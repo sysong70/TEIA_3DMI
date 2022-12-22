@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0"
+	xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<ItemDefinitionGroup>
+		<ClCompile>
+			<DisableSpecificWarnings>4819%(DisableSpecificWarnings)</DisableSpecificWarnings>
+			<TreatWarningAsError>false</TreatWarningAsError>
+		</ClCompile>
+		<ResourceCompile>
+		</ResourceCompile>
+	</ItemDefinitionGroup>
+
+	<PropertyGroup Label="UserMacros">
+		<TargetArchSuffix Condition="$(Platform.Contains('32')) Or $(Platform.Contains('86'))">32</TargetArchSuffix>
+		<TargetArchSuffix Condition="$(Platform.Contains('64'))">64</TargetArchSuffix>
+
+		<TargetConf Condition="$(Configuration.Contains('Debug'))">Debug</TargetConf>
+		<TargetConf Condition="$(Configuration.Contains('Release'))">Release</TargetConf>
+
+		<TargetProd>3DMI</TargetProd>
+
+		<!-- directories -->
+		<DmiRootDir>$(MSBuildThisFileDirectory)</DmiRootDir>
+
+		<DmiBuildDir Condition="'$(DmiBuildDir)'==''">$(DmiRootDir)Build</DmiBuildDir>
+
+		<!-- Stage directory -->
+		<DmiStageDir Condition="$(Configuration.Contains('Debug'))">$(DmiBuildDir)\$(TargetProd).Debug$(TargetArchSuffix)</DmiStageDir>
+		<DmiStageDir Condition="$(Configuration.Contains('Release'))">$(DmiBuildDir)\$(TargetProd).$(TargetArchSuffix)</DmiStageDir>
+
+		<!-- Output directory -->
+		<DmiOutDir>$(DmiBuildDir)\$(TargetProd).$(TargetConf)$(TargetArchSuffix)</DmiOutDir>
+
+		<!-- Intermediate files directory -->
+		<DmiIntDir>$(DmiOutDir)\Int\$(TargetProd)$(ProjectName).dir</DmiIntDir>
+
+		<!-- Symbols directory -->
+		<DmiSymbolsDir>$(DmiOutDir)\Symbols</DmiSymbolsDir>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<!-- HOOPS 3DF Header Include Path -->
+		<DevTools>..\3DF\Dev_Tools</DevTools>
+		<Dmi3dfInclude>$(DevTools)\hoops_3dgs\source;</Dmi3dfInclude>
+    <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\hoops_3dgs\source;</Dmi3dfInclude>
+    <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\hoops_hio\hio_dwf\hoops_dwf\source;</Dmi3dfInclude>
+    <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\hoops_hio\hio_exchange\source;</Dmi3dfInclude>
+    <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\hoops_mvo\source;</Dmi3dfInclude>
+    <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\hoops_mfc\source;</Dmi3dfInclude>
+    <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\hoops_stream\source;</Dmi3dfInclude>
+    <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\base_stream\source\stream_common;</Dmi3dfInclude>
+    <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\utility\source;</Dmi3dfInclude>
+    <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\hoops_ooc\source;</Dmi3dfInclude>
+
+    <!-- HOOPS 3DF Header Library Path -->
+    <Dmi3dfLibarayPath>$(DevTools)\hoops_3dgs\lib\nt_x64_v141;</Dmi3dfLibarayPath>
+    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\hoops_mvo\lib\nt_x64_v141;</Dmi3dfLibarayPath>
+    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\hoops_mfc\lib\nt_x64_v141;</Dmi3dfLibarayPath>
+    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\hoops_stream\lib\nt_x64_v141;</Dmi3dfLibarayPath>
+    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\utility\lib\nt_x64_v141;</Dmi3dfLibarayPath>
+    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\hoops_ooc\lib\nt_x64_v141;</Dmi3dfLibarayPath>
+
+    <DebFlg Condition="$(Configuration.Contains('Debug'))">d</DebFlg>
+    <DebFlg Condition="$(Configuration.Contains('Release'))"></DebFlg >
+
+    <Dmi3dfLibaray>vfw32.lib;</Dmi3dfLibaray>
+    <Dmi3dfLibaray>$(Dmi3dfLibaray)hoops_utilsstat$(DebFlg)_md.lib;</Dmi3dfLibaray>
+    <Dmi3dfLibaray>$(Dmi3dfLibaray)hoops_mvo_mgk$(DebFlg).lib;</Dmi3dfLibaray>
+    <Dmi3dfLibaray>$(Dmi3dfLibaray)hoops_mfcu_mgk_dinput$(DebFlg).lib;</Dmi3dfLibaray>
+    <Dmi3dfLibaray>$(Dmi3dfLibaray)hoops_stream$(DebFlg).lib;</Dmi3dfLibaray>
+    <Dmi3dfLibaray>$(Dmi3dfLibaray)hoops$(DebFlg).lib;</Dmi3dfLibaray>
+    <Dmi3dfLibaray>$(Dmi3dfLibaray)hoops_ooc$(DebFlg).lib;</Dmi3dfLibaray>
+  </PropertyGroup> 
+
+</Project>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="32px"
+	 height="32px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
+<g id="Background" display="none">
+	<rect x="-305.667" y="-142.333" display="inline" fill="#363636" width="540" height="407.333"/>
+</g>
+<g id="Layer_1">
+	<g>
+		
+			<radialGradient id="SVGID_1_" cx="-32.1484" cy="7.9795" r="8.1816" fx="-35.5102" fy="4.1062" gradientTransform="matrix(0.9333 0 0 0.9333 43.459 3.4621)" gradientUnits="userSpaceOnUse">
+			<stop  offset="0" style="stop-color:#DBEFF7"/>
+			<stop  offset="1" style="stop-color:#48677E"/>
+		</radialGradient>
+		<circle fill="url(#SVGID_1_)" cx="13.455" cy="10.909" r="7.636"/>
+		<g>
+			<g>
+				<polyline fill="none" stroke="#3B9ADC" stroke-width="2" stroke-linejoin="round" points="13.03,12.728 10.273,11.546 
+					8.579,14.021 				"/>
+				
+					<line fill="none" stroke="#3B9ADC" stroke-width="2" stroke-linejoin="round" stroke-dasharray="4.3249,2.1624" x1="7.358" y1="15.806" x2="4.305" y2="20.268"/>
+				<polyline fill="none" stroke="#3B9ADC" stroke-width="2" stroke-linejoin="round" points="3.694,21.16 2,23.636 4.555,25.208 
+									"/>
+				<polyline fill="none" stroke="#3B9ADC" stroke-width="2" stroke-linejoin="round" points="7.719,27.154 10.273,28.727 
+					12.828,27.154 				"/>
+				<polyline fill="none" stroke="#3B9ADC" stroke-width="2" stroke-linejoin="round" points="14.663,26.025 17.218,24.453 
+					22.364,27.455 24.955,25.943 				"/>
+				<polyline fill="none" stroke="#3B9ADC" stroke-width="2" stroke-linejoin="round" points="27.409,24.512 30,23 30,20 				"/>
+				<polyline fill="none" stroke="#3B9ADC" stroke-width="2" stroke-linejoin="round" points="30,16.455 30,13.455 27.154,12.506 
+									"/>
+				<polyline fill="none" stroke="#3B9ADC" stroke-width="2" stroke-linejoin="round" stroke-dasharray="7.4725,3.7362" points="
+					23.609,11.324 22.364,10.909 14.748,13.448 				"/>
+			</g>
+		</g>
+	</g>
+</g>
+</svg>

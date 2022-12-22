@@ -1,0 +1,101 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32901.215
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommandAnalyzer", "Library\DmiCommandAnalyzer\DmiCommandAnalyzer.vcxproj", "{7539DCD3-489E-493C-956F-445FB649078F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1B664A17-DD85-4E85-8546-3655FACA8825} = {1B664A17-DD85-4E85-8546-3655FACA8825}
+		{3F27ACA6-B691-493D-B5E7-92ED776B7906} = {3F27ACA6-B691-493D-B5E7-92ED776B7906}
+		{C20AEC1D-49A3-40EC-B0F0-4180FA14E421} = {C20AEC1D-49A3-40EC-B0F0-4180FA14E421}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "HpsInterface", "Library\DmiHpsInterface\DmiHpsInterface.vcxproj", "{B30055A4-E878-4BFD-8531-F6BFB229E831}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3dxInterface", "Library\Dmi3dxInterface\Dmi3dxInterface.vcxproj", "{C20AEC1D-49A3-40EC-B0F0-4180FA14E421}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3F27ACA6-B691-493D-B5E7-92ED776B7906} = {3F27ACA6-B691-493D-B5E7-92ED776B7906}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "C3dInterface", "Library\DmiC3dInterface\DmiC3dInterface.vcxproj", "{1B664A17-DD85-4E85-8546-3655FACA8825}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E2BB3C51-BA99-4024-A2E0-589883FD819C}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		DmiCpp.props = DmiCpp.props
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3DMI", "UiMain\DMI.vcxproj", "{A10F3C61-D7D8-44F2-B385-603AAF6319B4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1B664A17-DD85-4E85-8546-3655FACA8825} = {1B664A17-DD85-4E85-8546-3655FACA8825}
+		{7539DCD3-489E-493C-956F-445FB649078F} = {7539DCD3-489E-493C-956F-445FB649078F}
+		{B30055A4-E878-4BFD-8531-F6BFB229E831} = {B30055A4-E878-4BFD-8531-F6BFB229E831}
+		{C20AEC1D-49A3-40EC-B0F0-4180FA14E421} = {C20AEC1D-49A3-40EC-B0F0-4180FA14E421}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "3dfInterface", "Library\Dmi3dfInterface\Dmi3dfInterface.vcxproj", "{3F27ACA6-B691-493D-B5E7-92ED776B7906}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7539DCD3-489E-493C-956F-445FB649078F}.Debug|x64.ActiveCfg = Debug|x64
+		{7539DCD3-489E-493C-956F-445FB649078F}.Debug|x64.Build.0 = Debug|x64
+		{7539DCD3-489E-493C-956F-445FB649078F}.Debug|x86.ActiveCfg = Debug|Win32
+		{7539DCD3-489E-493C-956F-445FB649078F}.Debug|x86.Build.0 = Debug|Win32
+		{7539DCD3-489E-493C-956F-445FB649078F}.Release|x64.ActiveCfg = Release|x64
+		{7539DCD3-489E-493C-956F-445FB649078F}.Release|x64.Build.0 = Release|x64
+		{7539DCD3-489E-493C-956F-445FB649078F}.Release|x86.ActiveCfg = Release|Win32
+		{7539DCD3-489E-493C-956F-445FB649078F}.Release|x86.Build.0 = Release|Win32
+		{B30055A4-E878-4BFD-8531-F6BFB229E831}.Debug|x64.ActiveCfg = Debug|x64
+		{B30055A4-E878-4BFD-8531-F6BFB229E831}.Debug|x64.Build.0 = Debug|x64
+		{B30055A4-E878-4BFD-8531-F6BFB229E831}.Debug|x86.ActiveCfg = Debug|Win32
+		{B30055A4-E878-4BFD-8531-F6BFB229E831}.Debug|x86.Build.0 = Debug|Win32
+		{B30055A4-E878-4BFD-8531-F6BFB229E831}.Release|x64.ActiveCfg = Release|x64
+		{B30055A4-E878-4BFD-8531-F6BFB229E831}.Release|x64.Build.0 = Release|x64
+		{B30055A4-E878-4BFD-8531-F6BFB229E831}.Release|x86.ActiveCfg = Release|Win32
+		{B30055A4-E878-4BFD-8531-F6BFB229E831}.Release|x86.Build.0 = Release|Win32
+		{C20AEC1D-49A3-40EC-B0F0-4180FA14E421}.Debug|x64.ActiveCfg = Debug|x64
+		{C20AEC1D-49A3-40EC-B0F0-4180FA14E421}.Debug|x64.Build.0 = Debug|x64
+		{C20AEC1D-49A3-40EC-B0F0-4180FA14E421}.Debug|x86.ActiveCfg = Debug|Win32
+		{C20AEC1D-49A3-40EC-B0F0-4180FA14E421}.Debug|x86.Build.0 = Debug|Win32
+		{C20AEC1D-49A3-40EC-B0F0-4180FA14E421}.Release|x64.ActiveCfg = Release|x64
+		{C20AEC1D-49A3-40EC-B0F0-4180FA14E421}.Release|x64.Build.0 = Release|x64
+		{C20AEC1D-49A3-40EC-B0F0-4180FA14E421}.Release|x86.ActiveCfg = Release|Win32
+		{C20AEC1D-49A3-40EC-B0F0-4180FA14E421}.Release|x86.Build.0 = Release|Win32
+		{1B664A17-DD85-4E85-8546-3655FACA8825}.Debug|x64.ActiveCfg = Debug|x64
+		{1B664A17-DD85-4E85-8546-3655FACA8825}.Debug|x64.Build.0 = Debug|x64
+		{1B664A17-DD85-4E85-8546-3655FACA8825}.Debug|x86.ActiveCfg = Debug|Win32
+		{1B664A17-DD85-4E85-8546-3655FACA8825}.Debug|x86.Build.0 = Debug|Win32
+		{1B664A17-DD85-4E85-8546-3655FACA8825}.Release|x64.ActiveCfg = Release|x64
+		{1B664A17-DD85-4E85-8546-3655FACA8825}.Release|x64.Build.0 = Release|x64
+		{1B664A17-DD85-4E85-8546-3655FACA8825}.Release|x86.ActiveCfg = Release|Win32
+		{1B664A17-DD85-4E85-8546-3655FACA8825}.Release|x86.Build.0 = Release|Win32
+		{A10F3C61-D7D8-44F2-B385-603AAF6319B4}.Debug|x64.ActiveCfg = Debug|x64
+		{A10F3C61-D7D8-44F2-B385-603AAF6319B4}.Debug|x64.Build.0 = Debug|x64
+		{A10F3C61-D7D8-44F2-B385-603AAF6319B4}.Debug|x86.ActiveCfg = Debug|Win32
+		{A10F3C61-D7D8-44F2-B385-603AAF6319B4}.Debug|x86.Build.0 = Debug|Win32
+		{A10F3C61-D7D8-44F2-B385-603AAF6319B4}.Release|x64.ActiveCfg = Release|x64
+		{A10F3C61-D7D8-44F2-B385-603AAF6319B4}.Release|x64.Build.0 = Release|x64
+		{A10F3C61-D7D8-44F2-B385-603AAF6319B4}.Release|x86.ActiveCfg = Release|Win32
+		{A10F3C61-D7D8-44F2-B385-603AAF6319B4}.Release|x86.Build.0 = Release|Win32
+		{3F27ACA6-B691-493D-B5E7-92ED776B7906}.Debug|x64.ActiveCfg = Debug|x64
+		{3F27ACA6-B691-493D-B5E7-92ED776B7906}.Debug|x64.Build.0 = Debug|x64
+		{3F27ACA6-B691-493D-B5E7-92ED776B7906}.Debug|x86.ActiveCfg = Debug|x64
+		{3F27ACA6-B691-493D-B5E7-92ED776B7906}.Debug|x86.Build.0 = Debug|x64
+		{3F27ACA6-B691-493D-B5E7-92ED776B7906}.Release|x64.ActiveCfg = Release|x64
+		{3F27ACA6-B691-493D-B5E7-92ED776B7906}.Release|x64.Build.0 = Release|x64
+		{3F27ACA6-B691-493D-B5E7-92ED776B7906}.Release|x86.ActiveCfg = Release|x64
+		{3F27ACA6-B691-493D-B5E7-92ED776B7906}.Release|x86.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {ED438C8A-7B61-4CCA-80EE-E047D66B5CDA}
+	EndGlobalSection
+EndGlobal

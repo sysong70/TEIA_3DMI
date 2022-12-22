@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="32px"
+	 height="32px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
+<g id="Background" display="none">
+	<rect x="-172" y="-31" display="inline" fill="#363636" width="500" height="97"/>
+</g>
+<g id="Layer_1">
+	<g>
+		<polygon fill="#549DD7" points="29,29 3,29 3,3 27.407,3 29,4.592 		"/>
+		<g>
+			<rect x="6" y="14" fill="#F2F2F2" width="20" height="15"/>
+			<path fill="#F2F2F2" d="M9,3v8h14V3H9z M22,10h-3V4h3V10z"/>
+		</g>
+		<g>
+			<line fill="#0066B4" stroke="#0066B4" stroke-width="2" stroke-miterlimit="10" x1="9" y1="19" x2="23" y2="19"/>
+			<line fill="#0066B4" stroke="#0066B4" stroke-width="2" stroke-miterlimit="10" x1="9" y1="22" x2="23" y2="22"/>
+			<line fill="#0066B4" stroke="#0066B4" stroke-width="2" stroke-miterlimit="10" x1="9" y1="25" x2="23" y2="25"/>
+		</g>
+	</g>
+</g>
+</svg>

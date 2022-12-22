@@ -1,0 +1,114 @@
+{
+"Debug":{
+	"Dialog":"FileOpenOption"
+},
+
+"Dialog":{
+	"Progress":{
+		"title":"Open File|파일 열기",
+		"size":{"cx":400, "cy":300},
+		"body":{
+			"Indicator":{"cx":24, "cy": 24},
+			"Message":{"title":"Ready...|준비..."},
+			"Log":{}
+		}
+	},
+
+	"FileOpen":{
+		"title":"Open File|파일 열기",
+		"filter":[
+			"All types (*.*)|*.*|",
+			"3D XML (*.3dxml)|*.3dxml|",
+			"ACIS (*.sat, *.sab)|*.sat;*.sab|",
+			"Alias Wavefront (*.obj)|*.obj|",
+			"AutoCAD (*.dwg, *.dxf)|*.dwg;*.dxf|",
+			"CATIA V4 (*.model, *.exp, *.session, *.dlv)|*.model;*.exp;*.session;*.dlv|",
+			"CATPart (*.catpart)|*.catpart|",
+			"CATProduct (*.catproduct)|*.catproduct|",
+			"CATShape (*.catshape)|*.catshape|",
+			"CGR (*.cgr)|*.cgr|",
+			"Computer Graphics Meta (*.cgm)|*.cgm|",
+			"HOOPS Stream (*.hsf)|*.hsf|",
+			"I-deas (*.mf1, *.arc, *.unv, *.pkg)|*.mf1;*.arc;*.unv;*.pkg|",
+			"IGES (*.igs, *.iges)|*.igs;*.iges|",
+			"Industry Foundation Classes (*.ifc, *.ifczip)|*.ifc;*.ifczip|",
+			"Inventor (*.ipt, *.iam)|*.ipt;*.iam|",
+			"JT (*.jt)|*.jt|",
+			"Parasolid (*.x_t, *.x_b, *.xmt, *.xmt_txt)|*.x_t;*.x_b;*.xmt;*.xmt_txt|",
+			"PDF (*.pdf)|*.pdf|",
+			"PLY (*.ply)|*.ply|",
+			"Point Cloud (*.pts, *.ptx, *.xyz)|*.pts;*.ptx;*.xyz|",
+			"PRC (*.prc)|*.prc|",
+			"Pro/ENGINEER (*.asm, *.neu, *.prt, *.xas, *.xpr)|*.asm;*.neu;*.prt;*.xas;*.xpr|",
+			"Revit (*.rvt, *.rfa)|*.rvt;*.rfa|",
+			"Rhino (*.3dm)|*.3dm|",
+			"SolidEdge (*.asm, *.par, *.pwd, *.psm)|*.asm;*.par;*.pwd;*.psm|",
+			"Solidworks (*.sldasm, *.sldprt)|*.sldasm;*.sldprt|",
+			"STEP (*.step, *.stp, *.stpz, *.stp.z)|*.step;*.stp;*.stpz;*.stp.z|",
+			"STL (*.stl)|*.stl|",
+			"Uinversal3D (*.u3d)|*.u3d|",
+			"Unigraphics (*.prt)|*.prt|",
+			"VDA (*.vda)|*.vda|",
+			"VRML (*.wrl, *.vrml)|*.wrl;*.vrml|",
+			"|"
+		]
+	},
+		
+	"FileOpenOption":{
+		"title":"Options|옵션",
+		"properties":[
+			{"type":"group", "name":"GENERAL", "title":"General", "list":[
+				{"type":"combo", "name":"ReadingMode", "title":"Reading Mode|_#_", "desc":"_#_|_#_", "value":0, "list":[
+					"Feature Trees|_#_",
+					"B-Rep|_#_",
+					"Tessellation Only|_#_"
+				]},
+				{"type":"check", "name":"Solids", "title":"Solid|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"Surfaces", "title":"Surfaces|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"Wireframes", "title":"Wireframes|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"Attributes", "title":"Attributes|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"HiddenObjects", "title":"Hidden Objects|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"References", "title":"Construction and References|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"ActiveFilter", "title":"Active Filter|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"SewModel", "title":"Sew Model|_#_", "desc":"_#_|_#_"},
+				{"type":"edit", "name":"SewingTolerance", "title":"Sewing Tolerance|_#_", "desc":"_#_|_#_", "value":"0.001"},
+				{"type":"check", "name":"ShellOrientation", "title":"Compute Non-Solid Shell Orientation|_#_", "desc":"_#_|_#_"},
+				{"type":"combo", "name":"LoadingMode", "title":"Loading Mode|_#_", "desc":"_#_|_#_", "value":0, "list":[
+					"Complete|_#_",
+					"Incremental|_#_"
+				]}
+			]},
+			{"type":"group", "name":"TESSELLATION", "title":"Tessellation", "list":[
+				{"type":"combo", "name":"TessLevel", "title":"Predefined Tessellation Level|_#_", "value":2, "list":[
+					"Extra Low|_#_",
+					"Low|_#_",
+					"Medium|_#_",
+					"High|_#_",
+					"Extra High|_#_",
+					"Custom|_#_"
+				]},
+				{"type":"group", "name":"CUSTOMTESS", "title":"Custom Tessellation Level", "list":[
+					{"type":"combo", "name":"ChordLimitType", "title":"Chord Limit|_#_", "desc":"_#_|_#_", "value":1, "list":[
+						"Ratio|_#_",
+						"Height|_#_"
+					]},
+					{"type":"edit", "name":"ChordLimit", "title":"Limit|_#_", "desc":"_#_|_#_", "value":10000},
+					{"type":"edit", "name":"AngleTolerance", "title":"Angle Tolerance|_#_", "desc":"_#_|_#_", "value":40}
+				]},
+				{"type":"check", "name":"PreserveUV", "title":"Preserve UV Points|_#_", "desc":"_#_|_#_"},
+				{"type":"edit", "name":"MaxEdgeLength", "title":"Maximum Edge Length|_#_", "desc":"_#_|_#_", "value":"0"},
+				{"type":"group", "name":"Accurate", "title":"Accurate Tessellation|_#_", "list":[
+					{"type":"check", "name":"AccurateTess", "title":"Accurate Tessellation|_#_", "desc":"_#_|_#_"},
+					{"type":"check", "name":"GridAlignedTess", "title":"Grid Aligned Tessellation|_#_", "desc":"_#_|_#_"},
+					{"type":"edit", "name":"MaxStitchLength", "title":"Maximum Stitch Length|_#_", "value":"0.001", "desc":"_#_|_#_"},
+					{"type":"check", "name":"SurfaceCurvatures", "title":"Adapt to Surface Curvatures|_#_", "desc":"_#_|_#_"}
+				]}
+			]}
+		],
+		"commands":{
+			"ResetDefaults":{"type":"button", "title":"Reset Defaults|_#_"},
+			"SetToDefaults":{"type":"button", "title":"Set to Defaults|_#_"}
+		}
+	}
+}
+}

@@ -1,0 +1,356 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="OutputBar.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertiesViewBar.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="WorkSpaceBar.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="WorkSpaceBar2.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Message.Broker.cpp">
+      <Filter>Message</Filter>
+    </ClCompile>
+    <ClCompile Include="Message.cpp">
+      <Filter>Message</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.ModelTree.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.PropertyBar.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.RibbonBar.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.StatusBar.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Data.AppResources.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Data.AppSettings.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Data.Base.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Data.FileOption.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Data.Preference.cpp">
+      <Filter>Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.ExchangeProgress.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.FileOpenOption.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.PropertyList.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.Standard.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.Base.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.Application.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.ChildFrame.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.Document.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.MainFrame.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.View.cpp">
+      <Filter>Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.Index.cpp">
+      <Filter>Command</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\Common\Json.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\Common\Str.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\Common\Common.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\Common\Path.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\Common\WStr.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="OutputBar.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertiesViewBar.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="WorkSpaceBar.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="WorkSpaceBar2.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="DynamicLinkLibraryLoader.h">
+      <Filter>Message</Filter>
+    </ClInclude>
+    <ClInclude Include="Message.Broker.h">
+      <Filter>Message</Filter>
+    </ClInclude>
+    <ClInclude Include="Message.h">
+      <Filter>Message</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.ModelTree.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.PropertyBar.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.RibbonBar.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.StatusBar.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Data.AppResources.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Data.AppSettings.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Data.Base.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Data.FileOption.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Data.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Data.Preference.h">
+      <Filter>Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.Base.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.ExchangeProgress.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.FileOpenOption.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.PropertyList.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.Standard.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.Application.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.ChildFrame.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.Document.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.MainFrame.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.View.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.h">
+      <Filter>Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.2dDef.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.3dDef.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.Common.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.Index.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\Common\Common.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\Common\Json.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\Common\Str.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\Common\Path.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\Common\WStr.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="res\BCGSoft_ribbon\ribbon.xml" />
+    <Xml Include="TODO.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\DMI.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\DMIDoc.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\Toolbar.bmp">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="res\RibbonDisplayOptions.ico">
+      <Filter>리소스 파일</Filter>
+    </Image>
+    <Image Include="RES\palette_zoom.png">
+      <Filter>Resource</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\DMI.toolbar.rc2">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\DMI.ribbon.rc2">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\ribbondisplayoptions.svg">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\ribbonfilelarge.svg">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\Workspace.svg">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\Toolbar.svg">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\ribbon_bar.svg">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\main.svg">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\category_large_0.svg">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\category_backstage_small.svg">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="DMI.vcxproj.user" />
+    <None Include="RES\category_visualize_large.svg">
+      <Filter>리소스 파일</Filter>
+    </None>
+    <None Include="RES\category_main_large.svg">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="RES\category_main_small.svg">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\category_small_0.svg">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="res\DMI.rc2">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="RES\UI.json">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="RES\FileOptions.json">
+      <Filter>Resource</Filter>
+    </None>
+    <None Include="RES\Ribbon.json">
+      <Filter>Resource</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{32d6b818-a630-4599-bde2-c012536215cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Command">
+      <UniqueIdentifier>{fa93dbae-1ca6-432b-8dea-6942ddbb0ea1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component">
+      <UniqueIdentifier>{ab01829f-a84a-44d3-99e1-ebf2d574c98f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{abe429c7-b8c5-4c3a-a6c0-4011f5223583}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialog">
+      <UniqueIdentifier>{68f7f893-f23f-4f50-b913-008354ea1609}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Message">
+      <UniqueIdentifier>{400793f1-06e2-4488-b10e-d930e1a5ae86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Windows">
+      <UniqueIdentifier>{56b81b42-d8d0-4d77-9037-8cdf52e027b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{94726c7a-4f7c-47e1-aa59-979c7a18e695}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DMI.rc">
+      <Filter>리소스 파일</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

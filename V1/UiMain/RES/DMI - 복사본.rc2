@@ -1,0 +1,13 @@
+IDF_JSON_UI                                       TEXT      "res/UI.json"
+IDF_JSON_FILE_OPTIONS                             TEXT      "res/FileOptions.json"
+IDB_RIBBON_MAIN                                   PNG       "res/ribbon_main.png"
+IDB_RIBBON_PANEL                                  SVG       "res/ribbon_panel.svg"
+
+IDB_CATEGORY_MAIN_LARGE                           SVG       "res/category_main_large.svg"
+IDB_CATEGORY_MAIN_SMALL                           SVG       "res/category_main_small.svg"
+IDB_CATEOGRY_VISUALIZE_LARGE                      SVG       "res/category_visualize_large.svg"
+
+IDB_PALETTE_ZOOM                                  PNG       "res/palette_zoom.png"
+IDB_PALETTE_BUILTIN_VIEW                          PNG       "res/palette_builtin_view.png"
+IDB_PALETTE_ROTATE                                PNG       "res/palette_rotate.png"
+IDB_PALETTE_RENDER                                PNG       "res/palette_render.png"

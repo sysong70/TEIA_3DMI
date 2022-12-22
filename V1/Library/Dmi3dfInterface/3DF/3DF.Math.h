@@ -1,0 +1,410 @@
+﻿#pragma once
+
+#include "3DF.h"
+
+/*
+#ifndef MVO_API
+#	ifdef _3DF_EXPORT
+#		define MVO_API __declspec (dllexport)
+#	else
+#		define MVO_API __declspec (dllimport)
+#	endif
+#endif
+
+#include <HGlobals.h>
+*/
+
+#ifdef max
+#	undef max
+#	include <boost/pool/pool_alloc.hpp>
+#	define max(a,b) (((a) > (b)) ? (a) : (b))
+#else
+#	include <boost / pool / pool_alloc.hpp>
+#endif
+
+template <typename T> _3DF_INLINE T Abs(T const & a) { return a < 0 ? -a : a; }
+
+OPEN_3DF_NAMESPACE
+
+/// The Float class is a concept class that exposes a number of useful utilities for working with floating point numbers.
+class API_3DF Float
+{
+private:
+	enum Parts
+	{
+# if HOOPS_BIGENDIAN
+		High, Low
+# else
+		Low, High
+# endif
+	};
+
+	// & functions for a float represented in an int, * version for a double in an array of 2 ints
+	static _3DF_INLINE bool is_infinite(int32_t const & v) { return (v & 0x7FFFFFFF) == 0x7F800000; }
+	static _3DF_INLINE bool is_infinite(uint32_t const & v) { return (v & 0x7FFFFFFF) == 0x7F800000; }
+	static _3DF_INLINE bool is_infinite(int32_t const * v) { return (v[High] & 0x7FFFFFFF) == 0x7FF00000 && v[Low] == 0; }
+	static _3DF_INLINE bool is_infinite(uint32_t const * v) { return (v[High] & 0x7FFFFFFF) == 0x7FF00000 && v[Low] == 0; }
+
+	static _3DF_INLINE bool is_nan(int32_t const & v) {
+		uint32_t exp = v & 0x7F800000, mantissa = v & 0x007FFFFF;
+		return exp == 0x7F800000 && mantissa != 0;
+	}
+	static _3DF_INLINE bool is_nan(uint32_t const & v) {
+		uint32_t exp = v & 0x7F800000, mantissa = v & 0x007FFFFF;
+		return exp == 0x7F800000 && mantissa != 0;
+	}
+	static _3DF_INLINE bool is_nan(int32_t const * v) {
+		uint32_t exp = v[High] & 0x7FF00000, mantissa_high = v[High] & 0x000FFFFF;
+		return exp == 0x7FF00000 && (mantissa_high | v[Low]) != 0;
+	}
+	static _3DF_INLINE bool is_nan(uint32_t const * v) {
+		uint32_t exp = v[High] & 0x7FF00000, mantissa_high = v[High] & 0x000FFFFF;
+		return exp == 0x7FF00000 && (mantissa_high | v[Low]) != 0;
+	}
+
+	static _3DF_INLINE bool is_special(int32_t const & v) { return (v & 0x7F800000) == 0x7F800000; }
+	static _3DF_INLINE bool is_special(uint32_t const & v) { return (v & 0x7F800000) == 0x7F800000; }
+	static _3DF_INLINE bool is_special(int32_t const * v) { return (v[High] & 0x7FF00000) == 0x7FF00000; }
+	static _3DF_INLINE bool is_special(uint32_t const * v) { return (v[High] & 0x7FF00000) == 0x7FF00000; }
+public:
+
+	/*! The 32-bit float representation of infinity. */
+	static const float Infinity;
+	/*! The 32-bit float representation of negative infinity. */
+	static const float NegativeInfinity;
+
+	/*! See if the value is either infinity */
+	static _3DF_INLINE bool IsInfinite(float const & a) { return is_infinite(extract_uint32_t(a)); }
+	static _3DF_INLINE bool IsInfinite(double const & a) {
+		uint32_t v[2];
+		memcpy(v, &a, sizeof(double));
+		return is_infinite(v);
+	}
+
+	/*! See if the value is Not-A-Number */
+	static _3DF_INLINE bool IsNAN(float const & a) { return is_nan(extract_uint32_t(a)); }
+	static _3DF_INLINE bool IsNAN(double const & a) {
+		uint32_t v[2];
+		memcpy(v, &a, sizeof(double));
+		return is_nan(v);
+	}
+
+	/*! See if the value is not "normal" (infinite or NaN) */
+	static _3DF_INLINE bool IsAbnormal(float const & a) { return is_special(extract_uint32_t(a)); }
+	static _3DF_INLINE bool IsAbnormal(double const & a) {
+		uint32_t v[2];
+		memcpy(v, &a, sizeof(double));
+		return is_special(v);
+	}
+
+	// Checks two floats for equality within a specified tolerance.
+	// The tolerance is specified in float increments that scale with the floats themselves.
+	static _3DF_INLINE bool Equals(float const & a, float const & b, int tolerance = 32);
+	static _3DF_INLINE bool Equals(double const & a, double const & b, int tolerance = 32);
+
+	template <typename Alloc>
+	static _3DF_INLINE bool Equals(std::vector<float, Alloc> const & a, std::vector<float, Alloc> const & b, int tolerance = 32)
+	{
+		if(a.size() != b.size())
+			return false;
+
+		auto it1 = a.begin();
+		auto it2 = b.begin();
+		auto const end = a.end();
+		for(; it1 != end; ++it1, ++it2)
+		{
+			if(!Equals(*it1, *it2, tolerance))
+				return false;
+		}
+		return true;
+	}
+
+	static _3DF_INLINE uint32_t extract_sign_bit(float const & a) {
+		return extract_uint32_t(a) & 0x80000000;
+	}
+	static _3DF_INLINE uint32_t extract_sign_bit(double const & a) {
+		uint32_t v[2];
+		memcpy(v, &a, sizeof(double));
+		return v[High] & 0x80000000;
+	}
+
+	static _3DF_INLINE void apply_sign_bit(float & a, uint32_t const & sign_bit) {
+		uint32_t v = extract_uint32_t(a);
+		v &= 0x7FFFFFFF;
+		v |= sign_bit;
+		inject_uint32_t(a, v);
+	}
+	static _3DF_INLINE void apply_sign_bit(double & a, uint32_t const & sign_bit) {
+		uint32_t v[2];
+		memcpy(v, &a, sizeof(double));
+		v[High] &= 0x7FFFFFFF;
+		v[High] |= sign_bit;
+		memcpy(&a, v, sizeof(double));
+	}
+
+
+	static _3DF_INLINE unsigned char unit_to_byte(float const & a) {
+		uint32_t v = extract_uint32_t(a);
+
+		v &= 0x7FFFFFFF;
+		if(v < 0x3B800000)
+			return 0;
+
+		v--;
+
+		uint32_t exp = v >> 23;
+		uint32_t man = (v & 0x007FFFFF) | 0x00800000;
+
+		return (unsigned char) (man >> (16 + 126 - exp));
+	}
+
+	static _3DF_INLINE unsigned char unit_to_byte_scaled(float const & a, unsigned char mix) {
+		uint32_t v = extract_uint32_t(a);
+
+		v &= 0x7FFFFFFF;
+		if(v < 0x3B800000)
+			return 0;
+
+		v--;
+
+		uint32_t exp = v >> 23;
+		uint32_t man = (v & 0x007FFFFF) | 0x00800000;
+
+		uint32_t x = (man >> (16 + 126 - exp));
+
+		return (unsigned char) ((x * (mix + 1)) >> 8);
+	}
+
+
+	static _3DF_INLINE bool match(float const & a, float const & b) {
+		uint32_t va = extract_uint32_t(a);
+		uint32_t vb = extract_uint32_t(b);
+
+		if(((va | vb) & 0x7FFFFFFF) == 0)
+			return true;
+
+		return va == vb;
+	}
+	static _3DF_INLINE bool match(double const & a, double const & b) {
+		return a == b;
+	}
+
+
+	static _3DF_INLINE void replace_if_smaller(float & a, float const & b) {
+		if(b < a)
+			a = b;
+	}
+	static _3DF_INLINE void replace_if_smaller(double & a, double const & b) {
+		if(b < a)
+			a = b;
+	}
+
+	static _3DF_INLINE void replace_if_larger(float & a, float const & b) {
+		if(b > a)
+			a = b;
+	}
+	static _3DF_INLINE void replace_if_larger(double & a, double const & b) {
+		if(b > a)
+			a = b;
+	}
+
+
+	static _3DF_INLINE uint32_t extract_uint32_t(float const & a) {
+		uint32_t i;
+		memcpy(&i, &a, sizeof(float));
+		return i;
+	}
+
+	static _3DF_INLINE void inject_uint32_t(float & a, uint32_t const & i) {
+		memcpy(&a, &i, sizeof(float));
+	}
+
+ 	static _3DF_INLINE float C2F(unsigned char x) {
+ 		return (float)x * (1.0f/255.0f);
+ 	}
+
+	// SSE convenience functions
+	static _3DF_INLINE void pack_4(float const & f, float * m) {
+		memcpy(&m[0], &f, sizeof(float));
+		memcpy(&m[1], &f, sizeof(float));
+		memcpy(&m[2], &f, sizeof(float));
+		memcpy(&m[3], &f, sizeof(float));
+	}
+
+	static _3DF_INLINE void pack_4(float const & f0, float const & f1, float const & f2, float const & f3, float * m) {
+		memcpy(&m[0], &f0, sizeof(float));
+		memcpy(&m[1], &f1, sizeof(float));
+		memcpy(&m[2], &f2, sizeof(float));
+		memcpy(&m[3], &f3, sizeof(float));
+	}
+
+	static _3DF_INLINE void unpack_4(float * f0, float const * const m) {
+		memcpy(f0, m, sizeof(float) * 4);
+	}
+
+	static _3DF_INLINE void unpack_4(float & f0, float & f1, float & f2, float & f3, float const * const m) {
+		memcpy(&f0, &m[0], sizeof(float));
+		memcpy(&f1, &m[1], sizeof(float));
+		memcpy(&f2, &m[2], sizeof(float));
+		memcpy(&f3, &m[3], sizeof(float));
+	}
+
+private:
+
+	Float();
+};
+
+_3DF_INLINE bool Float::Equals(float const & a, float const & b, int tolerance) {
+	int32_t va = Float::extract_uint32_t(a);
+	int32_t vb = Float::extract_uint32_t(b);
+
+	if(is_special(va) || is_special(vb)) {
+		if(is_infinite(va) || is_infinite(vb))
+			return va == vb;  // final check is for sign bits same
+		if(is_nan(va) || is_nan(vb))
+			return false;
+	}
+
+	int const close_to_zero = 0x36A00000; // (approx) 5.0e-6f;
+	if((va & 0x7FFFFFFF) == 0)
+		return (vb & 0x7FFFFFFF) < close_to_zero;
+	else if((vb & 0x7FFFFFFF) == 0)
+		return (va & 0x7FFFFFFF) < close_to_zero;
+
+	uint32_t sign_mask = va ^ vb;
+	(int32_t &) sign_mask >>= 31;
+
+	int32_t diff = ((va + sign_mask) ^ (sign_mask & 0x7FFFFFFF)) - vb;
+	int32_t v1 = tolerance + diff;
+	int32_t v2 = tolerance - diff;
+	return (v1 | v2) >= 0;
+}
+
+_3DF_INLINE bool Float::Equals(double const & a, double const & b, int tolerance) {
+	int32_t va[2], vb[2];
+	memcpy(va, &a, sizeof(double));
+	memcpy(vb, &b, sizeof(double));
+
+	if(is_special(va) || is_special(vb)) {
+		if(is_infinite(va) || is_infinite(vb))
+			return va[High] == vb[High] && va[Low] == vb[Low]; // final check is for sign bits same
+		if(is_nan(va) || is_nan(vb))
+			return false;
+	}
+
+	if((va[High] == 0 && va[Low] == 0) || (vb[High] == 0 && vb[Low] == 0))
+		return Abs(a - b) < 0.000000000000005;
+
+	if(extract_sign_bit(a) != extract_sign_bit(b))
+		return a == b; //-V550
+
+	if(va[High] != vb[High])
+		return false;
+
+	return Abs(va[Low] - vb[Low]) <= tolerance;
+}
+
+template <typename F> class Vector_3D;
+
+template<class T>
+class CBoostPool
+{
+public:
+	void * operator new(size_t _size)
+	{
+		return m_bpool.malloc();
+	}
+	void operator delete(void * _p)
+	{
+		m_bpool.free(_p);
+	}
+protected:
+	static boost::pool<> m_bpool;
+};
+template<class T>
+boost::pool<> CBoostPool<T>::m_bpool(sizeof(T));
+
+/*
+class Point3D // : public CBoostPool<Point3D>
+{
+public:
+	float x;
+	float y;
+	float z;
+
+	void Set(float X, float Y, float Z) { x = X; y = Y; z = Z; };
+};
+
+class Vector3D : public CBoostPool<Vector3D>
+{
+public:
+	float x;
+	float y;
+	float z;
+
+	void Set(float X, float Y, float Z) { x = X; y = Y; z = Z; };
+};
+*/
+
+template <typename F>
+class Point_3D
+{
+public:
+	F x;
+	F y;
+	F z;
+
+	Point_3D() {}
+	Point_3D(F v1, F v2, F v3) : x(v1), y(v2), z(v3) {}
+
+	template <typename D>
+	explicit Point_3D(Point_3D<D> const & that) : x((F) that.x), y((F) that.y), z((F) that.z) {}
+
+	explicit Point_3D(Vector_3D<F> const & v);
+
+	void Set(F X, F Y, F Z) { x = X; y = Y; z = Z; };
+};
+
+using Point = Point_3D<float>;
+
+template <typename F>
+class Vector_3D
+{
+public:
+	F x;
+	F y;
+	F z;
+
+	Vector_3D() {}
+	Vector_3D(F v1, F v2, F v3) : x(v1), y(v2), z(v3) {}
+	template <typename D>
+	explicit Vector_3D(Vector_3D<D> const & that) : x((F) that.x), y((F) that.y), z((F) that.z) {}
+	explicit Vector_3D(Point_3D<F> const & p) : x(p.x), y(p.y), z(p.z) {}
+
+	void Set(F X, F Y, F Z) { x = X; y = Y; z = Z; };
+};
+
+using Vector = Vector_3D<float>;
+
+// using IntArray = std::vector<int>;
+// using PointArray = std::vector<HPoint>;
+// using VectorArray = std::vector<Vector>;
+
+using IntArray = std::vector<int, boost::pool_allocator<int>>;
+using PointArray = std::vector<Point, boost::pool_allocator<Point>>;
+using VectorArray = std::vector<Vector, boost::pool_allocator<Vector>>;
+
+// template <typename F>
+// _3DF_INLINE	Point_3D<F>::Point_3D(Vector_3D<F> const & v) : x(v.x), y(v.y), z(v.z) {}
+
+
+class API_3DF MatrixKit
+{
+public:
+	float m_fData[16];
+
+	MatrixKit();
+	MatrixKit(float const fInMatrixSource[]);
+};
+
+CLOSE_3DF_NAMESPACE

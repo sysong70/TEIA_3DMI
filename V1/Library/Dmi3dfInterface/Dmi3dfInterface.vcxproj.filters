@@ -1,0 +1,267 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{f5d3ee21-81e6-4212-8bfc-bb1ad88e9e34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Operator">
+      <UniqueIdentifier>{61aa0c71-e84b-416a-9212-854e50ce448f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Common">
+      <UniqueIdentifier>{98914b14-1839-4099-8895-9a64c9be6b92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Signal">
+      <UniqueIdentifier>{66db3189-f20d-45d6-b0c1-f4310086a5db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3DF">
+      <UniqueIdentifier>{5a713acd-f001-4ee5-9a5b-3386472f4165}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3DF\Base">
+      <UniqueIdentifier>{93a88395-ea70-4807-b99a-a9c1d6b0f6d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3DF\Control">
+      <UniqueIdentifier>{39a8d4b3-e1e2-4397-9863-2ab00624e3bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Import">
+      <UniqueIdentifier>{24a38bfd-32e2-42dc-b512-c2de10707db1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dmi3dxInterface\LogManager.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Common_Define.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Fio.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Json.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Path.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\WStr.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Signal\Signal.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Signal\SignalBase.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Signal\WorkerThread.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="3DFSignal.Manager.h">
+      <Filter>Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="3DFSignal.ApplicationManager.h">
+      <Filter>Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="3DFSignal.ViewManager.h">
+      <Filter>Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.View.h">
+      <Filter>3DF\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Model.h">
+      <Filter>3DF\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Segment.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Selection.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+    <ClInclude Include="3DFSignal.h">
+      <Filter>Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="3DFSignal.Interface.h">
+      <Filter>Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Selectability.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Import\DLL.Helper.h">
+      <Filter>Import</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+    <ClInclude Include="Import\DLL.3DF.Interface.h">
+      <Filter>Import</Filter>
+    </ClInclude>
+    <ClInclude Include="Import\DLL.h">
+      <Filter>Import</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.MaterialMappingControl.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Material.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Math.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Color.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.ShellKey.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Key.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.IncludeKey.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.View.OpCameraPan.h">
+      <Filter>Operator</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Database.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Portfolio.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Style.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Control.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Bounding.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Line.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Dmi3dxInterface\LogManager.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Common_Define.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Fio.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Json.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Path.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\WStr.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Signal\Signal.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Signal\SignalBase.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Signal\WorkerThread.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="3DFSignal.Manager.cpp">
+      <Filter>Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="3DFSignal.ApplicationManager.cpp">
+      <Filter>Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="3DFSignal.ViewManager.cpp">
+      <Filter>Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.View.cpp">
+      <Filter>3DF\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Model.cpp">
+      <Filter>3DF\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Segment.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Selection.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DFSignal.Interface.cpp">
+      <Filter>Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Selectability.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="Import\DLL.3DF.Interface.cpp">
+      <Filter>Import</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.MaterialMappingControl.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Material.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Math.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Color.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.ShellKey.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Key.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.IncludeKey.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.View.OpCameraPan.cpp">
+      <Filter>Operator</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Database.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Portfolio.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Style.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Control.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Bounding.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Line.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,171 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="HPS">
+      <UniqueIdentifier>{42e776ff-f350-4ec8-b19f-563efc76b3cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Handler">
+      <UniqueIdentifier>{5ff7c4cd-0682-436b-9e8b-6c99ba21db44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{98914b14-1839-4099-8895-9a64c9be6b92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{f5d3ee21-81e6-4212-8bfc-bb1ad88e9e34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Operator">
+      <UniqueIdentifier>{61aa0c71-e84b-416a-9212-854e50ce448f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Interface">
+      <UniqueIdentifier>{ec79c845-6658-47e3-8f84-d9a0e952a55a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ComponentTree">
+      <UniqueIdentifier>{a3b429d7-4c4b-4937-85d3-41cd606219f3}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="DmiHpsView.h">
+      <Filter>HPS</Filter>
+    </ClInclude>
+    <ClInclude Include="DmiHpsSignalAnalyzer.h">
+      <Filter>HPS</Filter>
+    </ClInclude>
+    <ClInclude Include="Handler\DmiEventHandler.h">
+      <Filter>Handler</Filter>
+    </ClInclude>
+    <ClInclude Include="DmiModelHandler.h">
+      <Filter>Handler</Filter>
+    </ClInclude>
+    <ClInclude Include="DmiHpsInterface.h">
+      <Filter>Interface</Filter>
+    </ClInclude>
+    <ClInclude Include="DmiHpsFileInterface.h">
+      <Filter>HPS</Filter>
+    </ClInclude>
+    <ClInclude Include="DmiHpsCreator.h">
+      <Filter>HPS</Filter>
+    </ClInclude>
+    <ClInclude Include="DmiHpsUtility.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Operator\DmiSelectOperator.h">
+      <Filter>Operator</Filter>
+    </ClInclude>
+    <ClInclude Include="Operator\DmiOrbitSelectOperator.h">
+      <Filter>Operator</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentTree\DmiHpsComponentTree.h">
+      <Filter>ComponentTree</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Dmi3dxInterface\LogManager.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Common_Define.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Fio.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Json.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Path.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\WStr.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Signal\Signal.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Signal\SignalBase.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Signal\WorkerThread.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DmiHpsSignalAnalyzer.cpp">
+      <Filter>HPS</Filter>
+    </ClCompile>
+    <ClCompile Include="DmiHpsView.cpp">
+      <Filter>HPS</Filter>
+    </ClCompile>
+    <ClCompile Include="Handler\DmiEventHandler.cpp">
+      <Filter>Handler</Filter>
+    </ClCompile>
+    <ClCompile Include="DmiModelHandler.cpp">
+      <Filter>Handler</Filter>
+    </ClCompile>
+    <ClCompile Include="DmiHpsInterface.cpp">
+      <Filter>Interface</Filter>
+    </ClCompile>
+    <ClCompile Include="DmiHpsFileInterface.cpp">
+      <Filter>HPS</Filter>
+    </ClCompile>
+    <ClCompile Include="DmiHpsCreator.cpp">
+      <Filter>HPS</Filter>
+    </ClCompile>
+    <ClCompile Include="DmiHpsUtility.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Operator\DmiSelectOperator.cpp">
+      <Filter>Operator</Filter>
+    </ClCompile>
+    <ClCompile Include="Operator\DmiOrbitSelectOperator.cpp">
+      <Filter>Operator</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentTree\DmiHpsComponentTree.cpp">
+      <Filter>ComponentTree</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Dmi3dxInterface\LogManager.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Common_Define.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Fio.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Json.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Path.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\WStr.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Signal\Signal.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Signal\SignalBase.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Signal\WorkerThread.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

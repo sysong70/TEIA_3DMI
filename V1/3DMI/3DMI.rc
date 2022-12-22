@@ -1,0 +1,710 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 한국어(대한민국) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
+#pragma code_page(949)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""RES\\RCT3D.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""      // Standard components\r\n"
+    "#include ""afxprint.rc""    // printing/print preview resources\r\n"
+    "#include ""RES\\BCGSoft_ribbon\\RCT3D.ribbon.rc2""  // BCG Designer resources\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+#endif    // 한국어(대한민국) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// 영어(미국) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "RES\\RCT3D.ico"
+
+IDR_RCT3DTYPE           ICON                    "RES\\RCT3DDoc.ico"
+
+IDI_RIBBON_DISPLAY_OPTIONS ICON                    "res\\RibbonDisplayOptions.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// SVG
+//
+
+IDB_TOOLBAR_HC          SVG                     "res\\Toolbar.svg"
+
+IDB_RIBBON_DISPLAY_OPTIONS SVG                     "res\\ribbondisplayoptions.svg"
+
+IDB_RIBBON_FILELARGE    SVG                     "res\\ribbonfilelarge.svg"
+
+IDB_WORKSPACE           SVG                     "res\\Workspace.svg"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAINFRAME MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "P&rint Setup...",             ID_FILE_PRINT_SETUP
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "&Close",                      ID_FILE_CLOSE
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&View"
+    BEGIN
+        POPUP "&Toolbars"
+        BEGIN
+            MENUITEM "",                            ID_VIEW_TOOLBARS
+        END
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+        POPUP "&Application Look"
+        BEGIN
+            MENUITEM "",                            ID_VIEW_APPLOOK
+        END
+    END
+    POPUP "&Tools"
+    BEGIN
+        MENUITEM "&User-defined tools",         ID_TOOLS_ENTRY
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About RCT3D...",             ID_APP_ABOUT
+    END
+END
+
+IDR_RCT3DTYPE MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM "&Close",                      ID_FILE_CLOSE
+        MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE
+        MENUITEM "Save &As...",                 ID_FILE_SAVE_AS
+        MENUITEM SEPARATOR
+        MENUITEM "&Print...\tCtrl+P",           ID_FILE_PRINT
+        MENUITEM "Print Pre&view",              ID_FILE_PRINT_PREVIEW
+        MENUITEM "P&rint Setup...",             ID_FILE_PRINT_SETUP
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",                 ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_APP_EXIT
+    END
+    POPUP "&Edit"
+    BEGIN
+        MENUITEM "&Undo\tCtrl+Z",               ID_EDIT_UNDO
+        MENUITEM SEPARATOR
+        MENUITEM "Cu&t\tCtrl+X",                ID_EDIT_CUT
+        MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
+        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
+    END
+    POPUP "&View"
+    BEGIN
+        POPUP "&Toolbars"
+        BEGIN
+            MENUITEM "",                            ID_VIEW_TOOLBARS
+        END
+        MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+        POPUP "&Application Look"
+        BEGIN
+            MENUITEM "",                            ID_VIEW_APPLOOK
+        END
+    END
+    POPUP "&Tools"
+    BEGIN
+        MENUITEM "&User-defined tools",         ID_TOOLS_ENTRY
+    END
+    POPUP "&Window"
+    BEGIN
+        MENUITEM "&New Window",                 ID_WINDOW_NEW
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About RCT3D...",             ID_APP_ABOUT
+    END
+END
+
+IDR_CONTEXT_MENU MENU
+BEGIN
+    POPUP "_POPUP_"
+    BEGIN
+        MENUITEM "Cu&t",                        ID_EDIT_CUT
+        MENUITEM "&Copy",                       ID_EDIT_COPY
+        MENUITEM "&Paste",                      ID_EDIT_PASTE
+    END
+END
+
+IDR_POPUP_TOOLBAR MENU
+BEGIN
+    POPUP "DUMMY"
+    BEGIN
+        MENUITEM "Standard Toolbar",            ID_VIEW_TOOLBAR
+        MENUITEM "&Workspace",                  ID_VIEW_WORKSPACE
+        MENUITEM "&Workspace 2",                ID_VIEW_WORKSPACE2
+        MENUITEM "&Output",                     ID_VIEW_OUTPUT
+    END
+END
+
+IDR_POPUP_MDITABS MENU
+BEGIN
+    POPUP "DUMMY"
+    BEGIN
+        MENUITEM "&Save",                       ID_FILE_SAVE
+        MENUITEM "&Close",                      ID_FILE_CLOSE
+        MENUITEM SEPARATOR
+        MENUITEM "New &Horizontal Tab Group",   ID_MDI_NEW_HORZ_TAB_GROUP
+        MENUITEM "New &Vertical Tab Group",     ID_MDI_NEW_VERT_GROUP
+        MENUITEM "Move to Ne&xt Tab Group",     ID_MDI_MOVE_TO_NEXT_GROUP
+        MENUITEM "Move to P&revious Tab Group", ID_MDI_MOVE_TO_PREV_GROUP
+    END
+END
+
+IDR_POPUP_DROP_MDITABS MENU
+BEGIN
+    POPUP "DUMMY"
+    BEGIN
+        MENUITEM "New &Horizontal Tab Group",   ID_MDI_NEW_HORZ_TAB_GROUP
+        MENUITEM "New &Vertical Tab Group",     ID_MDI_NEW_VERT_GROUP
+        MENUITEM "Move to Ne&xt Tab Group",     ID_MDI_MOVE_TO_NEXT_GROUP
+        MENUITEM "Move to P&revious Tab Group", ID_MDI_MOVE_TO_PREV_GROUP
+        MENUITEM SEPARATOR
+        MENUITEM "&Cancel",                     ID_MDI_CANCEL
+    END
+END
+
+IDR_PASTE_MENU MENU
+BEGIN
+    MENUITEM "&Paste",                      ID_EDIT_PASTE
+    MENUITEM "Paste &Special...",           ID_EDIT_PASTE_SPECIAL
+END
+
+IDR_WINDOWS_MENU MENU
+BEGIN
+    MENUITEM "&New Window",                 ID_WINDOW_NEW
+END
+
+IDR_THEME_MENU MENU
+BEGIN
+    MENUITEM "",                            ID_VIEW_APPLOOK
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_MAINFRAME ACCELERATORS
+BEGIN
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL
+    "P",            ID_FILE_PRINT,          VIRTKEY, CONTROL
+    "Z",            ID_EDIT_UNDO,           VIRTKEY, CONTROL
+    "X",            ID_EDIT_CUT,            VIRTKEY, CONTROL
+    "C",            ID_EDIT_COPY,           VIRTKEY, CONTROL
+    "V",            ID_EDIT_PASTE,          VIRTKEY, CONTROL
+    VK_BACK,        ID_EDIT_UNDO,           VIRTKEY, ALT
+    VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT
+    VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL
+    VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT
+    VK_F6,          ID_NEXT_PANE,           VIRTKEY 
+    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About RCT3D"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,7,7,21,20
+    LTEXT           "RCT3D Version 1.0",IDC_STATIC,40,10,119,8,SS_NOPREFIX
+    LTEXT           "Copyright (C) 2020",IDC_STATIC,40,25,119,8
+    DEFPUSHBUTTON   "OK",IDOK,178,7,50,16,WS_GROUP
+    PUSHBUTTON      "http://www.<MyCompany>.com",IDC_COMPANY_URL,40,36,119,14
+END
+
+IDD_FORM_INFO DIALOG 0, 0, 333, 259
+STYLE DS_SETFONT | WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "<doc name>",IDC_DOC_NAME,7,7,139,16
+    LTEXT           "<doc path>",IDC_PATH_LABEL,7,25,139,8
+    CONTROL         "",IDC_SEPARATOR_1,"Static",SS_ETCHEDHORZ,7,36,139,1
+    PUSHBUTTON      "Button 1",IDC_BUTTON1,7,47,56,49,BS_MULTILINE
+    LTEXT           "Some description about this item.",IDC_TEXT1,75,47,71,36
+    CONTROL         "",IDC_SEPARATOR_2,"Static",SS_ETCHEDHORZ,7,110,139,1
+    PUSHBUTTON      "Button 2",IDC_BUTTON2,7,124,56,49,BS_MULTILINE
+    LTEXT           "Some description about this item.",IDC_TEXT2,75,124,71,36
+    CONTROL         "",IDC_SEPARATOR_3,"Static",SS_ETCHEDHORZ,7,186,139,1
+    PUSHBUTTON      "Button 3",IDC_BUTTON3,7,202,56,49,BS_MULTILINE
+    LTEXT           "Some description about this item.",IDC_TEXT3,75,202,71,36
+    CONTROL         "",IDC_SEPARATOR_4,"Static",SS_ETCHEDVERT,155,7,1,245
+    LTEXT           "Information",IDC_INFO_LABEL,166,7,160,16
+    CONTROL         "",IDC_SEPARATOR_5,"Static",SS_ETCHEDHORZ,166,36,160,1
+    PUSHBUTTON      "Thumbnail",IDC_PREVIEW,166,47,160,85
+    LTEXT           "Some additional information about your application/document.",IDC_TEXT4,166,142,160,110
+END
+
+IDD_EXCHANGE_IMPORT_DIALOG DIALOGEX 0, 0, 295, 170
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Cancel Import",IDCANCEL,186,147,102,18
+    CONTROL         "",IDC_PROGRESS_BAR,"msctls_progress32",PBS_SMOOTH | PBS_MARQUEE,6,6,282,14
+    EDITTEXT        IDC_EDIT_MESSAGES,6,36,282,105,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL | WS_HSCROLL
+    CTEXT           "Static",IDC_IMPORT_MESSAGE,6,24,282,8
+    CONTROL         "Keep Dialog Open",IDC_CHECK_KEEP_OPEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,151,73,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "TODO: <Company name>"
+            VALUE "FileDescription", "TODO: <File description>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "RCT3D.exe"
+            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
+            VALUE "OriginalFilename", "RCT3D.exe"
+            VALUE "ProductName", "TODO: <Product name>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_EXCHANGE_IMPORT_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 288
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 163
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_EXCHANGE_IMPORT_DIALOG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_MB_UNKNOWN          BITMAP                  "res\\img_unkn.bmp"
+
+IDB_MODEL_FILE          BITMAP                  "res\\il_class.bmp"
+
+IDB_RI_SURFACE          BITMAP                  "res\\img_surf.bmp"
+
+IDB_RI_SOLID            BITMAP                  "res\\img_solid.bmp"
+
+IDB_RI_POINT_CLOUD      BITMAP                  "res\\img_points_cloud.bmp"
+
+IDB_RI_POINT            BITMAP                  "res\\img_poin.bmp"
+
+IDB_RI_PLANE            BITMAP                  "res\\img_plan.bmp"
+
+IDB_RI_LINE             BITMAP                  "res\\img_line.bmp"
+
+IDB_RI_GEOMETRY_SET     BITMAP                  "res\\dir_geom.bmp"
+
+IDB_RI_DIRECTION        BITMAP                  "res\\img_direction.bmp"
+
+IDB_RI_CURVE            BITMAP                  "res\\img_curv.bmp"
+
+IDB_RI_COORD_SYS        BITMAP                  "res\\img_axis.bmp"
+
+IDB_RI_COMP_CURVE       BITMAP                  "res\\img_compcurve.bmp"
+
+IDB_RI_ARC              BITMAP                  "res\\img_arc.bmp"
+
+IDB_PRODUCT_STRUCTURE_2 BITMAP                  "res\\dir_product2.bmp"
+
+IDB_PRODUCT_STRUCTURE_1 BITMAP                  "res\\dir_product.bmp"
+
+IDB_VIEW                BITMAP                  "res\\pmiview_productview.bmp"
+
+IDB_ANNOTATION_VIEW     BITMAP                  "res\\cadview.bmp"
+
+IDB_VIEW_GROUP          BITMAP                  "res\\dir_mark.bmp"
+
+IDB_PMI_TOLERANCE       BITMAP                  "res\\cadtoler.bmp"
+
+IDB_PMI_TEXT            BITMAP                  "res\\markup.bmp"
+
+IDB_PMI_TABLE           BITMAP                  "res\\cadtable.bmp"
+
+IDB_PMI_SPOT_WELDING    BITMAP                  "res\\cadspotwelding.bmp"
+
+IDB_PMI_ROUGHNESS       BITMAP                  "res\\cadrough.bmp"
+
+IDB_PMI_MEASUREMENT_POINT BITMAP                  "res\\cadmeasurementpoint.bmp"
+
+IDB_PMI_LOCATOR         BITMAP                  "res\\cadlocator.bmp"
+
+IDB_PMI_LINE_WELDING    BITMAP                  "res\\cadlinewelding.bmp"
+
+IDB_PMI_GROUP           BITMAP                  "res\\pmi_grou.bmp"
+
+IDB_PMI_FASTENER        BITMAP                  "res\\cadFastener.bmp"
+
+IDB_PMI_DIM_RADIUS      BITMAP                  "res\\dim_radius.bmp"
+
+IDB_PMI_DIM_LENGTH      BITMAP                  "res\\dim_length.bmp"
+
+IDB_PMI_DIM_DISTANCE    BITMAP                  "res\\dim_distance.bmp"
+
+IDB_PMI_DIM_DIAMETER    BITMAP                  "res\\dim_diameter.bmp"
+
+IDB_PMI_DIM_ANGLE       BITMAP                  "res\\dim_angle.bmp"
+
+IDB_PMI_DATUM_TARGET    BITMAP                  "res\\cadtarge.bmp"
+
+IDB_PMI_DATUM           BITMAP                  "res\\cadrefer.bmp"
+
+IDB_PMI_COORDINATE      BITMAP                  "res\\dim_coordinate.bmp"
+
+IDB_PMI_CIRCLE_CENTER   BITMAP                  "res\\cadcirclecenter.bmp"
+
+IDB_PMI_BALLOON         BITMAP                  "res\\cadballoon.bmp"
+
+IDB_PMI_ARROW           BITMAP                  "res\\cadleaderarrow.bmp"
+
+IDB_DRW_VIEW_TOP        BITMAP                  "res\\img_drawing_view_top.bmp"
+
+IDB_DRW_VIEW_SECTION    BITMAP                  "res\\img_drawing_view_section.bmp"
+
+IDB_DRW_VIEW_RIGHT      BITMAP                  "res\\img_drawing_view_right.bmp"
+
+IDB_DRW_VIEW_LEFT       BITMAP                  "res\\img_drawing_view_left.bmp"
+
+IDB_DRW_VIEW_ISO        BITMAP                  "res\\img_drawing_view_iso.bmp"
+
+IDB_DRW_VIEW_FRONT      BITMAP                  "res\\img_drawing_view_front.bmp"
+
+IDB_DRW_VIEW_DETAIL     BITMAP                  "res\\img_drawing_view_detail.bmp"
+
+IDB_DRW_VIEW_BOTTOM     BITMAP                  "res\\img_drawing_view_bottom.bmp"
+
+IDB_DRW_VIEW_BACKGROUND BITMAP                  "res\\img_drawing_view_background.bmp"
+
+IDB_DRW_VIEW_BACK       BITMAP                  "res\\img_drawing_view_back.bmp"
+
+IDB_DRW_VIEW            BITMAP                  "res\\img_drawing_view.bmp"
+
+IDB_DRW_SHEET           BITMAP                  "res\\img_drawing_sheet.bmp"
+
+IDB_DRW_MODEL           BITMAP                  "res\\img_drawing_model.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE
+BEGIN
+    IDP_OLE_INIT_FAILED     "OLE initialization failed.  Make sure that the OLE libraries are the correct version."
+    IDS_MAIN_TOOLBAR        "Standard"
+    IDS_WINDOWS_MANAGER     "&Windows..."
+END
+
+STRINGTABLE
+BEGIN
+    IDR_MAINFRAME           "3DMI"
+    IDR_RCT3DTYPE           "\nRCT3D\nRCT3D\n\n\nRCT3D.Document\nRCT3D.Document"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_APP_TITLE       "RCT3D"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+STRINGTABLE
+BEGIN
+    ID_INDICATOR_EXT        "EXT"
+    ID_INDICATOR_CAPS       "CAP"
+    ID_INDICATOR_NUM        "NUM"
+    ID_INDICATOR_SCRL       "SCRL"
+    ID_INDICATOR_OVR        "OVR"
+    ID_INDICATOR_REC        "REC"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_NEW             "Create a new document\nNew"
+    ID_FILE_OPEN            "Open an existing document\nOpen"
+    ID_FILE_CLOSE           "Close the active document\nClose"
+    ID_FILE_SAVE            "Save the active document\nSave"
+    ID_FILE_SAVE_AS         "Save the active document with a new name\nSave As"
+    ID_FILE_PAGE_SETUP      "Change the printing options\nPage Setup"
+    ID_FILE_PRINT_SETUP     "Change the printer and printing options\nPrint Setup"
+    ID_FILE_PRINT           "Print the active document\nPrint"
+    ID_FILE_PRINT_DIRECT    "Send the document directly to the default printer without making changes\nQuick Print"
+    ID_FILE_PRINT_PREVIEW   "Display full pages\nPrint Preview"
+END
+
+STRINGTABLE
+BEGIN
+    ID_APP_ABOUT            "Display program information, version number and copyright\nAbout"
+    ID_APP_EXIT             "Quit the application; prompts to save documents\nExit"
+END
+
+STRINGTABLE
+BEGIN
+    ID_FILE_MRU_FILE1       "Open this document"
+    ID_FILE_MRU_FILE2       "Open this document"
+    ID_FILE_MRU_FILE3       "Open this document"
+    ID_FILE_MRU_FILE4       "Open this document"
+    ID_FILE_MRU_FILE5       "Open this document"
+    ID_FILE_MRU_FILE6       "Open this document"
+    ID_FILE_MRU_FILE7       "Open this document"
+    ID_FILE_MRU_FILE8       "Open this document"
+    ID_FILE_MRU_FILE9       "Open this document"
+    ID_FILE_MRU_FILE10      "Open this document"
+    ID_FILE_MRU_FILE11      "Open this document"
+    ID_FILE_MRU_FILE12      "Open this document"
+    ID_FILE_MRU_FILE13      "Open this document"
+    ID_FILE_MRU_FILE14      "Open this document"
+    ID_FILE_MRU_FILE15      "Open this document"
+    ID_FILE_MRU_FILE16      "Open this document"
+END
+
+STRINGTABLE
+BEGIN
+    ID_NEXT_PANE            "Switch to the next window pane\nNext Pane"
+    ID_PREV_PANE            "Switch back to the previous window pane\nPrevious Pane"
+END
+
+STRINGTABLE
+BEGIN
+    ID_WINDOW_MANAGER       "Manages the currently opened window\nWindow List"
+    ID_VIEW_PROPERTIES      "Show or hide the property grid\nToggle Property Grid"
+END
+
+STRINGTABLE
+BEGIN
+    ID_WINDOW_NEW           "Open another window for the active document\nNew Window"
+    ID_WINDOW_SPLIT         "Split the active window into panes\nSplit"
+END
+
+STRINGTABLE
+BEGIN
+    ID_EDIT_CLEAR           "Erase the selection\nErase"
+    ID_EDIT_CLEAR_ALL       "Erase everything\nErase All"
+    ID_EDIT_COPY            "Copy the selection and put it on the Clipboard\nCopy"
+    ID_EDIT_CUT             "Cut the selection and put it on the Clipboard\nCut"
+    ID_EDIT_FIND            "Find the specified text\nFind"
+    ID_EDIT_PASTE           "Insert Clipboard contents\nPaste"
+    ID_EDIT_REPEAT          "Repeat the last action\nRepeat"
+    ID_EDIT_REPLACE         "Replace specific text with different text\nReplace"
+    ID_EDIT_SELECT_ALL      "Select the entire document\nSelect All"
+    ID_EDIT_UNDO            "Undo the last action\nUndo"
+    ID_EDIT_REDO            "Redo the previously undone action\nRedo"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_TOOLBAR         "Show or hide the toolbar\nToggle ToolBar"
+    ID_VIEW_STATUS_BAR      "Show or hide the status bar\nToggle StatusBar"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_SCSIZE          "Change the window size"
+    AFX_IDS_SCMOVE          "Change the window position"
+    AFX_IDS_SCMINIMIZE      "Reduce the window to an icon"
+    AFX_IDS_SCMAXIMIZE      "Enlarge the window to full size"
+    AFX_IDS_SCNEXTWINDOW    "Switch to the next document window"
+    AFX_IDS_SCPREVWINDOW    "Switch to the previous document window"
+    AFX_IDS_SCCLOSE         "Close the active window and prompts to save the documents"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_SCRESTORE       "Restore the window to normal size"
+    AFX_IDS_SCTASKLIST      "Activate Task List"
+    AFX_IDS_MDICHILD        "Activate this window"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_PREVIEW_CLOSE   "Close print preview mode\nCancel Preview"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_OUTPUT          "Show or hide the output bar\nToggle Output"
+    ID_USER_TOOL1           "Activates user-defined tool\nUser Tool"
+    ID_USER_TOOL2           "Activates user-defined tool\nUser Tool"
+    ID_USER_TOOL3           "Activates user-defined tool\nUser Tool"
+    ID_USER_TOOL4           "Activates user-defined tool\nUser Tool"
+    ID_USER_TOOL5           "Activates user-defined tool\nUser Tool"
+    ID_USER_TOOL6           "Activates user-defined tool\nUser Tool"
+    ID_USER_TOOL7           "Activates user-defined tool\nUser Tool"
+    ID_USER_TOOL8           "Activates user-defined tool\nUser Tool"
+    ID_USER_TOOL9           "Activates user-defined tool\nUser Tool"
+    ID_USER_TOOL10          "Activates user-defined tool\nUser Tool"
+    ID_TOOLS_MANAGER        "Manages the user-defined tools such as macros, external applications or Internet shortcuts\nManage User-defined Tools"
+END
+
+STRINGTABLE
+BEGIN
+    ID_VIEW_WORKSPACE       "Show or hide the workspace bar\nToggle Workspace"
+    ID_VIEW_WORKSPACE2      "Show or hide the second workspace bar\nToggle Second Workspace"
+END
+
+STRINGTABLE
+BEGIN
+    ID_TOOLS_OPTIONS        "Changes application options\nOptions"
+    ID_STATUSBAR_PANE1      "Status bar indicator 1"
+    ID_STATUSBAR_PANE2      "Status bar indicator 2"
+END
+
+#endif    // 영어(미국) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "RES\RCT3D.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"      // Standard components
+#include "afxprint.rc"    // printing/print preview resources
+#include "RES\BCGSoft_ribbon\RCT3D.ribbon.rc2"  // BCG Designer resources
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

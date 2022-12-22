@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{B30055A4-E878-4BFD-8531-F6BFB229E831}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>DmiHpsInterface</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <SccProjectName>SAK</SccProjectName>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccProvider>SAK</SccProvider>
+    <ProjectName>HpsInterface</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="../../DmiCpp.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="../../DmiCpp.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(DmiStageDir)\</OutDir>
+    <IntDir>$(DmiIntDir)\</IntDir>
+    <TargetName>$(TargetProd)$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(DmiStageDir)\</OutDir>
+    <IntDir>$(DmiIntDir)\</IntDir>
+    <TargetName>$(TargetProd)$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;DMIHPSINTERFACE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>../../Library/Common;../HPS/include;../../Library/C3D/Kernel/Include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>hps_core.lib;hps_sprk.lib;hps_sprk_ops.lib;hps_sprk_exchange.lib;c3d.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>../HPS/lib/win64_v141d;../../Library/C3D/Kernel/$(Configuration)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(DmiOutDir)\$(TargetName).lib</ImportLibrary>
+      <ProgramDatabaseFile>$(DmiSymbolsDir)\$(TargetName).pdb</ProgramDatabaseFile>
+      <ProfileGuidedDatabase>$(DmiSymbolsDir)\$(TargetName).pgd</ProfileGuidedDatabase>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;DMIHPSINTERFACE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>../../Library/Common;../HPS/include;../../Library/C3D/Kernel/Include</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>../HPS/lib/win64_v141d;../../Library/C3D/Kernel/$(Configuration)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>hps_core.lib;hps_sprk.lib;hps_sprk_ops.lib;hps_sprk_exchange.lib;c3d.lib</AdditionalDependencies>
+      <ImportLibrary>$(DmiOutDir)\$(TargetName).lib</ImportLibrary>
+      <ProgramDatabaseFile>$(DmiSymbolsDir)\$(TargetName).pdb</ProgramDatabaseFile>
+      <ProfileGuidedDatabase>$(DmiSymbolsDir)\$(TargetName).pgd</ProfileGuidedDatabase>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Common\Common_Define.h" />
+    <ClInclude Include="..\Common\Fio.h" />
+    <ClInclude Include="..\Common\Json.h" />
+    <ClInclude Include="..\Common\Path.h" />
+    <ClInclude Include="..\Common\WStr.h" />
+    <ClInclude Include="..\Dmi3dxInterface\LogManager.h" />
+    <ClInclude Include="..\Signal\Signal.h" />
+    <ClInclude Include="..\Signal\SignalBase.h" />
+    <ClInclude Include="..\Signal\WorkerThread.h" />
+    <ClInclude Include="ComponentTree\DmiHpsComponentTree.h" />
+    <ClInclude Include="Operator\DmiOrbitSelectOperator.h" />
+    <ClInclude Include="Operator\DmiSelectOperator.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Handler\DmiEventHandler.h" />
+    <ClInclude Include="DmiHpsCreator.h" />
+    <ClInclude Include="DmiHpsFileInterface.h" />
+    <ClInclude Include="DmiHpsInterface.h" />
+    <ClInclude Include="DmiHpsUtility.h" />
+    <ClInclude Include="DmiHpsView.h" />
+    <ClInclude Include="DmiHpsSignalAnalyzer.h" />
+    <ClInclude Include="DmiModelHandler.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Common\Common_Define.cpp" />
+    <ClCompile Include="..\Common\Fio.cpp" />
+    <ClCompile Include="..\Common\Json.cpp" />
+    <ClCompile Include="..\Common\Path.cpp" />
+    <ClCompile Include="..\Common\WStr.cpp" />
+    <ClCompile Include="..\Dmi3dxInterface\LogManager.cpp" />
+    <ClCompile Include="..\Signal\Signal.cpp" />
+    <ClCompile Include="..\Signal\SignalBase.cpp" />
+    <ClCompile Include="..\Signal\WorkerThread.cpp" />
+    <ClCompile Include="ComponentTree\DmiHpsComponentTree.cpp" />
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Operator\DmiOrbitSelectOperator.cpp" />
+    <ClCompile Include="Operator\DmiSelectOperator.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Handler\DmiEventHandler.cpp" />
+    <ClCompile Include="DmiHpsCreator.cpp" />
+    <ClCompile Include="DmiHpsFileInterface.cpp" />
+    <ClCompile Include="DmiHpsInterface.cpp" />
+    <ClCompile Include="DmiHpsUtility.cpp" />
+    <ClCompile Include="DmiHpsView.cpp" />
+    <ClCompile Include="DmiHpsSignalAnalyzer.cpp" />
+    <ClCompile Include="DmiModelHandler.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

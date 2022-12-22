@@ -1,0 +1,202 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{3F27ACA6-B691-493D-B5E7-92ED776B7906}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Dmi3dfInterface</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <SccProjectName>SAK</SccProjectName>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccProvider>SAK</SccProvider>
+    <ProjectName>3dfInterface</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="../../DmiCpp.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="../../DmiCpp.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(DmiStageDir)\</OutDir>
+    <IntDir>$(DmiIntDir)\</IntDir>
+    <TargetName>$(TargetProd)$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(DmiStageDir)\</OutDir>
+    <IntDir>$(DmiIntDir)\</IntDir>
+    <TargetName>$(TargetProd)$(ProjectName)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_3DF_EXPORT;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(Dmi3dfInclude);../../Library/Common;../../Library/C3D/Kernel/Include;../../Library/3DX/include;../../Library/boost</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>$(Dmi3dfLibaray);c3d.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(Dmi3dfLibarayPath);../../Library/C3D/Kernel/$(Configuration);../../Libaray/boost/stage/lib</AdditionalLibraryDirectories>
+      <ImportLibrary>$(DmiOutDir)\$(TargetName).lib</ImportLibrary>
+      <ProgramDatabaseFile>$(DmiSymbolsDir)\$(TargetName).pdb</ProgramDatabaseFile>
+      <ProfileGuidedDatabase>$(DmiSymbolsDir)\$(TargetName).pgd</ProfileGuidedDatabase>
+      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_3DF_EXPORT;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>$(Dmi3dfInclude);../../Library/Common;../../Library/C3D/Kernel/Include;../../Library/3DX/include;../../Library/boost</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>$(Dmi3dfLibarayPath);../../Library/C3D/Kernel/$(Configuration);../../Libaray/boost/stage/lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(Dmi3dfLibaray);c3d.lib</AdditionalDependencies>
+      <ImportLibrary>$(DmiOutDir)\$(TargetName).lib</ImportLibrary>
+      <ProgramDatabaseFile>$(DmiSymbolsDir)\$(TargetName).pdb</ProgramDatabaseFile>
+      <ProfileGuidedDatabase>$(DmiSymbolsDir)\$(TargetName).pgd</ProfileGuidedDatabase>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Common\Common_Define.h" />
+    <ClInclude Include="..\Common\Fio.h" />
+    <ClInclude Include="..\Common\Json.h" />
+    <ClInclude Include="..\Common\Path.h" />
+    <ClInclude Include="..\Common\WStr.h" />
+    <ClInclude Include="..\Dmi3dxInterface\LogManager.h" />
+    <ClInclude Include="..\Signal\Signal.h" />
+    <ClInclude Include="..\Signal\SignalBase.h" />
+    <ClInclude Include="..\Signal\WorkerThread.h" />
+    <ClInclude Include="3DF\3DF.Bounding.h" />
+    <ClInclude Include="3DF\3DF.Color.h" />
+    <ClInclude Include="3DF\3DF.Control.h" />
+    <ClInclude Include="3DF\3DF.Database.h" />
+    <ClInclude Include="3DF\3DF.h" />
+    <ClInclude Include="3DF\3DF.IncludeKey.h" />
+    <ClInclude Include="3DF\3DF.Key.h" />
+    <ClInclude Include="3DF\3DF.Line.h" />
+    <ClInclude Include="3DF\3DF.Material.h" />
+    <ClInclude Include="3DF\3DF.MaterialMappingControl.h" />
+    <ClInclude Include="3DF\3DF.Math.h" />
+    <ClInclude Include="3DF\3DF.Model.h" />
+    <ClInclude Include="3DF\3DF.Portfolio.h" />
+    <ClInclude Include="3DF\3DF.Selectability.h" />
+    <ClInclude Include="3DF\3DF.Selection.h" />
+    <ClInclude Include="3DF\3DF.ShellKey.h" />
+    <ClInclude Include="3DF\3DF.Style.h" />
+    <ClInclude Include="3DF\3DF.View.h" />
+    <ClInclude Include="3DF\3DF.Segment.h" />
+    <ClInclude Include="3DFSignal.ApplicationManager.h" />
+    <ClInclude Include="3DFSignal.Interface.h" />
+    <ClInclude Include="3DFSignal.h" />
+    <ClInclude Include="3DFSignal.ViewManager.h" />
+    <ClInclude Include="3DF\3DF.View.OpCameraPan.h" />
+    <ClInclude Include="Import\DLL.3DF.Interface.h" />
+    <ClInclude Include="Import\DLL.h" />
+    <ClInclude Include="Import\DLL.Helper.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="3DFSignal.Manager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Common\Common_Define.cpp" />
+    <ClCompile Include="..\Common\Fio.cpp" />
+    <ClCompile Include="..\Common\Json.cpp" />
+    <ClCompile Include="..\Common\Path.cpp" />
+    <ClCompile Include="..\Common\WStr.cpp" />
+    <ClCompile Include="..\Dmi3dxInterface\LogManager.cpp" />
+    <ClCompile Include="..\Signal\Signal.cpp" />
+    <ClCompile Include="..\Signal\SignalBase.cpp" />
+    <ClCompile Include="..\Signal\WorkerThread.cpp" />
+    <ClCompile Include="3DF\3DF.Bounding.cpp" />
+    <ClCompile Include="3DF\3DF.Color.cpp" />
+    <ClCompile Include="3DF\3DF.Control.cpp" />
+    <ClCompile Include="3DF\3DF.Database.cpp" />
+    <ClCompile Include="3DF\3DF.IncludeKey.cpp" />
+    <ClCompile Include="3DF\3DF.Key.cpp" />
+    <ClCompile Include="3DF\3DF.Line.cpp" />
+    <ClCompile Include="3DF\3DF.Material.cpp" />
+    <ClCompile Include="3DF\3DF.MaterialMappingControl.cpp" />
+    <ClCompile Include="3DF\3DF.Math.cpp" />
+    <ClCompile Include="3DF\3DF.Model.cpp" />
+    <ClCompile Include="3DF\3DF.Portfolio.cpp" />
+    <ClCompile Include="3DF\3DF.Selectability.cpp" />
+    <ClCompile Include="3DF\3DF.Selection.cpp" />
+    <ClCompile Include="3DF\3DF.cpp" />
+    <ClCompile Include="3DF\3DF.ShellKey.cpp" />
+    <ClCompile Include="3DF\3DF.Style.cpp" />
+    <ClCompile Include="3DF\3DF.View.cpp" />
+    <ClCompile Include="3DF\3DF.Segment.cpp" />
+    <ClCompile Include="3DF\3DF.View.OpCameraPan.cpp" />
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="3DFSignal.ApplicationManager.cpp" />
+    <ClCompile Include="3DFSignal.Interface.cpp" />
+    <ClCompile Include="3DFSignal.ViewManager.cpp" />
+    <ClCompile Include="Import\DLL.3DF.Interface.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="3DFSignal.Manager.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

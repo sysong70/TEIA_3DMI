@@ -1,0 +1,379 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="OutputBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PropertiesViewBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BackStagePageInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WorkSpaceBar2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Json.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\DmiDefine.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\DmiString.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RtDoc.cpp">
+      <Filter>Base\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="RtView.cpp">
+      <Filter>Base\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>Base\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="ChildFrm.cpp">
+      <Filter>Base\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="RtApp.cpp">
+      <Filter>Base\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="HPSExchangeProgressDialog.cpp">
+      <Filter>Base\Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="DLL\RtCommandAnalyzerDll.cpp">
+      <Filter>DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="DLL\DmiJsonCmd.cpp">
+      <Filter>DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelBrowser\ModelBrowserBar.cpp">
+      <Filter>Base\ModelBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelBrowser\ModelTree.cpp">
+      <Filter>Base\ModelBrowser</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="OutputBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PropertiesViewBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WorkSpaceBar2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BackStagePageInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Json.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\DmiDefine.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\DmiString.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="framework.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ChildFrm.h">
+      <Filter>Base\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>Base\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="RtDoc.h">
+      <Filter>Base\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="RtView.h">
+      <Filter>Base\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="RtApp.h">
+      <Filter>Base\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="DLL\DllHelper.h">
+      <Filter>DLL</Filter>
+    </ClInclude>
+    <ClInclude Include="DLL\RtCommandAnalyzerDll.h">
+      <Filter>DLL</Filter>
+    </ClInclude>
+    <ClInclude Include="DLL\DmiJsonCmd.h">
+      <Filter>DLL</Filter>
+    </ClInclude>
+    <ClInclude Include="HPSExchangeProgressDialog.h">
+      <Filter>Base\Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelBrowser\ModelBrowserBar.h">
+      <Filter>Base\ModelBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelBrowser\ModelTree.h">
+      <Filter>Base\ModelBrowser</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="res\BCGSoft_ribbon\ribbon.xml" />
+    <Xml Include="TODO.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\RCT3D.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\RCT3DDoc.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Toolbar.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\RibbonDisplayOptions.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_unkn.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\il_class.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_surf.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_solid.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_points_cloud.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_poin.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_plan.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_line.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\dir_geom.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_direction.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_curv.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_axis.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_compcurve.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_arc.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\dir_product2.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\dir_product.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\pmiview_productview.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\cadview.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\dir_mark.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\cadtoler.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\markup.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\cadtable.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\cadspotwelding.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\cadrough.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\cadmeasurementpoint.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\cadlocator.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\cadlinewelding.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\pmi_grou.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\cadFastener.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\dim_radius.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\dim_length.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\dim_distance.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\dim_diameter.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\dim_angle.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\cadtarge.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\cadrefer.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\dim_coordinate.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\cadcirclecenter.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\cadballoon.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\cadleaderarrow.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_drawing_view_top.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_drawing_view_section.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_drawing_view_right.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_drawing_view_left.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_drawing_view_iso.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_drawing_view_front.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_drawing_view_detail.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_drawing_view_bottom.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_drawing_view_background.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_drawing_view_back.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_drawing_view.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_drawing_sheet.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\img_drawing_model.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\RCT3D.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\RCT3D.toolbar.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\RCT3D.ribbon.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\ribbondisplayoptions.svg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\ribbonfilelarge.svg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Workspace.svg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\Toolbar.svg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\ribbon_bar.svg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\main.svg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\category_small_0.svg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\category_large_0.svg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\category_backstage_small.svg">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{df0efa4e-a6c0-43fd-86ae-af01a62bbfc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base">
+      <UniqueIdentifier>{c7717190-b541-43bb-8eb1-dc8e70475cef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\Application">
+      <UniqueIdentifier>{2ac2b98b-7038-4db6-a590-4c8c08784cfb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Base\Dialog">
+      <UniqueIdentifier>{87f39693-ef21-4150-9f09-583d3a2b2c23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DLL">
+      <UniqueIdentifier>{8411d614-6e6b-4f25-861f-d5c5ecdc269f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Base\ModelBrowser">
+      <UniqueIdentifier>{18c5ba19-3e0e-4f04-8d6c-35061a548bce}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="RCT3D.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

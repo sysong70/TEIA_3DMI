@@ -1,0 +1,416 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="Component.RibbonBar.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.StatusBar.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Facility.AppResources.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="Facility.AppSettings.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="Facility.Base.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="Facility.FileOption.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="Facility.Preference.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.Base.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.Standard.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\Common\Json.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\Common\WStr.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\Common\Path.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.Application.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.ChildFrame.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.Document.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.MainFrame.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.View.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>_Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\Common\Common_Define.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\Common\Fio.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Connector.cpp">
+      <Filter>Connector</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.ProgressLog.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\Signal\Signal.cpp">
+      <Filter>_Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\Signal\SignalBase.cpp">
+      <Filter>_Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.LayerPanel.cpp">
+      <Filter>Component\PanelBar</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.ModelTreePanel.cpp">
+      <Filter>Component\PanelBar</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.ViewPanel.cpp">
+      <Filter>Component\PanelBar</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.ScenePanel.cpp">
+      <Filter>Component\PanelBar</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.Panel.cpp">
+      <Filter>Component\PanelBar</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.HistoryBar.cpp">
+      <Filter>Component\ToolBar</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Facility.CommandIndexer.cpp">
+      <Filter>Facility\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Facility.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.ToolBar.cpp">
+      <Filter>Component\ToolBar</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.PanelBar.cpp">
+      <Filter>Component\PanelBar</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.TaskBar.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.PropertyBar.cpp">
+      <Filter>Component\Property</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.TabWnd.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.PropList.cpp">
+      <Filter>Component\Property</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\Common\Dir.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Library\Common\File.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.Property.cpp">
+      <Filter>Component\Property</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Command.Common.h">
+      <Filter>Facility\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.RibbonBar.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.StatusBar.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Facility.AppResources.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="Facility.AppSettings.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="Facility.Base.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="Facility.FileOption.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="Facility.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="Facility.Preference.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.Base.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.Standard.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\Common\Json.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>_Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\Common\WStr.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>_Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\Common\Path.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.Application.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.ChildFrame.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.Document.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.MainFrame.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.View.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>_Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\Common\Common_Define.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\Common\Fio.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Connector.h">
+      <Filter>Connector</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.Resource.h">
+      <Filter>Facility\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.ProgressLog.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\Signal\Signal.h">
+      <Filter>_Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\Signal\SignalBase.h">
+      <Filter>_Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.LayerPanel.h">
+      <Filter>Component\PanelBar</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.ModelTreePanel.h">
+      <Filter>Component\PanelBar</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.ViewPanel.h">
+      <Filter>Component\PanelBar</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.ScenePanel.h">
+      <Filter>Component\PanelBar</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.Panel.h">
+      <Filter>Component\PanelBar</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.HistoryBar.h">
+      <Filter>Component\ToolBar</Filter>
+    </ClInclude>
+    <ClInclude Include="Facility.CommandIndexer.h">
+      <Filter>Facility\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.ToolBar.h">
+      <Filter>Component\ToolBar</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.PanelBar.h">
+      <Filter>Component\PanelBar</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.TaskBar.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.PropertyBar.h">
+      <Filter>Component\Property</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.TabWnd.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.PropList.h">
+      <Filter>Component\Property</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\Common\Dir.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\Common\File.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.Property.h">
+      <Filter>Component\Property</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Xml Include="res\BCGSoft_ribbon\ribbon.xml">
+      <Filter>_Resource</Filter>
+    </Xml>
+    <Xml Include="TODO.xml">
+      <Filter>_Resource</Filter>
+    </Xml>
+    <Xml Include="DpiAwareness.xml">
+      <Filter>_Resource</Filter>
+    </Xml>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\DMI.ico">
+      <Filter>_Resource</Filter>
+    </Image>
+    <Image Include="RES\palette_zoom.png">
+      <Filter>_Resource</Filter>
+    </Image>
+    <Image Include="res\RibbonDisplayOptions.ico">
+      <Filter>_Resource</Filter>
+    </Image>
+    <Image Include="res\Toolbar.bmp">
+      <Filter>_Resource</Filter>
+    </Image>
+    <Image Include="res\DMIDoc.ico">
+      <Filter>_Resource</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\BCGSoft_ribbon\category_backstage_small.svg">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\category_large_0.svg">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="RES\category_main_large.svg">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="RES\category_main_small.svg">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\category_small_0.svg">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="RES\category_visualize_large.svg">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\DMI.ribbon.rc2">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="res\DMI.toolbar.rc2">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\main.svg">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="RES\Ribbon.json">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="res\BCGSoft_ribbon\ribbon_bar.svg">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="res\ribbondisplayoptions.svg">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="res\ribbonfilelarge.svg">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="res\Toolbar.svg">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="RES\UI.json">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="RES\FileOptions.json">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="res\Workspace.svg">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="RES\DMI_ENU.rc2">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="RES\DMI_KOR.rc2">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="RES\DMI.rc2">
+      <Filter>_Resource</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Component">
+      <UniqueIdentifier>{ba176a78-43a4-410d-a9fa-e45c827bf1c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialog">
+      <UniqueIdentifier>{926466f9-0eab-4599-90a4-dfdeb1480304}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Window">
+      <UniqueIdentifier>{de91bf0f-f3ed-49a6-8ff6-11682b4caf5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Connector">
+      <UniqueIdentifier>{548c7e7f-a4c4-46f5-87a3-25aed4147b06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Signal">
+      <UniqueIdentifier>{3fa6ca85-306e-4855-8675-3bbd31f1539e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Resource">
+      <UniqueIdentifier>{c42b87a4-4dc7-4b9a-9df2-192721ac7010}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Main">
+      <UniqueIdentifier>{5626235d-04b2-48ff-aa6a-b189a3f69c04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Common">
+      <UniqueIdentifier>{fb2d04f0-eb3c-414a-af01-e993443a5070}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Facility">
+      <UniqueIdentifier>{c01d14a0-5142-4118-a49b-dd83bfce121e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Facility\Command">
+      <UniqueIdentifier>{107652ad-09a5-4c94-9c81-79e4c50396f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\ToolBar">
+      <UniqueIdentifier>{2b53c47b-abd9-4258-b544-b53d91ef6ea1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\PanelBar">
+      <UniqueIdentifier>{17e426a6-77e8-4a55-a4e4-86e17ed068a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Property">
+      <UniqueIdentifier>{0ee36090-15e6-4a9a-ad6d-e55fe0877cd9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DMI.rc">
+      <Filter>_Resource</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

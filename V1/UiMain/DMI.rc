@@ -1,0 +1,324 @@
+﻿// Microsoft Visual C++ generated resource script.
+//
+#pragma code_page(65001)
+
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+#pragma region 한국어(대한민국) Resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+/*
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""RES\\DMI.rc2"" // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc"" // Standard components\r\n"
+    "#include ""afxprint.rc"" // printing/print preview resources\r\n"
+    "#endif\r\n"
+    "\0"
+END
+*/
+#endif // APSTUDIO_INVOKED
+
+#pragma region Dialog
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About DMI"
+FONT 8, "Segoe UI", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME, IDC_STATIC, 7,7,21,20
+    LTEXT           "DMI Version 1.0", IDC_STATIC, 40,10,119,8, SS_NOPREFIX
+    LTEXT           "Copyright (C) 2020", IDC_STATIC, 40,25,119,8
+    DEFPUSHBUTTON   "OK", IDOK, 178,7,50,16, WS_GROUP
+    PUSHBUTTON      "http://www.<MyCompany>.com", IDC_COMPANY_URL, 40,36,119,14
+END
+
+IDD_DMI_STANDARD DIALOGEX 0, 0, 123, 100
+STYLE WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | DS_SETFONT
+CAPTION "Dialog"
+FONT 8, "Segoe UI", 400, 0, 0x1
+BEGIN
+    LTEXT           "", IDC_DMI_SIZE_CHECKER, 0,0,32,32, NOT WS_VISIBLE
+    LTEXT           "", IDC_INNERFRAME, 0,0,123,100, NOT WS_VISIBLE | WS_BORDER
+END
+
+IDD_DMI_FORMVIEW DIALOGEX 0, 0, 250, 150
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "Segoe UI", 0, 0, 0x0
+BEGIN
+    LTEXT           "", IDC_DMI_SIZE_CHECKER, 0, 0, 32, 32, NOT WS_VISIBLE
+END
+
+IDD_DMI_PROGRESS_LOG DIALOGEX 0, 0, 180, 120
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Progress Log"
+FONT 9, "Segoe UI", 400, 0, 0x81
+BEGIN
+    LTEXT           "", IDC_DMI_SIZE_CHECKER, 0,0,1,1, NOT WS_VISIBLE
+    LTEXT           "", IDC_DMI_CONTROL_01, 0,0,1,1, WS_VISIBLE
+    LTEXT           "Opening File...", IDC_DMI_CONTROL_02, 40,0,100,32, WS_VISIBLE
+    LISTBOX         IDC_DMI_CONTROL_03, 0,0,1,1, LBS_OWNERDRAWVARIABLE | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL
+END
+
+#pragma endregion Dialog
+
+#endif // !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+
+#pragma endregion 한국어(대한민국) Resources
+
+#pragma region 영어(미국) Resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+
+#pragma region Icon
+// Icon with lowest ID value placed first to ensure application icon remains consistent on all systems.
+
+IDR_MAINFRAME                ICON   "RES\\DMI.ico"
+IDR_DMITYPE                  ICON   "RES\\DMIDoc.ico"
+IDI_RIBBON_DISPLAY_OPTIONS   ICON   "RES\\RibbonDisplayOptions.ico"
+
+#pragma endregion Icon
+
+#pragma region SVG
+
+IDB_TOOLBAR_HC               SVG "res\\Toolbar.svg"
+IDB_RIBBON_DISPLAY_OPTIONS   SVG "res\\ribbondisplayoptions.svg"
+IDB_RIBBON_FILELARGE         SVG "res\\ribbonfilelarge.svg"
+IDB_WORKSPACE                SVG "res\\Workspace.svg"
+
+#pragma endregion SVG
+
+#pragma region Menu
+
+IDR_MAINFRAME MENU
+BEGIN
+    POPUP "File"
+    BEGIN
+        MENUITEM "New\tCtrl+N",     FILE_3D_CMD_New
+        MENUITEM "Open...\tCtrl+O", FILE_3D_CMD_Open
+        MENUITEM SEPARATOR
+        MENUITEM "Print Setup...",  ID_FILE_PRINT_SETUP
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",     ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Close",           ID_FILE_CLOSE
+        MENUITEM "Exit",            ID_APP_EXIT
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About DMI...",   ID_APP_ABOUT
+    END
+END
+
+IDR_DMITYPE MENU
+BEGIN
+    POPUP "File"
+    BEGIN
+        MENUITEM "New\tCtrl+N",     FILE_3D_CMD_New
+        MENUITEM "Open...\tCtrl+O", FILE_3D_CMD_Open
+        MENUITEM SEPARATOR
+        MENUITEM "Print Setup...",  ID_FILE_PRINT_SETUP
+        MENUITEM SEPARATOR
+        MENUITEM "Recent File",     ID_FILE_MRU_FILE1, GRAYED
+        MENUITEM SEPARATOR
+        MENUITEM "Close",           ID_FILE_CLOSE
+        MENUITEM "Exit",            ID_APP_EXIT
+    END
+    POPUP "Help"
+    BEGIN
+        MENUITEM "About DMI...",   ID_APP_ABOUT
+    END
+END
+
+IDR_CONTEXT_MENU MENU
+BEGIN
+    POPUP "DUMMY"
+    BEGIN
+        MENUITEM "Cu&t",   ID_EDIT_CUT
+        MENUITEM "&Copy",  ID_EDIT_COPY
+        MENUITEM "&Paste", ID_EDIT_PASTE
+    END
+END
+
+IDR_POPUP_MDITABS MENU
+BEGIN
+    POPUP "DUMMY"
+    BEGIN
+        MENUITEM "&Save",                       ID_FILE_SAVE
+        MENUITEM "&Close",                      ID_FILE_CLOSE
+        MENUITEM SEPARATOR
+        MENUITEM "New &Horizontal Tab Group",   ID_MDI_NEW_HORZ_TAB_GROUP
+        MENUITEM "New &Vertical Tab Group",     ID_MDI_NEW_VERT_GROUP
+        MENUITEM "Move to Ne&xt Tab Group",     ID_MDI_MOVE_TO_NEXT_GROUP
+        MENUITEM "Move to P&revious Tab Group", ID_MDI_MOVE_TO_PREV_GROUP
+    END
+END
+
+IDR_POPUP_DROP_MDITABS MENU
+BEGIN
+    POPUP "DUMMY"
+    BEGIN
+        MENUITEM "New &Horizontal Tab Group",   ID_MDI_NEW_HORZ_TAB_GROUP
+        MENUITEM "New &Vertical Tab Group",     ID_MDI_NEW_VERT_GROUP
+        MENUITEM "Move to Ne&xt Tab Group",     ID_MDI_MOVE_TO_NEXT_GROUP
+        MENUITEM "Move to P&revious Tab Group", ID_MDI_MOVE_TO_PREV_GROUP
+        MENUITEM SEPARATOR
+        MENUITEM "&Cancel",                     ID_MDI_CANCEL
+    END
+END
+
+IDR_PASTE_MENU MENU
+BEGIN
+    MENUITEM "&Paste",            ID_EDIT_PASTE
+    MENUITEM "Paste &Special...", ID_EDIT_PASTE_SPECIAL
+END
+
+IDR_WINDOWS_MENU MENU
+BEGIN
+    MENUITEM "&New Window", ID_WINDOW_NEW
+END
+
+IDR_THEME_MENU MENU
+BEGIN
+    MENUITEM "", ID_VIEW_APPLOOK
+END
+
+#pragma endregion Menu
+
+#pragma region Accelerator
+
+IDR_MAINFRAME ACCELERATORS
+BEGIN
+END
+
+#pragma endregion Accelerator
+
+#pragma region Version
+
+VS_VERSION_INFO VERSIONINFO
+    FILEVERSION 1,0,0,1
+    PRODUCTVERSION 1,0,0,1
+    FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+    FILEFLAGS 0x1L
+#else
+    FILEFLAGS 0x0L
+#endif
+    FILEOS 0x4L
+    FILETYPE 0x1L
+    FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "TODO: <Company name>"
+            VALUE "FileDescription", "Digital Manufacturing Information"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "DMI.exe"
+            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
+            VALUE "OriginalFilename", "DMI.exe"
+            VALUE "ProductName", "TODO: <Product name>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#pragma endregion Version
+
+#pragma region String Table
+
+STRINGTABLE
+BEGIN
+    IDR_MAINFRAME           "DMI"
+    IDR_DMITYPE             "\nDMI\nDMI\n\n\nDMI.Document\nDMI.Document"
+END
+
+STRINGTABLE
+BEGIN
+    AFX_IDS_APP_TITLE       "DMI"
+    AFX_IDS_IDLEMESSAGE     "Ready"
+END
+
+#pragma endregion String Table
+
+#endif // !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+
+#pragma endregion 영어(미국) Resources
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
+
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#include "RES\DMI_ENU.rc2"
+#include "afxres.rc" // Standard components
+#include "afxprint.rc" // printing/print preview resources
+#endif
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
+#pragma code_page(949)
+#include "RES\DMI_KOR.rc2"
+#include "afxres.rc" // Standard components
+#include "afxprint.rc" // printing/print preview resources
+#endif
+
+#include "RES\DMI.rc2"
+
+1 24 DISCARDABLE "DpiAwareness.xml"
+
+IDF_JSON_UI             TEXT   "res/UI.json"
+IDF_JSON_FILE_OPTIONS   TEXT   "res/FileOptions.json"

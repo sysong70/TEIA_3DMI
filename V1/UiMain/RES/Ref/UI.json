@@ -1,0 +1,167 @@
+﻿{
+"Strings":[
+	{"eng":"Enter menu name to search...", "kor":"검색할 메뉴명을 입력하세요..."}
+],
+	
+"Menu":{
+	"File":{"title":"File|파일"},
+	"FileNew":{"title":"New...|새 파일...", "desc":"_#_|_#_"},
+	"FileOpen":{"title":"Open...|열기...", "desc":"_#_|_#_"},
+	"FileSave":{"title":"Save|저장", "desc":"_#_|_#_"},
+	"FileSaveAs":{"title":"Save As...|다른 이름으로 저장...", "desc":"_#_|_#_"},
+	"FilePrint":{"title":"Print...|인쇄...", "desc":"_#_|_#_"},
+	"FileImport":{"title":"Import|_#_", "desc":"_#_|_#_"},
+	"FileExport":{"title":"Export|_#_", "desc":"_#_|_#_"},
+	"FileOptions":{"title":"File Options|_#_", "desc":"_#_|_#_"},
+	"Main":{"name":"File|파일", "items":[
+		{"type":"menu", "name":"FileNew", "title":"New|새로 만들기", "desc":"_#_|_#_"},
+		{"type":"menu", "name":"FileOpen", "title":"Open...|열기...", "desc":"_#_|_#_"},
+		{"type":"menu", "name":"FileSave", "title":"Save|저장", "desc":"_#_|_#_"},
+		{"type":"menu", "name":"FileSaveAs", "title":"Save As...|다른 이름으로 저장...", "desc":"_#_|_#_"},
+		{"type":"menu", "name":"FileImport", "title":"Import|_#_", "desc":"_#_|_#_"},
+		{"type":"menu", "name":"FileExport", "title":"Export|_#_", "desc":"_#_|_#_"},
+		{"type":"menu", "name":"FileOptions", "title":"File Options|_#_", "desc":"_#_|_#_"}
+	]},
+	"Ribbon":[
+		{"type":"category", "name":"Visualize", "title":"Visualize|_#_", "items":[
+			{"type":"panel", "name":"Zoom", "title":"Zoom|_#_", "items":[
+				{"type":"button", "name":"ZoomIn", "title":"Zoom In|_#_", "desc":"_#_|_#_"},
+				{"type":"button", "name":"ZoomOut", "title":"Zoom Out|_#_", "desc":"_#_|_#_"},
+				{"type":"palette", "name":"ZoomMore", "title":"Zoom More|_#_", "desc":"_#_|_#_", "items":[
+					{"type":"item", "name":"ZoomFit", "title":"Zoom Fit|_#_", "desc":"_#_|_#_"},
+					{"type":"item", "name":"ZoomArea", "title":"Zoom Area|_#_", "desc":"_#_|_#_"},
+					{"type":"item", "name":"ZoomDynamic", "title":"Zoom Dynamic|_#_", "desc":"_#_|_#_"},
+					{"type":"item", "name":"ZoomObject", "title":"Zoom Object|_#_", "desc":"_#_|_#_"}
+				]}
+			]},
+			{"type":"panel", "name":"ViewDirection", "title":"View Direction|_#_", "items":[
+				{"name":"PerspectiveMode", "title":"Perspective Mode|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewNormal", "title":"ViewNormal|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewAlign", "title":"ViewAlign|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewBuiltIn", "title":"Built-In View", "desc":"_#_|_#_", "items":[
+					{"name":"ViewISO", "title":"ISO View|_#_", "desc":"_#_|_#_"},
+					{"name":"ViewLeft", "title":"Left View|_#_", "desc":"_#_|_#_"},
+					{"name":"ViewTop", "title":"Top View|_#_", "desc":"_#_|_#_"},
+					{"name":"ViewFront", "title":"Front View|_#_", "desc":"_#_|_#_"},
+					{"name":"ViewISOSE", "title":"ISO SE View|_#_", "desc":"_#_|_#_"},
+					{"name":"ViewRight", "title":"Right View|_#_", "desc":"_#_|_#_"},
+					{"name":"ViewBottom", "title":"Bottom View|_#_", "desc":"_#_|_#_"},
+					{"name":"ViewBack", "title":"Back View|_#_", "desc":"_#_|_#_"}
+				]}
+			]},
+			{"type":"panel", "name":"ViewControl", "title":"View Control|_#_", "items":[
+				{"name":"ViewPan", "title":"ViewPan|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewRotateCenter", "title":"ViewRotateCenter|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewRotate", "title":"ViewRotate|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewRotateX", "title":"ViewRotateX|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewRotateY", "title":"ViewRotateY|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewRotateZ", "title":"ViewRotateZ|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewFlyThrough", "title":"ViewFlyThrough|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewWalkThrough", "title":"ViewWalkThrough|_#_", "desc":"_#_|_#_"}
+			]},
+			{"type":"panel", "name":"ViewManager", "title":"View Manager|_#_", "items":[
+				{"name":"ViewPrevious", "title":"ViewPrevious|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewSave", "title":"ViewSave|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewLoad", "title":"ViewLoad|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewScene", "title":"ViewScene|_#_", "desc":"_#_|_#_"}
+			]},
+			{"type":"panel", "name":"Visibility", "title":"Visibility|_#_", "items":[
+				{"name":"ViewShowAllEntity", "title":"ViewShowAllEntity|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewHideEntity", "title":"ViewHideEntity|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewShowEntityOnly", "title":"ViewShowEntityOnly|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewShowMode", "title":"ViewShowMode|_#_", "desc":"_#_|_#_"}
+			]},
+			{"type":"panel", "name":"Render", "title":"Render|_#_", "items":[
+				{"name":"ViewShade", "title":"ViewShade|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewWireframe", "title":"ViewWireframe|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewHiddenLineRemove", "title":"ViewHiddenLineRemove|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewShadeWithEdges", "title":"ViewShadeWithEdges|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewWireframeWithEdges", "title":"ViewWireframeWithEdges|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewTessellated", "title":"ViewTessellated|_#_", "desc":"_#_|_#_"}
+			]},
+			{"type":"panel", "name":"GraphicEffects", "title":"Graphic Effects", "items":[
+				{"name":"ViewShadow", "title":"ViewShadow|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewPlaneReflection", "title":"ViewPlaneReflection|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewAmbientOcclusion", "title":"ViewAmbientOcclusion|_#_", "desc":"_#_|_#_"},
+				{"name":"ViewSilhouetteEdg", "title":"ViewSilhouetteEdg|_#_", "desc":"_#_|_#_"}
+			]}
+		]}
+	],
+	"Style":{
+		"title":"Color Theme|색 테마", "list":[
+			{"type":"menu", "name":"StyleLight", "id":20001, "title":"Light Theme|밝은 테마"},
+			{"type":"menu", "name":"StyleDark", "id":20002, "title":"Dark Theme|어두운 테마"}
+		]
+	},
+	"context":{
+
+	}
+},
+
+"Command":{
+
+},
+
+"Debug":{
+	"Dialog":"FileOpenOption"
+},
+
+"Dialog":{
+	"FileOpenOption":{
+		"title":"Options|옵션",
+		"properties":[
+			{"type":"group", "name":"GENERAL", "title":"General", "list":[
+				{"type":"combo", "name":"ReadingMode", "title":"Reading Mode|_#_", "desc":"_#_|_#_", "value":0, "list":[
+					"Feature Trees|_#_",
+					"B-Rep|_#_",
+					"Tessellation Only|_#_"
+				]},
+				{"type":"check", "name":"Solids", "title":"Solid|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"Surfaces", "title":"Surfaces|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"Wireframes", "title":"Wireframes|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"Attributes", "title":"Attributes|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"HiddenObjects", "title":"Hidden Objects|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"References", "title":"Construction and References|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"ActiveFilter", "title":"Active Filter|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"SewModel", "title":"Sew Model|_#_", "desc":"_#_|_#_"},
+				{"type":"edit", "name":"SewingTolerance", "title":"Sewing Tolerance|_#_", "desc":"_#_|_#_", "value":"0.001"},
+				{"type":"check", "name":"ShellOrientation", "title":"Compute Non-Solid Shell Orientation|_#_", "desc":"_#_|_#_"},
+				{"type":"combo", "name":"LoadingMode", "title":"Loading Mode|_#_", "desc":"_#_|_#_", "value":0, "list":[
+					"Complete|_#_",
+					"Incremental|_#_"
+				]}
+			]},
+			{"type":"group", "name":"TESSELLATION", "title":"Tessellation", "list":[
+				{"type":"combo", "name":"TessLevel", "title":"Predefined Tessellation Level|_#_", "value":2, "list":[
+					"Extra Low|_#_",
+					"Low|_#_",
+					"Medium|_#_",
+					"High|_#_",
+					"Extra High|_#_",
+					"Custom|_#_"
+				]},
+				{"type":"group", "name":"CUSTOMTESS", "title":"Custom Tessellation Level", "list":[
+					{"type":"combo", "name":"ChordLimitType", "title":"Chord Limit|_#_", "desc":"_#_|_#_", "value":1, "list":[
+						"Ratio|_#_",
+						"Height|_#_"
+					]},
+					{"type":"edit", "name":"ChordLimit", "title":"Limit|_#_", "desc":"_#_|_#_", "value":10000},
+					{"type":"edit", "name":"AngleTolerance", "title":"Angle Tolerance|_#_", "desc":"_#_|_#_", "value":40}
+				]},
+				{"type":"check", "name":"PreserveUV", "title":"Preserve UV Points|_#_", "desc":"_#_|_#_"},
+				{"type":"edit", "name":"MaxEdgeLength", "title":"Maximum Edge Length|_#_", "desc":"_#_|_#_", "value":"0"},
+				{"type":"group", "name":"Accurate", "title":"Accurate Tessellation|_#_", "list":[
+					{"type":"check", "name":"AccurateTess", "title":"Accurate Tessellation|_#_", "desc":"_#_|_#_"},
+					{"type":"check", "name":"GridAlignedTess", "title":"Grid Aligned Tessellation|_#_", "desc":"_#_|_#_"},
+					{"type":"edit", "name":"MaxStitchLength", "title":"Maximum Stitch Length|_#_", "value":"0.001", "desc":"_#_|_#_"},
+					{"type":"check", "name":"SurfaceCurvatures", "title":"Adapt to Surface Curvatures|_#_", "desc":"_#_|_#_"}
+				]}
+			]}
+		],
+		"commands":{
+			"ResetDefaults":{"type":"button", "title":"Reset Defaults|_#_"},
+			"SetToDefaults":{"type":"button", "title":"Set to Defaults|_#_"}
+		}
+	}
+}
+}

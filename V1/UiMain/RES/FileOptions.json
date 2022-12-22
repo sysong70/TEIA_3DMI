@@ -1,0 +1,35 @@
+{
+	"Import":{		
+		"_DEFAULT_":{
+			"General":{
+				"ReadingMode":1,
+				"Solids":true,
+				"Surfaces":true,
+				"Wireframes":true,
+				"Attributes":true,
+				"HiddenObjects":true,
+				"References":true,
+				"ActiveFilter":true,
+				"SewModel":true,
+				"SewingTolerance":0.001,
+				"ShellOrientation":true,
+				"LoadingMode":0
+			},
+			"Tessellation":{
+				"TessLevel":2,
+				"ChordLimitType":0,
+				"ChordLimit":2000,
+				"AngleTolerance":40,
+				"PreserveUV":true,
+				"MaxEdgeLength":0,
+				"AccurateTess":true,
+				"GridAlignedTess":true,
+				"MaxStitchLength":0.001,
+				"SurfaceCurvatures":true
+			}
+		}
+	},
+
+	"Export":{
+	}
+}
