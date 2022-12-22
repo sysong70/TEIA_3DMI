@@ -84,6 +84,10 @@ void View::Init()
 
 	SetGpu("Default");
 
+	SetDoubleBuffering(true);
+
+	SetDisplayListType(DisplayListOff);
+
 	// if(!CAppSettings::bLightScaling) CAppSettings::bLightScaling = true
 	SetLightScaling(0);
 
@@ -97,7 +101,11 @@ void View::Init()
 	COLORREF nWindowBackgroundColor = RGB(59, 68, 83);
 	SetWindowBackGroundColor(nWindowBackgroundColor, nWindowBackgroundColor);
 
-	SetDoubleBuffering(true);
+	// Setting Framerate Mode
+	SetFramerateMode(FramerateOff);
+	SetCullingThreshold(2);
+
+	SetPolygonHandednessMode(HandednessLeft);
 
 	SetDefaultOperator();
 

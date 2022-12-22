@@ -2,8 +2,8 @@
 
 #include "3DF.Key.h"
 
-#include "3DF.IncludeKey.h"
-#include "3DF.ShellKey.h"
+#include "3DF.Include.h"
+#include "3DF.Shell.h"
 #include "3DF.Selectability.h"
 #include "3DF.Portfolio.h"
 #include "3DF.Style.h"

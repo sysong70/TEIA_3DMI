@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.MaterialMappingControl.h"
+#include "3DF.MaterialMapping.h"
 
 #include "3DF.Segment.h"
 

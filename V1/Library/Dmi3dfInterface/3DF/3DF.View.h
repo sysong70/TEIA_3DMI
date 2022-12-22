@@ -57,7 +57,7 @@ public:
 protected:
 	DWORD MouseMapFlags(DWORD state);
 
-	//== Operator 관련 함수 ==============================================================================
+	//== Operator 관련 함수 ==========================================================================
 protected:
 	void SetDefaultOperator();
 	void LocalSetOperator(HBaseOperator * pcNewOperator);

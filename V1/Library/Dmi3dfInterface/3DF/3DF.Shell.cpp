@@ -1,8 +1,8 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.ShellKey.h"
+#include "3DF.Shell.h"
 
-#include "3DF.MaterialMappingControl.h"
+#include "3DF.MaterialMapping.h"
 
 USING_3DF_NAMESPACE
 

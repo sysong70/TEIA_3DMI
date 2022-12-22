@@ -4,7 +4,7 @@
 
 #include <3DF/3DF.Segment.h>
 #include <3DF/3DF.Math.h>
-#include <3DF/3DF.MaterialMappingControl.h>
+#include <3DF/3DF.MaterialMapping.h>
 
 #include "3DX.ImportBase.h"
 

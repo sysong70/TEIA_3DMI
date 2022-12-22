@@ -8,10 +8,10 @@
 
 #include <mb_matrix3d.h>
 
-#include <3DF/3DF.MaterialMappingControl.h>
+#include <3DF/3DF.MaterialMapping.h>
 #include <3DF/3DF.Portfolio.h>
 #include <3DF/3DF.Style.h>
-#include <3DF/3DF.ShellKey.h>
+#include <3DF/3DF.Shell.h>
 #include <3DF/3DF.Line.h>
 
 #include <chrono>
