@@ -112,8 +112,8 @@ protected:
 	bool ConvertFaceList(TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap,
 		A3DUns32 * pnFacePointIndex, A3DUns32 * pnFaceNormalIndex, _3DF::IntArray & anFacelistArray);
 
-	A3DStatus DrawStyle(const A3DGraphStyleData * pcStyleData, A3DInt32 * pnUVCoordinatesIndex, A3DUns8 * pucTextureDimension, _3DF::MaterialMappingKit & cMaterialKit);
-	A3DStatus DrawStyle(const A3DGraphStyleData * pcStyleData, _3DF::MaterialMappingKit & cMaterialKit);
+	A3DStatus DrawStyle(const A3DMiscCascadedAttributesData & cAttrsData, A3DInt32 * pnUVCoordinatesIndex, A3DUns8 * pucTextureDimension, _3DF::MaterialMappingKit & cMaterialKit);
+	A3DStatus DrawStyle(const A3DMiscCascadedAttributesData & cAttrsData, _3DF::MaterialMappingKit & cMaterialKit);
 
 	A3DStatus DrawTransformation(const A3DMiscTransformation * pcTransformation);
 

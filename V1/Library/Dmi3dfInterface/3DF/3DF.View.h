@@ -35,6 +35,7 @@ public:
 protected:
 	void SetGpu(CString strGpu);
 	void SetDriverOption();
+	void SetViewTransparency();
 	void SetViewAxis();
 	void SetWindowBackGroundColor(COLORREF nNewTopColor, COLORREF nNewBottomColor, bool bEmitMessage = true);
 

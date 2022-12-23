@@ -164,19 +164,41 @@ SegmentKey & SegmentKey::SetMaterialMapping(_3DF::MaterialMappingKit const & cIn
 	//----- Face 설정 -----
 	if(true == cInKit.ShowFaceChannel(Material::Channel::DiffuseColor, eType, cRgbaColor, strTextureName, fValue)) {
 		CString strColorText;
-		strColorText.Format(L"faces = (diffuse = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
+
+		if(1.0f == cRgbaColor.alpha) {
+			strColorText.Format(L"faces = (diffuse = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
+		}
+		else {
+			float fTransparency = 1.0f - cRgbaColor.alpha;
+			strColorText.Format(L"faces = (diffuse = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, fTransparency, fTransparency, fTransparency);
+		}
+
 		HC_Set_Color(H_ASCII_TEXT(strColorText));
 	}
 
 	if(true == cInKit.ShowFaceChannel(Material::Channel::Specular, eType, cRgbaColor, strTextureName, fValue)) {
 		CString strColorText;
-		strColorText.Format(L"faces = (specular = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
+		if(1.0f == cRgbaColor.alpha) {
+			strColorText.Format(L"faces = (diffuse = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
+		}
+		else {
+			float fTransparency = 1.0f - cRgbaColor.alpha;
+			strColorText.Format(L"faces = (diffuse = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, fTransparency, fTransparency, fTransparency);
+		}
+
 		HC_Set_Color(H_ASCII_TEXT(strColorText));
 	}
 
 	if(true == cInKit.ShowFaceChannel(Material::Channel::Emission, eType, cRgbaColor, strTextureName, fValue)) {
 		CString strColorText;
-		strColorText.Format(L"faces = (emission = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
+		if(1.0f == cRgbaColor.alpha) {
+			strColorText.Format(L"faces = (diffuse = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
+		}
+		else {
+			float fTransparency = 1.0f - cRgbaColor.alpha;
+			strColorText.Format(L"faces = (diffuse = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, fTransparency, fTransparency, fTransparency);
+		}
+
 		HC_Set_Color(H_ASCII_TEXT(strColorText));
 	}
 
