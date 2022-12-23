@@ -55,10 +55,10 @@ void View::Init()
 	// call base's init function first to get the default HOOPS hierarchy for the view
 	HBaseView::Init();
 
-	SetGpu("Default");
-
 	// do all the setup with no updates
 	SetSuppressUpdate(true);
+
+	SetGpu("Default");
 
 	SetDriverOption();
 
@@ -70,6 +70,10 @@ void View::Init()
 	// Setting Framerate Mode
 	SetFramerateMode(FramerateOff);
 	SetCullingThreshold(2);
+
+	SetBackplaneCulling(false);
+	
+	SetProjMode(ProjOrthographic);
 
 	//SetLineAntialiasing(true);
 
