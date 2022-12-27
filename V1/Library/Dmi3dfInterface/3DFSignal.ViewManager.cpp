@@ -49,7 +49,7 @@ void ViewManager::ExecuteSignal(Json::Object & cInObject)
 			int nX = cInObject.GetInteger(SKW_X);
 			int nY = cInObject.GetInteger(SKW_Y);
 
-			//OnResizeView(nViewId, nX, nY);
+			// Resize(nViewId, nX, nY);
 		}
 		break;
 

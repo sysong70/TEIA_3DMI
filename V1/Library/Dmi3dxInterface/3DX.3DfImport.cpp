@@ -265,7 +265,7 @@ A3DStatus _3DfImport::DrawProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 	MaterialMappingKit cMaterialMapping;
 	A3DInt32 iUVCoordinatesIndex = -1;
 	A3DUns8 ucTextureDimension = 2;
-	DrawStyle(&cAttrsData.m_sStyle, &iUVCoordinatesIndex, &ucTextureDimension, cMaterialMapping);
+	DrawStyle(cAttrsData, &iUVCoordinatesIndex, &ucTextureDimension, cMaterialMapping);
 
 	if(cAttrsData.m_bShow && !cAttrsData.m_bRemoved && true == IsShow(pcOccurrence))
 	{
@@ -877,7 +877,7 @@ A3DStatus _3DfImport::DrawRepresentationItem(const A3DRiRepresentationItem * pcR
 	MaterialMappingKit cMaterialMapping;
 	A3DInt32 iUVCoordinatesIndex = -1;
 	A3DUns8 ucTextureDimension = 2;
-	DrawStyle(&cAttrData.m_sStyle, &iUVCoordinatesIndex, &ucTextureDimension, cMaterialMapping);
+	DrawStyle(cAttrData, &iUVCoordinatesIndex, &ucTextureDimension, cMaterialMapping);
 
 	if(true == cMaterialMapping.IsAllocate()) {
 		SegmentKey cStyleSegment;
@@ -1104,7 +1104,7 @@ A3DStatus _3DfImport::DrawAnnotationItem(const A3DMkpAnnotationItem * pcAnnotati
 	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcAnnotationItem, pcParentAttr, &pcAttr, &cAttrData));
 
 	MaterialMappingKit cMaterialMapping;
-	DrawStyle(&cAttrData.m_sStyle, cMaterialMapping);
+	DrawStyle(cAttrData, cMaterialMapping);
 
 	if(cAttrData.m_bShow && !cAttrData.m_bRemoved)
 	{
@@ -1357,7 +1357,7 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DRiRepresen
 		CreateAndPushCascadedAttributesTessFace(pcRepItem, pcTess3D, &cTessFaceData, 0, pcParentAttr, &pcAttribute, &sAttrData);
 
 		MaterialMappingKit cMaterialMapping;
-		DrawStyle(&sAttrData.m_sStyle, cMaterialMapping);
+		DrawStyle(sAttrData, cMaterialMapping);
 
 		// Parent Material과 다른 경우 한개의 Segment를 생성하고, Material Mapping을 적용한다.
 		if(cMaterialMapping != cParentMaterialMapping) {
@@ -2124,9 +2124,11 @@ bool _3DfImport::ConvertFaceList(TessIndexMap & maPointIndexMap, TessIndexMap & 
 }
 
 // 8. Face Draw Style 정의
-A3DStatus _3DfImport::DrawStyle(const A3DGraphStyleData * pcStyleData, A3DInt32 * pnUVCoordinatesIndex,
+A3DStatus _3DfImport::DrawStyle(const A3DMiscCascadedAttributesData & cAttrsData, A3DInt32 * pnUVCoordinatesIndex,
 	A3DUns8 * pucTextureDimension, _3DF::MaterialMappingKit & cMaterialKit)
 {
+	const A3DGraphStyleData * pcStyleData = &cAttrsData.m_sStyle;
+
 	if(pcStyleData == nullptr)
 		return A3D_ERROR;
 
@@ -2223,11 +2225,16 @@ A3DStatus _3DfImport::DrawStyle(const A3DGraphStyleData * pcStyleData, A3DInt32 
 }
 
 // 8-1. 일반 DrawStyle 정의 
-A3DStatus _3DfImport::DrawStyle(const A3DGraphStyleData * pcStyleData, _3DF::MaterialMappingKit & cMaterialKit)
+A3DStatus _3DfImport::DrawStyle(const A3DMiscCascadedAttributesData & cAttrsData, _3DF::MaterialMappingKit & cMaterialKit)
 {
+	const A3DGraphStyleData * pcStyleData = &cAttrsData.m_sStyle;
+
 	if(pcStyleData == nullptr) {
 		return A3D_ERROR;
 	}
+
+	bool bTransparencyDefined = (1 == cAttrsData.m_sStyle.m_bIsTransparencyDefined) ? true : false;
+	float fTransparency = cAttrsData.m_sStyle.m_ucTransparency / 255.0f;
 
 	A3DStatus nRetStatus = A3D_SUCCESS;
 
@@ -2279,6 +2286,7 @@ A3DStatus _3DfImport::DrawStyle(const A3DGraphStyleData * pcStyleData, _3DF::Mat
 			CHECK_A3D_RETURN(A3DGlobalGetGraphMaterialData(pcStyleData->m_uiRgbColorIndex, &sMaterialData));
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiDiffuse, &sRgbColorData));
 			_3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dDiffuseAlpha);
+			if(true == bTransparencyDefined) {  cDiffuseColor.alpha = fTransparency; }
 			cMaterialKit.SetFaceColor(cDiffuseColor, _3DF::Material::Color::Channel::DiffuseColor);
 
 /*
@@ -2291,11 +2299,13 @@ A3DStatus _3DfImport::DrawStyle(const A3DGraphStyleData * pcStyleData, _3DF::Mat
 			//nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiEmissive, &sRgbColorData));
 			_3DF::RGBAColor cEmissiveColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dEmissiveAlpha);
+			if(true == bTransparencyDefined) { cEmissiveColor.alpha = fTransparency; }
 			cMaterialKit.SetFaceColor(cEmissiveColor, _3DF::Material::Color::Channel::Emission);
 
 			//nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiSpecular, &sRgbColorData));
 			_3DF::RGBAColor cSpecularColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dSpecularAlpha);
+			if(true == bTransparencyDefined) { cSpecularColor.alpha = fTransparency; }
 			cMaterialKit.SetFaceColor(cSpecularColor, _3DF::Material::Color::Channel::Specular);
 
 			nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
@@ -2314,6 +2324,7 @@ A3DStatus _3DfImport::DrawStyle(const A3DGraphStyleData * pcStyleData, _3DF::Mat
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(pcStyleData->m_uiRgbColorIndex, &sRgbColorData));
 
 			_3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
+			if(true == bTransparencyDefined) { cDiffuseColor.alpha = fTransparency; }
 			cMaterialKit.SetFaceColor(cDiffuseColor);
 
 			A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);

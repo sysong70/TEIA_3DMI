@@ -52,14 +52,42 @@ View::~View()
 
 void View::Init()
 {
-	SetSuppressUpdate(true);
-
 	// call base's init function first to get the default HOOPS hierarchy for the view
 	HBaseView::Init();
-	GetModel()->GetEventManager()->RegisterHandler((HAnimationListener *) this, HAnimationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
+
+	// do all the setup with no updates
+	SetSuppressUpdate(true);
+
+	SetGpu("Default");
+
+	SetDriverOption();
+
+	SetLightScaling(0);
+
+	SetDisplayListType(DisplayListSegment);
+	SetDisplayListMode(true);
+
+	// Setting Framerate Mode
+	SetFramerateMode(FramerateOff);
+	SetCullingThreshold(2);
+
+	SetBackplaneCulling(false);
+	
+	SetProjMode(ProjOrthographic);
+
+	//SetLineAntialiasing(true);
+
+	SetViewTransparency();
+
+	SetSmoothTransition(false);
+
+	SetPolygonHandednessMode(HandednessLeft);
 
 	GetModel()->SetStaticModel(true);
+	//GetModel()->SetLMVModel(true);
 
+	GetModel()->GetEventManager()->RegisterHandler((HAnimationListener *) this, HAnimationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
+	
 	m_pSelection = new SelectionControl(this);
 	m_pSelection->Init();
 	m_pSelection->SetAllowSubentityDeselection(true);
@@ -82,17 +110,6 @@ void View::Init()
 	cWindowSpaceSegment.SetMarkerSymbol("+");
 	cWindowSpaceSegment.GetSelectabilityControl().SetEverything(false);
 
-	SetGpu("Default");
-
-	SetDoubleBuffering(true);
-
-	SetDisplayListType(DisplayListOff);
-
-	// if(!CAppSettings::bLightScaling) CAppSettings::bLightScaling = true
-	SetLightScaling(0);
-
-	SetDriverOption();
-
 	SetViewAxis();
 
 	SetViewMode(HViewIsoFrontRightTop);		// fit the camera to the scene extents
@@ -101,10 +118,6 @@ void View::Init()
 	COLORREF nWindowBackgroundColor = RGB(59, 68, 83);
 	SetWindowBackGroundColor(nWindowBackgroundColor, nWindowBackgroundColor);
 
-	// Setting Framerate Mode
-	SetFramerateMode(FramerateOff);
-	SetCullingThreshold(2);
-
 	SetPolygonHandednessMode(HandednessLeft);
 
 	SetDefaultOperator();
@@ -112,6 +125,8 @@ void View::Init()
 	// View 설정이 끝나고 나면 
 	// File Import 시작
 	//ImportExchangeFile(nViewId, strFilePathName);
+
+	SetHandednessFromModel();
 
 	SetSuppressUpdate(false);
 }
@@ -136,11 +151,45 @@ void View::SetDriverOption()
 	//sprintf(chDriverOpts, "%s, anti-alias=%d ", chDriverOpts, nAntialiasingLevel);
 	sprintf(chDriverOpts, "anti-alias=%d ", nAntialiasingLevel);
 
+	sprintf(chDriverOpts, "%s, quick moves preference = %s",
+		chDriverOpts, "Default");
+
 	HC_Open_Segment_By_Key(GetViewKey()); {
 		HC_Set_Driver_Options(chDriverOpts);
 		//if(CAppSettings::bAntiAliasing)
 		HC_Set_Rendering_Options("anti-alias = (screen = on)");
+
+		HC_Set_Driver_Options("special events, update interrupts");
+		HC_Control_Update(".", "redraw everything");
+
 	} HC_Close_Segment();
+}
+
+void View::SetViewTransparency()
+{
+	char text[4096];
+	char style[4096];
+	char sorting[4096];
+	char layers[4096];
+	bool fast_z_sort = false;
+
+	strcpy(style, "blended");
+	strcpy(sorting, "depth peeling");
+	strcpy(layers, "3");
+
+	if(strstr(sorting, "z-sort"))
+	{
+		if(strstr(sorting, "fast"))
+			fast_z_sort = true;
+		sprintf(sorting, "z-sort only");
+	}
+
+	sprintf(text, "style = %s, hsr algorithm = %s, depth peeling options = (layers= %s, algorithm=%s), depth writing = %s",
+		style, sorting, layers, false ? "pixel" : "buffer", false == TRUE ? "on" : "off");
+
+	//sprintf(text, "style = %s, hsr algorithm = %s,depth peeling options=(layers= %s)", style, sorting, layers);
+
+	SetTransparency(text, fast_z_sort);
 }
 
 void View::SetViewAxis()
