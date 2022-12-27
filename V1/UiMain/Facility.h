@@ -12,7 +12,7 @@ namespace Facility
 
 
 
-	enum class UiLanguage
+	enum class ELanguage
 	{
 		English = 0,
 		Korean,
@@ -20,9 +20,9 @@ namespace Facility
 
 #pragma region Language
 
-	UiLanguage GetLanguage();
+	ELanguage GetLanguage();
 
-	void SetLanguage(UiLanguage e);
+	void SetLanguage(ELanguage e);
 
 	CString Local(LPCTSTR pStrings);
 

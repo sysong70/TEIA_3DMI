@@ -5,6 +5,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 
@@ -52,36 +54,36 @@ bool Window::IsAllowedFile(const wchar_t* pFilePath)
 
 
 
-CString Window::GetDocTypeName(DocType e)
+CString Window::GetDocTypeName(EDocType e)
 {
 	switch (e) {
-	case DocType::ACIS:        return L"ACIS";
-	case DocType::CATIA4:      return L"CATIA4";
-	case DocType::CATIA5:      return L"CATIA5";
-	case DocType::CGR:         return L"CGR";
-	case DocType::IDEAS:       return L"IDEAS";
-	case DocType::IFC:         return L"IFC";
-	case DocType::IGES:        return L"IGES";
-	case DocType::Inventor:    return L"Inventor";
-	case DocType::JT:          return L"JT";
-	case DocType::Parasolid:   return L"Parasolid";
-	case DocType::PDF:         return L"PDF";
-	case DocType::PRC:         return L"PRC";
-	case DocType::ProEngineer: return L"ProEngineer";
-	case DocType::Rhino:       return L"Rhino";
-	case DocType::SolidEdge:   return L"SolidEdge";
-	case DocType::Solidworks:  return L"Solidworks";
-	case DocType::STEP:        return L"STEP";
-	case DocType::STL:         return L"STL";
-	case DocType::Universal3D: return L"Universal3D";
-	case DocType::Unigraphics: return L"Unigraphics";
-	case DocType::VDAFS:       return L"VDAFS";
-	case DocType::VRML:        return L"VRML";
-	case DocType::DWG3D:       return L"DWG3D";
-	case DocType::DWG2D:       return L"DWG2D";
-	case DocType::DXF:         return L"DXF";
-	case DocType::Revit:       return L"Revit";
-	case DocType::HPGL:        return L"HPGL";
+	case EDocType::ACIS:        return L"ACIS";
+	case EDocType::CATIA4:      return L"CATIA4";
+	case EDocType::CATIA5:      return L"CATIA5";
+	case EDocType::CGR:         return L"CGR";
+	case EDocType::IDEAS:       return L"IDEAS";
+	case EDocType::IFC:         return L"IFC";
+	case EDocType::IGES:        return L"IGES";
+	case EDocType::Inventor:    return L"Inventor";
+	case EDocType::JT:          return L"JT";
+	case EDocType::Parasolid:   return L"Parasolid";
+	case EDocType::PDF:         return L"PDF";
+	case EDocType::PRC:         return L"PRC";
+	case EDocType::ProEngineer: return L"ProEngineer";
+	case EDocType::Rhino:       return L"Rhino";
+	case EDocType::SolidEdge:   return L"SolidEdge";
+	case EDocType::Solidworks:  return L"Solidworks";
+	case EDocType::STEP:        return L"STEP";
+	case EDocType::STL:         return L"STL";
+	case EDocType::Universal3D: return L"Universal3D";
+	case EDocType::Unigraphics: return L"Unigraphics";
+	case EDocType::VDAFS:       return L"VDAFS";
+	case EDocType::VRML:        return L"VRML";
+	case EDocType::DWG3D:       return L"DWG3D";
+	case EDocType::DWG2D:       return L"DWG2D";
+	case EDocType::DXF:         return L"DXF";
+	case EDocType::Revit:       return L"Revit";
+	case EDocType::HPGL:        return L"HPGL";
 
 	default:
 		DEBUG_STOP;

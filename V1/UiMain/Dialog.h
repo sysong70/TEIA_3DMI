@@ -10,10 +10,21 @@ namespace Dialog
 {
 	class Base;
 
+	class AppSettings;
 	class FileOpenOption;
 	class ProgressLog;
 	class PropertyList;
 	class Standard;
 
+
+
 	typedef std::list<CWnd*> Controls;
+
+
+
+	CSize ControlGap();
+
+	int FooterPadding();
+
+	CSize GetControlSize(CWnd* pControl);
 }

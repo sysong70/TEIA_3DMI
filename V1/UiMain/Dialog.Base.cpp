@@ -3,6 +3,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 
@@ -86,6 +88,27 @@ CRect Dialog::Base::ConstructFooter(const CRect& boundary)
 
 
 
+CRect Dialog::Base::GetBodyRect()
+{
+	CRect rect = GetClientArea();
+
+	rect.top += m_nHeaderHeight;
+	rect.bottom -= m_nFooterHeight;
+
+	return rect;
+}
+
+
+
+CSize Dialog::Base::GetBodySize()
+{
+	CRect rect = GetClientArea();
+
+	return { rect.Width(), rect.Height() - m_nHeaderHeight - m_nFooterHeight };
+}
+
+
+
 BOOL Dialog::Base::OnInitDialog()
 {
 	__super::OnInitDialog();
@@ -101,9 +124,7 @@ BOOL Dialog::Base::OnInitDialog()
 
 void Dialog::Base::PostNcDestroy()
 {
-	delete this;
-
-	//__super::PostNcDestroy();
+	__super::PostNcDestroy();
 }
 
 
@@ -139,6 +160,16 @@ void Dialog::Base::EnableParent(bool enable)
 	if (m_pParentWnd != nullptr && m_pParentWnd->GetSafeHwnd() != nullptr) {
 		m_pParentWnd->EnableWindow(enable);
 	}
+}
+
+
+
+inline CRect Dialog::Base::GetClientArea()
+{
+	CRect rect;
+	GetClientRect(&rect);
+
+	return rect;
 }
 
 

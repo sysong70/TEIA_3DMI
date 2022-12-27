@@ -130,6 +130,15 @@
     <ClCompile Include="Component.Property.cpp">
       <Filter>Component\Property</Filter>
     </ClCompile>
+    <ClCompile Include="Dialog.AppSettings.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.TreePropList.cpp">
+      <Filter>Component\Property</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.Common.h">
@@ -274,6 +283,12 @@
       <Filter>_Common</Filter>
     </ClInclude>
     <ClInclude Include="Component.Property.h">
+      <Filter>Component\Property</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.AppSettings.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.TreePropList.h">
       <Filter>Component\Property</Filter>
     </ClInclude>
   </ItemGroup>

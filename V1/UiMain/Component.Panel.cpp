@@ -38,6 +38,7 @@ Component::Panel::Panel()
 
 Component::Panel::~Panel()
 {
+	DestroyWindow();
 }
 
 
@@ -113,6 +114,13 @@ CSize Component::Panel::GetBodySize()
 	GetClientRect(rect);
 
 	return { rect.Width(), rect.Height() - m_nHeaderHeight - m_nFooterHeight };
+}
+
+
+
+void Component::Panel::PostNcDestroy()
+{
+	__super::PostNcDestroy();
 }
 
 

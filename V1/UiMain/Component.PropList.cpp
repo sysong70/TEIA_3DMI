@@ -3,6 +3,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 
@@ -12,11 +14,6 @@
 namespace PresetPropList
 {
 	int const Id = WM_USER;
-
-	int RowPadding()
-	{
-		return globalUtils.ScaleByDPI(1);
-	}
 }
 
 
@@ -49,5 +46,5 @@ void Component::PropList::Initialize(CWnd* pParentWnd)
 	SetVSDotNetLook();
 	SetGroupNameFullWidth();
 
-	SetRowPadding(PRESET::RowPadding());
+	SetRowPadding(PropListRowPadding());
 }

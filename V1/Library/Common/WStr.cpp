@@ -489,32 +489,32 @@ CString WStr::ToUtf16(const char* value)
 
 #pragma region Helper Functions
 
-void WStr::GetWrapper(Wrapper e, wchar_t& prefix, wchar_t& postfix)
+void WStr::GetWrapper(EWrapper e, wchar_t& prefix, wchar_t& postfix)
 {
 	switch (e) {
-	case Wrapper::Space:
+	case EWrapper::Space:
 		prefix = postfix = ' ';
 		break;
 
-	case Wrapper::SingleQuot:
+	case EWrapper::SingleQuot:
 		prefix = postfix = '\'';
 		break;
 
-	case Wrapper::DoubleQuot:
+	case EWrapper::DoubleQuot:
 		prefix = postfix = '\"';
 		break;
 
-	case Wrapper::RoundBracket:
+	case EWrapper::RoundBracket:
 		prefix = '(';
 		postfix = ')';
 		break;
 
-	case Wrapper::CurlyBracket:
+	case EWrapper::CurlyBracket:
 		prefix = '{';
 		postfix = '}';
 		break;
 
-	case Wrapper::SquareBracket:
+	case EWrapper::SquareBracket:
 		prefix = '[';
 		postfix = ']';
 		break;
@@ -529,7 +529,7 @@ void WStr::GetWrapper(Wrapper e, wchar_t& prefix, wchar_t& postfix)
 
 
 
-CString WStr::Get(CString& source, Wrapper e, bool erase)
+CString WStr::Get(CString& source, EWrapper e, bool erase)
 {
 	if (source.IsEmpty()) {
 		return L"";
@@ -584,7 +584,7 @@ void WStr::TrailingZero(CString& source)
 
 
 
-void WStr::Unwrap(CString& source, Wrapper e)
+void WStr::Unwrap(CString& source, EWrapper e)
 {
 	wchar_t prefix, postfix;
 	GetWrapper(e, prefix, postfix);
@@ -619,7 +619,7 @@ void WStr::Wrap(CString& source, wchar_t frontCh, wchar_t backCh, int count)
 
 
 
-void WStr::Wrap(CString& source, Wrapper e, int count /*= 1*/)
+void WStr::Wrap(CString& source, EWrapper e, int count /*= 1*/)
 {
 	wchar_t prefix = 0;
 	wchar_t postfix = 0;

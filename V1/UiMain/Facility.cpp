@@ -3,6 +3,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 
@@ -11,31 +13,31 @@
 
 namespace PresetFacility
 {
-	Facility::UiLanguage Language = Facility::UiLanguage::English;
+	Facility::ELanguage Language = Facility::ELanguage::English;
 }
 
 
 
 #pragma region Language
 
-Facility::UiLanguage Facility::GetLanguage()
+Facility::ELanguage Facility::GetLanguage()
 {
 	return PRESET::Language;
 }
 
 
 
-void Facility::SetLanguage(UiLanguage value)
+void Facility::SetLanguage(ELanguage value)
 {
 	PRESET::Language = value;
 
 	BOOL success = FALSE;
 	switch (value) {
-	case UiLanguage::Korean:
+	case ELanguage::Korean:
 		success = SetThreadPreferredUILanguages(MUI_LANGUAGE_NAME, L"ko-KR", NULL);
 		break;
 
-	case UiLanguage::English:
+	case ELanguage::English:
 	default:
 		success = SetThreadPreferredUILanguages(MUI_LANGUAGE_NAME, L"en-US", NULL);
 		break;

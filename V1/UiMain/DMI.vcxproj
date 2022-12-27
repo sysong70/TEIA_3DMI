@@ -97,7 +97,7 @@
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>../Library/Common;../Library/Signal</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -130,7 +130,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MinimalRebuild>false</MinimalRebuild>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>../Library/Common;../Library/Signal</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -164,10 +164,12 @@
     <ClInclude Include="..\Library\Signal\Signal.h" />
     <ClInclude Include="Command.Common.h" />
     <ClInclude Include="Component.Property.h" />
+    <ClInclude Include="Component.TreePropList.h" />
     <ClInclude Include="Component.PropList.h" />
     <ClInclude Include="Component.TabWnd.h" />
     <ClInclude Include="Component.TaskBar.h" />
     <ClInclude Include="Component.ToolBar.h" />
+    <ClInclude Include="Dialog.AppSettings.h" />
     <ClInclude Include="Facility.CommandIndexer.h" />
     <ClInclude Include="Command.Resource.h" />
     <ClInclude Include="Component.h" />
@@ -213,10 +215,13 @@
     <ClCompile Include="..\Library\Signal\SignalBase.cpp" />
     <ClCompile Include="..\Library\Signal\Signal.cpp" />
     <ClCompile Include="Component.Property.cpp" />
+    <ClCompile Include="Component.TreePropList.cpp" />
     <ClCompile Include="Component.PropList.cpp" />
     <ClCompile Include="Component.TabWnd.cpp" />
     <ClCompile Include="Component.TaskBar.cpp" />
     <ClCompile Include="Component.ToolBar.cpp" />
+    <ClCompile Include="Dialog.AppSettings.cpp" />
+    <ClCompile Include="Dialog.cpp" />
     <ClCompile Include="Facility.CommandIndexer.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="Component.LayerPanel.cpp" />

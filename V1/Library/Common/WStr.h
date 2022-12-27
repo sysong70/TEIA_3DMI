@@ -4,7 +4,7 @@
 
 namespace WStr
 {
-	enum class Wrapper
+	enum class EWrapper
 	{
 		Space,			// ' '
 		SingleQuot,		// ''
@@ -214,14 +214,14 @@ namespace WStr
 
 #pragma region Helper Functions
 
-	void GetWrapper(Wrapper e, wchar_t& prefix, wchar_t& postfix);
+	void GetWrapper(EWrapper e, wchar_t& prefix, wchar_t& postfix);
 
 	/*
 		CString source = L"**[Data]**";
 
-		ASSERT(Get(source, Wrapper::SquareBracket, true) == L"[Data]" && source == L"****");
+		ASSERT(Get(source, EWrapper::SquareBracket, true) == L"[Data]" && source == L"****");
 	*/
-	CString Get(CString& source, Wrapper e, bool erase);
+	CString Get(CString& source, EWrapper e, bool erase);
 
 	/*
 		WStringArray sa = { L"one", L"two", L"three" };
@@ -243,23 +243,23 @@ namespace WStr
 	/*
 		CString source = L"[Data]";
 
-		Unwrap(source, Wrapper::SquareBracket);
+		Unwrap(source, EWrapper::SquareBracket);
 		ASSERT(source == L"Data");
 	*/
-	void Unwrap(CString& source, Wrapper e);
+	void Unwrap(CString& source, EWrapper e);
 
 	/*
 		CString source = L"Data";
 
 		Wrap(source, '*', 3); ASSERT(source == L"***Data***");
 		Wrap(source, '-', ':', 3); ASSERT(source == L"---***Data***:::");
-		Wrap(source, Wrapper::CurlyBracket, 2); ASSERT(source == L"{{---***Data***:::}}");
+		Wrap(source, EWrapper::CurlyBracket, 2); ASSERT(source == L"{{---***Data***:::}}");
 	*/
 	void Wrap(CString& source, wchar_t ch, int count = 1);
 
 	void Wrap(CString& source, wchar_t frontCh, wchar_t backCh, int count = 1);
 
-	void Wrap(CString& source, Wrapper e, int count = 1);
+	void Wrap(CString& source, EWrapper e, int count = 1);
 
 #pragma endregion //:REGION
 }

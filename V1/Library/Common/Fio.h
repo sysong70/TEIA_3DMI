@@ -6,14 +6,14 @@
 
 namespace Fio
 {
-	enum class Mode
+	enum class EMode
 	{
 		Read,
 		Write,
 		Append,
 	};
 
-	enum class Encoding
+	enum class EEncoding
 	{
 
 		UTF8 = 0,    // Same as ANSI
@@ -62,7 +62,7 @@ namespace Fio
 			return Write((const char*)(&value), sizeof(T)) == sizeof(T);
 		}
 
-		bool Open(const wchar_t* path, Mode mode);
+		bool Open(const wchar_t* path, EMode mode);
 
 		size_t Read(const char* buffer, size_t length);
 
@@ -70,7 +70,7 @@ namespace Fio
 
 	protected:
 
-		virtual CString GetMode(Mode e);
+		virtual CString GetMode(EMode e);
 
 		FILE* m_pFile;
 	};
@@ -106,7 +106,7 @@ namespace Fio
 
 	public:
 
-		bool Open(const wchar_t* path, Mode mode, Encoding encoding);
+		bool Open(const wchar_t* path, EMode mode, EEncoding encoding);
 
 		size_t Read(CString& result);
 
@@ -122,9 +122,9 @@ namespace Fio
 
 	protected:
 
-		CString GetMode(Mode e) override;
+		CString GetMode(EMode e) override;
 
-		CString GetEncodeing(Encoding e);
+		CString GetEncodeing(EEncoding e);
 	};
 }
 

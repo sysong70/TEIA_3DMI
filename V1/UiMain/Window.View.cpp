@@ -7,6 +7,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 
@@ -19,7 +21,7 @@ namespace PresetView
 	const UINT_PTR ActivateDelayTimer = 1234567;
 	const UINT TabId = WM_USER + 1;
 
-	enum class PanelId
+	enum class EPanelId
 	{
 		ModelTree = TabId + 1,
 		View,
@@ -54,7 +56,7 @@ BEGIN_MESSAGE_MAP(View, CView)
 	ON_WM_SIZE()
 
 	ON_COMMAND_RANGE(COMMAND_START, COMMAND_END, OnCommand)
-	ON_MESSAGE((UINT)UserMessage::OnSignal, OnSignal)
+	ON_MESSAGE((UINT)EUserMessage::OnSignal, OnSignal)
 	ON_WM_TIMER()
 END_MESSAGE_MAP()
 
@@ -107,10 +109,10 @@ void Window::View::ReceiveSignal(Json::Object* pData)
 		m_bValid = data.GetBoolean(SKW_VALID);
 		if (m_bValid) {
 			CRect rect = GetClientArea();
-			m_delivery.view.OnResize(rect.Width(), rect.Height());
+			m_delivery.view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
 
 			if (GetMainFrame().HasNextFile()) {
-				GetMainFrame().PostMessage((UINT)UserMessage::OnNextFileOpen);
+				GetMainFrame().PostMessage((UINT)EUserMessage::OnNextFileOpen);
 			}
 			else {
 				SendMessage(WM_ACTIVATE, (WPARAM)WA_ACTIVE);
@@ -533,10 +535,10 @@ void Window::View::CreatePanelTabs()
 		DEBUG_RETURN;
 	}
 
-	m_modelTreePanel.Initialize(&m_tabs, (UINT)PRESET::PanelId::ModelTree);
-	m_viewPanel.Initialize(&m_tabs, (UINT)PRESET::PanelId::View);
-	m_layerPanel.Initialize(&m_tabs, (UINT)PRESET::PanelId::Layer);
-	m_scenePanel.Initialize(&m_tabs, (UINT)PRESET::PanelId::Scene);
+	m_modelTreePanel.Initialize(&m_tabs, (UINT)PRESET::EPanelId::ModelTree);
+	m_viewPanel.Initialize(&m_tabs, (UINT)PRESET::EPanelId::View);
+	m_layerPanel.Initialize(&m_tabs, (UINT)PRESET::EPanelId::Layer);
+	m_scenePanel.Initialize(&m_tabs, (UINT)PRESET::EPanelId::Scene);
 
 	m_tabs.SetLocation(CBCGPTabWnd::LOCATION_TOP);
 	m_tabs.SetIconLocation(CBCGPTabWnd::TAB_ICON_LEFT);

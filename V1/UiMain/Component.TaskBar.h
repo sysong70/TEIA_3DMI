@@ -22,6 +22,8 @@ namespace Component
 
 	protected:
 
+		void PostNcDestroy() override;
+
 		afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 
 		afx_msg LRESULT OnDPIChangedAfterParent(WPARAM, LPARAM);

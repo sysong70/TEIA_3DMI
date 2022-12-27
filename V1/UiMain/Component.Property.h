@@ -64,7 +64,7 @@ namespace Property
 		CBrush m_brBackground;
 	};
 
-#pragma endregion //:RETION
+#pragma endregion //:REGION
 
 	class ComboBoxEx : public CBCGPProp
 	{

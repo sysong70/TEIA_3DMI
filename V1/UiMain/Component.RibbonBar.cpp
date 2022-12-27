@@ -5,6 +5,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 
@@ -116,7 +118,7 @@ bool Component::RibbonBar::Initialize(CWnd* pMainFrame)
 	EnableMinimizeButton();
 	EnableToolTips(FALSE, FALSE);
 
-	SetApplicationModes((UINT)Window::AppMode::Standard);
+	SetApplicationModes((UINT)Window::EAppMode::Standard);
 	SetMinimizeButtonLocation(BCGPRibbonMinimizeButtonLocation_RightOfCategory);
 	//SetGrayDisabledImages();
 	//SetImagesLuminosity(1.1); // 0.1, 1.1

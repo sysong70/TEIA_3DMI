@@ -4,6 +4,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 
@@ -12,7 +14,7 @@
 
 namespace PresetStatusBar
 {
-	enum class PaneId
+	enum class EPaneId
 	{
 		Unknown = WM_USER,
 		Message,
@@ -40,8 +42,8 @@ bool Component::StatusBar::Initialize(CWnd* pMainFrame)
 		RETURN_FALSE;
 	}
 
-	AddElement(new CBCGPRibbonStatusBarPane((UINT)PRESET::PaneId::Message, L"", TRUE), L"MessagePane");
-	AddExtendedElement(new CBCGPRibbonStatusBarPane((UINT)PRESET::PaneId::Coordinate, L"", TRUE), L"CoordinatePane");
+	AddElement(new CBCGPRibbonStatusBarPane((UINT)PRESET::EPaneId::Message, L"", TRUE), L"MessagePane");
+	AddExtendedElement(new CBCGPRibbonStatusBarPane((UINT)PRESET::EPaneId::Coordinate, L"", TRUE), L"CoordinatePane");
 
 #ifdef _DEBUG
 	GetElement(0)->SetText(L"Message Pane");

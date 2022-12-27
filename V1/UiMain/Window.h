@@ -10,7 +10,7 @@ namespace Window
 
 
 
-	enum class AppMode
+	enum class EAppMode
 	{
 		All = -1,
 		Lite,
@@ -20,7 +20,7 @@ namespace Window
 
 
 
-	enum class StatusArea
+	enum class EStatusArea
 	{
 		Message = 0,
 		Progress,
@@ -29,7 +29,7 @@ namespace Window
 
 
 
-	enum class UserMessage
+	enum class EUserMessage
 	{
 		Unknown = -1,
 		OnSignal = WM_USER,

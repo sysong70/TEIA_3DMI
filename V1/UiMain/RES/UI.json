@@ -4,14 +4,10 @@
 },
 
 "Dialog":{
-	"Progress":{
-		"title":"Open File|파일 열기",
-		"size":{"cx":400, "cy":300},
-		"body":{
-			"Indicator":{"cx":24, "cy": 24},
-			"Message":{"title":"Ready...|준비..."},
-			"Log":{}
-		}
+	"DefaultButtons":{
+		"Ok":{"title":"Ok|확인", "id":1, "commant":"IDOK"},
+		"Cancel":{"title":"Cancel|취소", "id":2, "commant":"IDCANCEL"},
+		"Apply":{"title":"Apply|적용", "id":7, "comment":"IDAPPLY substitute IDYES"}
 	},
 
 	"FileOpen":{
@@ -53,8 +49,48 @@
 			"|"
 		]
 	},
-		
-	"FileOpenOption":{
+
+	"Progress":{
+		"title":"Open File|파일 열기",
+		"size":{"cx":400, "cy":300},
+		"body":{
+			"Indicator":{"cx":24, "cy": 24},
+			"Message":{"title":"Ready...|준비..."},
+			"Log":{}
+		}
+	},
+
+	"AppSettings":{
+		"title":"Settings|설정",
+		"size":{"cx":800, "cy":600},
+		"body":{
+			"Tabs":[
+				"Preference",
+				"File"
+			]
+		},
+		"footer":{
+			"Initialize":{"title":"Initialize|초기화"},
+			"Reset":{"title":"Reset To Previous|이전으로 재설정"}
+		}
+	},
+
+	"Preference":{
+		"tree":[
+			{"type":"group", "name":"Interface", "title":"Interface|인터페이스", "list":[
+				"Mouse"
+			]}
+		],
+		"properties":{
+			"Mouse":{"type":"group", "title":"Mouse|마우스", "list":[
+				"SwapButtons", "ReverseWheel"
+			]},
+			"SwapButtons":{"type":"check", "title":"Swap left and right buttons|좌우 버트 전환", "desc":"__#__|__#__"},
+			"ReverseWheel":{"type":"check", "title":"Swap wheel button direction|휠 버튼 방황 전환", "desc":"__#__|__#__"}
+		}
+	},
+
+	"File":{
 		"title":"Options|옵션",
 		"properties":[
 			{"type":"group", "name":"GENERAL", "title":"General", "list":[
@@ -104,11 +140,7 @@
 					{"type":"check", "name":"SurfaceCurvatures", "title":"Adapt to Surface Curvatures|_#_", "desc":"_#_|_#_"}
 				]}
 			]}
-		],
-		"commands":{
-			"ResetDefaults":{"type":"button", "title":"Reset Defaults|_#_"},
-			"SetToDefaults":{"type":"button", "title":"Set to Defaults|_#_"}
-		}
+		]
 	}
 }
 }

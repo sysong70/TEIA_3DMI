@@ -4,6 +4,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 
@@ -51,6 +53,7 @@ Component::TaskBar::TaskBar()
 
 Component::TaskBar::~TaskBar()
 {
+	DestroyWindow();
 }
 
 
@@ -80,6 +83,13 @@ CSize Component::TaskBar::AdjustLayout()
 	CSize size = PRESET::MinBarSize();
 	size.cy = rect.Height() - PRESET::BottomOffset();
 	SetWindowPos(nullptr, 0, 0, size.cx, size.cy, SWP_NOMOVE);
+}
+
+
+
+void Component::TaskBar::PostNcDestroy()
+{
+	__super::PostNcDestroy();
 }
 
 

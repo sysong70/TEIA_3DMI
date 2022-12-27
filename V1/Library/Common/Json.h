@@ -14,7 +14,7 @@ namespace Json
 
 
 
-	enum class ValueType
+	enum class EValueType
 	{
 		Null = 0,	// null value
 		Boolean,	// bool value
@@ -26,10 +26,6 @@ namespace Json
 		Object,		// object value (collection of name/value pairs).
 		Unknown,
 	};
-
-#ifdef _DEBUG
-	void UnitTest();
-#endif
 
 
 
@@ -118,7 +114,7 @@ namespace Json
 
 	public: // get value
 
-		ValueType GetType();
+		EValueType GetType();
 
 		bool IsValid();
 
@@ -198,7 +194,7 @@ namespace Json
 
 	private:
 
-		ValueType m_eType;
+		EValueType m_eType;
 
 		union ValueHolder
 		{
@@ -409,6 +405,6 @@ namespace Json
 		// "Path":"c:/temp"
 		CString Encode(const char* pName, CString sValue, bool bContinue = true);
 		// pArray allowed - Boolean(bool*), Int(int*), Uint(unsigned int*), Real(double*), CString(CString*)
-		CString Encode(const char* pName, void* pArray, int count, ValueType eType, bool bContinue = true);
+		CString Encode(const char* pName, void* pArray, int count, EValueType eType, bool bContinue = true);
 	};
 }

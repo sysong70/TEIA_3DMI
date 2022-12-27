@@ -262,7 +262,7 @@ void Json::Array::Stringify(CString& buffer)
 #pragma region Value Class
 
 Json::Value::Value()
-	: m_eType(ValueType::Unknown)
+	: m_eType(EValueType::Unknown)
 {
 	Initailize();
 }
@@ -270,7 +270,7 @@ Json::Value::Value()
 
 
 Json::Value::Value(int value)
-	: m_eType(ValueType::Unknown)
+	: m_eType(EValueType::Unknown)
 {
 	Initailize();
 	SetInteger(value);
@@ -279,7 +279,7 @@ Json::Value::Value(int value)
 
 
 Json::Value::Value(DWORD value)
-	: m_eType(ValueType::Unknown)
+	: m_eType(EValueType::Unknown)
 {
 	Initailize();
 	SetInteger((int)value);
@@ -288,7 +288,7 @@ Json::Value::Value(DWORD value)
 
 
 Json::Value::Value(double value)
-	: m_eType(ValueType::Unknown)
+	: m_eType(EValueType::Unknown)
 {
 	Initailize();
 	SetReal(value);
@@ -297,7 +297,7 @@ Json::Value::Value(double value)
 
 
 Json::Value::Value(bool value)
-	: m_eType(ValueType::Unknown)
+	: m_eType(EValueType::Unknown)
 {
 	Initailize();
 	SetBoolean(value);
@@ -306,7 +306,7 @@ Json::Value::Value(bool value)
 
 
 Json::Value::Value(CString value)
-	: m_eType(ValueType::Unknown)
+	: m_eType(EValueType::Unknown)
 {
 	Initailize();
 	SetString(value);
@@ -315,7 +315,7 @@ Json::Value::Value(CString value)
 
 
 Json::Value::Value(CString number, bool bReal)
-	: m_eType(ValueType::Unknown)
+	: m_eType(EValueType::Unknown)
 {
 	Initailize();
 	SetNumber(number, bReal);
@@ -324,7 +324,7 @@ Json::Value::Value(CString number, bool bReal)
 
 
 Json::Value::Value(Array& arrayData)
-	: m_eType(ValueType::Unknown)
+	: m_eType(EValueType::Unknown)
 {
 	Initailize();
 	SetArray(&arrayData);
@@ -333,7 +333,7 @@ Json::Value::Value(Array& arrayData)
 
 
 Json::Value::Value(Object& objectData)
-	: m_eType(ValueType::Unknown)
+	: m_eType(EValueType::Unknown)
 {
 	Initailize();
 	SetObject(&objectData);
@@ -348,15 +348,15 @@ Json::Value::Value(const Value& other)
 	Initailize();
 
 	switch (m_eType) {
-	case ValueType::String:
+	case EValueType::String:
 		m_valueHolder.vString = new CString(*(other.m_valueHolder.vString));
 		break;
 
-	case ValueType::Array:
+	case EValueType::Array:
 		m_valueHolder.vArray = new Array(*(other.m_valueHolder.vArray));
 		break;
 
-	case ValueType::Object:
+	case EValueType::Object:
 		m_valueHolder.vObject = new Object(*(other.m_valueHolder.vObject));
 		break;
 
@@ -375,7 +375,7 @@ Json::Value::~Value()
 
 //--------------------------------------------------------------------------------------------------
 
-Json::ValueType Json::Value::GetType()
+Json::EValueType Json::Value::GetType()
 {
 	return m_eType;
 }
@@ -384,56 +384,56 @@ Json::ValueType Json::Value::GetType()
 
 bool Json::Value::IsValid()
 {
-	return (m_eType != ValueType::Unknown);
+	return (m_eType != EValueType::Unknown);
 }
 
 
 
 bool Json::Value::IsArray()
 {
-	return (m_eType == ValueType::Array);
+	return (m_eType == EValueType::Array);
 }
 
 
 
 bool Json::Value::IsBoolean()
 {
-	return (m_eType == ValueType::Boolean);
+	return (m_eType == EValueType::Boolean);
 }
 
 
 
 bool Json::Value::IsInteger()
 {
-	return (m_eType == ValueType::Int || m_eType == ValueType::Uint);
+	return (m_eType == EValueType::Int || m_eType == EValueType::Uint);
 }
 
 
 
 bool Json::Value::IsNumber()
 {
-	return (m_eType == ValueType::Int || m_eType == ValueType::Uint || m_eType == ValueType::Real);
+	return (m_eType == EValueType::Int || m_eType == EValueType::Uint || m_eType == EValueType::Real);
 }
 
 
 
 bool Json::Value::IsObject()
 {
-	return (m_eType == ValueType::Object);
+	return (m_eType == EValueType::Object);
 }
 
 
 
 bool Json::Value::IsReal()
 {
-	return (m_eType == ValueType::Real);
+	return (m_eType == EValueType::Real);
 }
 
 
 
 bool Json::Value::IsString()
 {
-	return (m_eType == ValueType::String);
+	return (m_eType == EValueType::String);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -448,14 +448,14 @@ Json::Array* Json::Value::ToArray()
 bool Json::Value::ToBoolean()
 {
 	switch (m_eType) {
-	case ValueType::Boolean:
+	case EValueType::Boolean:
 		return m_valueHolder.vBoolean;
 
-	case ValueType::Int:
-	case ValueType::Uint:
+	case EValueType::Int:
+	case EValueType::Uint:
 		return m_valueHolder.vInteger != 0;
 
-	case ValueType::Real:
+	case EValueType::Real:
 		return (int)m_valueHolder.vReal != 0;
 
 	default:
@@ -469,14 +469,14 @@ bool Json::Value::ToBoolean()
 int Json::Value::ToInteger()
 {
 	switch (m_eType) {
-	case ValueType::Boolean:
+	case EValueType::Boolean:
 		return m_valueHolder.vBoolean ? 1 : 0;
 
-	case ValueType::Int:
-	case ValueType::Uint:
+	case EValueType::Int:
+	case EValueType::Uint:
 		return m_valueHolder.vInteger;
 
-	case ValueType::Real:
+	case EValueType::Real:
 		return (int)m_valueHolder.vReal;
 
 	default:
@@ -497,14 +497,14 @@ Json::Object* Json::Value::ToObject()
 double Json::Value::ToReal()
 {
 	switch (m_eType) {
-	case ValueType::Boolean:
+	case EValueType::Boolean:
 		return m_valueHolder.vBoolean ? 1.0 : 0.0;
 
-	case ValueType::Int:
-	case ValueType::Uint:
+	case EValueType::Int:
+	case EValueType::Uint:
 		return (double)m_valueHolder.vInteger;
 
-	case ValueType::Real:
+	case EValueType::Real:
 		return m_valueHolder.vReal;
 
 	default:
@@ -518,17 +518,17 @@ double Json::Value::ToReal()
 CString Json::Value::ToString()
 {
 	switch (m_eType) {
-	case ValueType::Boolean:
+	case EValueType::Boolean:
 		return m_valueHolder.vBoolean ? L"true" : L"false";
 
-	case ValueType::Int:
-	case ValueType::Uint:
+	case EValueType::Int:
+	case EValueType::Uint:
 		return WStr::ToString(m_valueHolder.vInteger);
 
-	case ValueType::Real:
+	case EValueType::Real:
 		return WStr::ToString(m_valueHolder.vReal, 3);
 
-	case ValueType::String:
+	case EValueType::String:
 		return *m_valueHolder.vString;
 
 	default:
@@ -595,58 +595,58 @@ CString& Json::Value::CreateString()
 
 void Json::Value::SetArray(Array* pArray)
 {
-	ASSERT(m_eType == ValueType::Unknown || m_eType == ValueType::Array);
+	ASSERT(m_eType == EValueType::Unknown || m_eType == EValueType::Array);
 
-	if (m_eType == ValueType::Array && m_valueHolder.vArray != nullptr) {
+	if (m_eType == EValueType::Array && m_valueHolder.vArray != nullptr) {
 		REMOVE_POINTER(m_valueHolder.vArray);
 	}
 
 	m_valueHolder.vArray = pArray;
-	m_eType = ValueType::Array;
+	m_eType = EValueType::Array;
 }
 
 
 
 void Json::Value::SetBoolean(bool value)
 {
-	ASSERT(m_eType == ValueType::Unknown || m_eType == ValueType::Boolean);
+	ASSERT(m_eType == EValueType::Unknown || m_eType == EValueType::Boolean);
 
 	m_valueHolder.vBoolean = value;
-	m_eType = ValueType::Boolean;
+	m_eType = EValueType::Boolean;
 }
 
 
 
 void Json::Value::SetInteger(int value)
 {
-	ASSERT(m_eType == ValueType::Unknown || m_eType == ValueType::Int);
+	ASSERT(m_eType == EValueType::Unknown || m_eType == EValueType::Int);
 
 	m_valueHolder.vInteger = value;
-	m_eType = ValueType::Int;
+	m_eType = EValueType::Int;
 }
 
 
 
 void Json::Value::SetNull()
 {
-	ASSERT(m_eType == ValueType::Unknown || m_eType == ValueType::Null);
+	ASSERT(m_eType == EValueType::Unknown || m_eType == EValueType::Null);
 
-	m_eType = ValueType::Null;
+	m_eType = EValueType::Null;
 }
 
 
 
 void Json::Value::SetNumber(CString& value, bool real)
 {
-	ASSERT(m_eType == ValueType::Unknown || m_eType == ValueType::Real || m_eType == ValueType::Int);
+	ASSERT(m_eType == EValueType::Unknown || m_eType == EValueType::Real || m_eType == EValueType::Int);
 
 	if (real) {
 		m_valueHolder.vReal = WStr::ToDouble(value.GetBuffer());
-		m_eType = ValueType::Real;
+		m_eType = EValueType::Real;
 	}
 	else {
 		m_valueHolder.vInteger = WStr::ToInteger(value.GetBuffer());
-		m_eType = ValueType::Int;
+		m_eType = EValueType::Int;
 	}
 }
 
@@ -654,38 +654,38 @@ void Json::Value::SetNumber(CString& value, bool real)
 
 void Json::Value::SetObject(Object* pObject)
 {
-	ASSERT(m_eType == ValueType::Unknown || m_eType == ValueType::Object);
+	ASSERT(m_eType == EValueType::Unknown || m_eType == EValueType::Object);
 
-	if (m_eType == ValueType::Object && m_valueHolder.vObject != nullptr) {
+	if (m_eType == EValueType::Object && m_valueHolder.vObject != nullptr) {
 		REMOVE_POINTER(m_valueHolder.vObject);
 	}
 
 	m_valueHolder.vObject = pObject;
-	m_eType = ValueType::Object;
+	m_eType = EValueType::Object;
 }
 
 
 
 void Json::Value::SetReal(double value)
 {
-	ASSERT(m_eType == ValueType::Unknown || m_eType == ValueType::Real);
+	ASSERT(m_eType == EValueType::Unknown || m_eType == EValueType::Real);
 
 	m_valueHolder.vReal = value;
-	m_eType = ValueType::Real;
+	m_eType = EValueType::Real;
 }
 
 
 
 void Json::Value::SetString(const CString& value)
 {
-	ASSERT(m_eType == ValueType::Unknown || m_eType == ValueType::String);
+	ASSERT(m_eType == EValueType::Unknown || m_eType == EValueType::String);
 
-	if (m_eType == ValueType::String && m_valueHolder.vString != nullptr) {
+	if (m_eType == EValueType::String && m_valueHolder.vString != nullptr) {
 		REMOVE_POINTER(m_valueHolder.vString);
 	}
 
 	m_valueHolder.vString = new CString(value);
-	m_eType = ValueType::String;
+	m_eType = EValueType::String;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -693,15 +693,15 @@ void Json::Value::SetString(const CString& value)
 void Json::Value::Clean()
 {
 	switch (m_eType) {
-	case ValueType::String:
+	case EValueType::String:
 		REMOVE_POINTER(m_valueHolder.vString);
 		break;
 
-	case ValueType::Array:
+	case EValueType::Array:
 		REMOVE_POINTER(m_valueHolder.vArray);
 		break;
 
-	case ValueType::Object:
+	case EValueType::Object:
 		REMOVE_POINTER(m_valueHolder.vObject);
 		break;
 
@@ -743,35 +743,35 @@ Json::Value* Json::Value::DeepCopy()
 void Json::Value::Serialize(CString& buffer, int indent)
 {
 	switch (m_eType) {
-	case ValueType::Null:
+	case EValueType::Null:
 		buffer += L"null";
 		break;
 
-	case ValueType::Boolean:
+	case EValueType::Boolean:
 		buffer += (m_valueHolder.vBoolean ? L"true" : L"false");
 		break;
 
-	case ValueType::Int:
-	case ValueType::Uint: {
+	case EValueType::Int:
+	case EValueType::Uint: {
 		CString sValue = WStr::Format(L"%d", m_valueHolder.vInteger);
 		buffer += sValue;
 	} break;
 
-	case ValueType::Real: {
+	case EValueType::Real: {
 		CString sValue = WStr::Format(L"%f", m_valueHolder.vReal);
 		WStr::TrailingZero(sValue);
 		buffer += sValue;
 	} break;
 
-	case ValueType::String:
+	case EValueType::String:
 		buffer += L"\"" + *(m_valueHolder.vString) + L"\"";
 		break;
 
-	case ValueType::Array:
+	case EValueType::Array:
 		m_valueHolder.vArray->Serialize(buffer, indent);
 		break;
 
-	case ValueType::Object:
+	case EValueType::Object:
 		m_valueHolder.vObject->Serialize(buffer, indent);
 		break;
 
@@ -786,36 +786,36 @@ void Json::Value::Serialize(CString& buffer, int indent)
 void Json::Value::Stringify(CString& buffer)
 {
 	switch (m_eType) {
-	case ValueType::Null:
+	case EValueType::Null:
 		buffer += L"null";
 		break;
 
-	case ValueType::Boolean:
+	case EValueType::Boolean:
 		buffer += (m_valueHolder.vBoolean ? L"true" : L"false");
 		break;
 
-	case ValueType::Int:
-	case ValueType::Uint: {
+	case EValueType::Int:
+	case EValueType::Uint: {
 		CString sValue = WStr::Format(L"%d", m_valueHolder.vInteger);
 		buffer += sValue;
 	} break;
 
-	case ValueType::Real: {
+	case EValueType::Real: {
 		CString sValue = WStr::Format(L"%f", m_valueHolder.vReal);
 		WStr::TrailingZero(sValue);
 		buffer += sValue;
 	} break;
 
-	case ValueType::String: {
+	case EValueType::String: {
 		CString string = *(m_valueHolder.vString);
 		buffer += L"\"" + string + L"\"";
 	} break;
 
-	case ValueType::Array:
+	case EValueType::Array:
 		m_valueHolder.vArray->Stringify(buffer);
 		break;
 
-	case ValueType::Object:
+	case EValueType::Object:
 		m_valueHolder.vObject->Stringify(buffer);
 		break;
 
@@ -1569,7 +1569,7 @@ bool Json::Helper::Read(CString path, Object& object)
 {
 	Fio::TextFile file;
 
-	if (file.Open(path.GetBuffer(), Fio::Mode::Read, Fio::Encoding::UTF16LE) == false) {
+	if (file.Open(path.GetBuffer(), Fio::EMode::Read, Fio::EEncoding::UTF16LE) == false) {
 		return false;
 	}
 
@@ -1586,7 +1586,7 @@ bool Json::Helper::Write(CString path, Object& object, bool bSerialize /*= true*
 {
 	Fio::TextFile file;
 
-	if (file.Open(path.GetBuffer(), Fio::Mode::Write, Fio::Encoding::UTF16LE) == false) {
+	if (file.Open(path.GetBuffer(), Fio::EMode::Write, Fio::EEncoding::UTF16LE) == false) {
 		return false;
 	}
 
@@ -1765,12 +1765,12 @@ CString Json::Builder::Encode(const char* pName, int nValue, bool bContinue /*= 
 
 
 
-CString Json::Builder::Encode(const char* pName, void* pArray, int count, ValueType eType, bool bContinue /*= true*/)
+CString Json::Builder::Encode(const char* pName, void* pArray, int count, EValueType eType, bool bContinue /*= true*/)
 {
 	CString sArray = WStr::ToUtf16(pName);
 	sArray += L"[";
 
-	if (eType == ValueType::Boolean) {
+	if (eType == EValueType::Boolean) {
 		bool* pBoolean = (bool*)pArray;
 
 		for (int i = 0; i < count; i++) {
@@ -1780,7 +1780,7 @@ CString Json::Builder::Encode(const char* pName, void* pArray, int count, ValueT
 			}
 		}
 	}
-	else if (eType == ValueType::Int) {
+	else if (eType == EValueType::Int) {
 		int* pInt = (int*)pArray;
 		for (int i = 0; i < count; i++) {
 			sArray += WStr::Format(L"%d", pInt[i]);
@@ -1789,7 +1789,7 @@ CString Json::Builder::Encode(const char* pName, void* pArray, int count, ValueT
 			}
 		}
 	}
-	else if (eType == ValueType::Uint) {
+	else if (eType == EValueType::Uint) {
 		UINT* pInt = (UINT*)pArray;
 		for (int i = 0; i < count; i++) {
 			sArray += WStr::Format(L"%d", pInt[i]);
@@ -1798,7 +1798,7 @@ CString Json::Builder::Encode(const char* pName, void* pArray, int count, ValueT
 			}
 		}
 	}
-	else if (eType == ValueType::Real) {
+	else if (eType == EValueType::Real) {
 		double* pDouble = (double*)pArray;
 		for (int i = 0; i < count; i++) {
 			sArray += WStr::Format(L"%f", pDouble[i]);
@@ -1807,7 +1807,7 @@ CString Json::Builder::Encode(const char* pName, void* pArray, int count, ValueT
 			}
 		}
 	}
-	else if (eType == ValueType::String) {
+	else if (eType == EValueType::String) {
 		CString* pString = (CString*)pArray;
 
 		for (int i = 0; i < count; i++) {

@@ -4,10 +4,13 @@
 #include "Window.Document.h"
 #include "Window.View.h"
 #include "Facility.AppResources.h"
+#include "Dialog.AppSettings.h"
 #include "Dialog.ProgressLog.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 
@@ -22,8 +25,9 @@ BEGIN_MESSAGE_MAP(MainFrame, CBCGPMDIFrameWnd)
 	ON_WM_DROPFILES()
 
 	ON_COMMAND(FILE_3D_CMD_Open, OnFileOpen)
-	ON_MESSAGE((UINT)UserMessage::OnSignal, OnSignal)
-	ON_MESSAGE((UINT)UserMessage::OnNextFileOpen, OnNextFileOpen)
+	ON_COMMAND(FILE_3D_CMD_Preference, OnFilePreference)
+	ON_MESSAGE((UINT)EUserMessage::OnSignal, OnSignal)
+	ON_MESSAGE((UINT)EUserMessage::OnNextFileOpen, OnNextFileOpen)
 END_MESSAGE_MAP()
 
 
@@ -37,6 +41,7 @@ Window::MainFrame::MainFrame()
 Window::MainFrame::~MainFrame()
 {
 }
+
 
 
 CRect Window::MainFrame::GetMDIRect()
@@ -68,7 +73,7 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 		int id = data.GetInteger(SKW_VIEWID);
 		View* pView = TheAppication.FindView(id);
 		if (pView != nullptr) {
-			pView->PostMessage((int)UserMessage::OnSignal, (WPARAM)pData);
+			pView->PostMessage((int)EUserMessage::OnSignal, (WPARAM)pData);
 		}
 	} break;
 
@@ -284,7 +289,7 @@ void Window::MainFrame::OnDropFiles(HDROP hDropInfo)
 	}
 
 	::DragFinish(hDropInfo);
-	PostMessage((UINT)UserMessage::OnNextFileOpen);
+	PostMessage((UINT)EUserMessage::OnNextFileOpen);
 
 	__super::OnDropFiles(hDropInfo);
 }
@@ -308,8 +313,16 @@ void Window::MainFrame::OnFileOpen()
 			m_fileNames.push_back(path);
 		}
 
-		PostMessage((UINT)UserMessage::OnNextFileOpen);
+		PostMessage((UINT)EUserMessage::OnNextFileOpen);
 	}
+}
+
+
+
+void Window::MainFrame::OnFilePreference()
+{
+	Dialog::AppSettings dlg;
+	dlg.DoModal();
 }
 
 

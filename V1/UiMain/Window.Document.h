@@ -6,7 +6,7 @@
 
 namespace Window
 {
-	enum class DocType
+	enum class EDocType
 	{
 		Unknown = -1,
 
@@ -41,7 +41,7 @@ namespace Window
 
 	bool IsAllowedFile(const wchar_t* pFilePath);
 
-	CString GetDocTypeName(DocType e);
+	CString GetDocTypeName(EDocType e);
 
 
 

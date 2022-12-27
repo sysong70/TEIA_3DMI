@@ -60,6 +60,7 @@ namespace Signal
 	enum class Target
 	{
 		Unknown = -1,
+
 		Application,
 		MainFrame,
 		StatusBar,
@@ -85,6 +86,7 @@ namespace Signal
 		enum class Action
 		{
 			Unknown = -1,
+
 			OnInitInstance,
 			OnExitInstance,
 		};
@@ -111,6 +113,7 @@ namespace Signal
 		enum class Action
 		{
 			Unknown = -1,
+
 			ShowNotice,
 			ShowProgress,
 			HideProgress,
@@ -141,6 +144,7 @@ namespace Signal
 		enum class Action
 		{
 			Unknown = -1,
+
 			ShowMessage,
 			ShowCoordinate,
 		};
@@ -159,6 +163,7 @@ namespace Signal
 	};
 
 
+
 	class Progress
 	{
 	public:
@@ -168,6 +173,7 @@ namespace Signal
 		enum class Action
 		{
 			Unknown = -1,
+
 			StartMarquee,
 			SetMessage,
 			AddLog,
@@ -178,6 +184,7 @@ namespace Signal
 		enum class Status
 		{
 			Unknown = -1,
+
 			Succeed,  // black
 			Fail,     // red
 		};
@@ -281,8 +288,20 @@ namespace Signal
 		enum class Action
 		{
 			Unknown = -1,
-			OnSelChanged,
+
+			OnBeginDrag,
+			OnBeginLabelEdit,
+			OnClick,
+			OnDblClick,
+			OnDeleteItem,
+			OnEndLabelEdit,
 			OnItemExpanded,
+			OnItemExpanding,
+			OnRClick,
+			OnRDbClick,
+			OnSelChanged,
+			OnSelChanging,
+			OnSetFocus,
 
 			AddItem,
 		};
@@ -300,7 +319,6 @@ namespace Signal
 
 	public:
 
-		//:TODO
 		void AddItem(...);
 	};
 

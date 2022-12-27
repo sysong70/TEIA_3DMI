@@ -4,6 +4,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 
@@ -34,16 +36,12 @@ public:
 	{
 	}
 
-
-
 	~Broker3d()
 	{
 		if (hInstance != nullptr) {
 			::FreeLibrary(hInstance);
 		}
 	}
-
-
 
 	bool Load(const CString& filePath)
 	{
@@ -105,7 +103,7 @@ void Connector3d::ReceiveSignal(const wchar_t* content)
 	case Signal::Target::MainFrame:
 	case Signal::Target::Progress:
 	case Signal::Target::View:
-		TheAppication.GetMainFrame().PostMessage((UINT)Window::UserMessage::OnSignal, (WPARAM)pData);
+		TheAppication.GetMainFrame().PostMessage((UINT)Window::EUserMessage::OnSignal, (WPARAM)pData);
 		break;
 
 	case::Signal::Target::Unknown:
@@ -140,8 +138,6 @@ public:
 	{
 	}
 
-
-
 	~Broker2d()
 	{
 		if (IsValid) {
@@ -151,8 +147,6 @@ public:
 			::FreeLibrary(hInstance);
 		}
 	}
-
-
 
 	bool Load(const CString& filePath)
 	{

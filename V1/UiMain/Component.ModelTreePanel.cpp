@@ -5,6 +5,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 
@@ -14,11 +16,6 @@
 namespace PresetModelTreePanel
 {
 	const UINT Id = WM_USER;
-
-	int RowHeight()
-	{
-		return globalUtils.ScaleByDPI(24);
-	}
 }
 
 
@@ -114,7 +111,7 @@ void Component::ModelTreePanel::ConstructBody()
 	m_wndControl.EnableGridLines(FALSE);
 	m_wndControl.ModifyStyle(0, TVS_CHECKBOXES); // EnableCheckBoxes() not working
 	m_wndControl.ModifyStyle(TVS_TRACKSELECT, 0); // off hot tracking
-	m_wndControl.SetCustomRowHeight(PRESET::RowHeight());
+	m_wndControl.SetCustomRowHeight(TreeRowHeight());
 	m_wndControl.SetSingleSel(FALSE);
 
 	//:WARNING - do not use local string

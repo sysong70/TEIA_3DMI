@@ -6,6 +6,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 
@@ -68,8 +70,9 @@ Component::ToolBar::~ToolBar()
 	for (auto holder : m_buttons) {
 		REMOVE_POINTER(holder);
 	}
-
 	m_buttons.clear();
+
+	//DestroyWindow();
 }
 
 
@@ -250,6 +253,13 @@ CPoint Component::ToolBar::AdjustLocation(CSize size)
 	}
 
 	return pivot;
+}
+
+
+
+void Component::ToolBar::PostNcDestroy()
+{
+	__super::PostNcDestroy();
 }
 
 

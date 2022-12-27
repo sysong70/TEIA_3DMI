@@ -62,6 +62,8 @@ namespace Window
 
 		afx_msg void OnFileOpen();
 
+		afx_msg void OnFilePreference();
+
 		DECLARE_MESSAGE_MAP()
 
 	private: // Components

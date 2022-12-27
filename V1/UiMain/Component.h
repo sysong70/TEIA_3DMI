@@ -18,6 +18,7 @@ namespace Component
 	class StatusBar;
 	class TabWnd;
 	class ToolBar;
+	class TreePropList;
 
 
 
@@ -32,6 +33,17 @@ namespace Component
 		VerticalTop,
 		VerticalCenter,
 		VerticalBottom
+	};
+
+
+
+	enum class EDirection
+	{
+		Unknown = 0,
+		ToRight,
+		ToLeft,
+		ToBottom,
+		ToTop,
 	};
 
 
@@ -68,6 +80,13 @@ namespace Component
 		Blue = RGB(0x00, 0x00, 0xFF),
 		Black = RGB(0, 0, 0),
 	};
+
+
+
+	// CBCGPTreeCtrlEx row height
+	int TreeRowHeight();
+	// CBCGPPropList row padding
+	int PropListRowPadding();
 
 #pragma endregion //:REGION
 }

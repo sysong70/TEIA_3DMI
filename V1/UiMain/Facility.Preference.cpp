@@ -3,6 +3,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 
@@ -33,7 +35,7 @@ bool Facility::Preference::Set(Json::Object* pData)
 		return false;
 	}
 
-	SetLanguage((UiLanguage)pData->GetInteger("Language"));
+	SetLanguage((ELanguage)pData->GetInteger("Language"));
 
 	return true;
 }

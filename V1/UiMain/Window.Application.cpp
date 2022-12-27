@@ -10,6 +10,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 
@@ -78,11 +80,12 @@ END_MESSAGE_MAP()
 
 Window::Application::Application()
 {
+#ifdef _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
 	// Support Restart Manager
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_ALL_ASPECTS;
-
-	//AddVisualTheme(BCGP_VISUAL_THEME_OFFICE_2019_COLORFUL, CMD_THEME_LIGHT);
-	//AddVisualTheme(BCGP_VISUAL_THEME_OFFICE_2019_BLACK, CMD_THEME_DARK);
 	SetVisualTheme(BCGP_VISUAL_THEME_OFFICE_2019_BLACK);
 }
 
@@ -136,6 +139,7 @@ CString Window::Application::Path(bool bLastBackslash)
 int Window::Application::ExitInstance()
 {
 	Connector3d::GetInstance().application.OnExitInstance();
+	//Connector2d::GetInstance().application.OnExitInstance();
 
 	return __super::ExitInstance();
 }
@@ -146,13 +150,14 @@ BOOL Window::Application::InitInstance()
 {
 #pragma region Initialize Settings
 
-	Facility::SetLanguage(Facility::UiLanguage::English);
+	Facility::SetLanguage(Facility::ELanguage::English);
 
 	if (Connector3d::Initialize()) {
 		Connector3d::GetInstance().application.OnInitInstance();
 	}
-
-	//Connector2d::Initialize();
+	//if (Connector2d::Initialize()) {
+	//	Connector2d::GetInstance().application.OnInitInstance();
+	//}
 
 #pragma endregion //:REGION
 

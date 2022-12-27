@@ -33,8 +33,14 @@ namespace Dialog
 	protected:
 
 		virtual CRect ConstructHeader(const CRect& boundary);
+	
 		virtual CRect ConstructBody(const CRect& boundary);
+		
 		virtual CRect ConstructFooter(const CRect& boundary);
+		// exclude margin
+		virtual CRect GetBodyRect();
+		// include margin
+		virtual CSize GetBodySize();
 
 	protected: // Windows message handler
 
@@ -53,6 +59,8 @@ namespace Dialog
 
 		void EnableParent(bool enable = true);
 
+		CRect GetClientArea();
+
 		CFont* GetDefaultFont();
 		// gap between client area and window nc area
 		CRect GetPadding();
@@ -69,6 +77,8 @@ namespace Dialog
 
 		UINT m_nTemplateId = IDD_DMI_STANDARD; // dialog tamplate id
 		CSize m_windowSize;
+		int m_nHeaderHeight = 0;
+		int m_nFooterHeight = 0;
 		MINMAXINFO m_sizeLimit = {}; // For OnGetMinMaxInfo
 	};
 }

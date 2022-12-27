@@ -15,7 +15,5 @@ namespace Component
 		~PropList() override;
 
 		void Initialize(CWnd* pParentWnd);
-
-
 	};
 }

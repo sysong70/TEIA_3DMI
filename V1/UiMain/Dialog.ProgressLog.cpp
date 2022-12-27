@@ -4,17 +4,19 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 
 
-#define DDX_CONTROL(x) DDX_Control(pDX, (int)PRESET::ControlId::x, m_wnd##x);
+#define DDX_CONTROL(x) DDX_Control(pDX, (int)PRESET::EControlId::x, m_wnd##x);
 
 #define PRESET PresetProgressLog
 
 namespace PresetProgressLog
 {
-	enum class ControlId
+	enum class EControlId
 	{
 		Unknown = WM_USER,
 		Indicator = IDC_DMI_CONTROL_01,
@@ -22,7 +24,7 @@ namespace PresetProgressLog
 		Log = IDC_DMI_CONTROL_03,
 	};
 
-	enum class ListIndex
+	enum class EListIndex
 	{
 		Status = 0,
 		File,

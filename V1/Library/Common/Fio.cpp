@@ -17,7 +17,7 @@ namespace UnitTestFio
 	{
 		BinFile file;
 
-		if (file.Open(L"c:\\temp\\test.bin", Mode::Write)) {
+		if (file.Open(L"c:\\temp\\test.bin", EMode::Write)) {
 			double data = 1.23;
 
 			file.Write((char*)&data, sizeof(double));
@@ -27,7 +27,7 @@ namespace UnitTestFio
 			ASSERT(false);
 		}
 
-		if (file.Open(L"c:\\temp\\test.bin", Mode::Read)) {
+		if (file.Open(L"c:\\temp\\test.bin", EMode::Read)) {
 			double data1;
 			long data2;
 
@@ -48,14 +48,14 @@ namespace UnitTestFio
 		CString other = L"Append\n\r\n";
 		TextFile file;
 
-		if (file.Open(L"c:\\temp\\utf8bom.txt", Mode::Write, Encoding::UTF8BOM)) {
+		if (file.Open(L"c:\\temp\\utf8bom.txt", EMode::Write, EEncoding::UTF8BOM)) {
 			file.Write(data.GetBuffer(), data.GetLength());
 		}
 		else {
 			ASSERT(false);
 		}
 
-		if (file.Open(L"c:\\temp\\utf8bom.txt", Mode::Read, Encoding::UTF8BOM)) {
+		if (file.Open(L"c:\\temp\\utf8bom.txt", EMode::Read, EEncoding::UTF8BOM)) {
 			CString result;
 			size_t read = file.Read(result);
 
@@ -65,7 +65,7 @@ namespace UnitTestFio
 			ASSERT(false);
 		}
 
-		if (file.Open(L"c:\\temp\\utf8bom.txt", Mode::Read, Encoding::UTF8BOM)) {
+		if (file.Open(L"c:\\temp\\utf8bom.txt", EMode::Read, EEncoding::UTF8BOM)) {
 			WStringArray sa;
 			bool success = file.ReadLines(sa, false);
 
@@ -75,14 +75,14 @@ namespace UnitTestFio
 			ASSERT(false);
 		}
 
-		if (file.Open(L"c:\\temp\\utf16le.txt", Mode::Write, Encoding::UTF16LE)) {
+		if (file.Open(L"c:\\temp\\utf16le.txt", EMode::Write, EEncoding::UTF16LE)) {
 			file.Write(data.GetBuffer(), data.GetLength());
 		}
 		else {
 			ASSERT(false);
 		}
 
-		if (file.Open(L"c:\\temp\\utf16le.txt", Mode::Read, Encoding::UTF16LE)) {
+		if (file.Open(L"c:\\temp\\utf16le.txt", EMode::Read, EEncoding::UTF16LE)) {
 			CString result;
 			size_t read = file.Read(result);
 
@@ -92,14 +92,14 @@ namespace UnitTestFio
 			ASSERT(false);
 		}
 
-		if (file.Open(L"c:\\temp\\utf16le.txt", Mode::Append, Encoding::UTF16LE)) {
+		if (file.Open(L"c:\\temp\\utf16le.txt", EMode::Append, EEncoding::UTF16LE)) {
 			file.Write(other.GetBuffer(), other.GetLength());
 		}
 		else {
 			ASSERT(false);
 		}
 
-		if (file.Open(L"c:\\temp\\utf16le.txt", Mode::Read, Encoding::UTF16LE)) {
+		if (file.Open(L"c:\\temp\\utf16le.txt", EMode::Read, EEncoding::UTF16LE)) {
 			WStringArray sa;
 			bool success = file.ReadLines(sa);
 
@@ -109,7 +109,7 @@ namespace UnitTestFio
 			ASSERT(false);
 		}
 
-		if (file.Open(L"c:\\temp\\utf16le.txt", Mode::Write, Encoding::UTF16LE)) {
+		if (file.Open(L"c:\\temp\\utf16le.txt", EMode::Write, EEncoding::UTF16LE)) {
 			WStringArray sa = { L"Data1", L"데이터2", L"Data3" };
 			bool success = file.WriteLines(sa);
 
@@ -188,7 +188,7 @@ void Fio::BinFile::Close()
 
 
 
-bool Fio::BinFile::Open(const wchar_t* path, Mode mode)
+bool Fio::BinFile::Open(const wchar_t* path, EMode mode)
 {
 	Close();
 
@@ -226,12 +226,12 @@ size_t Fio::BinFile::Write(const char* buffer, size_t length)
 
 
 
-CString Fio::BinFile::GetMode(Mode e)
+CString Fio::BinFile::GetMode(EMode e)
 {
 	switch (e) {
-	case Mode::Read: return L"rb";
-	case Mode::Write: return L"wb";
-	case Mode::Append: return L"ab";
+	case EMode::Read: return L"rb";
+	case EMode::Write: return L"wb";
+	case EMode::Append: return L"ab";
 	default:
 		DEBUG_STOP;
 		return L"rb";
@@ -254,7 +254,7 @@ Fio::TextFile::~TextFile()
 
 
 
-bool Fio::TextFile::Open(const wchar_t* path, Mode mode, Encoding encoding)
+bool Fio::TextFile::Open(const wchar_t* path, EMode mode, EEncoding encoding)
 {
 	Close();
 
@@ -364,12 +364,12 @@ bool Fio::TextFile::WriteLines(WStringArray& lines)
 
 
 
-CString Fio::TextFile::GetMode(Mode e)
+CString Fio::TextFile::GetMode(EMode e)
 {
 	switch (e) {
-	case Mode::Read: return L"rt";
-	case Mode::Write: return L"wt";
-	case Mode::Append: return L"at";
+	case EMode::Read: return L"rt";
+	case EMode::Write: return L"wt";
+	case EMode::Append: return L"at";
 	default:
 		DEBUG_STOP;
 		return L"rt";
@@ -378,12 +378,12 @@ CString Fio::TextFile::GetMode(Mode e)
 
 
 
-CString Fio::TextFile::GetEncodeing(Encoding e)
+CString Fio::TextFile::GetEncodeing(EEncoding e)
 {
 	switch (e) {
-	case Encoding::UTF8: return L",ccs=UTF-8";
-	case Encoding::UTF16LE: return L",ccs=UTF-16LE";
-	case Encoding::UTF8BOM: return L",ccs=UTF-8";
+	case EEncoding::UTF8: return L",ccs=UTF-8";
+	case EEncoding::UTF16LE: return L",ccs=UTF-16LE";
+	case EEncoding::UTF8BOM: return L",ccs=UTF-8";
 	default:
 		DEBUG_STOP;
 		return L"";
