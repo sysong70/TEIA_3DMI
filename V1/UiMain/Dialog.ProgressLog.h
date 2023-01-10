@@ -32,7 +32,7 @@ namespace Dialog
 
 	protected:
 
-		CRect ConstructBody(const CRect& boundary) override;
+		void ConstructBody(const CRect& boundary) override;
 
 		BOOL DestroyWindow() override;
 

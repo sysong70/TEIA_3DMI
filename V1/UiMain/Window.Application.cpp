@@ -6,6 +6,7 @@
 #include "Window.View.h"
 #include "Connector.h"
 #include "Facility.AppResources.h"
+#include "Facility.AppSettings.h"
 #include "Path.h"
 
 #ifdef _DEBUG
@@ -74,6 +75,7 @@ using namespace Window;
 
 BEGIN_MESSAGE_MAP(Application, CBCGPWinApp)
 	ON_COMMAND(ID_APP_ABOUT, OnAppAbout)
+	ON_COMMAND(FILE_3D_CMD_New, CBCGPWinApp::OnFileNew)
 END_MESSAGE_MAP()
 
 
@@ -152,6 +154,10 @@ BOOL Window::Application::InitInstance()
 
 	Facility::SetLanguage(Facility::ELanguage::English);
 
+	TheAppResources.Load();
+	TheAppSettings.SetFolderPath(Path());
+	TheAppSettings.Load();
+
 	if (Connector3d::Initialize()) {
 		Connector3d::GetInstance().application.OnInitInstance();
 	}
@@ -176,8 +182,6 @@ BOOL Window::Application::InitInstance()
 		return FALSE;
 	}
 	AfxEnableControlContainer();
-
-	LoadResource();
 
 	SetRegistryKey(_T("Dataface"));
 	LoadStdProfileSettings(4);
@@ -383,13 +387,6 @@ void Window::Application::InitializeBcg()
 		type.Font.DeleteObject();
 		type.Font.CreateFontIndirect(&lf);
 	}
-}
-
-
-
-void Window::Application::LoadResource()
-{
-	TheAppResources.Load();
 }
 
 #undef PRESET

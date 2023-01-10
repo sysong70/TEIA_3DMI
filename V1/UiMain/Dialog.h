@@ -25,6 +25,4 @@ namespace Dialog
 	CSize ControlGap();
 
 	int FooterPadding();
-
-	CSize GetControlSize(CWnd* pControl);
 }

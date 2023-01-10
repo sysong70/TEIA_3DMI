@@ -11,33 +11,26 @@ namespace Facility
 	{
 	public:
 
+		AppSettings();
+
 		~AppSettings();
 
 		void SetFolderPath(CString c);
+
+		Json::Object& GetPreferences();
+
+		Json::Object& GetFileOptions();
 
 		bool Load();
 
 		bool Save();
 
-		Facility::Preference Preference;
-
-		Facility::ImportOption* GetImportOption(CString name);
-
 	private:
 
-		CString GetFilePath();
+ 		CString m_sFolderPath;
 
-		Json::Object* GetImportOptions();
-
-		bool SetImportOptions(Json::Object* pData);
-
-	private:
-
-		CString m_sFolderPath;
-
-		static Facility::ImportOption* m_pImportOptionDefault;
-
-		std::vector<Facility::ImportOption*> m_importOptions;
+		Json::Object m_preferences;
+		Json::Object m_fileOptions;
 	};
 }
 

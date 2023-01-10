@@ -45,8 +45,7 @@ Component::Panel::~Panel()
 
 bool Component::Panel::Initialize(CWnd* pParentWnd, UINT id)
 {
-	bool success = __super::Create(nullptr, L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, {}, pParentWnd, id);
-	if (success == false) {
+	if (__super::Create(nullptr, L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, {}, pParentWnd, id) == FALSE) {
 		RETURN_FALSE;
 	}
 
@@ -171,3 +170,5 @@ void Component::Panel::OnSize(UINT nType, int cx, int cy)
 		AdjustLayout(cx, cy);
 	}
 }
+
+#undef PRESET

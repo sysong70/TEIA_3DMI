@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "Component.TreePropList.h"
 #include "Facility.h"
+#include "Json.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -14,9 +15,14 @@ static char THIS_FILE[] = __FILE__;
 
 namespace PresetTreePropList
 {
-	const int Id = WM_USER;
-	const int TreeId = WM_USER + 1;
-	const int PropListId = WM_USER + 2;
+#define GetName(data) data.GetString("name")
+
+	enum ControlId
+	{
+		Id = WM_USER,
+		Tree,
+		PropList,
+	};
 
 	int TreeWidth()
 	{
@@ -25,7 +31,7 @@ namespace PresetTreePropList
 
 	CSize Padding()
 	{
-		return globalUtils.ScaleByDPI(CSize(3, 3));
+		return globalUtils.ScaleByDPI(CSize(6, 6));
 	}
 }
 
@@ -34,7 +40,11 @@ namespace PresetTreePropList
 using namespace Component;
 
 BEGIN_MESSAGE_MAP(TreePropList, CWnd)
+	ON_WM_ERASEBKGND()
 	ON_WM_SIZE()
+
+	ON_NOTIFY(TVN_SELCHANGED, PRESET::Tree, OnTreeSelChanged)
+	ON_REGISTERED_MESSAGE(BCGM_PROPERTY_CHANGED, OnPropertyChanged)
 END_MESSAGE_MAP()
 
 
@@ -65,9 +75,25 @@ bool Component::TreePropList::Initialize(CWnd* pParentWnd)
 
 
 
-void Component::TreePropList::PostNcDestroy()
+void Component::TreePropList::InitializeDesign(Json::Object& design)
 {
-	__super::PostNcDestroy();
+	m_pDesign = &design;
+	m_tree.InitializeDesign(m_pDesign->GetArray("tree"));
+	ChangePropList(m_tree.GetSelectedItem());
+}
+
+
+
+void Component::TreePropList::InitializeData(Json::Object& data)
+{
+	m_pData = &data;
+}
+
+
+
+BOOL Component::TreePropList::OnEraseBkgnd(CDC* pDC)
+{
+	return __super::OnEraseBkgnd(pDC);
 }
 
 
@@ -77,13 +103,68 @@ void Component::TreePropList::OnSize(UINT nType, int cx, int cy)
 	__super::OnSize(nType, cx, cy);
 
 	if (cx > 0 && cy > 0) {
-		int width = PRESET::TreeWidth();
 		CSize padding = PRESET::Padding();
-		cx -= padding.cx * 2;
-		cy -= padding.cy * 2;
 
-		m_wndTree.SetWindowPos(nullptr, padding.cx, padding.cy, width, cy, 0);
-		m_wndPropList.SetWindowPos(nullptr, padding.cx + width, padding.cy, cx - width, cy, 0);
+		int x = padding.cx;
+		int y = padding.cy;
+		int width = PRESET::TreeWidth();
+		int height = cy - padding.cy * 2;
+		m_tree.SetWindowPos(nullptr, x, y, width, height, 0);
+
+		x += width + padding.cx;
+		width = cx - width - padding.cx * 3;
+		m_propList.SetWindowPos(nullptr, x, y, width, height, 0);
+	}
+}
+
+
+
+void Component::TreePropList::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	*pResult = S_OK;
+
+	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
+	ChangePropList(pNMTreeView->itemNew.hItem);
+}
+
+
+
+LRESULT Component::TreePropList::OnPropertyChanged(WPARAM wp, LPARAM lp)
+{
+	CBCGPProp* pProp = (CBCGPProp*)lp;
+	Json::Value* pValue = reinterpret_cast<Json::Value*>(pProp->GetData());
+
+	if (m_propList.m_bInitialized && pValue != nullptr) {
+		if (pProp->GetOptionCount() > 0) {
+			pValue->SetInteger(pProp->GetSelectedOption());
+		}
+		else {
+			switch (pValue->GetType()) {
+			case Json::EValueType::Boolean: pValue->SetBoolean(pProp->GetValue()); break;
+			case Json::EValueType::Int:     pValue->SetInteger(pProp->GetValue()); break;
+			case Json::EValueType::Uint:    pValue->SetInteger(pProp->GetValue()); break;
+			case Json::EValueType::Real:    pValue->SetReal(pProp->GetValue()); break;
+			case Json::EValueType::String:  pValue->SetString(pProp->GetValue().bstrVal); break;
+
+			default:
+				DEBUG_STOP;
+				return S_OK;
+			}
+		}
+
+		m_bModified = true;
+	}
+
+	return S_OK;
+}
+
+
+
+void Component::TreePropList::CreatePropList()
+{
+	const DWORD dwStyle = WS_VISIBLE | WS_CHILD;
+	if (m_propList.Create(dwStyle, {}, this, PRESET::PropList) == FALSE) {
+		DEBUG_RETURN;
 	}
 }
 
@@ -92,50 +173,34 @@ void Component::TreePropList::OnSize(UINT nType, int cx, int cy)
 void Component::TreePropList::CreateTreeCtrl()
 {
 	DWORD dwStyle = WS_CHILD | WS_VISIBLE |
-		TVS_HASLINES | TVS_TRACKSELECT | TVS_LINESATROOT | TVS_HASBUTTONS |
-		TVS_SHOWSELALWAYS | TVS_FULLROWSELECT;
-	if (m_wndTree.Create(dwStyle, {}, this, PRESET::TreeId) == FALSE) {
+		TVS_FULLROWSELECT | TVS_HASBUTTONS | TVS_SHOWSELALWAYS;
+	if (m_tree.Create(dwStyle, {}, this, PRESET::Tree) == FALSE) {
 		DEBUG_RETURN;
 	}
-
-	m_wndTree.SetVisualManagerColorTheme();
-	m_wndTree.EnableColumnAutoSize();
-	m_wndTree.EnableAlternateRows(FALSE);
-	m_wndTree.EnableGridLines(FALSE);
-	m_wndTree.ModifyStyle(TVS_TRACKSELECT, 0);
-	m_wndTree.SetCustomRowHeight(TreeRowHeight());
-	m_wndTree.SetSingleSel(TRUE);
-
-	//:WARNING - do not use local string
-	BCGP_GRID_FILTERBAR_OPTIONS filter(m_sFilterMessage = Facility::Local(L"Search models...|모델 검색..."));
-	filter.m_clrMarkBackground = (COLORREF)EColor::White;
-	filter.m_clrMarkText = 0;
-	filter.m_bAutoExpandGroups = TRUE;
-	filter.m_bIncludeGroups = TRUE;
-
-	m_wndTree.SetOutOfFilterLabel(Facility::Local(L"No items match your search.|일치하는 항목을 찾을 수 없습니다."));
-	m_wndTree.EnableFilterBar(TRUE, filter);
-	m_wndTree.OnFilterBarUpdate(0);
 }
 
 
-
-void Component::TreePropList::CreatePropList()
+void Component::TreePropList::ChangePropList(HTREEITEM pItem)
 {
-	DWORD dwStyle = WS_VISIBLE | WS_CHILD;
-	if (m_wndPropList.Create(dwStyle, {}, this, PRESET::PropListId) == FALSE) {
-		DEBUG_RETURN;
+	if (pItem == nullptr || m_tree.m_bInitialized == false) {
+		return;
 	}
 
-	m_wndPropList.EnableToolBar();
-	m_wndPropList.EnableSearchBox();
-	m_wndPropList.EnableHeaderCtrl(FALSE);
-	m_wndPropList.EnableDescriptionArea();
-	m_wndPropList.EnableContextMenu();
+	HTREEITEM pChild = m_tree.GetChildItem(pItem);
+	if (pChild != nullptr) {
+		m_tree.SelectItem(pChild);
+		return;
+	}
 
-	m_wndPropList.MarkModifiedProperties();
-	m_wndPropList.SetVSDotNetLook();
-	m_wndPropList.SetGroupNameFullWidth();
+	CStringA path = (CStringA)m_tree.GetItemNamePath(pItem);
+	Json::Object* pDesign = Json::Helper::FindObjectByPath(*m_pDesign, "properties/" + path);
+	Json::Object* pData = Json::Helper::FindObjectByPath(*m_pData, path);
 
-	m_wndPropList.SetRowPadding(PropListRowPadding());
+	if (pDesign != nullptr) {
+		DEBUG_VALID(pData);
+		m_propList.InitializeDesign(*pDesign);
+		m_propList.InitializeData(*pData);
+	}
 }
+
+#undef PRESET

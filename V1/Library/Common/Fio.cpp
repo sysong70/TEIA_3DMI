@@ -229,8 +229,8 @@ size_t Fio::BinFile::Write(const char* buffer, size_t length)
 CString Fio::BinFile::GetMode(EMode e)
 {
 	switch (e) {
-	case EMode::Read: return L"rb";
-	case EMode::Write: return L"wb";
+	case EMode::Read:   return L"rb";
+	case EMode::Write:  return L"wb";
 	case EMode::Append: return L"ab";
 	default:
 		DEBUG_STOP;
@@ -367,8 +367,8 @@ bool Fio::TextFile::WriteLines(WStringArray& lines)
 CString Fio::TextFile::GetMode(EMode e)
 {
 	switch (e) {
-	case EMode::Read: return L"rt";
-	case EMode::Write: return L"wt";
+	case EMode::Read:   return L"rt";
+	case EMode::Write:  return L"wt";
 	case EMode::Append: return L"at";
 	default:
 		DEBUG_STOP;
@@ -381,7 +381,7 @@ CString Fio::TextFile::GetMode(EMode e)
 CString Fio::TextFile::GetEncodeing(EEncoding e)
 {
 	switch (e) {
-	case EEncoding::UTF8: return L",ccs=UTF-8";
+	case EEncoding::UTF8:    return L",ccs=UTF-8";
 	case EEncoding::UTF16LE: return L",ccs=UTF-16LE";
 	case EEncoding::UTF8BOM: return L",ccs=UTF-8";
 	default:

@@ -47,8 +47,6 @@ namespace Window
 	private:
 
 		void InitializeBcg();
-
-		void LoadResource();
 	};
 }
 

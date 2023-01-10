@@ -53,6 +53,44 @@ bool WStr::IsCharAfterBlank(wchar_t*& stream, wchar_t ch, bool peek)
 
 
 
+bool WStr::IsDigit(CString& value)
+{
+	wchar_t* stream = (wchar_t*)value.GetBuffer();
+
+	for (int i = 0; i < value.GetLength(); i++) {
+		if (IsDigit(*stream) == false) {
+			return false;
+		}
+		stream++;
+	}
+
+	return true;
+}
+
+
+
+bool WStr::IsDigit(wchar_t value)
+{
+	switch (value) {
+	case L'0':
+	case L'1':
+	case L'2':
+	case L'3':
+	case L'4':
+	case L'5':
+	case L'6':
+	case L'7':
+	case L'8':
+	case L'9':
+		return true;
+
+	default:
+		return false;
+	}
+}
+
+
+
 bool WStr::IsNumeric(wchar_t value)
 {
 	switch (value) {

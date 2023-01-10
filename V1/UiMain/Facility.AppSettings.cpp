@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
+#include "resource.h"
 #include "Facility.AppSettings.h"
 #include "Path.h"
+#include "Dir.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -11,16 +13,25 @@ static char THIS_FILE[] = __FILE__;
 
 
 Facility::AppSettings TheAppSettings;
-Facility::ImportOption* Facility::AppSettings::m_pImportOptionDefault = nullptr;
+
+#define PRESET PresetAppSettings
+
+namespace PRESET
+{
+	const CString PreferencesName = L"Preferences.Json";
+	const CString FileOpeionsName = L"FileOptions.Json";
+}
+
+
+
+Facility::AppSettings::AppSettings()
+{
+}
 
 
 
 Facility::AppSettings::~AppSettings()
 {
-	for (Facility::ImportOption* pOption : m_importOptions) {
-		REMOVE_POINTER(pOption);
-	}
-	m_importOptions.clear();
 }
 
 
@@ -33,15 +44,37 @@ void Facility::AppSettings::SetFolderPath(CString c)
 
 
 
+Json::Object& Facility::AppSettings::GetPreferences()
+{
+	return m_preferences;
+}
+
+
+
+Json::Object& Facility::AppSettings::GetFileOptions()
+{
+	return m_fileOptions;
+}
+
+
+
 bool Facility::AppSettings::Load()
 {
-	Json::Object data;
-	if (Json::Helper::Read(GetFilePath(), data) == false) {
-		return false;
-	}
+	const CString PreferencesPath = m_sFolderPath + PRESET::PreferencesName;
+	const CString FileOptionsPath = m_sFolderPath + PRESET::FileOpeionsName;
 
-	Preference.Set(data.GetValue("Preference").ToObject());
-	SetImportOptions(data.GetValue("Import").ToObject());
+	if (Dir::IsExist((LPCTSTR)PreferencesPath)) {
+		m_preferences.Clean();
+		if (Json::Helper::Read(PreferencesPath, m_preferences) == false) {
+			return false;
+		}
+	}
+	if (Dir::IsExist((LPCTSTR)FileOptionsPath)) {
+		m_fileOptions.Clean();
+		if (Json::Helper::Read(FileOptionsPath, m_fileOptions) == false) {
+			return false;
+		}
+	}
 
 	return true;
 }
@@ -50,72 +83,14 @@ bool Facility::AppSettings::Load()
 
 bool Facility::AppSettings::Save()
 {
-	Json::Object data;
-	data.SetObject("Import", GetImportOptions());
-
-	return Json::Helper::Write(GetFilePath(), data);
-}
-
-
-
-Facility::ImportOption* Facility::AppSettings::GetImportOption(CString name)
-{
-	for (Facility::ImportOption* pOption : m_importOptions) {
-		if (pOption->Name == name) {
-			return pOption;
-		}
+	if (Json::Helper::Write(m_sFolderPath + PRESET::PreferencesName, m_preferences) == false) {
+		RETURN_FALSE;
 	}
-
-	DEBUG_STOP;
-	return m_pImportOptionDefault;
-}
-
-
-
-CString Facility::AppSettings::GetFilePath()
-{
-	return m_sFolderPath + L"Settings.json";
-}
-
-
-
-Json::Object* Facility::AppSettings::GetImportOptions()
-{
-	Json::Object* pData = new Json::Object();
-
-	for (Facility::ImportOption* pOption : m_importOptions) {
-		Json::Object* pResult = pOption->Get();
-		if (pResult != nullptr) {
-			pData->SetObject(CStringA(pOption->Name), pResult);
-		}
-		else {
-			DEBUG_STOP;
-		}
-	}
-
-	return pData;
-}
-
-
-
-bool Facility::AppSettings::SetImportOptions(Json::Object* pData)
-{
-	if (pData == nullptr) {
+	if (Json::Helper::Write(m_sFolderPath + PRESET::FileOpeionsName, m_fileOptions) == false) {
 		RETURN_FALSE;
 	}
 
-	for (auto* pMember : pData->GetMembers()) {
-		Facility::ImportOption* pOption = new Facility::ImportOption(CString(pMember->Name));
-		if (pOption->Set(pMember->pValue->ToObject())) {
-			m_importOptions.push_back(pOption);
-		}
-		else {
-			REMOVE_POINTER(pOption);
-			RETURN_FALSE;
-		}
-	}
-
-	m_pImportOptionDefault = GetImportOption(L"_DEFAULT_");
-
 	return true;
 }
+
+#undef PRESET

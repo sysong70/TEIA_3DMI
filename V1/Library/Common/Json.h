@@ -35,9 +35,13 @@ namespace Json
 
 		Array();
 
+		Array(CString& sourceStream);
+
 		Array(const Array& other);
 
 		virtual ~Array();
+
+		Array& operator =(const Array& other);
 
 	public:
 
@@ -184,7 +188,7 @@ namespace Json
 
 		void Clean();
 
-		void Initailize();
+		void Initialize();
 
 		Value* DeepCopy();
 		// pretty format
@@ -237,6 +241,8 @@ namespace Json
 
 		Object();
 
+		Object(CString& sourceStream);
+
 		Object(const Object& other);
 
 		virtual ~Object();
@@ -256,6 +262,9 @@ namespace Json
 
 	public: // use only when certain or FindValue()
 
+		// use when uncertain
+		Value* FindValue(CStringA name);
+
 		Array& GetArray(CStringA name);
 		// alias of GetObject()
 		Object& GetAt(CStringA name);
@@ -263,8 +272,6 @@ namespace Json
 		Object& GetObject(CStringA name);
 
 		Value& GetValue(CStringA name);
-		// use when uncertain
-		Value* FindValue(CStringA name);
 
 	public: // get single value. direct access
 
@@ -353,11 +360,20 @@ namespace Json
 	{
 		bool Load(CString& value, Object& object);
 
+		bool Load(CString& value, Array& array);
+
 		bool Load(const wchar_t* pValue, Object& object);
+
+		bool Load(const wchar_t* pValue, Array& array);
 
 		bool Read(CString path, Object& object);
 
 		bool Write(CString path, Object& object, bool serialize = true);
+
+		// object/value, do not check last object
+		Value* FindValueByPath(Json::Object& object, CStringA path);
+		//:SAMPLE - FindObjectByPath("Dialog/FileOptions/Import/ACIS")
+		Object* FindObjectByPath(Json::Object& object, CStringA path);
 
 		CStringA GetIdString(UINT id);
 

@@ -30,33 +30,33 @@ namespace Component
 
 	private:
 
-		afx_msg LRESULT OnCheckClickTree(WPARAM wp, LPARAM lp);
+		afx_msg LRESULT OnTreeCheckClick(WPARAM wp, LPARAM lp);
 
-		afx_msg void OnBeginDragTree(NMHDR* pNMHDR, LRESULT* pResult);
+		afx_msg void OnTreeBeginDrag(NMHDR* pNMHDR, LRESULT* pResult);
 
-		afx_msg void OnBeginLabelEditTree(NMHDR* pNMHDR, LRESULT* pResult);
+		afx_msg void OnTreeBeginLabelEdit(NMHDR* pNMHDR, LRESULT* pResult);
 
-		afx_msg void OnClickTree(NMHDR* pNMHDR, LRESULT* pResult);
+		afx_msg void OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult);
 
-		afx_msg void OnDblClickTree(NMHDR* pNMHDR, LRESULT* pResult);
+		afx_msg void OnTreeDblClick(NMHDR* pNMHDR, LRESULT* pResult);
 
-		afx_msg void OnDeleteItemTree(NMHDR* pNMHDR, LRESULT* pResult);
+		afx_msg void OnTreeDeleteItem(NMHDR* pNMHDR, LRESULT* pResult);
 
-		afx_msg void OnEndLabelEditTree(NMHDR* pNMHDR, LRESULT* pResult);
+		afx_msg void OnTreeEndLabelEdit(NMHDR* pNMHDR, LRESULT* pResult);
 
-		afx_msg void OnItemExpandedTree(NMHDR* pNMHDR, LRESULT* pResult);
+		afx_msg void OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult);
 
-		afx_msg void OnItemExpandingTree(NMHDR* pNMHDR, LRESULT* pResult);
+		afx_msg void OnTreeItemExpanding(NMHDR* pNMHDR, LRESULT* pResult);
 
-		afx_msg void OnRClickTree(NMHDR* pNMHDR, LRESULT* pResult);
+		afx_msg void OnTreeRClick(NMHDR* pNMHDR, LRESULT* pResult);
 
-		afx_msg void OnRDbClickTree(NMHDR* pNMHDR, LRESULT* pResult);
+		afx_msg void OnTreeRDbClick(NMHDR* pNMHDR, LRESULT* pResult);
 
-		afx_msg void OnSelChangedTree(NMHDR* pNMHDR, LRESULT* pResult);
+		afx_msg void OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult);
 
-		afx_msg void OnSelChangingTree(NMHDR* pNMHDR, LRESULT* pResult);
+		afx_msg void OnTreeSelChanging(NMHDR* pNMHDR, LRESULT* pResult);
 
-		afx_msg void OnSetFocusTree(NMHDR* pNMHDR, LRESULT* pResult);
+		afx_msg void OnTreeSetFocus(NMHDR* pNMHDR, LRESULT* pResult);
 
 		//afx_msg LRESULT OnDPIChangedAfterParent(WPARAM wp, LPARAM lp);
 

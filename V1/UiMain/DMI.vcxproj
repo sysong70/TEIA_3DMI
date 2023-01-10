@@ -164,6 +164,7 @@
     <ClInclude Include="..\Library\Signal\Signal.h" />
     <ClInclude Include="Command.Common.h" />
     <ClInclude Include="Component.Property.h" />
+    <ClInclude Include="Component.TreeCtrlEx.h" />
     <ClInclude Include="Component.TreePropList.h" />
     <ClInclude Include="Component.PropList.h" />
     <ClInclude Include="Component.TabWnd.h" />
@@ -177,7 +178,6 @@
     <ClInclude Include="Component.HistoryBar.h" />
     <ClInclude Include="Component.ModelTreePanel.h" />
     <ClInclude Include="Component.Panel.h" />
-    <ClInclude Include="Component.PropertyBar.h" />
     <ClInclude Include="Component.RibbonBar.h" />
     <ClInclude Include="Component.ScenePanel.h" />
     <ClInclude Include="Component.StatusBar.h" />
@@ -215,6 +215,7 @@
     <ClCompile Include="..\Library\Signal\SignalBase.cpp" />
     <ClCompile Include="..\Library\Signal\Signal.cpp" />
     <ClCompile Include="Component.Property.cpp" />
+    <ClCompile Include="Component.TreeCtrlEx.cpp" />
     <ClCompile Include="Component.TreePropList.cpp" />
     <ClCompile Include="Component.PropList.cpp" />
     <ClCompile Include="Component.TabWnd.cpp" />
@@ -228,7 +229,6 @@
     <ClCompile Include="Component.HistoryBar.cpp" />
     <ClCompile Include="Component.ModelTreePanel.cpp" />
     <ClCompile Include="Component.Panel.cpp" />
-    <ClCompile Include="Component.PropertyBar.cpp" />
     <ClCompile Include="Component.RibbonBar.cpp" />
     <ClCompile Include="Component.ScenePanel.cpp" />
     <ClCompile Include="Component.StatusBar.cpp" />
@@ -261,39 +261,20 @@
     <ResourceCompile Include="DMI.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="RES\palette_zoom.png" />
     <Image Include="res\DMI.ico" />
     <Image Include="res\DMIDoc.ico" />
-    <Image Include="res\Toolbar.bmp" />
-    <Image Include="res\RibbonDisplayOptions.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="RES\category_main_large.svg" />
-    <None Include="RES\category_main_small.svg" />
-    <None Include="RES\category_visualize_large.svg" />
     <None Include="RES\DMI.rc2" />
     <None Include="RES\DMI_ENU.rc2" />
     <None Include="RES\DMI_KOR.rc2" />
     <None Include="RES\FileOptions.json" />
-    <None Include="res\DMI.toolbar.rc2" />
-    <None Include="res\BCGSoft_ribbon\DMI.ribbon.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="RES\Ribbon.json" />
-    <None Include="res\ribbondisplayoptions.svg" />
-    <None Include="res\ribbonfilelarge.svg" />
     <None Include="RES\UI.json" />
-    <None Include="res\Workspace.svg" />
-    <None Include="res\Toolbar.svg" />
-    <None Include="res\BCGSoft_ribbon\ribbon_bar.svg" />
-    <None Include="res\BCGSoft_ribbon\main.svg" />
-    <None Include="res\BCGSoft_ribbon\category_small_0.svg" />
-    <None Include="res\BCGSoft_ribbon\category_large_0.svg" />
-    <None Include="res\BCGSoft_ribbon\category_backstage_small.svg" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="DpiAwareness.xml" />
-    <Xml Include="res\BCGSoft_ribbon\ribbon.xml" />
     <Xml Include="TODO.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

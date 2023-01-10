@@ -71,9 +71,31 @@ Json::Array::Array()
 
 
 
+Json::Array::Array(CString& sourceStream)
+{
+	Helper::Load(sourceStream, *this);
+}
+
+
+
 Json::Array::Array(const Array& other)
 {
-	DEBUG_STOP;
+	*this = other;
+}
+
+
+
+Json::Array& Json::Array::operator =(const Array& other)
+{
+	Clean();
+
+	CString buffer;
+	Array* pSource = (Array*)&other;
+	pSource->Stringify(buffer);
+
+	Helper::Load(buffer, *this);
+
+	return *this;
 }
 
 
@@ -264,7 +286,7 @@ void Json::Array::Stringify(CString& buffer)
 Json::Value::Value()
 	: m_eType(EValueType::Unknown)
 {
-	Initailize();
+	Initialize();
 }
 
 
@@ -272,7 +294,7 @@ Json::Value::Value()
 Json::Value::Value(int value)
 	: m_eType(EValueType::Unknown)
 {
-	Initailize();
+	Initialize();
 	SetInteger(value);
 }
 
@@ -281,7 +303,7 @@ Json::Value::Value(int value)
 Json::Value::Value(DWORD value)
 	: m_eType(EValueType::Unknown)
 {
-	Initailize();
+	Initialize();
 	SetInteger((int)value);
 }
 
@@ -290,7 +312,7 @@ Json::Value::Value(DWORD value)
 Json::Value::Value(double value)
 	: m_eType(EValueType::Unknown)
 {
-	Initailize();
+	Initialize();
 	SetReal(value);
 }
 
@@ -299,7 +321,7 @@ Json::Value::Value(double value)
 Json::Value::Value(bool value)
 	: m_eType(EValueType::Unknown)
 {
-	Initailize();
+	Initialize();
 	SetBoolean(value);
 }
 
@@ -308,7 +330,7 @@ Json::Value::Value(bool value)
 Json::Value::Value(CString value)
 	: m_eType(EValueType::Unknown)
 {
-	Initailize();
+	Initialize();
 	SetString(value);
 }
 
@@ -317,7 +339,7 @@ Json::Value::Value(CString value)
 Json::Value::Value(CString number, bool bReal)
 	: m_eType(EValueType::Unknown)
 {
-	Initailize();
+	Initialize();
 	SetNumber(number, bReal);
 }
 
@@ -326,7 +348,7 @@ Json::Value::Value(CString number, bool bReal)
 Json::Value::Value(Array& arrayData)
 	: m_eType(EValueType::Unknown)
 {
-	Initailize();
+	Initialize();
 	SetArray(&arrayData);
 }
 
@@ -335,7 +357,7 @@ Json::Value::Value(Array& arrayData)
 Json::Value::Value(Object& objectData)
 	: m_eType(EValueType::Unknown)
 {
-	Initailize();
+	Initialize();
 	SetObject(&objectData);
 }
 
@@ -345,7 +367,7 @@ Json::Value::Value(const Value& other)
 {
 	m_eType = other.m_eType;
 
-	Initailize();
+	Initialize();
 
 	switch (m_eType) {
 	case EValueType::String:
@@ -712,7 +734,7 @@ void Json::Value::Clean()
 
 
 
-void Json::Value::Initailize()
+void Json::Value::Initialize()
 {
 	m_valueHolder.vString = nullptr;
 	m_valueHolder.vArray = nullptr;
@@ -867,6 +889,13 @@ Json::Object::Object()
 
 
 
+Json::Object::Object(CString& sourceStream)
+{
+	Helper::Load(sourceStream, *this);
+}
+
+
+
 Json::Object::Object(const Object& other)
 {
 	*this = other;
@@ -948,6 +977,18 @@ CString& Json::Object::CreateString(CStringA name)
 
 //--------------------------------------------------------------------------------------------------
 
+Json::Value* Json::Object::FindValue(CStringA name)
+{
+	Pair* pPair = Look(name.GetBuffer());
+	if (pPair != nullptr) {
+		return pPair->pValue;
+	}
+
+	return nullptr;
+}
+
+
+
 Json::Array& Json::Object::GetArray(CStringA name)
 {
 	Pair* pPair = Look(name.GetBuffer());
@@ -990,18 +1031,6 @@ Json::Value& Json::Object::GetValue(CStringA name)
 
 	DEBUG_STOP;
 	return theDummyValue;
-}
-
-
-
-Json::Value* Json::Object::FindValue(CStringA name)
-{
-	Pair* pPair = Look(name.GetBuffer());
-	if (pPair != nullptr) {
-		return pPair->pValue;
-	}
-
-	return nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1565,6 +1594,21 @@ bool Json::Helper::Load(const wchar_t* pValue, Object& object)
 
 
 
+bool Json::Helper::Load(CString& value, Array& array)
+{
+	return Load(value.GetBuffer(), array);
+}
+
+
+
+bool Json::Helper::Load(const wchar_t* pValue, Array& array)
+{
+	wchar_t* pBuffer = (wchar_t*)pValue;
+	return Reader::ReadArray(pBuffer, array);
+}
+
+
+
 bool Json::Helper::Read(CString path, Object& object)
 {
 	Fio::TextFile file;
@@ -1601,6 +1645,76 @@ bool Json::Helper::Write(CString path, Object& object, bool bSerialize /*= true*
 	file.Write(buffer.GetBuffer(), buffer.GetLength());
 
 	return true;
+}
+
+
+
+Json::Value* Json::Helper::FindValueByPath(Object& object, CStringA path)
+{
+#define RETURN_INVALID root.Initialize(); return nullptr
+
+	WStringArray paths;
+	if (path.IsEmpty() || WStr::Split(CString(path).GetBuffer(), L'/', paths) == false) {
+		return nullptr;
+	}
+
+	// add path itself
+	if (paths.size() == 0) {
+		paths.push_back(CString(path));
+	}
+
+	Json::Value root(object);
+	Json::Value* pValue = &root;
+
+	for (auto& sub : paths) {
+		if (pValue == nullptr || pValue->IsValid() == false) {
+			RETURN_INVALID;
+		}
+
+		if (pValue->GetType() == EValueType::Object) {
+			Json::Object& target = pValue->AsObject();
+			pValue = target.FindValue((CStringA)sub);
+		}
+		else if (pValue->GetType() == EValueType::Array) {
+			Json::Array& target = pValue->AsArray();
+			if (target.GetSize() == 0) {
+				RETURN_INVALID;
+			}
+
+			if (WStr::IsDigit(sub) == false) {
+				RETURN_INVALID;
+			}
+			int index = WStr::ToInteger(sub);
+			if ((0 <= index && index < target.GetSize()) == false) {
+				RETURN_INVALID;
+			}
+
+			pValue = target.GetAt(index);
+		}
+		else {
+			RETURN_INVALID;
+		}
+	}
+
+	root.Initialize();
+
+	return pValue;
+
+#undef RETURN_INVALID
+}
+
+
+
+Json::Object* Json::Helper::FindObjectByPath(Object& object, CStringA path)
+{
+	Json::Value* pValue = FindValueByPath(object, path);
+
+	if (pValue != nullptr && pValue->GetType() == EValueType::Object) {
+		return &pValue->AsObject();
+	}
+	else {
+		return nullptr;
+	}
 }
 
 

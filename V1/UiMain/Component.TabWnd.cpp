@@ -9,9 +9,19 @@ static char THIS_FILE[] = __FILE__;
 
 
 
+using namespace Component;
+
+BEGIN_MESSAGE_MAP(TabWnd, CBCGPTabWnd)
+	ON_WM_ERASEBKGND()
+END_MESSAGE_MAP()
+
+
+
 Component::TabWnd::TabWnd()
 	: CBCGPTabWnd()
 {
+	m_bTransparent = TRUE;
+	m_bVisualManagerStyle = TRUE;
 }
 
 
@@ -19,6 +29,15 @@ Component::TabWnd::TabWnd()
 void Component::TabWnd::SetImageSize(CSize size)
 {
 	m_sizeImage = size;
+}
+
+
+
+void Component::TabWnd::SetTabHeight(int height)
+{
+	//:CHECK
+	m_sizeImage.cx = height;
+	m_sizeImage.cy = height;
 }
 
 
@@ -40,4 +59,11 @@ void Component::TabWnd::AddImages(std::vector<UINT> ids)
 	if (m_ImagesGray.GetSafeHandle() != NULL) {
 		m_ImagesGray.DeleteImageList();
 	}
+}
+
+
+
+BOOL Component::TabWnd::OnEraseBkgnd(CDC* pDC)
+{
+	return __super::OnEraseBkgnd(pDC);
 }

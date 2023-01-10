@@ -95,11 +95,11 @@ BEGIN
     LISTBOX         IDC_DMI_CONTROL_03, 0,0,1,1, LBS_OWNERDRAWVARIABLE | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL
 END
 
-#pragma endregion Dialog
+#pragma endregion //:REGION - Dialog
 
 #endif // !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
 
-#pragma endregion 한국어(대한민국) Resources
+#pragma endregion //:REGION - 한국어(대한민국) Resources
 
 #pragma region 영어(미국) Resources
 
@@ -111,18 +111,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 
 IDR_MAINFRAME                ICON   "RES\\DMI.ico"
 IDR_DMITYPE                  ICON   "RES\\DMIDoc.ico"
-IDI_RIBBON_DISPLAY_OPTIONS   ICON   "RES\\RibbonDisplayOptions.ico"
 
-#pragma endregion Icon
-
-#pragma region SVG
-
-IDB_TOOLBAR_HC               SVG "res\\Toolbar.svg"
-IDB_RIBBON_DISPLAY_OPTIONS   SVG "res\\ribbondisplayoptions.svg"
-IDB_RIBBON_FILELARGE         SVG "res\\ribbonfilelarge.svg"
-IDB_WORKSPACE                SVG "res\\Workspace.svg"
-
-#pragma endregion SVG
+#pragma endregion //:REGION - Icon
 
 #pragma region Menu
 
@@ -219,7 +209,7 @@ BEGIN
     MENUITEM "", ID_VIEW_APPLOOK
 END
 
-#pragma endregion Menu
+#pragma endregion //:REGION - Menu
 
 #pragma region Accelerator
 
@@ -227,7 +217,7 @@ IDR_MAINFRAME ACCELERATORS
 BEGIN
 END
 
-#pragma endregion Accelerator
+#pragma endregion //:REGION - Accelerator
 
 #pragma region Version
 
@@ -264,7 +254,7 @@ BEGIN
     END
 END
 
-#pragma endregion Version
+#pragma endregion //:REGION - Version
 
 #pragma region String Table
 
@@ -280,11 +270,11 @@ BEGIN
     AFX_IDS_IDLEMESSAGE     "Ready"
 END
 
-#pragma endregion String Table
+#pragma endregion //:REGION - String Table
 
 #endif // !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 
-#pragma endregion 영어(미국) Resources
+#pragma endregion //:REGION - 영어(미국) Resources
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -320,5 +310,7 @@ LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
 
 1 24 DISCARDABLE "DpiAwareness.xml"
 
-IDF_JSON_UI             TEXT   "res/UI.json"
-IDF_JSON_FILE_OPTIONS   TEXT   "res/FileOptions.json"
+IDF_JSON_UI                 TEXT   "res/UI.json"
+IDF_JSON_DATA_PREFERENCES   TEXT   "res/Data.Preferences.json"
+IDF_JSON_DATA_FILEOPTIONS   TEXT   "res/Data.FileOptions.json"
+

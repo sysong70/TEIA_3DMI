@@ -113,7 +113,7 @@ void Connector3d::ReceiveSignal(const wchar_t* content)
 	}
 }
 
-#pragma endregion
+#pragma endregion //:REGION
 
 #pragma region Connector2d Namespace
 
@@ -205,4 +205,4 @@ void Connector2d::ReceiveSignal(const wchar_t* content)
 	DEBUG_STOP;
 }
 
-#pragma endregion
+#pragma endregion //:REGION

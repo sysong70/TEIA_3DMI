@@ -10,13 +10,13 @@ static char THIS_FILE[] = __FILE__;
 
 
 
-#define DDX_CONTROL(x) DDX_Control(pDX, (int)PRESET::EControlId::x, m_wnd##x);
+#define DDX_CONTROL(x) DDX_Control(pDX, (int)PRESET::x, m_wnd##x);
 
 #define PRESET PresetProgressLog
 
 namespace PresetProgressLog
 {
-	enum class EControlId
+	enum ControlId
 	{
 		Unknown = WM_USER,
 		Indicator = IDC_DMI_CONTROL_01,
@@ -24,7 +24,7 @@ namespace PresetProgressLog
 		Log = IDC_DMI_CONTROL_03,
 	};
 
-	enum class EListIndex
+	enum ListIndex
 	{
 		Status = 0,
 		File,
@@ -79,11 +79,11 @@ void Dialog::ProgressLog::ReceiveSignal(Json::Object* pData)
 
 	Signal::Progress::Action action = (Signal::Progress::Action)data.GetInteger(SKW_ACTION);
 	switch (action) {
-	case Signal::Progress::Action::StartMarquee: StartMarquee(); break;
-	case Signal::Progress::Action::SetMessage: SetMessage(data); break;
-	case Signal::Progress::Action::AddLog: AddLog(data); break;
-	case Signal::Progress::Action::SetLogStatus: SetLogStatus(data); break;
-	case Signal::Progress::Action::StopMarquee: StartMarquee(false); break;
+	case Signal::Progress::Action::StartMarquee: StartMarquee();      break;
+	case Signal::Progress::Action::SetMessage:   SetMessage(data);    break;
+	case Signal::Progress::Action::AddLog:       AddLog(data);        break;
+	case Signal::Progress::Action::SetLogStatus: SetLogStatus(data);  break;
+	case Signal::Progress::Action::StopMarquee:  StartMarquee(false); break;
 
 	default:
 		DEBUG_STOP;
@@ -115,9 +115,13 @@ BOOL Dialog::ProgressLog::OnInitDialog()
 	CSize frame = GetFrameThickness();
 	CSize winSize = globalUtils.ScaleByDPI(CSize(data.GetInteger("cx"), data.GetInteger("cy")));
 	CRect body = { 0, frame.cy, winSize.cx, winSize.cy };
+
 	ConstructBody(body);
 
-	AdjustWindowSize(winSize);
+	m_windowSize = AdjustWindowSize(winSize);
+	SetSizeLimit(true, true);
+	//:CHECK
+	StartMarquee();
 
 	return TRUE;
 }
@@ -136,7 +140,7 @@ int Dialog::ProgressLog::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 
 
-CRect Dialog::ProgressLog::ConstructBody(const CRect& boundary)
+void Dialog::ProgressLog::ConstructBody(const CRect& boundary)
 {
 	Json::Object& data = GetUiData().GetAt("body");
 
@@ -153,8 +157,6 @@ CRect Dialog::ProgressLog::ConstructBody(const CRect& boundary)
 	area.top = area.bottom + GetFrameThickness().cy;
 	area.bottom = boundary.bottom;
 	SetupControl(m_wndLog, data.GetAt("Log"), Component::EPivot::TopLeft, area);
-
-	return area;
 }
 
 
@@ -206,3 +208,4 @@ void Dialog::ProgressLog::SetLogStatus(Json::Object& data)
 }
 
 #undef DDX_CONTROL
+#undef PRESET
