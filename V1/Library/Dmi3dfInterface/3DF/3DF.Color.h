@@ -416,4 +416,6 @@ _3DF_INLINE RGB24Color Interpolate(RGB24Color const & a, RGB24Color const & b, f
 		(unsigned char) (a.b + ((float) b.b - (float) a.b) * t));
 }
 
+using RGBAColorArray = std::vector<_3DF::RGBAColor, boost::pool_allocator<RGBAColor>>;
+
 CLOSE_3DF_NAMESPACE

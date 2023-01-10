@@ -40,12 +40,14 @@ View::View(HBaseModel * pcBaseModel, const char * pchAlias, const char * pchDriv
 
 View::~View()
 {
+	HC_Relinquish_Memory();
+
 	if(nullptr != m_pnSweetenKeyList) {
 		delete[] m_pnSweetenKeyList;
 	}
 
-	ClearClashList();
-	delete_vlist(m_pcClashList);
+// 	ClearClashList();
+// 	delete_vlist(m_pcClashList);
 }
 
 //== Hoops 설정 함수 =================================================================================
@@ -84,7 +86,7 @@ void View::Init()
 	SetPolygonHandednessMode(HandednessLeft);
 
 	GetModel()->SetStaticModel(true);
-	//GetModel()->SetLMVModel(true);
+	GetModel()->SetLMVModel(true);
 
 	GetModel()->GetEventManager()->RegisterHandler((HAnimationListener *) this, HAnimationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
 	
@@ -112,7 +114,9 @@ void View::Init()
 
 	SetViewAxis();
 
-	SetViewMode(HViewIsoFrontRightTop);		// fit the camera to the scene extents
+	SetViewMode(HViewIso);		// fit the camera to the scene extents
+
+	SetHandedness(HandednessRight, true);
 
 	// 배경화면 설정
 	COLORREF nWindowBackgroundColor = RGB(59, 68, 83);

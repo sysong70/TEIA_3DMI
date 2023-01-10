@@ -21,6 +21,5 @@
 // 	#include <A3DSDKLoader.h>
 // #endif // A3DSDKLOADER_H
 
-
 #define BUILD_PRODUCTNAME	L"3DMI"
 #define BUILD_VER_BRAND		L"1.0"

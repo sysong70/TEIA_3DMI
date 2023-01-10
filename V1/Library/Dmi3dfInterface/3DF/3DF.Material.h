@@ -45,6 +45,15 @@ public:
 	class Color
 	{
 	public:
+		enum class Type : uint32_t
+		{
+			Diffuse,
+			Specular,
+			Emission,
+			Line,
+			Count
+		};
+
 		// Material Color Channel
 		enum class Channel : uint32_t
 		{

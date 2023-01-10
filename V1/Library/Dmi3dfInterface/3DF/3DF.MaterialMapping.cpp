@@ -13,102 +13,73 @@ USING_3DF_NAMESPACE
 
 MaterialMappingKit::MaterialMappingKit()
 {
-	for(auto & pbSetColor : m_pbSetColors) {
-		for(bool & bSetColor : pbSetColor) {
-			bSetColor = false;
-		}
+	for(auto & pbSetColor : m_pbSetColorFlags) {
+		pbSetColor = false;
 	}
 
-	for(auto & eColorType : m_eColorType) {
-		eColorType = Material::Type::None;
+	m_bGlossFlag = false;
+	m_fGloss = 1.0;
+}
+
+//== Color 설정 =====================================================================================
+
+MaterialMappingKit & MaterialMappingKit::SetColor(RGBAColor const & cInRgbaColor, Material::Color::Type eType)
+{
+	m_pcColors[(int) eType] = cInRgbaColor;
+	m_pbSetColorFlags[(int) eType] = true;
+	return *this;
+}
+
+MaterialMappingKit & MaterialMappingKit::SetGloss(float fGloss)
+{
+	m_fGloss = fGloss;
+	m_bGlossFlag = true;
+	return *this;
+}
+
+bool MaterialMappingKit::ShowColor(Material::Color::Type eType, RGBAColor & cOutRgbaColor) const
+{
+	if(false == m_pbSetColorFlags[(int) eType]) {
+		return false;
 	}
 
-	for(auto & dShininess : m_fGloss) {
-		dShininess = 1.0;
-	}
-
-	for(auto & bShininessFlag : m_bGlossFlag) {
-		bShininessFlag = false;
-	}
-
-
-/*
-	for(int nTypeIndex = 0; nTypeIndex < (int) TypeIndex::Count; nTypeIndex++) {
-		for(int nColorIndex = 0; nColorIndex < (int) ColorIndex::Count; nColorIndex++) {
-			m_pbSetColors[nTypeIndex][nColorIndex] = false;
-		}
-	}
-*/
-}
-
-//== Face Color 설정 ================================================================================
-
-MaterialMappingKit & MaterialMappingKit::SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
-{
-	return SetColor(TypeIndex::Face, (Material::Channel) eInChannel, cInRgbaColor);
-}
-
-MaterialMappingKit & MaterialMappingKit::SetFaceGloss(float fGloss)
-{
-	return SetGloss(TypeIndex::Face, fGloss);
-}
-
-bool MaterialMappingKit::ShowFaceChannel(Material::Channel eInChannel, Material::Type & eOutType, RGBAColor & cOutRgbaColor, CString & strOutTextureName, float & fOutValue) const
-{
-	return ShowChannel(TypeIndex::Face, eInChannel, eOutType, cOutRgbaColor, strOutTextureName, fOutValue);
-}
-
-//== Line Color 설정 ================================================================================
-
-MaterialMappingKit & MaterialMappingKit::SetLineColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
-{
-	return SetColor(TypeIndex::Line, (Material::Channel) eInChannel, cInRgbaColor);
-}
-
-bool MaterialMappingKit::ShowLineChannel(Material::Channel eInChannel, Material::Type & eOutType, RGBAColor & cOutRgbaColor, CString & strOutTextureName, float & fOutValue) const
-{
-	return ShowChannel(TypeIndex::Line, eInChannel, eOutType, cOutRgbaColor, strOutTextureName, fOutValue);
+	cOutRgbaColor = m_pcColors[(int) eType];
+	return true;
 }
 
 MaterialMappingKit & MaterialMappingKit::operator = (MaterialMappingKit const & cInThat)
 {
-	for(int nTypeIndex = 0; nTypeIndex < (int) TypeIndex::Count; nTypeIndex++) {
-		for(int nColorIndex = 0; nColorIndex < (int) Material::Channel::Count; nColorIndex++) {
-			m_pcColors[nTypeIndex][nColorIndex] = cInThat.Colors(nTypeIndex, nColorIndex);
-			m_pbSetColors[nTypeIndex][nColorIndex] = cInThat.SetColors(nTypeIndex, nColorIndex);
-		}
+	for(int nTypeIndex = 0; nTypeIndex < (int) Material::Color::Type::Count; nTypeIndex++) {
+		m_pcColors[nTypeIndex] = cInThat.Colors(nTypeIndex);
+		m_pbSetColorFlags[nTypeIndex] = cInThat.SetColorFlags(nTypeIndex);
 	}
 
-	for(int nTypeIndex = 0; nTypeIndex < (int) TypeIndex::Count; nTypeIndex++) {
-		m_fGloss[nTypeIndex] = cInThat.Gloss()[nTypeIndex];
-		m_bGlossFlag[nTypeIndex] = cInThat.GlossFlag()[nTypeIndex];
-	}
+	m_fGloss = cInThat.Gloss();
+	m_bGlossFlag = cInThat.GlossFlag();
 
 	return *this;
 }
 
 bool MaterialMappingKit::operator == (MaterialMappingKit const & cInThat) const
 {
-	for(int nTypeIndex = 0; nTypeIndex < (int) TypeIndex::Count; nTypeIndex++) {
-		for(int nColorIndex = 0; nColorIndex < (int) Material::Channel::Count; nColorIndex++) {
-			if(m_pbSetColors[nTypeIndex][nColorIndex] != cInThat.SetColors(nTypeIndex, nColorIndex)) {
-				return false;
-			}
-
-			if(m_pcColors[nTypeIndex][nColorIndex] != cInThat.Colors(nTypeIndex, nColorIndex)) {
-				return false;
-			}
-		}
-	}
-
-	for(int nTypeIndex = 0; nTypeIndex < (int) TypeIndex::Count; nTypeIndex++) {
-		if(m_bGlossFlag[nTypeIndex] != cInThat.GlossFlag()[nTypeIndex]) {
+	for(int nTypeIndex = 0; nTypeIndex < (int) Material::Color::Type::Count; nTypeIndex++) {
+		if(m_pbSetColorFlags[nTypeIndex] != cInThat.SetColorFlags(nTypeIndex)) {
 			return false;
 		}
+
+		if(true == m_pbSetColorFlags[nTypeIndex]) {
+			if(false == m_pcColors[nTypeIndex].Equals(cInThat.Colors(nTypeIndex))) {
+				return false;
+			}
+		}
 	}
 
-	for(int nTypeIndex = 0; nTypeIndex < (int) TypeIndex::Count; nTypeIndex++) {
-		if(m_fGloss[nTypeIndex] != cInThat.Gloss()[nTypeIndex]) {
+	if(m_bGlossFlag != cInThat.GlossFlag()) {
+		return false;
+	}
+
+	if(true == m_bGlossFlag) {
+		if(m_fGloss != cInThat.Gloss()) {
 			return false;
 		}
 	}
@@ -116,94 +87,50 @@ bool MaterialMappingKit::operator == (MaterialMappingKit const & cInThat) const
 	return true;
 }
 
-bool MaterialMappingKit::IsAllocate()
+bool MaterialMappingKit::operator != (MaterialMappingKit const & cInThat) const
 {
-	for(auto & pbSetColor : m_pbSetColors) {
-		for(bool & bSetColor : pbSetColor) {
-			if(true == bSetColor) {
-				return true;
-			}
-		}
+	if(*this == cInThat) {
+		return false;
 	}
 
-	for(auto & bShininessFlag : m_bGlossFlag) {
-		if(true == bShininessFlag) {
+	return true;
+}
+
+bool MaterialMappingKit::IsAllocate()
+{
+	for(auto & pbSetColor : m_pbSetColorFlags) {
+		if(true == pbSetColor) {
 			return true;
 		}
 	}
 
-	return false;
-
-}
-
-MaterialMappingKit & MaterialMappingKit::SetColor(TypeIndex nTypeIndex, Material::Channel eInChannel, RGBAColor const & cInRgbaColor)
-{
-	m_eColorType[(int) nTypeIndex] = Material::Type::RGBAColor;
-	m_pcColors[(int) nTypeIndex][(int) eInChannel] = cInRgbaColor;
-	m_pbSetColors[(int) nTypeIndex][(int) eInChannel] = true;
-	return *this;
-}
-
-MaterialMappingKit & MaterialMappingKit::SetGloss(TypeIndex nTypeIndex, float fGloss)
-{
-	m_eColorType[(int) nTypeIndex] = Material::Type::GlossValue;
-	m_fGloss[(int) nTypeIndex] = fGloss;
-	m_bGlossFlag[(int) nTypeIndex] = true;
-
-	return *this;
-}
-
-MaterialMappingKit & MaterialMappingKit::UnsetColor(TypeIndex nTypeIndex, Material::Channel eInChannel)
-{
-	m_eColorType[(int) nTypeIndex] = Material::Type::None;
-	m_pbSetColors[(int) nTypeIndex][(int) eInChannel] = false;
-	return *this;
-}
-
-MaterialMappingKit & MaterialMappingKit::UnsetGloss(TypeIndex nTypeIndex)
-{
-	m_eColorType[(int) nTypeIndex] = Material::Type::None;
-	m_bGlossFlag[(int) nTypeIndex] = false;
-
-	return *this;
-}
-
-bool MaterialMappingKit::ShowChannel(TypeIndex nTypeIndex, Material::Channel eInChannel, Material::Type & eOutType, RGBAColor & cOutRgbaColor, CString & strOutTextureName, float & fOutValue) const
-{
-	if(true == m_pbSetColors[(int) nTypeIndex][(int)eInChannel]) {
-		eOutType = m_eColorType[(int) nTypeIndex];
-		cOutRgbaColor = m_pcColors[(int) nTypeIndex][(int) eInChannel];
-		return true;
-	}
-
-	if(true == m_bGlossFlag[(int) nTypeIndex]) {
-		fOutValue = m_fGloss[(int) nTypeIndex];
+	if(true == m_bGlossFlag) {
 		return true;
 	}
 
 	return false;
+
 }
 
-RGBAColor MaterialMappingKit::Colors(int nTypeIndex, int nInChannel) const
+RGBAColor MaterialMappingKit::Colors(int nTypeIndex) const
 {
-	return m_pcColors[nTypeIndex][nInChannel];
+	return m_pcColors[nTypeIndex];
 }
 
-bool MaterialMappingKit::SetColors(int nTypeIndex, int nInChannel) const
+bool MaterialMappingKit::SetColorFlags(int nTypeIndex) const
 {
-	return m_pbSetColors[nTypeIndex][nInChannel];
+	return m_pbSetColorFlags[nTypeIndex];
 }
 
-float * MaterialMappingKit::Gloss() const
+float MaterialMappingKit::Gloss() const
 {
-	return (float *) m_fGloss;
+	return m_fGloss;
 }
 
-bool * MaterialMappingKit::GlossFlag() const
+bool MaterialMappingKit::GlossFlag() const
 { 
-	return (bool *) m_bGlossFlag; 
+	return m_bGlossFlag; 
 }
-
 
 //== MaterialMappingControl ========================================================================
 

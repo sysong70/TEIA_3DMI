@@ -17,3 +17,22 @@ MatrixKit::MatrixKit(float const fInMatrixSource[])
 {
 	memcpy(m_fData, fInMatrixSource, 16 * sizeof(float));
 }
+
+bool MatrixKit::IsIdentity()
+{
+	float fIdMatrix[16] = {
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1,
+	};
+
+	// can't use memcmp because of -0.0f and +0.0f
+	for(int i = 0; i < 16; ++i) {
+		if(m_fData[i] != fIdMatrix[i]) {
+			return false;
+		}
+	}
+
+	return true;
+}

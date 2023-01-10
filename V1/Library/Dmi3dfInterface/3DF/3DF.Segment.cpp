@@ -137,18 +137,18 @@ ShellKey SegmentKey::InsertShell(ShellKit const & cInKit)
 	return cShell;
 }
 
-//== Line 관련 함수 ==============================================================================
+//== Line 관련 함수 ==================================================================================
 LineKey SegmentKey::InsertLine(size_t in_count, Point const pcInPoints[])
 {
 	Open();
-	HC_KEY nKey = HC_Insert_Polyline(in_count, pcInPoints);
+	HC_KEY nKey = HC_Insert_Polyline((int) in_count, pcInPoints);
 	Close();
 
 	LineKey cLine(nKey);
 	return cLine;
 }
 
-//== Material Mapping 관련 함수 ==================================================================
+//== Material Mapping 관련 함수 ======================================================================
 SegmentKey & SegmentKey::SetMaterialMapping(_3DF::MaterialMappingKit const & cInKit)
 {
 	Open();
@@ -156,13 +156,10 @@ SegmentKey & SegmentKey::SetMaterialMapping(_3DF::MaterialMappingKit const & cIn
 
 	//bool MaterialMappingKit::ShowFaceChannel(Material::Channel eInChannel, Material::Type & eOutType, RGBAColor & cOutRgbaColor, CString & strOutTextureName, float & fOutValue) const
 	Material::Channel eInChannel = Material::Channel::DiffuseColor;
-	Material::Type eType;
 	RGBAColor cRgbaColor;
-	CString strTextureName;
-	float fValue = 0.0f;
 
 	//----- Face 설정 -----
-	if(true == cInKit.ShowFaceChannel(Material::Channel::DiffuseColor, eType, cRgbaColor, strTextureName, fValue)) {
+	if(true == cInKit.ShowColor(Material::Color::Type::Diffuse , cRgbaColor)) {
 		CString strColorText;
 
 		if(1.0f == cRgbaColor.alpha) {
@@ -176,34 +173,34 @@ SegmentKey & SegmentKey::SetMaterialMapping(_3DF::MaterialMappingKit const & cIn
 		HC_Set_Color(H_ASCII_TEXT(strColorText));
 	}
 
-	if(true == cInKit.ShowFaceChannel(Material::Channel::Specular, eType, cRgbaColor, strTextureName, fValue)) {
+	if(true == cInKit.ShowColor(Material::Color::Type::Specular, cRgbaColor)) {
 		CString strColorText;
 		if(1.0f == cRgbaColor.alpha) {
-			strColorText.Format(L"faces = (diffuse = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
+			strColorText.Format(L"faces = (specular = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
 		}
 		else {
 			float fTransparency = 1.0f - cRgbaColor.alpha;
-			strColorText.Format(L"faces = (diffuse = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, fTransparency, fTransparency, fTransparency);
+			strColorText.Format(L"faces = (specular = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, fTransparency, fTransparency, fTransparency);
 		}
 
 		HC_Set_Color(H_ASCII_TEXT(strColorText));
 	}
 
-	if(true == cInKit.ShowFaceChannel(Material::Channel::Emission, eType, cRgbaColor, strTextureName, fValue)) {
+	if(true == cInKit.ShowColor(Material::Color::Type::Emission, cRgbaColor)) {
 		CString strColorText;
 		if(1.0f == cRgbaColor.alpha) {
-			strColorText.Format(L"faces = (diffuse = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
+			strColorText.Format(L"faces = (emission = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
 		}
 		else {
 			float fTransparency = 1.0f - cRgbaColor.alpha;
-			strColorText.Format(L"faces = (diffuse = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, fTransparency, fTransparency, fTransparency);
+			strColorText.Format(L"faces = (emission = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, fTransparency, fTransparency, fTransparency);
 		}
 
 		HC_Set_Color(H_ASCII_TEXT(strColorText));
 	}
 
 	//----- Line 설정 -----
-	if(true == cInKit.ShowLineChannel(Material::Channel::DiffuseColor, eType, cRgbaColor, strTextureName, fValue)) {
+	if(true == cInKit.ShowColor(Material::Color::Type::Line, cRgbaColor)) {
 		CString strColorText;
 		strColorText.Format(L"lines = (diffuse = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
 		HC_Set_Color(H_ASCII_TEXT(strColorText));

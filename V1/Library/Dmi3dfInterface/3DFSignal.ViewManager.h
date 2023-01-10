@@ -20,6 +20,7 @@ public:
 
 protected:
 	void Initialize(int nViewId, Json::Object & cInObject);
+	void Destruct(int nViewId);
 	void Paint(int nViewId, Json::Object & cInObject);
 
 	void SaveHsfFile(CString strFilePathName, _3DF::View * pcHoopsView);

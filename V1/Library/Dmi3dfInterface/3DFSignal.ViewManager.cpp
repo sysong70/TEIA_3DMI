@@ -37,7 +37,7 @@ void ViewManager::ExecuteSignal(Json::Object & cInObject)
 			break;
 
 		case Signal::View::Action::OnDestruct:
-			//OnDestructView(nViewId);
+			Destruct(nViewId);
 			break;
 
 		case Signal::View::Action::OnPaint:
@@ -106,7 +106,7 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 	DLL::_3DF::Interface cInterfaace;
 	cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, strErrorMessage);
 
-	SaveHsfFile(L"Z://Test.hsf", pcHoopsView);
+ 	//SaveHsfFile(L"Z://Test.hsf", pcHoopsView);
 
 	//pcHoopsView->SetSmoothTransition(true);
 	pcHoopsView->ZoomToExtents();
@@ -116,6 +116,24 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 	delivery.ViewId = nViewId;
 	delivery.SetSender(Wrapper().m_pc3dfInterface->GetSignalCallback());
 	delivery.view.SetValidation();
+}
+
+void ViewManager::Destruct(int nViewId)
+{
+	View * pcHoopsView = Wrapper().m_mpcHoopsView[nViewId];
+	if(nullptr != pcHoopsView) {
+
+		pcHoopsView->SetSuppressUpdate(true);
+
+		Model * pcModel = (Model *) pcHoopsView->GetModel();
+
+		delete pcHoopsView;
+		Wrapper().m_mpcHoopsView[nViewId] = nullptr;
+
+		if(nullptr != pcModel) {
+			delete pcModel;
+		}
+	}
 }
 
 void ViewManager::Paint(int nViewId, Json::Object & cInObject)

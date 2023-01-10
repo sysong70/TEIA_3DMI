@@ -22,9 +22,43 @@
 #	include <boost / pool / pool_alloc.hpp>
 #endif
 
-template <typename T> _3DF_INLINE T Abs(T const & a) { return a < 0 ? -a : a; }
-
 OPEN_3DF_NAMESPACE
+
+template <typename T>	_3DF_INLINE	T		Abs(T const & a) { return  a < 0 ? -a : a; }
+template <typename T>	_3DF_INLINE	int		Compare(T const & a, T const & b) { return a == b ? 0 : a < b ? -1 : 1; }
+template <typename T>	_3DF_INLINE	int		Sign(T const & a) { return Compare(a, (T) 0); }
+template <typename T>	_3DF_INLINE	void	Swap(T & a, T & b) { T temp = a; a = b; b = temp; }
+template <typename T>	_3DF_INLINE	int		Floor(T const & a) { return ((a > 0 || (T) (int) a == a) ? (int) a : ((int) a - 1)); }
+template <typename T>	_3DF_INLINE	int		Ceiling(T const & a) { return ((a < 0 || (T) (int) a == a) ? (int) a : ((int) a + 1)); }
+
+template <typename T>	_3DF_INLINE	T const & Min(T const & a, T const & b) { return  a < b ? a : b; }
+template <typename T>	_3DF_INLINE	T const & Min(T const & a, T const & b, T const & c) { return  Min(Min(a, b), c); }
+template <typename T>	_3DF_INLINE	T const & Min(T const & a, T const & b, T const & c, T const & d) { return Min(Min(a, b, c), d); }
+template <typename T>	_3DF_INLINE	T const & Min(T const & a, T const & b, T const & c, T const & d, T const & e) { return Min(Min(a, b, c, d), e); }
+template <typename T>	_3DF_INLINE	T const & Min(T const & a, T const & b, T const & c, T const & d, T const & e, T const & f) { return Min(Min(a, b, c, d, e), f); }
+
+template <typename T>	_3DF_INLINE	T const & Max(T const & a, T const & b) { return  a > b ? a : b; }
+template <typename T>	_3DF_INLINE	T const & Max(T const & a, T const & b, T const & c) { return  Max(Max(a, b), c); }
+template <typename T>	_3DF_INLINE	T const & Max(T const & a, T const & b, T const & c, T const & d) { return Max(Max(a, b, c), d); }
+template <typename T>	_3DF_INLINE	T const & Max(T const & a, T const & b, T const & c, T const & d, T const & e) { return Max(Max(a, b, c, d), e); }
+template <typename T>	_3DF_INLINE	T const & Max(T const & a, T const & b, T const & c, T const & d, T const & e, T const & f) { return Max(Max(a, b, c, d, e), f); }
+
+template <typename T>	_3DF_INLINE	T const & Clamp(T const & x, T const & min, T const & max) { return x < min ? min : x > max ? max : x; }
+
+
+template <typename F>	struct Float_Traits {};
+template <> struct Float_Traits<float>
+{
+	typedef double	Alternative;
+	static const int Type = 1;
+	static float Epsilon() { return 1.0e-30f; }
+};
+template <> struct Float_Traits<double>
+{
+	typedef float	Alternative;
+	static const int Type = 2;
+	static double Epsilon() { return 1.0e-300; }
+};
 
 /// The Float class is a concept class that exposes a number of useful utilities for working with floating point numbers.
 class API_3DF Float
@@ -382,7 +416,59 @@ public:
 	explicit Vector_3D(Point_3D<F> const & p) : x(p.x), y(p.y), z(p.z) {}
 
 	void Set(F X, F Y, F Z) { x = X; y = Y; z = Z; };
+
+	_3DF_INLINE F Dot(Vector_3D const & v) const { return x * v.x + y * v.y + z * v.z; }
+
+	_3DF_INLINE Vector_3D Cross(Vector_3D const & v) const {
+		return Vector_3D(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
+	}
+
+	Vector_3D & operator+= (Vector_3D const & v) { x += v.x; y += v.y; z += v.z;  return *this; }
+	Vector_3D & operator-= (Vector_3D const & v) { x -= v.x; y -= v.y; z -= v.z;  return *this; }
+	Vector_3D const operator+ (Vector_3D const & v) const { return Vector_3D(x + v.x, y + v.y, z + v.z); }
+	Vector_3D const operator- (Vector_3D const & v) const { return Vector_3D(x - v.x, y - v.y, z - v.z); }
+
+	Vector_3D & operator*= (F s) { x *= s; y *= s; z *= s;  return *this; }
+	Vector_3D & operator/= (F s) { return operator*= (1.0f / s); }
+	Vector_3D const operator* (F s) const { return Vector_3D(x * s, y * s, z * s); }
+	Vector_3D const operator/ (F s) const { return operator* (1.0f / s); }
+
+	_3DF_INLINE double Length() const { return sqrt(LengthSquared()); }
+
+	_3DF_INLINE double LengthSquared() const { return (double) x * (double) x + (double) y * (double) y + (double) z * (double) z; }
+
+	_3DF_INLINE Vector_3D & Normalize(bool check_range = false, F epsilon = Float_Traits<F>::Epsilon()) {// not const &; allow V.normalize() *= S;
+		if(check_range) {
+			F	range = Max(Abs(x), Abs(y), Abs(z));
+			if(range > F(1.0e10))
+				operator/= (range);
+		}
+
+		F	len = (F) Length();
+		if(len > epsilon)
+			operator/= (len);
+		else
+			*this = Zero();
+		return *this;
+	}
+
+	_3DF_INLINE Vector_3D & Normalize(F epsilon) { return Normalize(false, epsilon); }
+
+	static _3DF_INLINE Vector_3D XAxis() { return Vector_3D(1, 0, 0); };
+	static _3DF_INLINE Vector_3D YAxis() { return Vector_3D(0, 1, 0); };
+	static _3DF_INLINE Vector_3D ZAxis() { return Vector_3D(0, 0, 1); };
+	static _3DF_INLINE Vector_3D Zero() { return Vector_3D(0, 0, 0); };
+	static _3DF_INLINE Vector_3D Unit() { return Vector_3D(1, 1, 1); };
+
 };
+
+template <typename F, typename S>
+_3DF_INLINE	Vector_3D<F>	operator* (S s, Vector_3D<F> const & v) { return Vector_3D<F>(F(s * v.x), F(s * v.y), F(s * v.z)); }
+
+template <typename F>
+_3DF_INLINE bool Is_Abnormal(Vector_3D<F> const & v) {
+	return Is_Abnormal(v.x) || Is_Abnormal(v.y) || Is_Abnormal(v.z);
+}
 
 using Vector = Vector_3D<float>;
 
@@ -391,6 +477,7 @@ using Vector = Vector_3D<float>;
 // using VectorArray = std::vector<Vector>;
 
 using IntArray = std::vector<int, boost::pool_allocator<int>>;
+using FloatArray = std::vector<float, boost::pool_allocator<float>>;
 using PointArray = std::vector<Point, boost::pool_allocator<Point>>;
 using VectorArray = std::vector<Vector, boost::pool_allocator<Vector>>;
 
@@ -405,6 +492,8 @@ public:
 
 	MatrixKit();
 	MatrixKit(float const fInMatrixSource[]);
+
+	bool IsIdentity();
 };
 
 CLOSE_3DF_NAMESPACE

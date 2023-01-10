@@ -11,9 +11,10 @@
 #include <atlcoll.h>
 #include <vector>
 
-using TessIndexMap = CAtlMap<A3DUns32, A3DUns32>;
-
  OPEN_3DX_NAMESPACE
+
+using TessIndexMap = CAtlMap<A3DUns32, A3DUns32>;
+using IndexHash = std::unordered_map<A3DUns32, _3DF::IntArray>;
 
 struct ImportOption
 {
@@ -50,10 +51,39 @@ protected:
 
 	// == 3DF 변환 관련 함수 =====================================================================
 protected:
+
+	struct ConvertFaceInfo
+	{
+		A3DUns32 * pnInIndices;							// "global" index array for normals, points and vertex parameters
+		_3DF::PointArray aInPoints;						// "global" point array
+		_3DF::VectorArray aInNormals;					// "global" normal array
+		_3DF::FloatArray cInParams;						// optional "global" parameter array
+		_3DF::RGBAColorArray aInColors;					// optional RGBA color array
+		A3DTessFaceData * pcInTessFaceData;				// tessellation data for *this* (CAD) face
+		float fInNormalCosine{};							// cosine limit for determining equal normals
+
+		A3DUns32 nOutTriSizeIndex{};					// offset into A3DTessFaceData::m_puiSizesTriangulated
+		A3DUns32 nOutTriStartIndex{};					// offset into in_indices
+		A3DUns32 nOutTriColorIndex{};					// offset into in_colors
+		IndexHash mOutIndexMap;							// mapping of "global" indices to "local" indices for *this* (CAD) face
+		_3DF::IntArray aOutVertexRefs;					// count of references to a particular (vertex, normal) pair
+		_3DF::PointArray aOutFacePoints;				// points for *this* (CAD) face
+		_3DF::IntArray aOutFaceList;					// facelist for *this* (CAD) face (wrt to points for *this* (CAD) face)
+		_3DF::IntArray aOutFaceVertexNormalsIndex;		// Face list에 대응되는 Normal Index를 저장.
+		_3DF::VectorArray aOutFaceVertexNormals;		// vertex normals for *this* (CAD) face
+		_3DF::FloatArray aOutFaceVertexParams;			// optional vertex parameters for *this* (CAD) face
+		_3DF::RGBAColorArray aOutFaceVertexColors;		// optional RGBA vertex colors for *this* (CAD) face
+
+		ConvertFaceInfo() {
+			pnInIndices = nullptr;
+			pcInTessFaceData = nullptr;
+		}
+	};
+
 	bool DrawModel(const A3DAsmModelFile * pcAsmModelFile, _3DF::SegmentKey & cModelSegment);
 
 	// == Product Occurrences 관련 함수 =========================================================
-	A3DStatus DrawProductOccurrence(A3DAsmProductOccurrence * pcOccurrence, _3DF::SegmentKey & cParentSegment, A3DMiscCascadedAttributes * pcParentAttr);
+	A3DStatus ConvertProductOccurrence(A3DAsmProductOccurrence * pcOccurrence, _3DF::SegmentKey & cParentSegment, A3DMiscCascadedAttributes * pcParentAttr);
 	A3DStatus ProductOccurrenceGetLocation(const A3DAsmProductOccurrenceData * pcPoData, _3DF::MatrixKit & cTransMatrix);
 	A3DStatus ProductOccurrenceGetLocation(const A3DAsmProductOccurrenceData * psPOccData, A3DMiscCartesianTransformation ** ppLocation);
 	A3DStatus ProductOccurrenceGetExternalData(const A3DAsmProductOccurrenceData * pcPOccData,
@@ -74,9 +104,21 @@ protected:
 
 	//== Draw 관련 함수 =========================================================================
 	A3DStatus DrawPartDefinition(const A3DAsmPartDefinition * pcPart, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
-	A3DStatus DrawRepresentationItem(const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cParentSegment,
+	A3DStatus DrawRiRepresentationItem(const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cParentSegment,
 		const A3DMiscCascadedAttributes * pcParentAttr);
+
 	A3DStatus DrawSet(const A3DRiSet * pSet, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+
+	A3DStatus DrawRiBrepModel(const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cSegment,
+		const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData);
+
+	A3DStatus DrawRiPolyBrepModel(const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cSegment,
+		const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData);
+
+	A3DStatus DrawRiPolyWire(const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr,
+		const A3DMiscCascadedAttributesData & cAttrData);
+
+	A3DStatus DrawRiCurve(A3DRiCurve * pcInputRiCurve, _3DF::SegmentKey & cParentSegment, A3DMiscCascadedAttributes * pcParentAttr);
 
 	A3DStatus DrawMarkupView(const A3DMkpView * pcView, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
 	A3DStatus DrawAnnotation(const A3DMkpAnnotationEntity * pcAnnotation, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
@@ -84,33 +126,51 @@ protected:
 	A3DStatus DrawAnnotationReference(const A3DMkpAnnotationItem * /*pcAnnotationItem*/, const A3DMiscCascadedAttributes * /*pcParentAttr*/);
 	A3DStatus DrawAnnotationItem(const A3DMkpAnnotationItem * pcAnnotationItem, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
 
-	A3DStatus DrawMarkup(const A3DMkpMarkup * pcMarkup, _3DF::SegmentKey & cParentSegment, _3DF::MaterialMappingKit const & cParentMaterialMapping, 
+	A3DStatus DrawMarkup(const A3DMkpMarkup * pcMarkup, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+
+	A3DStatus DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+
+	A3DStatus DrawTess3D(const A3DTess3D * pcTess3D, const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+
+	UINT ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo);
+	UINT DrawTessFaceDataTriangle(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriangleIndices, A3DUns32 & nTriangleSizeIndex, A3DUns32 & nTriangleStartIndex,
+		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray);
+
+	UINT ConvertTessFaceDataTriangleFan(ConvertFaceInfo & cInFaceInfo);
+	UINT DrawTessFaceDataTriangleFan(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
+		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray);
+
+	UINT ConvertTessFaceDataTriangleStripe(ConvertFaceInfo & cInFaceInfo);
+	UINT DrawTessFaceDataTriangleStripe(A3DTessFaceData & cTessFaceData, _3DF::PointArray & acInPoints, _3DF::VectorArray acInNormals, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, 
+		A3DUns32 & nTriStartIndex, A3DUns32 & nTriColorIndex, IndexHash & mOutIndexMap, TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray);
+
+	UINT ConvertTessFaceDataTriangleOneNormal(ConvertFaceInfo & cInFaceInfo);
+	UINT DrawTessFaceDataTriangleOneNormal(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
+		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray);
+
+	UINT ConvertTessFaceDataTriangleFanOneNormal(ConvertFaceInfo & cInFaceInfo);
+	UINT DrawTessFaceDataTriangleFanOneNormal(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
+		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray);
+
+	UINT ConvertTessFaceDataTriangleStripeOneNormal(ConvertFaceInfo & cInFaceInfo);
+	UINT DrawTessFaceDataTriangleStripeOneNormal(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
+		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray);
+
+	UINT DrawTessFaceDataTriangleTextured(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
+		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray);
+	
+	A3DStatus DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cParentSegment, 
 		const A3DMiscCascadedAttributes * pcParentAttr);
 
-	A3DStatus DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresentationItem * pcRepItem,
-		_3DF::SegmentKey & cParentSegment, _3DF::MaterialMappingKit const & cParentMaterialMapping, const A3DMiscCascadedAttributes * pcParentAttr);
-
-	A3DStatus DrawTess3D(const A3DTess3D * pcTess3D, const A3DRiRepresentationItem * pcRepItem,
-		_3DF::SegmentKey & cParentSegment, _3DF::MaterialMappingKit const & cParentMaterialMapping, const A3DMiscCascadedAttributes * pcParentAttr);
-	UINT DrawTessFaceDataTriangle(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriangleIndices, A3DUns32 & nTriangleSizeIndex, A3DUns32 & nTriangleStartIndex,
-		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray);
-	UINT DrawTessFaceDataTriangleFan(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
-		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray);
-	UINT DrawTessFaceDataTriangleStripe(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
-		A3DUns32 & nTriColorIndex, TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray);
-	UINT DrawTessFaceDataTriangleOneNormal(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
-		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray);
-	UINT DrawTessFaceDataTriangleFanOneNormal(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
-		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray);
-	UINT DrawTessFaceDataTriangleStripeOneNormal(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
-		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray);
-	
 	A3DUns32 Tess3DDataGetNumberOfFacets(const A3DTess3DData * pcTess3DData);
 	A3DUns32 TessFaceDataGetNumberOfFacets(const A3DTessFaceData * pcTessFaceData);
 
 	void MatchVertexNormal(TessIndexMap & maNormalIndexMap, A3DUns32 nVertexIndex, A3DUns32 & nNormalIndex);
 	bool ConvertFaceList(TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap,
-		A3DUns32 * pnFacePointIndex, A3DUns32 * pnFaceNormalIndex, _3DF::IntArray & anFacelistArray);
+		A3DUns32 * pnFacePointIndex, A3DUns32 * pnFaceNormalIndex, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anVertexNoramlIndexArray);
+
+	void AddTriangle(ConvertFaceInfo & cInFaceInfo, int const pnInFaceListIndices[3], int const pnInFaceVertexNromalIndices[3],
+		int const pnInFaceVertexParamIndices[3], int const pnInFaceVertexColorIndices[3], A3DUns32  nInVertexParamSize);
 
 	A3DStatus DrawStyle(const A3DMiscCascadedAttributesData & cAttrsData, A3DInt32 * pnUVCoordinatesIndex, A3DUns8 * pucTextureDimension, _3DF::MaterialMappingKit & cMaterialKit);
 	A3DStatus DrawStyle(const A3DMiscCascadedAttributesData & cAttrsData, _3DF::MaterialMappingKit & cMaterialKit);
@@ -129,7 +189,7 @@ protected:
 		const A3DTessBase * pcTessBase, const A3DTessFaceData * pcTessFaceData, A3DUns32 uiFaceIndex,
 		const A3DMiscCascadedAttributes * pcParentAttr, A3DMiscCascadedAttributes ** ppcAttr, A3DMiscCascadedAttributesData * pcAttrData);
 
-	bool IsShow(const A3DRootBaseWithGraphics * pGraphics);
+	A3DStatus IsShow(const A3DRootBaseWithGraphics * pGraphics);
 
 	bool SetStyleMaterialMapping(_3DF::MaterialMappingKit const & cInKit, _3DF::SegmentKey & cSegment);
 	bool SetStyle(_3DF::SegmentKey & cSegment, _3DF::SegmentKey & cStyleSegment);
@@ -149,6 +209,8 @@ private:
 	A3DUTF8Char * m_pchRepresentationItemName = nullptr;
 
 	bool m_bDrawMarkups = true;
+
+	float m_fNormalAngleCosine = 0.0f;
 
 	//----- Segment Header -----
 	_3DF::SegmentKey * m_pcModelSegment = nullptr;
@@ -204,6 +266,10 @@ private:
 	void LogDecreaseTabIndex(int nId);
 	CString LogHexStr(DWORD_PTR nValue);
 	CString LogBoolStr(bool bValue);
+
+
+
+	void  parseAttributes(const A3DEntity * pEntity);
 };
   
  CLOSE_3DX_NAMESPACE

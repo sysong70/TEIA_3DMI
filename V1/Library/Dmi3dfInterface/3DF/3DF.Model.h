@@ -19,7 +19,7 @@ class Model : public HBaseModel
 {
 public:
 	Model();
-	~Model();
+	virtual ~Model();
 
 	SegmentKey GetSegmentKey() { return m_cSegmentKey; }
 
