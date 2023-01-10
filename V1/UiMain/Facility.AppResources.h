@@ -15,21 +15,23 @@ namespace Facility
 
 		bool Load();
 
-		bool Load(CString stream);
-
 		Json::Object& GetDialog(CStringA name);
-	#ifdef _DEBUG
-		Json::Object& GetDebug();
-	#endif
+
+		Json::Object& GetFileOptions();
+
+		Json::Object& GetPreferences();
 
 	private:
 
-		Json::Object m_data;
+		Json::Object m_fileOptions; // default value
+		Json::Object m_preferences; // default value
+		Json::Object m_ui;
 
-		Json::Object* m_pDialog;
-	#ifdef _DEBUG
-		Json::Object* m_pDebug;
-	#endif
+		bool InitDialog();
+
+		bool InitFileOptions();
+
+		bool InitPreferences();
 	};
 }
 

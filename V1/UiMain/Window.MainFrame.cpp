@@ -213,13 +213,12 @@ LRESULT Window::MainFrame::OnNextFileOpen(WPARAM wp, LPARAM lp)
 			CString fileName = m_fileNames.front();
 			m_fileNames.erase(m_fileNames.begin());
 
+			//:REF - create new file; pDocTemplate->OpenDocumentFile(NULL)
 			CDocument* pDoc = pDocTemplate->OpenDocumentFile(fileName);
-			// New file
-			// CDocument* pDoc = pDocTemplate->OpenDocumentFile(NULL);
 		}
 	}
 
-	return 0;
+	return S_OK;
 }
 
 
@@ -235,13 +234,15 @@ void Window::MainFrame::OnClose()
 void Window::MainFrame::OnCommand(UINT id)
 {
 	switch (id) {
-	case FILE_3D_CMD_New: TheAppication.OnFileNew(); return;
-	case FILE_3D_CMD_Open: OnFileOpen(); return;
-	case HOME_3D_CMD_Window_Cascade: SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_CASCADE); return;
+	case FILE_3D_CMD_New:                   TheAppication.OnFileNew();                            return;
+	case FILE_3D_CMD_Open:                  OnFileOpen();                                         return;
+	case FILE_3D_CMD_Preference:            OnFilePreference();                                   return;
+	case HOME_3D_CMD_Window_Cascade:        SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_CASCADE);   return;
 	case HOME_3D_CMD_Window_TileHorizontal: SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_TILE_HORZ); return;
-	case HOME_3D_CMD_Window_TileVertical: SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_TILE_VERT); return;
+	case HOME_3D_CMD_Window_TileVertical:   SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_TILE_VERT); return;
 
 	default:
+		DEBUG_STOP;
 		break;
 	}
 }
@@ -298,6 +299,8 @@ void Window::MainFrame::OnDropFiles(HDROP hDropInfo)
 
 void Window::MainFrame::OnFileOpen()
 {
+	const DWORD SHOW_OPTION = WM_USER;
+
 	Json::Object& dialog = TheAppResources.GetDialog("FileOpen");
 	Json::Array& arr = dialog.GetArray("filter");
 	CString filter;
@@ -305,7 +308,32 @@ void Window::MainFrame::OnFileOpen()
 		filter += pValue->AsString();
 	}
 
-	CFileDialog dlg(TRUE, nullptr, nullptr, OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT, filter);
+//#define USE_OPTION_DLG
+
+#ifdef USE_OPTION_DLG
+	CFileDialog dlg(TRUE, nullptr, nullptr, OFN_HIDEREADONLY, filter, this);
+	//:WARNING
+	dlg.AddCheckButton(SHOW_OPTION, Facility::Local(L"Show import option|파일 옵션 보기"), TRUE);
+	dlg.MakeProminent(SHOW_OPTION); // align to buttons
+
+	if (dlg.DoModal() == IDOK) {
+		m_fileNames.push_back(dlg.GetFileName());
+
+		BOOL bShow = FALSE;
+		dlg.GetCheckButtonState(WM_USER, bShow);
+		if (bShow) {
+			//:TODO - show option dialog
+		}
+		else {
+			//:WARNING
+			m_importOption.Clean();
+		}
+
+		PostMessage((UINT)EUserMessage::OnNextFileOpen);
+	}
+#else
+	CFileDialog dlg(TRUE, nullptr, nullptr, OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT, filter, this);
+
 	if (dlg.DoModal() == IDOK) {
 		POSITION pos = dlg.GetStartPosition();
 		while (pos != nullptr) {
@@ -315,6 +343,9 @@ void Window::MainFrame::OnFileOpen()
 
 		PostMessage((UINT)EUserMessage::OnNextFileOpen);
 	}
+#endif
+
+#undef USE_OPTION_DLG
 }
 
 

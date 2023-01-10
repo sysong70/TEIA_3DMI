@@ -44,30 +44,10 @@ namespace Dialog
 
 	protected:
 
-		// resize and move control
-		static CRect AdjustLayout(CWnd* pControl, CRect frame, CSize baseSize, Component::EPivot ePivot);
-		// move control
-		static CRect AdjustPosition(CWnd* pControl, CRect frame, Component::EPivot ePivot);
-		// resize control
-		static CSize AdjustSize(CWnd* pControl, CSize baseSize);
 		// align controls at base point
-		static CRect AlignControls(Controls controls, CPoint basePoint, Component::EAlign eAlign);
+		CRect AlignControls(Controls controls, CPoint basePoint, Component::EAlign eAlign);
 		// destribute controls from base point with gap
-		static CRect DestributeControls(Controls controls, CPoint basePoint, int gap, Component::EDirection eDir);
-
-	protected: // Set Json data
-
-		static UINT GetId(Json::Object& data);
-
-		static void GetListItems(Json::Object& data, std::vector<CString>& list);
-
-		static Component::EPivot GetPivot(Json::Object& data);
-
-		static CRect GetRect(Json::Object& data);
-
-		static CString GetTitle(Json::Object& data);
-
-		static Json::Object& SetData(Json::Object& data, UINT id = 0, const CString& title = L"", Component::EPivot ePivot = Component::EPivot::Unknown, const CRect& rect = {});
+		CRect DestributeControls(Controls controls, CPoint basePoint, int gap, Component::EDirection eDir);
 
 	protected:
 

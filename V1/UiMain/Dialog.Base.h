@@ -32,11 +32,11 @@ namespace Dialog
 
 	protected:
 
-		virtual CRect ConstructHeader(const CRect& boundary);
+		virtual void ConstructHeader(const CRect& boundary);
 	
-		virtual CRect ConstructBody(const CRect& boundary);
+		virtual void ConstructBody(const CRect& boundary);
 		
-		virtual CRect ConstructFooter(const CRect& boundary);
+		virtual void ConstructFooter(const CRect& boundary);
 		// exclude margin
 		virtual CRect GetBodyRect();
 		// include margin

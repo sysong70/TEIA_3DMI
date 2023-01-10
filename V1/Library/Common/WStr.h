@@ -48,6 +48,10 @@ namespace WStr
 		}
 		ASSERT(target == L"10.2e-2");
 	*/
+	bool IsDigit(CString& value);
+
+	bool IsDigit(wchar_t value);
+
 	bool IsNumeric(wchar_t value);
 
 	/*

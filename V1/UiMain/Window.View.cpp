@@ -19,11 +19,11 @@ namespace PresetView
 {
 	int ViewIndex = 0;
 	const UINT_PTR ActivateDelayTimer = 1234567;
-	const UINT TabId = WM_USER + 1;
 
-	enum class EPanelId
+	enum EPanelId
 	{
-		ModelTree = TabId + 1,
+		TabId = WM_USER,
+		ModelTree,
 		View,
 		Layer,
 		Scene,
@@ -223,6 +223,7 @@ void Window::View::OnCommand(UINT id)
 	switch (id) {
 	case FILE_3D_CMD_New:
 	case FILE_3D_CMD_Open:
+	case FILE_3D_CMD_Preference:
 	case HOME_3D_CMD_Window_Cascade:
 	case HOME_3D_CMD_Window_TileHorizontal:
 	case HOME_3D_CMD_Window_TileVertical:
@@ -376,7 +377,7 @@ void Window::View::OnMouseMove(UINT nFlags, CPoint point)
 
 BOOL Window::View::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 {
-	if (IsValid()) {
+	if (m_bValid) {
 		CRect rect;
 		GetWindowRect(rect);
 		//ScreenToClient(&point);
@@ -527,18 +528,17 @@ void Window::View::CreateToolBar()
 
 void Window::View::CreatePanelTabs()
 {
-	//:WARNING - setting before create()
+	//:WARNING - setting before Create()
 	m_tabs.SetImageSize(PRESET::TabImageSize());
 
-	CRect dummy;
-	if (m_tabs.Create(CBCGPTabWnd::STYLE_3D, dummy, this, PRESET::TabId) == FALSE) {
+	if (m_tabs.Create(CBCGPTabWnd::STYLE_3D, {}, this, PRESET::TabId) == FALSE) {
 		DEBUG_RETURN;
 	}
 
-	m_modelTreePanel.Initialize(&m_tabs, (UINT)PRESET::EPanelId::ModelTree);
-	m_viewPanel.Initialize(&m_tabs, (UINT)PRESET::EPanelId::View);
-	m_layerPanel.Initialize(&m_tabs, (UINT)PRESET::EPanelId::Layer);
-	m_scenePanel.Initialize(&m_tabs, (UINT)PRESET::EPanelId::Scene);
+	m_modelTreePanel.Initialize(&m_tabs, PRESET::ModelTree);
+	m_viewPanel.Initialize(&m_tabs, PRESET::View);
+	m_layerPanel.Initialize(&m_tabs, PRESET::Layer);
+	m_scenePanel.Initialize(&m_tabs, PRESET::Scene);
 
 	m_tabs.SetLocation(CBCGPTabWnd::LOCATION_TOP);
 	m_tabs.SetIconLocation(CBCGPTabWnd::TAB_ICON_LEFT);

@@ -14,7 +14,7 @@ static char THIS_FILE[] = __FILE__;
 
 namespace PresetStatusBar
 {
-	enum class EPaneId
+	enum PaneId
 	{
 		Unknown = WM_USER,
 		Message,
@@ -42,8 +42,8 @@ bool Component::StatusBar::Initialize(CWnd* pMainFrame)
 		RETURN_FALSE;
 	}
 
-	AddElement(new CBCGPRibbonStatusBarPane((UINT)PRESET::EPaneId::Message, L"", TRUE), L"MessagePane");
-	AddExtendedElement(new CBCGPRibbonStatusBarPane((UINT)PRESET::EPaneId::Coordinate, L"", TRUE), L"CoordinatePane");
+	AddElement(new CBCGPRibbonStatusBarPane(PRESET::Message, L"", TRUE), L"MessagePane");
+	AddExtendedElement(new CBCGPRibbonStatusBarPane(PRESET::Coordinate, L"", TRUE), L"CoordinatePane");
 
 #ifdef _DEBUG
 	GetElement(0)->SetText(L"Message Pane");
@@ -61,7 +61,7 @@ void Component::StatusBar::ReceiveSignal(Json::Object* pData)
 
 	Signal::StatusBar::Action action = (Signal::StatusBar::Action)data.GetInteger(SKW_ACTION);
 	switch (action) {
-	case Signal::StatusBar::Action::ShowMessage: ShowMessage(data); break;
+	case Signal::StatusBar::Action::ShowMessage:    ShowMessage(data);    break;
 	case Signal::StatusBar::Action::ShowCoordinate: ShowCoordinate(data); break;
 
 	default:
@@ -103,3 +103,5 @@ void Component::StatusBar::ShowCoordinate(Json::Object& data)
 
 	pPane->SetText(coord);
 }
+
+#undef PRESET

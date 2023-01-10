@@ -22,46 +22,17 @@ Facility::AppResources::~AppResources()
 
 bool Facility::AppResources::Load()
 {
-	HRSRC hRes = ::FindResource(nullptr, MAKEINTRESOURCE(IDF_JSON_UI), L"TEXT");
-	DWORD dwResourceSize = ::SizeofResource(nullptr, hRes);
-	HGLOBAL hGlobal = ::LoadResource(nullptr, hRes);
-	LPVOID pData = ::LockResource(hGlobal);
-
-	char* pChar = new char[dwResourceSize + 1];
-	memcpy_s(pChar, dwResourceSize, pData, dwResourceSize);
-	pChar[dwResourceSize] = _T('\0');
-
-	int nSize = ::MultiByteToWideChar(CP_UTF8, 0, pChar, -1, NULL, 0);
-	if (nSize == 0) {
-		RETURN_FALSE;
-	}
-
-	wchar_t* pWide = new wchar_t[nSize];
-	DEBUG_VALID(pWide);
-
-	::MultiByteToWideChar(CP_UTF8, 0, pChar, -1, pWide, nSize);
-
-	CString stream = pWide;
-
-	REMOVE_ARRAY(pChar);
-	REMOVE_ARRAY(pWide);
-	::FreeResource(hGlobal);
-
-	return Load(stream);
-}
-
-
-
-bool Facility::AppResources::Load(CString stream)
-{
-	if (Json::Helper::Load(stream, m_data) == false) {
+	if (InitDialog() == false) {
 		return false;
 	}
 
-	m_pDialog = &m_data.GetObject("Dialog");
-#ifdef _DEBUG
-	m_pDebug = &m_data.GetObjectW("Debug");
-#endif
+	if (InitFileOptions() == false) {
+		return false;
+	}
+
+	if (InitPreferences() == false) {
+		return false;
+	}
 
 	return true;
 }
@@ -70,15 +41,93 @@ bool Facility::AppResources::Load(CString stream)
 
 Json::Object& Facility::AppResources::GetDialog(CStringA name)
 {
-	DEBUG_VALID(m_pDialog);
-	return m_pDialog->GetObject(name);
+	return m_ui.GetAt("Dialog").GetAt(name);
 }
 
-#ifdef _DEBUG
 
-Json::Object& Facility::AppResources::GetDebug()
+
+Json::Object& Facility::AppResources::GetFileOptions()
 {
-	return *m_pDebug;
+	return m_fileOptions;
 }
 
-#endif
+
+
+Json::Object& Facility::AppResources::GetPreferences()
+{
+	return m_preferences;
+}
+
+
+
+bool Facility::AppResources::InitDialog()
+{
+	CString stream;
+	if (LoadTextResource(IDF_JSON_UI, stream) == false ||
+		Json::Helper::Load(stream, m_ui) == false) {
+		RETURN_FALSE;
+	}
+
+	Json::Object& fileOptions = m_ui.GetAt("Dialog").GetAt("FileOptions");
+	if (fileOptions.FindValue("properties") != nullptr) {
+		return true;
+	}
+
+	Json::Object& prop = fileOptions.CreateObject("properties");
+	Json::Object& importProp = prop.CreateObject("Import");
+
+	CString commonStream;
+	Json::Array& common = fileOptions.GetArray("__DEFAULT__");
+	common.Stringify(commonStream);
+
+	Json::Array& importTree = fileOptions.GetArray("tree")[0]->AsObject().GetArray("items");
+	for (auto item : importTree.GetBuffer()) {
+		CString name = item->AsObject().GetString("name");
+
+		Json::Object& sub = importProp.CreateObject((CStringA)name);
+		sub.SetString("type", L"root");
+		sub.SetArray("items", new Json::Array(commonStream));
+	}
+
+	return true;
+}
+
+
+
+bool Facility::AppResources::InitFileOptions()
+{
+	CString stream;
+	if (LoadTextResource(IDF_JSON_DATA_FILEOPTIONS, stream) == false ||
+		Json::Helper::Load(stream, m_fileOptions) == false) {
+		RETURN_FALSE;
+	}
+
+	Json::Object& import = m_fileOptions.GetAt("Import");
+	Json::Object& common = import.GetAt("__DEFAULT__");
+	if (common.IsEmpty()) {
+		return true;
+	}
+
+	Json::Array& importTree = Json::Helper::FindValueByPath(m_ui, "Dialog/FileOptions/tree/0/items")->AsArray();
+	for (auto item : importTree.GetBuffer()) {
+		CStringA name = (CStringA)item->AsObject().GetString("name");
+		import.CreateObject(name) = common;
+	}
+
+	import.Remove("__DEFAULT__");
+
+	return true;
+}
+
+
+
+bool Facility::AppResources::InitPreferences()
+{
+	CString stream;
+	if (LoadTextResource(IDF_JSON_DATA_PREFERENCES, stream) == false ||
+		Json::Helper::Load(stream, m_preferences) == false) {
+		RETURN_FALSE;
+	}
+
+	return true;
+}

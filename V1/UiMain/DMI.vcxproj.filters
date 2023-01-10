@@ -112,14 +112,8 @@
     <ClCompile Include="Component.TaskBar.cpp">
       <Filter>Component</Filter>
     </ClCompile>
-    <ClCompile Include="Component.PropertyBar.cpp">
-      <Filter>Component\Property</Filter>
-    </ClCompile>
     <ClCompile Include="Component.TabWnd.cpp">
       <Filter>Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.PropList.cpp">
-      <Filter>Component\Property</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Dir.cpp">
       <Filter>_Common</Filter>
@@ -128,16 +122,22 @@
       <Filter>_Common</Filter>
     </ClCompile>
     <ClCompile Include="Component.Property.cpp">
-      <Filter>Component\Property</Filter>
+      <Filter>Component\Tree and PropList</Filter>
     </ClCompile>
     <ClCompile Include="Dialog.AppSettings.cpp">
       <Filter>Dialog</Filter>
     </ClCompile>
-    <ClCompile Include="Component.TreePropList.cpp">
-      <Filter>Component\Property</Filter>
-    </ClCompile>
     <ClCompile Include="Dialog.cpp">
       <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.PropList.cpp">
+      <Filter>Component\Tree and PropList</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.TreeCtrlEx.cpp">
+      <Filter>Component\Tree and PropList</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.TreePropList.cpp">
+      <Filter>Component\Tree and PropList</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -267,14 +267,8 @@
     <ClInclude Include="Component.TaskBar.h">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="Component.PropertyBar.h">
-      <Filter>Component\Property</Filter>
-    </ClInclude>
     <ClInclude Include="Component.TabWnd.h">
       <Filter>Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.PropList.h">
-      <Filter>Component\Property</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Dir.h">
       <Filter>_Common</Filter>
@@ -283,19 +277,22 @@
       <Filter>_Common</Filter>
     </ClInclude>
     <ClInclude Include="Component.Property.h">
-      <Filter>Component\Property</Filter>
+      <Filter>Component\Tree and PropList</Filter>
     </ClInclude>
     <ClInclude Include="Dialog.AppSettings.h">
       <Filter>Dialog</Filter>
     </ClInclude>
+    <ClInclude Include="Component.PropList.h">
+      <Filter>Component\Tree and PropList</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.TreeCtrlEx.h">
+      <Filter>Component\Tree and PropList</Filter>
+    </ClInclude>
     <ClInclude Include="Component.TreePropList.h">
-      <Filter>Component\Property</Filter>
+      <Filter>Component\Tree and PropList</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="res\BCGSoft_ribbon\ribbon.xml">
-      <Filter>_Resource</Filter>
-    </Xml>
     <Xml Include="TODO.xml">
       <Filter>_Resource</Filter>
     </Xml>
@@ -307,69 +304,15 @@
     <Image Include="res\DMI.ico">
       <Filter>_Resource</Filter>
     </Image>
-    <Image Include="RES\palette_zoom.png">
-      <Filter>_Resource</Filter>
-    </Image>
-    <Image Include="res\RibbonDisplayOptions.ico">
-      <Filter>_Resource</Filter>
-    </Image>
-    <Image Include="res\Toolbar.bmp">
-      <Filter>_Resource</Filter>
-    </Image>
     <Image Include="res\DMIDoc.ico">
       <Filter>_Resource</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\BCGSoft_ribbon\category_backstage_small.svg">
-      <Filter>_Resource</Filter>
-    </None>
-    <None Include="res\BCGSoft_ribbon\category_large_0.svg">
-      <Filter>_Resource</Filter>
-    </None>
-    <None Include="RES\category_main_large.svg">
-      <Filter>_Resource</Filter>
-    </None>
-    <None Include="RES\category_main_small.svg">
-      <Filter>_Resource</Filter>
-    </None>
-    <None Include="res\BCGSoft_ribbon\category_small_0.svg">
-      <Filter>_Resource</Filter>
-    </None>
-    <None Include="RES\category_visualize_large.svg">
-      <Filter>_Resource</Filter>
-    </None>
-    <None Include="res\BCGSoft_ribbon\DMI.ribbon.rc2">
-      <Filter>_Resource</Filter>
-    </None>
-    <None Include="res\DMI.toolbar.rc2">
-      <Filter>_Resource</Filter>
-    </None>
-    <None Include="res\BCGSoft_ribbon\main.svg">
-      <Filter>_Resource</Filter>
-    </None>
-    <None Include="RES\Ribbon.json">
-      <Filter>_Resource</Filter>
-    </None>
-    <None Include="res\BCGSoft_ribbon\ribbon_bar.svg">
-      <Filter>_Resource</Filter>
-    </None>
-    <None Include="res\ribbondisplayoptions.svg">
-      <Filter>_Resource</Filter>
-    </None>
-    <None Include="res\ribbonfilelarge.svg">
-      <Filter>_Resource</Filter>
-    </None>
-    <None Include="res\Toolbar.svg">
-      <Filter>_Resource</Filter>
-    </None>
     <None Include="RES\UI.json">
       <Filter>_Resource</Filter>
     </None>
     <None Include="RES\FileOptions.json">
-      <Filter>_Resource</Filter>
-    </None>
-    <None Include="res\Workspace.svg">
       <Filter>_Resource</Filter>
     </None>
     <None Include="RES\DMI_ENU.rc2">
@@ -419,7 +362,7 @@
     <Filter Include="Component\PanelBar">
       <UniqueIdentifier>{17e426a6-77e8-4a55-a4e4-86e17ed068a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Component\Property">
+    <Filter Include="Component\Tree and PropList">
       <UniqueIdentifier>{0ee36090-15e6-4a9a-ad6d-e55fe0877cd9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

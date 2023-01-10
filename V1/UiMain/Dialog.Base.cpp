@@ -71,19 +71,16 @@ void Dialog::Base::ReceiveSignal(Json::Object* pData)
 
 
 
-CRect Dialog::Base::ConstructHeader(const CRect& boundary)
+void Dialog::Base::ConstructHeader(const CRect& boundary)
 {
-	return {};
 }
 
-CRect Dialog::Base::ConstructBody(const CRect& boundary)
+void Dialog::Base::ConstructBody(const CRect& boundary)
 {
-	return {};
 }
 
-CRect Dialog::Base::ConstructFooter(const CRect& boundary)
+void Dialog::Base::ConstructFooter(const CRect& boundary)
 {
-	return {};
 }
 
 

@@ -14,7 +14,10 @@ static char THIS_FILE[] = __FILE__;
 
 namespace PresetTaskBar
 {
-	const int Id = WM_USER;
+	enum ControlId
+	{
+		Id = WM_USER,
+	};
 
 	int BottomOffset()
 	{
@@ -83,6 +86,8 @@ CSize Component::TaskBar::AdjustLayout()
 	CSize size = PRESET::MinBarSize();
 	size.cy = rect.Height() - PRESET::BottomOffset();
 	SetWindowPos(nullptr, 0, 0, size.cx, size.cy, SWP_NOMOVE);
+
+	return size;
 }
 
 
@@ -134,3 +139,5 @@ void Component::TaskBar::OnSize(UINT nType, int cx, int cy)
 {
 	__super::OnSize(nType, cx, cy);
 }
+
+#undef PRESET

@@ -1,13 +1,9 @@
 {
-"Debug":{
-	"Dialog":"FileOpenOption"
-},
-
 "Dialog":{
 	"DefaultButtons":{
-		"Ok":{"title":"Ok|확인", "id":1, "commant":"IDOK"},
-		"Cancel":{"title":"Cancel|취소", "id":2, "commant":"IDCANCEL"},
-		"Apply":{"title":"Apply|적용", "id":7, "comment":"IDAPPLY substitute IDYES"}
+		"Ok":{"title":"Ok|확인", "id":1, "comment":"IDOK"},
+		"Cancel":{"title":"Cancel|취소", "id":2, "comment":"IDCANCEL"},
+		"Apply":{"title":"Apply|적용", "id":3, "comment":"IDAPPLY substitute IDYES"}
 	},
 
 	"FileOpen":{
@@ -64,9 +60,9 @@
 		"title":"Settings|설정",
 		"size":{"cx":800, "cy":600},
 		"body":{
-			"Tabs":[
-				"Preference",
-				"File"
+			"tabs":[
+				"Preferences",
+				"FileOptions"
 			]
 		},
 		"footer":{
@@ -75,32 +71,64 @@
 		}
 	},
 
-	"Preference":{
+	"Preferences":{
 		"tree":[
-			{"type":"group", "name":"Interface", "title":"Interface|인터페이스", "list":[
-				"Mouse"
-			]}
+			{"name":"Interface", "title":"Interface|인터페이스"}
 		],
 		"properties":{
-			"Mouse":{"type":"group", "title":"Mouse|마우스", "list":[
-				"SwapButtons", "ReverseWheel"
-			]},
-			"SwapButtons":{"type":"check", "title":"Swap left and right buttons|좌우 버트 전환", "desc":"__#__|__#__"},
-			"ReverseWheel":{"type":"check", "title":"Swap wheel button direction|휠 버튼 방황 전환", "desc":"__#__|__#__"}
+			"Interface":{"type":"root", "items":[
+				{"name":"Mouse", "type":"group", "title":"Mouse|마우스", "items":[
+					{"name":"SwapButtons", "type":"check", "title":"Swap left and right buttons|좌우 버트 전환", "desc":"__#__|__#__"},
+					{"name":"ReverseWheel", "type":"check", "title":"Swap wheel button direction|휠 버튼 방황 전환", "desc":"__#__|__#__"}
+				]}
+			]}
 		}
 	},
 
-	"File":{
-		"title":"Options|옵션",
-		"properties":[
-			{"type":"group", "name":"GENERAL", "title":"General", "list":[
-				{"type":"combo", "name":"ReadingMode", "title":"Reading Mode|_#_", "desc":"_#_|_#_", "value":0, "list":[
+	"FileOptions":{
+		"tree":[
+			{"name":"Import", "title":"Import|가져오기", "items":[
+				{"name":"3DS", "title":"3DS"},
+				{"name":"3MF", "title":"3MF"},
+				{"name":"ACIS", "title":"ACIS"},
+				{"name":"CATIA4", "title":"CATIA V4"},
+				{"name":"CATIA5", "title":"CATIA V5"},
+				{"name":"CATIA6", "title":"CATIA V6"},
+				{"name":"CGR", "title":"CGR"},
+				{"name":"COLLADA", "title":"COLLADA"},
+				{"name":"DWG2D", "title":"DWG 2D"},
+				{"name":"DWG3D", "title":"DWG 3D"},
+				{"name":"IDEAS", "title":"I-deas"},
+				{"name":"IFC", "title":"IFC"},
+				{"name":"IGES", "title":"IGES"},
+				{"name":"Inventor", "title":"Inventor"},
+				{"name":"JT", "title":"JT"},
+				{"name":"Navisworks", "title":"Navisworks"},
+				{"name":"Parasolid", "title":"Parasolid"},
+				{"name":"PDF", "title":"PDF"},
+				{"name":"PRC", "title":"PRC"},
+				{"name":"ProEngineer", "title":"Pro/Engineer"},
+				{"name":"Revit", "title":"Revit"},
+				{"name":"Rhino", "title":"Rhino"},
+				{"name":"SolidEdge", "title":"SolidEdge"},
+				{"name":"Solidworks", "title":"Solidworks"},
+				{"name":"STEP", "title":"STEP"},
+				{"name":"STL", "title":"STL"},
+				{"name":"Unigraphics", "title":"Unigraphics"},
+				{"name":"Universal3D", "title":"Universal3D"},
+				{"name":"VDAFS", "title":"VDAFS"},
+				{"name":"VRML", "title":"VRML"}
+			]}
+		],
+		"__DEFAULT__":[
+			{"type":"group", "name":"General", "title":"General|일반", "items":[
+				{"type":"drop", "name":"ReadingMode", "title":"Reading Mode|_#_", "desc":"_#_|_#_", "value":0, "items":[
 					"Feature Trees|_#_",
 					"B-Rep|_#_",
 					"Tessellation Only|_#_"
 				]},
-				{"type":"check", "name":"Solids", "title":"Solid|_#_", "desc":"_#_|_#_"},
-				{"type":"check", "name":"Surfaces", "title":"Surfaces|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"Solids", "title":"Solid|_#_", "desc":"Allows reading of solid parts.|_#_"},
+				{"type":"check", "name":"Surfaces", "title":"Surfaces|_#_", "desc":"Allows reading of surfaces entities.|_#_"},
 				{"type":"check", "name":"Wireframes", "title":"Wireframes|_#_", "desc":"_#_|_#_"},
 				{"type":"check", "name":"Attributes", "title":"Attributes|_#_", "desc":"_#_|_#_"},
 				{"type":"check", "name":"HiddenObjects", "title":"Hidden Objects|_#_", "desc":"_#_|_#_"},
@@ -109,13 +137,13 @@
 				{"type":"check", "name":"SewModel", "title":"Sew Model|_#_", "desc":"_#_|_#_"},
 				{"type":"edit", "name":"SewingTolerance", "title":"Sewing Tolerance|_#_", "desc":"_#_|_#_", "value":"0.001"},
 				{"type":"check", "name":"ShellOrientation", "title":"Compute Non-Solid Shell Orientation|_#_", "desc":"_#_|_#_"},
-				{"type":"combo", "name":"LoadingMode", "title":"Loading Mode|_#_", "desc":"_#_|_#_", "value":0, "list":[
+				{"type":"drop", "name":"LoadingMode", "title":"Loading Mode|_#_", "desc":"_#_|_#_", "value":0, "items":[
 					"Complete|_#_",
 					"Incremental|_#_"
 				]}
 			]},
-			{"type":"group", "name":"TESSELLATION", "title":"Tessellation", "list":[
-				{"type":"combo", "name":"TessLevel", "title":"Predefined Tessellation Level|_#_", "value":2, "list":[
+			{"type":"group", "name":"Tessellation", "title":"Tessellation", "items":[
+				{"type":"drop", "name":"TessLevel", "title":"Predefined Tessellation Level|_#_", "value":2, "items":[
 					"Extra Low|_#_",
 					"Low|_#_",
 					"Medium|_#_",
@@ -123,8 +151,8 @@
 					"Extra High|_#_",
 					"Custom|_#_"
 				]},
-				{"type":"group", "name":"CUSTOMTESS", "title":"Custom Tessellation Level", "list":[
-					{"type":"combo", "name":"ChordLimitType", "title":"Chord Limit|_#_", "desc":"_#_|_#_", "value":1, "list":[
+				{"type":"group", "name":"CustomTessLevel", "title":"Custom Tessellation Level", "items":[
+					{"type":"drop", "name":"ChordLimitType", "title":"Chord Limit|_#_", "desc":"_#_|_#_", "value":1, "items":[
 						"Ratio|_#_",
 						"Height|_#_"
 					]},
@@ -133,7 +161,7 @@
 				]},
 				{"type":"check", "name":"PreserveUV", "title":"Preserve UV Points|_#_", "desc":"_#_|_#_"},
 				{"type":"edit", "name":"MaxEdgeLength", "title":"Maximum Edge Length|_#_", "desc":"_#_|_#_", "value":"0"},
-				{"type":"group", "name":"Accurate", "title":"Accurate Tessellation|_#_", "list":[
+				{"type":"group", "name":"Accurate", "title":"Accurate Tessellation|_#_", "items":[
 					{"type":"check", "name":"AccurateTess", "title":"Accurate Tessellation|_#_", "desc":"_#_|_#_"},
 					{"type":"check", "name":"GridAlignedTess", "title":"Grid Aligned Tessellation|_#_", "desc":"_#_|_#_"},
 					{"type":"edit", "name":"MaxStitchLength", "title":"Maximum Stitch Length|_#_", "value":"0.001", "desc":"_#_|_#_"},

@@ -1,0 +1,8 @@
+{
+	"Interface":{
+		"Mouse":{
+			"SwapButtons":false,
+			"ReverseWheel":false
+		}
+	}
+}

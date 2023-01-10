@@ -70,6 +70,7 @@ namespace Component
 		LightBack = RGB(0x60, 0x60, 0x60),
 		MidiumBack = RGB(0x48, 0x48, 0x48),
 		DarkBack = RGB(0x30, 0x30, 0x30),
+		DialogBack = RGB(0x25, 0x25, 0x25),
 
 		Arsenic = RGB(0x43, 0x43, 0x43),
 		Charcoal = RGB(0x3B, 0x44, 0x53),
@@ -82,7 +83,16 @@ namespace Component
 	};
 
 
+	// resize and move control
+	CRect AdjustLayout(CWnd* pControl, CRect frame, CSize baseSize, EPivot ePivot);
+	// move control
+	CRect AdjustPosition(CWnd* pControl, CRect frame, EPivot ePivot);
+	// resize control
+	CSize AdjustSize(CWnd* pControl, CSize baseSize);
 
+	CSize GetControlSize(CWnd* pControl);
+	// CBCGPTabWnd tab height
+	int TabHeight();
 	// CBCGPTreeCtrlEx row height
 	int TreeRowHeight();
 	// CBCGPPropList row padding

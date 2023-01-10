@@ -4,19 +4,6 @@
 //
 #define IDD_ABOUTBOX                    100
 #define IDP_OLE_INIT_FAILED             100
-#define IDS_MAIN_TOOLBAR                101
-#define IDD_FORM_INFO                   106
-#define IDC_PREVIEW                     107
-#define IDS_WINDOWS_MANAGER             107
-#define IDC_SEPARATOR_1                 108
-#define IDC_TEXT1                       109
-#define IDC_SEPARATOR_2                 110
-#define IDC_TEXT2                       111
-#define IDC_SEPARATOR_3                 112
-#define IDC_TEXT3                       113
-#define IDC_SEPARATOR_4                 114
-#define IDC_SEPARATOR_5                 115
-#define IDC_TEXT4                       116
 #define IDR_MAINFRAME                   128
 #define IDR_DMITYPE                     129
 #define IDR_CONTEXT_MENU                130
@@ -26,57 +13,19 @@
 #define IDR_PASTE_MENU                  134
 #define IDR_WINDOWS_MENU                135
 #define IDR_THEME_MENU                  136
-#define IDB_WORKSPACE                   147
-#define IDB_TOOLBAR_HC                  151
-#define IDB_RIBBON_FILELARGE            156
-#define IDB_RIBBON_DISPLAY_OPTIONS      160
-#define IDI_RIBBON_DISPLAY_OPTIONS      161
-#define IDR_PROPERTIES                  162
-#define IDB_PROPERTIES_HC               163
-#define IDC_PROGRESS_BAR                1000
-#define IDC_EDIT_MESSAGES               1007
-#define IDC_IMPORT_MESSAGE              1008
 #define IDC_CHECK_KEEP_OPEN             1009
 #define IDC_COMPANY_URL                 1041
-#define IDC_INFO_LABEL                  1042
-#define IDC_PATH_LABEL                  1043
-#define IDC_BUTTON1                     1044
-#define IDC_BUTTON2                     1045
-#define IDC_BUTTON3                     1046
-#define IDC_DOC_NAME                    1047
-#define ID_VIEW_TOOLBARS                32771
-#define ID_VIEW_OUTPUT                  32803
-#define ID_TOOLS_ENTRY                  32804
-#define ID_USER_TOOL1                   32805
-#define ID_USER_TOOL2                   32806
-#define ID_USER_TOOL3                   32807
-#define ID_USER_TOOL4                   32808
-#define ID_USER_TOOL5                   32809
-#define ID_USER_TOOL6                   32810
-#define ID_USER_TOOL7                   32811
-#define ID_USER_TOOL8                   32812
-#define ID_USER_TOOL9                   32813
-#define ID_USER_TOOL10                  32814
-#define ID_TOOLS_MANAGER                32815
-#define ID_WINDOW_MANAGER               32825
 #define ID_VIEW_APPLOOK                 32826
-#define ID_VIEW_PROPERTIES              32827
 #define ID_MDI_NEW_VERT_GROUP           32828
 #define ID_MDI_NEW_HORZ_TAB_GROUP       32829
 #define ID_MDI_MOVE_TO_PREV_GROUP       32830
 #define ID_MDI_CANCEL                   32831
 #define ID_MDI_MOVE_TO_NEXT_GROUP       32832
-#define ID_TOOLS_OPTIONS                32833
-#define ID_RIBBON_AUTOHIDE              32834
-#define ID_RIBBON_SHOW_TABS             32835
-#define ID_RIBBON_SHOW_TABS_COMMANDS    32836
-#define ID_STATUSBAR_PANE1              32837
-#define ID_STATUSBAR_PANE2              32838
 
 #pragma region Custom Control Id
 // Dialog
 #define IDD_DMI_STANDARD        10011
-#define IDD_DIM_FORMVIEW        10012
+#define IDD_DMI_FORMVIEW        10012
 #define IDD_DMI_PROGRESS_LOG	10013
 // Special controls
 #define IDC_INNERFRAME          10100
@@ -96,8 +45,9 @@
 
 #pragma region Local Resource
 
-#define IDF_JSON_UI             19101
-#define IDF_JSON_FILE_OPTIONS   19102
+#define IDF_JSON_UI                 19101
+#define IDF_JSON_DATA_PREFERENCES   19102
+#define IDF_JSON_DATA_FILEOPTIONS   19103
 
 #pragma endregion //:REGION
 
