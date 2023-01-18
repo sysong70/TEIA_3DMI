@@ -14,9 +14,11 @@
 #include <3DF/3DF.Shell.h>
 #include <3DF/3DF.Line.h>
 
+#include <3DF/3DF.Visibility.h>
+#include <3DF/3DF.MarkerAttribute.h>
+
 #include <chrono>
 #include <utility>
-
 
 #ifdef _DEBUG
 #	define new DEBUG_NEW
@@ -62,6 +64,8 @@ bool _3DfImport::FileImport(CString strFilePathName, _3DF::SegmentKey & cModelSe
 	if(false == InitializeA3DLibrary(strErrorMessage)) {
 		return false;
 	}
+
+	m_nIncrementalId = 0;
 
 	m_pcModelSegment = &cModelSegment;
 
@@ -118,6 +122,7 @@ bool _3DfImport::FileImport(CString strFilePathName, _3DF::SegmentKey & cModelSe
 	m_cPartsIncludeSegment = cModelInclude.Subsegment(L"parts");
 	m_cPoccsIncludeSegment = cModelInclude.Subsegment(L"poccs");
 	m_cRisIncludeSegment = cModelInclude.Subsegment(L"ris");
+	m_cPmiIncludeSegment = cModelInclude.Subsegment(L"pmi");
 
 	// Import 관련 Option 설정
 	ImportOption sImportOption;
@@ -130,8 +135,9 @@ bool _3DfImport::FileImport(CString strFilePathName, _3DF::SegmentKey & cModelSe
 	cModelSegment.SetVisibility(L"lines=on");
 	
 	MaterialMappingKit cMaterialMapping;
-	cMaterialMapping.SetColor(RGBAColor(0, 0, 0), Material::Color::Type::Line);
-	cModelSegment.SetMaterialMapping(cMaterialMapping);
+	cMaterialMapping.SetColor(RGBAColor(0, 0, 0), Material::Color::Type::Diffuse);
+	cModelSegment.SetMaterialMapping(L"lines", cMaterialMapping);
+	cModelSegment.GetMarkerAttributeControl().SetSize(0.1f);
 
 	bool bStatus = DrawModel(pcAsmModelFile, cModelSegment);
 
@@ -163,13 +169,13 @@ bool _3DfImport::SetDefaultParamsLoadData(A3DRWParamsLoadData & cParamsLoadData)
 	cParamsLoadData.m_sGeneral.m_bReadFeature = false; // Allows reading of model feature tree. version 10.2
 
 	// PMI 변수
-	//cParamsLoadData.m_sPmi.m_bAlwaysSubstituteFont = true;
-// 	cParamsLoadData.m_sPmi.m_pcSubstitutionFont = new A3DUTF8Char[sizeof("Myriad CAD")];
-// 	printf(cParamsLoadData.m_sPmi.m_pcSubstitutionFont, "%s", "Myriad CAD");
+// 	cParamsLoadData.m_sPmi.m_bAlwaysSubstituteFont = true;
+//  	cParamsLoadData.m_sPmi.m_pcSubstitutionFont = new A3DUTF8Char[sizeof("Myriad CAD")];
+//  	printf(cParamsLoadData.m_sPmi.m_pcSubstitutionFont, "%s", "Myriad CAD");
 
 	// Tessellation 변수
 	cParamsLoadData.m_sTessellation.m_eTessellationLevelOfDetail = kA3DTessLODMedium;
-	cParamsLoadData.m_sTessellation.m_bDoNotComputeNormalsInAccurateTessellation = true;	// Compute Normal
+	//cParamsLoadData.m_sTessellation.m_bDoNotComputeNormalsInAccurateTessellation = true;	// Compute Normal
 
 	// Assembly 변수
 	cParamsLoadData.m_sAssembly.m_bUseRootDirectory = true;
@@ -177,6 +183,7 @@ bool _3DfImport::SetDefaultParamsLoadData(A3DRWParamsLoadData & cParamsLoadData)
 
 	// Multiple models 변수
 	//cParamsLoadData.m_sMultiEntries
+
 
 	// 특정 CAD Format 관련 변수
 	// cParamsLoadData.m_sSpecifics
@@ -238,7 +245,7 @@ bool _3DfImport::DrawModel(const A3DAsmModelFile * pcAsmModelFile, _3DF::Segment
 
 	_3DF::MaterialMappingKit cMaterial;
 	cMaterial.SetColor(RGBAColor(0.752941f, 0.752941f, 0.752941f));
-	cModelSegment.SetMaterialMapping(cMaterial);
+	cModelSegment.SetMaterialMapping(L"faces", cMaterial);
 
 	// 최초의 Attribute 생성
 	A3DMiscCascadedAttributes * pcAttrs = nullptr;
@@ -274,8 +281,21 @@ A3DStatus _3DfImport::ConvertProductOccurrence(A3DAsmProductOccurrence * pcOccur
 
 	Log(2, L"DrawProductOccurrence: pocc%d", m_nIncrementalId);
 
+	//g_strPccName.Format(L"pocc%d", m_nIncrementalId);
+
+	// #3DF_Debug
+// 	if(2271 == m_nIncrementalId) {
+// 		m_nIncrementalId = m_nIncrementalId;
+// 	}
+// 
+// 	if(3630 == m_nIncrementalId) {
+// 		m_nIncrementalId = m_nIncrementalId;
+// 	}
+
 	// Segment를 생성하고 생성된 Segment를 Parent Segment에 Include한다.
-	SegmentKey cSegment = m_cPoccsIncludeSegment.Subsegment(L"pocc%d", m_nIncrementalId++);
+	CString strSegmentName;
+	strSegmentName.Format(L"pocc%d", m_nIncrementalId++);
+	_3DF::SegmentKey cSegment = m_cPoccsIncludeSegment.Subsegment(strSegmentName);
 	cParentSegment.IncludeSegment(cSegment);
 
 	// Attribute 생성
@@ -327,6 +347,7 @@ A3DStatus _3DfImport::ConvertProductOccurrence(A3DAsmProductOccurrence * pcOccur
 				}
 			}
 */
+
 			_3DF::MatrixKit cMatrix;
 			if(A3D_SUCCESS == ProductOccurrenceGetLocation(&cData, cMatrix)) {
 				if(false == cMatrix.IsIdentity()) {
@@ -354,6 +375,7 @@ A3DStatus _3DfImport::ConvertProductOccurrence(A3DAsmProductOccurrence * pcOccur
 			PointerArrayTerminate(&apcChildArray);
 
 			//m_bDrawMarkups = false;
+
 			if(true == m_bDrawMarkups)
 			{
 				A3DPointerArray cMarkups, cViews;
@@ -366,7 +388,6 @@ A3DStatus _3DfImport::ConvertProductOccurrence(A3DAsmProductOccurrence * pcOccur
 				for(A3DUns32 nIndex = 0; nIndex < nSize; nIndex++) {
 					CHECK_A3D_RETURN(DrawMarkupView(cViews.m_ppPointers[nIndex], cSegment, pcAttrs));
 				}
-					
 
 				nSize = cMarkups.m_uiSize;
 				for(UINT nIndex = 0; nIndex < nSize; nIndex++) {
@@ -861,9 +882,9 @@ A3DStatus _3DfImport::DrawPartDefinition(const A3DAsmPartDefinition * pcPart, _3
 		return A3D_SUCCESS;
 	}
 
-	if(2273 == m_nIncrementalId) {
-		m_nIncrementalId = m_nIncrementalId;
-	}
+// 	if(2273 == m_nIncrementalId) {
+// 		m_nIncrementalId = m_nIncrementalId;
+// 	}
 
 	Log(2, L"DrawPartDefinition: part%d", m_nIncrementalId);
 
@@ -901,31 +922,14 @@ A3DStatus _3DfImport::DrawPartDefinition(const A3DAsmPartDefinition * pcPart, _3
 		A3D_INITIALIZE_DATA(A3DAsmPartDefinitionData, sData);
 		CHECK_A3D_RETURN(A3DAsmPartDefinitionGet(pcPart, &sData));
 
-		for(A3DUns32 nIndex = 0; nIndex < sData.m_uiRepItemsSize; nIndex++) {
-			CHECK_A3D_RETURN(DrawRiRepresentationItem(sData.m_ppRepItems[nIndex], cSegment, pcAttr));
-		}
-
-/*
-		// #Require_coding
-		if(stbDrawMarkups)
+		if(0 < sData.m_uiRepItemsSize)
 		{
-			A3DPointerArray sMarkups;
-			PointerArrayInitialize(&sMarkups);
-			// #Require_coding
-			// stPartDefinitionGetMarkups(&sData, &sMarkups);
-			A3DUns32 ui;
-
-			for(ui = 0; ui < sData.m_uiViewsSize; ui++) {
-				// #Require_coding
-				//CHECK_A3D_RETURN(stDrawView(sData.m_ppViews[ui], pcAttr));
+			for(A3DUns32 nIndex = 0; nIndex < sData.m_uiRepItemsSize; nIndex++) {
+				CHECK_A3D_RETURN(DrawRiRepresentationItem(sData.m_ppRepItems[nIndex], cSegment, pcAttr));
 			}
 
-			A3DUns32 uiSize = sMarkups.m_uiSize;
-			for(ui = 0; ui < uiSize; ui++)
-				CHECK_A3D_RETURN(DrawMarkup(sMarkups.m_ppPointers[ui], pcAttr));
-
-			PointerArrayTerminate(&sMarkups);
-		}*/
+			//parseAnnotations(sData.m_ppAnnotations, sData.m_uiAnnotationsSize);
+		}
 
 		CHECK_A3D_RETURN(A3DAsmPartDefinitionGet(nullptr, &sData));
 	}
@@ -963,6 +967,14 @@ A3DStatus _3DfImport::DrawRiRepresentationItem(const A3DRiRepresentationItem * p
 
 	parseAttributes(pcRepItem);
 */
+	//g_strRiName.Format(L"ri%d", m_nIncrementalId);
+
+// 	if(10 < m_nIncrementalId) {
+// 		m_nIncrementalId++;
+// 		return A3D_SUCCESS;
+// //		m_nIncrementalId = m_nIncrementalId;
+// 	}
+
 	SegmentKey cSegment = m_cRisIncludeSegment.Subsegment(L"ri%d", m_nIncrementalId++);
 	cParentSegment.IncludeSegment(cSegment);
 
@@ -974,16 +986,18 @@ A3DStatus _3DfImport::DrawRiRepresentationItem(const A3DRiRepresentationItem * p
 	A3DInt32 iUVCoordinatesIndex = -1;
 	A3DUns8 ucTextureDimension = 2;
 
-	if(A3D_SUCCESS == DrawStyle(cAttrData, &iUVCoordinatesIndex, &ucTextureDimension, cMaterialMapping)) {
+	CString strGeometry = L"faces";
+	//if(A3D_SUCCESS == DrawStyle(cAttrData, &iUVCoordinatesIndex, &ucTextureDimension, cMaterialMapping)) {
+	if(A3D_SUCCESS == DrawStyle(cAttrData, cMaterialMapping)) {
 		if(true == cMaterialMapping.IsAllocate()) {
 			LogIncreaseTabIndex(2);
 			SegmentKey cStyleSegment;
-			if(true == FindMaterialMapping(cMaterialMapping, cStyleSegment)) {
+			if(true == FindMaterialMapping(strGeometry, cMaterialMapping, cStyleSegment)) {
 				SetStyle(cSegment, cStyleSegment);
 				Log(2, L"SetStyle");
 			}
 			else {
-				SetStyleMaterialMapping(cMaterialMapping, cSegment);
+				SetStyleMaterialMapping(strGeometry, cMaterialMapping, cSegment);
 				Log(2, L"SetStyleMaterialMapping");
 			}
 			LogDecreaseTabIndex(2);
@@ -997,6 +1011,31 @@ A3DStatus _3DfImport::DrawRiRepresentationItem(const A3DRiRepresentationItem * p
 		A3DEEntityType eType = kA3DTypeUnknown;
 		CHECK_A3D_RETURN(A3DEntityGetType(pcRepItem, &eType));
 
+		A3DRiRepresentationItemData cRepItemData;
+		A3D_INITIALIZE_DATA(A3DRiRepresentationItemData, cRepItemData);
+		CHECK_A3D_RETURN(A3DRiRepresentationItemGet(pcRepItem, &cRepItemData));
+
+		const A3DRiCoordinateSystem * pcCoordSys = nullptr;
+
+		if(cAttrData.m_pCoordinateSystem != nullptr) {
+			pcCoordSys = cAttrData.m_pCoordinateSystem;
+		}
+		else if(cRepItemData.m_pCoordinateSystem != nullptr) {
+			pcCoordSys = cRepItemData.m_pCoordinateSystem;
+		}
+
+		if(pcCoordSys != nullptr) {
+			A3DRiCoordinateSystemData sCSysData;
+			A3D_INITIALIZE_DATA(A3DRiCoordinateSystemData, sCSysData);
+			CHECK_A3D_RETURN(A3DRiCoordinateSystemGet(pcCoordSys, &sCSysData));
+
+			_3DF::MatrixKit cMatrix;
+			GetMatrix(sCSysData.m_pTransformation, cMatrix);
+			cSegment.SetModellingMatrix(cMatrix);
+
+			CHECK_A3D_RETURN(A3DRiCoordinateSystemGet(nullptr, &sCSysData));
+		}
+
 		switch(eType)
 		{
 			case kA3DTypeRiSet:
@@ -1004,26 +1043,28 @@ A3DStatus _3DfImport::DrawRiRepresentationItem(const A3DRiRepresentationItem * p
 			break;
 
 			case kA3DTypeRiBrepModel:
-				eStatus = DrawRiBrepModel(pcRepItem, cSegment, pcAttr, cAttrData);
+				eStatus = DrawRiBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
 			break;
 
 			case kA3DTypeRiPolyBrepModel:
-				eStatus = DrawRiPolyBrepModel(pcRepItem, cSegment, pcAttr, cAttrData);
+				eStatus = DrawRiPolyBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
 			break;
 
 			case kA3DTypeRiCurve:
 			case kA3DTypeRiPolyWire:
-				eStatus = DrawRiPolyWire(pcRepItem, cSegment, pcAttr, cAttrData);
+				eStatus = DrawRiPolyWire(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
 			break;
 
-// 			case kA3DTypeRiCurve:
-// 				DrawRiCurve(pcRepItem, cSegment, )
-// 			break;
+			case kA3DTypeRiPointSet:
+				eStatus = DrawRiPointSet(pcRepItem, cSegment, pcAttr);
+			break;
 
 			default:
 				assert(false);
 			break;
 		}
+
+		A3DRiRepresentationItemGet(nullptr, &cRepItemData);
 	}
 
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttr));
@@ -1063,8 +1104,8 @@ A3DStatus _3DfImport::DrawSet(const A3DRiSet * pSet, _3DF::SegmentKey & cParentS
 }
 
 // 2-1. Draw Ri Brep Model
-A3DStatus _3DfImport::DrawRiBrepModel(const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cSegment,
-	const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData)
+A3DStatus _3DfImport::DrawRiBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData,
+	_3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData)
 {
 	LogIncreaseTabIndex(2);
 
@@ -1075,43 +1116,6 @@ A3DStatus _3DfImport::DrawRiBrepModel(const A3DRiRepresentationItem * pcRepItem,
 	CHECK_A3D_RETURN(A3DRootBaseGet(pcRepItem, &cRootBaseData));
 	m_pchRepresentationItemName = cRootBaseData.m_pcName;
 
-/*	if(0 < cRootBaseData.m_uiSize)
-	{
-		for(A3DUns32 nIndex = 0; nIndex < cRootBaseData.m_uiSize; nIndex++)
-		{
-			A3DMiscAttributeData cMiscAttrData;
-			A3D_INITIALIZE_DATA(A3DMiscAttributeData, cMiscAttrData);
-			CHECK_A3D_RETURN(A3DMiscAttributeGet(cRootBaseData.m_ppAttributes[nIndex], &cMiscAttrData));
-			CHECK_A3D_RETURN(A3DMiscAttributeGet(nullptr, &cMiscAttrData));
-		}
-	}
-*/
-
-	A3DRiRepresentationItemData cRepItemData;
-	A3D_INITIALIZE_DATA(A3DRiRepresentationItemData, cRepItemData);
-	CHECK_A3D_RETURN(A3DRiRepresentationItemGet(pcRepItem, &cRepItemData));
-
-	const A3DRiCoordinateSystem * pcCoordSys = nullptr;
-
-	if(cAttrData.m_pCoordinateSystem != nullptr) {
-		pcCoordSys = cAttrData.m_pCoordinateSystem;
-	}
-	else if(cRepItemData.m_pCoordinateSystem != nullptr) {
-		pcCoordSys = cRepItemData.m_pCoordinateSystem;
-	}
-
-	if(pcCoordSys != nullptr) {
-		A3DRiCoordinateSystemData sCSysData;
-		A3D_INITIALIZE_DATA(A3DRiCoordinateSystemData, sCSysData);
-		CHECK_A3D_RETURN(A3DRiCoordinateSystemGet(cRepItemData.m_pCoordinateSystem, &sCSysData));
-
-		_3DF::MatrixKit cMatrix;
-		GetMatrix(sCSysData.m_pTransformation, cMatrix);
-		cSegment.SetModellingMatrix(cMatrix);
-
-		CHECK_A3D_RETURN(A3DRiCoordinateSystemGet(nullptr, &sCSysData));
-	}
-
 	if(cRepItemData.m_pTessBase != nullptr) {
 		CHECK_A3D_RETURN(DrawTessBase(cRepItemData.m_pTessBase, pcRepItem, cSegment, pcAttr));
 	}
@@ -1119,18 +1123,12 @@ A3DStatus _3DfImport::DrawRiBrepModel(const A3DRiRepresentationItem * pcRepItem,
 		A3DRWParamsTessellationData sTesselationData;
 		A3D_INITIALIZE_DATA(A3DRWParamsTessellationData, sTesselationData);
 		sTesselationData.m_eTessellationLevelOfDetail = kA3DTessLODMedium;
-		CHECK_A3D_RETURN(A3DRiRepresentationItemComputeTessellation((A3DRiRepresentationItem *) pcRepItem, &sTesselationData));
+		CHECK_A3D_RETURN(A3DRiRepresentationItemComputeTessellation((A3DRiRepresentationItem *)pcRepItem, &sTesselationData));
 
-		//CHECK_A3D_RETURN(A3DRiRepresentationItemGet(nullptr, &cRepItemData));
-
-		A3D_INITIALIZE_DATA(A3DRiRepresentationItemData, cRepItemData);
-		CHECK_A3D_RETURN(A3DRiRepresentationItemGet(pcRepItem, &cRepItemData));
 		if(cRepItemData.m_pTessBase != nullptr) {
 			CHECK_A3D_RETURN(DrawTessBase(cRepItemData.m_pTessBase, pcRepItem, cSegment, pcAttr));
 		}
 	}
-
-	CHECK_A3D_RETURN(A3DRiRepresentationItemGet(nullptr, &cRepItemData));
 
 	m_pchRepresentationItemName = nullptr;
 	CHECK_A3D_RETURN(A3DRootBaseGet(nullptr, &cRootBaseData));
@@ -1141,31 +1139,17 @@ A3DStatus _3DfImport::DrawRiBrepModel(const A3DRiRepresentationItem * pcRepItem,
 }
 
 // 2-3. Draw Poly Brep Model
-A3DStatus _3DfImport::DrawRiPolyBrepModel(const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr,
-	const A3DMiscCascadedAttributesData & cAttrData)
+A3DStatus _3DfImport::DrawRiPolyBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, 
+	_3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData)
 {
 	LogIncreaseTabIndex(2);
 
 	Log(2, L"DrawRiPolyBrepModel: %s", LogHexStr((DWORD_PTR) pcRepItem));
 
-	A3DRiRepresentationItemData cRiRepItemData;
-	A3D_INITIALIZE_DATA(A3DRiRepresentationItemData, cRiRepItemData);
-	A3DStatus nResult = A3DRiRepresentationItemGet(pcRepItem, &cRiRepItemData);
-	if(nResult != A3D_SUCCESS) {
-		return nResult;
-	}
-
-// 	A3DRiPolyBrepModelData cPolyBrepModelData;
-// 	A3D_INITIALIZE_DATA(A3DRiPolyBrepModelData, cPolyBrepModelData);
-// 	CHECK_A3D_RETURN(A3DRiPolyBrepModelGet(pcRepItem, &cPolyBrepModelData));
-
 	A3DStatus nStatus = A3D_SUCCESS;
-	if(nullptr != cRiRepItemData.m_pTessBase) {
-		nStatus = DrawTessBase(cRiRepItemData.m_pTessBase, pcRepItem, cSegment, pcAttr);
+	if(nullptr != cRepItemData.m_pTessBase) {
+		nStatus = DrawTessBase(cRepItemData.m_pTessBase, pcRepItem, cSegment, pcAttr);
 	}
-
-	A3DRiRepresentationItemGet(nullptr, &cRiRepItemData);
-//	A3DRiPolyBrepModelGet(nullptr, &cPolyBrepModelData);
 
 	LogDecreaseTabIndex(2);
 
@@ -1173,84 +1157,36 @@ A3DStatus _3DfImport::DrawRiPolyBrepModel(const A3DRiRepresentationItem * pcRepI
 }
 
 // 2-3. Draw Poly Wire
-A3DStatus _3DfImport::DrawRiPolyWire(const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr,
-	const A3DMiscCascadedAttributesData & cAttrData)
+A3DStatus _3DfImport::DrawRiPolyWire(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, 
+	_3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData)
 {
-	A3DRiRepresentationItemData cRiRepItemData;
-	A3D_INITIALIZE_DATA(A3DRiRepresentationItemData, cRiRepItemData);
-	CHECK_A3D_RETURN(A3DRiRepresentationItemGet(pcRepItem, &cRiRepItemData));
-
 	A3DStatus nStatus = A3D_SUCCESS;
-	if(nullptr != cRiRepItemData.m_pTessBase) {
-		nStatus = DrawTessBase(cRiRepItemData.m_pTessBase, pcRepItem, cSegment, pcAttr);
+	if(nullptr != cRepItemData.m_pTessBase) {
+		nStatus = DrawTessBase(cRepItemData.m_pTessBase, pcRepItem, cSegment, pcAttr);
 	}
 
 	return nStatus;
-/*
+}
 
-	A3DTess3DWireData sData;
-	A3D_INITIALIZE_DATA(A3DTess3DWireData, sData);
+A3DStatus _3DfImport::DrawRiPointSet(const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+{
+	SetGeometryStyle(L"markers", pcRepItem, cSegment, pcParentAttr);
 
-	A3DMiscCascadedAttributesData aData;
-	A3D_INITIALIZE_DATA(A3DMiscCascadedAttributesData, aData);
-	A3DEEntityType eType;
+	A3DRiPointSetData sData;
+	A3D_INITIALIZE_DATA(A3DRiPointSetData, sData);
 
-	A3DEntityGetType(pRepItem, &eType);
-	if(A3DTess3DWireGet(p, &sData) != A3D_SUCCESS)
-		return;
-	HC_Set_Visibility("lines = on");
+	A3DStatus nStatus = A3DRiPointSetGet((A3DRiPointSet *) pcRepItem, &sData);
+	if(A3D_SUCCESS == nStatus) {
+		cSegment.GetVisibilityControl().SetMarkers(true);
 
-	VArray<double> point_coords;
-
-	if(sData.m_puiSizesWires == 0)
-		HC_DInsert_Polyline(tessbasedata->m_uiCoordSize / 3, tessbasedata->m_pdCoords);
-	else
-	{
-		A3DUns32 index = 0;
-		int info_index = 0;
-		int pt_index = 0;
-		bool bClosed = false;
-		point_coords.EnsureSize(tessbasedata->m_uiCoordSize);
-		while(index < sData.m_uiSizesWiresSize)
-		{
-			info_index = sData.m_puiSizesWires[index];
-			if(info_index & kA3DTess3DWireDataIsClosing)
-			{
-				bClosed = true;
-				info_index -= kA3DTess3DWireDataIsClosing;
-			}
-			if(!(info_index & kA3DTess3DWireDataIsContinuous)) //Continuious
-			{
-				if(point_coords.Count() > 0)
-				{
-					HC_DInsert_Polyline((int) point_coords.Count() / 3, point_coords);
-					point_coords.SetCount(0);
-				}
-			}
-			else
-				info_index -= kA3DTess3DWireDataIsContinuous;
-
-			for(int i = 0; i < info_index; i++)
-			{
-				pt_index = sData.m_puiSizesWires[index + 1 + i];
-				point_coords.AppendArray(tessbasedata->m_pdCoords + pt_index, 3);
-			}
-			if(bClosed)
-			{
-				pt_index = sData.m_puiSizesWires[index + 1];
-				point_coords.AppendArray(tessbasedata->m_pdCoords + pt_index, 3);
-				HC_DInsert_Polyline((int) point_coords.Count() / 3, point_coords);
-				point_coords.SetCount(0);
-			}
-			index += info_index + 1;
+		for(unsigned int i = 0; i < sData.m_uiSize; ++i) {
+			cSegment.InsertMarker(sData.m_pPts[i].m_dX, sData.m_pPts[i].m_dY, sData.m_pPts[i].m_dZ);
 		}
+
+		A3DRiPointSetGet(nullptr, &sData);
 	}
 
-	A3DTess3DWireGet(NULL, &sData);
-	A3DMiscCascadedAttributesGet(pFatherAttr, &aData);
-	SetMaterial(&aData);
-	SetLinePattern(&aData.m_sStyle);
-*/
+	return nStatus;
 }
 
 
@@ -1378,7 +1314,7 @@ A3DStatus _3DfImport::DrawMarkupView(const A3DMkpView * pcView, _3DF::SegmentKey
 
 		for(A3DUns32 ui = 0; ui < cViewData.m_uiAnnotationsSize; ui++)
 		{
-			CHECK_A3D_RETURN(DrawAnnotation(cViewData.m_ppAnnotations[ui], cParentSegment, pcAttr));
+			//CHECK_A3D_RETURN(DrawAnnotations(cViewData.m_ppAnnotations[ui], cParentSegment, pcAttr));
 		}
 
 		CHECK_A3D_RETURN(A3DMkpViewGet(nullptr, &cViewData));
@@ -1389,31 +1325,93 @@ A3DStatus _3DfImport::DrawMarkupView(const A3DMkpView * pcView, _3DF::SegmentKey
 
 	return iRet;
 }
-// 6. Draw Annotation
-A3DStatus _3DfImport::DrawAnnotation(const A3DMkpAnnotationEntity * pcAnnotation, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+// 6. 복수의 Annotation을 그리는 함수
+A3DStatus _3DfImport::DrawAnnotations(const A3DMkpAnnotationEntity ** pcAnnotation, A3DUns32 nAnnotationsSize, _3DF::SegmentKey & cParentSegment)
 {
-	A3DEEntityType eType = kA3DTypeUnknown;
+	if(0 == nAnnotationsSize) {
+		return A3D_SUCCESS;
+	}
 
-	CHECK_A3D_RETURN(A3DEntityGetType(pcAnnotation, &eType));
+	A3DMiscCascadedAttributes * pcParentAttr = nullptr;
+	A3DMiscCascadedAttributesCreate(&pcParentAttr);
+
+	for(unsigned int i = 0; i < nAnnotationsSize; i++)
+	{
+		DrawAnnotation(pcAnnotation[i], pcParentAttr, cParentSegment);
+	}
+
+	return A3D_SUCCESS;
+}
+
+// 6-1. Annotation을 그리는 함수
+A3DStatus _3DfImport::DrawAnnotation(const A3DMkpAnnotationEntity * pcAnnotation, A3DMiscCascadedAttributes * pcParentAttr, _3DF::SegmentKey & cParentSegment)
+{
+	A3DEEntityType eType;
+	A3DEntityGetType(pcAnnotation, &eType);
+
+	A3DMiscCascadedAttributes * pcAttrs;
+	A3DMiscCascadedAttributesData sAttrData;
+	CreateAndPushCascadedAttributes(pcAnnotation, pcParentAttr, &pcAttrs, &sAttrData);
 
 	switch(eType)
 	{
+		case kA3DTypeMkpAnnotationItem:
+		{
+			A3DMkpAnnotationItemData sData;
+			A3D_INITIALIZE_DATA(A3DMkpAnnotationItemData, sData);
+			A3DMkpAnnotationItemGet(pcAnnotation, &sData);
+
+			A3DMiscCascadedAttributes * pcMarkupAttr;
+			A3DMiscCascadedAttributesData sMarkupAttribData;
+			CreateAndPushCascadedAttributes(sData.m_pMarkup, pcAttrs, &pcMarkupAttr, &sMarkupAttribData);
+
+			//DrawMarkup(sData.m_pMarkup, &sMarkupAttribData, &tester);
+
+/*
+			HC_KEY tester = 0;
+			int res = vhash_lookup_item(m_annotationhash, (void *) sData.m_pMarkup, (void **) &tester);
+
+			if(res == VHASH_STATUS_SUCCESS)
+			{
+				HC_Open_Segment_By_Key(tester); {
+					if(sMarkupAttribData.m_bShow)
+						HC_Set_User_Options("default_visibility=on");
+				}HC_Close_Segment();
+			}
+			else
+			{
+				m_AnnotationCounter++;
+				traverseMarkup(sData.m_pMarkup, &sMarkupAttribData, &tester);
+				vhash_insert_item(m_annotationhash, (void *) sData.m_pMarkup, (void *) tester);
+			}
+*/
+
+			A3DMiscCascadedAttributesDelete(pcMarkupAttr);
+		}
+		break;
+		
 		case kA3DTypeMkpAnnotationSet:
-			CHECK_A3D_RETURN(DrawAnnotationSet(pcAnnotation, cParentSegment, pcParentAttr));
-			break;
+		{
+			A3DMkpAnnotationSetData sData;
+			A3D_INITIALIZE_DATA(A3DMkpAnnotationSetData, sData);
+
+			A3DMkpAnnotationSetGet(pcAnnotation, &sData);
+			for(A3DUns32 i = 0; i < sData.m_uiAnnotationsSize; ++i)
+			{
+				//parseAnnotation(sData.m_ppAnnotations[i], pcAttrs);
+			}
+
+			A3DMkpAnnotationSetGet(NULL, &sData);
+		}
+		break;
 
 		case kA3DTypeMkpAnnotationReference:
-			CHECK_A3D_RETURN(DrawAnnotationReference(pcAnnotation, pcParentAttr));
-			break;
-
-		case kA3DTypeMkpAnnotationItem:
-			CHECK_A3D_RETURN(DrawAnnotationItem(pcAnnotation, cParentSegment, pcParentAttr));
-			break;
 
 		default:
-			assert(false);
-			break;
+		break;
 	}
+
+	A3DMiscCascadedAttributesDelete(pcAttrs);
 
 	return A3D_SUCCESS;
 }
@@ -1422,6 +1420,7 @@ A3DStatus _3DfImport::DrawAnnotation(const A3DMkpAnnotationEntity * pcAnnotation
 A3DStatus _3DfImport::DrawAnnotationSet(const A3DMkpAnnotationSet * pcAnnotationSet, _3DF::SegmentKey & cParentSegment, 
 	const A3DMiscCascadedAttributes * pcParentAttr)
 {
+/*
 	A3DStatus iRet = A3D_SUCCESS;
 
 	A3DMiscCascadedAttributes * pcAttr;
@@ -1437,7 +1436,7 @@ A3DStatus _3DfImport::DrawAnnotationSet(const A3DMkpAnnotationSet * pcAnnotation
 		A3DUns32 ui;
 		for(ui = 0; ui < sAnnotationSetData.m_uiAnnotationsSize; ui++)
 		{
-			CHECK_A3D_RETURN(DrawAnnotation(sAnnotationSetData.m_ppAnnotations[ui], cParentSegment, pcAttr));
+			CHECK_A3D_RETURN(DrawAnnotations(sAnnotationSetData.m_ppAnnotations[ui], cParentSegment, pcAttr));
 		}
 
 		CHECK_A3D_RETURN(A3DMkpAnnotationSetGet(nullptr, &sAnnotationSetData));
@@ -1445,8 +1444,9 @@ A3DStatus _3DfImport::DrawAnnotationSet(const A3DMkpAnnotationSet * pcAnnotation
 
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttr));
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrData));
+*/
 
-	return iRet;
+	return A3D_SUCCESS;
 }
 
 // 6-2. (미완성) Draw Annotation Reference
@@ -1532,10 +1532,6 @@ A3DStatus _3DfImport::DrawMarkup(const A3DMkpMarkup * pcMarkup, _3DF::SegmentKey
 
 	return A3D_SUCCESS;
 }
-
-
-DWORD nDrawTessBaseCount = 0;
-
 // 8. Draw Tessellation Base
 A3DStatus _3DfImport::DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cParentSegment, 
 	const A3DMiscCascadedAttributes * pcParentAttr)
@@ -1547,38 +1543,26 @@ A3DStatus _3DfImport::DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresen
 	A3DEEntityType eEntityType;
 	CHECK_A3D_RETURN(A3DEntityGetType(pcTessBase, &eEntityType));
 
+	A3DTessBaseData sTessBaseData;
+	A3D_INITIALIZE_DATA(A3DTessBaseData, sTessBaseData);
+	CHECK_A3D_RETURN(A3DTessBaseGet(pcTessBase, &sTessBaseData));
+
 	A3DStatus eStatus = A3D_SUCCESS;
-
-	//if(!(1400 <= nDrawTessBaseCount && nDrawTessBaseCount < 1450)) {
-	//if(!(1400 <= nDrawTessBaseCount && nDrawTessBaseCount < 1455)) {
-	//if(1459 < nDrawTessBaseCount) {
-	if(1492 <= nDrawTessBaseCount) {
-		return A3D_SUCCESS;
-	}
-
-// 	if(1491 != nDrawTessBaseCount) {
-// 		nDrawTessBaseCount = nDrawTessBaseCount;
-// 		return A3D_SUCCESS;
-// 	}
-
-	nDrawTessBaseCount++;
 
 	switch(eEntityType)
 	{
 		case kA3DTypeTess3D:
-			eStatus = DrawTess3D((A3DTess3D *) pcTessBase, pcRepItem, cParentSegment, pcParentAttr);
+			eStatus = DrawTess3D((A3DTess3D *) pcTessBase, &sTessBaseData, pcRepItem, pcParentAttr, cParentSegment);
 		break;
 
 		case kA3DTypeTess3DWire:
-			eStatus = DrawTess3DWire((A3DTess3DWire *) pcTessBase, pcRepItem, cParentSegment, pcParentAttr);
+			eStatus = DrawTess3DWire((A3DTess3DWire *) pcTessBase, &sTessBaseData, pcRepItem, pcParentAttr, cParentSegment);
 		break;
 
 /*
 		case kA3DTypeTessMarkup:
-		{
 			//eStatus = DrawTessMarkup((A3DTessMarkup *) pcTessBase, pcRepItem, pcParentAttr);
-			break;
-		}
+		break;
 */
 
 		default:
@@ -1586,24 +1570,21 @@ A3DStatus _3DfImport::DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresen
 		break;
 	}
 
+	A3DTessBaseGet(nullptr, &sTessBaseData);
+
 	return eStatus;
 }
 
+
 // 8-1. Draw Tess3D
-A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DRiRepresentationItem * pcRepItem,
-	_3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
+	const A3DMiscCascadedAttributes * pcParentAttr, _3DF::SegmentKey & cParentSegment)
 {
 	LogIncreaseTabIndex(2);
-
-	Log(2, L"DrawTess3D: %s", LogHexStr((DWORD_PTR) pcTess3D));
 
 	double dUnitScale = 1.0;	// Tessellation은 1:1 비율로 들어온다 
 
 	_3DF::SegmentKey cCurrnetSegment = cParentSegment;
-
-	A3DTessBaseData sTessBaseData;
-	A3D_INITIALIZE_DATA(A3DTessBaseData, sTessBaseData);
-	CHECK_A3D_RETURN(A3DTessBaseGet(pcTess3D, &sTessBaseData));
 
 	A3DTess3DData cTess3dData;
 	A3D_INITIALIZE_DATA(A3DTess3DData, cTess3dData);
@@ -1613,7 +1594,6 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DRiRepresen
 
 	if(0 == nFacesCount) {
 		A3DTess3DGet(nullptr, &cTess3dData);
-		A3DTessBaseGet(nullptr, &sTessBaseData);
 		return A3D_ERROR;
 	}
 
@@ -1623,15 +1603,16 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DRiRepresen
 	A3DMiscCascadedAttributesData sAttrData;
 	CreateAndPushCascadedAttributesTessFace(pcRepItem, pcTess3D, &cTessFaceData, 0, pcParentAttr, &pcAttribute, &sAttrData);
 
+	CString strGeometry = L"faces";
 	_3DF::MaterialMappingKit cFirstMaterialMapping;
 	if(A3D_SUCCESS == DrawStyle(sAttrData, cFirstMaterialMapping)) {
 		if(true == cFirstMaterialMapping.IsAllocate()) {
 			SegmentKey cStyleSegment;
-			if(true == FindMaterialMapping(cFirstMaterialMapping, cStyleSegment)) {
+			if(true == FindMaterialMapping(strGeometry, cFirstMaterialMapping, cStyleSegment)) {
 				SetStyle(cCurrnetSegment, cStyleSegment);
 			}
 			else {
-				SetStyleMaterialMapping(cFirstMaterialMapping, cCurrnetSegment);
+				SetStyleMaterialMapping(strGeometry, cFirstMaterialMapping, cCurrnetSegment);
 			}
 		}
 	}
@@ -1639,79 +1620,28 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DRiRepresen
 	A3DMiscCascadedAttributesDelete(pcAttribute);
 	A3DMiscCascadedAttributesGet(nullptr, &sAttrData);
 
-	// Attribute of Cascade
-	/*A3DTessFaceData & cTessFaceData = cTess3dData.m_psFaceTessData[0];
-	A3DMiscCascadedAttributes * pcAttribute;
-	A3DMiscCascadedAttributesData sAttrData;
-	CreateAndPushCascadedAttributesTessFace(pcRepItem, pcTess3D, &cTessFaceData, 0, pcParentAttr, &pcAttribute, &sAttrData);
-*/
-
 	const double cBigValue = 1.0e+12;
 	bool bStrange = false;
 
 	double dScale = 1.0;// cImportInfo.dModelScale * cImportInfo.dTessellationScale;
-
-	A3DUns32 nTextureCoordCount = cTess3dData.m_uiTextureCoordSize / 2;
-	/*
-		HPoint * const texcor = new HPoint[nTextureCoordCount];
-
-		for(UINT i = 0; i < nTextureCoordCount; ++i) {
-			texcor[i].Set(cTess3dData.m_pdTextureCoords[i * 2], cTess3dData.m_pdTextureCoords[i * 2 + 1], 0);
-		}
-	*/
 
 	A3DUns32 * pnTriangleIndices = cTess3dData.m_puiTriangulatedIndexes;
 
 	UINT nTriangleFaceCount = 0;
 
 	// ----- Point 활당 -----
-	A3DUns32 nPointCount = sTessBaseData.m_uiCoordSize / 3;
-
-/*
-	DWORD nTick1 = GetTickCount();
-	for(int nIndex = 0; nIndex < 10000; nIndex++) {
-		_3DF::PointArray acPoints1(10000);
-		//std::vector<_3DF::Point3D> acPoints2(10000);
-	}
-	DWORD nTick2 = GetTickCount();
-	for(int nIndex = 0; nIndex < 10000; nIndex++) {
-		std::vector<_3DF::Point> acPoints2(10000);
-	}
-	DWORD nTick3 = GetTickCount();
-	for(int nIndex = 0; nIndex < 10000; nIndex++) {
-		_3DF::Point * pcPoint1 = new _3DF::Point[10000];
-// 		for(int nIndex1 = 0; nIndex1 < 10000; nIndex1++) {
-// 			pcPoint1[nIndex1].Set(nIndex1, nIndex1, nIndex1);
-// 		}
-		delete[] pcPoint1;
-	}
-	DWORD nTick4 = GetTickCount();
-	for(int nIndex = 0; nIndex < 10000; nIndex++) {
-		_3DF::Point3D * pcPoint1 = new _3DF::Point3D[10000];
-// 		for(int nIndex1 = 0; nIndex1 < 10000; nIndex1++) {
-// 			pcPoint1[nIndex1].Set(nIndex1, nIndex1, nIndex1);
-// 		}
-		delete[] pcPoint1;
-	}
-	DWORD nTick5 = GetTickCount();
-
-	DWORD nSub1 = nTick2 - nTick1;
-	DWORD nSub2 = nTick3 - nTick2;
-	DWORD nSub3 = nTick4 - nTick3;
-	DWORD nSub4 = nTick5 - nTick4;
-*/
+	A3DUns32 nPointCount = pcTessBaseData->m_uiCoordSize / 3;
 
 	ConvertFaceInfo cConFaceInfo;
 
 	cConFaceInfo.pnInIndices = cTess3dData.m_puiTriangulatedIndexes;
 
 	cConFaceInfo.aInPoints.resize(nPointCount);
-	//_3DF::PointArray acPoints(nPointCount);
 	for(A3DUns32 nIndex = 0; nIndex < nPointCount; nIndex++) {
 		cConFaceInfo.aInPoints[nIndex].Set(
-			sTessBaseData.m_pdCoords[nIndex * 3],
-			sTessBaseData.m_pdCoords[nIndex * 3 + 1],
-			sTessBaseData.m_pdCoords[nIndex * 3 + 2]);
+			pcTessBaseData->m_pdCoords[nIndex * 3],
+			pcTessBaseData->m_pdCoords[nIndex * 3 + 1],
+			pcTessBaseData->m_pdCoords[nIndex * 3 + 2]);
 	}
 
 	// ----- Normal Vector 활당 -----
@@ -1724,13 +1654,17 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DRiRepresen
 			cTess3dData.m_pdNormals[nIndex * 3 + 2]);
 	}
 
+	// ----- Texture Parameter 활당 -----
+	A3DUns32 nTextureCoordCount = cTess3dData.m_uiTextureCoordSize;
+	cConFaceInfo.aInParams.resize(nTextureCoordCount);
+	for(A3DUns32 nIndex = 0; nIndex < nTextureCoordCount; nIndex++) {
+		cConFaceInfo.aInParams[nIndex] = static_cast<float>(cTess3dData.m_pdTextureCoords[nIndex]);
+	}
+
+	LogIncreaseTabIndex(2);
+
 	for(A3DUns32 nFaceIndex = 0; nFaceIndex < nFacesCount; nFaceIndex++)
 	{
-		// #3DF_Debug
-//  		if(0 != nFaceIndex) {
-//  			continue;
-//  		}
-
 		A3DTessFaceData & cTessFaceData = cTess3dData.m_psFaceTessData[nFaceIndex];
 		cConFaceInfo.pcInTessFaceData = &cTessFaceData;
 
@@ -1750,34 +1684,18 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DRiRepresen
 
 						cCurrnetSegment = cParentSegment.Subsegment(L"face_%d", nFaceIndex);
 
+						CString strGeometry = L"faces";
 						SegmentKey cStyleSegment;
-						if(true == FindMaterialMapping(cMaterialMapping, cStyleSegment)) {
+						if(true == FindMaterialMapping(strGeometry, cMaterialMapping, cStyleSegment)) {
 							SetStyle(cCurrnetSegment, cStyleSegment);
 						}
 						else {
-							SetStyleMaterialMapping(cMaterialMapping, cCurrnetSegment);
+							SetStyleMaterialMapping(strGeometry, cMaterialMapping, cCurrnetSegment);
 						}
 					}
 				}
 			}
 		}
-
-// 		_3DF::IntArray anFacelistArray;
-// 		_3DF::IntArray anNormalIndexArray;
-// 		_3DF::IntArray anTristripsArray;
-// 		_3DF::PointArray acFacePoints; // the points for *this* face
-
-// 		A3DUns32			tri_size_index = 0;		// index into A3DTessFaceData::m_puiSizesTriangulated
-// 		A3DUns32			tri_start_index = 0;	// index into A3DTess3DData::m_puiTriangulatedIndexes
-// 		A3DUns32			nTriColorIndex = 0;	// index into A3DTessFaceData::m_pucRGBAVertices
-// 
-// 		HPointArray			fpoints;				// the points for *this* face
-// 		IntArray			flist;					// the facelist for *this* face (wrt the points for *this* face)
-// 		VectorArray			fvnormals;				// the vertex normals for *this* face
-// 		FloatArray			fvparams;				// the optional vertex params for *this* face
-// 		RGBAColorArray		fvcolors;				// the optional RGBA vertex colors for *this* face
-// 		IndexHash			index_map;				// map for translating "global" indices to "local" indices
-// 		IntArray			vertex_refs;			// count of references to a particular (vertex, normal) pair
 
 		cConFaceInfo.nOutTriSizeIndex = 0;	// 한 Triangle Type당 하나씩
 		cConFaceInfo.nOutTriStartIndex = cTessFaceData.m_uiStartTriangulated;
@@ -1792,50 +1710,48 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DRiRepresen
 		cConFaceInfo.aOutFaceVertexParams.clear();
 		cConFaceInfo.aOutFaceVertexColors.clear();
 
-		// 3DX에서 돌려주는 Face Index는 Tess3d 전체의 Index를 돌려주는데, Grid를 구성하기 위해서는 부분적인 Point들의 Index가 필요함.
-		// 별도의 순서를 갖는 Face Index를 구성하기 위해서 Map을 사용한다.
-		TessIndexMap maPointIndexMap;
-		TessIndexMap maNormalIndexMap;
+		// fill out the RGBA vertex color array (if necessary)
+		cConFaceInfo.aInColors.reserve(cTessFaceData.m_uiRGBAVerticesSize / (cTessFaceData.m_bIsRGBA ? 4 : 3));
+		for(A3DUns32 nIndex = 0; nIndex < cTessFaceData.m_uiRGBAVerticesSize; /* increment inside loop */)
+		{
+			RGBAColor cRgbaColor(cTessFaceData.m_pucRGBAVertices[nIndex + 0] / 255.0f,
+				cTessFaceData.m_pucRGBAVertices[nIndex + 1] / 255.0f,
+				cTessFaceData.m_pucRGBAVertices[nIndex + 2] / 255.0f);
+			nIndex += 3;
+			if(cTessFaceData.m_bIsRGBA) {
+				cRgbaColor.alpha = cTessFaceData.m_pucRGBAVertices[nIndex++] / 255.0f;
+			}
+
+			cConFaceInfo.aInColors.push_back(cRgbaColor);
+		}
+
 
 		if(cTessFaceData.m_usUsedEntitiesFlags & kA3DTessFaceDataTriangle) {
 			nTriangleFaceCount += ConvertTessFaceDataTriangle(cConFaceInfo);
-// 			nTriangleFaceCount += DrawTessFaceDataTriangle(cTessFaceData, pnTriangleIndices, nTriSizeIndex, nTriStartIndex,
-// 				maPointIndexMap, maNormalIndexMap, anFacelistArray);
 		}
 
 		if(cTessFaceData.m_usUsedEntitiesFlags & kA3DTessFaceDataTriangleFan) {
 			nTriangleFaceCount += ConvertTessFaceDataTriangleFan(cConFaceInfo);
-// 			nTriangleFaceCount += DrawTessFaceDataTriangleFan(cTessFaceData, pnTriangleIndices, nTriSizeIndex, nTriStartIndex,
-// 				maPointIndexMap, maNormalIndexMap, anFacelistArray);
 		}
 
 		if(cTessFaceData.m_usUsedEntitiesFlags & kA3DTessFaceDataTriangleStripe) {
 			nTriangleFaceCount += ConvertTessFaceDataTriangleStripe(cConFaceInfo);
-// 			nTriangleFaceCount += DrawTessFaceDataTriangleStripe(cTessFaceData, acPoints, acNormals, pnTriangleIndices, 
-// 				nTriSizeIndex, nTriStartIndex, nTriColorIndex, mIndexMap, maPointIndexMap, maNormalIndexMap, anFacelistArray, anNormalIndexArray);
 		}
 
 		if(cTessFaceData.m_usUsedEntitiesFlags & kA3DTessFaceDataTriangleOneNormal) {
 			nTriangleFaceCount += ConvertTessFaceDataTriangleOneNormal(cConFaceInfo);
-//  			nTriangleFaceCount += DrawTessFaceDataTriangleOneNormal(cTessFaceData, pnTriangleIndices, nTriSizeIndex, nTriStartIndex,
-//  				maPointIndexMap, maNormalIndexMap, anFacelistArray);
 		}
 
 		if(cTessFaceData.m_usUsedEntitiesFlags & kA3DTessFaceDataTriangleFanOneNormal) {
 			nTriangleFaceCount += ConvertTessFaceDataTriangleFanOneNormal(cConFaceInfo);
-// 			nTriangleFaceCount += DrawTessFaceDataTriangleFanOneNormal(cTessFaceData, pnTriangleIndices, nTriSizeIndex, nTriStartIndex,
-// 				maPointIndexMap, maNormalIndexMap, anFacelistArray);
 		}
 
 		if(cTessFaceData.m_usUsedEntitiesFlags & kA3DTessFaceDataTriangleStripeOneNormal) {
 			nTriangleFaceCount += ConvertTessFaceDataTriangleStripeOneNormal(cConFaceInfo);
-//  			nTriangleFaceCount += DrawTessFaceDataTriangleStripeOneNormal(cTessFaceData, pnTriangleIndices, nTriSizeIndex, nTriStartIndex,
-//  				maPointIndexMap, maNormalIndexMap, anFacelistArray);
 		}
 
 		if(cTessFaceData.m_usUsedEntitiesFlags & kA3DTessFaceDataTriangleTextured) {
-// 			nTriangleFaceCount += DrawTessFaceDataTriangleTextured(cTessFaceData, pnTriangleIndices, nTriSizeIndex, nTriStartIndex,
-// 				maPointIndexMap, maNormalIndexMap, anFacelistArray);
+			nTriangleFaceCount += ConveTessFaceDataTriangleTextured(cConFaceInfo);
 		}
 
 		if(false == cConFaceInfo.aOutFacePoints.empty()) {
@@ -1844,58 +1760,13 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DRiRepresen
 			cShellKit.SetPoints(cConFaceInfo.aOutFacePoints);
 			cShellKit.SetNormals(cConFaceInfo.aOutFaceVertexNormals);
 			cShellKit.SetFacelist(cConFaceInfo.aOutFaceList);
-			//cShellKit.SetVertexNormalsByRange(size_t in_start, VectorArray const & in_normals);
-			//cShellKit.SetTristrips(anTristripsArray);
+			cShellKit.SetParameters(cConFaceInfo.aOutFaceVertexParams);
+			cShellKit.SetColors(cConFaceInfo.aOutFaceVertexColors);
 
 			ShellKey cShell = cCurrnetSegment.InsertShell(cShellKit);
 		}
-			
-/*
-		if(false == anFacelistArray.empty()) {
+		
 
-			size_t nPoitnCount = maPointIndexMap.GetCount();
-			size_t nNormalCount = maNormalIndexMap.GetCount();
-
-			if(nPoitnCount != nNormalCount) {
-				ASSERT(false);
-			}
-
-			PointArray cShellPoints(nPoitnCount);
-			VectorArray cShellNormals(nPoitnCount);
-
-			A3DUns32 nOriginIndex, nGridIndex;
-			POSITION pcPosition = maPointIndexMap.GetStartPosition();
-			while(nullptr != pcPosition)
-			{
-				maPointIndexMap.GetNextAssoc(pcPosition, nOriginIndex, nGridIndex);
-				if(nGridIndex >= nPoitnCount) {
-					ASSERT(false);
-				}
-
-				cShellPoints[nGridIndex] = acPoints[nOriginIndex];
-			}
-
-			pcPosition = maNormalIndexMap.GetStartPosition();
-			while(nullptr != pcPosition)
-			{
-				maNormalIndexMap.GetNextAssoc(pcPosition, nGridIndex, nOriginIndex);
-				if(nGridIndex >= nNormalCount) {
-					ASSERT(false);
-				}
-
-				cShellNormals[nGridIndex] = acNormals[nOriginIndex];
-			}
-
-			_3DF::ShellKit cShellKit;
-			cShellKit.SetPoints(cShellPoints);
-			cShellKit.SetNormals(cShellNormals);
-			cShellKit.SetFacelist(anFacelistArray);
-			cShellKit.SetVertexNormalsByRange(size_t in_start, VectorArray const & in_normals);
-			cShellKit.SetTristrips(anTristripsArray);
-
-			ShellKey cShell = cCurrnetSegment.InsertShell(cShellKit);
-		}
-*/
 		//---- Draw Edge Line -----
 
 		A3DUns32 nStartWireIndex = cTessFaceData.m_uiStartWire;
@@ -1922,12 +1793,14 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DRiRepresen
 		cCurrnetSegment = cParentSegment;
 	}
 
+	LogDecreaseTabIndex(2);
+
+	Log(2, L"DrawTess3D: %s, %d", LogHexStr((DWORD_PTR) pcTess3D), nTriangleFaceCount);
 
 // 
 // 	if(cTess3DData.m_bMustRecalculateNormals)
 // 		cTess3DData.m_pdNormals = nullptr;
 
-	CHECK_A3D_RETURN(A3DTessBaseGet(nullptr, &sTessBaseData));
 	CHECK_A3D_RETURN(A3DTess3DGet(nullptr, &cTess3dData));
 
 	LogDecreaseTabIndex(2);
@@ -1945,6 +1818,8 @@ UINT _3DfImport::ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo)
 	A3DUns32  nInVertexParamSize = 0;
 
 	A3DUns32 nTriangleCount = cInFaceInfo.pcInTessFaceData->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
+
+	// Log(2, L"ConvertTessFaceDataTriangle: %d", nTriangleCount);
 
 	for(A3DUns32 nTriIndex = 0; nTriIndex < nTriangleCount; nTriIndex++)
 	{
@@ -2014,6 +1889,8 @@ UINT _3DfImport::ConvertTessFaceDataTriangleFan(ConvertFaceInfo & cInFaceInfo)
 	A3DUns32  nInVertexParamSize = 0;
 
 	A3DUns32 nTriFanCount = cInFaceInfo.pcInTessFaceData->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
+
+	// Log(2, L"ConvertTessFaceDataTriangleFan: %d", nTriFanCount);
 
 	for(A3DUns32 nFanIndex = 0; nFanIndex < nTriFanCount; nFanIndex++)
 	{
@@ -2131,58 +2008,54 @@ UINT _3DfImport::ConvertTessFaceDataTriangleStripe(ConvertFaceInfo & cInFaceInfo
 	A3DUns32 nStripesCount = cInFaceInfo.pcInTessFaceData->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
 	A3DUns32 nTriFaceCount = 0;
 
+	// Log(2, L"ConvertTessFaceDataTriangleStripe: %d", nStripesCount);
+
 	bool hasVertexColor = false; // INT2bool(cTessFaceData.m_uiRGBAVerticesSize);
 	if(0 < cInFaceInfo.pcInTessFaceData->m_uiRGBAVerticesSize) {
 		hasVertexColor = true;
 	}
 
-	// #3DF_Debug
-	//nStripesCount = 48;
 	for(A3DUns32 nStripeIndex = 0; nStripeIndex < nStripesCount; nStripeIndex++)
 	{
 		A3DUns32 nTriStripIndex = cInFaceInfo.nOutTriStartIndex;
-		A3DUns32 nTriCount = cInFaceInfo.pcInTessFaceData->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex];
-		if(0 == nTriCount) {
+		A3DUns32 nPointCount = cInFaceInfo.pcInTessFaceData->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex];
+		if(0 == nPointCount) {
 			cInFaceInfo.nOutTriSizeIndex++;
 			assert(false);
 			continue;
 		}
 
-// 		int nColorIndex = nTriColorIndex;
- 		
-
 		cInFaceInfo.nOutTriSizeIndex++;
 
-// 		if(true == bSingleNormalFlag) {
-// 			nTriStripIndex++;
-// 		}
-
-		for(A3DUns32 tri = 0; tri < nTriCount - 2; tri++)
+		for(A3DUns32 tri = 0; tri < nPointCount - 2; tri++)
 		{
 			if((tri % 2) == 0)
 			{
-				nFaceVertexNormalIndices[0] = cInFaceInfo.pnInIndices[nTriStripIndex++] / 3;
-				nFaceVertexParamIndices[0] = cInFaceInfo.pnInIndices[nTriStripIndex];
-				nFaceListIndices[0] = cInFaceInfo.pnInIndices[nTriStripIndex++] / 3;
+				nFaceListIndices[0] = cInFaceInfo.pnInIndices[nTriStripIndex + 1] / 3;
+				nFaceVertexNormalIndices[0] = cInFaceInfo.pnInIndices[nTriStripIndex] / 3;
+				nTriStripIndex += 2;
 
-				nFaceVertexNormalIndices[1] = cInFaceInfo.pnInIndices[nTriStripIndex] / 3;
-				nFaceVertexParamIndices[1] = cInFaceInfo.pnInIndices[nTriStripIndex + 1];
 				nFaceListIndices[1] = cInFaceInfo.pnInIndices[nTriStripIndex + 1] / 3;
+				nFaceVertexNormalIndices[1] = cInFaceInfo.pnInIndices[nTriStripIndex] / 3;
+				nTriStripIndex += 2;
 
-				nFaceVertexNormalIndices[2] = cInFaceInfo.pnInIndices[nTriStripIndex + 2] / 3;
-				nFaceVertexParamIndices[2] = cInFaceInfo.pnInIndices[nTriStripIndex + 3];
-				nFaceListIndices[2] = cInFaceInfo.pnInIndices[nTriStripIndex + 3] / 3;
+				nFaceListIndices[2] = cInFaceInfo.pnInIndices[nTriStripIndex + 1] / 3;
+				nFaceVertexNormalIndices[2] = cInFaceInfo.pnInIndices[nTriStripIndex] / 3;
+				nTriStripIndex -= 2;
 			}
 			else
 			{
-				nFaceVertexNormalIndices[0] = cInFaceInfo.pnInIndices[nTriStripIndex + 4] / 3;
-				nFaceListIndices[0] = cInFaceInfo.pnInIndices[nTriStripIndex + 5] / 3;
+				nFaceListIndices[2] = cInFaceInfo.pnInIndices[nTriStripIndex + 1] / 3;
+				nFaceVertexNormalIndices[2] = cInFaceInfo.pnInIndices[nTriStripIndex] / 3;
+				nTriStripIndex += 2;
 
-				nFaceVertexNormalIndices[1] = cInFaceInfo.pnInIndices[nTriStripIndex + 2] / 3;
-				nFaceListIndices[1] = cInFaceInfo.pnInIndices[nTriStripIndex + 3] / 3;
+				nFaceListIndices[1] = cInFaceInfo.pnInIndices[nTriStripIndex + 1] / 3;
+				nFaceVertexNormalIndices[1] = cInFaceInfo.pnInIndices[nTriStripIndex] / 3;
+				nTriStripIndex += 2;
 
-				nFaceVertexNormalIndices[2] = cInFaceInfo.pnInIndices[nTriStripIndex++] / 3;
-				nFaceListIndices[2] = cInFaceInfo.pnInIndices[nTriStripIndex++] / 3;
+				nFaceListIndices[0] = cInFaceInfo.pnInIndices[nTriStripIndex + 1] / 3;
+				nFaceVertexNormalIndices[0] = cInFaceInfo.pnInIndices[nTriStripIndex] / 3;
+				nTriStripIndex -= 2;
 			}
 
 			A3DUns32  nInVertexParamSize = 0; //(tc_size == 0 ? 0 : 2),
@@ -2197,7 +2070,7 @@ UINT _3DfImport::ConvertTessFaceDataTriangleStripe(ConvertFaceInfo & cInFaceInfo
 // 			nOutTriStartIndex += (1) * nTsPoints + 1;
 // 		else
 
-		cInFaceInfo.nOutTriStartIndex += (2) * nTriCount;
+		cInFaceInfo.nOutTriStartIndex += 2 * nPointCount;
 	}
 
 	return nTriFaceCount;
@@ -2372,8 +2245,9 @@ UINT _3DfImport::ConvertTessFaceDataTriangleOneNormal(ConvertFaceInfo & cInFaceI
 	int nFaceVertexColorIndices[3];		// vertex color indices into the RGBA color array
 	A3DUns32 nInVertexParamSize = 0;
 
-
 	A3DUns32 nTriangleCount = cInFaceInfo.pcInTessFaceData->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
+
+	// Log(2, L"ConvertTessFaceDataTriangleOneNormal: %d", nTriangleCount);
 
 	for(A3DUns32 nTriIndex = 0; nTriIndex < nTriangleCount; nTriIndex++)
 	{
@@ -2396,7 +2270,6 @@ UINT _3DfImport::ConvertTessFaceDataTriangleOneNormal(ConvertFaceInfo & cInFaceI
 
 	return nTriangleCount;
 }
-
 
 UINT _3DfImport::DrawTessFaceDataTriangleOneNormal(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
 	TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray)
@@ -2440,7 +2313,9 @@ UINT _3DfImport::ConvertTessFaceDataTriangleFanOneNormal(ConvertFaceInfo & cInFa
 	int nFaceVertexColorIndices[3];		// vertex color indices into the RGBA color array
 	A3DUns32 nInVertexParamSize = 0;
 
-	A3DUns32	nTriFanCount = cInFaceInfo.pcInTessFaceData->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
+	A3DUns32 nTriFanCount = cInFaceInfo.pcInTessFaceData->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
+	
+	// Log(2, L"ConvertTessFaceDataTriangleFanOneNormal: %d", nTriFanCount);
 
 	for(A3DUns32 fan = 0; fan < nTriFanCount; fan++)
 	{
@@ -2604,6 +2479,8 @@ UINT _3DfImport::ConvertTessFaceDataTriangleStripeOneNormal(ConvertFaceInfo & cI
 
 	A3DUns32 nStripesCount = cInFaceInfo.pcInTessFaceData->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
 
+	// Log(2, L"ConvertTessFaceDataTriangleStripeOneNormal: %d", nStripesCount);
+
 	for(A3DUns32 nStripIndex = 0; nStripIndex < nStripesCount; nStripIndex++)
 	{
 		A3DUns32 nTriStripIndex = cInFaceInfo.nOutTriStartIndex;
@@ -2683,105 +2560,53 @@ UINT _3DfImport::ConvertTessFaceDataTriangleStripeOneNormal(ConvertFaceInfo & cI
 	return nStripesCount;
 }
 
-UINT _3DfImport::DrawTessFaceDataTriangleStripeOneNormal(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
-	TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray)
+UINT _3DfImport::ConveTessFaceDataTriangleTextured(ConvertFaceInfo & cInFaceInfo)
 {
-	A3DUns32 nFacePointIndex[3];
-	A3DUns32 nFaceNormalIndex[3];
-
-	UINT nTriCount = 0;
-
-	//size = size & ~kA3DTessFaceDataWireIsNotDrawn;
-	bool bNormalSingleFlag;
-	A3DUns32 numstripes = cTessFaceData.m_puiSizesTriangulated[nTriSizeIndex++];
-	for(A3DUns32 stripe = 0; stripe < numstripes; ++stripe)
-	{
-		if(cTessFaceData.m_puiSizesTriangulated[nTriSizeIndex] & kA3DTessFaceDataNormalSingle) {
-			bNormalSingleFlag = true;
-		}
-		else {
-			bNormalSingleFlag = false;
-		}
-
-		A3DUns32 numpoints = cTessFaceData.m_puiSizesTriangulated[nTriSizeIndex] & ~kA3DTessFaceDataNormalSingle;
-		++nTriSizeIndex;
-		A3DUns32 tpos2 = nTriStartIndex;
-		if(!bNormalSingleFlag)
-		{
-			for(A3DUns32 i = 0; i < numpoints - 2; ++i)
-			{
-				if(!(i % 2))
-				{
-					nFacePointIndex[0] = pnTriIndices[tpos2 + 1] / 3;
-					nFaceNormalIndex[0] = pnTriIndices[tpos2] / 3;
-					tpos2 += 2;
-					nFacePointIndex[1] = pnTriIndices[tpos2 + 1] / 3;
-					nFaceNormalIndex[1] = pnTriIndices[tpos2] / 3;
-					tpos2 += 2;
-					nFacePointIndex[2] = pnTriIndices[tpos2 + 1] / 3;
-					nFaceNormalIndex[2] = pnTriIndices[tpos2] / 3;
-					tpos2 -= 2;
-				}
-				else
-				{
-					nFacePointIndex[2] = pnTriIndices[tpos2 + 1] / 3;
-					nFaceNormalIndex[2] = pnTriIndices[tpos2] / 3;
-					tpos2 += 2;
-					nFacePointIndex[1] = pnTriIndices[tpos2 + 1] / 3;
-					nFaceNormalIndex[1] = pnTriIndices[tpos2] / 3;
-					tpos2 += 2;
-					nFacePointIndex[0] = pnTriIndices[tpos2 + 1] / 3;
-					nFaceNormalIndex[0] = pnTriIndices[tpos2] / 3;
-					tpos2 -= 2;
-				}
-
-				ConvertFaceList(maPointIndexMap, maNormalIndexMap, nFacePointIndex, nFaceNormalIndex, anFacelistArray, anNormalIndexArray);
-				//cCreatedShell.AddNextFaceWithDistinctNormals(pcPoints, pcNormals, nFacePointIndex, nFaceNormalIndex, 3);
-				nTriCount++;
-			}
-
-			nTriStartIndex += numpoints * 2;
-		}
-		else
-		{
-			tpos2++;
-			for(A3DUns32 i = 0; i < numpoints - 2; ++i)
-			{
-				if(!(i % 2))
-				{
-					nFacePointIndex[0] = pnTriIndices[tpos2] / 3;
-					nFaceNormalIndex[0] = pnTriIndices[nTriStartIndex] / 3;
-					tpos2++;
-					nFacePointIndex[1] = pnTriIndices[tpos2] / 3;
-					nFaceNormalIndex[1] = pnTriIndices[nTriStartIndex] / 3;
-					tpos2++;
-					nFacePointIndex[2] = pnTriIndices[tpos2] / 3;
-					nFaceNormalIndex[2] = pnTriIndices[nTriStartIndex] / 3;
-					tpos2--;
-				}
-				else
-				{
-					nFacePointIndex[2] = pnTriIndices[tpos2] / 3;
-					nFaceNormalIndex[2] = pnTriIndices[nTriStartIndex] / 3;
-					tpos2++;
-					nFacePointIndex[1] = pnTriIndices[tpos2] / 3;
-					nFaceNormalIndex[1] = pnTriIndices[nTriStartIndex] / 3;
-					tpos2++;
-					nFacePointIndex[0] = pnTriIndices[tpos2] / 3;
-					nFaceNormalIndex[0] = pnTriIndices[nTriStartIndex] / 3;
-					tpos2--;
-				}
-
-				ConvertFaceList(maPointIndexMap, maNormalIndexMap, nFacePointIndex, nFaceNormalIndex, anFacelistArray, anNormalIndexArray);
-				//cCreatedShell.AddNextFaceWithDistinctNormals(pcPoints, pcNormals, nFacePointIndex, nFaceNormalIndex, 3);
-				nTriCount++;
-			}
-
-			nTriStartIndex += (numpoints + 1);
-		}
+	A3DUns32 nTextureCoordSize = 0;
+	if(cInFaceInfo.pcInTessFaceData->m_usUsedEntitiesFlags & kA3DTessFaceDataTriangleTextured) {
+		nTextureCoordSize = cInFaceInfo.pcInTessFaceData->m_uiTextureCoordIndexesSize;
 	}
 
-	return nTriCount;
+	int nFaceListIndices[3]; // facelist indices into the "global" point array
+	int nFaceVertexNormalIndices[3]; // vertex normal indices into the "global" normal array
+	int nFaceVertexParamIndices[3]; // vertex parameter indices into the "global" parameter array
+	int nFaceVertexColorIndices[3]; // vertex color indices into the RGBA color array
+	A3DUns32 nInVertexParamSize = 0;
+
+	A3DUns32 nTriangleCount = cInFaceInfo.pcInTessFaceData->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
+
+	for(A3DUns32 tri = 0; tri < nTriangleCount; tri++)
+	{
+		A3DUns32 nNormalIndex = cInFaceInfo.nOutTriStartIndex++;
+
+		nFaceVertexNormalIndices[0] = cInFaceInfo.pnInIndices[nNormalIndex] / 3;
+		nFaceVertexParamIndices[0] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex];
+		cInFaceInfo.nOutTriStartIndex += nTextureCoordSize;
+		nFaceListIndices[0] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex++] / 3;
+		if(cInFaceInfo.aInColors.size() > 0) {
+			nFaceVertexColorIndices[0] = cInFaceInfo.nOutTriColorIndex++;
+		}
+
+		nFaceVertexNormalIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex++] / 3;
+		nFaceVertexParamIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex];
+		cInFaceInfo.nOutTriStartIndex += nTextureCoordSize;
+		nFaceListIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex++] / 3;
+		if(cInFaceInfo.aInColors.size() > 0) {
+			nFaceVertexColorIndices[1] = cInFaceInfo.nOutTriColorIndex++;
+		}
+
+		nFaceVertexNormalIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex++] / 3;
+		nFaceVertexParamIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex];
+		cInFaceInfo.nOutTriStartIndex += nTextureCoordSize;
+		nFaceListIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex++] / 3;
+		if(cInFaceInfo.aInColors.size() > 0) {
+			nFaceVertexColorIndices[2] = cInFaceInfo.nOutTriColorIndex++;
+		}
+
+		AddTriangle(cInFaceInfo, nFaceListIndices, nFaceVertexNormalIndices, nFaceVertexParamIndices, nFaceVertexColorIndices, nInVertexParamSize);
+	}
+
+	return nTriangleCount;
 }
 
 UINT _3DfImport::DrawTessFaceDataTriangleTextured(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
@@ -2823,51 +2648,135 @@ UINT _3DfImport::DrawTessFaceDataTriangleTextured(A3DTessFaceData & cTessFaceDat
 	return nTriangleCount;
 }
 
-
 // 8-2-1. Tess3D Wire 처리
-A3DStatus _3DfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cParentSegment, 
-	const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus _3DfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
+	const A3DMiscCascadedAttributes * pcParentAttr, _3DF::SegmentKey & cParentSegment)
 {
-	A3DStatus iRet = A3D_SUCCESS;
-	A3DTessBaseData sTessBaseData;
-	A3D_INITIALIZE_DATA(A3DTessBaseData, sTessBaseData);
-	CHECK_A3D_RETURN(A3DTessBaseGet(pTess3DWire, &sTessBaseData));
+	A3DEEntityType eType;
+	CHECK_A3D_RETURN(A3DEntityGetType(pcRepItem, &eType));
 
-	A3DMiscCascadedAttributesData sAttrData;
-	A3D_INITIALIZE_DATA(A3DMiscCascadedAttributesData, sAttrData);
-	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(pcParentAttr, &sAttrData));
-
-	// computing the box if we're not using the callbacks (A3DDrawModelFileGetBoundingBox)
-// 	double adMatrix[16];
-// 	GetMatrix(adMatrix);
-
-	A3DDouble dX, dY, dZ;
-	A3DDouble dAbsX, dAbsY, dAbsZ;
-
-	const A3DDouble * pdCoord = &sTessBaseData.m_pdCoords[0];
-	const A3DDouble * pdEnd = &sTessBaseData.m_pdCoords[sTessBaseData.m_uiCoordSize - 1];
-
-	MaterialMappingKit cMaterialMapping;
-	DrawStyle(sAttrData, cMaterialMapping);
-
-	A3DUns32 uiPointSize = sTessBaseData.m_uiCoordSize / 3;
-
-	for(; pdCoord < pdEnd; pdCoord += 3)
+	switch (eType)
 	{
-		dX = *pdCoord;
-		dY = *(pdCoord + 1);
-		dZ = *(pdCoord + 2);
+		case kA3DTypeRiPolyWire:
+			return DrawPolyWires(pTess3DWire, pcTessBaseData, pcRepItem, pcParentAttr, cParentSegment);
+		break;
 
-//		VectorMatrixMult(dX, dY, dZ, adMatrix, &dAbsX, &dAbsY, &dAbsZ);
- 	}
+/*
+		case kA3DTypeRiCurve:
+			assert(false);
+			return A3D_ERROR;
+		break;
+*/
+	}
+	
 
-	CHECK_A3D_RETURN(A3DTessBaseGet(nullptr, &sTessBaseData));
-	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &sAttrData));
+	A3DStatus nStatus = A3D_SUCCESS;
 
-	return iRet;
+	SetGeometryStyle(L"lines", pTess3DWire, cParentSegment, pcParentAttr);
+
+	const A3DDouble * pdCoord = &pcTessBaseData->m_pdCoords[0];
+
+	A3DUns32 nPointCount = pcTessBaseData->m_uiCoordSize / 3;
+
+	_3DF::PointArray acWirePoints(nPointCount);
+
+	for(A3DUns32 nIndex = 0; nIndex < nPointCount; nIndex++)
+	{
+		acWirePoints[nIndex].x = pcTessBaseData->m_pdCoords[(nIndex * 3)];
+		acWirePoints[nIndex].y = pcTessBaseData->m_pdCoords[(nIndex * 3) + 1];
+		acWirePoints[nIndex].z = pcTessBaseData->m_pdCoords[(nIndex * 3) + 2];
+	}
+
+	cParentSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
+
+	return nStatus;
 }
 
-// 8-2-1. Facet 갯수를 가져옴
+A3DStatus _3DfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
+	const A3DMiscCascadedAttributes * pcParentAttr, _3DF::SegmentKey & cSegment)
+{
+	A3DTess3DWireData sWireData;
+	A3D_INITIALIZE_DATA(A3DTess3DWireData, sWireData);
+	CHECK_A3D_RETURN(A3DTess3DWireGet(pcTess3D, &sWireData));
+
+	cSegment.GetVisibilityControl().SetLines(true);
+
+	if(nullptr == sWireData.m_puiSizesWires) {
+		A3DUns32 nPointCount = pcTessBaseData->m_uiCoordSize / 3;
+		_3DF::PointArray aPoints(nPointCount);
+
+		A3DUns32 nPointIndex = 0;
+		for(A3DUns32 nIndex = 0; nIndex < nPointCount; nIndex++) {
+			nPointIndex = nIndex * 3;
+			aPoints[nIndex].x = pcTessBaseData->m_pdCoords[nPointIndex];
+			aPoints[nIndex].y = pcTessBaseData->m_pdCoords[nPointIndex + 1];
+			aPoints[nIndex].z = pcTessBaseData->m_pdCoords[nPointIndex + 2];
+		}
+
+		cSegment.InsertLine(aPoints.size(), aPoints.data());
+	}
+	else 
+	{
+		A3DUns32 nIndex = 0;
+		A3DUns32 nInfoIndex = 0;
+		A3DUns32 nPointIndex = 0;
+		bool bClosed = false;
+		Point cPoint;
+
+		_3DF::PointArray aPoints;
+
+		while(nIndex < sWireData.m_uiSizesWiresSize)
+		{
+			nInfoIndex = sWireData.m_puiSizesWires[nIndex];
+
+			if(nInfoIndex & kA3DTess3DWireDataIsClosing) {
+				bClosed = true;
+				nInfoIndex -= kA3DTess3DWireDataIsClosing;
+			}
+
+			if(!(nInfoIndex & kA3DTess3DWireDataIsContinuous)) //Continuious
+			{
+				if(0 < aPoints.size())
+				{
+					cSegment.InsertLine(aPoints.size(), aPoints.data());
+					aPoints.resize(0);
+				}
+			}
+			else {
+				nInfoIndex -= kA3DTess3DWireDataIsContinuous;
+			}
+
+			for(A3DUns32 i = 0; i < nInfoIndex; i++)
+			{
+				nPointIndex = sWireData.m_puiSizesWires[nIndex + 1 + i];
+				cPoint.x = pcTessBaseData->m_pdCoords[nPointIndex];
+				cPoint.y = pcTessBaseData->m_pdCoords[nPointIndex + 1];
+				cPoint.z = pcTessBaseData->m_pdCoords[nPointIndex + 2];
+				aPoints.push_back(cPoint);
+			}
+
+			if(bClosed)
+			{
+				nPointIndex = sWireData.m_puiSizesWires[nIndex + 1];
+				cPoint.x = pcTessBaseData->m_pdCoords[nPointIndex];
+				cPoint.y = pcTessBaseData->m_pdCoords[nPointIndex + 1];
+				cPoint.z = pcTessBaseData->m_pdCoords[nPointIndex + 2];
+				aPoints.push_back(cPoint);
+
+				cSegment.InsertLine(aPoints.size(), aPoints.data());
+				aPoints.resize(0);
+			}
+
+			nIndex += nInfoIndex + 1;
+		}
+	}
+
+	SetGeometryStyle(L"lines", cSegment, pcParentAttr);
+
+	return A3D_SUCCESS;
+}
+
+// 8-2-3. Facet 갯수를 가져옴
 A3DUns32 _3DfImport::Tess3DDataGetNumberOfFacets(const A3DTess3DData * pcTess3DData)
 {
 	A3DUns32 ui;
@@ -3055,25 +2964,6 @@ bool _3DfImport::ConvertFaceList(TessIndexMap & maPointIndexMap, TessIndexMap & 
 		}
 	}
 
-/*
-	for(int nIndex = 0; nIndex < 3; nIndex++) {
-		A3DUns32 nNormalIndex;
-		if(false == maNormalIndexMap.Lookup(nPointIndex[nIndex], nNormalIndex)) {
-			maNormalIndexMap.SetAt(nPointIndex[nIndex], pnFaceNormalIndex[nIndex]);
-		}
-	}
-*/
-	// Point Index를 바탕으로 Normal Index를 구성한다.
-/*
-	for(int nIndex = 0; nIndex < 3; nIndex++) {
-		A3DUns32 nNormalIndex;
-		if(false == maNormalIndexMap.Lookup(nPointIndex[nIndex], nNormalIndex)) {
-			maNormalIndexMap.SetAt(nPointIndex[nIndex], pnFaceNormalIndex[nIndex]);
-		}
-	}
-*/
-	
-
 	anFacelistArray.push_back(3);
 	anFacelistArray.push_back(nPointIndex[0]);
 	anFacelistArray.push_back(nPointIndex[1]);
@@ -3094,8 +2984,28 @@ void _3DfImport::AddTriangle(ConvertFaceInfo & cInFaceInfo,
 	int const pnInFaceVertexColorIndices[3],	// optional vertex color indices into the RGBA color array for this triangle
 	A3DUns32  nInVertexParamSize)				// vertex parameter size (0 if no parameters)
 {
+	if(pnInFaceListIndices[0] == pnInFaceListIndices[1] || pnInFaceListIndices[1] == pnInFaceListIndices[2] || pnInFaceListIndices[0] == pnInFaceListIndices[2]) {
+		return;
+	}
+
 	// Face List 숫자 추가
 	cInFaceInfo.aOutFaceList.push_back(3);
+
+	_3DF::Vector cNormal;
+	bool bZeroLengthFlag = false;
+
+	double dLength0 = cInFaceInfo.aInNormals[pnInFaceVertexNromalIndices[0]].LengthSquared();
+	double dLength1 = cInFaceInfo.aInNormals[pnInFaceVertexNromalIndices[1]].LengthSquared();
+	double dLength2 = cInFaceInfo.aInNormals[pnInFaceVertexNromalIndices[2]].LengthSquared();
+	
+	if(0.01 > dLength0 || 0.01 > dLength1 || 0.01 > dLength2) {
+		bZeroLengthFlag = true;
+		_3DF::Vector cX = cInFaceInfo.aInPoints[pnInFaceListIndices[1]] - cInFaceInfo.aInPoints[pnInFaceListIndices[0]];
+		_3DF::Vector cY = cInFaceInfo.aInPoints[pnInFaceListIndices[2]] - cInFaceInfo.aInPoints[pnInFaceListIndices[0]];
+
+		cNormal = cX.Cross(cY);
+		cNormal.Normalize();
+	}
 
 	for(int nVertexIndex = 0; nVertexIndex < 3; nVertexIndex++)
 	{
@@ -3117,12 +3027,17 @@ void _3DfImport::AddTriangle(ConvertFaceInfo & cInFaceInfo,
 				cInFaceInfo.aOutFaceList.push_back(static_cast<int>(cInFaceInfo.aOutFacePoints.size() - 1));
 
 				if(cInFaceInfo.aInNormals.size() > 0) {
-					cInFaceInfo.aOutFaceVertexNormals.push_back(cInFaceInfo.aInNormals[pnInFaceVertexNromalIndices[nVertexIndex]]);
+					if(false == bZeroLengthFlag) {
+						cInFaceInfo.aOutFaceVertexNormals.push_back(cInFaceInfo.aInNormals[pnInFaceVertexNromalIndices[nVertexIndex]]);
+					}
+					else {
+						cInFaceInfo.aOutFaceVertexNormals.push_back(cNormal);
+					}
 				}
 
 				if(nInVertexParamSize > 0) {
 					for(A3DUns32 k = 0; k < nInVertexParamSize; k++) {
-						cInFaceInfo.aOutFaceVertexParams.push_back(cInFaceInfo.cInParams[pnInFaceVertexParamIndices[nVertexIndex] + k]);
+						cInFaceInfo.aOutFaceVertexParams.push_back(cInFaceInfo.aInParams[pnInFaceVertexParamIndices[nVertexIndex] + k]);
 					}
 				}
 
@@ -3132,53 +3047,107 @@ void _3DfImport::AddTriangle(ConvertFaceInfo & cInFaceInfo,
 
 				cInFaceInfo.mOutIndexMap[pnInFaceListIndices[nVertexIndex]].push_back(static_cast<int>(cInFaceInfo.aOutFacePoints.size() - 1));
 				cInFaceInfo.aOutVertexRefs.push_back(1);
-
+				
 				break;
 			}
 			// Index Map에서 FaceListIndex를 발견한 경우 처리
-			else if(cInFaceInfo.aInNormals.empty() ||
-				cInFaceInfo.aOutFaceVertexNormals[*cOutIndexIterator].Dot(cInFaceInfo.aInNormals[pnInFaceVertexNromalIndices[nVertexIndex]]) >= cInFaceInfo.fInNormalCosine)
+			else if(false == bZeroLengthFlag)
 			{
-				bool bMatchingFlag = true;
-				for(A3DUns32 k = 0; k < nInVertexParamSize; k++) {
-					if(cInFaceInfo.aOutFaceVertexParams[*cOutIndexIterator + k] != cInFaceInfo.cInParams[pnInFaceVertexParamIndices[nVertexIndex] + k])
+				if(cInFaceInfo.aInNormals.empty() ||
+					cInFaceInfo.aOutFaceVertexNormals[*cOutIndexIterator].Dot(cInFaceInfo.aInNormals[pnInFaceVertexNromalIndices[nVertexIndex]]) >= cInFaceInfo.fInNormalCosine)
+				{
+					bool bMatchingFlag = true;
+					for(A3DUns32 k = 0; k < nInVertexParamSize; k++) {
+						if(cInFaceInfo.aOutFaceVertexParams[*cOutIndexIterator + k] != cInFaceInfo.aInParams[pnInFaceVertexParamIndices[nVertexIndex] + k])
+						{
+							bMatchingFlag = false;
+							break;
+						}
+					}
+
+					if(cInFaceInfo.aInColors.size() > 0) {
+						if(cInFaceInfo.aOutFaceVertexColors[*cOutIndexIterator] != cInFaceInfo.aInColors[pnInFaceVertexColorIndices[nVertexIndex]]) {
+							bMatchingFlag = false;
+						}
+					}
+
+					if(true == bMatchingFlag)
 					{
-						bMatchingFlag = false;
+						// 찾은 Index를 이용해서 Face List를 추가한다.
+						cInFaceInfo.aOutFaceList.push_back(*cOutIndexIterator);
+						cInFaceInfo.aOutVertexRefs[*cOutIndexIterator] += 1;
+
+						if(!cInFaceInfo.aInNormals.empty())
+						{
+							int ref_count = cInFaceInfo.aOutVertexRefs[*cOutIndexIterator];
+
+							cInFaceInfo.aOutFaceVertexNormals[*cOutIndexIterator] = (ref_count - 1) / (float) ref_count * cInFaceInfo.aOutFaceVertexNormals[*cOutIndexIterator] +
+								cInFaceInfo.aInNormals[pnInFaceVertexNromalIndices[nVertexIndex]] / (float) ref_count;
+
+							cInFaceInfo.aOutFaceVertexNormals[*cOutIndexIterator].Normalize();
+						}
 						break;
 					}
-				}
-
-				if(cInFaceInfo.aInColors.size() > 0) {
-					if(cInFaceInfo.aOutFaceVertexColors[*cOutIndexIterator] != cInFaceInfo.aInColors[pnInFaceVertexColorIndices[nVertexIndex]])
-						bMatchingFlag = false;
-				}
-
-				if(true == bMatchingFlag)
-				{
-					// 찾은 Index를 이용해서 Face List를 추가한다.
-					cInFaceInfo.aOutFaceList.push_back(*cOutIndexIterator);
-					cInFaceInfo.aOutVertexRefs[*cOutIndexIterator] += 1;
-
-					if(!cInFaceInfo.aInNormals.empty())
-					{
-						int ref_count = cInFaceInfo.aOutVertexRefs[*cOutIndexIterator];
-
-						cInFaceInfo.aOutFaceVertexNormals[*cOutIndexIterator] = 
-							(ref_count - 1) / 
-							(float) ref_count * cInFaceInfo.aOutFaceVertexNormals[*cOutIndexIterator] + 
-							cInFaceInfo.aInNormals[pnInFaceVertexNromalIndices[nVertexIndex]] / (float) ref_count;
-						cInFaceInfo.aOutFaceVertexNormals[*cOutIndexIterator].Normalize();
-					}
-					break;
-				}
-			}
+				} // if(cInFaceInfo.aInNormals.empty() ||
+			} // else if(false == bZeroLengthFlag)
 
 			cOutIndexIterator++;
 		}
 	}
+
+
+}
+// 8. Face Draw Style 정의
+A3DStatus _3DfImport::SetGeometryStyle(CString strGeometry, const A3DRootBaseWithGraphics * pcBase, _3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+{
+	A3DMiscCascadedAttributes * pcAttrs;
+	A3DMiscCascadedAttributesData cAttrsData;
+	CreateAndPushCascadedAttributes(pcBase, pcParentAttr, &pcAttrs, &cAttrsData);
+
+	_3DF::MaterialMappingKit cMaterialMapping;
+	if(A3D_SUCCESS == DrawStyle(cAttrsData, cMaterialMapping)) {
+		if(true == cMaterialMapping.IsAllocate()) {
+			SegmentKey cStyleSegment;
+			if(true == FindMaterialMapping(strGeometry, cMaterialMapping, cStyleSegment)) {
+				SetStyle(cSegment, cStyleSegment);
+			}
+			else {
+				SetStyleMaterialMapping(strGeometry, cMaterialMapping, cSegment);
+			}
+		}
+	}
+
+	A3DMiscCascadedAttributesDelete(pcAttrs);
+	A3DMiscCascadedAttributesGet(nullptr, &cAttrsData);
+
+	return A3D_SUCCESS;
 }
 
-// 8. Face Draw Style 정의
+A3DStatus _3DfImport::SetGeometryStyle(CString strGeometry, _3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+{
+	A3DMiscCascadedAttributesData cAttrsData;
+	A3D_INITIALIZE_DATA(A3DMiscCascadedAttributesData, cAttrsData);
+	A3DMiscCascadedAttributesGet(pcParentAttr, &cAttrsData);
+
+	_3DF::MaterialMappingKit cMaterialMapping;
+	if(A3D_SUCCESS == DrawStyle(cAttrsData, cMaterialMapping)) {
+		if(true == cMaterialMapping.IsAllocate()) {
+			SegmentKey cStyleSegment;
+			if(true == FindMaterialMapping(strGeometry, cMaterialMapping, cStyleSegment)) {
+				SetStyle(cSegment, cStyleSegment);
+			}
+			else {
+				SetStyleMaterialMapping(strGeometry, cMaterialMapping, cSegment);
+			}
+		}
+	}
+
+	A3DMiscCascadedAttributesGet(nullptr, &cAttrsData);
+
+	return A3D_SUCCESS;
+}
+
+
 A3DStatus _3DfImport::DrawStyle(const A3DMiscCascadedAttributesData & cAttrsData, A3DInt32 * pnUVCoordinatesIndex,
 	A3DUns8 * pucTextureDimension, _3DF::MaterialMappingKit & cMaterialKit)
 {
@@ -3244,7 +3213,7 @@ A3DStatus _3DfImport::DrawStyle(const A3DMiscCascadedAttributesData & cAttrsData
 			if(true == bTransparencyDefined) { cDiffuseColor.alpha = fTransparency; }
 			cMaterialKit.SetColor(cDiffuseColor, _3DF::Material::Color::Type::Diffuse);
 
-			Log(2, L"DrawStyle: DiffuseColor R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
+			//Log(2, L"DrawStyle: DiffuseColor R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
 /*
 			nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiAmbient, &sRgbColorData));
@@ -3281,7 +3250,7 @@ A3DStatus _3DfImport::DrawStyle(const A3DMiscCascadedAttributesData & cAttrsData
 			_3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
 			cMaterialKit.SetColor(cDiffuseColor);
 
-			Log(2, L"DrawStyle: R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
+			//Log(2, L"DrawStyle: R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
 
 			//nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 		}
@@ -3310,40 +3279,42 @@ A3DStatus _3DfImport::DrawStyle(const A3DMiscCascadedAttributesData & cAttrsData
 
 	if(A3D_TRUE == pcStyleData->m_bMaterial)
 	{
-		A3DBool bMaterialIsTexture = false;
+		A3DGraphMaterialData materialdata;
+		A3D_INITIALIZE_DATA(A3DGraphMaterialData, materialdata);
 
-		// check if this material is a texture
-		CHECK_A3D_RETURN(A3DGlobalIsMaterialTexture(pcStyleData->m_uiRgbColorIndex, &bMaterialIsTexture));
+		nRetStatus = A3DGlobalGetGraphMaterialData(pcStyleData->m_uiRgbColorIndex, &materialdata);
+		A3DBool bMaterialIsTexture = A3D_FALSE;
+		A3DGlobalIsMaterialTexture(pcStyleData->m_uiRgbColorIndex, &bMaterialIsTexture);
 
 		if(A3D_TRUE == bMaterialIsTexture)
 		{
-			assert(false);
-/*
-			A3DGraphTextureApplicationData sTextureAppplicationData;
-			A3D_INITIALIZE_DATA(A3DGraphTextureApplicationData, sTextureAppplicationData);
-			CHECK_A3D_RETURN(A3DGlobalGetGraphTextureApplicationData(pcStyleData->m_uiRgbColorIndex,
-				&sTextureAppplicationData));
+			A3DGraphRgbColorData sRgbColorData;
+			A3D_INITIALIZE_DATA(A3DGraphRgbColorData, sRgbColorData);
 
-			*pnUVCoordinatesIndex = sTextureAppplicationData.m_iUVCoordinatesIndex;
+			nRetStatus = A3DGlobalGetGraphRgbColorData(materialdata.m_uiDiffuse, &sRgbColorData);
 
-			A3DGraphTextureDefinitionData sTextureDefinitionData;
-			A3D_INITIALIZE_DATA(A3DGraphTextureDefinitionData, sTextureDefinitionData);
-			CHECK_A3D_RETURN(A3DGlobalGetGraphTextureDefinitionData(sTextureAppplicationData.m_uiTextureDefinitionIndex,
-				&sTextureDefinitionData));
+			A3DGraphTextureApplicationData sTextureAppData;
+			A3D_INITIALIZE_DATA(A3DGraphTextureApplicationData, sTextureAppData);
 
-			*pucTextureDimension = sTextureDefinitionData.m_ucTextureDimension;
+			A3DGlobalGetGraphTextureApplicationData(pcStyleData->m_uiRgbColorIndex, &sTextureAppData);
 
-			_3DF::RGBAColor cDiffuseColor(sTextureDefinitionData.m_dRed, sTextureDefinitionData.m_dGreen,
-				sTextureDefinitionData.m_dBlue, sTextureDefinitionData.m_dAlpha);
+			A3DGraphTextureDefinitionData sTextureData;
+			A3D_INITIALIZE_DATA(A3DGraphTextureDefinitionData, sTextureData);
 
-			//cMaterialKit.SetDiffuseColor(cDiffuseColor);
+			A3DGlobalGetGraphTextureDefinitionData(sTextureAppData.m_uiTextureDefinitionIndex, &sTextureData);
 
-			//A3D_DRAW_CALL3(Material, kA3DDrawMaterialDiffuse, adColor, 4);
+			_3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
+			cMaterialKit.SetColor(cDiffuseColor, _3DF::Material::Color::Type::Diffuse);
 
-			nRetStatus = A3DGlobalGetGraphTextureDefinitionData(A3D_DEFAULT_TEXTURE_DEFINITION_INDEX, &sTextureDefinitionData);
+			CString strTexture;
+			if(sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
+				strTexture.Format(L"environment = texture_%d, mirror = (r = 0.5 g = 0.5 b = 0.5))", sTextureAppData.m_uiTextureDefinitionIndex);
+			}
+			else {
+				strTexture.Format(L"texture_%d", sTextureAppData.m_uiTextureDefinitionIndex);
+			}
 
-			nRetStatus = A3DGlobalGetGraphTextureApplicationData(A3D_DEFAULT_MATERIAL_INDEX, &sTextureAppplicationData);
-*/
+			cMaterialKit.SetTexture(strTexture);
 		}
 		else
 		{
@@ -3359,7 +3330,7 @@ A3DStatus _3DfImport::DrawStyle(const A3DMiscCascadedAttributesData & cAttrsData
 			if(true == bTransparencyDefined) {  cDiffuseColor.alpha = fTransparency; }
 			cMaterialKit.SetColor(cDiffuseColor, _3DF::Material::Color::Type::Diffuse);
 
-			Log(2, L"DrawStyle: DiffuseColor R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
+			//Log(2, L"DrawStyle: DiffuseColor R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
 /*
 			nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiAmbient, &sRgbColorData));
@@ -3397,7 +3368,7 @@ A3DStatus _3DfImport::DrawStyle(const A3DMiscCascadedAttributesData & cAttrsData
 			if(true == bTransparencyDefined) { cDiffuseColor.alpha = fTransparency; }
 			cMaterialKit.SetColor(cDiffuseColor);
 
-			Log(2, L"DrawStyle: R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
+			//Log(2, L"DrawStyle: R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
 
 			//A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 		}
@@ -3479,7 +3450,145 @@ A3DStatus _3DfImport::DrawTransformation(const A3DMiscTransformation * pcTransfo
 	return A3D_SUCCESS;
 }
 
-// == Attribute 관련 함수 ============================================================================
+//== Texture 관련 함수 ===============================================================================
+
+void _3DfImport::PopulateTextures()
+{
+/*
+	InitializeMagick(".");
+
+	HC_Set_Visibility("image = off");
+
+	A3DGlobal * pGlobal = NULL;
+	A3DGlobalGetPointer(&pGlobal);
+
+	A3DGlobalData globalData;
+	A3D_INITIALIZE_DATA(A3DGlobalData, globalData);
+
+	A3DGlobalGet(pGlobal, &globalData);
+
+	/ * This while loop is loading all the images. * /
+	VArray<unsigned char> pixels;
+
+	for(unsigned int ui = 0; ui < globalData.m_uiPicturesSize; ui++)
+	{
+		Query::GraphPicture graphPicture(ui);
+		if(!graphPicture.IsValid())
+			continue;
+
+		A3DGraphPictureData const & data = graphPicture.data;
+		bool	size_ok = (data.m_uiPixelWidth != 0 && data.m_uiPixelHeight != 0);
+
+		if(size_ok && data.m_eFormat == kA3DPictureBitmapRgbaByte)
+		{
+			InvertImage(data.m_pucBinaryData, data.m_uiPixelWidth, data.m_uiPixelHeight, true);
+			HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u, local = on", ui), data.m_uiPixelWidth, data.m_uiPixelHeight, data.m_pucBinaryData);
+		}
+		else if(size_ok && data.m_eFormat == kA3DPictureBitmapRgbByte)
+		{
+			InvertImage(data.m_pucBinaryData, data.m_uiPixelWidth, data.m_uiPixelHeight, false);
+			HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgb, name = image %u, local = on", ui), data.m_uiPixelWidth, data.m_uiPixelHeight, data.m_pucBinaryData);
+		}
+		else
+		{
+			ExceptionInfo exception;
+			GetExceptionInfo(&exception);
+			ImageInfo * image_info = CloneImageInfo((ImageInfo *) NULL);
+			Image * image = BlobToImage(image_info, (void *) data.m_pucBinaryData, data.m_uiSize, &exception);
+			if(image != NULL)
+			{
+				unsigned long width = image->magick_columns;
+				unsigned long height = image->magick_rows;
+				pixels.EnsureSize(width * height * 4);
+
+				ExportImagePixels(image, 0, 0, width, height, "RGBA", CharPixel, &pixels[0], &exception);
+				DestroyImage(image);
+				DestroyImageInfo(image_info);
+				DestroyExceptionInfo(&exception);
+
+				HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u, local = on", ui), width, height, &pixels[0]);
+			}
+		}
+	}
+
+	for(A3DUns32 ui = 0; ui < globalData.m_uiTextureDefinitionsSize; ui++)
+	{
+		Query::GraphTextureDefinition textureDefinition(ui);
+		if(!textureDefinition.IsValid())
+			continue;
+
+		A3DGraphTextureDefinitionData const & data = textureDefinition.data;
+
+		H_FORMAT_TEXT texture_options("source = image %u", data.m_uiPictureIndex);
+
+		if(data.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection)
+		{
+			texture_options.Append(", parameterization source = reflection vector");
+		}
+		else
+		{
+			texture_options.Append(", parameterization source = uv");
+		}
+
+		texture_options.Append(data.m_eTextureFunction == kA3DTextureFunctionModulate ? ", modulate" : ", no modulate");
+
+		char const * tiling = nullptr;
+		switch(data.m_eTextureWrappingModeS)
+		{
+			case kA3DTextureWrappingModeMirroredRepeat:
+			{
+				tiling = "mirror";
+			}	break;
+
+			case kA3DTextureWrappingModeClamp:
+			case kA3DTextureWrappingModeClampToBorder:
+			case kA3DTextureWrappingModeClampToEdge:
+			{
+				tiling = "drop";
+			}	break;
+
+			case kA3DTextureWrappingModeUnknown:
+			case kA3DTextureWrappingModeRepeat:
+			default:
+			{
+				tiling = "repeat";
+			}
+		}
+		texture_options.Append(", tiling = %s", tiling);
+
+		if(data.m_pTextureTransfo != nullptr)
+		{
+			A3DGraphTextureTransformationData transformationData;
+			A3D_INITIALIZE_DATA(A3DGraphTextureTransformationData, transformationData);
+			A3DGraphTextureTransformationGet(data.m_pTextureTransfo, &transformationData);
+			float textureMatrix[16] = { 0 };
+			for(int i = 0; i < 16; ++i)
+				textureMatrix[i] = static_cast<float>(transformationData.m_dMatrix[i]);
+			HC_Compute_Matrix_Inverse(textureMatrix, textureMatrix);
+
+			char textureTransformSegment[4096] = "";
+			HC_Open_Segment("/include library/texture_transformations");
+			{
+				HC_Open_Segment("");
+				{
+					HC_Show_Segment(HC_Create_Segment("."), textureTransformSegment);
+					HC_Set_Texture_Matrix(textureMatrix);
+				}
+				HC_Close_Segment();
+			}
+			HC_Close_Segment();
+
+			texture_options.Append(", transform = %s", textureTransformSegment);
+		}
+
+		texture_options.Append(", decal, interpolation filter = on, no decimation filter, no downsampling, parameter offset = 0");
+		HC_Define_Local_Texture(H_FORMAT_TEXT("texture_%u", ui), texture_options);
+	}
+	DestroyMagick();
+*/
+}
+
+//== Attribute 관련 함수 =============================================================================
 
 // 1. Parent에서 받은(계단식으로) Attribute를 이용해서, Attribute를 생성
 A3DStatus _3DfImport::CreateAndPushCascadedAttributes(const A3DRootBaseWithGraphics * pcBase, const A3DMiscCascadedAttributes * pcParentAttr,
@@ -3562,10 +3671,10 @@ A3DStatus _3DfImport::IsShow(const A3DRootBaseWithGraphics * pGraphics)
 }
 
 // 5. 주어진 Material Mapping을 이용해서 
-bool _3DfImport::SetStyleMaterialMapping(MaterialMappingKit const & cInKit, _3DF::SegmentKey & cSegment)
+bool _3DfImport::SetStyleMaterialMapping(CString strGeomety, _3DF::MaterialMappingKit const & cInKit, _3DF::SegmentKey & cSegment)
 {
 	_3DF::SegmentKey cStyleSegment = m_pcModelSegment->StylesInclude().Subsegment(L"material_%d", m_nShellMaterialId++);
-	cStyleSegment.SetMaterialMapping(cInKit);
+	cStyleSegment.SetMaterialMapping(strGeomety, cInKit);
 
 	_3DF::StyleControl cStyleControl = cSegment.GetStyleControl();
 	_3DF::StyleKey cStyle = cSegment.GetStyleControl().PushSegment(cStyleSegment);
@@ -3575,6 +3684,7 @@ bool _3DfImport::SetStyleMaterialMapping(MaterialMappingKit const & cInKit, _3DF
 	}
 
 	MaterialMappingStyleKit cMaterialMappingStyle;
+	cMaterialMappingStyle.strGeometry = strGeomety;
 	cMaterialMappingStyle.cMaterialMappingKit = cInKit;
 	cMaterialMappingStyle.cStyleSegment = cStyleSegment;
 
@@ -3597,12 +3707,14 @@ bool _3DfImport::SetStyle(SegmentKey & cSegment, SegmentKey & cStyleSegment)
 }
 
 // 6. 미리 저장되어 있는 Material Mapping Kit을 찾아오는 함수
-bool _3DfImport::FindMaterialMapping(MaterialMappingKit const & cInKit, SegmentKey & cOutStyleSegment)
+bool _3DfImport::FindMaterialMapping(CString strGeometry, MaterialMappingKit const & cInKit, SegmentKey & cOutStyleSegment)
 {
 	for(auto & cMaterialStyle : m_vcMaterialMappingStyleVector) {
-		if(cMaterialStyle.cMaterialMappingKit == cInKit) {
-			cOutStyleSegment = cMaterialStyle.cStyleSegment;
-			return true;
+		if(0 == cMaterialStyle.strGeometry.CompareNoCase(strGeometry)) {
+			if(cMaterialStyle.cMaterialMappingKit == cInKit) {
+				cOutStyleSegment = cMaterialStyle.cStyleSegment;
+				return true;
+			}
 		}
 	}
 
@@ -3623,34 +3735,31 @@ A3DStatus _3DfImport::GetMatrix(A3DMiscTransformation * pcLocation, MbMatrix3D &
 
 	if(eType == kA3DTypeMiscCartesianTransformation)
 	{
-		A3DMiscCartesianTransformationData cTransformationData;
-		A3D_INITIALIZE_DATA(A3DMiscCartesianTransformationData, cTransformationData);
+		A3DMiscCartesianTransformationData sData;
+		A3D_INITIALIZE_DATA(A3DMiscCartesianTransformationData, sData);
 
-		CHECK_A3D_RETURN(A3DMiscCartesianTransformationGet(pcLocation, &cTransformationData));
+		CHECK_A3D_RETURN(A3DMiscCartesianTransformationGet(pcLocation, &sData));
 
-		double m_dTopoContextScaleX = cTransformationData.m_sScale.m_dX;
-		double m_dTopoContextScaleY = cTransformationData.m_sScale.m_dY;
-		double m_dTopoContextScaleZ = cTransformationData.m_sScale.m_dZ;
-
-		MbCartPoint3D cOrigin = GetMbCartPoint3D(cTransformationData.m_sOrigin);
-		cOrigin.Scale(m_dTopoContextScaleX, m_dTopoContextScaleY, m_dTopoContextScaleZ);
-		MbVector3D cAxisX = GetMbVector3D(cTransformationData.m_sXVector);
-		MbVector3D cAxisY = GetMbVector3D(cTransformationData.m_sYVector);
+		MbCartPoint3D cOrigin = GetMbCartPoint3D(sData.m_sOrigin);
+		MbVector3D cAxisX = GetMbVector3D(sData.m_sXVector);
+		MbVector3D cAxisY = GetMbVector3D(sData.m_sYVector);
 		MbVector3D cAxisZ;
 
-		if(cTransformationData.m_ucBehaviour & kA3DTransformationMirror) {
+		if(sData.m_ucBehaviour & kA3DTransformationMirror) {
 			cAxisZ = cAxisY | cAxisX;
 		}
 		else {
 			cAxisZ = cAxisX | cAxisY;
 		}
 
-		cMatrix.SetOrigin() = cOrigin;
 		cMatrix.SetAxisX() = cAxisX;
 		cMatrix.SetAxisY() = cAxisY;
 		cMatrix.SetAxisZ() = cAxisZ;
+		cMatrix.Scale(sData.m_sScale.m_dX, sData.m_sScale.m_dY, sData.m_sScale.m_dZ);
 
-		CHECK_A3D_RETURN(A3DMiscCartesianTransformationGet(nullptr, &cTransformationData));
+		cMatrix.SetOrigin() = cOrigin;
+
+		CHECK_A3D_RETURN(A3DMiscCartesianTransformationGet(nullptr, &sData));
 	}
 	else if(eType == kA3DTypeMiscGeneralTransformation)
 	{

@@ -48,7 +48,7 @@ public:
 	HC_KEY m_nKey;
 };
 
-class  MultiSelectItem
+class MultiSelectItem
 {
 public:
 	MultiSelectItem(HC_KEY key);

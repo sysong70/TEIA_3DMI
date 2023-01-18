@@ -380,6 +380,8 @@ public:
 };
 */
 
+template <typename F> class Vector_3D;
+
 template <typename F>
 class Point_3D
 {
@@ -395,6 +397,8 @@ public:
 	explicit Point_3D(Point_3D<D> const & that) : x((F) that.x), y((F) that.y), z((F) that.z) {}
 
 	explicit Point_3D(Vector_3D<F> const & v);
+
+	Vector_3D<F> const operator- (Point_3D const & p) const { return Vector_3D(x - p.x, y - p.y, z - p.z); };
 
 	void Set(F X, F Y, F Z) { x = X; y = Y; z = Z; };
 };
@@ -476,10 +480,16 @@ using Vector = Vector_3D<float>;
 // using PointArray = std::vector<HPoint>;
 // using VectorArray = std::vector<Vector>;
 
-using IntArray = std::vector<int, boost::pool_allocator<int>>;
-using FloatArray = std::vector<float, boost::pool_allocator<float>>;
-using PointArray = std::vector<Point, boost::pool_allocator<Point>>;
-using VectorArray = std::vector<Vector, boost::pool_allocator<Vector>>;
+// using IntArray = std::vector<int, boost::pool_allocator<int>>;
+// using FloatArray = std::vector<float, boost::pool_allocator<float>>;
+// using PointArray = std::vector<_3DF::Point, boost::pool_allocator<Point>>;
+// using VectorArray = std::vector<_3DF::Vector, boost::pool_allocator<Vector>>;
+
+using ByteArray = std::vector<byte>;
+using IntArray = std::vector<int>;
+using FloatArray = std::vector<float>;
+using PointArray = std::vector<_3DF::Point>;
+using VectorArray = std::vector<_3DF::Vector>;
 
 // template <typename F>
 // _3DF_INLINE	Point_3D<F>::Point_3D(Vector_3D<F> const & v) : x(v.x), y(v.y), z(v.z) {}

@@ -106,6 +106,7 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 	DLL::_3DF::Interface cInterfaace;
 	cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, strErrorMessage);
 
+	// #3DF_Debug
  	//SaveHsfFile(L"Z://Test.hsf", pcHoopsView);
 
 	//pcHoopsView->SetSmoothTransition(true);

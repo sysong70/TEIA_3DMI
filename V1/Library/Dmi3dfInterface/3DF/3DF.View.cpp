@@ -16,6 +16,10 @@
 #include "3DF.Segment.h"
 #include "3DF.Selection.h"
 
+#include "3DF.Selectability.h"
+#include "3DF.Visibility.h"
+#include "3DF.MaterialMapping.h"
+
 #include "3DF.View.OpCameraPan.h"
 
 #include "../Signal/Signal.h"
@@ -77,13 +81,9 @@ void View::Init()
 	
 	SetProjMode(ProjOrthographic);
 
-	//SetLineAntialiasing(true);
-
 	SetViewTransparency();
 
 	SetSmoothTransition(false);
-
-	SetPolygonHandednessMode(HandednessLeft);
 
 	GetModel()->SetStaticModel(true);
 	GetModel()->SetLMVModel(true);
@@ -130,7 +130,7 @@ void View::Init()
 	// File Import 시작
 	//ImportExchangeFile(nViewId, strFilePathName);
 
-	SetHandednessFromModel();
+	bool bFlag = SetHandednessFromModel();
 
 	SetSuppressUpdate(false);
 }

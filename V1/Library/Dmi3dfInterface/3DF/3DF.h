@@ -27,8 +27,10 @@
 
 #ifdef _3DF_EXPORT
 #	define API_3DF __declspec (dllexport)
+#	define DLLEXPORT_TEMPLATE
 #else
 #	define API_3DF __declspec (dllimport)
+#	define DLLEXPORT_TEMPLATE extern
 #endif
 
 #define OPEN_3DF_NAMESPACE namespace _3DF {
@@ -49,6 +51,10 @@ class LineKey;
 class BoundingKit;
 class NamedStyleDefinition;
 class StyleKey;
+
+class SelectabilityControl;
+class VisibilityControl;
+class MarkerAttributeControl;
 //==================================================================================================
 
 enum class ModelHandedness

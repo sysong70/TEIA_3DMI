@@ -57,6 +57,18 @@ ShellKit & ShellKit::SetTristrips(IntArray const & acInTristrips)
 	return *this;
 }
 
+ShellKit & ShellKit::SetParameters(FloatArray const & aInParameters)
+{
+	m_paParameterArray = &aInParameters;
+	return *this;
+}
+
+ShellKit & ShellKit::SetColors(RGBAColorArray const & aInColors)
+{
+	m_paColorArray = &aInColors;
+	return *this;
+}
+
 bool ShellKit::ShowPoints(PointArray & acOutPoints) const
 {
 	if(nullptr == m_pacPointArray) {
@@ -97,20 +109,32 @@ bool ShellKit::ShowTristrips(IntArray & acOutTristrips) const
 	return true;
 }
 
+bool ShellKit::ShowParameters(FloatArray & aOutParameters) const
+{
+	if(nullptr == m_paParameterArray) {
+		return false;
+	}
+
+	aOutParameters = *m_paParameterArray;
+	return true;
+}
+
+bool ShellKit::ShowColors(RGBAColorArray & aOutColors) const
+{
+	if(nullptr == m_paColorArray) {
+		return false;
+	}
+
+	aOutColors = *m_paColorArray;
+	return true;
+}
+
 ShellKit & ShellKit::SetMaterialMapping(MaterialMappingKit const & cInkit)
 {
 	m_cMaterialMappingKit = cInkit;
 	return *this;
 }
 
-/*
-ShellKit & ShellKit::operator = (ShellKit const & cOther)
-{
-	m_cMaterialMappingKit = cOther.GetM
-	m_nKey = cOther.KeyValue();
-	return *this;
-}
-*/
 
 //== ShellKey Class ================================================================================
 

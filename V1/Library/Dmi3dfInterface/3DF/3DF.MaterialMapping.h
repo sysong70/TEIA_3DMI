@@ -1,4 +1,5 @@
 ﻿#pragma once
+#pragma warning(disable : 4251)
 
 #include "3DF.h"
 
@@ -12,7 +13,7 @@ class API_3DF MaterialMappingKit
 public:
 	MaterialMappingKit();
 
-	//----- Face Color 설정 -----
+	//----- Color 설정 -----
 	MaterialMappingKit & SetColor(RGBAColor const & cInRgbaColor, Material::Color::Type eType = Material::Color::Type::Diffuse);
 	MaterialMappingKit & SetGloss(float fGloss);
 	bool ShowColor(Material::Color::Type eType, RGBAColor & cOutRgbaColor) const;
@@ -29,46 +30,33 @@ public:
 	float Gloss() const;
 	bool GlossFlag() const;
 
+	CString Texture() const;
+	void SetTexture(CString strTexture);
+
 private:
 	RGBAColor m_pcColors[(int) Material::Color::Type::Count];
 	bool m_pbSetColorFlags[(int) Material::Color::Type::Count];
 	float m_fGloss;
 	bool m_bGlossFlag;
+	CString m_strTexture;
 };
 
-class MaterialMappingControl
+class API_3DF MaterialMappingControl
 {
 public:
 	MaterialMappingControl(SegmentKey & cInSegmentKey);
 
-	//== Selectability 설정 =========================================================================
-	MaterialMappingControl & SetWindows(bool bInValue);
-	MaterialMappingControl & SetEdges(bool bInValue);
-	MaterialMappingControl & SetFaces(bool bInValue);
-	MaterialMappingControl & SetLights(bool bInValue);
-	MaterialMappingControl & SetLines(bool bInValue);
-	MaterialMappingControl & SetMarkers(bool bInValue);
-	MaterialMappingControl & SetVertices(bool bInValue);
-	MaterialMappingControl & SetText(bool bInValue);
-	MaterialMappingControl & SetGeometry(bool bInValue);
-	MaterialMappingControl & SetEverything(bool bInValue);
+	//== Color 설정 =================================================================================
+	MaterialMappingControl & SetMarkerColor(RGBAColor const & cInRgbaColor);
 
-	MaterialMappingControl & UnsetWindows();
-	MaterialMappingControl & UnsetEdges();
-	MaterialMappingControl & UnsetFaces();
-	MaterialMappingControl & UnsetLights();
-	MaterialMappingControl & UnsetLines();
-	MaterialMappingControl & UnsetMarkers();
-	MaterialMappingControl & UnsetVertices();
-	MaterialMappingControl & UnsetText();
-	MaterialMappingControl & UnsetGeometry();
-	MaterialMappingControl & UnsetEverything();
+	//== Texture 설정 ===============================================================================
+	void PopulateTextures();
 
 private:
 	SegmentKey & m_cInSegmentKey;
 	
-	MaterialMappingControl & SetSelectability(CString strInType, bool bInValue);
-	MaterialMappingControl & UnSetSelectability(CString strInType);
+	MaterialMappingControl & SetColor(CString strGeometry, CString strChannel, RGBAColor const & cInRgbaColor);
+	MaterialMappingControl & UnSetColor(CString strInType);
 };
 
 CLOSE_3DF_NAMESPACE

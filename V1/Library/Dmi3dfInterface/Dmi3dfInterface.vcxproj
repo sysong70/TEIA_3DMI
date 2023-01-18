@@ -130,9 +130,11 @@
     <ClInclude Include="3DF\3DF.Control.h" />
     <ClInclude Include="3DF\3DF.Database.h" />
     <ClInclude Include="3DF\3DF.h" />
+    <ClInclude Include="3DF\3DF.Image.h" />
     <ClInclude Include="3DF\3DF.Include.h" />
     <ClInclude Include="3DF\3DF.Key.h" />
     <ClInclude Include="3DF\3DF.Line.h" />
+    <ClInclude Include="3DF\3DF.Marker.h" />
     <ClInclude Include="3DF\3DF.Material.h" />
     <ClInclude Include="3DF\3DF.MaterialMapping.h" />
     <ClInclude Include="3DF\3DF.Math.h" />
@@ -149,6 +151,8 @@
     <ClInclude Include="3DFSignal.h" />
     <ClInclude Include="3DFSignal.ViewManager.h" />
     <ClInclude Include="3DF\3DF.View.OpCameraPan.h" />
+    <ClInclude Include="3DF\3DF.Visibility.h" />
+    <ClInclude Include="3DF\3DF.MarkerAttribute.h" />
     <ClInclude Include="Import\DLL.3DF.Interface.h" />
     <ClInclude Include="Import\DLL.h" />
     <ClInclude Include="Import\DLL.Helper.h" />
@@ -169,9 +173,11 @@
     <ClCompile Include="3DF\3DF.Color.cpp" />
     <ClCompile Include="3DF\3DF.Control.cpp" />
     <ClCompile Include="3DF\3DF.Database.cpp" />
+    <ClCompile Include="3DF\3DF.Image.cpp" />
     <ClCompile Include="3DF\3DF.Include.cpp" />
     <ClCompile Include="3DF\3DF.Key.cpp" />
     <ClCompile Include="3DF\3DF.Line.cpp" />
+    <ClCompile Include="3DF\3DF.Marker.cpp" />
     <ClCompile Include="3DF\3DF.Material.cpp" />
     <ClCompile Include="3DF\3DF.MaterialMapping.cpp" />
     <ClCompile Include="3DF\3DF.Math.cpp" />
@@ -185,6 +191,8 @@
     <ClCompile Include="3DF\3DF.View.cpp" />
     <ClCompile Include="3DF\3DF.Segment.cpp" />
     <ClCompile Include="3DF\3DF.View.OpCameraPan.cpp" />
+    <ClCompile Include="3DF\3DF.Visibility.cpp" />
+    <ClCompile Include="3DF\3DF.MarkerAttribute.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="3DFSignal.ApplicationManager.cpp" />
     <ClCompile Include="3DFSignal.Interface.cpp" />

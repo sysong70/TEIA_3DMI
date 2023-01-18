@@ -25,6 +25,7 @@ struct ImportOption
 
 struct MaterialMappingStyleKit
 {
+	CString strGeometry;
 	_3DF::SegmentKey cStyleSegment;
 	_3DF::MaterialMappingKit cMaterialMappingKit;
 };
@@ -57,7 +58,7 @@ protected:
 		A3DUns32 * pnInIndices;							// "global" index array for normals, points and vertex parameters
 		_3DF::PointArray aInPoints;						// "global" point array
 		_3DF::VectorArray aInNormals;					// "global" normal array
-		_3DF::FloatArray cInParams;						// optional "global" parameter array
+		_3DF::FloatArray aInParams;						// optional "global" parameter array
 		_3DF::RGBAColorArray aInColors;					// optional RGBA color array
 		A3DTessFaceData * pcInTessFaceData;				// tessellation data for *this* (CAD) face
 		float fInNormalCosine{};							// cosine limit for determining equal normals
@@ -109,19 +110,24 @@ protected:
 
 	A3DStatus DrawSet(const A3DRiSet * pSet, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
 
-	A3DStatus DrawRiBrepModel(const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cSegment,
-		const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData);
+	A3DStatus DrawRiBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, 
+		_3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData);
 
-	A3DStatus DrawRiPolyBrepModel(const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cSegment,
-		const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData);
+	A3DStatus DrawRiPolyBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, 
+		_3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData);
 
-	A3DStatus DrawRiPolyWire(const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr,
-		const A3DMiscCascadedAttributesData & cAttrData);
+	A3DStatus DrawRiPolyWire(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, 
+		_3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData);
+
+	A3DStatus DrawRiPointSet(const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr);
 
 	A3DStatus DrawRiCurve(A3DRiCurve * pcInputRiCurve, _3DF::SegmentKey & cParentSegment, A3DMiscCascadedAttributes * pcParentAttr);
 
 	A3DStatus DrawMarkupView(const A3DMkpView * pcView, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
-	A3DStatus DrawAnnotation(const A3DMkpAnnotationEntity * pcAnnotation, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+
+	A3DStatus DrawAnnotations(const A3DMkpAnnotationEntity ** pcAnnotation, A3DUns32 nAnnotationsSize, _3DF::SegmentKey & cParentSegment);
+	A3DStatus DrawAnnotation(const A3DMkpAnnotationEntity * pcAnnotation, A3DMiscCascadedAttributes * pcParentAttr, _3DF::SegmentKey & cParentSegment);
+
 	A3DStatus DrawAnnotationSet(const A3DMkpAnnotationSet * pcAnnotationSet, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
 	A3DStatus DrawAnnotationReference(const A3DMkpAnnotationItem * /*pcAnnotationItem*/, const A3DMiscCascadedAttributes * /*pcParentAttr*/);
 	A3DStatus DrawAnnotationItem(const A3DMkpAnnotationItem * pcAnnotationItem, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
@@ -130,7 +136,7 @@ protected:
 
 	A3DStatus DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
 
-	A3DStatus DrawTess3D(const A3DTess3D * pcTess3D, const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+	A3DStatus DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem, const A3DMiscCascadedAttributes * pcParentAttr, _3DF::SegmentKey & cParentSegment);
 
 	UINT ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo);
 	UINT DrawTessFaceDataTriangle(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriangleIndices, A3DUns32 & nTriangleSizeIndex, A3DUns32 & nTriangleStartIndex,
@@ -153,14 +159,16 @@ protected:
 		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray);
 
 	UINT ConvertTessFaceDataTriangleStripeOneNormal(ConvertFaceInfo & cInFaceInfo);
-	UINT DrawTessFaceDataTriangleStripeOneNormal(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
-		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray);
 
+	UINT ConveTessFaceDataTriangleTextured(ConvertFaceInfo & cInFaceInfo);
 	UINT DrawTessFaceDataTriangleTextured(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
 		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray);
 	
-	A3DStatus DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cParentSegment, 
-		const A3DMiscCascadedAttributes * pcParentAttr);
+	A3DStatus DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
+		const A3DMiscCascadedAttributes * pcParentAttr, _3DF::SegmentKey & cParentSegment);
+
+	A3DStatus DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
+		const A3DMiscCascadedAttributes * pcParentAttr, _3DF::SegmentKey & cSegment);
 
 	A3DUns32 Tess3DDataGetNumberOfFacets(const A3DTess3DData * pcTess3DData);
 	A3DUns32 TessFaceDataGetNumberOfFacets(const A3DTessFaceData * pcTessFaceData);
@@ -172,10 +180,16 @@ protected:
 	void AddTriangle(ConvertFaceInfo & cInFaceInfo, int const pnInFaceListIndices[3], int const pnInFaceVertexNromalIndices[3],
 		int const pnInFaceVertexParamIndices[3], int const pnInFaceVertexColorIndices[3], A3DUns32  nInVertexParamSize);
 
+	A3DStatus SetGeometryStyle(CString strGeometry, const A3DRootBaseWithGraphics * pcBase, _3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+	A3DStatus SetGeometryStyle(CString strGeometry, _3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+
 	A3DStatus DrawStyle(const A3DMiscCascadedAttributesData & cAttrsData, A3DInt32 * pnUVCoordinatesIndex, A3DUns8 * pucTextureDimension, _3DF::MaterialMappingKit & cMaterialKit);
 	A3DStatus DrawStyle(const A3DMiscCascadedAttributesData & cAttrsData, _3DF::MaterialMappingKit & cMaterialKit);
 
 	A3DStatus DrawTransformation(const A3DMiscTransformation * pcTransformation);
+
+	//== Texture 관련 함수 ===========================================================================
+	void PopulateTextures();
 
 	//== Attribute 관련 함수 ====================================================================
 	A3DStatus CreateAndPushCascadedAttributes(const A3DRootBaseWithGraphics * pcBase, const A3DMiscCascadedAttributes * pcParentAttr,
@@ -191,9 +205,10 @@ protected:
 
 	A3DStatus IsShow(const A3DRootBaseWithGraphics * pGraphics);
 
-	bool SetStyleMaterialMapping(_3DF::MaterialMappingKit const & cInKit, _3DF::SegmentKey & cSegment);
+	bool SetStyleMaterialMapping(CString strGeomety, _3DF::MaterialMappingKit const & cInKit, _3DF::SegmentKey & cSegment);
+
 	bool SetStyle(_3DF::SegmentKey & cSegment, _3DF::SegmentKey & cStyleSegment);
-	bool FindMaterialMapping(_3DF::MaterialMappingKit const & cInKit, _3DF::SegmentKey & cOutStyleSegment);
+	bool FindMaterialMapping(CString strGeometry, _3DF::MaterialMappingKit const & cInKit, _3DF::SegmentKey & cOutStyleSegment);
 
 	// == C3D 관련 Utility 함수 =================================================================
 protected:
@@ -217,6 +232,7 @@ private:
 	_3DF::SegmentKey m_cPartsIncludeSegment;
 	_3DF::SegmentKey m_cPoccsIncludeSegment;
 	_3DF::SegmentKey m_cRisIncludeSegment;
+	_3DF::SegmentKey m_cPmiIncludeSegment;
 
 	CAtlMap<DWORD_PTR, HC_KEY> m_mPartsMap;
 

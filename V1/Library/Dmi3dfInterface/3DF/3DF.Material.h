@@ -50,7 +50,6 @@ public:
 			Diffuse,
 			Specular,
 			Emission,
-			Line,
 			Count
 		};
 

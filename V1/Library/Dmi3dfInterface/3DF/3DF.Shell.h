@@ -22,21 +22,25 @@ public:
 	ShellKit & SetNormals(VectorArray const & acInVectors);
 	ShellKit & SetFacelist(IntArray const & acInFacelist);
 	ShellKit & SetTristrips(IntArray const & acInTristrips);
+	ShellKit & SetParameters(FloatArray const & aInParameters);
+	ShellKit & SetColors(RGBAColorArray const & aInColors);
 
 	bool ShowPoints(PointArray & acOutPoints) const;
 	bool ShowNormals(VectorArray & acOutVectors) const;
 	bool ShowFacelist(IntArray & acOutFacelist) const;
 	bool ShowTristrips(IntArray & acOutTristrips) const;
+	bool ShowParameters(FloatArray & aOutParameters) const;
+	bool ShowColors(RGBAColorArray & aOutColors) const;
 
 	ShellKit & SetMaterialMapping(MaterialMappingKit const & cInkit);
-
-	//ShellKit & operator = (ShellKit const & cOther);
 
 private:
 	PointArray const * m_pacPointArray = nullptr;
 	VectorArray const * m_pacNormalArray = nullptr;
 	IntArray const * m_panFacelistArray = nullptr;
 	IntArray const * m_panTristripsArray = nullptr;
+	FloatArray const * m_paParameterArray = nullptr;
+	RGBAColorArray const * m_paColorArray = nullptr;
 
 	MaterialMappingKit m_cMaterialMappingKit;
 };

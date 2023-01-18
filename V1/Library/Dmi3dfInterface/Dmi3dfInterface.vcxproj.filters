@@ -156,6 +156,18 @@
     <ClInclude Include="3DF\3DF.Line.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\3DF.Marker.h">
+      <Filter>3DF\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Visibility.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.MarkerAttribute.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Image.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -265,6 +277,18 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.Line.cpp">
       <Filter>3DF\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Marker.cpp">
+      <Filter>3DF\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Visibility.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.MarkerAttribute.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Image.cpp">
+      <Filter>3DF\Control</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

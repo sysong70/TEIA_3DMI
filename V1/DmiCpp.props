@@ -52,6 +52,7 @@
     <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\base_stream\source\stream_common;</Dmi3dfInclude>
     <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\utility\source;</Dmi3dfInclude>
     <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\hoops_ooc\source;</Dmi3dfInclude>
+    <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\3rdParty\ImageMagick;</Dmi3dfInclude>
 
     <!-- HOOPS 3DF Header Library Path -->
     <Dmi3dfLibarayPath>$(DevTools)\hoops_3dgs\lib\nt_x64_v141;</Dmi3dfLibarayPath>

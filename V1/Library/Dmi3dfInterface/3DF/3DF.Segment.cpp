@@ -4,19 +4,21 @@
 
 #include "3DF.Database.h"
 #include "3DF.Segment.h"
-#include "3DF.Selectability.h"
 #include "3DF.Bounding.h"
 #include "3DF.Line.h"
 
+#include "3DF.Selectability.h"
+#include "3DF.Visibility.h"
+#include "3DF.MaterialMapping.h"
+#include "3DF.MarkerAttribute.h"
+
 USING_3DF_NAMESPACE
 
-SegmentKey::SegmentKey() :
-	m_cSelectabilityControl(*this)
+SegmentKey::SegmentKey()
 {
 }
 
-SegmentKey::SegmentKey(CString strInName) :
-	m_cSelectabilityControl(*this)
+SegmentKey::SegmentKey(CString strInName)
 {
 	if(false == strInName.IsEmpty()) {
 		m_nKey = HC_Create_Segment(H_ASCII_TEXT(strInName));
@@ -26,14 +28,12 @@ SegmentKey::SegmentKey(CString strInName) :
 	}
 }
 
-SegmentKey::SegmentKey(HC_KEY nKey) :
-	m_cSelectabilityControl(*this)
+SegmentKey::SegmentKey(HC_KEY nKey)
 {
 	m_nKey = nKey;
 }
 
-SegmentKey::SegmentKey(SegmentKey const & cInThat) :
-	m_cSelectabilityControl(*this)
+SegmentKey::SegmentKey(SegmentKey const & cInThat)
 {
 	m_nKey = cInThat.KeyValue();
 	//m_cSelectabilityControl = cInThat.GetSelectabilityControl();
@@ -117,10 +117,14 @@ ShellKey SegmentKey::InsertShell(ShellKit const & cInKit)
 	_3DF::PointArray acPoints;
 	_3DF::VectorArray acNormals;
 	_3DF::IntArray acFacelist;
+	_3DF::FloatArray aParameters;
+	_3DF::RGBAColorArray aColors;
 
 	cInKit.ShowPoints(acPoints);
 	cInKit.ShowNormals(acNormals);
 	cInKit.ShowFacelist(acFacelist);
+	cInKit.ShowParameters(aParameters);
+	cInKit.ShowColors(aColors);
 
 	Open();
 	HC_KEY nShellKey = HC_Insert_Shell(static_cast<int>(acPoints.size()), acPoints.data(), static_cast<int>(acFacelist.size()), acFacelist.data());
@@ -128,6 +132,14 @@ ShellKey SegmentKey::InsertShell(ShellKit const & cInKit)
 	if(INVALID_KEY != nShellKey) {
 		if(false == acNormals.empty()) {
 			HC_MSet_Vertex_Normals(nShellKey, 0, static_cast<int>(acNormals.size()), acNormals.data());
+		}
+
+		if(false == aParameters.empty()) {
+			HC_MSet_Vertex_Parameters(nShellKey, 0, static_cast<int>(aParameters.size() / 2), 2, aParameters.data());
+		}
+
+		if(false == aColors.empty()) {
+			HC_MSet_Vertex_Colors_By_Value(nShellKey, "face", 0, "rgb", static_cast<int>(aColors.size()), aColors.data());
 		}
 	}
 
@@ -148,8 +160,48 @@ LineKey SegmentKey::InsertLine(size_t in_count, Point const pcInPoints[])
 	return cLine;
 }
 
+//== Marker 관련 함수 ================================================================================
+MarkerKey SegmentKey::InsertMarker(Point const & cInPosition)
+{
+	return InsertMarker(cInPosition.x, cInPosition.y, cInPosition.z);
+}
+
+MarkerKey SegmentKey::InsertMarker(double x, double y, double z)
+{
+	Open();
+	HC_KEY nKey = HC_Insert_Marker(x, y, z);
+	Close();
+
+	MarkerKey cMarker(nKey);
+	return cMarker;
+}
+
+MarkerAttributeControl SegmentKey::GetMarkerAttributeControl()
+{
+	MarkerAttributeControl cMarkerAttributeControl(KeyValue());
+	return cMarkerAttributeControl;
+}
+
+MarkerAttributeControl const SegmentKey::GetMarkerAttributeControl() const
+{
+	MarkerAttributeControl cMarkerAttributeControl(KeyValue());
+	return cMarkerAttributeControl;
+}
+
 //== Material Mapping 관련 함수 ======================================================================
-SegmentKey & SegmentKey::SetMaterialMapping(_3DF::MaterialMappingKit const & cInKit)
+MaterialMappingControl SegmentKey::GetMaterialMappingControl()
+{
+	MaterialMappingControl cMaterialMappingControl(*this);
+	return cMaterialMappingControl;
+}
+
+MaterialMappingControl const SegmentKey::GetMaterialMappingControl() const
+{
+	MaterialMappingControl cMaterialMappingControl(*(SegmentKey *) this);
+	return cMaterialMappingControl;
+}
+
+SegmentKey & SegmentKey::SetMaterialMapping(CString strGeometry, _3DF::MaterialMappingKit const & cInKit)
 {
 	Open();
 	//----- Color 설정 -----
@@ -163,11 +215,11 @@ SegmentKey & SegmentKey::SetMaterialMapping(_3DF::MaterialMappingKit const & cIn
 		CString strColorText;
 
 		if(1.0f == cRgbaColor.alpha) {
-			strColorText.Format(L"faces = (diffuse = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
+			strColorText.Format(L"%s = (diffuse = (r=%f g=%f b=%f))", strGeometry, cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
 		}
 		else {
 			float fTransparency = 1.0f - cRgbaColor.alpha;
-			strColorText.Format(L"faces = (diffuse = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, fTransparency, fTransparency, fTransparency);
+			strColorText.Format(L"%s = (diffuse = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", strGeometry, cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, fTransparency, fTransparency, fTransparency);
 		}
 
 		HC_Set_Color(H_ASCII_TEXT(strColorText));
@@ -176,11 +228,11 @@ SegmentKey & SegmentKey::SetMaterialMapping(_3DF::MaterialMappingKit const & cIn
 	if(true == cInKit.ShowColor(Material::Color::Type::Specular, cRgbaColor)) {
 		CString strColorText;
 		if(1.0f == cRgbaColor.alpha) {
-			strColorText.Format(L"faces = (specular = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
+			strColorText.Format(L"%s = (specular = (r=%f g=%f b=%f))", strGeometry, cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
 		}
 		else {
 			float fTransparency = 1.0f - cRgbaColor.alpha;
-			strColorText.Format(L"faces = (specular = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, fTransparency, fTransparency, fTransparency);
+			strColorText.Format(L"%s = (specular = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", strGeometry, cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, fTransparency, fTransparency, fTransparency);
 		}
 
 		HC_Set_Color(H_ASCII_TEXT(strColorText));
@@ -189,22 +241,27 @@ SegmentKey & SegmentKey::SetMaterialMapping(_3DF::MaterialMappingKit const & cIn
 	if(true == cInKit.ShowColor(Material::Color::Type::Emission, cRgbaColor)) {
 		CString strColorText;
 		if(1.0f == cRgbaColor.alpha) {
-			strColorText.Format(L"faces = (emission = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
+			strColorText.Format(L"%s = (emission = (r=%f g=%f b=%f))", strGeometry, cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
 		}
 		else {
 			float fTransparency = 1.0f - cRgbaColor.alpha;
-			strColorText.Format(L"faces = (emission = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, fTransparency, fTransparency, fTransparency);
+			strColorText.Format(L"%s = (emission = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", strGeometry, cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, fTransparency, fTransparency, fTransparency);
 		}
 
 		HC_Set_Color(H_ASCII_TEXT(strColorText));
 	}
 
+	if(false == cInKit.Texture().IsEmpty()) {
+		HC_Set_Color(H_ASCII_TEXT(cInKit.Texture()));
+	}
+
+/*
 	//----- Line 설정 -----
 	if(true == cInKit.ShowColor(Material::Color::Type::Line, cRgbaColor)) {
 		CString strColorText;
 		strColorText.Format(L"lines = (diffuse = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
 		HC_Set_Color(H_ASCII_TEXT(strColorText));
-	}
+	}*/
 
 	Close();
 
@@ -214,31 +271,50 @@ SegmentKey & SegmentKey::SetMaterialMapping(_3DF::MaterialMappingKit const & cIn
 //== Control 관련 함수 ===============================================================================
 SelectabilityControl SegmentKey::GetSelectabilityControl()
 {
-	return m_cSelectabilityControl;
+	SelectabilityControl cSelectabilityControl(*this);
+	return cSelectabilityControl;
 }
 
 SelectabilityControl const SegmentKey::GetSelectabilityControl() const
 {
-	return m_cSelectabilityControl;
-
-/*
-	if(nullptr != m_pcSelectabilityControl) {
-		return *m_pcSelectabilityControl;
-	}
-
-	m_pcSelectabilityControl = new SelectabilityControl(*this);
-	if(nullptr == m_pcSelectabilityControl) {
-		assert(false);
-	}
-
-	return *m_pcSelectabilityControl;
-*/
+	SelectabilityControl cSelectabilityControl(*(SegmentKey *) this);
+	return cSelectabilityControl;
 }
 
 SegmentKey & SegmentKey::SetSelectability(CString strList)
 {
 	Open();
 	HC_Set_Selectability(H_ASCII_TEXT(strList));
+	Close();
+	return *this;
+}
+
+//== Visibility Control 관련 함수 ================================================================
+VisibilityControl SegmentKey::GetVisibilityControl()
+{
+	VisibilityControl cVisibilityControl(*this);
+	return cVisibilityControl;
+}
+
+VisibilityControl const SegmentKey::GetVisibilityControl() const
+{
+	VisibilityControl cVisibilityControl(*(SegmentKey *)this);
+	return cVisibilityControl;
+}
+
+SegmentKey & SegmentKey::SetVisibility(CString strList)
+{
+	Open();
+	HC_Set_Visibility(H_ASCII_TEXT(strList));
+	Close();
+	return *this;
+}
+
+//== Condition 관련 함수 =============================================================================
+SegmentKey & SegmentKey::SetCondition(CString strInCondition)
+{
+	Open();
+	HC_Set_Conditions(H_ASCII_TEXT(strInCondition));
 	Close();
 	return *this;
 }
@@ -267,13 +343,6 @@ void SegmentKey::SetRenderingOptions(CString strList)
 {
 	Open();
 	HC_Set_Rendering_Options(H_ASCII_TEXT(strList));
-	Close();
-}
-
-void SegmentKey::SetVisibility(CString strList)
-{
-	Open();
-	HC_Set_Visibility(H_ASCII_TEXT(strList));
 	Close();
 }
 

@@ -4,9 +4,10 @@
 
 #include "3DF.Include.h"
 #include "3DF.Shell.h"
-#include "3DF.Selectability.h"
 #include "3DF.Portfolio.h"
 #include "3DF.Style.h"
+
+#include "3DF.Marker.h"
 
 OPEN_3DF_NAMESPACE
 
@@ -39,14 +40,31 @@ public:
 	//== Line 관련 함수 ==============================================================================
 	LineKey InsertLine(size_t nInCount, Point const pcInPoints[]);
 
+	//== Marker 관련 함수 ============================================================================
+	MarkerKey InsertMarker(Point const & in_position);
+	MarkerKey InsertMarker(double x, double y, double z);
+
+	MarkerAttributeControl GetMarkerAttributeControl();
+	MarkerAttributeControl const GetMarkerAttributeControl() const;
+
 	//== Material Mapping 관련 함수 ==================================================================
-	SegmentKey & SetMaterialMapping(MaterialMappingKit const & cInKit);
+	SegmentKey & SetMaterialMapping(CString strGeometry, MaterialMappingKit const & cInKit);
+	MaterialMappingControl GetMaterialMappingControl();
+	MaterialMappingControl const GetMaterialMappingControl() const;
 
 	//== Select Control 관련 함수 ====================================================================
 	SelectabilityControl GetSelectabilityControl();
 	SelectabilityControl const GetSelectabilityControl() const;
 	SegmentKey & SetSelectability(CString strText);
 
+	//== Visibility Control 관련 함수 ================================================================
+	VisibilityControl GetVisibilityControl();
+	VisibilityControl const GetVisibilityControl() const;
+	SegmentKey & SetVisibility(CString strList);
+
+	//== Condition 관련 함수 =========================================================================
+	SegmentKey & SetCondition(CString strInCondition);
+	
 	//== Portfolio Control 관련 함수 =================================================================
 	//PortfolioControl GetPortfolioControl();
 	//PortfolioControl const GetPortfolioControl() const;
@@ -55,7 +73,6 @@ public:
 	StyleControl GetStyleControl();
 
 	void SetRenderingOptions(CString strList);
-	void SetVisibility(CString strList);
 	void SetColorByIndex(CString strList, int nIndex);
 	void SetMarkerSymbol(CString strSymbol);
 
@@ -73,11 +90,6 @@ public:
 
 private:
 	//bool m_bOpenSegment = false; // 현재 Segment가 Open되어 있는지를 나타내는 flag
-	SelectabilityControl m_cSelectabilityControl;
-
-	//PortfolioControl m_cPortfolioControl;
-
-	//SelectabilityControl * m_pcSelectabilityControl = nullptr;
 
 	HC_KEY m_nModelIncludeKey = INVALID_KEY;
 	HC_KEY m_nStylesIncludeKey = INVALID_KEY;

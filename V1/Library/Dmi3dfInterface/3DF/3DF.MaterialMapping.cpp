@@ -4,8 +4,10 @@
 
 #include "3DF.Segment.h"
 
+#include <hc.h>
 #include <HUtility.h>
 #include <HTools.h>
+#include <magick/api.h>
 
 USING_3DF_NAMESPACE
 
@@ -56,6 +58,7 @@ MaterialMappingKit & MaterialMappingKit::operator = (MaterialMappingKit const & 
 
 	m_fGloss = cInThat.Gloss();
 	m_bGlossFlag = cInThat.GlossFlag();
+	m_strTexture = cInThat.Texture();
 
 	return *this;
 }
@@ -82,6 +85,10 @@ bool MaterialMappingKit::operator == (MaterialMappingKit const & cInThat) const
 		if(m_fGloss != cInThat.Gloss()) {
 			return false;
 		}
+	}
+
+	if(0 != m_strTexture.CompareNoCase(cInThat.Texture())) {
+		return false;
 	}
 
 	return true;
@@ -132,6 +139,16 @@ bool MaterialMappingKit::GlossFlag() const
 	return m_bGlossFlag; 
 }
 
+CString MaterialMappingKit::Texture() const
+{ 
+	return m_strTexture; 
+}
+
+void MaterialMappingKit::SetTexture(CString strTexture)
+{ 
+	m_strTexture = strTexture; 
+}
+
 //== MaterialMappingControl ========================================================================
 
 MaterialMappingControl::MaterialMappingControl(SegmentKey & cInSegmentKey) :
@@ -140,126 +157,27 @@ MaterialMappingControl::MaterialMappingControl(SegmentKey & cInSegmentKey) :
 
 }
 
-MaterialMappingControl & MaterialMappingControl::SetWindows(bool bInValue)
+//== Color 설정 =====================================================================================
+MaterialMappingControl & MaterialMappingControl::SetMarkerColor(RGBAColor const & cInRgbaColor)
 {
-	return SetSelectability("windows", bInValue);
+	return SetColor(L"markers", "diffuse", cInRgbaColor);
 }
 
-MaterialMappingControl & MaterialMappingControl::SetEdges(bool bInValue)
-{
-	return SetSelectability("edges", bInValue);
-}
 
-MaterialMappingControl & MaterialMappingControl::SetFaces(bool bInValue)
-{
-	return SetSelectability("faces", bInValue);
-}
-
-MaterialMappingControl & MaterialMappingControl::SetLights(bool bInValue) 
-{
-	return SetSelectability("lights", bInValue);
-}
-
-MaterialMappingControl & MaterialMappingControl::SetLines(bool bInValue) 
-{
-	return SetSelectability("lines", bInValue);
-}
-
-MaterialMappingControl & MaterialMappingControl::SetMarkers(bool bInValue)
-{
-	return SetSelectability("markers", bInValue);
-}
-
-MaterialMappingControl & MaterialMappingControl::SetVertices(bool bInValue)
-{
-	return SetSelectability("vertices", bInValue);
-}
-
-MaterialMappingControl & MaterialMappingControl::SetText(bool bInValue)
-{
-	return SetSelectability("text", bInValue);
-}
-
-MaterialMappingControl & MaterialMappingControl::SetGeometry(bool bInValue)
-{
-	return SetSelectability("geometry", bInValue);
-}
-
-MaterialMappingControl & MaterialMappingControl::SetEverything(bool bInValue)
-{
-	return SetSelectability("everything", bInValue);
-}
-
-MaterialMappingControl & MaterialMappingControl::UnsetWindows()
-{
-	return UnSetSelectability("windows");
-}
-
-MaterialMappingControl & MaterialMappingControl::UnsetEdges()
-{
-	return UnSetSelectability("edges");
-}
-
-MaterialMappingControl & MaterialMappingControl::UnsetFaces()
-{
-	return UnSetSelectability("faces");
-}
-
-MaterialMappingControl & MaterialMappingControl::UnsetLights()
-{
-	return UnSetSelectability("lights");
-}
-
-MaterialMappingControl & MaterialMappingControl::UnsetLines()
-{
-	return UnSetSelectability("lines");
-}
-
-MaterialMappingControl & MaterialMappingControl::UnsetMarkers() 
-{
-	return UnSetSelectability("markers");
-}
-
-MaterialMappingControl & MaterialMappingControl::UnsetVertices()
-{
-	return UnSetSelectability("vertices");
-}
-
-MaterialMappingControl & MaterialMappingControl::UnsetText()
-{
-	return UnSetSelectability("text");
-}
-
-MaterialMappingControl & MaterialMappingControl::UnsetGeometry() 
-{
-	return UnSetSelectability("geometry");
-}
-
-MaterialMappingControl & MaterialMappingControl::UnsetEverything()
+MaterialMappingControl & MaterialMappingControl::SetColor(CString strGeometry, CString strChannel, RGBAColor const & cInRgbaColor)
 {
 	m_cInSegmentKey.Open();
 
-	HC_UnSet_Selectability();
+	CString strColorText;
+	strColorText.Format(L"%s = (%s = (r=%f g=%f b=%f))", strGeometry, strChannel, cInRgbaColor.red, cInRgbaColor.green, cInRgbaColor.blue);
+	HC_Set_Color(H_ASCII_TEXT(strColorText));
 
 	m_cInSegmentKey.Close();
 
 	return *this;
 }
 
-MaterialMappingControl & MaterialMappingControl::SetSelectability(CString strInType, bool bInValue)
-{
-	m_cInSegmentKey.Open();
-
-	CString strList;
-	strList.Format(L"%s = %s", strInType, (true == bInValue ? L"on" : L"off"));
-	HC_Set_Selectability(H_ASCII_TEXT(strList));
-
-	m_cInSegmentKey.Close();
-
-	return *this;
-}
-
-MaterialMappingControl & MaterialMappingControl::UnSetSelectability(CString strInType)
+MaterialMappingControl & MaterialMappingControl::UnSetColor(CString strInType)
 {
 	m_cInSegmentKey.Open();
 
