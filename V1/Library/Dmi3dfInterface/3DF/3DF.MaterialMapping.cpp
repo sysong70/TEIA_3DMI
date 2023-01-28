@@ -148,6 +148,17 @@ void MaterialMappingKit::SetTexture(CString strTexture)
 { 
 	m_strTexture = strTexture; 
 }
+/*
+
+char * MaterialMappingKit::GetMapIndex()
+{
+	char pchMapIndex[MATERIAL_MAPPING_MAP_INDEX_SIZE];
+	int nIndex = 0;
+	pchMapIndex[nIndex++] = 
+
+}
+
+*/
 
 //== MaterialMappingControl ========================================================================
 

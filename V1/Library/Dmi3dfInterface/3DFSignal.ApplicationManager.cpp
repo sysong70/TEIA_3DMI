@@ -77,10 +77,8 @@ void ApplicationManager::InitInstance()
 	::GetWindowsDirectory(fontDirectory, MAX_PATH);
 	_tcscat(fontDirectory, _T("\\Fonts"));
 	char buf[4096];
-	sprintf(buf, "font directory = (%s, .)", H_ASCII_TEXT(fontDirectory));
-// 	sprintf(buf, "%s, multi-threading=%s", buf,
-// 		CAppSettings::MultiThreading == MultiThreadingFull ? "full" :
-// 		CAppSettings::MultiThreading == MultiThreadingBasic ? "basic" : "off");
+ 	sprintf(buf, "font directory = (%s, .)", H_ASCII_TEXT(fontDirectory));
+
 	HC_Define_System_Options(buf);
 }
 

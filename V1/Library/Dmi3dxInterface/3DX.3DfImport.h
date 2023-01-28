@@ -10,6 +10,7 @@
 
 #include <atlcoll.h>
 #include <vector>
+#include <unordered_map>
 
  OPEN_3DX_NAMESPACE
 
@@ -81,10 +82,11 @@ protected:
 		}
 	};
 
-	bool DrawModel(const A3DAsmModelFile * pcAsmModelFile, _3DF::SegmentKey & cModelSegment);
+	bool ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, _3DF::SegmentKey & cModelSegment);
 
 	// == Product Occurrences 관련 함수 =========================================================
-	A3DStatus ConvertProductOccurrence(A3DAsmProductOccurrence * pcOccurrence, _3DF::SegmentKey & cParentSegment, A3DMiscCascadedAttributes * pcParentAttr);
+	A3DStatus ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurrence, A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, _3DF::SegmentKey & cParentSegment);
+
 	A3DStatus ProductOccurrenceGetLocation(const A3DAsmProductOccurrenceData * pcPoData, _3DF::MatrixKit & cTransMatrix);
 	A3DStatus ProductOccurrenceGetLocation(const A3DAsmProductOccurrenceData * psPOccData, A3DMiscCartesianTransformation ** ppLocation);
 	A3DStatus ProductOccurrenceGetExternalData(const A3DAsmProductOccurrenceData * pcPOccData,
@@ -104,8 +106,9 @@ protected:
 	A3DStatus ProductOccurrenceGetPart(const A3DAsmProductOccurrenceData * pcPOccData, A3DAsmPartDefinition ** ppcPart);
 
 	//== Draw 관련 함수 =========================================================================
-	A3DStatus DrawPartDefinition(const A3DAsmPartDefinition * pcPart, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
-	A3DStatus DrawRiRepresentationItem(const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cParentSegment,
+	A3DStatus ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, _3DF::SegmentKey & cParentSegment);
+
+	A3DStatus ParseRiRepresentationItem(const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cParentSegment,
 		const A3DMiscCascadedAttributes * pcParentAttr);
 
 	A3DStatus DrawSet(const A3DRiSet * pSet, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
@@ -180,11 +183,20 @@ protected:
 	void AddTriangle(ConvertFaceInfo & cInFaceInfo, int const pnInFaceListIndices[3], int const pnInFaceVertexNromalIndices[3],
 		int const pnInFaceVertexParamIndices[3], int const pnInFaceVertexColorIndices[3], A3DUns32  nInVertexParamSize);
 
-	A3DStatus SetGeometryStyle(CString strGeometry, const A3DRootBaseWithGraphics * pcBase, _3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
-	A3DStatus SetGeometryStyle(CString strGeometry, _3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+	A3DStatus SetFaceStyle(const A3DRootBaseWithGraphics * pcBase, _3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+	A3DStatus SetFaceStyle(_3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+	A3DStatus SetFaceStyle(_3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData);
 
-	A3DStatus DrawStyle(const A3DMiscCascadedAttributesData & cAttrsData, A3DInt32 * pnUVCoordinatesIndex, A3DUns8 * pucTextureDimension, _3DF::MaterialMappingKit & cMaterialKit);
-	A3DStatus DrawStyle(const A3DMiscCascadedAttributesData & cAttrsData, _3DF::MaterialMappingKit & cMaterialKit);
+	A3DStatus SetLineStyle(const A3DRootBaseWithGraphics * pcBase, _3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+	A3DStatus SetLineStyle(_3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+	A3DStatus SetLineStyle(_3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData);
+
+	A3DStatus SetMarkerStyle(const A3DRootBaseWithGraphics * pcBase, _3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+	A3DStatus SetMarkerStyle(_3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+	A3DStatus SetMarkerStyle(_3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData);
+
+	A3DStatus GetMaterialMapping(const A3DMiscCascadedAttributesData & cAttrsData, A3DInt32 * pnUVCoordinatesIndex, A3DUns8 * pucTextureDimension, _3DF::MaterialMappingKit & cMaterialKit);
+	A3DStatus GetMaterialMapping(const A3DMiscCascadedAttributesData & cAttrsData, _3DF::MaterialMappingKit & cMaterialKit);
 
 	A3DStatus DrawTransformation(const A3DMiscTransformation * pcTransformation);
 
@@ -199,15 +211,16 @@ protected:
 		const A3DTessFaceData * pcTessFaceData, A3DUns32 nFaceIndex, const A3DMiscCascadedAttributes * pcParentAttribute,
 		A3DMiscCascadedAttributes ** pcAttrs, A3DMiscCascadedAttributesData * pcAttributesData);
 
-	A3DStatus CreateAndPushCascadedAttributesFace(const A3DRiRepresentationItem * pcRepItem,
-		const A3DTessBase * pcTessBase, const A3DTessFaceData * pcTessFaceData, A3DUns32 uiFaceIndex,
-		const A3DMiscCascadedAttributes * pcParentAttr, A3DMiscCascadedAttributes ** ppcAttr, A3DMiscCascadedAttributesData * pcAttrData);
-
 	A3DStatus IsShow(const A3DRootBaseWithGraphics * pGraphics);
 
-	bool SetStyleMaterialMapping(CString strGeomety, _3DF::MaterialMappingKit const & cInKit, _3DF::SegmentKey & cSegment);
+	bool SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, _3DF::MaterialMappingKit const & cInKit, _3DF::SegmentKey & cSegment);
+	bool SetLineMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, _3DF::MaterialMappingKit const & cInKit, _3DF::SegmentKey & cSegment);
+	bool SetMarkerMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, _3DF::MaterialMappingKit const & cInKit, _3DF::SegmentKey & cSegment);
 
 	bool SetStyle(_3DF::SegmentKey & cSegment, _3DF::SegmentKey & cStyleSegment);
+	bool FindFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, _3DF::SegmentKey & cOutStyleSegment);
+	bool FindLineMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, _3DF::SegmentKey & cOutStyleSegment);
+	bool FindMarkerMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, _3DF::SegmentKey & cOutStyleSegment);
 	bool FindMaterialMapping(CString strGeometry, _3DF::MaterialMappingKit const & cInKit, _3DF::SegmentKey & cOutStyleSegment);
 
 	// == C3D 관련 Utility 함수 =================================================================
@@ -239,9 +252,13 @@ private:
 	// MaterialMap Style 키를 저장하는 Vector
 	std::vector<MaterialMappingStyleKit> m_vcMaterialMappingStyleVector;
 
+	std::unordered_map<A3DUns32, _3DF::SegmentKey> m_mFaceMaterialMappingStyleMap;
+	std::unordered_map<A3DUns32, _3DF::SegmentKey> m_mLineMaterialMappingStyleMap;
+	std::unordered_map<A3DUns32, _3DF::SegmentKey> m_mMarkerMaterialMappingStyleMap;
+
+
 	// Segment Key Name 뒤부분에 붙는 Id값
 	DWORD m_nIncrementalId = 0;
-	DWORD m_nShellMaterialId = 0;
 
 	//== 계산 관련 함수 ==========================================================================
 private:

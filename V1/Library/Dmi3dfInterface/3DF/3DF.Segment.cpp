@@ -35,7 +35,8 @@ SegmentKey::SegmentKey(HC_KEY nKey)
 
 SegmentKey::SegmentKey(SegmentKey const & cInThat)
 {
-	m_nKey = cInThat.KeyValue();
+	*this = cInThat;
+//	m_nKey = cInThat.KeyValue();
 	//m_cSelectabilityControl = cInThat.GetSelectabilityControl();
 }
 
@@ -47,15 +48,23 @@ SegmentKey & SegmentKey::operator = (SegmentKey const & cOther)
 {
 	m_nKey = cOther.KeyValue();
 
+	m_bOpen = cOther.IsOpen();
+	m_bForcedOpen = cOther.IsForcedOpen();
+
 	m_nModelIncludeKey = cOther.ModelInclude().KeyValue();
 	m_nStylesIncludeKey = cOther.StylesInclude().KeyValue();
 
 	return *this;
 }
 
-SegmentKey SegmentKey::Subsegment() const
+SegmentKey const SegmentKey::Subsegment()
 {
 	CString strText;
+
+// 	HC_KEY nKey = HC_Create_Segment_Key_By_Key(KeyValue(), nullptr);
+// 
+// 	SegmentKey cSubsegment(nKey);
+
 	Open();
 	SegmentKey cSubsegment(strText);
 	Close();
@@ -63,7 +72,7 @@ SegmentKey SegmentKey::Subsegment() const
 	return cSubsegment;
 }
 
-SegmentKey SegmentKey::Subsegment(LPCTSTR chFormat, ...) const
+SegmentKey const SegmentKey::Subsegment(LPCTSTR chFormat, ...)
 {
 	CString strText;
 	va_list argList;
@@ -71,6 +80,10 @@ SegmentKey SegmentKey::Subsegment(LPCTSTR chFormat, ...) const
 	va_start(argList, chFormat);
 	strText.FormatV(chFormat, argList);
 	va_end(argList);
+
+// 	HC_KEY nKey = HC_Create_Segment_Key_By_Key(KeyValue(), H_ASCII_TEXT(strText));
+// 
+// 	SegmentKey cSubsegment(nKey);
 
 	Open();
 	SegmentKey cSubsegment(strText);
@@ -134,13 +147,13 @@ ShellKey SegmentKey::InsertShell(ShellKit const & cInKit)
 			HC_MSet_Vertex_Normals(nShellKey, 0, static_cast<int>(acNormals.size()), acNormals.data());
 		}
 
-		if(false == aParameters.empty()) {
-			HC_MSet_Vertex_Parameters(nShellKey, 0, static_cast<int>(aParameters.size() / 2), 2, aParameters.data());
-		}
+// 		if(false == aParameters.empty()) {
+// 			HC_MSet_Vertex_Parameters(nShellKey, 0, static_cast<int>(aParameters.size() / 2), 2, aParameters.data());
+// 		}
 
-		if(false == aColors.empty()) {
-			HC_MSet_Vertex_Colors_By_Value(nShellKey, "face", 0, "rgb", static_cast<int>(aColors.size()), aColors.data());
-		}
+// 		if(false == aColors.empty()) {
+// 			HC_MSet_Vertex_Colors_By_Value(nShellKey, "face", 0, "rgb", static_cast<int>(aColors.size()), aColors.data());
+// 		}
 	}
 
 	Close();
@@ -263,6 +276,11 @@ SegmentKey & SegmentKey::SetMaterialMapping(CString strGeometry, _3DF::MaterialM
 		HC_Set_Color(H_ASCII_TEXT(strColorText));
 	}*/
 
+	Close();
+
+	char chBuffer[MVO_BUFFER_SIZE];
+	Open();
+	HC_Show_Color(chBuffer);
 	Close();
 
 	return *this;

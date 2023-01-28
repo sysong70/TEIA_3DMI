@@ -23,8 +23,8 @@ public:
 
 	SegmentKey & operator = (SegmentKey const & cOther);
 
-	SegmentKey Subsegment() const;
-	SegmentKey Subsegment(LPCTSTR pszFromat, ...) const;
+	SegmentKey const Subsegment();
+	SegmentKey const Subsegment(LPCTSTR pszFromat, ...);
 
 	CString Name() const;
 	SegmentKey & SetName(CString strInName);
