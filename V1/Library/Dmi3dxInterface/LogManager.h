@@ -60,7 +60,10 @@ public:
 	class Init 
 	{
 	public:
+
 		Init();
+		//:Ken
+		~Init();
 	};
 
 

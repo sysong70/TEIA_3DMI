@@ -70,8 +70,6 @@ Component::ToolBar::~ToolBar()
 		REMOVE_POINTER(holder);
 	}
 	m_buttons.clear();
-
-	//DestroyWindow();
 }
 
 

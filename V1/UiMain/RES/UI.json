@@ -173,7 +173,7 @@
 
 	"ObjectSnaps":{
 		"title":"Object Snaps|개체 스냅",
-		"size":{"cx":300, "cy":400}
+		"size":{"cx":180, "cy":400}
 	},
 
 	"SelectionFilters":{

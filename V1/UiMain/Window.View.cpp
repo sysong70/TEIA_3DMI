@@ -78,6 +78,7 @@ Window::View::View()
 
 Window::View::~View()
 {
+	m_tabs.DestroyWindow();
 	m_delivery.view.OnDestruct();
 
 	GetMainFrame().ViewChanged(WM_DESTROY, this);
@@ -252,10 +253,10 @@ void Window::View::OnCommand(UINT id)
 	Facility::CommandIndexer::Command& data = TheCommandIndexer.Get(id);
 
 	if (data.Local) {
-		switch (id) {
-		default:
-			break;
-		}
+		//switch (id) {
+		//default:
+		//	break;
+		//}
 	}
 	else {
 		switch (data.Type) {

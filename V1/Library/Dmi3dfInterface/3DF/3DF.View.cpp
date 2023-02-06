@@ -50,6 +50,11 @@ View::~View()
 		delete[] m_pnSweetenKeyList;
 	}
 
+	//:Ken
+	if (m_pcCameraManipulate != nullptr) {
+		delete m_pcCameraManipulate;
+	}
+
 // 	ClearClashList();
 // 	delete_vlist(m_pcClashList);
 }
