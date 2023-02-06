@@ -79,7 +79,7 @@
     <ClCompile Include="Component.LayerPanel.cpp">
       <Filter>Component\PanelBar</Filter>
     </ClCompile>
-    <ClCompile Include="Component.ModelTreePanel.cpp">
+    <ClCompile Include="Component.ModelPanel.cpp">
       <Filter>Component\PanelBar</Filter>
     </ClCompile>
     <ClCompile Include="Component.ViewPanel.cpp">
@@ -138,6 +138,15 @@
     </ClCompile>
     <ClCompile Include="Component.TreePropList.cpp">
       <Filter>Component\Tree and PropList</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.ObjectSnaps.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.CheckListBox.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.CheckButton.cpp">
+      <Filter>Component</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -240,7 +249,7 @@
     <ClInclude Include="Component.LayerPanel.h">
       <Filter>Component\PanelBar</Filter>
     </ClInclude>
-    <ClInclude Include="Component.ModelTreePanel.h">
+    <ClInclude Include="Component.ModelPanel.h">
       <Filter>Component\PanelBar</Filter>
     </ClInclude>
     <ClInclude Include="Component.ViewPanel.h">
@@ -290,6 +299,15 @@
     </ClInclude>
     <ClInclude Include="Component.TreePropList.h">
       <Filter>Component\Tree and PropList</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.ObjectSnaps.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.CheckListBox.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.CheckButton.h">
+      <Filter>Component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

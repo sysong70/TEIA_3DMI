@@ -33,14 +33,14 @@ namespace PresetToolBar
 		return globalUtils.ScaleByDPI(CSize(24, 24));
 	}
 
-	CSize Padding()
-	{
-		return globalUtils.ScaleByDPI(CSize(3, 3));
-	}
-
 	CSize SeperatorMargin()
 	{
 		return globalUtils.ScaleByDPI(CSize(6, 6));
+	}
+
+	CSize ToolBarPadding()
+	{
+		return globalUtils.ScaleByDPI(CSize(3, 3));
 	}
 }
 
@@ -49,7 +49,6 @@ namespace PresetToolBar
 using namespace Component;
 
 BEGIN_MESSAGE_MAP(ToolBar, CWnd)
-	ON_WM_CREATE()
 	ON_WM_ERASEBKGND()
 	ON_WM_SIZE()
 	ON_MESSAGE(WM_DPICHANGED_AFTERPARENT, OnDPIChangedAfterParent)
@@ -109,9 +108,12 @@ void Component::ToolBar::ViewChanged(UINT message, Window::View* pView)
 
 
 
-void Component::ToolBar::AddButton(UINT id)
+CBCGPButton* Component::ToolBar::AddButton(UINT id, bool menu)
 {
-	m_buttons.push_back(CreateButton(id));
+	CBCGPButton* button = CreateButton(id, menu);
+	m_buttons.push_back(button);
+
+	return button;
 }
 
 
@@ -139,21 +141,24 @@ void Component::ToolBar::AddSeperator()
 
 CSize Component::ToolBar::AdjustLayout()
 {
+	const int ArrowWidth = 18;
+
 	if (m_buttons.size() == 0 || GetParent() == nullptr || GetParent()->GetSafeHwnd() == nullptr) {
 		return {};
 	}
 
 	CSize buttonSize = PRESET::ButtonSize();
 	CSize buttonMargin = PRESET::ButtonMargin();
-	CSize padding = PRESET::Padding();
+	CSize padding = PRESET::ToolBarPadding();
 	CPoint offset(padding.cx, padding.cy);
 	CSize size;
 
 	if (IsHorizontal()) {
 		for (auto button : m_buttons) {
 			if (button != nullptr) {
-				button->MoveWindow(offset.x, offset.y, buttonSize.cx, buttonSize.cy);
-				offset.x += buttonSize.cx + buttonMargin.cx;
+				int width = buttonSize.cx + (dynamic_cast<CBCGPMenuButton*>(button) == nullptr ? 0 : globalUtils.ScaleByDPI(ArrowWidth));
+				button->MoveWindow(offset.x, offset.y, width, buttonSize.cy);
+				offset.x += width + buttonMargin.cx;
 			}
 			else {
 				offset.x += PRESET::SeperatorMargin().cx;
@@ -166,8 +171,9 @@ CSize Component::ToolBar::AdjustLayout()
 	else {
 		for (auto button : m_buttons) {
 			if (button != nullptr) {
-				button->MoveWindow(offset.x, offset.y, buttonSize.cx, buttonSize.cy);
-				offset.y += buttonSize.cy + buttonMargin.cy;
+				int height = buttonSize.cy + (dynamic_cast<CBCGPMenuButton*>(button) == nullptr ? 0 : globalUtils.ScaleByDPI(ArrowWidth));
+				button->MoveWindow(offset.x, offset.y, buttonSize.cx, height);
+				offset.y += height + buttonMargin.cy;
 			}
 			else {
 				offset.y += PRESET::SeperatorMargin().cy;
@@ -257,6 +263,19 @@ CPoint Component::ToolBar::AdjustLocation(CSize size)
 
 
 
+CBCGPButton* Component::ToolBar::GetButton(UINT id)
+{
+	for (auto button : m_buttons) {
+		if (button != nullptr && button->GetDlgCtrlID() == id) {
+			return button;
+		}
+	}
+
+	RETURN_NULL;
+}
+
+
+
 void Component::ToolBar::PostNcDestroy()
 {
 	__super::PostNcDestroy();
@@ -267,18 +286,6 @@ void Component::ToolBar::PostNcDestroy()
 void Component::ToolBar::OnCommand(UINT id)
 {
 	GetParent()->SendMessage(WM_COMMAND, (WPARAM)id);
-}
-
-
-
-int Component::ToolBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
-{
-	if (__super::OnCreate(lpCreateStruct) == -1) {
-		DEBUG_STOP;
-		return -1;
-	}
-
-	return 0;
 }
 
 
@@ -318,9 +325,9 @@ void Component::ToolBar::OnSize(UINT nType, int cx, int cy)
 
 
 
-CBCGPButton* Component::ToolBar::CreateButton(UINT id)
+CBCGPButton* Component::ToolBar::CreateButton(UINT id, bool menu)
 {
-	CBCGPButton* pButton = new CBCGPButton();
+	CBCGPButton* pButton = menu ? new CBCGPMenuButton() : new CBCGPButton();
 	DEBUG_VALID(pButton);
 
 	CBCGPButton& button = *pButton;

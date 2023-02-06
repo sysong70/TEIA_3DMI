@@ -28,6 +28,7 @@ namespace Facility
 		struct Command
 		{
 			ItemType Type = Unknown;
+			bool Local = false;      // not send command to renderer
 			int Id = -1;             // File_3D_CMD_New
 			CString StringId;        // L"File_3D_CMD_New"
 		};

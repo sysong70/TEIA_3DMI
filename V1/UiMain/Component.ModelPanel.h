@@ -8,13 +8,13 @@
 
 namespace Component
 {
-	class ModelTreePanel : public Panel
+	class ModelPanel : public Panel
 	{
 	public:
 
-		ModelTreePanel();
+		ModelPanel();
 
-		~ModelTreePanel() override;
+		~ModelPanel() override;
 
 		void ReceiveSignal(Json::Object* pData);
 

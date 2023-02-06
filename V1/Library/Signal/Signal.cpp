@@ -357,7 +357,7 @@ Wrapper().SendData(data);
 		SetWrapper(statusBar);
 		SetWrapper(progress);
 		SetWrapper(view);
-		SetWrapper(modelTreePanel);
+		SetWrapper(modelPanel);
 
 	#undef SetWrapper
 	}

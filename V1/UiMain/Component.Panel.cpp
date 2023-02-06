@@ -22,7 +22,6 @@ namespace PresetPanel
 using namespace Component;
 
 BEGIN_MESSAGE_MAP(Panel, CWnd)
-	ON_WM_CREATE()
 	ON_WM_ERASEBKGND()
 	ON_WM_SIZE()
 	ON_MESSAGE(WM_DPICHANGED_AFTERPARENT, OnDPIChangedAfterParent)
@@ -120,18 +119,6 @@ CSize Component::Panel::GetBodySize()
 void Component::Panel::PostNcDestroy()
 {
 	__super::PostNcDestroy();
-}
-
-
-
-int Component::Panel::OnCreate(LPCREATESTRUCT lpCreateStruct)
-{
-	if (__super::OnCreate(lpCreateStruct) == -1) {
-		DEBUG_STOP;
-		return -1;
-	}
-
-	return 0;
 }
 
 

@@ -25,4 +25,8 @@ namespace Dialog
 	CSize ControlGap();
 
 	int FooterPadding();
+	// control frame padding
+	CSize FramePadding();
+	// for non-frame widnow
+	CSize WindowPadding();
 }

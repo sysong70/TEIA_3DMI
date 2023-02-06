@@ -28,8 +28,6 @@ namespace Dialog
 
 		afx_msg LRESULT OnChangeActiveTab(WPARAM wp, LPARAM lp);
 
-		afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-
 		afx_msg void OnApply();
 
 		afx_msg void OnInitialize();

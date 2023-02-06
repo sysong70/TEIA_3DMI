@@ -25,8 +25,9 @@
 #pragma region Custom Control Id
 // Dialog
 #define IDD_DMI_STANDARD        10011
-#define IDD_DMI_FORMVIEW        10012
-#define IDD_DMI_PROGRESS_LOG	10013
+#define IDD_DMI_DROPDOWN        10012
+#define IDD_DMI_FORMVIEW        10013
+#define IDD_DMI_PROGRESS_LOG	10014
 // Special controls
 #define IDC_INNERFRAME          10100
 #define IDC_DMI_SIZE_CHECKER    10101

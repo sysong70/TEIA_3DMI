@@ -36,9 +36,7 @@ namespace Component
 
 		void PostNcDestroy() override;
 
-		afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-
-		afx_msg LRESULT OnDPIChangedAfterParent(WPARAM, LPARAM);
+		afx_msg LRESULT OnDPIChangedAfterParent(WPARAM wp, LPARAM lp);
 
 		afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 

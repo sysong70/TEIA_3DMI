@@ -24,7 +24,7 @@ namespace Component
 
 	public:
 
-		void AddButton(UINT id);
+		CBCGPButton* AddButton(UINT id, bool menu = false);
 
 		void AddButtons(std::vector<UINT> ids);
 
@@ -34,13 +34,13 @@ namespace Component
 
 		CPoint AdjustLocation(CSize size);
 
+		CBCGPButton* GetButton(UINT id);
+
 	protected:
 
 		void PostNcDestroy() override;
 
 		afx_msg void OnCommand(UINT id);
-
-		afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 
 		afx_msg LRESULT OnDPIChangedAfterParent(WPARAM, LPARAM);
 
@@ -57,7 +57,7 @@ namespace Component
 
 		std::vector<CBCGPButton*> m_buttons;
 
-		CBCGPButton* CreateButton(UINT id);
+		CBCGPButton* CreateButton(UINT id, bool menu);
 
 		bool IsHorizontal();
 	};

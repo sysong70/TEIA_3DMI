@@ -20,10 +20,6 @@ namespace Dialog
 
 		~Standard() override;
 
-	public:
-
-		Json::Object& GetUiData();
-
 	protected:
 
 		BOOL OnInitDialog() override;
@@ -33,12 +29,6 @@ namespace Dialog
 	protected: // Create and setup controls
 
 		CSize SetupControl(CBCGPButton& control, Json::Object& data);
-
-		CRect SetupControl(CBCGPCircularProgressIndicatorCtrl& control, Json::Object& data, Component::EPivot ePivot, CRect rect);
-
-		CRect SetupControl(CBCGPListBox& control, Json::Object& data, Component::EPivot ePivot, CRect rect);
-
-		CRect SetupControl(CBCGPListCtrl& control, Json::Object& data, Component::EPivot ePivot, CRect rect);
 
 		CRect SetupControl(CBCGPStatic& control, Json::Object& data, Component::EPivot ePivot, CRect rect);
 
@@ -58,5 +48,13 @@ namespace Dialog
 
 		// dialog structure information from TheResource
 		Json::Object* m_pDialogData;
+
+		Json::Object& GetDefaultButtons();
+
+		Json::Object& GetUiData();
+
+		CSize GetWinSize();
+
+		CString GetWinTitle();
 	};
 }

@@ -7,7 +7,7 @@
 namespace Component
 {
 	class LayerPanel;
-	class ModelTreePanel;
+	class ModelPanel;
 	class ScenePanel;
 	class ViewPanel;
 
@@ -73,7 +73,10 @@ namespace Component
 		DialogBack = RGB(0x25, 0x25, 0x25),
 
 		Arsenic = RGB(0x43, 0x43, 0x43),
+		BlueBolt = RGB(0x00, 0xAA, 0xFF),
 		Charcoal = RGB(0x3B, 0x44, 0x53),
+		HonoluluBlue = RGB(0x00, 0x67, 0xAD),
+		OldSilver = RGB(0x86, 0x86, 0x86),
 
 		White = RGB(0xFF, 0xFF, 0xFF),
 		Red = RGB(0xFF, 0x00, 0x00),

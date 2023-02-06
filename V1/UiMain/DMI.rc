@@ -59,7 +59,7 @@ END
 IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About DMI"
-FONT 8, "Segoe UI", 0, 0, 0x1
+FONT 9, "Segoe UI"
 BEGIN
     ICON            IDR_MAINFRAME, IDC_STATIC, 7,7,21,20
     LTEXT           "DMI Version 1.0", IDC_STATIC, 40,10,119,8, SS_NOPREFIX
@@ -71,15 +71,21 @@ END
 IDD_DMI_STANDARD DIALOGEX 0, 0, 123, 100
 STYLE WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME | DS_SETFONT
 CAPTION "Dialog"
-FONT 8, "Segoe UI", 400, 0, 0x1
+FONT 9, "Segoe UI"
 BEGIN
     LTEXT           "", IDC_DMI_SIZE_CHECKER, 0,0,32,32, NOT WS_VISIBLE
     LTEXT           "", IDC_INNERFRAME, 0,0,123,100, NOT WS_VISIBLE | WS_BORDER
 END
 
+IDD_DMI_DROPDOWN DIALOG DISCARDABLE 0, 0, 200, 300
+STYLE WS_CHILD | WS_CLIPSIBLINGS | WS_CLIPCHILDREN
+FONT 9, "Segoe UI"
+BEGIN
+END
+
 IDD_DMI_FORMVIEW DIALOGEX 0, 0, 250, 150
 STYLE DS_SETFONT | WS_CHILD
-FONT 8, "Segoe UI", 0, 0, 0x0
+FONT 8, "Segoe UI"
 BEGIN
     LTEXT           "", IDC_DMI_SIZE_CHECKER, 0, 0, 32, 32, NOT WS_VISIBLE
 END
@@ -87,7 +93,7 @@ END
 IDD_DMI_PROGRESS_LOG DIALOGEX 0, 0, 180, 120
 STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "Progress Log"
-FONT 9, "Segoe UI", 400, 0, 0x81
+FONT 9, "Segoe UI"
 BEGIN
     LTEXT           "", IDC_DMI_SIZE_CHECKER, 0,0,1,1, NOT WS_VISIBLE
     LTEXT           "", IDC_DMI_CONTROL_01, 0,0,1,1, WS_VISIBLE
@@ -238,14 +244,14 @@ BEGIN
     BEGIN
         BLOCK "040904B0"
         BEGIN
-            VALUE "CompanyName", "TODO: <Company name>"
-            VALUE "FileDescription", "Digital Manufacturing Information"
-            VALUE "FileVersion", "1.0.0.1"
+            VALUE "CompanyName", "DATAFACE Co.,Ltd"
+            VALUE "FileDescription", "3D Digital Manufacturing Information"
+            VALUE "FileVersion", "1.0.0"
             VALUE "InternalName", "DMI.exe"
-            VALUE "LegalCopyright", "TODO: (c) <Company name>.  All rights reserved."
+            VALUE "LegalCopyright", "DATAFACE Co.,Ltd. All rights reserved."
             VALUE "OriginalFilename", "DMI.exe"
-            VALUE "ProductName", "TODO: <Product name>"
-            VALUE "ProductVersion", "1.0.0.1"
+            VALUE "ProductName", "3DMI"
+            VALUE "ProductVersion", "1.0.0"
         END
     END
     BLOCK "VarFileInfo"

@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "resource.h"
-#include "Component.ModelTreePanel.h"
+#include "Component.ModelPanel.h"
 #include "Facility.h"
 
 #ifdef _DEBUG
@@ -11,9 +11,9 @@ static char THIS_FILE[] = __FILE__;
 
 
 
-#define PRESET PresetModelTreePanel
+#define PRESET PresetModelPanel
 
-namespace PresetModelTreePanel
+namespace PresetModelPanel
 {
 	const UINT Id = WM_USER;
 }
@@ -22,7 +22,7 @@ namespace PresetModelTreePanel
 
 using namespace Component;
 
-BEGIN_MESSAGE_MAP(ModelTreePanel, Panel)
+BEGIN_MESSAGE_MAP(ModelPanel, Panel)
 	ON_REGISTERED_MESSAGE(BCGM_GRID_ROW_CHECKBOX_CLICK, OnTreeCheckClick)
 
 	ON_NOTIFY(TVN_BEGINDRAG, PRESET::Id, OnTreeBeginDrag)
@@ -45,19 +45,19 @@ END_MESSAGE_MAP()
 
 
 
-Component::ModelTreePanel::ModelTreePanel()
+Component::ModelPanel::ModelPanel()
 {
 }
 
 
 
-Component::ModelTreePanel::~ModelTreePanel()
+Component::ModelPanel::~ModelPanel()
 {
 }
 
 
 
-void Component::ModelTreePanel::ReceiveSignal(Json::Object* pData)
+void Component::ModelPanel::ReceiveSignal(Json::Object* pData)
 {
 	Json::Object& data = *pData;
 
@@ -68,7 +68,7 @@ void Component::ModelTreePanel::ReceiveSignal(Json::Object* pData)
 
 
 
-void Component::ModelTreePanel::AdjustLayout(int cx, int cy)
+void Component::ModelPanel::AdjustLayout(int cx, int cy)
 {
 	__super::AdjustLayout(cx, cy);
 
@@ -78,7 +78,7 @@ void Component::ModelTreePanel::AdjustLayout(int cx, int cy)
 
 
 
-int Component::ModelTreePanel::ConstructHeader(int cx)
+int Component::ModelPanel::ConstructHeader(int cx)
 {
 	m_toolBar.SetPivot(EPivot::TopLeft);
 	m_toolBar.Initialize(this);
@@ -95,7 +95,7 @@ int Component::ModelTreePanel::ConstructHeader(int cx)
 
 
 
-void Component::ModelTreePanel::ConstructBody()
+void Component::ModelPanel::ConstructBody()
 {
 	DWORD dwStyle = WS_CHILD | WS_VISIBLE |
 		TVS_CHECKBOXES | TVS_FULLROWSELECT | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS;
@@ -156,7 +156,7 @@ void Component::ModelTreePanel::ConstructBody()
 
 
 
-void Component::ModelTreePanel::OnCommand(UINT id)
+void Component::ModelPanel::OnCommand(UINT id)
 {
 	if (m_wndControl.GetSafeHwnd() == nullptr) {
 		return;
@@ -179,7 +179,7 @@ void Component::ModelTreePanel::OnCommand(UINT id)
 
 
 
-LRESULT Component::ModelTreePanel::OnTreeCheckClick(WPARAM wp, LPARAM lp)
+LRESULT Component::ModelPanel::OnTreeCheckClick(WPARAM wp, LPARAM lp)
 {
 	CBCGPGridRow* pRow = (CBCGPGridRow*)lp;
 	if (pRow == NULL) {
@@ -201,7 +201,7 @@ LRESULT Component::ModelTreePanel::OnTreeCheckClick(WPARAM wp, LPARAM lp)
 
 
 
-void Component::ModelTreePanel::OnTreeBeginDrag(NMHDR* pNMHDR, LRESULT* pResult)
+void Component::ModelPanel::OnTreeBeginDrag(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
@@ -214,7 +214,7 @@ void Component::ModelTreePanel::OnTreeBeginDrag(NMHDR* pNMHDR, LRESULT* pResult)
 
 
 
-void Component::ModelTreePanel::OnTreeBeginLabelEdit(NMHDR* pNMHDR, LRESULT* pResult)
+void Component::ModelPanel::OnTreeBeginLabelEdit(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	TV_DISPINFO* pTVDispInfo = (TV_DISPINFO*)pNMHDR;
 
@@ -230,7 +230,7 @@ void Component::ModelTreePanel::OnTreeBeginLabelEdit(NMHDR* pNMHDR, LRESULT* pRe
 
 
 
-void Component::ModelTreePanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
+void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	*pResult = S_OK;
 
@@ -253,7 +253,7 @@ void Component::ModelTreePanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 
 
 
-void Component::ModelTreePanel::OnTreeDblClick(NMHDR* pNMHDR, LRESULT* pResult)
+void Component::ModelPanel::OnTreeDblClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	UNREFERENCED_PARAMETER(pNMHDR);
 	DEBUG_TRACE(L"NM_DBLCLICK\r\n");
@@ -263,7 +263,7 @@ void Component::ModelTreePanel::OnTreeDblClick(NMHDR* pNMHDR, LRESULT* pResult)
 
 
 
-void Component::ModelTreePanel::OnTreeDeleteItem(NMHDR* pNMHDR, LRESULT* pResult)
+void Component::ModelPanel::OnTreeDeleteItem(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
@@ -275,7 +275,7 @@ void Component::ModelTreePanel::OnTreeDeleteItem(NMHDR* pNMHDR, LRESULT* pResult
 
 
 
-void Component::ModelTreePanel::OnTreeEndLabelEdit(NMHDR* pNMHDR, LRESULT* pResult)
+void Component::ModelPanel::OnTreeEndLabelEdit(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	TV_DISPINFO* pTVDispInfo = (TV_DISPINFO*)pNMHDR;
 
@@ -287,7 +287,7 @@ void Component::ModelTreePanel::OnTreeEndLabelEdit(NMHDR* pNMHDR, LRESULT* pResu
 
 
 
-void Component::ModelTreePanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
+void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
@@ -302,7 +302,7 @@ void Component::ModelTreePanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResu
 
 
 
-void Component::ModelTreePanel::OnTreeItemExpanding(NMHDR* pNMHDR, LRESULT* pResult)
+void Component::ModelPanel::OnTreeItemExpanding(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
@@ -317,7 +317,7 @@ void Component::ModelTreePanel::OnTreeItemExpanding(NMHDR* pNMHDR, LRESULT* pRes
 
 
 
-void Component::ModelTreePanel::OnTreeRClick(NMHDR* pNMHDR, LRESULT* pResult)
+void Component::ModelPanel::OnTreeRClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	UNREFERENCED_PARAMETER(pNMHDR);
 	DEBUG_TRACE(L"NM_RCLICK\r\n");
@@ -327,7 +327,7 @@ void Component::ModelTreePanel::OnTreeRClick(NMHDR* pNMHDR, LRESULT* pResult)
 
 
 
-void Component::ModelTreePanel::OnTreeRDbClick(NMHDR* pNMHDR, LRESULT* pResult)
+void Component::ModelPanel::OnTreeRDbClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	UNREFERENCED_PARAMETER(pNMHDR);
 	DEBUG_TRACE(L"NM_RDBLCLICK\r\n");
@@ -337,7 +337,7 @@ void Component::ModelTreePanel::OnTreeRDbClick(NMHDR* pNMHDR, LRESULT* pResult)
 
 
 
-void Component::ModelTreePanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
+void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
@@ -354,7 +354,7 @@ void Component::ModelTreePanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult
 
 
 
-void Component::ModelTreePanel::OnTreeSelChanging(NMHDR* pNMHDR, LRESULT* pResult)
+void Component::ModelPanel::OnTreeSelChanging(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
@@ -371,7 +371,7 @@ void Component::ModelTreePanel::OnTreeSelChanging(NMHDR* pNMHDR, LRESULT* pResul
 
 
 
-void Component::ModelTreePanel::OnTreeSetFocus(NMHDR* pNMHDR, LRESULT* pResult)
+void Component::ModelPanel::OnTreeSetFocus(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	UNREFERENCED_PARAMETER(pNMHDR);
 	DEBUG_TRACE(L"NM_SETFOCUS\r\n");
@@ -381,14 +381,14 @@ void Component::ModelTreePanel::OnTreeSetFocus(NMHDR* pNMHDR, LRESULT* pResult)
 
 
 
-void Component::ModelTreePanel::GetParent(HTREEITEM sel, std::vector<HTREEITEM>& parent)
+void Component::ModelPanel::GetParent(HTREEITEM sel, std::vector<HTREEITEM>& parent)
 {
 	DEBUG_STOP;
 }
 
 
 
-void Component::ModelTreePanel::EnableAlternateRows()
+void Component::ModelPanel::EnableAlternateRows()
 {
 	m_bAlternateRows = !m_bAlternateRows;
 	m_wndControl.EnableAlternateRows(m_bAlternateRows);
@@ -396,7 +396,7 @@ void Component::ModelTreePanel::EnableAlternateRows()
 
 
 
-void Component::ModelTreePanel::EnableGridLines()
+void Component::ModelPanel::EnableGridLines()
 {
 	m_bGridLines = !m_bGridLines;
 	m_wndControl.EnableGridLines(m_bGridLines);

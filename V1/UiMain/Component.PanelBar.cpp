@@ -29,7 +29,6 @@ namespace PresetPanelBar
 using namespace Component;
 
 BEGIN_MESSAGE_MAP(PanelBar, CBCGPDockingControlBar)
-	ON_WM_CREATE()
 	ON_WM_SIZE()
 	ON_WM_ERASEBKGND()
 	ON_WM_GETMINMAXINFO()
@@ -86,18 +85,6 @@ void Component::PanelBar::ViewChanged(TabWnd* pTabs)
 	m_pActiveTabs->ShowWindow(SW_SHOW);
 
 	EnableWindow(TRUE);
-}
-
-
-
-int Component::PanelBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
-{
-	if (__super::OnCreate(lpCreateStruct) == -1) {
-		DEBUG_STOP;
-		return -1;
-	}
-
-	return 0;
 }
 
 

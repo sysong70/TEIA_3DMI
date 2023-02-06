@@ -64,6 +64,8 @@ namespace Facility
 
 	int GetPivot(Json::Object& source);
 
+	CSize GetSize(Json::Object& source);
+
 	CRect GetRect(Json::Object& source);
 
 	CString GetTitle(Json::Object& source);

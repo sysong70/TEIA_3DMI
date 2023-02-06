@@ -4,7 +4,7 @@
 #include "Signal.h"
 #include "Component.HistoryBar.h"
 #include "Component.LayerPanel.h"
-#include "Component.ModelTreePanel.h"
+#include "Component.ModelPanel.h"
 #include "Component.PanelBar.h"
 #include "Component.ScenePanel.h"
 #include "Component.TabWnd.h"
@@ -119,7 +119,7 @@ namespace Window
 
 		Component::TabWnd m_tabs;
 
-		Component::ModelTreePanel m_modelTreePanel;
+		Component::ModelPanel m_modelPanel;
 		Component::ViewPanel m_viewPanel;
 		Component::LayerPanel m_layerPanel;
 		Component::ScenePanel m_scenePanel;

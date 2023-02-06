@@ -47,13 +47,15 @@ Facility::CommandIndexer::Command& Facility::CommandIndexer::GetDummyData()
 
 void Facility::CommandIndexer::Initialize()
 {
-#define ITEM_DEF(type,id,stringId) { id, { type, id, stringId } },
+#define ITEM_DEF(type,id,stringId) { id, { type, false, id, stringId } },
 
 	m_commandMap = {
 #include "Command.Common.h"
 	};
 
 #undef ITEM_DEF
+
+	Get(HOME_3D_POP_ObjectSnap).Local = true;
 }
 
 

@@ -4,6 +4,7 @@
 #include "Window.Application.h"
 #include "Window.Document.h"
 #include "Connector.h"
+#include "Dialog.ObjectSnaps.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -230,7 +231,7 @@ void Window::View::OnCommand(UINT id)
 		GetMainFrame().OnCommand(id);
 		return;
 
-	case HOME_3D_CMD_Panels_ModelTree:
+	case HOME_3D_CMD_Panels_Model:
 	case HOME_3D_CMD_Panels_View:
 	case HOME_3D_CMD_Panels_Layer:
 	case HOME_3D_CMD_Panels_Scene:
@@ -248,23 +249,29 @@ void Window::View::OnCommand(UINT id)
 	id += (pId >= 0 ? pId : 0);
 	m_historyBar.PushButton(id);
 
-	return;
-
 	Facility::CommandIndexer::Command& data = TheCommandIndexer.Get(id);
 
-	switch (data.Type) {
-	case Facility::CommandIndexer::ListItem:
-	case Facility::CommandIndexer::Check: //:TEMP
-		m_delivery.view.OnCommand(id + pId);
-		break;
+	if (data.Local) {
+		switch (id) {
+		default:
+			break;
+		}
+	}
+	else {
+		switch (data.Type) {
+		case Facility::CommandIndexer::ListItem:
+		case Facility::CommandIndexer::Check: //:TEMP
+			m_delivery.view.OnCommand(id + pId);
+			break;
 
-	case Facility::CommandIndexer::Unknown:
-		DEBUG_STOP;
-		break;
+		case Facility::CommandIndexer::Unknown:
+			DEBUG_STOP;
+			break;
 
-	default:
-		m_delivery.view.OnCommand(id);
-		break;
+		default:
+			m_delivery.view.OnCommand(id);
+			break;
+		}
 	}
 }
 
@@ -519,8 +526,6 @@ void Window::View::CreateToolBar()
 		HOME_3D_LST_VisualEffects,
 		0,
 		HOME_3D_LST_Select,
-		HOME_3D_POP_SelectionFiter,
-		HOME_3D_POP_ObjectSanp
 	});
 }
 
@@ -528,29 +533,28 @@ void Window::View::CreateToolBar()
 
 void Window::View::CreatePanelTabs()
 {
-	//:WARNING - setting before Create()
-	m_tabs.SetImageSize(PRESET::TabImageSize());
-
 	if (m_tabs.Create(CBCGPTabWnd::STYLE_3D, {}, this, PRESET::TabId) == FALSE) {
 		DEBUG_RETURN;
 	}
 
-	m_modelTreePanel.Initialize(&m_tabs, PRESET::ModelTree);
+	m_tabs.SetTabHeight(Component::TabHeight());
+
+	m_modelPanel.Initialize(&m_tabs, PRESET::ModelTree);
 	m_viewPanel.Initialize(&m_tabs, PRESET::View);
 	m_layerPanel.Initialize(&m_tabs, PRESET::Layer);
 	m_scenePanel.Initialize(&m_tabs, PRESET::Scene);
 
 	m_tabs.SetLocation(CBCGPTabWnd::LOCATION_TOP);
 	m_tabs.SetIconLocation(CBCGPTabWnd::TAB_ICON_LEFT);
-	m_tabs.AddImages({
-		HOME_3D_CMD_Panels_ModelTree,
+	m_tabs.SetImageList({
+		HOME_3D_CMD_Panels_Model,
 		HOME_3D_CMD_Panels_View,
 		HOME_3D_CMD_Panels_Layer,
 		HOME_3D_CMD_Panels_Scene,
-	});
+	}, PRESET::TabImageSize());
 
 	int image = 0;
-	m_tabs.AddTab(&m_modelTreePanel, Facility::GetTitle(HOME_3D_CMD_Panels_ModelTree), image++);
+	m_tabs.AddTab(&m_modelPanel, Facility::GetTitle(HOME_3D_CMD_Panels_Model), image++);
 	m_tabs.AddTab(&m_viewPanel, Facility::GetTitle(HOME_3D_CMD_Panels_View), image++);
 	m_tabs.AddTab(&m_layerPanel, Facility::GetTitle(HOME_3D_CMD_Panels_Layer), image++);
 	m_tabs.AddTab(&m_scenePanel, Facility::GetTitle(HOME_3D_CMD_Panels_Scene), image++);

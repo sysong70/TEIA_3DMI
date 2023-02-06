@@ -227,6 +227,13 @@ int Facility::GetPivot(Json::Object& source)
 
 
 
+CSize Facility::GetSize(Json::Object& source)
+{
+	return CSize(source.GetInteger("cx"), source.GetInteger("cy"));
+}
+
+
+
 CRect Facility::GetRect(Json::Object& source)
 {
 	CRect rect;
