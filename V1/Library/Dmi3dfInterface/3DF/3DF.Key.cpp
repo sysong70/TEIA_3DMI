@@ -12,13 +12,65 @@ Key::Key(HC_KEY nInKey)
 	m_nKey = nInKey;
 }
 
-void Key::Open() const
+Key::~Key()
 {
+	if(true == m_bForcedOpen) {
+		return;
+	}
+
+	if(true == m_bOpen) {
+		HC_Close_Segment();
+	}
+}
+
+void Key::Open()
+{
+	if(true == m_bForcedOpen) {
+		return;
+	}
+
+	if(true == m_bOpen) {
+		return;
+	}
+
+	m_bOpen = true;
 	HC_Open_Segment_By_Key(m_nKey);
 }
 
-void Key::Close() const
+void Key::Close()
 {
+	if(true == m_bForcedOpen) {
+		return;
+	}
+
+	if(false == m_bOpen) {
+		return;
+	}
+
+	m_bOpen = false;
+	HC_Close_Segment();
+}
+
+void Key::ForcedOpen()
+{
+	m_bForcedOpen = true;
+
+	if(true == m_bOpen) {
+		return;
+	}
+	
+	m_bOpen = true;
+	HC_Open_Segment_By_Key(m_nKey);
+}
+
+void Key::ForcedClose()
+{
+	if(false == m_bOpen) {
+		return;
+	}
+
+	m_bForcedOpen = false;
+	m_bOpen = false;
 	HC_Close_Segment();
 }
 

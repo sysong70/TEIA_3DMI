@@ -103,15 +103,19 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 	SegmentKey cModelSegmentKey = m_pcHoopsModel->GetSegmentKey();
 	cModelSegmentKey.ConfigureSegmentModel();
 
+	//cModelSegmentKey.ForcedOpen();
+
 	DLL::_3DF::Interface cInterfaace;
 	cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, strErrorMessage);
 
-	// #3DF_Debug
+	//cModelSegmentKey.ForcedClose();
+
+	// #3DF_Debug: Z://Test.hsf
  	//SaveHsfFile(L"Z://Test.hsf", pcHoopsView);
 
 	//pcHoopsView->SetSmoothTransition(true);
 	pcHoopsView->ZoomToExtents();
-	pcHoopsView->ForceUpdate();
+	//pcHoopsView->Update();
 
 	Signal::Delivery delivery;
 	delivery.ViewId = nViewId;

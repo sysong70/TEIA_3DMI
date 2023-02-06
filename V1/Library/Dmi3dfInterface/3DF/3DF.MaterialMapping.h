@@ -8,6 +8,8 @@
 
 OPEN_3DF_NAMESPACE
 
+#define MATERIAL_MAPPING_MAP_INDEX_SIZE		10
+
 class API_3DF MaterialMappingKit
 {
 public:
@@ -32,6 +34,8 @@ public:
 
 	CString Texture() const;
 	void SetTexture(CString strTexture);
+
+	// char * GetMapIndex();
 
 private:
 	RGBAColor m_pcColors[(int) Material::Color::Type::Count];

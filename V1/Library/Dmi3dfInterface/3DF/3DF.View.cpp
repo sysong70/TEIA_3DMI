@@ -86,7 +86,7 @@ void View::Init()
 	SetSmoothTransition(false);
 
 	GetModel()->SetStaticModel(true);
-	GetModel()->SetLMVModel(true);
+	GetModel()->SetLMVModel(false);
 
 	GetModel()->GetEventManager()->RegisterHandler((HAnimationListener *) this, HAnimationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
 	
