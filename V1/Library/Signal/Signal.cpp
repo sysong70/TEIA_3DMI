@@ -1,8 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Signal.h"
 
-
-
 #define SendActionDataOnly(action) \
 Json::Object data; \
 ConstructData(data, action); \

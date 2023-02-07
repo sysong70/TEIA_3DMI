@@ -3,7 +3,7 @@
 #include "Component.h"
 #include "Facility.CommandIndexer.h"
 
-//#define _OLD_TEST_
+
 
 namespace Component
 {

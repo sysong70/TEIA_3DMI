@@ -6,12 +6,12 @@
 
 namespace Facility
 {
-	class Base;
-
+	class CommandIndexer;
 	class AppResource;
 	class AppSettings;
-	class CommandIndexer;
-	class FileOption;
+
+	class Base;
+	class ImportOption;
 	class Preference;
 
 

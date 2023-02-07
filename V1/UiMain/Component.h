@@ -6,19 +6,26 @@
 
 namespace Component
 {
+	class CheckButton; // CWnd
+	class TaskBar; // CWnd
+	class TreePropList; // CWnd
+
+	class Panel; // CWnd
 	class LayerPanel;
 	class ModelPanel;
 	class ScenePanel;
 	class ViewPanel;
 
+	class ToolBar; // CWnd
 	class HistoryBar;
-	class PanelBar;
-	class PropertyBar;
-	class RibbonBar;
-	class StatusBar;
-	class TabWnd;
-	class ToolBar;
-	class TreePropList;
+
+	class CheckListBox; // CBCGPCheckListBox
+	class PanelBar; // CBCGPDockingControlBar
+	class PropList; // CBCGPPropList
+	class RibbonBar; // CBCGPRibbonBar
+	class StatusBar; // CBCGPRibbonStatusBar
+	class TabWnd; // CBCGPTabWnd
+	class TreeCtrlEx; // CBCGPTreeCtrlEx
 
 
 

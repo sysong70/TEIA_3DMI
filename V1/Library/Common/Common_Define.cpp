@@ -1,9 +1,9 @@
 ﻿#include "stdafx.h"
 #include "Common_Define.h"
 
+#include <locale>
 #include <memory>
 #include <string>
-#include <locale>
 
 #ifdef _DEBUG
 #ifdef _AFXDLL
