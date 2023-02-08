@@ -123,8 +123,6 @@
     <ClInclude Include="..\Common\WStr.h" />
     <ClInclude Include="..\Dmi3dxInterface\LogManager.h" />
     <ClInclude Include="..\Signal\Signal.h" />
-    <ClInclude Include="..\Signal\SignalBase.h" />
-    <ClInclude Include="..\Signal\WorkerThread.h" />
     <ClInclude Include="3DF\3DF.Bounding.h" />
     <ClInclude Include="3DF\3DF.Color.h" />
     <ClInclude Include="3DF\3DF.Control.h" />
@@ -167,8 +165,6 @@
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\Dmi3dxInterface\LogManager.cpp" />
     <ClCompile Include="..\Signal\Signal.cpp" />
-    <ClCompile Include="..\Signal\SignalBase.cpp" />
-    <ClCompile Include="..\Signal\WorkerThread.cpp" />
     <ClCompile Include="3DF\3DF.Bounding.cpp" />
     <ClCompile Include="3DF\3DF.Color.cpp" />
     <ClCompile Include="3DF\3DF.Control.cpp" />

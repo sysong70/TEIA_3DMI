@@ -73,9 +73,6 @@
     <ClCompile Include="..\Library\Signal\Signal.cpp">
       <Filter>_Signal</Filter>
     </ClCompile>
-    <ClCompile Include="..\Library\Signal\SignalBase.cpp">
-      <Filter>_Signal</Filter>
-    </ClCompile>
     <ClCompile Include="Component.LayerPanel.cpp">
       <Filter>Component\PanelBar</Filter>
     </ClCompile>
@@ -241,9 +238,6 @@
       <Filter>Dialog</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Signal\Signal.h">
-      <Filter>_Signal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\Signal\SignalBase.h">
       <Filter>_Signal</Filter>
     </ClInclude>
     <ClInclude Include="Component.LayerPanel.h">

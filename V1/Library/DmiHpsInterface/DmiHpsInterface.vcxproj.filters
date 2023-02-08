@@ -93,9 +93,6 @@
     <ClInclude Include="..\Signal\Signal.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\Signal\SignalBase.h">
-      <Filter>Common</Filter>
-    </ClInclude>
     <ClInclude Include="..\Signal\WorkerThread.h">
       <Filter>Common</Filter>
     </ClInclude>
@@ -159,9 +156,6 @@
       <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Signal\Signal.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Signal\SignalBase.cpp">
       <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Signal\WorkerThread.cpp">

@@ -164,7 +164,6 @@
     <ClInclude Include="..\Library\Common\Json.h" />
     <ClInclude Include="..\Library\Common\Path.h" />
     <ClInclude Include="..\Library\Common\WStr.h" />
-    <ClInclude Include="..\Library\Signal\SignalBase.h" />
     <ClInclude Include="..\Library\Signal\Signal.h" />
     <ClInclude Include="Command.Common.h" />
     <ClInclude Include="Component.CheckButton.h" />
@@ -219,7 +218,6 @@
     <ClCompile Include="..\Library\Common\Json.cpp" />
     <ClCompile Include="..\Library\Common\Path.cpp" />
     <ClCompile Include="..\Library\Common\WStr.cpp" />
-    <ClCompile Include="..\Library\Signal\SignalBase.cpp" />
     <ClCompile Include="..\Library\Signal\Signal.cpp" />
     <ClCompile Include="Component.CheckButton.cpp" />
     <ClCompile Include="Component.CheckListBox.cpp" />

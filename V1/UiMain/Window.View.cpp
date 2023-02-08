@@ -135,13 +135,6 @@ void Window::View::ReceiveSignal(Json::Object* pData)
 
 
 
-void Window::View::SetFilePath(CString s)
-{
-	m_sFilePath = s;
-}
-
-
-
 void Window::View::OnActivateView(BOOL bActivate, CView* pActivateView, CView* pDeactiveView)
 {
 	Activate(bActivate);
@@ -165,7 +158,7 @@ void Window::View::OnInitialUpdate()
 {
 	__super::OnInitialUpdate();
 
-	m_delivery.view.OnInitialize((DWORD_PTR)m_hWnd, m_sFilePath);
+	m_delivery.view.OnInitialize((DWORD_PTR)m_hWnd, GetDocument()->GetFilePath());
 
 	CreateHistoryBar();
 	CreateToolBar();

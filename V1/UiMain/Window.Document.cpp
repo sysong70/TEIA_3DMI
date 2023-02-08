@@ -113,9 +113,9 @@ Window::Document::~Document()
 
 
 
-int Window::Document::GetId()
+CString Window::Document::GetFilePath()
 {
-	return GetView()->GetId();
+	return m_sFilePath;
 }
 
 
@@ -124,7 +124,7 @@ Window::View* Window::Document::GetView()
 {
 	POSITION pos = GetFirstViewPosition();
 	if (pos != nullptr) {
-		View* pView = DYNAMIC_DOWNCAST(View,  GetNextView(pos));
+		View* pView = DYNAMIC_DOWNCAST(View, GetNextView(pos));
 		if (pView != nullptr) {
 			return pView;
 		}
@@ -155,7 +155,7 @@ BOOL Window::Document::OnNewDocument()
 
 BOOL Window::Document::OnOpenDocument(LPCTSTR lpszPathName)
 {
-	GetView()->SetFilePath(lpszPathName);
+	m_sFilePath = lpszPathName;
 
 	return TRUE;
 }

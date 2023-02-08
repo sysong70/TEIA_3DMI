@@ -2,6 +2,8 @@
 #include "WorkerThread.h"
 #include "Json.h"
 
+
+
 #pragma region EventWrapper Structure
 
 EventWrapper::EventWrapper(int type, int id, void* pEventData)

@@ -57,9 +57,9 @@ namespace Window
 
 		~Document() override;
 
-		View* GetView();
+		CString GetFilePath();
 
-		int GetId();
+		View* GetView();
 
 	public:
 
@@ -80,5 +80,9 @@ namespace Window
 	#endif
 
 		DECLARE_MESSAGE_MAP()
+
+	protected:
+
+		CString m_sFilePath;
 	};
 }
