@@ -73,7 +73,7 @@ void Component::ModelPanel::AdjustLayout(int cx, int cy)
 	__super::AdjustLayout(cx, cy);
 
 	CRect rect = GetBodyRect();
-	m_wndControl.SetWindowPos(nullptr, rect.left, rect.top, rect.Width(), rect.Height(), SWP_NOACTIVATE);
+	m_wndControl.SetWindowPos(NULL, rect.left, rect.top, rect.Width(), rect.Height(), SWP_NOACTIVATE);
 }
 
 
@@ -182,7 +182,7 @@ void Component::ModelPanel::OnCommand(UINT id)
 LRESULT Component::ModelPanel::OnTreeCheckClick(WPARAM wp, LPARAM lp)
 {
 	CBCGPGridRow* pRow = (CBCGPGridRow*)lp;
-	if (pRow == NULL) {
+	if (pRow == nullptr) {
 		return 0;
 	}
 
@@ -219,7 +219,7 @@ void Component::ModelPanel::OnTreeBeginLabelEdit(NMHDR* pNMHDR, LRESULT* pResult
 	TV_DISPINFO* pTVDispInfo = (TV_DISPINFO*)pNMHDR;
 
 	CEdit* pEdit = (CEdit*)CWnd::FromHandle((HWND)m_wndControl.SendMessage(TVM_GETEDITCONTROL));
-	if (pEdit->GetSafeHwnd() != NULL) {
+	if (pEdit->GetSafeHwnd() != nullptr) {
 		pEdit->PostMessage(EM_SETSEL, 0, (LPARAM)-1);
 	}
 
@@ -280,7 +280,7 @@ void Component::ModelPanel::OnTreeEndLabelEdit(NMHDR* pNMHDR, LRESULT* pResult)
 	TV_DISPINFO* pTVDispInfo = (TV_DISPINFO*)pNMHDR;
 
 	DEBUG_TRACE(L"TVN_ENDLABELEDIT: item: %s\r\n",
-		pTVDispInfo->item.pszText == NULL ? L"CANCELED" : pTVDispInfo->item.pszText);
+		pTVDispInfo->item.pszText == nullptr ? L"CANCELED" : pTVDispInfo->item.pszText);
 
 	*pResult = S_OK;
 }
@@ -341,8 +341,8 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
-	const CString oldItem = pNMTreeView->itemOld.hItem == NULL ? L"(none)" : m_wndControl.GetItemText(pNMTreeView->itemOld.hItem);
-	const CString newItem = pNMTreeView->itemNew.hItem == NULL ? L"(none)" : m_wndControl.GetItemText(pNMTreeView->itemNew.hItem);
+	const CString oldItem = pNMTreeView->itemOld.hItem == nullptr ? L"(none)" : m_wndControl.GetItemText(pNMTreeView->itemOld.hItem);
+	const CString newItem = pNMTreeView->itemNew.hItem == nullptr ? L"(none)" : m_wndControl.GetItemText(pNMTreeView->itemNew.hItem);
 	const CString action = pNMTreeView->action == TVC_BYMOUSE ? L"by mouse" :
 		pNMTreeView->action == TVC_BYKEYBOARD ? L"by keyboard" : L"unknown";
 
@@ -358,8 +358,8 @@ void Component::ModelPanel::OnTreeSelChanging(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
-	const CString oldItem = pNMTreeView->itemOld.hItem == NULL ? L"(none)" : m_wndControl.GetItemText(pNMTreeView->itemOld.hItem);
-	const CString newItem = pNMTreeView->itemNew.hItem == NULL ? L"(none)" : m_wndControl.GetItemText(pNMTreeView->itemNew.hItem);
+	const CString oldItem = pNMTreeView->itemOld.hItem == nullptr ? L"(none)" : m_wndControl.GetItemText(pNMTreeView->itemOld.hItem);
+	const CString newItem = pNMTreeView->itemNew.hItem == nullptr ? L"(none)" : m_wndControl.GetItemText(pNMTreeView->itemNew.hItem);
 	const CString action = pNMTreeView->action == TVC_BYMOUSE ? L"by mouse" :
 		pNMTreeView->action == TVC_BYKEYBOARD ? L"by keyboard" : L"unknown";
 

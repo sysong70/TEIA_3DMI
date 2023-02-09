@@ -35,7 +35,7 @@ void Property::DurationCtrl::OnKillFocus(CWnd* pNewWnd)
 	}
 
 	CBCGPProp* pSel = pParent->GetCurSel();
-	if (pSel != NULL && pSel->IsInPlaceEditing() && pSel->IsEnabled()) {
+	if (pSel != nullptr && pSel->IsInPlaceEditing() && pSel->IsEnabled()) {
 		if (pParent->EndEditItem() == FALSE) {
 			SetFocus();
 		}
@@ -108,7 +108,7 @@ void Property::IconComboBox::OnMeasureItem(int /*nIDCtl*/, LPMEASUREITEMSTRUCT l
 		CBCGPClientDC dc(this);
 		CBCGPFontSelector fs(dc, &globalUtils.GetFontRegular(this));
 
-		for (POSITION pos = m_iconNames.GetHeadPosition(); pos != NULL;) {
+		for (POSITION pos = m_iconNames.GetHeadPosition(); pos != nullptr;) {
 			CString name = m_iconNames.GetNext(pos);
 			nTextWidth = max(nTextWidth, dc.GetTextExtent(name).cx + ICON_PADDING(this));
 		}
@@ -171,7 +171,7 @@ void Property::SliderCtrl::HScroll(UINT /*nSBCode*/, UINT /*nPos*/)
 Property::ComboBoxEx::ComboBoxEx(const CString& name, const CString& value, LPCTSTR lpDescr, DWORD_PTR data, CBCGPToolBarImages* pImageList)
 	: CBCGPProp(name, (LPCTSTR)value, lpDescr, data)
 {
-	if (pImageList != NULL) {
+	if (pImageList != nullptr) {
 		pImageList->ExportToImageList(m_imageList);
 	}
 }
@@ -950,7 +950,7 @@ CWnd* Property::Password::CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultFormat
 
 CString Property::Password::FormatProperty()
 {
-	if (m_pWndInPlace != NULL) {
+	if (m_pWndInPlace != nullptr) {
 		return __super::FormatProperty();
 	}
 
@@ -1222,7 +1222,7 @@ void Property::TwoButtons::LoadImages()
 	m_images.SetTransparentColor(RGB(255, 0, 255));
 	//m_images.Load(IDB_BUTTONS);
 
-	globalUtils.ScaleByDPI(m_images, (m_pWndList->GetSafeHwnd() == NULL ? AfxGetMainWnd() : m_pWndList));
+	globalUtils.ScaleByDPI(m_images, (m_pWndList->GetSafeHwnd() == nullptr ? AfxGetMainWnd() : m_pWndList));
 }
 
 #pragma endregion //:REGION

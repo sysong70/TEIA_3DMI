@@ -266,6 +266,7 @@ namespace Signal
 		void OnRButtonUp(UINT flags, int x, int y);
 		void OnMouseWheel(UINT flags, short delta, int x, int y, int left, int top, int right, int bottom);
 
+		void OnPaint();
 		void OnPaint(int left, int top, int right, int bottom);
 
 		void OnResize(int x, int y);

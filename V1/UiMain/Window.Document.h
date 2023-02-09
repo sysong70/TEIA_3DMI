@@ -41,6 +41,8 @@ namespace Window
 
 	bool IsAllowedFile(const wchar_t* pFilePath);
 
+
+
 	CString GetDocTypeName(EDocType e);
 
 
@@ -55,7 +57,16 @@ namespace Window
 
 	public:
 
+		enum EType
+		{
+			Unknown = -1,
+			Doc3d,
+			Doc2d,
+		};
+
 		~Document() override;
+
+		EType GetCateogry();
 
 		CString GetFilePath();
 

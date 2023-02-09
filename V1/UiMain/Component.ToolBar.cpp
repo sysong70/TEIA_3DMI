@@ -76,7 +76,7 @@ Component::ToolBar::~ToolBar()
 
 void Component::ToolBar::Initialize(CWnd* pParentWnd, const RECT& rect)
 {
-	__super::Create(nullptr, L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, rect, pParentWnd, PRESET::Id);
+	__super::Create(NULL, L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, rect, pParentWnd, PRESET::Id);
 }
 
 
@@ -195,7 +195,7 @@ CSize Component::ToolBar::AdjustLayout()
 	}
 
 	CPoint pivot = AdjustLocation(size);
-	SetWindowPos(nullptr, pivot.x, pivot.y, size.cx, size.cy, SWP_NOACTIVATE);
+	SetWindowPos(NULL, pivot.x, pivot.y, size.cx, size.cy, SWP_NOACTIVATE);
 
 	return size;
 }

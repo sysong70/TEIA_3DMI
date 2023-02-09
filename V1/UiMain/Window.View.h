@@ -94,8 +94,9 @@ namespace Window
 
 	protected:
 
+		EType m_eType = EType::Unknown;
 		int m_nViewId = -1;
-		bool m_bValid = false;
+		bool m_bRenderer = false;
 		bool m_bActivate = false;
 
 		Signal::Delivery m_delivery;
@@ -105,6 +106,8 @@ namespace Window
 		void DelayViewActivation();
 
 		CRect GetClientArea();
+
+		CSize GetClientSize();
 
 		Window::MainFrame& GetMainFrame();
 

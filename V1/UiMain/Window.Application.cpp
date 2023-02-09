@@ -161,9 +161,9 @@ BOOL Window::Application::InitInstance()
 	if (Connector3d::Initialize()) {
 		Connector3d::GetInstance().application.OnInitInstance();
 	}
-	//if (Connector2d::Initialize()) {
-	//	Connector2d::GetInstance().application.OnInitInstance();
-	//}
+	if (Connector2d::Initialize()) {
+		Connector2d::GetInstance().application.OnInitInstance();
+	}
 
 #pragma endregion //:REGION
 
@@ -184,7 +184,8 @@ BOOL Window::Application::InitInstance()
 	AfxEnableControlContainer();
 
 	SetRegistryKey(_T("Dataface"));
-	LoadStdProfileSettings(4);
+	//:WARNING - recend file counts
+	LoadStdProfileSettings(16);
 	SetRegistryBase(_T("Settings"));
 
 	CMultiDocTemplate* pDocTemplate;

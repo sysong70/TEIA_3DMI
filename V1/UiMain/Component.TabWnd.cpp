@@ -41,7 +41,7 @@ void Component::TabWnd::SetImageList(std::vector<UINT> ids, CSize imageSize)
 
 	images.ExportToImageList(m_Images);
 
-	if (m_ImagesGray.GetSafeHandle() != NULL) {
+	if (m_ImagesGray.GetSafeHandle() != nullptr) {
 		m_ImagesGray.DeleteImageList();
 	}
 }

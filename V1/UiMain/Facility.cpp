@@ -36,12 +36,12 @@ void Facility::SetLanguage(ELanguage value)
 	BOOL success = FALSE;
 	switch (value) {
 	case ELanguage::Korean:
-		success = SetThreadPreferredUILanguages(MUI_LANGUAGE_NAME, L"ko-KR", NULL);
+		success = ::SetThreadPreferredUILanguages(MUI_LANGUAGE_NAME, L"ko-KR", NULL);
 		break;
 
 	case ELanguage::English:
 	default:
-		success = SetThreadPreferredUILanguages(MUI_LANGUAGE_NAME, L"en-US", NULL);
+		success = ::SetThreadPreferredUILanguages(MUI_LANGUAGE_NAME, L"en-US", NULL);
 		break;
 	}
 
@@ -142,9 +142,9 @@ CString Facility::GetTooltip(UINT id)
 
 bool Facility::LoadTextResource(UINT id, CString& result)
 {
-	HRSRC hRes = ::FindResource(nullptr, MAKEINTRESOURCE(id), L"TEXT");
-	DWORD dwResourceSize = ::SizeofResource(nullptr, hRes);
-	HGLOBAL hGlobal = ::LoadResource(nullptr, hRes);
+	HRSRC hRes = ::FindResource(NULL, MAKEINTRESOURCE(id), L"TEXT");
+	DWORD dwResourceSize = ::SizeofResource(NULL, hRes);
+	HGLOBAL hGlobal = ::LoadResource(NULL, hRes);
 	LPVOID pData = ::LockResource(hGlobal);
 
 	char* pChar = new char[dwResourceSize + 1];

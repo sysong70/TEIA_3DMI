@@ -132,7 +132,7 @@ CRect Dialog::Standard::AlignControls(Controls controls, CPoint basePoint, Compo
 			break;
 		}
 
-		pControl->SetWindowPos(nullptr, pivot.x, pivot.y, 0, 0, SWP_NOSIZE);
+		pControl->SetWindowPos(NULL, pivot.x, pivot.y, 0, 0, SWP_NOSIZE);
 		// recalculate boundary 
 		controlFrame = GetControlRect(pControl);
 
@@ -187,7 +187,7 @@ CRect Dialog::Standard::DestributeControls(Controls controls, CPoint basePoint, 
 			break;
 		}
 
-		pControl->SetWindowPos(nullptr, pivot.x, pivot.y, 0, 0, SWP_NOSIZE);
+		pControl->SetWindowPos(NULL, pivot.x, pivot.y, 0, 0, SWP_NOSIZE);
 		// recalculate boundary 
 		controlFrame = GetControlRect(pControl);
 

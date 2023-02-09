@@ -16,7 +16,7 @@ static char THIS_FILE[] = __FILE__;
 bool Dir::Create(const wchar_t* path)
 {
 	// recursive
-	if (::SHCreateDirectory(nullptr, path) == ERROR_SUCCESS) {
+	if (::SHCreateDirectory(NULL, path) == ERROR_SUCCESS) {
 		return true;
 	}
 	else {

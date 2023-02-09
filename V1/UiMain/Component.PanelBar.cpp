@@ -81,7 +81,7 @@ void Component::PanelBar::ViewChanged(TabWnd* pTabs)
 	m_pActiveTabs = pTabs;
 	m_pActiveTabs->ShowWindow(SW_HIDE);
 	m_pActiveTabs->SetParent(this);
-	m_pActiveTabs->SetWindowPos(nullptr, 0, 0, rect.Width(), rect.Height(), SWP_NOMOVE);
+	m_pActiveTabs->SetWindowPos(NULL, 0, 0, rect.Width(), rect.Height(), SWP_NOMOVE);
 	m_pActiveTabs->ShowWindow(SW_SHOW);
 
 	EnableWindow(TRUE);
@@ -107,7 +107,7 @@ void Component::PanelBar::OnSize(UINT nType, int cx, int cy)
 	__super::OnSize(nType, cx, cy);
 
 	if (m_pActiveTabs != nullptr) {
-		m_pActiveTabs->SetWindowPos(nullptr, 0, 0, cx, cy, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
+		m_pActiveTabs->SetWindowPos(NULL, 0, 0, cx, cy, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
 	}
 }
 

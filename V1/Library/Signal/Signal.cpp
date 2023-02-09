@@ -294,6 +294,11 @@ Wrapper().SendData(data);
 
 #undef SendMouseData
 
+	void View::OnPaint()
+	{
+		SendActionDataOnly(Action::OnPaint);
+	}
+
 	void View::OnPaint(int left, int top, int right, int bottom)
 	{
 		Json::Object data;

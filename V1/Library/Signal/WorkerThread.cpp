@@ -69,8 +69,10 @@ void WorkerThread::Exit()
 
 	// Create a new event
 	auto wrapper = std::make_shared<EventWrapper>((int)Event::Close);
+	//:WARNING - do not lock
+	//std::lock_guard<std::mutex> lock(m_mutex);
+
 	// Put close event into the queue
-	std::lock_guard<std::mutex> lock(m_mutex);
 	m_queue.push(wrapper);
 	m_condition.notify_one();
 	// End thread

@@ -46,7 +46,7 @@ Component::Panel::~Panel()
 
 bool Component::Panel::Initialize(CWnd* pParentWnd, UINT id)
 {
-	if (__super::Create(nullptr, L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, {}, pParentWnd, id) == FALSE) {
+	if (__super::Create(NULL, L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, {}, pParentWnd, id) == FALSE) {
 		RETURN_FALSE;
 	}
 

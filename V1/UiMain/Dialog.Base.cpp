@@ -145,7 +145,7 @@ CSize Dialog::Base::AdjustWindowSize(CSize client)
 	win.cx += padding.left + padding.right;
 	win.cy += padding.top + padding.bottom;
 
-	SetWindowPos(nullptr, 0, 0, win.cx, win.cy, SWP_NOMOVE);
+	SetWindowPos(NULL, 0, 0, win.cx, win.cy, SWP_NOMOVE);
 
 	return win;
 }

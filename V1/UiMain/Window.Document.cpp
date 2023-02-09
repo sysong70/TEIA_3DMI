@@ -113,6 +113,26 @@ Window::Document::~Document()
 
 
 
+Window::Document::EType Window::Document::GetCateogry()
+{
+	//:WARNING - new document
+	if (m_sFilePath.IsEmpty()) {
+		return EType::Doc3d;
+	}
+
+	CString ext = Path::GetExtension(m_sFilePath);
+	ext.MakeLower();
+
+	if (ext == "dwg" || ext == "dxf") {
+		return EType::Doc2d;
+	}
+	else {
+		return EType::Doc3d;
+	}
+}
+
+
+
 CString Window::Document::GetFilePath()
 {
 	return m_sFilePath;

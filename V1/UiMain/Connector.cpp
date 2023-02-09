@@ -92,7 +92,7 @@ Signal::Delivery& Connector3d::GetInstance()
 
 void Connector3d::ReceiveSignal(const wchar_t* content)
 {
-	//:WARNING - remove later
+	//:WARNING - delete this pointer after use
 	Json::Object* pData = new Json::Object();
 	Json::Object& data = *pData;
 	Json::Helper::Load(content, data);
@@ -153,7 +153,7 @@ public:
 		hInstance = ::LoadLibrary(filePath);
 		if (hInstance == nullptr) {
 			ErrorCode = ::GetLastError();
-			RETURN_FALSE;
+			return false;
 		}
 
 		Initialize = (InitializeFunc)GetProcAddress(hInstance, "Initialize");
@@ -170,7 +170,7 @@ public:
 			return true;
 		}
 
-		RETURN_FALSE;
+		return false;
 	}
 };
 
@@ -202,7 +202,27 @@ Signal::Delivery& Connector2d::GetInstance()
 
 void Connector2d::ReceiveSignal(const wchar_t* content)
 {
-	DEBUG_STOP;
+	//:CHECK - 2d case
+
+	//:WARNING - delete this pointer after use
+	Json::Object* pData = new Json::Object();
+	Json::Object& data = *pData;
+	Json::Helper::Load(content, data);
+
+	Signal::Target target = (Signal::Target)data.GetInteger(SKW_TARGET, -1);
+
+	switch (target) {
+	case Signal::Target::MainFrame:
+	case Signal::Target::Progress:
+	case Signal::Target::View:
+		TheAppication.GetMainFrame().PostMessage((UINT)Window::EUserMessage::OnSignal, (WPARAM)pData);
+		break;
+
+	case::Signal::Target::Unknown:
+	default:
+		REMOVE_POINTER(pData);
+		DEBUG_STOP;
+	}
 }
 
 #pragma endregion //:REGION

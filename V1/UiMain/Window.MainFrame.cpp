@@ -163,7 +163,14 @@ CBCGPMDIChildWnd* Window::MainFrame::CreateDocumentWindow(LPCTSTR lpcszDocName, 
 		}
 	}
 
-	return NULL;
+	return nullptr;
+}
+
+
+
+HMENU Window::MainFrame::GetWindowMenuPopup(HMENU hMenuBar)
+{
+	return nullptr;
 }
 
 
@@ -213,7 +220,7 @@ LRESULT Window::MainFrame::OnNextFileOpen(WPARAM wp, LPARAM lp)
 			CString fileName = m_fileNames.front();
 			m_fileNames.erase(m_fileNames.begin());
 
-			//:REF - create new file; pDocTemplate->OpenDocumentFile(NULL)
+			//:REF - create new file; pDocTemplate->OpenDocumentFile(nullptr)
 			CDocument* pDoc = pDocTemplate->OpenDocumentFile(fileName);
 		}
 	}
@@ -311,7 +318,7 @@ void Window::MainFrame::OnFileOpen()
 //#define USE_OPTION_DLG
 
 #ifdef USE_OPTION_DLG
-	CFileDialog dlg(TRUE, nullptr, nullptr, OFN_HIDEREADONLY, filter, this);
+	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY, filter, this);
 	//:WARNING
 	dlg.AddCheckButton(SHOW_OPTION, Facility::Local(L"Show import option|파일 옵션 보기"), TRUE);
 	dlg.MakeProminent(SHOW_OPTION); // align to buttons
@@ -332,7 +339,7 @@ void Window::MainFrame::OnFileOpen()
 		PostMessage((UINT)EUserMessage::OnNextFileOpen);
 	}
 #else
-	CFileDialog dlg(TRUE, nullptr, nullptr, OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT, filter, this);
+	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT, filter, this);
 
 	if (dlg.DoModal() == IDOK) {
 		POSITION pos = dlg.GetStartPosition();

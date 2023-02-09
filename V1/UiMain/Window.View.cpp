@@ -67,10 +67,6 @@ Window::View::View()
 {
 	m_nViewId = PRESET::ViewIndex++;
 
-	m_delivery.ViewId = m_nViewId;
-	m_delivery.SetSender(Connector3d::GetSender());
-	m_delivery.view.OnConstruct();
-
 	GetMainFrame().ViewChanged(WM_CREATE, this);
 }
 
@@ -108,10 +104,17 @@ void Window::View::ReceiveSignal(Json::Object* pData)
 
 	switch (action) {
 	case Signal::View::Action::SetValidation:
-		m_bValid = data.GetBoolean(SKW_VALID);
-		if (m_bValid) {
-			CRect rect = GetClientArea();
-			m_delivery.view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
+		m_bRenderer = data.GetBoolean(SKW_VALID);
+		if (m_bRenderer) {
+			if (m_eType == EType::View3d) {
+				CRect rect = GetClientArea();
+				m_delivery.view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
+			}
+			else {
+				CSize client = GetClientSize();
+				m_delivery.view.OnResize(client.cx, client.cy);
+				m_delivery.view.OnPaint();
+			}
 
 			if (GetMainFrame().HasNextFile()) {
 				GetMainFrame().PostMessage((UINT)EUserMessage::OnNextFileOpen);
@@ -158,6 +161,23 @@ void Window::View::OnInitialUpdate()
 {
 	__super::OnInitialUpdate();
 
+	m_delivery.ViewId = m_nViewId;
+	switch (GetDocument()->GetCateogry()) {
+	case Document::Doc3d:
+		m_eType = EType::View3d;
+		m_delivery.SetSender(Connector3d::GetSender());
+		break;
+
+	case Document::Doc2d:
+		m_eType = EType::View2d;
+		m_delivery.SetSender(Connector2d::GetSender());
+		break;
+
+	default:
+		DEBUG_STOP;
+	}
+
+	m_delivery.view.OnConstruct();
 	m_delivery.view.OnInitialize((DWORD_PTR)m_hWnd, GetDocument()->GetFilePath());
 
 	CreateHistoryBar();
@@ -234,7 +254,7 @@ void Window::View::OnCommand(UINT id)
 		return;
 
 	default:
-		if (m_bValid == false) {
+		if (m_bRenderer == false) {
 			return;
 		}
 	}
@@ -273,7 +293,7 @@ void Window::View::OnCommand(UINT id)
 
 void Window::View::OnContextMenu(CWnd*, CPoint point)
 {
-	if (CBCGPPopupMenu::GetSafeActivePopupMenu() != NULL) {
+	if (CBCGPPopupMenu::GetSafeActivePopupMenu() != nullptr) {
 		return;
 	}
 
@@ -288,7 +308,7 @@ void Window::View::OnPaint()
 	CPaintDC dc(this);
 	CRect rect = GetClientArea();
 
-	if (m_bValid) {
+	if (m_bRenderer) {
 		m_delivery.view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
 	}
 	else {
@@ -378,12 +398,14 @@ void Window::View::OnMouseMove(UINT nFlags, CPoint point)
 
 BOOL Window::View::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 {
-	if (m_bValid) {
+	if (m_bRenderer) {
+		if (m_eType == EType::View2d) {
+			ScreenToClient(&point);
+		}
+
 		CRect rect;
 		GetWindowRect(rect);
-		//ScreenToClient(&point);
-		m_delivery.view.OnMouseWheel(nFlags, zDelta,
-			point.x, point.y, rect.left, rect.top, rect.right, rect.bottom);
+		m_delivery.view.OnMouseWheel(nFlags, zDelta, point.x, point.y, rect.left, rect.top, rect.right, rect.bottom);
 	}
 
 	return __super::OnMouseWheel(nFlags, zDelta, point);
@@ -427,7 +449,7 @@ void Window::View::OnSize(UINT nType, int cx, int cy)
 		m_taskBar.AdjustLayout();
 	}
 
-	if (m_bValid) {
+	if (m_bRenderer) {
 		m_delivery.view.OnResize(cx, cy);
 	}
 }
@@ -449,10 +471,10 @@ void Window::View::OnTimer(UINT_PTR nIDEvent)
 
 void Window::View::Activate(bool value)
 {
-	if (m_bValid) {
+	if (m_bRenderer) {
 		if (value) {
 			GetMainFrame().ViewChanged(WM_ACTIVATE, this);
-			DelayViewActivation();
+			//DelayViewActivation();
 			m_toolBar.ShowWindow(SW_SHOW);
 			m_historyBar.ShowWindow(SW_SHOW);
 		}
@@ -483,6 +505,13 @@ CRect Window::View::GetClientArea()
 
 
 
+CSize Window::View::GetClientSize()
+{
+	return GetClientArea().Size();
+}
+
+
+
 Window::MainFrame& Window::View::GetMainFrame()
 {
 	return *(Window::MainFrame*)AfxGetMainWnd();
@@ -492,7 +521,7 @@ Window::MainFrame& Window::View::GetMainFrame()
 
 bool Window::View::IsValid()
 {
-	return m_bValid && m_bActivate;
+	return m_bRenderer && m_bActivate;
 }
 
 

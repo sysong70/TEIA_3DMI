@@ -69,7 +69,7 @@ CRect Component::AdjustLayout(CWnd* pControl, CRect frame, CSize baseSize, EPivo
 	}
 
 	// move and resize
-	pControl->SetWindowPos(nullptr, pivot.x, pivot.y, size.cx, size.cy, 0);
+	pControl->SetWindowPos(NULL, pivot.x, pivot.y, size.cx, size.cy, 0);
 
 	return { pivot, size };
 }
@@ -132,7 +132,7 @@ CRect Component::AdjustPosition(CWnd* pControl, CRect frame, EPivot ePivot)
 		break;
 	}
 
-	pControl->SetWindowPos(nullptr, pivot.x, pivot.y, 0, 0, SWP_NOSIZE);
+	pControl->SetWindowPos(NULL, pivot.x, pivot.y, 0, 0, SWP_NOSIZE);
 
 	return { pivot, size };
 }
@@ -145,7 +145,7 @@ CSize Component::AdjustSize(CWnd* pControl, CSize baseSize)
 	size.cx = max(size.cx, baseSize.cx);
 	size.cy = max(size.cy, baseSize.cy);
 
-	pControl->SetWindowPos(nullptr, 0, 0, size.cx, size.cy, SWP_NOMOVE);
+	pControl->SetWindowPos(NULL, 0, 0, size.cx, size.cy, SWP_NOMOVE);
 
 	return size;
 }

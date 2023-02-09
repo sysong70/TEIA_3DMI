@@ -36,7 +36,7 @@ namespace PresetStatusBar
 	public:
 
 		StatusBarButton(UINT nCmdID)
-			: CBCGPRibbonStatusBarPane(nCmdID, nullptr)
+			: CBCGPRibbonStatusBarPane(nCmdID, NULL)
 		{
 			SetIcon(Facility::CreateIcon(nCmdID, PRESET::ImageSize()));
 		}
