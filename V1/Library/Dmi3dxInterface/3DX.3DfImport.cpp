@@ -4,6 +4,8 @@
 
 #include "3DFSignal.Interface.h"
 
+#include "3DX.ExchangeWrapper.h"
+
 #include "LogManager.h"
 
 #include <mb_matrix3d.h>
@@ -13,12 +15,17 @@
 #include <3DF/3DF.Style.h>
 #include <3DF/3DF.Shell.h>
 #include <3DF/3DF.Line.h>
+#include <3DF/3DF.Polygon.h>
 
 #include <3DF/3DF.Visibility.h>
 #include <3DF/3DF.MarkerAttribute.h>
 
+#include <WStr.h>
+
 #include <chrono>
 #include <utility>
+
+#include "A3DSDKIncludes.h"
 
 #ifdef _DEBUG
 //#	define new DEBUG_NEW
@@ -123,6 +130,9 @@ bool _3DfImport::FileImport(CString strFilePathName, _3DF::SegmentKey & cModelSe
 	m_cPoccsIncludeSegment = cModelInclude.Subsegment(L"poccs");
 	m_cRisIncludeSegment = cModelInclude.Subsegment(L"ris");
 	m_cPmiIncludeSegment = cModelInclude.Subsegment(L"pmi");
+
+	m_cPmiIncludeSegment.SetVisibility(L"everything = off");
+	m_cPmiIncludeSegment.SetHeuristics(L"exclude bounding");
 
 	// Import 관련 Option 설정
 	ImportOption sImportOption;
@@ -232,9 +242,6 @@ bool _3DfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, _3DF::Se
 	// cImportInfo.dModelScale = cModelFileData.m_bUnitFromCAD ? cModelFileData.m_dUnit : 1.0;
 	// cImportInfo.eModellerType = cModelFileData.m_eModellerType;
 
-	// Texture 관련 사항 정의
-	PopulateTextures();
-
 	double dModelScale = cModelFileData.m_bUnitFromCAD ? cModelFileData.m_dUnit : 1.0;
 
 	m_bGlobalDataFlag = false;
@@ -248,6 +255,10 @@ bool _3DfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, _3DF::Se
 			m_bGlobalDataFlag = true;
 		}
 	}
+
+ 	_3DF::SegmentKey cTextureDefineSegment = cModelSegment.Subsegment(L"texture_define");
+// 	// Texture 관련 사항 정의
+ 	PopulateTextures(cTextureDefineSegment);
 
 	_3DF::MaterialMappingKit cMaterial;
 	cMaterial.SetColor(RGBAColor(0.752941f, 0.752941f, 0.752941f));
@@ -293,30 +304,13 @@ A3DStatus _3DfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurre
 	_3DF::SegmentKey cSegment = m_cPoccsIncludeSegment.Subsegment(strSegmentName);
 	cParentSegment.IncludeSegment(cSegment);
 
+	cSegment.ForcedOpen();
+
 	// Attribute 생성
 	// Parent에서 받은(계단식으로) Attribute를 이용해서, Attribute를 생성
 	A3DMiscCascadedAttributes * pcAttrs;
 	A3DMiscCascadedAttributesData cAttrsData;
 	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcOccurrence, pcParentAttr, &pcAttrs, &cAttrsData));
-
-/*
-	MaterialMappingKit cMaterialMapping;
-	if(A3D_SUCCESS == DrawStyle(cAttrsData, cMaterialMapping)) {
-		if(true == cMaterialMapping.IsAllocate()) {
-			LogIncreaseTabIndex(2);
-			SegmentKey cStyleSegment;
-			if(true == FindMaterialMapping(cMaterialMapping, cStyleSegment)) {
-				SetStyle(cSegment, cStyleSegment);
-				Log(2, L"SetStyle");
-			}
-			else {
-				SetStyleMaterialMapping(cMaterialMapping, cSegment);
-				Log(2, L"SetStyleMaterialMapping");
-			}
-			LogDecreaseTabIndex(2);
-		}
-	}
-*/
 
 	if(cAttrsData.m_bShow && !cAttrsData.m_bRemoved && A3D_SUCCESS == IsShow(pcOccurrence))
 	{
@@ -342,9 +336,8 @@ A3DStatus _3DfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurre
 				}
 			}
 */
-			//cSegment.ForcedOpen();
 
-			_3DF::MatrixKit cMatrix;
+			_3DF::Matrix cMatrix;
 			if(A3D_SUCCESS == ProductOccurrenceGetLocation(&cData, cMatrix)) {
 				if(false == cMatrix.IsIdentity()) {
 					cSegment.SetModellingMatrix(cMatrix);
@@ -377,24 +370,28 @@ A3DStatus _3DfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurre
 				A3DPointerArray cMarkups, cViews;
 				PointerArrayInitialize(&cMarkups);
 				PointerArrayInitialize(&cViews);
-				ProductOccurrenceGetMarkups(&cData, &cMarkups);
+
+				// Product Occurrence Markup 정보 수집
+				//ProductOccurrenceGetMarkups(&cData, &cMarkups);
+				// Product Occurrence View 정보 수집
 				ProductOccurrenceGetViews(&cData, &cViews);
 
 				nSize = cViews.m_uiSize;
 				for(A3DUns32 nIndex = 0; nIndex < nSize; nIndex++) {
-					CHECK_A3D_RETURN(DrawMarkupView(cViews.m_ppPointers[nIndex], cSegment, pcAttrs));
+					//CHECK_A3D_RETURN(DrawMarkupView(cViews.m_ppPointers[nIndex], cSegment, pcAttrs));
 				}
 
-				nSize = cMarkups.m_uiSize;
-				for(UINT nIndex = 0; nIndex < nSize; nIndex++) {
-					CHECK_A3D_RETURN(DrawMarkup(cMarkups.m_ppPointers[nIndex], cSegment, pcAttrs));
-				}
+				ParseAnnotations(cData.m_ppAnnotations, cData.m_uiAnnotationsSize, cSegment);
 
-				PointerArrayTerminate(&cMarkups);
+// 				nSize = cMarkups.m_uiSize;
+// 				for(UINT nIndex = 0; nIndex < nSize; nIndex++) {
+// 					ParseAnnotation(cMarkups.m_ppPointers[nIndex], pcAttrs, cSegment);
+// 					//CHECK_A3D_RETURN(BuildMarkup(cMarkups.m_ppPointers[nIndex], pcAttrs, cSegment));
+// 				}
+
+				// PointerArrayTerminate(&cMarkups);
 				PointerArrayTerminate(&cViews);
 			}
-
-			//cSegment.ForcedClose();
 
 			//CHECK_A3D_RETURN(A3DRootBaseGet(nullptr, &cRootBaseData));
 		}
@@ -405,7 +402,7 @@ A3DStatus _3DfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurre
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttrs));
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrsData));
 
-	//cSegment.ForcedClose();
+	cSegment.ForcedClose();
 
 	LogDecreaseTabIndex(2);
 /*
@@ -484,7 +481,7 @@ A3DStatus _3DfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurre
 }
 
 // 2-1-1. Assembly Product Occurence의 위치를 가져오는 함수 / ProductOccurrenceGetLocation
-A3DStatus _3DfImport::ProductOccurrenceGetLocation(A3DAsmProductOccurrenceData const * pcPoData, MatrixKit & cTransMatrix)
+A3DStatus _3DfImport::ProductOccurrenceGetLocation(A3DAsmProductOccurrenceData const * pcPoData, Matrix & cTransMatrix)
 {
 	if(nullptr == pcPoData) {
 		return A3D_ERROR;
@@ -889,6 +886,8 @@ A3DStatus _3DfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMi
 	cParentSegment.IncludeSegment(cSegment);
 	m_mPartsMap.SetAt((DWORD_PTR) pcPart, cSegment.KeyValue());
 
+	cSegment.ForcedOpen();
+
 	A3DMiscCascadedAttributes * pcAttr;
 	A3DMiscCascadedAttributesData cAttrData;
 	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcPart, pcParentAttr, &pcAttr, &cAttrData));
@@ -901,15 +900,13 @@ A3DStatus _3DfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMi
 
 		if(0 < sData.m_uiRepItemsSize)
 		{
-			cSegment.ForcedOpen();
-
 			for(A3DUns32 nIndex = 0; nIndex < sData.m_uiRepItemsSize; nIndex++) {
 				CHECK_A3D_RETURN(ParseRiRepresentationItem(sData.m_ppRepItems[nIndex], cSegment, pcAttr));
 			}
+		}
 
-			cSegment.ForcedClose();
-
-			//parseAnnotations(sData.m_ppAnnotations, sData.m_uiAnnotationsSize);
+		if (0 < sData.m_uiAnnotationsSize) {
+			ParseAnnotations(sData.m_ppAnnotations, sData.m_uiAnnotationsSize, cSegment);
 		}
 
 		CHECK_A3D_RETURN(A3DAsmPartDefinitionGet(nullptr, &sData));
@@ -917,6 +914,8 @@ A3DStatus _3DfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMi
 
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttr));
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrData));
+
+	cSegment.ForcedClose();
 
 	LogDecreaseTabIndex(2);
 
@@ -962,7 +961,6 @@ A3DStatus _3DfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * 
 
 	SegmentKey cSegment = m_cRisIncludeSegment.Subsegment(L"ri%d", m_nIncrementalId++);
 	cParentSegment.IncludeSegment(cSegment);
-	//cSegment.ForcedOpen();
 
 	A3DMiscCascadedAttributes * pcAttr;
 	A3DMiscCascadedAttributesData cAttrData;
@@ -973,20 +971,6 @@ A3DStatus _3DfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * 
 	A3DUns8 ucTextureDimension = 2;
 
 	cSegment.ForcedOpen();
-
-/*
-	SegmentKey cStyleSegment;
-	if(true == FindFaceMaterialMapping(cAttrData, cStyleSegment)) {
-		SetStyle(cSegment, cStyleSegment);
-	}
-	else {
-		if(A3D_SUCCESS == GetMaterialMapping(cAttrData, cMaterialMapping)) {
-			if(true == cMaterialMapping.IsAllocate()) {
-				SetFaceMaterialMapping(cAttrData, cMaterialMapping, cSegment);
-			}
-		}
-	}
-*/
 
 	A3DStatus eStatus = A3D_SUCCESS;
 
@@ -1015,7 +999,7 @@ A3DStatus _3DfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * 
 			A3D_INITIALIZE_DATA(A3DRiCoordinateSystemData, sCSysData);
 			CHECK_A3D_RETURN(A3DRiCoordinateSystemGet(pcCoordSys, &sCSysData));
 
-			_3DF::MatrixKit cMatrix;
+			_3DF::Matrix cMatrix;
 			GetMatrix(sCSysData.m_pTransformation, cMatrix);
 			cSegment.SetModellingMatrix(cMatrix);
 
@@ -1302,7 +1286,7 @@ A3DStatus _3DfImport::DrawMarkupView(const A3DMkpView * pcView, _3DF::SegmentKey
 
 		for(A3DUns32 ui = 0; ui < cViewData.m_uiAnnotationsSize; ui++)
 		{
-			//CHECK_A3D_RETURN(DrawAnnotations(cViewData.m_ppAnnotations[ui], cParentSegment, pcAttr));
+			CHECK_A3D_RETURN(ParseAnnotation(cViewData.m_ppAnnotations[ui], pcAttr, cParentSegment));
 		}
 
 		CHECK_A3D_RETURN(A3DMkpViewGet(nullptr, &cViewData));
@@ -1313,26 +1297,26 @@ A3DStatus _3DfImport::DrawMarkupView(const A3DMkpView * pcView, _3DF::SegmentKey
 
 	return iRet;
 }
+
 // 6. 복수의 Annotation을 그리는 함수
-A3DStatus _3DfImport::DrawAnnotations(const A3DMkpAnnotationEntity ** pcAnnotation, A3DUns32 nAnnotationsSize, _3DF::SegmentKey & cParentSegment)
+A3DStatus _3DfImport::ParseAnnotations(A3DMkpAnnotationEntity ** pcAnnotation, A3DUns32 nAnnotationsSize, _3DF::SegmentKey & cParentSegment)
 {
 	if(0 == nAnnotationsSize) {
 		return A3D_SUCCESS;
 	}
 
-	A3DMiscCascadedAttributes * pcParentAttr = nullptr;
-	A3DMiscCascadedAttributesCreate(&pcParentAttr);
+	A3DMiscCascadedAttributes * pcAttr = nullptr;
+	A3DMiscCascadedAttributesCreate(&pcAttr);
 
 	for(unsigned int i = 0; i < nAnnotationsSize; i++)
 	{
-		DrawAnnotation(pcAnnotation[i], pcParentAttr, cParentSegment);
+		ParseAnnotation(pcAnnotation[i], pcAttr, cParentSegment);
 	}
 
 	return A3D_SUCCESS;
 }
 
-// 6-1. Annotation을 그리는 함수
-A3DStatus _3DfImport::DrawAnnotation(const A3DMkpAnnotationEntity * pcAnnotation, A3DMiscCascadedAttributes * pcParentAttr, _3DF::SegmentKey & cParentSegment)
+A3DStatus _3DfImport::ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation, A3DMiscCascadedAttributes * pcParentAttr, _3DF::SegmentKey & cParentSegment)
 {
 	A3DEEntityType eType;
 	A3DEntityGetType(pcAnnotation, &eType);
@@ -1353,7 +1337,7 @@ A3DStatus _3DfImport::DrawAnnotation(const A3DMkpAnnotationEntity * pcAnnotation
 			A3DMiscCascadedAttributesData sMarkupAttribData;
 			CreateAndPushCascadedAttributes(sData.m_pMarkup, pcAttrs, &pcMarkupAttr, &sMarkupAttribData);
 
-			//DrawMarkup(sData.m_pMarkup, &sMarkupAttribData, &tester);
+			TraverseMarkup(sData.m_pMarkup, &sMarkupAttribData, cParentSegment);
 
 /*
 			HC_KEY tester = 0;
@@ -1386,10 +1370,10 @@ A3DStatus _3DfImport::DrawAnnotation(const A3DMkpAnnotationEntity * pcAnnotation
 			A3DMkpAnnotationSetGet(pcAnnotation, &sData);
 			for(A3DUns32 i = 0; i < sData.m_uiAnnotationsSize; ++i)
 			{
-				//parseAnnotation(sData.m_ppAnnotations[i], pcAttrs);
+				ParseAnnotation(sData.m_ppAnnotations[i], pcAttrs, cParentSegment);
 			}
 
-			A3DMkpAnnotationSetGet(NULL, &sData);
+			A3DMkpAnnotationSetGet(nullptr, &sData);
 		}
 		break;
 
@@ -1463,7 +1447,7 @@ A3DStatus _3DfImport::DrawAnnotationItem(const A3DMkpAnnotationItem * pcAnnotati
 		A3D_INITIALIZE_DATA(A3DMkpAnnotationItemData, sAnnotationItemData);
 		CHECK_A3D_RETURN(A3DMkpAnnotationItemGet(pcAnnotationItem, &sAnnotationItemData));
 
-		CHECK_A3D_RETURN(DrawMarkup(sAnnotationItemData.m_pMarkup, cParentSegment, pcAttr));
+		//CHECK_A3D_RETURN(DrawMarkup(sAnnotationItemData.m_pMarkup, cParentSegment, pcAttr));
 
 		CHECK_A3D_RETURN(A3DMkpAnnotationItemGet(nullptr, &sAnnotationItemData));
 	}
@@ -1474,52 +1458,750 @@ A3DStatus _3DfImport::DrawAnnotationItem(const A3DMkpAnnotationItem * pcAnnotati
 	return iRet;
 }
 
-// 7. Draw Markup
-A3DStatus _3DfImport::DrawMarkup(const A3DMkpMarkup * pcMarkup, _3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+// 7. Markup Data를 전체적으로 가져오는 부분
+A3DStatus _3DfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedAttributesData * psAttribData, _3DF::SegmentKey & cParentSegment)
 {
-	A3DMiscCascadedAttributes * pcAttr;
-	A3DMiscCascadedAttributesData cAttrData;
-	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcMarkup, pcParentAttr, &pcAttr, &cAttrData));
+	A3DMkpMarkupData sData;
+	A3D_INITIALIZE_DATA(A3DMkpMarkupData, sData);
 
-	if(cAttrData.m_bShow && !cAttrData.m_bRemoved)
+/*
+	markup_key = HC_KOpen_Segment(H_FORMAT_TEXT("Markup %05d", HDB::GetUniqueID()));
 	{
-		A3DRootBaseData sRootBaseData;
-		A3D_INITIALIZE_DATA(A3DRootBaseData, sRootBaseData);
-		CHECK_A3D_RETURN(A3DRootBaseGet(pcMarkup, &sRootBaseData));
-
-		A3DMkpMarkupData sMarkupData;
-		A3D_INITIALIZE_DATA(A3DMkpMarkupData, sMarkupData);
-		CHECK_A3D_RETURN(A3DMkpMarkupGet(pcMarkup, &sMarkupData));
-
-		A3DEMarkupType eType;
-		A3DEMarkupSubType eSubType;
-		eType = sMarkupData.m_eType;
-		eSubType = sMarkupData.m_eSubType;
-
-		if(sMarkupData.m_pTessellation != nullptr)
+		HC_Set_User_Options("hobject = pmi_markup, markup = true, view_assoc=no");
+		if (psAttribData)
 		{
-			CHECK_A3D_RETURN(DrawTessBase((A3DTessBase *) sMarkupData.m_pTessellation, nullptr, cParentSegment, pcAttr));
+			if (psAttribData->m_bShow)
+				HC_Set_User_Options("default_visibility=on");
+			else
+				HC_Set_User_Options("default_visibility=off");
+		}
+	}
+	HC_Close_Segment();
+*/
+
+/*
+	if (pmarkup_key)
+		*pmarkup_key = markup_key;
+	if (m_pConnector) //  Hoops entity와 3DX 요소를 연결하는 Connector
+		m_pConnector->AddConnection(markup_key, (void *)pMarkup);
+*/
+
+
+	SegmentKey cMarkupSegment = cParentSegment.Subsegment(L"Markup%d", m_nMarkupId++);
+	assert(INVALID_KEY != cMarkupSegment.KeyValue());
+
+	A3DMkpMarkupGet(pcMarkup, &sData);
+
+	_3DF::PMI::Entity * pcEntity = nullptr;
+
+	switch (sData.m_eType)
+	{
+		case kA3DMarkupTypeDatum:
+		{
+			pcEntity = new _3DF::PMI::DatumEntity(cMarkupSegment);
+			_3DF::PMI::DatumEntity * pcDatum = (PMI::DatumEntity *)pcEntity;
+
+			switch (sData.m_eSubType)
+			{
+				case kA3DMarkupSubTypeDatumIdent:
+					pcDatum->SetDatumType(PMI::Datum::Type::Identifier);
+					break;
+
+				case kA3DMarkupSubTypeDatumTarget:
+					pcDatum->SetDatumType(PMI::Datum::Type::Target);
+					break;
+
+				default:
+					pcDatum->SetDatumType(PMI::Datum::Type::Unknown);
+			}
+		}
+		break;
+
+		case kA3DMarkupTypeDimension:
+		{
+			pcEntity = new _3DF::PMI::DimensionEntity(cMarkupSegment);
+			PMI::DimensionEntity * pcDimension = (PMI::DimensionEntity *)pcEntity;
+
+			pcDimension->SetDimensionType(PMI::Dimension::Type::UnknownType);
+
+			switch (sData.m_eSubType)
+			{
+				case kA3DMarkupSubTypeDimensionAngle:
+					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::AngleSubType);
+					break;
+				case kA3DMarkupSubTypeDimensionChamfer:
+					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::ChamferSubType);
+					break;
+				case kA3DMarkupSubTypeDimensionDiameter:
+				case kA3DMarkupSubTypeDimensionDiameterCone:
+				case kA3DMarkupSubTypeDimensionDiameterCylinder:
+				case kA3DMarkupSubTypeDimensionDiameterEdge:
+				case kA3DMarkupSubTypeDimensionDiameterTangent:
+					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::DiameterSubType);
+					break;
+				case kA3DMarkupSubTypeDimensionDistance:
+				case kA3DMarkupSubTypeDimensionDistanceCumulate:
+				case kA3DMarkupSubTypeDimensionDistanceOffset:
+					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::DistanceSubType);
+					break;
+				case kA3DMarkupSubTypeDimensionLength:
+				case kA3DMarkupSubTypeDimensionLengthCircular:
+				case kA3DMarkupSubTypeDimensionLengthCurvilinear:
+					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::LengthSubType);
+					break;
+				case kA3DMarkupSubTypeDimensionRadius:
+				case kA3DMarkupSubTypeDimensionRadiusCylinder:
+				case kA3DMarkupSubTypeDimensionRadiusEdge:
+				case kA3DMarkupSubTypeDimensionRadiusTangent:
+					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::RadiusSubType);
+					break;
+				case kA3DMarkupSubTypeDimensionSlope:
+					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::SlopeSubType);
+					break;
+				default:
+					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::UnknownSubType);
+			}
+		} 
+		break;
+
+		case kA3DMarkupTypeGdt:
+		{
+			// current data coming out of 3DX for FCFs makes it quite difficult to accurately determine components
+			// of a FCF, so we just insert a generic entity (just text strings and polylines, no extra information)
+			pcEntity = new PMI::GenericEntity(cMarkupSegment);
+		} 
+		break;
+
+		case kA3DMarkupTypeRoughness:
+		{
+			pcEntity = new PMI::RoughnessEntity(cMarkupSegment);
+
+			PMI::RoughnessEntity * pcRoughness = (PMI::RoughnessEntity *)pcEntity;
+
+			pcRoughness->SetObtentionType(PMI::Roughness::Obtention::Type::Unknown);
+			pcRoughness->SetApplicabilityType(PMI::Roughness::Applicability::Type::Unknown);
+			pcRoughness->SetModeType(PMI::Roughness::Mode::Type::Unknown);
+		} 
+		break;
+
+		case kA3DMarkupTypeText:
+		{
+			pcEntity = new PMI::NoteEntity(cMarkupSegment);
+		}
+		break;
+
+		default:
+		{
+			pcEntity = new PMI::GenericEntity(cMarkupSegment);
 		}
 
-		A3DUns32 ui;
-		for(ui = 0; ui < sMarkupData.m_uiLeadersSize; ui++)
-		{
-			// #Require_coding
-			//CHECK_A3D_RETURN(DrawLeader(sMarkupData.m_ppLeaders[ui], pcAttr));
-		}
-
-		CHECK_A3D_RETURN(A3DMkpMarkupGet(nullptr, &sMarkupData));
-
-		CHECK_A3D_RETURN(A3DRootBaseGet(nullptr, &sRootBaseData));
-
-		//uiTotalMarkups++;
 	}
 
-	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttr));
-	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrData));
+
+	PolylineArray cLeaderLines;
+	PolygonArray cLeaderSymbols;
+
+	for (unsigned int i = 0; i < sData.m_uiLeadersSize; i++) {
+		GetLeaderLinesAndSymbols(sData.m_ppLeaders[i], cLeaderLines, cLeaderSymbols);
+	}
+
+	if (0 < cLeaderLines.GetCount()) {
+		pcEntity->SetLeaderLines((unsigned int)cLeaderLines.GetCount(), cLeaderLines.GetData());
+	}
+
+	if (0 < cLeaderSymbols.GetCount()) {
+		pcEntity->SetLeaderSymbols((unsigned int)cLeaderSymbols.GetCount(), cLeaderSymbols.GetData());
+	}
+
+/*
+	if (GetDLLVersion() >= 202)
+	{
+		for (unsigned int j = 0; j < sData.m_uiLinkedItemsSize; j++)
+		{
+			A3DMiscMarkupLinkedItemData sData2;
+			A3D_INITIALIZE_DATA(A3DMiscMarkupLinkedItemData, sData2);
+
+			A3DMiscMarkupLinkedItemGet(sData.m_ppLinkedItems[j], &sData2);
+
+			if (sData2.m_pReference)
+				treatReference(sData2.m_pReference, pMarkup);
+
+			A3DMiscMarkupLinkedItemGet(NULL, &sData2);
+		}
+	}
+*/
+	A3DTessBaseData sBaseData;
+	A3D_INITIALIZE_DATA(A3DTessBaseData, sBaseData);
+
+	A3DTessBaseGet(sData.m_pTessellation, &sBaseData);
+
+	A3DMkpMarkupGet(nullptr, &sData);
+
+	A3DTessMarkupData sMarkupData;
+	A3D_INITIALIZE_DATA(A3DTessMarkupData, sMarkupData);
+
+	A3DTessMarkupGet(sData.m_pTessellation, &sMarkupData);
+
+	PolylineArray aPolyline;
+	StringArray aStrings;
+	PMI::TextAttributesArray aTextAttributes;
+ 	PMI::Options cOptions;
+	PolygonArray aPolygons;
+
+	GetMarkupTesselation(&sBaseData, &sMarkupData, aPolyline, aPolygons, aStrings, aTextAttributes, &cOptions);
+
+	A3DTessMarkupGet(nullptr, &sMarkupData);
+	A3DTessBaseGet(nullptr, &sBaseData);
+
+	if (false == aPolyline.IsEmpty())
+	{
+		PMI::Frame cFrame;
+		cFrame.SetPolylines((unsigned int)aPolyline.GetCount(), aPolyline.GetData());
+		if (nullptr != pcEntity) {
+			pcEntity->SetFrame(cFrame);
+		}
+	}
+
+	if (false == aPolygons.IsEmpty())
+	{
+		PMI::Drawing cDrawing;
+		cDrawing.SetPolygons((unsigned int)aPolygons.GetCount(), aPolygons.GetData());
+		pcEntity->SetDrawing(cDrawing);
+	}
+
+	assert(aStrings.GetCount() == aTextAttributes.GetCount());
+	unsigned int nCount = (unsigned int)aStrings.GetCount();
+
+
+	switch (pcEntity->GetType())
+	{
+		case PMI::Type::DatumType:
+		{
+			PMI::DatumEntity * pcDatum = (PMI::DatumEntity *)pcEntity;
+			pcDatum->SetDisplayParallelToScreen(cOptions.IsDisplayParallelToScreen());
+			if (0 < nCount) {
+				pcDatum->SetLabels(nCount, aStrings.GetData(), aTextAttributes.GetData());
+			}
+		}
+		break;
+
+		case PMI::Type::DimensionType:
+		{
+			PMI::DimensionEntity * pcDimension = (PMI::DimensionEntity *)pcEntity;
+
+			pcDimension->SetDisplayParallelToScreen(cOptions.IsDisplayParallelToScreen());
+			if (0 < nCount) {
+				pcDimension->SetStrings(nCount, aStrings.GetData(), aTextAttributes.GetData());
+			}
+		}
+		break;
+
+		case PMI::Type::GenericType:
+		{
+			PMI::GenericEntity * pcGeneric = (PMI::GenericEntity *)pcEntity;
+
+			if (0 < nCount) {
+				pcGeneric->SetStrings(nCount, aStrings.GetData(), aTextAttributes.GetData());
+			}
+		}
+		break;
+
+		case PMI::Type::NoteType:
+		{
+			PMI::NoteEntity * pcNote = (PMI::NoteEntity *)pcEntity;
+
+			pcNote->SetDisplayParallelToScreen(cOptions.IsDisplayParallelToScreen());
+			if (0 < nCount) {
+				pcNote->SetStrings(nCount, aStrings.GetData(), aTextAttributes.GetData());
+			}
+		}
+		break;
+
+		case PMI::Type::RoughnessType:
+		{
+			PMI::RoughnessEntity * pcRoughness = (PMI::RoughnessEntity *)pcEntity;
+
+			if (0 < nCount) {
+				pcRoughness->SetFields(nCount, aStrings.GetData(), aTextAttributes.GetData());
+			}
+				
+		} break;
+
+		default:
+			break;
+	}
+
+//	m_pmi_entities.push_back(*pcEntity);
+
+
+	if (nullptr != pcEntity) {
+		delete pcEntity;
+	}
 
 	return A3D_SUCCESS;
 }
+
+// 7-1. Mark up Tesselation 처리
+A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData, const A3DTessMarkupData * psTessMarkupData,
+	PolylineArray & aOutPolylines, PolygonArray & aOutPolygones, StringArray & aOutStrings, PMI::TextAttributesArray & cOutTextAttributes,
+	PMI::Options * pcOutPmiOptions)
+{
+	if (psTessMarkupData->m_uiCodesSize == 0) {
+		return A3D_ERROR;
+	}
+
+#define DEFAULT_OFFSET {\
+	pdCoordData += *(pnStartCodes + 1); \
+	pnStartCodes += (nCount + 1);\
+}
+
+#define MAKE_OFFSET(CountInt, CountFloats) {\
+	pdCoordData += CountFloats;\
+	pnStartCodes += (CountInt + 1);\
+}
+
+	unsigned int nCount = 0;
+
+	const A3DDouble * pdCoordData = psTessBaseData->m_pdCoords;
+	const A3DUns32 * pnStartCodes = &psTessMarkupData->m_puiCodes[0];
+	const A3DUns32 * pnEndCodes = &psTessMarkupData->m_puiCodes[psTessMarkupData->m_uiCodesSize - 1];
+
+	if (nullptr == pdCoordData || nullptr == pnStartCodes || nullptr == pnEndCodes) {
+		return A3D_ERROR;
+	}
+
+	A3DFontKeyData sFontKeyData;
+	A3D_INITIALIZE_DATA(A3DFontKeyData, sFontKeyData);
+
+	A3DGraphRgbColorData sRgbColorData;
+	A3D_INITIALIZE_DATA(A3DGraphRgbColorData, sRgbColorData);
+
+	A3DGraphVPicturePatternData sPicturePatternData;
+	A3D_INITIALIZE_DATA(A3DGraphVPicturePatternData, sPicturePatternData);
+
+	RGBColor cColor(1, 1, 1);
+	PMI::TextAttributes cTextAttributes;
+// 	PMI::Options options;
+
+	bool bFrameDrawMode = false;
+	bool bFaceViewMode = false;
+// 	H_UTF8 pmi_utf8;
+ 	Point cTextMove;
+	float char_width = 0.;
+	float char_height = 1.;
+	Matrix cMatrix;
+	Matrix cTransformMatrix;
+ 	//FloatArray pline;
+	CString strLinePattern;
+// 	H_UTF8 line_pattern;
+
+// 	float cmatrix[16];
+// 	float transform_matrix[16];
+// 	TestMatrix cm;
+// 	cm.ComputeIdentityMatrix(cmatrix);
+// 	cm.ComputeIdentityMatrix(transform_matrix);
+
+	for (; pnStartCodes < pnEndCodes; ++pnStartCodes)
+	{
+		nCount = *pnStartCodes & kA3DMarkupIntegerMask;
+
+		if (*pnStartCodes & kA3DMarkupIsExtraData)
+		{
+			switch (A3D_DECODE_EXTRA_DATA(*pnStartCodes))
+			{
+				case 0:  //pattern
+					DEFAULT_OFFSET;
+				break;
+
+				case 1:  //picture
+					DEFAULT_OFFSET;
+				break;
+
+				case 2:  //triangles
+				{
+					unsigned int triangleCount = *(pnStartCodes + 1) / 9;
+					for (unsigned int i = 0; i < triangleCount; ++i)
+					{
+						_3DF::Point cPoints[3];
+						for (UINT j = 0; j < 3; ++j)
+						{
+							cPoints[j].x = static_cast<float>(pdCoordData[9 * i + 3 * j + 0]);
+							cPoints[j].y = static_cast<float>(pdCoordData[9 * i + 3 * j + 1]);
+							cPoints[j].z = static_cast<float>(pdCoordData[9 * i + 3 * j + 2]);
+						}
+
+						if (false == cTransformMatrix.IsIdentity()) {
+							for (UINT j = 0; j < 3; ++j) {
+								cPoints[j] = cTransformMatrix.Transform(cPoints[j]);
+							}
+						}
+
+						_3DF::PolygonKit cPolygon;
+						cPolygon.SetPoints(3, cPoints);
+						cPolygon.SetRGBColor(cColor);
+						aOutPolygones.Add(cPolygon);
+					}
+
+					DEFAULT_OFFSET;
+				}
+				break;
+
+				case 3:  //picture
+					DEFAULT_OFFSET;
+				break;
+
+				case 6:  //faceview  
+				{
+					if (*(pnStartCodes + 1) > 0)
+					{
+						bFaceViewMode = true;
+
+						if (nullptr != pcOutPmiOptions) {
+							pcOutPmiOptions->SetDisplayParallelToScreen();
+						}
+
+						Matrix cMatrix;
+						cMatrix[3][0] = static_cast<float>(pdCoordData[0]);
+						cMatrix[3][1] = static_cast<float>(pdCoordData[1]);
+						cMatrix[3][2] = static_cast<float>(pdCoordData[2]);
+
+						PMI::Orientation cOrientation;
+						cOrientation.SetMatrix(cMatrix);
+
+						cTextAttributes.SetOrientation(cOrientation);
+
+						MAKE_OFFSET(0, 3);
+					}
+					else
+					{
+						bFaceViewMode = false;
+
+						MAKE_OFFSET(0, 0);
+					}
+				}
+				break;
+
+				case 7:  //framedraw  
+				{
+					if (*(pnStartCodes + 1) > 0)
+					{
+						bFrameDrawMode = true;
+
+						if (nullptr != pcOutPmiOptions) {
+							pcOutPmiOptions->SetDisplayParallelToScreen();
+						}
+
+						_3DF::Matrix cMatrix;
+						cMatrix[3][0] = static_cast<float>(pdCoordData[0]);
+						cMatrix[3][1] = static_cast<float>(pdCoordData[1]);
+						cMatrix[3][2] = static_cast<float>(pdCoordData[2]);
+
+						PMI::Orientation cOrientation;
+						cOrientation.SetMatrix(cMatrix);
+						cTextAttributes.SetOrientation(cOrientation);
+						MAKE_OFFSET(0, 3);
+					}
+					else
+					{
+						bFrameDrawMode = false;
+						MAKE_OFFSET(0, 0);
+					}
+				}
+				break;
+
+				case 8:  //fixed size  
+					// this defines the size of an object which has a view independent size
+					DEFAULT_OFFSET;
+				break;
+
+				case 9:  //symbol  
+				{
+					A3DGlobalGetGraphVPicturePatternData(*(pnStartCodes + 2), &sPicturePatternData);
+					A3DTessBaseData sBaseData;
+					A3D_INITIALIZE_DATA(A3DTessBaseData, sBaseData);
+					A3DTessBaseGet(sPicturePatternData.m_pMarkupTess, &sBaseData);
+
+					A3DTessMarkupData spMarkupData;
+					A3D_INITIALIZE_DATA(A3DTessMarkupData, spMarkupData);
+
+					A3DTessMarkupGet(sPicturePatternData.m_pMarkupTess, &spMarkupData);
+					GetMarkupTesselation(&sBaseData, &spMarkupData, aOutPolylines, aOutPolygones, aOutStrings, cOutTextAttributes, pcOutPmiOptions);
+					A3DTessBaseGet(NULL, &sBaseData);
+					A3DTessMarkupGet(NULL, &spMarkupData);
+					// this is an image which will be texture mapped to a 3d quad
+					DEFAULT_OFFSET;
+				}
+				break;
+
+				case 10:  //cylinder  
+					DEFAULT_OFFSET;
+				break;
+
+				case 11:  //color
+				{
+					A3DGlobalGetGraphRgbColorData(*(pnStartCodes + 2), &sRgbColorData);
+					cColor.Set(static_cast<float>(sRgbColorData.m_dRed),
+						static_cast<float>(sRgbColorData.m_dGreen),
+						static_cast<float>(sRgbColorData.m_dBlue));
+					DEFAULT_OFFSET;
+				}
+				break;
+
+				case 12:  //line stipple
+				{
+// 					if (0 < nCount)
+// 						strLinePattern = GetLinePattern(*(pnStartCodes + 2));
+// 					else
+// 						strLinePattern = L"";
+
+					DEFAULT_OFFSET;
+				}
+				break;
+
+				case 13:  //font
+				{
+					sFontKeyData.m_iFontFamilyIndex = *(pnStartCodes + 2);
+					sFontKeyData.m_iFontStyleIndex = (*(pnStartCodes + 3) & kA3DFontKeyStyle) >> 24;
+					sFontKeyData.m_iFontSizeIndex = (*(pnStartCodes + 3) & kA3DFontKeySize) >> 12;
+					sFontKeyData.m_cAttributes = (A3DInt8)(*(pnStartCodes + 3) & kA3DFontKeyAttrib);
+
+					A3DFontData fontdata;
+					A3D_INITIALIZE_DATA(A3DFontData, fontdata);
+
+					A3DGlobalFontKeyGet(&sFontKeyData, &fontdata);
+
+					cTextAttributes.SetFontSize(static_cast<float>(fontdata.m_uiSize));
+					if (fontdata.m_pcFamilyName) {
+						cTextAttributes.SetFontName(fontdata.m_pcFamilyName);
+					}
+
+					cTextAttributes.SetFormat(sFontKeyData.m_cAttributes);
+
+					A3DGlobalFontKeyGet(nullptr, &fontdata);
+
+					DEFAULT_OFFSET;
+				}
+				break;
+
+				case 14:  //text
+				{
+					double dTextboxHeight = pdCoordData[1];
+
+					A3DUns32 nTextIndex = pnStartCodes[2];
+					A3DUTF8Char * pcBuffer = nullptr;
+
+					if (nTextIndex < psTessMarkupData->m_uiTextsSize) {
+						pcBuffer = psTessMarkupData->m_ppcTexts[nTextIndex];
+					}
+
+					CString strText = WStr::ToUtf16(pcBuffer);
+					aOutStrings.Add(strText);
+
+					cTextAttributes.SetRGBColor(cColor);
+					cTextAttributes.SetFontSize(static_cast<float>(dTextboxHeight * char_height));
+					if (true == bFrameDrawMode) {
+						cTextAttributes.SetFontSizeUnits(PMI::Font::Size::Units::PixelUnits);
+						cTextAttributes.SetInsertionPoint(cTextMove);
+					}
+					else if (true == bFaceViewMode) {
+						cTextAttributes.SetFontSizeUnits(PMI::Font::Size::Units::WorldSpaceUnits);
+						cTextAttributes.SetInsertionPoint(cTextMove);
+					}
+					else {
+						cTextAttributes.SetFontSizeUnits(PMI::Font::Size::Units::WorldSpaceUnits);
+					}
+
+					cOutTextAttributes.Add(cTextAttributes);
+
+					DEFAULT_OFFSET;
+				}
+				break;
+
+				case 15:  //points
+					DEFAULT_OFFSET;
+				break;
+
+				case 16:  //polygon
+				{
+					int kSize = *(pnStartCodes + 1);
+
+					Point * pcPoints = new Point[kSize];
+					int pt_count = 0;
+					int i = 0;
+					while (i < kSize)
+					{
+						pcPoints[pt_count].x = static_cast<float>(pdCoordData[i++]);
+						pcPoints[pt_count].y = static_cast<float>(pdCoordData[i++]);
+						pcPoints[pt_count++].z = static_cast<float>(pdCoordData[i++]);
+					}
+
+					if (false == cTransformMatrix.IsIdentity()) {
+						for (int nIndex = 0; nIndex < pt_count; nIndex++) {
+							pcPoints[nIndex] = cTransformMatrix.Transform(pcPoints[nIndex]);
+						}
+					}
+
+					_3DF::PolygonKit cPmiPolygon;
+					cPmiPolygon.SetPoints(pt_count, pcPoints);
+					cPmiPolygon.SetRGBColor(cColor);
+					aOutPolygones.Add(cPmiPolygon);
+
+					if (nullptr != pcPoints) {
+						delete[] pcPoints;
+					}
+				}
+				DEFAULT_OFFSET;
+				break;
+
+				case 17:  //line width
+					DEFAULT_OFFSET;
+				break;
+
+				default:
+					DEFAULT_OFFSET;
+			}
+		}
+		else if (*pnStartCodes & kA3DMarkupIsMatrix)
+		{
+			if (*(pnStartCodes + 1) > 0)
+			{
+				Vector x(static_cast<float>(pdCoordData[0]), static_cast<float>(pdCoordData[1]), static_cast<float>(pdCoordData[2]));
+				char_width = (float)x.Length();
+
+				Vector y(static_cast<float>(pdCoordData[4]), static_cast<float>(pdCoordData[5]), static_cast<float>(pdCoordData[6]));
+				char_height = (float)y.Length();
+
+				if (bFrameDrawMode || bFaceViewMode) {
+					cTextAttributes.SetWidthScale(char_width / char_height);
+					cTextMove.Set(static_cast<float>(pdCoordData[12] / m_dCadModelUnit),
+						static_cast<float>(pdCoordData[13] / m_dCadModelUnit),
+						static_cast<float>(pdCoordData[14] / m_dCadModelUnit));
+				}
+				else {
+					x.Normalize();
+					y.Normalize();
+					Vector z = x.Cross(y);
+
+					cMatrix[0][0] = x.x;
+					cMatrix[0][1] = x.y;
+					cMatrix[0][2] = x.z;
+
+					cMatrix[1][0] = y.x;
+					cMatrix[1][1] = y.y;
+					cMatrix[1][2] = y.z;
+
+					cMatrix[2][0] = z.x;
+					cMatrix[2][1] = z.y;
+					cMatrix[2][2] = z.z;
+
+					cMatrix[3][0] = static_cast<float>(pdCoordData[12]);
+					cMatrix[3][1] = static_cast<float>(pdCoordData[13]);
+					cMatrix[3][2] = static_cast<float>(pdCoordData[14]);
+
+					// cTransformMatrix = cMatrix * cTransformMatrix;
+
+					_3DF::TestMatrix cm;
+					cm.ComputeMatrixProduct(cMatrix.GetData(), cTransformMatrix.GetData(), cTransformMatrix.GetData());
+
+					PMI::Orientation orientation;
+					orientation.SetMatrix(cTransformMatrix);
+					cTextAttributes.SetOrientation(orientation);
+				}
+
+				MAKE_OFFSET(0, 16);
+			}
+			else
+			{
+				//_3DF::Matrix cInverseMatrix;
+				//cMatrix = cMatrix.Inverse();
+				//cTransformMatrix = cMatrix * cTransformMatrix;
+				_3DF::TestMatrix cm;
+				cm.InverseMatrix(cMatrix.GetData(), cMatrix.GetData());
+				cm.ComputeMatrixProduct(cMatrix.GetData(), cTransformMatrix.GetData(), cTransformMatrix.GetData());
+				cMatrix.SetIdentity();
+				char_height = 1.;
+				MAKE_OFFSET(0, 0);
+			}
+		}
+		else
+		{
+			if (true == bFrameDrawMode || true == bFaceViewMode)
+			{
+				DEFAULT_OFFSET;
+				continue;
+			}
+
+			int kSize = *(pnStartCodes + 1);
+			//pline.SetCount(kSize);
+
+			int i = 0, nPointCount = kSize / 3;
+			Point * pcPoints = new Point[nPointCount];
+			nPointCount = 0;
+
+			while (i < kSize)
+			{
+				pcPoints[nPointCount].x = static_cast<float>(pdCoordData[i++]);
+				pcPoints[nPointCount].y = static_cast<float>(pdCoordData[i++]);
+				pcPoints[nPointCount++].z = static_cast<float>(pdCoordData[i++]);
+			}
+
+			if (false == cTransformMatrix.IsIdentity()) {
+				for (int nIndex = 0; nIndex < nPointCount; nIndex++) {
+					pcPoints[nIndex] = cTransformMatrix.Transform(pcPoints[nIndex]);
+				}
+			}
+			
+			_3DF::Polyline cPmiPolyline;
+			cPmiPolyline.SetPoints(nPointCount, pcPoints);
+			cPmiPolyline.SetRGBColor(cColor);
+
+// 			if (line_pattern.encodedText())
+// 				cPmiPolyline.SetLinePattern(reinterpret_cast<char const *>(line_pattern.encodedText()));
+
+			aOutPolylines.Add(cPmiPolyline);
+
+			DEFAULT_OFFSET;
+		}
+	}
+
+#undef DEFAULT_OFFSET
+#undef MAKE_OFFSET
+	
+	return A3D_SUCCESS;
+}
+
+// 7-2. Leader Lines 및 Symbol 처리
+A3DStatus _3DfImport::GetLeaderLinesAndSymbols(const A3DMkpLeader * pMarkup, PolylineArray & cOutLeaderLines, PolygonArray & cOutLeaderSymbols)
+{
+	A3DMkpLeaderData sData;
+	A3D_INITIALIZE_DATA(A3DMkpLeaderData, sData);
+
+	A3DMkpLeaderGet(pMarkup, &sData);
+
+	A3DTessBaseData sBaseData;
+	A3D_INITIALIZE_DATA(A3DTessBaseData, sBaseData);
+
+	A3DTessBaseGet(sData.m_pTessellation, &sBaseData);
+
+	A3DTessMarkupData sMarkupData;
+	A3D_INITIALIZE_DATA(A3DTessMarkupData, sMarkupData);
+
+	A3DInt32 iErr = A3DTessMarkupGet(sData.m_pTessellation, &sMarkupData);
+	if (!iErr && sData.m_pTessellation)
+	{
+		StringArray strings;
+		PMI::TextAttributesArray text_attributes;
+
+		GetMarkupTesselation(&sBaseData, &sMarkupData, cOutLeaderLines, cOutLeaderSymbols, strings, text_attributes);
+	}
+
+	A3DTessMarkupGet(nullptr, &sMarkupData);
+	A3DTessBaseGet(nullptr, &sBaseData);
+	A3DMkpLeaderGet(nullptr, &sData);
+
+	return A3D_SUCCESS;
+}
+
 // 8. Draw Tessellation Base
 A3DStatus _3DfImport::DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresentationItem * pcRepItem, _3DF::SegmentKey & cParentSegment, 
 	const A3DMiscCascadedAttributes * pcParentAttr)
@@ -1547,11 +2229,10 @@ A3DStatus _3DfImport::DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresen
 			eStatus = DrawTess3DWire((A3DTess3DWire *) pcTessBase, &sTessBaseData, pcRepItem, pcParentAttr, cParentSegment);
 		break;
 
-/*
 		case kA3DTypeTessMarkup:
-			//eStatus = DrawTessMarkup((A3DTessMarkup *) pcTessBase, pcRepItem, pcParentAttr);
+			eStatus = BuildMarkup((A3DTessMarkup *) pcTessBase, &sTessBaseData, cParentSegment);
 		break;
-*/
+
 
 		default:
 			assert(false);
@@ -1616,7 +2297,7 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 
 	cConFaceInfo.pnInIndices = cTess3dData.m_puiTriangulatedIndexes;
 
-	cConFaceInfo.aInPoints.resize(nPointCount);
+	cConFaceInfo.aInPoints.SetCount(nPointCount);
 	for(A3DUns32 nIndex = 0; nIndex < nPointCount; nIndex++) {
 		cConFaceInfo.aInPoints[nIndex].Set(
 			pcTessBaseData->m_pdCoords[nIndex * 3],
@@ -1626,22 +2307,21 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 
 	// ----- Normal Vector 활당 -----
 	A3DUns32 nNormalCount = cTess3dData.m_uiNormalSize / 3;
-	cConFaceInfo.aInNormals.resize(nNormalCount);
+	cConFaceInfo.aInNormals.SetCount(nNormalCount);
 	for(A3DUns32 nIndex = 0; nIndex < nNormalCount; nIndex++) {
 		cConFaceInfo.aInNormals[nIndex].Set(
 			cTess3dData.m_pdNormals[nIndex * 3],
 			cTess3dData.m_pdNormals[nIndex * 3 + 1],
 			cTess3dData.m_pdNormals[nIndex * 3 + 2]);
 	}
-
+	 
 	// ----- Texture Parameter 활당 -----
-/*
 	A3DUns32 nTextureCoordCount = cTess3dData.m_uiTextureCoordSize;
-	cConFaceInfo.aInParams.resize(nTextureCoordCount);
+	cConFaceInfo.aInParams.SetCount(nTextureCoordCount);
 	for(A3DUns32 nIndex = 0; nIndex < nTextureCoordCount; nIndex++) {
 		cConFaceInfo.aInParams[nIndex] = static_cast<float>(cTess3dData.m_pdTextureCoords[nIndex]);
 	}
-*/
+
 	// Attribute를 계산해서 처리하는 부분, 전체 Attribute를 찾아서 가장 많은 종류의 Index를 찾아서 처리한다.
 	A3DMiscCascadedAttributesData * psAttrData = new A3DMiscCascadedAttributesData[nFacesCount];
 	A3DMiscCascadedAttributes * pcAttribute;
@@ -1650,7 +2330,7 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 	{
 		DWORD nCount = 0;
 		A3DUns32 nRgbColorIndex = 0;
-		A3DUns32 nFirstFaceIndex = 0;
+		A3DUns32 nFirstFaceIndex = 0; // nRgbColorIndex가 처음 나타나는 Face Index;
 	};
 
 	CAtlMap<A3DUns32, StyleDefine> mStyleDefineMap;
@@ -1659,6 +2339,8 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 	A3DUns32 nMaxFaceIndex = 0;
 	DWORD nMaxCount = 0;
 
+
+	//----- Style 관련 정보 수집 -----
 	for(A3DUns32 nFaceIndex = 0; nFaceIndex < nFacesCount; nFaceIndex++) {
 		A3DTessFaceData & cTessFaceData = cTess3dData.m_psFaceTessData[nFaceIndex];
 		CreateAndPushCascadedAttributesTessFace(pcRepItem, pcTess3D, &cTessFaceData, nFaceIndex, pcParentAttr, &pcAttribute, &psAttrData[nFaceIndex]);
@@ -1695,6 +2377,10 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 
 	// Max Color Index 값을 Parent Segment에 적용시켜 대표 Color Style로 지정한다.
 	SetFaceStyle(cParentSegment, psAttrData[nMaxFaceIndex]);
+
+	// Texture Mapping 설정
+	//SetTextureMapping(cParentSegment, psAttrData[nMaxFaceIndex]);
+
 	mFaceSegmentStyleMap.SetAt(nMaxRgbColorIndex, cParentSegment.KeyValue());
 	Log(2, L"max_style_face_%d, count: %d", nMaxRgbColorIndex, nMaxCount);
 
@@ -1706,6 +2392,7 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 
 		_3DF::SegmentKey cSubSegment = cParentSegment.Subsegment(L"style_face_%d", sStyleDefine.nRgbColorIndex).KeyValue();
 		SetFaceStyle(cSubSegment, psAttrData[sStyleDefine.nFirstFaceIndex]);
+
 		mFaceSegmentStyleMap.SetAt(sStyleDefine.nRgbColorIndex, cSubSegment.KeyValue());
 	}
 
@@ -1730,24 +2417,28 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 				bForceOpenFlag = true;
 				cCurrnetSegment.ForcedOpen();
 
+				//----- Texture Mapping 설정 -----
+				//SetTextureMapping(cCurrnetSegment, psAttrData[nFaceIndex]);
+
 				Log(2, L"style_face_%d", nRgbColorIndex);
 			}
 		}
 
+	
 		cConFaceInfo.nOutTriSizeIndex = 0;	// 한 Triangle Type당 하나씩
 		cConFaceInfo.nOutTriStartIndex = cTessFaceData.m_uiStartTriangulated;
 		cConFaceInfo.nOutTriColorIndex = 0;
 		cConFaceInfo.fInNormalCosine = m_fNormalAngleCosine;
 
-		cConFaceInfo.mOutIndexMap.clear();
-		cConFaceInfo.aOutVertexRefs.clear();
-		cConFaceInfo.aOutFacePoints.clear();
-		cConFaceInfo.aOutFaceList.clear();
-		cConFaceInfo.aOutFaceVertexNormals.clear();
-		cConFaceInfo.aOutFaceVertexParams.clear();
+		cConFaceInfo.mOutIndexMap.RemoveAll();
+		cConFaceInfo.aOutVertexRefs.RemoveAll();
+		cConFaceInfo.aOutFacePoints.RemoveAll();
+		cConFaceInfo.aOutFaceList.RemoveAll();
+		cConFaceInfo.aOutFaceVertexNormals.RemoveAll();
+		cConFaceInfo.aOutFaceVertexParams.RemoveAll();
 		cConFaceInfo.aOutFaceVertexColors.clear();
 
-		// fill out the RGBA vertex color array (if necessary)
+		// fill out the RGBA vertex color array (if necessary) 1
 /*
 		cConFaceInfo.aInColors.reserve(cTessFaceData.m_uiRGBAVerticesSize / (cTessFaceData.m_bIsRGBA ? 4 : 3));
 		for(A3DUns32 nIndex = 0; nIndex < cTessFaceData.m_uiRGBAVerticesSize; / * increment inside loop * /)
@@ -1793,8 +2484,7 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 			nTriangleFaceCount += ConveTessFaceDataTriangleTextured(cConFaceInfo);
 		}
 
-		if(false == cConFaceInfo.aOutFacePoints.empty()) {
-
+		if(false == cConFaceInfo.aOutFacePoints.IsEmpty()) {
 			_3DF::ShellKit cShellKit;
 			cShellKit.SetPoints(cConFaceInfo.aOutFacePoints);
 			cShellKit.SetNormals(cConFaceInfo.aOutFaceVertexNormals);
@@ -1804,7 +2494,6 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 
 			ShellKey cShell = cCurrnetSegment.InsertShell(cShellKit);
 		}
-		
 
 		//---- Draw Edge Line -----
 		A3DUns32 nStartWireIndex = cTessFaceData.m_uiStartWire;
@@ -1819,13 +2508,14 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 				continue;
 			}
 
-			_3DF::PointArray acWirePoints(size);
+			_3DF::PointArray acWirePoints;
+			acWirePoints.SetCount(size);
 
 			for(A3DUns32 k = 0; k < size; ++k) {
 				acWirePoints[k] = cConFaceInfo.aInPoints[cTess3dData.m_puiWireIndexes[nStartWireIndex + index++] / 3];
 			}
 
-			cCurrnetSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
+			cCurrnetSegment.InsertLine(acWirePoints.GetCount(), acWirePoints.GetData());
 		}
 
 		if(true == bForceOpenFlag) {
@@ -1835,14 +2525,17 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 		cCurrnetSegment = cParentSegment;
 	}
 
+	mFaceSegmentStyleMap.RemoveAll();
+
+	for(A3DUns32 nFaceIndex = 0; nFaceIndex < nFacesCount; nFaceIndex++) {
+		A3DMiscCascadedAttributesGet(NULL, &psAttrData[nFaceIndex]);
+	}
+
+	REMOVE_ARRAY(psAttrData);
+
 	LogDecreaseTabIndex(2);
 
 	Log(2, L"DrawTess3D: %s, %d, Style Count: %d", LogHexStr((DWORD_PTR) pcTess3D), nTriangleFaceCount, m_mFaceMaterialMappingStyleMap.size());
-
-	REMOVE_ARRAY(psAttrData);
-// 
-// 	if(cTess3DData.m_bMustRecalculateNormals)
-// 		cTess3DData.m_pdNormals = nullptr;
 
 	CHECK_A3D_RETURN(A3DTess3DGet(nullptr, &cTess3dData));
 
@@ -2614,7 +3307,6 @@ UINT _3DfImport::ConveTessFaceDataTriangleTextured(ConvertFaceInfo & cInFaceInfo
 	int nFaceVertexNormalIndices[3]; // vertex normal indices into the "global" normal array
 	int nFaceVertexParamIndices[3]; // vertex parameter indices into the "global" parameter array
 	int nFaceVertexColorIndices[3]; // vertex color indices into the RGBA color array
-	A3DUns32 nInVertexParamSize = 0;
 
 	A3DUns32 nTriangleCount = cInFaceInfo.pcInTessFaceData->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
 
@@ -2646,7 +3338,7 @@ UINT _3DfImport::ConveTessFaceDataTriangleTextured(ConvertFaceInfo & cInFaceInfo
 			nFaceVertexColorIndices[2] = cInFaceInfo.nOutTriColorIndex++;
 		}
 
-		AddTriangle(cInFaceInfo, nFaceListIndices, nFaceVertexNormalIndices, nFaceVertexParamIndices, nFaceVertexColorIndices, nInVertexParamSize);
+		AddTriangle(cInFaceInfo, nFaceListIndices, nFaceVertexNormalIndices, nFaceVertexParamIndices, nFaceVertexColorIndices, (0 == nTextureCoordSize ? 0 : 2));
 	}
 
 	return nTriangleCount;
@@ -2721,7 +3413,8 @@ A3DStatus _3DfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3
 
 	A3DUns32 nPointCount = pcTessBaseData->m_uiCoordSize / 3;
 
-	_3DF::PointArray acWirePoints(nPointCount);
+	_3DF::PointArray acWirePoints;
+	acWirePoints.SetCount(nPointCount);
 
 	for(A3DUns32 nIndex = 0; nIndex < nPointCount; nIndex++)
 	{
@@ -2730,7 +3423,7 @@ A3DStatus _3DfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3
 		acWirePoints[nIndex].z = pcTessBaseData->m_pdCoords[(nIndex * 3) + 2];
 	}
 
-	cParentSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
+	cParentSegment.InsertLine(acWirePoints.GetCount(), acWirePoints.GetData());
 
 	return nStatus;
 }
@@ -2746,7 +3439,8 @@ A3DStatus _3DfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBas
 
 	if(nullptr == sWireData.m_puiSizesWires) {
 		A3DUns32 nPointCount = pcTessBaseData->m_uiCoordSize / 3;
-		_3DF::PointArray aPoints(nPointCount);
+		_3DF::PointArray aPoints;
+		aPoints.SetCount(nPointCount);
 
 		A3DUns32 nPointIndex = 0;
 		for(A3DUns32 nIndex = 0; nIndex < nPointCount; nIndex++) {
@@ -2756,7 +3450,7 @@ A3DStatus _3DfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBas
 			aPoints[nIndex].z = pcTessBaseData->m_pdCoords[nPointIndex + 2];
 		}
 
-		cSegment.InsertLine(aPoints.size(), aPoints.data());
+		cSegment.InsertLine(aPoints.GetCount(), aPoints.GetData());
 	}
 	else 
 	{
@@ -2779,10 +3473,10 @@ A3DStatus _3DfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBas
 
 			if(!(nInfoIndex & kA3DTess3DWireDataIsContinuous)) //Continuious
 			{
-				if(0 < aPoints.size())
+				if(0 < aPoints.GetCount())
 				{
-					cSegment.InsertLine(aPoints.size(), aPoints.data());
-					aPoints.resize(0);
+					cSegment.InsertLine(aPoints.GetCount(), aPoints.GetData());
+					aPoints.SetCount(0);
 				}
 			}
 			else {
@@ -2795,7 +3489,7 @@ A3DStatus _3DfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBas
 				cPoint.x = pcTessBaseData->m_pdCoords[nPointIndex];
 				cPoint.y = pcTessBaseData->m_pdCoords[nPointIndex + 1];
 				cPoint.z = pcTessBaseData->m_pdCoords[nPointIndex + 2];
-				aPoints.push_back(cPoint);
+				aPoints.Add(cPoint);
 			}
 
 			if(bClosed)
@@ -2804,10 +3498,10 @@ A3DStatus _3DfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBas
 				cPoint.x = pcTessBaseData->m_pdCoords[nPointIndex];
 				cPoint.y = pcTessBaseData->m_pdCoords[nPointIndex + 1];
 				cPoint.z = pcTessBaseData->m_pdCoords[nPointIndex + 2];
-				aPoints.push_back(cPoint);
+				aPoints.Add(cPoint);
 
-				cSegment.InsertLine(aPoints.size(), aPoints.data());
-				aPoints.resize(0);
+				cSegment.InsertLine(aPoints.GetCount(), aPoints.GetData());
+				aPoints.SetCount(0);
 			}
 
 			nIndex += nInfoIndex + 1;
@@ -2961,6 +3655,25 @@ A3DUns32 _3DfImport::TessFaceDataGetNumberOfFacets(const A3DTessFaceData * pcTes
 	return iNbFacet;
 }
 
+// 8-3. Build Markup 
+A3DStatus _3DfImport::BuildMarkup(A3DTess3D * pcTess3d, A3DTessBaseData * pcTessBaseData, _3DF::SegmentKey & cParentSegment)
+{
+	A3DTessMarkupData sData;
+	A3D_INITIALIZE_DATA(A3DTessMarkupData, sData);
+
+	CHECK_A3D_RETURN(A3DTessMarkupGet(pcTess3d, &sData));
+
+	PolylineArray aPolyline;
+	StringArray aStrings;
+	PMI::TextAttributesArray aTextAttributes;
+	PMI::Options cOptions;
+	PolygonArray aPolygons;
+
+	GetMarkupTesselation(pcTessBaseData, &sData, aPolyline, aPolygons, aStrings, aTextAttributes, &cOptions);
+
+	A3DTessMarkupGet(nullptr, &sData);
+}
+
 // ----- Utility -----
 
 // 7-10-1. Normal Index를 조정하는 함수
@@ -3007,20 +3720,140 @@ bool _3DfImport::ConvertFaceList(TessIndexMap & maPointIndexMap, TessIndexMap & 
 		}
 	}
 
-	anFacelistArray.push_back(3);
-	anFacelistArray.push_back(nPointIndex[0]);
-	anFacelistArray.push_back(nPointIndex[1]);
-	anFacelistArray.push_back(nPointIndex[2]);
+	anFacelistArray.Add(3);
+	anFacelistArray.Add(nPointIndex[0]);
+	anFacelistArray.Add(nPointIndex[1]);
+	anFacelistArray.Add(nPointIndex[2]);
 
-	anVertexNoramlIndexArray.push_back(3);
-	anVertexNoramlIndexArray.push_back(nNormalIndex[0]);
-	anVertexNoramlIndexArray.push_back(nNormalIndex[1]);
-	anVertexNoramlIndexArray.push_back(nNormalIndex[2]);
+	anVertexNoramlIndexArray.Add(3);
+	anVertexNoramlIndexArray.Add(nNormalIndex[0]);
+	anVertexNoramlIndexArray.Add(nNormalIndex[1]);
+	anVertexNoramlIndexArray.Add(nNormalIndex[2]);
 
 	return true;
 }
 
 void _3DfImport::AddTriangle(ConvertFaceInfo & cInFaceInfo,
+	int const pnInFaceListIndices[3],			// facelist indices into the "global" point array for this triangle
+	int const pnInFaceVertexNromalIndices[3],	// vertex normal indices into the "global" normal array for this triangle
+	int const pnInFaceVertexParamIndices[3],	// optional vertex parameter indices into the "global" parameter array for this triangle
+	int const pnInFaceVertexColorIndices[3],	// optional vertex color indices into the RGBA color array for this triangle
+	A3DUns32  nInVertexParamSize)				// vertex parameter size (0 if no parameters)
+{
+	if(pnInFaceListIndices[0] == pnInFaceListIndices[1] || pnInFaceListIndices[1] == pnInFaceListIndices[2] || pnInFaceListIndices[0] == pnInFaceListIndices[2]) {
+		return;
+	}
+
+	// Face List 숫자 추가
+	cInFaceInfo.aOutFaceList.Add(3);
+
+	_3DF::Vector cNormal;
+	bool bZeroLengthFlag = false;
+
+	double dLength0 = cInFaceInfo.aInNormals[pnInFaceVertexNromalIndices[0]].LengthSquared();
+	double dLength1 = cInFaceInfo.aInNormals[pnInFaceVertexNromalIndices[1]].LengthSquared();
+	double dLength2 = cInFaceInfo.aInNormals[pnInFaceVertexNromalIndices[2]].LengthSquared();
+
+	if(0.01 > dLength0 || 0.01 > dLength1 || 0.01 > dLength2) {
+		bZeroLengthFlag = true;
+		_3DF::Vector cX = cInFaceInfo.aInPoints[pnInFaceListIndices[1]] - cInFaceInfo.aInPoints[pnInFaceListIndices[0]];
+		_3DF::Vector cY = cInFaceInfo.aInPoints[pnInFaceListIndices[2]] - cInFaceInfo.aInPoints[pnInFaceListIndices[0]];
+
+		cNormal = cX.Cross(cY);
+		cNormal.Normalize();
+	}
+
+	for(int nVertexIndex = 0; nVertexIndex < 3; nVertexIndex++)
+	{
+		// Two cases:
+		// (1) Either we haven't seen this vertex before (or we have but our normal, if present, or vertex parameter, if present, 
+		//     or vertex color, if present, is different), in which case we need to add this point, possibly normal, possibly vertex parameter
+		//     and possibly vertex color to our "local" arrays and note the mapping between the "global" index and the new "local" index; OR
+		// (2) We have seen this vertex before and it has the same normals if present (and vertex parameter if present, and vertex color if present)
+		//     as a previous encounter, in which case we can reuse the "local" index.
+
+		auto cOutIndexIterator = cInFaceInfo.mOutIndexMap[pnInFaceListIndices[nVertexIndex]].cbegin();
+
+		while(true)
+		{
+			// Index Map에서 FaceListIndex를 발견하지 못한 경우 처리
+			if(cOutIndexIterator == cInFaceInfo.mOutIndexMap[pnInFaceListIndices[nVertexIndex]].cend())
+			{
+				cInFaceInfo.aOutFacePoints.Add(cInFaceInfo.aInPoints[pnInFaceListIndices[nVertexIndex]]);
+				cInFaceInfo.aOutFaceList.Add(static_cast<int>(cInFaceInfo.aOutFacePoints.GetCount() - 1));
+
+				if(0 < cInFaceInfo.aInNormals.GetCount()) {
+					if(false == bZeroLengthFlag) {
+						cInFaceInfo.aOutFaceVertexNormals.Add(cInFaceInfo.aInNormals[pnInFaceVertexNromalIndices[nVertexIndex]]);
+					}
+					else {
+						cInFaceInfo.aOutFaceVertexNormals.Add(cNormal);
+					}
+				}
+
+				if(0 < nInVertexParamSize) {
+					for(A3DUns32 k = 0; k < nInVertexParamSize; k++) {
+						cInFaceInfo.aOutFaceVertexParams.Add(cInFaceInfo.aInParams[pnInFaceVertexParamIndices[nVertexIndex] + k]);
+					}
+				}
+
+				if(0 < cInFaceInfo.aInColors.size()) {
+					cInFaceInfo.aOutFaceVertexColors.push_back(cInFaceInfo.aInColors[pnInFaceVertexColorIndices[nVertexIndex]]);
+				}
+
+				cInFaceInfo.mOutIndexMap[pnInFaceListIndices[nVertexIndex]].push_back(static_cast<int>(cInFaceInfo.aOutFacePoints.GetCount() - 1));
+				cInFaceInfo.aOutVertexRefs.Add(1);
+
+				break;
+			}
+			// Index Map에서 FaceListIndex를 발견한 경우 처리
+			else if(false == bZeroLengthFlag)
+			{
+				if(true == cInFaceInfo.aInNormals.IsEmpty() ||
+					cInFaceInfo.aOutFaceVertexNormals[*cOutIndexIterator].Dot(cInFaceInfo.aInNormals[pnInFaceVertexNromalIndices[nVertexIndex]]) >= cInFaceInfo.fInNormalCosine)
+				{
+					bool bMatchingFlag = true;
+					for(A3DUns32 k = 0; k < nInVertexParamSize; k++) {
+						if(cInFaceInfo.aOutFaceVertexParams[*cOutIndexIterator + k] != cInFaceInfo.aInParams[pnInFaceVertexParamIndices[nVertexIndex] + k])
+						{
+							bMatchingFlag = false;
+							break;
+						}
+					}
+
+					if(cInFaceInfo.aInColors.size() > 0) {
+						if(cInFaceInfo.aOutFaceVertexColors[*cOutIndexIterator] != cInFaceInfo.aInColors[pnInFaceVertexColorIndices[nVertexIndex]]) {
+							bMatchingFlag = false;
+						}
+					}
+
+					if(true == bMatchingFlag)
+					{
+						// 찾은 Index를 이용해서 Face List를 추가한다.
+						cInFaceInfo.aOutFaceList.Add(*cOutIndexIterator);
+						cInFaceInfo.aOutVertexRefs[*cOutIndexIterator] += 1;
+
+						if(!cInFaceInfo.aInNormals.IsEmpty())
+						{
+							int ref_count = cInFaceInfo.aOutVertexRefs[*cOutIndexIterator];
+
+							cInFaceInfo.aOutFaceVertexNormals[*cOutIndexIterator] = (ref_count - 1) / (float) ref_count * cInFaceInfo.aOutFaceVertexNormals[*cOutIndexIterator] +
+								cInFaceInfo.aInNormals[pnInFaceVertexNromalIndices[nVertexIndex]] / (float) ref_count;
+
+							cInFaceInfo.aOutFaceVertexNormals[*cOutIndexIterator].Normalize();
+						}
+						break;
+					}
+				} // if(cInFaceInfo.aInNormals.empty() ||
+			} // else if(false == bZeroLengthFlag)
+
+			cOutIndexIterator++;
+		}
+	}
+}
+
+/*
+void _3DfImport::AddTriangle_IndexHash(ConvertFaceInfo & cInFaceInfo,
 	int const pnInFaceListIndices[3],			// facelist indices into the "global" point array for this triangle
 	int const pnInFaceVertexNromalIndices[3],	// vertex normal indices into the "global" normal array for this triangle
 	int const pnInFaceVertexParamIndices[3],	// optional vertex parameter indices into the "global" parameter array for this triangle
@@ -3137,9 +3970,9 @@ void _3DfImport::AddTriangle(ConvertFaceInfo & cInFaceInfo,
 			cOutIndexIterator++;
 		}
 	}
-
-
 }
+*/
+
 // 8. Face Draw Style 정의
 A3DStatus _3DfImport::SetFaceStyle(const A3DRootBaseWithGraphics * pcBase, _3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
@@ -3288,15 +4121,64 @@ A3DStatus _3DfImport::GetMaterialMapping(const A3DMiscCascadedAttributesData & c
 
 	if(A3D_TRUE == pcStyleData->m_bMaterial)
 	{
-		A3DBool bMaterialIsTexture = false;
-
 		A3DDouble adColor[4] = { 0.0, 0.0, 0.0, 1.0 };
 
-		// check if this material is a texture
-		CHECK_A3D_RETURN(A3DGlobalIsMaterialTexture(pcStyleData->m_uiRgbColorIndex, &bMaterialIsTexture));
+		A3DGraphMaterialData materialdata;
+		A3D_INITIALIZE_DATA(A3DGraphMaterialData, materialdata);
+
+		nRetStatus = A3DGlobalGetGraphMaterialData(pcStyleData->m_uiRgbColorIndex, &materialdata);
+		A3DBool bMaterialIsTexture = A3D_FALSE;
+		A3DGlobalIsMaterialTexture(pcStyleData->m_uiRgbColorIndex, &bMaterialIsTexture);
 
 		if(A3D_TRUE == bMaterialIsTexture)
 		{
+			A3DGraphRgbColorData sRgbColorData;
+			A3D_INITIALIZE_DATA(A3DGraphRgbColorData, sRgbColorData);
+			nRetStatus = A3DGlobalGetGraphRgbColorData(materialdata.m_uiDiffuse, &sRgbColorData);
+
+			A3DGraphTextureApplicationData sTextureAppData;
+			A3D_INITIALIZE_DATA(A3DGraphTextureApplicationData, sTextureAppData);
+			A3DGlobalGetGraphTextureApplicationData(pcStyleData->m_uiRgbColorIndex, &sTextureAppData);
+
+			A3DGraphTextureDefinitionData sTextureData;
+			A3D_INITIALIZE_DATA(A3DGraphTextureDefinitionData, sTextureData);
+			A3DGlobalGetGraphTextureDefinitionData(sTextureAppData.m_uiTextureDefinitionIndex, &sTextureData);
+
+			_3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
+			cMaterialKit.SetColor(cDiffuseColor, _3DF::Material::Color::Type::Diffuse);
+
+			CString strTextureName;
+			strTextureName.Format(L"texture_%d", sTextureAppData.m_uiTextureDefinitionIndex);
+			cMaterialKit.SetTextureName(strTextureName);
+
+			if(sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
+				cMaterialKit.SetTextureMirror(true);
+			}
+/*
+
+			if(sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
+				strTextureName.Format(L"environment = texture_%d, mirror = (r = 0.5 g = 0.5 b = 0.5))", sTextureAppData.m_uiTextureDefinitionIndex);
+			}
+			else {
+				strTextureName.Format(L"faces = (diffuse = (r=%f g=%f b=%f) texture_%d)", sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue,
+					sTextureAppData.m_uiTextureDefinitionIndex);
+			}
+*/
+
+			CString strTextureOption;
+			strTextureOption.Format(L"source = image %u", sTextureData.m_uiPictureIndex);
+
+			if(sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
+				strTextureOption.Append(L", parameterization source = reflection vector");
+			}
+			else {
+				strTextureOption.Append(L", parameterization source = uv");
+			}
+
+			cMaterialKit.SetTextureOption(strTextureOption);
+
+			/*
+
 			A3DGraphTextureApplicationData sTextureAppplicationData;
 			A3D_INITIALIZE_DATA(A3DGraphTextureApplicationData, sTextureAppplicationData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphTextureApplicationData(pcStyleData->m_uiRgbColorIndex,
@@ -3312,7 +4194,7 @@ A3DStatus _3DfImport::GetMaterialMapping(const A3DMiscCascadedAttributesData & c
 			*pucTextureDimension = sTextureDefinitionData.m_ucTextureDimension;
 
 			_3DF::RGBAColor cDiffuseColor(sTextureDefinitionData.m_dRed, sTextureDefinitionData.m_dGreen,
-				sTextureDefinitionData.m_dBlue, sTextureDefinitionData.m_dAlpha);
+				sTextureDefinitionData.m_dBlue, sTextureDefinitionData.m_dAlpha);*/
 
 			//cMaterialKit.SetDiffuseColor(cDiffuseColor);
 
@@ -3401,10 +4283,10 @@ A3DStatus _3DfImport::GetMaterialMapping(const A3DMiscCascadedAttributesData & c
 
 	if(A3D_TRUE == pcStyleData->m_bMaterial)
 	{
-		A3DGraphMaterialData materialdata;
-		A3D_INITIALIZE_DATA(A3DGraphMaterialData, materialdata);
+		A3DGraphMaterialData cMaterialData;
+		A3D_INITIALIZE_DATA(A3DGraphMaterialData, cMaterialData);
 
-		nRetStatus = A3DGlobalGetGraphMaterialData(pcStyleData->m_uiRgbColorIndex, &materialdata);
+		nRetStatus = A3DGlobalGetGraphMaterialData(pcStyleData->m_uiRgbColorIndex, &cMaterialData);
 		A3DBool bMaterialIsTexture = A3D_FALSE;
 		A3DGlobalIsMaterialTexture(pcStyleData->m_uiRgbColorIndex, &bMaterialIsTexture);
 
@@ -3412,31 +4294,49 @@ A3DStatus _3DfImport::GetMaterialMapping(const A3DMiscCascadedAttributesData & c
 		{
 			A3DGraphRgbColorData sRgbColorData;
 			A3D_INITIALIZE_DATA(A3DGraphRgbColorData, sRgbColorData);
-
-			nRetStatus = A3DGlobalGetGraphRgbColorData(materialdata.m_uiDiffuse, &sRgbColorData);
+			nRetStatus = A3DGlobalGetGraphRgbColorData(cMaterialData.m_uiDiffuse, &sRgbColorData);
 
 			A3DGraphTextureApplicationData sTextureAppData;
 			A3D_INITIALIZE_DATA(A3DGraphTextureApplicationData, sTextureAppData);
-
 			A3DGlobalGetGraphTextureApplicationData(pcStyleData->m_uiRgbColorIndex, &sTextureAppData);
 
 			A3DGraphTextureDefinitionData sTextureData;
 			A3D_INITIALIZE_DATA(A3DGraphTextureDefinitionData, sTextureData);
-
 			A3DGlobalGetGraphTextureDefinitionData(sTextureAppData.m_uiTextureDefinitionIndex, &sTextureData);
 
 			_3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
 			cMaterialKit.SetColor(cDiffuseColor, _3DF::Material::Color::Type::Diffuse);
 
-			CString strTexture;
+			CString strTextureName;
+			strTextureName.Format(L"texture_%d", sTextureAppData.m_uiTextureDefinitionIndex);
+			cMaterialKit.SetTextureName(strTextureName);
+
 			if(sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
-				strTexture.Format(L"environment = texture_%d, mirror = (r = 0.5 g = 0.5 b = 0.5))", sTextureAppData.m_uiTextureDefinitionIndex);
-			}
-			else {
-				strTexture.Format(L"texture_%d", sTextureAppData.m_uiTextureDefinitionIndex);
+				cMaterialKit.SetTextureMirror(true);
 			}
 
-			cMaterialKit.SetTexture(strTexture);
+/*
+			if(sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
+				strTextureName.Format(L"environment = texture_%d, mirror = (r = 0.5 g = 0.5 b = 0.5))",
+					sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sTextureAppData.m_uiTextureDefinitionIndex);
+			}
+			else {
+				strTextureName.Format(L"environment = texture_%d",
+					sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sTextureAppData.m_uiTextureDefinitionIndex);
+			}
+*/
+
+			CString strTextureOption;
+			strTextureOption.Format(L"source = image %u", sTextureData.m_uiPictureIndex);
+
+			if(sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
+				strTextureOption.Append(L", parameterization source = reflection vector");
+			}
+			else {
+				strTextureOption.Append(L", parameterization source = uv");
+			}
+
+			cMaterialKit.SetTextureOption(strTextureOption);
 		}
 		else
 		{
@@ -3574,140 +4474,317 @@ A3DStatus _3DfImport::DrawTransformation(const A3DMiscTransformation * pcTransfo
 
 //== Texture 관련 함수 ===============================================================================
 
-void _3DfImport::PopulateTextures()
+A3DStatus _3DfImport::PopulateTextures(_3DF::SegmentKey & cSegment)
 {
-/*
-	InitializeMagick(".");
+// 	InitializeMagick(".");
+// 
+// 	HC_Set_Visibility("image = off");
 
-	HC_Set_Visibility("image = off");
-
-	A3DGlobal * pGlobal = NULL;
-	A3DGlobalGetPointer(&pGlobal);
+	A3DGlobal * pcGlobal = nullptr;
+	A3DGlobalGetPointer(&pcGlobal);
 
 	A3DGlobalData globalData;
 	A3D_INITIALIZE_DATA(A3DGlobalData, globalData);
 
-	A3DGlobalGet(pGlobal, &globalData);
+	A3DGlobalGet(pcGlobal, &globalData);
+	
+	A3DGraphPictureData cPictureData;
+	A3D_INITIALIZE_DATA(A3DGraphPictureData, cPictureData);
+	
+	if(0 == globalData.m_uiPicturesSize) {
+		return A3D_SUCCESS;
+	}
 
-	/ * This while loop is loading all the images. * /
-	VArray<unsigned char> pixels;
+	//cSegment.Open();
 
-	for(unsigned int ui = 0; ui < globalData.m_uiPicturesSize; ui++)
+	_3DF::MaterialMappingControl cMappingControl = cSegment.GetMaterialMappingControl();
+	cMappingControl.InitPopulateTextures();
+
+	// This while loop is loading all the images.
+	//VArray<unsigned char> pixels;
+
+	for(UINT nIndex = 0; nIndex < globalData.m_uiPicturesSize; nIndex++)
 	{
-		Query::GraphPicture graphPicture(ui);
-		if(!graphPicture.IsValid())
-			continue;
+		CHECK_A3D_RETURN(A3DGlobalGetGraphPictureData(nIndex, &cPictureData));
 
-		A3DGraphPictureData const & data = graphPicture.data;
-		bool	size_ok = (data.m_uiPixelWidth != 0 && data.m_uiPixelHeight != 0);
+		bool bSizeOk = (cPictureData.m_uiPixelWidth != 0 && cPictureData.m_uiPixelHeight != 0);
 
-		if(size_ok && data.m_eFormat == kA3DPictureBitmapRgbaByte)
-		{
-			InvertImage(data.m_pucBinaryData, data.m_uiPixelWidth, data.m_uiPixelHeight, true);
-			HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u, local = on", ui), data.m_uiPixelWidth, data.m_uiPixelHeight, data.m_pucBinaryData);
+		if(bSizeOk && cPictureData.m_eFormat == kA3DPictureBitmapRgbaByte) {
+			InvertImage(cPictureData.m_pucBinaryData, cPictureData.m_uiPixelWidth, cPictureData.m_uiPixelHeight, true);
+			cMappingControl.InsertPicture(nIndex, cPictureData.m_uiPixelWidth, cPictureData.m_uiPixelHeight, cPictureData.m_pucBinaryData);
+			//HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u, local = on", nIndex), cPictureData.m_uiPixelWidth, cPictureData.m_uiPixelHeight, cPictureData.m_pucBinaryData);
 		}
-		else if(size_ok && data.m_eFormat == kA3DPictureBitmapRgbByte)
-		{
-			InvertImage(data.m_pucBinaryData, data.m_uiPixelWidth, data.m_uiPixelHeight, false);
-			HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgb, name = image %u, local = on", ui), data.m_uiPixelWidth, data.m_uiPixelHeight, data.m_pucBinaryData);
+		else if(bSizeOk && cPictureData.m_eFormat == kA3DPictureBitmapRgbByte) {
+			InvertImage(cPictureData.m_pucBinaryData, cPictureData.m_uiPixelWidth, cPictureData.m_uiPixelHeight, false);
+			cMappingControl.InsertPicture(nIndex, cPictureData.m_uiPixelWidth, cPictureData.m_uiPixelHeight, cPictureData.m_pucBinaryData);
+			//HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgb, name = image %u, local = on", nIndex), cPictureData.m_uiPixelWidth, cPictureData.m_uiPixelHeight, cPictureData.m_pucBinaryData);
 		}
-		else
-		{
-			ExceptionInfo exception;
-			GetExceptionInfo(&exception);
-			ImageInfo * image_info = CloneImageInfo((ImageInfo *) NULL);
-			Image * image = BlobToImage(image_info, (void *) data.m_pucBinaryData, data.m_uiSize, &exception);
-			if(image != NULL)
-			{
-				unsigned long width = image->magick_columns;
-				unsigned long height = image->magick_rows;
-				pixels.EnsureSize(width * height * 4);
-
-				ExportImagePixels(image, 0, 0, width, height, "RGBA", CharPixel, &pixels[0], &exception);
-				DestroyImage(image);
-				DestroyImageInfo(image_info);
-				DestroyExceptionInfo(&exception);
-
-				HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u, local = on", ui), width, height, &pixels[0]);
-			}
+		else {
+			cMappingControl.InsertDifaultPicture(nIndex, cPictureData.m_uiSize, cPictureData.m_pucBinaryData);
 		}
 	}
 
-	for(A3DUns32 ui = 0; ui < globalData.m_uiTextureDefinitionsSize; ui++)
+	/*
+	for(A3DUns32 nIndex = 0; nIndex < globalData.m_uiTextureDefinitionsSize; nIndex++)
 	{
-		Query::GraphTextureDefinition textureDefinition(ui);
-		if(!textureDefinition.IsValid())
+		Query::GraphTextureDefinition cTextureDefinition(nIndex);
+		if(!cTextureDefinition.IsValid()) {
 			continue;
+		}
 
-		A3DGraphTextureDefinitionData const & data = textureDefinition.data;
+		A3DGraphTextureDefinitionData const & cData = cTextureDefinition.data;
 
-		H_FORMAT_TEXT texture_options("source = image %u", data.m_uiPictureIndex);
+		CString strTextureOptions;
+		strTextureOptions.Format(L"source = image %u", cData.m_uiPictureIndex);
 
-		if(data.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection)
+		if(cData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection)
 		{
-			texture_options.Append(", parameterization source = reflection vector");
+			strTextureOptions.Append(L", parameterization source = reflection vector");
 		}
 		else
 		{
-			texture_options.Append(", parameterization source = uv");
+			strTextureOptions.Append(L", parameterization source = uv");
 		}
 
-		texture_options.Append(data.m_eTextureFunction == kA3DTextureFunctionModulate ? ", modulate" : ", no modulate");
+		strTextureOptions.Append(cData.m_eTextureFunction == kA3DTextureFunctionModulate ? L", modulate" : L", no modulate");
 
-		char const * tiling = nullptr;
-		switch(data.m_eTextureWrappingModeS)
+		CString strTiling;
+		switch(cData.m_eTextureWrappingModeS)
 		{
 			case kA3DTextureWrappingModeMirroredRepeat:
 			{
-				tiling = "mirror";
+				strTiling = L"mirror";
 			}	break;
 
 			case kA3DTextureWrappingModeClamp:
 			case kA3DTextureWrappingModeClampToBorder:
 			case kA3DTextureWrappingModeClampToEdge:
 			{
-				tiling = "drop";
+				strTiling = L"drop";
 			}	break;
 
 			case kA3DTextureWrappingModeUnknown:
 			case kA3DTextureWrappingModeRepeat:
 			default:
 			{
-				tiling = "repeat";
+				strTiling = L"repeat";
 			}
 		}
-		texture_options.Append(", tiling = %s", tiling);
 
-		if(data.m_pTextureTransfo != nullptr)
+		CString strText;
+		strText.Format(L", tiling = %s", strTiling);
+		strTextureOptions.Append(strText);
+
+		if(cData.m_pTextureTransfo != nullptr)
 		{
 			A3DGraphTextureTransformationData transformationData;
 			A3D_INITIALIZE_DATA(A3DGraphTextureTransformationData, transformationData);
-			A3DGraphTextureTransformationGet(data.m_pTextureTransfo, &transformationData);
-			float textureMatrix[16] = { 0 };
-			for(int i = 0; i < 16; ++i)
-				textureMatrix[i] = static_cast<float>(transformationData.m_dMatrix[i]);
-			HC_Compute_Matrix_Inverse(textureMatrix, textureMatrix);
-
-			char textureTransformSegment[4096] = "";
-			HC_Open_Segment("/include library/texture_transformations");
-			{
-				HC_Open_Segment("");
-				{
-					HC_Show_Segment(HC_Create_Segment("."), textureTransformSegment);
-					HC_Set_Texture_Matrix(textureMatrix);
-				}
-				HC_Close_Segment();
+			A3DGraphTextureTransformationGet(cData.m_pTextureTransfo, &transformationData);
+			float pfTextureMatrix[16] = { 0 };
+			for(int i = 0; i < 16; ++i) {
+				pfTextureMatrix[i] = static_cast<float>(transformationData.m_dMatrix[i]);
 			}
-			HC_Close_Segment();
 
-			texture_options.Append(", transform = %s", textureTransformSegment);
+			char pchTextureTransformSegment[4096] = "";
+			cMappingControl.SetTextureMatrix(pfTextureMatrix, pchTextureTransformSegment);
+				
+// 			HC_Compute_Matrix_Inverse(textureMatrix, textureMatrix);
+// 
+// 			char textureTransformSegment[4096] = "";
+// 			HC_Open_Segment("/include library/texture_transformations");
+// 			{
+// 				HC_Open_Segment("");
+// 				{
+// 					HC_Show_Segment(HC_Create_Segment("."), textureTransformSegment);
+// 					HC_Set_Texture_Matrix(textureMatrix);
+// 				}
+// 				HC_Close_Segment();
+// 			}
+// 			HC_Close_Segment();
+
+			//strText.Format(L", transform = %s", textureTransformSegment);
+			//strTextureOptions.Append(strText);
 		}
 
-		texture_options.Append(", decal, interpolation filter = on, no decimation filter, no downsampling, parameter offset = 0");
-		HC_Define_Local_Texture(H_FORMAT_TEXT("texture_%u", ui), texture_options);
+		strTextureOptions.Append(L", decal, interpolation filter = on, no decimation filter, no downsampling, parameter offset = 0");
+
+		strText.Format(L"texture_%u", nIndex);
+		cMappingControl.SetDefineLocalTexture(nIndex, strTextureOptions);
+		//HC_Define_Local_Texture(H_FORMAT_TEXT("texture_%u", ui), strTextureOptions);
 	}
-	DestroyMagick();
 */
+
+	cMappingControl.EndPopulateTextures();
+
+	//cSegment.Close();
+
+	return A3D_SUCCESS;
+}
+
+A3DStatus _3DfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cAttrsData, _3DF::MaterialMappingKit & cMaterialKit)
+{
+	const A3DGraphStyleData * pcStyleData = &cAttrsData.m_sStyle;
+
+	if (pcStyleData == nullptr) {
+		return A3D_ERROR;
+	}
+
+	LogIncreaseTabIndex(2);
+
+	bool bTransparencyDefined = (1 == cAttrsData.m_sStyle.m_bIsTransparencyDefined) ? true : false;
+	float fTransparency = cAttrsData.m_sStyle.m_ucTransparency / 255.0f;
+
+	A3DStatus nRetStatus = A3D_SUCCESS;
+
+	if (A3D_TRUE == pcStyleData->m_bMaterial)
+	{
+		A3DGraphMaterialData cMaterialData;
+		A3D_INITIALIZE_DATA(A3DGraphMaterialData, cMaterialData);
+
+		nRetStatus = A3DGlobalGetGraphMaterialData(pcStyleData->m_uiRgbColorIndex, &cMaterialData);
+		A3DBool bMaterialIsTexture = A3D_FALSE;
+		A3DGlobalIsMaterialTexture(pcStyleData->m_uiRgbColorIndex, &bMaterialIsTexture);
+
+		if (A3D_TRUE == bMaterialIsTexture)
+		{
+			A3DGraphRgbColorData sRgbColorData;
+			A3D_INITIALIZE_DATA(A3DGraphRgbColorData, sRgbColorData);
+			nRetStatus = A3DGlobalGetGraphRgbColorData(cMaterialData.m_uiDiffuse, &sRgbColorData);
+
+			A3DGraphTextureApplicationData sTextureAppData;
+			A3D_INITIALIZE_DATA(A3DGraphTextureApplicationData, sTextureAppData);
+			A3DGlobalGetGraphTextureApplicationData(pcStyleData->m_uiRgbColorIndex, &sTextureAppData);
+
+			A3DGraphTextureDefinitionData sTextureData;
+			A3D_INITIALIZE_DATA(A3DGraphTextureDefinitionData, sTextureData);
+			A3DGlobalGetGraphTextureDefinitionData(sTextureAppData.m_uiTextureDefinitionIndex, &sTextureData);
+
+			_3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
+			cMaterialKit.SetColor(cDiffuseColor, _3DF::Material::Color::Type::Diffuse);
+
+			CString strTextureName;
+			strTextureName.Format(L"texture_%d", sTextureAppData.m_uiTextureDefinitionIndex);
+			cMaterialKit.SetTextureName(strTextureName);
+
+			if (sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
+				cMaterialKit.SetTextureMirror(true);
+			}
+
+			/*
+						if(sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
+							strTextureName.Format(L"environment = texture_%d, mirror = (r = 0.5 g = 0.5 b = 0.5))",
+								sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sTextureAppData.m_uiTextureDefinitionIndex);
+						}
+						else {
+							strTextureName.Format(L"environment = texture_%d",
+								sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sTextureAppData.m_uiTextureDefinitionIndex);
+						}
+			*/
+
+			CString strTextureOption;
+			strTextureOption.Format(L"source = image %u", sTextureData.m_uiPictureIndex);
+
+			if (sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
+				strTextureOption.Append(L", parameterization source = reflection vector");
+			}
+			else {
+				strTextureOption.Append(L", parameterization source = uv");
+			}
+
+			cMaterialKit.SetTextureOption(strTextureOption);
+		}
+		else
+		{
+			A3DGraphRgbColorData sRgbColorData;
+			A3D_INITIALIZE_DATA(A3DGraphRgbColorData, sRgbColorData);
+
+			A3DGraphMaterialData sMaterialData;
+			A3D_INITIALIZE_DATA(A3DGraphMaterialData, sMaterialData);
+
+			CHECK_A3D_RETURN(A3DGlobalGetGraphMaterialData(pcStyleData->m_uiRgbColorIndex, &sMaterialData));
+			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiDiffuse, &sRgbColorData));
+			_3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dDiffuseAlpha);
+			if (true == bTransparencyDefined) { cDiffuseColor.alpha = fTransparency; }
+			cMaterialKit.SetColor(cDiffuseColor, _3DF::Material::Color::Type::Diffuse);
+
+			//Log(2, L"DrawStyle: DiffuseColor R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
+/*
+			nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
+			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiAmbient, &sRgbColorData));
+			_3DF::RGBAColor cAmbientColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dAmbientAlpha);
+			cMaterialKit.SetFaceColor(cAmbientColor, _3DF::Material::Color::Channel::);
+*/
+
+//nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
+			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiEmissive, &sRgbColorData));
+			_3DF::RGBAColor cEmissiveColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dEmissiveAlpha);
+			if (true == bTransparencyDefined) { cEmissiveColor.alpha = fTransparency; }
+			cMaterialKit.SetColor(cEmissiveColor, _3DF::Material::Color::Type::Emission);
+
+			//nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
+			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiSpecular, &sRgbColorData));
+			_3DF::RGBAColor cSpecularColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dSpecularAlpha);
+			if (true == bTransparencyDefined) { cSpecularColor.alpha = fTransparency; }
+			cMaterialKit.SetColor(cSpecularColor, _3DF::Material::Color::Type::Specular);
+
+			// 			nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
+			// 			nRetStatus = A3DGlobalGetGraphMaterialData(A3D_DEFAULT_MATERIAL_INDEX, &sMaterialData);
+			cMaterialKit.SetGloss(sMaterialData.m_dShininess);
+		}
+	}
+	else
+	{
+		// m_uiRgbColorIndex : A global index to either an `A3DGraphMaterialData` or an `A3DGraphRgbColorData` according to the value of `m_bMaterial`.
+		if (A3D_DEFAULT_COLOR_INDEX != pcStyleData->m_uiRgbColorIndex)
+		{
+			A3DGraphRgbColorData sRgbColorData;
+			A3D_INITIALIZE_DATA(A3DGraphRgbColorData, sRgbColorData);
+			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(pcStyleData->m_uiRgbColorIndex, &sRgbColorData));
+
+			_3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
+			if (true == bTransparencyDefined) { cDiffuseColor.alpha = fTransparency; }
+			cMaterialKit.SetColor(cDiffuseColor);
+
+			//Log(2, L"DrawStyle: R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
+
+			//A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
+		}
+	}
+
+	LogDecreaseTabIndex(2);
+
+	return A3D_SUCCESS;
+}
+
+A3DStatus _3DfImport::SetTextureMapping(_3DF::SegmentKey cSegment, A3DMiscCascadedAttributesData & sAttrData) 
+{
+	_3DF::MaterialMappingKit cMaterialMapping;
+	if (A3D_SUCCESS != GetMaterialMapping(sAttrData, cMaterialMapping)) {
+		return A3D_ERROR;
+	}
+
+	cSegment.SetTextureMapping(L"faces", cMaterialMapping);
+
+	return A3D_SUCCESS;
+}
+
+void _3DfImport::InvertImage(unsigned char * imagebuffer, int width, int height, bool rgba)
+{
+	unsigned char * row = new unsigned char[width * 4];
+
+	for(int y = 0; y < height / 2; y++)
+	{
+		int w;
+		if(rgba)
+			w = 4;
+		else
+			w = 3;
+
+		memcpy(row, imagebuffer + (width * (height - 1 - y) * w), width * w);
+		memcpy(imagebuffer + (width * (height - 1 - y) * w), imagebuffer + (width * w * y),
+			width * w);
+		memcpy(imagebuffer + (width * w * y), row, width * w);
+	}
 }
 
 //== Attribute 관련 함수 =============================================================================
@@ -3783,7 +4860,7 @@ bool _3DfImport::SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cA
 	_3DF::StyleControl cStyleControl = cSegment.GetStyleControl();
 	_3DF::StyleKey cStyle = cSegment.GetStyleControl().PushSegment(cStyleSegment);
 
-// 	if(INVALID_KEY == cStyle.KeyValue()) {
+// 	if(INVALID_KEY == cStyle.KeyValue()) { 
 // 		return false;
 // 	}
 
@@ -3957,30 +5034,30 @@ A3DStatus _3DfImport::GetMatrix(A3DMiscTransformation * pcLocation, MbMatrix3D &
 	return A3D_SUCCESS;
 }
 
-A3DStatus _3DfImport::GetMatrix(A3DMiscTransformation * pcLocation, MatrixKit & cOutMatrix)
+A3DStatus _3DfImport::GetMatrix(A3DMiscTransformation * pcLocation, Matrix & cOutMatrix)
 {
 	MbMatrix3D cMatrix;
 	CHECK_A3D_RETURN(GetMatrix(pcLocation, cMatrix));
 
 	// X-Axis
-	cOutMatrix.m_fData[0] = cMatrix.GetAxisX().x;
-	cOutMatrix.m_fData[1] = cMatrix.GetAxisX().y;
-	cOutMatrix.m_fData[2] = cMatrix.GetAxisX().z;
+	cOutMatrix[0][0] = cMatrix.GetAxisX().x;
+	cOutMatrix[0][1] = cMatrix.GetAxisX().y;
+	cOutMatrix[0][2] = cMatrix.GetAxisX().z;
 
 	// Y-Axis
-	cOutMatrix.m_fData[4] = cMatrix.GetAxisY().x;
-	cOutMatrix.m_fData[5] = cMatrix.GetAxisY().y;
-	cOutMatrix.m_fData[6] = cMatrix.GetAxisY().z;
+	cOutMatrix[1][0] = cMatrix.GetAxisY().x;
+	cOutMatrix[1][1] = cMatrix.GetAxisY().y;
+	cOutMatrix[1][2] = cMatrix.GetAxisY().z;
 
 	// Z-Axis
-	cOutMatrix.m_fData[8] = cMatrix.GetAxisZ().x;
-	cOutMatrix.m_fData[9] = cMatrix.GetAxisZ().y;
-	cOutMatrix.m_fData[10] = cMatrix.GetAxisZ().z;
+	cOutMatrix[2][0]= cMatrix.GetAxisZ().x;
+	cOutMatrix[2][1]= cMatrix.GetAxisZ().y;
+	cOutMatrix[2][2] = cMatrix.GetAxisZ().z;
 
 	// Origin
-	cOutMatrix.m_fData[12] = cMatrix.GetOrigin().x;
-	cOutMatrix.m_fData[13] = cMatrix.GetOrigin().y;
-	cOutMatrix.m_fData[14] = cMatrix.GetOrigin().z;
+	cOutMatrix[3][0] = cMatrix.GetOrigin().x;
+	cOutMatrix[3][1] = cMatrix.GetOrigin().y;
+	cOutMatrix[3][2] = cMatrix.GetOrigin().z;
 
 	return A3D_SUCCESS;
 }

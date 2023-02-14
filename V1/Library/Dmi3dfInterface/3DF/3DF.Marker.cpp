@@ -4,7 +4,7 @@
 
 USING_3DF_NAMESPACE
 
-MarkerKey::MarkerKey(HC_KEY nInKey)
+MarkerKey::MarkerKey(HC_KEY nInKey) :
+	Key(nInKey)
 {
-	m_nKey = nInKey;
 }

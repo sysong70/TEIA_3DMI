@@ -61,7 +61,8 @@
     <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\hoops_stream\lib\nt_x64_v141;</Dmi3dfLibarayPath>
     <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\utility\lib\nt_x64_v141;</Dmi3dfLibarayPath>
     <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\hoops_ooc\lib\nt_x64_v141;</Dmi3dfLibarayPath>
-
+    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\3rdparty\ImageMagick\lib\nt_x64_v141;</Dmi3dfLibarayPath>
+    
     <DebFlg Condition="$(Configuration.Contains('Debug'))">d</DebFlg>
     <DebFlg Condition="$(Configuration.Contains('Release'))"></DebFlg >
 
@@ -72,6 +73,7 @@
     <Dmi3dfLibaray>$(Dmi3dfLibaray)hoops_stream$(DebFlg).lib;</Dmi3dfLibaray>
     <Dmi3dfLibaray>$(Dmi3dfLibaray)hoops$(DebFlg).lib;</Dmi3dfLibaray>
     <Dmi3dfLibaray>$(Dmi3dfLibaray)hoops_ooc$(DebFlg).lib;</Dmi3dfLibaray>
+    <Dmi3dfLibaray>$(Dmi3dfLibaray)hoops_mgkstat$(DebFlg)_md.lib;</Dmi3dfLibaray>
   </PropertyGroup> 
 
 </Project>

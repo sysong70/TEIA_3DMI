@@ -85,9 +85,6 @@ void View::Init()
 
 	SetSmoothTransition(false);
 
-	GetModel()->SetStaticModel(true);
-	GetModel()->SetLMVModel(false);
-
 	GetModel()->GetEventManager()->RegisterHandler((HAnimationListener *) this, HAnimationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
 	
 	m_pSelection = new SelectionControl(this);
@@ -129,6 +126,10 @@ void View::Init()
 	// View 설정이 끝나고 나면 
 	// File Import 시작
 	//ImportExchangeFile(nViewId, strFilePathName);
+
+	GetModel()->SetStaticModel(true);
+	GetModel()->SetLMVModel(false);
+
 
 	bool bFlag = SetHandednessFromModel();
 

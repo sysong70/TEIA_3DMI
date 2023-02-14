@@ -105,17 +105,21 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	//cModelSegmentKey.ForcedOpen();
 
+	//pcHoopsView->SetSuppressUpdate(true);
+
 	DLL::_3DF::Interface cInterfaace;
 	cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, strErrorMessage);
 
 	//cModelSegmentKey.ForcedClose();
 
 	// #3DF_Debug: Z://Test.hsf
- 	//SaveHsfFile(L"Z://Test.hsf", pcHoopsView);
+ 	SaveHsfFile(L"Z://Test.hsf", pcHoopsView);
+
+	//pcHoopsView->SetSuppressUpdate(false);
 
 	//pcHoopsView->SetSmoothTransition(true);
 	pcHoopsView->ZoomToExtents();
-	//pcHoopsView->Update();
+	pcHoopsView->ForceUpdate();
 
 	Signal::Delivery delivery;
 	delivery.ViewId = nViewId;
@@ -269,7 +273,6 @@ bool ViewManager::RButtonUp(_3DF::View * pcView, int nFlags, int x, int y)
 	return pcView->RButtonUp(nFlags, x, y);
 }
 
-
 bool ViewManager::RButtonDown(_3DF::View * pcView, int nFlags, int x, int y)
 {
 	assert(pcView);
@@ -289,7 +292,6 @@ bool ViewManager::MouseWheel(_3DF::View * pcView, int nFlags, int zDelta, int x,
 	assert(pcView);
 	return pcView->MouseWheel(nFlags, zDelta, x, y, cInObject);
 }
-
 
 void ViewManager::SaveHsfFile(CString strFilePathName, View * pcHoopsView)
 {

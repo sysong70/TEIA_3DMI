@@ -25,6 +25,8 @@ protected:
 private: 
 	Manager * m_pcWrapper = nullptr; 
 	Manager & Wrapper() { return *m_pcWrapper; }
+
+	CString GetExecuteDirectory();
 };
 
 CLOSE_3DF_SIGNAL_NAMESPACE

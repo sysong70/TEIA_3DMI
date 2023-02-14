@@ -75,9 +75,13 @@ void ApplicationManager::InitInstance()
 	// set the font directory
 	TCHAR fontDirectory[MAX_PATH + 32];
 	::GetWindowsDirectory(fontDirectory, MAX_PATH);
+//	
 	_tcscat(fontDirectory, _T("\\Fonts"));
+
+	CString strFontDirectory = GetExecuteDirectory() + L"Fonts";
+
 	char buf[4096];
- 	sprintf(buf, "font directory = (%s, .)", H_ASCII_TEXT(fontDirectory));
+ 	sprintf(buf, "font directory = (%s, .)", H_ASCII_TEXT(strFontDirectory));
 
 	HC_Define_System_Options(buf);
 }
@@ -86,4 +90,22 @@ void ApplicationManager::InitInstance()
 void ApplicationManager::ExitInstance()
 {
 
+}
+
+// 실행 파일 경로 (끝에 '\' 붙어서 나옴)
+CString ApplicationManager::GetExecuteDirectory()
+{
+	TCHAR szBuffer[MAX_PATH];
+	TCHAR Drive[_MAX_DRIVE];
+	TCHAR Path[_MAX_PATH];
+	TCHAR Filename[_MAX_FNAME];
+	TCHAR Ext[_MAX_EXT];
+
+	GetModuleFileName(NULL, szBuffer, sizeof(szBuffer)); // get process file name
+	_wsplitpath_s(szBuffer, Drive, _MAX_DRIVE, Path, _MAX_PATH, Filename, _MAX_FNAME, Ext, _MAX_EXT); // get drive, path, file, ext name
+
+	CString strFilePath;
+	strFilePath.Format(L"%s%s", Drive, Path);
+
+	return strFilePath;
 }

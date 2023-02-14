@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "3DF.Key.h"
+#include "3DF.Geometry.h"
 
 #include "3DF.Math.h"
 
@@ -25,12 +25,12 @@ public:
 	ShellKit & SetParameters(FloatArray const & aInParameters);
 	ShellKit & SetColors(RGBAColorArray const & aInColors);
 
-	bool ShowPoints(PointArray & acOutPoints) const;
-	bool ShowNormals(VectorArray & acOutVectors) const;
-	bool ShowFacelist(IntArray & acOutFacelist) const;
-	bool ShowTristrips(IntArray & acOutTristrips) const;
-	bool ShowParameters(FloatArray & aOutParameters) const;
-	bool ShowColors(RGBAColorArray & aOutColors) const;
+	bool ShowPoints(PointArray const *& acOutPoints) const;
+	bool ShowNormals(VectorArray const *& acOutVectors) const;
+	bool ShowFacelist(IntArray const *& acOutFacelist) const;
+	bool ShowTristrips(IntArray const *& acOutTristrips) const;
+	bool ShowParameters(FloatArray const *& aOutParameters) const;
+	bool ShowColors(RGBAColorArray const *& aOutColors) const;
 
 	ShellKit & SetMaterialMapping(MaterialMappingKit const & cInkit);
 
@@ -45,14 +45,13 @@ private:
 	MaterialMappingKit m_cMaterialMappingKit;
 };
 
-class API_3DF ShellKey : public Key
+class API_3DF ShellKey : public GeometryKey
 {
 public:
-	ShellKey() {};
-	ShellKey(HC_KEY nKey);
+	ShellKey(HC_KEY nInKey = INVALID_KEY);
 	ShellKey(ShellKey const & cInThat);
 
-	ShellKey & operator = (ShellKey const & cOther);
+	ShellKey & operator = (ShellKey const & cInThat);
 };
 
 CLOSE_3DF_NAMESPACE

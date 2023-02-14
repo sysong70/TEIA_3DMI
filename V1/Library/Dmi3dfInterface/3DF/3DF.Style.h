@@ -26,10 +26,10 @@ private:
 class API_3DF StyleKey : public Key
 {
 public:
-	StyleKey();
-	explicit StyleKey(Key const & cInThat);
+	StyleKey(HC_KEY cInKey = INVALID_KEY);
 	StyleKey(StyleKey const & cInThat);
 
+	void Set(StyleKey const & cInThat);
 	StyleKey & operator = (StyleKey const & cInThat);
 };
 

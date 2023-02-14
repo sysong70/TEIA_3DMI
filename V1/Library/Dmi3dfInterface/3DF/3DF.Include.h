@@ -7,11 +7,11 @@ OPEN_3DF_NAMESPACE
 class API_3DF IncludeKey : public Key
 {
 public:
-	IncludeKey();
-	IncludeKey(HC_KEY nKey);
+	IncludeKey(HC_KEY nInKey = INVALID_KEY);
 	IncludeKey(IncludeKey const & cInThat);
 
-	IncludeKey & operator = (IncludeKey const & cOther);
+	void Set(IncludeKey const & cInThat);
+	IncludeKey & operator = (IncludeKey const & cInThat);
 };
 
 CLOSE_3DF_NAMESPACE

@@ -15,4 +15,3 @@
 // #include <boost/pool/pool_alloc.hpp>
 
 USING_3DF_NAMESPACE
-
