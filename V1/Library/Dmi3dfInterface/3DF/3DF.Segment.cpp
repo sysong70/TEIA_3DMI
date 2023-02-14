@@ -14,45 +14,40 @@
 
 USING_3DF_NAMESPACE
 
-SegmentKey::SegmentKey()
-{
-}
-
 SegmentKey::SegmentKey(CString strInName)
 {
+	HC_KEY nKey = INVALID_KEY;
+
 	if(false == strInName.IsEmpty()) {
-		m_nKey = HC_Create_Segment(H_ASCII_TEXT(strInName));
+		nKey = HC_Create_Segment(H_ASCII_TEXT(strInName));
 	}
 	else {
-		m_nKey = HC_Create_Segment(nullptr);
+		nKey = HC_Create_Segment(nullptr);
 	}
+
+	SetKeyValue(nKey);
 }
 
-SegmentKey::SegmentKey(HC_KEY nKey)
+SegmentKey::SegmentKey(HC_KEY nInKey) :
+	Key(nInKey)
 {
-	m_nKey = nKey;
 }
 
-SegmentKey::SegmentKey(SegmentKey const & cInThat)
+SegmentKey::SegmentKey(SegmentKey const & cInThat) :
+	Key(cInThat)
 {
-	*this = cInThat;
-//	m_nKey = cInThat.KeyValue();
-	//m_cSelectabilityControl = cInThat.GetSelectabilityControl();
 }
 
 SegmentKey::~SegmentKey()
 {
 }
 
-SegmentKey & SegmentKey::operator = (SegmentKey const & cOther)
+SegmentKey & SegmentKey::operator = (SegmentKey const & cInThat)
 {
-	m_nKey = cOther.KeyValue();
+	Key::Set(cInThat);
 
-	m_bOpen = cOther.IsOpen();
-	m_bForcedOpen = cOther.IsForcedOpen();
-
-	m_nModelIncludeKey = cOther.ModelInclude().KeyValue();
-	m_nStylesIncludeKey = cOther.StylesInclude().KeyValue();
+	m_nModelIncludeKey = cInThat.ModelInclude().KeyValue();
+	m_nStylesIncludeKey = cInThat.StylesInclude().KeyValue();
 
 	return *this;
 }
@@ -97,7 +92,7 @@ CString SegmentKey::Name() const
 	CString strOutName;
 
 	char chSegName[MVO_BUFFER_SIZE];
-	HC_Show_Segment(m_nKey, chSegName);
+	HC_Show_Segment(KeyValue(), chSegName);
 
 	strOutName = chSegName;
 	
@@ -127,29 +122,29 @@ IncludeKey SegmentKey::IncludeSegment(SegmentKey const & cInSegment)
 //== Shell 관련 함수 =================================================================================
 ShellKey SegmentKey::InsertShell(ShellKit const & cInKit)
 {
-	_3DF::PointArray acPoints;
-	_3DF::VectorArray acNormals;
-	_3DF::IntArray acFacelist;
-	_3DF::FloatArray aParameters;
-	_3DF::RGBAColorArray aColors;
+	_3DF::PointArray const * pacPoints;
+	_3DF::VectorArray const * pacNormals;
+	_3DF::IntArray const * pacFacelist;
+	_3DF::FloatArray const * paParameters;
+	_3DF::RGBAColorArray const * paColors;
 
-	cInKit.ShowPoints(acPoints);
-	cInKit.ShowNormals(acNormals);
-	cInKit.ShowFacelist(acFacelist);
-	cInKit.ShowParameters(aParameters);
-	cInKit.ShowColors(aColors);
+	cInKit.ShowPoints(pacPoints);
+	cInKit.ShowNormals(pacNormals);
+	cInKit.ShowFacelist(pacFacelist);
+	cInKit.ShowParameters(paParameters);
+	cInKit.ShowColors(paColors);
 
 	Open();
-	HC_KEY nShellKey = HC_Insert_Shell(static_cast<int>(acPoints.size()), acPoints.data(), static_cast<int>(acFacelist.size()), acFacelist.data());
+	HC_KEY nShellKey = HC_Insert_Shell(static_cast<int>(pacPoints->GetCount()), pacPoints->GetData(), static_cast<int>(pacFacelist->GetCount()), pacFacelist->GetData());
 
 	if(INVALID_KEY != nShellKey) {
-		if(false == acNormals.empty()) {
-			HC_MSet_Vertex_Normals(nShellKey, 0, static_cast<int>(acNormals.size()), acNormals.data());
+		if(false == pacNormals->IsEmpty()) {
+			HC_MSet_Vertex_Normals(nShellKey, 0, static_cast<int>(pacNormals->GetCount()), pacNormals->GetData());
 		}
 
-// 		if(false == aParameters.empty()) {
-// 			HC_MSet_Vertex_Parameters(nShellKey, 0, static_cast<int>(aParameters.size() / 2), 2, aParameters.data());
-// 		}
+		if(false == paParameters->IsEmpty()) {
+			HC_MSet_Vertex_Parameters(nShellKey, 0, static_cast<int>(paParameters->GetCount() / 2), 2, paParameters->GetData());
+		}
 
 // 		if(false == aColors.empty()) {
 // 			HC_MSet_Vertex_Colors_By_Value(nShellKey, "face", 0, "rgb", static_cast<int>(aColors.size()), aColors.data());
@@ -217,17 +212,15 @@ MaterialMappingControl const SegmentKey::GetMaterialMappingControl() const
 SegmentKey & SegmentKey::SetMaterialMapping(CString strGeometry, _3DF::MaterialMappingKit const & cInKit)
 {
 	Open();
-	//----- Color 설정 -----
 
 	//bool MaterialMappingKit::ShowFaceChannel(Material::Channel eInChannel, Material::Type & eOutType, RGBAColor & cOutRgbaColor, CString & strOutTextureName, float & fOutValue) const
 	Material::Channel eInChannel = Material::Channel::DiffuseColor;
 	RGBAColor cRgbaColor;
 
-	//----- Face 설정 -----
-	if(true == cInKit.ShowColor(Material::Color::Type::Diffuse , cRgbaColor)) {
+	if (true == cInKit.ShowColor(Material::Color::Type::Diffuse, cRgbaColor)) {
 		CString strColorText;
 
-		if(1.0f == cRgbaColor.alpha) {
+		if (1.0f == cRgbaColor.alpha) {
 			strColorText.Format(L"%s = (diffuse = (r=%f g=%f b=%f))", strGeometry, cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
 		}
 		else {
@@ -238,9 +231,9 @@ SegmentKey & SegmentKey::SetMaterialMapping(CString strGeometry, _3DF::MaterialM
 		HC_Set_Color(H_ASCII_TEXT(strColorText));
 	}
 
-	if(true == cInKit.ShowColor(Material::Color::Type::Specular, cRgbaColor)) {
+	if (true == cInKit.ShowColor(Material::Color::Type::Specular, cRgbaColor)) {
 		CString strColorText;
-		if(1.0f == cRgbaColor.alpha) {
+		if (1.0f == cRgbaColor.alpha) {
 			strColorText.Format(L"%s = (specular = (r=%f g=%f b=%f))", strGeometry, cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
 		}
 		else {
@@ -251,9 +244,9 @@ SegmentKey & SegmentKey::SetMaterialMapping(CString strGeometry, _3DF::MaterialM
 		HC_Set_Color(H_ASCII_TEXT(strColorText));
 	}
 
-	if(true == cInKit.ShowColor(Material::Color::Type::Emission, cRgbaColor)) {
+	if (true == cInKit.ShowColor(Material::Color::Type::Emission, cRgbaColor)) {
 		CString strColorText;
-		if(1.0f == cRgbaColor.alpha) {
+		if (1.0f == cRgbaColor.alpha) {
 			strColorText.Format(L"%s = (emission = (r=%f g=%f b=%f))", strGeometry, cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
 		}
 		else {
@@ -264,23 +257,80 @@ SegmentKey & SegmentKey::SetMaterialMapping(CString strGeometry, _3DF::MaterialM
 		HC_Set_Color(H_ASCII_TEXT(strColorText));
 	}
 
-	if(false == cInKit.Texture().IsEmpty()) {
-		HC_Set_Color(H_ASCII_TEXT(cInKit.Texture()));
-	}
+	char chBuffer[MVO_BUFFER_SIZE];
+	HC_Show_Color(chBuffer);
 
-/*
-	//----- Line 설정 -----
-	if(true == cInKit.ShowColor(Material::Color::Type::Line, cRgbaColor)) {
-		CString strColorText;
-		strColorText.Format(L"lines = (diffuse = (r=%f g=%f b=%f))", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
-		HC_Set_Color(H_ASCII_TEXT(strColorText));
-	}*/
+	if (false == cInKit.TextureName().IsEmpty()) {
+// 		RGBAColor cRgbaColor;
+// 		CString strColorText;
+// 		cInKit.ShowColor(Material::Color::Type::Diffuse, cRgbaColor);
+
+		if (true == cInKit.TextureMirror()) {
+			CString strText;
+			strText.Format(L"faces = (environment = %s, mirror = (r = 0.5 g = 0.5 b = 0.5))", cInKit.TextureName());
+			HC_Set_Color(H_ASCII_TEXT(strText));
+		}
+		else {
+			CString strText;
+			strText.Format(L"faces = (%s)", cInKit.TextureName());
+
+			HC_Set_Color(H_ASCII_TEXT(strText));
+		}
+
+//		char chBuffer[MVO_BUFFER_SIZE];
+		HC_Show_Color(chBuffer);
+
+		if (false == cInKit.TextureOption().IsEmpty()) {
+			CString strTextureName = cInKit.TextureName();
+			CString strTextureOption = cInKit.TextureOption();
+			HC_Define_Local_Texture(H_ASCII_TEXT(strTextureName), H_ASCII_TEXT(strTextureOption));
+		}
+	}
 
 	Close();
 
-	char chBuffer[MVO_BUFFER_SIZE];
+	/*
+		char chBuffer[MVO_BUFFER_SIZE];
+		Open();
+		HC_Show_Color(chBuffer);
+		Close();
+	*/
+
+	return *this;
+}
+
+SegmentKey & SegmentKey::SetTextureMapping(CString strGeometry, _3DF::MaterialMappingKit const & cInKit)
+{
 	Open();
-	HC_Show_Color(chBuffer);
+
+	if (false == cInKit.TextureName().IsEmpty()) {
+		RGBAColor cRgbaColor;
+		CString strColorText;
+		cInKit.ShowColor(Material::Color::Type::Diffuse, cRgbaColor);
+
+		if (true == cInKit.TextureMirror()) {
+			CString strText;
+			strText.Format(L"faces = environment = %s, mirror = (r = 0.5 g = 0.5 b = 0.5))", cInKit.TextureName());
+			HC_Set_Color(H_ASCII_TEXT(strText));
+		}
+		else {
+			CString strText;
+			strText.Format(L"faces = (%s)", cInKit.TextureName());
+
+			HC_Set_Color(H_ASCII_TEXT(strText));
+		}
+
+		if (false == cInKit.TextureOption().IsEmpty()) {
+			CString strTextureName = cInKit.TextureName();
+			CString strTextureOption = cInKit.TextureOption();
+			HC_Define_Local_Texture(H_ASCII_TEXT(strTextureName), H_ASCII_TEXT(strTextureOption));
+
+// 			char chName[MVO_BUFFER_SIZE];
+// 			char chOption[MVO_BUFFER_SIZE];
+// 			HC_Show_Local_Texture(chName, chOption);
+		}
+	}
+
 	Close();
 
 	return *this;
@@ -333,6 +383,15 @@ SegmentKey & SegmentKey::SetCondition(CString strInCondition)
 {
 	Open();
 	HC_Set_Conditions(H_ASCII_TEXT(strInCondition));
+	Close();
+	return *this;
+}
+
+//== Heuristics 관련 함수 ============================================================================
+SegmentKey & SegmentKey::SetHeuristics(CString strInHeuristics)
+{
+	Open();
+	HC_Set_Heuristics(H_ASCII_TEXT(strInHeuristics));
 	Close();
 	return *this;
 }
@@ -465,11 +524,11 @@ SegmentKey SegmentKey::StylesInclude() const
 	return cStylesInclude;
 }
 
-SegmentKey & SegmentKey::SetModellingMatrix(MatrixKit const & cInKit)
+SegmentKey & SegmentKey::SetModellingMatrix(Matrix const & cInKit)
 {
 	Open();
 
-	HC_Set_Modelling_Matrix(cInKit.m_fData);
+	HC_Set_Modelling_Matrix(cInKit.GetData());
 
 	Close();
 

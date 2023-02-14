@@ -40,6 +40,9 @@
     <Filter Include="3DF\Key">
       <UniqueIdentifier>{ed679bfd-af3e-4c5c-b119-7f7ea9e0e627}</UniqueIdentifier>
     </Filter>
+    <Filter Include="3DF\Entity">
+      <UniqueIdentifier>{f1662886-5b26-443f-9b56-3e38f64383d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -135,9 +138,6 @@
     <ClInclude Include="3DF\3DF.Selection.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Include.h">
-      <Filter>3DF\Key</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\3DF.Shell.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
@@ -161,6 +161,24 @@
     </ClInclude>
     <ClInclude Include="3DF\3DF.Image.h">
       <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.PMI.Entity.h">
+      <Filter>3DF\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Polygon.h">
+      <Filter>3DF\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Geometry.h">
+      <Filter>3DF\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Object.h">
+      <Filter>3DF\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Kit.h">
+      <Filter>3DF\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Include.h">
+      <Filter>3DF\Key</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -251,9 +269,6 @@
     <ClCompile Include="3DF\3DF.Selection.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Include.cpp">
-      <Filter>3DF\Key</Filter>
-    </ClCompile>
     <ClCompile Include="3DF\3DF.Shell.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
@@ -277,6 +292,24 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.Image.cpp">
       <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.PMI.Entity.cpp">
+      <Filter>3DF\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Polygon.cpp">
+      <Filter>3DF\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Geometry.cpp">
+      <Filter>3DF\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Object.cpp">
+      <Filter>3DF\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Kit.cpp">
+      <Filter>3DF\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Include.cpp">
+      <Filter>3DF\Key</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

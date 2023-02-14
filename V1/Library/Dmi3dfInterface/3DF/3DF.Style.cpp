@@ -45,25 +45,24 @@ PortfolioKey NamedStyleDefinition::Owner() const
 }
 
 //== StyleKey Function =============================================================================
-
-StyleKey::StyleKey()
+StyleKey::StyleKey(HC_KEY nInKey) :
+	Key(nInKey)
 {
-	m_nKey = INVALID_KEY;
 }
 
-StyleKey::StyleKey(Key const & cInThat)
+StyleKey::StyleKey(StyleKey const & cInThat) :
+	Key(cInThat)
 {
-	m_nKey = cInThat.KeyValue();
 }
 
-StyleKey::StyleKey(StyleKey const & cInThat)
+void StyleKey::Set(StyleKey const & cInThat)
 {
-	m_nKey = cInThat.KeyValue();
+	Key::Set(cInThat);
 }
 
 StyleKey & StyleKey::operator = (StyleKey const & cInThat)
 {
-	m_nKey = cInThat.KeyValue();
+	Set(cInThat);
 	return *this;
 }
 

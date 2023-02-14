@@ -4,24 +4,24 @@
 
 USING_3DF_NAMESPACE
 
-IncludeKey::IncludeKey()
+IncludeKey::IncludeKey(HC_KEY nInKey) :
+	Key(nInKey)
 {
-
+	
 }
 
-IncludeKey::IncludeKey(HC_KEY nKey)
+IncludeKey::IncludeKey(IncludeKey const & cInThat):
+	Key(cInThat.KeyValue())
 {
-	m_nKey = nKey;
 }
 
-IncludeKey::IncludeKey(IncludeKey const & cInThat)
+void IncludeKey::Set(IncludeKey const & cInThat)
 {
-	m_nKey = cInThat.KeyValue();
+	Key::Set(cInThat);
 }
 
-
-IncludeKey & IncludeKey::operator = (IncludeKey const & cOther)
+IncludeKey & IncludeKey::operator = (IncludeKey const & cInThat)
 {
-	m_nKey = cOther.KeyValue();
+	Key::Set(cInThat);
 	return *this;
 }

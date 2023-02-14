@@ -14,7 +14,7 @@ size_t ShellKit::GetPointCount() const
 		return -0;
 	}
 
-	return m_pacPointArray->size();
+	return m_pacPointArray->GetCount();
 }
 size_t ShellKit::GetFacelistCount() const
 {
@@ -22,7 +22,7 @@ size_t ShellKit::GetFacelistCount() const
 		return -0;
 	}
 
-	return m_panFacelistArray->size();
+	return m_panFacelistArray->GetCount();
 }
 
 size_t ShellKit::GetTristripsCount() const
@@ -31,7 +31,7 @@ size_t ShellKit::GetTristripsCount() const
 		return -0;
 	}
 
-	return m_panTristripsArray->size();
+	return m_panTristripsArray->GetCount();
 }
 
 ShellKit & ShellKit::SetPoints(PointArray const & acInPoints)
@@ -69,63 +69,64 @@ ShellKit & ShellKit::SetColors(RGBAColorArray const & aInColors)
 	return *this;
 }
 
-bool ShellKit::ShowPoints(PointArray & acOutPoints) const
+bool ShellKit::ShowPoints(PointArray const *& acOutPoints) const
 {
 	if(nullptr == m_pacPointArray) {
 		return false;
 	}
 
-	acOutPoints = *m_pacPointArray;
+	acOutPoints = m_pacPointArray;
 	return true;
 }
 
-bool ShellKit::ShowNormals(VectorArray & acOutVectors) const
+bool ShellKit::ShowNormals(VectorArray const *& acOutVectors) const
 {
 	if(nullptr == m_pacNormalArray) {
 		return false;
 	}
 
-	acOutVectors = *m_pacNormalArray;
+	acOutVectors = m_pacNormalArray;
 	return true;
 }
 
-bool ShellKit::ShowFacelist(IntArray & acOutFacelist) const
+bool ShellKit::ShowFacelist(IntArray const *& acOutFacelist) const
 {
 	if(nullptr == m_panFacelistArray) {
 		return false;
 	}
 
-	acOutFacelist = *m_panFacelistArray;
+	acOutFacelist = m_panFacelistArray;
 	return true;
 }
 
-bool ShellKit::ShowTristrips(IntArray & acOutTristrips) const
+
+bool ShellKit::ShowTristrips(IntArray const *& acOutTristrips) const
 {
 	if(nullptr == m_panTristripsArray) {
 		return false;
 	}
 
-	acOutTristrips = *m_panTristripsArray;
+	acOutTristrips = m_panTristripsArray;
 	return true;
 }
 
-bool ShellKit::ShowParameters(FloatArray & aOutParameters) const
+bool ShellKit::ShowParameters(FloatArray const *& aOutParameters) const
 {
 	if(nullptr == m_paParameterArray) {
 		return false;
 	}
 
-	aOutParameters = *m_paParameterArray;
+	aOutParameters = m_paParameterArray;
 	return true;
 }
 
-bool ShellKit::ShowColors(RGBAColorArray & aOutColors) const
+bool ShellKit::ShowColors(RGBAColorArray const *& aOutColors) const
 {
 	if(nullptr == m_paColorArray) {
 		return false;
 	}
 
-	aOutColors = *m_paColorArray;
+	aOutColors = m_paColorArray;
 	return true;
 }
 
@@ -138,18 +139,18 @@ ShellKit & ShellKit::SetMaterialMapping(MaterialMappingKit const & cInkit)
 
 //== ShellKey Class ================================================================================
 
-ShellKey::ShellKey(HC_KEY nKey)
+ShellKey::ShellKey(HC_KEY nInKey) :
+	GeometryKey(nInKey)
 {
-	m_nKey = nKey;
 }
 
-ShellKey::ShellKey(ShellKey const & cInThat)
+ShellKey::ShellKey(ShellKey const & cInThat) :
+	GeometryKey(cInThat)
 {
-	m_nKey = cInThat.KeyValue();
 }
 
-ShellKey & ShellKey::operator = (ShellKey const & cOther)
+ShellKey & ShellKey::operator = (ShellKey const & cInThat)
 {
-	m_nKey = cOther.KeyValue();
+	Key::Set(cInThat);
 	return *this;
 }

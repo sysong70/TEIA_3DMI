@@ -32,9 +32,14 @@ public:
 	float Gloss() const;
 	bool GlossFlag() const;
 
-	CString Texture() const;
-	void SetTexture(CString strTexture);
+	bool TextureMirror() const;
+	MaterialMappingKit & SetTextureMirror(bool bFlag);
 
+	CString TextureName() const;
+	MaterialMappingKit & SetTextureName(CString strTextureName, Material::Texture::Channel eChannel = Material::Texture::Channel::DiffuseTexture, size_t nInLayer = 0);
+	
+	CString TextureOption() const;
+	MaterialMappingKit & SetTextureOption(CString strTextureOption);
 	// char * GetMapIndex();
 
 private:
@@ -42,7 +47,10 @@ private:
 	bool m_pbSetColorFlags[(int) Material::Color::Type::Count];
 	float m_fGloss;
 	bool m_bGlossFlag;
-	CString m_strTexture;
+
+	bool m_bTextureMirror = false;
+	CString m_strTextureName;
+	CString m_strTextureOption;
 };
 
 class API_3DF MaterialMappingControl
@@ -54,7 +62,12 @@ public:
 	MaterialMappingControl & SetMarkerColor(RGBAColor const & cInRgbaColor);
 
 	//== Texture 설정 ===============================================================================
-	void PopulateTextures();
+	void InitPopulateTextures();
+	void InsertPicture(UINT nIndex, UINT nPixelWidth, UINT nPixelHeight, UCHAR * pucBinaryData);
+	void InsertDifaultPicture(UINT nIndex, UINT nSize, UCHAR * pucBinaryData);
+	void SetTextureMatrix(float * pfTextureMatrix, char * pchTextureTransformSegment);
+	void SetDefineLocalTexture(UINT nIndex, CString strTextureOptions);
+	void EndPopulateTextures();
 
 private:
 	SegmentKey & m_cInSegmentKey;
@@ -62,5 +75,7 @@ private:
 	MaterialMappingControl & SetColor(CString strGeometry, CString strChannel, RGBAColor const & cInRgbaColor);
 	MaterialMappingControl & UnSetColor(CString strInType);
 };
+
+
 
 CLOSE_3DF_NAMESPACE

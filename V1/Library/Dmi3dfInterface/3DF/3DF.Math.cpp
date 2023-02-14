@@ -2,37 +2,21 @@
 
 #include "3DF.Math.h"
 
+#include <hc.h>
+
 USING_3DF_NAMESPACE
 
-MatrixKit::MatrixKit()
+void TestMatrix::InverseMatrix(const float * matrix, float * out_matrix)
 {
-	memset(m_fData, 0, 16 * sizeof(float));
-	m_fData[0] = 1.0;
-	m_fData[5] = 1.0;
-	m_fData[10] = 1.0;
-	m_fData[15] = 1.0;
+	HC_Compute_Matrix_Inverse(matrix, out_matrix);
 }
 
-MatrixKit::MatrixKit(float const fInMatrixSource[])
+void TestMatrix::ComputeMatrixProduct(const float * matrix1, const float * matrix2, float * out_matrix)
 {
-	memcpy(m_fData, fInMatrixSource, 16 * sizeof(float));
+	HC_Compute_Matrix_Product(matrix1, matrix2, out_matrix);
 }
 
-bool MatrixKit::IsIdentity()
+void TestMatrix::ComputeIdentityMatrix(float * out_matrix)
 {
-	float fIdMatrix[16] = {
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1,
-	};
-
-	// can't use memcmp because of -0.0f and +0.0f
-	for(int i = 0; i < 16; ++i) {
-		if(m_fData[i] != fIdMatrix[i]) {
-			return false;
-		}
-	}
-
-	return true;
+	HC_Compute_Identity_Matrix(out_matrix);
 }

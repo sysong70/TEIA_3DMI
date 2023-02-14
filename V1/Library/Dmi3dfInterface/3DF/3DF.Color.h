@@ -26,8 +26,9 @@ public:
 	explicit _3DF_INLINE RGBColor(RGBA32Color const & c32);
 	explicit _3DF_INLINE RGBColor(RGBAColor const & c);
 
-	_3DF_INLINE bool		IsGray() const { return (red == green && green == blue); }
-	_3DF_INLINE float	Gray() const { return  0.3125f * red + 0.5000f * green + 0.1875f * blue; }
+	_3DF_INLINE void Set(float r, float g, float b) { red = r, green = g, blue = b; }
+	_3DF_INLINE bool IsGray() const { return (red == green && green == blue); }
+	_3DF_INLINE float Gray() const { return  0.3125f * red + 0.5000f * green + 0.1875f * blue; }
 	float Distance(RGBColor const & other_color) const;
 	_3DF_INLINE bool		IsValid() const {
 		return (Float::extract_sign_bit(red) | Float::extract_sign_bit(green) | Float::extract_sign_bit(blue)) == 0;

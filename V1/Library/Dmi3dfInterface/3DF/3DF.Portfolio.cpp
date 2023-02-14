@@ -9,19 +9,24 @@
 
 USING_3DF_NAMESPACE
 
-PortfolioKey::PortfolioKey(HC_KEY nInKey)
+PortfolioKey::PortfolioKey(HC_KEY nInKey) :
+	Key(nInKey)
 {
-	m_nKey = nInKey;
 }
 
-PortfolioKey::PortfolioKey(PortfolioKey const & cInThat)
+PortfolioKey::PortfolioKey(PortfolioKey const & cInThat) :
+	Key(cInThat)
 {
-	m_nKey = cInThat.KeyValue();
+}
+
+void PortfolioKey::Set(PortfolioKey const & cInThat)
+{
+	Key::Set(cInThat);
 }
 
 PortfolioKey & PortfolioKey::operator = (PortfolioKey const & cInThat)
 {
-	m_nKey = cInThat.KeyValue();
+	Key::Set(cInThat);
 	return *this;
 }
 

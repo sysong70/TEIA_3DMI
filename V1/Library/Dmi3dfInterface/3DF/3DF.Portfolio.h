@@ -12,10 +12,10 @@ using PortfolioDeque = std::deque<PortfolioKey *>;
 class API_3DF PortfolioKey : public Key
 {
 public:
-	PortfolioKey() {}
-	PortfolioKey(HC_KEY nInKey);
+	PortfolioKey(HC_KEY nInKey = INVALID_KEY);
 	PortfolioKey(PortfolioKey const & cInThat);
 
+	void Set(PortfolioKey const & cInThat);
 	PortfolioKey & operator = (PortfolioKey const & cInThat);
 
 	NamedStyleDefinition DefineNamedStyle(CString strInName, SegmentKey const & cInStyleSource);

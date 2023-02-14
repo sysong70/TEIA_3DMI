@@ -38,7 +38,11 @@
 
 #define USING_3DF_NAMESPACE using namespace _3DF;
 
+#include <atlcoll.h>
+
 OPEN_3DF_NAMESPACE
+
+#define PATTERN_BUFFER_SIZE		1024
 
 //== Forward Declarations ==========================================================================
 class Model;
@@ -47,7 +51,10 @@ class Key;
 class SegmentKey;
 class PortfolioKey;
 class ShellKey;
+class LineKit;
 class LineKey;
+class PolygonKit;
+class PolygonKey;
 class BoundingKit;
 class NamedStyleDefinition;
 class StyleKey;
@@ -57,12 +64,33 @@ class VisibilityControl;
 class MarkerAttributeControl;
 //==================================================================================================
 
+using LineArray = CAtlArray<LineKit>;
+using PolylineArray = LineArray;
+using Polyline = LineKit;
+
+using Polygon = PolygonKit;
+using PolygonArray = CAtlArray<PolygonKit>;
+
+using StringArray = CAtlArray<CString>;
+
+namespace PMI {
+	class TextAttributes;
+	using TextAttributesArray = CAtlArray<TextAttributes>;
+};
+
 enum class ModelHandedness
 {
 	Left,
 	Right,
 	None,
 	NotSet
+};
+
+class PrivateImpl
+{
+public:
+	PrivateImpl() {}
+	virtual ~PrivateImpl() {}
 };
 
 CLOSE_3DF_NAMESPACE

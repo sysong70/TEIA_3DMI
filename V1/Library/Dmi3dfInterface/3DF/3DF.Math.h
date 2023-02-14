@@ -14,12 +14,16 @@
 #include <HGlobals.h>
 */
 
+
+
+#include <atlcoll.h>
+
 #ifdef max
 #	undef max
 #	include <boost/pool/pool_alloc.hpp>
 #	define max(a,b) (((a) > (b)) ? (a) : (b))
 #else
-#	include <boost / pool / pool_alloc.hpp>
+#	include <boost/pool/pool_alloc.hpp>
 #endif
 
 OPEN_3DF_NAMESPACE
@@ -390,7 +394,7 @@ public:
 	F y;
 	F z;
 
-	Point_3D() {}
+	Point_3D() { x = 0, y = 0, z = 0; }
 	Point_3D(F v1, F v2, F v3) : x(v1), y(v2), z(v3) {}
 
 	template <typename D>
@@ -413,7 +417,7 @@ public:
 	F y;
 	F z;
 
-	Vector_3D() {}
+	Vector_3D() { x = 0, y = 0, z = 0; }
 	Vector_3D(F v1, F v2, F v3) : x(v1), y(v2), z(v3) {}
 	template <typename D>
 	explicit Vector_3D(Vector_3D<D> const & that) : x((F) that.x), y((F) that.y), z((F) that.z) {}
@@ -485,25 +489,184 @@ using Vector = Vector_3D<float>;
 // using PointArray = std::vector<_3DF::Point, boost::pool_allocator<Point>>;
 // using VectorArray = std::vector<_3DF::Vector, boost::pool_allocator<Vector>>;
 
-using ByteArray = std::vector<byte>;
-using IntArray = std::vector<int>;
-using FloatArray = std::vector<float>;
-using PointArray = std::vector<_3DF::Point>;
-using VectorArray = std::vector<_3DF::Vector>;
+using ByteArray = CAtlArray<byte>;
+using IntArray = CAtlArray<int>;
+using FloatArray = CAtlArray<float>;
+using PointArray = CAtlArray<_3DF::Point>;
+using VectorArray = CAtlArray<_3DF::Vector>;
 
 // template <typename F>
 // _3DF_INLINE	Point_3D<F>::Point_3D(Vector_3D<F> const & v) : x(v.x), y(v.y), z(v.z) {}
 
-
-class API_3DF MatrixKit
+template <typename F>
+class MatrixKit
 {
 public:
-	float m_fData[16];
-
 	MatrixKit();
-	MatrixKit(float const fInMatrixSource[]);
+	MatrixKit(F const fInMatrixSource[]);
 
+	_3DF_INLINE const F * operator [] (int nIndex) const { return m[nIndex]; }
+	_3DF_INLINE F * operator [] (int nIndex) { return m[nIndex]; }
+
+	void SetIdentity();
 	bool IsIdentity();
+
+	MatrixKit<F> Inverse();
+
+	_3DF::Point Transform(_3DF::Point const & cInSource) const;
+
+	F * GetData() const { return (F *)r; }
+
+	union
+	{
+		F m[4][4] = { {1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1} };
+		F r[16];
+	};
+
+private:
+
+};
+
+template <typename F>
+MatrixKit<F>::MatrixKit()
+{
+	//SetIdentity();
+}
+
+template <typename F>
+MatrixKit<F>::MatrixKit(F const fInMatrixSource[])
+{
+	memcpy(r, fInMatrixSource, 16 * sizeof(float));
+}
+
+template <typename F>
+void MatrixKit<F>::SetIdentity()
+{
+	// set to zero all the elements except the diagonal
+	for (int i = 0; i < 4; i++) {
+		for (int j = i + 1; j < 4; j++) {
+			m[i][j] = m[j][i] = 0.0;
+		}
+	}
+	
+	// set to 1 the diagonal
+	m[0][0] = m[1][1] = m[2][2] = m[3][3] = 1.0;
+}
+
+template <typename F>
+bool MatrixKit<F>::IsIdentity()
+{
+	F fIdMatrix[16] = {
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 1, 0,
+		0, 0, 0, 1,
+	};
+
+	// can't use memcmp because of -0.0f and +0.0f
+	for (int i = 0; i < 16; ++i) {
+		if (r[i] != fIdMatrix[i]) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+template <typename F>
+Point MatrixKit<F>::Transform(_3DF::Point const & cInSource) const
+{
+	_3DF::Point cPoint;
+
+	cPoint.x = m[0][0] * cInSource.x + m[1][0] * cInSource.y + m[2][0] * cInSource.z + m[3][0];
+	cPoint.y = m[0][1] * cInSource.x + m[1][1] * cInSource.y + m[2][1] * cInSource.z + m[3][1];
+	cPoint.z = m[0][2] * cInSource.x + m[1][2] * cInSource.y + m[2][2] * cInSource.z + m[3][2];
+
+	return cPoint;
+}
+
+template <typename F>
+_3DF_INLINE MatrixKit<F> operator * (const MatrixKit<F> & M1, const MatrixKit<F> & M2)
+{
+	MatrixKit<F> cMatrix;
+
+	for (int c = 0; c < 4; c++) {
+		for (int r = 0; r < 4; r++) {
+			cMatrix[r][c] = M1[0][c] * M2[r][0];
+
+			for (int p = 1; p < 4; p++) {
+				cMatrix[r][c] += M1[p][c] * M2[r][p];
+			}
+		}
+	}
+
+	return cMatrix;
+}
+
+template <typename F>
+MatrixKit<F> MatrixKit<F>::Inverse()
+{
+	int i, j, k;
+	MatrixKit<F> M, Mr;
+	double dError = 10e-10;
+
+	M = *this;
+
+	for (i = 0; i < 4; i++)
+	{
+		if (-dError < M[i][i] && M[i][i] < dError)
+		{
+			for (k = 0; k < 4; k++)
+			{
+				if (-dError < M[k][i] && M[k][i] < dError) {
+					continue;
+				}
+
+				for (j = 0; j < 4; j++)
+				{
+					M[i][j] += M[k][j];
+					Mr[i][j] += Mr[k][j];
+				}
+				break;
+			}
+			if (-dError < M[i][i] && M[i][i] < dError)
+				return Mr;
+		}
+	}//for i
+
+	for (i = 0; i < 4; i++)
+	{
+		double constant = M[i][i];
+		if (M[i][i] == 0) constant = dError;
+
+		for (j = 0; j < 4; j++)
+		{
+			M[i][j] /= constant;
+			Mr[i][j] /= constant;
+		}
+		for (k = 0; k < 4; k++)
+		{
+			if (k == i) continue;
+			if (M[k][i] == 0) continue;
+			constant = M[k][i];
+			for (j = 0; j < 4; j++)
+			{
+				M[k][j] = M[k][j] - M[i][j] * constant;
+				Mr[k][j] = Mr[k][j] - Mr[i][j] * constant;
+			}
+		}
+	}
+
+	return Mr;
+}
+
+using Matrix = MatrixKit<float>;
+
+class API_3DF TestMatrix {
+public:
+	void InverseMatrix(const float * matrix, float * out_matrix);
+	void ComputeMatrixProduct(const float * matrix1, const float * matrix2, float * out_matrix);
+	void ComputeIdentityMatrix(float * out_matrix);
 };
 
 CLOSE_3DF_NAMESPACE

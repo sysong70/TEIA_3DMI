@@ -14,14 +14,13 @@ OPEN_3DF_NAMESPACE
 class API_3DF SegmentKey : public Key
 {
 public:
-	SegmentKey();
 	SegmentKey(CString strInName);
-	SegmentKey(HC_KEY nKey);
+	SegmentKey(HC_KEY nInKey = INVALID_KEY);
 	SegmentKey(SegmentKey const & cInThat);
 
 	virtual ~SegmentKey();
 
-	SegmentKey & operator = (SegmentKey const & cOther);
+	SegmentKey & operator = (SegmentKey const & cInThat);
 
 	SegmentKey const Subsegment();
 	SegmentKey const Subsegment(LPCTSTR pszFromat, ...);
@@ -49,6 +48,7 @@ public:
 
 	//== Material Mapping 관련 함수 ==================================================================
 	SegmentKey & SetMaterialMapping(CString strGeometry, MaterialMappingKit const & cInKit);
+	SegmentKey & SetTextureMapping(CString strGeometry, _3DF::MaterialMappingKit const & cInKit);
 	MaterialMappingControl GetMaterialMappingControl();
 	MaterialMappingControl const GetMaterialMappingControl() const;
 
@@ -65,6 +65,9 @@ public:
 	//== Condition 관련 함수 =========================================================================
 	SegmentKey & SetCondition(CString strInCondition);
 	
+	//== Heuristics 관련 함수 ========================================================================
+	SegmentKey & SetHeuristics(CString strInHeuristics);
+
 	//== Portfolio Control 관련 함수 =================================================================
 	//PortfolioControl GetPortfolioControl();
 	//PortfolioControl const GetPortfolioControl() const;
@@ -83,7 +86,7 @@ public:
 	SegmentKey StylesInclude();
 	SegmentKey StylesInclude() const;
 
-	SegmentKey & SetModellingMatrix(MatrixKit const & cInKit);
+	SegmentKey & SetModellingMatrix(Matrix const & cInKit);
 
 	//== Bounding 관련 함수 ==========================================================================
 	SegmentKey & SetBounding(BoundingKit const & cInKit);
