@@ -4,7 +4,6 @@
 #include "Window.Application.h"
 #include "Window.Document.h"
 #include "Connector.h"
-#include "Dialog.ObjectSnaps.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -24,16 +23,7 @@ namespace PresetView
 	enum EPanelId
 	{
 		TabId = WM_USER,
-		ModelTree,
-		View,
-		Layer,
-		Scene,
 	};
-
-	CSize TabImageSize()
-	{
-		return globalUtils.ScaleByDPI(CSize(24, 24));
-	}
 }
 
 
@@ -50,7 +40,6 @@ BEGIN_MESSAGE_MAP(View, CView)
 	ON_WM_MBUTTONUP()
 	ON_WM_MOUSEACTIVATE()
 	ON_WM_MOUSEMOVE()
-	ON_WM_MOUSEWHEEL()
 	ON_WM_PAINT()
 	ON_WM_RBUTTONDOWN()
 	ON_WM_RBUTTONUP()
@@ -99,41 +88,6 @@ int Window::View::GetId()
 
 void Window::View::ReceiveSignal(Json::Object* pData)
 {
-	Json::Object& data = *pData;
-	Signal::View::Action action = (Signal::View::Action)data.GetInteger(SKW_ACTION);
-
-	switch (action) {
-	case Signal::View::Action::SetValidation:
-		m_bRenderer = data.GetBoolean(SKW_VALID);
-		if (m_bRenderer) {
-			if (m_eType == EType::View3d) {
-				CRect rect = GetClientArea();
-				m_delivery.view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
-			}
-			else {
-				CSize client = GetClientSize();
-				m_delivery.view.OnResize(client.cx, client.cy);
-				m_delivery.view.OnPaint();
-			}
-
-			if (GetMainFrame().HasNextFile()) {
-				GetMainFrame().PostMessage((UINT)EUserMessage::OnNextFileOpen);
-			}
-			else {
-				SendMessage(WM_ACTIVATE, (WPARAM)WA_ACTIVE);
-			}
-		}
-		else {
-			GetDocument()->OnCloseDocument();
-		}
-		break;
-
-	default:
-		DEBUG_STOP;
-		break;
-	}
-
-	REMOVE_POINTER(pData);
 }
 
 
@@ -161,23 +115,6 @@ void Window::View::OnInitialUpdate()
 {
 	__super::OnInitialUpdate();
 
-	m_delivery.ViewId = m_nViewId;
-	switch (GetDocument()->GetCateogry()) {
-	case Document::Doc3d:
-		m_eType = EType::View3d;
-		m_delivery.SetSender(Connector3d::GetSender());
-		break;
-
-	case Document::Doc2d:
-		m_eType = EType::View2d;
-		m_delivery.SetSender(Connector2d::GetSender());
-		break;
-
-	default:
-		DEBUG_STOP;
-	}
-
-	m_delivery.view.OnConstruct();
 	m_delivery.view.OnInitialize((DWORD_PTR)m_hWnd, GetDocument()->GetFilePath());
 
 	CreateHistoryBar();
@@ -396,23 +333,6 @@ void Window::View::OnMouseMove(UINT nFlags, CPoint point)
 
 
 
-BOOL Window::View::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
-{
-	if (m_bRenderer) {
-		if (m_eType == EType::View2d) {
-			ScreenToClient(&point);
-		}
-
-		CRect rect;
-		GetWindowRect(rect);
-		m_delivery.view.OnMouseWheel(nFlags, zDelta, point.x, point.y, rect.left, rect.top, rect.right, rect.bottom);
-	}
-
-	return __super::OnMouseWheel(nFlags, zDelta, point);
-}
-
-
-
 void Window::View::OnRButtonDown(UINT nFlags, CPoint point)
 {
 	if (IsValid()) {
@@ -472,6 +392,8 @@ void Window::View::OnTimer(UINT_PTR nIDEvent)
 void Window::View::Activate(bool value)
 {
 	if (m_bRenderer) {
+		m_bActivate = value;
+
 		if (value) {
 			GetMainFrame().ViewChanged(WM_ACTIVATE, this);
 			//DelayViewActivation();
@@ -479,7 +401,6 @@ void Window::View::Activate(bool value)
 			m_historyBar.ShowWindow(SW_SHOW);
 		}
 		else {
-			m_bActivate = false;
 			m_toolBar.ShowWindow(SW_HIDE);
 			m_historyBar.ShowWindow(SW_HIDE);
 		}
@@ -537,19 +458,6 @@ void Window::View::CreateHistoryBar()
 void Window::View::CreateToolBar()
 {
 	m_toolBar.Initialize(this);
-
-	m_toolBar.AddButtons({
-		HOME_3D_CMD_Pan,
-		HOME_3D_LST_Zoom,
-		HOME_3D_LST_Rotate,
-		0,
-		HOME_3D_LST_ViewStyle,
-		HOME_3D_LST_ViewDirection,
-		HOME_3D_LST_Visualize,
-		HOME_3D_LST_VisualEffects,
-		0,
-		HOME_3D_LST_Select,
-	});
 }
 
 
@@ -561,28 +469,8 @@ void Window::View::CreatePanelTabs()
 	}
 
 	m_tabs.SetTabHeight(Component::TabHeight());
-
-	m_modelPanel.Initialize(&m_tabs, PRESET::ModelTree);
-	m_viewPanel.Initialize(&m_tabs, PRESET::View);
-	m_layerPanel.Initialize(&m_tabs, PRESET::Layer);
-	m_scenePanel.Initialize(&m_tabs, PRESET::Scene);
-
 	m_tabs.SetLocation(CBCGPTabWnd::LOCATION_TOP);
 	m_tabs.SetIconLocation(CBCGPTabWnd::TAB_ICON_LEFT);
-	m_tabs.SetImageList({
-		HOME_3D_CMD_Panels_Model,
-		HOME_3D_CMD_Panels_View,
-		HOME_3D_CMD_Panels_Layer,
-		HOME_3D_CMD_Panels_Scene,
-	}, PRESET::TabImageSize());
-
-	int image = 0;
-	m_tabs.AddTab(&m_modelPanel, Facility::GetTitle(HOME_3D_CMD_Panels_Model), image++);
-	m_tabs.AddTab(&m_viewPanel, Facility::GetTitle(HOME_3D_CMD_Panels_View), image++);
-	m_tabs.AddTab(&m_layerPanel, Facility::GetTitle(HOME_3D_CMD_Panels_Layer), image++);
-	m_tabs.AddTab(&m_scenePanel, Facility::GetTitle(HOME_3D_CMD_Panels_Scene), image++);
-
-	m_tabs.SetActiveTab(0);
 }
 
 

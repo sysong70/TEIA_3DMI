@@ -1,0 +1,135 @@
+﻿#include "stdafx.h"
+#include "resource.h"
+#include "Window.Document.h"
+#include "Window.MainFrame.h"
+#include "Window.View2d.h"
+#include "Connector.h"
+#include "Facility.h"
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
+
+
+#define PRESET PresetView2d
+
+namespace PresetView2d
+{
+	enum EPanelId
+	{
+		TabId = WM_USER,
+		Layer,
+	};
+
+	CSize TabImageSize()
+	{
+		return globalUtils.ScaleByDPI(CSize(24, 24));
+	}
+}
+
+
+
+using namespace Window;
+
+IMPLEMENT_DYNCREATE(View2d, CView)
+
+BEGIN_MESSAGE_MAP(View2d, CView)
+	ON_WM_MOUSEWHEEL()
+END_MESSAGE_MAP()
+
+
+
+Window::View2d::View2d()
+	: View()
+{
+	m_eType = EType::View2d;
+
+	m_delivery.ViewId = m_nViewId;
+	m_delivery.SetSender(Connector2d::GetSender());
+	m_delivery.view.OnConstruct();
+}
+
+
+
+Window::View2d::~View2d()
+{
+}
+
+
+
+void Window::View2d::ReceiveSignal(Json::Object* pData)
+{
+	Json::Object& data = *pData;
+	Signal::View::Action action = (Signal::View::Action)data.GetInteger(SKW_ACTION);
+
+	switch (action) {
+	case Signal::View::Action::SetValidation:
+		m_bRenderer = data.GetBoolean(SKW_VALID);
+		if (m_bRenderer) {
+			CSize client = GetClientSize();
+			m_delivery.view.OnResize(client.cx, client.cy);
+			m_delivery.view.OnPaint();
+
+			if (GetMainFrame().HasNextFile()) {
+				GetMainFrame().PostMessage((UINT)EUserMessage::OnNextFileOpen);
+			}
+			else {
+				SendMessage(WM_ACTIVATE, (WPARAM)WA_ACTIVE);
+			}
+		}
+		else {
+			GetDocument()->OnCloseDocument();
+		}
+		break;
+
+	default:
+		DEBUG_STOP;
+		break;
+	}
+
+	REMOVE_POINTER(pData);
+}
+
+
+
+BOOL Window::View2d::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
+{
+	if (m_bRenderer) {
+		ScreenToClient(&point);
+		m_delivery.view.OnMouseWheel(nFlags, zDelta, point.x, point.y);
+	}
+
+	return __super::OnMouseWheel(nFlags, zDelta, point);
+}
+
+
+
+void Window::View2d::CreateToolBar()
+{
+	__super::CreateToolBar();
+
+	m_toolBar.AddButtons({
+		HOME_3D_CMD_Pan,
+		HOME_3D_LST_Zoom,
+		0,
+		HOME_3D_LST_Select,
+	});
+}
+
+
+
+void Window::View2d::CreatePanelTabs()
+{
+	__super::CreatePanelTabs();
+
+	m_layerPanel.Initialize(&m_tabs, PRESET::Layer);
+
+	m_tabs.SetImageList({ HOME_3D_CMD_Panels_Layer }, PRESET::TabImageSize());
+	m_tabs.AddTab(&m_layerPanel, Facility::GetTitle(HOME_3D_CMD_Panels_Layer), 0);
+	m_tabs.SetActiveTab(0);
+}
+
+#undef PRESET

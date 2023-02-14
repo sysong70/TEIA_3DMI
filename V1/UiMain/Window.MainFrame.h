@@ -18,6 +18,8 @@ namespace Window
 
 		friend class Document;
 		friend class View;
+		friend class View3d;
+		friend class View2d;
 		friend class TaskBar;
 
 		MainFrame();

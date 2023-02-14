@@ -3,7 +3,8 @@
 #include "Window.Application.h"
 #include "Window.ChildFrame.h"
 #include "Window.Document.h"
-#include "Window.View.h"
+#include "Window.View3d.h"
+#include "Window.View2d.h"
 #include "Connector.h"
 #include "Facility.AppResources.h"
 #include "Facility.AppSettings.h"
@@ -185,18 +186,29 @@ BOOL Window::Application::InitInstance()
 
 	SetRegistryKey(_T("Dataface"));
 	//:WARNING - recend file counts
-	LoadStdProfileSettings(16);
+	LoadStdProfileSettings(10);
 	SetRegistryBase(_T("Settings"));
 
 	CMultiDocTemplate* pDocTemplate;
-	pDocTemplate = new CMultiDocTemplate(IDR_DMITYPE,
+
+	pDocTemplate = new CMultiDocTemplate(IDR_DMITYPE_3D,
 		RUNTIME_CLASS(Document),
 		RUNTIME_CLASS(ChildFrame), // custom MDI child frame
-		RUNTIME_CLASS(View));
+		RUNTIME_CLASS(View3d));
 	if (pDocTemplate == nullptr) {
 		RETURN_FALSE;
 	}
 	AddDocTemplate(pDocTemplate);
+
+	DEBUG_STOP;
+	//pDocTemplate = new CMultiDocTemplate(IDR_DMITYPE_2D,
+	//	RUNTIME_CLASS(Document),
+	//	RUNTIME_CLASS(ChildFrame), // custom MDI child frame
+	//	RUNTIME_CLASS(View2d));
+	//if (pDocTemplate == nullptr) {
+	//	RETURN_FALSE;
+	//}
+	//AddDocTemplate(pDocTemplate);
 
 	MainFrame* pMainFrame = new MainFrame;
 	if (pMainFrame->LoadFrame(IDR_MAINFRAME) == FALSE) {

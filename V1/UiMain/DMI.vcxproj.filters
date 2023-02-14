@@ -145,6 +145,12 @@
     <ClCompile Include="Component.CheckButton.cpp">
       <Filter>Component</Filter>
     </ClCompile>
+    <ClCompile Include="Window.View3d.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.View2d.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.Common.h">
@@ -302,6 +308,12 @@
     </ClInclude>
     <ClInclude Include="Component.CheckButton.h">
       <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.View2d.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.View3d.h">
+      <Filter>Window</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

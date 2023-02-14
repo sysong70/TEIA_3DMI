@@ -116,7 +116,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Icon with lowest ID value placed first to ensure application icon remains consistent on all systems.
 
 IDR_MAINFRAME                ICON   "RES\\DMI.ico"
-IDR_DMITYPE                  ICON   "RES\\DMIDoc.ico"
+IDR_DMITYPE_3D               ICON   "RES\\DMIDoc.ico"
+IDR_DMITYPE_2D               ICON   "RES\\DMIDoc.ico"
 
 #pragma endregion //:REGION - Icon
 
@@ -139,26 +140,6 @@ BEGIN
     POPUP "&Help"
     BEGIN
         MENUITEM "&About DMI...",   ID_APP_ABOUT
-    END
-END
-
-IDR_DMITYPE MENU
-BEGIN
-    POPUP "File"
-    BEGIN
-        MENUITEM "New\tCtrl+N",     FILE_3D_CMD_New
-        MENUITEM "Open...\tCtrl+O", FILE_3D_CMD_Open
-        MENUITEM SEPARATOR
-        MENUITEM "Print Setup...",  ID_FILE_PRINT_SETUP
-        MENUITEM SEPARATOR
-        MENUITEM "Recent File",     ID_FILE_MRU_FILE1, GRAYED
-        MENUITEM SEPARATOR
-        MENUITEM "Close",           ID_FILE_CLOSE
-        MENUITEM "Exit",            ID_APP_EXIT
-    END
-    POPUP "Help"
-    BEGIN
-        MENUITEM "About DMI...",   ID_APP_ABOUT
     END
 END
 
@@ -267,7 +248,8 @@ END
 STRINGTABLE
 BEGIN
     IDR_MAINFRAME           "DMI"
-    IDR_DMITYPE             "\nDMI\nDMI\n\n\nDMI.Document\nDMI.Document"
+    IDR_DMITYPE_3D          "\nDMI 3D\nDMI3D\n\n\nDMI.Document\nDMI.Document"
+    IDR_DMITYPE_2D          "\nDMI 2D\nDMI2D\nAutoCAD Files\n.dwg;.dxf\nDMI.Document\nDMI.Document"
 END
 
 STRINGTABLE

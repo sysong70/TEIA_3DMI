@@ -40,7 +40,7 @@ namespace Window
 
 		int GetId();
 
-		void ReceiveSignal(Json::Object* pData);
+		virtual void ReceiveSignal(Json::Object* pData);
 
 	protected:
 
@@ -80,8 +80,6 @@ namespace Window
 
 		afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 
-		afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint point);
-
 		afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
 
 		afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
@@ -118,9 +116,9 @@ namespace Window
 		Component::ToolBar m_toolBar;
 		Component::HistoryBar m_historyBar;
 
-		void CreateHistoryBar();
+		virtual void CreateHistoryBar();
 
-		void CreateToolBar();
+		virtual void CreateToolBar();
 
 	protected: // PanelBar
 
@@ -131,7 +129,7 @@ namespace Window
 		Component::LayerPanel m_layerPanel;
 		Component::ScenePanel m_scenePanel;
 
-		void CreatePanelTabs();
+		virtual void CreatePanelTabs();
 
 	protected:
 

@@ -5,7 +5,8 @@
 #define IDD_ABOUTBOX                    100
 #define IDP_OLE_INIT_FAILED             100
 #define IDR_MAINFRAME                   128
-#define IDR_DMITYPE                     129
+#define IDR_DMITYPE_3D                  140
+#define IDR_DMITYPE_2D                  141
 #define IDR_CONTEXT_MENU                130
 #define IDR_POPUP_TOOLBAR               131
 #define IDR_POPUP_MDITABS               132

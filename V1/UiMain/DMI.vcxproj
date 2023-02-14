@@ -209,6 +209,8 @@
     <ClInclude Include="Window.h" />
     <ClInclude Include="Window.MainFrame.h" />
     <ClInclude Include="Window.View.h" />
+    <ClInclude Include="Window.View2d.h" />
+    <ClInclude Include="Window.View3d.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Library\Common\Common_Define.cpp" />
@@ -264,6 +266,8 @@
     <ClCompile Include="Window.Document.cpp" />
     <ClCompile Include="Window.MainFrame.cpp" />
     <ClCompile Include="Window.View.cpp" />
+    <ClCompile Include="Window.View2d.cpp" />
+    <ClCompile Include="Window.View3d.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DMI.rc" />

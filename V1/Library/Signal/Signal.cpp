@@ -276,6 +276,14 @@ Wrapper().SendData(data);
 		SendMouseData(Action::OnRButtonUp);
 	}
 
+	void View::OnMouseWheel(UINT flags, short delta, int x, int y)
+	{
+		Json::Object data;
+		ConstructWheelData(data, flags, delta, x, y);
+
+		Wrapper().SendData(data);
+	}
+
 	void View::OnMouseWheel(UINT flags, short delta, int x, int y, int left, int top, int right, int bottom)
 	{
 		Json::Object data;
