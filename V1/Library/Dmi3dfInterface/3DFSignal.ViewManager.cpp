@@ -105,7 +105,7 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	//cModelSegmentKey.ForcedOpen();
 
-	//pcHoopsView->SetSuppressUpdate(true);
+	pcHoopsView->SetSuppressUpdate(true);
 
 	DLL::_3DF::Interface cInterfaace;
 	cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, strErrorMessage);
@@ -113,9 +113,9 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 	//cModelSegmentKey.ForcedClose();
 
 	// #3DF_Debug: Z://Test.hsf
- 	SaveHsfFile(L"Z://Test.hsf", pcHoopsView);
+ 	//SaveHsfFile(L"Z://Test.hsf", pcHoopsView);
 
-	//pcHoopsView->SetSuppressUpdate(false);
+	pcHoopsView->SetSuppressUpdate(false);
 
 	//pcHoopsView->SetSmoothTransition(true);
 	pcHoopsView->ZoomToExtents();

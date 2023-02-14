@@ -2098,10 +2098,8 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 					cMatrix[3][1] = static_cast<float>(pdCoordData[13]);
 					cMatrix[3][2] = static_cast<float>(pdCoordData[14]);
 
-					// cTransformMatrix = cMatrix * cTransformMatrix;
-
-					_3DF::TestMatrix cm;
-					cm.ComputeMatrixProduct(cMatrix.GetData(), cTransformMatrix.GetData(), cTransformMatrix.GetData());
+					//_3DF::TestMatrix cm;
+					MatrixCal::ComputeMatrixProduct(cMatrix.GetData(), cTransformMatrix.GetData(), cTransformMatrix.GetData());
 
 					PMI::Orientation orientation;
 					orientation.SetMatrix(cTransformMatrix);
@@ -2112,12 +2110,8 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 			}
 			else
 			{
-				//_3DF::Matrix cInverseMatrix;
-				//cMatrix = cMatrix.Inverse();
-				//cTransformMatrix = cMatrix * cTransformMatrix;
-				_3DF::TestMatrix cm;
-				cm.InverseMatrix(cMatrix.GetData(), cMatrix.GetData());
-				cm.ComputeMatrixProduct(cMatrix.GetData(), cTransformMatrix.GetData(), cTransformMatrix.GetData());
+				MatrixCal::InverseMatrix(cMatrix.GetData(), cMatrix.GetData());
+				MatrixCal::ComputeMatrixProduct(cMatrix.GetData(), cTransformMatrix.GetData(), cTransformMatrix.GetData());
 				cMatrix.SetIdentity();
 				char_height = 1.;
 				MAKE_OFFSET(0, 0);
@@ -2535,7 +2529,7 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 
 	LogDecreaseTabIndex(2);
 
-	Log(2, L"DrawTess3D: %s, %d, Style Count: %d", LogHexStr((DWORD_PTR) pcTess3D), nTriangleFaceCount, m_mFaceMaterialMappingStyleMap.size());
+	Log(2, L"DrawTess3D: %s, %d, Style Count: %d", LogHexStr((DWORD_PTR) pcTess3D), nTriangleFaceCount, m_mFaceMaterialMappingStyleMap.GetCount());
 
 	CHECK_A3D_RETURN(A3DTess3DGet(nullptr, &cTess3dData));
 
@@ -2562,15 +2556,15 @@ UINT _3DfImport::ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo)
 		A3DUns32 nNormalIndex = cInFaceInfo.nOutTriStartIndex++;
 
 		nFaceVertexNormalIndices[0] = cInFaceInfo.pnInIndices[nNormalIndex] / 3;
-		nFaceVertexParamIndices[0] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex];
+		//nFaceVertexParamIndices[0] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex];
 		nFaceListIndices[0] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex++] / 3;
 
 		nFaceVertexNormalIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex++] / 3;
-		nFaceVertexParamIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex];
+		//nFaceVertexParamIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex];
 		nFaceListIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex++] / 3;
 
 		nFaceVertexNormalIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex++] / 3;
-		nFaceVertexParamIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex];
+		//nFaceVertexParamIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex];
 		nFaceListIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex++] / 3;
 
 		AddTriangle(cInFaceInfo, nFaceListIndices, nFaceVertexNormalIndices, nFaceVertexParamIndices, nFaceVertexColorIndices, nInVertexParamSize);
@@ -4372,8 +4366,8 @@ A3DStatus _3DfImport::GetMaterialMapping(const A3DMiscCascadedAttributesData & c
 			if(true == bTransparencyDefined) { cSpecularColor.alpha = fTransparency; }
 			cMaterialKit.SetColor(cSpecularColor, _3DF::Material::Color::Type::Specular);
 
-// 			nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
-// 			nRetStatus = A3DGlobalGetGraphMaterialData(A3D_DEFAULT_MATERIAL_INDEX, &sMaterialData);
+ 			nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
+ 			nRetStatus = A3DGlobalGetGraphMaterialData(A3D_DEFAULT_MATERIAL_INDEX, &sMaterialData);
 			cMaterialKit.SetGloss(sMaterialData.m_dShininess);
 		}
 	}
@@ -4392,7 +4386,7 @@ A3DStatus _3DfImport::GetMaterialMapping(const A3DMiscCascadedAttributesData & c
 
 			//Log(2, L"DrawStyle: R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
 
-			//A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
+			A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 		}
 	}
 
@@ -4854,7 +4848,7 @@ A3DStatus _3DfImport::IsShow(const A3DRootBaseWithGraphics * pGraphics)
 // 5. 주어진 Material Mapping을 이용해서 
 bool _3DfImport::SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, _3DF::MaterialMappingKit const & cInKit, _3DF::SegmentKey & cSegment)
 {
-	_3DF::SegmentKey cStyleSegment = m_pcModelSegment->StylesInclude().Subsegment(L"face_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
+	_3DF::SegmentKey cStyleSegment = m_pcModelSegment->StylesInclude().Subsegment(L"face_mat_%d_%d", cAttrData.m_sStyle.m_uiRgbColorIndex, cAttrData.m_sStyle.m_ucTransparency);
 	cStyleSegment.SetMaterialMapping(L"faces", cInKit);
 
 	_3DF::StyleControl cStyleControl = cSegment.GetStyleControl();
@@ -4864,7 +4858,9 @@ bool _3DfImport::SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cA
 // 		return false;
 // 	}
 
-	m_mFaceMaterialMappingStyleMap.insert(std::make_pair(cAttrData.m_sStyle.m_uiRgbColorIndex, cStyleSegment));
+	CString strStyleText;
+	strStyleText.Format(L"%d_%d", cAttrData.m_sStyle.m_uiRgbColorIndex, cAttrData.m_sStyle.m_ucTransparency);
+	m_mFaceMaterialMappingStyleMap.SetAt(strStyleText, cStyleSegment);
 
 	return true;
 }
@@ -4919,15 +4915,14 @@ bool _3DfImport::SetStyle(_3DF::SegmentKey & cSegment, _3DF::SegmentKey & cStyle
 // 6. 미리 저장되어 있는 Material Mapping Kit을 찾아오는 함수
 bool _3DfImport::FindFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, SegmentKey & cOutStyleSegment)
 {
-	auto pcIterator = m_mFaceMaterialMappingStyleMap.find(cAttrData.m_sStyle.m_uiRgbColorIndex);
+	CString strStyleText;
+	strStyleText.Format(L"%d_%d", cAttrData.m_sStyle.m_uiRgbColorIndex, cAttrData.m_sStyle.m_ucTransparency);
 
-	if(pcIterator == m_mFaceMaterialMappingStyleMap.end()) {
-		return false;
+	if (true == m_mFaceMaterialMappingStyleMap.Lookup(strStyleText, cOutStyleSegment)) {
+		return true;
 	}
 
-	cOutStyleSegment = pcIterator->second;
-
-	return true;
+	return false;
 }
 
 bool _3DfImport::FindLineMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, SegmentKey & cOutStyleSegment)

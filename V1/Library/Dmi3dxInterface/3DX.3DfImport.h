@@ -267,7 +267,7 @@ private:
 	// MaterialMap Style 키를 저장하는 Vector
 	std::vector<MaterialMappingStyleKit> m_vcMaterialMappingStyleVector;
 
-	std::unordered_map<A3DUns32, _3DF::SegmentKey> m_mFaceMaterialMappingStyleMap;
+	CAtlMap<CString, _3DF::SegmentKey> m_mFaceMaterialMappingStyleMap;
 	std::unordered_map<A3DUns32, _3DF::SegmentKey> m_mLineMaterialMappingStyleMap;
 	std::unordered_map<A3DUns32, _3DF::SegmentKey> m_mMarkerMaterialMappingStyleMap;
 
