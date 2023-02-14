@@ -297,7 +297,13 @@ void Window::MainFrame::OnDropFiles(HDROP hDropInfo)
 	}
 
 	::DragFinish(hDropInfo);
-	PostMessage((UINT)EUserMessage::OnNextFileOpen);
+
+	if (m_fileNames.size() > 0) {
+		PostMessage((UINT)EUserMessage::OnNextFileOpen);
+	}
+	else {
+		BCGPMessageBox(L"No files are allowed. Please select a different file.");
+	}
 
 	__super::OnDropFiles(hDropInfo);
 }
@@ -345,10 +351,17 @@ void Window::MainFrame::OnFileOpen()
 		POSITION pos = dlg.GetStartPosition();
 		while (pos != nullptr) {
 			CString path = dlg.GetNextPathName(pos);
-			m_fileNames.push_back(path);
+			if (IsAllowedFile(path)) {
+				m_fileNames.push_back(path);
+			}
 		}
 
-		PostMessage((UINT)EUserMessage::OnNextFileOpen);
+		if (m_fileNames.size() > 0) {
+			PostMessage((UINT)EUserMessage::OnNextFileOpen);
+		}
+		else {
+			BCGPMessageBox(L"No files are allowed. Please select a different file.");
+		}
 	}
 #endif
 
