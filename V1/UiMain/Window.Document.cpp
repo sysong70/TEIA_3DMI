@@ -3,6 +3,8 @@
 #include "Window.View.h"
 #include "Path.h"
 
+#include "WStr.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -17,21 +19,26 @@ bool Window::IsAllowedFile(const wchar_t* pFilePath)
 	ext.MakeLower();
 
 	if (ext == L"3dxml") return true;
+	if (ext == L"3ds") return true;
+	if (ext == L"3mf") return true;
 	if (ext == L"sat" || ext == L"sab") return true;
 	if (ext == L"obj") return true;
 	if (ext == L"dwg" || ext == L"dxf") return true;
 	if (ext == L"model" || ext == L"exp" || ext == L"session" || ext == L"dlv") return true;
+	if (ext == L"catdrawing") return true;
 	if (ext == L"catpart") return true;
 	if (ext == L"catproduct") return true;
 	if (ext == L"catshape") return true;
 	if (ext == L"cgr") return true;
-	if (ext == L"cgm") return true;
+	if (ext == L"dae") return true;
+	if (ext == L"skp") return true;
 	if (ext == L"hsf") return true;
 	if (ext == L"mf1" || ext == L"arc" || ext == L"unv" || ext == L"pkg") return true;
 	if (ext == L"igs" || ext == L"iges") return true;
 	if (ext == L"ifc" || ext == L"ifczip") return true;
 	if (ext == L"ipt" || ext == L"iam") return true;
 	if (ext == L"jt") return true;
+	if (ext == L"nwd") return true;
 	if (ext == L"x_t" || ext == L"x_b" || ext == L"xmt" || ext == L"xmt_txt") return true;
 	if (ext == L"pdf") return true;
 	if (ext == L"ply") return true;
@@ -48,6 +55,8 @@ bool Window::IsAllowedFile(const wchar_t* pFilePath)
 	if (ext == L"prt") return true;
 	if (ext == L"vda") return true;
 	if (ext == L"wrl" || ext == L"vrml") return true;
+
+	if (WStr::IsDigit(ext)) return true;
 
 	return false;
 }
