@@ -39,6 +39,8 @@ namespace Window
 	protected:
 
 		CBCGPMDIChildWnd* CreateDocumentWindow(LPCTSTR lpcszDocName, CObject* /*pObj*/) override;
+		//:WARNING - for remove debug message (AppMsg - Warning: GetWindowMenuPopup failed!)
+		HMENU GetWindowMenuPopup(HMENU hMenuBar) override;
 
 		BOOL PreCreateWindow(CREATESTRUCT& cs) override;
 

@@ -3,6 +3,8 @@
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
 #endif
 
 
@@ -22,7 +24,6 @@ namespace PresetPanel
 using namespace Component;
 
 BEGIN_MESSAGE_MAP(Panel, CWnd)
-	ON_WM_CREATE()
 	ON_WM_ERASEBKGND()
 	ON_WM_SIZE()
 	ON_MESSAGE(WM_DPICHANGED_AFTERPARENT, OnDPIChangedAfterParent)
@@ -45,7 +46,7 @@ Component::Panel::~Panel()
 
 bool Component::Panel::Initialize(CWnd* pParentWnd, UINT id)
 {
-	if (__super::Create(nullptr, L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, {}, pParentWnd, id) == FALSE) {
+	if (__super::Create(NULL, L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, {}, pParentWnd, id) == FALSE) {
 		RETURN_FALSE;
 	}
 
@@ -120,18 +121,6 @@ CSize Component::Panel::GetBodySize()
 void Component::Panel::PostNcDestroy()
 {
 	__super::PostNcDestroy();
-}
-
-
-
-int Component::Panel::OnCreate(LPCREATESTRUCT lpCreateStruct)
-{
-	if (__super::OnCreate(lpCreateStruct) == -1) {
-		DEBUG_STOP;
-		return -1;
-	}
-
-	return 0;
 }
 
 

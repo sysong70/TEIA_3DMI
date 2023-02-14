@@ -4,7 +4,7 @@
 #include "Signal.h"
 #include "Component.HistoryBar.h"
 #include "Component.LayerPanel.h"
-#include "Component.ModelTreePanel.h"
+#include "Component.ModelPanel.h"
 #include "Component.PanelBar.h"
 #include "Component.ScenePanel.h"
 #include "Component.TabWnd.h"
@@ -25,6 +25,13 @@ namespace Window
 
 	public:
 
+		enum EType
+		{
+			Unknown = -1,
+			View3d,
+			View2d,
+		};
+
 		friend class MainFrame;
 
 		~View() override;
@@ -34,8 +41,6 @@ namespace Window
 		int GetId();
 
 		void ReceiveSignal(Json::Object* pData);
-
-		void SetFilePath(CString s);
 
 	protected:
 
@@ -87,11 +92,11 @@ namespace Window
 
 		DECLARE_MESSAGE_MAP()
 
-	private:
+	protected:
 
+		EType m_eType = EType::Unknown;
 		int m_nViewId = -1;
-		CString m_sFilePath;
-		bool m_bValid = false;
+		bool m_bRenderer = false;
 		bool m_bActivate = false;
 
 		Signal::Delivery m_delivery;
@@ -102,11 +107,13 @@ namespace Window
 
 		CRect GetClientArea();
 
+		CSize GetClientSize();
+
 		Window::MainFrame& GetMainFrame();
 
 		bool IsValid();
 
-	private: // ToolBar
+	protected: // ToolBar
 
 		Component::ToolBar m_toolBar;
 		Component::HistoryBar m_historyBar;
@@ -115,18 +122,18 @@ namespace Window
 
 		void CreateToolBar();
 
-	private: // PanelBar
+	protected: // PanelBar
 
 		Component::TabWnd m_tabs;
 
-		Component::ModelTreePanel m_modelTreePanel;
+		Component::ModelPanel m_modelPanel;
 		Component::ViewPanel m_viewPanel;
 		Component::LayerPanel m_layerPanel;
 		Component::ScenePanel m_scenePanel;
 
 		void CreatePanelTabs();
 
-	private:
+	protected:
 
 		Component::TaskBar m_taskBar;
 

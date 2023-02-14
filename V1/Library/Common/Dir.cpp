@@ -2,14 +2,21 @@
 #include "Dir.h"
 #include "File.h"
 #include "Path.h"
+
 #include <shlobj_core.h>
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
 
 
 
 bool Dir::Create(const wchar_t* path)
 {
 	// recursive
-	if (::SHCreateDirectory(nullptr, path) == ERROR_SUCCESS) {
+	if (::SHCreateDirectory(NULL, path) == ERROR_SUCCESS) {
 		return true;
 	}
 	else {

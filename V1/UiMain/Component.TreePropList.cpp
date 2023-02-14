@@ -63,7 +63,7 @@ Component::TreePropList::~TreePropList()
 
 bool Component::TreePropList::Initialize(CWnd* pParentWnd)
 {
-	if (__super::Create(nullptr, L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, {}, pParentWnd, PRESET::Id) == FALSE) {
+	if (__super::Create(NULL, L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, {}, pParentWnd, PRESET::Id) == FALSE) {
 		return false;
 	}
 
@@ -109,11 +109,11 @@ void Component::TreePropList::OnSize(UINT nType, int cx, int cy)
 		int y = padding.cy;
 		int width = PRESET::TreeWidth();
 		int height = cy - padding.cy * 2;
-		m_tree.SetWindowPos(nullptr, x, y, width, height, 0);
+		m_tree.SetWindowPos(NULL, x, y, width, height, 0);
 
 		x += width + padding.cx;
 		width = cx - width - padding.cx * 3;
-		m_propList.SetWindowPos(nullptr, x, y, width, height, 0);
+		m_propList.SetWindowPos(NULL, x, y, width, height, 0);
 	}
 }
 

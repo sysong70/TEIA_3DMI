@@ -69,12 +69,6 @@
     <ClInclude Include="..\Signal\Signal.h">
       <Filter>_Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\Signal\SignalBase.h">
-      <Filter>_Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Signal\WorkerThread.h">
-      <Filter>_Common</Filter>
-    </ClInclude>
     <ClInclude Include="3DFSignal.Manager.h">
       <Filter>Signal</Filter>
     </ClInclude>
@@ -213,12 +207,6 @@
       <Filter>_Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Signal\Signal.cpp">
-      <Filter>_Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Signal\SignalBase.cpp">
-      <Filter>_Common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Signal\WorkerThread.cpp">
       <Filter>_Common</Filter>
     </ClCompile>
     <ClCompile Include="3DFSignal.Manager.cpp">

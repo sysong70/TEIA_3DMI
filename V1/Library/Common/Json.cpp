@@ -4,11 +4,14 @@
 #include "WStr.h"
 
 #ifdef _DEBUG
-	#undef THIS_FILE
-	static char THIS_FILE[] = __FILE__;
+#ifndef DEBUG_NEW
+#define DEBUG_NEW new(_CLIENT_BLOCK, __FILE__, __LINE__)
 #endif
 
-
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
 
 Json::Array theDummyArray;
 Json::Object theDummyObject;

@@ -63,8 +63,8 @@ namespace Dialog
 
 		CFont* GetDefaultFont();
 		// gap between client area and window nc area
-		CRect GetPadding();
-		// gap bwtween bottom right
+		CRect GetFramePadding();
+		// gap bottom right
 		CSize GetFrameThickness();
 		// dialog control size 32x32 in resource
 		CSize GetScaled32();

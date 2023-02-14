@@ -55,7 +55,7 @@ namespace Signal
 	class MainFrame;
 	class Progress;
 	class View;
-	class ModelTreePanel;
+	class ModelPanel;
 
 	enum class Target
 	{
@@ -69,7 +69,7 @@ namespace Signal
 		ViewPanel,
 		LayerPanel,
 		ScenePanel,
-		ModelTreePanel,
+		ModelPanel,
 		TaskBar,
 
 		Progress,
@@ -266,6 +266,7 @@ namespace Signal
 		void OnRButtonUp(UINT flags, int x, int y);
 		void OnMouseWheel(UINT flags, short delta, int x, int y, int left, int top, int right, int bottom);
 
+		void OnPaint();
 		void OnPaint(int left, int top, int right, int bottom);
 
 		void OnResize(int x, int y);
@@ -279,11 +280,11 @@ namespace Signal
 
 
 
-	class ModelTreePanel
+	class ModelPanel
 	{
 	public:
 
-		CHILD_CONSTRUCTOR(ModelTreePanel);
+		CHILD_CONSTRUCTOR(ModelPanel);
 
 		enum class Action
 		{
@@ -332,7 +333,7 @@ namespace Signal
 		friend class MainFrame;
 		friend class Progress;
 		friend class View;
-		friend class ModelTreePanel;
+		friend class ModelPanel;
 
 		Delivery();
 
@@ -349,7 +350,7 @@ namespace Signal
 		StatusBar statusBar;
 		Progress progress;
 		View view;
-		ModelTreePanel modelTreePanel;
+		ModelPanel modelPanel;
 
 		void (*SendSignal)(const wchar_t*) = nullptr;
 

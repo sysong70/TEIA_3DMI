@@ -54,6 +54,15 @@ LogManager::Init::Init()
 	}
 }
 
+//:Ken
+LogManager::Init::~Init()
+{
+	if (m_bInstanceFlag && m_pcLogManger != nullptr) {
+		delete m_pcLogManger;
+		m_pcLogManger = nullptr;
+	}
+}
+
 LogManager::Init LogManager::StaticInitializer;
 
 LogManager::~LogManager()

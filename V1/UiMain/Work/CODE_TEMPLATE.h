@@ -1,18 +1,18 @@
 ﻿#pragma once
 
-#include "PARENT.H"
+#include "parent_.h"
 
 
 
-namespace NAMESPACE
+namespace namespace_
 {
-	class CLASS : public CWnd
+	class class_ : public CWnd
 	{
 	public:
 
-		CLASS();
+		class_();
 
-		~CLASS() override;
+		~class_() override;
 
 	protected:
 

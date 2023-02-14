@@ -4,6 +4,12 @@
 #include "Path.h"
 #include "WStr.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
 
 
 #pragma region Finder Class
@@ -82,7 +88,7 @@ void File::Finder::Close()
 
 bool File::Create(const wchar_t* path)
 {
-	HANDLE hFile = ::CreateFile(path, GENERIC_READ, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = ::CreateFile(path, GENERIC_READ, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		return false;
 	}

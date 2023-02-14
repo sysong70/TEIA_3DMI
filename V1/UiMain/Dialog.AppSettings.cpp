@@ -35,8 +35,6 @@ namespace PresetAppSettings
 using namespace Dialog;
 
 BEGIN_MESSAGE_MAP(AppSettings, Standard)
-	ON_WM_CREATE()
-
 	ON_COMMAND(PRESET::Initialize, OnInitialize)
 	ON_COMMAND(PRESET::Reset, OnReset)
 	ON_COMMAND(PRESET::IDAPPLY, OnApply)
@@ -80,17 +78,15 @@ BOOL Dialog::AppSettings::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	Json::Object& data = GetUiData().GetAt("size");
-
 	CSize frame = GetFrameThickness();
-	CSize winSize = globalUtils.ScaleByDPI(CSize(data.GetInteger("cx"), data.GetInteger("cy")));
-	CRect body = { 0, frame.cy, winSize.cx, winSize.cy };
+	CSize size = GetWinSize();
+	CRect body = { 0, frame.cy, size.cx, size.cy };
 
 	ConstructFooter(body);
 	body.bottom -= m_nFooterHeight;
 	ConstructBody(body);
 
-	m_windowSize = AdjustWindowSize(winSize);
+	m_windowSize = AdjustWindowSize(size);
 	SetSizeLimit(true, true);
 
 	// data initialize
@@ -146,19 +142,7 @@ LRESULT Dialog::AppSettings::OnChangeActiveTab(WPARAM wp, LPARAM lp)
 {
 	int index = (int)wp;
 
-	return 0;
-}
-
-
-
-int Dialog::AppSettings::OnCreate(LPCREATESTRUCT lpCreateStruct)
-{
-	if (CBCGPDialog::OnCreate(lpCreateStruct) == -1) {
-		DEBUG_STOP;
-		return -1;
-	}
-
-	return 0;
+	return S_OK;
 }
 
 
@@ -225,7 +209,7 @@ void Dialog::AppSettings::ConstructBody(const CRect& boundary)
 void Dialog::AppSettings::ConstructFooter(const CRect& boundary)
 {
 	Json::Object& footer = GetUiData().GetAt("footer");
-	Json::Object& buttons = TheAppResources.GetDialog("DefaultButtons");
+	Json::Object& buttons = GetDefaultButtons();
 
 	int maxHeight = 0;
 

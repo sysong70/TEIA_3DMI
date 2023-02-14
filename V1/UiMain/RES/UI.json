@@ -169,6 +169,16 @@
 				]}
 			]}
 		]
+	},
+
+	"ObjectSnaps":{
+		"title":"Object Snaps|개체 스냅",
+		"size":{"cx":180, "cy":400}
+	},
+
+	"SelectionFilters":{
+		"title":"Selection Filters|선택 필터",
+		"size":{"cx":400, "cy":600}
 	}
 }
 }

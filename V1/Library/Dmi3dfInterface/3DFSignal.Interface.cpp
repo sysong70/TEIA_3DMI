@@ -20,8 +20,9 @@ Interface::Interface()
 
 Interface::~Interface()
 {
-	if(nullptr == m_pcSignalManager) {
-		delete m_pcSignalManager;
+	//:Ken
+	if(nullptr != m_pcSignalManager) {
+		delete (Manager*)m_pcSignalManager;
 		m_pcSignalManager = nullptr;
 	}
 }

@@ -40,7 +40,6 @@ namespace PresetTaskBar
 using namespace Component;
 
 BEGIN_MESSAGE_MAP(TaskBar, CWnd)
-	ON_WM_CREATE()
 	ON_WM_ERASEBKGND()
 	ON_WM_SIZE()
 	ON_MESSAGE(WM_DPICHANGED_AFTERPARENT, OnDPIChangedAfterParent)
@@ -63,7 +62,7 @@ Component::TaskBar::~TaskBar()
 
 bool Component::TaskBar::Initialize(CWnd* pParentWnd)
 {
-	bool success = __super::Create(nullptr, L"", WS_CHILD | WS_CLIPCHILDREN, {}, pParentWnd, PRESET::Id);
+	bool success = __super::Create(NULL, L"", WS_CHILD | WS_CLIPCHILDREN, {}, pParentWnd, PRESET::Id);
 	if (success == false) {
 		RETURN_FALSE;
 	}
@@ -85,7 +84,7 @@ CSize Component::TaskBar::AdjustLayout()
 
 	CSize size = PRESET::MinBarSize();
 	size.cy = rect.Height() - PRESET::BottomOffset();
-	SetWindowPos(nullptr, 0, 0, size.cx, size.cy, SWP_NOMOVE);
+	SetWindowPos(NULL, 0, 0, size.cx, size.cy, SWP_NOMOVE);
 
 	return size;
 }
@@ -95,18 +94,6 @@ CSize Component::TaskBar::AdjustLayout()
 void Component::TaskBar::PostNcDestroy()
 {
 	__super::PostNcDestroy();
-}
-
-
-
-int Component::TaskBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
-{
-	if (__super::OnCreate(lpCreateStruct) == -1) {
-		DEBUG_STOP;
-		return -1;
-	}
-
-	return 0;
 }
 
 

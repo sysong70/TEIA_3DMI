@@ -1,8 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Signal.h"
 
-
-
 #define SendActionDataOnly(action) \
 Json::Object data; \
 ConstructData(data, action); \
@@ -296,6 +294,11 @@ Wrapper().SendData(data);
 
 #undef SendMouseData
 
+	void View::OnPaint()
+	{
+		SendActionDataOnly(Action::OnPaint);
+	}
+
 	void View::OnPaint(int left, int top, int right, int bottom)
 	{
 		Json::Object data;
@@ -357,7 +360,7 @@ Wrapper().SendData(data);
 		SetWrapper(statusBar);
 		SetWrapper(progress);
 		SetWrapper(view);
-		SetWrapper(modelTreePanel);
+		SetWrapper(modelPanel);
 
 	#undef SetWrapper
 	}

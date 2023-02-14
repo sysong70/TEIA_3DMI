@@ -1,20 +1,20 @@
 ﻿#pragma once
 
-#include <BCGCBProInc.h>
 #include "Json.h"
+
+#include <BCGCBProInc.h>
 #include <list>
 
 
 
 namespace Dialog
 {
-	class Base;
+	class Base; // CBCGPDialog
 
+	class Standard; // Base
 	class AppSettings;
-	class FileOpenOption;
+	class ObjectSnaps;
 	class ProgressLog;
-	class PropertyList;
-	class Standard;
 
 
 
@@ -25,4 +25,8 @@ namespace Dialog
 	CSize ControlGap();
 
 	int FooterPadding();
+	// control frame padding
+	CSize FramePadding();
+	// for non-frame widnow
+	CSize WindowPadding();
 }

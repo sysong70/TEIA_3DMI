@@ -113,9 +113,29 @@ Window::Document::~Document()
 
 
 
-int Window::Document::GetId()
+Window::Document::EType Window::Document::GetCateogry()
 {
-	return GetView()->GetId();
+	//:WARNING - new document
+	if (m_sFilePath.IsEmpty()) {
+		return EType::Doc3d;
+	}
+
+	CString ext = Path::GetExtension(m_sFilePath);
+	ext.MakeLower();
+
+	if (ext == "dwg" || ext == "dxf") {
+		return EType::Doc2d;
+	}
+	else {
+		return EType::Doc3d;
+	}
+}
+
+
+
+CString Window::Document::GetFilePath()
+{
+	return m_sFilePath;
 }
 
 
@@ -124,7 +144,7 @@ Window::View* Window::Document::GetView()
 {
 	POSITION pos = GetFirstViewPosition();
 	if (pos != nullptr) {
-		View* pView = DYNAMIC_DOWNCAST(View,  GetNextView(pos));
+		View* pView = DYNAMIC_DOWNCAST(View, GetNextView(pos));
 		if (pView != nullptr) {
 			return pView;
 		}
@@ -155,7 +175,7 @@ BOOL Window::Document::OnNewDocument()
 
 BOOL Window::Document::OnOpenDocument(LPCTSTR lpszPathName)
 {
-	GetView()->SetFilePath(lpszPathName);
+	m_sFilePath = lpszPathName;
 
 	return TRUE;
 }

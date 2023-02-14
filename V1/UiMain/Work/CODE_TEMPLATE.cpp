@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "CODE_TEMPLATE.h"
+#include "header_.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -9,41 +9,41 @@ static char THIS_FILE[] = __FILE__;
 
 
 
-#define PRESET PresetCLASS
+#define PRESET PresetClass_
 
-namespace PresetCLASS
+namespace PresetClass_
 {
 }
 
 
 
-using namespace NAMESPACE;
+using namespace namespace_;
 
-BEGIN_MESSAGE_MAP(CLASS, CWnd)
+BEGIN_MESSAGE_MAP(class_, CWnd)
 END_MESSAGE_MAP()
 
 
 
-NAMESPACE::CLASS::CLASS()
+NAMESPACE::class_::class_()
 {
 }
 
 
 
-NAMESPACE::CLASS::~CLASS()
+NAMESPACE::class_::~class_()
 {
 }
 
 
 
-void NAMESPACE::CLASS::PostNcDestroy()
+void NAMESPACE::class_::PostNcDestroy()
 {
 	__super::PostNcDestroy();
 }
 
 
 
-int NAMESPACE::CLASS::OnCreate(LPCREATESTRUCT lpCreateStruct)
+int NAMESPACE::class_::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (__super::OnCreate(lpCreateStruct) == -1) {
 		DEBUG_STOP;
@@ -52,3 +52,5 @@ int NAMESPACE::CLASS::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	return 0;
 }
+
+#undef PRESET

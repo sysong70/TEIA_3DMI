@@ -35,6 +35,10 @@ namespace PresetProgressLog
 		(COLORREF)Component::EColor::Red,
 	};
 
+	int ExtraHeight() {
+		return globalUtils.ScaleByDPI(6);
+	}
+
 	int Gap()
 	{
 		return globalUtils.ScaleByDPI(8);
@@ -48,7 +52,6 @@ using namespace Dialog;
 IMPLEMENT_DYNAMIC(ProgressLog, Standard)
 
 BEGIN_MESSAGE_MAP(ProgressLog, Standard)
-	ON_WM_CREATE()
 END_MESSAGE_MAP()
 
 
@@ -110,32 +113,18 @@ BOOL Dialog::ProgressLog::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	Json::Object& data = GetUiData().GetAt("size");
-
 	CSize frame = GetFrameThickness();
-	CSize winSize = globalUtils.ScaleByDPI(CSize(data.GetInteger("cx"), data.GetInteger("cy")));
-	CRect body = { 0, frame.cy, winSize.cx, winSize.cy };
+	CSize size = GetWinSize();
+	CRect body = { 0, frame.cy, size.cx, size.cy };
 
 	ConstructBody(body);
 
-	m_windowSize = AdjustWindowSize(winSize);
+	m_windowSize = AdjustWindowSize(size);
 	SetSizeLimit(true, true);
 	//:CHECK
 	StartMarquee();
 
 	return TRUE;
-}
-
-
-
-int Dialog::ProgressLog::OnCreate(LPCREATESTRUCT lpCreateStruct)
-{
-	if (CBCGPDialog::OnCreate(lpCreateStruct) == -1) {
-		DEBUG_STOP;
-		return -1;
-	}
-
-	return 0;
 }
 
 
@@ -148,15 +137,43 @@ void Dialog::ProgressLog::ConstructBody(const CRect& boundary)
 	CRect area = boundary;
 	area.bottom = area.top + height;
 
-	CRect result = SetupControl(m_wndIndicator, data.GetAt("Indicator"), Component::EPivot::TopLeft, area);
+	// Indicator
+
+	CSize size = Facility::GetSize(data.GetAt("Indicator"));
+	CRect result = AdjustLayout(&m_wndIndicator, area, globalUtils.ScaleByDPI(size), Component::EPivot::TopLeft);
+	
+	CBCGPCircularProgressIndicatorImpl* pProgress = m_wndIndicator.GetCircularProgressIndicator();
+	CBCGPCircularProgressIndicatorOptions options = pProgress->GetOptions();
+	options.m_bMarqueeStyle = TRUE;
+	options.m_Shape = CBCGPCircularProgressIndicatorOptions::BCGPCircularProgressIndicator_Arc;
+	options.m_dblProgressWidth = (double)globalUtils.ScaleByDPI(result.Size().cx) * 0.1;
+	pProgress->SetOptions(options);
+	
+	// clear fraem and background
+	CBCGPCircularProgressIndicatorColors colors = pProgress->GetColors();
+	colors.m_brFill = CBCGPBrush();
+	colors.m_brFrameOutline = CBCGPBrush();
+	
+	pProgress->SetColors(colors);
+	pProgress->Redraw();
+	
+	m_wndIndicator.ShowWindow(SW_SHOWNOACTIVATE);
+	
+	// Message
 
 	area.left = result.right + PRESET::Gap();
 	SetupControl(m_wndMessage, data.GetAt("Message"), Component::EPivot::MiddleLeft, area);
 
+	// Log
+
 	area.left = boundary.left;
 	area.top = area.bottom + GetFrameThickness().cy;
 	area.bottom = boundary.bottom;
-	SetupControl(m_wndLog, data.GetAt("Log"), Component::EPivot::TopLeft, area);
+
+	m_wndLog.EnableItemDescription(TRUE, 1);
+	m_wndLog.SetAlternateRowColor();
+	m_wndLog.SetItemExtraHeight(PRESET::ExtraHeight());
+	AdjustLayout(&m_wndLog, area, area.Size(), Component::EPivot::TopLeft);
 }
 
 

@@ -2,6 +2,7 @@
 
 #include "Component.ToolBar.h"
 #include "Signal.h"
+
 #include <unordered_map>
 
 
@@ -36,9 +37,7 @@ namespace Component
 
 		void PostNcDestroy() override;
 
-		afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-
-		afx_msg LRESULT OnDPIChangedAfterParent(WPARAM, LPARAM);
+		afx_msg LRESULT OnDPIChangedAfterParent(WPARAM wp, LPARAM lp);
 
 		afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 

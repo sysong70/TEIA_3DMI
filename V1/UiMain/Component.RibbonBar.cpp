@@ -230,7 +230,7 @@ bool Component::RibbonBar::CreateCategories()
 	pCategory = AddCategory(Facility::GetTitle(HOME_3D_CAT), 0, 0);
 
 	pPanel = CreatePanel(pCategory, HOME_3D_PNL_Panels);
-	pPanel->Add(CreateButton(HOME_3D_CMD_Panels_ModelTree));
+	pPanel->Add(CreateButton(HOME_3D_CMD_Panels_Model));
 	pPanel->Add(CreateButton(HOME_3D_CMD_Panels_View));
 	pPanel->Add(CreateButton(HOME_3D_CMD_Panels_Layer));
 	pPanel->Add(CreateButton(HOME_3D_CMD_Panels_Scene));
@@ -249,7 +249,7 @@ bool Component::RibbonBar::CreateCategories()
 	pPanel = CreatePanel(pCategory, HOME_3D_PNL_SelectAndSnap);
 	pPanel->Add(CreatePalette(HOME_3D_LST_Select, HOME_3D_CMD_Select_All, HOME_3D_CMD_Select_Axis, false));
 	pPanel->Add(CreatePalette(HOME_3D_POP_SelectionFiter, HOME_3D_CMD_SelectionFiter_Point, HOME_3D_CMD_SelectionFiter_PMI, false));
-	pPanel->Add(CreatePalette(HOME_3D_POP_ObjectSanp, HOME_3D_CMD_ObjectSanp_Point, HOME_3D_CMD_ObjectSanp_ExpandLine, false));
+	pPanel->Add(CreatePalette(HOME_3D_POP_ObjectSnap, HOME_3D_CMD_ObjectSnap_Point, HOME_3D_CMD_ObjectSnap_ExpandLine, false));
 
 	pPanel = CreatePanel(pCategory, HOME_3D_PNL_Window);
 	pPanel->Add(CreateButton(HOME_3D_CMD_Window_Cascade));

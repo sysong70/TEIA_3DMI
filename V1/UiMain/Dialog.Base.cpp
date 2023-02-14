@@ -140,12 +140,12 @@ void Dialog::Base::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 
 CSize Dialog::Base::AdjustWindowSize(CSize client)
 {
-	CRect padding = GetPadding();
+	CRect padding = GetFramePadding();
 	CSize win = client;
 	win.cx += padding.left + padding.right;
 	win.cy += padding.top + padding.bottom;
 
-	SetWindowPos(nullptr, 0, 0, win.cx, win.cy, SWP_NOMOVE);
+	SetWindowPos(NULL, 0, 0, win.cx, win.cy, SWP_NOMOVE);
 
 	return win;
 }
@@ -179,7 +179,7 @@ CFont* Dialog::Base::GetDefaultFont()
 
 
 
-CRect Dialog::Base::GetPadding()
+CRect Dialog::Base::GetFramePadding()
 {
 	CRect windowRect;
 	GetWindowRect(windowRect);
@@ -187,19 +187,27 @@ CRect Dialog::Base::GetPadding()
 	GetClientRect(clientArea);
 	ClientToScreen(&clientArea);
 
-	return {
+	CRect padding = {
 		abs(windowRect.left - clientArea.left),
 		abs(windowRect.top - clientArea.top),
 		abs(windowRect.right - clientArea.right),
 		abs(windowRect.bottom - clientArea.bottom)
 	};
+
+	if (padding.IsRectNull()) {
+		int dp = globalUtils.ScaleByDPI(6);
+
+		padding = { dp ,dp ,dp ,dp };
+	}
+
+	return padding;
 }
 
 
 
 CSize Dialog::Base::GetFrameThickness()
 {
-	return GetPadding().BottomRight();
+	return GetFramePadding().BottomRight();
 }
 
 

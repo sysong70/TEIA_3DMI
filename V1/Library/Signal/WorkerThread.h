@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "Common_Define.h"
-#include "SignalBase.h"
 
 #include <atomic>
 #include <condition_variable>
@@ -13,7 +12,7 @@
 
 //:REF - https://www.codeproject.com/Articles/1169105/Cplusplus-std-thread-Event-Loop-with-Message-Queue
 
-class WorkerThread;
+
 
 struct EventWrapper
 {

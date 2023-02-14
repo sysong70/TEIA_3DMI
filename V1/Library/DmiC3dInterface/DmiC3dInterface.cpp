@@ -22,7 +22,8 @@ DmiC3dInterface::DmiC3dInterface()
 
 DmiC3dInterface::~DmiC3dInterface()
 {
-
+	//:Ken
+	delete m_pcC3dModeler;
 }
 
 bool DmiC3dInterface::ExecuteCommand(DWORD_PTR nJsonObject)

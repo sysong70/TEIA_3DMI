@@ -45,19 +45,11 @@ Dialog::Standard::~Standard()
 
 
 
-Json::Object& Dialog::Standard::GetUiData()
-{
-	DEBUG_VALID(m_pDialogData);
-	return *m_pDialogData;
-}
-
-
-
 BOOL Dialog::Standard::OnInitDialog()
 {
 	__super::OnInitDialog();
 
-	SetWindowText(Facility::Local(GetUiData().GetString("title")));
+	SetWindowText(GetWinTitle());
 
 	return TRUE;
 }
@@ -66,7 +58,7 @@ BOOL Dialog::Standard::OnInitDialog()
 
 CSize Dialog::Standard::SetupControl(CBCGPButton& control, Json::Object& data)
 {
-	const CSize defaultSize = CSize(96, 0);
+	const CSize defaultSize = CSize(64, 0);
 	const DWORD dwStyle = WS_CHILD | WS_VISIBLE;
 
 	if (control.GetSafeHwnd() == nullptr) {
@@ -83,80 +75,11 @@ CSize Dialog::Standard::SetupControl(CBCGPButton& control, Json::Object& data)
 
 
 
-CRect Dialog::Standard::SetupControl(CBCGPCircularProgressIndicatorCtrl& control, Json::Object& data, Component::EPivot ePivot, CRect rect)
-{
-	DEBUG_VALID(control.GetSafeHwnd());
-
-	CSize size(data.GetInteger("cx"), data.GetInteger("cy"));
-	CRect result = AdjustLayout(&control, rect, globalUtils.ScaleByDPI(size), ePivot);
-
-	CBCGPCircularProgressIndicatorImpl* pProgress = control.GetCircularProgressIndicator();
-
-	CBCGPCircularProgressIndicatorOptions options = pProgress->GetOptions();
-	options.m_bMarqueeStyle = TRUE;
-	options.m_Shape = CBCGPCircularProgressIndicatorOptions::BCGPCircularProgressIndicator_Arc;
-	options.m_dblProgressWidth = (double)globalUtils.ScaleByDPI(result.Size().cx) * 0.1;
-	pProgress->SetOptions(options);
-
-	// clear fraem and background
-	CBCGPCircularProgressIndicatorColors colors = pProgress->GetColors();
-	colors.m_brFill = CBCGPBrush();
-	colors.m_brFrameOutline = CBCGPBrush();
-
-	pProgress->SetColors(colors);
-	pProgress->Redraw();
-
-	control.ShowWindow(SW_SHOWNOACTIVATE);
-
-	return result;
-}
-
-
-
-CRect Dialog::Standard::SetupControl(CBCGPListBox& control, Json::Object& data, Component::EPivot ePivot, CRect rect)
-{
-	DEBUG_VALID(control.GetSafeHwnd());
-
-	//control.SetItemExtraHeight(globalUtils.ScaleByDPI(4));
-	control.EnableItemDescription(TRUE, 1);
-	control.SetAlternateRowColor();
-
-	return AdjustLayout(&control, rect, CSize(rect.Width(), rect.Height()), ePivot);
-}
-
-/*
-	"Log":{"columns":[
-		{"header":"Status|상태", "width":0.15},
-		{"header":"File|파일", "width":0.85}
-	]}
-*/
-
-CRect Dialog::Standard::SetupControl(CBCGPListCtrl& control, Json::Object& data, Component::EPivot ePivot, CRect rect)
-{
-	DEBUG_VALID(control.GetSafeHwnd());
-
-	CRect result = AdjustLayout(&control, rect, CSize(rect.Width(), rect.Height()), ePivot);
-	CSize size = result.Size();
-	Json::Array& ar = data.GetArray("columns");
-
-	for (int i = 0; i < ar.GetSize(); i++) {
-		Json::Object& column = ar[i]->AsObject();
-		CString header = column.GetString("header");
-		int width = int(size.cx * column.GetReal("width"));
-
-		control.InsertColumn(i, Facility::Local(header), LVCFMT_LEFT, width);
-	}
-
-	return result;
-}
-
-
-
 CRect Dialog::Standard::SetupControl(CBCGPStatic& control, Json::Object& data, Component::EPivot ePivot, CRect rect)
 {
 	DEBUG_VALID(control.GetSafeHwnd());
 
-	control.SetWindowText(Facility::Local(data.GetString("title")));
+	control.SetWindowText(Facility::GetTitle(data));
 	control.SizeToContent();
 
 	return AdjustLayout(&control, rect, CSize(rect.Width(), 0), ePivot);
@@ -209,7 +132,7 @@ CRect Dialog::Standard::AlignControls(Controls controls, CPoint basePoint, Compo
 			break;
 		}
 
-		pControl->SetWindowPos(nullptr, pivot.x, pivot.y, 0, 0, SWP_NOSIZE);
+		pControl->SetWindowPos(NULL, pivot.x, pivot.y, 0, 0, SWP_NOSIZE);
 		// recalculate boundary 
 		controlFrame = GetControlRect(pControl);
 
@@ -264,7 +187,7 @@ CRect Dialog::Standard::DestributeControls(Controls controls, CPoint basePoint, 
 			break;
 		}
 
-		pControl->SetWindowPos(nullptr, pivot.x, pivot.y, 0, 0, SWP_NOSIZE);
+		pControl->SetWindowPos(NULL, pivot.x, pivot.y, 0, 0, SWP_NOSIZE);
 		// recalculate boundary 
 		controlFrame = GetControlRect(pControl);
 
@@ -293,4 +216,48 @@ CRect Dialog::Standard::GetControlRect(CWnd* pControl)
 	}
 
 	return rect;
+}
+
+
+
+Json::Object& Dialog::Standard::GetDefaultButtons()
+{
+	return TheAppResources.GetDialog("DefaultButtons");
+}
+
+
+
+Json::Object& Dialog::Standard::GetUiData()
+{
+	DEBUG_VALID(m_pDialogData);
+	return *m_pDialogData;
+}
+
+
+
+CSize Dialog::Standard::GetWinSize()
+{
+	Json::Value* pValue = GetUiData().FindValue("size");
+	if (pValue != nullptr) {
+		Json::Object& data = pValue->AsObject();
+		return globalUtils.ScaleByDPI(Facility::GetSize(data));
+	}
+	else {
+		DEBUG_STOP;
+		return {};
+	}
+}
+
+
+
+CString Dialog::Standard::GetWinTitle()
+{
+	Json::Value* pValue = GetUiData().FindValue("title");
+	if (pValue != nullptr) {
+		return Facility::Local(pValue->ToString());
+	}
+	else {
+		DEBUG_STOP;
+		return L"";
+	}
 }

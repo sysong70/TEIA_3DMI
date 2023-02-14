@@ -89,6 +89,8 @@ void ApplicationManager::InitInstance()
 // 2. CWinApp::OnExitInstance() 처리
 void ApplicationManager::ExitInstance()
 {
+	//:Ken
+	delete Wrapper().m_pcHoopsDB;
 
 }
 

@@ -26,8 +26,6 @@ namespace Dialog
 
 		BOOL OnInitDialog() override;
 
-		afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
-
 		DECLARE_MESSAGE_MAP()
 
 	protected:

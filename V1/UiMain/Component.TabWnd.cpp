@@ -12,7 +12,6 @@ static char THIS_FILE[] = __FILE__;
 using namespace Component;
 
 BEGIN_MESSAGE_MAP(TabWnd, CBCGPTabWnd)
-	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 
@@ -26,24 +25,10 @@ Component::TabWnd::TabWnd()
 
 
 
-void Component::TabWnd::SetImageSize(CSize size)
+void Component::TabWnd::SetImageList(std::vector<UINT> ids, CSize imageSize)
 {
-	m_sizeImage = size;
-}
+	m_sizeImage = imageSize;
 
-
-
-void Component::TabWnd::SetTabHeight(int height)
-{
-	//:CHECK
-	m_sizeImage.cx = height;
-	m_sizeImage.cy = height;
-}
-
-
-
-void Component::TabWnd::AddImages(std::vector<UINT> ids)
-{
 	CBCGPToolBarImages images;
 	images.SetImageSize(m_sizeImage);
 
@@ -56,14 +41,16 @@ void Component::TabWnd::AddImages(std::vector<UINT> ids)
 
 	images.ExportToImageList(m_Images);
 
-	if (m_ImagesGray.GetSafeHandle() != NULL) {
+	if (m_ImagesGray.GetSafeHandle() != nullptr) {
 		m_ImagesGray.DeleteImageList();
 	}
 }
 
 
 
-BOOL Component::TabWnd::OnEraseBkgnd(CDC* pDC)
+void Component::TabWnd::SetTabHeight(int height)
 {
-	return __super::OnEraseBkgnd(pDC);
+	//:CHECK
+	m_sizeImage.cx = height;
+	m_sizeImage.cy = height;
 }
