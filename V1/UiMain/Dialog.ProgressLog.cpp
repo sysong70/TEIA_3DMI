@@ -171,8 +171,10 @@ void Dialog::ProgressLog::ConstructBody(const CRect& boundary)
 	area.bottom = boundary.bottom;
 
 	//m_wndLog.EnableItemDescription(TRUE, 1);
-	//m_wndLog.SetAlternateRowColor();
-	//m_wndLog.SetItemExtraHeight(PRESET::ExtraHeight());
+	m_wndLog.ModifyStyle(0, LBS_NOSEL);
+	m_wndLog.SetAlternateRowColor();
+	m_wndLog.SetItemExtraHeight(PRESET::ExtraHeight());
+
 	AdjustLayout(&m_wndLog, area, area.Size(), Component::EPivot::TopLeft);
 }
 
