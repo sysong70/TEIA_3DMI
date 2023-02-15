@@ -1,4 +1,4 @@
-﻿{
+{
 "Dialog":{
 	"DefaultButtons":{
 		"Ok":{"title":"Ok|확인", "id":1, "comment":"IDOK"},

@@ -128,7 +128,7 @@ namespace Signal
 	void Progress::SetMessage(CString message)
 	{
 		Json::Object data;
-		ConstructData(data, Action::StartMarquee);
+		ConstructData(data, Action::SetMessage);
 
 		data.SetString(SKW_MESSAGE, message);
 
@@ -140,7 +140,7 @@ namespace Signal
 	void Progress::AddLog(Status status, CString title, CString description, CString tooltip)
 	{
 		Json::Object data;
-		ConstructData(data, Action::StartMarquee);
+		ConstructData(data, Action::AddLog);
 
 		data.SetInteger(SKW_STATUS, (int)status);
 		data.SetString(SKW_TITLE, title);

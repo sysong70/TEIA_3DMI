@@ -170,9 +170,9 @@ void Dialog::ProgressLog::ConstructBody(const CRect& boundary)
 	area.top = area.bottom + GetFrameThickness().cy;
 	area.bottom = boundary.bottom;
 
-	m_wndLog.EnableItemDescription(TRUE, 1);
-	m_wndLog.SetAlternateRowColor();
-	m_wndLog.SetItemExtraHeight(PRESET::ExtraHeight());
+	//m_wndLog.EnableItemDescription(TRUE, 1);
+	//m_wndLog.SetAlternateRowColor();
+	//m_wndLog.SetItemExtraHeight(PRESET::ExtraHeight());
 	AdjustLayout(&m_wndLog, area, area.Size(), Component::EPivot::TopLeft);
 }
 
@@ -199,6 +199,8 @@ void Dialog::ProgressLog::SetMessage(Json::Object& data)
 {
 	CString message = data.GetString(SKW_MESSAGE);
 	m_wndMessage.SetWindowText(message);
+
+	RedrawWindow();
 }
 
 
@@ -213,6 +215,8 @@ void Dialog::ProgressLog::AddLog(Json::Object& data)
 	if (status > Signal::Progress::Status::Succeed) {
 		m_wndLog.SetItemColorBar(index, PRESET::ItemColors[(int)status]);
 	}
+
+	RedrawWindow();
 }
 
 
@@ -222,6 +226,8 @@ void Dialog::ProgressLog::SetLogStatus(Json::Object& data)
 	int status = data.GetInteger(SKW_STATUS);
 	int index = m_wndLog.GetCount();
 	m_wndLog.SetItemColorBar(index - 1, PRESET::ItemColors[status]);
+
+	RedrawWindow();
 }
 
 #undef DDX_CONTROL

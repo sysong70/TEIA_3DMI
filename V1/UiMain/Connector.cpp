@@ -103,7 +103,7 @@ void Connector3d::ReceiveSignal(const wchar_t* content)
 	case Signal::Target::MainFrame:
 	case Signal::Target::Progress:
 	case Signal::Target::View:
-		TheAppication.GetMainFrame().PostMessage((UINT)Window::EUserMessage::OnSignal, (WPARAM)pData);
+		TheAppication.GetMainFrame().SendMessage((UINT)Window::EUserMessage::OnSignal, (WPARAM)pData);
 		break;
 
 	case::Signal::Target::Unknown:
@@ -215,7 +215,8 @@ void Connector2d::ReceiveSignal(const wchar_t* content)
 	case Signal::Target::MainFrame:
 	case Signal::Target::Progress:
 	case Signal::Target::View:
-		TheAppication.GetMainFrame().PostMessage((UINT)Window::EUserMessage::OnSignal, (WPARAM)pData);
+		//:CHECK - why not PostMessage
+		TheAppication.GetMainFrame().SendMessage((UINT)Window::EUserMessage::OnSignal, (WPARAM)pData);
 		break;
 
 	case::Signal::Target::Unknown:

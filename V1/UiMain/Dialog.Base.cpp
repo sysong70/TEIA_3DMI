@@ -33,11 +33,14 @@ Dialog::Base::~Base()
 
 void Dialog::Base::DoModaless()
 {
+	//:CHECK
 	EnableParent(false);
 
 	AdjustControlsLayout();
 	Create(m_nTemplateId);
 	ShowWindow(SW_SHOW);
+	//:WARNING - do not remove (pump message)
+	RedrawWindow();
 }
 
 // return dialog result

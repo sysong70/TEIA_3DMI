@@ -109,6 +109,9 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 	delivery.ViewId = nViewId;
 	delivery.SetSender(Wrapper().m_pc3dfInterface->GetSignalCallback());
 	delivery.mainFrame.ShowProgress();
+	//:Ken - test
+	delivery.progress.SetMessage(strFilePathName);
+	delivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Start reading...");
 
 	pcHoopsView->SetSuppressUpdate(true);
 
@@ -123,6 +126,9 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 #endif
 
 	pcHoopsView->SetSuppressUpdate(false);
+
+	//:Ken - test
+	delivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Update...");
 
 	//pcHoopsView->SetSmoothTransition(true);
 	pcHoopsView->ZoomToExtents();

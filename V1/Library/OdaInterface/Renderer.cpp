@@ -303,25 +303,29 @@ void Renderer::OpenFile(Json::Object& options)
 void Renderer::OpenFile(CString filePath)
 {
 	m_filePath = filePath;
+	bool read = false;
 
 	if (m_filePath.IsEmpty()) {
 		DEBUG_RETURN;
 	}
 
+	m_delivery.mainFrame.ShowProgress();
+	m_delivery.progress.SetMessage(filePath);
+
 	try {
+		m_delivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Start reading file");
 		m_pDatabase = TheApp.readFile(m_filePath.GetBuffer(), true, false);
+
+		OdGiContextForDbDatabase::setDatabase(m_pDatabase);
+		enableGsModel(true);
+
+		if (CreateDevice(true, true)) {
+			m_delivery.mainFrame.HideProgress();
+			m_delivery.view.SetValidation();
+		}
 	} catch (OdError&) {
-		DEBUG_RETURN;
+		m_delivery.mainFrame.HideProgress();
 	}
-
-	OdGiContextForDbDatabase::setDatabase(m_pDatabase);
-	enableGsModel(true);
-
-	if (CreateDevice(true, true) == false) {
-		DEBUG_RETURN;
-	}
-
-	m_delivery.view.SetValidation();
 }
 
 
