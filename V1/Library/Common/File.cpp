@@ -138,6 +138,23 @@ bool File::Gather(const wchar_t* path, const wchar_t* filter, WStringArray& file
 
 
 
+unsigned long File::GetFileSize(const wchar_t* path)
+{
+	WIN32_FILE_ATTRIBUTE_DATA fad;
+	if (!::GetFileAttributesEx(path, GetFileExInfoStandard, &fad)) {
+		// error condition, could call GetLastError to find out more
+		return -1;
+	}
+
+	LARGE_INTEGER size;
+	size.HighPart = fad.nFileSizeHigh;
+	size.LowPart = fad.nFileSizeLow;
+
+	return size.QuadPart;
+}
+
+
+
 bool File::IsExist(const wchar_t* path)
 {
 	WIN32_FIND_DATA data;

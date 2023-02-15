@@ -36,7 +36,7 @@ namespace PresetProgressLog
 	};
 
 	int ExtraHeight() {
-		return globalUtils.ScaleByDPI(6);
+		return globalUtils.ScaleByDPI(2);
 	}
 
 	int Gap()

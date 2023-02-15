@@ -84,9 +84,9 @@ void Window::View2d::ReceiveSignal(Json::Object* pData)
 	case Signal::View::Action::SetValidation:
 		m_bRenderer = data.GetBoolean(SKW_VALID);
 		if (m_bRenderer) {
-			CSize client = GetClientSize();
-			m_delivery.view.OnResize(client.cx, client.cy);
-			m_delivery.view.OnPaint();
+			//CSize client = GetClientSize();
+			//m_delivery.view.OnResize(client.cx, client.cy);
+			//m_delivery.view.OnPaint();
 
 			if (GetMainFrame().HasNextFile()) {
 				GetMainFrame().PostMessage((UINT)EUserMessage::OnNextFileOpen);

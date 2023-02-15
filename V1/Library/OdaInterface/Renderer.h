@@ -117,11 +117,13 @@ public: // Command
 
 	void CloseFile();
 
-	void OpenFile(Json::Object& options);
+	bool OpenFile(Json::Object& options);
 
-	void OpenFile(CString filePath);
+	bool OpenFile(CString filePath);
 
 	void RedrawWindow(LPRECT lpRect = nullptr);
+	// first single call
+	void UpdateWindow();
 
 public:
 

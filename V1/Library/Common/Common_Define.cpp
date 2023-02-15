@@ -22,7 +22,7 @@ void Trace(const wchar_t* pFormat, ...)
 
 	va_list args;
 	va_start(args, pFormat);
-	int size = ::vswprintf(nullptr, 0, pFormat, args);
+	int size = ::vswprintf(nullptr, 0, pFormat, args) + 1;
 	::vswprintf(buffer, size, pFormat, args);
 	va_end(args);
 

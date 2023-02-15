@@ -86,7 +86,6 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 
 		case Signal::MainFrame::Action::HideProgress:
 			ShowProgress(false);
-			REMOVE_POINTER(m_pDialog);
 			break;
 
 		default:
@@ -98,9 +97,14 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 	} break;
 
 	case Signal::Target::Progress: {
-		DEBUG_VALID(m_pDialog);
-		ASSERT(m_pDialog->GetSignalTargetId() == target);
-		m_pDialog->ReceiveSignal(pData);
+		//DEBUG_VALID(m_pDialog);
+		//ASSERT(m_pDialog->GetSignalTargetId() == target);
+		if (m_pDialog != nullptr && m_pDialog->GetSignalTargetId() == target) {
+			m_pDialog->ReceiveSignal(pData);
+		}
+		else {
+			REMOVE_POINTER(pData);
+		}
 	} break;
 
 	default:
@@ -127,10 +131,10 @@ void Window::MainFrame::ShowProgress(bool bShow)
 		m_pDialog->DoModaless();
 	}
 	else {
-		DEBUG_VALID(m_pDialog);
-		m_pDialog->DestroyWindow();
-		//:WARING - do not remove pointer
-		m_pDialog = nullptr;
+		if (m_pDialog != nullptr) {
+			m_pDialog->DestroyWindow();
+			REMOVE_POINTER(m_pDialog);
+		}
 	}
 }
 
@@ -214,15 +218,10 @@ LRESULT Window::MainFrame::OnSignal(WPARAM wp, LPARAM lp)
 LRESULT Window::MainFrame::OnNextFileOpen(WPARAM wp, LPARAM lp)
 {
 	if (m_fileNames.size() > 0) {
-		POSITION pos = AfxGetApp()->GetFirstDocTemplatePosition();
-		CDocTemplate* pDocTemplate = AfxGetApp()->GetNextDocTemplate(pos);
-		if (pDocTemplate != nullptr) {
-			CString fileName = m_fileNames.front();
-			m_fileNames.erase(m_fileNames.begin());
-
-			//:REF - create new file; pDocTemplate->OpenDocumentFile(nullptr)
-			CDocument* pDoc = pDocTemplate->OpenDocumentFile(fileName);
-		}
+		//:WARNING - do not use CDocTemplate, or check CMultiDocTemplate
+		CString fileName = m_fileNames.front();
+		m_fileNames.erase(m_fileNames.begin());
+		CDocument* pDoc = AfxGetApp()->OpenDocumentFile(fileName);
 	}
 
 	return S_OK;

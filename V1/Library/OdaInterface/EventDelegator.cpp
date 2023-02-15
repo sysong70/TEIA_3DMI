@@ -59,7 +59,7 @@ bool EventDelegator::OnSignal(std::shared_ptr<EventWrapper> wrapper)
 		}
 
 		if (pSignal->Target == Signal::Target::View) {
-			//TRACE(L"\n%s", (LPCTSTR)pSignal->Dump());
+			//TRACE(L"%s", (LPCTSTR)pSignal->Dump());
 
 			switch ((Signal::View::Action)pSignal->Action) {
 			case Signal::View::Action::OnCommand:     OnCommand((SignalArgs::Command*)pSignal);       break;

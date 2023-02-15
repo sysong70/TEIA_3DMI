@@ -58,6 +58,8 @@ namespace File
 
 	bool Gather(const wchar_t* path, const wchar_t* filter, WStringArray& files);
 
+	unsigned long GetFileSize(const wchar_t* path);
+
 	bool IsExist(const wchar_t* path);
 
 	bool Move(const wchar_t* sourcePath, const wchar_t* targetPath);

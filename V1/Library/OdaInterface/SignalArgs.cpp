@@ -5,7 +5,7 @@
 #define DUMP_BASE
 //#define DUMP_COMMAND
 #define DUMP_INITIALIZE
-//#define DUMP_MOUSE
+#define DUMP_MOUSE
 #define DUMP_RESIZE
 #define DUMP_PAINT
 //#define DUMP_TEXT

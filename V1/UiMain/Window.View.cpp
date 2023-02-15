@@ -84,12 +84,12 @@ void Window::View::OnInitialUpdate()
 {
 	__super::OnInitialUpdate();
 
-	m_delivery.view.OnInitialize((DWORD_PTR)m_hWnd, GetDocument()->GetPathName());
-
 	CreateHistoryBar();
 	CreateToolBar();
 	CreatePanelTabs();
 	CreateTaskBar();
+
+	m_delivery.view.OnInitialize((DWORD_PTR)m_hWnd, GetDocument()->GetPathName());
 }
 
 

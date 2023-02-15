@@ -9,6 +9,8 @@
 #include "Ge/GePlane.h"
 #include "RxVariantValue.h"
 
+#include "File.h"
+
 
 
 const double ZOOM_FACTOR = 0.8;
@@ -195,9 +197,7 @@ bool Renderer::OnInitialize(SignalArgs::Initialize* signal)
 
 	m_hWnd = signal->hWnd;
 
-	OpenFile(signal->FilePath);
-
-	return true;
+	return OpenFile(signal->FilePath);
 }
 
 
@@ -278,7 +278,6 @@ void Renderer::OnResize(SignalArgs::Resize* signal)
 		// Update the client rectangle
 		OdGsDCRect rect(OdGsDCPoint(0, signal->Height), OdGsDCPoint(signal->Width, 0));
 		m_pDevice->onSize(rect);
-		//m_pDevice->update();
 	}
 }
 
@@ -295,37 +294,42 @@ void Renderer::CloseFile()
 
 
 
-void Renderer::OpenFile(Json::Object& options)
+bool Renderer::OpenFile(Json::Object& options)
 {
-	OpenFile(options.GetString(SKW_FILEPATH));
+	return OpenFile(options.GetString(SKW_FILEPATH));
 }
 
-void Renderer::OpenFile(CString filePath)
+bool Renderer::OpenFile(CString filePath)
 {
 	m_filePath = filePath;
-	bool read = false;
-
 	if (m_filePath.IsEmpty()) {
-		DEBUG_RETURN;
+		return true;
 	}
 
-	m_delivery.mainFrame.ShowProgress();
-	m_delivery.progress.SetMessage(filePath);
-
 	try {
+		//:CEHCK
+		if (File::GetFileSize(m_filePath) > 1000000) {
+			m_delivery.mainFrame.ShowProgress();
+			m_delivery.progress.SetMessage(filePath);
+		}
+
 		m_delivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Start reading file");
 		m_pDatabase = TheApp.readFile(m_filePath.GetBuffer(), true, false);
 
 		OdGiContextForDbDatabase::setDatabase(m_pDatabase);
 		enableGsModel(true);
 
+		m_delivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Create rendering device");
 		if (CreateDevice(true, true)) {
 			m_delivery.mainFrame.HideProgress();
 			m_delivery.view.SetValidation();
 		}
 	} catch (OdError&) {
 		m_delivery.mainFrame.HideProgress();
+		RETURN_FALSE;
 	}
+
+	return true;
 }
 
 
@@ -333,6 +337,12 @@ void Renderer::OpenFile(CString filePath)
 void Renderer::RedrawWindow(LPRECT lpRect)
 {
 	::RedrawWindow(m_hWnd, lpRect, nullptr, 0);
+}
+
+
+
+void Renderer::UpdateWindow()
+{
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -384,9 +394,7 @@ bool Renderer::CreateDevice(bool recreate, bool zoomExtents)
 	// Update the client rectangle
 	OdGsDCRect rect(OdGsDCPoint(rc.left, rc.bottom), OdGsDCPoint(rc.right, rc.top));
 	m_pDevice->onSize(rect);
-
-	// Redraw the window
-	RedrawWindow();
+	m_pDevice->update();
 
 	return true;
 }
