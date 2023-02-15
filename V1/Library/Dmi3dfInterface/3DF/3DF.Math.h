@@ -511,8 +511,6 @@ public:
 	void SetIdentity();
 	bool IsIdentity();
 
-	MatrixKit<F> Inverse();
-
 	_3DF::Point Transform(_3DF::Point const & cInSource) const;
 
 	F * GetData() const { return (F *)r; }
@@ -522,9 +520,6 @@ public:
 		F m[4][4] = { {1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1} };
 		F r[16];
 	};
-
-private:
-
 };
 
 template <typename F>
@@ -603,70 +598,12 @@ _3DF_INLINE MatrixKit<F> operator * (const MatrixKit<F> & M1, const MatrixKit<F>
 	return cMatrix;
 }
 
-template <typename F>
-MatrixKit<F> MatrixKit<F>::Inverse()
-{
-	int i, j, k;
-	MatrixKit<F> M, Mr;
-	double dError = 10e-10;
-
-	M = *this;
-
-	for (i = 0; i < 4; i++)
-	{
-		if (-dError < M[i][i] && M[i][i] < dError)
-		{
-			for (k = 0; k < 4; k++)
-			{
-				if (-dError < M[k][i] && M[k][i] < dError) {
-					continue;
-				}
-
-				for (j = 0; j < 4; j++)
-				{
-					M[i][j] += M[k][j];
-					Mr[i][j] += Mr[k][j];
-				}
-				break;
-			}
-			if (-dError < M[i][i] && M[i][i] < dError)
-				return Mr;
-		}
-	}//for i
-
-	for (i = 0; i < 4; i++)
-	{
-		double constant = M[i][i];
-		if (M[i][i] == 0) constant = dError;
-
-		for (j = 0; j < 4; j++)
-		{
-			M[i][j] /= constant;
-			Mr[i][j] /= constant;
-		}
-		for (k = 0; k < 4; k++)
-		{
-			if (k == i) continue;
-			if (M[k][i] == 0) continue;
-			constant = M[k][i];
-			for (j = 0; j < 4; j++)
-			{
-				M[k][j] = M[k][j] - M[i][j] * constant;
-				Mr[k][j] = Mr[k][j] - Mr[i][j] * constant;
-			}
-		}
-	}
-
-	return Mr;
-}
-
 using Matrix = MatrixKit<float>;
 
-class API_3DF TestMatrix {
-public:
-	void InverseMatrix(const float * matrix, float * out_matrix);
-	void ComputeMatrixProduct(const float * matrix1, const float * matrix2, float * out_matrix);
-	void ComputeIdentityMatrix(float * out_matrix);
+namespace  MatrixCal {
+	API_3DF void InverseMatrix(const float * matrix, float * out_matrix);
+	API_3DF void ComputeMatrixProduct(const float * matrix1, const float * matrix2, float * out_matrix);
+	API_3DF void ComputeIdentityMatrix(float * out_matrix);
 };
 
 CLOSE_3DF_NAMESPACE

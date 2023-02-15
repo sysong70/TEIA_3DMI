@@ -257,9 +257,6 @@ SegmentKey & SegmentKey::SetMaterialMapping(CString strGeometry, _3DF::MaterialM
 		HC_Set_Color(H_ASCII_TEXT(strColorText));
 	}
 
-	char chBuffer[MVO_BUFFER_SIZE];
-	HC_Show_Color(chBuffer);
-
 	if (false == cInKit.TextureName().IsEmpty()) {
 // 		RGBAColor cRgbaColor;
 // 		CString strColorText;
@@ -276,9 +273,6 @@ SegmentKey & SegmentKey::SetMaterialMapping(CString strGeometry, _3DF::MaterialM
 
 			HC_Set_Color(H_ASCII_TEXT(strText));
 		}
-
-//		char chBuffer[MVO_BUFFER_SIZE];
-		HC_Show_Color(chBuffer);
 
 		if (false == cInKit.TextureOption().IsEmpty()) {
 			CString strTextureName = cInKit.TextureName();

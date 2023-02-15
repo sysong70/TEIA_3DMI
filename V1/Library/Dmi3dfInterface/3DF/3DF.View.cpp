@@ -135,7 +135,6 @@ void View::Init()
 	GetModel()->SetStaticModel(true);
 	GetModel()->SetLMVModel(false);
 
-
 	bool bFlag = SetHandednessFromModel();
 
 	SetSuppressUpdate(false);
@@ -175,6 +174,7 @@ void View::SetDriverOption()
 	} HC_Close_Segment();
 }
 
+// 투명도 적용 방법 설정
 void View::SetViewTransparency()
 {
 	char text[4096];

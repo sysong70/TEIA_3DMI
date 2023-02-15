@@ -2098,10 +2098,8 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 					cMatrix[3][1] = static_cast<float>(pdCoordData[13]);
 					cMatrix[3][2] = static_cast<float>(pdCoordData[14]);
 
-					// cTransformMatrix = cMatrix * cTransformMatrix;
-
-					_3DF::TestMatrix cm;
-					cm.ComputeMatrixProduct(cMatrix.GetData(), cTransformMatrix.GetData(), cTransformMatrix.GetData());
+					//_3DF::TestMatrix cm;
+					MatrixCal::ComputeMatrixProduct(cMatrix.GetData(), cTransformMatrix.GetData(), cTransformMatrix.GetData());
 
 					PMI::Orientation orientation;
 					orientation.SetMatrix(cTransformMatrix);
@@ -2112,12 +2110,8 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 			}
 			else
 			{
-				//_3DF::Matrix cInverseMatrix;
-				//cMatrix = cMatrix.Inverse();
-				//cTransformMatrix = cMatrix * cTransformMatrix;
-				_3DF::TestMatrix cm;
-				cm.InverseMatrix(cMatrix.GetData(), cMatrix.GetData());
-				cm.ComputeMatrixProduct(cMatrix.GetData(), cTransformMatrix.GetData(), cTransformMatrix.GetData());
+				MatrixCal::InverseMatrix(cMatrix.GetData(), cMatrix.GetData());
+				MatrixCal::ComputeMatrixProduct(cMatrix.GetData(), cTransformMatrix.GetData(), cTransformMatrix.GetData());
 				cMatrix.SetIdentity();
 				char_height = 1.;
 				MAKE_OFFSET(0, 0);
@@ -2528,14 +2522,14 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 	mFaceSegmentStyleMap.RemoveAll();
 
 	for(A3DUns32 nFaceIndex = 0; nFaceIndex < nFacesCount; nFaceIndex++) {
-		A3DMiscCascadedAttributesGet(NULL, &psAttrData[nFaceIndex]);
+		A3DMiscCascadedAttributesGet(nullptr, &psAttrData[nFaceIndex]);
 	}
 
 	REMOVE_ARRAY(psAttrData);
 
 	LogDecreaseTabIndex(2);
 
-	Log(2, L"DrawTess3D: %s, %d, Style Count: %d", LogHexStr((DWORD_PTR) pcTess3D), nTriangleFaceCount, m_mFaceMaterialMappingStyleMap.size());
+	Log(2, L"DrawTess3D: %s, %d, Style Count: %d", LogHexStr((DWORD_PTR) pcTess3D), nTriangleFaceCount, m_mFaceMaterialMappingStyleMap.GetCount());
 
 	CHECK_A3D_RETURN(A3DTess3DGet(nullptr, &cTess3dData));
 
@@ -2562,54 +2556,18 @@ UINT _3DfImport::ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo)
 		A3DUns32 nNormalIndex = cInFaceInfo.nOutTriStartIndex++;
 
 		nFaceVertexNormalIndices[0] = cInFaceInfo.pnInIndices[nNormalIndex] / 3;
-		nFaceVertexParamIndices[0] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex];
+		//nFaceVertexParamIndices[0] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex];
 		nFaceListIndices[0] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex++] / 3;
 
 		nFaceVertexNormalIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex++] / 3;
-		nFaceVertexParamIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex];
+		//nFaceVertexParamIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex];
 		nFaceListIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex++] / 3;
 
 		nFaceVertexNormalIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex++] / 3;
-		nFaceVertexParamIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex];
+		//nFaceVertexParamIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex];
 		nFaceListIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex++] / 3;
 
 		AddTriangle(cInFaceInfo, nFaceListIndices, nFaceVertexNormalIndices, nFaceVertexParamIndices, nFaceVertexColorIndices, nInVertexParamSize);
-	}
-
-	return nTriangleCount;
-}
-
-UINT _3DfImport::DrawTessFaceDataTriangle(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriangleIndices, A3DUns32 & nTriangleSizeIndex, A3DUns32 & nTriangleStartIndex,
-	TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray)
-{
-	A3DUns32 nTriangleCount = cTessFaceData.m_puiSizesTriangulated[nTriangleSizeIndex++];
-
-	A3DUns32 nFacePointIndex[3];
-	A3DUns32 nFaceNormalIndex[3];
-
-	TessIndexMap maLocalNormalIndexMap;
-
-	for(A3DUns32 nIndex = 0; nIndex < nTriangleCount; ++nIndex)
-	{
-		nFacePointIndex[0] = pnTriangleIndices[nTriangleStartIndex + 1] / 3;
-		nFaceNormalIndex[0] = pnTriangleIndices[nTriangleStartIndex] / 3;
-		nTriangleStartIndex += 2;
-
-		MatchVertexNormal(maLocalNormalIndexMap, nFacePointIndex[0], nFaceNormalIndex[0]);
-
-		nFacePointIndex[1] = pnTriangleIndices[nTriangleStartIndex + 1] / 3;
-		nFaceNormalIndex[1] = pnTriangleIndices[nTriangleStartIndex] / 3;
-		nTriangleStartIndex += 2;
-
-		MatchVertexNormal(maLocalNormalIndexMap, nFacePointIndex[1], nFaceNormalIndex[1]);
-
-		nFacePointIndex[2] = pnTriangleIndices[nTriangleStartIndex + 1] / 3;
-		nFaceNormalIndex[2] = pnTriangleIndices[nTriangleStartIndex] / 3;
-		nTriangleStartIndex += 2;
-
-		MatchVertexNormal(maLocalNormalIndexMap, nFacePointIndex[2], nFaceNormalIndex[2]);
-
-		ConvertFaceList(maPointIndexMap, maNormalIndexMap, nFacePointIndex, nFaceNormalIndex, anFacelistArray, anNormalIndexArray);
 	}
 
 	return nTriangleCount;
@@ -2662,7 +2620,7 @@ UINT _3DfImport::ConvertTessFaceDataTriangleFan(ConvertFaceInfo & cInFaceInfo)
 			nFaceListIndices[1] = cInFaceInfo.pnInIndices[nTriFanIndex++] / 3;
 
 			nFaceVertexNormalIndices[2] = cInFaceInfo.pnInIndices[nTriFanIndex] / 3;
-			nFaceVertexParamIndices[2] = cInFaceInfo.pnInIndices[nTriFanIndex + 1];
+			// nFaceVertexParamIndices[2] = cInFaceInfo.pnInIndices[nTriFanIndex + 1];
 			nFaceListIndices[2] = cInFaceInfo.pnInIndices[nTriFanIndex + 1] / 3;
 
 			AddTriangle(cInFaceInfo, nFaceListIndices, nFaceVertexNormalIndices, nFaceVertexParamIndices, nFaceVertexColorIndices, nInVertexParamSize);
@@ -2678,59 +2636,6 @@ UINT _3DfImport::ConvertTessFaceDataTriangleFan(ConvertFaceInfo & cInFaceInfo)
 	}
 
 	return nTriFanCount;
-}
-
-UINT _3DfImport::DrawTessFaceDataTriangleFan(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
-	TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray)
-{
-	A3DUns32 nFacePointIndex[3];
-	A3DUns32 nFaceNormalIndex[3];
-
-	A3DUns32 nTriangleCount = cTessFaceData.m_puiSizesTriangulated[nTriSizeIndex++];
-	A3DUns32 nTriFaceCount = 0;
-
-	for(A3DUns32 stripe = 0; stripe < nTriangleCount; stripe++)
-	{
-		A3DUns32 nPointCount = cTessFaceData.m_puiSizesTriangulated[nTriSizeIndex++];
-		A3DUns32 nTriStartIndex2 = nTriStartIndex;
-
-		for(A3DUns32 nIndex = 0; nIndex < nPointCount - 1; ++nIndex)
-		{
-			if(!(nIndex % 2) || 1)
-			{
-				nFacePointIndex[0] = pnTriIndices[nTriStartIndex + 1] / 3;
-				nFaceNormalIndex[0] = pnTriIndices[nTriStartIndex] / 3;
-
-				nFacePointIndex[1] = pnTriIndices[nTriStartIndex2 + 1] / 3;
-				nFaceNormalIndex[1] = pnTriIndices[nTriStartIndex2] / 3;
-
-				nTriStartIndex2 += 2;
-
-				nFacePointIndex[2] = pnTriIndices[nTriStartIndex2 + 1] / 3;
-				nFaceNormalIndex[2] = pnTriIndices[nTriStartIndex2] / 3;
-			}
-			else
-			{
-				nFacePointIndex[2] = pnTriIndices[nTriStartIndex + 1] / 3;
-				nFaceNormalIndex[2] = pnTriIndices[nTriStartIndex] / 3;
-
-				nFacePointIndex[1] = pnTriIndices[nTriStartIndex2 + 1] / 3;
-				nFaceNormalIndex[1] = pnTriIndices[nTriStartIndex2] / 3;
-
-				nTriStartIndex2 += 2;
-
-				nFacePointIndex[0] = pnTriIndices[nTriStartIndex2 + 1] / 3;
-				nFaceNormalIndex[0] = pnTriIndices[nTriStartIndex2] / 3;
-			}
-
-			ConvertFaceList(maPointIndexMap, maNormalIndexMap, nFacePointIndex, nFaceNormalIndex, anFacelistArray, anNormalIndexArray);
-			nTriFaceCount++;
-		}
-
-		nTriStartIndex += nPointCount * 2;
-	}
-
-	return nTriFaceCount;
 }
 
 // 8-1-3. Triangle Stripe Data 변환
@@ -2797,8 +2702,6 @@ UINT _3DfImport::ConvertTessFaceDataTriangleStripe(ConvertFaceInfo & cInFaceInfo
 			A3DUns32  nInVertexParamSize = 0; //(tc_size == 0 ? 0 : 2),
 			AddTriangle(cInFaceInfo, nFaceListIndices, nFaceVertexNormalIndices, nFaceVertexParamIndices, nFaceVertexColorIndices, nInVertexParamSize);
 
-			//ConvertFaceList(maPointIndexMap, maNormalIndexMap, nFacelistIndices, nVertexNormalIndices, anFacelistArray, anNormalIndexArray);
-
 			nTriFaceCount++;
 		}
 
@@ -2807,166 +2710,6 @@ UINT _3DfImport::ConvertTessFaceDataTriangleStripe(ConvertFaceInfo & cInFaceInfo
 // 		else
 
 		cInFaceInfo.nOutTriStartIndex += 2 * nPointCount;
-	}
-
-	return nTriFaceCount;
-}
-
-UINT _3DfImport::DrawTessFaceDataTriangleStripe(A3DTessFaceData & cTessFaceData, _3DF::PointArray & acInPoints, _3DF::VectorArray acInNormals, A3DUns32 * pnInIndices,
-	A3DUns32 & nOutTriSizeIndex, A3DUns32 & nOutTriStartIndex, A3DUns32 & nTriColorIndex, IndexHash & mOutIndexMap, TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap,
-	_3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray)
-{
-	int nFaceListIndices[3];			// facelist indices into the "global" point array
-	int nFaceVertexNormalIndices[3];	// vertex normal indices into the "global" normal array
-	int nFaceVertexParamIndices[3];		// vertex parameter indices into the "global" parameter array
-	int nFaceVertexColorIndices[3];		// vertex color indices into the RGBA color array
-
-	// HPoint face4[3];
-
-	A3DUns32 nStripesCount = cTessFaceData.m_puiSizesTriangulated[nOutTriSizeIndex++];
-	A3DUns32 nTriFaceCount = 0;
-
-	bool hasVertexColor = false; // INT2bool(cTessFaceData.m_uiRGBAVerticesSize);
-	if(0 < cTessFaceData.m_uiRGBAVerticesSize) {
-		hasVertexColor = true;
-	}
-
-	//for(A3DUns32 nStripeIndex = 0; nStripeIndex < nStripesCount; nStripeIndex++)
-	for(A3DUns32 nStripeIndex = 0; nStripeIndex < 4; nStripeIndex++)
-	{
-		A3DUns32 nTsPoints = cTessFaceData.m_puiSizesTriangulated[nOutTriSizeIndex];
-		if(0 == nTsPoints) {
-			nOutTriSizeIndex++;
-			continue;
-		}
-
-		int nColorIndex = nTriColorIndex;
-		int nTriStripIndex = nOutTriStartIndex;
-
-		bool bSingleNormalFlag = false;								// flag indicating if there are uniform vertex normals per tri-nStripIndex
-
-		// determine if we have a normal per vertex or just one per triangle nStripIndex
-		if(cTessFaceData.m_usUsedEntitiesFlags & kA3DTessFaceDataTriangleStripeOneNormal
-			|| cTessFaceData.m_usUsedEntitiesFlags & kA3DTessFaceDataTriangleStripeOneNormalTextured)
-		{
-			if(cTessFaceData.m_puiSizesTriangulated[nOutTriSizeIndex] & kA3DTessFaceDataNormalSingle)
-			{
-				bSingleNormalFlag = true;
-			}
-		}
-
-		nOutTriSizeIndex++;
-
-		if(true == bSingleNormalFlag) {
-			nTriStripIndex++;
-		}
-
-		for(A3DUns32 tri = 0; tri < nTsPoints - 2; tri++)
-		{
-			if((tri % 2) == 0)
-			{
-				nFaceVertexNormalIndices[0] = pnInIndices[nTriStripIndex++] / 3;
-				//nVertexNormalIndices[0] = pnInIndices[(bSingleNormalFlag ? nOutTriStartIndex : nTriStripIndex++)] / 3;
-				nFaceListIndices[0] = pnInIndices[nTriStripIndex++] / 3;
-
-				nFaceVertexNormalIndices[1] = pnInIndices[nTriStripIndex] / 3;
-				//nVertexNormalIndices[1] = pnInIndices[(bSingleNormalFlag ? nOutTriStartIndex : nTriStripIndex + 0)] / 3;
-				nFaceListIndices[1] = pnInIndices[nTriStripIndex + 1] / 3;
-				//nFacelistIndices[1] = pnInIndices[nTriStripIndex + (bSingleNormalFlag ? 0 : 1) + tc_size] / 3;
-
-				nFaceVertexNormalIndices[2] = pnInIndices[nTriStripIndex + 2] / 3;
-				//nVertexNormalIndices[2] = pnInIndices[(bSingleNormalFlag ? nOutTriStartIndex : nTriStripIndex + 2 + tc_size)] / 3;
-				nFaceListIndices[2] = pnInIndices[nTriStripIndex + 3] / 3;
-				//nFacelistIndices[2] = pnInIndices[nTriStripIndex + (bSingleNormalFlag ? 1 : 3) + 2 * tc_size] / 3;
-			}
-			else
-			{
-				nFaceVertexNormalIndices[0] = pnInIndices[(bSingleNormalFlag ? nOutTriStartIndex : nTriStripIndex + 4)] / 3;
-				nFaceListIndices[0] = pnInIndices[nTriStripIndex + (bSingleNormalFlag ? 2 : 5)] / 3;
-
-				nFaceVertexNormalIndices[1] = pnInIndices[(bSingleNormalFlag ? nOutTriStartIndex : nTriStripIndex + 2)] / 3;
-				nFaceListIndices[1] = pnInIndices[nTriStripIndex + (bSingleNormalFlag ? 1 : 3)] / 3;
-
-				nFaceVertexNormalIndices[2] = pnInIndices[(bSingleNormalFlag ? nOutTriStartIndex : nTriStripIndex++)] / 3;
-				nFaceListIndices[2] = pnInIndices[nTriStripIndex++] / 3;
-			}
-/*
-			if(!(tri % 2))
-			{
-				nVertexNormalIndices[0] = pnInIndices[nTriStripIndex] / 3;
-				nFacelistIndices[0] = pnInIndices[nTriStripIndex + 1] / 3;
-				nTriStripIndex += 2;
-
-				nVertexNormalIndices[1] = pnInIndices[nTriStripIndex] / 3;
-				nFacelistIndices[1] = pnInIndices[nTriStripIndex + 1] / 3;
-				nTriStripIndex += 2;
-
-				nVertexNormalIndices[2] = pnInIndices[nTriStripIndex] / 3;
-				nFacelistIndices[2] = pnInIndices[nTriStripIndex + 1] / 3;
-				nTriStripIndex -= 2;
-
-				if(hasVertexColor) {
-					//AddVertexColor(face4, cTessFaceData.m_pucRGBAVertices, nColorIndex, false, true)
-				}
-			}
-			else
-			{
-				nFacelistIndices[2] = pnInIndices[nTriStripIndex + 1] / 3;
-				nVertexNormalIndices[2] = pnInIndices[nTriStripIndex] / 3;
-				nTriStripIndex += 2;
-
-				nFacelistIndices[1] = pnInIndices[nTriStripIndex + 1] / 3;
-				nVertexNormalIndices[1] = pnInIndices[nTriStripIndex] / 3;
-				nTriStripIndex += 2;
-
-				nFacelistIndices[0] = pnInIndices[nTriStripIndex + 1] / 3;
-				nVertexNormalIndices[0] = pnInIndices[nTriStripIndex] / 3;
-				nTriStripIndex -= 2;
-
-				if(hasVertexColor) {
-					//AddVertexColor(face4, cTessFaceData.m_pucRGBAVertices, nColorIndex, true, true);
-				}
-			}*/
-
-/*
-			// m_VColors가 nullptr 인 경우가 있다 -_-;
-			if(hasVertexColor && cCreatedShell.m_VColors) {
-				cCreatedShell.AddNextFaceWithDistinctNormalsAndColor(pcPoints, pcNormals, nFacePointIndex, nFaceNormalIndex, face4, 3);
-			}
-			else {
-				cCreatedShell.AddNextFaceWithDistinctNormals(pcPoints, pcNormals, nFacePointIndex, nFaceNormalIndex, 3);
-			}
-*/
-
-			FloatArray cInGParams;
-			RGBAColorArray acInColors;
-			A3DUns32  nInVertexParamSize = 0; //(tc_size == 0 ? 0 : 2),
-			IntArray anIntVertexRefsArray;
-
-// 			AddTriangle(acInPoints, acInNormals, cInGParams, acInColors, nFaceListIndices, nFaceVertexNormalIndices, nFaceVertexParamIndices, nFaceVertexColorIndices,
-// 				nInVertexParamSize, m_fNormalAngleCosine, mOutIndexMap, anIntVertexRefsArray);
-
-
-/*
-				_3DF::PointArray & acOutFacePoints,		// points for the shell (representing a CAD face) to which we are adding this triangle
-				_3DF::IntArray & anOutFaceList,			// facelist for shell (representing a CAD face) to which we are adding this triangle
-				_3DF::VectorArray & acOutFaceVertexNormals,		// vertex normals for the shell (representing a CAD face) to which we are adding this triangle
-				_3DF::FloatArray & afOutFaceVertexParams,		// optional vertex parameters for the shell (representing a CAD face) to which we are adding this triangle
-				_3DF::RGBAColorArray & acOutFaceVertexColors)		// optional RGBA vertex colors for the shell (representing a CAD face) to which we are adding this triangle
-*/
-
-			//ConvertFaceList(maPointIndexMap, maNormalIndexMap, nFacelistIndices, nVertexNormalIndices, anFacelistArray, anNormalIndexArray);
-
-			nTriFaceCount++;
-		}
-
-		if(bSingleNormalFlag)
-			nOutTriStartIndex += (1) * nTsPoints + 1;
-		else
-			nOutTriStartIndex += (2) * nTsPoints;
-
-// 		nOutTriStartIndex += nTsPoints * 2;
-// 		nTriColorIndex += nTsPoints * 3;
 	}
 
 	return nTriFaceCount;
@@ -3005,39 +2748,6 @@ UINT _3DfImport::ConvertTessFaceDataTriangleOneNormal(ConvertFaceInfo & cInFaceI
 	}
 
 	return nTriangleCount;
-}
-
-UINT _3DfImport::DrawTessFaceDataTriangleOneNormal(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
-	TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray)
-{
-	A3DUns32 nFacePointIndex[3];
-	A3DUns32 nFaceNormalIndex[3];
-
-	A3DUns32 nTriCount = cTessFaceData.m_puiSizesTriangulated[nTriSizeIndex++];
-	//if (numtriangles>1)
-	//	numtriangles = numtriangles;
-
-	for(A3DUns32 i = 0; i < nTriCount; ++i)
-	{
-		int nStartIndex = nTriStartIndex;
-		++nTriStartIndex;
-		nFacePointIndex[0] = pnTriIndices[nTriStartIndex] / 3;
-		nFaceNormalIndex[0] = pnTriIndices[nStartIndex] / 3;
-
-		++nTriStartIndex;
-		nFacePointIndex[1] = pnTriIndices[nTriStartIndex] / 3;
-		nFaceNormalIndex[1] = pnTriIndices[nStartIndex] / 3;
-
-		++nTriStartIndex;
-		nFacePointIndex[2] = pnTriIndices[nTriStartIndex] / 3;
-		nFaceNormalIndex[2] = pnTriIndices[nStartIndex] / 3;
-
-		++nTriStartIndex;
-
-		ConvertFaceList(maPointIndexMap, maNormalIndexMap, nFacePointIndex, nFaceNormalIndex, anFacelistArray, anNormalIndexArray);
-	}
-
-	return nTriCount;
 }
 
 // 8-1-5. Triangle Fan One Normal Data 변환
@@ -4372,8 +4082,8 @@ A3DStatus _3DfImport::GetMaterialMapping(const A3DMiscCascadedAttributesData & c
 			if(true == bTransparencyDefined) { cSpecularColor.alpha = fTransparency; }
 			cMaterialKit.SetColor(cSpecularColor, _3DF::Material::Color::Type::Specular);
 
-// 			nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
-// 			nRetStatus = A3DGlobalGetGraphMaterialData(A3D_DEFAULT_MATERIAL_INDEX, &sMaterialData);
+ 			nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
+ 			nRetStatus = A3DGlobalGetGraphMaterialData(A3D_DEFAULT_MATERIAL_INDEX, &sMaterialData);
 			cMaterialKit.SetGloss(sMaterialData.m_dShininess);
 		}
 	}
@@ -4392,7 +4102,7 @@ A3DStatus _3DfImport::GetMaterialMapping(const A3DMiscCascadedAttributesData & c
 
 			//Log(2, L"DrawStyle: R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
 
-			//A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
+			A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 		}
 	}
 
@@ -4854,7 +4564,7 @@ A3DStatus _3DfImport::IsShow(const A3DRootBaseWithGraphics * pGraphics)
 // 5. 주어진 Material Mapping을 이용해서 
 bool _3DfImport::SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, _3DF::MaterialMappingKit const & cInKit, _3DF::SegmentKey & cSegment)
 {
-	_3DF::SegmentKey cStyleSegment = m_pcModelSegment->StylesInclude().Subsegment(L"face_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
+	_3DF::SegmentKey cStyleSegment = m_pcModelSegment->StylesInclude().Subsegment(L"face_mat_%d_%d", cAttrData.m_sStyle.m_uiRgbColorIndex, cAttrData.m_sStyle.m_ucTransparency);
 	cStyleSegment.SetMaterialMapping(L"faces", cInKit);
 
 	_3DF::StyleControl cStyleControl = cSegment.GetStyleControl();
@@ -4864,7 +4574,9 @@ bool _3DfImport::SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cA
 // 		return false;
 // 	}
 
-	m_mFaceMaterialMappingStyleMap.insert(std::make_pair(cAttrData.m_sStyle.m_uiRgbColorIndex, cStyleSegment));
+	CString strStyleText;
+	strStyleText.Format(L"%d_%d", cAttrData.m_sStyle.m_uiRgbColorIndex, cAttrData.m_sStyle.m_ucTransparency);
+	m_mFaceMaterialMappingStyleMap.SetAt(strStyleText, cStyleSegment);
 
 	return true;
 }
@@ -4919,15 +4631,14 @@ bool _3DfImport::SetStyle(_3DF::SegmentKey & cSegment, _3DF::SegmentKey & cStyle
 // 6. 미리 저장되어 있는 Material Mapping Kit을 찾아오는 함수
 bool _3DfImport::FindFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, SegmentKey & cOutStyleSegment)
 {
-	auto pcIterator = m_mFaceMaterialMappingStyleMap.find(cAttrData.m_sStyle.m_uiRgbColorIndex);
+	CString strStyleText;
+	strStyleText.Format(L"%d_%d", cAttrData.m_sStyle.m_uiRgbColorIndex, cAttrData.m_sStyle.m_ucTransparency);
 
-	if(pcIterator == m_mFaceMaterialMappingStyleMap.end()) {
-		return false;
+	if (true == m_mFaceMaterialMappingStyleMap.Lookup(strStyleText, cOutStyleSegment)) {
+		return true;
 	}
 
-	cOutStyleSegment = pcIterator->second;
-
-	return true;
+	return false;
 }
 
 bool _3DfImport::FindLineMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, SegmentKey & cOutStyleSegment)

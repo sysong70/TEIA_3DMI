@@ -105,7 +105,12 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	//cModelSegmentKey.ForcedOpen();
 
-	//pcHoopsView->SetSuppressUpdate(true);
+	Signal::Delivery delivery;
+	delivery.ViewId = nViewId;
+	delivery.SetSender(Wrapper().m_pc3dfInterface->GetSignalCallback());
+	delivery.mainFrame.ShowProgress();
+
+	pcHoopsView->SetSuppressUpdate(true);
 
 	DLL::_3DF::Interface cInterfaace;
 	cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, strErrorMessage);
@@ -113,17 +118,18 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 	//cModelSegmentKey.ForcedClose();
 
 	// #3DF_Debug: Z://Test.hsf
+#ifdef _DEBUG
  	SaveHsfFile(L"Z://Test.hsf", pcHoopsView);
+#endif
 
-	//pcHoopsView->SetSuppressUpdate(false);
+	pcHoopsView->SetSuppressUpdate(false);
 
 	//pcHoopsView->SetSmoothTransition(true);
 	pcHoopsView->ZoomToExtents();
 	pcHoopsView->ForceUpdate();
 
-	Signal::Delivery delivery;
-	delivery.ViewId = nViewId;
-	delivery.SetSender(Wrapper().m_pc3dfInterface->GetSignalCallback());
+	delivery.mainFrame.HideProgress();
+
 	delivery.view.SetValidation();
 }
 
