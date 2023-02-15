@@ -33,6 +33,74 @@ namespace PresetApplication
 
 		return appPath.Left(nPos);
 	}
+
+	//:REF - C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\atlmfc\src\mfc\doctempl.cpp
+
+	class DocTemplate3d : public CMultiDocTemplate
+	{
+	public:
+
+		DocTemplate3d()
+			: CMultiDocTemplate(IDR_DMITYPE_3D, RUNTIME_CLASS(Window::Document), RUNTIME_CLASS(Window::ChildFrame), RUNTIME_CLASS(Window::View3d)) {}
+
+		Confidence MatchDocType(LPCTSTR lpszPathName, CDocument*& rpDocMatch) override
+		{
+			ASSERT(lpszPathName != NULL);
+			rpDocMatch = NULL;
+
+			// go through all documents
+			POSITION pos = GetFirstDocPosition();
+			while (pos != NULL) {
+				CDocument* pDoc = GetNextDoc(pos);
+				if (pDoc->GetPathName() == lpszPathName) {
+					// already open
+					rpDocMatch = pDoc;
+					return yesAlreadyOpen;
+				}
+			}
+
+			if (Window::IsAllowed3d(lpszPathName)) {
+				return yesAttemptNative; // extension matches, looks like ours
+			}
+
+			// otherwise we will guess it may work
+			return yesAttemptForeign;
+		}
+	};
+
+
+
+	class DocTemplate2d : public CMultiDocTemplate
+	{
+	public:
+
+		DocTemplate2d()
+			: CMultiDocTemplate(IDR_DMITYPE_2D, RUNTIME_CLASS(Window::Document), RUNTIME_CLASS(Window::ChildFrame), RUNTIME_CLASS(Window::View2d)) {}
+
+		Confidence MatchDocType(LPCTSTR lpszPathName, CDocument*& rpDocMatch) override
+		{
+			ASSERT(lpszPathName != NULL);
+			rpDocMatch = NULL;
+
+			// go through all documents
+			POSITION pos = GetFirstDocPosition();
+			while (pos != NULL) {
+				CDocument* pDoc = GetNextDoc(pos);
+				if (pDoc->GetPathName() == lpszPathName) {
+					// already open
+					rpDocMatch = pDoc;
+					return yesAlreadyOpen;
+				}
+			}
+
+			if (Window::IsAllowed2d(lpszPathName)) {
+				return yesAttemptNative; // extension matches, looks like ours
+			}
+
+			// otherwise we will guess it may work
+			return yesAttemptForeign;
+		}
+	};
 }
 
 
@@ -114,7 +182,8 @@ Window::View* Window::Application::FindView(int id)
 		while (docPos != nullptr) {
 			Document* pDocument = DYNAMIC_DOWNCAST(Document, pDocTemplate->GetNextDoc(docPos));
 			if (pDocument != nullptr) {
-				View* pView = DYNAMIC_DOWNCAST(View, pDocument->GetView());
+				//View* pView = DYNAMIC_DOWNCAST(View, pDocument->GetView());
+				View* pView = (View*)pDocument->GetView();
 				if (pView != nullptr && pView->GetId() == id) {
 					return pView;
 				}
@@ -191,24 +260,15 @@ BOOL Window::Application::InitInstance()
 
 	CMultiDocTemplate* pDocTemplate;
 
-	pDocTemplate = new CMultiDocTemplate(IDR_DMITYPE_3D,
-		RUNTIME_CLASS(Document),
-		RUNTIME_CLASS(ChildFrame), // custom MDI child frame
-		RUNTIME_CLASS(View3d));
-	if (pDocTemplate == nullptr) {
+	if ((pDocTemplate = new PRESET::DocTemplate3d()) == nullptr) {
 		RETURN_FALSE;
 	}
 	AddDocTemplate(pDocTemplate);
 
-	DEBUG_STOP;
-	//pDocTemplate = new CMultiDocTemplate(IDR_DMITYPE_2D,
-	//	RUNTIME_CLASS(Document),
-	//	RUNTIME_CLASS(ChildFrame), // custom MDI child frame
-	//	RUNTIME_CLASS(View2d));
-	//if (pDocTemplate == nullptr) {
-	//	RETURN_FALSE;
-	//}
-	//AddDocTemplate(pDocTemplate);
+	if ((pDocTemplate = new PRESET::DocTemplate2d()) == nullptr) {
+		RETURN_FALSE;
+	}
+	AddDocTemplate(pDocTemplate);
 
 	MainFrame* pMainFrame = new MainFrame;
 	if (pMainFrame->LoadFrame(IDR_MAINFRAME) == FALSE) {

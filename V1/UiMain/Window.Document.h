@@ -6,44 +6,11 @@
 
 namespace Window
 {
-	enum class EDocType
-	{
-		Unknown = -1,
-
-		ACIS,
-		CATIA4,
-		CATIA5,
-		CGR,
-		IDEAS,
-		IFC,
-		IGES,
-		Inventor,
-		JT,
-		Parasolid,
-		PDF,
-		PRC,
-		ProEngineer,
-		Rhino,
-		SolidEdge,
-		Solidworks,
-		STEP,
-		STL,
-		Universal3D,
-		Unigraphics,
-		VDAFS,
-		VRML,
-		DWG3D,
-		DWG2D,
-		DXF,
-		Revit,
-		HPGL,
-	};
-
 	bool IsAllowedFile(const wchar_t* pFilePath);
 
+	bool IsAllowed3d(const wchar_t* pFilePath);
 
-
-	CString GetDocTypeName(EDocType e);
+	bool IsAllowed2d(const wchar_t* pFilePath);
 
 
 
@@ -68,8 +35,6 @@ namespace Window
 
 		EType GetCateogry();
 
-		CString GetFilePath();
-
 		View* GetView();
 
 	public:
@@ -91,9 +56,5 @@ namespace Window
 	#endif
 
 		DECLARE_MESSAGE_MAP()
-
-	protected:
-
-		CString m_sFilePath;
 	};
 }

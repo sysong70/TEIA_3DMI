@@ -356,9 +356,6 @@ bool Renderer::CreateDevice(bool recreate, bool zoomExtents)
 	// Set the window handle for this GsDevice
 	pProperties->putAt("WindowHWND", OdRxVariantValue((OdIntPtr)m_hWnd));
 
-	// Define a device coordinate rectangle equal to the client rectangle
-	OdGsDCRect gsRect(rc.left, rc.right, rc.bottom, rc.top);
-
 	// Set the device background color and palette
 	m_pDevice->setBackgroundColor(m_clrBackground);
 	m_pDevice->setLogicalPalette(CurrentPalette(), 256);

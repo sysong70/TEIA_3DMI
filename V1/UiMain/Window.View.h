@@ -40,13 +40,13 @@ namespace Window
 
 		int GetId();
 
-		virtual void ReceiveSignal(Json::Object* pData);
+		virtual void ReceiveSignal(Json::Object* pData) {}
 
 	protected:
 
 		void OnActivateView(BOOL bActivate, CView* pActivateView, CView* pDeactiveView) override;
 
-		void OnDraw(CDC* pDC) override;
+		void OnDraw(CDC* pDC) override {}
 
 		void OnInitialUpdate() override;
 
@@ -61,8 +61,6 @@ namespace Window
 		afx_msg LRESULT OnSignal(WPARAM wp, LPARAM lp);
 
 		afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
-
-		afx_msg void OnCommand(UINT id);
 
 		afx_msg void OnContextMenu(CWnd*, CPoint point);
 

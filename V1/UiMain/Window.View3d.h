@@ -24,6 +24,8 @@ namespace Window
 
 	protected:
 
+		afx_msg void OnCommand(UINT id);
+
 		afx_msg BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint point);
 
 		DECLARE_MESSAGE_MAP()

@@ -43,7 +43,22 @@ using namespace Window;
 IMPLEMENT_DYNCREATE(View3d, View)
 
 BEGIN_MESSAGE_MAP(View3d, View)
+	ON_WM_ACTIVATE()
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONUP()
+	ON_WM_MBUTTONDOWN()
+	ON_WM_MBUTTONUP()
+	ON_WM_MOUSEACTIVATE()
+	ON_WM_MOUSEMOVE()
 	ON_WM_MOUSEWHEEL()
+	ON_WM_PAINT()
+	ON_WM_RBUTTONDOWN()
+	ON_WM_RBUTTONUP()
+	ON_WM_SIZE()
+	ON_WM_TIMER()
+
+	ON_COMMAND_RANGE(COMMAND_START, COMMAND_END, OnCommand)
+	ON_MESSAGE((UINT)EUserMessage::OnSignal, OnSignal)
 END_MESSAGE_MAP()
 
 
@@ -97,6 +112,67 @@ void Window::View3d::ReceiveSignal(Json::Object* pData)
 
 	REMOVE_POINTER(pData);
 }
+
+
+
+void Window::View3d::OnCommand(UINT id)
+{
+	// global post process
+
+	switch (id) {
+	case FILE_3D_CMD_New:
+	case FILE_3D_CMD_Open:
+	case FILE_3D_CMD_Preference:
+	case HOME_3D_CMD_Window_Cascade:
+	case HOME_3D_CMD_Window_TileHorizontal:
+	case HOME_3D_CMD_Window_TileVertical:
+		GetMainFrame().OnCommand(id);
+		return;
+
+	case HOME_3D_CMD_Panels_Model:
+	case HOME_3D_CMD_Panels_View:
+	case HOME_3D_CMD_Panels_Layer:
+	case HOME_3D_CMD_Panels_Scene:
+		m_tabs.SetActiveTab(id - HOME_3D_PNL_Panels - 1);
+		GetMainFrame().ShowPanelBar();
+		return;
+
+	default:
+		if (m_bRenderer == false) {
+			return;
+		}
+	}
+
+	int pId = CBCGPRibbonPaletteButton::GetLastSelectedItem(id);
+	id += (pId >= 0 ? pId : 0);
+	m_historyBar.PushButton(id);
+
+	Facility::CommandIndexer::Command& data = TheCommandIndexer.Get(id);
+
+	if (data.Local) {
+		//switch (id) {
+		//default:
+		//	break;
+		//}
+	}
+	else {
+		switch (data.Type) {
+		case Facility::CommandIndexer::ListItem:
+		case Facility::CommandIndexer::Check: //:TEMP
+			m_delivery.view.OnCommand(id + pId);
+			break;
+
+		case Facility::CommandIndexer::Unknown:
+			DEBUG_STOP;
+			break;
+
+		default:
+			m_delivery.view.OnCommand(id);
+			break;
+		}
+	}
+}
+
 
 
 BOOL Window::View3d::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)

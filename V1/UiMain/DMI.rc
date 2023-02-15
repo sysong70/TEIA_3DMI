@@ -245,11 +245,19 @@ END
 
 #pragma region String Table
 
+// windowTitle
+// docName
+// fileNewName
+// filterName
+// filterExt
+// regFileTypeId
+// regFileTypeName
+
 STRINGTABLE
 BEGIN
     IDR_MAINFRAME           "DMI"
-    IDR_DMITYPE_3D          "\nDMI 3D\nDMI3D\n\n\nDMI.Document\nDMI.Document"
-    IDR_DMITYPE_2D          "\nDMI 2D\nDMI2D\nAutoCAD Files\n.dwg;.dxf\nDMI.Document\nDMI.Document"
+    IDR_DMITYPE_3D          "\nDMI 3D\nDMI3D\n3D Models\n\nDMI.Document\nDMI.Document"
+    IDR_DMITYPE_2D          "\nDMI 2D\nDMI2D\n2D Drawings\n\nDMI.Document\nDMI.Document"
 END
 
 STRINGTABLE

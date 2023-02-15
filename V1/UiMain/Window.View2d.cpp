@@ -37,7 +37,22 @@ using namespace Window;
 IMPLEMENT_DYNCREATE(View2d, CView)
 
 BEGIN_MESSAGE_MAP(View2d, CView)
+	ON_WM_ACTIVATE()
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONUP()
+	ON_WM_MBUTTONDOWN()
+	ON_WM_MBUTTONUP()
+	ON_WM_MOUSEACTIVATE()
+	ON_WM_MOUSEMOVE()
 	ON_WM_MOUSEWHEEL()
+	ON_WM_PAINT()
+	ON_WM_RBUTTONDOWN()
+	ON_WM_RBUTTONUP()
+	ON_WM_SIZE()
+	ON_WM_TIMER()
+
+	ON_COMMAND_RANGE(COMMAND_START, COMMAND_END, OnCommand)
+	ON_MESSAGE((UINT)EUserMessage::OnSignal, OnSignal)
 END_MESSAGE_MAP()
 
 
@@ -47,8 +62,8 @@ Window::View2d::View2d()
 {
 	m_eType = EType::View2d;
 
-	m_delivery.ViewId = m_nViewId;
 	m_delivery.SetSender(Connector2d::GetSender());
+	m_delivery.ViewId = m_nViewId;
 	m_delivery.view.OnConstruct();
 }
 
@@ -91,6 +106,27 @@ void Window::View2d::ReceiveSignal(Json::Object* pData)
 	}
 
 	REMOVE_POINTER(pData);
+}
+
+
+
+void Window::View2d::OnCommand(UINT id)
+{
+	// global post process
+
+	switch (id) {
+	case FILE_3D_CMD_New:
+	case FILE_3D_CMD_Open:
+	case FILE_3D_CMD_Preference:
+	case HOME_3D_CMD_Window_Cascade:
+	case HOME_3D_CMD_Window_TileHorizontal:
+	case HOME_3D_CMD_Window_TileVertical:
+		GetMainFrame().OnCommand(id);
+		return;
+
+	default:
+		DEBUG_RETURN;
+	}
 }
 
 

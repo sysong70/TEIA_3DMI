@@ -15,90 +15,91 @@ static char THIS_FILE[] = __FILE__;
 
 bool Window::IsAllowedFile(const wchar_t* pFilePath)
 {
+	return IsAllowed3d(pFilePath) || IsAllowed2d(pFilePath);
+}
+
+
+
+bool Window::IsAllowed3d(const wchar_t* pFilePath)
+{
+	//:REF - https://docs.techsoft3d.com/exchange/latest/start/supported-formats.html
+
+	//:WARNING - check formats
+
+	const CString EXTENSIONS[] = {
+		L"3MF", // 3MF
+		L"SAT", L"SAB", // ACIS
+		L"3DS", // Autodesk 3DS
+		L"IPT", L"IAM", // Autodesk Inventor
+		L"NWD", // Autodesk Navisworks
+		L"MODEL", L"SESSION", L"DLV", L"EXP", // Catia V4
+		L"CATPART", L"CATPRODUCT", L"CATSHAPE", L"CGR", // Catia V5
+		L"3DXML", // Catia V6 / 3DExperience
+		L"DAE", // COLLADA
+		L"ASM", L"NEU", L"PRT", L"XAS", L"XPR", // Creo - Pro/E
+		L"FBX", // FBX
+		L"GLTF", L"GLB", // GL Transmission Format
+		L"MF1", L"ARC", L"UNV", L"PKG", // I-deas
+		L"IFC", L"IFCZIP", // IFC
+		L"IGS", L"IGES", // IGES
+		L"JT", // JT
+		L"DGN", // Microstation DGN
+		L"PRT", // NX - Unigraphics
+		L"X_B", L"X_T", L"XMT", L"XMT_TXT", // Parasolid
+		//L"PDF", // PDF
+		L"PRC", // PRC
+		L"RVT, RFA", // Revit
+		L"3DM", // Rhino3D
+		L"ASM", L"PAR", L"PWD", L"PSM", // Solid Edge
+		L"SLDASM", L"SLDPRT", // SolidWorks
+		L"STP", L"STEP", L"STPZ", // STEP
+		L"STPX", L"STPXZ", // STEP/XML
+		L"STL", // Stereo Lithography (STL)
+		L"U3D", // U3D
+		L"VDA", // VDA-FS
+		L"WRL", L"VRML", // VRML
+		L"OBJ", // Wavefront OBJ
+	};
+
 	CString ext = Path::GetExtension(pFilePath);
-	ext.MakeLower();
+	ext.MakeUpper();
 
-	if (ext == L"3dxml") return true;
-	if (ext == L"3ds") return true;
-	if (ext == L"3mf") return true;
-	if (ext == L"sat" || ext == L"sab") return true;
-	if (ext == L"obj") return true;
-	if (ext == L"dwg" || ext == L"dxf") return true;
-	if (ext == L"model" || ext == L"exp" || ext == L"session" || ext == L"dlv") return true;
-	if (ext == L"catdrawing") return true;
-	if (ext == L"catpart") return true;
-	if (ext == L"catproduct") return true;
-	if (ext == L"catshape") return true;
-	if (ext == L"cgr") return true;
-	if (ext == L"dae") return true;
-	if (ext == L"skp") return true;
-	if (ext == L"hsf") return true;
-	if (ext == L"mf1" || ext == L"arc" || ext == L"unv" || ext == L"pkg") return true;
-	if (ext == L"igs" || ext == L"iges") return true;
-	if (ext == L"ifc" || ext == L"ifczip") return true;
-	if (ext == L"ipt" || ext == L"iam") return true;
-	if (ext == L"jt") return true;
-	if (ext == L"nwd") return true;
-	if (ext == L"x_t" || ext == L"x_b" || ext == L"xmt" || ext == L"xmt_txt") return true;
-	if (ext == L"pdf") return true;
-	if (ext == L"ply") return true;
-	if (ext == L"pts" || ext == L"ptx" || ext == L"xyz") return true;
-	if (ext == L"prc") return true;
-	if (ext == L"asm" || ext == L"neu" || ext == L"prt" || ext == L"xas" || ext == L"xpr") return true;
-	if (ext == L"rvt" || ext == L"rfa") return true;
-	if (ext == L"3dm") return true;
-	if (ext == L"asm" || ext == L"par" || ext == L"pwd" || ext == L"psm") return true;
-	if (ext == L"sldasm" || ext == L"sldprt") return true;
-	if (ext == L"step" || ext == L"stp" || ext == L"stpz" || ext == L"z") return true;
-	if (ext == L"stl") return true;
-	if (ext == L"u3d") return true;
-	if (ext == L"prt") return true;
-	if (ext == L"vda") return true;
-	if (ext == L"wrl" || ext == L"vrml") return true;
+	for (auto pre : EXTENSIONS) {
+		if (pre == ext) {
+			return true;
+		}
+	}
 
-	if (WStr::IsDigit(ext)) return true;
+	//:WARNING - Creo - Pro/E (case *.1)
+	if (WStr::IsDigit(ext)) {
+		return true;
+	}
 
 	return false;
 }
 
 
 
-CString Window::GetDocTypeName(EDocType e)
+bool Window::IsAllowed2d(const wchar_t* pFilePath)
 {
-	switch (e) {
-	case EDocType::ACIS:        return L"ACIS";
-	case EDocType::CATIA4:      return L"CATIA4";
-	case EDocType::CATIA5:      return L"CATIA5";
-	case EDocType::CGR:         return L"CGR";
-	case EDocType::IDEAS:       return L"IDEAS";
-	case EDocType::IFC:         return L"IFC";
-	case EDocType::IGES:        return L"IGES";
-	case EDocType::Inventor:    return L"Inventor";
-	case EDocType::JT:          return L"JT";
-	case EDocType::Parasolid:   return L"Parasolid";
-	case EDocType::PDF:         return L"PDF";
-	case EDocType::PRC:         return L"PRC";
-	case EDocType::ProEngineer: return L"ProEngineer";
-	case EDocType::Rhino:       return L"Rhino";
-	case EDocType::SolidEdge:   return L"SolidEdge";
-	case EDocType::Solidworks:  return L"Solidworks";
-	case EDocType::STEP:        return L"STEP";
-	case EDocType::STL:         return L"STL";
-	case EDocType::Universal3D: return L"Universal3D";
-	case EDocType::Unigraphics: return L"Unigraphics";
-	case EDocType::VDAFS:       return L"VDAFS";
-	case EDocType::VRML:        return L"VRML";
-	case EDocType::DWG3D:       return L"DWG3D";
-	case EDocType::DWG2D:       return L"DWG2D";
-	case EDocType::DXF:         return L"DXF";
-	case EDocType::Revit:       return L"Revit";
-	case EDocType::HPGL:        return L"HPGL";
+	const CString EXTENSIONS[] = {
+		L"DWG", L"DXF" // AutoCAD
+		//L"DWF", L"DWFX", // Autodesk DWF
+		//L"CATDRAWING",
+	};
 
-	default:
-		DEBUG_STOP;
-		return L"Unknown";
+	CString ext = Path::GetExtension(pFilePath);
+	ext.MakeUpper();
+
+	for (auto pre : EXTENSIONS) {
+		if (pre == ext) {
+			return true;
+		}
 	}
+
+	return false;
 }
+
 
 
 using namespace Window;
@@ -124,12 +125,14 @@ Window::Document::~Document()
 
 Window::Document::EType Window::Document::GetCateogry()
 {
+	CString filePath = GetPathName();
+
 	//:WARNING - new document
-	if (m_sFilePath.IsEmpty()) {
+	if (filePath.IsEmpty()) {
 		return EType::Doc3d;
 	}
 
-	CString ext = Path::GetExtension(m_sFilePath);
+	CString ext = Path::GetExtension(filePath);
 	ext.MakeLower();
 
 	if (ext == "dwg" || ext == "dxf") {
@@ -142,18 +145,12 @@ Window::Document::EType Window::Document::GetCateogry()
 
 
 
-CString Window::Document::GetFilePath()
-{
-	return m_sFilePath;
-}
-
-
-
 Window::View* Window::Document::GetView()
 {
 	POSITION pos = GetFirstViewPosition();
 	if (pos != nullptr) {
-		View* pView = DYNAMIC_DOWNCAST(View, GetNextView(pos));
+		//View* pView = DYNAMIC_DOWNCAST(View, GetNextView(pos));
+		View* pView = (View*)GetNextView(pos);
 		if (pView != nullptr) {
 			return pView;
 		}
@@ -184,8 +181,6 @@ BOOL Window::Document::OnNewDocument()
 
 BOOL Window::Document::OnOpenDocument(LPCTSTR lpszPathName)
 {
-	m_sFilePath = lpszPathName;
-
 	return TRUE;
 }
 
