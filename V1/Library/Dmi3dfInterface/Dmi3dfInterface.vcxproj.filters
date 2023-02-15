@@ -34,14 +34,14 @@
     <Filter Include="3DF\Control">
       <UniqueIdentifier>{39a8d4b3-e1e2-4397-9863-2ab00624e3bc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Import">
-      <UniqueIdentifier>{24a38bfd-32e2-42dc-b512-c2de10707db1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="3DF\Key">
       <UniqueIdentifier>{ed679bfd-af3e-4c5c-b119-7f7ea9e0e627}</UniqueIdentifier>
     </Filter>
     <Filter Include="3DF\Entity">
       <UniqueIdentifier>{f1662886-5b26-443f-9b56-3e38f64383d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DLL">
+      <UniqueIdentifier>{24a38bfd-32e2-42dc-b512-c2de10707db1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -94,16 +94,16 @@
       <Filter>3DF\Control</Filter>
     </ClInclude>
     <ClInclude Include="Import\DLL.Helper.h">
-      <Filter>Import</Filter>
+      <Filter>DLL</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.h">
       <Filter>3DF</Filter>
     </ClInclude>
     <ClInclude Include="Import\DLL.3DF.Interface.h">
-      <Filter>Import</Filter>
+      <Filter>DLL</Filter>
     </ClInclude>
     <ClInclude Include="Import\DLL.h">
-      <Filter>Import</Filter>
+      <Filter>DLL</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.MaterialMapping.h">
       <Filter>3DF\Control</Filter>
@@ -234,7 +234,7 @@
       <Filter>3DF</Filter>
     </ClCompile>
     <ClCompile Include="Import\DLL.3DF.Interface.cpp">
-      <Filter>Import</Filter>
+      <Filter>DLL</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.MaterialMapping.cpp">
       <Filter>3DF\Control</Filter>

@@ -147,20 +147,9 @@ protected:
 	A3DStatus DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem, const A3DMiscCascadedAttributes * pcParentAttr, _3DF::SegmentKey & cParentSegment);
 
 	UINT ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo);
-	UINT DrawTessFaceDataTriangle(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriangleIndices, A3DUns32 & nTriangleSizeIndex, A3DUns32 & nTriangleStartIndex,
-		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray);
-
 	UINT ConvertTessFaceDataTriangleFan(ConvertFaceInfo & cInFaceInfo);
-	UINT DrawTessFaceDataTriangleFan(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
-		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray);
-
 	UINT ConvertTessFaceDataTriangleStripe(ConvertFaceInfo & cInFaceInfo);
-	UINT DrawTessFaceDataTriangleStripe(A3DTessFaceData & cTessFaceData, _3DF::PointArray & acInPoints, _3DF::VectorArray acInNormals, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, 
-		A3DUns32 & nTriStartIndex, A3DUns32 & nTriColorIndex, IndexHash & mOutIndexMap, TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray);
-
 	UINT ConvertTessFaceDataTriangleOneNormal(ConvertFaceInfo & cInFaceInfo);
-	UINT DrawTessFaceDataTriangleOneNormal(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
-		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, _3DF::IntArray & anFacelistArray, _3DF::IntArray & anNormalIndexArray);
 
 	UINT ConvertTessFaceDataTriangleFanOneNormal(ConvertFaceInfo & cInFaceInfo);
 	UINT DrawTessFaceDataTriangleFanOneNormal(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
