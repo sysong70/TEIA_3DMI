@@ -180,6 +180,9 @@
     <ClInclude Include="3DF\3DF.Include.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\3DF.Utility.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -310,6 +313,9 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.Include.cpp">
       <Filter>3DF\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Utility.cpp">
+      <Filter>3DF</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

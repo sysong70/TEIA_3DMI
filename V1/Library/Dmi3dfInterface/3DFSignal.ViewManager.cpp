@@ -6,10 +6,12 @@
 
 #include "../Signal/Signal.h"
 #include <Common_Define.h>
+#include <Path.h>
 
 #include "3DF/3DF.Model.h"
 #include "3DF/3DF.View.h"
 #include "3DF/3DF.Segment.h"
+#include "3DF/3DF.Utility.h"
 
 #include "Import/DLL.3DF.Interface.h"
 
@@ -119,10 +121,27 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	pcHoopsView->SetSuppressUpdate(true);
 
-	DLL::_3DF::Interface cInterfaace;
-	//cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, strErrorMessage);
+	const CString EXTENSIONS[] = {
+			L"PTS", L"PTX", L"XYZ", // Point Cloud
+	};
 
-	LoadPointCloudFile(strFilePathName, pcHoopsView);
+	CString ext = Path::GetExtension(strFilePathName);
+	ext.MakeUpper();
+
+	bool bPointColudData = false;
+	for (auto pre : EXTENSIONS) {
+		if (pre == ext) {
+			bPointColudData = true;
+		}
+	}
+
+	if (false == bPointColudData) {
+		DLL::_3DF::Interface cInterfaace;
+		cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, strErrorMessage);
+	}
+	else {
+		LoadPointCloudFile(strFilePathName, pcHoopsView);
+	}
 
 	//cModelSegmentKey.ForcedClose();
 
@@ -325,16 +344,36 @@ void ViewManager::SaveHsfFile(CString strFilePathName, View * pcHoopsView)
 
 void ViewManager::LoadPointCloudFile(CString strFilePathName, View * pcHoopsView)
 {
+	SegmentKey cViewKey(pcHoopsView->GetViewKey());
+	cViewKey.Open();
+	HC_Set_Driver_Options("eye dome lighting = (on, strength=1.0)");
+	cViewKey.Close();
+
 	HInputHandlerOptions cOptions;
 	cOptions.m_tk = pcHoopsView->GetModel()->GetStreamFileTK();
 	cOptions.m_pHBaseView = pcHoopsView;
+	
+	//cOptions.m_pExtendedData = &cPointCloudOptions;
+
+	//m_point_cloud_options = (HPointCloudOptions *)options->m_pExtendedData;
 
 	SegmentKey cModelKey(pcHoopsView->GetModelKey());
-	SegmentKey cPointCloudSegment = cModelKey.Subsegment(L"point_cloud");
+	SegmentKey cPointCloudSegment = cModelKey.Subsegment(L"_3dmi_point_cloud");
 
 	HIOUtilityPointCloud cPointCloud;
-	//cPointCloud.FileInputByKey(H_ASCII_TEXT(strFilePathName), pcHoopsView->GetModelKey(), &cOptions);
+	
+	// 라이브러리를 사용해야 하므로 미리 cPointCloudSegment를 Open하도록 한다.
 	cPointCloudSegment.Open();
 	cPointCloud.FileInputByKey(H_ASCII_TEXT(strFilePathName), cPointCloudSegment.KeyValue(), &cOptions);
+
+	HC_UnSet_Marker_Symbol();
+	HC_Set_Marker_Size(0.2);
+
 	cPointCloudSegment.Close();
+
+	// Point Clouse Segment의 하부를 검색해서 색상을 변경함.
+	// Library에서 나오는 색상은 기본적으로 Black으로 나옴.
+	MaterialMappingKit cMaterialMapping;
+	cMaterialMapping.SetColor(RGBAColor(0.75, 0.75, 0.75)); // Gray Color 설정
+	Utility::ChangeSubSegmentColor(cPointCloudSegment, L"vertex", cMaterialMapping, true);
 }

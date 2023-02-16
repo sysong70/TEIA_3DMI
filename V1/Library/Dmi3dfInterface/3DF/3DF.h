@@ -49,6 +49,7 @@ class Model;
 class View;
 class Key;
 class SegmentKey;
+class MaterialMappingKit;
 class PortfolioKey;
 class ShellKey;
 class LineKit;
@@ -63,6 +64,8 @@ class SelectabilityControl;
 class VisibilityControl;
 class MarkerAttributeControl;
 //==================================================================================================
+
+using SegmentKeyArray = CAtlArray<SegmentKey>;
 
 using LineArray = CAtlArray<LineKit>;
 using PolylineArray = LineArray;

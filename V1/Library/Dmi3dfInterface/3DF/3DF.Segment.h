@@ -22,8 +22,12 @@ public:
 
 	SegmentKey & operator = (SegmentKey const & cInThat);
 
+	//== Sub Segment 관련 함수 =======================================================================
 	SegmentKey const Subsegment();
 	SegmentKey const Subsegment(LPCTSTR pszFromat, ...);
+	
+	size_t ShowSubsegments() const;
+	size_t ShowSubsegments(SegmentKeyArray & cOutChildren) const;
 
 	CString Name() const;
 	SegmentKey & SetName(CString strInName);

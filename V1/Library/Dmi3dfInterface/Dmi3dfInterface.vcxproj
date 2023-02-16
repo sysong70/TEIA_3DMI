@@ -147,6 +147,7 @@
     <ClInclude Include="3DF\3DF.Selection.h" />
     <ClInclude Include="3DF\3DF.Shell.h" />
     <ClInclude Include="3DF\3DF.Style.h" />
+    <ClInclude Include="3DF\3DF.Utility.h" />
     <ClInclude Include="3DF\3DF.View.h" />
     <ClInclude Include="3DF\3DF.Segment.h" />
     <ClInclude Include="3DFSignal.ApplicationManager.h" />
@@ -194,6 +195,7 @@
     <ClCompile Include="3DF\3DF.cpp" />
     <ClCompile Include="3DF\3DF.Shell.cpp" />
     <ClCompile Include="3DF\3DF.Style.cpp" />
+    <ClCompile Include="3DF\3DF.Utility.cpp" />
     <ClCompile Include="3DF\3DF.View.cpp" />
     <ClCompile Include="3DF\3DF.Segment.cpp" />
     <ClCompile Include="3DF\3DF.View.OpCameraPan.cpp" />

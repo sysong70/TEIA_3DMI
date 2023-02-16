@@ -87,6 +87,56 @@ SegmentKey const SegmentKey::Subsegment(LPCTSTR chFormat, ...)
 	return cSubsegment;
 }
 
+size_t SegmentKey::ShowSubsegments() const
+{
+	int nSegmentCount = 0;
+
+	Open();
+
+	HC_Begin_Contents_Search(".", "segments");
+	{
+		HC_Show_Contents_Count(&nSegmentCount);
+	}
+	HC_End_Contents_Search();
+
+	Close();
+
+	return nSegmentCount;
+}
+
+size_t SegmentKey::ShowSubsegments(SegmentKeyArray & cOutChildren) const
+{
+	int nSegmentCount = 0;
+
+	Open();
+
+	HC_Begin_Contents_Search(".", "segments");
+	{
+		HC_Show_Contents_Count(&nSegmentCount);
+
+		HC_KEY nChildSegkey;
+		char chType[MVO_BUFFER_SIZE];
+
+		for (int i = 0; i < nSegmentCount; i++)
+		{
+			HC_Find_Contents(chType, &nChildSegkey);
+
+// 			if (streq(chType, "include")) {	// Include도 포함한다
+// 				childSegkey = HC_KShow_Include_Segment(childSegkey);
+// 				childSegkey = HC_KShow_Original_Key(childSegkey);
+// 			}
+
+			SegmentKey cChildSegment(nChildSegkey);
+			cOutChildren.Add(nChildSegkey);
+		}
+	}
+	HC_End_Contents_Search();
+
+	Close();
+
+	return nSegmentCount;
+}
+
 CString SegmentKey::Name() const
 {
 	CString strOutName;
