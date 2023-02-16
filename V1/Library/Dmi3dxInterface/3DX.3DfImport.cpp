@@ -3382,6 +3382,8 @@ A3DStatus _3DfImport::BuildMarkup(A3DTess3D * pcTess3d, A3DTessBaseData * pcTess
 	GetMarkupTesselation(pcTessBaseData, &sData, aPolyline, aPolygons, aStrings, aTextAttributes, &cOptions);
 
 	A3DTessMarkupGet(nullptr, &sData);
+
+	return A3D_SUCCESS;
 }
 
 // ----- Utility -----

@@ -15,6 +15,7 @@
 
 #include <HIOUtilityHsf.h>
 #include <HConstantFrameRate.h>
+#include <HIOUtilityPointCloud.h>
 
 USING_3DF_NAMESPACE
 USING_3DF_SIGNAL_NAMESPACE
@@ -108,7 +109,10 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 	Signal::Delivery delivery;
 	delivery.ViewId = nViewId;
 	delivery.SetSender(Wrapper().m_pc3dfInterface->GetSignalCallback());
+	
+	// Progress dialog 나타내기
 	delivery.mainFrame.ShowProgress();
+
 	//:Ken - test
 	delivery.progress.SetMessage(strFilePathName);
 	delivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Start reading...");
@@ -116,7 +120,9 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 	pcHoopsView->SetSuppressUpdate(true);
 
 	DLL::_3DF::Interface cInterfaace;
-	cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, strErrorMessage);
+	//cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, strErrorMessage);
+
+	LoadPointCloudFile(strFilePathName, pcHoopsView);
 
 	//cModelSegmentKey.ForcedClose();
 
@@ -315,4 +321,20 @@ void ViewManager::SaveHsfFile(CString strFilePathName, View * pcHoopsView)
 	HFileOutputResult eResult = cUtilityHsf.FileOutputByKey(strFilePathName, nModelKey, &cOptions);
 
 	int i = 0;
+}
+
+void ViewManager::LoadPointCloudFile(CString strFilePathName, View * pcHoopsView)
+{
+	HInputHandlerOptions cOptions;
+	cOptions.m_tk = pcHoopsView->GetModel()->GetStreamFileTK();
+	cOptions.m_pHBaseView = pcHoopsView;
+
+	SegmentKey cModelKey(pcHoopsView->GetModelKey());
+	SegmentKey cPointCloudSegment = cModelKey.Subsegment(L"point_cloud");
+
+	HIOUtilityPointCloud cPointCloud;
+	//cPointCloud.FileInputByKey(H_ASCII_TEXT(strFilePathName), pcHoopsView->GetModelKey(), &cOptions);
+	cPointCloudSegment.Open();
+	cPointCloud.FileInputByKey(H_ASCII_TEXT(strFilePathName), cPointCloudSegment.KeyValue(), &cOptions);
+	cPointCloudSegment.Close();
 }
