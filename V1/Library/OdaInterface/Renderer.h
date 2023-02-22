@@ -87,31 +87,31 @@ protected:
 
 	bool OnClose() override { RETURN_FALSE; }
 
-	void OnCommand(SignalArgs::Command* signal) override;
+	bool OnCommand(SignalArgs::Base* pSignal) override;
 
-	bool OnInitialize(SignalArgs::Initialize* signal) override;
+	bool OnInitialize(SignalArgs::Base* pSignal) override;
 
-	void OnLButtonDown(SignalArgs::Mouse* signal) override;
+	bool OnLButtonDown(SignalArgs::Base* pSignal) override { return false; }
 
-	void OnLButtonUp(SignalArgs::Mouse* signal) override;
+	bool OnLButtonUp(SignalArgs::Base* pSignal) override { return false; }
 
-	void OnMButtonDown(SignalArgs::Mouse* signal) override;
+	bool OnMButtonDown(SignalArgs::Base* pSignal) override { return false; }
 
-	void OnMButtonUp(SignalArgs::Mouse* signal) override;
+	bool OnMButtonUp(SignalArgs::Base* pSignal) override { return false; }
 
-	void OnRButtonDown(SignalArgs::Mouse* signal) override;
+	bool OnRButtonDown(SignalArgs::Base* pSignal) override { return false; }
 
-	void OnRButtonUp(SignalArgs::Mouse* signal) override;
+	bool OnRButtonUp(SignalArgs::Base* pSignal) override { return false; }
 
-	void OnMouseMove(SignalArgs::Mouse* signal) override;
+	bool OnMouseMove(SignalArgs::Base* pSignal) override { return false; }
 
-	void OnMouseWheel(SignalArgs::Mouse* signal) override;
+	bool OnMouseWheel(SignalArgs::Base* pSignal) override;
 
-	void OnPaint(SignalArgs::Paint* signal) override;
+	bool OnPaint(SignalArgs::Base* pSignal) override;
 
-	void OnResize(SignalArgs::Resize* signal) override;
+	bool OnResize(SignalArgs::Base* pSignal) override;
 
-	void OnText(SignalArgs::Text* signal) override;
+	bool OnText(SignalArgs::Base* pSignal) override { return false; }
 
 public: // Command
 

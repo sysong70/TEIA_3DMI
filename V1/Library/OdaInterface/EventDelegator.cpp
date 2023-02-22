@@ -57,24 +57,23 @@ bool EventDelegator::OnSignal(std::shared_ptr<EventWrapper> wrapper)
 		if (pSignal == nullptr) {
 			RETURN_FALSE;
 		}
+		//TRACE(L"%s", (LPCTSTR)pSignal->Dump());
 
 		if (pSignal->Target == Signal::Target::View) {
-			//TRACE(L"%s", (LPCTSTR)pSignal->Dump());
-
 			switch ((Signal::View::Action)pSignal->Action) {
-			case Signal::View::Action::OnCommand:     OnCommand((SignalArgs::Command*)pSignal);       break;
-			case Signal::View::Action::OnInitialize:  OnInitialize((SignalArgs::Initialize*)pSignal); break;
-			case Signal::View::Action::OnLButtonDown: OnLButtonDown((SignalArgs::Mouse*)pSignal);     break;
-			case Signal::View::Action::OnLButtonUp:   OnLButtonUp((SignalArgs::Mouse*)pSignal);       break;
-			case Signal::View::Action::OnMButtonDown: OnMButtonDown((SignalArgs::Mouse*)pSignal);     break;
-			case Signal::View::Action::OnMButtonUp:   OnMButtonUp((SignalArgs::Mouse*)pSignal);       break;
-			case Signal::View::Action::OnRButtonDown: OnRButtonDown((SignalArgs::Mouse*)pSignal);     break;
-			case Signal::View::Action::OnRButtonUp:   OnRButtonUp((SignalArgs::Mouse*)pSignal);       break;
-			case Signal::View::Action::OnMouseMove:   OnMouseMove((SignalArgs::Mouse*)pSignal);       break;
-			case Signal::View::Action::OnMouseWheel:  OnMouseWheel((SignalArgs::Mouse*)pSignal);      break;
-			case Signal::View::Action::OnPaint:       OnPaint((SignalArgs::Paint*)pSignal);           break;
-			case Signal::View::Action::OnResize:      OnResize((SignalArgs::Resize*)pSignal);         break;
-			case Signal::View::Action::OnText:        OnText((SignalArgs::Text*)pSignal);             break;
+			case Signal::View::Action::OnCommand:     OnCommand(pSignal);     break;
+			case Signal::View::Action::OnInitialize:  OnInitialize(pSignal);  break;
+			case Signal::View::Action::OnLButtonDown: OnLButtonDown(pSignal); break;
+			case Signal::View::Action::OnLButtonUp:   OnLButtonUp(pSignal);   break;
+			case Signal::View::Action::OnMButtonDown: OnMButtonDown(pSignal); break;
+			case Signal::View::Action::OnMButtonUp:   OnMButtonUp(pSignal);   break;
+			case Signal::View::Action::OnRButtonDown: OnRButtonDown(pSignal); break;
+			case Signal::View::Action::OnRButtonUp:   OnRButtonUp(pSignal);   break;
+			case Signal::View::Action::OnMouseMove:   OnMouseMove(pSignal);   break;
+			case Signal::View::Action::OnMouseWheel:  OnMouseWheel(pSignal);  break;
+			case Signal::View::Action::OnPaint:       OnPaint(pSignal);       break;
+			case Signal::View::Action::OnResize:      OnResize(pSignal);      break;
+			case Signal::View::Action::OnText:        OnText(pSignal);        break;
 
 			case Signal::View::Action::OnConstruct:
 			case Signal::View::Action::OnDestruct:

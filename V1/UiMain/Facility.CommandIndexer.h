@@ -44,7 +44,8 @@ namespace Facility
 
 		void Initialize();
 
-		typedef std::unordered_map<int, Command> CommandMap;
+		//typedef std::unordered_map<int, Command> CommandMap;
+		using CommandMap = std::unordered_map<int, Command>;
 
 		CommandMap& GetInstance();
 

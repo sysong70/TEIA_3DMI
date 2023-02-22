@@ -10,8 +10,10 @@ static char THIS_FILE[] = __FILE__;
 
 
 
-typedef bool (*InitializeFunc)(void);
-typedef bool (*TerminateFunc)(void);
+//typedef bool (*InitializeFunc)(void);
+//typedef bool (*TerminateFunc)(void);
+using InitializeFunc = bool (*)(void);
+using TerminateFunc = bool (*)(void);
 
 
 

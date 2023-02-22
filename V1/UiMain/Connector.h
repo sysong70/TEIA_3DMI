@@ -5,8 +5,10 @@
 
 
 
-typedef void (*SendSignalFunc)(const wchar_t* content);
-typedef void (*AssignSendSignalFunc)(SendSignalFunc fp);
+//typedef void (*SendSignalFunc)(const wchar_t* content);
+//typedef void (*AssignSendSignalFunc)(SendSignalFunc fp);
+using SendSignalFunc = void (*)(const wchar_t* content);
+using AssignSendSignalFunc = void (*)(SendSignalFunc fp);
 
 
 

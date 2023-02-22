@@ -16,6 +16,9 @@
     <Filter Include="_Common">
       <UniqueIdentifier>{472337a1-7e18-468e-9d28-ff1621fc6d25}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Tracker">
+      <UniqueIdentifier>{5e1e3227-07b7-4fd6-99d9-f23847556782}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\OdaInterface\stdafx.h">

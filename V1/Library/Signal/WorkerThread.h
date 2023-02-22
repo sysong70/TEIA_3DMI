@@ -46,9 +46,8 @@ public:
     // Get the ID of the currently executing thread
     static std::thread::id GetCurrentThreadId();
 
-protected:
+protected: //:WARNING - disabed
 
-    //:WARNING - disabed
     WorkerThread(const WorkerThread&) = delete;
     WorkerThread& operator =(const WorkerThread&) = delete;
 

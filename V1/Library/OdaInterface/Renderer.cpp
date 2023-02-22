@@ -174,20 +174,23 @@ void Renderer::PostPaintSignal(bool lock)
 
 
 
-void Renderer::OnCommand(SignalArgs::Command* signal)
+bool Renderer::OnCommand(SignalArgs::Base* pSignal)
 {
+	SignalArgs::Command* signal = (SignalArgs::Command*)pSignal;
+
 	if (signal->GlobalName == "Open") {
-		OpenFile(signal->Options);
+		return OpenFile(signal->Options);
 	}
 	else {
-		DEBUG_STOP;
+		RETURN_FALSE;
 	}
 }
 
 
 
-bool Renderer::OnInitialize(SignalArgs::Initialize* signal)
+bool Renderer::OnInitialize(SignalArgs::Base* pSignal)
 {
+	SignalArgs::Initialize* signal = (SignalArgs::Initialize*)pSignal;
 	DEBUG_VALID(signal);
 	DEBUG_VALID(signal->hWnd);
 
@@ -202,43 +205,10 @@ bool Renderer::OnInitialize(SignalArgs::Initialize* signal)
 
 
 
-void Renderer::OnLButtonDown(SignalArgs::Mouse* signal)
-{}
-
-
-
-void Renderer::OnLButtonUp(SignalArgs::Mouse* signal)
-{}
-
-
-
-void Renderer::OnMButtonDown(SignalArgs::Mouse* signal)
-{}
-
-
-
-void Renderer::OnMButtonUp(SignalArgs::Mouse* signal)
-{}
-
-
-
-void Renderer::OnRButtonDown(SignalArgs::Mouse* signal)
-{}
-
-
-
-void Renderer::OnRButtonUp(SignalArgs::Mouse* signal)
-{}
-
-
-
-void Renderer::OnMouseMove(SignalArgs::Mouse* signal)
-{}
-
-
-
-void Renderer::OnMouseWheel(SignalArgs::Mouse* signal)
+bool Renderer::OnMouseWheel(SignalArgs::Base* pSignal)
 {
+	SignalArgs::Mouse* signal = (SignalArgs::Mouse*)pSignal;
+
 	OdGsViewPtr pView = GetGsView();
 	OdGePoint3d position(pView->position());
 	position.transformBy(pView->worldToDeviceMatrix());
@@ -254,37 +224,47 @@ void Renderer::OnMouseWheel(SignalArgs::Mouse* signal)
 	Dolly(x, y);
 
 	m_pDevice->update();
+
+	return true;
 }
 
 
 
-void Renderer::OnPaint(SignalArgs::Paint* signal)
+bool Renderer::OnPaint(SignalArgs::Base* pSignal)
 {
+	//SignalArgs::Paint* signal = (SignalArgs::Paint*)pSignal;
+
 	if (m_pDevice.isNull() == false) {
 		try {
 			m_pDevice->update();
+			return true;
 		}
 		catch (...) {
-			DEBUG_STOP;
+			RETURN_FALSE;
 		}
+	}
+	else {
+		return false;
 	}
 }
 
 
 
-void Renderer::OnResize(SignalArgs::Resize* signal)
+bool Renderer::OnResize(SignalArgs::Base* pSignal)
 {
+	SignalArgs::Resize* signal = (SignalArgs::Resize*)pSignal;
+
 	if (m_pDevice.isNull() == false && signal->Valid) {
 		// Update the client rectangle
 		OdGsDCRect rect(OdGsDCPoint(0, signal->Height), OdGsDCPoint(signal->Width, 0));
 		m_pDevice->onSize(rect);
+
+		return true;
+	}
+	else {
+		return false;
 	}
 }
-
-
-
-void Renderer::OnText(SignalArgs::Text* signal)
-{}
 
 //--------------------------------------------------------------------------------------------------
 

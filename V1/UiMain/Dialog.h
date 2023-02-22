@@ -18,7 +18,8 @@ namespace Dialog
 
 
 
-	typedef std::list<CWnd*> Controls;
+	//typedef std::list<CWnd*> Controls;
+	using Controls = std::list<CWnd*>;
 
 
 

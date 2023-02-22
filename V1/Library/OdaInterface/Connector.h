@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-typedef void (*SendSignalFunc)(const wchar_t* content);
+//typedef void (*SendSignalFunc)(const wchar_t* content);
+using SendSignalFunc = void (*)(const wchar_t* content);
 
 
 
