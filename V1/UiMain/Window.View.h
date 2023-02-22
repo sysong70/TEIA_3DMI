@@ -62,6 +62,8 @@ namespace Window
 
 		afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
 
+		afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
+
 		afx_msg void OnContextMenu(CWnd*, CPoint point);
 
 		afx_msg void OnPaint();

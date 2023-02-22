@@ -137,6 +137,23 @@ void Window::View::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 
 
 
+void Window::View::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	switch (nChar) {
+	case VK_ESCAPE:
+		m_delivery.view.OnCancel();
+		return;
+
+	case VK_RETURN:
+	default:
+		break;
+	}
+
+	CView::OnChar(nChar, nRepCnt, nFlags);
+}
+
+
+
 void Window::View::OnContextMenu(CWnd*, CPoint point)
 {
 	if (CBCGPPopupMenu::GetSafeActivePopupMenu() != nullptr) {

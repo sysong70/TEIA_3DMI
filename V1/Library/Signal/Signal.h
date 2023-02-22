@@ -223,6 +223,7 @@ namespace Signal
 			OnInitialize, // CreateModelHandler, InitialUpdateHpsView
 
 			OnCommand,
+			OnCancel, // cancel command
 
 			OnMouseMove,
 			OnLButtonDown,
@@ -256,6 +257,7 @@ namespace Signal
 		void OnInitialize(DWORD_PTR hWnd, CString path = L"");
 		// id: enum Command
 		void OnCommand(UINT id);
+		void OnCancel();
 
 		void OnMouseMove(UINT flags, int x, int y);
 		void OnLButtonDown(UINT flags, int x, int y);
