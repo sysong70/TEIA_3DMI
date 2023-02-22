@@ -171,6 +171,8 @@ void View::SetDriverOption()
 		HC_Set_Driver_Options("special events, update interrupts");
 		HC_Control_Update(".", "redraw everything");
 
+		HC_Set_Driver_Options("eye dome lighting = (on, strength=1.0)");
+
 	} HC_Close_Segment();
 }
 

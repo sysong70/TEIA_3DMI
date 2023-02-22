@@ -3,6 +3,7 @@
 #include "Window.View.h"
 #include "Path.h"
 
+#include "File.h"
 #include "WStr.h"
 
 #ifdef _DEBUG
@@ -59,6 +60,7 @@ bool Window::IsAllowed3d(const wchar_t* pFilePath)
 		L"VDA", // VDA-FS
 		L"WRL", L"VRML", // VRML
 		L"OBJ", // Wavefront OBJ
+		L"PTS", L"PTX", L"XYZ", // Point Cloud
 	};
 
 	CString ext = Path::GetExtension(pFilePath);
@@ -181,7 +183,13 @@ BOOL Window::Document::OnNewDocument()
 
 BOOL Window::Document::OnOpenDocument(LPCTSTR lpszPathName)
 {
-	return TRUE;
+	if (File::IsExist(lpszPathName)) {
+		return TRUE;
+	}
+	else {
+		BCGPMessageBox(L"File not found!");
+		return FALSE;
+	}
 }
 
 

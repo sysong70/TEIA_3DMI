@@ -24,6 +24,8 @@ protected:
 	void Paint(int nViewId, Json::Object & cInObject);
 
 	void SaveHsfFile(CString strFilePathName, _3DF::View * pcHoopsView);
+	
+	void LoadPointCloudFile(CString strFilePathName, _3DF::View * pcHoopsView);
 
 	//== Mouse 관련 함수 =============================================================================
 protected:
