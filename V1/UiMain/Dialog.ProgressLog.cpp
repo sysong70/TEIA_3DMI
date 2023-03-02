@@ -19,8 +19,8 @@ namespace PresetProgressLog
 	enum ControlId
 	{
 		Unknown = WM_USER,
-		Indicator = IDC_DMI_CONTROL_01,
-		Message = IDC_DMI_CONTROL_02,
+		Message = IDC_DMI_CONTROL_01,
+		Progress = IDC_DMI_CONTROL_02,
 		Log = IDC_DMI_CONTROL_03,
 	};
 
@@ -31,9 +31,19 @@ namespace PresetProgressLog
 	};
 
 	const COLORREF ItemColors[] = {
-		(COLORREF)Component::EColor::Black,
+		(COLORREF)Component::EColor::Gray,
+		(COLORREF)Component::EColor::Green,
+		(COLORREF)Component::EColor::Yellow,
 		(COLORREF)Component::EColor::Red,
 	};
+
+	int MessageHeight() {
+		return globalUtils.ScaleByDPI(24);
+	}
+
+	int ProgressHeight() {
+		return globalUtils.ScaleByDPI(8);
+	}
 
 	int ExtraHeight() {
 		return globalUtils.ScaleByDPI(2);
@@ -82,11 +92,12 @@ void Dialog::ProgressLog::ReceiveSignal(Json::Object* pData)
 
 	Signal::Progress::Action action = (Signal::Progress::Action)data.GetInteger(SKW_ACTION);
 	switch (action) {
-	case Signal::Progress::Action::StartMarquee: StartMarquee();      break;
+	case Signal::Progress::Action::SetRange:     SetRange(data);      break;
+	case Signal::Progress::Action::SetPosition:  SetPosition(data);   break;
 	case Signal::Progress::Action::SetMessage:   SetMessage(data);    break;
 	case Signal::Progress::Action::AddLog:       AddLog(data);        break;
 	case Signal::Progress::Action::SetLogStatus: SetLogStatus(data);  break;
-	case Signal::Progress::Action::StopMarquee:  StartMarquee(false); break;
+	case Signal::Progress::Action::ClearLog:     ClearLog();          break;
 
 	default:
 		DEBUG_STOP;
@@ -102,7 +113,7 @@ void Dialog::ProgressLog::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
-	DDX_CONTROL(Indicator);
+	DDX_CONTROL(Progress);
 	DDX_CONTROL(Message);
 	DDX_CONTROL(Log);
 }
@@ -121,8 +132,6 @@ BOOL Dialog::ProgressLog::OnInitDialog()
 
 	m_windowSize = AdjustWindowSize(size);
 	SetSizeLimit(true, true);
-	//:CHECK
-	StartMarquee();
 
 	return TRUE;
 }
@@ -133,44 +142,29 @@ void Dialog::ProgressLog::ConstructBody(const CRect& boundary)
 {
 	Json::Object& data = GetUiData().GetAt("body");
 
-	int height = globalUtils.ScaleByDPI(24);
 	CRect area = boundary;
-	area.bottom = area.top + height;
 
-	// Indicator
-
-	CSize size = Facility::GetSize(data.GetAt("Indicator"));
-	CRect result = AdjustLayout(&m_wndIndicator, area, globalUtils.ScaleByDPI(size), Component::EPivot::TopLeft);
-	
-	CBCGPCircularProgressIndicatorImpl* pProgress = m_wndIndicator.GetCircularProgressIndicator();
-	CBCGPCircularProgressIndicatorOptions options = pProgress->GetOptions();
-	options.m_bMarqueeStyle = TRUE;
-	options.m_Shape = CBCGPCircularProgressIndicatorOptions::BCGPCircularProgressIndicator_Arc;
-	options.m_dblProgressWidth = (double)globalUtils.ScaleByDPI(result.Size().cx) * 0.1;
-	pProgress->SetOptions(options);
-	
-	// clear fraem and background
-	CBCGPCircularProgressIndicatorColors colors = pProgress->GetColors();
-	colors.m_brFill = CBCGPBrush();
-	colors.m_brFrameOutline = CBCGPBrush();
-	
-	pProgress->SetColors(colors);
-	pProgress->Redraw();
-	
-	m_wndIndicator.ShowWindow(SW_SHOWNOACTIVATE);
-	
 	// Message
 
-	area.left = result.right + PRESET::Gap();
-	SetupControl(m_wndMessage, data.GetAt("Message"), Component::EPivot::MiddleLeft, area);
+	area.bottom = area.top + PRESET::MessageHeight();
+	CRect result = SetupControl(m_wndMessage, data.GetAt("Message"), Component::EPivot::TopLeft, area);
+
+	// Progress
+
+	area.top = result.bottom + PRESET::Gap();
+	area.bottom = area.top + PRESET::ProgressHeight();
+	Component::SetControlSize(&m_wndProgress, { area.Size().cx, PRESET::ProgressHeight() });
+	result = AdjustLayout(&m_wndProgress, area, area.Size(), Component::EPivot::TopLeft);
+
+	m_wndProgress.m_bSetPosSmoothAnimation = TRUE;
+	m_wndProgress.m_bSetPosLighting = TRUE;
+	m_wndProgress.m_bDrawFrame = TRUE;
 
 	// Log
 
-	area.left = boundary.left;
-	area.top = area.bottom + GetFrameThickness().cy;
+	area.top = result.bottom + PRESET::Gap();
 	area.bottom = boundary.bottom;
 
-	//m_wndLog.EnableItemDescription(TRUE, 1);
 	m_wndLog.ModifyStyle(0, LBS_NOSEL);
 	m_wndLog.SetAlternateRowColor();
 	m_wndLog.SetItemExtraHeight(PRESET::ExtraHeight());
@@ -189,10 +183,16 @@ BOOL Dialog::ProgressLog::DestroyWindow()
 
 
 
-void Dialog::ProgressLog::StartMarquee(bool start)
+void Dialog::ProgressLog::SetRange(Json::Object& data)
 {
-	CBCGPCircularProgressIndicatorImpl* pProgress = m_wndIndicator.GetCircularProgressIndicator();
-	pProgress->StartMarquee(start);
+	m_wndProgress.SetRange32(data.GetInteger(SKW_MIN), data.GetInteger(SKW_MAX));
+}
+
+
+
+void Dialog::ProgressLog::SetPosition(Json::Object& data)
+{
+	m_wndProgress.SetPos(data.GetInteger(SKW_POSITION));
 }
 
 
@@ -214,9 +214,7 @@ void Dialog::ProgressLog::AddLog(Json::Object& data)
 	m_wndLog.SetItemToolTip(index, data.GetString(SKW_TOOLTIP));
 
 	Signal::Progress::Status status = (Signal::Progress::Status)data.GetInteger(SKW_STATUS);
-	if (status > Signal::Progress::Status::Succeed) {
-		m_wndLog.SetItemColorBar(index, PRESET::ItemColors[(int)status]);
-	}
+	m_wndLog.SetItemColorBar(index, PRESET::ItemColors[(int)status]);
 
 	RedrawWindow();
 }
@@ -228,6 +226,15 @@ void Dialog::ProgressLog::SetLogStatus(Json::Object& data)
 	int status = data.GetInteger(SKW_STATUS);
 	int index = m_wndLog.GetCount();
 	m_wndLog.SetItemColorBar(index - 1, PRESET::ItemColors[status]);
+
+	RedrawWindow();
+}
+
+
+
+void Dialog::ProgressLog::ClearLog()
+{
+	m_wndLog.ResetContent();
 
 	RedrawWindow();
 }

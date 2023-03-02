@@ -42,6 +42,8 @@ namespace Dialog
 		// include margin
 		virtual CSize GetBodySize();
 
+		virtual bool PumpMessages();
+
 	protected: // Windows message handler
 
 		BOOL OnInitDialog() override;

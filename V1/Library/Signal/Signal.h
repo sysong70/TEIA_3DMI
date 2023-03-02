@@ -20,7 +20,9 @@
 #define SKW_HWND			"HWND"
 #define SKW_ID				"Id"
 #define SKW_INITIALIZE		"Initialize"
+#define SKW_MAX				"Max"
 #define SKW_MESSAGE			"Message"
+#define SKW_MIN				"Min"
 #define SKW_OPTION			"Option"
 #define SKW_POSITION		"Position"
 #define SKW_RECT			"Rect"
@@ -162,7 +164,28 @@ namespace Signal
 		void ShowCoordinate(double x, double y, double z);
 	};
 
+	/*
+		Delivery delivery;
+		delivery.mainFrame.ShowProgress();
+		delivery.progress.SetRange(0, 3);
+		delivery.progress.SetMessage(L"FileName")
 
+		delivery.progress.SetPosition(1);
+		delivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Start reading file");
+		// ...
+		delivery.progress.SetPosition(2);
+		delivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Create rendering device");
+		// ...
+
+		if (success) {
+			delivery.mainFrame.HideProgress();
+			delivery.view.SetValidation();
+		}
+		else {
+			delivery.progress.ClearLog();
+			delivery.progress.AddLog(Signal::Progress::Status::Fail, L"Error message");
+		}
+	*/
 
 	class Progress
 	{
@@ -174,19 +197,22 @@ namespace Signal
 		{
 			Unknown = -1,
 
-			StartMarquee,
+			SetRange,
+			SetPosition,
 			SetMessage,
 			AddLog,
 			SetLogStatus,
-			StopMarquee,
+			ClearLog,
 		};
 
 		enum class Status
 		{
 			Unknown = -1,
 
-			Succeed,  // black
-			Fail,     // red
+			Succeed,  // LightGray
+			Info,     // Green
+			Warning,  // Yellow
+			Fail,     // Red
 		};
 
 		DEFINE_WRAPPER;
@@ -195,7 +221,9 @@ namespace Signal
 
 	public:
 
-		void StartMarquee();
+		void SetRange(int min = 0, int max = 100);
+
+		void SetPosition(int pos);
 
 		void SetMessage(CString message);
 
@@ -203,7 +231,7 @@ namespace Signal
 		// change last item color by status
 		void SetLogStatus(Status status);
 
-		void StopMarquee();
+		void ClearLog();
 	};
 
 

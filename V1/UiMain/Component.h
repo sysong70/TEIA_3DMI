@@ -89,6 +89,9 @@ namespace Component
 		Red = RGB(0xFF, 0x00, 0x00),
 		Green = RGB(0x00, 0xFF, 0x00),
 		Blue = RGB(0x00, 0x00, 0xFF),
+		Yellow = RGB(0xFF, 0xFF, 0x00),
+		Gray = RGB(0x80, 0x80, 0x80),
+		LightGray = RGB(0xB0, 0xB0, 0xB0),
 		Black = RGB(0, 0, 0),
 	};
 
@@ -101,6 +104,8 @@ namespace Component
 	CSize AdjustSize(CWnd* pControl, CSize baseSize);
 
 	CSize GetControlSize(CWnd* pControl);
+
+	void SetControlSize(CWnd* pControl, CSize size);
 	// CBCGPTabWnd tab height
 	int TabHeight();
 	// CBCGPTreeCtrlEx row height

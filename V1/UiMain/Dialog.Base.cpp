@@ -109,6 +109,42 @@ CSize Dialog::Base::GetBodySize()
 
 
 
+bool Dialog::Base::PumpMessages()
+{
+	// Must call Create() before using the dialog
+	HWND hWnd = GetSafeHwnd();
+	ASSERT(hWnd != NULL);
+
+	while (TRUE) {
+		if (!::IsWindow(hWnd)) {
+			return false;
+		}
+
+		MSG msg;
+		// Handle dialog messages
+		while (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+			if (msg.message == WM_QUIT) {
+				PostThreadMessage(GetCurrentThreadId(), msg.message, msg.wParam, msg.lParam);
+				return false;
+			}
+			if (!::IsWindow(hWnd)) {
+				return false;
+			}
+			if (!IsDialogMessage(&msg)) {
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
+			if (!::IsWindow(hWnd)) {
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+
+
 BOOL Dialog::Base::OnInitDialog()
 {
 	__super::OnInitDialog();

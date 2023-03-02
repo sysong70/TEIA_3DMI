@@ -1,4 +1,4 @@
-{
+﻿{
 "Dialog":{
 	"DefaultButtons":{
 		"Ok":{"title":"Ok|확인", "id":1, "comment":"IDOK"},
@@ -46,9 +46,8 @@
 
 	"Progress":{
 		"title":"Open File|파일 열기",
-		"size":{"cx":400, "cy":300},
+		"size":{"cx":500, "cy":300},
 		"body":{
-			"Indicator":{"cx":24, "cy": 24},
 			"Message":{"title":"Ready...|준비..."},
 			"Log":{}
 		}

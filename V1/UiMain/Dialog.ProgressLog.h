@@ -36,18 +36,22 @@ namespace Dialog
 
 	private:
 
-		void StartMarquee(bool start = true);
+		void SetRange(Json::Object& data);
+
+		void SetPosition(Json::Object& data);
 
 		void SetMessage(Json::Object& data);
 
 		void AddLog(Json::Object& data);
-
+		// Last log only
 		void SetLogStatus(Json::Object& data);
+
+		void ClearLog();
 
 	private: // Body controls
 
-		CBCGPCircularProgressIndicatorCtrl m_wndIndicator;
 		CBCGPStatic m_wndMessage;
+		CBCGPProgressCtrl m_wndProgress;
 		CBCGPListBox m_wndLog;
 	};
 }

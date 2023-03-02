@@ -169,6 +169,13 @@ CSize Component::GetControlSize(CWnd* pControl)
 
 
 
+void Component::SetControlSize(CWnd* pControl, CSize size)
+{
+	pControl->SetWindowPos(NULL, 0, 0, size.cx, size.cy, SWP_NOMOVE);
+}
+
+
+
 int Component::TabHeight()
 {
 	return globalUtils.ScaleByDPI(24);

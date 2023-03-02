@@ -116,9 +116,27 @@ void Signal::Progress::ConstructData(Json::Object& data, Action action)
 
 
 
-void Signal::Progress::StartMarquee()
+void Signal::Progress::SetRange(int min, int max)
 {
-	SendActionDataOnly(Action::StartMarquee);
+	Json::Object data;
+	ConstructData(data, Action::SetRange);
+
+	data.SetInteger(SKW_MIN, min);
+	data.SetInteger(SKW_MAX, max);
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::Progress::SetPosition(int pos)
+{
+	Json::Object data;
+	ConstructData(data, Action::SetPosition);
+
+	data.SetInteger(SKW_POSITION, pos);
+
+	Wrapper().SendData(data);
 }
 
 
@@ -162,9 +180,9 @@ void Signal::Progress::SetLogStatus(Status status)
 
 
 
-void Signal::Progress::StopMarquee()
+void Signal::Progress::ClearLog()
 {
-	SendActionDataOnly(Action::StopMarquee);
+	SendActionDataOnly(Action::ClearLog);
 }
 
 #pragma endregion //:REGION

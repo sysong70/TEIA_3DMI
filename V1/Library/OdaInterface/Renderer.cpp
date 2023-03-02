@@ -290,11 +290,14 @@ bool Renderer::OpenFile(CString filePath)
 		//:CEHCK
 		if (File::GetFileSize(m_filePath) > 1000000) {
 			m_delivery.mainFrame.ShowProgress();
+			m_delivery.progress.SetRange(0, 3);
 			m_delivery.progress.SetMessage(filePath);
 		}
 
+		m_delivery.progress.SetPosition(1);
 		m_delivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Start reading file");
 		m_pDatabase = TheApp.readFile(m_filePath.GetBuffer(), true, false);
+		m_delivery.progress.SetPosition(2);
 
 		OdGiContextForDbDatabase::setDatabase(m_pDatabase);
 		enableGsModel(true);
@@ -304,8 +307,8 @@ bool Renderer::OpenFile(CString filePath)
 			m_delivery.mainFrame.HideProgress();
 			m_delivery.view.SetValidation();
 		}
-	} catch (OdError&) {
-		m_delivery.mainFrame.HideProgress();
+	} catch (const OdError& err) {
+		m_delivery.progress.AddLog(Signal::Progress::Status::Fail, (LPCTSTR)err.description().c_str());
 		RETURN_FALSE;
 	}
 

@@ -160,8 +160,8 @@ bool Facility::LoadTextResource(UINT id, CString& result)
 	DEBUG_VALID(pWide);
 
 	::MultiByteToWideChar(CP_UTF8, 0, pChar, -1, pWide, nSize);
-
-	result = pWide;
+	// UTF-8 BOM or UTF-8
+	result = (pWide[0] == 0xFEFF ? pWide + 1 : pWide);
 
 	REMOVE_ARRAY(pChar);
 	REMOVE_ARRAY(pWide);
