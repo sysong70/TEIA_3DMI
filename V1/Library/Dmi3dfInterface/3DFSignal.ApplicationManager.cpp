@@ -54,10 +54,6 @@ void ApplicationManager::InitInstance()
 	//HC_Define_System_Options("no warnings, no info, no errors, no fatal errors, no message limit");
 #endif
 
-	// Thread 설정
-	//this is overridden later and could be removed
-	HC_Define_System_Options("multi-threading = full");
-
 	HDB::EnableErrorManager();
 
 	//----- InitInstance에서 처리하는 부분 -----
@@ -82,6 +78,7 @@ void ApplicationManager::InitInstance()
 
 	char buf[4096];
  	sprintf(buf, "font directory = (%s, .)", H_ASCII_TEXT(strFontDirectory));
+	sprintf(buf, "%s, multi-threading=%s", buf, "full");
 
 	HC_Define_System_Options(buf);
 }

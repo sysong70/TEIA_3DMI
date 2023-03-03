@@ -14,7 +14,6 @@ Model::Model() :
 	m_cSegmentKey(GetModelKey())
 {
 	SetBRepGeometry(false);
-	m_pcMultiSelectManager = new MultiSelectManager();
 
 	m_eModelHandedness = ModelHandedness::NotSet;
 	m_pcTopologyManager = new BREP_Topology;
@@ -26,10 +25,6 @@ Model::Model() :
 
 Model::~Model()
 {
-	if(nullptr != m_pcMultiSelectManager) {
-		REMOVE_POINTER(m_pcMultiSelectManager);
-	}
-
 	if(nullptr != m_pcTopologyManager) {
 		REMOVE_POINTER(m_pcTopologyManager);
 	}
@@ -60,4 +55,35 @@ void Model::SetBRepGeometry(bool bBrepFlag)
 	}
 
 	HBaseModel::SetBRepGeometry(bBrepFlag);
+}
+
+void Model::UpdateModelHandedness()
+{
+	// see if handedness attribute was defined in the model,
+	// if yes set our member variable
+	// what is the polygon handedness for this model
+	HC_Open_Segment_By_Key(GetModelKey()); {
+		if (HC_Show_Existence("heuristics"))
+		{
+			unsigned int token_num = 0;
+			char heuristics[MVO_BUFFER_SIZE], token[MVO_BUFFER_SIZE];
+			HC_Show_Heuristics(heuristics);
+			while (HC_Parse_String(heuristics, ",", token_num++, token))
+			{
+				if (strstr(token, "polygon handedness"))
+				{
+					HC_Parse_String(token, "=", token_num++, token);
+					if (strstr(token, "left"))
+						m_eModelHandedness = ModelHandedness::Left;
+					else if (strstr(token, "right"))
+						m_eModelHandedness = ModelHandedness::Right;
+					else
+						m_eModelHandedness = ModelHandedness::None;
+				}
+			}
+		}
+		else {
+			m_eModelHandedness = ModelHandedness::NotSet;
+		}
+	} HC_Close_Segment();
 }

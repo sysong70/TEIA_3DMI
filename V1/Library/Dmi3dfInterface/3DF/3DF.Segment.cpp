@@ -172,11 +172,11 @@ IncludeKey SegmentKey::IncludeSegment(SegmentKey const & cInSegment)
 //== Shell 관련 함수 =================================================================================
 ShellKey SegmentKey::InsertShell(ShellKit const & cInKit)
 {
-	_3DF::PointArray const * pacPoints;
-	_3DF::VectorArray const * pacNormals;
-	_3DF::IntArray const * pacFacelist;
-	_3DF::FloatArray const * paParameters;
-	_3DF::RGBAColorArray const * paColors;
+	_3DF::PointArray const * pacPoints = nullptr;
+	_3DF::VectorArray const * pacNormals = nullptr;
+	_3DF::IntArray const * pacFacelist = nullptr;
+	_3DF::FloatArray const * paParameters = nullptr;
+	_3DF::RGBAColorArray const * paColors = nullptr;
 
 	cInKit.ShowPoints(pacPoints);
 	cInKit.ShowNormals(pacNormals);
@@ -185,15 +185,27 @@ ShellKey SegmentKey::InsertShell(ShellKit const & cInKit)
 	cInKit.ShowColors(paColors);
 
 	Open();
-	HC_KEY nShellKey = HC_Insert_Shell(static_cast<int>(pacPoints->GetCount()), pacPoints->GetData(), static_cast<int>(pacFacelist->GetCount()), pacFacelist->GetData());
+
+	HC_KEY nShellKey = INVALID_KEY;
+	if (nullptr != pacFacelist) {
+		nShellKey = HC_Insert_Shell(static_cast<int>(pacPoints->GetCount()), pacPoints->GetData(), static_cast<int>(pacFacelist->GetCount()), pacFacelist->GetData());
+	}
+	else {
+		nShellKey = HC_Insert_Shell(static_cast<int>(pacPoints->GetCount()), pacPoints->GetData(), 0, nullptr);
+	}
+	
 
 	if(INVALID_KEY != nShellKey) {
-		if(false == pacNormals->IsEmpty()) {
-			HC_MSet_Vertex_Normals(nShellKey, 0, static_cast<int>(pacNormals->GetCount()), pacNormals->GetData());
+		if (nullptr != pacNormals) {
+			if (false == pacNormals->IsEmpty()) {
+				HC_MSet_Vertex_Normals(nShellKey, 0, static_cast<int>(pacNormals->GetCount()), pacNormals->GetData());
+			}
 		}
 
-		if(false == paParameters->IsEmpty()) {
-			HC_MSet_Vertex_Parameters(nShellKey, 0, static_cast<int>(paParameters->GetCount() / 2), 2, paParameters->GetData());
+		if (nullptr != paParameters) {
+			if (false == paParameters->IsEmpty()) {
+				HC_MSet_Vertex_Parameters(nShellKey, 0, static_cast<int>(paParameters->GetCount() / 2), 2, paParameters->GetData());
+			}
 		}
 
 // 		if(false == aColors.empty()) {

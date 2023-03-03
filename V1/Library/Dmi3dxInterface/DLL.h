@@ -4,6 +4,7 @@
 #include <atlstr.h>
 
 #include "../../Library/Dmi3dfInterface/3DF/3DF.h"
+#include "../Signal/Signal.h"
 
 #define OPEN_DLL_NAMESPACE namespace DLL {
 #define CLOSE_DLL_NAMESPACE }
@@ -14,7 +15,7 @@
 extern "C" {
 #endif  / * __cplusplus * /
 
-	_declspec (dllexport) bool _3DFImportFile(CString pchFilePathName, _3DF::SegmentKey & cModelSegmentKey, CString & strErrorMessage);
+	_declspec (dllexport) bool _3DFImportFile(CString pchFilePathName, _3DF::SegmentKey & cModelSegmentKey, Signal::Delivery & cInDelivery, CString & strErrorMessage);
 
 #ifdef __cplusplus
 }

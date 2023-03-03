@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Common">
-      <UniqueIdentifier>{171e8008-7852-404e-ba8a-4e7b26d21778}</UniqueIdentifier>
-    </Filter>
     <Filter Include="3DX">
       <UniqueIdentifier>{7f496ad0-262a-431e-b987-5f885c8f654e}</UniqueIdentifier>
     </Filter>
@@ -45,6 +42,12 @@
     </Filter>
     <Filter Include="DLL">
       <UniqueIdentifier>{e7d7b1c5-abb3-4eb0-b863-19e4fb6709d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Common">
+      <UniqueIdentifier>{171e8008-7852-404e-ba8a-4e7b26d21778}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Signal">
+      <UniqueIdentifier>{c69e44d6-cd5c-41ac-b158-f84e0e681edc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -127,19 +130,19 @@
       <Filter>Object\Surface</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Common_Define.h">
-      <Filter>Common</Filter>
+      <Filter>_Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Fio.h">
-      <Filter>Common</Filter>
+      <Filter>_Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\WStr.h">
-      <Filter>Common</Filter>
+      <Filter>_Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Json.h">
-      <Filter>Common</Filter>
+      <Filter>_Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Path.h">
-      <Filter>Common</Filter>
+      <Filter>_Common</Filter>
     </ClInclude>
     <ClInclude Include="3DXSignal.h">
       <Filter>Signal</Filter>
@@ -164,6 +167,9 @@
     </ClInclude>
     <ClInclude Include="3DX.ExchangeWrapper.h">
       <Filter>Import</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Signal\Signal.h">
+      <Filter>_Signal</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -249,19 +255,19 @@
       <Filter>Object\Surface</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Common_Define.cpp">
-      <Filter>Common</Filter>
+      <Filter>_Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Fio.cpp">
-      <Filter>Common</Filter>
+      <Filter>_Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\WStr.cpp">
-      <Filter>Common</Filter>
+      <Filter>_Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Json.cpp">
-      <Filter>Common</Filter>
+      <Filter>_Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Path.cpp">
-      <Filter>Common</Filter>
+      <Filter>_Common</Filter>
     </ClCompile>
     <ClCompile Include="3DXSignal.Interface.cpp">
       <Filter>Signal</Filter>
@@ -280,6 +286,9 @@
     </ClCompile>
     <ClCompile Include="DLL.cpp">
       <Filter>DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Signal\Signal.cpp">
+      <Filter>_Signal</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -3,16 +3,18 @@
 #include "Json.h"
 
 #include <3DF/3DF.Segment.h>
-#include <3DF/3DF.Math.h>
 #include <3DF/3DF.MaterialMapping.h>
 
 #include <3DF/3DF.PMI.Entity.h>
+
+#include "../Signal/Signal.h"
 
 #include "3DX.ImportBase.h"
 
 #include <atlcoll.h>
 #include <vector>
 #include <unordered_map>
+#include <chrono>
 
 OPEN_3DX_NAMESPACE
 
@@ -47,7 +49,7 @@ public:
 	} A3DPointerArray;
 
 	// == File _3DfImport 관련 함수 =================================================================
-	bool FileImport(CString strFilePathName, _3DF::SegmentKey & cModelSegment, CString & strErrorMessage);
+	bool FileImport(CString strFilePathName, _3DF::SegmentKey & cModelSegment, Signal::Delivery & cInDelivery, CString & strErrorMessage);
 
 	// == 3DX 설정 관련 함수 =====================================================================
 protected:
@@ -59,8 +61,8 @@ protected:
 	struct ConvertFaceInfo
 	{
 		A3DUns32 * pnInIndices;							// "global" index array for normals, points and vertex parameters
-		_3DF::PointArray aInPoints;						// "global" point array
-		_3DF::VectorArray aInNormals;					// "global" normal array
+		//_3DF::PointArray aInPoints;						// "global" point array
+		//_3DF::VectorArray aInNormals;					// "global" normal array
 		_3DF::FloatArray aInParams;						// optional "global" parameter array
 		_3DF::RGBAColorArray aInColors;					// optional RGBA color array
 		A3DTessFaceData * pcInTessFaceData;				// tessellation data for *this* (CAD) face
@@ -260,10 +262,23 @@ private:
 	std::unordered_map<A3DUns32, _3DF::SegmentKey> m_mLineMaterialMappingStyleMap;
 	std::unordered_map<A3DUns32, _3DF::SegmentKey> m_mMarkerMaterialMappingStyleMap;
 
+	//----- Tessellation 관련 -----
+	_3DF::Point * m_pcPoints = nullptr;
+	int m_nPointCount = 0;
+	int m_nMaxPointCount = 0;
+
+	_3DF::Vector * m_pcNormals = nullptr;
+	int m_nNormalCount = 0;
+	int m_nMaxNormalCount = 0;
+
 	// Segment Key Name 뒤부분에 붙는 Id값
 	DWORD m_nIncrementalId = 0;
 	DWORD m_nViewId = 0;
 	DWORD m_nMarkupId = 0;
+
+	A3DEModellerType m_eModellerType = kA3DModellerUnknown;
+
+	Signal::Delivery * m_pcInDelivery = nullptr;
 
 	//== 계산 관련 함수 ==========================================================================
 private:
@@ -304,8 +319,6 @@ private:
 	void LogDecreaseTabIndex(int nId);
 	CString LogHexStr(DWORD_PTR nValue);
 	CString LogBoolStr(bool bValue);
-
-
 
 	void  parseAttributes(const A3DEntity * pEntity);
 };
