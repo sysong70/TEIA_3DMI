@@ -19,6 +19,9 @@
 #include <HConstantFrameRate.h>
 #include <HIOUtilityPointCloud.h>
 
+#include <chrono>
+using namespace std::chrono;
+
 USING_3DF_NAMESPACE
 USING_3DF_SIGNAL_NAMESPACE
 
@@ -51,8 +54,7 @@ void ViewManager::ExecuteSignal(Json::Object & cInObject)
 		{
 			int nX = cInObject.GetInteger(SKW_X);
 			int nY = cInObject.GetInteger(SKW_Y);
-
-			// Resize(nViewId, nX, nY);
+			Resize(nViewId, nX, nY);
 		}
 		break;
 
@@ -65,6 +67,10 @@ void ViewManager::ExecuteSignal(Json::Object & cInObject)
 		case Signal::View::Action::OnRButtonUp:
 		case Signal::View::Action::OnMouseWheel:
 			ExecuteMouseSignal(nViewId, nAction, cInObject);
+			break;
+
+		case Signal::View::Action::OnCancel:
+			CancelCommands(nViewId);
 			break;
 
 		default:
@@ -82,6 +88,7 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 	if(nullptr == m_pcHoopsModel) {
 		DEBUG_RETURN;
 	}
+	m_pcHoopsModel->Init();
 
 	HWND hWnd = (HWND) cInObject.GetDwordPtr(SKW_HWND);
 
@@ -108,21 +115,23 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	//cModelSegmentKey.ForcedOpen();
 
-	Signal::Delivery delivery;
-	delivery.ViewId = nViewId;
-	delivery.SetSender(Wrapper().m_pc3dfInterface->GetSignalCallback());
+	Signal::Delivery cDelivery;
+	cDelivery.ViewId = nViewId;
+	cDelivery.SetSender(Wrapper().m_pc3dfInterface->GetSignalCallback());
 	
 	// Progress dialog 나타내기
-	delivery.mainFrame.ShowProgress();
+	cDelivery.mainFrame.ShowProgress();
 
-	//:Ken - test
-	delivery.progress.SetMessage(strFilePathName);
-	delivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Start reading...");
+	system_clock::time_point cTime1 = system_clock::now();
+
+	cDelivery.progress.SetMessage(strFilePathName);
+	cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/3 : Import and Tessellation");
 
 	pcHoopsView->SetSuppressUpdate(true);
+	pcHoopsView->SetSuppressUpdateTick(true);
 
 	const CString EXTENSIONS[] = {
-			L"PTS", L"PTX", L"XYZ", // Point Cloud
+		L"PTS", L"PTX", L"XYZ", // Point Cloud
 	};
 
 	CString ext = Path::GetExtension(strFilePathName);
@@ -135,13 +144,25 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 		}
 	}
 
+	// HC_Define_System_Options("update control=thread=off");
+
 	if (false == bPointColudData) {
+		SegmentKey cViewKey(pcHoopsView->GetViewKey());
+		cViewKey.Open();
+		HC_Set_Driver_Options("eye dome lighting = off");
+		cViewKey.Close();
+
 		DLL::_3DF::Interface cInterfaace;
-		cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, strErrorMessage);
+		cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, cDelivery, strErrorMessage);
 	}
 	else {
 		LoadPointCloudFile(strFilePathName, pcHoopsView);
 	}
+
+	system_clock::time_point cTime2 = system_clock::now();
+
+	cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 3/3 : Performing Initial Update");
+
 
 	//cModelSegmentKey.ForcedClose();
 
@@ -150,26 +171,72 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
  	SaveHsfFile(L"Z://Test.hsf", pcHoopsView);
 #endif
 
+	//HC_Define_System_Options("update control=thread");
+
+	pcHoopsView->SetSuppressUpdateTick(false);
 	pcHoopsView->SetSuppressUpdate(false);
 
-	//:Ken - test
-	delivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Update...");
+	bool m_has_initial_view = pcHoopsView->HasInitialView();
+	pcHoopsView->GetModel()->SetFileLoadComplete(true);
+	pcHoopsView->GetModel()->SetFirstFitComplete(true);
+
+	pcHoopsView->SetGeometryChanged();
+
+	if (!m_has_initial_view) {
+		pcHoopsView->FitWorld();		// fit the camera to the scene extents
+		if (pcHoopsView->GetModel()->GetContainsDouble()) {
+			HC_Convert_Precision(pcHoopsView->GetSceneKey(), "double, camera");
+		}
+
+		pcHoopsView->CameraPositionChanged(true);
+	}
+
+	pcHoopsView->SetZoomLimit();
+	m_pcHoopsModel->UpdateModelHandedness();
+
+	pcHoopsView->SetRenderMode(pcHoopsView->GetRenderMode(), true);
 
 	//pcHoopsView->SetSmoothTransition(true);
-	pcHoopsView->ZoomToExtents();
+	//pcHoopsView->ZoomToExtents();
 	pcHoopsView->ForceUpdate();
 
-	delivery.mainFrame.HideProgress();
+/*
 
-	delivery.view.SetValidation();
+	char chBuffer[MVO_BUFFER_SIZE];
+	HC_Open_Segment("/");
+		HC_Show_Net_Heuristics(chBuffer);
+	HC_Close_Segment();
+
+	HC_Open_Segment("/");
+		HC_Show_Net_Rendering_Options(chBuffer);
+	HC_Close_Segment();
+
+	HC_Open_Segment("/");
+		HC_Show_Net_Driver_Options(chBuffer);
+	HC_Close_Segment();
+*/
+
+	system_clock::time_point cTime3 = system_clock::now();
+	auto cMilliSec1 = duration_cast<milliseconds>(cTime3 - cTime2);
+
+	CString strMessage;
+	strMessage.Format(L"Stage 3/3 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec1));
+	cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+
+	auto cMilliSec2 = duration_cast<milliseconds>(cTime3 - cTime1);
+	strMessage;
+	strMessage.Format(L"Total Load Time : [%s]", Utility::GetTimeSpanString(cMilliSec2));
+	cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+
+	cDelivery.mainFrame.HideProgress();
+
+	cDelivery.view.SetValidation();
 }
 
 void ViewManager::Destruct(int nViewId)
 {
 	View * pcHoopsView = Wrapper().m_mpcHoopsView[nViewId];
 	if(nullptr != pcHoopsView) {
-
-		pcHoopsView->SetSuppressUpdate(true);
 
 		Model * pcModel = (Model *) pcHoopsView->GetModel();
 
@@ -209,9 +276,27 @@ void ViewManager::Paint(int nViewId, Json::Object & cInObject)
 	}
 }
 
-// == Mouse Function ===============================================================================
+void ViewManager::Resize(int nViewId, int x, int y)
+{
+	_3DF::View * pcView = Wrapper().m_mpcHoopsView[nViewId];
+	assert(pcView);
 
-// 1. Mouse Signal 처리 함수
+	pcView->SetXYSizeOverride(x, y);
+	//m_pHView->Notify( HSignalResize );
+}
+
+//== Command 관련 함수 ===========================================================================
+
+// 명령어 취소 함수, Select된 Object도 취소됨.
+void ViewManager::CancelCommands(int nViewId)
+{
+	_3DF::View * pcView = Wrapper().m_mpcHoopsView[nViewId];
+	pcView->CancelCommands();
+}
+
+// == Action Function ==============================================================================
+
+// 1. Action Signal 처리 함수
 bool ViewManager::ExecuteMouseSignal(int nViewId, int nAction, Json::Object & cInObject)
 {
 	_3DF::View * pcView = Wrapper().m_mpcHoopsView[nViewId];
@@ -336,10 +421,24 @@ void ViewManager::SaveHsfFile(CString strFilePathName, View * pcHoopsView)
 
 	HC_KEY nModelKey = pcHoopsView->GetModelKey();
 
+	HC_Open_Segment_By_Key(nModelKey);
+
 	HOutputHandlerOptions cOptions;
+	HStreamFileToolkit * mytool = new HStreamFileToolkit;
+	cOptions.ExtendedData(mytool);
+
+	int sflags = 0;
+	sflags |= TK_Full_Resolution_Vertices;
+	sflags |= TK_Full_Resolution_Normals;
+	sflags |= TK_Full_Resolution_Parameters;
+
+	mytool->SetWriteFlags(sflags);
+
 	HFileOutputResult eResult = cUtilityHsf.FileOutputByKey(strFilePathName, nModelKey, &cOptions);
 
-	int i = 0;
+	HC_Close_Segment();
+
+	delete mytool;
 }
 
 void ViewManager::LoadPointCloudFile(CString strFilePathName, View * pcHoopsView)

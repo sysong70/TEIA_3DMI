@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.View.OpCameraPan.h"
+#include "3DF.OpCameraPan.h"
 
 USING_3DF_NAMESPACE
 
@@ -8,6 +8,16 @@ OpCameraPan::OpCameraPan(HBaseView * view, int DoRepeat, int DoCapture) :
 	HOpCameraPan(view, DoRepeat, DoCapture)
 {
 
+}
+
+const char * OpCameraPan::GetName()
+{
+	return "3DF_OpCameraPan";
+}
+
+HBaseOperator * OpCameraPan::Clone()
+{
+	return new OpCameraPan(GetView());
 }
 
 int OpCameraPan::OnRButtonDown(HEventInfo & hevent)

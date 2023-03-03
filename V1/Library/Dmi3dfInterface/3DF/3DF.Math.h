@@ -400,9 +400,11 @@ public:
 	template <typename D>
 	explicit Point_3D(Point_3D<D> const & that) : x((F) that.x), y((F) that.y), z((F) that.z) {}
 
-	explicit Point_3D(Vector_3D<F> const & v);
+	explicit Point_3D(Vector_3D<F> const & that) : x((F)that.x), y((F)that.y), z((F)that.z) {}
 
 	Vector_3D<F> const operator- (Point_3D const & p) const { return Vector_3D(x - p.x, y - p.y, z - p.z); };
+	
+	Point_3D<F> const operator= (F const * p) const { return Point_3D(p[0], p[1], p[2]); };
 
 	void Set(F X, F Y, F Z) { x = X; y = Y; z = Z; };
 };

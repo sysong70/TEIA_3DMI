@@ -34,11 +34,33 @@ size_t ShellKit::GetTristripsCount() const
 	return m_panTristripsArray->GetCount();
 }
 
+ShellKit & ShellKit::SetPoints(int nInPointCount, Point const * pcInPoints)
+{
+	m_nPointCount = nInPointCount;
+	m_pcPoints = pcInPoints;
+	return *this;
+}
+
+ShellKit & ShellKit::SetPoints(int nInPointCount, PointArray const & acInPoints)
+{
+	m_nPointCount = nInPointCount;
+	m_pacPointArray = &acInPoints;
+	return *this;
+}
+
 ShellKit & ShellKit::SetPoints(PointArray const & acInPoints)
 {
 	m_pacPointArray = &acInPoints;
 	return *this;
 }
+
+ShellKit & ShellKit::SetNormals(int nInNormalCount, VectorArray const & acInVectors)
+{
+	m_nNormalCount = nInNormalCount;
+	m_pacNormalArray = &acInVectors;
+	return *this;
+}
+
 ShellKit & ShellKit::SetNormals(VectorArray const & acInVectors)
 {
 	m_pacNormalArray = &acInVectors;
@@ -69,6 +91,25 @@ ShellKit & ShellKit::SetColors(RGBAColorArray const & aInColors)
 	return *this;
 }
 
+//== Show 관련 함수 ==================================================================================
+bool ShellKit::ShowPoints(int & nOutPointCount, Point const *& pcOutPoints) const
+{
+	nOutPointCount = m_nPointCount;
+	pcOutPoints = m_pcPoints;
+	return true;
+}
+
+bool ShellKit::ShowPoints(int & nOutPointCount, PointArray const *& acOutPoints) const
+{
+	if (nullptr == m_pacPointArray) {
+		return false;
+	}
+
+	nOutPointCount = m_nPointCount;
+	acOutPoints = m_pacPointArray;
+	return true;
+}
+
 bool ShellKit::ShowPoints(PointArray const *& acOutPoints) const
 {
 	if(nullptr == m_pacPointArray) {
@@ -76,6 +117,16 @@ bool ShellKit::ShowPoints(PointArray const *& acOutPoints) const
 	}
 
 	acOutPoints = m_pacPointArray;
+	return true;
+}
+
+bool ShellKit::ShowNormals(int & nOutNormalCount, VectorArray const *& acOutVectors) const
+{
+	if (nullptr == m_pacNormalArray) {
+		return false;
+	}
+	nOutNormalCount = m_nNormalCount;
+	acOutVectors = m_pacNormalArray;
 	return true;
 }
 

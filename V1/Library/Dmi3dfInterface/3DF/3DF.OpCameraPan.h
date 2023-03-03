@@ -11,6 +11,9 @@ class OpCameraPan : public HOpCameraPan
 public:
 	OpCameraPan(HBaseView * view, int DoRepeat = 0, int DoCapture = 1);
 
+	const char * GetName() override;
+	HBaseOperator * Clone() override;
+
 	int OnRButtonDown(HEventInfo & hevent) override;
 	int OnRButtonDownAndMove(HEventInfo & hevent) override;
 	int OnRButtonUp(HEventInfo & hevent) override;

@@ -27,6 +27,8 @@ public:
 
 	_3DF::ModelHandedness GetModelHandedness() { return m_eModelHandedness; }
 
+	void UpdateModelHandedness();
+
 private:
 	SegmentKey m_cSegmentKey;
 

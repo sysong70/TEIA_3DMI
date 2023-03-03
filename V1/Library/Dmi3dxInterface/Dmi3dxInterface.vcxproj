@@ -121,6 +121,7 @@
     <ClInclude Include="..\Common\Json.h" />
     <ClInclude Include="..\Common\Path.h" />
     <ClInclude Include="..\Common\WStr.h" />
+    <ClInclude Include="..\Signal\Signal.h" />
     <ClInclude Include="3DX.3DfImport.h" />
     <ClInclude Include="3DX.ExchangeWrapper.h" />
     <ClInclude Include="3DX.h" />
@@ -162,6 +163,7 @@
     <ClCompile Include="..\Common\Json.cpp" />
     <ClCompile Include="..\Common\Path.cpp" />
     <ClCompile Include="..\Common\WStr.cpp" />
+    <ClCompile Include="..\Signal\Signal.cpp" />
     <ClCompile Include="3DX.3DfImport.cpp" />
     <ClCompile Include="3DX.cpp" />
     <ClCompile Include="3DX.ImportBase.cpp" />

@@ -47,7 +47,7 @@ bool Window::IsAllowed3d(const wchar_t* pFilePath)
 		L"DGN", // Microstation DGN
 		L"PRT", // NX - Unigraphics
 		L"X_B", L"X_T", L"XMT", L"XMT_TXT", // Parasolid
-		//L"PDF", // PDF
+		L"PDF", // PDF
 		L"PRC", // PRC
 		L"RVT, RFA", // Revit
 		L"3DM", // Rhino3D

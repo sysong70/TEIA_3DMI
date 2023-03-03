@@ -22,10 +22,14 @@ protected:
 	void Initialize(int nViewId, Json::Object & cInObject);
 	void Destruct(int nViewId);
 	void Paint(int nViewId, Json::Object & cInObject);
+	void Resize(int nViewId, int x, int y);
 
 	void SaveHsfFile(CString strFilePathName, _3DF::View * pcHoopsView);
 	
 	void LoadPointCloudFile(CString strFilePathName, _3DF::View * pcHoopsView);
+
+	//== Command 관련 함수 ===========================================================================
+	void CancelCommands(int nViewId);
 
 	//== Mouse 관련 함수 =============================================================================
 protected:
