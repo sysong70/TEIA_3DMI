@@ -127,6 +127,8 @@
     <ClInclude Include="3DF\3DF.Color.h" />
     <ClInclude Include="3DF\3DF.Control.h" />
     <ClInclude Include="3DF\3DF.Database.h" />
+    <ClInclude Include="3DF\3DF.Facility.Base.h" />
+    <ClInclude Include="3DF\3DF.Facility.Preference.h" />
     <ClInclude Include="3DF\3DF.Geometry.h" />
     <ClInclude Include="3DF\3DF.h" />
     <ClInclude Include="3DF\3DF.Image.h" />
@@ -140,6 +142,8 @@
     <ClInclude Include="3DF\3DF.Math.h" />
     <ClInclude Include="3DF\3DF.Model.h" />
     <ClInclude Include="3DF\3DF.Object.h" />
+    <ClInclude Include="3DF\3DF.OpCameraOrbitSelect.h" />
+    <ClInclude Include="3DF\3DF.OpSelectArea.h" />
     <ClInclude Include="3DF\3DF.PMI.Entity.h" />
     <ClInclude Include="3DF\3DF.Polygon.h" />
     <ClInclude Include="3DF\3DF.Portfolio.h" />
@@ -154,7 +158,7 @@
     <ClInclude Include="3DFSignal.Interface.h" />
     <ClInclude Include="3DFSignal.h" />
     <ClInclude Include="3DFSignal.ViewManager.h" />
-    <ClInclude Include="3DF\3DF.View.OpCameraPan.h" />
+    <ClInclude Include="3DF\3DF.OpCameraPan.h" />
     <ClInclude Include="3DF\3DF.Visibility.h" />
     <ClInclude Include="3DF\3DF.MarkerAttribute.h" />
     <ClInclude Include="Import\DLL.3DF.Interface.h" />
@@ -175,6 +179,8 @@
     <ClCompile Include="3DF\3DF.Color.cpp" />
     <ClCompile Include="3DF\3DF.Control.cpp" />
     <ClCompile Include="3DF\3DF.Database.cpp" />
+    <ClCompile Include="3DF\3DF.Facility.Base.cpp" />
+    <ClCompile Include="3DF\3DF.Facility.Preference.cpp" />
     <ClCompile Include="3DF\3DF.Geometry.cpp" />
     <ClCompile Include="3DF\3DF.Image.cpp" />
     <ClCompile Include="3DF\3DF.Include.cpp" />
@@ -187,6 +193,8 @@
     <ClCompile Include="3DF\3DF.Math.cpp" />
     <ClCompile Include="3DF\3DF.Model.cpp" />
     <ClCompile Include="3DF\3DF.Object.cpp" />
+    <ClCompile Include="3DF\3DF.OpCameraOrbitSelect.cpp" />
+    <ClCompile Include="3DF\3DF.OpSelectArea.cpp" />
     <ClCompile Include="3DF\3DF.PMI.Entity.cpp" />
     <ClCompile Include="3DF\3DF.Polygon.cpp" />
     <ClCompile Include="3DF\3DF.Portfolio.cpp" />
@@ -198,7 +206,7 @@
     <ClCompile Include="3DF\3DF.Utility.cpp" />
     <ClCompile Include="3DF\3DF.View.cpp" />
     <ClCompile Include="3DF\3DF.Segment.cpp" />
-    <ClCompile Include="3DF\3DF.View.OpCameraPan.cpp" />
+    <ClCompile Include="3DF\3DF.OpCameraPan.cpp" />
     <ClCompile Include="3DF\3DF.Visibility.cpp" />
     <ClCompile Include="3DF\3DF.MarkerAttribute.cpp" />
     <ClCompile Include="dllmain.cpp" />
