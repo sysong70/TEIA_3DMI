@@ -136,7 +136,7 @@ void View::Init()
 	SetZoomLimit();
 
 	char chGpuToUse[256];
-	strcpy(chGpuToUse, "Default");
+	strcpy(chGpuToUse, (char const *)H_UTF8(m_cPreference.General.Display.Gpu).encodedText());
 	if (strcmp(chGpuToUse, "Default") != 0) {
 		HC_Open_Segment_By_Key(GetViewKey()); {
 			HC_Set_Driver_Options(H_FORMAT_TEXT("gpu preference = specific = %s", chGpuToUse));
@@ -154,96 +154,102 @@ void View::Init()
 	GetEventManager()->RegisterHandler((HJoyStickListener *)this, HJoyStickListener::GetType(), HLISTENER_PRIORITY_NORMAL);
 
 	SetKeyStateCallback(GetKeyState);
-	GetModel()->GetBhvBehaviorManager()->SetUpdateCamera(true); // bool CAppSet_tings::UpdateCamera = true;
+	GetModel()->GetBhvBehaviorManager()->SetUpdateCamera(m_cPreference.Interaction.Animation.UpdateCamera);
 
-	long debug_flags = DEBUG_NO_WINDOWS_HOOK | DEBUG_STARTUP_CLEAR_BLACK;
+	long nDebugFlags = DEBUG_NO_WINDOWS_HOOK | DEBUG_STARTUP_CLEAR_BLACK;
 
 	// use soft ogl if set
-	if (false) //bool CAppSet_tings::bDriverForceSoftware = false;
-		debug_flags |= DEBUG_FORCE_SOFTWARE;
+	if (true == m_cPreference.General.Display.DriverForceSoftware) {
+		nDebugFlags |= DEBUG_FORCE_SOFTWARE;
+	}
 
-	sprintf(chDriverOpts, "debug = %u", debug_flags);
+	sprintf(chDriverOpts, "debug = %u", nDebugFlags);
 
 	// set anti-aliasing if set
-	if (true) // bool CAppSet_tings::bAntiAliasing = true;
-		sprintf(chDriverOpts, "%s, anti-alias=%d ", chDriverOpts, 4); // int CAppSet_tings::AntialiasingLevel = 4;
+	if (true == m_cPreference.Appearance.AntiAliasing.Use) {
+		sprintf(chDriverOpts, "%s, anti-alias=%d ", chDriverOpts, m_cPreference.Appearance.AntiAliasing.Level);
+	}
 
-	if (false) // bool CAppSet_tings::bDriverDisplayStats = false;
+	if (true == m_cPreference.General.Display.DriverDisplayStats) {
 		sprintf(chDriverOpts, "%s, display stats, display time stats, display memory stats", chDriverOpts);
+	}
 
-	if (false) // bool CAppSet_tings::StereoMode = false;
+	if (true == m_cPreference.General.Display.StereoMode) {
 		sprintf(chDriverOpts, "%s, stereo", chDriverOpts);
+	}
 
-	sprintf(chDriverOpts, "%s, quick moves preference = %s", chDriverOpts, "Default"); // CString CAppSet_tings::csQuickMovesType = "Default";
+	sprintf(chDriverOpts, "%s, quick moves preference = %s", chDriverOpts, H_ASCII_TEXT(m_cPreference.Selection.Highlight.QuickMovesType));
 
 	HCLOCALE(sprintf(chDriverOpts,
-		"%s, ambient occlusion = (%s, strength = %f, quality = %s), fast silhouette edges = (%s, tolerance = %f, %s heavy exterior)",
-		chDriverOpts, (CAppSet_UseFastAmbient ? "on" : "off"), CAppSet_FastAmbientStrength,
-		(CAppSet_HQAmbientOcclusion ? "nicest" : "fast"),
-		(CAppSet_UseFastSilhouette ? "on" : "off"), CAppSet_FastSilhouetteTolerance,
-		(CAppSet_HeavyExteriorSilhouette ? "" : "no")));
+		"%s, ambient occlusion = (%s, strength = %f, quality = %s), fast silhouette edges = (%s, tolerance = %f, %s heavy exterior)", chDriverOpts, 
+		(m_cPreference.Effects.FrameBuffer.UseAmbient ? "on" : "off"), m_cPreference.Effects.FrameBuffer.AmbientStrength,
+		(m_cPreference.Effects.FrameBuffer.HighQualityAmbient ? "nicest" : "fast"),
+		(m_cPreference.Effects.FrameBuffer.UseFastSilhouette ? "on" : "off"), m_cPreference.Effects.FrameBuffer.FastSilhouetteTolerance,
+		(m_cPreference.Effects.FrameBuffer.HeavyExteriorSilhouette ? "" : "no")));
 
-	SetDoubleBuffering(CAppSet_DoubleBuffer);
+	SetDoubleBuffering(m_cPreference.General.Display.DoubleBuffer);
 
 	HC_Open_Segment_By_Key(GetViewKey()); {
 		HC_Set_User_Index(H_VIEW_POINTER_INDEX, this);  /* This is used in the event_checker for constant framerate. */
 		HC_Set_Driver_Options(chDriverOpts);
 		HCLOCALE(sprintf(chDriverOpts, "bloom = (%s, strength=%f, blur=%d, shape=%s)",
-			(CAppSet_UseBloom ? "on" : "off"),
-			CAppSet_BloomStrength,
-			CAppSet_BloomBlur,
-			(CAppSet_BloomShape == RadialBloom ? "radial" : "star")));
+			(m_cPreference.Lighting.Bloom.Use ? "on" : "off"),
+			m_cPreference.Lighting.Bloom.Strength,
+			m_cPreference.Lighting.Bloom.Blur,
+			(m_cPreference.Lighting.Bloom.Shape == RadialBloom ? "radial" : "star")));
 		HC_Set_Driver_Options(chDriverOpts);
 		// antialiasing needs rendering option in addition to driver option
-		if (CAppSet_bAntiAliasing) {
+		if (true == m_cPreference.Appearance.AntiAliasing.Use) {
 			HC_Set_Rendering_Options("anti-alias = (screen = on)");
 		}
 		HC_Set_Driver_Options("special events, update interrupts");
 		HC_Control_Update(".", "redraw everything");
 	} HC_Close_Segment();
 
-	bool CAppSet_bLightScaling = true;
 	int CAppSet_LightScaleFactor = 100000;;
 
-	if (!CAppSet_bLightScaling) {
+	if (false == m_cPreference.Lighting.Light.Scaling) {
 		SetLightScaling(0);
 	}
 	else {
-		SetLightScaling(CAppSet_LightScaleFactor / 100000.f);
+		SetLightScaling(m_cPreference.Lighting.Light.ScaleFactor / 100000.f);
 	}
 
 		
-	SetLightFollowsCamera(CAppSet_LightFollowsCamera);
+	SetLightFollowsCamera(m_cPreference.Lighting.Light.FollowsCamera);
 	//SetLightCount(LightCount); //defer until after camera is all set up
 	// SetDeepSelectionMode(DeepSelection); OCC를 사용할 때 대응하는 함수
-	SetVisibilitySelectionMode(CAppSet_VisibilitySelection);
-	SetDynamicHighlighting(CAppSet_DynamicHighlighting);
-	SetDetailSelection(CAppSet_DetailSelection);
-	SetRelatedSelectionLimit(CAppSet_RelatedSelectionLimit);
-	SetTransparentSelectionBoxMode(CAppSet_bUseSelectBox);
-	SetRespectSelectionCulling(CAppSet_SelectionRespectCulling);
+	SetVisibilitySelectionMode(m_cPreference.Selection.Behavior.VisibilitySelection);
+	SetDynamicHighlighting(m_cPreference.Selection.Behavior.DynamicHighlighting);
+	SetDetailSelection(m_cPreference.Selection.Behavior.DetailSelection); // "Honor Line/Edge Weight/Pattern"
+	SetRelatedSelectionLimit(m_cPreference.Selection.Behavior.RelatedSelectionLimit);
+	SetTransparentSelectionBoxMode(m_cPreference.Selection.Behavior.UseSelectBox); // show a transparent box when selecting areas
+	SetRespectSelectionCulling(m_cPreference.Selection.Behavior.RespectCulling); // Respect Culling during selection.
 	SetFastFitWorld(true);
-	SetForceFastHiddenLine(CAppSet_HiddenLineMode == FastHiddenLine);
-	SetSpritingMode(CAppSet_Spriting);
-	SetAllowInteractiveCutGeometry(CAppSet_UpdateCutGeometry);
-	SetAllowInteractiveShadows(CAppSet_UpdateShadows);
-	SetBackplaneCulling(CAppSet_bBackplaneCulling);
-	SetOcclusionCullingMode(CAppSet_OcclusionCulling, true, CAppSet_OcclusionThreshold);
+	SetForceFastHiddenLine(m_cPreference.Perfromance.Optimization.HiddenLineMode == FastHiddenLine);
+	SetSpritingMode(m_cPreference.Interaction.GeometryManipulation.Spriting);
+	SetAllowInteractiveCutGeometry(m_cPreference.Interaction.GeometryManipulation.UpdateCutGeometry);
+	SetAllowInteractiveShadows(m_cPreference.Interaction.GeometryManipulation.UpdateShadows);
+	SetBackplaneCulling(m_cPreference.General.Etc.BackplaneCulling);
+	SetOcclusionCullingMode(m_cPreference.Perfromance.Optimization.OcclusionCulling, true, m_cPreference.Perfromance.Optimization.OcclusionThreshold);
 
 	SetDisplayListType(DisplayListOff);
 
-	if (CAppSet_UseFramerate)
+	if (true == m_cPreference.Perfromance.FramerateOptimization.UseFramerate)
 	{
 		//if (!pDoc->IsFileReadDeferedForView() || CurrentFramerateMode == FramerateFixed)
-		if (CAppSet_CurrentFramerateMode == FramerateFixed)
+		if (FramerateFixed == m_cPreference.Perfromance.FramerateOptimization.CurrentFramerateMode)
 		{
-			SetFramerateMode(CAppSet_CurrentFramerateMode, CAppSet_FramerateTime, CAppSet_MaxThreshold, UINT2bool(CAppSet_UseLods), CAppSet_DetailSteps, CAppSet_HardCutoff);
+			SetFramerateMode(m_cPreference.Perfromance.FramerateOptimization.CurrentFramerateMode, 
+				m_cPreference.Perfromance.FramerateOptimization.FramerateTime, m_cPreference.Perfromance.FramerateOptimization.MaxThreshold, 
+				UINT2bool(m_cPreference.Perfromance.FramerateOptimization.UseLods), m_cPreference.Perfromance.FramerateOptimization.DetailSteps, 
+				m_cPreference.Perfromance.FramerateOptimization.HardCutoff);
 		}
 	}
-	else if (CAppSet_CullingThresholdSet)
+	else if (m_cPreference.Perfromance.FramerateOptimization.CullingThresholdSet)
 	{
 		SetFramerateMode(FramerateOff);
-		SetCullingThreshold(CAppSet_CullingThreshold);
+		SetCullingThreshold(m_cPreference.Perfromance.FramerateOptimization.CullingThreshold);
 	}
 	else
 	{
@@ -252,16 +258,15 @@ void View::Init()
 	}
 
 	SetSmoothTransition(false);
-	SetShadowRenderingMode(CAppSet_ShadowRenderingMode);
+	SetShadowRenderingMode(m_cPreference.Effects.SimpleShadow.ShadowRenderingMode);
 	SetViewAxis();
 	SetTransparency();
 
 	SetViewMode(HViewIsoFrontRightTop);		// fit the camera to the scene extents
-	SetAxisMode(CAppSet_bDisplayAxisTriad ? AxisOn : AxisOff);
+	SetAxisMode(m_cPreference.General.Rendering.DisplayAxisTriad ? AxisOn : AxisOff);
 
 	// 배경화면 설정
-	COLORREF nWindowBackgroundColor = RGB(59, 68, 83);
-	SetWindowBackGroundColor(nWindowBackgroundColor, nWindowBackgroundColor);
+	SetWindowBackGroundColor(m_cPreference.Appearance.BackgroundColor.Top, m_cPreference.Appearance.BackgroundColor.Bottom);
 	//SetWindowColor(WindowBackgroundTopColor, WindowBackgroundBottomColor);
 
 	HPoint FakeHLRColor;
@@ -434,11 +439,11 @@ void View::Init()
 	}*/
 
 	
-// 	if (pDoc->IsFileReadDeferedForView())
-// 		LoadFile(pDoc->filename, hmodel->GetStreamFileTK());
-// 	else
-	{
 /*
+ 	if (pDoc->IsFileReadDeferedForView())
+ 		LoadFile(pDoc->filename, hmodel->GetStreamFileTK());
+ 	else
+	{
 		SetLineAntialiasing(CAppSet_LineAntialiasing);
 		SetTextAntialiasing(CAppSet_TextAntialiasing);
 
@@ -450,8 +455,8 @@ void View::Init()
 			EnableFrameRate();
 
 		ViewReady();
-*/
 	}
+*/
 
 	SetSceneFont(CAppSet_FontName, CAppSet_FontSize, CAppSet_FontUnits);
 
@@ -830,27 +835,28 @@ void View::SetDriverOption()
 // 투명도 적용 방법 설정
 void View::SetTransparency()
 {
-	char chText[4096];
-	char chStyle[4096];
-	char chSorting[4096];
-	char chLayers[4096];
-	bool chFastZsort = false;
+	char text[4096];
+	char style[4096];
+	char sorting[4096];
+	char layers[4096];
+	bool fast_z_sort = false;
 
-	strcpy(chStyle, H_ASCII_TEXT(m_cPreference.Transparency.Style));
-	strcpy(chSorting, H_ASCII_TEXT(m_cPreference.Transparency.Sorting));
-	strcpy(chLayers, H_ASCII_TEXT(m_cPreference.Transparency.DepthPeelingLayers));
+	strcpy(style, H_ASCII_TEXT(m_cPreference.General.Transparency.Style));
+	strcpy(sorting, H_ASCII_TEXT(m_cPreference.General.Transparency.Sorting));
+	strcpy(layers, H_ASCII_TEXT(m_cPreference.General.Transparency.DepthPeelingLayers));
 
-	if(strstr(chSorting, "z-sort")) {
-		if (strstr(chSorting, "fast")) {
-			chFastZsort = true;
+	if(strstr(sorting, "z-sort")) {
+		if (strstr(sorting, "fast")) {
+			fast_z_sort = true;
 		}
-		sprintf(chSorting, "z-sort only");
+		sprintf(sorting, "z-sort only");
 	}
 
-	sprintf(chText, "style = %s, hsr algorithm = %s, depth peeling options = (layers= %s, algorithm=%s), depth writing = %s",
-		chStyle, chSorting, chLayers, m_cPreference.Transparency.PixelOIT ? "pixel" : "buffer", m_cPreference.Transparency.DepthWriting == TRUE ? "on" : "off");
+	sprintf(text, "style = %s, hsr algorithm = %s, depth peeling options = (layers= %s, algorithm=%s), depth writing = %s",
+		style, sorting, layers, m_cPreference.General.Transparency.PixelOIT ? "pixel" : "buffer", 
+		m_cPreference.General.Transparency.DepthWriting == true ? "on" : "off");
 
-	HBaseView::SetTransparency(chText, chFastZsort);
+	HBaseView::SetTransparency(text, fast_z_sort);
 }
 
 void View::SetViewAxis()
@@ -889,12 +895,13 @@ void View::SetSelectOption()
 	HPixelRGBA cHighlightSelectColor;
 	cHighlightSelectColor.Set(0, 255, 0);
 	GetHighlightSelection()->SetSelectionFaceColor(cHighlightSelectColor);
-	GetHighlightSelection()->SetSelectionLevel(HSelectLevel::HSelectSegment);
+	//GetHighlightSelection()->SetSelectionLevel(HSelectLevel::HSelectSegment);
+	GetHighlightSelection()->SetSelectionLevel(HSelectLevel::HSelectEntity);
 	GetHighlightSelection()->SetGrayScale(false); // CAppSet_tings::CAppSet_bGrayScaleSelection
 	GetHighlightSelection()->SetUseDefinedHighlight(false); // CAppSet_tings::CAppSet_bUseDefinedHighlighting
 	GetHighlightSelection()->SetInvisible(false); // CAppSet_tings::bInvisibleSelection
 	GetHighlightSelection()->SetAllowDisplacement(false); // CAppSet_tings::bDisplaceSelection
-	GetHighlightSelection()->SetHighlightMode(HighlightQuickmoves);
+	GetHighlightSelection()->SetHighlightMode(HighlightDefault);// HighlightQuickmoves);
 	GetHighlightSelection()->UpdateHighlightStyle();
 
 	char qm_pref[MVO_BUFFER_SIZE];
@@ -1006,7 +1013,7 @@ void View::SetShadowColor(COLORREF new_color)
 
 void View::event_checker(HIC_Rendition const * nr)
 {
-	MSG msg;
+	//MSG msg;
 	View * pCurrentView = (View *)HIC_Show_User_Index(nr, H_VIEW_POINTER_INDEX);
 	if (pCurrentView)
 	{
@@ -1096,9 +1103,8 @@ void View::ViewReady()
 	SetShadowIgnoresTransparency(CAppSet_IgnoreTransparency);
 	SetShadowMode(CAppSet_ShadowMode);
 	SetOcclusionCullingMode(CAppSet_OcclusionCulling, true);
-	SetLineAntialiasing(CAppSet_LineAntialiasing);
-	SetTextAntialiasing(CAppSet_TextAntialiasing);
-
+	SetLineAntialiasing(m_cPreference.Appearance.AntiAliasing.Line);
+	SetTextAntialiasing(m_cPreference.Appearance.AntiAliasing.Text);
 	SetTransparency();
 
 	//Turn on static model and display lists last, and in that order
@@ -1139,14 +1145,16 @@ void View::SetupViews()
 {
 	SetRenderMode(CAppSet_RenderMode, true);
 	SetShadowMode(CAppSet_ShadowMode);
-	SetOcclusionCullingMode(CAppSet_OcclusionCulling, true);
+	SetOcclusionCullingMode(m_cPreference.Perfromance.Optimization.OcclusionCulling, true);
 }
 
 void View::EnableFrameRate(bool onoff)
 {
-	int steps = (CAppSet_DynamicAdjustment ? CAppSet_DetailSteps : 0);
+	int nSteps = (CAppSet_DynamicAdjustment ? m_cPreference.Perfromance.FramerateOptimization.DetailSteps : 0);
+
 	if (onoff) {
-		SetFramerateMode(FramerateTarget, CAppSet_FramerateTime, CAppSet_MaxThreshold, UINT2bool(CAppSet_UseLods), steps);
+		SetFramerateMode(FramerateTarget, m_cPreference.Perfromance.FramerateOptimization.FramerateTime, 
+			m_cPreference.Perfromance.FramerateOptimization.MaxThreshold, UINT2bool(m_cPreference.Perfromance.FramerateOptimization.UseLods), nSteps);
 	}
 	else {
 		SetFramerateMode(FramerateOff);

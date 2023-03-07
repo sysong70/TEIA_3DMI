@@ -176,6 +176,9 @@ void OpCameraOrbitSelect::HandleSelection(HEventInfo & cEvent)
 		pcSelection->SetSelectionLevel(HSelectLevel::HSelectSegment);
 	}
 
+	// Object snap을 위해서 Entity별로 선택하도록 한다.
+	pcSelection->SetSelectionLevel(HSelectLevel::HSelectEntity);
+
 	//don't notify in the selection set, we'll do that at the end
 	pcSelection->SetSelectWillNotify(false);
 

@@ -92,9 +92,9 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	HWND hWnd = (HWND) cInObject.GetDwordPtr(SKW_HWND);
 
-	CString strHoopsDriver = L"dx11";
+	Facility::Preference cPreference;
 
-	View * pcHoopsView = new View(m_pcHoopsModel, nullptr, H_ASCII_TEXT(strHoopsDriver), nullptr,
+	View * pcHoopsView = new View(m_pcHoopsModel, nullptr, H_ASCII_TEXT(cPreference.General.Display.Driver), nullptr,
 		reinterpret_cast<void *>(hWnd), nullptr); // reinterpret_cast<void *>(pcPalette));
 
 	if(nullptr == pcHoopsView) {
@@ -196,9 +196,17 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	pcHoopsView->SetRenderMode(pcHoopsView->GetRenderMode(), true);
 
+	pcHoopsView->ViewReady();
+	pcHoopsView->ExhaustiveUpdate();
+
+	pcHoopsView->SetSuppressUpdateTick(false);
+
+	pcHoopsView->ForceUpdate();
+
 	//pcHoopsView->SetSmoothTransition(true);
 	//pcHoopsView->ZoomToExtents();
-	pcHoopsView->ForceUpdate();
+	// Temp
+	//pcHoopsView->ForceUpdate();
 
 /*
 

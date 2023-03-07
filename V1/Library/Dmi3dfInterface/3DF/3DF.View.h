@@ -6,7 +6,6 @@
 #include "HUtility.h"
 
 #include "3DF.h"
-
 #include "3DF.Facility.Preference.h"
 
 OPEN_3DF_NAMESPACE
@@ -37,6 +36,7 @@ public:
 	//== Hoops 설정 함수 =============================================================================
 	void Init() override;
 	void Init_CUR();
+	void ViewReady();
 
 protected:
 	void SetGpu(CString strGpu);
@@ -54,7 +54,6 @@ protected:
 
 	void SetShowCollisions(bool sc) { m_bShowCollisions = sc; }
 
-	void ViewReady();
 	void SetupViews();
 
 	void EnableFrameRate(bool onoff = true);
@@ -68,44 +67,8 @@ protected:
 	static bool signal_deselected_all(int signal, void * signal_data, void * user_data);
 	bool OnSignalDeSelectedAll();
 
-	bool CAppSet_UseFastAmbient = false;
-	float CAppSet_FastAmbientStrength = 1.0f;
-	bool CAppSet_HQAmbientOcclusion = false;
-	bool CAppSet_UseFastSilhouette = false;
-	float CAppSet_FastSilhouetteTolerance = 1.0f;
-	bool CAppSet_HeavyExteriorSilhouette = false;
-	bool CAppSet_DoubleBuffer = true;
-	bool CAppSet_UseBloom = false;
-	float CAppSet_BloomStrength = 1.0f;
-	int CAppSet_BloomBlur = 5;
-	HBloomShape CAppSet_BloomShape = RadialBloom;
-	bool CAppSet_bAntiAliasing = true;
-	bool CAppSet_LightFollowsCamera = true;
-	bool CAppSet_DeepSelection = false;
-	bool CAppSet_VisibilitySelection = false;
-	bool CAppSet_DynamicHighlighting = true;
-	bool CAppSet_DetailSelection = false;
-	int CAppSet_RelatedSelectionLimit = 0;
-	bool CAppSet_bUseSelectBox = true;
-	bool CAppSet_SelectionRespectCulling = false;
-	HLRMode CAppSet_HiddenLineMode = FakeHiddenLine;
-	bool CAppSet_Spriting = true;
-	bool CAppSet_UpdateCutGeometry = false;
-	bool CAppSet_UpdateShadows = true;
-	bool CAppSet_bBackplaneCulling = false;
 	bool CAppSet_OcclusionCulling = false;
 	int CAppSet_OcclusionThreshold = 50;
-	bool CAppSet_UseFramerate = false;
-	FramerateMode CAppSet_CurrentFramerateMode = FramerateFixed;
-	float CAppSet_FramerateTime = 0.05f;
-	int	CAppSet_MaxThreshold = 100;
-	int	CAppSet_UseLods = 0;
-	int	CAppSet_DetailSteps = 15;
-	int CAppSet_CAppSet_HardCutoff = 10;
-	int	CAppSet_CullingThresholdSet = 1;
-	int	CAppSet_CullingThreshold = 2;
-	HShadowRenderingMode CAppSet_ShadowRenderingMode = SoftwareOpenglShadow;
-	bool CAppSet_bDisplayAxisTriad = true;
 	COLORREF CAppSet_FakeHLRColor = RGB(255, 255, 255);
 	ProjMode CAppSet_ProjectionMode = ProjOrthographic;
 	bool CAppSet_bSmoothTransition = true;
@@ -131,8 +94,6 @@ protected:
 	CString CAppSet_csRefSelType = "Spriting";
 	HRenderMode CAppSet_RenderMode = HRenderGouraud;
 	bool CAppSet_ShowCollisions = false;
-	bool CAppSet_LineAntialiasing = false;
-	bool CAppSet_TextAntialiasing = false;
 	HShadowMode CAppSet_ShadowMode = HShadowNone;
 	bool CAppSet_bShadowMap = false;
 	int CAppSet_HardCutoff = 10;
@@ -204,6 +165,12 @@ protected:
 	int	CAppSet_GreekingLimit = 6000;	// Greeking limit * 1000 (to store float as int)
 
 	int CAppSet_LightCount = 1;
+
+	CString CAppSet_TransparencyStyle = "blended";
+	CString CAppSet_TransparencySorting = "depth peeling";
+	CString CAppSet_TransparencyDepthPeelingLayers = "3";
+	bool CAppSet_PixelOIT = false;
+	bool CAppSet_DepthWriting= false;
 
 	//== Command 관련 함수 ===========================================================================
 public:
