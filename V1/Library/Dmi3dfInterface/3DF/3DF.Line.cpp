@@ -94,7 +94,60 @@ void LineKit::GetLinePattern(char out_pattern[PATTERN_BUFFER_SIZE]) const
 }
 
 //== LineKey =======================================================================================
+class LineKeyPrivate : public PrivateImpl
+{
+public:
+	_3DF::Type Type() const override { return _3DF::Type::LineKey; }
+
+	void Copy(LineKeyPrivate * pcInThat) {
+		cKey = pcInThat->cKey;
+	}
+
+	Key cKey;
+};
+
+LineKey::LineKey()
+{
+}
+
+LineKey::LineKey(Key const & cInKey)
+{
+	LineKeyPrivate * pcImpl = new LineKeyPrivate();
+	pcImpl->cKey = cInKey;
+
+	m_pcImpl = pcImpl;
+}
+
+LineKey::LineKey(LineKey const & cInThat)
+{
+	m_pcImpl = new LineKeyPrivate();
+	Set(cInThat);
+}
+
+LineKey::~LineKey()
+{
+
+}
+
+/*
 LineKey::LineKey(HC_KEY nInKey) :
 	GeometryKey(nInKey)
 {
+}*/
+
+void LineKey::Set(LineKey const & cInThat)
+{
+	if (nullptr == m_pcImpl || nullptr == cInThat.m_pcImpl) {
+		return;
+	}
+
+	LineKeyPrivate * pcImpl = (LineKeyPrivate *)m_pcImpl;
+	LineKeyPrivate * pcInThatImpl = (LineKeyPrivate *)cInThat.m_pcImpl;
+	pcImpl->Copy(pcInThatImpl);
+}
+
+LineKey & LineKey::operator=(LineKey const & cInThat)
+{
+	Set(cInThat);
+	return *this;
 }

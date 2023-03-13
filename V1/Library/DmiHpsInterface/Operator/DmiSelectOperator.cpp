@@ -60,8 +60,7 @@ bool DmiSelectOperator::OnDaynamicHighlightMouseMove(HPS::MouseState const & cIn
 
 	HPS::WindowKey cInWindow = cInState.GetEventSource();
 	m_cOldDynamicActiveSelection = m_cNewDynamicActiveSelection;
- 	size_t nSelectedCount = cInWindow.GetSelectionControl().SelectByPoint(cInState.GetLocation(), 
- 		m_cSelectionOptions, m_cNewDynamicActiveSelection);
+ 	size_t nSelectedCount = cInWindow.GetSelectionControl().SelectByPoint(cInState.GetLocation(), m_cSelectionOptions, m_cNewDynamicActiveSelection);
 	//size_t nSelectedCount = cInWindow.GetSelectionControl().SelectByPoint(cInState.GetLocation(), m_cDynamicActiveSelection);
 
 	ULONG64 nEndTick = GetTickCount64();

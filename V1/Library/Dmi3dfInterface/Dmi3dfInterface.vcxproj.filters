@@ -81,7 +81,7 @@
     <ClInclude Include="3DFSignal.ViewManager.h">
       <Filter>Signal</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.View.h">
+    <ClInclude Include="3DF\3DF.Canvas.h">
       <Filter>3DF\Base</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.Model.h">
@@ -201,6 +201,9 @@
     <ClInclude Include="3DF\3DF.Facility.Base.h">
       <Filter>Facility</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\3DF.Window.h">
+      <Filter>3DF\Key</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -236,7 +239,7 @@
     <ClCompile Include="3DFSignal.ViewManager.cpp">
       <Filter>Signal</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.View.cpp">
+    <ClCompile Include="3DF\3DF.Canvas.cpp">
       <Filter>3DF\Base</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Model.cpp">
@@ -346,6 +349,9 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.Facility.Base.cpp">
       <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Window.cpp">
+      <Filter>3DF\Key</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

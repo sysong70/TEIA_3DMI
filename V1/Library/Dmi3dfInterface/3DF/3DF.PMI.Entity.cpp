@@ -128,15 +128,11 @@ unsigned int Entity::GetLeaderLineCount() const
 
 	int count = 0;
 
-	HC_Open_Segment("leader");
-	{
-		HC_Begin_Contents_Search("...", "polylines, lines");
-		{
+	HC_Open_Segment("leader"); {
+		HC_Begin_Contents_Search("...", "polylines, lines"); {
 			HC_Show_Contents_Count(&count);
-		}
-		HC_End_Contents_Search();
-	}
-	HC_Close_Segment();
+		} HC_End_Contents_Search();
+	} HC_Close_Segment();
 
 	Close();
 

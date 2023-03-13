@@ -512,7 +512,6 @@ bool DmiOrbitSelectOperator::DynamicHighlightCommon(HPS::WindowKey & cInWindow, 
 	}
 	
 	// 선택된 결과에서 Dynamic Highlight가 작동하더라도 꺼지지 않도록 처리하는 부분
-
 	HPS::SelectionResults cSelectionResults = GetActiveSelection();
 	size_t nSelectedCount = cSelectionResults.GetCount();
 

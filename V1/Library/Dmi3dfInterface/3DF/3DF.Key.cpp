@@ -31,9 +31,10 @@ public:
 
 Key::Key(HC_KEY nInKey)
 {
-	m_pcImpl = new KeyPrivate();
-	KeyPrivate * pcImpl = (KeyPrivate *)m_pcImpl;
+	KeyPrivate * pcImpl = new KeyPrivate();
 	pcImpl->m_nKey = nInKey;
+
+	m_pcImpl = pcImpl;
 }
 
 Key::Key(Key const & cInThat)

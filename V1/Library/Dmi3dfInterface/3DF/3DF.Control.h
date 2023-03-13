@@ -1,10 +1,11 @@
 ﻿#pragma once
 
 #include "3DF.h"
+#include "3DF.Object.h"
 
 OPEN_3DF_NAMESPACE
 
-class API_3DF Control
+class API_3DF Control : public Object
 {
 public:
 	Control() {};

@@ -45,8 +45,10 @@ OPEN_3DF_NAMESPACE
 #define PATTERN_BUFFER_SIZE		1024
 
 //== Forward Declarations ==========================================================================
+class Object;
+class Canvas;
+class WindowKey;
 class Model;
-class View;
 class Key;
 class SegmentKey;
 class MaterialMappingKit;
@@ -64,6 +66,48 @@ class SelectabilityControl;
 class VisibilityControl;
 class MarkerAttributeControl;
 //==================================================================================================
+
+// The Type class is a concept class that contains type information for all classes.
+enum class Type : uint32_t
+{
+	None									= 0x00000000,
+	GenericMask								= 0xffffff00,
+
+	SelectionResults						= 0x0000000a,
+	SelectionItem							= 0x0000000b,
+
+	Kit										= 0x01000000,
+	LineKit									= 0x01000020,
+	ShellKit								= 0x01000027,
+
+	Key										= 0x10000000,
+	IncludeKey								= 0x10000001,
+	PortfolioKey							= 0x10000002,
+	StyleKey								= 0x10000003,
+
+	SegmentKey								= 0x10200000,
+	WindowKey								= 0x10600000,
+
+	GeometryKey								= 0x10100000,
+	ReferenceKey							= 0x10100001,
+	CircleKey								= 0x10100002,
+	CircularArcKey							= 0x10100003,
+	CircularWedgeKey						= 0x10100004,
+	CuttingSectionKey						= 0x10100005,
+	CylinderKey								= 0x10100006,
+	EllipseKey								= 0x10100007,
+	EllipticalArcKey						= 0x10100008,
+	InfiniteLineKey							= 0x10100009,
+	LineKey									= 0x1010000a,
+	PolygonKey								= 0x10100011,
+	ShellKey								= 0x10100012,
+	SphereKey								= 0x10100013,
+	TextKey									= 0x10100014,
+
+	Control									= 0x50000000,
+	SelectionControl						= 0x50000017,
+	HighlightControl						= 0x50000018,
+};
 
 using SegmentKeyArray = CAtlArray<SegmentKey>;
 
@@ -94,6 +138,11 @@ class PrivateImpl
 public:
 	PrivateImpl() {}
 	virtual ~PrivateImpl() {}
+
+	virtual _3DF::Type Type() const;
+
+	void SetImpl(Object * pcObject, PrivateImpl * pcImpl);
+	void SetObject(Object * pcObject);
 };
 
 CLOSE_3DF_NAMESPACE

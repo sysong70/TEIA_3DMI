@@ -8,8 +8,9 @@
 #include <Common_Define.h>
 #include <Path.h>
 
+#include "3DF/3DF.Canvas.h"
+
 #include "3DF/3DF.Model.h"
-#include "3DF/3DF.View.h"
 #include "3DF/3DF.Segment.h"
 #include "3DF/3DF.Utility.h"
 
@@ -94,16 +95,15 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	Facility::Preference cPreference;
 
-	View * pcHoopsView = new View(m_pcHoopsModel, nullptr, H_ASCII_TEXT(cPreference.General.Display.Driver), nullptr,
-		reinterpret_cast<void *>(hWnd), nullptr); // reinterpret_cast<void *>(pcPalette));
+	_3DF::Canvas * pcCanvas = new _3DF::Canvas(m_pcHoopsModel, reinterpret_cast<void *>(hWnd));
 
-	if(nullptr == pcHoopsView) {
+	if(nullptr == pcCanvas) {
 		DEBUG_RETURN;
 	}
 
-	Wrapper().m_mpcHoopsView[nViewId] = pcHoopsView;
+	Wrapper().m_mpcHoopsView[nViewId] = pcCanvas;
 
-	pcHoopsView->Init();
+	pcCanvas->Init();
 
 	CString strFilePathName = cInObject.GetString(SKW_FILEPATH);
 
@@ -127,8 +127,8 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 	cDelivery.progress.SetMessage(strFilePathName);
 	cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/3 : Import and Tessellation");
 
-	pcHoopsView->SetSuppressUpdate(true);
-	pcHoopsView->SetSuppressUpdateTick(true);
+	pcCanvas->GetBaseView()->SetSuppressUpdate(true);
+	pcCanvas->GetBaseView()->SetSuppressUpdateTick(true);
 
 	const CString EXTENSIONS[] = {
 		L"PTS", L"PTX", L"XYZ", // Point Cloud
@@ -147,7 +147,7 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 	// HC_Define_System_Options("update control=thread=off");
 
 	if (false == bPointColudData) {
-		SegmentKey cViewKey(pcHoopsView->GetViewKey());
+		SegmentKey cViewKey(pcCanvas->GetBaseView()->GetViewKey());
 		cViewKey.Open();
 		HC_Set_Driver_Options("eye dome lighting = off");
 		cViewKey.Close();
@@ -156,7 +156,7 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 		cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, cDelivery, strErrorMessage);
 	}
 	else {
-		LoadPointCloudFile(strFilePathName, pcHoopsView);
+		LoadPointCloudFile(strFilePathName, pcCanvas);
 	}
 
 	system_clock::time_point cTime2 = system_clock::now();
@@ -168,40 +168,48 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	// #3DF_Debug: Z://Test.hsf
 #ifdef _DEBUG
- 	SaveHsfFile(L"Z://Test.hsf", pcHoopsView);
+ 	SaveHsfFile(L"Z://Test.hsf", pcCanvas);
 #endif
 
 	//HC_Define_System_Options("update control=thread");
 
-	pcHoopsView->SetSuppressUpdateTick(false);
-	pcHoopsView->SetSuppressUpdate(false);
+	pcCanvas->GetBaseView()->SetSuppressUpdateTick(false);
+	pcCanvas->GetBaseView()->SetSuppressUpdate(false);
 
-	bool m_has_initial_view = pcHoopsView->HasInitialView();
-	pcHoopsView->GetModel()->SetFileLoadComplete(true);
-	pcHoopsView->GetModel()->SetFirstFitComplete(true);
+	bool m_has_initial_view = pcCanvas->GetBaseView()->HasInitialView();
+	pcCanvas->GetBaseView()->GetModel()->SetFileLoadComplete(true);
+	pcCanvas->GetBaseView()->GetModel()->SetFirstFitComplete(true);
 
-	pcHoopsView->SetGeometryChanged();
+	pcCanvas->GetBaseView()->SetGeometryChanged();
 
 	if (!m_has_initial_view) {
-		pcHoopsView->FitWorld();		// fit the camera to the scene extents
-		if (pcHoopsView->GetModel()->GetContainsDouble()) {
-			HC_Convert_Precision(pcHoopsView->GetSceneKey(), "double, camera");
+		pcCanvas->GetBaseView()->FitWorld();		// fit the camera to the scene extents
+		if (pcCanvas->GetBaseView()->GetModel()->GetContainsDouble()) {
+			HC_Convert_Precision(pcCanvas->GetBaseView()->GetSceneKey(), "double, camera");
 		}
 
-		pcHoopsView->CameraPositionChanged(true);
+		pcCanvas->GetBaseView()->CameraPositionChanged(true);
 	}
 
-	pcHoopsView->SetZoomLimit();
+	pcCanvas->GetBaseView()->SetZoomLimit();
 	m_pcHoopsModel->UpdateModelHandedness();
 
-	pcHoopsView->SetRenderMode(pcHoopsView->GetRenderMode(), true);
+	pcCanvas->GetBaseView()->SetRenderMode(pcCanvas->GetBaseView()->GetRenderMode(), true);
 
-	pcHoopsView->ViewReady();
-	pcHoopsView->ExhaustiveUpdate();
+	pcCanvas->ViewReady();
+	pcCanvas->GetBaseView()->ExhaustiveUpdate();
 
-	pcHoopsView->SetSuppressUpdateTick(false);
+	pcCanvas->GetBaseView()->SetSuppressUpdateTick(false);
 
-	pcHoopsView->ForceUpdate();
+/*
+	HC_Open_Segment_By_Key(pcHoopsView->GetSceneKey()); {
+		HC_Set_Visibility("lines = on");
+	}HC_Close_Segment();
+
+	pcHoopsView->SetGeometryChanged();
+*/
+
+	pcCanvas->GetBaseView()->ForceUpdate();
 
 	//pcHoopsView->SetSmoothTransition(true);
 	//pcHoopsView->ZoomToExtents();
@@ -243,10 +251,10 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 void ViewManager::Destruct(int nViewId)
 {
-	View * pcHoopsView = Wrapper().m_mpcHoopsView[nViewId];
+	Canvas * pcHoopsView = Wrapper().m_mpcHoopsView[nViewId];
 	if(nullptr != pcHoopsView) {
 
-		Model * pcModel = (Model *) pcHoopsView->GetModel();
+		Model * pcModel = (Model *) pcHoopsView->GetBaseView()->GetModel();
 
 		delete pcHoopsView;
 		Wrapper().m_mpcHoopsView[nViewId] = nullptr;
@@ -259,26 +267,26 @@ void ViewManager::Destruct(int nViewId)
 
 void ViewManager::Paint(int nViewId, Json::Object & cInObject)
 {
-	_3DF::View * pcView = Wrapper().m_mpcHoopsView[nViewId];
+	_3DF::Canvas * pcView = Wrapper().m_mpcHoopsView[nViewId];
 	if(nullptr == pcView) {
 		DEBUG_RETURN;
 	}
 
 	// execute a HOOPS update if we have a valid HBaseView object
-	if(pcView && pcView->GetViewActive() && !pcView->GetSuppressUpdate())
+	if (pcView && pcView->GetBaseView()->GetViewActive() && !pcView->GetBaseView()->GetSuppressUpdate())
 	{
-		HC_Control_Update_By_Key(pcView->GetViewKey(), "redraw everything");
-		pcView->GetConstantFrameRateObject()->SetActivityType(GeneralActivity);
+		HC_Control_Update_By_Key(pcView->GetBaseView()->GetViewKey(), "redraw everything");
+		pcView->GetBaseView()->GetConstantFrameRateObject()->SetActivityType(GeneralActivity);
 
 //		pcView->GetIntRectangle(&rectangle);
 // 		m_pHView->Notify(HSignalPaint, &rectangle);
 // 		m_pHView->ResetIdleTime();
 
-		if(false == pcView->GetFirstUpdate()) {
-			pcView->ForceUpdate();
+		if(false == pcView->GetBaseView()->GetFirstUpdate()) {
+			pcView->GetBaseView()->ForceUpdate();
 		}
 		else {
-			pcView->Update();
+			pcView->GetBaseView()->Update();
 		}
 
 	}
@@ -286,10 +294,10 @@ void ViewManager::Paint(int nViewId, Json::Object & cInObject)
 
 void ViewManager::Resize(int nViewId, int x, int y)
 {
-	_3DF::View * pcView = Wrapper().m_mpcHoopsView[nViewId];
+	_3DF::Canvas * pcView = Wrapper().m_mpcHoopsView[nViewId];
 	assert(pcView);
 
-	pcView->SetXYSizeOverride(x, y);
+	pcView->GetBaseView()->SetXYSizeOverride(x, y);
 	//m_pHView->Notify( HSignalResize );
 }
 
@@ -298,7 +306,7 @@ void ViewManager::Resize(int nViewId, int x, int y)
 // 명령어 취소 함수, Select된 Object도 취소됨.
 void ViewManager::CancelCommands(int nViewId)
 {
-	_3DF::View * pcView = Wrapper().m_mpcHoopsView[nViewId];
+	_3DF::Canvas * pcView = Wrapper().m_mpcHoopsView[nViewId];
 	pcView->CancelCommands();
 }
 
@@ -307,7 +315,7 @@ void ViewManager::CancelCommands(int nViewId)
 // 1. Action Signal 처리 함수
 bool ViewManager::ExecuteMouseSignal(int nViewId, int nAction, Json::Object & cInObject)
 {
-	_3DF::View * pcView = Wrapper().m_mpcHoopsView[nViewId];
+	_3DF::Canvas * pcView = Wrapper().m_mpcHoopsView[nViewId];
 
 	int nFlag = cInObject.GetInteger(SKW_FLAG);
 	int x = cInObject.GetInteger(SKW_X);
@@ -359,13 +367,13 @@ bool ViewManager::ExecuteMouseSignal(int nViewId, int nAction, Json::Object & cI
 }
 
 // 2. Left Button 처리 함수
-bool ViewManager::LButtonDown(_3DF::View * pcView, int nFlags, int x, int y)
+bool ViewManager::LButtonDown(_3DF::Canvas * pcView, int nFlags, int x, int y)
 {
 	assert(pcView);
  	return pcView->LButtonDown(nFlags, x, y);
 }
 
-bool ViewManager::LButtonUp(_3DF::View * pcView, int nFlags, int x, int y)
+bool ViewManager::LButtonUp(_3DF::Canvas * pcView, int nFlags, int x, int y)
 {
 	assert(pcView);
 	return pcView->LButtonUp(nFlags, x, y);
@@ -382,14 +390,14 @@ bool ViewManager::LButtonUp(_3DF::View * pcView, int nFlags, int x, int y)
 }
 
 // 3. Middle Button 처리 함수
-bool ViewManager::MButtonDown(_3DF::View * pcView, int nFlags, int x, int y)
+bool ViewManager::MButtonDown(_3DF::Canvas * pcView, int nFlags, int x, int y)
 {
 	assert(pcView);
 	return true;
 	//return pcView->MButtonDown(nFlags, x, y);
 }
 
-bool ViewManager::MButtonUp(_3DF::View * pcView, int nFlags, int x, int y)
+bool ViewManager::MButtonUp(_3DF::Canvas * pcView, int nFlags, int x, int y)
 {
 	assert(pcView);
 	return true;
@@ -397,37 +405,37 @@ bool ViewManager::MButtonUp(_3DF::View * pcView, int nFlags, int x, int y)
 }
 
 // 4. Right Button 처리 함수
-bool ViewManager::RButtonUp(_3DF::View * pcView, int nFlags, int x, int y)
+bool ViewManager::RButtonUp(_3DF::Canvas * pcView, int nFlags, int x, int y)
 {
 	assert(pcView);
 	return pcView->RButtonUp(nFlags, x, y);
 }
 
-bool ViewManager::RButtonDown(_3DF::View * pcView, int nFlags, int x, int y)
+bool ViewManager::RButtonDown(_3DF::Canvas * pcView, int nFlags, int x, int y)
 {
 	assert(pcView);
 	return pcView->RButtonDown(nFlags, x, y);
 }
 
 // 5. Mouse Move 처리 함수
-bool ViewManager::MouseMove(_3DF::View * pcView, int nFlags, int x, int y)
+bool ViewManager::MouseMove(_3DF::Canvas * pcView, int nFlags, int x, int y)
 {
 	assert(pcView);
 	return pcView->MouseMove(nFlags, x, y);
 }
 
 // 6. Mouse Wheel 처리 함수
-bool ViewManager::MouseWheel(_3DF::View * pcView, int nFlags, int zDelta, int x, int y, Json::Object & cInObject)
+bool ViewManager::MouseWheel(_3DF::Canvas * pcView, int nFlags, int zDelta, int x, int y, Json::Object & cInObject)
 {
 	assert(pcView);
 	return pcView->MouseWheel(nFlags, zDelta, x, y, cInObject);
 }
 
-void ViewManager::SaveHsfFile(CString strFilePathName, View * pcHoopsView)
+void ViewManager::SaveHsfFile(CString strFilePathName, Canvas * pcHoopsView)
 {
 	HIOUtilityHsf cUtilityHsf;
 
-	HC_KEY nModelKey = pcHoopsView->GetModelKey();
+	HC_KEY nModelKey = pcHoopsView->GetBaseView()->GetModelKey();
 
 	HC_Open_Segment_By_Key(nModelKey);
 
@@ -449,22 +457,22 @@ void ViewManager::SaveHsfFile(CString strFilePathName, View * pcHoopsView)
 	delete mytool;
 }
 
-void ViewManager::LoadPointCloudFile(CString strFilePathName, View * pcHoopsView)
+void ViewManager::LoadPointCloudFile(CString strFilePathName, Canvas * pcHoopsView)
 {
-	SegmentKey cViewKey(pcHoopsView->GetViewKey());
+	SegmentKey cViewKey(pcHoopsView->GetBaseView()->GetViewKey());
 	cViewKey.Open();
 	HC_Set_Driver_Options("eye dome lighting = (on, strength=1.0)");
 	cViewKey.Close();
 
 	HInputHandlerOptions cOptions;
-	cOptions.m_tk = pcHoopsView->GetModel()->GetStreamFileTK();
-	cOptions.m_pHBaseView = pcHoopsView;
+	cOptions.m_tk = pcHoopsView->GetBaseView()->GetModel()->GetStreamFileTK();
+	cOptions.m_pHBaseView = pcHoopsView->GetBaseView();
 	
 	//cOptions.m_pExtendedData = &cPointCloudOptions;
 
 	//m_point_cloud_options = (HPointCloudOptions *)options->m_pExtendedData;
 
-	SegmentKey cModelKey(pcHoopsView->GetModelKey());
+	SegmentKey cModelKey(pcHoopsView->GetBaseView()->GetModelKey());
 	SegmentKey cPointCloudSegment = cModelKey.Subsegment(L"_3dmi_point_cloud");
 
 	HIOUtilityPointCloud cPointCloud;

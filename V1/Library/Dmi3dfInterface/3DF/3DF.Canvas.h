@@ -8,6 +8,8 @@
 #include "3DF.h"
 #include "3DF.Facility.Preference.h"
 
+#include <HSelectionSet.h>
+
 OPEN_3DF_NAMESPACE
 
 class OpCameraOrbitSelect;
@@ -26,16 +28,20 @@ public:
 	bool bActive;
 };
 
-class View : public HBaseView, public HAnimationListener
+class Canvas // : public HBaseView, public HAnimationListener
 {
 public:
-	View(HBaseModel * pcBaseModel, const char * pchAlias = nullptr, const char * pchDriverType = nullptr,
+	Canvas(HBaseModel * pcBaseModel, void * pcWindowHandle);
+
+/*
+	Canvas(HBaseModel * pcBaseModel, const char * pchAlias = nullptr, const char * pchDriverType = nullptr,
 		const char * pchInstanceName = nullptr, void * pcWindowHandle = nullptr, void * pcColorMap = nullptr);
-	virtual ~View();
+*/
+
+	virtual ~Canvas();
 
 	//== Hoops 설정 함수 =============================================================================
-	void Init() override;
-	void Init_CUR();
+	void Init();
 	void ViewReady();
 
 protected:
@@ -67,6 +73,8 @@ protected:
 	static bool signal_deselected_all(int signal, void * signal_data, void * user_data);
 	bool OnSignalDeSelectedAll();
 
+	HSelectLevel m_eSelectLevel = HSelectEntity;
+
 	bool CAppSet_OcclusionCulling = false;
 	int CAppSet_OcclusionThreshold = 50;
 	COLORREF CAppSet_FakeHLRColor = RGB(255, 255, 255);
@@ -76,6 +84,7 @@ protected:
 	bool CAppSet_bWorldHandedness = true;
 	bool CAppSet_bGrayScaleSelection = false;	// no gray scale selection
 	bool CAppSet_bUseDefinedHighlighting = false;
+	bool CAppSet_bInvisibleSelection = false;
 	bool CAppSet_bDisplaceSelection = false;	// no gray scale selection
 	int CAppSet_SelectionColorTransparency = 0;
 	COLORREF CAppSet_PolygonSelectionColor = RGB(255, 128, 0);
@@ -117,7 +126,7 @@ protected:
 	bool CAppSet_StaticModel = true;
 	bool CAppSet_LMVModel = true;
 	bool CAppSet_bRestoreAnnotations = false;
-	DisplayListType CAppSet_DisplayList = DisplayListSegment;// DisplayListOff;
+	DisplayListType CAppSet_DisplayList = DisplayListSegment;
 	int	CAppSet_DynamicAdjustment = 1;
 
 	float CAppSet_ShadowOpacity = 1.f;
@@ -207,6 +216,14 @@ public:
 	//== 환경 변수 관련 함수 ==========================================================================
 protected:
 	Facility::Preference m_cPreference;
+
+	//== 운영 변수 ===================================================================================
+public:
+	HBaseView * GetBaseView() { return m_pcBaseView; }
+
+protected:
+	HBaseView * m_pcBaseView = nullptr;
+	_3DF::WindowKey * m_pcWindow = nullptr;
 
 private:
 	OpCameraOrbitSelect * m_pcCameraOrbitSelect;

@@ -128,8 +128,8 @@ public:
 	void Set(Entity const & cInThat);
 	Entity const & operator=(Entity const & cInThat);
 
-	/*! \return the PMI::Type for this entity. Overridden by subclasses. */
-	virtual Type GetType() const { return PMI::Type::UnknownType; };
+	// return the PMI::Type for this entity. Overridden by subclasses.
+	virtual PMI::Type GetType() const { return PMI::Type::UnknownType; };
 
 	void SetFrame(Frame const & cInFrame);
 
@@ -166,7 +166,7 @@ public:
 	void Set(DatumEntity const & cInThat);
 	DatumEntity const & operator=(DatumEntity const & cInThat);
 
-	Type GetType() const override { return PMI::Type::DatumType; };
+	PMI::Type GetType() const override { return PMI::Type::DatumType; };
 
 	Datum::Type GetDatumType() const;
 	void SetDatumType(Datum::Type const eInType);
@@ -186,7 +186,7 @@ public:
 	void Set(DimensionEntity const & cInThat);
 	DimensionEntity const & operator=(DimensionEntity const & cInThat);
 
-	Type GetType() const override { return Type::DimensionType; };
+	PMI::Type GetType() const override { return Type::DimensionType; };
 
 	Dimension::Type GetDimensionType() const;
 	void SetDimensionType(Dimension::Type const cInType);
@@ -209,7 +209,7 @@ public:
 	void Set(GenericEntity const & cInThat);
 	GenericEntity const & operator=(GenericEntity const & cInThat);
 
-	Type GetType() const override { return PMI::Type::GenericType; };
+	PMI::Type GetType() const override { return PMI::Type::GenericType; };
 
 	unsigned int GetStringCount() const;
 	void GetStrings(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const;
@@ -229,7 +229,7 @@ public:
 	void Set(NoteEntity const & cInThat);
 	NoteEntity const & operator=(NoteEntity const & cInThat);
 
-	Type GetType() const override { return PMI::Type::NoteType; };
+	PMI::Type GetType() const override { return PMI::Type::NoteType; };
 
 	unsigned int GetStringCount() const;
 	void GetStrings(unsigned int & nOutCount, CString pstrOutStrings[], TextAttributes pcOutTextAttributes[]) const;
@@ -246,7 +246,7 @@ public:
 	void Set(RoughnessEntity const & cInThat);
 	RoughnessEntity const & operator=(RoughnessEntity const & cInThat);
 
-	virtual Type GetType() const { return PMI::Type::RoughnessType; };
+	virtual PMI::Type GetType() const { return PMI::Type::RoughnessType; };
 
 	Roughness::Obtention::Type GetObtentionType() const;
 	void SetObtentionType(Roughness::Obtention::Type const in_obtention_type);

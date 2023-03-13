@@ -2,7 +2,7 @@
 
 #include "3DF.OpSelectArea.h"
 
-#include "3DF.View.h"
+#include "3DF.Canvas.h"
 #include "3DF.Selection.h"
 
 #include <HTools.h>
@@ -15,8 +15,8 @@
 
 USING_3DF_NAMESPACE
 
-OpSelectArea::OpSelectArea(HBaseView * view, int DoRepeat, int DoCapture) :
-	HOpSelectArea(view, DoRepeat, DoCapture)
+OpSelectArea::OpSelectArea(HBaseView * Canvas, int DoRepeat, int DoCapture) :
+	HOpSelectArea(Canvas, DoRepeat, DoCapture)
 {
 
 }
@@ -32,12 +32,12 @@ HBaseOperator * OpSelectArea::Clone()
 
 int OpSelectArea::OnLButtonDown(HEventInfo & cEvent)
 {
-	//View * pcView = (View *)GetView();
+	//Canvas * pcView = (Canvas *)GetView();
 	//pcView->SetSubentitySelectLevel();
 
 	// Control을 누른경우 Face 단위로 선택이 됨.
 	if (MK_CONTROL & cEvent.GetFlags()) {
-		View * pcView = (View *)GetView();
+		Canvas * pcView = (Canvas *)GetView();
 		pcView->SetSubentitySelectLevel();
 		GetView()->GetSelection()->SetSelectionLevel(HSelectLevel::HSelectEntity);
 	}
@@ -70,7 +70,7 @@ int OpSelectArea::ButtonUp(HEventInfo & cEvent)
 
 	//GetView()->SetVisibilitySelectionMode(true);
 
-	SelectionControl * pcSelection = (SelectionControl *)GetView()->GetSelection();
+	DmiSelectionControl * pcSelection = (DmiSelectionControl *)GetView()->GetSelection();
 
 	// Perform standard Windows explorer method of selecting and deselecting
 	// using Shift and Control keys
@@ -334,7 +334,7 @@ int OpSelectArea::ButtonUp(HEventInfo & cEvent)
 
 		pcSelection->SetSelectWillNotify(true);
 
-		// notify the cEvent to view
+		// notify the cEvent to Canvas
 		GetView()->Notify(HSignalSelected, pcSelection);
 
 		pcSelection->FlushPShowCache();

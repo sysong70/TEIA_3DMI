@@ -131,9 +131,9 @@ namespace Facility
 		{
 			struct ANTIALIASING {
 				bool Use = true;		// CAppSettings::bAntiAliasing
-				bool Line = true;			// CAppSettings::LineAntialiasing
-				bool Text = true;			// CAppSettings::TextAntialiasing
-				int Level = 4;				// CAppSettings::AntialiasingLevel
+				bool Line = false;		// CAppSettings::LineAntialiasing
+				bool Text = false;		// CAppSettings::TextAntialiasing
+				int Level = 4;			// CAppSettings::AntialiasingLevel
 
 				Json::Object * Get();
 				bool Set(Json::Object * pcData);
@@ -215,6 +215,9 @@ namespace Facility
 		{
 			struct SIMPLE_SHADOW {
 				HShadowRenderingMode ShadowRenderingMode = SoftwareOpenglShadow;	// CAppSettings::ShadowRenderingMode
+
+// 				Json::Object * Get();
+// 				bool Set(Json::Object * pcData);
 			}
 			SimpleShadow;
 
@@ -225,8 +228,14 @@ namespace Facility
 				bool UseFastSilhouette = false;			// CAppSettings::UseFastSilhouette
 				float FastSilhouetteTolerance = 1.0f;	// CAppSettings::FastSilhouetteTolerance
 				bool HeavyExteriorSilhouette = false;	// CAppSettings::HeavyExteriorSilhouette
+
+// 				Json::Object * Get();
+// 				bool Set(Json::Object * pcData);
 			}
 			FrameBuffer;
+
+// 			Json::Object * Get();
+// 			bool Set(Json::Object * pcData);
 		}
 		Effects;
 	};

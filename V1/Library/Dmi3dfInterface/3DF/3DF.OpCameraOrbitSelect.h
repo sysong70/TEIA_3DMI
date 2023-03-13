@@ -3,13 +3,18 @@
 #include "3DF.h"
 #include "3DF.Math.h"
 
+#include "3DF.Selection.h"
+
 #include <HOpCameraOrbit.h>
 
 OPEN_3DF_NAMESPACE
 
+class WindowKey;
+
 class OpCameraOrbitSelect : public HOpCameraOrbit
 {
 public:
+	OpCameraOrbitSelect(WindowKey * pcWindow, int DoRepeat = 0, int DoCapture = 1);
 	OpCameraOrbitSelect(HBaseView * view, int DoRepeat = 0, int DoCapture = 1);
 	~OpCameraOrbitSelect();
 
@@ -20,24 +25,22 @@ public:
 	int OnLButtonDown(HEventInfo & cEvent) override;
 	int OnLButtonUp(HEventInfo & cEvent) override;
 	int OnLButtonDownAndMove(HEventInfo & cEvent) override;
+	int OnNoButtonDownAndMove(HEventInfo & cEvent) override;
 
-	//== Select 관련 함수 ============================================================================
+	//== Selection 관련 함수 =========================================================================
 protected:
-	int SelectButtonDown(HEventInfo & cEvent);
-	void HandleSelection(HEventInfo & cEvent);
+	int OnDaynamicHighlightMouseMove(HEventInfo & cEvent);
 
+protected:
 	bool m_bOrbitMode;
 	DWORD m_nSelectPickCount;
 	DWORD m_nMouseDownTickCount;
 	HPoint m_cMouseDownPoint;
-	
-	enum SelType{
-		None,
-		Shell,
-		Region,
-		Marker,
-		Line
-	};
+
+	WindowKey * m_pcWindow = nullptr;
+
+	SelectionResults m_cNewHighlightSelection;
+	SelectionResults m_cOldHighlightSelection;
 };
 
 CLOSE_3DF_NAMESPACE

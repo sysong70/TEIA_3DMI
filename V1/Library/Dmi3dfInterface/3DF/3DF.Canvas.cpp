@@ -18,7 +18,8 @@
 #include <hic.h>
 #include <HConstantFrameRate.h>
 
-#include "3DF.View.h"
+#include "3DF.Canvas.h"
+#include "3DF.Window.h"
 #include "3DF.Segment.h"
 #include "3DF.Selection.h"
 
@@ -57,10 +58,13 @@ CameraPos::CameraPos() {
 	bActive = false;
 }
 
-View::View(HBaseModel * pcBaseModel, const char * pchAlias, const char * pchDriverType,
-	const char * pchInstanceName, void * pcWindowHandle, void * pcColorMap)
-	: HBaseView(pcBaseModel, pchAlias, pchDriverType, pchInstanceName, pcWindowHandle, pcColorMap)
+Canvas::Canvas(HBaseModel * pcBaseModel, void * pcWindowHandle)
 {
+	m_pcBaseView = new HBaseView(pcBaseModel, nullptr, H_ASCII_TEXT(m_cPreference.General.Display.Driver), nullptr,
+		reinterpret_cast<void *>(pcWindowHandle), nullptr);
+
+	m_pcWindow = new WindowKey(m_pcBaseView);
+
 	m_bOocSelection = false;
 	m_bDeepSelection = false;
 
@@ -72,7 +76,7 @@ View::View(HBaseModel * pcBaseModel, const char * pchAlias, const char * pchDriv
 	m_nCookieDeSelectedAll = 0;
 }
 
-View::~View()
+Canvas::~Canvas()
 {
 	HC_Relinquish_Memory();
 
@@ -98,63 +102,64 @@ View::~View()
 
 //== Hoops 설정 함수 =================================================================================
 
-void View::Init()
+void Canvas::Init()
 {
 	char chDriverOpts[MVO_BUFFER_SIZE], chRenderingOpts[MVO_BUFFER_SIZE] = { 0 };
 
-	// call base's init function first to get the default HOOPS hierarchy for the view
-	HBaseView::Init();
+	// call base's init function first to get the default HOOPS hierarchy for the Canvas
+	m_pcBaseView->Init();
 
-	GetModel()->GetEventManager()->RegisterHandler((HAnimationListener *)this, HAnimationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
+	m_pcBaseView->GetModel()->GetEventManager()->RegisterHandler((HAnimationListener *)GetBaseView(), HAnimationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
 
-	m_pSelection = new SelectionControl(this);
-	m_pSelection->Init();
-	m_pSelection->SetAllowSubentityDeselection(true);
+	_3DF::DmiSelectionControl * pcSelection = new _3DF::DmiSelectionControl(m_pcBaseView);
+	pcSelection->SetAllowSubentityDeselection(true);
 
-	m_pMarkupManager = new HMarkupManager(this);
+	m_pcBaseView->SetSelection(pcSelection);
 
-	HC_Open_Segment_By_Key(m_ViewKey); {
+	HMarkupManager * pcMarkupManager = new HMarkupManager(m_pcBaseView);
+	m_pcBaseView->SetMarkupManager(pcMarkupManager);
+
+	HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
 		HC_Set_Selectability("everything = off");
-	}HC_Close_Segment();
+	} HC_Close_Segment();
 
 	// set up some scene defaults
-	HC_Open_Segment_By_Key(m_SceneKey); {
+	HC_Open_Segment_By_Key(m_pcBaseView->GetSceneKey()); {
 		HC_Set_Rendering_Options("no color interpolation, color index interpolation");
-		HC_Set_Visibility("lights = (faces = on, edges = off), markers = off, faces=on, edges=off, lines=off, text = on");
-	}HC_Close_Segment();
+		HC_Set_Visibility("lights = (faces = on, edges = off), markers = off, faces=on, edges=off, lines=on, text = on");
+	} HC_Close_Segment();
 
 	// windowspace (overlay) defaults
-	HC_Open_Segment_By_Key(m_WindowspaceKey); {
+	HC_Open_Segment_By_Key(m_pcBaseView->GetWindowspaceKey()); {
 		HC_Set_Color_By_Index("geometry", 3);
 		HC_Set_Color_By_Index("window contrast", 1);
 		HC_Set_Color_By_Index("windows", 1);
 		HC_Set_Visibility("markers=on");
 		HC_Set_Marker_Symbol("+");
 		HC_Set_Selectability("off");
-	}HC_Close_Segment();
-
-	SetZoomLimit();
+	} HC_Close_Segment();
 
 	char chGpuToUse[256];
 	strcpy(chGpuToUse, (char const *)H_UTF8(m_cPreference.General.Display.Gpu).encodedText());
 	if (strcmp(chGpuToUse, "Default") != 0) {
-		HC_Open_Segment_By_Key(GetViewKey()); {
+		HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
 			HC_Set_Driver_Options(H_FORMAT_TEXT("gpu preference = specific = %s", chGpuToUse));
-		}HC_Close_Segment();
+		} HC_Close_Segment();
 	}
 
 	// do all the setup with no updates
-	SetSuppressUpdate(true);
+	m_pcBaseView->SetSuppressUpdate(true);
 
-	SetAxisManipulateOperator(new HOpCameraManipulate(this, 0, 1, new HOpCameraOrbit(this), new HOpCameraPan(this), new HOpCameraZoom(this), 0, false));
+	m_pcBaseView->SetAxisManipulateOperator(new HOpCameraManipulate(GetBaseView(), 0, 1, new HOpCameraOrbit(GetBaseView()), new HOpCameraPan(GetBaseView()), new HOpCameraZoom(GetBaseView()), 0, false));
 
-	HOpMoveHandle * handleoperator = new HOpMoveHandle(this, this, false);
-	SetHandleOperator(handleoperator);
-	GetEventManager()->RegisterHandler((HObjectManipulationListener *)handleoperator, HObjectManipulationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
-	GetEventManager()->RegisterHandler((HJoyStickListener *)this, HJoyStickListener::GetType(), HLISTENER_PRIORITY_NORMAL);
+	HOpMoveHandle * handleoperator = new HOpMoveHandle(GetBaseView(), GetBaseView(), false);
+	m_pcBaseView->SetHandleOperator(handleoperator);
 
-	SetKeyStateCallback(GetKeyState);
-	GetModel()->GetBhvBehaviorManager()->SetUpdateCamera(m_cPreference.Interaction.Animation.UpdateCamera);
+	m_pcBaseView->GetEventManager()->RegisterHandler((HObjectManipulationListener *)handleoperator, HObjectManipulationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
+	m_pcBaseView->GetEventManager()->RegisterHandler((HJoyStickListener *)GetBaseView(), HJoyStickListener::GetType(), HLISTENER_PRIORITY_NORMAL);
+
+	m_pcBaseView->SetKeyStateCallback(GetKeyState);
+	m_pcBaseView->GetModel()->GetBhvBehaviorManager()->SetUpdateCamera(m_cPreference.Interaction.Animation.UpdateCamera);
 
 	long nDebugFlags = DEBUG_NO_WINDOWS_HOOK | DEBUG_STARTUP_CLEAR_BLACK;
 
@@ -180,6 +185,7 @@ void View::Init()
 
 	sprintf(chDriverOpts, "%s, quick moves preference = %s", chDriverOpts, H_ASCII_TEXT(m_cPreference.Selection.Highlight.QuickMovesType));
 
+
 	HCLOCALE(sprintf(chDriverOpts,
 		"%s, ambient occlusion = (%s, strength = %f, quality = %s), fast silhouette edges = (%s, tolerance = %f, %s heavy exterior)", chDriverOpts, 
 		(m_cPreference.Effects.FrameBuffer.UseAmbient ? "on" : "off"), m_cPreference.Effects.FrameBuffer.AmbientStrength,
@@ -187,10 +193,11 @@ void View::Init()
 		(m_cPreference.Effects.FrameBuffer.UseFastSilhouette ? "on" : "off"), m_cPreference.Effects.FrameBuffer.FastSilhouetteTolerance,
 		(m_cPreference.Effects.FrameBuffer.HeavyExteriorSilhouette ? "" : "no")));
 
-	SetDoubleBuffering(m_cPreference.General.Display.DoubleBuffer);
+	m_pcBaseView->SetDoubleBuffering(m_cPreference.General.Display.DoubleBuffer);
 
-	HC_Open_Segment_By_Key(GetViewKey()); {
-		HC_Set_User_Index(H_VIEW_POINTER_INDEX, this);  /* This is used in the event_checker for constant framerate. */
+
+	HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
+		HC_Set_User_Index(H_VIEW_POINTER_INDEX, GetBaseView());  // This is used in the event_checker for constant framerate.
 		HC_Set_Driver_Options(chDriverOpts);
 		HCLOCALE(sprintf(chDriverOpts, "bloom = (%s, strength=%f, blur=%d, shape=%s)",
 			(m_cPreference.Lighting.Bloom.Use ? "on" : "off"),
@@ -206,41 +213,44 @@ void View::Init()
 		HC_Control_Update(".", "redraw everything");
 	} HC_Close_Segment();
 
+
 	int CAppSet_LightScaleFactor = 100000;;
 
 	if (false == m_cPreference.Lighting.Light.Scaling) {
-		SetLightScaling(0);
+		m_pcBaseView->SetLightScaling(0);
 	}
 	else {
-		SetLightScaling(m_cPreference.Lighting.Light.ScaleFactor / 100000.f);
+		m_pcBaseView->SetLightScaling(m_cPreference.Lighting.Light.ScaleFactor / 100000.f);
 	}
-
 		
-	SetLightFollowsCamera(m_cPreference.Lighting.Light.FollowsCamera);
+	m_pcBaseView->SetLightFollowsCamera(m_cPreference.Lighting.Light.FollowsCamera);
 	//SetLightCount(LightCount); //defer until after camera is all set up
 	// SetDeepSelectionMode(DeepSelection); OCC를 사용할 때 대응하는 함수
-	SetVisibilitySelectionMode(m_cPreference.Selection.Behavior.VisibilitySelection);
-	SetDynamicHighlighting(m_cPreference.Selection.Behavior.DynamicHighlighting);
-	SetDetailSelection(m_cPreference.Selection.Behavior.DetailSelection); // "Honor Line/Edge Weight/Pattern"
-	SetRelatedSelectionLimit(m_cPreference.Selection.Behavior.RelatedSelectionLimit);
-	SetTransparentSelectionBoxMode(m_cPreference.Selection.Behavior.UseSelectBox); // show a transparent box when selecting areas
-	SetRespectSelectionCulling(m_cPreference.Selection.Behavior.RespectCulling); // Respect Culling during selection.
-	SetFastFitWorld(true);
-	SetForceFastHiddenLine(m_cPreference.Perfromance.Optimization.HiddenLineMode == FastHiddenLine);
-	SetSpritingMode(m_cPreference.Interaction.GeometryManipulation.Spriting);
-	SetAllowInteractiveCutGeometry(m_cPreference.Interaction.GeometryManipulation.UpdateCutGeometry);
-	SetAllowInteractiveShadows(m_cPreference.Interaction.GeometryManipulation.UpdateShadows);
-	SetBackplaneCulling(m_cPreference.General.Etc.BackplaneCulling);
-	SetOcclusionCullingMode(m_cPreference.Perfromance.Optimization.OcclusionCulling, true, m_cPreference.Perfromance.Optimization.OcclusionThreshold);
+	m_pcBaseView->SetVisibilitySelectionMode(m_cPreference.Selection.Behavior.VisibilitySelection);
 
-	SetDisplayListType(DisplayListOff);
+	m_pcBaseView->SetDynamicHighlighting(m_cPreference.Selection.Behavior.DynamicHighlighting);
+
+	m_pcBaseView->SetDetailSelection(m_cPreference.Selection.Behavior.DetailSelection); // "Honor Line/Edge Weight/Pattern"
+	m_pcBaseView->SetRelatedSelectionLimit(m_cPreference.Selection.Behavior.RelatedSelectionLimit);
+	m_pcBaseView->SetTransparentSelectionBoxMode(m_cPreference.Selection.Behavior.UseSelectBox); // show a transparent box when selecting areas
+	m_pcBaseView->SetRespectSelectionCulling(m_cPreference.Selection.Behavior.RespectCulling); // Respect Culling during selection.
+	m_pcBaseView->SetFastFitWorld(true);
+	m_pcBaseView->SetForceFastHiddenLine(m_cPreference.Perfromance.Optimization.HiddenLineMode == FastHiddenLine);
+	m_pcBaseView->SetSpritingMode(m_cPreference.Interaction.GeometryManipulation.Spriting);
+	m_pcBaseView->SetAllowInteractiveCutGeometry(m_cPreference.Interaction.GeometryManipulation.UpdateCutGeometry);
+	m_pcBaseView->SetAllowInteractiveShadows(m_cPreference.Interaction.GeometryManipulation.UpdateShadows);
+
+	m_pcBaseView->SetBackplaneCulling(m_cPreference.General.Etc.BackplaneCulling);
+//	SetOcclusionCullingMode(m_cPreference.Perfromance.Optimization.OcclusionCulling, true, m_cPreference.Perfromance.Optimization.OcclusionThreshold);
+
+	m_pcBaseView->SetDisplayListType(DisplayListSegment);// DisplayListOff);
 
 	if (true == m_cPreference.Perfromance.FramerateOptimization.UseFramerate)
 	{
 		//if (!pDoc->IsFileReadDeferedForView() || CurrentFramerateMode == FramerateFixed)
 		if (FramerateFixed == m_cPreference.Perfromance.FramerateOptimization.CurrentFramerateMode)
 		{
-			SetFramerateMode(m_cPreference.Perfromance.FramerateOptimization.CurrentFramerateMode, 
+			m_pcBaseView->SetFramerateMode(m_cPreference.Perfromance.FramerateOptimization.CurrentFramerateMode,
 				m_cPreference.Perfromance.FramerateOptimization.FramerateTime, m_cPreference.Perfromance.FramerateOptimization.MaxThreshold, 
 				UINT2bool(m_cPreference.Perfromance.FramerateOptimization.UseLods), m_cPreference.Perfromance.FramerateOptimization.DetailSteps, 
 				m_cPreference.Perfromance.FramerateOptimization.HardCutoff);
@@ -248,22 +258,22 @@ void View::Init()
 	}
 	else if (m_cPreference.Perfromance.FramerateOptimization.CullingThresholdSet)
 	{
-		SetFramerateMode(FramerateOff);
-		SetCullingThreshold(m_cPreference.Perfromance.FramerateOptimization.CullingThreshold);
+		m_pcBaseView->SetFramerateMode(FramerateOff);
+		m_pcBaseView->SetCullingThreshold(m_cPreference.Perfromance.FramerateOptimization.CullingThreshold);
 	}
 	else
 	{
-		SetFramerateMode(FramerateOff);
-		SetCullingThreshold(0);
+		m_pcBaseView->SetFramerateMode(FramerateOff);
+		m_pcBaseView->SetCullingThreshold(0);
 	}
 
-	SetSmoothTransition(false);
-	SetShadowRenderingMode(m_cPreference.Effects.SimpleShadow.ShadowRenderingMode);
+	m_pcBaseView->SetSmoothTransition(false);
+	m_pcBaseView->SetShadowRenderingMode(m_cPreference.Effects.SimpleShadow.ShadowRenderingMode);
 	SetViewAxis();
 	SetTransparency();
 
-	SetViewMode(HViewIsoFrontRightTop);		// fit the camera to the scene extents
-	SetAxisMode(m_cPreference.General.Rendering.DisplayAxisTriad ? AxisOn : AxisOff);
+	m_pcBaseView->SetViewMode(HViewIsoFrontRightTop);		// fit the camera to the scene extents
+	m_pcBaseView->SetAxisMode(m_cPreference.General.Rendering.DisplayAxisTriad ? AxisOn : AxisOff);
 
 	// 배경화면 설정
 	SetWindowBackGroundColor(m_cPreference.Appearance.BackgroundColor.Top, m_cPreference.Appearance.BackgroundColor.Bottom);
@@ -276,36 +286,38 @@ void View::Init()
 		static_cast<float>(GetBValue(CAppSet_FakeHLRColor)) / 255.0f
 	);
 
-	SetFakeHLRColor(FakeHLRColor);
-	SetProjMode(CAppSet_ProjectionMode);
-	SetSmoothTransition(CAppSet_bSmoothTransition);
-	SetSmoothTransitionDuration(0.5f);
-	GetUndoManager()->Flush();			//don't care about this initial camera change
-	SetDisplayHandlesOnDblClk(!CAppSet_DisableEditing);
+	m_pcBaseView->SetFakeHLRColor(FakeHLRColor);
+	m_pcBaseView->SetProjMode(CAppSet_ProjectionMode);
+	m_pcBaseView->SetSmoothTransition(CAppSet_bSmoothTransition);
+	m_pcBaseView->SetSmoothTransitionDuration(0.5f);
+	m_pcBaseView->GetUndoManager()->Flush();			//don't care about this initial camera change
+	m_pcBaseView->SetDisplayHandlesOnDblClk(!CAppSet_DisableEditing);
 
 	//SetCoordinateSystemHandedness(bWorldHandedness ? HandednessRight : HandednessLeft, true);
-	SetHandedness(CAppSet_bWorldHandedness ? HandednessRight : HandednessLeft, true);
+	m_pcBaseView->SetHandedness(CAppSet_bWorldHandedness ? HandednessRight : HandednessLeft, true);
 
 	// The state of world today with polygon handedness is
 	// 1. Since we are using display lists by default, we want this setting.
-	// 2. We will have it only on the view key. If required, model could have it's own
+	// 2. We will have it only on the Canvas key. If required, model could have it's own
 	// Rajesh B (11-Apr-2003)
-	SetPolygonHandednessMode(HandednessLeft);
+	m_pcBaseView->SetPolygonHandednessMode(HandednessLeft);
 
 	HPixelRGBA cHighlightSelectColor;
 	cHighlightSelectColor.Set(255, 0, 0);
-	GetHighlightSelection()->SetSelectionFaceColor(cHighlightSelectColor);
-	GetHighlightSelection()->SetSelectionEdgeColor(cHighlightSelectColor);
-	GetHighlightSelection()->SetSelectionMarkerColor(cHighlightSelectColor);
+	m_pcBaseView->GetHighlightSelection()->SetSelectionFaceColor(cHighlightSelectColor);
+	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeColor(cHighlightSelectColor);
+	m_pcBaseView->GetHighlightSelection()->SetSelectionMarkerColor(cHighlightSelectColor);
 
-	//GetHighlightSelection()->SetGrayScale(true);
-	GetHighlightSelection()->SetGrayScale(CAppSet_bGrayScaleSelection);
-	GetHighlightSelection()->SetUseDefinedHighlight(CAppSet_bUseDefinedHighlighting);
-	GetHighlightSelection()->SetAllowDisplacement(CAppSet_bDisplaceSelection);
-	GetHighlightSelection()->UpdateHighlightStyle();
+	m_pcBaseView->GetSelection()->SetSelectionEdgeWeight(2.0);
+	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeWeight(2.0);
+
+	m_pcBaseView->GetHighlightSelection()->SetGrayScale(false);// CAppSet_bGrayScaleSelection);
+	m_pcBaseView->GetHighlightSelection()->SetUseDefinedHighlight(false);// CAppSet_bUseDefinedHighlighting);
+	m_pcBaseView->GetHighlightSelection()->SetAllowDisplacement(false);// CAppSet_bDisplaceSelection);
+	m_pcBaseView->GetHighlightSelection()->UpdateHighlightStyle();
 
 	// set the selection color
-	HSelectionSet * sel_set = GetSelection();
+	HSelectionSet * sel_set = m_pcBaseView->GetSelection();
 	assert(sel_set);
 	HPixelRGBA sel_col;
 	int sel_alpha = (int)(CAppSet_SelectionColorTransparency * 2.56f);		// settings is a %, scale it to 256
@@ -335,41 +347,79 @@ void View::Init()
 
 	SetShadowColor(CAppSet_ShadowColor);
 
-	GetMarkupManager()->SetMarkupWeight(CAppSet_MarkupWeight / 100.0f);
-	SetShadowResolution(CAppSet_ShadowRes);
-	SetShadowBlurring(CAppSet_ShadowBlur);
+	m_pcBaseView->GetMarkupManager()->SetMarkupWeight(CAppSet_MarkupWeight / 100.0f);
+	m_pcBaseView->SetShadowResolution(CAppSet_ShadowRes);
+	m_pcBaseView->SetShadowBlurring(CAppSet_ShadowBlur);
 
 	// set the color index interpolation settings
-	SetColorInterpolation(CAppSet_bCiByValue);
-	SetColorIndexInterpolation(CAppSet_bCiByColormapIndex, CAppSet_bCiIsolines);
+	m_pcBaseView->SetColorInterpolation(CAppSet_bCiByValue);
+	m_pcBaseView->SetColorIndexInterpolation(CAppSet_bCiByColormapIndex, CAppSet_bCiIsolines);
 
-	GetSelection()->SetGrayScale(CAppSet_bGrayScaleSelection);
-	GetSelection()->SetUseDefinedHighlight(CAppSet_bUseDefinedHighlighting);
-	GetSelection()->SetAllowDisplacement(CAppSet_bDisplaceSelection);
-	GetSelection()->SetHighlightMode(CAppSet_HighlightMode);
+	m_pcBaseView->GetSelection()->SetGrayScale(CAppSet_bGrayScaleSelection);
+	m_pcBaseView->GetSelection()->SetUseDefinedHighlight(CAppSet_bUseDefinedHighlighting);
+	m_pcBaseView->GetSelection()->SetAllowDisplacement(CAppSet_bDisplaceSelection);
+	m_pcBaseView->GetSelection()->SetHighlightMode(HighlightQuickmoves);
+	m_pcBaseView->GetHighlightSelection()->SetHighlightMode(HighlightQuickmoves);
 
-	GetHighlightSelection()->SetHighlightMode(CAppSet_HighlightMode);
-	GetSelection()->SetHighlightTransparency(CAppSet_TransparencyLevel);
+	m_pcBaseView->GetSelection()->SetHighlightTransparency(CAppSet_TransparencyLevel);
 
-	if (CAppSet_csRefSelType == "Spriting")
-		GetSelection()->SetReferenceSelectionType(RefSelSpriting);
-	else if (CAppSet_csRefSelType == "Off")
-		GetSelection()->SetReferenceSelectionType(RefSelOff);
-	else
-		GetSelection()->SetReferenceSelectionType(RefSelDefault);
+	if (CAppSet_csRefSelType == "Spriting") {
+		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelSpriting);
+	}
+	else if (CAppSet_csRefSelType == "Off") {
+		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelOff);
+	}
+	else {
+		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelDefault);
+	}
 
-	GetSelection()->UpdateHighlightStyle();
+	m_pcBaseView->GetSelection()->UpdateHighlightStyle();
 
 	// set the rendermode
-	SetRenderMode(CAppSet_RenderMode, true);
+	m_pcBaseView->SetRenderMode(CAppSet_RenderMode, true);
 
-	SetEventCheckerCallback(event_checker);
+	m_pcBaseView->SetEventCheckerCallback(event_checker);
+
+	char chRenderingOption[MVO_BUFFER_SIZE] = "0";
+	char chHeuristics[MVO_BUFFER_SIZE] = "0";
+	char chNetHeuristics[MVO_BUFFER_SIZE] = "0";
+
+/*
+	HC_KEY nHighlightStyleKey = m_pcBaseView->GetHighlightSelection()->GetHighlightStyle();
+	HC_Open_Segment_By_Key(nHighlightStyleKey); {
+		HC_Show_Rendering_Options(chRenderingOption);
+		HC_Show_Heuristics(chHeuristics);
+	} HC_Close_Segment();
+
+	HC_KEY nSelectionSegmentKey = m_pcBaseView->GetHighlightSelection()->GetSelectionSegment();
+	HC_Open_Segment_By_Key(nSelectionSegmentKey); {
+		HC_Show_Rendering_Options(chRenderingOption);
+		HC_Show_Heuristics(chHeuristics);
+	} HC_Close_Segment();
+
+	HC_KEY nSceneKey = m_pcBaseView->GetSceneKey();
+	HC_Open_Segment_By_Key(nSceneKey); {
+		HC_Open_Segment("./overwrite/lights/selection_segment"); {
+			HC_Show_Net_Heuristics(chNetHeuristics);
+		}HC_Close_Segment();
+
+		HC_Show_Rendering_Options(chRenderingOption);
+		HC_Show_Heuristics(chHeuristics);
+	} HC_Close_Segment();
+*/
+
+
+// 	SetDefaultOperator();
+// 	SetSuppressUpdate(false);
+// 
+// 	return;
 
 	//we need to adjust the axis window outside the mvo class as the calculation of the window
 	//extents is mfc specific
 
 	// initialize the QueryDialog and AdvancedQueryDialog
-/* // Remark
+	// Remark
+/*
 	m_query_dialog = new CQueryDialog();
 	m_query_dialog->Create(IDD_QUERYDIALOG);
 	m_query_dialog->SetText("No entities currently under cursor.");
@@ -377,7 +427,6 @@ void View::Init()
 	m_advanced_query_dialog->Create(IDD_QUERY_ADVANCED_DLG);
 	m_advanced_query_dialog->SetText("No entities currently under cursor.");
 */
-
 	
 	SetShowCollisions(CAppSet_ShowCollisions);
 
@@ -387,7 +436,7 @@ void View::Init()
 	{
 		// NOTE: I am setting these opcode handlers here, even if it is not a stream file. Who knows if we are in a
 		// collaborative session and someone loads an hsf file - Rajesh B
-		// install our custom TK_Initial_View opcode handler so that we set the initial view appropriately
+		// install our custom TK_Initial_View opcode handler so that we set the initial Canvas appropriately
 		tk->SetPrewalkHandler(new PartviewerHSFExtras(this));
 		tk->SetOpcodeHandler(TKE_View, new PartviewerHSFExtras(this));
 
@@ -469,7 +518,7 @@ void View::Init()
 // 	frame->GetBhvToolbar()->m_wndBhvSlider.SetPos(0);
 
 
-	HC_Open_Segment_By_Key(GetCuttingPlanesKey()); {
+	HC_Open_Segment_By_Key(m_pcBaseView->GetCuttingPlanesKey()); {
 		HC_Open_Segment("plane2"); {
 			HC_Rotate_Object(90, 0, 0);
 		}HC_Close_Segment();
@@ -480,14 +529,14 @@ void View::Init()
 	}HC_Close_Segment();
 
 	//apply hiding of overlapped text (or not)
-	SetHideOverlappedText(CAppSet_bHideOverlappedText);
+	m_pcBaseView->SetHideOverlappedText(CAppSet_bHideOverlappedText);
 
-	HC_Open_Segment_By_Key(GetShadowMapSegmentKey()); {
+	HC_Open_Segment_By_Key(m_pcBaseView->GetShadowMapSegmentKey()); {
 		if (CAppSet_bShadowMap) {
 			sprintf(chRenderingOpts, "shadow map=(on, resolution=%d, samples=%d, %s jitter, %s)",
 				CAppSet_nSMResolution, CAppSet_nSMSamples,
 				(CAppSet_Jitter ? "" : "no"),
-				(CAppSet_ViewDependentShadowMap ? "view dependent" : "view independent"));
+				(CAppSet_ViewDependentShadowMap ? "Canvas dependent" : "Canvas independent"));
 		}
 		else {
 			sprintf(chRenderingOpts, "no shadow map");
@@ -495,7 +544,7 @@ void View::Init()
 		HC_Set_Rendering_Options(chRenderingOpts);
 	} HC_Close_Segment();
 
-	HC_Open_Segment_By_Key(GetSceneKey()); {
+	HC_Open_Segment_By_Key(m_pcBaseView->GetSceneKey()); {
 		HC_Set_Variable_Edge_Weight(H_ASCII_TEXT(CAppSet_LineWeight));
 		HC_Set_Variable_Line_Weight(H_ASCII_TEXT(CAppSet_LineWeight));
 
@@ -543,13 +592,13 @@ void View::Init()
 
 		//Apply curve geometry options
 		char curve_opt[4096];
-		HCLOCALE(sprintf(curve_opt, "general curve = (budget = %d, continued budget = %d, maximum deviation = %f, maximum angle = %f, maximum length = %f, %s view independent)",
+		HCLOCALE(sprintf(curve_opt, "general curve = (budget = %d, continued budget = %d, maximum deviation = %f, maximum angle = %f, maximum length = %f, %s Canvas independent)",
 			CAppSet_Budget, CAppSet_ContinuedBudget, CAppSet_MaxDeviation / 10000.f,
 			CAppSet_MaxAngle / 10000.f, CAppSet_MaxLength / 10000.f, CAppSet_bViewIndependent ? "" : "no"));
 
 		HC_Set_Rendering_Options(curve_opt);
 
-		SetReflectionPlane(CAppSet_bReflectionPlane, CAppSet_ReflectionOpacity,
+		m_pcBaseView->SetReflectionPlane(CAppSet_bReflectionPlane, CAppSet_ReflectionOpacity,
 			CAppSet_bReflectionFading, CAppSet_ReflectionUseAttenuation,
 			CAppSet_ReflectionHither, CAppSet_ReflectionYon,
 			CAppSet_ReflectionUseBlur, CAppSet_ReflectionBlur);
@@ -624,188 +673,31 @@ void View::Init()
 	}
 */
 
-	SetLightCount(CAppSet_LightCount);
-	SetViewSelectionLevel(HSelectionLevelSegment);
+	m_pcBaseView->SetLightCount(CAppSet_LightCount);
+	m_pcBaseView->SetViewSelectionLevel(HSelectionLevelSegment);
 
 	SetDefaultOperator();
 
-	//LocalSetOperator(new HOpSelectArea(this));
+	m_pcWindow->GetSelectionOptionsControl().SetLevel(Selection::Level::Entity);
+	//m_pcWindowKey->GetSelectionOptionsControl().SetProximity(0.1);
+	m_pcWindow->GetSelectionOptionsControl().SetBias(Selection::Bias::Lines);// .SetBias(Selection::Bias::Markers);
 
 	// do all the setup with no updates
-	SetSuppressUpdate(false);
-/*
-	SetGpu("Default");
-
-	SetDriverOption();
-
-	SetLightScaling(0);
-
-	SetDisplayListType(DisplayListSegment);
-	SetDisplayListMode(true);
-
-	// Setting Framerate Mode
-	SetFramerateMode(FramerateOff);
-	SetCullingThreshold(2);
-
-	SetBackplaneCulling(false);
-
-	SetProjMode(ProjOrthographic);
-
-	SetTransparency();
-
-	SetSmoothTransition(false);
-
-	GetModel()->GetEventManager()->RegisterHandler((HAnimationListener *)this, HAnimationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
-
-	m_pSelection = new SelectionControl(this);
-	m_pSelection->Init();
-	m_pSelection->SetAllowSubentityDeselection(true);
-
-	SetSelectOption();
-
-	// Zoom Fit에 이상이 생김.
-	// SetFastFitWorld(true);
-
-	// app-specific scene Defaults
-	_3DF::SegmentKey cViewSegment(m_ViewKey);
-	cViewSegment.GetSelectabilityControl().SetEverything(false);
-
-	// set up some scene defaults
-	_3DF::SegmentKey cSceneSegment(m_SceneKey);
-	cViewSegment.SetRenderingOptions("no color interpolation, color index interpolation");
-	cViewSegment.SetVisibility("lights = (faces = on, edges = off), markers = off, faces=on, edges=off, lines=off, text = on");
-
-	// windowspace (overlay) defaults
-	_3DF::SegmentKey cWindowSpaceSegment(m_WindowspaceKey);
-	cWindowSpaceSegment.SetColorByIndex("geometry", 3);
-	cWindowSpaceSegment.SetColorByIndex("window contrast", 1);
-	cWindowSpaceSegment.SetColorByIndex("windows", 1);
-	cWindowSpaceSegment.SetVisibility("markers=on");
-	cWindowSpaceSegment.SetMarkerSymbol("+");
-	cWindowSpaceSegment.GetSelectabilityControl().SetEverything(false);
-
-	SetViewAxis();
-
-	SetViewMode(HViewIso);		// fit the camera to the scene extents
-
-	SetHandedness(HandednessRight, true);
-
-	// 배경화면 설정
-	COLORREF nWindowBackgroundColor = RGB(59, 68, 83);
-	SetWindowBackGroundColor(nWindowBackgroundColor, nWindowBackgroundColor);
-
-	SetPolygonHandednessMode(HandednessLeft);
-
-	SetDefaultOperator();
-
-	// View 설정이 끝나고 나면 
-	// File Import 시작
-	//ImportExchangeFile(nViewId, strFilePathName);
-
-	GetModel()->SetStaticModel(true);
-	GetModel()->SetLMVModel(true);
-
-	bool bFlag = SetHandednessFromModel();
-
-	SetSuppressUpdate(false);*/
+	m_pcBaseView->SetSuppressUpdate(false);
 }
 
-void View::Init_CUR()
-{
-	// call base's init function first to get the default HOOPS hierarchy for the view
-	HBaseView::Init();
-
-	// do all the setup with no updates
-	SetSuppressUpdate(true);
-	
-	SetGpu("Default");
-
-	SetDriverOption();
-
-	SetLightScaling(0);
-
-	SetDisplayListType(DisplayListSegment);
-	SetDisplayListMode(true);
-
-	// Setting Framerate Mode
-	SetFramerateMode(FramerateOff);
-	SetCullingThreshold(2);
-
-	SetBackplaneCulling(false);
-	
-	SetProjMode(ProjOrthographic);
-
-	SetTransparency();
-
-	SetSmoothTransition(false);
-
-	GetModel()->GetEventManager()->RegisterHandler((HAnimationListener *) this, HAnimationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
-	
-	m_pSelection = new SelectionControl(this);
-	m_pSelection->Init();
-	m_pSelection->SetAllowSubentityDeselection(true);
-
-	SetSelectOption();
-
-	// Zoom Fit에 이상이 생김.
-	// SetFastFitWorld(true);
-
-	// app-specific scene Defaults
-	_3DF::SegmentKey cViewSegment(m_ViewKey);
-	cViewSegment.GetSelectabilityControl().SetEverything(false);
-
-	// set up some scene defaults
-	_3DF::SegmentKey cSceneSegment(m_SceneKey);
-	cViewSegment.SetRenderingOptions("no color interpolation, color index interpolation");
-	cViewSegment.SetVisibility("lights = (faces = on, edges = off), markers = off, faces=on, edges=off, lines=off, text = on");
-
-	// windowspace (overlay) defaults
-	_3DF::SegmentKey cWindowSpaceSegment(m_WindowspaceKey);
-	cWindowSpaceSegment.SetColorByIndex("geometry", 3);
-	cWindowSpaceSegment.SetColorByIndex("window contrast", 1);
-	cWindowSpaceSegment.SetColorByIndex("windows", 1);
-	cWindowSpaceSegment.SetVisibility("markers=on");
-	cWindowSpaceSegment.SetMarkerSymbol("+");
-	cWindowSpaceSegment.GetSelectabilityControl().SetEverything(false);
-
-	SetViewAxis();
-
-	SetViewMode(HViewIso);		// fit the camera to the scene extents
-
-	SetHandedness(HandednessRight, true);
-
-	// 배경화면 설정
-	COLORREF nWindowBackgroundColor = RGB(59, 68, 83);
-	SetWindowBackGroundColor(nWindowBackgroundColor, nWindowBackgroundColor);
-
-	SetPolygonHandednessMode(HandednessLeft);
-
-	SetDefaultOperator();
-
-	// View 설정이 끝나고 나면 
-	// File Import 시작
-	//ImportExchangeFile(nViewId, strFilePathName);
-
-	GetModel()->SetStaticModel(true);
-	GetModel()->SetLMVModel(true);
-
-	bool bFlag = SetHandednessFromModel();
-
-	SetSuppressUpdate(false);
-}
-
-void View::SetGpu(CString strGpu)
+void Canvas::SetGpu(CString strGpu)
 {
 	char gpu_to_use[256];
 	strcpy(gpu_to_use, (char const *) H_UTF8(strGpu).encodedText());
 	if(strcmp(gpu_to_use, "Default") != 0)
 	{
-		SegmentKey cSegment(GetViewKey());
+		SegmentKey cSegment(m_pcBaseView->GetViewKey());
 		HC_Set_Driver_Options(H_FORMAT_TEXT("gpu preference = specific = %s", gpu_to_use));
 	}
 }
 
-void View::SetDriverOption()
+void Canvas::SetDriverOption()
 {
 	char chDriverOpts[MVO_BUFFER_SIZE];
 
@@ -820,7 +712,7 @@ void View::SetDriverOption()
 	// CAppSet_tings::csQuickMovesType
 	sprintf(chDriverOpts, "%s, quick moves preference = %s", chDriverOpts, "Default");
 
-	HC_Open_Segment_By_Key(GetViewKey()); {
+	HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
 		HC_Set_Driver_Options(chDriverOpts);
 		HC_Set_Rendering_Options("anti-alias = (screen = on)");
 
@@ -833,7 +725,7 @@ void View::SetDriverOption()
 }
 
 // 투명도 적용 방법 설정
-void View::SetTransparency()
+void Canvas::SetTransparency()
 {
 	char text[4096];
 	char style[4096];
@@ -856,10 +748,10 @@ void View::SetTransparency()
 		style, sorting, layers, m_cPreference.General.Transparency.PixelOIT ? "pixel" : "buffer", 
 		m_cPreference.General.Transparency.DepthWriting == true ? "on" : "off");
 
-	HBaseView::SetTransparency(text, fast_z_sort);
+	m_pcBaseView->SetTransparency(text, fast_z_sort);
 }
 
-void View::SetViewAxis()
+void Canvas::SetViewAxis()
 {
 	char text[4096];
 	HVector front, top;
@@ -868,85 +760,78 @@ void View::SetViewAxis()
 	sscanf(text, "%f %f %f %f %f %f", &front.x, &front.y, &front.z,
 		&top.x, &top.y, &top.z);
 
-	HBaseView::SetViewAxis(&front, &top);
+	m_pcBaseView->SetViewAxis(&front, &top);
 
-	HBaseView::SetAxisMode(AxisOn);
+	m_pcBaseView->SetAxisMode(AxisOn);
 }
 
-void View::SetSelectOption()
+void Canvas::SetSelectOption()
 {
-	SetDetailSelection(false);
-	SetRelatedSelectionLimit(0);
-	SetTransparentSelectionBoxMode(true);
-	SetRespectSelectionCulling(false);
-	SetSpritingMode(true);
-	SetDynamicHighlighting(true);
-	SetViewSelectionLevel(HSelectionLevelSegment);
-	//SetVisibilitySelectionMode(false);
-
-	HSelectionSet * pcSelSet = GetSelection();
-	assert(pcSelSet);
-
-	pcSelSet->Init();
-	pcSelSet->SetAllowSubentityDeselection(true);
-
-	//these need to be done before the regular selection set
-
 	HPixelRGBA cHighlightSelectColor;
-	cHighlightSelectColor.Set(0, 255, 0);
-	GetHighlightSelection()->SetSelectionFaceColor(cHighlightSelectColor);
-	//GetHighlightSelection()->SetSelectionLevel(HSelectLevel::HSelectSegment);
-	GetHighlightSelection()->SetSelectionLevel(HSelectLevel::HSelectEntity);
-	GetHighlightSelection()->SetGrayScale(false); // CAppSet_tings::CAppSet_bGrayScaleSelection
-	GetHighlightSelection()->SetUseDefinedHighlight(false); // CAppSet_tings::CAppSet_bUseDefinedHighlighting
-	GetHighlightSelection()->SetInvisible(false); // CAppSet_tings::bInvisibleSelection
-	GetHighlightSelection()->SetAllowDisplacement(false); // CAppSet_tings::bDisplaceSelection
-	GetHighlightSelection()->SetHighlightMode(HighlightDefault);// HighlightQuickmoves);
-	GetHighlightSelection()->UpdateHighlightStyle();
+	cHighlightSelectColor.Set(255, 0, 0);
+	m_pcBaseView->GetHighlightSelection()->SetSelectionFaceColor(cHighlightSelectColor);
+	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeColor(cHighlightSelectColor);
+	m_pcBaseView->GetHighlightSelection()->SetSelectionMarkerColor(cHighlightSelectColor);
 
-	char qm_pref[MVO_BUFFER_SIZE];
-	sprintf(qm_pref, "quick moves preference = %s", "Default");// H_ASCII_TEXT(CAppSet_tings::csQuickMovesType));
-	HC_Open_Segment_By_Key(GetViewKey());
-	HC_Set_Driver_Options(qm_pref);
-	HC_Close_Segment();
+	m_pcBaseView->GetHighlightSelection()->SetGrayScale(CAppSet_bGrayScaleSelection);
+	m_pcBaseView->GetHighlightSelection()->SetUseDefinedHighlight(CAppSet_bUseDefinedHighlighting);
+	m_pcBaseView->GetHighlightSelection()->SetInvisible(CAppSet_bInvisibleSelection);
+	m_pcBaseView->GetHighlightSelection()->SetAllowDisplacement(CAppSet_bDisplaceSelection);
+	m_pcBaseView->SetDynamicHighlighting(true);
+	m_pcBaseView->GetHighlightSelection()->UpdateHighlightStyle();
 
+	char chDriverOpts[MVO_BUFFER_SIZE];
+	sprintf(chDriverOpts, "quick moves preference = %s", H_ASCII_TEXT(m_cPreference.Selection.Highlight.QuickMovesType));
+	HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
+		HC_Set_Driver_Options(chDriverOpts);
+	} HC_Close_Segment();
 
-	// apply the selection color
-	//int sel_alpha = (int)(CAppSet_tings::SelectionColorTransparency * 2.56f);		// settings is a %, scale it to 256
-	HPixelRGBA cSelectColor;
-	cSelectColor.Set(255, 128, 0);
-	pcSelSet->SetSelectionFaceColor(cSelectColor);
-	pcSelSet->SetSelectionEdgeColor(cSelectColor);
-	pcSelSet->SetSelectionMarkerColor(cSelectColor);
+	// set the selection color
+	HSelectionSet * sel_set = m_pcBaseView->GetSelection();
+	assert(sel_set);
+	HPixelRGBA sel_col;
+	int sel_alpha = (int)(CAppSet_SelectionColorTransparency * 2.56f);		// settings is a %, scale it to 256
+	sel_col.Set(
+		GetRValue(CAppSet_PolygonSelectionColor),
+		GetGValue(CAppSet_PolygonSelectionColor),
+		GetBValue(CAppSet_PolygonSelectionColor),
+		(unsigned char)sel_alpha);
+	sel_set->SetSelectionFaceColor(sel_col);
 
-	pcSelSet->SetSelectionLevel(HSelectLevel::HSelectSegment);
-	pcSelSet->SetGrayScale(false);
- 	pcSelSet->SetUseDefinedHighlight(false);
- 	pcSelSet->SetAllowDisplacement(false);
- 	pcSelSet->SetHighlightMode(HighlightQuickmoves);
+	sel_col.Set(
+		GetRValue(CAppSet_LineSelectionColor),
+		GetGValue(CAppSet_LineSelectionColor),
+		GetBValue(CAppSet_LineSelectionColor),
+		(unsigned char)sel_alpha);
+	sel_set->SetSelectionEdgeColor(sel_col);
 
- 	pcSelSet->SetHighlightTransparency(0.9f);
- 	pcSelSet->SetReferenceSelectionType(RefSelSpriting);
+	sel_col.Set(
+		GetRValue(CAppSet_MarkerSelectionColor),
+		GetGValue(CAppSet_MarkerSelectionColor),
+		GetBValue(CAppSet_MarkerSelectionColor),
+		(unsigned char)sel_alpha);
+	sel_set->SetSelectionMarkerColor(sel_col);
 
-	pcSelSet->UpdateHighlightStyle();
+	m_pcBaseView->GetSelection()->SetGrayScale(CAppSet_bGrayScaleSelection);
+	m_pcBaseView->GetSelection()->SetUseDefinedHighlight(CAppSet_bUseDefinedHighlighting);
+	m_pcBaseView->GetSelection()->SetAllowDisplacement(CAppSet_bDisplaceSelection);
+	m_pcBaseView->GetSelection()->SetInvisible(CAppSet_bInvisibleSelection);
+	m_pcBaseView->GetSelection()->SetHighlightMode(CAppSet_HighlightMode);
 
-	
-/*
-	pActiveView->SetDeepSelectionMode(CAppSet_tings::DeepSelection);
-	pBaseView->SetVisibilitySelectionMode(CAppSet_tings::VisibilitySelection);
-	pBaseView->SetTransparentSelectionBoxMode(CAppSet_tings::bUseSelectBox);
-*/
+	m_pcBaseView->GetHighlightSelection()->SetHighlightMode(CAppSet_HighlightMode);
+	m_pcBaseView->GetSelection()->SetHighlightTransparency(CAppSet_TransparencyLevel);
 
-/*
-	pBaseView->SetDetailSelection(CAppSet_tings::DetailSelection);
-	pBaseView->SetRespectSelectionCulling(CAppSet_tings::SelectionRespectCulling);
+	if (CAppSet_csRefSelType == "Spriting")
+		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelSpriting);
+	else if (CAppSet_csRefSelType == "Off")
+		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelOff);
+	else
+		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelDefault);
 
-	pBaseView->SetSuppressUpdate(false);
-	pBaseView->Update();
-*/
+	m_pcBaseView->GetSelection()->UpdateHighlightStyle();
 }
 
-void View::SetWindowBackGroundColor(COLORREF nNewTopColor, COLORREF nNewBottomColor, bool bEmitMessage)
+void Canvas::SetWindowBackGroundColor(COLORREF nNewTopColor, COLORREF nNewBottomColor, bool bEmitMessage)
 {
 	HPoint nWindowTopColor;
 	nWindowTopColor.Set(
@@ -960,10 +845,10 @@ void View::SetWindowBackGroundColor(COLORREF nNewTopColor, COLORREF nNewBottomCo
 		static_cast<float>(GetGValue(nNewBottomColor)) / 255.0f,
 		static_cast<float>(GetBValue(nNewBottomColor)) / 255.0f);
 
-	HBaseView::SetWindowColor(nWindowTopColor, nWindowBottomColor, bEmitMessage);
+	m_pcBaseView->SetWindowColor(nWindowTopColor, nWindowBottomColor, bEmitMessage);
 }
 
-bool View::GetKeyState(unsigned int key, int & flags)
+bool Canvas::GetKeyState(unsigned int key, int & flags)
 {
 	unsigned char state[256];
 	flags = 0;
@@ -984,7 +869,7 @@ bool View::GetKeyState(unsigned int key, int & flags)
 		return false;
 }
 
-void View::SetMarkupColor(COLORREF new_color, bool emit_message)
+void Canvas::SetMarkupColor(COLORREF new_color, bool emit_message)
 {
 	UNREFERENCED(emit_message);
 
@@ -994,35 +879,35 @@ void View::SetMarkupColor(COLORREF new_color, bool emit_message)
 		static_cast<float>(GetGValue(new_color)) / 255.0f,
 		static_cast<float>(GetBValue(new_color)) / 255.0f);
 
-	HC_Open_Segment_By_Key(GetMarkupManager()->GetMarkupKey()); {
+	HC_Open_Segment_By_Key(m_pcBaseView->GetMarkupManager()->GetMarkupKey()); {
 		HC_Set_Color_By_Value("everything", "RGB", new_mkp_color.x, new_mkp_color.y, new_mkp_color.z);
 	}HC_Close_Segment();
 
-	GetMarkupManager()->SetMarkupColor(new_mkp_color);
+	m_pcBaseView->GetMarkupManager()->SetMarkupColor(new_mkp_color);
 }
 
-void View::SetShadowColor(COLORREF new_color)
+void Canvas::SetShadowColor(COLORREF new_color)
 {
 	HPoint new_shd_color;
 	new_shd_color.Set(
 		static_cast<float>(GetRValue(new_color)) / 255.0f,
 		static_cast<float>(GetGValue(new_color)) / 255.0f,
 		static_cast<float>(GetBValue(new_color)) / 255.0f);
-	HBaseView::SetShadowColor(new_shd_color);
+	m_pcBaseView->SetShadowColor(new_shd_color);
 }
 
-void View::event_checker(HIC_Rendition const * nr)
+void Canvas::event_checker(HIC_Rendition const * nr)
 {
 	//MSG msg;
-	View * pCurrentView = (View *)HIC_Show_User_Index(nr, H_VIEW_POINTER_INDEX);
+	Canvas * pCurrentView = (Canvas *)HIC_Show_User_Index(nr, H_VIEW_POINTER_INDEX);
 	if (pCurrentView)
 	{
 		int state = GetAsyncKeyState(VK_LBUTTON);
 		if (state & 32768)
 		{
-			pCurrentView->GetConstantFrameRateObject()->InitiateDelay();
+			pCurrentView->GetBaseView()->GetConstantFrameRateObject()->InitiateDelay();
 
-			pCurrentView->SetUpdateInterrupted(true);
+			pCurrentView->GetBaseView()->SetUpdateInterrupted(true);
 
 			HIC_Abort_Update(nr);
 		}
@@ -1031,7 +916,7 @@ void View::event_checker(HIC_Rendition const * nr)
 		if (state & 32768)
 		{
 			HIC_Abort_Update(nr);
-			pCurrentView->SetUpdateInterrupted(true);
+			pCurrentView->GetBaseView()->SetUpdateInterrupted(true);
 		}
 
 // 		if (PeekMessage(&msg, pCurrentView->m_hWnd, WM_MOUSEWHEEL, WM_MOUSEWHEEL, PM_NOREMOVE))
@@ -1043,24 +928,24 @@ void View::event_checker(HIC_Rendition const * nr)
 	int state = GetAsyncKeyState(VK_RBUTTON);
 	if (state & 32768)
 	{
-		pCurrentView->GetConstantFrameRateObject()->InitiateDelay();
-		pCurrentView->SetUpdateInterrupted(2);
+		pCurrentView->GetBaseView()->GetConstantFrameRateObject()->InitiateDelay();
+		pCurrentView->GetBaseView()->SetUpdateInterrupted(2);
 		HIC_Abort_Update(nr);
 	}
 
 }
 
-void View::ViewReady()
+void Canvas::ViewReady()
 {
-	HBaseModel * hmodel = GetModel();
+	HBaseModel * hmodel = GetBaseView()->GetModel();
 
-	SetSuppressUpdate(true);
+	GetBaseView()->SetSuppressUpdate(true);
 
-	SetSplatRendering(BOOL2bool(CAppSet_bSplatRendering));
+	GetBaseView()->SetSplatRendering(BOOL2bool(CAppSet_bSplatRendering));
 
-	SetFastMarkerDrawing(CAppSet_bFastMarkers);
+	GetBaseView()->SetFastMarkerDrawing(CAppSet_bFastMarkers);
 
-	HC_Open_Segment_By_Key(GetShadowMapSegmentKey()); {
+	HC_Open_Segment_By_Key(GetBaseView()->GetShadowMapSegmentKey()); {
 		char opt[MVO_BUFFER_SIZE];
 
 		sprintf(opt, "shadow map=(%s, resolution=%d, samples=%d, %s jitter)",
@@ -1070,7 +955,8 @@ void View::ViewReady()
 		HC_Set_Rendering_Options(opt);
 	} HC_Close_Segment();
 
-	HC_Open_Segment_By_Key(GetSceneKey()); {
+
+	HC_Open_Segment_By_Key(GetBaseView()->GetSceneKey()); {
 		if (CAppSet_bShadowMap) {
 			HC_Set_Visibility("shadows = (emitting, casting, receiving)");
 		}
@@ -1099,12 +985,14 @@ void View::ViewReady()
 		HC_Set_Rendering_Options(opt);
 	} HC_Close_Segment();
 
-	SetShadowLightDirection(CAppSet_UseLightVector, &CAppSet_LightVector);
-	SetShadowIgnoresTransparency(CAppSet_IgnoreTransparency);
-	SetShadowMode(CAppSet_ShadowMode);
-	SetOcclusionCullingMode(CAppSet_OcclusionCulling, true);
-	SetLineAntialiasing(m_cPreference.Appearance.AntiAliasing.Line);
-	SetTextAntialiasing(m_cPreference.Appearance.AntiAliasing.Text);
+
+	GetBaseView()->SetShadowLightDirection(CAppSet_UseLightVector, &CAppSet_LightVector);
+	GetBaseView()->SetShadowIgnoresTransparency(CAppSet_IgnoreTransparency);
+	GetBaseView()->SetShadowMode(CAppSet_ShadowMode);
+	GetBaseView()->SetOcclusionCullingMode(CAppSet_OcclusionCulling, true);
+	GetBaseView()->SetLineAntialiasing(m_cPreference.Appearance.AntiAliasing.Line);
+	GetBaseView()->SetTextAntialiasing(m_cPreference.Appearance.AntiAliasing.Text);
+
 	SetTransparency();
 
 	//Turn on static model and display lists last, and in that order
@@ -1113,15 +1001,15 @@ void View::ViewReady()
 	hmodel->SetLMVModel(CAppSet_LMVModel);
 
 	if (CAppSet_bRestoreAnnotations) {
-		SetAnnotationResize(true);
+		GetBaseView()->SetAnnotationResize(true);
 	}
 
 	if (DisplayListOff == CAppSet_DisplayList) {
-		SetDisplayListMode(false);
+		GetBaseView()->SetDisplayListMode(false);
 	}
 	else {
-		SetDisplayListType(CAppSet_DisplayList);
-		SetDisplayListMode(true);
+		GetBaseView()->SetDisplayListType(CAppSet_DisplayList);
+		GetBaseView()->SetDisplayListMode(true);
 	}
 
 	// Check whether this file contains layout, if yes, load them (applicable to dwg files, and hsfs saved from
@@ -1136,55 +1024,55 @@ void View::ViewReady()
 	}
 */
 
-	SetHandednessFromModel();
+	GetBaseView()->SetHandednessFromModel();
 
-	SetSuppressUpdate(false);
+	GetBaseView()->SetSuppressUpdate(false);
 }
 
-void View::SetupViews()
+void Canvas::SetupViews()
 {
-	SetRenderMode(CAppSet_RenderMode, true);
-	SetShadowMode(CAppSet_ShadowMode);
-	SetOcclusionCullingMode(m_cPreference.Perfromance.Optimization.OcclusionCulling, true);
+	GetBaseView()->SetRenderMode(CAppSet_RenderMode, true);
+	GetBaseView()->SetShadowMode(CAppSet_ShadowMode);
+	GetBaseView()->SetOcclusionCullingMode(m_cPreference.Perfromance.Optimization.OcclusionCulling, true);
 }
 
-void View::EnableFrameRate(bool onoff)
+void Canvas::EnableFrameRate(bool onoff)
 {
 	int nSteps = (CAppSet_DynamicAdjustment ? m_cPreference.Perfromance.FramerateOptimization.DetailSteps : 0);
 
 	if (onoff) {
-		SetFramerateMode(FramerateTarget, m_cPreference.Perfromance.FramerateOptimization.FramerateTime, 
+		GetBaseView()->SetFramerateMode(FramerateTarget, m_cPreference.Perfromance.FramerateOptimization.FramerateTime,
 			m_cPreference.Perfromance.FramerateOptimization.MaxThreshold, UINT2bool(m_cPreference.Perfromance.FramerateOptimization.UseLods), nSteps);
 	}
 	else {
-		SetFramerateMode(FramerateOff);
+		GetBaseView()->SetFramerateMode(FramerateOff);
 	}
 }
 
-void View::SetSceneFont(CString csFontName, CString csFontSize, CString csFontUnits)
+void Canvas::SetSceneFont(CString csFontName, CString csFontSize, CString csFontUnits)
 {
-	HC_Open_Segment_By_Key(GetSceneKey());
+	HC_Open_Segment_By_Key(GetBaseView()->GetSceneKey()); {
 
-	// first let's query the user's font size settings
-	float size = (float)atof(H_ASCII_TEXT(csFontSize));
-	if (size < 0)
-		size *= -1;
+		// first let's query the user's font size settings
+		float size = (float)atof(H_ASCII_TEXT(csFontSize));
+		if (size < 0)
+			size *= -1;
 
-	char cfname[MVO_BUFFER_SIZE];
-	sprintf(cfname, "name = \"%s\"", (const char *)H_ASCII_TEXT(csFontName));
-	HC_Set_Text_Font(cfname);
+		char cfname[MVO_BUFFER_SIZE];
+		sprintf(cfname, "name = \"%s\"", (const char *)H_ASCII_TEXT(csFontName));
+		HC_Set_Text_Font(cfname);
 
-	// set the font size via MVO - to propogate it to the hnet clients
-	// hnet removed: do we still need to do this?
-	char cfsize[MVO_BUFFER_SIZE];
-	HCLOCALE(sprintf(cfsize, "%f %s", size, (const char *)H_ASCII_TEXT(csFontUnits)));
+		// set the font size via MVO - to propogate it to the hnet clients
+		// hnet removed: do we still need to do this?
+		char cfsize[MVO_BUFFER_SIZE];
+		HCLOCALE(sprintf(cfsize, "%f %s", size, (const char *)H_ASCII_TEXT(csFontUnits)));
 
-	SetFontSize(cfsize, true);
+		GetBaseView()->SetFontSize(cfsize, true);
 
-	HC_Close_Segment();
+	} HC_Close_Segment();
 }
 
-bool View::signal_selected(int signal, void * signal_data, void * user_data)
+bool Canvas::signal_selected(int signal, void * signal_data, void * user_data)
 {
 	return true;
 /*
@@ -1196,7 +1084,7 @@ bool View::signal_selected(int signal, void * signal_data, void * user_data)
 /*!
   Receive the MVO event HSignalDeSelectedAll event here and call the appropriate handler
 */
-bool View::signal_deselected_all(int signal, void * signal_data, void * user_data)
+bool Canvas::signal_deselected_all(int signal, void * signal_data, void * user_data)
 {
 	return true;
 /*
@@ -1206,7 +1094,7 @@ bool View::signal_deselected_all(int signal, void * signal_data, void * user_dat
 	return OnSignalDeSelectedAll();*/
 }
 
-bool View::OnSignalSelected()
+bool Canvas::OnSignalSelected()
 {
 /*
 
@@ -1227,7 +1115,7 @@ bool View::OnSignalSelected()
   HSignalDeSelectedAll MVO event handler. Update any dialog bars we have
   \return bool
 */
-bool View::OnSignalDeSelectedAll()
+bool Canvas::OnSignalDeSelectedAll()
 {
 /*
 	if (m_pDlgClashBrowser)
@@ -1243,39 +1131,39 @@ bool View::OnSignalDeSelectedAll()
 
 
 //== Command 관련 함수 ===========================================================================
-void View::CancelCommands()
+void Canvas::CancelCommands()
 {
 	DeSelectAll();
 }
 
 //== Mouse 관련 함수 =============================================================================
-bool View::LButtonDown(int nFlags, int x, int y)
+bool Canvas::LButtonDown(int nFlags, int x, int y)
 {
-	SetDynamicHighlighting(false);
+	GetBaseView()->SetDynamicHighlighting(false);
 
 	// Shift & L Button 이벤트는 Area Select
 	if (MK_SHIFT & nFlags) {
-		SetOperator(m_pcSelectArea);
+		GetBaseView()->SetOperator(m_pcSelectArea);
 	}
 	else {
-		SetOperator(m_pcCameraOrbitSelect);
+		GetBaseView()->SetOperator(m_pcCameraOrbitSelect);
 	}
 
-	HEventInfo cEvent(this);
+	HEventInfo cEvent(GetBaseView());
 	cEvent.SetPoint(HE_LButtonDown, x, y, MouseMapFlags(nFlags));
-	HLISTENER_EVENT(HMouseListener, GetEventManager(), OnLButtonDown(cEvent));
+	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnLButtonDown(cEvent));
 	return true;
 }
 
-bool View::LButtonUp(int nFlags, int x, int y)
+bool Canvas::LButtonUp(int nFlags, int x, int y)
 {
-	SetDynamicHighlighting(true);
+	GetBaseView()->SetDynamicHighlighting(true);
 
-	HEventInfo cEvent(this);
+	HEventInfo cEvent(GetBaseView());
 	cEvent.SetPoint(HE_LButtonUp, x, y, MouseMapFlags(nFlags));
-	HLISTENER_EVENT(HMouseListener, GetEventManager(), OnLButtonUp(cEvent));
+	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnLButtonUp(cEvent));
 
-	HBaseOperator * op = GetCurrentOperator();
+	HBaseOperator * op = GetBaseView()->GetCurrentOperator();
 
 	if (op) {
 		if (op->Capture()) {
@@ -1283,35 +1171,40 @@ bool View::LButtonUp(int nFlags, int x, int y)
 		}
 	}
 
+	GetBaseView()->SetOperator(m_pcCameraOrbitSelect);
+
 	return true;
 }
 
-bool View::RButtonDown(int nFlags, int x, int y)
+bool Canvas::RButtonDown(int nFlags, int x, int y)
 {
-	SetDynamicHighlighting(false);
+	GetBaseView()->SetDynamicHighlighting(false);
 
-	SetOperator(m_pcCameraPan);
+	GetBaseView()->SetOperator(m_pcCameraPan);
 
-	HEventInfo cEvent(this);
+	HEventInfo cEvent(GetBaseView());
 	cEvent.SetPoint(HE_RButtonDown, x, y, MouseMapFlags(nFlags));
-	HLISTENER_EVENT(HMouseListener, GetEventManager(), OnRButtonDown(cEvent));
+	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnRButtonDown(cEvent));
 	return true;
 }
 
-bool View::RButtonUp(int nFlags, int x, int y)
+bool Canvas::RButtonUp(int nFlags, int x, int y)
 {
-	SetDynamicHighlighting(true);
+	GetBaseView()->SetDynamicHighlighting(true);
 
-	HEventInfo cEvent(this);
+	HEventInfo cEvent(GetBaseView());
 	cEvent.SetPoint(HE_RButtonUp, x, y, MouseMapFlags(nFlags));
-	HLISTENER_EVENT(HMouseListener, GetEventManager(), OnRButtonUp(cEvent));
+	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnRButtonUp(cEvent));
+
+	GetBaseView()->SetOperator(m_pcCameraOrbitSelect);
+
 	return true;
 }
 
-bool View::MouseMove(int nFlags, int x, int y)
+bool Canvas::MouseMove(int nFlags, int x, int y)
 {
 	// Control을 누른경우 Face 단위로 선택이 됨.
-
+/*
 	if (nFlags & MK_CONTROL) {
 		// select on arbitrary subentities(face, edge, or vertex)
 		GetHighlightSelection()->SetSelectionLevel(HSelectLevel::HSelectEntity);
@@ -1319,30 +1212,42 @@ bool View::MouseMove(int nFlags, int x, int y)
 	else {
 		GetHighlightSelection()->SetSelectionLevel(HSelectLevel::HSelectSegment);
 	}
+*/
 
-	HEventInfo cEvent(this);
+	HEventInfo cEvent(GetBaseView());
 	cEvent.SetPoint(HE_MouseMove, x, y, MouseMapFlags(nFlags));
-	HLISTENER_EVENT(HMouseListener, GetEventManager(), OnMouseMove(cEvent));
+
+/*
+	if (MK_LBUTTON & nFlags || MK_RBUTTON & nFlags) {
+		GetBaseView()->GetOperator()->OnMouseMove(cEvent);
+	}
+	else {
+		m_pcWindow->OnMouseMove(cEvent);
+	}
+*/
+
+	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnMouseMove(cEvent));
+
 	return true;
 }
 
 // Mouse Wheel 대응
-bool View::MouseWheel(int nFlags, int zDelta, int x, int y, Json::Object & cInObject)
+bool Canvas::MouseWheel(int nFlags, int zDelta, int x, int y, Json::Object & cInObject)
 {
 	Json::Array & cArray = cInObject.GetArray(SKW_RECT);
 
 	int nLeft = cArray[0]->ToInteger();
 	int nTop = cArray[1]->ToInteger();
 
-	HEventInfo	cEvent(this);
+	HEventInfo	cEvent(GetBaseView());
 	cEvent.SetPoint(HE_MouseWheel, x - nLeft, y - nTop, MouseMapFlags(nFlags));
 	cEvent.SetMouseWheelDelta(zDelta);
-	HLISTENER_EVENT(HMouseListener, GetEventManager(), OnMouseWheel(cEvent));
+	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnMouseWheel(cEvent));
 
 	return true;
 }
 
-DWORD View::MouseMapFlags(DWORD state)
+DWORD Canvas::MouseMapFlags(DWORD state)
 {
 	DWORD nFlag = 0;
 
@@ -1358,23 +1263,25 @@ DWORD View::MouseMapFlags(DWORD state)
 
 //== Operator 관련 함수 ==============================================================================
 
-void View::SetDefaultOperator()
+void Canvas::SetDefaultOperator()
 {
 	//m_pcCameraManipulate = new HOpCameraManipulate(this, 0, 1, new OpCameraOrbitSelect(this), new OpCameraPan(this));
 // 		, new HSOpCameraPan(m_pHView),
 // 		new HSOpCameraZoom(m_pHView), 0, false))
+	
+	m_pcCameraOrbitSelect = new OpCameraOrbitSelect(m_pcWindow);
+	m_pcCameraPan = new OpCameraPan(GetBaseView());
+	m_pcSelectArea = new OpSelectArea(GetBaseView());
 
-	m_pcCameraOrbitSelect = new OpCameraOrbitSelect(this);
-	m_pcCameraPan = new OpCameraPan(this);
-	m_pcSelectArea = new OpSelectArea(this);
+	GetBaseView()->SetOperator(m_pcCameraOrbitSelect);
 
 	//LocalSetOperator(m_pcCameraManipulate);
 }
 
-void View::LocalSetOperator(HBaseOperator * pcNewOperator)
+void Canvas::LocalSetOperator(HBaseOperator * pcNewOperator)
 {
-	HBaseOperator * pcOperator = GetOperator();
-	SetOperator(pcNewOperator);
+	HBaseOperator * pcOperator = GetBaseView()->GetOperator();
+	GetBaseView()->SetOperator(pcNewOperator);
 
 	if (nullptr != pcOperator) {
 		delete pcOperator;
@@ -1396,30 +1303,30 @@ void View::LocalSetOperator(HBaseOperator * pcNewOperator)
 //== Select 관련 함수 ================================================================================
 
 // 선택된 Entity 선택 해제
-void View::DeSelectAll()
+void Canvas::DeSelectAll()
 {
-	if (0 < GetSelection()->GetSize()) {
-		GetSelection()->DeSelectAll();
-		ForceUpdate();
+	if (0 < GetBaseView()->GetSelection()->GetSize()) {
+		GetBaseView()->GetSelection()->DeSelectAll();
+		GetBaseView()->ForceUpdate();
 	}
 }
 
-void View::SetSubentitySelectLevel()
+void Canvas::SetSubentitySelectLevel()
 {
-	HSelectionSet * pcSelection = GetSelection();
+	HSelectionSet * pcSelection = GetBaseView()->GetSelection();
 
 	if (HSelectLevel::HSelectSubentity != pcSelection->GetSelectionLevel()) {
 		pcSelection->DeSelectAll();
-		Update();
+		GetBaseView()->Update();
 	}
 	pcSelection->SetSelectionLevel(HSelectLevel::HSelectSubentity);
-	SetViewSelectionLevel(HSelectionLevelEntity);
-	Update();
+	GetBaseView()->SetViewSelectionLevel(HSelectionLevelEntity);
+	GetBaseView()->Update();
 }
 
 //== Clash 관련 함수 =================================================================================
 
-void View::ClearClashList()
+void Canvas::ClearClashList()
 {
 	if(nullptr != m_pcClashList)
 	{

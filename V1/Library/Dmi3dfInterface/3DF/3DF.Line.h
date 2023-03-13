@@ -20,6 +20,8 @@ public:
 	void Set(LineKit const & cInThat);
 	LineKit const & operator=(LineKit const & cInThat);
 
+	_3DF::Type ObjectType() const { return _3DF::Type::LineKit; };
+
 	unsigned int GetPointCount() const;
 
 	void GetPoints(unsigned int & nOutCount, _3DF::Point pcOutPoints[]) const;
@@ -34,7 +36,17 @@ public:
 class API_3DF LineKey : public GeometryKey
 {
 public:
-	LineKey(HC_KEY nInKey = INVALID_KEY);
+	LineKey();
+	explicit LineKey(Key const & cInKey);
+	LineKey(LineKey const & cInThat);
+	virtual ~LineKey();
+
+	//LineKey(HC_KEY nInKey = INVALID_KEY);
+
+	void Set(LineKey const & cInThat);
+	LineKey & operator=(LineKey const & cInThat);
+
+	_3DF::Type ObjectType() const { return _3DF::Type::LineKey; };
 };
 
 CLOSE_3DF_NAMESPACE

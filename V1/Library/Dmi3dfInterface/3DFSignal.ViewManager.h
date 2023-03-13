@@ -24,9 +24,9 @@ protected:
 	void Paint(int nViewId, Json::Object & cInObject);
 	void Resize(int nViewId, int x, int y);
 
-	void SaveHsfFile(CString strFilePathName, _3DF::View * pcHoopsView);
+	void SaveHsfFile(CString strFilePathName, _3DF::Canvas * pcHoopsView);
 	
-	void LoadPointCloudFile(CString strFilePathName, _3DF::View * pcHoopsView);
+	void LoadPointCloudFile(CString strFilePathName, _3DF::Canvas * pcHoopsView);
 
 	//== Command 관련 함수 ===========================================================================
 	void CancelCommands(int nViewId);
@@ -35,18 +35,18 @@ protected:
 protected:
 	bool ExecuteMouseSignal(int nViewId, int nAction, Json::Object & cInObject);
 
-	bool LButtonUp(_3DF::View * pcView, int nFlags, int x, int y);
-	bool LButtonDown(_3DF::View * pcView, int nFlags, int x, int y);
+	bool LButtonUp(_3DF::Canvas * pcView, int nFlags, int x, int y);
+	bool LButtonDown(_3DF::Canvas * pcView, int nFlags, int x, int y);
 
-	bool MButtonUp(_3DF::View * pcView, int nFlags, int x, int y);
-	bool MButtonDown(_3DF::View * pcView, int nFlags, int x, int y);
+	bool MButtonUp(_3DF::Canvas * pcView, int nFlags, int x, int y);
+	bool MButtonDown(_3DF::Canvas * pcView, int nFlags, int x, int y);
 
-	bool RButtonUp(_3DF::View * pcView, int nFlags, int x, int y);
-	bool RButtonDown(_3DF::View * pcView, int nFlags, int x, int y);
+	bool RButtonUp(_3DF::Canvas * pcView, int nFlags, int x, int y);
+	bool RButtonDown(_3DF::Canvas * pcView, int nFlags, int x, int y);
 
-	bool MouseMove(_3DF::View * pcView, int nFlags, int x, int y);
+	bool MouseMove(_3DF::Canvas * pcView, int nFlags, int x, int y);
 
-	bool MouseWheel(_3DF::View * pcView, int nFlags, int zDelta, int x, int y, Json::Object & cInObject);
+	bool MouseWheel(_3DF::Canvas * pcView, int nFlags, int zDelta, int x, int y, Json::Object & cInObject);
 
 private: 
 	Manager * m_pcWrapper = nullptr; 

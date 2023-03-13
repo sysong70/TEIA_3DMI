@@ -1,6 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #include "3DF.h"
+#include "3DF.Object.h"
 
 #include <iostream>
 #include <string>
@@ -15,3 +16,29 @@
 // #include <boost/pool/pool_alloc.hpp>
 
 USING_3DF_NAMESPACE
+
+_3DF::Type PrivateImpl::Type() const {
+	return _3DF::Type::None;
+}
+
+void PrivateImpl::SetImpl(Object * pcObject, PrivateImpl * pcImpl)
+{
+	if (nullptr == pcImpl) {
+		DEBUG_RETURN;
+	}
+
+	if(nullptr != pcObject->m_pcImpl) {
+		delete pcObject->m_pcImpl;
+	}
+
+	pcObject->m_pcImpl = pcImpl;
+}
+
+void PrivateImpl::SetObject(Object * pcObject)
+{
+	if (nullptr != pcObject->m_pcImpl) {
+		delete pcObject->m_pcImpl;
+	}
+
+	pcObject->m_pcImpl = this;
+}

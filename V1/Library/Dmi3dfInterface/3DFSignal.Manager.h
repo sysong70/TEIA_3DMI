@@ -33,7 +33,7 @@ private:
 	// Pointer to the HOOPS/MVO HDB object associated with this instance of the application
 	HDB * m_pcHoopsDB = nullptr;
 
-	std::map<int, _3DF::View *> m_mpcHoopsView;
+	std::map<int, _3DF::Canvas *> m_mpcHoopsView;
 };
 
 CLOSE_3DF_SIGNAL_NAMESPACE

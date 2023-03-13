@@ -20,5 +20,7 @@
 // 
 // #include <model.h>
 
+#include <Common_Define.h>
+
 #define CHECK_POINTER(pcValue) if(0 == pcValue) { assert(FALSE);  return false; } 
 #define CHECK_DWORD_PTR(nValue) if(0 == nValue) { assert(FALSE);  return false; } 

@@ -15,3 +15,12 @@ Object::~Object()
 		m_pcImpl = nullptr;
 	}
 }
+
+_3DF::Type Object::Type() const
+{
+	if (nullptr == m_pcImpl) {
+		return _3DF::Type::None;
+	}
+
+	return m_pcImpl->Type();
+}
