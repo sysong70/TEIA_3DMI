@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "resource.h"
-#include "Component.HistoryBar.h"
+#include "Control.HistoryBar.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -10,19 +10,19 @@ static char THIS_FILE[] = __FILE__;
 
 
 
-Component::HistoryBar::HistoryBar()
+Control::HistoryBar::HistoryBar()
 {
 }
 
 
 
-Component::HistoryBar::~HistoryBar()
+Control::HistoryBar::~HistoryBar()
 {
 }
 
 
 
-void Component::HistoryBar::PushButton(UINT id)
+void Control::HistoryBar::PushButton(UINT id)
 {
 	RemoveButton(id);
 
@@ -39,7 +39,7 @@ void Component::HistoryBar::PushButton(UINT id)
 
 
 
-void Component::HistoryBar::RemoveButton(UINT id)
+void Control::HistoryBar::RemoveButton(UINT id)
 {
 	std::vector<CBCGPButton*>::iterator iter;
 	for (iter = m_buttons.begin(); iter != m_buttons.end(); iter++) {

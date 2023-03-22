@@ -8,7 +8,7 @@
 #include "Connector.h"
 #include "Facility.AppResources.h"
 #include "Facility.AppSettings.h"
-#include "Path.h"
+#include <Path.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -400,7 +400,7 @@ void Window::Application::InitializeBcg()
 	params.m_bBoldLabel = FALSE;
 	params.m_bDrawDescription = FALSE;
 	params.m_bDrawIcon = FALSE;
-	params.m_clrFill = (COLORREF)Component::EColor::Arsenic;
+	params.m_clrFill = (COLORREF)Control::EColor::Arsenic;
 	params.m_clrText = globalData.clrBarFace;
 	params.m_clrBorder = globalData.clrWindowFrame;
 

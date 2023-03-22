@@ -1,15 +1,15 @@
 ﻿#pragma once
 
 #include "Window.h"
-#include "Signal.h"
-#include "Component.HistoryBar.h"
 #include "Component.LayerPanel.h"
 #include "Component.ModelPanel.h"
 #include "Component.PanelBar.h"
 #include "Component.ScenePanel.h"
-#include "Component.TabWnd.h"
 #include "Component.TaskBar.h"
 #include "Component.ViewPanel.h"
+#include "Control.HistoryBar.h"
+#include "Control.TabWnd.h"
+#include <Signal.h>
 
 
 
@@ -41,6 +41,8 @@ namespace Window
 		int GetId();
 
 		virtual void ReceiveSignal(Json::Object* pData) {}
+
+		Signal::Delivery& Delivery();
 
 	protected:
 
@@ -113,8 +115,8 @@ namespace Window
 
 	protected: // ToolBar
 
-		Component::ToolBar m_toolBar;
-		Component::HistoryBar m_historyBar;
+		Control::ToolBar m_toolBar;
+		Control::HistoryBar m_historyBar;
 
 		virtual void CreateHistoryBar();
 
@@ -122,7 +124,7 @@ namespace Window
 
 	protected: // PanelBar
 
-		Component::TabWnd m_tabs;
+		Control::TabWnd m_tabs;
 
 		Component::ModelPanel m_modelPanel;
 		Component::ViewPanel m_viewPanel;
@@ -137,6 +139,6 @@ namespace Window
 
 		void CreateTaskBar();
 
-		void ShowTaskBar();
+		void ShowTaskBar(bool show = true);
 	};
 }

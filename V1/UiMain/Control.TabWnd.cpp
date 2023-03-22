@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "Component.TabWnd.h"
+#include "Control.TabWnd.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -9,14 +9,14 @@ static char THIS_FILE[] = __FILE__;
 
 
 
-using namespace Component;
+using namespace Control;
 
 BEGIN_MESSAGE_MAP(TabWnd, CBCGPTabWnd)
 END_MESSAGE_MAP()
 
 
 
-Component::TabWnd::TabWnd()
+Control::TabWnd::TabWnd()
 	: CBCGPTabWnd()
 {
 	m_bTransparent = TRUE;
@@ -25,7 +25,7 @@ Component::TabWnd::TabWnd()
 
 
 
-void Component::TabWnd::SetImageList(std::vector<UINT> ids, CSize imageSize)
+void Control::TabWnd::SetImageList(std::vector<UINT> ids, CSize imageSize)
 {
 	m_sizeImage = imageSize;
 
@@ -48,7 +48,7 @@ void Component::TabWnd::SetImageList(std::vector<UINT> ids, CSize imageSize)
 
 
 
-void Component::TabWnd::SetTabHeight(int height)
+void Control::TabWnd::SetTabHeight(int height)
 {
 	//:CHECK
 	m_sizeImage.cx = height;

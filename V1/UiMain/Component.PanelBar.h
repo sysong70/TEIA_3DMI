@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Component.h"
+#include "Control.TabWnd.h"
 
 
 
@@ -16,7 +17,7 @@ namespace Component
 
 		bool Initialize(CWnd* pMainFrame);
 
-		void ViewChanged(TabWnd* pTabs);
+		void ViewChanged(Control::TabWnd* pTabs);
 
 	protected:
 
@@ -28,6 +29,6 @@ namespace Component
 
 	private:
 
-		TabWnd* m_pActiveTabs = nullptr;
+		Control::TabWnd* m_pActiveTabs = nullptr;
 	};
 }

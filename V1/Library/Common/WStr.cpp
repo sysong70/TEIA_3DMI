@@ -114,8 +114,7 @@ bool WStr::IsNumeric(wchar_t value)
 	case L'-':
 	case L'+':
 	case L'.':
-	case L'e':
-	case L'E':
+	case L'e': case L'E':
 		return true;
 
 	default:
@@ -450,6 +449,14 @@ int WStr::ToInteger(const wchar_t* value)
 long WStr::ToLong(const wchar_t* value)
 {
 	return ::wcstol(value, nullptr, 0);
+}
+
+
+
+int WStr::FromHex(const wchar_t* value)
+{
+	wchar_t* end;
+	return wcstoul(value, &end, 16);
 }
 
 

@@ -3,7 +3,7 @@
 #include "Component.StatusBar.h"
 #include "Dialog.ObjectSnaps.h"
 #include "Facility.h"
-#include "Signal.h"
+#include <Signal.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "Component.Property.h"
+#include "Control.Property.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

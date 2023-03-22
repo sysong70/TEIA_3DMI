@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "Component.CheckListBox.h"
+#include "Control.CheckListBox.h"
 #include "Facility.h"
 
 #ifdef _DEBUG
@@ -18,21 +18,21 @@ namespace PresetListBox
 
 
 
-using namespace Component;
+using namespace Control;
 
 BEGIN_MESSAGE_MAP(CheckListBox, CBCGPListBox)
 END_MESSAGE_MAP()
 
 
 
-Component::CheckListBox::CheckListBox()
+Control::CheckListBox::CheckListBox()
 {
 	m_bVisualManagerStyle = TRUE;
 }
 
 
 
-void Component::CheckListBox::AddItem(UINT resourceId)
+void Control::CheckListBox::AddItem(UINT resourceId)
 {
 	CString title, desc;
 	Facility::GetResource(resourceId, title, desc);
@@ -51,7 +51,7 @@ void Component::CheckListBox::AddItem(UINT resourceId)
 
 
 
-void Component::CheckListBox::AddItems(std::vector<UINT> ids, CSize imageSize)
+void Control::CheckListBox::AddItems(std::vector<UINT> ids, CSize imageSize)
 {
 	m_hImageList = NULL;
 	m_ImageList.Clear();
@@ -67,7 +67,7 @@ void Component::CheckListBox::AddItems(std::vector<UINT> ids, CSize imageSize)
 
 
 
-void Component::CheckListBox::SetImageList(std::vector<UINT> ids, CSize imageSize)
+void Control::CheckListBox::SetImageList(std::vector<UINT> ids, CSize imageSize)
 {
 	m_hImageList = NULL;
 	m_ImageList.Clear();
@@ -89,7 +89,7 @@ void Component::CheckListBox::SetImageList(std::vector<UINT> ids, CSize imageSiz
 
 
 
-void Component::CheckListBox::OnClickItem(int index)
+void Control::CheckListBox::OnClickItem(int index)
 {
 	int check = GetCheck(index);
 	SetCheck(index, check == BST_CHECKED ? BST_UNCHECKED : BST_CHECKED);

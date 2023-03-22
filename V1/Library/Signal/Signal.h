@@ -5,6 +5,7 @@
 /// Delivery Keywords
 
 #define SKW_ACTION			"Action"
+#define SKW_CHILDREN		"Children"
 #define SKW_DATA			"Data"
 #define SKW_Delivery		"Delivery"
 #define SKW_DELTA			"Delta"
@@ -20,10 +21,14 @@
 #define SKW_HWND			"HWND"
 #define SKW_ID				"Id"
 #define SKW_INITIALIZE		"Initialize"
+#define SKW_ITEM			"Item"
+#define SKW_ITEMS			"Items"
+#define SKW_KEY				"Key"
 #define SKW_MAX				"Max"
 #define SKW_MESSAGE			"Message"
 #define SKW_MIN				"Min"
 #define SKW_OPTION			"Option"
+#define SKW_PARENT			"Parent"
 #define SKW_POSITION		"Position"
 #define SKW_RECT			"Rect"
 #define SKW_STATUS			"Status"
@@ -31,6 +36,7 @@
 #define SKW_TITLE			"Title"
 #define SKW_TOOLTIP			"Tooltip"
 #define SKW_TYPE			"Type"
+#define SKW_USERDATA		"UserData"
 #define SKW_VALID			"Valid"
 #define SKW_VIEWID			"ViewId"
 #define SKW_WIDTH			"Width"
@@ -335,7 +341,17 @@ namespace Signal
 			OnSelChanging,
 			OnSetFocus,
 
-			AddItem,
+			AddItems,
+			AddChildren,
+		};
+
+		//:TODO
+		enum class ElementType
+		{
+			Unknown = -1,
+
+			Solid,
+			Surface,
 		};
 
 		DEFINE_WRAPPER;
@@ -344,14 +360,28 @@ namespace Signal
 
 	public:
 
-		//:TODO
-		void OnSelChanged();
-		//:TODO
-		void OnItemExpanded();
+		void OnDeleteItem(DWORD_PTR key);
+		// response AddChildren();
+		void OnItemExpanded(DWORD_PTR key);
+
+		void OnSelChanged(DWORD_PTR key);
 
 	public:
 
-		void AddItem(...);
+		struct Item
+		{
+			DWORD_PTR ParentKey = 0;
+			DWORD_PTR Key = 0;
+			CString Title;
+			bool HasChildren = false;
+			ElementType Type = ElementType::Unknown;
+		};
+
+		using Items = std::vector<Item>;
+
+		void AddItems(Items& items);
+		// ignore TreeItem.Parent
+		void AddChildren(DWORD_PTR parentKey, Items& items);
 	};
 
 

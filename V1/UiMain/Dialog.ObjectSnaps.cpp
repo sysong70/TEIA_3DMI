@@ -129,9 +129,9 @@ void Dialog::ObjectSnaps::ConstructFooter(const CRect& boundary)
 	basePoint.y = boundary.bottom - maxHeight / 2;
 	basePoint.x = boundary.left;
 
-	AlignControls({ &m_wndCancel, &m_wndOk }, basePoint, Component::EAlign::VerticalCenter);
+	AlignControls({ &m_wndCancel, &m_wndOk }, basePoint, Control::EAlign::VerticalCenter);
 	basePoint.x = boundary.right;
-	DestributeControls({ &m_wndCancel, &m_wndOk }, basePoint, FooterPadding(), Component::EDirection::ToLeft);
+	DestributeControls({ &m_wndCancel, &m_wndOk }, basePoint, FooterPadding(), Control::EDirection::ToLeft);
 }
 
 #undef PRESET

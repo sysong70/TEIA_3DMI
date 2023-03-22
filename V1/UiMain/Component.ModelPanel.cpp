@@ -2,6 +2,10 @@
 #include "resource.h"
 #include "Component.ModelPanel.h"
 #include "Facility.h"
+#include "Window.Document.h"
+#include "Window.View.h"
+#include <Path.h>
+#include <Signal.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -16,6 +20,8 @@ static char THIS_FILE[] = __FILE__;
 namespace PresetModelPanel
 {
 	const UINT Id = WM_USER;
+
+	WCHAR DummyName[] = L"_$_DUMMY_$_";
 }
 
 
@@ -60,8 +66,20 @@ Component::ModelPanel::~ModelPanel()
 void Component::ModelPanel::ReceiveSignal(Json::Object* pData)
 {
 	Json::Object& data = *pData;
+	Signal::ModelPanel::Action action = (Signal::ModelPanel::Action)data.GetInteger(SKW_ACTION);
 
-	DEBUG_STOP;
+	switch (action) {
+	case Signal::ModelPanel::Action::AddItems:
+		AddItems(pData);
+		break;
+
+	case Signal::ModelPanel::Action::AddChildren:
+		AddChildren(pData);
+		break;
+
+	default:
+		DEBUG_STOP;
+	}
 
 	REMOVE_POINTER(pData);
 }
@@ -80,7 +98,7 @@ void Component::ModelPanel::AdjustLayout(int cx, int cy)
 
 int Component::ModelPanel::ConstructHeader(int cx)
 {
-	m_toolBar.SetPivot(EPivot::TopLeft);
+	m_toolBar.SetPivot(Control::EPivot::TopLeft);
 	m_toolBar.Initialize(this);
 
 	m_toolBar.AddButton(TOOLBAR_3D_CMD_Sort_ByOriginal);
@@ -113,7 +131,7 @@ void Component::ModelPanel::ConstructBody()
 
 	//:WARNING - do not use local string
 	BCGP_GRID_FILTERBAR_OPTIONS filter(m_sFilterMessage = Facility::Local(L"Search models...|모델 검색..."));
-	filter.m_clrMarkBackground = (COLORREF)EColor::White;
+	filter.m_clrMarkBackground = (COLORREF)Control::EColor::White;
 	filter.m_clrMarkText = 0;
 	filter.m_bAutoExpandGroups = TRUE;
 	filter.m_bIncludeGroups = TRUE;
@@ -122,36 +140,12 @@ void Component::ModelPanel::ConstructBody()
 	m_wndControl.EnableFilterBar(TRUE, filter);
 	m_wndControl.OnFilterBarUpdate(0);
 
-#ifdef _DEBUG
-	m_wndControl.SetRedraw(FALSE);
-
-	auto GetRandom = []() -> CString {
-		const CString& CHARS = L"ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-		const int LENGTH = CHARS.GetLength();
-
-		CString random;
-		for (int i = 0; i < 20; ++i) {
-			int index = rand() % LENGTH;
-			TCHAR nextChar = CHARS[index];
-			random.AppendChar(nextChar);
-		}
-
-		return random;
-	};
-
-	HTREEITEM parent[6] = { nullptr };
-	for (int i = 0; i < 300; i++) {
-		int index = rand() % 5;
-		HTREEITEM hParent = parent[index];
-		HTREEITEM hCurrent = m_wndControl.InsertItem(GetRandom(), hParent);
-		m_wndControl.SetCheck(hCurrent);
-		parent[index + 1] = hCurrent;
-	}
-
-	m_wndControl.SetRedraw(TRUE);
+	//m_wndControl.SetRedraw(FALSE);
+	//CString fileName = Path::GetFileName(m_pView->GetDocument()->GetPathName());
+	//AddItem(nullptr, 0, fileName, true, 0);
+	//m_wndControl.SetRedraw(TRUE);
 	//:WARNING - UpdateWindow or RedrawWindow not working 
-	m_wndControl.AdjustLayout();
-#endif
+	//m_wndControl.AdjustLayout();
 }
 
 
@@ -270,6 +264,12 @@ void Component::ModelPanel::OnTreeDeleteItem(NMHDR* pNMHDR, LRESULT* pResult)
 	DEBUG_TRACE(L"TVN_DELETEITEM: item: %s\r\n",
 		(LPCTSTR)m_wndControl.GetItemText(pNMTreeView->itemOld.hItem));
 
+	if (m_wndControl.GetItemText(pNMTreeView->itemOld.hItem) != PRESET::DummyName) {
+		DWORD_PTR key = m_wndControl.GetItemData(pNMTreeView->itemOld.hItem);
+		m_keyMap.erase(key);
+		m_pView->Delivery().modelPanel.OnDeleteItem(key);
+	}
+
 	*pResult = S_OK;
 }
 
@@ -296,6 +296,16 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 
 	DEBUG_TRACE(L"TVN_ITEMEXPANDED: item: %s; action: %s\r\n",
 		(LPCTSTR)m_wndControl.GetItemText(pNMTreeView->itemNew.hItem), (LPCTSTR)action);
+
+	if (pNMTreeView->action == TVE_EXPAND) {
+		HTREEITEM hItem = m_wndControl.GetChildItem(pNMTreeView->itemNew.hItem);
+		if (m_wndControl.GetItemText(hItem) == PRESET::DummyName) {
+			m_wndControl.DeleteItem(hItem);
+
+			DWORD_PTR key = m_wndControl.GetItemData(pNMTreeView->itemNew.hItem);
+			m_pView->Delivery().modelPanel.OnItemExpanded(key);
+		}
+	}
 
 	*pResult = S_OK;
 }
@@ -349,6 +359,10 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 	DEBUG_TRACE(L"TVN_SELCHANGED: Old item: %s New item: %s; action: %s\r\n",
 		(LPCTSTR)oldItem, (LPCTSTR)newItem, (LPCTSTR)action);
 
+
+	DWORD_PTR key = m_wndControl.GetItemData(pNMTreeView->itemNew.hItem);
+	m_pView->Delivery().modelPanel.OnSelChanged(key);
+
 	*pResult = S_OK;
 }
 
@@ -381,9 +395,84 @@ void Component::ModelPanel::OnTreeSetFocus(NMHDR* pNMHDR, LRESULT* pResult)
 
 
 
-void Component::ModelPanel::GetParent(HTREEITEM sel, std::vector<HTREEITEM>& parent)
+void Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, CString title, bool hasChildren, int type)
 {
-	DEBUG_STOP;
+	TVINSERTSTRUCT tvi;
+	tvi.hParent = parent;
+	tvi.hInsertAfter = TVI_LAST;
+	tvi.item.pszText = (LPWSTR)(LPCTSTR)title;
+	tvi.item.mask = TVIF_TEXT;
+	tvi.item.lParam = (LPARAM)key;
+
+	HTREEITEM hCurrent = m_wndControl.InsertItem(&tvi);
+	m_keyMap[key] = hCurrent;
+
+	if (hasChildren) {
+		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
+		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
+	}
+}
+
+
+
+void Component::ModelPanel::AddItems(Json::Object* pData)
+{
+	m_wndControl.SetRedraw(FALSE);
+
+	Json::Object& data = *pData;
+	Json::Array& items = data.GetArray(SKW_ITEMS);
+
+	for (auto item : items.GetBuffer()) {
+		Json::Object& target = item->AsObject();
+
+		AddItem(GetItem(target.GetDwordPtr(SKW_PARENT)),
+			target.GetDwordPtr(SKW_KEY),
+			target.GetString(SKW_TITLE),
+			target.GetBoolean(SKW_HASCHILDREN),
+			target.GetInteger(SKW_TYPE)
+		);
+	}
+
+	m_wndControl.SetRedraw(TRUE);
+	m_wndControl.AdjustLayout();
+}
+
+
+
+void Component::ModelPanel::AddChildren(Json::Object* pData)
+{
+	m_wndControl.SetRedraw(FALSE);
+
+	Json::Object& data = *pData;
+	Json::Array& items = data.GetArray(SKW_ITEMS);
+
+	HTREEITEM hParent = GetItem(data.GetDwordPtr(SKW_PARENT));
+
+	for (auto item : items.GetBuffer()) {
+		Json::Object& target = item->AsObject();
+
+		AddItem(hParent,
+			target.GetDwordPtr(SKW_KEY),
+			target.GetString(SKW_TITLE),
+			target.GetBoolean(SKW_HASCHILDREN),
+			target.GetInteger(SKW_TYPE)
+		);
+	}
+
+	m_wndControl.SetRedraw(TRUE);
+	m_wndControl.AdjustLayout();
+}
+
+
+
+HTREEITEM Component::ModelPanel::GetItem(DWORD_PTR key)
+{
+	if (auto result = m_keyMap.find(key); result != m_keyMap.end()) {
+		return result->second;
+	}
+	else {
+		return nullptr;
+	}
 }
 
 

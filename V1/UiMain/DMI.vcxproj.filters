@@ -1,12 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Component.RibbonBar.cpp">
-      <Filter>Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.StatusBar.cpp">
-      <Filter>Component</Filter>
-    </ClCompile>
     <ClCompile Include="Facility.AppResources.cpp">
       <Filter>Facility</Filter>
     </ClCompile>
@@ -16,7 +10,7 @@
     <ClCompile Include="Facility.Base.cpp">
       <Filter>Facility</Filter>
     </ClCompile>
-    <ClCompile Include="Facility.FileOption.cpp">
+    <ClCompile Include="Facility.ImportOption.cpp">
       <Filter>Facility</Filter>
     </ClCompile>
     <ClCompile Include="Facility.Preference.cpp">
@@ -53,7 +47,7 @@
       <Filter>Window</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
-      <Filter>_Main</Filter>
+      <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Common_Define.cpp">
       <Filter>_Common</Filter>
@@ -74,22 +68,16 @@
       <Filter>_Signal</Filter>
     </ClCompile>
     <ClCompile Include="Component.LayerPanel.cpp">
-      <Filter>Component\PanelBar</Filter>
+      <Filter>Component\Panel</Filter>
     </ClCompile>
     <ClCompile Include="Component.ModelPanel.cpp">
-      <Filter>Component\PanelBar</Filter>
+      <Filter>Component\Panel</Filter>
     </ClCompile>
     <ClCompile Include="Component.ViewPanel.cpp">
-      <Filter>Component\PanelBar</Filter>
+      <Filter>Component\Panel</Filter>
     </ClCompile>
     <ClCompile Include="Component.ScenePanel.cpp">
-      <Filter>Component\PanelBar</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.Panel.cpp">
-      <Filter>Component\PanelBar</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.HistoryBar.cpp">
-      <Filter>Component\ToolBar</Filter>
+      <Filter>Component\Panel</Filter>
     </ClCompile>
     <ClCompile Include="Component.cpp">
       <Filter>Component</Filter>
@@ -100,26 +88,11 @@
     <ClCompile Include="Facility.cpp">
       <Filter>Facility</Filter>
     </ClCompile>
-    <ClCompile Include="Component.ToolBar.cpp">
-      <Filter>Component\ToolBar</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.PanelBar.cpp">
-      <Filter>Component\PanelBar</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.TaskBar.cpp">
-      <Filter>Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.TabWnd.cpp">
-      <Filter>Component</Filter>
-    </ClCompile>
     <ClCompile Include="..\Library\Common\Dir.cpp">
       <Filter>_Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\File.cpp">
       <Filter>_Common</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.Property.cpp">
-      <Filter>Component\Tree and PropList</Filter>
     </ClCompile>
     <ClCompile Include="Dialog.AppSettings.cpp">
       <Filter>Dialog</Filter>
@@ -127,23 +100,8 @@
     <ClCompile Include="Dialog.cpp">
       <Filter>Dialog</Filter>
     </ClCompile>
-    <ClCompile Include="Component.PropList.cpp">
-      <Filter>Component\Tree and PropList</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.TreeCtrlEx.cpp">
-      <Filter>Component\Tree and PropList</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.TreePropList.cpp">
-      <Filter>Component\Tree and PropList</Filter>
-    </ClCompile>
     <ClCompile Include="Dialog.ObjectSnaps.cpp">
       <Filter>Dialog</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.CheckListBox.cpp">
-      <Filter>Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.CheckButton.cpp">
-      <Filter>Component</Filter>
     </ClCompile>
     <ClCompile Include="Window.View3d.cpp">
       <Filter>Window</Filter>
@@ -151,18 +109,66 @@
     <ClCompile Include="Window.View2d.cpp">
       <Filter>Window</Filter>
     </ClCompile>
+    <ClCompile Include="Control.TabWnd.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.Panel.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.CheckListBox.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.Property.cpp">
+      <Filter>Control\Tree And Property\Wait</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.RibbonBar.cpp">
+      <Filter>Component\Main Frame</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.StatusBar.cpp">
+      <Filter>Component\Main Frame</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.TaskBar.cpp">
+      <Filter>Component\Main Frame</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.PropList.cpp">
+      <Filter>Control\Tree And Property</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.TreeCtrlEx.cpp">
+      <Filter>Control\Tree And Property</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.TreePropList.cpp">
+      <Filter>Control\Tree And Property</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.ToolBar.cpp">
+      <Filter>Control\Tool Bar</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.HistoryBar.cpp">
+      <Filter>Control\Tool Bar</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.PanelBar.cpp">
+      <Filter>Component\Main Frame</Filter>
+    </ClCompile>
+    <ClCompile Include="Layout.ControlWrapper.cpp">
+      <Filter>Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Layout.Base.cpp">
+      <Filter>Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Layout.cpp">
+      <Filter>Layout</Filter>
+    </ClCompile>
+    <ClCompile Include="Layout.Stack.cpp">
+      <Filter>Layout</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.Common.h">
       <Filter>Facility\Command</Filter>
     </ClInclude>
     <ClInclude Include="Component.h">
-      <Filter>Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.RibbonBar.h">
-      <Filter>Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.StatusBar.h">
       <Filter>Component</Filter>
     </ClInclude>
     <ClInclude Include="Facility.AppResources.h">
@@ -174,7 +180,7 @@
     <ClInclude Include="Facility.Base.h">
       <Filter>Facility</Filter>
     </ClInclude>
-    <ClInclude Include="Facility.FileOption.h">
+    <ClInclude Include="Facility.ImportOption.h">
       <Filter>Facility</Filter>
     </ClInclude>
     <ClInclude Include="Facility.h">
@@ -196,13 +202,13 @@
       <Filter>_Common</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>_Resource</Filter>
+      <Filter>Resource</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\WStr.h">
       <Filter>_Common</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>_Resource</Filter>
+      <Filter>Resource</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Path.h">
       <Filter>_Common</Filter>
@@ -226,7 +232,7 @@
       <Filter>Window</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
-      <Filter>_Main</Filter>
+      <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Common_Define.h">
       <Filter>_Common</Filter>
@@ -247,37 +253,19 @@
       <Filter>_Signal</Filter>
     </ClInclude>
     <ClInclude Include="Component.LayerPanel.h">
-      <Filter>Component\PanelBar</Filter>
+      <Filter>Component\Panel</Filter>
     </ClInclude>
     <ClInclude Include="Component.ModelPanel.h">
-      <Filter>Component\PanelBar</Filter>
+      <Filter>Component\Panel</Filter>
     </ClInclude>
     <ClInclude Include="Component.ViewPanel.h">
-      <Filter>Component\PanelBar</Filter>
+      <Filter>Component\Panel</Filter>
     </ClInclude>
     <ClInclude Include="Component.ScenePanel.h">
-      <Filter>Component\PanelBar</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.Panel.h">
-      <Filter>Component\PanelBar</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.HistoryBar.h">
-      <Filter>Component\ToolBar</Filter>
+      <Filter>Component\Panel</Filter>
     </ClInclude>
     <ClInclude Include="Facility.CommandIndexer.h">
       <Filter>Facility\Command</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.ToolBar.h">
-      <Filter>Component\ToolBar</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.PanelBar.h">
-      <Filter>Component\PanelBar</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.TaskBar.h">
-      <Filter>Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.TabWnd.h">
-      <Filter>Component</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Dir.h">
       <Filter>_Common</Filter>
@@ -285,29 +273,11 @@
     <ClInclude Include="..\Library\Common\File.h">
       <Filter>_Common</Filter>
     </ClInclude>
-    <ClInclude Include="Component.Property.h">
-      <Filter>Component\Tree and PropList</Filter>
-    </ClInclude>
     <ClInclude Include="Dialog.AppSettings.h">
       <Filter>Dialog</Filter>
     </ClInclude>
-    <ClInclude Include="Component.PropList.h">
-      <Filter>Component\Tree and PropList</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.TreeCtrlEx.h">
-      <Filter>Component\Tree and PropList</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.TreePropList.h">
-      <Filter>Component\Tree and PropList</Filter>
-    </ClInclude>
     <ClInclude Include="Dialog.ObjectSnaps.h">
       <Filter>Dialog</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.CheckListBox.h">
-      <Filter>Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.CheckButton.h">
-      <Filter>Component</Filter>
     </ClInclude>
     <ClInclude Include="Window.View2d.h">
       <Filter>Window</Filter>
@@ -315,38 +285,92 @@
     <ClInclude Include="Window.View3d.h">
       <Filter>Window</Filter>
     </ClInclude>
+    <ClInclude Include="Control.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.TabWnd.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.Panel.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.CheckListBox.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.Property.h">
+      <Filter>Control\Tree And Property\Wait</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.RibbonBar.h">
+      <Filter>Component\Main Frame</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.StatusBar.h">
+      <Filter>Component\Main Frame</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.TaskBar.h">
+      <Filter>Component\Main Frame</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.PropList.h">
+      <Filter>Control\Tree And Property</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.TreeCtrlEx.h">
+      <Filter>Control\Tree And Property</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.TreePropList.h">
+      <Filter>Control\Tree And Property</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.ToolBar.h">
+      <Filter>Control\Tool Bar</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.HistoryBar.h">
+      <Filter>Control\Tool Bar</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.PanelBar.h">
+      <Filter>Component\Main Frame</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout.Base.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout.ControlWrapper.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
+    <ClInclude Include="Layout.Stack.h">
+      <Filter>Layout</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="TODO.xml">
-      <Filter>_Resource</Filter>
+      <Filter>Resource</Filter>
     </Xml>
     <Xml Include="DpiAwareness.xml">
-      <Filter>_Resource</Filter>
+      <Filter>Resource</Filter>
     </Xml>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\DMI.ico">
-      <Filter>_Resource</Filter>
+      <Filter>Resource</Filter>
     </Image>
     <Image Include="res\DMIDoc.ico">
-      <Filter>_Resource</Filter>
+      <Filter>Resource</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="RES\UI.json">
-      <Filter>_Resource</Filter>
+      <Filter>Resource</Filter>
     </None>
     <None Include="RES\FileOptions.json">
-      <Filter>_Resource</Filter>
+      <Filter>Resource</Filter>
     </None>
     <None Include="RES\DMI_ENU.rc2">
-      <Filter>_Resource</Filter>
+      <Filter>Resource</Filter>
     </None>
     <None Include="RES\DMI_KOR.rc2">
-      <Filter>_Resource</Filter>
+      <Filter>Resource</Filter>
     </None>
     <None Include="RES\DMI.rc2">
-      <Filter>_Resource</Filter>
+      <Filter>Resource</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -365,34 +389,46 @@
     <Filter Include="_Signal">
       <UniqueIdentifier>{3fa6ca85-306e-4855-8675-3bbd31f1539e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="_Resource">
-      <UniqueIdentifier>{c42b87a4-4dc7-4b9a-9df2-192721ac7010}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="_Main">
-      <UniqueIdentifier>{5626235d-04b2-48ff-aa6a-b189a3f69c04}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="_Common">
-      <UniqueIdentifier>{fb2d04f0-eb3c-414a-af01-e993443a5070}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Facility">
       <UniqueIdentifier>{c01d14a0-5142-4118-a49b-dd83bfce121e}</UniqueIdentifier>
     </Filter>
     <Filter Include="Facility\Command">
       <UniqueIdentifier>{107652ad-09a5-4c94-9c81-79e4c50396f8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Component\ToolBar">
-      <UniqueIdentifier>{2b53c47b-abd9-4258-b544-b53d91ef6ea1}</UniqueIdentifier>
+    <Filter Include="Control">
+      <UniqueIdentifier>{54e5b7f9-b1c6-4146-9960-ef402a5e0520}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Component\PanelBar">
+    <Filter Include="Component\Main Frame">
+      <UniqueIdentifier>{8cff23ec-11e5-4f51-a933-7b8a2f2d9fac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Control\Tree And Property">
+      <UniqueIdentifier>{3d17d7b6-2a80-4d06-a5c9-0cdaf14dc8bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Control\Tree And Property\Wait">
+      <UniqueIdentifier>{726f27e2-44f1-4e2a-ad76-8edaf3c085a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Control\Tool Bar">
+      <UniqueIdentifier>{cbf0972b-db82-4dd9-a406-974efbc9634b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Common">
+      <UniqueIdentifier>{fb2d04f0-eb3c-414a-af01-e993443a5070}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{5626235d-04b2-48ff-aa6a-b189a3f69c04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource">
+      <UniqueIdentifier>{c42b87a4-4dc7-4b9a-9df2-192721ac7010}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\Panel">
       <UniqueIdentifier>{17e426a6-77e8-4a55-a4e4-86e17ed068a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Component\Tree and PropList">
-      <UniqueIdentifier>{0ee36090-15e6-4a9a-ad6d-e55fe0877cd9}</UniqueIdentifier>
+    <Filter Include="Layout">
+      <UniqueIdentifier>{dcd9ed46-81ef-4f39-81e3-b0e41b745e1c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DMI.rc">
-      <Filter>_Resource</Filter>
+      <Filter>Resource</Filter>
     </ResourceCompile>
   </ItemGroup>
 </Project>

@@ -111,10 +111,13 @@ LRESULT Component::TaskBar::OnDPIChangedAfterParent(WPARAM, LPARAM)
 
 BOOL Component::TaskBar::OnEraseBkgnd(CDC* pDC)
 {
-	const CBrush backgound((COLORREF)EColor::DarkBack);
+	const CBrush backgound((COLORREF)Control::EColor::DarkBack);
 
 	CRect rect;
 	GetClientRect(rect);
+
+	pDC->FillRect(rect, (CBrush*)&CBrush((COLORREF)Control::EColor::HonoluluBlue));
+	rect.DeflateRect(CRect(1, 1, 1, 1));
 	pDC->FillRect(rect, (CBrush*)&backgound);
 
 	return __super::OnEraseBkgnd(pDC);

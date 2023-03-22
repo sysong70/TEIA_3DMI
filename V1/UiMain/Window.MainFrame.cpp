@@ -3,9 +3,9 @@
 #include "Window.Application.h"
 #include "Window.Document.h"
 #include "Window.View.h"
-#include "Facility.AppResources.h"
 #include "Dialog.AppSettings.h"
 #include "Dialog.ProgressLog.h"
+#include "Facility.AppResources.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -69,6 +69,7 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 	Signal::Target target = (Signal::Target)data.GetInteger(SKW_TARGET);
 
 	switch (target) {
+	case Signal::Target::ModelPanel:
 	case Signal::Target::View: {
 		int id = data.GetInteger(SKW_VIEWID);
 		View* pView = TheAppication.FindView(id);

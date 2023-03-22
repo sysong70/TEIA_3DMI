@@ -22,7 +22,7 @@ Facility::AppResources::~AppResources()
 
 bool Facility::AppResources::Load()
 {
-	if (InitDialog() == false) {
+	if (Initialize() == false) {
 		return false;
 	}
 
@@ -60,7 +60,14 @@ Json::Object& Facility::AppResources::GetPreferences()
 
 
 
-bool Facility::AppResources::InitDialog()
+Json::Object& Facility::AppResources::GetStyles()
+{
+	return m_ui.GetAt("Styles");
+}
+
+
+
+bool Facility::AppResources::Initialize()
 {
 	CString stream;
 	if (LoadTextResource(IDF_JSON_UI, stream) == false ||

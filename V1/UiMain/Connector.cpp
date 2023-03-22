@@ -105,6 +105,7 @@ void Connector3d::ReceiveSignal(const wchar_t* content)
 	case Signal::Target::MainFrame:
 	case Signal::Target::Progress:
 	case Signal::Target::View:
+	case Signal::Target::ModelPanel:
 		TheAppication.GetMainFrame().SendMessage((UINT)Window::EUserMessage::OnSignal, (WPARAM)pData);
 		break;
 

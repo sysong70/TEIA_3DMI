@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Dialog.ProgressLog.h"
-#include "Component.h"
+#include "Control.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -31,10 +31,10 @@ namespace PresetProgressLog
 	};
 
 	const COLORREF ItemColors[] = {
-		(COLORREF)Component::EColor::Gray,
-		(COLORREF)Component::EColor::Green,
-		(COLORREF)Component::EColor::Yellow,
-		(COLORREF)Component::EColor::Red,
+		(COLORREF)Control::EColor::Gray,
+		(COLORREF)Control::EColor::Green,
+		(COLORREF)Control::EColor::Yellow,
+		(COLORREF)Control::EColor::Red,
 	};
 
 	int MessageHeight() {
@@ -147,14 +147,14 @@ void Dialog::ProgressLog::ConstructBody(const CRect& boundary)
 	// Message
 
 	area.bottom = area.top + PRESET::MessageHeight();
-	CRect result = SetupControl(m_wndMessage, data.GetAt("Message"), Component::EPivot::TopLeft, area);
+	CRect result = SetupControl(m_wndMessage, data.GetAt("Message"), Control::EPivot::TopLeft, area);
 
 	// Progress
 
 	area.top = result.bottom + PRESET::Gap();
 	area.bottom = area.top + PRESET::ProgressHeight();
-	Component::SetControlSize(&m_wndProgress, { area.Size().cx, PRESET::ProgressHeight() });
-	result = AdjustLayout(&m_wndProgress, area, area.Size(), Component::EPivot::TopLeft);
+	Control::SetControlSize(&m_wndProgress, { area.Size().cx, PRESET::ProgressHeight() });
+	result = Control::AdjustLayout(&m_wndProgress, area, area.Size(), Control::EPivot::TopLeft);
 
 	m_wndProgress.m_bSetPosSmoothAnimation = TRUE;
 	m_wndProgress.m_bSetPosLighting = TRUE;
@@ -169,7 +169,7 @@ void Dialog::ProgressLog::ConstructBody(const CRect& boundary)
 	m_wndLog.SetAlternateRowColor();
 	m_wndLog.SetItemExtraHeight(PRESET::ExtraHeight());
 
-	AdjustLayout(&m_wndLog, area, area.Size(), Component::EPivot::TopLeft);
+	Control::AdjustLayout(&m_wndLog, area, area.Size(), Control::EPivot::TopLeft);
 }
 
 

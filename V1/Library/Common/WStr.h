@@ -186,6 +186,8 @@ namespace WStr
 
 	long ToLong(const wchar_t* value);
 
+	int FromHex(const wchar_t* value);
+
 	/*
 		ASSERT(ToString(LONG_MAX) == L"2147483647");
 		ASSERT(ToString(3.141592, 2) == L"3.14");

@@ -85,30 +85,40 @@ Window::View3d::~View3d()
 void Window::View3d::ReceiveSignal(Json::Object* pData)
 {
 	Json::Object& data = *pData;
-	Signal::View::Action action = (Signal::View::Action)data.GetInteger(SKW_ACTION);
+	Signal::Target target = (Signal::Target)data.GetInteger(SKW_TARGET);
+	if (target == Signal::Target::ModelPanel) {
+		m_modelPanel.ReceiveSignal(pData);
+		return;
+	}
+	else if (target == Signal::Target::View) {
+		Signal::View::Action action = (Signal::View::Action)data.GetInteger(SKW_ACTION);
 
-	switch (action) {
-	case Signal::View::Action::SetValidation:
-		m_bRenderer = data.GetBoolean(SKW_VALID);
-		if (m_bRenderer) {
-			CRect rect = GetClientArea();
-			m_delivery.view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
+		switch (action) {
+		case Signal::View::Action::SetValidation:
+			m_bRenderer = data.GetBoolean(SKW_VALID);
+			if (m_bRenderer) {
+				CRect rect = GetClientArea();
+				m_delivery.view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
 
-			if (GetMainFrame().HasNextFile()) {
-				GetMainFrame().PostMessage((UINT)EUserMessage::OnNextFileOpen);
+				if (GetMainFrame().HasNextFile()) {
+					GetMainFrame().PostMessage((UINT)EUserMessage::OnNextFileOpen);
+				}
+				else {
+					SendMessage(WM_ACTIVATE, (WPARAM)WA_ACTIVE);
+				}
 			}
 			else {
-				SendMessage(WM_ACTIVATE, (WPARAM)WA_ACTIVE);
+				GetDocument()->OnCloseDocument();
 			}
-		}
-		else {
-			GetDocument()->OnCloseDocument();
-		}
-		break;
+			break;
 
-	default:
+		default:
+			DEBUG_STOP;
+			break;
+		}
+	}
+	else {
 		DEBUG_STOP;
-		break;
 	}
 
 	REMOVE_POINTER(pData);
@@ -213,10 +223,10 @@ void Window::View3d::CreatePanelTabs()
 {
 	__super::CreatePanelTabs();
 
-	m_modelPanel.Initialize(&m_tabs, PRESET::ModelTree);
-	m_viewPanel.Initialize(&m_tabs, PRESET::View);
-	m_layerPanel.Initialize(&m_tabs, PRESET::Layer);
-	m_scenePanel.Initialize(&m_tabs, PRESET::Scene);
+	m_modelPanel.Initialize(&m_tabs, this, PRESET::ModelTree);
+	m_viewPanel.Initialize(&m_tabs, this, PRESET::View);
+	m_layerPanel.Initialize(&m_tabs, this, PRESET::Layer);
+	m_scenePanel.Initialize(&m_tabs, this, PRESET::Scene);
 
 	int image = 0;
 

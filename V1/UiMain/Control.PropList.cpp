@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "Component.PropList.h"
+#include "Control.PropList.h"
 #include "Facility.h"
 
 #ifdef _DEBUG
@@ -30,7 +30,7 @@ namespace PresetPropList
 
 
 
-using namespace Component;
+using namespace Control;
 
 BEGIN_MESSAGE_MAP(PropList, CBCGPPropList)
 	ON_WM_CREATE()
@@ -40,7 +40,7 @@ END_MESSAGE_MAP()
 
 
 
-Component::PropList::PropList()
+Control::PropList::PropList()
 {
 	m_bVisualManagerStyle = TRUE;
 
@@ -54,13 +54,13 @@ Component::PropList::PropList()
 
 
 
-Component::PropList::~PropList()
+Control::PropList::~PropList()
 {
 }
 
 
 
-void Component::PropList::InitializeDesign(Json::Object& design)
+void Control::PropList::InitializeDesign(Json::Object& design)
 {
 	PRESET::Initialize();
 	RemoveAll();
@@ -77,7 +77,7 @@ void Component::PropList::InitializeDesign(Json::Object& design)
 
 
 
-void Component::PropList::InitializeData(Json::Object& data)
+void Control::PropList::InitializeData(Json::Object& data)
 {
 	m_pData = &data;
 
@@ -96,7 +96,7 @@ void Component::PropList::InitializeData(Json::Object& data)
 
 
 
-void Component::PropList::GetAncestor(CBCGPProp* pItem, std::vector<CBCGPProp*>& ancestor)
+void Control::PropList::GetAncestor(CBCGPProp* pItem, std::vector<CBCGPProp*>& ancestor)
 {
 	CBCGPProp* pParent = pItem;
 	while (pParent != nullptr) {
@@ -107,7 +107,7 @@ void Component::PropList::GetAncestor(CBCGPProp* pItem, std::vector<CBCGPProp*>&
 
 
 
-Json::Object& Component::PropList::GetData()
+Json::Object& Control::PropList::GetData()
 {
 	DEBUG_VALID(m_pData);
 	return *m_pData;
@@ -115,7 +115,7 @@ Json::Object& Component::PropList::GetData()
 
 
 
-CString Component::PropList::GetItemNamePath(CBCGPProp* pItem)
+CString Control::PropList::GetItemNamePath(CBCGPProp* pItem)
 {
 	std::vector<CBCGPProp*> items;
 	GetAncestor(pItem, items);
@@ -140,7 +140,7 @@ CString Component::PropList::GetItemNamePath(CBCGPProp* pItem)
 
 
 
-CBCGPProp* Component::PropList::CreateProp(Json::Object& design)
+CBCGPProp* Control::PropList::CreateProp(Json::Object& design)
 {
 	CBCGPProp* pProp = nullptr;
 	CString type = Facility::GetType(design);
@@ -187,7 +187,7 @@ CBCGPProp* Component::PropList::CreateProp(Json::Object& design)
 
 
 
-CBCGPProp* Component::PropList::CreateGroupProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateGroupProp(Json::Object& design, UINT id)
 {
 	id = (id != 0 ? id : PRESET::GetControlId());
 
@@ -209,7 +209,7 @@ CBCGPProp* Component::PropList::CreateGroupProp(Json::Object& design, UINT id)
 
 
 
-CBCGPProp* Component::PropList::CreateCheckProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateCheckProp(Json::Object& design, UINT id)
 {
 	id = (id != 0 ? id : PRESET::GetControlId());
 
@@ -222,14 +222,14 @@ CBCGPProp* Component::PropList::CreateCheckProp(Json::Object& design, UINT id)
 
 
 
-CBCGPProp* Component::PropList::CreateColorProp(Json::Object& data, UINT id)
+CBCGPProp* Control::PropList::CreateColorProp(Json::Object& data, UINT id)
 {
 	RETURN_NULL;
 }
 
 
 
-CBCGPProp* Component::PropList::CreateDropdownProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateDropdownProp(Json::Object& design, UINT id)
 {
 	id = (id != 0 ? id : PRESET::GetControlId());
 
@@ -251,7 +251,7 @@ CBCGPProp* Component::PropList::CreateDropdownProp(Json::Object& design, UINT id
 
 
 
-CBCGPProp* Component::PropList::CreateEditProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateEditProp(Json::Object& design, UINT id)
 {
 	id = (id != 0 ? id : PRESET::GetControlId());
 
@@ -270,21 +270,21 @@ CBCGPProp* Component::PropList::CreateEditProp(Json::Object& design, UINT id)
 
 
 
-CBCGPProp* Component::PropList::CreateFileProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateFileProp(Json::Object& design, UINT id)
 {
 	RETURN_NULL;
 }
 
 
 
-CBCGPProp* Component::PropList::CreateFolderProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateFolderProp(Json::Object& design, UINT id)
 {
 	RETURN_NULL;
 }
 
 
 
-CBCGPProp* Component::PropList::FindPropByData(CString& name)
+CBCGPProp* Control::PropList::FindPropByData(CString& name)
 {
 	for (POSITION pos = m_lstProps.GetHeadPosition(); pos != nullptr;) {
 		CBCGPProp* pProp = m_lstProps.GetNext(pos);
@@ -299,7 +299,7 @@ CBCGPProp* Component::PropList::FindPropByData(CString& name)
 
 
 
-CBCGPProp* Component::PropList::FindPropByData(CBCGPProp* pParent, CString& name)
+CBCGPProp* Control::PropList::FindPropByData(CBCGPProp* pParent, CString& name)
 {
 	for (int i = 0; i < pParent->GetSubItemsCount(); i++) {
 		CBCGPProp* pProp = pParent->GetSubItem(i);
@@ -314,7 +314,7 @@ CBCGPProp* Component::PropList::FindPropByData(CBCGPProp* pParent, CString& name
 
 
 
-void Component::PropList::ReplacePropData(CBCGPProp* pProp, Json::Value* pValue)
+void Control::PropList::ReplacePropData(CBCGPProp* pProp, Json::Value* pValue)
 {
 	if (pProp == nullptr || pValue == nullptr) {
 		DEBUG_RETURN;
@@ -358,7 +358,7 @@ void Component::PropList::ReplacePropData(CBCGPProp* pProp, Json::Value* pValue)
 
 
 
-void Component::PropList::SetPropName(CBCGPProp* pProp, Json::Object& design)
+void Control::PropList::SetPropName(CBCGPProp* pProp, Json::Object& design)
 {
 	Json::Value* pValue = design.FindValue("name");
 	if (pValue != nullptr) {

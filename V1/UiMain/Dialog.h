@@ -1,24 +1,22 @@
 ﻿#pragma once
 
-#include "Json.h"
-
-#include <BCGCBProInc.h>
+#include <Json.h>
 #include <list>
+#include <BCGCBProInc.h>
 
 
 
 namespace Dialog
 {
-	class Base; // CBCGPDialog
-
-	class Standard; // Base
 	class AppSettings;
+	class Base;
+	class Standard;
 	class ObjectSnaps;
 	class ProgressLog;
+	class Standard;
 
 
 
-	//typedef std::list<CWnd*> Controls;
 	using Controls = std::list<CWnd*>;
 
 

@@ -162,7 +162,7 @@ void Window::View2d::CreatePanelTabs()
 {
 	__super::CreatePanelTabs();
 
-	m_layerPanel.Initialize(&m_tabs, PRESET::Layer);
+	m_layerPanel.Initialize(&m_tabs, this, PRESET::Layer);
 
 	m_tabs.SetImageList({ HOME_3D_CMD_Panels_Layer }, PRESET::TabImageSize());
 	m_tabs.AddTab(&m_layerPanel, Facility::GetTitle(HOME_3D_CMD_Panels_Layer), 0);

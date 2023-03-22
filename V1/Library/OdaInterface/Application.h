@@ -19,6 +19,9 @@ class Application
 {
 public:
 
+	//:WARNING - defined for future enhancements, from DllMain
+	static HMODULE Instance;
+
 	std::map<int, Renderer*> Renderers;
 
 protected:

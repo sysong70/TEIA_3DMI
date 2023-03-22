@@ -1,13 +1,12 @@
 ﻿#pragma once
 
-#include "Component.h"
+#include "Control.h"
 #include "Window.h"
-
 #include <vector>
 
 
 
-namespace Component
+namespace Control
 {
 	class ToolBar : public CWnd
 	{
@@ -20,8 +19,6 @@ namespace Component
 		void Initialize(CWnd* pParentWnd, const RECT& rect = {});
 
 		void SetPivot(EPivot pivot, bool expandSize = true);
-
-		void ViewChanged(UINT message, Window::View* pView);
 
 	public:
 

@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-#include "Component.h"
+#include "Control.h"
 
 
 
-namespace Component
+namespace Control
 {
 	class TabWnd : public CBCGPTabWnd
 	{

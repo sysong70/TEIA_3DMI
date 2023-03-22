@@ -187,7 +187,7 @@ void Dialog::AppSettings::ConstructBody(const CRect& boundary)
 	Json::Object& data = GetUiData().GetAt("body");
 
 	//:WARNING - setting before Create()
-	m_tabs.SetTabHeight(Component::TabHeight());
+	m_tabs.SetTabHeight(Control::TabHeight());
 
 	if (m_tabs.Create(CBCGPTabWnd::STYLE_3D, boundary, this, PRESET::Id) == FALSE) {
 		DEBUG_RETURN;
@@ -225,12 +225,12 @@ void Dialog::AppSettings::ConstructFooter(const CRect& boundary)
 	basePoint.y = boundary.bottom - maxHeight / 2;
 	basePoint.x = boundary.left;
 
-	AlignControls({ &m_wndInitialize, &m_wndReset }, basePoint, Component::EAlign::VerticalCenter);
-	DestributeControls({ &m_wndInitialize, &m_wndReset }, basePoint, FooterPadding(), Component::EDirection::ToRight);
+	AlignControls({ &m_wndInitialize, &m_wndReset }, basePoint, Control::EAlign::VerticalCenter);
+	DestributeControls({ &m_wndInitialize, &m_wndReset }, basePoint, FooterPadding(), Control::EDirection::ToRight);
 
-	AlignControls({ &m_wndCancel, &m_wndApply, &m_wndOk }, basePoint, Component::EAlign::VerticalCenter);
+	AlignControls({ &m_wndCancel, &m_wndApply, &m_wndOk }, basePoint, Control::EAlign::VerticalCenter);
 	basePoint.x = boundary.right;
-	DestributeControls({ &m_wndCancel, &m_wndApply, &m_wndOk }, basePoint, FooterPadding(), Component::EDirection::ToLeft);
+	DestributeControls({ &m_wndCancel, &m_wndApply, &m_wndOk }, basePoint, FooterPadding(), Control::EDirection::ToLeft);
 }
 
 #undef DDX_CONTROL

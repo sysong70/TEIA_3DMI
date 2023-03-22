@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
-#include "Component.Panel.h"
+#include "Control.Panel.h"
+#include "Window.View.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -21,7 +22,7 @@ namespace PresetPanel
 
 
 
-using namespace Component;
+using namespace Control;
 
 BEGIN_MESSAGE_MAP(Panel, CWnd)
 	ON_WM_ERASEBKGND()
@@ -31,21 +32,23 @@ END_MESSAGE_MAP()
 
 
 
-Component::Panel::Panel()
+Control::Panel::Panel()
 {
 }
 
 
 
-Component::Panel::~Panel()
+Control::Panel::~Panel()
 {
 	DestroyWindow();
 }
 
 
 
-bool Component::Panel::Initialize(CWnd* pParentWnd, UINT id)
+bool Control::Panel::Initialize(CWnd* pParentWnd, Window::View* pView, UINT id)
 {
+	m_pView = pView;
+
 	if (__super::Create(NULL, L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, {}, pParentWnd, id) == FALSE) {
 		RETURN_FALSE;
 	}
@@ -65,34 +68,41 @@ bool Component::Panel::Initialize(CWnd* pParentWnd, UINT id)
 
 
 
-void Component::Panel::AdjustLayout(int cx, int cy)
+Window::View* Control::Panel::ParentView()
+{
+	return m_pView;
+}
+
+
+
+void Control::Panel::AdjustLayout(int cx, int cy)
 {
 	m_toolBar.AdjustLayout();
 }
 
 
 
-void Component::Panel::ConstructBody()
+void Control::Panel::ConstructBody()
 {
 }
 
 
 
-int Component::Panel::ConstructFooter(int cy)
+int Control::Panel::ConstructFooter(int cy)
 {
 	return m_nFooterHeight = 0;
 }
 
 
 
-int Component::Panel::ConstructHeader(int cx)
+int Control::Panel::ConstructHeader(int cx)
 {
 	return m_nHeaderHeight = 0;
 }
 
 
 
-CRect Component::Panel::GetBodyRect()
+CRect Control::Panel::GetBodyRect()
 {
 	CSize padding = PRESET::BodyPadding();
 	CRect rect;
@@ -108,7 +118,7 @@ CRect Component::Panel::GetBodyRect()
 
 
 
-CSize Component::Panel::GetBodySize()
+CSize Control::Panel::GetBodySize()
 {
 	CRect rect;
 	GetClientRect(rect);
@@ -118,14 +128,14 @@ CSize Component::Panel::GetBodySize()
 
 
 
-void Component::Panel::PostNcDestroy()
+void Control::Panel::PostNcDestroy()
 {
 	__super::PostNcDestroy();
 }
 
 
 
-LRESULT Component::Panel::OnDPIChangedAfterParent(WPARAM, LPARAM)
+LRESULT Control::Panel::OnDPIChangedAfterParent(WPARAM, LPARAM)
 {
 	LRESULT result = Default();
 
@@ -136,7 +146,7 @@ LRESULT Component::Panel::OnDPIChangedAfterParent(WPARAM, LPARAM)
 
 
 
-BOOL Component::Panel::OnEraseBkgnd(CDC* pDC)
+BOOL Control::Panel::OnEraseBkgnd(CDC* pDC)
 {
 	const CBrush backgound((COLORREF)EColor::MidiumBack);
 
@@ -149,7 +159,7 @@ BOOL Component::Panel::OnEraseBkgnd(CDC* pDC)
 
 
 
-void Component::Panel::OnSize(UINT nType, int cx, int cy)
+void Control::Panel::OnSize(UINT nType, int cx, int cy)
 {
 	__super::OnSize(nType, cx, cy);
 

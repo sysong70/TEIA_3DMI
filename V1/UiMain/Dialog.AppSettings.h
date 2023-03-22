@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include "Dialog.Standard.h"
-#include "Component.TabWnd.h"
-#include "Component.TreePropList.h"
+#include "Control.TreePropList.h"
+#include "Control.TabWnd.h"
 
 
 
@@ -48,9 +48,9 @@ namespace Dialog
 
 	private: // Body controls
 
-		Component::TabWnd m_tabs;
-		Component::TreePropList m_preferencesUi;
-		Component::TreePropList m_fileOptionsUi;
+		Control::TabWnd m_tabs;
+		Control::TreePropList m_preferencesUi;
+		Control::TreePropList m_fileOptionsUi;
 
 	private: // Footer controls
 

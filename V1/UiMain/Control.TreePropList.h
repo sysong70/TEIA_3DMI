@@ -1,12 +1,12 @@
 ﻿#pragma once
 
-#include "Component.h"
-#include "Component.PropList.h"
-#include "Component.TreeCtrlEx.h"
+#include "Control.h"
+#include "Control.PropList.h"
+#include "Control.TreeCtrlEx.h"
 
 
 
-namespace Component
+namespace Control
 {
 	class TreePropList : public CWnd
 	{

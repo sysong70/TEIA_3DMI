@@ -200,7 +200,7 @@ void Dialog::Base::EnableParent(bool enable)
 
 
 
-inline CRect Dialog::Base::GetClientArea()
+CRect Dialog::Base::GetClientArea()
 {
 	CRect rect;
 	GetClientRect(&rect);

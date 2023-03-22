@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "Component.TreeCtrlEx.h"
+#include "Control.TreeCtrlEx.h"
 #include "Facility.h"
 
 #ifdef _DEBUG
@@ -18,7 +18,7 @@ namespace PresetTreeCtrlEx
 
 
 
-using namespace Component;
+using namespace Control;
 
 BEGIN_MESSAGE_MAP(TreeCtrlEx, CBCGPTreeCtrlEx)
 	ON_WM_LBUTTONDOWN()
@@ -26,20 +26,20 @@ END_MESSAGE_MAP()
 
 
 
-Component::TreeCtrlEx::TreeCtrlEx()
+Control::TreeCtrlEx::TreeCtrlEx()
 {
 	m_bVisualManagerStyle = TRUE;
 }
 
 
 
-Component::TreeCtrlEx::~TreeCtrlEx()
+Control::TreeCtrlEx::~TreeCtrlEx()
 {
 }
 
 
 
-void Component::TreeCtrlEx::InitializeDesign(Json::Array& design)
+void Control::TreeCtrlEx::InitializeDesign(Json::Array& design)
 {
 	SetRedraw(FALSE);
 	m_bInitialized = false;
@@ -54,7 +54,7 @@ void Component::TreeCtrlEx::InitializeDesign(Json::Array& design)
 
 
 
-void Component::TreeCtrlEx::GetAncestor(HTREEITEM pItem, std::vector<HTREEITEM>& ancestor)
+void Control::TreeCtrlEx::GetAncestor(HTREEITEM pItem, std::vector<HTREEITEM>& ancestor)
 {
 	HTREEITEM pParent = pItem;
 	while (pParent != nullptr) {
@@ -65,7 +65,7 @@ void Component::TreeCtrlEx::GetAncestor(HTREEITEM pItem, std::vector<HTREEITEM>&
 
 
 
-CString Component::TreeCtrlEx::GetItemNamePath(HTREEITEM pItem)
+CString Control::TreeCtrlEx::GetItemNamePath(HTREEITEM pItem)
 {
 	std::vector<HTREEITEM> items;
 	GetAncestor(pItem, items);
@@ -89,7 +89,7 @@ CString Component::TreeCtrlEx::GetItemNamePath(HTREEITEM pItem)
 
 
 
-void Component::TreeCtrlEx::OnLButtonDown(UINT nFlags, CPoint point)
+void Control::TreeCtrlEx::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	UINT flag = 0;
 	HTREEITEM hItem = HitTest(point, &flag);
@@ -108,7 +108,7 @@ void Component::TreeCtrlEx::OnLButtonDown(UINT nFlags, CPoint point)
 
 
 
-HTREEITEM Component::TreeCtrlEx::CreateItem(Json::Object& design, HTREEITEM pParent)
+HTREEITEM Control::TreeCtrlEx::CreateItem(Json::Object& design, HTREEITEM pParent)
 {
 	HTREEITEM pItem = InsertItem(Facility::GetTitle(design), pParent);
 	if (GetSelectedItem() == nullptr) {
@@ -130,7 +130,7 @@ HTREEITEM Component::TreeCtrlEx::CreateItem(Json::Object& design, HTREEITEM pPar
 
 
 
-void Component::TreeCtrlEx::CreateItem(Json::Array& design, HTREEITEM pParent)
+void Control::TreeCtrlEx::CreateItem(Json::Array& design, HTREEITEM pParent)
 {
 	for (auto item : design.GetBuffer()) {
 		if (item == nullptr) {

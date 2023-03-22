@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "resource.h"
-#include "Component.ToolBar.h"
+#include "Control.ToolBar.h"
 #include "Facility.h"
 #include "Window.View.h"
 
@@ -46,7 +46,7 @@ namespace PresetToolBar
 
 
 
-using namespace Component;
+using namespace Control;
 
 BEGIN_MESSAGE_MAP(ToolBar, CWnd)
 	ON_WM_ERASEBKGND()
@@ -58,13 +58,13 @@ END_MESSAGE_MAP()
 
 
 
-Component::ToolBar::ToolBar()
+Control::ToolBar::ToolBar()
 {
 }
 
 
 
-Component::ToolBar::~ToolBar()
+Control::ToolBar::~ToolBar()
 {
 	for (auto holder : m_buttons) {
 		REMOVE_POINTER(holder);
@@ -74,14 +74,14 @@ Component::ToolBar::~ToolBar()
 
 
 
-void Component::ToolBar::Initialize(CWnd* pParentWnd, const RECT& rect)
+void Control::ToolBar::Initialize(CWnd* pParentWnd, const RECT& rect)
 {
 	__super::Create(NULL, L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, rect, pParentWnd, PRESET::Id);
 }
 
 
 
-void Component::ToolBar::SetPivot(EPivot pivot, bool expandSize)
+void Control::ToolBar::SetPivot(EPivot pivot, bool expandSize)
 {
 	m_ePivot = pivot;
 	m_bExpandSize = expandSize;
@@ -89,24 +89,7 @@ void Component::ToolBar::SetPivot(EPivot pivot, bool expandSize)
 
 
 
-void Component::ToolBar::ViewChanged(UINT message, Window::View* pView)
-{
-	if (message == WM_CREATE || pView->GetSafeHwnd() == nullptr) {
-		return;
-	}
-
-	if (message == WM_ACTIVATE) {
-		ShowWindow(SW_HIDE);
-		//:WARNING - not SetOwner()
-		SetParent((CWnd*)pView);
-		AdjustLayout();
-		ShowWindow(SW_SHOW);
-	}
-}
-
-
-
-CBCGPButton* Component::ToolBar::AddButton(UINT id, bool menu)
+CBCGPButton* Control::ToolBar::AddButton(UINT id, bool menu)
 {
 	CBCGPButton* button = CreateButton(id, menu);
 	m_buttons.push_back(button);
@@ -116,7 +99,7 @@ CBCGPButton* Component::ToolBar::AddButton(UINT id, bool menu)
 
 
 
-void Component::ToolBar::AddButtons(std::vector<UINT> ids)
+void Control::ToolBar::AddButtons(std::vector<UINT> ids)
 {
 	for (auto id : ids) {
 		if (id != 0) {
@@ -130,14 +113,14 @@ void Component::ToolBar::AddButtons(std::vector<UINT> ids)
 
 
 
-void Component::ToolBar::AddSeperator()
+void Control::ToolBar::AddSeperator()
 {
 	m_buttons.push_back(nullptr);
 }
 
 
 
-CSize Component::ToolBar::AdjustLayout()
+CSize Control::ToolBar::AdjustLayout()
 {
 	const int ArrowWidth = 18;
 
@@ -202,7 +185,7 @@ CSize Component::ToolBar::AdjustLayout()
 
 
 
-CPoint Component::ToolBar::AdjustLocation(CSize size)
+CPoint Control::ToolBar::AdjustLocation(CSize size)
 {
 	CRect parentArea;
 	GetParent()->GetClientRect(&parentArea);
@@ -261,7 +244,7 @@ CPoint Component::ToolBar::AdjustLocation(CSize size)
 
 
 
-CBCGPButton* Component::ToolBar::GetButton(UINT id)
+CBCGPButton* Control::ToolBar::GetButton(UINT id)
 {
 	for (auto button : m_buttons) {
 		if (button != nullptr && button->GetDlgCtrlID() == id) {
@@ -274,21 +257,21 @@ CBCGPButton* Component::ToolBar::GetButton(UINT id)
 
 
 
-void Component::ToolBar::PostNcDestroy()
+void Control::ToolBar::PostNcDestroy()
 {
 	__super::PostNcDestroy();
 }
 
 
 
-void Component::ToolBar::OnCommand(UINT id)
+void Control::ToolBar::OnCommand(UINT id)
 {
 	GetParent()->SendMessage(WM_COMMAND, (WPARAM)id);
 }
 
 
 
-LRESULT Component::ToolBar::OnDPIChangedAfterParent(WPARAM, LPARAM)
+LRESULT Control::ToolBar::OnDPIChangedAfterParent(WPARAM, LPARAM)
 {
 	LRESULT result = Default();
 
@@ -299,7 +282,7 @@ LRESULT Component::ToolBar::OnDPIChangedAfterParent(WPARAM, LPARAM)
 
 
 
-BOOL Component::ToolBar::OnEraseBkgnd(CDC* pDC)
+BOOL Control::ToolBar::OnEraseBkgnd(CDC* pDC)
 {
 	const CBrush backgound((COLORREF)EColor::DarkBack);
 
@@ -312,7 +295,7 @@ BOOL Component::ToolBar::OnEraseBkgnd(CDC* pDC)
 
 
 
-void Component::ToolBar::OnSize(UINT nType, int cx, int cy)
+void Control::ToolBar::OnSize(UINT nType, int cx, int cy)
 {
 	__super::OnSize(nType, cx, cy);
 
@@ -323,7 +306,7 @@ void Component::ToolBar::OnSize(UINT nType, int cx, int cy)
 
 
 
-CBCGPButton* Component::ToolBar::CreateButton(UINT id, bool menu)
+CBCGPButton* Control::ToolBar::CreateButton(UINT id, bool menu)
 {
 	CBCGPButton* pButton = menu ? new CBCGPMenuButton() : new CBCGPButton();
 	DEBUG_VALID(pButton);
@@ -342,7 +325,7 @@ CBCGPButton* Component::ToolBar::CreateButton(UINT id, bool menu)
 
 
 
-bool Component::ToolBar::IsHorizontal()
+bool Control::ToolBar::IsHorizontal()
 {
 	return !(m_ePivot == EPivot::MiddleLeft || m_ePivot == EPivot::MiddleRight);
 }

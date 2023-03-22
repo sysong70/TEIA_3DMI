@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Facility.h"
-#include "Component.h"
+#include "Control.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -275,7 +275,7 @@ Json::Object& Facility::SetData(Json::Object& target, UINT id, const CString& ti
 	if (target.FindValue("title") == nullptr && title.IsEmpty() == false) {
 		target.SetString("title", title);
 	}
-	if (target.FindValue("pivot") == nullptr && (Component::EPivot)ePivot != Component::EPivot::Unknown) {
+	if (target.FindValue("pivot") == nullptr && (Control::EPivot)ePivot != Control::EPivot::Unknown) {
 		target.SetInteger("pivot", (int)ePivot);
 	}
 	if (target.FindValue("rect") == nullptr && (rect.Width() > 0 || rect.Height() > 0)) {
