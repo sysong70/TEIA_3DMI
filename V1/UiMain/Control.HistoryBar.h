@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-#include "Component.ToolBar.h"
+#include "Control.ToolBar.h"
 
 
 
-namespace Component
+namespace Control
 {
 	class HistoryBar : public ToolBar
 	{

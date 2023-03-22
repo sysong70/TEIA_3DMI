@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Dialog.Base.h"
-#include "Component.h"
+#include "Control.h"
 
 
 
@@ -30,14 +30,14 @@ namespace Dialog
 
 		CSize SetupControl(CBCGPButton& control, Json::Object& data);
 
-		CRect SetupControl(CBCGPStatic& control, Json::Object& data, Component::EPivot ePivot, CRect rect);
+		CRect SetupControl(CBCGPStatic& control, Json::Object& data, Control::EPivot ePivot, CRect rect);
 
 	protected:
 
 		// align controls at base point
-		CRect AlignControls(Controls controls, CPoint basePoint, Component::EAlign eAlign);
+		CRect AlignControls(Controls controls, CPoint basePoint, Control::EAlign eAlign);
 		// destribute controls from base point with gap
-		CRect DestributeControls(Controls controls, CPoint basePoint, int gap, Component::EDirection eDir);
+		CRect DestributeControls(Controls controls, CPoint basePoint, int gap, Control::EDirection eDir);
 
 	protected:
 

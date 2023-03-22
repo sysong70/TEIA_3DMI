@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Dialog.Standard.H"
-#include "Component.CheckListBox.h"
+#include "Control.CheckListBox.h"
 
 
 
@@ -35,7 +35,7 @@ namespace Dialog
 
 	private: // Controls
 
-		Component::CheckListBox m_list;
+		Control::CheckListBox m_list;
 		CBCGPButton m_wndOk;
 		CBCGPButton m_wndCancel;
 	};

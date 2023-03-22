@@ -2,12 +2,6 @@
 
 #include "3DF.Facility.Preference.h"
 
-#ifdef _DEBUG
-#	define new(THIS_FILE, __LINE__)
-#	undef THIS_FILE
-static char THIS_FILE[] = __FILE__;
-#endif
-
 USING_3DF_NAMESPACE
 
 Facility::Preference::Preference()

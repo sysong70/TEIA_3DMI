@@ -504,6 +504,15 @@ int Json::Value::ToInteger()
 	case EValueType::Real:
 		return (int)m_valueHolder.vReal;
 
+	case EValueType::String:
+		if (m_valueHolder.vString->GetAt(0) == L'0' &&
+			m_valueHolder.vString->GetAt(1) == L'x' || m_valueHolder.vString->GetAt(1) == L'X') {
+			return WStr::FromHex(m_valueHolder.vString->GetBuffer());
+		}
+		else {
+			return WStr::ToInteger(m_valueHolder.vString->GetBuffer());
+		}
+
 	default:
 		DEBUG_STOP;
 		return 0;
@@ -1494,7 +1503,7 @@ bool Json::Reader::ReadValue(wchar_t*& pStream, Value& value)
 		case L',':
 			return true;
 
-		case L'\"': {
+		case L'"': {
 			CString stringValue;
 			if (ReadString(pStream, stringValue)) {
 				value.SetString(stringValue);

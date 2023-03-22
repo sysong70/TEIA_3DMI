@@ -70,12 +70,12 @@ CSize Dialog::Standard::SetupControl(CBCGPButton& control, Json::Object& data)
 	control.m_bVisualManagerStyle = TRUE;
 	control.SizeToContent();
 
-	return Component::AdjustSize(&control, globalUtils.ScaleByDPI(defaultSize));
+	return Control::AdjustSize(&control, globalUtils.ScaleByDPI(defaultSize));
 }
 
 
 
-CRect Dialog::Standard::SetupControl(CBCGPStatic& control, Json::Object& data, Component::EPivot ePivot, CRect rect)
+CRect Dialog::Standard::SetupControl(CBCGPStatic& control, Json::Object& data, Control::EPivot ePivot, CRect rect)
 {
 	DEBUG_VALID(control.GetSafeHwnd());
 
@@ -87,7 +87,7 @@ CRect Dialog::Standard::SetupControl(CBCGPStatic& control, Json::Object& data, C
 
 
 
-CRect Dialog::Standard::AlignControls(Controls controls, CPoint basePoint, Component::EAlign eAlign)
+CRect Dialog::Standard::AlignControls(Controls controls, CPoint basePoint, Control::EAlign eAlign)
 {
 	CRect boundary;
 
@@ -97,32 +97,32 @@ CRect Dialog::Standard::AlignControls(Controls controls, CPoint basePoint, Compo
 		CPoint pivot;
 
 		switch (eAlign) {
-		case Component::EAlign::HorizontalLeft:
+		case Control::EAlign::HorizontalLeft:
 			pivot.x = basePoint.x;
 			pivot.y = controlFrame.top;
 			break;
 
-		case Component::EAlign::HorizontalCenter:
+		case Control::EAlign::HorizontalCenter:
 			pivot.x = basePoint.x - (controlSize.cx / 2);
 			pivot.y = controlFrame.top;
 			break;
 
-		case Component::EAlign::HorizontalRight:
+		case Control::EAlign::HorizontalRight:
 			pivot.x = basePoint.x - controlSize.cx;
 			pivot.y = controlFrame.top;
 			break;
 
-		case Component::EAlign::VerticalTop:
+		case Control::EAlign::VerticalTop:
 			pivot.x = controlFrame.left;
 			pivot.y = basePoint.y;
 			break;
 
-		case Component::EAlign::VerticalCenter:
+		case Control::EAlign::VerticalCenter:
 			pivot.x = controlFrame.left;
 			pivot.y = basePoint.y - (controlSize.cy / 2);
 			break;
 
-		case Component::EAlign::VerticalBottom:
+		case Control::EAlign::VerticalBottom:
 			pivot.x = controlFrame.left;
 			pivot.y = basePoint.y - controlSize.cy;
 			break;
@@ -147,7 +147,7 @@ CRect Dialog::Standard::AlignControls(Controls controls, CPoint basePoint, Compo
 
 
 
-CRect Dialog::Standard::DestributeControls(Controls controls, CPoint basePoint, int gap, Component::EDirection eDir)
+CRect Dialog::Standard::DestributeControls(Controls controls, CPoint basePoint, int gap, Control::EDirection eDir)
 {
 	CRect boundary;
 	CPoint offset = basePoint;
@@ -158,25 +158,25 @@ CRect Dialog::Standard::DestributeControls(Controls controls, CPoint basePoint, 
 		CPoint pivot;
 
 		switch (eDir) {
-		case Component::EDirection::ToRight:
+		case Control::EDirection::ToRight:
 			pivot.x = offset.x;
 			pivot.y = controlFrame.top;
 			offset.x += size.cx + gap;
 			break;
 
-		case Component::EDirection::ToLeft:
+		case Control::EDirection::ToLeft:
 			pivot.x = offset.x - size.cx;
 			pivot.y = controlFrame.top;
 			offset.x -= size.cx + gap;
 			break;
 
-		case Component::EDirection::ToBottom:
+		case Control::EDirection::ToBottom:
 			pivot.x = controlFrame.left;
 			pivot.y = offset.y;
 			offset.y += size.cy + gap;
 			break;
 
-		case Component::EDirection::ToTop:
+		case Control::EDirection::ToTop:
 			pivot.x = controlFrame.left;
 			pivot.y = offset.y - size.cy;
 			offset.y -= size.cy + gap;

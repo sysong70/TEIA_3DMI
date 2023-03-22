@@ -1,13 +1,12 @@
 ﻿#pragma once
 
-#include "Component.ToolBar.h"
-#include "Signal.h"
-
+#include "Control.h"
+#include "Control.ToolBar.h"
 #include <unordered_map>
 
 
 
-namespace Component
+namespace Control
 {
 	class Panel : public CWnd
 	{
@@ -17,7 +16,9 @@ namespace Component
 
 		~Panel() override;
 
-		bool Initialize(CWnd* pParentWnd, UINT id);
+		bool Initialize(CWnd* pParentWnd, Window::View* pView, UINT id);
+
+		Window::View* ParentView();
 
 	public:
 
@@ -46,6 +47,8 @@ namespace Component
 		DECLARE_MESSAGE_MAP()
 
 	protected:
+
+		Window::View* m_pView = nullptr;
 
 		ToolBar m_toolBar;
 		int m_nHeaderHeight = 0;

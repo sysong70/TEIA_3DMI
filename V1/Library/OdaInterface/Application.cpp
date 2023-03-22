@@ -6,6 +6,7 @@
 
 //--------------------------------------------------------------------------------------------------
 
+HMODULE Application::Instance = nullptr;
 // single instance
 Application TheApp;
 

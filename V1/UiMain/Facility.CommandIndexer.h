@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "Facility.h"
-
 #include <unordered_map>
 
 

@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 #include "resource.h"
 #include "Facility.AppSettings.h"
-#include "Dir.h"
-#include "Path.h"
+#include <Dir.h>
+#include <Path.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

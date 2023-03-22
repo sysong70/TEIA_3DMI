@@ -380,6 +380,86 @@ void Signal::View::SetValidation(bool success)
 
 #pragma endregion //:REGION
 
+#pragma region ModelPanel
+
+void Signal::ModelPanel::ConstructData(Json::Object& data, Action action)
+{
+	data.SetInteger(SKW_TARGET, (int)Target::ModelPanel);
+	data.SetInteger(SKW_ACTION, (int)action);
+	data.SetInteger(SKW_VIEWID, Wrapper().ViewId);
+}
+
+#define SendKeyData(action) \
+Json::Object data; \
+ConstructData(data, action); \
+data.SetDwordPtr(SKW_KEY, key); \
+Wrapper().SendData(data);
+
+void Signal::ModelPanel::OnDeleteItem(DWORD_PTR key)
+{
+	SendKeyData(Action::OnDeleteItem);
+}
+
+
+
+void Signal::ModelPanel::OnItemExpanded(DWORD_PTR key)
+{
+	SendKeyData(Action::OnItemExpanded);
+}
+
+
+
+void Signal::ModelPanel::OnSelChanged(DWORD_PTR key)
+{
+	SendKeyData(Action::OnSelChanged);
+}
+
+#undef SendKeyData
+
+void Signal::ModelPanel::AddItems(Items& items)
+{
+	Json::Object data;
+	ConstructData(data, Action::AddItems);
+
+	Json::Array& nodes = data.CreateArray(SKW_ITEMS);
+	for (auto& item : items) {
+		Json::Object* pChild = new Json::Object();
+
+		pChild->SetDwordPtr(SKW_PARENT, item.ParentKey);
+		pChild->SetDwordPtr(SKW_KEY, item.Key);
+		pChild->SetString(SKW_TITLE, item.Title);
+		pChild->SetBoolean(SKW_HASCHILDREN, item.HasChildren);
+		pChild->SetInteger(SKW_TYPE, (int)item.Type);
+
+		nodes.AddObject(*pChild);
+	}
+}
+
+
+
+void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, Items& items)
+{
+	Json::Object data;
+	ConstructData(data, Action::AddChildren);
+
+	data.SetDwordPtr(SKW_PARENT, parentKey);
+
+	Json::Array& nodes = data.CreateArray(SKW_CHILDREN);
+	for (auto& item : items) {
+		Json::Object* pChild = new Json::Object();
+
+		// ignore TreeItem.Parent
+		pChild->SetDwordPtr(SKW_KEY, item.Key);
+		pChild->SetString(SKW_TITLE, item.Title);
+		pChild->SetBoolean(SKW_HASCHILDREN, item.HasChildren);
+		pChild->SetInteger(SKW_TYPE, (int)item.Type);
+
+		nodes.AddObject(*pChild);
+	}
+}
+
+#pragma endregion //:REGION
+
 #pragma region Delivery Class
 
 Signal::Delivery::Delivery()

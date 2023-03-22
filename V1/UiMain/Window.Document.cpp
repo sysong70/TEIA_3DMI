@@ -1,10 +1,9 @@
 ﻿#include "stdafx.h"
 #include "Window.Document.h"
 #include "Window.View.h"
-#include "Path.h"
-
-#include "File.h"
-#include "WStr.h"
+#include <File.h>
+#include <Path.h>
+#include <WStr.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

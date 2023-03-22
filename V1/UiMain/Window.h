@@ -1,12 +1,16 @@
 ﻿#pragma once
 
+
+
 namespace Window
 {
-	class Application; // CBCGPWinApp
-	class ChildFrame; // CBCGPMDIChildWnd
-	class Document; // CDocument
-	class MainFrame; // CBCGPMDIFrameWnd
-	class View; // CView
+	class Application;
+	class ChildFrame;
+	class Document;
+	class MainFrame;
+	class View;
+	class View2d;
+	class View3d;
 
 
 

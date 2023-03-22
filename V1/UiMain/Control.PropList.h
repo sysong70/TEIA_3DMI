@@ -1,13 +1,12 @@
 ﻿#pragma once
 
-#include "Component.h"
-#include "Json.h"
-
+#include "Control.h"
+#include <Json.h>
 #include <unordered_map>
 
 
 
-namespace Component
+namespace Control
 {
 	class PropList : public CBCGPPropList
 	{

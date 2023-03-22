@@ -1,15 +1,15 @@
 ﻿#pragma once
 
-#include "Component.Panel.h"
-#include "Json.h"
-
+#include "Component.h"
+#include "Control.Panel.h"
+#include <Json.h>
 #include <unordered_map>
 
 
 
 namespace Component
 {
-	class ModelPanel : public Panel
+	class ModelPanel : public Control::Panel
 	{
 	public:
 
@@ -63,10 +63,17 @@ namespace Component
 
 		DECLARE_MESSAGE_MAP()
 
-		void GetParent(HTREEITEM sel, std::vector<HTREEITEM>& parent);
+		void AddItem(HTREEITEM parent, DWORD_PTR key, CString title, bool hasChildren, int type);
+
+		void AddItems(Json::Object* pData);
+
+		void AddChildren(Json::Object* pData);
+
+		HTREEITEM GetItem(DWORD_PTR key);
 
 	private:
 
+		std::unordered_map<DWORD_PTR, HTREEITEM> m_keyMap;
 		CBCGPTreeCtrlEx m_wndControl;
 
 		CString m_sFilterMessage = L"";

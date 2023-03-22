@@ -1,11 +1,11 @@
 ﻿#pragma once
 
-#include "Component.h"
-#include "Json.h"
+#include "Control.h"
+#include <Json.h>
 
 
 
-namespace Component
+namespace Control
 {
 	class TreeCtrlEx : public CBCGPTreeCtrlEx
 	{

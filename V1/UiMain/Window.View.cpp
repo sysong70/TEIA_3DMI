@@ -71,6 +71,13 @@ int Window::View::GetId()
 
 
 
+Signal::Delivery& Window::View::Delivery()
+{
+	return m_delivery;
+}
+
+
+
 void Window::View::OnActivateView(BOOL bActivate, CView* pActivateView, CView* pDeactiveView)
 {
 	Activate(bActivate);
@@ -175,7 +182,7 @@ void Window::View::OnPaint()
 		m_delivery.view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
 	}
 	else {
-		dc.FillSolidRect(rect, (COLORREF)Component::EColor::Charcoal);
+		dc.FillSolidRect(rect, (COLORREF)Control::EColor::Charcoal);
 	}
 }
 
@@ -375,7 +382,7 @@ bool Window::View::IsValid()
 
 void Window::View::CreateHistoryBar()
 {
-	m_historyBar.SetPivot(Component::EPivot::BottomCenter, false);
+	m_historyBar.SetPivot(Control::EPivot::BottomCenter, false);
 	m_historyBar.Initialize(this);
 }
 
@@ -394,7 +401,7 @@ void Window::View::CreatePanelTabs()
 		DEBUG_RETURN;
 	}
 
-	m_tabs.SetTabHeight(Component::TabHeight());
+	m_tabs.SetTabHeight(Control::TabHeight());
 	m_tabs.SetLocation(CBCGPTabWnd::LOCATION_TOP);
 	m_tabs.SetIconLocation(CBCGPTabWnd::TAB_ICON_LEFT);
 }
@@ -404,14 +411,20 @@ void Window::View::CreatePanelTabs()
 void Window::View::CreateTaskBar()
 {
 	m_taskBar.Initialize(this);
+//	ShowTaskBar();
 }
 
 
 
-void Window::View::ShowTaskBar()
+void Window::View::ShowTaskBar(bool show)
 {
-	m_taskBar.ShowWindow(SW_SHOW);
-	m_taskBar.AdjustLayout();
+	if (show) {
+		m_taskBar.ShowWindow(SW_SHOW);
+		m_taskBar.AdjustLayout();
+	}
+	else {
+		m_taskBar.ShowWindow(SW_HIDE);
+	}
 }
 
 #undef PRESET

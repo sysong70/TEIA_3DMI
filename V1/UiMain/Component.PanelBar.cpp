@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "resource.h"
 #include "Component.PanelBar.h"
-#include "Component.TabWnd.h"
 #include "Facility.h"
 
 #ifdef _DEBUG
@@ -71,7 +70,7 @@ bool Component::PanelBar::Initialize(CWnd* pMainFrame)
 
 
 
-void Component::PanelBar::ViewChanged(TabWnd* pTabs)
+void Component::PanelBar::ViewChanged(Control::TabWnd* pTabs)
 {
 	DEBUG_VALID(pTabs);
 
@@ -91,7 +90,7 @@ void Component::PanelBar::ViewChanged(TabWnd* pTabs)
 
 BOOL Component::PanelBar::OnEraseBkgnd(CDC* pDC)
 {
-	const CBrush backgound((COLORREF)EColor::DarkBack);
+	const CBrush backgound((COLORREF)Control::EColor::DarkBack);
 
 	CRect rect;
 	GetClientRect(rect);

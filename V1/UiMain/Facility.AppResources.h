@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Facility.h"
-#include "Json.h"
+#include <Json.h>
 
 
 
@@ -21,13 +21,15 @@ namespace Facility
 
 		Json::Object& GetPreferences();
 
+		Json::Object& GetStyles();
+
 	private:
 
 		Json::Object m_fileOptions; // default value
 		Json::Object m_preferences; // default value
 		Json::Object m_ui;
 
-		bool InitDialog();
+		bool Initialize();
 
 		bool InitFileOptions();
 

@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
-#include "Component.TreePropList.h"
+#include "Control.TreePropList.h"
 #include "Facility.h"
-#include "Json.h"
+#include <Json.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -37,7 +37,7 @@ namespace PresetTreePropList
 
 
 
-using namespace Component;
+using namespace Control;
 
 BEGIN_MESSAGE_MAP(TreePropList, CWnd)
 	ON_WM_ERASEBKGND()
@@ -49,19 +49,19 @@ END_MESSAGE_MAP()
 
 
 
-Component::TreePropList::TreePropList()
+Control::TreePropList::TreePropList()
 {
 }
 
 
 
-Component::TreePropList::~TreePropList()
+Control::TreePropList::~TreePropList()
 {
 }
 
 
 
-bool Component::TreePropList::Initialize(CWnd* pParentWnd)
+bool Control::TreePropList::Initialize(CWnd* pParentWnd)
 {
 	if (__super::Create(NULL, L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, {}, pParentWnd, PRESET::Id) == FALSE) {
 		return false;
@@ -75,7 +75,7 @@ bool Component::TreePropList::Initialize(CWnd* pParentWnd)
 
 
 
-void Component::TreePropList::InitializeDesign(Json::Object& design)
+void Control::TreePropList::InitializeDesign(Json::Object& design)
 {
 	m_pDesign = &design;
 	m_tree.InitializeDesign(m_pDesign->GetArray("tree"));
@@ -84,21 +84,21 @@ void Component::TreePropList::InitializeDesign(Json::Object& design)
 
 
 
-void Component::TreePropList::InitializeData(Json::Object& data)
+void Control::TreePropList::InitializeData(Json::Object& data)
 {
 	m_pData = &data;
 }
 
 
 
-BOOL Component::TreePropList::OnEraseBkgnd(CDC* pDC)
+BOOL Control::TreePropList::OnEraseBkgnd(CDC* pDC)
 {
 	return __super::OnEraseBkgnd(pDC);
 }
 
 
 
-void Component::TreePropList::OnSize(UINT nType, int cx, int cy)
+void Control::TreePropList::OnSize(UINT nType, int cx, int cy)
 {
 	__super::OnSize(nType, cx, cy);
 
@@ -119,7 +119,7 @@ void Component::TreePropList::OnSize(UINT nType, int cx, int cy)
 
 
 
-void Component::TreePropList::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
+void Control::TreePropList::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	*pResult = S_OK;
 
@@ -129,7 +129,7 @@ void Component::TreePropList::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 
 
 
-LRESULT Component::TreePropList::OnPropertyChanged(WPARAM wp, LPARAM lp)
+LRESULT Control::TreePropList::OnPropertyChanged(WPARAM wp, LPARAM lp)
 {
 	CBCGPProp* pProp = (CBCGPProp*)lp;
 	Json::Value* pValue = reinterpret_cast<Json::Value*>(pProp->GetData());
@@ -160,7 +160,7 @@ LRESULT Component::TreePropList::OnPropertyChanged(WPARAM wp, LPARAM lp)
 
 
 
-void Component::TreePropList::CreatePropList()
+void Control::TreePropList::CreatePropList()
 {
 	const DWORD dwStyle = WS_VISIBLE | WS_CHILD;
 	if (m_propList.Create(dwStyle, {}, this, PRESET::PropList) == FALSE) {
@@ -170,7 +170,7 @@ void Component::TreePropList::CreatePropList()
 
 
 
-void Component::TreePropList::CreateTreeCtrl()
+void Control::TreePropList::CreateTreeCtrl()
 {
 	DWORD dwStyle = WS_CHILD | WS_VISIBLE |
 		TVS_FULLROWSELECT | TVS_HASBUTTONS | TVS_SHOWSELALWAYS;
@@ -180,7 +180,7 @@ void Component::TreePropList::CreateTreeCtrl()
 }
 
 
-void Component::TreePropList::ChangePropList(HTREEITEM pItem)
+void Control::TreePropList::ChangePropList(HTREEITEM pItem)
 {
 	if (pItem == nullptr || m_tree.m_bInitialized == false) {
 		return;

@@ -1,12 +1,13 @@
 ﻿#pragma once
 
-#include "Component.Panel.h"
+#include "Component.h"
+#include "Control.Panel.h"
 
 
 
 namespace Component
 {
-	class ViewPanel : public Panel
+	class ViewPanel : public Control::Panel
 	{
 	public:
 
