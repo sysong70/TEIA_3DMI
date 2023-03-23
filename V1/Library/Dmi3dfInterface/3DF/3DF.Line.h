@@ -39,14 +39,18 @@ public:
 	LineKey();
 	explicit LineKey(Key const & cInKey);
 	LineKey(LineKey const & cInThat);
-	virtual ~LineKey();
-
-	//LineKey(HC_KEY nInKey = INVALID_KEY);
 
 	void Set(LineKey const & cInThat);
 	LineKey & operator=(LineKey const & cInThat);
 
 	_3DF::Type ObjectType() const { return _3DF::Type::LineKey; };
+
+	int GetPointCount() const;
+	bool ShowPoints(WorldPointArray & aOutPoints) const;
+
+	//== 계산 함수 ===================================================================================
+	bool NearPoint(WindowKey const & cInWindow, const WorldPoint & cInPoint, WorldPoint & cOutPoint) const override;
+	bool DistanceToPoint(const WorldPoint & cInPoint, double & nOutDistance) const override;
 };
 
 CLOSE_3DF_NAMESPACE

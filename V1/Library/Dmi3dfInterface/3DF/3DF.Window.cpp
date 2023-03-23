@@ -51,6 +51,17 @@ HBaseView * WindowKey::GetBaseView()
 	return pcImpl->GetBaseView();
 }
 
+HC_KEY WindowKey::GetSceneKey()
+{
+	return GetBaseView()->GetSceneKey();
+}
+
+const HC_KEY WindowKey::GetSceneKey() const
+{
+	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	return pcImpl->GetBaseView()->GetSceneKey();
+}
+
 void WindowKey::Initialize()
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
@@ -82,7 +93,6 @@ int WindowKey::OnMouseMove(HEventInfo & cEvent)
 // 
 // 		DoDynamicHighlighting(new_pos);
 // 		return HLISTENER_PASS_EVENT;
-
 
 		nResult = pcImpl->GetBaseView()->OnNoButtonDownAndMove(cEvent);
 	}
@@ -125,3 +135,4 @@ HighlightControl const WindowKey::GetHighlightControl() const
 	HighlightControl ccHighlight(*this);
 	return ccHighlight;
 }
+

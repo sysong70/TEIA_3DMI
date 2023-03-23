@@ -2,6 +2,7 @@
 
 #include "3DF.Segment.h"
 #include "3DF.Selection.h"
+#include "3DF.Highlight.h"
 
 class HBaseView;
 
@@ -15,6 +16,9 @@ public:
 
 	const HBaseView * GetBaseView() const;
 	HBaseView * GetBaseView();
+
+	HC_KEY GetSceneKey();
+	const HC_KEY GetSceneKey() const;
 
 	int OnMouseMove(HEventInfo & cEvent);
 

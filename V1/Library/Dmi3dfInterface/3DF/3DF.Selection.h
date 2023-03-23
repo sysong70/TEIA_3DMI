@@ -10,6 +10,7 @@
 #include "3DF.Control.h"
 
 #include "3DF.Math.h"
+#include "3DF.Point.h"
 
 #include <vector>
 
@@ -101,6 +102,15 @@ public:
 	SelectionOptionsKit & SetAlgorithm(Selection::Algorithm eInAlgorithm);
 	SelectionOptionsKit & SetGranularity(Selection::Granularity eInGranularity);
 	SelectionOptionsKit & SetBias(Selection::Bias eInBias);
+
+	bool ShowProximity(float & fOutProximity) const;
+	bool ShowLevel(Selection::Level & eOutLevel) const;
+	bool ShowInternalLimit(size_t & nOutLimit) const;
+	bool ShowRelatedLimit(size_t & nOutLimit) const;
+	bool ShowSorting(Selection::Sorting & eOutSorting) const;
+	bool ShowAlgorithm(Selection::Algorithm & eOutAlgorithm) const;
+	bool ShowGranularity(Selection::Granularity & eOutGranularity) const;
+	bool ShowBias(Selection::Bias & eOutBias) const;
 };
 
 class SelectionOptionsControl : public Control
@@ -157,7 +167,10 @@ public:
 
 	_3DF::Type ObjectType() const { return _3DF::Type::SelectionItem; };
 
-	bool ShowSelectedItem(Key & out_selection) const;
+	bool ShowSelectedItem(Key *& pcOutSelection);
+
+	bool ShowSelectionPosition(WindowPoint & cOutLocation) const;
+	bool ShowSelectionPosition(WorldPoint & cOutLocation) const;
 };
 
 class SelectionResults : public Object
@@ -176,6 +189,10 @@ public:
 	void Reset();
 
 	size_t GetCount() const;
+	POSITION GetHeadPosition() const;
+
+	SelectionItem * GetNext(POSITION & pcPosition);
+	SelectionItem * GetNext(POSITION & pcPosition) const;
 };
 
 class SelectionControl : public Control
@@ -193,35 +210,13 @@ public:
 	size_t SelectByPoint(HEventInfo & cEvent, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const;
 	size_t SelectByPoint(HEventInfo & cEvent, SelectionResults & cOutResults) const;
 
+	size_t SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const;
 	size_t SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const;
 	size_t SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults) const;
 
 private:
 	// Private default constructor to prevent instantiation without a window.
 	SelectionControl();
-};
-
-class HighlightControl : public Control
-{
-public:
-	explicit HighlightControl(WindowKey const & cInWindow);
-	HighlightControl(HighlightControl const & cInThat);
-	~HighlightControl();
-
-	void Set(HighlightControl const & cInThat);
-	HighlightControl & operator=(HighlightControl const & cInThat);
-
-	_3DF::Type ObjectType() const { return _3DF::Type::HighlightControl; };
-// 
-// 	size_t SelectByPoint(HEventInfo & cEvent, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const;
-// 	size_t SelectByPoint(HEventInfo & cEvent, SelectionResults & cOutResults) const;
-// 
-// 	size_t SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const;
-// 	size_t SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults) const;
-
-private:
-	// Private default constructor to prevent instantiation without a window.
-	HighlightControl();
 };
 
 class DmiSelectionControl : public HSelectionSet

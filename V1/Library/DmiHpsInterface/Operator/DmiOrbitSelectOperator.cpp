@@ -537,6 +537,7 @@ bool DmiOrbitSelectOperator::DynamicHighlightCommon(HPS::WindowKey & cInWindow, 
 
 	nStartTick = GetTickCount64();
 
+	// cInWindow.GetSelectionControl().SelectByPoint(cInLocation, m_cSelectionOptions, cNewSelection) 함수를 통해서 선택됨.
 	HPS::SelectionResults cDynamicSelectionResults = GetNewDynamicActiveSelection();
 	size_t nDynamicSelectedCount = cDynamicSelectionResults.GetCount();
 

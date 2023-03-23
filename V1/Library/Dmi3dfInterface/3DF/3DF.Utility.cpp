@@ -42,3 +42,17 @@ CString Utility::GetTimeSpanString(milliseconds & ms)
 
 	return strSpanText;
 }
+
+void Utility::Set3DfOptionString(char * chBuffer, char * chOption)
+{
+	if (0 == strlen(chOption)) {
+		return;
+	}
+
+	if (0 == strlen(chBuffer)) {
+		sprintf(chBuffer, "%s", chOption);
+	}
+	else {
+		sprintf(chBuffer, "%s, %s", chBuffer, chOption);
+	}
+}

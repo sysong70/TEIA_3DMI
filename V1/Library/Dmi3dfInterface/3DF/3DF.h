@@ -43,6 +43,7 @@
 OPEN_3DF_NAMESPACE
 
 #define PATTERN_BUFFER_SIZE		1024
+#define STYLE_BUFFER_SIZE		128
 
 //== Forward Declarations ==========================================================================
 class Object;
@@ -59,6 +60,11 @@ class LineKey;
 class PolygonKit;
 class PolygonKey;
 class BoundingKit;
+
+class WindowPoint;
+class WorldPoint;
+class PixelPoint;
+
 class NamedStyleDefinition;
 class StyleKey;
 
@@ -114,6 +120,10 @@ using SegmentKeyArray = CAtlArray<SegmentKey>;
 using LineArray = CAtlArray<LineKit>;
 using PolylineArray = LineArray;
 using Polyline = LineKit;
+
+using WindowPointArray = CAtlArray<WindowPoint>;
+using WorldPointArray = CAtlArray<WorldPoint>;
+using PixelPointArray = CAtlArray<PixelPoint>;
 
 using Polygon = PolygonKit;
 using PolygonArray = CAtlArray<PolygonKit>;

@@ -397,19 +397,133 @@ public:
 	Point_3D() { x = 0, y = 0, z = 0; }
 	Point_3D(F v1, F v2, F v3) : x(v1), y(v2), z(v3) {}
 
+	void Set(F X, F Y, F Z) { x = X; y = Y; z = Z; };
+
 	template <typename D>
 	explicit Point_3D(Point_3D<D> const & that) : x((F) that.x), y((F) that.y), z((F) that.z) {}
 
-	explicit Point_3D(Vector_3D<F> const & that) : x((F)that.x), y((F)that.y), z((F)that.z) {}
+	explicit Point_3D(Vector_3D<F> const & v);
 
-	Vector_3D<F> const operator- (Point_3D const & p) const { return Vector_3D(x - p.x, y - p.y, z - p.z); };
-	
-	Point_3D<F> const operator= (F const * p) const { return Point_3D(p[0], p[1], p[2]); };
+	Point_3D const	operator- () const	{ return Point_3D (-x, -y, -z); }
 
-	void Set(F X, F Y, F Z) { x = X; y = Y; z = Z; };
+	bool operator== (Point_3D const & p) const { return  x == p.x && y == p.y && z == p.z; }
+	bool operator!= (Point_3D const & p) const { return  !(*this == p); }
+
+	bool Equals(Point_3D const & p, int in_tolerance = 32) const {
+		return	Float::Equals(x, p.x, in_tolerance) &&
+			Float::Equals(y, p.y, in_tolerance) &&
+			Float::Equals(z, p.z, in_tolerance);
+	}
+
+
+	Point_3D & operator*= (F s) { x *= s; y *= s; z *= s;  return *this; }
+	Point_3D & operator/= (F s) { return operator*= ((F)1 / s); }
+	Point_3D const operator* (F s) const { return Point_3D(x * s, y * s, z * s); }
+	Point_3D const operator/ (F s) const { return operator* ((F)1 / s); }
+
+	F & operator[] (size_t i) { return (&x)[i]; }
+	F const & operator[] (size_t i) const { return (&x)[i]; }
+
+	Point_3D & operator+= (Vector_3D<F> const & v);
+	Point_3D & operator-= (Vector_3D<F> const & v);
+	Point_3D & operator*= (Vector_3D<F> const & v);
+	Point_3D & operator/= (Vector_3D<F> const & v);
+	Point_3D const operator* (Vector_3D<F> const & v) const;
+	Point_3D const operator/ (Vector_3D<F> const & v) const;
+
+	Vector_3D<F> const operator- (Point_3D const & p) const;
+
+	Point_3D const operator+ (Vector_3D<F> const & v) const;
+	Point_3D const operator- (Vector_3D<F> const & v) const;
+
+	static _3DF_INLINE Point_3D	Origin() {return Point_3D (0, 0, 0);};
+	static _3DF_INLINE Point_3D	Zero() {return Point_3D (0, 0, 0);}; //-V524
+
+	double	DistanceWith(Point_3D const & p) const;
 };
 
 using Point = Point_3D<float>;
+using DPoint = Point_3D<double>;
+
+
+template <typename F, typename S>
+_3DF_INLINE Point_3D<F>	operator* (S s, Point_3D<F> const & a) { return Point_3D<F>(F(s * a.x), F(s * a.y), F(s * a.z)); }
+
+template <typename F>
+_3DF_INLINE Point_3D<F> Midpoint(Point_3D<F> const & a, Point_3D<F> const & b) {
+	return Point_3D<F>(a.x + b.x, a.y + b.y, a.z + b.z) * 0.5f;
+}
+
+template <typename F>
+_3DF_INLINE Point_3D<F> Midpoint(Point_3D<F> const & a, Point_3D<F> const & b, Point_3D<F> const & c) {
+	return Point_3D<F>(a.x + b.x + c.x, a.y + b.y + c.y, a.z + b.z + c.z) * (F)(1.0 / 3.0);
+}
+
+template <typename F>
+_3DF_INLINE bool Is_Abnormal(Point_3D<F> const & p) {
+	return Is_Abnormal(p.x) || Is_Abnormal(p.y) || Is_Abnormal(p.z);
+}
+
+template <typename F>
+_3DF_INLINE	Point_3D<F>::Point_3D(Vector_3D<F> const & v) : x(v.x), y(v.y), z(v.z) {}
+
+template <typename F>
+_3DF_INLINE	Point_3D<F> & Point_3D<F>::operator+= (Vector_3D<F> const & v) { x += v.x; y += v.y; z += v.z;  return *this; }
+template <typename F>
+_3DF_INLINE	Point_3D<F> & Point_3D<F>::operator-= (Vector_3D<F> const & v) { x -= v.x; y -= v.y; z -= v.z;  return *this; }
+
+template <typename F>
+_3DF_INLINE	Vector_3D<F> const	Point_3D<F>::operator- (Point_3D<F> const & p) const { return Vector_3D<F>(x - p.x, y - p.y, z - p.z); }
+
+template <typename F>
+_3DF_INLINE	Point_3D<F> const	Point_3D<F>::operator+ (Vector_3D<F> const & v) const { return Point_3D<F>(x + v.x, y + v.y, z + v.z); }
+template <typename F>
+_3DF_INLINE	Point_3D<F> const	Point_3D<F>::operator- (Vector_3D<F> const & v) const { return Point_3D<F>(x - v.x, y - v.y, z - v.z); }
+
+template <typename F>
+_3DF_INLINE	Point_3D<F> & Point_3D<F>::operator*= (Vector_3D<F> const & v) { x *= v.x; y *= v.y; z *= v.z;  return *this; }
+template <typename F>
+_3DF_INLINE	Point_3D<F> & Point_3D<F>::operator/= (Vector_3D<F> const & v) { x /= v.x; y /= v.y; z /= v.z;  return *this; }
+template <typename F>
+_3DF_INLINE	Point_3D<F> const	Point_3D<F>::operator* (Vector_3D<F> const & v) const { return Point_3D<F>(x * v.x, y * v.y, z * v.z); }
+template <typename F>
+_3DF_INLINE	Point_3D<F> const	Point_3D<F>::operator/ (Vector_3D<F> const & v) const { return Point_3D<F>(x / v.x, y / v.y, z / v.z); }
+
+template <typename F>
+double	Point_3D<F>::DistanceWith(Point_3D const & p) const {
+	return (*this - p).Length();
+}
+
+template <typename F>
+_3DF_INLINE Point_3D<F> Interpolate(Point_3D<F> const & a, Point_3D<F> const & b, float t) {
+	return a + (b - a) * t;
+}
+
+template <typename F>
+_3DF_INLINE Vector_3D<F> Interpolate(Vector_3D<F> const & a, Vector_3D<F> const & b, float t) {
+	return Vector_3D<F>(a + (b - a) * t).Normalize();
+}
+
+
+template <typename F>
+_3DF_INLINE	double PointToPointDistance(Point_3D<F> const & p1, Point_3D<F> const & p2) {
+	return (p2 - p1).Length();
+}
+
+template <typename F>
+_3DF_INLINE	double PointToPointDistanceSquared(Point_3D<F> const & p1, Point_3D<F> const & p2) {
+	return (p2 - p1).LengthSquared();
+}
+
+template <typename F>
+_3DF_INLINE Point_3D<F> Circumcenter(Point_3D<F> const & a, Point_3D<F> const & b, Point_3D<F> const & c) {
+	F p = static_cast<F>((c - b).LengthSquared());
+	F q = static_cast<F>((c - a).LengthSquared());
+	F r = static_cast<F>((b - a).LengthSquared());
+
+	return Point_3D<F>((a * (p * (q + r - p)) + (Vector_3D<F>)b * (q * (r + p - q)) + (Vector_3D<F>)c * (r * (p + q - r)))
+		/ (2 * (p * q + p * r + q * r) - (p * p + q * q + r * r)));
+}
 
 template <typename F>
 class Vector_3D
@@ -419,50 +533,91 @@ public:
 	F y;
 	F z;
 
-	Vector_3D() { x = 0, y = 0, z = 0; }
-	Vector_3D(F v1, F v2, F v3) : x(v1), y(v2), z(v3) {}
+	Vector_3D () {}
+	Vector_3D (F v1, F v2, F v3) : x (v1), y (v2), z (v3) {}
 	template <typename D>
-	explicit Vector_3D(Vector_3D<D> const & that) : x((F) that.x), y((F) that.y), z((F) that.z) {}
+	explicit Vector_3D (Vector_3D<D> const & that) : x ((F)that.x), y ((F)that.y), z ((F)that.z) {}
 	explicit Vector_3D(Point_3D<F> const & p) : x(p.x), y(p.y), z(p.z) {}
+// 	explicit Vector_3D(Plane_3D<F> const & p);
+// 	explicit Vector_3D (Vector_2D<F> const & that);
 
 	void Set(F X, F Y, F Z) { x = X; y = Y; z = Z; };
 
-	_3DF_INLINE F Dot(Vector_3D const & v) const { return x * v.x + y * v.y + z * v.z; }
+	Vector_3D const	operator- () const	{ return Vector_3D (-x, -y, -z); }
 
-	_3DF_INLINE Vector_3D Cross(Vector_3D const & v) const {
-		return Vector_3D(y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x);
+	bool operator== (Vector_3D const & v) const {
+		return  Float::match(x, v.x) && Float::match(y, v.y) && Float::match(z, v.z);
+	}
+	bool operator!= (Vector_3D const & v) const { return  !(*this == v); }
+
+	bool Equals(Vector_3D const & v, int in_tolerance = 32) const {
+		return	Float::Equals(x, v.x, in_tolerance) && Float::Equals(y, v.y, in_tolerance) && Float::Equals(z, v.z, in_tolerance);
 	}
 
-	Vector_3D & operator+= (Vector_3D const & v) { x += v.x; y += v.y; z += v.z;  return *this; }
-	Vector_3D & operator-= (Vector_3D const & v) { x -= v.x; y -= v.y; z -= v.z;  return *this; }
-	Vector_3D const operator+ (Vector_3D const & v) const { return Vector_3D(x + v.x, y + v.y, z + v.z); }
-	Vector_3D const operator- (Vector_3D const & v) const { return Vector_3D(x - v.x, y - v.y, z - v.z); }
+	Vector_3D &			operator+= (Vector_3D const & v)		{ x += v.x; y += v.y; z += v.z;  return *this; }
+	Vector_3D &			operator-= (Vector_3D const & v)		{ x -= v.x; y -= v.y; z -= v.z;  return *this; }
+	Vector_3D const		operator+ (Vector_3D const & v) const	{ return Vector_3D (x + v.x, y + v.y, z + v.z); }
+	Vector_3D const		operator- (Vector_3D const & v) const	{ return Vector_3D (x - v.x, y - v.y, z - v.z); }
 
-	Vector_3D & operator*= (F s) { x *= s; y *= s; z *= s;  return *this; }
-	Vector_3D & operator/= (F s) { return operator*= (1.0f / s); }
-	Vector_3D const operator* (F s) const { return Vector_3D(x * s, y * s, z * s); }
-	Vector_3D const operator/ (F s) const { return operator* (1.0f / s); }
+	Vector_3D &			operator*= (F s)				{ x *= s; y *= s; z *= s;  return *this; }
+	Vector_3D &			operator/= (F s)				{ return operator*= (1.0f / s); }
+	Vector_3D const		operator* (F s) const			{ return Vector_3D (x * s, y * s, z * s); }
+	Vector_3D const		operator/ (F s) const			{ return operator* (1.0f / s); }
 
-	_3DF_INLINE double Length() const { return sqrt(LengthSquared()); }
+	F &					operator[] (size_t i)		{ return (&x)[i]; }
+	F const &			operator[] (size_t i) const	{ return (&x)[i]; }
 
-	_3DF_INLINE double LengthSquared() const { return (double) x * (double) x + (double) y * (double) y + (double) z * (double) z; }
+	_3DF_INLINE double	Length () const { return sqrt (LengthSquared()); }
 
-	_3DF_INLINE Vector_3D & Normalize(bool check_range = false, F epsilon = Float_Traits<F>::Epsilon()) {// not const &; allow V.normalize() *= S;
-		if(check_range) {
-			F	range = Max(Abs(x), Abs(y), Abs(z));
-			if(range > F(1.0e10))
+	_3DF_INLINE double	LengthSquared () const { return (double)x*(double)x + (double)y*(double)y + (double)z*(double)z; }
+
+	_3DF_INLINE double	Length2D () const { return sqrt (LengthSquared2D()); }
+
+	_3DF_INLINE double	LengthSquared2D () const { return (double)x*(double)x + (double)y*(double)y;}
+
+	_3DF_INLINE Vector_3D &	Normalize (bool check_range = false, F epsilon = Float_Traits<F>::Epsilon()) {// not const &; allow V.normalize() *= S;
+		if (check_range) {
+			F	range = Max (Abs (x), Abs (y), Abs (z));
+			if (range > F(1.0e10))
 				operator/= (range);
 		}
 
-		F	len = (F) Length();
-		if(len > epsilon)
+		F	len = (F)Length();
+		if (len > epsilon)
 			operator/= (len);
 		else
 			*this = Zero();
 		return *this;
 	}
+	_3DF_INLINE Vector_3D &	Normalize (F epsilon) { return Normalize (false, epsilon); }
 
-	_3DF_INLINE Vector_3D & Normalize(F epsilon) { return Normalize(false, epsilon); }
+	_3DF_INLINE Vector_3D &	Clean_Zeroes (F epsilon = F(1.0e-4)) {
+		if (Abs(x) < epsilon) x = 0;
+		if (Abs(y) < epsilon) y = 0;
+		if (Abs(z) < epsilon) z = 0;
+		return *this;
+	}
+
+	_3DF_INLINE F Magnitude () const { return Max (Abs(x), Abs(y), Abs(z)); }
+	_3DF_INLINE F Manhattan () const { return Abs(x)+Abs(y)+Abs(z); }
+
+	_3DF_INLINE F Dot (Vector_3D const & v) const { return x * v.x  +  y * v.y  +  z * v.z; }
+
+	_3DF_INLINE Vector_3D Cross (Vector_3D const & v) const { 
+		return Vector_3D (y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x); 
+	}
+
+	_3DF_INLINE Vector_3D Scale(Vector_3D const & v) const {
+		return Vector_3D(x * v.x, y * v.y, z * v.z);
+	}
+
+	Vector_3D<F> different_vector () const {
+		if (Abs (x) < Abs (y))
+			return Vector_3D<F>::XAxis();
+		else
+			return Vector_3D<F>::YAxis();
+	}
+
 
 	static _3DF_INLINE Vector_3D XAxis() { return Vector_3D(1, 0, 0); };
 	static _3DF_INLINE Vector_3D YAxis() { return Vector_3D(0, 1, 0); };
@@ -480,7 +635,20 @@ _3DF_INLINE bool Is_Abnormal(Vector_3D<F> const & v) {
 	return Is_Abnormal(v.x) || Is_Abnormal(v.y) || Is_Abnormal(v.z);
 }
 
+template <typename F>
+_3DF_INLINE bool Normalize(size_t count, Vector_3D<F> * vectors) {
+	bool success = true;
+	for (size_t i = 0; i < count; ++i) {
+		if (vectors->Normalize() == Vector_3D<F>::Zero())
+			success = false;
+		vectors++;
+	}
+	return success;
+}
+
+
 using Vector = Vector_3D<float>;
+using DVector = Vector_3D<double>;
 
 // using IntArray = std::vector<int>;
 // using PointArray = std::vector<HPoint>;
@@ -606,6 +774,14 @@ namespace  MatrixCal {
 	API_3DF void InverseMatrix(const float * matrix, float * out_matrix);
 	API_3DF void ComputeMatrixProduct(const float * matrix1, const float * matrix2, float * out_matrix);
 	API_3DF void ComputeIdentityMatrix(float * out_matrix);
+};
+
+namespace Math
+{
+	bool NormalPointWithInRange(Point cSP, Point cEP, Point cOtherPoint, Point & cNormalPoint);
+
+	bool GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, PixelPointArray & aOutPoints);
+	bool GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, WindowPointArray & aOutPoints);
 };
 
 CLOSE_3DF_NAMESPACE

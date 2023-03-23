@@ -1,8 +1,12 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.OpCameraOrbitSelect.h"
+#include "3DF.Operator.CameraOrbitSelect.h"
+#include "Private/3DF.SelectionPrivate.h"
 
 #include "3DF.Window.h"
+#include "3DF.Line.h"
+
+#include "3DF.Operator.ObjectSnap.h"
 
 #include <Common_Define.h>
 
@@ -15,7 +19,7 @@
 
 USING_3DF_NAMESPACE
 
-OpCameraOrbitSelect::OpCameraOrbitSelect(WindowKey * pcWindow, int DoRepeat, int DoCapture) :
+Operator::CameraOrbitSelect::CameraOrbitSelect(WindowKey * pcWindow, int DoRepeat, int DoCapture) :
 	HOpCameraOrbit(pcWindow->GetBaseView(), DoRepeat, DoCapture)
 {
 	m_pcWindow = pcWindow;
@@ -26,7 +30,7 @@ OpCameraOrbitSelect::OpCameraOrbitSelect(WindowKey * pcWindow, int DoRepeat, int
 
 }
 
-OpCameraOrbitSelect::OpCameraOrbitSelect(HBaseView * view, int DoRepeat, int DoCapture) :
+Operator::CameraOrbitSelect::CameraOrbitSelect(HBaseView * view, int DoRepeat, int DoCapture) :
 	HOpCameraOrbit(view, DoRepeat, DoCapture)
 {
 	m_nSelectPickCount = 200;
@@ -35,25 +39,25 @@ OpCameraOrbitSelect::OpCameraOrbitSelect(HBaseView * view, int DoRepeat, int DoC
 
 }
 
-OpCameraOrbitSelect::~OpCameraOrbitSelect()
+Operator::CameraOrbitSelect::~CameraOrbitSelect()
 {
 	HC_Open_Segment_By_Key(GetView()->GetConstructionKey());
 	HC_Flush_Contents(".", "geometry");
 	HC_Close_Segment();
 }
 
-const char * OpCameraOrbitSelect::GetName()
+const char * Operator::CameraOrbitSelect::GetName()
 {
-	return "3DF_OpCameraOrbitSelect";
+	return "3DF_Operator::CameraOrbitSelect";
 }
 
-HBaseOperator * OpCameraOrbitSelect::Clone()
+HBaseOperator * Operator::CameraOrbitSelect::Clone()
 {
-	return new OpCameraOrbitSelect(GetView());
+	return new Operator::CameraOrbitSelect(GetView());
 }
 //== Mouse Event 처리 ===============================================================================
 
-int OpCameraOrbitSelect::OnLButtonDown(HEventInfo & cEvent)
+int Operator::CameraOrbitSelect::OnLButtonDown(HEventInfo & cEvent)
 {
 	m_cMouseDownPoint = cEvent.GetMousePixelPos();
 	m_nMouseDownTickCount = GetTickCount();
@@ -66,7 +70,7 @@ int OpCameraOrbitSelect::OnLButtonDown(HEventInfo & cEvent)
 	return HOpCameraOrbit::OnLButtonDown(cEvent);
 }
 
-int OpCameraOrbitSelect::OnLButtonUp(HEventInfo & cEvent)
+int Operator::CameraOrbitSelect::OnLButtonUp(HEventInfo & cEvent)
 {
 	DWORD nMouseUpTickCount = GetTickCount();
 	DWORD nTickCount = nMouseUpTickCount - m_nMouseDownTickCount;
@@ -92,44 +96,34 @@ int OpCameraOrbitSelect::OnLButtonUp(HEventInfo & cEvent)
 	return HOpCameraOrbit::OnLButtonUp(cEvent);
 }
 
-int OpCameraOrbitSelect::OnLButtonDownAndMove(HEventInfo & cEvent)
+int Operator::CameraOrbitSelect::OnLButtonDownAndMove(HEventInfo & cEvent)
 {
 	m_bOrbitMode = true;
 	return HOpCameraOrbit::OnLButtonDownAndMove(cEvent);
 }
 
-int OpCameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cEvent)
+int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cEvent)
 {
-	return OnDaynamicHighlightMouseMove(cEvent);
+	SelectionOptionsKit cSelectOption;
+	cSelectOption.SetLevel(Selection::Level::Entity);
+	cSelectOption.SetRelatedLimit(0);
+	cSelectOption.SetInternalLimit(0);
+	cSelectOption.SetSorting(Selection::Sorting::Default);
+	//"v, selection level = entity, related selection limit = 0, selection sorting, internal selection limit = 0", cInLocation.x, cInLocation.y);
 
-/*
-	HPoint  new_pos;
-	new_pos = event.GetMouseWindowPos();
+	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cEvent, cSelectOption, m_cNewHighlightSelection);
 
-	DoDynamicHighlighting(new_pos);
-	return HLISTENER_PASS_EVENT;
-*/
-}
+	HighlightOptionsKit cKit;
+	m_pcWindow->GetHighlightControl().Highlight(m_cNewHighlightSelection, cKit);
 
-//== Selection 관련 함수 =============================================================================
+	Operator::ObjectSnap cSnap(m_pcWindow);
+	cSnap.DrawObjectSnapPoint(m_cNewHighlightSelection);
 
-// Mouse를 이동할 때 Highlight 처리
-int  OpCameraOrbitSelect::OnDaynamicHighlightMouseMove(HEventInfo & cEvent)
-{
-	if (nullptr == m_pcWindow) {
-		return HLISTENER_PASS_EVENT;
-	}
+	//DrawObjectSnapPoint(m_cNewHighlightSelection);
 
-	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cEvent, m_cNewHighlightSelection);
+	m_cNewHighlightSelection.Reset();
 
-	if (0 < m_cNewHighlightSelection.GetCount()) {
-		m_cNewHighlightSelection.Reset();
-	}
-
-	if (0 < m_cOldHighlightSelection.GetCount()) {
-		//m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
-	}
+	//m_pcWindow->GetBaseView()->DoDynamicHighlighting(cEvent.GetMouseWindowPos());
 
 	return HLISTENER_PASS_EVENT;
 }
-

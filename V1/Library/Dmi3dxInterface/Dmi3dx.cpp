@@ -260,6 +260,14 @@ std::wstring Dmi3dx::GetA3dEntityTypeString(A3DEEntityType eType)
 			strText = L"SurfExtrusion";
 			break;
 
+		case kA3DTypeRiPolyWire:
+			strText = L"RiPolyWire";
+			break;
+
+		case kA3DTypeRiCurve:
+			strText = L"RiCurve";
+			break;
+
 		default:
 			strText = std::format(L"A3dEntityType: {}", (int)eType);
 			break;

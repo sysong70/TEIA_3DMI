@@ -1359,55 +1359,55 @@ bool C3dImport::ConvertRiRepresentationItem(int nIndex, A3DRiRepresentationItem 
 		}
 		break;
 
-		/*
-				case kA3DTypeMiscCartesianTransformation:
-				case kA3DTypeMiscEntityReference:
-					ASSERT(FALSE);
-					break;
+/*
+		case kA3DTypeMiscCartesianTransformation:
+		case kA3DTypeMiscEntityReference:
+			ASSERT(FALSE);
+			break;
 
 
-				case kA3DTypeRiPointSet:
-					ParseRiPointSet(pcRepresentationItem, info, sData.m_pCoordinateSystem, pcAttribute);
-				break;
-		*/
+		case kA3DTypeRiPointSet:
+			ParseRiPointSet(pcRepresentationItem, info, sData.m_pCoordinateSystem, pcAttribute);
+			break;
+*/
 	}
 
 	if(eStatus == A3D_SUCCESS)		// Plane은 제외한다 
 	{
-		/*
-				if ( eType != kA3DTypeRiPlane)
-				{
-					//check to see if we need to regenerate tessellation
-					if (sData.m_pTessBase == nullptr && (eType == kA3DTypeRiBrepModel || eType == kA3DTypeRiCurve))
-					{
-						A3DRWParamsTessellationData tessellation_data;
-						A3D_INITIALIZE_DATA(A3DRWParamsTessellationData, tessellation_data);
+/*
+		if ( eType != kA3DTypeRiPlane)
+		{
+			//check to see if we need to regenerate tessellation
+			if (sData.m_pTessBase == nullptr && (eType == kA3DTypeRiBrepModel || eType == kA3DTypeRiCurve))
+			{
+				A3DRWParamsTessellationData tessellation_data;
+				A3D_INITIALIZE_DATA(A3DRWParamsTessellationData, tessellation_data);
 
 
-						SetupTessellationData(info.pcImportOpt, tessellation_data);
+				SetupTessellationData(info.pcImportOpt, tessellation_data);
 
-						A3DRiRepresentationItemComputeTessellation(pcRepresentationItem, &tessellation_data);
-						A3DRiRepresentationItemGet(pcRepresentationItem, &sData);
-					}
+				A3DRiRepresentationItemComputeTessellation(pcRepresentationItem, &tessellation_data);
+				A3DRiRepresentationItemGet(pcRepresentationItem, &sData);
+			}
 
-					ParseTess(sData.m_pTessBase, pcRepresentationItem, info, pcAttribute, sData.m_pCoordinateSystem);
+			ParseTess(sData.m_pTessBase, pcRepresentationItem, info, pcAttribute, sData.m_pCoordinateSystem);
 
-					// IwObject를 MvGeometry에 연결한다
-					//if ( pIwCreatedObject)
-					//{
-						//info.pIwObjContainer->AddObject( pIwCreatedObject);
+			// IwObject를 MvGeometry에 연결한다
+			//if ( pIwCreatedObject)
+			//{
+				//info.pIwObjContainer->AddObject( pIwCreatedObject);
 
-						// Shell인 경우 Solid인지 알려준다
-					//}
-				}
-				else
-				{
-					// Plane은 Export때 다른 개체와 연결되지 않도록 변경한다
-					OprPrcManipulator encorder;
-					UINT nConnectID = (UINT)-1;
-					encorder.SetConnectID( pcRepresentationItem, nConnectID);
-				}
-		*/
+				// Shell인 경우 Solid인지 알려준다
+			//}
+		}
+		else
+		{
+			// Plane은 Export때 다른 개체와 연결되지 않도록 변경한다
+			OprPrcManipulator encorder;
+			UINT nConnectID = (UINT)-1;
+			encorder.SetConnectID( pcRepresentationItem, nConnectID);
+		}
+*/
 
 		// A3DRiRepresentationItemGet(nullptr, &cRiRepItemData); // delete sData	
 	}

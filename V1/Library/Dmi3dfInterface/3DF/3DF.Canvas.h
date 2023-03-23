@@ -12,9 +12,12 @@
 
 OPEN_3DF_NAMESPACE
 
-class OpCameraOrbitSelect;
-class OpCameraPan;
-class OpSelectArea;
+namespace Operator
+{
+	class CameraOrbitSelect;
+	class CameraPan;
+	class SelectArea;
+}
 
 //== Camera 관련 Class ==============================================================================
 
@@ -226,9 +229,9 @@ protected:
 	_3DF::WindowKey * m_pcWindow = nullptr;
 
 private:
-	OpCameraOrbitSelect * m_pcCameraOrbitSelect;
-	OpCameraPan * m_pcCameraPan;
-	OpSelectArea * m_pcSelectArea;
+	Operator::CameraOrbitSelect * m_pcCameraOrbitSelect;
+	Operator::CameraPan * m_pcCameraPan;
+	Operator::SelectArea * m_pcSelectArea;
 
 private:
 	HPoint		m_pos, m_tar;
@@ -240,8 +243,8 @@ private:
 	bool		m_bShowCollisions;
 	bool		m_bOocSelection;
 	bool		m_bDeepSelection;
-	long m_nCookieSelected;					// cookie for HSignalSelected signal subscription
-	long m_nCookieDeSelectedAll;				// cookie for HSignalDeSelectedAll signal subscription
+	long		m_nCookieSelected;					// cookie for HSignalSelected signal subscription
+	long		m_nCookieDeSelectedAll;				// cookie for HSignalDeSelectedAll signal subscription
 
 	// keys to HOOPS entities that need to be sweetened.  Should be private but public for the moment
 	HC_KEY * m_pnSweetenKeyList = nullptr;	

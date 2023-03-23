@@ -29,6 +29,8 @@
 
 #include "A3DSDKIncludes.h"
 
+#include "Dmi3dx.h"
+
 #ifdef _DEBUG
 //#	define new DEBUG_NEW
 #	define USED_LOG_MANAGER
@@ -183,7 +185,7 @@ bool _3DfImport::SetDefaultParamsLoadData(A3DRWParamsLoadData & cParamsLoadData)
 	cParamsLoadData.m_sGeneral.m_bReadActiveFilter = true;
 
 	cParamsLoadData.m_sGeneral.m_eReadingMode2D3D = kA3DRead_3D;
-	cParamsLoadData.m_sGeneral.m_eReadGeomTessMode = kA3DReadTessOnly;
+	cParamsLoadData.m_sGeneral.m_eReadGeomTessMode = kA3DReadGeomOnly;// kA3DReadTessOnly;
 	cParamsLoadData.m_sGeneral.m_eDefaultUnit = kA3DUnitUnknown;
 
 	cParamsLoadData.m_sGeneral.m_bReadFeature = false; // Allows reading of model feature tree. version 10.2
@@ -3133,6 +3135,10 @@ A3DStatus _3DfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3
 {
 	A3DEEntityType eType;
 	CHECK_A3D_RETURN(A3DEntityGetType(pcRepItem, &eType));
+	
+	LogIncreaseTabIndex(2);
+
+	Log(2, L"DrawTess3DWire: %s, %s", LogHexStr((DWORD_PTR)pTess3DWire), Dmi3dx::GetA3dEntityTypeString(eType).c_str());
 
 	switch (eType)
 	{
@@ -3147,9 +3153,31 @@ A3DStatus _3DfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3
 		break;
 */
 	}
-	
 
-	A3DStatus nStatus = A3D_SUCCESS;
+	A3DRiCurve * pcRiCurve = (A3DRiCurve *)pcRepItem;
+
+	A3DRiCurveData cRiCurveData;
+	A3D_INITIALIZE_DATA(A3DRiCurveData, cRiCurveData);
+	A3DStatus nStatus = A3DRiCurveGet(pcRiCurve, &cRiCurveData);
+
+	if (nullptr == cRiCurveData.m_pBody) {
+		A3DRiCurveGet(nullptr, &cRiCurveData);
+	}
+
+	A3DTopoSingleWireBodyData cSingleWireBodyData;
+	A3D_INITIALIZE_DATA(A3DTopoSingleWireBodyData, cSingleWireBodyData);
+	nStatus = A3DTopoSingleWireBodyGet(cRiCurveData.m_pBody, &cSingleWireBodyData);
+
+	if (nullptr != cSingleWireBodyData.m_pWireEdge) {
+		A3DTopoWireEdgeData cWireEdgeData;
+		A3D_INITIALIZE_DATA(A3DTopoWireEdgeData, cWireEdgeData);
+		nStatus = A3DTopoWireEdgeGet(cSingleWireBodyData.m_pWireEdge, &cWireEdgeData);
+
+		A3DEEntityType eEntityType = kA3DTypeUnknown;
+		CHECK_A3D_RETURN(A3DEntityGetType(cWireEdgeData.m_p3dCurve, &eEntityType));
+
+		Log(2, L"3dCurve type: %s, %s", LogHexStr((DWORD_PTR)cWireEdgeData.m_p3dCurve), Dmi3dx::GetA3dEntityTypeString(eEntityType).c_str());
+	}
 
 	SetLineStyle(pTess3DWire, cParentSegment, pcParentAttr);
 
@@ -3169,12 +3197,20 @@ A3DStatus _3DfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3
 
 	cParentSegment.InsertLine(acWirePoints.GetCount(), acWirePoints.GetData());
 
+	LogDecreaseTabIndex(2);
+
 	return nStatus;
 }
 
 A3DStatus _3DfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
 	const A3DMiscCascadedAttributes * pcParentAttr, _3DF::SegmentKey & cSegment)
 {
+	LogIncreaseTabIndex(2);
+
+	Log(2, L"DrawPolyWires: %s", LogHexStr((DWORD_PTR)pcTess3D));
+
+	LogDecreaseTabIndex(2);
+
 	A3DTess3DWireData sWireData;
 	A3D_INITIALIZE_DATA(A3DTess3DWireData, sWireData);
 	CHECK_A3D_RETURN(A3DTess3DWireGet(pcTess3D, &sWireData));

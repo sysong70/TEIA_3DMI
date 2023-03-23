@@ -13,6 +13,8 @@ public:
 	virtual _3DF::Type Type() const;
 
 	_3DF::Type ObjectType() const { return _3DF::Type::None; };
+	PrivateImpl * GetImpl() { return m_pcImpl; }
+	const PrivateImpl * GetImpl() const { return m_pcImpl; }
 
 protected:
 	friend class PrivateImpl;

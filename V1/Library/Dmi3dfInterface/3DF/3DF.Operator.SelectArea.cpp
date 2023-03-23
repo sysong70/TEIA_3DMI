@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.OpSelectArea.h"
+#include "3DF.Operator.SelectArea.h"
 
 #include "3DF.Canvas.h"
 #include "3DF.Selection.h"
@@ -15,22 +15,23 @@
 
 USING_3DF_NAMESPACE
 
-OpSelectArea::OpSelectArea(HBaseView * Canvas, int DoRepeat, int DoCapture) :
+Operator::SelectArea::SelectArea(HBaseView * Canvas, int DoRepeat, int DoCapture) :
 	HOpSelectArea(Canvas, DoRepeat, DoCapture)
 {
 
 }
-const char * OpSelectArea::GetName()
+
+const char * Operator::SelectArea::GetName()
 {
-	return "3DF_OpSelectArea";
+	return "3DF_SelectArea";
 }
 
-HBaseOperator * OpSelectArea::Clone()
+HBaseOperator * Operator::SelectArea::Clone()
 {
-	return new OpSelectArea(GetView());
+	return new SelectArea(GetView());
 }
 
-int OpSelectArea::OnLButtonDown(HEventInfo & cEvent)
+int Operator::SelectArea::OnLButtonDown(HEventInfo & cEvent)
 {
 	//Canvas * pcView = (Canvas *)GetView();
 	//pcView->SetSubentitySelectLevel();
@@ -48,19 +49,19 @@ int OpSelectArea::OnLButtonDown(HEventInfo & cEvent)
 	return HOpSelectArea::OnLButtonDown(cEvent);
 }
 
-// int OpSelectArea::OnRButtonDownAndMove(HEventInfo & cEvent)
+// int Operator::SelectArea::OnRButtonDownAndMove(HEventInfo & cEvent)
 // {
 // 	return HOpSelectArea::OnLButtonDownAndMove(cEvent);
 // }
 
-int OpSelectArea::OnLButtonUp(HEventInfo & cEvent)
+int Operator::SelectArea::OnLButtonUp(HEventInfo & cEvent)
 {
 	//return HOpSelectArea::OnLButtonUp(cEvent);
 
 	return ButtonUp(cEvent);
 }
 
-int OpSelectArea::ButtonUp(HEventInfo & cEvent)
+int Operator::SelectArea::ButtonUp(HEventInfo & cEvent)
 {
 	if (!OperatorStarted()) {
 		return HBaseOperator::OnLButtonDownAndMove(cEvent);

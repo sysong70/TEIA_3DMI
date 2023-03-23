@@ -2,6 +2,8 @@
 
 #include "3DF.Shell.h"
 
+#include "Private/3DF.KeyPrivate.h"
+
 #include "3DF.MaterialMapping.h"
 
 USING_3DF_NAMESPACE
@@ -189,15 +191,45 @@ ShellKit & ShellKit::SetMaterialMapping(MaterialMappingKit const & cInkit)
 
 
 //== ShellKey Class ================================================================================
+namespace _3DF {
+	class ShellKeyPrivate : public KeyPrivate
+	{
+	public:
+		_3DF::Type Type() const override { return _3DF::Type::ShellKey; }
 
-ShellKey::ShellKey(HC_KEY nInKey) :
-	GeometryKey(nInKey)
+		void Copy(ShellKeyPrivate * pcInThat) {
+			KeyPrivate::Copy(pcInThat);
+		}
+	};
+};
+
+ShellKey::ShellKey()
 {
 }
 
-ShellKey::ShellKey(ShellKey const & cInThat) :
-	GeometryKey(cInThat)
+ShellKey::ShellKey(Key const & cInKey)
 {
+	ShellKeyPrivate * pcImpl = new ShellKeyPrivate();
+	m_pcImpl = pcImpl;
+
+	((KeyPrivate *)pcImpl)->Copy((KeyPrivate *)(cInKey.GetImpl()));
+}
+
+ShellKey::ShellKey(ShellKey const & cInThat)
+{
+	m_pcImpl = new ShellKeyPrivate();
+	Set(cInThat);
+}
+
+void ShellKey::Set(ShellKey const & cInThat)
+{
+	if (nullptr == m_pcImpl || nullptr == cInThat.m_pcImpl) {
+		return;
+	}
+
+	ShellKeyPrivate * pcImpl = (ShellKeyPrivate *)m_pcImpl;
+	ShellKeyPrivate * pcInThatImpl = (ShellKeyPrivate *)cInThat.m_pcImpl;
+	pcImpl->Copy(pcInThatImpl);
 }
 
 ShellKey & ShellKey::operator = (ShellKey const & cInThat)

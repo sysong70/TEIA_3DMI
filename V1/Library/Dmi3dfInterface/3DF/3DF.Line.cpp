@@ -1,7 +1,14 @@
 ﻿#include "StdAfx.h"
 
 #include "3DF.Line.h"
+
 #include "3DF.Math.h"
+#include "3DF.Point.h"
+
+
+#include "Private/3DF.KeyPrivate.h"
+
+#include <HTools.h>
 
 USING_3DF_NAMESPACE
 
@@ -94,28 +101,30 @@ void LineKit::GetLinePattern(char out_pattern[PATTERN_BUFFER_SIZE]) const
 }
 
 //== LineKey =======================================================================================
-class LineKeyPrivate : public PrivateImpl
-{
-public:
-	_3DF::Type Type() const override { return _3DF::Type::LineKey; }
+namespace _3DF {
 
-	void Copy(LineKeyPrivate * pcInThat) {
-		cKey = pcInThat->cKey;
-	}
+	class LineKeyPrivate : public _3DF::KeyPrivate
+	{
+	public:
+		_3DF::Type Type() const override { return _3DF::Type::LineKey; }
 
-	Key cKey;
+		void Copy(LineKeyPrivate * pcInThat) {
+			KeyPrivate::Copy(pcInThat);
+		}
+	};
 };
 
 LineKey::LineKey()
 {
+	m_pcImpl = new LineKeyPrivate();
 }
 
 LineKey::LineKey(Key const & cInKey)
 {
 	LineKeyPrivate * pcImpl = new LineKeyPrivate();
-	pcImpl->cKey = cInKey;
-
 	m_pcImpl = pcImpl;
+
+	((KeyPrivate *)pcImpl)->Copy((KeyPrivate *)(cInKey.GetImpl()));
 }
 
 LineKey::LineKey(LineKey const & cInThat)
@@ -124,25 +133,17 @@ LineKey::LineKey(LineKey const & cInThat)
 	Set(cInThat);
 }
 
-LineKey::~LineKey()
-{
-
-}
-
-/*
-LineKey::LineKey(HC_KEY nInKey) :
-	GeometryKey(nInKey)
-{
-}*/
-
 void LineKey::Set(LineKey const & cInThat)
 {
 	if (nullptr == m_pcImpl || nullptr == cInThat.m_pcImpl) {
 		return;
 	}
 
+	SetKeyValue(cInThat.KeyValue());
+
 	LineKeyPrivate * pcImpl = (LineKeyPrivate *)m_pcImpl;
 	LineKeyPrivate * pcInThatImpl = (LineKeyPrivate *)cInThat.m_pcImpl;
+
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -150,4 +151,80 @@ LineKey & LineKey::operator=(LineKey const & cInThat)
 {
 	Set(cInThat);
 	return *this;
+}
+
+int LineKey::GetPointCount() const
+{
+	int nCount = 0;
+	HC_Show_Polyline_Count(KeyValue(), &nCount);
+
+	return nCount;
+}
+
+bool LineKey::ShowPoints(WorldPointArray & aOutPoints) const
+{
+	int nCount = 0;
+	HC_Show_Polyline_Count(KeyValue(), &nCount);
+	if (0 == nCount) {
+		return false;
+	}
+
+	Point * pcPoints = new Point[nCount];
+
+	HC_Show_Polyline(KeyValue(), &nCount, pcPoints);
+
+	aOutPoints.SetCount(nCount);
+
+	for (int nIndex = 0; nIndex < nCount; nIndex++) {
+		aOutPoints[nIndex] = pcPoints[nIndex];
+	}
+
+	delete[] pcPoints;
+
+	return true;
+}
+
+//== 계산 함수 ===================================================================================
+bool LineKey::NearPoint(WindowKey const & cInWindow, const WorldPoint & cInPoint, WorldPoint & cOutPoint) const
+{
+	WorldPointArray aPoints;
+
+	if (false == ShowPoints(aPoints)) {
+		return false;
+	}
+
+	double dDist;
+	double dMinDist = DBL_MAX;
+	
+	WorldPoint cNomalPoint;
+
+	bool bResultFlag = false;
+
+	for (INT_PTR nIndex = 0; nIndex < aPoints.GetCount() - 1; nIndex++) {
+		if (true == Math::NormalPointWithInRange(aPoints[nIndex], aPoints[nIndex + 1], cInPoint, cNomalPoint)) {
+			dDist = cInPoint.DistanceWith(cNomalPoint);
+			if (dDist < dMinDist) {
+				dMinDist = dDist;
+				cOutPoint = cNomalPoint;
+				bResultFlag = true;
+			}
+		}
+	}
+
+	return bResultFlag;
+}
+
+bool LineKey::DistanceToPoint(const WorldPoint & cInPoint, double & nOutDistance) const
+{
+/*
+	PointArray aPoints;
+
+	if (false == ShowPoints(aPoints)) {
+		return false;
+	}
+
+	MbCurve3D
+*/
+
+	return false;
 }

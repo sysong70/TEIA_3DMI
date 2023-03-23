@@ -15,7 +15,8 @@ public:
 	void Set(Key const & cInThat);
 	Key const & operator=(Key const & cInThat);
 
-	_3DF::Type ObjectType() const { return _3DF::Type::Key; };
+	static const _3DF::Type staticType = _3DF::Type::Key;
+	_3DF::Type ObjectType() const { return staticType; };
 
 	virtual void Open();
 	virtual void Open() const;

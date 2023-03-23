@@ -63,10 +63,14 @@ private:
 class API_3DF ShellKey : public GeometryKey
 {
 public:
-	ShellKey(HC_KEY nInKey = INVALID_KEY);
+	ShellKey();
+	explicit ShellKey(Key const & cInKey);
 	ShellKey(ShellKey const & cInThat);
 
-	ShellKey & operator = (ShellKey const & cInThat);
+	void Set(ShellKey const & cInThat);
+	ShellKey & operator=(ShellKey const & cInThat);
+
+	_3DF::Type ObjectType() const { return _3DF::Type::ShellKey; };
 };
 
 CLOSE_3DF_NAMESPACE

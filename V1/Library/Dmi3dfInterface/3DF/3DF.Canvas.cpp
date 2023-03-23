@@ -27,9 +27,10 @@
 #include "3DF.Visibility.h"
 #include "3DF.MaterialMapping.h"
 
-#include "3DF.OpCameraOrbitSelect.h"
-#include "3DF.OpCameraPan.h"
-#include "3DF.OpSelectArea.h"
+#include "3DF.Operator.CameraOrbitSelect.h"
+#include "3DF.Operator.CameraPan.h"
+#include "3DF.Operator.SelectArea.h"
+#include "3DF.Operator.ObjectSnap.h"
 
 #include "../Signal/Signal.h"
 
@@ -319,28 +320,28 @@ void Canvas::Init()
 	// set the selection color
 	HSelectionSet * sel_set = m_pcBaseView->GetSelection();
 	assert(sel_set);
-	HPixelRGBA sel_col;
+	HPixelRGBA cSelectColor;
 	int sel_alpha = (int)(CAppSet_SelectionColorTransparency * 2.56f);		// settings is a %, scale it to 256
-	sel_col.Set(
+	cSelectColor.Set(
 		GetRValue(CAppSet_PolygonSelectionColor),
 		GetGValue(CAppSet_PolygonSelectionColor),
 		GetBValue(CAppSet_PolygonSelectionColor),
 		(unsigned char)sel_alpha);
-	sel_set->SetSelectionFaceColor(sel_col);
+	sel_set->SetSelectionFaceColor(cSelectColor);
 
-	sel_col.Set(
+	cSelectColor.Set(
 		GetRValue(CAppSet_LineSelectionColor),
 		GetGValue(CAppSet_LineSelectionColor),
 		GetBValue(CAppSet_LineSelectionColor),
 		(unsigned char)sel_alpha);
-	sel_set->SetSelectionEdgeColor(sel_col);
+	sel_set->SetSelectionEdgeColor(cSelectColor);
 
-	sel_col.Set(
+	cSelectColor.Set(
 		GetRValue(CAppSet_MarkerSelectionColor),
 		GetGValue(CAppSet_MarkerSelectionColor),
 		GetBValue(CAppSet_MarkerSelectionColor),
 		(unsigned char)sel_alpha);
-	sel_set->SetSelectionMarkerColor(sel_col);
+	sel_set->SetSelectionMarkerColor(cSelectColor);
 
 	// set markup color and weight
 	SetMarkupColor(CAppSet_MarkupColor);
@@ -678,9 +679,14 @@ void Canvas::Init()
 
 	SetDefaultOperator();
 
-	m_pcWindow->GetSelectionOptionsControl().SetLevel(Selection::Level::Entity);
+//	m_pcWindow->GetSelectionOptionsControl().SetLevel(Selection::Level::Entity);
 	//m_pcWindowKey->GetSelectionOptionsControl().SetProximity(0.1);
 	m_pcWindow->GetSelectionOptionsControl().SetBias(Selection::Bias::Lines);// .SetBias(Selection::Bias::Markers);
+//	m_pcWindow->GetSelectionOptionsControl().SetRelatedLimit(5);
+	//m_pcWindow->GetSelectionOptionsControl().SetInternalLimit(5);
+
+	// Object Snap용 Glyph 생성
+	Operator::ObjectSnap::CreateGlyph();
 
 	// do all the setup with no updates
 	m_pcBaseView->SetSuppressUpdate(false);
@@ -1269,9 +1275,9 @@ void Canvas::SetDefaultOperator()
 // 		, new HSOpCameraPan(m_pHView),
 // 		new HSOpCameraZoom(m_pHView), 0, false))
 	
-	m_pcCameraOrbitSelect = new OpCameraOrbitSelect(m_pcWindow);
-	m_pcCameraPan = new OpCameraPan(GetBaseView());
-	m_pcSelectArea = new OpSelectArea(GetBaseView());
+	m_pcCameraOrbitSelect = new Operator::CameraOrbitSelect(m_pcWindow);
+	m_pcCameraPan = new Operator::CameraPan(GetBaseView());
+	m_pcSelectArea = new Operator::SelectArea(GetBaseView());
 
 	GetBaseView()->SetOperator(m_pcCameraOrbitSelect);
 

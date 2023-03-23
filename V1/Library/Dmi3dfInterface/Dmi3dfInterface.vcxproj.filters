@@ -120,7 +120,7 @@
     <ClInclude Include="3DF\3DF.Color.h">
       <Filter>3DF</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.OpCameraPan.h">
+    <ClInclude Include="3DF\3DF.Operator.CameraPan.h">
       <Filter>Operator</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.Database.h">
@@ -183,7 +183,7 @@
     <ClInclude Include="3DF\3DF.Include.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.OpCameraOrbitSelect.h">
+    <ClInclude Include="3DF\3DF.Operator.CameraOrbitSelect.h">
       <Filter>Operator</Filter>
     </ClInclude>
     <ClInclude Include="..\Signal\Signal.h">
@@ -192,7 +192,7 @@
     <ClInclude Include="3DF\3DF.Utility.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.OpSelectArea.h">
+    <ClInclude Include="3DF\3DF.Operator.SelectArea.h">
       <Filter>Operator</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.Facility.Preference.h">
@@ -203,6 +203,21 @@
     </ClInclude>
     <ClInclude Include="3DF\3DF.Window.h">
       <Filter>3DF\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Highlight.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Private\3DF.SelectionPrivate.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Private\3DF.KeyPrivate.h">
+      <Filter>3DF\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Operator.ObjectSnap.h">
+      <Filter>Operator</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Point.h">
+      <Filter>3DF</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -269,7 +284,7 @@
     <ClCompile Include="3DF\3DF.Color.cpp">
       <Filter>3DF</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.OpCameraPan.cpp">
+    <ClCompile Include="3DF\3DF.Operator.CameraPan.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Database.cpp">
@@ -332,7 +347,7 @@
     <ClCompile Include="3DF\3DF.Include.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.OpCameraOrbitSelect.cpp">
+    <ClCompile Include="3DF\3DF.Operator.CameraOrbitSelect.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
     <ClCompile Include="..\Signal\Signal.cpp">
@@ -341,7 +356,7 @@
     <ClCompile Include="3DF\3DF.Utility.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.OpSelectArea.cpp">
+    <ClCompile Include="3DF\3DF.Operator.SelectArea.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Facility.Preference.cpp">
@@ -352,6 +367,21 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.Window.cpp">
       <Filter>3DF\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Highlight.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Private\3DF.SelectionPrivate.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Private\3DF.KeyPrivate.cpp">
+      <Filter>3DF\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Operator.ObjectSnap.cpp">
+      <Filter>Operator</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Point.cpp">
+      <Filter>3DF</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

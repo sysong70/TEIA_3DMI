@@ -1,33 +1,13 @@
 ﻿#include "StdAfx.h"
 
 #include "3DF.Key.h"
+#include "Private/3DF.KeyPrivate.h"
+
 #include "3DF.Segment.h"
 
 #include <HTools.h>
 
 USING_3DF_NAMESPACE
-
-class KeyPrivate : public _3DF::PrivateImpl
-{
-public:
-	KeyPrivate() {}
-	~KeyPrivate() {}
-
-	HC_KEY m_nKey = INVALID_KEY;
-	HC_KEY m_nOwnerKey = INVALID_KEY;
-
-	bool m_bOpen = false;
-	bool m_bForcedOpen = false; // 개발자가 직접 Open해서 Close를 제어한다. 일반적인 Open과 Close는 적용되지 않는다.
-
-	void Copy(KeyPrivate * pcInThat)
-	{
-		m_nKey = pcInThat->m_nKey;
-		m_nOwnerKey = pcInThat->m_nOwnerKey;
-
-		m_bOpen = pcInThat->m_bOpen;
-		m_bForcedOpen = pcInThat->m_bForcedOpen;
-	}
-};
 
 Key::Key(HC_KEY nInKey)
 {
@@ -45,16 +25,6 @@ Key::Key(Key const & cInThat)
 
 Key::~Key()
 {
-/*
-	KeyPrivate * pcImpl = (KeyPrivate *)m_pcImpl;
-
-	if(true == pcImpl->m_bForcedOpen) {
-		return;
-	}
-
-	if(true == pcImpl->m_bOpen) {
-		HC_Close_Segment();
-	}*/
 }
 
 void Key::Set(Key const & cInThat)
