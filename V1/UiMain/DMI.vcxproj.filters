@@ -47,7 +47,7 @@
       <Filter>Window</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
-      <Filter>Main</Filter>
+      <Filter>_Main</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Common_Define.cpp">
       <Filter>_Common</Filter>
@@ -163,6 +163,9 @@
     <ClCompile Include="Layout.Stack.cpp">
       <Filter>Layout</Filter>
     </ClCompile>
+    <ClCompile Include="Component.InputBar.cpp">
+      <Filter>Component\View</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.Common.h">
@@ -202,13 +205,13 @@
       <Filter>_Common</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>Resource</Filter>
+      <Filter>_Resource</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\WStr.h">
       <Filter>_Common</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>Resource</Filter>
+      <Filter>_Resource</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Path.h">
       <Filter>_Common</Filter>
@@ -232,7 +235,7 @@
       <Filter>Window</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
-      <Filter>Main</Filter>
+      <Filter>_Main</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Common_Define.h">
       <Filter>_Common</Filter>
@@ -339,38 +342,41 @@
     <ClInclude Include="Layout.Stack.h">
       <Filter>Layout</Filter>
     </ClInclude>
+    <ClInclude Include="Component.InputBar.h">
+      <Filter>Component\View</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="TODO.xml">
-      <Filter>Resource</Filter>
+      <Filter>_Resource</Filter>
     </Xml>
     <Xml Include="DpiAwareness.xml">
-      <Filter>Resource</Filter>
+      <Filter>_Resource</Filter>
     </Xml>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\DMI.ico">
-      <Filter>Resource</Filter>
+      <Filter>_Resource</Filter>
     </Image>
     <Image Include="res\DMIDoc.ico">
-      <Filter>Resource</Filter>
+      <Filter>_Resource</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="RES\UI.json">
-      <Filter>Resource</Filter>
+      <Filter>_Resource</Filter>
     </None>
     <None Include="RES\FileOptions.json">
-      <Filter>Resource</Filter>
+      <Filter>_Resource</Filter>
     </None>
     <None Include="RES\DMI_ENU.rc2">
-      <Filter>Resource</Filter>
+      <Filter>_Resource</Filter>
     </None>
     <None Include="RES\DMI_KOR.rc2">
-      <Filter>Resource</Filter>
+      <Filter>_Resource</Filter>
     </None>
     <None Include="RES\DMI.rc2">
-      <Filter>Resource</Filter>
+      <Filter>_Resource</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -413,22 +419,25 @@
     <Filter Include="_Common">
       <UniqueIdentifier>{fb2d04f0-eb3c-414a-af01-e993443a5070}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Main">
-      <UniqueIdentifier>{5626235d-04b2-48ff-aa6a-b189a3f69c04}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource">
-      <UniqueIdentifier>{c42b87a4-4dc7-4b9a-9df2-192721ac7010}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Component\Panel">
       <UniqueIdentifier>{17e426a6-77e8-4a55-a4e4-86e17ed068a0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Layout">
       <UniqueIdentifier>{dcd9ed46-81ef-4f39-81e3-b0e41b745e1c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="_Main">
+      <UniqueIdentifier>{5626235d-04b2-48ff-aa6a-b189a3f69c04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Resource">
+      <UniqueIdentifier>{c42b87a4-4dc7-4b9a-9df2-192721ac7010}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\View">
+      <UniqueIdentifier>{02e349aa-e87e-4b99-9609-75debd2ed290}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DMI.rc">
-      <Filter>Resource</Filter>
+      <Filter>_Resource</Filter>
     </ResourceCompile>
   </ItemGroup>
 </Project>

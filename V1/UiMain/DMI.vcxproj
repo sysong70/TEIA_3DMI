@@ -200,6 +200,7 @@
     <ClInclude Include="Dialog.h" />
     <ClInclude Include="Dialog.ProgressLog.h" />
     <ClInclude Include="Dialog.Standard.h" />
+    <ClInclude Include="Component.InputBar.h" />
     <ClInclude Include="Layout.Base.h" />
     <ClInclude Include="Layout.h" />
     <ClInclude Include="Layout.ControlWrapper.h" />
@@ -258,6 +259,7 @@
     <ClCompile Include="Dialog.Base.cpp" />
     <ClCompile Include="Dialog.ProgressLog.cpp" />
     <ClCompile Include="Dialog.Standard.cpp" />
+    <ClCompile Include="Component.InputBar.cpp" />
     <ClCompile Include="Layout.Base.cpp" />
     <ClCompile Include="Layout.cpp" />
     <ClCompile Include="Layout.ControlWrapper.cpp" />

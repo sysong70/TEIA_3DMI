@@ -10,8 +10,9 @@ static char THIS_FILE[] = __FILE__;
 
 
 
-Layout::ControlWrapper::ControlWrapper()
+Layout::ControlWrapper::ControlWrapper(CWnd* pValue, EContent type)
 {
+	Content(pValue, type);
 }
 
 
@@ -25,6 +26,152 @@ Layout::ControlWrapper::~ControlWrapper()
 
 
 
+void Layout::ControlWrapper::HorizontalAlignment(EHorizontalAlignment value)
+{
+	m_eHorizontalAlignment = value;
+}
+
+Layout::EHorizontalAlignment Layout::ControlWrapper::HorizontalAlignment()
+{
+	return m_eHorizontalAlignment;
+}
+
+
+
+void Layout::ControlWrapper::HorizontalContentAlignment(EHorizontalAlignment value)
+{
+	m_eHorizontalContentAlignment = value;
+}
+
+Layout::EHorizontalAlignment Layout::ControlWrapper::HorizontalContentAlignment()
+{
+	return m_eHorizontalContentAlignment;
+}
+
+
+
+void Layout::ControlWrapper::VerticalAlignment(EVerticalAlignment value)
+{
+	m_eVerticalAlignment = value;
+}
+
+Layout::EVerticalAlignment Layout::ControlWrapper::VerticalAlignment()
+{
+	return m_eVerticalAlignment;
+}
+
+
+
+void Layout::ControlWrapper::VerticalContentAlignment(EVerticalAlignment value)
+{
+	m_eVerticalContentAlignment = value;
+}
+
+Layout::EVerticalAlignment Layout::ControlWrapper::VerticalContentAlignment()
+{
+	return m_eVerticalContentAlignment;
+}
+
+
+
+void Layout::ControlWrapper::Alignment(EHorizontalAlignment h, EVerticalAlignment v)
+{
+	m_eHorizontalAlignment = h;
+	m_eVerticalAlignment = v;
+}
+
+
+
+void Layout::ControlWrapper::ContentAlignment(EHorizontalAlignment h, EVerticalAlignment v)
+{
+	m_eHorizontalContentAlignment = h;
+	m_eVerticalContentAlignment = v;
+}
+
+
+
+int Layout::ControlWrapper::CalculateWidth(EBoxModel box)
+{
+	int cx = m_size.cx;
+
+	if (cx == 0) {
+		CRect rect;
+		m_pContent->GetClientRect(rect);
+		cx = rect.Width();
+
+		if (box > EBoxModel::Content) cx += m_padding.left + m_padding.right;
+		if (box > EBoxModel::Padding) cx += m_border.left + m_border.right;
+		if (box > EBoxModel::Border) cx += m_margin.left + m_margin.right;
+	}
+	else {
+		cx += m_margin.left + m_margin.right;
+
+		if (box < EBoxModel::Margin) cx -= m_margin.left + m_margin.right;
+		if (box < EBoxModel::Border) cx -= m_border.left + m_border.right;
+		if (box < EBoxModel::Padding) cx -= m_padding.left + m_padding.right;
+	}
+
+	return cx;
+}
+
+
+
+int Layout::ControlWrapper::CalculateHeight(EBoxModel box)
+{
+	int cy = m_size.cy;
+
+	if (cy == 0) {
+		CRect rect;
+		m_pContent->GetClientRect(rect);
+		cy = rect.Height();
+
+		if (box > EBoxModel::Content) cy += m_padding.top + m_padding.bottom;
+		if (box > EBoxModel::Padding) cy += m_border.top + m_border.bottom;
+		if (box > EBoxModel::Border) cy += m_margin.top + m_margin.bottom;
+	}
+	else {
+		cy += m_margin.top + m_margin.bottom;
+
+		if (box < EBoxModel::Margin) cy -= m_margin.top + m_margin.bottom;
+		if (box < EBoxModel::Border) cy -= m_border.top + m_border.bottom;
+		if (box < EBoxModel::Padding) cy -= m_padding.top + m_padding.bottom;
+	}
+
+	return 0;
+}
+
+
+
+void Layout::ControlWrapper::Update()
+{
+	CRect boundary;
+	m_pContent->GetClientRect(boundary);
+	boundary.DeflateRect(m_border);
+	boundary.DeflateRect(m_padding);
+
+	CPoint offset = boundary.TopLeft();
+	CSize size = CalculateSize(EBoxModel::Content);
+	CRect content = { offset, size };
+
+	switch (HorizontalContentAlignment()) {
+	case EHorizontalAlignment::Center: offset.x = boundary.CenterPoint().x  - size.cx / 2; break;
+	case EHorizontalAlignment::Right: offset.x = boundary.right - content.Size().cx; break;
+	case EHorizontalAlignment::Stretch: size.cx = boundary.Size().cx; break;
+	default: break;
+	}
+
+	switch (VerticalContentAlignment()) {
+	case EVerticalAlignment::Center: offset.y = boundary.CenterPoint().y - size.cy / 2; break;
+	case EVerticalAlignment::Bottom: offset.y = boundary.bottom - content.Size().cy; break;
+	case EVerticalAlignment::Stretch: size.cy = boundary.Size().cy; break;
+	default: break;
+	}
+
+	m_pContent->SetWindowPos(nullptr, offset.x, offset.y, size.cx, size.cy, SWP_NOZORDER | SWP_NOREDRAW);
+}
+
+
+
 void Layout::ControlWrapper::Content(CWnd* pValue, EContent type)
 {
 	m_pContent = pValue;
@@ -32,10 +179,14 @@ void Layout::ControlWrapper::Content(CWnd* pValue, EContent type)
 
 	switch (type) {
 	case EContent::Button:
-		Style(L"Button");
+		Style("Button");
 		break;
 
+	case EContent::Label:
+		Style("Label");
+
 	default:
+		DEBUG_STOP;
 		break;
 	}
 }

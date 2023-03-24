@@ -6,6 +6,7 @@
 
 namespace Component
 {
+	class InputBar;
 	class LayerPanel;
 	class ModelPanel;
 	class PanelBar;

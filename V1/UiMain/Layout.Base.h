@@ -22,19 +22,22 @@ namespace Layout
 
 		virtual void Parent(Base* pValue);
 
-		virtual void Style(CString name);
+		virtual void Style(CStringA name);
 
-		virtual void HorizontalAlignment(EHorizontalAlignment value);
+		virtual void HorizontalAlignment(EHorizontalAlignment value) IMPLEMENT();
+		virtual EHorizontalAlignment HorizontalAlignment() IMPLEMENT(EHorizontalAlignment::Stretch);
 
-		virtual void HorizontalContentAlignment(EHorizontalAlignment value);
+		virtual void HorizontalContentAlignment(EHorizontalAlignment value) IMPLEMENT();
+		virtual EHorizontalAlignment HorizontalContentAlignment() IMPLEMENT(EHorizontalAlignment::Stretch);
 
-		virtual void VerticalAlignment(EVerticalAlignment value);
+		virtual void VerticalAlignment(EVerticalAlignment value) IMPLEMENT();
+		virtual EVerticalAlignment VerticalAlignment() IMPLEMENT(EVerticalAlignment::Stretch);
 
-		virtual void VerticalContentAlignment(EVerticalAlignment value);
+		virtual void VerticalContentAlignment(EVerticalAlignment value) IMPLEMENT();
+		virtual EVerticalAlignment VerticalContentAlignment() IMPLEMENT(EVerticalAlignment::Stretch);
 
-		virtual void Alignment(EHorizontalAlignment h, EVerticalAlignment v);
-
-		virtual void ContentAlignment(EHorizontalAlignment h, EVerticalAlignment v);
+		virtual void Alignment(EHorizontalAlignment h, EVerticalAlignment v) IMPLEMENT();
+		virtual void ContentAlignment(EHorizontalAlignment h, EVerticalAlignment v) IMPLEMENT();
 
 		virtual void Visibility(EVisibility value) IMPLEMENT();
 
@@ -45,10 +48,9 @@ namespace Layout
 		virtual void Size(int cx, int cy);
 		virtual void Size(CSize value);
 
-		virtual int CalculateWidth() IMPLEMENT(0);
-		virtual int CalculateHeight() IMPLEMENT(0);
-		virtual CSize CalculateSize();
-		virtual CRect CalculateRect(EBoxModel type) IMPLEMENT(0);
+		virtual int CalculateWidth(EBoxModel box = EBoxModel::Margin) IMPLEMENT(0);
+		virtual int CalculateHeight(EBoxModel box = EBoxModel::Margin) IMPLEMENT(0);
+		virtual CSize CalculateSize(EBoxModel box = EBoxModel::Margin);
 
 		virtual void Thickness(int value, EBoxModel type);
 		virtual void Thickness(int horizontal, int vertical, EBoxModel type);
@@ -56,12 +58,7 @@ namespace Layout
 		virtual void Thickness(CRect value, EBoxModel type);
 		virtual CRect Thickness(EBoxModel type);
 
-		virtual void Update(CRect parent) IMPLEMENT();
-		virtual void AdjustChildren() IMPLEMENT();
-		virtual void AdjustParent() IMPLEMENT();
-
-		virtual void Add(Base* pValue) IMPLEMENT();
-		virtual void Remove(Base* pValue) IMPLEMENT();
+		virtual void Update() IMPLEMENT();
 
 	protected:
 
@@ -84,22 +81,23 @@ namespace Layout
 	protected:
 
 		Base* m_pParent = nullptr;
-		CString m_styleName;
-
-		EHorizontalAlignment m_eHorizontalAlignment = EHorizontalAlignment::Stretch;
-		EVerticalAlignment m_eVerticalAlignment = EVerticalAlignment::Stretch;
-		EHorizontalAlignment m_eHorizontalContentAlignment = EHorizontalAlignment::Stretch;
-		EVerticalAlignment m_eVerticalContentAlignment = EVerticalAlignment::Stretch;
 
 		EVisibility m_eVisibility = EVisibility::Visible;
 
 		Control::EColor m_borderColor = Control::EColor::Transparent;
 		Control::EColor m_backColor = Control::EColor::Transparent;
 
-		CSize m_size; // Content + Padding + Border
+		CSize m_size; // Window size - Content + Padding + Border
 		CRect m_padding; // Thickness
 		CRect m_border; // Thickness
 		CRect m_margin; // Thickness
+
+	private:
+
+		EHorizontalAlignment m_eHorizontalAlignment = EHorizontalAlignment::Stretch;
+		EVerticalAlignment m_eVerticalAlignment = EVerticalAlignment::Stretch;
+		EHorizontalAlignment m_eHorizontalContentAlignment = EHorizontalAlignment::Stretch;
+		EVerticalAlignment m_eVerticalContentAlignment = EVerticalAlignment::Stretch;
 
 	protected:
 

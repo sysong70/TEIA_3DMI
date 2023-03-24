@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Window.h"
+#include "Component.InputBar.h"
 #include "Component.LayerPanel.h"
 #include "Component.ModelPanel.h"
 #include "Component.PanelBar.h"
@@ -68,6 +69,8 @@ namespace Window
 
 		afx_msg void OnContextMenu(CWnd*, CPoint point);
 
+		afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+
 		afx_msg void OnPaint();
 
 		afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
@@ -133,12 +136,18 @@ namespace Window
 
 		virtual void CreatePanelTabs();
 
-	protected:
+	protected: // TaskBar
 
 		Component::TaskBar m_taskBar;
 
 		void CreateTaskBar();
 
 		void ShowTaskBar(bool show = true);
-	};
+
+	protected: // InputBar
+
+		Component::InputBar m_inputBar;
+
+		void ShowInputBar(bool show = true);
+};
 }

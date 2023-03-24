@@ -38,7 +38,7 @@ void Layout::Base::Parent(Base* pValue)
 
 
 
-void Layout::Base::Style(CString name)
+void Layout::Base::Style(CStringA name)
 {
 	auto AssignThickness = [](Json::Object& style, CStringA name, CRect& thickness, bool scale = true) {
 		if (style.FindValue(name) == false) {
@@ -58,10 +58,10 @@ void Layout::Base::Style(CString name)
 		}
 	};
 
-	if (TheAppResources.GetStyles().FindValue((CStringA)name) == false) {
+	if (TheAppResources.GetStyles().FindValue(name) == false) {
 		return;
 	}
-	Json::Object& style = TheAppResources.GetStyles().GetAt((CStringA)name);
+	Json::Object& style = TheAppResources.GetStyles().GetAt(name);
 
 	if (style.FindValue("size")) {
 		Json::Array& size = style.GetArray("size");
@@ -82,50 +82,6 @@ void Layout::Base::Style(CString name)
 	m_borderColor = (Control::EColor)style.GetInteger("borderColor", (int)m_borderColor);
 	m_backColor = (Control::EColor)style.GetInteger("backColor", (int)m_backColor);
 
-}
-
-
-
-void Layout::Base::HorizontalAlignment(EHorizontalAlignment value)
-{
-	m_eHorizontalAlignment = value;
-}
-
-
-
-void Layout::Base::HorizontalContentAlignment(EHorizontalAlignment value)
-{
-	m_eHorizontalContentAlignment = value;
-}
-
-
-
-void Layout::Base::VerticalAlignment(EVerticalAlignment value)
-{
-	m_eVerticalAlignment = value;
-}
-
-
-
-void Layout::Base::VerticalContentAlignment(EVerticalAlignment value)
-{
-	m_eVerticalContentAlignment = value;
-}
-
-
-
-void Layout::Base::Alignment(EHorizontalAlignment h, EVerticalAlignment v)
-{
-	m_eHorizontalAlignment = h;
-	m_eVerticalAlignment = v;
-}
-
-
-
-void Layout::Base::ContentAlignment(EHorizontalAlignment h, EVerticalAlignment v)
-{
-	m_eHorizontalContentAlignment = h;
-	m_eVerticalContentAlignment = v;
 }
 
 
@@ -159,9 +115,9 @@ void Layout::Base::Size(CSize value)
 
 
 
-CSize Layout::Base::CalculateSize()
+CSize Layout::Base::CalculateSize(EBoxModel box)
 {
-	return { CalculateWidth(), CalculateHeight() };
+	return { CalculateWidth(box), CalculateHeight(box) };
 }
 
 

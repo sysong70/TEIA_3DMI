@@ -149,10 +149,13 @@ void Window::View::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	switch (nChar) {
 	case VK_ESCAPE:
 		m_delivery.view.OnCancel();
+		ShowInputBar(false);
 		return;
 
-	case VK_RETURN:
 	default:
+		if (m_inputBar.IsVisible()) {
+			m_inputBar.OnChar(nChar, nRepCnt, nFlags);
+		}
 		break;
 	}
 
@@ -172,6 +175,22 @@ void Window::View::OnContextMenu(CWnd*, CPoint point)
 
 
 
+void Window::View::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	switch (nChar) {
+	case VK_F1:
+		ShowInputBar();
+		return;
+
+	default:
+		break;
+	}
+
+	CView::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+
+
 void Window::View::OnPaint()
 {
 	//:WARNING - do not remove! call CPaintDC or CWindow::View::OnPaint() 
@@ -180,6 +199,7 @@ void Window::View::OnPaint()
 
 	if (m_bRenderer) {
 		m_delivery.view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
+		TRACE(L"OnPaint\n");
 	}
 	else {
 		dc.FillSolidRect(rect, (COLORREF)Control::EColor::Charcoal);
@@ -258,6 +278,10 @@ int Window::View::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message
 void Window::View::OnMouseMove(UINT nFlags, CPoint point)
 {
 	if (IsValid()) {
+		if (m_inputBar.IsVisible()) {
+			m_inputBar.OnMouseMove(nFlags, point);
+		}
+
 		m_delivery.view.OnMouseMove(nFlags, point.x, point.y);
 	}
 
@@ -424,6 +448,27 @@ void Window::View::ShowTaskBar(bool show)
 	}
 	else {
 		m_taskBar.ShowWindow(SW_HIDE);
+	}
+}
+
+
+
+void Window::View::ShowInputBar(bool show)
+{
+	if (show) {
+		if (m_inputBar.IsVisible() == false) {
+			m_inputBar.Initialize(this);
+		}
+
+		CPoint point;
+		GetCursorPos(&point);
+		ScreenToClient(&point);
+
+		m_inputBar.OnMouseMove(0, point);
+		m_inputBar.ShowWindow(SW_SHOW);
+	}
+	else {
+		m_inputBar.ShowWindow(SW_HIDE);
 	}
 }
 

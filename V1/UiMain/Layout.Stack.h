@@ -17,23 +17,44 @@ namespace Layout
 			Vertical,
 		};
 
+		enum class EFlow
+		{
+			LeftToRight,
+			RightToLeft,
+			TopToBottom,
+			BottomToTop,
+		};
+
 		Stack();
 
 		virtual ~Stack();
 
-		int CalculateWidth() override;
+		void HorizontalAlignment(EHorizontalAlignment value) override;
+		EHorizontalAlignment HorizontalAlignment() override;
 
-		int CalculateHeight() override;
+		void VerticalAlignment(EVerticalAlignment value) override;
+		EVerticalAlignment VerticalAlignment() override;
 
-		void Update(CRect parent) override;
+		int CalculateWidth(EBoxModel box = EBoxModel::Margin) override;
+
+		int CalculateHeight(EBoxModel box = EBoxModel::Margin) override;
+
+		void Update() override;
 
 	public:
 
+		void AddChild(Base* pValue);
+
+		void RemoveChild(Base* pValue);
+
 		void Orientation(EOrientation value);
+
+		void Flow(EFlow value);
 
 	protected:
 
 		EOrientation m_eOrientation = EOrientation::Horizontal;
+		EFlow m_eFlow = EFlow::LeftToRight;
 		Bases m_children;
 	};
 }

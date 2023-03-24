@@ -78,7 +78,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(TargetProd)HpsInterface.lib;$(TargetProd)3dfInterface.lib;$(TargetProd)C3dInterface.lib;$(TargetProd)3dxInterface.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(TargetProd)3dfInterface.lib;$(TargetProd)C3dInterface.lib;$(TargetProd)3dxInterface.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(DmiOutDir)</AdditionalLibraryDirectories>
       <ImportLibrary>$(DmiOutDir)\$(TargetName).lib</ImportLibrary>
       <ProgramDatabaseFile>$(DmiSymbolsDir)\$(TargetName).pdb</ProgramDatabaseFile>
@@ -105,7 +105,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(TargetProd)HpsInterface.lib;$(TargetProd)3dfInterface.lib;$(TargetProd)3dxInterface.lib;$(TargetProd)C3dInterface.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(TargetProd)3dfInterface.lib;$(TargetProd)3dxInterface.lib;$(TargetProd)C3dInterface.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(DmiOutDir)</AdditionalLibraryDirectories>
       <ImportLibrary>$(DmiOutDir)\$(TargetName).lib</ImportLibrary>
       <ProgramDatabaseFile>$(DmiSymbolsDir)\$(TargetName).pdb</ProgramDatabaseFile>
