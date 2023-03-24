@@ -223,10 +223,15 @@ protected:
 	//== 운영 변수 ===================================================================================
 public:
 	HBaseView * GetBaseView() { return m_pcBaseView; }
+	
+	int ViewId() { return m_nViewId; }
+	void SetViewId(int nViewId);
 
 protected:
 	HBaseView * m_pcBaseView = nullptr;
 	_3DF::WindowKey * m_pcWindow = nullptr;
+
+	int m_nViewId = -1;
 
 private:
 	Operator::CameraOrbitSelect * m_pcCameraOrbitSelect;

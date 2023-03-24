@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 
-#include "3DFSignal.Manager.h"
+#include "3DF.Signal.Manager.h"
 
-#include "3DFSignal.ApplicationManager.h"
+#include "3DF.Signal.ApplicationManager.h"
 
 #include "../Signal/Signal.h"
 #include <Common_Define.h>
@@ -10,7 +10,7 @@
 using namespace std;
 using namespace std::chrono;
 
-USING_3DF_SIGNAL_NAMESPACE
+USING_3DF_NAMESPACE
 
 Manager::Manager(Interface * pc3dfInterface) :
 	m_pc3dfInterface(pc3dfInterface)

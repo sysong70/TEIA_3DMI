@@ -1,10 +1,10 @@
 ﻿#include "stdafx.h"
-#include "3DFSignal.ViewManager.h"
+#include "3DF.Signal.ViewManager.h"
 
-#include "3DFSignal.Interface.h"
-#include "3DFSignal.Manager.h"
+#include "3DF.Signal.Interface.h"
+#include "3DF.Signal.Manager.h"
+#include "3DF.Signal.Connector.h"
 
-#include "../Signal/Signal.h"
 #include <Common_Define.h>
 #include <Path.h>
 
@@ -24,7 +24,6 @@
 using namespace std::chrono;
 
 USING_3DF_NAMESPACE
-USING_3DF_SIGNAL_NAMESPACE
 
 //== 전달 받은 명령어 분기 =============================================================================
 
@@ -95,13 +94,15 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	Facility::Preference cPreference;
 
+	// HBaseView 관련 사항을 구성하는 부분
 	_3DF::Canvas * pcCanvas = new _3DF::Canvas(m_pcHoopsModel, reinterpret_cast<void *>(hWnd));
 
 	if(nullptr == pcCanvas) {
 		DEBUG_RETURN;
 	}
 
-	Wrapper().m_mpcHoopsView[nViewId] = pcCanvas;
+	Wrapper().m_mpcCanvas[nViewId] = pcCanvas;
+	pcCanvas->SetViewId(nViewId);
 
 	pcCanvas->Init();
 
@@ -115,17 +116,14 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	//cModelSegmentKey.ForcedOpen();
 
-	Signal::Delivery cDelivery;
-	cDelivery.ViewId = nViewId;
-	cDelivery.SetSender(Wrapper().m_pc3dfInterface->GetSignalCallback());
 	
 	// Progress dialog 나타내기
-	cDelivery.mainFrame.ShowProgress();
+	Connector::GetInstance(nViewId).mainFrame.ShowProgress();
 
 	system_clock::time_point cTime1 = system_clock::now();
-
-	cDelivery.progress.SetMessage(strFilePathName);
-	cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/3 : Import and Tessellation");
+	
+	Connector::GetInstance(nViewId).progress.SetMessage(strFilePathName);
+	Connector::GetInstance(nViewId).progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/3 : Import and Tessellation");
 
 	pcCanvas->GetBaseView()->SetSuppressUpdate(true);
 	pcCanvas->GetBaseView()->SetSuppressUpdateTick(true);
@@ -153,7 +151,7 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 		cViewKey.Close();
 
 		DLL::_3DF::Interface cInterfaace;
-		cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, cDelivery, strErrorMessage);
+		cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, Connector::GetInstance(nViewId), strErrorMessage);
 	}
 	else {
 		LoadPointCloudFile(strFilePathName, pcCanvas);
@@ -161,8 +159,7 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	system_clock::time_point cTime2 = system_clock::now();
 
-	cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 3/3 : Performing Initial Update");
-
+	Connector::GetInstance(nViewId).progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 3/3 : Performing Initial Update");
 
 	//cModelSegmentKey.ForcedClose();
 
@@ -237,27 +234,29 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	CString strMessage;
 	strMessage.Format(L"Stage 3/3 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec1));
-	cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+	Connector::GetInstance(nViewId).progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
 
 	auto cMilliSec2 = duration_cast<milliseconds>(cTime3 - cTime1);
 	strMessage;
 	strMessage.Format(L"Total Load Time : [%s]", Utility::GetTimeSpanString(cMilliSec2));
-	cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+	Connector::GetInstance(nViewId).progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
 
-	cDelivery.mainFrame.HideProgress();
+	Connector::GetInstance(nViewId).mainFrame.HideProgress();
 
-	cDelivery.view.SetValidation();
+	Connector::GetInstance(nViewId).view.SetValidation();
+
+	
 }
 
 void ViewManager::Destruct(int nViewId)
 {
-	Canvas * pcHoopsView = Wrapper().m_mpcHoopsView[nViewId];
+	Canvas * pcHoopsView = Wrapper().m_mpcCanvas[nViewId];
 	if(nullptr != pcHoopsView) {
 
 		Model * pcModel = (Model *) pcHoopsView->GetBaseView()->GetModel();
 
 		delete pcHoopsView;
-		Wrapper().m_mpcHoopsView[nViewId] = nullptr;
+		Wrapper().m_mpcCanvas[nViewId] = nullptr;
 
 		if(nullptr != pcModel) {
 			delete pcModel;
@@ -267,7 +266,7 @@ void ViewManager::Destruct(int nViewId)
 
 void ViewManager::Paint(int nViewId, Json::Object & cInObject)
 {
-	_3DF::Canvas * pcView = Wrapper().m_mpcHoopsView[nViewId];
+	_3DF::Canvas * pcView = Wrapper().m_mpcCanvas[nViewId];
 	if(nullptr == pcView) {
 		DEBUG_RETURN;
 	}
@@ -294,7 +293,7 @@ void ViewManager::Paint(int nViewId, Json::Object & cInObject)
 
 void ViewManager::Resize(int nViewId, int x, int y)
 {
-	_3DF::Canvas * pcView = Wrapper().m_mpcHoopsView[nViewId];
+	_3DF::Canvas * pcView = Wrapper().m_mpcCanvas[nViewId];
 	assert(pcView);
 
 	pcView->GetBaseView()->SetXYSizeOverride(x, y);
@@ -306,7 +305,7 @@ void ViewManager::Resize(int nViewId, int x, int y)
 // 명령어 취소 함수, Select된 Object도 취소됨.
 void ViewManager::CancelCommands(int nViewId)
 {
-	_3DF::Canvas * pcView = Wrapper().m_mpcHoopsView[nViewId];
+	_3DF::Canvas * pcView = Wrapper().m_mpcCanvas[nViewId];
 	pcView->CancelCommands();
 }
 
@@ -315,7 +314,7 @@ void ViewManager::CancelCommands(int nViewId)
 // 1. Action Signal 처리 함수
 bool ViewManager::ExecuteMouseSignal(int nViewId, int nAction, Json::Object & cInObject)
 {
-	_3DF::Canvas * pcView = Wrapper().m_mpcHoopsView[nViewId];
+	_3DF::Canvas * pcView = Wrapper().m_mpcCanvas[nViewId];
 
 	int nFlag = cInObject.GetInteger(SKW_FLAG);
 	int x = cInObject.GetInteger(SKW_X);

@@ -15,10 +15,13 @@ public:
 	void Copy(WindowKeyPrivate * pcInThat)
 	{
 		m_pcBaseView = pcInThat->m_pcBaseView;
+		m_nViewId = pcInThat->m_nViewId;
 	}
 
 	HBaseView * GetBaseView() { return (HBaseView *)m_pcBaseView; }
 	const HBaseView * m_pcBaseView = nullptr;
+
+	int m_nViewId = -1;
 };
 
 WindowKey::WindowKey(HBaseView * pcBaseView)
@@ -60,6 +63,24 @@ const HC_KEY WindowKey::GetSceneKey() const
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return pcImpl->GetBaseView()->GetSceneKey();
+}
+
+int WindowKey::ViewId()
+{
+	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	return pcImpl->m_nViewId;
+}
+
+const int WindowKey::ViewId() const
+{ 
+	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	return pcImpl->m_nViewId;
+}
+
+void WindowKey::SetViewId(int nViewId) 
+{ 
+	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	pcImpl->m_nViewId = nViewId;
 }
 
 void WindowKey::Initialize()

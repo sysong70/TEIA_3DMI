@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "../Dmi3dfInterface/3DFSignal.Interface.h"
+#include "../Dmi3dfInterface/3DF.Signal.Interface.h"
 #include "../Dmi3dxInterface/3DXSignal.Interface.h"
 #include "../DmiC3dInterface/DmiC3dInterface.h"
 
@@ -21,7 +21,7 @@ public:
 	DmiSignalCallback GetSignalCallback() { return m_lpfnSignalCallback; }
 
 private:
-	_3DFSignal::Interface m_3DF_Interface;
+	_3DF::Interface m_3DF_Interface;
 
 	//Dmi3dxInterface m_c3dxInterface;
 

@@ -20,6 +20,10 @@ public:
 	HC_KEY GetSceneKey();
 	const HC_KEY GetSceneKey() const;
 
+	int ViewId();
+	const int ViewId() const;
+	void SetViewId(int nViewId);
+
 	int OnMouseMove(HEventInfo & cEvent);
 
 	// Returns a control that allows the user to manipulate and query details of the selection options on this window.

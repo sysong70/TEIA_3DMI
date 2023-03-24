@@ -72,13 +72,13 @@
     <ClInclude Include="..\Common\WStr.h">
       <Filter>_Common</Filter>
     </ClInclude>
-    <ClInclude Include="3DFSignal.Manager.h">
+    <ClInclude Include="3DF.Signal.Manager.h">
       <Filter>Signal</Filter>
     </ClInclude>
-    <ClInclude Include="3DFSignal.ApplicationManager.h">
+    <ClInclude Include="3DF.Signal.ApplicationManager.h">
       <Filter>Signal</Filter>
     </ClInclude>
-    <ClInclude Include="3DFSignal.ViewManager.h">
+    <ClInclude Include="3DF.Signal.ViewManager.h">
       <Filter>Signal</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.Canvas.h">
@@ -87,10 +87,10 @@
     <ClInclude Include="3DF\3DF.Model.h">
       <Filter>3DF\Base</Filter>
     </ClInclude>
-    <ClInclude Include="3DFSignal.h">
+    <ClInclude Include="3DF.Signal.h">
       <Filter>Signal</Filter>
     </ClInclude>
-    <ClInclude Include="3DFSignal.Interface.h">
+    <ClInclude Include="3DF.Signal.Interface.h">
       <Filter>Signal</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.Selectability.h">
@@ -219,6 +219,9 @@
     <ClInclude Include="3DF\3DF.Point.h">
       <Filter>3DF</Filter>
     </ClInclude>
+    <ClInclude Include="3DF.Signal.Connector.h">
+      <Filter>Signal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -245,13 +248,13 @@
     <ClCompile Include="..\Common\WStr.cpp">
       <Filter>_Common</Filter>
     </ClCompile>
-    <ClCompile Include="3DFSignal.Manager.cpp">
+    <ClCompile Include="3DF.Signal.Manager.cpp">
       <Filter>Signal</Filter>
     </ClCompile>
-    <ClCompile Include="3DFSignal.ApplicationManager.cpp">
+    <ClCompile Include="3DF.Signal.ApplicationManager.cpp">
       <Filter>Signal</Filter>
     </ClCompile>
-    <ClCompile Include="3DFSignal.ViewManager.cpp">
+    <ClCompile Include="3DF.Signal.ViewManager.cpp">
       <Filter>Signal</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Canvas.cpp">
@@ -260,7 +263,7 @@
     <ClCompile Include="3DF\3DF.Model.cpp">
       <Filter>3DF\Base</Filter>
     </ClCompile>
-    <ClCompile Include="3DFSignal.Interface.cpp">
+    <ClCompile Include="3DF.Signal.Interface.cpp">
       <Filter>Signal</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Selectability.cpp">
@@ -382,6 +385,9 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.Point.cpp">
       <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF.Signal.Connector.cpp">
+      <Filter>Signal</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -5,11 +5,13 @@
 #include <map>
 #include <chrono>
 
-#include "3DFSignal.h"
+#include "3DF.Signal.h"
+
+#include "../Signal/Signal.h"
 
 class HDB;
 
-OPEN_3DF_SIGNAL_NAMESPACE
+OPEN_3DF_NAMESPACE
 
 class ApplicationManager
 {
@@ -23,10 +25,11 @@ protected:
 	void ExitInstance();
 
 private: 
-	Manager * m_pcWrapper = nullptr; 
+	// m_pcWrapper 변수는 Manager가 선언되면서 붙여줌.
+	Manager * m_pcWrapper = nullptr;
 	Manager & Wrapper() { return *m_pcWrapper; }
 
 	CString GetExecuteDirectory();
 };
 
-CLOSE_3DF_SIGNAL_NAMESPACE
+CLOSE_3DF_NAMESPACE

@@ -5,12 +5,13 @@
 #include <map>
 #include <chrono>
 
-#include "3DFSignal.h"
+#include "3DF.Signal.h"
 
-#include "3DFSignal.ApplicationManager.h"
-#include "3DFSignal.ViewManager.h"
+#include "3DF.Signal.Interface.h"
+#include "3DF.Signal.ApplicationManager.h"
+#include "3DF.Signal.ViewManager.h"
 
-OPEN_3DF_SIGNAL_NAMESPACE
+OPEN_3DF_NAMESPACE
 
 class Manager
 {
@@ -23,6 +24,8 @@ public:
 
 	void ExecuteSignal(Json::Object & cInObject);
 
+	Interface * GetInterface() { return m_pc3dfInterface; }
+
 protected:
 	ViewManager m_cViewManager;
 	ApplicationManager m_cApplicationManager;
@@ -33,7 +36,9 @@ private:
 	// Pointer to the HOOPS/MVO HDB object associated with this instance of the application
 	HDB * m_pcHoopsDB = nullptr;
 
-	std::map<int, _3DF::Canvas *> m_mpcHoopsView;
+	std::map<int, _3DF::Canvas *> m_mpcCanvas;
 };
 
-CLOSE_3DF_SIGNAL_NAMESPACE
+CLOSE_3DF_NAMESPACE
+
+extern _3DF::Manager theManager;

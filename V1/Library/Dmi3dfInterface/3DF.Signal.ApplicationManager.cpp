@@ -1,17 +1,22 @@
 ﻿#include "stdafx.h"
-#include "3DFSignal.ApplicationManager.h"
+
+#include "3DF.Signal.ApplicationManager.h"
 
 #include <Common_Define.h>
 
 #include "../Signal/Signal.h"
-#include "3DFSignal.Manager.h"
+
+#include "3DF.Signal.Manager.h"
+#include "3DF.Signal.Interface.h"
 
 // ----- HOOPS Header -----
 #include <hoops_license.h>
 
 #include <HDB.h>
 
-USING_3DF_SIGNAL_NAMESPACE
+USING_3DF_NAMESPACE
+
+ApplicationManager theApplicationManager;
 
 //== 전달 받은 명령어 분기 =============================================================================
 

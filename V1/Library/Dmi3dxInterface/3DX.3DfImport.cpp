@@ -2,7 +2,7 @@
 
 #include "3DX.3DfImport.h"
 
-#include "3DFSignal.Interface.h"
+#include "3DF.Signal.Interface.h"
 
 #include "3DX.ExchangeWrapper.h"
 

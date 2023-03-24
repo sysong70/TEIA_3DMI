@@ -7,9 +7,9 @@
 
 #include "3DF/3DF.h"
 
-#include "3DFSignal.h"
+#include "3DF.Signal.h"
 
-OPEN_3DF_SIGNAL_NAMESPACE
+OPEN_3DF_NAMESPACE
 
 class ViewManager
 {
@@ -55,4 +55,4 @@ private:
 	_3DF::Model * m_pcHoopsModel = nullptr;
 };
 
-CLOSE_3DF_SIGNAL_NAMESPACE
+CLOSE_3DF_NAMESPACE

@@ -1,14 +1,16 @@
 ﻿#include "stdafx.h"
-#include "3DFSignal.Interface.h"
+#include "3DF.Signal.Interface.h"
 
-#include "3DFSignal.Manager.h"
+#include "3DF.Signal.Manager.h"
+
+#include "3DF.Signal.Connector.h"
 
 #include "../Signal/Signal.h"
 #include "Common_Define.h"
 
 #include <Json.h>
 
-USING_3DF_SIGNAL_NAMESPACE
+USING_3DF_NAMESPACE
 
 Interface::Interface()
 {
@@ -31,4 +33,9 @@ void Interface::ExecuteSignal(Json::Object & cInObject)
 {
 	assert(m_pcSignalManager);
 	((Manager *)m_pcSignalManager)->ExecuteSignal(cInObject);
+}
+
+void Interface::SetSignalCallback(SendSignalFunc lpfnSendSignalFunc) {
+	m_lpfnSendSignalFunc = lpfnSendSignalFunc;
+	Connector::SetSender(lpfnSendSignalFunc);
 }

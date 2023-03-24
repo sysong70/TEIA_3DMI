@@ -123,6 +123,7 @@
     <ClInclude Include="..\Common\WStr.h" />
     <ClInclude Include="..\Dmi3dxInterface\LogManager.h" />
     <ClInclude Include="..\Signal\Signal.h" />
+    <ClInclude Include="3DF.Signal.Connector.h" />
     <ClInclude Include="3DF\3DF.Bounding.h" />
     <ClInclude Include="3DF\3DF.Color.h" />
     <ClInclude Include="3DF\3DF.Control.h" />
@@ -157,10 +158,10 @@
     <ClInclude Include="3DF\3DF.Utility.h" />
     <ClInclude Include="3DF\3DF.Canvas.h" />
     <ClInclude Include="3DF\3DF.Segment.h" />
-    <ClInclude Include="3DFSignal.ApplicationManager.h" />
-    <ClInclude Include="3DFSignal.Interface.h" />
-    <ClInclude Include="3DFSignal.h" />
-    <ClInclude Include="3DFSignal.ViewManager.h" />
+    <ClInclude Include="3DF.Signal.ApplicationManager.h" />
+    <ClInclude Include="3DF.Signal.Interface.h" />
+    <ClInclude Include="3DF.Signal.h" />
+    <ClInclude Include="3DF.Signal.ViewManager.h" />
     <ClInclude Include="3DF\3DF.Operator.CameraPan.h" />
     <ClInclude Include="3DF\3DF.Visibility.h" />
     <ClInclude Include="3DF\3DF.MarkerAttribute.h" />
@@ -171,7 +172,7 @@
     <ClInclude Include="Import\DLL.h" />
     <ClInclude Include="Import\DLL.Helper.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="3DFSignal.Manager.h" />
+    <ClInclude Include="3DF.Signal.Manager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\Common_Define.cpp" />
@@ -181,6 +182,7 @@
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\Dmi3dxInterface\LogManager.cpp" />
     <ClCompile Include="..\Signal\Signal.cpp" />
+    <ClCompile Include="3DF.Signal.Connector.cpp" />
     <ClCompile Include="3DF\3DF.Bounding.cpp" />
     <ClCompile Include="3DF\3DF.Color.cpp" />
     <ClCompile Include="3DF\3DF.Control.cpp" />
@@ -222,15 +224,15 @@
     <ClCompile Include="3DF\Private\3DF.KeyPrivate.cpp" />
     <ClCompile Include="3DF\Private\3DF.SelectionPrivate.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="3DFSignal.ApplicationManager.cpp" />
-    <ClCompile Include="3DFSignal.Interface.cpp" />
-    <ClCompile Include="3DFSignal.ViewManager.cpp" />
+    <ClCompile Include="3DF.Signal.ApplicationManager.cpp" />
+    <ClCompile Include="3DF.Signal.Interface.cpp" />
+    <ClCompile Include="3DF.Signal.ViewManager.cpp" />
     <ClCompile Include="Import\DLL.3DF.Interface.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="3DFSignal.Manager.cpp" />
+    <ClCompile Include="3DF.Signal.Manager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

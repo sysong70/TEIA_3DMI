@@ -692,6 +692,15 @@ void Canvas::Init()
 	m_pcBaseView->SetSuppressUpdate(false);
 }
 
+void Canvas::SetViewId(int nViewId) 
+{ 
+	m_nViewId = nViewId; 
+
+	if (nullptr != m_pcWindow) {
+		m_pcWindow->SetViewId(m_nViewId);
+	}
+}
+
 void Canvas::SetGpu(CString strGpu)
 {
 	char gpu_to_use[256];

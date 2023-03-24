@@ -7,6 +7,8 @@
 
 #include "3DF.Line.h"
 
+#include "../3DF.Signal.Connector.h"
+
 #include <Common_Define.h>
 
 #include <HTools.h>
@@ -72,6 +74,9 @@ void Operator::ObjectSnap::DrawObjectSnapPoint(_3DF::SelectionResults & cInItems
 				WorldPoint cNearPoint;
 				if (true == cLine.NearPoint(*m_pcWindow, cWorldPoint, cNearPoint)) {
 					DrawNearPoint("NearPoint", cNearPoint, RGB(255, 255, 0), 0.4);
+
+					//int nViewId = m_pcWindow->ViewId();
+					Connector::GetInstance(m_pcWindow->ViewId()).statusBar.ShowCoordinate(cWorldPoint.x, cWorldPoint.y, cWorldPoint.z);
 				}
 
 				WorldPointArray aPoints;
