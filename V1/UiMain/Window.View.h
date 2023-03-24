@@ -4,6 +4,7 @@
 #include "Component.InputBar.h"
 #include "Component.LayerPanel.h"
 #include "Component.ModelPanel.h"
+#include "Component.ObjectSnaps.h"
 #include "Component.PanelBar.h"
 #include "Component.ScenePanel.h"
 #include "Component.TaskBar.h"
@@ -117,6 +118,10 @@ namespace Window
 		Window::MainFrame& GetMainFrame();
 
 		bool IsValid();
+
+	protected:
+
+		Component::ObjectSnaps m_osnap;
 
 	protected: // ToolBar
 

@@ -153,8 +153,8 @@ bool Component::StatusBar::Initialize(CWnd* pMainFrame)
 	AddExtendedElement(os, L"");
 
 #ifdef _DEBUG
-	GetElement(0)->SetText(L"Message Pane");
-	GetExElement(0)->SetText(L"Coordinate Pane");
+	//GetElement(0)->SetText(L"Message Pane");
+	//GetExElement(0)->SetText(L"Coordinate Pane");
 #endif
 
 	return true;
@@ -189,6 +189,7 @@ void Component::StatusBar::ShowMessage(Json::Object& data)
 	}
 
 	pPane->SetText(data.GetString(SKW_MESSAGE));
+	pPane->Redraw();
 }
 
 
@@ -209,6 +210,7 @@ void Component::StatusBar::ShowCoordinate(Json::Object& data)
 	}
 
 	pPane->SetText(coord);
+	pPane->Redraw();
 }
 
 #undef PRESET

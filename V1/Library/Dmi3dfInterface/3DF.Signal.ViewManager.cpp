@@ -286,8 +286,11 @@ void ViewManager::Paint(int nViewId, Json::Object & cInObject)
 		}
 		else {
 			pcView->GetBaseView()->Update();
+
 		}
 
+		//:Ken
+		Connector::GetInstance(nViewId).view.PaintOverlap();
 	}
 }
 

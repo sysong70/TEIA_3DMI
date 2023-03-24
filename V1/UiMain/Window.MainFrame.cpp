@@ -97,9 +97,11 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 		REMOVE_POINTER(pData);
 	} break;
 
+	case Signal::Target::StatusBar:
+		m_statusBar.ReceiveSignal(pData);
+		break;
+
 	case Signal::Target::Progress: {
-		//DEBUG_VALID(m_pDialog);
-		//ASSERT(m_pDialog->GetSignalTargetId() == target);
 		if (m_pDialog != nullptr && m_pDialog->GetSignalTargetId() == target) {
 			m_pDialog->ReceiveSignal(pData);
 		}

@@ -115,6 +115,8 @@ void Operator::ObjectSnap::DrawObjectSnapPoint(_3DF::SelectionResults & cInItems
 	} HC_Close_Segment();
 
 	m_pcWindow->GetBaseView()->Update();
+	//:Ken
+	Connector::GetInstance(m_pcWindow->ViewId()).view.PaintOverlap();
 }
 
 //== Object Snap Point를 그리는 함수 ==================================================================

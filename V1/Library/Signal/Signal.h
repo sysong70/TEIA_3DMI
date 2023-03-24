@@ -27,8 +27,8 @@
 #define SKW_MAX				"Max"
 #define SKW_MESSAGE			"Message"
 #define SKW_MIN				"Min"
-#define SKW_OSNAPINDEX		"OsnapIndex"
 #define SKW_OPTION			"Option"
+#define SKW_OSNAPID			"OsnapId"
 #define SKW_PARENT			"Parent"
 #define SKW_POSITION		"Position"
 #define SKW_RECT			"Rect"
@@ -45,7 +45,7 @@
 #define SKW_Y				"y"
 #define SKW_Z				"z"
 
-// Enum's only
+// enum, struct
 
 namespace Signal
 {
@@ -68,7 +68,7 @@ namespace Signal
 
 	struct ObjectSnapPoint
 	{
-		int Index = 0;
+		int Id = 0;
 		int X = 0;
 		int Y = 0;
 		EObjectSnap Type = EObjectSnap::Unknown;
@@ -326,6 +326,7 @@ namespace Signal
 			OnText,
 
 			SetValidation, // complete opening file
+			PaintOverlap, // complete OnPaint
 			SetObjectSnapPoints,
 			ClearObjectSnapPoints,
 		};
@@ -350,8 +351,7 @@ namespace Signal
 		void OnCancel();
 
 		void OnMouseMove(UINT flags, int x, int y);
-		//:WORKING - object snap, osnapIndex: hilighted(selected) osnap index
-		void OnLButtonDown(UINT flags, int x, int y, int osnapIndex = -1);
+		void OnLButtonDown(UINT flags, int x, int y, int osnapId = -1);
 		void OnLButtonUp(UINT flags, int x, int y);
 		void OnMButtonDown(UINT flags, int x, int y);
 		void OnMButtonUp(UINT flags, int x, int y);
@@ -371,13 +371,11 @@ namespace Signal
 
 		void SetValidation(bool success = true);
 		//:TODO
-		void SetObjectSnapPoints(ObjectSnapPoints& osnaps) {
-			DEBUG_STOP;
-		}
-		//:TODO
-		void ClearObjectSnapPoints() {
-			DEBUG_STOP;
-		}
+		void PaintOverlap();
+
+		void SetObjectSnapPoints(ObjectSnapPoints& osnaps);
+
+		void ClearObjectSnapPoints();
 	};
 
 

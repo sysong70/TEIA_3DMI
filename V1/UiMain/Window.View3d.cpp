@@ -113,6 +113,17 @@ void Window::View3d::ReceiveSignal(Json::Object* pData)
 			}
 			break;
 
+		case Signal::View::Action::PaintOverlap:
+		case Signal::View::Action::SetObjectSnapPoints:
+		case Signal::View::Action::ClearObjectSnapPoints:
+			//DoGraphicsManagerDraw(GetDC(), this);
+			//break;
+		{
+			CPaintDC dc(this);
+			dc.FillRect(CRect(500, 500, 1000, 1000), (CBrush*)&CBrush(RGB(255, 0, 0)));
+			TRACE(L"PaintOverlap\n");
+		} break;
+
 		default:
 			DEBUG_STOP;
 			break;

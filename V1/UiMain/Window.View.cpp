@@ -48,15 +48,7 @@ Window::View::View()
 
 void Window::View::OnGraphicsManagerDraw(CBCGPGraphicsManager* pGM, const CBCGPRect& rect, BOOL bIsPrinting)
 {
-	CPoint point;
-	GetCursorPos(&point);
-	ScreenToClient(&point);
-
-	CBCGPBrush brush(CBCGPColor::WhiteSmoke);
-	pGM->DrawLine(point.x - 30, point.y, point.x + 30, point.y, brush);
-	pGM->DrawLine(point.x, point.y - 30, point.x, point.y + 30, brush);
-	
-
+	m_osnap.Draw(pGM);
 }
 
 
@@ -220,7 +212,6 @@ void Window::View::OnPaint()
 
 	if (m_bRenderer) {
 		m_delivery.view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
-		DoGraphicsManagerDraw(&dc, this);
 	}
 	else {
 		dc.FillSolidRect(rect, (COLORREF)Control::EColor::Charcoal);
@@ -234,6 +225,9 @@ void Window::View::OnLButtonDown(UINT nFlags, CPoint point)
 	if (IsValid()) {
 		SetCapture();
 		m_delivery.view.OnLButtonDown(nFlags, point.x, point.y);
+		//:TEMP
+		m_osnap.Add(0, point.x, point.y, Signal::EObjectSnap::Point);
+		RedrawWindow();
 	}
 
 	__super::OnLButtonDown(nFlags, point);

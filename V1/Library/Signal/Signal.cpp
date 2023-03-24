@@ -79,6 +79,8 @@ void Signal::StatusBar::ShowMessage(CString message)
 	ConstructData(data, Action::ShowMessage);
 
 	data.SetString(SKW_MESSAGE, message);
+
+	Wrapper().SendData(data);
 }
 
 
@@ -86,10 +88,12 @@ void Signal::StatusBar::ShowMessage(CString message)
 void Signal::StatusBar::ShowCoordinate(double x, double y)
 {
 	Json::Object data;
-	ConstructData(data, Action::ShowMessage);
+	ConstructData(data, Action::ShowCoordinate);
 
 	data.SetReal(SKW_X, x);
 	data.SetReal(SKW_Y, y);
+
+	Wrapper().SendData(data);
 }
 
 
@@ -97,11 +101,13 @@ void Signal::StatusBar::ShowCoordinate(double x, double y)
 void Signal::StatusBar::ShowCoordinate(double x, double y, double z)
 {
 	Json::Object data;
-	ConstructData(data, Action::ShowMessage);
+	ConstructData(data, Action::ShowCoordinate);
 
 	data.SetReal(SKW_X, x);
 	data.SetReal(SKW_Y, y);
 	data.SetReal(SKW_Z, z);
+
+	Wrapper().SendData(data);
 }
 
 #pragma endregion //:REGION
@@ -272,12 +278,12 @@ void Signal::View::OnMouseMove(UINT flags, int x, int y)
 	SendMouseData(Action::OnMouseMove);
 }
 
-void Signal::View::OnLButtonDown(UINT flags, int x, int y, int osnapIndex)
+void Signal::View::OnLButtonDown(UINT flags, int x, int y, int osnapId)
 {
 	Json::Object data;
 	ConstructMouseData(data, Action::OnLButtonDown, flags, x, y);
 
-	data.SetInteger(SKW_OSNAPINDEX, osnapIndex);
+	data.SetInteger(SKW_OSNAPID, osnapId);
 
 	Wrapper().SendData(data);
 }
@@ -384,6 +390,42 @@ void Signal::View::SetValidation(bool success)
 	data.SetBoolean(SKW_VALID, success);
 
 	Wrapper().SendData(data);
+}
+
+
+
+void Signal::View::PaintOverlap()
+{
+	SendActionDataOnly(Action::PaintOverlap);
+}
+
+
+
+void Signal::View::SetObjectSnapPoints(ObjectSnapPoints& osnaps)
+{
+	Json::Object data;
+	ConstructData(data, Action::SetObjectSnapPoints);
+
+	Json::Array& items = data.CreateArray(SKW_ITEMS);
+	for (auto point : osnaps) {
+		Json::Object* pChild = new Json::Object();
+
+		pChild->SetInteger(SKW_ID, point.Id);
+		pChild->SetInteger(SKW_X, point.X);
+		pChild->SetInteger(SKW_Y, point.Y);
+		pChild->SetInteger(SKW_TYPE, (int)point.Type);
+
+		items.AddObject(*pChild);
+	}
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::View::ClearObjectSnapPoints()
+{
+	SendActionDataOnly(Action::ClearObjectSnapPoints);
 }
 
 #pragma endregion //:REGION
