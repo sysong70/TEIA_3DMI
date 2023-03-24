@@ -212,6 +212,7 @@ void Signal::View::ConstructMouseData(Json::Object& data, Action action, UINT fl
 void Signal::View::ConstructWheelData(Json::Object& data, UINT flags, short delta, int x, int y)
 {
 	ConstructMouseData(data, Action::OnMouseWheel, flags, x, y);
+
 	data.SetInteger(SKW_DELTA, delta);
 }
 
@@ -235,6 +236,7 @@ void Signal::View::OnInitialize(DWORD_PTR hWnd, CString path)
 {
 	Json::Object data;
 	ConstructData(data, Action::OnInitialize);
+
 	data.SetDwordPtr(SKW_HWND, hWnd);
 	data.SetString(SKW_FILEPATH, path);
 
@@ -247,6 +249,7 @@ void Signal::View::OnCommand(UINT id)
 {
 	Json::Object data;
 	ConstructData(data, Action::OnCommand);
+
 	data.SetInteger(SKW_ID, id);
 
 	Wrapper().SendData(data);
@@ -269,9 +272,14 @@ void Signal::View::OnMouseMove(UINT flags, int x, int y)
 	SendMouseData(Action::OnMouseMove);
 }
 
-void Signal::View::OnLButtonDown(UINT flags, int x, int y)
+void Signal::View::OnLButtonDown(UINT flags, int x, int y, int osnapIndex)
 {
-	SendMouseData(Action::OnLButtonDown);
+	Json::Object data;
+	ConstructMouseData(data, Action::OnLButtonDown, flags, x, y);
+
+	data.SetInteger(SKW_OSNAPINDEX, osnapIndex);
+
+	Wrapper().SendData(data);
 }
 
 void Signal::View::OnLButtonUp(UINT flags, int x, int y)
@@ -416,7 +424,7 @@ void Signal::ModelPanel::OnSelChanged(DWORD_PTR key)
 
 #undef SendKeyData
 
-void Signal::ModelPanel::AddItems(Items& items)
+void Signal::ModelPanel::AddItems(TreeItems& items)
 {
 	Json::Object data;
 	ConstructData(data, Action::AddItems);
@@ -437,7 +445,7 @@ void Signal::ModelPanel::AddItems(Items& items)
 
 
 
-void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, Items& items)
+void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items)
 {
 	Json::Object data;
 	ConstructData(data, Action::AddChildren);

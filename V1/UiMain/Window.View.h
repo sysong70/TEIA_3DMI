@@ -16,11 +16,13 @@
 
 namespace Window
 {
-	class View : public CView
+	class View : public CView, public CBCGPGraphicsManagerHelper
 	{
 	protected:
 
 		View();
+
+		virtual void OnGraphicsManagerDraw(CBCGPGraphicsManager* pGM, const CBCGPRect& rect, BOOL bIsPrinting);
 
 		DECLARE_DYNCREATE(View)
 
@@ -49,7 +51,7 @@ namespace Window
 
 		void OnActivateView(BOOL bActivate, CView* pActivateView, CView* pDeactiveView) override;
 
-		void OnDraw(CDC* pDC) override {}
+		void OnDraw(CDC* pDC) override;
 
 		void OnInitialUpdate() override;
 

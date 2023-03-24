@@ -166,6 +166,9 @@
     <ClCompile Include="Component.InputBar.cpp">
       <Filter>Component\View</Filter>
     </ClCompile>
+    <ClCompile Include="Component.ObjectSnaps.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.Common.h">
@@ -344,6 +347,9 @@
     </ClInclude>
     <ClInclude Include="Component.InputBar.h">
       <Filter>Component\View</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.ObjectSnaps.h">
+      <Filter>Component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

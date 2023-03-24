@@ -46,6 +46,21 @@ Window::View::View()
 
 
 
+void Window::View::OnGraphicsManagerDraw(CBCGPGraphicsManager* pGM, const CBCGPRect& rect, BOOL bIsPrinting)
+{
+	CPoint point;
+	GetCursorPos(&point);
+	ScreenToClient(&point);
+
+	CBCGPBrush brush(CBCGPColor::WhiteSmoke);
+	pGM->DrawLine(point.x - 30, point.y, point.x + 30, point.y, brush);
+	pGM->DrawLine(point.x, point.y - 30, point.x, point.y + 30, brush);
+	
+
+}
+
+
+
 Window::View::~View()
 {
 	m_tabs.DestroyWindow();
@@ -83,6 +98,12 @@ void Window::View::OnActivateView(BOOL bActivate, CView* pActivateView, CView* p
 	Activate(bActivate);
 
 	__super::OnActivateView(bActivate, pActivateView, pDeactiveView);
+}
+
+
+
+void Window::View::OnDraw(CDC* pDC)
+{
 }
 
 
@@ -199,7 +220,7 @@ void Window::View::OnPaint()
 
 	if (m_bRenderer) {
 		m_delivery.view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
-		TRACE(L"OnPaint\n");
+		DoGraphicsManagerDraw(&dc, this);
 	}
 	else {
 		dc.FillSolidRect(rect, (COLORREF)Control::EColor::Charcoal);
@@ -401,6 +422,7 @@ bool Window::View::IsValid()
 {
 	return m_bRenderer && m_bActivate;
 }
+
 
 
 

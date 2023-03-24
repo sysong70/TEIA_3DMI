@@ -27,6 +27,7 @@
 #define SKW_MAX				"Max"
 #define SKW_MESSAGE			"Message"
 #define SKW_MIN				"Min"
+#define SKW_OSNAPINDEX		"OsnapIndex"
 #define SKW_OPTION			"Option"
 #define SKW_PARENT			"Parent"
 #define SKW_POSITION		"Position"
@@ -43,6 +44,59 @@
 #define SKW_X				"x"
 #define SKW_Y				"y"
 #define SKW_Z				"z"
+
+// Enum's only
+
+namespace Signal
+{
+	enum class EObjectSnap
+	{
+		Unknown = -1,
+
+		Point,
+		End,
+		Mid,
+		Intersection,
+		Perpendicular,
+		Center,
+		Quadrant,
+		Near,
+		OnSurface,
+		BoundaryCenter,
+		Axis,
+	};
+
+	struct ObjectSnapPoint
+	{
+		int Index = 0;
+		int X = 0;
+		int Y = 0;
+		EObjectSnap Type = EObjectSnap::Unknown;
+	};
+
+	using ObjectSnapPoints = std::vector<ObjectSnapPoint>;
+
+
+
+	enum class ETreeItem
+	{
+		Unknown = -1,
+
+		Solid,
+		Surface,
+	};
+
+	struct TreeItem
+	{
+		DWORD_PTR ParentKey = 0;
+		DWORD_PTR Key = 0;
+		CString Title;
+		bool HasChildren = false;
+		ETreeItem Type = ETreeItem::Unknown;
+	};
+
+	using TreeItems = std::vector<TreeItem>;
+}
 
 
 
@@ -272,6 +326,8 @@ namespace Signal
 			OnText,
 
 			SetValidation, // complete opening file
+			SetObjectSnapPoints,
+			ClearObjectSnapPoints,
 		};
 
 		DEFINE_WRAPPER;
@@ -294,7 +350,8 @@ namespace Signal
 		void OnCancel();
 
 		void OnMouseMove(UINT flags, int x, int y);
-		void OnLButtonDown(UINT flags, int x, int y);
+		//:WORKING - object snap, osnapIndex: hilighted(selected) osnap index
+		void OnLButtonDown(UINT flags, int x, int y, int osnapIndex = -1);
 		void OnLButtonUp(UINT flags, int x, int y);
 		void OnMButtonDown(UINT flags, int x, int y);
 		void OnMButtonUp(UINT flags, int x, int y);
@@ -313,6 +370,14 @@ namespace Signal
 	public:
 
 		void SetValidation(bool success = true);
+		//:TODO
+		void SetObjectSnapPoints(ObjectSnapPoints& osnaps) {
+			DEBUG_STOP;
+		}
+		//:TODO
+		void ClearObjectSnapPoints() {
+			DEBUG_STOP;
+		}
 	};
 
 
@@ -345,15 +410,6 @@ namespace Signal
 			AddChildren,
 		};
 
-		//:TODO
-		enum class ElementType
-		{
-			Unknown = -1,
-
-			Solid,
-			Surface,
-		};
-
 		DEFINE_WRAPPER;
 
 		void ConstructData(Json::Object& data, Action action);
@@ -368,20 +424,9 @@ namespace Signal
 
 	public:
 
-		struct Item
-		{
-			DWORD_PTR ParentKey = 0;
-			DWORD_PTR Key = 0;
-			CString Title;
-			bool HasChildren = false;
-			ElementType Type = ElementType::Unknown;
-		};
-
-		using Items = std::vector<Item>;
-
-		void AddItems(Items& items);
+		void AddItems(TreeItems& items);
 		// ignore TreeItem.Parent
-		void AddChildren(DWORD_PTR parentKey, Items& items);
+		void AddChildren(DWORD_PTR parentKey, TreeItems& items);
 	};
 
 
