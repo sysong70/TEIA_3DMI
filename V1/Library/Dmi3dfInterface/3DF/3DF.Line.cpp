@@ -230,8 +230,8 @@ bool LineKey::GetMidPoint(Point & cMP)
 		dLength += aPoints[nIndex].DistanceWith(aPoints[nIndex + 1]);
 	}
 
-	dLength = 0;
 	double dMidLength = dLength / 2.0;
+	dLength = 0;
 
 	for (size_t nIndex = 0; nIndex < aPoints.GetCount() - 1; nIndex++) {
 		dLength += aPoints[nIndex].DistanceWith(aPoints[nIndex + 1]);

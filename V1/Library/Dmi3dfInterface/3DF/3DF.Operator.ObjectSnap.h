@@ -36,10 +36,13 @@ namespace Operator
 
 		//== Object Snap 계산 =======================================================================
 		void CalculationObjectSnapPoint(_3DF::SelectionResults & cInItems);
-		void CalculationLienObjectSnapPoint(Key * pcLine);
+		bool CalculationLienObjectSnapPoint(const Key * pcLine, const WorldPoint & cWorldPoint);
 		void CalculationLienAndLineObjectSnapPoint(LineKey & cLine1, LineKey & cLine2);
 
 		//== Object Snap Draw ======================================================================
+		
+		void DrawSnapItems();
+
 		void DrawObjectSnapPoint(_3DF::SelectionResults & cInItems);
 
 		void DrawCenterMark(const char * pchSegmentName, Point cPoint, COLORREF = RGB(0, 0, 255), double dWeight = 1.0);
@@ -54,7 +57,7 @@ namespace Operator
 
 		//== Utility Function ======================================================================
 		bool AddSnapItem(Key * pcKey, Point cSnapPoint, SnapType eType);
-
+		void ResetSnapItem();
 	protected:
 
 		WindowKey * m_pcWindow = nullptr;

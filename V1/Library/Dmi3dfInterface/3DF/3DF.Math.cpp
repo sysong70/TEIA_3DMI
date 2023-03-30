@@ -61,6 +61,8 @@ bool Math::GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoin
 			HC_Compute_Coordinates(".", "world", &aInPoints[nIndex], "outer pixels", &aOutPoints[nIndex]);
 		}
 	} HC_Close_Segment();
+
+	return true;
 }
 
 bool Math::GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, WindowPointArray & aOutPoints)
@@ -78,4 +80,6 @@ bool Math::GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoin
 			HC_Compute_Coordinates(".", "world", &aInPoints[nIndex], "outer window", &aOutPoints[nIndex]);
 		}
 	} HC_Close_Segment();
+
+	return true;
 }

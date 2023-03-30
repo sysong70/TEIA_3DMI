@@ -102,8 +102,6 @@ void Window::View::OnInitialUpdate()
 	CreatePanelTabs();
 	CreateTaskBar();
 
-	m_pcBrush = new CBrush(RGB(255, 0, 0));
-
 	m_delivery.view.OnInitialize((DWORD_PTR)m_hWnd, GetDocument()->GetPathName());
 }
 
