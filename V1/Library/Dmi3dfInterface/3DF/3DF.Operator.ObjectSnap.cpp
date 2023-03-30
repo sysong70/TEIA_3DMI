@@ -110,7 +110,7 @@ namespace OSnap
 
 
 
-	const char* Format = "rgba, size=24 pixels";
+	const char* Format = "rgba, size=12 pixels";
 	int Width = 32;
 	int Height = 32;
 
@@ -356,7 +356,13 @@ void Operator::ObjectSnap::DrawSnapItems()
 
 void Operator::ObjectSnap::DrawCenterMark(const char * pchSegmentName, Point cPoint, COLORREF nColor, double dWeight)
 {
-#ifndef USE_IMAGE
+#ifdef USE_IMAGE
+	HC_Open_Segment(pchSegmentName);
+	{
+		HC_Insert_Image(cPoint.x, cPoint.y, cPoint.z, OSnap::Format, OSnap::Width, OSnap::Height, OSnap::Center.Buffer);
+	}
+	HC_Close_Segment();
+#else
 	HC_Open_Segment(pchSegmentName);
 	{
 /*
@@ -378,12 +384,6 @@ void Operator::ObjectSnap::DrawCenterMark(const char * pchSegmentName, Point cPo
 		HC_Insert_Marker(cPoint.x, cPoint.y, cPoint.z);
 	}
 	HC_Close_Segment();
-#else
-	HC_Open_Segment(pchSegmentName);
-	{
-		HC_Insert_Image(cPoint.x, cPoint.y, cPoint.z, OSnap::Format, OSnap::Width, OSnap::Height, OSnap::Center.Buffer);
-	}
-	HC_Close_Segment();
 #endif
 }
 
@@ -403,7 +403,13 @@ void Operator::ObjectSnap::DrawBox(const char * pchSegmentName, Point cPoint, CO
 
 void Operator::ObjectSnap::DrawEndPoint(const char * pchSegmentName, Point cPoint, COLORREF nColor, double dWeight)
 {
-#ifndef USE_IMAGE
+#ifdef USE_IMAGE
+	HC_Open_Segment(pchSegmentName);
+	{
+		HC_Insert_Image(cPoint.x, cPoint.y, cPoint.z, OSnap::Format, OSnap::Width, OSnap::Height, OSnap::Center.Buffer);
+	}
+	HC_Close_Segment();
+#else
 	HC_Open_Segment(pchSegmentName);
 	{
 		HC_Set_Visibility("marker = on");
@@ -414,18 +420,18 @@ void Operator::ObjectSnap::DrawEndPoint(const char * pchSegmentName, Point cPoin
 		HC_Insert_Marker(cPoint.x, cPoint.y, cPoint.z);
 	}
 	HC_Close_Segment();
-#else
-	HC_Open_Segment(pchSegmentName);
-	{
-		HC_Insert_Image(cPoint.x, cPoint.y, cPoint.z, OSnap::Format, OSnap::Width, OSnap::Height, OSnap::End.Buffer);
-	}
-	HC_Close_Segment();
 #endif
 }
 
 void Operator::ObjectSnap::DrawMidPoint(const char * pchSegmentName, Point cPoint, COLORREF nColor, double dWeight)
 {
-#ifndef USE_IMAGE
+#ifdef USE_IMAGE
+	HC_Open_Segment(pchSegmentName);
+	{
+		HC_Insert_Image(cPoint.x, cPoint.y, cPoint.z, OSnap::Format, OSnap::Width, OSnap::Height, OSnap::Center.Buffer);
+	}
+	HC_Close_Segment();
+#else
 	HC_Open_Segment(pchSegmentName);
 	{
 		HC_Set_Visibility("marker = on");
@@ -436,18 +442,18 @@ void Operator::ObjectSnap::DrawMidPoint(const char * pchSegmentName, Point cPoin
 		HC_Insert_Marker(cPoint.x, cPoint.y, cPoint.z);
 	}
 	HC_Close_Segment();
-#else
-	HC_Open_Segment(pchSegmentName);
-	{
-		HC_Insert_Image(cPoint.x, cPoint.y, cPoint.z, OSnap::Format, OSnap::Width, OSnap::Height, OSnap::Mid.Buffer);
-	}
-	HC_Close_Segment();
 #endif
 }
 
 void Operator::ObjectSnap::DrawNearPoint(const char * pchSegmentName, Point cPoint, COLORREF nColor, double dWeight)
 {
-#ifndef USE_IMAGE
+#ifdef USE_IMAGE
+	HC_Open_Segment(pchSegmentName);
+	{
+		HC_Insert_Image(cPoint.x, cPoint.y, cPoint.z, OSnap::Format, OSnap::Width, OSnap::Height, OSnap::Center.Buffer);
+	}
+	HC_Close_Segment();
+#else
 	HC_Open_Segment(pchSegmentName);
 	{
 		HC_Set_Variable_Marker_Size("3 oru");
@@ -458,12 +464,6 @@ void Operator::ObjectSnap::DrawNearPoint(const char * pchSegmentName, Point cPoi
 
 		HC_Set_Marker_Symbol("ObjectSnapNearPoint");
 		HC_Insert_Marker(cPoint.x, cPoint.y, cPoint.z);
-	}
-	HC_Close_Segment();
-#else
-	HC_Open_Segment(pchSegmentName);
-	{
-		HC_Insert_Image(cPoint.x, cPoint.y, cPoint.z, OSnap::Format, OSnap::Width, OSnap::Height, OSnap::Nearest.Buffer);
 	}
 	HC_Close_Segment();
 #endif
