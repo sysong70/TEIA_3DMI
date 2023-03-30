@@ -45,6 +45,7 @@ IMPLEMENT_DYNCREATE(View3d, View)
 BEGIN_MESSAGE_MAP(View3d, View)
 	ON_WM_ACTIVATE()
 	ON_WM_CHAR()
+	ON_WM_ERASEBKGND()
 	ON_WM_KEYDOWN()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
@@ -112,17 +113,6 @@ void Window::View3d::ReceiveSignal(Json::Object* pData)
 				GetDocument()->OnCloseDocument();
 			}
 			break;
-
-		case Signal::View::Action::PaintOverlap:
-		case Signal::View::Action::SetObjectSnapPoints:
-		case Signal::View::Action::ClearObjectSnapPoints:
-			//DoGraphicsManagerDraw(GetDC(), this);
-			//break;
-		{
-			CPaintDC dc(this);
-			dc.FillRect(CRect(500, 500, 1000, 1000), (CBrush*)&CBrush(RGB(255, 0, 0)));
-			TRACE(L"PaintOverlap\n");
-		} break;
 
 		default:
 			DEBUG_STOP;

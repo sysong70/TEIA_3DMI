@@ -16,6 +16,7 @@ namespace Operator
 	class ObjectSnap
 	{
 	public:
+
 		ObjectSnap(WindowKey * pcWindow);
 
 		void DrawObjectSnapPoint(_3DF::SelectionResults & cInItems);
@@ -27,8 +28,11 @@ namespace Operator
 		void DrawNearPoint(const char * pchSegmentName, Point cPoint, COLORREF = RGB(0, 0, 255), double dWeight = 1.0);
 
 		static void CreateGlyph();
+		//:Ken
+		static void LoadResource();
 
 	protected:
+
 		WindowKey * m_pcWindow = nullptr;
 	};
 }

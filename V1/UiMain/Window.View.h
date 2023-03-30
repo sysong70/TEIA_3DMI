@@ -4,7 +4,6 @@
 #include "Component.InputBar.h"
 #include "Component.LayerPanel.h"
 #include "Component.ModelPanel.h"
-#include "Component.ObjectSnaps.h"
 #include "Component.PanelBar.h"
 #include "Component.ScenePanel.h"
 #include "Component.TaskBar.h"
@@ -17,13 +16,11 @@
 
 namespace Window
 {
-	class View : public CView, public CBCGPGraphicsManagerHelper
+	class View : public CView
 	{
 	protected:
 
 		View();
-
-		virtual void OnGraphicsManagerDraw(CBCGPGraphicsManager* pGM, const CBCGPRect& rect, BOOL bIsPrinting);
 
 		DECLARE_DYNCREATE(View)
 
@@ -72,6 +69,8 @@ namespace Window
 
 		afx_msg void OnContextMenu(CWnd*, CPoint point);
 
+		afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+
 		afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 
 		afx_msg void OnPaint();
@@ -119,10 +118,6 @@ namespace Window
 
 		bool IsValid();
 
-	protected:
-
-		Component::ObjectSnaps m_osnap;
-
 	protected: // ToolBar
 
 		Control::ToolBar m_toolBar;
@@ -156,5 +151,5 @@ namespace Window
 		Component::InputBar m_inputBar;
 
 		void ShowInputBar(bool show = true);
-};
+	};
 }

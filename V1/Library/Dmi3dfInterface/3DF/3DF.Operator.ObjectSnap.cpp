@@ -44,7 +44,133 @@
 #define MARKER_OPCODE_LINE_12 12
 #define MARKER_OPCODE_LINE_13 13
 
+#define USE_IMAGE
+
+#ifdef USE_IMAGE
+
+#include "../Resource.h"
+#include "../dllmain.h"
+#include <GdiPlus.h>
+using namespace Gdiplus;
+#pragma comment(lib, "Gdiplus.lib")
+
+
+
+namespace OSnap
+{
+	Bitmap* LoadPngFromResource(UINT id)
+	{
+		IStream* pStream = nullptr;
+		Gdiplus::Bitmap* pBitmap = nullptr;
+
+		HRSRC hResource = ::FindResource(Application::Instance, MAKEINTRESOURCE(id), L"PNG");
+		DWORD dwResourceSize = ::SizeofResource(Application::Instance, hResource);
+		HGLOBAL hGlobalResource = ::LoadResource(Application::Instance, hResource);
+		LPVOID pData = LockResource(hGlobalResource);
+
+		HGLOBAL hGlobal = ::GlobalAlloc(GHND, dwResourceSize);
+		LPVOID pBuffer = ::GlobalLock(hGlobal);
+		memcpy_s(pBuffer, dwResourceSize, pData, dwResourceSize);
+		HRESULT hResult = CreateStreamOnHGlobal(hGlobal, TRUE, &pStream);
+		if (SUCCEEDED(hResult)) {
+			// pStream now owns the global handle and will invoke GlobalFree on release
+			hGlobal = nullptr;
+			pBitmap = new Gdiplus::Bitmap(pStream);
+		}
+
+		if (pStream) {
+			pStream->Release();
+			pStream = nullptr;
+		}
+
+		return pBitmap;
+	}
+
+	class GdiLoader
+	{
+	public:
+
+		GdiLoader()
+		{
+			GdiplusStartup(&token, &input, nullptr);
+		}
+
+		~GdiLoader()
+		{
+			GdiplusShutdown(token);
+		}
+
+	private:
+
+		GdiplusStartupInput input;
+		ULONG_PTR token;
+	};
+
+	GdiLoader Initializer;
+
+
+
+	const char* Format = "rgba, size=24 pixels";
+	int Width = 32;
+	int Height = 32;
+
+	class ImageLoader
+	{
+	public:
+
+		ImageLoader(UINT id)
+		{
+			Id = id;
+		}
+
+		~ImageLoader()
+		{
+			REMOVE_ARRAY(Buffer);
+		}
+
+		void Load()
+		{
+			Bitmap* pBitmap = LoadPngFromResource(Id);
+			ASSERT(pBitmap != nullptr);
+			ASSERT(pBitmap->GetWidth() > 0 && pBitmap->GetHeight() > 0);
+
+			Buffer = new BYTE[Width * Height * 4];
+			Color color;
+			int index = 0;
+
+			for (int y = 0; y < Height; y++) {
+				for (int x = 0; x < Width; x++) {
+					pBitmap->GetPixel(x, y, &color);
+					Buffer[index++] = color.GetR();
+					Buffer[index++] = color.GetG();
+					Buffer[index++] = color.GetB();
+					Buffer[index++] = color.GetA();
+				}
+			}
+
+			REMOVE_POINTER(pBitmap);
+		}
+
+		UINT Id = 0;
+		BYTE* Buffer = nullptr;
+	};
+
+	ImageLoader Center(IDF_OSNAP_CENTER);
+	ImageLoader End(IDF_OSNAP_END);
+	ImageLoader Intersection(IDF_OSNAP_INTERSECTION);
+	ImageLoader Mid(IDF_OSNAP_MID);
+	ImageLoader Nearest(IDF_OSNAP_NEAREST);
+	ImageLoader Node(IDF_OSNAP_NODE);
+	ImageLoader Perpendicular(IDF_OSNAP_PERPENDICULAR);
+	ImageLoader Quadrant(IDF_OSNAP_QUADRANT);
+	ImageLoader Tangent(IDF_OSNAP_TANGENT);
+}
+
+#endif
+
 USING_3DF_NAMESPACE
+
+
 
 Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 {
@@ -115,13 +241,12 @@ void Operator::ObjectSnap::DrawObjectSnapPoint(_3DF::SelectionResults & cInItems
 	} HC_Close_Segment();
 
 	m_pcWindow->GetBaseView()->Update();
-	//:Ken
-	Connector::GetInstance(m_pcWindow->ViewId()).view.PaintOverlap();
 }
 
 //== Object Snap Point를 그리는 함수 ==================================================================
 void Operator::ObjectSnap::DrawCenterMark(const char * pchSegmentName, Point cPoint, COLORREF nColor, double dWeight)
 {
+#ifndef USE_IMAGE
 	HC_Open_Segment(pchSegmentName);
 	{
 /*
@@ -143,6 +268,13 @@ void Operator::ObjectSnap::DrawCenterMark(const char * pchSegmentName, Point cPo
 		HC_Insert_Marker(cPoint.x, cPoint.y, cPoint.z);
 	}
 	HC_Close_Segment();
+#else
+	HC_Open_Segment(pchSegmentName);
+	{
+		HC_Insert_Image(cPoint.x, cPoint.y, cPoint.z, OSnap::Format, OSnap::Width, OSnap::Height, OSnap::Center.Buffer);
+	}
+	HC_Close_Segment();
+#endif
 }
 
 void Operator::ObjectSnap::DrawBox(const char * pchSegmentName, Point cPoint, COLORREF nColor, double dWeight)
@@ -161,6 +293,7 @@ void Operator::ObjectSnap::DrawBox(const char * pchSegmentName, Point cPoint, CO
 
 void Operator::ObjectSnap::DrawEndPoint(const char * pchSegmentName, Point cPoint, COLORREF nColor, double dWeight)
 {
+#ifndef USE_IMAGE
 	HC_Open_Segment(pchSegmentName);
 	{
 		HC_Set_Visibility("marker = on");
@@ -171,10 +304,18 @@ void Operator::ObjectSnap::DrawEndPoint(const char * pchSegmentName, Point cPoin
 		HC_Insert_Marker(cPoint.x, cPoint.y, cPoint.z);
 	}
 	HC_Close_Segment();
+#else
+	HC_Open_Segment(pchSegmentName);
+	{
+		HC_Insert_Image(cPoint.x, cPoint.y, cPoint.z, OSnap::Format, OSnap::Width, OSnap::Height, OSnap::End.Buffer);
+	}
+	HC_Close_Segment();
+#endif
 }
 
 void Operator::ObjectSnap::DrawMidPoint(const char * pchSegmentName, Point cPoint, COLORREF nColor, double dWeight)
 {
+#ifndef USE_IMAGE
 	HC_Open_Segment(pchSegmentName);
 	{
 		HC_Set_Visibility("marker = on");
@@ -185,10 +326,18 @@ void Operator::ObjectSnap::DrawMidPoint(const char * pchSegmentName, Point cPoin
 		HC_Insert_Marker(cPoint.x, cPoint.y, cPoint.z);
 	}
 	HC_Close_Segment();
+#else
+	HC_Open_Segment(pchSegmentName);
+	{
+		HC_Insert_Image(cPoint.x, cPoint.y, cPoint.z, OSnap::Format, OSnap::Width, OSnap::Height, OSnap::Mid.Buffer);
+	}
+	HC_Close_Segment();
+#endif
 }
 
 void Operator::ObjectSnap::DrawNearPoint(const char * pchSegmentName, Point cPoint, COLORREF nColor, double dWeight)
 {
+#ifndef USE_IMAGE
 	HC_Open_Segment(pchSegmentName);
 	{
 		HC_Set_Variable_Marker_Size("3 oru");
@@ -201,6 +350,13 @@ void Operator::ObjectSnap::DrawNearPoint(const char * pchSegmentName, Point cPoi
 		HC_Insert_Marker(cPoint.x, cPoint.y, cPoint.z);
 	}
 	HC_Close_Segment();
+#else
+	HC_Open_Segment(pchSegmentName);
+	{
+		HC_Insert_Image(cPoint.x, cPoint.y, cPoint.z, OSnap::Format, OSnap::Width, OSnap::Height, OSnap::Nearest.Buffer);
+	}
+	HC_Close_Segment();
+#endif
 }
 
 void Operator::ObjectSnap::CreateGlyph()
@@ -350,4 +506,17 @@ void Operator::ObjectSnap::CreateGlyph()
 		HC_Define_Glyph("ObjectSnapCenterMark", sizeof(chCenterMarkData), chCenterMarkData);
 
 	} HC_Close_Segment();
+}
+
+void Operator::ObjectSnap::LoadResource()
+{
+	OSnap::Center.Load();
+	OSnap::End.Load();
+	OSnap::Intersection.Load();
+	OSnap::Mid.Load();
+	OSnap::Nearest.Load();
+	OSnap::Node.Load();
+	OSnap::Perpendicular.Load();
+	OSnap::Quadrant.Load();
+	OSnap::Tangent.Load();
 }

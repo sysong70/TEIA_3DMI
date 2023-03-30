@@ -1,0 +1,69 @@
+﻿// Microsoft Visual C++에서 생성한 리소스 스크립트입니다.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE 2 리소스에서 생성되었습니다.
+//
+#include "winres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 한국어(대한민국) 리소스
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
+LANGUAGE 18, 1
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE  
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE  
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE  
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+IDF_OSNAP_CENTER         PNG "res/ObjectSnap_Center.png"
+IDF_OSNAP_END            PNG "res/ObjectSnap_End.png"
+IDF_OSNAP_INTERSECTION   PNG "res/ObjectSnap_Intersection.png"
+IDF_OSNAP_MID            PNG "res/ObjectSnap_Mid.png"
+IDF_OSNAP_NEAREST        PNG "res/ObjectSnap_Nearest.png"
+IDF_OSNAP_NODE           PNG "res/ObjectSnap_Node.png"
+IDF_OSNAP_PERPENDICULAR  PNG "res/ObjectSnap_Perpendicular.png"
+IDF_OSNAP_QUADRANT       PNG "res/ObjectSnap_Quadrant.png"
+IDF_OSNAP_TANGENT        PNG "res/ObjectSnap_Tangent.png"
+
+#endif    // 한국어(대한민국) 리소스
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE 3 리소스에서 생성되었습니다.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // APSTUDIO_INVOKED가 아님
