@@ -177,17 +177,35 @@ Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 	m_pcWindow = pcWindow;
 }
 
-//== Object Snap 계산 =============================================================================== 
+//== 1. Object Snap 계산 =============================================================================== 
 
 // 1. 주어진 Selection Object를 이용해서 연관된 Object Snap Point를 계산한다.
 void Operator::ObjectSnap::CalculationObjectSnapPoint(_3DF::SelectionResults & cInItems)
 {
+	// 단일 Object Snap Point를 계산한다.
 	POSITION pcPosition = cInItems.GetHeadPosition();
+	while (nullptr != pcPosition) {
+		SelectionItem * pcItem = cInItems.GetNext(pcPosition);
+		SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)pcItem->GetImpl();
+
+		const WorldPoint cWorldPoint = pcImpl->cWorldPoint;
+
+		Key * pcKey = nullptr;
+		pcItem->ShowSelectedItem(pcKey);
+
+		// Line Key 처리
+		if (_3DF::Type::LineKey == pcKey->Type()) {
+			CalculationLienObjectSnapPoint(pcKey, cWorldPoint);
+		}
+	}
+
+	// 상호간의 Object Snap Point를 계산한다.
+	pcPosition = cInItems.GetHeadPosition();
 
 	while (nullptr != pcPosition) {
 		SelectionItem * pcItem = cInItems.GetNext(pcPosition);
 
-		if (nullptr != pcPosition) {
+		if (nullptr == pcPosition) {
 			continue;
 		}
 
@@ -203,9 +221,9 @@ void Operator::ObjectSnap::CalculationObjectSnapPoint(_3DF::SelectionResults & c
 	}
 }
 
-// 2. 단일 Geometry Object Snap 계산
+//== 2. 단일 Geometry Object Snap 계산 ==============================================================
 
-// 2-1. Line Object Snap 계산
+// 2-1. Line Object Snap 계산 (EndPoint, MidPoint, NearPoint를 계산)
 bool Operator::ObjectSnap::CalculationLienObjectSnapPoint(const Key * pcLine, const WorldPoint & cWorldPoint)
 {
 	if (Type::LineKey != pcLine->Type()) {
@@ -247,7 +265,7 @@ bool Operator::ObjectSnap::CalculationLienObjectSnapPoint(const Key * pcLine, co
 	return true;
 }
 
-// 3. 2개의 Geometry Object Snap 계산 
+//== 3. 2개의 Geometry Object Snap 계산 =============================================================
 
 // 3-1. Line & Line 관련 Object Snap을 계산, Intersection
 void Operator::ObjectSnap::CalculationLienAndLineObjectSnapPoint(LineKey & cLine1, LineKey & cLine2)
@@ -261,61 +279,7 @@ void Operator::ObjectSnap::DrawObjectSnapPoint(_3DF::SelectionResults & cInItems
 {
 	ResetSnapItem();
 
-	//CalculationObjectSnapPoint(cInItems);
-
-	for (POSITION pcPosition = cInItems.GetHeadPosition(); nullptr != pcPosition; ) {
-		SelectionItem * pcItem = cInItems.GetNext(pcPosition);
-		SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)pcItem->GetImpl();
-
-		const WorldPoint cWorldPoint = pcImpl->cWorldPoint;
-
-		Key * pcKey = nullptr;
-		pcItem->ShowSelectedItem(pcKey);
-
-		if (_3DF::Type::LineKey == pcKey->Type()) {
-
-			CalculationLienObjectSnapPoint(pcKey, cWorldPoint);
-
-/*
-			LineKey cLine = LineKey(*pcKey);
-
-			WorldPoint cNearPoint;
-			if (true == cLine.NearPoint(*m_pcWindow, cWorldPoint, cNearPoint)) {
-				DrawNearPoint("NearPoint", cNearPoint, RGB(255, 255, 0), 0.4);
-
-				//int nViewId = m_pcWindow->ViewId();
-				Connector::GetInstance(m_pcWindow->ViewId()).statusBar.ShowCoordinate(cWorldPoint.x, cWorldPoint.y, cWorldPoint.z);
-			}
-
-			WorldPointArray aPoints;
-			cLine.ShowPoints(aPoints);
-
-			if (2 == aPoints.GetCount()) {
-				DrawEndPoint("Temp2", aPoints[0], RGB(255, 255, 0), 0.4);
-				DrawEndPoint("Temp3", aPoints[1], RGB(255, 255, 0), 0.4);
-			}
-			else if (2 < aPoints.GetCount()) {
-				Point cPo[3];
-
-				cPo[0] = aPoints[0];
-				cPo[2] = aPoints[aPoints.GetCount() - 1];
-
-				DrawMidPoint("Temp1", cPo[1], RGB(255, 255, 0), 0.4);
-				DrawEndPoint("Temp2", cPo[0], RGB(255, 255, 0), 0.4);
-				DrawEndPoint("Temp3", cPo[2], RGB(255, 255, 0), 0.4);
-
-				//HC_Insert_Polyline(3, cPo);
-
-// 					HC_Insert_Line(cPo[0].x, cPo[0].y, cPo[0].z, cPo[1].x, cPo[1].y, cPo[1].z);
-// 					HC_Insert_Line(cPo[1].x, cPo[1].y, cPo[1].z, cPo[2].x, cPo[2].y, cPo[2].z);
-// 
-// 					HC_Insert_Marker(cPo[0].x, cPo[0].y, cPo[0].z);
-// 					HC_Insert_Marker(cPo[1].x, cPo[1].y, cPo[1].z);
-// 					HC_Insert_Marker(cPo[2].x, cPo[2].y, cPo[2].z);
-			}
-*/
-		}
-	}
+	CalculationObjectSnapPoint(cInItems);
 
 	DrawSnapItems();
 }
