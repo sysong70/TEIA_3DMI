@@ -49,11 +49,14 @@ namespace Operator
 		void DrawNearPoint(const char * pchSegmentName, Point cPoint, COLORREF = RGB(0, 0, 255), double dWeight = 1.0);
 
 		static void CreateGlyph();
+		//:Ken
+		static void LoadResource();
 
 		//== Utility Function ======================================================================
 		bool AddSnapItem(Key * pcKey, Point cSnapPoint, SnapType eType);
 
 	protected:
+
 		WindowKey * m_pcWindow = nullptr;
 
 		CAtlList<SnapItem *> m_aSnapItems;

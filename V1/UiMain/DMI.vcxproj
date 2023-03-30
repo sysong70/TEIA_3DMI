@@ -205,7 +205,6 @@
     <ClInclude Include="Layout.h" />
     <ClInclude Include="Layout.ControlWrapper.h" />
     <ClInclude Include="Layout.Stack.h" />
-    <ClInclude Include="Component.ObjectSnaps.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
@@ -265,7 +264,6 @@
     <ClCompile Include="Layout.cpp" />
     <ClCompile Include="Layout.ControlWrapper.cpp" />
     <ClCompile Include="Layout.Stack.cpp" />
-    <ClCompile Include="Component.ObjectSnaps.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

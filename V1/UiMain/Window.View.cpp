@@ -46,13 +46,6 @@ Window::View::View()
 
 
 
-void Window::View::OnGraphicsManagerDraw(CBCGPGraphicsManager* pGM, const CBCGPRect& rect, BOOL bIsPrinting)
-{
-	m_osnap.Draw(pGM);
-}
-
-
-
 Window::View::~View()
 {
 	m_tabs.DestroyWindow();
@@ -190,6 +183,15 @@ void Window::View::OnContextMenu(CWnd*, CPoint point)
 
 
 
+BOOL Window::View::OnEraseBkgnd(CDC* pDC)
+{
+	//:WARING - do not remove background
+	//return __super::OnEraseBkgnd(pDC);
+	return TRUE;
+}
+
+
+
 void Window::View::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	switch (nChar) {
@@ -229,9 +231,6 @@ void Window::View::OnLButtonDown(UINT nFlags, CPoint point)
 	if (IsValid()) {
 		SetCapture();
 		m_delivery.view.OnLButtonDown(nFlags, point.x, point.y);
-		//:TEMP
-		m_osnap.Add(0, point.x, point.y, Signal::EObjectSnap::Point);
-		RedrawWindow();
 	}
 
 	__super::OnLButtonDown(nFlags, point);
@@ -498,3 +497,5 @@ void Window::View::ShowInputBar(bool show)
 }
 
 #undef PRESET
+
+

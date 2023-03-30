@@ -288,9 +288,6 @@ void ViewManager::Paint(int nViewId, Json::Object & cInObject)
 			pcView->GetBaseView()->Update();
 
 		}
-
-		//:Ken
-		Connector::GetInstance(nViewId).view.PaintOverlap();
 	}
 }
 
