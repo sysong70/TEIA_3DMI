@@ -156,5 +156,8 @@ namespace Window
 		Component::InputBar m_inputBar;
 
 		void ShowInputBar(bool show = true);
+
+
+		CBrush * m_pcBrush = nullptr;
 };
 }

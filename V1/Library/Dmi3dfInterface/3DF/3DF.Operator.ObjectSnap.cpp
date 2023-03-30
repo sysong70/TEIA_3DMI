@@ -51,6 +51,79 @@ Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 	m_pcWindow = pcWindow;
 }
 
+//== Object Snap 계산 =============================================================================== 
+
+// 1. 주어진 Selection Object를 이용해서 연관된 Object Snap Point를 계산한다.
+void Operator::ObjectSnap::CalculationObjectSnapPoint(_3DF::SelectionResults & cInItems)
+{
+	POSITION pcPosition = cInItems.GetHeadPosition();
+
+	while (nullptr != pcPosition) {
+		SelectionItem * pcItem = cInItems.GetNext(pcPosition);
+
+		if (nullptr != pcPosition) {
+			continue;
+		}
+
+		SelectionItem * pcNextItem = cInItems.GetAt(pcPosition);
+
+		Key * pcSelection = nullptr;
+		Key * pcNextSelection = nullptr;
+		if (true == pcItem->ShowSelectedItem(pcSelection) && pcNextItem->ShowSelectedItem(pcNextSelection)) {
+ 			if (Type::LineKey == pcSelection->Type() && Type::LineKey == pcNextSelection->Type()) {
+ 				// CalculationLienAndLineObjectSnapPoint(*((LineKey *)pcSelection), *((LineKey *)pcNextSelection));
+ 			}
+		}
+	}
+}
+
+// 2. 단일 Geometry Object Snap 계산
+
+// 2-1. Line Object Snap 계산
+void Operator::ObjectSnap::CalculationLienObjectSnapPoint(Key * pcLine)
+{
+	if (Type::LineKey != pcLine->Type()) {
+		return;
+	}
+
+	LineKey & cLine = *(LineKey *)pcLine;
+
+	WorldPointArray aPoints;
+	cLine.ShowPoints(aPoints);
+
+	size_t nCount = aPoints.GetCount();
+
+	if (1 >= nCount) {
+		return;
+	}
+
+	SnapItem * psSnapItem = nullptr;
+
+	// End Point 처리
+	Point cSP, cEP;
+	if (true == cLine.GetEndPoint(cSP, cEP)) {
+		AddSnapItem(pcLine, cSP, SnapType::EndPoint);
+		AddSnapItem(pcLine, cEP, SnapType::EndPoint);
+	}
+
+	// Mid Point 처리
+	if (2 == nCount) {
+		Point cMP = (cSP + cEP) / 2;
+		AddSnapItem(pcLine, cMP, SnapType::MidPoint);
+		return;
+	}
+}
+
+// 3. 2개의 Geometry Object Snap 계산 
+
+// 3-1. Line & Line 관련 Object Snap을 계산, Intersection
+void Operator::ObjectSnap::CalculationLienAndLineObjectSnapPoint(LineKey & cLine1, LineKey & cLine2)
+{
+	
+}
+
+//== Object Snap Draw ==============================================================================
+
 void Operator::ObjectSnap::DrawObjectSnapPoint(_3DF::SelectionResults & cInItems)
 {
 	HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetConstructionKey()); {
@@ -68,7 +141,6 @@ void Operator::ObjectSnap::DrawObjectSnapPoint(_3DF::SelectionResults & cInItems
 			pcItem->ShowSelectedItem(pcKey);
 
 			if (_3DF::Type::LineKey == pcKey->Type()) {
-
 				LineKey cLine = LineKey(*pcKey);
 
 				WorldPoint cNearPoint;
@@ -83,18 +155,20 @@ void Operator::ObjectSnap::DrawObjectSnapPoint(_3DF::SelectionResults & cInItems
 				cLine.ShowPoints(aPoints);
 
 				if (2 == aPoints.GetCount()) {
-					Point cPo[2];
 
-					cPo[0] = aPoints[0];
-					cPo[1] = aPoints[1];
+// 					Point cPo[2];
+// 					cPo[0] = aPoints[0];
+// 					cPo[1] = aPoints[1];
 
-					HC_Insert_Polyline(2, cPo);
+					DrawEndPoint("Temp2", aPoints[0], RGB(255, 255, 0), 0.4);
+					DrawEndPoint("Temp3", aPoints[1], RGB(255, 255, 0), 0.4);
+
+//					HC_Insert_Polyline(2, cPo);
 				}
 				else if (2 < aPoints.GetCount()) {
 					Point cPo[3];
 
 					cPo[0] = aPoints[0];
-					cPo[1] = aPoints[(aPoints.GetCount() - 1) / 2];
 					cPo[2] = aPoints[aPoints.GetCount() - 1];
 
 					DrawMidPoint("Temp1", cPo[1], RGB(255, 255, 0), 0.4);
@@ -350,4 +424,17 @@ void Operator::ObjectSnap::CreateGlyph()
 		HC_Define_Glyph("ObjectSnapCenterMark", sizeof(chCenterMarkData), chCenterMarkData);
 
 	} HC_Close_Segment();
+}
+
+//== Utility Function ==============================================================================
+
+bool Operator::ObjectSnap::AddSnapItem(Key * pcKey, Point cSnapPoint, SnapType eType)
+{
+	SnapItem * psSnapItem = new SnapItem();
+	psSnapItem->pcKey = pcKey;
+	psSnapItem->cPoint = cSnapPoint;
+	psSnapItem->eType = SnapType::EndPoint;
+	m_aSnapItems.AddTail(psSnapItem);
+
+	return true;
 }

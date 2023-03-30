@@ -39,6 +39,7 @@ namespace Operator
 
 		SelectionResults m_cNewHighlightSelection;
 		SelectionResults m_cOldHighlightSelection;
+		SelectionResults m_cHighlightSelection;
 	};
 }
 

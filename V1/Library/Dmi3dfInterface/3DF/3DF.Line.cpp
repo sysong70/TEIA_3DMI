@@ -184,6 +184,71 @@ bool LineKey::ShowPoints(WorldPointArray & aOutPoints) const
 	return true;
 }
 
+bool LineKey::GetEndPoint(Point & cSP, Point & cEP)
+{
+	WorldPointArray aPoints;
+	if (false == ShowPoints(aPoints)) {
+		return false;
+	}
+
+	// 점이 2개 이상인 경우만 처리
+	if (1 >= aPoints.GetCount()) {
+		return false;
+	}
+
+	cSP = aPoints[0];
+	cEP = aPoints[aPoints.GetCount() - 1];
+
+	return true;
+}
+
+bool LineKey::GetMidPoint(Point & cMP)
+{
+	WorldPointArray aPoints;
+	if (false == ShowPoints(aPoints)) {
+		return false;
+	}
+
+	// 점이 2개 이상인 경우만 처리
+	if (1 >= aPoints.GetCount()) {
+		return false;
+	}
+
+	Point cSP, cEP;
+
+	if (2 == aPoints.GetCount()) {
+		cSP = aPoints[0];
+		cEP = aPoints[1];
+
+		cMP = (cSP + cEP) / 2.0;
+		return true;
+	}
+
+	// 전체 길이 계산
+	double dLength = 0.0;
+	for (size_t nIndex = 0; nIndex < aPoints.GetCount() - 1; nIndex++) {
+		dLength += aPoints[nIndex].DistanceWith(aPoints[nIndex + 1]);
+	}
+
+	dLength = 0;
+	double dMidLength = dLength / 2.0;
+
+	for (size_t nIndex = 0; nIndex < aPoints.GetCount() - 1; nIndex++) {
+		dLength += aPoints[nIndex].DistanceWith(aPoints[nIndex + 1]);
+		if (dMidLength < dLength) {
+			double dDiff = dLength - dMidLength;
+
+			Vector cVec = aPoints[nIndex + 1] - aPoints[nIndex];
+			cVec.Normalize();
+
+			cMP = aPoints[nIndex + 1] + (cVec * (float)dDiff);
+
+			return true;
+		}
+	}
+
+	return false;
+}
 //== 계산 함수 ===================================================================================
 bool LineKey::NearPoint(WindowKey const & cInWindow, const WorldPoint & cInPoint, WorldPoint & cOutPoint) const
 {
@@ -200,7 +265,7 @@ bool LineKey::NearPoint(WindowKey const & cInWindow, const WorldPoint & cInPoint
 
 	bool bResultFlag = false;
 
-	for (INT_PTR nIndex = 0; nIndex < aPoints.GetCount() - 1; nIndex++) {
+	for (size_t nIndex = 0; nIndex < aPoints.GetCount() - 1; nIndex++) {
 		if (true == Math::NormalPointWithInRange(aPoints[nIndex], aPoints[nIndex + 1], cInPoint, cNomalPoint)) {
 			dDist = cInPoint.DistanceWith(cNomalPoint);
 			if (dDist < dMinDist) {

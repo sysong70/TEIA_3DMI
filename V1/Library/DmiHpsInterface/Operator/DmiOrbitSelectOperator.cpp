@@ -594,6 +594,7 @@ bool DmiOrbitSelectOperator::DynamicHighlightCommon(HPS::WindowKey & cInWindow, 
 	//GetAttachedView().Update(HPS::Window::UpdateType::Default, 0.05);
 // 	HPS::UpdateNotifier cUpdateNotifier = cInWindow.UpdateWithNotifier(HPS::Window::UpdateType::Default, 0.05);
 // 	cUpdateNotifier.Wait();
+
 	HPS::UpdateNotifier cUpdateNotifier = cInWindow.UpdateWithNotifier();
 	cUpdateNotifier.Wait();
 

@@ -159,7 +159,7 @@ namespace Facility
 		{
 			struct BEHAVIOR {
 				bool VisibilitySelection = false;		// CAppSettings::VisibilitySelection
-				bool DynamicHighlighting = true;		// CAppSettings::DynamicHighlighting
+				bool DynamicHighlighting = false;		// CAppSettings::DynamicHighlighting
 				bool DetailSelection = false;			// CAppSettings::DetailSelection, Honor Line/Edge Weight/Pattern
 				int RelatedSelectionLimit = 0;			// CAppSettings::RelatedSelectionLimit
 				bool UseSelectBox = true;				// CAppSettings::bUseSelectBox, Transparent select box, show a transparent box when selecting areas

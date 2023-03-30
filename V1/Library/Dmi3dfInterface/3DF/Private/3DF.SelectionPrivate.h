@@ -89,14 +89,26 @@ public:
 	_3DF::Type Type() const override { return _3DF::Type::SelectionItem; }
 
 	void Copy(SelectionItemPrivate * pcInThat) {
-		pcKey = pcInThat->pcKey;
+		pcKey = pcInThat->pcKey->Copy();
 
 		nKeyCount = pcInThat->nKeyCount;
-		pnKeys = pcInThat->pnKeys;
-
+		// pnKeys값 복사
+		if (0 < nKeyCount) {
+			pnKeys = new HC_KEY[nKeyCount];
+			for (int i = 0; i < nKeyCount; i++) {
+				pnKeys[i] = pcInThat->pnKeys[i];
+			}
+		}
+		
 		nIncludeCount = pcInThat->nIncludeCount;
-		pnIncludeKeys = pcInThat->pnIncludeKeys;
-
+		// pnIncludeKeys값 복사
+		if (0 < nIncludeCount) {
+			pnIncludeKeys = new HC_KEY[nIncludeCount];
+			for (int i = 0; i < nIncludeCount; i++) {
+				pnIncludeKeys[i] = pcInThat->pnIncludeKeys[i];
+			}
+		}
+		
 		nOffset1 = pcInThat->nOffset1;
 		nOffset2 = pcInThat->nOffset2;
 		nOffset3 = pcInThat->nOffset3;
@@ -130,14 +142,22 @@ public:
 	WindowPoint cWindowPoint;
 };
 
+
 class SelectionResultsPrivate : public PrivateImpl
 {
 public:
 	_3DF::Type Type() const override { return _3DF::Type::SelectionResults; }
 
 	void Copy(SelectionResultsPrivate * pcInThat) {
-		for (POSITION pcPosition = pcInThat->aItemList.GetHeadPosition(); pcPosition != NULL; ) {
-			aItemList.AddTail(pcInThat->aItemList.GetNext(pcPosition));
+
+		// 입력된 pcInThat의 aItemList를 복사
+
+		POSITION pcPosition = pcInThat->aItemList.GetHeadPosition();
+
+		while (nullptr != pcPosition) {
+			SelectionItem * pcInThatItem = pcInThat->aItemList.GetNext(pcPosition);
+			SelectionItem * pcItem = new SelectionItem(*pcInThatItem);
+			aItemList.AddTail(pcItem);
 		}
 	}
 

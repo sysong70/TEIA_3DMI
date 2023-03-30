@@ -162,10 +162,13 @@ public:
 	SelectionItem();
 	SelectionItem(SelectionItem const & cInThat);
 	
+	_3DF::Type ObjectType() const { return _3DF::Type::SelectionItem; };
+
 	void Set(SelectionItem const & cInThat);
 	SelectionItem & operator=(SelectionItem const & cInThat);
 
-	_3DF::Type ObjectType() const { return _3DF::Type::SelectionItem; };
+	bool operator==(SelectionItem const & cInThat) const;
+	bool operator!=(SelectionItem const & cInThat) const;
 
 	bool ShowSelectedItem(Key *& pcOutSelection);
 
@@ -181,18 +184,34 @@ public:
 	SelectionResults(SelectionResults const & cInThat);
 	~SelectionResults();
 
+	_3DF::Type ObjectType() const { return _3DF::Type::SelectionResults; };
+
 	void Set(SelectionResults const & cInThat);
 	SelectionResults & operator=(SelectionResults const & cInThat);
 
-	_3DF::Type ObjectType() const { return _3DF::Type::SelectionResults; };
+	bool operator==(SelectionResults const & cInThat) const;
+	bool operator!=(SelectionResults const & cInThat) const;
 
 	void Reset();
 
 	size_t GetCount() const;
 	POSITION GetHeadPosition() const;
 
+	SelectionItem * GetAt(POSITION & pcPosition);
+	SelectionItem * GetAt(POSITION & pcPosition) const;
+
 	SelectionItem * GetNext(POSITION & pcPosition);
 	SelectionItem * GetNext(POSITION & pcPosition) const;
+
+	void RemoveAt(POSITION & pcPosition);
+	void RemoveAt(POSITION & pcPosition) const;
+
+	void SetSize(size_t nInSize);
+
+	bool Union(SelectionResults const & cInThat);
+
+	void LeaveType(DWORD nType);
+	void RemoveType(DWORD nType);
 };
 
 class SelectionControl : public Control

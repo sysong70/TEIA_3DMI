@@ -40,6 +40,8 @@ public:
 	SegmentKey Owner();
 
 	void Delete();
+
+	Key * Copy() const;
 };
 
 CLOSE_3DF_NAMESPACE

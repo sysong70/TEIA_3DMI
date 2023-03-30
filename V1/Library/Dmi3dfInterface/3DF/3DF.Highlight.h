@@ -46,6 +46,9 @@ public:
 
 	HighlightControl & Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting = true);
 
+	HighlightControl & Unhighlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions = HighlightOptionsKit());
+	HighlightControl & Unhighlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions = HighlightOptionsKit());
+
 private:
 	// Private default constructor to prevent instantiation without a window.
 	HighlightControl();

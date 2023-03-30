@@ -485,30 +485,96 @@ SelectionOptionsControl & SelectionOptionsControl::UnsetBias()
 }
 
 //== SelectionItem Class ===========================================================================
-SelectionItem::SelectionItem()
+_3DF::SelectionItem::SelectionItem()
 {
 }
 
-SelectionItem::SelectionItem(SelectionItem const & cInThat)
+_3DF::SelectionItem::SelectionItem(SelectionItem const & cInThat)
 {
 	m_pcImpl = new SelectionItemPrivate();
+
 	Set(cInThat);
 }
 
-void SelectionItem::Set(SelectionItem const & cInThat)
+void _3DF::SelectionItem::Set(SelectionItem const & cInThat)
 {
 	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)m_pcImpl;
 	SelectionItemPrivate * pcInThatImpl = (SelectionItemPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-SelectionItem & SelectionItem::operator=(SelectionItem const & cInThat)
+SelectionItem & _3DF::SelectionItem::operator=(SelectionItem const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-bool SelectionItem::ShowSelectedItem(Key *& pcOutSelection)
+bool _3DF::SelectionItem::operator==(SelectionItem const & cInThat) const
+{
+	if (nullptr == m_pcImpl) {
+		return false;
+	}
+
+	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)m_pcImpl;
+	SelectionItemPrivate * pcInThatImpl = (SelectionItemPrivate *)cInThat.m_pcImpl;
+
+	if (pcImpl->pcKey->KeyValue() != pcInThatImpl->pcKey->KeyValue()) {
+		return false;
+	}
+
+	if (pcImpl->nKeyCount != pcInThatImpl->nKeyCount) {
+		return false;
+	}
+
+	for (int nIndex = 0; nIndex < pcImpl->nKeyCount; nIndex++) {
+		if (pcImpl->pnKeys[nIndex] != pcInThatImpl->pnKeys[nIndex]) {
+			return false;
+		}
+	}
+
+	if (pcImpl->nIncludeCount != pcInThatImpl->nIncludeCount) {
+		return false;
+	}
+
+	for (int nIndex = 0; nIndex < pcImpl->nIncludeCount; nIndex++) {
+		if (pcImpl->pnIncludeKeys[nIndex] != pcInThatImpl->pnIncludeKeys[nIndex]) {
+			return false;
+		}
+	}
+
+	if (pcImpl->nOffset1 != pcInThatImpl->nOffset1) {
+		return false;
+	}
+
+	if (pcImpl->nOffset2 != pcInThatImpl->nOffset2) {
+		return false;
+	}
+
+	if (pcImpl->nOffset3 != pcInThatImpl->nOffset3) {
+		return false;
+	}
+
+	if (pcImpl->nRegion != pcInThatImpl->nRegion) {
+		return false;
+	}
+
+	if (pcImpl->nLowest != pcInThatImpl->nLowest) {
+		return false;
+	}
+
+	if (pcImpl->nHighest != pcInThatImpl->nHighest) {
+		return false;
+	}
+
+	return true;
+}
+
+bool _3DF::SelectionItem::operator!=(SelectionItem const & cInThat) const
+{
+	return !(*this == cInThat);
+}
+
+bool _3DF::SelectionItem::ShowSelectedItem(Key *& pcOutSelection)
 {
 	if (nullptr == m_pcImpl) { 
 		return false;
@@ -520,7 +586,7 @@ bool SelectionItem::ShowSelectedItem(Key *& pcOutSelection)
 	return true;
 }
 
-bool SelectionItem::ShowSelectionPosition(WindowPoint & cOutLocation) const
+bool _3DF::SelectionItem::ShowSelectionPosition(WindowPoint & cOutLocation) const
 {
 	if (nullptr == m_pcImpl) {
 		return false;
@@ -532,7 +598,7 @@ bool SelectionItem::ShowSelectionPosition(WindowPoint & cOutLocation) const
 	return true;
 }
 
-bool SelectionItem::ShowSelectionPosition(WorldPoint & cOutLocation) const
+bool _3DF::SelectionItem::ShowSelectionPosition(WorldPoint & cOutLocation) const
 {
 	if (nullptr == m_pcImpl) {
 		return false;
@@ -544,10 +610,10 @@ bool SelectionItem::ShowSelectionPosition(WorldPoint & cOutLocation) const
 	return true;
 }
 
-
 //== SelectionResults Class ========================================================================
 SelectionResults::SelectionResults()
 {
+	m_pcImpl = new SelectionResultsPrivate();
 }
 
 SelectionResults::SelectionResults(SelectionResults const & cInThat)
@@ -563,8 +629,12 @@ SelectionResults::~SelectionResults()
 
 void SelectionResults::Set(SelectionResults const & cInThat)
 {
+	// 복사하기 전에 기존의 결과값을 삭제한다.
+	Reset();
+
 	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
 	SelectionResultsPrivate * pcInThatImpl = (SelectionResultsPrivate *)cInThat.m_pcImpl;
+
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -572,6 +642,45 @@ SelectionResults & SelectionResults::operator=(SelectionResults const & cInThat)
 {
 	Set(cInThat);
 	return *this;
+}
+
+bool SelectionResults::operator==(SelectionResults const & cInThat) const
+{
+	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
+	SelectionResultsPrivate * pcInThatImpl = (SelectionResultsPrivate *)cInThat.m_pcImpl;
+
+	POSITION pcPosition = pcImpl->aItemList.GetHeadPosition();
+
+	while (nullptr != pcPosition)
+	{
+		SelectionItem * pcItem = pcImpl->aItemList.GetNext(pcPosition);
+
+		POSITION pcInThatPosition = pcInThatImpl->aItemList.GetHeadPosition();
+
+		bool bFindSameItemFlag = false;
+		while (nullptr != pcInThatPosition) {
+			SelectionItem * pcInThatItem = pcInThatImpl->aItemList.GetNext(pcInThatPosition);
+			if (*pcItem == *pcInThatItem) {
+				bFindSameItemFlag = true;
+				break;
+			}
+		}
+
+		if (false == bFindSameItemFlag) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool SelectionResults::operator!=(SelectionResults const & cInThat) const
+{
+	if (*this == cInThat) {
+		return false;
+	}
+
+	return true;
 }
 
 // 결과값을 삭제한다.
@@ -611,24 +720,179 @@ POSITION SelectionResults::GetHeadPosition() const
 	return  pcImpl->aItemList.GetHeadPosition();
 }
 
+SelectionItem * SelectionResults::GetAt(POSITION & pcPosition)
+{
+	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
+	return pcImpl->aItemList.GetAt(pcPosition);
+}
+
+SelectionItem * SelectionResults::GetAt(POSITION & pcPosition) const
+{
+	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
+	return pcImpl->aItemList.GetAt(pcPosition);
+}
+
 SelectionItem * SelectionResults::GetNext(POSITION & pcPosition)
 {
-	if (nullptr == m_pcImpl) {
-		return nullptr;
-	}
-
 	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
 	return  pcImpl->aItemList.GetNext(pcPosition);
 }
 
 SelectionItem * SelectionResults::GetNext(POSITION & pcPosition) const
 {
+	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
+	return  pcImpl->aItemList.GetNext(pcPosition);
+}
+
+void SelectionResults::RemoveAt(POSITION & pcPosition)
+{
+	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
+
+	SelectionItem * pcItem = pcImpl->aItemList.GetAt(pcPosition);
+	if (nullptr != pcItem) {
+		delete pcItem;
+		pcItem = nullptr;
+	}
+
+	pcImpl->aItemList.RemoveAt(pcPosition);
+}
+
+void SelectionResults::RemoveAt(POSITION & pcPosition) const
+{
 	if (nullptr == m_pcImpl) {
-		return nullptr;
+		return;
 	}
 
 	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
-	return  pcImpl->aItemList.GetNext(pcPosition);
+
+	SelectionItem * pcItem = pcImpl->aItemList.GetAt(pcPosition);
+	if (nullptr != pcItem) {
+		delete pcItem;
+		pcItem = nullptr;
+	}
+
+	pcImpl->aItemList.RemoveAt(pcPosition);
+}
+
+// 내부 요소가 Size보다 큰 경우 Size 보다 큰 부분은 삭제한다.
+void SelectionResults::SetSize(size_t nInSize)
+{
+	if (nullptr == m_pcImpl) {
+		return;
+	}
+
+	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
+
+	size_t nCount = pcImpl->aItemList.GetCount();
+	if (nCount <= nInSize) {
+		return;
+	}
+
+	POSITION pcPosition = pcImpl->aItemList.GetHeadPosition();
+	POSITION pcCurrentPosition = nullptr;
+
+	size_t nIndex = 0;
+	while (nullptr != pcPosition) {
+		pcCurrentPosition = pcPosition;
+		SelectionItem * pcItem = pcImpl->aItemList.GetNext(pcPosition);
+
+		nIndex++;
+
+		// Size보다 작을때는 삭제를 하지 않는다.
+		if (nIndex <= nInSize) {
+			continue;
+		}
+
+		pcImpl->aItemList.RemoveAt(pcCurrentPosition);
+		delete pcItem;
+	}
+}
+
+// 들어오는 SelectionResults 값을 추가시킨다. 
+bool SelectionResults::Union(SelectionResults const & cInThat)
+{
+	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
+	SelectionResultsPrivate * pcInThatImpl = (SelectionResultsPrivate *)cInThat.m_pcImpl;
+
+	if (nullptr == pcImpl || nullptr == pcInThatImpl) {
+		return false;
+	}
+
+	POSITION pcInThatPosition = pcInThatImpl->aItemList.GetHeadPosition();
+
+	while (nullptr != pcInThatPosition)
+	{
+		SelectionItem * pcInThatItem = pcInThatImpl->aItemList.GetNext(pcInThatPosition);
+
+		POSITION pcPosition = pcImpl->aItemList.GetHeadPosition();
+
+		bool bFindFlag = false;
+		while (nullptr != pcPosition) {
+			SelectionItem * pcItem = pcImpl->aItemList.GetNext(pcPosition);
+
+			if (*pcItem == *pcInThatItem) {
+				bFindFlag = true;
+				break;
+			}
+		}
+
+		if (true == bFindFlag) {
+			continue;
+		}
+
+		SelectionItem * pcNewItem = new SelectionItem(*pcInThatItem);
+		pcImpl->aItemList.AddHead(pcNewItem);
+	}
+
+	return true;
+}
+
+void SelectionResults::LeaveType(DWORD nType)
+{
+	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
+
+	POSITION pcPosition = pcImpl->aItemList.GetHeadPosition();
+	POSITION pcCurrentPosition = nullptr;
+
+	while (nullptr != pcPosition)
+	{
+		pcCurrentPosition = pcPosition;
+		SelectionItem * pcItem = pcImpl->aItemList.GetNext(pcPosition);
+
+		Key * pcItemKey = nullptr;
+		if(true == pcItem->ShowSelectedItem(pcItemKey)) {
+			DWORD nItemType = (DWORD)pcItemKey->Type();
+			// 원하는 Type이면 삭제하지 않는다.
+			if (nItemType == (nType & nItemType)) {
+				continue;
+			}
+		}
+
+		pcImpl->aItemList.RemoveAt(pcCurrentPosition);
+	}
+}
+
+void SelectionResults::RemoveType(DWORD nType)
+{
+	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
+
+	POSITION pcPosition = pcImpl->aItemList.GetHeadPosition();
+	POSITION pcCurrentPosition = nullptr;
+
+	while (nullptr != pcPosition)
+	{
+		pcCurrentPosition = pcPosition;
+		SelectionItem * pcItem = pcImpl->aItemList.GetNext(pcPosition);
+
+		Key * pcItemKey = nullptr;
+		if (true == pcItem->ShowSelectedItem(pcItemKey)) {
+			DWORD nItemType = (DWORD)pcItemKey->Type();
+			// 원하는 Type이면 삭제한다.
+			if (nItemType == (nType & nItemType)) {
+				pcImpl->aItemList.RemoveAt(pcCurrentPosition);
+			}
+		}
+	}
 }
 
 //== SelectionControl Class ========================================================================

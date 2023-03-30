@@ -31,10 +31,12 @@ int SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionO
 
 	char chAction[MVO_BUFFER_SIZE] = "v";
 
+	// 선택 옵션을 문자열로 변환
 	GetSelectOption(cInOptions, chAction);
 
 	HSelectionSet * pcSelection = GetBaseView()->GetSelection();
 
+	// 선택 옵션에 따라 선택 작업 실시
 	HC_Open_Segment_By_Key(GetBaseView()->GetViewKey()); {
 		nResult = HC_Compute_Selection(".",
 			(pcSelection->GetSubwindowPenetration() ? "" : "./scene/overwrite"), chAction, cInLocation.x, cInLocation.y);
@@ -54,9 +56,11 @@ int SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionO
 	char chKeyType[MVO_BUFFER_SIZE];
 	int	nIncludeCount = 0;
 
+	// 선택된 요소를 SelectionResults에 저장하기 위해서 새롭게 생성
 	SelectionResultsPrivate * pcResultsPrivate = new SelectionResultsPrivate();
 
 	do {
+		// 선택된 요소를 저장하기 위해서 Item 생성
 		SelectionItemPrivate * pcItemPrivate = new SelectionItemPrivate();
 
 		HC_Show_Selection_Element(&nKey, &nOffset1, &nOffset2, &nOffset3);

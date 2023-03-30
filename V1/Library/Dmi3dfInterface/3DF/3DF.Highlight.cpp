@@ -283,19 +283,19 @@ HighlightControl & _3DF::HighlightControl::Highlight(SelectionResults const & cI
 {
 	HighlightControlPrivate * pcHighlightControlImpl = (HighlightControlPrivate *)m_pcImpl;
 	HBaseView * pcView = pcHighlightControlImpl->GetBaseView();
-	
+
 	char chType[MVO_BUFFER_SIZE];
 
 	bool bNeedDeselect = true;
 	bool bNeedUpdate = true;
 
-	for (POSITION pcPosition = cInItems.GetHeadPosition(); pcPosition != NULL; ) {
+	for (POSITION pcPosition = cInItems.GetHeadPosition(); nullptr != pcPosition; ) {
 		SelectionItem * pcItem = cInItems.GetNext(pcPosition);
 		SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)pcItem->GetImpl();
 
 		HC_KEY nKey = pcImpl->pcKey->KeyValue();
 
-		if (_3DF::Type::ShellKey == pcItem->ObjectType() && (pcImpl->nLowest != pcImpl->nHighest || pcImpl->nLowest > 0)) {
+		if (_3DF::Type::ShellKey == pcItem->Type() && (pcImpl->nLowest != pcImpl->nHighest || pcImpl->nLowest > 0)) {
 			bNeedDeselect = false;
 
 			if (!pcView->GetHighlightSelection()->IsRegionSelected(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, pcImpl->nRegion))
@@ -352,6 +352,48 @@ HighlightControl & _3DF::HighlightControl::Highlight(SelectionResults const & cI
 	if (bNeedUpdate) {
 		pcView->ForceUpdate();
 	}
+
+	return *this;
+}
+
+HighlightControl & HighlightControl::Unhighlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions)
+{
+	if (0 == cInItems.GetCount()) {
+		return *this;
+	}
+
+	HighlightControlPrivate * pcHighlightControlImpl = (HighlightControlPrivate *)m_pcImpl;
+	HBaseView * pcView = pcHighlightControlImpl->GetBaseView();
+
+	// cInItem를 순회하면서 Unhighlight를 수행한다.
+	for (POSITION pcPosition = cInItems.GetHeadPosition(); nullptr != pcPosition; ) {
+		SelectionItem * pcItem = cInItems.GetNext(pcPosition);
+		SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)pcItem->GetImpl();
+
+		HC_KEY nKey = pcImpl->pcKey->KeyValue();
+		pcView->GetHighlightSelection()->DeSelect(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, false);
+	}
+
+	pcView->ForceUpdate();
+
+	return *this;
+}
+
+HighlightControl & HighlightControl::Unhighlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions)
+{
+	// cInItem의 Impl을 가져와서 작업을 수행한다.
+	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)cInItem.GetImpl();
+	if (nullptr == pcImpl) {
+		return *this;
+	}
+	
+	HighlightControlPrivate * pcHighlightControlImpl = (HighlightControlPrivate *)m_pcImpl;
+	HBaseView * pcView = pcHighlightControlImpl->GetBaseView();
+
+	HC_KEY nKey = pcImpl->pcKey->KeyValue();
+	pcView->GetHighlightSelection()->DeSelect(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, false);
+
+	pcView->ForceUpdate();
 
 	return *this;
 }

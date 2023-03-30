@@ -5,6 +5,8 @@
 
 #include "3DF.Segment.h"
 
+#include "3DF.Line.h"
+
 #include <HTools.h>
 
 USING_3DF_NAMESPACE
@@ -199,4 +201,26 @@ SegmentKey Key::Owner()
 void Key::Delete()
 {
 	assert(false);
+}
+
+Key * Key::Copy() const
+{
+	_3DF::Type eType = Type();
+
+	switch (eType)
+	{
+		case Type::LineKey:
+			return new LineKey(*this);
+			break;
+
+		case Type::ShellKey:
+			return new ShellKey(*this);
+			break;
+
+		default:
+			assert(false);
+			break;
+	}
+
+	return nullptr;
 }
