@@ -792,7 +792,7 @@ void Canvas::SetSelectOption()
 	m_pcBaseView->GetHighlightSelection()->SetUseDefinedHighlight(CAppSet_bUseDefinedHighlighting);
 	m_pcBaseView->GetHighlightSelection()->SetInvisible(CAppSet_bInvisibleSelection);
 	m_pcBaseView->GetHighlightSelection()->SetAllowDisplacement(CAppSet_bDisplaceSelection);
-	m_pcBaseView->SetDynamicHighlighting(true);
+	m_pcBaseView->SetDynamicHighlighting(m_cPreference.Selection.Behavior.DynamicHighlighting);
 	m_pcBaseView->GetHighlightSelection()->UpdateHighlightStyle();
 
 	char chDriverOpts[MVO_BUFFER_SIZE];
@@ -1154,7 +1154,7 @@ void Canvas::CancelCommands()
 //== Mouse 관련 함수 =============================================================================
 bool Canvas::LButtonDown(int nFlags, int x, int y)
 {
-	GetBaseView()->SetDynamicHighlighting(false);
+	// GetBaseView()->SetDynamicHighlighting(false);
 
 	// Shift & L Button 이벤트는 Area Select
 	if (MK_SHIFT & nFlags) {
@@ -1172,7 +1172,7 @@ bool Canvas::LButtonDown(int nFlags, int x, int y)
 
 bool Canvas::LButtonUp(int nFlags, int x, int y)
 {
-	GetBaseView()->SetDynamicHighlighting(true);
+	// GetBaseView()->SetDynamicHighlighting(true);
 
 	HEventInfo cEvent(GetBaseView());
 	cEvent.SetPoint(HE_LButtonUp, x, y, MouseMapFlags(nFlags));
@@ -1193,7 +1193,7 @@ bool Canvas::LButtonUp(int nFlags, int x, int y)
 
 bool Canvas::RButtonDown(int nFlags, int x, int y)
 {
-	GetBaseView()->SetDynamicHighlighting(false);
+	//GetBaseView()->SetDynamicHighlighting(false);
 
 	GetBaseView()->SetOperator(m_pcCameraPan);
 
@@ -1205,7 +1205,7 @@ bool Canvas::RButtonDown(int nFlags, int x, int y)
 
 bool Canvas::RButtonUp(int nFlags, int x, int y)
 {
-	GetBaseView()->SetDynamicHighlighting(true);
+	//GetBaseView()->SetDynamicHighlighting(true);
 
 	HEventInfo cEvent(GetBaseView());
 	cEvent.SetPoint(HE_RButtonUp, x, y, MouseMapFlags(nFlags));

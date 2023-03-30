@@ -48,6 +48,9 @@ public:
 	int GetPointCount() const;
 	bool ShowPoints(WorldPointArray & aOutPoints) const;
 
+	bool GetEndPoint(Point & cSP, Point & cEP);
+	bool GetMidPoint(Point & cMP);
+
 	//== 계산 함수 ===================================================================================
 	bool NearPoint(WindowKey const & cInWindow, const WorldPoint & cInPoint, WorldPoint & cOutPoint) const override;
 	bool DistanceToPoint(const WorldPoint & cInPoint, double & nOutDistance) const override;

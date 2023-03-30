@@ -102,6 +102,8 @@ void Window::View::OnInitialUpdate()
 	CreatePanelTabs();
 	CreateTaskBar();
 
+	m_pcBrush = new CBrush(RGB(255, 0, 0));
+
 	m_delivery.view.OnInitialize((DWORD_PTR)m_hWnd, GetDocument()->GetPathName());
 }
 
@@ -218,6 +220,8 @@ void Window::View::OnPaint()
 	else {
 		dc.FillSolidRect(rect, (COLORREF)Control::EColor::Charcoal);
 	}
+
+	// GetDC()->FillRect(CRect(500, 500, 1000, 1000), m_pcBrush);
 }
 
 
@@ -291,13 +295,18 @@ int Window::View::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message
 
 void Window::View::OnMouseMove(UINT nFlags, CPoint point)
 {
+	// GetDC()->FillRect(CRect(500, 500, 1000, 1000), m_pcBrush);
+
 	if (IsValid()) {
 		if (m_inputBar.IsVisible()) {
 			m_inputBar.OnMouseMove(nFlags, point);
 		}
 
+
 		m_delivery.view.OnMouseMove(nFlags, point.x, point.y);
 	}
+
+	// GetDC()->FillRect(CRect(500, 500, 1000, 1000), m_pcBrush);
 
 	__super::OnMouseMove(nFlags, point);
 }

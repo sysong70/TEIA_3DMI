@@ -415,6 +415,8 @@ public:
 			Float::Equals(z, p.z, in_tolerance);
 	}
 
+	Point_3D const operator+(const Point_3D & p) const { return Point_3D(x + p.x, y + p.y, z + p.z); }
+	//Point_3D const operator-(const Point_3D & p) const { return Point_3D(x - p.x, y - p.y, z - p.z); }
 
 	Point_3D & operator*= (F s) { x *= s; y *= s; z *= s;  return *this; }
 	Point_3D & operator/= (F s) { return operator*= ((F)1 / s); }

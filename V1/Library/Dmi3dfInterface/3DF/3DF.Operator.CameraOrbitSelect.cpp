@@ -102,6 +102,7 @@ int Operator::CameraOrbitSelect::OnLButtonDownAndMove(HEventInfo & cEvent)
 	return HOpCameraOrbit::OnLButtonDownAndMove(cEvent);
 }
 
+// Dynamic Highlighting 처리
 int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cEvent)
 {
 	SelectionOptionsKit cSelectOption;
@@ -109,21 +110,42 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cEvent)
 	cSelectOption.SetRelatedLimit(0);
 	cSelectOption.SetInternalLimit(0);
 	cSelectOption.SetSorting(Selection::Sorting::Default);
-	//"v, selection level = entity, related selection limit = 0, selection sorting, internal selection limit = 0", cInLocation.x, cInLocation.y);
-
-	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cEvent, cSelectOption, m_cNewHighlightSelection);
-
-	HighlightOptionsKit cKit;
-	m_pcWindow->GetHighlightControl().Highlight(m_cNewHighlightSelection, cKit);
-
-	Operator::ObjectSnap cSnap(m_pcWindow);
-	cSnap.DrawObjectSnapPoint(m_cNewHighlightSelection);
-
-	//DrawObjectSnapPoint(m_cNewHighlightSelection);
 
 	m_cNewHighlightSelection.Reset();
+	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cEvent, cSelectOption, m_cNewHighlightSelection);
 
-	//m_pcWindow->GetBaseView()->DoDynamicHighlighting(cEvent.GetMouseWindowPos());
+	// Old와 New가 다르면 Old를 삭제한다.
+	if (0 < m_cOldHighlightSelection.GetCount() && m_cOldHighlightSelection != m_cNewHighlightSelection) {
+		m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
+		m_cOldHighlightSelection.Reset();
+	}
+
+	// 새롭게 선택된 Selection Result에서 Line만 추출하도록 한다.
+	m_cNewHighlightSelection.LeaveType((DWORD)_3DF::Type::LineKey);
+
+	m_cHighlightSelection.Union(m_cNewHighlightSelection);
+	if (5 < m_cHighlightSelection.GetCount()) {
+		m_cHighlightSelection.SetSize(5);
+	}
+
+	m_cOldHighlightSelection = m_cNewHighlightSelection;
+
+	HighlightOptionsKit cKit;
+
+	if (0 < m_cNewHighlightSelection.GetCount()) {
+		m_pcWindow->GetHighlightControl().Highlight(m_cNewHighlightSelection, cKit);
+
+		Operator::ObjectSnap cSnap(m_pcWindow);
+		cSnap.DrawObjectSnapPoint(m_cNewHighlightSelection);
+	}
+	else {
+		// Object Snape 등을 지우도록 한다.
+		HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetConstructionKey()); {
+			HC_Flush_Contents(".", "geometry, segment");
+		} HC_Close_Segment();
+
+		m_pcWindow->GetBaseView()->Update();
+	}
 
 	return HLISTENER_PASS_EVENT;
 }
