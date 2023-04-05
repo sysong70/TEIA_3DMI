@@ -24,7 +24,7 @@ public:
 	}
 
 	PointArray m_aPoints;
-	_3DF::RGBColor m_cColor;
+	TDF::RGBColor m_cColor;
 };
 
 PolygonKit::PolygonKit()
@@ -58,7 +58,7 @@ unsigned int PolygonKit::GetPointCount() const
 	return static_cast<unsigned int>(pcImpl->m_aPoints.GetCount());
 }
 
-void PolygonKit::GetPoints(unsigned int & nOutCount, _3DF::Point * pcOutPoints) const
+void PolygonKit::GetPoints(unsigned int & nOutCount, TDF::Point * pcOutPoints) const
 {
 	if (nullptr == pcOutPoints) {
 		nOutCount = 0;
@@ -85,13 +85,13 @@ PolygonKit & PolygonKit::SetPoints(size_t nInCount, Point const cInPoints[])
 	return *this;
 }
 
-void PolygonKit::GetRGBColor(_3DF::RGBColor & cOutColor) const
+void PolygonKit::GetRGBColor(TDF::RGBColor & cOutColor) const
 {
 	PolygonKitPrivate * pcImpl = (PolygonKitPrivate *)m_pcImpl;
 	cOutColor = pcImpl->m_cColor;
 }
 
-void PolygonKit::SetRGBColor(_3DF::RGBColor const & cInColor)
+void PolygonKit::SetRGBColor(TDF::RGBColor const & cInColor)
 {
 	PolygonKitPrivate * pcImpl = (PolygonKitPrivate *)m_pcImpl;
 	pcImpl->m_cColor = cInColor;

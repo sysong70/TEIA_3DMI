@@ -564,7 +564,9 @@ public:
 	Vector_3D &			operator*= (F s)				{ x *= s; y *= s; z *= s;  return *this; }
 	Vector_3D &			operator/= (F s)				{ return operator*= (1.0f / s); }
 	Vector_3D const		operator* (F s) const			{ return Vector_3D (x * s, y * s, z * s); }
+	Vector_3D const		operator* (double s) const		{ return Vector_3D(x * s, y * s, z * s); }
 	Vector_3D const		operator/ (F s) const			{ return operator* (1.0f / s); }
+	Vector_3D const		operator/ (double s) const		{ return operator* (1.0f / s); }
 
 	F &					operator[] (size_t i)		{ return (&x)[i]; }
 	F const &			operator[] (size_t i) const	{ return (&x)[i]; }
@@ -658,14 +660,14 @@ using DVector = Vector_3D<double>;
 
 // using IntArray = std::vector<int, boost::pool_allocator<int>>;
 // using FloatArray = std::vector<float, boost::pool_allocator<float>>;
-// using PointArray = std::vector<_3DF::Point, boost::pool_allocator<Point>>;
-// using VectorArray = std::vector<_3DF::Vector, boost::pool_allocator<Vector>>;
+// using PointArray = std::vector<TDF::Point, boost::pool_allocator<Point>>;
+// using VectorArray = std::vector<TDF::Vector, boost::pool_allocator<Vector>>;
 
 using ByteArray = CAtlArray<byte>;
 using IntArray = CAtlArray<int>;
 using FloatArray = CAtlArray<float>;
-using PointArray = CAtlArray<_3DF::Point>;
-using VectorArray = CAtlArray<_3DF::Vector>;
+using PointArray = CAtlArray<TDF::Point>;
+using VectorArray = CAtlArray<TDF::Vector>;
 
 // template <typename F>
 // _3DF_INLINE	Point_3D<F>::Point_3D(Vector_3D<F> const & v) : x(v.x), y(v.y), z(v.z) {}
@@ -683,7 +685,7 @@ public:
 	void SetIdentity();
 	bool IsIdentity();
 
-	_3DF::Point Transform(_3DF::Point const & cInSource) const;
+	TDF::Point Transform(TDF::Point const & cInSource) const;
 
 	F * GetData() const { return (F *)r; }
 
@@ -741,9 +743,9 @@ bool MatrixKit<F>::IsIdentity()
 }
 
 template <typename F>
-Point MatrixKit<F>::Transform(_3DF::Point const & cInSource) const
+Point MatrixKit<F>::Transform(TDF::Point const & cInSource) const
 {
-	_3DF::Point cPoint;
+	TDF::Point cPoint;
 
 	cPoint.x = m[0][0] * cInSource.x + m[1][0] * cInSource.y + m[2][0] * cInSource.z + m[3][0];
 	cPoint.y = m[0][1] * cInSource.x + m[1][1] * cInSource.y + m[2][1] * cInSource.z + m[3][1];
@@ -781,6 +783,10 @@ namespace  MatrixCal {
 namespace Math
 {
 	bool NormalPointWithInRange(Point cSP, Point cEP, Point cOtherPoint, Point & cNormalPoint);
+	bool NormalPointWithInRange(Point cSP, Point cEP, Point cOtherPoint, Point & cNormalPoint, double & dPrameter);
+
+	bool IntersectionPoint(Point cSP1, Point cEP1, Point cSP2, Point cEP2, Point & cIntersectionPoint);
+	bool IntersectionPointInRange(Point cSP1, Point cEP1, Point cSP2, Point cEP2, Point & cIntersectionPoint);
 
 	bool GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, PixelPointArray & aOutPoints);
 	bool GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, WindowPointArray & aOutPoints);

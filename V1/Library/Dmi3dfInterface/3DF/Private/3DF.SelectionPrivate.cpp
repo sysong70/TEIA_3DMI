@@ -464,15 +464,15 @@ void SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & cInOpt
 	if (true == cInOptions.ShowLevel(eLevel)) {
 		switch (eLevel)
 		{
-			case _3DF::Selection::Level::Segment:
+			case TDF::Selection::Level::Segment:
 				sprintf(chOption, "selection level = segment");
 				break;
 
-			case _3DF::Selection::Level::Entity:
+			case TDF::Selection::Level::Entity:
 				sprintf(chOption, "selection level = entity");
 				break;
 
-			case _3DF::Selection::Level::Subentity:
+			case TDF::Selection::Level::Subentity:
 				chOption[0] = '\0';
 				break;
 		}
@@ -504,11 +504,11 @@ void SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & cInOpt
 	if (true == cInOptions.ShowSorting(eSorting)) {
 		switch (eSorting)
 		{
-			case _3DF::Selection::Sorting::Off:
+			case TDF::Selection::Sorting::Off:
 				sprintf(chOption, "no selection sorting");
 				break;
 
-			case _3DF::Selection::Sorting::Default:
+			case TDF::Selection::Sorting::Default:
 				sprintf(chOption, "selection sorting");
 				break;
 

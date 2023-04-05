@@ -194,8 +194,8 @@ public:
 	bool LButtonDown(int nFlags, int x, int y);
 /*
 
-	bool MButtonUp(_3DF::View * pcView, int nFlags, int x, int y);
-	bool MButtonDown(_3DF::View * pcView, int nFlags, int x, int y);
+	bool MButtonUp(TDF::View * pcView, int nFlags, int x, int y);
+	bool MButtonDown(TDF::View * pcView, int nFlags, int x, int y);
 */
 	bool RButtonUp(int nFlags, int x, int y);
 	bool RButtonDown(int nFlags, int x, int y);
@@ -229,7 +229,7 @@ public:
 
 protected:
 	HBaseView * m_pcBaseView = nullptr;
-	_3DF::WindowKey * m_pcWindow = nullptr;
+	TDF::WindowKey * m_pcWindow = nullptr;
 
 	int m_nViewId = -1;
 

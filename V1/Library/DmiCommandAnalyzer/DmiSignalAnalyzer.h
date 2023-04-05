@@ -21,7 +21,7 @@ public:
 	DmiSignalCallback GetSignalCallback() { return m_lpfnSignalCallback; }
 
 private:
-	_3DF::Interface m_3DF_Interface;
+	TDF::Interface m_3DF_Interface;
 
 	//Dmi3dxInterface m_c3dxInterface;
 

@@ -5,7 +5,6 @@
 #include "3DF.Math.h"
 #include "3DF.Point.h"
 
-
 #include "Private/3DF.KeyPrivate.h"
 
 #include <HTools.h>
@@ -23,7 +22,7 @@ public:
 	}
 
 	PointArray m_aPoints;
-	_3DF::RGBColor m_cColor;
+	TDF::RGBColor m_cColor;
 	char m_chPattern[PATTERN_BUFFER_SIZE];
 };
 
@@ -57,7 +56,7 @@ unsigned int LineKit::GetPointCount() const
 	return static_cast<unsigned int>(pcImpl->m_aPoints.GetCount());
 }
 
-void LineKit::GetPoints(unsigned int & nOutCount, _3DF::Point pcOutPoints[]) const
+void LineKit::GetPoints(unsigned int & nOutCount, TDF::Point pcOutPoints[]) const
 {
 	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
 
@@ -82,7 +81,7 @@ void LineKit::SetPoints(unsigned int nInCount, Point const pcInPoints[])
 	}
 }
 
-void LineKit::GetRGBColor(_3DF::RGBColor & cOutColor) const
+void LineKit::GetRGBColor(TDF::RGBColor & cOutColor) const
 {
 	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
 	cOutColor = pcImpl->m_cColor;
@@ -101,12 +100,12 @@ void LineKit::GetLinePattern(char out_pattern[PATTERN_BUFFER_SIZE]) const
 }
 
 //== LineKey =======================================================================================
-namespace _3DF {
+namespace TDF {
 
-	class LineKeyPrivate : public _3DF::KeyPrivate
+	class LineKeyPrivate : public TDF::KeyPrivate
 	{
 	public:
-		_3DF::Type Type() const override { return _3DF::Type::LineKey; }
+		TDF::Type Type() const override { return TDF::Type::LineKey; }
 
 		void Copy(LineKeyPrivate * pcInThat) {
 			KeyPrivate::Copy(pcInThat);
@@ -249,8 +248,58 @@ bool LineKey::GetMidPoint(Point & cMP)
 
 	return false;
 }
+
+bool LineKey::GetIntersectionPoint(LineKey & cInLine, PointArray & aOutIntersectionPoints)
+{
+	WorldPointArray aPoints;
+	if (false == ShowPoints(aPoints)) {
+		return false;
+	}
+
+	WorldPointArray aInPoints;
+	if (false == cInLine.ShowPoints(aInPoints)) {
+		return false;
+	}
+
+	// 점이 2개 이상인 경우만 처리
+	if (1 >= aPoints.GetCount() || 1 >= aInPoints.GetCount()) {
+		return false;
+	}
+
+
+
+	bool bResult = false;
+	Point cSP[2], cEP[2], cIntersectionPoint;
+
+	cSP[0].x = -100, cSP[0].y = 0, cSP[0].z = 0;
+	cEP[0].x = 100, cEP[0].y = 0, cEP[0].z = 0;
+
+	cSP[1].x = 20, cSP[1].y = 20, cSP[1].z = 0;
+	cEP[1].x = -20, cEP[1].y = -20, cEP[1].z = 0;
+
+	Math::IntersectionPointInRange(cSP[0], cEP[0], cSP[1], cEP[1], cIntersectionPoint);
+
+	// aPoints와 aInPoints를 비교해서 교차점을 구함.
+	for (size_t nIndex = 0; nIndex < aPoints.GetCount() - 1; nIndex++) {
+		cSP[0] = aPoints[nIndex];
+		cEP[0] = aPoints[nIndex + 1];
+
+		for (size_t nInIndex = 0; nInIndex < aInPoints.GetCount() - 1; nInIndex++) {
+			cSP[1] = aInPoints[nInIndex];
+			cEP[1] = aInPoints[nInIndex + 1];
+
+			if (true == Math::IntersectionPointInRange(cSP[0], cEP[0], cSP[1], cEP[1], cIntersectionPoint)) {
+				aOutIntersectionPoints.Add(cIntersectionPoint);
+				bResult = true;
+			}
+		}
+	}
+
+	return bResult;
+}
+
 //== 계산 함수 ===================================================================================
-bool LineKey::NearPoint(WindowKey const & cInWindow, const WorldPoint & cInPoint, WorldPoint & cOutPoint) const
+bool LineKey::NearPoint(WindowKey const & cInWindow, const WindowPoint & cInPoint, WorldPoint & cOutPoint) const
 {
 	WorldPointArray aPoints;
 
@@ -258,19 +307,28 @@ bool LineKey::NearPoint(WindowKey const & cInWindow, const WorldPoint & cInPoint
 		return false;
 	}
 
+	// 선택 정밀도를 높이기 위해서 스크린 좌표계로 환산해서 계산한다.
+	// Z 좌표는 작은 값으로 0.01 정도로 나오기 때문에, 계산에 주는 영향이 적다고 가정한다.
+	PixelPointArray aPixelPoints;
+	Math::GetPoint(cInWindow, aPoints, aPixelPoints);
+
+	PixelPoint cInPixelPoint(cInWindow, cInPoint);
+
 	double dDist;
 	double dMinDist = DBL_MAX;
-	
+	double dParameter = 0;
+
 	WorldPoint cNomalPoint;
 
 	bool bResultFlag = false;
 
 	for (size_t nIndex = 0; nIndex < aPoints.GetCount() - 1; nIndex++) {
-		if (true == Math::NormalPointWithInRange(aPoints[nIndex], aPoints[nIndex + 1], cInPoint, cNomalPoint)) {
-			dDist = cInPoint.DistanceWith(cNomalPoint);
+		if (true == Math::NormalPointWithInRange(aPixelPoints[nIndex], aPixelPoints[nIndex + 1], cInPixelPoint, cNomalPoint, dParameter)) {
+			dDist = cInPixelPoint.DistanceWith(cNomalPoint);
 			if (dDist < dMinDist) {
 				dMinDist = dDist;
-				cOutPoint = cNomalPoint;
+				Vector cVec = aPoints[nIndex + 1] - aPoints[nIndex];
+				cOutPoint = aPoints[nIndex] + cVec * dParameter;
 				bResultFlag = true;
 			}
 		}

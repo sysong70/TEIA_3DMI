@@ -25,31 +25,31 @@
 USING_3DF_NAMESPACE
 
 //== SelectionOptionsKit Class =====================================================================
-_3DF::SelectionOptionsKit::SelectionOptionsKit()
+TDF::SelectionOptionsKit::SelectionOptionsKit()
 {
 	m_pcImpl = new SelectionOptionsKitPrivate();
 }
 
-_3DF::SelectionOptionsKit::SelectionOptionsKit(SelectionOptionsKit const & cInThat)
+TDF::SelectionOptionsKit::SelectionOptionsKit(SelectionOptionsKit const & cInThat)
 {
 	m_pcImpl = new SelectionOptionsKitPrivate();
 	Set(cInThat);
 }
 
-void _3DF::SelectionOptionsKit::Set(SelectionOptionsKit const & cInThat)
+void TDF::SelectionOptionsKit::Set(SelectionOptionsKit const & cInThat)
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	SelectionOptionsKitPrivate * pcInThatImpl = (SelectionOptionsKitPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-SelectionOptionsKit & _3DF::SelectionOptionsKit::operator =(SelectionOptionsKit const & cInThat)
+SelectionOptionsKit & TDF::SelectionOptionsKit::operator =(SelectionOptionsKit const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-SelectionOptionsKit & _3DF::SelectionOptionsKit::SetProximity(float fInProximity)
+SelectionOptionsKit & TDF::SelectionOptionsKit::SetProximity(float fInProximity)
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	pcImpl->fProximity = fInProximity;
@@ -57,7 +57,7 @@ SelectionOptionsKit & _3DF::SelectionOptionsKit::SetProximity(float fInProximity
 	return *this;
 }
 
-SelectionOptionsKit & _3DF::SelectionOptionsKit::SetLevel(Selection::Level eInLevel)
+SelectionOptionsKit & TDF::SelectionOptionsKit::SetLevel(Selection::Level eInLevel)
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	pcImpl->eLevel = eInLevel;
@@ -65,7 +65,7 @@ SelectionOptionsKit & _3DF::SelectionOptionsKit::SetLevel(Selection::Level eInLe
 	return *this;
 }
 
-SelectionOptionsKit & _3DF::SelectionOptionsKit::SetInternalLimit(size_t nInLimit)
+SelectionOptionsKit & TDF::SelectionOptionsKit::SetInternalLimit(size_t nInLimit)
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	pcImpl->nInternalLimit = nInLimit;
@@ -73,7 +73,7 @@ SelectionOptionsKit & _3DF::SelectionOptionsKit::SetInternalLimit(size_t nInLimi
 	return *this;
 }
 
-SelectionOptionsKit & _3DF::SelectionOptionsKit::SetRelatedLimit(size_t nInLimit)
+SelectionOptionsKit & TDF::SelectionOptionsKit::SetRelatedLimit(size_t nInLimit)
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	pcImpl->nRelatedLimit = nInLimit;
@@ -81,7 +81,7 @@ SelectionOptionsKit & _3DF::SelectionOptionsKit::SetRelatedLimit(size_t nInLimit
 	return *this;
 }
 
-SelectionOptionsKit & _3DF::SelectionOptionsKit::SetSorting(Selection::Sorting eInSorting)
+SelectionOptionsKit & TDF::SelectionOptionsKit::SetSorting(Selection::Sorting eInSorting)
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	pcImpl->eSorting = eInSorting;
@@ -89,7 +89,7 @@ SelectionOptionsKit & _3DF::SelectionOptionsKit::SetSorting(Selection::Sorting e
 	return *this;
 }
 
-SelectionOptionsKit & _3DF::SelectionOptionsKit::SetAlgorithm(Selection::Algorithm eInAlgorithm)
+SelectionOptionsKit & TDF::SelectionOptionsKit::SetAlgorithm(Selection::Algorithm eInAlgorithm)
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	pcImpl->eAlgorithm = eInAlgorithm;
@@ -97,7 +97,7 @@ SelectionOptionsKit & _3DF::SelectionOptionsKit::SetAlgorithm(Selection::Algorit
 	return *this;
 }
 
-SelectionOptionsKit & _3DF::SelectionOptionsKit::SetGranularity(Selection::Granularity eInGranularity)
+SelectionOptionsKit & TDF::SelectionOptionsKit::SetGranularity(Selection::Granularity eInGranularity)
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	pcImpl->eGranularity = eInGranularity;
@@ -105,7 +105,7 @@ SelectionOptionsKit & _3DF::SelectionOptionsKit::SetGranularity(Selection::Granu
 	return *this;
 }
 
-SelectionOptionsKit & _3DF::SelectionOptionsKit::SetBias(Selection::Bias eInBias)
+SelectionOptionsKit & TDF::SelectionOptionsKit::SetBias(Selection::Bias eInBias)
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	pcImpl->eBias = eInBias;
@@ -113,7 +113,7 @@ SelectionOptionsKit & _3DF::SelectionOptionsKit::SetBias(Selection::Bias eInBias
 	return *this;
 }
 
-bool _3DF::SelectionOptionsKit::ShowProximity(float & fOutProximity) const
+bool TDF::SelectionOptionsKit::ShowProximity(float & fOutProximity) const
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	if (false == pcImpl->bProximity) {
@@ -124,7 +124,7 @@ bool _3DF::SelectionOptionsKit::ShowProximity(float & fOutProximity) const
 	return true;
 }
 
-bool _3DF::SelectionOptionsKit::ShowLevel(Selection::Level & eOutLevel) const
+bool TDF::SelectionOptionsKit::ShowLevel(Selection::Level & eOutLevel) const
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	if (false == pcImpl->bLevel) {
@@ -135,7 +135,7 @@ bool _3DF::SelectionOptionsKit::ShowLevel(Selection::Level & eOutLevel) const
 	return true;
 }
 
-bool _3DF::SelectionOptionsKit::ShowInternalLimit(size_t & nOutLimit) const
+bool TDF::SelectionOptionsKit::ShowInternalLimit(size_t & nOutLimit) const
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	if (false == pcImpl->bInternalLimit) {
@@ -146,7 +146,7 @@ bool _3DF::SelectionOptionsKit::ShowInternalLimit(size_t & nOutLimit) const
 	return true;
 }
 
-bool _3DF::SelectionOptionsKit::ShowRelatedLimit(size_t & nOutLimit) const
+bool TDF::SelectionOptionsKit::ShowRelatedLimit(size_t & nOutLimit) const
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	if (false == pcImpl->bRelatedLimit) {
@@ -158,7 +158,7 @@ bool _3DF::SelectionOptionsKit::ShowRelatedLimit(size_t & nOutLimit) const
 
 }
 
-bool _3DF::SelectionOptionsKit::ShowSorting(Selection::Sorting & eOutSorting) const
+bool TDF::SelectionOptionsKit::ShowSorting(Selection::Sorting & eOutSorting) const
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	if (false == pcImpl->bSorting) {
@@ -169,7 +169,7 @@ bool _3DF::SelectionOptionsKit::ShowSorting(Selection::Sorting & eOutSorting) co
 	return true;
 }
 
-bool _3DF::SelectionOptionsKit::ShowAlgorithm(Selection::Algorithm & eOutAlgorithm) const
+bool TDF::SelectionOptionsKit::ShowAlgorithm(Selection::Algorithm & eOutAlgorithm) const
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	if (false == pcImpl->bAlgorithm) {
@@ -180,7 +180,7 @@ bool _3DF::SelectionOptionsKit::ShowAlgorithm(Selection::Algorithm & eOutAlgorit
 	return true;
 }
 
-bool _3DF::SelectionOptionsKit::ShowGranularity(Selection::Granularity & eOutGranularity) const
+bool TDF::SelectionOptionsKit::ShowGranularity(Selection::Granularity & eOutGranularity) const
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	if (false == pcImpl->bGranularity) {
@@ -191,7 +191,7 @@ bool _3DF::SelectionOptionsKit::ShowGranularity(Selection::Granularity & eOutGra
 	return true;
 }
 
-bool _3DF::SelectionOptionsKit::ShowBias(Selection::Bias & eOutBias) const
+bool TDF::SelectionOptionsKit::ShowBias(Selection::Bias & eOutBias) const
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
 	if (false == pcImpl->bBias) {
@@ -203,7 +203,7 @@ bool _3DF::SelectionOptionsKit::ShowBias(Selection::Bias & eOutBias) const
 }
 
 //== SelectionOptionsControl Class =================================================================
-SelectionOptionsControl::SelectionOptionsControl(_3DF::WindowKey const & cInWindow)
+SelectionOptionsControl::SelectionOptionsControl(TDF::WindowKey const & cInWindow)
 {
 	SelectionOptionsControlPrivate * pcImpl = new SelectionOptionsControlPrivate();
 	pcImpl->m_pcBaseView = cInWindow.GetBaseView();
@@ -258,18 +258,18 @@ SelectionOptionsControl & SelectionOptionsControl::SetLevel(Selection::Level eIn
 	switch (eInLevel)
 	{
 		// directs selection events to return the identifier of the containing segment of the item selected.
-		case _3DF::Selection::Level::Segment:
+		case TDF::Selection::Level::Segment:
 			pcImpl->GetBaseView()->SetViewSelectionLevel(HSelectionLevelSegment);
 			pcImpl->GetBaseView()->GetSelection()->SetSelectionLevel(HSelectSegment);
 			break;
 
 			// directs selection events to return the item that was selected.
-		case _3DF::Selection::Level::Entity:
+		case TDF::Selection::Level::Entity:
 			pcImpl->GetBaseView()->SetViewSelectionLevel(HSelectionLevelEntity);
 			pcImpl->GetBaseView()->GetSelection()->SetSelectionLevel(HSelectEntity);
 			break;
 
-		case _3DF::Selection::Level::Subentity:
+		case TDF::Selection::Level::Subentity:
 			pcImpl->GetBaseView()->SetViewSelectionLevel(HSelectionLevelSegment);
 			pcImpl->GetBaseView()->GetSelection()->SetSelectionLevel(HSelectSubentity);
 			break;
@@ -316,20 +316,20 @@ SelectionOptionsControl & SelectionOptionsControl::SetSorting(Selection::Sorting
 	HC_Open_Segment_By_Key(nViewKey); {
 		switch (eInSorting)
 		{
-			case _3DF::Selection::Sorting::Off:
+			case TDF::Selection::Sorting::Off:
 				HC_Set_Heuristics("selection sorting = off");
 				break;
 
-			case _3DF::Selection::Sorting::Proximity:
+			case TDF::Selection::Sorting::Proximity:
 				HC_Set_Heuristics("selection sorting = proximity");
 				break;
 
-			case _3DF::Selection::Sorting::ZSorting:
+			case TDF::Selection::Sorting::ZSorting:
 				HC_Set_Heuristics("selection sorting = z-sort");
 				break;
 
 			// Uses the appropriate sorting based on the selection type: Proximity for point selections and z-sorting for all other selections.
-			case _3DF::Selection::Sorting::Default:
+			case TDF::Selection::Sorting::Default:
 				HC_Set_Heuristics("selection sorting = default");
 				break;
 		}
@@ -380,19 +380,19 @@ SelectionOptionsControl & SelectionOptionsControl::SetBias(Selection::Bias eInBi
 	HC_Open_Segment_By_Key(nViewKey); {
 		switch (eInBias)
 		{
-			case _3DF::Selection::Bias::Lines:
+			case TDF::Selection::Bias::Lines:
 				HC_Set_Heuristics("selection bias = lines");
 				break;
 
-			case _3DF::Selection::Bias::NoLines:
+			case TDF::Selection::Bias::NoLines:
 				HC_Set_Heuristics("selection bias = no lines");
 				break;
 
-			case _3DF::Selection::Bias::Markers:
+			case TDF::Selection::Bias::Markers:
 				HC_Set_Heuristics("selection bias = markers");
 				break;
 
-			case _3DF::Selection::Bias::NoMarkers:
+			case TDF::Selection::Bias::NoMarkers:
 				HC_Set_Heuristics("selection bias = no markers");
 				break;
 		}
@@ -485,31 +485,31 @@ SelectionOptionsControl & SelectionOptionsControl::UnsetBias()
 }
 
 //== SelectionItem Class ===========================================================================
-_3DF::SelectionItem::SelectionItem()
+TDF::SelectionItem::SelectionItem()
 {
 }
 
-_3DF::SelectionItem::SelectionItem(SelectionItem const & cInThat)
+TDF::SelectionItem::SelectionItem(SelectionItem const & cInThat)
 {
 	m_pcImpl = new SelectionItemPrivate();
 
 	Set(cInThat);
 }
 
-void _3DF::SelectionItem::Set(SelectionItem const & cInThat)
+void TDF::SelectionItem::Set(SelectionItem const & cInThat)
 {
 	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)m_pcImpl;
 	SelectionItemPrivate * pcInThatImpl = (SelectionItemPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-SelectionItem & _3DF::SelectionItem::operator=(SelectionItem const & cInThat)
+SelectionItem & TDF::SelectionItem::operator=(SelectionItem const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-bool _3DF::SelectionItem::operator==(SelectionItem const & cInThat) const
+bool TDF::SelectionItem::operator==(SelectionItem const & cInThat) const
 {
 	if (nullptr == m_pcImpl) {
 		return false;
@@ -569,12 +569,12 @@ bool _3DF::SelectionItem::operator==(SelectionItem const & cInThat) const
 	return true;
 }
 
-bool _3DF::SelectionItem::operator!=(SelectionItem const & cInThat) const
+bool TDF::SelectionItem::operator!=(SelectionItem const & cInThat) const
 {
 	return !(*this == cInThat);
 }
 
-bool _3DF::SelectionItem::ShowSelectedItem(Key *& pcOutSelection)
+bool TDF::SelectionItem::ShowSelectedItem(Key *& pcOutSelection)
 {
 	if (nullptr == m_pcImpl) { 
 		return false;
@@ -586,7 +586,7 @@ bool _3DF::SelectionItem::ShowSelectedItem(Key *& pcOutSelection)
 	return true;
 }
 
-bool _3DF::SelectionItem::ShowSelectionPosition(WindowPoint & cOutLocation) const
+bool TDF::SelectionItem::ShowSelectionPosition(WindowPoint & cOutLocation) const
 {
 	if (nullptr == m_pcImpl) {
 		return false;
@@ -598,7 +598,7 @@ bool _3DF::SelectionItem::ShowSelectionPosition(WindowPoint & cOutLocation) cons
 	return true;
 }
 
-bool _3DF::SelectionItem::ShowSelectionPosition(WorldPoint & cOutLocation) const
+bool TDF::SelectionItem::ShowSelectionPosition(WorldPoint & cOutLocation) const
 {
 	if (nullptr == m_pcImpl) {
 		return false;
@@ -896,7 +896,7 @@ void SelectionResults::RemoveType(DWORD nType)
 }
 
 //== SelectionControl Class ========================================================================
-_3DF::SelectionControl::SelectionControl(WindowKey const & cInWindow)
+TDF::SelectionControl::SelectionControl(WindowKey const & cInWindow)
 {
 	SelectionControlPrivate * pcImpl = new SelectionControlPrivate();
 	pcImpl->m_pcWindow = &cInWindow;
@@ -905,32 +905,32 @@ _3DF::SelectionControl::SelectionControl(WindowKey const & cInWindow)
 	m_pcImpl = pcImpl;
 }
 
-_3DF::SelectionControl::SelectionControl(SelectionControl const & cInThat)
+TDF::SelectionControl::SelectionControl(SelectionControl const & cInThat)
 {
 	m_pcImpl = new SelectionControlPrivate();
 	Set(cInThat);
 }
 
-_3DF::SelectionControl::SelectionControl() {}
+TDF::SelectionControl::SelectionControl() {}
 
-_3DF::SelectionControl::~SelectionControl()
+TDF::SelectionControl::~SelectionControl()
 {
 }
 
-void _3DF::SelectionControl::Set(SelectionControl const & cInThat)
+void TDF::SelectionControl::Set(SelectionControl const & cInThat)
 {
 	SelectionControlPrivate * pcImpl = (SelectionControlPrivate *)m_pcImpl;
 	SelectionControlPrivate * pcInThatImpl = (SelectionControlPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-SelectionControl & _3DF::SelectionControl::operator =(SelectionControl const & cInThat)
+SelectionControl & TDF::SelectionControl::operator =(SelectionControl const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-size_t _3DF::SelectionControl::SelectByPoint(HEventInfo & cEvent, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const
+size_t TDF::SelectionControl::SelectByPoint(HEventInfo & cEvent, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const
 {
 	Point cInLocation;
 	cInLocation.x = cEvent.GetMouseWindowPos().x;
@@ -940,7 +940,7 @@ size_t _3DF::SelectionControl::SelectByPoint(HEventInfo & cEvent, SelectionOptio
 	return SelectByPoint(cInLocation, cInOptions, cOutResults);
 }
 
-size_t _3DF::SelectionControl::SelectByPoint(HEventInfo & cEvent, SelectionResults & cOutResults) const
+size_t TDF::SelectionControl::SelectByPoint(HEventInfo & cEvent, SelectionResults & cOutResults) const
 {
 	Point cInLocation;
 	cInLocation.x = cEvent.GetMouseWindowPos().x;
@@ -950,18 +950,18 @@ size_t _3DF::SelectionControl::SelectByPoint(HEventInfo & cEvent, SelectionResul
 	return SelectByPoint(cInLocation, cInOptions, cOutResults);
 }
 
-size_t _3DF::SelectionControl::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const
+size_t TDF::SelectionControl::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const
 {
 	SelectionControlPrivate * pcImpl = (SelectionControlPrivate *)m_pcImpl;
 	return pcImpl->SelectByPoint(cInLocation, cInOptions, cOutResults);
 }
 
-size_t _3DF::SelectionControl::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const
+size_t TDF::SelectionControl::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const
 {
 	return 0;
 }
 
-size_t _3DF::SelectionControl::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults) const
+size_t TDF::SelectionControl::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults) const
 {
 	SelectionControlPrivate * pcImpl = (SelectionControlPrivate *)m_pcImpl;
 	SelectionOptionsKit cInOptions;

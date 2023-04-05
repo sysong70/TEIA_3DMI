@@ -112,7 +112,7 @@ void Canvas::Init()
 
 	m_pcBaseView->GetModel()->GetEventManager()->RegisterHandler((HAnimationListener *)GetBaseView(), HAnimationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
 
-	_3DF::DmiSelectionControl * pcSelection = new _3DF::DmiSelectionControl(m_pcBaseView);
+	TDF::DmiSelectionControl * pcSelection = new TDF::DmiSelectionControl(m_pcBaseView);
 	pcSelection->SetAllowSubentityDeselection(true);
 
 	m_pcBaseView->SetSelection(pcSelection);
@@ -680,7 +680,7 @@ void Canvas::Init()
 	SetDefaultOperator();
 
 //	m_pcWindow->GetSelectionOptionsControl().SetLevel(Selection::Level::Entity);
-	//m_pcWindowKey->GetSelectionOptionsControl().SetProximity(0.1);
+	//m_pcWindow->GetSelectionOptionsControl().SetProximity(0.1);
 	m_pcWindow->GetSelectionOptionsControl().SetBias(Selection::Bias::Lines);// .SetBias(Selection::Bias::Markers);
 //	m_pcWindow->GetSelectionOptionsControl().SetRelatedLimit(5);
 	//m_pcWindow->GetSelectionOptionsControl().SetInternalLimit(5);

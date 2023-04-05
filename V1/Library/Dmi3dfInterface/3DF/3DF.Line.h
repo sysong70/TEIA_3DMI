@@ -20,15 +20,15 @@ public:
 	void Set(LineKit const & cInThat);
 	LineKit const & operator=(LineKit const & cInThat);
 
-	_3DF::Type ObjectType() const { return _3DF::Type::LineKit; };
+	TDF::Type ObjectType() const { return TDF::Type::LineKit; };
 
 	unsigned int GetPointCount() const;
 
-	void GetPoints(unsigned int & nOutCount, _3DF::Point pcOutPoints[]) const;
+	void GetPoints(unsigned int & nOutCount, TDF::Point pcOutPoints[]) const;
 	void SetPoints(unsigned int nInCount, Point const pcInPoints[]);
 
-	void GetRGBColor(_3DF::RGBColor & cOutColor) const;
-	void SetRGBColor(_3DF::RGBColor const & cInColor);
+	void GetRGBColor(TDF::RGBColor & cOutColor) const;
+	void SetRGBColor(TDF::RGBColor const & cInColor);
 
 	void GetLinePattern(char out_pattern[PATTERN_BUFFER_SIZE]) const;
 };
@@ -43,16 +43,17 @@ public:
 	void Set(LineKey const & cInThat);
 	LineKey & operator=(LineKey const & cInThat);
 
-	_3DF::Type ObjectType() const { return _3DF::Type::LineKey; };
+	TDF::Type ObjectType() const { return TDF::Type::LineKey; };
 
 	int GetPointCount() const;
 	bool ShowPoints(WorldPointArray & aOutPoints) const;
 
 	bool GetEndPoint(Point & cSP, Point & cEP);
 	bool GetMidPoint(Point & cMP);
+	bool GetIntersectionPoint(LineKey & cLine, PointArray & aOutIntersectionPoints);
 
 	//== 계산 함수 ===================================================================================
-	bool NearPoint(WindowKey const & cInWindow, const WorldPoint & cInPoint, WorldPoint & cOutPoint) const override;
+	bool NearPoint(WindowKey const & cInWindow, const WindowPoint & cInPoint, WorldPoint & cOutPoint) const override;
 	bool DistanceToPoint(const WorldPoint & cInPoint, double & nOutDistance) const override;
 };
 

@@ -36,9 +36,9 @@ private:
 	// Pointer to the HOOPS/MVO HDB object associated with this instance of the application
 	HDB * m_pcHoopsDB = nullptr;
 
-	std::map<int, _3DF::Canvas *> m_mpcCanvas;
+	std::map<int, TDF::Canvas *> m_mpcCanvas;
 };
 
 CLOSE_3DF_NAMESPACE
 
-extern _3DF::Manager theManager;
+extern TDF::Manager theManager;

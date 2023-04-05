@@ -10,9 +10,9 @@ public:
 	Object();
 	virtual ~Object();
 
-	virtual _3DF::Type Type() const;
+	virtual TDF::Type Type() const;
 
-	_3DF::Type ObjectType() const { return _3DF::Type::None; };
+	TDF::Type ObjectType() const { return TDF::Type::None; };
 	PrivateImpl * GetImpl() { return m_pcImpl; }
 	const PrivateImpl * GetImpl() const { return m_pcImpl; }
 

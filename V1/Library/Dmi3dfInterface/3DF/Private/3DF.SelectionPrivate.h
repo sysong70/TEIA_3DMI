@@ -86,7 +86,7 @@ public:
 		}
 	}
 
-	_3DF::Type Type() const override { return _3DF::Type::SelectionItem; }
+	TDF::Type Type() const override { return TDF::Type::SelectionItem; }
 
 	void Copy(SelectionItemPrivate * pcInThat) {
 		pcKey = pcInThat->pcKey->Copy();
@@ -146,7 +146,7 @@ public:
 class SelectionResultsPrivate : public PrivateImpl
 {
 public:
-	_3DF::Type Type() const override { return _3DF::Type::SelectionResults; }
+	TDF::Type Type() const override { return TDF::Type::SelectionResults; }
 
 	void Copy(SelectionResultsPrivate * pcInThat) {
 
@@ -167,7 +167,7 @@ public:
 class SelectionControlPrivate : public PrivateImpl
 {
 public:
-	_3DF::Type Type() const override { return _3DF::Type::SelectionControl; }
+	TDF::Type Type() const override { return TDF::Type::SelectionControl; }
 
 	void Copy(SelectionControlPrivate * pcInThat) {
 		m_pcBaseView = pcInThat->m_pcBaseView;

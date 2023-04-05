@@ -6,11 +6,14 @@
 #include "3DF.Segment.h"
 #include "3DF.Bounding.h"
 #include "3DF.Line.h"
+#include "3DF.Circle.h"
 
 #include "3DF.Selectability.h"
 #include "3DF.Visibility.h"
 #include "3DF.MaterialMapping.h"
 #include "3DF.MarkerAttribute.h"
+
+#include "3DF.Camera.h"
 
 USING_3DF_NAMESPACE
 
@@ -172,11 +175,11 @@ IncludeKey SegmentKey::IncludeSegment(SegmentKey const & cInSegment)
 //== Shell 관련 함수 =================================================================================
 ShellKey SegmentKey::InsertShell(ShellKit const & cInKit)
 {
-	_3DF::PointArray const * pacPoints = nullptr;
-	_3DF::VectorArray const * pacNormals = nullptr;
-	_3DF::IntArray const * pacFacelist = nullptr;
-	_3DF::FloatArray const * paParameters = nullptr;
-	_3DF::RGBAColorArray const * paColors = nullptr;
+	TDF::PointArray const * pacPoints = nullptr;
+	TDF::VectorArray const * pacNormals = nullptr;
+	TDF::IntArray const * pacFacelist = nullptr;
+	TDF::FloatArray const * paParameters = nullptr;
+	TDF::RGBAColorArray const * paColors = nullptr;
 
 	cInKit.ShowPoints(pacPoints);
 	cInKit.ShowNormals(pacNormals);
@@ -230,6 +233,17 @@ LineKey SegmentKey::InsertLine(size_t in_count, Point const pcInPoints[])
 	return cLine;
 }
 
+//== Circle 관련 함수 ============================================================================
+CircleKey SegmentKey::InsertCircle(Point const & cInCenter, float fInRadius, Vector const & cInNormal)
+{
+	Open();
+	HC_KEY nKey = HC_Insert_Circle_By_Radius(&cInCenter, fInRadius, &cInNormal);
+	Close();
+
+	CircleKey cCircle(nKey);
+	return cCircle;
+}
+
 //== Marker 관련 함수 ================================================================================
 MarkerKey SegmentKey::InsertMarker(Point const & cInPosition)
 {
@@ -271,7 +285,7 @@ MaterialMappingControl const SegmentKey::GetMaterialMappingControl() const
 	return cMaterialMappingControl;
 }
 
-SegmentKey & SegmentKey::SetMaterialMapping(CString strGeometry, _3DF::MaterialMappingKit const & cInKit)
+SegmentKey & SegmentKey::SetMaterialMapping(CString strGeometry, TDF::MaterialMappingKit const & cInKit)
 {
 	Open();
 
@@ -355,7 +369,7 @@ SegmentKey & SegmentKey::SetMaterialMapping(CString strGeometry, _3DF::MaterialM
 	return *this;
 }
 
-SegmentKey & SegmentKey::SetTextureMapping(CString strGeometry, _3DF::MaterialMappingKit const & cInKit)
+SegmentKey & SegmentKey::SetTextureMapping(CString strGeometry, TDF::MaterialMappingKit const & cInKit)
 {
 	Open();
 
@@ -493,6 +507,31 @@ void SegmentKey::SetMarkerSymbol(CString strSymbol)
 	Close();
 }
 
+//== Camera 관련 함수 ================================================================================
+// 	SegmentKey & SetCamera(CameraKit const & cInKit);
+// 	SegmentKey & UnsetCamera();
+
+bool SegmentKey::ShowCamera(CameraKit & cOutKit) const
+{
+	Open();
+
+	Vector cUpVector;
+	HC_Show_Net_Camera_Up_Vector(&cUpVector.x, &cUpVector.y, &cUpVector.z);
+	cOutKit.SetUpVector(cUpVector);
+
+	Point cPosition;
+	HC_Show_Net_Camera_Position(&cPosition.x, &cPosition.y, &cPosition.z);
+	cOutKit.SetPosition(cPosition);
+
+	Point cTarget;
+ 	HC_Show_Net_Camera_Target(&cTarget.x, &cTarget.y, &cTarget.z);
+	cOutKit.SetTarget(cTarget);
+
+	Close();
+
+	return true;
+}
+
 //== Model Segment 관련 함수 =====================================================================
 
 // Model용 Segment를 구성한다.
@@ -525,7 +564,7 @@ void SegmentKey::ConfigureSegmentModel()
 
 	//---- Portfolio 구성 -----
 	// 앞으로 사용을 위해서 미리 한개를 만들어 놓는다.
-// 	_3DF::PortfolioKey cPortfolio(cPortfolios.KeyValue());
+// 	TDF::PortfolioKey cPortfolio(cPortfolios.KeyValue());
 // 	m_cPortfolioControl.Push(cPortfolio);
 
 /*

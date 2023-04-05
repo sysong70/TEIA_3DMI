@@ -43,6 +43,9 @@ public:
 	//== Line 관련 함수 ==============================================================================
 	LineKey InsertLine(size_t nInCount, Point const pcInPoints[]);
 
+	//== Circle 관련 함수 ============================================================================
+	CircleKey InsertCircle(Point const & cInCenter, float fInRadius, Vector const & cInNormal);
+
 	//== Marker 관련 함수 ============================================================================
 	MarkerKey InsertMarker(Point const & in_position);
 	MarkerKey InsertMarker(double x, double y, double z);
@@ -52,7 +55,7 @@ public:
 
 	//== Material Mapping 관련 함수 ==================================================================
 	SegmentKey & SetMaterialMapping(CString strGeometry, MaterialMappingKit const & cInKit);
-	SegmentKey & SetTextureMapping(CString strGeometry, _3DF::MaterialMappingKit const & cInKit);
+	SegmentKey & SetTextureMapping(CString strGeometry, TDF::MaterialMappingKit const & cInKit);
 	MaterialMappingControl GetMaterialMappingControl();
 	MaterialMappingControl const GetMaterialMappingControl() const;
 
@@ -82,6 +85,11 @@ public:
 	void SetRenderingOptions(CString strList);
 	void SetColorByIndex(CString strList, int nIndex);
 	void SetMarkerSymbol(CString strSymbol);
+
+	//== Camera 관련 함수 ===========================================================================
+// 	SegmentKey & SetCamera(CameraKit const & cInKit);
+// 	SegmentKey & UnsetCamera();
+	bool ShowCamera(CameraKit & cOutKit) const;
 
 	//== Model Segment 관련 함수 =====================================================================
 	void ConfigureSegmentModel();

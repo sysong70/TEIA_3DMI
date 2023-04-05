@@ -25,7 +25,7 @@ public:
 
 	void SetBRepGeometry(bool brep) override;
 
-	_3DF::ModelHandedness GetModelHandedness() { return m_eModelHandedness; }
+	TDF::ModelHandedness GetModelHandedness() { return m_eModelHandedness; }
 
 	void UpdateModelHandedness();
 

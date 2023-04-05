@@ -38,19 +38,19 @@ public:
 	char m_chInSecondaryStyleName[STYLE_BUFFER_SIZE];
 };
 
-_3DF::HighlightOptionsKit::HighlightOptionsKit()
+TDF::HighlightOptionsKit::HighlightOptionsKit()
 {
 	m_pcImpl = new HighlightOptionsKitPrivate();
 }
 
-_3DF::HighlightOptionsKit::HighlightOptionsKit(char const * chInStyleName)
+TDF::HighlightOptionsKit::HighlightOptionsKit(char const * chInStyleName)
 {
 	HighlightOptionsKitPrivate * pcImpl = new HighlightOptionsKitPrivate();
 	strncpy(pcImpl->m_chInStyleName, chInStyleName, STYLE_BUFFER_SIZE);
 	m_pcImpl = pcImpl;
 }
 
-_3DF::HighlightOptionsKit::HighlightOptionsKit(char const * chInStyleName, char const * chInSecondaryStyleName)
+TDF::HighlightOptionsKit::HighlightOptionsKit(char const * chInStyleName, char const * chInSecondaryStyleName)
 {
 	HighlightOptionsKitPrivate * pcImpl = new HighlightOptionsKitPrivate();
 	strncpy(pcImpl->m_chInStyleName, chInStyleName, STYLE_BUFFER_SIZE);
@@ -58,25 +58,25 @@ _3DF::HighlightOptionsKit::HighlightOptionsKit(char const * chInStyleName, char 
 	m_pcImpl = pcImpl;
 }
 
-_3DF::HighlightOptionsKit::HighlightOptionsKit(HighlightOptionsKit const & cInThat)
+TDF::HighlightOptionsKit::HighlightOptionsKit(HighlightOptionsKit const & cInThat)
 {
 	m_pcImpl = new HighlightOptionsKitPrivate();
 	Set(cInThat);
 }
 
-_3DF::HighlightOptionsKit::~HighlightOptionsKit()
+TDF::HighlightOptionsKit::~HighlightOptionsKit()
 {
 
 }
 
-void _3DF::HighlightOptionsKit::Set(HighlightOptionsKit const & cInThat)
+void TDF::HighlightOptionsKit::Set(HighlightOptionsKit const & cInThat)
 {
 	HighlightOptionsKitPrivate * pcImpl = (HighlightOptionsKitPrivate *)m_pcImpl;
 	HighlightOptionsKitPrivate * pcInThatImpl = (HighlightOptionsKitPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-HighlightOptionsKit & _3DF::HighlightOptionsKit::operator=(HighlightOptionsKit const & cInThat)
+HighlightOptionsKit & TDF::HighlightOptionsKit::operator=(HighlightOptionsKit const & cInThat)
 {
 	Set(cInThat);
 	return *this;
@@ -87,7 +87,7 @@ HighlightOptionsKit & _3DF::HighlightOptionsKit::operator=(HighlightOptionsKit c
 class HighlightControlPrivate : public PrivateImpl
 {
 public:
-	_3DF::Type Type() const override { return _3DF::Type::SelectionControl; }
+	TDF::Type Type() const override { return TDF::Type::SelectionControl; }
 
 	void Copy(HighlightControlPrivate * pcInThat) {
 		m_pcBaseView = pcInThat->m_pcBaseView;
@@ -104,7 +104,7 @@ public:
 	const HBaseView * m_pcBaseView = nullptr;
 };
 
-_3DF::HighlightControl::HighlightControl(WindowKey const & cInWindow)
+TDF::HighlightControl::HighlightControl(WindowKey const & cInWindow)
 {
 	HighlightControlPrivate * pcImpl = new HighlightControlPrivate();
 	pcImpl->m_pcWindow = &cInWindow;
@@ -113,33 +113,33 @@ _3DF::HighlightControl::HighlightControl(WindowKey const & cInWindow)
 	m_pcImpl = pcImpl;
 }
 
-_3DF::HighlightControl::HighlightControl(HighlightControl const & cInThat)
+TDF::HighlightControl::HighlightControl(HighlightControl const & cInThat)
 {
 	m_pcImpl = new HighlightControlPrivate();
 	Set(cInThat);
 }
 
-_3DF::HighlightControl::HighlightControl() {}
+TDF::HighlightControl::HighlightControl() {}
 
-_3DF::HighlightControl::~HighlightControl()
+TDF::HighlightControl::~HighlightControl()
 {
 
 }
 
-void _3DF::HighlightControl::Set(HighlightControl const & cInThat)
+void TDF::HighlightControl::Set(HighlightControl const & cInThat)
 {
 	HighlightControlPrivate * pcImpl = (HighlightControlPrivate *)m_pcImpl;
 	HighlightControlPrivate * pcInThatImpl = (HighlightControlPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-HighlightControl & _3DF::HighlightControl::operator=(HighlightControl const & cInThat)
+HighlightControl & TDF::HighlightControl::operator=(HighlightControl const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-void _3DF::HighlightControl::DynamicHighlight(Point const & cInLocation)
+void TDF::HighlightControl::DynamicHighlight(Point const & cInLocation)
 {
 	HighlightControlPrivate * pcImpl = (HighlightControlPrivate *)m_pcImpl;
 	HBaseView * pcView = pcImpl->GetBaseView();
@@ -279,7 +279,7 @@ void _3DF::HighlightControl::DynamicHighlight(Point const & cInLocation)
 	}
 }
 
-HighlightControl & _3DF::HighlightControl::Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting)
+HighlightControl & TDF::HighlightControl::Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting)
 {
 	HighlightControlPrivate * pcHighlightControlImpl = (HighlightControlPrivate *)m_pcImpl;
 	HBaseView * pcView = pcHighlightControlImpl->GetBaseView();
@@ -295,7 +295,7 @@ HighlightControl & _3DF::HighlightControl::Highlight(SelectionResults const & cI
 
 		HC_KEY nKey = pcImpl->pcKey->KeyValue();
 
-		if (_3DF::Type::ShellKey == pcItem->Type() && (pcImpl->nLowest != pcImpl->nHighest || pcImpl->nLowest > 0)) {
+		if (TDF::Type::ShellKey == pcItem->Type() && (pcImpl->nLowest != pcImpl->nHighest || pcImpl->nLowest > 0)) {
 			bNeedDeselect = false;
 
 			if (!pcView->GetHighlightSelection()->IsRegionSelected(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, pcImpl->nRegion))

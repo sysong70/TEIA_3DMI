@@ -28,7 +28,7 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
-    <UseOfMfc>Dynamic</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -36,7 +36,7 @@
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <UseOfMfc>Dynamic</UseOfMfc>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -126,6 +126,8 @@
     <ClInclude Include="..\Dmi3dxInterface\LogManager.h" />
     <ClInclude Include="..\Signal\Signal.h" />
     <ClInclude Include="3DF.Signal.Connector.h" />
+    <ClInclude Include="3DF\3DF.Camera.h" />
+    <ClInclude Include="3DF\3DF.Circle.h" />
     <ClInclude Include="dllmain.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="3DF\3DF.Bounding.h" />
@@ -188,6 +190,8 @@
     <ClCompile Include="..\Signal\Signal.cpp" />
     <ClCompile Include="3DF.Signal.Connector.cpp" />
     <ClCompile Include="3DF\3DF.Bounding.cpp" />
+    <ClCompile Include="3DF\3DF.Camera.cpp" />
+    <ClCompile Include="3DF\3DF.Circle.cpp" />
     <ClCompile Include="3DF\3DF.Color.cpp" />
     <ClCompile Include="3DF\3DF.Control.cpp" />
     <ClCompile Include="3DF\3DF.Database.cpp" />

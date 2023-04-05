@@ -86,7 +86,7 @@ int Operator::CameraOrbitSelect::OnLButtonUp(HEventInfo & cEvent)
 			cPoint.x = cEvent.GetMouseWindowPos().x;
 			cPoint.y = cEvent.GetMouseWindowPos().y;
 
-			_3DF::SelectionResults cResult;
+			TDF::SelectionResults cResult;
 			m_pcWindow->GetSelectionControl().SelectByPoint(cPoint, cEvent.GetFlags(), cResult);
 		}
 	}
@@ -121,7 +121,7 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cEvent)
 	}
 
 	// 새롭게 선택된 Selection Result에서 Line만 추출하도록 한다.
-	m_cNewHighlightSelection.LeaveType((DWORD)_3DF::Type::LineKey);
+	m_cNewHighlightSelection.LeaveType((DWORD)TDF::Type::LineKey);
 
 	m_cHighlightSelection.Union(m_cNewHighlightSelection);
 	if (5 < m_cHighlightSelection.GetCount()) {
@@ -134,6 +134,8 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cEvent)
 
 	if (0 < m_cNewHighlightSelection.GetCount()) {
 		m_pcWindow->GetHighlightControl().Highlight(m_cNewHighlightSelection, cKit);
+// 	if (0 < m_cHighlightSelection.GetCount()) {
+// 			m_pcWindow->GetHighlightControl().Highlight(m_cHighlightSelection, cKit);
 
 		Operator::ObjectSnap cSnap(m_pcWindow);
 		cSnap.DrawObjectSnapPoint(m_cNewHighlightSelection);
@@ -146,6 +148,8 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cEvent)
 
 		m_pcWindow->GetBaseView()->Update();
 	}
+
+	// OBJEC 
 
 	return HLISTENER_PASS_EVENT;
 }

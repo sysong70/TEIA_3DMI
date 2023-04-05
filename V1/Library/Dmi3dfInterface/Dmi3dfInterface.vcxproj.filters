@@ -228,6 +228,12 @@
     <ClInclude Include="dllmain.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\3DF.Camera.h">
+      <Filter>3DF\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Circle.h">
+      <Filter>3DF\Key</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -394,6 +400,12 @@
     </ClCompile>
     <ClCompile Include="3DF.Signal.Connector.cpp">
       <Filter>Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Camera.cpp">
+      <Filter>3DF\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Circle.cpp">
+      <Filter>3DF\Key</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -12,7 +12,7 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 	{
 		case DLL_PROCESS_ATTACH:
 			Application::Instance = hModule;
-			_3DF::Operator::ObjectSnap::LoadResource();
+			TDF::Operator::ObjectSnap::LoadResource();
 			break;
 
 		case DLL_THREAD_ATTACH:

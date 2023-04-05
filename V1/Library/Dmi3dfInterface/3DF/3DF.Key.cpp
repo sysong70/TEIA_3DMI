@@ -205,7 +205,7 @@ void Key::Delete()
 
 Key * Key::Copy() const
 {
-	_3DF::Type eType = Type();
+	TDF::Type eType = Type();
 
 	switch (eType)
 	{

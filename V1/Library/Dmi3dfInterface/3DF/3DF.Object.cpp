@@ -16,10 +16,10 @@ Object::~Object()
 	}
 }
 
-_3DF::Type Object::Type() const
+TDF::Type Object::Type() const
 {
 	if (nullptr == m_pcImpl) {
-		return _3DF::Type::None;
+		return TDF::Type::None;
 	}
 
 	return m_pcImpl->Type();

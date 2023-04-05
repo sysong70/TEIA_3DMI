@@ -191,11 +191,11 @@ ShellKit & ShellKit::SetMaterialMapping(MaterialMappingKit const & cInkit)
 
 
 //== ShellKey Class ================================================================================
-namespace _3DF {
+namespace TDF {
 	class ShellKeyPrivate : public KeyPrivate
 	{
 	public:
-		_3DF::Type Type() const override { return _3DF::Type::ShellKey; }
+		TDF::Type Type() const override { return TDF::Type::ShellKey; }
 
 		void Copy(ShellKeyPrivate * pcInThat) {
 			KeyPrivate::Copy(pcInThat);

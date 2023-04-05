@@ -24,12 +24,12 @@ public:
 	PolygonKit const & operator = (PolygonKit const & cInThat);
 
 	unsigned int GetPointCount() const;
-	void GetPoints(unsigned int & nOutCount, _3DF::Point * pcOutPoints) const;
+	void GetPoints(unsigned int & nOutCount, TDF::Point * pcOutPoints) const;
 	// Replace the points on this PolygonKey with the specified points.
-	PolygonKit & SetPoints(size_t nInCount, _3DF::Point const cInPoints[]);
+	PolygonKit & SetPoints(size_t nInCount, TDF::Point const cInPoints[]);
 
-	void GetRGBColor(_3DF::RGBColor & cOutColor) const;
-	void SetRGBColor(_3DF::RGBColor const & cInColor);
+	void GetRGBColor(TDF::RGBColor & cOutColor) const;
+	void SetRGBColor(TDF::RGBColor const & cInColor);
 };
 
 class API_3DF PolygonKey : public GeometryKey

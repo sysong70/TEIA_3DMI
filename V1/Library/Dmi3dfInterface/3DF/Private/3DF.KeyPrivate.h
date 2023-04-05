@@ -5,7 +5,7 @@
 
 OPEN_3DF_NAMESPACE
 
-class KeyPrivate : public _3DF::PrivateImpl
+class KeyPrivate : public TDF::PrivateImpl
 {
 public:
 	KeyPrivate() {}

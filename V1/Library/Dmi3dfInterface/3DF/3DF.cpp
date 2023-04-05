@@ -17,8 +17,8 @@
 
 USING_3DF_NAMESPACE
 
-_3DF::Type PrivateImpl::Type() const {
-	return _3DF::Type::None;
+TDF::Type PrivateImpl::Type() const {
+	return TDF::Type::None;
 }
 
 void PrivateImpl::SetImpl(Object * pcObject, PrivateImpl * pcImpl)

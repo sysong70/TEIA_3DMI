@@ -8,10 +8,10 @@
 
 #include <atlstr.h>
 
-#define OPEN_3DF_PMI_NAMESPACE namespace _3DF { namespace PMI {
+#define OPEN_3DF_PMI_NAMESPACE namespace TDF { namespace PMI {
 #define CLOSE_3DF_PMI_NAMESPACE } }
 
-#define USING_3DF_PMI_NAMESPACE using namespace _3DF::PMI;
+#define USING_3DF_PMI_NAMESPACE using namespace TDF::PMI;
 
 OPEN_3DF_PMI_NAMESPACE
 
@@ -139,16 +139,16 @@ public:
 	unsigned int GetLeaderLineCount() const;
 	void SetLeaderLines(unsigned int in_count, Polyline const * in_leader_lines);
 
-	void SetLeaderSymbols(unsigned int nInCount, _3DF::Polygon const * pcInLeaderSymbols);
+	void SetLeaderSymbols(unsigned int nInCount, TDF::Polygon const * pcInLeaderSymbols);
 
 	void SetDisplayParallelToScreen(bool const bInParallel);
 	bool IsDisplayParallelToScreen() const;
 
 protected:
-	void SetPolygons(char const * pchInSegmentName, unsigned int nInCount, _3DF::Polygon const * pcInPolygons);
+	void SetPolygons(char const * pchInSegmentName, unsigned int nInCount, TDF::Polygon const * pcInPolygons);
 
-	void SetColor(const _3DF::Polyline & cPolyline);
-	void SetColor(const _3DF::Polygon & cPolygon);
+	void SetColor(const TDF::Polyline & cPolyline);
+	void SetColor(const TDF::Polygon & cPolygon);
 
 	unsigned int GetStringsAndTextAttributesCount(CString strInSegmentName) const;
 	void GetStringsAndTextAttributes(CString strInSegmentName, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const;
@@ -272,7 +272,7 @@ public:
 	Orientation const & operator=(Orientation const & cInThat);
 
 	void GetMatrix(float out_matrix[16]) const;
-	void SetMatrix(_3DF::Matrix const & cInMatrix);
+	void SetMatrix(TDF::Matrix const & cInMatrix);
 };
 
 class API_3DF TextAttributes : public Entity
@@ -284,8 +284,8 @@ public:
 	void Set(TextAttributes const & cInThat);
 	TextAttributes const & operator=(TextAttributes const & cInThat);
 
-	void GetInsertionPoint(_3DF::Point & out_point) const;
-	void SetInsertionPoint(_3DF::Point const & in_point);
+	void GetInsertionPoint(TDF::Point & out_point) const;
+	void SetInsertionPoint(TDF::Point const & in_point);
 
 	void GetFontSize(float & fOutSize) const;
 	void SetFontSize(float const nInSize);
@@ -299,8 +299,8 @@ public:
 	void GetOrientation(Orientation & cOutOrientation) const;
 	void SetOrientation(Orientation const & cInOrientation);
 
-	void GetRGBColor(_3DF::RGBColor & cOutColor) const;
-	void SetRGBColor(_3DF::RGBColor const & cInColor);
+	void GetRGBColor(TDF::RGBColor & cOutColor) const;
+	void SetRGBColor(TDF::RGBColor const & cInColor);
 
 	bool IsBold() const;
 	bool IsItalic() const;
@@ -342,8 +342,8 @@ public:
 	Frame const & operator=(Frame const & cInThat);
 
 	unsigned int GetPolylineCount() const;
-	void GetPolylines(unsigned int & nOutCount, _3DF::Polyline * pcOutPolylines) const;
-	void SetPolylines(unsigned int nInCount, _3DF::Polyline const * pcInPolylines);
+	void GetPolylines(unsigned int & nOutCount, TDF::Polyline * pcOutPolylines) const;
+	void SetPolylines(unsigned int nInCount, TDF::Polyline const * pcInPolylines);
 };
 
 class API_3DF Drawing : public Entity
@@ -357,8 +357,8 @@ public:
 
 	unsigned int GetPolygonCount() const;
 
-	void GetPolygons(unsigned int & nOutCount, _3DF::Polygon pcOutPolygons[]) const;
-	void SetPolygons(unsigned int nInCount, _3DF::Polygon const pcInPolygons[]);
+	void GetPolygons(unsigned int & nOutCount, TDF::Polygon pcOutPolygons[]) const;
+	void SetPolygons(unsigned int nInCount, TDF::Polygon const pcInPolygons[]);
 };
 
 

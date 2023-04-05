@@ -162,7 +162,7 @@ public:
 	SelectionItem();
 	SelectionItem(SelectionItem const & cInThat);
 	
-	_3DF::Type ObjectType() const { return _3DF::Type::SelectionItem; };
+	TDF::Type ObjectType() const { return TDF::Type::SelectionItem; };
 
 	void Set(SelectionItem const & cInThat);
 	SelectionItem & operator=(SelectionItem const & cInThat);
@@ -184,7 +184,7 @@ public:
 	SelectionResults(SelectionResults const & cInThat);
 	~SelectionResults();
 
-	_3DF::Type ObjectType() const { return _3DF::Type::SelectionResults; };
+	TDF::Type ObjectType() const { return TDF::Type::SelectionResults; };
 
 	void Set(SelectionResults const & cInThat);
 	SelectionResults & operator=(SelectionResults const & cInThat);
@@ -224,7 +224,7 @@ public:
 	void Set(SelectionControl const & cInThat);
 	SelectionControl & operator=(SelectionControl const & cInThat);
 
-	_3DF::Type ObjectType() const { return _3DF::Type::SelectionControl; };
+	TDF::Type ObjectType() const { return TDF::Type::SelectionControl; };
 
 	size_t SelectByPoint(HEventInfo & cEvent, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const;
 	size_t SelectByPoint(HEventInfo & cEvent, SelectionResults & cOutResults) const;

@@ -40,7 +40,7 @@ public:
 	void Set(HighlightControl const & cInThat);
 	HighlightControl & operator=(HighlightControl const & cInThat);
 
-	_3DF::Type ObjectType() const { return _3DF::Type::HighlightControl; };
+	TDF::Type ObjectType() const { return TDF::Type::HighlightControl; };
 
 	void DynamicHighlight(Point const & cInLocation);
 

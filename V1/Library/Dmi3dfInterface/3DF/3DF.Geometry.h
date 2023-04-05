@@ -10,9 +10,9 @@ class API_3DF GeometryKey : public Key
 public:
 	GeometryKey(HC_KEY nInKey = INVALID_KEY);
 
-	_3DF::Type ObjectType() const { return _3DF::Type::GeometryKey; };
+	TDF::Type ObjectType() const { return TDF::Type::GeometryKey; };
 
-	virtual bool NearPoint(WindowKey const & cInWindow, const WorldPoint & cInPoint, WorldPoint & cOutPoint) const;
+	virtual bool NearPoint(WindowKey const & cInWindow, const WindowPoint & cInPoint, WorldPoint & cOutPoint) const;
 	virtual bool DistanceToPoint(const WorldPoint & cInPoint, double & nOutDistance) const;
 };
 

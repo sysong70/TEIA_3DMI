@@ -33,10 +33,10 @@
 #	define DLLEXPORT_TEMPLATE extern
 #endif
 
-#define OPEN_3DF_NAMESPACE namespace _3DF {
+#define OPEN_3DF_NAMESPACE namespace TDF {
 #define CLOSE_3DF_NAMESPACE }
 
-#define USING_3DF_NAMESPACE using namespace _3DF;
+#define USING_3DF_NAMESPACE using namespace TDF;
 
 #include <atlcoll.h>
 
@@ -55,11 +55,15 @@ class SegmentKey;
 class MaterialMappingKit;
 class PortfolioKey;
 class ShellKey;
+class CircleKit;
+class CircleKey;
 class LineKit;
 class LineKey;
 class PolygonKit;
 class PolygonKey;
 class BoundingKit;
+
+class CameraKit;
 
 class WindowPoint;
 class WorldPoint;
@@ -83,8 +87,10 @@ enum class Type : uint32_t
 	SelectionItem							= 0x0000000b,
 
 	Kit										= 0x01000000,
+	CircleKit								= 0x01000017,
 	LineKit									= 0x01000020,
 	ShellKit								= 0x01000027,
+	CameraKit								= 0x01000031,
 
 	Key										= 0x10000000,
 	IncludeKey								= 0x10000001,
@@ -149,7 +155,7 @@ public:
 	PrivateImpl() {}
 	virtual ~PrivateImpl() {}
 
-	virtual _3DF::Type Type() const;
+	virtual TDF::Type Type() const;
 
 	void SetImpl(Object * pcObject, PrivateImpl * pcImpl);
 	void SetObject(Object * pcObject);
