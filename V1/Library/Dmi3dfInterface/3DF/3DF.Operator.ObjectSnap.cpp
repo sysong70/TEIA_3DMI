@@ -318,6 +318,8 @@ void Operator::ObjectSnap::DrawObjectSnapPoint(TDF::SelectionResults & cInItems)
 
 void Operator::ObjectSnap::DrawSnapItems()
 {
+	HC_KEY nConstructionKey = m_pcWindow->GetBaseView()->GetConstructionKey();
+
 	// Camera 정보를 받아옴.
 	SegmentKey cScene(m_pcWindow->GetSceneKey());
 	CameraKit cCamera;
@@ -327,7 +329,79 @@ void Operator::ObjectSnap::DrawSnapItems()
 	cConstruction.ForcedOpen();
 
 	//HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetConstructionKey()); {
-		HC_Flush_Contents(".", "geometry, segment");
+	HC_Flush_Contents(".", "geometry, segment");
+
+	HC_Open_Segment(""); {
+		HC_Set_Heuristics("hidden surfaces, related selection limit = 5");
+		HC_Set_Window_Frame("off");
+		//SetDefaultSelectionProximity(0.1f);
+		HC_Set_Rendering_Options("hlro = (face displacement = 5, visibility = off, pattern = 1, dim factor = 0.6)");
+		HC_Set_Rendering_Options("join cutoff angle=150");
+		HC_Set_Driver_Options("marker drawing = fastest");
+
+		HC_Set_Rendering_Options("hsra = hardware z-buffer, technology = standard");
+		HC_Set_Driver_Options("double-buffering");
+
+		char text[MVO_BUFFER_SIZE];
+		sprintf(text, "anti-alias = %d", 4);
+		HC_Set_Driver_Options(text);
+		HC_Set_Rendering_Options("anti-alias = (screen)");
+		HC_Set_Rendering_Options("anti-alias = (text = on)");
+
+		HC_Insert_Text(0, 0, 0, "1234567890_Test");
+	} HC_Close_Segment();
+
+// 	SegmentKey cTestSegement(nRecKey);
+// 	cTestSegement.GetVisibilityControl().SetFaces(true).SetEdges(true);
+
+/*
+		float       x0 = 0;
+		float       y0 = 0;
+		float       x1 = 200;
+		float       y1 = 100;
+		float       z = 0;
+		bool        fill = true;
+		HPoint  pts[5];
+		HC_KEY	key;
+
+		pts[0].x = x0;   pts[0].y = y0;   pts[0].z = z;
+		pts[1].x = x0;   pts[1].y = y1;   pts[1].z = z;
+		pts[2].x = x1;   pts[2].y = y1;   pts[2].z = z;
+		pts[3].x = x1;   pts[3].y = y0;   pts[3].z = z;
+		pts[4].x = x0;   pts[4].y = y0;   pts[4].z = z;
+
+		if (fill) {
+
+			HC_KEY nRecKey = HC_Open_Segment(""); {
+
+				int i;
+				int flist[] = { 4,0,1,2,3 };
+				key = HC_Insert_Shell(4, pts, 5, flist);
+
+				HC_Open_Geometry(key);
+				for (i = 0; i < 4; i++) {
+					HC_Open_Vertex(i);
+					HC_Set_Visibility("off");
+					HC_Close_Vertex();
+				}
+				HC_Close_Geometry();
+
+				HC_Set_Visibility("on");
+
+			} HC_Close_Segment();
+
+			// 			SegmentKey cTestSegement(nRecKey);
+			// 			cTestSegement.GetVisibilityControl().SetFaces(true).SetEdges(true);
+		}
+		else {
+			HC_Insert_Polyline(5, pts);
+			//key = HC_QKInsert_Polyline("seg", 5, pts);
+		}
+*/
+
+// 		HC_KEY nKey = HUtility::InsertRectangle("test", 0, 0, 100, 200, 0, true);
+// 		SegmentKey cTestSegement(nKey);
+// 		cTestSegement.GetVisibilityControl().SetFaces(true).SetEdges(true);
 
 		Point cPosition;
 		cCamera.ShowPosition(cPosition);
@@ -499,9 +573,14 @@ void Operator::ObjectSnap::DrawCircle(SegmentKey & cConstruction, Point cPoint, 
 	float fRadius = cWorldPoint1.DistanceWith(cWorldPoint2);
 
 	SegmentKey cCircle = cConstruction.Subsegment();
-	cCircle.SetMaterialMapping("geometry", cMaterial);
-	cCircle.GetVisibilityControl().SetFaces(true);
-	cCircle.InsertCircle(cPoint, fRadius, cViewNormal);
+// 	cCircle.SetMaterialMapping("geometry", cMaterial);
+// 	cCircle.GetVisibilityControl().SetFaces(true);
+// 	cCircle.InsertCircle(cPoint, fRadius, cViewNormal);
+
+	//cCircle.ForcedOpen();
+	//static HC_KEY InsertRectangle(const char * seg, float x0, float y0, float x1, float y1, float z = 0.0f, bool fill = false)
+	
+	//cCircle.ForcedClose();
 }
 
 void Operator::ObjectSnap::DrawRectangle(SegmentKey & cConstruction, Point cPoint, Vector cViewNormal, COLORREF nColor, double dWeight)
@@ -521,6 +600,8 @@ void Operator::ObjectSnap::DrawRectangle(SegmentKey & cConstruction, Point cPoin
 	cCircle.SetMaterialMapping("geometry", cMaterial);
 	cCircle.GetVisibilityControl().SetFaces(true);
 	cCircle.InsertCircle(cPoint, fRadius, cViewNormal);
+
+	//HUtility::InsertRectangle()
 }
 
 void Operator::ObjectSnap::CreateGlyph()

@@ -132,7 +132,7 @@ namespace Facility
 			struct ANTIALIASING {
 				bool Use = true;		// CAppSettings::bAntiAliasing
 				bool Line = false;		// CAppSettings::LineAntialiasing
-				bool Text = false;		// CAppSettings::TextAntialiasing
+				bool Text = true;		// CAppSettings::TextAntialiasing
 				int Level = 4;			// CAppSettings::AntialiasingLevel
 
 				Json::Object * Get();
