@@ -18,30 +18,12 @@ public:
 	static const TDF::Type staticType = TDF::Type::Key;
 	TDF::Type ObjectType() const { return staticType; };
 
-	virtual void Open();
-	virtual void Open() const;
-
-	virtual void Close();
-	virtual void Close() const;
-
-	void ForcedOpen();
-	void ForcedClose();
-
 	HC_KEY KeyValue() const;
 	void SetKeyValue(HC_KEY nInKey);
 	void SetKeyValue(HC_KEY nInKey) const;
 
-	bool IsOpen() const;
-	bool IsForcedOpen() const;
-
-	bool HasOwner() const;
-	void SetOwerKey(HC_KEY nInKey);
-
-	SegmentKey Owner();
 
 	void Delete();
-
-	Key * Copy() const;
 };
 
 CLOSE_3DF_NAMESPACE

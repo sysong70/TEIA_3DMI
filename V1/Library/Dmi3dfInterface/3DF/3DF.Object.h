@@ -10,7 +10,7 @@ public:
 	Object();
 	virtual ~Object();
 
-	virtual TDF::Type Type() const;
+	TDF::Type Type() const;
 
 	TDF::Type ObjectType() const { return TDF::Type::None; };
 	PrivateImpl * GetImpl() { return m_pcImpl; }

@@ -25,6 +25,8 @@
 
 USING_3DF_NAMESPACE
 
+
+// 주어진 Point와 Selection Option을 이용해서 선택 작업을 수행하고, 선택된 요소를 SelectionResults에 저장한다.
 int SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
 {
 	int	 nResult = 0;
@@ -114,7 +116,7 @@ int SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionO
 
 		if (streq(chKeyType, "line") || streq(chKeyType, "polyline") || streq(chKeyType, "circular arc") || streq(chKeyType, "elliptical arc")) {
 			eSelectedType = SelType::Line;
-			pcItemPrivate->pcKey = new LineKey(Key(nKey));
+			pcItemPrivate->cKey = LineKey(Key(nKey));
 		}
 		else if (streq(chKeyType, "marker")) {
 			eSelectedType = SelType::Marker;
@@ -126,7 +128,7 @@ int SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionO
 		else {
 			// This may be shell, mesh, cyliner, etc...
 			eSelectedType = SelType::Shell;
-			pcItemPrivate->pcKey = new ShellKey(Key(nKey));
+			pcItemPrivate->cKey = ShellKey(Key(nKey));
 
 			// But if it really is a shell, check for regions.
 			if (streq(chKeyType, "shell") && nOffset3 != -1) {
@@ -153,7 +155,7 @@ int SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionO
 			}
 		}
 
-		HC_KEY nTestKey2 = pcItemPrivate->pcKey->KeyValue();
+		HC_KEY nTestKey2 = pcItemPrivate->cKey.KeyValue();
 
 		// Selection Item을 생성해서 Selection Item Private을 저장한다.
 		SelectionItem * pcItem = new SelectionItem();
@@ -354,7 +356,7 @@ void SelectionControlPrivate::HandleSelection(UINT const nFlags, SelectionResult
 			eSelectedType = SelType::Line;
 
 			SelectionItemPrivate * pcItemPrivate = new SelectionItemPrivate();
-			pcItemPrivate->pcKey = new LineKey(Key(nKey));
+			pcItemPrivate->cKey = LineKey(Key(nKey));
 
 			SelectionItem * pcItem = new SelectionItem();
 			pcItemPrivate->SetObject(pcItem);

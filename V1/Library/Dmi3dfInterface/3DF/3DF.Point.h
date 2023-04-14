@@ -3,6 +3,7 @@
 #include "3DF.h"
 #include "3DF.Math.h"
 
+
 OPEN_3DF_NAMESPACE
 
 // using WindowPointArray = CAtlArray<WindowPoint>;
@@ -22,6 +23,8 @@ public:
 // 	WorldPoint(WindowKey const & cInWindow, InnerPixelPoint const & cInPoint);
  	WorldPoint(WindowKey const & cInWindow, WindowPoint const & cInPoint);
  	WorldPoint(WindowKey const & cInWindow, PixelPoint const & cInPoint);
+
+	//WorldPoint & operator = (HPoint const & cInPoint) { x = cInPoint.x, y = cInPoint.y, z = cInPoint.z; return *this; }
 
 private:
 // 	WorldPoint(ObjectPoint const & cInPoint); // Prevents implicit conversion to other points

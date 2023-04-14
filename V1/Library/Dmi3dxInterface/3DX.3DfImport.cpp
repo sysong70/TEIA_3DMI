@@ -17,6 +17,8 @@
 #include <3DF/3DF.Line.h>
 #include <3DF/3DF.Polygon.h>
 
+#include <3DF/3DF.Math.Matrix.h>
+
 #include <3DF/3DF.Visibility.h>
 #include <3DF/3DF.MarkerAttribute.h>
 
@@ -313,7 +315,7 @@ A3DStatus _3DfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurre
 	TDF::SegmentKey cSegment = m_cPoccsIncludeSegment.Subsegment(strSegmentName);
 	cParentSegment.IncludeSegment(cSegment);
 
-	cSegment.ForcedOpen();
+	//cSegment.ForcedOpen();
 
 	// Attribute 생성
 	// Parent에서 받은(계단식으로) Attribute를 이용해서, Attribute를 생성
@@ -346,7 +348,7 @@ A3DStatus _3DfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurre
 			}
 */
 
-			TDF::Matrix cMatrix;
+			TDF::Math::MatrixKit cMatrix;
 			if(A3D_SUCCESS == ProductOccurrenceGetLocation(&cData, cMatrix)) {
 				if(false == cMatrix.IsIdentity()) {
 					cSegment.SetModellingMatrix(cMatrix);
@@ -411,7 +413,7 @@ A3DStatus _3DfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurre
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttrs));
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrsData));
 
-	cSegment.ForcedClose();
+	//cSegment.ForcedClose();
 
 	LogDecreaseTabIndex(2);
 /*
@@ -490,7 +492,7 @@ A3DStatus _3DfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurre
 }
 
 // 2-1-1. Assembly Product Occurence의 위치를 가져오는 함수 / ProductOccurrenceGetLocation
-A3DStatus _3DfImport::ProductOccurrenceGetLocation(A3DAsmProductOccurrenceData const * pcPoData, Matrix & cTransMatrix)
+A3DStatus _3DfImport::ProductOccurrenceGetLocation(A3DAsmProductOccurrenceData const * pcPoData, TDF::Math::MatrixKit & cTransMatrix)
 {
 	if(nullptr == pcPoData) {
 		return A3D_ERROR;
@@ -878,7 +880,8 @@ A3DStatus _3DfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMi
 	// 기존에 생성된 Part를 찾은 경우 Include로 Parent에 추가 시킨다.
 
 	HC_KEY nSegmentKey = INVALID_KEY;
-	if(true == m_mPartsMap.Lookup((DWORD_PTR) pcPart, nSegmentKey)) {
+	if(true == m_mPartsMap.Lookup((DWORD_PTR) pcPart, nSegmentKey)) 
+	{
 		TDF::SegmentKey cSegment(nSegmentKey);
 		cParentSegment.IncludeSegment(cSegment);
 		Log(2, L"ParsePart Map: %s", cSegment.Name());
@@ -1008,7 +1011,7 @@ A3DStatus _3DfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * 
 			A3D_INITIALIZE_DATA(A3DRiCoordinateSystemData, sCSysData);
 			CHECK_A3D_RETURN(A3DRiCoordinateSystemGet(pcCoordSys, &sCSysData));
 
-			TDF::Matrix cMatrix;
+			TDF::Math::MatrixKit cMatrix;
 			GetMatrix(sCSysData.m_pTransformation, cMatrix);
 			cSegment.SetModellingMatrix(cMatrix);
 
@@ -1806,8 +1809,8 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
  	Point cTextMove;
 	float char_width = 0.;
 	float char_height = 1.;
-	Matrix cMatrix;
-	Matrix cTransformMatrix;
+	TDF::Math::MatrixKit cMatrix;
+	TDF::Math::MatrixKit cTransformMatrix;
  	//FloatArray pline;
 	CString strLinePattern;
 // 	H_UTF8 line_pattern;
@@ -1877,7 +1880,7 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 							pcOutPmiOptions->SetDisplayParallelToScreen();
 						}
 
-						Matrix cMatrix;
+						TDF::Math::MatrixKit cMatrix;
 						cMatrix[3][0] = static_cast<float>(pdCoordData[0]);
 						cMatrix[3][1] = static_cast<float>(pdCoordData[1]);
 						cMatrix[3][2] = static_cast<float>(pdCoordData[2]);
@@ -1908,7 +1911,7 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 							pcOutPmiOptions->SetDisplayParallelToScreen();
 						}
 
-						TDF::Matrix cMatrix;
+						TDF::Math::MatrixKit cMatrix;
 						cMatrix[3][0] = static_cast<float>(pdCoordData[0]);
 						cMatrix[3][1] = static_cast<float>(pdCoordData[1]);
 						cMatrix[3][2] = static_cast<float>(pdCoordData[2]);
@@ -2115,8 +2118,10 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 					cMatrix[3][1] = static_cast<float>(pdCoordData[13]);
 					cMatrix[3][2] = static_cast<float>(pdCoordData[14]);
 
+
+					cTransformMatrix = cMatrix * cTransformMatrix;
 					//TDF::TestMatrix cm;
-					MatrixCal::ComputeMatrixProduct(cMatrix.GetData(), cTransformMatrix.GetData(), cTransformMatrix.GetData());
+					//MatrixCal::ComputeMatrixProduct(cMatrix.GetData(), cTransformMatrix.GetData(), cTransformMatrix.GetData());
 
 					PMI::Orientation orientation;
 					orientation.SetMatrix(cTransformMatrix);
@@ -2127,9 +2132,13 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 			}
 			else
 			{
-				MatrixCal::InverseMatrix(cMatrix.GetData(), cMatrix.GetData());
-				MatrixCal::ComputeMatrixProduct(cMatrix.GetData(), cTransformMatrix.GetData(), cTransformMatrix.GetData());
-				cMatrix.SetIdentity();
+				cMatrix.Invert();
+				cTransformMatrix = cMatrix * cTransformMatrix;
+				cMatrix.Reset();
+
+// 				MatrixCal::InverseMatrix(cMatrix.GetData(), cMatrix.GetData());
+// 				MatrixCal::ComputeMatrixProduct(cMatrix.GetData(), cTransformMatrix.GetData(), cTransformMatrix.GetData());
+// 				cMatrix.SetIdentity();
 				char_height = 1.;
 				MAKE_OFFSET(0, 0);
 			}
@@ -3034,7 +3043,7 @@ UINT _3DfImport::ConvertTessFaceDataTriangleStripeOneNormal(ConvertFaceInfo & cI
 		else
 			cInFaceInfo.nOutTriStartIndex += 2 * nTriStripPointSize;
 
-		if(0 < cInFaceInfo.aInColors.size() > 0) {
+		if(0 < cInFaceInfo.aInColors.size()) {
 			cInFaceInfo.nOutTriColorIndex += nTriStripPointSize;
 		}
 	}
@@ -4817,7 +4826,7 @@ A3DStatus _3DfImport::GetMatrix(A3DMiscTransformation * pcLocation, MbMatrix3D &
 	return A3D_SUCCESS;
 }
 
-A3DStatus _3DfImport::GetMatrix(A3DMiscTransformation * pcLocation, Matrix & cOutMatrix)
+A3DStatus _3DfImport::GetMatrix(A3DMiscTransformation * pcLocation, TDF::Math::MatrixKit & cOutMatrix)
 {
 	MbMatrix3D cMatrix;
 	CHECK_A3D_RETURN(GetMatrix(pcLocation, cMatrix));

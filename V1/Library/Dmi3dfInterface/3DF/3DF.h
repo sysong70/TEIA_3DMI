@@ -18,7 +18,7 @@
 #endif
 
 #ifndef _3DF_INLINE
-#	define _3DF_INLINE __forceinline
+#	define TDF_INLINE __forceinline
 #endif
 
 #ifndef _3DF_UNREFERENCED
@@ -75,6 +75,12 @@ class StyleKey;
 class SelectabilityControl;
 class VisibilityControl;
 class MarkerAttributeControl;
+
+namespace Math
+{
+	class MatrixKit;
+};
+
 //==================================================================================================
 
 // The Type class is a concept class that contains type information for all classes.
@@ -121,6 +127,15 @@ enum class Type : uint32_t
 	HighlightControl						= 0x50000018,
 };
 
+enum class UserDataIndex : uint32_t
+{
+	None									= 0x00000000,
+
+	// Item 관련 User Data Index
+	Type									= 0x10000000,
+	Name									= 0x10000001,
+};
+
 using SegmentKeyArray = CAtlArray<SegmentKey>;
 
 using LineArray = CAtlArray<LineKit>;
@@ -155,10 +170,14 @@ public:
 	PrivateImpl() {}
 	virtual ~PrivateImpl() {}
 
-	virtual TDF::Type Type() const;
+	TDF::Type Type() const;
+	void SetType(TDF::Type eType);
 
 	void SetImpl(Object * pcObject, PrivateImpl * pcImpl);
 	void SetObject(Object * pcObject);
+
+protected:
+	TDF::Type m_eType = TDF::Type::None;
 };
 
 CLOSE_3DF_NAMESPACE

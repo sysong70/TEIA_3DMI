@@ -6,7 +6,11 @@
 #include "3DF.Window.h"
 #include "3DF.Line.h"
 
+#include "3DF.Camera.h"
+
 #include "3DF.Operator.ObjectSnap.h"
+
+#include "HDraw.h"
 
 #include <Common_Define.h>
 
@@ -93,6 +97,8 @@ int Operator::CameraOrbitSelect::OnLButtonUp(HEventInfo & cEvent)
 
 	m_bOrbitMode = false;
 
+	m_cClickPoint = cEvent.GetMouseWorldPos();
+
 	return HOpCameraOrbit::OnLButtonUp(cEvent);
 }
 
@@ -114,21 +120,26 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cEvent)
 	m_cNewHighlightSelection.Reset();
 	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cEvent, cSelectOption, m_cNewHighlightSelection);
 
-	// Old와 New가 다르면 Old를 삭제한다.
+	// Old와 New가 다르면 Old를 Unhiglight하고 Reset 시킨다.
 	if (0 < m_cOldHighlightSelection.GetCount() && m_cOldHighlightSelection != m_cNewHighlightSelection) {
 		m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
 		m_cOldHighlightSelection.Reset();
 	}
 
-	// 새롭게 선택된 Selection Result에서 Line만 추출하도록 한다.
+	// 새롭게 선택된 Selection Result에서 Line만 남기도록 한다.
 	m_cNewHighlightSelection.LeaveType((DWORD)TDF::Type::LineKey);
 
-	m_cHighlightSelection.Union(m_cNewHighlightSelection);
-	if (5 < m_cHighlightSelection.GetCount()) {
-		m_cHighlightSelection.SetSize(5);
+	// 추가된것이 있는 경우에 Count를 검사해서 5개까지만 남기도록 한다.
+	if (true == m_cHighlightSelection.Union(m_cNewHighlightSelection)) {
+		if (5 < m_cHighlightSelection.GetCount()) {
+			m_cHighlightSelection.SetSize(5);
+		}
 	}
 
+	TRACE(L"HighlightSelection Count: %d\n", m_cHighlightSelection.GetCount());
+
 	m_cOldHighlightSelection = m_cNewHighlightSelection;
+
 
 	HighlightOptionsKit cKit;
 
@@ -138,18 +149,68 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cEvent)
 // 			m_pcWindow->GetHighlightControl().Highlight(m_cHighlightSelection, cKit);
 
 		Operator::ObjectSnap cSnap(m_pcWindow);
-		cSnap.DrawObjectSnapPoint(m_cNewHighlightSelection);
+		cSnap.DrawObjectSnapPoint(m_cHighlightSelection);
 	}
 	else {
 		// Object Snape 등을 지우도록 한다.
+		// 아래 code 테스트용으로 임시 Remark
+/*
 		HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetConstructionKey()); {
 			HC_Flush_Contents(".", "geometry, segment");
 		} HC_Close_Segment();
 
-		m_pcWindow->GetBaseView()->Update();
+		m_pcWindow->GetBaseView()->Update();*/
 	}
 
-	// OBJEC 
+	SegmentKey cSecne(m_pcWindow->GetSceneKey());
+
+	CameraKit cCamera;
+	cSecne.ShowCamera(cCamera);
+
+	Math::Matrix cMatrix;
+	cCamera.ShowMatrix(cMatrix);
+
+	Point cOP[2];
+
+	Point cPoint[2];
+	cPoint[0].x = m_cClickPoint.x;
+	cPoint[0].y = m_cClickPoint.y;
+	cPoint[0].z = m_cClickPoint.z;
+
+	cPoint[1].x = cEvent.GetMouseWorldPos().x;
+	cPoint[1].y = cEvent.GetMouseWorldPos().y;
+	cPoint[1].z = cEvent.GetMouseWorldPos().z;
+
+	cOP[0] = cPoint[0];
+	cOP[1] = cPoint[1];
+
+	Math::Matrix cInverseMatrix;
+	cMatrix.ShowInverse(cInverseMatrix);
+
+	cPoint[0] = cInverseMatrix.Transform(cPoint[0]);
+	cPoint[1] = cInverseMatrix.Transform(cPoint[1]);
+
+	HPoint cHPoint[2];
+
+	cHPoint[0].x = cPoint[0].x;
+	cHPoint[0].y = cPoint[0].y;
+	cHPoint[0].z = cPoint[0].z;
+
+	cHPoint[1].x = cPoint[1].x;
+	cHPoint[1].y = cPoint[1].y;
+	cHPoint[1].z = cPoint[1].z;
+
+	// Test Object Snap
+	HC_Open_Segment_By_Key(GetView()->GetConstructionKey());
+	{
+		HC_Open_Segment("test_draw"); {
+			HC_Set_Modelling_Matrix(cMatrix.m_fData);
+			HDraw::Test(GetView(), cMatrix, cHPoint[0], cHPoint[1], cOP[0], cOP[1]);
+		} HC_Close_Segment();
+	}
+	HC_Close_Segment();
+
+	GetView()->Update();
 
 	return HLISTENER_PASS_EVENT;
 }

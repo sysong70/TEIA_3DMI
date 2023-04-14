@@ -4,7 +4,7 @@
 
 #include "3DF.Include.h"
 #include "3DF.Shell.h"
-#include "3DF.Portfolio.h"
+//#include "3DF.Portfolio.h"
 #include "3DF.Style.h"
 
 #include "3DF.Marker.h"
@@ -20,7 +20,21 @@ public:
 
 	virtual ~SegmentKey();
 
+	void Set(SegmentKey const & cInThat);
 	SegmentKey & operator = (SegmentKey const & cInThat);
+
+	//== Segment 관련 함수 ===========================================================================
+	void Open();
+	void Open() const;
+
+	void Close();
+	void Close() const;
+
+	void ForcedOpen();
+	void ForcedClose();
+
+	bool IsOpen() const;
+	bool IsForcedOpen() const;
 
 	//== Sub Segment 관련 함수 =======================================================================
 	SegmentKey const Subsegment();
@@ -98,7 +112,7 @@ public:
 	SegmentKey StylesInclude();
 	SegmentKey StylesInclude() const;
 
-	SegmentKey & SetModellingMatrix(Matrix const & cInKit);
+	SegmentKey & SetModellingMatrix(Math::MatrixKit const & cInKit);
 
 	//== Bounding 관련 함수 ==========================================================================
 	SegmentKey & SetBounding(BoundingKit const & cInKit);

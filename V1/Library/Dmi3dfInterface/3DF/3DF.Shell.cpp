@@ -195,7 +195,7 @@ namespace TDF {
 	class ShellKeyPrivate : public KeyPrivate
 	{
 	public:
-		TDF::Type Type() const override { return TDF::Type::ShellKey; }
+		ShellKeyPrivate() {m_eType = TDF::Type::ShellKey; }
 
 		void Copy(ShellKeyPrivate * pcInThat) {
 			KeyPrivate::Copy(pcInThat);

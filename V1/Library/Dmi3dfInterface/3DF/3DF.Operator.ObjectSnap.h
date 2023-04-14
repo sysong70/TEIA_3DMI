@@ -35,7 +35,7 @@ namespace Operator
 
 		//== Object Snap 계산 =======================================================================
 		void CalculationObjectSnapPoint(TDF::SelectionResults & cInItems);
-		bool CalculationLienObjectSnapPoint(const Key * pcLine, const WindowPoint & cInPoint);
+		bool CalculationLienObjectSnapPoint(const Key & cInLineKey, const WindowPoint & cInPoint);
 		void CalculationLienAndLineObjectSnapPoint(LineKey & cLine1, LineKey & cLine2);
 
 		//== Object Snap Draw ======================================================================
@@ -57,7 +57,7 @@ namespace Operator
 		static void LoadResource();
 
 		//== Utility Function ======================================================================
-		bool AddSnapItem(Key * pcKey, Point cSnapPoint, SnapType eType);
+		bool AddSnapItem(Key & cInKey, Point cSnapPoint, SnapType eType);
 		void ResetSnapItem();
 	protected:
 

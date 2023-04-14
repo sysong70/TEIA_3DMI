@@ -72,11 +72,8 @@ public:
 class SelectionItemPrivate : public PrivateImpl
 {
 public:
+	SelectionItemPrivate() { m_eType = TDF::Type::SelectionItem; }
 	~SelectionItemPrivate() {
-		if (nullptr != pcKey) {
-			delete pcKey;
-		}
-
 		if (nullptr != pnKeys) {
 			delete pnKeys;
 		}
@@ -86,10 +83,8 @@ public:
 		}
 	}
 
-	TDF::Type Type() const override { return TDF::Type::SelectionItem; }
-
 	void Copy(SelectionItemPrivate * pcInThat) {
-		pcKey = pcInThat->pcKey->Copy();
+		cKey = pcInThat->cKey;
 
 		nKeyCount = pcInThat->nKeyCount;
 		// pnKeys값 복사
@@ -122,7 +117,7 @@ public:
 	}
 
 	// LineKey 등이 저장되는 변수
-	Key * pcKey = nullptr;
+	Key cKey;
 
 	int nKeyCount = 0;
 	HC_KEY * pnKeys = nullptr;
@@ -146,7 +141,7 @@ public:
 class SelectionResultsPrivate : public PrivateImpl
 {
 public:
-	TDF::Type Type() const override { return TDF::Type::SelectionResults; }
+	SelectionResultsPrivate() { m_eType = TDF::Type::SelectionResults; }	
 
 	void Copy(SelectionResultsPrivate * pcInThat) {
 
@@ -167,7 +162,7 @@ public:
 class SelectionControlPrivate : public PrivateImpl
 {
 public:
-	TDF::Type Type() const override { return TDF::Type::SelectionControl; }
+	SelectionControlPrivate() { m_eType = TDF::Type::SelectionControl; }	
 
 	void Copy(SelectionControlPrivate * pcInThat) {
 		m_pcBaseView = pcInThat->m_pcBaseView;

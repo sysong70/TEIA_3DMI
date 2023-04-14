@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "3DF.h"
-#include "3DF.Key.h"
+#include "3DF.Segment.h"
 #include "3DF.Math.h"
 
 #include "3DF.Color.h"
@@ -118,7 +118,7 @@ namespace Font
 class Frame;
 class Drawing;
 
-class API_3DF Entity : public Key
+class API_3DF Entity : public SegmentKey
 {
 public:
 	Entity(HC_KEY nInKey = INVALID_KEY);
@@ -272,7 +272,7 @@ public:
 	Orientation const & operator=(Orientation const & cInThat);
 
 	void GetMatrix(float out_matrix[16]) const;
-	void SetMatrix(TDF::Matrix const & cInMatrix);
+	void SetMatrix(Math::MatrixKit const & cInMatrix);
 };
 
 class API_3DF TextAttributes : public Entity

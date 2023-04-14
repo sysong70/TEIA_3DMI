@@ -87,7 +87,7 @@ HighlightOptionsKit & TDF::HighlightOptionsKit::operator=(HighlightOptionsKit co
 class HighlightControlPrivate : public PrivateImpl
 {
 public:
-	TDF::Type Type() const override { return TDF::Type::SelectionControl; }
+	HighlightControlPrivate() { m_eType = TDF::Type::HighlightControl; }
 
 	void Copy(HighlightControlPrivate * pcInThat) {
 		m_pcBaseView = pcInThat->m_pcBaseView;
@@ -293,7 +293,7 @@ HighlightControl & TDF::HighlightControl::Highlight(SelectionResults const & cIn
 		SelectionItem * pcItem = cInItems.GetNext(pcPosition);
 		SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)pcItem->GetImpl();
 
-		HC_KEY nKey = pcImpl->pcKey->KeyValue();
+		HC_KEY nKey = pcImpl->cKey.KeyValue();
 
 		if (TDF::Type::ShellKey == pcItem->Type() && (pcImpl->nLowest != pcImpl->nHighest || pcImpl->nLowest > 0)) {
 			bNeedDeselect = false;
@@ -370,7 +370,7 @@ HighlightControl & HighlightControl::Unhighlight(SelectionResults const & cInIte
 		SelectionItem * pcItem = cInItems.GetNext(pcPosition);
 		SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)pcItem->GetImpl();
 
-		HC_KEY nKey = pcImpl->pcKey->KeyValue();
+		HC_KEY nKey = pcImpl->cKey.KeyValue();
 		pcView->GetHighlightSelection()->DeSelect(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, false);
 	}
 
@@ -390,7 +390,7 @@ HighlightControl & HighlightControl::Unhighlight(SelectionItem const & cInItem, 
 	HighlightControlPrivate * pcHighlightControlImpl = (HighlightControlPrivate *)m_pcImpl;
 	HBaseView * pcView = pcHighlightControlImpl->GetBaseView();
 
-	HC_KEY nKey = pcImpl->pcKey->KeyValue();
+	HC_KEY nKey = pcImpl->cKey.KeyValue();
 	pcView->GetHighlightSelection()->DeSelect(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, false);
 
 	pcView->ForceUpdate();

@@ -91,7 +91,7 @@ protected:
 	// == Product Occurrences 관련 함수 =========================================================
 	A3DStatus ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurrence, A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, TDF::SegmentKey & cParentSegment);
 
-	A3DStatus ProductOccurrenceGetLocation(const A3DAsmProductOccurrenceData * pcPoData, TDF::Matrix & cTransMatrix);
+	A3DStatus ProductOccurrenceGetLocation(const A3DAsmProductOccurrenceData * pcPoData, TDF::Math::MatrixKit & cTransMatrix);
 	A3DStatus ProductOccurrenceGetLocation(const A3DAsmProductOccurrenceData * psPOccData, A3DMiscCartesianTransformation ** ppLocation);
 	A3DStatus ProductOccurrenceGetExternalData(const A3DAsmProductOccurrenceData * pcPOccData,
 		A3DAsmProductOccurrence ** ppcExternalData);
@@ -230,7 +230,7 @@ protected:
 	// == C3D 관련 Utility 함수 =====================================================================
 protected:
 	A3DStatus GetMatrix(A3DMiscTransformation * pcLocation, MbMatrix3D & cMatrix);
-	A3DStatus GetMatrix(A3DMiscTransformation * pcLocation, TDF::Matrix & cOutMatrix);
+	A3DStatus GetMatrix(A3DMiscTransformation * pcLocation, TDF::Math::MatrixKit & cOutMatrix);
 
 private:
 	CString m_strCadFileName;
@@ -264,12 +264,12 @@ private:
 
 	//----- Tessellation 관련 -----
 	TDF::Point * m_pcPoints = nullptr;
-	int m_nPointCount = 0;
-	int m_nMaxPointCount = 0;
+	A3DUns32 m_nPointCount = 0;
+	A3DUns32 m_nMaxPointCount = 0;
 
 	TDF::Vector * m_pcNormals = nullptr;
-	int m_nNormalCount = 0;
-	int m_nMaxNormalCount = 0;
+	A3DUns32 m_nNormalCount = 0;
+	A3DUns32 m_nMaxNormalCount = 0;
 
 	// Segment Key Name 뒤부분에 붙는 Id값
 	DWORD m_nIncrementalId = 0;

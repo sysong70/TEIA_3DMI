@@ -128,6 +128,9 @@
     <ClInclude Include="3DF.Signal.Connector.h" />
     <ClInclude Include="3DF\3DF.Camera.h" />
     <ClInclude Include="3DF\3DF.Circle.h" />
+    <ClInclude Include="3DF\3DF.Math.Matrix.h" />
+    <ClInclude Include="3DF\HDraw.h" />
+    <ClInclude Include="3DF\Private\3DF.SegmentPrivate.h" />
     <ClInclude Include="dllmain.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="3DF\3DF.Bounding.h" />
@@ -208,6 +211,7 @@
     <ClCompile Include="3DF\3DF.Material.cpp" />
     <ClCompile Include="3DF\3DF.MaterialMapping.cpp" />
     <ClCompile Include="3DF\3DF.Math.cpp" />
+    <ClCompile Include="3DF\3DF.Math.Matrix.cpp" />
     <ClCompile Include="3DF\3DF.Model.cpp" />
     <ClCompile Include="3DF\3DF.Object.cpp" />
     <ClCompile Include="3DF\3DF.Operator.CameraOrbitSelect.cpp" />
@@ -229,7 +233,9 @@
     <ClCompile Include="3DF\3DF.Visibility.cpp" />
     <ClCompile Include="3DF\3DF.MarkerAttribute.cpp" />
     <ClCompile Include="3DF\3DF.Window.cpp" />
+    <ClCompile Include="3DF\HDraw.cpp" />
     <ClCompile Include="3DF\Private\3DF.KeyPrivate.cpp" />
+    <ClCompile Include="3DF\Private\3DF.SegmentPrivate.cpp" />
     <ClCompile Include="3DF\Private\3DF.SelectionPrivate.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="3DF.Signal.ApplicationManager.cpp" />

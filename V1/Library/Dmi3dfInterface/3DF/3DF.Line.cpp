@@ -105,7 +105,7 @@ namespace TDF {
 	class LineKeyPrivate : public TDF::KeyPrivate
 	{
 	public:
-		TDF::Type Type() const override { return TDF::Type::LineKey; }
+		LineKeyPrivate() { m_eType = TDF::Type::LineKey; }
 
 		void Copy(LineKeyPrivate * pcInThat) {
 			KeyPrivate::Copy(pcInThat);
@@ -124,6 +124,9 @@ LineKey::LineKey(Key const & cInKey)
 	m_pcImpl = pcImpl;
 
 	((KeyPrivate *)pcImpl)->Copy((KeyPrivate *)(cInKey.GetImpl()));
+
+	// 외부에서 들어오는 Key는 LineKey가 아닐 수 있으므로, LineKey로 변경한다.
+	pcImpl->SetType(TDF::Type::LineKey);
 }
 
 LineKey::LineKey(LineKey const & cInThat)
@@ -266,18 +269,24 @@ bool LineKey::GetIntersectionPoint(LineKey & cInLine, PointArray & aOutIntersect
 		return false;
 	}
 
-
-
 	bool bResult = false;
 	Point cSP[2], cEP[2], cIntersectionPoint;
 
-	cSP[0].x = -100, cSP[0].y = 0, cSP[0].z = 0;
-	cEP[0].x = 100, cEP[0].y = 0, cEP[0].z = 0;
+	// 직선인 경우 범위밖에 있는 교차점도 구하도록 한다.
+	if (2 == aPoints.GetCount() && 2 == aInPoints.GetCount()) {
+		cSP[0] = aPoints[0];
+		cEP[0] = aPoints[1];
 
-	cSP[1].x = 20, cSP[1].y = 20, cSP[1].z = 0;
-	cEP[1].x = -20, cEP[1].y = -20, cEP[1].z = 0;
+		cSP[1] = aInPoints[0];
+		cEP[1] = aInPoints[1];
 
-	Math::IntersectionPointInRange(cSP[0], cEP[0], cSP[1], cEP[1], cIntersectionPoint);
+		if (true == Math::IntersectionPoint(cSP[0], cEP[0], cSP[1], cEP[1], cIntersectionPoint)) {
+			aOutIntersectionPoints.Add(cIntersectionPoint);
+			bResult = true;
+		}
+
+		return bResult;
+	}
 
 	// aPoints와 aInPoints를 비교해서 교차점을 구함.
 	for (size_t nIndex = 0; nIndex < aPoints.GetCount() - 1; nIndex++) {
@@ -328,7 +337,7 @@ bool LineKey::NearPoint(WindowKey const & cInWindow, const WindowPoint & cInPoin
 			if (dDist < dMinDist) {
 				dMinDist = dDist;
 				Vector cVec = aPoints[nIndex + 1] - aPoints[nIndex];
-				cOutPoint = aPoints[nIndex] + cVec * dParameter;
+				cOutPoint = aPoints[nIndex] + cVec * (float)dParameter;
 				bResultFlag = true;
 			}
 		}

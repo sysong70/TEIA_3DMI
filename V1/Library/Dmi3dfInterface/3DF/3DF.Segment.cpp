@@ -15,6 +15,8 @@
 
 #include "3DF.Camera.h"
 
+#include "./Private/3DF.SegmentPrivate.h"
+
 USING_3DF_NAMESPACE
 
 SegmentKey::SegmentKey(CString strInName)
@@ -28,21 +30,40 @@ SegmentKey::SegmentKey(CString strInName)
 		nKey = HC_Create_Segment(nullptr);
 	}
 
-	SetKeyValue(nKey);
+	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
+	pcImpl->SetKeyValue(nKey);
+	
+	m_pcImpl = pcImpl;
 }
 
-SegmentKey::SegmentKey(HC_KEY nInKey) :
-	Key(nInKey)
+SegmentKey::SegmentKey(HC_KEY nInKey)
 {
+	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
+	pcImpl->SetKeyValue(nInKey);
+
+	m_pcImpl = pcImpl;
 }
 
-SegmentKey::SegmentKey(SegmentKey const & cInThat) :
-	Key(cInThat)
+SegmentKey::SegmentKey(SegmentKey const & cInThat)
 {
+	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
+	m_pcImpl = pcImpl;
+
+	Set(cInThat);
 }
 
 SegmentKey::~SegmentKey()
 {
+}
+
+void SegmentKey::Set(SegmentKey const & cInThat)
+{
+	Key::Set(cInThat);
+
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
+	SegmentKeyPrivate * pcInThatImpl = (SegmentKeyPrivate *)cInThat.m_pcImpl;
+
+	pcImpl->Copy(pcInThatImpl);
 }
 
 SegmentKey & SegmentKey::operator = (SegmentKey const & cInThat)
@@ -55,6 +76,57 @@ SegmentKey & SegmentKey::operator = (SegmentKey const & cInThat)
 	return *this;
 }
 
+//== Segment 관련 함수 ===============================================================================
+
+void SegmentKey::Open()
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
+	pcImpl->Open();
+}
+
+void SegmentKey::Open() const
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
+	pcImpl->Open();
+}
+
+void SegmentKey::Close()
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
+	pcImpl->Close();
+}
+
+void SegmentKey::Close() const
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
+	pcImpl->Close();
+}
+
+void SegmentKey::ForcedOpen()
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
+	pcImpl->ForcedOpen();
+}
+
+void SegmentKey::ForcedClose()
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
+	pcImpl->ForcedClose();
+}
+
+bool SegmentKey::IsOpen() const
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
+	return pcImpl->IsOpen();
+}
+
+bool SegmentKey::IsForcedOpen() const
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
+	return pcImpl->IsForcedOpen();	
+}
+
+//== Sub Segment 관련 함수 ===========================================================================
 SegmentKey const SegmentKey::Subsegment()
 {
 	CString strText;
@@ -515,17 +587,31 @@ bool SegmentKey::ShowCamera(CameraKit & cOutKit) const
 {
 	Open();
 
-	Vector cUpVector;
-	HC_Show_Net_Camera_Up_Vector(&cUpVector.x, &cUpVector.y, &cUpVector.z);
-	cOutKit.SetUpVector(cUpVector);
-
 	Point cPosition;
-	HC_Show_Net_Camera_Position(&cPosition.x, &cPosition.y, &cPosition.z);
-	cOutKit.SetPosition(cPosition);
-
 	Point cTarget;
- 	HC_Show_Net_Camera_Target(&cTarget.x, &cTarget.y, &cTarget.z);
+	Vector cUpVector;
+	float fWidth, fHeight;
+	char chProjecionType[MVO_BUFFER_SIZE];
+
+	HC_Show_Net_Camera(&cPosition, &cTarget, &cUpVector, &fWidth, &fHeight, chProjecionType);
+
+	cOutKit.SetUpVector(cUpVector);
+	cOutKit.SetPosition(cPosition);
 	cOutKit.SetTarget(cTarget);
+
+	Camera::Projection eType = Camera::Projection::Default;
+	if (0 == strieq(chProjecionType, "Perspective")) {
+		eType = Camera::Projection::Perspective;
+	}
+	else if (0 == strieq(chProjecionType, "Orthographic")) {
+		eType = Camera::Projection::Orthographic;
+	}
+	else if (0 == strieq(chProjecionType, "Stretched")) {
+		eType = Camera::Projection::Stretched;
+	}
+	cOutKit.SetProjection(eType);
+
+	cOutKit.SetField(fWidth, fHeight);
 
 	Close();
 
@@ -619,11 +705,11 @@ SegmentKey SegmentKey::StylesInclude() const
 	return cStylesInclude;
 }
 
-SegmentKey & SegmentKey::SetModellingMatrix(Matrix const & cInKit)
+SegmentKey & SegmentKey::SetModellingMatrix(Math::MatrixKit const & cInKit)
 {
 	Open();
 
-	HC_Set_Modelling_Matrix(cInKit.GetData());
+	HC_Set_Modelling_Matrix(cInKit.m_fData);
 
 	Close();
 

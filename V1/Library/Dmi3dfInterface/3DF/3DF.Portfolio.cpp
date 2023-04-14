@@ -9,24 +9,30 @@
 
 USING_3DF_NAMESPACE
 
+PortfolioKey::PortfolioKey(CString strInName)  :
+	SegmentKey(strInName)
+{
+
+}
+
 PortfolioKey::PortfolioKey(HC_KEY nInKey) :
-	Key(nInKey)
+	SegmentKey(nInKey)
 {
 }
 
 PortfolioKey::PortfolioKey(PortfolioKey const & cInThat) :
-	Key(cInThat)
+	SegmentKey(cInThat)
 {
 }
 
 void PortfolioKey::Set(PortfolioKey const & cInThat)
 {
-	Key::Set(cInThat);
+	SegmentKey::Set(cInThat);
 }
 
 PortfolioKey & PortfolioKey::operator = (PortfolioKey const & cInThat)
 {
-	Key::Set(cInThat);
+	SegmentKey::Set(cInThat);
 	return *this;
 }
 

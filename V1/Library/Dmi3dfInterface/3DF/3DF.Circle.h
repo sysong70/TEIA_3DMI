@@ -21,6 +21,14 @@ public:
 	CircleKit const & operator=(CircleKit const & cInThat);
 
 	TDF::Type ObjectType() const { return TDF::Type::CircleKit; };
+
+	CircleKit & SetCenter(Point const & cInCenter);
+	CircleKit & SetRadius(double dInRadius);
+	CircleKit & SetNormal(Vector const & cInNormal);
+
+	bool ShowCenter(Point & cOutCenter) const;
+	bool ShowRadius(float & cOutRadius) const;
+	bool ShowNormal(Vector & cOutNormal) const;
 };
 
 class API_3DF CircleKey : public GeometryKey
@@ -34,6 +42,10 @@ public:
 	CircleKey & operator=(CircleKey const & cInThat);
 
 	TDF::Type ObjectType() const { return TDF::Type::CircleKey; };
+
+	CircleKey & SetCenter(Point const & cInCenter);
+	CircleKey & SetRadius(double dInRadius);
+	CircleKey & SetNormal(Vector const & cInNormal);
 };
 
 CLOSE_3DF_NAMESPACE

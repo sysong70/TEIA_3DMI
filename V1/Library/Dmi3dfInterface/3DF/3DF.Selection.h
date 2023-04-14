@@ -170,7 +170,7 @@ public:
 	bool operator==(SelectionItem const & cInThat) const;
 	bool operator!=(SelectionItem const & cInThat) const;
 
-	bool ShowSelectedItem(Key *& pcOutSelection);
+	bool ShowSelectedItem(Key & cOutSelection);
 
 	bool ShowSelectionPosition(WindowPoint & cOutLocation) const;
 	bool ShowSelectionPosition(WorldPoint & cOutLocation) const;
@@ -196,6 +196,9 @@ public:
 
 	size_t GetCount() const;
 	POSITION GetHeadPosition() const;
+
+	SelectionItem * GetHead();
+	SelectionItem * GetHead() const;
 
 	SelectionItem * GetAt(POSITION & pcPosition);
 	SelectionItem * GetAt(POSITION & pcPosition) const;

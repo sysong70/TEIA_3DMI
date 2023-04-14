@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "3DF.Key.h"
+#include "3DF.Segment.h"
 #include "3DF.Control.h"
 
 #include <deque>
@@ -9,9 +9,10 @@ OPEN_3DF_NAMESPACE
 
 using PortfolioDeque = std::deque<PortfolioKey *>;
 
-class API_3DF PortfolioKey : public Key
+class API_3DF PortfolioKey : public SegmentKey
 {
 public:
+	PortfolioKey(CString strInName);
 	PortfolioKey(HC_KEY nInKey = INVALID_KEY);
 	PortfolioKey(PortfolioKey const & cInThat);
 

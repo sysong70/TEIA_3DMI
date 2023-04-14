@@ -5,26 +5,38 @@
 #include "3DF.Line.h"
 #include "3DF.Polygon.h"
 
+#include "3DF.Math.Matrix.h"
+
 #include <HTools.h>
 #include <utf_utils.h>
 
 #include <WStr.h>
 
+#include "./Private/3DF.SegmentPrivate.h"
+
 USING_3DF_PMI_NAMESPACE
 
-Entity::Entity(HC_KEY nInKey) :
-	Key(nInKey)
+Entity::Entity(HC_KEY nInKey)
 {
+	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
+	pcImpl->SetKeyValue(nInKey);
+	m_pcImpl = pcImpl;
 }
 
-Entity::Entity(Key const & cInThat) :
-	Key(cInThat)
+Entity::Entity(Key const & cInThat)
 {
+	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
+	m_pcImpl = pcImpl;
+
+	Key::Set(cInThat);
 }
 
-Entity::Entity(Entity const & cInThat) :
-	Key(cInThat)
+Entity::Entity(Entity const & cInThat)
 {
+	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
+	m_pcImpl = pcImpl;
+
+	Set(cInThat);
 }
 
 void Entity::Set(Entity const & cInThat)
@@ -415,6 +427,7 @@ void Entity::GetStringsAndTextAttributes(CString strInSegmentName, CString * pst
 							Orientation cOrientation;
 							float matrix[16];
 							HC_Show_Modelling_Matrix(matrix);
+
 							cOrientation.SetMatrix(matrix);
 							pcOutTextAttributes[i].SetOrientation(cOrientation);
 
@@ -1246,7 +1259,7 @@ public:
 		m_cMatrix = pcInThat->m_cMatrix;
 	}
 
-	TDF::Matrix m_cMatrix;
+	TDF::Math::MatrixKit m_cMatrix;
 };
 
 Orientation::Orientation()
@@ -1278,13 +1291,13 @@ void Orientation::GetMatrix(float out_matrix[16]) const
 	OrientationPrivate * pcImpl = (OrientationPrivate *)m_pcImpl;
 
 	for (int nIndex = 0; nIndex < 16; nIndex++) {
-		out_matrix[nIndex] = pcImpl->m_cMatrix.r[nIndex];
+		out_matrix[nIndex] = pcImpl->m_cMatrix.m_fData[nIndex];
 	}
 
 	// memcpy(out_matrix, pcImpl->m_cMatrix.GetData(), 16 * sizeof(float));
 }
 
-void Orientation::SetMatrix(TDF::Matrix const & cInMatrix)
+void Orientation::SetMatrix(Math::MatrixKit const & cInMatrix)
 {
 	OrientationPrivate * pcImpl = (OrientationPrivate *)m_pcImpl;
 	pcImpl->m_cMatrix = cInMatrix;

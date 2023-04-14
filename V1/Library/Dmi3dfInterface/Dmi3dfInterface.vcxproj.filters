@@ -49,6 +49,9 @@
     <Filter Include="Facility">
       <UniqueIdentifier>{85153672-7fe8-4121-95d3-6294d3c13e7d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="3DF\Key\Private">
+      <UniqueIdentifier>{b402e2ea-86b4-4b1a-ab07-3dfabf3d5e3a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -210,9 +213,6 @@
     <ClInclude Include="3DF\Private\3DF.SelectionPrivate.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Private\3DF.KeyPrivate.h">
-      <Filter>3DF\Key</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\3DF.Operator.ObjectSnap.h">
       <Filter>Operator</Filter>
     </ClInclude>
@@ -233,6 +233,18 @@
     </ClInclude>
     <ClInclude Include="3DF\3DF.Circle.h">
       <Filter>3DF\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Private\3DF.SegmentPrivate.h">
+      <Filter>3DF\Key\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Private\3DF.KeyPrivate.h">
+      <Filter>3DF\Key\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Math.Matrix.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\HDraw.h">
+      <Filter>3DF</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -389,9 +401,6 @@
     <ClCompile Include="3DF\Private\3DF.SelectionPrivate.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Private\3DF.KeyPrivate.cpp">
-      <Filter>3DF\Key</Filter>
-    </ClCompile>
     <ClCompile Include="3DF\3DF.Operator.ObjectSnap.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
@@ -406,6 +415,18 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.Circle.cpp">
       <Filter>3DF\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Private\3DF.SegmentPrivate.cpp">
+      <Filter>3DF\Key\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Private\3DF.KeyPrivate.cpp">
+      <Filter>3DF\Key\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Math.Matrix.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\HDraw.cpp">
+      <Filter>3DF</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -518,7 +518,7 @@ bool TDF::SelectionItem::operator==(SelectionItem const & cInThat) const
 	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)m_pcImpl;
 	SelectionItemPrivate * pcInThatImpl = (SelectionItemPrivate *)cInThat.m_pcImpl;
 
-	if (pcImpl->pcKey->KeyValue() != pcInThatImpl->pcKey->KeyValue()) {
+	if (pcImpl->cKey.KeyValue() != pcInThatImpl->cKey.KeyValue()) {
 		return false;
 	}
 
@@ -542,6 +542,9 @@ bool TDF::SelectionItem::operator==(SelectionItem const & cInThat) const
 		}
 	}
 
+	// Arc나 Polygon, Polyline 등에서 특성값이나, 몇번째 요소들이 선택되었는지 여부를 나타내는 값들이다.
+	// 값이 같지 않아도 같은 요소들이 선택된것일 수 있으므로 비교처리하지 않는다.
+/*  
 	if (pcImpl->nOffset1 != pcInThatImpl->nOffset1) {
 		return false;
 	}
@@ -553,6 +556,7 @@ bool TDF::SelectionItem::operator==(SelectionItem const & cInThat) const
 	if (pcImpl->nOffset3 != pcInThatImpl->nOffset3) {
 		return false;
 	}
+*/
 
 	if (pcImpl->nRegion != pcInThatImpl->nRegion) {
 		return false;
@@ -574,14 +578,15 @@ bool TDF::SelectionItem::operator!=(SelectionItem const & cInThat) const
 	return !(*this == cInThat);
 }
 
-bool TDF::SelectionItem::ShowSelectedItem(Key *& pcOutSelection)
+
+bool TDF::SelectionItem::ShowSelectedItem(Key & cOutSelection)
 {
-	if (nullptr == m_pcImpl) { 
+	if (nullptr == m_pcImpl) {
 		return false;
 	}
 
 	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)m_pcImpl;
-	pcOutSelection = pcImpl->pcKey;
+	cOutSelection = pcImpl->cKey;
 
 	return true;
 }
@@ -720,6 +725,18 @@ POSITION SelectionResults::GetHeadPosition() const
 	return  pcImpl->aItemList.GetHeadPosition();
 }
 
+SelectionItem * SelectionResults::GetHead()
+{
+	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
+	return pcImpl->aItemList.GetHead();
+}
+
+SelectionItem * SelectionResults::GetHead() const
+{
+	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
+	return pcImpl->aItemList.GetHead();
+}
+
 SelectionItem * SelectionResults::GetAt(POSITION & pcPosition)
 {
 	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
@@ -818,28 +835,41 @@ bool SelectionResults::Union(SelectionResults const & cInThat)
 		return false;
 	}
 
+	// 기존에 List에서 같은 값이 있으면 삭제한다.
+	// 새롭게 들어오는 항목이 앞쪽에 있도록 정렬하기 위함.
 	POSITION pcInThatPosition = pcInThatImpl->aItemList.GetHeadPosition();
-
 	while (nullptr != pcInThatPosition)
 	{
 		SelectionItem * pcInThatItem = pcInThatImpl->aItemList.GetNext(pcInThatPosition);
 
+		POSITION pcCurrentPosition = nullptr;
 		POSITION pcPosition = pcImpl->aItemList.GetHeadPosition();
 
 		bool bFindFlag = false;
 		while (nullptr != pcPosition) {
+			
+			pcCurrentPosition = pcPosition;
 			SelectionItem * pcItem = pcImpl->aItemList.GetNext(pcPosition);
 
+			Key cItemKey, cInThatItemKey;
+			pcItem->ShowSelectedItem(cItemKey);
+			pcInThatItem->ShowSelectedItem(cInThatItemKey);
+
+			TRACE(L"Item Key: %d, InThat Item Key: %d\n", cItemKey.KeyValue(), cInThatItemKey.KeyValue());
+
+
+
+			// 들어온 요소에 대해서 기존에 있는 요소와 비교해서 같은 것이 있으면 삭제한다.
 			if (*pcItem == *pcInThatItem) {
-				bFindFlag = true;
-				break;
+				pcImpl->aItemList.RemoveAt(pcCurrentPosition);
 			}
 		}
+	}
 
-		if (true == bFindFlag) {
-			continue;
-		}
-
+	pcInThatPosition = pcInThatImpl->aItemList.GetHeadPosition();
+	while (nullptr != pcInThatPosition)
+	{
+		SelectionItem * pcInThatItem = pcInThatImpl->aItemList.GetNext(pcInThatPosition);
 		SelectionItem * pcNewItem = new SelectionItem(*pcInThatItem);
 		pcImpl->aItemList.AddHead(pcNewItem);
 	}
@@ -859,11 +889,11 @@ void SelectionResults::LeaveType(DWORD nType)
 		pcCurrentPosition = pcPosition;
 		SelectionItem * pcItem = pcImpl->aItemList.GetNext(pcPosition);
 
-		Key * pcItemKey = nullptr;
-		if(true == pcItem->ShowSelectedItem(pcItemKey)) {
-			DWORD nItemType = (DWORD)pcItemKey->Type();
+		Key cItemKey;
+		if(true == pcItem->ShowSelectedItem(cItemKey)) {
+			DWORD nItemType = (DWORD)cItemKey.Type();
 			// 원하는 Type이면 삭제하지 않는다.
-			if (nItemType == (nType & nItemType)) {
+			if (nType == (nType & nItemType)) {
 				continue;
 			}
 		}
@@ -884,9 +914,9 @@ void SelectionResults::RemoveType(DWORD nType)
 		pcCurrentPosition = pcPosition;
 		SelectionItem * pcItem = pcImpl->aItemList.GetNext(pcPosition);
 
-		Key * pcItemKey = nullptr;
-		if (true == pcItem->ShowSelectedItem(pcItemKey)) {
-			DWORD nItemType = (DWORD)pcItemKey->Type();
+		Key cItemKey;
+		if (true == pcItem->ShowSelectedItem(cItemKey)) {
+			DWORD nItemType = (DWORD)cItemKey.Type();
 			// 원하는 Type이면 삭제한다.
 			if (nItemType == (nType & nItemType)) {
 				pcImpl->aItemList.RemoveAt(pcCurrentPosition);

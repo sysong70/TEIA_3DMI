@@ -18,7 +18,11 @@
 USING_3DF_NAMESPACE
 
 TDF::Type PrivateImpl::Type() const {
-	return TDF::Type::None;
+	return m_eType;
+}
+
+void PrivateImpl::SetType(TDF::Type eType) {
+	m_eType = eType;
 }
 
 void PrivateImpl::SetImpl(Object * pcObject, PrivateImpl * pcImpl)
