@@ -9,6 +9,8 @@
 
 #include "3DF.Marker.h"
 
+#include "3DF.Math.Matrix.h"
+
 OPEN_3DF_NAMESPACE
 
 class API_3DF SegmentKey : public Key
@@ -112,7 +114,7 @@ public:
 	SegmentKey StylesInclude();
 	SegmentKey StylesInclude() const;
 
-	SegmentKey & SetModellingMatrix(Math::MatrixKit const & cInKit);
+	SegmentKey & SetModellingMatrix(MatrixKit const & cInKit);
 
 	//== Bounding 관련 함수 ==========================================================================
 	SegmentKey & SetBounding(BoundingKit const & cInKit);

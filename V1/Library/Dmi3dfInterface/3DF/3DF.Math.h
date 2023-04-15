@@ -401,7 +401,7 @@ public:
 	F z;
 
 	Point_3D() { x = 0, y = 0, z = 0; }
-	Point_3D(F v1, F v2, F v3) : x(v1), y(v2), z(v3) {}
+	Point_3D(F v1, F v2, F v3 = (F)0.0) : x(v1), y(v2), z(v3) {}
 
 	void Set(F X, F Y, F Z) { x = X; y = Y; z = Z; };
 

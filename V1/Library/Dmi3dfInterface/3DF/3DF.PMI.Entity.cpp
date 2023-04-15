@@ -1259,7 +1259,7 @@ public:
 		m_cMatrix = pcInThat->m_cMatrix;
 	}
 
-	TDF::Math::MatrixKit m_cMatrix;
+	TDF::MatrixKit m_cMatrix;
 };
 
 Orientation::Orientation()
@@ -1297,7 +1297,7 @@ void Orientation::GetMatrix(float out_matrix[16]) const
 	// memcpy(out_matrix, pcImpl->m_cMatrix.GetData(), 16 * sizeof(float));
 }
 
-void Orientation::SetMatrix(Math::MatrixKit const & cInMatrix)
+void Orientation::SetMatrix(MatrixKit const & cInMatrix)
 {
 	OrientationPrivate * pcImpl = (OrientationPrivate *)m_pcImpl;
 	pcImpl->m_cMatrix = cInMatrix;

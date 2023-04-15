@@ -271,7 +271,7 @@ bool CameraKit::ShowNearLimit(float & fOutNearLimit) const
 }
 
 // Show Matrix 생성
-bool CameraKit::ShowMatrix(Math::MatrixKit & cMatrix) const
+bool CameraKit::ShowMatrix(MatrixKit & cMatrix) const
 {
 	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
 

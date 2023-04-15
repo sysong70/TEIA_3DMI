@@ -348,7 +348,7 @@ A3DStatus _3DfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurre
 			}
 */
 
-			TDF::Math::MatrixKit cMatrix;
+			TDF::MatrixKit cMatrix;
 			if(A3D_SUCCESS == ProductOccurrenceGetLocation(&cData, cMatrix)) {
 				if(false == cMatrix.IsIdentity()) {
 					cSegment.SetModellingMatrix(cMatrix);
@@ -492,7 +492,7 @@ A3DStatus _3DfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurre
 }
 
 // 2-1-1. Assembly Product Occurence의 위치를 가져오는 함수 / ProductOccurrenceGetLocation
-A3DStatus _3DfImport::ProductOccurrenceGetLocation(A3DAsmProductOccurrenceData const * pcPoData, TDF::Math::MatrixKit & cTransMatrix)
+A3DStatus _3DfImport::ProductOccurrenceGetLocation(A3DAsmProductOccurrenceData const * pcPoData, TDF::MatrixKit & cTransMatrix)
 {
 	if(nullptr == pcPoData) {
 		return A3D_ERROR;
@@ -1011,7 +1011,7 @@ A3DStatus _3DfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * 
 			A3D_INITIALIZE_DATA(A3DRiCoordinateSystemData, sCSysData);
 			CHECK_A3D_RETURN(A3DRiCoordinateSystemGet(pcCoordSys, &sCSysData));
 
-			TDF::Math::MatrixKit cMatrix;
+			TDF::MatrixKit cMatrix;
 			GetMatrix(sCSysData.m_pTransformation, cMatrix);
 			cSegment.SetModellingMatrix(cMatrix);
 
@@ -1809,8 +1809,8 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
  	Point cTextMove;
 	float char_width = 0.;
 	float char_height = 1.;
-	TDF::Math::MatrixKit cMatrix;
-	TDF::Math::MatrixKit cTransformMatrix;
+	TDF::MatrixKit cMatrix;
+	TDF::MatrixKit cTransformMatrix;
  	//FloatArray pline;
 	CString strLinePattern;
 // 	H_UTF8 line_pattern;
@@ -1880,7 +1880,7 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 							pcOutPmiOptions->SetDisplayParallelToScreen();
 						}
 
-						TDF::Math::MatrixKit cMatrix;
+						TDF::MatrixKit cMatrix;
 						cMatrix[3][0] = static_cast<float>(pdCoordData[0]);
 						cMatrix[3][1] = static_cast<float>(pdCoordData[1]);
 						cMatrix[3][2] = static_cast<float>(pdCoordData[2]);
@@ -1911,7 +1911,7 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 							pcOutPmiOptions->SetDisplayParallelToScreen();
 						}
 
-						TDF::Math::MatrixKit cMatrix;
+						TDF::MatrixKit cMatrix;
 						cMatrix[3][0] = static_cast<float>(pdCoordData[0]);
 						cMatrix[3][1] = static_cast<float>(pdCoordData[1]);
 						cMatrix[3][2] = static_cast<float>(pdCoordData[2]);
@@ -4826,7 +4826,7 @@ A3DStatus _3DfImport::GetMatrix(A3DMiscTransformation * pcLocation, MbMatrix3D &
 	return A3D_SUCCESS;
 }
 
-A3DStatus _3DfImport::GetMatrix(A3DMiscTransformation * pcLocation, TDF::Math::MatrixKit & cOutMatrix)
+A3DStatus _3DfImport::GetMatrix(A3DMiscTransformation * pcLocation, TDF::MatrixKit & cOutMatrix)
 {
 	MbMatrix3D cMatrix;
 	CHECK_A3D_RETURN(GetMatrix(pcLocation, cMatrix));

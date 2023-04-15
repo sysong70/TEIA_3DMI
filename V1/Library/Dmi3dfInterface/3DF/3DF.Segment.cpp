@@ -705,7 +705,7 @@ SegmentKey SegmentKey::StylesInclude() const
 	return cStylesInclude;
 }
 
-SegmentKey & SegmentKey::SetModellingMatrix(Math::MatrixKit const & cInKit)
+SegmentKey & SegmentKey::SetModellingMatrix(MatrixKit const & cInKit)
 {
 	Open();
 

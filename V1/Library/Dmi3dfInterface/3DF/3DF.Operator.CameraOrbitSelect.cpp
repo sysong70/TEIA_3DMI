@@ -167,10 +167,8 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cEvent)
 	CameraKit cCamera;
 	cSecne.ShowCamera(cCamera);
 
-	Math::Matrix cMatrix;
+	Matrix cMatrix;
 	cCamera.ShowMatrix(cMatrix);
-
-	Point cOP[2];
 
 	Point cPoint[2];
 	cPoint[0].x = m_cClickPoint.x;
@@ -181,34 +179,11 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cEvent)
 	cPoint[1].y = cEvent.GetMouseWorldPos().y;
 	cPoint[1].z = cEvent.GetMouseWorldPos().z;
 
-	cOP[0] = cPoint[0];
-	cOP[1] = cPoint[1];
-
-	Math::Matrix cInverseMatrix;
-	cMatrix.ShowInverse(cInverseMatrix);
-
-	cPoint[0] = cInverseMatrix.Transform(cPoint[0]);
-	cPoint[1] = cInverseMatrix.Transform(cPoint[1]);
-
-	HPoint cHPoint[2];
-
-	cHPoint[0].x = cPoint[0].x;
-	cHPoint[0].y = cPoint[0].y;
-	cHPoint[0].z = cPoint[0].z;
-
-	cHPoint[1].x = cPoint[1].x;
-	cHPoint[1].y = cPoint[1].y;
-	cHPoint[1].z = cPoint[1].z;
 
 	// Test Object Snap
-	HC_Open_Segment_By_Key(GetView()->GetConstructionKey());
-	{
-		HC_Open_Segment("test_draw"); {
-			HC_Set_Modelling_Matrix(cMatrix.m_fData);
-			HDraw::Test(GetView(), cMatrix, cHPoint[0], cHPoint[1], cOP[0], cOP[1]);
-		} HC_Close_Segment();
-	}
-	HC_Close_Segment();
+	HC_Open_Segment_By_Key(GetView()->GetConstructionKey()); {
+		HDraw::Test(GetView(), cMatrix, cPoint[0], cPoint[1]);
+	} HC_Close_Segment();
 
 	GetView()->Update();
 

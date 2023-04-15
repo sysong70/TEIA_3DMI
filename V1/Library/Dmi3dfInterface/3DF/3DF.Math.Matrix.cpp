@@ -8,8 +8,6 @@ const double EPSILON = 1e-10; // 미세한 값
 
 USING_3DF_NAMESPACE
 
-using namespace TDF::Math;
-
 MatrixKit::MatrixKit()
 {
 	Reset();

@@ -54,7 +54,7 @@ public:
 	bool ShowHeight(float & fOutHeight) const;
 	bool ShowField(float & fOutWidth, float & fOutHeight) const;
 	bool ShowNearLimit(float & fOutNearLimit) const;
-	bool ShowMatrix(Math::MatrixKit & cMatrix) const;
+	bool ShowMatrix(MatrixKit & cMatrix) const;
 };
 
 CLOSE_3DF_NAMESPACE

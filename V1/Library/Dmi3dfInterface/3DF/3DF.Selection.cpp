@@ -893,7 +893,7 @@ void SelectionResults::LeaveType(DWORD nType)
 		if(true == pcItem->ShowSelectedItem(cItemKey)) {
 			DWORD nItemType = (DWORD)cItemKey.Type();
 			// 원하는 Type이면 삭제하지 않는다.
-			if (nType == (nType & nItemType)) {
+			if (nType == nItemType) {
 				continue;
 			}
 		}

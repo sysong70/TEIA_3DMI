@@ -10,157 +10,164 @@ namespace HDraw
 }
 
 
-void HDraw::Test(HBaseView* view, TDF::Math::Matrix & cMatrix, HPoint p1, HPoint p2, Point op1, Point op2)
+void HDraw::Test(HBaseView* view, TDF::Matrix & cMatrix, Point p1, Point p2)
 {
     SetView(view);
 
-    HC_Open_Segment("construct");
-    {
-        // Remove previous
+	Matrix cInverseMatrix;
+	cMatrix.ShowInverse(cInverseMatrix);
 
-        HC_Flush_Contents(".", "geometry, segment");
+    Point cInvPo1 = cInverseMatrix.Transform(p1);
+    Point cInvPo2 = cInverseMatrix.Transform(p2);
 
-        // Set default settings
+    HC_Open_Segment("test_draw"); {
 
-        HC_Set_Color("edges = white");
-        HC_Set_Color("faces = black");
-        HC_Set_Color("lines = white");
-        HC_Set_Color("text = white");
+        HC_Set_Modelling_Matrix(cMatrix.m_fData);
 
-        HC_Set_Visibility("edges");
-        HC_Set_Visibility("faces");
-        HC_Set_Visibility("lines");
-        HC_Set_Visibility("text");
-
-        // Draw line
-
-        HC_Open_Segment("world");
+        HC_Open_Segment("construct");
         {
-            HC_Set_Line_Weight(2);
-            HC_Set_Line_Pattern("- -");
+            // Remove previous
 
-            Line::Create(p1, p2);
-        }
-        HC_Close_Segment();
+            HC_Flush_Contents(".", "geometry, segment");
 
-        // Draw first symbol
+            // Set default settings
 
-        HC_Open_Segment("first");
-        {
-			HC_Set_Color("edges = black");
-			HC_Set_Color("faces = white");
+            HC_Set_Color("edges = white");
+            HC_Set_Color("faces = black");
+            HC_Set_Color("lines = white");
+            HC_Set_Color("text = white");
 
-            HC_Set_Edge_Weight(4);
-            //:TODO - calculate point or use segment metrix
-            double radius = Compute::PixelToWorld(8);
-            Circle::Create(p1, radius, false);
-        }
-        HC_Close_Segment();
+            HC_Set_Visibility("edges");
+            HC_Set_Visibility("faces");
+            HC_Set_Visibility("lines");
+            HC_Set_Visibility("text");
 
-        // Draw second symbol
+            // Draw line
 
-        HC_Open_Segment("second");
-        {
-			HC_Set_Color("edges = black");
-			HC_Set_Color("faces = white");
+            HC_Open_Segment("world");
+            {
+                HC_Set_Line_Weight(2);
+                HC_Set_Line_Pattern("- -");
 
-            HC_Set_Edge_Weight(4);
-            //:TODO - calculate point or use segment metrix
-            double radius = Compute::PixelToWorld(8);
-            Circle::Create(p2, radius, false);
-        }
-        HC_Close_Segment();
+                Line::Create(cInvPo1, cInvPo2);
+            }
+            HC_Close_Segment();
 
-        // Draw text and outer frame
+            // Draw first symbol
 
-		HPoint center = (p1 + p2) / 2.0f;
+            HC_Open_Segment("first");
+            {
+                HC_Set_Color("edges = black");
+                HC_Set_Color("faces = white");
 
-        Point cP1(p1.x, p1.y, p1.z);
-        Point cP2(p2.x, p2.y, p2.z);;
+                HC_Set_Edge_Weight(4);
+                //:TODO - calculate point or use segment metrix
+                double radius = Compute::PixelToWorld(8);
+                Circle::Create(cInvPo1, radius, false);
+            }
+            HC_Close_Segment();
 
-        Vector cXAixs = cMatrix.XAxis();
-        Vector cYAixs = cMatrix.YAxis();
-        Vector cZAixs = cMatrix.ZAxis();
-        Vector cOrigin = cMatrix.Origin();
+            // Draw second symbol
 
-		Point2D cDrop1 = op1.DropPoint(cOrigin, cXAixs, cYAixs);
-		Point2D cDrop2 = op2.DropPoint(cOrigin, cXAixs, cYAixs);
+            HC_Open_Segment("second");
+            {
+                HC_Set_Color("edges = black");
+                HC_Set_Color("faces = white");
 
-/*
-		HC_Open_Segment("test"); {
-			HC_Set_Line_Weight(2);
-            HC_Set_Color("geometry=blue");
-            HC_Insert_Line(0.0, 0.0, 0.0, 100, 0, 0);
-            HC_Insert_Line(0.0, 0.0, 0.0, 0, 100, 0);
+                HC_Set_Edge_Weight(4);
+                //:TODO - calculate point or use segment metrix
+                double radius = Compute::PixelToWorld(8);
+                Circle::Create(cInvPo2, radius, false);
+            }
+            HC_Close_Segment();
 
-            HC_Insert_Line(0.0, 0.0, 0.0, cP1.x, cP1.y, cP1.z);
-            HC_Insert_Line(0.0, 0.0, 0.0, cP2.x, cP2.y, cP2.z);
-		} HC_Close_Segment();
+            // Draw text and outer frame
 
-		HC_Open_Segment("test1"); {
-			HC_Set_Line_Weight(2);
-            HC_Set_Color("geometry=red");
-            HC_Insert_Line(cDrop1.x, cDrop1.y, 0.0, cDrop2.x, cDrop2.y, 0.0);
-		} HC_Close_Segment();
-*/
+            TDF::Point center = (cInvPo1 + cInvPo2) / 2.0f;
+
+            Vector cXAixs = cMatrix.XAxis();
+            Vector cYAixs = cMatrix.YAxis();
+            Vector cZAixs = cMatrix.ZAxis();
+            Vector cOrigin = cMatrix.Origin();
+
+            Point2D cDrop1 = p1.DropPoint(cOrigin, cXAixs, cYAixs);
+            Point2D cDrop2 = p2.DropPoint(cOrigin, cXAixs, cYAixs);
+
+            /*
+                    HC_Open_Segment("test"); {
+                        HC_Set_Line_Weight(2);
+                        HC_Set_Color("geometry=blue");
+                        HC_Insert_Line(0.0, 0.0, 0.0, 100, 0, 0);
+                        HC_Insert_Line(0.0, 0.0, 0.0, 0, 100, 0);
+
+                        HC_Insert_Line(0.0, 0.0, 0.0, cP1.x, cP1.y, cP1.z);
+                        HC_Insert_Line(0.0, 0.0, 0.0, cP2.x, cP2.y, cP2.z);
+                    } HC_Close_Segment();
+
+                    HC_Open_Segment("test1"); {
+                        HC_Set_Line_Weight(2);
+                        HC_Set_Color("geometry=red");
+                        HC_Insert_Line(cDrop1.x, cDrop1.y, 0.0, cDrop2.x, cDrop2.y, 0.0);
+                    } HC_Close_Segment();
+            */
 
 
-        Vector2D cDropVector = cDrop2 - cDrop1;
+            Vector2D cDropVector = cDrop2 - cDrop1;
 
-        Vector cVector(cDropVector);
+            Vector cVector(cDropVector);
 
-        //cZAixs = -cZAixs;
+            //cZAixs = -cZAixs;
 
-        float fAngle = Vector::ZAxis().CCWAngleWith(Vector::XAxis(), cVector);
-        //float fAngle = Vector::XAxis().CCWAngleWith(cVector);
+            float fAngle = Vector::ZAxis().CCWAngleWith(Vector::XAxis(), cVector);
+            //float fAngle = Vector::XAxis().CCWAngleWith(cVector);
 
-        TRACE(L"TextAngle: %f\n", fAngle);
+            TRACE(L"TextAngle: %f\n", fAngle);
 
-//         if (180.0f > fAngle) {
-//             fAngle = fAngle - 180.0f;
-//         }
+            // Text 회전각도 조절
+            if (90.0f < fAngle && fAngle < 270.0f) {
+                fAngle = fAngle + 180.0f;
+            }
 
-		TDF::Math::Matrix cRotation;
-        cRotation.RotateOffAxis(TDF::Vector::ZAxis(), fAngle);
-        cRotation.Translate(center.x, center.y, center.z);
-		
-        HC_Open_Segment("text");
-        {
-            //HC_Rotate_Object(0, 0, 10);
-            HC_Set_Modelling_Matrix(cRotation.m_fData);
+            TDF::Matrix cRotation;
+            cRotation.RotateOffAxis(TDF::Vector::ZAxis(), fAngle);
+            cRotation.Translate(center.x, center.y, center.z);
 
-            HC_Set_Edge_Weight(2);
+            HC_Open_Segment("text");
+            {
+                //HC_Rotate_Object(0, 0, 10);
+                HC_Set_Modelling_Matrix(cRotation.m_fData);
 
-            Font::SetName("arial");
-            Font::SetBold();
-            Font::SetSize(Compute::PixelToWorld(32), "oru");
-            Font::SetRenderer("truetype");
-            Font::SetTransform();
+                HC_Set_Edge_Weight(2);
 
-            Format value("%.3f mm", Compute::Distance(p1, p2));
-            float width, height;
-            Text::GetExtent(value, width, height);
+                Font::SetName("arial");
+                Font::SetBold();
+                Font::SetSize(Compute::PixelToWorld(32), "oru");
+                Font::SetRenderer("truetype");
+                Font::SetTransform();
 
-            //:TODO - calculate point or use segment metrix
-            
-			HPoint cTextCenter = center;
-			cTextCenter.y += -height / 2.0f;
+                Format value("%.3f mm", Compute::Distance(cInvPo1, cInvPo2));
+                float width, height;
+                Text::GetExtent(value, width, height);
 
-			//Text::Create(cTextCenter, value);
-            Text::Create(HPoint(0, -height / 2), value);
+                //:TODO - calculate point or use segment metrix
 
-			double offset = Compute::PixelToWorld(8);
-			HPoint cFigureCenter = center;
-			HPoint cOffset1(-width / 2, height / 2 + offset);
-			HPoint cOffset2(width / 2, -height / 2 - offset);
+                Point cTextCenter = center;
+                cTextCenter.y += -height / 2.0f;
 
-			//:TODO - calculate point or use segment metrix
-			//Figure::CreateObround(cFigureCenter + cOffset1, cFigureCenter + cOffset2);
-			Figure::CreateObround(HPoint(-width / 2, height / 2 + offset), HPoint(width / 2, -height / 2 - offset));
-        }
-        HC_Close_Segment();
-    }
-    HC_Close_Segment();
+                //Text::Create(cTextCenter, value);
+                Text::Create(Point(0, -height / 2), value);
+
+                double offset = Compute::PixelToWorld(8);
+                Point cFigureCenter = center;
+                Point cOffset1(-width / 2, height / 2 + offset);
+                Point cOffset2(width / 2, -height / 2 - offset);
+
+                //:TODO - calculate point or use segment metrix
+                //Figure::CreateObround(cFigureCenter + cOffset1, cFigureCenter + cOffset2);
+                Figure::CreateObround(Point(-width / 2, height / 2 + offset), Point(width / 2, -height / 2 - offset));
+            } HC_Close_Segment();
+        } HC_Close_Segment();
+    } HC_Close_Segment();
 
     SetView(nullptr);
 }
@@ -174,7 +181,7 @@ void HDraw::SetView(HBaseView* view)
 
 
 
-void HDraw::Arc::Create(HPoint first, HPoint second, HPoint third)
+void HDraw::Arc::Create(TDF::Point first, TDF::Point second, TDF::Point third)
 {
     first.z = 0;
     second.z = 0;
@@ -184,7 +191,7 @@ void HDraw::Arc::Create(HPoint first, HPoint second, HPoint third)
     ASSERT(key != HC_ERROR_KEY);
 }
 
-void HDraw::Arc::GetPoints(HPoint center, double radius, double startAngle, double endAngle, HPoints& points)
+void HDraw::Arc::GetPoints(TDF::Point center, double radius, double startAngle, double endAngle, HPoints& points)
 {
     if (endAngle < startAngle) {
         endAngle += 360;
@@ -194,19 +201,19 @@ void HDraw::Arc::GetPoints(HPoint center, double radius, double startAngle, doub
 
     for (int i = (int)startAngle; i <= (int)endAngle; i++) {
         double angle = i * 3.141592 / 180;
-        HPoint p(cos(angle), sin(angle));
+        TDF::Point p(cos(angle), sin(angle));
         points.push_back(center + (p * radius));
     }
 }
 
 void HDraw::Arc::GetPoints(float x, float y, double radius, double startAngle, double endAngle, HPoints& points)
 {
-    GetPoints(HPoint(x, y), radius, startAngle, endAngle, points);
+    GetPoints(TDF::Point(x, y), radius, startAngle, endAngle, points);
 }
 
 
 
-void HDraw::Circle::Create(HPoint center, double radius, bool polygon)
+void HDraw::Circle::Create(TDF::Point center, double radius, bool polygon)
 {
     center.z = 0;
 
@@ -215,7 +222,7 @@ void HDraw::Circle::Create(HPoint center, double radius, bool polygon)
 
         for (int i = 0; i <= 360; i += 6) {
             double angle = i * 3.141592 / 180;
-            HPoint p(cos(angle), sin(angle));
+            TDF::Point p(cos(angle), sin(angle));
             points.push_back(center + (p * radius));
         }
 
@@ -227,7 +234,7 @@ void HDraw::Circle::Create(HPoint center, double radius, bool polygon)
     }
 }
 
-void HDraw::Circle::Create(HPoint first, HPoint second, HPoint third, bool polygon)
+void HDraw::Circle::Create(TDF::Point first, TDF::Point second, TDF::Point third, bool polygon)
 {
     first.z = 0;
     second.z = 0;
@@ -239,15 +246,15 @@ void HDraw::Circle::Create(HPoint first, HPoint second, HPoint third, bool polyg
 
 
 
-double HDraw::Compute::Distance(HPoint p1, HPoint p2)
+double HDraw::Compute::Distance(TDF::Point p1, TDF::Point p2)
 {
-    HPoint d = p2 - p1;
+    TDF::Point d = p2 - p1;
     return sqrt(d.x * d.x + d.y * d.y + d.z * d.z);
 }
 
 double HDraw::Compute::PixelToWorld(double value)
 {
-    HVector points[2];
+    Point points[2];
     points[1].x = value;
 
     HC_Open_Segment_By_Key(View->GetSceneKey());
@@ -258,16 +265,16 @@ double HDraw::Compute::PixelToWorld(double value)
     return Distance(points[0], points[1]);
 }
 
-HVector HDraw::Compute::Normal()
+Vector HDraw::Compute::Normal()
 {
-    HVector normal;
+    Vector normal;
 
     HC_Open_Segment_By_Key(View->GetSceneKey());
     {
-        HPoint position;
+        TDF::Point position;
         HC_Show_Net_Camera_Position(&position.x, &position.y, &position.z);
 
-        HPoint target;
+        TDF::Point target;
         HC_Show_Net_Camera_Target(&target.x, &target.y, &target.z);
 
         normal = target - position;
@@ -308,10 +315,10 @@ void HDraw::Font::SetTransform(bool value)
 
 
 
-void HDraw::Figure::CreateObround(HPoint topLeft, HPoint bottomRight)
+void HDraw::Figure::CreateObround(TDF::Point topLeft, TDF::Point bottomRight)
 {
     HPoints points;
-    HPoint center = (bottomRight + topLeft) / 2;
+    TDF::Point center = (bottomRight + topLeft) / 2;
     double dist = fabs(topLeft.y - bottomRight.y) / 2;
 
     Arc::GetPoints(topLeft.x, center.y, dist, 90, 270, points);
@@ -322,7 +329,7 @@ void HDraw::Figure::CreateObround(HPoint topLeft, HPoint bottomRight)
 
 
 
-void HDraw::Line::Create(HPoint first, HPoint second, bool firstEnd, bool secondEnd)
+void HDraw::Line::Create(TDF::Point first, TDF::Point second, bool firstEnd, bool secondEnd)
 {
     HC_KEY key = HC_Insert_Line(first.x, first.y, 0, second.x, second.y, 0);
     ASSERT(key != HC_ERROR_KEY);
@@ -346,7 +353,7 @@ void HDraw::Polygon::Create(HPoints& points)
 
 
 
-void HDraw::Text::Create(HPoint center, const char* value)
+void HDraw::Text::Create(TDF::Point center, const char* value)
 {
     HC_KEY key = HC_Insert_Text(center.x, center.y, 0, value);
     ASSERT(key != HC_ERROR_KEY);

@@ -3,6 +3,7 @@
 #include "3DF.h"
 #include "3DF.Segment.h"
 #include "3DF.Math.h"
+#include "3DF.Math.Matrix.h"
 
 #include "3DF.Color.h"
 
@@ -272,7 +273,7 @@ public:
 	Orientation const & operator=(Orientation const & cInThat);
 
 	void GetMatrix(float out_matrix[16]) const;
-	void SetMatrix(Math::MatrixKit const & cInMatrix);
+	void SetMatrix(TDF::MatrixKit const & cInMatrix);
 };
 
 class API_3DF TextAttributes : public Entity

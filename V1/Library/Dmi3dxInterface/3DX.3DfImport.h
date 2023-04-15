@@ -91,7 +91,7 @@ protected:
 	// == Product Occurrences 관련 함수 =========================================================
 	A3DStatus ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurrence, A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, TDF::SegmentKey & cParentSegment);
 
-	A3DStatus ProductOccurrenceGetLocation(const A3DAsmProductOccurrenceData * pcPoData, TDF::Math::MatrixKit & cTransMatrix);
+	A3DStatus ProductOccurrenceGetLocation(const A3DAsmProductOccurrenceData * pcPoData, TDF::MatrixKit & cTransMatrix);
 	A3DStatus ProductOccurrenceGetLocation(const A3DAsmProductOccurrenceData * psPOccData, A3DMiscCartesianTransformation ** ppLocation);
 	A3DStatus ProductOccurrenceGetExternalData(const A3DAsmProductOccurrenceData * pcPOccData,
 		A3DAsmProductOccurrence ** ppcExternalData);
@@ -230,7 +230,7 @@ protected:
 	// == C3D 관련 Utility 함수 =====================================================================
 protected:
 	A3DStatus GetMatrix(A3DMiscTransformation * pcLocation, MbMatrix3D & cMatrix);
-	A3DStatus GetMatrix(A3DMiscTransformation * pcLocation, TDF::Math::MatrixKit & cOutMatrix);
+	A3DStatus GetMatrix(A3DMiscTransformation * pcLocation, TDF::MatrixKit & cOutMatrix);
 
 private:
 	CString m_strCadFileName;

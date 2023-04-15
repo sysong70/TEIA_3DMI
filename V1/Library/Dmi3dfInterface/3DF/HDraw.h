@@ -12,7 +12,7 @@ class HEventInfo;
 
 namespace HDraw
 {
-	void Test(HBaseView* view, TDF::Math::Matrix & cMatrix, HPoint p1, HPoint p2, TDF::Point op1, TDF::Point op2);
+	void Test(HBaseView* view, TDF::Matrix & cMatrix, TDF::Point p1, TDF::Point p2);
 
 	class Format
 	{
@@ -39,7 +39,7 @@ namespace HDraw
 
 
 
-	using HPoints = std::vector<HPoint>;
+	using HPoints = std::vector<TDF::Point>;
 
 	void SetView(HBaseView* view);
 
@@ -48,9 +48,9 @@ namespace HDraw
 	namespace Arc
 	{
 		// 3 Points
-		void Create(HPoint first, HPoint second, HPoint third);
+		void Create(TDF::Point first, TDF::Point second, TDF::Point third);
 		// angle: degree
-		void GetPoints(HPoint center, double radius, double startAngle, double endAngle, HPoints& points);
+		void GetPoints(TDF::Point center, double radius, double startAngle, double endAngle, HPoints& points);
 
 		void GetPoints(float x, float y, double radius, double startAngle, double endAngle, HPoints& points);
 	};
@@ -60,20 +60,20 @@ namespace HDraw
 	namespace Circle
 	{
 		// Center, Radius
-		void Create(HPoint center, double radius, bool polygon = true);
+		void Create(TDF::Point center, double radius, bool polygon = true);
 		// 3 Points
-		void Create(HPoint first, HPoint second, HPoint third, bool polygon = true);
+		void Create(TDF::Point first, TDF::Point second, TDF::Point third, bool polygon = true);
 	};
 
 
 
 	namespace Compute
 	{
-		double Distance(HPoint p1, HPoint p2);
+		double Distance(TDF::Point p1, TDF::Point p2);
 
 		double PixelToWorld(double value);
 
-		HVector Normal();
+		TDF::Vector Normal();
 	}
 
 
@@ -81,7 +81,7 @@ namespace HDraw
 	namespace Figure
 	{
 		// Left & Right Half Circle
-		void CreateObround(HPoint topLeft, HPoint bottomRight);
+		void CreateObround(TDF::Point topLeft, TDF::Point bottomRight);
 	};
 
 	//:REF - https://docs.techsoft3d.com/3df/latest/api_ref/3dgs/HC_Set_Text_Font.html
@@ -112,7 +112,7 @@ namespace HDraw
 
 	namespace Line
 	{
-		void Create(HPoint first, HPoint second, bool firstEnd = false, bool secondEnd = false);
+		void Create(TDF::Point first, TDF::Point second, bool firstEnd = false, bool secondEnd = false);
 	};
 
 
@@ -133,7 +133,7 @@ namespace HDraw
 
 	namespace Text
 	{
-		void Create(HPoint center, const char* value);
+		void Create(TDF::Point center, const char* value);
 
 		void GetExtent(const char* value, float& width, float& height);
 	};
