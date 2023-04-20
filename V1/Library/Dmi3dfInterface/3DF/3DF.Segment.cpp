@@ -708,13 +708,30 @@ SegmentKey SegmentKey::StylesInclude() const
 SegmentKey & SegmentKey::SetModellingMatrix(MatrixKit const & cInKit)
 {
 	Open();
-
 	HC_Set_Modelling_Matrix(cInKit.m_fData);
-
 	Close();
 
 	return *this;
 }
+
+SegmentKey & SegmentKey::SegmentKey::UnsetModellingMatrix()
+{
+	Open();
+	HC_UnSet_Modelling_Matrix();
+	Close();
+
+	return *this;
+}
+
+bool SegmentKey::ShowModellingMatrix(MatrixKit & cOutKit) const
+{
+	Open();
+	HC_Show_Modelling_Matrix(cOutKit.m_fData);
+	Close();
+
+	return true;
+}
+
 
 SegmentKey & SegmentKey::SetBounding(BoundingKit const & cInKit)
 {

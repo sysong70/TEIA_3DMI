@@ -114,7 +114,10 @@ public:
 	SegmentKey StylesInclude();
 	SegmentKey StylesInclude() const;
 
+	//== Modelling Matrix 관련 함수 ==================================================================
 	SegmentKey & SetModellingMatrix(MatrixKit const & cInKit);
+	SegmentKey & UnsetModellingMatrix();
+	bool ShowModellingMatrix(MatrixKit & cOutKit) const;
 
 	//== Bounding 관련 함수 ==========================================================================
 	SegmentKey & SetBounding(BoundingKit const & cInKit);

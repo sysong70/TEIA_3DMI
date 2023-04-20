@@ -216,3 +216,4 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 
 	return HLISTENER_PASS_EVENT;
 }
+
