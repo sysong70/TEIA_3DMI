@@ -127,11 +127,11 @@ void Entity::SetDrawing(Drawing const & cInDrawing)
 	unsigned int nCount = cInDrawing.GetPolygonCount();
 	
 	PolygonArray aPolygons;
-	aPolygons.SetCount(nCount);
+	aPolygons.resize(nCount);
 
-	cInDrawing.GetPolygons(nCount, aPolygons.GetData());
+	cInDrawing.GetPolygons(nCount, aPolygons.data());
 
-	SetPolygons("drawing", nCount, aPolygons.GetData());
+	SetPolygons("drawing", nCount, aPolygons.data());
 }
 
 unsigned int Entity::GetLeaderLineCount() const
@@ -1596,7 +1596,7 @@ class FramePrivate : public TDF::PrivateImpl
 public:
 	void Copy(FramePrivate * that)
 	{
-		m_aPolylines.Copy(that->m_aPolylines);
+		m_aPolylines = that->m_aPolylines;
 	}
 
 	TDF::PolylineArray	m_aPolylines;
@@ -1629,14 +1629,14 @@ Frame const & Frame::operator=(Frame const & cInThat)
 unsigned int Frame::GetPolylineCount() const
 {
 	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
-	return static_cast<unsigned int>(pcImpl->m_aPolylines.GetCount());
+	return static_cast<unsigned int>(pcImpl->m_aPolylines.size());
 }
 
 void Frame::GetPolylines(unsigned int & nOutCount, TDF::Polyline * pcOutPolylines) const
 {
 	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
 
-	nOutCount = (unsigned int)pcImpl->m_aPolylines.GetCount();
+	nOutCount = (unsigned int)pcImpl->m_aPolylines.size();
 
 	if (nullptr == pcOutPolylines) {
 		return;
@@ -1650,7 +1650,7 @@ void Frame::GetPolylines(unsigned int & nOutCount, TDF::Polyline * pcOutPolyline
 void Frame::SetPolylines(unsigned int nInCount, TDF::Polyline const * pcInPolylines)
 {
 	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
-	pcImpl->m_aPolylines.SetCount(nInCount);
+	pcImpl->m_aPolylines.resize(nInCount);
 
 	for (unsigned int nIndex = 0; nIndex < nInCount; nIndex++) {
 		pcImpl->m_aPolylines[nIndex]= pcInPolylines[nIndex];
@@ -1664,7 +1664,7 @@ class DrawingPrivate : public TDF::PrivateImpl
 public:
 	void Copy(DrawingPrivate * that)
 	{
-		m_polygons.Copy(that->m_polygons);
+		m_polygons = that->m_polygons;
 	}
 
 	TDF::PolygonArray m_polygons;
@@ -1697,13 +1697,13 @@ Drawing const & Drawing::operator=(Drawing const & cInThat)
 unsigned int Drawing::GetPolygonCount() const
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
-	return static_cast<unsigned int>(pcImpl->m_polygons.GetCount());
+	return static_cast<unsigned int>(pcImpl->m_polygons.size());
 }
 
 void Drawing::GetPolygons(unsigned int & nOutCount, TDF::Polygon * pcOutPolygons) const
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
-	nOutCount = (unsigned int)pcImpl->m_polygons.GetCount();
+	nOutCount = (unsigned int)pcImpl->m_polygons.size();
 
 	if (nullptr == pcOutPolygons) {
 		return;
@@ -1717,7 +1717,7 @@ void Drawing::GetPolygons(unsigned int & nOutCount, TDF::Polygon * pcOutPolygons
 void Drawing::SetPolygons(unsigned int nInCount, TDF::Polygon const * pcInPolygons)
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
-	pcImpl->m_polygons.SetCount(nInCount);
+	pcImpl->m_polygons.resize(nInCount);
 
 	for (unsigned int i = 0; i < nInCount; i++)
 		pcImpl->m_polygons[i] = pcInPolygons[i];

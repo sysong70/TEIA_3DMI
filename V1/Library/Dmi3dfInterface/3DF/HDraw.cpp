@@ -9,16 +9,9 @@ namespace HDraw
     HBaseView* View = nullptr;
 }
 
-
-void HDraw::Test(HBaseView* view, TDF::Matrix & cMatrix, Point p1, Point p2)
+void HDraw::Test(HBaseView * view, TDF::Matrix & cMatrix, Point2D p1, Point2D p2)
 {
     SetView(view);
-
-	Matrix cInverseMatrix;
-	cMatrix.ShowInverse(cInverseMatrix);
-
-    Point cInvPo1 = cInverseMatrix.Transform(p1);
-    Point cInvPo2 = cInverseMatrix.Transform(p2);
 
     HC_Open_Segment("test_draw"); {
 
@@ -49,7 +42,7 @@ void HDraw::Test(HBaseView* view, TDF::Matrix & cMatrix, Point p1, Point p2)
                 HC_Set_Line_Weight(2);
                 HC_Set_Line_Pattern("- -");
 
-                Line::Create(cInvPo1, cInvPo2);
+                Line::Create(Point(p1), Point(p2));
             }
             HC_Close_Segment();
 
@@ -63,7 +56,7 @@ void HDraw::Test(HBaseView* view, TDF::Matrix & cMatrix, Point p1, Point p2)
                 HC_Set_Edge_Weight(4);
                 //:TODO - calculate point or use segment metrix
                 double radius = Compute::PixelToWorld(8);
-                Circle::Create(cInvPo1, radius, false);
+                Circle::Create(Point(p1), radius, false);
             }
             HC_Close_Segment();
 
@@ -77,51 +70,16 @@ void HDraw::Test(HBaseView* view, TDF::Matrix & cMatrix, Point p1, Point p2)
                 HC_Set_Edge_Weight(4);
                 //:TODO - calculate point or use segment metrix
                 double radius = Compute::PixelToWorld(8);
-                Circle::Create(cInvPo2, radius, false);
+                Circle::Create(Point(p2), radius, false);
             }
             HC_Close_Segment();
-
+                        
             // Draw text and outer frame
 
-            TDF::Point center = (cInvPo1 + cInvPo2) / 2.0f;
+            Point2D center = (p1 + p2) / 2.0f;
 
-            Vector cXAixs = cMatrix.XAxis();
-            Vector cYAixs = cMatrix.YAxis();
-            Vector cZAixs = cMatrix.ZAxis();
-            Vector cOrigin = cMatrix.Origin();
-
-            Point2D cDrop1 = p1.DropPoint(cOrigin, cXAixs, cYAixs);
-            Point2D cDrop2 = p2.DropPoint(cOrigin, cXAixs, cYAixs);
-
-            /*
-                    HC_Open_Segment("test"); {
-                        HC_Set_Line_Weight(2);
-                        HC_Set_Color("geometry=blue");
-                        HC_Insert_Line(0.0, 0.0, 0.0, 100, 0, 0);
-                        HC_Insert_Line(0.0, 0.0, 0.0, 0, 100, 0);
-
-                        HC_Insert_Line(0.0, 0.0, 0.0, cP1.x, cP1.y, cP1.z);
-                        HC_Insert_Line(0.0, 0.0, 0.0, cP2.x, cP2.y, cP2.z);
-                    } HC_Close_Segment();
-
-                    HC_Open_Segment("test1"); {
-                        HC_Set_Line_Weight(2);
-                        HC_Set_Color("geometry=red");
-                        HC_Insert_Line(cDrop1.x, cDrop1.y, 0.0, cDrop2.x, cDrop2.y, 0.0);
-                    } HC_Close_Segment();
-            */
-
-
-            Vector2D cDropVector = cDrop2 - cDrop1;
-
-            Vector cVector(cDropVector);
-
-            //cZAixs = -cZAixs;
-
-            float fAngle = Vector::ZAxis().CCWAngleWith(Vector::XAxis(), cVector);
-            //float fAngle = Vector::XAxis().CCWAngleWith(cVector);
-
-            TRACE(L"TextAngle: %f\n", fAngle);
+            Vector2D cVector = p2 - p1;
+            float fAngle = Vector2D::XAxis().CCWAngleWith(cVector);
 
             // Text 회전각도 조절
             if (90.0f < fAngle && fAngle < 270.0f) {
@@ -129,12 +87,12 @@ void HDraw::Test(HBaseView* view, TDF::Matrix & cMatrix, Point p1, Point p2)
             }
 
             TDF::Matrix cRotation;
-            cRotation.RotateOffAxis(TDF::Vector::ZAxis(), fAngle);
-            cRotation.Translate(center.x, center.y, center.z);
+            cRotation.RotateOffAxis(Vector::ZAxis(), fAngle);
+            cRotation.Translate(center.x, center.y, 0.0f);
 
             HC_Open_Segment("text");
             {
-                //HC_Rotate_Object(0, 0, 10);
+                // 회전 Matrix 적용
                 HC_Set_Modelling_Matrix(cRotation.m_fData);
 
                 HC_Set_Edge_Weight(2);
@@ -145,22 +103,23 @@ void HDraw::Test(HBaseView* view, TDF::Matrix & cMatrix, Point p1, Point p2)
                 Font::SetRenderer("truetype");
                 Font::SetTransform();
 
-                Format value("%.3f mm", Compute::Distance(cInvPo1, cInvPo2));
+                Format value("%.3f mm", Compute::Distance(Point(p1), Point(p2)));
                 float width, height;
                 Text::GetExtent(value, width, height);
 
                 //:TODO - calculate point or use segment metrix
 
-                Point cTextCenter = center;
-                cTextCenter.y += -height / 2.0f;
+//                 Point2D cTestCenter;
+//                 cTestCenter.x = (cDrop1.x + cDrop2.x) / 2.0f;
+//                 cTestCenter.y = (cDrop1.y + cDrop2.y) / 2.0f;
 
                 //Text::Create(cTextCenter, value);
-                Text::Create(Point(0, -height / 2), value);
+                Text::Create(Point(0, -height / 2, 1.0f), value);
 
                 double offset = Compute::PixelToWorld(8);
-                Point cFigureCenter = center;
-                Point cOffset1(-width / 2, height / 2 + offset);
-                Point cOffset2(width / 2, -height / 2 - offset);
+                Point2D cFigureCenter = center;
+                Point2D cOffset1(-width / 2, height / 2 + offset);
+                Point2D cOffset2(width / 2, -height / 2 - offset);
 
                 //:TODO - calculate point or use segment metrix
                 //Figure::CreateObround(cFigureCenter + cOffset1, cFigureCenter + cOffset2);
@@ -210,7 +169,6 @@ void HDraw::Arc::GetPoints(float x, float y, double radius, double startAngle, d
 {
     GetPoints(TDF::Point(x, y), radius, startAngle, endAngle, points);
 }
-
 
 
 void HDraw::Circle::Create(TDF::Point center, double radius, bool polygon)
@@ -355,7 +313,7 @@ void HDraw::Polygon::Create(HPoints& points)
 
 void HDraw::Text::Create(TDF::Point center, const char* value)
 {
-    HC_KEY key = HC_Insert_Text(center.x, center.y, 0, value);
+    HC_KEY key = HC_Insert_Text(center.x, center.y, center.z, value);
     ASSERT(key != HC_ERROR_KEY);
 }
 

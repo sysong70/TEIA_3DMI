@@ -126,14 +126,14 @@ protected:
 	bool ConvertPart(A3DAsmPartDefinition * pcPartDefinition, A3DMiscCascadedAttributes * pcParentAttr,
 		c3d::AssemblySPtr & pcParentAssy);
 
-	bool ConvertRiRepresentationItem(int nIndex, A3DRiRepresentationItem * pcRiRepItem, A3DMiscCascadedAttributes * pcParentAttr,
+	bool ParseRiRepresentationItem(int nIndex, A3DRiRepresentationItem * pcRiRepItem, A3DMiscCascadedAttributes * pcParentAttr,
 		c3d::AssemblySPtr & pcParentAssy);
 
 	void ConvertRiCurve(A3DRiCurve * pcInputRiCurve, A3DMiscCascadedAttributes * pcParentAttr, c3d::AssemblySPtr & pcParentAssy);
 
 	void ConvertRiSet(A3DRiSet * pcInputRiSet, A3DMiscCascadedAttributes * pcParentAttr, c3d::AssemblySPtr & pcParentAssy);
 
-	bool ConvertRiBrepModel(A3DRiRepresentationItem * pcInputRiBrepModel, A3DMiscCascadedAttributes * pcParentAttr,
+	bool ParseRiBrepModel(A3DRiRepresentationItem * pcInputRiBrepModel, A3DMiscCascadedAttributes * pcParentAttr,
 		c3d::AssemblySPtr & pcParentAssy, bool bCopyModelFlag);
 
 	bool ConvertTessBase(A3DRiRepresentationItemData & cRiRepItemData, A3DRiRepresentationItem * pcInputRiBrepModel, A3DMiscCascadedAttributes * pcParentAttr,

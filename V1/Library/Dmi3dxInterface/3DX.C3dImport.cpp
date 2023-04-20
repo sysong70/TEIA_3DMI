@@ -1226,15 +1226,8 @@ bool C3dImport::ConvertPart(A3DAsmPartDefinition * pcPartDefinition, A3DMiscCasc
 	SetItemName(pcAssy, strName);
 	pcParentAssy->AddItem(*pcAssy);
 
-	for(A3DUns32 nIndex = 0; nIndex < cPartDefinitionData.m_uiRepItemsSize; ++nIndex)
-	{
-		// #import_debug : Solid Index / Convert Part에서 하부 수랑
-		// [24] Standard Part
-// 		if(28 != nIndex) {
-// 			continue;
-// 		}
-
-		ConvertRiRepresentationItem(nIndex, cPartDefinitionData.m_ppRepItems[nIndex], pcAttrs, pcAssy);
+	for(A3DUns32 nIndex = 0; nIndex < cPartDefinitionData.m_uiRepItemsSize; ++nIndex) {
+		ParseRiRepresentationItem(nIndex, cPartDefinitionData.m_ppRepItems[nIndex], pcAttrs, pcAssy);
 	}
 
 	A3DAsmPartDefinitionGet(nullptr, &cPartDefinitionData);
@@ -1248,10 +1241,10 @@ bool C3dImport::ConvertPart(A3DAsmPartDefinition * pcPartDefinition, A3DMiscCasc
 }
 
 // 3-4. Representation Item 변환 --
-bool C3dImport::ConvertRiRepresentationItem(int nIndex, A3DRiRepresentationItem * pcRiRepItem, A3DMiscCascadedAttributes * pcParentAttr,
+bool C3dImport::ParseRiRepresentationItem(int nIndex, A3DRiRepresentationItem * pcRiRepItem, A3DMiscCascadedAttributes * pcParentAttr,
 	AssemblySPtr & pcParentAssy)
 {
-	Log(2, L"ConvertRiRepresentationItem[%d]", nIndex);
+	Log(2, L"ParseRiRepresentationItem[%d]", nIndex);
 
 	LogIncreaseTabIndex(2);
 
@@ -1321,8 +1314,8 @@ bool C3dImport::ConvertRiRepresentationItem(int nIndex, A3DRiRepresentationItem 
 
 		case kA3DTypeRiBrepModel:
 			// #Chech_point : A3DCopyAndAdaptBrepModel
-			ConvertRiBrepModel(pcRiRepItem, pcAttrs, pcParentAssy, true);
-			//ConvertRiBrepModel(pcRiRepItem, pcAttrs, pcParentAssy, false);
+			ParseRiBrepModel(pcRiRepItem, pcAttrs, pcParentAssy, true);
+			//ParseRiBrepModel(pcRiRepItem, pcAttrs, pcParentAssy, false);
 			break;
 
 		case kA3DTypeRiCoordinateSystem:
@@ -1355,7 +1348,7 @@ bool C3dImport::ConvertRiRepresentationItem(int nIndex, A3DRiRepresentationItem 
 					break;
 			}
 
-			Log(2, L"ConvertRiRepresentationItem Type: %s", strText);
+			Log(2, L"ParseRiRepresentationItem Type: %s", strText);
 		}
 		break;
 
@@ -1558,7 +1551,7 @@ void C3dImport::ConvertRiSet(A3DRiSet * pcInputRiSet, A3DMiscCascadedAttributes 
 // 			continue;
 // 		}
 
-		ConvertRiRepresentationItem(nIndex, cRiSetData.m_ppRepItems[nIndex], pcAttrs, pcParentAssy);
+		ParseRiRepresentationItem(nIndex, cRiSetData.m_ppRepItems[nIndex], pcAttrs, pcParentAssy);
 	}
 
 	A3DMiscCascadedAttributesDelete(pcAttrs);
@@ -1568,12 +1561,12 @@ void C3dImport::ConvertRiSet(A3DRiSet * pcInputRiSet, A3DMiscCascadedAttributes 
 }
 
 // 3-7. Ri Brep Model 변환 (B-Rep Model 및 Tessellation Model도 함께 처리된다.)
-bool C3dImport::ConvertRiBrepModel(A3DRiRepresentationItem * pcInputRiBrepModel, A3DMiscCascadedAttributes * pcParentAttr,
+bool C3dImport::ParseRiBrepModel(A3DRiRepresentationItem * pcInputRiBrepModel, A3DMiscCascadedAttributes * pcParentAttr,
 	AssemblySPtr & pcParentAssy, bool bCopyModelFlag)
 {
 	MbSolid * pcSolid = nullptr;
 	if(true == m_mpcSolidMap.Lookup((DWORD_PTR) pcInputRiBrepModel, pcSolid)) {
-		Log(2, L"ConvertRiBrepModel-Instance: [%s]", LogHexStr((DWORD_PTR) pcInputRiBrepModel));
+		Log(2, L"ParseRiBrepModel-Instance: [%s]", LogHexStr((DWORD_PTR) pcInputRiBrepModel));
 		pcParentAssy->AddItem(*pcSolid);
 		return true;
 	}
@@ -1581,7 +1574,7 @@ bool C3dImport::ConvertRiBrepModel(A3DRiRepresentationItem * pcInputRiBrepModel,
 	CString strName;
 	GetName(pcInputRiBrepModel, strName);
 
-	Log(2, L"ConvertRiBrepModel: %s, [%s]", strName, LogHexStr((DWORD_PTR) pcInputRiBrepModel));
+	Log(2, L"ParseRiBrepModel: %s, [%s]", strName, LogHexStr((DWORD_PTR) pcInputRiBrepModel));
 
 	LogIncreaseTabIndex(2);
 
@@ -1670,7 +1663,7 @@ bool C3dImport::ConvertRiBrepModel(A3DRiRepresentationItem * pcInputRiBrepModel,
 	A3DStatus nResult = A3DRiBrepModelGet(pcRiBrepModel, &cBrepModelData);
 
 	if(A3D_SUCCESS != nResult) {
-		SetLastErrorMessage(L"ConvertRiBrepModel - RiBrepModelGet Error", nResult);
+		SetLastErrorMessage(L"ParseRiBrepModel - RiBrepModelGet Error", nResult);
 		return false;
 	}
 
@@ -1684,7 +1677,7 @@ bool C3dImport::ConvertRiBrepModel(A3DRiRepresentationItem * pcInputRiBrepModel,
 	nResult = A3DTopoBrepDataGet(cBrepModelData.m_pBrepData, &cTopoBrepDataData);
 	if(A3D_SUCCESS != nResult) {
 		A3DRiBrepModelGet(nullptr, &cBrepModelData);
-		SetLastErrorMessage(L"ConvertRiBrepModel - TopoBrepDataGet Error", nResult);
+		SetLastErrorMessage(L"ParseRiBrepModel - TopoBrepDataGet Error", nResult);
 		return false;
 	}
 
@@ -1888,7 +1881,7 @@ bool C3dImport::ConvertTopoConnex(int nIndex, A3DTopoConnex * pcTopoConnex, A3DM
 	A3D_INITIALIZE_DATA(A3DTopoConnexData, cTopoConnexData);
 	A3DStatus eStatus = A3DTopoConnexGet(pcTopoConnex, &cTopoConnexData);
 	if(A3D_SUCCESS != eStatus) {
-		SetLastErrorMessage(L"ConvertRiBrepModel - TopoConnexGet Error", eStatus);
+		SetLastErrorMessage(L"ParseRiBrepModel - TopoConnexGet Error", eStatus);
 		return false;
 	}
 
@@ -4927,7 +4920,7 @@ bool C3dImport::ConvertTopoConnex(A3DTopoConnex * pcTopoConnex, A3DMiscCascadedA
 	A3D_INITIALIZE_DATA(A3DTopoConnexData, cTopoConnexData);
 	A3DStatus eStatus = A3DTopoConnexGet(pcTopoConnex, &cTopoConnexData);
 	if(A3D_SUCCESS != eStatus) {
-		SetLastErrorMessage(L"ConvertRiBrepModel - TopoConnexGet Error", eStatus);
+		SetLastErrorMessage(L"ParseRiBrepModel - TopoConnexGet Error", eStatus);
 		return false;
 	}
 

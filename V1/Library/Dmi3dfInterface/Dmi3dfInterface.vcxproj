@@ -73,7 +73,7 @@
       <PreprocessorDefinitions>_DEBUG;_3DF_EXPORT;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(Dmi3dfInclude);../../Library/Common;../../Library/C3D/Kernel/Include;../../Library/3DX/include;../../Library/boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Dmi3dfInclude);../../Library/Common;../../Library/C3D/Kernel/Include;../../Library/3DX/include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
@@ -100,7 +100,7 @@
       <PreprocessorDefinitions>NDEBUG;_3DF_EXPORT;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(Dmi3dfInclude);../../Library/Common;../../Library/C3D/Kernel/Include;../../Library/3DX/include;../../Library/boost</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Dmi3dfInclude);../../Library/Common;../../Library/C3D/Kernel/Include;../../Library/3DX/include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>

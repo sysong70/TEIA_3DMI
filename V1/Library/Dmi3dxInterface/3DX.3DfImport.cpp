@@ -62,17 +62,17 @@ using namespace std::chrono;
 USING_3DF_NAMESPACE
 USING_3DX_NAMESPACE
 
-_3DfImport::_3DfImport(_3DXSignal::Interface * pc3dxInterface) :
+TdfImport::TdfImport(_3DXSignal::Interface * pc3dxInterface) :
 	ImportBase(pc3dxInterface)
 {
 }
 
-_3DfImport::~_3DfImport()
+TdfImport::~TdfImport()
 {
 	m_vcMaterialMappingStyleVector.clear();
 }
 
-bool _3DfImport::FileImport(CString strFilePathName, TDF::SegmentKey & cModelSegment, Signal::Delivery & cInDelivery, CString & strErrorMessage)
+bool TdfImport::FileImport(CString strFilePathName, TDF::SegmentKey & cModelSegment, Signal::Delivery & cInDelivery, CString & strErrorMessage)
 {
 	if(false == InitializeA3DLibrary(strErrorMessage)) {
 		return false;
@@ -89,7 +89,7 @@ bool _3DfImport::FileImport(CString strFilePathName, TDF::SegmentKey & cModelSeg
 
 	m_strCadFileName = strFilePathName.Right(strFilePathName.GetLength() - strFilePathName.ReverseFind('\\') - 1);
 
-	// ===== _3DfImport 옵션을 설정 =====
+	// ===== TdfImport 옵션을 설정 =====
 	A3DRWParamsLoadData cParamsLoadData;
 	A3D_INITIALIZE_DATA(A3DRWParamsLoadData, cParamsLoadData);
 
@@ -97,8 +97,8 @@ bool _3DfImport::FileImport(CString strFilePathName, TDF::SegmentKey & cModelSeg
 
 	// #option : ReadGeomTessMode
 	//cParamsLoadData.m_sGeneral.m_eReadGeomTessMode = kA3DReadGeomOnly;
-	//cParamsLoadData.m_sGeneral.m_eReadGeomTessMode = kA3DReadGeomAndTess;
-	cParamsLoadData.m_sGeneral.m_eReadGeomTessMode = kA3DReadTessOnly;
+	cParamsLoadData.m_sGeneral.m_eReadGeomTessMode = kA3DReadGeomAndTess;
+	//cParamsLoadData.m_sGeneral.m_eReadGeomTessMode = kA3DReadTessOnly;
 
 	// Report용 Callback 함수 설정
 	SetCallbacksReport();
@@ -126,7 +126,20 @@ bool _3DfImport::FileImport(CString strFilePathName, TDF::SegmentKey & cModelSeg
 		// 초기화를 해주지 않으면 다음번에 계속 오류가 난다 
 		CString strErrorMessage;
 		Reset(strErrorMessage);
-		SetLastErrorMessage(L"Model File Load Error", eStatus);
+		
+		CString strMessage;
+		switch (eStatus)
+		{
+			case A3D_LOAD_FILE_TOO_RECENT:
+				strMessage = L"The file is too recent for the current version of the software.";
+				break;
+
+			default:
+				strMessage = L"Model File Load Error";
+				break;
+		}
+
+		SetLastErrorMessage(strMessage, eStatus);
 		return false;
 	}
 
@@ -173,7 +186,7 @@ bool _3DfImport::FileImport(CString strFilePathName, TDF::SegmentKey & cModelSeg
 }
 
 // == 3DX 설정 관련 함수 ==============================================================================
-bool _3DfImport::SetDefaultParamsLoadData(A3DRWParamsLoadData & cParamsLoadData)
+bool TdfImport::SetDefaultParamsLoadData(A3DRWParamsLoadData & cParamsLoadData)
 {
 	// General 변수
 	cParamsLoadData.m_sGeneral.m_bReadSolids = true;
@@ -217,7 +230,7 @@ bool _3DfImport::SetDefaultParamsLoadData(A3DRWParamsLoadData & cParamsLoadData)
 	return true;
 }
 //== 1. 3DF 변환 관련 함수 ============================================================================
-bool _3DfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, TDF::SegmentKey & cModelSegment)
+bool TdfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, TDF::SegmentKey & cModelSegment)
 {
 	// #Import_Log : ExcuteFunction.log
 #ifdef USED_LOG_MANAGER
@@ -298,7 +311,7 @@ bool _3DfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, TDF::Seg
 // == 2. Product Occurrences 관련 함수 ===============================================================
 
 // 2-1. Product Occurrence 처리
-A3DStatus _3DfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurrence, A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, 
+A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurrence, A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, 
 	TDF::SegmentKey & cParentSegment)
 {
 	if(nullptr == pcOccurrence) {
@@ -452,7 +465,7 @@ A3DStatus _3DfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurre
 		pcParentAssy->AddInstance(*pcAssy, cMatrix);
 	}
 
-	if(true == strPoName.IsEmpty()) {
+	if(true == strPoName.empty()) {
 		strPoName.Format(L"Product %d", m_nProductId);
 	}
 
@@ -492,7 +505,7 @@ A3DStatus _3DfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurre
 }
 
 // 2-1-1. Assembly Product Occurence의 위치를 가져오는 함수 / ProductOccurrenceGetLocation
-A3DStatus _3DfImport::ProductOccurrenceGetLocation(A3DAsmProductOccurrenceData const * pcPoData, TDF::MatrixKit & cTransMatrix)
+A3DStatus TdfImport::ProductOccurrenceGetLocation(A3DAsmProductOccurrenceData const * pcPoData, TDF::MatrixKit & cTransMatrix)
 {
 	if(nullptr == pcPoData) {
 		return A3D_ERROR;
@@ -546,7 +559,7 @@ A3DStatus _3DfImport::ProductOccurrenceGetLocation(A3DAsmProductOccurrenceData c
 }
 
 // 2-1-1. Product Occurence의 위치를 가져오는 함수
-A3DStatus _3DfImport::ProductOccurrenceGetLocation(const A3DAsmProductOccurrenceData * pcPOccData,
+A3DStatus TdfImport::ProductOccurrenceGetLocation(const A3DAsmProductOccurrenceData * pcPOccData,
 	A3DMiscCartesianTransformation ** ppcLocation)
 {
 	if(nullptr == pcPOccData) {
@@ -606,7 +619,7 @@ A3DStatus _3DfImport::ProductOccurrenceGetLocation(const A3DAsmProductOccurrence
 }
 
 // 2-1-2. Product Occurence의 External Data 위치를 가져오는 함수
-A3DStatus _3DfImport::ProductOccurrenceGetExternalData(const A3DAsmProductOccurrenceData * pcPOccData,
+A3DStatus TdfImport::ProductOccurrenceGetExternalData(const A3DAsmProductOccurrenceData * pcPOccData,
 	A3DAsmProductOccurrence ** ppcExternalData)
 {
 	if(nullptr == pcPOccData) {
@@ -630,7 +643,7 @@ A3DStatus _3DfImport::ProductOccurrenceGetExternalData(const A3DAsmProductOccurr
 }
 
 // 2-1-3. Product Occurrence의 Markups을 가져옴
-A3DStatus _3DfImport::ProductOccurrenceGetMarkups(const A3DAsmProductOccurrenceData * pcPOccData, A3DPointerArray * pcArray)
+A3DStatus TdfImport::ProductOccurrenceGetMarkups(const A3DAsmProductOccurrenceData * pcPOccData, A3DPointerArray * pcArray)
 {
 	if(pcPOccData == nullptr || pcArray == nullptr) {
 		return A3D_ERROR;
@@ -656,7 +669,7 @@ A3DStatus _3DfImport::ProductOccurrenceGetMarkups(const A3DAsmProductOccurrenceD
 }
 
 // 2-1-3. Product Occurrence의 View를 가져옴
-A3DStatus _3DfImport::ProductOccurrenceGetViews(const A3DAsmProductOccurrenceData * pcPOccData, A3DPointerArray * pcArray)
+A3DStatus TdfImport::ProductOccurrenceGetViews(const A3DAsmProductOccurrenceData * pcPOccData, A3DPointerArray * pcArray)
 {
 	if(pcPOccData == nullptr || pcArray == nullptr)
 		return A3D_ERROR;
@@ -678,7 +691,7 @@ A3DStatus _3DfImport::ProductOccurrenceGetViews(const A3DAsmProductOccurrenceDat
 }
 
 // 2-2. Product Occurrence의 Child를 가져오는 함수
-A3DStatus _3DfImport::ProductOccurrenceGetChild(const A3DAsmProductOccurrenceData * pcPOccData, A3DPointerArray * pcArray)
+A3DStatus TdfImport::ProductOccurrenceGetChild(const A3DAsmProductOccurrenceData * pcPOccData, A3DPointerArray * pcArray)
 {
 	if(pcPOccData == nullptr || pcArray == nullptr)
 		return A3D_ERROR;
@@ -710,7 +723,7 @@ A3DStatus _3DfImport::ProductOccurrenceGetChild(const A3DAsmProductOccurrenceDat
 }
 
 // 2-2-1. Product Occurrence의 Occurrence를 가져오는 함수
-A3DStatus _3DfImport::ProductOccurrenceGetOccurrences(const A3DAsmProductOccurrenceData * pcPOccData,
+A3DStatus TdfImport::ProductOccurrenceGetOccurrences(const A3DAsmProductOccurrenceData * pcPOccData,
 	A3DPointerArray * pcArray)
 {
 	if(pcPOccData == nullptr || pcArray == nullptr)
@@ -737,7 +750,7 @@ A3DStatus _3DfImport::ProductOccurrenceGetOccurrences(const A3DAsmProductOccurre
 
 }
 // 2-3. Annotation Markups을 가져옴
-A3DStatus _3DfImport::AnnotationGetMarkups(const A3DMkpAnnotationEntity * pcAnnotation, A3DPointerArray * pcArray)
+A3DStatus TdfImport::AnnotationGetMarkups(const A3DMkpAnnotationEntity * pcAnnotation, A3DPointerArray * pcArray)
 {
 	A3DStatus iRet = A3D_SUCCESS;
 	A3DEEntityType eType = kA3DTypeUnknown;
@@ -767,7 +780,7 @@ A3DStatus _3DfImport::AnnotationGetMarkups(const A3DMkpAnnotationEntity * pcAnno
 }
 
 // 2-3-1. Annotation Set Markups을 가져옴
-A3DStatus _3DfImport::AnnotationSetGetMarkups(const A3DMkpAnnotationSet * pcAnnotationSet, A3DPointerArray * pcArray)
+A3DStatus TdfImport::AnnotationSetGetMarkups(const A3DMkpAnnotationSet * pcAnnotationSet, A3DPointerArray * pcArray)
 {
 	A3DStatus iRet = A3D_SUCCESS;
 
@@ -786,14 +799,14 @@ A3DStatus _3DfImport::AnnotationSetGetMarkups(const A3DMkpAnnotationSet * pcAnno
 }
 
 // 2-3-2. (미처리) Annotation Reference Markups을 가져옴
-A3DStatus _3DfImport::AnnotationReferenceGetMarkups(const A3DMkpAnnotationItem * /*pcAnnotationItem*/, A3DPointerArray * /*pcArray*/)
+A3DStatus TdfImport::AnnotationReferenceGetMarkups(const A3DMkpAnnotationItem * /*pcAnnotationItem*/, A3DPointerArray * /*pcArray*/)
 {
 	assert(false);
 	return A3D_SUCCESS;
 }
 
 // 2-3-3. Annotation Item Markups을 가져옴
-A3DStatus _3DfImport::AnnotationItemGetMarkups(const A3DMkpAnnotationItem * pcAnnotationItem, A3DPointerArray * pcArray)
+A3DStatus TdfImport::AnnotationItemGetMarkups(const A3DMkpAnnotationItem * pcAnnotationItem, A3DPointerArray * pcArray)
 {
 	if(pcAnnotationItem == nullptr || pcArray == nullptr)
 		return A3D_ERROR;
@@ -814,7 +827,7 @@ A3DStatus _3DfImport::AnnotationItemGetMarkups(const A3DMkpAnnotationItem * pcAn
 //== 3. Part 관련 함수 ===============================================================================
 
 // 3-1. 현재 product의 part를 가져오는 함수 
-A3DStatus _3DfImport::ProductOccurrenceGetPart(const A3DAsmProductOccurrenceData * pcPOccData, A3DAsmPartDefinition ** ppcPart)
+A3DStatus TdfImport::ProductOccurrenceGetPart(const A3DAsmProductOccurrenceData * pcPOccData, A3DAsmPartDefinition ** ppcPart)
 {
 	if(nullptr == pcPOccData) {
 		return A3D_ERROR;
@@ -873,7 +886,7 @@ A3DStatus _3DfImport::ProductOccurrenceGetPart(const A3DAsmProductOccurrenceData
 //== Parse 관련 함수 =================================================================================
 
 // 1. Parse Part Definition
-A3DStatus _3DfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, TDF::SegmentKey & cParentSegment)
+A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, TDF::SegmentKey & cParentSegment)
 {
 	LogIncreaseTabIndex(2);
 	
@@ -935,7 +948,7 @@ A3DStatus _3DfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMi
 }
 
 // 2. Draw Representation Item
-A3DStatus _3DfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * pcRepItem, TDF::SegmentKey & cParentSegment,
+A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * pcRepItem, TDF::SegmentKey & cParentSegment,
 	const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	LogIncreaseTabIndex(2);
@@ -1025,7 +1038,7 @@ A3DStatus _3DfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * 
 			break;
 
 			case kA3DTypeRiBrepModel:
-				eStatus = DrawRiBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
+				eStatus = ParseRiBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
 			break;
 
 			case kA3DTypeRiPolyBrepModel:
@@ -1060,7 +1073,7 @@ A3DStatus _3DfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * 
 }
 
 // 2-2. Draw Set
-A3DStatus _3DfImport::DrawSet(const A3DRiSet * pSet, TDF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::DrawSet(const A3DRiSet * pSet, TDF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DMiscCascadedAttributes * pcAttr;
 	A3DMiscCascadedAttributesData cAttrData;
@@ -1087,18 +1100,29 @@ A3DStatus _3DfImport::DrawSet(const A3DRiSet * pSet, TDF::SegmentKey & cParentSe
 	return A3D_SUCCESS;
 }
 
-// 2-1. Draw Ri Brep Model
-A3DStatus _3DfImport::DrawRiBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData,
+// 2-1. Draw Ri Brep Model (B-Rep Model 및 Tessellation Model도 함께 처리된다.)
+A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData,
 	TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData)
 {
 	LogIncreaseTabIndex(2);
 
-	Log(2, L"DrawRiBrepModel: %s", LogHexStr((DWORD_PTR) pcRepItem));
+	Log(2, L"ParseRiBrepModel: %s", LogHexStr((DWORD_PTR) pcRepItem));
 
 	A3DRootBaseData cRootBaseData;
 	A3D_INITIALIZE_DATA(A3DRootBaseData, cRootBaseData);
 	CHECK_A3D_RETURN(A3DRootBaseGet(pcRepItem, &cRootBaseData));
 	m_pchRepresentationItemName = cRootBaseData.m_pcName;
+
+
+/*
+	A3DRiBrepModelData cBrepModelData;
+	A3D_INITIALIZE_DATA(A3DRiBrepModelData, cBrepModelData);
+	A3DStatus nResult = A3DRiBrepModelGet(pcRepItem, &cBrepModelData);
+
+	// Scale을 구하기 위해서 Context Data에서 값을 가져온다.
+	double m_dContextScale = 1.0;
+	ParseTopoContextScale(cBrepModelData.m_pBrepData, m_dContextScale);
+*/
 
 	if(cRepItemData.m_pTessBase != nullptr) {
 		CHECK_A3D_RETURN(DrawTessBase(cRepItemData.m_pTessBase, pcRepItem, cSegment, pcAttr));
@@ -1117,13 +1141,15 @@ A3DStatus _3DfImport::DrawRiBrepModel(const A3DRiRepresentationItem * pcRepItem,
 	m_pchRepresentationItemName = nullptr;
 	CHECK_A3D_RETURN(A3DRootBaseGet(nullptr, &cRootBaseData));
 
+//	CHECK_A3D_RETURN(A3DRiBrepModelGet(nullptr, &cBrepModelData));
+
 	LogDecreaseTabIndex(2);
 
 	return A3D_SUCCESS;
 }
 
 // 2-3. Draw Poly Brep Model
-A3DStatus _3DfImport::DrawRiPolyBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, 
+A3DStatus TdfImport::DrawRiPolyBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, 
 	TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData)
 {
 	LogIncreaseTabIndex(2);
@@ -1141,7 +1167,7 @@ A3DStatus _3DfImport::DrawRiPolyBrepModel(const A3DRiRepresentationItem * pcRepI
 }
 
 // 2-3. Draw Poly Wire
-A3DStatus _3DfImport::DrawRiPolyWire(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, 
+A3DStatus TdfImport::DrawRiPolyWire(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, 
 	TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData)
 {
 	A3DStatus nStatus = A3D_SUCCESS;
@@ -1152,7 +1178,7 @@ A3DStatus _3DfImport::DrawRiPolyWire(const A3DRiRepresentationItem * pcRepItem, 
 	return nStatus;
 }
 
-A3DStatus _3DfImport::DrawRiPointSet(const A3DRiRepresentationItem * pcRepItem, TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::DrawRiPointSet(const A3DRiRepresentationItem * pcRepItem, TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	SetMarkerStyle(pcRepItem, cSegment, pcParentAttr);
 
@@ -1166,7 +1192,7 @@ A3DStatus _3DfImport::DrawRiPointSet(const A3DRiRepresentationItem * pcRepItem, 
 
 		PointArray cPointArray;
 		for(unsigned int i = 0; i < sData.m_uiSize; ++i) {
-			cPointArray.Add(Point(sData.m_pPts[i].m_dX, sData.m_pPts[i].m_dY, sData.m_pPts[i].m_dZ));
+			cPointArray.push_back(Point(sData.m_pPts[i].m_dX, sData.m_pPts[i].m_dY, sData.m_pPts[i].m_dZ));
 			//cSegment.InsertMarker(sData.m_pPts[i].m_dX, sData.m_pPts[i].m_dY, sData.m_pPts[i].m_dZ);
 		}
 
@@ -1183,7 +1209,7 @@ A3DStatus _3DfImport::DrawRiPointSet(const A3DRiRepresentationItem * pcRepItem, 
 
 
 // 4. Draw Ri Curve
-A3DStatus _3DfImport::DrawRiCurve(A3DRiCurve * pcInputRiCurve, TDF::SegmentKey & cParentSegment, A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::DrawRiCurve(A3DRiCurve * pcInputRiCurve, TDF::SegmentKey & cParentSegment, A3DMiscCascadedAttributes * pcParentAttr)
 {
 	CString strName;
 	GetName(pcInputRiCurve, strName);
@@ -1258,7 +1284,7 @@ A3DStatus _3DfImport::DrawRiCurve(A3DRiCurve * pcInputRiCurve, TDF::SegmentKey &
 		SInstanceSPtr cSpaceInstance(new MbSpaceInstance(*pcSpaceCurve));
 
 		// 1. 이름 설정
-		if(false == strName.IsEmpty()) {
+		if(false == strName.empty()) {
 			SetItemName(cSpaceInstance, strName);
 		}
 
@@ -1290,7 +1316,7 @@ A3DStatus _3DfImport::DrawRiCurve(A3DRiCurve * pcInputRiCurve, TDF::SegmentKey &
 }
 
 // 5. Draw Markup 관련 View
-A3DStatus _3DfImport::DrawMarkupView(const A3DMkpView * pcView, TDF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::DrawMarkupView(const A3DMkpView * pcView, TDF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DStatus iRet = A3D_SUCCESS;
 
@@ -1319,7 +1345,7 @@ A3DStatus _3DfImport::DrawMarkupView(const A3DMkpView * pcView, TDF::SegmentKey 
 }
 
 // 6. 복수의 Annotation을 그리는 함수
-A3DStatus _3DfImport::ParseAnnotations(A3DMkpAnnotationEntity ** pcAnnotation, A3DUns32 nAnnotationsSize, TDF::SegmentKey & cParentSegment)
+A3DStatus TdfImport::ParseAnnotations(A3DMkpAnnotationEntity ** pcAnnotation, A3DUns32 nAnnotationsSize, TDF::SegmentKey & cParentSegment)
 {
 	if(0 == nAnnotationsSize) {
 		return A3D_SUCCESS;
@@ -1336,7 +1362,7 @@ A3DStatus _3DfImport::ParseAnnotations(A3DMkpAnnotationEntity ** pcAnnotation, A
 	return A3D_SUCCESS;
 }
 
-A3DStatus _3DfImport::ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation, A3DMiscCascadedAttributes * pcParentAttr, TDF::SegmentKey & cParentSegment)
+A3DStatus TdfImport::ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation, A3DMiscCascadedAttributes * pcParentAttr, TDF::SegmentKey & cParentSegment)
 {
 	A3DEEntityType eType;
 	A3DEntityGetType(pcAnnotation, &eType);
@@ -1409,7 +1435,7 @@ A3DStatus _3DfImport::ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotatio
 }
 
 // 6-1. Draw Annotation Set
-A3DStatus _3DfImport::DrawAnnotationSet(const A3DMkpAnnotationSet * pcAnnotationSet, TDF::SegmentKey & cParentSegment, 
+A3DStatus TdfImport::DrawAnnotationSet(const A3DMkpAnnotationSet * pcAnnotationSet, TDF::SegmentKey & cParentSegment, 
 	const A3DMiscCascadedAttributes * pcParentAttr)
 {
 /*
@@ -1442,14 +1468,14 @@ A3DStatus _3DfImport::DrawAnnotationSet(const A3DMkpAnnotationSet * pcAnnotation
 }
 
 // 6-2. (미완성) Draw Annotation Reference
-A3DStatus _3DfImport::DrawAnnotationReference(const A3DMkpAnnotationItem * /*pcAnnotationItem*/, const A3DMiscCascadedAttributes * /*pcParentAttr*/)
+A3DStatus TdfImport::DrawAnnotationReference(const A3DMkpAnnotationItem * /*pcAnnotationItem*/, const A3DMiscCascadedAttributes * /*pcParentAttr*/)
 {
 	assert(false);
 	return A3D_SUCCESS;
 }
 
 // 6-3. Draw Annotation Item
-A3DStatus _3DfImport::DrawAnnotationItem(const A3DMkpAnnotationItem * pcAnnotationItem, TDF::SegmentKey & cParentSegment, 
+A3DStatus TdfImport::DrawAnnotationItem(const A3DMkpAnnotationItem * pcAnnotationItem, TDF::SegmentKey & cParentSegment, 
 	const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DStatus iRet = A3D_SUCCESS;
@@ -1479,7 +1505,7 @@ A3DStatus _3DfImport::DrawAnnotationItem(const A3DMkpAnnotationItem * pcAnnotati
 }
 
 // 7. Markup Data를 전체적으로 가져오는 부분
-A3DStatus _3DfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedAttributesData * psAttribData, TDF::SegmentKey & cParentSegment)
+A3DStatus TdfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedAttributesData * psAttribData, TDF::SegmentKey & cParentSegment)
 {
 	A3DMkpMarkupData sData;
 	A3D_INITIALIZE_DATA(A3DMkpMarkupData, sData);
@@ -1625,12 +1651,12 @@ A3DStatus _3DfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCasca
 		GetLeaderLinesAndSymbols(sData.m_ppLeaders[i], cLeaderLines, cLeaderSymbols);
 	}
 
-	if (0 < cLeaderLines.GetCount()) {
-		pcEntity->SetLeaderLines((unsigned int)cLeaderLines.GetCount(), cLeaderLines.GetData());
+	if (0 < cLeaderLines.size()) {
+		pcEntity->SetLeaderLines((unsigned int)cLeaderLines.size(), cLeaderLines.data());
 	}
 
-	if (0 < cLeaderSymbols.GetCount()) {
-		pcEntity->SetLeaderSymbols((unsigned int)cLeaderSymbols.GetCount(), cLeaderSymbols.GetData());
+	if (0 < cLeaderSymbols.size()) {
+		pcEntity->SetLeaderSymbols((unsigned int)cLeaderSymbols.size(), cLeaderSymbols.data());
 	}
 
 /*
@@ -1673,24 +1699,24 @@ A3DStatus _3DfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCasca
 	A3DTessMarkupGet(nullptr, &sMarkupData);
 	A3DTessBaseGet(nullptr, &sBaseData);
 
-	if (false == aPolyline.IsEmpty())
+	if (false == aPolyline.empty())
 	{
 		PMI::Frame cFrame;
-		cFrame.SetPolylines((unsigned int)aPolyline.GetCount(), aPolyline.GetData());
+		cFrame.SetPolylines((unsigned int)aPolyline.size(), aPolyline.data());
 		if (nullptr != pcEntity) {
 			pcEntity->SetFrame(cFrame);
 		}
 	}
 
-	if (false == aPolygons.IsEmpty())
+	if (false == aPolygons.empty())
 	{
 		PMI::Drawing cDrawing;
-		cDrawing.SetPolygons((unsigned int)aPolygons.GetCount(), aPolygons.GetData());
+		cDrawing.SetPolygons((unsigned int)aPolygons.size(), aPolygons.data());
 		pcEntity->SetDrawing(cDrawing);
 	}
 
-	assert(aStrings.GetCount() == aTextAttributes.GetCount());
-	unsigned int nCount = (unsigned int)aStrings.GetCount();
+	assert(aStrings.size() == aTextAttributes.size());
+	unsigned int nCount = (unsigned int)aStrings.size();
 
 
 	switch (pcEntity->GetType())
@@ -1700,7 +1726,7 @@ A3DStatus _3DfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCasca
 			PMI::DatumEntity * pcDatum = (PMI::DatumEntity *)pcEntity;
 			pcDatum->SetDisplayParallelToScreen(cOptions.IsDisplayParallelToScreen());
 			if (0 < nCount) {
-				pcDatum->SetLabels(nCount, aStrings.GetData(), aTextAttributes.GetData());
+				pcDatum->SetLabels(nCount, aStrings.data(), aTextAttributes.data());
 			}
 		}
 		break;
@@ -1711,7 +1737,7 @@ A3DStatus _3DfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCasca
 
 			pcDimension->SetDisplayParallelToScreen(cOptions.IsDisplayParallelToScreen());
 			if (0 < nCount) {
-				pcDimension->SetStrings(nCount, aStrings.GetData(), aTextAttributes.GetData());
+				pcDimension->SetStrings(nCount, aStrings.data(), aTextAttributes.data());
 			}
 		}
 		break;
@@ -1721,7 +1747,7 @@ A3DStatus _3DfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCasca
 			PMI::GenericEntity * pcGeneric = (PMI::GenericEntity *)pcEntity;
 
 			if (0 < nCount) {
-				pcGeneric->SetStrings(nCount, aStrings.GetData(), aTextAttributes.GetData());
+				pcGeneric->SetStrings(nCount, aStrings.data(), aTextAttributes.data());
 			}
 		}
 		break;
@@ -1732,7 +1758,7 @@ A3DStatus _3DfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCasca
 
 			pcNote->SetDisplayParallelToScreen(cOptions.IsDisplayParallelToScreen());
 			if (0 < nCount) {
-				pcNote->SetStrings(nCount, aStrings.GetData(), aTextAttributes.GetData());
+				pcNote->SetStrings(nCount, aStrings.data(), aTextAttributes.data());
 			}
 		}
 		break;
@@ -1742,7 +1768,7 @@ A3DStatus _3DfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCasca
 			PMI::RoughnessEntity * pcRoughness = (PMI::RoughnessEntity *)pcEntity;
 
 			if (0 < nCount) {
-				pcRoughness->SetFields(nCount, aStrings.GetData(), aTextAttributes.GetData());
+				pcRoughness->SetFields(nCount, aStrings.data(), aTextAttributes.data());
 			}
 				
 		} break;
@@ -1762,7 +1788,7 @@ A3DStatus _3DfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCasca
 }
 
 // 7-1. Mark up Tesselation 처리
-A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData, const A3DTessMarkupData * psTessMarkupData,
+A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData, const A3DTessMarkupData * psTessMarkupData,
 	PolylineArray & aOutPolylines, PolygonArray & aOutPolygones, StringArray & aOutStrings, PMI::TextAttributesArray & cOutTextAttributes,
 	PMI::Options * pcOutPmiOptions)
 {
@@ -1859,7 +1885,7 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 						TDF::PolygonKit cPolygon;
 						cPolygon.SetPoints(3, cPoints);
 						cPolygon.SetRGBColor(cColor);
-						aOutPolygones.Add(cPolygon);
+						aOutPolygones.push_back(cPolygon);
 					}
 
 					DEFAULT_OFFSET;
@@ -2015,7 +2041,7 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 					}
 
 					CString strText = WStr::ToUtf16(pcBuffer);
-					aOutStrings.Add(strText);
+					aOutStrings.push_back(strText);
 
 					cTextAttributes.SetRGBColor(cColor);
 					cTextAttributes.SetFontSize(static_cast<float>(dTextboxHeight * char_height));
@@ -2031,7 +2057,7 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 						cTextAttributes.SetFontSizeUnits(PMI::Font::Size::Units::WorldSpaceUnits);
 					}
 
-					cOutTextAttributes.Add(cTextAttributes);
+					cOutTextAttributes.push_back(cTextAttributes);
 
 					DEFAULT_OFFSET;
 				}
@@ -2064,7 +2090,7 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 					TDF::PolygonKit cPmiPolygon;
 					cPmiPolygon.SetPoints(pt_count, pcPoints);
 					cPmiPolygon.SetRGBColor(cColor);
-					aOutPolygones.Add(cPmiPolygon);
+					aOutPolygones.push_back(cPmiPolygon);
 
 					if (nullptr != pcPoints) {
 						delete[] pcPoints;
@@ -2121,7 +2147,7 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 
 					cTransformMatrix = cMatrix * cTransformMatrix;
 					//TDF::TestMatrix cm;
-					//MatrixCal::ComputeMatrixProduct(cMatrix.GetData(), cTransformMatrix.GetData(), cTransformMatrix.GetData());
+					//MatrixCal::ComputeMatrixProduct(cMatrix.data(), cTransformMatrix.data(), cTransformMatrix.data());
 
 					PMI::Orientation orientation;
 					orientation.SetMatrix(cTransformMatrix);
@@ -2136,8 +2162,8 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 				cTransformMatrix = cMatrix * cTransformMatrix;
 				cMatrix.Reset();
 
-// 				MatrixCal::InverseMatrix(cMatrix.GetData(), cMatrix.GetData());
-// 				MatrixCal::ComputeMatrixProduct(cMatrix.GetData(), cTransformMatrix.GetData(), cTransformMatrix.GetData());
+// 				MatrixCal::InverseMatrix(cMatrix.data(), cMatrix.data());
+// 				MatrixCal::ComputeMatrixProduct(cMatrix.data(), cTransformMatrix.data(), cTransformMatrix.data());
 // 				cMatrix.SetIdentity();
 				char_height = 1.;
 				MAKE_OFFSET(0, 0);
@@ -2178,7 +2204,7 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 // 			if (line_pattern.encodedText())
 // 				cPmiPolyline.SetLinePattern(reinterpret_cast<char const *>(line_pattern.encodedText()));
 
-			aOutPolylines.Add(cPmiPolyline);
+			aOutPolylines.push_back(cPmiPolyline);
 
 			DEFAULT_OFFSET;
 		}
@@ -2191,7 +2217,7 @@ A3DStatus _3DfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseDat
 }
 
 // 7-2. Leader Lines 및 Symbol 처리
-A3DStatus _3DfImport::GetLeaderLinesAndSymbols(const A3DMkpLeader * pMarkup, PolylineArray & cOutLeaderLines, PolygonArray & cOutLeaderSymbols)
+A3DStatus TdfImport::GetLeaderLinesAndSymbols(const A3DMkpLeader * pMarkup, PolylineArray & cOutLeaderLines, PolygonArray & cOutLeaderSymbols)
 {
 	A3DMkpLeaderData sData;
 	A3D_INITIALIZE_DATA(A3DMkpLeaderData, sData);
@@ -2223,7 +2249,7 @@ A3DStatus _3DfImport::GetLeaderLinesAndSymbols(const A3DMkpLeader * pMarkup, Pol
 }
 
 // 8. Draw Tessellation Base
-A3DStatus _3DfImport::DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresentationItem * pcRepItem, TDF::SegmentKey & cParentSegment, 
+A3DStatus TdfImport::DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresentationItem * pcRepItem, TDF::SegmentKey & cParentSegment, 
 	const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	if(pcTessBase == nullptr) {
@@ -2266,7 +2292,7 @@ A3DStatus _3DfImport::DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresen
 
 
 // 8-1. Draw Tess3D
-A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
+A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
 	const A3DMiscCascadedAttributes * pcParentAttr, TDF::SegmentKey & cParentSegment)
 {
 	LogIncreaseTabIndex(2);
@@ -2287,7 +2313,6 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 	}
 
 	A3DTessFaceData & cTessFaceData = cTess3dData.m_psFaceTessData[0];
-
 
 /*
 	A3DMiscCascadedAttributes * pcAttribute;
@@ -2358,7 +2383,7 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 
 	// ----- Texture Parameter 활당 -----
 	A3DUns32 nTextureCoordCount = cTess3dData.m_uiTextureCoordSize;
-	cConFaceInfo.aInParams.SetCount(nTextureCoordCount);
+	cConFaceInfo.aInParams.resize(nTextureCoordCount);
 	for(A3DUns32 nIndex = 0; nIndex < nTextureCoordCount; nIndex++) {
 		cConFaceInfo.aInParams[nIndex] = static_cast<float>(cTess3dData.m_pdTextureCoords[nIndex]);
 	}
@@ -2479,13 +2504,13 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 			}
 
 			TDF::PointArray acWirePoints;
-			acWirePoints.SetCount(size);
+			acWirePoints.resize(size);
 
 			for (A3DUns32 k = 0; k < size; ++k) {
 				acWirePoints[k] = m_pcPoints[cTess3dData.m_puiWireIndexes[nStartWireIndex + index++] / 3];
 			}
 
-			cCurrnetSegment.InsertLine(acWirePoints.GetCount(), acWirePoints.GetData());
+			cCurrnetSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
 		}
 	
 		cConFaceInfo.nOutTriSizeIndex = 0;	// 한 Triangle Type당 하나씩
@@ -2494,11 +2519,11 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 		cConFaceInfo.fInNormalCosine = m_fNormalAngleCosine;
 
 		cConFaceInfo.mOutIndexMap.RemoveAll();
-		cConFaceInfo.aOutVertexRefs.RemoveAll();
-		cConFaceInfo.aOutFacePoints.RemoveAll();
-		cConFaceInfo.aOutFaceList.RemoveAll();
-		cConFaceInfo.aOutFaceVertexNormals.RemoveAll();
-		cConFaceInfo.aOutFaceVertexParams.RemoveAll();
+		cConFaceInfo.aOutVertexRefs.clear();
+		cConFaceInfo.aOutFacePoints.clear();
+		cConFaceInfo.aOutFaceList.clear();
+		cConFaceInfo.aOutFaceVertexNormals.clear();
+		cConFaceInfo.aOutFaceVertexParams.clear();
 		cConFaceInfo.aOutFaceVertexColors.clear();
 
 		// fill out the RGBA vertex color array (if necessary) 1
@@ -2546,7 +2571,7 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 			nTriangleFaceCount += ConveTessFaceDataTriangleTextured(cConFaceInfo);
 		}
 
-		if(false == cConFaceInfo.aOutFacePoints.IsEmpty()) {
+		if(false == cConFaceInfo.aOutFacePoints.empty()) {
 			TDF::ShellKit cShellKit;
 			cShellKit.SetPoints(cConFaceInfo.aOutFacePoints);
 			cShellKit.SetNormals(cConFaceInfo.aOutFaceVertexNormals);
@@ -2584,7 +2609,7 @@ A3DStatus _3DfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDa
 }
 
 // 8-1-1. Triangle Face Data 변환
-UINT _3DfImport::ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo)
+UINT TdfImport::ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo)
 {
 	int nFaceListIndices[3];			// facelist indices into the "global" point array
 	int nFaceVertexNormalIndices[3];	// vertex normal indices into the "global" normal array
@@ -2619,7 +2644,7 @@ UINT _3DfImport::ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo)
 }
 
 // 8-1-2. Triangle Fan Data 변환
-UINT _3DfImport::ConvertTessFaceDataTriangleFan(ConvertFaceInfo & cInFaceInfo)
+UINT TdfImport::ConvertTessFaceDataTriangleFan(ConvertFaceInfo & cInFaceInfo)
 {
 	int nFaceListIndices[3];			// facelist indices into the "global" point array
 	int nFaceVertexNormalIndices[3];	// vertex normal indices into the "global" normal array
@@ -2684,7 +2709,7 @@ UINT _3DfImport::ConvertTessFaceDataTriangleFan(ConvertFaceInfo & cInFaceInfo)
 }
 
 // 8-1-3. Triangle Stripe Data 변환
-UINT _3DfImport::ConvertTessFaceDataTriangleStripe(ConvertFaceInfo & cInFaceInfo)
+UINT TdfImport::ConvertTessFaceDataTriangleStripe(ConvertFaceInfo & cInFaceInfo)
 {
 	int nFaceListIndices[3];			// facelist indices into the "global" point array
 	int nFaceVertexNormalIndices[3];	// vertex normal indices into the "global" normal array
@@ -2761,7 +2786,7 @@ UINT _3DfImport::ConvertTessFaceDataTriangleStripe(ConvertFaceInfo & cInFaceInfo
 }
 
 // 8-1-4. Triangle Stripe One Normal 변환
-UINT _3DfImport::ConvertTessFaceDataTriangleOneNormal(ConvertFaceInfo & cInFaceInfo)
+UINT TdfImport::ConvertTessFaceDataTriangleOneNormal(ConvertFaceInfo & cInFaceInfo)
 {
 	int nFaceListIndices[3];			// facelist indices into the "global" point array
 	int nFaceVertexNormalIndices[3];	// vertex normal indices into the "global" normal array
@@ -2796,7 +2821,7 @@ UINT _3DfImport::ConvertTessFaceDataTriangleOneNormal(ConvertFaceInfo & cInFaceI
 }
 
 // 8-1-5. Triangle Fan One Normal Data 변환
-UINT _3DfImport::ConvertTessFaceDataTriangleFanOneNormal(ConvertFaceInfo & cInFaceInfo)
+UINT TdfImport::ConvertTessFaceDataTriangleFanOneNormal(ConvertFaceInfo & cInFaceInfo)
 {
 	int nFaceListIndices[3];			// facelist indices into the "global" point array
 	int nFaceVertexNormalIndices[3];	// vertex normal indices into the "global" normal array
@@ -2867,7 +2892,7 @@ UINT _3DfImport::ConvertTessFaceDataTriangleFanOneNormal(ConvertFaceInfo & cInFa
 	return nTriFanCount;
 }
 
-UINT _3DfImport::DrawTessFaceDataTriangleFanOneNormal(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
+UINT TdfImport::DrawTessFaceDataTriangleFanOneNormal(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
 	TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, TDF::IntArray & anFacelistArray, TDF::IntArray & anNormalIndexArray)
 {
 	A3DUns32 nFacePointIndex[3];
@@ -2960,7 +2985,7 @@ UINT _3DfImport::DrawTessFaceDataTriangleFanOneNormal(A3DTessFaceData & cTessFac
 }
 
 // 8-1-6. Triangle Stripe One Normal Data 변환
-UINT _3DfImport::ConvertTessFaceDataTriangleStripeOneNormal(ConvertFaceInfo & cInFaceInfo)
+UINT TdfImport::ConvertTessFaceDataTriangleStripeOneNormal(ConvertFaceInfo & cInFaceInfo)
 {
 	int nFaceListIndices[3];			// facelist indices into the "global" point array
 	int nFaceVertexNormalIndices[3];	// vertex normal indices into the "global" normal array
@@ -3051,7 +3076,7 @@ UINT _3DfImport::ConvertTessFaceDataTriangleStripeOneNormal(ConvertFaceInfo & cI
 	return nStripesCount;
 }
 
-UINT _3DfImport::ConveTessFaceDataTriangleTextured(ConvertFaceInfo & cInFaceInfo)
+UINT TdfImport::ConveTessFaceDataTriangleTextured(ConvertFaceInfo & cInFaceInfo)
 {
 	A3DUns32 nTextureCoordSize = 0;
 	if(cInFaceInfo.pcInTessFaceData->m_usUsedEntitiesFlags & kA3DTessFaceDataTriangleTextured) {
@@ -3099,7 +3124,7 @@ UINT _3DfImport::ConveTessFaceDataTriangleTextured(ConvertFaceInfo & cInFaceInfo
 	return nTriangleCount;
 }
 
-UINT _3DfImport::DrawTessFaceDataTriangleTextured(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
+UINT TdfImport::DrawTessFaceDataTriangleTextured(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
 	TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, TDF::IntArray & anFacelistArray, TDF::IntArray & anNormalIndexArray)
 {
 	A3DUns32 nTriangleCount = cTessFaceData.m_puiSizesTriangulated[nTriSizeIndex++];
@@ -3139,7 +3164,7 @@ UINT _3DfImport::DrawTessFaceDataTriangleTextured(A3DTessFaceData & cTessFaceDat
 }
 
 // 8-2-1. Tess3D Wire 처리
-A3DStatus _3DfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
+A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
 	const A3DMiscCascadedAttributes * pcParentAttr, TDF::SegmentKey & cParentSegment)
 {
 	A3DEEntityType eType;
@@ -3151,6 +3176,7 @@ A3DStatus _3DfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3
 
 	switch (eType)
 	{
+		// kA3DReadTessOnly Mode로 읽을 경우, kA3DTypeRiPolyWire로 바로 들어옴. Curve의 형식을 알수는 없음.
 		case kA3DTypeRiPolyWire:
 			return DrawPolyWires(pTess3DWire, pcTessBaseData, pcRepItem, pcParentAttr, cParentSegment);
 		break;
@@ -3195,7 +3221,7 @@ A3DStatus _3DfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3
 	A3DUns32 nPointCount = pcTessBaseData->m_uiCoordSize / 3;
 
 	TDF::PointArray acWirePoints;
-	acWirePoints.SetCount(nPointCount);
+	acWirePoints.resize(nPointCount);
 
 	for(A3DUns32 nIndex = 0; nIndex < nPointCount; nIndex++)
 	{
@@ -3204,14 +3230,14 @@ A3DStatus _3DfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3
 		acWirePoints[nIndex].z = pcTessBaseData->m_pdCoords[(nIndex * 3) + 2];
 	}
 
-	cParentSegment.InsertLine(acWirePoints.GetCount(), acWirePoints.GetData());
+	cParentSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
 
 	LogDecreaseTabIndex(2);
 
 	return nStatus;
 }
 
-A3DStatus _3DfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
+A3DStatus TdfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
 	const A3DMiscCascadedAttributes * pcParentAttr, TDF::SegmentKey & cSegment)
 {
 	LogIncreaseTabIndex(2);
@@ -3229,7 +3255,7 @@ A3DStatus _3DfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBas
 	if(nullptr == sWireData.m_puiSizesWires) {
 		A3DUns32 nPointCount = pcTessBaseData->m_uiCoordSize / 3;
 		TDF::PointArray aPoints;
-		aPoints.SetCount(nPointCount);
+		aPoints.resize(nPointCount);
 
 		A3DUns32 nPointIndex = 0;
 		for(A3DUns32 nIndex = 0; nIndex < nPointCount; nIndex++) {
@@ -3239,7 +3265,7 @@ A3DStatus _3DfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBas
 			aPoints[nIndex].z = pcTessBaseData->m_pdCoords[nPointIndex + 2];
 		}
 
-		cSegment.InsertLine(aPoints.GetCount(), aPoints.GetData());
+		cSegment.InsertLine(aPoints.size(), aPoints.data());
 	}
 	else 
 	{
@@ -3262,10 +3288,10 @@ A3DStatus _3DfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBas
 
 			if(!(nInfoIndex & kA3DTess3DWireDataIsContinuous)) //Continuious
 			{
-				if(0 < aPoints.GetCount())
+				if(0 < aPoints.size())
 				{
-					cSegment.InsertLine(aPoints.GetCount(), aPoints.GetData());
-					aPoints.SetCount(0);
+					cSegment.InsertLine(aPoints.size(), aPoints.data());
+					aPoints.resize(0);
 				}
 			}
 			else {
@@ -3278,7 +3304,7 @@ A3DStatus _3DfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBas
 				cPoint.x = pcTessBaseData->m_pdCoords[nPointIndex];
 				cPoint.y = pcTessBaseData->m_pdCoords[nPointIndex + 1];
 				cPoint.z = pcTessBaseData->m_pdCoords[nPointIndex + 2];
-				aPoints.Add(cPoint);
+				aPoints.push_back(cPoint);
 			}
 
 			if(bClosed)
@@ -3287,10 +3313,10 @@ A3DStatus _3DfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBas
 				cPoint.x = pcTessBaseData->m_pdCoords[nPointIndex];
 				cPoint.y = pcTessBaseData->m_pdCoords[nPointIndex + 1];
 				cPoint.z = pcTessBaseData->m_pdCoords[nPointIndex + 2];
-				aPoints.Add(cPoint);
+				aPoints.push_back(cPoint);
 
-				cSegment.InsertLine(aPoints.GetCount(), aPoints.GetData());
-				aPoints.SetCount(0);
+				cSegment.InsertLine(aPoints.size(), aPoints.data());
+				aPoints.resize(0);
 			}
 
 			nIndex += nInfoIndex + 1;
@@ -3303,7 +3329,7 @@ A3DStatus _3DfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBas
 }
 
 // 8-2-3. Facet 갯수를 가져옴
-A3DUns32 _3DfImport::Tess3DDataGetNumberOfFacets(const A3DTess3DData * pcTess3DData)
+A3DUns32 TdfImport::Tess3DDataGetNumberOfFacets(const A3DTess3DData * pcTess3DData)
 {
 	A3DUns32 ui;
 	A3DUns32 uiNbFacets = 0;
@@ -3316,7 +3342,7 @@ A3DUns32 _3DfImport::Tess3DDataGetNumberOfFacets(const A3DTess3DData * pcTess3DD
 }
 
 // 8-2-1-1. Facet 갯수를 가져옴
-A3DUns32 _3DfImport::TessFaceDataGetNumberOfFacets(const A3DTessFaceData * pcTessFaceData)
+A3DUns32 TdfImport::TessFaceDataGetNumberOfFacets(const A3DTessFaceData * pcTessFaceData)
 {
 	A3DUns32 iNbFacet = 0;
 	A3DUns32 iNumberIndex = 0;
@@ -3445,7 +3471,7 @@ A3DUns32 _3DfImport::TessFaceDataGetNumberOfFacets(const A3DTessFaceData * pcTes
 }
 
 // 8-3. Build Markup 
-A3DStatus _3DfImport::BuildMarkup(A3DTess3D * pcTess3d, A3DTessBaseData * pcTessBaseData, TDF::SegmentKey & cParentSegment)
+A3DStatus TdfImport::BuildMarkup(A3DTess3D * pcTess3d, A3DTessBaseData * pcTessBaseData, TDF::SegmentKey & cParentSegment)
 {
 	A3DTessMarkupData sData;
 	A3D_INITIALIZE_DATA(A3DTessMarkupData, sData);
@@ -3465,11 +3491,11 @@ A3DStatus _3DfImport::BuildMarkup(A3DTess3D * pcTess3d, A3DTessBaseData * pcTess
 	return A3D_SUCCESS;
 }
 
-// ----- Utility -----
+//== Utility =======================================================================================
 
 // 7-10-1. Normal Index를 조정하는 함수
 // Vertex는 중복이 되고 Normal Index는 각각 별도로 들어온다 (vertex index에서 찾도록 검사)
-void _3DfImport::MatchVertexNormal(TessIndexMap & maNormalIndexMap, A3DUns32 nVertexIndex, A3DUns32 & nNormalIndex)
+void TdfImport::MatchVertexNormal(TessIndexMap & maNormalIndexMap, A3DUns32 nVertexIndex, A3DUns32 & nNormalIndex)
 {
 	A3DUns32 nFindNormalIndex;
 	if(true == maNormalIndexMap.Lookup(nVertexIndex, nFindNormalIndex)) {
@@ -3482,7 +3508,7 @@ void _3DfImport::MatchVertexNormal(TessIndexMap & maNormalIndexMap, A3DUns32 nVe
 
 // 7-10-2. Point Index Map과 Normal Index Map, Point, Normal Index를 이용해서 MbTrianle Vector를 구성한다.
 // 주어진 Triangle Vector에 생성된 Vector를 추가시킴.
-bool _3DfImport::ConvertFaceList(TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap,
+bool TdfImport::ConvertFaceList(TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap,
 	A3DUns32 * pnFacePointIndex, A3DUns32 * pnFaceNormalIndex, TDF::IntArray & anFacelistArray, TDF::IntArray & anVertexNoramlIndexArray)
 {
 	// Triangle을 구성할 Point Index
@@ -3511,20 +3537,20 @@ bool _3DfImport::ConvertFaceList(TessIndexMap & maPointIndexMap, TessIndexMap & 
 		}
 	}
 
-	anFacelistArray.Add(3);
-	anFacelistArray.Add(nPointIndex[0]);
-	anFacelistArray.Add(nPointIndex[1]);
-	anFacelistArray.Add(nPointIndex[2]);
+	anFacelistArray.push_back(3);
+	anFacelistArray.push_back(nPointIndex[0]);
+	anFacelistArray.push_back(nPointIndex[1]);
+	anFacelistArray.push_back(nPointIndex[2]);
 
-	anVertexNoramlIndexArray.Add(3);
-	anVertexNoramlIndexArray.Add(nNormalIndex[0]);
-	anVertexNoramlIndexArray.Add(nNormalIndex[1]);
-	anVertexNoramlIndexArray.Add(nNormalIndex[2]);
+	anVertexNoramlIndexArray.push_back(3);
+	anVertexNoramlIndexArray.push_back(nNormalIndex[0]);
+	anVertexNoramlIndexArray.push_back(nNormalIndex[1]);
+	anVertexNoramlIndexArray.push_back(nNormalIndex[2]);
 
 	return true;
 }
 
-void _3DfImport::AddTriangle(ConvertFaceInfo & cInFaceInfo,
+void TdfImport::AddTriangle(ConvertFaceInfo & cInFaceInfo,
 	int const pnInFaceListIndices[3],			// facelist indices into the "global" point array for this triangle
 	int const pnInFaceVertexNromalIndices[3],	// vertex normal indices into the "global" normal array for this triangle
 	int const pnInFaceVertexParamIndices[3],	// optional vertex parameter indices into the "global" parameter array for this triangle
@@ -3536,7 +3562,7 @@ void _3DfImport::AddTriangle(ConvertFaceInfo & cInFaceInfo,
 	}
 
 	// Face List 숫자 추가
-	cInFaceInfo.aOutFaceList.Add(3);
+	cInFaceInfo.aOutFaceList.push_back(3);
 
 	TDF::Vector cNormal;
 	bool bZeroLengthFlag = false;
@@ -3570,21 +3596,21 @@ void _3DfImport::AddTriangle(ConvertFaceInfo & cInFaceInfo,
 			// Index Map에서 FaceListIndex를 발견하지 못한 경우 처리
 			if(cOutIndexIterator == cInFaceInfo.mOutIndexMap[pnInFaceListIndices[nVertexIndex]].cend())
 			{
-				cInFaceInfo.aOutFacePoints.Add(m_pcPoints[pnInFaceListIndices[nVertexIndex]]);
-				cInFaceInfo.aOutFaceList.Add(static_cast<int>(cInFaceInfo.aOutFacePoints.GetCount() - 1));
+				cInFaceInfo.aOutFacePoints.push_back(m_pcPoints[pnInFaceListIndices[nVertexIndex]]);
+				cInFaceInfo.aOutFaceList.push_back(static_cast<int>(cInFaceInfo.aOutFacePoints.size() - 1));
 
 				if(0 < m_nNormalCount) {
 					if(false == bZeroLengthFlag) {
-						cInFaceInfo.aOutFaceVertexNormals.Add(m_pcNormals[pnInFaceVertexNromalIndices[nVertexIndex]]);
+						cInFaceInfo.aOutFaceVertexNormals.push_back(m_pcNormals[pnInFaceVertexNromalIndices[nVertexIndex]]);
 					}
 					else {
-						cInFaceInfo.aOutFaceVertexNormals.Add(cNormal);
+						cInFaceInfo.aOutFaceVertexNormals.push_back(cNormal);
 					}
 				}
 
 				if(0 < nInVertexParamSize) {
 					for(A3DUns32 k = 0; k < nInVertexParamSize; k++) {
-						cInFaceInfo.aOutFaceVertexParams.Add(cInFaceInfo.aInParams[pnInFaceVertexParamIndices[nVertexIndex] + k]);
+						cInFaceInfo.aOutFaceVertexParams.push_back(cInFaceInfo.aInParams[pnInFaceVertexParamIndices[nVertexIndex] + k]);
 					}
 				}
 
@@ -3592,8 +3618,8 @@ void _3DfImport::AddTriangle(ConvertFaceInfo & cInFaceInfo,
 					cInFaceInfo.aOutFaceVertexColors.push_back(cInFaceInfo.aInColors[pnInFaceVertexColorIndices[nVertexIndex]]);
 				}
 
-				cInFaceInfo.mOutIndexMap[pnInFaceListIndices[nVertexIndex]].push_back(static_cast<int>(cInFaceInfo.aOutFacePoints.GetCount() - 1));
-				cInFaceInfo.aOutVertexRefs.Add(1);
+				cInFaceInfo.mOutIndexMap[pnInFaceListIndices[nVertexIndex]].push_back(static_cast<int>(cInFaceInfo.aOutFacePoints.size() - 1));
+				cInFaceInfo.aOutVertexRefs.push_back(1);
 
 				break;
 			}
@@ -3621,7 +3647,7 @@ void _3DfImport::AddTriangle(ConvertFaceInfo & cInFaceInfo,
 					if(true == bMatchingFlag)
 					{
 						// 찾은 Index를 이용해서 Face List를 추가한다.
-						cInFaceInfo.aOutFaceList.Add(*cOutIndexIterator);
+						cInFaceInfo.aOutFaceList.push_back(*cOutIndexIterator);
 						cInFaceInfo.aOutVertexRefs[*cOutIndexIterator] += 1;
 
 						if(0 < m_nNormalCount)
@@ -3644,7 +3670,7 @@ void _3DfImport::AddTriangle(ConvertFaceInfo & cInFaceInfo,
 }
 
 /*
-void _3DfImport::AddTriangle_IndexHash(ConvertFaceInfo & cInFaceInfo,
+void TdfImport::AddTriangle_IndexHash(ConvertFaceInfo & cInFaceInfo,
 	int const pnInFaceListIndices[3],			// facelist indices into the "global" point array for this triangle
 	int const pnInFaceVertexNromalIndices[3],	// vertex normal indices into the "global" normal array for this triangle
 	int const pnInFaceVertexParamIndices[3],	// optional vertex parameter indices into the "global" parameter array for this triangle
@@ -3765,7 +3791,7 @@ void _3DfImport::AddTriangle_IndexHash(ConvertFaceInfo & cInFaceInfo,
 */
 
 // 8. Face Draw Style 정의
-A3DStatus _3DfImport::SetFaceStyle(const A3DRootBaseWithGraphics * pcBase, TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::SetFaceStyle(const A3DRootBaseWithGraphics * pcBase, TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DMiscCascadedAttributes * pcAttrs;
 	A3DMiscCascadedAttributesData cAttrsData;
@@ -3779,7 +3805,7 @@ A3DStatus _3DfImport::SetFaceStyle(const A3DRootBaseWithGraphics * pcBase, TDF::
 	return eStatus;
 }
 
-A3DStatus _3DfImport::SetFaceStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::SetFaceStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DMiscCascadedAttributesData cAttrsData;
 	A3D_INITIALIZE_DATA(A3DMiscCascadedAttributesData, cAttrsData);
@@ -3792,7 +3818,7 @@ A3DStatus _3DfImport::SetFaceStyle(TDF::SegmentKey & cSegment, const A3DMiscCasc
 	return eStatus;
 }
 
-A3DStatus _3DfImport::SetFaceStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData)
+A3DStatus TdfImport::SetFaceStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData)
 {
 	SegmentKey cStyleSegment;
 	if(true == FindFaceMaterialMapping(cAttrsData, cStyleSegment)) {
@@ -3808,7 +3834,7 @@ A3DStatus _3DfImport::SetFaceStyle(TDF::SegmentKey & cSegment, const A3DMiscCasc
 	return A3D_SUCCESS;
 }
 
-A3DStatus _3DfImport::SetLineStyle(const A3DRootBaseWithGraphics * pcBase, TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::SetLineStyle(const A3DRootBaseWithGraphics * pcBase, TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DMiscCascadedAttributes * pcAttrs;
 	A3DMiscCascadedAttributesData cAttrsData;
@@ -3822,7 +3848,7 @@ A3DStatus _3DfImport::SetLineStyle(const A3DRootBaseWithGraphics * pcBase, TDF::
 	return eStatus;
 }
 
-A3DStatus _3DfImport::SetLineStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::SetLineStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DMiscCascadedAttributesData cAttrsData;
 	A3D_INITIALIZE_DATA(A3DMiscCascadedAttributesData, cAttrsData);
@@ -3835,7 +3861,7 @@ A3DStatus _3DfImport::SetLineStyle(TDF::SegmentKey & cSegment, const A3DMiscCasc
 	return eStatus;
 }
 
-A3DStatus _3DfImport::SetLineStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData)
+A3DStatus TdfImport::SetLineStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData)
 {
 	SegmentKey cStyleSegment;
 	if(true == FindLineMaterialMapping(cAttrsData, cStyleSegment)) {
@@ -3851,7 +3877,7 @@ A3DStatus _3DfImport::SetLineStyle(TDF::SegmentKey & cSegment, const A3DMiscCasc
 	return A3D_SUCCESS;
 }
 
-A3DStatus _3DfImport::SetMarkerStyle(const A3DRootBaseWithGraphics * pcBase, TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::SetMarkerStyle(const A3DRootBaseWithGraphics * pcBase, TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DMiscCascadedAttributes * pcAttrs;
 	A3DMiscCascadedAttributesData cAttrsData;
@@ -3865,7 +3891,7 @@ A3DStatus _3DfImport::SetMarkerStyle(const A3DRootBaseWithGraphics * pcBase, TDF
 	return eStatus;
 }
 
-A3DStatus _3DfImport::SetMarkerStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::SetMarkerStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DMiscCascadedAttributesData cAttrsData;
 	A3D_INITIALIZE_DATA(A3DMiscCascadedAttributesData, cAttrsData);
@@ -3878,7 +3904,7 @@ A3DStatus _3DfImport::SetMarkerStyle(TDF::SegmentKey & cSegment, const A3DMiscCa
 	return eStatus;
 }
 
-A3DStatus _3DfImport::SetMarkerStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData)
+A3DStatus TdfImport::SetMarkerStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData)
 {
 	SegmentKey cStyleSegment;
 	if(true == FindMarkerMaterialMapping(cAttrsData, cStyleSegment)) {
@@ -3894,7 +3920,7 @@ A3DStatus _3DfImport::SetMarkerStyle(TDF::SegmentKey & cSegment, const A3DMiscCa
 	return A3D_SUCCESS;
 }
 
-A3DStatus _3DfImport::GetMaterialMapping(const A3DMiscCascadedAttributesData & cAttrsData, A3DInt32 * pnUVCoordinatesIndex,
+A3DStatus TdfImport::GetMaterialMapping(const A3DMiscCascadedAttributesData & cAttrsData, A3DInt32 * pnUVCoordinatesIndex,
 	A3DUns8 * pucTextureDimension, TDF::MaterialMappingKit & cMaterialKit)
 {
 	const A3DGraphStyleData * pcStyleData = &cAttrsData.m_sStyle;
@@ -4057,7 +4083,7 @@ A3DStatus _3DfImport::GetMaterialMapping(const A3DMiscCascadedAttributesData & c
 }
 
 // 8-1. 일반 DrawStyle 정의 
-A3DStatus _3DfImport::GetMaterialMapping(const A3DMiscCascadedAttributesData & cAttrsData, TDF::MaterialMappingKit & cMaterialKit)
+A3DStatus TdfImport::GetMaterialMapping(const A3DMiscCascadedAttributesData & cAttrsData, TDF::MaterialMappingKit & cMaterialKit)
 {
 	const A3DGraphStyleData * pcStyleData = &cAttrsData.m_sStyle;
 
@@ -4192,8 +4218,40 @@ A3DStatus _3DfImport::GetMaterialMapping(const A3DMiscCascadedAttributesData & c
 	return A3D_SUCCESS;
 }
 
+// 9. Context Scale 구하는 함수
+bool TdfImport::ParseTopoContextScale(const A3DTopoBody * pcBody, double & dTopoContextScale)
+{
+	// 아래쪽에서 문제가 생겨서 값을 가져올 수 없는 경우를 대비해서 Scale값을 1.0을 저장한다.
+	dTopoContextScale = 1.0;
+
+	// Scale을 구하기 위해서 Context Data를 가져온다.
+	A3DTopoBodyData cTopoBodyData;
+	A3D_INITIALIZE_DATA(A3DTopoBodyData, cTopoBodyData);
+	A3DStatus nResult = A3DTopoBodyGet(pcBody, &cTopoBodyData);
+	if (A3D_SUCCESS != nResult) {
+		return false;
+	}
+
+	A3DTopoContextData cTopoContextData;
+	A3D_INITIALIZE_DATA(A3DTopoContextData, cTopoContextData);
+	nResult = A3DTopoContextGet(cTopoBodyData.m_pContext, &cTopoContextData);
+	if (A3D_SUCCESS != nResult) {
+		A3DTopoBodyGet(nullptr, &cTopoBodyData);
+		return false;
+	}
+
+	if (A3D_TRUE == cTopoContextData.m_bHaveScale) {
+		dTopoContextScale = cTopoContextData.m_dScale;
+	}
+
+	A3DTopoBodyGet(nullptr, &cTopoBodyData);
+	A3DTopoContextGet(nullptr, &cTopoContextData);
+
+	return true;
+}
+
 // 20. Draw용 Transforamtion을 계산하는 부분
-A3DStatus _3DfImport::DrawTransformation(const A3DMiscTransformation * pcTransformation)
+A3DStatus TdfImport::DrawTransformation(const A3DMiscTransformation * pcTransformation)
 {
 	if(nullptr == pcTransformation) {
 		return A3D_SUCCESS;
@@ -4265,7 +4323,7 @@ A3DStatus _3DfImport::DrawTransformation(const A3DMiscTransformation * pcTransfo
 
 //== Texture 관련 함수 ===============================================================================
 
-A3DStatus _3DfImport::PopulateTextures(TDF::SegmentKey & cSegment)
+A3DStatus TdfImport::PopulateTextures(TDF::SegmentKey & cSegment)
 {
 // 	InitializeMagick(".");
 // 
@@ -4412,7 +4470,7 @@ A3DStatus _3DfImport::PopulateTextures(TDF::SegmentKey & cSegment)
 	return A3D_SUCCESS;
 }
 
-A3DStatus _3DfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cAttrsData, TDF::MaterialMappingKit & cMaterialKit)
+A3DStatus TdfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cAttrsData, TDF::MaterialMappingKit & cMaterialKit)
 {
 	const A3DGraphStyleData * pcStyleData = &cAttrsData.m_sStyle;
 
@@ -4547,7 +4605,7 @@ A3DStatus _3DfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cA
 	return A3D_SUCCESS;
 }
 
-A3DStatus _3DfImport::SetTextureMapping(TDF::SegmentKey cSegment, A3DMiscCascadedAttributesData & sAttrData) 
+A3DStatus TdfImport::SetTextureMapping(TDF::SegmentKey cSegment, A3DMiscCascadedAttributesData & sAttrData) 
 {
 	TDF::MaterialMappingKit cMaterialMapping;
 	if (A3D_SUCCESS != GetMaterialMapping(sAttrData, cMaterialMapping)) {
@@ -4559,7 +4617,7 @@ A3DStatus _3DfImport::SetTextureMapping(TDF::SegmentKey cSegment, A3DMiscCascade
 	return A3D_SUCCESS;
 }
 
-void _3DfImport::InvertImage(unsigned char * imagebuffer, int width, int height, bool rgba)
+void TdfImport::InvertImage(unsigned char * imagebuffer, int width, int height, bool rgba)
 {
 	unsigned char * row = new unsigned char[width * 4];
 
@@ -4581,7 +4639,7 @@ void _3DfImport::InvertImage(unsigned char * imagebuffer, int width, int height,
 //== Attribute 관련 함수 =============================================================================
 
 // 1. Parent에서 받은(계단식으로) Attribute를 이용해서, Attribute를 생성
-A3DStatus _3DfImport::CreateAndPushCascadedAttributes(const A3DRootBaseWithGraphics * pcBase, const A3DMiscCascadedAttributes * pcParentAttr,
+A3DStatus TdfImport::CreateAndPushCascadedAttributes(const A3DRootBaseWithGraphics * pcBase, const A3DMiscCascadedAttributes * pcParentAttr,
 	A3DMiscCascadedAttributes ** ppcAttr, A3DMiscCascadedAttributesData * pcAttrData)
 {
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesCreate(ppcAttr));
@@ -4594,7 +4652,7 @@ A3DStatus _3DfImport::CreateAndPushCascadedAttributes(const A3DRootBaseWithGraph
 }
 
 // 2. Tess Face용 Attribute 생성
-A3DStatus _3DfImport::CreateAndPushCascadedAttributesTessFace(const A3DRiRepresentationItem * pcRepItem, const A3DTessBase * pcTessBase,
+A3DStatus TdfImport::CreateAndPushCascadedAttributesTessFace(const A3DRiRepresentationItem * pcRepItem, const A3DTessBase * pcTessBase,
 	const A3DTessFaceData * pcTessFaceData, A3DUns32 nFaceIndex, const A3DMiscCascadedAttributes * pcParentAttribute,
 	A3DMiscCascadedAttributes ** pcAttrs, A3DMiscCascadedAttributesData * pcAttributesData)
 {
@@ -4608,7 +4666,7 @@ A3DStatus _3DfImport::CreateAndPushCascadedAttributesTessFace(const A3DRiReprese
 }
 
 // 4. Show 상태를 확인
-A3DStatus _3DfImport::IsShow(const A3DRootBaseWithGraphics * pGraphics)
+A3DStatus TdfImport::IsShow(const A3DRootBaseWithGraphics * pGraphics)
 {
 	if(pGraphics == nullptr) {
 		return A3D_ERROR;
@@ -4643,7 +4701,7 @@ A3DStatus _3DfImport::IsShow(const A3DRootBaseWithGraphics * pGraphics)
 }
 
 // 5. 주어진 Material Mapping을 이용해서 
-bool _3DfImport::SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::MaterialMappingKit const & cInKit, TDF::SegmentKey & cSegment)
+bool TdfImport::SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::MaterialMappingKit const & cInKit, TDF::SegmentKey & cSegment)
 {
 	TDF::SegmentKey cStyleSegment = m_pcModelSegment->StylesInclude().Subsegment(L"face_mat_%d_%d", cAttrData.m_sStyle.m_uiRgbColorIndex, cAttrData.m_sStyle.m_ucTransparency);
 	cStyleSegment.SetMaterialMapping(L"faces", cInKit);
@@ -4662,7 +4720,7 @@ bool _3DfImport::SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cA
 	return true;
 }
 
-bool _3DfImport::SetLineMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::MaterialMappingKit const & cInKit, TDF::SegmentKey & cSegment)
+bool TdfImport::SetLineMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::MaterialMappingKit const & cInKit, TDF::SegmentKey & cSegment)
 {
 	TDF::SegmentKey cStyleSegment = m_pcModelSegment->StylesInclude().Subsegment(L"line_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
 	cStyleSegment.SetMaterialMapping(L"lines", cInKit);
@@ -4679,7 +4737,7 @@ bool _3DfImport::SetLineMaterialMapping(const A3DMiscCascadedAttributesData & cA
 	return true;
 }
 
-bool _3DfImport::SetMarkerMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::MaterialMappingKit const & cInKit, TDF::SegmentKey & cSegment)
+bool TdfImport::SetMarkerMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::MaterialMappingKit const & cInKit, TDF::SegmentKey & cSegment)
 {
 	TDF::SegmentKey cStyleSegment = m_pcModelSegment->StylesInclude().Subsegment(L"marker_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
 	cStyleSegment.SetMaterialMapping(L"markers", cInKit);
@@ -4698,7 +4756,7 @@ bool _3DfImport::SetMarkerMaterialMapping(const A3DMiscCascadedAttributesData & 
 
 
 // 5-1. 주어진 Material Mapping을 이용해서 
-bool _3DfImport::SetStyle(TDF::SegmentKey & cSegment, TDF::SegmentKey & cStyleSegment)
+bool TdfImport::SetStyle(TDF::SegmentKey & cSegment, TDF::SegmentKey & cStyleSegment)
 {
 	TDF::StyleKey cStyle = cSegment.GetStyleControl().PushSegment(cStyleSegment);
 
@@ -4710,7 +4768,7 @@ bool _3DfImport::SetStyle(TDF::SegmentKey & cSegment, TDF::SegmentKey & cStyleSe
 }
 
 // 6. 미리 저장되어 있는 Material Mapping Kit을 찾아오는 함수
-bool _3DfImport::FindFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, SegmentKey & cOutStyleSegment)
+bool TdfImport::FindFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, SegmentKey & cOutStyleSegment)
 {
 	CString strStyleText;
 	strStyleText.Format(L"%d_%d", cAttrData.m_sStyle.m_uiRgbColorIndex, cAttrData.m_sStyle.m_ucTransparency);
@@ -4722,7 +4780,7 @@ bool _3DfImport::FindFaceMaterialMapping(const A3DMiscCascadedAttributesData & c
 	return false;
 }
 
-bool _3DfImport::FindLineMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, SegmentKey & cOutStyleSegment)
+bool TdfImport::FindLineMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, SegmentKey & cOutStyleSegment)
 {
 	auto pcIterator = m_mLineMaterialMappingStyleMap.find(cAttrData.m_sStyle.m_uiRgbColorIndex);
 
@@ -4735,7 +4793,7 @@ bool _3DfImport::FindLineMaterialMapping(const A3DMiscCascadedAttributesData & c
 	return true;
 }
 
-bool _3DfImport::FindMarkerMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, SegmentKey & cOutStyleSegment)
+bool TdfImport::FindMarkerMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, SegmentKey & cOutStyleSegment)
 {
 	auto pcIterator = m_mMarkerMaterialMappingStyleMap.find(cAttrData.m_sStyle.m_uiRgbColorIndex);
 
@@ -4748,7 +4806,7 @@ bool _3DfImport::FindMarkerMaterialMapping(const A3DMiscCascadedAttributesData &
 	return true;
 }
 
-bool _3DfImport::FindMaterialMapping(CString strGeometry, TDF::MaterialMappingKit const & cInKit, SegmentKey & cOutStyleSegment)
+bool TdfImport::FindMaterialMapping(CString strGeometry, TDF::MaterialMappingKit const & cInKit, SegmentKey & cOutStyleSegment)
 {
 	for(auto & cMaterialStyle : m_vcMaterialMappingStyleVector) {
 		if(0 == cMaterialStyle.strGeometry.CompareNoCase(strGeometry)) {
@@ -4765,7 +4823,7 @@ bool _3DfImport::FindMaterialMapping(CString strGeometry, TDF::MaterialMappingKi
 // == C3D 관련 Utility 함수 =========================================================================
 
 // 1. 3DX Location을 C3D Matrix로 변환해서 돌려줌
-A3DStatus _3DfImport::GetMatrix(A3DMiscTransformation * pcLocation, MbMatrix3D & cMatrix)
+A3DStatus TdfImport::GetMatrix(A3DMiscTransformation * pcLocation, MbMatrix3D & cMatrix)
 {
 	if(nullptr == pcLocation) {
 		return A3D_ERROR;
@@ -4826,7 +4884,7 @@ A3DStatus _3DfImport::GetMatrix(A3DMiscTransformation * pcLocation, MbMatrix3D &
 	return A3D_SUCCESS;
 }
 
-A3DStatus _3DfImport::GetMatrix(A3DMiscTransformation * pcLocation, TDF::MatrixKit & cOutMatrix)
+A3DStatus TdfImport::GetMatrix(A3DMiscTransformation * pcLocation, TDF::MatrixKit & cOutMatrix)
 {
 	MbMatrix3D cMatrix;
 	CHECK_A3D_RETURN(GetMatrix(pcLocation, cMatrix));
@@ -4856,7 +4914,7 @@ A3DStatus _3DfImport::GetMatrix(A3DMiscTransformation * pcLocation, TDF::MatrixK
 
 //== 계산 관련 함수 ===================================================================================
 
-void _3DfImport::MatrixMatrixMult(double m[16], const double o[16])
+void TdfImport::MatrixMatrixMult(double m[16], const double o[16])
 {
 	memcpy(m_dMatrix, m, 16 * sizeof(double));
 	m[0] = m_dMatrix[0] * o[0] + m_dMatrix[4] * o[1] + m_dMatrix[8] * o[2] + m_dMatrix[12] * o[3];
@@ -4880,7 +4938,7 @@ void _3DfImport::MatrixMatrixMult(double m[16], const double o[16])
 	m[15] = m_dMatrix[3] * o[12] + m_dMatrix[7] * o[13] + m_dMatrix[11] * o[14] + m_dMatrix[15] * o[15];
 }
 
-void _3DfImport::LoadMatrixIdentity()
+void TdfImport::LoadMatrixIdentity()
 {
 	memset(m_dMatrixStack[m_nMatrixPos], 0, 16 * sizeof(double));
 	m_dMatrixStack[m_nMatrixPos][0] = 1.0;
@@ -4889,12 +4947,12 @@ void _3DfImport::LoadMatrixIdentity()
 	m_dMatrixStack[m_nMatrixPos][15] = 1.0;
 }
 
-void _3DfImport::MultMatrix(const double m[16])
+void TdfImport::MultMatrix(const double m[16])
 {
 	MatrixMatrixMult(m_dMatrixStack[m_nMatrixPos], m);
 }
 
-void _3DfImport::PushMatrix()
+void TdfImport::PushMatrix()
 {
 	if(m_nMatrixPos < 7)
 	{
@@ -4903,7 +4961,7 @@ void _3DfImport::PushMatrix()
 	}
 }
 
-void _3DfImport::PopMatrix()
+void TdfImport::PopMatrix()
 {
 	if(m_nMatrixPos > 0)
 	{
@@ -4911,19 +4969,19 @@ void _3DfImport::PopMatrix()
 	}
 }
 
-void _3DfImport::GetMatrix(double m[16])
+void TdfImport::GetMatrix(double m[16])
 {
 	memcpy(m, m_dMatrixStack[m_nMatrixPos], 16 * sizeof(double));
 }
 
-void _3DfImport::VectorCross(const A3DVector3dData * X, const A3DVector3dData * Y, A3DVector3dData * Z)
+void TdfImport::VectorCross(const A3DVector3dData * X, const A3DVector3dData * Y, A3DVector3dData * Z)
 {
 	Z->m_dX = X->m_dY * Y->m_dZ - X->m_dZ * Y->m_dY;
 	Z->m_dY = X->m_dZ * Y->m_dX - X->m_dX * Y->m_dZ;
 	Z->m_dZ = X->m_dX * Y->m_dY - X->m_dY * Y->m_dX;
 }
 
-void _3DfImport::VectorMatrixMult(A3DDouble dX, A3DDouble dY, A3DDouble dZ, double adMatrix[16],
+void TdfImport::VectorMatrixMult(A3DDouble dX, A3DDouble dY, A3DDouble dZ, double adMatrix[16],
 	A3DDouble * pdResX, A3DDouble * pdResY, A3DDouble * pdResZ)
 {
 	*pdResX = adMatrix[0] * dX + adMatrix[4] * dY + adMatrix[8] * dZ + adMatrix[12];
@@ -4931,7 +4989,7 @@ void _3DfImport::VectorMatrixMult(A3DDouble dX, A3DDouble dY, A3DDouble dZ, doub
 	*pdResZ = adMatrix[2] * dX + adMatrix[6] * dY + adMatrix[10] * dZ + adMatrix[14];
 }
 
-void _3DfImport::AllocVector3dArray(A3DVector3dData ** ppacArray, A3DUns32 uiSize)
+void TdfImport::AllocVector3dArray(A3DVector3dData ** ppacArray, A3DUns32 uiSize)
 {
 	A3DUns32 ui;
 	*ppacArray = (A3DVector3dData *) malloc(uiSize * sizeof(A3DVector3dData));
@@ -4939,14 +4997,14 @@ void _3DfImport::AllocVector3dArray(A3DVector3dData ** ppacArray, A3DUns32 uiSiz
 		A3D_INITIALIZE_DATA(A3DVector3dData, ((*ppacArray)[ui]));
 }
 
-void _3DfImport::AllocNormalsAndPoints(A3DVector3dData ** ppasNormals, A3DUns32 uiNormalSize, A3DVector3dData ** ppasPoints,
+void TdfImport::AllocNormalsAndPoints(A3DVector3dData ** ppasNormals, A3DUns32 uiNormalSize, A3DVector3dData ** ppasPoints,
 	A3DUns32 uiPointSize)
 {
 	AllocVector3dArray(ppasNormals, uiNormalSize);
 	AllocVector3dArray(ppasPoints, uiPointSize);
 }
 
-void _3DfImport::BoundingBoxAddPoint(A3DBoundingBoxData * e, double x, double y, double z)
+void TdfImport::BoundingBoxAddPoint(A3DBoundingBoxData * e, double x, double y, double z)
 {
 	if(e == nullptr)
 		return;
@@ -4960,7 +5018,7 @@ void _3DfImport::BoundingBoxAddPoint(A3DBoundingBoxData * e, double x, double y,
 }
 
 //== 변수 Pointer 관리 함수 ===========================================================================
-void _3DfImport::PointerArrayInitialize(A3DPointerArray * pcArray)
+void TdfImport::PointerArrayInitialize(A3DPointerArray * pcArray)
 {
 	if(pcArray == nullptr)
 		return;
@@ -4970,19 +5028,19 @@ void _3DfImport::PointerArrayInitialize(A3DPointerArray * pcArray)
 	pcArray->m_ppPointers = nullptr;
 }
 
-void _3DfImport::PointerArrayFree(A3DPointerArray * pcArray)
+void TdfImport::PointerArrayFree(A3DPointerArray * pcArray)
 {
 	pcArray->m_uiAllocated = 0;
 	pcArray->m_uiSize = 0;
 	free(pcArray->m_ppPointers);
 }
 
-void _3DfImport::PointerArrayTerminate(A3DPointerArray * pcArray)
+void TdfImport::PointerArrayTerminate(A3DPointerArray * pcArray)
 {
 	PointerArrayFree(pcArray);
 }
 
-void * _3DfImport::MiscRealloc(void * p, A3DUns32 uiOldSize, A3DUns32 uiNewSize)
+void * TdfImport::MiscRealloc(void * p, A3DUns32 uiOldSize, A3DUns32 uiNewSize)
 {
 	void * newp = malloc(uiNewSize);
 	memcpy(newp, p, uiOldSize);
@@ -4991,7 +5049,7 @@ void * _3DfImport::MiscRealloc(void * p, A3DUns32 uiOldSize, A3DUns32 uiNewSize)
 	return newp;
 }
 
-UINT _3DfImport::PointerArrayAdd(A3DPointerArray * pcArray, void * pcPointer)
+UINT TdfImport::PointerArrayAdd(A3DPointerArray * pcArray, void * pcPointer)
 {
 	if(pcArray == nullptr)
 		return 0;
@@ -5015,7 +5073,7 @@ UINT _3DfImport::PointerArrayAdd(A3DPointerArray * pcArray, void * pcPointer)
 	return pcArray->m_uiSize;
 }
 
-int _3DfImport::PointerArrayFind(A3DPointerArray * pcArray, void * pcPointer)
+int TdfImport::PointerArrayFind(A3DPointerArray * pcArray, void * pcPointer)
 {
 	for(UINT ui = 0; ui < pcArray->m_uiSize; ui++)
 	{
@@ -5026,7 +5084,7 @@ int _3DfImport::PointerArrayFind(A3DPointerArray * pcArray, void * pcPointer)
 	return -1;
 }
 
-UINT _3DfImport::PointerArrayAddUnique(A3DPointerArray * pcArray, void * pcPointer)
+UINT TdfImport::PointerArrayAddUnique(A3DPointerArray * pcArray, void * pcPointer)
 {
 	if(pcArray == nullptr) {
 		return 0;
@@ -5038,7 +5096,7 @@ UINT _3DfImport::PointerArrayAddUnique(A3DPointerArray * pcArray, void * pcPoint
 	return PointerArrayAdd(pcArray, pcPointer);
 }
 
-UINT _3DfImport::PointerArrayAddArray(A3DPointerArray * pcArray, void ** const ppcPointers, UINT uiSize)
+UINT TdfImport::PointerArrayAddArray(A3DPointerArray * pcArray, void ** const ppcPointers, UINT uiSize)
 {
 	for(UINT ui = 0; ui < uiSize; ui++) {
 		PointerArrayAdd(pcArray, ppcPointers[ui]);
@@ -5048,7 +5106,7 @@ UINT _3DfImport::PointerArrayAddArray(A3DPointerArray * pcArray, void ** const p
 }
 
 //== Log 관련 함수 ===================================================================================
-void _3DfImport::CreateLog(int nId, const WCHAR * pchFilePathName)
+void TdfImport::CreateLog(int nId, const WCHAR * pchFilePathName)
 {
 	LogManager::SetCurrentId(nId);
 
@@ -5062,7 +5120,7 @@ void _3DfImport::CreateLog(int nId, const WCHAR * pchFilePathName)
 	LogManager::SetWriteTimeLog(nId, false);
 }
 
-void _3DfImport::Log(int nId, LPCWSTR chMessage, ...)
+void TdfImport::Log(int nId, LPCWSTR chMessage, ...)
 {
 #ifdef USED_LOG_MANAGER
 	va_list cArgList;
@@ -5077,21 +5135,21 @@ void _3DfImport::Log(int nId, LPCWSTR chMessage, ...)
 #endif
 }
 
-void _3DfImport::LogIncreaseTabIndex(int nId)
+void TdfImport::LogIncreaseTabIndex(int nId)
 {
 #ifdef USED_LOG_MANAGER
 	LogManager::IncreaseTabIndex(nId);
 #endif
 }
 
-void _3DfImport::LogDecreaseTabIndex(int nId)
+void TdfImport::LogDecreaseTabIndex(int nId)
 {
 #ifdef USED_LOG_MANAGER
 	LogManager::DecreaseTabIndex(nId);
 #endif
 }
 
-CString _3DfImport::LogHexStr(DWORD_PTR nValue)
+CString TdfImport::LogHexStr(DWORD_PTR nValue)
 {
 #ifdef USED_LOG_MANAGER
 	return LogManager::HexStr(nValue);
@@ -5099,7 +5157,7 @@ CString _3DfImport::LogHexStr(DWORD_PTR nValue)
 	return L"";
 }
 
-CString _3DfImport::LogBoolStr(bool bValue)
+CString TdfImport::LogBoolStr(bool bValue)
 {
 #ifdef USED_LOG_MANAGER
 	return LogManager::BoolStr(bValue);
@@ -5109,7 +5167,7 @@ CString _3DfImport::LogBoolStr(bool bValue)
 
 #define MVO_BUFFER_SIZE 4096
 
-void  _3DfImport::parseAttributes(const A3DEntity * pEntity)
+void  TdfImport::parseAttributes(const A3DEntity * pEntity)
 {
 	A3DRootBaseData rootbaseData;
 	A3D_INITIALIZE_DATA(A3DRootBaseData, rootbaseData);

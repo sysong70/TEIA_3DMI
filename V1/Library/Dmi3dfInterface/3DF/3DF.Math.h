@@ -17,17 +17,11 @@
 
 
 #include <atlcoll.h>
+#include <memory>
 
-#ifdef max
-#	undef max
-#	include <boost/pool/pool_alloc.hpp>
-#	define max(a,b) (((a) > (b)) ? (a) : (b))
-#else
-#	include <boost/pool/pool_alloc.hpp>
-#endif
 
 #ifndef M_PI
-#	define M_PI 3.14159265358979323846
+#	define M_PI 3.1415926535897932384626433832795028841971693993751
 #endif
 
 OPEN_3DF_NAMESPACE
@@ -53,6 +47,7 @@ template <typename T>	TDF_INLINE	T const & Max(T const & a, T const & b, T const
 
 template <typename T>	TDF_INLINE	T const & Clamp(T const & x, T const & min, T const & max) { return x < min ? min : x > max ? max : x; }
 
+//== Float Template Specializations ================================================================
 
 template <typename F>	struct Float_Traits {};
 template <> struct Float_Traits<float>
@@ -347,47 +342,6 @@ TDF_INLINE bool Float::Equals(double const & a, double const & b, int tolerance)
 }
 
 template <typename F> class Vector_3D;
-
-template<class T>
-class CBoostPool
-{
-public:
-	void * operator new(size_t _size)
-	{
-		return m_bpool.malloc();
-	}
-	void operator delete(void * _p)
-	{
-		m_bpool.free(_p);
-	}
-protected:
-	static boost::pool<> m_bpool;
-};
-template<class T>
-boost::pool<> CBoostPool<T>::m_bpool(sizeof(T));
-
-/*
-class Point3D // : public CBoostPool<Point3D>
-{
-public:
-	float x;
-	float y;
-	float z;
-
-	void Set(float X, float Y, float Z) { x = X; y = Y; z = Z; };
-};
-
-class Vector3D : public CBoostPool<Vector3D>
-{
-public:
-	float x;
-	float y;
-	float z;
-
-	void Set(float X, float Y, float Z) { x = X; y = Y; z = Z; };
-};
-*/
-
 template <typename F> class Vector_3D;
 template <typename F> class Vector_2D;
 template <typename F> class Point_2D;
@@ -447,7 +401,6 @@ public:
 	Point_3D const operator* (Vector_3D<F> const & v) const;
 	Point_3D const operator/ (Vector_3D<F> const & v) const;
 
-
 	Point_3D & operator+= (Vector_2D<F> const & v);
 	Point_3D & operator-= (Vector_2D<F> const & v);
 	Point_3D & operator*= (Vector_2D<F> const & v);
@@ -463,7 +416,10 @@ public:
 
 	double	DistanceWith(Point_3D const & p) const;
 
+	// Drop Point 함수는 3D 좌표를 2D 좌표로 변환하는 함수이다. (이 함수는 3D Point가 주어지는 Plane 위에 있어야 정확한 값으로 계산된다.)
 	Point_2D<F> DropPoint(Point_3D cOrigin, Vector_3D<F> cXAxis, Vector_3D<F> cYAxis);
+
+	// 3D Point를 주어진 Plane 위에 Projection 시킨다.
 	Point_3D ProjectionPoint(Point_3D cOrigin, Vector_3D<F> cNormal);
 };
 
@@ -590,6 +546,7 @@ public:
 	explicit Point_2D(Point_3D<F> const & that) : x((F)that.x), y((F)that.y) {}
 	explicit Point_2D(Vector_2D<F> const & v);
 
+	Point_2D const operator+ (const Point_2D & p) const { return Point_2D(x + p.x, y + p.y); }
 	Point_2D const	operator- () const { return Point_2D(-x, -y); }
 
 	bool operator== (Point_2D const & p) const { return  x == p.x && y == p.y; }
@@ -756,22 +713,6 @@ public:
 		F len = Length() * v.Length();
 		F cos_angle = dot / len;
 		return acos(cos_angle) * (F)180 / M_PI;
-	}
-
-	TDF_INLINE F CCWAngleWith(Vector_3D const & v) const {
-		F dot = Dot(v);
-		F len = Length() * v.Length();
-		F cos_angle = dot / len;
-
-		Vector_3D<F> cross = Cross(v);
-		F dot2 = cross.Dot(v);
-		F angle = acos(cos_angle) * (F)180 / M_PI;
-
-		if (dot2 < 0) {
-			angle = 360.0 - angle;
-		}
-
-		return angle;
 	}
 
 	TDF_INLINE F CCWAngleWith(Vector_3D const & v1, Vector_3D const & v2) const {
@@ -950,16 +891,34 @@ public:
 	TDF_INLINE F		Magnitude() const { return Max(Abs(x), Abs(y)); }
 	TDF_INLINE F		Manhattan() const { return Abs(x) + Abs(y); }
 
-	TDF_INLINE F		Dot(Vector_2D const & v) const { return x * v.x + y * v.y; }
-
-
-	TDF_INLINE F		Cross(Vector_2D const & v) const {
-		return x * v.y - y * v.x;
+	TDF_INLINE F AngleWith(Vector_2D const & v) const {
+		F dot = Dot(v);
+		F len = Length() * v.Length();
+		F cos_angle = dot / len;
+		return acos(cos_angle) * (F)180 / M_PI;
 	}
 
-	TDF_INLINE Vector_2D	Scale(Vector_2D const & v) const {
-		return Vector_2D(x * v.x, y * v.y);
+	TDF_INLINE F CCWAngleWith(Vector_2D const & v) const {
+		F dot = this->Dot(v);
+		F len = this->Length() * v.Length();
+		F cos_angle = dot / len;
+
+		//Vector_3D<F> cross = v1.Cross(*this);
+		Vector_3D<F> cross = Vector_3D<F>::ZAxis().Cross(Vector_3D<F>(*this));
+		F dot2 = cross.Dot(Vector_3D<F>(v));
+		F angle = acos(cos_angle) * (F)180 / M_PI;
+
+		if (dot2 < 0) {
+			angle = 360.0 - angle;
+		}
+
+		return angle;
 	}
+
+	TDF_INLINE F Dot(Vector_2D const & v) const { return x * v.x + y * v.y; }
+	TDF_INLINE F Cross(Vector_2D const & v) const { return x * v.y - y * v.x; }
+
+	TDF_INLINE Vector_2D Scale(Vector_2D const & v) const { return Vector_2D(x * v.x, y * v.y); }
 
 	static TDF_INLINE Vector_2D	XAxis() { return Vector_2D(1, 0); };
 	static TDF_INLINE Vector_2D	YAxis() { return Vector_2D(0, 1); };
@@ -979,139 +938,14 @@ TDF_INLINE bool Is_Abnormal(Vector_2D<F> const & v) {
 	return Is_Abnormal(v.x) || Is_Abnormal(v.y);
 }
 
-
-// using IntArray = std::vector<int>;
-// using PointArray = std::vector<HPoint>;
-// using VectorArray = std::vector<Vector>;
-
-// using IntArray = std::vector<int, boost::pool_allocator<int>>;
-// using FloatArray = std::vector<float, boost::pool_allocator<float>>;
-// using PointArray = std::vector<TDF::Point, boost::pool_allocator<Point>>;
-// using VectorArray = std::vector<TDF::Vector, boost::pool_allocator<Vector>>;
-
-using ByteArray = CAtlArray<byte>;
-using IntArray = CAtlArray<int>;
-using FloatArray = CAtlArray<float>;
-using PointArray = CAtlArray<TDF::Point>;
-using Point2DArray = CAtlArray<TDF::Point2D>;
-using DPoint2DArray = CAtlArray<TDF::DPoint2D>;
-using VectorArray = CAtlArray<TDF::Vector>;
-using Vector2DArray = CAtlArray<TDF::Vector2D>;
-
-// template <typename F>
-// _3DF_INLINE	Point_3D<F>::Point_3D(Vector_3D<F> const & v) : x(v.x), y(v.y), z(v.z) {}
-
-/*
-
-template <typename F>
-class MatrixKit
-{
-public:
-	MatrixKit();
-	MatrixKit(F const fInMatrixSource[]);
-
-	TDF_INLINE const F * operator [] (int nIndex) const { return m[nIndex]; }
-	TDF_INLINE F * operator [] (int nIndex) { return m[nIndex]; }
-
-	void SetIdentity();
-	bool IsIdentity();
-
-	TDF::Point Transform(TDF::Point const & cInSource) const;
-
-	F * GetData() const { return (F *)r; }
-
-	union
-	{
-		F m[4][4] = { {1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1} };
-		F r[16];
-	};
-};
-
-template <typename F>
-MatrixKit<F>::MatrixKit()
-{
-	//SetIdentity();
-}
-
-template <typename F>
-MatrixKit<F>::MatrixKit(F const fInMatrixSource[])
-{
-	memcpy(r, fInMatrixSource, 16 * sizeof(float));
-}
-
-template <typename F>
-void MatrixKit<F>::SetIdentity()
-{
-	// set to zero all the elements except the diagonal
-	for (int i = 0; i < 4; i++) {
-		for (int j = i + 1; j < 4; j++) {
-			m[i][j] = m[j][i] = 0.0;
-		}
-	}
-	
-	// set to 1 the diagonal
-	m[0][0] = m[1][1] = m[2][2] = m[3][3] = 1.0;
-}
-
-template <typename F>
-bool MatrixKit<F>::IsIdentity()
-{
-	F fIdMatrix[16] = {
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1,
-	};
-
-	// can't use memcmp because of -0.0f and +0.0f
-	for (int i = 0; i < 16; ++i) {
-		if (r[i] != fIdMatrix[i]) {
-			return false;
-		}
-	}
-
-	return true;
-}
-
-template <typename F>
-Point MatrixKit<F>::Transform(TDF::Point const & cInSource) const
-{
-	TDF::Point cPoint;
-
-	cPoint.x = m[0][0] * cInSource.x + m[1][0] * cInSource.y + m[2][0] * cInSource.z + m[3][0];
-	cPoint.y = m[0][1] * cInSource.x + m[1][1] * cInSource.y + m[2][1] * cInSource.z + m[3][1];
-	cPoint.z = m[0][2] * cInSource.x + m[1][2] * cInSource.y + m[2][2] * cInSource.z + m[3][2];
-
-	return cPoint;
-}
-
-template <typename F>
-TDF_INLINE MatrixKit<F> operator * (const MatrixKit<F> & M1, const MatrixKit<F> & M2)
-{
-	MatrixKit<F> cMatrix;
-
-	for (int c = 0; c < 4; c++) {
-		for (int r = 0; r < 4; r++) {
-			cMatrix[r][c] = M1[0][c] * M2[r][0];
-
-			for (int p = 1; p < 4; p++) {
-				cMatrix[r][c] += M1[p][c] * M2[r][p];
-			}
-		}
-	}
-
-	return cMatrix;
-}
-*/
-
-//using Matrix = MatrixKit<float>;
-//using DMatrix = MatrixKit<double>;
-
-// namespace  MatrixCal {
-// 	API_3DF void InverseMatrix(const float * matrix, float * out_matrix);
-// 	API_3DF void ComputeMatrixProduct(const float * matrix1, const float * matrix2, float * out_matrix);
-// 	API_3DF void ComputeIdentityMatrix(float * out_matrix);
-// };
+using ByteArray = std::vector<byte, Allocator<byte>>;
+using IntArray = std::vector<int, Allocator<int>>;
+using FloatArray = std::vector<float, Allocator<float>>;
+using PointArray = std::vector<TDF::Point, Allocator<TDF::Point>>;
+using Point2DArray = std::vector<TDF::Point2D, Allocator<TDF::Point2D>>;
+using DPoint2DArray = std::vector<TDF::DPoint2D, Allocator<TDF::DPoint2D>>;
+using VectorArray = std::vector<TDF::Vector, Allocator<TDF::Vector>>;
+using Vector2DArray = std::vector<TDF::Vector2D, Allocator<TDF::Vector2D>>;
 
 namespace Math
 {

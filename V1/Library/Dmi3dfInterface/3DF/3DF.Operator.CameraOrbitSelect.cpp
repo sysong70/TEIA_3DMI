@@ -61,55 +61,79 @@ HBaseOperator * Operator::CameraOrbitSelect::Clone()
 }
 //== Mouse Event 처리 ===============================================================================
 
-int Operator::CameraOrbitSelect::OnLButtonDown(HEventInfo & cEvent)
+int Operator::CameraOrbitSelect::OnLButtonDown(HEventInfo & cInEvent)
 {
-	m_cMouseDownPoint = cEvent.GetMousePixelPos();
+	m_cMouseDownPoint = cInEvent.GetMousePixelPos();
 	m_nMouseDownTickCount = GetTickCount();
 	m_bOrbitMode = false;
 
 	// Shift & L Button 이벤트는 Area Select
-	if (MVO_SHIFT & cEvent.GetFlags()) {
+	if (MVO_SHIFT & cInEvent.GetFlags()) {
 	}
 
-	return HOpCameraOrbit::OnLButtonDown(cEvent);
+	return HOpCameraOrbit::OnLButtonDown(cInEvent);
 }
 
-int Operator::CameraOrbitSelect::OnLButtonUp(HEventInfo & cEvent)
+int Operator::CameraOrbitSelect::OnLButtonUp(HEventInfo & cInEvent)
 {
 	DWORD nMouseUpTickCount = GetTickCount();
 	DWORD nTickCount = nMouseUpTickCount - m_nMouseDownTickCount;
 
 	// 2 Pixel이하 200 Tick이하에서만 선택하는 것으로 판정한다.
 	if (m_nSelectPickCount > nTickCount) {
-		const HPoint & cMoustPoint = cEvent.GetMousePixelPos();
+		const HPoint & cMoustPoint = cInEvent.GetMousePixelPos();
 		HVector cVector = cMoustPoint - m_cMouseDownPoint;
 		double dLength = HC_Compute_Vector_Length(&cVector);
 
 		if (2.0 > dLength) {
 			Point cPoint;
-			cPoint.x = cEvent.GetMouseWindowPos().x;
-			cPoint.y = cEvent.GetMouseWindowPos().y;
+			cPoint.x = cInEvent.GetMouseWindowPos().x;
+			cPoint.y = cInEvent.GetMouseWindowPos().y;
 
 			TDF::SelectionResults cResult;
-			m_pcWindow->GetSelectionControl().SelectByPoint(cPoint, cEvent.GetFlags(), cResult);
+			m_pcWindow->GetSelectionControl().SelectByPoint(cPoint, cInEvent.GetFlags(), cResult);
 		}
 	}
 
 	m_bOrbitMode = false;
 
-	m_cClickPoint = cEvent.GetMouseWorldPos();
+	m_cClickPoint = cInEvent.GetMouseWorldPos();
 
-	return HOpCameraOrbit::OnLButtonUp(cEvent);
+	return HOpCameraOrbit::OnLButtonUp(cInEvent);
 }
 
-int Operator::CameraOrbitSelect::OnLButtonDownAndMove(HEventInfo & cEvent)
+int Operator::CameraOrbitSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
 {
+	// PMI Test	Code
+/*
+
+	SegmentKey cSecne(m_pcWindow->GetSceneKey());
+
+	CameraKit cCamera;
+	cSecne.ShowCamera(cCamera);
+
+	Matrix cMatrix;
+	cCamera.ShowMatrix(cMatrix);
+
+	WorldPoint cPoint[2];
+
+	cPoint[0] = m_cClickPoint;
+	cPoint[1] = cInEvent.GetMouseWorldPos();
+
+	// Test Object Snap
+	HC_Open_Segment_By_Key(GetView()->GetConstructionKey()); {
+		HDraw::Test(GetView(), cMatrix, cPoint[0], cPoint[1]);
+	} HC_Close_Segment();
+*/
+
+
+
 	m_bOrbitMode = true;
-	return HOpCameraOrbit::OnLButtonDownAndMove(cEvent);
+	return HOpCameraOrbit::OnLButtonDownAndMove(cInEvent);
 }
 
 // Dynamic Highlighting 처리
-int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cEvent)
+int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 {
 	SelectionOptionsKit cSelectOption;
 	cSelectOption.SetLevel(Selection::Level::Entity);
@@ -118,7 +142,7 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cEvent)
 	cSelectOption.SetSorting(Selection::Sorting::Default);
 
 	m_cNewHighlightSelection.Reset();
-	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cEvent, cSelectOption, m_cNewHighlightSelection);
+	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cInEvent, cSelectOption, m_cNewHighlightSelection);
 
 	// Old와 New가 다르면 Old를 Unhiglight하고 Reset 시킨다.
 	if (0 < m_cOldHighlightSelection.GetCount() && m_cOldHighlightSelection != m_cNewHighlightSelection) {
@@ -139,7 +163,6 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cEvent)
 	TRACE(L"HighlightSelection Count: %d\n", m_cHighlightSelection.GetCount());
 
 	m_cOldHighlightSelection = m_cNewHighlightSelection;
-
 
 	HighlightOptionsKit cKit;
 
@@ -162,6 +185,8 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cEvent)
 		m_pcWindow->GetBaseView()->Update();*/
 	}
 
+	// PMI Test	Code
+
 	SegmentKey cSecne(m_pcWindow->GetSceneKey());
 
 	CameraKit cCamera;
@@ -170,19 +195,21 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cEvent)
 	Matrix cMatrix;
 	cCamera.ShowMatrix(cMatrix);
 
-	Point cPoint[2];
-	cPoint[0].x = m_cClickPoint.x;
-	cPoint[0].y = m_cClickPoint.y;
-	cPoint[0].z = m_cClickPoint.z;
+	WorldPoint cPoint[2];
+	
+	cPoint[0] = m_cClickPoint;
+	cPoint[1] = cInEvent.GetMouseWorldPos();
 
-	cPoint[1].x = cEvent.GetMouseWorldPos().x;
-	cPoint[1].y = cEvent.GetMouseWorldPos().y;
-	cPoint[1].z = cEvent.GetMouseWorldPos().z;
+	Vector cXAixs = cMatrix.XAxis();
+	Vector cYAixs = cMatrix.YAxis();
+	Vector cOrigin = cMatrix.Origin();
 
+	Point2D cP1 = cPoint[0].DropPoint(cOrigin, cXAixs, cYAixs);
+	Point2D cP2 = cPoint[1].DropPoint(cOrigin, cXAixs, cYAixs);
 
 	// Test Object Snap
 	HC_Open_Segment_By_Key(GetView()->GetConstructionKey()); {
-		HDraw::Test(GetView(), cMatrix, cPoint[0], cPoint[1]);
+		HDraw::Test(GetView(), cMatrix, cP1, cP2);
 	} HC_Close_Segment();
 
 	GetView()->Update();

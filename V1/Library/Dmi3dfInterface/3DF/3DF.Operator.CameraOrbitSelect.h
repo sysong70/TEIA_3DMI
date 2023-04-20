@@ -24,10 +24,10 @@ namespace Operator
 		HBaseOperator * Clone() override;
 
 		//== Mouse Event 처리 =======================================================================
-		int OnLButtonUp(HEventInfo & cEvent) override;
-		int OnLButtonDown(HEventInfo & cEvent) override;
-		int OnLButtonDownAndMove(HEventInfo & cEvent) override;
-		int OnNoButtonDownAndMove(HEventInfo & cEvent) override;
+		int OnLButtonUp(HEventInfo & cInEvent) override;
+		int OnLButtonDown(HEventInfo & cInEvent) override;
+		int OnLButtonDownAndMove(HEventInfo & cInEvent) override;
+		int OnNoButtonDownAndMove(HEventInfo & cInEvent) override;
 
 	protected:
 		bool m_bOrbitMode;

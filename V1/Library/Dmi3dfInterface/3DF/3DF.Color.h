@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "3DF.h"
-
 #include "3DF.Math.h"
 
 OPEN_3DF_NAMESPACE
@@ -417,6 +416,6 @@ TDF_INLINE RGB24Color Interpolate(RGB24Color const & a, RGB24Color const & b, fl
 		(unsigned char) (a.b + ((float) b.b - (float) a.b) * t));
 }
 
-using RGBAColorArray = std::vector<TDF::RGBAColor, boost::pool_allocator<RGBAColor>>;
+using RGBAColorArray = std::vector<TDF::RGBAColor, Allocator<TDF::RGBAColor> >;
 
 CLOSE_3DF_NAMESPACE

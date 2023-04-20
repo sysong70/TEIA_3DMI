@@ -6,13 +6,14 @@
 
 #include "3DF.Math.h"
 #include "3DF.Math.Matrix.h"
+#include "3DF.Point.h"
 
 class HBaseView;
 class HEventInfo;
 
 namespace HDraw
 {
-	void Test(HBaseView* view, TDF::Matrix & cMatrix, TDF::Point p1, TDF::Point p2);
+	void Test(HBaseView* view, TDF::Matrix & cMatrix, TDF::Point2D p1, TDF::Point2D p2);
 
 	class Format
 	{

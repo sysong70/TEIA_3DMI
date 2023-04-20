@@ -2,6 +2,8 @@
 
 #include "3DF.Math.Matrix.h"
 
+#include "3DF.Point.h"
+
 #include <hc.h>
 
 const double EPSILON = 1e-10; // 미세한 값
@@ -170,9 +172,26 @@ Point MatrixKit::Transform(Point const & cInSource) const
 	return cPoint;
 }
 
-void MatrixKit::Transform(PointArray const & cInSource, PointArray & cOutPointArray) const
+PointArray MatrixKit::Transform(PointArray const & cInSource) const
 {
-	HC_Compute_Transformed_Points((int)cInSource.GetCount(), cInSource.GetData(), m_fData, cOutPointArray.GetData());
+	PointArray cPointArray;
+	cPointArray.resize(cInSource.size());
+
+	HC_Compute_Transformed_Points((int)cInSource.size(), cInSource.data(), m_fData, cPointArray.data());
+
+	return cPointArray;
+}
+
+WorldPointArray MatrixKit::Transform(WorldPointArray const & cInSource) const
+{
+	size_t nSize = cInSource.size();
+
+	WorldPointArray cPointArray;
+	cPointArray.resize(nSize);
+
+	HC_Compute_Transformed_Points((int)cInSource.size(), cInSource.data(), m_fData, cPointArray.data());
+
+	return cPointArray;
 }
 
 Vector MatrixKit::XAxis() const

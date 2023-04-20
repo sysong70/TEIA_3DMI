@@ -16,6 +16,46 @@ SelectabilityKit::SelectabilityKit()
 	}
 }
 
+bool SelectabilityKit::Set(char * pchValue)
+{
+	if (nullptr == pchValue) {
+		RETURN_FALSE;
+	}
+
+	if (0 == strcmp(pchValue, "windows")) {
+		SetWindows(true);
+	}
+	if (0 == strcmp(pchValue, "edges")) {
+		SetEdges(true);
+	}
+	if (0 == strcmp(pchValue, "faces")) {
+		SetFaces(true);
+	}
+	if (0 == strcmp(pchValue, "lights")) {
+		SetLights(true);
+	}
+	if (0 == strcmp(pchValue, "lines")) {
+		SetLines(true);
+	}
+	if (0 == strcmp(pchValue, "markers")) {
+		SetMarkers(true);
+	}
+	if (0 == strcmp(pchValue, "vertices")) {
+		SetVertices(true);
+	}
+	if (0 == strcmp(pchValue, "text")) {
+		SetText(true);
+	}
+	if (0 == strcmp(pchValue, "geometry")) {
+		SetGeometry(true);
+	}
+	if (0 == strcmp(pchValue, "everything")) {
+		SetEverything(true);
+	}
+
+	return true;
+}
+
 //== Set Selectability Kit =========================================================================
 
 SelectabilityKit & SelectabilityKit::SetWindows(bool bInValue)

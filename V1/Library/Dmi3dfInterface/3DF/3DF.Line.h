@@ -50,11 +50,15 @@ public:
 
 	bool GetEndPoint(Point & cSP, Point & cEP);
 	bool GetMidPoint(Point & cMP);
-	bool GetIntersectionPoint(LineKey & cLine, PointArray & aOutIntersectionPoints);
+	bool GetIntersectionPoint(LineKey & cInLine, PointArray & aOutIntersectionPoints);
+	bool GetIntersectionPoint(LineKey & cInLine, const MatrixKit & cMatrix1, const MatrixKit & cMatrix2, PointArray & aOutIntersectionPoints);
 
 	//== 계산 함수 ===================================================================================
-	bool NearPoint(WindowKey const & cInWindow, const WindowPoint & cInPoint, WorldPoint & cOutPoint) const override;
+	bool NearPoint(WindowKey const & cInWindow, const MatrixKit & cModelingMatrix, const WindowPoint & cInPoint, WorldPoint & cOutPoint) const override;
 	bool DistanceToPoint(const WorldPoint & cInPoint, double & nOutDistance) const override;
+
+private:
+	bool GetIntersectionPoint(const WorldPointArray & aPoints1, const WorldPointArray & aPoints2, PointArray & aOutIntersectionPoints);
 };
 
 CLOSE_3DF_NAMESPACE

@@ -591,6 +591,19 @@ bool TDF::SelectionItem::ShowSelectedItem(Key & cOutSelection)
 	return true;
 }
 
+bool TDF::SelectionItem::ShowPath(KeyPath & cOutPath) const
+{
+	if (nullptr == m_pcImpl) {
+		return false;
+	}
+
+	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)m_pcImpl;
+
+	cOutPath = KeyPath(pcImpl->nIncludeCount, pcImpl->pnIncludeKeys);
+
+	return true;
+}
+
 bool TDF::SelectionItem::ShowSelectionPosition(WindowPoint & cOutLocation) const
 {
 	if (nullptr == m_pcImpl) {

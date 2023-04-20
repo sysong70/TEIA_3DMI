@@ -35,8 +35,8 @@ namespace Operator
 
 		//== Object Snap 계산 =======================================================================
 		void CalculationObjectSnapPoint(TDF::SelectionResults & cInItems);
-		bool CalculationLienObjectSnapPoint(const Key & cInLineKey, const WindowPoint & cInPoint);
-		void CalculationLienAndLineObjectSnapPoint(LineKey & cLine1, LineKey & cLine2);
+		bool CalculationLienObjectSnapPoint(const Key & cInLineKey, const WindowPoint & cInPoint, const MatrixKit & cModelingMatrix);
+		void CalculationLienAndLineObjectSnapPoint(LineKey & cLine1, LineKey & cLine2, const MatrixKit & cMatrix1, const MatrixKit & cMatrix2);
 
 		//== Object Snap Draw ======================================================================
 		

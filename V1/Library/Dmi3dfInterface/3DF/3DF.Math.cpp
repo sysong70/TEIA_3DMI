@@ -54,7 +54,7 @@ public:
 bool TDF::Math::GetCircle(WorldPointArray & cPoints, CircleKit & cCircle)
 {
 	//cPoints의 갯수가 4개 이상인 경우에만 계산한다.
-	if (4 > cPoints.GetCount()) {
+	if (4 > cPoints.size()) {
 		return false;
 	}
 
@@ -83,10 +83,10 @@ bool TDF::Math::GetCircle(WorldPointArray & cPoints, CircleKit & cCircle)
 	double dOriginPointProjectionDistance = cNormal.Dot(cOrigin);
 
 	DPoint2DArray cPoints2D;
-	cPoints2D.SetCount(cPoints.GetCount());
+	cPoints2D.resize(cPoints.size());
 
 	// 순회하면서 Points의 모든 점이 같은 평면에 있는지 확인한다.
-	for (size_t nIndex = 0; nIndex < cPoints.GetCount(); nIndex++)
+	for (size_t nIndex = 0; nIndex < cPoints.size(); nIndex++)
 	{
 		// Target Point를 ZAxis 방향으로 투영한 내적값.
 		double dInputPointProjectionDistance = cNormal.Dot(cPoints[nIndex]);
@@ -138,7 +138,7 @@ bool TDF::Math::CircleFitByHyper(DPoint2DArray & cPoints, double & dCX, double &
 
 	double dAverX = 0.0, dAverY = 0.0;
 
-	size_t nPointCount = cPoints.GetCount();
+	size_t nPointCount = cPoints.size();
 
 	for (size_t nIndex = 0; nIndex < nPointCount; nIndex++)
 	{
@@ -187,7 +187,7 @@ bool TDF::Math::CircleFitByHyper(DPoint2DArray & cPoints, double & dCX, double &
 	//    using Newton's method starting at x=0  
 	//     (it is guaranteed to converge to the right root)
 
-	for (x = 0.0, y = A0, nIter = 0.0; nIter < nIterMax; nIter++)  // usually, 4-6 iterations are enough
+	for (x = 0.0, y = A0, nIter = 0; nIter < nIterMax; nIter++)  // usually, 4-6 iterations are enough
 	{
 		Dy = A1 + x * (A22 + 16.0 * x * x);
 		xnew = x - y / Dy;
@@ -343,13 +343,13 @@ bool Math::IntersectionPointInRange(Point cSP1, Point cEP1, Point cSP2, Point cE
 
 bool Math::GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, PixelPointArray & aOutPoints)
 {
-	size_t nCount = aInPoints.GetCount();
+	size_t nCount = aInPoints.size();
 
 	if (0 == nCount) {
 		return false;
 	}
 
-	aOutPoints.SetCount(nCount);
+	aOutPoints.resize(nCount);
 
 	HC_Open_Segment_By_Key(cInWindow.GetSceneKey()); {
 		for (size_t nIndex = 0; nIndex < nCount; nIndex++) {
@@ -362,13 +362,13 @@ bool Math::GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoin
 
 bool Math::GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, WindowPointArray & aOutPoints)
 {
-	size_t nCount = aInPoints.GetCount();
+	size_t nCount = aInPoints.size();
 
 	if (0 == nCount) {
 		return false;
 	}
 
-	aOutPoints.SetCount(nCount);
+	aOutPoints.resize(nCount);
 
 	HC_Open_Segment_By_Key(cInWindow.GetSceneKey()); {
 		for (size_t nIndex = 0; nIndex < nCount; nIndex++) {

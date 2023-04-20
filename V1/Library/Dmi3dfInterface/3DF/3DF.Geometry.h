@@ -12,7 +12,7 @@ public:
 
 	TDF::Type ObjectType() const { return TDF::Type::GeometryKey; };
 
-	virtual bool NearPoint(WindowKey const & cInWindow, const WindowPoint & cInPoint, WorldPoint & cOutPoint) const;
+	virtual bool NearPoint(WindowKey const & cInWindow, const MatrixKit & cModelingMatrix, const WindowPoint & cInPoint, WorldPoint & cOutPoint) const;
 	virtual bool DistanceToPoint(const WorldPoint & cInPoint, double & nOutDistance) const;
 };
 

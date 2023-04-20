@@ -9,6 +9,8 @@
 #include "3DF.Circle.h"
 #include "3DF.Point.h"
 
+#include "3DF.Math.Matrix.h"
+
 #include "3DF.Camera.h"
 #include "3DF.Color.h"
 
@@ -196,19 +198,27 @@ void Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults & cI
 {
 	// 단일 Object Snap Point를 계산한다. 이 경우 첫번째 Item만 처리한다.
 	SelectionItem * pcItem = cInItems.GetHead();
-	if (nullptr != pcItem) {
-		SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)pcItem->GetImpl();
 
-		const WorldPoint cWorldPoint = pcImpl->cWorldPoint;
-		const WindowPoint cWindowPoint = pcImpl->cWindowPoint;
+	if (nullptr != pcItem) {
+		WorldPoint cWorldPoint;
+		WindowPoint cWindowPoint;
+
+		pcItem->ShowSelectionPosition(cWorldPoint);
+		pcItem->ShowSelectionPosition(cWindowPoint);
 
 		Key cKey;
 		pcItem->ShowSelectedItem(cKey);
 		TDF::Type eType = cKey.Type();
 
+		KeyPath cPath;
+		pcItem->ShowPath(cPath);
+
+		Matrix cMatrix;
+		cPath.ShowNetModellingMatrix(cMatrix);
+	
 		// Line Key 처리
 		if (TDF::Type::LineKey == eType) {
-			CalculationLienObjectSnapPoint(cKey, cWindowPoint);
+			CalculationLienObjectSnapPoint(cKey, cWindowPoint, cMatrix);
 		}
 	}
 
@@ -217,6 +227,12 @@ void Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults & cI
 	
 	// 제일 첫번째 Item을 메인으로 해서 계산을 진행한다.
 	pcItem = cInItems.GetNext(pcPosition);
+
+	KeyPath cPath;
+	pcItem->ShowPath(cPath);
+
+	Matrix cMatrix;
+	cPath.ShowNetModellingMatrix(cMatrix);
 
 	Key cSelection;
 	if (false == pcItem->ShowSelectedItem(cSelection)) {
@@ -227,12 +243,18 @@ void Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults & cI
 		// 다음 Item을 가져온다.
 		SelectionItem * pcNextItem = cInItems.GetNext(pcPosition);
 
+		KeyPath cNextPath;
+		pcNextItem->ShowPath(cNextPath);
+
+		Matrix cNextMatrix;
+		cNextPath.ShowNetModellingMatrix(cNextMatrix);
+
 		Key cNextSelection;
 		if (true == pcNextItem->ShowSelectedItem(cNextSelection)) {
  			if (Type::LineKey == cSelection.Type() && Type::LineKey == cNextSelection.Type()) {
 				LineKey cLine = LineKey(cSelection);
 				LineKey cNextLine = LineKey(cNextSelection);
- 				CalculationLienAndLineObjectSnapPoint(cLine, cNextLine);
+ 				CalculationLienAndLineObjectSnapPoint(cLine, cNextLine, cMatrix, cNextMatrix);
  			}
 		}
 	}
@@ -241,7 +263,7 @@ void Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults & cI
 //== 2. 단일 Geometry Object Snap 계산 ==============================================================
 
 // 2-1. Line Object Snap 계산 (EndPoint, MidPoint, NearPoint를 계산)
-bool Operator::ObjectSnap::CalculationLienObjectSnapPoint(const Key & cInLineKey, const WindowPoint & cInPoint)
+bool Operator::ObjectSnap::CalculationLienObjectSnapPoint(const Key & cInLineKey, const WindowPoint & cInPoint, const MatrixKit & cModelingMatrix)
 {
 	if (Type::LineKey != cInLineKey.Type()) {
 		return false;
@@ -252,7 +274,7 @@ bool Operator::ObjectSnap::CalculationLienObjectSnapPoint(const Key & cInLineKey
 	WorldPointArray aPoints;
 	cLine.ShowPoints(aPoints);
 
-	size_t nCount = aPoints.GetCount();
+	size_t nCount = aPoints.size();
 
 	if (1 >= nCount) {
 		return false;
@@ -262,14 +284,16 @@ bool Operator::ObjectSnap::CalculationLienObjectSnapPoint(const Key & cInLineKey
 	if (true == TDF::Math::GetCircle(aPoints, cCircle)) {
 		Point cCenter;
 		cCircle.ShowCenter(cCenter);
+		cCenter = cModelingMatrix.Transform(cCenter);
 		AddSnapItem(cLine, cCenter, SnapType::MidPoint);
-
 		return true;
 	}
 
 	// End Point 처리
 	Point cSP, cEP;
 	if (true == cLine.GetEndPoint(cSP, cEP)) {
+		cSP = cModelingMatrix.Transform(cSP);
+		cEP = cModelingMatrix.Transform(cEP);
 		AddSnapItem(cLine, cSP, SnapType::EndPoint);
 		AddSnapItem(cLine, cEP, SnapType::EndPoint);
 	}
@@ -277,12 +301,13 @@ bool Operator::ObjectSnap::CalculationLienObjectSnapPoint(const Key & cInLineKey
 	// Mid Point 처리
 	Point cMP;
 	if(true == cLine.GetMidPoint(cMP)) {
+		cMP = cModelingMatrix.Transform(cMP);
 		AddSnapItem(cLine, cMP, SnapType::MidPoint);
 	}
 
 	// Near Point 처리
 	WorldPoint cNearPoint;
-	if (true == cLine.NearPoint(*m_pcWindow, cInPoint, cNearPoint)) {
+	if (true == cLine.NearPoint(*m_pcWindow, cModelingMatrix, cInPoint, cNearPoint)) {
 		AddSnapItem(cLine, cNearPoint, SnapType::NearPoint);
 	}
 
@@ -292,13 +317,13 @@ bool Operator::ObjectSnap::CalculationLienObjectSnapPoint(const Key & cInLineKey
 //== 3. 2개의 Geometry Object Snap 계산 =============================================================
 
 // 3-1. Line & Line 관련 Object Snap을 계산, Intersection
-void Operator::ObjectSnap::CalculationLienAndLineObjectSnapPoint(LineKey & cLine1, LineKey & cLine2)
+void Operator::ObjectSnap::CalculationLienAndLineObjectSnapPoint(LineKey & cLine1, LineKey & cLine2, const MatrixKit & cMatrix1, const MatrixKit & cMatrix2)
 {
 	// 교차점 처리
 	PointArray aIntersectionPoints;
-	if (true == cLine1.GetIntersectionPoint(cLine2, aIntersectionPoints)) {
+	if (true == cLine1.GetIntersectionPoint(cLine2, cMatrix1, cMatrix2, aIntersectionPoints)) {
 		// 찾아온 교차점을 SnapItem에 추가한다.
-		for (size_t nIndex = 0; nIndex < aIntersectionPoints.GetCount(); nIndex++) {
+		for (size_t nIndex = 0; nIndex < aIntersectionPoints.size(); nIndex++) {
 			AddSnapItem(cLine1, aIntersectionPoints[nIndex], SnapType::MidPoint);
 		}
 	}

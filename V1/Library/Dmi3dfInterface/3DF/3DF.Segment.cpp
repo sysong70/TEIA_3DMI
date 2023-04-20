@@ -202,7 +202,7 @@ size_t SegmentKey::ShowSubsegments(SegmentKeyArray & cOutChildren) const
 // 			}
 
 			SegmentKey cChildSegment(nChildSegkey);
-			cOutChildren.Add(nChildSegkey);
+			cOutChildren.push_back(nChildSegkey);
 		}
 	}
 	HC_End_Contents_Search();
@@ -263,23 +263,23 @@ ShellKey SegmentKey::InsertShell(ShellKit const & cInKit)
 
 	HC_KEY nShellKey = INVALID_KEY;
 	if (nullptr != pacFacelist) {
-		nShellKey = HC_Insert_Shell(static_cast<int>(pacPoints->GetCount()), pacPoints->GetData(), static_cast<int>(pacFacelist->GetCount()), pacFacelist->GetData());
+		nShellKey = HC_Insert_Shell(static_cast<int>(pacPoints->size()), pacPoints->data(), static_cast<int>(pacFacelist->size()), pacFacelist->data());
 	}
 	else {
-		nShellKey = HC_Insert_Shell(static_cast<int>(pacPoints->GetCount()), pacPoints->GetData(), 0, nullptr);
+		nShellKey = HC_Insert_Shell(static_cast<int>(pacPoints->size()), pacPoints->data(), 0, nullptr);
 	}
 	
 
 	if(INVALID_KEY != nShellKey) {
 		if (nullptr != pacNormals) {
-			if (false == pacNormals->IsEmpty()) {
-				HC_MSet_Vertex_Normals(nShellKey, 0, static_cast<int>(pacNormals->GetCount()), pacNormals->GetData());
+			if (false == pacNormals->empty()) {
+				HC_MSet_Vertex_Normals(nShellKey, 0, static_cast<int>(pacNormals->size()), pacNormals->data());
 			}
 		}
 
 		if (nullptr != paParameters) {
-			if (false == paParameters->IsEmpty()) {
-				HC_MSet_Vertex_Parameters(nShellKey, 0, static_cast<int>(paParameters->GetCount() / 2), 2, paParameters->GetData());
+			if (false == paParameters->empty()) {
+				HC_MSet_Vertex_Parameters(nShellKey, 0, static_cast<int>(paParameters->size() / 2), 2, paParameters->data());
 			}
 		}
 

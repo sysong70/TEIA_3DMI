@@ -54,8 +54,8 @@ public:
 	MatrixKit Multiply(float fInScalar) const;
 
 	Point Transform(Point const & cInSource) const;
-
-	void Transform(PointArray const & cInSource, PointArray & cOutPointArray) const;
+	PointArray Transform(PointArray const & cInSource) const;
+	WorldPointArray Transform(WorldPointArray const & cInSource) const;
 
 	Vector XAxis() const;
 	Vector YAxis() const;

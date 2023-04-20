@@ -35,11 +35,11 @@ struct MaterialMappingStyleKit
 	TDF::MaterialMappingKit cMaterialMappingKit;
 };
 
-class _3DfImport : public ImportBase
+class TdfImport : public ImportBase
 {
 public:
-	_3DfImport(_3DXSignal::Interface * pc3dxInterface);
-	~_3DfImport();
+	TdfImport(_3DXSignal::Interface * pc3dxInterface);
+	~TdfImport();
 
 	typedef struct
 	{
@@ -48,7 +48,7 @@ public:
 		void ** m_ppPointers;
 	} A3DPointerArray;
 
-	// == File _3DfImport 관련 함수 =================================================================
+	// == File TdfImport 관련 함수 =================================================================
 	bool FileImport(CString strFilePathName, TDF::SegmentKey & cModelSegment, Signal::Delivery & cInDelivery, CString & strErrorMessage);
 
 	// == 3DX 설정 관련 함수 =====================================================================
@@ -117,7 +117,7 @@ protected:
 
 	A3DStatus DrawSet(const A3DRiSet * pSet, TDF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
 
-	A3DStatus DrawRiBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, 
+	A3DStatus ParseRiBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, 
 		TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData);
 
 	A3DStatus DrawRiPolyBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, 
@@ -197,6 +197,8 @@ protected:
 
 	A3DStatus GetMaterialMapping(const A3DMiscCascadedAttributesData & cAttrsData, A3DInt32 * pnUVCoordinatesIndex, A3DUns8 * pucTextureDimension, TDF::MaterialMappingKit & cMaterialKit);
 	A3DStatus GetMaterialMapping(const A3DMiscCascadedAttributesData & cAttrsData, TDF::MaterialMappingKit & cMaterialKit);
+
+	bool ParseTopoContextScale(const A3DTopoBody * pcBody, double & dTopoContextScale);
 
 	A3DStatus DrawTransformation(const A3DMiscTransformation * pcTransformation);
 

@@ -7,15 +7,28 @@
 #include <string>
 #include <vector>
 
-//#undef max
-//#define NOMINMAX
-
-// #include <boost/pool/pool.hpp>
-// #include <boost/pool/object_pool.hpp>
-// #include <boost/pool/singleton_pool.hpp>
-// #include <boost/pool/pool_alloc.hpp>
-
 USING_3DF_NAMESPACE
+
+//== 메모리 관리 =====================================================================================
+
+void * Memory::Allocate(size_t nInBytes, bool bInClearMemory)
+{
+	void * pByte = new BYTE[nInBytes];
+	if (true == bInClearMemory) {
+		memset(pByte, 0, nInBytes);
+	}
+
+	return pByte;
+}
+
+void Memory::Free(void * pInPointer)
+{
+	delete[] pInPointer;
+	pInPointer = nullptr;
+}
+
+Memory::Memory() {}
+
 
 TDF::Type PrivateImpl::Type() const {
 	return m_eType;

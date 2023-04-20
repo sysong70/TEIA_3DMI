@@ -11,7 +11,7 @@ GeometryKey::GeometryKey(HC_KEY nInKey) :
 {
 }
 
-bool GeometryKey::NearPoint(WindowKey const & cInWindow, const WindowPoint & cInPoint, WorldPoint & cOutPoint) const
+bool GeometryKey::NearPoint(WindowKey const & cInWindow, const MatrixKit & cModelingMatrix, const WindowPoint & cInPoint, WorldPoint & cOutPoint) const
 {
 	return false;
 }

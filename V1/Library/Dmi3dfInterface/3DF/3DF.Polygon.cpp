@@ -19,7 +19,7 @@ public:
 
 	void Copy(PolygonKitPrivate * pcInThat)
 	{
-		m_aPoints.Copy(pcInThat->m_aPoints);
+		m_aPoints = pcInThat->m_aPoints;
 		m_cColor = pcInThat->m_cColor;
 	}
 
@@ -55,7 +55,7 @@ PolygonKit const & PolygonKit::operator=(PolygonKit const & cInThat)
 unsigned int PolygonKit::GetPointCount() const
 {
 	PolygonKitPrivate * pcImpl = (PolygonKitPrivate *)m_pcImpl;
-	return static_cast<unsigned int>(pcImpl->m_aPoints.GetCount());
+	return static_cast<unsigned int>(pcImpl->m_aPoints.size());
 }
 
 void PolygonKit::GetPoints(unsigned int & nOutCount, TDF::Point * pcOutPoints) const
@@ -76,10 +76,10 @@ void PolygonKit::GetPoints(unsigned int & nOutCount, TDF::Point * pcOutPoints) c
 // Replace the points on this PolygonKey with the specified points.
 PolygonKit & PolygonKit::SetPoints(size_t nInCount, Point const cInPoints[])
 {
-	((PolygonKitPrivate *)m_pcImpl)->m_aPoints.RemoveAll();
+	((PolygonKitPrivate *)m_pcImpl)->m_aPoints.clear();
 
 	for (size_t nIndex = 0; nIndex < nInCount; nIndex++) {
-		((PolygonKitPrivate *)m_pcImpl)->m_aPoints.Add(cInPoints[nIndex]);
+		((PolygonKitPrivate *)m_pcImpl)->m_aPoints.push_back(cInPoints[nIndex]);
 	}
 
 	return *this;

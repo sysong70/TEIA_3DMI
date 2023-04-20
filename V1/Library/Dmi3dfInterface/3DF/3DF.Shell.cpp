@@ -16,7 +16,7 @@ size_t ShellKit::GetPointCount() const
 		return -0;
 	}
 
-	return m_pacPointArray->GetCount();
+	return m_pacPointArray->size();
 }
 size_t ShellKit::GetFacelistCount() const
 {
@@ -24,7 +24,7 @@ size_t ShellKit::GetFacelistCount() const
 		return -0;
 	}
 
-	return m_panFacelistArray->GetCount();
+	return m_panFacelistArray->size();
 }
 
 size_t ShellKit::GetTristripsCount() const
@@ -33,7 +33,7 @@ size_t ShellKit::GetTristripsCount() const
 		return -0;
 	}
 
-	return m_panTristripsArray->GetCount();
+	return m_panTristripsArray->size();
 }
 
 ShellKit & ShellKit::SetPoints(int nInPointCount, Point const * pcInPoints)

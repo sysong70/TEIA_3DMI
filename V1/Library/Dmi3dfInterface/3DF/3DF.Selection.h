@@ -172,6 +172,8 @@ public:
 
 	bool ShowSelectedItem(Key & cOutSelection);
 
+	bool ShowPath(KeyPath & cOutPath) const;
+
 	bool ShowSelectionPosition(WindowPoint & cOutLocation) const;
 	bool ShowSelectionPosition(WorldPoint & cOutLocation) const;
 };

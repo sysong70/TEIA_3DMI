@@ -23,6 +23,7 @@ public:
 	};
 
 	SelectabilityKit();
+	bool Set(char * pchValue);
 
 	const bool * GetSelectabilityFlag() const { return m_bSelectabilityFlag; }
 
@@ -49,6 +50,8 @@ public:
 	SelectabilityKit & UnsetText();
 	SelectabilityKit & UnsetGeometry();
 	SelectabilityKit & UnsetEverything();
+
+
 
 	//== Operator ==================================================================================
 	SelectabilityKit & operator = (SelectabilityKit const & cInKit);
