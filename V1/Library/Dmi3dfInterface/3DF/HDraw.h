@@ -13,6 +13,8 @@ class HEventInfo;
 
 namespace HDraw
 {
+	void DrawSnapPoint(HBaseView * view, TDF::Matrix & cMatrix, TDF::Point2D cPo);
+
 	void Test(HBaseView* view, TDF::Matrix & cMatrix, TDF::Point2D p1, TDF::Point2D p2);
 
 	class Format

@@ -13,9 +13,9 @@ class RGBAColor;
 class API_3DF RGBColor
 {
 public:
-	float	red;
-	float	green;
-	float	blue;
+	float	red = -1.f;
+	float	green = -1.f;
+	float	blue = -1.f;
 
 	TDF_INLINE RGBColor() {}
 	TDF_INLINE RGBColor(float r, float g, float b) : red(r), green(g), blue(b) {}
@@ -26,10 +26,15 @@ public:
 	explicit TDF_INLINE RGBColor(RGBAColor const & c);
 
 	TDF_INLINE void Set(float r, float g, float b) { red = r, green = g, blue = b; }
+	TDF_INLINE void SetRed(float r) { red = r; }
+	TDF_INLINE void SetGreen(float g) { green = g; }
+	TDF_INLINE void SetBlue(float b) { blue = b; }
+
 	TDF_INLINE bool IsGray() const { return (red == green && green == blue); }
 	TDF_INLINE float Gray() const { return  0.3125f * red + 0.5000f * green + 0.1875f * blue; }
 	float Distance(RGBColor const & other_color) const;
 	TDF_INLINE bool		IsValid() const {
+		if (red < 0.f && green < 0.f && blue < 0.f) { return false; }
 		return (Float::extract_sign_bit(red) | Float::extract_sign_bit(green) | Float::extract_sign_bit(blue)) == 0;
 	}
 
@@ -77,14 +82,20 @@ TDF_INLINE	RGBColor const	operator- (float s, RGBColor const & v) { return RGBCo
 class API_3DF RGBAColor
 {
 public:
-	float	red; // Red component of this color object, from 0.0 to 1.0
-	float	green; // Green component of this color object, from 0.0 to 1.0
-	float	blue; // Blue component of this color object, from 0.0 to 1.0
-	float	alpha; // Alpha component of this color object, from 0.0 to 1.0
+	float	red = -1.0f;	// Red component of this color object, from 0.0 to 1.0
+	float	green = -1.0f;	// Green component of this color object, from 0.0 to 1.0
+	float	blue = -1.0f;	// Blue component of this color object, from 0.0 to 1.0
+	float	alpha = -1.0f;	// Alpha component of this color object, from 0.0 to 1.0
 
 	TDF_INLINE RGBAColor() {}
 	explicit TDF_INLINE RGBAColor(float gray, float a = 1) : red(gray), green(gray), blue(gray), alpha(a) {}
 	TDF_INLINE RGBAColor(float r, float g, float b, float a = 1) : red(r), green(g), blue(b), alpha(a) {}
+
+	TDF_INLINE void Set(float r, float g, float b, float a = 1) { red = r, green = g, blue = b, alpha = a; }
+	TDF_INLINE void SetRed(float r) { red = r; }
+	TDF_INLINE void SetGreen(float g) { green = g; }
+	TDF_INLINE void SetBlue(float b) { blue = b; }
+	TDF_INLINE void SetAlpha(float a) { alpha = a; }
 
 	TDF_INLINE RGBAColor(RGBColor const & c) {
 		memcpy(this, &c, sizeof(RGBColor)); //-V512
@@ -102,6 +113,7 @@ public:
 	TDF_INLINE bool		IsGray() const { return (red == green && green == blue); }
 	TDF_INLINE float	Gray() const { return  0.3125f * red + 0.5000f * green + 0.1875f * blue; }
 	TDF_INLINE bool		IsValid() const {
+		if (red < 0.f && green < 0.f && blue < 0.f && alpha < 0.f) { return false; }
 		return (Float::extract_sign_bit(red) | Float::extract_sign_bit(green) | Float::extract_sign_bit(blue) | Float::extract_sign_bit(alpha)) == 0;
 	}
 

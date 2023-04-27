@@ -90,11 +90,23 @@ enum class Type : uint32_t
 	SelectionResults						= 0x0000000a,
 	SelectionItem							= 0x0000000b,
 
+	SelectionResultsIterator				= 0x01000003,
+
 	Kit										= 0x01000000,
 	CircleKit								= 0x01000017,
 	LineKit									= 0x01000020,
 	ShellKit								= 0x01000027,
+	MaterialKit								= 0x01000029,
 	CameraKit								= 0x01000031,
+	BoundingKit								= 0x01000032,
+	CullingKit								= 0x01000033,
+	CurveAttributeKit						= 0x01000034,
+	CylinderAttributeKit					= 0x01000035,
+	EdgeAttributeKit						= 0x01000036,
+	LightingAttributeKit					= 0x01000037,
+	LineAttributeKit						= 0x01000038,
+	MarkerAttributeKit						= 0x01000039,
+	MaterialMappingKit						= 0x0100003a,
 
 	Key										= 0x10000000,
 	IncludeKey								= 0x10000001,
@@ -242,7 +254,6 @@ public:
 	void SetType(TDF::Type eType);
 
 	void SetImpl(Object * pcObject, PrivateImpl * pcImpl);
-	void SetObject(Object * pcObject);
 
 protected:
 	TDF::Type m_eType = TDF::Type::None;

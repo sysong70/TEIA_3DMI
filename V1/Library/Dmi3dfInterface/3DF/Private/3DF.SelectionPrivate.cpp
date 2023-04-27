@@ -8,8 +8,11 @@
 #include "../3DF.Shell.h"
 #include "../3DF.Utility.h"
 
+#include "3DF.WindowPrivate.h"
+
 #include <vhash.h>
 #include <vlist.h>
+#include <algorithm>
 
 #include <atlcoll.h>
 
@@ -25,9 +28,8 @@
 
 USING_3DF_NAMESPACE
 
-
 // 주어진 Point와 Selection Option을 이용해서 선택 작업을 수행하고, 선택된 요소를 SelectionResults에 저장한다.
-int SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
+size_t SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
 {
 	int	 nResult = 0;
 
@@ -52,18 +54,18 @@ int SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionO
 
 	HC_KEY  nKey = INVALID_KEY;
 	int nOffset1, nOffset2, nOffset3;
-	HC_KEY * pnKeys = nullptr;
 	HC_KEY * pnIncludeKeys = nullptr;
 	int	eSelectedType = SelType::None;
 	char chKeyType[MVO_BUFFER_SIZE];
 	int	nIncludeCount = 0;
 
 	// 선택된 요소를 SelectionResults에 저장하기 위해서 새롭게 생성
-	SelectionResultsPrivate * pcResultsPrivate = new SelectionResultsPrivate();
+	SelectionResultsPrivate * pcResultsPrivate = (SelectionResultsPrivate *)cOutResults.GetImpl();
 
 	do {
 		// 선택된 요소를 저장하기 위해서 Item 생성
-		SelectionItemPrivate * pcItemPrivate = new SelectionItemPrivate();
+		SelectionItem * pcItem = new SelectionItem();
+		SelectionItemPrivate * pcItemPrivate = (SelectionItemPrivate *)pcItem->GetImpl();
 
 		HC_Show_Selection_Element(&nKey, &nOffset1, &nOffset2, &nOffset3);
 		HC_Show_Selection_Original_Key(&nKey);
@@ -82,14 +84,14 @@ int SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionO
 		// build up an array of include keys to pass with the selection
 		int nKeyCount = 0;
 		HC_Show_Selection_Keys_Count(&nKeyCount);
-		pcItemPrivate->nKeyCount = nKeyCount;
 
 		if (0 < nKeyCount) {
-			pnKeys = new HC_KEY[nKeyCount];
+			WindowKeyPrivate * pcImpl = (WindowKeyPrivate *)m_pcWindow->GetImpl();
+			HC_KEY * pnKeys = pcImpl->GetSelectBufferKey(nKeyCount);
+
 			pnIncludeKeys = new HC_KEY[nKeyCount];
 			HC_Show_Selection_Original_Keys(&nKeyCount, pnKeys);
 
-			pcItemPrivate->pnKeys = pnKeys;
 			pcItemPrivate->pnIncludeKeys = pnIncludeKeys;
 
 			nIncludeCount = 0;
@@ -155,19 +157,84 @@ int SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionO
 			}
 		}
 
-		HC_KEY nTestKey2 = pcItemPrivate->cKey.KeyValue();
-
-		// Selection Item을 생성해서 Selection Item Private을 저장한다.
-		SelectionItem * pcItem = new SelectionItem();
-		pcItemPrivate->SetObject(pcItem);
-
-		pcResultsPrivate->aItemList.AddTail(pcItem);
+		pcResultsPrivate->PushBack(pcItem);
 
 	} while (HC_Find_Related_Selection());
 
-	pcResultsPrivate->SetObject(&cOutResults);
+	// 정렬
 
-	return HOP_READY;
+	TRACE(L"\n");
+
+	SelectionResultsIterator cIter = cOutResults.GetIterator();
+	int nIndex = 0;
+	while (true == cIter.IsValid()) {
+		SelectionItem * pcItem = cIter.GetItem();
+
+		Key cItemKey;
+
+		if (true == pcItem->ShowSelectedItem(cItemKey)) {
+			WorldPoint cWorldPoint;
+			pcItem->ShowSelectionPosition(cWorldPoint);
+
+			WindowPoint cWindowPoint;
+			pcItem->ShowSelectionPosition(cWindowPoint);
+
+			TDF::Type eType = cItemKey.Type();
+
+			CString strTypeString = TDF::Utility::GetTypeString(eType);
+
+			TRACE(L"%02d.%s[%s]\t\t%f\t%f\n", nIndex++, strTypeString, TDF::Utility::HexStr(cItemKey.KeyValue()), cWindowPoint.z, cWorldPoint.z);
+		}
+
+		cIter.Next();
+	}
+
+	TRACE(L"\n");
+
+	// #Selection: 선택요소를 Z방향으로 Sorting
+	if (2 <= pcResultsPrivate->Size()) {
+		std::sort(pcResultsPrivate->Begin(), pcResultsPrivate->End(), SorterFunction);
+	}
+
+	cIter = cOutResults.GetIterator();
+	nIndex = 0;
+	while (true == cIter.IsValid()) {
+		SelectionItem * pcItem = cIter.GetItem();
+
+		Key cItemKey;
+
+		if (true == pcItem->ShowSelectedItem(cItemKey)) {
+			WorldPoint cWorldPoint;
+			pcItem->ShowSelectionPosition(cWorldPoint);
+
+			WindowPoint cWindowPoint;
+			pcItem->ShowSelectionPosition(cWindowPoint);
+
+			TDF::Type eType = cItemKey.Type();
+
+			CString strTypeString = TDF::Utility::GetTypeString(eType);
+
+			TRACE(L"%02d.%s[%s]\t\t%f\t%f\n", nIndex++, strTypeString, TDF::Utility::HexStr(cItemKey.KeyValue()), cWindowPoint.z, cWorldPoint.z);
+		}
+
+		cIter.Next();
+	}
+
+	return pcResultsPrivate->Size();
+}
+
+bool SelectionControlPrivate::SorterFunction(const void * pcArg1, const void * pcArg2)
+{
+	SelectionItem * pcItem1 = (SelectionItem *)pcArg1;
+	SelectionItem * pcItem2 = (SelectionItem *)pcArg2;
+
+	WindowPoint cP1, cP2;
+	pcItem1->ShowSelectionPosition(cP1);
+	pcItem2->ShowSelectionPosition(cP2);
+
+	if (cP1.z < cP2.z) return true;
+	
+	return false;
 }
 
 
@@ -321,7 +388,7 @@ void SelectionControlPrivate::HandleSelection(UINT const nFlags, SelectionResult
 	}
 */
 
-	SelectionResultsPrivate * pcResultsPrivate = new SelectionResultsPrivate();
+	SelectionResultsPrivate * pcResultsPrivate = (SelectionResultsPrivate *)cOutResults.GetImpl();
 
 	//don't notify in the selection set, we'll do that at the end
 	pcSelection->SetSelectWillNotify(false);
@@ -355,13 +422,11 @@ void SelectionControlPrivate::HandleSelection(UINT const nFlags, SelectionResult
 		if (streq(chType, "line") || streq(chType, "polyline") || streq(chType, "circular arc") || streq(chType, "elliptical arc")) {
 			eSelectedType = SelType::Line;
 
-			SelectionItemPrivate * pcItemPrivate = new SelectionItemPrivate();
-			pcItemPrivate->cKey = LineKey(Key(nKey));
-
 			SelectionItem * pcItem = new SelectionItem();
-			pcItemPrivate->SetObject(pcItem);
+			SelectionItemPrivate * pcItemPrivate = (SelectionItemPrivate *)pcItem->GetImpl();
+			pcItemPrivate->cKey = LineKey(Key(nKey));
 			
-			pcResultsPrivate->aItemList.AddTail(pcItem);
+			pcResultsPrivate->PushBack(pcItem);
 		}
 		else if (streq(chType, "marker")) {
 			eSelectedType = SelType::Marker;
@@ -454,8 +519,6 @@ void SelectionControlPrivate::HandleSelection(UINT const nFlags, SelectionResult
 
 	delete[] pnKeys;
 	delete[] pnIncludeKeys;
-
-	pcResultsPrivate->SetObject(&cOutResults);
 }
 
 void SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & cInOptions, char * pchOutOption)
@@ -507,15 +570,58 @@ void SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & cInOpt
 		switch (eSorting)
 		{
 			case TDF::Selection::Sorting::Off:
-				sprintf(chOption, "no selection sorting");
+				sprintf(chOption, "selection sorting = off");
 				break;
 
 			case TDF::Selection::Sorting::Default:
-				sprintf(chOption, "selection sorting");
+				sprintf(chOption, "selection sorting = default");
 				break;
 
+			case TDF::Selection::Sorting::Proximity:
+				sprintf(chOption, "selection sorting = proximity");
+				break;
+
+			case TDF::Selection::Sorting::ZSorting:
+				sprintf(chOption, "selection sorting = on");
+				break;
 		}
 
 		Utility::Set3DfOptionString(pchOutOption, chOption);
 	}
+
+	float fProximity = 0.0;
+	if (true == cInOptions.ShowProximity(fProximity)) {
+		sprintf(chOption, "selection proximity = %f", fProximity);
+
+		Utility::Set3DfOptionString(pchOutOption, chOption);
+	}
+
+	Selection::Bias eBias;
+	if (true == cInOptions.ShowBias(eBias)) {
+		switch (eBias)
+		{
+			case TDF::Selection::Bias::Lines:
+				sprintf(chOption, "selection bias = lines");
+				break;
+
+			case TDF::Selection::Bias::NoLines:
+				sprintf(chOption, "selection bias = no lines");
+				break;
+
+			case TDF::Selection::Bias::Markers:
+				sprintf(chOption, "selection bias = markers");
+				break;
+
+			case TDF::Selection::Bias::NoMarkers:
+				sprintf(chOption, "selection bias = no markers");
+				break;
+		}
+
+		Utility::Set3DfOptionString(pchOutOption, chOption);
+	}
+}
+
+HBaseView * SelectionControlPrivate::GetBaseView() 
+{ 
+	return (HBaseView *)m_pcWindow->GetBaseView(); 
 }

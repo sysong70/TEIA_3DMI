@@ -39,9 +39,6 @@ public:
 	HighlightControl const GetHighlightControl() const;
 
 	void Initialize();
-
-private:
-	SelectionControl * m_pcSelection;
 };
 
 CLOSE_3DF_NAMESPACE

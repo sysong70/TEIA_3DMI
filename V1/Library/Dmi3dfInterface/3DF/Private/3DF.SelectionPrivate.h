@@ -14,8 +14,11 @@
 #include "../3DF.Math.h"
 
 #include <vector>
+#include <deque>
 
 OPEN_3DF_NAMESPACE
+
+class WindowKey;
 
 class SelectionOptionsKitPrivate : public PrivateImpl
 {
@@ -73,11 +76,8 @@ class SelectionItemPrivate : public PrivateImpl
 {
 public:
 	SelectionItemPrivate() { m_eType = TDF::Type::SelectionItem; }
-	~SelectionItemPrivate() {
-		if (nullptr != pnKeys) {
-			delete pnKeys;
-		}
-
+	virtual ~SelectionItemPrivate() 
+	{
 		if (nullptr != pnIncludeKeys) {
 			delete pnIncludeKeys;
 		}
@@ -86,15 +86,6 @@ public:
 	void Copy(SelectionItemPrivate * pcInThat) {
 		cKey = pcInThat->cKey;
 
-		nKeyCount = pcInThat->nKeyCount;
-		// pnKeys값 복사
-		if (0 < nKeyCount) {
-			pnKeys = new HC_KEY[nKeyCount];
-			for (int i = 0; i < nKeyCount; i++) {
-				pnKeys[i] = pcInThat->pnKeys[i];
-			}
-		}
-		
 		nIncludeCount = pcInThat->nIncludeCount;
 		// pnIncludeKeys값 복사
 		if (0 < nIncludeCount) {
@@ -119,9 +110,6 @@ public:
 	// LineKey 등이 저장되는 변수
 	Key cKey;
 
-	int nKeyCount = 0;
-	HC_KEY * pnKeys = nullptr;
-
 	int nIncludeCount = 0;
 	HC_KEY * pnIncludeKeys = nullptr;
 
@@ -137,6 +125,21 @@ public:
 	WindowPoint cWindowPoint;
 };
 
+class SelectionResultsIteratorPrivate : public PrivateImpl
+{
+public:
+	SelectionResultsIteratorPrivate() { m_eType = TDF::Type::SelectionResultsIterator; }
+
+	void Copy(SelectionResultsIteratorPrivate * pcInThat) {
+		pcIterator = pcInThat->pcIterator;
+		pcBeginIterator = pcInThat->pcBeginIterator;
+		pcEndIterator = pcInThat->pcEndIterator;
+	}
+
+	std::deque<SelectionItem *>::iterator pcIterator;
+	std::deque<SelectionItem *>::iterator pcBeginIterator;
+	std::deque<SelectionItem *>::iterator pcEndIterator;
+};
 
 class SelectionResultsPrivate : public PrivateImpl
 {
@@ -144,19 +147,34 @@ public:
 	SelectionResultsPrivate() { m_eType = TDF::Type::SelectionResults; }	
 
 	void Copy(SelectionResultsPrivate * pcInThat) {
-
-		// 입력된 pcInThat의 aItemList를 복사
-
-		POSITION pcPosition = pcInThat->aItemList.GetHeadPosition();
-
-		while (nullptr != pcPosition) {
-			SelectionItem * pcInThatItem = pcInThat->aItemList.GetNext(pcPosition);
-			SelectionItem * pcItem = new SelectionItem(*pcInThatItem);
-			aItemList.AddTail(pcItem);
+		deItems.clear();
+		for (auto pcItem : pcInThat->deItems) {
+			SelectionItem * pcNewItem = new SelectionItem(*pcItem);
+			deItems.push_back(pcNewItem);
 		}
 	}
 
-	CAtlList<SelectionItem *> aItemList;
+	void PushFront(SelectionItem *& pcInItem) { deItems.push_front(pcInItem); }
+	void PushBack(SelectionItem *& pcInItem) { deItems.push_back(pcInItem); }
+
+	SelectionItem * Front() { return deItems.front(); }
+	SelectionItem * Back() { return deItems.back(); }
+
+	auto Begin() { return deItems.begin(); }
+	auto End() { return deItems.end(); }
+
+	void Clear() { deItems.clear(); }
+
+	auto Erase(auto cIter) { return deItems.erase(cIter); }
+	auto Erase(auto cBegin, auto cEnd) { return deItems.erase(cBegin, cEnd); }
+
+	size_t Size() { return deItems.size(); }
+	void Resize(size_t nInSize) { deItems.resize(nInSize); }
+
+	std::deque<SelectionItem *> & GetItems() { return deItems; }
+
+private:
+	std::deque<SelectionItem *> deItems;
 };
 
 class SelectionControlPrivate : public PrivateImpl
@@ -165,11 +183,10 @@ public:
 	SelectionControlPrivate() { m_eType = TDF::Type::SelectionControl; }	
 
 	void Copy(SelectionControlPrivate * pcInThat) {
-		m_pcBaseView = pcInThat->m_pcBaseView;
 		m_pcWindow = pcInThat->m_pcWindow;
 	}
 
-	int SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults);
+	size_t SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults);
 	int SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults);
 	int SelectButtonDown_V1(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults);
 	void HandleSelection(UINT const nFlags, SelectionResults & cOutResults);
@@ -179,8 +196,7 @@ public:
 	WindowKey * GetWindow() { return (WindowKey *)m_pcWindow; }
 	const WindowKey * m_pcWindow = nullptr;
 
-	HBaseView * GetBaseView() { return (HBaseView *)m_pcBaseView; }
-	const HBaseView * m_pcBaseView = nullptr;
+	HBaseView * GetBaseView();
 
 private:
 	// & 연산을 해야하므로 enum class를 사용하지 않는다.
@@ -191,6 +207,8 @@ private:
 		Marker,
 		Line
 	};
+
+	static bool SorterFunction(const void * pcArg1, const void * pcArg2);
 };
 
 CLOSE_3DF_NAMESPACE

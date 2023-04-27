@@ -4,7 +4,7 @@
 
 #include "Private/3DF.KeyPrivate.h"
 
-#include "3DF.MaterialMapping.h"
+#include "3DF.Material.h"
 
 USING_3DF_NAMESPACE
 
@@ -213,6 +213,9 @@ ShellKey::ShellKey(Key const & cInKey)
 	m_pcImpl = pcImpl;
 
 	((KeyPrivate *)pcImpl)->Copy((KeyPrivate *)(cInKey.GetImpl()));
+
+	// 외부에서 들어오는 Key는 ShellKey가 아닐 수 있으므로, ShellKey로 변경한다.
+	pcImpl->SetType(TDF::Type::ShellKey);
 }
 
 ShellKey::ShellKey(ShellKey const & cInThat)

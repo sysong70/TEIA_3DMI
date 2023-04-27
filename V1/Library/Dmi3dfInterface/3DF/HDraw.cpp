@@ -9,6 +9,22 @@ namespace HDraw
     HBaseView* View = nullptr;
 }
 
+void HDraw::DrawSnapPoint(HBaseView * view, TDF::Matrix & cMatrix, Point2D cPo)
+{
+    SetView(view);
+
+    HC_Set_Modelling_Matrix(cMatrix.m_fData);
+
+	HC_Set_Color("edges = black");
+	HC_Set_Color("faces = white");
+    HC_Set_Visibility("faces");
+
+	HC_Set_Edge_Weight(2);
+	//:TODO - calculate point or use segment metrix
+	double radius = Compute::PixelToWorld(4);
+	Circle::Create(Point(cPo), radius, true);
+}
+
 void HDraw::Test(HBaseView * view, TDF::Matrix & cMatrix, Point2D p1, Point2D p2)
 {
     SetView(view);

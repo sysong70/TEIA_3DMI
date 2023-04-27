@@ -487,6 +487,7 @@ SelectionOptionsControl & SelectionOptionsControl::UnsetBias()
 //== SelectionItem Class ===========================================================================
 TDF::SelectionItem::SelectionItem()
 {
+	m_pcImpl = new SelectionItemPrivate();
 }
 
 TDF::SelectionItem::SelectionItem(SelectionItem const & cInThat)
@@ -520,16 +521,6 @@ bool TDF::SelectionItem::operator==(SelectionItem const & cInThat) const
 
 	if (pcImpl->cKey.KeyValue() != pcInThatImpl->cKey.KeyValue()) {
 		return false;
-	}
-
-	if (pcImpl->nKeyCount != pcInThatImpl->nKeyCount) {
-		return false;
-	}
-
-	for (int nIndex = 0; nIndex < pcImpl->nKeyCount; nIndex++) {
-		if (pcImpl->pnKeys[nIndex] != pcInThatImpl->pnKeys[nIndex]) {
-			return false;
-		}
 	}
 
 	if (pcImpl->nIncludeCount != pcInThatImpl->nIncludeCount) {
@@ -627,6 +618,97 @@ bool TDF::SelectionItem::ShowSelectionPosition(WorldPoint & cOutLocation) const
 
 	return true;
 }
+//== SelectionResultsIterator Class ================================================================
+SelectionResultsIterator::SelectionResultsIterator()
+{
+	m_pcImpl = new SelectionResultsIteratorPrivate();
+}
+
+SelectionResultsIterator::SelectionResultsIterator(SelectionResultsIterator const & cInThat)
+{
+	m_pcImpl = new SelectionResultsIteratorPrivate();
+	Set(cInThat);
+}
+
+void SelectionResultsIterator::Set(SelectionResultsIterator const & cInThat)
+{
+	SelectionResultsIteratorPrivate * pcImpl = (SelectionResultsIteratorPrivate *)m_pcImpl;
+	SelectionResultsIteratorPrivate * pcInThatImpl = (SelectionResultsIteratorPrivate *)cInThat.m_pcImpl;
+
+	pcImpl->Copy(pcInThatImpl);
+}
+
+SelectionResultsIterator & SelectionResultsIterator::operator=(SelectionResultsIterator const & cInThat)
+{
+	Set(cInThat);
+	return *this;
+}
+
+void SelectionResultsIterator::Next()
+{
+	SelectionResultsIteratorPrivate * pcImpl = (SelectionResultsIteratorPrivate *)m_pcImpl;
+	++pcImpl->pcIterator;
+}
+
+SelectionResultsIterator & SelectionResultsIterator::operator++()
+{
+	Next();
+	return *this;
+}
+
+SelectionResultsIterator & SelectionResultsIterator::operator++(int nInVal)
+{
+	SelectionResultsIteratorPrivate * pcImpl = (SelectionResultsIteratorPrivate *)m_pcImpl;
+	std::advance(pcImpl->pcIterator, nInVal);
+	return *this;
+}
+
+bool SelectionResultsIterator::operator == (SelectionResultsIterator const & cInSearchResultsIterator)
+{
+	SelectionResultsIteratorPrivate * pcImpl = (SelectionResultsIteratorPrivate *)m_pcImpl;
+	SelectionResultsIteratorPrivate * pcInThatImpl = (SelectionResultsIteratorPrivate *)cInSearchResultsIterator.m_pcImpl;
+	if(pcImpl->pcIterator != pcInThatImpl->pcIterator) {
+		return false;
+	}
+
+	if(pcImpl->pcBeginIterator != pcInThatImpl->pcBeginIterator) {
+		return false;
+	}
+
+	if(pcImpl->pcEndIterator != pcInThatImpl->pcEndIterator) {
+		return false;
+	}
+
+	return true;
+}
+
+bool SelectionResultsIterator::operator != (SelectionResultsIterator const & cInSearchResultsIterator)
+{
+	return !(*this == cInSearchResultsIterator);
+}
+
+bool SelectionResultsIterator::IsValid() const
+{
+	SelectionResultsIteratorPrivate * pcImpl = (SelectionResultsIteratorPrivate *)m_pcImpl;
+	return pcImpl->pcIterator != pcImpl->pcEndIterator;
+}
+
+void SelectionResultsIterator::Reset()
+{
+	SelectionResultsIteratorPrivate * pcImpl = (SelectionResultsIteratorPrivate *)m_pcImpl;
+	pcImpl->pcIterator = pcImpl->pcBeginIterator;
+}
+
+SelectionItem * SelectionResultsIterator::GetItem() const
+{
+	SelectionResultsIteratorPrivate * pcImpl = (SelectionResultsIteratorPrivate *)m_pcImpl;
+	return *pcImpl->pcIterator;
+}
+
+SelectionItem * SelectionResultsIterator::operator * () const
+{
+	return GetItem();
+}
 
 //== SelectionResults Class ========================================================================
 SelectionResults::SelectionResults()
@@ -667,25 +749,17 @@ bool SelectionResults::operator==(SelectionResults const & cInThat) const
 	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
 	SelectionResultsPrivate * pcInThatImpl = (SelectionResultsPrivate *)cInThat.m_pcImpl;
 
-	POSITION pcPosition = pcImpl->aItemList.GetHeadPosition();
-
-	while (nullptr != pcPosition)
-	{
-		SelectionItem * pcItem = pcImpl->aItemList.GetNext(pcPosition);
-
-		POSITION pcInThatPosition = pcInThatImpl->aItemList.GetHeadPosition();
-
+	for (auto pcItem : pcImpl->GetItems()) {
 		bool bFindSameItemFlag = false;
-		while (nullptr != pcInThatPosition) {
-			SelectionItem * pcInThatItem = pcInThatImpl->aItemList.GetNext(pcInThatPosition);
+		for (auto pcInThatItem : pcInThatImpl->GetItems()) {
 			if (*pcItem == *pcInThatItem) {
 				bFindSameItemFlag = true;
 				break;
 			}
-		}
 
-		if (false == bFindSameItemFlag) {
-			return false;
+			if (false == bFindSameItemFlag) {
+				return false;
+			}
 		}
 	}
 
@@ -710,12 +784,11 @@ void SelectionResults::Reset()
 
 	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
 
-	for (POSITION pcPosition = pcImpl->aItemList.GetHeadPosition(); pcPosition != NULL; ) {
-		SelectionItem * pcItem = pcImpl->aItemList.GetNext(pcPosition);
+	for (auto pcItem : pcImpl->GetItems()) {
 		delete pcItem;
 	}
 
-	pcImpl->aItemList.RemoveAll();
+	pcImpl->Clear();
 }
 
 size_t SelectionResults::GetCount() const
@@ -725,83 +798,38 @@ size_t SelectionResults::GetCount() const
 	}
 
 	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
-	return  pcImpl->aItemList.GetCount();
+	return  pcImpl->Size();
 }
 
-POSITION SelectionResults::GetHeadPosition() const
+SelectionResultsIterator SelectionResults::GetIterator() const
 {
-	if (nullptr == m_pcImpl) {
-		return nullptr;
-	}
+	SelectionResultsIterator cIterator;
+	SelectionResultsIteratorPrivate * pcIteratorImpl = (SelectionResultsIteratorPrivate *)cIterator.GetImpl();
 
 	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
-	return  pcImpl->aItemList.GetHeadPosition();
+	pcIteratorImpl->pcBeginIterator = pcImpl->Begin();
+	pcIteratorImpl->pcEndIterator = pcImpl->End();
+	pcIteratorImpl->pcIterator = pcIteratorImpl->pcBeginIterator;
+
+	return cIterator;
 }
 
-SelectionItem * SelectionResults::GetHead()
+SelectionItem * SelectionResults::Front()
 {
 	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
-	return pcImpl->aItemList.GetHead();
+	return pcImpl->Front();
 }
 
-SelectionItem * SelectionResults::GetHead() const
+SelectionItem * SelectionResults::Front() const
 {
 	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
-	return pcImpl->aItemList.GetHead();
+	return pcImpl->Front();
 }
 
-SelectionItem * SelectionResults::GetAt(POSITION & pcPosition)
+void SelectionResults::PushBack(SelectionItem * pcInItem)
 {
 	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
-	return pcImpl->aItemList.GetAt(pcPosition);
-}
-
-SelectionItem * SelectionResults::GetAt(POSITION & pcPosition) const
-{
-	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
-	return pcImpl->aItemList.GetAt(pcPosition);
-}
-
-SelectionItem * SelectionResults::GetNext(POSITION & pcPosition)
-{
-	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
-	return  pcImpl->aItemList.GetNext(pcPosition);
-}
-
-SelectionItem * SelectionResults::GetNext(POSITION & pcPosition) const
-{
-	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
-	return  pcImpl->aItemList.GetNext(pcPosition);
-}
-
-void SelectionResults::RemoveAt(POSITION & pcPosition)
-{
-	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
-
-	SelectionItem * pcItem = pcImpl->aItemList.GetAt(pcPosition);
-	if (nullptr != pcItem) {
-		delete pcItem;
-		pcItem = nullptr;
-	}
-
-	pcImpl->aItemList.RemoveAt(pcPosition);
-}
-
-void SelectionResults::RemoveAt(POSITION & pcPosition) const
-{
-	if (nullptr == m_pcImpl) {
-		return;
-	}
-
-	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
-
-	SelectionItem * pcItem = pcImpl->aItemList.GetAt(pcPosition);
-	if (nullptr != pcItem) {
-		delete pcItem;
-		pcItem = nullptr;
-	}
-
-	pcImpl->aItemList.RemoveAt(pcPosition);
+	pcImpl->PushBack(pcInItem);
 }
 
 // 내부 요소가 Size보다 큰 경우 Size 보다 큰 부분은 삭제한다.
@@ -812,7 +840,20 @@ void SelectionResults::SetSize(size_t nInSize)
 	}
 
 	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
+	
+	size_t nIndex = 0;
+	for (auto pcItem : pcImpl->GetItems()) {
+		nIndex++;
+		if (nIndex <= nInSize) {
+			continue;
+		}
 
+		delete pcItem;
+	}
+
+	pcImpl->Resize(nInSize);
+
+/*
 	size_t nCount = pcImpl->aItemList.GetCount();
 	if (nCount <= nInSize) {
 		return;
@@ -835,7 +876,7 @@ void SelectionResults::SetSize(size_t nInSize)
 
 		pcImpl->aItemList.RemoveAt(pcCurrentPosition);
 		delete pcItem;
-	}
+	}*/
 }
 
 // 들어오는 SelectionResults 값을 추가시킨다. 
@@ -847,6 +888,26 @@ bool SelectionResults::Union(SelectionResults const & cInThat)
 	if (nullptr == pcImpl || nullptr == pcInThatImpl) {
 		return false;
 	}
+
+	for (auto pcInThatItem : pcInThatImpl->GetItems()) {
+		bool bFindFlag = false;
+
+		for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
+			Key cItemKey, cInThatItemKey;
+			(*pcItemIter)->ShowSelectedItem(cItemKey);
+			pcInThatItem->ShowSelectedItem(cInThatItemKey);
+
+			// 들어온 요소에 대해서 기존에 있는 요소와 비교해서 같은 것이 있으면 삭제한다.
+			if (*(*pcItemIter) == *pcInThatItem) {
+				//요소 삭제 후, 다음 iterator 반환
+				pcItemIter = pcImpl->Erase(pcItemIter);
+			}
+			else {
+				++pcItemIter; // 다음 요소로 이동
+			}
+		}
+	}
+/*
 
 	// 기존에 List에서 같은 값이 있으면 삭제한다.
 	// 새롭게 들어오는 항목이 앞쪽에 있도록 정렬하기 위함.
@@ -870,14 +931,18 @@ bool SelectionResults::Union(SelectionResults const & cInThat)
 
 			TRACE(L"Item Key: %d, InThat Item Key: %d\n", cItemKey.KeyValue(), cInThatItemKey.KeyValue());
 
-
-
 			// 들어온 요소에 대해서 기존에 있는 요소와 비교해서 같은 것이 있으면 삭제한다.
 			if (*pcItem == *pcInThatItem) {
 				pcImpl->aItemList.RemoveAt(pcCurrentPosition);
 			}
 		}
+	}*/
+
+	for (auto pcInThatItem : pcInThatImpl->GetItems()) {
+		SelectionItem * pcNewItem = new SelectionItem(*pcInThatItem);
+		pcImpl->PushFront(pcNewItem);
 	}
+/*
 
 	pcInThatPosition = pcInThatImpl->aItemList.GetHeadPosition();
 	while (nullptr != pcInThatPosition)
@@ -886,6 +951,7 @@ bool SelectionResults::Union(SelectionResults const & cInThat)
 		SelectionItem * pcNewItem = new SelectionItem(*pcInThatItem);
 		pcImpl->aItemList.AddHead(pcNewItem);
 	}
+*/
 
 	return true;
 }
@@ -893,47 +959,42 @@ bool SelectionResults::Union(SelectionResults const & cInThat)
 void SelectionResults::LeaveType(DWORD nType)
 {
 	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
-
-	POSITION pcPosition = pcImpl->aItemList.GetHeadPosition();
-	POSITION pcCurrentPosition = nullptr;
-
-	while (nullptr != pcPosition)
-	{
-		pcCurrentPosition = pcPosition;
-		SelectionItem * pcItem = pcImpl->aItemList.GetNext(pcPosition);
-
+	for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
 		Key cItemKey;
-		if(true == pcItem->ShowSelectedItem(cItemKey)) {
+		if (true == (*pcItemIter)->ShowSelectedItem(cItemKey)) {
 			DWORD nItemType = (DWORD)cItemKey.Type();
 			// 원하는 Type이면 삭제하지 않는다.
 			if (nType == nItemType) {
+				++pcItemIter; // 다음 요소로 이동
 				continue;
 			}
-		}
 
-		pcImpl->aItemList.RemoveAt(pcCurrentPosition);
+			//요소 삭제 후, 다음 iterator 반환
+			pcItemIter = pcImpl->Erase(pcItemIter);
+		}
+		else {
+			++pcItemIter; // 다음 요소로 이동
+		}
 	}
 }
 
 void SelectionResults::RemoveType(DWORD nType)
 {
 	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
-
-	POSITION pcPosition = pcImpl->aItemList.GetHeadPosition();
-	POSITION pcCurrentPosition = nullptr;
-
-	while (nullptr != pcPosition)
-	{
-		pcCurrentPosition = pcPosition;
-		SelectionItem * pcItem = pcImpl->aItemList.GetNext(pcPosition);
-
+	for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
 		Key cItemKey;
-		if (true == pcItem->ShowSelectedItem(cItemKey)) {
+		if (true == (*pcItemIter)->ShowSelectedItem(cItemKey)) {
 			DWORD nItemType = (DWORD)cItemKey.Type();
 			// 원하는 Type이면 삭제한다.
 			if (nItemType == (nType & nItemType)) {
-				pcImpl->aItemList.RemoveAt(pcCurrentPosition);
+				pcItemIter = pcImpl->Erase(pcItemIter);
 			}
+			else {
+				++pcItemIter; // 다음 요소로 이동
+			}
+		}
+		else {
+			++pcItemIter; // 다음 요소로 이동
 		}
 	}
 }
@@ -943,7 +1004,6 @@ TDF::SelectionControl::SelectionControl(WindowKey const & cInWindow)
 {
 	SelectionControlPrivate * pcImpl = new SelectionControlPrivate();
 	pcImpl->m_pcWindow = &cInWindow;
-	pcImpl->m_pcBaseView = cInWindow.GetBaseView();
 
 	m_pcImpl = pcImpl;
 }

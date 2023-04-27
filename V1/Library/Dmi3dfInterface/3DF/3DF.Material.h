@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include "3DF.h"
+#include "3DF.Kit.h"
+#include "3DF.Color.h"
 
 OPEN_3DF_NAMESPACE
 
@@ -27,39 +29,31 @@ public:
 	// Material Channel
 	enum class Channel : uint32_t
 	{
-		DiffuseColor = 1,		// Material Channel
-		DiffuseTexture = 2,		// Material Channel
-		Specular = 3,			// Material Channel
-		Emission = 4,			// Material Channel
-		Transmission = 5,		// Material Channel
-		Mirror = 6,				// Material Channel
-		Bump = 7,				// Material Channel
-		EnvironmentTexture = 8,	// Material Channel
-		EnvironmentCubeMap = 9,	// Material Channel
-		Gloss = 10,				// Material Channel
-		Alpha = 11,				// Material Channel
-		Count = 12
+		DiffuseColor = 0,		// Material Channel
+		DiffuseTexture = 1,		// Material Channel
+		Specular = 2,			// Material Channel
+		Emission = 3,			// Material Channel
+		Transmission = 4,		// Material Channel
+		Mirror = 5,				// Material Channel
+		Bump = 6,				// Material Channel
+		EnvironmentTexture = 7,	// Material Channel
+		EnvironmentCubeMap = 8,	// Material Channel
+		Count = 9
+// 		Gloss = 9,				// Material Channel
+// 		Alpha = 10,				// Material Channel
 	};
 
 	// The Material Color Class*/
 	class Color
 	{
 	public:
-		enum class Type : uint32_t
-		{
-			Diffuse,
-			Specular,
-			Emission,
-			Count
-		};
-
 		// Material Color Channel
 		enum class Channel : uint32_t
 		{
-			DiffuseColor = 1,				// Material Color Channel
-			Specular = 3,					// Material Color Channel
-			Emission = 4,					// Material Color Channel
-			Mirror = 6						// Material Color Channel
+			DiffuseColor = 0,				// Material Color Channel
+			Specular = 2,					// Material Color Channel
+			Emission = 3,					// Material Color Channel
+			Mirror = 5						// Material Color Channel
 		};
 
 	private:
@@ -74,14 +68,14 @@ public:
 		// Material Texture Channel
 		enum class Channel : uint32_t
 		{
-			DiffuseTexture = 2,			// Material Texture Channel
-			Specular = 3,				// Material Texture Channel
-			Emission = 4,				// Material Texture Channel
-			Transmission = 5,			// Material Texture Channel
-			Mirror = 6,					// Material Texture Channel
-			Bump = 7,					// Material Texture Channel
-			EnvironmentTexture = 8,		// Material Texture Channel
-			EnvironmentCubeMap = 9		// Material Texture Channel
+			DiffuseTexture = 1,			// Material Texture Channel
+			Specular = 2,				// Material Texture Channel
+			Emission = 3,				// Material Texture Channel
+			Transmission = 4,			// Material Texture Channel
+			Mirror = 5,					// Material Texture Channel
+			Bump = 6,					// Material Texture Channel
+			EnvironmentTexture = 7,		// Material Texture Channel
+			EnvironmentCubeMap = 8		// Material Texture Channel
 		};
 
 		// Enumeration of the parameterization sources for textures.
@@ -179,6 +173,193 @@ public:
 
 private:
 	Material() {}
+};
+
+class API_3DF MaterialKit : public Kit
+{
+public:
+	MaterialKit();
+	MaterialKit(MaterialKit const & cInKit);
+
+	void Set(MaterialKit const & cInThat);
+	MaterialKit & operator = (MaterialKit const & cInThat);
+	bool operator == (MaterialKit const & cInThat) const;
+	bool operator != (MaterialKit const & cInThat) const;
+
+	void Show(MaterialKit & cOutKit) const;
+	bool Empty() const;
+
+	// Applies an RGB color to the whole diffuse channel, replacing any diffuse textures or shaders.
+	MaterialKit & SetDiffuse(RGBColor const & cInColor);
+	MaterialKit & SetDiffuse(RGBAColor const & cInColor);
+
+	// Applies an RGB color to the diffuse color channel
+	MaterialKit & SetDiffuseColor(RGBColor const & cInColor);
+	MaterialKit & SetDiffuseColor(RGBAColor const & cInColor);
+	//Applies an alpha channel the diffuse color channel.
+	MaterialKit & SetDiffuseAlpha(float fInAlpha);
+
+	MaterialKit & SetDiffuseTexture(CString strTextureName);
+	MaterialKit & SetDiffuseTexture(CString strTextureName, RGBAColor const & cInModulatingColor);
+	MaterialKit & SetDiffuseTextureOption(CString strTextureOption);
+
+	MaterialKit & SetSpecular(RGBAColor const & cInColor);
+	MaterialKit & SetSpecular(CString strTextureName, RGBAColor const & cInModulatingColor);
+
+	MaterialKit & SetMirror(RGBAColor const & cInColor);
+	MaterialKit & SetMirror(CString strTextureName, RGBAColor const & cInModulatingColor);
+
+	MaterialKit & SetTransmission(CString strTextureName, RGBAColor const & cInModulatingColor);
+
+	MaterialKit & SetEmission(RGBAColor const & cInColor);
+	MaterialKit & SetEmission(CString strTextureName, RGBAColor const & cInModulatingColor);
+
+	MaterialKit & SetEnvironmentTexture(CString strTextureName);
+	MaterialKit & SetEnvironmentTexture(CString strTextureName, RGBAColor const & cInModulatingColor);
+
+	MaterialKit & SetEnvironmentCubeMap(CString strTextureName);
+	MaterialKit & SetEnvironmentCubeMap(CString strTextureName, RGBAColor const & cInModulatingColor);
+
+	MaterialKit & SetBump(CString strTextureName);
+	MaterialKit & SetGloss(float fInGloss);
+
+
+	// Removes all settings applied to the diffuse rgb channel.
+	MaterialKit & UnsetDiffuseColorRGB();
+	// Removes all settings applied to the diffuse color channel including alpha.
+	MaterialKit & UnsetDiffuseColor();
+	MaterialKit & UnsetDiffuseAlpha();
+	MaterialKit & UnsetDiffuseTexture();
+	MaterialKit & UnsetSpecular();
+	MaterialKit & UnsetMirror();
+	MaterialKit & UnsetTransmission();
+	MaterialKit & UnsetEmission();
+	MaterialKit & UnsetEnvironment();
+	MaterialKit & UnsetBump();
+	MaterialKit & UnsetGloss();
+	MaterialKit & UnsetEverything();
+
+	bool ShowDiffuseColor(RGBColor & cOutColor) const;
+	bool ShowDiffuseColor(RGBAColor & cOutColor) const;
+	bool ShowDiffuseAlpha(float & fOutAlpha) const;
+	bool ShowDiffuseTexture(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+	bool ShowSpecular(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+
+	bool ShowMirror(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+	bool ShowTransmission(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+	bool ShowEmission(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+	bool ShowEnvironment(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+	bool ShowBump(CString & strOutTextureName) const;
+	bool ShowGloss(float & fOutGloss) const;
+};
+
+class API_3DF MaterialMappingKit : public Kit
+{
+public:
+	MaterialMappingKit();
+	MaterialMappingKit(MaterialMappingKit const & cInKit);
+
+	void Set(MaterialMappingKit const & cInThat);
+	MaterialMappingKit & operator = (MaterialMappingKit const & cInThat);
+
+	//----- Color 설정 -----
+	MaterialMappingKit & SetAmbientLightUpColor(RGBAColor const & cInRgbaColor);
+	MaterialMappingKit & SetAmbientLightDownColor(RGBAColor const & cInRgbaColor);
+
+	MaterialMappingKit & SetBackFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
+	MaterialMappingKit & SetBackFaceAlpha(float fInAlpha);
+	MaterialMappingKit & SetBackFaceTexture(CString strTextureName);
+	MaterialMappingKit & SetBackFaceTextureOption(CString strTextureOption);
+	MaterialMappingKit & SetBackFaceGloss(float fInValue);
+	MaterialMappingKit & SetBackFaceMaterial(MaterialKit const & cInMaterial);
+
+	MaterialMappingKit & SetFrontFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
+	MaterialMappingKit & SetFrontFaceAlpha(float fInAlpha);
+	MaterialMappingKit & SetFrontFaceTexture(CString strTextureName);
+	MaterialMappingKit & SetFrontFaceTextureOption(CString strTextureOption);
+	MaterialMappingKit & SetFrontFaceGloss(float fInValue);
+	MaterialMappingKit & SetFrontFaceMaterial(MaterialKit const & cInMaterial);
+
+	MaterialMappingKit & SetEdgeAlpha(float fInAlpha);
+	MaterialMappingKit & SetEdgeColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
+	MaterialMappingKit & SetEdgeTexture(char const * strTextureName);
+	MaterialMappingKit & SetEdgeGloss(float fInValue);
+	MaterialMappingKit & SetEdgeMaterial(MaterialKit const & cInMaterial);
+
+	MaterialMappingKit & SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
+	MaterialMappingKit & SetFaceAlpha(float fInAlpha);
+	MaterialMappingKit & SetFaceTexture(CString strTextureName);
+	MaterialMappingKit & SetFaceTextureOption(CString strTextureOption);
+	MaterialMappingKit & SetFaceGloss(float fInValue);
+	MaterialMappingKit & SetFaceMaterial(MaterialKit const & cInMaterial);
+
+	MaterialMappingKit & SetLineAlpha(float fInAlpha);
+	MaterialMappingKit & SetLineColor(RGBAColor const & cInRgbaColor);
+
+	MaterialMappingKit & SetMarkerColor(RGBAColor const & cInRgbaColor);
+
+	MaterialMappingKit & SetTextColor(RGBAColor const & cInRgbaColor);
+
+	MaterialMappingKit & SetVertexAlpha(float fInAlpha);
+	MaterialMappingKit & SetVertexColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
+	MaterialMappingKit & SetVertexTexture(CString strTextureName);
+	MaterialMappingKit & SetVertexGloss(float fInValue);
+	MaterialMappingKit & SetVertexMaterial(MaterialKit const & cInMaterial);
+
+	MaterialMappingKit & SetGeometryColor(RGBAColor const & cInRgbaColor);
+
+	//----- Operator -----
+	bool operator == (MaterialMappingKit const & cInThat) const;
+	bool operator != (MaterialMappingKit const & cInThat) const;
+
+	bool ShowAmbientLightUpColor(Material::Type & cOutType, RGBAColor & cOutColor) const;
+	bool ShowAmbientLightDownColor(Material::Type & cOutType, RGBAColor & cOutColor) const;
+
+	bool ShowBackFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+	bool ShowBackFaceMaterial(MaterialKit & cOutKit) const;
+
+	bool ShowFrontFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+	bool ShowFrontFaceMaterial(MaterialKit & cOutKit) const;
+
+	bool ShowEdgeChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+	bool ShowEdgeMaterial(MaterialKit & cOutKit) const;
+
+	bool ShowFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+	bool ShowFaceMaterial(MaterialKit & cOutKit) const;
+
+	bool ShowLineAlpha(float & fOutAlpha) const;
+
+	bool ShowLineColor(RGBAColor & cOutColor) const;
+
+	bool ShowMarkerColor(RGBAColor & cOutColor) const;
+
+	bool ShowTextColor(RGBAColor & cOutColor) const;
+
+	bool ShowVertexChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+	bool ShowVertexMaterial(MaterialKit & cOutKit) const;
+};
+
+class API_3DF MaterialMappingControl
+{
+public:
+	MaterialMappingControl(SegmentKey & cInSegmentKey);
+
+	//== Color 설정 =================================================================================
+	MaterialMappingControl & SetMarkerColor(RGBAColor const & cInRgbaColor);
+
+	//== Texture 설정 ===============================================================================
+	void InitPopulateTextures();
+	void InsertPicture(UINT nIndex, UINT nPixelWidth, UINT nPixelHeight, UCHAR * pucBinaryData);
+	void InsertDifaultPicture(UINT nIndex, UINT nSize, UCHAR * pucBinaryData);
+	void SetTextureMatrix(float * pfTextureMatrix, char * pchTextureTransformSegment);
+	void SetDefineLocalTexture(UINT nIndex, CString strTextureOptions);
+	void EndPopulateTextures();
+
+private:
+	SegmentKey & m_cInSegmentKey;
+
+	MaterialMappingControl & SetColor(CString strGeometry, CString strChannel, RGBAColor const & cInRgbaColor);
+	MaterialMappingControl & UnSetColor(CString strInType);
 };
 
 CLOSE_3DF_NAMESPACE

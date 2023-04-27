@@ -94,10 +94,43 @@ public:
 	void Set(SelectionOptionsKit const & cInThat);
 	SelectionOptionsKit & operator =(SelectionOptionsKit const & cInThat);
 
+	// Sets the selection proximity in centimeters or object-relative-units (ORU), depending
+	// on the selection-routine being utilized. The selection proximity augments point-based or
+	// shell-based selections by also factoring in the area surrounding the selection-point or
+	// selection-shell.
+	//
+	// For SelectionControl::SelectByPoint, this specifies the radius in
+	// centimeters around the selection within which objects will be returned as selected.
+	// The value must be positive.
+	//
+	// For SelectionControl::SelectByShell, this specifies a distance in object-relative-units that determines whether a selection is performed. 
+	// A positive proximity value will cause the selection algorithm to perform a selection when the distance between the two bodies is <= proximity, which means the bodies do not have
+	// to be touching in order for Visualize to perform a selection.  If the proximity == 0,
+	// the bodies must be coincident or penetrating for a selection to occur. If proximity < 0,
+	// the shells must penetrate each other by at least that amount before a selection is performed.
+	//
+	// Selection proximity is not relevant for other selection types.
+	//
+	// When using HPS::SelectionControl::SelectByShell, false positives or negatives for selection may occur if the proximity and/or selection shells meet any of the following criteria:
+	// - The absolute value of a negative proximity is much larger than the actual intersection of the shells.   An example would be a shell that represents a thin plate or a thinly-walled tube, and the specified proximity is larger than the thickness of the plate or tube.
+	// - Selection shells ("probes") have vertices with complex intersections
+	// - Selection shells ("probes") have concavities, especially multiple adjacent concavities.
 	SelectionOptionsKit & SetProximity(float fInProximity);
+
 	SelectionOptionsKit & SetLevel(Selection::Level eInLevel);
+
+	// Sets the internal selection limit. The internal selection limit is the maximum number of subentities for shells and meshes that will be
+	// returned if performing subentity selection.
 	SelectionOptionsKit & SetInternalLimit(size_t nInLimit);
+
+	// Sets the related selection limit. The related selection limit is the maximum number of items that will be returned as selected when performing
+	// a selection. A related selection limit of 0 would result in only the first item getting returned. If the value is
+	// greater than 0, this indicates the number of additional items beyond the first to return. The order of these additional
+	// items will depend on whether sorting is enabled
 	SelectionOptionsKit & SetRelatedLimit(size_t nInLimit);
+
+	// Sets whether to sort selection results. This is only relevant if the related selection limit is greater than 0 (see SetRelatedLimit).
+	// Sorting works on an entity level. Subentity components like edges, vertices and faces are not sorted.
 	SelectionOptionsKit & SetSorting(Selection::Sorting eInSorting);
 	SelectionOptionsKit & SetAlgorithm(Selection::Algorithm eInAlgorithm);
 	SelectionOptionsKit & SetGranularity(Selection::Granularity eInGranularity);
@@ -178,6 +211,34 @@ public:
 	bool ShowSelectionPosition(WorldPoint & cOutLocation) const;
 };
 
+class SelectionResultsIterator : public Object
+{
+public:
+	SelectionResultsIterator();
+	SelectionResultsIterator(SelectionResultsIterator const & cInThat);
+
+	TDF::Type ObjectType() const { return TDF::Type::SelectionResultsIterator; };
+
+	void Set(SelectionResultsIterator const & in_that);
+	SelectionResultsIterator & operator=(SelectionResultsIterator const & cInThat);
+
+	void Next();
+
+	SelectionResultsIterator & operator++();
+	SelectionResultsIterator & operator++(int nInVal);
+
+	bool operator == (SelectionResultsIterator const & cInSearchResultsIterator);
+	bool operator != (SelectionResultsIterator const & cInSearchResultsIterator);
+
+	bool IsValid() const;
+
+	void Reset();
+
+	SelectionItem * GetItem() const;
+
+	SelectionItem * operator * () const;
+};
+
 class SelectionResults : public Object
 {
 public:
@@ -197,19 +258,12 @@ public:
 	void Reset();
 
 	size_t GetCount() const;
-	POSITION GetHeadPosition() const;
+	SelectionResultsIterator GetIterator() const;
 
-	SelectionItem * GetHead();
-	SelectionItem * GetHead() const;
+	SelectionItem * Front();
+	SelectionItem * Front() const;
 
-	SelectionItem * GetAt(POSITION & pcPosition);
-	SelectionItem * GetAt(POSITION & pcPosition) const;
-
-	SelectionItem * GetNext(POSITION & pcPosition);
-	SelectionItem * GetNext(POSITION & pcPosition) const;
-
-	void RemoveAt(POSITION & pcPosition);
-	void RemoveAt(POSITION & pcPosition) const;
+	void PushBack(SelectionItem * pcInItem);
 
 	void SetSize(size_t nInSize);
 

@@ -50,12 +50,3 @@ void PrivateImpl::SetImpl(Object * pcObject, PrivateImpl * pcImpl)
 
 	pcObject->m_pcImpl = pcImpl;
 }
-
-void PrivateImpl::SetObject(Object * pcObject)
-{
-	if (nullptr != pcObject->m_pcImpl) {
-		delete pcObject->m_pcImpl;
-	}
-
-	pcObject->m_pcImpl = this;
-}

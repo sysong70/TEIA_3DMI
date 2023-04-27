@@ -4,6 +4,7 @@
 #include "3DF.Math.h"
 
 #include "3DF.Selection.h"
+#include "3DF.Segment.h"
 
 #include <HOpCameraOrbit.h>
 
@@ -41,6 +42,7 @@ namespace Operator
 		//== Object Snap Draw ======================================================================
 		
 		void DrawSnapItems();
+		void DrawSnapItems1();
 
 		void DrawObjectSnapPoint(TDF::SelectionResults & cInItems);
 
@@ -63,7 +65,9 @@ namespace Operator
 
 		WindowKey * m_pcWindow = nullptr;
 
-		CAtlList<SnapItem *> m_aSnapItems;
+		SegmentKey m_cSnapPointSegment;
+
+		std::vector<SnapItem *> m_vSnapItems;
 	};
 }
 CLOSE_3DF_NAMESPACE

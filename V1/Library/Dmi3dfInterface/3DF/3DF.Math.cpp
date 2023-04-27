@@ -302,7 +302,7 @@ bool Math::IntersectionPointInRange(Point cSP1, Point cEP1, Point cSP2, Point cE
 
 	double dNormalLengthSquared = cNormal.LengthSquared();
 
-	TRACE(L"NL: %f\n", dNormalLengthSquared);
+	//TRACE(L"NL: %f\n", dNormalLengthSquared);
 
 	// 라인이 같은 평면에 존재하는지 여부 확인
 	// double d = cStartVec.Dot(dNormal);
@@ -328,7 +328,7 @@ bool Math::IntersectionPointInRange(Point cSP1, Point cEP1, Point cSP2, Point cE
 	// 교차점을 계산하기 위한 파라미터 계산
 	double dParam2 = cStartVec.Cross(cVec1).Dot(cNormal) / dNormalLengthSquared;
 
-	TRACE(L"Pa1: %f, Pa2: %f\n", dParam1, dParam2);
+	//TRACE(L"Pa1: %f, Pa2: %f\n", dParam1, dParam2);
 
 	// Line 2의 범위내에 있는지 여부 확인
 	if (dParam2 < 0.0 || dParam2 > 1.0) {

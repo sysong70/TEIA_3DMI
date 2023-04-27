@@ -185,6 +185,21 @@ USING_3DF_NAMESPACE
 Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 {
 	m_pcWindow = pcWindow;
+
+	SegmentKey cConstruction(m_pcWindow->GetBaseView()->GetConstructionKey());
+
+	m_cSnapPointSegment = cConstruction.Subsegment(L"SnapPoint");
+
+/*
+	m_cSnapPointSegment.
+
+	HC_Set_Modelling_Matrix(cMatrix.m_fData);
+
+	HC_Set_Color("edges = black");
+	HC_Set_Color("faces = white");
+	HC_Set_Visibility("faces");
+
+	HC_Set_Edge_Weight(2);*/
 }
 
 //== 1. Object Snap 계산 =============================================================================== 
@@ -197,7 +212,7 @@ Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 void Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults & cInItems)
 {
 	// 단일 Object Snap Point를 계산한다. 이 경우 첫번째 Item만 처리한다.
-	SelectionItem * pcItem = cInItems.GetHead();
+	SelectionItem * pcItem = cInItems.Front();
 
 	if (nullptr != pcItem) {
 		WorldPoint cWorldPoint;
@@ -222,11 +237,17 @@ void Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults & cI
 		}
 	}
 
-	// 상호간의 Object Snap Point를 계산한다.
-	POSITION pcPosition = cInItems.GetHeadPosition();
+	//----- 상호간의 Object Snap Point를 계산한다. -----
+
+	SelectionResultsIterator cIter = cInItems.GetIterator();
 	
 	// 제일 첫번째 Item을 메인으로 해서 계산을 진행한다.
-	pcItem = cInItems.GetNext(pcPosition);
+
+	if(false == cIter.IsValid()) { // 정상적인 상태인지 확인.
+		return;
+	}
+
+	pcItem = cIter.GetItem();
 
 	KeyPath cPath;
 	pcItem->ShowPath(cPath);
@@ -239,24 +260,25 @@ void Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults & cI
 		return;
 	}
 
-	while (nullptr != pcPosition) {
-		// 다음 Item을 가져온다.
-		SelectionItem * pcNextItem = cInItems.GetNext(pcPosition);
+	// 다음 Item을 가져온다.
+	cIter.Next();
 
+	while (cIter.IsValid()) {
+		SelectionItem * pcNextItem = cIter.GetItem();
 		KeyPath cNextPath;
 		pcNextItem->ShowPath(cNextPath);
-
 		Matrix cNextMatrix;
 		cNextPath.ShowNetModellingMatrix(cNextMatrix);
-
 		Key cNextSelection;
 		if (true == pcNextItem->ShowSelectedItem(cNextSelection)) {
- 			if (Type::LineKey == cSelection.Type() && Type::LineKey == cNextSelection.Type()) {
+			if (Type::LineKey == cSelection.Type() && Type::LineKey == cNextSelection.Type()) {
 				LineKey cLine = LineKey(cSelection);
 				LineKey cNextLine = LineKey(cNextSelection);
  				CalculationLienAndLineObjectSnapPoint(cLine, cNextLine, cMatrix, cNextMatrix);
  			}
 		}
+		// 다음 Item을 가져온다.
+		cIter.Next();
 	}
 }
 
@@ -347,6 +369,34 @@ void Operator::ObjectSnap::DrawObjectSnapPoint(TDF::SelectionResults & cInItems)
 
 void Operator::ObjectSnap::DrawSnapItems()
 {
+	SegmentKey cSecne(m_pcWindow->GetSceneKey());
+
+	CameraKit cCamera;
+	cSecne.ShowCamera(cCamera);
+
+	Matrix cMatrix;
+	cCamera.ShowMatrix(cMatrix);
+
+	Vector cXAixs = cMatrix.XAxis();
+	Vector cYAixs = cMatrix.YAxis();
+	Vector cOrigin = cMatrix.Origin();
+
+	m_cSnapPointSegment.ForcedOpen(); {
+
+		HC_Flush_Contents(".", "geometry, segment");
+
+		for (auto pcItem : m_vSnapItems) {
+			Point2D cDropPoint = pcItem->cPoint.DropPoint(cOrigin, cXAixs, cYAixs);
+			HDraw::DrawSnapPoint(m_pcWindow->GetBaseView(), cMatrix, cDropPoint);
+		}
+
+	} m_cSnapPointSegment.ForcedClose();
+
+	m_pcWindow->GetBaseView()->Update();
+}
+
+void Operator::ObjectSnap::DrawSnapItems1()
+{
 	HC_KEY nConstructionKey = m_pcWindow->GetBaseView()->GetConstructionKey();
 
 	// Camera 정보를 받아옴.
@@ -375,11 +425,8 @@ void Operator::ObjectSnap::DrawSnapItems()
 
 	Vector cXAxis = cYAxis.Cross(cViewNormal);
 
-
-	for (POSITION pcPosition = m_aSnapItems.GetHeadPosition(); nullptr != pcPosition; ) {
-		SnapItem * pcItem = m_aSnapItems.GetNext(pcPosition);
-
-		switch (pcItem->eType) 
+	for (auto pcItem : m_vSnapItems) {
+		switch (pcItem->eType)
 		{
 			case SnapType::EndPoint:
 				//cConstruction.InsertCircle(pcItem->cPoint, 2.0, cViewNormal);
@@ -526,7 +573,7 @@ void Operator::ObjectSnap::DrawCircle(SegmentKey & cConstruction, Point cPoint, 
 {
 	RGBAColor cDiffuseColor(GetRValue(nColor) / 255.0, GetGValue(nColor) / 255.0, GetBValue(nColor) / 255.0);
 	MaterialMappingKit cMaterial;
-	cMaterial.SetColor(cDiffuseColor);
+	cMaterial.SetLineColor(cDiffuseColor);
 
 	PixelPoint cRadiusPoints[2];
 	cRadiusPoints[1].x = 100.0f;
@@ -537,11 +584,9 @@ void Operator::ObjectSnap::DrawCircle(SegmentKey & cConstruction, Point cPoint, 
 	float fRadius = cWorldPoint1.DistanceWith(cWorldPoint2);
 
 	SegmentKey cCircle = cConstruction.Subsegment();
- 	cCircle.SetMaterialMapping("geometry", cMaterial);
+ 	cCircle.SetMaterialMapping(cMaterial);
  	cCircle.GetVisibilityControl().SetFaces(true);
  	cCircle.InsertCircle(cPoint, fRadius, cViewNormal);
-
-
 
 
 	//cCircle.ForcedOpen();
@@ -554,7 +599,7 @@ void Operator::ObjectSnap::DrawRectangle(SegmentKey & cConstruction, Point cPoin
 {
 	RGBAColor cDiffuseColor(GetRValue(nColor) / 255.0, GetGValue(nColor) / 255.0, GetBValue(nColor) / 255.0);
 	MaterialMappingKit cMaterial;
-	cMaterial.SetColor(cDiffuseColor);
+	cMaterial.SetLineColor(cDiffuseColor);
 
 	PixelPoint cRadiusPoints[2];
 	cRadiusPoints[1].x = 100.0f;
@@ -564,7 +609,7 @@ void Operator::ObjectSnap::DrawRectangle(SegmentKey & cConstruction, Point cPoin
 	float fRadius = cWorldPoint1.DistanceWith(cWorldPoint2);
 
 	SegmentKey cCircle = cConstruction.Subsegment();
-	cCircle.SetMaterialMapping("geometry", cMaterial);
+	cCircle.SetMaterialMapping(cMaterial);
 	cCircle.GetVisibilityControl().SetFaces(true);
 	cCircle.InsertCircle(cPoint, fRadius, cViewNormal);
 
@@ -740,7 +785,7 @@ bool Operator::ObjectSnap::AddSnapItem(Key & cInKey, Point cSnapPoint, SnapType 
 	SnapItem * psSnapItem = new SnapItem();
 	psSnapItem->cPoint = cSnapPoint;
 	psSnapItem->eType = eType;
-	m_aSnapItems.AddTail(psSnapItem);
+	m_vSnapItems.push_back(psSnapItem);
 
 	return true;
 }
@@ -748,13 +793,9 @@ bool Operator::ObjectSnap::AddSnapItem(Key & cInKey, Point cSnapPoint, SnapType 
 void Operator::ObjectSnap::ResetSnapItem()
 {
 	// m_aSnapItems을 삭제
-
-	POSITION pos = m_aSnapItems.GetHeadPosition();
-	while (pos != NULL)
-	{
-		SnapItem * psSnapItem = m_aSnapItems.GetNext(pos);
-		delete psSnapItem;
+	for (auto pcSnapItem : m_vSnapItems) {
+		delete pcSnapItem;
 	}
 
-	m_aSnapItems.RemoveAll();
+	m_vSnapItems.clear();
 }

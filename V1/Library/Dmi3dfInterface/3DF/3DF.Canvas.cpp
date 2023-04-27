@@ -25,7 +25,7 @@
 
 #include "3DF.Selectability.h"
 #include "3DF.Visibility.h"
-#include "3DF.MaterialMapping.h"
+#include "3DF.Material.h"
 
 #include "3DF.Operator.CameraOrbitSelect.h"
 #include "3DF.Operator.CameraPan.h"
@@ -124,8 +124,11 @@ void Canvas::Init()
 		HC_Set_Selectability("everything = off");
 	} HC_Close_Segment();
 
+
 	// set up some scene defaults
 	HC_Open_Segment_By_Key(m_pcBaseView->GetSceneKey()); {
+		// #Selection: Line이 더 잘보이게 하고 선택이 잘되도록 하기 위해서 Face를 뒤로 보냄
+		HC_Set_Rendering_Options("face displacement = 16"); // 양수값이 Camera에서 멀어지는 방향임.
 		HC_Set_Rendering_Options("no color interpolation, color index interpolation");
 		HC_Set_Visibility("lights = (faces = on, edges = off), markers = off, faces=on, edges=off, lines=on, text = on");
 	} HC_Close_Segment();
@@ -305,12 +308,20 @@ void Canvas::Init()
 
 	HPixelRGBA cHighlightSelectColor;
 	cHighlightSelectColor.Set(255, 0, 0);
+
 	m_pcBaseView->GetHighlightSelection()->SetSelectionFaceColor(cHighlightSelectColor);
 	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeColor(cHighlightSelectColor);
 	m_pcBaseView->GetHighlightSelection()->SetSelectionMarkerColor(cHighlightSelectColor);
 
-	m_pcBaseView->GetSelection()->SetSelectionEdgeWeight(2.0);
-	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeWeight(2.0);
+	m_pcBaseView->GetSelection()->SetSelectionEdgeWeight(5.0);
+	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeWeight(5.0);
+
+	// #Selection: Highlighting Line, Edge 두께 설정
+	HC_KEY nHighlightSelectionKey = m_pcBaseView->GetHighlightSelection()->GetSelectionSegment();
+	HC_Open_Segment_By_Key(nHighlightSelectionKey); {
+		HC_Set_Line_Weight(3.0);
+		HC_Set_Edge_Weight(3.0);
+	} HC_Close_Segment();
 
 	m_pcBaseView->GetHighlightSelection()->SetGrayScale(false);// CAppSet_bGrayScaleSelection);
 	m_pcBaseView->GetHighlightSelection()->SetUseDefinedHighlight(false);// CAppSet_bUseDefinedHighlighting);
@@ -679,11 +690,12 @@ void Canvas::Init()
 
 	SetDefaultOperator();
 
-//	m_pcWindow->GetSelectionOptionsControl().SetLevel(Selection::Level::Entity);
-	//m_pcWindow->GetSelectionOptionsControl().SetProximity(0.1);
-	m_pcWindow->GetSelectionOptionsControl().SetBias(Selection::Bias::Lines);// .SetBias(Selection::Bias::Markers);
-//	m_pcWindow->GetSelectionOptionsControl().SetRelatedLimit(5);
-	//m_pcWindow->GetSelectionOptionsControl().SetInternalLimit(5);
+	// #Selection: Selection Option 설정 
+	m_pcWindow->GetSelectionOptionsControl().SetLevel(Selection::Level::Entity);
+	m_pcWindow->GetSelectionOptionsControl().SetRelatedLimit(10);
+	m_pcWindow->GetSelectionOptionsControl().SetProximity(0.2f);
+	//m_pcWindow->GetSelectionOptionsControl().SetBias(Selection::Bias::Lines);
+	//m_pcWindow->GetSelectionOptionsControl().SetSorting(Selection::Sorting::Proximity); // Sorting 해도 Z방향 Sort가 정확하게 되지는 않됨.
 
 	// Object Snap용 Glyph 생성
 	Operator::ObjectSnap::CreateGlyph();

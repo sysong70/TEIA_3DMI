@@ -3,7 +3,7 @@
 #include "Json.h"
 
 #include <3DF/3DF.Segment.h>
-#include <3DF/3DF.MaterialMapping.h>
+#include <3DF/3DF.Material.h>
 
 #include <3DF/3DF.PMI.Entity.h>
 
@@ -195,8 +195,8 @@ protected:
 	A3DStatus SetMarkerStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
 	A3DStatus SetMarkerStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData);
 
-	A3DStatus GetMaterialMapping(const A3DMiscCascadedAttributesData & cAttrsData, A3DInt32 * pnUVCoordinatesIndex, A3DUns8 * pucTextureDimension, TDF::MaterialMappingKit & cMaterialKit);
-	A3DStatus GetMaterialMapping(const A3DMiscCascadedAttributesData & cAttrsData, TDF::MaterialMappingKit & cMaterialKit);
+	A3DStatus GetMaterial(const A3DMiscCascadedAttributesData & cAttrsData, A3DInt32 * pnUVCoordinatesIndex, A3DUns8 * pucTextureDimension, TDF::MaterialKit & cMaterialKit);
+	A3DStatus GetMaterial(const A3DMiscCascadedAttributesData & cAttrsData, TDF::MaterialKit & cMaterialKit);
 
 	bool ParseTopoContextScale(const A3DTopoBody * pcBody, double & dTopoContextScale);
 
@@ -204,7 +204,7 @@ protected:
 
 	//== Texture 관련 함수 ===========================================================================
 	A3DStatus PopulateTextures(TDF::SegmentKey & cSegment);
-	A3DStatus GetTextureMapping(const A3DMiscCascadedAttributesData & cAttrsData, TDF::MaterialMappingKit & cMaterialKit);
+	A3DStatus GetTextureMapping(const A3DMiscCascadedAttributesData & cAttrsData, TDF::MaterialKit & cMaterialKit);
 	A3DStatus SetTextureMapping(TDF::SegmentKey cSegment, A3DMiscCascadedAttributesData & sAttrData);
 
 	void InvertImage(unsigned char * imagebuffer, int width, int height, bool rgba);
@@ -219,9 +219,9 @@ protected:
 
 	A3DStatus IsShow(const A3DRootBaseWithGraphics * pGraphics);
 
-	bool SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::MaterialMappingKit const & cInKit, TDF::SegmentKey & cSegment);
-	bool SetLineMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::MaterialMappingKit const & cInKit, TDF::SegmentKey & cSegment);
-	bool SetMarkerMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::MaterialMappingKit const & cInKit, TDF::SegmentKey & cSegment);
+	bool SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::MaterialKit const & cInKit, TDF::SegmentKey & cSegment);
+	bool SetLineMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::MaterialKit const & cInKit, TDF::SegmentKey & cSegment);
+	bool SetMarkerMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::MaterialKit const & cInKit, TDF::SegmentKey & cSegment);
 
 	bool SetStyle(TDF::SegmentKey & cSegment, TDF::SegmentKey & cStyleSegment);
 	bool FindFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::SegmentKey & cOutStyleSegment);

@@ -118,3 +118,17 @@ void SegmentKeyPrivate::SetKeyValue(HC_KEY nInKey)
 	m_nKey = nInKey;
 }
 
+void SegmentKeyPrivate::SetColor(CString strInGeometryName, RGBAColor cInColor)
+{
+	CString strColorText;
+	if (1.0f == cInColor.alpha) {
+		strColorText.Format(L"%s = (diffuse = (r=%f g=%f b=%f))", strInGeometryName, cInColor.red, cInColor.green, cInColor.blue);
+	}
+	else {
+		float fTransparency = 1.0f - cInColor.alpha;
+		strColorText.Format(L"%s = (diffuse = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", strInGeometryName, cInColor.red, cInColor.green, cInColor.blue, fTransparency, fTransparency, fTransparency);
+	}
+
+	HC_Set_Color(H_ASCII_TEXT(strColorText));
+}
+

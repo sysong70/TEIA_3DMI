@@ -488,6 +488,6 @@ void ViewManager::LoadPointCloudFile(CString strFilePathName, Canvas * pcHoopsVi
 	// Point Clouse Segment의 하부를 검색해서 색상을 변경함.
 	// Library에서 나오는 색상은 기본적으로 Black으로 나옴.
 	MaterialMappingKit cMaterialMapping;
-	cMaterialMapping.SetColor(RGBAColor(0.75, 0.75, 0.75)); // Gray Color 설정
-	Utility::ChangeSubSegmentColor(cPointCloudSegment, L"vertex", cMaterialMapping, true);
+	cMaterialMapping.SetVertexColor(RGBAColor(0.75, 0.75, 0.75)); // Gray Color 설정
+	Utility::ChangeSubSegmentColor(cPointCloudSegment, cMaterialMapping, true);
 }

@@ -1,6 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #include "3DF.Window.h"
+#include "Private/3DF.WindowPrivate.h"
 
 #include <hc.h>
 #include <HBaseOperator.h>
@@ -9,28 +10,12 @@ USING_3DF_NAMESPACE
 
 // public HBaseView, public HAnimationListener
 
-class WindowKeyPrivate : public PrivateImpl
-{
-public:
-	void Copy(WindowKeyPrivate * pcInThat)
-	{
-		m_pcBaseView = pcInThat->m_pcBaseView;
-		m_nViewId = pcInThat->m_nViewId;
-	}
-
-	HBaseView * GetBaseView() { return (HBaseView *)m_pcBaseView; }
-	const HBaseView * m_pcBaseView = nullptr;
-
-	int m_nViewId = -1;
-};
 
 WindowKey::WindowKey(HBaseView * pcBaseView)
 {
 	WindowKeyPrivate * pcImpl = new WindowKeyPrivate();
 	pcImpl->m_pcBaseView = static_cast<HBaseView *>(pcBaseView);
 	m_pcImpl = pcImpl;
-
-	m_pcSelection = new SelectionControl(*this);
 
 	// Initialize();
 }

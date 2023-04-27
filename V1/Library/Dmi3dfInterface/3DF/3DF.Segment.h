@@ -70,8 +70,7 @@ public:
 	MarkerAttributeControl const GetMarkerAttributeControl() const;
 
 	//== Material Mapping 관련 함수 ==================================================================
-	SegmentKey & SetMaterialMapping(CString strGeometry, MaterialMappingKit const & cInKit);
-	SegmentKey & SetTextureMapping(CString strGeometry, TDF::MaterialMappingKit const & cInKit);
+	SegmentKey & SetMaterialMapping(MaterialMappingKit const & cInKit);
 	MaterialMappingControl GetMaterialMappingControl();
 	MaterialMappingControl const GetMaterialMappingControl() const;
 

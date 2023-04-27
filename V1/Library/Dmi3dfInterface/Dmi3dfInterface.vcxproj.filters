@@ -111,12 +111,6 @@
     <ClInclude Include="Import\DLL.h">
       <Filter>DLL</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.MaterialMapping.h">
-      <Filter>3DF\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.Material.h">
-      <Filter>3DF</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\3DF.Math.h">
       <Filter>3DF</Filter>
     </ClInclude>
@@ -246,6 +240,12 @@
     <ClInclude Include="3DF\HDraw.h">
       <Filter>3DF</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\Private\3DF.WindowPrivate.h">
+      <Filter>3DF\Key\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Material.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -298,12 +298,6 @@
     </ClCompile>
     <ClCompile Include="Import\DLL.3DF.Interface.cpp">
       <Filter>DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\3DF.MaterialMapping.cpp">
-      <Filter>3DF\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\3DF.Material.cpp">
-      <Filter>3DF</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Math.cpp">
       <Filter>3DF</Filter>
@@ -427,6 +421,12 @@
     </ClCompile>
     <ClCompile Include="3DF\HDraw.cpp">
       <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Private\3DF.WindowPrivate.cpp">
+      <Filter>3DF\Key\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Material.cpp">
+      <Filter>3DF\Control</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

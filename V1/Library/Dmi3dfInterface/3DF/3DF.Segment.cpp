@@ -10,7 +10,7 @@
 
 #include "3DF.Selectability.h"
 #include "3DF.Visibility.h"
-#include "3DF.MaterialMapping.h"
+#include "3DF.Material.h"
 #include "3DF.MarkerAttribute.h"
 
 #include "3DF.Camera.h"
@@ -357,119 +357,63 @@ MaterialMappingControl const SegmentKey::GetMaterialMappingControl() const
 	return cMaterialMappingControl;
 }
 
-SegmentKey & SegmentKey::SetMaterialMapping(CString strGeometry, TDF::MaterialMappingKit const & cInKit)
+SegmentKey & SegmentKey::SetMaterialMapping(TDF::MaterialMappingKit const & cInKit)
 {
+	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
+
 	Open();
 
-	//bool MaterialMappingKit::ShowFaceChannel(Material::Channel eInChannel, Material::Type & eOutType, RGBAColor & cOutRgbaColor, CString & strOutTextureName, float & fOutValue) const
-	Material::Channel eInChannel = Material::Channel::DiffuseColor;
+	Material::Type eType = Material::Type::None;
 	RGBAColor cRgbaColor;
+	CString strTextureName;
 
-	if (true == cInKit.ShowColor(Material::Color::Type::Diffuse, cRgbaColor)) {
-		CString strColorText;
-
-		if (1.0f == cRgbaColor.alpha) {
-			strColorText.Format(L"%s = (diffuse = (r=%f g=%f b=%f))", strGeometry, cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
-		}
-		else {
-			float fTransparency = 1.0f - cRgbaColor.alpha;
-			strColorText.Format(L"%s = (diffuse = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", strGeometry, cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, fTransparency, fTransparency, fTransparency);
-		}
-
-		HC_Set_Color(H_ASCII_TEXT(strColorText));
-	}
-
-	if (true == cInKit.ShowColor(Material::Color::Type::Specular, cRgbaColor)) {
-		CString strColorText;
-		if (1.0f == cRgbaColor.alpha) {
-			strColorText.Format(L"%s = (specular = (r=%f g=%f b=%f))", strGeometry, cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
-		}
-		else {
-			float fTransparency = 1.0f - cRgbaColor.alpha;
-			strColorText.Format(L"%s = (specular = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", strGeometry, cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, fTransparency, fTransparency, fTransparency);
-		}
-
-		HC_Set_Color(H_ASCII_TEXT(strColorText));
-	}
-
-	if (true == cInKit.ShowColor(Material::Color::Type::Emission, cRgbaColor)) {
-		CString strColorText;
-		if (1.0f == cRgbaColor.alpha) {
-			strColorText.Format(L"%s = (emission = (r=%f g=%f b=%f))", strGeometry, cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
-		}
-		else {
-			float fTransparency = 1.0f - cRgbaColor.alpha;
-			strColorText.Format(L"%s = (emission = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", strGeometry, cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, fTransparency, fTransparency, fTransparency);
-		}
-
-		HC_Set_Color(H_ASCII_TEXT(strColorText));
-	}
-
-	if (false == cInKit.TextureName().IsEmpty()) {
-// 		RGBAColor cRgbaColor;
-// 		CString strColorText;
-// 		cInKit.ShowColor(Material::Color::Type::Diffuse, cRgbaColor);
-
-		if (true == cInKit.TextureMirror()) {
-			CString strText;
-			strText.Format(L"faces = (environment = %s, mirror = (r = 0.5 g = 0.5 b = 0.5))", cInKit.TextureName());
-			HC_Set_Color(H_ASCII_TEXT(strText));
-		}
-		else {
-			CString strText;
-			strText.Format(L"faces = (%s)", cInKit.TextureName());
-
-			HC_Set_Color(H_ASCII_TEXT(strText));
-		}
-
-		if (false == cInKit.TextureOption().IsEmpty()) {
-			CString strTextureName = cInKit.TextureName();
-			CString strTextureOption = cInKit.TextureOption();
-			HC_Define_Local_Texture(H_ASCII_TEXT(strTextureName), H_ASCII_TEXT(strTextureOption));
+	if (true == cInKit.ShowFaceChannel(Material::Channel::DiffuseColor, eType, cRgbaColor, strTextureName)) {
+		if (Material::Type::RGBAColor == eType) {
+			pcImpl->SetColor(L"faces", cRgbaColor);
 		}
 	}
 
-	Close();
-
-	/*
-		char chBuffer[MVO_BUFFER_SIZE];
-		Open();
-		HC_Show_Color(chBuffer);
-		Close();
-	*/
-
-	return *this;
-}
-
-SegmentKey & SegmentKey::SetTextureMapping(CString strGeometry, TDF::MaterialMappingKit const & cInKit)
-{
-	Open();
-
-	if (false == cInKit.TextureName().IsEmpty()) {
-		RGBAColor cRgbaColor;
-		CString strColorText;
-		cInKit.ShowColor(Material::Color::Type::Diffuse, cRgbaColor);
-
-		if (true == cInKit.TextureMirror()) {
+	if (true == cInKit.ShowFaceChannel(Material::Channel::DiffuseTexture, eType, cRgbaColor, strTextureName)) {
+		if (Material::Type::TextureName == eType) {
 			CString strText;
-			strText.Format(L"faces = environment = %s, mirror = (r = 0.5 g = 0.5 b = 0.5))", cInKit.TextureName());
+			strText.Format(L"faces = (%s)", strTextureName);
 			HC_Set_Color(H_ASCII_TEXT(strText));
 		}
-		else {
-			CString strText;
-			strText.Format(L"faces = (%s)", cInKit.TextureName());
+		else if (Material::Type::ModulatedTexture == eType) {
+		}
+	}
 
+	if (true == cInKit.ShowFaceChannel(Material::Channel::Mirror, eType, cRgbaColor, strTextureName)) {
+		if (Material::Type::TextureName == eType) {
+			CString strText;
+			strText.Format(L"faces = (environment = %s, mirror = (r = 0.5 g = 0.5 b = 0.5))", strTextureName);
 			HC_Set_Color(H_ASCII_TEXT(strText));
 		}
+		else if (Material::Type::ModulatedTexture == eType) {
+		}
+	}
 
-		if (false == cInKit.TextureOption().IsEmpty()) {
-			CString strTextureName = cInKit.TextureName();
-			CString strTextureOption = cInKit.TextureOption();
-			HC_Define_Local_Texture(H_ASCII_TEXT(strTextureName), H_ASCII_TEXT(strTextureOption));
+	if (true == cInKit.ShowLineColor(cRgbaColor)) {
+		if (Material::Type::RGBAColor == eType) {
+			pcImpl->SetColor(L"lines", cRgbaColor);
+		}
+	}
 
-// 			char chName[MVO_BUFFER_SIZE];
-// 			char chOption[MVO_BUFFER_SIZE];
-// 			HC_Show_Local_Texture(chName, chOption);
+	if (true == cInKit.ShowMarkerColor(cRgbaColor)) {
+		if (Material::Type::RGBAColor == eType) {
+			pcImpl->SetColor(L"markers", cRgbaColor);
+		}
+	}
+
+	if (true == cInKit.ShowTextColor(cRgbaColor)) {
+		if (Material::Type::RGBAColor == eType) {
+			pcImpl->SetColor(L"text", cRgbaColor);
+		}
+	}
+
+	if (true == cInKit.ShowVertexChannel(Material::Channel::DiffuseColor, eType, cRgbaColor, strTextureName)) {
+		if (Material::Type::RGBAColor == eType) {
+			pcImpl->SetColor(L"vertex", cRgbaColor);
 		}
 	}
 

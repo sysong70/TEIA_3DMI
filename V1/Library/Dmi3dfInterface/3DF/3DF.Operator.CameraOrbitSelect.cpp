@@ -106,7 +106,6 @@ int Operator::CameraOrbitSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
 {
 	// PMI Test	Code
 /*
-
 	SegmentKey cSecne(m_pcWindow->GetSceneKey());
 
 	CameraKit cCamera;
@@ -126,8 +125,6 @@ int Operator::CameraOrbitSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
 	} HC_Close_Segment();
 */
 
-
-
 	m_bOrbitMode = true;
 	return HOpCameraOrbit::OnLButtonDownAndMove(cInEvent);
 }
@@ -136,13 +133,73 @@ int Operator::CameraOrbitSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
 int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 {
 	SelectionOptionsKit cSelectOption;
-	cSelectOption.SetLevel(Selection::Level::Entity);
-	cSelectOption.SetRelatedLimit(0);
-	cSelectOption.SetInternalLimit(0);
-	cSelectOption.SetSorting(Selection::Sorting::Default);
+	cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(10).SetProximity(0.2f).SetSorting(Selection::Sorting::ZSorting);
 
+	SelectionResults cHighlightSelection;
+	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cInEvent, cSelectOption, cHighlightSelection);
+
+	// Selection된 Item들에서 Windows Point의 Z값을 이용해서 Sort하도록 한다.
+	// 1.나오는 Item은 이미 Sorting이 되어 있음.
+	// 2.맨앞에 나온 요소가 ShellKey이고, 같은 Z값에 LineKey가 있는 경우 LineKey를 사용하도록 한다.
+
+	// 신규 선택 요소 저장소는 초기화한다.
 	m_cNewHighlightSelection.Reset();
-	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cInEvent, cSelectOption, m_cNewHighlightSelection);
+
+	if (0 < nSelectedCount) {
+		SelectionResultsIterator cIter = cHighlightSelection.GetIterator();
+
+		if (true == cIter.IsValid()) {
+			SelectionItem * pcItem = cIter.GetItem();
+
+			Key cSelectKey;
+			pcItem->ShowSelectedItem(cSelectKey);
+
+			// 나오는 요소의 종류를 확인한다.
+			Type eType = cSelectKey.Type();
+
+			m_cNewHighlightSelection.PushBack(new SelectionItem(*pcItem));
+
+			if (Type::LineKey == eType) {
+				m_cNewHighlightSelection.PushBack(new SelectionItem(*pcItem));
+			}
+		}
+	}
+
+/*
+	bool bFindShellKey = false; // ShellKey를 찾았는지 여부
+	float fZValue = 0.0f; // Z값을 저장;
+
+	while (true == cIter.IsValid()) {
+		SelectionItem * pcItem = cIter.GetItem();
+
+		// Window Point를 얻어서 Z값을 얻는다.
+		WindowPoint cWindowPoint;
+		pcItem->ShowSelectionPosition(cWindowPoint);
+
+		Key cSelectKey;
+		pcItem->ShowSelectedItem(cSelectKey);
+
+		// 나오는 요소의 종류를 확인한다.
+		Type eType = cSelectKey.Type();
+
+		if (Type::LineKey == eType) {
+			m_cNewHighlightSelection.PushBack(new SelectionItem(*pcItem));
+			TRACE(L"LineKey, \t%f\n", cWindowPoint.z);
+			break;
+		}
+		// Sort가 잘되어서 별도로 처리하지 않아도 될것 같음.
+		// 일단 Code는 남겨둠.
+		else if (Type::ShellKey == eType) {
+			//m_cNewHighlightSelection.PushBack(new SelectionItem(*pcItem));
+			bFindShellKey = true;
+			fZValue = cWindowPoint.z;
+
+			TRACE(L"ShellKey, \t%f\n", cWindowPoint.z);
+		}
+
+		cIter.Next();
+	}
+*/
 
 	// Old와 New가 다르면 Old를 Unhiglight하고 Reset 시킨다.
 	if (0 < m_cOldHighlightSelection.GetCount() && m_cOldHighlightSelection != m_cNewHighlightSelection) {
@@ -150,8 +207,8 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 		m_cOldHighlightSelection.Reset();
 	}
 
-	// 새롭게 선택된 Selection Result에서 Line만 남기도록 한다.
-	m_cNewHighlightSelection.LeaveType((DWORD)TDF::Type::LineKey);
+	// 	새롭게 선택된 Selection Result에서 Line만 남기도록 한다.
+	// 	m_cNewHighlightSelection.LeaveType((DWORD)TDF::Type::LineKey);
 
 	// 추가된것이 있는 경우에 Count를 검사해서 5개까지만 남기도록 한다.
 	if (true == m_cHighlightSelection.Union(m_cNewHighlightSelection)) {
@@ -160,30 +217,26 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 		}
 	}
 
-	TRACE(L"HighlightSelection Count: %d\n", m_cHighlightSelection.GetCount());
-
 	m_cOldHighlightSelection = m_cNewHighlightSelection;
 
 	HighlightOptionsKit cKit;
 
 	if (0 < m_cNewHighlightSelection.GetCount()) {
 		m_pcWindow->GetHighlightControl().Highlight(m_cNewHighlightSelection, cKit);
-// 	if (0 < m_cHighlightSelection.GetCount()) {
-// 			m_pcWindow->GetHighlightControl().Highlight(m_cHighlightSelection, cKit);
 
 		Operator::ObjectSnap cSnap(m_pcWindow);
 		cSnap.DrawObjectSnapPoint(m_cHighlightSelection);
 	}
 	else {
 		// Object Snape 등을 지우도록 한다.
-		// 아래 code 테스트용으로 임시 Remark
-/*
 		HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetConstructionKey()); {
 			HC_Flush_Contents(".", "geometry, segment");
 		} HC_Close_Segment();
 
-		m_pcWindow->GetBaseView()->Update();*/
+		m_pcWindow->GetBaseView()->Update();
 	}
+
+	return HLISTENER_PASS_EVENT;
 
 	// PMI Test	Code
 

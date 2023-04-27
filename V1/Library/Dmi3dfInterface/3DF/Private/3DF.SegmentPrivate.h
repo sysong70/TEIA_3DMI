@@ -2,6 +2,7 @@
 
 #include "../3DF.h"
 #include "../3DF.Object.h"
+#include "../3DF.Color.h"
 
 #include "3DF.KeyPrivate.h"
 
@@ -30,6 +31,8 @@ public:
 
 	HC_KEY const KeyValue() const;
 	void SetKeyValue(HC_KEY nInKey);
+
+	void SetColor(CString strInGeometryName, RGBAColor cInColor);
 
 private:
 	mutable bool m_bOpen = false;
