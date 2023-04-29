@@ -133,6 +133,11 @@ enum class Type : uint32_t
 	TextKey									= 0x10100014,
 
 	Control									= 0x50000000,
+	CylinderAttributeControl				= 0x50000006,
+	TextAttributeControl					= 0x50000007,
+	LineAttributeControl					= 0x50000008,
+	EdgeAttributeControl					= 0x50000009,
+	CurveAttributeControl					= 0x5000000a,
 	SelectionControl						= 0x50000017,
 	HighlightControl						= 0x50000018,
 };

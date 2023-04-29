@@ -13,6 +13,7 @@
 
 #include "3DF.Camera.h"
 #include "3DF.Color.h"
+#include "3DF.Material.h"
 
 #include "3DF.Visibility.h"
 
@@ -182,24 +183,29 @@ namespace OSnap
 USING_3DF_NAMESPACE
 
 
-Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
+Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow, std::vector<SnapItem *> & vInSnapItems)
 {
 	m_pcWindow = pcWindow;
+
+	m_pvSnapItems = &vInSnapItems;
 
 	SegmentKey cConstruction(m_pcWindow->GetBaseView()->GetConstructionKey());
 
 	m_cSnapPointSegment = cConstruction.Subsegment(L"SnapPoint");
 
-/*
-	m_cSnapPointSegment.
 
-	HC_Set_Modelling_Matrix(cMatrix.m_fData);
+	MaterialKit cMaterial;
+	cMaterial.SetDiffuseColor(RGBAColor(0, 0, 0));
 
-	HC_Set_Color("edges = black");
-	HC_Set_Color("faces = white");
-	HC_Set_Visibility("faces");
+	MaterialMappingKit cMaterialMapping;
+	cMaterialMapping.SetEdgeColor(RGBAColor(0, 0, 0));
+	cMaterialMapping.SetFaceColor(RGBAColor(1, 1, 1));
 
-	HC_Set_Edge_Weight(2);*/
+	m_cSnapPointSegment.SetMaterialMapping(cMaterialMapping);
+
+	m_cSnapPointSegment.GetVisibilityControl().SetFaces(true);
+
+	HC_Set_Edge_Weight(2);
 }
 
 //== 1. Object Snap 계산 =============================================================================== 
@@ -362,12 +368,12 @@ void Operator::ObjectSnap::DrawObjectSnapPoint(TDF::SelectionResults & cInItems)
 	CalculationObjectSnapPoint(cInItems);
 
 	// Object Snap Point를 그린다.
-	DrawSnapItems();
+	DrawSnapItems(false);
 }
 
 //== Object Snap Point를 그리는 함수 ==================================================================
 
-void Operator::ObjectSnap::DrawSnapItems()
+void Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 {
 	SegmentKey cSecne(m_pcWindow->GetSceneKey());
 
@@ -381,18 +387,22 @@ void Operator::ObjectSnap::DrawSnapItems()
 	Vector cYAixs = cMatrix.YAxis();
 	Vector cOrigin = cMatrix.Origin();
 
-	m_cSnapPointSegment.ForcedOpen(); {
+	m_cSnapPointSegment.Open(); {
 
 		HC_Flush_Contents(".", "geometry, segment");
 
-		for (auto pcItem : m_vSnapItems) {
+		m_cSnapPointSegment.SetModellingMatrix(cMatrix);
+
+		for (auto pcItem : *m_pvSnapItems) {
 			Point2D cDropPoint = pcItem->cPoint.DropPoint(cOrigin, cXAixs, cYAixs);
 			HDraw::DrawSnapPoint(m_pcWindow->GetBaseView(), cMatrix, cDropPoint);
 		}
 
-	} m_cSnapPointSegment.ForcedClose();
+	} m_cSnapPointSegment.Close();
 
-	m_pcWindow->GetBaseView()->Update();
+	if(true == bUpdate) {
+		m_pcWindow->GetBaseView()->Update();
+	}
 }
 
 void Operator::ObjectSnap::DrawSnapItems1()
@@ -406,7 +416,7 @@ void Operator::ObjectSnap::DrawSnapItems1()
 	cScene.ShowCamera(cCamera);
 
 	SegmentKey cConstruction(m_pcWindow->GetBaseView()->GetConstructionKey());
-	cConstruction.ForcedOpen();
+	cConstruction.Open();
 
 	HC_Flush_Contents(".", "geometry, segment");
 
@@ -425,7 +435,7 @@ void Operator::ObjectSnap::DrawSnapItems1()
 
 	Vector cXAxis = cYAxis.Cross(cViewNormal);
 
-	for (auto pcItem : m_vSnapItems) {
+	for (auto pcItem : *m_pvSnapItems) {
 		switch (pcItem->eType)
 		{
 			case SnapType::EndPoint:
@@ -449,7 +459,7 @@ void Operator::ObjectSnap::DrawSnapItems1()
 		}
 	}
 
-	cConstruction.ForcedClose();
+	cConstruction.Close();
 
 	m_pcWindow->GetBaseView()->Update();
 }
@@ -612,8 +622,6 @@ void Operator::ObjectSnap::DrawRectangle(SegmentKey & cConstruction, Point cPoin
 	cCircle.SetMaterialMapping(cMaterial);
 	cCircle.GetVisibilityControl().SetFaces(true);
 	cCircle.InsertCircle(cPoint, fRadius, cViewNormal);
-
-	//HUtility::InsertRectangle()
 }
 
 void Operator::ObjectSnap::CreateGlyph()
@@ -785,7 +793,7 @@ bool Operator::ObjectSnap::AddSnapItem(Key & cInKey, Point cSnapPoint, SnapType 
 	SnapItem * psSnapItem = new SnapItem();
 	psSnapItem->cPoint = cSnapPoint;
 	psSnapItem->eType = eType;
-	m_vSnapItems.push_back(psSnapItem);
+	m_pvSnapItems->push_back(psSnapItem);
 
 	return true;
 }
@@ -793,9 +801,9 @@ bool Operator::ObjectSnap::AddSnapItem(Key & cInKey, Point cSnapPoint, SnapType 
 void Operator::ObjectSnap::ResetSnapItem()
 {
 	// m_aSnapItems을 삭제
-	for (auto pcSnapItem : m_vSnapItems) {
+	for (auto pcSnapItem : *m_pvSnapItems) {
 		delete pcSnapItem;
 	}
 
-	m_vSnapItems.clear();
+	m_pvSnapItems->clear();
 }

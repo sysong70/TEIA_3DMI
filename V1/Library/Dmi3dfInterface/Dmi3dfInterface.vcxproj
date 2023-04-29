@@ -128,6 +128,8 @@
     <ClInclude Include="3DF.Signal.Connector.h" />
     <ClInclude Include="3DF\3DF.Camera.h" />
     <ClInclude Include="3DF\3DF.Circle.h" />
+    <ClInclude Include="3DF\3DF.EdgeAttribute.h" />
+    <ClInclude Include="3DF\3DF.LineAttribute.h" />
     <ClInclude Include="3DF\3DF.Math.Matrix.h" />
     <ClInclude Include="3DF\HDraw.h" />
     <ClInclude Include="3DF\Private\3DF.SegmentPrivate.h" />
@@ -198,6 +200,7 @@
     <ClCompile Include="3DF\3DF.Color.cpp" />
     <ClCompile Include="3DF\3DF.Control.cpp" />
     <ClCompile Include="3DF\3DF.Database.cpp" />
+    <ClCompile Include="3DF\3DF.EdgeAttribute.cpp" />
     <ClCompile Include="3DF\3DF.Facility.Base.cpp" />
     <ClCompile Include="3DF\3DF.Facility.Preference.cpp" />
     <ClCompile Include="3DF\3DF.Geometry.cpp" />
@@ -207,6 +210,7 @@
     <ClCompile Include="3DF\3DF.Key.cpp" />
     <ClCompile Include="3DF\3DF.Kit.cpp" />
     <ClCompile Include="3DF\3DF.Line.cpp" />
+    <ClCompile Include="3DF\3DF.LineAttribute.cpp" />
     <ClCompile Include="3DF\3DF.Marker.cpp" />
     <ClCompile Include="3DF\3DF.Material.cpp" />
     <ClCompile Include="3DF\3DF.Math.cpp" />

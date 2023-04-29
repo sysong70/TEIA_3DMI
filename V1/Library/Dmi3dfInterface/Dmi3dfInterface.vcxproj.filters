@@ -246,6 +246,12 @@
     <ClInclude Include="3DF\3DF.Material.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\3DF.EdgeAttribute.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.LineAttribute.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -426,6 +432,12 @@
       <Filter>3DF\Key\Private</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Material.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.EdgeAttribute.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.LineAttribute.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
   </ItemGroup>

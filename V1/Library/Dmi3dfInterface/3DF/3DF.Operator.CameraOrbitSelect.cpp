@@ -104,29 +104,145 @@ int Operator::CameraOrbitSelect::OnLButtonUp(HEventInfo & cInEvent)
 
 int Operator::CameraOrbitSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
 {
-	// PMI Test	Code
-/*
-	SegmentKey cSecne(m_pcWindow->GetSceneKey());
-
-	CameraKit cCamera;
-	cSecne.ShowCamera(cCamera);
-
-	Matrix cMatrix;
-	cCamera.ShowMatrix(cMatrix);
-
-	WorldPoint cPoint[2];
-
-	cPoint[0] = m_cClickPoint;
-	cPoint[1] = cInEvent.GetMouseWorldPos();
-
-	// Test Object Snap
-	HC_Open_Segment_By_Key(GetView()->GetConstructionKey()); {
-		HDraw::Test(GetView(), cMatrix, cPoint[0], cPoint[1]);
-	} HC_Close_Segment();
-*/
-
 	m_bOrbitMode = true;
-	return HOpCameraOrbit::OnLButtonDownAndMove(cInEvent);
+
+	int nResult = HOpCameraOrbit_OnLButtonDownAndMove(cInEvent);
+
+	Operator::ObjectSnap cSnap(m_pcWindow, m_vSnapItems);
+	cSnap.DrawSnapItems(false);
+
+	GetView()->Update();
+
+	return nResult;
+}
+
+int Operator::CameraOrbitSelect::HOpCameraOrbit_OnLButtonDownAndMove(HEventInfo & event)
+{
+	HPoint first_point, new_point, axis, vtmp, m_real_new;
+	float theta, dist, tmp, vl;
+
+	if (!OperatorStarted()) return HBaseOperator::OnLButtonDownAndMove(event);
+
+	m_bSingleClick = false;
+	GetView()->SetViewMode(HViewUnknown);
+
+	// read mouse position
+	SetNewPoint(event.GetMouseWindowPos());
+
+	// remember the real mouse positions
+	m_real_new.x = GetNewPoint().x;
+	m_real_new.y = GetNewPoint().y;
+
+	// map screen mouse points to sphere mouse points
+	tmp = GetNewPoint().x * GetNewPoint().x + GetNewPoint().y * GetNewPoint().y;
+	vl = (float)sqrt(tmp);
+
+	new_point = GetNewPoint();
+	if (vl > 1.0f)
+	{
+		new_point.x /= vl;
+		new_point.y /= vl;
+		new_point.z = 0.0;
+	}
+	else {
+		new_point.z = (float)sqrt(1.0f - tmp);
+	}
+	SetNewPoint(new_point);
+
+	// get the axis of rotation
+	first_point = GetFirstPoint();
+	HC_Compute_Cross_Product(&first_point, &new_point, &axis);
+
+	// this is for screen mouse based movement
+	vtmp.x = m_real_new.x - m_ptRealOld.x;
+	vtmp.y = m_real_new.y - m_ptRealOld.y;
+	dist = (float)sqrt(vtmp.x * vtmp.x + vtmp.y * vtmp.y) * 90.0f;
+
+	if ((axis.x != 0.0 || axis.y != 0.0 || axis.z != 0)) {
+
+		if (GetView()->GetHandedness() == HandednessRight)
+		{
+			axis.y *= -1;
+			axis.z *= -1;
+		}
+
+		HC_Compute_Normalized_Vector(&axis, &axis);
+
+		HC_Open_Segment_By_Key(GetView()->GetSceneKey());
+
+		// project axis of rotation onto yz plane 
+		vtmp.x = 0.0;
+		vtmp.y = axis.y;
+		vtmp.z = axis.z;
+
+		// calculate angle of x orbit
+		tmp = (float)HC_Compute_Dot_Product(&axis, &vtmp);
+		if (fabs(tmp) > 1.001f || fabs(tmp) < 0.999f)
+			theta = (float)H_ACOS(tmp);
+		else
+			theta = 0.0f;
+
+
+		if (axis.x < 0.0)
+			m_Angle2 = -theta * dist;
+		else
+			m_Angle2 = theta * dist;
+
+		// project axis of rotation onto xz plane 
+		vtmp.x = axis.x;
+		vtmp.y = 0.0;
+		vtmp.z = axis.z;
+
+		// calculate angle of y orbit
+		tmp = (float)HC_Compute_Dot_Product(&axis, &vtmp);
+		if (fabs(tmp) > 1.001f || fabs(tmp) < 0.999f)
+			theta = (float)H_ACOS(tmp);
+		else
+			theta = 0.0f;
+
+		if (axis.y < 0.0)
+			m_Angle1 = theta * dist;
+		else
+			m_Angle1 = -theta * dist;
+
+		// project axis of rotation onto xy plane 
+		vtmp.x = axis.x;
+		vtmp.y = axis.y;
+		vtmp.z = 0.0;
+
+		// calculate angle of z orbit
+		tmp = (float)HC_Compute_Dot_Product(&axis, &vtmp);
+		if (fabs(tmp) > 1.001f || fabs(tmp) < 0.999f)
+			theta = (float)H_ACOS(tmp);
+		else
+			theta = 0.0f;
+
+		if (axis.z < 0.0)
+			m_Angle3 = theta * dist;
+		else
+			m_Angle3 = -theta * dist;
+
+		HC_Orbit_Camera(m_Angle1, 0);
+		HC_Orbit_Camera(0, m_Angle2);
+		HC_Roll_Camera(m_Angle3);
+
+		HC_Close_Segment();
+
+		// update default light
+		GetView()->CameraPositionChanged();
+
+	}
+
+	// update sphere space mouse
+	SetFirstPoint(GetNewPoint());
+
+	// update screen space mouse
+	m_ptRealOld.x = m_real_new.x;
+	m_ptRealOld.y = m_real_new.y;
+
+//	GetView()->Update();
+	return HOP_OK;
+
 }
 
 // Dynamic Highlighting 처리
@@ -157,7 +273,7 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 			// 나오는 요소의 종류를 확인한다.
 			Type eType = cSelectKey.Type();
 
-			m_cNewHighlightSelection.PushBack(new SelectionItem(*pcItem));
+			//m_cNewHighlightSelection.PushBack(new SelectionItem(*pcItem));
 
 			if (Type::LineKey == eType) {
 				m_cNewHighlightSelection.PushBack(new SelectionItem(*pcItem));
@@ -201,9 +317,12 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 	}
 */
 
+	HighlightOptionsKit cHighlightOptions;
+	cHighlightOptions.SetNotification(false);
+
 	// Old와 New가 다르면 Old를 Unhiglight하고 Reset 시킨다.
 	if (0 < m_cOldHighlightSelection.GetCount() && m_cOldHighlightSelection != m_cNewHighlightSelection) {
-		m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
+		m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection, cHighlightOptions);
 		m_cOldHighlightSelection.Reset();
 	}
 
@@ -219,12 +338,10 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 
 	m_cOldHighlightSelection = m_cNewHighlightSelection;
 
-	HighlightOptionsKit cKit;
-
 	if (0 < m_cNewHighlightSelection.GetCount()) {
-		m_pcWindow->GetHighlightControl().Highlight(m_cNewHighlightSelection, cKit);
+		m_pcWindow->GetHighlightControl().Highlight(m_cNewHighlightSelection, cHighlightOptions);
 
-		Operator::ObjectSnap cSnap(m_pcWindow);
+		Operator::ObjectSnap cSnap(m_pcWindow, m_vSnapItems);
 		cSnap.DrawObjectSnapPoint(m_cHighlightSelection);
 	}
 	else {
@@ -232,9 +349,9 @@ int Operator::CameraOrbitSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 		HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetConstructionKey()); {
 			HC_Flush_Contents(".", "geometry, segment");
 		} HC_Close_Segment();
-
-		m_pcWindow->GetBaseView()->Update();
 	}
+
+	m_pcWindow->GetBaseView()->ForceUpdate();
 
 	return HLISTENER_PASS_EVENT;
 

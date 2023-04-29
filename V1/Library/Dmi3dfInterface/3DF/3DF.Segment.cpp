@@ -19,6 +19,8 @@
 
 USING_3DF_NAMESPACE
 
+
+
 SegmentKey::SegmentKey(CString strInName)
 {
 	HC_KEY nKey = INVALID_KEY;
@@ -78,13 +80,33 @@ SegmentKey & SegmentKey::operator = (SegmentKey const & cInThat)
 
 //== Segment 관련 함수 ===============================================================================
 
+/*
 void SegmentKey::Open()
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
-	pcImpl->Open();
+	pcImpl->LocalOpen();
 }
 
 void SegmentKey::Open() const
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
+	pcImpl->LocalOpen();
+}
+
+void SegmentKey::Close()
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
+	pcImpl->LocalClose();
+}
+
+void SegmentKey::Close() const
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
+	pcImpl->LocalClose();
+}
+*/
+
+void SegmentKey::Open()
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
 	pcImpl->Open();
@@ -96,36 +118,6 @@ void SegmentKey::Close()
 	pcImpl->Close();
 }
 
-void SegmentKey::Close() const
-{
-	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
-	pcImpl->Close();
-}
-
-void SegmentKey::ForcedOpen()
-{
-	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
-	pcImpl->ForcedOpen();
-}
-
-void SegmentKey::ForcedClose()
-{
-	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
-	pcImpl->ForcedClose();
-}
-
-bool SegmentKey::IsOpen() const
-{
-	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
-	return pcImpl->IsOpen();
-}
-
-bool SegmentKey::IsForcedOpen() const
-{
-	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
-	return pcImpl->IsForcedOpen();	
-}
-
 //== Sub Segment 관련 함수 ===========================================================================
 SegmentKey const SegmentKey::Subsegment()
 {
@@ -135,9 +127,9 @@ SegmentKey const SegmentKey::Subsegment()
 // 
 // 	SegmentKey cSubsegment(nKey);
 
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	SegmentKey cSubsegment(strText);
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 
 	return cSubsegment;
 }
@@ -155,9 +147,9 @@ SegmentKey const SegmentKey::Subsegment(LPCTSTR chFormat, ...)
 // 
 // 	SegmentKey cSubsegment(nKey);
 
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	SegmentKey cSubsegment(strText);
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 
 	return cSubsegment;
 }
@@ -166,7 +158,7 @@ size_t SegmentKey::ShowSubsegments() const
 {
 	int nSegmentCount = 0;
 
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 
 	HC_Begin_Contents_Search(".", "segments");
 	{
@@ -174,7 +166,7 @@ size_t SegmentKey::ShowSubsegments() const
 	}
 	HC_End_Contents_Search();
 
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 
 	return nSegmentCount;
 }
@@ -183,7 +175,7 @@ size_t SegmentKey::ShowSubsegments(SegmentKeyArray & cOutChildren) const
 {
 	int nSegmentCount = 0;
 
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 
 	HC_Begin_Contents_Search(".", "segments");
 	{
@@ -207,7 +199,7 @@ size_t SegmentKey::ShowSubsegments(SegmentKeyArray & cOutChildren) const
 	}
 	HC_End_Contents_Search();
 
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 
 	return nSegmentCount;
 }
@@ -226,9 +218,9 @@ CString SegmentKey::Name() const
 
 SegmentKey & SegmentKey::SetName(CString strInName)
 {
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Rename_Segment(".", H_ASCII_TEXT(strInName));
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 
 	return *this;
 }
@@ -236,10 +228,10 @@ SegmentKey & SegmentKey::SetName(CString strInName)
 //== Include 관련 함수 ===============================================================================
 IncludeKey SegmentKey::IncludeSegment(SegmentKey const & cInSegment)
 {
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	HC_KEY nIncludeKey = HC_Include_Segment_By_Key(cInSegment.KeyValue());
 	IncludeKey cInclude(nIncludeKey);
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 
 	return cInclude;
 }
@@ -259,7 +251,7 @@ ShellKey SegmentKey::InsertShell(ShellKit const & cInKit)
 	cInKit.ShowParameters(paParameters);
 	cInKit.ShowColors(paColors);
 
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 
 	HC_KEY nShellKey = INVALID_KEY;
 	if (nullptr != pacFacelist) {
@@ -288,7 +280,7 @@ ShellKey SegmentKey::InsertShell(ShellKit const & cInKit)
 // 		}
 	}
 
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 
 	ShellKey cShell(nShellKey);
 	return cShell;
@@ -297,9 +289,9 @@ ShellKey SegmentKey::InsertShell(ShellKit const & cInKit)
 //== Line 관련 함수 ==================================================================================
 LineKey SegmentKey::InsertLine(size_t in_count, Point const pcInPoints[])
 {
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	HC_KEY nKey = HC_Insert_Polyline((int) in_count, pcInPoints);
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 
 	LineKey cLine(nKey);
 	return cLine;
@@ -308,9 +300,9 @@ LineKey SegmentKey::InsertLine(size_t in_count, Point const pcInPoints[])
 //== Circle 관련 함수 ============================================================================
 CircleKey SegmentKey::InsertCircle(Point const & cInCenter, float fInRadius, Vector const & cInNormal)
 {
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	HC_KEY nKey = HC_Insert_Circle_By_Radius(&cInCenter, fInRadius, &cInNormal);
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 
 	CircleKey cCircle(nKey);
 	return cCircle;
@@ -324,9 +316,9 @@ MarkerKey SegmentKey::InsertMarker(Point const & cInPosition)
 
 MarkerKey SegmentKey::InsertMarker(double x, double y, double z)
 {
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	HC_KEY nKey = HC_Insert_Marker(x, y, z);
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 
 	MarkerKey cMarker(nKey);
 	return cMarker;
@@ -361,7 +353,7 @@ SegmentKey & SegmentKey::SetMaterialMapping(TDF::MaterialMappingKit const & cInK
 {
 	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
 
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 
 	Material::Type eType = Material::Type::None;
 	RGBAColor cRgbaColor;
@@ -394,21 +386,15 @@ SegmentKey & SegmentKey::SetMaterialMapping(TDF::MaterialMappingKit const & cInK
 	}
 
 	if (true == cInKit.ShowLineColor(cRgbaColor)) {
-		if (Material::Type::RGBAColor == eType) {
-			pcImpl->SetColor(L"lines", cRgbaColor);
-		}
+		pcImpl->SetColor(L"lines", cRgbaColor);
 	}
 
 	if (true == cInKit.ShowMarkerColor(cRgbaColor)) {
-		if (Material::Type::RGBAColor == eType) {
-			pcImpl->SetColor(L"markers", cRgbaColor);
-		}
+		pcImpl->SetColor(L"markers", cRgbaColor);
 	}
 
 	if (true == cInKit.ShowTextColor(cRgbaColor)) {
-		if (Material::Type::RGBAColor == eType) {
-			pcImpl->SetColor(L"text", cRgbaColor);
-		}
+		pcImpl->SetColor(L"text", cRgbaColor);
 	}
 
 	if (true == cInKit.ShowVertexChannel(Material::Channel::DiffuseColor, eType, cRgbaColor, strTextureName)) {
@@ -417,7 +403,7 @@ SegmentKey & SegmentKey::SetMaterialMapping(TDF::MaterialMappingKit const & cInK
 		}
 	}
 
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 
 	return *this;
 }
@@ -437,9 +423,9 @@ SelectabilityControl const SegmentKey::GetSelectabilityControl() const
 
 SegmentKey & SegmentKey::SetSelectability(CString strList)
 {
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Selectability(H_ASCII_TEXT(strList));
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 	return *this;
 }
 
@@ -458,27 +444,27 @@ VisibilityControl const SegmentKey::GetVisibilityControl() const
 
 SegmentKey & SegmentKey::SetVisibility(CString strList)
 {
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Visibility(H_ASCII_TEXT(strList));
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 	return *this;
 }
 
 //== Condition 관련 함수 =============================================================================
 SegmentKey & SegmentKey::SetCondition(CString strInCondition)
 {
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Conditions(H_ASCII_TEXT(strInCondition));
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 	return *this;
 }
 
 //== Heuristics 관련 함수 ============================================================================
 SegmentKey & SegmentKey::SetHeuristics(CString strInHeuristics)
 {
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Heuristics(H_ASCII_TEXT(strInHeuristics));
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 	return *this;
 }
 
@@ -504,23 +490,23 @@ StyleControl SegmentKey::GetStyleControl()
 
 void SegmentKey::SetRenderingOptions(CString strList)
 {
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Rendering_Options(H_ASCII_TEXT(strList));
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 }
 
 void SegmentKey::SetColorByIndex(CString strList, int nIndex)
 {
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Color_By_Index(H_ASCII_TEXT(strList), nIndex);
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 }
 
 void SegmentKey::SetMarkerSymbol(CString strSymbol)
 {
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Marker_Symbol(H_ASCII_TEXT(strSymbol));
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 }
 
 //== Camera 관련 함수 ================================================================================
@@ -529,7 +515,7 @@ void SegmentKey::SetMarkerSymbol(CString strSymbol)
 
 bool SegmentKey::ShowCamera(CameraKit & cOutKit) const
 {
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 
 	Point cPosition;
 	Point cTarget;
@@ -557,7 +543,7 @@ bool SegmentKey::ShowCamera(CameraKit & cOutKit) const
 
 	cOutKit.SetField(fWidth, fHeight);
 
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 
 	return true;
 }
@@ -570,7 +556,7 @@ void SegmentKey::ConfigureSegmentModel()
 	//---- model include 구성 -----
 	// Model이 들아갈 Include 구성을 한다.
 	// 이 영역에, Modeling data와 Style data를 구성한다.
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 
 	SegmentKey cModelInclude = Subsegment(L"model_include");
 	cModelInclude.SetVisibility(L"off");
@@ -590,7 +576,7 @@ void SegmentKey::ConfigureSegmentModel()
 // 	m_cPoccsIncludeSegment = cIncludeSegment.Subsegment(L"poccs");
 // 	m_cRisIncludeSegment = cIncludeSegment.Subsegment(L"ris");
 
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 
 	//---- Portfolio 구성 -----
 	// 앞으로 사용을 위해서 미리 한개를 만들어 놓는다.
@@ -651,27 +637,27 @@ SegmentKey SegmentKey::StylesInclude() const
 
 SegmentKey & SegmentKey::SetModellingMatrix(MatrixKit const & cInKit)
 {
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Modelling_Matrix(cInKit.m_fData);
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 
 	return *this;
 }
 
 SegmentKey & SegmentKey::SegmentKey::UnsetModellingMatrix()
 {
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	HC_UnSet_Modelling_Matrix();
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 
 	return *this;
 }
 
 bool SegmentKey::ShowModellingMatrix(MatrixKit & cOutKit) const
 {
-	Open();
+	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Show_Modelling_Matrix(cOutKit.m_fData);
-	Close();
+	SegmentKeyPrivate::LocalClose(*this);
 
 	return true;
 }
@@ -684,9 +670,9 @@ SegmentKey & SegmentKey::SetBounding(BoundingKit const & cInKit)
 	cInKit.ShowExclusion(bExclusion);
 
 	if(true == bExclusion) {
-		Open();
+		SegmentKeyPrivate::LocalOpen(*this);
 		HC_Set_Heuristics("exclude bounding");
-		Close();
+		SegmentKeyPrivate::LocalClose(*this);
 	}
 
 	return *this;

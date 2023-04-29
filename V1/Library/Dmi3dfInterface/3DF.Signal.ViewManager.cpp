@@ -12,6 +12,8 @@
 
 #include "3DF/3DF.Model.h"
 #include "3DF/3DF.Segment.h"
+#include "3DF/Private/3DF.SegmentPrivate.h"
+
 #include "3DF/3DF.Utility.h"
 
 #include "Import/DLL.3DF.Interface.h"
@@ -146,9 +148,9 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	if (false == bPointColudData) {
 		SegmentKey cViewKey(pcCanvas->GetBaseView()->GetViewKey());
-		cViewKey.Open();
+		SegmentKeyPrivate::LocalOpen(cViewKey);
 		HC_Set_Driver_Options("eye dome lighting = off");
-		cViewKey.Close();
+		SegmentKeyPrivate::LocalClose(cViewKey);
 
 		DLL::TDF::Interface cInterfaace;
 		cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, Connector::GetInstance(nViewId), strErrorMessage);
@@ -459,9 +461,9 @@ void ViewManager::SaveHsfFile(CString strFilePathName, Canvas * pcHoopsView)
 void ViewManager::LoadPointCloudFile(CString strFilePathName, Canvas * pcHoopsView)
 {
 	SegmentKey cViewKey(pcHoopsView->GetBaseView()->GetViewKey());
-	cViewKey.Open();
+	SegmentKeyPrivate::LocalOpen(cViewKey);
 	HC_Set_Driver_Options("eye dome lighting = (on, strength=1.0)");
-	cViewKey.Close();
+	SegmentKeyPrivate::LocalClose(cViewKey);
 
 	HInputHandlerOptions cOptions;
 	cOptions.m_tk = pcHoopsView->GetBaseView()->GetModel()->GetStreamFileTK();
@@ -477,13 +479,13 @@ void ViewManager::LoadPointCloudFile(CString strFilePathName, Canvas * pcHoopsVi
 	HIOUtilityPointCloud cPointCloud;
 	
 	// 라이브러리를 사용해야 하므로 미리 cPointCloudSegment를 Open하도록 한다.
-	cPointCloudSegment.Open();
+	SegmentKeyPrivate::LocalOpen(cPointCloudSegment);
 	cPointCloud.FileInputByKey(H_ASCII_TEXT(strFilePathName), cPointCloudSegment.KeyValue(), &cOptions);
 
 	HC_UnSet_Marker_Symbol();
 	HC_Set_Marker_Size(0.2);
 
-	cPointCloudSegment.Close();
+	SegmentKeyPrivate::LocalOpen(cPointCloudSegment);
 
 	// Point Clouse Segment의 하부를 검색해서 색상을 변경함.
 	// Library에서 나오는 색상은 기본적으로 Black으로 나옴.

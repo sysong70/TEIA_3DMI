@@ -3,6 +3,7 @@
 #include "3DF.Selectability.h"
 
 #include "3DF.Segment.h"
+#include "./Private/3DF.SegmentPrivate.h"
 
 #include <HUtility.h>
 #include <HTools.h>
@@ -288,35 +289,35 @@ SelectabilityControl & SelectabilityControl::UnsetGeometry()
 
 SelectabilityControl & SelectabilityControl::UnsetEverything()
 {
-	m_cInSegmentKey.Open();
+	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
 	HC_UnSet_Selectability();
 
-	m_cInSegmentKey.Close();
+	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 
 	return *this;
 }
 
 SelectabilityControl & SelectabilityControl::SetSelectability(CString strInType, bool bInValue)
 {
-	m_cInSegmentKey.Open();
+	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
 	CString strList;
 	strList.Format(L"%s = %s", strInType, (true == bInValue ? L"on" : L"off"));
 	HC_Set_Selectability(H_ASCII_TEXT(strList));
 
-	m_cInSegmentKey.Close();
+	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 
 	return *this;
 }
 
 SelectabilityControl & SelectabilityControl::UnSetSelectability(CString strInType)
 {
-	m_cInSegmentKey.Open();
+	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
 	HC_UnSet_One_Selectability(H_ASCII_TEXT(strInType));
 
-	m_cInSegmentKey.Close();
+	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 
 	return *this;
 }

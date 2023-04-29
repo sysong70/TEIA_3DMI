@@ -24,10 +24,14 @@ public:
 	HighlightOptionsKit(char const * chInStyleName, char const * chInSecondaryStyleName);
 	HighlightOptionsKit(HighlightOptionsKit const & cInThat);
 
-	virtual ~HighlightOptionsKit();
-
 	void Set(HighlightOptionsKit const & cInThat);
 	HighlightOptionsKit & operator=(HighlightOptionsKit const & cInThat);
+
+	// Whether to inject a notification event after highlighting (or unhighlighting).
+	// param: bInState Whether to inject a notification event after highlighting(or unhighlighting).
+	HighlightOptionsKit & SetNotification(bool bInState);
+	HighlightOptionsKit & UnsetNotification();
+	bool ShowNotification(bool & bOutState) const;
 };
 
 class HighlightControl : public Control
@@ -41,8 +45,6 @@ public:
 	HighlightControl & operator=(HighlightControl const & cInThat);
 
 	TDF::Type ObjectType() const { return TDF::Type::HighlightControl; };
-
-	void DynamicHighlight(Point const & cInLocation);
 
 	HighlightControl & Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting = true);
 

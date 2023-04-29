@@ -17,16 +17,20 @@ public:
 	void Copy(SegmentKeyPrivate * pcInThat);
 
 	//== Segment 관련 함수 ===========================================================================
+	void LocalOpen();
+	void LocalOpen() const;
+	static void LocalOpen(SegmentKey & cSegmentKey);
+	static void LocalOpen(SegmentKey const & cSegmentKey);
+
+	void LocalClose();
+	void LocalClose() const;
+	static void LocalClose(SegmentKey & cSegmentKey);
+	static void LocalClose(SegmentKey const & cSegmentKey);
+
 	void Open();
-	void Open() const;
-
 	void Close();
-	void Close() const;
 
-	void ForcedOpen();
-	void ForcedClose();
-
-	bool IsOpen() const;
+	bool IsLocalOpen() const;
 	bool IsForcedOpen() const;
 
 	HC_KEY const KeyValue() const;

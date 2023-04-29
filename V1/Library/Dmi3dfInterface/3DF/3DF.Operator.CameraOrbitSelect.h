@@ -5,6 +5,8 @@
 
 #include "3DF.Selection.h"
 
+#include "3DF.Operator.ObjectSnap.h"
+
 #include <HOpCameraOrbit.h>
 
 OPEN_3DF_NAMESPACE
@@ -28,6 +30,8 @@ namespace Operator
 		int OnLButtonDown(HEventInfo & cInEvent) override;
 		int OnLButtonDownAndMove(HEventInfo & cInEvent) override;
 		int OnNoButtonDownAndMove(HEventInfo & cInEvent) override;
+	private:
+		int HOpCameraOrbit_OnLButtonDownAndMove(HEventInfo & event);
 
 	protected:
 		bool m_bOrbitMode;
@@ -43,6 +47,8 @@ namespace Operator
 
 	private:
 		HPoint m_cClickPoint;
+
+		std::vector<ObjectSnap::SnapItem *> m_vSnapItems;
 	};
 }
 

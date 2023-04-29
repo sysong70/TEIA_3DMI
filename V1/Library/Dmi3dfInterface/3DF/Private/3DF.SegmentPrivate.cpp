@@ -3,6 +3,7 @@
 #include <HTools.h>
 
 #include "3DF.SegmentPrivate.h"
+#include "../3DF.Segment.h"
 
 USING_3DF_NAMESPACE
 
@@ -13,69 +14,93 @@ void SegmentKeyPrivate::Copy(SegmentKeyPrivate * pcInThat)
 }
 
 //== Segment 관련 함수 ===============================================================================
+void SegmentKeyPrivate::LocalOpen()
+{
+	if (true == m_bForcedOpen) {
+		return;
+	}
+
+	if (true == m_bOpen) {
+		return;
+	}
+
+	m_bOpen = true;
+
+	assert(INVALID_KEY != m_nKey);
+	HC_Open_Segment_By_Key(m_nKey);
+}
+
+void SegmentKeyPrivate::LocalOpen() const
+{
+	if (true == m_bForcedOpen) {
+		return;
+	}
+
+	if (true == m_bOpen) {
+		return;
+	}
+
+	m_bOpen = true;
+
+	assert(INVALID_KEY != m_nKey);
+	HC_Open_Segment_By_Key(m_nKey);
+}
+
+void SegmentKeyPrivate::LocalOpen(SegmentKey & cSegmentKey)
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)cSegmentKey.GetImpl();
+	pcImpl->LocalOpen();
+}
+
+void SegmentKeyPrivate::LocalOpen(SegmentKey const & cSegmentKey)
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)cSegmentKey.GetImpl();
+	pcImpl->LocalOpen();
+}
+
+void SegmentKeyPrivate::LocalClose()
+{
+	if (true == m_bForcedOpen) {
+		return;
+	}
+
+	if (false == m_bOpen) {
+		return;
+	}
+
+	m_bOpen = false;
+	assert(INVALID_KEY != m_nKey);
+	HC_Close_Segment();
+}
+
+void SegmentKeyPrivate::LocalClose() const
+{
+	if (true == m_bForcedOpen) {
+		return;
+	}
+
+	if (false == m_bOpen) {
+		return;
+	}
+
+	m_bOpen = false;
+	assert(INVALID_KEY != m_nKey);
+	HC_Close_Segment();
+}
+
+void SegmentKeyPrivate::LocalClose(SegmentKey & cSegmentKey)
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)cSegmentKey.GetImpl();
+	pcImpl->LocalClose();
+}
+
+void TDF::SegmentKeyPrivate::LocalClose(SegmentKey const & cSegmentKey)
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)cSegmentKey.GetImpl();
+	pcImpl->LocalClose();
+}
+
 void SegmentKeyPrivate::Open()
-{
-	if (true == m_bForcedOpen) {
-		return;
-	}
-
-	if (true == m_bOpen) {
-		return;
-	}
-
-	m_bOpen = true;
-
-	assert(INVALID_KEY != m_nKey);
-	HC_Open_Segment_By_Key(m_nKey);
-}
-
-void SegmentKeyPrivate::Open() const
-{
-	if (true == m_bForcedOpen) {
-		return;
-	}
-
-	if (true == m_bOpen) {
-		return;
-	}
-
-	m_bOpen = true;
-
-	assert(INVALID_KEY != m_nKey);
-	HC_Open_Segment_By_Key(m_nKey);
-}
-
-void SegmentKeyPrivate::Close()
-{
-	if (true == m_bForcedOpen) {
-		return;
-	}
-
-	if (false == m_bOpen) {
-		return;
-	}
-
-	m_bOpen = false;
-	assert(INVALID_KEY != m_nKey);
-	HC_Close_Segment();
-}
-
-void SegmentKeyPrivate::Close() const
-{
-	if (true == m_bForcedOpen) {
-		return;
-	}
-
-	if (false == m_bOpen) {
-		return;
-	}
-
-	m_bOpen = false;
-	assert(INVALID_KEY != m_nKey);
-	HC_Close_Segment();
-}
-
-void SegmentKeyPrivate::ForcedOpen()
 {
 	m_bForcedOpen = true;
 
@@ -87,7 +112,7 @@ void SegmentKeyPrivate::ForcedOpen()
 	HC_Open_Segment_By_Key(m_nKey);
 }
 
-void SegmentKeyPrivate::ForcedClose()
+void SegmentKeyPrivate::Close()
 {
 	if (false == m_bOpen) {
 		return;
@@ -98,7 +123,7 @@ void SegmentKeyPrivate::ForcedClose()
 	HC_Close_Segment();
 }
 
-bool SegmentKeyPrivate::IsOpen() const
+bool SegmentKeyPrivate::IsLocalOpen() const
 {
 	return m_bOpen;
 }

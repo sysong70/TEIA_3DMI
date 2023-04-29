@@ -7,6 +7,15 @@
 
 USING_3DF_NAMESPACE
 
+class ControlPrivate : public TDF::PrivateImpl
+{
+public:
+	
+
+
+};
+
+
 Control::Control(HC_KEY nKey)
 {
 	m_nKey = nKey;

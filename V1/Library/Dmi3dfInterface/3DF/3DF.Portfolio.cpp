@@ -3,6 +3,8 @@
 #include "3DF.Portfolio.h"
 
 #include "3DF.Segment.h"
+#include "./Private/3DF.SegmentPrivate.h"
+
 #include "3DF.Style.h"
 
 #include <HTools.h>
@@ -38,15 +40,13 @@ PortfolioKey & PortfolioKey::operator = (PortfolioKey const & cInThat)
 
 NamedStyleDefinition PortfolioKey::DefineNamedStyle(CString strInName, SegmentKey const & cInStyleSource)
 {
-	Open();
-	HC_KEY nKey = HC_Open_Segment(H_ASCII_TEXT(strInName));
-	
-	//HC_Define_Named_Style_By_Key(H_ASCII_TEXT(strInName), cInStyleSource.KeyValue());
+	SegmentKeyPrivate::LocalOpen(*this);
 
-	HC_Close_Segment();
-	Close();
+	SegmentKey cSubSegment = Subsegment(strInName);
 
-	NamedStyleDefinition cStyle(nKey);
+	SegmentKeyPrivate::LocalClose(*this);
+
+	NamedStyleDefinition cStyle(cSubSegment.KeyValue());
 	return cStyle;
 }
 

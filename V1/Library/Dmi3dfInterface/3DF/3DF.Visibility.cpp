@@ -3,6 +3,7 @@
 #include "3DF.Visibility.h"
 
 #include "3DF.Segment.h"
+#include "./Private/3DF.SegmentPrivate.h"
 
 #include <HUtility.h>
 #include <HTools.h>
@@ -248,35 +249,35 @@ VisibilityControl & VisibilityControl::UnsetGeometry()
 
 VisibilityControl & VisibilityControl::UnsetEverything()
 {
-	m_cInSegmentKey.Open();
+	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
 	HC_UnSet_Visibility();
 
-	m_cInSegmentKey.Close();
+	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 
 	return *this;
 }
 
 VisibilityControl & VisibilityControl::SetVisibility(CString strInType, bool bInValue)
 {
-	m_cInSegmentKey.Open();
+	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
 	CString strList;
 	strList.Format(L"%s = %s", strInType, (true == bInValue ? L"on" : L"off"));
 	HC_Set_Visibility(H_ASCII_TEXT(strList));
 
-	m_cInSegmentKey.Close();
+	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 
 	return *this;
 }
 
 VisibilityControl & VisibilityControl::UnSetVisibility(CString strInType)
 {
-	m_cInSegmentKey.Open();
+	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
 	HC_UnSet_One_Visibility(H_ASCII_TEXT(strInType));
 
-	m_cInSegmentKey.Close();
+	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 
 	return *this;
 }

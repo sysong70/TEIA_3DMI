@@ -32,10 +32,12 @@ public:
 	void Copy(HighlightOptionsKitPrivate * pcInThat) {
 		strncpy(m_chInStyleName, pcInThat->m_chInStyleName, STYLE_BUFFER_SIZE);
 		strncpy(m_chInSecondaryStyleName, pcInThat->m_chInSecondaryStyleName, STYLE_BUFFER_SIZE);
+		m_nNotification = pcInThat->m_nNotification;
 	}
 
 	char m_chInStyleName[STYLE_BUFFER_SIZE];
 	char m_chInSecondaryStyleName[STYLE_BUFFER_SIZE];
+	int m_nNotification = -1;
 };
 
 TDF::HighlightOptionsKit::HighlightOptionsKit()
@@ -64,11 +66,6 @@ TDF::HighlightOptionsKit::HighlightOptionsKit(HighlightOptionsKit const & cInTha
 	Set(cInThat);
 }
 
-TDF::HighlightOptionsKit::~HighlightOptionsKit()
-{
-
-}
-
 void TDF::HighlightOptionsKit::Set(HighlightOptionsKit const & cInThat)
 {
 	HighlightOptionsKitPrivate * pcImpl = (HighlightOptionsKitPrivate *)m_pcImpl;
@@ -80,6 +77,38 @@ HighlightOptionsKit & TDF::HighlightOptionsKit::operator=(HighlightOptionsKit co
 {
 	Set(cInThat);
 	return *this;
+}
+
+HighlightOptionsKit & HighlightOptionsKit::SetNotification(bool bInState)
+{
+	HighlightOptionsKitPrivate * pcImpl = (HighlightOptionsKitPrivate *)m_pcImpl;
+
+	if (true == bInState) {
+		pcImpl->m_nNotification = true;
+	}
+	else {
+		pcImpl->m_nNotification = false;
+	}
+
+	return *this;
+}
+
+HighlightOptionsKit & HighlightOptionsKit::UnsetNotification()
+{
+	HighlightOptionsKitPrivate * pcImpl = (HighlightOptionsKitPrivate *)m_pcImpl;
+	pcImpl->m_nNotification = -1;
+	return *this;
+}
+
+bool HighlightOptionsKit::ShowNotification(bool & bOutState) const
+{
+	HighlightOptionsKitPrivate * pcImpl = (HighlightOptionsKitPrivate *)m_pcImpl;
+	if (0 > pcImpl->m_nNotification) {
+		return false;
+	}
+
+	bOutState = (0 != pcImpl->m_nNotification);
+	return true;
 }
 
 //== HighlightControl Class ========================================================================
@@ -137,146 +166,6 @@ HighlightControl & TDF::HighlightControl::operator=(HighlightControl const & cIn
 {
 	Set(cInThat);
 	return *this;
-}
-
-void TDF::HighlightControl::DynamicHighlight(Point const & cInLocation)
-{
-	HighlightControlPrivate * pcImpl = (HighlightControlPrivate *)m_pcImpl;
-	HBaseView * pcView = pcImpl->GetBaseView();
-
-	int res, offset1, offset2, offset3;
-	char pathname[MVO_SEGMENT_PATHNAME_BUFFER], type[MVO_BUFFER_SIZE];
-	HC_KEY nKey;
-
-	if (!pcView->GetDynamicHighlighting()
-		|| pcView->GetSuppressUpdateTick()
-		|| pcView->GetSuppressUpdate()
-		|| !pcView->GetModel()->GetFileLoadComplete())
-		return;
-
-	HC_Open_Segment_By_Key(pcView->GetViewKey());
-	res = HC_Compute_Selection(".", "./scene/overwrite", "v, selection level = entity", cInLocation.x, cInLocation.y);
-	HC_Close_Segment();
-
-	// compute the selection using the HOOPS window coordinate of the pick location
-	bool bNeedDeselect = true;
-	bool bNeedUpdate = true;
-
-	if (res)
-	{
-		HC_Show_Selection_Element(&nKey, &offset1, &offset2, &offset3);
-		HC_Show_Selection_Pathname(pathname);
-
-		int incl_count;
-		int skey_count;
-		char skey_type[MVO_BUFFER_SIZE];
-
-		HC_Show_Selection_Keys_Count(&skey_count);
-
-		HC_KEY * keys = new HC_KEY[skey_count];
-		HC_KEY * incl_keys = new HC_KEY[skey_count];
-		HC_Show_Selection_Keys(&skey_count, keys);
-
-		incl_count = 0;
-		for (int i = skey_count - 1; i >= 0; i--)
-		{
-			HC_Show_Key_Type(keys[i], skey_type);
-			if (strstr(skey_type, "include"))
-			{
-				incl_keys[incl_count] = keys[i];
-				incl_count++;
-			}
-			else if (streq(skey_type, "reference")) {
-				nKey = keys[i];
-				break;
-			}
-		}
-
-		// Get the type of the selected
-		HC_Show_Key_Type(nKey, type);
-
-		//if we have a shell with visible faces, we may need to select regions
-		if (streq(type, "shell") && offset3 != -1)
-		{
-			int region;
-			int lowest = 0;
-			int highest = 0;
-
-			if (pcView->GetHighlightSelection()->GetAllowRegionSelection()) {
-				HC_Show_Region_Range(nKey, &lowest, &highest);
-
-				if (lowest != highest || lowest > 0)
-				{
-					HC_Open_Geometry(nKey); {
-						HC_Open_Face(offset3); {
-							HC_Show_Region(&region);
-						}HC_Close_Face();
-					}HC_Close_Geometry();
-
-					bNeedDeselect = false;
-
-					if (!pcView->GetHighlightSelection()->IsRegionSelected(nKey, incl_count, incl_keys, region))
-					{
-						pcView->GetHighlightSelection()->DeSelectAll();
-						pcView->GetHighlightSelection()->SelectRegion(nKey, incl_count, incl_keys, region, false);
-					}
-					else {
-						bNeedUpdate = false;
-					}
-
-					goto DONE;
-				}
-			}
-
-			//NON-REGION SELECT FALLS THROUGH
-		}
-
-		bNeedDeselect = false;
-
-		if (!pcView->GetHighlightSelection()->IsSelected(nKey, incl_count, incl_keys)) {
-			if (pcView->GetHighlightSelection()->GetSelectionLevel() != HSelectSegment) // never should fail for dynamic highlighting, but let's be nice and check
-			{
-				// the key is to a geometric entity.  If we are in segment selection mode,
-				// then we need to get the key to its parent segment.
-
-				HC_Show_Key_Type(nKey, type);
-
-				if (!streq("segment", type))
-				{
-					char segname[MVO_BUFFER_SIZE];
-					HC_KEY segkey;
-
-					segkey = HC_KShow_Owner_Original_Key(nKey);
-					HC_Show_Owner_By_Key(nKey, segname);
-
-					// climb up one more level if this is the temporary highlight key
-					if (pcView->GetHighlightSelection()->IsHighlightSegment(segkey))
-					{
-						segkey = HC_KShow_Owner_Original_Key(segkey);
-						HC_Show_Owner_By_Key(segkey, segname);
-					}
-				}
-			}
-
-			pcView->GetHighlightSelection()->DeSelectAll();
-			pcView->GetHighlightSelection()->Select(nKey, incl_count, incl_keys, false);
-		}
-		else {
-			bNeedUpdate = false;
-		}
-
-	DONE:
-		delete[] keys;
-		delete[] incl_keys;
-	}
-
-	if (bNeedDeselect) {
-		pcView->GetHighlightSelection()->DeSelectAll();
-	}
-
-	if (bNeedUpdate) {
-		pcView->ForceUpdate();
-	}
 }
 
 HighlightControl & TDF::HighlightControl::Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting)
@@ -408,13 +297,18 @@ HighlightControl & TDF::HighlightControl::Highlight(SelectionResults const & cIn
 	}
 
 	if (bNeedUpdate) {
-		pcView->ForceUpdate();
+		bool bShowNotification = false;
+		cInOptions.ShowNotification(bShowNotification);
+
+		if (true == bShowNotification) {
+			pcView->ForceUpdate();
+		}
 	}
 
 	return *this;
 }
 
-HighlightControl & HighlightControl::Unhighlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions)
+HighlightControl & TDF::HighlightControl::Unhighlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions)
 {
 	if (0 == cInItems.GetCount()) {
 		return *this;
@@ -432,22 +326,17 @@ HighlightControl & HighlightControl::Unhighlight(SelectionResults const & cInIte
 		pcView->GetHighlightSelection()->DeSelect(nKey, pcItemImpl->nIncludeCount, pcItemImpl->pnIncludeKeys, false);
 	}
 	
-/*
-	for (POSITION pcPosition = cInItems.GetHeadPosition(); nullptr != pcPosition; ) {
-		SelectionItem * pcItem = cInItems.GetNext(pcPosition);
-		SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)pcItem->GetImpl();
+	bool bShowNotification = false;
+	cInOptions.ShowNotification(bShowNotification);
 
-		HC_KEY nKey = pcImpl->cKey.KeyValue();
-		pcView->GetHighlightSelection()->DeSelect(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, false);
+	if (true == bShowNotification) {
+		pcView->ForceUpdate();
 	}
-*/
-
-	pcView->ForceUpdate();
 
 	return *this;
 }
 
-HighlightControl & HighlightControl::Unhighlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions)
+HighlightControl & TDF::HighlightControl::Unhighlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions)
 {
 	// cInItem의 Impl을 가져와서 작업을 수행한다.
 	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)cInItem.GetImpl();
@@ -461,7 +350,13 @@ HighlightControl & HighlightControl::Unhighlight(SelectionItem const & cInItem, 
 	HC_KEY nKey = pcImpl->cKey.KeyValue();
 	pcView->GetHighlightSelection()->DeSelect(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, false);
 
-	pcView->ForceUpdate();
+	bool bShowNotification = false;
+	cInOptions.ShowNotification(bShowNotification);
+
+	if (true == bShowNotification) {
+		pcView->ForceUpdate();
+	}
+
 
 	return *this;
 }

@@ -166,7 +166,9 @@ bool TdfImport::FileImport(CString strFilePathName, TDF::SegmentKey & cModelSegm
 	
 	MaterialMappingKit cMaterialMapping;
 	cMaterialMapping.SetLineColor(RGBAColor(0, 0, 0));
+	cMaterialMapping.SetEdgeColor(RGBAColor(0, 0, 0));
 	cModelSegment.SetMaterialMapping(cMaterialMapping);
+
 	cModelSegment.GetMarkerAttributeControl().SetSize(0.2f);
 
 	bool bStatus = ParseModelFile(pcAsmModelFile, cModelSegment);
@@ -911,7 +913,7 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 	cParentSegment.IncludeSegment(cSegment);
 	m_mPartsMap.SetAt((DWORD_PTR) pcPart, cSegment.KeyValue());
 
-	cSegment.ForcedOpen();
+	cSegment.Open();
 
 	A3DMiscCascadedAttributes * pcAttr;
 	A3DMiscCascadedAttributesData cAttrData;
@@ -940,7 +942,7 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttr));
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrData));
 
-	cSegment.ForcedClose();
+	cSegment.Close();
 
 	LogDecreaseTabIndex(2);
 
@@ -995,7 +997,7 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 	A3DInt32 iUVCoordinatesIndex = -1;
 	A3DUns8 ucTextureDimension = 2;
 
-	cSegment.ForcedOpen();
+	cSegment.Open();
 
 	A3DStatus eStatus = A3D_SUCCESS;
 
@@ -1062,7 +1064,7 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 		A3DRiRepresentationItemGet(nullptr, &cRepItemData);
 	}
 
-	cSegment.ForcedClose();
+	cSegment.Close();
 
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttr));
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrData));
@@ -2481,7 +2483,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 				TDF::SegmentKey cSubSegment(nKey);
 				cCurrnetSegment = cSubSegment;
 				bForceOpenFlag = true;
-				cCurrnetSegment.ForcedOpen();
+				cCurrnetSegment.Open();
 
 				//----- Texture Mapping 설정 -----
 				//SetTextureMapping(cCurrnetSegment, psAttrData[nFaceIndex]);
@@ -2583,7 +2585,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 		}
 
 		if(true == bForceOpenFlag) {
-			cCurrnetSegment.ForcedClose();
+			cCurrnetSegment.Close();
 		}
 
 		cCurrnetSegment = cParentSegment;

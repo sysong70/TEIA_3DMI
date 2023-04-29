@@ -3,6 +3,7 @@
 #include "3DF.Material.h"
 
 #include "3DF.Segment.h"
+#include "./Private/3DF.SegmentPrivate.h"
 
 #include <hc.h>
 #include <HUtility.h>
@@ -1038,24 +1039,24 @@ MaterialMappingControl & MaterialMappingControl::SetMarkerColor(RGBAColor const 
 
 MaterialMappingControl & MaterialMappingControl::SetColor(CString strGeometry, CString strChannel, RGBAColor const & cInRgbaColor)
 {
-	m_cInSegmentKey.Open();
+	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
 	CString strColorText;
 	strColorText.Format(L"%s = (%s = (r=%f g=%f b=%f))", strGeometry, strChannel, cInRgbaColor.red, cInRgbaColor.green, cInRgbaColor.blue);
 	HC_Set_Color(H_ASCII_TEXT(strColorText));
 
-	m_cInSegmentKey.Close();
+	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 
 	return *this;
 }
 
 MaterialMappingControl & MaterialMappingControl::UnSetColor(CString strInType)
 {
-	m_cInSegmentKey.Open();
+	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
 	HC_UnSet_One_Selectability(H_ASCII_TEXT(strInType));
 
-	m_cInSegmentKey.Close();
+	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 
 	return *this;
 }
@@ -1064,21 +1065,21 @@ void MaterialMappingControl::InitPopulateTextures()
 {
 	InitializeMagick(".");
 
-	m_cInSegmentKey.Open();
+	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
 	HC_Set_Visibility("image = off");
 
-	m_cInSegmentKey.Close();
+	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 }
 
 void MaterialMappingControl::InsertPicture(UINT nIndex, UINT nPixelWidth, UINT nPixelHeight, UCHAR * pucBinaryData)
 {
-	m_cInSegmentKey.Open();
+	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
 	//HC_KEY nKey = HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u, local = on", nIndex), nPixelWidth, nPixelHeight, pucBinaryData);
 	HC_KEY nKey = HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u", nIndex), nPixelWidth, nPixelHeight, pucBinaryData);
 
-	m_cInSegmentKey.Close();
+	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 }
 
 void MaterialMappingControl::InsertDifaultPicture(UINT nIndex, UINT nSize, UCHAR * pucBinaryData)
@@ -1100,18 +1101,18 @@ void MaterialMappingControl::InsertDifaultPicture(UINT nIndex, UINT nSize, UCHAR
 		DestroyImageInfo(image_info);
 		DestroyExceptionInfo(&exception);
 
-		m_cInSegmentKey.Open();
+		SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
 		//HC_KEY nKey = HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u, local = on", nIndex), width, height, &anPixels[0]);
 		HC_KEY nKey = HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u", nIndex), width, height, &anPixels[0]);
 
-		m_cInSegmentKey.Close();
+		SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 	}
 }
 
 void MaterialMappingControl::SetTextureMatrix(float * pfTextureMatrix, char * pchTextureTransformSegment)
 {
-	m_cInSegmentKey.Open();
+	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
 	HC_Compute_Matrix_Inverse(pfTextureMatrix, pfTextureMatrix);
 
@@ -1127,7 +1128,7 @@ void MaterialMappingControl::SetTextureMatrix(float * pfTextureMatrix, char * pc
 	}
 	HC_Close_Segment();
 
-	m_cInSegmentKey.Close();
+	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 }
 
 void MaterialMappingControl::SetDefineLocalTexture(UINT nIndex, CString strTextureOptions)
@@ -1135,11 +1136,11 @@ void MaterialMappingControl::SetDefineLocalTexture(UINT nIndex, CString strTextu
 	CString strText;
 	strText.Format(L"texture_%u", nIndex);
 
-	m_cInSegmentKey.Open();
+	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
 	HC_Define_Local_Texture(H_ASCII_TEXT(strText), H_ASCII_TEXT(strTextureOptions));
 
-	m_cInSegmentKey.Close();
+	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 }
 
 void MaterialMappingControl::EndPopulateTextures()

@@ -27,16 +27,7 @@ public:
 
 	//== Segment 관련 함수 ===========================================================================
 	void Open();
-	void Open() const;
-
 	void Close();
-	void Close() const;
-
-	void ForcedOpen();
-	void ForcedClose();
-
-	bool IsOpen() const;
-	bool IsForcedOpen() const;
 
 	//== Sub Segment 관련 함수 =======================================================================
 	SegmentKey const Subsegment();

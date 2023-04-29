@@ -32,7 +32,7 @@ namespace Operator
 			SnapType eType = SnapType::None;
 		};
 
-		ObjectSnap(WindowKey * pcWindow);
+		ObjectSnap(WindowKey * pcWindow, std::vector<SnapItem *> & vInSnapItems);
 
 		//== Object Snap 계산 =======================================================================
 		void CalculationObjectSnapPoint(TDF::SelectionResults & cInItems);
@@ -41,7 +41,7 @@ namespace Operator
 
 		//== Object Snap Draw ======================================================================
 		
-		void DrawSnapItems();
+		void DrawSnapItems(bool bUpdate = true);
 		void DrawSnapItems1();
 
 		void DrawObjectSnapPoint(TDF::SelectionResults & cInItems);
@@ -67,7 +67,7 @@ namespace Operator
 
 		SegmentKey m_cSnapPointSegment;
 
-		std::vector<SnapItem *> m_vSnapItems;
+		std::vector<SnapItem *> * m_pvSnapItems;
 	};
 }
 CLOSE_3DF_NAMESPACE
