@@ -217,11 +217,11 @@ LineAttributeControl & LineAttributeControl::SetWeight(float fInWeight, Line::Si
 					break;
 
 				case TDF::Line::SizeUnits::Pixels:
-					strWeight.Format(_T("%f Pixels"), fInWeight);
+					strWeight.Format(_T("%f pixels"), fInWeight);
 					break;
 			}
 			
-			HC_Set_Variable_Edge_Weight(H_ASCII_TEXT(strWeight));
+			HC_Set_Variable_Line_Weight(H_ASCII_TEXT(strWeight));
 		}
 
 	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);

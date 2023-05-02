@@ -10,6 +10,7 @@
 
 #include "3DF.Selectability.h"
 #include "3DF.Visibility.h"
+#include "3DF.VisualEffects.h"
 #include "3DF.Material.h"
 #include "3DF.MarkerAttribute.h"
 
@@ -286,6 +287,13 @@ ShellKey SegmentKey::InsertShell(ShellKit const & cInKit)
 	return cShell;
 }
 
+//== Edge 관련 함수 ==================================================================================
+EdgeAttributeControl SegmentKey::GetEdgeAttributeControl()
+{
+	EdgeAttributeControl cControl(*this);
+	return cControl;
+}
+
 //== Line 관련 함수 ==================================================================================
 LineKey SegmentKey::InsertLine(size_t in_count, Point const pcInPoints[])
 {
@@ -429,7 +437,7 @@ SegmentKey & SegmentKey::SetSelectability(CString strList)
 	return *this;
 }
 
-//== Visibility Control 관련 함수 ================================================================
+//== Visibility Control 관련 함수 ====================================================================
 VisibilityControl SegmentKey::GetVisibilityControl()
 {
 	VisibilityControl cVisibilityControl(*this);
@@ -448,6 +456,19 @@ SegmentKey & SegmentKey::SetVisibility(CString strList)
 	HC_Set_Visibility(H_ASCII_TEXT(strList));
 	SegmentKeyPrivate::LocalClose(*this);
 	return *this;
+}
+
+//== Visibility Control 관련 함수 ====================================================================
+VisualEffectsControl SegmentKey::GetVisualEffectsControl()
+{
+	VisualEffectsControl cVisibilityControl(*this);
+	return cVisibilityControl;
+}
+
+VisualEffectsControl const SegmentKey::GetVisualEffectsControl() const
+{
+	VisualEffectsControl cVisibilityControl(*(SegmentKey *)this);
+	return cVisibilityControl;
 }
 
 //== Condition 관련 함수 =============================================================================

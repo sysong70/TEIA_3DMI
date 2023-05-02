@@ -20,6 +20,8 @@ public:
 	HC_KEY GetSceneKey();
 	const HC_KEY GetSceneKey() const;
 
+	void Update();
+
 	int ViewId();
 	const int ViewId() const;
 	void SetViewId(int nViewId);

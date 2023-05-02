@@ -749,21 +749,24 @@ bool SelectionResults::operator==(SelectionResults const & cInThat) const
 	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
 	SelectionResultsPrivate * pcInThatImpl = (SelectionResultsPrivate *)cInThat.m_pcImpl;
 
+	if (pcImpl->GetItems().size() != pcInThatImpl->GetItems().size()) {
+		return false;
+	}
+
+	bool bSameFlag = false;
+
 	for (auto pcItem : pcImpl->GetItems()) {
-		bool bFindSameItemFlag = false;
 		for (auto pcInThatItem : pcInThatImpl->GetItems()) {
 			if (*pcItem == *pcInThatItem) {
-				bFindSameItemFlag = true;
-				break;
+				bSameFlag = true;
 			}
-
-			if (false == bFindSameItemFlag) {
+			else {
 				return false;
 			}
 		}
 	}
 
-	return true;
+	return bSameFlag;
 }
 
 bool SelectionResults::operator!=(SelectionResults const & cInThat) const
@@ -886,6 +889,10 @@ bool SelectionResults::Union(SelectionResults const & cInThat)
 	SelectionResultsPrivate * pcInThatImpl = (SelectionResultsPrivate *)cInThat.m_pcImpl;
 
 	if (nullptr == pcImpl || nullptr == pcInThatImpl) {
+		return false;
+	}
+
+	if (true == pcInThatImpl->Empty()) {
 		return false;
 	}
 

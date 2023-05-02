@@ -168,6 +168,7 @@ public:
 	auto Erase(auto cIter) { return deItems.erase(cIter); }
 	auto Erase(auto cBegin, auto cEnd) { return deItems.erase(cBegin, cEnd); }
 
+	bool Empty() { return deItems.empty(); }
 	size_t Size() { return deItems.size(); }
 	void Resize(size_t nInSize) { deItems.resize(nInSize); }
 

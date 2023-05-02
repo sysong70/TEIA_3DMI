@@ -4,6 +4,7 @@
 
 #include "3DF.Include.h"
 #include "3DF.Shell.h"
+#include "3DF.EdgeAttribute.h"
 //#include "3DF.Portfolio.h"
 #include "3DF.Style.h"
 
@@ -47,6 +48,9 @@ public:
 // 	ShellKey InsertShell(PointArray const & in_points, IntArray const & in_facelist);
 // 	ShellKey InsertShell(size_t in_point_count, Point const in_points[], size_t in_facelist_count, int const in_facelist[]);
 
+	//== Edge 관련 함수 ==============================================================================
+	EdgeAttributeControl GetEdgeAttributeControl();
+
 	//== Line 관련 함수 ==============================================================================
 	LineKey InsertLine(size_t nInCount, Point const pcInPoints[]);
 
@@ -74,6 +78,10 @@ public:
 	VisibilityControl GetVisibilityControl();
 	VisibilityControl const GetVisibilityControl() const;
 	SegmentKey & SetVisibility(CString strList);
+
+	//== Visual Effect Control 관련 함수 =============================================================
+	VisualEffectsControl GetVisualEffectsControl();
+	VisualEffectsControl const GetVisualEffectsControl() const;
 
 	//== Condition 관련 함수 =========================================================================
 	SegmentKey & SetCondition(CString strInCondition);

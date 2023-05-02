@@ -14,8 +14,6 @@
 #include <HGlobals.h>
 */
 
-
-
 #include <atlcoll.h>
 #include <memory>
 
@@ -962,7 +960,6 @@ namespace Math
 
 	bool GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, PixelPointArray & aOutPoints);
 	bool GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, WindowPointArray & aOutPoints);
-
 };
 
 CLOSE_3DF_NAMESPACE

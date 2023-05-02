@@ -12,6 +12,7 @@
 #include <HEventListener.h>
 #include <HOpCameraManipulate.h>
 #include <HOpCameraOrbit.h>
+#include <HOpCameraPan.h>
 #include <HOpCameraZoom.h>
 #include <HOpMoveHandle.h>
 #include <HUndoManager.h>
@@ -27,8 +28,7 @@
 #include "3DF.Visibility.h"
 #include "3DF.Material.h"
 
-#include "3DF.Operator.CameraOrbitSelect.h"
-#include "3DF.Operator.CameraPan.h"
+#include "3DF.Operator.CameraSelect.h"
 #include "3DF.Operator.SelectArea.h"
 #include "3DF.Operator.ObjectSnap.h"
 
@@ -70,7 +70,6 @@ Canvas::Canvas(HBaseModel * pcBaseModel, void * pcWindowHandle)
 	m_bDeepSelection = false;
 
 	m_pcCameraOrbitSelect = nullptr;
-	m_pcCameraPan = nullptr;
 	m_pcSelectArea = nullptr;
 
 	m_nCookieSelected = 0;
@@ -87,10 +86,6 @@ Canvas::~Canvas()
 
 	if (nullptr != m_pcCameraOrbitSelect) {
 		delete m_pcCameraOrbitSelect;
-	}
-
-	if (nullptr != m_pcCameraPan) {
-		delete m_pcCameraPan;
 	}
 
 	if (nullptr != m_pcSelectArea) {
@@ -189,7 +184,6 @@ void Canvas::Init()
 
 	sprintf(chDriverOpts, "%s, quick moves preference = %s", chDriverOpts, H_ASCII_TEXT(m_cPreference.Selection.Highlight.QuickMovesType));
 
-
 	HCLOCALE(sprintf(chDriverOpts,
 		"%s, ambient occlusion = (%s, strength = %f, quality = %s), fast silhouette edges = (%s, tolerance = %f, %s heavy exterior)", chDriverOpts, 
 		(m_cPreference.Effects.FrameBuffer.UseAmbient ? "on" : "off"), m_cPreference.Effects.FrameBuffer.AmbientStrength,
@@ -217,6 +211,11 @@ void Canvas::Init()
 		HC_Control_Update(".", "redraw everything");
 	} HC_Close_Segment();
 
+	HC_Open_Segment_By_Key(m_pcBaseView->GetConstructionKey()); {
+		if (true == m_cPreference.Appearance.AntiAliasing.Use) {
+			HC_Set_Rendering_Options("anti-alias = (screen = on)");
+		}
+	} HC_Close_Segment();
 
 	int CAppSet_LightScaleFactor = 100000;;
 
@@ -1207,7 +1206,7 @@ bool Canvas::RButtonDown(int nFlags, int x, int y)
 {
 	//GetBaseView()->SetDynamicHighlighting(false);
 
-	GetBaseView()->SetOperator(m_pcCameraPan);
+	GetBaseView()->SetOperator(m_pcCameraOrbitSelect);
 
 	HEventInfo cEvent(GetBaseView());
 	cEvent.SetPoint(HE_RButtonDown, x, y, MouseMapFlags(nFlags));
@@ -1222,8 +1221,6 @@ bool Canvas::RButtonUp(int nFlags, int x, int y)
 	HEventInfo cEvent(GetBaseView());
 	cEvent.SetPoint(HE_RButtonUp, x, y, MouseMapFlags(nFlags));
 	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnRButtonUp(cEvent));
-
-	GetBaseView()->SetOperator(m_pcCameraOrbitSelect);
 
 	return true;
 }
@@ -1266,10 +1263,14 @@ bool Canvas::MouseWheel(int nFlags, int zDelta, int x, int y, Json::Object & cIn
 	int nLeft = cArray[0]->ToInteger();
 	int nTop = cArray[1]->ToInteger();
 
+	//HBaseOperator * pcOperator = GetBaseView()->GetOperator();
+
 	HEventInfo	cEvent(GetBaseView());
 	cEvent.SetPoint(HE_MouseWheel, x - nLeft, y - nTop, MouseMapFlags(nFlags));
 	cEvent.SetMouseWheelDelta(zDelta);
-	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnMouseWheel(cEvent));
+	m_pcCameraOrbitSelect->OnMouseWheel(cEvent);
+
+	//HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnMouseWheel(cEvent));
 
 	return true;
 }
@@ -1296,8 +1297,7 @@ void Canvas::SetDefaultOperator()
 // 		, new HSOpCameraPan(m_pHView),
 // 		new HSOpCameraZoom(m_pHView), 0, false))
 	
-	m_pcCameraOrbitSelect = new Operator::CameraOrbitSelect(m_pcWindow);
-	m_pcCameraPan = new Operator::CameraPan(GetBaseView());
+	m_pcCameraOrbitSelect = new Operator::CameraSelect(m_pcWindow);
 	m_pcSelectArea = new Operator::SelectArea(GetBaseView());
 
 	GetBaseView()->SetOperator(m_pcCameraOrbitSelect);

@@ -50,6 +50,11 @@ const HC_KEY WindowKey::GetSceneKey() const
 	return pcImpl->GetBaseView()->GetSceneKey();
 }
 
+void WindowKey::Update()
+{
+	GetBaseView()->Update();
+}
+
 int WindowKey::ViewId()
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);

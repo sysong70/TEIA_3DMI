@@ -76,6 +76,7 @@ class StyleKey;
 
 class SelectabilityControl;
 class VisibilityControl;
+class VisualEffectsControl;
 class MarkerAttributeControl;
 
 
@@ -138,6 +139,9 @@ enum class Type : uint32_t
 	LineAttributeControl					= 0x50000008,
 	EdgeAttributeControl					= 0x50000009,
 	CurveAttributeControl					= 0x5000000a,
+	VisualEffectsControl					= 0x50000013,
+	SelectionOptionsControl					= 0x50000014,
+	HighlightOptionsControl					= 0x50000015,
 	SelectionControl						= 0x50000017,
 	HighlightControl						= 0x50000018,
 };

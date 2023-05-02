@@ -131,6 +131,7 @@
     <ClInclude Include="3DF\3DF.EdgeAttribute.h" />
     <ClInclude Include="3DF\3DF.LineAttribute.h" />
     <ClInclude Include="3DF\3DF.Math.Matrix.h" />
+    <ClInclude Include="3DF\3DF.VisualEffects.h" />
     <ClInclude Include="3DF\HDraw.h" />
     <ClInclude Include="3DF\Private\3DF.SegmentPrivate.h" />
     <ClInclude Include="3DF\Private\3DF.WindowPrivate.h" />
@@ -155,7 +156,7 @@
     <ClInclude Include="3DF\3DF.Math.h" />
     <ClInclude Include="3DF\3DF.Model.h" />
     <ClInclude Include="3DF\3DF.Object.h" />
-    <ClInclude Include="3DF\3DF.Operator.CameraOrbitSelect.h" />
+    <ClInclude Include="3DF\3DF.Operator.CameraSelect.h" />
     <ClInclude Include="3DF\3DF.Operator.ObjectSnap.h" />
     <ClInclude Include="3DF\3DF.Operator.SelectArea.h" />
     <ClInclude Include="3DF\3DF.PMI.Entity.h" />
@@ -173,7 +174,6 @@
     <ClInclude Include="3DF.Signal.Interface.h" />
     <ClInclude Include="3DF.Signal.h" />
     <ClInclude Include="3DF.Signal.ViewManager.h" />
-    <ClInclude Include="3DF\3DF.Operator.CameraPan.h" />
     <ClInclude Include="3DF\3DF.Visibility.h" />
     <ClInclude Include="3DF\3DF.MarkerAttribute.h" />
     <ClInclude Include="3DF\3DF.Window.h" />
@@ -217,7 +217,7 @@
     <ClCompile Include="3DF\3DF.Math.Matrix.cpp" />
     <ClCompile Include="3DF\3DF.Model.cpp" />
     <ClCompile Include="3DF\3DF.Object.cpp" />
-    <ClCompile Include="3DF\3DF.Operator.CameraOrbitSelect.cpp" />
+    <ClCompile Include="3DF\3DF.Operator.CameraSelect.cpp" />
     <ClCompile Include="3DF\3DF.Operator.ObjectSnap.cpp" />
     <ClCompile Include="3DF\3DF.Operator.SelectArea.cpp" />
     <ClCompile Include="3DF\3DF.PMI.Entity.cpp" />
@@ -232,9 +232,9 @@
     <ClCompile Include="3DF\3DF.Utility.cpp" />
     <ClCompile Include="3DF\3DF.Canvas.cpp" />
     <ClCompile Include="3DF\3DF.Segment.cpp" />
-    <ClCompile Include="3DF\3DF.Operator.CameraPan.cpp" />
     <ClCompile Include="3DF\3DF.Visibility.cpp" />
     <ClCompile Include="3DF\3DF.MarkerAttribute.cpp" />
+    <ClCompile Include="3DF\3DF.VisualEffects.cpp" />
     <ClCompile Include="3DF\3DF.Window.cpp" />
     <ClCompile Include="3DF\HDraw.cpp" />
     <ClCompile Include="3DF\Private\3DF.KeyPrivate.cpp" />

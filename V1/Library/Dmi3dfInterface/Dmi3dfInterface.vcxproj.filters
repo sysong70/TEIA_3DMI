@@ -117,9 +117,6 @@
     <ClInclude Include="3DF\3DF.Color.h">
       <Filter>3DF</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Operator.CameraPan.h">
-      <Filter>Operator</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\3DF.Database.h">
       <Filter>3DF</Filter>
     </ClInclude>
@@ -180,7 +177,7 @@
     <ClInclude Include="3DF\3DF.Include.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Operator.CameraOrbitSelect.h">
+    <ClInclude Include="3DF\3DF.Operator.CameraSelect.h">
       <Filter>Operator</Filter>
     </ClInclude>
     <ClInclude Include="..\Signal\Signal.h">
@@ -252,6 +249,9 @@
     <ClInclude Include="3DF\3DF.LineAttribute.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\3DF.VisualEffects.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -310,9 +310,6 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.Color.cpp">
       <Filter>3DF</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\3DF.Operator.CameraPan.cpp">
-      <Filter>Operator</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Database.cpp">
       <Filter>3DF</Filter>
@@ -374,7 +371,7 @@
     <ClCompile Include="3DF\3DF.Include.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Operator.CameraOrbitSelect.cpp">
+    <ClCompile Include="3DF\3DF.Operator.CameraSelect.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
     <ClCompile Include="..\Signal\Signal.cpp">
@@ -438,6 +435,9 @@
       <Filter>3DF\Control</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.LineAttribute.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.VisualEffects.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
   </ItemGroup>

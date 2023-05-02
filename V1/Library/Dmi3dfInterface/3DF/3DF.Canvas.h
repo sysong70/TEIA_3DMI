@@ -14,7 +14,7 @@ OPEN_3DF_NAMESPACE
 
 namespace Operator
 {
-	class CameraOrbitSelect;
+	class CameraSelect;
 	class CameraPan;
 	class SelectArea;
 }
@@ -234,8 +234,7 @@ protected:
 	int m_nViewId = -1;
 
 private:
-	Operator::CameraOrbitSelect * m_pcCameraOrbitSelect;
-	Operator::CameraPan * m_pcCameraPan;
+	Operator::CameraSelect * m_pcCameraOrbitSelect;
 	Operator::SelectArea * m_pcSelectArea;
 
 private:

@@ -185,12 +185,16 @@ HighlightControl & TDF::HighlightControl::Highlight(SelectionResults const & cIn
 
 		HC_KEY nKey = pcImpl->cKey.KeyValue();
 
+		// Region 선택 관련 처리 부분
 		if (TDF::Type::ShellKey == pcItem->Type() && (pcImpl->nLowest != pcImpl->nHighest || pcImpl->nLowest > 0)) {
 			bNeedDeselect = false;
 
 			if (!pcView->GetHighlightSelection()->IsRegionSelected(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, pcImpl->nRegion))
 			{
-				pcView->GetHighlightSelection()->DeSelectAll();
+				if (true == bInRemoveExisting) {
+					pcView->GetHighlightSelection()->DeSelectAll();
+				}
+
 				pcView->GetHighlightSelection()->SelectRegion(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, pcImpl->nRegion, false);
 			}
 			else {
@@ -198,7 +202,6 @@ HighlightControl & TDF::HighlightControl::Highlight(SelectionResults const & cIn
 			}
 		}
 		else {
-
 			bNeedDeselect = false;
 
 			if (!pcView->GetHighlightSelection()->IsSelected(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys)) {
@@ -225,7 +228,10 @@ HighlightControl & TDF::HighlightControl::Highlight(SelectionResults const & cIn
 					}
 				}
 
-				pcView->GetHighlightSelection()->DeSelectAll();
+				if (true == bInRemoveExisting) {
+					pcView->GetHighlightSelection()->DeSelectAll();
+				}
+				
 				pcView->GetHighlightSelection()->Select(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, false);
 			}
 			else {
@@ -356,7 +362,6 @@ HighlightControl & TDF::HighlightControl::Unhighlight(SelectionItem const & cInI
 	if (true == bShowNotification) {
 		pcView->ForceUpdate();
 	}
-
 
 	return *this;
 }

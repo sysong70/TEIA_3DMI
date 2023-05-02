@@ -131,7 +131,7 @@ namespace Facility
 		{
 			struct ANTIALIASING {
 				bool Use = true;		// CAppSettings::bAntiAliasing
-				bool Line = false;		// CAppSettings::LineAntialiasing
+				bool Line = true;		// CAppSettings::LineAntialiasing
 				bool Text = true;		// CAppSettings::TextAntialiasing
 				int Level = 4;			// CAppSettings::AntialiasingLevel
 
