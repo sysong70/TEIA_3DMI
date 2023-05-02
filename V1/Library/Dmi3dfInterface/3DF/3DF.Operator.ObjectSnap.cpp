@@ -196,18 +196,20 @@ Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 	MaterialMappingKit cMaterialMapping;
 	cMaterialMapping.SetEdgeColor(RGBAColor(0, 0, 0));
 	cMaterialMapping.SetFaceColor(RGBAColor(1, 1, 1));
+
 	m_cSnapPointSegment.SetMaterialMapping(cMaterialMapping);
 	m_cSnapPointSegment.GetVisibilityControl().SetFaces(true);
 	m_cSnapPointSegment.GetEdgeAttributeControl().SetWeight(4.0, Edge::SizeUnits::Pixels);
-//	m_cSnapPointSegment.GetVisualEffectsControl().SetAntiAliasing(false);
+	m_cSnapPointSegment.GetVisualEffectsControl().SetAntiAliasing(false);
 
 
 	char chDriverOption[MVO_BUFFER_SIZE];
 	char chRenderingOption[MVO_BUFFER_SIZE];
 	HC_Open_Segment_By_Key(m_cSnapPointSegment.KeyValue());
+	HC_Set_Heuristics("no quick moves");
 	HC_Set_Rendering_Options("lines=on");
-	HC_Show_Net_Driver_Options(chDriverOption);
-	HC_Show_Net_Rendering_Options(chRenderingOption);
+// 	HC_Show_Net_Driver_Options(chDriverOption);
+// 	HC_Show_Net_Rendering_Options(chRenderingOption);
 	HC_Close_Segment();
 
 }
