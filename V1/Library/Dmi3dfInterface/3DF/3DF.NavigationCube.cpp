@@ -1,0 +1,565 @@
+﻿#include "StdAfx.h"
+#include "3DF.NavigationCube.h"
+#include "3DF.Painter.h"
+
+#include <GdiPlus.h>
+#pragma comment(lib, "Gdiplus.lib")
+#pragma warning(disable: 4244)
+
+USING_3DF_NAMESPACE
+
+
+
+namespace NavigationCubePreset
+{
+	class GdiLoader
+	{
+	public:
+
+		GdiLoader()
+		{
+			Gdiplus::GdiplusStartup(&token, &input, nullptr);
+		}
+
+		~GdiLoader()
+		{
+			Gdiplus::GdiplusShutdown(token);
+		}
+
+	private:
+
+		Gdiplus::GdiplusStartupInput input;
+		ULONG_PTR token;
+	};
+
+	GdiLoader Initializer;
+
+
+
+	class ImageLoader
+	{
+	public:
+
+		const char* Format = "rgba, size=16 pixels";
+		int Width = 16;
+		int Height = 16;
+
+		ImageLoader()
+		{
+		}
+
+		~ImageLoader()
+		{
+			delete[] Buffer;
+		}
+
+		void Load(CString path)
+		{
+			//:TODO
+			path = L"c:\\temp\\axis_" + path + L".png";
+
+			Gdiplus::Bitmap* pBitmap = Gdiplus::Bitmap::FromFile(path);
+			ASSERT(pBitmap != nullptr);
+			ASSERT(pBitmap->GetWidth() > 0 && pBitmap->GetHeight() > 0);
+
+			Buffer = new BYTE[Width * Height * 4];
+			Gdiplus::Color color;
+			int index = 0;
+
+			for (int y = 0; y < Height; y++) {
+				for (int x = 0; x < Width; x++) {
+					pBitmap->GetPixel(x, y, &color);
+					Buffer[index++] = color.GetR();
+					Buffer[index++] = color.GetG();
+					Buffer[index++] = color.GetB();
+					Buffer[index++] = color.GetA();
+				}
+			}
+
+			delete[] pBitmap;
+		}
+
+		BYTE* Buffer = nullptr;
+	};
+
+
+
+	class Format
+	{
+	public:
+
+		Format(const char* format, ...)
+		{
+			va_list ap;
+
+			va_start(ap, format);
+			buffer.FormatV(format, ap);
+			va_end(ap);
+		}
+
+		operator char const* () const
+		{
+			return buffer;
+		}
+
+	private:
+
+		CStringA buffer;
+	};
+
+
+
+	COLORREF EdgeColor()
+	{
+		return 0;
+	}
+
+	COLORREF FaceColor()
+	{
+		return RGB(0xC0, 0xC0, 0xC0);
+	}
+
+	COLORREF LineColor()
+	{
+		//return RGB(0x00, 0x5E, 0x97);
+		return RGB(0x80, 0x80, 0x80);
+	}
+
+	COLORREF TextColor()
+	{
+		return RGB(0x33, 0x33, 0x33);
+	}
+
+
+
+	double PlaneUnit()
+	{
+		return 0.4;
+	}
+
+	double EdgeUnit()
+	{
+		return 0.25;
+	}
+
+	double CornerUnit()
+	{
+		return 0.15;
+	}
+
+	double AxisUnit()
+	{
+		return 0.6;
+	}
+}
+
+#define PRESET NavigationCubePreset
+
+
+
+NavigationCube::NavigationCube(HBaseView* view)
+	: m_pView(view)
+{
+}
+
+
+
+NavigationCube::~NavigationCube()
+{
+}
+
+
+
+void NavigationCube::SetSize(ESize size)
+{
+	m_eCubeSize = size;
+}
+
+
+
+void NavigationCube::SetView(HBaseView* view) {
+	m_pView = view;
+}
+
+
+
+void NavigationCube::SetVisible(bool axis, bool cube)
+{
+	m_bAxisVisible = axis;
+	m_bCubeVisible = cube;
+}
+
+
+
+bool NavigationCube::IsValid()
+{
+	return m_cubeSegment != HC_ERROR_KEY;
+}
+
+
+
+void NavigationCube::Create(float width, float height, HC_KEY parent)
+{
+	m_parentSegment = parent;
+	ASSERT(m_parentSegment != HC_ERROR_KEY);
+
+	HC_Open_Segment_By_Key(m_parentSegment);
+	{
+		OpenCubeSegment();
+		{
+			HC_Set_Rendering_Options("attribute lock = visibility"
+				", hidden line removal options = render faces"
+				", no lod"
+				", no frame buffer effects"
+				", no display lists"
+				", depth range = (0, 0.1)"
+				", simple shadow = off"
+				", simple reflection = off"
+				", no force grayscale"
+				", diffuse color tint = off"
+				", anti-alias = (text = on)"
+			);
+			SetWindowSize(width, height, false);
+
+			HC_Set_Camera_Projection("orthographic");
+			HC_Set_Visibility("cutting planes = off"
+				", edges = off"
+				", faces = on"
+				", lights = off"
+				", lines = on"
+				", markers = off"
+				", shadows = off"
+				", text = on"
+				", vertices = off"
+			);
+
+			HC_Set_Text_Font("name = franklin gothic book"
+				", bold = on"
+			);
+			HC_Set_Text_Alignment("**");
+
+			Painter::Segment::SetColor("faces", PRESET::FaceColor());
+			Painter::Segment::SetColor("edges", PRESET::EdgeColor());
+			Painter::Segment::SetColor("lines", PRESET::LineColor());
+			Painter::Segment::SetColor("text", PRESET::TextColor());
+
+			if (m_bCubeVisible) {
+				CreateCube();
+			}
+
+			if (m_bAxisVisible) {
+				CreateAxis();
+			}
+		}
+		CloseCubeSegment();
+	}
+	HC_Close_Segment();
+}
+
+
+
+HC_KEY NavigationCube::HitTest(float x, float y, float z)
+{
+	ASSERT(FALSE);
+	return HC_ERROR_KEY;
+}
+
+
+
+void NavigationCube::Transform()
+{
+	HPoint position;
+	HPoint target;
+	HVector up;
+	float width, height;
+	char projection[MVO_BUFFER_SIZE];
+
+	HC_Open_Segment_By_Key(m_pView->GetSceneKey());
+	{
+		HC_Show_Net_Camera(&position, &target, &up, &width, &height, projection);
+	}
+	HC_Close_Segment();
+
+	OpenCubeSegment();
+	{
+		//:TODO - only rotation
+		HC_Set_Camera(&position, &target, &up, 2, 2, projection);
+	}
+	CloseCubeSegment();
+}
+
+
+
+void NavigationCube::OnSize(float width, float height)
+{
+	SetWindowSize(width, height);
+}
+
+
+
+void NavigationCube::OpenCubeSegment()
+{
+	if (m_cubeSegment == HC_ERROR_KEY) {
+		m_cubeSegment = HC_Open_Segment("cube window");
+	}
+	else {
+		HC_Open_Segment_By_Key(m_cubeSegment);
+	}
+}
+
+
+
+void NavigationCube::OpenPlaneSegment()
+{
+	if (m_planeSegment == HC_ERROR_KEY) {
+		m_planeSegment = HC_Open_Segment("plane window");
+	}
+	else {
+		HC_Open_Segment_By_Key(m_planeSegment);
+	}
+}
+
+
+
+void NavigationCube::CloseCubeSegment()
+{
+	HC_Close_Segment();
+}
+
+
+
+void NavigationCube::ClosePlaneSegment()
+{
+	HC_Close_Segment();
+}
+
+
+
+void NavigationCube::CreateAxis()
+{
+	double plane = PRESET::PlaneUnit();
+	double axis = PRESET::AxisUnit() - 0.05;
+	double text = PRESET::AxisUnit() + 0.1;
+
+	CreateAxis("x", "X", HPoint(axis, -plane, -plane), HPoint(text, -plane, -plane), RGB(255, 0, 0));
+	CreateAxis("y", "Y", HPoint(-plane, axis, -plane), HPoint(-plane, text, -plane), RGB(0, 255, 0));
+	CreateAxis("z", "Z", HPoint(-plane, -plane, axis), HPoint(-plane, -plane, text), RGB(0, 0, 255));
+
+	//CreateAxis("x", "X", HPoint(axis, -plane, -plane), HPoint(text, -plane, -plane), RGB(0xD4, 0x23, 0x14));
+	//CreateAxis("y", "Y", HPoint(-plane, axis, -plane), HPoint(-plane, text, -plane), RGB(0x30, 0x90, 0x48));
+	//CreateAxis("z", "Z", HPoint(-plane, -plane, axis), HPoint(-plane, -plane, text), RGB(0x00, 0x63, 0xB1));
+}
+
+
+
+void NavigationCube::CreateCube()
+{
+	double plane = PRESET::PlaneUnit();
+
+	// Cube wire
+
+	HPoint maxPoint(plane, plane, plane);
+	HPoint minPoint(-plane, -plane, -plane);
+	HUtility::InsertWireframeBox(&maxPoint, &minPoint);
+
+	// Plane and text
+
+	CreatePlaneShell("top", "TOP", { 0, 0, plane }, { 0, 0, 0 });
+	CreatePlaneShell("bottom", "BOTTOM", { 0, 0, -plane }, { 0, 180, 0 });
+	CreatePlaneShell("front", "FRONT", { 0, -plane, 0 }, { 90, 0, 0 });
+	CreatePlaneShell("back", "BACK", { 0, plane, 0 }, { 90, 0, 180 });
+	CreatePlaneShell("left", "LEFT", { -plane, 0, 0 }, { 90, 0, -90 });
+	CreatePlaneShell("right", "RIGHT", { plane, 0, 0 }, { 90, 0, 90 });
+
+	// Edges - n: negative, p: positive
+
+	CreateEdgeShell("py-nz", { 0, plane, -plane }, { 0, 0, 0 });
+	CreateEdgeShell("py-pz", { 0, plane, plane }, { 90, 0, 0 });
+	CreateEdgeShell("ny-pz", { 0, -plane, plane }, { 180, 0, 0 });
+	CreateEdgeShell("ny-nz", { 0, -plane, -plane }, { 270, 0, 0 });
+
+	CreateEdgeShell("nx-nz", { -plane, 0, -plane }, { 0, 0, 90 });
+	CreateEdgeShell("nx-pz", { -plane, 0, plane }, { 90, 0, 90 });
+	CreateEdgeShell("px-pz", { plane, 0, plane }, { 180, 0, 90 });
+	CreateEdgeShell("px-nz", { plane, 0, -plane }, { 270, 0, 90 });
+
+	CreateEdgeShell("nx-py", { -plane, plane, 0 }, { 0, 90, 0 });
+	CreateEdgeShell("px-py", { plane, plane, 0 }, { 90, 90, 0 });
+	CreateEdgeShell("px-ny", { plane, -plane, 0 }, { 180, 90, 0 });
+	CreateEdgeShell("nx-ny", { -plane, -plane, 0 }, { 270, 90, 0 });
+
+	// Corners - n: negative, p: positive
+
+	CreateCornerShell("nx-py-nz", { -plane, plane, -plane }, { 0, 0, 0 });
+	CreateCornerShell("nx-py-pz", { -plane, plane, plane }, { 90, 0, 0 });
+	CreateCornerShell("nx-ny-pz", { -plane, -plane, plane }, { 180, 0, 0 });
+	CreateCornerShell("nx-ny-nz", { -plane, -plane, -plane }, { 270, 0, 0 });
+
+	CreateCornerShell("px-py-pz", { plane, plane, plane }, { 0, 180, 0 });
+	CreateCornerShell("px-py-nz", { plane, plane, -plane }, { 90, 180, 0 });
+	CreateCornerShell("px-ny-nz", { plane, -plane, -plane }, { 180, 180, 0 });
+	CreateCornerShell("px-ny-pz", { plane, -plane, plane }, { 270, 180, 0 });
+}
+
+
+
+HC_KEY NavigationCube::CreatePlaneShell(const char* name, const char* text, Triple pos, Triple angle)
+{
+	double unit = PRESET::PlaneUnit() - PRESET::CornerUnit();
+	HPoint p1(-unit, unit);
+	HPoint p2(unit, -unit);
+
+	HPoint points[4];
+	points[0] = p1;
+	points[1].Set(p1.x, p2.y);
+	points[2].Set(p2.x, p2.y);
+	points[3].Set(p2.x, p1.y);
+
+	int faces[] = {
+		4, 0, 1, 2, 3
+	};
+
+	HC_KEY segKey = HC_Open_Segment(name);
+	ASSERT(segKey != HC_ERROR_KEY);
+	{
+		HC_Set_Text_Font("transforms = on");
+
+		HC_KEY shellKey = HC_Insert_Shell(4, points, 5, faces);
+		ASSERT(shellKey != HC_ERROR_KEY);
+
+		HC_KEY textKey = HC_Insert_Text(0, 0, 0, text);
+		ASSERT(textKey != HC_ERROR_KEY);
+
+		HC_Rotate_Object(angle.x, angle.y, angle.z);
+		HC_Translate_Object(pos.x, pos.y, pos.z);
+	}
+	HC_Close_Segment();
+
+	return segKey;
+}
+
+
+
+HC_KEY NavigationCube::CreateEdgeShell(const char* name, Triple pos, Triple angle)
+{
+	double width = PRESET::EdgeUnit();
+	double height = PRESET::CornerUnit();
+
+	HPoint points[6];
+	points[0].Set(-width,       0,      0);
+	points[1].Set(-width, -height,      0);
+	points[2].Set( width, -height,      0);
+	points[3].Set( width,       0,      0);
+	points[4].Set( width,       0, height);
+	points[5].Set(-width,       0, height);
+
+	int faces[] = {
+		4, 0, 1, 2, 3,
+		4, 3, 4, 5, 0
+	};
+
+	HC_KEY segKey = HC_Open_Segment(name);
+	ASSERT(segKey != HC_ERROR_KEY);
+	{
+		//Segment::SetColor("faces", RGB(255, 0, 0), 0.5);
+
+		HC_KEY shellKey = HC_Insert_Shell(6, points, 10, faces);
+		ASSERT(shellKey != HC_ERROR_KEY);
+
+		HC_Rotate_Object(angle.x, angle.y, angle.z);
+		HC_Translate_Object(pos.x, pos.y, pos.z);
+	}
+	HC_Close_Segment();
+
+	return segKey;
+}
+
+
+
+HC_KEY NavigationCube::CreateCornerShell(const char* name, Triple pos, Triple angle)
+{
+	double unit = PRESET::CornerUnit();
+
+	HPoint points[7];
+	points[0].Set(   0,     0,    0);
+	points[1].Set(   0, -unit,    0);
+	points[2].Set(unit, -unit,    0);
+	points[3].Set(unit,     0,    0);
+	points[4].Set(unit,     0, unit);
+	points[5].Set(   0,     0, unit);
+	points[6].Set(   0, -unit, unit);
+
+	int faces[] = {
+		4, 0, 1, 2, 3,
+		4, 3, 4, 5, 0,
+		4, 5, 6, 1, 0
+	};
+
+	HC_KEY segKey = HC_Open_Segment(name);
+	ASSERT(segKey != HC_ERROR_KEY);
+	{
+		//Segment::SetColor("faces", RGB(0, 0, 255), 0.5);
+
+		HC_KEY shellKey = HC_Insert_Shell(7, points, 15, faces);
+		ASSERT(shellKey != HC_ERROR_KEY);
+
+		HC_Rotate_Object(angle.x, angle.y, angle.z);
+		HC_Translate_Object(pos.x, pos.y, pos.z);
+	}
+	HC_Close_Segment();
+
+	return segKey;
+}
+
+
+
+HC_KEY NavigationCube::CreateAxis(const char* name, const char* text, HPoint axisEnd, HPoint textCenter, COLORREF rgb)
+{
+	double unit = PRESET::PlaneUnit();
+	HPoint axisStart(-unit, -unit, -unit);
+
+	PRESET::ImageLoader image;
+
+	HC_KEY segKey = HC_Open_Segment(name);
+	ASSERT(segKey != HC_ERROR_KEY);
+	{
+		Painter::Segment::SetColor("faces", rgb);
+		Painter::Segment::SetColor("text", rgb);
+
+		//HC_Insert_Line(axisStart.x, axisStart.y, axisStart.z, axisEnd.x, axisEnd.y, axisEnd.z);
+		//HC_Set_Variable_Line_Weight("10 px");
+		HC_KEY key = HC_Insert_Cylinder(&axisStart, &axisEnd, 0.01, "none");
+		ASSERT(key != HC_ERROR_KEY);
+
+		HC_KEY textKey = HC_Insert_Text(textCenter.x, textCenter.y, textCenter.z, text);
+		ASSERT(textKey != HC_ERROR_KEY);
+		//image.Load(text);
+		//HC_Insert_Image(textCenter.x, textCenter.y, textCenter.z, image.Format, image.Width, image.Height, image.Buffer);
+	}
+	HC_Close_Segment();
+
+	return segKey;
+}
+
+
+
+void NavigationCube::SetWindowSize(double width, double height, bool openSegment)
+{
+	if (openSegment) {
+		OpenCubeSegment();
+	}
+
+	double windowSize = (double)m_eCubeSize;
+	double fontSize = 9.5 * (double)m_eCubeSize / (double)ESize::Midium;
+
+	double left = 1.0 - 2.0 / width * windowSize;
+	double bottom = 1.0 - 2.0 / height * windowSize;
+	HC_Set_Rendering_Options(PRESET::Format("screen range = (%.6f, 1, %.6f, 1)", left, bottom));
+	HC_Set_Text_Font(PRESET::Format("size = %.3f pt", fontSize));
+
+	if (openSegment) {
+		CloseCubeSegment();
+	}
+}
+
+#undef PRESET

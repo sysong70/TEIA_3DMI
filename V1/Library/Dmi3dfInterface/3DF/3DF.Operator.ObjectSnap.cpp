@@ -20,8 +20,6 @@
 
 #include "../3DF.Signal.Connector.h"
 
-#include "HDraw.h"
-
 #include <Common_Define.h>
 
 #include <HTools.h>
@@ -56,130 +54,6 @@
 #define MARKER_OPCODE_LINE_11 11
 #define MARKER_OPCODE_LINE_12 12
 #define MARKER_OPCODE_LINE_13 13
-
-//#define USE_IMAGE
-
-#ifdef USE_IMAGE
-
-#include "../Resource.h"
-#include "../dllmain.h"
-#include <GdiPlus.h>
-using namespace Gdiplus;
-#pragma comment(lib, "Gdiplus.lib")
-
-
-
-namespace OSnap
-{
-	Bitmap* LoadPngFromResource(UINT id)
-	{
-		IStream* pStream = nullptr;
-		Gdiplus::Bitmap* pBitmap = nullptr;
-
-		HRSRC hResource = ::FindResource(Application::Instance, MAKEINTRESOURCE(id), L"PNG");
-		DWORD dwResourceSize = ::SizeofResource(Application::Instance, hResource);
-		HGLOBAL hGlobalResource = ::LoadResource(Application::Instance, hResource);
-		LPVOID pData = LockResource(hGlobalResource);
-
-		HGLOBAL hGlobal = ::GlobalAlloc(GHND, dwResourceSize);
-		LPVOID pBuffer = ::GlobalLock(hGlobal);
-		memcpy_s(pBuffer, dwResourceSize, pData, dwResourceSize);
-		HRESULT hResult = CreateStreamOnHGlobal(hGlobal, TRUE, &pStream);
-		if (SUCCEEDED(hResult)) {
-			// pStream now owns the global handle and will invoke GlobalFree on release
-			hGlobal = nullptr;
-			pBitmap = new Gdiplus::Bitmap(pStream);
-		}
-
-		if (pStream) {
-			pStream->Release();
-			pStream = nullptr;
-		}
-
-		return pBitmap;
-	}
-
-	class GdiLoader
-	{
-	public:
-
-		GdiLoader()
-		{
-			GdiplusStartup(&token, &input, nullptr);
-		}
-
-		~GdiLoader()
-		{
-			GdiplusShutdown(token);
-		}
-
-	private:
-
-		GdiplusStartupInput input;
-		ULONG_PTR token;
-	};
-
-	GdiLoader Initializer;
-
-
-
-	const char* Format = "rgba, size=12 pixels";
-	int Width = 32;
-	int Height = 32;
-
-	class ImageLoader
-	{
-	public:
-
-		ImageLoader(UINT id)
-		{
-			Id = id;
-		}
-
-		~ImageLoader()
-		{
-			REMOVE_ARRAY(Buffer);
-		}
-
-		void Load()
-		{
-			Bitmap* pBitmap = LoadPngFromResource(Id);
-			ASSERT(pBitmap != nullptr);
-			ASSERT(pBitmap->GetWidth() > 0 && pBitmap->GetHeight() > 0);
-
-			Buffer = new BYTE[Width * Height * 4];
-			Color color;
-			int index = 0;
-
-			for (int y = 0; y < Height; y++) {
-				for (int x = 0; x < Width; x++) {
-					pBitmap->GetPixel(x, y, &color);
-					Buffer[index++] = color.GetR();
-					Buffer[index++] = color.GetG();
-					Buffer[index++] = color.GetB();
-					Buffer[index++] = color.GetA();
-				}
-			}
-
-			REMOVE_POINTER(pBitmap);
-		}
-
-		UINT Id = 0;
-		BYTE* Buffer = nullptr;
-	};
-
-	ImageLoader Center(IDF_OSNAP_CENTER);
-	ImageLoader End(IDF_OSNAP_END);
-	ImageLoader Intersection(IDF_OSNAP_INTERSECTION);
-	ImageLoader Mid(IDF_OSNAP_MID);
-	ImageLoader Nearest(IDF_OSNAP_NEAREST);
-	ImageLoader Node(IDF_OSNAP_NODE);
-	ImageLoader Perpendicular(IDF_OSNAP_PERPENDICULAR);
-	ImageLoader Quadrant(IDF_OSNAP_QUADRANT);
-	ImageLoader Tangent(IDF_OSNAP_TANGENT);
-}
-
-#endif
 
 USING_3DF_NAMESPACE
 
@@ -561,7 +435,7 @@ void Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 			}
 
 			CString strSnapType;
-			HDraw::DrawSnapPoint(cCameraInfo.dObjectSnapRadius, cDropPoint, bSelected);
+			DrawSnapPoint(cCameraInfo.dObjectSnapRadius, cDropPoint, bSelected);
 		}
 
 	} m_cSnapPointSegment.Close();
@@ -588,7 +462,7 @@ void Operator::ObjectSnap::DrawSnapItems(CamerInformation & cInCameraInfo, bool 
 			}
 
 			CString strSnapType;
-			HDraw::DrawSnapPoint(cInCameraInfo.dObjectSnapRadius, cDropPoint, bSelected);
+			DrawSnapPoint(cInCameraInfo.dObjectSnapRadius, cDropPoint, bSelected);
 		}
 
 	} m_cSnapPointSegment.Close();
@@ -614,7 +488,7 @@ void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & 
 		}
 
 		CString strSnapType;
-		HDraw::DrawSnapPoint(cInCameraInfo.dObjectSnapRadius, cDropPoint, bSelected);
+		DrawSnapPoint(cInCameraInfo.dObjectSnapRadius, cDropPoint, bSelected);
 
 	} m_cSnapPointSegment.Close();
 
@@ -1017,19 +891,6 @@ void Operator::ObjectSnap::CreateGlyph()
 	} HC_Close_Segment();
 }
 
-void Operator::ObjectSnap::LoadResource()
-{
-// 	OSnap::Center.Load();
-// 	OSnap::End.Load();
-// 	OSnap::Intersection.Load();
-// 	OSnap::Mid.Load();
-// 	OSnap::Nearest.Load();
-// 	OSnap::Node.Load();
-// 	OSnap::Perpendicular.Load();
-// 	OSnap::Quadrant.Load();
-// 	OSnap::Tangent.Load();
-}
-
 void Operator::ObjectSnap::ClearSnapItems(bool bUpdate)
 {
 	m_cSnapPointSegment.Open(); {
@@ -1038,6 +899,39 @@ void Operator::ObjectSnap::ClearSnapItems(bool bUpdate)
 
 	if (true == bUpdate) {
 		m_pcWindow->GetBaseView()->Update();
+	}
+}
+
+#include "3DF.Painter.h"
+
+void Operator::ObjectSnap::DrawSnapPoint(double dRadius, Point2D center, bool bSelected)
+{
+	using namespace Painter;
+
+	if (bSelected) {
+		//Painter::Circle::Create(Point(center), dRadius * 3, true);
+
+		Circle::Create(Point(center), dRadius, true);
+
+		HC_Open_Segment("outer");
+		{
+			Segment::SetVisibility("edges", false);
+			Segment::SetColor("faces", RGB(255, 255, 255), 0.5);
+			Figure::CreateDonut(Point(center), dRadius, dRadius * 2);
+		}
+		HC_Close_Segment();
+
+		//:TODO
+		HC_Open_Segment("snap name");
+		{
+			Segment::SetColor("text", 0);
+			Font::SetAlignment(Font::EPivot::BottomCenter);
+			HC_Insert_Text(center.x, center.y + dRadius * 3, 0, "Near point");
+		}
+		HC_Close_Segment();
+	}
+	else {
+		Circle::Create(Point(center), dRadius, true);
 	}
 }
 

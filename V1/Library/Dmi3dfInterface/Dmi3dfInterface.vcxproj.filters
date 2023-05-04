@@ -234,9 +234,6 @@
     <ClInclude Include="3DF\3DF.Math.Matrix.h">
       <Filter>3DF</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\HDraw.h">
-      <Filter>3DF</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\Private\3DF.WindowPrivate.h">
       <Filter>3DF\Key\Private</Filter>
     </ClInclude>
@@ -251,6 +248,12 @@
     </ClInclude>
     <ClInclude Include="3DF\3DF.VisualEffects.h">
       <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Painter.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.NavigationCube.h">
+      <Filter>3DF</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -422,9 +425,6 @@
     <ClCompile Include="3DF\3DF.Math.Matrix.cpp">
       <Filter>3DF</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\HDraw.cpp">
-      <Filter>3DF</Filter>
-    </ClCompile>
     <ClCompile Include="3DF\Private\3DF.WindowPrivate.cpp">
       <Filter>3DF\Key\Private</Filter>
     </ClCompile>
@@ -439,6 +439,12 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.VisualEffects.cpp">
       <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Painter.cpp">
+      <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.NavigationCube.cpp">
+      <Filter>3DF</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
