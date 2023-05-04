@@ -27,8 +27,8 @@ public:
 	SegmentKey & operator = (SegmentKey const & cInThat);
 
 	//== Segment 관련 함수 ===========================================================================
-	void Open();
-	void Close();
+	SegmentKey & Open();
+	SegmentKey & Close();
 
 	//== Sub Segment 관련 함수 =======================================================================
 	SegmentKey const Subsegment();

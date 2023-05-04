@@ -176,7 +176,7 @@ LineAttributeControl & LineAttributeControl::SetPattern(CString strInPatternName
 	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
 
 	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
-		HC_Set_Edge_Pattern(H_ASCII_TEXT(strInPatternName));
+		HC_Set_Line_Pattern(H_ASCII_TEXT(strInPatternName));
 	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;
@@ -189,7 +189,7 @@ LineAttributeControl & LineAttributeControl::SetWeight(float fInWeight, Line::Si
 	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		
 		if (Line::SizeUnits::ScaleFactor == eInUnits) {
-			HC_Set_Edge_Weight(fInWeight);
+			HC_Set_Line_Weight(fInWeight);
 		}
 		else {
 			CString strWeight;
@@ -234,7 +234,7 @@ LineAttributeControl & LineAttributeControl::UnsetPattern()
 	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
 
 	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
-		HC_UnSet_Edge_Pattern();
+		HC_UnSet_Line_Pattern();
 	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;
@@ -245,7 +245,7 @@ LineAttributeControl & LineAttributeControl::UnsetWeight()
 	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
 
 	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
-		HC_UnSet_Edge_Weight();
+		HC_UnSet_Line_Weight();
 	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;
@@ -255,8 +255,8 @@ LineAttributeControl & LineAttributeControl::UnsetEverything()
 {
 	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
 	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
-		HC_UnSet_Edge_Pattern();
-		HC_UnSet_Edge_Weight();
+		HC_UnSet_Line_Pattern();
+		HC_UnSet_Line_Weight();
 		HC_UnSet_One_Rendering_Option("geometry options");
 	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
 	return *this;
@@ -268,7 +268,7 @@ bool LineAttributeControl::ShowPattern(CString & strOutPatternName) const
 
 	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		char chBuffer[MVO_BUFFER_SIZE] = "\n";
-		HC_Show_Edge_Pattern(chBuffer);
+		HC_Show_Line_Pattern(chBuffer);
 		strOutPatternName = chBuffer;
 	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
 

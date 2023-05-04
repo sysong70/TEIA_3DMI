@@ -107,16 +107,20 @@ void SegmentKey::Close() const
 }
 */
 
-void SegmentKey::Open()
+SegmentKey & SegmentKey::Open()
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
 	pcImpl->Open();
+
+	return *this;
 }
 
-void SegmentKey::Close()
+SegmentKey & SegmentKey::Close()
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
 	pcImpl->Close();
+
+	return *this;
 }
 
 //== Sub Segment 관련 함수 ===========================================================================
