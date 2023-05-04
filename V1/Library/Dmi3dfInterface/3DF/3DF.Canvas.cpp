@@ -193,7 +193,6 @@ void Canvas::Init()
 
 	m_pcBaseView->SetDoubleBuffering(m_cPreference.General.Display.DoubleBuffer);
 
-
 	HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
 		HC_Set_User_Index(H_VIEW_POINTER_INDEX, GetBaseView());  // This is used in the event_checker for constant framerate.
 		HC_Set_Driver_Options(chDriverOpts);
@@ -205,7 +204,8 @@ void Canvas::Init()
 		HC_Set_Driver_Options(chDriverOpts);
 		// antialiasing needs rendering option in addition to driver option
 		if (true == m_cPreference.Appearance.AntiAliasing.Use) {
-			HC_Set_Rendering_Options("anti-alias = (screen = on)");
+			// Rendering Option에서는 Screen On만 설정한다.
+			HC_Set_Rendering_Options("anti-alias = (screen = on)"); 
 		}
 		HC_Set_Driver_Options("special events, update interrupts");
 		HC_Control_Update(".", "redraw everything");
@@ -213,6 +213,7 @@ void Canvas::Init()
 
 	HC_Open_Segment_By_Key(m_pcBaseView->GetConstructionKey()); {
 		if (true == m_cPreference.Appearance.AntiAliasing.Use) {
+			// Rendering Option에서는 Screen On만 설정한다.
 			HC_Set_Rendering_Options("anti-alias = (screen = on)");
 		}
 	} HC_Close_Segment();
@@ -322,6 +323,12 @@ void Canvas::Init()
 		HC_Set_Edge_Weight(3.0);
 	} HC_Close_Segment();
 
+	HC_KEY nSelectionKey = m_pcBaseView->GetSelection()->GetSelectionSegment();
+	HC_Open_Segment_By_Key(nSelectionKey); {
+		HC_Set_Line_Weight(3.0);
+		HC_Set_Edge_Weight(3.0);
+	} HC_Close_Segment();
+
 	m_pcBaseView->GetHighlightSelection()->SetGrayScale(false);// CAppSet_bGrayScaleSelection);
 	m_pcBaseView->GetHighlightSelection()->SetUseDefinedHighlight(false);// CAppSet_bUseDefinedHighlighting);
 	m_pcBaseView->GetHighlightSelection()->SetAllowDisplacement(false);// CAppSet_bDisplaceSelection);
@@ -384,6 +391,7 @@ void Canvas::Init()
 		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelDefault);
 	}
 
+	m_pcBaseView->GetHighlightSelection()->UpdateHighlightStyle();
 	m_pcBaseView->GetSelection()->UpdateHighlightStyle();
 
 	// set the rendermode

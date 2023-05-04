@@ -163,6 +163,8 @@ size_t SelectionControlPrivate::SelectByPoint(Point const & cInLocation, Selecti
 
 	// 정렬
 
+/*
+
 	TRACE(L"\n");
 
 	SelectionResultsIterator cIter = cOutResults.GetIterator();
@@ -189,6 +191,8 @@ size_t SelectionControlPrivate::SelectByPoint(Point const & cInLocation, Selecti
 		cIter.Next();
 	}
 
+	
+*/
 	TRACE(L"\n");
 
 	// #Selection: 선택요소를 Z방향으로 Sorting
@@ -196,8 +200,8 @@ size_t SelectionControlPrivate::SelectByPoint(Point const & cInLocation, Selecti
 		std::sort(pcResultsPrivate->Begin(), pcResultsPrivate->End(), SorterFunction);
 	}
 
-	cIter = cOutResults.GetIterator();
-	nIndex = 0;
+	SelectionResultsIterator cIter = cOutResults.GetIterator();
+	int nIndex = 0;
 	while (true == cIter.IsValid()) {
 		SelectionItem * pcItem = cIter.GetItem();
 
@@ -214,7 +218,7 @@ size_t SelectionControlPrivate::SelectByPoint(Point const & cInLocation, Selecti
 
 			CString strTypeString = TDF::Utility::GetTypeString(eType);
 
-			TRACE(L"%02d.%s[%s]\t\t%f\t%f\n", nIndex++, strTypeString, TDF::Utility::HexStr(cItemKey.KeyValue()), cWindowPoint.z, cWorldPoint.z);
+			TRACE(L"%02d.%s[%d]\t\t%f\t%f\n", nIndex++, strTypeString, cItemKey.KeyValue(), cWindowPoint.z, cWorldPoint.z);
 		}
 
 		cIter.Next();

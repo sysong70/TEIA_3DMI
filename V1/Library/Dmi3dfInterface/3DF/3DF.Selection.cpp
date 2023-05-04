@@ -1013,6 +1013,10 @@ TDF::SelectionControl::SelectionControl(WindowKey const & cInWindow)
 	pcImpl->m_pcWindow = &cInWindow;
 
 	m_pcImpl = pcImpl;
+
+
+
+
 }
 
 TDF::SelectionControl::SelectionControl(SelectionControl const & cInThat)

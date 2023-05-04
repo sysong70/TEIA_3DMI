@@ -24,7 +24,6 @@ public:
 	void SetKeyValue(HC_KEY nInKey);
 	void SetKeyValue(HC_KEY nInKey) const;
 
-
 	void Delete();
 };
 

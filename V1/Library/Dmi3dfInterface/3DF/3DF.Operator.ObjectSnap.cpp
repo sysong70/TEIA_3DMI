@@ -64,6 +64,23 @@ Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 
 	SegmentKey cConstruction(m_pcWindow->GetBaseView()->GetConstructionKey());
 
+/*
+	cTestSnapPoint.Open(); {
+		SegmentKey cTestSnapPoint = cConstruction.Subsegment(L"SnapPoint");
+		HC_Set_Heuristics("quick moves, no backplane culling, no hidden surfaces");
+ 		HC_Set_Selectability("everything = off");
+ 		HC_Set_Line_Weight(1);
+ 		HC_Set_Edge_Weight(1);
+		//HC_Set_Visibility("lights = off, cutting planes = off, faces = off, edges = on, lines = on, text = on, markers = off");
+ 		HC_Set_Visibility("no shadows");
+ 		//HC_Set_Color("lines = markers = text = light green");
+ 		//HC_Set_Rendering_Options("nurbs curve = (budget = 10000, maximum angle = 10)");
+		HC_Set_Rendering_Options("no display lists");
+		HC_Set_Rendering_Options("no frame buffer effects");
+		HC_Set_Heuristics("exclude bounding");
+	} cTestSnapPoint.Close();
+*/
+
 	// Snap Point Segment 설정
 	m_cSnapPointSegment = cConstruction.Subsegment(L"SnapPoint");
 
@@ -73,24 +90,26 @@ Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 
 	m_cSnapPointSegment.SetMaterialMapping(cMaterialMapping);
 	m_cSnapPointSegment.GetVisibilityControl().SetFaces(true);
-	m_cSnapPointSegment.GetEdgeAttributeControl().SetWeight(4.0, Edge::SizeUnits::Pixels);
-	m_cSnapPointSegment.GetVisualEffectsControl().SetAntiAliasing(false);
-
-
-	char chDriverOption[MVO_BUFFER_SIZE];
-	char chRenderingOption[MVO_BUFFER_SIZE];
-	HC_Open_Segment_By_Key(m_cSnapPointSegment.KeyValue());
-	HC_Set_Heuristics("no quick moves");
-	HC_Set_Rendering_Options("lines=on");
-// 	HC_Show_Net_Driver_Options(chDriverOption);
-// 	HC_Show_Net_Rendering_Options(chRenderingOption);
-	HC_Close_Segment();
-
+	m_cSnapPointSegment.GetVisibilityControl().SetLines(true);
+	m_cSnapPointSegment.GetVisibilityControl().SetEdges(true);
+	m_cSnapPointSegment.GetEdgeAttributeControl().SetWeight(3.0, Edge::SizeUnits::Pixels);
+	//m_cSnapPointSegment.GetEdgeAttributeControl().SetWeight(5.0);
+	//m_cSnapPointSegment.GetVisualEffectsControl().SetAntiAliasing(true);
+	m_cSnapPointSegment.GetVisualEffectsControl().SetLineAntiAliasing(true);
+	//m_cSnapPointSegment.GetVisualEffectsControl().SetTextAntiAliasing(true);
 }
 
 //== Mouse Event ===================================================================================
 int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 {
+	PixelPoint cMousePoint(cInEvent.GetMousePixelPos());
+
+	if (0 == m_cPrevPoint.DistanceWith(cMousePoint)) {
+		return HLISTENER_PASS_EVENT;
+	}
+
+	m_cPrevPoint = cMousePoint;
+
 	CamerInformation cCameraInfo;
 	ShowCameraInformation(m_fSnapRadius, cCameraInfo);
 
@@ -115,8 +134,8 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 	}
 
 	SelectionOptionsKit cSelectOption;
-	//cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(10).SetProximity(0.2f).SetSorting(Selection::Sorting::ZSorting);
-	cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(10).SetSorting(Selection::Sorting::ZSorting);
+	cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(10).SetProximity(0.2f).SetSorting(Selection::Sorting::ZSorting);
+	//cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(10).SetSorting(Selection::Sorting::ZSorting);
 
 	SelectionResults cHighlightSelection;
 	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cInEvent, cSelectOption, cHighlightSelection);
@@ -170,24 +189,19 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 					}
 				}
 			}*/
+
 			if (TDF::Type::LineKey == eType) {
+				TRACE(L"SelectByPoint: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());
 				m_cNewHighlightSelection.PushBack(new SelectionItem(*pcItem));
 			}
 		}
 	}
-
-	HighlightOptionsKit cHighlightOptions;
-	cHighlightOptions.SetNotification(false);
-
-	bool bForceUpdate = false;
-
-	// Old와 New가 다르면 Old를 Unhiglight하고 Reset 시킨다.
-	if (0 < m_cOldHighlightSelection.GetCount() && m_cOldHighlightSelection != m_cNewHighlightSelection) {
-		m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection, cHighlightOptions);
-		m_cOldHighlightSelection.Reset();
-		ClearSnapItems(false);
-		bForceUpdate = true;
+	else {
+		TRACE(L"SelectByPoint: %d\n", nSelectedCount);
 	}
+
+	
+	bool bForceUpdate = false;
 
 	// 	새롭게 선택된 Selection Result에서 Line만 남기도록 한다.
 	// 	m_cNewHighlightSelection.LeaveType((DWORD)TDF::Type::LineKey);
@@ -199,12 +213,59 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 		}
 	}
 
-	m_cOldHighlightSelection = m_cNewHighlightSelection;
+	HighlightOptionsKit cHighlightOptions;
+	cHighlightOptions.SetNotification(false);
 
-	if (0 < m_cNewHighlightSelection.GetCount()) {
-		m_pcWindow->GetHighlightControl().Highlight(m_cNewHighlightSelection, cHighlightOptions);
+	// 선택된 요소가 있고 기존과 다른 경우에만 Highlight를 한다.
+	if (0 < m_cNewHighlightSelection.GetCount() && m_cOldHighlightSelection != m_cNewHighlightSelection) {
+		m_pcWindow->GetHighlightControl().Highlight(m_cNewHighlightSelection, cHighlightOptions, true);
 		bForceUpdate = true;
 
+		Key cNewKey;
+		if(0 < m_cNewHighlightSelection.GetCount()) {
+			m_cNewHighlightSelection.Front()->ShowSelectedItem(cNewKey);
+		}
+
+		Key cOldKey;
+		if (0 < m_cOldHighlightSelection.GetCount()) {
+			m_cOldHighlightSelection.Front()->ShowSelectedItem(cOldKey);
+		}
+
+		TRACE(L"Highlight: %d, %d\n", cOldKey.KeyValue(), cNewKey.KeyValue());
+	}
+	else if(0 == m_cNewHighlightSelection.GetCount() && 0 < m_cOldHighlightSelection.GetCount()) {
+		// 기존에 선택된 요소가 있고 새로운 요소가 없는 경우에는 기존 요소를 지운다.
+		m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection, cHighlightOptions);
+
+		if(false == m_vSnapItems.empty()) { 
+			ClearSnapItems(false); 
+		}
+		
+		bForceUpdate = true;
+
+		Key cOldKey;
+		if (0 < m_cOldHighlightSelection.GetCount()) {
+			m_cOldHighlightSelection.Front()->ShowSelectedItem(cOldKey);
+		}
+
+		TRACE(L"Unhighlight: %d\n", cOldKey.KeyValue());
+	}
+
+	m_cOldHighlightSelection = m_cNewHighlightSelection;
+
+	Key cNewKey;
+	if (0 < m_cNewHighlightSelection.GetCount()) {
+		m_cNewHighlightSelection.Front()->ShowSelectedItem(cNewKey);
+	}
+
+	Key cOldKey;
+	if (0 < m_cOldHighlightSelection.GetCount()) {
+		m_cOldHighlightSelection.Front()->ShowSelectedItem(cOldKey);
+	}
+
+	TRACE(L"Copy: %d, %d\n", cOldKey.KeyValue(), cNewKey.KeyValue());
+
+	if (0 < m_cNewHighlightSelection.GetCount()) {
 		// 사전 선택된 Object Snap Point 삭제
 		ResetSnapItem();
 
@@ -213,6 +274,10 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 
 		// Snap Item을 그린다.
 		DrawSnapItems(false);
+
+		if(false == m_vSnapItems.empty()) {
+			bForceUpdate = true;
+		}
 	}
 
 	/*
@@ -228,7 +293,8 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 		}*/
 
 	if (true == bForceUpdate) {
-		m_pcWindow->GetBaseView()->ForceUpdate();
+		m_pcWindow->Update();
+		//m_pcWindow->GetBaseView()->ForceUpdate();
 	}
 
 	return HLISTENER_PASS_EVENT;

@@ -19,6 +19,14 @@ public:
 	TDF::Type ObjectType() const { return TDF::Type::VisualEffectsControl; };
 
 	VisualEffectsControl & SetAntiAliasing(bool bInState);
+	VisualEffectsControl & SetTextAntiAliasing(bool bInState);
+	VisualEffectsControl & SetLineAntiAliasing(bool bInState);
+
+	VisualEffectsControl & UnsetAntiAliasing();
+
+	bool ShowAntiAliasing(bool & bOutState) const;
+	bool ShowTextAntiAliasing(bool & bOutState) const;
+	bool ShowLineAntiAliasing(bool & bOutState) const;
 };
 
 CLOSE_3DF_NAMESPACE
