@@ -8,14 +8,14 @@ USING_3DF_NAMESPACE
 
 //== WorldPoint class ==============================================================================
 
-WorldPoint::WorldPoint(WindowKey const & cInWindow, WindowPoint const & cInPoint)
+TDF::WorldPoint::WorldPoint(WindowKey const & cInWindow, WindowPoint const & cInPoint)
 {
 	HC_Open_Segment_By_Key(cInWindow.GetSceneKey()); {
 		HC_Compute_Coordinates(".", "outer window", &cInPoint, "world", this);
 	} HC_Close_Segment();
 }
 
-WorldPoint::WorldPoint(WindowKey const & cInWindow, PixelPoint const & cInPoint)
+TDF::WorldPoint::WorldPoint(WindowKey const & cInWindow, PixelPoint const & cInPoint)
 {
 	HC_Open_Segment_By_Key(cInWindow.GetSceneKey()); {
 		HC_Compute_Coordinates(".", "outer pixels", &cInPoint, "world", this);

@@ -5,16 +5,23 @@
 
 #include <HTools.h>
 
+namespace TDF {
+	class ControlPrivate : public PrivateImpl
+	{
+		public:
+		ControlPrivate() { m_eType = TDF::Type::Control; }
+		void Copy(ControlPrivate * pcInThat) {
+			m_nKey = pcInThat->m_nKey;
+			m_nOwnerKey = pcInThat->m_nOwnerKey;
+		}
+		// Key
+		HC_KEY m_nKey = INVALID_KEY;
+		// Owner Key
+		HC_KEY m_nOwnerKey = INVALID_KEY;
+	};
+}
+
 USING_3DF_NAMESPACE
-
-class ControlPrivate : public TDF::PrivateImpl
-{
-public:
-	
-
-
-};
-
 
 Control::Control(HC_KEY nKey)
 {

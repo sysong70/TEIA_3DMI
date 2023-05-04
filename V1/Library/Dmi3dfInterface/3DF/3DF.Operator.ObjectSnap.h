@@ -94,7 +94,9 @@ namespace Operator
 
 		SegmentKey m_cSnapPointSegment;
 
-		float m_fSnapRadius = 10;
+		float m_fSnapRadius = 8;
+
+		Point m_cPrevPoint;
 
 		std::vector<ObjectSnap::SnapItem *> m_vSnapItems;
 	};

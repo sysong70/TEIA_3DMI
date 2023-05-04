@@ -8,9 +8,9 @@
 #include <hc.h>
 #include <HTools.h>
 
-USING_3DF_NAMESPACE
-
 //== LineAttributeKit class ========================================================================
+
+OPEN_3DF_NAMESPACE
 
 class LineAttributeKitPrivate : public PrivateImpl
 {
@@ -26,6 +26,10 @@ public:
 	float m_fWeight = -1;
 	Line::SizeUnits m_eInUnits = Line::SizeUnits::ScaleFactor;
 };
+
+CLOSE_3DF_NAMESPACE
+
+using namespace TDF;
 
 LineAttributeKit::LineAttributeKit()
 {
