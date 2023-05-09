@@ -79,6 +79,7 @@ namespace Operator
 		void ClearSnapItems(bool bUpdate);
 
 		void DrawSnapPoint(double dRadius, Point2D center, bool bSelected);
+		void DrawSnapPoint(double dRadius, Point2D center, SnapItem* pItem);
 
 		//== Utility Function ======================================================================
 		bool AddSnapItem(Key & cInKey, Point cSnapPoint, Type eType);

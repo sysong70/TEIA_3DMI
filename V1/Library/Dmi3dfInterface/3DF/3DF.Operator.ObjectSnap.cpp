@@ -497,13 +497,14 @@ void Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 		for (auto pcItem : m_vSnapItems) {
 			Point2D cDropPoint = pcItem->cPoint.DropPoint(cCameraInfo.cOrigin, cCameraInfo.cXAixs, cCameraInfo.cYAixs);
 
-			bool bSelected = false;
-			if (Status::Selected == pcItem->eStatus) {
-				bSelected = true;
-			}
+			//bool bSelected = false;
+			//if (Status::Selected == pcItem->eStatus) {
+			//	bSelected = true;
+			//}
 
-			CString strSnapType;
-			DrawSnapPoint(cCameraInfo.dObjectSnapRadius, cDropPoint, bSelected);
+			//CString strSnapType;
+			//DrawSnapPoint(cCameraInfo.dObjectSnapRadius, cDropPoint, bSelected);
+			DrawSnapPoint(cCameraInfo.dObjectSnapRadius, cDropPoint, pcItem);
 		}
 
 	} m_cSnapPointSegment.Close();
@@ -550,13 +551,14 @@ void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & 
 
 		Point2D cDropPoint = pcInItem->cPoint.DropPoint(cInCameraInfo.cOrigin, cInCameraInfo.cXAixs, cInCameraInfo.cYAixs);
 
-		bool bSelected = false;
-		if (Status::Selected == pcInItem->eStatus) {
-			bSelected = true;
-		}
+		//bool bSelected = false;
+		//if (Status::Selected == pcInItem->eStatus) {
+		//	bSelected = true;
+		//}
 
-		CString strSnapType;
-		DrawSnapPoint(cInCameraInfo.dObjectSnapRadius, cDropPoint, bSelected);
+		//CString strSnapType;
+		//DrawSnapPoint(cInCameraInfo.dObjectSnapRadius, cDropPoint, bSelected);
+		DrawSnapPoint(cInCameraInfo.dObjectSnapRadius, cDropPoint, pcInItem);
 
 	} m_cSnapPointSegment.Close();
 
@@ -971,6 +973,7 @@ void Operator::ObjectSnap::ClearSnapItems(bool bUpdate)
 }
 
 #include "3DF.Painter.h"
+#define OPEN_SEG(x) HC_Open_Segment(x); {
 
 void Operator::ObjectSnap::DrawSnapPoint(double dRadius, Point2D center, bool bSelected)
 {
@@ -981,26 +984,95 @@ void Operator::ObjectSnap::DrawSnapPoint(double dRadius, Point2D center, bool bS
 
 		Circle::Create(Point(center), dRadius, true);
 
-		HC_Open_Segment("outer");
-		{
+		HC_Open_Segment("outer"); {
 			Segment::SetVisibility("edges", false);
 			Segment::SetColor("faces", RGB(255, 255, 255), 0.5);
 			Figure::CreateDonut(Point(center), dRadius, dRadius * 2);
-		}
-		HC_Close_Segment();
+		} HC_Close_Segment();
 
 		//:TODO
-		HC_Open_Segment("snap name");
-		{
+		HC_Open_Segment("snap name"); {
 			Segment::SetColor("text", 0);
 			Font::SetAlignment(Font::EPivot::BottomCenter);
 			HC_Insert_Text(center.x, center.y + dRadius * 3, 0, "Near point");
-		}
-		HC_Close_Segment();
+		} HC_Close_Segment();
 	}
 	else {
 		Circle::Create(Point(center), dRadius, true);
 	}
+}
+
+void Operator::ObjectSnap::DrawSnapPoint(double dRadius, Point2D center, SnapItem* pItem)
+{
+	using namespace Painter;
+
+#define WARM_BALCK RGB(0x1F, 0x1E, 0x1C)
+#define WARM_WHITE RGB(0xFD, 0xF4, 0xDC)
+
+	Point p(center);
+
+	HC_Open_Segment("inner"); {
+		Segment::SetVisibility("edges", false);
+		Segment::SetColor("faces", WARM_WHITE);
+
+		Circle::Create(p, dRadius, true);
+
+		HC_Open_Segment("wire"); {
+			Segment::SetColor("faces", WARM_BALCK);
+
+			Figure::CreateDonut(p, dRadius * 0.6, dRadius);
+		} HC_Close_Segment();
+	} HC_Close_Segment();
+
+	if (pItem->eStatus != Status::Selected) {
+		return;
+	}
+
+	HC_Open_Segment("outer"); {
+		Segment::SetVisibility("edges", false);
+		Segment::SetColor("faces", WARM_WHITE, 0.5);
+
+		Figure::CreateDonut(p, dRadius, dRadius * 2);
+	} HC_Close_Segment();
+
+	//:TODO - language
+	const char* pText = nullptr;
+
+	switch (pItem->eType) {
+	case Type::EndPoint:	pText = "End Point";	break;
+	case Type::MidPoint:	pText = "Mid Point";	break;
+	case Type::NearPoint:	pText = "Near Point";	break;
+	case Type::Center:		pText = "Center Point";	break;
+	default:
+		return;
+	}
+
+	HC_Open_Segment("snap name"); {
+		p.y += dRadius * 3;
+
+		HC_Open_Segment("frame"); {
+			Segment::SetColor("faces", 0);
+			Segment::SetColor("edges", WARM_WHITE);
+
+			float width, height;
+			Text::GetExtent(pText, width, height);
+			//WorldPoint size(*m_pcWindow, WindowPoint(width, height));
+
+			//TDF::Point p1(p.x - size.x / 2, p.y + size.y / 2);
+			//TDF::Point p2(p.x + size.x / 2, p.y - size.y / 2);
+			//Figure::CreateRectangle(p1, p2);
+		} HC_Close_Segment();
+
+		Segment::SetColor("text", WARM_WHITE);
+		Font::SetName("franklin gothic book");
+		Font::SetSize(10, "pt");
+		Font::SetAlignment(Font::EPivot::BottomCenter);
+
+		Text::Create(p, pText);
+	} HC_Close_Segment();
+
+#undef WARM_BLACK
+#undef WARM_WHITE
 }
 
 //== Utility Function ==============================================================================
