@@ -1030,9 +1030,9 @@ void Canvas::ViewReady()
 	SetTransparency();
 
 	//Turn on static model and display lists last, and in that order
-	hmodel->SetStaticModel(CAppSet_StaticModel);
+	hmodel->SetStaticModel(m_cPreference.Perfromance.Optimization.StaticModel);
 
-	hmodel->SetLMVModel(CAppSet_LMVModel);
+	hmodel->SetLMVModel(m_cPreference.Perfromance.Optimization.LMVModel);
 
 	if (CAppSet_bRestoreAnnotations) {
 		GetBaseView()->SetAnnotationResize(true);

@@ -2,6 +2,7 @@
 
 #include "3DF.h"
 #include "3DF.Key.h"
+#include "3DF.Math.h"
 
 OPEN_3DF_NAMESPACE
 
@@ -14,6 +15,10 @@ public:
 
 	virtual bool NearPoint(WindowKey const & cInWindow, const MatrixKit & cModelingMatrix, const WindowPoint & cInPoint, WorldPoint & cOutPoint) const;
 	virtual bool DistanceToPoint(const WorldPoint & cInPoint, double & nOutDistance) const;
+
+	virtual bool IsCoincident(const LineKey & cInThat) const;
+
+	virtual bool ShowVolume(SimpleCuboid & out_cuboid) const;
 };
 
 CLOSE_3DF_NAMESPACE

@@ -37,7 +37,7 @@ void Key::Set(Key const & cInThat)
 	pcImpl->Copy(pcInThatImpl);
 }
 
-Key const & Key::operator=(Key const & cInThat)
+Key const & Key::operator = (Key const & cInThat)
 {
 	Set(cInThat);
 	return *this;
@@ -47,7 +47,7 @@ bool Key::operator == (Key const & cInThat) const
 {
 	KeyPrivate * pcImpl = (KeyPrivate *)m_pcImpl;
 	KeyPrivate * pcInThatImpl = (KeyPrivate *)cInThat.m_pcImpl;
-	return pcImpl->m_nKey == pcInThatImpl->m_nKey;
+	return (pcImpl->m_nKey == pcInThatImpl->m_nKey);
 }
 
 HC_KEY Key::KeyValue() const 

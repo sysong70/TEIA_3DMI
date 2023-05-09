@@ -4,6 +4,9 @@
 
 #include "3DF.Segment.h"
 
+#include <HUtility.h>
+#include <HTools.h>
+
 using namespace std::chrono;
 
 USING_3DF_NAMESPACE
@@ -212,4 +215,50 @@ CString Utility::GetTypeString(Type eType)
 	}
 
 	return strText;
+}
+
+bool Utility::SetSegmentName(SegmentKey & cInSegment, CString strName)
+{
+	char * pchName = nullptr;
+	int nSize = 0;
+
+	if (false == UnicodeToChar(strName, pchName, nSize)) {
+		return false;
+	}
+
+	cInSegment.SetUserData((intptr_t)UserDataIndex::Name, nSize, (BYTE *)pchName);
+
+	delete [] pchName;
+
+	return true;
+}
+
+bool Utility::UnicodeToChar(CString strText, char *& pchBuffer)
+{
+	int nBufferSize = 0;
+	return UnicodeToChar(strText, pchBuffer, nBufferSize);
+}
+
+bool Utility::UnicodeToChar(CString strText, char *& pchBuffer, int & nBufferSize)
+{
+	if (true == strText.IsEmpty()) {
+		return false;
+	}
+
+	int nSize = WideCharToMultiByte(CP_ACP, 0, strText, -1, NULL, 0, NULL, NULL);
+	pchBuffer = new char[nSize];
+	if (nullptr == pchBuffer) {
+		ASSERT(FALSE);
+		return false;
+	}
+
+	nBufferSize = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR)strText, -1, pchBuffer, nSize, NULL, NULL);
+
+	if (0 == nBufferSize) {
+		ASSERT(FALSE);
+		delete [] pchBuffer;
+		return false;
+	}
+
+	return true;
 }

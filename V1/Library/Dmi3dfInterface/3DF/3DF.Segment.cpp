@@ -20,8 +20,6 @@
 
 USING_3DF_NAMESPACE
 
-
-
 SegmentKey::SegmentKey(CString strInName)
 {
 	HC_KEY nKey = INVALID_KEY;
@@ -687,7 +685,7 @@ bool SegmentKey::ShowModellingMatrix(MatrixKit & cOutKit) const
 	return true;
 }
 
-
+//== Bounding 관련 함수 ==============================================================================
 SegmentKey & SegmentKey::SetBounding(BoundingKit const & cInKit)
 {
 	bool bExclusion = false;
@@ -699,6 +697,40 @@ SegmentKey & SegmentKey::SetBounding(BoundingKit const & cInKit)
 		HC_Set_Heuristics("exclude bounding");
 		SegmentKeyPrivate::LocalClose(*this);
 	}
+
+	return *this;
+}
+
+//== User Data 관련 함수 =============================================================================
+SegmentKey & SegmentKey::SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData)
+{
+	if (aInIndices.size() == aInData.size()) {
+		for (size_t nIndex = 0; nIndex < aInIndices.size(); ++nIndex) {
+			SetUserData(aInIndices[nIndex], aInData[nIndex]);
+		}
+	}
+
+	return *this;
+}
+
+SegmentKey & SegmentKey::SetUserData(intptr_t nInIndex, size_t nInBytes, BYTE const pnInData[])
+{
+	SegmentKeyPrivate::LocalOpen(*this);
+
+	HC_Set_User_Data(nInIndex, pnInData, nInBytes);
+
+	SegmentKeyPrivate::LocalClose(*this);
+
+	return *this;
+}
+
+SegmentKey & SegmentKey::SetUserData(intptr_t nInIndex, ByteArray const & aInData)
+{
+	SegmentKeyPrivate::LocalOpen(*this);
+
+	HC_Set_User_Data(nInIndex, aInData.data(), aInData.size());
+
+	SegmentKeyPrivate::LocalClose(*this);
 
 	return *this;
 }

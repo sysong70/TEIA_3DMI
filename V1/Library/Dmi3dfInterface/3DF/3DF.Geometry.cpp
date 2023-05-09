@@ -20,3 +20,13 @@ bool GeometryKey::DistanceToPoint(const WorldPoint & cInPoint, double & nOutDist
 {
 	return false;
 }
+
+bool GeometryKey::IsCoincident(const LineKey & cInThat) const
+{
+	return false;
+}
+
+bool GeometryKey::ShowVolume(SimpleCuboid & out_cuboid) const
+{
+	return false;
+}

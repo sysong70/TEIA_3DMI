@@ -187,6 +187,54 @@ bool LineKey::ShowPoints(WorldPointArray & aOutPoints) const
 	return true;
 }
 
+bool LineKey::IsCoincident(const LineKey & cInThat, const MatrixKit & cMatrix1, const MatrixKit & cMatrix2) const
+{
+	WorldPointArray aPoints;
+	if (false == ShowPoints(aPoints)) {
+		return false;
+	}
+
+	WorldPointArray aInPoints;
+	if (false == cInThat.ShowPoints(aInPoints)) {
+		return false;
+	}
+
+	// 점이 2개 이상인 경우만 처리
+	if (1 >= aPoints.size() || 1 >= aInPoints.size()) {
+		return false;
+	}
+
+	aPoints = cMatrix1.Transform(aPoints);
+	aInPoints = cMatrix2.Transform(aInPoints);
+
+	double dLength = 0, dInThatLength = 0;
+
+	for (int nIndex = 0; nIndex < aPoints.size() - 1; nIndex++) {
+		dLength += aPoints[nIndex].DistanceWith(aPoints[nIndex + 1]);
+	}
+
+	for (int nIndex = 0; nIndex < aInPoints.size() - 1; nIndex++) {
+		dInThatLength += aInPoints[nIndex].DistanceWith(aInPoints[nIndex + 1]);
+	}
+
+	// 길이가 다르면 false
+	if (1e-3 < fabs(dLength - dInThatLength)) {
+		return false;
+	}
+
+	TRACE(L"dLength, dInThatLength: %f, %f\n", dLength, dInThatLength);
+
+	SimpleCuboid cCuboid, cInThatCuboid;
+	cCuboid.Merge(aPoints.size(), aPoints.data());
+	cInThatCuboid.Merge(aInPoints.size(), aInPoints.data());
+
+	if (false == cCuboid.Equals(cInThatCuboid)) {
+		return false;
+	}
+
+	return true;
+}
+
 bool LineKey::GetEndPoint(Point & cSP, Point & cEP)
 {
 	WorldPointArray aPoints;
@@ -391,4 +439,31 @@ bool LineKey::DistanceToPoint(const WorldPoint & cInPoint, double & nOutDistance
 */
 
 	return false;
+}
+
+bool LineKey::Length(double & dLength) const
+{
+	int nCount = 0;
+	HC_Show_Polyline_Count(KeyValue(), &nCount);
+	if (0 == nCount) {
+		return false;
+	}
+
+	Point * pcPoints = new Point[nCount];
+
+	HC_Show_Polyline(KeyValue(), &nCount, pcPoints);
+
+	dLength = -1;
+
+	for (int nIndex = 0; nIndex < nCount - 1; nIndex++) {
+		dLength += pcPoints[nIndex].DistanceWith(pcPoints[nIndex + 1]);
+	}
+
+	delete[] pcPoints;
+
+	if (0 > dLength) {
+		return false;
+	}
+
+	return true;
 }

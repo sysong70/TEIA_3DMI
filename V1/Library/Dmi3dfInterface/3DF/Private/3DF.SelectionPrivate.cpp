@@ -28,6 +28,55 @@
 
 USING_3DF_NAMESPACE
 
+
+//== SelectionResultsPrivate class =================================================================
+bool SelectionResultsPrivate::Sort()
+{
+	if (2 > deItems.size()) {
+		return false;
+	}
+
+	// 선택된 요소를 정렬하기 위해서 STL의 sort 함수를 사용
+	std::sort(deItems.begin(), deItems.end(), [] (SelectionItem * pcItem1, SelectionItem * pcItem2) {
+		WindowPoint cP1, cP2;
+		pcItem1->ShowSelectionPosition(cP1);
+		pcItem2->ShowSelectionPosition(cP2);
+
+		if (cP1.z < cP2.z) return true;
+		return false;
+	});
+/*
+	TRACE(L"\n");
+
+	SelectionResultsIterator cIter = cOutResults.GetIterator();
+	int nIndex = 0;
+	while (true == cIter.IsValid()) {
+		SelectionItem * pcItem = cIter.GetItem();
+
+		Key cItemKey;
+
+		if (true == pcItem->ShowSelectedItem(cItemKey)) {
+			WorldPoint cWorldPoint;
+			pcItem->ShowSelectionPosition(cWorldPoint);
+
+			WindowPoint cWindowPoint;
+			pcItem->ShowSelectionPosition(cWindowPoint);
+
+			TDF::Type eType = cItemKey.Type();
+
+			CString strTypeString = TDF::Utility::GetTypeString(eType);
+
+			TRACE(L"%02d.%s[%d]\t\t%f\t%f\n", nIndex++, strTypeString, cItemKey.KeyValue(), cWindowPoint.z, cWorldPoint.z);
+		}
+
+		cIter.Next();
+	}*/
+
+	return true;
+}
+
+//== SelectionControlPrivate class =================================================================
+
 // 주어진 Point와 Selection Option을 이용해서 선택 작업을 수행하고, 선택된 요소를 SelectionResults에 저장한다.
 size_t SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
 {
@@ -161,69 +210,6 @@ size_t SelectionControlPrivate::SelectByPoint(Point const & cInLocation, Selecti
 
 	} while (HC_Find_Related_Selection());
 
-	// 정렬
-
-/*
-
-	TRACE(L"\n");
-
-	SelectionResultsIterator cIter = cOutResults.GetIterator();
-	int nIndex = 0;
-	while (true == cIter.IsValid()) {
-		SelectionItem * pcItem = cIter.GetItem();
-
-		Key cItemKey;
-
-		if (true == pcItem->ShowSelectedItem(cItemKey)) {
-			WorldPoint cWorldPoint;
-			pcItem->ShowSelectionPosition(cWorldPoint);
-
-			WindowPoint cWindowPoint;
-			pcItem->ShowSelectionPosition(cWindowPoint);
-
-			TDF::Type eType = cItemKey.Type();
-
-			CString strTypeString = TDF::Utility::GetTypeString(eType);
-
-			TRACE(L"%02d.%s[%s]\t\t%f\t%f\n", nIndex++, strTypeString, TDF::Utility::HexStr(cItemKey.KeyValue()), cWindowPoint.z, cWorldPoint.z);
-		}
-
-		cIter.Next();
-	}
-
-	
-*/
-	TRACE(L"\n");
-
-	// #Selection: 선택요소를 Z방향으로 Sorting
-	if (2 <= pcResultsPrivate->Size()) {
-		std::sort(pcResultsPrivate->Begin(), pcResultsPrivate->End(), SorterFunction);
-	}
-
-	SelectionResultsIterator cIter = cOutResults.GetIterator();
-	int nIndex = 0;
-	while (true == cIter.IsValid()) {
-		SelectionItem * pcItem = cIter.GetItem();
-
-		Key cItemKey;
-
-		if (true == pcItem->ShowSelectedItem(cItemKey)) {
-			WorldPoint cWorldPoint;
-			pcItem->ShowSelectionPosition(cWorldPoint);
-
-			WindowPoint cWindowPoint;
-			pcItem->ShowSelectionPosition(cWindowPoint);
-
-			TDF::Type eType = cItemKey.Type();
-
-			CString strTypeString = TDF::Utility::GetTypeString(eType);
-
-			TRACE(L"%02d.%s[%d]\t\t%f\t%f\n", nIndex++, strTypeString, cItemKey.KeyValue(), cWindowPoint.z, cWorldPoint.z);
-		}
-
-		cIter.Next();
-	}
-
 	return pcResultsPrivate->Size();
 }
 
@@ -237,7 +223,6 @@ bool SelectionControlPrivate::SorterFunction(const void * pcArg1, const void * p
 	pcItem2->ShowSelectionPosition(cP2);
 
 	if (cP1.z < cP2.z) return true;
-	
 	return false;
 }
 

@@ -64,6 +64,7 @@ class PolygonKey;
 class BoundingKit;
 class SelectabilityKit;
 
+
 class MatrixKit;
 class CameraKit;
 
@@ -165,7 +166,7 @@ enum class UserDataIndex : uint32_t
 class API_3DF Memory
 {
 public:
-	static void * Allocate(size_t nInBytes, bool bInClearMemory = true);
+	static void * Allocate(size_t nInBytes, bool bInClearMemory = false);
 	static void	Free(void * pInPointer);
 
 private:
@@ -185,7 +186,6 @@ public:
 	typedef size_t				size_type;
 	typedef ptrdiff_t			difference_type;
 
-
 	Allocator() {}
 	Allocator(Allocator<T> const & in_that) { TDF_UNREFERENCED(in_that); }
 	~Allocator() {}
@@ -193,16 +193,14 @@ public:
 	template <typename U> Allocator(Allocator<U> const &) {}
 
 	template <typename U>
-	struct rebind
-	{
+	struct rebind {
 		typedef Allocator<U> other;
 	};
-
 
 	pointer address(reference x) const { return &x; }
 	const_pointer address(const_reference x) const { return &x; }
 
-	pointer  allocate(size_type n, void * v = 0) { TDF_UNREFERENCED(v); return static_cast<pointer>(Memory::Allocate(n * sizeof(T))); }
+	pointer allocate(size_type n, void * v = 0) { TDF_UNREFERENCED(v); return static_cast<pointer>(Memory::Allocate(n * sizeof(T))); }
 	void deallocate(pointer p, size_type n) { TDF_UNREFERENCED(n); Memory::Free(p); }
 
 #if defined(_MSC_VER) || defined (__APPLE__)
@@ -212,16 +210,17 @@ public:
 	template<typename U, typename... Args>
 	void construct(U * p, Args&&... args) { new(p) U(std::forward<Args>(args)...); }
 #endif
+
 	void destroy(pointer p) { TDF_UNREFERENCED(p); p->~T(); }
 
 	size_type max_size() const { return static_cast<size_type>(-1) / sizeof(T); }
 };
 
 template <typename T, typename U>
-bool operator==(const Allocator<T> &, const Allocator<U> &) { return true; }
+bool operator == (const Allocator<T> &, const Allocator<U> &) { return true; }
 
 template <typename T, typename U>
-bool operator!=(const Allocator<T> &, const Allocator<U> &) { return false; }
+bool operator != (const Allocator<T> &, const Allocator<U> &) { return false; }
 
 
 //== Type Definitions ==============================================================================
@@ -239,6 +238,10 @@ using Polygon = PolygonKit;
 using PolygonArray = std::vector<PolygonKit, Allocator<PolygonKit>>;
 
 using StringArray = std::vector<CString, Allocator<CString>>;
+
+using IntPtrTArray = std::vector<intptr_t, Allocator<intptr_t>>;
+using ByteArray = std::vector<BYTE, Allocator<BYTE>>;
+using ByteArrayArray = std::vector<ByteArray, Allocator<ByteArray>>;
 
 namespace PMI {
 	class TextAttributes;
@@ -267,5 +270,7 @@ public:
 protected:
 	TDF::Type m_eType = TDF::Type::None;
 };
+
+
 
 CLOSE_3DF_NAMESPACE

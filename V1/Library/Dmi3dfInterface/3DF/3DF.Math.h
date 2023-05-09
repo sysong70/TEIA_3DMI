@@ -14,9 +14,7 @@
 #include <HGlobals.h>
 */
 
-#include <atlcoll.h>
-#include <memory>
-
+#include <limits>
 
 #ifndef M_PI
 #	define M_PI 3.1415926535897932384626433832795028841971693993751
@@ -340,7 +338,7 @@ TDF_INLINE bool Float::Equals(double const & a, double const & b, int tolerance)
 }
 
 template <typename F> class Vector_3D;
-template <typename F> class Vector_3D;
+template <typename F> class Plane_3D;
 template <typename F> class Vector_2D;
 template <typename F> class Point_2D;
 
@@ -355,13 +353,14 @@ public:
 	Point_3D() { x = 0, y = 0, z = 0; }
 	Point_3D(F v1, F v2, F v3 = (F)0.0) : x(v1), y(v2), z(v3) {}
 
-	void Set(F X, F Y, F Z) { x = X; y = Y; z = Z; };
-
 	template <typename D>
 	Point_3D(Point_3D<D> const & that) : x((F) that.x), y((F) that.y), z((F) that.z) {}
+
 	Point_3D(Vector_3D<F> const & v);
 	explicit Point_3D(Vector_2D<F> const & v);
 	explicit Point_3D(Point_2D<F> const & that);
+
+	void Set(F X, F Y, F Z) { x = X; y = Y; z = Z; };
 
 	Point_3D const	operator- () const	{ return Point_3D (-x, -y, -z); }
 
@@ -634,7 +633,7 @@ public:
 	template <typename D>
 	Vector_3D (Point_3D<D> const & p) : x(p.x), y(p.y), z(p.z) {}
 	// explicit Vector_3D(Point_3D<F> const & p) : x(p.x), y(p.y), z(p.z) {}
-	// explicit Vector_3D(Plane_3D<F> const & p);
+	explicit Vector_3D(Plane_3D<F> const & p);
 	explicit Vector_3D (Vector_2D<F> const & that);
 
 	void Set(F X, F Y, F Z) { x = X; y = Y; z = Z; };
@@ -934,6 +933,516 @@ TDF_INLINE	Vector_2D<F>	operator* (S s, Vector_2D<F> const & v) { return Vector_
 template <typename F>
 TDF_INLINE bool Is_Abnormal(Vector_2D<F> const & v) {
 	return Is_Abnormal(v.x) || Is_Abnormal(v.y);
+}
+
+template <typename F>
+class Plane_3D {
+public:
+	F	a;
+	F	b;
+	F	c;
+	F	d;
+
+	Plane_3D() {}
+	Plane_3D(F v1, F v2, F v3, F v4) : a(v1), b(v2), c(v3), d(v4) {}
+	Plane_3D(Vector_3D<F> const & v, F f = 0) : a(v.x), b(v.y), c(v.z), d(f) {}
+	Plane_3D(Vector_3D<F> const & v, Point_3D<F> const & p) : a(v.x), b(v.y), c(v.z), d(-(p.x * v.x + p.y * v.y + p.z * v.z)) {}
+	Plane_3D(Point_3D<F> const & p, Vector_3D<F> const & v) : a(v.x), b(v.y), c(v.z), d(-(p.x * v.x + p.y * v.y + p.z * v.z)) {}
+	template <typename D>
+	explicit Plane_3D(Plane_3D<D> const & that) : a((F)that.a), b((F)that.b), c((F)that.c), d((F)that.d) {}
+
+	Plane_3D(size_t count, Point_3D<F> const * points) {
+		if (count >= 3) {
+			// The 3 coefficients A, B, and C are proportional to the areas of the
+			// projections of the polygon onto the yz, zx, and xy planes, respectively.
+
+			// run around the polygon, collecting trapezoidal areas
+			// a "center" point is also collected, to make the plane 'd' slightly more "valid" when the polygon is non-planar.
+
+			// take care of the swing point first
+			Point_3D<F> const * p0 = &points[count - 1];
+
+			Point_3D<double>	ctr = Point_3D<double>::Origin();
+			Vector_3D<F>		normal = Vector_3D<F>::Zero();
+
+			for (size_t i = 0; i < count; ++i) {
+				Point_3D<F> const * p1 = &points[i];
+
+				normal.x += (p0->y + p1->y) * (p1->z - p0->z);
+				normal.y += (p0->z + p1->z) * (p1->x - p0->x);
+				normal.z += (p0->x + p1->x) * (p1->y - p0->y);
+
+				ctr += Vector_3D<double>(Vector_3D<F>(points[i]));
+
+				p0 = p1;
+			}
+
+			// ("should" always be != 0)
+			if (normal.Normalize() != Vector_3D<F>::Zero()) {
+				/* finish finding the average */
+				double	inv_count = 1.0 / (double)count;
+				ctr *= inv_count;
+
+				*this = Plane_3D(normal, Point_3D<F>(ctr));
+				return;
+			}
+		}
+
+		*this = Plane_3D::Zero();
+	}
+
+
+	Plane_3D const		operator- () const { return Plane_3D(-a, -b, -c, -d); }
+
+	bool				operator== (Plane_3D const & p) const { return  a == p.a && b == p.b && c == p.c && d == p.d; }
+	bool				operator!= (Plane_3D const & p) const { return  !(*this == p); }
+
+	F & operator[] (size_t i) { return (&a)[i]; }
+	F const & operator[] (size_t i) const { return (&a)[i]; }
+
+	TDF_INLINE bool	Equals(Plane_3D const & p, int in_tolerance = 32) const {
+		return  Float::Equals(a, p.a, in_tolerance) && Float::Equals(b, p.b, in_tolerance) &&
+			Float::Equals(c, p.c, in_tolerance) && Float::Equals(d, p.d, in_tolerance);
+	}
+
+	Plane_3D & Normalize(F epsilon = Float_Traits<F>::Epsilon()) {	// not const &; allow V.normalize() *= S;
+		F len = (F)Vector_3D<F>(*this).Length();
+		if (len > epsilon)
+			operator/= (len);
+		else
+			*this = Zero();
+		return *this;
+	}
+
+	bool IntersectLineSegment(Point_3D<F> const & p1, Point_3D<F> const & p2, Point_3D<F> & cIntersectPoint, float eps = 1e-5f) const {
+//	Point_3D<F> IntersectLineSegment(Point_3D<F> const & p1, Point_3D<F> const & p2, float eps = 1e-5f) const {
+		F val1 = Abs(a * p1.x + b * p1.y + c * p1.z + d);
+		F val2 = Abs(a * p2.x + b * p2.y + c * p2.z + d);
+
+		if (val1 >= eps) {
+			cIntersectPoint = Point_3D<F>(((val1 * p2.x) + (val2 * p1.x)) / (val1 + val2),
+				((val1 * p2.y) + (val2 * p1.y)) / (val1 + val2),
+				((val1 * p2.z) + (val2 * p1.z)) / (val1 + val2));
+			return true;
+		}
+
+		return false;
+	}
+
+	Point_3D<F> IntersectLineSegment2(Point_3D<F> const & p1, Point_3D<F> const & p2) const {
+		F		 u = (a * p1.x + b * p1.y + c * p1.z + d) /
+			(a * (p1.x - p2.x) + b * (p1.y - p2.y) + c * (p1.z - p2.z));
+
+		return Point_3D<F>(p1.x + u * (p2.x - p1.x), p1.y + u * (p2.y - p1.y), p1.z + u * (p2.z - p1.z));
+	}
+
+
+	bool parallel(Plane_3D const & p) const {
+		return  equivalent(a, p.a) &&
+			equivalent(b, p.b) &&
+			equivalent(c, p.c);
+	}
+
+	bool equivalent(Plane_3D const & p) const {
+		return  parallel(p) &&
+			equivalent(d, p.d, (F)1.0e-6);
+	}
+
+
+	static TDF_INLINE Plane_3D Zero() { return Plane_3D(0.0f, 0.0f, 0.0f, 0.0f); };
+
+
+private:
+	Plane_3D & operator*= (F s) { a *= s; b *= s; c *= s; d *= s; return *this; }
+	Plane_3D & operator/= (F s) { return operator*= ((F)1.0 / s); }
+	Plane_3D const	operator* (F s) const { return Plane_3D(a * s, b * s, c * s, d * s); }
+	Plane_3D const	operator/ (F s) const { return operator* ((F)1.0 / s); }
+
+	static bool equivalent(float a, float b) {					// for vector components
+		if (Abs(a) < 1.0e-4f && Abs(b) < 1.0e-4f)
+			return true;
+		return Float::Equals(a, b);
+	}
+
+	static bool equivalent(float a, float b, float cutoff) {	// for distance
+		if (Abs(a) < cutoff && Abs(b) < cutoff)
+			return a == b;
+		return Float::Equals(a, b);
+	}
+};
+
+typedef Plane_3D<float>		Plane;
+typedef Plane_3D<double>	DPlane;
+
+
+template <typename F>
+TDF_INLINE bool Is_Abnormal(Plane_3D<F> const & p) {
+	return Is_Abnormal(p.a) || Is_Abnormal(p.b) || Is_Abnormal(p.c) || Is_Abnormal(p.d);
+}
+
+
+template <typename F>
+TDF_INLINE	F operator* (Plane_3D<F> const & plane, Point_3D<F> const & point) {
+	return plane.a * point.x + plane.b * point.y + plane.c * point.z + plane.d;
+}
+template <typename F>
+TDF_INLINE	F operator* (Point_3D<F> const & point, Plane_3D<F> const & plane) {
+	return plane * point;
+}
+
+template <typename F>
+TDF_INLINE Plane_3D<F> Interpolate(Plane_3D<F> const & a, Plane_3D<F> const & b, float t) {
+	return Plane_3D<F>(a.a + (b.a - a.a) * t, a.b + (b.b - a.b) * t, a.c + (b.c - a.c) * t, a.d + (b.d - a.d) * t);
+}
+
+template <typename F>
+Vector_3D<F>::Vector_3D(Plane_3D<F> const & p) : x(p.a), y(p.b), z(p.c) {}
+
+
+//== Cuboid_3D Class ===============================================================================
+
+template <typename F>
+struct Cuboid_3D {
+	Point_3D<F>		cMin;
+	Point_3D<F>		cMax;
+
+	// Creates an invalid cuboid.
+	Cuboid_3D() : cMin(Limit_Point()), cMax(-Limit_Point()) {}
+
+
+	// Creates a cuboid equal to another cuboid.
+	template <typename D>
+	explicit Cuboid_3D(Cuboid_3D<D> const & that) : cMin(Point_3D<F>(that.cMin)), cMax(Point_3D<F>(that.cMax)) {}
+
+	// Creates a cuboid that will fit tightly around a sphere.
+	// Cuboid_3D(Sphere_3D<F> const & that);
+
+	// Creates a cuboid based on two points, which become opposite corners of the cuboid.
+	Cuboid_3D(Point_3D<F> const & in_min, Point_3D<F> const & in_max) : cMin(in_min), cMax(in_max) {}
+
+	// Creates a cuboid based on an array of points. Only the minimum and maximum points are used, which become opposite corners of the cuboid. If count is 0, then an invalid cuboid is returned.
+	Cuboid_3D(size_t count, Point_3D<F> const * points) {
+		if (count == 0) {
+			cMin = Limit_Point();
+			cMax = -Limit_Point();
+			return;
+		}
+		cMin = cMax = *points++;
+		if (--count > 0)
+			Merge(count, points);
+	}
+
+	// Creates a cuboid based on an array of points. Only the minimum and maximum points are used, which become opposite corners of the cuboid. If count is 0, then an invalid cuboid is returned.
+	template <typename T>
+	Cuboid_3D(size_t count, T const * indices, Point_3D<F> const * points) {
+		if (count == 0) {
+			cMin = Limit_Point();
+			cMax = -Limit_Point();
+			return;
+		}
+		cMin = cMax = points[*indices++];
+		if (--count > 0) {
+			Merge(count, indices, points);
+		}
+	}
+
+	// Creates a cuboid with the same dimensions as a rectangle.
+	//Cuboid_3D(Rectangle const & that) : cMin(Point_3D<F>(that.left, that.bottom, 0)), cMax(Point_3D<F>(that.right, that.top, 0)) {}
+
+	// Tests whether this cuboid is valid. The cuboid is considered valid if the minimum point is less than or equal to the maximum point.
+	TDF_INLINE bool		IsValid() const {
+		return cMin.x <= cMax.x && cMin.y <= cMax.y && cMin.z <= cMax.z;
+	}
+
+	// Creates an invalid cuboid.
+	static TDF_INLINE Cuboid_3D Invalid() { return Cuboid_3D(); };
+
+	// Invalidates this cuboid.
+	void Invalidate() { cMin = Limit_Point(); cMax = -Limit_Point(); }
+
+	// Determines if the maximum and minimum points of this cuboid are equal to the maximum and minimum points of another cuboid.
+	TDF_INLINE bool		operator== (Cuboid_3D const & cuboid) const { return  (cMin == cuboid.cMin && cMax == cuboid.cMax); }
+
+	// Determines if the maximum and minimum points of this cuboid are not equal to the maximum and minimum points of another cuboid.
+	TDF_INLINE bool		operator!= (Cuboid_3D const & cuboid) const { return  !(*this == cuboid); }
+
+	bool Equals(Cuboid_3D const & p, int in_tolerance = 32) const {
+		if (false == cMin.Equals(p.cMin, in_tolerance)) {
+			return false;
+		}
+
+		if (false == cMax.Equals(p.cMax, in_tolerance)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	// Assigns the eight corners of the cuboid based on the points in the parameter array. The array must contain at least eight points.
+	TDF_INLINE void Generate_Cuboid_Points(Point_3D<F> * points) const {
+		points[0] = Point_3D<F>(cMin.x, cMin.y, cMin.z);
+		points[1] = Point_3D<F>(cMin.x, cMin.y, cMax.z);
+		points[2] = Point_3D<F>(cMin.x, cMax.y, cMin.z);
+		points[3] = Point_3D<F>(cMin.x, cMax.y, cMax.z);
+		points[4] = Point_3D<F>(cMax.x, cMin.y, cMin.z);
+		points[5] = Point_3D<F>(cMax.x, cMin.y, cMax.z);
+		points[6] = Point_3D<F>(cMax.x, cMax.y, cMin.z);
+		points[7] = Point_3D<F>(cMax.x, cMax.y, cMax.z);
+	}
+
+	// Returns the diagonal vector of the cuboid.
+	TDF_INLINE Vector_3D<F> Diagonal() const { return cMax - cMin; }
+
+	// Returns the volume of this cuboid.
+	TDF_INLINE F Volume() const { return (cMax.x - cMin.x) * (cMax.y - cMin.y) * (cMax.z - cMin.z); }
+
+	// Determines whether this cuboid intersects with another cuboid.
+	TDF_INLINE bool Intersecting(Cuboid_3D const & cuboid) const {
+		return	cMax.x >= cuboid.cMin.x && cMin.x <= cuboid.cMax.x &&
+			cMax.y >= cuboid.cMin.y && cMin.y <= cuboid.cMax.y &&
+			cMax.z >= cuboid.cMin.z && cMin.z <= cuboid.cMax.z;
+	}
+
+	// Determines whether this cuboid intersects with another cuboid. Allows for a tolerance value to be considered.
+	TDF_INLINE bool Intersecting(Cuboid_3D const & cuboid, F const allowance) const {
+		return	cMax.x + allowance >= cuboid.cMin.x && cMin.x - allowance <= cuboid.cMax.x &&
+			cMax.y + allowance >= cuboid.cMin.y && cMin.y - allowance <= cuboid.cMax.y &&
+			cMax.z + allowance >= cuboid.cMin.z && cMin.z - allowance <= cuboid.cMax.z;
+	}
+
+	// Retuns true if this cuboid intersects with the parameter cuboid along a certain axis.
+	TDF_INLINE bool Intersecting(int dimension, Cuboid_3D const & cuboid) const {
+		//ASSERT (0 <= dimension && dimension <= 2);
+		return	cMax[dimension] >= cuboid.cMin[dimension] && cMin[dimension] <= cuboid.cMax[dimension];
+	}
+
+	// Returns true if this cuboid intersects with the parameter cuboid along a certain axis, and considers a tolerance value.
+	TDF_INLINE bool Intersecting(int dimension, Cuboid_3D const & cuboid, F const allowance) const {
+		//ASSERT (0 <= dimension && dimension <= 2);
+		return	cMax[dimension] + allowance >= cuboid.cMin[dimension] && cMin[dimension] - allowance <= cuboid.cMax[dimension];
+	}
+
+	// Determines whether this cuboid intersects with a ray.
+	TDF_INLINE bool Intersecting(Point_3D<F> const & start, Vector_3D<F> const & direction) const {
+		return LineIntersecting(start, direction, true);
+	}
+
+	// Determines whether this cuboid intersects with an infinite line.
+	TDF_INLINE bool Intersecting(Point_3D<F> const & point1, Point_3D<F> const & point2) const {
+		Vector_3D<F> const direction = point2 - point1;
+		return LineIntersecting(point1, direction, false);
+	}
+
+	// Merges this cuboid with another cuboid. Only the smallest and largest values of the cuboids are retained.
+	TDF_INLINE void Merge(Cuboid_3D const & cuboid) {
+		Float::replace_if_smaller(cMin.x, cuboid.cMin.x);
+		Float::replace_if_smaller(cMin.y, cuboid.cMin.y);
+		Float::replace_if_smaller(cMin.z, cuboid.cMin.z);
+		Float::replace_if_larger(cMax.x, cuboid.cMax.x);
+		Float::replace_if_larger(cMax.y, cuboid.cMax.y);
+		Float::replace_if_larger(cMax.z, cuboid.cMax.z);
+	}
+
+	// Merges this cuboid with another cuboid created from a sphere. Only the smallest and largest values of the cuboids are retained.
+	//TDF_INLINE void Merge(Sphere_3D<F> const & sphere) { Merge(Cuboid_3D(sphere)); }
+
+	// Expands the cuboid to include a point.
+	TDF_INLINE void Merge(Point_3D<F> const & point) {
+		Float::replace_if_smaller(cMin.x, point.x);
+		Float::replace_if_smaller(cMin.y, point.y);
+		Float::replace_if_smaller(cMin.z, point.z);
+		Float::replace_if_larger(cMax.x, point.x);
+		Float::replace_if_larger(cMax.y, point.y);
+		Float::replace_if_larger(cMax.z, point.z);
+	}
+
+	// Expands this cuboid to include a set of points.
+	void Merge(size_t count, Point_3D<F> const * points) {
+		while (count > 1) {
+			merge2(points[0], points[1]);
+			points += 2;
+			count -= 2;
+		}
+
+		if (count > 0)
+			Merge(*points);
+	}
+
+	// Expands this cuboid to include a set of indexed points.
+	template <typename T>
+	void Merge(size_t count, T const * indices, Point_3D<F> const * points) {
+		while (count > 1) {
+			T		i1 = *indices++;
+			T		i2 = *indices++;
+			merge2(points[i1], points[i2]);
+			count -= 2;
+		}
+
+		if (count > 0)
+			Merge(points[*indices]);
+	}
+
+	// Returns true if the cuboid completely contains the parameter cuboid.
+	TDF_INLINE bool Contains(Cuboid_3D const & contained) const {
+		return (contained.cMin.x >= cMin.x &&
+			contained.cMin.y >= cMin.y &&
+			contained.cMin.z >= cMin.z &&
+			contained.cMax.x <= cMax.x &&
+			contained.cMax.y <= cMax.y &&
+			contained.cMax.z <= cMax.z);
+	}
+
+	// Returns true if the cuboid completely contains a cuboid based on the  parameter points.
+	TDF_INLINE bool Contains(Point_3D<F> const & contained) const {
+		return (contained.x >= cMin.x &&
+			contained.y >= cMin.y &&
+			contained.z >= cMin.z &&
+			contained.x <= cMax.x &&
+			contained.y <= cMax.y &&
+			contained.z <= cMax.z);
+	}
+
+	// Returns true if the cuboid completely contains a cuboid based on the  parameter points, with a tolerance value.
+	TDF_INLINE bool Contains(Point_3D<F> const & contained, F epsilon) const {
+		return (contained.x >= cMin.x - epsilon &&
+			contained.y >= cMin.y - epsilon &&
+			contained.z >= cMin.z - epsilon &&
+			contained.x <= cMax.x + epsilon &&
+			contained.y <= cMax.y + epsilon &&
+			contained.z <= cMax.z + epsilon);
+	}
+
+	// Replaces this cuboid with the intersection of this cuboid and the parameter cuboid.
+	TDF_INLINE Cuboid_3D & Intersect(Cuboid_3D const & cuboid) {
+		Float::replace_if_larger(cMin.x, cuboid.cMin.x);
+		Float::replace_if_larger(cMin.y, cuboid.cMin.y);
+		Float::replace_if_larger(cMin.z, cuboid.cMin.z);
+		Float::replace_if_smaller(cMax.x, cuboid.cMax.x);
+		Float::replace_if_smaller(cMax.y, cuboid.cMax.y);
+		Float::replace_if_smaller(cMax.z, cuboid.cMax.z);
+		return *this;
+	}
+
+	// Replaces this cuboid with the union of this cuboid and the parameter cuboid.
+	TDF_INLINE Cuboid_3D & Union(Cuboid_3D const & cuboid) {
+		Float::replace_if_smaller(cMin.x, cuboid.cMin.x);
+		Float::replace_if_smaller(cMin.y, cuboid.cMin.y);
+		Float::replace_if_smaller(cMin.z, cuboid.cMin.z);
+		Float::replace_if_larger(cMax.x, cuboid.cMax.x);
+		Float::replace_if_larger(cMax.y, cuboid.cMax.y);
+		Float::replace_if_larger(cMax.z, cuboid.cMax.z);
+		return *this;
+	}
+
+	// Expands both corners of this cuboid.
+	TDF_INLINE Cuboid_3D & Expand(F border) {
+		Vector_3D<F>		delta(border, border, border);
+		cMin -= delta;
+		cMax += delta;
+		return *this;
+	}
+
+	// Contracts both corners of this cuboid.
+	TDF_INLINE Cuboid_3D & Contract(F border) {
+		Vector_3D<F>		delta(border, border, border);
+		cMin += delta;
+		cMax -= delta;
+		return *this;
+	}
+
+private:
+	void merge2(Point_3D<F> const & p1, Point_3D<F> const & p2) {
+		if (p1.x > p2.x) {
+			Float::replace_if_smaller(cMin.x, p2.x);
+			Float::replace_if_larger(cMax.x, p1.x);
+		}
+		else {
+			Float::replace_if_smaller(cMin.x, p1.x);
+			Float::replace_if_larger(cMax.x, p2.x);
+		}
+
+		if (p1.y > p2.y) {
+			Float::replace_if_smaller(cMin.y, p2.y);
+			Float::replace_if_larger(cMax.y, p1.y);
+		}
+		else {
+			Float::replace_if_smaller(cMin.y, p1.y);
+			Float::replace_if_larger(cMax.y, p2.y);
+		}
+
+		if (p1.z > p2.z) {
+			Float::replace_if_smaller(cMin.z, p2.z);
+			Float::replace_if_larger(cMax.z, p1.z);
+		}
+		else {
+			Float::replace_if_smaller(cMin.z, p1.z);
+			Float::replace_if_larger(cMax.z, p2.z);
+		}
+	}
+
+	TDF_INLINE static Point_3D<F> Limit_Point() {
+		F const	x = (std::numeric_limits<F>::max)();
+		return Point_3D<F>(x, x, x);
+	}
+
+	bool LineIntersecting(Point_3D<F> const & cInStart, Vector_3D<F> const & cInDirection, bool bIsRay) const {
+		// convert the line segment/ray to a line
+
+		Point_3D<F> cStart, cEnd;
+
+		if (true == bIsRay) {
+			cStart = cInStart + cInDirection * (std::numeric_limits<F>::max)();
+			cEnd = cInStart - cInDirection * (std::numeric_limits<F>::max)();
+		}
+		else  {
+			cStart = cInStart;
+			cEnd = cInStart + cInDirection;
+		}
+
+		// check if the line intersects any of the six faces of the cuboid
+		const Plane_3D<F> planes[6] = {
+			Plane_3D<F>(Point_3D<F>(cMin.x, cMin.y, cMin.z), Vector_3D<F>(1, 0, 0)), // x=cMin.x
+			Plane_3D<F>(Point_3D<F>(cMin.x, cMin.y, cMin.z), Vector_3D<F>(0, 1, 0)), // y=cMin.y
+			Plane_3D<F>(Point_3D<F>(cMin.x, cMin.y, cMin.z), Vector_3D<F>(0, 0, 1)), // z=cMin.z
+			Plane_3D<F>(Point_3D<F>(cMax.x, cMax.y, cMax.z), Vector_3D<F>(-1, 0, 0)), // x=cMax.x
+			Plane_3D<F>(Point_3D<F>(cMax.x, cMax.y, cMax.z), Vector_3D<F>(0, -1, 0)), // y=cMax.y
+			Plane_3D<F>(Point_3D<F>(cMax.x, cMax.y, cMax.z), Vector_3D<F>(0, 0, -1)), // z=cMax.z
+		};
+		for (const auto & plane : planes) {
+			if (true == plane.IntersectLineSegment(cStart, cEnd)) {
+				return true;
+			}
+		}
+
+		return false;
+	};
+};
+
+using SimpleCuboid = Cuboid_3D<float>;
+using DSimpleCuboid = Cuboid_3D<double>;
+
+template <typename F>
+TDF_INLINE Cuboid_3D<F> Intersect(Cuboid_3D<F> const & a, Cuboid_3D<F> const & b) {
+	Cuboid_3D<F> temp = a;
+	return temp.Intersect(b);
+}
+
+template <typename F>
+TDF_INLINE Cuboid_3D<F> Union(Cuboid_3D<F> const & a, Cuboid_3D<F> const & b) {
+	Cuboid_3D<F> temp = a;
+	return temp.Union(b);
+}
+
+template <typename F>
+TDF_INLINE Cuboid_3D<F> Expand(Cuboid_3D<F> const & a, F border) {
+	Cuboid_3D<F> temp = a;
+	return temp.Expand(border);
+}
+
+template <typename F>
+TDF_INLINE Cuboid_3D<F> Contract(Cuboid_3D<F> const & a, F border) {
+	Cuboid_3D<F> temp = a;
+	return temp.Contract(border);
 }
 
 using ByteArray = std::vector<byte, Allocator<byte>>;

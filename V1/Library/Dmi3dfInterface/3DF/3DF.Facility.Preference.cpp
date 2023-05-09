@@ -183,6 +183,8 @@ Json::Object * Facility::Preference::PERFROMANCE::OPTIMIZATION::Get()
 	Json::Object * pcData = new Json::Object();
 
 	pcData->SetInteger("HiddenLineMode", (int)HiddenLineMode);
+	pcData->SetBoolean("StaticModel", StaticModel);
+	pcData->SetBoolean("LMVModel", LMVModel);
 	pcData->SetBoolean("OcclusionCulling", OcclusionCulling);
 	pcData->SetInteger("OcclusionThreshold", OcclusionThreshold);
 
@@ -192,6 +194,8 @@ Json::Object * Facility::Preference::PERFROMANCE::OPTIMIZATION::Get()
 bool Facility::Preference::PERFROMANCE::OPTIMIZATION::Set(Json::Object * pcData)
 {
 	HiddenLineMode = (HLRMode)pcData->GetInteger("HiddenLineMode");
+	StaticModel = pcData->GetBoolean("StaticModel");
+	LMVModel = pcData->GetBoolean("LMVModel");
 	OcclusionCulling = pcData->GetBoolean("OcclusionCulling");
 	OcclusionThreshold = pcData->GetInteger("OcclusionThreshold");
 

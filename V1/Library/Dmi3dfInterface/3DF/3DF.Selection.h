@@ -271,6 +271,8 @@ public:
 
 	void LeaveType(DWORD nType);
 	void RemoveType(DWORD nType);
+
+	bool Sort();
 };
 
 class SelectionControl : public Control

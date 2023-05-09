@@ -172,6 +172,8 @@ public:
 	size_t Size() { return deItems.size(); }
 	void Resize(size_t nInSize) { deItems.resize(nInSize); }
 
+	bool Sort();
+
 	std::deque<SelectionItem *> & GetItems() { return deItems; }
 
 private:

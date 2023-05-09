@@ -322,7 +322,10 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 
 	LogIncreaseTabIndex(2);
 
-	Log(2, L"DrawProductOccurrence: pocc%d", m_nIncrementalId);
+	CString strPoName;
+	GetName(pcOccurrence, strPoName);
+
+	Log(2, L"ParseProductOccurrence: pocc%d, %s", m_nIncrementalId, strPoName);
 
 	// Segment를 생성하고 생성된 Segment를 Parent Segment에 Include한다.
 	CString strSegmentName;
@@ -330,7 +333,9 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 	TDF::SegmentKey cSegment = m_cPoccsIncludeSegment.Subsegment(strSegmentName);
 	cParentSegment.IncludeSegment(cSegment);
 
-	//cSegment.ForcedOpen();
+	cSegment.Open();
+
+	TDF::Utility::SetSegmentName(cSegment, strPoName);
 
 	// Attribute 생성
 	// Parent에서 받은(계단식으로) Attribute를 이용해서, Attribute를 생성
@@ -428,7 +433,7 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttrs));
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrsData));
 
-	//cSegment.ForcedClose();
+	cSegment.Close();
 
 	LogDecreaseTabIndex(2);
 /*

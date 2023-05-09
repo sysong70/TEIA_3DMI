@@ -304,9 +304,22 @@ bool Math::IntersectionPointInRange(Point cSP1, Point cEP1, Point cSP2, Point cE
 
 	//TRACE(L"NL: %f\n", dNormalLengthSquared);
 
+/*
+	vec3 p2_p1 = sub_vec3(p2, p1);
+	vec3 cross_v1_v2 = cross(v1, v2);
+	double denom = dot(v1, cross_v1_v2);
+	if (denom == 0.0) { // 두 직선이 평행한 경우
+		return false;
+	}
+*/
+
 	// 라인이 같은 평면에 존재하는지 여부 확인
-	// double d = cStartVec.Dot(dNormal);
-	if (dNormalLengthSquared < 1.0e-9) {
+	// 여기서 denom은 선분과 평면이 만드는 교차점을 계산하기 위한 중요한 값 중 하나로, 선분의 방향벡터와 평면의 법선벡터가 이루는 각에 대한 코사인값을 나타냅니다.
+	// 따라서, denom 값이 0에 가까울수록 선분과 평면이 평행에 가까우며, denom 값이 0이라면 선분과 평면이 평행합니다.
+	// 그렇지 않은 경우, t = (point - line.start).dot(normal) / denom 식을 사용하여 선분과 평면이 만나는 점의 위치를 계산할 수 있습니다.
+	double denom = cVec1.Dot(cNormal);
+	if (denom < 1.0e-9) {
+	//if (dNormalLengthSquared < 1.0e-9) {
 // 		if ((cNormal.x) != 0 || (cNormal.y) != 0 || (cNormal.z) != 0) {
 // 			// "Lines are parallel and not in the same plane"
 // 		}

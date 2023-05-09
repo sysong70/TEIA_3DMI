@@ -37,6 +37,7 @@ public:
 	size_t ShowSubsegments() const;
 	size_t ShowSubsegments(SegmentKeyArray & cOutChildren) const;
 
+	// Segment의 자체의 Title을 변경함.
 	CString Name() const;
 	SegmentKey & SetName(CString strInName);
 
@@ -120,9 +121,12 @@ public:
 	//== Bounding 관련 함수 ==========================================================================
 	SegmentKey & SetBounding(BoundingKit const & cInKit);
 
-private:
-	//bool m_bOpenSegment = false; // 현재 Segment가 Open되어 있는지를 나타내는 flag
+	//== User Data 관련 함수 =========================================================================
+	SegmentKey & SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData);
+	SegmentKey & SetUserData(intptr_t nInIndex, size_t nInBytes, BYTE const pnInData[]);
+	SegmentKey & SetUserData(intptr_t nInIndex, ByteArray const & aInData);
 
+private:
 	HC_KEY m_nModelIncludeKey = INVALID_KEY;
 	HC_KEY m_nStylesIncludeKey = INVALID_KEY;
 };

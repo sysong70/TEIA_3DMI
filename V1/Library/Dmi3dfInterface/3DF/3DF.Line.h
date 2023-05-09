@@ -46,7 +46,10 @@ public:
 	TDF::Type ObjectType() const { return TDF::Type::LineKey; };
 
 	int GetPointCount() const;
+
 	bool ShowPoints(WorldPointArray & aOutPoints) const;
+
+	bool IsCoincident(const LineKey & cInThat, const MatrixKit & cMatrix1, const MatrixKit & cMatrix2) const;
 
 	bool GetEndPoint(Point & cSP, Point & cEP);
 	bool GetMidPoint(Point & cMP);
@@ -56,6 +59,8 @@ public:
 	//== 계산 함수 ===================================================================================
 	bool NearPoint(WindowKey const & cInWindow, const MatrixKit & cModelingMatrix, const WindowPoint & cInPoint, WorldPoint & cOutPoint) const override;
 	bool DistanceToPoint(const WorldPoint & cInPoint, double & nOutDistance) const override;
+
+	bool Length(double & dLength) const;
 
 private:
 	bool GetIntersectionPoint(const WorldPointArray & aPoints1, const WorldPointArray & aPoints2, PointArray & aOutIntersectionPoints);

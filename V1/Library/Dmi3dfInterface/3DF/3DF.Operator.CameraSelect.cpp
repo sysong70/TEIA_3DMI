@@ -41,7 +41,6 @@ Operator::CameraSelect::CameraSelect(HBaseView * view, int DoRepeat, int DoCaptu
 	m_nSelectPickCount = 200;
 	m_nMouseDownTickCount = 0;
 	m_bOrbitMode = false;
-
 }
 */
 

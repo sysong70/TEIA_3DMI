@@ -16,6 +16,13 @@ namespace Utility
 	CString HexStr(DWORD_PTR nValue);
 
 	CString GetTypeString(Type eType);
+
+
+	API_3DF bool SetSegmentName(SegmentKey & cInSegment, CString strName);
+
+	// 사용후 Buffer를 삭제해야 함.
+	bool UnicodeToChar(CString strText, char *& pchBuffer);
+	bool UnicodeToChar(CString strText, char *& pchBuffer, int & nBufferSize);
 };
 
 CLOSE_3DF_NAMESPACE

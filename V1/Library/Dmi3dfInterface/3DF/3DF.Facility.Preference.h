@@ -73,6 +73,8 @@ namespace Facility
 		{
 			struct OPTIMIZATION {
 				HLRMode HiddenLineMode = FakeHiddenLine;	// CAppSettings::HiddenLineMode
+				bool StaticModel = true;					// CAppSettings::StaticModel
+				bool LMVModel = true;						// CAppSettings::LMVModel
 				bool OcclusionCulling = false;				// CAppSettings::OcclusionCulling
 				int OcclusionThreshold = 50;				// CAppSettings::OcclusionThreshold
 

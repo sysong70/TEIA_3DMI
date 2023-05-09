@@ -1006,6 +1006,13 @@ void SelectionResults::RemoveType(DWORD nType)
 	}
 }
 
+// Selection Item point의 Z값을 이용해서 정렬한다.
+bool SelectionResults::Sort()
+{
+	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
+	return pcImpl->Sort();
+}
+
 //== SelectionControl Class ========================================================================
 TDF::SelectionControl::SelectionControl(WindowKey const & cInWindow)
 {

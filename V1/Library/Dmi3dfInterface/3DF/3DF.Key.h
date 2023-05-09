@@ -15,8 +15,7 @@ public:
 	void Set(Key const & cInThat);
 	Key const & operator = (Key const & cInThat);
 
-	static const TDF::Type staticType = TDF::Type::Key;
-	TDF::Type ObjectType() const { return staticType; };
+	TDF::Type ObjectType() const { return TDF::Type::Key; };
 
 	bool operator == (Key const & cInThat) const;
 

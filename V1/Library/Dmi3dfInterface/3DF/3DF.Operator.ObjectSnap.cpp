@@ -260,11 +260,12 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 	}
 
 	SelectionOptionsKit cSelectOption;
-	cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(10).SetProximity(0.2f).SetSorting(Selection::Sorting::ZSorting);
+	cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(10).SetProximity(0.1f).SetSorting(Selection::Sorting::ZSorting);
 	//cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(10).SetSorting(Selection::Sorting::ZSorting);
 
 	SelectionResults cHighlightSelection;
 	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cInEvent, cSelectOption, cHighlightSelection);
+	cHighlightSelection.Sort();
 
 	// 신규 선택 요소 저장소는 초기화한다.
 	m_cNewHighlightSelection.Reset();
@@ -273,9 +274,12 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 	// 1.나오는 Item은 이미 Sorting이 되어 있음.
 	// 2.맨앞에 나온 요소가 ShellKey이고, 같은 Z값에 LineKey가 있는 경우 LineKey를 사용하도록 한다.
 	if (0 < nSelectedCount) {
+		std::vector<SelectionItem *> vLineSelectedItems;
+		std::vector<SelectionItem *> vShellSelectedItems;
+
 		SelectionResultsIterator cIter = cHighlightSelection.GetIterator();
 
-		if (true == cIter.IsValid()) {
+		while (true == cIter.IsValid()) {
 			SelectionItem * pcItem = cIter.GetItem();
 
 			Key cSelectKey;
@@ -317,15 +321,64 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 			}*/
 
 			if (TDF::Type::LineKey == eType) {
-				TRACE(L"SelectByPoint: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());
-				m_cNewHighlightSelection.PushBack(new SelectionItem(*pcItem));
+				TRACE(L"SelectByPoint Line: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());
+				vLineSelectedItems.push_back(pcItem);
+			}
+			else if (TDF::Type::ShellKey == eType) {
+				TRACE(L"SelectByPoint Shell: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());		
+				vShellSelectedItems.push_back(pcItem);
+			}
+
+			cIter.Next();
+		}
+
+		// Line과 Shell이 모두 선택된 경우 처리
+		if (0 < vLineSelectedItems.size() && 0 < vShellSelectedItems.size()) {
+			// Shell과 Line이 같은 Z값에 있는 경우 Line을 사용한다.
+			// 1. Shell과 Line의 Z값이 같은지 확인한다.
+			// 2. 같은 경우 Line을 사용한다.
+			// 3. 다른 경우 Shell을 사용한다.
+			SelectionItem * pcLineItem = vLineSelectedItems[0];
+			SelectionItem * pcShellItem = vShellSelectedItems[0];
+
+			WindowPoint cLinePoint;
+			pcLineItem->ShowSelectionPosition(cLinePoint);
+
+			WindowPoint cShellPoint;
+			pcShellItem->ShowSelectionPosition(cShellPoint);
+
+			//TRACE(L"Line Z: %f\tShell Z: %f\t[%f]\n", cLinePoint.z, cShellPoint.z, cLinePoint.z - cShellPoint.z);
+
+			// Line이 가장 앞에 있는 경우 (Windows Point의 Z값이 가장 작은 경우)
+			if (cLinePoint.z < cShellPoint.z) {
+				m_cNewHighlightSelection.PushBack(new SelectionItem(*pcLineItem));
+				//TRACE(L"cLinePoint.z > cShellPoint.z\n");
+			}
+			// Shell의 선택점과 Line의 선택점이 거의 같은 경우 Line을 선택한다.
+			else if (1.0e-2 >fabs(cLinePoint.z - cShellPoint.z)) {
+				m_cNewHighlightSelection.PushBack(new SelectionItem(*pcLineItem));
+				//TRACE(L"1.0e-2 >fabs(cLinePoint.z - cShellPoint.z)\n");
+			}
+			else {
+				m_cNewHighlightSelection.PushBack(new SelectionItem(*pcShellItem));
 			}
 		}
+		else if (0 < vLineSelectedItems.size()) {
+			// Line만 있는 경우
+			m_cNewHighlightSelection.PushBack(new SelectionItem(*vLineSelectedItems[0]));
+		}
+		else if (0 < vShellSelectedItems.size()) {
+			// Shell만 있는 경우
+			m_cNewHighlightSelection.PushBack(new SelectionItem(*vShellSelectedItems[0]));
+		}
+		else {
+			// Line과 Shell이 없는 경우
+			//m_cNewHighlightSelection.PushBack(new SelectionItem(*cHighlightSelection.GetIterator().GetItem()));
+			}
 	}
 	else {
 		TRACE(L"SelectByPoint: %d\n", nSelectedCount);
 	}
-
 	
 	bool bForceUpdate = false;
 
@@ -407,16 +460,16 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 	}
 
 	/*
-		else {
-			// Object Snape 등을 지우도록 한다.
-			HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetConstructionKey()); {
-				HC_Flush_Contents(".", "geometry, segment");
-			} HC_Close_Segment();
+	else {
+		// Object Snape 등을 지우도록 한다.
+		HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetConstructionKey()); {
+			HC_Flush_Contents(".", "geometry, segment");
+		} HC_Close_Segment();
 
-			if (false == bForceUpdate) {
-				// m_pcWindow->GetBaseView()->Update();
-			}
-		}*/
+		if (false == bForceUpdate) {
+			// m_pcWindow->GetBaseView()->Update();
+		}
+	}*/
 
 	if (true == bForceUpdate) {
 		m_pcWindow->Update();
@@ -597,6 +650,10 @@ bool Operator::ObjectSnap::CalculationLienObjectSnapPoint(const Key & cInLineKey
 // 3-1. Line & Line 관련 Object Snap을 계산, Intersection
 void Operator::ObjectSnap::CalculationLienAndLineObjectSnapPoint(LineKey & cLine1, LineKey & cLine2, const MatrixKit & cMatrix1, const MatrixKit & cMatrix2)
 {
+// 	if (true == cLine1.IsCoincident(cLine2, cMatrix1, cMatrix2)) {
+// 		return;
+// 	}
+
 	// 교차점 처리
 	PointArray aIntersectionPoints;
 	if (true == cLine1.GetIntersectionPoint(cLine2, cMatrix1, cMatrix2, aIntersectionPoints)) {
