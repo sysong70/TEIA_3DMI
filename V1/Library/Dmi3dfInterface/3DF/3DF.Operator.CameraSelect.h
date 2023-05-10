@@ -7,6 +7,8 @@
 
 #include "3DF.Operator.ObjectSnap.h"
 
+#include "3DF.NavigationCube.h"
+
 #include <HOpCameraOrbit.h>
 
 OPEN_3DF_NAMESPACE
@@ -18,7 +20,7 @@ namespace Operator
 	class CameraSelect : public HOpCameraOrbit
 	{
 	public:
-		CameraSelect(WindowKey * pcWindow, int DoRepeat = 0, int DoCapture = 1);
+		CameraSelect(WindowKey * pcWindow, NavigationCube & cNaviCube, int DoRepeat = 0, int DoCapture = 1);
 		//CameraSelect(HBaseView * view, int DoRepeat = 0, int DoCapture = 1);
 		~CameraSelect();
 
@@ -62,6 +64,8 @@ namespace Operator
 		SelectionResults m_cHighlightSelection;
 
 		Operator::ObjectSnap m_cObjectSnapOperator;
+
+		NavigationCube * m_pcNaviCube = nullptr;
 
 	private:
 		HPoint m_cClickPoint;

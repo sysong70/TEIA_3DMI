@@ -33,6 +33,8 @@
 
 #include "Dmi3dx.h"
 
+#include <Signal.h>
+
 #ifdef _DEBUG
 //#	define new DEBUG_NEW
 #	define USED_LOG_MANAGER
@@ -184,6 +186,34 @@ bool TdfImport::FileImport(CString strFilePathName, TDF::SegmentKey & cModelSegm
 	strMessage.Format(L"Stage 2/3 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec2));
 	cInDelivery.progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
 
+	//== Tree Item Test ==
+	SegmentKeyArray cChildren;
+	cModelSegment.ShowIncluders(cChildren);
+
+	Signal::TreeItems cTreeItems;
+
+	for (auto cSegment : cChildren) {
+		CString strName;
+		if (false == TDF::Utility::ShowSegmentName(cSegment, strName)) {
+			strName = cSegment.Name();
+		}
+
+		Signal::TreeItem cItem;
+		cItem.Title = strName;
+		cTreeItems.push_back(cItem);
+	}
+
+	cInDelivery.modelPanel.AddItems(cTreeItems);
+
+/*
+	Signal::TreeItems cTreeItems;
+	Signal::TreeItem cItem;
+	cItem.Title = L"TestModel";
+	cTreeItems.push_back(cItem);
+*/
+
+	
+
 	return bStatus;
 }
 
@@ -333,9 +363,12 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 	TDF::SegmentKey cSegment = m_cPoccsIncludeSegment.Subsegment(strSegmentName);
 	cParentSegment.IncludeSegment(cSegment);
 
-	cSegment.Open();
+	//cSegment.Open(); // Segment를 Open하면 문제가 생김. 검토가 필요함.
 
-	TDF::Utility::SetSegmentName(cSegment, strPoName);
+// 	TDF::Utility::SetSegmentName(cSegment, strPoName);
+// 	CString strOutName;
+// 	TDF::Utility::ShowSegmentName(cSegment, strOutName);
+
 
 	// Attribute 생성
 	// Parent에서 받은(계단식으로) Attribute를 이용해서, Attribute를 생성
@@ -433,7 +466,7 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttrs));
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrsData));
 
-	cSegment.Close();
+	//cSegment.Close();
 
 	LogDecreaseTabIndex(2);
 /*
@@ -5391,4 +5424,4 @@ void  TdfImport::parseAttributes(const A3DEntity * pEntity)
 	}
 	//Clean the struct
 	A3DAsmProductOccurrenceGetLayerList(NULL, &LayerNb, &pLayerList);
-}
+};

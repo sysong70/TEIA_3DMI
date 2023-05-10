@@ -233,6 +233,20 @@ bool Utility::SetSegmentName(SegmentKey & cInSegment, CString strName)
 	return true;
 }
 
+bool Utility::ShowSegmentName(SegmentKey & cInSegment, CString & strName)
+{
+	ByteArray aUserData;
+	if (false == cInSegment.ShowUserData((intptr_t)UserDataIndex::Name, aUserData)) {
+		return false;
+	}
+
+	if (false == CharToUnicode((char *)aUserData.data(), strName)) {
+		return false;
+	}
+
+	return true;
+}
+
 bool Utility::UnicodeToChar(CString strText, char *& pchBuffer)
 {
 	int nBufferSize = 0;
@@ -259,6 +273,44 @@ bool Utility::UnicodeToChar(CString strText, char *& pchBuffer, int & nBufferSiz
 		delete [] pchBuffer;
 		return false;
 	}
+
+	return true;
+}
+
+bool Utility::CharToUnicode(char * pchText, CString & strText)
+{
+	if (nullptr == pchText) {
+		return false;
+	}
+
+	size_t nSize = strlen(pchText);
+	if (0 == nSize) {
+		return false;
+	}
+
+	int nBufferSize = MultiByteToWideChar(CP_ACP, 0, pchText, -1, NULL, NULL);
+	if (0 == nBufferSize) {
+		return false;
+	}
+
+	WCHAR * pchBuffer = new WCHAR[nBufferSize + 1];
+	if (nullptr == pchBuffer) {
+		ASSERT(FALSE);
+		return false;
+	}
+
+	int nConvertSize = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pchText, strlen(pchText), pchBuffer, nBufferSize);
+	if (0 == nConvertSize) {
+		ASSERT(FALSE);
+		delete [] pchBuffer;
+		return false;
+	}
+
+	pchBuffer[nConvertSize] = L'\0';
+
+	strText = pchBuffer;
+
+	delete [] pchBuffer;
 
 	return true;
 }

@@ -36,6 +36,7 @@ public:
 	HC_KEY HitTest(float x, float y, float z);
 
 	void Transform();
+	void Transform_ORG();
 
 	void OnSize(float width, float height);
 

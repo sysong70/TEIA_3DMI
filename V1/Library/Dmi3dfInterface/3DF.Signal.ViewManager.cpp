@@ -268,26 +268,40 @@ void ViewManager::Destruct(int nViewId)
 
 void ViewManager::Paint(int nViewId, Json::Object & cInObject)
 {
-	TDF::Canvas * pcView = Wrapper().m_mpcCanvas[nViewId];
-	if(nullptr == pcView) {
+	TDF::Canvas * pcCanvas = Wrapper().m_mpcCanvas[nViewId];
+	if(nullptr == pcCanvas) {
 		DEBUG_RETURN;
 	}
 
+	if (false == pcCanvas->IsInitNavigationCube()) {
+		Json::Array & cArray = cInObject.GetArray(SKW_RECT);
+		int nLeft = cArray[0]->ToInteger();
+		int nTop = cArray[1]->ToInteger();
+		int nRight = cArray[2]->ToInteger();
+		int nBottom = cArray[3]->ToInteger();
+
+		pcCanvas->InitNavigationCube(nRight, nBottom);
+	}
+
+	//pcCanvas->SetClientRect(nWidth, nHeight);
+
+	//pcCanvas->SetClientRect(nWidth, nHeight);
+
 	// execute a HOOPS update if we have a valid HBaseView object
-	if (pcView && pcView->GetBaseView()->GetViewActive() && !pcView->GetBaseView()->GetSuppressUpdate())
+	if (pcCanvas && pcCanvas->GetBaseView()->GetViewActive() && !pcCanvas->GetBaseView()->GetSuppressUpdate())
 	{
-		HC_Control_Update_By_Key(pcView->GetBaseView()->GetViewKey(), "redraw everything");
-		pcView->GetBaseView()->GetConstantFrameRateObject()->SetActivityType(GeneralActivity);
+		HC_Control_Update_By_Key(pcCanvas->GetBaseView()->GetViewKey(), "redraw everything");
+		pcCanvas->GetBaseView()->GetConstantFrameRateObject()->SetActivityType(GeneralActivity);
 
 //		pcView->GetIntRectangle(&rectangle);
 // 		m_pHView->Notify(HSignalPaint, &rectangle);
 // 		m_pHView->ResetIdleTime();
 
-		if(false == pcView->GetBaseView()->GetFirstUpdate()) {
-			pcView->GetBaseView()->ForceUpdate();
+		if(false == pcCanvas->GetBaseView()->GetFirstUpdate()) {
+			pcCanvas->GetBaseView()->ForceUpdate();
 		}
 		else {
-			pcView->GetBaseView()->Update();
+			pcCanvas->GetBaseView()->Update();
 
 		}
 	}
@@ -295,10 +309,11 @@ void ViewManager::Paint(int nViewId, Json::Object & cInObject)
 
 void ViewManager::Resize(int nViewId, int x, int y)
 {
-	TDF::Canvas * pcView = Wrapper().m_mpcCanvas[nViewId];
-	assert(pcView);
+	TDF::Canvas * pcCanvas = Wrapper().m_mpcCanvas[nViewId];
+	assert(pcCanvas);
 
-	pcView->GetBaseView()->SetXYSizeOverride(x, y);
+	pcCanvas->Resize(x, y);
+	pcCanvas->GetBaseView()->SetXYSizeOverride(x, y);
 	//m_pHView->Notify( HSignalResize );
 }
 

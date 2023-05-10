@@ -23,11 +23,13 @@
 
 USING_3DF_NAMESPACE
 
-Operator::CameraSelect::CameraSelect(WindowKey * pcWindow, int DoRepeat, int DoCapture) :
+Operator::CameraSelect::CameraSelect(WindowKey * pcWindow, NavigationCube & cNaviCube, int DoRepeat, int DoCapture) :
 	HOpCameraOrbit(pcWindow->GetBaseView(), DoRepeat, DoCapture),
 	m_cObjectSnapOperator(pcWindow)
 {
 	m_pcWindow = pcWindow;
+
+	m_pcNaviCube = &cNaviCube;
 
 	m_nSelectPickCount = 200;
 	m_nMouseDownTickCount = 0;
@@ -58,7 +60,7 @@ const char * Operator::CameraSelect::GetName()
 
 HBaseOperator * Operator::CameraSelect::Clone()
 {
-	return new Operator::CameraSelect(m_pcWindow);
+	return new Operator::CameraSelect(m_pcWindow, *m_pcNaviCube);
 }
 //== Mouse Event 처리 ===============================================================================
 
@@ -110,6 +112,10 @@ int Operator::CameraSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
 	int nResult = HOpCameraOrbit_OnLButtonDownAndMove(cInEvent);
 
 	m_cObjectSnapOperator.DrawSnapItems(false);
+
+	if (nullptr != m_pcNaviCube) {
+		m_pcNaviCube->Transform();
+	}
 
 	GetView()->Update();
 

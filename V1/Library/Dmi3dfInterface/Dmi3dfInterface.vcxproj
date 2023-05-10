@@ -126,6 +126,7 @@
     <ClInclude Include="..\Dmi3dxInterface\LogManager.h" />
     <ClInclude Include="..\Signal\Signal.h" />
     <ClInclude Include="3DF.Signal.Connector.h" />
+    <ClInclude Include="3DF\3DF.BaseView.h" />
     <ClInclude Include="3DF\3DF.Camera.h" />
     <ClInclude Include="3DF\3DF.Circle.h" />
     <ClInclude Include="3DF\3DF.EdgeAttribute.h" />
@@ -195,6 +196,7 @@
     <ClCompile Include="..\Dmi3dxInterface\LogManager.cpp" />
     <ClCompile Include="..\Signal\Signal.cpp" />
     <ClCompile Include="3DF.Signal.Connector.cpp" />
+    <ClCompile Include="3DF\3DF.BaseView.cpp" />
     <ClCompile Include="3DF\3DF.Bounding.cpp" />
     <ClCompile Include="3DF\3DF.Camera.cpp" />
     <ClCompile Include="3DF\3DF.Circle.cpp" />

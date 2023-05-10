@@ -52,6 +52,7 @@ class WindowKey;
 class Model;
 class Key;
 class SegmentKey;
+class IncludeKey;
 class MaterialMappingKit;
 class PortfolioKey;
 class ShellKey;
@@ -225,6 +226,7 @@ bool operator != (const Allocator<T> &, const Allocator<U> &) { return false; }
 
 //== Type Definitions ==============================================================================
 using SegmentKeyArray = std::vector<SegmentKey, Allocator<SegmentKey>>;
+using IncludeKeyArray = std::vector<IncludeKey, Allocator<IncludeKey>>;
 
 using LineArray = std::vector<LineKit, Allocator<LineKit>>;
 using PolylineArray = LineArray;

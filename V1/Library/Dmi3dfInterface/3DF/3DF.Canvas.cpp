@@ -61,7 +61,7 @@ CameraPos::CameraPos() {
 
 Canvas::Canvas(HBaseModel * pcBaseModel, void * pcWindowHandle)
 {
-	m_pcBaseView = new HBaseView(pcBaseModel, nullptr, H_ASCII_TEXT(m_cPreference.General.Display.Driver), nullptr,
+	m_pcBaseView = new TDF::BaseView(pcBaseModel, nullptr, H_ASCII_TEXT(m_cPreference.General.Display.Driver), nullptr,
 		reinterpret_cast<void *>(pcWindowHandle), nullptr);
 
 	m_pcWindow = new WindowKey(m_pcBaseView);
@@ -799,6 +799,17 @@ void Canvas::SetViewAxis()
 	m_pcBaseView->SetAxisMode(AxisOn);
 }
 
+void Canvas::InitNavigationCube(int nWidth, int nHeight)
+{
+	m_cNaviCube.SetView(m_pcBaseView);
+	m_cNaviCube.SetSize(NavigationCube::Midium);
+	m_cNaviCube.SetVisible(true, true);
+	m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetSceneKey());
+	m_cNaviCube.Transform();
+
+	m_bInitNaviCube = true;
+}
+
 void Canvas::SetSelectOption()
 {
 	HPixelRGBA cHighlightSelectColor;
@@ -1165,6 +1176,15 @@ bool Canvas::OnSignalDeSelectedAll()
 
 
 //== Command 관련 함수 ===========================================================================
+void Canvas::Resize(int cx, int cy)
+{
+	GetBaseView()->SetXYSizeOverride(cx, cy);
+
+	if (cx > 0 && cy > 0 && m_cNaviCube.IsValid()) {
+		m_cNaviCube.OnSize(cx, cy);
+	}
+}
+
 void Canvas::CancelCommands()
 {
 	DeSelectAll();
@@ -1305,7 +1325,7 @@ void Canvas::SetDefaultOperator()
 // 		, new HSOpCameraPan(m_pHView),
 // 		new HSOpCameraZoom(m_pHView), 0, false))
 	
-	m_pcCameraOrbitSelect = new Operator::CameraSelect(m_pcWindow);
+	m_pcCameraOrbitSelect = new Operator::CameraSelect(m_pcWindow, m_cNaviCube);
 	m_pcSelectArea = new Operator::SelectArea(GetBaseView());
 
 	GetBaseView()->SetOperator(m_pcCameraOrbitSelect);

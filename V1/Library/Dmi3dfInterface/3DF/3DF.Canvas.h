@@ -2,11 +2,11 @@
 
 #include <Json.h>
 
-#include "HBaseView.h"
-#include "HUtility.h"
-
 #include "3DF.h"
+#include "3DF.BaseView.h"
 #include "3DF.Facility.Preference.h"
+
+#include "3DF.NavigationCube.h"
 
 #include <HSelectionSet.h>
 
@@ -46,6 +46,8 @@ public:
 	//== Hoops 설정 함수 =============================================================================
 	void Init();
 	void ViewReady();
+	void InitNavigationCube(int nWidth, int nHeight);
+	bool IsInitNavigationCube() { return m_bInitNaviCube; }
 
 protected:
 	void SetGpu(CString strGpu);
@@ -187,6 +189,7 @@ protected:
 	//== Command 관련 함수 ===========================================================================
 public:
 	void CancelCommands();
+	void Resize(int cx, int cy);
 
 	//== Mouse 관련 함수 =============================================================================
 public:
@@ -222,13 +225,13 @@ protected:
 
 	//== 운영 변수 ===================================================================================
 public:
-	HBaseView * GetBaseView() { return m_pcBaseView; }
+	TDF::BaseView * GetBaseView() { return m_pcBaseView; }
 	
 	int ViewId() { return m_nViewId; }
 	void SetViewId(int nViewId);
 
 protected:
-	HBaseView * m_pcBaseView = nullptr;
+	TDF::BaseView * m_pcBaseView = nullptr;
 	TDF::WindowKey * m_pcWindow = nullptr;
 
 	int m_nViewId = -1;
@@ -236,6 +239,9 @@ protected:
 private:
 	Operator::CameraSelect * m_pcCameraOrbitSelect;
 	Operator::SelectArea * m_pcSelectArea;
+
+	NavigationCube m_cNaviCube;
+	bool m_bInitNaviCube = false;
 
 private:
 	HPoint		m_pos, m_tar;

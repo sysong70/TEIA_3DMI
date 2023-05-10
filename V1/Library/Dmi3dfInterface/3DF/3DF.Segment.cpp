@@ -16,6 +16,8 @@
 
 #include "3DF.Camera.h"
 
+#include "3DF.Utility.h"
+
 #include "./Private/3DF.SegmentPrivate.h"
 
 USING_3DF_NAMESPACE
@@ -157,7 +159,7 @@ SegmentKey const SegmentKey::Subsegment(LPCTSTR chFormat, ...)
 	return cSubsegment;
 }
 
-size_t SegmentKey::ShowSubsegments() const
+size_t TDF::SegmentKey::ShowSubsegments() const
 {
 	int nSegmentCount = 0;
 
@@ -174,7 +176,7 @@ size_t SegmentKey::ShowSubsegments() const
 	return nSegmentCount;
 }
 
-size_t SegmentKey::ShowSubsegments(SegmentKeyArray & cOutChildren) const
+size_t TDF::SegmentKey::ShowSubsegments(SegmentKeyArray & cOutChildren) const
 {
 	int nSegmentCount = 0;
 
@@ -211,10 +213,13 @@ CString SegmentKey::Name() const
 {
 	CString strOutName;
 
-	char chSegName[MVO_BUFFER_SIZE];
+	char chSegName[MVO_BUFFER_SIZE] = "\n";
 	HC_Show_Segment(KeyValue(), chSegName);
 
-	strOutName = chSegName;
+	char chIncludeSegName[MVO_BUFFER_SIZE] = "\n";
+	HC_Show_Include_Segment(KeyValue(), chIncludeSegName);
+
+	TDF::Utility::CharToUnicode(chSegName, strOutName);
 	
 	return strOutName;
 }
@@ -238,6 +243,63 @@ IncludeKey SegmentKey::IncludeSegment(SegmentKey const & cInSegment)
 
 	return cInclude;
 }
+
+size_t SegmentKey::ShowIncluders(SegmentKeyArray & aOutSegments) const
+{
+	int nSegmentCount = 0;
+
+	SegmentKeyPrivate::LocalOpen(*this);
+
+	HC_Begin_Contents_Search(".", "include");
+	{
+		HC_Show_Contents_Count(&nSegmentCount);
+
+		HC_KEY nIncludeKey;
+		char chType[MVO_BUFFER_SIZE];
+
+		for (int i = 0; i < nSegmentCount; i++)
+		{
+			HC_Find_Contents(chType, &nIncludeKey);
+
+			SegmentKey cIncludeSegment(nIncludeKey);
+			aOutSegments.push_back(cIncludeSegment);
+		}
+	}
+	HC_End_Contents_Search();
+
+	SegmentKeyPrivate::LocalClose(*this);
+
+	return nSegmentCount;
+}
+
+size_t SegmentKey::ShowIncluders(IncludeKeyArray & aOutIncludes) const
+{
+	int nIncludeCount = 0;
+
+	SegmentKeyPrivate::LocalOpen(*this);
+
+	HC_Begin_Contents_Search(".", "include");
+	{
+		HC_Show_Contents_Count(&nIncludeCount);
+
+		HC_KEY nIncludeKey;
+		char chType[MVO_BUFFER_SIZE];
+
+		for (int i = 0; i < nIncludeCount; i++)
+		{
+			HC_Find_Contents(chType, &nIncludeKey);
+
+			IncludeKey cInclude(nIncludeKey);
+			aOutIncludes.push_back(cInclude);
+		}
+	}
+	HC_End_Contents_Search();
+
+	SegmentKeyPrivate::LocalClose(*this);
+
+	return nIncludeCount;
+}
+
 
 //== Shell 관련 함수 =================================================================================
 ShellKey SegmentKey::InsertShell(ShellKit const & cInKit)
@@ -733,4 +795,129 @@ SegmentKey & SegmentKey::SetUserData(intptr_t nInIndex, ByteArray const & aInDat
 	SegmentKeyPrivate::LocalClose(*this);
 
 	return *this;
+}
+
+SegmentKey & SegmentKey::UnsetUserData(intptr_t nInIndex)
+{
+	SegmentKeyPrivate::LocalOpen(*this);
+
+	HC_UnSet_One_User_Data(nInIndex);
+
+	SegmentKeyPrivate::LocalClose(*this);
+
+	return *this;
+}
+
+SegmentKey & SegmentKey::UnsetUserData(size_t nInCount, intptr_t const pnInIndices[])
+{
+	SegmentKeyPrivate::LocalOpen(*this);
+
+	for (size_t nIndex = 0; nIndex < nInCount; ++nIndex) {
+		HC_UnSet_One_User_Data(pnInIndices[nIndex]);
+	}
+
+	SegmentKeyPrivate::LocalClose(*this);
+
+	return *this;
+}
+
+SegmentKey & SegmentKey::UnsetUserData(IntPtrTArray const & pnInIndices)
+{
+	SegmentKeyPrivate::LocalOpen(*this);
+
+	for (size_t nIndex = 0; nIndex < pnInIndices.size(); ++nIndex) {
+		HC_UnSet_One_User_Data(pnInIndices[nIndex]);
+	}
+
+	SegmentKeyPrivate::LocalClose(*this);
+
+	return *this;
+}
+
+SegmentKey & SegmentKey::UnsetAllUserData()
+{
+	SegmentKeyPrivate::LocalOpen(*this);
+
+	HC_UnSet_User_Data();
+
+	SegmentKeyPrivate::LocalClose(*this);
+
+	return *this;
+
+}
+
+size_t SegmentKey::ShowUserDataCount() const
+{
+	SegmentKeyPrivate::LocalOpen(*this);
+
+	size_t nCount = abs(HC_Show_User_Data_Indices(nullptr, 0));
+
+	SegmentKeyPrivate::LocalClose(*this);
+
+	return nCount;
+}
+
+bool SegmentKey::ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray & aOutData) const
+{
+	SegmentKeyPrivate::LocalOpen(*this);
+
+	long nSize = HC_Show_User_Data_Indices(nullptr, 0);
+	nSize = abs(nSize);
+	aOutIndices.resize(nSize);
+
+	nSize = HC_Show_User_Data_Indices(aOutIndices.data(), nSize);
+	if (0 == nSize) {
+		return false;
+	}
+
+	aOutData.resize(nSize);
+
+	for (size_t nIndex = 0; nIndex < aOutIndices.size(); ++nIndex) {
+		long nBytes = HC_Show_One_User_Data(aOutIndices[nIndex], nullptr, 0);
+		nBytes = abs(nBytes);
+		aOutData[nIndex].resize(nBytes);
+
+		HC_Show_One_User_Data(aOutIndices[nIndex], aOutData[nIndex].data(), nBytes);
+	}
+
+	SegmentKeyPrivate::LocalClose(*this);
+
+	return true;
+}
+
+bool SegmentKey::ShowUserDataIndices(IntPtrTArray & aOutIndices) const
+{	
+	SegmentKeyPrivate::LocalOpen(*this);
+
+	long nSize = HC_Show_User_Data_Indices(nullptr, 0);
+	nSize = abs(nSize);
+	aOutIndices.resize(nSize);
+
+	nSize = HC_Show_User_Data_Indices(aOutIndices.data(), nSize);
+	if (0 == nSize) {
+		return false;
+	}
+
+	SegmentKeyPrivate::LocalClose(*this);
+
+	return true;
+}
+
+bool SegmentKey::ShowUserData(intptr_t nInIndex, ByteArray & aOutData) const
+{
+	SegmentKeyPrivate::LocalOpen(*this);
+
+	long nSize = HC_Show_One_User_Data(nInIndex, nullptr, 0);
+	nSize = abs(nSize);
+
+	aOutData.resize(nSize);
+
+	nSize = HC_Show_One_User_Data(nInIndex, aOutData.data(), nSize);
+	if (0 == nSize) {
+		return false;
+	}
+
+	SegmentKeyPrivate::LocalClose(*this);
+
+	return true;
 }

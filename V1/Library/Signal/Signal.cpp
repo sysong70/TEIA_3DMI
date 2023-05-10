@@ -483,6 +483,8 @@ void Signal::ModelPanel::AddItems(TreeItems& items)
 
 		nodes.AddObject(*pChild);
 	}
+
+	Wrapper().SendData(data);
 }
 
 

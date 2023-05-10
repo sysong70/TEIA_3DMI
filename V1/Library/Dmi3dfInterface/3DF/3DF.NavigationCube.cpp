@@ -268,6 +268,68 @@ HC_KEY NavigationCube::HitTest(float x, float y, float z)
 
 void NavigationCube::Transform()
 {
+	HPoint position, target, up_vector;
+
+	HC_Open_Segment_By_Key(m_pView->GetSceneKey()); {
+		HC_Show_Net_Camera_Target(&target.x, &target.y, &target.z);
+		HC_Show_Net_Camera_Up_Vector(&up_vector.x, &up_vector.y, &up_vector.z);
+		HC_Show_Net_Camera_Position(&position.x, &position.y, &position.z);
+	} HC_Close_Segment();
+
+	HC_Open_Segment_By_Key(m_pView->GetSceneKey()); {
+		HC_Open_Segment_By_Key(m_cubeSegment); {
+			HPoint oldposition;
+			HPoint old_up_vector;
+
+			double new_position[] = { position.x - target.x, position.y - target.y, position.z - target.z };
+
+			HC_DCompute_Normalized_Vector(new_position, new_position);
+			new_position[0] *= 5.0; new_position[1] *= 5.0; new_position[2] *= 5.0;
+
+			HC_Show_Net_Camera_Position(&oldposition.x, &oldposition.y, &oldposition.z);
+			double const difference[] = { fabs(oldposition.x - new_position[0]), fabs(oldposition.y - new_position[1]), fabs(oldposition.z - new_position[2]) };
+
+			HC_Show_Net_Camera_Up_Vector(&old_up_vector.x, &old_up_vector.y, &old_up_vector.z);
+			double const difference2[] = { fabs(old_up_vector.x - up_vector.x), fabs(old_up_vector.y - up_vector.y), fabs(old_up_vector.z - up_vector.z) };
+
+			//			 we only modify the axis display if there has been an actual change in the camera settings
+			//			 we also have to consider the up vector!!!
+			if (difference[0] + difference[1] + difference[2] > 0.01 || difference2[0] + difference2[1] + difference2[2] > 0.01)
+			{
+				HC_Set_Camera_Target(0.0f, 0.0f, 0.0f);
+				HC_Set_Camera_Position(new_position[0], new_position[1], new_position[2]);
+				HC_Set_Camera_Up_Vector(up_vector.x, up_vector.y, up_vector.z);
+			}
+		} HC_Close_Segment();
+	} HC_Close_Segment();
+
+/*
+
+	HPoint position;
+	HPoint target;
+	HVector up;
+	float width, height;
+	char projection[MVO_BUFFER_SIZE];
+
+	HC_Open_Segment_By_Key(m_pView->GetSceneKey());
+	{
+		HC_Show_Net_Camera(&position, &target, &up, &width, &height, projection);
+	}
+	HC_Close_Segment();
+
+	OpenCubeSegment();
+	{
+		//:TODO - only rotation
+		HC_Set_Camera(&position, &target, &up, 2, 2, projection);
+	}
+	CloseCubeSegment();
+*/
+}
+
+
+
+void NavigationCube::Transform_ORG()
+{
 	HPoint position;
 	HPoint target;
 	HVector up;

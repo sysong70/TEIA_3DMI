@@ -255,6 +255,9 @@
     <ClInclude Include="3DF\3DF.NavigationCube.h">
       <Filter>3DF</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\3DF.BaseView.h">
+      <Filter>3DF\Base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -445,6 +448,9 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.NavigationCube.cpp">
       <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.BaseView.cpp">
+      <Filter>3DF\Base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

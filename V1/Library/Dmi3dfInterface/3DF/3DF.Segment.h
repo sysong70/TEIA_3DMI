@@ -44,6 +44,9 @@ public:
 	//== Include 관련 함수 ===========================================================================
 	IncludeKey IncludeSegment(SegmentKey const & cInSegment);
 
+	size_t ShowIncluders(SegmentKeyArray & aOutSegments) const;
+	size_t ShowIncluders(IncludeKeyArray & aOutIncludes) const;
+
 	//== Shell 관련 함수 =============================================================================
 	ShellKey InsertShell(ShellKit const & cInKit);
 // 	ShellKey InsertShell(PointArray const & in_points, IntArray const & in_facelist);
@@ -125,6 +128,16 @@ public:
 	SegmentKey & SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData);
 	SegmentKey & SetUserData(intptr_t nInIndex, size_t nInBytes, BYTE const pnInData[]);
 	SegmentKey & SetUserData(intptr_t nInIndex, ByteArray const & aInData);
+
+	SegmentKey & UnsetUserData(intptr_t nInIndex);
+	SegmentKey & UnsetUserData(size_t nInCount, intptr_t const pnInIndices[]);
+	SegmentKey & UnsetUserData(IntPtrTArray const & pnInIndices);
+	SegmentKey & UnsetAllUserData();
+
+	size_t ShowUserDataCount() const;
+	bool ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray & aOutData) const;
+	bool ShowUserDataIndices(IntPtrTArray & aOutIndices) const;
+	bool ShowUserData(intptr_t nInIndex, ByteArray & aOutData) const;
 
 private:
 	HC_KEY m_nModelIncludeKey = INVALID_KEY;
