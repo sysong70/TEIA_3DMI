@@ -258,6 +258,9 @@
     <ClInclude Include="3DF\3DF.BaseView.h">
       <Filter>3DF\Base</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\HDraw.h">
+      <Filter>3DF</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -451,6 +454,9 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.BaseView.cpp">
       <Filter>3DF\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\HDraw.cpp">
+      <Filter>3DF</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
