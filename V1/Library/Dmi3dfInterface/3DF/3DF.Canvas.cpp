@@ -212,10 +212,10 @@ void Canvas::Init()
 	} HC_Close_Segment();
 
 	HC_Open_Segment_By_Key(m_pcBaseView->GetConstructionKey()); {
-		if (true == m_cPreference.Appearance.AntiAliasing.Use) {
-			// Rendering Option에서는 Screen On만 설정한다.
-			HC_Set_Rendering_Options("anti-alias = (screen = on)");
-		}
+// 		if (true == m_cPreference.Appearance.AntiAliasing.Use) {
+// 			// Rendering Option에서는 Screen On만 설정한다.
+// 			HC_Set_Rendering_Options("anti-alias = (screen = on)");
+// 		}
 	} HC_Close_Segment();
 
 	int CAppSet_LightScaleFactor = 100000;;
@@ -804,7 +804,7 @@ void Canvas::InitNavigationCube(int nWidth, int nHeight)
 	m_cNaviCube.SetView(m_pcBaseView);
 	m_cNaviCube.SetSize(NavigationCube::Midium);
 	m_cNaviCube.SetVisible(true, true);
-	m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetSceneKey());
+	m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetModelKey());
 	m_cNaviCube.Transform();
 
 	m_bInitNaviCube = true;

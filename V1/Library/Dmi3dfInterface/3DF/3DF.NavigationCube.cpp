@@ -23,7 +23,7 @@ namespace NavigationCubePreset
 
 		~GdiLoader()
 		{
-			Gdiplus::GdiplusShutdown(token);
+			// Gdiplus::GdiplusShutdown(token);
 		}
 
 	private:

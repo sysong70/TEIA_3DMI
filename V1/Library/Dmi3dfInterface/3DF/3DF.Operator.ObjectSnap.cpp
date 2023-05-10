@@ -28,6 +28,8 @@
 #include <HEventManager.h>
 #include <HConstantFrameRate.h>
 
+#include "HDraw.h"
+
 USING_3DF_NAMESPACE
 
 
@@ -37,6 +39,7 @@ Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 	m_pcWindow = pcWindow;
 
 	SegmentKey cConstruction(m_pcWindow->GetBaseView()->GetConstructionKey());
+	//SegmentKey cConstruction(m_pcWindow->GetBaseView()->GetSceneKey());
 
 	// Snap Point Segment 설정
 	m_cSnapPointSegment = cConstruction.Subsegment(L"SnapPoint");
@@ -306,10 +309,10 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 		//m_pcWindow->GetBaseView()->ForceUpdate();
 	}
 
-	return HLISTENER_PASS_EVENT;
+	// return HLISTENER_PASS_EVENT;
 
 	// PMI Test	Code
-/*
+
 	SegmentKey cSecne(m_pcWindow->GetSceneKey());
 
 	CameraKit cCamera;
@@ -320,7 +323,7 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 
 	WorldPoint cPoint[2];
 
-	cPoint[0] = m_cClickPoint;
+	//cPoint[0];
 	cPoint[1] = cInEvent.GetMouseWorldPos();
 
 	Vector cXAixs = cMatrix.XAxis();
@@ -331,12 +334,11 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 	Point2D cP2 = cPoint[1].DropPoint(cOrigin, cXAixs, cYAixs);
 
 	// Test Object Snap
-	HC_Open_Segment_By_Key(GetView()->GetConstructionKey()); {
-		HDraw::Test(GetView(), cMatrix, cP1, cP2);
+	HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetConstructionKey()); {
+		HDraw::Test(m_pcWindow->GetBaseView(), cMatrix, cP1, cP2);
 	} HC_Close_Segment();
 
-	GetView()->Update();
-*/
+	m_pcWindow->GetBaseView()->Update();
 
 	return HLISTENER_PASS_EVENT;
 }
@@ -504,7 +506,7 @@ void Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 
 		HC_Flush_Contents(".", "geometry, segment");
 
-		m_cSnapPointSegment.SetModellingMatrix(cCameraInfo.cMatrix);
+		//m_cSnapPointSegment.SetModellingMatrix(cCameraInfo.cMatrix);
 
 		for (auto pcItem : m_vSnapItems) {
 			Point2D cDropPoint = pcItem->cPoint.DropPoint(cCameraInfo.cOrigin, cCameraInfo.cXAixs, cCameraInfo.cYAixs);
@@ -526,11 +528,18 @@ void Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 	}
 }
 
+bool btemp = false;
+
 void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & cInCameraInfo, bool bUpdate)
 {
+	if (false == btemp) {
+		btemp = true;
+		return;
+	}
+
 	m_cSnapPointSegment.Open(); {
 
-		HC_Flush_Contents(".", "geometry, segment");
+		//  HC_Flush_Contents(".", "geometry, segment");
 
 		m_cSnapPointSegment.SetModellingMatrix(cInCameraInfo.cMatrix);
 
@@ -606,10 +615,54 @@ void Operator::ObjectSnap::DrawSnapPoint(double dRadius, Point2D center, SnapIte
 		return;
 	}
 
+	float width, height;
+
 	HC_Open_Segment("snap name");
 	{
-		p.y += dRadius * 3;
+		HC_Set_Rendering_Options("hidden line removal options=(visibility,dim factor=0),general displacement=-64");
+		HC_Set_Heuristics("no static model");
 
+		char chBuffer[MVO_BUFFER_SIZE] = "\n";
+		HC_Show_Net_Rendering_Options(chBuffer);
+
+		//HC_Set_Heuristics("backplane culling");
+		//HC_Set_Rendering_Options("display lists");
+		//HC_Set_Rendering_Options(
+
+		p.y += dRadius * 3;
+/*
+		Segment::SetColor("text", WARM_WHITE);
+		Font::SetName("arial");
+		//Font::SetName("arial");
+		//Font::SetBold();
+		Font::SetSize(dRadius * 5, "oru");
+		//Font::SetSize(10, "pt");
+		Font::SetRenderer("truetype");
+		Font::SetTransform();
+		Font::SetAlignment(Font::EPivot::BottomCenter);
+*/
+		Segment::SetColor("text", WARM_WHITE);
+		Font::SetName("franklin gothic book");
+		Font::SetSize(dRadius * 20, "oru");
+		Font::SetRenderer("truetype");
+		Font::SetTransform();
+
+		Text::GetExtent(pText, width, height);
+/*
+		Segment::SetColor("text", WARM_WHITE);
+ 		Font::SetName("franklin gothic book");
+		Font::SetSize(dRadius * 3, "oru");
+ 		//Font::SetSize(1000, "pt");
+// 		Font::SetSize(dRadius * 5, "oru");
+		Font::SetRenderer("truetype");
+ 		Font::SetAlignment(Font::EPivot::BottomCenter);
+		Font::SetTransform();
+*/
+		p.z = 10;
+		Text::Create(p, pText);
+		p.z = 0;
+
+/*
 		HC_Open_Segment("frame");
 		{
 			Segment::SetColor("faces", 0);
@@ -617,22 +670,53 @@ void Operator::ObjectSnap::DrawSnapPoint(double dRadius, Point2D center, SnapIte
 
 			float width, height;
 			Text::GetExtent(pText, width, height);
-			//WorldPoint size(*m_pcWindow, WindowPoint(width, height));
 
-			//TDF::Point p1(p.x - size.x / 2, p.y + size.y / 2);
-			//TDF::Point p2(p.x + size.x / 2, p.y - size.y / 2);
+			Point size(width, height);
+
+// 			HC_Open_Segment_By_Key(m_pcWindow->GetSceneKey()); {
+// 				HC_Compute_Coordinates(".", "window", &size, "world", &size);
+// 			} HC_Close_Segment();
+
+			//WorldPoint size(*m_pcWindow, WindowPoint(width, height));
+			//WorldPoint size(width * 10, height * 10);
+
+			TDF::Point p1(p.x - size.x / 2, p.y + size.y / 2);
+			TDF::Point p2(p.x + size.x / 2, p.y - size.y / 2);
+
+			Figure::CreateObround(p1, p2);
 			//Figure::CreateRectangle(p1, p2);
 		}
 		HC_Close_Segment();
-
-		Segment::SetColor("text", WARM_WHITE);
-		Font::SetName("franklin gothic book");
-		Font::SetSize(10, "pt");
-		Font::SetAlignment(Font::EPivot::BottomCenter);
-
-		Text::Create(p, pText);
+*/
 	}
 	HC_Close_Segment();
+
+	HC_Open_Segment("frame");
+	{
+		HC_Set_Heuristics("no face culling,exclude bounding,no culling");
+//		HC_Set_Rendering_Options("mask transform = (camera = (rotation, scale, perspective), model = (rotation, scale))");
+		HC_Set_Heuristics("no static model");
+
+		Segment::SetColor("faces", 0);
+		Segment::SetColor("edges", WARM_WHITE);
+
+		Point size(width, height);
+
+// 			HC_Open_Segment_By_Key(m_pcWindow->GetSceneKey()); {
+// 				HC_Compute_Coordinates(".", "window", &size, "world", &size);
+// 			} HC_Close_Segment();
+
+		//WorldPoint size(*m_pcWindow, WindowPoint(width, height));
+		//WorldPoint size(width * 10, height * 10);
+
+		TDF::Point p1(p.x - size.x / 2, p.y + size.y / 2);
+		TDF::Point p2(p.x + size.x / 2, p.y - size.y / 2);
+
+		Figure::CreateObround(p1, p2);
+		//Figure::CreateRectangle(p1, p2);
+	}
+	HC_Close_Segment();
+
 
 #undef WARM_BLACK
 #undef WARM_WHITE
