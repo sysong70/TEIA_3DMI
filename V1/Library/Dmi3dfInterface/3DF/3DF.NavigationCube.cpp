@@ -613,7 +613,7 @@ void NavigationCube::SetWindowSize(double width, double height, bool openSegment
 	}
 
 	double windowSize = (double)m_eCubeSize;
-	double fontSize = 9.5 * (double)m_eCubeSize / (double)ESize::Midium;
+	double fontSize = 12 * (double)m_eCubeSize / (double)ESize::Midium;
 
 	double left = 1.0 - 2.0 / width * windowSize;
 	double bottom = 1.0 - 2.0 / height * windowSize;

@@ -280,7 +280,10 @@ void Canvas::Init()
 	m_pcBaseView->SetAxisMode(m_cPreference.General.Rendering.DisplayAxisTriad ? AxisOn : AxisOff);
 
 	// 배경화면 설정
-	SetWindowBackGroundColor(m_cPreference.Appearance.BackgroundColor.Top, m_cPreference.Appearance.BackgroundColor.Bottom);
+	//SetWindowBackGroundColor(m_cPreference.Appearance.BackgroundColor.Top, m_cPreference.Appearance.BackgroundColor.Bottom);
+	//:Ken - set preference later...
+	COLORREF back = RGB(0x30, 0x30, 0x30);
+	SetWindowBackGroundColor(back, back);
 	//SetWindowColor(WindowBackgroundTopColor, WindowBackgroundBottomColor);
 
 	HPoint FakeHLRColor;

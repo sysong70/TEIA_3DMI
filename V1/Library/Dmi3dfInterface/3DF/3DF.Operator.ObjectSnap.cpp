@@ -502,26 +502,18 @@ void Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 	CamerInformation cCameraInfo;
 	ShowCameraInformation(m_fSnapRadius, cCameraInfo);
 
-	m_cSnapPointSegment.Open(); {
-
+	m_cSnapPointSegment.Open();
+	{
 		HC_Flush_Contents(".", "geometry, segment");
 
 		m_cSnapPointSegment.SetModellingMatrix(cCameraInfo.cMatrix);
 
 		for (auto pcItem : m_vSnapItems) {
 			Point2D cDropPoint = pcItem->cPoint.DropPoint(cCameraInfo.cOrigin, cCameraInfo.cXAixs, cCameraInfo.cYAixs);
-
-			//bool bSelected = false;
-			//if (Status::Selected == pcItem->eStatus) {
-			//	bSelected = true;
-			//}
-
-			//CString strSnapType;
-			//DrawSnapPoint(cCameraInfo.dObjectSnapRadius, cDropPoint, bSelected);
 			DrawSnapPoint(pcItem, cDropPoint, cCameraInfo.dObjectSnapRadius);
 		}
-
-	} m_cSnapPointSegment.Close();
+	}
+	m_cSnapPointSegment.Close();
 
 	if (true == bUpdate) {
 		m_pcWindow->GetBaseView()->Update();
@@ -537,24 +529,15 @@ void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & 
 		return;
 	}
 
-	m_cSnapPointSegment.Open(); {
-
-		//  HC_Flush_Contents(".", "geometry, segment");
-
+	m_cSnapPointSegment.Open();
+	{
 		m_cSnapPointSegment.SetModellingMatrix(cInCameraInfo.cMatrix);
 
 		Point2D cDropPoint = pcInItem->cPoint.DropPoint(cInCameraInfo.cOrigin, cInCameraInfo.cXAixs, cInCameraInfo.cYAixs);
-
-		//bool bSelected = false;
-		//if (Status::Selected == pcInItem->eStatus) {
-		//	bSelected = true;
-		//}
-
-		//CString strSnapType;
-		//DrawSnapPoint(cInCameraInfo.dObjectSnapRadius, cDropPoint, bSelected);
 		DrawSnapPoint(pcInItem, cDropPoint, cInCameraInfo.dObjectSnapRadius);
 
-	} m_cSnapPointSegment.Close();
+	}
+	m_cSnapPointSegment.Close();
 
 	if (true == bUpdate) {
 		m_pcWindow->GetBaseView()->Update();
@@ -563,7 +546,7 @@ void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & 
 
 #include "3DF.Painter.h"
 
-void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double dRadius)
+void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double dUnit)
 {
 	using namespace Painter;
 
@@ -577,13 +560,13 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 		Segment::SetVisibility("edges", false);
 		Segment::SetColor("faces", WARM_WHITE);
 
-		Circle::Create(p, dRadius, true);
+		Circle::Create(p, dUnit, true);
 
 		HC_Open_Segment("wire");
 		{
 			Segment::SetColor("faces", WARM_BALCK);
 
-			Figure::CreateDonut(p, dRadius * 0.6, dRadius);
+			Figure::CreateDonut(p, dUnit * 0.6, dUnit);
 		}
 		HC_Close_Segment();
 	}
@@ -598,7 +581,7 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 		Segment::SetVisibility("edges", false);
 		Segment::SetColor("faces", WARM_WHITE, 0.5);
 
-		Figure::CreateDonut(p, dRadius, dRadius * 2);
+		Figure::CreateDonut(p, dUnit, dUnit * 2);
 	}
 	HC_Close_Segment();
 
@@ -619,58 +602,21 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 
 	HC_Open_Segment("snap name");
 	{
-		HC_Set_Heuristics("quick moves, no backplane culling, no hidden surfaces");
-		HC_Set_Selectability("everything = off");
-		HC_Set_Line_Weight(1);
-		HC_Set_Edge_Weight(1);
-		HC_Set_Visibility("lights = off, cutting planes = off, faces = on, edges = on, lines = on, text = on, markers = off");
-		HC_Set_Visibility("no shadows");
-		HC_Set_Color("lines = markers = text = light green");
-		HC_Set_Rendering_Options("nurbs curve = (budget = 10000, maximum angle = 10)");
-		HC_Set_Rendering_Options("no display lists");
-		HC_Set_Rendering_Options("no frame buffer effects");
-		HC_Set_Heuristics("exclude bounding");
-
-		char chBuffer[MVO_BUFFER_SIZE] = "\n";
-		HC_Show_Net_Rendering_Options(chBuffer);
-
-		//HC_Set_Heuristics("backplane culling");
-		//HC_Set_Rendering_Options("display lists");
-		//HC_Set_Rendering_Options(
-
-		p.y += dRadius * 3;
-/*
 		Segment::SetColor("text", WARM_WHITE);
-		Font::SetName("arial");
+		//:WARNING - very important! (
+		Segment::SetEdgeWeight(1);
+		//Font::SetName("franklin gothic book");
 		//Font::SetName("arial");
-		//Font::SetBold();
-		Font::SetSize(dRadius * 5, "oru");
-		//Font::SetSize(10, "pt");
-		Font::SetRenderer("truetype");
-		Font::SetTransform();
-		Font::SetAlignment(Font::EPivot::BottomCenter);
-*/
-		Segment::SetColor("text", WARM_WHITE);
-		Font::SetName("franklin gothic book");
-		Font::SetSize(dRadius * 20, "oru");
+		Font::SetName("segoe ui");
+		//:CHECK
+		Font::SetSize(dUnit * 1.75, "oru");
 		Font::SetRenderer("truetype");
 		Font::SetAlignment(Font::EPivot::MiddleCenter);
+		//:WARNING - for calculating text extent
 		Font::SetTransform();
 
-		Text::GetExtent(pText, width, height);
-/*
-		Segment::SetColor("text", WARM_WHITE);
- 		Font::SetName("franklin gothic book");
-		Font::SetSize(dRadius * 3, "oru");
- 		//Font::SetSize(1000, "pt");
-// 		Font::SetSize(dRadius * 5, "oru");
-		Font::SetRenderer("truetype");
- 		Font::SetAlignment(Font::EPivot::BottomCenter);
-		Font::SetTransform();
-*/
-		p.z = 10;
+		p.y += dUnit * 5;
 		Text::Create(p, pText);
-		p.z = 0;
 
 		HC_Open_Segment("frame");
 		{
@@ -680,20 +626,13 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 			float width, height;
 			Text::GetExtent(pText, width, height);
 
-			Point size(width, height);
-
-// 			HC_Open_Segment_By_Key(m_pcWindow->GetSceneKey()); {
-// 				HC_Compute_Coordinates(".", "window", &size, "world", &size);
-// 			} HC_Close_Segment();
-
-			//WorldPoint size(*m_pcWindow, WindowPoint(width, height));
-			//WorldPoint size(width * 10, height * 10);
+			Point size(width + dUnit * 2, height + dUnit * 2);
 
 			TDF::Point p1(p.x - size.x / 2, p.y + size.y / 2);
 			TDF::Point p2(p.x + size.x / 2, p.y - size.y / 2);
 
-			Figure::CreateObround(p1, p2);
 			//Figure::CreateRectangle(p1, p2);
+			Figure::CreateObround(p1, p2);
 		}
 		HC_Close_Segment();
 	}
