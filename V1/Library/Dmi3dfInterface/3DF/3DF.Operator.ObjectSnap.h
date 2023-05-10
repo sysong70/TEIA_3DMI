@@ -51,41 +51,27 @@ namespace Operator
 
 		int NoButtonDownAndMove(HEventInfo & cInEvent);
 
-		//== Object Snap 계산 =======================================================================
-		void CalculationObjectSnapPoint(TDF::SelectionResults & cInItems);
-
 	protected:
+
+		void CalculationObjectSnapPoint(TDF::SelectionResults& cInItems);
 		bool CalculationLienObjectSnapPoint(const Key & cInLineKey, const WindowPoint & cInPoint, const MatrixKit & cModelingMatrix);
 		void CalculationLienAndLineObjectSnapPoint(LineKey & cLine1, LineKey & cLine2, const MatrixKit & cMatrix1, const MatrixKit & cMatrix2);
 
-		//== Object Snap Draw ======================================================================
 	public:
+
 		void DrawSnapItems(bool bUpdate = true);
-		void DrawSnapItems(CamerInformation & cInCameraInfo, bool bUpdate = true);
 		void DrawSnapItem(SnapItem * pcInItem, CamerInformation & cInCameraInfo, bool bUpdate = true);
+		void DrawSnapPoint(double dRadius, Point2D center, SnapItem* pItem);
 		bool ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo);
 
-		void DrawSnapItems1();
-		void DrawCenterMark(const char * pchSegmentName, Point cPoint, COLORREF = RGB(0, 0, 255), double dWeight = 1.0);
-		void DrawBox(const char * pchSegmentName, Point cPoint, COLORREF = RGB(0, 0, 255), double dWeight = 1.0);
-		void DrawEndPoint(const char * pchSegmentName, Point cPoint, COLORREF = RGB(0, 0, 255), double dWeight = 1.0);
-		void DrawMidPoint(const char * pchSegmentName, Point cPoint, COLORREF = RGB(0, 0, 255), double dWeight = 1.0);
-		void DrawNearPoint(const char * pchSegmentName, Point cPoint, COLORREF = RGB(0, 0, 255), double dWeight = 1.0);
-		void DrawCircle(SegmentKey & cConstruction, Point cPoint, Vector cViewNormal, COLORREF = RGB(0, 0, 255), double dWeight = 1.0);
-		void DrawRectangle(SegmentKey & cConstruction, Point cPoint, Vector cViewNormal, COLORREF = RGB(0, 0, 255), double dWeight = 1.0);
+	private:
 
-		static void CreateGlyph();
-
-		void ClearSnapItems(bool bUpdate);
-
-		void DrawSnapPoint(double dRadius, Point2D center, bool bSelected);
-		void DrawSnapPoint(double dRadius, Point2D center, SnapItem* pItem);
-
-		//== Utility Function ======================================================================
 		bool AddSnapItem(Key & cInKey, Point cSnapPoint, Type eType);
+		void ClearSnapItems(bool bUpdate);
 		void ResetSnapItem();
 
 	protected:
+
 		SelectionResults m_cNewHighlightSelection;
 		SelectionResults m_cOldHighlightSelection;
 		SelectionResults m_cHighlightSelection;

@@ -705,7 +705,7 @@ void Canvas::Init()
 	//m_pcWindow->GetSelectionOptionsControl().SetSorting(Selection::Sorting::Proximity); // Sorting 해도 Z방향 Sort가 정확하게 되지는 않됨.
 
 	// Object Snap용 Glyph 생성
-	Operator::ObjectSnap::CreateGlyph();
+	//Operator::ObjectSnap::CreateGlyph();
 
 	// do all the setup with no updates
 	m_pcBaseView->SetSuppressUpdate(false);
