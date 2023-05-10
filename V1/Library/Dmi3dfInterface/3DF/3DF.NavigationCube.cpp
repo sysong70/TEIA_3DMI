@@ -2,9 +2,9 @@
 #include "3DF.NavigationCube.h"
 #include "3DF.Painter.h"
 
-#include <GdiPlus.h>
-#pragma comment(lib, "Gdiplus.lib")
-#pragma warning(disable: 4244)
+//#include <GdiPlus.h>
+//#pragma comment(lib, "Gdiplus.lib")
+//#pragma warning(disable: 4244)
 
 USING_3DF_NAMESPACE
 
@@ -12,6 +12,7 @@ USING_3DF_NAMESPACE
 
 namespace NavigationCubePreset
 {
+	/*
 	class GdiLoader
 	{
 	public:
@@ -81,7 +82,7 @@ namespace NavigationCubePreset
 
 		BYTE* Buffer = nullptr;
 	};
-
+	*/
 
 
 	class Format
@@ -580,7 +581,7 @@ HC_KEY NavigationCube::CreateAxis(const char* name, const char* text, HPoint axi
 	double unit = PRESET::PlaneUnit();
 	HPoint axisStart(-unit, -unit, -unit);
 
-	PRESET::ImageLoader image;
+	//PRESET::ImageLoader image;
 
 	HC_KEY segKey = HC_Open_Segment(name);
 	ASSERT(segKey != HC_ERROR_KEY);

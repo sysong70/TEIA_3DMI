@@ -516,7 +516,7 @@ void Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 
 			//CString strSnapType;
 			//DrawSnapPoint(cCameraInfo.dObjectSnapRadius, cDropPoint, bSelected);
-			DrawSnapPoint(cCameraInfo.dObjectSnapRadius, cDropPoint, pcItem);
+			DrawSnapPoint(pcItem, cDropPoint, cCameraInfo.dObjectSnapRadius);
 		}
 
 	} m_cSnapPointSegment.Close();
@@ -543,7 +543,7 @@ void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & 
 
 		//CString strSnapType;
 		//DrawSnapPoint(cInCameraInfo.dObjectSnapRadius, cDropPoint, bSelected);
-		DrawSnapPoint(cInCameraInfo.dObjectSnapRadius, cDropPoint, pcInItem);
+		DrawSnapPoint(pcInItem, cDropPoint, cInCameraInfo.dObjectSnapRadius);
 
 	} m_cSnapPointSegment.Close();
 
@@ -554,7 +554,7 @@ void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & 
 
 #include "3DF.Painter.h"
 
-void Operator::ObjectSnap::DrawSnapPoint(double dRadius, Point2D center, SnapItem* pItem)
+void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double dRadius)
 {
 	using namespace Painter;
 
@@ -629,6 +629,10 @@ void Operator::ObjectSnap::DrawSnapPoint(double dRadius, Point2D center, SnapIte
 		Font::SetName("franklin gothic book");
 		Font::SetSize(10, "pt");
 		Font::SetAlignment(Font::EPivot::BottomCenter);
+
+		//Font::SetName("Segoe UI");
+		//HC_Set_Text_Spacing(0.9);
+		//Font::SetSize(9, "pt");
 
 		Text::Create(p, pText);
 	}
