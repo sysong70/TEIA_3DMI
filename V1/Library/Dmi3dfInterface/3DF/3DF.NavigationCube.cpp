@@ -617,7 +617,7 @@ void NavigationCube::SetWindowSize(double width, double height, bool openSegment
 	double left = 1.0 - 2.0 / width * windowSize;
 	double bottom = 1.0 - 2.0 / height * windowSize;
 	HC_Set_Rendering_Options(PRESET::Format("screen range = (%.6f, 1, %.6f, 1)", left, bottom));
-	HC_Set_Text_Font(PRESET::Format("size = %.3f pt", fontSize));
+	HC_Set_Text_Font(PRESET::Format("size = %.3f px", fontSize));
 
 	if (openSegment) {
 		CloseCubeSegment();
