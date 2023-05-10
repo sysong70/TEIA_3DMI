@@ -598,12 +598,11 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 		return;
 	}
 
-	float width, height;
-
 	HC_Open_Segment("snap name");
 	{
-		Segment::SetColor("text", WARM_WHITE);
-		//:WARNING - very important! (
+		//Segment::SetColor("text", WARM_WHITE);
+		Segment::SetColor("text", RGB(0xF0, 0xF0, 0xD5));
+		//:WARNING - very important! the order between text and edge.. (why?)
 		Segment::SetEdgeWeight(1);
 		//Font::SetName("franklin gothic book");
 		//Font::SetName("arial");
@@ -612,26 +611,27 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 		Font::SetSize(dUnit * 1.75, "oru");
 		Font::SetRenderer("truetype");
 		Font::SetAlignment(Font::EPivot::MiddleCenter);
-		//:WARNING - for calculating text extent
-		Font::SetTransform();
 
 		p.y += dUnit * 5;
 		Text::Create(p, pText);
 
-		HC_Open_Segment("frame");
-		{
-			Segment::SetColor("faces", 0);
-			Segment::SetColor("edges", WARM_WHITE);
-
+		//:WARNING - for calculating text extent
+		Font::SetTransform();
 			float width, height;
 			Text::GetExtent(pText, width, height);
+		Font::SetTransform(false);
 
-			Point size(width + dUnit * 2, height + dUnit * 2);
+		HC_Open_Segment("frame");
+		{
+			//Segment::SetColor("faces", 0);
+			//Segment::SetColor("edges", WARM_WHITE);
+			Segment::SetColor("faces", RGB(0x43, 0x43, 0x43));
+			Segment::SetColor("edges", RGB(0x64, 0x64, 0x64));
 
+			Point size(width, height + dUnit * 2);
 			TDF::Point p1(p.x - size.x / 2, p.y + size.y / 2);
 			TDF::Point p2(p.x + size.x / 2, p.y - size.y / 2);
 
-			//Figure::CreateRectangle(p1, p2);
 			Figure::CreateObround(p1, p2);
 		}
 		HC_Close_Segment();

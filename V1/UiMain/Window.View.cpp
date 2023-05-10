@@ -216,7 +216,7 @@ void Window::View::OnPaint()
 		m_delivery.view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
 	}
 	else {
-		dc.FillSolidRect(rect, (COLORREF)Control::EColor::Charcoal);
+		dc.FillSolidRect(rect, (COLORREF)Control::EColor::DarkBack);
 	}
 
 	// GetDC()->FillRect(CRect(500, 500, 1000, 1000), m_pcBrush);
