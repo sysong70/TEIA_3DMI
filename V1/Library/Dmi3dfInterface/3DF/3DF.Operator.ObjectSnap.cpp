@@ -1,8 +1,5 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.Operator.ObjectSnap.h"
-#include "Private/3DF.SelectionPrivate.h"
-
 #include "3DF.Window.h"
 
 #include "3DF.Line.h"
@@ -18,6 +15,8 @@
 #include "3DF.Visibility.h"
 #include "3DF.VisualEffects.h"
 
+#include "3DF.Operator.ObjectSnap.h"
+#include "Private/3DF.SelectionPrivate.h"
 #include "../3DF.Signal.Connector.h"
 
 #include <Common_Define.h>
@@ -29,33 +28,8 @@
 #include <HEventManager.h>
 #include <HConstantFrameRate.h>
 
-#define MARKER_OPCODE_START_FILL -1
-#define MARKER_OPCODE_RESTART_FILL -2
-#define MARKER_OPCODE_END_FILL -3
-#define MARKER_OPCODE_ELLIPSE -4
-#define MARKER_OPCODE_CIRCULAR_ARC -5
-#define MARKER_OPCODE_INFINITE_LINE -6
-#define MARKER_OPCODE_INFINITE_RAY -7
-#define MARKER_OPCODE_START_CONTRAST_COLOR -8
-#define MARKER_OPCODE_START_NORMAL_COLOR -9
-#define MARKER_OPCODE_START_RGB_COLOR -10
-#define MARKER_OPCODE_START_INDEXED_COLOR -11
-#define MARKER_OPCODE_TERMINATE 0
-#define MARKER_OPCODE_POINT 1
-#define MARKER_OPCODE_LINE_2 2
-#define MARKER_OPCODE_LINE_3 3
-#define MARKER_OPCODE_LINE_4 4
-#define MARKER_OPCODE_LINE_5 5
-#define MARKER_OPCODE_LINE_6 6
-#define MARKER_OPCODE_LINE_7 7
-#define MARKER_OPCODE_LINE_8 8
-#define MARKER_OPCODE_LINE_9 9
-#define MARKER_OPCODE_LINE_10 10
-#define MARKER_OPCODE_LINE_11 11
-#define MARKER_OPCODE_LINE_12 12
-#define MARKER_OPCODE_LINE_13 13
-
 USING_3DF_NAMESPACE
+
 
 
 Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
@@ -63,23 +37,6 @@ Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 	m_pcWindow = pcWindow;
 
 	SegmentKey cConstruction(m_pcWindow->GetBaseView()->GetConstructionKey());
-
-/*
-	cTestSnapPoint.Open(); {
-		SegmentKey cTestSnapPoint = cConstruction.Subsegment(L"SnapPoint");
-		HC_Set_Heuristics("quick moves, no backplane culling, no hidden surfaces");
- 		HC_Set_Selectability("everything = off");
- 		HC_Set_Line_Weight(1);
- 		HC_Set_Edge_Weight(1);
-		//HC_Set_Visibility("lights = off, cutting planes = off, faces = off, edges = on, lines = on, text = on, markers = off");
- 		HC_Set_Visibility("no shadows");
- 		//HC_Set_Color("lines = markers = text = light green");
- 		//HC_Set_Rendering_Options("nurbs curve = (budget = 10000, maximum angle = 10)");
-		HC_Set_Rendering_Options("no display lists");
-		HC_Set_Rendering_Options("no frame buffer effects");
-		HC_Set_Heuristics("exclude bounding");
-	} cTestSnapPoint.Close();
-*/
 
 	// Snap Point Segment 설정
 	m_cSnapPointSegment = cConstruction.Subsegment(L"SnapPoint");
@@ -99,7 +56,6 @@ Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 	//m_cSnapPointSegment.GetVisualEffectsControl().SetTextAntiAliasing(true);
 }
 
-//== Mouse Event ===================================================================================
 int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 {
 	PixelPoint cMousePoint(cInEvent.GetMousePixelPos());
@@ -385,7 +341,6 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 	return HLISTENER_PASS_EVENT;
 }
 
-
 //== 1. Object Snap 계산 =============================================================================== 
 
 // 1. 주어진 Selection Object를 이용해서 연관된 Object Snap Point를 계산한다.
@@ -571,33 +526,6 @@ void Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 	}
 }
 
-void Operator::ObjectSnap::DrawSnapItems(CamerInformation & cInCameraInfo, bool bUpdate)
-{
-	m_cSnapPointSegment.Open(); {
-
-		HC_Flush_Contents(".", "geometry, segment");
-
-		m_cSnapPointSegment.SetModellingMatrix(cInCameraInfo.cMatrix);
-
-		for (auto pcItem : m_vSnapItems) {
-			Point2D cDropPoint = pcItem->cPoint.DropPoint(cInCameraInfo.cOrigin, cInCameraInfo.cXAixs, cInCameraInfo.cYAixs);
-
-			bool bSelected = false;
-			if (Status::Selected == pcItem->eStatus) {
-				bSelected = true;
-			}
-
-			CString strSnapType;
-			DrawSnapPoint(cInCameraInfo.dObjectSnapRadius, cDropPoint, bSelected);
-		}
-
-	} m_cSnapPointSegment.Close();
-
-	if(true == bUpdate) {
-		m_pcWindow->GetBaseView()->Update();
-	}
-}
-
 void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & cInCameraInfo, bool bUpdate)
 {
 	m_cSnapPointSegment.Open(); {
@@ -622,6 +550,92 @@ void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & 
 	if (true == bUpdate) {
 		m_pcWindow->GetBaseView()->Update();
 	}
+}
+
+#include "3DF.Painter.h"
+
+void Operator::ObjectSnap::DrawSnapPoint(double dRadius, Point2D center, SnapItem* pItem)
+{
+	using namespace Painter;
+
+#define WARM_BALCK RGB(0x1F, 0x1E, 0x1C)
+#define WARM_WHITE RGB(0xFD, 0xF4, 0xDC)
+
+	Point p(center);
+
+	HC_Open_Segment("inner");
+	{
+		Segment::SetVisibility("edges", false);
+		Segment::SetColor("faces", WARM_WHITE);
+
+		Circle::Create(p, dRadius, true);
+
+		HC_Open_Segment("wire");
+		{
+			Segment::SetColor("faces", WARM_BALCK);
+
+			Figure::CreateDonut(p, dRadius * 0.6, dRadius);
+		}
+		HC_Close_Segment();
+	}
+	HC_Close_Segment();
+
+	if (pItem->eStatus != Status::Selected) {
+		return;
+	}
+
+	HC_Open_Segment("outer");
+	{
+		Segment::SetVisibility("edges", false);
+		Segment::SetColor("faces", WARM_WHITE, 0.5);
+
+		Figure::CreateDonut(p, dRadius, dRadius * 2);
+	}
+	HC_Close_Segment();
+
+	//:TODO - language
+	const char* pText = nullptr;
+
+	switch (pItem->eType) {
+	case Type::EndPoint:	pText = "End Point";	break;
+	case Type::MidPoint:	pText = "Mid Point";	break;
+	case Type::NearPoint:	pText = "Near Point";	break;
+	case Type::Center:		pText = "Center Point";	break;
+	default:
+		ASSERT(FALSE);
+		return;
+	}
+
+	HC_Open_Segment("snap name");
+	{
+		p.y += dRadius * 3;
+
+		HC_Open_Segment("frame");
+		{
+			Segment::SetColor("faces", 0);
+			Segment::SetColor("edges", WARM_WHITE);
+
+			float width, height;
+			Text::GetExtent(pText, width, height);
+			//WorldPoint size(*m_pcWindow, WindowPoint(width, height));
+
+			//TDF::Point p1(p.x - size.x / 2, p.y + size.y / 2);
+			//TDF::Point p2(p.x + size.x / 2, p.y - size.y / 2);
+			//Figure::CreateRectangle(p1, p2);
+		}
+		HC_Close_Segment();
+
+		Segment::SetColor("text", WARM_WHITE);
+		Font::SetName("franklin gothic book");
+		Font::SetSize(10, "pt");
+		Font::SetAlignment(Font::EPivot::BottomCenter);
+
+		Text::Create(p, pText);
+	}
+	HC_Close_Segment();
+
+#undef WARM_BLACK
+#undef WARM_WHITE
 }
 
 bool Operator::ObjectSnap::ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo)
@@ -650,490 +664,6 @@ bool Operator::ObjectSnap::ShowCameraInformation(float fInRadius, CamerInformati
 	return true;
 }
 
-void Operator::ObjectSnap::DrawSnapItems1()
-{
-	HC_KEY nConstructionKey = m_pcWindow->GetBaseView()->GetConstructionKey();
-
-	// Camera 정보를 받아옴.
-	SegmentKey cScene(m_pcWindow->GetSceneKey());
-
-	CameraKit cCamera;
-	cScene.ShowCamera(cCamera);
-
-	SegmentKey cConstruction(m_pcWindow->GetBaseView()->GetConstructionKey());
-	cConstruction.Open();
-
-	HC_Flush_Contents(".", "geometry, segment");
-
-	Point cPosition;
-	cCamera.ShowPosition(cPosition);
-
-	Point cTarget;
-	cCamera.ShowTarget(cTarget);
-
-	Vector cViewNormal = cTarget - cPosition;
-	cViewNormal.Normalize();
-
-	Vector cYAxis;
-	cCamera.ShowUpVector(cYAxis);
-	cYAxis.Normalize();
-
-	Vector cXAxis = cYAxis.Cross(cViewNormal);
-
-	for (auto pcItem : m_vSnapItems) {
-		switch (pcItem->eType)
-		{
-			case Type::EndPoint:
-				//cConstruction.InsertCircle(pcItem->cPoint, 2.0, cViewNormal);
-
-				//DrawCircle(cConstruction, pcItem->cPoint, cViewNormal, RGB(255, 255, 0), 0.4);
-				DrawEndPoint("EndPoint", pcItem->cPoint, RGB(255, 255, 0), 0.4);
-				break;
-
-			case Type::MidPoint:
-				DrawMidPoint("MidPoint", pcItem->cPoint, RGB(255, 255, 0), 0.4);
-				break;
-
-			case Type::NearPoint:
-				DrawNearPoint("NearPoint", pcItem->cPoint, RGB(255, 255, 0), 0.4);
-				break;
-
-// 			case SnapType::Intersection:
-// 				DrawIntersection("Intersection", pcItem->cPoint, RGB(255, 255, 0), 0.4);
-// 				break;
-		}
-	}
-
-	cConstruction.Close();
-
-	m_pcWindow->GetBaseView()->Update();
-}
-
-void Operator::ObjectSnap::DrawCenterMark(const char * pchSegmentName, Point cPoint, COLORREF nColor, double dWeight)
-{
-#ifdef USE_IMAGE
-	HC_Open_Segment(pchSegmentName);
-	{
-		HC_Insert_Image(cPoint.x, cPoint.y, cPoint.z, OSnap::Format, OSnap::Width, OSnap::Height, OSnap::Center.Buffer);
-	}
-	HC_Close_Segment();
-#else
-	HC_Open_Segment(pchSegmentName);
-	{
-/*
-		if (true == bTempDrawFlag) {
-			HC_Set_Rendering_Options("no simple reflection");
-			HC_Set_Rendering_Options("no simple shadow, no frame buffer effects");
-			HC_Set_Rendering_Options("depth range = (0.1,0.2)");
-			HC_Set_Visibility("shadows = off");
-			HC_Set_Visibility("cutting planes = off");
-			HC_Set_User_Options("on top");
-		}
-*/
-
-		HC_Set_Visibility("marker = on");
-		HC_Set_Marker_Size(dWeight);
-		HC_Set_Color_By_Value("geometry", "rgb", GetRValue(nColor) / 255.0, GetGValue(nColor) / 255.0, GetBValue(nColor) / 255.0);
-
-		HC_Set_Marker_Symbol("ObjectSnapCenterMark");
-		HC_Insert_Marker(cPoint.x, cPoint.y, cPoint.z);
-	}
-	HC_Close_Segment();
-#endif
-}
-
-void Operator::ObjectSnap::DrawBox(const char * pchSegmentName, Point cPoint, COLORREF nColor, double dWeight)
-{
-	HC_Open_Segment(pchSegmentName);
-	{
-		HC_Set_Visibility("marker = on");
-		HC_Set_Marker_Size(dWeight);
-		HC_Set_Color_By_Value("geometry", "rgb", GetRValue(nColor) / 255.0, GetGValue(nColor) / 255.0, GetBValue(nColor) / 255.0);
-
-		HC_Set_Marker_Symbol("ObjectSnapBox");
-		HC_Insert_Marker(cPoint.x, cPoint.y, cPoint.z);
-	}
-	HC_Close_Segment();
-}
-
-void Operator::ObjectSnap::DrawEndPoint(const char * pchSegmentName, Point cPoint, COLORREF nColor, double dWeight)
-{
-#ifdef USE_IMAGE
-	HC_Open_Segment(pchSegmentName);
-	{
-		HC_Insert_Image(cPoint.x, cPoint.y, cPoint.z, OSnap::Format, OSnap::Width, OSnap::Height, OSnap::Center.Buffer);
-	}
-	HC_Close_Segment();
-#else
-	HC_Open_Segment(pchSegmentName);
-	{
-		HC_Set_Visibility("marker = on");
-		HC_Set_Marker_Size(dWeight);
-		HC_Set_Color_By_Value("geometry", "rgb", GetRValue(nColor) / 255.0, GetGValue(nColor) / 255.0, GetBValue(nColor) / 255.0);
-
-		HC_Set_Marker_Symbol("ObjectSnapEndPoint");
-		HC_Insert_Marker(cPoint.x, cPoint.y, cPoint.z);
-	}
-	HC_Close_Segment();
-#endif
-}
-
-void Operator::ObjectSnap::DrawMidPoint(const char * pchSegmentName, Point cPoint, COLORREF nColor, double dWeight)
-{
-#ifdef USE_IMAGE
-	HC_Open_Segment(pchSegmentName);
-	{
-		HC_Insert_Image(cPoint.x, cPoint.y, cPoint.z, OSnap::Format, OSnap::Width, OSnap::Height, OSnap::Center.Buffer);
-	}
-	HC_Close_Segment();
-#else
-	HC_Open_Segment(pchSegmentName);
-	{
-		HC_Set_Visibility("marker = on");
-		HC_Set_Marker_Size(dWeight);
-		HC_Set_Color_By_Value("geometry", "rgb", GetRValue(nColor) / 255.0, GetGValue(nColor) / 255.0, GetBValue(nColor) / 255.0);
-
-		HC_Set_Marker_Symbol("ObjectSnapMidPoint");
-		HC_Insert_Marker(cPoint.x, cPoint.y, cPoint.z);
-	}
-	HC_Close_Segment();
-#endif
-}
-
-void Operator::ObjectSnap::DrawNearPoint(const char * pchSegmentName, Point cPoint, COLORREF nColor, double dWeight)
-{
-#ifdef USE_IMAGE
-	HC_Open_Segment(pchSegmentName);
-	{
-		HC_Insert_Image(cPoint.x, cPoint.y, cPoint.z, OSnap::Format, OSnap::Width, OSnap::Height, OSnap::Center.Buffer);
-	}
-	HC_Close_Segment();
-#else
-	HC_Open_Segment(pchSegmentName);
-	{
-		HC_Set_Variable_Marker_Size("3 oru");
-
-		HC_Set_Visibility("marker = on");
-		HC_Set_Marker_Size(dWeight);
-		HC_Set_Color_By_Value("geometry", "rgb", GetRValue(nColor) / 255.0, GetGValue(nColor) / 255.0, GetBValue(nColor) / 255.0);
-
-		HC_Set_Marker_Symbol("ObjectSnapNearPoint");
-		HC_Insert_Marker(cPoint.x, cPoint.y, cPoint.z);
-	}
-	HC_Close_Segment();
-#endif
-}
-
-void Operator::ObjectSnap::DrawCircle(SegmentKey & cConstruction, Point cPoint, Vector cViewNormal, COLORREF nColor, double dWeight)
-{
-	RGBAColor cDiffuseColor(GetRValue(nColor) / 255.0, GetGValue(nColor) / 255.0, GetBValue(nColor) / 255.0);
-	MaterialMappingKit cMaterial;
-	cMaterial.SetLineColor(cDiffuseColor);
-
-	PixelPoint cRadiusPoints[2];
-	cRadiusPoints[1].x = 100.0f;
-
-	WorldPoint cWorldPoint1(*m_pcWindow, cRadiusPoints[0]);
-	WorldPoint cWorldPoint2(*m_pcWindow, cRadiusPoints[1]);
-
-	float fRadius = cWorldPoint1.DistanceWith(cWorldPoint2);
-
-	SegmentKey cCircle = cConstruction.Subsegment();
- 	cCircle.SetMaterialMapping(cMaterial);
- 	cCircle.GetVisibilityControl().SetFaces(true);
- 	cCircle.InsertCircle(cPoint, fRadius, cViewNormal);
-
-
-	//cCircle.ForcedOpen();
-	//static HC_KEY InsertRectangle(const char * seg, float x0, float y0, float x1, float y1, float z = 0.0f, bool fill = false)
-	
-	//cCircle.ForcedClose();
-}
-
-void Operator::ObjectSnap::DrawRectangle(SegmentKey & cConstruction, Point cPoint, Vector cViewNormal, COLORREF nColor, double dWeight)
-{
-	RGBAColor cDiffuseColor(GetRValue(nColor) / 255.0, GetGValue(nColor) / 255.0, GetBValue(nColor) / 255.0);
-	MaterialMappingKit cMaterial;
-	cMaterial.SetLineColor(cDiffuseColor);
-
-	PixelPoint cRadiusPoints[2];
-	cRadiusPoints[1].x = 100.0f;
-
-	WorldPoint cWorldPoint1(*m_pcWindow, cRadiusPoints[0]);
-	WorldPoint cWorldPoint2(*m_pcWindow, cRadiusPoints[1]);
-	float fRadius = cWorldPoint1.DistanceWith(cWorldPoint2);
-
-	SegmentKey cCircle = cConstruction.Subsegment();
-	cCircle.SetMaterialMapping(cMaterial);
-	cCircle.GetVisibilityControl().SetFaces(true);
-	cCircle.InsertCircle(cPoint, fRadius, cViewNormal);
-}
-
-void Operator::ObjectSnap::CreateGlyph()
-{
-	HC_Open_Segment("/"); {
-		const char chEndPointData[] = {
-			127,	// radius size (최대 127까지만 사용한다.)
-			0, 0,	// offset origin
-
-			MARKER_OPCODE_LINE_5,
-			-127, 127,
-			127, 127,
-			127, -127,
-			-127, -127,
-			-127, 127,
-
-			MARKER_OPCODE_LINE_5,
-			-107, 107,
-			107, 107,
-			107, -107,
-			-107, -107,
-			-107, 107,
-
-			MARKER_OPCODE_TERMINATE
-		};
-
-		HC_Define_Glyph("ObjectSnapEndPoint", sizeof(chEndPointData), chEndPointData);
-
-		const char chMidPointData[] = {
-			127,	// radius size (최대 127까지만 사용한다.)
-			0, 0,	// offset origin
-
-			MARKER_OPCODE_LINE_4,
-			0, 127,
-			-127, -93,
-			127, -93,
-			0, 127,
-
-			MARKER_OPCODE_LINE_4,
-			0, 87,
-			-92, -73,
-			92, -73,
-			0, 87,
-
-			MARKER_OPCODE_LINE_4,
-			0, 97,
-			-101, -77,
-			101, -77,
-			0, 97,
-
-			MARKER_OPCODE_TERMINATE
-		};
-
-		HC_Define_Glyph("ObjectSnapMidPoint", sizeof(chMidPointData), chMidPointData);
-
-		const char chNearPointData[] = {
-			127,	// radius size (최대 127까지만 사용한다.)
-			0, 0,	// offset origin
-
-			MARKER_OPCODE_LINE_5,
-			-127, 127,
-			127, 127,
-			-127, -127,
-			127, -127,
-			-127, 127,
-
-// 			MARKER_OPCODE_LINE_5,
-// 			-127, 127,
-// 			127, 127,
-// 			-127, -127,
-// 			127, -127,
-// 			-127, 127,
-
-// 			-127, 127,
-// 			127, 127,
-// 			127, -127,
-// 			-127, -127,
-// 			-127, 127,
-
-			MARKER_OPCODE_TERMINATE
-		};
-
-		HC_Define_Glyph("ObjectSnapNearPoint", sizeof(chNearPointData), chNearPointData);
-
-		const char chBoxData[] = {
-			127,	// radius size (최대 127까지만 사용한다.)
-			0, 0,	// offset origin
-
-			MARKER_OPCODE_LINE_5,
-			-127, 127,
-			127, 127,
-			127, -127,
-			-127, -127,
-			-127, 127,
-			MARKER_OPCODE_TERMINATE
-		};
-
-		HC_Define_Glyph("ObjectSnapBox", sizeof(chBoxData), chBoxData);
-
-		const char chCenterMarkData[] = {
-			127,	// radius size (최대 127까지만 사용한다.)
-			0, 0,	// offset origin
-
-			// 우측 상단 원호
-			MARKER_OPCODE_CIRCULAR_ARC,
-			127, 0,
-			90, 90,
-			0, 127,
-
-			// 좌측 상단 원호 채움
-			MARKER_OPCODE_START_FILL,
-			MARKER_OPCODE_CIRCULAR_ARC,
-			0, 127,
-			-90, 90,
-			-127, 0,
-			MARKER_OPCODE_LINE_2,
-			-127, 0,
-			0, 0,
-			MARKER_OPCODE_LINE_2,
-			0, 0,
-			0,127,
-			MARKER_OPCODE_END_FILL,
-
-			// 좌측 하단 원호
-			MARKER_OPCODE_CIRCULAR_ARC,
-			-127, 0,
-			-90, -90,
-			0, -127,
-
-			// 우측 하단 원호 채움
-			MARKER_OPCODE_START_FILL,
-			MARKER_OPCODE_CIRCULAR_ARC,
-			0, -127,
-			90, -90,
-			127,0,
-			MARKER_OPCODE_LINE_2,
-			127, 0,
-			0, 0,
-			MARKER_OPCODE_LINE_2,
-			0, 0,
-			0, -127,
-			MARKER_OPCODE_END_FILL,
-
-			MARKER_OPCODE_TERMINATE
-		};
-
-		HC_Define_Glyph("ObjectSnapCenterMark", sizeof(chCenterMarkData), chCenterMarkData);
-
-	} HC_Close_Segment();
-}
-
-void Operator::ObjectSnap::ClearSnapItems(bool bUpdate)
-{
-	m_cSnapPointSegment.Open(); {
-		HC_Flush_Contents(".", "geometry, segment");
-	} m_cSnapPointSegment.Close();
-
-	if (true == bUpdate) {
-		m_pcWindow->GetBaseView()->Update();
-	}
-}
-
-#include "3DF.Painter.h"
-#define OPEN_SEG(x) HC_Open_Segment(x); {
-
-void Operator::ObjectSnap::DrawSnapPoint(double dRadius, Point2D center, bool bSelected)
-{
-	using namespace Painter;
-
-	if (bSelected) {
-		//Painter::Circle::Create(Point(center), dRadius * 3, true);
-
-		Circle::Create(Point(center), dRadius, true);
-
-		HC_Open_Segment("outer"); {
-			Segment::SetVisibility("edges", false);
-			Segment::SetColor("faces", RGB(255, 255, 255), 0.5);
-			Figure::CreateDonut(Point(center), dRadius, dRadius * 2);
-		} HC_Close_Segment();
-
-		//:TODO
-		HC_Open_Segment("snap name"); {
-			Segment::SetColor("text", 0);
-			Font::SetAlignment(Font::EPivot::BottomCenter);
-			HC_Insert_Text(center.x, center.y + dRadius * 3, 0, "Near point");
-		} HC_Close_Segment();
-	}
-	else {
-		Circle::Create(Point(center), dRadius, true);
-	}
-}
-
-void Operator::ObjectSnap::DrawSnapPoint(double dRadius, Point2D center, SnapItem* pItem)
-{
-	using namespace Painter;
-
-#define WARM_BALCK RGB(0x1F, 0x1E, 0x1C)
-#define WARM_WHITE RGB(0xFD, 0xF4, 0xDC)
-
-	Point p(center);
-
-	HC_Open_Segment("inner"); {
-		Segment::SetVisibility("edges", false);
-		Segment::SetColor("faces", WARM_WHITE);
-
-		Circle::Create(p, dRadius, true);
-
-		HC_Open_Segment("wire"); {
-			Segment::SetColor("faces", WARM_BALCK);
-
-			Figure::CreateDonut(p, dRadius * 0.6, dRadius);
-		} HC_Close_Segment();
-	} HC_Close_Segment();
-
-	if (pItem->eStatus != Status::Selected) {
-		return;
-	}
-
-	HC_Open_Segment("outer"); {
-		Segment::SetVisibility("edges", false);
-		Segment::SetColor("faces", WARM_WHITE, 0.5);
-
-		Figure::CreateDonut(p, dRadius, dRadius * 2);
-	} HC_Close_Segment();
-
-	//:TODO - language
-	const char* pText = nullptr;
-
-	switch (pItem->eType) {
-	case Type::EndPoint:	pText = "End Point";	break;
-	case Type::MidPoint:	pText = "Mid Point";	break;
-	case Type::NearPoint:	pText = "Near Point";	break;
-	case Type::Center:		pText = "Center Point";	break;
-	default:
-		return;
-	}
-
-	HC_Open_Segment("snap name"); {
-		p.y += dRadius * 3;
-
-		HC_Open_Segment("frame"); {
-			Segment::SetColor("faces", 0);
-			Segment::SetColor("edges", WARM_WHITE);
-
-			float width, height;
-			Text::GetExtent(pText, width, height);
-			//WorldPoint size(*m_pcWindow, WindowPoint(width, height));
-
-			//TDF::Point p1(p.x - size.x / 2, p.y + size.y / 2);
-			//TDF::Point p2(p.x + size.x / 2, p.y - size.y / 2);
-			//Figure::CreateRectangle(p1, p2);
-		} HC_Close_Segment();
-
-		Segment::SetColor("text", WARM_WHITE);
-		Font::SetName("franklin gothic book");
-		Font::SetSize(10, "pt");
-		Font::SetAlignment(Font::EPivot::BottomCenter);
-
-		Text::Create(p, pText);
-	} HC_Close_Segment();
-
-#undef WARM_BLACK
-#undef WARM_WHITE
-}
-
-//== Utility Function ==============================================================================
-
 bool Operator::ObjectSnap::AddSnapItem(Key & cInKey, Point cSnapPoint, Type eType)
 {
 	SnapItem * psSnapItem = new SnapItem();
@@ -1142,6 +672,19 @@ bool Operator::ObjectSnap::AddSnapItem(Key & cInKey, Point cSnapPoint, Type eTyp
 	m_vSnapItems.push_back(psSnapItem);
 
 	return true;
+}
+
+void Operator::ObjectSnap::ClearSnapItems(bool bUpdate)
+{
+	m_cSnapPointSegment.Open();
+	{
+		HC_Flush_Contents(".", "geometry, segment");
+	}
+	m_cSnapPointSegment.Close();
+
+	if (true == bUpdate) {
+		m_pcWindow->GetBaseView()->Update();
+	}
 }
 
 void Operator::ObjectSnap::ResetSnapItem()
