@@ -309,7 +309,7 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 		//m_pcWindow->GetBaseView()->ForceUpdate();
 	}
 
-	// return HLISTENER_PASS_EVENT;
+	return HLISTENER_PASS_EVENT;
 
 	// PMI Test	Code
 
@@ -506,7 +506,7 @@ void Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 
 		HC_Flush_Contents(".", "geometry, segment");
 
-		//m_cSnapPointSegment.SetModellingMatrix(cCameraInfo.cMatrix);
+		m_cSnapPointSegment.SetModellingMatrix(cCameraInfo.cMatrix);
 
 		for (auto pcItem : m_vSnapItems) {
 			Point2D cDropPoint = pcItem->cPoint.DropPoint(cCameraInfo.cOrigin, cCameraInfo.cXAixs, cCameraInfo.cYAixs);
@@ -619,8 +619,17 @@ void Operator::ObjectSnap::DrawSnapPoint(double dRadius, Point2D center, SnapIte
 
 	HC_Open_Segment("snap name");
 	{
-		HC_Set_Rendering_Options("hidden line removal options=(visibility,dim factor=0),general displacement=-64");
-		HC_Set_Heuristics("no static model");
+		HC_Set_Heuristics("quick moves, no backplane culling, no hidden surfaces");
+		HC_Set_Selectability("everything = off");
+		HC_Set_Line_Weight(1);
+		HC_Set_Edge_Weight(1);
+		HC_Set_Visibility("lights = off, cutting planes = off, faces = on, edges = on, lines = on, text = on, markers = off");
+		HC_Set_Visibility("no shadows");
+		HC_Set_Color("lines = markers = text = light green");
+		HC_Set_Rendering_Options("nurbs curve = (budget = 10000, maximum angle = 10)");
+		HC_Set_Rendering_Options("no display lists");
+		HC_Set_Rendering_Options("no frame buffer effects");
+		HC_Set_Heuristics("exclude bounding");
 
 		char chBuffer[MVO_BUFFER_SIZE] = "\n";
 		HC_Show_Net_Rendering_Options(chBuffer);
@@ -645,6 +654,7 @@ void Operator::ObjectSnap::DrawSnapPoint(double dRadius, Point2D center, SnapIte
 		Font::SetName("franklin gothic book");
 		Font::SetSize(dRadius * 20, "oru");
 		Font::SetRenderer("truetype");
+		Font::SetAlignment(Font::EPivot::MiddleCenter);
 		Font::SetTransform();
 
 		Text::GetExtent(pText, width, height);
@@ -662,7 +672,6 @@ void Operator::ObjectSnap::DrawSnapPoint(double dRadius, Point2D center, SnapIte
 		Text::Create(p, pText);
 		p.z = 0;
 
-/*
 		HC_Open_Segment("frame");
 		{
 			Segment::SetColor("faces", 0);
@@ -687,36 +696,8 @@ void Operator::ObjectSnap::DrawSnapPoint(double dRadius, Point2D center, SnapIte
 			//Figure::CreateRectangle(p1, p2);
 		}
 		HC_Close_Segment();
-*/
 	}
 	HC_Close_Segment();
-
-	HC_Open_Segment("frame");
-	{
-		HC_Set_Heuristics("no face culling,exclude bounding,no culling");
-//		HC_Set_Rendering_Options("mask transform = (camera = (rotation, scale, perspective), model = (rotation, scale))");
-		HC_Set_Heuristics("no static model");
-
-		Segment::SetColor("faces", 0);
-		Segment::SetColor("edges", WARM_WHITE);
-
-		Point size(width, height);
-
-// 			HC_Open_Segment_By_Key(m_pcWindow->GetSceneKey()); {
-// 				HC_Compute_Coordinates(".", "window", &size, "world", &size);
-// 			} HC_Close_Segment();
-
-		//WorldPoint size(*m_pcWindow, WindowPoint(width, height));
-		//WorldPoint size(width * 10, height * 10);
-
-		TDF::Point p1(p.x - size.x / 2, p.y + size.y / 2);
-		TDF::Point p2(p.x + size.x / 2, p.y - size.y / 2);
-
-		Figure::CreateObround(p1, p2);
-		//Figure::CreateRectangle(p1, p2);
-	}
-	HC_Close_Segment();
-
 
 #undef WARM_BLACK
 #undef WARM_WHITE
