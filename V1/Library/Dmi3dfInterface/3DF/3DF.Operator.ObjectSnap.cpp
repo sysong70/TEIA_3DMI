@@ -550,21 +550,24 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 {
 	using namespace Painter;
 
-#define WARM_BALCK RGB(0x1F, 0x1E, 0x1C)
-#define WARM_WHITE RGB(0xFD, 0xF4, 0xDC)
+	const COLORREF PointBackColor = RGB(0xFD, 0xF4, 0xDC);
+	const COLORREF PointWireColor = RGB(0x1F, 0x1E, 0x1C);
+	const COLORREF TooltipTextColor = RGB(0xF0, 0xF0, 0xD5);
+	const COLORREF TooltipBackColor = RGB(0x43, 0x43, 0x43);
+	const COLORREF TooltipEdgeColor = RGB(0x64, 0x64, 0x64);
 
 	Point p(center);
 
 	HC_Open_Segment("inner");
 	{
 		Segment::SetVisibility("edges", false);
-		Segment::SetColor("faces", WARM_WHITE);
+		Segment::SetColor("faces", PointBackColor);
 
 		Circle::Create(p, dUnit, true);
 
 		HC_Open_Segment("wire");
 		{
-			Segment::SetColor("faces", WARM_BALCK);
+			Segment::SetColor("faces", PointWireColor);
 
 			Figure::CreateDonut(p, dUnit * 0.6, dUnit);
 		}
@@ -579,7 +582,7 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 	HC_Open_Segment("outer");
 	{
 		Segment::SetVisibility("edges", false);
-		Segment::SetColor("faces", WARM_WHITE, 0.5);
+		Segment::SetColor("faces", PointBackColor, 0.5);
 
 		Figure::CreateDonut(p, dUnit, dUnit * 2);
 	}
@@ -600,12 +603,7 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 
 	HC_Open_Segment("snap name");
 	{
-		//Segment::SetColor("text", WARM_WHITE);
-		Segment::SetColor("text", RGB(0xF0, 0xF0, 0xD5));
-		//:WARNING - very important! the order between text and edge.. (why?)
-		Segment::SetEdgeWeight(1);
-		//Font::SetName("franklin gothic book");
-		//Font::SetName("arial");
+		Segment::SetColor("text", TooltipTextColor);
 		Font::SetName("segoe ui");
 		//:CHECK
 		Font::SetSize(dUnit * 1.75, "oru");
@@ -623,10 +621,8 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 
 		HC_Open_Segment("frame");
 		{
-			//Segment::SetColor("faces", 0);
-			//Segment::SetColor("edges", WARM_WHITE);
-			Segment::SetColor("faces", RGB(0x43, 0x43, 0x43));
-			Segment::SetColor("edges", RGB(0x64, 0x64, 0x64));
+			Segment::SetColor("faces", TooltipBackColor);
+			Segment::SetColor("edges", TooltipEdgeColor);
 
 			Point size(width, height + dUnit * 2);
 			TDF::Point p1(p.x - size.x / 2, p.y + size.y / 2);
@@ -637,9 +633,6 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 		HC_Close_Segment();
 	}
 	HC_Close_Segment();
-
-#undef WARM_BLACK
-#undef WARM_WHITE
 }
 
 bool Operator::ObjectSnap::ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo)
