@@ -261,6 +261,12 @@
     <ClInclude Include="3DF\HDraw.h">
       <Filter>3DF</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\3DF.Search.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Private\3DF.SearchPrivate.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -457,6 +463,12 @@
     </ClCompile>
     <ClCompile Include="3DF\HDraw.cpp">
       <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Search.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Private\3DF.SearchPrivate.cpp">
+      <Filter>3DF\Control</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -19,6 +19,7 @@
 #include "3DF.Utility.h"
 
 #include "./Private/3DF.SegmentPrivate.h"
+#include "./Private/3DF.SearchPrivate.h"
 
 USING_3DF_NAMESPACE
 
@@ -123,6 +124,30 @@ SegmentKey & SegmentKey::Close()
 	return *this;
 }
 
+CString SegmentKey::Name() const
+{
+	CString strOutName;
+
+	char chSegName[MVO_BUFFER_SIZE] = "\n";
+	HC_Show_Segment(KeyValue(), chSegName);
+
+	char chIncludeSegName[MVO_BUFFER_SIZE] = "\n";
+	HC_Show_Include_Segment(KeyValue(), chIncludeSegName);
+
+	TDF::Utility::CharToUnicode(chSegName, strOutName);
+
+	return strOutName;
+}
+
+SegmentKey & SegmentKey::SetName(CString strInName)
+{
+	SegmentKeyPrivate::LocalOpen(*this);
+	HC_Rename_Segment(".", H_ASCII_TEXT(strInName));
+	SegmentKeyPrivate::LocalClose(*this);
+
+	return *this;
+}
+
 //== Sub Segment 관련 함수 ===========================================================================
 SegmentKey const SegmentKey::Subsegment()
 {
@@ -209,28 +234,61 @@ size_t TDF::SegmentKey::ShowSubsegments(SegmentKeyArray & cOutChildren) const
 	return nSegmentCount;
 }
 
-CString SegmentKey::Name() const
-{
-	CString strOutName;
-
-	char chSegName[MVO_BUFFER_SIZE] = "\n";
-	HC_Show_Segment(KeyValue(), chSegName);
-
-	char chIncludeSegName[MVO_BUFFER_SIZE] = "\n";
-	HC_Show_Include_Segment(KeyValue(), chIncludeSegName);
-
-	TDF::Utility::CharToUnicode(chSegName, strOutName);
-	
-	return strOutName;
-}
-
-SegmentKey & SegmentKey::SetName(CString strInName)
+//== Flush 관련 함수 =============================================================================
+void SegmentKey::Flush(Search::Type eInTypeToRemove, Search::Space eInSearchSpace)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
-	HC_Rename_Segment(".", H_ASCII_TEXT(strInName));
-	SegmentKeyPrivate::LocalClose(*this);
 
-	return *this;
+	CString strType = SearchPrivate::GetSearchTypeString(eInTypeToRemove);
+	CString strSearchSpace = SearchPrivate::GetSearchSpaceString(eInSearchSpace);
+
+	HC_Flush_Contents(H_ASCII_TEXT(strSearchSpace), H_ASCII_TEXT(strType));
+
+	SegmentKeyPrivate::LocalClose(*this);
+}
+
+void SegmentKey::Flush(SearchTypeArray const & aInTypesToRemove, Search::Space eInSearchSpace)
+{
+	SegmentKeyPrivate::LocalOpen(*this);
+
+	CString strType;
+	
+	for (auto eType : aInTypesToRemove)
+	{
+		if (false == strType.IsEmpty()) {
+			strType += ", ";
+		}
+
+		strType += SearchPrivate::GetSearchTypeString(eType);
+	}
+
+	CString strSearchSpace = SearchPrivate::GetSearchSpaceString(eInSearchSpace);
+
+	HC_Flush_Contents(H_ASCII_TEXT(strSearchSpace), H_ASCII_TEXT(strType));
+
+	SegmentKeyPrivate::LocalClose(*this);
+}
+
+void SegmentKey::Flush(size_t nInTypesCount, Search::Type const peInTypesToRemove[], Search::Space eInSearchSpace)
+{
+	SegmentKeyPrivate::LocalOpen(*this);
+
+	CString strType;
+
+	for (size_t nIndex = 0 ; nIndex < nInTypesCount ; nIndex++)
+	{
+		if (false == strType.IsEmpty()) {
+			strType += ", ";
+		}
+
+		strType += SearchPrivate::GetSearchTypeString(peInTypesToRemove[nIndex]);
+	}
+
+	CString strSearchSpace = SearchPrivate::GetSearchSpaceString(eInSearchSpace);
+
+	HC_Flush_Contents(H_ASCII_TEXT(strSearchSpace), H_ASCII_TEXT(strType));
+
+	SegmentKeyPrivate::LocalClose(*this);
 }
 
 //== Include 관련 함수 ===============================================================================
@@ -779,7 +837,7 @@ SegmentKey & SegmentKey::SetUserData(intptr_t nInIndex, size_t nInBytes, BYTE co
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
-	HC_Set_User_Data(nInIndex, pnInData, nInBytes);
+	HC_Set_User_Data(nInIndex, pnInData, (long)nInBytes);
 
 	SegmentKeyPrivate::LocalClose(*this);
 
@@ -790,7 +848,7 @@ SegmentKey & SegmentKey::SetUserData(intptr_t nInIndex, ByteArray const & aInDat
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
-	HC_Set_User_Data(nInIndex, aInData.data(), aInData.size());
+	HC_Set_User_Data(nInIndex, aInData.data(), (long)aInData.size());
 
 	SegmentKeyPrivate::LocalClose(*this);
 

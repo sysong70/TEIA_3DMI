@@ -220,6 +220,7 @@ void NavigationCube::Create(float width, float height, HC_KEY parent)
 				", diffuse color tint = off"
 				", anti-alias = (text = on)"
 			);
+
 			SetWindowSize(width, height, false);
 
 			HC_Set_Camera_Projection("orthographic");
@@ -617,7 +618,15 @@ void NavigationCube::SetWindowSize(double width, double height, bool openSegment
 
 	double left = 1.0 - 2.0 / width * windowSize;
 	double bottom = 1.0 - 2.0 / height * windowSize;
-	HC_Set_Rendering_Options(PRESET::Format("screen range = (%.6f, 1, %.6f, 1)", left, bottom));
+
+	HC_Set_Window(0.8, 1.0, 0.7, 1.0);
+	HC_Set_Window_Pattern("clear");
+	//HC_Set_Driver_Options("border, control area");
+// 	//HC_Set_Color("windows=light gray");
+// 	//HC_Set_Window_Frame("single");
+// 	HC_Set_Window_Pattern("::");
+// 	HC_Set_Color("windows=purple,window constrast=yellow");
+	//HC_Set_Rendering_Options(PRESET::Format("screen range = (%.6f, 1, %.6f, 1)", left, bottom));
 	HC_Set_Text_Font(PRESET::Format("size = %.3f px", fontSize));
 
 	if (openSegment) {

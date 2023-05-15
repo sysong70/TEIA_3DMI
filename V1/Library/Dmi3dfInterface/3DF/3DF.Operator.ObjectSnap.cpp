@@ -30,9 +30,11 @@
 
 #include "HDraw.h"
 
+#include "3DF.Painter.h"
+
 USING_3DF_NAMESPACE
 
-
+bool btemp = false;
 
 Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 {
@@ -41,8 +43,20 @@ Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 	SegmentKey cConstruction(m_pcWindow->GetBaseView()->GetConstructionKey());
 	//SegmentKey cConstruction(m_pcWindow->GetBaseView()->GetSceneKey());
 
-	// Snap Point Segment 설정
 	m_cSnapPointSegment = cConstruction.Subsegment(L"SnapPoint");
+
+	m_cSnapPointSegment.Open();
+		HC_Set_Heuristics("quick moves, no backplane culling, no hidden surfaces");
+		HC_Set_Selectability("everything = off");
+		HC_Set_Visibility("lights = off, cutting planes = off, text = on, markers = off");
+		HC_Set_Visibility("no shadows");
+ 		HC_Set_Rendering_Options("no display lists");
+ 		HC_Set_Rendering_Options("no frame buffer effects");
+ 		HC_Set_Heuristics("exclude bounding");
+	m_cSnapPointSegment.Close();
+
+	// Snap Point Segment 설정
+	//m_cSnapPointSegment = cConstruction.Subsegment(L"SnapPoint");
 
 	MaterialMappingKit cMaterialMapping;
 	cMaterialMapping.SetEdgeColor(RGBAColor(0, 0, 0));
@@ -56,13 +70,14 @@ Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 	//m_cSnapPointSegment.GetEdgeAttributeControl().SetWeight(5.0);
 	//m_cSnapPointSegment.GetVisualEffectsControl().SetAntiAliasing(true);
 	m_cSnapPointSegment.GetVisualEffectsControl().SetLineAntiAliasing(true);
-	//m_cSnapPointSegment.GetVisualEffectsControl().SetTextAntiAliasing(true);
+	m_cSnapPointSegment.GetVisualEffectsControl().SetTextAntiAliasing(true);
 }
 
 int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 {
 	PixelPoint cMousePoint(cInEvent.GetMousePixelPos());
 
+	// 같은 Mouse Point가 계속 들어오는 경우는 처리하지 않는다.
 	if (0 == m_cPrevPoint.DistanceWith(cMousePoint)) {
 		return HLISTENER_PASS_EVENT;
 	}
@@ -85,9 +100,24 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 
 		double dDist = cPixelPoint.DistanceWith(cMousePoint);
 
+		// Snap Point가 선택된 경우 처리 (주어진 Pixel 범위내에 있을 때)
+		// Snap Point를 그리고 기존 Select Item과 Object Snap Point는 삭제한다.
 		if (15 > dDist) {
 			pcSnapItem->eStatus = ObjectSnap::Status::Selected;
+			
+// 			// 기존에 선택된 Snap Point가 있으면 삭제한다.	
+// 			m_cSnapPointSegment.Flush(Search::Type::Segment);
+
+			// 기존 선택 요소 Unhighlight
+			if (0 < m_cOldHighlightSelection.GetCount()) {
+				m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
+			}
+
 			DrawSnapItem(pcSnapItem, cCameraInfo);
+
+			m_pcWindow->Update();
+	
+			//HC_Flush_Contents
 			return HLISTENER_PASS_EVENT;
 		}
 	}
@@ -225,7 +255,9 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 		}
 	}
 
+
 	HighlightOptionsKit cHighlightOptions;
+	// Update를 하지 않기 위해서 Notification을 끈다.
 	cHighlightOptions.SetNotification(false);
 
 	// 선택된 요소가 있고 기존과 다른 경우에만 Highlight를 한다.
@@ -305,8 +337,8 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 	}*/
 
 	if (true == bForceUpdate) {
-		m_pcWindow->Update();
-		//m_pcWindow->GetBaseView()->ForceUpdate();
+		//m_pcWindow->Update();
+		m_pcWindow->GetBaseView()->ForceUpdate();
 	}
 
 	return HLISTENER_PASS_EVENT;
@@ -447,7 +479,7 @@ bool Operator::ObjectSnap::CalculationLienObjectSnapPoint(const Key & cInLineKey
 		Point cCenter;
 		cCircle.ShowCenter(cCenter);
 		cCenter = cModelingMatrix.Transform(cCenter);
-		AddSnapItem(cLine, cCenter, Type::MidPoint);
+		AddSnapItem(cLine, cCenter, Type::Center);
 		return true;
 	}
 
@@ -490,7 +522,7 @@ void Operator::ObjectSnap::CalculationLienAndLineObjectSnapPoint(LineKey & cLine
 	if (true == cLine1.GetIntersectionPoint(cLine2, cMatrix1, cMatrix2, aIntersectionPoints)) {
 		// 찾아온 교차점을 SnapItem에 추가한다.
 		for (size_t nIndex = 0; nIndex < aIntersectionPoints.size(); nIndex++) {
-			AddSnapItem(cLine1, aIntersectionPoints[nIndex], Type::MidPoint);
+			AddSnapItem(cLine1, aIntersectionPoints[nIndex], Type::Intersection);
 		}
 	}
 }
@@ -520,8 +552,6 @@ void Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 	}
 }
 
-bool btemp = false;
-
 void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & cInCameraInfo, bool bUpdate)
 {
 	if (false == btemp) {
@@ -543,8 +573,6 @@ void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & 
 		m_pcWindow->GetBaseView()->Update();
 	}
 }
-
-#include "3DF.Painter.h"
 
 void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double dUnit)
 {
@@ -592,10 +620,11 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 	const char* pText = nullptr;
 
 	switch (pItem->eType) {
-	case Type::EndPoint:	pText = "End Point";	break;
-	case Type::MidPoint:	pText = "Mid Point";	break;
-	case Type::NearPoint:	pText = "Near Point";	break;
-	case Type::Center:		pText = "Center Point";	break;
+	case Type::EndPoint:		pText = "End Point";	break;
+	case Type::MidPoint:		pText = "Mid Point";	break;
+	case Type::NearPoint:		pText = "Near Point";	break;
+	case Type::Center:			pText = "Center Point";	break;
+	case Type::Intersection:	pText = "Intersection";	break;
 	default:
 		ASSERT(FALSE);
 		return;

@@ -807,6 +807,7 @@ void Canvas::InitNavigationCube(int nWidth, int nHeight)
 	m_cNaviCube.SetView(m_pcBaseView);
 	m_cNaviCube.SetSize(NavigationCube::Midium);
 	m_cNaviCube.SetVisible(true, true);
+
 	m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetModelKey());
 	m_cNaviCube.Transform();
 
