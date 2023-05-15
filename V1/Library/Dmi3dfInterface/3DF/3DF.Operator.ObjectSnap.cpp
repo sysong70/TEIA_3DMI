@@ -28,8 +28,6 @@
 #include <HEventManager.h>
 #include <HConstantFrameRate.h>
 
-#include "HDraw.h"
-
 USING_3DF_NAMESPACE
 
 
@@ -335,13 +333,140 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 
 	// Test Object Snap
 	HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetConstructionKey()); {
-		HDraw::Test(m_pcWindow->GetBaseView(), cMatrix, cP1, cP2);
+		//:Ken - removed
+		//HDraw::Test(m_pcWindow->GetBaseView(), cMatrix, cP1, cP2);
 	} HC_Close_Segment();
 
 	m_pcWindow->GetBaseView()->Update();
 
 	return HLISTENER_PASS_EVENT;
 }
+
+//:TODO - remove later
+/*
+void HDraw::Test(HBaseView* view, TDF::Matrix& cMatrix, Point2D p1, Point2D p2)
+{
+	SetView(view);
+
+	HC_Open_Segment("test_draw");
+	{
+
+		HC_Set_Modelling_Matrix(cMatrix.m_fData);
+
+		HC_Open_Segment("construct");
+		{
+			// Remove previous
+
+			HC_Flush_Contents(".", "geometry, segment");
+
+			// Set default settings
+
+			HC_Set_Color("edges = white");
+			HC_Set_Color("faces = black");
+			HC_Set_Color("lines = white");
+			HC_Set_Color("text = white");
+
+			HC_Set_Visibility("edges");
+			HC_Set_Visibility("faces");
+			HC_Set_Visibility("lines");
+			HC_Set_Visibility("text");
+
+			// Draw line
+
+			HC_Open_Segment("world");
+			{
+				HC_Set_Line_Weight(2);
+				HC_Set_Line_Pattern("- -");
+
+				Line::Create(Point(p1), Point(p2));
+			}
+			HC_Close_Segment();
+
+			// Draw first symbol
+
+			HC_Open_Segment("first");
+			{
+				HC_Set_Color("edges = black");
+				HC_Set_Color("faces = white");
+
+				HC_Set_Edge_Weight(4);
+				//:TODO - calculate point or use segment metrix
+				double radius = Compute::PixelToWorld(8);
+				Circle::Create(Point(p1), radius, false);
+			}
+			HC_Close_Segment();
+
+			// Draw second symbol
+
+			HC_Open_Segment("second");
+			{
+				HC_Set_Color("edges = black");
+				HC_Set_Color("faces = white");
+
+				HC_Set_Edge_Weight(4);
+				//:TODO - calculate point or use segment metrix
+				double radius = Compute::PixelToWorld(8);
+				Circle::Create(Point(p2), radius, false);
+			}
+			HC_Close_Segment();
+
+			// Draw text and outer frame
+
+			Point2D center = (p1 + p2) / 2.0f;
+
+			Vector2D cVector = p2 - p1;
+			float fAngle = Vector2D::XAxis().CCWAngleWith(cVector);
+
+			// Text 회전각도 조절
+			if (90.0f < fAngle && fAngle < 270.0f) {
+				fAngle = fAngle + 180.0f;
+			}
+
+			TDF::Matrix cRotation;
+			cRotation.RotateOffAxis(Vector::ZAxis(), fAngle);
+			cRotation.Translate(center.x, center.y, 0.0f);
+
+			HC_Open_Segment("text");
+			{
+				// 회전 Matrix 적용
+				HC_Set_Modelling_Matrix(cRotation.m_fData);
+
+				HC_Set_Edge_Weight(2);
+
+				Font::SetName("arial");
+				Font::SetBold();
+				Font::SetSize(Compute::PixelToWorld(32), "oru");
+				Font::SetRenderer("truetype");
+				Font::SetTransform();
+
+				Format value("%.3f mm", Compute::Distance(Point(p1), Point(p2)));
+				float width, height;
+				Text::GetExtent(value, width, height);
+
+				//:TODO - calculate point or use segment metrix
+
+//                 Point2D cTestCenter;
+//                 cTestCenter.x = (cDrop1.x + cDrop2.x) / 2.0f;
+//                 cTestCenter.y = (cDrop1.y + cDrop2.y) / 2.0f;
+
+				//Text::Create(cTextCenter, value);
+				Text::Create(Point(0, -height / 2, 1.0f), value);
+
+				double offset = Compute::PixelToWorld(8);
+				Point2D cFigureCenter = center;
+				Point2D cOffset1(-width / 2, height / 2 + offset);
+				Point2D cOffset2(width / 2, -height / 2 - offset);
+
+				//:TODO - calculate point or use segment metrix
+				//Figure::CreateObround(cFigureCenter + cOffset1, cFigureCenter + cOffset2);
+				Figure::CreateObround(Point(-width / 2, height / 2 + offset), Point(width / 2, -height / 2 - offset));
+			} HC_Close_Segment();
+		} HC_Close_Segment();
+	} HC_Close_Segment();
+
+	SetView(nullptr);
+}
+*/
 
 //== 1. Object Snap 계산 =============================================================================== 
 
@@ -556,20 +681,20 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 	const COLORREF TooltipBackColor = RGB(0x43, 0x43, 0x43);
 	const COLORREF TooltipEdgeColor = RGB(0x64, 0x64, 0x64);
 
-	Point p(center);
+	Point position(center);
 
 	HC_Open_Segment("inner");
 	{
 		Segment::SetVisibility("edges", false);
 		Segment::SetColor("faces", PointBackColor);
 
-		Circle::Create(p, dUnit, true);
+		Circle::Create(position, dUnit, true);
 
 		HC_Open_Segment("wire");
 		{
 			Segment::SetColor("faces", PointWireColor);
 
-			Figure::CreateDonut(p, dUnit * 0.6, dUnit);
+			Figure::CreateDonut(position, dUnit * 0.6, dUnit);
 		}
 		HC_Close_Segment();
 	}
@@ -584,7 +709,7 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 		Segment::SetVisibility("edges", false);
 		Segment::SetColor("faces", PointBackColor, 0.5);
 
-		Figure::CreateDonut(p, dUnit, dUnit * 2);
+		Figure::CreateDonut(position, dUnit, dUnit * 2);
 	}
 	HC_Close_Segment();
 
@@ -605,13 +730,14 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 	{
 		Segment::SetColor("text", TooltipTextColor);
 		Font::SetName("segoe ui");
-		//:CHECK
+		//:TODO - text dpi scale
 		Font::SetSize(dUnit * 1.75, "oru");
 		Font::SetRenderer("truetype");
 		Font::SetAlignment(Font::EPivot::MiddleCenter);
 
-		p.y += dUnit * 5;
-		Text::Create(p, pText);
+		//:TODO - text position in window
+		position.y += dUnit * 5;
+		Text::Create(position, pText);
 
 		//:WARNING - for calculating text extent
 		Font::SetTransform();
@@ -625,8 +751,8 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 			Segment::SetColor("edges", TooltipEdgeColor);
 
 			Point size(width, height + dUnit * 2);
-			TDF::Point p1(p.x - size.x / 2, p.y + size.y / 2);
-			TDF::Point p2(p.x + size.x / 2, p.y - size.y / 2);
+			TDF::Point p1(position.x - size.x / 2, position.y + size.y / 2);
+			TDF::Point p2(position.x + size.x / 2, position.y - size.y / 2);
 
 			Figure::CreateObround(p1, p2);
 		}
