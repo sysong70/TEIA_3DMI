@@ -747,10 +747,11 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 
 		HC_Open_Segment("frame");
 		{
+			Segment::SetEdgeWeight(0.1);
 			Segment::SetColor("faces", TooltipBackColor);
 			Segment::SetColor("edges", TooltipEdgeColor);
 
-			Point size(width, height + dUnit * 2);
+			Point size(width, height + dUnit * 3);
 			TDF::Point p1(position.x - size.x / 2, position.y + size.y / 2);
 			TDF::Point p2(position.x + size.x / 2, position.y - size.y / 2);
 
