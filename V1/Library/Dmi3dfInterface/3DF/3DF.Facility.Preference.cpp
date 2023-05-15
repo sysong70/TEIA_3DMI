@@ -4,12 +4,26 @@
 
 USING_3DF_NAMESPACE
 
+#define GetBooleanValue(name)	pcData->SetBoolean(#name, name)
+#define GetEnumValue(name)		pcData->SetInteger(#name, (int)name)
+#define GetIntegerValue(name)	pcData->SetInteger(#name, name)
+#define GetObjectValue(name)	pcData->SetObject(#name, name.Get())
+#define GetRealValue(name)		pcData->SetReal(#name, name)
+#define GetStringValue(name)	pcData->SetString(#name, name)
+
+#define SetBooleanValue(name)		name = pcData->GetBoolean(#name, name)
+#define SetEnumValue(name, type)	name = (type)pcData->GetInteger(#name, (int)name)
+#define SetIntegerValue(name)		name = pcData->GetInteger(#name, name)
+#define SetObjectValue(name)		name.Set(&pcData->GetAt(#name))
+#define SetRealValue(name)			name = pcData->GetReal(#name, name)
+#define SetStringValue(name)		name = pcData->GetString(#name, name)
+
+
+
 Facility::Preference::Preference()
 	: Base(L"Preference")
 {
 }
-
-
 
 Facility::Preference::~Preference()
 {
@@ -19,9 +33,7 @@ Facility::Preference::~Preference()
 
 Json::Object* Facility::Preference::Get()
 {
-	Json::Object * pcData = new Json::Object();
-
-	//pcData->SetObject("General", General.Get());
+	Json::Object* pcData = new Json::Object();
 
 	return pcData;
 }
@@ -32,463 +44,559 @@ bool Facility::Preference::Set(Json::Object* pcData)
 		return false;
 	}
 
-	//SetLanguage((ELanguage)pcData->GetInteger("Language"));
-
 	return true;
 }
 
-//== General Option ================================================================================
+#pragma region General
 
-Json::Object * Facility::Preference::GENERAL::Get()
+Json::Object* Facility::Preference::GENERAL::Get()
 {
-	Json::Object * pcData = new Json::Object();
+	Json::Object* pcData = new Json::Object();
 
-	pcData->SetObject("Display", Display.Get());
-	pcData->SetObject("Transparency", Transparency.Get());
-	pcData->SetObject("Rendering", Rendering.Get());
-	pcData->SetObject("Etc", Etc.Get());
+	GetObjectValue(Display);
+	GetObjectValue(Transparency);
+	GetObjectValue(Rendering);
+	GetObjectValue(Etc);
 
 	return pcData;
 }
 
-bool Facility::Preference::GENERAL::Set(Json::Object * pcData)
+bool Facility::Preference::GENERAL::Set(Json::Object* pcData)
 {
-	Json::Object & cDisplayObject = pcData->GetObject("Display");
-	Display.Set(&cDisplayObject);
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
 
-	Json::Object & cTransparencyObject = pcData->GetObject("Transparency");
-	Transparency.Set(&cTransparencyObject);
-
-	Json::Object & cRenderingObject = pcData->GetObject("Rendering");
-	Rendering.Set(&cRenderingObject);
-
-	Json::Object & cEtcObject = pcData->GetObject("Etc");
-	Etc.Set(&cEtcObject);
+	SetObjectValue(Display);
+	SetObjectValue(Transparency);
+	SetObjectValue(Rendering);
+	SetObjectValue(Etc);
 
 	return true;
 }
 
 
-// Display Option
-Json::Object * Facility::Preference::GENERAL::DISPLAY::Get()
-{
-	Json::Object * pcData = new Json::Object();
 
-	pcData->SetString("Driver", Driver);
-	pcData->SetString("Gpu", Gpu);
-	pcData->SetBoolean("DriverForceSoftware", DriverForceSoftware);
-	pcData->SetBoolean("DriverDisplayStats", DriverDisplayStats);
-	pcData->SetBoolean("DoubleBuffer", DoubleBuffer);
-	pcData->SetBoolean("StereoMode", StereoMode);
+Json::Object* Facility::Preference::GENERAL::DISPLAY::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetStringValue(Driver);
+	GetStringValue(Gpu);
+	GetBooleanValue(DriverForceSoftware);
+	GetBooleanValue(DriverDisplayStats);
+	GetBooleanValue(DoubleBuffer);
+	GetBooleanValue(StereoMode);
 
 	return pcData;
 }
 
-bool Facility::Preference::GENERAL::DISPLAY::Set(Json::Object * pcData)
+bool Facility::Preference::GENERAL::DISPLAY::Set(Json::Object* pcData)
 {
-	Driver = pcData->GetString("Driver");
-	Gpu = pcData->GetString("Gpu");
-	DriverForceSoftware = pcData->GetBoolean("DriverForceSoftware");
-	DriverDisplayStats = pcData->GetBoolean("DriverDisplayStats");
-	DoubleBuffer = pcData->GetBoolean("DoubleBuffer");
-	StereoMode = pcData->GetBoolean("StereoMode");
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetStringValue(Driver);
+	SetStringValue(Gpu);
+	SetBooleanValue(DriverForceSoftware);
+	SetBooleanValue(DriverDisplayStats);
+	SetBooleanValue(DoubleBuffer);
+	SetBooleanValue(StereoMode);
 
 	return true;
 }
 
-// Transparency Option
-Json::Object * Facility::Preference::GENERAL::TRANSPARENCY::Get()
-{
-	Json::Object * pcData = new Json::Object();
 
-	pcData->SetString("Style", Style);
-	pcData->SetString("Sorting", Sorting);
-	pcData->SetString("DepthPeelingLayers", DepthPeelingLayers);
-	pcData->SetBoolean("PixelOIT", PixelOIT);
-	pcData->SetBoolean("DepthWriting", DepthWriting);
+
+Json::Object* Facility::Preference::GENERAL::TRANSPARENCY::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetStringValue(Style);
+	GetStringValue(Sorting);
+	GetStringValue(DepthPeelingLayers);
+	GetBooleanValue(PixelOIT);
+	GetBooleanValue(DepthWriting);
 
 	return pcData;
 }
 
-bool Facility::Preference::GENERAL::TRANSPARENCY::Set(Json::Object * pcData)
+bool Facility::Preference::GENERAL::TRANSPARENCY::Set(Json::Object* pcData)
 {
-	Style = pcData->GetString("Style");
-	Sorting = pcData->GetString("Sorting");
-	DepthPeelingLayers = pcData->GetString("DepthPeelingLayers");
-	PixelOIT = pcData->GetBoolean("PixelOIT");
-	DepthWriting = pcData->GetBoolean("DepthWriting");
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetStringValue(Style);
+	SetStringValue(Sorting);
+	SetStringValue(DepthPeelingLayers);
+	GetBooleanValue(PixelOIT);
+	GetBooleanValue(DepthWriting);
 
 	return true;
 }
 
-// Rendering Option
-Json::Object * Facility::Preference::GENERAL::RENDERING::Get()
-{
-	Json::Object * pcData = new Json::Object();
 
-	pcData->SetBoolean("DisplayAxisTriad", DisplayAxisTriad);
+
+Json::Object* Facility::Preference::GENERAL::RENDERING::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetBooleanValue(DisplayAxisTriad);
 
 	return pcData;
 }
 
-bool Facility::Preference::GENERAL::RENDERING::Set(Json::Object * pcData)
+bool Facility::Preference::GENERAL::RENDERING::Set(Json::Object* pcData)
 {
-	DisplayAxisTriad = pcData->GetBoolean("DisplayAxisTriad");
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetBooleanValue(DisplayAxisTriad);
 
 	return true;
 }
 
-// ETC Option
-Json::Object * Facility::Preference::GENERAL::ETC::Get()
-{
-	Json::Object * pcData = new Json::Object();
 
-	pcData->SetBoolean("BackplaneCulling", BackplaneCulling);
+
+Json::Object* Facility::Preference::GENERAL::ETC::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetBooleanValue(BackplaneCulling);
 
 	return pcData;
 }
 
-bool Facility::Preference::GENERAL::ETC::Set(Json::Object * pcData)
+bool Facility::Preference::GENERAL::ETC::Set(Json::Object* pcData)
 {
-	BackplaneCulling = pcData->GetBoolean("BackplaneCulling");
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetBooleanValue(BackplaneCulling);
 
 	return true;
 }
 
-//== Perfromance Option ============================================================================
-Json::Object * Facility::Preference::PERFROMANCE::Get()
-{
-	Json::Object * pcData = new Json::Object();
+#pragma endregion //:REGION
 
-	pcData->SetObject("Optimization", Optimization.Get());
-	pcData->SetObject("FramerateOptimization", FramerateOptimization.Get());
+#pragma region Performance
+
+Json::Object* Facility::Preference::PERFORMANCE::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetObjectValue(Optimization);
+	GetObjectValue(FramerateOptimization);
 
 	return pcData;
 }
 
-bool Facility::Preference::PERFROMANCE::Set(Json::Object * pcData)
+bool Facility::Preference::PERFORMANCE::Set(Json::Object* pcData)
 {
-	Json::Object & cOptimizationObject = pcData->GetObject("Optimization");
-	Optimization.Set(&cOptimizationObject);
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
 
-	Json::Object & cFramerateOptimizationObject = pcData->GetObject("FramerateOptimization");
-	FramerateOptimization.Set(&cFramerateOptimizationObject);
+	SetObjectValue(Optimization);
+	SetObjectValue(FramerateOptimization);
 
 	return true;
 }
 
-// Optimization Option
-Json::Object * Facility::Preference::PERFROMANCE::OPTIMIZATION::Get()
-{
-	Json::Object * pcData = new Json::Object();
 
-	pcData->SetInteger("HiddenLineMode", (int)HiddenLineMode);
-	pcData->SetBoolean("StaticModel", StaticModel);
-	pcData->SetBoolean("LMVModel", LMVModel);
-	pcData->SetBoolean("OcclusionCulling", OcclusionCulling);
-	pcData->SetInteger("OcclusionThreshold", OcclusionThreshold);
+
+Json::Object* Facility::Preference::PERFORMANCE::OPTIMIZATION::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetEnumValue(HiddenLineMode);
+	GetBooleanValue(StaticModel);
+	GetBooleanValue(LMVModel);
+	GetBooleanValue(OcclusionCulling);
+	GetIntegerValue(OcclusionThreshold);
 
 	return pcData;
 }
 
-bool Facility::Preference::PERFROMANCE::OPTIMIZATION::Set(Json::Object * pcData)
+bool Facility::Preference::PERFORMANCE::OPTIMIZATION::Set(Json::Object* pcData)
 {
-	HiddenLineMode = (HLRMode)pcData->GetInteger("HiddenLineMode");
-	StaticModel = pcData->GetBoolean("StaticModel");
-	LMVModel = pcData->GetBoolean("LMVModel");
-	OcclusionCulling = pcData->GetBoolean("OcclusionCulling");
-	OcclusionThreshold = pcData->GetInteger("OcclusionThreshold");
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetEnumValue(HiddenLineMode, HLRMode);
+	SetBooleanValue(StaticModel);
+	SetBooleanValue(LMVModel);
+	SetBooleanValue(OcclusionCulling);
+	SetIntegerValue(OcclusionThreshold);
 
 	return true;
 }
 
-// Framerate Optimization Option
-Json::Object * Facility::Preference::PERFROMANCE::FRAMERATE_OPTIMIZATION::Get()
-{
-	Json::Object * pcData = new Json::Object();
 
-	pcData->SetBoolean("UseFramerate", UseFramerate);
-	pcData->SetInteger("CurrentFramerateMode", (int)CurrentFramerateMode);
-	pcData->SetReal("FramerateTime", FramerateTime);
-	pcData->SetInteger("MaxThreshold", MaxThreshold);
-	pcData->SetInteger("UseLods", UseLods);
-	pcData->SetInteger("DetailSteps", DetailSteps);
-	pcData->SetInteger("HardCutoff", HardCutoff);
-	pcData->SetInteger("CullingThresholdSet", CullingThresholdSet);
-	pcData->SetInteger("CullingThreshold", CullingThreshold);
+
+Json::Object* Facility::Preference::PERFORMANCE::FRAMERATE_OPTIMIZATION::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetBooleanValue(UseFramerate);
+	GetEnumValue(CurrentFramerateMode);
+	GetIntegerValue(MaxThreshold);
+	GetIntegerValue(UseLods);
+	GetIntegerValue(DetailSteps);
+	GetIntegerValue(HardCutoff);
+	GetIntegerValue(CullingThresholdSet);
+	GetIntegerValue(CullingThreshold);
 
 	return pcData;
 }
 
-bool Facility::Preference::PERFROMANCE::FRAMERATE_OPTIMIZATION::Set(Json::Object * pcData)
+bool Facility::Preference::PERFORMANCE::FRAMERATE_OPTIMIZATION::Set(Json::Object* pcData)
 {
-	UseFramerate = pcData->GetBoolean("UseFramerate");
-	CurrentFramerateMode = (FramerateMode)pcData->GetReal("CurrentFramerateMode");
-	MaxThreshold = pcData->GetInteger("MaxThreshold");
-	UseLods = pcData->GetInteger("UseLods");
-	DetailSteps = pcData->GetInteger("DetailSteps");
-	HardCutoff = pcData->GetInteger("HardCutoff");
-	CullingThresholdSet = pcData->GetInteger("CullingThresholdSet");
-	CullingThreshold = pcData->GetInteger("CullingThreshold");
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetBooleanValue(UseFramerate);
+	SetEnumValue(CurrentFramerateMode, FramerateMode);
+	SetIntegerValue(MaxThreshold);
+	SetIntegerValue(UseLods);
+	SetIntegerValue(DetailSteps);
+	SetIntegerValue(HardCutoff);
+	SetIntegerValue(CullingThresholdSet);
+	SetIntegerValue(CullingThreshold);
 
 	return true;
 }
 
-//== Interaction Option ============================================================================
-Json::Object * Facility::Preference::INTERACTION::Get()
-{
-	Json::Object * pcData = new Json::Object();
+#pragma endregion //:REGION
 
-	pcData->SetObject("Animation", Animation.Get());
-	pcData->SetObject("GeometryManipulation", GeometryManipulation.Get());
+#pragma region Interaction
+
+Json::Object* Facility::Preference::INTERACTION::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetObjectValue(Animation);
+	GetObjectValue(GeometryManipulation);
 
 	return pcData;
 }
 
-bool Facility::Preference::INTERACTION::Set(Json::Object * pcData)
+bool Facility::Preference::INTERACTION::Set(Json::Object* pcData)
 {
-	Json::Object & cAnimationObject = pcData->GetObject("Animation");
-	Animation.Set(&cAnimationObject);
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
 
-	Json::Object & cGeometryManipulationObject = pcData->GetObject("GeometryManipulation");
-	GeometryManipulation.Set(&cGeometryManipulationObject);
+	SetObjectValue(Animation);
+	SetObjectValue(GeometryManipulation);
 
 	return true;
 }
 
-// Geometry Manipulation Option
-Json::Object * Facility::Preference::INTERACTION::GEOMETRY_MANIPULATION::Get()
-{
-	Json::Object * pcData = new Json::Object();
 
-	pcData->SetBoolean("Spriting", Spriting);
-	pcData->SetBoolean("UpdateCutGeometry", UpdateCutGeometry);
-	pcData->SetBoolean("UpdateShadows", UpdateShadows);
+
+Json::Object* Facility::Preference::INTERACTION::GEOMETRY_MANIPULATION::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetBooleanValue(Spriting);
+	GetBooleanValue(UpdateCutGeometry);
+	GetBooleanValue(UpdateShadows);
 
 	return pcData;
 }
 
-bool Facility::Preference::INTERACTION::GEOMETRY_MANIPULATION::Set(Json::Object * pcData)
+bool Facility::Preference::INTERACTION::GEOMETRY_MANIPULATION::Set(Json::Object* pcData)
 {
-	Spriting = pcData->GetBoolean("Spriting");
-	UpdateCutGeometry = pcData->GetBoolean("UpdateCutGeometry");
-	UpdateShadows = pcData->GetBoolean("UpdateShadows");
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetBooleanValue(Spriting);
+	SetBooleanValue(UpdateCutGeometry);
+	SetBooleanValue(UpdateShadows);
 
 	return true;
 }
 
-// Animation Option
-Json::Object * Facility::Preference::INTERACTION::ANIMATION::Get()
-{
-	Json::Object * pcData = new Json::Object();
 
-	pcData->SetBoolean("UpdateCamera", UpdateCamera);
+
+Json::Object* Facility::Preference::INTERACTION::ANIMATION::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetBooleanValue(UpdateCamera);
 
 	return pcData;
 }
 
-bool Facility::Preference::INTERACTION::ANIMATION::Set(Json::Object * pcData)
+bool Facility::Preference::INTERACTION::ANIMATION::Set(Json::Object* pcData)
 {
-	UpdateCamera = pcData->GetBoolean("UpdateCamera");
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetBooleanValue(UpdateCamera);
 
 	return true;
 }
 
-//== Appearance Option ===============================================================================
+#pragma endregion //:REGION
 
-Json::Object * Facility::Preference::APPEARANCE::Get()
+#pragma region Appearance
+
+Json::Object* Facility::Preference::APPEARANCE::Get()
 {
-	Json::Object * pcData = new Json::Object();
+	Json::Object* pcData = new Json::Object();
 
-	pcData->SetObject("AntiAliasing", AntiAliasing.Get());
-	pcData->SetObject("BackgroundColor", AntiAliasing.Get());
+	GetObjectValue(AntiAliasing);
+	GetObjectValue(BackgroundColor);
 
 	return pcData;
 }
 
-bool Facility::Preference::APPEARANCE::Set(Json::Object * pcData)
+bool Facility::Preference::APPEARANCE::Set(Json::Object* pcData)
 {
-	Json::Object & cAntiAliasingObject = pcData->GetObject("AntiAliasing");
-	AntiAliasing.Set(&cAntiAliasingObject);
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
 
-	Json::Object & cBackgroundColorObject = pcData->GetObject("BackgroundColor");
-	BackgroundColor.Set(&cBackgroundColorObject);
+	SetObjectValue(AntiAliasing);
+	SetObjectValue(BackgroundColor);
 
 	return true;
 }
 
-// AntiAliasing Option
-Json::Object * Facility::Preference::APPEARANCE::ANTIALIASING::Get()
-{
-	Json::Object * pcData = new Json::Object();
 
-	pcData->SetBoolean("Use", Use);
-	pcData->SetBoolean("Line", Line);
-	pcData->SetBoolean("Text", Text);
-	pcData->SetInteger("Level", Level);
+
+Json::Object* Facility::Preference::APPEARANCE::ANTIALIASING::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetBooleanValue(Use);
+	GetBooleanValue(Line);
+	GetBooleanValue(Text);
+	GetIntegerValue(Level);
 
 	return pcData;
 }
 
-bool Facility::Preference::APPEARANCE::ANTIALIASING::Set(Json::Object * pcData)
+bool Facility::Preference::APPEARANCE::ANTIALIASING::Set(Json::Object* pcData)
 {
-	Use = pcData->GetBoolean("Use");
-	Line = pcData->GetBoolean("Line");
-	Text = pcData->GetBoolean("Text");
-	Level = pcData->GetInteger("Level");
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetBooleanValue(Use);
+	SetBooleanValue(Line);
+	SetBooleanValue(Text);
+	SetIntegerValue(Level);
 
 	return true;
 }
 
-// Background Color Option
-Json::Object * Facility::Preference::APPEARANCE::BACKGROUND_COLOR::Get()
-{
-	Json::Object * pcData = new Json::Object();
 
-	pcData->SetInteger("Top", Top);
-	pcData->SetInteger("Bottom", Bottom);
+
+Json::Object* Facility::Preference::APPEARANCE::BACKGROUND_COLOR::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetIntegerValue(Top);
+	GetIntegerValue(Bottom);
 
 	return pcData;
 }
 
-bool Facility::Preference::APPEARANCE::BACKGROUND_COLOR::Set(Json::Object * pcData)
+bool Facility::Preference::APPEARANCE::BACKGROUND_COLOR::Set(Json::Object* pcData)
 {
-	Top = pcData->GetInteger("Top");
-	Bottom = pcData->GetInteger("Bottom");
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetIntegerValue(Top);
+	SetIntegerValue(Bottom);
 
 	return true;
 }
 
-//== Selectiion Option ============================================================================
-Json::Object * Facility::Preference::SELECTIION::Get()
-{
-	Json::Object * pcData = new Json::Object();
+#pragma endregion //:REGION
 
-	pcData->SetObject("Behavior", Behavior.Get());
-	pcData->SetObject("Highlight", Highlight.Get());
+#pragma region Selection
+
+Json::Object* Facility::Preference::SELECTIION::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetObjectValue(Behavior);
+	GetObjectValue(Highlight);
 
 	return pcData;
 }
 
-bool Facility::Preference::SELECTIION::Set(Json::Object * pcData)
+bool Facility::Preference::SELECTIION::Set(Json::Object* pcData)
 {
-	Json::Object & cBehaviorObject = pcData->GetObject("Behavior");
-	Behavior.Set(&cBehaviorObject);
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
 
-	Json::Object & cHighlightObject = pcData->GetObject("Highlight");
-	Highlight.Set(&cHighlightObject);
+	SetObjectValue(Behavior);
+	SetObjectValue(Highlight);
 
 	return true;
 }
 
-// Behavior Option
-Json::Object * Facility::Preference::SELECTIION::BEHAVIOR::Get()
-{
-	Json::Object * pcData = new Json::Object();
 
-	pcData->SetBoolean("VisibilitySelection", VisibilitySelection);
-	pcData->SetBoolean("DynamicHighlighting", DynamicHighlighting);
-	pcData->SetBoolean("DetailSelection", DetailSelection);
-	pcData->SetInteger("RelatedSelectionLimit", RelatedSelectionLimit);
-	pcData->SetBoolean("UseSelectBox", UseSelectBox);
-	pcData->SetBoolean("RespectCulling", RespectCulling);
+
+Json::Object* Facility::Preference::SELECTIION::BEHAVIOR::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetBooleanValue(VisibilitySelection);
+	GetBooleanValue(DynamicHighlighting);
+	GetBooleanValue(DetailSelection);
+	GetIntegerValue(RelatedSelectionLimit);
+	GetBooleanValue(UseSelectBox);
+	GetBooleanValue(RespectCulling);
 
 	return pcData;
 }
 
-bool Facility::Preference::SELECTIION::BEHAVIOR::Set(Json::Object * pcData)
+bool Facility::Preference::SELECTIION::BEHAVIOR::Set(Json::Object* pcData)
 {
-	VisibilitySelection = pcData->GetBoolean("VisibilitySelection");
-	DynamicHighlighting = pcData->GetBoolean("DynamicHighlighting");
-	DetailSelection = pcData->GetBoolean("DetailSelection");
-	RelatedSelectionLimit = pcData->GetInteger("RelatedSelectionLimit");
-	UseSelectBox = pcData->GetBoolean("UseSelectBox");
-	RespectCulling = pcData->GetBoolean("RespectCulling");
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetBooleanValue(VisibilitySelection);
+	SetBooleanValue(DynamicHighlighting);
+	SetBooleanValue(DetailSelection);
+	SetIntegerValue(RelatedSelectionLimit);
+	SetBooleanValue(UseSelectBox);
+	SetBooleanValue(RespectCulling);
 
 	return true;
 }
 
-// Highlight Option
-Json::Object * Facility::Preference::SELECTIION::HIGHLIGHT::Get()
-{
-	Json::Object * pcData = new Json::Object();
 
-	pcData->SetString("QuickMovesType", QuickMovesType);
+
+Json::Object* Facility::Preference::SELECTIION::HIGHLIGHT::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetStringValue(QuickMovesType);
 
 	return pcData;
 }
 
-bool Facility::Preference::SELECTIION::HIGHLIGHT::Set(Json::Object * pcData)
+bool Facility::Preference::SELECTIION::HIGHLIGHT::Set(Json::Object* pcData)
 {
-	QuickMovesType = pcData->GetString("QuickMovesType");
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetStringValue(QuickMovesType);
 
 	return true;
 }
 
-//== Lighting Option ===============================================================================
+#pragma endregion //:REGION
 
-Json::Object * Facility::Preference::LIGHTING::Get()
+#pragma region Lighting
+
+Json::Object* Facility::Preference::LIGHTING::Get()
 {
-	Json::Object * pcData = new Json::Object();
+	Json::Object* pcData = new Json::Object();
 
-	pcData->SetObject("Bloom", Bloom.Get());
-	pcData->SetObject("Light", Light.Get());
+	GetObjectValue(Bloom);
+	GetObjectValue(Light);
 
 	return pcData;
 }
 
-bool Facility::Preference::LIGHTING::Set(Json::Object * pcData)
+bool Facility::Preference::LIGHTING::Set(Json::Object* pcData)
 {
-	Json::Object & cBloomObject = pcData->GetObject("Bloom");
-	Bloom.Set(&cBloomObject);
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
 
-	Json::Object & cLightObject = pcData->GetObject("Light");
-	Light.Set(&cLightObject);
+	SetObjectValue(Bloom);
+	SetObjectValue(Light);
 
 	return true;
 }
 
-// Bloom Option
-Json::Object * Facility::Preference::LIGHTING::BLOOM::Get()
-{
-	Json::Object * pcData = new Json::Object();
 
-	pcData->SetBoolean("Use", Use);
-	pcData->SetReal("Strength", Strength);
-	pcData->SetInteger("Blur", Blur);
-	pcData->SetInteger("Shape", (int)Shape);
+
+Json::Object* Facility::Preference::LIGHTING::BLOOM::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetBooleanValue(Use);
+	GetRealValue(Strength);
+	GetIntegerValue(Blur);
+	GetEnumValue(Shape);
 
 	return pcData;
 }
 
-bool Facility::Preference::LIGHTING::BLOOM::Set(Json::Object * pcData)
+bool Facility::Preference::LIGHTING::BLOOM::Set(Json::Object* pcData)
 {
-	Use = pcData->GetBoolean("Use");
-	Strength = pcData->GetReal("Strength");
-	Blur = pcData->GetInteger("Blur");
-	Shape = (HBloomShape)pcData->GetInteger("Shape");
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetBooleanValue(Use);
+	SetRealValue(Strength);
+	SetIntegerValue(Blur);
+	SetEnumValue(Shape, HBloomShape);
 
 	return true;
 }
 
-// Light Option
-Json::Object * Facility::Preference::LIGHTING::LIGHT::Get()
-{
-	Json::Object * pcData = new Json::Object();
 
-	pcData->SetBoolean("FollowsCamera", FollowsCamera);
-	pcData->SetBoolean("Scaling", FollowsCamera);
-	pcData->SetInteger("ScaleFactor", ScaleFactor);
+
+Json::Object* Facility::Preference::LIGHTING::LIGHT::Get()
+{
+	Json::Object* pcData = new Json::Object();
+
+	GetBooleanValue(FollowsCamera);
+	GetBooleanValue(Scaling);
+	GetIntegerValue(ScaleFactor);
 
 	return pcData;
 }
 
-bool Facility::Preference::LIGHTING::LIGHT::Set(Json::Object * pcData)
+bool Facility::Preference::LIGHTING::LIGHT::Set(Json::Object* pcData)
 {
-	FollowsCamera = pcData->GetBoolean("FollowsCamera");
-	Scaling = pcData->GetBoolean("Scaling");
-	ScaleFactor = pcData->GetInteger("ScaleFactor");
+	if (pcData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetBooleanValue(FollowsCamera);
+	SetBooleanValue(Scaling);
+	SetIntegerValue(ScaleFactor);
 
 	return true;
 }
 
+#pragma endregion //:REGION
+
+#undef GetBooleanValue
+#undef GetEnumValue
+#undef GetIntegerValue
+#undef GetObjectValue
+#undef GetRealValue
+#undef GetStringValue
+
+#undef SetBooleanValue
+#undef SetEnumValue
+#undef SetIntegerValue
+#undef SetObjectValue
+#undef SetRealValue
+#undef SetStringValue

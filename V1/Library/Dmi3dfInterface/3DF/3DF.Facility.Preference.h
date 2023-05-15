@@ -13,12 +13,14 @@ namespace Facility
 	class Preference : public Base
 	{
 	public:
+
 		Preference();
 		~Preference() override;
 
 	public:
-		Json::Object * Get() override;
-		bool Set(Json::Object * pcData) override;
+
+		Json::Object* Get() override;
+		bool Set(Json::Object* pcData) override;
 
 		struct GENERAL 
 		{
@@ -30,8 +32,8 @@ namespace Facility
 				bool DoubleBuffer = true;				// CAppSettings::DoubleBuffer
 				bool StereoMode = false;				// CAppSettings::StereoMode
 
-				Json::Object * Get();
-				bool Set(Json::Object * pcData);
+				Json::Object* Get();
+				bool Set(Json::Object* pcData);
 			}
 			Display;
 
@@ -42,8 +44,8 @@ namespace Facility
 				bool PixelOIT = false;
 				bool DepthWriting = false;
 
-				Json::Object * Get();
-				bool Set(Json::Object * pcData);
+				Json::Object* Get();
+				bool Set(Json::Object* pcData);
 			}
 			Transparency;
 
@@ -51,25 +53,25 @@ namespace Facility
 			{
 				bool DisplayAxisTriad = true;			// CAppSettings::bDisplayAxisTriad
 
-				Json::Object * Get();
-				bool Set(Json::Object * pcData);
+				Json::Object* Get();
+				bool Set(Json::Object* pcData);
 			}
 			Rendering;
 
 			struct ETC {
 				bool BackplaneCulling = false;			// CAppSettings::bBackplaneCulling
 
-				Json::Object * Get();
-				bool Set(Json::Object * pcData);
+				Json::Object* Get();
+				bool Set(Json::Object* pcData);
 			}
 			Etc;
 
-			Json::Object * Get();
-			bool Set(Json::Object * pcData);
+			Json::Object* Get();
+			bool Set(Json::Object* pcData);
 		}
 		General;
 
-		struct PERFROMANCE 
+		struct PERFORMANCE 
 		{
 			struct OPTIMIZATION {
 				HLRMode HiddenLineMode = FakeHiddenLine;	// CAppSettings::HiddenLineMode
@@ -78,8 +80,8 @@ namespace Facility
 				bool OcclusionCulling = false;				// CAppSettings::OcclusionCulling
 				int OcclusionThreshold = 50;				// CAppSettings::OcclusionThreshold
 
-				Json::Object * Get();
-				bool Set(Json::Object * pcData);
+				Json::Object* Get();
+				bool Set(Json::Object* pcData);
 			}
 			Optimization;
 
@@ -94,15 +96,15 @@ namespace Facility
 				int	CullingThresholdSet = 1;				// CAppSettings::CullingThresholdSet
 				int	CullingThreshold = 10;					// CAppSettings::CullingThreshold
 
-				Json::Object * Get();
-				bool Set(Json::Object * pcData);
+				Json::Object* Get();
+				bool Set(Json::Object* pcData);
 			}
 			FramerateOptimization;
 
-			Json::Object * Get();
-			bool Set(Json::Object * pcData);
+			Json::Object* Get();
+			bool Set(Json::Object* pcData);
 		}
-		Perfromance;
+		Performance;
 
 		struct INTERACTION
 		{
@@ -111,21 +113,21 @@ namespace Facility
 				bool UpdateCutGeometry = false;			// CAppSettings::UpdateCutGeometry
 				bool UpdateShadows = true;				// CAppSettings::UpdateShadows
 
-				Json::Object * Get();
-				bool Set(Json::Object * pcData);
+				Json::Object* Get();
+				bool Set(Json::Object* pcData);
 			}
 			GeometryManipulation;
 
 			struct ANIMATION {
 				bool UpdateCamera = true;				// CAppSettings::UpdateCamera
 
-				Json::Object * Get();
-				bool Set(Json::Object * pcData);
+				Json::Object* Get();
+				bool Set(Json::Object* pcData);
 			}
 			Animation;
 
-			Json::Object * Get();
-			bool Set(Json::Object * pcData);
+			Json::Object* Get();
+			bool Set(Json::Object* pcData);
 		}
 		Interaction;
 
@@ -137,23 +139,23 @@ namespace Facility
 				bool Text = true;		// CAppSettings::TextAntialiasing
 				int Level = 4;			// CAppSettings::AntialiasingLevel
 
-				Json::Object * Get();
-				bool Set(Json::Object * pcData);
+				Json::Object* Get();
+				bool Set(Json::Object* pcData);
 			}
 			AntiAliasing;
 
 			struct BACKGROUND_COLOR
 			{
-				COLORREF Top = RGB(59, 68, 83);
-				COLORREF Bottom = RGB(59, 68, 83);
+				COLORREF Top = RGB(0x30, 0x30, 0x30);
+				COLORREF Bottom = RGB(0x30, 0x30, 0x30);
 
-				Json::Object * Get();
-				bool Set(Json::Object * pcData);
+				Json::Object* Get();
+				bool Set(Json::Object* pcData);
 			}
 			BackgroundColor;
 
-			Json::Object * Get();
-			bool Set(Json::Object * pcData);
+			Json::Object* Get();
+			bool Set(Json::Object* pcData);
 		}
 		Appearance;
 
@@ -167,21 +169,21 @@ namespace Facility
 				bool UseSelectBox = true;				// CAppSettings::bUseSelectBox, Transparent select box, show a transparent box when selecting areas
 				bool RespectCulling = false;			// CAppSettings::SelectionRespectCulling, Respect Culling during selection.
 
-				Json::Object * Get();
-				bool Set(Json::Object * pcData);
+				Json::Object* Get();
+				bool Set(Json::Object* pcData);
 			}
 			Behavior;
 
 			struct HIGHLIGHT {
 				CString QuickMovesType = L"Default";		// CAppSettings::csQuickMovesType, Quick Moves Preference
 
-				Json::Object * Get();
-				bool Set(Json::Object * pcData);
+				Json::Object* Get();
+				bool Set(Json::Object* pcData);
 			}
 			Highlight;
 
-			Json::Object * Get();
-			bool Set(Json::Object * pcData);
+			Json::Object* Get();
+			bool Set(Json::Object* pcData);
 		}
 		Selection;
 
@@ -193,8 +195,8 @@ namespace Facility
 				int Blur = 5;						// CAppSettings::BloomBlur
 				HBloomShape Shape = RadialBloom;	// CAppSettings::BloomShape
 
-				Json::Object * Get();
-				bool Set(Json::Object * pcData);
+				Json::Object* Get();
+				bool Set(Json::Object* pcData);
 			}
 			Bloom;
 
@@ -203,13 +205,13 @@ namespace Facility
 				bool Scaling = true;				// CAppSettings::bLightScaling
 				int ScaleFactor = 100000;			// CAppSettings::LightScaleFactor
 
-				Json::Object * Get();
-				bool Set(Json::Object * pcData);
+				Json::Object* Get();
+				bool Set(Json::Object* pcData);
 			}
 			Light;
 
-			Json::Object * Get();
-			bool Set(Json::Object * pcData);
+			Json::Object* Get();
+			bool Set(Json::Object* pcData);
 		}
 		Lighting;
 
@@ -218,8 +220,8 @@ namespace Facility
 			struct SIMPLE_SHADOW {
 				HShadowRenderingMode ShadowRenderingMode = SoftwareOpenglShadow;	// CAppSettings::ShadowRenderingMode
 
-// 				Json::Object * Get();
-// 				bool Set(Json::Object * pcData);
+// 				Json::Object* Get();
+// 				bool Set(Json::Object* pcData);
 			}
 			SimpleShadow;
 
@@ -231,13 +233,13 @@ namespace Facility
 				float FastSilhouetteTolerance = 1.0f;	// CAppSettings::FastSilhouetteTolerance
 				bool HeavyExteriorSilhouette = false;	// CAppSettings::HeavyExteriorSilhouette
 
-// 				Json::Object * Get();
-// 				bool Set(Json::Object * pcData);
+// 				Json::Object* Get();
+// 				bool Set(Json::Object* pcData);
 			}
 			FrameBuffer;
 
-// 			Json::Object * Get();
-// 			bool Set(Json::Object * pcData);
+// 			Json::Object* Get();
+// 			bool Set(Json::Object* pcData);
 		}
 		Effects;
 	};
