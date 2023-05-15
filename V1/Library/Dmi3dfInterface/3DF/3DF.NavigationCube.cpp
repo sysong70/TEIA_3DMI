@@ -2,89 +2,12 @@
 #include "3DF.NavigationCube.h"
 #include "3DF.Painter.h"
 
-//#include <GdiPlus.h>
-//#pragma comment(lib, "Gdiplus.lib")
-//#pragma warning(disable: 4244)
-
 USING_3DF_NAMESPACE
 
 
 
 namespace NavigationCubePreset
 {
-	/*
-	class GdiLoader
-	{
-	public:
-
-		GdiLoader()
-		{
-			Gdiplus::GdiplusStartup(&token, &input, nullptr);
-		}
-
-		~GdiLoader()
-		{
-			// Gdiplus::GdiplusShutdown(token);
-		}
-
-	private:
-
-		Gdiplus::GdiplusStartupInput input;
-		ULONG_PTR token;
-	};
-
-	GdiLoader Initializer;
-
-
-
-	class ImageLoader
-	{
-	public:
-
-		const char* Format = "rgba, size=16 pixels";
-		int Width = 16;
-		int Height = 16;
-
-		ImageLoader()
-		{
-		}
-
-		~ImageLoader()
-		{
-			delete[] Buffer;
-		}
-
-		void Load(CString path)
-		{
-			//:TODO
-			path = L"c:\\temp\\axis_" + path + L".png";
-
-			Gdiplus::Bitmap* pBitmap = Gdiplus::Bitmap::FromFile(path);
-			ASSERT(pBitmap != nullptr);
-			ASSERT(pBitmap->GetWidth() > 0 && pBitmap->GetHeight() > 0);
-
-			Buffer = new BYTE[Width * Height * 4];
-			Gdiplus::Color color;
-			int index = 0;
-
-			for (int y = 0; y < Height; y++) {
-				for (int x = 0; x < Width; x++) {
-					pBitmap->GetPixel(x, y, &color);
-					Buffer[index++] = color.GetR();
-					Buffer[index++] = color.GetG();
-					Buffer[index++] = color.GetB();
-					Buffer[index++] = color.GetA();
-				}
-			}
-
-			delete[] pBitmap;
-		}
-
-		BYTE* Buffer = nullptr;
-	};
-	*/
-
-
 	class Format
 	{
 	public:
@@ -582,23 +505,17 @@ HC_KEY NavigationCube::CreateAxis(const char* name, const char* text, HPoint axi
 	double unit = PRESET::PlaneUnit();
 	HPoint axisStart(-unit, -unit, -unit);
 
-	//PRESET::ImageLoader image;
-
 	HC_KEY segKey = HC_Open_Segment(name);
 	ASSERT(segKey != HC_ERROR_KEY);
 	{
 		Painter::Segment::SetColor("faces", rgb);
 		Painter::Segment::SetColor("text", rgb);
 
-		//HC_Insert_Line(axisStart.x, axisStart.y, axisStart.z, axisEnd.x, axisEnd.y, axisEnd.z);
-		//HC_Set_Variable_Line_Weight("10 px");
 		HC_KEY key = HC_Insert_Cylinder(&axisStart, &axisEnd, 0.01, "none");
 		ASSERT(key != HC_ERROR_KEY);
 
 		HC_KEY textKey = HC_Insert_Text(textCenter.x, textCenter.y, textCenter.z, text);
 		ASSERT(textKey != HC_ERROR_KEY);
-		//image.Load(text);
-		//HC_Insert_Image(textCenter.x, textCenter.y, textCenter.z, image.Format, image.Width, image.Height, image.Buffer);
 	}
 	HC_Close_Segment();
 

@@ -258,9 +258,6 @@
     <ClInclude Include="3DF\3DF.BaseView.h">
       <Filter>3DF\Base</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\HDraw.h">
-      <Filter>3DF</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\3DF.Search.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
@@ -460,9 +457,6 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.BaseView.cpp">
       <Filter>3DF\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\HDraw.cpp">
-      <Filter>3DF</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Search.cpp">
       <Filter>3DF\Control</Filter>

@@ -239,31 +239,31 @@ void Canvas::Init()
 	m_pcBaseView->SetTransparentSelectionBoxMode(m_cPreference.Selection.Behavior.UseSelectBox); // show a transparent box when selecting areas
 	m_pcBaseView->SetRespectSelectionCulling(m_cPreference.Selection.Behavior.RespectCulling); // Respect Culling during selection.
 	m_pcBaseView->SetFastFitWorld(true);
-	m_pcBaseView->SetForceFastHiddenLine(m_cPreference.Perfromance.Optimization.HiddenLineMode == FastHiddenLine);
+	m_pcBaseView->SetForceFastHiddenLine(m_cPreference.Performance.Optimization.HiddenLineMode == FastHiddenLine);
 	m_pcBaseView->SetSpritingMode(m_cPreference.Interaction.GeometryManipulation.Spriting);
 	m_pcBaseView->SetAllowInteractiveCutGeometry(m_cPreference.Interaction.GeometryManipulation.UpdateCutGeometry);
 	m_pcBaseView->SetAllowInteractiveShadows(m_cPreference.Interaction.GeometryManipulation.UpdateShadows);
 
 	m_pcBaseView->SetBackplaneCulling(m_cPreference.General.Etc.BackplaneCulling);
-//	SetOcclusionCullingMode(m_cPreference.Perfromance.Optimization.OcclusionCulling, true, m_cPreference.Perfromance.Optimization.OcclusionThreshold);
+//	SetOcclusionCullingMode(m_cPreference.Performance.Optimization.OcclusionCulling, true, m_cPreference.Performance.Optimization.OcclusionThreshold);
 
 	m_pcBaseView->SetDisplayListType(DisplayListSegment);// DisplayListOff);
 
-	if (true == m_cPreference.Perfromance.FramerateOptimization.UseFramerate)
+	if (true == m_cPreference.Performance.FramerateOptimization.UseFramerate)
 	{
 		//if (!pDoc->IsFileReadDeferedForView() || CurrentFramerateMode == FramerateFixed)
-		if (FramerateFixed == m_cPreference.Perfromance.FramerateOptimization.CurrentFramerateMode)
+		if (FramerateFixed == m_cPreference.Performance.FramerateOptimization.CurrentFramerateMode)
 		{
-			m_pcBaseView->SetFramerateMode(m_cPreference.Perfromance.FramerateOptimization.CurrentFramerateMode,
-				m_cPreference.Perfromance.FramerateOptimization.FramerateTime, m_cPreference.Perfromance.FramerateOptimization.MaxThreshold, 
-				UINT2bool(m_cPreference.Perfromance.FramerateOptimization.UseLods), m_cPreference.Perfromance.FramerateOptimization.DetailSteps, 
-				m_cPreference.Perfromance.FramerateOptimization.HardCutoff);
+			m_pcBaseView->SetFramerateMode(m_cPreference.Performance.FramerateOptimization.CurrentFramerateMode,
+				m_cPreference.Performance.FramerateOptimization.FramerateTime, m_cPreference.Performance.FramerateOptimization.MaxThreshold, 
+				UINT2bool(m_cPreference.Performance.FramerateOptimization.UseLods), m_cPreference.Performance.FramerateOptimization.DetailSteps, 
+				m_cPreference.Performance.FramerateOptimization.HardCutoff);
 		}
 	}
-	else if (m_cPreference.Perfromance.FramerateOptimization.CullingThresholdSet)
+	else if (m_cPreference.Performance.FramerateOptimization.CullingThresholdSet)
 	{
 		m_pcBaseView->SetFramerateMode(FramerateOff);
-		m_pcBaseView->SetCullingThreshold(m_cPreference.Perfromance.FramerateOptimization.CullingThreshold);
+		m_pcBaseView->SetCullingThreshold(m_cPreference.Performance.FramerateOptimization.CullingThreshold);
 	}
 	else
 	{
@@ -280,11 +280,7 @@ void Canvas::Init()
 	m_pcBaseView->SetAxisMode(m_cPreference.General.Rendering.DisplayAxisTriad ? AxisOn : AxisOff);
 
 	// 배경화면 설정
-	//SetWindowBackGroundColor(m_cPreference.Appearance.BackgroundColor.Top, m_cPreference.Appearance.BackgroundColor.Bottom);
-	//:Ken - set preference later...
-	COLORREF back = RGB(0x30, 0x30, 0x30);
-	SetWindowBackGroundColor(back, back);
-	//SetWindowColor(WindowBackgroundTopColor, WindowBackgroundBottomColor);
+	SetWindowBackGroundColor(m_cPreference.Appearance.BackgroundColor.Top, m_cPreference.Appearance.BackgroundColor.Bottom);
 
 	HPoint FakeHLRColor;
 	FakeHLRColor.Set(
@@ -1045,9 +1041,9 @@ void Canvas::ViewReady()
 	SetTransparency();
 
 	//Turn on static model and display lists last, and in that order
-	hmodel->SetStaticModel(m_cPreference.Perfromance.Optimization.StaticModel);
+	hmodel->SetStaticModel(m_cPreference.Performance.Optimization.StaticModel);
 
-	hmodel->SetLMVModel(m_cPreference.Perfromance.Optimization.LMVModel);
+	hmodel->SetLMVModel(m_cPreference.Performance.Optimization.LMVModel);
 
 	if (CAppSet_bRestoreAnnotations) {
 		GetBaseView()->SetAnnotationResize(true);
@@ -1082,16 +1078,16 @@ void Canvas::SetupViews()
 {
 	GetBaseView()->SetRenderMode(CAppSet_RenderMode, true);
 	GetBaseView()->SetShadowMode(CAppSet_ShadowMode);
-	GetBaseView()->SetOcclusionCullingMode(m_cPreference.Perfromance.Optimization.OcclusionCulling, true);
+	GetBaseView()->SetOcclusionCullingMode(m_cPreference.Performance.Optimization.OcclusionCulling, true);
 }
 
 void Canvas::EnableFrameRate(bool onoff)
 {
-	int nSteps = (CAppSet_DynamicAdjustment ? m_cPreference.Perfromance.FramerateOptimization.DetailSteps : 0);
+	int nSteps = (CAppSet_DynamicAdjustment ? m_cPreference.Performance.FramerateOptimization.DetailSteps : 0);
 
 	if (onoff) {
-		GetBaseView()->SetFramerateMode(FramerateTarget, m_cPreference.Perfromance.FramerateOptimization.FramerateTime,
-			m_cPreference.Perfromance.FramerateOptimization.MaxThreshold, UINT2bool(m_cPreference.Perfromance.FramerateOptimization.UseLods), nSteps);
+		GetBaseView()->SetFramerateMode(FramerateTarget, m_cPreference.Performance.FramerateOptimization.FramerateTime,
+			m_cPreference.Performance.FramerateOptimization.MaxThreshold, UINT2bool(m_cPreference.Performance.FramerateOptimization.UseLods), nSteps);
 	}
 	else {
 		GetBaseView()->SetFramerateMode(FramerateOff);
