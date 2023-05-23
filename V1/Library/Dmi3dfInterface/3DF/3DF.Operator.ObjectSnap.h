@@ -23,6 +23,7 @@ namespace Operator
 			MidPoint,
 			NearPoint,
 			Center,
+			Intersection,
 			None
 		};
 

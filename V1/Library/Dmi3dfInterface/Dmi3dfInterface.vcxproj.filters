@@ -52,6 +52,9 @@
     <Filter Include="3DF\Key\Private">
       <UniqueIdentifier>{b402e2ea-86b4-4b1a-ab07-3dfabf3d5e3a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Control">
+      <UniqueIdentifier>{94caf97e-5866-43e8-8edb-faa6983abdc6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -270,6 +273,12 @@
     <ClInclude Include="3DF\3DF.Facility.FileExportSetting.h">
       <Filter>Facility</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\Private\3DF.SearchPrivate.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Search.h">
+      <Filter>Control</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -475,6 +484,12 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.Facility.FileImportSetting.cpp">
       <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Private\3DF.SearchPrivate.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Search.cpp">
+      <Filter>Control</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

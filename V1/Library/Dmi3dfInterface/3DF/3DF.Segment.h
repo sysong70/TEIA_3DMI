@@ -7,6 +7,7 @@
 #include "3DF.EdgeAttribute.h"
 //#include "3DF.Portfolio.h"
 #include "3DF.Style.h"
+#include "3DF.Search.h"
 
 #include "3DF.Marker.h"
 
@@ -30,6 +31,10 @@ public:
 	SegmentKey & Open();
 	SegmentKey & Close();
 
+	// Segment의 자체의 Title을 변경함.
+	CString Name() const;
+	SegmentKey & SetName(CString strInName);
+
 	//== Sub Segment 관련 함수 =======================================================================
 	SegmentKey const Subsegment();
 	SegmentKey const Subsegment(LPCTSTR pszFromat, ...);
@@ -37,9 +42,10 @@ public:
 	size_t ShowSubsegments() const;
 	size_t ShowSubsegments(SegmentKeyArray & cOutChildren) const;
 
-	// Segment의 자체의 Title을 변경함.
-	CString Name() const;
-	SegmentKey & SetName(CString strInName);
+	//== Flush 관련 함수 =============================================================================
+	void Flush(Search::Type eInTypeToRemove = Search::Type::Everything, Search::Space eInSearchSpace = Search::Space::SegmentOnly);
+	void Flush(SearchTypeArray const & aInTypesToRemove, Search::Space eInSearchSpace = Search::Space::SegmentOnly);
+	void Flush(size_t nInTypesCount, Search::Type const peInTypesToRemove[], Search::Space eInSearchSpace = Search::Space::SegmentOnly);
 
 	//== Include 관련 함수 ===========================================================================
 	IncludeKey IncludeSegment(SegmentKey const & cInSegment);
