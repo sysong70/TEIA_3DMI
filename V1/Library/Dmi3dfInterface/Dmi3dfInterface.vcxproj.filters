@@ -258,6 +258,18 @@
     <ClInclude Include="3DF\3DF.BaseView.h">
       <Filter>3DF\Base</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\3DF.Facility.GuiSetting.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Facility.KernelSetting.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Facility.FileImportSetting.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Facility.FileExportSetting.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -451,6 +463,18 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.BaseView.cpp">
       <Filter>3DF\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Facility.GuiSetting.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Facility.KernelSetting.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Facility.FileExportSetting.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Facility.FileImportSetting.cpp">
+      <Filter>Facility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

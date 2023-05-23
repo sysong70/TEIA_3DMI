@@ -244,6 +244,9 @@ BOOL Window::Application::InitInstance()
 		Connector2d::GetInstance().application.OnInitInstance();
 	}
 
+	double dpi = globalUtils.GetDpiForWindow(nullptr) / 96.0;
+	Connector3d::GetInstance().application.OnDpiAware(dpi);
+
 #pragma endregion //:REGION
 
 	INITCOMMONCONTROLSEX InitCtrls;

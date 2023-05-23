@@ -94,8 +94,6 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	HWND hWnd = (HWND) cInObject.GetDwordPtr(SKW_HWND);
 
-	Facility::Preference cPreference;
-
 	// HBaseView 관련 사항을 구성하는 부분
 	TDF::Canvas * pcCanvas = new TDF::Canvas(m_pcHoopsModel, reinterpret_cast<void *>(hWnd));
 

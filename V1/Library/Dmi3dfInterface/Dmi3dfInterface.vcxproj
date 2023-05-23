@@ -130,6 +130,10 @@
     <ClInclude Include="3DF\3DF.Camera.h" />
     <ClInclude Include="3DF\3DF.Circle.h" />
     <ClInclude Include="3DF\3DF.EdgeAttribute.h" />
+    <ClInclude Include="3DF\3DF.Facility.FileExportSetting.h" />
+    <ClInclude Include="3DF\3DF.Facility.FileImportSetting.h" />
+    <ClInclude Include="3DF\3DF.Facility.GuiSetting.h" />
+    <ClInclude Include="3DF\3DF.Facility.KernelSetting.h" />
     <ClInclude Include="3DF\3DF.LineAttribute.h" />
     <ClInclude Include="3DF\3DF.Math.Matrix.h" />
     <ClInclude Include="3DF\3DF.NavigationCube.h" />
@@ -205,6 +209,10 @@
     <ClCompile Include="3DF\3DF.Database.cpp" />
     <ClCompile Include="3DF\3DF.EdgeAttribute.cpp" />
     <ClCompile Include="3DF\3DF.Facility.Base.cpp" />
+    <ClCompile Include="3DF\3DF.Facility.FileExportSetting.cpp" />
+    <ClCompile Include="3DF\3DF.Facility.FileImportSetting.cpp" />
+    <ClCompile Include="3DF\3DF.Facility.GuiSetting.cpp" />
+    <ClCompile Include="3DF\3DF.Facility.KernelSetting.cpp" />
     <ClCompile Include="3DF\3DF.Facility.Preference.cpp" />
     <ClCompile Include="3DF\3DF.Geometry.cpp" />
     <ClCompile Include="3DF\3DF.Highlight.cpp" />

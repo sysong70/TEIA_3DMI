@@ -62,6 +62,7 @@ namespace Operator
 		void DrawSnapItems(bool bUpdate = true);
 		void DrawSnapItem(SnapItem* pcInItem, CamerInformation & cInCameraInfo, bool bUpdate = true);
 		void DrawSnapPoint(SnapItem* pItem, Point2D center, double dRadius);
+		double PixelToWorld(double unit);
 		bool ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo);
 
 	private:

@@ -670,10 +670,16 @@ void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & 
 }
 
 #include "3DF.Painter.h"
+#include "3DF.Facility.Preference.h";
 
 void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double dUnit)
 {
 	using namespace Painter;
+
+	// pixel to world
+	double fontSize = PixelToWorld(ThePreference.Gui.General.FontSize * ThePreference.Gui.Session.DpiScale);
+	//:WARNING - replace dUnit
+	dUnit = fontSize * 0.5;
 
 	const COLORREF PointBackColor = RGB(0xFD, 0xF4, 0xDC);
 	const COLORREF PointWireColor = RGB(0x1F, 0x1E, 0x1C);
@@ -694,7 +700,9 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 		{
 			Segment::SetColor("faces", PointWireColor);
 
-			Figure::CreateDonut(position, dUnit * 0.6, dUnit);
+			double inner = dUnit * 0.5;
+			double outer = dUnit;
+			Figure::CreateDonut(position, inner, outer);
 		}
 		HC_Close_Segment();
 	}
@@ -709,18 +717,19 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 		Segment::SetVisibility("edges", false);
 		Segment::SetColor("faces", PointBackColor, 0.5);
 
-		Figure::CreateDonut(position, dUnit, dUnit * 2);
+		double inner = dUnit;
+		double outer = dUnit * 2;
+		Figure::CreateDonut(position, inner, outer);
 	}
 	HC_Close_Segment();
 
-	//:TODO - language
-	const char* pText = nullptr;
+	const wchar_t* pText = nullptr;
 
 	switch (pItem->eType) {
-	case Type::EndPoint:	pText = "End Point";	break;
-	case Type::MidPoint:	pText = "Mid Point";	break;
-	case Type::NearPoint:	pText = "Near Point";	break;
-	case Type::Center:		pText = "Center Point";	break;
+	case Type::EndPoint:	pText = L"End Point|끝점";		break;
+	case Type::MidPoint:	pText = L"Mid Point|중점";		break;
+	case Type::NearPoint:	pText = L"Near Point|근점";		break;
+	case Type::Center:		pText = L"Center Point|중심점";	break;
 	default:
 		ASSERT(FALSE);
 		return;
@@ -729,29 +738,31 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 	HC_Open_Segment("snap name");
 	{
 		Segment::SetColor("text", TooltipTextColor);
-		Font::SetName("segoe ui");
-		//:TODO - text dpi scale
-		Font::SetSize(dUnit * 1.75, "oru");
+		Font::SetName(ThePreference.Gui.General.FontName());
+		Font::SetSize(fontSize, "oru");
 		Font::SetRenderer("truetype");
 		Font::SetAlignment(Font::EPivot::MiddleCenter);
 
 		//:TODO - text position in window
-		position.y += dUnit * 5;
-		Text::Create(position, pText);
+		double textOffset = dUnit * 5;
+		position.y += textOffset;
+		CString text = ThePreference.Gui.General.Local(pText);
+		Text::Create(position, text);
 
 		//:WARNING - for calculating text extent
 		Font::SetTransform();
 			float width, height;
-			Text::GetExtent(pText, width, height);
+			Text::GetExtent(text, width, height);
 		Font::SetTransform(false);
 
 		HC_Open_Segment("frame");
 		{
-			Segment::SetEdgeWeight(0.1);
+			Segment::SetEdgeWeight(PixelToWorld(1));
 			Segment::SetColor("faces", TooltipBackColor);
 			Segment::SetColor("edges", TooltipEdgeColor);
 
-			Point size(width, height + dUnit * 3);
+			double padding = dUnit * 3;
+			Point size(width, height + padding);
 			TDF::Point p1(position.x - size.x / 2, position.y + size.y / 2);
 			TDF::Point p2(position.x + size.x / 2, position.y - size.y / 2);
 
@@ -760,6 +771,19 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 		HC_Close_Segment();
 	}
 	HC_Close_Segment();
+}
+
+double Operator::ObjectSnap::PixelToWorld(double unit)
+{
+	SegmentKey scene(m_pcWindow->GetSceneKey());
+
+	PixelPoint pixel1;
+	PixelPoint pixel2(unit, 0, 0);
+	WorldPoint world1(*m_pcWindow, pixel1);
+	WorldPoint world2(*m_pcWindow, pixel2);
+	Vector vector = world2 - world1;
+
+	return vector.Length();
 }
 
 bool Operator::ObjectSnap::ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo)
