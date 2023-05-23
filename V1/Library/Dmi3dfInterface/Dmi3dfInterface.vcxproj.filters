@@ -52,6 +52,9 @@
     <Filter Include="3DF\Key\Private">
       <UniqueIdentifier>{b402e2ea-86b4-4b1a-ab07-3dfabf3d5e3a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="3DF\Object">
+      <UniqueIdentifier>{e3d119c0-2ae9-4faf-84b6-3c5c9d24ac2f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -102,29 +105,11 @@
     <ClInclude Include="Import\DLL.Helper.h">
       <Filter>DLL</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.h">
-      <Filter>3DF</Filter>
-    </ClInclude>
     <ClInclude Include="Import\DLL.3DF.Interface.h">
       <Filter>DLL</Filter>
     </ClInclude>
     <ClInclude Include="Import\DLL.h">
       <Filter>DLL</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.Math.h">
-      <Filter>3DF</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.Color.h">
-      <Filter>3DF</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.Database.h">
-      <Filter>3DF</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.Style.h">
-      <Filter>3DF</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.Bounding.h">
-      <Filter>3DF</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.Control.h">
       <Filter>3DF\Control</Filter>
@@ -207,9 +192,6 @@
     <ClInclude Include="3DF\3DF.Operator.ObjectSnap.h">
       <Filter>Operator</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Point.h">
-      <Filter>3DF</Filter>
-    </ClInclude>
     <ClInclude Include="3DF.Signal.Connector.h">
       <Filter>Signal</Filter>
     </ClInclude>
@@ -261,8 +243,29 @@
     <ClInclude Include="3DF\3DF.Search.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Private\3DF.SearchPrivate.h">
-      <Filter>3DF\Control</Filter>
+    <ClInclude Include="3DF\3DF.Style.h">
+      <Filter>3DF\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Bounding.h">
+      <Filter>3DF\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Color.h">
+      <Filter>3DF\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Database.h">
+      <Filter>3DF\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.h">
+      <Filter>3DF\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Math.h">
+      <Filter>3DF\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Point.h">
+      <Filter>3DF\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.KeyPath.h">
+      <Filter>3DF\Key</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -311,26 +314,8 @@
     <ClCompile Include="3DF\3DF.Selectability.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.cpp">
-      <Filter>3DF</Filter>
-    </ClCompile>
     <ClCompile Include="Import\DLL.3DF.Interface.cpp">
       <Filter>DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\3DF.Math.cpp">
-      <Filter>3DF</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\3DF.Color.cpp">
-      <Filter>3DF</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\3DF.Database.cpp">
-      <Filter>3DF</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\3DF.Style.cpp">
-      <Filter>3DF</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\3DF.Bounding.cpp">
-      <Filter>3DF</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Control.cpp">
       <Filter>3DF\Control</Filter>
@@ -413,9 +398,6 @@
     <ClCompile Include="3DF\3DF.Operator.ObjectSnap.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Point.cpp">
-      <Filter>3DF</Filter>
-    </ClCompile>
     <ClCompile Include="3DF.Signal.Connector.cpp">
       <Filter>Signal</Filter>
     </ClCompile>
@@ -463,6 +445,30 @@
     </ClCompile>
     <ClCompile Include="3DF\Private\3DF.SearchPrivate.cpp">
       <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Style.cpp">
+      <Filter>3DF\Key</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Bounding.cpp">
+      <Filter>3DF\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Color.cpp">
+      <Filter>3DF\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.cpp">
+      <Filter>3DF\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Database.cpp">
+      <Filter>3DF\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Math.cpp">
+      <Filter>3DF\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Point.cpp">
+      <Filter>3DF\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.KeyPath.cpp">
+      <Filter>3DF\Key</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -337,6 +337,34 @@ TDF_INLINE bool Float::Equals(double const & a, double const & b, int tolerance)
 	return Abs(va[Low] - vb[Low]) <= tolerance;
 }
 
+/*! The Coordinate class is a concept class that contains information about various coordinate spaces. */
+class Coordinate
+{
+public:
+
+	/*! \enum Space
+		The Space enum is a list of all coordinate spaces used in Visualize.
+	*/
+	enum class Space : uint32_t
+	{
+		Object,					// An infinite 3D Cartesian coordinate system local to the object or segment itself.
+		World,					// An infinite 3D Cartesian coordinate system where objects reside after their modelling transformations have been applied.
+		Camera,					// A space defined by a camera's view of world space with the origin at the camera position, y-axis along the camera's up vector and z-axis pointing toward the camera target.
+		Window,					// A rectangle ([-1,1] in x and y directions) with the origin at center of the outer window.
+		Pixel,					// The pixel position of the outer window counting from the top-left corner
+		InnerWindow,			// A rectangle ([-1,1] in x and y directions) with the origin at center of the inner window.
+		InnerPixel,				// The pixel position of the inner window counting from the top-left corner
+		//NormalizedInnerWindow,	// Same as InnerWindow except z is in [0,1] with 0 at the camera limit and 1 at infinity
+		//NormalizedInnerPixel,	// Same as InnerPixel except z is in [0,1] with 0 at the camera limit and 1 at infinity
+		//NormalizedWindow,		// Same as Window except z is in [0,1] with 0 at the camera limit and 1 at infinity
+		//NormalizedPixel,		// Same as Pixel except z is in [0,1] with 0 at the camera limit and 1 at infinity
+		ScreenRange,
+	};
+
+private:
+	Coordinate() {}
+};
+
 template <typename F> class Vector_3D;
 template <typename F> class Plane_3D;
 template <typename F> class Vector_2D;

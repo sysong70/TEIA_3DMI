@@ -6,6 +6,7 @@
 #include <HSelectionSet.h>
 
 #include "3DF.h"
+#include "3DF.KeyPath.h"
 #include "3DF.Kit.h"
 #include "3DF.Control.h"
 
@@ -136,6 +137,22 @@ public:
 	SelectionOptionsKit & SetGranularity(Selection::Granularity eInGranularity);
 	SelectionOptionsKit & SetBias(Selection::Bias eInBias);
 
+	// Sets the starting location at which selection testing will begin.
+	// If the selection is being performed from a window, there must be a path from this segment to that window.
+	// param: cInStartSegment A segment, that must be a child of the window key, in which to begin selection testing.
+	// param: bInScopeOnly If true selections will only occur in the provided scope segment,
+	// otherwise selections will occur in subsegments and includes of in_start_segment as well.
+	// return: A reference to this SelectionOptionsKit.
+	SelectionOptionsKit & SetScope(SegmentKey const & cInStartSegment, bool bInScopeOnly = false);
+
+	// Sets the starting location at which selection testing will begin.
+	// If the selection is being performed from a window, there must be a path from this segment to that window.
+	// param: cInStartPath A path of segments and includes, leaf to root, from the segment to begin selection testing to the window key.
+	// param: bInScopeOnly If true selections will only occur in the provided scope segment,
+	// otherwise selections will occur in subsegments and includes of in_start_segment as well.
+	// return: A reference to this SelectionOptionsKit.
+	SelectionOptionsKit & SetScope(KeyPath const & cInStartPath, bool bInScopeOnly = false);
+
 	bool ShowProximity(float & fOutProximity) const;
 	bool ShowLevel(Selection::Level & eOutLevel) const;
 	bool ShowInternalLimit(size_t & nOutLimit) const;
@@ -144,6 +161,8 @@ public:
 	bool ShowAlgorithm(Selection::Algorithm & eOutAlgorithm) const;
 	bool ShowGranularity(Selection::Granularity & eOutGranularity) const;
 	bool ShowBias(Selection::Bias & eOutBias) const;
+	bool ShowScope(SegmentKey & cOutStartSegment, bool & bOutScopeOnly) const;
+	bool ShowScope(KeyPath & cOutStartPath, bool & bOutScopeOnly) const;
 };
 
 class SelectionOptionsControl : public Control
@@ -290,6 +309,7 @@ public:
 	size_t SelectByPoint(HEventInfo & cEvent, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const;
 	size_t SelectByPoint(HEventInfo & cEvent, SelectionResults & cOutResults) const;
 
+	// Point in window space at which to perform the selection.
 	size_t SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const;
 	size_t SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const;
 	size_t SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults) const;

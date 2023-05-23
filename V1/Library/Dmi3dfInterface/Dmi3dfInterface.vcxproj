@@ -130,6 +130,7 @@
     <ClInclude Include="3DF\3DF.Camera.h" />
     <ClInclude Include="3DF\3DF.Circle.h" />
     <ClInclude Include="3DF\3DF.EdgeAttribute.h" />
+    <ClInclude Include="3DF\3DF.KeyPath.h" />
     <ClInclude Include="3DF\3DF.LineAttribute.h" />
     <ClInclude Include="3DF\3DF.Math.Matrix.h" />
     <ClInclude Include="3DF\3DF.NavigationCube.h" />
@@ -212,6 +213,7 @@
     <ClCompile Include="3DF\3DF.Image.cpp" />
     <ClCompile Include="3DF\3DF.Include.cpp" />
     <ClCompile Include="3DF\3DF.Key.cpp" />
+    <ClCompile Include="3DF\3DF.KeyPath.cpp" />
     <ClCompile Include="3DF\3DF.Kit.cpp" />
     <ClCompile Include="3DF\3DF.Line.cpp" />
     <ClCompile Include="3DF\3DF.LineAttribute.cpp" />

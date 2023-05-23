@@ -69,8 +69,9 @@ class SelectabilityKit;
 class MatrixKit;
 class CameraKit;
 
-class WindowPoint;
 class WorldPoint;
+class InnerWindowPoint;
+class WindowPoint;
 class PixelPoint;
 
 class NamedStyleDefinition;

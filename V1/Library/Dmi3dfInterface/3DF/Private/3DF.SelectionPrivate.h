@@ -9,6 +9,7 @@
 #include "../3DF.Kit.h"
 #include "../3DF.Control.h"
 
+#include "../3DF.Segment.h"
 #include "../3DF.Selection.h"
 
 #include "../3DF.Math.h"
@@ -40,6 +41,9 @@ public:
 		bGranularity = pcInThat->bGranularity;
 		eBias = pcInThat->eBias;
 		bBias = pcInThat->bBias;
+		cStartSegment = pcInThat->cStartSegment;
+		cStartPath = pcInThat->cStartPath;
+		bScopeOnly = pcInThat->bScopeOnly;
 	}
 
 	bool bProximity = false;
@@ -59,6 +63,10 @@ public:
 	Selection::Algorithm eAlgorithm = Selection::Algorithm::Analytic;
 	Selection::Granularity eGranularity = Selection::Granularity::General;
 	Selection::Bias eBias = Selection::Bias::None;
+
+	SegmentKey cStartSegment;
+	KeyPath cStartPath;
+	bool bScopeOnly = false;
 };
 
 class SelectionOptionsControlPrivate : public PrivateImpl
@@ -195,6 +203,7 @@ public:
 	void HandleSelection(UINT const nFlags, SelectionResults & cOutResults);
 
 	void GetSelectOption(SelectionOptionsKit const & cInOptions, char * pchOutOption);
+	void GetScope(SelectionOptionsKit const & cInOptions, char * pchOutScope);
 
 	WindowKey * GetWindow() { return (WindowKey *)m_pcWindow; }
 	const WindowKey * m_pcWindow = nullptr;

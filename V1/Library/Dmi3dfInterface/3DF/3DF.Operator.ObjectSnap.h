@@ -85,6 +85,9 @@ namespace Operator
 
 		Point m_cPrevPoint;
 
+		DWORD m_nPrevMouseMoveTickCount;
+		DWORD m_nSelectPickCount;
+
 		std::vector<ObjectSnap::SnapItem *> m_vSnapItems;
 	};
 }

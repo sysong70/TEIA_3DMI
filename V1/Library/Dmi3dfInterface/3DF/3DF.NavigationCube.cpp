@@ -2,9 +2,13 @@
 #include "3DF.NavigationCube.h"
 #include "3DF.Painter.h"
 
+#include "3DF.KeyPath.h"
+#include "3DF.Window.h"
+
+#include "3DF.Selection.h"
+#include "./Private/3DF.SelectionPrivate.h"
+
 USING_3DF_NAMESPACE
-
-
 
 namespace NavigationCubePreset
 {
@@ -81,18 +85,154 @@ namespace NavigationCubePreset
 
 
 
-NavigationCube::NavigationCube(HBaseView* view)
-	: m_pView(view)
+NavigationCube::NavigationCube(TDF::BaseView * view, WindowKey * pcInWindow) :
+	m_pView(view),
+	m_pcWindow(pcInWindow)
 {
 }
-
-
 
 NavigationCube::~NavigationCube()
 {
 }
 
+int NavigationCube::LButtonUp(HEventInfo & cInEvent)
+{
+	if (0 == m_cOldHighlightSelection.GetCount()) {
+		return HLISTENER_PASS_EVENT;
+	}
 
+	SegmentKey cSelectKey;
+	if (false == m_cOldHighlightSelection.Front()->ShowSelectedItem(cSelectKey)) {
+		return HLISTENER_PASS_EVENT;
+	}
+
+	CString strName = cSelectKey.Name();
+	TRACE(L"%s\n", strName);
+
+	m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
+	// m_cOldHighlightSelection.Reset();
+
+	for (int nIndex = 0; nIndex < (int)TDF::ViewMode::Count; nIndex++) {
+		if (m_cSegments[nIndex] == cSelectKey) {
+			m_pView->SetViewMode((TDF::ViewMode)nIndex);
+			break;
+		}
+	}
+
+	return HLISTENER_CONSUME_EVENT;
+}
+
+int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
+{
+	char chPathName[MVO_BUFFER_SIZE] = "\n";
+	HC_Show_Segment(m_pView->GetSceneKey(), chPathName);
+
+	Point cInnerPoint;
+
+	KeyPath cKeyPath(chPathName);
+	//cKeyPath.PushBack(m_cubeSegment);
+
+	WindowPoint cPoint(cInEvent.GetMouseWindowPos());
+
+	bool bConvertFlag = cKeyPath.ConvertCoordinate(Coordinate::Space::Window, cPoint, Coordinate::Space::ScreenRange, cInnerPoint);
+
+	SelectionOptionsKit cSelectOption;
+	cSelectOption.SetLevel(Selection::Level::Segment).SetRelatedLimit(0).SetProximity(0.001);// SetSorting(Selection::Sorting::ZSorting);
+	//cSelectOption.SetScope(m_cubeSegment);
+
+	WindowPoint cWindowPoint = cInEvent.GetMouseWindowPos();
+
+	cInnerPoint = cPoint;
+
+/*
+	HC_Open_Segment_By_Key(m_cubeSegment); {
+		HC_Set_Rendering_Options("attribute lock=(selectability)");
+		
+		HC_Set_Selectability("geometry = on");
+		
+		int res = HC_Compute_Selection(m_pView->GetDriverPath(), ".", "v, selection level = entity, no related selection limit, visual selection = off", cInnerPoint.x, cInnerPoint.y);
+		//int res = HC_Compute_Selection(m_pView->GetDriverPath(), ".", "v, selection level = entity, no related selection limit, visual selection = off", cInnerPoint.x, cInnerPoint.y);
+		
+		HC_Set_Selectability("everything = off");
+
+		if (res) {
+			int i = 0;
+		}
+
+	} HC_Close_Segment();
+
+
+	HC_Open_Segment_By_Key(m_cubeSegment);
+		HC_Set_Rendering_Options("attribute lock=(selectability)");
+// 		SegmentKey cCubeSegment(m_cubeSegment);
+// 		InnerWindowPoint cInnerPoint(cCubeSegment, cWindowPoint);
+
+		HC_Set_Selectability("geometry = on");
+
+		const char * chDriverPath = m_pView->GetDriverPath();
+
+		int res = HC_Compute_Selection(m_pView->GetDriverPath(), ".", "v, selection level = entity, no related selection limit, visual selection = off", cInnerPoint.x, cInnerPoint.y);
+
+		HC_Set_Selectability("everything = off");
+
+		if (res) {
+			int i = 0;
+		}
+
+	HC_Close_Segment();
+*/
+
+	int nEvent = HLISTENER_PASS_EVENT;
+	bool bUpdateFlag = false;
+
+	SelectionResults cSelection;
+	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cInnerPoint, cSelectOption, cSelection);
+
+	// 선택된 요소가 없은 경우
+	if (0 == nSelectedCount) {
+		// 기존에 선택된 요소가 있는 경우 처리
+		if (0 < m_cOldHighlightSelection.GetCount()) {
+			m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
+			m_cOldHighlightSelection.Reset();
+			bUpdateFlag = true;
+		}
+	}
+	else {
+		// 이전에 선택된것과 다른 경우
+		if (m_cOldHighlightSelection != cSelection) {
+			m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
+			
+			SegmentKey cSelectKey;
+			cSelection.Front()->ShowSelectedItem(cSelectKey);
+
+			bool bFindFlag = false;
+
+			for (int nIndex = 0; nIndex < (int)TDF::ViewMode::Count; nIndex++) {
+				if (m_cSegments[nIndex] == cSelectKey) {
+					bFindFlag = true;
+				}
+			}
+
+			if (true == bFindFlag) {
+				HighlightOptionsKit cHighlightOptions;
+				m_pcWindow->GetHighlightControl().Highlight(cSelection, cHighlightOptions, true);
+				m_cOldHighlightSelection = cSelection;
+			}
+			else {
+				m_cOldHighlightSelection.Reset();
+			}
+
+			bUpdateFlag = true;
+			nEvent = HLISTENER_CONSUME_EVENT;
+		}
+	}
+
+	if (true == bUpdateFlag) {
+		m_pcWindow->Update();
+	}
+
+	return nEvent;
+}
 
 void NavigationCube::SetSize(ESize size)
 {
@@ -101,8 +241,9 @@ void NavigationCube::SetSize(ESize size)
 
 
 
-void NavigationCube::SetView(HBaseView* view) {
+void NavigationCube::SetView(TDF::BaseView * view, WindowKey * pcInWindow) {
 	m_pView = view;
+	m_pcWindow = pcInWindow;
 }
 
 
@@ -121,7 +262,6 @@ bool NavigationCube::IsValid()
 }
 
 
-
 void NavigationCube::Create(float width, float height, HC_KEY parent)
 {
 	m_parentSegment = parent;
@@ -131,6 +271,8 @@ void NavigationCube::Create(float width, float height, HC_KEY parent)
 	{
 		OpenCubeSegment();
 		{
+			HC_Set_Selectability("everything = off");
+
 			HC_Set_Rendering_Options("attribute lock = visibility"
 				", hidden line removal options = render faces"
 				", no lod"
@@ -227,31 +369,7 @@ void NavigationCube::Transform()
 			}
 		} HC_Close_Segment();
 	} HC_Close_Segment();
-
-/*
-
-	HPoint position;
-	HPoint target;
-	HVector up;
-	float width, height;
-	char projection[MVO_BUFFER_SIZE];
-
-	HC_Open_Segment_By_Key(m_pView->GetSceneKey());
-	{
-		HC_Show_Net_Camera(&position, &target, &up, &width, &height, projection);
-	}
-	HC_Close_Segment();
-
-	OpenCubeSegment();
-	{
-		//:TODO - only rotation
-		HC_Set_Camera(&position, &target, &up, 2, 2, projection);
-	}
-	CloseCubeSegment();
-*/
 }
-
-
 
 void NavigationCube::Transform_ORG()
 {
@@ -287,7 +405,7 @@ void NavigationCube::OnSize(float width, float height)
 void NavigationCube::OpenCubeSegment()
 {
 	if (m_cubeSegment == HC_ERROR_KEY) {
-		m_cubeSegment = HC_Open_Segment("cube window");
+		m_cubeSegment = HC_Open_Segment("cube_window");
 	}
 	else {
 		HC_Open_Segment_By_Key(m_cubeSegment);
@@ -351,41 +469,41 @@ void NavigationCube::CreateCube()
 
 	// Plane and text
 
-	CreatePlaneShell("top", "TOP", { 0, 0, plane }, { 0, 0, 0 });
-	CreatePlaneShell("bottom", "BOTTOM", { 0, 0, -plane }, { 0, 180, 0 });
-	CreatePlaneShell("front", "FRONT", { 0, -plane, 0 }, { 90, 0, 0 });
-	CreatePlaneShell("back", "BACK", { 0, plane, 0 }, { 90, 0, 180 });
-	CreatePlaneShell("left", "LEFT", { -plane, 0, 0 }, { 90, 0, -90 });
-	CreatePlaneShell("right", "RIGHT", { plane, 0, 0 }, { 90, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::top]		= CreatePlaneShell("top", "TOP", { 0, 0, plane }, { 0, 0, 0 });
+ 	m_cSegments[(int)TDF::ViewMode::bottom]		= CreatePlaneShell("bottom", "BOTTOM", { 0, 0, -plane }, { 0, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::front]		= CreatePlaneShell("front", "FRONT", { 0, -plane, 0 }, { 90, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::back]		= CreatePlaneShell("back", "BACK", { 0, plane, 0 }, { 90, 0, 180 });
+	m_cSegments[(int)TDF::ViewMode::left]		= CreatePlaneShell("left", "LEFT", { -plane, 0, 0 }, { 90, 0, -90 });
+	m_cSegments[(int)TDF::ViewMode::right]		= CreatePlaneShell("right", "RIGHT", { plane, 0, 0 }, { 90, 0, 90 });
 
 	// Edges - n: negative, p: positive
 
-	CreateEdgeShell("py-nz", { 0, plane, -plane }, { 0, 0, 0 });
-	CreateEdgeShell("py-pz", { 0, plane, plane }, { 90, 0, 0 });
-	CreateEdgeShell("ny-pz", { 0, -plane, plane }, { 180, 0, 0 });
-	CreateEdgeShell("ny-nz", { 0, -plane, -plane }, { 270, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::py_nz]		= CreateEdgeShell("py-nz", { 0, plane, -plane }, { 0, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::py_pz]		= CreateEdgeShell("py-pz", { 0, plane, plane }, { 90, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::ny_pz]		= CreateEdgeShell("ny-pz", { 0, -plane, plane }, { 180, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::ny_nz]		= CreateEdgeShell("ny-nz", { 0, -plane, -plane }, { 270, 0, 0 });
 
-	CreateEdgeShell("nx-nz", { -plane, 0, -plane }, { 0, 0, 90 });
-	CreateEdgeShell("nx-pz", { -plane, 0, plane }, { 90, 0, 90 });
-	CreateEdgeShell("px-pz", { plane, 0, plane }, { 180, 0, 90 });
-	CreateEdgeShell("px-nz", { plane, 0, -plane }, { 270, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::nx_nz]		= CreateEdgeShell("nx-nz", { -plane, 0, -plane }, { 0, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::nx_pz]		= CreateEdgeShell("nx-pz", { -plane, 0, plane }, { 90, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::px_pz]		= CreateEdgeShell("px-pz", { plane, 0, plane }, { 180, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::px_nz]		= CreateEdgeShell("px-nz", { plane, 0, -plane }, { 270, 0, 90 });
 
-	CreateEdgeShell("nx-py", { -plane, plane, 0 }, { 0, 90, 0 });
-	CreateEdgeShell("px-py", { plane, plane, 0 }, { 90, 90, 0 });
-	CreateEdgeShell("px-ny", { plane, -plane, 0 }, { 180, 90, 0 });
-	CreateEdgeShell("nx-ny", { -plane, -plane, 0 }, { 270, 90, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_py]		= CreateEdgeShell("nx-py", { -plane, plane, 0 }, { 0, 90, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_py]		= CreateEdgeShell("px-py", { plane, plane, 0 }, { 90, 90, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_ny]		= CreateEdgeShell("px-ny", { plane, -plane, 0 }, { 180, 90, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_ny]		= CreateEdgeShell("nx-ny", { -plane, -plane, 0 }, { 270, 90, 0 });
 
 	// Corners - n: negative, p: positive
 
-	CreateCornerShell("nx-py-nz", { -plane, plane, -plane }, { 0, 0, 0 });
-	CreateCornerShell("nx-py-pz", { -plane, plane, plane }, { 90, 0, 0 });
-	CreateCornerShell("nx-ny-pz", { -plane, -plane, plane }, { 180, 0, 0 });
-	CreateCornerShell("nx-ny-nz", { -plane, -plane, -plane }, { 270, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_py_nz]	= CreateCornerShell("nx-py-nz", { -plane, plane, -plane }, { 0, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_py_pz]	= CreateCornerShell("nx-py-pz", { -plane, plane, plane }, { 90, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_ny_pz]	= CreateCornerShell("nx-ny-pz", { -plane, -plane, plane }, { 180, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_ny_nz]	= CreateCornerShell("nx-ny-nz", { -plane, -plane, -plane }, { 270, 0, 0 });
 
-	CreateCornerShell("px-py-pz", { plane, plane, plane }, { 0, 180, 0 });
-	CreateCornerShell("px-py-nz", { plane, plane, -plane }, { 90, 180, 0 });
-	CreateCornerShell("px-ny-nz", { plane, -plane, -plane }, { 180, 180, 0 });
-	CreateCornerShell("px-ny-pz", { plane, -plane, plane }, { 270, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_py_pz]	= CreateCornerShell("px-py-pz", { plane, plane, plane }, { 0, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_py_nz]	= CreateCornerShell("px-py-nz", { plane, plane, -plane }, { 90, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_ny_nz]	= CreateCornerShell("px-ny-nz", { plane, -plane, -plane }, { 180, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_ny_pz]	= CreateCornerShell("px-ny-pz", { plane, -plane, plane }, { 270, 180, 0 });
 }
 
 
@@ -409,6 +527,8 @@ HC_KEY NavigationCube::CreatePlaneShell(const char* name, const char* text, Trip
 	HC_KEY segKey = HC_Open_Segment(name);
 	ASSERT(segKey != HC_ERROR_KEY);
 	{
+		HC_Set_Selectability("faces = on");
+
 		HC_Set_Text_Font("transforms = on");
 
 		HC_KEY shellKey = HC_Insert_Shell(4, points, 5, faces);
@@ -448,6 +568,8 @@ HC_KEY NavigationCube::CreateEdgeShell(const char* name, Triple pos, Triple angl
 	HC_KEY segKey = HC_Open_Segment(name);
 	ASSERT(segKey != HC_ERROR_KEY);
 	{
+		HC_Set_Selectability("faces = on");
+
 		//Segment::SetColor("faces", RGB(255, 0, 0), 0.5);
 
 		HC_KEY shellKey = HC_Insert_Shell(6, points, 10, faces);
@@ -485,6 +607,8 @@ HC_KEY NavigationCube::CreateCornerShell(const char* name, Triple pos, Triple an
 	HC_KEY segKey = HC_Open_Segment(name);
 	ASSERT(segKey != HC_ERROR_KEY);
 	{
+		HC_Set_Selectability("faces = on");
+
 		//Segment::SetColor("faces", RGB(0, 0, 255), 0.5);
 
 		HC_KEY shellKey = HC_Insert_Shell(7, points, 15, faces);
@@ -536,14 +660,19 @@ void NavigationCube::SetWindowSize(double width, double height, bool openSegment
 	double left = 1.0 - 2.0 / width * windowSize;
 	double bottom = 1.0 - 2.0 / height * windowSize;
 
-	HC_Set_Window(0.8, 1.0, 0.7, 1.0);
-	HC_Set_Window_Pattern("clear");
+	//HC_Set_Window(left, 1.0, bottom, 1.0);
+
+ 	//HC_Set_Window(0.8, 1.0, 0.7, 1.0);
+// 	HC_Set_Window_Pattern("clear");
+
 	//HC_Set_Driver_Options("border, control area");
 // 	//HC_Set_Color("windows=light gray");
 // 	//HC_Set_Window_Frame("single");
 // 	HC_Set_Window_Pattern("::");
 // 	HC_Set_Color("windows=purple,window constrast=yellow");
-	//HC_Set_Rendering_Options(PRESET::Format("screen range = (%.6f, 1, %.6f, 1)", left, bottom));
+
+
+	HC_Set_Rendering_Options(PRESET::Format("screen range = (%.6f, 1, %.6f, 1)", left, bottom));
 	HC_Set_Text_Font(PRESET::Format("size = %.3f px", fontSize));
 
 	if (openSegment) {

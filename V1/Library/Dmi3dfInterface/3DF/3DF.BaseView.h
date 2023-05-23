@@ -7,6 +7,45 @@
 
 OPEN_3DF_NAMESPACE
 
+class NavigationCube;
+
+enum class ViewMode
+{
+	top,
+	bottom,
+	front,
+	back,
+	left,
+	right,
+
+	py_nz,
+	py_pz,
+	ny_pz,
+	ny_nz,
+
+	nx_nz,
+	nx_pz,
+	px_pz,
+	px_nz,
+
+	nx_py,
+	px_py,
+	px_ny,
+	nx_ny,
+
+	nx_py_nz,
+	nx_py_pz,
+	nx_ny_pz,
+	nx_ny_nz,
+
+	px_py_pz, // ISO
+	px_py_nz,
+	px_ny_nz,
+	px_ny_pz,
+
+	Count
+};
+
 class BaseView : public HBaseView
 {
 public:
@@ -19,6 +58,20 @@ public:
 		void * clip_override = 0,
 		void * window_handle_2 = 0,
 		const char * driver_path = 0);
+
+	void UpdateInternal(bool antialias = false, bool force_update = false) override;
+
+	void SetViewMode(TDF::ViewMode mode, bool invert = false, bool fitWorld = true);
+
+public:
+	void SetNavigationCube(NavigationCube * pcNaviCube);
+
+	
+
+private:
+	NavigationCube * m_pcNaviCube = nullptr;
+
+	TDF::ViewMode m_eViewMode;
 };
 
 CLOSE_3DF_NAMESPACE

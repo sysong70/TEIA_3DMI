@@ -273,10 +273,13 @@ void Canvas::Init()
 
 	m_pcBaseView->SetSmoothTransition(false);
 	m_pcBaseView->SetShadowRenderingMode(m_cPreference.Effects.SimpleShadow.ShadowRenderingMode);
+	
 	SetViewAxis();
+
 	SetTransparency();
 
-	m_pcBaseView->SetViewMode(HViewIsoFrontRightTop);		// fit the camera to the scene extents
+	m_pcBaseView->SetViewMode(TDF::ViewMode::px_py_pz);		// fit the camera to the scene extents
+
 	m_pcBaseView->SetAxisMode(m_cPreference.General.Rendering.DisplayAxisTriad ? AxisOn : AxisOff);
 
 	// 배경화면 설정
@@ -296,8 +299,8 @@ void Canvas::Init()
 	m_pcBaseView->GetUndoManager()->Flush();			//don't care about this initial camera change
 	m_pcBaseView->SetDisplayHandlesOnDblClk(!CAppSet_DisableEditing);
 
-	//SetCoordinateSystemHandedness(bWorldHandedness ? HandednessRight : HandednessLeft, true);
-	m_pcBaseView->SetHandedness(CAppSet_bWorldHandedness ? HandednessRight : HandednessLeft, true);
+	//SetCoordinateSystemHandedness(HandednessRight, true);
+	m_pcBaseView->SetHandedness(HandednessRight, true);
 
 	// The state of world today with polygon handedness is
 	// 1. Since we are using display lists by default, we want this setting.
@@ -794,18 +797,20 @@ void Canvas::SetViewAxis()
 		&top.x, &top.y, &top.z);
 
 	m_pcBaseView->SetViewAxis(&front, &top);
-
-	m_pcBaseView->SetAxisMode(AxisOn);
 }
 
 void Canvas::InitNavigationCube(int nWidth, int nHeight)
 {
-	m_cNaviCube.SetView(m_pcBaseView);
-	m_cNaviCube.SetSize(NavigationCube::Midium);
+	m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
+	m_cNaviCube.SetSize(NavigationCube::Big);
 	m_cNaviCube.SetVisible(true, true);
 
 	m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetModelKey());
+	//m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetSceneKey());
+	//m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetOverwriteKey());
 	m_cNaviCube.Transform();
+
+	m_pcBaseView->SetNavigationCube(&m_cNaviCube);
 
 	m_bInitNaviCube = true;
 }

@@ -195,6 +195,8 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	pcCanvas->GetBaseView()->SetRenderMode(pcCanvas->GetBaseView()->GetRenderMode(), true);
 
+	pcCanvas->GetBaseView()->SetViewMode(TDF::ViewMode::px_py_pz);
+
 	pcCanvas->ViewReady();
 	pcCanvas->GetBaseView()->ExhaustiveUpdate();
 

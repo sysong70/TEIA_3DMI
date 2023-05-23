@@ -79,6 +79,12 @@ int Operator::CameraSelect::OnLButtonDown(HEventInfo & cInEvent)
 
 int Operator::CameraSelect::OnLButtonUp(HEventInfo & cInEvent)
 {
+	if (nullptr != m_pcNaviCube) {
+		if (HLISTENER_CONSUME_EVENT == m_pcNaviCube->LButtonUp(cInEvent)) {
+			return HLISTENER_CONSUME_EVENT;
+		}
+	}
+
 	DWORD nMouseUpTickCount = GetTickCount();
 	DWORD nTickCount = nMouseUpTickCount - m_nMouseDownTickCount;
 
@@ -113,9 +119,9 @@ int Operator::CameraSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
 
 	m_cObjectSnapOperator.DrawSnapItems(false);
 
-	if (nullptr != m_pcNaviCube) {
-		m_pcNaviCube->Transform();
-	}
+// 	if (nullptr != m_pcNaviCube) {
+// 		m_pcNaviCube->Transform();
+// 	}
 
 	GetView()->Update();
 
@@ -140,7 +146,11 @@ int Operator::CameraSelect::OnRButtonUp(HEventInfo & hevent)
 // Dynamic Highlighting 처리
 int Operator::CameraSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 {
-	m_cObjectSnapOperator.NoButtonDownAndMove(cInEvent);
+	if (HLISTENER_CONSUME_EVENT == m_pcNaviCube->NoButtonDownAndMove(cInEvent)) {
+		return HLISTENER_CONSUME_EVENT;
+	}
+
+	//m_cObjectSnapOperator.NoButtonDownAndMove(cInEvent);
 
 	return HLISTENER_PASS_EVENT;
 }
