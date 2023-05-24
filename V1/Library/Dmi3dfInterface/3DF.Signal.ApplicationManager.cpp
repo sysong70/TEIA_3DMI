@@ -14,6 +14,9 @@
 
 #include <HDB.h>
 
+//:Ken
+#include "3DF/3DF.Facility.Preference.h";
+
 USING_3DF_NAMESPACE
 
 ApplicationManager theApplicationManager;
@@ -34,6 +37,11 @@ void ApplicationManager::ExecuteSignal(Json::Object & cInObject)
 
 		case Signal::Application::Action::OnExitInstance:
 			ExitInstance();
+			break;
+
+		//:Ken
+		case Signal::Application::Action::OnDpiAware:
+			ThePreference.Gui.Session.DpiScale = cInObject.GetReal(SKW_DPISCALE);
 			break;
 
 		default:

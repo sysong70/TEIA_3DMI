@@ -52,8 +52,8 @@
     <Filter Include="3DF\Key\Private">
       <UniqueIdentifier>{b402e2ea-86b4-4b1a-ab07-3dfabf3d5e3a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3DF\Object">
-      <UniqueIdentifier>{e3d119c0-2ae9-4faf-84b6-3c5c9d24ac2f}</UniqueIdentifier>
+    <Filter Include="Control">
+      <UniqueIdentifier>{94caf97e-5866-43e8-8edb-faa6983abdc6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -240,32 +240,23 @@
     <ClInclude Include="3DF\3DF.BaseView.h">
       <Filter>3DF\Base</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\3DF.Facility.GuiSetting.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Facility.KernelSetting.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Facility.FileImportSetting.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Facility.FileExportSetting.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Private\3DF.SearchPrivate.h">
+      <Filter>Control</Filter>
+    </ClInclude>
     <ClInclude Include="3DF\3DF.Search.h">
-      <Filter>3DF\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.Style.h">
-      <Filter>3DF\Key</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.Bounding.h">
-      <Filter>3DF\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.Color.h">
-      <Filter>3DF\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.Database.h">
-      <Filter>3DF\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.h">
-      <Filter>3DF\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.Math.h">
-      <Filter>3DF\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.Point.h">
-      <Filter>3DF\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.KeyPath.h">
-      <Filter>3DF\Key</Filter>
+      <Filter>Control</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -440,11 +431,23 @@
     <ClCompile Include="3DF\3DF.BaseView.cpp">
       <Filter>3DF\Base</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Search.cpp">
-      <Filter>3DF\Control</Filter>
+    <ClCompile Include="3DF\3DF.Facility.GuiSetting.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Facility.KernelSetting.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Facility.FileExportSetting.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Facility.FileImportSetting.cpp">
+      <Filter>Facility</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Private\3DF.SearchPrivate.cpp">
-      <Filter>3DF\Control</Filter>
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Search.cpp">
+      <Filter>Control</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Style.cpp">
       <Filter>3DF\Key</Filter>

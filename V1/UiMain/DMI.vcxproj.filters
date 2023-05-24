@@ -350,9 +350,6 @@
     <Xml Include="TODO.xml">
       <Filter>_Resource</Filter>
     </Xml>
-    <Xml Include="DpiAwareness.xml">
-      <Filter>_Resource</Filter>
-    </Xml>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\DMI.ico">

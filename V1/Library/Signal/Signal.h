@@ -11,6 +11,7 @@
 #define SKW_DELTA			"Delta"
 #define SKW_DESCRIPTION		"Description"
 #define SKW_DOCID			"DocId"
+#define SKW_DPISCALE		"DpiScale"
 #define SKW_EVENT			"Event"
 #define SKW_FILEPATH		"FilePath"
 #define SKW_FLAG			"Flag"
@@ -151,6 +152,7 @@ namespace Signal
 
 			OnInitInstance,
 			OnExitInstance,
+			OnDpiAware,
 		};
 
 		DEFINE_WRAPPER;
@@ -162,6 +164,8 @@ namespace Signal
 		void OnInitInstance();
 
 		void OnExitInstance();
+
+		void OnDpiAware(double scale);
 	};
 
 
@@ -176,6 +180,9 @@ namespace Signal
 		{
 			Unknown = -1,
 
+			OnUpdatePreference,
+			OnUpdateFileOption,
+
 			ShowNotice,
 			ShowProgress,
 			HideProgress,
@@ -184,6 +191,12 @@ namespace Signal
 		DEFINE_WRAPPER;
 
 		void ConstructData(Json::Object& data, Action action);
+
+	public:
+
+		void OnUpdatePreference(const wchar_t* pData);
+
+		void OnUpdateFileOption(const wchar_t* pData);
 
 	public:
 

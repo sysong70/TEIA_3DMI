@@ -19,6 +19,8 @@ namespace TDF
 
 		void SetColor(const char* type, const char* space, double abc[3]);
 
+		TDF::Point TransColor(COLORREF color);
+
 
 
 		namespace Arc
@@ -157,7 +159,11 @@ namespace TDF
 		{
 			void Create(TDF::Point center, const char* value);
 
+			void Create(TDF::Point center, const wchar_t* value);
+
 			void GetExtent(const char* value, float& width, float& height);
+
+			void GetExtent(const wchar_t* value, float& width, float& height);
 		};
 	};
 };

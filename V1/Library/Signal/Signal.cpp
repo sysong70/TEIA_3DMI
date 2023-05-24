@@ -30,6 +30,18 @@ void Signal::Application::OnExitInstance()
 	SendActionDataOnly(Action::OnExitInstance);
 }
 
+
+
+void Signal::Application::OnDpiAware(double scale)
+{
+	Json::Object data;
+	ConstructData(data, Action::OnDpiAware);
+
+	data.SetReal(SKW_DPISCALE, scale);
+
+	Wrapper().SendData(data);
+}
+
 #pragma endregion //:REGION
 
 #pragma region MainFrame Class
@@ -38,6 +50,20 @@ void Signal::MainFrame::ConstructData(Json::Object& data, Action action)
 {
 	data.SetInteger(SKW_TARGET, (int)Target::MainFrame);
 	data.SetInteger(SKW_ACTION, (int)action);
+}
+
+
+
+void Signal::MainFrame::OnUpdatePreference(const wchar_t* pData)
+{
+	DEBUG_STOP;
+}
+
+
+
+void Signal::MainFrame::OnUpdateFileOption(const wchar_t* pData)
+{
+	DEBUG_STOP;
 }
 
 

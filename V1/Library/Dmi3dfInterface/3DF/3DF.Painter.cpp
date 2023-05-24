@@ -37,6 +37,29 @@ namespace TDF
             }
         };
 
+        class FormatW
+        {
+        private:
+
+            CString buffer;
+
+        public:
+
+            FormatW(const wchar_t* format, ...)
+            {
+                va_list ap;
+
+                va_start(ap, format);
+                buffer.FormatV(format, ap);
+                va_end(ap);
+            }
+
+            operator wchar_t const* () const
+            {
+                return buffer;
+            }
+        };
+
 
 
         bool CheckOption(const char* option, ...)
@@ -140,6 +163,17 @@ void TDF::Painter::SetColor(const char* type, const char* space, double abc[3])
     ));
 
     HC_Set_Color_By_Value(type, space, abc[0], abc[1], abc[2]);
+}
+
+TDF::Point TDF::Painter::TransColor(COLORREF color)
+{
+    TDF::Point rgb;
+
+    rgb.x = GetRValue(color) / 255.0;
+    rgb.y = GetGValue(color) / 255.0;
+    rgb.z = GetBValue(color) / 255.0;
+
+    return rgb;
 }
 
 #pragma endregion //:REGION
@@ -662,11 +696,21 @@ void TDF::Painter::Text::Create(TDF::Point center, const char* value)
     ASSERT(key != HC_ERROR_KEY);
 }
 
+void TDF::Painter::Text::Create(TDF::Point center, const wchar_t* value)
+{
+    HC_KEY key = HC_Insert_Text_With_Encoding(center.x, center.y, center.z, "wcs", value);
+}
+
 
 
 void TDF::Painter::Text::GetExtent(const char* value, float& width, float& height)
 {
     HC_Compute_Text_Extent(".", value, &width, &height);
+}
+
+void TDF::Painter::Text::GetExtent(const wchar_t* value, float& width, float& height)
+{
+    HC_Compute_Text_Extent_With_Encoding(".", "utf16", value, &width, &height);
 }
 
 #pragma endregion //:REGION
