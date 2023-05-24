@@ -5,6 +5,7 @@
 #include "Private/3DF.SelectionPrivate.h"
 
 #include "3DF.Window.h"
+#include "3DF.BaseView.h"
 
 #include "3DF.Line.h"
 
@@ -129,8 +130,8 @@ public:
 	WindowKey * GetWindow() { return (WindowKey *)m_pcWindow; }
 	const WindowKey * m_pcWindow = nullptr;
 
-	HBaseView * GetBaseView() { return (HBaseView *)m_pcBaseView; }
-	const HBaseView * m_pcBaseView = nullptr;
+	TDF::BaseView * GetBaseView() { return (TDF::BaseView *)m_pcBaseView; }
+	const TDF::BaseView * m_pcBaseView = nullptr;
 };
 
 TDF::HighlightControl::HighlightControl(WindowKey const & cInWindow)
@@ -171,7 +172,7 @@ HighlightControl & TDF::HighlightControl::operator=(HighlightControl const & cIn
 HighlightControl & TDF::HighlightControl::Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting)
 {
 	HighlightControlPrivate * pcHighlightControlImpl = (HighlightControlPrivate *)m_pcImpl;
-	HBaseView * pcView = pcHighlightControlImpl->GetBaseView();
+	TDF::BaseView * pcView = pcHighlightControlImpl->GetBaseView();
 
 	char chType[MVO_BUFFER_SIZE];
 

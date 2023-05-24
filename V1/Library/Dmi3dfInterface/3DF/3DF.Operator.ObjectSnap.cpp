@@ -1,6 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #include "3DF.Window.h"
+#include "3DF.BaseView.h"
 
 #include "3DF.Line.h"
 #include "3DF.Circle.h"

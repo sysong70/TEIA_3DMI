@@ -5,9 +5,9 @@
 
 #include <hc.h>
 
-class HBaseView;
-
 OPEN_3DF_NAMESPACE
+
+class BaseView;
 
 class WindowKeyPrivate : public PrivateImpl
 {
@@ -17,8 +17,8 @@ public:
 
 	void Copy(WindowKeyPrivate * pcInThat);
 
-	HBaseView * GetBaseView() { return (HBaseView *)m_pcBaseView; }
-	const HBaseView * m_pcBaseView = nullptr;
+	TDF::BaseView * GetBaseView() { return (TDF::BaseView *) m_pcBaseView; }
+	const TDF::BaseView * m_pcBaseView = nullptr;
 
 	int m_nViewId = -1;
 

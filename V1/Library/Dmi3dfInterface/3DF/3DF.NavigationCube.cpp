@@ -97,12 +97,20 @@ NavigationCube::~NavigationCube()
 
 int NavigationCube::LButtonUp(HEventInfo & cInEvent)
 {
-	if (0 == m_cOldHighlightSelection.GetCount()) {
+	WindowPoint cPoint(cInEvent.GetMouseWindowPos());
+
+	SelectionOptionsKit cSelectOption;
+	cSelectOption.SetLevel(Selection::Level::Segment).SetRelatedLimit(0);//.SetProximity(0.001);// SetSorting(Selection::Sorting::ZSorting);
+	
+	SelectionResults cSelection;
+	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cPoint, cSelectOption, cSelection);
+
+	if (0 == cSelection.GetCount()) {
 		return HLISTENER_PASS_EVENT;
 	}
 
 	SegmentKey cSelectKey;
-	if (false == m_cOldHighlightSelection.Front()->ShowSelectedItem(cSelectKey)) {
+	if (false == cSelection.Front()->ShowSelectedItem(cSelectKey)) {
 		return HLISTENER_PASS_EVENT;
 	}
 
@@ -110,7 +118,7 @@ int NavigationCube::LButtonUp(HEventInfo & cInEvent)
 	TRACE(L"%s\n", strName);
 
 	m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
-	// m_cOldHighlightSelection.Reset();
+	m_cOldHighlightSelection.Reset();
 
 	for (int nIndex = 0; nIndex < (int)TDF::ViewMode::Count; nIndex++) {
 		if (m_cSegments[nIndex] == cSelectKey) {
@@ -127,66 +135,16 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 	char chPathName[MVO_BUFFER_SIZE] = "\n";
 	HC_Show_Segment(m_pView->GetSceneKey(), chPathName);
 
-	Point cInnerPoint;
-
-	KeyPath cKeyPath(chPathName);
-	//cKeyPath.PushBack(m_cubeSegment);
-
 	WindowPoint cPoint(cInEvent.GetMouseWindowPos());
 
-	bool bConvertFlag = cKeyPath.ConvertCoordinate(Coordinate::Space::Window, cPoint, Coordinate::Space::ScreenRange, cInnerPoint);
-
 	SelectionOptionsKit cSelectOption;
-	cSelectOption.SetLevel(Selection::Level::Segment).SetRelatedLimit(0).SetProximity(0.001);// SetSorting(Selection::Sorting::ZSorting);
-	//cSelectOption.SetScope(m_cubeSegment);
-
-	WindowPoint cWindowPoint = cInEvent.GetMouseWindowPos();
-
-	cInnerPoint = cPoint;
-
-/*
-	HC_Open_Segment_By_Key(m_cubeSegment); {
-		HC_Set_Rendering_Options("attribute lock=(selectability)");
-		
-		HC_Set_Selectability("geometry = on");
-		
-		int res = HC_Compute_Selection(m_pView->GetDriverPath(), ".", "v, selection level = entity, no related selection limit, visual selection = off", cInnerPoint.x, cInnerPoint.y);
-		//int res = HC_Compute_Selection(m_pView->GetDriverPath(), ".", "v, selection level = entity, no related selection limit, visual selection = off", cInnerPoint.x, cInnerPoint.y);
-		
-		HC_Set_Selectability("everything = off");
-
-		if (res) {
-			int i = 0;
-		}
-
-	} HC_Close_Segment();
-
-
-	HC_Open_Segment_By_Key(m_cubeSegment);
-		HC_Set_Rendering_Options("attribute lock=(selectability)");
-// 		SegmentKey cCubeSegment(m_cubeSegment);
-// 		InnerWindowPoint cInnerPoint(cCubeSegment, cWindowPoint);
-
-		HC_Set_Selectability("geometry = on");
-
-		const char * chDriverPath = m_pView->GetDriverPath();
-
-		int res = HC_Compute_Selection(m_pView->GetDriverPath(), ".", "v, selection level = entity, no related selection limit, visual selection = off", cInnerPoint.x, cInnerPoint.y);
-
-		HC_Set_Selectability("everything = off");
-
-		if (res) {
-			int i = 0;
-		}
-
-	HC_Close_Segment();
-*/
+	cSelectOption.SetLevel(Selection::Level::Segment).SetRelatedLimit(0);//.SetProximity(0.001);// SetSorting(Selection::Sorting::ZSorting);
 
 	int nEvent = HLISTENER_PASS_EVENT;
 	bool bUpdateFlag = false;
 
 	SelectionResults cSelection;
-	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cInnerPoint, cSelectOption, cSelection);
+	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cPoint, cSelectOption, cSelection);
 
 	// 선택된 요소가 없은 경우
 	if (0 == nSelectedCount) {
@@ -478,32 +436,32 @@ void NavigationCube::CreateCube()
 
 	// Edges - n: negative, p: positive
 
-	m_cSegments[(int)TDF::ViewMode::py_nz]		= CreateEdgeShell("py-nz", { 0, plane, -plane }, { 0, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::py_pz]		= CreateEdgeShell("py-pz", { 0, plane, plane }, { 90, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::ny_pz]		= CreateEdgeShell("ny-pz", { 0, -plane, plane }, { 180, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::ny_nz]		= CreateEdgeShell("ny-nz", { 0, -plane, -plane }, { 270, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::py_nz]		= CreateEdgeShell("py_nz", { 0, plane, -plane }, { 0, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::py_pz]		= CreateEdgeShell("py_pz", { 0, plane, plane }, { 90, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::ny_pz]		= CreateEdgeShell("ny_pz", { 0, -plane, plane }, { 180, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::ny_nz]		= CreateEdgeShell("ny_nz", { 0, -plane, -plane }, { 270, 0, 0 });
 
-	m_cSegments[(int)TDF::ViewMode::nx_nz]		= CreateEdgeShell("nx-nz", { -plane, 0, -plane }, { 0, 0, 90 });
-	m_cSegments[(int)TDF::ViewMode::nx_pz]		= CreateEdgeShell("nx-pz", { -plane, 0, plane }, { 90, 0, 90 });
-	m_cSegments[(int)TDF::ViewMode::px_pz]		= CreateEdgeShell("px-pz", { plane, 0, plane }, { 180, 0, 90 });
-	m_cSegments[(int)TDF::ViewMode::px_nz]		= CreateEdgeShell("px-nz", { plane, 0, -plane }, { 270, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::nx_nz]		= CreateEdgeShell("nx_nz", { -plane, 0, -plane }, { 0, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::nx_pz]		= CreateEdgeShell("nx_pz", { -plane, 0, plane }, { 90, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::px_pz]		= CreateEdgeShell("px_pz", { plane, 0, plane }, { 180, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::px_nz]		= CreateEdgeShell("px_nz", { plane, 0, -plane }, { 270, 0, 90 });
 
-	m_cSegments[(int)TDF::ViewMode::nx_py]		= CreateEdgeShell("nx-py", { -plane, plane, 0 }, { 0, 90, 0 });
-	m_cSegments[(int)TDF::ViewMode::px_py]		= CreateEdgeShell("px-py", { plane, plane, 0 }, { 90, 90, 0 });
-	m_cSegments[(int)TDF::ViewMode::px_ny]		= CreateEdgeShell("px-ny", { plane, -plane, 0 }, { 180, 90, 0 });
-	m_cSegments[(int)TDF::ViewMode::nx_ny]		= CreateEdgeShell("nx-ny", { -plane, -plane, 0 }, { 270, 90, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_py]		= CreateEdgeShell("nx_py", { -plane, plane, 0 }, { 0, 90, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_py]		= CreateEdgeShell("px_py", { plane, plane, 0 }, { 90, 90, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_ny]		= CreateEdgeShell("px_ny", { plane, -plane, 0 }, { 180, 90, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_ny]		= CreateEdgeShell("nx_ny", { -plane, -plane, 0 }, { 270, 90, 0 });
 
 	// Corners - n: negative, p: positive
 
-	m_cSegments[(int)TDF::ViewMode::nx_py_nz]	= CreateCornerShell("nx-py-nz", { -plane, plane, -plane }, { 0, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::nx_py_pz]	= CreateCornerShell("nx-py-pz", { -plane, plane, plane }, { 90, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::nx_ny_pz]	= CreateCornerShell("nx-ny-pz", { -plane, -plane, plane }, { 180, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::nx_ny_nz]	= CreateCornerShell("nx-ny-nz", { -plane, -plane, -plane }, { 270, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_py_nz]	= CreateCornerShell("nx_py_nz", { -plane, plane, -plane }, { 0, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_py_pz]	= CreateCornerShell("nx_py_pz", { -plane, plane, plane }, { 90, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_ny_pz]	= CreateCornerShell("nx_ny_pz", { -plane, -plane, plane }, { 180, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_ny_nz]	= CreateCornerShell("nx_ny_nz", { -plane, -plane, -plane }, { 270, 0, 0 });
 
-	m_cSegments[(int)TDF::ViewMode::px_py_pz]	= CreateCornerShell("px-py-pz", { plane, plane, plane }, { 0, 180, 0 });
-	m_cSegments[(int)TDF::ViewMode::px_py_nz]	= CreateCornerShell("px-py-nz", { plane, plane, -plane }, { 90, 180, 0 });
-	m_cSegments[(int)TDF::ViewMode::px_ny_nz]	= CreateCornerShell("px-ny-nz", { plane, -plane, -plane }, { 180, 180, 0 });
-	m_cSegments[(int)TDF::ViewMode::px_ny_pz]	= CreateCornerShell("px-ny-pz", { plane, -plane, plane }, { 270, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_py_pz]	= CreateCornerShell("px_py_pz", { plane, plane, plane }, { 0, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_py_nz]	= CreateCornerShell("px_py_nz", { plane, plane, -plane }, { 90, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_ny_nz]	= CreateCornerShell("px_ny_nz", { plane, -plane, -plane }, { 180, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_ny_pz]	= CreateCornerShell("px_ny_pz", { plane, -plane, plane }, { 270, 180, 0 });
 }
 
 

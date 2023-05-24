@@ -278,8 +278,6 @@ void Canvas::Init()
 
 	SetTransparency();
 
-	m_pcBaseView->SetViewMode(TDF::ViewMode::px_py_pz);		// fit the camera to the scene extents
-
 	m_pcBaseView->SetAxisMode(m_cPreference.General.Rendering.DisplayAxisTriad ? AxisOn : AxisOff);
 
 	// 배경화면 설정

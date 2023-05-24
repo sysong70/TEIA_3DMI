@@ -43,7 +43,8 @@ enum class ViewMode
 	px_ny_nz,
 	px_ny_pz,
 
-	Count
+	Count,
+	Unknown
 };
 
 class BaseView : public HBaseView
@@ -61,7 +62,7 @@ public:
 
 	void UpdateInternal(bool antialias = false, bool force_update = false) override;
 
-	void SetViewMode(TDF::ViewMode mode, bool invert = false, bool fitWorld = true);
+	void SetViewMode(TDF::ViewMode mode, bool bFitWorld = true);
 
 public:
 	void SetNavigationCube(NavigationCube * pcNaviCube);
@@ -71,7 +72,7 @@ public:
 private:
 	NavigationCube * m_pcNaviCube = nullptr;
 
-	TDF::ViewMode m_eViewMode;
+	TDF::ViewMode m_eViewMode = TDF::ViewMode::Unknown;
 };
 
 CLOSE_3DF_NAMESPACE

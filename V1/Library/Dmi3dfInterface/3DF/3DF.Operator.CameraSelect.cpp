@@ -173,6 +173,7 @@ int Operator::CameraSelect::HOpCameraOrbit_OnLButtonDownAndMove(HEventInfo & eve
 
 	m_bSingleClick = false;
 	GetView()->SetViewMode(HViewUnknown);
+	m_pcWindow->GetBaseView()->SetViewMode(TDF::ViewMode::Unknown);
 
 	// read mouse position
 	SetNewPoint(event.GetMouseWindowPos());
@@ -322,9 +323,11 @@ int Operator::CameraSelect::HOpCameraPan_OnLButtonDown(HEventInfo & event)
 
 int Operator::CameraSelect::HOpCameraPan_OnLButtonDownAndMove(HEventInfo & event)
 {
-
-	if (!OperatorStarted())
+	if (!OperatorStarted()) {
 		return HBaseOperator::OnLButtonDownAndMove(event);
+	}
+
+	m_pcWindow->GetBaseView()->SetViewMode(TDF::ViewMode::Unknown);
 
 	SetNewPoint(event.GetMouseWorldPos());
 
@@ -394,8 +397,11 @@ int Operator::CameraSelect::HBaseView_OnMouseWheel(HEventInfo & event, bool bUdp
 {
 	float zDelta = static_cast<float>(event.GetMouseWheelDelta() / m_pcWindow->GetBaseView()->GetMouseWheelSensitivity() / 120.0 / 8.0);
 
-	if (m_pcWindow->GetBaseView()->GetInvertMouseWheelZoom())
+	if (m_pcWindow->GetBaseView()->GetInvertMouseWheelZoom()) {
 		zDelta *= -1;
+	}
+
+	m_pcWindow->GetBaseView()->SetViewMode(TDF::ViewMode::Unknown);
 
 	HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetSceneKey());
 

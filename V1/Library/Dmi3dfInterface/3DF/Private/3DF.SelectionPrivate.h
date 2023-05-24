@@ -20,6 +20,7 @@
 OPEN_3DF_NAMESPACE
 
 class WindowKey;
+class BaseView;
 
 class SelectionOptionsKitPrivate : public PrivateImpl
 {
@@ -76,8 +77,8 @@ public:
 		m_pcBaseView = pcInThat->m_pcBaseView;
 	}
 
-	HBaseView * GetBaseView() { return (HBaseView *)m_pcBaseView; }
-	const HBaseView * m_pcBaseView = nullptr;
+	TDF::BaseView * GetBaseView() { return (TDF::BaseView *)m_pcBaseView; }
+	const TDF::BaseView * m_pcBaseView = nullptr;
 };
 
 class SelectionItemPrivate : public PrivateImpl
