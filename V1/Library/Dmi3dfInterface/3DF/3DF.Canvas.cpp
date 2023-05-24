@@ -277,8 +277,7 @@ void Canvas::Init()
 
 	SetTransparency();
 
-	m_pcBaseView->SetViewMode(HViewIsoFrontRightTop);		// fit the camera to the scene extents
-	m_pcBaseView->SetAxisMode(TheKenelSetting.General.Rendering.DisplayAxisTriad ? AxisOn : AxisOff);
+	//m_pcBaseView->SetAxisMode(TheKenelSetting.General.Rendering.DisplayAxisTriad ? AxisOn : AxisOff);
 
 	// 배경화면 설정
 	SetWindowBackGroundColor(TheKenelSetting.Appearance.BackgroundColor.Top, TheKenelSetting.Appearance.BackgroundColor.Bottom);

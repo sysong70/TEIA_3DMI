@@ -150,7 +150,7 @@ int Operator::CameraSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 		return HLISTENER_CONSUME_EVENT;
 	}
 
-	//m_cObjectSnapOperator.NoButtonDownAndMove(cInEvent);
+	m_cObjectSnapOperator.NoButtonDownAndMove(cInEvent);
 
 	return HLISTENER_PASS_EVENT;
 }

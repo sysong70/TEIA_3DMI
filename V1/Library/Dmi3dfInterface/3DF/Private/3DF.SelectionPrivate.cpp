@@ -94,8 +94,6 @@ size_t TDF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, Se
 	HSelectionSet * pcSelection = GetBaseView()->GetSelection();
 
 	// 선택 옵션에 따라 선택 작업 실시
-
-
 /*
 	HC_Open_Segment_By_Key(GetBaseView()->GetViewKey()); {
 		nResult = HC_Compute_Selection(".", "", chAction, cInLocation.x, cInLocation.y);

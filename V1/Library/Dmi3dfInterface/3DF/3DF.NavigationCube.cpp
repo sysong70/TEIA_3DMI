@@ -132,9 +132,6 @@ int NavigationCube::LButtonUp(HEventInfo & cInEvent)
 
 int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 {
-	char chPathName[MVO_BUFFER_SIZE] = "\n";
-	HC_Show_Segment(m_pView->GetSceneKey(), chPathName);
-
 	WindowPoint cPoint(cInEvent.GetMouseWindowPos());
 
 	SelectionOptionsKit cSelectOption;
@@ -175,13 +172,13 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 				HighlightOptionsKit cHighlightOptions;
 				m_pcWindow->GetHighlightControl().Highlight(cSelection, cHighlightOptions, true);
 				m_cOldHighlightSelection = cSelection;
+				nEvent = HLISTENER_CONSUME_EVENT;
 			}
 			else {
 				m_cOldHighlightSelection.Reset();
 			}
 
 			bUpdateFlag = true;
-			nEvent = HLISTENER_CONSUME_EVENT;
 		}
 	}
 
