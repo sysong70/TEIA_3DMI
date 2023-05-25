@@ -101,7 +101,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../Library/Common;../Library/Signal</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;../Library/Common;../Library/Signal;../Library/Facility</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -141,7 +141,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../Library/Common;../Library/Signal</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./;../Library/Common;../Library/Signal;../Library/Facility</AdditionalIncludeDirectories>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -171,6 +171,7 @@
     <ClInclude Include="..\Library\Common\Json.h" />
     <ClInclude Include="..\Library\Common\Path.h" />
     <ClInclude Include="..\Library\Common\WStr.h" />
+    <ClInclude Include="..\Library\Facility\Facility.Base.h" />
     <ClInclude Include="..\Library\Signal\Signal.h" />
     <ClInclude Include="Command.Common.h" />
     <ClInclude Include="Control.CheckListBox.h" />
@@ -199,7 +200,6 @@
     <ClInclude Include="Connector.h" />
     <ClInclude Include="Facility.AppResources.h" />
     <ClInclude Include="Facility.AppSettings.h" />
-    <ClInclude Include="Facility.Base.h" />
     <ClInclude Include="Facility.ImportOption.h" />
     <ClInclude Include="Facility.h" />
     <ClInclude Include="Facility.Preference.h" />
@@ -232,6 +232,7 @@
     <ClCompile Include="..\Library\Common\Json.cpp" />
     <ClCompile Include="..\Library\Common\Path.cpp" />
     <ClCompile Include="..\Library\Common\WStr.cpp" />
+    <ClCompile Include="..\Library\Facility\Facility.Base.cpp" />
     <ClCompile Include="..\Library\Signal\Signal.cpp" />
     <ClCompile Include="Control.CheckListBox.cpp" />
     <ClCompile Include="Control.cpp" />
@@ -259,7 +260,6 @@
     <ClCompile Include="Connector.cpp" />
     <ClCompile Include="Facility.AppResources.cpp" />
     <ClCompile Include="Facility.AppSettings.cpp" />
-    <ClCompile Include="Facility.Base.cpp" />
     <ClCompile Include="Facility.cpp" />
     <ClCompile Include="Facility.ImportOption.cpp" />
     <ClCompile Include="Facility.Preference.cpp" />
@@ -297,7 +297,6 @@
     <None Include="RES\DMI.rc2" />
     <None Include="RES\DMI_ENU.rc2" />
     <None Include="RES\DMI_KOR.rc2" />
-    <None Include="RES\FileOptions.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="RES\UI.json" />

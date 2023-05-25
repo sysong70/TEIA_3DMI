@@ -81,8 +81,6 @@ void Control::PropList::InitializeData(Json::Object& data)
 {
 	m_pData = &data;
 
-	return;
-
 	for (int i = 0; i < GetPropertyCount(); i++) {
 		CBCGPProp* pProp = GetProperty(i);
 		CString* pName = reinterpret_cast<CString*>(pProp->GetData());

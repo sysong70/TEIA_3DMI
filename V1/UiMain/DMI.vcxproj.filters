@@ -7,9 +7,6 @@
     <ClCompile Include="Facility.AppSettings.cpp">
       <Filter>Facility</Filter>
     </ClCompile>
-    <ClCompile Include="Facility.Base.cpp">
-      <Filter>Facility</Filter>
-    </ClCompile>
     <ClCompile Include="Facility.ImportOption.cpp">
       <Filter>Facility</Filter>
     </ClCompile>
@@ -166,6 +163,9 @@
     <ClCompile Include="Component.InputBar.cpp">
       <Filter>Component\View</Filter>
     </ClCompile>
+    <ClCompile Include="..\Library\Facility\Facility.Base.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.Common.h">
@@ -178,9 +178,6 @@
       <Filter>Facility</Filter>
     </ClInclude>
     <ClInclude Include="Facility.AppSettings.h">
-      <Filter>Facility</Filter>
-    </ClInclude>
-    <ClInclude Include="Facility.Base.h">
       <Filter>Facility</Filter>
     </ClInclude>
     <ClInclude Include="Facility.ImportOption.h">
@@ -345,6 +342,9 @@
     <ClInclude Include="Component.InputBar.h">
       <Filter>Component\View</Filter>
     </ClInclude>
+    <ClInclude Include="..\Library\Facility\Facility.Base.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="TODO.xml">
@@ -361,9 +361,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="RES\UI.json">
-      <Filter>_Resource</Filter>
-    </None>
-    <None Include="RES\FileOptions.json">
       <Filter>_Resource</Filter>
     </None>
     <None Include="RES\DMI_ENU.rc2">

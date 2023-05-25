@@ -17,14 +17,14 @@ Facility::KernelSetting::~KernelSetting()
 
 Json::Object* Facility::KernelSetting::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::Set(Json::Object* pcData)
+bool Facility::KernelSetting::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		return false;
 	}
 
@@ -35,19 +35,19 @@ bool Facility::KernelSetting::Set(Json::Object* pcData)
 
 Json::Object* Facility::KernelSetting::GENERAL::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetObjectValue(Display);
 	GetObjectValue(Transparency);
 	GetObjectValue(Rendering);
 	GetObjectValue(Etc);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::GENERAL::Set(Json::Object* pcData)
+bool Facility::KernelSetting::GENERAL::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -63,7 +63,7 @@ bool Facility::KernelSetting::GENERAL::Set(Json::Object* pcData)
 
 Json::Object* Facility::KernelSetting::GENERAL::DISPLAY::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetStringValue(Driver);
 	GetStringValue(Gpu);
@@ -72,12 +72,12 @@ Json::Object* Facility::KernelSetting::GENERAL::DISPLAY::Get()
 	GetBooleanValue(DoubleBuffer);
 	GetBooleanValue(StereoMode);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::GENERAL::DISPLAY::Set(Json::Object* pcData)
+bool Facility::KernelSetting::GENERAL::DISPLAY::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -95,7 +95,7 @@ bool Facility::KernelSetting::GENERAL::DISPLAY::Set(Json::Object* pcData)
 
 Json::Object* Facility::KernelSetting::GENERAL::TRANSPARENCY::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetStringValue(Style);
 	GetStringValue(Sorting);
@@ -103,12 +103,12 @@ Json::Object* Facility::KernelSetting::GENERAL::TRANSPARENCY::Get()
 	GetBooleanValue(PixelOIT);
 	GetBooleanValue(DepthWriting);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::GENERAL::TRANSPARENCY::Set(Json::Object* pcData)
+bool Facility::KernelSetting::GENERAL::TRANSPARENCY::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -125,16 +125,16 @@ bool Facility::KernelSetting::GENERAL::TRANSPARENCY::Set(Json::Object* pcData)
 
 Json::Object* Facility::KernelSetting::GENERAL::RENDERING::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetBooleanValue(DisplayAxisTriad);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::GENERAL::RENDERING::Set(Json::Object* pcData)
+bool Facility::KernelSetting::GENERAL::RENDERING::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -147,16 +147,16 @@ bool Facility::KernelSetting::GENERAL::RENDERING::Set(Json::Object* pcData)
 
 Json::Object* Facility::KernelSetting::GENERAL::ETC::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetBooleanValue(BackplaneCulling);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::GENERAL::ETC::Set(Json::Object* pcData)
+bool Facility::KernelSetting::GENERAL::ETC::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -171,17 +171,17 @@ bool Facility::KernelSetting::GENERAL::ETC::Set(Json::Object* pcData)
 
 Json::Object* Facility::KernelSetting::PERFORMANCE::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetObjectValue(Optimization);
 	GetObjectValue(FramerateOptimization);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::PERFORMANCE::Set(Json::Object* pcData)
+bool Facility::KernelSetting::PERFORMANCE::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -195,7 +195,7 @@ bool Facility::KernelSetting::PERFORMANCE::Set(Json::Object* pcData)
 
 Json::Object* Facility::KernelSetting::PERFORMANCE::OPTIMIZATION::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetEnumValue(HiddenLineMode);
 	GetBooleanValue(StaticModel);
@@ -203,12 +203,12 @@ Json::Object* Facility::KernelSetting::PERFORMANCE::OPTIMIZATION::Get()
 	GetBooleanValue(OcclusionCulling);
 	GetIntegerValue(OcclusionThreshold);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::PERFORMANCE::OPTIMIZATION::Set(Json::Object* pcData)
+bool Facility::KernelSetting::PERFORMANCE::OPTIMIZATION::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -225,7 +225,7 @@ bool Facility::KernelSetting::PERFORMANCE::OPTIMIZATION::Set(Json::Object* pcDat
 
 Json::Object* Facility::KernelSetting::PERFORMANCE::FRAMERATE_OPTIMIZATION::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetBooleanValue(UseFramerate);
 	GetEnumValue(CurrentFramerateMode);
@@ -236,12 +236,12 @@ Json::Object* Facility::KernelSetting::PERFORMANCE::FRAMERATE_OPTIMIZATION::Get(
 	GetIntegerValue(CullingThresholdSet);
 	GetIntegerValue(CullingThreshold);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::PERFORMANCE::FRAMERATE_OPTIMIZATION::Set(Json::Object* pcData)
+bool Facility::KernelSetting::PERFORMANCE::FRAMERATE_OPTIMIZATION::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -263,17 +263,17 @@ bool Facility::KernelSetting::PERFORMANCE::FRAMERATE_OPTIMIZATION::Set(Json::Obj
 
 Json::Object* Facility::KernelSetting::INTERACTION::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetObjectValue(Animation);
 	GetObjectValue(GeometryManipulation);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::INTERACTION::Set(Json::Object* pcData)
+bool Facility::KernelSetting::INTERACTION::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -287,18 +287,18 @@ bool Facility::KernelSetting::INTERACTION::Set(Json::Object* pcData)
 
 Json::Object* Facility::KernelSetting::INTERACTION::GEOMETRY_MANIPULATION::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetBooleanValue(Spriting);
 	GetBooleanValue(UpdateCutGeometry);
 	GetBooleanValue(UpdateShadows);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::INTERACTION::GEOMETRY_MANIPULATION::Set(Json::Object* pcData)
+bool Facility::KernelSetting::INTERACTION::GEOMETRY_MANIPULATION::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -313,16 +313,16 @@ bool Facility::KernelSetting::INTERACTION::GEOMETRY_MANIPULATION::Set(Json::Obje
 
 Json::Object* Facility::KernelSetting::INTERACTION::ANIMATION::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetBooleanValue(UpdateCamera);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::INTERACTION::ANIMATION::Set(Json::Object* pcData)
+bool Facility::KernelSetting::INTERACTION::ANIMATION::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -337,17 +337,17 @@ bool Facility::KernelSetting::INTERACTION::ANIMATION::Set(Json::Object* pcData)
 
 Json::Object* Facility::KernelSetting::APPEARANCE::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetObjectValue(AntiAliasing);
 	GetObjectValue(BackgroundColor);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::APPEARANCE::Set(Json::Object* pcData)
+bool Facility::KernelSetting::APPEARANCE::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -361,19 +361,19 @@ bool Facility::KernelSetting::APPEARANCE::Set(Json::Object* pcData)
 
 Json::Object* Facility::KernelSetting::APPEARANCE::ANTIALIASING::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetBooleanValue(Use);
 	GetBooleanValue(Line);
 	GetBooleanValue(Text);
 	GetIntegerValue(Level);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::APPEARANCE::ANTIALIASING::Set(Json::Object* pcData)
+bool Facility::KernelSetting::APPEARANCE::ANTIALIASING::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -389,17 +389,17 @@ bool Facility::KernelSetting::APPEARANCE::ANTIALIASING::Set(Json::Object* pcData
 
 Json::Object* Facility::KernelSetting::APPEARANCE::BACKGROUND_COLOR::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetIntegerValue(Top);
 	GetIntegerValue(Bottom);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::APPEARANCE::BACKGROUND_COLOR::Set(Json::Object* pcData)
+bool Facility::KernelSetting::APPEARANCE::BACKGROUND_COLOR::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -415,17 +415,17 @@ bool Facility::KernelSetting::APPEARANCE::BACKGROUND_COLOR::Set(Json::Object* pc
 
 Json::Object* Facility::KernelSetting::SELECTIION::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetObjectValue(Behavior);
 	GetObjectValue(Highlight);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::SELECTIION::Set(Json::Object* pcData)
+bool Facility::KernelSetting::SELECTIION::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -439,7 +439,7 @@ bool Facility::KernelSetting::SELECTIION::Set(Json::Object* pcData)
 
 Json::Object* Facility::KernelSetting::SELECTIION::BEHAVIOR::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetBooleanValue(VisibilitySelection);
 	GetBooleanValue(DynamicHighlighting);
@@ -448,12 +448,12 @@ Json::Object* Facility::KernelSetting::SELECTIION::BEHAVIOR::Get()
 	GetBooleanValue(UseSelectBox);
 	GetBooleanValue(RespectCulling);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::SELECTIION::BEHAVIOR::Set(Json::Object* pcData)
+bool Facility::KernelSetting::SELECTIION::BEHAVIOR::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -471,16 +471,16 @@ bool Facility::KernelSetting::SELECTIION::BEHAVIOR::Set(Json::Object* pcData)
 
 Json::Object* Facility::KernelSetting::SELECTIION::HIGHLIGHT::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetStringValue(QuickMovesType);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::SELECTIION::HIGHLIGHT::Set(Json::Object* pcData)
+bool Facility::KernelSetting::SELECTIION::HIGHLIGHT::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -495,17 +495,17 @@ bool Facility::KernelSetting::SELECTIION::HIGHLIGHT::Set(Json::Object* pcData)
 
 Json::Object* Facility::KernelSetting::LIGHTING::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetObjectValue(Bloom);
 	GetObjectValue(Light);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::LIGHTING::Set(Json::Object* pcData)
+bool Facility::KernelSetting::LIGHTING::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -519,19 +519,19 @@ bool Facility::KernelSetting::LIGHTING::Set(Json::Object* pcData)
 
 Json::Object* Facility::KernelSetting::LIGHTING::BLOOM::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetBooleanValue(Use);
 	GetRealValue(Strength);
 	GetIntegerValue(Blur);
 	GetEnumValue(Shape);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::LIGHTING::BLOOM::Set(Json::Object* pcData)
+bool Facility::KernelSetting::LIGHTING::BLOOM::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -547,18 +547,18 @@ bool Facility::KernelSetting::LIGHTING::BLOOM::Set(Json::Object* pcData)
 
 Json::Object* Facility::KernelSetting::LIGHTING::LIGHT::Get()
 {
-	Json::Object* pcData = new Json::Object();
+	Json::Object* pData = new Json::Object();
 
 	GetBooleanValue(FollowsCamera);
 	GetBooleanValue(Scaling);
 	GetIntegerValue(ScaleFactor);
 
-	return pcData;
+	return pData;
 }
 
-bool Facility::KernelSetting::LIGHTING::LIGHT::Set(Json::Object* pcData)
+bool Facility::KernelSetting::LIGHTING::LIGHT::Set(Json::Object* pData)
 {
-	if (pcData == nullptr) {
+	if (pData == nullptr) {
 		RETURN_FALSE;
 	}
 

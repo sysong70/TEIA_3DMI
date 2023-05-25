@@ -30,7 +30,7 @@
 
 
 #include "3DF.Painter.h"
-#include "3DF.Facility.Preference.h";
+#include "3DF.Facility.Preference.h"
 
 USING_3DF_NAMESPACE
 

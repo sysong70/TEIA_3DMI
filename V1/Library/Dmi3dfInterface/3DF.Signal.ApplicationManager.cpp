@@ -15,7 +15,7 @@
 #include <HDB.h>
 
 //:Ken
-#include "3DF/3DF.Facility.Preference.h";
+#include "3DF/3DF.Facility.Preference.h"
 
 USING_3DF_NAMESPACE
 

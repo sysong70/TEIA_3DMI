@@ -152,9 +152,11 @@ void Dialog::AppSettings::OnInitialize()
 	int index = m_tabs.GetActiveTab();
 	if (index == 0) {
 		m_preferences.Data = m_preferences.DataResource;
+		m_preferencesUi.RefreshData();
 	}
 	else {
 		m_fileOptions.Data = m_fileOptions.DataResource;
+		m_fileOptionsUi.RefreshData();
 	}
 }
 
@@ -165,9 +167,11 @@ void Dialog::AppSettings::OnReset()
 	int index = m_tabs.GetActiveTab();
 	if (index == 0) {
 		m_preferences.Data = m_preferences.DataLocal;
+		m_preferencesUi.RefreshData();
 	}
 	else {
 		m_fileOptions.Data = m_fileOptions.DataLocal;
+		m_fileOptionsUi.RefreshData();
 	}
 }
 

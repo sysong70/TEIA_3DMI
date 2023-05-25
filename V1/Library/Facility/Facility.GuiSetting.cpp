@@ -1,9 +1,6 @@
 ﻿#include "stdafx.h"
-
-#include "3DF.Facility.GuiSetting.h"
+#include "Facility.GuiSetting.h"
 #include "WStr.h"
-
-USING_3DF_NAMESPACE
 
 
 

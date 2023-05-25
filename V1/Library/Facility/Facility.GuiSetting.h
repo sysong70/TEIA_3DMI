@@ -1,11 +1,19 @@
 ﻿#pragma once
 
-#include "3DF.Facility.Base.h"
+#include "Base.h"
 
-OPEN_3DF_NAMESPACE
+
 
 namespace Facility
 {
+	enum class ELanguage
+	{
+		English = 0,
+		Korean,
+	};
+
+
+
 	class GuiSetting : public Base
 	{
 	public:
@@ -33,7 +41,6 @@ namespace Facility
 			const char* FontName();
 			double FontSize = 9;
 			ELanguage Language = ELanguage::English;
-			//ELanguage Language = ELanguage::Korean;
 
 			CString Local(CString source);
 		}
@@ -50,11 +57,11 @@ namespace Facility
 		{
 			const char* FontName = "franklin gothic book";
 			double FontSize = 9.5;
+			// 100 ~ 500, interval 100
+			int CubeSize = 200;
 			bool ShowAxis = true;
 			bool ShowCube = true;
 		}
 		NavCube;
 	};
 }
-
-CLOSE_3DF_NAMESPACE
