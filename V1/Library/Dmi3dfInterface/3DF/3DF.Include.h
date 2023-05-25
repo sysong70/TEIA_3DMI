@@ -12,6 +12,10 @@ public:
 
 	void Set(IncludeKey const & cInThat);
 	IncludeKey & operator = (IncludeKey const & cInThat);
+
+	TDF::Type ObjectType() const { return TDF::Type::IncludeKey; };
+
+	SegmentKey GetTarget() const;
 };
 
 CLOSE_3DF_NAMESPACE

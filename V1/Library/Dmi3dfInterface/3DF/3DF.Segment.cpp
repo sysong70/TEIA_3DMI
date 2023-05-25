@@ -23,7 +23,7 @@
 
 USING_3DF_NAMESPACE
 
-SegmentKey::SegmentKey(CString strInName)
+TDF::SegmentKey::SegmentKey(CString strInName)
 {
 	HC_KEY nKey = INVALID_KEY;
 
@@ -40,7 +40,7 @@ SegmentKey::SegmentKey(CString strInName)
 	m_pcImpl = pcImpl;
 }
 
-SegmentKey::SegmentKey(HC_KEY nInKey)
+TDF::SegmentKey::SegmentKey(HC_KEY nInKey)
 {
 	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
 	pcImpl->SetKeyValue(nInKey);
@@ -48,7 +48,7 @@ SegmentKey::SegmentKey(HC_KEY nInKey)
 	m_pcImpl = pcImpl;
 }
 
-SegmentKey::SegmentKey(SegmentKey const & cInThat)
+TDF::SegmentKey::SegmentKey(SegmentKey const & cInThat)
 {
 	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
 	m_pcImpl = pcImpl;
@@ -56,11 +56,11 @@ SegmentKey::SegmentKey(SegmentKey const & cInThat)
 	Set(cInThat);
 }
 
-SegmentKey::~SegmentKey()
+TDF::SegmentKey::~SegmentKey()
 {
 }
 
-void SegmentKey::Set(SegmentKey const & cInThat)
+void TDF::SegmentKey::Set(SegmentKey const & cInThat)
 {
 	Key::Set(cInThat);
 
@@ -70,7 +70,7 @@ void SegmentKey::Set(SegmentKey const & cInThat)
 	pcImpl->Copy(pcInThatImpl);
 }
 
-SegmentKey & SegmentKey::operator = (SegmentKey const & cInThat)
+SegmentKey & TDF::SegmentKey::operator = (SegmentKey const & cInThat)
 {
 	Key::Set(cInThat);
 
@@ -83,32 +83,32 @@ SegmentKey & SegmentKey::operator = (SegmentKey const & cInThat)
 //== Segment 관련 함수 ===============================================================================
 
 /*
-void SegmentKey::Open()
+void TDF::SegmentKey::Open()
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
 	pcImpl->LocalOpen();
 }
 
-void SegmentKey::Open() const
+void TDF::SegmentKey::Open() const
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
 	pcImpl->LocalOpen();
 }
 
-void SegmentKey::Close()
+void TDF::SegmentKey::Close()
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
 	pcImpl->LocalClose();
 }
 
-void SegmentKey::Close() const
+void TDF::SegmentKey::Close() const
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
 	pcImpl->LocalClose();
 }
 */
 
-SegmentKey & SegmentKey::Open()
+SegmentKey & TDF::SegmentKey::Open()
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
 	pcImpl->Open();
@@ -116,7 +116,7 @@ SegmentKey & SegmentKey::Open()
 	return *this;
 }
 
-SegmentKey & SegmentKey::Close()
+SegmentKey & TDF::SegmentKey::Close()
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
 	pcImpl->Close();
@@ -124,7 +124,7 @@ SegmentKey & SegmentKey::Close()
 	return *this;
 }
 
-CString SegmentKey::Name() const
+CString TDF::SegmentKey::Name() const
 {
 	CString strOutName;
 
@@ -139,7 +139,7 @@ CString SegmentKey::Name() const
 	return strOutName;
 }
 
-SegmentKey & SegmentKey::SetName(CString strInName)
+SegmentKey & TDF::SegmentKey::SetName(CString strInName)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Rename_Segment(".", H_ASCII_TEXT(strInName));
@@ -149,7 +149,7 @@ SegmentKey & SegmentKey::SetName(CString strInName)
 }
 
 //== Sub Segment 관련 함수 ===========================================================================
-SegmentKey const SegmentKey::Subsegment()
+SegmentKey const TDF::SegmentKey::Subsegment()
 {
 	CString strText;
 
@@ -164,7 +164,7 @@ SegmentKey const SegmentKey::Subsegment()
 	return cSubsegment;
 }
 
-SegmentKey const SegmentKey::Subsegment(LPCTSTR chFormat, ...)
+SegmentKey const TDF::SegmentKey::Subsegment(LPCTSTR chFormat, ...)
 {
 	CString strText;
 	va_list argList;
@@ -235,7 +235,7 @@ size_t TDF::SegmentKey::ShowSubsegments(SegmentKeyArray & cOutChildren) const
 }
 
 //== Flush 관련 함수 =============================================================================
-void SegmentKey::Flush(Search::Type eInTypeToRemove, Search::Space eInSearchSpace)
+void TDF::SegmentKey::Flush(Search::Type eInTypeToRemove, Search::Space eInSearchSpace)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -247,7 +247,7 @@ void SegmentKey::Flush(Search::Type eInTypeToRemove, Search::Space eInSearchSpac
 	SegmentKeyPrivate::LocalClose(*this);
 }
 
-void SegmentKey::Flush(SearchTypeArray const & aInTypesToRemove, Search::Space eInSearchSpace)
+void TDF::SegmentKey::Flush(SearchTypeArray const & aInTypesToRemove, Search::Space eInSearchSpace)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -269,7 +269,7 @@ void SegmentKey::Flush(SearchTypeArray const & aInTypesToRemove, Search::Space e
 	SegmentKeyPrivate::LocalClose(*this);
 }
 
-void SegmentKey::Flush(size_t nInTypesCount, Search::Type const peInTypesToRemove[], Search::Space eInSearchSpace)
+void TDF::SegmentKey::Flush(size_t nInTypesCount, Search::Type const peInTypesToRemove[], Search::Space eInSearchSpace)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -292,7 +292,7 @@ void SegmentKey::Flush(size_t nInTypesCount, Search::Type const peInTypesToRemov
 }
 
 //== Include 관련 함수 ===============================================================================
-IncludeKey SegmentKey::IncludeSegment(SegmentKey const & cInSegment)
+IncludeKey TDF::SegmentKey::IncludeSegment(SegmentKey const & cInSegment)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_KEY nIncludeKey = HC_Include_Segment_By_Key(cInSegment.KeyValue());
@@ -302,7 +302,7 @@ IncludeKey SegmentKey::IncludeSegment(SegmentKey const & cInSegment)
 	return cInclude;
 }
 
-size_t SegmentKey::ShowIncluders(SegmentKeyArray & aOutSegments) const
+size_t TDF::SegmentKey::ShowIncluders(SegmentKeyArray & aOutSegments) const
 {
 	int nSegmentCount = 0;
 
@@ -314,12 +314,15 @@ size_t SegmentKey::ShowIncluders(SegmentKeyArray & aOutSegments) const
 
 		HC_KEY nIncludeKey;
 		char chType[MVO_BUFFER_SIZE];
+		char chPathName[MVO_BUFFER_SIZE];
 
 		for (int i = 0; i < nSegmentCount; i++)
 		{
 			HC_Find_Contents(chType, &nIncludeKey);
 
-			SegmentKey cIncludeSegment(nIncludeKey);
+			HC_KEY nSegmentKey = HC_Show_Include_Segment(nIncludeKey, chPathName);
+
+			SegmentKey cIncludeSegment(nSegmentKey);
 			aOutSegments.push_back(cIncludeSegment);
 		}
 	}
@@ -330,7 +333,7 @@ size_t SegmentKey::ShowIncluders(SegmentKeyArray & aOutSegments) const
 	return nSegmentCount;
 }
 
-size_t SegmentKey::ShowIncluders(IncludeKeyArray & aOutIncludes) const
+size_t TDF::SegmentKey::ShowIncluders(IncludeKeyArray & aOutIncludes) const
 {
 	int nIncludeCount = 0;
 
@@ -360,7 +363,7 @@ size_t SegmentKey::ShowIncluders(IncludeKeyArray & aOutIncludes) const
 
 
 //== Shell 관련 함수 =================================================================================
-ShellKey SegmentKey::InsertShell(ShellKit const & cInKit)
+ShellKey TDF::SegmentKey::InsertShell(ShellKit const & cInKit)
 {
 	TDF::PointArray const * pacPoints = nullptr;
 	TDF::VectorArray const * pacNormals = nullptr;
@@ -410,14 +413,14 @@ ShellKey SegmentKey::InsertShell(ShellKit const & cInKit)
 }
 
 //== Edge 관련 함수 ==================================================================================
-EdgeAttributeControl SegmentKey::GetEdgeAttributeControl()
+EdgeAttributeControl TDF::SegmentKey::GetEdgeAttributeControl()
 {
 	EdgeAttributeControl cControl(*this);
 	return cControl;
 }
 
 //== Line 관련 함수 ==================================================================================
-LineKey SegmentKey::InsertLine(size_t in_count, Point const pcInPoints[])
+LineKey TDF::SegmentKey::InsertLine(size_t in_count, Point const pcInPoints[])
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_KEY nKey = HC_Insert_Polyline((int) in_count, pcInPoints);
@@ -428,7 +431,7 @@ LineKey SegmentKey::InsertLine(size_t in_count, Point const pcInPoints[])
 }
 
 //== Circle 관련 함수 ============================================================================
-CircleKey SegmentKey::InsertCircle(Point const & cInCenter, float fInRadius, Vector const & cInNormal)
+CircleKey TDF::SegmentKey::InsertCircle(Point const & cInCenter, float fInRadius, Vector const & cInNormal)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_KEY nKey = HC_Insert_Circle_By_Radius(&cInCenter, fInRadius, &cInNormal);
@@ -439,12 +442,12 @@ CircleKey SegmentKey::InsertCircle(Point const & cInCenter, float fInRadius, Vec
 }
 
 //== Marker 관련 함수 ================================================================================
-MarkerKey SegmentKey::InsertMarker(Point const & cInPosition)
+MarkerKey TDF::SegmentKey::InsertMarker(Point const & cInPosition)
 {
 	return InsertMarker(cInPosition.x, cInPosition.y, cInPosition.z);
 }
 
-MarkerKey SegmentKey::InsertMarker(double x, double y, double z)
+MarkerKey TDF::SegmentKey::InsertMarker(double x, double y, double z)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_KEY nKey = HC_Insert_Marker(x, y, z);
@@ -454,32 +457,32 @@ MarkerKey SegmentKey::InsertMarker(double x, double y, double z)
 	return cMarker;
 }
 
-MarkerAttributeControl SegmentKey::GetMarkerAttributeControl()
+MarkerAttributeControl TDF::SegmentKey::GetMarkerAttributeControl()
 {
 	MarkerAttributeControl cMarkerAttributeControl(KeyValue());
 	return cMarkerAttributeControl;
 }
 
-MarkerAttributeControl const SegmentKey::GetMarkerAttributeControl() const
+MarkerAttributeControl const TDF::SegmentKey::GetMarkerAttributeControl() const
 {
 	MarkerAttributeControl cMarkerAttributeControl(KeyValue());
 	return cMarkerAttributeControl;
 }
 
 //== Material Mapping 관련 함수 ======================================================================
-MaterialMappingControl SegmentKey::GetMaterialMappingControl()
+MaterialMappingControl TDF::SegmentKey::GetMaterialMappingControl()
 {
 	MaterialMappingControl cMaterialMappingControl(*this);
 	return cMaterialMappingControl;
 }
 
-MaterialMappingControl const SegmentKey::GetMaterialMappingControl() const
+MaterialMappingControl const TDF::SegmentKey::GetMaterialMappingControl() const
 {
 	MaterialMappingControl cMaterialMappingControl(*(SegmentKey *) this);
 	return cMaterialMappingControl;
 }
 
-SegmentKey & SegmentKey::SetMaterialMapping(TDF::MaterialMappingKit const & cInKit)
+SegmentKey & TDF::SegmentKey::SetMaterialMapping(TDF::MaterialMappingKit const & cInKit)
 {
 	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
 
@@ -539,19 +542,19 @@ SegmentKey & SegmentKey::SetMaterialMapping(TDF::MaterialMappingKit const & cInK
 }
 
 //== Control 관련 함수 ===============================================================================
-SelectabilityControl SegmentKey::GetSelectabilityControl()
+SelectabilityControl TDF::SegmentKey::GetSelectabilityControl()
 {
 	SelectabilityControl cSelectabilityControl(*this);
 	return cSelectabilityControl;
 }
 
-SelectabilityControl const SegmentKey::GetSelectabilityControl() const
+SelectabilityControl const TDF::SegmentKey::GetSelectabilityControl() const
 {
 	SelectabilityControl cSelectabilityControl(*(SegmentKey *) this);
 	return cSelectabilityControl;
 }
 
-SegmentKey & SegmentKey::SetSelectability(CString strList)
+SegmentKey & TDF::SegmentKey::SetSelectability(CString strList)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Selectability(H_ASCII_TEXT(strList));
@@ -560,19 +563,19 @@ SegmentKey & SegmentKey::SetSelectability(CString strList)
 }
 
 //== Visibility Control 관련 함수 ====================================================================
-VisibilityControl SegmentKey::GetVisibilityControl()
+VisibilityControl TDF::SegmentKey::GetVisibilityControl()
 {
 	VisibilityControl cVisibilityControl(*this);
 	return cVisibilityControl;
 }
 
-VisibilityControl const SegmentKey::GetVisibilityControl() const
+VisibilityControl const TDF::SegmentKey::GetVisibilityControl() const
 {
 	VisibilityControl cVisibilityControl(*(SegmentKey *)this);
 	return cVisibilityControl;
 }
 
-SegmentKey & SegmentKey::SetVisibility(CString strList)
+SegmentKey & TDF::SegmentKey::SetVisibility(CString strList)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Visibility(H_ASCII_TEXT(strList));
@@ -581,20 +584,20 @@ SegmentKey & SegmentKey::SetVisibility(CString strList)
 }
 
 //== Visibility Control 관련 함수 ====================================================================
-VisualEffectsControl SegmentKey::GetVisualEffectsControl()
+VisualEffectsControl TDF::SegmentKey::GetVisualEffectsControl()
 {
 	VisualEffectsControl cVisibilityControl(*this);
 	return cVisibilityControl;
 }
 
-VisualEffectsControl const SegmentKey::GetVisualEffectsControl() const
+VisualEffectsControl const TDF::SegmentKey::GetVisualEffectsControl() const
 {
 	VisualEffectsControl cVisibilityControl(*(SegmentKey *)this);
 	return cVisibilityControl;
 }
 
 //== Condition 관련 함수 =============================================================================
-SegmentKey & SegmentKey::SetCondition(CString strInCondition)
+SegmentKey & TDF::SegmentKey::SetCondition(CString strInCondition)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Conditions(H_ASCII_TEXT(strInCondition));
@@ -603,7 +606,7 @@ SegmentKey & SegmentKey::SetCondition(CString strInCondition)
 }
 
 //== Heuristics 관련 함수 ============================================================================
-SegmentKey & SegmentKey::SetHeuristics(CString strInHeuristics)
+SegmentKey & TDF::SegmentKey::SetHeuristics(CString strInHeuristics)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Heuristics(H_ASCII_TEXT(strInHeuristics));
@@ -613,39 +616,39 @@ SegmentKey & SegmentKey::SetHeuristics(CString strInHeuristics)
 
 //== Portfolio Control 관련 함수 =====================================================================
 /*
-PortfolioControl SegmentKey::GetPortfolioControl()
+PortfolioControl TDF::SegmentKey::GetPortfolioControl()
 {
 	return m_cPortfolioControl;
 }
 
-SelectabilityControl const SegmentKey::GetPortfolioControl() const
+SelectabilityControl const TDF::SegmentKey::GetPortfolioControl() const
 {
 	return m_cPortfolioControl;
 }
 */
 
 //== StyleControl Control 관련 함수 ==================================================================
-StyleControl SegmentKey::GetStyleControl()
+StyleControl TDF::SegmentKey::GetStyleControl()
 {
 	StyleControl cStyleControl(*this);
 	return cStyleControl;
 }
 
-void SegmentKey::SetRenderingOptions(CString strList)
+void TDF::SegmentKey::SetRenderingOptions(CString strList)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Rendering_Options(H_ASCII_TEXT(strList));
 	SegmentKeyPrivate::LocalClose(*this);
 }
 
-void SegmentKey::SetColorByIndex(CString strList, int nIndex)
+void TDF::SegmentKey::SetColorByIndex(CString strList, int nIndex)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Color_By_Index(H_ASCII_TEXT(strList), nIndex);
 	SegmentKeyPrivate::LocalClose(*this);
 }
 
-void SegmentKey::SetMarkerSymbol(CString strSymbol)
+void TDF::SegmentKey::SetMarkerSymbol(CString strSymbol)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Marker_Symbol(H_ASCII_TEXT(strSymbol));
@@ -656,7 +659,7 @@ void SegmentKey::SetMarkerSymbol(CString strSymbol)
 // 	SegmentKey & SetCamera(CameraKit const & cInKit);
 // 	SegmentKey & UnsetCamera();
 
-bool SegmentKey::ShowCamera(CameraKit & cOutKit) const
+bool TDF::SegmentKey::ShowCamera(CameraKit & cOutKit) const
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -694,7 +697,7 @@ bool SegmentKey::ShowCamera(CameraKit & cOutKit) const
 //== Model Segment 관련 함수 =====================================================================
 
 // Model용 Segment를 구성한다.
-void SegmentKey::ConfigureSegmentModel()
+void TDF::SegmentKey::ConfigureSegmentModel()
 {
 	//---- model include 구성 -----
 	// Model이 들아갈 Include 구성을 한다.
@@ -754,31 +757,31 @@ void SegmentKey::ConfigureSegmentModel()
 */
 }
 
-SegmentKey SegmentKey::ModelInclude()
+SegmentKey TDF::SegmentKey::ModelInclude()
 {
 	SegmentKey cModelInclude(m_nModelIncludeKey);
 	return cModelInclude;
 }
 
-SegmentKey SegmentKey::ModelInclude() const
+SegmentKey TDF::SegmentKey::ModelInclude() const
 {
 	SegmentKey cModelInclude(m_nModelIncludeKey);
 	return cModelInclude;
 }
 
-SegmentKey SegmentKey::StylesInclude()
+SegmentKey TDF::SegmentKey::StylesInclude()
 {
 	SegmentKey cStylesInclude(m_nStylesIncludeKey);
 	return cStylesInclude;
 }
 
-SegmentKey SegmentKey::StylesInclude() const
+SegmentKey TDF::SegmentKey::StylesInclude() const
 {
 	SegmentKey cStylesInclude(m_nStylesIncludeKey);
 	return cStylesInclude;
 }
 
-SegmentKey & SegmentKey::SetModellingMatrix(MatrixKit const & cInKit)
+SegmentKey & TDF::SegmentKey::SetModellingMatrix(MatrixKit const & cInKit)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Modelling_Matrix(cInKit.m_fData);
@@ -787,7 +790,7 @@ SegmentKey & SegmentKey::SetModellingMatrix(MatrixKit const & cInKit)
 	return *this;
 }
 
-SegmentKey & SegmentKey::SegmentKey::UnsetModellingMatrix()
+SegmentKey & TDF::SegmentKey::UnsetModellingMatrix()
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_UnSet_Modelling_Matrix();
@@ -796,7 +799,7 @@ SegmentKey & SegmentKey::SegmentKey::UnsetModellingMatrix()
 	return *this;
 }
 
-bool SegmentKey::ShowModellingMatrix(MatrixKit & cOutKit) const
+bool TDF::SegmentKey::ShowModellingMatrix(MatrixKit & cOutKit) const
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Show_Modelling_Matrix(cOutKit.m_fData);
@@ -806,7 +809,7 @@ bool SegmentKey::ShowModellingMatrix(MatrixKit & cOutKit) const
 }
 
 //== Bounding 관련 함수 ==============================================================================
-SegmentKey & SegmentKey::SetBounding(BoundingKit const & cInKit)
+SegmentKey & TDF::SegmentKey::SetBounding(BoundingKit const & cInKit)
 {
 	bool bExclusion = false;
 
@@ -822,7 +825,7 @@ SegmentKey & SegmentKey::SetBounding(BoundingKit const & cInKit)
 }
 
 //== User Data 관련 함수 =============================================================================
-SegmentKey & SegmentKey::SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData)
+SegmentKey & TDF::SegmentKey::SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData)
 {
 	if (aInIndices.size() == aInData.size()) {
 		for (size_t nIndex = 0; nIndex < aInIndices.size(); ++nIndex) {
@@ -833,7 +836,7 @@ SegmentKey & SegmentKey::SetUserData(IntPtrTArray const & aInIndices, ByteArrayA
 	return *this;
 }
 
-SegmentKey & SegmentKey::SetUserData(intptr_t nInIndex, size_t nInBytes, BYTE const pnInData[])
+SegmentKey & TDF::SegmentKey::SetUserData(intptr_t nInIndex, size_t nInBytes, BYTE const pnInData[])
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -844,7 +847,7 @@ SegmentKey & SegmentKey::SetUserData(intptr_t nInIndex, size_t nInBytes, BYTE co
 	return *this;
 }
 
-SegmentKey & SegmentKey::SetUserData(intptr_t nInIndex, ByteArray const & aInData)
+SegmentKey & TDF::SegmentKey::SetUserData(intptr_t nInIndex, ByteArray const & aInData)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -855,7 +858,7 @@ SegmentKey & SegmentKey::SetUserData(intptr_t nInIndex, ByteArray const & aInDat
 	return *this;
 }
 
-SegmentKey & SegmentKey::UnsetUserData(intptr_t nInIndex)
+SegmentKey & TDF::SegmentKey::UnsetUserData(intptr_t nInIndex)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -866,7 +869,7 @@ SegmentKey & SegmentKey::UnsetUserData(intptr_t nInIndex)
 	return *this;
 }
 
-SegmentKey & SegmentKey::UnsetUserData(size_t nInCount, intptr_t const pnInIndices[])
+SegmentKey & TDF::SegmentKey::UnsetUserData(size_t nInCount, intptr_t const pnInIndices[])
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -879,7 +882,7 @@ SegmentKey & SegmentKey::UnsetUserData(size_t nInCount, intptr_t const pnInIndic
 	return *this;
 }
 
-SegmentKey & SegmentKey::UnsetUserData(IntPtrTArray const & pnInIndices)
+SegmentKey & TDF::SegmentKey::UnsetUserData(IntPtrTArray const & pnInIndices)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -892,7 +895,7 @@ SegmentKey & SegmentKey::UnsetUserData(IntPtrTArray const & pnInIndices)
 	return *this;
 }
 
-SegmentKey & SegmentKey::UnsetAllUserData()
+SegmentKey & TDF::SegmentKey::UnsetAllUserData()
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -904,7 +907,7 @@ SegmentKey & SegmentKey::UnsetAllUserData()
 
 }
 
-size_t SegmentKey::ShowUserDataCount() const
+size_t TDF::SegmentKey::ShowUserDataCount() const
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -915,7 +918,7 @@ size_t SegmentKey::ShowUserDataCount() const
 	return nCount;
 }
 
-bool SegmentKey::ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray & aOutData) const
+bool TDF::SegmentKey::ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray & aOutData) const
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -943,7 +946,7 @@ bool SegmentKey::ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray & aOutD
 	return true;
 }
 
-bool SegmentKey::ShowUserDataIndices(IntPtrTArray & aOutIndices) const
+bool TDF::SegmentKey::ShowUserDataIndices(IntPtrTArray & aOutIndices) const
 {	
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -961,7 +964,7 @@ bool SegmentKey::ShowUserDataIndices(IntPtrTArray & aOutIndices) const
 	return true;
 }
 
-bool SegmentKey::ShowUserData(intptr_t nInIndex, ByteArray & aOutData) const
+bool TDF::SegmentKey::ShowUserData(intptr_t nInIndex, ByteArray & aOutData) const
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 

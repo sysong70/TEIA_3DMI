@@ -25,6 +25,7 @@ public:
 
 	int LButtonUp(HEventInfo & cInEvent);
 
+	int LButtonDownAndMove(HEventInfo & cInEvent);
 	int NoButtonDownAndMove(HEventInfo & cInEvent);
 
 	void SetSize(ESize size);

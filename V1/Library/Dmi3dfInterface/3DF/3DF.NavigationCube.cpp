@@ -130,6 +130,16 @@ int NavigationCube::LButtonUp(HEventInfo & cInEvent)
 	return HLISTENER_CONSUME_EVENT;
 }
 
+int NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)
+{
+	if (0 < m_cOldHighlightSelection.GetCount()) {
+		m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
+		m_cOldHighlightSelection.Reset();
+	}
+
+	return HLISTENER_PASS_EVENT;
+}
+
 int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 {
 	WindowPoint cPoint(cInEvent.GetMouseWindowPos());
@@ -145,6 +155,8 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 
 	// 선택된 요소가 없은 경우
 	if (0 == nSelectedCount) {
+		TRACE(L"NavigationCube No Selection\n");
+
 		// 기존에 선택된 요소가 있는 경우 처리
 		if (0 < m_cOldHighlightSelection.GetCount()) {
 			m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
@@ -153,6 +165,8 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 		}
 	}
 	else {
+		TRACE(L"NavigationCube Selection: %d\n", nSelectedCount);
+
 		// 이전에 선택된것과 다른 경우
 		if (m_cOldHighlightSelection != cSelection) {
 			m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
@@ -163,12 +177,14 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 			bool bFindFlag = false;
 
 			for (int nIndex = 0; nIndex < (int)TDF::ViewMode::Count; nIndex++) {
-				if (m_cSegments[nIndex] == cSelectKey) {
+				if (m_cSegments[nIndex].KeyValue() == cSelectKey.KeyValue()) {
 					bFindFlag = true;
 				}
 			}
 
 			if (true == bFindFlag) {
+				TRACE(L"NavigationCube Find\n");
+
 				HighlightOptionsKit cHighlightOptions;
 				m_pcWindow->GetHighlightControl().Highlight(cSelection, cHighlightOptions, true);
 				m_cOldHighlightSelection = cSelection;
@@ -176,9 +192,14 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 			}
 			else {
 				m_cOldHighlightSelection.Reset();
+
+				TRACE(L"NavigationCube No Find\n");
 			}
 
 			bUpdateFlag = true;
+		}
+		else {
+			nEvent = HLISTENER_CONSUME_EVENT;
 		}
 	}
 

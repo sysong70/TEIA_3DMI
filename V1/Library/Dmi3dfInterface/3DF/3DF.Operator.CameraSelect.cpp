@@ -115,6 +115,10 @@ int Operator::CameraSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
 {
 	m_bOrbitMode = true;
 
+	if (nullptr != m_pcNaviCube) {
+		m_pcNaviCube->LButtonDownAndMove(cInEvent);
+	}
+
 	int nResult = HOpCameraOrbit_OnLButtonDownAndMove(cInEvent);
 
 	m_cObjectSnapOperator.DrawSnapItems(false);
@@ -146,8 +150,10 @@ int Operator::CameraSelect::OnRButtonUp(HEventInfo & hevent)
 // Dynamic Highlighting 처리
 int Operator::CameraSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 {
-	if (HLISTENER_CONSUME_EVENT == m_pcNaviCube->NoButtonDownAndMove(cInEvent)) {
-		return HLISTENER_CONSUME_EVENT;
+	if (nullptr != m_pcNaviCube) {
+		if (HLISTENER_CONSUME_EVENT == m_pcNaviCube->NoButtonDownAndMove(cInEvent)) {
+			return HLISTENER_CONSUME_EVENT;
+		}
 	}
 
 	m_cObjectSnapOperator.NoButtonDownAndMove(cInEvent);

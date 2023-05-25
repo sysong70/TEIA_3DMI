@@ -117,8 +117,6 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 			continue;
 		}
 
-		TRACE(L"Check Type, %d\n", (int)pcSnapItem->eType);
-
 		PixelPoint cPixelPoint(*m_pcWindow, pcSnapItem->cPoint);
 
 		double dDist = cPixelPoint.DistanceWith(cMousePoint);
@@ -134,6 +132,7 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 	// 				m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
 	// 			}
 
+			TRACE(L"1st DrawSnapItem, %d\n", (int)pcSnapItem->eType);
 			DrawSnapItem(pcSnapItem, cCameraInfo);
 
 			m_pcWindow->Update();

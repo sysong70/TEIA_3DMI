@@ -34,6 +34,7 @@
 #include "Dmi3dx.h"
 
 #include <Signal.h>
+#include <Path.h>
 
 #ifdef _DEBUG
 //#	define new DEBUG_NEW
@@ -186,35 +187,57 @@ bool TdfImport::FileImport(CString strFilePathName, TDF::SegmentKey & cModelSegm
 	strMessage.Format(L"Stage 2/3 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec2));
 	cInDelivery.progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
 
-	//== Tree Item Test ==
-	SegmentKeyArray cChildren;
-	cModelSegment.ShowIncluders(cChildren);
+	CreateBasicModelTree(strFilePathName, cModelSegment, cInDelivery);
 
+	return bStatus;
+}
+
+// File Open후에 Basic Model Tree 생성 함수 
+void TdfImport::CreateBasicModelTree(CString strFilePathName, TDF::SegmentKey & cModelSegment, Signal::Delivery & cInDelivery)
+{
+	CString strFileName = Path::GetFileName(strFilePathName);
+	
 	Signal::TreeItems cTreeItems;
 
-	for (auto cSegment : cChildren) {
+	Signal::TreeItem cItem;
+	cItem.Title = strFileName;
+	cItem.HasChildren = true;
+	cItem.Key = 0;
+	cTreeItems.push_back(cItem);
+	cInDelivery.modelPanel.AddItems(cTreeItems);
+
+	cTreeItems.clear();
+
+	cItem.Title = "Models";
+	cItem.HasChildren = true;
+	cItem.ParentKey = 0;
+	cItem.Key = 1;
+	cTreeItems.push_back(cItem);
+	cInDelivery.modelPanel.AddItems(cTreeItems);
+
+	cTreeItems.clear();
+
+	IncludeKeyArray cChildren;
+	cModelSegment.ShowIncluders(cChildren);
+
+	for (auto cInclude : cChildren) {
+		SegmentKey cSegment = cInclude.GetTarget();
+
 		CString strName;
 		if (false == TDF::Utility::ShowSegmentName(cSegment, strName)) {
 			strName = cSegment.Name();
 		}
 
-		Signal::TreeItem cItem;
+		size_t nCount = cSegment.ShowSubsegments();
+
 		cItem.Title = strName;
+		cItem.ParentKey = 1;
+		cItem.Key = cInclude.KeyValue();
+		cItem.HasChildren = (0 < nCount) ? true : false;
 		cTreeItems.push_back(cItem);
 	}
 
 	cInDelivery.modelPanel.AddItems(cTreeItems);
-
-/*
-	Signal::TreeItems cTreeItems;
-	Signal::TreeItem cItem;
-	cItem.Title = L"TestModel";
-	cTreeItems.push_back(cItem);
-*/
-
-
-	
-	return bStatus;
 }
 
 // == 3DX 설정 관련 함수 ==============================================================================
@@ -355,20 +378,17 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 	CString strPoName;
 	GetName(pcOccurrence, strPoName);
 
-	Log(2, L"ParseProductOccurrence: pocc%d, %s", m_nIncrementalId, strPoName);
+	Log(2, L"ParseProductOccurrence: pocc%d, Name: %s", m_nIncrementalId, strPoName);
 
 	// Segment를 생성하고 생성된 Segment를 Parent Segment에 Include한다.
 	CString strSegmentName;
 	strSegmentName.Format(L"pocc%d", m_nIncrementalId++);
 	TDF::SegmentKey cSegment = m_cPoccsIncludeSegment.Subsegment(strSegmentName);
-	cParentSegment.IncludeSegment(cSegment);
+	IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
 
 	//cSegment.Open(); // Segment를 Open하면 문제가 생김. 검토가 필요함.
 
-// 	TDF::Utility::SetSegmentName(cSegment, strPoName);
-// 	CString strOutName;
-// 	TDF::Utility::ShowSegmentName(cSegment, strOutName);
-
+ 	TDF::Utility::SetSegmentName(cSegment, strPoName);
 
 	// Attribute 생성
 	// Parent에서 받은(계단식으로) Attribute를 이용해서, Attribute를 생성

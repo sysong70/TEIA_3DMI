@@ -33,7 +33,7 @@ void TDF::BaseView::SetViewMode(TDF::ViewMode eViewMode, bool bFitWorld)
 	}
 
 	HPoint target, camera, view;
-	float length;
+	float fLength;
 
 	HPoint cPosition, cTarget, cUpVector;
 	float widtho, heighto;
@@ -56,9 +56,9 @@ void TDF::BaseView::SetViewMode(TDF::ViewMode eViewMode, bool bFitWorld)
 
 		view.Set(camera.x - target.x, camera.y - target.y, camera.z - target.z);
 
-		length = (float)HC_Compute_Vector_Length(&view);
+		fLength = (float)HC_Compute_Vector_Length(&view);
 
-		float newLen = length * 0.5774f;
+		float fNewLen = fLength * 0.5774f;
 
 		HPoint rightaxis;
 		HC_Compute_Cross_Product(&m_FrontAxis, &m_TopAxis, &rightaxis);
@@ -67,410 +67,415 @@ void TDF::BaseView::SetViewMode(TDF::ViewMode eViewMode, bool bFitWorld)
 			rightaxis.Set(-rightaxis.x, -rightaxis.y, -rightaxis.z);
 		}
 
-		float px = target.x + newLen * m_FrontAxis.x - newLen * rightaxis.x + newLen * m_TopAxis.x;
-		float py = target.y + newLen * m_FrontAxis.y - newLen * rightaxis.y + newLen * m_TopAxis.y;
-		float pz = target.z + newLen * m_FrontAxis.z - newLen * rightaxis.z + newLen * m_TopAxis.z;
+		float px = target.x + fNewLen * m_FrontAxis.x - fNewLen * rightaxis.x + fNewLen * m_TopAxis.x;
+		float py = target.y + fNewLen * m_FrontAxis.y - fNewLen * rightaxis.y + fNewLen * m_TopAxis.y;
+		float pz = target.z + fNewLen * m_FrontAxis.z - fNewLen * rightaxis.z + fNewLen * m_TopAxis.z;
 
 		float fCos45 = cos(M_PI / 4);
-		float fLenCos = length * fCos45;
+		float fLenCos = fLength * fCos45;
 
-		HVector cLenFrontAxis = m_FrontAxis * length;
-		HVector cTopAxis = m_TopAxis * length;
-		HVector cRightAxis = rightaxis * length;
+		HVector cLenFrontAxis = m_FrontAxis * fLength;
+		HVector cLenTopAxis = m_TopAxis * fLength;
+		HVector cLenRightAxis = rightaxis * fLength;
+
+		HVector cVertexVector(fNewLen * m_FrontAxis.x, fNewLen * m_TopAxis.y, fNewLen * rightaxis.z);
+
+		Point cSetPosition;
+		Vector cSetUpVector;
 
 		switch (m_eViewMode) {
 
 			case TDF::ViewMode::right: {
-				HC_Set_Camera_Position(target.x + cLenFrontAxis.x, target.y + cLenFrontAxis.y, target.z + cLenFrontAxis.z);
+				cSetPosition.Set(target.x + cLenFrontAxis.x, target.y + cLenFrontAxis.y, target.z + cLenFrontAxis.z);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0, 0, 1);
+					cSetUpVector.Set(0, 0, 1);
 				}
 				else {
-					HC_Set_Camera_Up_Vector(0, -cUpVector.z, cUpVector.y);
+					cSetUpVector.Set(0, -cUpVector.z, cUpVector.y);
 				}
 			} break;
 
 			case TDF::ViewMode::left: {
-				HC_Set_Camera_Position(target.x - cLenFrontAxis.x, target.y + cLenFrontAxis.y, target.z + cLenFrontAxis.z);
+				cSetPosition.Set(target.x - cLenFrontAxis.x, target.y + cLenFrontAxis.y, target.z + cLenFrontAxis.z);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0, 0, 1);
+					cSetUpVector.Set(0, 0, 1);
 				}
 				else {
-					HC_Set_Camera_Up_Vector(0, cUpVector.z, -cUpVector.y);
+					cSetUpVector.Set(0, cUpVector.z, -cUpVector.y);
 				}
 			} break;
 
 			case TDF::ViewMode::front: {
-				HC_Set_Camera_Position(target.x + cTopAxis.x, target.y - cTopAxis.y, target.z + cTopAxis.z);
+				cSetPosition.Set(target.x + cLenTopAxis.x, target.y - cLenTopAxis.y, target.z + cLenTopAxis.z);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0, 0, 1);
+					cSetUpVector.Set(0, 0, 1);
 				}
 				else {
-					HC_Set_Camera_Up_Vector(-cUpVector.z, 0, cUpVector.x);
+					cSetUpVector.Set(-cUpVector.z, 0, cUpVector.x);
 				}
 			} break;
 
 			case TDF::ViewMode::back: {
-				HC_Set_Camera_Position(target.x + cTopAxis.x, target.y + cTopAxis.y, target.z + cTopAxis.z);
+				cSetPosition.Set(target.x + cLenTopAxis.x, target.y + cLenTopAxis.y, target.z + cLenTopAxis.z);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0, 0, 1);
+					cSetUpVector.Set(0, 0, 1);
 				}
 				else {
-					HC_Set_Camera_Up_Vector(cUpVector.z, 0, -cUpVector.x);
+					cSetUpVector.Set(cUpVector.z, 0, -cUpVector.x);
 				}
 			} break;
 
 			case TDF::ViewMode::top: {
-				HC_Set_Camera_Position(target.x + cRightAxis.x, target.y + cRightAxis.y, target.z - cRightAxis.z);
+				cSetPosition.Set(target.x + cLenRightAxis.x, target.y + cLenRightAxis.y, target.z - cLenRightAxis.z);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0, 1, 0);
+					cSetUpVector.Set(0, 1, 0);
 				}
 				else {
-					HC_Set_Camera_Up_Vector(-cUpVector.y, cUpVector.x, 0);
+					cSetUpVector.Set(-cUpVector.y, cUpVector.x, 0);
 				}
 			} break;
 
 			case TDF::ViewMode::bottom: {
-				HC_Set_Camera_Position(target.x + cRightAxis.x, target.y + cRightAxis.y, target.z + cRightAxis.z);
+				cSetPosition.Set(target.x + cLenRightAxis.x, target.y + cLenRightAxis.y, target.z + cLenRightAxis.z);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0, 1, 0);
+					cSetUpVector.Set(0, 1, 0);
 				}
 				else {
-					HC_Set_Camera_Up_Vector(cUpVector.y, -cUpVector.x, 0);
+					cSetUpVector.Set(cUpVector.y, -cUpVector.x, 0);
 				}
 			} break;
 
 			case TDF::ViewMode::py_nz: { // Back - Bottom
-				HC_Set_Camera_Position(target.x, target.y + fLenCos, target.z - fLenCos);
+				cSetPosition.Set(target.x, target.y + fLenCos, target.z - fLenCos);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0, fCos45, fCos45);
+					cSetUpVector.Set(0, fCos45, fCos45);
 				}
 				else {
 					if (1e-6 > fabs(cUpVector.y - fCos45)) {
-						HC_Set_Camera_Up_Vector(1, 0, 0);
+						cSetUpVector.Set(1, 0, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.x - 1)) {
-						HC_Set_Camera_Up_Vector(0, -fCos45, -fCos45);
+						cSetUpVector.Set(0, -fCos45, -fCos45);
 					}
 					else if (1e-6 > fabs(cUpVector.y + fCos45)) {
-						HC_Set_Camera_Up_Vector(-1, 0, 0);
+						cSetUpVector.Set(-1, 0, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.x + 1)) {
-						HC_Set_Camera_Up_Vector(0, fCos45, fCos45);
+						cSetUpVector.Set(0, fCos45, fCos45);
 					}
 				}
 			} break;
 
 			case TDF::ViewMode::py_pz: { // Top - Back
-				HC_Set_Camera_Position(target.x, target.y + fLenCos, target.z + fLenCos);
+				cSetPosition.Set(target.x, target.y + fLenCos, target.z + fLenCos);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0, -fCos45, fCos45);
+					cSetUpVector.Set(0, -fCos45, fCos45);
 				}
 				else {
 					if (1e-6 > fabs(cUpVector.y + fCos45)) {
-						HC_Set_Camera_Up_Vector(1, 0, 0);
+						cSetUpVector.Set(1, 0, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.x - 1)) {
-						HC_Set_Camera_Up_Vector(0, fCos45, -fCos45);
+						cSetUpVector.Set(0, fCos45, -fCos45);
 					}
 					else if (1e-6 > fabs(cUpVector.y - fCos45)) {
-						HC_Set_Camera_Up_Vector(-1, 0, 0);
+						cSetUpVector.Set(-1, 0, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.x + 1)) {
-						HC_Set_Camera_Up_Vector(0, -fCos45, fCos45);
+						cSetUpVector.Set(0, -fCos45, fCos45);
 					}
 				}
 			} break;
 
 			case TDF::ViewMode::ny_pz: { // Top - Front
-				HC_Set_Camera_Position(target.x, target.y - fLenCos, target.z + fLenCos);
+				cSetPosition.Set(target.x, target.y - fLenCos, target.z + fLenCos);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0, fCos45, fCos45);
+					cSetUpVector.Set(0, fCos45, fCos45);
 				}
 				else {
 					if (1e-6 > fabs(cUpVector.y - fCos45)) {
-						HC_Set_Camera_Up_Vector(-1, 0, 0);
+						cSetUpVector.Set(-1, 0, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.x + 1)) {
-						HC_Set_Camera_Up_Vector(0, -fCos45, -fCos45);
+						cSetUpVector.Set(0, -fCos45, -fCos45);
 					}
 					else if (1e-6 > fabs(cUpVector.y + fCos45)) {
-						HC_Set_Camera_Up_Vector(1, 0, 0);
+						cSetUpVector.Set(1, 0, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.x - 1)) {
-						HC_Set_Camera_Up_Vector(0, fCos45, fCos45);
+						cSetUpVector.Set(0, fCos45, fCos45);
 					}
 				}
 			} break;
 
 			case TDF::ViewMode::ny_nz: { // Front - Bottom
-				HC_Set_Camera_Position(target.x, target.y - fLenCos, target.z - fLenCos);
+				cSetPosition.Set(target.x, target.y - fLenCos, target.z - fLenCos);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0, -fCos45, fCos45);
+					cSetUpVector.Set(0, -fCos45, fCos45);
 				}
 				else {
 					if (1e-6 > fabs(cUpVector.y + fCos45)) {
-						HC_Set_Camera_Up_Vector(-1, 0, 0);
+						cSetUpVector.Set(-1, 0, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.x + 1)) {
-						HC_Set_Camera_Up_Vector(0, fCos45, -fCos45);
+						cSetUpVector.Set(0, fCos45, -fCos45);
 					}
 					else if (1e-6 > fabs(cUpVector.y - fCos45)) {
-						HC_Set_Camera_Up_Vector(1, 0, 0);
+						cSetUpVector.Set(1, 0, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.x - 1)) {
-						HC_Set_Camera_Up_Vector(0, -fCos45, fCos45);
+						cSetUpVector.Set(0, -fCos45, fCos45);
 					}
 				}
 			} break;
 
 			case TDF::ViewMode::nx_nz: { // Left - Bottom
-				HC_Set_Camera_Position(target.x - fLenCos, target.y, target.z - fLenCos);
+				cSetPosition.Set(target.x - fLenCos, target.y, target.z - fLenCos);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(-fCos45, 0, fCos45);
+					cSetUpVector.Set(-fCos45, 0, fCos45);
 				}
 				else {
 					if (1e-6 > fabs(cUpVector.x + fCos45)) {
-						HC_Set_Camera_Up_Vector(0, 1, 0);
+						cSetUpVector.Set(0, 1, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.y - 1)) {
-						HC_Set_Camera_Up_Vector(fCos45, 0, -fCos45);
+						cSetUpVector.Set(fCos45, 0, -fCos45);
 					}
 					else if (1e-6 > fabs(cUpVector.x - fCos45)) {
-						HC_Set_Camera_Up_Vector(0, -1, 0);
+						cSetUpVector.Set(0, -1, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.y + 1)) {
-						HC_Set_Camera_Up_Vector(-fCos45, 0, fCos45);
+						cSetUpVector.Set(-fCos45, 0, fCos45);
 					}
 				}
 			} break;
 
-			case TDF::ViewMode::nx_pz: {
-				HC_Set_Camera_Position(target.x - fLenCos, target.y, target.z + fLenCos);
+			case TDF::ViewMode::nx_pz: { // top - Left
+				cSetPosition.Set(target.x - fLenCos, target.y, target.z + fLenCos);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(fCos45, 0, fCos45);
+					cSetUpVector.Set(fCos45, 0, fCos45);
 				}
 				else {
 					if (1e-6 > fabs(cUpVector.x - fCos45)) {
-						HC_Set_Camera_Up_Vector(0, 1, 0);
+						cSetUpVector.Set(0, 1, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.y - 1)) {
-						HC_Set_Camera_Up_Vector(-fCos45, 0, -fCos45);
+						cSetUpVector.Set(-fCos45, 0, -fCos45);
 					}
 					else if (1e-6 > fabs(cUpVector.x + fCos45)) {
-						HC_Set_Camera_Up_Vector(0, -1, 0);
+						cSetUpVector.Set(0, -1, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.y + 1)) {
-						HC_Set_Camera_Up_Vector(fCos45, 0, fCos45);
+						cSetUpVector.Set(fCos45, 0, fCos45);
 					}
 				}
 			} break;
 
 			case TDF::ViewMode::px_pz: { // Top - Right
-				HC_Set_Camera_Position(target.x + fLenCos, target.y, target.z + fLenCos);
+				cSetPosition.Set(target.x + fLenCos, target.y, target.z + fLenCos);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(-fCos45, 0, fCos45);
+					cSetUpVector.Set(-fCos45, 0, fCos45);
 				}
 				else {
 					if (1e-6 > fabs(cUpVector.x + fCos45)) {
-						HC_Set_Camera_Up_Vector(0, -1, 0);
+						cSetUpVector.Set(0, -1, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.y + 1)) {
-						HC_Set_Camera_Up_Vector(fCos45, 0, -fCos45);
+						cSetUpVector.Set(fCos45, 0, -fCos45);
 					}
 					else if (1e-6 > fabs(cUpVector.x - fCos45)) {
-						HC_Set_Camera_Up_Vector(0, 1, 0);
+						cSetUpVector.Set(0, 1, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.y - 1)) {
-						HC_Set_Camera_Up_Vector(-fCos45, 0, fCos45);
+						cSetUpVector.Set(-fCos45, 0, fCos45);
 					}
 				}
 			} break;
 
 			case TDF::ViewMode::px_nz: { // Right - Bottom
-				HC_Set_Camera_Position(target.x + fLenCos, target.y, target.z - fLenCos);
+				cSetPosition.Set(target.x + fLenCos, target.y, target.z - fLenCos);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(fCos45, 0, fCos45);
+					cSetUpVector.Set(fCos45, 0, fCos45);
 				}
 				else {
 					if (1e-6 > fabs(cUpVector.x - fCos45)) {
-						HC_Set_Camera_Up_Vector(0, -1, 0);
+						cSetUpVector.Set(0, -1, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.y + 1)) {
-						HC_Set_Camera_Up_Vector(-fCos45, 0, -fCos45);
+						cSetUpVector.Set(-fCos45, 0, -fCos45);
 					}
 					else if (1e-6 > fabs(cUpVector.x + fCos45)) {
-						HC_Set_Camera_Up_Vector(0, 1, 0);
+						cSetUpVector.Set(0, 1, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.y - 1)) {
-						HC_Set_Camera_Up_Vector(fCos45, 0, fCos45);
+						cSetUpVector.Set(fCos45, 0, fCos45);
 					}
 				}
 			} break;
 
 			case TDF::ViewMode::nx_py: { // Back - Left
-				HC_Set_Camera_Position(target.x - fLenCos, target.y + fLenCos, target.z);
+				cSetPosition.Set(target.x - fLenCos, target.y + fLenCos, target.z);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0, 0, 1);
+					cSetUpVector.Set(0, 0, 1);
 				}
 				else {
 					if (1e-6 > fabs(cUpVector.z - 1)) {
-						HC_Set_Camera_Up_Vector(fCos45, fCos45, 0);
+						cSetUpVector.Set(fCos45, fCos45, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.x - fCos45)) {
-						HC_Set_Camera_Up_Vector(0, 0, -1);
+						cSetUpVector.Set(0, 0, -1);
 					}
 					else if (1e-6 > fabs(cUpVector.z + 1)) {
-						HC_Set_Camera_Up_Vector(-fCos45, -fCos45, 0);
+						cSetUpVector.Set(-fCos45, -fCos45, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.x + fCos45)) {
-						HC_Set_Camera_Up_Vector(0, 0, 1);
+						cSetUpVector.Set(0, 0, 1);
 					}
 				}
 			} break;
 
 			case TDF::ViewMode::px_py: { // Right - Back
-				HC_Set_Camera_Position(target.x + fLenCos, target.y + fLenCos, target.z);
+				cSetPosition.Set(target.x + fLenCos, target.y + fLenCos, target.z);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0, 0, 1);
+					cSetUpVector.Set(0, 0, 1);
 				}
 				else {
 					if (1e-6 > fabs(cUpVector.z - 1)) {
-						HC_Set_Camera_Up_Vector(fCos45, -fCos45, 0);
+						cSetUpVector.Set(fCos45, -fCos45, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.x - fCos45)) {
-						HC_Set_Camera_Up_Vector(0, 0, -1);
+						cSetUpVector.Set(0, 0, -1);
 					}
 					else if (1e-6 > fabs(cUpVector.z + 1)) {
-						HC_Set_Camera_Up_Vector(-fCos45, fCos45, 0);
+						cSetUpVector.Set(-fCos45, fCos45, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.x + fCos45)) {
-						HC_Set_Camera_Up_Vector(0, 0, 1);
+						cSetUpVector.Set(0, 0, 1);
 					}
 				}
 			} break;
 
 			case TDF::ViewMode::px_ny: { // Front - Right
-				HC_Set_Camera_Position(target.x + fLenCos, target.y - fLenCos, target.z);
+				cSetPosition.Set(target.x + fLenCos, target.y - fLenCos, target.z);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0, 0, 1);
+					cSetUpVector.Set(0, 0, 1);
 				}
 				else {
 					if (1e-6 > fabs(cUpVector.z - 1)) {
-						HC_Set_Camera_Up_Vector(-fCos45, -fCos45, 0);
+						cSetUpVector.Set(-fCos45, -fCos45, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.x + fCos45)) {
-						HC_Set_Camera_Up_Vector(0, 0, -1);
+						cSetUpVector.Set(0, 0, -1);
 					}
 					else if (1e-6 > fabs(cUpVector.z + 1)) {
-						HC_Set_Camera_Up_Vector(fCos45, fCos45, 0);
+						cSetUpVector.Set(fCos45, fCos45, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.x - fCos45)) {
-						HC_Set_Camera_Up_Vector(0, 0, 1);
+						cSetUpVector.Set(0, 0, 1);
 					}
 				}
 			} break;
 
 			case TDF::ViewMode::nx_ny: { // Left - Front
-				HC_Set_Camera_Position(target.x - fLenCos, target.y - fLenCos, target.z);
+				cSetPosition.Set(target.x - fLenCos, target.y - fLenCos, target.z);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0, 0, 1);
+					cSetUpVector.Set(0, 0, 1);
 				}
 				else {
 					if (1e-6 > fabs(cUpVector.z - 1)) {
-						HC_Set_Camera_Up_Vector(-fCos45, fCos45, 0);
+						cSetUpVector.Set(-fCos45, fCos45, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.x + fCos45)) {
-						HC_Set_Camera_Up_Vector(0, 0, -1);
+						cSetUpVector.Set(0, 0, -1);
 					}
 					else if (1e-6 > fabs(cUpVector.z + 1)) {
-						HC_Set_Camera_Up_Vector(fCos45, -fCos45, 0);
+						cSetUpVector.Set(fCos45, -fCos45, 0);
 					}
 					else if (1e-6 > fabs(cUpVector.y - 1)) {
-						HC_Set_Camera_Up_Vector(0, 0, 1);
+						cSetUpVector.Set(0, 0, 1);
 					}
 				}
 			} break;
 
-			case TDF::ViewMode::nx_py_nz: {
-				HC_Set_Camera_Position(-px, py, -pz);
+			case TDF::ViewMode::nx_py_nz: { // bottom - left - back
+				cSetPosition.Set(target.x - cVertexVector.x, target.y + cVertexVector.y, -(target.z - cVertexVector.z));
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(-0.408248f, 0.408249f, 0.816497f);
+					cSetUpVector.Set(-0.408248f, 0.408248f, 0.816497f);
 				}
 				else {
-					HC_Set_Camera_Up_Vector(cUpVector.z, -cUpVector.x, -cUpVector.y);
+					cSetUpVector.Set(cUpVector.z, -cUpVector.x, -cUpVector.y);
 				}
 			} break;
 
-			case TDF::ViewMode::nx_py_pz: {
-				HC_Set_Camera_Position(-px, py, pz);
+			case TDF::ViewMode::nx_py_pz: { // top - back - left
+				cSetPosition.Set(target.x - cVertexVector.x, target.y + cVertexVector.y, target.z - cVertexVector.z);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0.408248f, -0.408249f, 0.816497f);
+					cSetUpVector.Set(0.408248f, -0.408248f, 0.816497f);
 				}
 				else {
-					HC_Set_Camera_Up_Vector(-cUpVector.y, cUpVector.z, -cUpVector.x);
+					cSetUpVector.Set(-cUpVector.y, cUpVector.z, -cUpVector.x);
 				}
 			} break;
 
-			case TDF::ViewMode::nx_ny_pz: {
-				HC_Set_Camera_Position(-px, -py, pz);
+			case TDF::ViewMode::nx_ny_pz: { // top - left - front
+				cSetPosition.Set(target.x - cVertexVector.x, -(target.y + cVertexVector.y), target.z - cVertexVector.z);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0.408248f, 0.408249f, 0.816497f);
+					cSetUpVector.Set(0.408248f, 0.408248f, 0.816497f);
 				}
 				else {
-					HC_Set_Camera_Up_Vector(-cUpVector.z, cUpVector.x, -cUpVector.y);
+					cSetUpVector.Set(-cUpVector.z, cUpVector.x, -cUpVector.y);
 				}
 			} break;
 
-			case TDF::ViewMode::nx_ny_nz: {
-				HC_Set_Camera_Position(-px, -py, -pz);
+			case TDF::ViewMode::nx_ny_nz: { // bottom - front - left
+				cSetPosition.Set(target.x - cVertexVector.x, -(target.y + cVertexVector.y), -(target.z - cVertexVector.z));
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(-0.408248f, -0.408248f, 0.816497f);
+					cSetUpVector.Set(-0.408248f, -0.408248f, 0.816497f);
 				}
 				else {
-					HC_Set_Camera_Up_Vector(cUpVector.y, cUpVector.z, cUpVector.x);
+					cSetUpVector.Set(cUpVector.y, cUpVector.z, cUpVector.x);
 				}
 			} break;
 
-			case TDF::ViewMode::px_py_pz: { // ISO
-				HC_Set_Camera_Position(px, py, pz);
+			case TDF::ViewMode::px_py_pz: { // ISO top - right - back
+				cSetPosition.Set(target.x + cVertexVector.x, target.y + cVertexVector.y, target.z - cVertexVector.z);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(-0.408248f, -0.408249f, 0.816497f);
+					cSetUpVector.Set(-0.408248f, -0.408248f, 0.816497f);
 				}
 				else {
-					HC_Set_Camera_Up_Vector(cUpVector.z, cUpVector.x, cUpVector.y);
+					cSetUpVector.Set(cUpVector.z, cUpVector.x, cUpVector.y);
 				}
 			} break;
 
-			case TDF::ViewMode::px_py_nz: {
-				HC_Set_Camera_Position(px, py, -pz);
+			case TDF::ViewMode::px_py_nz: { // bottom - back - right
+				cSetPosition.Set(target.x + cVertexVector.x, target.y + cVertexVector.y, -(target.z - cVertexVector.z));
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0.468564f, 0.317602f, 0.824364f);
+					cSetUpVector.Set(0.408248f, 0.408248f, 0.816497f);
 				}
 				else {
-					HC_Set_Camera_Up_Vector(cUpVector.y, -cUpVector.z, -cUpVector.x);
+					cSetUpVector.Set(cUpVector.y, -cUpVector.z, -cUpVector.x);
 				}
 				
 			} break;
 
-			case ViewMode::px_ny_nz: {
-				HC_Set_Camera_Position(px, -py, -pz);
+			case ViewMode::px_ny_nz: { // bottom - right - front
+				cSetPosition.Set(target.x + cVertexVector.x, -(target.y + cVertexVector.y), -(target.z - cVertexVector.z));
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(0.468564f, -0.317602f, 0.824364f);
+					cSetUpVector.Set(0.408248f, -0.408248f, 0.816497f);
 				}
 				else {
-					HC_Set_Camera_Up_Vector(-cUpVector.z, -cUpVector.x, cUpVector.y);
+					cSetUpVector.Set(-cUpVector.z, -cUpVector.x, cUpVector.y);
 				}
 
 			} break;
 
-			case ViewMode::px_ny_pz: {
-				HC_Set_Camera_Position(px, -py, pz);
+			case ViewMode::px_ny_pz: { // top - front - right
+				cSetPosition.Set(target.x + cVertexVector.x, -(target.y + cVertexVector.y), target.z - cVertexVector.z);
 				if (eViewMode != eOldViewMode) {
-					HC_Set_Camera_Up_Vector(-0.408249f, 0.408248f, 0.816497f);
+					cSetUpVector.Set(-0.408248f, 0.408248f, 0.816497f);
 				}
 				else {
-					HC_Set_Camera_Up_Vector(-cUpVector.y, -cUpVector.z, cUpVector.x);
+					cSetUpVector.Set(-cUpVector.y, -cUpVector.z, cUpVector.x);
 				}
 				
 			} break;
@@ -479,6 +484,9 @@ void TDF::BaseView::SetViewMode(TDF::ViewMode eViewMode, bool bFitWorld)
 				assert(0);
 				break;
 		}
+
+		HC_Set_Camera_Position(cSetPosition.x, cSetPosition.y, cSetPosition.z);
+		HC_Set_Camera_Up_Vector(cSetUpVector.x, cSetUpVector.y, cSetUpVector.z);
 
 		if (GetSmoothTransition())
 		{
