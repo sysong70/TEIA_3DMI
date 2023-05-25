@@ -274,10 +274,10 @@ void Canvas::Init()
 	m_pcBaseView->SetSmoothTransition(false);
 	m_pcBaseView->SetShadowRenderingMode(TheKenelSetting.Effects.SimpleShadow.ShadowRenderingMode);
 	SetViewAxis();
+
 	SetTransparency();
 
-	m_pcBaseView->SetViewMode(HViewIsoFrontRightTop);		// fit the camera to the scene extents
-	m_pcBaseView->SetAxisMode(TheKenelSetting.General.Rendering.DisplayAxisTriad ? AxisOn : AxisOff);
+	//m_pcBaseView->SetAxisMode(TheKenelSetting.General.Rendering.DisplayAxisTriad ? AxisOn : AxisOff);
 
 	// 배경화면 설정
 	SetWindowBackGroundColor(TheKenelSetting.Appearance.BackgroundColor.Top, TheKenelSetting.Appearance.BackgroundColor.Bottom);
@@ -767,18 +767,20 @@ void Canvas::SetViewAxis()
 		&top.x, &top.y, &top.z);
 
 	m_pcBaseView->SetViewAxis(&front, &top);
-
-	m_pcBaseView->SetAxisMode(AxisOn);
 }
 
 void Canvas::InitNavigationCube(int nWidth, int nHeight)
 {
-	m_cNaviCube.SetView(m_pcBaseView);
-	m_cNaviCube.SetSize(NavigationCube::Midium);
+	m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
+	m_cNaviCube.SetSize(NavigationCube::Big);
 	m_cNaviCube.SetVisible(true, true);
 
 	m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetModelKey());
+	//m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetSceneKey());
+	//m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetOverwriteKey());
 	m_cNaviCube.Transform();
+
+	m_pcBaseView->SetNavigationCube(&m_cNaviCube);
 
 	m_bInitNaviCube = true;
 }

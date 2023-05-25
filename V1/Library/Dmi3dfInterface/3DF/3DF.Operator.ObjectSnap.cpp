@@ -1,6 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #include "3DF.Window.h"
+#include "3DF.BaseView.h"
 
 #include "3DF.Line.h"
 #include "3DF.Circle.h"
@@ -71,56 +72,83 @@ Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 	//m_cSnapPointSegment.GetVisualEffectsControl().SetAntiAliasing(true);
 	m_cSnapPointSegment.GetVisualEffectsControl().SetLineAntiAliasing(true);
 	m_cSnapPointSegment.GetVisualEffectsControl().SetTextAntiAliasing(true);
+
+	// Tick Count 초기화
+	m_nPrevMouseMoveTickCount = GetTickCount();
+	m_nSelectPickCount = 300;
 }
 
 int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 {
 	PixelPoint cMousePoint(cInEvent.GetMousePixelPos());
 
+/*
+	DWORD nMouseMoveTickCount = GetTickCount();
+	DWORD nTickCount = nMouseMoveTickCount - m_nPrevMouseMoveTickCount;
+	m_nPrevMouseMoveTickCount = nMouseMoveTickCount;
+*/
+
+	float fDist = m_cPrevPoint.DistanceWith(cMousePoint);
+	m_cPrevPoint = cMousePoint;
+
+	//TRACE(L"ObjectSnap::NoButtonDownAndMove, Tick: %d, Dist: %f\n", nTickCount, fDist);
+
 	// 같은 Mouse Point가 계속 들어오는 경우는 처리하지 않는다.
-	if (0 == m_cPrevPoint.DistanceWith(cMousePoint)) {
+	if (3 < fDist || 0 == fDist) {
 		return HLISTENER_PASS_EVENT;
 	}
 
-	m_cPrevPoint = cMousePoint;
+	TRACE(L"ObjectSnap::NoButtonDownAndMove, Dist: %f\n", fDist);
+
+// 	if (m_nSelectPickCount > nTickCount) {
+// 		return HLISTENER_PASS_EVENT;
+// 	}
 
 	CamerInformation cCameraInfo;
 	ShowCameraInformation(m_fSnapRadius, cCameraInfo);
 
 	// Event에서 들어온 Mouse 위치를 이용해서 Snap Point가 선택된 경우 (주어진 Pixel 범위내에 있을 때), 
 	// Snap Point에 선택 Flag을 주어서 선택된 효과를 주도록 한다.
+// 	float fMinDist = FLT_MAX;
+// 	ObjectSnap::SnapItem * pcMinSnapItem = nullptr;
 	for (auto & pcSnapItem : m_vSnapItems) {
 
 		if (Type::NearPoint == pcSnapItem->eType) {
 			continue;
 		}
 
-		PixelPoint cMousePoint(cInEvent.GetMousePixelPos());
 		PixelPoint cPixelPoint(*m_pcWindow, pcSnapItem->cPoint);
 
 		double dDist = cPixelPoint.DistanceWith(cMousePoint);
 
-		// Snap Point가 선택된 경우 처리 (주어진 Pixel 범위내에 있을 때)
-		// Snap Point를 그리고 기존 Select Item과 Object Snap Point는 삭제한다.
 		if (15 > dDist) {
 			pcSnapItem->eStatus = ObjectSnap::Status::Selected;
-			
-// 			// 기존에 선택된 Snap Point가 있으면 삭제한다.	
-// 			m_cSnapPointSegment.Flush(Search::Type::Segment);
+
+			// 기존에 선택된 Snap Point가 있으면 삭제한다.	
+			m_cSnapPointSegment.Flush(Search::Type::Segment);
 
 			// 기존 선택 요소 Unhighlight
-			if (0 < m_cOldHighlightSelection.GetCount()) {
-				m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
-			}
+	// 			if (0 < m_cOldHighlightSelection.GetCount()) {
+	// 				m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
+	// 			}
 
+			TRACE(L"1st DrawSnapItem, %d\n", (int)pcSnapItem->eType);
 			DrawSnapItem(pcSnapItem, cCameraInfo);
 
 			m_pcWindow->Update();
-	
+
 			//HC_Flush_Contents
 			return HLISTENER_PASS_EVENT;
 		}
+
+// 		if (dDist < fMinDist) {
+// 			fMinDist = dDist;
+// 			pcMinSnapItem = pcSnapItem;
+// 		}
 	}
+
+	// Snap Point가 선택된 경우 처리 (주어진 Pixel 범위내에 있을 때)
+	// Snap Point를 그리고 기존 Select Item과 Object Snap Point는 삭제한다.
 
 	SelectionOptionsKit cSelectOption;
 	cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(10).SetProximity(0.1f).SetSorting(Selection::Sorting::ZSorting);
@@ -191,6 +219,9 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 				TRACE(L"SelectByPoint Shell: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());		
 				vShellSelectedItems.push_back(pcItem);
 			}
+			else {
+				TRACE(L"SelectByPoint: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());		
+			}
 
 			cIter.Next();
 		}
@@ -215,29 +246,31 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 			// Line이 가장 앞에 있는 경우 (Windows Point의 Z값이 가장 작은 경우)
 			if (cLinePoint.z < cShellPoint.z) {
 				m_cNewHighlightSelection.PushBack(new SelectionItem(*pcLineItem));
-				//TRACE(L"cLinePoint.z > cShellPoint.z\n");
+				TRACE(L"Line First Pushback\n");
 			}
 			// Shell의 선택점과 Line의 선택점이 거의 같은 경우 Line을 선택한다.
 			else if (1.0e-2 >fabs(cLinePoint.z - cShellPoint.z)) {
 				m_cNewHighlightSelection.PushBack(new SelectionItem(*pcLineItem));
-				//TRACE(L"1.0e-2 >fabs(cLinePoint.z - cShellPoint.z)\n");
+				TRACE(L"Line vs face near Pushback\n");
 			}
 			else {
-				m_cNewHighlightSelection.PushBack(new SelectionItem(*pcShellItem));
+				//m_cNewHighlightSelection.PushBack(new SelectionItem(*pcShellItem));
 			}
 		}
 		else if (0 < vLineSelectedItems.size()) {
 			// Line만 있는 경우
 			m_cNewHighlightSelection.PushBack(new SelectionItem(*vLineSelectedItems[0]));
+			TRACE(L"Line only Pushback\n");
 		}
 		else if (0 < vShellSelectedItems.size()) {
 			// Shell만 있는 경우
 			m_cNewHighlightSelection.PushBack(new SelectionItem(*vShellSelectedItems[0]));
+			TRACE(L"Shell only Pushback\n");
 		}
 		else {
 			// Line과 Shell이 없는 경우
 			//m_cNewHighlightSelection.PushBack(new SelectionItem(*cHighlightSelection.GetIterator().GetItem()));
-			}
+		}
 	}
 	else {
 		TRACE(L"SelectByPoint: %d\n", nSelectedCount);
@@ -255,32 +288,21 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 		}
 	}
 
-
 	HighlightOptionsKit cHighlightOptions;
 	// Update를 하지 않기 위해서 Notification을 끈다.
 	cHighlightOptions.SetNotification(false);
 
 	// 선택된 요소가 있고 기존과 다른 경우에만 Highlight를 한다.
 	if (0 < m_cNewHighlightSelection.GetCount() && m_cOldHighlightSelection != m_cNewHighlightSelection) {
+		TRACE(L"HighlightSelection Count: %d\n", m_cNewHighlightSelection.GetCount());
 		m_pcWindow->GetHighlightControl().Highlight(m_cNewHighlightSelection, cHighlightOptions, true);
 		bForceUpdate = true;
-
-		Key cNewKey;
-		if(0 < m_cNewHighlightSelection.GetCount()) {
-			m_cNewHighlightSelection.Front()->ShowSelectedItem(cNewKey);
-		}
-
-		Key cOldKey;
-		if (0 < m_cOldHighlightSelection.GetCount()) {
-			m_cOldHighlightSelection.Front()->ShowSelectedItem(cOldKey);
-		}
-
-		TRACE(L"Highlight: %d, %d\n", cOldKey.KeyValue(), cNewKey.KeyValue());
 	}
 	else if(0 == m_cNewHighlightSelection.GetCount() && 0 < m_cOldHighlightSelection.GetCount()) {
 		// 기존에 선택된 요소가 있고 새로운 요소가 없는 경우에는 기존 요소를 지운다.
 		m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection, cHighlightOptions);
 
+		// 화면상의 SnapItem을 지운다.
 		if(false == m_vSnapItems.empty()) { 
 			ClearSnapItems(false); 
 		}
@@ -297,22 +319,7 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 
 	m_cOldHighlightSelection = m_cNewHighlightSelection;
 
-	Key cNewKey;
 	if (0 < m_cNewHighlightSelection.GetCount()) {
-		m_cNewHighlightSelection.Front()->ShowSelectedItem(cNewKey);
-	}
-
-	Key cOldKey;
-	if (0 < m_cOldHighlightSelection.GetCount()) {
-		m_cOldHighlightSelection.Front()->ShowSelectedItem(cOldKey);
-	}
-
-	TRACE(L"Copy: %d, %d\n", cOldKey.KeyValue(), cNewKey.KeyValue());
-
-	if (0 < m_cNewHighlightSelection.GetCount()) {
-		// 사전 선택된 Object Snap Point 삭제
-		ResetSnapItem();
-
 		// Object Snap Point를 계산한다.
 		CalculationObjectSnapPoint(m_cHighlightSelection);
 
@@ -340,38 +347,6 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 		//m_pcWindow->Update();
 		m_pcWindow->GetBaseView()->ForceUpdate();
 	}
-
-	return HLISTENER_PASS_EVENT;
-
-	// PMI Test	Code
-
-	SegmentKey cSecne(m_pcWindow->GetSceneKey());
-
-	CameraKit cCamera;
-	cSecne.ShowCamera(cCamera);
-
-	Matrix cMatrix;
-	cCamera.ShowMatrix(cMatrix);
-
-	WorldPoint cPoint[2];
-
-	//cPoint[0];
-	cPoint[1] = cInEvent.GetMouseWorldPos();
-
-	Vector cXAixs = cMatrix.XAxis();
-	Vector cYAixs = cMatrix.YAxis();
-	Vector cOrigin = cMatrix.Origin();
-
-	Point2D cP1 = cPoint[0].DropPoint(cOrigin, cXAixs, cYAixs);
-	Point2D cP2 = cPoint[1].DropPoint(cOrigin, cXAixs, cYAixs);
-
-	// Test Object Snap
-	HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetConstructionKey()); {
-		//:Ken - removed
-		//HDraw::Test(m_pcWindow->GetBaseView(), cMatrix, cP1, cP2);
-	} HC_Close_Segment();
-
-	m_pcWindow->GetBaseView()->Update();
 
 	return HLISTENER_PASS_EVENT;
 }
@@ -532,6 +507,8 @@ void Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults & cI
 	
 		// Line Key 처리
 		if (TDF::Type::LineKey == eType) {
+			// 사전 선택된 Object Snap Point 삭제
+			ResetSnapItem();
 			CalculationLienObjectSnapPoint(cKey, cWindowPoint, cMatrix);
 		}
 	}
@@ -681,10 +658,10 @@ void Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 
 void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & cInCameraInfo, bool bUpdate)
 {
-	if (false == btemp) {
-		btemp = true;
-		return;
-	}
+// 	if (false == btemp) {
+// 		btemp = true;
+// 		return;
+// 	}
 
 	m_cSnapPointSegment.Open();
 	{

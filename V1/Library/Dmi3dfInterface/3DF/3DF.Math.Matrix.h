@@ -48,7 +48,7 @@ public:
 	MatrixKit & Invert();
 
 	bool IsIdentity() const;
-
+	;;;
 	MatrixKit Multiply(MatrixKit const & cInRight) const;
 
 	MatrixKit Multiply(float fInScalar) const;

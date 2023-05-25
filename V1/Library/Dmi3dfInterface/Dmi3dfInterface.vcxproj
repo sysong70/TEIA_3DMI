@@ -221,6 +221,7 @@
     <ClCompile Include="3DF\3DF.Image.cpp" />
     <ClCompile Include="3DF\3DF.Include.cpp" />
     <ClCompile Include="3DF\3DF.Key.cpp" />
+    <ClCompile Include="3DF\3DF.KeyPath.cpp" />
     <ClCompile Include="3DF\3DF.Kit.cpp" />
     <ClCompile Include="3DF\3DF.Line.cpp" />
     <ClCompile Include="3DF\3DF.LineAttribute.cpp" />

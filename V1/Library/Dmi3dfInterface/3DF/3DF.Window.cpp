@@ -3,6 +3,8 @@
 #include "3DF.Window.h"
 #include "Private/3DF.WindowPrivate.h"
 
+#include "3DF.BaseView.h"
+
 #include <hc.h>
 #include <HBaseOperator.h>
 
@@ -10,11 +12,10 @@ USING_3DF_NAMESPACE
 
 // public HBaseView, public HAnimationListener
 
-
-WindowKey::WindowKey(HBaseView * pcBaseView)
+WindowKey::WindowKey(TDF::BaseView * pcBaseView)
 {
 	WindowKeyPrivate * pcImpl = new WindowKeyPrivate();
-	pcImpl->m_pcBaseView = static_cast<HBaseView *>(pcBaseView);
+	pcImpl->m_pcBaseView = pcBaseView;
 	m_pcImpl = pcImpl;
 
 	// Initialize();
@@ -27,13 +28,13 @@ WindowKey::WindowKey(WindowKey const & cInThat)
 	m_pcImpl = pcImpl;
 }
 
-const HBaseView * WindowKey::GetBaseView() const
+const TDF::BaseView * WindowKey::GetBaseView() const
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return pcImpl->m_pcBaseView;
 }
 
-HBaseView * WindowKey::GetBaseView()
+TDF::BaseView * WindowKey::GetBaseView()
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return pcImpl->GetBaseView();

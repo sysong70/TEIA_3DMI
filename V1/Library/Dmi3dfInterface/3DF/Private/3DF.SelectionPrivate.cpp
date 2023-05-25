@@ -3,6 +3,7 @@
 #include "3DF.SelectionPrivate.h"
 
 #include "../3DF.Window.h"
+#include "../3DF.BaseView.h"
 
 #include "../3DF.Line.h"
 #include "../3DF.Shell.h"
@@ -30,7 +31,7 @@ USING_3DF_NAMESPACE
 
 
 //== SelectionResultsPrivate class =================================================================
-bool SelectionResultsPrivate::Sort()
+bool TDF::SelectionResultsPrivate::Sort()
 {
 	if (2 > deItems.size()) {
 		return false;
@@ -78,7 +79,7 @@ bool SelectionResultsPrivate::Sort()
 //== SelectionControlPrivate class =================================================================
 
 // 주어진 Point와 Selection Option을 이용해서 선택 작업을 수행하고, 선택된 요소를 SelectionResults에 저장한다.
-size_t SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
+size_t TDF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
 {
 	int	 nResult = 0;
 
@@ -87,14 +88,35 @@ size_t SelectionControlPrivate::SelectByPoint(Point const & cInLocation, Selecti
 	// 선택 옵션을 문자열로 변환
 	GetSelectOption(cInOptions, chAction);
 
+	char chScope[MVO_BUFFER_SIZE] = "";
+	GetScope(cInOptions, chScope);
+
 	HSelectionSet * pcSelection = GetBaseView()->GetSelection();
 
 	// 선택 옵션에 따라 선택 작업 실시
+/*
 	HC_Open_Segment_By_Key(GetBaseView()->GetViewKey()); {
-		nResult = HC_Compute_Selection(".",
-			(pcSelection->GetSubwindowPenetration() ? "" : "./scene/overwrite"), chAction, cInLocation.x, cInLocation.y);
-			//"v, selection level = entity, related selection limit = 0, selection sorting, internal selection limit = 0", cInLocation.x, cInLocation.y);
+		nResult = HC_Compute_Selection(".", "", chAction, cInLocation.x, cInLocation.y);
+		//"v, selection level = entity, related selection limit = 0, selection sorting, internal selection limit = 0", cInLocation.x, cInLocation.y);
 	} HC_Close_Segment();
+*/
+
+	if (0 < strlen(chScope)) {
+		HC_Open_Segment(chScope); {
+			HC_Set_Rendering_Options("attribute lock=(selectability)");
+			HC_Set_Selectability("geometry = on");
+			//nResult = HC_Compute_Selection(GetBaseView()->GetDriverPath(), ".", "v, selection level = entity, no related selection limit, visual selection = off", cInLocation.x, cInLocation.y);
+			nResult = HC_Compute_Selection(GetBaseView()->GetDriverPath(), ".", chAction, cInLocation.x, cInLocation.y);
+			HC_Set_Selectability("everything = off");
+		} HC_Close_Segment();
+	}
+	else {
+		HC_Open_Segment_By_Key(GetBaseView()->GetViewKey()); {
+			nResult = HC_Compute_Selection(".", "./scene/overwrite", chAction, cInLocation.x, cInLocation.y);
+			//(pcSelection->GetSubwindowPenetration() ? "" : "./scene/overwrite"), chAction, cInLocation.x, cInLocation.y);
+			//"v, selection level = entity, related selection limit = 0, selection sorting, internal selection limit = 0", cInLocation.x, cInLocation.y);
+		} HC_Close_Segment();
+	}
 
 	// 선택된 요소가 없음
 	if (0 == nResult) {
@@ -213,7 +235,7 @@ size_t SelectionControlPrivate::SelectByPoint(Point const & cInLocation, Selecti
 	return pcResultsPrivate->Size();
 }
 
-bool SelectionControlPrivate::SorterFunction(const void * pcArg1, const void * pcArg2)
+bool TDF::SelectionControlPrivate::SorterFunction(const void * pcArg1, const void * pcArg2)
 {
 	SelectionItem * pcItem1 = (SelectionItem *)pcArg1;
 	SelectionItem * pcItem2 = (SelectionItem *)pcArg2;
@@ -227,7 +249,7 @@ bool SelectionControlPrivate::SorterFunction(const void * pcArg1, const void * p
 }
 
 
-int SelectionControlPrivate::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
+int TDF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
 {
 	HPoint  new_pos;
 	int		nResult = 0;
@@ -281,7 +303,7 @@ int SelectionControlPrivate::SelectByPoint(Point const & cInLocation, UINT const
 
 
 // 입력되는 Location은 MouseWindowPos을 이용한다. HEventInfo에서 GetMouseWindowPos() 함수를 이용해서 가져올 수 있음
-int SelectionControlPrivate::SelectButtonDown_V1(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults)
+int TDF::SelectionControlPrivate::SelectButtonDown_V1(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults)
 {
 	HPoint  new_pos;
 	int		nResult = 0;
@@ -353,7 +375,7 @@ int SelectionControlPrivate::SelectButtonDown_V1(Point const & cInLocation, UINT
 }
 
 // Select 처리, 재선택 및 최초 선택 Region, PMI 선택등을 처리.
-void SelectionControlPrivate::HandleSelection(UINT const nFlags, SelectionResults & cOutResults)
+void TDF::SelectionControlPrivate::HandleSelection(UINT const nFlags, SelectionResults & cOutResults)
 {
 	HC_KEY  nKey = INVALID_KEY;
 	int nOffset1, nOffset2, nOffset3;
@@ -510,7 +532,7 @@ void SelectionControlPrivate::HandleSelection(UINT const nFlags, SelectionResult
 	delete[] pnIncludeKeys;
 }
 
-void SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & cInOptions, char * pchOutOption)
+void TDF::SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & cInOptions, char * pchOutOption)
 {
 	char chOption[MVO_BUFFER_SIZE] = "\0";
 
@@ -578,12 +600,15 @@ void SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & cInOpt
 		Utility::Set3DfOptionString(pchOutOption, chOption);
 	}
 
+/*
+	// Proximity 관련 설정은 View의 Driver 옵션이기 때문에 별도 처리해야 함.
 	float fProximity = 0.0;
 	if (true == cInOptions.ShowProximity(fProximity)) {
 		sprintf(chOption, "selection proximity = %f", fProximity);
 
 		Utility::Set3DfOptionString(pchOutOption, chOption);
 	}
+*/
 
 	Selection::Bias eBias;
 	if (true == cInOptions.ShowBias(eBias)) {
@@ -610,7 +635,20 @@ void SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & cInOpt
 	}
 }
 
-HBaseView * SelectionControlPrivate::GetBaseView() 
+void TDF::SelectionControlPrivate::GetScope(SelectionOptionsKit const & cInOptions, char * pchOutScope)
+{
+	SegmentKey cStartSegment;
+	KeyPath cStartPath;
+	bool bScopeOnly;
+
+	if (true == cInOptions.ShowScope(cStartSegment, bScopeOnly)) {
+		HC_Show_Segment(cStartSegment.KeyValue(), pchOutScope);
+	}
+	else if (true == cInOptions.ShowScope(cStartPath, bScopeOnly)) {
+	}
+}
+
+HBaseView * TDF::SelectionControlPrivate::GetBaseView()
 { 
 	return (HBaseView *)m_pcWindow->GetBaseView(); 
 }

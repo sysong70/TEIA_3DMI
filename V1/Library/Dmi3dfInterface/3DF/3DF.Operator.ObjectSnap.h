@@ -14,6 +14,8 @@ class WindowKey;
 
 namespace Operator
 {
+	class SnapItem;
+
 	class ObjectSnap
 	{
 	public:
@@ -31,13 +33,6 @@ namespace Operator
 		{
 			Selected,
 			Normal,
-		};
-
-		struct SnapItem
-		{
-			WorldPoint cPoint;
-			Type eType = Type::None;
-			Status eStatus = Status::Normal;
 		};
 
 		struct CamerInformation
@@ -61,8 +56,8 @@ namespace Operator
 	public:
 
 		void DrawSnapItems(bool bUpdate = true);
-		void DrawSnapItem(SnapItem* pcInItem, CamerInformation & cInCameraInfo, bool bUpdate = true);
-		void DrawSnapPoint(SnapItem* pItem, Point2D center, double dRadius);
+		void DrawSnapItem(SnapItem * pcInItem, CamerInformation & cInCameraInfo, bool bUpdate = true);
+		void DrawSnapPoint(SnapItem * pItem, Point2D center, double dRadius);
 		double PixelToWorld(double unit);
 		bool ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo);
 
@@ -86,7 +81,23 @@ namespace Operator
 
 		Point m_cPrevPoint;
 
-		std::vector<ObjectSnap::SnapItem *> m_vSnapItems;
+		DWORD m_nPrevMouseMoveTickCount;
+		DWORD m_nSelectPickCount;
+
+		std::vector<SnapItem *> m_vSnapItems;
+	};
+
+	class SnapItem
+	{
+	public:
+		SelectionItem m_cItem;
+
+		WorldPoint cPoint;
+		ObjectSnap::Type eType = ObjectSnap::Type::None;
+		ObjectSnap::Status eStatus = ObjectSnap::Status::Normal;
+
+		std::vector<WorldPoint> m_cPoints;
+		std::vector<ObjectSnap::Type> m_cTypes;
 	};
 }
 CLOSE_3DF_NAMESPACE

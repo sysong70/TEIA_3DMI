@@ -4,6 +4,7 @@
 #include "Private/3DF.SelectionPrivate.h"
 
 #include "3DF.Window.h"
+#include "3DF.BaseView.h"
 
 #include "3DF.Line.h"
 
@@ -113,6 +114,22 @@ SelectionOptionsKit & TDF::SelectionOptionsKit::SetBias(Selection::Bias eInBias)
 	return *this;
 }
 
+SelectionOptionsKit & TDF::SelectionOptionsKit::SetScope(SegmentKey const & cInStartSegment, bool bInScopeOnly)
+{
+	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
+	pcImpl->cStartSegment = cInStartSegment;
+	pcImpl->bScopeOnly = bInScopeOnly;
+	return *this;
+}
+
+SelectionOptionsKit & TDF::SelectionOptionsKit::SetScope(KeyPath const & cInStartPath, bool bInScopeOnly)
+{
+	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
+	pcImpl->cStartPath = cInStartPath;
+	pcImpl->bScopeOnly = bInScopeOnly;
+	return *this;
+}
+
 bool TDF::SelectionOptionsKit::ShowProximity(float & fOutProximity) const
 {
 	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
@@ -199,6 +216,32 @@ bool TDF::SelectionOptionsKit::ShowBias(Selection::Bias & eOutBias) const
 	}
 
 	eOutBias = pcImpl->eBias;
+	return true;
+}
+
+bool TDF::SelectionOptionsKit::ShowScope(SegmentKey & cOutStartSegment, bool & bOutScopeOnly) const
+{
+	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
+	if (INVALID_KEY == pcImpl->cStartSegment.KeyValue()) {
+		return false;
+	}
+
+	cOutStartSegment = pcImpl->cStartSegment;
+	bOutScopeOnly = pcImpl->bScopeOnly;
+	
+	return true;
+}
+
+bool TDF::SelectionOptionsKit::ShowScope(KeyPath & cOutStartPath, bool & bOutScopeOnly) const
+{
+	SelectionOptionsKitPrivate * pcImpl = (SelectionOptionsKitPrivate *)m_pcImpl;
+	if (true == pcImpl->cStartPath.Empty()) {
+		return false;
+	}
+
+	cOutStartPath = pcImpl->cStartPath;
+	bOutScopeOnly = pcImpl->bScopeOnly;
+
 	return true;
 }
 

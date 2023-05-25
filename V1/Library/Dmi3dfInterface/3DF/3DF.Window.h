@@ -4,18 +4,18 @@
 #include "3DF.Selection.h"
 #include "3DF.Highlight.h"
 
-class HBaseView;
-
 OPEN_3DF_NAMESPACE
+
+class BaseView;
 
 class API_3DF WindowKey : public SegmentKey
 {
 public:
-	WindowKey(HBaseView * pcBaseView);
+	WindowKey(TDF::BaseView * pcBaseView);
 	WindowKey(WindowKey const & cInThat);
 
-	const HBaseView * GetBaseView() const;
-	HBaseView * GetBaseView();
+	const TDF::BaseView * GetBaseView() const;
+	TDF::BaseView * GetBaseView();
 
 	HC_KEY GetSceneKey();
 	const HC_KEY GetSceneKey() const;

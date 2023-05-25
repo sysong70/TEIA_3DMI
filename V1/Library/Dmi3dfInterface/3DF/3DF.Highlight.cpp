@@ -5,6 +5,7 @@
 #include "Private/3DF.SelectionPrivate.h"
 
 #include "3DF.Window.h"
+#include "3DF.BaseView.h"
 
 #include "3DF.Line.h"
 
@@ -129,8 +130,8 @@ public:
 	WindowKey * GetWindow() { return (WindowKey *)m_pcWindow; }
 	const WindowKey * m_pcWindow = nullptr;
 
-	HBaseView * GetBaseView() { return (HBaseView *)m_pcBaseView; }
-	const HBaseView * m_pcBaseView = nullptr;
+	TDF::BaseView * GetBaseView() { return (TDF::BaseView *)m_pcBaseView; }
+	const TDF::BaseView * m_pcBaseView = nullptr;
 };
 
 TDF::HighlightControl::HighlightControl(WindowKey const & cInWindow)
@@ -171,7 +172,7 @@ HighlightControl & TDF::HighlightControl::operator=(HighlightControl const & cIn
 HighlightControl & TDF::HighlightControl::Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting)
 {
 	HighlightControlPrivate * pcHighlightControlImpl = (HighlightControlPrivate *)m_pcImpl;
-	HBaseView * pcView = pcHighlightControlImpl->GetBaseView();
+	TDF::BaseView * pcView = pcHighlightControlImpl->GetBaseView();
 
 	char chType[MVO_BUFFER_SIZE];
 
@@ -239,64 +240,6 @@ HighlightControl & TDF::HighlightControl::Highlight(SelectionResults const & cIn
 			}
 		}
 	}
-
-/*
-	for (POSITION pcPosition = cInItems.GetHeadPosition(); nullptr != pcPosition; ) {
-		SelectionItem * pcItem = cInItems.GetNext(pcPosition);
-		SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)pcItem->GetImpl();
-
-		HC_KEY nKey = pcImpl->cKey.KeyValue();
-
-		if (TDF::Type::ShellKey == pcItem->Type() && (pcImpl->nLowest != pcImpl->nHighest || pcImpl->nLowest > 0)) {
-			bNeedDeselect = false;
-
-			if (!pcView->GetHighlightSelection()->IsRegionSelected(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, pcImpl->nRegion))
-			{
-				pcView->GetHighlightSelection()->DeSelectAll();
-				pcView->GetHighlightSelection()->SelectRegion(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, pcImpl->nRegion, false);
-			}
-			else {
-				bNeedUpdate = false;
-			}
-		}
-		else {
-
-			bNeedDeselect = false;
-
-			if (!pcView->GetHighlightSelection()->IsSelected(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys)) {
-				if (pcView->GetHighlightSelection()->GetSelectionLevel() != HSelectSegment) // never should fail for dynamic highlighting, but let's be nice and check
-				{
-					// the key is to a geometric entity.  If we are in segment selection mode,
-					// then we need to get the key to its parent segment.
-					
-					HC_Show_Key_Type(nKey, chType);
-
-					if (!streq("segment", chType))
-					{
-						char segname[MVO_BUFFER_SIZE];
-						HC_KEY segkey;
-
-						segkey = HC_KShow_Owner_Original_Key(nKey);
-						HC_Show_Owner_By_Key(nKey, segname);
-
-						// climb up one more level if this is the temporary highlight key
-						if (pcView->GetHighlightSelection()->IsHighlightSegment(segkey))
-						{
-							segkey = HC_KShow_Owner_Original_Key(segkey);
-							HC_Show_Owner_By_Key(segkey, segname);
-						}
-					}
-				}
-
-				pcView->GetHighlightSelection()->DeSelectAll();
-				pcView->GetHighlightSelection()->Select(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, false);
-			}
-			else {
-				bNeedUpdate = false;
-			}
-		}
-	}
-*/
 
 	if (bNeedDeselect) {
 		pcView->GetHighlightSelection()->DeSelectAll();

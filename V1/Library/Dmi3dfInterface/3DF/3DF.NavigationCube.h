@@ -1,7 +1,9 @@
 ﻿#pragma once
 
 #include "3DF.h"
-#include "HBaseView.h"
+#include "3DF.BaseView.h"
+#include "3DF.Segment.h"
+#include "3DF.Selection.h"
 
 OPEN_3DF_NAMESPACE
 
@@ -17,13 +19,18 @@ public:
 		Big = 300,
 	};
 
-	NavigationCube(HBaseView* view = nullptr);
+	NavigationCube(TDF::BaseView * view = nullptr, WindowKey * pcInWindow = nullptr);
 
 	~NavigationCube();
 
+	int LButtonUp(HEventInfo & cInEvent);
+
+	int LButtonDownAndMove(HEventInfo & cInEvent);
+	int NoButtonDownAndMove(HEventInfo & cInEvent);
+
 	void SetSize(ESize size);
 
-	void SetView(HBaseView* view);
+	void SetView(TDF::BaseView * view, WindowKey * pcInWindow);
 
 	void SetVisible(bool axis, bool cube);
 
@@ -71,7 +78,8 @@ private:
 
 	void SetWindowSize(double width, double height, bool openSegment = true);
 
-	HBaseView* m_pView = nullptr;
+	WindowKey * m_pcWindow = nullptr;
+	TDF::BaseView * m_pView = nullptr;
 	ESize m_eCubeSize = ESize::Midium;
 	bool m_bAxisVisible = true;
 	bool m_bCubeVisible = true;
@@ -79,6 +87,11 @@ private:
 	HC_KEY m_parentSegment = HC_ERROR_KEY;
 	HC_KEY m_cubeSegment = HC_ERROR_KEY;
 	HC_KEY m_planeSegment = HC_ERROR_KEY;
+
+
+	SegmentKey m_cSegments[(int)TDF::ViewMode::Count];
+
+	SelectionResults m_cOldHighlightSelection;
 };
 
 CLOSE_3DF_NAMESPACE
