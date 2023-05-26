@@ -31,7 +31,7 @@
 
 
 #include "3DF.Painter.h"
-#include "3DF.Facility.Preference.h"
+#include "3DF.Facility.AppSettings.h"
 
 USING_3DF_NAMESPACE
 
@@ -683,7 +683,7 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 	using namespace Painter;
 
 	// pixel to world
-	double fontSize = PixelToWorld(ThePreference.Gui.General.FontSize * ThePreference.Gui.Session.DpiScale);
+	double fontSize = PixelToWorld(TheAppSettings.Preference.General.FontSize * TheAppSettings.Preference.Session.DpiScale);
 	//:WARNING - replace dUnit
 	dUnit = fontSize * 0.5;
 
@@ -745,7 +745,7 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 	HC_Open_Segment("snap name");
 	{
 		Segment::SetColor("text", TooltipTextColor);
-		Font::SetName(ThePreference.Gui.General.FontName());
+		Font::SetName(TheAppSettings.Preference.General.FontName());
 		Font::SetSize(fontSize, "oru");
 		Font::SetRenderer("truetype");
 		Font::SetAlignment(Font::EPivot::MiddleCenter);
@@ -753,7 +753,7 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 		//:TODO - text position in window
 		double textOffset = dUnit * 5;
 		position.y += textOffset;
-		CString text = ThePreference.Gui.General.Local(pText);
+		CString text = TheAppSettings.Preference.General.Local(pText);
 		Text::Create(position, text);
 
 		//:WARNING - for calculating text extent

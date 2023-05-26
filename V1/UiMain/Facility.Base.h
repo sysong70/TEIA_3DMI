@@ -1,12 +1,6 @@
 ﻿#pragma once
 
-#ifdef _3DF_EXPORT
-#include "3DF.h"
-#include <HBaseView.h>
-#endif
-
-#include <Facility.h>
-#include <Json.h>
+#include "Facility.h"
 
 #define GetBooleanValue(name)	pData->SetBoolean(#name, name)
 #define GetEnumValue(name)		pData->SetInteger(#name, (int)name)
@@ -22,9 +16,7 @@
 #define SetRealValue(name)			name = pData->GetReal(#name, name)
 #define SetStringValue(name)		name = pData->GetString(#name, name)
 
-#ifdef _3DF_EXPORT
-OPEN_3DF_NAMESPACE
-#endif
+
 
 namespace Facility
 {
@@ -46,7 +38,3 @@ namespace Facility
 		CString Name;
 	};
 }
-
-#ifdef _3DF_EXPORT
-CLOSE_3DF_NAMESPACE
-#endif

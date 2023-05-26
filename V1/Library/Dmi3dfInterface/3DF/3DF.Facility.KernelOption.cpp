@@ -1,28 +1,28 @@
 ﻿#include "stdafx.h"
 
-#include "3DF.Facility.KernelSetting.h"
+#include "3DF.Facility.KernelOption.h"
 
 USING_3DF_NAMESPACE
 
-Facility::KernelSetting::KernelSetting()
+Facility::KernelOption::KernelOption()
 	: Base(L"Kernel")
 {
 }
 
-Facility::KernelSetting::~KernelSetting()
+Facility::KernelOption::~KernelOption()
 {
 }
 
 
 
-Json::Object* Facility::KernelSetting::Get()
+Json::Object* Facility::KernelOption::Get()
 {
 	Json::Object* pData = new Json::Object();
 
 	return pData;
 }
 
-bool Facility::KernelSetting::Set(Json::Object* pData)
+bool Facility::KernelOption::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		return false;
@@ -33,7 +33,7 @@ bool Facility::KernelSetting::Set(Json::Object* pData)
 
 #pragma region General
 
-Json::Object* Facility::KernelSetting::GENERAL::Get()
+Json::Object* Facility::KernelOption::GENERAL::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -45,7 +45,7 @@ Json::Object* Facility::KernelSetting::GENERAL::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::GENERAL::Set(Json::Object* pData)
+bool Facility::KernelOption::GENERAL::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -61,7 +61,7 @@ bool Facility::KernelSetting::GENERAL::Set(Json::Object* pData)
 
 
 
-Json::Object* Facility::KernelSetting::GENERAL::DISPLAY::Get()
+Json::Object* Facility::KernelOption::GENERAL::DISPLAY::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -75,7 +75,7 @@ Json::Object* Facility::KernelSetting::GENERAL::DISPLAY::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::GENERAL::DISPLAY::Set(Json::Object* pData)
+bool Facility::KernelOption::GENERAL::DISPLAY::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -93,7 +93,7 @@ bool Facility::KernelSetting::GENERAL::DISPLAY::Set(Json::Object* pData)
 
 
 
-Json::Object* Facility::KernelSetting::GENERAL::TRANSPARENCY::Get()
+Json::Object* Facility::KernelOption::GENERAL::TRANSPARENCY::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -106,7 +106,7 @@ Json::Object* Facility::KernelSetting::GENERAL::TRANSPARENCY::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::GENERAL::TRANSPARENCY::Set(Json::Object* pData)
+bool Facility::KernelOption::GENERAL::TRANSPARENCY::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -123,7 +123,7 @@ bool Facility::KernelSetting::GENERAL::TRANSPARENCY::Set(Json::Object* pData)
 
 
 
-Json::Object* Facility::KernelSetting::GENERAL::RENDERING::Get()
+Json::Object* Facility::KernelOption::GENERAL::RENDERING::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -132,7 +132,7 @@ Json::Object* Facility::KernelSetting::GENERAL::RENDERING::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::GENERAL::RENDERING::Set(Json::Object* pData)
+bool Facility::KernelOption::GENERAL::RENDERING::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -145,7 +145,7 @@ bool Facility::KernelSetting::GENERAL::RENDERING::Set(Json::Object* pData)
 
 
 
-Json::Object* Facility::KernelSetting::GENERAL::ETC::Get()
+Json::Object* Facility::KernelOption::GENERAL::ETC::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -154,7 +154,7 @@ Json::Object* Facility::KernelSetting::GENERAL::ETC::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::GENERAL::ETC::Set(Json::Object* pData)
+bool Facility::KernelOption::GENERAL::ETC::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -169,7 +169,7 @@ bool Facility::KernelSetting::GENERAL::ETC::Set(Json::Object* pData)
 
 #pragma region Performance
 
-Json::Object* Facility::KernelSetting::PERFORMANCE::Get()
+Json::Object* Facility::KernelOption::PERFORMANCE::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -179,7 +179,7 @@ Json::Object* Facility::KernelSetting::PERFORMANCE::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::PERFORMANCE::Set(Json::Object* pData)
+bool Facility::KernelOption::PERFORMANCE::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -193,7 +193,7 @@ bool Facility::KernelSetting::PERFORMANCE::Set(Json::Object* pData)
 
 
 
-Json::Object* Facility::KernelSetting::PERFORMANCE::OPTIMIZATION::Get()
+Json::Object* Facility::KernelOption::PERFORMANCE::OPTIMIZATION::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -206,7 +206,7 @@ Json::Object* Facility::KernelSetting::PERFORMANCE::OPTIMIZATION::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::PERFORMANCE::OPTIMIZATION::Set(Json::Object* pData)
+bool Facility::KernelOption::PERFORMANCE::OPTIMIZATION::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -223,7 +223,7 @@ bool Facility::KernelSetting::PERFORMANCE::OPTIMIZATION::Set(Json::Object* pData
 
 
 
-Json::Object* Facility::KernelSetting::PERFORMANCE::FRAMERATE_OPTIMIZATION::Get()
+Json::Object* Facility::KernelOption::PERFORMANCE::FRAMERATE_OPTIMIZATION::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -239,7 +239,7 @@ Json::Object* Facility::KernelSetting::PERFORMANCE::FRAMERATE_OPTIMIZATION::Get(
 	return pData;
 }
 
-bool Facility::KernelSetting::PERFORMANCE::FRAMERATE_OPTIMIZATION::Set(Json::Object* pData)
+bool Facility::KernelOption::PERFORMANCE::FRAMERATE_OPTIMIZATION::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -261,7 +261,7 @@ bool Facility::KernelSetting::PERFORMANCE::FRAMERATE_OPTIMIZATION::Set(Json::Obj
 
 #pragma region Interaction
 
-Json::Object* Facility::KernelSetting::INTERACTION::Get()
+Json::Object* Facility::KernelOption::INTERACTION::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -271,7 +271,7 @@ Json::Object* Facility::KernelSetting::INTERACTION::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::INTERACTION::Set(Json::Object* pData)
+bool Facility::KernelOption::INTERACTION::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -285,7 +285,7 @@ bool Facility::KernelSetting::INTERACTION::Set(Json::Object* pData)
 
 
 
-Json::Object* Facility::KernelSetting::INTERACTION::GEOMETRY_MANIPULATION::Get()
+Json::Object* Facility::KernelOption::INTERACTION::GEOMETRY_MANIPULATION::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -296,7 +296,7 @@ Json::Object* Facility::KernelSetting::INTERACTION::GEOMETRY_MANIPULATION::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::INTERACTION::GEOMETRY_MANIPULATION::Set(Json::Object* pData)
+bool Facility::KernelOption::INTERACTION::GEOMETRY_MANIPULATION::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -311,7 +311,7 @@ bool Facility::KernelSetting::INTERACTION::GEOMETRY_MANIPULATION::Set(Json::Obje
 
 
 
-Json::Object* Facility::KernelSetting::INTERACTION::ANIMATION::Get()
+Json::Object* Facility::KernelOption::INTERACTION::ANIMATION::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -320,7 +320,7 @@ Json::Object* Facility::KernelSetting::INTERACTION::ANIMATION::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::INTERACTION::ANIMATION::Set(Json::Object* pData)
+bool Facility::KernelOption::INTERACTION::ANIMATION::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -335,7 +335,7 @@ bool Facility::KernelSetting::INTERACTION::ANIMATION::Set(Json::Object* pData)
 
 #pragma region Appearance
 
-Json::Object* Facility::KernelSetting::APPEARANCE::Get()
+Json::Object* Facility::KernelOption::APPEARANCE::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -345,7 +345,7 @@ Json::Object* Facility::KernelSetting::APPEARANCE::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::APPEARANCE::Set(Json::Object* pData)
+bool Facility::KernelOption::APPEARANCE::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -359,7 +359,7 @@ bool Facility::KernelSetting::APPEARANCE::Set(Json::Object* pData)
 
 
 
-Json::Object* Facility::KernelSetting::APPEARANCE::ANTIALIASING::Get()
+Json::Object* Facility::KernelOption::APPEARANCE::ANTIALIASING::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -371,7 +371,7 @@ Json::Object* Facility::KernelSetting::APPEARANCE::ANTIALIASING::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::APPEARANCE::ANTIALIASING::Set(Json::Object* pData)
+bool Facility::KernelOption::APPEARANCE::ANTIALIASING::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -387,7 +387,7 @@ bool Facility::KernelSetting::APPEARANCE::ANTIALIASING::Set(Json::Object* pData)
 
 
 
-Json::Object* Facility::KernelSetting::APPEARANCE::BACKGROUND_COLOR::Get()
+Json::Object* Facility::KernelOption::APPEARANCE::BACKGROUND_COLOR::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -397,7 +397,7 @@ Json::Object* Facility::KernelSetting::APPEARANCE::BACKGROUND_COLOR::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::APPEARANCE::BACKGROUND_COLOR::Set(Json::Object* pData)
+bool Facility::KernelOption::APPEARANCE::BACKGROUND_COLOR::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -413,7 +413,7 @@ bool Facility::KernelSetting::APPEARANCE::BACKGROUND_COLOR::Set(Json::Object* pD
 
 #pragma region Selection
 
-Json::Object* Facility::KernelSetting::SELECTIION::Get()
+Json::Object* Facility::KernelOption::SELECTIION::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -423,7 +423,7 @@ Json::Object* Facility::KernelSetting::SELECTIION::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::SELECTIION::Set(Json::Object* pData)
+bool Facility::KernelOption::SELECTIION::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -437,7 +437,7 @@ bool Facility::KernelSetting::SELECTIION::Set(Json::Object* pData)
 
 
 
-Json::Object* Facility::KernelSetting::SELECTIION::BEHAVIOR::Get()
+Json::Object* Facility::KernelOption::SELECTIION::BEHAVIOR::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -451,7 +451,7 @@ Json::Object* Facility::KernelSetting::SELECTIION::BEHAVIOR::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::SELECTIION::BEHAVIOR::Set(Json::Object* pData)
+bool Facility::KernelOption::SELECTIION::BEHAVIOR::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -469,7 +469,7 @@ bool Facility::KernelSetting::SELECTIION::BEHAVIOR::Set(Json::Object* pData)
 
 
 
-Json::Object* Facility::KernelSetting::SELECTIION::HIGHLIGHT::Get()
+Json::Object* Facility::KernelOption::SELECTIION::HIGHLIGHT::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -478,7 +478,7 @@ Json::Object* Facility::KernelSetting::SELECTIION::HIGHLIGHT::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::SELECTIION::HIGHLIGHT::Set(Json::Object* pData)
+bool Facility::KernelOption::SELECTIION::HIGHLIGHT::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -493,7 +493,7 @@ bool Facility::KernelSetting::SELECTIION::HIGHLIGHT::Set(Json::Object* pData)
 
 #pragma region Lighting
 
-Json::Object* Facility::KernelSetting::LIGHTING::Get()
+Json::Object* Facility::KernelOption::LIGHTING::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -503,7 +503,7 @@ Json::Object* Facility::KernelSetting::LIGHTING::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::LIGHTING::Set(Json::Object* pData)
+bool Facility::KernelOption::LIGHTING::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -517,7 +517,7 @@ bool Facility::KernelSetting::LIGHTING::Set(Json::Object* pData)
 
 
 
-Json::Object* Facility::KernelSetting::LIGHTING::BLOOM::Get()
+Json::Object* Facility::KernelOption::LIGHTING::BLOOM::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -529,7 +529,7 @@ Json::Object* Facility::KernelSetting::LIGHTING::BLOOM::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::LIGHTING::BLOOM::Set(Json::Object* pData)
+bool Facility::KernelOption::LIGHTING::BLOOM::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;
@@ -545,7 +545,7 @@ bool Facility::KernelSetting::LIGHTING::BLOOM::Set(Json::Object* pData)
 
 
 
-Json::Object* Facility::KernelSetting::LIGHTING::LIGHT::Get()
+Json::Object* Facility::KernelOption::LIGHTING::LIGHT::Get()
 {
 	Json::Object* pData = new Json::Object();
 
@@ -556,7 +556,7 @@ Json::Object* Facility::KernelSetting::LIGHTING::LIGHT::Get()
 	return pData;
 }
 
-bool Facility::KernelSetting::LIGHTING::LIGHT::Set(Json::Object* pData)
+bool Facility::KernelOption::LIGHTING::LIGHT::Set(Json::Object* pData)
 {
 	if (pData == nullptr) {
 		RETURN_FALSE;

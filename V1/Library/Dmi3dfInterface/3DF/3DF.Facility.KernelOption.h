@@ -7,12 +7,12 @@ OPEN_3DF_NAMESPACE
 
 namespace Facility
 {
-	class KernelSetting : public Base
+	class KernelOption : public Base
 	{
 	public:
 
-		KernelSetting();
-		~KernelSetting() override;
+		KernelOption();
+		~KernelOption() override;
 
 	public:
 
@@ -243,12 +243,12 @@ namespace Facility
 
 
 
-	class AppSetting : public Base
+	class KernelPreset : public Base
 	{
 	public:
 
-		AppSetting() {}
-		~AppSetting() override {}
+		KernelPreset() {}
+		~KernelPreset() override {}
 
 	public:
 
@@ -370,4 +370,4 @@ namespace Facility
 
 CLOSE_3DF_NAMESPACE
 
-extern TDF::Facility::AppSetting TheAppSetting;
+extern TDF::Facility::KernelPreset ThePreset;

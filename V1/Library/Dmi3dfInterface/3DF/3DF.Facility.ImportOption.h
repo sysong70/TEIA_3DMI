@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include "Facility.Base.h"
+#include "3DF.Facility.Base.h"
 
-
+OPEN_3DF_NAMESPACE
 
 namespace Facility
 {
@@ -90,3 +90,5 @@ namespace Facility
 		Tessellation;
 	};
 }
+
+CLOSE_3DF_NAMESPACE

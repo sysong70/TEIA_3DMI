@@ -17,23 +17,23 @@ namespace Facility
 
 		Json::Object& GetDialog(CStringA name);
 
-		Json::Object& GetFileOptions();
-
 		Json::Object& GetPreferences();
+
+		Json::Object& GetFileOptions();
 
 		Json::Object& GetStyles();
 
 	private:
 
-		Json::Object m_fileOptions; // default value
+		Json::Object m_ui; // Root value
 		Json::Object m_preferences; // default value
-		Json::Object m_ui;
+		Json::Object m_fileOptions; // default value
 
 		bool Initialize();
 
-		bool InitFileOptions();
-
 		bool InitPreferences();
+
+		bool InitFileOptions();
 	};
 }
 

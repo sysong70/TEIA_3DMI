@@ -7,12 +7,6 @@
     <ClCompile Include="Facility.AppSettings.cpp">
       <Filter>Facility</Filter>
     </ClCompile>
-    <ClCompile Include="Facility.ImportOption.cpp">
-      <Filter>Facility</Filter>
-    </ClCompile>
-    <ClCompile Include="Facility.Preference.cpp">
-      <Filter>Facility</Filter>
-    </ClCompile>
     <ClCompile Include="Dialog.Base.cpp">
       <Filter>Dialog</Filter>
     </ClCompile>
@@ -163,7 +157,7 @@
     <ClCompile Include="Component.InputBar.cpp">
       <Filter>Component\View</Filter>
     </ClCompile>
-    <ClCompile Include="..\Library\Facility\Facility.Base.cpp">
+    <ClCompile Include="Facility.Base.cpp">
       <Filter>Facility</Filter>
     </ClCompile>
   </ItemGroup>
@@ -180,13 +174,7 @@
     <ClInclude Include="Facility.AppSettings.h">
       <Filter>Facility</Filter>
     </ClInclude>
-    <ClInclude Include="Facility.ImportOption.h">
-      <Filter>Facility</Filter>
-    </ClInclude>
     <ClInclude Include="Facility.h">
-      <Filter>Facility</Filter>
-    </ClInclude>
-    <ClInclude Include="Facility.Preference.h">
       <Filter>Facility</Filter>
     </ClInclude>
     <ClInclude Include="Dialog.Base.h">
@@ -342,7 +330,7 @@
     <ClInclude Include="Component.InputBar.h">
       <Filter>Component\View</Filter>
     </ClInclude>
-    <ClInclude Include="..\Library\Facility\Facility.Base.h">
+    <ClInclude Include="Facility.Base.h">
       <Filter>Facility</Filter>
     </ClInclude>
   </ItemGroup>

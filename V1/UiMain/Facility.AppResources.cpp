@@ -26,11 +26,11 @@ bool Facility::AppResources::Load()
 		return false;
 	}
 
-	if (InitFileOptions() == false) {
+	if (InitPreferences() == false) {
 		return false;
 	}
 
-	if (InitPreferences() == false) {
+	if (InitFileOptions() == false) {
 		return false;
 	}
 
@@ -46,16 +46,16 @@ Json::Object& Facility::AppResources::GetDialog(CStringA name)
 
 
 
-Json::Object& Facility::AppResources::GetFileOptions()
+Json::Object& Facility::AppResources::GetPreferences()
 {
-	return m_fileOptions;
+	return m_preferences;
 }
 
 
 
-Json::Object& Facility::AppResources::GetPreferences()
+Json::Object& Facility::AppResources::GetFileOptions()
 {
-	return m_preferences;
+	return m_fileOptions;
 }
 
 
@@ -101,6 +101,19 @@ bool Facility::AppResources::Initialize()
 
 
 
+bool Facility::AppResources::InitPreferences()
+{
+	CString stream;
+	if (LoadTextResource(IDF_JSON_DATA_PREFERENCES, stream) == false ||
+		Json::Helper::Load(stream, m_preferences) == false) {
+		RETURN_FALSE;
+	}
+
+	return true;
+}
+
+
+
 bool Facility::AppResources::InitFileOptions()
 {
 	CString stream;
@@ -122,19 +135,6 @@ bool Facility::AppResources::InitFileOptions()
 	}
 
 	import.Remove("__DEFAULT__");
-
-	return true;
-}
-
-
-
-bool Facility::AppResources::InitPreferences()
-{
-	CString stream;
-	if (LoadTextResource(IDF_JSON_DATA_PREFERENCES, stream) == false ||
-		Json::Helper::Load(stream, m_preferences) == false) {
-		RETURN_FALSE;
-	}
 
 	return true;
 }

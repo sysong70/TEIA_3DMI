@@ -7,10 +7,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-#ifdef _3DF_EXPORT
-USING_3DF_NAMESPACE
-#endif
-
 
 
 Facility::Base::Base(CString name)

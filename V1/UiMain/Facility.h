@@ -10,8 +10,6 @@ namespace Facility
 	class AppSettings;
 	class Base;
 	class CommandIndexer;
-	class ImportOption;
-	class Preference;
 
 
 

@@ -1,5 +1,8 @@
 ﻿#pragma once
 
+#include "3DF.h"
+#include <HBaseView.h>
+
 #include "3DF.Facility.h"
 
 #define GetBooleanValue(name)	pData->SetBoolean(#name, name)
@@ -40,17 +43,3 @@ namespace Facility
 }
 
 CLOSE_3DF_NAMESPACE
-
-//#undef GetBooleanValue
-//#undef GetEnumValue
-//#undef GetIntegerValue
-//#undef GetObjectValue
-//#undef GetRealValue
-//#undef GetStringValue
-//
-//#undef SetBooleanValue
-//#undef SetEnumValue
-//#undef SetIntegerValue
-//#undef SetObjectValue
-//#undef SetRealValue
-//#undef SetStringValue
