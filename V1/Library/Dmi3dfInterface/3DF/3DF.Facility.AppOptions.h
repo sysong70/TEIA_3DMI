@@ -2,18 +2,18 @@
 
 #include "3DF.Facility.KernelOption.h"
 #include "3DF.Facility.Preference.h"
-#include "3DF.Facility.ImportOption.h"""
+#include "3DF.Facility.ImportOption.h"
 
 OPEN_3DF_NAMESPACE
 
 namespace Facility
 {
-	class AppSettings : public Base
+	class AppOptions : public Base
 	{
 	public:
 
-		AppSettings() {}
-		~AppSettings() override {}
+		AppOptions() {}
+		~AppOptions() override {}
 
 	public:
 
@@ -33,4 +33,4 @@ namespace Facility
 
 CLOSE_3DF_NAMESPACE
 
-extern TDF::Facility::AppSettings TheAppSettings;
+extern TDF::Facility::AppOptions TheAppOptions;

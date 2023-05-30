@@ -1,8 +1,22 @@
-{
-	"Interface":{
-		"Mouse":{
-			"SwapButtons":false,
-			"ReverseWheel":false
+﻿{
+	"Environment":{
+		"General":{
+			"Language":0
+		},
+		"Mouse": {
+			"SwapPanAndRotate":false,
+			"ReverseWheelDirection":false
+		}
+	},
+	"Views":{
+		"Colors":{
+			"BackTop":3158064,
+			"BackBottom":3158064
+		},
+		"NavCube":{
+			"Size":200,
+			"ShowAxis":true,
+			"ShowCube":true
 		}
 	}
 }

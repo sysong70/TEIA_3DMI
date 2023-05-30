@@ -15,12 +15,11 @@ namespace Facility
 
 	public:
 
-		Json::Object* Get() override {
-			return nullptr;
-		}
-		bool Set(Json::Object* pcData) override {
-			return false;
-		}
+		Json::Object* Get() override;
+
+		bool Set(Json::Object* pData) override;
+
+	public:
 
 		struct SESSION
 		{
@@ -28,32 +27,59 @@ namespace Facility
 		}
 		Session;
 
-		struct GENERAL
+		struct ENVIRONMENT
 		{
-			const char* FontName();
-			double FontSize = 9;
-			ELanguage Language = ELanguage::English;
-			//ELanguage Language = ELanguage::Korean;
+			struct GENERAL
+			{
+				const char* FontName();
+				double FontSize = 9;
+				ELanguage Language = ELanguage::English;
 
-			CString Local(CString source);
+				CString Local(CString source);
+
+				bool Set(Json::Object* pData);
+			}
+			General;
+
+			struct MOUSE
+			{
+				bool SwapPanAndRotate = false;
+				bool ReverseWheelDirection = false;
+
+				bool Set(Json::Object* pData);
+			}
+			Mouse;
+
+			bool Set(Json::Object* pData);
 		}
-		General;
+		Environment;
 
-		struct MOUSE
+		struct VIEWS
 		{
-			bool SwapLeftRight = false;
-			bool SwapWheelDirection = false;
-		}
-		Mouse;
+			struct COLORS
+			{
+				COLORREF BackTop = RGB(0x30, 0x30, 0x30);
+				COLORREF BackBottom = RGB(0x30, 0x30, 0x30);
 
-		struct NAVCUBE
-		{
-			const char* FontName = "franklin gothic book";
-			double FontSize = 9.5;
-			bool ShowAxis = true;
-			bool ShowCube = true;
+				bool Set(Json::Object* pData);
+			}
+			Colors;
+
+			struct NAVIGATION_CUBE
+			{
+				const char* FontName = "franklin gothic book";
+				double FontSize = 5.0;
+				int Size = 200;
+				bool ShowAxis = true;
+				bool ShowCube = true;
+
+				bool Set(Json::Object* pData);
+			}
+			NavCube;
+
+			bool Set(Json::Object* pData);
 		}
-		NavCube;
+		Views;
 	};
 }
 

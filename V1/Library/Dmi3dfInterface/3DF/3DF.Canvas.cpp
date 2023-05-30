@@ -34,7 +34,7 @@
 
 #include "../Signal/Signal.h"
 
-#include "3DF.Facility.AppSettings.h"
+#include "3DF.Facility.AppOptions.h"
 
 #define SEGMENT_TYPE						1
 #define ENTITY_TYPE							2
@@ -53,8 +53,8 @@
 
 USING_3DF_NAMESPACE
 
-#define TheKenel TheAppSettings.Kernel
-#define ThePreset TheAppSettings.Preset
+#define TheKenel TheAppOptions.Kernel
+#define ThePreset TheAppOptions.Preset
 #define ColorValue(x) GetRValue(x) / 255.0f, GetGValue(x) / 255.0f, GetBValue(x) / 255.0f
 #define ColorRGBA(x, alpha) GetRValue(x), GetGValue(x), GetBValue(x), (unsigned char)alpha
 
@@ -772,12 +772,7 @@ void Canvas::SetViewAxis()
 void Canvas::InitNavigationCube(int nWidth, int nHeight)
 {
 	m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
-	m_cNaviCube.SetSize(NavigationCube::Big);
-	m_cNaviCube.SetVisible(true, true);
-
 	m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetModelKey());
-	//m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetSceneKey());
-	//m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetOverwriteKey());
 	m_cNaviCube.Transform();
 
 	m_pcBaseView->SetNavigationCube(&m_cNaviCube);

@@ -32,6 +32,28 @@ void Signal::Application::OnExitInstance()
 
 
 
+void Signal::Application::OnUpdatePreference(Json::Object& value)
+{
+	//:WARNING - append construction to value
+	Json::Object data = value;
+	ConstructData(data, Action::OnUpdatePreference);
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::Application::OnUpdateFileOption(Json::Object& value)
+{
+	//:WARNING - append construction to value
+	Json::Object data = value;
+	ConstructData(data, Action::OnUpdateFileOption);
+
+	Wrapper().SendData(data);
+}
+
+
+
 void Signal::Application::OnDpiAware(double scale)
 {
 	Json::Object data;
@@ -50,20 +72,6 @@ void Signal::MainFrame::ConstructData(Json::Object& data, Action action)
 {
 	data.SetInteger(SKW_TARGET, (int)Target::MainFrame);
 	data.SetInteger(SKW_ACTION, (int)action);
-}
-
-
-
-void Signal::MainFrame::OnUpdatePreference(const wchar_t* pData)
-{
-	DEBUG_STOP;
-}
-
-
-
-void Signal::MainFrame::OnUpdateFileOption(const wchar_t* pData)
-{
-	DEBUG_STOP;
 }
 
 

@@ -3,7 +3,7 @@
 #include "Window.Application.h"
 #include "Window.Document.h"
 #include "Window.View.h"
-#include "Dialog.AppSettings.h"
+#include "Dialog.AppOptions.h"
 #include "Dialog.ProgressLog.h"
 #include "Facility.AppResources.h"
 
@@ -25,7 +25,7 @@ BEGIN_MESSAGE_MAP(MainFrame, CBCGPMDIFrameWnd)
 	ON_WM_DROPFILES()
 
 	ON_COMMAND(FILE_3D_CMD_Open, OnFileOpen)
-	ON_COMMAND(FILE_3D_CMD_Preference, OnFilePreference)
+	ON_COMMAND(FILE_3D_CMD_Options, OnAppOptions)
 	ON_MESSAGE((UINT)EUserMessage::OnSignal, OnSignal)
 	ON_MESSAGE((UINT)EUserMessage::OnNextFileOpen, OnNextFileOpen)
 END_MESSAGE_MAP()
@@ -243,12 +243,12 @@ void Window::MainFrame::OnClose()
 void Window::MainFrame::OnCommand(UINT id)
 {
 	switch (id) {
-	case FILE_3D_CMD_New:                   TheAppication.OnFileNew();                            return;
-	case FILE_3D_CMD_Open:                  OnFileOpen();                                         return;
-	case FILE_3D_CMD_Preference:            OnFilePreference();                                   return;
-	case HOME_3D_CMD_Window_Cascade:        SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_CASCADE);   return;
-	case HOME_3D_CMD_Window_TileHorizontal: SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_TILE_HORZ); return;
-	case HOME_3D_CMD_Window_TileVertical:   SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_TILE_VERT); return;
+	case FILE_3D_CMD_New:					TheAppication.OnFileNew();								return;
+	case FILE_3D_CMD_Open:					OnFileOpen();											return;
+	case FILE_3D_CMD_Options:				OnAppOptions();											return;
+	case HOME_3D_CMD_Window_Cascade:		SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_CASCADE);		return;
+	case HOME_3D_CMD_Window_TileHorizontal:	SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_TILE_HORZ);	return;
+	case HOME_3D_CMD_Window_TileVertical:	SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_TILE_VERT);	return;
 
 	default:
 		DEBUG_STOP;
@@ -372,9 +372,9 @@ void Window::MainFrame::OnFileOpen()
 
 
 
-void Window::MainFrame::OnFilePreference()
+void Window::MainFrame::OnAppOptions()
 {
-	Dialog::AppSettings dlg;
+	Dialog::AppOptions dlg;
 	dlg.DoModal();
 }
 

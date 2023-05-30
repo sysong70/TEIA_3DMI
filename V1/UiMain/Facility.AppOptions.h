@@ -6,13 +6,13 @@
 
 namespace Facility
 {
-	class AppSettings
+	class AppOptions
 	{
 	public:
 
-		AppSettings();
+		AppOptions();
 
-		~AppSettings();
+		~AppOptions();
 
 		void SetFolderPath(CString c);
 
@@ -27,10 +27,9 @@ namespace Facility
 	private:
 
  		CString m_sFolderPath;
-
 		Json::Object m_preferences;
 		Json::Object m_fileOptions;
 	};
 }
 
-extern Facility::AppSettings TheAppSettings;
+extern Facility::AppOptions TheAppOptions;

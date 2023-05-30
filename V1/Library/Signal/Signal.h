@@ -28,7 +28,7 @@
 #define SKW_MAX				"Max"
 #define SKW_MESSAGE			"Message"
 #define SKW_MIN				"Min"
-#define SKW_OPTION			"Option"
+#define SKW_OPTIONS			"Options"
 #define SKW_OSNAPID			"OsnapId"
 #define SKW_PARENT			"Parent"
 #define SKW_POSITION		"Position"
@@ -40,6 +40,7 @@
 #define SKW_TYPE			"Type"
 #define SKW_USERDATA		"UserData"
 #define SKW_VALID			"Valid"
+#define SKW_VALUE			"Value"
 #define SKW_VIEWID			"ViewId"
 #define SKW_WIDTH			"Width"
 #define SKW_X				"x"
@@ -153,6 +154,8 @@ namespace Signal
 			OnInitInstance,
 			OnExitInstance,
 			OnDpiAware,
+			OnUpdatePreference,
+			OnUpdateFileOption,
 		};
 
 		DEFINE_WRAPPER;
@@ -166,6 +169,10 @@ namespace Signal
 		void OnExitInstance();
 
 		void OnDpiAware(double scale);
+
+		void OnUpdatePreference(Json::Object& value);
+
+		void OnUpdateFileOption(Json::Object& value);
 	};
 
 
@@ -180,9 +187,6 @@ namespace Signal
 		{
 			Unknown = -1,
 
-			OnUpdatePreference,
-			OnUpdateFileOption,
-
 			ShowNotice,
 			ShowProgress,
 			HideProgress,
@@ -191,12 +195,6 @@ namespace Signal
 		DEFINE_WRAPPER;
 
 		void ConstructData(Json::Object& data, Action action);
-
-	public:
-
-		void OnUpdatePreference(const wchar_t* pData);
-
-		void OnUpdateFileOption(const wchar_t* pData);
 
 	public:
 

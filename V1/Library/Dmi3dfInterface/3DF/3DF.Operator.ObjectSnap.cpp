@@ -31,11 +31,12 @@
 
 
 #include "3DF.Painter.h"
-#include "3DF.Facility.AppSettings.h"
+#include "3DF.Facility.AppOptions.h"
 
 USING_3DF_NAMESPACE
 
-bool btemp = false;
+#define TheEnvironment TheAppOptions.Preference.Environment
+#define TheSession TheAppOptions.Preference.Session
 
 Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 {
@@ -658,11 +659,6 @@ void Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 
 void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & cInCameraInfo, bool bUpdate)
 {
-// 	if (false == btemp) {
-// 		btemp = true;
-// 		return;
-// 	}
-
 	m_cSnapPointSegment.Open();
 	{
 		m_cSnapPointSegment.SetModellingMatrix(cInCameraInfo.cMatrix);
@@ -683,7 +679,7 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 	using namespace Painter;
 
 	// pixel to world
-	double fontSize = PixelToWorld(TheAppSettings.Preference.General.FontSize * TheAppSettings.Preference.Session.DpiScale);
+	double fontSize = PixelToWorld(TheEnvironment.General.FontSize * TheSession.DpiScale);
 	//:WARNING - replace dUnit
 	dUnit = fontSize * 0.5;
 
@@ -745,7 +741,7 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 	HC_Open_Segment("snap name");
 	{
 		Segment::SetColor("text", TooltipTextColor);
-		Font::SetName(TheAppSettings.Preference.General.FontName());
+		Font::SetName(TheEnvironment.General.FontName());
 		Font::SetSize(fontSize, "oru");
 		Font::SetRenderer("truetype");
 		Font::SetAlignment(Font::EPivot::MiddleCenter);
@@ -753,7 +749,7 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 		//:TODO - text position in window
 		double textOffset = dUnit * 5;
 		position.y += textOffset;
-		CString text = TheAppSettings.Preference.General.Local(pText);
+		CString text = TheEnvironment.General.Local(pText);
 		Text::Create(position, text);
 
 		//:WARNING - for calculating text extent
@@ -851,3 +847,6 @@ void Operator::ObjectSnap::ResetSnapItem()
 
 	m_vSnapItems.clear();
 }
+
+#undef TheEnvironment
+#undef TheSession

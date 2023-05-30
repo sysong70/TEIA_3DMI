@@ -164,7 +164,7 @@ bool Component::RibbonBar::CreateMainCategory()
 	pMain->AddSeparator();
 	pMain->Add(PRESET::CreateButton(FILE_3D_CMD_Print));
 	pMain->AddSeparator();
-	pMain->Add(PRESET::CreateButton(FILE_3D_CMD_Preference));
+	pMain->Add(PRESET::CreateButton(FILE_3D_CMD_Options));
 
 	pMain->AddRecentFilesList(Facility::Local(L"Recent Documents|최근 파일"), 300, TRUE); //:WARNING
 #pragma endregion //:REGION

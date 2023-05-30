@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Control.PropList.h"
+#include "Control.Property.h"
 #include "Facility.h"
 
 #ifdef _DEBUG
@@ -84,12 +85,15 @@ void Control::PropList::InitializeData(Json::Object& data)
 	for (int i = 0; i < GetPropertyCount(); i++) {
 		CBCGPProp* pProp = GetProperty(i);
 		CString* pName = reinterpret_cast<CString*>(pProp->GetData());
-		if (pName != nullptr) {
+
+		if (pProp != nullptr && pName != nullptr) {
 			ReplacePropData(pProp, m_pData->FindValue((CStringA)*pName));
 		}
 	}
 
 	m_bInitialized = true;
+	//:WARNING - update window
+	AdjustLayout();
 }
 
 
@@ -164,6 +168,9 @@ CBCGPProp* Control::PropList::CreateProp(Json::Object& design)
 	else if (type == L"folder") {
 		pProp = CreateFolderProp(design);
 	}
+	else if (type == L"slider") {
+		pProp = CreateSliderProp(design);
+	}
 	else if (type == L"root") {
 		Json::Array* pItems = Facility::GetItems(design);
 		if (pItems != nullptr) {
@@ -212,7 +219,7 @@ CBCGPProp* Control::PropList::CreateCheckProp(Json::Object& design, UINT id)
 	id = (id != 0 ? id : PRESET::GetControlId());
 
 	CBCGPProp* pProp = new CBCGPProp(Facility::GetTitle(design), id,
-		design.GetBoolean("value"), Facility::GetDesciption(design));
+		false, Facility::GetDesciption(design));
 	SetPropName(pProp, design);
 
 	return pProp;
@@ -220,9 +227,15 @@ CBCGPProp* Control::PropList::CreateCheckProp(Json::Object& design, UINT id)
 
 
 
-CBCGPProp* Control::PropList::CreateColorProp(Json::Object& data, UINT id)
+CBCGPProp* Control::PropList::CreateColorProp(Json::Object& design, UINT id)
 {
-	RETURN_NULL;
+	id = (id != 0 ? id : PRESET::GetControlId());
+
+	CBCGPProp* pProp = new CBCGPColorProp(Facility::GetTitle(design), id,
+		(COLORREF)0, nullptr, Facility::GetDescription(design));
+	SetPropName(pProp, design);
+
+	return pProp;
 }
 
 
@@ -278,6 +291,23 @@ CBCGPProp* Control::PropList::CreateFileProp(Json::Object& design, UINT id)
 CBCGPProp* Control::PropList::CreateFolderProp(Json::Object& design, UINT id)
 {
 	RETURN_NULL;
+}
+
+
+
+CBCGPProp* Control::PropList::CreateSliderProp(Json::Object& design, UINT id)
+{
+	Property::Slider* pProp = new Property::Slider(Facility::GetTitle(design), id,
+		0, Facility::GetDescription(design));
+	SetPropName(pProp, design);
+
+	pProp->SetRange(
+		design.GetInteger("min"),
+		design.GetInteger("max"),
+		design.GetInteger("step")
+	);
+
+	return pProp;
 }
 
 
@@ -339,13 +369,17 @@ void Control::PropList::ReplacePropData(CBCGPProp* pProp, Json::Value* pValue)
 		if (pProp->GetOptionCount() > 0) {
 			pProp->SelectOption(pValue->ToInteger());
 		}
+		else if (dynamic_cast<CBCGPColorProp*>(pProp) != nullptr) {
+			//:WARNING - not SetValue()
+			((CBCGPColorProp*)pProp)->SetColor(pValue->ToInteger());
+		}
 		else {
 			switch (pValue->GetType()) {
-			case Json::EValueType::Boolean: pProp->SetValue(pValue->ToBoolean()); break;
-			case Json::EValueType::Int:     pProp->SetValue(pValue->ToInteger()); break;
-			case Json::EValueType::Uint:    pProp->SetValue(pValue->ToInteger()); break;
-			case Json::EValueType::Real:    pProp->SetValue(pValue->ToReal()); break;
-			case Json::EValueType::String:  pProp->SetValue((LPCTSTR)pValue->AsString()); break;
+			case Json::EValueType::Boolean:	pProp->SetValue(pValue->ToBoolean());			break;
+			case Json::EValueType::Int:		pProp->SetValue(pValue->ToInteger());			break;
+			case Json::EValueType::Uint:	pProp->SetValue(pValue->ToInteger());			break;
+			case Json::EValueType::Real:	pProp->SetValue(pValue->ToReal());				break;
+			case Json::EValueType::String:	pProp->SetValue((LPCTSTR)pValue->ToString());	break;
 
 			default:
 				DEBUG_STOP;

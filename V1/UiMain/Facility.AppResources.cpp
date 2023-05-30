@@ -10,7 +10,9 @@ static char THIS_FILE[] = __FILE__;
 
 
 
+
 Facility::AppResources TheAppResources;
+
 
 
 

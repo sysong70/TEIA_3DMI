@@ -51,6 +51,8 @@ namespace Control
 
 		CBCGPProp* CreateFolderProp(Json::Object& design, UINT id = 0);
 
+		CBCGPProp* CreateSliderProp(Json::Object& design, UINT id = 0);
+
 	protected:
 
 		bool m_bInitialized = false;

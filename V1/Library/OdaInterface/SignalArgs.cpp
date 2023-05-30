@@ -58,7 +58,23 @@ SignalArgs::Base* SignalArgs::Base::CreateInstance(Json::Object& content)
 	}
 	else if (target == Signal::Target::Application) {
 		Signal::Application::Action action = (Signal::Application::Action)content.GetInteger(SKW_ACTION, -1);
-		ASSERT(action == Signal::Application::Action::OnInitInstance);
+
+		switch (action) {
+		case Signal::Application::Action::OnInitInstance:
+			break;
+
+		case Signal::Application::Action::OnUpdatePreference:
+			break;
+
+		case Signal::Application::Action::OnUpdateFileOption:
+			break;
+
+		case Signal::Application::Action::OnExitInstance:
+			break;
+
+		default:
+			DEBUG_STOP;
+		};
 	}
 	else {
 		DEBUG_STOP;
@@ -111,7 +127,7 @@ SignalArgs::Command::Command(Json::Object& content)
 {
 	GroupName = content.GetString(SKW_GROUPNAME);
 	GlobalName = content.GetString(SKW_GLOBALNAME);
-	Options = content.GetAt(SKW_OPTION);
+	Options = content.GetAt(SKW_OPTIONS);
 
 	Valid &= (GlobalName.IsEmpty() == false);
 	ASSERT(Valid);

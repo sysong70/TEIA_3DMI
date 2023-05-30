@@ -4,7 +4,7 @@
 
 #include "3DF.h"
 #include "3DF.BaseView.h"
-#include "3DF.Facility.AppSettings.h"
+#include "3DF.Facility.AppOptions.h"
 
 #include "3DF.NavigationCube.h"
 

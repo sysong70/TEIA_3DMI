@@ -329,7 +329,9 @@ namespace Property
 
 		friend class SliderCtrl;
 
-		Slider(const CString& name, long value, LPCTSTR lpDescr = NULL, DWORD_PTR data = 0);
+		Slider(const CString& name, UINT id, long value, LPCTSTR lpDescr = NULL, DWORD_PTR data = 0);
+
+		void SetRange(int minValue, int maxValue, int step);
 
 	protected:
 
@@ -342,6 +344,14 @@ namespace Property
 		BOOL OnSetCursor() const override;
 
 		BOOL OnUpdateValue() override;
+
+	private:
+
+		SliderCtrl* m_pSlider = nullptr;
+
+		int m_minValue = INT_MIN;
+		int m_maxValue = INT_MAX;
+		int m_step = 1;
 	};
 
 

@@ -1051,9 +1051,21 @@ BOOL Property::RangeValidation::OnUpdateValue()
 
 #pragma region Slider Class
 
-Property::Slider::Slider(const CString& name, long value, LPCTSTR lpDescr, DWORD_PTR data) :
-	CBCGPProp(name, value, lpDescr, data)
+Property::Slider::Slider(const CString& name, UINT id, long value, LPCTSTR lpDescr, DWORD_PTR data) :
+	CBCGPProp(name, id, value, lpDescr, data)
 {
+	m_bIsVisible = true;
+}
+
+
+
+void Property::Slider::SetRange(int minValue, int maxValue, int step)
+{
+	ASSERT_VALID(this);
+
+	m_minValue = minValue;
+	m_maxValue = maxValue;
+	m_step = step;
 }
 
 
@@ -1064,24 +1076,28 @@ CWnd* Property::Slider::CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultFormat)
 	ASSERT_VALID(m_pWndList);
 
 	CBCGPClientDC dc(m_pWndList);
-	CBCGPFontSelector fs(dc, m_pWndList->GetFont());
 
 	CString strLabel(L"0000");
 	rectEdit.left += dc.GetTextExtent(strLabel).cx;
 
-	SliderCtrl* pSlider = new SliderCtrl(this, m_pWndList->GetBkColor());
-	if (pSlider->Create(WS_VISIBLE | WS_CHILD | TBS_NOTICKS, rectEdit, m_pWndList, BCGPROPLIST_ID_INPLACE) == FALSE) {
-		REMOVE_POINTER(pSlider);
+	m_pSlider = new SliderCtrl(this, m_pWndList->GetBkColor());
+	if (m_pSlider->Create(WS_VISIBLE | WS_CHILD | TBS_NOTICKS, rectEdit, m_pWndList, BCGPROPLIST_ID_INPLACE) == FALSE) {
+		REMOVE_POINTER(m_pSlider);
 		RETURN_NULL;
 	};
 
-	pSlider->SetPos((long)m_varValue);
-	pSlider->EnableProgressMode();
-	pSlider->EnableWindow(m_bEnabled);
+	m_pSlider->SetRange(m_minValue, m_maxValue, TRUE);
+	m_pSlider->SetTicFreq(m_step);
+	m_pSlider->SetLineSize(m_step); // move to cursor
+	m_pSlider->SetPageSize(m_step); // move to PgUp/PgDn
+
+	m_pSlider->SetPos((long)m_varValue);
+	m_pSlider->EnableProgressMode();
+	m_pSlider->EnableWindow(m_bEnabled);
 
 	bDefaultFormat = TRUE;
 
-	return pSlider;
+	return m_pSlider;
 }
 
 

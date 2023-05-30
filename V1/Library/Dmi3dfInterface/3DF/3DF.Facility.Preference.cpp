@@ -7,7 +7,24 @@ USING_3DF_NAMESPACE
 
 
 
-const char* Facility::Preference::GENERAL::FontName()
+Json::Object* Facility::Preference::Get()
+{
+	return nullptr;
+}
+
+
+
+bool Facility::Preference::Set(Json::Object* pData)
+{
+	SetObjectValue(Environment);
+	SetObjectValue(Views);
+
+	return true;
+}
+
+
+
+const char* Facility::Preference::ENVIRONMENT::GENERAL::FontName()
 {
 	switch (Language) {
 	case ELanguage::Korean: return "malgun gothic";
@@ -19,7 +36,8 @@ const char* Facility::Preference::GENERAL::FontName()
 
 
 
-CString Facility::Preference::GENERAL::Local(CString source)
+
+CString Facility::Preference::ENVIRONMENT::GENERAL::Local(CString source)
 {
 	WStringArray result;
 	if (WStr::Split(source, L'|', result)) {
@@ -28,4 +46,56 @@ CString Facility::Preference::GENERAL::Local(CString source)
 	else {
 		return source;
 	}
+}
+
+
+
+bool Facility::Preference::ENVIRONMENT::Set(Json::Object* pData)
+{
+	SetObjectValue(General);
+	SetObjectValue(Mouse);
+
+	return true;
+}
+
+bool Facility::Preference::ENVIRONMENT::GENERAL::Set(Json::Object* pData)
+{
+	SetEnumValue(Language, ELanguage);
+
+	return true;
+}
+
+bool Facility::Preference::ENVIRONMENT::MOUSE::Set(Json::Object* pData)
+{
+	SetBooleanValue(SwapPanAndRotate);
+	SetBooleanValue(ReverseWheelDirection);
+
+	return true;
+}
+
+
+
+bool Facility::Preference::VIEWS::Set(Json::Object* pData)
+{
+	SetObjectValue(Colors);
+	SetObjectValue(NavCube);
+
+	return true;
+}
+
+bool Facility::Preference::VIEWS::COLORS::Set(Json::Object* pData)
+{
+	SetIntegerValue(BackTop);
+	SetIntegerValue(BackBottom);
+
+	return true;
+}
+
+bool Facility::Preference::VIEWS::NAVIGATION_CUBE::Set(Json::Object* pData)
+{
+	SetIntegerValue(Size);
+	SetBooleanValue(ShowAxis);
+	SetBooleanValue(ShowCube);
+
+	return true;
 }

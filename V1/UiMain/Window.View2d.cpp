@@ -120,7 +120,7 @@ void Window::View2d::OnCommand(UINT id)
 	switch (id) {
 	case FILE_3D_CMD_New:
 	case FILE_3D_CMD_Open:
-	case FILE_3D_CMD_Preference:
+	case FILE_3D_CMD_Options:
 	case HOME_3D_CMD_Window_Cascade:
 	case HOME_3D_CMD_Window_TileHorizontal:
 	case HOME_3D_CMD_Window_TileVertical:

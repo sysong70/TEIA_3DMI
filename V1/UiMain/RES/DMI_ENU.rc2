@@ -11,7 +11,7 @@ BEGIN
     FILE_3D_CMD_Export                                "__#__\nExport"
     FILE_3D_CMD_Print                                 "__#__\nPrint"
     FILE_3D_PNL_Settings                              "__#__\nSettings"
-    FILE_3D_CMD_Preference                            "__#__\nPreference"
+    FILE_3D_CMD_Options                               "__#__\nOptions"
     FILE_3D_CMD_Close                                 "__#__\nClose"
     HOME_3D_CAT                                       "__#__\nHome"
     HOME_3D_PNL_Panels                                "__#__\nPanels"

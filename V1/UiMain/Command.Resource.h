@@ -11,7 +11,7 @@
 #define FILE_3D_CMD_Export                                20009
 #define FILE_3D_CMD_Print                                 20010
 #define FILE_3D_PNL_Settings                              20011
-#define FILE_3D_CMD_Preference                            20012
+#define FILE_3D_CMD_Options                               20012
 #define FILE_3D_CMD_Close                                 20013
 #define HOME_3D_CAT                                       20014
 #define HOME_3D_PNL_Panels                                20015
@@ -131,8 +131,6 @@
 #define TOOLBAR_3D_CMD_Option_CheckBoxes                  20129
 #define TOOLBAR_3D_CMD_Option_GridLines                   20130
 #define TOOLBAR_3D_CMD_Option_AlternateRows               20131
-#define TOOLBAR_3D_PNL_Scene                              20132
-#define TOOLBAR_3D_PNL_View                               20133
 
-#define COMMAND_END 20134
+#define COMMAND_END 20132
 

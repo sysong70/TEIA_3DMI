@@ -7,7 +7,7 @@
 namespace Facility
 {
 	class AppResource;
-	class AppSettings;
+	class AppOptions;
 	class Base;
 	class CommandIndexer;
 

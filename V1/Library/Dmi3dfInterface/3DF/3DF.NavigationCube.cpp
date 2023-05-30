@@ -6,6 +6,7 @@
 #include "3DF.Window.h"
 
 #include "3DF.Selection.h"
+#include "3DF.Facility.AppOptions.h"
 #include "./Private/3DF.SelectionPrivate.h"
 
 USING_3DF_NAMESPACE
@@ -82,7 +83,7 @@ namespace NavigationCubePreset
 }
 
 #define PRESET NavigationCubePreset
-
+#define TheCube TheAppOptions.Preference.Views.NavCube
 
 
 NavigationCube::NavigationCube(TDF::BaseView * view, WindowKey * pcInWindow) :
@@ -210,24 +211,11 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 	return nEvent;
 }
 
-void NavigationCube::SetSize(ESize size)
-{
-	m_eCubeSize = size;
-}
-
 
 
 void NavigationCube::SetView(TDF::BaseView * view, WindowKey * pcInWindow) {
 	m_pView = view;
 	m_pcWindow = pcInWindow;
-}
-
-
-
-void NavigationCube::SetVisible(bool axis, bool cube)
-{
-	m_bAxisVisible = axis;
-	m_bCubeVisible = cube;
 }
 
 
@@ -242,6 +230,12 @@ void NavigationCube::Create(float width, float height, HC_KEY parent)
 {
 	m_parentSegment = parent;
 	ASSERT(m_parentSegment != HC_ERROR_KEY);
+	m_windowSize.x = width;
+	m_windowSize.y = height;
+
+	if (TheCube.ShowAxis == false && TheCube.ShowCube) {
+		return;
+	}
 
 	HC_Open_Segment_By_Key(m_parentSegment);
 	{
@@ -286,17 +280,28 @@ void NavigationCube::Create(float width, float height, HC_KEY parent)
 			Painter::Segment::SetColor("lines", PRESET::LineColor());
 			Painter::Segment::SetColor("text", PRESET::TextColor());
 
-			if (m_bCubeVisible) {
+			if (TheCube.ShowCube) {
 				CreateCube();
 			}
 
-			if (m_bAxisVisible) {
+			if (TheCube.ShowAxis) {
 				CreateAxis();
 			}
 		}
 		CloseCubeSegment();
 	}
 	HC_Close_Segment();
+}
+
+
+
+void NavigationCube::Recreate()
+{
+	HC_Open_Segment_By_Key(m_parentSegment);
+	HC_Delete_By_Key(m_cubeSegment);
+	HC_Close_Segment();
+
+	Create(m_windowSize.x, m_windowSize.y, m_parentSegment);
 }
 
 
@@ -390,26 +395,7 @@ void NavigationCube::OpenCubeSegment()
 
 
 
-void NavigationCube::OpenPlaneSegment()
-{
-	if (m_planeSegment == HC_ERROR_KEY) {
-		m_planeSegment = HC_Open_Segment("plane window");
-	}
-	else {
-		HC_Open_Segment_By_Key(m_planeSegment);
-	}
-}
-
-
-
 void NavigationCube::CloseCubeSegment()
-{
-	HC_Close_Segment();
-}
-
-
-
-void NavigationCube::ClosePlaneSegment()
 {
 	HC_Close_Segment();
 }
@@ -626,27 +612,18 @@ HC_KEY NavigationCube::CreateAxis(const char* name, const char* text, HPoint axi
 
 void NavigationCube::SetWindowSize(double width, double height, bool openSegment)
 {
+	m_windowSize.x = width;
+	m_windowSize.y = height;
+
 	if (openSegment) {
 		OpenCubeSegment();
 	}
 
-	double windowSize = (double)m_eCubeSize;
-	double fontSize = 12 * (double)m_eCubeSize / (double)ESize::Midium;
+	double cubeSize = (double)TheCube.Size;
+	double fontSize = TheCube.FontSize * TheCube.Size / 100.0;
 
-	double left = 1.0 - 2.0 / width * windowSize;
-	double bottom = 1.0 - 2.0 / height * windowSize;
-
-	//HC_Set_Window(left, 1.0, bottom, 1.0);
-
- 	//HC_Set_Window(0.8, 1.0, 0.7, 1.0);
-// 	HC_Set_Window_Pattern("clear");
-
-	//HC_Set_Driver_Options("border, control area");
-// 	//HC_Set_Color("windows=light gray");
-// 	//HC_Set_Window_Frame("single");
-// 	HC_Set_Window_Pattern("::");
-// 	HC_Set_Color("windows=purple,window constrast=yellow");
-
+	double left = 1.0 - 2.0 / width * cubeSize;
+	double bottom = 1.0 - 2.0 / height * cubeSize;
 
 	HC_Set_Rendering_Options(PRESET::Format("screen range = (%.6f, 1, %.6f, 1)", left, bottom));
 	HC_Set_Text_Font(PRESET::Format("size = %.3f px", fontSize));
@@ -657,3 +634,4 @@ void NavigationCube::SetWindowSize(double width, double height, bool openSegment
 }
 
 #undef PRESET
+#undef TheCube
