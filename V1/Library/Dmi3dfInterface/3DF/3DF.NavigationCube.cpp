@@ -228,12 +228,12 @@ bool NavigationCube::IsValid()
 
 void NavigationCube::Create(float width, float height, HC_KEY parent)
 {
-	m_parentSegment = parent;
-	ASSERT(m_parentSegment != HC_ERROR_KEY);
 	m_windowSize.x = width;
 	m_windowSize.y = height;
+	m_parentSegment = parent;
+	ASSERT(m_parentSegment != HC_ERROR_KEY);
 
-	if (TheCube.ShowAxis == false && TheCube.ShowCube) {
+	if (TheCube.ShowAxis == false && TheCube.ShowCube == false) {
 		return;
 	}
 
@@ -352,28 +352,6 @@ void NavigationCube::Transform()
 	} HC_Close_Segment();
 }
 
-void NavigationCube::Transform_ORG()
-{
-	HPoint position;
-	HPoint target;
-	HVector up;
-	float width, height;
-	char projection[MVO_BUFFER_SIZE];
-
-	HC_Open_Segment_By_Key(m_pView->GetSceneKey());
-	{
-		HC_Show_Net_Camera(&position, &target, &up, &width, &height, projection);
-	}
-	HC_Close_Segment();
-
-	OpenCubeSegment();
-	{
-		//:TODO - only rotation
-		HC_Set_Camera(&position, &target, &up, 2, 2, projection);
-	}
-	CloseCubeSegment();
-}
-
 
 
 void NavigationCube::OnSize(float width, float height)
@@ -422,11 +400,14 @@ void NavigationCube::CreateAxis()
 void NavigationCube::CreateCube()
 {
 	double plane = PRESET::PlaneUnit();
+	//double offset = plane + 0.01;
 
 	// Cube wire
 
 	HPoint maxPoint(plane, plane, plane);
 	HPoint minPoint(-plane, -plane, -plane);
+	//HPoint maxPoint(offset, offset, offset);
+	//HPoint minPoint(-offset, -offset, -offset);
 	HUtility::InsertWireframeBox(&maxPoint, &minPoint);
 
 	// Plane and text

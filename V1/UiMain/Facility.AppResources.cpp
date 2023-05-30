@@ -89,7 +89,7 @@ bool Facility::AppResources::Initialize()
 	Json::Array& common = fileOptions.GetArray("__DEFAULT__");
 	common.Stringify(commonStream);
 
-	Json::Array& importTree = fileOptions.GetArray("tree")[0]->AsObject().GetArray("items");
+	Json::Array& importTree = Json::Helper::FindValueByPath(fileOptions, "tree/0/items")->AsArray();
 	for (auto item : importTree.GetBuffer()) {
 		CString name = item->AsObject().GetString("name");
 
@@ -97,6 +97,9 @@ bool Facility::AppResources::Initialize()
 		sub.SetString("type", L"root");
 		sub.SetArray("items", new Json::Array(commonStream));
 	}
+
+	//:TODO
+	//Json::Array& exportTree = Json::Helper::FindValueByPath(fileOptions, "tree/1/items")->AsArray();
 
 	return true;
 }

@@ -12,12 +12,12 @@
 #define GetRealValue(name)		pData->SetReal(#name, name)
 #define GetStringValue(name)	pData->SetString(#name, name)
 
-#define SetBooleanValue(name)		name = pData->GetBoolean(#name, name)
-#define SetEnumValue(name, type)	name = (type)pData->GetInteger(#name, (int)name)
-#define SetIntegerValue(name)		name = pData->GetInteger(#name, name)
-#define SetObjectValue(name)		name.Set(&pData->GetAt(#name))
-#define SetRealValue(name)			name = pData->GetReal(#name, name)
-#define SetStringValue(name)		name = pData->GetString(#name, name)
+#define SetBooleanValue(name)		ASSERT(pData->FindValue(#name)); name = pData->GetBoolean(#name, name)
+#define SetEnumValue(name, type)	ASSERT(pData->FindValue(#name)); name = (type)pData->GetInteger(#name, (int)name)
+#define SetIntegerValue(name)		ASSERT(pData->FindValue(#name)); name = pData->GetInteger(#name, name)
+#define SetObjectValue(name)		ASSERT(pData->FindValue(#name)); name.Set(&pData->GetAt(#name))
+#define SetRealValue(name)			ASSERT(pData->FindValue(#name)); name = pData->GetReal(#name, name)
+#define SetStringValue(name)		ASSERT(pData->FindValue(#name)); name = pData->GetString(#name, name)
 
 OPEN_3DF_NAMESPACE
 

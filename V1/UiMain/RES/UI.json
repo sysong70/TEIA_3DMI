@@ -15,14 +15,14 @@
 		"title":"Open File|파일 열기",
 		"filter": [
 			"All types (*.*)|*.*|",
-			"3MF (*.3mf)|*.3mf|",
 			"ACIS (*.sat, *.sab)|*.sat;*.sab|",
-			"AutoCAD Inventor (*.ipt, *.iam)|*.ipt;*.iam|",
-			"AutoCAD Navisworks (*.NWD)|*.nwd|",
-			"Autodesk 3DS (*.3ds)|*.3ds|",
-			"Catia V4 (*.model, *.session, *.dlv, *.exp)|*.model;*.session;*.dlv;*.exp|",
-			"Catia V5 (*.catpart, *.catproduct, *.catshape, *.cgr)|*.catpart;*.catproduct;*.catshape;*.cgr|",
-			"Catia V6 / 3DExperience (*.3dxml)|*.3dxml|",
+			"3DS (*.3ds)|*.3ds|",
+			"3MF (*.3mf)|*.3mf|",
+			"Inventor (*.ipt, *.iam)|*.ipt;*.iam|",
+			"Navisworks (*.nwd)|*.nwd|",
+			"CATIA V4 (*.model, *.session, *.dlv, *.exp)|*.model;*.session;*.dlv;*.exp|",
+			"CATIA V5 (*.catpart, *.catproduct, *.catshape, *.cgr)|*.catpart;*.catproduct;*.catshape;*.cgr|",
+			"CATIA V6 / 3DExperience (*.3dxml)|*.3dxml|",
 			"COLLADA (*.dae)|*.dae|",
 			"Creo - Pro/E (*.asm, *.neu, *.prt, *.xas, *.xpr)|*.asm;*.neu;*.prt;*.xas;*.xpr|",
 			"FBX (*.fbx)|*.fbx|",
@@ -97,7 +97,7 @@
 					{"type":"color", "name":"BackBottom", "title":"Background-Bottom|배경 하부", "desc":"__#__|__#__"}
 				]},
 				{"type":"group", "name":"NavCube", "title":"Navigation Cube|네비케이션 큐브", "items":[
-					{"type":"slider", "name":"Size", "title":"Size|크기", "desc":"__#__|__#__", "min":100, "max":500, "step":100},
+					{"type":"slider", "name":"Size", "title":"Size|크기", "desc":"__#__|__#__", "min":100, "max":300, "step":50},
 					{"type":"check", "name":"ShowAxis", "title":"Show Axis|축 보기", "desc":"__#__|__#__"},
 					{"type":"check", "name":"ShowCube", "title":"Show Cube|큐브 보기", "desc":"__#__|__#__"}
 				]}
@@ -118,6 +118,8 @@
 				{"name":"COLLADA", "title":"COLLADA"},
 				{"name":"DWG2D", "title":"DWG 2D"},
 				{"name":"DWG3D", "title":"DWG 3D"},
+				{"name":"FBX", "title":"FBX"},
+				{"name":"GLTF", "title":"GLTF"},
 				{"name":"IDEAS", "title":"I-deas"},
 				{"name":"IFC", "title":"IFC"},
 				{"name":"IGES", "title":"IGES"},

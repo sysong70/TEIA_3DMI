@@ -1,5 +1,4 @@
 ﻿#include "stdafx.h"
-
 #include "3DF.Facility.Preference.h"
 #include "WStr.h"
 
