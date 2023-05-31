@@ -50,7 +50,6 @@ namespace NavigationCubePreset
 
 	COLORREF LineColor()
 	{
-		//return RGB(0x00, 0x5E, 0x97);
 		return RGB(0x80, 0x80, 0x80);
 	}
 
@@ -340,8 +339,8 @@ void NavigationCube::Transform()
 			HC_Show_Net_Camera_Up_Vector(&old_up_vector.x, &old_up_vector.y, &old_up_vector.z);
 			double const difference2[] = { fabs(old_up_vector.x - up_vector.x), fabs(old_up_vector.y - up_vector.y), fabs(old_up_vector.z - up_vector.z) };
 
-			//			 we only modify the axis display if there has been an actual change in the camera settings
-			//			 we also have to consider the up vector!!!
+			// we only modify the axis display if there has been an actual change in the camera settings
+			// we also have to consider the up vector!!!
 			if (difference[0] + difference[1] + difference[2] > 0.01 || difference2[0] + difference2[1] + difference2[2] > 0.01)
 			{
 				HC_Set_Camera_Target(0.0f, 0.0f, 0.0f);
@@ -399,69 +398,109 @@ void NavigationCube::CreateAxis()
 
 void NavigationCube::CreateCube()
 {
-	double plane = PRESET::PlaneUnit();
-	//double offset = plane + 0.01;
+	double unit = PRESET::PlaneUnit();
 
-	// Cube wire
-
-	HPoint maxPoint(plane, plane, plane);
-	HPoint minPoint(-plane, -plane, -plane);
-	//HPoint maxPoint(offset, offset, offset);
-	//HPoint minPoint(-offset, -offset, -offset);
-	HUtility::InsertWireframeBox(&maxPoint, &minPoint);
+	CreateCubeWire();
 
 	// Plane and text
 
-	m_cSegments[(int)TDF::ViewMode::top]		= CreatePlaneShell("top", "TOP", { 0, 0, plane }, { 0, 0, 0 });
- 	m_cSegments[(int)TDF::ViewMode::bottom]		= CreatePlaneShell("bottom", "BOTTOM", { 0, 0, -plane }, { 0, 180, 0 });
-	m_cSegments[(int)TDF::ViewMode::front]		= CreatePlaneShell("front", "FRONT", { 0, -plane, 0 }, { 90, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::back]		= CreatePlaneShell("back", "BACK", { 0, plane, 0 }, { 90, 0, 180 });
-	m_cSegments[(int)TDF::ViewMode::left]		= CreatePlaneShell("left", "LEFT", { -plane, 0, 0 }, { 90, 0, -90 });
-	m_cSegments[(int)TDF::ViewMode::right]		= CreatePlaneShell("right", "RIGHT", { plane, 0, 0 }, { 90, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::top]		= CreatePlaneShell("top", "TOP", { 0, 0, unit }, { 0, 0, 0 });
+ 	m_cSegments[(int)TDF::ViewMode::bottom]		= CreatePlaneShell("bottom", "BOTTOM", { 0, 0, -unit }, { 0, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::front]		= CreatePlaneShell("front", "FRONT", { 0, -unit, 0 }, { 90, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::back]		= CreatePlaneShell("back", "BACK", { 0, unit, 0 }, { 90, 0, 180 });
+	m_cSegments[(int)TDF::ViewMode::left]		= CreatePlaneShell("left", "LEFT", { -unit, 0, 0 }, { 90, 0, -90 });
+	m_cSegments[(int)TDF::ViewMode::right]		= CreatePlaneShell("right", "RIGHT", { unit, 0, 0 }, { 90, 0, 90 });
 
 	// Edges - n: negative, p: positive
 
-	m_cSegments[(int)TDF::ViewMode::py_nz]		= CreateEdgeShell("py_nz", { 0, plane, -plane }, { 0, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::py_pz]		= CreateEdgeShell("py_pz", { 0, plane, plane }, { 90, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::ny_pz]		= CreateEdgeShell("ny_pz", { 0, -plane, plane }, { 180, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::ny_nz]		= CreateEdgeShell("ny_nz", { 0, -plane, -plane }, { 270, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::py_nz]		= CreateEdgeShell("py_nz", { 0, unit, -unit }, { 0, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::py_pz]		= CreateEdgeShell("py_pz", { 0, unit, unit }, { 90, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::ny_pz]		= CreateEdgeShell("ny_pz", { 0, -unit, unit }, { 180, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::ny_nz]		= CreateEdgeShell("ny_nz", { 0, -unit, -unit }, { 270, 0, 0 });
 
-	m_cSegments[(int)TDF::ViewMode::nx_nz]		= CreateEdgeShell("nx_nz", { -plane, 0, -plane }, { 0, 0, 90 });
-	m_cSegments[(int)TDF::ViewMode::nx_pz]		= CreateEdgeShell("nx_pz", { -plane, 0, plane }, { 90, 0, 90 });
-	m_cSegments[(int)TDF::ViewMode::px_pz]		= CreateEdgeShell("px_pz", { plane, 0, plane }, { 180, 0, 90 });
-	m_cSegments[(int)TDF::ViewMode::px_nz]		= CreateEdgeShell("px_nz", { plane, 0, -plane }, { 270, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::nx_nz]		= CreateEdgeShell("nx_nz", { -unit, 0, -unit }, { 0, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::nx_pz]		= CreateEdgeShell("nx_pz", { -unit, 0, unit }, { 90, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::px_pz]		= CreateEdgeShell("px_pz", { unit, 0, unit }, { 180, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::px_nz]		= CreateEdgeShell("px_nz", { unit, 0, -unit }, { 270, 0, 90 });
 
-	m_cSegments[(int)TDF::ViewMode::nx_py]		= CreateEdgeShell("nx_py", { -plane, plane, 0 }, { 0, 90, 0 });
-	m_cSegments[(int)TDF::ViewMode::px_py]		= CreateEdgeShell("px_py", { plane, plane, 0 }, { 90, 90, 0 });
-	m_cSegments[(int)TDF::ViewMode::px_ny]		= CreateEdgeShell("px_ny", { plane, -plane, 0 }, { 180, 90, 0 });
-	m_cSegments[(int)TDF::ViewMode::nx_ny]		= CreateEdgeShell("nx_ny", { -plane, -plane, 0 }, { 270, 90, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_py]		= CreateEdgeShell("nx_py", { -unit, unit, 0 }, { 0, 90, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_py]		= CreateEdgeShell("px_py", { unit, unit, 0 }, { 90, 90, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_ny]		= CreateEdgeShell("px_ny", { unit, -unit, 0 }, { 180, 90, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_ny]		= CreateEdgeShell("nx_ny", { -unit, -unit, 0 }, { 270, 90, 0 });
 
 	// Corners - n: negative, p: positive
 
-	m_cSegments[(int)TDF::ViewMode::nx_py_nz]	= CreateCornerShell("nx_py_nz", { -plane, plane, -plane }, { 0, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::nx_py_pz]	= CreateCornerShell("nx_py_pz", { -plane, plane, plane }, { 90, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::nx_ny_pz]	= CreateCornerShell("nx_ny_pz", { -plane, -plane, plane }, { 180, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::nx_ny_nz]	= CreateCornerShell("nx_ny_nz", { -plane, -plane, -plane }, { 270, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_py_nz]	= CreateCornerShell("nx_py_nz", { -unit, unit, -unit }, { 0, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_py_pz]	= CreateCornerShell("nx_py_pz", { -unit, unit, unit }, { 90, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_ny_pz]	= CreateCornerShell("nx_ny_pz", { -unit, -unit, unit }, { 180, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_ny_nz]	= CreateCornerShell("nx_ny_nz", { -unit, -unit, -unit }, { 270, 0, 0 });
 
-	m_cSegments[(int)TDF::ViewMode::px_py_pz]	= CreateCornerShell("px_py_pz", { plane, plane, plane }, { 0, 180, 0 });
-	m_cSegments[(int)TDF::ViewMode::px_py_nz]	= CreateCornerShell("px_py_nz", { plane, plane, -plane }, { 90, 180, 0 });
-	m_cSegments[(int)TDF::ViewMode::px_ny_nz]	= CreateCornerShell("px_ny_nz", { plane, -plane, -plane }, { 180, 180, 0 });
-	m_cSegments[(int)TDF::ViewMode::px_ny_pz]	= CreateCornerShell("px_ny_pz", { plane, -plane, plane }, { 270, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_py_pz]	= CreateCornerShell("px_py_pz", { unit, unit, unit }, { 0, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_py_nz]	= CreateCornerShell("px_py_nz", { unit, unit, -unit }, { 90, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_ny_nz]	= CreateCornerShell("px_ny_nz", { unit, -unit, -unit }, { 180, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_ny_pz]	= CreateCornerShell("px_ny_pz", { unit, -unit, unit }, { 270, 180, 0 });
 }
 
 
 
+void NavigationCube::CreateCubeWire()
+{
+#define CreateCylinder(p1, p2) \
+	key = key = HC_Insert_Cylinder(&points[p1], &points[p2], 0.005, "none"); \
+	ASSERT(key != HC_ERROR_KEY);
+
+	double unit = PRESET::PlaneUnit();
+
+	HPoint points[8];
+	// front
+	points[0].Set(-unit, -unit, -unit);
+	points[1].Set( unit, -unit, -unit);
+	points[2].Set( unit,  unit, -unit);
+	points[3].Set(-unit,  unit, -unit);
+	// back
+	points[4].Set(-unit, -unit,  unit);
+	points[5].Set( unit, -unit,  unit);
+	points[6].Set( unit,  unit,  unit);
+	points[7].Set(-unit,  unit,  unit);
+
+	HC_KEY key = HC_ERROR_KEY;
+	HC_KEY segKey = HC_Open_Segment("wire");
+	ASSERT(segKey != HC_ERROR_KEY);
+	{
+		Painter::Segment::SetColor("faces", PRESET::LineColor());
+
+		CreateCylinder(0, 1);
+		CreateCylinder(1, 2);
+		CreateCylinder(2, 3);
+		CreateCylinder(3, 0);
+
+		CreateCylinder(4, 5);
+		CreateCylinder(5, 6);
+		CreateCylinder(6, 7);
+		CreateCylinder(7, 4);
+
+		CreateCylinder(0, 4);
+		CreateCylinder(1, 5);
+		CreateCylinder(2, 6);
+		CreateCylinder(3, 7);
+	}
+	HC_Close_Segment();
+
+#undef CreateCylinder
+}
+
+//#define PLANE_EDGE
+//#define ROUND_EDGE
+
 HC_KEY NavigationCube::CreatePlaneShell(const char* name, const char* text, Triple pos, Triple angle)
 {
 	double unit = PRESET::PlaneUnit() - PRESET::CornerUnit();
-	HPoint p1(-unit, unit);
-	HPoint p2(unit, -unit);
 
 	HPoint points[4];
-	points[0] = p1;
-	points[1].Set(p1.x, p2.y);
-	points[2].Set(p2.x, p2.y);
-	points[3].Set(p2.x, p1.y);
+	points[0].Set(-unit,  unit);
+	points[1].Set(-unit, -unit);
+	points[2].Set( unit, -unit);
+	points[3].Set( unit,  unit);
 
 	int faces[] = {
 		4, 0, 1, 2, 3
@@ -474,7 +513,7 @@ HC_KEY NavigationCube::CreatePlaneShell(const char* name, const char* text, Trip
 
 		HC_Set_Text_Font("transforms = on");
 
-		HC_KEY shellKey = HC_Insert_Shell(4, points, 5, faces);
+		HC_KEY shellKey = HC_Insert_Shell(sizeof(points) / sizeof(HPoint), points, sizeof(faces) / sizeof(int), faces);
 		ASSERT(shellKey != HC_ERROR_KEY);
 
 		HC_KEY textKey = HC_Insert_Text(0, 0, 0, text);
@@ -495,6 +534,17 @@ HC_KEY NavigationCube::CreateEdgeShell(const char* name, Triple pos, Triple angl
 	double width = PRESET::EdgeUnit();
 	double height = PRESET::CornerUnit();
 
+#ifdef PLANE_EDGE
+	HPoint points[4];
+	points[0].Set(-width, -height,      0);
+	points[1].Set( width, -height,      0);
+	points[2].Set( width,       0, height);
+	points[3].Set(-width,       0, height);
+
+	int faces[] = {
+		4, 0, 1, 2, 3
+	};
+#else
 	HPoint points[6];
 	points[0].Set(-width,       0,      0);
 	points[1].Set(-width, -height,      0);
@@ -507,15 +557,14 @@ HC_KEY NavigationCube::CreateEdgeShell(const char* name, Triple pos, Triple angl
 		4, 0, 1, 2, 3,
 		4, 3, 4, 5, 0
 	};
+#endif
 
 	HC_KEY segKey = HC_Open_Segment(name);
 	ASSERT(segKey != HC_ERROR_KEY);
 	{
 		HC_Set_Selectability("faces = on");
 
-		//Segment::SetColor("faces", RGB(255, 0, 0), 0.5);
-
-		HC_KEY shellKey = HC_Insert_Shell(6, points, 10, faces);
+		HC_KEY shellKey = HC_Insert_Shell(sizeof(points) / sizeof(HPoint), points, sizeof(faces) / sizeof(int), faces);
 		ASSERT(shellKey != HC_ERROR_KEY);
 
 		HC_Rotate_Object(angle.x, angle.y, angle.z);
@@ -532,6 +581,16 @@ HC_KEY NavigationCube::CreateCornerShell(const char* name, Triple pos, Triple an
 {
 	double unit = PRESET::CornerUnit();
 
+#ifdef PLANE_EDGE
+	HPoint points[3];
+	points[0].Set(unit, -unit,    0);
+	points[1].Set(unit,     0, unit);
+	points[2].Set(   0, -unit, unit);
+
+	int faces[] = {
+		3, 0, 1, 2,
+	};
+#else
 	HPoint points[7];
 	points[0].Set(   0,     0,    0);
 	points[1].Set(   0, -unit,    0);
@@ -546,6 +605,7 @@ HC_KEY NavigationCube::CreateCornerShell(const char* name, Triple pos, Triple an
 		4, 3, 4, 5, 0,
 		4, 5, 6, 1, 0
 	};
+#endif
 
 	HC_KEY segKey = HC_Open_Segment(name);
 	ASSERT(segKey != HC_ERROR_KEY);
@@ -554,7 +614,7 @@ HC_KEY NavigationCube::CreateCornerShell(const char* name, Triple pos, Triple an
 
 		//Segment::SetColor("faces", RGB(0, 0, 255), 0.5);
 
-		HC_KEY shellKey = HC_Insert_Shell(7, points, 15, faces);
+		HC_KEY shellKey = HC_Insert_Shell(sizeof(points) / sizeof(HPoint), points, sizeof(faces) / sizeof(int), faces);
 		ASSERT(shellKey != HC_ERROR_KEY);
 
 		HC_Rotate_Object(angle.x, angle.y, angle.z);

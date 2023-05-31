@@ -24,6 +24,10 @@ namespace Facility
 
 		bool Save();
 
+	public: // Preference Values
+
+		bool BooleanValue(const char* path);
+
 	private:
 
  		CString m_sFolderPath;

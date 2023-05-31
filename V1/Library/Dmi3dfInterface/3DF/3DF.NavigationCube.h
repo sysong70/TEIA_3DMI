@@ -56,6 +56,8 @@ private:
 
 	void CreateCube();
 
+	void CreateCubeWire();
+
 	HC_KEY CreatePlaneShell(const char* name, const char* text, Triple pos, Triple angle);
 
 	HC_KEY CreateEdgeShell(const char* name, Triple pos, Triple angle);

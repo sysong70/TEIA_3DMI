@@ -15,9 +15,11 @@ static char THIS_FILE[] = __FILE__;
 
 Facility::AppOptions TheAppOptions;
 
+
+
 #define PRESET PresetAppOptions
 
-namespace PRESET
+namespace PresetAppOptions
 {
 	const CString PreferencesName = L"Preferences.Json";
 	const CString FileOpeionsName = L"FileOptions.Json";
@@ -99,6 +101,19 @@ bool Facility::AppOptions::Save()
 	}
 
 	return true;
+}
+
+
+
+bool Facility::AppOptions::BooleanValue(const char* path)
+{
+	Json::Value* pValue = Json::Helper::FindValueByPath(m_preferences, path);
+	if (pValue != nullptr) {
+		return pValue->AsBoolean();
+	}
+	else {
+		RETURN_FALSE;
+	}
 }
 
 #undef PRESET

@@ -5,6 +5,7 @@
 #include "Window.View3d.h"
 #include "Connector.h"
 #include "Facility.h"
+#include "Facility.AppOptions.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -193,6 +194,8 @@ BOOL Window::View3d::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 	if (m_bRenderer) {
 		CRect rect;
 		GetWindowRect(rect);
+
+		zDelta *= TheAppOptions.BooleanValue("Environment/Mouse/ReverseWheelDirection") ? -1 : 1;
 		m_delivery.view.OnMouseWheel(nFlags, zDelta, point.x, point.y, rect.left, rect.top, rect.right, rect.bottom);
 	}
 

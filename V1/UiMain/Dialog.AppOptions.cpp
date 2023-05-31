@@ -121,7 +121,6 @@ BOOL Dialog::AppOptions::OnInitDialog()
 void Dialog::AppOptions::OnOK()
 {
 	OnApply();
-	//:TODO - sand data to connector
 
 	__super::OnOK();
 }
