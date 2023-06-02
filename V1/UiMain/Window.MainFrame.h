@@ -44,6 +44,10 @@ namespace Window
 		//:WARNING - for remove debug message (AppMsg - Warning: GetWindowMenuPopup failed!)
 		HMENU GetWindowMenuPopup(HMENU hMenuBar) override;
 
+		BOOL OnEraseMDIClientBackground(CDC* pDC) override;
+
+		void OnSizeMDIClient(const CRect& rectOld, const CRect& rectNew) override;
+
 		BOOL PreCreateWindow(CREATESTRUCT& cs) override;
 
 	#ifdef _DEBUG

@@ -306,7 +306,7 @@ LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
 
 1 24 DISCARDABLE "DpiAwareness.xml"
 
-IDF_JSON_UI                 TEXT   "res/UI.json"
-IDF_JSON_DATA_PREFERENCES   TEXT   "res/Data.Preferences.json"
-IDF_JSON_DATA_FILEOPTIONS   TEXT   "res/Data.FileOptions.json"
-
+IDF_JSON_UI                 TEXT    "res/UI.json"
+IDF_JSON_DATA_PREFERENCES   TEXT    "res/Data.Preferences.json"
+IDF_JSON_DATA_FILEOPTIONS   TEXT    "res/Data.FileOptions.json"
+IDF_PNG_BACKGROUND          PNG     "res/Background.png"

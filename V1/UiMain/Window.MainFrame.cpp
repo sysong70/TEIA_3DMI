@@ -182,6 +182,35 @@ HMENU Window::MainFrame::GetWindowMenuPopup(HMENU hMenuBar)
 
 
 
+BOOL Window::MainFrame::OnEraseMDIClientBackground(CDC* pDC)
+{
+	HBITMAP hBitmap = TheAppResources.GetBackground();
+	CBitmap* pBitmap = CBitmap::FromHandle(hBitmap);
+	BITMAP bitmap;
+	pBitmap->GetBitmap(&bitmap);
+
+	CDC memDC;
+	memDC.CreateCompatibleDC(pDC);
+	memDC.SelectObject(pBitmap);
+
+	CRect rect;
+	m_wndClientArea.GetClientRect(rect);
+
+	pDC->FillRect(rect, &CBrush(RGB(0x36, 0x36, 0x36)));
+	pDC->BitBlt(rect.left, rect.bottom - bitmap.bmHeight, bitmap.bmWidth, bitmap.bmHeight, &memDC, 0, 0, SRCCOPY);
+
+	return TRUE;
+}
+
+
+
+void Window::MainFrame::OnSizeMDIClient(const CRect& rectOld, const CRect& rectNew)
+{
+	m_wndClientArea.RedrawWindow();
+}
+
+
+
 BOOL Window::MainFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
 	if (__super::PreCreateWindow(cs) == FALSE) {

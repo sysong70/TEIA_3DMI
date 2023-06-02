@@ -18,6 +18,10 @@ Facility::AppResources TheAppResources;
 
 Facility::AppResources::~AppResources()
 {
+	if (m_background != nullptr) {
+		::DeleteObject(m_background);
+		m_background = nullptr;
+	}
 }
 
 
@@ -33,6 +37,10 @@ bool Facility::AppResources::Load()
 	}
 
 	if (InitFileOptions() == false) {
+		return false;
+	}
+
+	if (InitImages() == false) {
 		return false;
 	}
 
@@ -65,6 +73,13 @@ Json::Object& Facility::AppResources::GetFileOptions()
 Json::Object& Facility::AppResources::GetStyles()
 {
 	return m_ui.GetAt("Styles");
+}
+
+
+
+HBITMAP Facility::AppResources::GetBackground()
+{
+	return m_background;
 }
 
 
@@ -115,6 +130,21 @@ bool Facility::AppResources::InitPreferences()
 	}
 
 	return true;
+}
+
+bool Facility::AppResources::InitImages()
+{
+	CBCGPPngImage image;
+	image.m_bUseBackground = FALSE;
+	image.Load(IDF_PNG_BACKGROUND);
+	m_background = (HBITMAP)image.Detach();
+
+	if (m_background == nullptr) {
+		RETURN_FALSE;
+	}
+	else {
+		return true;
+	}
 }
 
 
