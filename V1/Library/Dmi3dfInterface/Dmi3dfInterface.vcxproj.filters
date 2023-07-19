@@ -282,6 +282,9 @@
     <ClInclude Include="3DF\3DF.Facility.ImportOption.h">
       <Filter>Facility</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\3DF.Operator.KeyboardTest.h">
+      <Filter>Operator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -493,6 +496,9 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.Facility.ImportOption.cpp">
       <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Operator.KeyboardTest.cpp">
+      <Filter>Operator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -155,7 +155,7 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 
 	// 선택된 요소가 없은 경우
 	if (0 == nSelectedCount) {
-		TRACE(L"NavigationCube No Selection\n");
+		//TRACE(L"NavigationCube No Selection\n");
 
 		// 기존에 선택된 요소가 있는 경우 처리
 		if (0 < m_cOldHighlightSelection.GetCount()) {
@@ -165,7 +165,7 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 		}
 	}
 	else {
-		TRACE(L"NavigationCube Selection: %d\n", nSelectedCount);
+		//TRACE(L"NavigationCube Selection: %d\n", nSelectedCount);
 
 		// 이전에 선택된것과 다른 경우
 		if (m_cOldHighlightSelection != cSelection) {
@@ -183,7 +183,7 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 			}
 
 			if (true == bFindFlag) {
-				TRACE(L"NavigationCube Find\n");
+				//TRACE(L"NavigationCube Find\n");
 
 				HighlightOptionsKit cHighlightOptions;
 				m_pcWindow->GetHighlightControl().Highlight(cSelection, cHighlightOptions, true);
@@ -193,7 +193,7 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 			else {
 				m_cOldHighlightSelection.Reset();
 
-				TRACE(L"NavigationCube No Find\n");
+				//TRACE(L"NavigationCube No Find\n");
 			}
 
 			bUpdateFlag = true;

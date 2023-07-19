@@ -99,7 +99,7 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 		return HLISTENER_PASS_EVENT;
 	}
 
-	TRACE(L"ObjectSnap::NoButtonDownAndMove, Dist: %f\n", fDist);
+	//TRACE(L"ObjectSnap::NoButtonDownAndMove, Dist: %f\n", fDist);
 
 // 	if (m_nSelectPickCount > nTickCount) {
 // 		return HLISTENER_PASS_EVENT;
@@ -133,7 +133,7 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 	// 				m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
 	// 			}
 
-			TRACE(L"1st DrawSnapItem, %d\n", (int)pcSnapItem->eType);
+			//TRACE(L"1st DrawSnapItem, %d\n", (int)pcSnapItem->eType);
 			DrawSnapItem(pcSnapItem, cCameraInfo);
 
 			m_pcWindow->Update();
@@ -213,15 +213,15 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 			}*/
 
 			if (TDF::Type::LineKey == eType) {
-				TRACE(L"SelectByPoint Line: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());
+				//TRACE(L"SelectByPoint Line: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());
 				vLineSelectedItems.push_back(pcItem);
 			}
 			else if (TDF::Type::ShellKey == eType) {
-				TRACE(L"SelectByPoint Shell: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());		
+				//TRACE(L"SelectByPoint Shell: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());		
 				vShellSelectedItems.push_back(pcItem);
 			}
 			else {
-				TRACE(L"SelectByPoint: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());		
+				//TRACE(L"SelectByPoint: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());		
 			}
 
 			cIter.Next();
@@ -247,12 +247,12 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 			// Line이 가장 앞에 있는 경우 (Windows Point의 Z값이 가장 작은 경우)
 			if (cLinePoint.z < cShellPoint.z) {
 				m_cNewHighlightSelection.PushBack(new SelectionItem(*pcLineItem));
-				TRACE(L"Line First Pushback\n");
+				//TRACE(L"Line First Pushback\n");
 			}
 			// Shell의 선택점과 Line의 선택점이 거의 같은 경우 Line을 선택한다.
 			else if (1.0e-2 >fabs(cLinePoint.z - cShellPoint.z)) {
 				m_cNewHighlightSelection.PushBack(new SelectionItem(*pcLineItem));
-				TRACE(L"Line vs face near Pushback\n");
+				//TRACE(L"Line vs face near Pushback\n");
 			}
 			else {
 				//m_cNewHighlightSelection.PushBack(new SelectionItem(*pcShellItem));
@@ -261,12 +261,12 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 		else if (0 < vLineSelectedItems.size()) {
 			// Line만 있는 경우
 			m_cNewHighlightSelection.PushBack(new SelectionItem(*vLineSelectedItems[0]));
-			TRACE(L"Line only Pushback\n");
+			//TRACE(L"Line only Pushback\n");
 		}
 		else if (0 < vShellSelectedItems.size()) {
 			// Shell만 있는 경우
 			m_cNewHighlightSelection.PushBack(new SelectionItem(*vShellSelectedItems[0]));
-			TRACE(L"Shell only Pushback\n");
+			//TRACE(L"Shell only Pushback\n");
 		}
 		else {
 			// Line과 Shell이 없는 경우
@@ -274,7 +274,7 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 		}
 	}
 	else {
-		TRACE(L"SelectByPoint: %d\n", nSelectedCount);
+		//TRACE(L"SelectByPoint: %d\n", nSelectedCount);
 	}
 	
 	bool bForceUpdate = false;
@@ -295,7 +295,7 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 
 	// 선택된 요소가 있고 기존과 다른 경우에만 Highlight를 한다.
 	if (0 < m_cNewHighlightSelection.GetCount() && m_cOldHighlightSelection != m_cNewHighlightSelection) {
-		TRACE(L"HighlightSelection Count: %d\n", m_cNewHighlightSelection.GetCount());
+		//TRACE(L"HighlightSelection Count: %d\n", m_cNewHighlightSelection.GetCount());
 		m_pcWindow->GetHighlightControl().Highlight(m_cNewHighlightSelection, cHighlightOptions, true);
 		bForceUpdate = true;
 	}
@@ -315,7 +315,7 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 			m_cOldHighlightSelection.Front()->ShowSelectedItem(cOldKey);
 		}
 
-		TRACE(L"Unhighlight: %d\n", cOldKey.KeyValue());
+		//TRACE(L"Unhighlight: %d\n", cOldKey.KeyValue());
 	}
 
 	m_cOldHighlightSelection = m_cNewHighlightSelection;
@@ -756,7 +756,7 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 		Font::SetTransform();
 			float width, height;
 			Text::GetExtent(text, width, height);
-			Font::SetTransform(false);
+		Font::SetTransform(false);
 
 		HC_Open_Segment("frame");
 		{

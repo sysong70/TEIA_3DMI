@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Window.h"
+#include "Component.Input.h"
 #include "Component.InputBar.h"
 #include "Component.LayerPanel.h"
 #include "Component.ModelPanel.h"
@@ -18,6 +19,8 @@ namespace Window
 {
 	class View : public CView
 	{
+		friend class Component::Input;
+
 	protected:
 
 		View();
@@ -72,6 +75,8 @@ namespace Window
 		afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 
 		afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+
+		afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 
 		afx_msg void OnPaint();
 
@@ -148,8 +153,6 @@ namespace Window
 
 	protected: // InputBar
 
-		Component::InputBar m_inputBar;
-
-		void ShowInputBar(bool show = true);
+		Component::Input m_input;
 	};
 }

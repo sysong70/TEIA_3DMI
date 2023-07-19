@@ -26,7 +26,7 @@ namespace TDF
 		namespace Arc
 		{
 			// 3 Points
-			void Create(TDF::Point first, TDF::Point second, TDF::Point third);
+			HC_KEY Create(TDF::Point first, TDF::Point second, TDF::Point third);
 			// angle: degree
 			void GetPoints(TDF::Point center, double radius, double startAngle, double endAngle, Points& points);
 
@@ -38,9 +38,9 @@ namespace TDF
 		namespace Circle
 		{
 			// Center, Radius
-			void Create(TDF::Point center, double radius, bool polygon = true);
+			HC_KEY Create(TDF::Point center, double radius, bool polygon = true);
 			// 3 Points
-			void Create(TDF::Point first, TDF::Point second, TDF::Point third, bool polygon = true);
+			HC_KEY Create(TDF::Point first, TDF::Point second, TDF::Point third, bool polygon = true);
 
 			void GetPoints(TDF::Point center, double radius, bool reverse, Points& points);
 		};
@@ -60,11 +60,11 @@ namespace TDF
 
 		namespace Figure
 		{
-			void CreateDonut(TDF::Point center, double inner, double outer);
+			HC_KEY CreateDonut(TDF::Point center, double inner, double outer);
 			// Left & Right Half Circle
-			void CreateObround(TDF::Point topLeft, TDF::Point bottomRight);
+			HC_KEY CreateObround(TDF::Point topLeft, TDF::Point bottomRight);
 
-			void CreateRectangle(TDF::Point topLeft, TDF::Point bottomRight);
+			HC_KEY CreateRectangle(TDF::Point topLeft, TDF::Point bottomRight);
 		};
 
 		//:REF - https://docs.techsoft3d.com/3df/latest/api_ref/3dgs/HC_Set_Text_Font.html
@@ -113,21 +113,21 @@ namespace TDF
 
 		namespace Line
 		{
-			void Create(TDF::Point first, TDF::Point second, bool firstEnd = false, bool secondEnd = false);
+			HC_KEY Create(TDF::Point first, TDF::Point second, bool firstEnd = false, bool secondEnd = false);
 		};
 
 
 
 		namespace Polyline
 		{
-			void Create(Points& points);
+			HC_KEY Create(Points& points);
 		};
 
 
 
 		namespace Polygon
 		{
-			void Create(Points& points);
+			HC_KEY Create(Points& points);
 		};
 
 
@@ -157,13 +157,26 @@ namespace TDF
 
 		namespace Text
 		{
-			void Create(TDF::Point center, const char* value);
+			HC_KEY Create(TDF::Point center, const char* value);
 
-			void Create(TDF::Point center, const wchar_t* value);
+			HC_KEY Create(TDF::Point center, const wchar_t* value);
 
 			void GetExtent(const char* value, float& width, float& height);
 
 			void GetExtent(const wchar_t* value, float& width, float& height);
+
+			void Update(HC_KEY textKey, const wchar_t* value);
 		};
+
+
+
+		namespace Cursor
+		{
+			HC_KEY Create(HC_KEY textKey, int row, int column);
+
+			void Hide(HC_KEY key);
+
+			void Move(HC_KEY key, int row, int column);
+		}
 	};
 };

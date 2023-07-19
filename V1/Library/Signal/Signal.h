@@ -5,7 +5,9 @@
 /// Delivery Keywords
 
 #define SKW_ACTION			"Action"
+#define SKW_CHAR			"Char"
 #define SKW_CHILDREN		"Children"
+#define SKW_COLUMN			"Column"
 #define SKW_DATA			"Data"
 #define SKW_Delivery		"Delivery"
 #define SKW_DELTA			"Delta"
@@ -28,11 +30,13 @@
 #define SKW_MAX				"Max"
 #define SKW_MESSAGE			"Message"
 #define SKW_MIN				"Min"
+#define SKW_MODE			"Mode"
 #define SKW_OPTIONS			"Options"
 #define SKW_OSNAPID			"OsnapId"
 #define SKW_PARENT			"Parent"
 #define SKW_POSITION		"Position"
 #define SKW_RECT			"Rect"
+#define SKW_ROW				"Row"
 #define SKW_STATUS			"Status"
 #define SKW_TARGET			"Target"
 #define SKW_TITLE			"Title"
@@ -51,34 +55,46 @@
 
 namespace Signal
 {
-	enum class EObjectSnap
+	enum class EInputMode
 	{
-		Unknown = -1,
+		Unknown = -1, // stop
 
-		Point,
-		End,
-		Mid,
-		Intersection,
-		Perpendicular,
-		Center,
-		Quadrant,
-		Near,
-		OnSurface,
-		BoundaryCenter,
-		Axis,
+		Real,
+		Integer,
+		String,
+		Point2d,
+		Point3d,
 	};
 
-	struct ObjectSnapPoint
+	enum EInputControl
 	{
-		int Id = 0;
-		int X = 0;
-		int Y = 0;
-		EObjectSnap Type = EObjectSnap::Unknown;
+		// Sets the "Accept Z coordinate" mode. Input is restricted to 2d input by default.
+		Accept3dCoordinates = 0x0001,
+		// Sets the "Use mouse up for points" mode. Mouse-up events do not register as points by default.
+		AcceptMouseUpAsPoint = 0x0002,
+		// Sets the "Accept non-keyword string input" mode. This mode is off by default.
+		AcceptOtherInputString = 0x0004,
+		// Sets the "Any blank terminates input" mode. This mode is off by default.
+		AnyBlankTerminatesInput = 0x0008,
+		// Sets the "Don't update last point" mode. The last point is updated by default.
+		DoNotUpdateLastPoint = 0x0010,
+		// Sets the "honor ORTHOMODE sysvar" bit of the user input request packet.
+		// By default, this bit is not set.
+		// Note that the Jig.acquirePoint(Point3d&, const Point3d& basePnt) method always honors the ORTHOMODE sysvar,
+		// regardless of this bit's state.
+		GovernedByOrthoMode = 0x0020,
+		// Sets the "Initial blank terminates input" mode. This mode is off by default.
+		InitialBlankTerminatesInput = 0x0040,
+		// Sets the "Don't accept negative values" mode. Negative values are accepted by default.
+		// This works for the functions acquireDist() and acquireAngle() only.
+		NoNegativeResponseAccepted = 0x0080,
+		// Sets the "Don't accept zero values" mode. Zero values are accepted by default.
+		// This works for the functions acquireDist() and acquireAngle() only.
+		NoZeroResponseAccepted = 0x0100,
+		// Sets the "null input acceptable" bit of the user input request packet.
+		// This bit is clear by default, and null input is not acceptable. 
+		NullResponseAccepted = 0x0200,
 	};
-
-	using ObjectSnapPoints = std::vector<ObjectSnapPoint>;
-
-
 
 	enum class ETreeItem
 	{
@@ -334,12 +350,15 @@ namespace Signal
 			OnMouseWheel,
 			OnPaint,
 			OnResize,
-			OnText,
+			OnInput,
+
+			OnChar,
+			OnKeyDown,
+			OnKeyUp,
 
 			SetValidation, // complete opening file
 			PaintOverlap, // complete OnPaint
-			SetObjectSnapPoints,
-			ClearObjectSnapPoints,
+			SetInputMode,
 		};
 
 		DEFINE_WRAPPER;
@@ -349,6 +368,8 @@ namespace Signal
 		void ConstructMouseData(Json::Object& data, Action action, UINT flags, int x, int y);
 
 		void ConstructWheelData(Json::Object& data, UINT flags, short delta, int x, int y);
+
+		void ConstructKeyData(Json::Object& data, Action action, UINT chr, UINT repeat, UINT flags);
 
 	public:
 
@@ -375,8 +396,11 @@ namespace Signal
 		void OnPaint(int left, int top, int right, int bottom);
 
 		void OnResize(int x, int y);
+		void OnInput(CString value, int row, int column);
 
-		void OnText(UINT flags, int x, int y);
+		void OnChar(UINT chr, UINT repeat, UINT flags);
+		void OnKeyDown(UINT chr, UINT repeat, UINT flags);
+		void OnKeyUp(UINT chr, UINT repeat, UINT flags);
 
 	public:
 
@@ -384,9 +408,7 @@ namespace Signal
 		//:TODO
 		void PaintOverlap();
 
-		void SetObjectSnapPoints(ObjectSnapPoints& osnaps);
-
-		void ClearObjectSnapPoints();
+		void SetInputMode(EInputMode mode);
 	};
 
 

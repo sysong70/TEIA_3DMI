@@ -1263,6 +1263,35 @@ DWORD Canvas::MouseMapFlags(DWORD state)
 	return nFlag;
 }
 
+#include "3DF.Operator.KeyboardTest.h"
+//:TEMP
+Operator::KeyboardTest* g_pOperator = nullptr;
+
+bool Canvas::KeyboardInput(Json::Object& input)
+{
+	using namespace Signal;
+
+	if (g_pOperator == nullptr) {
+		g_pOperator = new Operator::KeyboardTest(this->m_pcWindow);
+	}
+
+	View::Action action = (View::Action)input.GetInteger(SKW_ACTION);
+
+	switch (action) {
+	case View::Action::OnChar:
+	case View::Action::OnKeyDown:
+	case View::Action::OnKeyUp:
+	case View::Action::OnInput:
+		g_pOperator->OnKeyboard(input);
+		break;
+
+	default:
+		return false;
+	}
+
+	return true;
+}
+
 //== Operator 관련 함수 ==============================================================================
 
 void Canvas::SetDefaultOperator()

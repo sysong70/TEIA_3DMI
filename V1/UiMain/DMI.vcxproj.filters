@@ -160,6 +160,9 @@
     <ClCompile Include="Control.Property.cpp">
       <Filter>Control\Tree And Property</Filter>
     </ClCompile>
+    <ClCompile Include="Component.Input.cpp">
+      <Filter>Component\View</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.Common.h">
@@ -332,6 +335,9 @@
     </ClInclude>
     <ClInclude Include="Control.Property.h">
       <Filter>Control\Tree And Property</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.Input.h">
+      <Filter>Component\View</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

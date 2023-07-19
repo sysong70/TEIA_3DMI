@@ -45,7 +45,7 @@
     <ClInclude Include="..\Signal\Signal.h">
       <Filter>_Signal</Filter>
     </ClInclude>
-    <ClInclude Include="..\OdaInterface\CommandBase.h">
+    <ClInclude Include="Command.h">
       <Filter>Command</Filter>
     </ClInclude>
     <ClInclude Include="..\OdaInterface\CommandReactor.h">
@@ -65,6 +65,9 @@
     </ClInclude>
     <ClInclude Include="..\Common\Path.h">
       <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.Line.h">
+      <Filter>Command</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -101,7 +104,7 @@
     <ClCompile Include="..\Signal\Signal.cpp">
       <Filter>_Signal</Filter>
     </ClCompile>
-    <ClCompile Include="..\OdaInterface\CommandBase.cpp">
+    <ClCompile Include="Command.cpp">
       <Filter>Command</Filter>
     </ClCompile>
     <ClCompile Include="..\OdaInterface\CommandReactor.cpp">
@@ -121,6 +124,9 @@
     </ClCompile>
     <ClCompile Include="..\Common\Path.cpp">
       <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.Line.cpp">
+      <Filter>Command</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

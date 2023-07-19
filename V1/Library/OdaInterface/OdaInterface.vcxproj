@@ -169,7 +169,7 @@
     <ClInclude Include="..\Common\Path.h" />
     <ClInclude Include="..\Common\WStr.h" />
     <ClInclude Include="..\OdaInterface\Application.h" />
-    <ClInclude Include="..\OdaInterface\CommandBase.h" />
+    <ClInclude Include="Command.h" />
     <ClInclude Include="..\OdaInterface\CommandReactor.h" />
     <ClInclude Include="..\OdaInterface\Connector.h" />
     <ClInclude Include="..\OdaInterface\framework.h" />
@@ -177,6 +177,7 @@
     <ClInclude Include="..\OdaInterface\Renderer.h" />
     <ClInclude Include="..\Signal\Signal.h" />
     <ClInclude Include="..\Signal\WorkerThread.h" />
+    <ClInclude Include="Command.Line.h" />
     <ClInclude Include="SignalArgs.h" />
     <ClInclude Include="EventDelegator.h" />
     <ClInclude Include="ThreadPool.h" />
@@ -190,7 +191,7 @@
     <ClCompile Include="..\Common\Path.cpp" />
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\OdaInterface\Application.cpp" />
-    <ClCompile Include="..\OdaInterface\CommandBase.cpp" />
+    <ClCompile Include="Command.cpp" />
     <ClCompile Include="..\OdaInterface\CommandReactor.cpp" />
     <ClCompile Include="..\OdaInterface\Connector.cpp" />
     <ClCompile Include="..\OdaInterface\dllmain.cpp" />
@@ -201,6 +202,7 @@
     <ClCompile Include="..\Teigha\Drawing\Extensions\ExServices\ExHostAppServices.cpp" />
     <ClCompile Include="..\Teigha\Kernel\Extensions\ExServices\OdFileBuf.cpp" />
     <ClCompile Include="..\Teigha\Kernel\Extensions\ExServices\RxSystemServicesImpl.cpp" />
+    <ClCompile Include="Command.Line.cpp" />
     <ClCompile Include="SignalArgs.cpp" />
     <ClCompile Include="EventDelegator.cpp" />
     <ClCompile Include="ThreadPool.cpp" />

@@ -111,7 +111,7 @@ protected:
 
 	bool OnResize(SignalArgs::Base* pSignal) override;
 
-	bool OnText(SignalArgs::Base* pSignal) override { return false; }
+	bool OnInput(SignalArgs::Base* pSignal) override { return false; }
 
 public: // Command
 

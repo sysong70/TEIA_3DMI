@@ -40,5 +40,5 @@ protected:
     virtual bool OnMouseWheel(SignalArgs::Base* pSignal) { return false; }
     virtual bool OnPaint(SignalArgs::Base* pSignal) { return false; }
     virtual bool OnResize(SignalArgs::Base* pSignal) { return false; }
-    virtual bool OnText(SignalArgs::Base* pSignal) { return false; }
+    virtual bool OnInput(SignalArgs::Base* pSignal) { return false; }
 };

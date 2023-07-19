@@ -103,6 +103,11 @@ public:
 protected:
 	DWORD MouseMapFlags(DWORD state);
 
+public:
+
+	//:Ken - 20230607
+	bool KeyboardInput(Json::Object& input);
+
 	//== Operator 관련 함수 ==========================================================================
 protected:
 	void SetDefaultOperator();

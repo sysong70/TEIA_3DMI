@@ -258,6 +258,16 @@ void Signal::View::ConstructWheelData(Json::Object& data, UINT flags, short delt
 
 
 
+void Signal::View::ConstructKeyData(Json::Object& data, Action action, UINT chr, UINT repeat, UINT flags)
+{
+	ConstructData(data, action);
+
+	data.SetInteger(SKW_CHAR, chr);
+	data.SetInteger(SKW_FLAG, flags);
+}
+
+
+
 void Signal::View::OnConstruct()
 {
 	SendActionDataOnly(Action::OnConstruct);
@@ -409,12 +419,39 @@ void Signal::View::OnResize(int x, int y)
 
 
 
-void Signal::View::OnText(UINT flags, int x, int y)
+void Signal::View::OnInput(CString value, int row, int column)
 {
-	DEBUG_STOP;
+	Json::Object data;
+	ConstructData(data, Action::OnInput);
+
+	data.SetString(SKW_VALUE, value);
+	data.SetInteger(SKW_ROW, row);
+	data.SetInteger(SKW_COLUMN, column);
+
+	Wrapper().SendData(data);
 }
 
+#define SendKeyData(action) \
+Json::Object data; \
+ConstructKeyData(data, action, chr, repeat, flags); \
+Wrapper().SendData(data);
 
+void Signal::View::OnChar(UINT chr, UINT repeat, UINT flags)
+{
+	SendKeyData(Action::OnChar);
+}
+
+void Signal::View::OnKeyDown(UINT chr, UINT repeat, UINT flags)
+{
+	SendKeyData(Action::OnKeyDown);
+}
+
+void Signal::View::OnKeyUp(UINT chr, UINT repeat, UINT flags)
+{
+	SendKeyData(Action::OnKeyUp);
+}
+
+#undef SendKeyData
 
 void Signal::View::SetValidation(bool success)
 {
@@ -435,31 +472,14 @@ void Signal::View::PaintOverlap()
 
 
 
-void Signal::View::SetObjectSnapPoints(ObjectSnapPoints& osnaps)
+void Signal::View::SetInputMode(EInputMode mode)
 {
 	Json::Object data;
-	ConstructData(data, Action::SetObjectSnapPoints);
+	ConstructData(data, Action::SetInputMode);
 
-	Json::Array& items = data.CreateArray(SKW_ITEMS);
-	for (auto point : osnaps) {
-		Json::Object* pChild = new Json::Object();
-
-		pChild->SetInteger(SKW_ID, point.Id);
-		pChild->SetInteger(SKW_X, point.X);
-		pChild->SetInteger(SKW_Y, point.Y);
-		pChild->SetInteger(SKW_TYPE, (int)point.Type);
-
-		items.AddObject(*pChild);
-	}
+	data.SetInteger(SKW_MODE, (int)mode);
 
 	Wrapper().SendData(data);
-}
-
-
-
-void Signal::View::ClearObjectSnapPoints()
-{
-	SendActionDataOnly(Action::ClearObjectSnapPoints);
 }
 
 #pragma endregion //:REGION
