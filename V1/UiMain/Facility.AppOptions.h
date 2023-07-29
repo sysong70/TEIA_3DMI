@@ -1,19 +1,18 @@
 ﻿#pragma once
 
-#include "Facility.ImportOption.h"
-#include "Facility.Preference.h"
+#include "Facility.h"
 
 
 
 namespace Facility
 {
-	class AppSettings
+	class AppOptions
 	{
 	public:
 
-		AppSettings();
+		AppOptions();
 
-		~AppSettings();
+		~AppOptions();
 
 		void SetFolderPath(CString c);
 
@@ -25,13 +24,16 @@ namespace Facility
 
 		bool Save();
 
+	public: // Preference Values
+
+		bool BooleanValue(const char* path);
+
 	private:
 
  		CString m_sFolderPath;
-
 		Json::Object m_preferences;
 		Json::Object m_fileOptions;
 	};
 }
 
-extern Facility::AppSettings TheAppSettings;
+extern Facility::AppOptions TheAppOptions;

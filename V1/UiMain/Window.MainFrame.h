@@ -44,6 +44,10 @@ namespace Window
 		//:WARNING - for remove debug message (AppMsg - Warning: GetWindowMenuPopup failed!)
 		HMENU GetWindowMenuPopup(HMENU hMenuBar) override;
 
+		BOOL OnEraseMDIClientBackground(CDC* pDC) override;
+
+		void OnSizeMDIClient(const CRect& rectOld, const CRect& rectNew) override;
+
 		BOOL PreCreateWindow(CREATESTRUCT& cs) override;
 
 	#ifdef _DEBUG
@@ -66,7 +70,7 @@ namespace Window
 
 		afx_msg void OnFileOpen();
 
-		afx_msg void OnFilePreference();
+		afx_msg void OnAppOptions();
 
 		DECLARE_MESSAGE_MAP()
 
@@ -83,7 +87,7 @@ namespace Window
 	private:
 
 		std::vector<CString> m_fileNames;
-		Json::Object m_importOption;
+		//Json::Object m_importOption;
 
 		bool HasNextFile();
 

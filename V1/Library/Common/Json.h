@@ -154,7 +154,13 @@ namespace Json
 
 		Array& AsArray();
 
+		bool AsBoolean();
+
+		int AsInteger();
+
 		Object& AsObject();
+
+		double AsReal();
 
 		CString& AsString();
 

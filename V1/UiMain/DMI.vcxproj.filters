@@ -4,18 +4,6 @@
     <ClCompile Include="Facility.AppResources.cpp">
       <Filter>Facility</Filter>
     </ClCompile>
-    <ClCompile Include="Facility.AppSettings.cpp">
-      <Filter>Facility</Filter>
-    </ClCompile>
-    <ClCompile Include="Facility.Base.cpp">
-      <Filter>Facility</Filter>
-    </ClCompile>
-    <ClCompile Include="Facility.ImportOption.cpp">
-      <Filter>Facility</Filter>
-    </ClCompile>
-    <ClCompile Include="Facility.Preference.cpp">
-      <Filter>Facility</Filter>
-    </ClCompile>
     <ClCompile Include="Dialog.Base.cpp">
       <Filter>Dialog</Filter>
     </ClCompile>
@@ -94,7 +82,7 @@
     <ClCompile Include="..\Library\Common\File.cpp">
       <Filter>_Common</Filter>
     </ClCompile>
-    <ClCompile Include="Dialog.AppSettings.cpp">
+    <ClCompile Include="Dialog.AppOptions.cpp">
       <Filter>Dialog</Filter>
     </ClCompile>
     <ClCompile Include="Dialog.cpp">
@@ -117,9 +105,6 @@
     </ClCompile>
     <ClCompile Include="Control.CheckListBox.cpp">
       <Filter>Control</Filter>
-    </ClCompile>
-    <ClCompile Include="Control.Property.cpp">
-      <Filter>Control\Tree And Property\Wait</Filter>
     </ClCompile>
     <ClCompile Include="Control.cpp">
       <Filter>Control</Filter>
@@ -166,6 +151,18 @@
     <ClCompile Include="Component.InputBar.cpp">
       <Filter>Component\View</Filter>
     </ClCompile>
+    <ClCompile Include="Facility.Base.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="Facility.AppOptions.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.Property.cpp">
+      <Filter>Control\Tree And Property</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.Input.cpp">
+      <Filter>Component\View</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.Common.h">
@@ -177,19 +174,7 @@
     <ClInclude Include="Facility.AppResources.h">
       <Filter>Facility</Filter>
     </ClInclude>
-    <ClInclude Include="Facility.AppSettings.h">
-      <Filter>Facility</Filter>
-    </ClInclude>
-    <ClInclude Include="Facility.Base.h">
-      <Filter>Facility</Filter>
-    </ClInclude>
-    <ClInclude Include="Facility.ImportOption.h">
-      <Filter>Facility</Filter>
-    </ClInclude>
     <ClInclude Include="Facility.h">
-      <Filter>Facility</Filter>
-    </ClInclude>
-    <ClInclude Include="Facility.Preference.h">
       <Filter>Facility</Filter>
     </ClInclude>
     <ClInclude Include="Dialog.Base.h">
@@ -276,7 +261,7 @@
     <ClInclude Include="..\Library\Common\File.h">
       <Filter>_Common</Filter>
     </ClInclude>
-    <ClInclude Include="Dialog.AppSettings.h">
+    <ClInclude Include="Dialog.AppOptions.h">
       <Filter>Dialog</Filter>
     </ClInclude>
     <ClInclude Include="Dialog.ObjectSnaps.h">
@@ -299,9 +284,6 @@
     </ClInclude>
     <ClInclude Include="Control.CheckListBox.h">
       <Filter>Control</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.Property.h">
-      <Filter>Control\Tree And Property\Wait</Filter>
     </ClInclude>
     <ClInclude Include="Component.RibbonBar.h">
       <Filter>Component\Main Frame</Filter>
@@ -345,6 +327,18 @@
     <ClInclude Include="Component.InputBar.h">
       <Filter>Component\View</Filter>
     </ClInclude>
+    <ClInclude Include="Facility.Base.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="Facility.AppOptions.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.Property.h">
+      <Filter>Control\Tree And Property</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.Input.h">
+      <Filter>Component\View</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="TODO.xml">
@@ -363,9 +357,6 @@
     <None Include="RES\UI.json">
       <Filter>_Resource</Filter>
     </None>
-    <None Include="RES\FileOptions.json">
-      <Filter>_Resource</Filter>
-    </None>
     <None Include="RES\DMI_ENU.rc2">
       <Filter>_Resource</Filter>
     </None>
@@ -373,6 +364,12 @@
       <Filter>_Resource</Filter>
     </None>
     <None Include="RES\DMI.rc2">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="RES\Data.Preferences.json">
+      <Filter>_Resource</Filter>
+    </None>
+    <None Include="RES\Data.FileOptions.json">
       <Filter>_Resource</Filter>
     </None>
   </ItemGroup>
@@ -406,9 +403,6 @@
     </Filter>
     <Filter Include="Control\Tree And Property">
       <UniqueIdentifier>{3d17d7b6-2a80-4d06-a5c9-0cdaf14dc8bd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Control\Tree And Property\Wait">
-      <UniqueIdentifier>{726f27e2-44f1-4e2a-ad76-8edaf3c085a7}</UniqueIdentifier>
     </Filter>
     <Filter Include="Control\Tool Bar">
       <UniqueIdentifier>{cbf0972b-db82-4dd9-a406-974efbc9634b}</UniqueIdentifier>

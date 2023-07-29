@@ -4,6 +4,7 @@
 #include "Window.Application.h"
 #include "Window.Document.h"
 #include "Connector.h"
+#include "Facility.AppOptions.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -155,16 +156,10 @@ void Window::View::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 	switch (nChar) {
 	case VK_ESCAPE:
 		m_delivery.view.OnCancel();
-		ShowInputBar(false);
 		return;
 
 	default:
-		if (m_inputBar.IsVisible()) {
-			m_inputBar.OnChar(nChar, nRepCnt, nFlags);
-		}
-		else {
-			m_delivery.view.OnChar(nChar, nRepCnt, nFlags);
-		}
+		m_input.OnChar(nChar, nRepCnt, nFlags);
 		break;
 	}
 
@@ -197,14 +192,40 @@ void Window::View::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	switch (nChar) {
 	case VK_F1:
-		ShowInputBar();
+		m_input.SetView(this);
+		m_input.SetMode(Signal::EInputMode::Real);
+		return;
+
+	case VK_F2:
+		m_input.SetView(this);
+		m_input.SetMode(Signal::EInputMode::Integer);
+		return;
+
+	case VK_F3:
+		m_input.SetView(this);
+		m_input.SetMode(Signal::EInputMode::Point2d);
+		return;
+
+	case VK_F4:
+		m_input.SetView(this);
+		m_input.SetMode(Signal::EInputMode::Point3d);
 		return;
 
 	default:
+		m_input.OnKeyDown(nChar, nRepCnt, nFlags);
 		break;
 	}
 
-	CView::OnKeyDown(nChar, nRepCnt, nFlags);
+	__super::OnKeyDown(nChar, nRepCnt, nFlags);
+}
+
+
+
+void Window::View::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	m_input.OnKeyUp(nChar, nRepCnt, nFlags);
+
+	__super::OnKeyUp(nChar, nRepCnt, nFlags);
 }
 
 
@@ -231,7 +252,14 @@ void Window::View::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	if (IsValid()) {
 		SetCapture();
-		m_delivery.view.OnLButtonDown(nFlags, point.x, point.y);
+
+		//if (TheAppOptions.BooleanValue("Environment/Mouse/SwapPanAndRotate")) {
+		//	nFlags |= (nFlags & ~MK_LBUTTON) | MK_RBUTTON;
+		//	m_delivery.view.OnRButtonDown(nFlags, point.x, point.y);
+		//}
+		//else {
+			m_delivery.view.OnLButtonDown(nFlags, point.x, point.y);
+		//}
 	}
 
 	__super::OnLButtonDown(nFlags, point);
@@ -242,8 +270,15 @@ void Window::View::OnLButtonDown(UINT nFlags, CPoint point)
 void Window::View::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	if (IsValid()) {
-		nFlags |= MK_LBUTTON;
-		m_delivery.view.OnLButtonUp(nFlags, point.x, point.y);
+		//if (TheAppOptions.BooleanValue("Environment/Mouse/SwapPanAndRotate")) {
+		//	nFlags |= MK_RBUTTON;
+		//	m_delivery.view.OnRButtonUp(nFlags, point.x, point.y);
+		//}
+		//else {
+			nFlags |= MK_LBUTTON;
+			m_delivery.view.OnLButtonUp(nFlags, point.x, point.y);
+		//}
+
 		ReleaseCapture();
 		SetCursor(TheAppication.LoadStandardCursor(IDC_ARROW));
 	}
@@ -257,6 +292,7 @@ void Window::View::OnMButtonDown(UINT nFlags, CPoint point)
 {
 	if (IsValid()) {
 		SetCapture();
+
 		m_delivery.view.OnLButtonDown(nFlags, point.x, point.y);
 	}
 
@@ -270,6 +306,7 @@ void Window::View::OnMButtonUp(UINT nFlags, CPoint point)
 	if (IsValid()) {
 		nFlags |= MK_MBUTTON;
 		m_delivery.view.OnMButtonUp(nFlags, point.x, point.y);
+
 		ReleaseCapture();
 		SetCursor(TheAppication.LoadStandardCursor(IDC_ARROW));
 	}
@@ -281,7 +318,7 @@ void Window::View::OnMButtonUp(UINT nFlags, CPoint point)
 
 int Window::View::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message)
 {
-	int result = CView::OnMouseActivate(pDesktopWnd, nHitTest, message);
+	int result = __super::OnMouseActivate(pDesktopWnd, nHitTest, message);
 
 	if (m_bActivate) {
 		return result;
@@ -299,11 +336,6 @@ void Window::View::OnMouseMove(UINT nFlags, CPoint point)
 	// GetDC()->FillRect(CRect(500, 500, 1000, 1000), m_pcBrush);
 
 	if (IsValid()) {
-		if (m_inputBar.IsVisible()) {
-			m_inputBar.OnMouseMove(nFlags, point);
-		}
-
-
 		m_delivery.view.OnMouseMove(nFlags, point.x, point.y);
 	}
 
@@ -318,7 +350,14 @@ void Window::View::OnRButtonDown(UINT nFlags, CPoint point)
 {
 	if (IsValid()) {
 		SetCapture();
-		m_delivery.view.OnRButtonDown(nFlags, point.x, point.y);
+
+		//if (TheAppOptions.BooleanValue("Environment/Mouse/SwapPanAndRotate")) {
+		//	nFlags != (nFlags & ~MK_LBUTTON) | MK_RBUTTON;
+		//	m_delivery.view.OnLButtonDown(nFlags, point.x, point.y);
+		//}
+		//else {
+			m_delivery.view.OnRButtonDown(nFlags, point.x, point.y);
+		//}
 	}
 
 	__super::OnRButtonDown(nFlags, point);
@@ -329,8 +368,15 @@ void Window::View::OnRButtonDown(UINT nFlags, CPoint point)
 void Window::View::OnRButtonUp(UINT nFlags, CPoint point)
 {
 	if (IsValid()) {
-		nFlags |= MK_MBUTTON;
-		m_delivery.view.OnRButtonUp(nFlags, point.x, point.y);
+		//if (TheAppOptions.BooleanValue("Environment/Mouse/SwapPanAndRotate")) {
+		//	nFlags |= MK_LBUTTON;
+		//	m_delivery.view.OnLButtonUp(nFlags, point.x, point.y);
+		//}
+		//else {
+			nFlags |= MK_RBUTTON;
+			m_delivery.view.OnRButtonUp(nFlags, point.x, point.y);
+		//}
+
 		ReleaseCapture();
 		SetCursor(TheAppication.LoadStandardCursor(IDC_ARROW));
 	}
@@ -365,7 +411,7 @@ void Window::View::OnTimer(UINT_PTR nIDEvent)
 		m_bActivate = true;
 	}
 
-	CView::OnTimer(nIDEvent);
+	__super::OnTimer(nIDEvent);
 }
 
 
@@ -476,27 +522,4 @@ void Window::View::ShowTaskBar(bool show)
 	}
 }
 
-
-
-void Window::View::ShowInputBar(bool show)
-{
-	if (show) {
-		if (m_inputBar.IsVisible() == false) {
-			m_inputBar.Initialize(this);
-		}
-
-		CPoint point;
-		GetCursorPos(&point);
-		ScreenToClient(&point);
-
-		m_inputBar.OnMouseMove(0, point);
-		m_inputBar.ShowWindow(SW_SHOW);
-	}
-	else {
-		m_inputBar.ShowWindow(SW_HIDE);
-	}
-}
-
 #undef PRESET
-
-

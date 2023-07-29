@@ -11,7 +11,7 @@ BEGIN
     FILE_3D_CMD_Export                                "__#__\n추출"
     FILE_3D_CMD_Print                                 "__#__\n인쇄"
     FILE_3D_PNL_Settings                              "__#__\n설정"
-    FILE_3D_CMD_Preference                            "__#__\n환경 설정"
+    FILE_3D_CMD_Options                               "__#__\n옵션"
     FILE_3D_CMD_Close                                 "__#__\n닫기"
     HOME_3D_CAT                                       "__#__\n홈"
     HOME_3D_PNL_Panels                                "__#__\n패널"

@@ -91,6 +91,13 @@ void Control::TreePropList::InitializeData(Json::Object& data)
 
 
 
+void Control::TreePropList::RefreshData()
+{
+	ChangePropList(m_tree.GetSelectedItem());
+}
+
+
+
 BOOL Control::TreePropList::OnEraseBkgnd(CDC* pDC)
 {
 	return __super::OnEraseBkgnd(pDC);

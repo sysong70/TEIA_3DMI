@@ -10,12 +10,18 @@ static char THIS_FILE[] = __FILE__;
 
 
 
+
 Facility::AppResources TheAppResources;
+
 
 
 
 Facility::AppResources::~AppResources()
 {
+	if (m_background != nullptr) {
+		::DeleteObject(m_background);
+		m_background = nullptr;
+	}
 }
 
 
@@ -26,11 +32,15 @@ bool Facility::AppResources::Load()
 		return false;
 	}
 
+	if (InitPreferences() == false) {
+		return false;
+	}
+
 	if (InitFileOptions() == false) {
 		return false;
 	}
 
-	if (InitPreferences() == false) {
+	if (InitImages() == false) {
 		return false;
 	}
 
@@ -46,13 +56,6 @@ Json::Object& Facility::AppResources::GetDialog(CStringA name)
 
 
 
-Json::Object& Facility::AppResources::GetFileOptions()
-{
-	return m_fileOptions;
-}
-
-
-
 Json::Object& Facility::AppResources::GetPreferences()
 {
 	return m_preferences;
@@ -60,9 +63,23 @@ Json::Object& Facility::AppResources::GetPreferences()
 
 
 
+Json::Object& Facility::AppResources::GetFileOptions()
+{
+	return m_fileOptions;
+}
+
+
+
 Json::Object& Facility::AppResources::GetStyles()
 {
 	return m_ui.GetAt("Styles");
+}
+
+
+
+HBITMAP Facility::AppResources::GetBackground()
+{
+	return m_background;
 }
 
 
@@ -87,7 +104,7 @@ bool Facility::AppResources::Initialize()
 	Json::Array& common = fileOptions.GetArray("__DEFAULT__");
 	common.Stringify(commonStream);
 
-	Json::Array& importTree = fileOptions.GetArray("tree")[0]->AsObject().GetArray("items");
+	Json::Array& importTree = Json::Helper::FindValueByPath(fileOptions, "tree/0/items")->AsArray();
 	for (auto item : importTree.GetBuffer()) {
 		CString name = item->AsObject().GetString("name");
 
@@ -96,7 +113,38 @@ bool Facility::AppResources::Initialize()
 		sub.SetArray("items", new Json::Array(commonStream));
 	}
 
+	//:TODO
+	//Json::Array& exportTree = Json::Helper::FindValueByPath(fileOptions, "tree/1/items")->AsArray();
+
 	return true;
+}
+
+
+
+bool Facility::AppResources::InitPreferences()
+{
+	CString stream;
+	if (LoadTextResource(IDF_JSON_DATA_PREFERENCES, stream) == false ||
+		Json::Helper::Load(stream, m_preferences) == false) {
+		RETURN_FALSE;
+	}
+
+	return true;
+}
+
+bool Facility::AppResources::InitImages()
+{
+	CBCGPPngImage image;
+	image.m_bUseBackground = FALSE;
+	image.Load(IDF_PNG_BACKGROUND);
+	m_background = (HBITMAP)image.Detach();
+
+	if (m_background == nullptr) {
+		RETURN_FALSE;
+	}
+	else {
+		return true;
+	}
 }
 
 
@@ -122,19 +170,6 @@ bool Facility::AppResources::InitFileOptions()
 	}
 
 	import.Remove("__DEFAULT__");
-
-	return true;
-}
-
-
-
-bool Facility::AppResources::InitPreferences()
-{
-	CString stream;
-	if (LoadTextResource(IDF_JSON_DATA_PREFERENCES, stream) == false ||
-		Json::Helper::Load(stream, m_preferences) == false) {
-		RETURN_FALSE;
-	}
 
 	return true;
 }

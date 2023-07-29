@@ -1,7 +1,8 @@
 ﻿#include "stdafx.h"
 #include "resource.h"
-#include "Facility.AppSettings.h"
-#include <Dir.h>
+#include "Facility.AppOptions.h"
+#include "Facility.AppResources.h"
+#include <File.h>
 #include <Path.h>
 
 #ifdef _DEBUG
@@ -12,11 +13,13 @@ static char THIS_FILE[] = __FILE__;
 
 
 
-Facility::AppSettings TheAppSettings;
+Facility::AppOptions TheAppOptions;
 
-#define PRESET PresetAppSettings
 
-namespace PRESET
+
+#define PRESET PresetAppOptions
+
+namespace PresetAppOptions
 {
 	const CString PreferencesName = L"Preferences.Json";
 	const CString FileOpeionsName = L"FileOptions.Json";
@@ -24,19 +27,19 @@ namespace PRESET
 
 
 
-Facility::AppSettings::AppSettings()
+Facility::AppOptions::AppOptions()
 {
 }
 
 
 
-Facility::AppSettings::~AppSettings()
+Facility::AppOptions::~AppOptions()
 {
 }
 
 
 
-void Facility::AppSettings::SetFolderPath(CString c)
+void Facility::AppOptions::SetFolderPath(CString c)
 {
 	m_sFolderPath = c;
 	Path::AddBackslash(m_sFolderPath);
@@ -44,36 +47,43 @@ void Facility::AppSettings::SetFolderPath(CString c)
 
 
 
-Json::Object& Facility::AppSettings::GetPreferences()
+Json::Object& Facility::AppOptions::GetPreferences()
 {
 	return m_preferences;
 }
 
 
 
-Json::Object& Facility::AppSettings::GetFileOptions()
+Json::Object& Facility::AppOptions::GetFileOptions()
 {
 	return m_fileOptions;
 }
 
 
 
-bool Facility::AppSettings::Load()
+bool Facility::AppOptions::Load()
 {
 	const CString PreferencesPath = m_sFolderPath + PRESET::PreferencesName;
 	const CString FileOptionsPath = m_sFolderPath + PRESET::FileOpeionsName;
 
-	if (Dir::IsExist((LPCTSTR)PreferencesPath)) {
+	if (File::IsExist((LPCTSTR)PreferencesPath)) {
 		m_preferences.Clean();
 		if (Json::Helper::Read(PreferencesPath, m_preferences) == false) {
 			return false;
 		}
 	}
-	if (Dir::IsExist((LPCTSTR)FileOptionsPath)) {
+	else {
+		m_preferences = TheAppResources.GetPreferences();
+	}
+
+	if (File::IsExist((LPCTSTR)FileOptionsPath)) {
 		m_fileOptions.Clean();
 		if (Json::Helper::Read(FileOptionsPath, m_fileOptions) == false) {
 			return false;
 		}
+	}
+	else {
+		m_fileOptions = TheAppResources.GetFileOptions();
 	}
 
 	return true;
@@ -81,7 +91,7 @@ bool Facility::AppSettings::Load()
 
 
 
-bool Facility::AppSettings::Save()
+bool Facility::AppOptions::Save()
 {
 	if (Json::Helper::Write(m_sFolderPath + PRESET::PreferencesName, m_preferences) == false) {
 		RETURN_FALSE;
@@ -91,6 +101,19 @@ bool Facility::AppSettings::Save()
 	}
 
 	return true;
+}
+
+
+
+bool Facility::AppOptions::BooleanValue(const char* path)
+{
+	Json::Value* pValue = Json::Helper::FindValueByPath(m_preferences, path);
+	if (pValue != nullptr) {
+		return pValue->AsBoolean();
+	}
+	else {
+		RETURN_FALSE;
+	}
 }
 
 #undef PRESET

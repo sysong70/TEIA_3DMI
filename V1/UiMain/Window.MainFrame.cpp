@@ -3,7 +3,7 @@
 #include "Window.Application.h"
 #include "Window.Document.h"
 #include "Window.View.h"
-#include "Dialog.AppSettings.h"
+#include "Dialog.AppOptions.h"
 #include "Dialog.ProgressLog.h"
 #include "Facility.AppResources.h"
 
@@ -25,7 +25,7 @@ BEGIN_MESSAGE_MAP(MainFrame, CBCGPMDIFrameWnd)
 	ON_WM_DROPFILES()
 
 	ON_COMMAND(FILE_3D_CMD_Open, OnFileOpen)
-	ON_COMMAND(FILE_3D_CMD_Preference, OnFilePreference)
+	ON_COMMAND(FILE_3D_CMD_Options, OnAppOptions)
 	ON_MESSAGE((UINT)EUserMessage::OnSignal, OnSignal)
 	ON_MESSAGE((UINT)EUserMessage::OnNextFileOpen, OnNextFileOpen)
 END_MESSAGE_MAP()
@@ -182,6 +182,35 @@ HMENU Window::MainFrame::GetWindowMenuPopup(HMENU hMenuBar)
 
 
 
+BOOL Window::MainFrame::OnEraseMDIClientBackground(CDC* pDC)
+{
+	HBITMAP hBitmap = TheAppResources.GetBackground();
+	CBitmap* pBitmap = CBitmap::FromHandle(hBitmap);
+	BITMAP bitmap;
+	pBitmap->GetBitmap(&bitmap);
+
+	CDC memDC;
+	memDC.CreateCompatibleDC(pDC);
+	memDC.SelectObject(pBitmap);
+
+	CRect rect;
+	m_wndClientArea.GetClientRect(rect);
+
+	pDC->FillRect(rect, &CBrush(RGB(0x36, 0x36, 0x36)));
+	pDC->BitBlt(rect.left, rect.bottom - bitmap.bmHeight, bitmap.bmWidth, bitmap.bmHeight, &memDC, 0, 0, SRCCOPY);
+
+	return TRUE;
+}
+
+
+
+void Window::MainFrame::OnSizeMDIClient(const CRect& rectOld, const CRect& rectNew)
+{
+	m_wndClientArea.RedrawWindow();
+}
+
+
+
 BOOL Window::MainFrame::PreCreateWindow(CREATESTRUCT& cs)
 {
 	if (__super::PreCreateWindow(cs) == FALSE) {
@@ -243,12 +272,12 @@ void Window::MainFrame::OnClose()
 void Window::MainFrame::OnCommand(UINT id)
 {
 	switch (id) {
-	case FILE_3D_CMD_New:                   TheAppication.OnFileNew();                            return;
-	case FILE_3D_CMD_Open:                  OnFileOpen();                                         return;
-	case FILE_3D_CMD_Preference:            OnFilePreference();                                   return;
-	case HOME_3D_CMD_Window_Cascade:        SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_CASCADE);   return;
-	case HOME_3D_CMD_Window_TileHorizontal: SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_TILE_HORZ); return;
-	case HOME_3D_CMD_Window_TileVertical:   SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_TILE_VERT); return;
+	case FILE_3D_CMD_New:					TheAppication.OnFileNew();								return;
+	case FILE_3D_CMD_Open:					OnFileOpen();											return;
+	case FILE_3D_CMD_Options:				OnAppOptions();											return;
+	case HOME_3D_CMD_Window_Cascade:		SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_CASCADE);		return;
+	case HOME_3D_CMD_Window_TileHorizontal:	SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_TILE_HORZ);	return;
+	case HOME_3D_CMD_Window_TileVertical:	SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_TILE_VERT);	return;
 
 	default:
 		DEBUG_STOP;
@@ -372,9 +401,9 @@ void Window::MainFrame::OnFileOpen()
 
 
 
-void Window::MainFrame::OnFilePreference()
+void Window::MainFrame::OnAppOptions()
 {
-	Dialog::AppSettings dlg;
+	Dialog::AppOptions dlg;
 	dlg.DoModal();
 }
 

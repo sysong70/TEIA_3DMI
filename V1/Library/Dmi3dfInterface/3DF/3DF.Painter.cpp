@@ -180,7 +180,7 @@ TDF::Point TDF::Painter::TransColor(COLORREF color)
 
 #pragma region Arc
 
-void TDF::Painter::Arc::Create(TDF::Point first, TDF::Point second, TDF::Point third)
+HC_KEY TDF::Painter::Arc::Create(TDF::Point first, TDF::Point second, TDF::Point third)
 {
     first.z = 0;
     second.z = 0;
@@ -188,6 +188,8 @@ void TDF::Painter::Arc::Create(TDF::Point first, TDF::Point second, TDF::Point t
 
     HC_KEY key = HC_Insert_Circular_Arc(&first, &second, &third);
     ASSERT(key != HC_ERROR_KEY);
+
+    return key;
 }
 
 
@@ -218,7 +220,7 @@ void TDF::Painter::Arc::GetPoints(float x, float y, double radius, double startA
 
 #pragma region Circle
 
-void TDF::Painter::Circle::Create(TDF::Point center, double radius, bool polygon)
+HC_KEY TDF::Painter::Circle::Create(TDF::Point center, double radius, bool polygon)
 {
     center.z = 0;
 
@@ -231,17 +233,19 @@ void TDF::Painter::Circle::Create(TDF::Point center, double radius, bool polygon
             points.push_back(center + (p * radius));
         }
 
-        Polygon::Create(points);
+        return Polygon::Create(points);
     }
     else {
         HC_KEY key = HC_Insert_Circle_By_Radius(&center, radius, NULL);
         ASSERT(key != HC_ERROR_KEY);
+
+        return key;
     }
 }
 
 
 
-void TDF::Painter::Circle::Create(TDF::Point first, TDF::Point second, TDF::Point third, bool polygon)
+HC_KEY TDF::Painter::Circle::Create(TDF::Point first, TDF::Point second, TDF::Point third, bool polygon)
 {
     first.z = 0;
     second.z = 0;
@@ -249,6 +253,8 @@ void TDF::Painter::Circle::Create(TDF::Point first, TDF::Point second, TDF::Poin
 
     HC_KEY key = HC_Insert_Circle(&first, &second, &third);
     ASSERT(key != HC_ERROR_KEY);
+
+    return key;
 }
 
 
@@ -423,19 +429,19 @@ void TDF::Painter::Font::SetTransform(const char* value)
 
 #pragma region Figure
 
-void TDF::Painter::Figure::CreateDonut(TDF::Point center, double inner, double outer)
+HC_KEY TDF::Painter::Figure::CreateDonut(TDF::Point center, double inner, double outer)
 {
     Points points;
 
     Circle::GetPoints(center, inner, false, points);
     Circle::GetPoints(center, outer, true, points);
 
-    Polygon::Create(points);
+    return Polygon::Create(points);
 }
 
 
 
-void TDF::Painter::Figure::CreateObround(TDF::Point topLeft, TDF::Point bottomRight)
+HC_KEY TDF::Painter::Figure::CreateObround(TDF::Point topLeft, TDF::Point bottomRight)
 {
     Points points;
     TDF::Point center = (bottomRight + topLeft) / 2;
@@ -444,12 +450,12 @@ void TDF::Painter::Figure::CreateObround(TDF::Point topLeft, TDF::Point bottomRi
     Arc::GetPoints(topLeft.x, center.y, dist, 90, 270, points);
     Arc::GetPoints(bottomRight.x, center.y, dist, 270, 90, points);
 
-    Polygon::Create(points);
+    return Polygon::Create(points);
 }
 
 
 
-void TDF::Painter::Figure::CreateRectangle(TDF::Point topLeft, TDF::Point bottomRight)
+HC_KEY TDF::Painter::Figure::CreateRectangle(TDF::Point topLeft, TDF::Point bottomRight)
 {
     topLeft.z = 0;
     bottomRight.z = 0;
@@ -462,37 +468,46 @@ void TDF::Painter::Figure::CreateRectangle(TDF::Point topLeft, TDF::Point bottom
     points[3].x = topLeft.x; points[3].y = bottomRight.y;
     points[4] = topLeft;
 
-    HC_Insert_Polygon(5, points);
+    HC_KEY key = HC_Insert_Polygon(5, points);
+    ASSERT(key != HC_ERROR_KEY);
+
+    return key;
 }
 
 #pragma endregion //:REGION
 
 #pragma region Line
 
-void TDF::Painter::Line::Create(TDF::Point first, TDF::Point second, bool firstEnd, bool secondEnd)
+HC_KEY TDF::Painter::Line::Create(TDF::Point first, TDF::Point second, bool firstEnd, bool secondEnd)
 {
     HC_KEY key = HC_Insert_Line(first.x, first.y, 0, second.x, second.y, 0);
     ASSERT(key != HC_ERROR_KEY);
+
+    return key;
 }
 
 #pragma endregion //:REGION
 
 #pragma region Polyline
 
-void TDF::Painter::Polyline::Create(Points& points)
+HC_KEY TDF::Painter::Polyline::Create(Points& points)
 {
     HC_KEY key = HC_Insert_Polyline(points.size(), points.data());
     ASSERT(key != HC_ERROR_KEY);
+
+    return key;
 }
 
 #pragma endregion //:REGION
 
 #pragma region Polygon
 
-void TDF::Painter::Polygon::Create(Points& points)
+HC_KEY TDF::Painter::Polygon::Create(Points& points)
 {
     HC_KEY key = HC_Insert_Polygon(points.size(), points.data());
     ASSERT(key != HC_ERROR_KEY);
+
+    return key;
 }
 
 #pragma endregion //:REGION
@@ -690,15 +705,20 @@ void TDF::Painter::Segment::SetVisibility(const char* option, const char* sub, b
 
 #pragma region Text
 
-void TDF::Painter::Text::Create(TDF::Point center, const char* value)
+HC_KEY TDF::Painter::Text::Create(TDF::Point center, const char* value)
 {
     HC_KEY key = HC_Insert_Text(center.x, center.y, center.z, value);
     ASSERT(key != HC_ERROR_KEY);
+
+    return key;
 }
 
-void TDF::Painter::Text::Create(TDF::Point center, const wchar_t* value)
+HC_KEY TDF::Painter::Text::Create(TDF::Point center, const wchar_t* value)
 {
     HC_KEY key = HC_Insert_Text_With_Encoding(center.x, center.y, center.z, "wcs", value);
+    ASSERT(key != HC_ERROR_KEY);
+
+    return key;
 }
 
 
@@ -711,6 +731,40 @@ void TDF::Painter::Text::GetExtent(const char* value, float& width, float& heigh
 void TDF::Painter::Text::GetExtent(const wchar_t* value, float& width, float& height)
 {
     HC_Compute_Text_Extent_With_Encoding(".", "utf16", value, &width, &height);
+}
+
+
+
+void TDF::Painter::Text::Update(HC_KEY key, const wchar_t* value)
+{
+    //:TODO
+    ASSERT(FALSE);
+}
+
+#pragma endregion //:REGION
+
+#pragma region Cursor
+
+HC_KEY TDF::Painter::Cursor::Create(HC_KEY textKey, int row, int column)
+{
+    HC_KEY key = HC_Insert_String_Cursor(textKey, row, column);
+    ASSERT(key != HC_ERROR_KEY);
+
+    return key;
+}
+
+
+
+void TDF::Painter::Cursor::Hide(HC_KEY key)
+{
+    HC_Flush_By_Key(key);
+}
+
+
+
+void TDF::Painter::Cursor::Move(HC_KEY key, int row, int column)
+{
+    HC_Move_String_Cursor(key, row, column);
 }
 
 #pragma endregion //:REGION

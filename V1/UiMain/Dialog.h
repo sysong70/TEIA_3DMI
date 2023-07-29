@@ -8,7 +8,7 @@
 
 namespace Dialog
 {
-	class AppSettings;
+	class AppOptions;
 	class Base;
 	class Standard;
 	class ObjectSnaps;

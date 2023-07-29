@@ -9,7 +9,7 @@ ITEM_DEF(MainButton          , FILE_3D_CMD_SaveAs                               
 ITEM_DEF(MainButton          , FILE_3D_CMD_Export                                , L"FILE_3D_CMD_Export")
 ITEM_DEF(MainButton          , FILE_3D_CMD_Print                                 , L"FILE_3D_CMD_Print")
 ITEM_DEF(Panel               , FILE_3D_PNL_Settings                              , L"FILE_3D_PNL_Settings")
-ITEM_DEF(MainButton          , FILE_3D_CMD_Preference                            , L"FILE_3D_CMD_Preference")
+ITEM_DEF(MainButton          , FILE_3D_CMD_Options                               , L"FILE_3D_CMD_Options")
 ITEM_DEF(MainButton          , FILE_3D_CMD_Close                                 , L"FILE_3D_CMD_Close")
 ITEM_DEF(Category            , HOME_3D_CAT                                       , L"HOME_3D_CAT")
 ITEM_DEF(Panel               , HOME_3D_PNL_Panels                                , L"HOME_3D_PNL_Panels")
@@ -129,6 +129,4 @@ ITEM_DEF(Button              , TOOLBAR_3D_CMD_Sort_ByDescending                 
 ITEM_DEF(Check               , TOOLBAR_3D_CMD_Option_CheckBoxes                  , L"TOOLBAR_3D_CMD_Option_CheckBoxes")
 ITEM_DEF(Check               , TOOLBAR_3D_CMD_Option_GridLines                   , L"TOOLBAR_3D_CMD_Option_GridLines")
 ITEM_DEF(Check               , TOOLBAR_3D_CMD_Option_AlternateRows               , L"TOOLBAR_3D_CMD_Option_AlternateRows")
-ITEM_DEF(Panel               , TOOLBAR_3D_PNL_Scene                              , L"TOOLBAR_3D_PNL_Scene")
-ITEM_DEF(Panel               , TOOLBAR_3D_PNL_View                               , L"TOOLBAR_3D_PNL_View")
 

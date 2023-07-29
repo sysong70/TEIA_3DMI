@@ -31,18 +31,14 @@
 
 
 #include "3DF.Painter.h"
-#include "3DF.Facility.Preference.h";
+#include "3DF.Facility.AppOptions.h"
 
 #include <unordered_set>
 
 USING_3DF_NAMESPACE
 
-TDF::Operator::ObjectSnap::SnapPoint::SnapPoint(TDF::Operator::ObjectSnap::SnapPoint const & cInThat)
-{
-	cPoint = cInThat.cPoint;
-	eType = cInThat.eType;
-	eStatus = cInThat.eStatus;
-}
+#define TheEnvironment TheAppOptions.Preference.Environment
+#define TheSession TheAppOptions.Preference.Session
 
 TDF::Operator::ObjectSnap::SnapPoint & TDF::Operator::ObjectSnap::SnapPoint::operator = (TDF::Operator::ObjectSnap::SnapPoint const & cInThat)
 {
@@ -152,7 +148,7 @@ int TDF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 		return HLISTENER_PASS_EVENT;
 	}
 
-	// TRACE(L"ObjectSnap::NoButtonDownAndMove, Dist: %f\n", fDist);
+	//TRACE(L"ObjectSnap::NoButtonDownAndMove, Dist: %f\n", fDist);
 
 // 	if (m_nSelectPickCount > nTickCount) {
 // 		return HLISTENER_PASS_EVENT;
@@ -200,7 +196,8 @@ int TDF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 				// 기존에 선택된 Snap Point가 있으면 삭제한다.	
 				// m_cSnapPointSegment.Flush(Search::Type::Segment);
 
-				DrawSnapPoint(cSnapPoint, cCameraInfo);
+			//TRACE(L"1st DrawSnapItem, %d\n", (int)pcSnapItem->eType);
+			DrawSnapItem(pcSnapItem, cCameraInfo);
 
 				HighlightOptionsKit cHighlightOptions;
 				cHighlightOptions.SetNotification(false);
@@ -288,15 +285,15 @@ int TDF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 			}*/
 
 			if (TDF::Type::LineKey == eType) {
-				TRACE(L"SelectByPoint Line: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());
+				//TRACE(L"SelectByPoint Line: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());
 				vLineSelectedItems.push_back(pcItem);
 			}
 			else if (TDF::Type::ShellKey == eType) {
-				TRACE(L"SelectByPoint Shell: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());
+				//TRACE(L"SelectByPoint Shell: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());		
 				vShellSelectedItems.push_back(pcItem);
 			}
 			else {
-				//TRACE(L"SelectByPoint: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());
+				//TRACE(L"SelectByPoint: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());		
 			}
 
 			cIter.Next();
@@ -322,12 +319,12 @@ int TDF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 			// Line이 가장 앞에 있는 경우 (Windows Point의 Z값이 가장 작은 경우)
 			if (cLinePoint.z < cShellPoint.z) {
 				m_cNewHighlightSelection.PushBack(new SelectionItem(*pcLineItem));
-				TRACE(L"Line First Pushback\n");
+				//TRACE(L"Line First Pushback\n");
 			}
 			// Shell의 선택점과 Line의 선택점이 거의 같은 경우 Line을 선택한다.
 			else if (1.0e-2 > fabs(cLinePoint.z - cShellPoint.z)) {
 				m_cNewHighlightSelection.PushBack(new SelectionItem(*pcLineItem));
-				TRACE(L"Line vs face near Pushback\n");
+				//TRACE(L"Line vs face near Pushback\n");
 			}
 			else {
 				//m_cNewHighlightSelection.PushBack(new SelectionItem(*pcShellItem));
@@ -336,12 +333,12 @@ int TDF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 		else if (0 < vLineSelectedItems.size()) {
 			// Line만 있는 경우
 			m_cNewHighlightSelection.PushBack(new SelectionItem(*vLineSelectedItems[0]));
-			TRACE(L"Line only Pushback\n");
+			//TRACE(L"Line only Pushback\n");
 		}
 		else if (0 < vShellSelectedItems.size()) {
 			// Shell만 있는 경우
 			m_cNewHighlightSelection.PushBack(new SelectionItem(*vShellSelectedItems[0]));
-			TRACE(L"Shell only Pushback\n");
+			//TRACE(L"Shell only Pushback\n");
 		}
 		else {
 			// Line과 Shell이 없는 경우
@@ -370,7 +367,7 @@ int TDF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 
 	// 선택된 요소가 있고 기존과 다른 경우에만 Highlight를 한다.
 	if (0 < m_cNewHighlightSelection.GetCount() && m_cOldHighlightSelection != m_cNewHighlightSelection) {
-		TRACE(L"HighlightSelection Count: %d\n", m_cNewHighlightSelection.GetCount());
+		//TRACE(L"HighlightSelection Count: %d\n", m_cNewHighlightSelection.GetCount());
 		m_pcWindow->GetHighlightControl().Highlight(m_cNewHighlightSelection, cHighlightOptions, true);
 		bForceUpdate = true;
 	}
@@ -390,7 +387,7 @@ int TDF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 			m_cOldHighlightSelection.Front()->ShowSelectedItem(cOldKey);
 		}
 
-		TRACE(L"Unhighlight: %d\n", cOldKey.KeyValue());
+		//TRACE(L"Unhighlight: %d\n", cOldKey.KeyValue());
 	}
 
 	m_cOldHighlightSelection = m_cNewHighlightSelection;
@@ -786,11 +783,6 @@ void TDF::Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 
 void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & cInCameraInfo, bool bUpdate)
 {
-// 	if (false == btemp) {
-// 		btemp = true;
-// 		return;
-// 	}
-
 	m_cSnapPointSegment.Open();
 	{
 		m_cSnapPointSegment.SetModellingMatrix(cInCameraInfo.cMatrix);
@@ -822,7 +814,7 @@ void TDF::Operator::ObjectSnap::DrawSnapPoint(Point2D center, ObjectSnap::Status
 	using namespace Painter;
 
 	// pixel to world
-	double fontSize = PixelToWorld(ThePreference.Gui.General.FontSize * ThePreference.Gui.Session.DpiScale);
+	double fontSize = PixelToWorld(TheEnvironment.General.FontSize * TheSession.DpiScale);
 	//:WARNING - replace dUnit
 	dUnit = fontSize * 0.5;
 
@@ -884,7 +876,7 @@ void TDF::Operator::ObjectSnap::DrawSnapPoint(Point2D center, ObjectSnap::Status
 	HC_Open_Segment("snap name");
 	{
 		Segment::SetColor("text", TooltipTextColor);
-		Font::SetName(ThePreference.Gui.General.FontName());
+		Font::SetName(TheEnvironment.General.FontName());
 		Font::SetSize(fontSize, "oru");
 		Font::SetRenderer("truetype");
 		Font::SetAlignment(Font::EPivot::MiddleCenter);
@@ -892,13 +884,13 @@ void TDF::Operator::ObjectSnap::DrawSnapPoint(Point2D center, ObjectSnap::Status
 		//:TODO - text position in window
 		double textOffset = dUnit * 5;
 		position.y += textOffset;
-		CString text = ThePreference.Gui.General.Local(pText);
+		CString text = TheEnvironment.General.Local(pText);
 		Text::Create(position, text);
 
 		//:WARNING - for calculating text extent
 		Font::SetTransform();
-		float width, height;
-		Text::GetExtent(text, width, height);
+			float width, height;
+			Text::GetExtent(text, width, height);
 		Font::SetTransform(false);
 
 		HC_Open_Segment("frame");
@@ -1018,3 +1010,6 @@ void TDF::Operator::ObjectSnap::ResetSnapItem()
 
 	m_vSnapItems.clear();
 }
+
+#undef TheEnvironment
+#undef TheSession

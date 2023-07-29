@@ -7,7 +7,7 @@
 #include "Window.View2d.h"
 #include "Connector.h"
 #include "Facility.AppResources.h"
-#include "Facility.AppSettings.h"
+#include "Facility.AppOptions.h"
 #include <Path.h>
 
 #ifdef _DEBUG
@@ -234,14 +234,27 @@ BOOL Window::Application::InitInstance()
 	Facility::SetLanguage(Facility::ELanguage::English);
 
 	TheAppResources.Load();
-	TheAppSettings.SetFolderPath(Path());
-	TheAppSettings.Load();
+	TheAppOptions.SetFolderPath(Path());
+	TheAppOptions.Load();
 
 	if (Connector3d::Initialize()) {
-		Connector3d::GetInstance().application.OnInitInstance();
+		Signal::Application& app = Connector3d::GetInstance().application;
+		app.OnInitInstance();
+		app.OnUpdatePreference(TheAppOptions.GetPreferences());
+		app.OnUpdateFileOption(TheAppOptions.GetFileOptions());
 	}
+	else {
+		RETURN_FALSE;
+	}
+
 	if (Connector2d::Initialize()) {
-		Connector2d::GetInstance().application.OnInitInstance();
+		Signal::Application& app = Connector2d::GetInstance().application;
+		app.OnInitInstance();
+		app.OnUpdatePreference(TheAppOptions.GetPreferences());
+		app.OnUpdateFileOption(TheAppOptions.GetFileOptions());
+	}
+	else {
+		RETURN_FALSE;
 	}
 
 	double dpi = globalUtils.GetDpiForWindow(nullptr) / 96.0;

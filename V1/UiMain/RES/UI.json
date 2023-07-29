@@ -15,14 +15,14 @@
 		"title":"Open File|파일 열기",
 		"filter": [
 			"All types (*.*)|*.*|",
-			"3MF (*.3mf)|*.3mf|",
 			"ACIS (*.sat, *.sab)|*.sat;*.sab|",
-			"AutoCAD Inventor (*.ipt, *.iam)|*.ipt;*.iam|",
-			"AutoCAD Navisworks (*.NWD)|*.nwd|",
-			"Autodesk 3DS (*.3ds)|*.3ds|",
-			"Catia V4 (*.model, *.session, *.dlv, *.exp)|*.model;*.session;*.dlv;*.exp|",
-			"Catia V5 (*.catpart, *.catproduct, *.catshape, *.cgr)|*.catpart;*.catproduct;*.catshape;*.cgr|",
-			"Catia V6 / 3DExperience (*.3dxml)|*.3dxml|",
+			"3DS (*.3ds)|*.3ds|",
+			"3MF (*.3mf)|*.3mf|",
+			"Inventor (*.ipt, *.iam)|*.ipt;*.iam|",
+			"Navisworks (*.nwd)|*.nwd|",
+			"CATIA V4 (*.model, *.session, *.dlv, *.exp)|*.model;*.session;*.dlv;*.exp|",
+			"CATIA V5 (*.catpart, *.catproduct, *.catshape, *.cgr)|*.catpart;*.catproduct;*.catshape;*.cgr|",
+			"CATIA V6 / 3DExperience (*.3dxml)|*.3dxml|",
 			"COLLADA (*.dae)|*.dae|",
 			"Creo - Pro/E (*.asm, *.neu, *.prt, *.xas, *.xpr)|*.asm;*.neu;*.prt;*.xas;*.xpr|",
 			"FBX (*.fbx)|*.fbx|",
@@ -58,8 +58,8 @@
 		}
 	},
 
-	"AppSettings":{
-		"title":"Settings|설정",
+	"AppOptions":{
+		"title":"Options|옵션",
 		"size":{"cx":800, "cy":600},
 		"body":{
 			"tabs":[
@@ -75,13 +75,31 @@
 
 	"Preferences":{
 		"tree":[
-			{"name":"Interface", "title":"Interface|인터페이스"}
+			{"name":"Environment", "title":"Environment|환경"},
+			{"name":"Views", "title":"Views|뷰"}
 		],
 		"properties":{
-			"Interface":{"type":"root", "items":[
-				{"name":"Mouse", "type":"group", "title":"Mouse|마우스", "items":[
-					{"name":"SwapButtons", "type":"check", "title":"Swap left and right buttons|좌우 버트 전환", "desc":"__#__|__#__"},
-					{"name":"ReverseWheel", "type":"check", "title":"Swap wheel button direction|휠 버튼 방황 전환", "desc":"__#__|__#__"}
+			"Environment":{"type":"root", "items":[
+				{"type":"group", "name":"General", "title":"General|일반", "items":[
+					{"type":"drop", "name":"Language", "title":"Language|언어", "desc":"_#_|_#_", "value":0, "items":[
+						"English|영어",
+						"Korean|한글"
+					]}
+				]},
+				{"type":"group", "name":"Mouse", "title":"Mouse|마우스", "items":[
+					{"type":"check", "name":"SwapPanAndRotate", "title":"Swap Pan and Rotate button|펜/회전 버튼 교환", "desc":"__#__|__#__"},
+					{"type":"check", "name":"ReverseWheelDirection", "title":"Reverse wheel button direction|휠 버튼 방황 전환", "desc":"__#__|__#__"}
+				]}
+			]},
+			"Views":{"type":"root", "items":[
+				{"type":"group", "name":"Colors", "title":"Colors|색상", "items":[
+					{"type":"color", "name":"BackTop", "title":"Background-Top|배경 상부", "desc":"__#__|__#__"},
+					{"type":"color", "name":"BackBottom", "title":"Background-Bottom|배경 하부", "desc":"__#__|__#__"}
+				]},
+				{"type":"group", "name":"NavCube", "title":"Navigation Cube|네비케이션 큐브", "items":[
+					{"type":"slider", "name":"Size", "title":"Size|크기", "desc":"__#__|__#__", "min":100, "max":300, "step":50},
+					{"type":"check", "name":"ShowAxis", "title":"Show Axis|축 보기", "desc":"__#__|__#__"},
+					{"type":"check", "name":"ShowCube", "title":"Show Cube|큐브 보기", "desc":"__#__|__#__"}
 				]}
 			]}
 		}
@@ -100,6 +118,8 @@
 				{"name":"COLLADA", "title":"COLLADA"},
 				{"name":"DWG2D", "title":"DWG 2D"},
 				{"name":"DWG3D", "title":"DWG 3D"},
+				{"name":"FBX", "title":"FBX"},
+				{"name":"GLTF", "title":"GLTF"},
 				{"name":"IDEAS", "title":"I-deas"},
 				{"name":"IFC", "title":"IFC"},
 				{"name":"IGES", "title":"IGES"},

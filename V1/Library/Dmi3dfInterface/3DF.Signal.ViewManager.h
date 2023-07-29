@@ -48,8 +48,8 @@ protected:
 
 	bool MouseWheel(TDF::Canvas * pcView, int nFlags, int zDelta, int x, int y, Json::Object & cInObject);
 
-	//== Keyboard 관련 함수 ==========================================================================
-	bool Char(int nViewId, UINT nChar, UINT nRepCnt, UINT nFlags);
+	//:Ken - 20230607
+	bool ExecuteKeyboardSignal(int nViewId, int nAction, Json::Object& cInObject);
 
 private: 
 	Manager * m_pcWrapper = nullptr; 

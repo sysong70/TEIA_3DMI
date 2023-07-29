@@ -22,6 +22,8 @@ namespace Control
 
 		void InitializeData(Json::Object& data);
 
+		void RefreshData();
+
 	protected:
 
 		afx_msg BOOL OnEraseBkgnd(CDC* pDC);

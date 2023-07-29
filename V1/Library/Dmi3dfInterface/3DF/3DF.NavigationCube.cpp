@@ -6,6 +6,7 @@
 #include "3DF.Window.h"
 
 #include "3DF.Selection.h"
+#include "3DF.Facility.AppOptions.h"
 #include "./Private/3DF.SelectionPrivate.h"
 
 USING_3DF_NAMESPACE
@@ -49,7 +50,6 @@ namespace NavigationCubePreset
 
 	COLORREF LineColor()
 	{
-		//return RGB(0x00, 0x5E, 0x97);
 		return RGB(0x80, 0x80, 0x80);
 	}
 
@@ -82,7 +82,7 @@ namespace NavigationCubePreset
 }
 
 #define PRESET NavigationCubePreset
-
+#define TheCube TheAppOptions.Preference.Views.NavCube
 
 
 NavigationCube::NavigationCube(TDF::BaseView * view, WindowKey * pcInWindow) :
@@ -158,7 +158,7 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 
 	// 선택된 요소가 없은 경우
 	if (0 == nSelectedCount) {
-		// TRACE(L"NavigationCube No Selection\n");
+		//TRACE(L"NavigationCube No Selection\n");
 
 		// 기존에 선택된 요소가 있는 경우 처리
 		if (0 < m_cOldHighlightSelection.GetCount()) {
@@ -168,7 +168,7 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 		}
 	}
 	else {
-		// TRACE(L"NavigationCube Selection: %d\n", nSelectedCount);
+		//TRACE(L"NavigationCube Selection: %d\n", nSelectedCount);
 
 		// 이전에 선택된것과 다른 경우
 		if (m_cOldHighlightSelection != cSelection) {
@@ -186,7 +186,7 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 			}
 
 			if (true == bFindFlag) {
-				// TRACE(L"NavigationCube Find\n");
+				//TRACE(L"NavigationCube Find\n");
 
 				HighlightOptionsKit cHighlightOptions;
 				m_pcWindow->GetHighlightControl().Highlight(cSelection, cHighlightOptions, true);
@@ -196,7 +196,7 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 			else {
 				m_cOldHighlightSelection.Reset();
 
-				// TRACE(L"NavigationCube No Find\n");
+				//TRACE(L"NavigationCube No Find\n");
 			}
 
 			bUpdateFlag = true;
@@ -213,25 +213,12 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 	return nEvent;
 }
 
-void NavigationCube::SetSize(ESize size)
-{
-	m_eCubeSize = size;
-}
-
 
 
 void NavigationCube::SetView(TDF::BaseView * view, WindowKey * pcInWindow) 
 {
 	m_pView = view;
 	m_pcWindow = pcInWindow;
-}
-
-
-
-void NavigationCube::SetVisible(bool axis, bool cube)
-{
-	m_bAxisVisible = axis;
-	m_bCubeVisible = cube;
 }
 
 
@@ -244,8 +231,14 @@ bool NavigationCube::IsValid()
 
 void NavigationCube::Create(float width, float height, HC_KEY parent)
 {
+	m_windowSize.x = width;
+	m_windowSize.y = height;
 	m_parentSegment = parent;
 	ASSERT(m_parentSegment != HC_ERROR_KEY);
+
+	if (TheCube.ShowAxis == false && TheCube.ShowCube == false) {
+		return;
+	}
 
 	HC_Open_Segment_By_Key(m_parentSegment);
 	{
@@ -290,17 +283,28 @@ void NavigationCube::Create(float width, float height, HC_KEY parent)
 			Painter::Segment::SetColor("lines", PRESET::LineColor());
 			Painter::Segment::SetColor("text", PRESET::TextColor());
 
-			if (m_bCubeVisible) {
+			if (TheCube.ShowCube) {
 				CreateCube();
 			}
 
-			if (m_bAxisVisible) {
+			if (TheCube.ShowAxis) {
 				CreateAxis();
 			}
 		}
 		CloseCubeSegment();
 	}
 	HC_Close_Segment();
+}
+
+
+
+void NavigationCube::Recreate()
+{
+	HC_Open_Segment_By_Key(m_parentSegment);
+	HC_Delete_By_Key(m_cubeSegment);
+	HC_Close_Segment();
+
+	Create(m_windowSize.x, m_windowSize.y, m_parentSegment);
 }
 
 
@@ -339,8 +343,8 @@ void NavigationCube::Transform()
 			HC_Show_Net_Camera_Up_Vector(&old_up_vector.x, &old_up_vector.y, &old_up_vector.z);
 			double const difference2[] = { fabs(old_up_vector.x - up_vector.x), fabs(old_up_vector.y - up_vector.y), fabs(old_up_vector.z - up_vector.z) };
 
-			//			 we only modify the axis display if there has been an actual change in the camera settings
-			//			 we also have to consider the up vector!!!
+			// we only modify the axis display if there has been an actual change in the camera settings
+			// we also have to consider the up vector!!!
 			if (difference[0] + difference[1] + difference[2] > 0.01 || difference2[0] + difference2[1] + difference2[2] > 0.01)
 			{
 				HC_Set_Camera_Target(0.0f, 0.0f, 0.0f);
@@ -349,28 +353,6 @@ void NavigationCube::Transform()
 			}
 		} HC_Close_Segment();
 	} HC_Close_Segment();
-}
-
-void NavigationCube::Transform_ORG()
-{
-	HPoint position;
-	HPoint target;
-	HVector up;
-	float width, height;
-	char projection[MVO_BUFFER_SIZE];
-
-	HC_Open_Segment_By_Key(m_pView->GetSceneKey());
-	{
-		HC_Show_Net_Camera(&position, &target, &up, &width, &height, projection);
-	}
-	HC_Close_Segment();
-
-	OpenCubeSegment();
-	{
-		//:TODO - only rotation
-		HC_Set_Camera(&position, &target, &up, 2, 2, projection);
-	}
-	CloseCubeSegment();
 }
 
 
@@ -394,26 +376,7 @@ void NavigationCube::OpenCubeSegment()
 
 
 
-void NavigationCube::OpenPlaneSegment()
-{
-	if (m_planeSegment == HC_ERROR_KEY) {
-		m_planeSegment = HC_Open_Segment("plane window");
-	}
-	else {
-		HC_Open_Segment_By_Key(m_planeSegment);
-	}
-}
-
-
-
 void NavigationCube::CloseCubeSegment()
-{
-	HC_Close_Segment();
-}
-
-
-
-void NavigationCube::ClosePlaneSegment()
 {
 	HC_Close_Segment();
 }
@@ -439,66 +402,109 @@ void NavigationCube::CreateAxis()
 
 void NavigationCube::CreateCube()
 {
-	double plane = PRESET::PlaneUnit();
+	double unit = PRESET::PlaneUnit();
 
-	// Cube wire
-
-	HPoint maxPoint(plane, plane, plane);
-	HPoint minPoint(-plane, -plane, -plane);
-	HUtility::InsertWireframeBox(&maxPoint, &minPoint);
+	CreateCubeWire();
 
 	// Plane and text
 
-	m_cSegments[(int)TDF::ViewMode::top]		= CreatePlaneShell("top", "TOP", { 0, 0, plane }, { 0, 0, 0 });
- 	m_cSegments[(int)TDF::ViewMode::bottom]		= CreatePlaneShell("bottom", "BOTTOM", { 0, 0, -plane }, { 0, 180, 0 });
-	m_cSegments[(int)TDF::ViewMode::front]		= CreatePlaneShell("front", "FRONT", { 0, -plane, 0 }, { 90, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::back]		= CreatePlaneShell("back", "BACK", { 0, plane, 0 }, { 90, 0, 180 });
-	m_cSegments[(int)TDF::ViewMode::left]		= CreatePlaneShell("left", "LEFT", { -plane, 0, 0 }, { 90, 0, -90 });
-	m_cSegments[(int)TDF::ViewMode::right]		= CreatePlaneShell("right", "RIGHT", { plane, 0, 0 }, { 90, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::top]		= CreatePlaneShell("top", "TOP", { 0, 0, unit }, { 0, 0, 0 });
+ 	m_cSegments[(int)TDF::ViewMode::bottom]		= CreatePlaneShell("bottom", "BOTTOM", { 0, 0, -unit }, { 0, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::front]		= CreatePlaneShell("front", "FRONT", { 0, -unit, 0 }, { 90, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::back]		= CreatePlaneShell("back", "BACK", { 0, unit, 0 }, { 90, 0, 180 });
+	m_cSegments[(int)TDF::ViewMode::left]		= CreatePlaneShell("left", "LEFT", { -unit, 0, 0 }, { 90, 0, -90 });
+	m_cSegments[(int)TDF::ViewMode::right]		= CreatePlaneShell("right", "RIGHT", { unit, 0, 0 }, { 90, 0, 90 });
 
 	// Edges - n: negative, p: positive
 
-	m_cSegments[(int)TDF::ViewMode::py_nz]		= CreateEdgeShell("py_nz", { 0, plane, -plane }, { 0, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::py_pz]		= CreateEdgeShell("py_pz", { 0, plane, plane }, { 90, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::ny_pz]		= CreateEdgeShell("ny_pz", { 0, -plane, plane }, { 180, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::ny_nz]		= CreateEdgeShell("ny_nz", { 0, -plane, -plane }, { 270, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::py_nz]		= CreateEdgeShell("py_nz", { 0, unit, -unit }, { 0, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::py_pz]		= CreateEdgeShell("py_pz", { 0, unit, unit }, { 90, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::ny_pz]		= CreateEdgeShell("ny_pz", { 0, -unit, unit }, { 180, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::ny_nz]		= CreateEdgeShell("ny_nz", { 0, -unit, -unit }, { 270, 0, 0 });
 
-	m_cSegments[(int)TDF::ViewMode::nx_nz]		= CreateEdgeShell("nx_nz", { -plane, 0, -plane }, { 0, 0, 90 });
-	m_cSegments[(int)TDF::ViewMode::nx_pz]		= CreateEdgeShell("nx_pz", { -plane, 0, plane }, { 90, 0, 90 });
-	m_cSegments[(int)TDF::ViewMode::px_pz]		= CreateEdgeShell("px_pz", { plane, 0, plane }, { 180, 0, 90 });
-	m_cSegments[(int)TDF::ViewMode::px_nz]		= CreateEdgeShell("px_nz", { plane, 0, -plane }, { 270, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::nx_nz]		= CreateEdgeShell("nx_nz", { -unit, 0, -unit }, { 0, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::nx_pz]		= CreateEdgeShell("nx_pz", { -unit, 0, unit }, { 90, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::px_pz]		= CreateEdgeShell("px_pz", { unit, 0, unit }, { 180, 0, 90 });
+	m_cSegments[(int)TDF::ViewMode::px_nz]		= CreateEdgeShell("px_nz", { unit, 0, -unit }, { 270, 0, 90 });
 
-	m_cSegments[(int)TDF::ViewMode::nx_py]		= CreateEdgeShell("nx_py", { -plane, plane, 0 }, { 0, 90, 0 });
-	m_cSegments[(int)TDF::ViewMode::px_py]		= CreateEdgeShell("px_py", { plane, plane, 0 }, { 90, 90, 0 });
-	m_cSegments[(int)TDF::ViewMode::px_ny]		= CreateEdgeShell("px_ny", { plane, -plane, 0 }, { 180, 90, 0 });
-	m_cSegments[(int)TDF::ViewMode::nx_ny]		= CreateEdgeShell("nx_ny", { -plane, -plane, 0 }, { 270, 90, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_py]		= CreateEdgeShell("nx_py", { -unit, unit, 0 }, { 0, 90, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_py]		= CreateEdgeShell("px_py", { unit, unit, 0 }, { 90, 90, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_ny]		= CreateEdgeShell("px_ny", { unit, -unit, 0 }, { 180, 90, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_ny]		= CreateEdgeShell("nx_ny", { -unit, -unit, 0 }, { 270, 90, 0 });
 
 	// Corners - n: negative, p: positive
 
-	m_cSegments[(int)TDF::ViewMode::nx_py_nz]	= CreateCornerShell("nx_py_nz", { -plane, plane, -plane }, { 0, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::nx_py_pz]	= CreateCornerShell("nx_py_pz", { -plane, plane, plane }, { 90, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::nx_ny_pz]	= CreateCornerShell("nx_ny_pz", { -plane, -plane, plane }, { 180, 0, 0 });
-	m_cSegments[(int)TDF::ViewMode::nx_ny_nz]	= CreateCornerShell("nx_ny_nz", { -plane, -plane, -plane }, { 270, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_py_nz]	= CreateCornerShell("nx_py_nz", { -unit, unit, -unit }, { 0, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_py_pz]	= CreateCornerShell("nx_py_pz", { -unit, unit, unit }, { 90, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_ny_pz]	= CreateCornerShell("nx_ny_pz", { -unit, -unit, unit }, { 180, 0, 0 });
+	m_cSegments[(int)TDF::ViewMode::nx_ny_nz]	= CreateCornerShell("nx_ny_nz", { -unit, -unit, -unit }, { 270, 0, 0 });
 
-	m_cSegments[(int)TDF::ViewMode::px_py_pz]	= CreateCornerShell("px_py_pz", { plane, plane, plane }, { 0, 180, 0 });
-	m_cSegments[(int)TDF::ViewMode::px_py_nz]	= CreateCornerShell("px_py_nz", { plane, plane, -plane }, { 90, 180, 0 });
-	m_cSegments[(int)TDF::ViewMode::px_ny_nz]	= CreateCornerShell("px_ny_nz", { plane, -plane, -plane }, { 180, 180, 0 });
-	m_cSegments[(int)TDF::ViewMode::px_ny_pz]	= CreateCornerShell("px_ny_pz", { plane, -plane, plane }, { 270, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_py_pz]	= CreateCornerShell("px_py_pz", { unit, unit, unit }, { 0, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_py_nz]	= CreateCornerShell("px_py_nz", { unit, unit, -unit }, { 90, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_ny_nz]	= CreateCornerShell("px_ny_nz", { unit, -unit, -unit }, { 180, 180, 0 });
+	m_cSegments[(int)TDF::ViewMode::px_ny_pz]	= CreateCornerShell("px_ny_pz", { unit, -unit, unit }, { 270, 180, 0 });
 }
 
 
 
+void NavigationCube::CreateCubeWire()
+{
+#define CreateCylinder(p1, p2) \
+	key = key = HC_Insert_Cylinder(&points[p1], &points[p2], 0.005, "none"); \
+	ASSERT(key != HC_ERROR_KEY);
+
+	double unit = PRESET::PlaneUnit();
+
+	HPoint points[8];
+	// front
+	points[0].Set(-unit, -unit, -unit);
+	points[1].Set( unit, -unit, -unit);
+	points[2].Set( unit,  unit, -unit);
+	points[3].Set(-unit,  unit, -unit);
+	// back
+	points[4].Set(-unit, -unit,  unit);
+	points[5].Set( unit, -unit,  unit);
+	points[6].Set( unit,  unit,  unit);
+	points[7].Set(-unit,  unit,  unit);
+
+	HC_KEY key = HC_ERROR_KEY;
+	HC_KEY segKey = HC_Open_Segment("wire");
+	ASSERT(segKey != HC_ERROR_KEY);
+	{
+		Painter::Segment::SetColor("faces", PRESET::LineColor());
+
+		CreateCylinder(0, 1);
+		CreateCylinder(1, 2);
+		CreateCylinder(2, 3);
+		CreateCylinder(3, 0);
+
+		CreateCylinder(4, 5);
+		CreateCylinder(5, 6);
+		CreateCylinder(6, 7);
+		CreateCylinder(7, 4);
+
+		CreateCylinder(0, 4);
+		CreateCylinder(1, 5);
+		CreateCylinder(2, 6);
+		CreateCylinder(3, 7);
+	}
+	HC_Close_Segment();
+
+#undef CreateCylinder
+}
+
+//#define PLANE_EDGE
+//#define ROUND_EDGE
+
 HC_KEY NavigationCube::CreatePlaneShell(const char* name, const char* text, Triple pos, Triple angle)
 {
 	double unit = PRESET::PlaneUnit() - PRESET::CornerUnit();
-	HPoint p1(-unit, unit);
-	HPoint p2(unit, -unit);
 
 	HPoint points[4];
-	points[0] = p1;
-	points[1].Set(p1.x, p2.y);
-	points[2].Set(p2.x, p2.y);
-	points[3].Set(p2.x, p1.y);
+	points[0].Set(-unit,  unit);
+	points[1].Set(-unit, -unit);
+	points[2].Set( unit, -unit);
+	points[3].Set( unit,  unit);
 
 	int faces[] = {
 		4, 0, 1, 2, 3
@@ -511,7 +517,7 @@ HC_KEY NavigationCube::CreatePlaneShell(const char* name, const char* text, Trip
 
 		HC_Set_Text_Font("transforms = on");
 
-		HC_KEY shellKey = HC_Insert_Shell(4, points, 5, faces);
+		HC_KEY shellKey = HC_Insert_Shell(sizeof(points) / sizeof(HPoint), points, sizeof(faces) / sizeof(int), faces);
 		ASSERT(shellKey != HC_ERROR_KEY);
 
 		HC_KEY textKey = HC_Insert_Text(0, 0, 0, text);
@@ -532,6 +538,17 @@ HC_KEY NavigationCube::CreateEdgeShell(const char* name, Triple pos, Triple angl
 	double width = PRESET::EdgeUnit();
 	double height = PRESET::CornerUnit();
 
+#ifdef PLANE_EDGE
+	HPoint points[4];
+	points[0].Set(-width, -height,      0);
+	points[1].Set( width, -height,      0);
+	points[2].Set( width,       0, height);
+	points[3].Set(-width,       0, height);
+
+	int faces[] = {
+		4, 0, 1, 2, 3
+	};
+#else
 	HPoint points[6];
 	points[0].Set(-width,       0,      0);
 	points[1].Set(-width, -height,      0);
@@ -544,15 +561,14 @@ HC_KEY NavigationCube::CreateEdgeShell(const char* name, Triple pos, Triple angl
 		4, 0, 1, 2, 3,
 		4, 3, 4, 5, 0
 	};
+#endif
 
 	HC_KEY segKey = HC_Open_Segment(name);
 	ASSERT(segKey != HC_ERROR_KEY);
 	{
 		HC_Set_Selectability("faces = on");
 
-		//Segment::SetColor("faces", RGB(255, 0, 0), 0.5);
-
-		HC_KEY shellKey = HC_Insert_Shell(6, points, 10, faces);
+		HC_KEY shellKey = HC_Insert_Shell(sizeof(points) / sizeof(HPoint), points, sizeof(faces) / sizeof(int), faces);
 		ASSERT(shellKey != HC_ERROR_KEY);
 
 		HC_Rotate_Object(angle.x, angle.y, angle.z);
@@ -569,6 +585,16 @@ HC_KEY NavigationCube::CreateCornerShell(const char* name, Triple pos, Triple an
 {
 	double unit = PRESET::CornerUnit();
 
+#ifdef PLANE_EDGE
+	HPoint points[3];
+	points[0].Set(unit, -unit,    0);
+	points[1].Set(unit,     0, unit);
+	points[2].Set(   0, -unit, unit);
+
+	int faces[] = {
+		3, 0, 1, 2,
+	};
+#else
 	HPoint points[7];
 	points[0].Set(   0,     0,    0);
 	points[1].Set(   0, -unit,    0);
@@ -583,6 +609,7 @@ HC_KEY NavigationCube::CreateCornerShell(const char* name, Triple pos, Triple an
 		4, 3, 4, 5, 0,
 		4, 5, 6, 1, 0
 	};
+#endif
 
 	HC_KEY segKey = HC_Open_Segment(name);
 	ASSERT(segKey != HC_ERROR_KEY);
@@ -591,7 +618,7 @@ HC_KEY NavigationCube::CreateCornerShell(const char* name, Triple pos, Triple an
 
 		//Segment::SetColor("faces", RGB(0, 0, 255), 0.5);
 
-		HC_KEY shellKey = HC_Insert_Shell(7, points, 15, faces);
+		HC_KEY shellKey = HC_Insert_Shell(sizeof(points) / sizeof(HPoint), points, sizeof(faces) / sizeof(int), faces);
 		ASSERT(shellKey != HC_ERROR_KEY);
 
 		HC_Rotate_Object(angle.x, angle.y, angle.z);
@@ -630,27 +657,18 @@ HC_KEY NavigationCube::CreateAxis(const char* name, const char* text, HPoint axi
 
 void NavigationCube::SetWindowSize(double width, double height, bool openSegment)
 {
+	m_windowSize.x = width;
+	m_windowSize.y = height;
+
 	if (openSegment) {
 		OpenCubeSegment();
 	}
 
-	double windowSize = (double)m_eCubeSize;
-	double fontSize = 12 * (double)m_eCubeSize / (double)ESize::Midium;
+	double cubeSize = (double)TheCube.Size;
+	double fontSize = TheCube.FontSize * TheCube.Size / 100.0;
 
-	double left = 1.0 - 2.0 / width * windowSize;
-	double bottom = 1.0 - 2.0 / height * windowSize;
-
-	//HC_Set_Window(left, 1.0, bottom, 1.0);
-
- 	//HC_Set_Window(0.8, 1.0, 0.7, 1.0);
-// 	HC_Set_Window_Pattern("clear");
-
-	//HC_Set_Driver_Options("border, control area");
-// 	//HC_Set_Color("windows=light gray");
-// 	//HC_Set_Window_Frame("single");
-// 	HC_Set_Window_Pattern("::");
-// 	HC_Set_Color("windows=purple,window constrast=yellow");
-
+	double left = 1.0 - 2.0 / width * cubeSize;
+	double bottom = 1.0 - 2.0 / height * cubeSize;
 
 	HC_Set_Rendering_Options(PRESET::Format("screen range = (%.6f, 1, %.6f, 1)", left, bottom));
 	HC_Set_Text_Font(PRESET::Format("size = %.3f px", fontSize));
@@ -661,3 +679,4 @@ void NavigationCube::SetWindowSize(double width, double height, bool openSegment
 }
 
 #undef PRESET
+#undef TheCube

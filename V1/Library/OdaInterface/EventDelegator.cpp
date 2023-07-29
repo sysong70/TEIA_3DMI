@@ -50,6 +50,8 @@ void EventDelegator::SendSignal(SignalArgs::Base* signal)
 
 bool EventDelegator::OnSignal(std::shared_ptr<EventWrapper> wrapper)
 {
+#define OnAction(x) Signal::View::Action::On##x: On##x(pSignal); break
+
 	WorkerThread::Event e = (WorkerThread::Event)wrapper->Type;
 
 	if (e == WorkerThread::Event::Signal) {
@@ -61,19 +63,33 @@ bool EventDelegator::OnSignal(std::shared_ptr<EventWrapper> wrapper)
 
 		if (pSignal->Target == Signal::Target::View) {
 			switch ((Signal::View::Action)pSignal->Action) {
-			case Signal::View::Action::OnCommand:     OnCommand(pSignal);     break;
-			case Signal::View::Action::OnInitialize:  OnInitialize(pSignal);  break;
-			case Signal::View::Action::OnLButtonDown: OnLButtonDown(pSignal); break;
-			case Signal::View::Action::OnLButtonUp:   OnLButtonUp(pSignal);   break;
-			case Signal::View::Action::OnMButtonDown: OnMButtonDown(pSignal); break;
-			case Signal::View::Action::OnMButtonUp:   OnMButtonUp(pSignal);   break;
-			case Signal::View::Action::OnRButtonDown: OnRButtonDown(pSignal); break;
-			case Signal::View::Action::OnRButtonUp:   OnRButtonUp(pSignal);   break;
-			case Signal::View::Action::OnMouseMove:   OnMouseMove(pSignal);   break;
-			case Signal::View::Action::OnMouseWheel:  OnMouseWheel(pSignal);  break;
-			case Signal::View::Action::OnPaint:       OnPaint(pSignal);       break;
-			case Signal::View::Action::OnResize:      OnResize(pSignal);      break;
-			case Signal::View::Action::OnText:        OnText(pSignal);        break;
+				//case Signal::View::Action::OnCommand:     OnCommand(pSignal);     break;
+				//case Signal::View::Action::OnInitialize:	OnInitialize(pSignal);	break;
+				//case Signal::View::Action::OnLButtonDown:	OnLButtonDown(pSignal);	break;
+				//case Signal::View::Action::OnLButtonUp:		OnLButtonUp(pSignal);	break;
+				//case Signal::View::Action::OnMButtonDown:	OnMButtonDown(pSignal);	break;
+				//case Signal::View::Action::OnMButtonUp:		OnMButtonUp(pSignal);	break;
+				//case Signal::View::Action::OnRButtonDown:	OnRButtonDown(pSignal);	break;
+				//case Signal::View::Action::OnRButtonUp:		OnRButtonUp(pSignal);	break;
+				//case Signal::View::Action::OnMouseMove:		OnMouseMove(pSignal);	break;
+				//case Signal::View::Action::OnMouseWheel:	OnMouseWheel(pSignal);	break;
+				//case Signal::View::Action::OnPaint:			OnPaint(pSignal);		break;
+				//case Signal::View::Action::OnResize:		OnResize(pSignal);		break;
+				//case Signal::View::Action::OnInput:			OnInput(pSignal);		break;
+
+			case OnAction(Command);
+			case OnAction(Initialize);
+			case OnAction(LButtonDown);
+			case OnAction(LButtonUp);
+			case OnAction(MButtonDown);
+			case OnAction(MButtonUp);
+			case OnAction(RButtonDown);
+			case OnAction(RButtonUp);
+			case OnAction(MouseMove);
+			case OnAction(MouseWheel);
+			case OnAction(Paint);
+			case OnAction(Resize);
+			case OnAction(Input);
 
 			case Signal::View::Action::OnConstruct:
 			case Signal::View::Action::OnDestruct:
@@ -95,4 +111,6 @@ bool EventDelegator::OnSignal(std::shared_ptr<EventWrapper> wrapper)
 	}
 
 	return true;
+
+#undef OnAction
 }

@@ -46,16 +46,7 @@ protected:
 
 class SingleCommandBase : public CommandBase
 {
-
-};
-
-
-
-class OpenCommand : public SingleCommandBase
-{
 public:
-
-
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -63,8 +54,6 @@ public:
 class TrackerCommandBase : public CommandBase
 {
 public:
-
-
 
 protected:
 
@@ -75,16 +64,10 @@ protected:
 	OdEdInputTrackerPtr m_tracker;
 };
 
+//--------------------------------------------------------------------------------------------------
 
-
-class FastPanCommand : public SingleCommandBase
+namespace Command
 {
-public:
-};
-
-
-
-class LineCommand : public TrackerCommandBase
-{
-
-};
+	class FastPan;
+	class Line;
+}

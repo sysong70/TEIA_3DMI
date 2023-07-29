@@ -7,11 +7,9 @@
 namespace Facility
 {
 	class AppResource;
-	class AppSettings;
+	class AppOptions;
 	class Base;
 	class CommandIndexer;
-	class ImportOption;
-	class Preference;
 
 
 

@@ -1,22 +1,23 @@
 ﻿#pragma once
 
 #include "3DF.Facility.Base.h"
+#include <HBaseView.h>
 
 OPEN_3DF_NAMESPACE
 
 namespace Facility
 {
-	class KernelSetting : public Base
+	class KernelOption : public Base
 	{
 	public:
 
-		KernelSetting();
-		~KernelSetting() override;
+		KernelOption();
+		~KernelOption() override;
 
 	public:
 
 		Json::Object* Get() override;
-		bool Set(Json::Object* pcData) override;
+		bool Set(Json::Object* pData) override;
 
 		struct GENERAL 
 		{
@@ -29,7 +30,7 @@ namespace Facility
 				bool StereoMode = false;				// CAppSettings::StereoMode
 
 				Json::Object* Get();
-				bool Set(Json::Object* pcData);
+				bool Set(Json::Object* pData);
 			}
 			Display;
 
@@ -41,7 +42,7 @@ namespace Facility
 				bool DepthWriting = false;
 
 				Json::Object* Get();
-				bool Set(Json::Object* pcData);
+				bool Set(Json::Object* pData);
 			}
 			Transparency;
 
@@ -50,7 +51,7 @@ namespace Facility
 				bool DisplayAxisTriad = true;			// CAppSettings::bDisplayAxisTriad
 
 				Json::Object* Get();
-				bool Set(Json::Object* pcData);
+				bool Set(Json::Object* pData);
 			}
 			Rendering;
 
@@ -58,12 +59,12 @@ namespace Facility
 				bool BackplaneCulling = false;			// CAppSettings::bBackplaneCulling
 
 				Json::Object* Get();
-				bool Set(Json::Object* pcData);
+				bool Set(Json::Object* pData);
 			}
 			Etc;
 
 			Json::Object* Get();
-			bool Set(Json::Object* pcData);
+			bool Set(Json::Object* pData);
 		}
 		General;
 
@@ -77,7 +78,7 @@ namespace Facility
 				int OcclusionThreshold = 50;				// CAppSettings::OcclusionThreshold
 
 				Json::Object* Get();
-				bool Set(Json::Object* pcData);
+				bool Set(Json::Object* pData);
 			}
 			Optimization;
 
@@ -93,12 +94,12 @@ namespace Facility
 				int	CullingThreshold = 10;					// CAppSettings::CullingThreshold
 
 				Json::Object* Get();
-				bool Set(Json::Object* pcData);
+				bool Set(Json::Object* pData);
 			}
 			FramerateOptimization;
 
 			Json::Object* Get();
-			bool Set(Json::Object* pcData);
+			bool Set(Json::Object* pData);
 		}
 		Performance;
 
@@ -110,7 +111,7 @@ namespace Facility
 				bool UpdateShadows = true;				// CAppSettings::UpdateShadows
 
 				Json::Object* Get();
-				bool Set(Json::Object* pcData);
+				bool Set(Json::Object* pData);
 			}
 			GeometryManipulation;
 
@@ -118,12 +119,12 @@ namespace Facility
 				bool UpdateCamera = true;				// CAppSettings::UpdateCamera
 
 				Json::Object* Get();
-				bool Set(Json::Object* pcData);
+				bool Set(Json::Object* pData);
 			}
 			Animation;
 
 			Json::Object* Get();
-			bool Set(Json::Object* pcData);
+			bool Set(Json::Object* pData);
 		}
 		Interaction;
 
@@ -136,7 +137,7 @@ namespace Facility
 				int Level = 4;			// CAppSettings::AntialiasingLevel
 
 				Json::Object* Get();
-				bool Set(Json::Object* pcData);
+				bool Set(Json::Object* pData);
 			}
 			AntiAliasing;
 
@@ -146,12 +147,12 @@ namespace Facility
 				COLORREF Bottom = RGB(0x30, 0x30, 0x30);
 
 				Json::Object* Get();
-				bool Set(Json::Object* pcData);
+				bool Set(Json::Object* pData);
 			}
 			BackgroundColor;
 
 			Json::Object* Get();
-			bool Set(Json::Object* pcData);
+			bool Set(Json::Object* pData);
 		}
 		Appearance;
 
@@ -166,7 +167,7 @@ namespace Facility
 				bool RespectCulling = false;			// CAppSettings::SelectionRespectCulling, Respect Culling during selection.
 
 				Json::Object* Get();
-				bool Set(Json::Object* pcData);
+				bool Set(Json::Object* pData);
 			}
 			Behavior;
 
@@ -174,12 +175,12 @@ namespace Facility
 				CString QuickMovesType = L"Default";		// CAppSettings::csQuickMovesType, Quick Moves Preference
 
 				Json::Object* Get();
-				bool Set(Json::Object* pcData);
+				bool Set(Json::Object* pData);
 			}
 			Highlight;
 
 			Json::Object* Get();
-			bool Set(Json::Object* pcData);
+			bool Set(Json::Object* pData);
 		}
 		Selection;
 
@@ -192,7 +193,7 @@ namespace Facility
 				HBloomShape Shape = RadialBloom;	// CAppSettings::BloomShape
 
 				Json::Object* Get();
-				bool Set(Json::Object* pcData);
+				bool Set(Json::Object* pData);
 			}
 			Bloom;
 
@@ -202,12 +203,12 @@ namespace Facility
 				int ScaleFactor = 100000;			// CAppSettings::LightScaleFactor
 
 				Json::Object* Get();
-				bool Set(Json::Object* pcData);
+				bool Set(Json::Object* pData);
 			}
 			Light;
 
 			Json::Object* Get();
-			bool Set(Json::Object* pcData);
+			bool Set(Json::Object* pData);
 		}
 		Lighting;
 
@@ -217,7 +218,7 @@ namespace Facility
 				HShadowRenderingMode ShadowRenderingMode = SoftwareOpenglShadow;	// CAppSettings::ShadowRenderingMode
 
 // 				Json::Object* Get();
-// 				bool Set(Json::Object* pcData);
+// 				bool Set(Json::Object* pData);
 			}
 			SimpleShadow;
 
@@ -230,31 +231,31 @@ namespace Facility
 				bool HeavyExteriorSilhouette = false;	// CAppSettings::HeavyExteriorSilhouette
 
 // 				Json::Object* Get();
-// 				bool Set(Json::Object* pcData);
+// 				bool Set(Json::Object* pData);
 			}
 			FrameBuffer;
 
 // 			Json::Object* Get();
-// 			bool Set(Json::Object* pcData);
+// 			bool Set(Json::Object* pData);
 		}
 		Effects;
 	};
 
 
 
-	class AppSetting : public Base
+	class KernelPreset : public Base
 	{
 	public:
 
-		AppSetting() {}
-		~AppSetting() override {}
+		KernelPreset() {}
+		~KernelPreset() override {}
 
 	public:
 
 		Json::Object* Get() override {
 			return nullptr;
 		}
-		bool Set(Json::Object* pcData) override {
+		bool Set(Json::Object* pData) override {
 			return false;
 		}
 
@@ -369,4 +370,4 @@ namespace Facility
 
 CLOSE_3DF_NAMESPACE
 
-extern TDF::Facility::AppSetting TheAppSetting;
+extern TDF::Facility::KernelPreset ThePreset;

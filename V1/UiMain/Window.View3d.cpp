@@ -5,6 +5,7 @@
 #include "Window.View3d.h"
 #include "Connector.h"
 #include "Facility.h"
+#include "Facility.AppOptions.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -47,6 +48,7 @@ BEGIN_MESSAGE_MAP(View3d, View)
 	ON_WM_CHAR()
 	ON_WM_ERASEBKGND()
 	ON_WM_KEYDOWN()
+	ON_WM_KEYUP()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
 	ON_WM_MBUTTONDOWN()
@@ -135,7 +137,7 @@ void Window::View3d::OnCommand(UINT id)
 	switch (id) {
 	case FILE_3D_CMD_New:
 	case FILE_3D_CMD_Open:
-	case FILE_3D_CMD_Preference:
+	case FILE_3D_CMD_Options:
 	case HOME_3D_CMD_Window_Cascade:
 	case HOME_3D_CMD_Window_TileHorizontal:
 	case HOME_3D_CMD_Window_TileVertical:
@@ -193,6 +195,8 @@ BOOL Window::View3d::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 	if (m_bRenderer) {
 		CRect rect;
 		GetWindowRect(rect);
+
+		zDelta *= TheAppOptions.BooleanValue("Environment/Mouse/ReverseWheelDirection") ? -1 : 1;
 		m_delivery.view.OnMouseWheel(nFlags, zDelta, point.x, point.y, rect.left, rect.top, rect.right, rect.bottom);
 	}
 

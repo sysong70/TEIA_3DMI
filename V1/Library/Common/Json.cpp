@@ -112,6 +112,7 @@ Json::Array::~Array()
 
 Json::Value* Json::Array::GetAt(int i)
 {
+	ASSERT(0 <= i && i < (int)m_buffer.size());
 	return m_buffer.at(i);
 }
 
@@ -119,6 +120,7 @@ Json::Value* Json::Array::GetAt(int i)
 
 Json::Value* Json::Array::operator [](int i)
 {
+	ASSERT(0 <= i && i < (int)m_buffer.size());
 	return GetAt(i);
 }
 
@@ -581,10 +583,34 @@ Json::Array& Json::Value::AsArray()
 
 
 
+bool Json::Value::AsBoolean()
+{
+	ASSERT(IsBoolean());
+	return m_valueHolder.vBoolean;
+}
+
+
+
+int Json::Value::AsInteger()
+{
+	ASSERT(IsInteger());
+	return m_valueHolder.vInteger;
+}
+
+
+
 Json::Object& Json::Value::AsObject()
 {
 	ASSERT(IsObject() && m_valueHolder.vObject != nullptr);
 	return *m_valueHolder.vObject;
+}
+
+
+
+double Json::Value::AsReal()
+{
+	ASSERT(IsReal());
+	return m_valueHolder.vReal;
 }
 
 

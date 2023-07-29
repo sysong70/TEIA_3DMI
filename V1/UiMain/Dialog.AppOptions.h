@@ -8,13 +8,13 @@
 
 namespace Dialog
 {
-	class AppSettings : public Standard
+	class AppOptions : public Standard
 	{
 	public:
 
-		AppSettings();
+		AppOptions();
 
-		~AppSettings() override;
+		~AppOptions() override;
 
 	protected:
 

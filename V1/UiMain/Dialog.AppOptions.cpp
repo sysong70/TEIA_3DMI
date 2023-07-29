@@ -1,8 +1,9 @@
 ﻿#include "stdafx.h"
-#include "Dialog.AppSettings.h"
+#include "Dialog.AppOptions.h"
 #include "Component.h"
+#include "Connector.h"
 #include "Facility.AppResources.h"
-#include "Facility.AppSettings.h"
+#include "Facility.AppOptions.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -14,9 +15,9 @@ static char THIS_FILE[] = __FILE__;
 
 #define DDX_CONTROL(x) DDX_Control(pDX, (int)PRESET::x, m_wnd##x);
 
-#define PRESET PresetAppSettings
+#define PRESET PresetAppOptions
 
-namespace PresetAppSettings
+namespace PresetAppOptions
 {
 	const int IDAPPLY = 3;
 
@@ -34,7 +35,7 @@ namespace PresetAppSettings
 
 using namespace Dialog;
 
-BEGIN_MESSAGE_MAP(AppSettings, Standard)
+BEGIN_MESSAGE_MAP(AppOptions, Standard)
 	ON_COMMAND(PRESET::Initialize, OnInitialize)
 	ON_COMMAND(PRESET::Reset, OnReset)
 	ON_COMMAND(PRESET::IDAPPLY, OnApply)
@@ -44,20 +45,20 @@ END_MESSAGE_MAP()
 
 
 
-Dialog::AppSettings::AppSettings()
-	: Standard(IDD_DMI_STANDARD, "AppSettings", nullptr)
+Dialog::AppOptions::AppOptions()
+	: Standard(IDD_DMI_STANDARD, "AppOptions", nullptr)
 {
 }
 
 
 
-Dialog::AppSettings::~AppSettings()
+Dialog::AppOptions::~AppOptions()
 {
 }
 
 
 
-void Dialog::AppSettings::DoDataExchange(CDataExchange* pDX)
+void Dialog::AppOptions::DoDataExchange(CDataExchange* pDX)
 {
 	__super::DoDataExchange(pDX);
 
@@ -67,14 +68,14 @@ void Dialog::AppSettings::DoDataExchange(CDataExchange* pDX)
 
 
 
-void Dialog::AppSettings::OnCancel()
+void Dialog::AppOptions::OnCancel()
 {
 	__super::OnCancel();
 }
 
 
 
-BOOL Dialog::AppSettings::OnInitDialog()
+BOOL Dialog::AppOptions::OnInitDialog()
 {
 	__super::OnInitDialog();
 
@@ -94,19 +95,8 @@ BOOL Dialog::AppSettings::OnInitDialog()
 	m_preferences.DataResource = TheAppResources.GetPreferences();
 	m_fileOptions.DataResource = TheAppResources.GetFileOptions();
 
-	if (TheAppSettings.GetPreferences().IsEmpty()) {
-		m_preferences.DataLocal = TheAppResources.GetPreferences();
-	}
-	else {
-		m_preferences.DataLocal = TheAppSettings.GetPreferences();
-	}
-
-	if (TheAppSettings.GetFileOptions().IsEmpty()) {
-		m_fileOptions.DataLocal = TheAppResources.GetFileOptions();
-	}
-	else {
-		m_fileOptions.DataLocal = TheAppSettings.GetFileOptions();
-	}
+	m_preferences.DataLocal = TheAppOptions.GetPreferences();
+	m_fileOptions.DataLocal = TheAppOptions.GetFileOptions();
 
 	m_preferences.Data = m_preferences.DataLocal;
 	m_fileOptions.Data = m_fileOptions.DataLocal;
@@ -128,17 +118,16 @@ BOOL Dialog::AppSettings::OnInitDialog()
 
 
 
-void Dialog::AppSettings::OnOK()
+void Dialog::AppOptions::OnOK()
 {
 	OnApply();
-	//:TODO - sand data to connector
 
 	__super::OnOK();
 }
 
 
 
-LRESULT Dialog::AppSettings::OnChangeActiveTab(WPARAM wp, LPARAM lp)
+LRESULT Dialog::AppOptions::OnChangeActiveTab(WPARAM wp, LPARAM lp)
 {
 	int index = (int)wp;
 
@@ -147,42 +136,51 @@ LRESULT Dialog::AppSettings::OnChangeActiveTab(WPARAM wp, LPARAM lp)
 
 
 
-void Dialog::AppSettings::OnInitialize()
+void Dialog::AppOptions::OnInitialize()
 {
 	int index = m_tabs.GetActiveTab();
 	if (index == 0) {
 		m_preferences.Data = m_preferences.DataResource;
+		m_preferencesUi.RefreshData();
 	}
 	else {
 		m_fileOptions.Data = m_fileOptions.DataResource;
+		m_fileOptionsUi.RefreshData();
 	}
 }
 
 
 
-void Dialog::AppSettings::OnReset()
+void Dialog::AppOptions::OnReset()
 {
 	int index = m_tabs.GetActiveTab();
 	if (index == 0) {
 		m_preferences.Data = m_preferences.DataLocal;
+		m_preferencesUi.RefreshData();
 	}
 	else {
 		m_fileOptions.Data = m_fileOptions.DataLocal;
+		m_fileOptionsUi.RefreshData();
 	}
 }
 
 
 
-void Dialog::AppSettings::OnApply()
+void Dialog::AppOptions::OnApply()
 {
-	TheAppSettings.GetPreferences() = m_preferences.Data;
-	TheAppSettings.GetFileOptions() = m_fileOptions.Data;
-	TheAppSettings.Save();
+	TheAppOptions.GetPreferences() = m_preferences.Data;
+	TheAppOptions.GetFileOptions() = m_fileOptions.Data;
+	TheAppOptions.Save();
+
+	Connector3d::GetInstance().application.OnUpdatePreference(m_preferences.Data);
+	Connector3d::GetInstance().application.OnUpdateFileOption(m_fileOptions.Data);
+	Connector2d::GetInstance().application.OnUpdatePreference(m_preferences.Data);
+	Connector2d::GetInstance().application.OnUpdatePreference(m_fileOptions.Data);
 }
 
 
 
-void Dialog::AppSettings::ConstructBody(const CRect& boundary)
+void Dialog::AppOptions::ConstructBody(const CRect& boundary)
 {
 	Json::Object& data = GetUiData().GetAt("body");
 
@@ -206,7 +204,7 @@ void Dialog::AppSettings::ConstructBody(const CRect& boundary)
 
 
 
-void Dialog::AppSettings::ConstructFooter(const CRect& boundary)
+void Dialog::AppOptions::ConstructFooter(const CRect& boundary)
 {
 	Json::Object& footer = GetUiData().GetAt("footer");
 	Json::Object& buttons = GetDefaultButtons();

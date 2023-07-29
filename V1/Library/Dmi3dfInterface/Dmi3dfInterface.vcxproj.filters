@@ -177,10 +177,7 @@
     <ClInclude Include="3DF\3DF.Operator.SelectArea.h">
       <Filter>Operator</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Facility.Preference.h">
-      <Filter>Facility</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.Facility.Base.h">
+    <ClInclude Include="3DF\3DF.Facility.AppOptions.h">
       <Filter>Facility</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.Window.h">
@@ -243,16 +240,10 @@
     <ClInclude Include="3DF\3DF.BaseView.h">
       <Filter>3DF\Base</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Facility.GuiSetting.h">
+    <ClInclude Include="3DF\3DF.Facility.Preference.h">
       <Filter>Facility</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Facility.KernelSetting.h">
-      <Filter>Facility</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.Facility.FileImportSetting.h">
-      <Filter>Facility</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\3DF.Facility.FileExportSetting.h">
+    <ClInclude Include="3DF\3DF.Facility.KernelOption.h">
       <Filter>Facility</Filter>
     </ClInclude>
     <ClInclude Include="3DF\Private\3DF.SearchPrivate.h">
@@ -282,10 +273,16 @@
     <ClInclude Include="3DF\3DF.h">
       <Filter>3DF</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Private\3DF.HighlightPrivate.h">
-      <Filter>3DF\Key\Private</Filter>
+    <ClInclude Include="3DF\3DF.Facility.Base.h">
+      <Filter>Facility</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Operator.KinematicTest.h">
+    <ClInclude Include="3DF\3DF.Facility.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Facility.ImportOption.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Operator.KeyboardTest.h">
       <Filter>Operator</Filter>
     </ClInclude>
   </ItemGroup>
@@ -401,10 +398,7 @@
     <ClCompile Include="3DF\3DF.Operator.SelectArea.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Facility.Preference.cpp">
-      <Filter>Facility</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\3DF.Facility.Base.cpp">
+    <ClCompile Include="3DF\3DF.Facility.AppOptions.cpp">
       <Filter>Facility</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Window.cpp">
@@ -461,16 +455,10 @@
     <ClCompile Include="3DF\3DF.BaseView.cpp">
       <Filter>3DF\Base</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Facility.GuiSetting.cpp">
+    <ClCompile Include="3DF\3DF.Facility.Preference.cpp">
       <Filter>Facility</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Facility.KernelSetting.cpp">
-      <Filter>Facility</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\3DF.Facility.FileExportSetting.cpp">
-      <Filter>Facility</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\3DF.Facility.FileImportSetting.cpp">
+    <ClCompile Include="3DF\3DF.Facility.KernelOption.cpp">
       <Filter>Facility</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Private\3DF.SearchPrivate.cpp">
@@ -503,10 +491,13 @@
     <ClCompile Include="3DF\3DF.cpp">
       <Filter>3DF</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Private\3DF.HighlightPrivate.cpp">
-      <Filter>3DF\Key\Private</Filter>
+    <ClCompile Include="3DF\3DF.Facility.Base.cpp">
+      <Filter>Facility</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Operator.KinematicTest.cpp">
+    <ClCompile Include="3DF\3DF.Facility.ImportOption.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Operator.KeyboardTest.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
   </ItemGroup>

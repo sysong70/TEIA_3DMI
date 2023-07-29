@@ -11,14 +11,6 @@ class NavigationCube
 {
 public:
 
-	// Cube pixel size
-	enum ESize
-	{
-		Small = 100,
-		Midium = 200,
-		Big = 300,
-	};
-
 	NavigationCube(TDF::BaseView * view = nullptr, WindowKey * pcInWindow = nullptr);
 
 	~NavigationCube();
@@ -26,9 +18,8 @@ public:
 	int LButtonUp(HEventInfo & cInEvent);
 
 	int LButtonDownAndMove(HEventInfo & cInEvent);
-	int NoButtonDownAndMove(HEventInfo & cInEvent);
 
-	void SetSize(ESize size);
+	int NoButtonDownAndMove(HEventInfo & cInEvent);
 
 	void SetView(TDF::BaseView * view, WindowKey * pcInWindow);
 
@@ -39,11 +30,12 @@ public:
 public:
 
 	void Create(float width, float height, HC_KEY parent);
+	//:WARNING - on changing preference
+	void Recreate();
 
 	HC_KEY HitTest(float x, float y, float z);
 
 	void Transform();
-	void Transform_ORG();
 
 	void OnSize(float width, float height);
 
@@ -58,15 +50,13 @@ private:
 
 	void OpenCubeSegment();
 
-	void OpenPlaneSegment();
-
 	void CloseCubeSegment();
-
-	void ClosePlaneSegment();
 
 	void CreateAxis();
 
 	void CreateCube();
+
+	void CreateCubeWire();
 
 	HC_KEY CreatePlaneShell(const char* name, const char* text, Triple pos, Triple angle);
 
@@ -78,16 +68,12 @@ private:
 
 	void SetWindowSize(double width, double height, bool openSegment = true);
 
-	WindowKey * m_pcWindow = nullptr;
-	TDF::BaseView * m_pView = nullptr;
-	ESize m_eCubeSize = ESize::Midium;
-	bool m_bAxisVisible = true;
-	bool m_bCubeVisible = true;
+	WindowKey* m_pcWindow = nullptr;
+	TDF::BaseView* m_pView = nullptr;
+	TDF::Point2D m_windowSize;
 
 	HC_KEY m_parentSegment = HC_ERROR_KEY;
 	HC_KEY m_cubeSegment = HC_ERROR_KEY;
-	HC_KEY m_planeSegment = HC_ERROR_KEY;
-
 
 	SegmentKey m_cSegments[(int)TDF::ViewMode::Count];
 

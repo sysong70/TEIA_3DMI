@@ -35,7 +35,7 @@
 
 #include "../Signal/Signal.h"
 
-#include "3DF.Facility.Preference.h"
+#include "3DF.Facility.AppOptions.h"
 
 #include "3DF.Operator.KinematicTest.h"
 
@@ -56,8 +56,8 @@
 
 USING_3DF_NAMESPACE
 
-#define TheKenelSetting ThePreference.Kernel
-#define TheAppSetting ThePreference.App
+#define TheKenel TheAppOptions.Kernel
+#define ThePreset TheAppOptions.Preset
 #define ColorValue(x) GetRValue(x) / 255.0f, GetGValue(x) / 255.0f, GetBValue(x) / 255.0f
 #define ColorRGBA(x, alpha) GetRValue(x), GetGValue(x), GetBValue(x), (unsigned char)alpha
 
@@ -71,7 +71,7 @@ CameraPos::CameraPos() {
 
 Canvas::Canvas(HBaseModel * pcBaseModel, void * pcWindowHandle)
 {
-	m_pcBaseView = new TDF::BaseView(pcBaseModel, nullptr, H_ASCII_TEXT(TheKenelSetting.General.Display.Driver), nullptr,
+	m_pcBaseView = new TDF::BaseView(pcBaseModel, nullptr, H_ASCII_TEXT(TheKenel.General.Display.Driver), nullptr,
 		reinterpret_cast<void *>(pcWindowHandle), nullptr);
 
 	m_pcWindow = new WindowKey(m_pcBaseView);
@@ -153,7 +153,7 @@ void Canvas::Init()
 	} HC_Close_Segment();
 
 	char chGpuToUse[256];
-	strcpy(chGpuToUse, (char const *)H_UTF8(TheKenelSetting.General.Display.Gpu).encodedText());
+	strcpy(chGpuToUse, (char const *)H_UTF8(TheKenel.General.Display.Gpu).encodedText());
 	if (strcmp(chGpuToUse, "Default") != 0) {
 		HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
 			HC_Set_Driver_Options(H_FORMAT_TEXT("gpu preference = specific = %s", chGpuToUse));
@@ -172,52 +172,52 @@ void Canvas::Init()
 	m_pcBaseView->GetEventManager()->RegisterHandler((HJoyStickListener *)GetBaseView(), HJoyStickListener::GetType(), HLISTENER_PRIORITY_NORMAL);
 
 	m_pcBaseView->SetKeyStateCallback(GetKeyState);
-	m_pcBaseView->GetModel()->GetBhvBehaviorManager()->SetUpdateCamera(TheKenelSetting.Interaction.Animation.UpdateCamera);
+	m_pcBaseView->GetModel()->GetBhvBehaviorManager()->SetUpdateCamera(TheKenel.Interaction.Animation.UpdateCamera);
 
 	long nDebugFlags = DEBUG_NO_WINDOWS_HOOK | DEBUG_STARTUP_CLEAR_BLACK;
 
 	// use soft ogl if set
-	if (true == TheKenelSetting.General.Display.DriverForceSoftware) {
+	if (true == TheKenel.General.Display.DriverForceSoftware) {
 		nDebugFlags |= DEBUG_FORCE_SOFTWARE;
 	}
 
 	sprintf(chDriverOpts, "debug = %u", nDebugFlags);
 
 	// set anti-aliasing if set
-	if (true == TheKenelSetting.Appearance.AntiAliasing.Use) {
-		sprintf(chDriverOpts, "%s, anti-alias=%d ", chDriverOpts, TheKenelSetting.Appearance.AntiAliasing.Level);
+	if (true == TheKenel.Appearance.AntiAliasing.Use) {
+		sprintf(chDriverOpts, "%s, anti-alias=%d ", chDriverOpts, TheKenel.Appearance.AntiAliasing.Level);
 	}
 
-	if (true == TheKenelSetting.General.Display.DriverDisplayStats) {
+	if (true == TheKenel.General.Display.DriverDisplayStats) {
 		sprintf(chDriverOpts, "%s, display stats, display time stats, display memory stats", chDriverOpts);
 	}
 
-	if (true == TheKenelSetting.General.Display.StereoMode) {
+	if (true == TheKenel.General.Display.StereoMode) {
 		sprintf(chDriverOpts, "%s, stereo", chDriverOpts);
 	}
 
-	sprintf(chDriverOpts, "%s, quick moves preference = %s", chDriverOpts, H_ASCII_TEXT(TheKenelSetting.Selection.Highlight.QuickMovesType));
+	sprintf(chDriverOpts, "%s, quick moves preference = %s", chDriverOpts, H_ASCII_TEXT(TheKenel.Selection.Highlight.QuickMovesType));
 
 	HCLOCALE(sprintf(chDriverOpts,
 		"%s, ambient occlusion = (%s, strength = %f, quality = %s), fast silhouette edges = (%s, tolerance = %f, %s heavy exterior)", chDriverOpts, 
-		(TheKenelSetting.Effects.FrameBuffer.UseAmbient ? "on" : "off"), TheKenelSetting.Effects.FrameBuffer.AmbientStrength,
-		(TheKenelSetting.Effects.FrameBuffer.HighQualityAmbient ? "nicest" : "fast"),
-		(TheKenelSetting.Effects.FrameBuffer.UseFastSilhouette ? "on" : "off"), TheKenelSetting.Effects.FrameBuffer.FastSilhouetteTolerance,
-		(TheKenelSetting.Effects.FrameBuffer.HeavyExteriorSilhouette ? "" : "no")));
+		(TheKenel.Effects.FrameBuffer.UseAmbient ? "on" : "off"), TheKenel.Effects.FrameBuffer.AmbientStrength,
+		(TheKenel.Effects.FrameBuffer.HighQualityAmbient ? "nicest" : "fast"),
+		(TheKenel.Effects.FrameBuffer.UseFastSilhouette ? "on" : "off"), TheKenel.Effects.FrameBuffer.FastSilhouetteTolerance,
+		(TheKenel.Effects.FrameBuffer.HeavyExteriorSilhouette ? "" : "no")));
 
-	m_pcBaseView->SetDoubleBuffering(TheKenelSetting.General.Display.DoubleBuffer);
+	m_pcBaseView->SetDoubleBuffering(TheKenel.General.Display.DoubleBuffer);
 
 	HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
 		HC_Set_User_Index(H_VIEW_POINTER_INDEX, GetBaseView());  // This is used in the event_checker for constant framerate.
 		HC_Set_Driver_Options(chDriverOpts);
 		HCLOCALE(sprintf(chDriverOpts, "bloom = (%s, strength=%f, blur=%d, shape=%s)",
-			(TheKenelSetting.Lighting.Bloom.Use ? "on" : "off"),
-			TheKenelSetting.Lighting.Bloom.Strength,
-			TheKenelSetting.Lighting.Bloom.Blur,
-			(TheKenelSetting.Lighting.Bloom.Shape == RadialBloom ? "radial" : "star")));
+			(TheKenel.Lighting.Bloom.Use ? "on" : "off"),
+			TheKenel.Lighting.Bloom.Strength,
+			TheKenel.Lighting.Bloom.Blur,
+			(TheKenel.Lighting.Bloom.Shape == RadialBloom ? "radial" : "star")));
 		HC_Set_Driver_Options(chDriverOpts);
 		// antialiasing needs rendering option in addition to driver option
-		if (true == TheKenelSetting.Appearance.AntiAliasing.Use) {
+		if (true == TheKenel.Appearance.AntiAliasing.Use) {
 			// Rendering Option에서는 Screen On만 설정한다.
 			HC_Set_Rendering_Options("anti-alias = (screen = on)"); 
 		}
@@ -226,51 +226,51 @@ void Canvas::Init()
 	} HC_Close_Segment();
 
 	HC_Open_Segment_By_Key(m_pcBaseView->GetConstructionKey()); {
-// 		if (true == TheKenelSetting.Appearance.AntiAliasing.Use) {
+// 		if (true == TheKenel.Appearance.AntiAliasing.Use) {
 // 			// Rendering Option에서는 Screen On만 설정한다.
 // 			HC_Set_Rendering_Options("anti-alias = (screen = on)");
 // 		}
 	} HC_Close_Segment();
 
-	if (false == TheKenelSetting.Lighting.Light.Scaling) {
+	if (false == TheKenel.Lighting.Light.Scaling) {
 		m_pcBaseView->SetLightScaling(0);
 	}
 	else {
-		m_pcBaseView->SetLightScaling(TheKenelSetting.Lighting.Light.ScaleFactor / 100000.f);
+		m_pcBaseView->SetLightScaling(TheKenel.Lighting.Light.ScaleFactor / 100000.f);
 	}
 		
-	m_pcBaseView->SetLightFollowsCamera(TheKenelSetting.Lighting.Light.FollowsCamera);
+	m_pcBaseView->SetLightFollowsCamera(TheKenel.Lighting.Light.FollowsCamera);
 	//SetLightCount(LightCount); //defer until after camera is all set up
 	// SetDeepSelectionMode(DeepSelection); OCC를 사용할 때 대응하는 함수
-	m_pcBaseView->SetVisibilitySelectionMode(TheKenelSetting.Selection.Behavior.VisibilitySelection);
-	m_pcBaseView->SetDynamicHighlighting(TheKenelSetting.Selection.Behavior.DynamicHighlighting);
-	m_pcBaseView->SetDetailSelection(TheKenelSetting.Selection.Behavior.DetailSelection); // "Honor Line/Edge Weight/Pattern"
-	m_pcBaseView->SetRelatedSelectionLimit(TheKenelSetting.Selection.Behavior.RelatedSelectionLimit);
-	m_pcBaseView->SetTransparentSelectionBoxMode(TheKenelSetting.Selection.Behavior.UseSelectBox); // show a transparent box when selecting areas
-	m_pcBaseView->SetRespectSelectionCulling(TheKenelSetting.Selection.Behavior.RespectCulling); // Respect Culling during selection.
+	m_pcBaseView->SetVisibilitySelectionMode(TheKenel.Selection.Behavior.VisibilitySelection);
+	m_pcBaseView->SetDynamicHighlighting(TheKenel.Selection.Behavior.DynamicHighlighting);
+	m_pcBaseView->SetDetailSelection(TheKenel.Selection.Behavior.DetailSelection); // "Honor Line/Edge Weight/Pattern"
+	m_pcBaseView->SetRelatedSelectionLimit(TheKenel.Selection.Behavior.RelatedSelectionLimit);
+	m_pcBaseView->SetTransparentSelectionBoxMode(TheKenel.Selection.Behavior.UseSelectBox); // show a transparent box when selecting areas
+	m_pcBaseView->SetRespectSelectionCulling(TheKenel.Selection.Behavior.RespectCulling); // Respect Culling during selection.
 	m_pcBaseView->SetFastFitWorld(true);
-	m_pcBaseView->SetForceFastHiddenLine(TheKenelSetting.Performance.Optimization.HiddenLineMode == FastHiddenLine);
-	m_pcBaseView->SetSpritingMode(TheKenelSetting.Interaction.GeometryManipulation.Spriting);
-	m_pcBaseView->SetAllowInteractiveCutGeometry(TheKenelSetting.Interaction.GeometryManipulation.UpdateCutGeometry);
-	m_pcBaseView->SetAllowInteractiveShadows(TheKenelSetting.Interaction.GeometryManipulation.UpdateShadows);
-	m_pcBaseView->SetBackplaneCulling(TheKenelSetting.General.Etc.BackplaneCulling);
+	m_pcBaseView->SetForceFastHiddenLine(TheKenel.Performance.Optimization.HiddenLineMode == FastHiddenLine);
+	m_pcBaseView->SetSpritingMode(TheKenel.Interaction.GeometryManipulation.Spriting);
+	m_pcBaseView->SetAllowInteractiveCutGeometry(TheKenel.Interaction.GeometryManipulation.UpdateCutGeometry);
+	m_pcBaseView->SetAllowInteractiveShadows(TheKenel.Interaction.GeometryManipulation.UpdateShadows);
+	m_pcBaseView->SetBackplaneCulling(TheKenel.General.Etc.BackplaneCulling);
 	m_pcBaseView->SetDisplayListType(DisplayListSegment);// DisplayListOff);
 
-	if (true == TheKenelSetting.Performance.FramerateOptimization.UseFramerate)
+	if (true == TheKenel.Performance.FramerateOptimization.UseFramerate)
 	{
 		//if (!pDoc->IsFileReadDeferedForView() || CurrentFramerateMode == FramerateFixed)
-		if (FramerateFixed == TheKenelSetting.Performance.FramerateOptimization.CurrentFramerateMode)
+		if (FramerateFixed == TheKenel.Performance.FramerateOptimization.CurrentFramerateMode)
 		{
-			m_pcBaseView->SetFramerateMode(TheKenelSetting.Performance.FramerateOptimization.CurrentFramerateMode,
-				TheKenelSetting.Performance.FramerateOptimization.FramerateTime, TheKenelSetting.Performance.FramerateOptimization.MaxThreshold,
-				UINT2bool(TheKenelSetting.Performance.FramerateOptimization.UseLods), TheKenelSetting.Performance.FramerateOptimization.DetailSteps,
-				TheKenelSetting.Performance.FramerateOptimization.HardCutoff);
+			m_pcBaseView->SetFramerateMode(TheKenel.Performance.FramerateOptimization.CurrentFramerateMode,
+				TheKenel.Performance.FramerateOptimization.FramerateTime, TheKenel.Performance.FramerateOptimization.MaxThreshold,
+				UINT2bool(TheKenel.Performance.FramerateOptimization.UseLods), TheKenel.Performance.FramerateOptimization.DetailSteps,
+				TheKenel.Performance.FramerateOptimization.HardCutoff);
 		}
 	}
-	else if (TheKenelSetting.Performance.FramerateOptimization.CullingThresholdSet)
+	else if (TheKenel.Performance.FramerateOptimization.CullingThresholdSet)
 	{
 		m_pcBaseView->SetFramerateMode(FramerateOff);
-		m_pcBaseView->SetCullingThreshold(TheKenelSetting.Performance.FramerateOptimization.CullingThreshold);
+		m_pcBaseView->SetCullingThreshold(TheKenel.Performance.FramerateOptimization.CullingThreshold);
 	}
 	else
 	{
@@ -279,28 +279,28 @@ void Canvas::Init()
 	}
 
 	m_pcBaseView->SetSmoothTransition(false);
-	m_pcBaseView->SetShadowRenderingMode(TheKenelSetting.Effects.SimpleShadow.ShadowRenderingMode);
+	m_pcBaseView->SetShadowRenderingMode(TheKenel.Effects.SimpleShadow.ShadowRenderingMode);
 	SetViewAxis();
 
 	SetTransparency();
 
-	//m_pcBaseView->SetAxisMode(TheKenelSetting.General.Rendering.DisplayAxisTriad ? AxisOn : AxisOff);
+	//m_pcBaseView->SetAxisMode(TheKenel.General.Rendering.DisplayAxisTriad ? AxisOn : AxisOff);
 
 	// 배경화면 설정
-	SetWindowBackGroundColor(TheKenelSetting.Appearance.BackgroundColor.Top, TheKenelSetting.Appearance.BackgroundColor.Bottom);
+	SetWindowBackGroundColor(TheKenel.Appearance.BackgroundColor.Top, TheKenel.Appearance.BackgroundColor.Bottom);
 
 	HPoint FakeHLRColor;
-	FakeHLRColor.Set(ColorValue(TheAppSetting.FakeHLRColor));
+	FakeHLRColor.Set(ColorValue(ThePreset.FakeHLRColor));
 
 	m_pcBaseView->SetFakeHLRColor(FakeHLRColor);
-	m_pcBaseView->SetProjMode(TheAppSetting.ProjectionMode);
-	m_pcBaseView->SetSmoothTransition(TheAppSetting.SmoothTransition);
+	m_pcBaseView->SetProjMode(ThePreset.ProjectionMode);
+	m_pcBaseView->SetSmoothTransition(ThePreset.SmoothTransition);
 	m_pcBaseView->SetSmoothTransitionDuration(0.5f);
 	m_pcBaseView->GetUndoManager()->Flush();			//don't care about this initial camera change
-	m_pcBaseView->SetDisplayHandlesOnDblClk(!TheAppSetting.DisableEditing);
+	m_pcBaseView->SetDisplayHandlesOnDblClk(!ThePreset.DisableEditing);
 
 	//SetCoordinateSystemHandedness(bWorldHandedness ? HandednessRight : HandednessLeft, true);
-	m_pcBaseView->SetHandedness(TheAppSetting.WorldHandedness ? HandednessRight : HandednessLeft, true);
+	m_pcBaseView->SetHandedness(ThePreset.WorldHandedness ? HandednessRight : HandednessLeft, true);
 
 	// The state of world today with polygon handedness is
 	// 1. Since we are using display lists by default, we want this setting.
@@ -331,50 +331,50 @@ void Canvas::Init()
 		HC_Set_Edge_Weight(3.0);
 	} HC_Close_Segment();
 
-	m_pcBaseView->GetHighlightSelection()->SetGrayScale(false);// TheAppSetting.GrayScaleSelection);
-	m_pcBaseView->GetHighlightSelection()->SetUseDefinedHighlight(false);// TheAppSetting.UseDefinedHighlighting);
-	m_pcBaseView->GetHighlightSelection()->SetAllowDisplacement(false);// TheAppSetting.DisplaceSelection);
+	m_pcBaseView->GetHighlightSelection()->SetGrayScale(false);// ThePreset.GrayScaleSelection);
+	m_pcBaseView->GetHighlightSelection()->SetUseDefinedHighlight(false);// ThePreset.UseDefinedHighlighting);
+	m_pcBaseView->GetHighlightSelection()->SetAllowDisplacement(false);// ThePreset.DisplaceSelection);
 	m_pcBaseView->GetHighlightSelection()->UpdateHighlightStyle();
 
 	// set the selection color
 	HSelectionSet * sel_set = m_pcBaseView->GetSelection();
 	assert(sel_set);
 	HPixelRGBA cSelectColor;
-	int sel_alpha = (int)(TheAppSetting.SelectionColorTransparency * 2.56f);		// settings is a %, scale it to 256
-	cSelectColor.Set(ColorRGBA(TheAppSetting.PolygonSelectionColor, sel_alpha));
+	int sel_alpha = (int)(ThePreset.SelectionColorTransparency * 2.56f);		// settings is a %, scale it to 256
+	cSelectColor.Set(ColorRGBA(ThePreset.PolygonSelectionColor, sel_alpha));
 	sel_set->SetSelectionFaceColor(cSelectColor);
 
-	cSelectColor.Set(ColorRGBA(TheAppSetting.LineSelectionColor, sel_alpha));
+	cSelectColor.Set(ColorRGBA(ThePreset.LineSelectionColor, sel_alpha));
 	sel_set->SetSelectionEdgeColor(cSelectColor);
 
-	cSelectColor.Set(ColorRGBA(TheAppSetting.MarkerSelectionColor, sel_alpha));
+	cSelectColor.Set(ColorRGBA(ThePreset.MarkerSelectionColor, sel_alpha));
 	sel_set->SetSelectionMarkerColor(cSelectColor);
 
 	// set markup color and weight
-	SetMarkupColor(TheAppSetting.MarkupColor);
+	SetMarkupColor(ThePreset.MarkupColor);
 
-	SetShadowColor(TheAppSetting.ShadowColor);
+	SetShadowColor(ThePreset.ShadowColor);
 
-	m_pcBaseView->GetMarkupManager()->SetMarkupWeight(TheAppSetting.MarkupWeight / 100.0f);
-	m_pcBaseView->SetShadowResolution(TheAppSetting.ShadowRes);
-	m_pcBaseView->SetShadowBlurring(TheAppSetting.ShadowBlur);
+	m_pcBaseView->GetMarkupManager()->SetMarkupWeight(ThePreset.MarkupWeight / 100.0f);
+	m_pcBaseView->SetShadowResolution(ThePreset.ShadowRes);
+	m_pcBaseView->SetShadowBlurring(ThePreset.ShadowBlur);
 
 	// set the color index interpolation settings
-	m_pcBaseView->SetColorInterpolation(TheAppSetting.CiByValue);
-	m_pcBaseView->SetColorIndexInterpolation(TheAppSetting.CiByColormapIndex, TheAppSetting.CiIsolines);
+	m_pcBaseView->SetColorInterpolation(ThePreset.CiByValue);
+	m_pcBaseView->SetColorIndexInterpolation(ThePreset.CiByColormapIndex, ThePreset.CiIsolines);
 
-	m_pcBaseView->GetSelection()->SetGrayScale(TheAppSetting.GrayScaleSelection);
-	m_pcBaseView->GetSelection()->SetUseDefinedHighlight(TheAppSetting.UseDefinedHighlighting);
-	m_pcBaseView->GetSelection()->SetAllowDisplacement(TheAppSetting.DisplaceSelection);
+	m_pcBaseView->GetSelection()->SetGrayScale(ThePreset.GrayScaleSelection);
+	m_pcBaseView->GetSelection()->SetUseDefinedHighlight(ThePreset.UseDefinedHighlighting);
+	m_pcBaseView->GetSelection()->SetAllowDisplacement(ThePreset.DisplaceSelection);
 	m_pcBaseView->GetSelection()->SetHighlightMode(HighlightQuickmoves);
 	m_pcBaseView->GetHighlightSelection()->SetHighlightMode(HighlightQuickmoves);
 
-	m_pcBaseView->GetSelection()->SetHighlightTransparency(TheAppSetting.TransparencyLevel);
+	m_pcBaseView->GetSelection()->SetHighlightTransparency(ThePreset.TransparencyLevel);
 
-	if (TheAppSetting.RefSelType == "Spriting") {
+	if (ThePreset.RefSelType == "Spriting") {
 		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelSpriting);
 	}
-	else if (TheAppSetting.RefSelType == "Off") {
+	else if (ThePreset.RefSelType == "Off") {
 		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelOff);
 	}
 	else {
@@ -385,7 +385,7 @@ void Canvas::Init()
 	m_pcBaseView->GetSelection()->UpdateHighlightStyle();
 
 	// set the rendermode
-	m_pcBaseView->SetRenderMode(TheAppSetting.RenderMode, true);
+	m_pcBaseView->SetRenderMode(ThePreset.RenderMode, true);
 
 	m_pcBaseView->SetEventCheckerCallback(event_checker);
 
@@ -437,7 +437,7 @@ void Canvas::Init()
 	m_advanced_query_dialog->SetText("No entities currently under cursor.");
 */
 	
-	SetShowCollisions(TheAppSetting.ShowCollisions);
+	SetShowCollisions(ThePreset.ShowCollisions);
 
 /* // Remark
 	HStreamFileToolkit * tk = GetModel()->GetStreamFileTK();
@@ -456,33 +456,33 @@ void Canvas::Init()
 		// set defaults on stream toolkit
 		int sflags = 0;
 
-		if (!TheAppSetting.tings::bCompressVertices)
+		if (!ThePreset::bCompressVertices)
 			sflags |= TK_Full_Resolution_Vertices;
 		else
-			tk->SetNumVertexBits(TheAppSetting.tings::NumVertexBits);
+			tk->SetNumVertexBits(ThePreset::NumVertexBits);
 
-		if (!TheAppSetting.tings::bCompressNormals)
+		if (!ThePreset::bCompressNormals)
 			sflags |= TK_Full_Resolution_Normals;
 		else
-			tk->SetNumNormalBits(TheAppSetting.tings::NumNormalBits);
+			tk->SetNumNormalBits(ThePreset::NumNormalBits);
 
-		if (!TheAppSetting.tings::bCompressParameters)
+		if (!ThePreset::bCompressParameters)
 			sflags |= TK_Full_Resolution_Parameters;
 		else
-			tk->SetNumParameterBits(TheAppSetting.tings::NumParameterBits);
+			tk->SetNumParameterBits(ThePreset::NumParameterBits);
 
 
-		if (TheAppSetting.tings::bExportDictionary == true)
+		if (ThePreset::bExportDictionary == true)
 			sflags |= TK_Generate_Dictionary;
 
 
-		if (TheAppSetting.tings::bEnableInstancing == false)
+		if (ThePreset::bEnableInstancing == false)
 			sflags |= TK_Disable_Instancing;
 
-		if (TheAppSetting.tings::bCompressConnectivity == true)
+		if (ThePreset::bCompressConnectivity == true)
 			sflags |= TK_Connectivity_Compression;
 
-		if (TheAppSetting.tings::bSaveLogFile == true)
+		if (ThePreset::bSaveLogFile == true)
 			tk->SetLogging(true);
 		else
 			tk->SetLogging(false);
@@ -492,8 +492,8 @@ void Canvas::Init()
 		tk->SetWriteFlags(sflags);
 
 		// Anything <= 0 for export version means use the default.
-		if (TheAppSetting.tings::HsfExportVersion > 0)
-			tk->SetTargetVersion(TheAppSetting.tings::HsfExportVersion);
+		if (ThePreset::HsfExportVersion > 0)
+			tk->SetTargetVersion(ThePreset::HsfExportVersion);
 	}*/
 
 	
@@ -502,21 +502,21 @@ void Canvas::Init()
  		LoadFile(pDoc->filename, hmodel->GetStreamFileTK());
  	else
 	{
-		SetLineAntialiasing(TheAppSetting.LineAntialiasing);
-		SetTextAntialiasing(TheAppSetting.TextAntialiasing);
+		SetLineAntialiasing(ThePreset.LineAntialiasing);
+		SetTextAntialiasing(ThePreset.TextAntialiasing);
 
 		EmitSegment(GetModel()->GetModelKey(), true);
 
 		SetupViews();
 
-		if (TheAppSetting.UseFramerate && TheAppSetting.CurrentFramerateMode == FramerateTarget)
+		if (ThePreset.UseFramerate && ThePreset.CurrentFramerateMode == FramerateTarget)
 			EnableFrameRate();
 
 		ViewReady();
 	}
 */
 
-	SetSceneFont(TheAppSetting.FontName, TheAppSetting.FontSize, TheAppSetting.FontUnits);
+	SetSceneFont(ThePreset.FontName, ThePreset.FontSize, ThePreset.FontUnits);
 
 	// subscribe to selection events
 // 	m_nCookieSelected = SetSignalNotify(HSignalSelected, CSolidHoopsView::signal_selected, this);
@@ -538,14 +538,14 @@ void Canvas::Init()
 	}HC_Close_Segment();
 
 	//apply hiding of overlapped text (or not)
-	m_pcBaseView->SetHideOverlappedText(TheAppSetting.HideOverlappedText);
+	m_pcBaseView->SetHideOverlappedText(ThePreset.HideOverlappedText);
 
 	HC_Open_Segment_By_Key(m_pcBaseView->GetShadowMapSegmentKey()); {
-		if (TheAppSetting.ShadowMap) {
+		if (ThePreset.ShadowMap) {
 			sprintf(chRenderingOpts, "shadow map=(on, resolution=%d, samples=%d, %s jitter, %s)",
-				TheAppSetting.SMResolution, TheAppSetting.SMSamples,
-				(TheAppSetting.Jitter ? "" : "no"),
-				(TheAppSetting.ViewDependentShadowMap ? "Canvas dependent" : "Canvas independent"));
+				ThePreset.SMResolution, ThePreset.SMSamples,
+				(ThePreset.Jitter ? "" : "no"),
+				(ThePreset.ViewDependentShadowMap ? "Canvas dependent" : "Canvas independent"));
 		}
 		else {
 			sprintf(chRenderingOpts, "no shadow map");
@@ -554,67 +554,67 @@ void Canvas::Init()
 	} HC_Close_Segment();
 
 	HC_Open_Segment_By_Key(m_pcBaseView->GetSceneKey()); {
-		HC_Set_Variable_Edge_Weight(H_ASCII_TEXT(TheAppSetting.LineWeight));
-		HC_Set_Variable_Line_Weight(H_ASCII_TEXT(TheAppSetting.LineWeight));
+		HC_Set_Variable_Edge_Weight(H_ASCII_TEXT(ThePreset.LineWeight));
+		HC_Set_Variable_Line_Weight(H_ASCII_TEXT(ThePreset.LineWeight));
 
 		//apply stereo mode
-		if (TheAppSetting.StereoMode) {
-			HCLOCALE(sprintf(chRenderingOpts, "stereo, stereo separation = %f", TheAppSetting.StereoSeparation / 10000.f));
+		if (ThePreset.StereoMode) {
+			HCLOCALE(sprintf(chRenderingOpts, "stereo, stereo separation = %f", ThePreset.StereoSeparation / 10000.f));
 			HC_Set_Rendering_Options(chRenderingOpts);
 		}
 
-		HCLOCALE(sprintf(chRenderingOpts, "simple shadow = (opacity = %f)", TheAppSetting.ShadowOpacity));
+		HCLOCALE(sprintf(chRenderingOpts, "simple shadow = (opacity = %f)", ThePreset.ShadowOpacity));
 		HC_Set_Rendering_Options(chRenderingOpts);
 
 		char gooch_color_map[4096];
 		HCLOCALE(sprintf(gooch_color_map, "(R=%f G=%f B=%f), (R=%f G=%f B=%f), (R=%f G=%f B=%f), (R=%f G=%f B=%f), (R=%f G=%f B=%f), (R=%f G=%f B=%f)",
-			ColorValue(TheAppSetting.GoochColor1),
-			ColorValue(TheAppSetting.GoochColor2),
-			ColorValue(TheAppSetting.GoochColor3),
-			ColorValue(TheAppSetting.GoochColor4),
-			ColorValue(TheAppSetting.GoochColor5),
-			ColorValue(TheAppSetting.GoochColor6))
+			ColorValue(ThePreset.GoochColor1),
+			ColorValue(ThePreset.GoochColor2),
+			ColorValue(ThePreset.GoochColor3),
+			ColorValue(ThePreset.GoochColor4),
+			ColorValue(ThePreset.GoochColor5),
+			ColorValue(ThePreset.GoochColor6))
 		);
-		TheAppSetting.GoochColorMap = gooch_color_map;
+		ThePreset.GoochColorMap = gooch_color_map;
 
 		HC_Open_Segment("./overwrite/lights/gooch_color_map_segment"); {
-			HC_Set_Color_Map(H_ASCII_TEXT(TheAppSetting.GoochColorMap));
+			HC_Set_Color_Map(H_ASCII_TEXT(ThePreset.GoochColorMap));
 		}HC_Close_Segment();
 
 		HCLOCALE(sprintf(chRenderingOpts, "gooch options = (diffuse weight = %f, color range=(0.0, %f), color map segment = `./overwrite/lights/gooch_color_map_segment`)",
-			TheAppSetting.GoochWeight, TheAppSetting.GoochColorHigh));
+			ThePreset.GoochWeight, ThePreset.GoochColorHigh));
 		HC_Set_Rendering_Options(chRenderingOpts);
 
 		//set camera near limit
-		HC_Set_Camera_Near_Limit(TheAppSetting.NearCameraLimit / 100000.f);
+		HC_Set_Camera_Near_Limit(ThePreset.NearCameraLimit / 100000.f);
 
 		//Apply curve geometry options
 		char curve_opt[4096];
 		HCLOCALE(sprintf(curve_opt, "general curve = (budget = %d, continued budget = %d, maximum deviation = %f, maximum angle = %f, maximum length = %f, %s Canvas independent)",
-			TheAppSetting.Budget, TheAppSetting.ContinuedBudget, TheAppSetting.MaxDeviation / 10000.f,
-			TheAppSetting.MaxAngle / 10000.f, TheAppSetting.MaxLength / 10000.f, TheAppSetting.ViewIndependent ? "" : "no"));
+			ThePreset.Budget, ThePreset.ContinuedBudget, ThePreset.MaxDeviation / 10000.f,
+			ThePreset.MaxAngle / 10000.f, ThePreset.MaxLength / 10000.f, ThePreset.ViewIndependent ? "" : "no"));
 
 		HC_Set_Rendering_Options(curve_opt);
 
-		m_pcBaseView->SetReflectionPlane(TheAppSetting.ReflectionPlane, TheAppSetting.ReflectionOpacity,
-			TheAppSetting.ReflectionFading, TheAppSetting.ReflectionUseAttenuation,
-			TheAppSetting.ReflectionHither, TheAppSetting.ReflectionYon,
-			TheAppSetting.ReflectionUseBlur, TheAppSetting.ReflectionBlur);
+		m_pcBaseView->SetReflectionPlane(ThePreset.ReflectionPlane, ThePreset.ReflectionOpacity,
+			ThePreset.ReflectionFading, ThePreset.ReflectionUseAttenuation,
+			ThePreset.ReflectionHither, ThePreset.ReflectionYon,
+			ThePreset.ReflectionUseBlur, ThePreset.ReflectionBlur);
 
 		char ambient_color[MVO_BUFFER_SIZE];
-		if (TheAppSetting.HemisphericAmbient)
+		if (ThePreset.HemisphericAmbient)
 		{
 			float r1, g1, b1, r2, g2, b2;
 			char ropt[MVO_BUFFER_SIZE];
 
 			//darken all colors by about 75%
-			r1 = (GetRValue(TheAppSetting.AmbientTopColor) >> 2) / 255.0f;
-			g1 = (GetGValue(TheAppSetting.AmbientTopColor) >> 2) / 255.0f;
-			b1 = (GetBValue(TheAppSetting.AmbientTopColor) >> 2) / 255.0f;
+			r1 = (GetRValue(ThePreset.AmbientTopColor) >> 2) / 255.0f;
+			g1 = (GetGValue(ThePreset.AmbientTopColor) >> 2) / 255.0f;
+			b1 = (GetBValue(ThePreset.AmbientTopColor) >> 2) / 255.0f;
 
-			r2 = (GetRValue(TheAppSetting.AmbientBottomColor) >> 2) / 255.0f;
-			g2 = (GetGValue(TheAppSetting.AmbientBottomColor) >> 2) / 255.0f;
-			b2 = (GetBValue(TheAppSetting.AmbientBottomColor) >> 2) / 255.0f;
+			r2 = (GetRValue(ThePreset.AmbientBottomColor) >> 2) / 255.0f;
+			g2 = (GetGValue(ThePreset.AmbientBottomColor) >> 2) / 255.0f;
+			b2 = (GetBValue(ThePreset.AmbientBottomColor) >> 2) / 255.0f;
 
 			sprintf(ambient_color, "ambient up=(R=%f G=%f B=%f), ambient down=(R=%f G=%f B=%f)",
 				r1, g1, b1, r2, g2, b2);
@@ -622,10 +622,10 @@ void Canvas::Init()
 			HC_Set_Color(ambient_color);
 			HC_Define_System_Options("disable ambient material");
 
-			if (TheAppSetting.UseAmbientUpVector) {
+			if (ThePreset.UseAmbientUpVector) {
 				HCLOCALE(sprintf(ropt, "ambient up vector = (%f, %f, %f)",
-					TheAppSetting.AmbientUpVector.x, TheAppSetting.AmbientUpVector.y,
-					TheAppSetting.AmbientUpVector.z));
+					ThePreset.AmbientUpVector.x, ThePreset.AmbientUpVector.y,
+					ThePreset.AmbientUpVector.z));
 				HC_Set_Rendering_Options(ropt);
 			}
 			else
@@ -638,9 +638,9 @@ void Canvas::Init()
 			float r1, g1, b1;
 
 			//darken all colors by about 75%
-			r1 = (GetRValue(TheAppSetting.AmbientTopColor) >> 2) / 255.0f;
-			g1 = (GetGValue(TheAppSetting.AmbientTopColor) >> 2) / 255.0f;
-			b1 = (GetBValue(TheAppSetting.AmbientTopColor) >> 2) / 255.0f;
+			r1 = (GetRValue(ThePreset.AmbientTopColor) >> 2) / 255.0f;
+			g1 = (GetGValue(ThePreset.AmbientTopColor) >> 2) / 255.0f;
+			b1 = (GetBValue(ThePreset.AmbientTopColor) >> 2) / 255.0f;
 
 			HCLOCALE(sprintf(ambient_color, "ambient=(R=%f G=%f B=%f)", r1, g1, b1));
 			HC_Set_Color(ambient_color);
@@ -650,12 +650,12 @@ void Canvas::Init()
 
 		//Apply Greeking Settings
 		char cGreekingSettings[2048] = "no greeking limit";
-		if (TheAppSetting.UseGreeking)
+		if (ThePreset.UseGreeking)
 		{
 			CString csGreekingSettings;
 			csGreekingSettings.Format(_T("greeking mode= %s, greeking limit= %f %s"),
-				TheAppSetting.GreekingMode, TheAppSetting.GreekingLimit / 1000.f,
-				TheAppSetting.GreekingUnits);
+				ThePreset.GreekingMode, ThePreset.GreekingLimit / 1000.f,
+				ThePreset.GreekingUnits);
 			strcpy(cGreekingSettings, H_ASCII_TEXT(csGreekingSettings));
 		}
 		HC_Set_Text_Font(cGreekingSettings);
@@ -671,7 +671,7 @@ void Canvas::Init()
 	}
 */
 
-	m_pcBaseView->SetLightCount(TheAppSetting.LightCount);
+	m_pcBaseView->SetLightCount(ThePreset.LightCount);
 	m_pcBaseView->SetViewSelectionLevel(HSelectionLevelSegment);
 
 	SetDefaultOperator();
@@ -712,12 +712,12 @@ void Canvas::SetDriverOption()
 	long debug_flags = DEBUG_NO_WINDOWS_HOOK | DEBUG_STARTUP_CLEAR_BLACK;
 	sprintf(chDriverOpts, "debug = %u", debug_flags);
 
-	//if(TheAppSetting.tings::bAntiAliasing)
-	int nAntialiasingLevel = 4; //  TheAppSetting.tings::AntialiasingLevel
+	//if(ThePreset::bAntiAliasing)
+	int nAntialiasingLevel = 4; //  ThePreset::AntialiasingLevel
 	sprintf(chDriverOpts, "%s, anti-alias=%d ", chDriverOpts, nAntialiasingLevel);
 	//sprintf(chDriverOpts, "anti-alias=%d ", nAntialiasingLevel);
 
-	// TheAppSetting.tings::csQuickMovesType
+	// ThePreset::csQuickMovesType
 	sprintf(chDriverOpts, "%s, quick moves preference = %s", chDriverOpts, "Default");
 
 	HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
@@ -741,9 +741,9 @@ void Canvas::SetTransparency()
 	char layers[4096];
 	bool fast_z_sort = false;
 
-	strcpy(style, H_ASCII_TEXT(TheKenelSetting.General.Transparency.Style));
-	strcpy(sorting, H_ASCII_TEXT(TheKenelSetting.General.Transparency.Sorting));
-	strcpy(layers, H_ASCII_TEXT(TheKenelSetting.General.Transparency.DepthPeelingLayers));
+	strcpy(style, H_ASCII_TEXT(TheKenel.General.Transparency.Style));
+	strcpy(sorting, H_ASCII_TEXT(TheKenel.General.Transparency.Sorting));
+	strcpy(layers, H_ASCII_TEXT(TheKenel.General.Transparency.DepthPeelingLayers));
 
 	if(strstr(sorting, "z-sort")) {
 		if (strstr(sorting, "fast")) {
@@ -753,8 +753,8 @@ void Canvas::SetTransparency()
 	}
 
 	sprintf(text, "style = %s, hsr algorithm = %s, depth peeling options = (layers= %s, algorithm=%s), depth writing = %s",
-		style, sorting, layers, TheKenelSetting.General.Transparency.PixelOIT ? "pixel" : "buffer",
-		TheKenelSetting.General.Transparency.DepthWriting == true ? "on" : "off");
+		style, sorting, layers, TheKenel.General.Transparency.PixelOIT ? "pixel" : "buffer",
+		TheKenel.General.Transparency.DepthWriting == true ? "on" : "off");
 
 	m_pcBaseView->SetTransparency(text, fast_z_sort);
 }
@@ -773,12 +773,8 @@ void Canvas::SetViewAxis()
 
 void Canvas::InitNavigationCube(int nWidth, int nHeight)
 {
-	m_cNaviCube.SetSize(NavigationCube::Big);
-	m_cNaviCube.SetVisible(true, true);
-
+	m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
 	m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetModelKey());
-	//m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetSceneKey());
-	//m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetOverwriteKey());
 	m_cNaviCube.Transform();
 
 	m_pcBaseView->SetNavigationCube(&m_cNaviCube);
@@ -813,15 +809,15 @@ void Canvas::SetSelectOption()
 	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeColor(cHighlightSelectColor);
 	m_pcBaseView->GetHighlightSelection()->SetSelectionMarkerColor(cHighlightSelectColor);
 
-	m_pcBaseView->GetHighlightSelection()->SetGrayScale(TheAppSetting.GrayScaleSelection);
-	m_pcBaseView->GetHighlightSelection()->SetUseDefinedHighlight(TheAppSetting.UseDefinedHighlighting);
-	m_pcBaseView->GetHighlightSelection()->SetInvisible(TheAppSetting.InvisibleSelection);
-	m_pcBaseView->GetHighlightSelection()->SetAllowDisplacement(TheAppSetting.DisplaceSelection);
-	m_pcBaseView->SetDynamicHighlighting(TheKenelSetting.Selection.Behavior.DynamicHighlighting);
+	m_pcBaseView->GetHighlightSelection()->SetGrayScale(ThePreset.GrayScaleSelection);
+	m_pcBaseView->GetHighlightSelection()->SetUseDefinedHighlight(ThePreset.UseDefinedHighlighting);
+	m_pcBaseView->GetHighlightSelection()->SetInvisible(ThePreset.InvisibleSelection);
+	m_pcBaseView->GetHighlightSelection()->SetAllowDisplacement(ThePreset.DisplaceSelection);
+	m_pcBaseView->SetDynamicHighlighting(TheKenel.Selection.Behavior.DynamicHighlighting);
 	m_pcBaseView->GetHighlightSelection()->UpdateHighlightStyle();
 
 	char chDriverOpts[MVO_BUFFER_SIZE];
-	sprintf(chDriverOpts, "quick moves preference = %s", H_ASCII_TEXT(TheKenelSetting.Selection.Highlight.QuickMovesType));
+	sprintf(chDriverOpts, "quick moves preference = %s", H_ASCII_TEXT(TheKenel.Selection.Highlight.QuickMovesType));
 	HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
 		HC_Set_Driver_Options(chDriverOpts);
 	} HC_Close_Segment();
@@ -830,28 +826,28 @@ void Canvas::SetSelectOption()
 	HSelectionSet * sel_set = m_pcBaseView->GetSelection();
 	assert(sel_set);
 	HPixelRGBA sel_col;
-	int sel_alpha = (int)(TheAppSetting.SelectionColorTransparency * 2.56f);		// settings is a %, scale it to 256
-	sel_col.Set(ColorRGBA(TheAppSetting.PolygonSelectionColor, sel_alpha));
+	int sel_alpha = (int)(ThePreset.SelectionColorTransparency * 2.56f);		// settings is a %, scale it to 256
+	sel_col.Set(ColorRGBA(ThePreset.PolygonSelectionColor, sel_alpha));
 	sel_set->SetSelectionFaceColor(sel_col);
 
-	sel_col.Set(ColorRGBA(TheAppSetting.LineSelectionColor, sel_alpha));
+	sel_col.Set(ColorRGBA(ThePreset.LineSelectionColor, sel_alpha));
 	sel_set->SetSelectionEdgeColor(sel_col);
 
-	sel_col.Set(ColorRGBA(TheAppSetting.MarkerSelectionColor, sel_alpha));
+	sel_col.Set(ColorRGBA(ThePreset.MarkerSelectionColor, sel_alpha));
 	sel_set->SetSelectionMarkerColor(sel_col);
 
-	m_pcBaseView->GetSelection()->SetGrayScale(TheAppSetting.GrayScaleSelection);
-	m_pcBaseView->GetSelection()->SetUseDefinedHighlight(TheAppSetting.UseDefinedHighlighting);
-	m_pcBaseView->GetSelection()->SetAllowDisplacement(TheAppSetting.DisplaceSelection);
-	m_pcBaseView->GetSelection()->SetInvisible(TheAppSetting.InvisibleSelection);
-	m_pcBaseView->GetSelection()->SetHighlightMode(TheAppSetting.HighlightMode);
+	m_pcBaseView->GetSelection()->SetGrayScale(ThePreset.GrayScaleSelection);
+	m_pcBaseView->GetSelection()->SetUseDefinedHighlight(ThePreset.UseDefinedHighlighting);
+	m_pcBaseView->GetSelection()->SetAllowDisplacement(ThePreset.DisplaceSelection);
+	m_pcBaseView->GetSelection()->SetInvisible(ThePreset.InvisibleSelection);
+	m_pcBaseView->GetSelection()->SetHighlightMode(ThePreset.HighlightMode);
 
-	m_pcBaseView->GetHighlightSelection()->SetHighlightMode(TheAppSetting.HighlightMode);
-	m_pcBaseView->GetSelection()->SetHighlightTransparency(TheAppSetting.TransparencyLevel);
+	m_pcBaseView->GetHighlightSelection()->SetHighlightMode(ThePreset.HighlightMode);
+	m_pcBaseView->GetSelection()->SetHighlightTransparency(ThePreset.TransparencyLevel);
 
-	if (TheAppSetting.RefSelType == "Spriting")
+	if (ThePreset.RefSelType == "Spriting")
 		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelSpriting);
-	else if (TheAppSetting.RefSelType == "Off")
+	else if (ThePreset.RefSelType == "Off")
 		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelOff);
 	else
 		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelDefault);
@@ -957,23 +953,23 @@ void Canvas::ViewReady()
 
 	GetBaseView()->SetSuppressUpdate(true);
 
-	GetBaseView()->SetSplatRendering(BOOL2bool(TheAppSetting.SplatRendering));
+	GetBaseView()->SetSplatRendering(BOOL2bool(ThePreset.SplatRendering));
 
-	GetBaseView()->SetFastMarkerDrawing(TheAppSetting.FastMarkers);
+	GetBaseView()->SetFastMarkerDrawing(ThePreset.FastMarkers);
 
 	HC_Open_Segment_By_Key(GetBaseView()->GetShadowMapSegmentKey()); {
 		char opt[MVO_BUFFER_SIZE];
 
 		sprintf(opt, "shadow map=(%s, resolution=%d, samples=%d, %s jitter)",
-			TheAppSetting.ShadowMap ? "on" : "off",
-			TheAppSetting.SMResolution, TheAppSetting.SMSamples, TheAppSetting.Jitter ? "" : "no");
+			ThePreset.ShadowMap ? "on" : "off",
+			ThePreset.SMResolution, ThePreset.SMSamples, ThePreset.Jitter ? "" : "no");
 
 		HC_Set_Rendering_Options(opt);
 	} HC_Close_Segment();
 
 
 	HC_Open_Segment_By_Key(GetBaseView()->GetSceneKey()); {
-		if (TheAppSetting.ShadowMap) {
+		if (ThePreset.ShadowMap) {
 			HC_Set_Visibility("shadows = (emitting, casting, receiving)");
 		}
 	
@@ -981,19 +977,19 @@ void Canvas::ViewReady()
 		char refl_opt[MVO_BUFFER_SIZE];
 
 		HCLOCALE(sprintf(opt, "simple reflection=(%s, opacity=%f, fading= %s, ",
-			TheAppSetting.ReflectionPlane ? "on" : "off",
-			TheAppSetting.ReflectionOpacity, TheAppSetting.ReflectionFading ? "on" : "off"));
+			ThePreset.ReflectionPlane ? "on" : "off",
+			ThePreset.ReflectionOpacity, ThePreset.ReflectionFading ? "on" : "off"));
 
-		if (TheAppSetting.ReflectionUseAttenuation) {
+		if (ThePreset.ReflectionUseAttenuation) {
 			HCLOCALE(sprintf(refl_opt, "attenuation = (hither=%f, yon=%f), ",
-				TheAppSetting.ReflectionHither, TheAppSetting.ReflectionYon));
+				ThePreset.ReflectionHither, ThePreset.ReflectionYon));
 		}
 		else
 			sprintf(refl_opt, "no attenuation, ");
 		strcat(opt, refl_opt);
 
-		if (TheAppSetting.ReflectionUseBlur)
-			sprintf(refl_opt, "blur=%d)", TheAppSetting.ReflectionBlur);
+		if (ThePreset.ReflectionUseBlur)
+			sprintf(refl_opt, "blur=%d)", ThePreset.ReflectionBlur);
 		else
 			sprintf(refl_opt, "no blur)");
 		strcat(opt, refl_opt);
@@ -1002,29 +998,29 @@ void Canvas::ViewReady()
 	} HC_Close_Segment();
 
 
-	GetBaseView()->SetShadowLightDirection(TheAppSetting.UseLightVector, &TheAppSetting.LightVector);
-	GetBaseView()->SetShadowIgnoresTransparency(TheAppSetting.IgnoreTransparency);
-	GetBaseView()->SetShadowMode(TheAppSetting.ShadowMode);
-	GetBaseView()->SetOcclusionCullingMode(TheAppSetting.OcclusionCulling);
-	GetBaseView()->SetLineAntialiasing(TheKenelSetting.Appearance.AntiAliasing.Line);
-	GetBaseView()->SetTextAntialiasing(TheKenelSetting.Appearance.AntiAliasing.Text);
+	GetBaseView()->SetShadowLightDirection(ThePreset.UseLightVector, &ThePreset.LightVector);
+	GetBaseView()->SetShadowIgnoresTransparency(ThePreset.IgnoreTransparency);
+	GetBaseView()->SetShadowMode(ThePreset.ShadowMode);
+	GetBaseView()->SetOcclusionCullingMode(ThePreset.OcclusionCulling);
+	GetBaseView()->SetLineAntialiasing(TheKenel.Appearance.AntiAliasing.Line);
+	GetBaseView()->SetTextAntialiasing(TheKenel.Appearance.AntiAliasing.Text);
 
 	SetTransparency();
 
 	//Turn on static model and display lists last, and in that order
-	hmodel->SetStaticModel(TheKenelSetting.Performance.Optimization.StaticModel);
+	hmodel->SetStaticModel(TheKenel.Performance.Optimization.StaticModel);
 
-	hmodel->SetLMVModel(TheKenelSetting.Performance.Optimization.LMVModel);
+	hmodel->SetLMVModel(TheKenel.Performance.Optimization.LMVModel);
 
-	if (TheAppSetting.RestoreAnnotations) {
+	if (ThePreset.RestoreAnnotations) {
 		GetBaseView()->SetAnnotationResize(true);
 	}
 
-	if (DisplayListOff == TheAppSetting.DisplayList) {
+	if (DisplayListOff == ThePreset.DisplayList) {
 		GetBaseView()->SetDisplayListMode(false);
 	}
 	else {
-		GetBaseView()->SetDisplayListType(TheAppSetting.DisplayList);
+		GetBaseView()->SetDisplayListType(ThePreset.DisplayList);
 		GetBaseView()->SetDisplayListMode(true);
 	}
 
@@ -1047,18 +1043,18 @@ void Canvas::ViewReady()
 
 void Canvas::SetupViews()
 {
-	GetBaseView()->SetRenderMode(TheAppSetting.RenderMode, true);
-	GetBaseView()->SetShadowMode(TheAppSetting.ShadowMode);
-	GetBaseView()->SetOcclusionCullingMode(TheKenelSetting.Performance.Optimization.OcclusionCulling, true);
+	GetBaseView()->SetRenderMode(ThePreset.RenderMode, true);
+	GetBaseView()->SetShadowMode(ThePreset.ShadowMode);
+	GetBaseView()->SetOcclusionCullingMode(TheKenel.Performance.Optimization.OcclusionCulling, true);
 }
 
 void Canvas::EnableFrameRate(bool onoff)
 {
-	int nSteps = (TheAppSetting.DynamicAdjustment ? TheKenelSetting.Performance.FramerateOptimization.DetailSteps : 0);
+	int nSteps = (ThePreset.DynamicAdjustment ? TheKenel.Performance.FramerateOptimization.DetailSteps : 0);
 
 	if (onoff) {
-		GetBaseView()->SetFramerateMode(FramerateTarget, TheKenelSetting.Performance.FramerateOptimization.FramerateTime,
-			TheKenelSetting.Performance.FramerateOptimization.MaxThreshold, UINT2bool(TheKenelSetting.Performance.FramerateOptimization.UseLods), nSteps);
+		GetBaseView()->SetFramerateMode(FramerateTarget, TheKenel.Performance.FramerateOptimization.FramerateTime,
+			TheKenel.Performance.FramerateOptimization.MaxThreshold, UINT2bool(TheKenel.Performance.FramerateOptimization.UseLods), nSteps);
 	}
 	else {
 		GetBaseView()->SetFramerateMode(FramerateOff);
@@ -1325,6 +1321,35 @@ DWORD Canvas::MouseMapFlags(DWORD state)
 	return nFlag;
 }
 
+#include "3DF.Operator.KeyboardTest.h"
+//:TEMP
+Operator::KeyboardTest* g_pOperator = nullptr;
+
+bool Canvas::KeyboardInput(Json::Object& input)
+{
+	using namespace Signal;
+
+	if (g_pOperator == nullptr) {
+		g_pOperator = new Operator::KeyboardTest(this->m_pcWindow);
+	}
+
+	View::Action action = (View::Action)input.GetInteger(SKW_ACTION);
+
+	switch (action) {
+	case View::Action::OnChar:
+	case View::Action::OnKeyDown:
+	case View::Action::OnKeyUp:
+	case View::Action::OnInput:
+		g_pOperator->OnKeyboard(input);
+		break;
+
+	default:
+		return false;
+	}
+
+	return true;
+}
+
 //== Operator 관련 함수 ==============================================================================
 
 void Canvas::SetDefaultOperator()
@@ -1405,5 +1430,5 @@ void Canvas::ClearClashList()
 	m_pcClashList = new_vlist(malloc, free);
 }
 
-#undef TheAppSetting
-
+#undef TheKernel
+#undef ThePreset

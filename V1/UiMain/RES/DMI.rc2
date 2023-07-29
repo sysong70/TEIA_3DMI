@@ -8,7 +8,7 @@ FILE_3D_CMD_SaveAs                                SVG       "res/svg/FILE_3D_CMD
 FILE_3D_CMD_Export                                SVG       "res/svg/FILE_3D_CMD_Export.svg"
 FILE_3D_CMD_Print                                 SVG       "res/svg/FILE_3D_CMD_Print.svg"
 FILE_3D_PNL_Settings                              SVG       "res/svg/FILE_3D_PNL_Settings.svg"
-FILE_3D_CMD_Preference                            SVG       "res/svg/FILE_3D_CMD_Preference.svg"
+FILE_3D_CMD_Options                               SVG       "res/svg/FILE_3D_CMD_Options.svg"
 HOME_3D_PNL_Panels                                SVG       "res/svg/HOME_3D_PNL_Panels.svg"
 HOME_3D_CMD_Panels_Model                          SVG       "res/svg/HOME_3D_CMD_Panels_Model.svg"
 HOME_3D_CMD_Panels_View                           SVG       "res/svg/HOME_3D_CMD_Panels_View.svg"

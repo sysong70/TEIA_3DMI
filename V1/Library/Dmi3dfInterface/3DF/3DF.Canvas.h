@@ -4,7 +4,7 @@
 
 #include "3DF.h"
 #include "3DF.BaseView.h"
-#include "3DF.Facility.Preference.h"
+#include "3DF.Facility.AppOptions.h"
 
 #include "3DF.NavigationCube.h"
 
@@ -108,6 +108,11 @@ public:
 protected:
 	DWORD MouseMapFlags(DWORD state);
 
+public:
+
+	//:Ken - 20230607
+	bool KeyboardInput(Json::Object& input);
+
 	//== Operator 관련 함수 ==========================================================================
 protected:
 	void SetDefaultOperator();
@@ -120,7 +125,7 @@ public:
 
 	//== 환경 변수 관련 함수 ==========================================================================
 protected:
-	Facility::KernelSetting m_cPreference;
+	Facility::KernelOption m_cPreference;
 
 	//== 운영 변수 ===================================================================================
 public:
