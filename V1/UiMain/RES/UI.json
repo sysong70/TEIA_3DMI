@@ -132,37 +132,7 @@
 				{"type":"check", "name":"Solids", "title":"Solid|_#_", "desc":"Allows reading of solid parts.|_#_"},
 				{"type":"check", "name":"Surfaces", "title":"Surfaces|_#_", "desc":"Allows reading of surfaces entities.|_#_"},
 				{"type":"check", "name":"Wireframes", "title":"Wireframes|_#_", "desc":"_#_|_#_"},
-				{"type":"check", "name":"Attributes", "title":"Attributes|_#_", "desc":"_#_|_#_"},
-				{"type":"check", "name":"HiddenObjects", "title":"Hidden Objects|_#_", "desc":"_#_|_#_"},
-				{"type":"check", "name":"References", "title":"Construction and References|_#_", "desc":"_#_|_#_"},
-				{"type":"check", "name":"ActiveFilter", "title":"Active Filter|_#_", "desc":"_#_|_#_"},
-				{"type":"check", "name":"SewModel", "title":"Sew Model|_#_", "desc":"_#_|_#_"},
-				{"type":"edit", "name":"SewingTolerance", "title":"Sewing Tolerance|_#_", "desc":"_#_|_#_", "value":"0.001"},
-				{"type":"check", "name":"ShellOrientation", "title":"Compute Non-Solid Shell Orientation|_#_", "desc":"_#_|_#_"},
-				{"type":"drop", "name":"LoadingMode", "title":"Loading Mode|_#_", "desc":"_#_|_#_", "value":0, "items":[
-					"Complete|_#_",
-					"Incremental|_#_"
-				]}
-			]},
-			{"type":"group", "name":"Tessellation", "title":"Tessellation", "items":[
-				{"type":"drop", "name":"TessLevel", "title":"Predefined Tessellation Level|_#_", "value":2, "items":[
-					"Extra Low|_#_",
-					"Low|_#_",
-					"Medium|_#_",
-					"High|_#_",
-					"Extra High|_#_",
-					"Custom|_#_"
-				]},
-				{"type":"group", "name":"CustomTessLevel", "title":"Custom Tessellation Level", "items":[
-					{"type":"drop", "name":"ChordLimitType", "title":"Chord Limit|_#_", "desc":"_#_|_#_", "value":1, "items":[
-						"Ratio|_#_",
-						"Height|_#_"
-					]},
-					{"type":"edit", "name":"ChordLimit", "title":"Limit|_#_", "desc":"_#_|_#_", "value":10000},
-					{"type":"edit", "name":"AngleTolerance", "title":"Angle Tolerance|_#_", "desc":"_#_|_#_", "value":40}
-				]},
-				{"type":"check", "name":"PreserveUV", "title":"Preserve UV Points|_#_", "desc":"_#_|_#_"},
-				{"type":"edit", "name":"MaxEdgeLength", "title":"Maximum Edge Length|_#_", "desc":"_#_|_#_", "value":"0"},
+				{"type":"check", "name":"Attributes", "title":"Attributes|_#_", "desc":"_#_|_cc
 				{"type":"group", "name":"Accurate", "title":"Accurate Tessellation|_#_", "items":[
 					{"type":"check", "name":"AccurateTess", "title":"Accurate Tessellation|_#_", "desc":"_#_|_#_"},
 					{"type":"check", "name":"GridAlignedTess", "title":"Grid Aligned Tessellation|_#_", "desc":"_#_|_#_"},

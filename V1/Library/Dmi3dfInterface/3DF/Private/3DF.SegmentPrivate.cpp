@@ -156,4 +156,3 @@ void SegmentKeyPrivate::SetColor(CString strInGeometryName, RGBAColor cInColor)
 
 	HC_Set_Color(H_ASCII_TEXT(strColorText));
 }
-

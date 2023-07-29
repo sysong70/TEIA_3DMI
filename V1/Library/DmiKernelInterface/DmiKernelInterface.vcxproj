@@ -12,15 +12,15 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{1B664A17-DD85-4E85-8546-3655FACA8825}</ProjectGuid>
-    <Keyword>MFCDLLProj</Keyword>
-    <RootNamespace>DmiC3dInterface</RootNamespace>
+    <ProjectGuid>{0F027AB5-6D86-4FEE-BE16-42A6B5B5CD4F}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>3DmiCommandAnalyzer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <SccProjectName>SAK</SccProjectName>
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
     <SccProvider>SAK</SccProvider>
-    <ProjectName>C3dInterface</ProjectName>
+    <ProjectName>KernelInterface</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -28,7 +28,6 @@
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
-    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -36,7 +35,6 @@
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
-    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -70,30 +68,22 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_WINDOWS;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;3DMICOMMANDANALYZER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../../Library/Common;../../Library/C3D/Kernel/Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Common</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <ModuleDefinitionFile>
-      </ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>../../Library/C3D/Kernel/$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>c3d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>$(TargetProd)3dfInterface.lib;$(TargetProd)C3dInterface.lib;$(TargetProd)3dxInterface.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(DmiOutDir)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(DmiOutDir)\$(TargetName).lib</ImportLibrary>
       <ProgramDatabaseFile>$(DmiSymbolsDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <ProfileGuidedDatabase>$(DmiSymbolsDir)\$(TargetName).pgd</ProfileGuidedDatabase>
-      <ImportLibrary>$(DmiOutDir)\$(TargetName).lib</ImportLibrary>
     </Link>
-    <Midl>
-      <MkTypLibCompatible>false</MkTypLibCompatible>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </Midl>
-    <ResourceCompile>
-      <Culture>0x0412</Culture>
-      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -103,56 +93,47 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_WINDOWS;NDEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;3DMICOMMANDANALYZER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>../../Library/Common;../../Library/C3D/Kernel/Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Common</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <ModuleDefinitionFile>
-      </ModuleDefinitionFile>
-      <AdditionalLibraryDirectories>../../Library/C3D/Kernel/$(Configuration)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>c3d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalDependencies>$(TargetProd)3dfInterface.lib;$(TargetProd)3dxInterface.lib;$(TargetProd)C3dInterface.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(DmiOutDir)</AdditionalLibraryDirectories>
       <ImportLibrary>$(DmiOutDir)\$(TargetName).lib</ImportLibrary>
       <ProgramDatabaseFile>$(DmiSymbolsDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <ProfileGuidedDatabase>$(DmiSymbolsDir)\$(TargetName).pgd</ProfileGuidedDatabase>
     </Link>
-    <Midl>
-      <MkTypLibCompatible>false</MkTypLibCompatible>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-    </Midl>
-    <ResourceCompile>
-      <Culture>0x0412</Culture>
-      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-    </ResourceCompile>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Common\Common_Define.h" />
+    <ClInclude Include="..\Common\Fio.h" />
+    <ClInclude Include="..\Common\Json.h" />
+    <ClInclude Include="..\Common\WStr.h" />
+    <ClInclude Include="DLL\DmiKernelInterfaceDll.h" />
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="DmiSignalAnalyzer.h" />
+  </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\Common_Define.cpp" />
     <ClCompile Include="..\Common\Fio.cpp" />
     <ClCompile Include="..\Common\Json.cpp" />
-    <ClCompile Include="..\Common\Path.cpp" />
     <ClCompile Include="..\Common\WStr.cpp" />
+    <ClCompile Include="DLL\DmiKernelInterfaceDll.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="DmiC3dInterface.cpp" />
-    <ClCompile Include="DmiC3dModeler.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\Common\Common_Define.h" />
-    <ClInclude Include="..\Common\Fio.h" />
-    <ClInclude Include="..\Common\Json.h" />
-    <ClInclude Include="..\Common\Path.h" />
-    <ClInclude Include="..\Common\WStr.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="DmiC3dInterface.h" />
-    <ClInclude Include="DmiC3dModeler.h" />
+    <ClCompile Include="DmiSignalAnalyzer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

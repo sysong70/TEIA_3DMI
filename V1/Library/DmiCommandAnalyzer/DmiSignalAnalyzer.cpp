@@ -152,4 +152,4 @@ void DmiSignalAnalyzer::SendCommandToMainFrame(UINT nMsg, WPARAM wParam, LPARAM 
 	}
 
 	m_lpfnMainFrameSendMessageCallback(nMsg, wParam, lParam);
-}
+}	

@@ -43,6 +43,29 @@ namespace Operator
 			double dObjectSnapRadius = 0.0;
 		};
 
+		class SnapPoint
+		{
+		public:
+			SnapPoint() {};
+			SnapPoint(const SnapPoint & cInThat);
+			SnapPoint & operator = (const SnapPoint & cInThat);
+
+			WorldPoint cPoint;
+			Type eType = Type::None;
+			Status eStatus = Status::Normal;
+		};
+
+		class SnapItem
+		{
+		public:
+			SnapItem() {};
+
+			bool operator == (const SnapItem & cInThat) const;
+
+			std::vector<SnapPoint> vcSnapPoints;
+			std::vector <TDF::SelectionItem> vcItems;
+		};
+
 		ObjectSnap(WindowKey * pcWindow);
 
 		int NoButtonDownAndMove(HEventInfo & cInEvent);
@@ -50,25 +73,28 @@ namespace Operator
 	protected:
 
 		void CalculationObjectSnapPoint(TDF::SelectionResults& cInItems);
-		bool CalculationLienObjectSnapPoint(const Key & cInLineKey, const WindowPoint & cInPoint, const MatrixKit & cModelingMatrix);
-		void CalculationLienAndLineObjectSnapPoint(LineKey & cLine1, LineKey & cLine2, const MatrixKit & cMatrix1, const MatrixKit & cMatrix2);
+		bool CalculationLienObjectSnapPoint(const SelectionItem * pcInSelectionItem, const WindowPoint & cInPoint);
+		void CalculationLienAndLineObjectSnapPoint(const SelectionItem * cInItems1, const SelectionItem * cInItems2, 
+			const MatrixKit & cMatrix1, const MatrixKit & cMatrix2);
 
 	public:
 
 		void DrawSnapItems(bool bUpdate = true);
-		void DrawSnapItem(SnapItem * pcInItem, CamerInformation & cInCameraInfo, bool bUpdate = true);
-		void DrawSnapPoint(SnapItem * pItem, Point2D center, double dRadius);
+		//void DrawSnapItem(SnapItem * pcInItem, CamerInformation & cInCameraInfo, bool bUpdate = true);
+
+		void DrawSnapPoint(SnapPoint & cSnapPoint, CamerInformation & cInCameraInfo);
+		void DrawSnapPoint(Point2D center, Status eInStatus, Type eInType, double dUnit);
+
 		double PixelToWorld(double unit);
 		bool ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo);
 
 	private:
-
-		bool AddSnapItem(Key & cInKey, Point cSnapPoint, Type eType);
+		bool AddSnapItems(SnapItem * psInSnapItem);
+		bool AddSnapItem(SnapItem * psInSnapItem, Point cInSnapPoint, Type eInType);
 		void ClearSnapItems(bool bUpdate);
 		void ResetSnapItem();
 
 	protected:
-
 		SelectionResults m_cNewHighlightSelection;
 		SelectionResults m_cOldHighlightSelection;
 		SelectionResults m_cHighlightSelection;
@@ -85,19 +111,9 @@ namespace Operator
 		DWORD m_nSelectPickCount;
 
 		std::vector<SnapItem *> m_vSnapItems;
-	};
 
-	class SnapItem
-	{
-	public:
-		SelectionItem m_cItem;
-
-		WorldPoint cPoint;
-		ObjectSnap::Type eType = ObjectSnap::Type::None;
-		ObjectSnap::Status eStatus = ObjectSnap::Status::Normal;
-
-		std::vector<WorldPoint> m_cPoints;
-		std::vector<ObjectSnap::Type> m_cTypes;
+		int m_nTotalSnapItemCount = 5;
 	};
 }
+
 CLOSE_3DF_NAMESPACE

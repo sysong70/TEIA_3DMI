@@ -38,8 +38,7 @@ class HighlightControl : public Control
 {
 public:
 	explicit HighlightControl(WindowKey const & cInWindow);
-	HighlightControl(HighlightControl const & cInThat);
-	~HighlightControl();
+	//HighlightControl(HighlightControl const & cInThat);
 
 	void Set(HighlightControl const & cInThat);
 	HighlightControl & operator=(HighlightControl const & cInThat);
@@ -47,13 +46,28 @@ public:
 	TDF::Type ObjectType() const { return TDF::Type::HighlightControl; };
 
 	HighlightControl & Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting = true);
+	HighlightControl & Highlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting = true);
 
 	HighlightControl & Unhighlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions = HighlightOptionsKit());
 	HighlightControl & Unhighlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions = HighlightOptionsKit());
 
+	//== Material Mapping 관련 함수 ==================================================================
+	HighlightControl & SetMaterialMapping(MaterialMappingKit const & cInKit);
+	MaterialMappingControl GetMaterialMappingControl();
+	MaterialMappingControl const GetMaterialMappingControl() const;
+
+	//== Line Attribute 관련 함수 ====================================================================
+	//HighlightControl & SetLineAttribute(LineAttributeKit const & cInKit);
+
+	LineAttributeControl GetLineAttributeControl();
+	LineAttributeControl const GetLineAttributeControl() const;
+
+
 private:
 	// Private default constructor to prevent instantiation without a window.
 	HighlightControl();
+
+	HighlightControl & Highlight_ORG(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting = true);
 };
 
 CLOSE_3DF_NAMESPACE

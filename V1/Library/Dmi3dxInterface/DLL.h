@@ -15,7 +15,7 @@
 extern "C" {
 #endif  / * __cplusplus * /
 
-	_declspec (dllexport) bool _3DFImportFile(CString pchFilePathName, TDF::SegmentKey & cModelSegmentKey, Signal::Delivery & cInDelivery, CString & strErrorMessage);
+	_declspec (dllexport) bool TDFImportFile(CString pchFilePathName, TDF::SegmentKey & cModelSegmentKey, Signal::Delivery & cInDelivery, CString & strErrorMessage);
 
 #ifdef __cplusplus
 }

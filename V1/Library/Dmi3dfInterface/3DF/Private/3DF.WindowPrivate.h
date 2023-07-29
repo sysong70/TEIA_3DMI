@@ -5,9 +5,13 @@
 
 #include <hc.h>
 
+class HSelectionSet;
+
 OPEN_3DF_NAMESPACE
 
 class BaseView;
+class HighlightControl;
+class SelectionControl;
 
 class WindowKeyPrivate : public PrivateImpl
 {
@@ -19,6 +23,20 @@ public:
 
 	TDF::BaseView * GetBaseView() { return (TDF::BaseView *) m_pcBaseView; }
 	const TDF::BaseView * m_pcBaseView = nullptr;
+
+	HSelectionSet * m_pcSelectionSet = nullptr;
+
+	SelectionControl * m_pcSelection = nullptr;
+	HighlightControl * m_pcHighlight = nullptr;
+	SelectionOptionsControl * m_pcSelectionOptions = nullptr;
+
+/*
+	HSelectionSet * GetSelection() { return m_pcSelection; }
+	HSelectionSet * m_pcSelection = nullptr;
+
+	HSelectionSet * GetHighlight() { return m_pcHighlight; }
+	HSelectionSet * m_pcHighlight = nullptr;
+*/
 
 	int m_nViewId = -1;
 

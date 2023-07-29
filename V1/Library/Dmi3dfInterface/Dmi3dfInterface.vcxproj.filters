@@ -282,6 +282,12 @@
     <ClInclude Include="3DF\3DF.h">
       <Filter>3DF</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\Private\3DF.HighlightPrivate.h">
+      <Filter>3DF\Key\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Operator.KinematicTest.h">
+      <Filter>Operator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -496,6 +502,12 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.cpp">
       <Filter>3DF</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Private\3DF.HighlightPrivate.cpp">
+      <Filter>3DF\Key\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Operator.KinematicTest.cpp">
+      <Filter>Operator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

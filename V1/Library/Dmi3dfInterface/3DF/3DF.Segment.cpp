@@ -13,6 +13,7 @@
 #include "3DF.VisualEffects.h"
 #include "3DF.Material.h"
 #include "3DF.MarkerAttribute.h"
+#include "3DF.LineAttribute.h"
 
 #include "3DF.Camera.h"
 
@@ -73,9 +74,6 @@ void TDF::SegmentKey::Set(SegmentKey const & cInThat)
 SegmentKey & TDF::SegmentKey::operator = (SegmentKey const & cInThat)
 {
 	Key::Set(cInThat);
-
-	m_nModelIncludeKey = cInThat.ModelInclude().KeyValue();
-	m_nStylesIncludeKey = cInThat.StylesInclude().KeyValue();
 
 	return *this;
 }
@@ -430,6 +428,18 @@ LineKey TDF::SegmentKey::InsertLine(size_t in_count, Point const pcInPoints[])
 	return cLine;
 }
 
+LineAttributeControl TDF::SegmentKey::GetLineAttributeControl()
+{
+	LineAttributeControl cControl(*this);
+	return cControl;
+}
+
+LineAttributeControl const TDF::SegmentKey::GetLineAttributeControl() const
+{
+	LineAttributeControl cControl(*(SegmentKey *)this);
+	return cControl;
+}
+
 //== Circle 관련 함수 ============================================================================
 CircleKey TDF::SegmentKey::InsertCircle(Point const & cInCenter, float fInRadius, Vector const & cInNormal)
 {
@@ -695,92 +705,6 @@ bool TDF::SegmentKey::ShowCamera(CameraKit & cOutKit) const
 }
 
 //== Model Segment 관련 함수 =====================================================================
-
-// Model용 Segment를 구성한다.
-void TDF::SegmentKey::ConfigureSegmentModel()
-{
-	//---- model include 구성 -----
-	// Model이 들아갈 Include 구성을 한다.
-	// 이 영역에, Modeling data와 Style data를 구성한다.
-	SegmentKeyPrivate::LocalOpen(*this);
-
-	SegmentKey cModelInclude = Subsegment(L"model_include");
-	cModelInclude.SetVisibility(L"off");
-
-	BoundingKit cBounding;
-	cBounding.SetExclusion(true);
-	cModelInclude.SetBounding(cBounding);
-
-	SegmentKey cIncludeSegment = cModelInclude.Subsegment();
-	cIncludeSegment = cIncludeSegment.Subsegment();
-	m_nModelIncludeKey = cIncludeSegment.KeyValue();
-	m_nStylesIncludeKey = cIncludeSegment.Subsegment(L"styles").KeyValue();
-
-	//SegmentKey cPortfolios = Subsegment(L"portfolios");
-
-// 	m_cPartsIncludeSegment = cIncludeSegment.Subsegment(L"parts");
-// 	m_cPoccsIncludeSegment = cIncludeSegment.Subsegment(L"poccs");
-// 	m_cRisIncludeSegment = cIncludeSegment.Subsegment(L"ris");
-
-	SegmentKeyPrivate::LocalClose(*this);
-
-	//---- Portfolio 구성 -----
-	// 앞으로 사용을 위해서 미리 한개를 만들어 놓는다.
-// 	TDF::PortfolioKey cPortfolio(cPortfolios.KeyValue());
-// 	m_cPortfolioControl.Push(cPortfolio);
-
-/*
-	HC_KEY nPrtfolioKey = HC_Open_Segment("/portfolios");
-	HC_Set_Priority(nPrtfolioKey, 0);
-	HC_KEY nNewPortfolioKey = HC_Create_Segment("");
-	HC_Close_Segment();
-
-	int nCount = 0;
-	HC_Open_Segment_By_Key(nRootKey);
-		HC_Begin_Contents_Search(".", "segments"); 
-		HC_Show_Contents_Count(&nCount);
-	HC_Close_Segment();
-
-	PortfolioKey cPortfolioKey(nNewPortfolioKey);
-	
-
-	char chModelOwner[MVO_BUFFER_SIZE];
-	HC_KEY nModelOwnerKey = HC_Show_Owner_By_Key(m_nKey, chModelOwner);
-
-	char chModelOwner1[MVO_BUFFER_SIZE];
-	HC_KEY nModelOwnerKey1 = HC_Show_Owner_By_Key(nModelOwnerKey, chModelOwner1);
-
-	HC_KEY nTestRoot = HC_Open_Segment("/");
-	HC_Close_Segment();
-
-	int i = 0;
-*/
-}
-
-SegmentKey TDF::SegmentKey::ModelInclude()
-{
-	SegmentKey cModelInclude(m_nModelIncludeKey);
-	return cModelInclude;
-}
-
-SegmentKey TDF::SegmentKey::ModelInclude() const
-{
-	SegmentKey cModelInclude(m_nModelIncludeKey);
-	return cModelInclude;
-}
-
-SegmentKey TDF::SegmentKey::StylesInclude()
-{
-	SegmentKey cStylesInclude(m_nStylesIncludeKey);
-	return cStylesInclude;
-}
-
-SegmentKey TDF::SegmentKey::StylesInclude() const
-{
-	SegmentKey cStylesInclude(m_nStylesIncludeKey);
-	return cStylesInclude;
-}
-
 SegmentKey & TDF::SegmentKey::SetModellingMatrix(MatrixKit const & cInKit)
 {
 	SegmentKeyPrivate::LocalOpen(*this);

@@ -2,8 +2,11 @@
 #include "dllmain.h"
 #include "3DF/3DF.Operator.ObjectSnap.h"
 
-HMODULE Application::Instance = nullptr;
+// #define _CRTDBG_MAP_ALLOC
+// #include <stdlib.h>
+// #include <crtdbg.h>
 
+HMODULE Application::Instance = nullptr;
 
 
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
@@ -22,6 +25,8 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 		case DLL_THREAD_DETACH:
 		case DLL_PROCESS_DETACH:
 			int i = 0;
+// 			_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_DEBUG);
+// 			_CrtDumpMemoryLeaks();
 			break;
 	}
 

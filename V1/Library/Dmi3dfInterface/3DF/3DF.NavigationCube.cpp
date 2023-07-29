@@ -89,6 +89,7 @@ NavigationCube::NavigationCube(TDF::BaseView * view, WindowKey * pcInWindow) :
 	m_pView(view),
 	m_pcWindow(pcInWindow)
 {
+	m_pcWindow = pcInWindow;
 }
 
 NavigationCube::~NavigationCube()
@@ -115,7 +116,7 @@ int NavigationCube::LButtonUp(HEventInfo & cInEvent)
 	}
 
 	CString strName = cSelectKey.Name();
-	TRACE(L"%s\n", strName);
+	// TRACE(L"%s\n", strName);
 
 	m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
 	m_cOldHighlightSelection.Reset();
@@ -150,12 +151,14 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 	int nEvent = HLISTENER_PASS_EVENT;
 	bool bUpdateFlag = false;
 
+	const SelectionControl * pcSelect = &m_pcWindow->GetSelectionControl();
+
 	SelectionResults cSelection;
 	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cPoint, cSelectOption, cSelection);
 
 	// 선택된 요소가 없은 경우
 	if (0 == nSelectedCount) {
-		TRACE(L"NavigationCube No Selection\n");
+		// TRACE(L"NavigationCube No Selection\n");
 
 		// 기존에 선택된 요소가 있는 경우 처리
 		if (0 < m_cOldHighlightSelection.GetCount()) {
@@ -165,7 +168,7 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 		}
 	}
 	else {
-		TRACE(L"NavigationCube Selection: %d\n", nSelectedCount);
+		// TRACE(L"NavigationCube Selection: %d\n", nSelectedCount);
 
 		// 이전에 선택된것과 다른 경우
 		if (m_cOldHighlightSelection != cSelection) {
@@ -183,7 +186,7 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 			}
 
 			if (true == bFindFlag) {
-				TRACE(L"NavigationCube Find\n");
+				// TRACE(L"NavigationCube Find\n");
 
 				HighlightOptionsKit cHighlightOptions;
 				m_pcWindow->GetHighlightControl().Highlight(cSelection, cHighlightOptions, true);
@@ -193,7 +196,7 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 			else {
 				m_cOldHighlightSelection.Reset();
 
-				TRACE(L"NavigationCube No Find\n");
+				// TRACE(L"NavigationCube No Find\n");
 			}
 
 			bUpdateFlag = true;
@@ -217,7 +220,8 @@ void NavigationCube::SetSize(ESize size)
 
 
 
-void NavigationCube::SetView(TDF::BaseView * view, WindowKey * pcInWindow) {
+void NavigationCube::SetView(TDF::BaseView * view, WindowKey * pcInWindow) 
+{
 	m_pView = view;
 	m_pcWindow = pcInWindow;
 }

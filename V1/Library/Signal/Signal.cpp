@@ -287,11 +287,21 @@ void Signal::View::OnCommand(UINT id)
 	Wrapper().SendData(data);
 }
 
-
-
 void Signal::View::OnCancel()
 {
 	SendActionDataOnly(Action::OnCancel);
+}
+
+void Signal::View::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	Json::Object data;
+	ConstructData(data, Action::OnChar);
+
+	data.SetInteger(SKW_CHAR, nChar);
+	data.SetInteger(SKW_REPCNT, nRepCnt);
+	data.SetInteger(SKW_FLAGS, nFlags);
+
+	Wrapper().SendData(data);
 }
 
 #define SendMouseData(action) \

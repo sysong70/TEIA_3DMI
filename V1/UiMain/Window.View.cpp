@@ -162,6 +162,9 @@ void Window::View::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 		if (m_inputBar.IsVisible()) {
 			m_inputBar.OnChar(nChar, nRepCnt, nFlags);
 		}
+		else {
+			m_delivery.view.OnChar(nChar, nRepCnt, nFlags);
+		}
 		break;
 	}
 

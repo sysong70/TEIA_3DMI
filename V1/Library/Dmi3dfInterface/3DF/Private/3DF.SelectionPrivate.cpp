@@ -251,11 +251,15 @@ bool TDF::SelectionControlPrivate::SorterFunction(const void * pcArg1, const voi
 
 int TDF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
 {
+	if (nullptr == m_pcSelectionSet) {
+		return HOP_NOT_HANDLED;
+	}
+
 	HPoint  new_pos;
 	int		nResult = 0;
 	bool	need_update = false;
 
-	HSelectionSet * pcSelection = GetBaseView()->GetSelection();
+	//HSelectionSet * pcSelection = GetBaseView()->GetSelection();
 
 	// Markup 선택
 	HMarkupManager * pcMarkupManager;
@@ -263,7 +267,7 @@ int TDF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, UINT 
 		HC_Open_Segment_By_Key(pcMarkupManager->GetMarkupKey()); {
 			// compute the selection using the HOOPS window coordinate of the the pick location
 			nResult = HC_Compute_Selection(GetBaseView()->GetDriverPath(),
-				(pcSelection->GetSubwindowPenetration() ? "" : "."),
+				(m_pcSelectionSet->GetSubwindowPenetration() ? "" : "."),
 				//"v", cInLocation.x, cInLocation.y);
 				"v, selection level = entity, selection sorting, internal selection limit = 0", cInLocation.x, cInLocation.y);
 		} HC_Close_Segment();
@@ -272,7 +276,7 @@ int TDF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, UINT 
 	if (nResult == 0) {
 		HC_Open_Segment_By_Key(GetBaseView()->GetViewKey()); {
 			nResult = HC_Compute_Selection(".",
-				(pcSelection->GetSubwindowPenetration() ? "" : "./scene/overwrite"),
+				(m_pcSelectionSet->GetSubwindowPenetration() ? "" : "./scene/overwrite"),
 				//"v", cInLocation.x, cInLocation.y);
 				"v, selection level = entity, related selection limit = 0, selection sorting, internal selection limit = 0", cInLocation.x, cInLocation.y);
 		} HC_Close_Segment();

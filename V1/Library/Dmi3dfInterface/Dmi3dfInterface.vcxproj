@@ -137,9 +137,11 @@
     <ClInclude Include="3DF\3DF.LineAttribute.h" />
     <ClInclude Include="3DF\3DF.Math.Matrix.h" />
     <ClInclude Include="3DF\3DF.NavigationCube.h" />
+    <ClInclude Include="3DF\3DF.Operator.KinematicTest.h" />
     <ClInclude Include="3DF\3DF.Search.h" />
     <ClInclude Include="3DF\3DF.VisualEffects.h" />
     <ClInclude Include="3DF\3DF.Painter.h" />
+    <ClInclude Include="3DF\Private\3DF.HighlightPrivate.h" />
     <ClInclude Include="3DF\Private\3DF.SearchPrivate.h" />
     <ClInclude Include="3DF\Private\3DF.SegmentPrivate.h" />
     <ClInclude Include="3DF\Private\3DF.WindowPrivate.h" />
@@ -233,6 +235,7 @@
     <ClCompile Include="3DF\3DF.NavigationCube.cpp" />
     <ClCompile Include="3DF\3DF.Object.cpp" />
     <ClCompile Include="3DF\3DF.Operator.CameraSelect.cpp" />
+    <ClCompile Include="3DF\3DF.Operator.KinematicTest.cpp" />
     <ClCompile Include="3DF\3DF.Operator.ObjectSnap.cpp" />
     <ClCompile Include="3DF\3DF.Operator.SelectArea.cpp" />
     <ClCompile Include="3DF\3DF.PMI.Entity.cpp" />
@@ -253,6 +256,7 @@
     <ClCompile Include="3DF\3DF.VisualEffects.cpp" />
     <ClCompile Include="3DF\3DF.Window.cpp" />
     <ClCompile Include="3DF\3DF.Painter.cpp" />
+    <ClCompile Include="3DF\Private\3DF.HighlightPrivate.cpp" />
     <ClCompile Include="3DF\Private\3DF.KeyPrivate.cpp" />
     <ClCompile Include="3DF\Private\3DF.SearchPrivate.cpp" />
     <ClCompile Include="3DF\Private\3DF.SegmentPrivate.cpp" />

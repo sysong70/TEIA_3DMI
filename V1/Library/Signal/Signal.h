@@ -46,6 +46,10 @@
 #define SKW_Y				"y"
 #define SKW_Z				"z"
 
+#define SKW_CHAR			"Char"
+#define SKW_REPCNT			"RepCnt"
+#define SKW_FLAGS			"Flags"
+
 // enum, struct
 
 namespace Signal
@@ -338,6 +342,8 @@ namespace Signal
 			OnResize,
 			OnText,
 
+			OnChar, // Test용
+
 			SetValidation, // complete opening file
 			PaintOverlap, // complete OnPaint
 			SetObjectSnapPoints,
@@ -362,6 +368,8 @@ namespace Signal
 		// id: enum Command
 		void OnCommand(UINT id);
 		void OnCancel();
+
+		void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 
 		void OnMouseMove(UINT flags, int x, int y);
 		void OnLButtonDown(UINT flags, int x, int y, int osnapId = -1);

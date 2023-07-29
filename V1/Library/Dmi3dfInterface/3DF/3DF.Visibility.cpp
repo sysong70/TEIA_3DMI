@@ -150,6 +150,11 @@ VisibilityControl::VisibilityControl(SegmentKey & cInSegmentKey) :
 
 //== Set Visibility Control ========================================================================
 
+VisibilityControl & VisibilityControl::SetCuttingSections(bool bInValue)
+{
+	return SetVisibility("cutting planes", bInValue);
+}
+
 VisibilityControl & VisibilityControl::SetWindows(bool bInValue)
 {
 	return SetVisibility("windows", bInValue);
@@ -201,6 +206,10 @@ VisibilityControl & VisibilityControl::SetEverything(bool bInValue)
 }
 
 //== Unset Selectability Control ===================================================================
+VisibilityControl & VisibilityControl::UnsetCuttingSections()
+{
+	return UnSetVisibility("cutting planes");
+}
 
 VisibilityControl & VisibilityControl::UnsetWindows()
 {
@@ -277,7 +286,7 @@ VisibilityControl & VisibilityControl::UnSetVisibility(CString strInType)
 
 	HC_UnSet_One_Visibility(H_ASCII_TEXT(strInType));
 
-	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
+	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);	
 
 	return *this;
 }

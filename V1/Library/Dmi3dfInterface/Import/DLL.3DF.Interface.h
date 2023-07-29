@@ -16,7 +16,7 @@ namespace TDF {
 		Helper m_cDLL{ L"3DMI3dxInterface.dll" };
 
 	public:
-		decltype(_3DFImportFile) * _3DFImportFile = m_cDLL["_3DFImportFile"];
+		decltype(TDFImportFile) * TDFImportFile = m_cDLL["TDFImportFile"];
 	};
 
 }

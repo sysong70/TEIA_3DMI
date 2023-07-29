@@ -285,6 +285,9 @@ bool Math::IntersectionPoint(Point cSP1, Point cEP1, Point cSP2, Point cEP2, Poi
 
 	// 교차점을 계산하기 위한 파라미터 계산
 	double dParam = cStartVec.Cross(cVec2).Dot(cNormal) / dNormalLengthSquared;
+	if (dParam < 1.0e-9) {
+		return false;
+	}
 
 	// 두 라인의 교차점 계산
 	cIntersectionPoint = cSP1 + cVec1 * dParam;

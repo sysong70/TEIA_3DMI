@@ -17,6 +17,7 @@ namespace Operator
 	class CameraSelect;
 	class CameraPan;
 	class SelectArea;
+	class KinematicTest;
 }
 
 //== Camera 관련 Class ==============================================================================
@@ -100,6 +101,10 @@ public:
 	bool MouseMove(int nFlags, int x, int y);
 
 	bool MouseWheel(int nFlags, int zDelta, int x, int y, Json::Object & cInObject);
+
+	//== Keyboard 관련 함수 ==========================================================================
+	bool Char(UINT nChar, UINT nRepCnt, UINT nFlags);
+
 protected:
 	DWORD MouseMapFlags(DWORD state);
 
@@ -124,6 +129,10 @@ public:
 	int ViewId() { return m_nViewId; }
 	void SetViewId(int nViewId);
 
+	//== Model 관련 함수 =============================================================================
+public:
+	SegmentKey GetModelKey();
+
 protected:
 	TDF::BaseView * m_pcBaseView = nullptr;
 	TDF::WindowKey * m_pcWindow = nullptr;
@@ -133,6 +142,7 @@ protected:
 private:
 	Operator::CameraSelect * m_pcCameraOrbitSelect;
 	Operator::SelectArea * m_pcSelectArea;
+	Operator::KinematicTest * m_pcKinematicTest;
 
 	NavigationCube m_cNaviCube;
 	bool m_bInitNaviCube = false;
