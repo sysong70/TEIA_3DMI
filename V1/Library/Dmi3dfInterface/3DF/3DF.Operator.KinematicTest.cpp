@@ -29,7 +29,6 @@ bool TDF::Operator::KinematicTest::CreateTestModel(SegmentKey cModelKey)
 
 	cCenter.Set(0, 0, 150);
 	CreateCylinder(cArm1Key, cCenter, 30, 500, cXAxis, cZAxis);
-
 	SegmentKey cArm2Key = cArm1Key.Subsegment(L"Arm2");
 
 	cMaterialMappingKit.SetFaceColor(RGBColor(0, 0, 1));

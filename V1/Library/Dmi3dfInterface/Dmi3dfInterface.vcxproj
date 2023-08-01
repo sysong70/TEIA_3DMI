@@ -139,6 +139,7 @@
     <ClInclude Include="3DF\3DF.Math.Matrix.h" />
     <ClInclude Include="3DF\3DF.NavigationCube.h" />
     <ClInclude Include="3DF\3DF.Operator.KeyboardTest.h" />
+    <ClInclude Include="3DF\3DF.Operator.KinematicTest.h" />
     <ClInclude Include="3DF\3DF.Search.h" />
     <ClInclude Include="3DF\3DF.VisualEffects.h" />
     <ClInclude Include="3DF\3DF.Painter.h" />
@@ -235,6 +236,7 @@
     <ClCompile Include="3DF\3DF.Object.cpp" />
     <ClCompile Include="3DF\3DF.Operator.CameraSelect.cpp" />
     <ClCompile Include="3DF\3DF.Operator.KeyboardTest.cpp" />
+    <ClCompile Include="3DF\3DF.Operator.KinematicTest.cpp" />
     <ClCompile Include="3DF\3DF.Operator.ObjectSnap.cpp" />
     <ClCompile Include="3DF\3DF.Operator.SelectArea.cpp" />
     <ClCompile Include="3DF\3DF.PMI.Entity.cpp" />

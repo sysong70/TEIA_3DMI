@@ -83,6 +83,7 @@ void ViewManager::ExecuteSignal(Json::Object & cInObject)
 			CancelCommands(nViewId);
 			break;
 
+/*
 		case Signal::View::Action::OnChar:
 		{
 			UINT nChar = (UINT)cInObject.GetInteger(SKW_CHAR);
@@ -91,6 +92,7 @@ void ViewManager::ExecuteSignal(Json::Object & cInObject)
 			Char(nViewId, nChar, nRepCnt, nFlags);
 		}
 		break;
+*/
 
 		default:
 			assert(false);

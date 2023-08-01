@@ -360,8 +360,6 @@ namespace Signal
 			OnKeyDown,
 			OnKeyUp,
 
-			OnChar, // Test용
-
 			SetValidation, // complete opening file
 			PaintOverlap, // complete OnPaint
 			SetInputMode,
@@ -387,8 +385,6 @@ namespace Signal
 		// id: enum Command
 		void OnCommand(UINT id);
 		void OnCancel();
-
-		void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 
 		void OnMouseMove(UINT flags, int x, int y);
 		void OnLButtonDown(UINT flags, int x, int y, int osnapId = -1);

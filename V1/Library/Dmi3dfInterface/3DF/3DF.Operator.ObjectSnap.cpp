@@ -40,6 +40,13 @@ USING_3DF_NAMESPACE
 #define TheEnvironment TheAppOptions.Preference.Environment
 #define TheSession TheAppOptions.Preference.Session
 
+TDF::Operator::ObjectSnap::SnapPoint::SnapPoint(TDF::Operator::ObjectSnap::SnapPoint const & cInThat)
+{
+	cPoint = cInThat.cPoint;
+	eType = cInThat.eType;
+	eStatus = cInThat.eStatus;
+}
+
 TDF::Operator::ObjectSnap::SnapPoint & TDF::Operator::ObjectSnap::SnapPoint::operator = (TDF::Operator::ObjectSnap::SnapPoint const & cInThat)
 {
 	cPoint = cInThat.cPoint;
@@ -196,8 +203,8 @@ int TDF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 				// 기존에 선택된 Snap Point가 있으면 삭제한다.	
 				// m_cSnapPointSegment.Flush(Search::Type::Segment);
 
-			//TRACE(L"1st DrawSnapItem, %d\n", (int)pcSnapItem->eType);
-			DrawSnapItem(pcSnapItem, cCameraInfo);
+				//TRACE(L"1st DrawSnapItem, %d\n", (int)pcSnapItem->eType);
+				DrawSnapPoint(cSnapPoint, cCameraInfo);
 
 				HighlightOptionsKit cHighlightOptions;
 				cHighlightOptions.SetNotification(false);
@@ -780,7 +787,6 @@ void TDF::Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 }
 
 /*
-
 void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & cInCameraInfo, bool bUpdate)
 {
 	m_cSnapPointSegment.Open();

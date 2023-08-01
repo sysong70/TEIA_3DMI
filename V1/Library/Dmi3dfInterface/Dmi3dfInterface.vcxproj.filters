@@ -285,6 +285,12 @@
     <ClInclude Include="3DF\3DF.Operator.KeyboardTest.h">
       <Filter>Operator</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\Private\3DF.HighlightPrivate.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\3DF.Operator.KinematicTest.h">
+      <Filter>Operator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -498,6 +504,12 @@
       <Filter>Facility</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Operator.KeyboardTest.cpp">
+      <Filter>Operator</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Private\3DF.HighlightPrivate.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Operator.KinematicTest.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
   </ItemGroup>
