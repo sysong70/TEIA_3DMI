@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>q</OutDir>
+    <OutDir>..\..\Build\3DMI.$(Configuration)$(PlatformArchitecture)\</OutDir>
     <IntDir>..\..\Build\3DMI.$(Configuration)$(PlatformArchitecture)\Int\$(ProjectName).dir\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
