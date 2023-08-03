@@ -16,6 +16,7 @@
 #include <3DF/3DF.Shell.h>
 #include <3DF/3DF.Line.h>
 #include <3DF/3DF.Polygon.h>
+#include <3DF/3DF.Bounding.h>
 
 #include <3DF/3DF.Math.Matrix.h>
 
@@ -147,12 +148,22 @@ bool TdfImport::FileImport(CString strFilePathName, TDF::SegmentKey & cModelSegm
 	}
 
 	//----- Model 관련 Include 선언 -----
-	SegmentKey cModelInclude = cModelSegment.ModelInclude();
 
-	m_cPartsIncludeSegment = cModelInclude.Subsegment(L"parts");
-	m_cPoccsIncludeSegment = cModelInclude.Subsegment(L"poccs");
-	m_cRisIncludeSegment = cModelInclude.Subsegment(L"ris");
-	m_cPmiIncludeSegment = cModelInclude.Subsegment(L"pmi");
+	SegmentKey cModelInclude = cModelSegment.Subsegment(L"model_include");
+	cModelInclude.SetVisibility(L"off");
+
+	BoundingKit cBounding;
+	cBounding.SetExclusion(true);
+	cModelInclude.SetBounding(cBounding);
+
+	SegmentKey cIncludeSegment = cModelInclude.Subsegment();
+	m_nModelIncludeKey = cIncludeSegment.Subsegment();
+	m_nStylesIncludeKey = m_nModelIncludeKey.Subsegment(L"styles").KeyValue();
+
+	m_cPartsIncludeSegment = m_nModelIncludeKey.Subsegment(L"parts");
+	m_cPoccsIncludeSegment = m_nModelIncludeKey.Subsegment(L"poccs");
+	m_cRisIncludeSegment = m_nModelIncludeKey.Subsegment(L"ris");
+	m_cPmiIncludeSegment = m_nModelIncludeKey.Subsegment(L"pmi");
 
 	m_cPmiIncludeSegment.SetVisibility(L"everything = off");
 	m_cPmiIncludeSegment.SetHeuristics(L"exclude bounding");
@@ -4756,7 +4767,7 @@ A3DStatus TdfImport::IsShow(const A3DRootBaseWithGraphics * pGraphics)
 // 5. 주어진 Material Mapping을 이용해서 
 bool TdfImport::SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::MaterialKit const & cInKit, TDF::SegmentKey & cSegment)
 {
-	TDF::SegmentKey cStyleSegment = m_pcModelSegment->StylesInclude().Subsegment(L"face_mat_%d_%d", cAttrData.m_sStyle.m_uiRgbColorIndex, cAttrData.m_sStyle.m_ucTransparency);
+	TDF::SegmentKey cStyleSegment = m_nStylesIncludeKey.Subsegment(L"face_mat_%d_%d", cAttrData.m_sStyle.m_uiRgbColorIndex, cAttrData.m_sStyle.m_ucTransparency);
 	
 	// 입력된 Matrial을 Face에 적용한다.
 	MaterialMappingKit cMaterialMapping;
@@ -4785,7 +4796,7 @@ bool TdfImport::SetLineMaterialMapping(const A3DMiscCascadedAttributesData & cAt
 		return false;
 	}
 
-	TDF::SegmentKey cStyleSegment = m_pcModelSegment->StylesInclude().Subsegment(L"line_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
+	TDF::SegmentKey cStyleSegment = m_nStylesIncludeKey.Subsegment(L"line_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
 
 	MaterialMappingKit cMaterialMapping;
 	cMaterialMapping.SetLineColor(cDiffuseColor);
@@ -4811,7 +4822,7 @@ bool TdfImport::SetMarkerMaterialMapping(const A3DMiscCascadedAttributesData & c
 		return false;
 	}
 
-	TDF::SegmentKey cStyleSegment = m_pcModelSegment->StylesInclude().Subsegment(L"marker_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
+	TDF::SegmentKey cStyleSegment = m_nStylesIncludeKey.Subsegment(L"marker_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
 
 	MaterialMappingKit cMaterialMapping;
 	cMaterialMapping.SetMarkerColor(cDiffuseColor);

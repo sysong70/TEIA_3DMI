@@ -51,6 +51,10 @@
 #define SKW_Y				"y"
 #define SKW_Z				"z"
 
+#define SKW_CHAR			"Char"
+#define SKW_REPCNT			"RepCnt"
+#define SKW_FLAGS			"Flags"
+
 // enum, struct
 
 namespace Signal

@@ -158,7 +158,7 @@ public:
 class LineAttributeControl : public Control
 {
 public:
-	LineAttributeControl(SegmentKey & cInSegmentKey);
+	explicit LineAttributeControl(SegmentKey & cInSegmentKey);
 	LineAttributeControl(LineAttributeControl const & cInThat);
 
 	void Set(LineAttributeControl const & cInThat);

@@ -33,12 +33,69 @@
 #include "3DF.Painter.h"
 #include "3DF.Facility.AppOptions.h"
 
+#include <unordered_set>
+
 USING_3DF_NAMESPACE
 
 #define TheEnvironment TheAppOptions.Preference.Environment
 #define TheSession TheAppOptions.Preference.Session
 
-Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
+TDF::Operator::ObjectSnap::SnapPoint::SnapPoint(TDF::Operator::ObjectSnap::SnapPoint const & cInThat)
+{
+	cPoint = cInThat.cPoint;
+	eType = cInThat.eType;
+	eStatus = cInThat.eStatus;
+}
+
+TDF::Operator::ObjectSnap::SnapPoint & TDF::Operator::ObjectSnap::SnapPoint::operator = (TDF::Operator::ObjectSnap::SnapPoint const & cInThat)
+{
+	cPoint = cInThat.cPoint;
+	eType = cInThat.eType;
+	eStatus = cInThat.eStatus;
+
+	return *this;
+}
+
+// Select Item의 구성 요소가 같은지 확인한다.
+bool TDF::Operator::ObjectSnap::SnapItem::operator == (const SnapItem & cInThat) const
+{
+/*
+	if (vcSnapPoints.size() != cInThat.vcSnapPoints.size()) {
+		return false;
+	}
+
+	// Point의 값이 같은지 확인한다.
+	for (size_t i = 0; i < vcSnapPoints.size(); ++i) {
+		if (vcSnapPoints[i].cPoint != cInThat.vcSnapPoints[i].cPoint) {
+			return false;
+		}
+	}
+*/
+	if (vcItems.size() != cInThat.vcItems.size()) {
+		return false;
+	}
+
+	for (auto & cSelItem : vcItems) {
+		bool bSameFind = false;
+		for (auto & cInSelItem : cInThat.vcItems) {
+			if (cSelItem == cInSelItem) {
+				bSameFind = true;
+				break;
+			}
+		}
+
+		if(false == bSameFind) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+//== ObjectSnap class ==============================================================================
+
+TDF::Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 {
 	m_pcWindow = pcWindow;
 
@@ -79,15 +136,14 @@ Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 	m_nSelectPickCount = 300;
 }
 
-int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
+
+int TDF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 {
 	PixelPoint cMousePoint(cInEvent.GetMousePixelPos());
 
-/*
-	DWORD nMouseMoveTickCount = GetTickCount();
-	DWORD nTickCount = nMouseMoveTickCount - m_nPrevMouseMoveTickCount;
-	m_nPrevMouseMoveTickCount = nMouseMoveTickCount;
-*/
+// 	DWORD nMouseMoveTickCount = GetTickCount();
+// 	DWORD nTickCount = nMouseMoveTickCount - m_nPrevMouseMoveTickCount;
+// 	m_nPrevMouseMoveTickCount = nMouseMoveTickCount;
 
 	float fDist = m_cPrevPoint.DistanceWith(cMousePoint);
 	m_cPrevPoint = cMousePoint;
@@ -110,42 +166,65 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 
 	// Event에서 들어온 Mouse 위치를 이용해서 Snap Point가 선택된 경우 (주어진 Pixel 범위내에 있을 때), 
 	// Snap Point에 선택 Flag을 주어서 선택된 효과를 주도록 한다.
+
 // 	float fMinDist = FLT_MAX;
 // 	ObjectSnap::SnapItem * pcMinSnapItem = nullptr;
+
+	// DrawSnapItems(false);
+
+	// 기존에 선택된 Snap Point가 있으면 삭제한다.	
+	m_cSnapPointSegment.Flush(Search::Type::Segment);
+
 	for (auto & pcSnapItem : m_vSnapItems) {
+		for (auto & cSnapPoint : pcSnapItem->vcSnapPoints) {
+			cSnapPoint.eStatus = ObjectSnap::Status::Normal;
 
-		if (Type::NearPoint == pcSnapItem->eType) {
-			continue;
+			if (Type::NearPoint == cSnapPoint.eType) {
+				continue;
+			}
+
+			DrawSnapPoint(cSnapPoint, cCameraInfo);
 		}
+	}
 
-		PixelPoint cPixelPoint(*m_pcWindow, pcSnapItem->cPoint);
+	for (auto & pcSnapItem : m_vSnapItems) {
+		for (auto & cSnapPoint : pcSnapItem->vcSnapPoints) {
+			if (Type::NearPoint == cSnapPoint.eType) {
+				continue;
+			}
 
-		double dDist = cPixelPoint.DistanceWith(cMousePoint);
+			PixelPoint cPixelPoint(*m_pcWindow, cSnapPoint.cPoint);
 
-		if (15 > dDist) {
-			pcSnapItem->eStatus = ObjectSnap::Status::Selected;
+			double dDist = cPixelPoint.DistanceWith(cMousePoint);
 
-			// 기존에 선택된 Snap Point가 있으면 삭제한다.	
-			m_cSnapPointSegment.Flush(Search::Type::Segment);
+			if (15 > dDist) {
+				cSnapPoint.eStatus = ObjectSnap::Status::Selected;
 
-			// 기존 선택 요소 Unhighlight
-	// 			if (0 < m_cOldHighlightSelection.GetCount()) {
-	// 				m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
-	// 			}
+				// 기존에 선택된 Snap Point가 있으면 삭제한다.	
+				// m_cSnapPointSegment.Flush(Search::Type::Segment);
 
-			//TRACE(L"1st DrawSnapItem, %d\n", (int)pcSnapItem->eType);
-			DrawSnapItem(pcSnapItem, cCameraInfo);
+				//TRACE(L"1st DrawSnapItem, %d\n", (int)pcSnapItem->eType);
+				DrawSnapPoint(cSnapPoint, cCameraInfo);
 
-			m_pcWindow->Update();
+				HighlightOptionsKit cHighlightOptions;
+				cHighlightOptions.SetNotification(false);
 
-			//HC_Flush_Contents
-			return HLISTENER_PASS_EVENT;
+				// 맨 처음에는 기존 Hightlight를 삭제한다.
+				bool bInRemoveExisting = true;
+				for (auto & pcSelItem : pcSnapItem->vcItems) {
+					m_pcWindow->GetHighlightControl().Highlight(pcSelItem, cHighlightOptions, bInRemoveExisting);
+					bInRemoveExisting = false;
+				}
+
+				if (0 < m_cOldHighlightSelection.GetCount()) {
+					m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection, cHighlightOptions);
+				}
+
+				m_pcWindow->Update();
+
+				return HLISTENER_PASS_EVENT;
+			}
 		}
-
-// 		if (dDist < fMinDist) {
-// 			fMinDist = dDist;
-// 			pcMinSnapItem = pcSnapItem;
-// 		}
 	}
 
 	// Snap Point가 선택된 경우 처리 (주어진 Pixel 범위내에 있을 때)
@@ -250,7 +329,7 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 				//TRACE(L"Line First Pushback\n");
 			}
 			// Shell의 선택점과 Line의 선택점이 거의 같은 경우 Line을 선택한다.
-			else if (1.0e-2 >fabs(cLinePoint.z - cShellPoint.z)) {
+			else if (1.0e-2 > fabs(cLinePoint.z - cShellPoint.z)) {
 				m_cNewHighlightSelection.PushBack(new SelectionItem(*pcLineItem));
 				//TRACE(L"Line vs face near Pushback\n");
 			}
@@ -276,7 +355,7 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 	else {
 		//TRACE(L"SelectByPoint: %d\n", nSelectedCount);
 	}
-	
+
 	bool bForceUpdate = false;
 
 	// 	새롭게 선택된 Selection Result에서 Line만 남기도록 한다.
@@ -284,8 +363,8 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 
 	// 추가된것이 있는 경우에 Count를 검사해서 5개까지만 남기도록 한다.
 	if (true == m_cHighlightSelection.Union(m_cNewHighlightSelection)) {
-		if (5 < m_cHighlightSelection.GetCount()) {
-			m_cHighlightSelection.SetSize(5);
+		if (m_nTotalSnapItemCount < m_cHighlightSelection.GetCount()) {
+			m_cHighlightSelection.SetSize(m_nTotalSnapItemCount);
 		}
 	}
 
@@ -299,15 +378,15 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 		m_pcWindow->GetHighlightControl().Highlight(m_cNewHighlightSelection, cHighlightOptions, true);
 		bForceUpdate = true;
 	}
-	else if(0 == m_cNewHighlightSelection.GetCount() && 0 < m_cOldHighlightSelection.GetCount()) {
+	else if (0 == m_cNewHighlightSelection.GetCount() && 0 < m_cOldHighlightSelection.GetCount()) {
 		// 기존에 선택된 요소가 있고 새로운 요소가 없는 경우에는 기존 요소를 지운다.
 		m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection, cHighlightOptions);
 
 		// 화면상의 SnapItem을 지운다.
-		if(false == m_vSnapItems.empty()) { 
-			ClearSnapItems(false); 
+		if (false == m_vSnapItems.empty()) {
+			ClearSnapItems(false);
 		}
-		
+
 		bForceUpdate = true;
 
 		Key cOldKey;
@@ -327,22 +406,22 @@ int Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 		// Snap Item을 그린다.
 		DrawSnapItems(false);
 
-		if(false == m_vSnapItems.empty()) {
+		if (false == m_vSnapItems.empty()) {
 			bForceUpdate = true;
 		}
 	}
-
 	/*
-	else {
-		// Object Snape 등을 지우도록 한다.
-		HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetConstructionKey()); {
-			HC_Flush_Contents(".", "geometry, segment");
-		} HC_Close_Segment();
+		else {
+			// Object Snape 등을 지우도록 한다.
+			HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetConstructionKey()); {
+				HC_Flush_Contents(".", "geometry, segment");
+			} HC_Close_Segment();
 
-		if (false == bForceUpdate) {
-			// m_pcWindow->GetBaseView()->Update();
+			if (false == bForceUpdate) {
+				// m_pcWindow->GetBaseView()->Update();
+			}
 		}
-	}*/
+	*/
 
 	if (true == bForceUpdate) {
 		//m_pcWindow->Update();
@@ -484,8 +563,10 @@ void HDraw::Test(HBaseView* view, TDF::Matrix& cMatrix, Point2D p1, Point2D p2)
 // 이 함수에서 개별요소의 Object Snap를 구하고, 연관된 요소들의 Object Snap를 구한다. 구하는 Object Snap은 각각의 
 // 요소에서 End, Mid, Near, Center등을 구하고 연관된 Entity에서 Intersection, Perpendicular, Tangent등을 구한다.
 // 구해진 값은 m_aSnapItems에 저장된다. SnapItem에는 연관된 Key값, Point, Snap Type등이 저장된다.
-void Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults & cInItems)
+void TDF::Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults & cInItems)
 {
+	TRACE(L"ObjectSnap::Items Count: %d\n", m_vSnapItems.size());
+
 	// 단일 Object Snap Point를 계산한다. 이 경우 첫번째 Item만 처리한다.
 	SelectionItem * pcItem = cInItems.Front();
 
@@ -505,22 +586,22 @@ void Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults & cI
 
 		Matrix cMatrix;
 		cPath.ShowNetModellingMatrix(cMatrix);
-	
+
 		// Line Key 처리
 		if (TDF::Type::LineKey == eType) {
 			// 사전 선택된 Object Snap Point 삭제
-			ResetSnapItem();
-			CalculationLienObjectSnapPoint(cKey, cWindowPoint, cMatrix);
+			//ResetSnapItem();
+			CalculationLienObjectSnapPoint(pcItem, cWindowPoint);
 		}
 	}
 
 	//----- 상호간의 Object Snap Point를 계산한다. -----
 
 	SelectionResultsIterator cIter = cInItems.GetIterator();
-	
+
 	// 제일 첫번째 Item을 메인으로 해서 계산을 진행한다.
 
-	if(false == cIter.IsValid()) { // 정상적인 상태인지 확인.
+	if (false == cIter.IsValid()) { // 정상적인 상태인지 확인.
 		return;
 	}
 
@@ -542,18 +623,20 @@ void Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults & cI
 
 	while (cIter.IsValid()) {
 		SelectionItem * pcNextItem = cIter.GetItem();
+		
 		KeyPath cNextPath;
 		pcNextItem->ShowPath(cNextPath);
+		
 		Matrix cNextMatrix;
 		cNextPath.ShowNetModellingMatrix(cNextMatrix);
+
 		Key cNextSelection;
 		if (true == pcNextItem->ShowSelectedItem(cNextSelection)) {
 			if (TDF::Type::LineKey == cSelection.Type() && TDF::Type::LineKey == cNextSelection.Type()) {
-				LineKey cLine = LineKey(cSelection);
-				LineKey cNextLine = LineKey(cNextSelection);
- 				CalculationLienAndLineObjectSnapPoint(cLine, cNextLine, cMatrix, cNextMatrix);
- 			}
+				CalculationLienAndLineObjectSnapPoint(pcItem, pcNextItem, cMatrix, cNextMatrix);
+			}
 		}
+
 		// 다음 Item을 가져온다.
 		cIter.Next();
 	}
@@ -562,13 +645,22 @@ void Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults & cI
 //== 2. 단일 Geometry Object Snap 계산 ==============================================================
 
 // 2-1. Line Object Snap 계산 (EndPoint, MidPoint, NearPoint를 계산)
-bool Operator::ObjectSnap::CalculationLienObjectSnapPoint(const Key & cInLineKey, const WindowPoint & cInPoint, const MatrixKit & cModelingMatrix)
+bool TDF::Operator::ObjectSnap::CalculationLienObjectSnapPoint(const SelectionItem * pcInSelectionItem, const WindowPoint & cInPoint)
 {
-	if (TDF::Type::LineKey != cInLineKey.Type()) {
+	Key cKey;
+	pcInSelectionItem->ShowSelectedItem(cKey);
+
+	if (TDF::Type::LineKey != cKey.Type()) {
 		return false;
 	}
 
-	LineKey cLine = LineKey(cInLineKey);
+	LineKey cLine = LineKey(cKey);
+
+	KeyPath cPath;
+	pcInSelectionItem->ShowPath(cPath);
+
+	Matrix cMatrix;
+	cPath.ShowNetModellingMatrix(cMatrix);
 
 	WorldPointArray aPoints;
 	cLine.ShowPoints(aPoints);
@@ -579,35 +671,45 @@ bool Operator::ObjectSnap::CalculationLienObjectSnapPoint(const Key & cInLineKey
 		return false;
 	}
 
-	CircleKit cCircle;
-	if (true == TDF::Math::GetCircle(aPoints, cCircle)) {
-		Point cCenter;
-		cCircle.ShowCenter(cCenter);
-		cCenter = cModelingMatrix.Transform(cCenter);
-		AddSnapItem(cLine, cCenter, Type::Center);
-		return true;
+	// 신규 Snap Item을 생성
+	SnapItem * psSnapItem = new SnapItem();
+	// Selection Item
+	psSnapItem->vcItems.push_back(*pcInSelectionItem);
+
+	if (false == AddSnapItems(psSnapItem)) {
+		delete psSnapItem;
+		return false;
 	}
 
 	// End Point 처리
 	Point cSP, cEP;
 	if (true == cLine.GetEndPoint(cSP, cEP)) {
-		cSP = cModelingMatrix.Transform(cSP);
-		cEP = cModelingMatrix.Transform(cEP);
-		AddSnapItem(cLine, cSP, Type::EndPoint);
-		AddSnapItem(cLine, cEP, Type::EndPoint);
+		cSP = cMatrix.Transform(cSP);
+		cEP = cMatrix.Transform(cEP);
+		AddSnapItem(psSnapItem, cSP, Type::EndPoint);
+		AddSnapItem(psSnapItem, cEP, Type::EndPoint);
 	}
 
 	// Mid Point 처리
 	Point cMP;
-	if(true == cLine.GetMidPoint(cMP)) {
-		cMP = cModelingMatrix.Transform(cMP);
-		AddSnapItem(cLine, cMP, Type::MidPoint);
+	if (true == cLine.GetMidPoint(cMP)) {
+		cMP = cMatrix.Transform(cMP);
+		AddSnapItem(psSnapItem, cMP, Type::MidPoint);
+	}
+
+	CircleKit cCircle;
+	if (true == TDF::Math::GetCircle(aPoints, cCircle)) {
+		Point cCenter;
+		cCircle.ShowCenter(cCenter);
+		cCenter = cMatrix.Transform(cCenter);
+		AddSnapItem(psSnapItem, cCenter, Type::Center);
+		return true;
 	}
 
 	// Near Point 처리
 	WorldPoint cNearPoint;
-	if (true == cLine.NearPoint(*m_pcWindow, cModelingMatrix, cInPoint, cNearPoint)) {
-		AddSnapItem(cLine, cNearPoint, Type::NearPoint);
+	if (true == cLine.NearPoint(*m_pcWindow, cMatrix, cInPoint, cNearPoint)) {
+		//AddSnapItem(psSnapItem, cNearPoint, Type::NearPoint);
 	}
 
 	return true;
@@ -616,25 +718,51 @@ bool Operator::ObjectSnap::CalculationLienObjectSnapPoint(const Key & cInLineKey
 //== 3. 2개의 Geometry Object Snap 계산 =============================================================
 
 // 3-1. Line & Line 관련 Object Snap을 계산, Intersection
-void Operator::ObjectSnap::CalculationLienAndLineObjectSnapPoint(LineKey & cLine1, LineKey & cLine2, const MatrixKit & cMatrix1, const MatrixKit & cMatrix2)
+void TDF::Operator::ObjectSnap::CalculationLienAndLineObjectSnapPoint(const SelectionItem * pcInItems1, const SelectionItem * pcInItems2, 
+	const MatrixKit & cMatrix1, const MatrixKit & cMatrix2)
 {
-// 	if (true == cLine1.IsCoincident(cLine2, cMatrix1, cMatrix2)) {
-// 		return;
-// 	}
+	if (*pcInItems1 == *pcInItems2) {
+		return;
+	}
 
-	// 교차점 처리
-	PointArray aIntersectionPoints;
-	if (true == cLine1.GetIntersectionPoint(cLine2, cMatrix1, cMatrix2, aIntersectionPoints)) {
+	Key cSelection1;
+	if (false == pcInItems1->ShowSelectedItem(cSelection1)) {
+		return;
+	}
+
+	Key cSelection2;
+	if (false == pcInItems2->ShowSelectedItem(cSelection2)) {
+		return;
+	}
+
+	LineKey cLine1 = LineKey(cSelection1);
+	LineKey cLine2 = LineKey(cSelection2);
+
+	if (true == cLine1.IsCoincident(cLine2, cMatrix1, cMatrix2)) {
+		return;
+	}
+
+	PointArray aInterPoints;
+	if (true == cLine1.GetIntersectionPoint(cLine2, cMatrix1, cMatrix2, aInterPoints)) {
+		SnapItem * pcSnapItem = new SnapItem();
+		pcSnapItem->vcItems.push_back(*pcInItems1);
+		pcSnapItem->vcItems.push_back(*pcInItems2);
+
 		// 찾아온 교차점을 SnapItem에 추가한다.
-		for (size_t nIndex = 0; nIndex < aIntersectionPoints.size(); nIndex++) {
-			AddSnapItem(cLine1, aIntersectionPoints[nIndex], Type::Intersection);
+		//for (size_t nIndex = 0; nIndex < aIntersectionPoints.size(); nIndex++) {
+		for (auto cPoint : aInterPoints) {
+			AddSnapItem(pcSnapItem, cPoint, Type::Intersection);
+		}
+
+		if (false == AddSnapItems(pcSnapItem)) {
+			delete pcSnapItem;
 		}
 	}
 }
 
 //== Object Snap Point를 그리는 함수 ==================================================================
 
-void Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
+void TDF::Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 {
 	CamerInformation cCameraInfo;
 	ShowCameraInformation(m_fSnapRadius, cCameraInfo);
@@ -646,8 +774,9 @@ void Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 		m_cSnapPointSegment.SetModellingMatrix(cCameraInfo.cMatrix);
 
 		for (auto pcItem : m_vSnapItems) {
-			Point2D cDropPoint = pcItem->cPoint.DropPoint(cCameraInfo.cOrigin, cCameraInfo.cXAixs, cCameraInfo.cYAixs);
-			DrawSnapPoint(pcItem, cDropPoint, cCameraInfo.dObjectSnapRadius);
+			for (auto & cSnapPoint : pcItem->vcSnapPoints) {
+				DrawSnapPoint(cSnapPoint, cCameraInfo);
+			}
 		}
 	}
 	m_cSnapPointSegment.Close();
@@ -657,6 +786,7 @@ void Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 	}
 }
 
+/*
 void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & cInCameraInfo, bool bUpdate)
 {
 	m_cSnapPointSegment.Open();
@@ -673,8 +803,19 @@ void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & 
 		m_pcWindow->GetBaseView()->Update();
 	}
 }
+*/
 
-void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double dUnit)
+void TDF::Operator::ObjectSnap::DrawSnapPoint(Operator::ObjectSnap::SnapPoint & cSnapPoint, CamerInformation & cInCameraInfo)
+{
+	m_cSnapPointSegment.Open(); {
+		m_cSnapPointSegment.SetModellingMatrix(cInCameraInfo.cMatrix);
+
+		Point2D cDropPoint = cSnapPoint.cPoint.DropPoint(cInCameraInfo.cOrigin, cInCameraInfo.cXAixs, cInCameraInfo.cYAixs);
+		DrawSnapPoint(cDropPoint, cSnapPoint.eStatus, cSnapPoint.eType, cInCameraInfo.dObjectSnapRadius);
+	} m_cSnapPointSegment.Close();
+}
+
+void TDF::Operator::ObjectSnap::DrawSnapPoint(Point2D center, ObjectSnap::Status eInStatus, ObjectSnap::Type eInType, double dUnit)
 {
 	using namespace Painter;
 
@@ -710,7 +851,7 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 	}
 	HC_Close_Segment();
 
-	if (pItem->eStatus != Status::Selected) {
+	if (eInStatus != Status::Selected) {
 		return;
 	}
 
@@ -725,17 +866,17 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 	}
 	HC_Close_Segment();
 
-	const wchar_t* pText = nullptr;
+	const wchar_t * pText = nullptr;
 
-	switch (pItem->eType) {
-	case Type::EndPoint:		pText = L"End Point|끝점";			break;
-	case Type::MidPoint:		pText = L"Mid Point|중점";			break;
-	case Type::NearPoint:		pText = L"Near Point|근점";			break;
-	case Type::Center:			pText = L"Center Point|중심점";		break;
-	case Type::Intersection:	pText = L"Intersection Point|교차점";	break;
-	default:
-		ASSERT(FALSE);
-		return;
+	switch (eInType) {
+		case Type::EndPoint:		pText = L"End Point|끝점";			break;
+		case Type::MidPoint:		pText = L"Mid Point|중점";			break;
+		case Type::NearPoint:		pText = L"Near Point|근점";			break;
+		case Type::Center:			pText = L"Center Point|중심점";		break;
+		case Type::Intersection:	pText = L"Intersection Point|교차점";	break;
+		default:
+			ASSERT(FALSE);
+			return;
 	}
 
 	HC_Open_Segment("snap name");
@@ -776,7 +917,7 @@ void Operator::ObjectSnap::DrawSnapPoint(SnapItem* pItem, Point2D center, double
 	HC_Close_Segment();
 }
 
-double Operator::ObjectSnap::PixelToWorld(double unit)
+double TDF::Operator::ObjectSnap::PixelToWorld(double unit)
 {
 	SegmentKey scene(m_pcWindow->GetSceneKey());
 
@@ -789,7 +930,7 @@ double Operator::ObjectSnap::PixelToWorld(double unit)
 	return vector.Length();
 }
 
-bool Operator::ObjectSnap::ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo)
+bool TDF::Operator::ObjectSnap::ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo)
 {
 	if(nullptr == m_pcWindow) {
 		return false;
@@ -815,17 +956,45 @@ bool Operator::ObjectSnap::ShowCameraInformation(float fInRadius, CamerInformati
 	return true;
 }
 
-bool Operator::ObjectSnap::AddSnapItem(Key & cInKey, Point cSnapPoint, Type eType)
+//== Utility Functions =============================================================================
+bool TDF::Operator::ObjectSnap::AddSnapItems(SnapItem * psInSnapItem)
 {
-	SnapItem * psSnapItem = new SnapItem();
-	psSnapItem->cPoint = cSnapPoint;
-	psSnapItem->eType = eType;
-	m_vSnapItems.push_back(psSnapItem);
+	if (nullptr == psInSnapItem) {
+		return false;
+	}
+
+	// 신규 Snap Item과 기존 Item의 중복을 검사한다.
+	for (auto pcSelItem : m_vSnapItems) {
+		if(*pcSelItem == *psInSnapItem) {
+			return false;
+		}
+	}
+
+	// 5개 이상의 SnapItem을 추가하려면 처음부분을 삭제한다.
+	if (m_nTotalSnapItemCount == m_vSnapItems.size()) {
+		auto pcSnapItem = m_vSnapItems.front();
+		delete pcSnapItem;
+		m_vSnapItems.erase(m_vSnapItems.begin());
+	}
+
+	m_vSnapItems.push_back(psInSnapItem);
 
 	return true;
 }
 
-void Operator::ObjectSnap::ClearSnapItems(bool bUpdate)
+bool TDF::Operator::ObjectSnap::AddSnapItem(SnapItem * psInSnapItem, Point cInSnapPoint, Type eInType)
+{
+	Operator::ObjectSnap::SnapPoint cSnapPoint;
+
+	cSnapPoint.cPoint = cInSnapPoint;
+	cSnapPoint.eType = eInType;
+
+	psInSnapItem->vcSnapPoints.push_back(cSnapPoint);
+
+	return true;
+}
+
+void TDF::Operator::ObjectSnap::ClearSnapItems(bool bUpdate)
 {
 	m_cSnapPointSegment.Open();
 	{
@@ -838,7 +1007,7 @@ void Operator::ObjectSnap::ClearSnapItems(bool bUpdate)
 	}
 }
 
-void Operator::ObjectSnap::ResetSnapItem()
+void TDF::Operator::ObjectSnap::ResetSnapItem()
 {
 	// m_aSnapItems을 삭제
 	for (auto pcSnapItem : m_vSnapItems) {

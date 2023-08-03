@@ -65,6 +65,8 @@ class PolygonKey;
 class BoundingKit;
 class SelectabilityKit;
 
+class LineAttributeKit;
+class LineAttributeControl;
 
 class MatrixKit;
 class CameraKit;
@@ -78,9 +80,13 @@ class NamedStyleDefinition;
 class StyleKey;
 
 class SelectabilityControl;
+class SelectionOptionsControl;
+
 class VisibilityControl;
 class VisualEffectsControl;
+
 class MarkerAttributeControl;
+class MaterialMappingControl;
 
 
 //==================================================================================================

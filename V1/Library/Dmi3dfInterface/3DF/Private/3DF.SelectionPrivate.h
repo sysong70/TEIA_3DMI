@@ -74,11 +74,15 @@ class SelectionOptionsControlPrivate : public PrivateImpl
 {
 public:
 	void Copy(SelectionOptionsControlPrivate * pcInThat) {
-		m_pcBaseView = pcInThat->m_pcBaseView;
+		m_pcWindow = pcInThat->m_pcWindow;
+		m_pcSelectionSet = pcInThat->m_pcSelectionSet;
+
 	}
 
-	TDF::BaseView * GetBaseView() { return (TDF::BaseView *)m_pcBaseView; }
-	const TDF::BaseView * m_pcBaseView = nullptr;
+	WindowKey * GetWindow() { return (WindowKey *)m_pcWindow; }
+	const WindowKey * m_pcWindow = nullptr;
+
+	HSelectionSet * m_pcSelectionSet = nullptr;
 };
 
 class SelectionItemPrivate : public PrivateImpl
@@ -196,6 +200,7 @@ public:
 
 	void Copy(SelectionControlPrivate * pcInThat) {
 		m_pcWindow = pcInThat->m_pcWindow;
+		m_pcSelectionSet = pcInThat->m_pcSelectionSet;
 	}
 
 	size_t SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults);
@@ -210,6 +215,8 @@ public:
 	const WindowKey * m_pcWindow = nullptr;
 
 	HBaseView * GetBaseView();
+
+	HSelectionSet * m_pcSelectionSet = nullptr;
 
 private:
 	// & 연산을 해야하므로 enum class를 사용하지 않는다.

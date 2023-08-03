@@ -64,6 +64,9 @@ public:
 	//== Line 관련 함수 ==============================================================================
 	LineKey InsertLine(size_t nInCount, Point const pcInPoints[]);
 
+	LineAttributeControl GetLineAttributeControl();
+	LineAttributeControl const GetLineAttributeControl() const;
+
 	//== Circle 관련 함수 ============================================================================
 	CircleKey InsertCircle(Point const & cInCenter, float fInRadius, Vector const & cInNormal);
 
@@ -108,19 +111,12 @@ public:
 
 	void SetRenderingOptions(CString strList);
 	void SetColorByIndex(CString strList, int nIndex);
-	void SetMarkerSymbol(CString strSymbol);
+	void SetMarkerSymbol(CString strSymbol);		
 
 	//== Camera 관련 함수 ===========================================================================
 // 	SegmentKey & SetCamera(CameraKit const & cInKit);
 // 	SegmentKey & UnsetCamera();
 	bool ShowCamera(CameraKit & cOutKit) const;
-
-	//== Model Segment 관련 함수 =====================================================================
-	void ConfigureSegmentModel();
-	SegmentKey ModelInclude();
-	SegmentKey ModelInclude() const;
-	SegmentKey StylesInclude();
-	SegmentKey StylesInclude() const;
 
 	//== Modelling Matrix 관련 함수 ==================================================================
 	SegmentKey & SetModellingMatrix(MatrixKit const & cInKit);
@@ -144,10 +140,6 @@ public:
 	bool ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray & aOutData) const;
 	bool ShowUserDataIndices(IntPtrTArray & aOutIndices) const;
 	bool ShowUserData(intptr_t nInIndex, ByteArray & aOutData) const;
-
-private:
-	HC_KEY m_nModelIncludeKey = INVALID_KEY;
-	HC_KEY m_nStylesIncludeKey = INVALID_KEY;
 };
 
 CLOSE_3DF_NAMESPACE

@@ -223,6 +223,7 @@ public:
 	bool operator!=(SelectionItem const & cInThat) const;
 
 	bool ShowSelectedItem(Key & cOutSelection);
+	const bool ShowSelectedItem(Key & cOutSelection) const;
 
 	bool ShowPath(KeyPath & cOutPath) const;
 

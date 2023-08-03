@@ -66,6 +66,7 @@ public:
 	VisibilityControl(SegmentKey & cInSegmentKey);
 
 	//== Set Selectability Control =================================================================
+	VisibilityControl & SetCuttingSections(bool bInValue);
 	VisibilityControl & SetWindows(bool bInValue);
 	VisibilityControl & SetEdges(bool bInValue);
 	VisibilityControl & SetFaces(bool bInValue);
@@ -78,6 +79,7 @@ public:
 	VisibilityControl & SetEverything(bool bInValue);
 
 	//== Unset Selectability Control ===============================================================
+	VisibilityControl & UnsetCuttingSections();
 	VisibilityControl & UnsetWindows();
 	VisibilityControl & UnsetEdges();
 	VisibilityControl & UnsetFaces();

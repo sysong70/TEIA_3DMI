@@ -249,7 +249,7 @@ bool TDF::SelectionOptionsKit::ShowScope(KeyPath & cOutStartPath, bool & bOutSco
 SelectionOptionsControl::SelectionOptionsControl(TDF::WindowKey const & cInWindow)
 {
 	SelectionOptionsControlPrivate * pcImpl = new SelectionOptionsControlPrivate();
-	pcImpl->m_pcBaseView = cInWindow.GetBaseView();
+	pcImpl->m_pcWindow = &cInWindow;
 
 	m_pcImpl = pcImpl;
 }
@@ -283,7 +283,7 @@ SelectionOptionsControl & SelectionOptionsControl::operator =(SelectionOptionsCo
 SelectionOptionsControl & SelectionOptionsControl::SetProximity(float fInProximity)
 {
 	SelectionOptionsControlPrivate * pcImpl = (SelectionOptionsControlPrivate *)m_pcImpl;
-	HC_KEY nViewKey = pcImpl->GetBaseView()->GetViewKey();
+	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
 		char chDriverOptions[MVO_BUFFER_SIZE];
@@ -302,19 +302,16 @@ SelectionOptionsControl & SelectionOptionsControl::SetLevel(Selection::Level eIn
 	{
 		// directs selection events to return the identifier of the containing segment of the item selected.
 		case TDF::Selection::Level::Segment:
-			pcImpl->GetBaseView()->SetViewSelectionLevel(HSelectionLevelSegment);
-			pcImpl->GetBaseView()->GetSelection()->SetSelectionLevel(HSelectSegment);
+			pcImpl->m_pcSelectionSet->SetSelectionLevel(HSelectSegment);
 			break;
 
 			// directs selection events to return the item that was selected.
 		case TDF::Selection::Level::Entity:
-			pcImpl->GetBaseView()->SetViewSelectionLevel(HSelectionLevelEntity);
-			pcImpl->GetBaseView()->GetSelection()->SetSelectionLevel(HSelectEntity);
+			pcImpl->m_pcSelectionSet->SetSelectionLevel(HSelectEntity);
 			break;
 
 		case TDF::Selection::Level::Subentity:
-			pcImpl->GetBaseView()->SetViewSelectionLevel(HSelectionLevelSegment);
-			pcImpl->GetBaseView()->GetSelection()->SetSelectionLevel(HSelectSubentity);
+			pcImpl->m_pcSelectionSet->SetSelectionLevel(HSelectSubentity);
 			break;
 		default:
 			break;
@@ -326,7 +323,7 @@ SelectionOptionsControl & SelectionOptionsControl::SetLevel(Selection::Level eIn
 SelectionOptionsControl & SelectionOptionsControl::SetInternalLimit(size_t nInLimit)
 {
 	SelectionOptionsControlPrivate * pcImpl = (SelectionOptionsControlPrivate *)m_pcImpl;
-	HC_KEY nViewKey = pcImpl->GetBaseView()->GetViewKey();
+	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
 		char chHeuristics[MVO_BUFFER_SIZE];
@@ -340,7 +337,7 @@ SelectionOptionsControl & SelectionOptionsControl::SetInternalLimit(size_t nInLi
 SelectionOptionsControl & SelectionOptionsControl::SetRelatedLimit(size_t nInLimit)
 {
 	SelectionOptionsControlPrivate * pcImpl = (SelectionOptionsControlPrivate *)m_pcImpl;
-	HC_KEY nViewKey = pcImpl->GetBaseView()->GetViewKey();
+	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
 		char chHeuristics[MVO_BUFFER_SIZE];
@@ -354,7 +351,7 @@ SelectionOptionsControl & SelectionOptionsControl::SetRelatedLimit(size_t nInLim
 SelectionOptionsControl & SelectionOptionsControl::SetSorting(Selection::Sorting eInSorting)
 {
 	SelectionOptionsControlPrivate * pcImpl = (SelectionOptionsControlPrivate *)m_pcImpl;
-	HC_KEY nViewKey = pcImpl->GetBaseView()->GetViewKey();
+	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
 		switch (eInSorting)
@@ -384,7 +381,7 @@ SelectionOptionsControl & SelectionOptionsControl::SetSorting(Selection::Sorting
 SelectionOptionsControl & SelectionOptionsControl::SetAlgorithm(Selection::Algorithm eInAlgorithm)
 {
 	SelectionOptionsControlPrivate * pcImpl = (SelectionOptionsControlPrivate *)m_pcImpl;
-	HC_KEY nViewKey = pcImpl->GetBaseView()->GetViewKey();
+	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
 		if (Selection::Algorithm::Visual == eInAlgorithm) {
@@ -401,7 +398,7 @@ SelectionOptionsControl & SelectionOptionsControl::SetAlgorithm(Selection::Algor
 SelectionOptionsControl & SelectionOptionsControl::SetGranularity(Selection::Granularity eInGranularity)
 {
 	SelectionOptionsControlPrivate * pcImpl = (SelectionOptionsControlPrivate *)m_pcImpl;
-	HC_KEY nViewKey = pcImpl->GetBaseView()->GetViewKey();
+	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
 		if (Selection::Granularity::Detailed == eInGranularity) {
@@ -418,7 +415,7 @@ SelectionOptionsControl & SelectionOptionsControl::SetGranularity(Selection::Gra
 SelectionOptionsControl & SelectionOptionsControl::SetBias(Selection::Bias eInBias)
 {
 	SelectionOptionsControlPrivate * pcImpl = (SelectionOptionsControlPrivate *)m_pcImpl;
-	HC_KEY nViewKey = pcImpl->GetBaseView()->GetViewKey();
+	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
 		switch (eInBias)
@@ -447,7 +444,7 @@ SelectionOptionsControl & SelectionOptionsControl::SetBias(Selection::Bias eInBi
 SelectionOptionsControl & SelectionOptionsControl::UnsetProximity()
 {
 	SelectionOptionsControlPrivate * pcImpl = (SelectionOptionsControlPrivate *)m_pcImpl;
-	HC_KEY nViewKey = pcImpl->GetBaseView()->GetViewKey();
+	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
 		HC_Set_Heuristics("no selection proximity");
@@ -465,7 +462,7 @@ SelectionOptionsControl & SelectionOptionsControl::UnsetLevel()
 SelectionOptionsControl & SelectionOptionsControl::UnsetInternalLimit()
 {
 	SelectionOptionsControlPrivate * pcImpl = (SelectionOptionsControlPrivate *)m_pcImpl;
-	HC_KEY nViewKey = pcImpl->GetBaseView()->GetViewKey();
+	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
 		HC_Set_Heuristics("no internal selection limit");
@@ -477,7 +474,7 @@ SelectionOptionsControl & SelectionOptionsControl::UnsetInternalLimit()
 SelectionOptionsControl & SelectionOptionsControl::UnsetRelatedLimit()
 {
 	SelectionOptionsControlPrivate * pcImpl = (SelectionOptionsControlPrivate *)m_pcImpl;
-	HC_KEY nViewKey = pcImpl->GetBaseView()->GetViewKey();
+	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
 		HC_Set_Heuristics("no related selection limit");
@@ -494,7 +491,7 @@ SelectionOptionsControl & SelectionOptionsControl::UnsetSorting()
 SelectionOptionsControl & SelectionOptionsControl::UnsetAlgorithm()
 {
 	SelectionOptionsControlPrivate * pcImpl = (SelectionOptionsControlPrivate *)m_pcImpl;
-	HC_KEY nViewKey = pcImpl->GetBaseView()->GetViewKey();
+	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
 		HC_Set_Heuristics("no] visual selection");
@@ -506,7 +503,7 @@ SelectionOptionsControl & SelectionOptionsControl::UnsetAlgorithm()
 SelectionOptionsControl & SelectionOptionsControl::UnsetGranularity()
 {
 	SelectionOptionsControlPrivate * pcImpl = (SelectionOptionsControlPrivate *)m_pcImpl;
-	HC_KEY nViewKey = pcImpl->GetBaseView()->GetViewKey();
+	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
 		HC_Set_Heuristics("no detail selection");
@@ -518,7 +515,7 @@ SelectionOptionsControl & SelectionOptionsControl::UnsetGranularity()
 SelectionOptionsControl & SelectionOptionsControl::UnsetBias()
 {
 	SelectionOptionsControlPrivate * pcImpl = (SelectionOptionsControlPrivate *)m_pcImpl;
-	HC_KEY nViewKey = pcImpl->GetBaseView()->GetViewKey();
+	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
 		HC_Set_Heuristics("no selection bias");
@@ -614,6 +611,18 @@ bool TDF::SelectionItem::operator!=(SelectionItem const & cInThat) const
 
 
 bool TDF::SelectionItem::ShowSelectedItem(Key & cOutSelection)
+{
+	if (nullptr == m_pcImpl) {
+		return false;
+	}
+
+	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)m_pcImpl;
+	cOutSelection = pcImpl->cKey;
+
+	return true;
+}
+
+const bool TDF::SelectionItem::ShowSelectedItem(Key & cOutSelection) const
 {
 	if (nullptr == m_pcImpl) {
 		return false;
@@ -1061,12 +1070,7 @@ TDF::SelectionControl::SelectionControl(WindowKey const & cInWindow)
 {
 	SelectionControlPrivate * pcImpl = new SelectionControlPrivate();
 	pcImpl->m_pcWindow = &cInWindow;
-
 	m_pcImpl = pcImpl;
-
-
-
-
 }
 
 TDF::SelectionControl::SelectionControl(SelectionControl const & cInThat)

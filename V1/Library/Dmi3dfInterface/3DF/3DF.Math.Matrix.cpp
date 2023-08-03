@@ -107,7 +107,12 @@ MatrixKit & MatrixKit::Rotate(double in_x, double in_y, double in_z)
 
 MatrixKit & MatrixKit::RotateOffAxis(Vector const & cInVector, float cInTheta)
 {
-	HC_Compute_Offaxis_Rotation(cInVector.x, cInVector.y, cInVector.z, cInTheta, m_fData);
+	float fData[16];
+	HC_Compute_Offaxis_Rotation(cInVector.x, cInVector.y, cInVector.z, cInTheta, fData);
+
+	HC_Compute_Matrix_Product(m_fData, fData, m_fData);
+
+	//HC_Compute_Offaxis_Rotation(cInVector.x, cInVector.y, cInVector.z, cInTheta, m_fData);
 	return *this;
 }
 

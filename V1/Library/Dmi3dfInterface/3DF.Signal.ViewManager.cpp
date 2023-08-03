@@ -83,6 +83,17 @@ void ViewManager::ExecuteSignal(Json::Object & cInObject)
 			CancelCommands(nViewId);
 			break;
 
+/*
+		case Signal::View::Action::OnChar:
+		{
+			UINT nChar = (UINT)cInObject.GetInteger(SKW_CHAR);
+			UINT nRepCnt = (UINT)cInObject.GetInteger(SKW_REPCNT);
+			UINT nFlags = (UINT)cInObject.GetInteger(SKW_FLAGS);
+			Char(nViewId, nChar, nRepCnt, nFlags);
+		}
+		break;
+*/
+
 		default:
 			assert(false);
 			break;
@@ -119,8 +130,8 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
  	CString strErrorMessage;
 
 	// Segement를 Model용으로 구성한다.
-	SegmentKey cModelSegmentKey = m_pcHoopsModel->GetSegmentKey();
-	cModelSegmentKey.ConfigureSegmentModel();
+ 	SegmentKey cModelSegmentKey = m_pcHoopsModel->GetSegmentKey();
+// 	cModelSegmentKey.ConfigureSegmentModel();
 
 	//cModelSegmentKey.ForcedOpen();
 
@@ -159,7 +170,7 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 		SegmentKeyPrivate::LocalClose(cViewKey);
 
 		DLL::TDF::Interface cInterfaace;
-		cInterfaace._3DFImportFile(strFilePathName, cModelSegmentKey, Connector::GetInstance(nViewId), strErrorMessage);
+		cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, Connector::GetInstance(nViewId), strErrorMessage);
 	}
 	else {
 		LoadPointCloudFile(strFilePathName, pcCanvas);
@@ -260,12 +271,12 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 void ViewManager::Destruct(int nViewId)
 {
-	Canvas * pcHoopsView = Wrapper().m_mpcCanvas[nViewId];
-	if(nullptr != pcHoopsView) {
+	Canvas * pcCanvas = Wrapper().m_mpcCanvas[nViewId];
+	if(nullptr != pcCanvas) {
 
-		Model * pcModel = (Model *) pcHoopsView->GetBaseView()->GetModel();
+		Model * pcModel = (Model *) pcCanvas->GetBaseView()->GetModel();
 
-		delete pcHoopsView;
+		delete pcCanvas;
 		Wrapper().m_mpcCanvas[nViewId] = nullptr;
 
 		if(nullptr != pcModel) {

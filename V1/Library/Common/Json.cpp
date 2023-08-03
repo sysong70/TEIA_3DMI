@@ -1300,7 +1300,10 @@ void Json::Object::Stringify(CString& buffer)
 
 	for (auto* pPair : m_members) {
 		if (pPair->pValue) {
-			buffer += L"\"" + WStr::ToUtf16(pPair->Name.GetBuffer()) + L"\":";
+			//buffer += L"\"" + WStr::ToUtf16(pPair->Name.GetBuffer()) + L"\":";
+			buffer += L"\"";
+			buffer += WStr::ToUtf16(pPair->Name.GetBuffer());
+			buffer += L"\":";
 			pPair->pValue->Stringify(buffer);
 		}
 		else {

@@ -20,6 +20,10 @@ void WindowKeyPrivate::Copy(WindowKeyPrivate * pcInThat)
 {
 	m_pcBaseView = pcInThat->m_pcBaseView;
 	m_nViewId = pcInThat->m_nViewId;
+
+	m_pcSelection = pcInThat->m_pcSelection;
+	m_pcHighlight = pcInThat->m_pcHighlight;
+	m_pcSelectionOptions = pcInThat->m_pcSelectionOptions;
 }
 
 // m_nSelectBufferKeyCount의 값이 nCount보다 작으면 m_pnSelectBufferKey를 재할당한다.

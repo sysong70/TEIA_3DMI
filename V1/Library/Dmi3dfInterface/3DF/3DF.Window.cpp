@@ -3,85 +3,129 @@
 #include "3DF.Window.h"
 #include "Private/3DF.WindowPrivate.h"
 
+#include "Private/3DF.SelectionPrivate.h"
+#include "Private/3DF.HighlightPrivate.h"
+
 #include "3DF.BaseView.h"
 
 #include <hc.h>
 #include <HBaseOperator.h>
+#include <HSelectionSet.h>
 
 USING_3DF_NAMESPACE
 
 // public HBaseView, public HAnimationListener
 
-WindowKey::WindowKey(TDF::BaseView * pcBaseView)
+TDF::WindowKey::WindowKey(TDF::BaseView * pcBaseView)
 {
 	WindowKeyPrivate * pcImpl = new WindowKeyPrivate();
-	pcImpl->m_pcBaseView = pcBaseView;
 	m_pcImpl = pcImpl;
+
+	pcImpl->m_pcBaseView = pcBaseView;
+
+	// SelectionSet 초기화, 3DF에서는 Hightliht, Selection을 구분하지 않고 사용한다.
+
+	pcImpl->m_pcSelectionSet = new HSelectionSet((HBaseView *)pcBaseView);
+
+	pcImpl->m_pcSelection = new SelectionControl(*this);
+	SelectionControlPrivate * pcSelectionImpl = static_cast<SelectionControlPrivate *>(pcImpl->m_pcSelection->GetImpl());
+	pcSelectionImpl->m_pcSelectionSet = pcImpl->m_pcSelectionSet;
+
+	pcImpl->m_pcHighlight = new HighlightControl(*this);
+	HighlightControlPrivate * pcHighlightImpl = static_cast<HighlightControlPrivate *>(pcImpl->m_pcHighlight->GetImpl());
+	pcHighlightImpl->m_pcSelectionSet = pcImpl->m_pcSelectionSet;
+
+	pcImpl->m_pcSelectionOptions = new SelectionOptionsControl(*this);
+	SelectionOptionsControlPrivate * pcSelectionOptionsImpl = static_cast<SelectionOptionsControlPrivate *>(pcImpl->m_pcSelectionOptions->GetImpl());
+	pcSelectionOptionsImpl->m_pcSelectionSet = pcImpl->m_pcSelectionSet;
 
 	// Initialize();
 }
 
-WindowKey::WindowKey(WindowKey const & cInThat)
+TDF::WindowKey::WindowKey(WindowKey const & cInThat)
 {
 	WindowKeyPrivate * pcImpl = new WindowKeyPrivate();
 	pcImpl->m_pcBaseView = ((WindowKeyPrivate *)cInThat.m_pcImpl)->m_pcBaseView;
 	m_pcImpl = pcImpl;
 }
 
-const TDF::BaseView * WindowKey::GetBaseView() const
+TDF::WindowKey::~WindowKey()
+{
+	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+
+	if (nullptr != pcImpl->m_pcSelectionSet)
+	{
+		delete pcImpl->m_pcSelectionSet;
+		pcImpl->m_pcSelectionSet = nullptr;
+	}
+
+	if (nullptr != pcImpl->m_pcSelection)
+	{
+		delete pcImpl->m_pcSelection;
+		pcImpl->m_pcSelection = nullptr;
+	}
+
+	if (nullptr != pcImpl->m_pcHighlight)
+	{
+		delete pcImpl->m_pcHighlight;
+		pcImpl->m_pcHighlight = nullptr;
+	}
+}
+
+const TDF::BaseView * TDF::WindowKey::GetBaseView() const
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return pcImpl->m_pcBaseView;
 }
 
-TDF::BaseView * WindowKey::GetBaseView()
+TDF::BaseView * TDF::WindowKey::GetBaseView()
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return pcImpl->GetBaseView();
 }
 
-HC_KEY WindowKey::GetSceneKey()
+HC_KEY TDF::WindowKey::GetSceneKey()
 {
 	return GetBaseView()->GetSceneKey();
 }
 
-const HC_KEY WindowKey::GetSceneKey() const
+const HC_KEY TDF::WindowKey::GetSceneKey() const
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return pcImpl->GetBaseView()->GetSceneKey();
 }
 
-void WindowKey::Update()
+void TDF::WindowKey::Update()
 {
 	GetBaseView()->Update();
 }
 
-int WindowKey::ViewId()
+int TDF::WindowKey::ViewId()
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return pcImpl->m_nViewId;
 }
 
-const int WindowKey::ViewId() const
+const int TDF::WindowKey::ViewId() const
 { 
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return pcImpl->m_nViewId;
 }
 
-void WindowKey::SetViewId(int nViewId) 
+void TDF::WindowKey::SetViewId(int nViewId) 
 { 
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	pcImpl->m_nViewId = nViewId;
 }
 
-void WindowKey::Initialize()
+void TDF::WindowKey::Initialize()
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 
 //	HBaseView * pcBaseView = pcImpl->m_pcBaseView;
 }
 
-int WindowKey::OnMouseMove(HEventInfo & cEvent)
+int TDF::WindowKey::OnMouseMove(HEventInfo & cEvent)
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 
@@ -112,39 +156,39 @@ int WindowKey::OnMouseMove(HEventInfo & cEvent)
 	return nResult;
 }
 
-SelectionOptionsControl WindowKey::GetSelectionOptionsControl()
+SelectionOptionsControl & TDF::WindowKey::GetSelectionOptionsControl()
 {
-	SelectionOptionsControl cSelectionOptions(*this);
-	return cSelectionOptions;
+	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	return * pcImpl->m_pcSelectionOptions;
 }
 
-SelectionOptionsControl const WindowKey::GetSelectionOptionsControl() const
+SelectionOptionsControl const & TDF::WindowKey::GetSelectionOptionsControl() const
 {
-	SelectionOptionsControl cSelectionOptions(*this);
-	return cSelectionOptions;
+	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	return *pcImpl->m_pcSelectionOptions;
 }
 
-SelectionControl WindowKey::GetSelectionControl()
+SelectionControl & TDF::WindowKey::GetSelectionControl()
 {
-	SelectionControl cSelection(*this);
-	return cSelection;
+	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	return *pcImpl->m_pcSelection;
 }
 
-SelectionControl const WindowKey::GetSelectionControl() const
+SelectionControl const & TDF::WindowKey::GetSelectionControl() const
 {
-	SelectionControl cSelection(*this);
-	return cSelection;
+	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	return *pcImpl->m_pcSelection;
 }
 
-HighlightControl WindowKey::GetHighlightControl()
+HighlightControl & TDF::WindowKey::GetHighlightControl()
 {
-	HighlightControl cHighlight(*this);
-	return cHighlight;
+	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	return *pcImpl->m_pcHighlight;
 }
 
-HighlightControl const WindowKey::GetHighlightControl() const
+HighlightControl const & TDF::WindowKey::GetHighlightControl() const
 {
-	HighlightControl ccHighlight(*this);
-	return ccHighlight;
+	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	return *pcImpl->m_pcHighlight;
 }
 

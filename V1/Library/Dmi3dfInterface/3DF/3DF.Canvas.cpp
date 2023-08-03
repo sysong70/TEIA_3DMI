@@ -27,6 +27,7 @@
 #include "3DF.Selectability.h"
 #include "3DF.Visibility.h"
 #include "3DF.Material.h"
+#include "3DF.LineAttribute.h"
 
 #include "3DF.Operator.CameraSelect.h"
 #include "3DF.Operator.SelectArea.h"
@@ -35,6 +36,8 @@
 #include "../Signal/Signal.h"
 
 #include "3DF.Facility.AppOptions.h"
+
+#include "3DF.Operator.KinematicTest.h"
 
 #define SEGMENT_TYPE						1
 #define ENTITY_TYPE							2
@@ -73,6 +76,8 @@ Canvas::Canvas(HBaseModel * pcBaseModel, void * pcWindowHandle)
 
 	m_pcWindow = new WindowKey(m_pcBaseView);
 
+	m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
+
 	m_bOocSelection = false;
 	m_bDeepSelection = false;
 
@@ -81,6 +86,8 @@ Canvas::Canvas(HBaseModel * pcBaseModel, void * pcWindowHandle)
 
 	m_nCookieSelected = 0;
 	m_nCookieDeSelectedAll = 0;
+
+	m_pcKinematicTest = nullptr;
 }
 
 Canvas::~Canvas()
@@ -669,15 +676,10 @@ void Canvas::Init()
 
 	SetDefaultOperator();
 
-	// #Selection: Selection Option 설정 
-	m_pcWindow->GetSelectionOptionsControl().SetLevel(Selection::Level::Entity);
-	m_pcWindow->GetSelectionOptionsControl().SetRelatedLimit(10);
-	m_pcWindow->GetSelectionOptionsControl().SetProximity(0.2f);
-	//m_pcWindow->GetSelectionOptionsControl().SetBias(Selection::Bias::Lines);
-	//m_pcWindow->GetSelectionOptionsControl().SetSorting(Selection::Sorting::Proximity); // Sorting 해도 Z방향 Sort가 정확하게 되지는 않됨.
-
 	// Object Snap용 Glyph 생성
 	//Operator::ObjectSnap::CreateGlyph();
+
+	SetSelectOption();
 
 	// do all the setup with no updates
 	m_pcBaseView->SetSuppressUpdate(false);
@@ -780,8 +782,27 @@ void Canvas::InitNavigationCube(int nWidth, int nHeight)
 	m_bInitNaviCube = true;
 }
 
+// Select option 처리
 void Canvas::SetSelectOption()
 {
+	MaterialMappingKit cMaterial;
+	cMaterial.SetFaceColor(RGBColor(1.0f, 0.5f, 0.0f));
+	cMaterial.SetEdgeColor(RGBColor(1.0f, 0.5f, 0.0f));
+	cMaterial.SetLineColor(RGBColor(1.0f, 0.5f, 0.0f));
+
+	// #Selection: Selection Option 설정 
+	m_pcWindow->GetSelectionOptionsControl().SetLevel(Selection::Level::Entity);
+	m_pcWindow->GetSelectionOptionsControl().SetRelatedLimit(10);
+	m_pcWindow->GetSelectionOptionsControl().SetProximity(0.2f);
+	//m_pcWindow->GetSelectionOptionsControl().SetBias(Selection::Bias::Lines);
+	//m_pcWindow->GetSelectionOptionsControl().SetSorting(Selection::Sorting::Proximity); // Sorting 해도 Z방향 Sort가 정확하게 되지는 않됨.
+
+	m_pcWindow->GetHighlightControl().SetMaterialMapping(cMaterial);
+	m_pcWindow->GetHighlightControl().GetLineAttributeControl().SetWeight(5.0);
+
+	return;
+
+
 	HPixelRGBA cHighlightSelectColor;
 	cHighlightSelectColor.Set(255, 0, 0);
 	m_pcBaseView->GetHighlightSelection()->SetSelectionFaceColor(cHighlightSelectColor);
@@ -1249,11 +1270,48 @@ bool Canvas::MouseWheel(int nFlags, int zDelta, int x, int y, Json::Object & cIn
 	return true;
 }
 
+//== Keyboard 관련 함수 ==============================================================================
+bool Canvas::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	switch (nChar)
+	{
+		case 't':
+		case 'T':
+		{
+			if (nullptr == m_pcKinematicTest) {
+				m_pcKinematicTest = new Operator::KinematicTest();
+				m_pcKinematicTest->CreateTestModel(GetModelKey());
+
+				GetBaseView()->SetSuppressUpdateTick(false);
+				GetBaseView()->SetSuppressUpdate(false);
+
+				GetBaseView()->GetModel()->SetFirstFitComplete(true);
+
+				GetBaseView()->SetGeometryChanged();
+
+				GetBaseView()->FitWorld();		// fit the camera to the scene extents
+				GetBaseView()->CameraPositionChanged(true);
+
+				GetBaseView()->SetZoomLimit();
+
+				GetBaseView()->ForceUpdate();
+			}
+		}
+		break;
+
+		default:
+			break;
+	}
+
+	return true;
+}
+
+
 DWORD Canvas::MouseMapFlags(DWORD state)
 {
 	DWORD nFlag = 0;
 
-	/*map the mfc events state to MVO*/
+	// map the mfc events state to MVO
 	if(state & MK_LBUTTON) nFlag |= MVO_LBUTTON;
 	if(state & MK_RBUTTON) nFlag |= MVO_RBUTTON;
 	if(state & MK_MBUTTON) nFlag |= MVO_MBUTTON;
@@ -1328,6 +1386,12 @@ void Canvas::LocalSetOperator(HBaseOperator * pcNewOperator)
 	if(m_pDlgKeyframeEditor)
 		m_pDlgKeyframeEditor->UpdateButtonStates();
 */
+}
+
+//== Model 관련 함수 =============================================================================
+SegmentKey Canvas::GetModelKey() 
+{ 
+	return m_pcBaseView->GetModelKey(); 
 }
 
 //== Select 관련 함수 ================================================================================

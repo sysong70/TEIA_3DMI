@@ -252,6 +252,8 @@ private:
 
 	//----- Segment Header -----
 	TDF::SegmentKey * m_pcModelSegment = nullptr;
+	TDF::SegmentKey m_nModelIncludeKey;
+	TDF::SegmentKey m_nStylesIncludeKey;
 	TDF::SegmentKey m_cPartsIncludeSegment;
 	TDF::SegmentKey m_cPoccsIncludeSegment;
 	TDF::SegmentKey m_cRisIncludeSegment;

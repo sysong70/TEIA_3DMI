@@ -305,8 +305,6 @@ void Signal::View::OnCommand(UINT id)
 	Wrapper().SendData(data);
 }
 
-
-
 void Signal::View::OnCancel()
 {
 	SendActionDataOnly(Action::OnCancel);

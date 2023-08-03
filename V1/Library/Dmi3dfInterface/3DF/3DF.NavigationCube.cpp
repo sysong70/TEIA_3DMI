@@ -89,6 +89,7 @@ NavigationCube::NavigationCube(TDF::BaseView * view, WindowKey * pcInWindow) :
 	m_pView(view),
 	m_pcWindow(pcInWindow)
 {
+	m_pcWindow = pcInWindow;
 }
 
 NavigationCube::~NavigationCube()
@@ -115,7 +116,7 @@ int NavigationCube::LButtonUp(HEventInfo & cInEvent)
 	}
 
 	CString strName = cSelectKey.Name();
-	TRACE(L"%s\n", strName);
+	// TRACE(L"%s\n", strName);
 
 	m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
 	m_cOldHighlightSelection.Reset();
@@ -149,6 +150,8 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 
 	int nEvent = HLISTENER_PASS_EVENT;
 	bool bUpdateFlag = false;
+
+	const SelectionControl * pcSelect = &m_pcWindow->GetSelectionControl();
 
 	SelectionResults cSelection;
 	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cPoint, cSelectOption, cSelection);
@@ -212,7 +215,8 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 
 
 
-void NavigationCube::SetView(TDF::BaseView * view, WindowKey * pcInWindow) {
+void NavigationCube::SetView(TDF::BaseView * view, WindowKey * pcInWindow) 
+{
 	m_pView = view;
 	m_pcWindow = pcInWindow;
 }
