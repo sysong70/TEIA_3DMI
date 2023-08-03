@@ -1,549 +1,206 @@
 ﻿{
-	"Styles": {
-		"Button": {
+"Styles":{
+	"Button":{
+	}
+},
+
+"Dialog":{
+	"DefaultButtons":{
+		"Ok":{"title":"Ok|확인", "id":1, "comment":"IDOK"},
+		"Cancel":{"title":"Cancel|취소", "id":2, "comment":"IDCANCEL"},
+		"Apply":{"title":"Apply|적용", "id":3, "comment":"IDAPPLY substitute IDYES"}
+	},
+
+	"FileOpen":{
+		"title":"Open File|파일 열기",
+		"filter": [
+			"All types (*.*)|*.*|",
+			"ACIS (*.sat, *.sab)|*.sat;*.sab|",
+			"3DS (*.3ds)|*.3ds|",
+			"3MF (*.3mf)|*.3mf|",
+			"Inventor (*.ipt, *.iam)|*.ipt;*.iam|",
+			"Navisworks (*.nwd)|*.nwd|",
+			"CATIA V4 (*.model, *.session, *.dlv, *.exp)|*.model;*.session;*.dlv;*.exp|",
+			"CATIA V5 (*.catpart, *.catproduct, *.catshape, *.cgr)|*.catpart;*.catproduct;*.catshape;*.cgr|",
+			"CATIA V6 / 3DExperience (*.3dxml)|*.3dxml|",
+			"COLLADA (*.dae)|*.dae|",
+			"Creo - Pro/E (*.asm, *.neu, *.prt, *.xas, *.xpr)|*.asm;*.neu;*.prt;*.xas;*.xpr|",
+			"FBX (*.fbx)|*.fbx|",
+			"GL Transmission Format (*.gltf, *.glb)|*.gltf;*.glb|",
+			"I-deas (*.mf1, *.arc, *.unv, *.pkg)|*.mf1;*.arc;*.unv;*.pkg|",
+			"IFC (*.ifc, *.ifczip)|*.ifc;*.ipczip|",
+			"IGES (*.igs, *.iges)|*.igs;*.iges|",
+			"JT (*.jt)|*.jt|",
+			"Microstation DGN (*.dgn)|*.dgn|",
+			"NX - Unigraphics (*.prt)|*.prt|",
+			"Parasolid (*.x_t, *.x_b, *.xmt, *.xmt_txt)|*.x_t;*.x_b;*.xmt;*.xmt_txt|",
+			"PRC (*.prc)|*.prc|",
+			"Revit (*.rvt, *.rfa)|*.rvt;*.rfa|",
+			"Rhino3D (*.3dm)|*.3dm|",
+			"Solid Edge (*.asm, *.par, *.pwd, *.psm)|*.asm;*.par;*.pwd;*.psm|",
+			"Solidworks (*.sldasm, *.sldprt)|*.sldasm;*.sldprt|",
+			"Steoeo Lithography (*.stl)|*.stl|",
+			"STEP (*.stp, *.step, *.stpz, *.stepx, *.stpxz)|*.stp;*.step;*.stpz;*.stepx;*.stpxz|",
+			"U3D (*.u3d)|*.u3d|",
+			"VDA-FS (*.vda)|*.vda|",
+			"VRML (*.wrl, *.vrml)|*.wrl;*.vrml|",
+			"Wavefront OBJ (*.obj)|*.obj|",
+			"|"
+		]
+	},
+
+	"Progress":{
+		"title":"Open File|파일 열기",
+		"size":{"cx":500, "cy":300},
+		"body":{
+			"Message":{"title":"Ready...|준비..."},
+			"Log":{}
 		}
 	},
 
-	"Dialog": {
-		"DefaultButtons": {
-			"Ok": {
-				"title": "Ok|확인",
-				"id": 1,
-				"comment": "IDOK"
-			},
-			"Cancel": {
-				"title": "Cancel|취소",
-				"id": 2,
-				"comment": "IDCANCEL"
-			},
-			"Apply": {
-				"title": "Apply|적용",
-				"id": 3,
-				"comment": "IDAPPLY substitute IDYES"
-			}
-		},
-
-		"FileOpen": {
-			"title": "Open File|파일 열기",
-			"filter": [
-				"All types (*.*)|*.*|",
-				"ACIS (*.sat, *.sab)|*.sat;*.sab|",
-				"3DS (*.3ds)|*.3ds|",
-				"3MF (*.3mf)|*.3mf|",
-				"Inventor (*.ipt, *.iam)|*.ipt;*.iam|",
-				"Navisworks (*.nwd)|*.nwd|",
-				"CATIA V4 (*.model, *.session, *.dlv, *.exp)|*.model;*.session;*.dlv;*.exp|",
-				"CATIA V5 (*.catpart, *.catproduct, *.catshape, *.cgr)|*.catpart;*.catproduct;*.catshape;*.cgr|",
-				"CATIA V6 / 3DExperience (*.3dxml)|*.3dxml|",
-				"COLLADA (*.dae)|*.dae|",
-				"Creo - Pro/E (*.asm, *.neu, *.prt, *.xas, *.xpr)|*.asm;*.neu;*.prt;*.xas;*.xpr|",
-				"FBX (*.fbx)|*.fbx|",
-				"GL Transmission Format (*.gltf, *.glb)|*.gltf;*.glb|",
-				"I-deas (*.mf1, *.arc, *.unv, *.pkg)|*.mf1;*.arc;*.unv;*.pkg|",
-				"IFC (*.ifc, *.ifczip)|*.ifc;*.ipczip|",
-				"IGES (*.igs, *.iges)|*.igs;*.iges|",
-				"JT (*.jt)|*.jt|",
-				"Microstation DGN (*.dgn)|*.dgn|",
-				"NX - Unigraphics (*.prt)|*.prt|",
-				"Parasolid (*.x_t, *.x_b, *.xmt, *.xmt_txt)|*.x_t;*.x_b;*.xmt;*.xmt_txt|",
-				"PRC (*.prc)|*.prc|",
-				"Revit (*.rvt, *.rfa)|*.rvt;*.rfa|",
-				"Rhino3D (*.3dm)|*.3dm|",
-				"Solid Edge (*.asm, *.par, *.pwd, *.psm)|*.asm;*.par;*.pwd;*.psm|",
-				"Solidworks (*.sldasm, *.sldprt)|*.sldasm;*.sldprt|",
-				"Steoeo Lithography (*.stl)|*.stl|",
-				"STEP (*.stp, *.step, *.stpz, *.stepx, *.stpxz)|*.stp;*.step;*.stpz;*.stepx;*.stpxz|",
-				"U3D (*.u3d)|*.u3d|",
-				"VDA-FS (*.vda)|*.vda|",
-				"VRML (*.wrl, *.vrml)|*.wrl;*.vrml|",
-				"Wavefront OBJ (*.obj)|*.obj|",
-				"|"
+	"AppOptions":{
+		"title":"Options|옵션",
+		"size":{"cx":800, "cy":600},
+		"body":{
+			"tabs":[
+				"Preferences",
+				"FileOptions"
 			]
 		},
-
-		"Progress": {
-			"title": "Open File|파일 열기",
-			"size": {
-				"cx": 500,
-				"cy": 300
-			},
-			"body": {
-				"Message": { "title": "Ready...|준비..." },
-				"Log": {}
-			}
-		},
-
-		"AppOptions": {
-			"title": "Options|옵션",
-			"size": {
-				"cx": 800,
-				"cy": 600
-			},
-			"body": {
-				"tabs": [
-					"Preferences",
-					"FileOptions"
-				]
-			},
-			"footer": {
-				"Initialize": { "title": "Initialize|초기화" },
-				"Reset": { "title": "Reset To Previous|이전으로 재설정" }
-			}
-		},
-
-		"Preferences": {
-			"tree": [
-				{
-					"name": "Environment",
-					"title": "Environment|환경"
-				},
-				{
-					"name": "Views",
-					"title": "Views|뷰"
-				}
-			],
-			"properties": {
-				"Environment": {
-					"type": "root",
-					"items": [
-						{
-							"type": "group",
-							"name": "General",
-							"title": "General|일반",
-							"items": [
-								{
-									"type": "drop",
-									"name": "Language",
-									"title": "Language|언어",
-									"desc": "_#_|_#_",
-									"value": 0,
-									"items": [
-										"English|영어",
-										"Korean|한글"
-									]
-								}
-							]
-						},
-						{
-							"type": "group",
-							"name": "Mouse",
-							"title": "Mouse|마우스",
-							"items": [
-								{
-									"type": "check",
-									"name": "SwapPanAndRotate",
-									"title": "Swap Pan and Rotate button|펜/회전 버튼 교환",
-									"desc": "__#__|__#__"
-								},
-								{
-									"type": "check",
-									"name": "ReverseWheelDirection",
-									"title": "Reverse wheel button direction|휠 버튼 방황 전환",
-									"desc": "__#__|__#__"
-								}
-							]
-						}
-					]
-				},
-				"Views": {
-					"type": "root",
-					"items": [
-						{
-							"type": "group",
-							"name": "Colors",
-							"title": "Colors|색상",
-							"items": [
-								{
-									"type": "color",
-									"name": "BackTop",
-									"title": "Background-Top|배경 상부",
-									"desc": "__#__|__#__"
-								},
-								{
-									"type": "color",
-									"name": "BackBottom",
-									"title": "Background-Bottom|배경 하부",
-									"desc": "__#__|__#__"
-								}
-							]
-						},
-						{
-							"type": "group",
-							"name": "NavCube",
-							"title": "Navigation Cube|네비케이션 큐브",
-							"items": [
-								{
-									"type": "slider",
-									"name": "Size",
-									"title": "Size|크기",
-									"desc": "__#__|__#__",
-									"min": 100,
-									"max": 300,
-									"step": 50
-								},
-								{
-									"type": "check",
-									"name": "ShowAxis",
-									"title": "Show Axis|축 보기",
-									"desc": "__#__|__#__"
-								},
-								{
-									"type": "check",
-									"name": "ShowCube",
-									"title": "Show Cube|큐브 보기",
-									"desc": "__#__|__#__"
-								}
-							]
-						}
-					]
-				}
-			}
-		},
-
-		"FileOptions": {
-			"tree": [
-				{
-					"name": "Import",
-					"title": "Import|가져오기",
-					"items": [
-						{
-							"name": "3DS",
-							"title": "3DS"
-						},
-						{
-							"name": "3MF",
-							"title": "3MF"
-						},
-						{
-							"name": "ACIS",
-							"title": "ACIS"
-						},
-						{
-							"name": "CATIA4",
-							"title": "CATIA V4"
-						},
-						{
-							"name": "CATIA5",
-							"title": "CATIA V5"
-						},
-						{
-							"name": "CATIA6",
-							"title": "CATIA V6"
-						},
-						{
-							"name": "CGR",
-							"title": "CGR"
-						},
-						{
-							"name": "COLLADA",
-							"title": "COLLADA"
-						},
-						{
-							"name": "DWG2D",
-							"title": "DWG 2D"
-						},
-						{
-							"name": "DWG3D",
-							"title": "DWG 3D"
-						},
-						{
-							"name": "FBX",
-							"title": "FBX"
-						},
-						{
-							"name": "GLTF",
-							"title": "GLTF"
-						},
-						{
-							"name": "IDEAS",
-							"title": "I-deas"
-						},
-						{
-							"name": "IFC",
-							"title": "IFC"
-						},
-						{
-							"name": "IGES",
-							"title": "IGES"
-						},
-						{
-							"name": "Inventor",
-							"title": "Inventor"
-						},
-						{
-							"name": "JT",
-							"title": "JT"
-						},
-						{
-							"name": "Navisworks",
-							"title": "Navisworks"
-						},
-						{
-							"name": "Parasolid",
-							"title": "Parasolid"
-						},
-						{
-							"name": "PDF",
-							"title": "PDF"
-						},
-						{
-							"name": "PRC",
-							"title": "PRC"
-						},
-						{
-							"name": "ProEngineer",
-							"title": "Pro/Engineer"
-						},
-						{
-							"name": "Revit",
-							"title": "Revit"
-						},
-						{
-							"name": "Rhino",
-							"title": "Rhino"
-						},
-						{
-							"name": "SolidEdge",
-							"title": "SolidEdge"
-						},
-						{
-							"name": "Solidworks",
-							"title": "Solidworks"
-						},
-						{
-							"name": "STEP",
-							"title": "STEP"
-						},
-						{
-							"name": "STL",
-							"title": "STL"
-						},
-						{
-							"name": "Unigraphics",
-							"title": "Unigraphics"
-						},
-						{
-							"name": "Universal3D",
-							"title": "Universal3D"
-						},
-						{
-							"name": "VDAFS",
-							"title": "VDAFS"
-						},
-						{
-							"name": "VRML",
-							"title": "VRML"
-						}
-					]
-				}
-			],
-			"__DEFAULT__": [
-				{
-					"type": "group",
-					"name": "General",
-					"title": "General|일반",
-					"items": [
-						{
-							"type": "drop",
-							"name": "ReadingMode",
-							"title": "Reading Mode|_#_",
-							"desc": "_#_|_#_",
-							"value": 0,
-							"items": [
-								"Feature Trees|_#_",
-								"B-Rep|_#_",
-								"Tessellation Only|_#_"
-							]
-						},
-						{
-							"type": "check",
-							"name": "Solids",
-							"title": "Solid|_#_",
-							"desc": "Allows reading of solid parts.|_#_"
-						},
-						{
-							"type": "check",
-							"name": "Surfaces",
-							"title": "Surfaces|_#_",
-							"desc": "Allows reading of surfaces entities.|_#_"
-						},
-						{
-							"type": "check",
-							"name": "Wireframes",
-							"title": "Wireframes|_#_",
-							"desc": "_#_|_#_"
-						},
-						{
-							"type": "check",
-							"name": "Attributes",
-							"title": "Attributes|_#_",
-							"desc": "_#_|_#_"
-						},
-						{
-							"type": "check",
-							"name": "HiddenObjects",
-							"title": "Hidden Objects|_#_",
-							"desc": "_#_|_#_"
-						},
-						{
-							"type": "check",
-							"name": "References",
-							"title": "Construction and References|_#_",
-							"desc": "_#_|_#_"
-						},
-						{
-							"type": "check",
-							"name": "ActiveFilter",
-							"title": "Active Filter|_#_",
-							"desc": "_#_|_#_"
-						},
-						{
-							"type": "check",
-							"name": "SewModel",
-							"title": "Sew Model|_#_",
-							"desc": "_#_|_#_"
-						},
-						{
-							"type": "edit",
-							"name": "SewingTolerance",
-							"title": "Sewing Tolerance|_#_",
-							"desc": "_#_|_#_",
-							"value": "0.001"
-						},
-						{
-							"type": "check",
-							"name": "ShellOrientation",
-							"title": "Compute Non-Solid Shell Orientation|_#_",
-							"desc": "_#_|_#_"
-						},
-						{
-							"type": "drop",
-							"name": "LoadingMode",
-							"title": "Loading Mode|_#_",
-							"desc": "_#_|_#_",
-							"value": 0,
-							"items": [
-								"Complete|_#_",
-								"Incremental|_#_"
-							]
-						}
-					]
-				},
-				{
-					"type": "group",
-					"name": "Tessellation",
-					"title": "Tessellation",
-					"items": [
-						{
-							"type": "drop",
-							"name": "TessLevel",
-							"title": "Predefined Tessellation Level|_#_",
-							"value": 2,
-							"items": [
-								"Extra Low|_#_",
-								"Low|_#_",
-								"Medium|_#_",
-								"High|_#_",
-								"Extra High|_#_",
-								"Custom|_#_"
-							]
-						},
-						{
-							"type": "group",
-							"name": "CustomTessLevel",
-							"title": "Custom Tessellation Level",
-							"items": [
-								{
-									"type": "drop",
-									"name": "ChordLimitType",
-									"title": "Chord Limit|_#_",
-									"desc": "_#_|_#_",
-									"value": 1,
-									"items": [
-										"Ratio|_#_",
-										"Height|_#_"
-									]
-								},
-								{
-									"type": "edit",
-									"name": "ChordLimit",
-									"title": "Limit|_#_",
-									"desc": "_#_|_#_",
-									"value": 10000
-								},
-								{
-									"type": "edit",
-									"name": "AngleTolerance",
-									"title": "Angle Tolerance|_#_",
-									"desc": "_#_|_#_",
-									"value": 40
-								}
-							]
-						},
-						{
-							"type": "check",
-							"name": "PreserveUV",
-							"title": "Preserve UV Points|_#_",
-							"desc": "_#_|_#_"
-						},
-						{
-							"type": "edit",
-							"name": "MaxEdgeLength",
-							"title": "Maximum Edge Length|_#_",
-							"desc": "_#_|_#_",
-							"value": "0"
-						},
-						{
-							"type": "group",
-							"name": "Accurate",
-							"title": "Accurate Tessellation|_#_",
-							"items": [
-								{
-									"type": "check",
-									"name": "AccurateTess",
-									"title": "Accurate Tessellation|_#_",
-									"desc": "_#_|_#_"
-								},
-								{
-									"type": "check",
-									"name": "GridAlignedTess",
-									"title": "Grid Aligned Tessellation|_#_",
-									"desc": "_#_|_#_"
-								},
-								{
-									"type": "edit",
-									"name": "MaxStitchLength",
-									"title": "Maximum Stitch Length|_#_",
-									"value": "0.001",
-									"desc": "_#_|_#_"
-								},
-								{
-									"type": "check",
-									"name": "SurfaceCurvatures",
-									"title": "Adapt to Surface Curvatures|_#_",
-									"desc": "_#_|_#_"
-								}
-							]
-						}
-					]
-				}
-			]
-		},
-
-		"ObjectSnaps": {
-			"title": "Object Snaps|개체 스냅",
-			"size": {
-				"cx": 180,
-				"cy": 400
-			}
-		},
-
-		"SelectionFilters": {
-			"title": "Selection Filters|선택 필터",
-			"size": {
-				"cx": 400,
-				"cy": 600
-			}
+		"footer":{
+			"Initialize":{"title":"Initialize|초기화"},
+			"Reset":{"title":"Reset To Previous|이전으로 재설정"}
 		}
+	},
+
+	"Preferences":{
+		"tree":[
+			{"name":"Environment", "title":"Environment|환경"},
+			{"name":"Views", "title":"Views|뷰"}
+		],
+		"properties":{
+			"Environment":{"type":"root", "items":[
+				{"type":"group", "name":"General", "title":"General|일반", "items":[
+					{"type":"drop", "name":"Language", "title":"Language|언어", "desc":"_#_|_#_", "value":0, "items":[
+						"English|영어",
+						"Korean|한글"
+					]}
+				]},
+				{"type":"group", "name":"Mouse", "title":"Mouse|마우스", "items":[
+					{"type":"check", "name":"SwapPanAndRotate", "title":"Swap Pan and Rotate button|펜/회전 버튼 교환", "desc":"__#__|__#__"},
+					{"type":"check", "name":"ReverseWheelDirection", "title":"Reverse wheel button direction|휠 버튼 방황 전환", "desc":"__#__|__#__"}
+				]}
+			]},
+			"Views":{"type":"root", "items":[
+				{"type":"group", "name":"Colors", "title":"Colors|색상", "items":[
+					{"type":"color", "name":"BackTop", "title":"Background-Top|배경 상부", "desc":"__#__|__#__"},
+					{"type":"color", "name":"BackBottom", "title":"Background-Bottom|배경 하부", "desc":"__#__|__#__"}
+				]},
+				{"type":"group", "name":"NavCube", "title":"Navigation Cube|네비케이션 큐브", "items":[
+					{"type":"slider", "name":"Size", "title":"Size|크기", "desc":"__#__|__#__", "min":100, "max":300, "step":50},
+					{"type":"check", "name":"ShowAxis", "title":"Show Axis|축 보기", "desc":"__#__|__#__"},
+					{"type":"check", "name":"ShowCube", "title":"Show Cube|큐브 보기", "desc":"__#__|__#__"}
+				]}
+			]}
+		}
+	},
+
+	"FileOptions":{
+		"tree":[
+			{"name":"Import", "title":"Import|가져오기", "items":[
+				{"name":"3DS", "title":"3DS"},
+				{"name":"3MF", "title":"3MF"},
+				{"name":"ACIS", "title":"ACIS"},
+				{"name":"CATIA4", "title":"CATIA V4"},
+				{"name":"CATIA5", "title":"CATIA V5"},
+				{"name":"CATIA6", "title":"CATIA V6"},
+				{"name":"CGR", "title":"CGR"},
+				{"name":"COLLADA", "title":"COLLADA"},
+				{"name":"DWG2D", "title":"DWG 2D"},
+				{"name":"DWG3D", "title":"DWG 3D"},
+				{"name":"FBX", "title":"FBX"},
+				{"name":"GLTF", "title":"GLTF"},
+				{"name":"IDEAS", "title":"I-deas"},
+				{"name":"IFC", "title":"IFC"},
+				{"name":"IGES", "title":"IGES"},
+				{"name":"Inventor", "title":"Inventor"},
+				{"name":"JT", "title":"JT"},
+				{"name":"Navisworks", "title":"Navisworks"},
+				{"name":"Parasolid", "title":"Parasolid"},
+				{"name":"PDF", "title":"PDF"},
+				{"name":"PRC", "title":"PRC"},
+				{"name":"ProEngineer", "title":"Pro/Engineer"},
+				{"name":"Revit", "title":"Revit"},
+				{"name":"Rhino", "title":"Rhino"},
+				{"name":"SolidEdge", "title":"SolidEdge"},
+				{"name":"Solidworks", "title":"Solidworks"},
+				{"name":"STEP", "title":"STEP"},
+				{"name":"STL", "title":"STL"},
+				{"name":"Unigraphics", "title":"Unigraphics"},
+				{"name":"Universal3D", "title":"Universal3D"},
+				{"name":"VDAFS", "title":"VDAFS"},
+				{"name":"VRML", "title":"VRML"}
+			]}
+		],
+		"__DEFAULT__":[
+			{"type":"group", "name":"General", "title":"General|일반", "items":[
+				{"type":"drop", "name":"ReadingMode", "title":"Reading Mode|_#_", "desc":"_#_|_#_", "value":0, "items":[
+					"Feature Trees|_#_",
+					"B-Rep|_#_",
+					"Tessellation Only|_#_"
+				]},
+				{"type":"check", "name":"Solids", "title":"Solid|_#_", "desc":"Allows reading of solid parts.|_#_"},
+				{"type":"check", "name":"Surfaces", "title":"Surfaces|_#_", "desc":"Allows reading of surfaces entities.|_#_"},
+				{"type":"check", "name":"Wireframes", "title":"Wireframes|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"Attributes", "title":"Attributes|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"HiddenObjects", "title":"Hidden Objects|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"References", "title":"Construction and References|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"ActiveFilter", "title":"Active Filter|_#_", "desc":"_#_|_#_"},
+				{"type":"check", "name":"SewModel", "title":"Sew Model|_#_", "desc":"_#_|_#_"},
+				{"type":"edit", "name":"SewingTolerance", "title":"Sewing Tolerance|_#_", "desc":"_#_|_#_", "value":"0.001"},
+				{"type":"check", "name":"ShellOrientation", "title":"Compute Non-Solid Shell Orientation|_#_", "desc":"_#_|_#_"},
+				{"type":"drop", "name":"LoadingMode", "title":"Loading Mode|_#_", "desc":"_#_|_#_", "value":0, "items":[
+					"Complete|_#_",
+					"Incremental|_#_"
+				]}
+			]},
+			{"type":"group", "name":"Tessellation", "title":"Tessellation", "items":[
+				{"type":"drop", "name":"TessLevel", "title":"Predefined Tessellation Level|_#_", "value":2, "items":[
+					"Extra Low|_#_",
+					"Low|_#_",
+					"Medium|_#_",
+					"High|_#_",
+					"Extra High|_#_",
+					"Custom|_#_"
+				]},
+				{"type":"group", "name":"CustomTessLevel", "title":"Custom Tessellation Level", "items":[
+					{"type":"drop", "name":"ChordLimitType", "title":"Chord Limit|_#_", "desc":"_#_|_#_", "value":1, "items":[
+						"Ratio|_#_",
+						"Height|_#_"
+					]},
+					{"type":"edit", "name":"ChordLimit", "title":"Limit|_#_", "desc":"_#_|_#_", "value":10000},
+					{"type":"edit", "name":"AngleTolerance", "title":"Angle Tolerance|_#_", "desc":"_#_|_#_", "value":40}
+				]},
+				{"type":"check", "name":"PreserveUV", "title":"Preserve UV Points|_#_", "desc":"_#_|_#_"},
+				{"type":"edit", "name":"MaxEdgeLength", "title":"Maximum Edge Length|_#_", "desc":"_#_|_#_", "value":"0"},
+				{"type":"group", "name":"Accurate", "title":"Accurate Tessellation|_#_", "items":[
+					{"type":"check", "name":"AccurateTess", "title":"Accurate Tessellation|_#_", "desc":"_#_|_#_"},
+					{"type":"check", "name":"GridAlignedTess", "title":"Grid Aligned Tessellation|_#_", "desc":"_#_|_#_"},
+					{"type":"edit", "name":"MaxStitchLength", "title":"Maximum Stitch Length|_#_", "value":"0.001", "desc":"_#_|_#_"},
+					{"type":"check", "name":"SurfaceCurvatures", "title":"Adapt to Surface Curvatures|_#_", "desc":"_#_|_#_"}
+				]}
+			]}
+		]
+	},
+
+	"ObjectSnaps":{
+		"title":"Object Snaps|개체 스냅",
+		"size":{"cx":180, "cy":400}
+	},
+
+	"SelectionFilters":{
+		"title":"Selection Filters|선택 필터",
+		"size":{"cx":400, "cy":600}
 	}
+}
 }
