@@ -1476,11 +1476,11 @@ TDF_INLINE Cuboid_3D<F> Contract(Cuboid_3D<F> const & a, F border) {
 using ByteArray = std::vector<byte, Allocator<byte>>;
 using IntArray = std::vector<int, Allocator<int>>;
 using FloatArray = std::vector<float, Allocator<float>>;
-using PointArray = std::vector<TDF::Point, Allocator<TDF::Point>>;
-using Point2DArray = std::vector<TDF::Point2D, Allocator<TDF::Point2D>>;
-using DPoint2DArray = std::vector<TDF::DPoint2D, Allocator<TDF::DPoint2D>>;
-using VectorArray = std::vector<TDF::Vector, Allocator<TDF::Vector>>;
-using Vector2DArray = std::vector<TDF::Vector2D, Allocator<TDF::Vector2D>>;
+using PointArray = std::vector<H3DF::Point, Allocator<H3DF::Point>>;
+using Point2DArray = std::vector<H3DF::Point2D, Allocator<H3DF::Point2D>>;
+using DPoint2DArray = std::vector<H3DF::DPoint2D, Allocator<H3DF::DPoint2D>>;
+using VectorArray = std::vector<H3DF::Vector, Allocator<H3DF::Vector>>;
+using Vector2DArray = std::vector<H3DF::Vector2D, Allocator<H3DF::Vector2D>>;
 
 namespace Math
 {

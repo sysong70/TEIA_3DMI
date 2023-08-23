@@ -9,26 +9,26 @@
 
 class HBaseView;
 
-namespace TDF
+namespace H3DF
 {
 	namespace Painter
 	{
-		using Points = std::vector<TDF::Point>;
+		using Points = std::vector<H3DF::Point>;
 
 		void SetView(HBaseView* view);
 
 		void SetColor(const char* type, const char* space, double abc[3]);
 
-		TDF::Point TransColor(COLORREF color);
+		H3DF::Point TransColor(COLORREF color);
 
 
 
 		namespace Arc
 		{
 			// 3 Points
-			HC_KEY Create(TDF::Point first, TDF::Point second, TDF::Point third);
+			HC_KEY Create(H3DF::Point first, H3DF::Point second, H3DF::Point third);
 			// angle: degree
-			void GetPoints(TDF::Point center, double radius, double startAngle, double endAngle, Points& points);
+			void GetPoints(H3DF::Point center, double radius, double startAngle, double endAngle, Points& points);
 
 			void GetPoints(float x, float y, double radius, double startAngle, double endAngle, Points& points);
 		};
@@ -38,33 +38,33 @@ namespace TDF
 		namespace Circle
 		{
 			// Center, Radius
-			HC_KEY Create(TDF::Point center, double radius, bool polygon = true);
+			HC_KEY Create(H3DF::Point center, double radius, bool polygon = true);
 			// 3 Points
-			HC_KEY Create(TDF::Point first, TDF::Point second, TDF::Point third, bool polygon = true);
+			HC_KEY Create(H3DF::Point first, H3DF::Point second, H3DF::Point third, bool polygon = true);
 
-			void GetPoints(TDF::Point center, double radius, bool reverse, Points& points);
+			void GetPoints(H3DF::Point center, double radius, bool reverse, Points& points);
 		};
 
 
 
 		namespace Compute
 		{
-			double Distance(TDF::Point p1, TDF::Point p2);
+			double Distance(H3DF::Point p1, H3DF::Point p2);
 
 			double PixelToWorld(double value);
 
-			TDF::Vector Normal();
+			H3DF::Vector Normal();
 		}
 
 
 
 		namespace Figure
 		{
-			HC_KEY CreateDonut(TDF::Point center, double inner, double outer);
+			HC_KEY CreateDonut(H3DF::Point center, double inner, double outer);
 			// Left & Right Half Circle
-			HC_KEY CreateObround(TDF::Point topLeft, TDF::Point bottomRight);
+			HC_KEY CreateObround(H3DF::Point topLeft, H3DF::Point bottomRight);
 
-			HC_KEY CreateRectangle(TDF::Point topLeft, TDF::Point bottomRight);
+			HC_KEY CreateRectangle(H3DF::Point topLeft, H3DF::Point bottomRight);
 		};
 
 		//:REF - https://docs.techsoft3d.com/3df/latest/api_ref/3dgs/HC_Set_Text_Font.html
@@ -113,7 +113,7 @@ namespace TDF
 
 		namespace Line
 		{
-			HC_KEY Create(TDF::Point first, TDF::Point second, bool firstEnd = false, bool secondEnd = false);
+			HC_KEY Create(H3DF::Point first, H3DF::Point second, bool firstEnd = false, bool secondEnd = false);
 		};
 
 
@@ -157,9 +157,9 @@ namespace TDF
 
 		namespace Text
 		{
-			HC_KEY Create(TDF::Point center, const char* value);
+			HC_KEY Create(H3DF::Point center, const char* value);
 
-			HC_KEY Create(TDF::Point center, const wchar_t* value);
+			HC_KEY Create(H3DF::Point center, const wchar_t* value);
 
 			void GetExtent(const char* value, float& width, float& height);
 

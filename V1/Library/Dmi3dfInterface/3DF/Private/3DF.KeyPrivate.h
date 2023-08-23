@@ -5,7 +5,7 @@
 
 OPEN_3DF_NAMESPACE
 
-class KeyPrivate : public TDF::PrivateImpl
+class KeyPrivate : public H3DF::PrivateImpl
 {
 public:
 	KeyPrivate() { m_eType = Type::Key; }

@@ -88,7 +88,7 @@ public:
 class SelectionItemPrivate : public PrivateImpl
 {
 public:
-	SelectionItemPrivate() { m_eType = TDF::Type::SelectionItem; }
+	SelectionItemPrivate() { m_eType = H3DF::Type::SelectionItem; }
 	virtual ~SelectionItemPrivate() 
 	{
 		if (nullptr != pnIncludeKeys) {
@@ -141,7 +141,7 @@ public:
 class SelectionResultsIteratorPrivate : public PrivateImpl
 {
 public:
-	SelectionResultsIteratorPrivate() { m_eType = TDF::Type::SelectionResultsIterator; }
+	SelectionResultsIteratorPrivate() { m_eType = H3DF::Type::SelectionResultsIterator; }
 
 	void Copy(SelectionResultsIteratorPrivate * pcInThat) {
 		pcIterator = pcInThat->pcIterator;
@@ -157,7 +157,7 @@ public:
 class SelectionResultsPrivate : public PrivateImpl
 {
 public:
-	SelectionResultsPrivate() { m_eType = TDF::Type::SelectionResults; }	
+	SelectionResultsPrivate() { m_eType = H3DF::Type::SelectionResults; }	
 
 	void Copy(SelectionResultsPrivate * pcInThat) {
 		deItems.clear();
@@ -196,7 +196,7 @@ private:
 class SelectionControlPrivate : public PrivateImpl
 {
 public:
-	SelectionControlPrivate() { m_eType = TDF::Type::SelectionControl; }	
+	SelectionControlPrivate() { m_eType = H3DF::Type::SelectionControl; }	
 
 	void Copy(SelectionControlPrivate * pcInThat) {
 		m_pcWindow = pcInThat->m_pcWindow;

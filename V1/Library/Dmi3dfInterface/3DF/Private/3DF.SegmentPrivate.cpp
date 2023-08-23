@@ -94,7 +94,7 @@ void SegmentKeyPrivate::LocalClose(SegmentKey & cSegmentKey)
 	pcImpl->LocalClose();
 }
 
-void TDF::SegmentKeyPrivate::LocalClose(SegmentKey const & cSegmentKey)
+void H3DF::SegmentKeyPrivate::LocalClose(SegmentKey const & cSegmentKey)
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)cSegmentKey.GetImpl();
 	pcImpl->LocalClose();

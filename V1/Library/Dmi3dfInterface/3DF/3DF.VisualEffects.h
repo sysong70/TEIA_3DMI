@@ -16,7 +16,7 @@ public:
 	void Set(VisualEffectsControl const & cInThat);
 	VisualEffectsControl & operator = (VisualEffectsControl const & cInThat);
 
-	TDF::Type ObjectType() const { return TDF::Type::VisualEffectsControl; };
+	H3DF::Type ObjectType() const { return H3DF::Type::VisualEffectsControl; };
 
 	VisualEffectsControl & SetAntiAliasing(bool bInState);
 	VisualEffectsControl & SetTextAntiAliasing(bool bInState);

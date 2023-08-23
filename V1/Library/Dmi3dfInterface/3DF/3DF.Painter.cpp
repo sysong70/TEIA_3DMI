@@ -6,7 +6,7 @@
 
 #pragma region Internal
 
-namespace TDF
+namespace H3DF
 {
     namespace Painter
     {
@@ -98,14 +98,14 @@ namespace TDF
 
 #pragma region Root
 
-void TDF::Painter::SetView(HBaseView* view)
+void H3DF::Painter::SetView(HBaseView* view)
 {
     View = view;
 }
 
 
 
-void TDF::Painter::SetColor(const char* type, const char* space, double abc[3])
+void H3DF::Painter::SetColor(const char* type, const char* space, double abc[3])
 {
     ASSERT(CheckOption(type,
         // If there are no light sources in a given scene, the "ambient" light color is ignored.
@@ -165,9 +165,9 @@ void TDF::Painter::SetColor(const char* type, const char* space, double abc[3])
     HC_Set_Color_By_Value(type, space, abc[0], abc[1], abc[2]);
 }
 
-TDF::Point TDF::Painter::TransColor(COLORREF color)
+H3DF::Point H3DF::Painter::TransColor(COLORREF color)
 {
-    TDF::Point rgb;
+    H3DF::Point rgb;
 
     rgb.x = GetRValue(color) / 255.0;
     rgb.y = GetGValue(color) / 255.0;
@@ -180,7 +180,7 @@ TDF::Point TDF::Painter::TransColor(COLORREF color)
 
 #pragma region Arc
 
-HC_KEY TDF::Painter::Arc::Create(TDF::Point first, TDF::Point second, TDF::Point third)
+HC_KEY H3DF::Painter::Arc::Create(H3DF::Point first, H3DF::Point second, H3DF::Point third)
 {
     first.z = 0;
     second.z = 0;
@@ -194,7 +194,7 @@ HC_KEY TDF::Painter::Arc::Create(TDF::Point first, TDF::Point second, TDF::Point
 
 
 
-void TDF::Painter::Arc::GetPoints(TDF::Point center, double radius, double startAngle, double endAngle, Points& points)
+void H3DF::Painter::Arc::GetPoints(H3DF::Point center, double radius, double startAngle, double endAngle, Points& points)
 {
     if (endAngle < startAngle) {
         endAngle += 360;
@@ -204,23 +204,23 @@ void TDF::Painter::Arc::GetPoints(TDF::Point center, double radius, double start
 
     for (int i = (int)startAngle; i <= (int)endAngle; i++) {
         double angle = i * 3.141592 / 180;
-        TDF::Point p(cos(angle), sin(angle));
+        H3DF::Point p(cos(angle), sin(angle));
         points.push_back(center + (p * radius));
     }
 }
 
 
 
-void TDF::Painter::Arc::GetPoints(float x, float y, double radius, double startAngle, double endAngle, Points& points)
+void H3DF::Painter::Arc::GetPoints(float x, float y, double radius, double startAngle, double endAngle, Points& points)
 {
-    GetPoints(TDF::Point(x, y), radius, startAngle, endAngle, points);
+    GetPoints(H3DF::Point(x, y), radius, startAngle, endAngle, points);
 }
 
 #pragma endregion //:REGION
 
 #pragma region Circle
 
-HC_KEY TDF::Painter::Circle::Create(TDF::Point center, double radius, bool polygon)
+HC_KEY H3DF::Painter::Circle::Create(H3DF::Point center, double radius, bool polygon)
 {
     center.z = 0;
 
@@ -229,7 +229,7 @@ HC_KEY TDF::Painter::Circle::Create(TDF::Point center, double radius, bool polyg
 
         for (int i = 0; i <= 360; i += 6) {
             double angle = i * 3.141592 / 180;
-            TDF::Point p(cos(angle), sin(angle));
+            H3DF::Point p(cos(angle), sin(angle));
             points.push_back(center + (p * radius));
         }
 
@@ -245,7 +245,7 @@ HC_KEY TDF::Painter::Circle::Create(TDF::Point center, double radius, bool polyg
 
 
 
-HC_KEY TDF::Painter::Circle::Create(TDF::Point first, TDF::Point second, TDF::Point third, bool polygon)
+HC_KEY H3DF::Painter::Circle::Create(H3DF::Point first, H3DF::Point second, H3DF::Point third, bool polygon)
 {
     first.z = 0;
     second.z = 0;
@@ -259,19 +259,19 @@ HC_KEY TDF::Painter::Circle::Create(TDF::Point first, TDF::Point second, TDF::Po
 
 
 
-void TDF::Painter::Circle::GetPoints(TDF::Point center, double radius, bool reverse, Points& points)
+void H3DF::Painter::Circle::GetPoints(H3DF::Point center, double radius, bool reverse, Points& points)
 {
     if (reverse) {
         for (int i = 360; i >= 0; i -= 6) {
             double angle = i * 3.141592 / 180;
-            TDF::Point p(cos(angle), sin(angle));
+            H3DF::Point p(cos(angle), sin(angle));
             points.push_back(center + (p * radius));
         }
     }
     else {
         for (int i = 0; i <= 360; i += 6) {
             double angle = i * 3.141592 / 180;
-            TDF::Point p(cos(angle), sin(angle));
+            H3DF::Point p(cos(angle), sin(angle));
             points.push_back(center + (p * radius));
         }
     }
@@ -281,15 +281,15 @@ void TDF::Painter::Circle::GetPoints(TDF::Point center, double radius, bool reve
 
 #pragma region Compute
 
-double TDF::Painter::Compute::Distance(TDF::Point p1, TDF::Point p2)
+double H3DF::Painter::Compute::Distance(H3DF::Point p1, H3DF::Point p2)
 {
-    TDF::Point d = p2 - p1;
+    H3DF::Point d = p2 - p1;
     return sqrt(d.x * d.x + d.y * d.y + d.z * d.z);
 }
 
 
 
-double TDF::Painter::Compute::PixelToWorld(double value)
+double H3DF::Painter::Compute::PixelToWorld(double value)
 {
     Point points[2];
     points[1].x = value;
@@ -304,16 +304,16 @@ double TDF::Painter::Compute::PixelToWorld(double value)
 
 
 
-TDF::Vector TDF::Painter::Compute::Normal()
+H3DF::Vector H3DF::Painter::Compute::Normal()
 {
     Vector normal;
 
     HC_Open_Segment_By_Key(View->GetSceneKey());
     {
-        TDF::Point position;
+        H3DF::Point position;
         HC_Show_Net_Camera_Position(&position.x, &position.y, &position.z);
 
-        TDF::Point target;
+        H3DF::Point target;
         HC_Show_Net_Camera_Target(&target.x, &target.y, &target.z);
 
         normal = target - position;
@@ -329,7 +329,7 @@ TDF::Vector TDF::Painter::Compute::Normal()
 
 #pragma region Font
 
-void TDF::Painter::Font::SetAlignment(const char* value)
+void H3DF::Painter::Font::SetAlignment(const char* value)
 {
     // value is 1 or 2 char
     // ^ top
@@ -340,7 +340,7 @@ void TDF::Painter::Font::SetAlignment(const char* value)
     HC_Set_Text_Alignment(value);
 }
 
-void TDF::Painter::Font::SetAlignment(EPivot value)
+void H3DF::Painter::Font::SetAlignment(EPivot value)
 {
     switch (value) {
     case EPivot::TopLeft:       HC_Set_Text_Alignment("^<"); break;
@@ -359,35 +359,35 @@ void TDF::Painter::Font::SetAlignment(EPivot value)
 
 
 
-void TDF::Painter::Font::SetBold(bool value)
+void H3DF::Painter::Font::SetBold(bool value)
 {
     HC_Set_Text_Font(Format("bold = %s", (value ? "on" : "off")));
 }
 
 
 
-void TDF::Painter::Font::SetName(const char* value)
+void H3DF::Painter::Font::SetName(const char* value)
 {
     HC_Set_Text_Font(Format("name = %s", value));
 }
 
 
 
-void TDF::Painter::Font::SetSize(double size, const char* unit)
+void H3DF::Painter::Font::SetSize(double size, const char* unit)
 {
     HC_Set_Text_Font(Format("size = %.6f %s", size, unit));
 }
 
 
 
-void TDF::Painter::Font::SetRenderer(const char* value)
+void H3DF::Painter::Font::SetRenderer(const char* value)
 {
     HC_Set_Text_Font(Format("renderer = %s", value));
 }
 
 
 
-void TDF::Painter::Font::SetRotation(double degree)
+void H3DF::Painter::Font::SetRotation(double degree)
 {
     if (fabs(degree) < 0.000001) {
         HC_Set_Text_Font("no ratation");
@@ -399,12 +399,12 @@ void TDF::Painter::Font::SetRotation(double degree)
 
 
 
-void TDF::Painter::Font::SetTransform(bool value)
+void H3DF::Painter::Font::SetTransform(bool value)
 {
     HC_Set_Text_Font(Format("transforms = %s", (value ? "on" : "off")));
 }
 
-void TDF::Painter::Font::SetTransform(const char* value)
+void H3DF::Painter::Font::SetTransform(const char* value)
 {
     ASSERT(CheckOption(value,
         // Transforms” (or “transforms = on”) tells the system to pick a font that can and should be subject to transformations just like regular geometry.
@@ -429,7 +429,7 @@ void TDF::Painter::Font::SetTransform(const char* value)
 
 #pragma region Figure
 
-HC_KEY TDF::Painter::Figure::CreateDonut(TDF::Point center, double inner, double outer)
+HC_KEY H3DF::Painter::Figure::CreateDonut(H3DF::Point center, double inner, double outer)
 {
     Points points;
 
@@ -441,10 +441,10 @@ HC_KEY TDF::Painter::Figure::CreateDonut(TDF::Point center, double inner, double
 
 
 
-HC_KEY TDF::Painter::Figure::CreateObround(TDF::Point topLeft, TDF::Point bottomRight)
+HC_KEY H3DF::Painter::Figure::CreateObround(H3DF::Point topLeft, H3DF::Point bottomRight)
 {
     Points points;
-    TDF::Point center = (bottomRight + topLeft) / 2;
+    H3DF::Point center = (bottomRight + topLeft) / 2;
     double dist = fabs(topLeft.y - bottomRight.y) / 2;
 
     Arc::GetPoints(topLeft.x, center.y, dist, 90, 270, points);
@@ -455,12 +455,12 @@ HC_KEY TDF::Painter::Figure::CreateObround(TDF::Point topLeft, TDF::Point bottom
 
 
 
-HC_KEY TDF::Painter::Figure::CreateRectangle(TDF::Point topLeft, TDF::Point bottomRight)
+HC_KEY H3DF::Painter::Figure::CreateRectangle(H3DF::Point topLeft, H3DF::Point bottomRight)
 {
     topLeft.z = 0;
     bottomRight.z = 0;
 
-    TDF::Point points[5];
+    H3DF::Point points[5];
 
     points[0] = topLeft;
     points[1].x = bottomRight.x; points[1].y = topLeft.y;
@@ -478,7 +478,7 @@ HC_KEY TDF::Painter::Figure::CreateRectangle(TDF::Point topLeft, TDF::Point bott
 
 #pragma region Line
 
-HC_KEY TDF::Painter::Line::Create(TDF::Point first, TDF::Point second, bool firstEnd, bool secondEnd)
+HC_KEY H3DF::Painter::Line::Create(H3DF::Point first, H3DF::Point second, bool firstEnd, bool secondEnd)
 {
     HC_KEY key = HC_Insert_Line(first.x, first.y, 0, second.x, second.y, 0);
     ASSERT(key != HC_ERROR_KEY);
@@ -490,7 +490,7 @@ HC_KEY TDF::Painter::Line::Create(TDF::Point first, TDF::Point second, bool firs
 
 #pragma region Polyline
 
-HC_KEY TDF::Painter::Polyline::Create(Points& points)
+HC_KEY H3DF::Painter::Polyline::Create(Points& points)
 {
     HC_KEY key = HC_Insert_Polyline(points.size(), points.data());
     ASSERT(key != HC_ERROR_KEY);
@@ -502,7 +502,7 @@ HC_KEY TDF::Painter::Polyline::Create(Points& points)
 
 #pragma region Polygon
 
-HC_KEY TDF::Painter::Polygon::Create(Points& points)
+HC_KEY H3DF::Painter::Polygon::Create(Points& points)
 {
     HC_KEY key = HC_Insert_Polygon(points.size(), points.data());
     ASSERT(key != HC_ERROR_KEY);
@@ -514,7 +514,7 @@ HC_KEY TDF::Painter::Polygon::Create(Points& points)
 
 #pragma region Segment
 
-void TDF::Painter::Segment::SetColor(const char* type, COLORREF color)
+void H3DF::Painter::Segment::SetColor(const char* type, COLORREF color)
 {
     double rgb[3];
     rgb[0] = GetRValue(color) / 255.0;
@@ -524,7 +524,7 @@ void TDF::Painter::Segment::SetColor(const char* type, COLORREF color)
     HC_Set_Color_By_Value(type, "RGB", rgb[0], rgb[1], rgb[2]);
 }
 
-void TDF::Painter::Segment::SetColor(const char* type, COLORREF color, double alpha)
+void H3DF::Painter::Segment::SetColor(const char* type, COLORREF color, double alpha)
 {
     double rgb[3];
     rgb[0] = GetRValue(color) / 255.0;
@@ -537,7 +537,7 @@ void TDF::Painter::Segment::SetColor(const char* type, COLORREF color, double al
 
 
 
-void TDF::Painter::Segment::SetEdgePattern(const char* value)
+void H3DF::Painter::Segment::SetEdgePattern(const char* value)
 {
     ASSERT(CheckOption(value,
         "---",          // A solid line.
@@ -557,14 +557,14 @@ void TDF::Painter::Segment::SetEdgePattern(const char* value)
 
 
 
-void TDF::Painter::Segment::SetEdgeWeight(double value)
+void H3DF::Painter::Segment::SetEdgeWeight(double value)
 {
     HC_Set_Edge_Weight(value);
 }
 
 
 
-void TDF::Painter::Segment::SetEdgeType(double weight, const char* pattern, COLORREF color)
+void H3DF::Painter::Segment::SetEdgeType(double weight, const char* pattern, COLORREF color)
 {
     SetEdgeWeight(weight);
     if (pattern != nullptr) {
@@ -577,7 +577,7 @@ void TDF::Painter::Segment::SetEdgeType(double weight, const char* pattern, COLO
 
 
 
-void TDF::Painter::Segment::SetLinePattern(const char* value, const char* prefix, const char* suffix)
+void H3DF::Painter::Segment::SetLinePattern(const char* value, const char* prefix, const char* suffix)
 {
     ASSERT(CheckOption(value,
         "---",      // A solid line.        
@@ -614,14 +614,14 @@ void TDF::Painter::Segment::SetLinePattern(const char* value, const char* prefix
 
 
 
-void TDF::Painter::Segment::SetLineWeight(double value)
+void H3DF::Painter::Segment::SetLineWeight(double value)
 {
     HC_Set_Line_Weight(value);
 }
 
 
 
-void TDF::Painter::Segment::SetLineType(double weight, const char* pattern, COLORREF color)
+void H3DF::Painter::Segment::SetLineType(double weight, const char* pattern, COLORREF color)
 {
     SetLineWeight(weight);
     if (pattern != nullptr) {
@@ -634,12 +634,12 @@ void TDF::Painter::Segment::SetLineType(double weight, const char* pattern, COLO
 
 
 
-void TDF::Painter::Segment::SetVisibility(const char* type, bool value)
+void H3DF::Painter::Segment::SetVisibility(const char* type, bool value)
 {
     HC_Set_Visibility(Format("%s = %s", type, (value ? "on" : "off")));
 }
 
-void TDF::Painter::Segment::SetVisibility(const char* option, const char* sub, bool value)
+void H3DF::Painter::Segment::SetVisibility(const char* option, const char* sub, bool value)
 {
     ASSERT(CheckOption(option,
         "cutting plane",
@@ -705,7 +705,7 @@ void TDF::Painter::Segment::SetVisibility(const char* option, const char* sub, b
 
 #pragma region Text
 
-HC_KEY TDF::Painter::Text::Create(TDF::Point center, const char* value)
+HC_KEY H3DF::Painter::Text::Create(H3DF::Point center, const char* value)
 {
     HC_KEY key = HC_Insert_Text(center.x, center.y, center.z, value);
     ASSERT(key != HC_ERROR_KEY);
@@ -713,7 +713,7 @@ HC_KEY TDF::Painter::Text::Create(TDF::Point center, const char* value)
     return key;
 }
 
-HC_KEY TDF::Painter::Text::Create(TDF::Point center, const wchar_t* value)
+HC_KEY H3DF::Painter::Text::Create(H3DF::Point center, const wchar_t* value)
 {
     HC_KEY key = HC_Insert_Text_With_Encoding(center.x, center.y, center.z, "wcs", value);
     ASSERT(key != HC_ERROR_KEY);
@@ -723,19 +723,19 @@ HC_KEY TDF::Painter::Text::Create(TDF::Point center, const wchar_t* value)
 
 
 
-void TDF::Painter::Text::GetExtent(const char* value, float& width, float& height)
+void H3DF::Painter::Text::GetExtent(const char* value, float& width, float& height)
 {
     HC_Compute_Text_Extent(".", value, &width, &height);
 }
 
-void TDF::Painter::Text::GetExtent(const wchar_t* value, float& width, float& height)
+void H3DF::Painter::Text::GetExtent(const wchar_t* value, float& width, float& height)
 {
     HC_Compute_Text_Extent_With_Encoding(".", "utf16", value, &width, &height);
 }
 
 
 
-void TDF::Painter::Text::Update(HC_KEY key, const wchar_t* value)
+void H3DF::Painter::Text::Update(HC_KEY key, const wchar_t* value)
 {
     //:TODO
     ASSERT(FALSE);
@@ -745,7 +745,7 @@ void TDF::Painter::Text::Update(HC_KEY key, const wchar_t* value)
 
 #pragma region Cursor
 
-HC_KEY TDF::Painter::Cursor::Create(HC_KEY textKey, int row, int column)
+HC_KEY H3DF::Painter::Cursor::Create(HC_KEY textKey, int row, int column)
 {
     HC_KEY key = HC_Insert_String_Cursor(textKey, row, column);
     ASSERT(key != HC_ERROR_KEY);
@@ -755,14 +755,14 @@ HC_KEY TDF::Painter::Cursor::Create(HC_KEY textKey, int row, int column)
 
 
 
-void TDF::Painter::Cursor::Hide(HC_KEY key)
+void H3DF::Painter::Cursor::Hide(HC_KEY key)
 {
     HC_Flush_By_Key(key);
 }
 
 
 
-void TDF::Painter::Cursor::Move(HC_KEY key, int row, int column)
+void H3DF::Painter::Cursor::Move(HC_KEY key, int row, int column)
 {
     HC_Move_String_Cursor(key, row, column);
 }

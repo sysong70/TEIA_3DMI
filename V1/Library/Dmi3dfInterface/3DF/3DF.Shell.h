@@ -70,7 +70,7 @@ public:
 	void Set(ShellKey const & cInThat);
 	ShellKey & operator=(ShellKey const & cInThat);
 
-	TDF::Type ObjectType() const { return TDF::Type::ShellKey; };
+	H3DF::Type ObjectType() const { return H3DF::Type::ShellKey; };
 };
 
 CLOSE_3DF_NAMESPACE

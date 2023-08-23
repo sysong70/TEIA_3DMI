@@ -21,8 +21,8 @@ public:
 
 	void Copy(WindowKeyPrivate * pcInThat);
 
-	TDF::BaseView * GetBaseView() { return (TDF::BaseView *) m_pcBaseView; }
-	const TDF::BaseView * m_pcBaseView = nullptr;
+	H3DF::BaseView * GetBaseView() { return (H3DF::BaseView *) m_pcBaseView; }
+	const H3DF::BaseView * m_pcBaseView = nullptr;
 
 	HSelectionSet * m_pcSelectionSet = nullptr;
 

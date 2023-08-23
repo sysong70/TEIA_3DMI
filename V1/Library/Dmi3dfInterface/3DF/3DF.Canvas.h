@@ -92,8 +92,8 @@ public:
 	bool LButtonDown(int nFlags, int x, int y);
 /*
 
-	bool MButtonUp(TDF::View * pcView, int nFlags, int x, int y);
-	bool MButtonDown(TDF::View * pcView, int nFlags, int x, int y);
+	bool MButtonUp(H3DF::View * pcView, int nFlags, int x, int y);
+	bool MButtonDown(H3DF::View * pcView, int nFlags, int x, int y);
 */
 	bool RButtonUp(int nFlags, int x, int y);
 	bool RButtonDown(int nFlags, int x, int y);
@@ -129,7 +129,7 @@ protected:
 
 	//== 운영 변수 ===================================================================================
 public:
-	TDF::BaseView * GetBaseView() { return m_pcBaseView; }
+	H3DF::BaseView * GetBaseView() { return m_pcBaseView; }
 	
 	int ViewId() { return m_nViewId; }
 	void SetViewId(int nViewId);
@@ -139,8 +139,8 @@ public:
 	SegmentKey GetModelKey();
 
 protected:
-	TDF::BaseView * m_pcBaseView = nullptr;
-	TDF::WindowKey * m_pcWindow = nullptr;
+	H3DF::BaseView * m_pcBaseView = nullptr;
+	H3DF::WindowKey * m_pcWindow = nullptr;
 
 	int m_nViewId = -1;
 

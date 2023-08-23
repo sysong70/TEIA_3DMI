@@ -4,7 +4,7 @@
 
 #include "Json.h"
 
-#include "../DmiKernelInterface/DmiSignalAnalyzer.h"
+#include "../DmiKernelInterface/Kernel.SignalAnalyzer.h"
 #include "3DX.C3DImport.h"
 
 using namespace Json;
@@ -17,7 +17,7 @@ USING_3DX_SIGNAL_NAMESPACE
 
 Interface::Interface()
 {
-	m_pc3dxImport = (DWORD_PTR *)new _3DX::C3dImport(this);
+	m_pc3dxImport = (DWORD_PTR *)new H3DX::C3dImport(this);
 
 	if(nullptr == m_pc3dxImport) {
 		MessageBox(NULL, L"Rt3dxImport init error!", L"Error", MB_OK);
@@ -45,7 +45,7 @@ bool Interface::ExecuteCommand(DWORD_PTR nJsonObject)
 	CString strType = pcObject->GetString("Type");
 
 	if(HOOPS_3DX_TYPE == strType) {
-		return ((_3DX::C3dImport *)m_pc3dxImport)->ExecuteCommand(pcObject);
+		return ((H3DX::C3dImport *)m_pc3dxImport)->ExecuteCommand(pcObject);
 	}
 
 	return false;

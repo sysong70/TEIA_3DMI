@@ -33,4 +33,4 @@ namespace Facility
 
 CLOSE_3DF_NAMESPACE
 
-extern TDF::Facility::AppOptions TheAppOptions;
+extern H3DF::Facility::AppOptions TheAppOptions;

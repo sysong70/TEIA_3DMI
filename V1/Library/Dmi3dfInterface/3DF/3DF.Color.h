@@ -428,6 +428,6 @@ TDF_INLINE RGB24Color Interpolate(RGB24Color const & a, RGB24Color const & b, fl
 		(unsigned char) (a.b + ((float) b.b - (float) a.b) * t));
 }
 
-using RGBAColorArray = std::vector<TDF::RGBAColor, Allocator<TDF::RGBAColor> >;
+using RGBAColorArray = std::vector<H3DF::RGBAColor, Allocator<H3DF::RGBAColor> >;
 
 CLOSE_3DF_NAMESPACE

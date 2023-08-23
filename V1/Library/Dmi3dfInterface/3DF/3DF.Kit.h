@@ -10,7 +10,7 @@ class API_3DF Kit : public Object
 public:
 	Kit();
 
-	TDF::Type ObjectType() const { return TDF::Type::Kit; };
+	H3DF::Type ObjectType() const { return H3DF::Type::Kit; };
 };
 
 CLOSE_3DF_NAMESPACE

@@ -31,7 +31,7 @@ USING_3DF_NAMESPACE
 
 
 //== SelectionResultsPrivate class =================================================================
-bool TDF::SelectionResultsPrivate::Sort()
+bool H3DF::SelectionResultsPrivate::Sort()
 {
 	if (2 > deItems.size()) {
 		return false;
@@ -63,9 +63,9 @@ bool TDF::SelectionResultsPrivate::Sort()
 			WindowPoint cWindowPoint;
 			pcItem->ShowSelectionPosition(cWindowPoint);
 
-			TDF::Type eType = cItemKey.Type();
+			H3DF::Type eType = cItemKey.Type();
 
-			CString strTypeString = TDF::Utility::GetTypeString(eType);
+			CString strTypeString = H3DF::Utility::GetTypeString(eType);
 
 			TRACE(L"%02d.%s[%d]\t\t%f\t%f\n", nIndex++, strTypeString, cItemKey.KeyValue(), cWindowPoint.z, cWorldPoint.z);
 		}
@@ -79,7 +79,7 @@ bool TDF::SelectionResultsPrivate::Sort()
 //== SelectionControlPrivate class =================================================================
 
 // 주어진 Point와 Selection Option을 이용해서 선택 작업을 수행하고, 선택된 요소를 SelectionResults에 저장한다.
-size_t TDF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
+size_t H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
 {
 	int	 nResult = 0;
 
@@ -235,7 +235,7 @@ size_t TDF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, Se
 	return pcResultsPrivate->Size();
 }
 
-bool TDF::SelectionControlPrivate::SorterFunction(const void * pcArg1, const void * pcArg2)
+bool H3DF::SelectionControlPrivate::SorterFunction(const void * pcArg1, const void * pcArg2)
 {
 	SelectionItem * pcItem1 = (SelectionItem *)pcArg1;
 	SelectionItem * pcItem2 = (SelectionItem *)pcArg2;
@@ -249,7 +249,7 @@ bool TDF::SelectionControlPrivate::SorterFunction(const void * pcArg1, const voi
 }
 
 
-int TDF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
+int H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
 {
 	if (nullptr == m_pcSelectionSet) {
 		return HOP_NOT_HANDLED;
@@ -307,7 +307,7 @@ int TDF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, UINT 
 
 
 // 입력되는 Location은 MouseWindowPos을 이용한다. HEventInfo에서 GetMouseWindowPos() 함수를 이용해서 가져올 수 있음
-int TDF::SelectionControlPrivate::SelectButtonDown_V1(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults)
+int H3DF::SelectionControlPrivate::SelectButtonDown_V1(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults)
 {
 	HPoint  new_pos;
 	int		nResult = 0;
@@ -379,7 +379,7 @@ int TDF::SelectionControlPrivate::SelectButtonDown_V1(Point const & cInLocation,
 }
 
 // Select 처리, 재선택 및 최초 선택 Region, PMI 선택등을 처리.
-void TDF::SelectionControlPrivate::HandleSelection(UINT const nFlags, SelectionResults & cOutResults)
+void H3DF::SelectionControlPrivate::HandleSelection(UINT const nFlags, SelectionResults & cOutResults)
 {
 	HC_KEY  nKey = INVALID_KEY;
 	int nOffset1, nOffset2, nOffset3;
@@ -536,7 +536,7 @@ void TDF::SelectionControlPrivate::HandleSelection(UINT const nFlags, SelectionR
 	delete[] pnIncludeKeys;
 }
 
-void TDF::SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & cInOptions, char * pchOutOption)
+void H3DF::SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & cInOptions, char * pchOutOption)
 {
 	char chOption[MVO_BUFFER_SIZE] = "\0";
 
@@ -544,15 +544,15 @@ void TDF::SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & c
 	if (true == cInOptions.ShowLevel(eLevel)) {
 		switch (eLevel)
 		{
-			case TDF::Selection::Level::Segment:
+			case H3DF::Selection::Level::Segment:
 				sprintf(chOption, "selection level = segment");
 				break;
 
-			case TDF::Selection::Level::Entity:
+			case H3DF::Selection::Level::Entity:
 				sprintf(chOption, "selection level = entity");
 				break;
 
-			case TDF::Selection::Level::Subentity:
+			case H3DF::Selection::Level::Subentity:
 				chOption[0] = '\0';
 				break;
 		}
@@ -584,19 +584,19 @@ void TDF::SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & c
 	if (true == cInOptions.ShowSorting(eSorting)) {
 		switch (eSorting)
 		{
-			case TDF::Selection::Sorting::Off:
+			case H3DF::Selection::Sorting::Off:
 				sprintf(chOption, "selection sorting = off");
 				break;
 
-			case TDF::Selection::Sorting::Default:
+			case H3DF::Selection::Sorting::Default:
 				sprintf(chOption, "selection sorting = default");
 				break;
 
-			case TDF::Selection::Sorting::Proximity:
+			case H3DF::Selection::Sorting::Proximity:
 				sprintf(chOption, "selection sorting = proximity");
 				break;
 
-			case TDF::Selection::Sorting::ZSorting:
+			case H3DF::Selection::Sorting::ZSorting:
 				sprintf(chOption, "selection sorting = on");
 				break;
 		}
@@ -618,19 +618,19 @@ void TDF::SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & c
 	if (true == cInOptions.ShowBias(eBias)) {
 		switch (eBias)
 		{
-			case TDF::Selection::Bias::Lines:
+			case H3DF::Selection::Bias::Lines:
 				sprintf(chOption, "selection bias = lines");
 				break;
 
-			case TDF::Selection::Bias::NoLines:
+			case H3DF::Selection::Bias::NoLines:
 				sprintf(chOption, "selection bias = no lines");
 				break;
 
-			case TDF::Selection::Bias::Markers:
+			case H3DF::Selection::Bias::Markers:
 				sprintf(chOption, "selection bias = markers");
 				break;
 
-			case TDF::Selection::Bias::NoMarkers:
+			case H3DF::Selection::Bias::NoMarkers:
 				sprintf(chOption, "selection bias = no markers");
 				break;
 		}
@@ -639,7 +639,7 @@ void TDF::SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & c
 	}
 }
 
-void TDF::SelectionControlPrivate::GetScope(SelectionOptionsKit const & cInOptions, char * pchOutScope)
+void H3DF::SelectionControlPrivate::GetScope(SelectionOptionsKit const & cInOptions, char * pchOutScope)
 {
 	SegmentKey cStartSegment;
 	KeyPath cStartPath;
@@ -652,7 +652,7 @@ void TDF::SelectionControlPrivate::GetScope(SelectionOptionsKit const & cInOptio
 	}
 }
 
-HBaseView * TDF::SelectionControlPrivate::GetBaseView()
+HBaseView * H3DF::SelectionControlPrivate::GetBaseView()
 { 
 	return (HBaseView *)m_pcWindow->GetBaseView(); 
 }

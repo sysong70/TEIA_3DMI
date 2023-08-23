@@ -16,7 +16,7 @@ Operator::KeyboardTest::KeyboardTest(WindowKey* pWindow)
 
 void Operator::KeyboardTest::OnKeyboard(Json::Object& input)
 {
-	using namespace TDF::Painter;
+	using namespace H3DF::Painter;
 
 	m_text = input.GetString(SKW_VALUE);
 	m_row = input.GetInteger(SKW_ROW);
@@ -28,7 +28,7 @@ void Operator::KeyboardTest::OnKeyboard(Json::Object& input)
 		HC_Delete_By_Key(m_textKey);
 		HC_Delete_By_Key(m_cursorKey);
 
-		m_textKey = Text::Create(TDF::Point(), m_text);
+		m_textKey = Text::Create(H3DF::Point(), m_text);
 		m_cursorKey = Cursor::Create(m_textKey, m_row, m_column);
 	}
 	HC_Close_Segment();

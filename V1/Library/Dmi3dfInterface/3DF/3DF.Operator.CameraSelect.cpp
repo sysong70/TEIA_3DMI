@@ -99,7 +99,7 @@ int Operator::CameraSelect::OnLButtonUp(HEventInfo & cInEvent)
 			cPoint.x = cInEvent.GetMouseWindowPos().x;
 			cPoint.y = cInEvent.GetMouseWindowPos().y;
 
-			TDF::SelectionResults cResult;
+			H3DF::SelectionResults cResult;
 			m_pcWindow->GetSelectionControl().SelectByPoint(cPoint, cInEvent.GetFlags(), cResult);
 		}
 	}
@@ -179,7 +179,7 @@ int Operator::CameraSelect::HOpCameraOrbit_OnLButtonDownAndMove(HEventInfo & eve
 
 	m_bSingleClick = false;
 	GetView()->SetViewMode(HViewUnknown);
-	m_pcWindow->GetBaseView()->SetViewMode(TDF::ViewMode::Unknown);
+	m_pcWindow->GetBaseView()->SetViewMode(H3DF::ViewMode::Unknown);
 
 	// read mouse position
 	SetNewPoint(event.GetMouseWindowPos());
@@ -333,7 +333,7 @@ int Operator::CameraSelect::HOpCameraPan_OnLButtonDownAndMove(HEventInfo & event
 		return HBaseOperator::OnLButtonDownAndMove(event);
 	}
 
-	m_pcWindow->GetBaseView()->SetViewMode(TDF::ViewMode::Unknown);
+	m_pcWindow->GetBaseView()->SetViewMode(H3DF::ViewMode::Unknown);
 
 	SetNewPoint(event.GetMouseWorldPos());
 
@@ -407,7 +407,7 @@ int Operator::CameraSelect::HBaseView_OnMouseWheel(HEventInfo & event, bool bUdp
 		zDelta *= -1;
 	}
 
-	m_pcWindow->GetBaseView()->SetViewMode(TDF::ViewMode::Unknown);
+	m_pcWindow->GetBaseView()->SetViewMode(H3DF::ViewMode::Unknown);
 
 	HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetSceneKey());
 

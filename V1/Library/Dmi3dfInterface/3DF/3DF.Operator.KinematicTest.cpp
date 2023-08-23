@@ -8,7 +8,7 @@
 
 USING_3DF_NAMESPACE
 
-bool TDF::Operator::KinematicTest::CreateTestModel(SegmentKey cModelKey)
+bool H3DF::Operator::KinematicTest::CreateTestModel(SegmentKey cModelKey)
 {
 	MaterialMappingKit cMaterialMappingKit;
 	cMaterialMappingKit.SetFaceColor(RGBColor(1, 0, 0));
@@ -51,7 +51,7 @@ bool TDF::Operator::KinematicTest::CreateTestModel(SegmentKey cModelKey)
 	return true;
 }
 
-bool TDF::Operator::KinematicTest::CreateCylinder(SegmentKey cKey, Point cCenter, float fRadius, float fHeight, Vector cXAxis, Vector cZAxis, int nSidesCount)
+bool H3DF::Operator::KinematicTest::CreateCylinder(SegmentKey cKey, Point cCenter, float fRadius, float fHeight, Vector cXAxis, Vector cZAxis, int nSidesCount)
 {
 	cKey.Open();
 

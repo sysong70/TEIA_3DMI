@@ -114,7 +114,7 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 	HWND hWnd = (HWND) cInObject.GetDwordPtr(SKW_HWND);
 
 	// HBaseView 관련 사항을 구성하는 부분
-	TDF::Canvas * pcCanvas = new TDF::Canvas(m_pcHoopsModel, reinterpret_cast<void *>(hWnd));
+	H3DF::Canvas * pcCanvas = new H3DF::Canvas(m_pcHoopsModel, reinterpret_cast<void *>(hWnd));
 
 	if(nullptr == pcCanvas) {
 		DEBUG_RETURN;
@@ -169,7 +169,7 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 		HC_Set_Driver_Options("eye dome lighting = off");
 		SegmentKeyPrivate::LocalClose(cViewKey);
 
-		DLL::TDF::Interface cInterfaace;
+		DLL::H3DF::Interface cInterfaace;
 		cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, Connector::GetInstance(nViewId), strErrorMessage);
 	}
 	else {
@@ -212,7 +212,7 @@ void ViewManager::Initialize(int nViewId, Json::Object & cInObject)
 
 	pcCanvas->GetBaseView()->SetRenderMode(pcCanvas->GetBaseView()->GetRenderMode(), true);
 
-	pcCanvas->GetBaseView()->SetViewMode(TDF::ViewMode::px_py_pz);
+	pcCanvas->GetBaseView()->SetViewMode(H3DF::ViewMode::px_py_pz);
 
 	pcCanvas->ViewReady();
 	pcCanvas->GetBaseView()->ExhaustiveUpdate();
@@ -287,7 +287,7 @@ void ViewManager::Destruct(int nViewId)
 
 void ViewManager::Paint(int nViewId, Json::Object & cInObject)
 {
-	TDF::Canvas * pcCanvas = Wrapper().m_mpcCanvas[nViewId];
+	H3DF::Canvas * pcCanvas = Wrapper().m_mpcCanvas[nViewId];
 	if(nullptr == pcCanvas) {
 		DEBUG_RETURN;
 	}
@@ -328,7 +328,7 @@ void ViewManager::Paint(int nViewId, Json::Object & cInObject)
 
 void ViewManager::Resize(int nViewId, int x, int y)
 {
-	TDF::Canvas * pcCanvas = Wrapper().m_mpcCanvas[nViewId];
+	H3DF::Canvas * pcCanvas = Wrapper().m_mpcCanvas[nViewId];
 	assert(pcCanvas);
 
 	pcCanvas->Resize(x, y);
@@ -341,7 +341,7 @@ void ViewManager::Resize(int nViewId, int x, int y)
 // 명령어 취소 함수, Select된 Object도 취소됨.
 void ViewManager::CancelCommands(int nViewId)
 {
-	TDF::Canvas * pcView = Wrapper().m_mpcCanvas[nViewId];
+	H3DF::Canvas * pcView = Wrapper().m_mpcCanvas[nViewId];
 	pcView->CancelCommands();
 }
 
@@ -350,7 +350,7 @@ void ViewManager::CancelCommands(int nViewId)
 // 1. Action Signal 처리 함수
 bool ViewManager::ExecuteMouseSignal(int nViewId, int nAction, Json::Object & cInObject)
 {
-	TDF::Canvas * pcView = Wrapper().m_mpcCanvas[nViewId];
+	H3DF::Canvas * pcView = Wrapper().m_mpcCanvas[nViewId];
 
 	int nFlag = cInObject.GetInteger(SKW_FLAG);
 	int x = cInObject.GetInteger(SKW_X);
@@ -402,13 +402,13 @@ bool ViewManager::ExecuteMouseSignal(int nViewId, int nAction, Json::Object & cI
 }
 
 // 2. Left Button 처리 함수
-bool ViewManager::LButtonDown(TDF::Canvas* pcView, int nFlags, int x, int y)
+bool ViewManager::LButtonDown(H3DF::Canvas* pcView, int nFlags, int x, int y)
 {
 	assert(pcView);
 	return pcView->LButtonDown(nFlags, x, y);
 }
 
-bool ViewManager::LButtonUp(TDF::Canvas* pcView, int nFlags, int x, int y)
+bool ViewManager::LButtonUp(H3DF::Canvas* pcView, int nFlags, int x, int y)
 {
 	assert(pcView);
 	return pcView->LButtonUp(nFlags, x, y);
@@ -425,14 +425,14 @@ bool ViewManager::LButtonUp(TDF::Canvas* pcView, int nFlags, int x, int y)
 }
 
 // 3. Middle Button 처리 함수
-bool ViewManager::MButtonDown(TDF::Canvas* pcView, int nFlags, int x, int y)
+bool ViewManager::MButtonDown(H3DF::Canvas* pcView, int nFlags, int x, int y)
 {
 	assert(pcView);
 	return true;
 	//return pcView->MButtonDown(nFlags, x, y);
 }
 
-bool ViewManager::MButtonUp(TDF::Canvas* pcView, int nFlags, int x, int y)
+bool ViewManager::MButtonUp(H3DF::Canvas* pcView, int nFlags, int x, int y)
 {
 	assert(pcView);
 	return true;
@@ -440,27 +440,27 @@ bool ViewManager::MButtonUp(TDF::Canvas* pcView, int nFlags, int x, int y)
 }
 
 // 4. Right Button 처리 함수
-bool ViewManager::RButtonUp(TDF::Canvas* pcView, int nFlags, int x, int y)
+bool ViewManager::RButtonUp(H3DF::Canvas* pcView, int nFlags, int x, int y)
 {
 	assert(pcView);
 	return pcView->RButtonUp(nFlags, x, y);
 }
 
-bool ViewManager::RButtonDown(TDF::Canvas* pcView, int nFlags, int x, int y)
+bool ViewManager::RButtonDown(H3DF::Canvas* pcView, int nFlags, int x, int y)
 {
 	assert(pcView);
 	return pcView->RButtonDown(nFlags, x, y);
 }
 
 // 5. Mouse Move 처리 함수
-bool ViewManager::MouseMove(TDF::Canvas* pcView, int nFlags, int x, int y)
+bool ViewManager::MouseMove(H3DF::Canvas* pcView, int nFlags, int x, int y)
 {
 	assert(pcView);
 	return pcView->MouseMove(nFlags, x, y);
 }
 
 // 6. Mouse Wheel 처리 함수
-bool ViewManager::MouseWheel(TDF::Canvas* pcView, int nFlags, int zDelta, int x, int y, Json::Object& cInObject)
+bool ViewManager::MouseWheel(H3DF::Canvas* pcView, int nFlags, int zDelta, int x, int y, Json::Object& cInObject)
 {
 	assert(pcView);
 	return pcView->MouseWheel(nFlags, zDelta, x, y, cInObject);
@@ -468,7 +468,7 @@ bool ViewManager::MouseWheel(TDF::Canvas* pcView, int nFlags, int zDelta, int x,
 
 bool ViewManager::ExecuteKeyboardSignal(int nViewId, int nAction, Json::Object& cInObject)
 {
-	TDF::Canvas* pcView = Wrapper().m_mpcCanvas[nViewId];
+	H3DF::Canvas* pcView = Wrapper().m_mpcCanvas[nViewId];
 
 	return pcView->KeyboardInput(cInObject);
 }

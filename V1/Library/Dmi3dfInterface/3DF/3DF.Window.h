@@ -11,12 +11,12 @@ class BaseView;
 class API_3DF WindowKey : public SegmentKey
 {
 public:
-	WindowKey(TDF::BaseView * pcBaseView);
+	WindowKey(H3DF::BaseView * pcBaseView);
 	WindowKey(WindowKey const & cInThat);
 	~WindowKey();
 
-	const TDF::BaseView * GetBaseView() const;
-	TDF::BaseView * GetBaseView();
+	const H3DF::BaseView * GetBaseView() const;
+	H3DF::BaseView * GetBaseView();
 
 	HC_KEY GetSceneKey();
 	const HC_KEY GetSceneKey() const;

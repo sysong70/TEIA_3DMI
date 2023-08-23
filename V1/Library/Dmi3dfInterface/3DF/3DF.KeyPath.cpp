@@ -13,7 +13,7 @@ USING_3DF_NAMESPACE
 
 //== KeyPath Class =================================================================================
 
-class KeyPathPrivate : public TDF::PrivateImpl
+class KeyPathPrivate : public H3DF::PrivateImpl
 {
 public:
 	void Copy(KeyPathPrivate * that)
@@ -114,12 +114,12 @@ bool KeyPathPrivate::GetCoordinateSpaceName(Coordinate::Space eInSpace, char chT
 	return true;
 }
 
-TDF::KeyPath::KeyPath()
+H3DF::KeyPath::KeyPath()
 {
 	m_pcImpl = new KeyPathPrivate();
 }
 
-TDF::KeyPath::KeyPath(KeyArray const & cInPath)
+H3DF::KeyPath::KeyPath(KeyArray const & cInPath)
 {
 	m_pcImpl = new KeyPathPrivate();
 
@@ -127,7 +127,7 @@ TDF::KeyPath::KeyPath(KeyArray const & cInPath)
 	pcImpl->Set(cInPath);
 }
 
-TDF::KeyPath::KeyPath(size_t nInPathCount, Key const pInPath[])
+H3DF::KeyPath::KeyPath(size_t nInPathCount, Key const pInPath[])
 {
 	m_pcImpl = new KeyPathPrivate();
 
@@ -135,7 +135,7 @@ TDF::KeyPath::KeyPath(size_t nInPathCount, Key const pInPath[])
 	pcImpl->Set(nInPathCount, pInPath);
 }
 
-TDF::KeyPath::KeyPath(size_t nInPathCount, HC_KEY const pInPath[])
+H3DF::KeyPath::KeyPath(size_t nInPathCount, HC_KEY const pInPath[])
 {
 	m_pcImpl = new KeyPathPrivate();
 
@@ -143,7 +143,7 @@ TDF::KeyPath::KeyPath(size_t nInPathCount, HC_KEY const pInPath[])
 	pcImpl->Set(nInPathCount, pInPath);
 }
 
-TDF::KeyPath::KeyPath(char chKeyPath[])
+H3DF::KeyPath::KeyPath(char chKeyPath[])
 {
 	m_pcImpl = new KeyPathPrivate();
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
@@ -151,41 +151,41 @@ TDF::KeyPath::KeyPath(char chKeyPath[])
 	strcpy(pcImpl->m_chKeyPath, chKeyPath);
 }
 
-void TDF::KeyPath::Set(KeyPath const & cInThat)
+void H3DF::KeyPath::Set(KeyPath const & cInThat)
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	KeyPathPrivate * pcInThatImpl = (KeyPathPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-KeyPath & TDF::KeyPath::operator = (KeyPath const & cInThat)
+KeyPath & H3DF::KeyPath::operator = (KeyPath const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-KeyPath & TDF::KeyPath::operator = (KeyArray const & cInPath)
+KeyPath & H3DF::KeyPath::operator = (KeyArray const & cInPath)
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	pcImpl->Set(cInPath);
 	return *this;
 }
 
-KeyPath & TDF::KeyPath::SetKeys(KeyArray const & cInKeys)
+KeyPath & H3DF::KeyPath::SetKeys(KeyArray const & cInKeys)
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	pcImpl->Set(cInKeys);
 	return *this;
 }
 
-KeyPath & TDF::KeyPath::SetKeys(size_t nInKeyCount, HC_KEY const pInKeys[])
+KeyPath & H3DF::KeyPath::SetKeys(size_t nInKeyCount, HC_KEY const pInKeys[])
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	pcImpl->Set(nInKeyCount, pInKeys);
 	return *this;
 }
 
-KeyPath & TDF::KeyPath::UnsetKeys()
+KeyPath & H3DF::KeyPath::UnsetKeys()
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	pcImpl->m_aPaths.clear();
@@ -193,7 +193,7 @@ KeyPath & TDF::KeyPath::UnsetKeys()
 	return *this;
 }
 
-bool TDF::KeyPath::ShowKeys(KeyArray & cOutKeys) const
+bool H3DF::KeyPath::ShowKeys(KeyArray & cOutKeys) const
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	if (true == pcImpl->m_aPaths.empty()) {
@@ -205,7 +205,7 @@ bool TDF::KeyPath::ShowKeys(KeyArray & cOutKeys) const
 	return true;
 }
 
-bool TDF::KeyPath::ConvertCoordinate(Coordinate::Space eInSpace, Point const & cInpoint, Coordinate::Space eInOutputSpace, Point & cOutPoint) const
+bool H3DF::KeyPath::ConvertCoordinate(Coordinate::Space eInSpace, Point const & cInpoint, Coordinate::Space eInOutputSpace, Point & cOutPoint) const
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 
@@ -233,7 +233,7 @@ bool TDF::KeyPath::ConvertCoordinate(Coordinate::Space eInSpace, Point const & c
 	return false;
 }
 
-bool TDF::KeyPath::ConvertCoordinate(Coordinate::Space eInSpace, PointArray const & aInPoints, Coordinate::Space eInOutputSpace, PointArray & aOutPoints) const
+bool H3DF::KeyPath::ConvertCoordinate(Coordinate::Space eInSpace, PointArray const & aInPoints, Coordinate::Space eInOutputSpace, PointArray & aOutPoints) const
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 
@@ -267,7 +267,7 @@ bool TDF::KeyPath::ConvertCoordinate(Coordinate::Space eInSpace, PointArray cons
 	return true;
 }
 
-bool TDF::KeyPath::ShowNetSelectability(SelectabilityKit & cOutKit) const
+bool H3DF::KeyPath::ShowNetSelectability(SelectabilityKit & cOutKit) const
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	if (true == pcImpl->m_vKeys.empty()) {
@@ -284,7 +284,7 @@ bool TDF::KeyPath::ShowNetSelectability(SelectabilityKit & cOutKit) const
 	return true;
 }
 
-bool TDF::KeyPath::ShowNetModellingMatrix(MatrixKit & cOutKit) const
+bool H3DF::KeyPath::ShowNetModellingMatrix(MatrixKit & cOutKit) const
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	if (true == pcImpl->m_vKeys.empty()) {
@@ -301,43 +301,43 @@ bool TDF::KeyPath::ShowNetModellingMatrix(MatrixKit & cOutKit) const
 	return true;
 }
 
-size_t TDF::KeyPath::Size() const
+size_t H3DF::KeyPath::Size() const
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	return pcImpl->m_aPaths.size();
 }
 
-bool TDF::KeyPath::Empty() const
+bool H3DF::KeyPath::Empty() const
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	return pcImpl->m_aPaths.empty();
 }
 
-Key & TDF::KeyPath::At(size_t nInIndex)
+Key & H3DF::KeyPath::At(size_t nInIndex)
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	return pcImpl->m_aPaths.at(nInIndex);
 }
 
-Key const & TDF::KeyPath::At(size_t nInIndex) const
+Key const & H3DF::KeyPath::At(size_t nInIndex) const
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	return pcImpl->m_aPaths.at(nInIndex);
 }
 
-void TDF::KeyPath::Insert(size_t nInIndex, Key const & cInItem)
+void H3DF::KeyPath::Insert(size_t nInIndex, Key const & cInItem)
 {
 	Insert(nInIndex, cInItem.KeyValue());
 }
 
-void TDF::KeyPath::Insert(size_t nInIndex, HC_KEY nInKey)
+void H3DF::KeyPath::Insert(size_t nInIndex, HC_KEY nInKey)
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	auto cIterator = pcImpl->m_aPaths.begin();
 	pcImpl->m_aPaths.insert(cIterator + nInIndex, nInKey);
 }
 
-void TDF::KeyPath::Remove(Key const & cInItem)
+void H3DF::KeyPath::Remove(Key const & cInItem)
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 
@@ -350,14 +350,14 @@ void TDF::KeyPath::Remove(Key const & cInItem)
 	}
 }
 
-void TDF::KeyPath::Remove(size_t nInIndex)
+void H3DF::KeyPath::Remove(size_t nInIndex)
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	auto cIterator = pcImpl->m_aPaths.begin();
 	pcImpl->m_aPaths.erase(cIterator + nInIndex);
 }
 
-KeyPath TDF::KeyPath::Reverse() const
+KeyPath H3DF::KeyPath::Reverse() const
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	KeyArray cReverseKeyArray = pcImpl->m_aPaths;
@@ -367,31 +367,31 @@ KeyPath TDF::KeyPath::Reverse() const
 	return KeyPath(cReverseKeyArray);
 }
 
-Key & TDF::KeyPath::Front()
+Key & H3DF::KeyPath::Front()
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	return pcImpl->m_aPaths.front();
 }
 
-Key const & TDF::KeyPath::Front() const
+Key const & H3DF::KeyPath::Front() const
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	return pcImpl->m_aPaths.front();
 }
 
-Key & TDF::KeyPath::Back()
+Key & H3DF::KeyPath::Back()
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	return pcImpl->m_aPaths.back();
 }
 
-Key const & TDF::KeyPath::Back() const
+Key const & H3DF::KeyPath::Back() const
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	return pcImpl->m_aPaths.back();
 }
 
-Key TDF::KeyPath::PopFront()
+Key H3DF::KeyPath::PopFront()
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	Key cKey = pcImpl->m_aPaths.front();
@@ -399,7 +399,7 @@ Key TDF::KeyPath::PopFront()
 	return cKey;
 }
 
-Key TDF::KeyPath::PopBack()
+Key H3DF::KeyPath::PopBack()
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	Key cKey = pcImpl->m_aPaths.back();
@@ -408,14 +408,14 @@ Key TDF::KeyPath::PopBack()
 	return cKey;
 }
 
-KeyPath & TDF::KeyPath::PushFront(Key const & cInKey)
+KeyPath & H3DF::KeyPath::PushFront(Key const & cInKey)
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	pcImpl->m_aPaths.insert(pcImpl->m_aPaths.begin(), cInKey);
 	return *this;
 }
 
-KeyPath & TDF::KeyPath::PushBack(Key const & cInKey)
+KeyPath & H3DF::KeyPath::PushBack(Key const & cInKey)
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	pcImpl->m_aPaths.push_back(cInKey);

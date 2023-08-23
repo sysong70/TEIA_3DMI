@@ -32,7 +32,7 @@ public:
 	void Set(CameraKit const & cInThat);
 	CameraKit const & operator=(CameraKit const & cInThat);
 
-	TDF::Type ObjectType() const { return TDF::Type::CameraKit; };
+	H3DF::Type ObjectType() const { return H3DF::Type::CameraKit; };
 
 	CameraKit & SetUpVector(Vector const & cInUpVector);
 	CameraKit & SetPosition(Point const & cInPosition);

@@ -76,7 +76,7 @@ TdfImport::~TdfImport()
 	m_vcMaterialMappingStyleVector.clear();
 }
 
-bool TdfImport::FileImport(CString strFilePathName, TDF::SegmentKey & cModelSegment, Signal::Delivery & cInDelivery, CString & strErrorMessage)
+bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSegment, Signal::Delivery & cInDelivery, CString & strErrorMessage)
 {
 	if(false == InitializeA3DLibrary(strErrorMessage)) {
 		return false;
@@ -204,7 +204,7 @@ bool TdfImport::FileImport(CString strFilePathName, TDF::SegmentKey & cModelSegm
 }
 
 // File Open후에 Basic Model Tree 생성 함수 
-void TdfImport::CreateBasicModelTree(CString strFilePathName, TDF::SegmentKey & cModelSegment, Signal::Delivery & cInDelivery)
+void TdfImport::CreateBasicModelTree(CString strFilePathName, H3DF::SegmentKey & cModelSegment, Signal::Delivery & cInDelivery)
 {
 	CString strFileName = Path::GetFileName(strFilePathName);
 	
@@ -235,7 +235,7 @@ void TdfImport::CreateBasicModelTree(CString strFilePathName, TDF::SegmentKey & 
 		SegmentKey cSegment = cInclude.GetTarget();
 
 		CString strName;
-		if (false == TDF::Utility::ShowSegmentName(cSegment, strName)) {
+		if (false == H3DF::Utility::ShowSegmentName(cSegment, strName)) {
 			strName = cSegment.Name();
 		}
 
@@ -296,7 +296,7 @@ bool TdfImport::SetDefaultParamsLoadData(A3DRWParamsLoadData & cParamsLoadData)
 	return true;
 }
 //== 1. 3DF 변환 관련 함수 ============================================================================
-bool TdfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, TDF::SegmentKey & cModelSegment)
+bool TdfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, H3DF::SegmentKey & cModelSegment)
 {
 	// #Import_Log : ExcuteFunction.log
 #ifdef USED_LOG_MANAGER
@@ -346,11 +346,11 @@ bool TdfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, TDF::Segm
 		}
 	}
 
- 	TDF::SegmentKey cTextureDefineSegment = cModelSegment.Subsegment(L"texture_define");
+ 	H3DF::SegmentKey cTextureDefineSegment = cModelSegment.Subsegment(L"texture_define");
 // 	// Texture 관련 사항 정의
  	PopulateTextures(cTextureDefineSegment);
 
-	TDF::MaterialMappingKit cMaterial;
+	H3DF::MaterialMappingKit cMaterial;
 	cMaterial.SetFaceColor(RGBAColor(0.752941f, 0.752941f, 0.752941f));
 	cModelSegment.SetMaterialMapping(cMaterial);
 
@@ -378,7 +378,7 @@ bool TdfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, TDF::Segm
 
 // 2-1. Product Occurrence 처리
 A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurrence, A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, 
-	TDF::SegmentKey & cParentSegment)
+	H3DF::SegmentKey & cParentSegment)
 {
 	if(nullptr == pcOccurrence) {
 		return A3D_ERROR;
@@ -394,12 +394,12 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 	// Segment를 생성하고 생성된 Segment를 Parent Segment에 Include한다.
 	CString strSegmentName;
 	strSegmentName.Format(L"pocc%d", m_nIncrementalId++);
-	TDF::SegmentKey cSegment = m_cPoccsIncludeSegment.Subsegment(strSegmentName);
+	H3DF::SegmentKey cSegment = m_cPoccsIncludeSegment.Subsegment(strSegmentName);
 	IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
 
 	//cSegment.Open(); // Segment를 Open하면 문제가 생김. 검토가 필요함.
 
- 	TDF::Utility::SetSegmentName(cSegment, strPoName);
+ 	H3DF::Utility::SetSegmentName(cSegment, strPoName);
 
 	// Attribute 생성
 	// Parent에서 받은(계단식으로) Attribute를 이용해서, Attribute를 생성
@@ -432,7 +432,7 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 			}
 */
 
-			TDF::MatrixKit cMatrix;
+			H3DF::MatrixKit cMatrix;
 			if(A3D_SUCCESS == ProductOccurrenceGetLocation(&cData, cMatrix)) {
 				if(false == cMatrix.IsIdentity()) {
 					cSegment.SetModellingMatrix(cMatrix);
@@ -576,7 +576,7 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 }
 
 // 2-1-1. Assembly Product Occurence의 위치를 가져오는 함수 / ProductOccurrenceGetLocation
-A3DStatus TdfImport::ProductOccurrenceGetLocation(A3DAsmProductOccurrenceData const * pcPoData, TDF::MatrixKit & cTransMatrix)
+A3DStatus TdfImport::ProductOccurrenceGetLocation(A3DAsmProductOccurrenceData const * pcPoData, H3DF::MatrixKit & cTransMatrix)
 {
 	if(nullptr == pcPoData) {
 		return A3D_ERROR;
@@ -957,7 +957,7 @@ A3DStatus TdfImport::ProductOccurrenceGetPart(const A3DAsmProductOccurrenceData 
 //== Parse 관련 함수 =================================================================================
 
 // 1. Parse Part Definition
-A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, TDF::SegmentKey & cParentSegment)
+A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, H3DF::SegmentKey & cParentSegment)
 {
 	LogIncreaseTabIndex(2);
 	
@@ -966,7 +966,7 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 	HC_KEY nSegmentKey = INVALID_KEY;
 	if(true == m_mPartsMap.Lookup((DWORD_PTR) pcPart, nSegmentKey)) 
 	{
-		TDF::SegmentKey cSegment(nSegmentKey);
+		H3DF::SegmentKey cSegment(nSegmentKey);
 		cParentSegment.IncludeSegment(cSegment);
 		Log(2, L"ParsePart Map: %s", cSegment.Name());
 
@@ -1019,7 +1019,7 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 }
 
 // 2. Draw Representation Item
-A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * pcRepItem, TDF::SegmentKey & cParentSegment,
+A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cParentSegment,
 	const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	LogIncreaseTabIndex(2);
@@ -1095,7 +1095,7 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 			A3D_INITIALIZE_DATA(A3DRiCoordinateSystemData, sCSysData);
 			CHECK_A3D_RETURN(A3DRiCoordinateSystemGet(pcCoordSys, &sCSysData));
 
-			TDF::MatrixKit cMatrix;
+			H3DF::MatrixKit cMatrix;
 			GetMatrix(sCSysData.m_pTransformation, cMatrix);
 			cSegment.SetModellingMatrix(cMatrix);
 
@@ -1144,7 +1144,7 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 }
 
 // 2-2. Draw Set
-A3DStatus TdfImport::DrawSet(const A3DRiSet * pSet, TDF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::DrawSet(const A3DRiSet * pSet, H3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DMiscCascadedAttributes * pcAttr;
 	A3DMiscCascadedAttributesData cAttrData;
@@ -1173,7 +1173,7 @@ A3DStatus TdfImport::DrawSet(const A3DRiSet * pSet, TDF::SegmentKey & cParentSeg
 
 // 2-1. Draw Ri Brep Model (B-Rep Model 및 Tessellation Model도 함께 처리된다.)
 A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData,
-	TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData)
+	H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData)
 {
 	LogIncreaseTabIndex(2);
 
@@ -1221,7 +1221,7 @@ A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcRepItem,
 
 // 2-3. Draw Poly Brep Model
 A3DStatus TdfImport::DrawRiPolyBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, 
-	TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData)
+	H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData)
 {
 	LogIncreaseTabIndex(2);
 
@@ -1239,7 +1239,7 @@ A3DStatus TdfImport::DrawRiPolyBrepModel(const A3DRiRepresentationItem * pcRepIt
 
 // 2-3. Draw Poly Wire
 A3DStatus TdfImport::DrawRiPolyWire(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, 
-	TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData)
+	H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData)
 {
 	A3DStatus nStatus = A3D_SUCCESS;
 	if(nullptr != cRepItemData.m_pTessBase) {
@@ -1249,7 +1249,7 @@ A3DStatus TdfImport::DrawRiPolyWire(const A3DRiRepresentationItem * pcRepItem, c
 	return nStatus;
 }
 
-A3DStatus TdfImport::DrawRiPointSet(const A3DRiRepresentationItem * pcRepItem, TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::DrawRiPointSet(const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	SetMarkerStyle(pcRepItem, cSegment, pcParentAttr);
 
@@ -1267,7 +1267,7 @@ A3DStatus TdfImport::DrawRiPointSet(const A3DRiRepresentationItem * pcRepItem, T
 			//cSegment.InsertMarker(sData.m_pPts[i].m_dX, sData.m_pPts[i].m_dY, sData.m_pPts[i].m_dZ);
 		}
 
-		TDF::ShellKit cShellKit;
+		H3DF::ShellKit cShellKit;
 		cShellKit.SetPoints(cPointArray);
 		
 		cSegment.InsertShell(cShellKit);
@@ -1280,7 +1280,7 @@ A3DStatus TdfImport::DrawRiPointSet(const A3DRiRepresentationItem * pcRepItem, T
 
 
 // 4. Draw Ri Curve
-A3DStatus TdfImport::DrawRiCurve(A3DRiCurve * pcInputRiCurve, TDF::SegmentKey & cParentSegment, A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::DrawRiCurve(A3DRiCurve * pcInputRiCurve, H3DF::SegmentKey & cParentSegment, A3DMiscCascadedAttributes * pcParentAttr)
 {
 	CString strName;
 	GetName(pcInputRiCurve, strName);
@@ -1387,7 +1387,7 @@ A3DStatus TdfImport::DrawRiCurve(A3DRiCurve * pcInputRiCurve, TDF::SegmentKey & 
 }
 
 // 5. Draw Markup 관련 View
-A3DStatus TdfImport::DrawMarkupView(const A3DMkpView * pcView, TDF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::DrawMarkupView(const A3DMkpView * pcView, H3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DStatus iRet = A3D_SUCCESS;
 
@@ -1416,7 +1416,7 @@ A3DStatus TdfImport::DrawMarkupView(const A3DMkpView * pcView, TDF::SegmentKey &
 }
 
 // 6. 복수의 Annotation을 그리는 함수
-A3DStatus TdfImport::ParseAnnotations(A3DMkpAnnotationEntity ** pcAnnotation, A3DUns32 nAnnotationsSize, TDF::SegmentKey & cParentSegment)
+A3DStatus TdfImport::ParseAnnotations(A3DMkpAnnotationEntity ** pcAnnotation, A3DUns32 nAnnotationsSize, H3DF::SegmentKey & cParentSegment)
 {
 	if(0 == nAnnotationsSize) {
 		return A3D_SUCCESS;
@@ -1433,7 +1433,7 @@ A3DStatus TdfImport::ParseAnnotations(A3DMkpAnnotationEntity ** pcAnnotation, A3
 	return A3D_SUCCESS;
 }
 
-A3DStatus TdfImport::ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation, A3DMiscCascadedAttributes * pcParentAttr, TDF::SegmentKey & cParentSegment)
+A3DStatus TdfImport::ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation, A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment)
 {
 	A3DEEntityType eType;
 	A3DEntityGetType(pcAnnotation, &eType);
@@ -1506,7 +1506,7 @@ A3DStatus TdfImport::ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation
 }
 
 // 6-1. Draw Annotation Set
-A3DStatus TdfImport::DrawAnnotationSet(const A3DMkpAnnotationSet * pcAnnotationSet, TDF::SegmentKey & cParentSegment, 
+A3DStatus TdfImport::DrawAnnotationSet(const A3DMkpAnnotationSet * pcAnnotationSet, H3DF::SegmentKey & cParentSegment, 
 	const A3DMiscCascadedAttributes * pcParentAttr)
 {
 /*
@@ -1546,7 +1546,7 @@ A3DStatus TdfImport::DrawAnnotationReference(const A3DMkpAnnotationItem * /*pcAn
 }
 
 // 6-3. Draw Annotation Item
-A3DStatus TdfImport::DrawAnnotationItem(const A3DMkpAnnotationItem * pcAnnotationItem, TDF::SegmentKey & cParentSegment, 
+A3DStatus TdfImport::DrawAnnotationItem(const A3DMkpAnnotationItem * pcAnnotationItem, H3DF::SegmentKey & cParentSegment, 
 	const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DStatus iRet = A3D_SUCCESS;
@@ -1576,7 +1576,7 @@ A3DStatus TdfImport::DrawAnnotationItem(const A3DMkpAnnotationItem * pcAnnotatio
 }
 
 // 7. Markup Data를 전체적으로 가져오는 부분
-A3DStatus TdfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedAttributesData * psAttribData, TDF::SegmentKey & cParentSegment)
+A3DStatus TdfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedAttributesData * psAttribData, H3DF::SegmentKey & cParentSegment)
 {
 	A3DMkpMarkupData sData;
 	A3D_INITIALIZE_DATA(A3DMkpMarkupData, sData);
@@ -1609,14 +1609,14 @@ A3DStatus TdfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascad
 
 	A3DMkpMarkupGet(pcMarkup, &sData);
 
-	TDF::PMI::Entity * pcEntity = nullptr;
+	H3DF::PMI::Entity * pcEntity = nullptr;
 
 	switch (sData.m_eType)
 	{
 		case kA3DMarkupTypeDatum:
 		{
-			pcEntity = new TDF::PMI::DatumEntity(cMarkupSegment);
-			TDF::PMI::DatumEntity * pcDatum = (PMI::DatumEntity *)pcEntity;
+			pcEntity = new H3DF::PMI::DatumEntity(cMarkupSegment);
+			H3DF::PMI::DatumEntity * pcDatum = (PMI::DatumEntity *)pcEntity;
 
 			switch (sData.m_eSubType)
 			{
@@ -1636,7 +1636,7 @@ A3DStatus TdfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascad
 
 		case kA3DMarkupTypeDimension:
 		{
-			pcEntity = new TDF::PMI::DimensionEntity(cMarkupSegment);
+			pcEntity = new H3DF::PMI::DimensionEntity(cMarkupSegment);
 			PMI::DimensionEntity * pcDimension = (PMI::DimensionEntity *)pcEntity;
 
 			pcDimension->SetDimensionType(PMI::Dimension::Type::UnknownType);
@@ -1906,8 +1906,8 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
  	Point cTextMove;
 	float char_width = 0.;
 	float char_height = 1.;
-	TDF::MatrixKit cMatrix;
-	TDF::MatrixKit cTransformMatrix;
+	H3DF::MatrixKit cMatrix;
+	H3DF::MatrixKit cTransformMatrix;
  	//FloatArray pline;
 	CString strLinePattern;
 // 	H_UTF8 line_pattern;
@@ -1939,7 +1939,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 					unsigned int triangleCount = *(pnStartCodes + 1) / 9;
 					for (unsigned int i = 0; i < triangleCount; ++i)
 					{
-						TDF::Point cPoints[3];
+						H3DF::Point cPoints[3];
 						for (UINT j = 0; j < 3; ++j)
 						{
 							cPoints[j].x = static_cast<float>(pdCoordData[9 * i + 3 * j + 0]);
@@ -1953,7 +1953,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 							}
 						}
 
-						TDF::PolygonKit cPolygon;
+						H3DF::PolygonKit cPolygon;
 						cPolygon.SetPoints(3, cPoints);
 						cPolygon.SetRGBColor(cColor);
 						aOutPolygones.push_back(cPolygon);
@@ -1977,7 +1977,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 							pcOutPmiOptions->SetDisplayParallelToScreen();
 						}
 
-						TDF::MatrixKit cMatrix;
+						H3DF::MatrixKit cMatrix;
 						cMatrix[3][0] = static_cast<float>(pdCoordData[0]);
 						cMatrix[3][1] = static_cast<float>(pdCoordData[1]);
 						cMatrix[3][2] = static_cast<float>(pdCoordData[2]);
@@ -2008,7 +2008,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 							pcOutPmiOptions->SetDisplayParallelToScreen();
 						}
 
-						TDF::MatrixKit cMatrix;
+						H3DF::MatrixKit cMatrix;
 						cMatrix[3][0] = static_cast<float>(pdCoordData[0]);
 						cMatrix[3][1] = static_cast<float>(pdCoordData[1]);
 						cMatrix[3][2] = static_cast<float>(pdCoordData[2]);
@@ -2158,7 +2158,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 						}
 					}
 
-					TDF::PolygonKit cPmiPolygon;
+					H3DF::PolygonKit cPmiPolygon;
 					cPmiPolygon.SetPoints(pt_count, pcPoints);
 					cPmiPolygon.SetRGBColor(cColor);
 					aOutPolygones.push_back(cPmiPolygon);
@@ -2217,7 +2217,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 
 
 					cTransformMatrix = cMatrix * cTransformMatrix;
-					//TDF::TestMatrix cm;
+					//H3DF::TestMatrix cm;
 					//MatrixCal::ComputeMatrixProduct(cMatrix.data(), cTransformMatrix.data(), cTransformMatrix.data());
 
 					PMI::Orientation orientation;
@@ -2268,7 +2268,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 				}
 			}
 			
-			TDF::Polyline cPmiPolyline;
+			H3DF::Polyline cPmiPolyline;
 			cPmiPolyline.SetPoints(nPointCount, pcPoints);
 			cPmiPolyline.SetRGBColor(cColor);
 
@@ -2320,7 +2320,7 @@ A3DStatus TdfImport::GetLeaderLinesAndSymbols(const A3DMkpLeader * pMarkup, Poly
 }
 
 // 8. Draw Tessellation Base
-A3DStatus TdfImport::DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresentationItem * pcRepItem, TDF::SegmentKey & cParentSegment, 
+A3DStatus TdfImport::DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cParentSegment, 
 	const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	if(pcTessBase == nullptr) {
@@ -2364,13 +2364,13 @@ A3DStatus TdfImport::DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresent
 
 // 8-1. Draw Tess3D
 A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
-	const A3DMiscCascadedAttributes * pcParentAttr, TDF::SegmentKey & cParentSegment)
+	const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment)
 {
 	LogIncreaseTabIndex(2);
 
 	double dUnitScale = 1.0;	// Tessellation은 1:1 비율로 들어온다 
 
-	TDF::SegmentKey cCurrnetSegment = cParentSegment;
+	H3DF::SegmentKey cCurrnetSegment = cParentSegment;
 
 	A3DTess3DData cTess3dData;
 	A3D_INITIALIZE_DATA(A3DTess3DData, cTess3dData);
@@ -2419,7 +2419,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 		}
 
 		m_nMaxPointCount = nPointCount * 1.2;
-		m_pcPoints = new TDF::Point[m_nMaxPointCount];
+		m_pcPoints = new H3DF::Point[m_nMaxPointCount];
 	}
 
 	m_nPointCount = nPointCount;
@@ -2440,7 +2440,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 		}
 
 		m_nMaxNormalCount = nNormalCount * 1.2;
-		m_pcNormals = new TDF::Vector[m_nMaxNormalCount];
+		m_pcNormals = new H3DF::Vector[m_nMaxNormalCount];
 	}
 
 	m_nNormalCount = nNormalCount;
@@ -2527,7 +2527,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 	{
 		StyleDefine sStyleDefine = mStyleDefineMap.GetNextValue(pcPos);
 
-		TDF::SegmentKey cSubSegment = cParentSegment.Subsegment(L"style_face_%d", sStyleDefine.nRgbColorIndex).KeyValue();
+		H3DF::SegmentKey cSubSegment = cParentSegment.Subsegment(L"style_face_%d", sStyleDefine.nRgbColorIndex).KeyValue();
 		SetFaceStyle(cSubSegment, psAttrData[sStyleDefine.nFirstFaceIndex]);
 
 		mFaceSegmentStyleMap.SetAt(sStyleDefine.nRgbColorIndex, cSubSegment.KeyValue());
@@ -2549,7 +2549,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 		{
 			HC_KEY nKey;
 			if(true == mFaceSegmentStyleMap.Lookup(nRgbColorIndex, nKey)) {
-				TDF::SegmentKey cSubSegment(nKey);
+				H3DF::SegmentKey cSubSegment(nKey);
 				cCurrnetSegment = cSubSegment;
 				bForceOpenFlag = true;
 				cCurrnetSegment.Open();
@@ -2574,7 +2574,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 				continue;
 			}
 
-			TDF::PointArray acWirePoints;
+			H3DF::PointArray acWirePoints;
 			acWirePoints.resize(size);
 
 			for (A3DUns32 k = 0; k < size; ++k) {
@@ -2643,7 +2643,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 		}
 
 		if(false == cConFaceInfo.aOutFacePoints.empty()) {
-			TDF::ShellKit cShellKit;
+			H3DF::ShellKit cShellKit;
 			cShellKit.SetPoints(cConFaceInfo.aOutFacePoints);
 			cShellKit.SetNormals(cConFaceInfo.aOutFaceVertexNormals);
 			cShellKit.SetFacelist(cConFaceInfo.aOutFaceList);
@@ -2964,7 +2964,7 @@ UINT TdfImport::ConvertTessFaceDataTriangleFanOneNormal(ConvertFaceInfo & cInFac
 }
 
 UINT TdfImport::DrawTessFaceDataTriangleFanOneNormal(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
-	TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, TDF::IntArray & anFacelistArray, TDF::IntArray & anNormalIndexArray)
+	TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, H3DF::IntArray & anFacelistArray, H3DF::IntArray & anNormalIndexArray)
 {
 	A3DUns32 nFacePointIndex[3];
 	A3DUns32 nFaceNormalIndex[3];
@@ -3196,7 +3196,7 @@ UINT TdfImport::ConveTessFaceDataTriangleTextured(ConvertFaceInfo & cInFaceInfo)
 }
 
 UINT TdfImport::DrawTessFaceDataTriangleTextured(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
-	TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, TDF::IntArray & anFacelistArray, TDF::IntArray & anNormalIndexArray)
+	TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, H3DF::IntArray & anFacelistArray, H3DF::IntArray & anNormalIndexArray)
 {
 	A3DUns32 nTriangleCount = cTessFaceData.m_puiSizesTriangulated[nTriSizeIndex++];
 	A3DUns32 nTextureCoordIndexSize = cTessFaceData.m_uiTextureCoordIndexesSize;
@@ -3236,7 +3236,7 @@ UINT TdfImport::DrawTessFaceDataTriangleTextured(A3DTessFaceData & cTessFaceData
 
 // 8-2-1. Tess3D Wire 처리
 A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
-	const A3DMiscCascadedAttributes * pcParentAttr, TDF::SegmentKey & cParentSegment)
+	const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment)
 {
 	A3DEEntityType eType;
 	CHECK_A3D_RETURN(A3DEntityGetType(pcRepItem, &eType));
@@ -3291,7 +3291,7 @@ A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3D
 
 	A3DUns32 nPointCount = pcTessBaseData->m_uiCoordSize / 3;
 
-	TDF::PointArray acWirePoints;
+	H3DF::PointArray acWirePoints;
 	acWirePoints.resize(nPointCount);
 
 	for(A3DUns32 nIndex = 0; nIndex < nPointCount; nIndex++)
@@ -3309,7 +3309,7 @@ A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3D
 }
 
 A3DStatus TdfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
-	const A3DMiscCascadedAttributes * pcParentAttr, TDF::SegmentKey & cSegment)
+	const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cSegment)
 {
 	LogIncreaseTabIndex(2);
 
@@ -3325,7 +3325,7 @@ A3DStatus TdfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBase
 
 	if(nullptr == sWireData.m_puiSizesWires) {
 		A3DUns32 nPointCount = pcTessBaseData->m_uiCoordSize / 3;
-		TDF::PointArray aPoints;
+		H3DF::PointArray aPoints;
 		aPoints.resize(nPointCount);
 
 		A3DUns32 nPointIndex = 0;
@@ -3346,7 +3346,7 @@ A3DStatus TdfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBase
 		bool bClosed = false;
 		Point cPoint;
 
-		TDF::PointArray aPoints;
+		H3DF::PointArray aPoints;
 
 		while(nIndex < sWireData.m_uiSizesWiresSize)
 		{
@@ -3542,7 +3542,7 @@ A3DUns32 TdfImport::TessFaceDataGetNumberOfFacets(const A3DTessFaceData * pcTess
 }
 
 // 8-3. Build Markup 
-A3DStatus TdfImport::BuildMarkup(A3DTess3D * pcTess3d, A3DTessBaseData * pcTessBaseData, TDF::SegmentKey & cParentSegment)
+A3DStatus TdfImport::BuildMarkup(A3DTess3D * pcTess3d, A3DTessBaseData * pcTessBaseData, H3DF::SegmentKey & cParentSegment)
 {
 	A3DTessMarkupData sData;
 	A3D_INITIALIZE_DATA(A3DTessMarkupData, sData);
@@ -3580,7 +3580,7 @@ void TdfImport::MatchVertexNormal(TessIndexMap & maNormalIndexMap, A3DUns32 nVer
 // 7-10-2. Point Index Map과 Normal Index Map, Point, Normal Index를 이용해서 MbTrianle Vector를 구성한다.
 // 주어진 Triangle Vector에 생성된 Vector를 추가시킴.
 bool TdfImport::ConvertFaceList(TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap,
-	A3DUns32 * pnFacePointIndex, A3DUns32 * pnFaceNormalIndex, TDF::IntArray & anFacelistArray, TDF::IntArray & anVertexNoramlIndexArray)
+	A3DUns32 * pnFacePointIndex, A3DUns32 * pnFaceNormalIndex, H3DF::IntArray & anFacelistArray, H3DF::IntArray & anVertexNoramlIndexArray)
 {
 	// Triangle을 구성할 Point Index
 	A3DUns32 nPointIndex[3];
@@ -3635,7 +3635,7 @@ void TdfImport::AddTriangle(ConvertFaceInfo & cInFaceInfo,
 	// Face List 숫자 추가
 	cInFaceInfo.aOutFaceList.push_back(3);
 
-	TDF::Vector cNormal;
+	H3DF::Vector cNormal;
 	bool bZeroLengthFlag = false;
 
 	double dLength0 = m_pcNormals[pnInFaceVertexNromalIndices[0]].LengthSquared();
@@ -3644,8 +3644,8 @@ void TdfImport::AddTriangle(ConvertFaceInfo & cInFaceInfo,
 
 	if(0.01 > dLength0 || 0.01 > dLength1 || 0.01 > dLength2) {
 		bZeroLengthFlag = true;
-		TDF::Vector cX = m_pcPoints[pnInFaceListIndices[1]] - m_pcPoints[pnInFaceListIndices[0]];
-		TDF::Vector cY = m_pcPoints[pnInFaceListIndices[2]] - m_pcPoints[pnInFaceListIndices[0]];
+		H3DF::Vector cX = m_pcPoints[pnInFaceListIndices[1]] - m_pcPoints[pnInFaceListIndices[0]];
+		H3DF::Vector cY = m_pcPoints[pnInFaceListIndices[2]] - m_pcPoints[pnInFaceListIndices[0]];
 
 		cNormal = cX.Cross(cY);
 		cNormal.Normalize();
@@ -3755,7 +3755,7 @@ void TdfImport::AddTriangle_IndexHash(ConvertFaceInfo & cInFaceInfo,
 	// Face List 숫자 추가
 	cInFaceInfo.aOutFaceList.push_back(3);
 
-	TDF::Vector cNormal;
+	H3DF::Vector cNormal;
 	bool bZeroLengthFlag = false;
 
 	double dLength0 = m_pcNormals[pnInFaceVertexNromalIndices[0]].LengthSquared();
@@ -3764,8 +3764,8 @@ void TdfImport::AddTriangle_IndexHash(ConvertFaceInfo & cInFaceInfo,
 	
 	if(0.01 > dLength0 || 0.01 > dLength1 || 0.01 > dLength2) {
 		bZeroLengthFlag = true;
-		TDF::Vector cX = cInFaceInfo.aInPoints[pnInFaceListIndices[1]] - cInFaceInfo.aInPoints[pnInFaceListIndices[0]];
-		TDF::Vector cY = cInFaceInfo.aInPoints[pnInFaceListIndices[2]] - cInFaceInfo.aInPoints[pnInFaceListIndices[0]];
+		H3DF::Vector cX = cInFaceInfo.aInPoints[pnInFaceListIndices[1]] - cInFaceInfo.aInPoints[pnInFaceListIndices[0]];
+		H3DF::Vector cY = cInFaceInfo.aInPoints[pnInFaceListIndices[2]] - cInFaceInfo.aInPoints[pnInFaceListIndices[0]];
 
 		cNormal = cX.Cross(cY);
 		cNormal.Normalize();
@@ -3862,7 +3862,7 @@ void TdfImport::AddTriangle_IndexHash(ConvertFaceInfo & cInFaceInfo,
 */
 
 // 8. Face Draw Style 정의
-A3DStatus TdfImport::SetFaceStyle(const A3DRootBaseWithGraphics * pcBase, TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::SetFaceStyle(const A3DRootBaseWithGraphics * pcBase, H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DMiscCascadedAttributes * pcAttrs;
 	A3DMiscCascadedAttributesData cAttrsData;
@@ -3876,7 +3876,7 @@ A3DStatus TdfImport::SetFaceStyle(const A3DRootBaseWithGraphics * pcBase, TDF::S
 	return eStatus;
 }
 
-A3DStatus TdfImport::SetFaceStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::SetFaceStyle(H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DMiscCascadedAttributesData cAttrsData;
 	A3D_INITIALIZE_DATA(A3DMiscCascadedAttributesData, cAttrsData);
@@ -3889,14 +3889,14 @@ A3DStatus TdfImport::SetFaceStyle(TDF::SegmentKey & cSegment, const A3DMiscCasca
 	return eStatus;
 }
 
-A3DStatus TdfImport::SetFaceStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData)
+A3DStatus TdfImport::SetFaceStyle(H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData)
 {
 	SegmentKey cStyleSegment;
 	if(true == FindFaceMaterialMapping(cAttrsData, cStyleSegment)) {
 		SetStyle(cSegment, cStyleSegment);
 	}
 	else {
-		TDF::MaterialKit cMaterial;
+		H3DF::MaterialKit cMaterial;
 		if(A3D_SUCCESS == GetMaterial(cAttrsData, cMaterial)) {
 			SetFaceMaterialMapping(cAttrsData, cMaterial, cSegment);
 		}
@@ -3905,7 +3905,7 @@ A3DStatus TdfImport::SetFaceStyle(TDF::SegmentKey & cSegment, const A3DMiscCasca
 	return A3D_SUCCESS;
 }
 
-A3DStatus TdfImport::SetLineStyle(const A3DRootBaseWithGraphics * pcBase, TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::SetLineStyle(const A3DRootBaseWithGraphics * pcBase, H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DMiscCascadedAttributes * pcAttrs;
 	A3DMiscCascadedAttributesData cAttrsData;
@@ -3919,7 +3919,7 @@ A3DStatus TdfImport::SetLineStyle(const A3DRootBaseWithGraphics * pcBase, TDF::S
 	return eStatus;
 }
 
-A3DStatus TdfImport::SetLineStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::SetLineStyle(H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DMiscCascadedAttributesData cAttrsData;
 	A3D_INITIALIZE_DATA(A3DMiscCascadedAttributesData, cAttrsData);
@@ -3932,14 +3932,14 @@ A3DStatus TdfImport::SetLineStyle(TDF::SegmentKey & cSegment, const A3DMiscCasca
 	return eStatus;
 }
 
-A3DStatus TdfImport::SetLineStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData)
+A3DStatus TdfImport::SetLineStyle(H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData)
 {
 	SegmentKey cStyleSegment;
 	if(true == FindLineMaterialMapping(cAttrsData, cStyleSegment)) {
 		SetStyle(cSegment, cStyleSegment);
 	}
 	else {
-		TDF::MaterialKit cMaterial;
+		H3DF::MaterialKit cMaterial;
 		if(A3D_SUCCESS == GetMaterial(cAttrsData, cMaterial)) {
 			SetLineMaterialMapping(cAttrsData, cMaterial, cSegment);
 		}
@@ -3948,7 +3948,7 @@ A3DStatus TdfImport::SetLineStyle(TDF::SegmentKey & cSegment, const A3DMiscCasca
 	return A3D_SUCCESS;
 }
 
-A3DStatus TdfImport::SetMarkerStyle(const A3DRootBaseWithGraphics * pcBase, TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::SetMarkerStyle(const A3DRootBaseWithGraphics * pcBase, H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DMiscCascadedAttributes * pcAttrs;
 	A3DMiscCascadedAttributesData cAttrsData;
@@ -3962,7 +3962,7 @@ A3DStatus TdfImport::SetMarkerStyle(const A3DRootBaseWithGraphics * pcBase, TDF:
 	return eStatus;
 }
 
-A3DStatus TdfImport::SetMarkerStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::SetMarkerStyle(H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	A3DMiscCascadedAttributesData cAttrsData;
 	A3D_INITIALIZE_DATA(A3DMiscCascadedAttributesData, cAttrsData);
@@ -3975,14 +3975,14 @@ A3DStatus TdfImport::SetMarkerStyle(TDF::SegmentKey & cSegment, const A3DMiscCas
 	return eStatus;
 }
 
-A3DStatus TdfImport::SetMarkerStyle(TDF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData)
+A3DStatus TdfImport::SetMarkerStyle(H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData)
 {
 	SegmentKey cStyleSegment;
 	if(true == FindMarkerMaterialMapping(cAttrsData, cStyleSegment)) {
 		SetStyle(cSegment, cStyleSegment);
 	}
 	else {
-		TDF::MaterialKit cMaterial;
+		H3DF::MaterialKit cMaterial;
 		if(A3D_SUCCESS == GetMaterial(cAttrsData, cMaterial)) {
 			SetMarkerMaterialMapping(cAttrsData, cMaterial, cSegment);
 		}
@@ -3992,7 +3992,7 @@ A3DStatus TdfImport::SetMarkerStyle(TDF::SegmentKey & cSegment, const A3DMiscCas
 }
 
 A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsData, A3DInt32 * pnUVCoordinatesIndex,
-	A3DUns8 * pucTextureDimension, TDF::MaterialKit & cMaterialKit)
+	A3DUns8 * pucTextureDimension, H3DF::MaterialKit & cMaterialKit)
 {
 	const A3DGraphStyleData * pcStyleData = &cAttrsData.m_sStyle;
 
@@ -4034,7 +4034,7 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 
 			CString strTextureName;
 			strTextureName.Format(L"texture_%d", sTextureAppData.m_uiTextureDefinitionIndex);
-			TDF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
+			H3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
 
 			CString strTextureOption;
 			strTextureOption.Format(L"source = image %u", sTextureData.m_uiPictureIndex);
@@ -4068,7 +4068,7 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 
 			*pucTextureDimension = sTextureDefinitionData.m_ucTextureDimension;
 
-			TDF::RGBAColor cDiffuseColor(sTextureDefinitionData.m_dRed, sTextureDefinitionData.m_dGreen,
+			H3DF::RGBAColor cDiffuseColor(sTextureDefinitionData.m_dRed, sTextureDefinitionData.m_dGreen,
 				sTextureDefinitionData.m_dBlue, sTextureDefinitionData.m_dAlpha);*/
 
 			//cMaterialKit.SetDiffuseColor(cDiffuseColor);
@@ -4088,7 +4088,7 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 
 			CHECK_A3D_RETURN(A3DGlobalGetGraphMaterialData(pcStyleData->m_uiRgbColorIndex, &sMaterialData));
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiDiffuse, &sRgbColorData));
-			TDF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dDiffuseAlpha);
+			H3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dDiffuseAlpha);
 			if(true == bTransparencyDefined) { cDiffuseColor.alpha = fTransparency; }
 
 			cMaterialKit.SetDiffuseColor(cDiffuseColor);
@@ -4097,19 +4097,19 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 /*
 			nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiAmbient, &sRgbColorData));
-			TDF::RGBAColor cAmbientColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dAmbientAlpha);
-			cMaterialKit.SetFaceColor(cAmbientColor, TDF::Material::Color::Channel::);
+			H3DF::RGBAColor cAmbientColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dAmbientAlpha);
+			cMaterialKit.SetFaceColor(cAmbientColor, H3DF::Material::Color::Channel::);
 */
 
 			//nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiEmissive, &sRgbColorData));
-			TDF::RGBAColor cEmissiveColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dEmissiveAlpha);
+			H3DF::RGBAColor cEmissiveColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dEmissiveAlpha);
 			if(true == bTransparencyDefined) { cEmissiveColor.alpha = fTransparency; }
 			cMaterialKit.SetEmission(cEmissiveColor);
 
 			//nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiSpecular, &sRgbColorData));
-			TDF::RGBAColor cSpecularColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dSpecularAlpha);
+			H3DF::RGBAColor cSpecularColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dSpecularAlpha);
 			if(true == bTransparencyDefined) { cSpecularColor.alpha = fTransparency; }
 			cMaterialKit.SetSpecular(cSpecularColor);
 
@@ -4127,7 +4127,7 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 			A3D_INITIALIZE_DATA(A3DGraphRgbColorData, sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(pcStyleData->m_uiRgbColorIndex, &sRgbColorData));
 
-			TDF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
+			H3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
 			cMaterialKit.SetDiffuseColor(cDiffuseColor);
 
 			//Log(2, L"DrawStyle: R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
@@ -4142,7 +4142,7 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 }
 
 // 8-1. 일반 DrawStyle 정의 
-A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsData, TDF::MaterialKit & cMaterialKit)
+A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsData, H3DF::MaterialKit & cMaterialKit)
 {
 	const A3DGraphStyleData * pcStyleData = &cAttrsData.m_sStyle;
 
@@ -4180,7 +4180,7 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 			A3D_INITIALIZE_DATA(A3DGraphTextureDefinitionData, sTextureData);
 			A3DGlobalGetGraphTextureDefinitionData(sTextureAppData.m_uiTextureDefinitionIndex, &sTextureData);
 
-			TDF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
+			H3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
 
 			CString strTextureName;
 			strTextureName.Format(L"texture_%d", sTextureAppData.m_uiTextureDefinitionIndex);
@@ -4225,7 +4225,7 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 
 			CHECK_A3D_RETURN(A3DGlobalGetGraphMaterialData(pcStyleData->m_uiRgbColorIndex, &sMaterialData));
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiDiffuse, &sRgbColorData));
-			TDF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dDiffuseAlpha);
+			H3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dDiffuseAlpha);
 			if(true == bTransparencyDefined) {  cDiffuseColor.alpha = fTransparency; }
 			cMaterialKit.SetDiffuseColor(cDiffuseColor);
 
@@ -4233,19 +4233,19 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 /*
 			nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiAmbient, &sRgbColorData));
-			TDF::RGBAColor cAmbientColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dAmbientAlpha);
-			cMaterialKit.SetFaceColor(cAmbientColor, TDF::Material::Color::Channel::);
+			H3DF::RGBAColor cAmbientColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dAmbientAlpha);
+			cMaterialKit.SetFaceColor(cAmbientColor, H3DF::Material::Color::Channel::);
 */
 
 			//nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiEmissive, &sRgbColorData));
-			TDF::RGBAColor cEmissiveColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dEmissiveAlpha);
+			H3DF::RGBAColor cEmissiveColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dEmissiveAlpha);
 			if(true == bTransparencyDefined) { cEmissiveColor.alpha = fTransparency; }
 			cMaterialKit.SetEmission(cEmissiveColor);
 
 			//nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiSpecular, &sRgbColorData));
-			TDF::RGBAColor cSpecularColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dSpecularAlpha);
+			H3DF::RGBAColor cSpecularColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dSpecularAlpha);
 			if(true == bTransparencyDefined) { cSpecularColor.alpha = fTransparency; }
 			cMaterialKit.SetSpecular(cSpecularColor);
 
@@ -4263,7 +4263,7 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 			A3D_INITIALIZE_DATA(A3DGraphRgbColorData, sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(pcStyleData->m_uiRgbColorIndex, &sRgbColorData));
 
-			TDF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
+			H3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
 			if(true == bTransparencyDefined) { cDiffuseColor.alpha = fTransparency; }
 			cMaterialKit.SetDiffuseColor(cDiffuseColor);
 
@@ -4383,7 +4383,7 @@ A3DStatus TdfImport::DrawTransformation(const A3DMiscTransformation * pcTransfor
 
 //== Texture 관련 함수 ===============================================================================
 
-A3DStatus TdfImport::PopulateTextures(TDF::SegmentKey & cSegment)
+A3DStatus TdfImport::PopulateTextures(H3DF::SegmentKey & cSegment)
 {
 // 	InitializeMagick(".");
 // 
@@ -4406,7 +4406,7 @@ A3DStatus TdfImport::PopulateTextures(TDF::SegmentKey & cSegment)
 
 	//cSegment.Open();
 
-	TDF::MaterialMappingControl cMappingControl = cSegment.GetMaterialMappingControl();
+	H3DF::MaterialMappingControl cMappingControl = cSegment.GetMaterialMappingControl();
 	cMappingControl.InitPopulateTextures();
 
 	// This while loop is loading all the images.
@@ -4530,7 +4530,7 @@ A3DStatus TdfImport::PopulateTextures(TDF::SegmentKey & cSegment)
 	return A3D_SUCCESS;
 }
 
-A3DStatus TdfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cAttrsData, TDF::MaterialKit & cMaterialKit)
+A3DStatus TdfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cAttrsData, H3DF::MaterialKit & cMaterialKit)
 {
 	const A3DGraphStyleData * pcStyleData = &cAttrsData.m_sStyle;
 
@@ -4568,7 +4568,7 @@ A3DStatus TdfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cAt
 			A3D_INITIALIZE_DATA(A3DGraphTextureDefinitionData, sTextureData);
 			A3DGlobalGetGraphTextureDefinitionData(sTextureAppData.m_uiTextureDefinitionIndex, &sTextureData);
 
-			TDF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
+			H3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
 
 			CString strTextureName;
 			strTextureName.Format(L"texture_%d", sTextureAppData.m_uiTextureDefinitionIndex);
@@ -4613,7 +4613,7 @@ A3DStatus TdfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cAt
 
 			CHECK_A3D_RETURN(A3DGlobalGetGraphMaterialData(pcStyleData->m_uiRgbColorIndex, &sMaterialData));
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiDiffuse, &sRgbColorData));
-			TDF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dDiffuseAlpha);
+			H3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dDiffuseAlpha);
 			if (true == bTransparencyDefined) { cDiffuseColor.alpha = fTransparency; }
 			cMaterialKit.SetDiffuseColor(cDiffuseColor);
 
@@ -4621,19 +4621,19 @@ A3DStatus TdfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cAt
 /*
 			nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiAmbient, &sRgbColorData));
-			TDF::RGBAColor cAmbientColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dAmbientAlpha);
-			cMaterialKit.SetFaceColor(cAmbientColor, TDF::Material::Color::Channel::);
+			H3DF::RGBAColor cAmbientColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dAmbientAlpha);
+			cMaterialKit.SetFaceColor(cAmbientColor, H3DF::Material::Color::Channel::);
 */
 
 //nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiEmissive, &sRgbColorData));
-			TDF::RGBAColor cEmissiveColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dEmissiveAlpha);
+			H3DF::RGBAColor cEmissiveColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dEmissiveAlpha);
 			if (true == bTransparencyDefined) { cEmissiveColor.alpha = fTransparency; }
 			cMaterialKit.SetEmission(cEmissiveColor);
 
 			//nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiSpecular, &sRgbColorData));
-			TDF::RGBAColor cSpecularColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dSpecularAlpha);
+			H3DF::RGBAColor cSpecularColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dSpecularAlpha);
 			if (true == bTransparencyDefined) { cSpecularColor.alpha = fTransparency; }
 			cMaterialKit.SetSpecular(cSpecularColor);
 
@@ -4651,7 +4651,7 @@ A3DStatus TdfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cAt
 			A3D_INITIALIZE_DATA(A3DGraphRgbColorData, sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(pcStyleData->m_uiRgbColorIndex, &sRgbColorData));
 
-			TDF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
+			H3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
 			if (true == bTransparencyDefined) { cDiffuseColor.alpha = fTransparency; }
 			cMaterialKit.SetDiffuseColor(cDiffuseColor);
 
@@ -4666,14 +4666,14 @@ A3DStatus TdfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cAt
 	return A3D_SUCCESS;
 }
 
-A3DStatus TdfImport::SetTextureMapping(TDF::SegmentKey cSegment, A3DMiscCascadedAttributesData & sAttrData) 
+A3DStatus TdfImport::SetTextureMapping(H3DF::SegmentKey cSegment, A3DMiscCascadedAttributesData & sAttrData) 
 {
-	TDF::MaterialKit cMaterial;
+	H3DF::MaterialKit cMaterial;
 	if (A3D_SUCCESS != GetMaterial(sAttrData, cMaterial)) {
 		return A3D_ERROR;
 	}
 
-	TDF::MaterialMappingKit cMaterialMapping;
+	H3DF::MaterialMappingKit cMaterialMapping;
 	cMaterialMapping.SetFaceMaterial(cMaterial);
 
 	cSegment.SetMaterialMapping(cMaterialMapping);
@@ -4765,9 +4765,9 @@ A3DStatus TdfImport::IsShow(const A3DRootBaseWithGraphics * pGraphics)
 }
 
 // 5. 주어진 Material Mapping을 이용해서 
-bool TdfImport::SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::MaterialKit const & cInKit, TDF::SegmentKey & cSegment)
+bool TdfImport::SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, H3DF::MaterialKit const & cInKit, H3DF::SegmentKey & cSegment)
 {
-	TDF::SegmentKey cStyleSegment = m_nStylesIncludeKey.Subsegment(L"face_mat_%d_%d", cAttrData.m_sStyle.m_uiRgbColorIndex, cAttrData.m_sStyle.m_ucTransparency);
+	H3DF::SegmentKey cStyleSegment = m_nStylesIncludeKey.Subsegment(L"face_mat_%d_%d", cAttrData.m_sStyle.m_uiRgbColorIndex, cAttrData.m_sStyle.m_ucTransparency);
 	
 	// 입력된 Matrial을 Face에 적용한다.
 	MaterialMappingKit cMaterialMapping;
@@ -4775,8 +4775,8 @@ bool TdfImport::SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAt
 
 	cStyleSegment.SetMaterialMapping(cMaterialMapping);
 
-	TDF::StyleControl cStyleControl = cSegment.GetStyleControl();
-	TDF::StyleKey cStyle = cSegment.GetStyleControl().PushSegment(cStyleSegment);
+	H3DF::StyleControl cStyleControl = cSegment.GetStyleControl();
+	H3DF::StyleKey cStyle = cSegment.GetStyleControl().PushSegment(cStyleSegment);
 
 // 	if(INVALID_KEY == cStyle.KeyValue()) { 
 // 		return false;
@@ -4789,22 +4789,22 @@ bool TdfImport::SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAt
 	return true;
 }
 
-bool TdfImport::SetLineMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::MaterialKit const & cInKit, TDF::SegmentKey & cSegment)
+bool TdfImport::SetLineMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, H3DF::MaterialKit const & cInKit, H3DF::SegmentKey & cSegment)
 {
 	RGBAColor cDiffuseColor;
 	if (false == cInKit.ShowDiffuseColor(cDiffuseColor)) {
 		return false;
 	}
 
-	TDF::SegmentKey cStyleSegment = m_nStylesIncludeKey.Subsegment(L"line_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
+	H3DF::SegmentKey cStyleSegment = m_nStylesIncludeKey.Subsegment(L"line_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
 
 	MaterialMappingKit cMaterialMapping;
 	cMaterialMapping.SetLineColor(cDiffuseColor);
 
 	cStyleSegment.SetMaterialMapping(cMaterialMapping);
 
-	TDF::StyleControl cStyleControl = cSegment.GetStyleControl();
-	TDF::StyleKey cStyle = cSegment.GetStyleControl().PushSegment(cStyleSegment);
+	H3DF::StyleControl cStyleControl = cSegment.GetStyleControl();
+	H3DF::StyleKey cStyle = cSegment.GetStyleControl().PushSegment(cStyleSegment);
 
 // 	if(INVALID_KEY == cStyle.KeyValue()) {
 // 		return false;
@@ -4815,22 +4815,22 @@ bool TdfImport::SetLineMaterialMapping(const A3DMiscCascadedAttributesData & cAt
 	return true;
 }
 
-bool TdfImport::SetMarkerMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, TDF::MaterialKit const & cInKit, TDF::SegmentKey & cSegment)
+bool TdfImport::SetMarkerMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, H3DF::MaterialKit const & cInKit, H3DF::SegmentKey & cSegment)
 {
 	RGBAColor cDiffuseColor;
 	if (false == cInKit.ShowDiffuseColor(cDiffuseColor)) {
 		return false;
 	}
 
-	TDF::SegmentKey cStyleSegment = m_nStylesIncludeKey.Subsegment(L"marker_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
+	H3DF::SegmentKey cStyleSegment = m_nStylesIncludeKey.Subsegment(L"marker_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
 
 	MaterialMappingKit cMaterialMapping;
 	cMaterialMapping.SetMarkerColor(cDiffuseColor);
 
 	cStyleSegment.SetMaterialMapping(cMaterialMapping);
 
-	TDF::StyleControl cStyleControl = cSegment.GetStyleControl();
-	TDF::StyleKey cStyle = cSegment.GetStyleControl().PushSegment(cStyleSegment);
+	H3DF::StyleControl cStyleControl = cSegment.GetStyleControl();
+	H3DF::StyleKey cStyle = cSegment.GetStyleControl().PushSegment(cStyleSegment);
 
 // 	if(INVALID_KEY == cStyle.KeyValue()) {
 // 		return false;
@@ -4843,9 +4843,9 @@ bool TdfImport::SetMarkerMaterialMapping(const A3DMiscCascadedAttributesData & c
 
 
 // 5-1. 주어진 Material Mapping을 이용해서 
-bool TdfImport::SetStyle(TDF::SegmentKey & cSegment, TDF::SegmentKey & cStyleSegment)
+bool TdfImport::SetStyle(H3DF::SegmentKey & cSegment, H3DF::SegmentKey & cStyleSegment)
 {
-	TDF::StyleKey cStyle = cSegment.GetStyleControl().PushSegment(cStyleSegment);
+	H3DF::StyleKey cStyle = cSegment.GetStyleControl().PushSegment(cStyleSegment);
 
 	if(INVALID_KEY == cStyle.KeyValue()) {
 		return false;
@@ -4893,7 +4893,7 @@ bool TdfImport::FindMarkerMaterialMapping(const A3DMiscCascadedAttributesData & 
 	return true;
 }
 
-bool TdfImport::FindMaterialMapping(CString strGeometry, TDF::MaterialMappingKit const & cInKit, SegmentKey & cOutStyleSegment)
+bool TdfImport::FindMaterialMapping(CString strGeometry, H3DF::MaterialMappingKit const & cInKit, SegmentKey & cOutStyleSegment)
 {
 	for(auto & cMaterialStyle : m_vcMaterialMappingStyleVector) {
 		if(0 == cMaterialStyle.strGeometry.CompareNoCase(strGeometry)) {
@@ -4971,7 +4971,7 @@ A3DStatus TdfImport::GetMatrix(A3DMiscTransformation * pcLocation, MbMatrix3D & 
 	return A3D_SUCCESS;
 }
 
-A3DStatus TdfImport::GetMatrix(A3DMiscTransformation * pcLocation, TDF::MatrixKit & cOutMatrix)
+A3DStatus TdfImport::GetMatrix(A3DMiscTransformation * pcLocation, H3DF::MatrixKit & cOutMatrix)
 {
 	MbMatrix3D cMatrix;
 	CHECK_A3D_RETURN(GetMatrix(pcLocation, cMatrix));

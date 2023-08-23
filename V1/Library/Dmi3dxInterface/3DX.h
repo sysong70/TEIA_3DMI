@@ -11,10 +11,10 @@
 #include <mb_cart_point3d.h>
 #include <mb_cart_point.h>
 
-#define OPEN_3DX_NAMESPACE namespace _3DX {
+#define OPEN_3DX_NAMESPACE namespace H3DX {
 #define CLOSE_3DX_NAMESPACE }
 
-#define USING_3DX_NAMESPACE using namespace _3DX;
+#define USING_3DX_NAMESPACE using namespace H3DX;
 
 OPEN_3DX_NAMESPACE
 

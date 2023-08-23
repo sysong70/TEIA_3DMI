@@ -15,7 +15,7 @@ USING_3DF_NAMESPACE
 class EdgeAttributeKitPrivate : public PrivateImpl
 {
 public:
-	EdgeAttributeKitPrivate() { m_eType = TDF::Type::EdgeAttributeKit; }
+	EdgeAttributeKitPrivate() { m_eType = H3DF::Type::EdgeAttributeKit; }
 
 	void Copy(EdgeAttributeKitPrivate * pcInThat) {
 		m_strPatternName = pcInThat->m_strPatternName;
@@ -157,7 +157,7 @@ bool EdgeAttributeKit::ShowHardAngle(float & fOutAngle) const
 class EdgeAttributeControlPrivate : public PrivateImpl
 {
 public:
-	EdgeAttributeControlPrivate() { m_eType = TDF::Type::EdgeAttributeControl; }
+	EdgeAttributeControlPrivate() { m_eType = H3DF::Type::EdgeAttributeControl; }
 
 	void Copy(EdgeAttributeControlPrivate * pcInThat) {
 		m_cParentSegmentKey = pcInThat->m_cParentSegmentKey;
@@ -219,27 +219,27 @@ EdgeAttributeControl & EdgeAttributeControl::SetWeight(float fInWeight, Edge::Si
 
 			switch (eInUnits)
 			{
-				case TDF::Edge::SizeUnits::ObjectSpace:
+				case H3DF::Edge::SizeUnits::ObjectSpace:
 					strWeight.Format(_T("%f oru"), fInWeight);
 					break;
 
-				case TDF::Edge::SizeUnits::SubscreenRelative:
+				case H3DF::Edge::SizeUnits::SubscreenRelative:
 					strWeight.Format(_T("%f sru"), fInWeight);
 					break;
 
-				case TDF::Edge::SizeUnits::WindowRelative:
+				case H3DF::Edge::SizeUnits::WindowRelative:
 					strWeight.Format(_T("%f wru"), fInWeight);
 					break;
 
-				case TDF::Edge::SizeUnits::WorldSpace:
+				case H3DF::Edge::SizeUnits::WorldSpace:
 					strWeight.Format(_T("%f wsu"), fInWeight);
 					break;
 
-				case TDF::Edge::SizeUnits::Points:
+				case H3DF::Edge::SizeUnits::Points:
 					strWeight.Format(_T("%f points"), fInWeight);
 					break;
 
-				case TDF::Edge::SizeUnits::Pixels:
+				case H3DF::Edge::SizeUnits::Pixels:
 					strWeight.Format(_T("%f Pixels"), fInWeight);
 					break;
 			}

@@ -12,7 +12,7 @@
 
 USING_3DF_NAMESPACE
 
-TDF::Key::Key(HC_KEY nInKey)
+H3DF::Key::Key(HC_KEY nInKey)
 {
 	KeyPrivate * pcImpl = new KeyPrivate();
 	pcImpl->m_nKey = nInKey;
@@ -20,60 +20,60 @@ TDF::Key::Key(HC_KEY nInKey)
 	m_pcImpl = pcImpl;
 }
 
-TDF::Key::Key(Key const & cInThat)
+H3DF::Key::Key(Key const & cInThat)
 {
 	m_pcImpl = new KeyPrivate();
 	Set(cInThat);
 }
 
-TDF::Key::~Key()
+H3DF::Key::~Key()
 {
 }
 
-void TDF::Key::Set(Key const & cInThat)
+void H3DF::Key::Set(Key const & cInThat)
 {
 	KeyPrivate * pcImpl = (KeyPrivate *)m_pcImpl;
 	KeyPrivate * pcInThatImpl = (KeyPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-Key const & TDF::Key::operator = (Key const & cInThat)
+Key const & H3DF::Key::operator = (Key const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-bool TDF::Key::operator == (Key const & cInThat) const
+bool H3DF::Key::operator == (Key const & cInThat) const
 {
 	KeyPrivate * pcImpl = (KeyPrivate *)m_pcImpl;
 	KeyPrivate * pcInThatImpl = (KeyPrivate *)cInThat.m_pcImpl;
 	return (pcImpl->m_nKey == pcInThatImpl->m_nKey);
 }
 
-HC_KEY TDF::Key::KeyValue() const 
+HC_KEY H3DF::Key::KeyValue() const 
 { 
 	KeyPrivate * pcImpl = (KeyPrivate *)m_pcImpl;
 	return pcImpl->m_nKey;
 }
 
-void TDF::Key::SetKeyValue(HC_KEY nInKey)
+void H3DF::Key::SetKeyValue(HC_KEY nInKey)
 {
 	KeyPrivate * pcImpl = (KeyPrivate *)m_pcImpl;
 	pcImpl->m_nKey = nInKey;
 }
 
-void TDF::Key::SetKeyValue(HC_KEY nInKey) const
+void H3DF::Key::SetKeyValue(HC_KEY nInKey) const
 {
 	KeyPrivate * pcImpl = (KeyPrivate *)m_pcImpl;
 	pcImpl->m_nKey = nInKey;
 }
 
-void TDF::Key::Delete()
+void H3DF::Key::Delete()
 {
 	assert(false);
 }
 
-bool TDF::Key::HasOwner() const
+bool H3DF::Key::HasOwner() const
 {
 	HC_KEY nOwnerKey  = HC_Show_Owner_Original_Key(KeyValue());
 	if (INVALID_KEY == nOwnerKey) {
@@ -84,13 +84,13 @@ bool TDF::Key::HasOwner() const
 }
 
 // return: The segment containing this key.
-SegmentKey TDF::Key::Up() const
+SegmentKey H3DF::Key::Up() const
 {
 	return Owner();
 }
 
 // return: The segment containing this key.
-SegmentKey TDF::Key::Owner() const
+SegmentKey H3DF::Key::Owner() const
 {
 	SegmentKey cOwner;
 

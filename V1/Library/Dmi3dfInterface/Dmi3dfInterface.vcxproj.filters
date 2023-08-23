@@ -58,6 +58,12 @@
     <Filter Include="3DF\Object">
       <UniqueIdentifier>{bcac17de-fcc0-4634-ab74-17a363d9339a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="3DF\Control\Private">
+      <UniqueIdentifier>{afa63e5c-ba9b-4717-88ba-b3c4d3bc2184}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component">
+      <UniqueIdentifier>{9f05a137-0d3c-473c-9264-e4a8fd7c2f12}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -285,11 +291,20 @@
     <ClInclude Include="3DF\3DF.Operator.KeyboardTest.h">
       <Filter>Operator</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Private\3DF.HighlightPrivate.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\3DF.Operator.KinematicTest.h">
       <Filter>Operator</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Private\3DF.HighlightPrivate.h">
+      <Filter>3DF\Control\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF.Component.Application.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF.Component.h">
+      <Filter>Component</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF.Component.View.h">
+      <Filter>Component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -506,11 +521,17 @@
     <ClCompile Include="3DF\3DF.Operator.KeyboardTest.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Private\3DF.HighlightPrivate.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="3DF\3DF.Operator.KinematicTest.cpp">
       <Filter>Operator</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Private\3DF.HighlightPrivate.cpp">
+      <Filter>3DF\Control\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF.Component.Application.cpp">
+      <Filter>Component</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF.Component.View.cpp">
+      <Filter>Component</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

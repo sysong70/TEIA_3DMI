@@ -54,7 +54,7 @@ public:
 		}
 
 		SendSignal = (SendSignalFunc)GetProcAddress(hInstance, "ExecuteCommand");
-		SetReceiver = (AssignSendSignalFunc)GetProcAddress(hInstance, "SendCommand");
+		SetReceiver = (AssignSendSignalFunc)GetProcAddress(hInstance, "AssignSendSignalFunc");
 
 		if (IsValid = SetReceiver) {
 			SetReceiver(Connector3d::ReceiveSignal);

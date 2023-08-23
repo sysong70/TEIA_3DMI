@@ -8,11 +8,11 @@
 #include <HUtility.h>
 #include <HTools.h>
 
-namespace TDF {
+namespace H3DF {
 	class VisualEffectsControlPrivate : public PrivateImpl
 	{
 	public:
-		VisualEffectsControlPrivate() { m_eType = TDF::Type::VisualEffectsControl; }
+		VisualEffectsControlPrivate() { m_eType = H3DF::Type::VisualEffectsControl; }
 
 		void Copy(VisualEffectsControlPrivate * pcInThat) {
 			m_cParentSegmentKey = pcInThat->m_cParentSegmentKey;

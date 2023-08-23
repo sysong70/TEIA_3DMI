@@ -11,13 +11,13 @@ class Line
 {
 public:
 
-	// The CoordinateSpace enum is a list of all coordinate spaces used in Visualize. These correspond to TDF::Coordinate::Space
+	// The CoordinateSpace enum is a list of all coordinate spaces used in Visualize. These correspond to H3DF::Coordinate::Space
 	enum class CoordinateSpace : uint32_t
 	{
-		Object,					// TDF::Coordinate::Space::Object
-		World,					// TDF::Coordinate::Space::World
-		NormalizedInnerWindow,	// TDF::Coordinate::Space::NormalizedInnerWindow
-		NormalizedInnerPixel	// TDF::Coordinate::Space::NormalizedInnerPixel
+		Object,					// H3DF::Coordinate::Space::Object
+		World,					// H3DF::Coordinate::Space::World
+		NormalizedInnerWindow,	// H3DF::Coordinate::Space::NormalizedInnerWindow
+		NormalizedInnerPixel	// H3DF::Coordinate::Space::NormalizedInnerPixel
 	};
 
 	// Line Size Units
@@ -134,7 +134,7 @@ public:
 	void Set(LineAttributeKit const & cInThat);
 	LineAttributeKit const & operator = (LineAttributeKit const & cInThat);
 
-	TDF::Type ObjectType() const { return TDF::Type::LineAttributeKit; };
+	H3DF::Type ObjectType() const { return H3DF::Type::LineAttributeKit; };
 
 	void Show(LineAttributeKit & cOutKit) const;
 
@@ -164,7 +164,7 @@ public:
 	void Set(LineAttributeControl const & cInThat);
 	LineAttributeControl & operator = (LineAttributeControl const & cInThat);
 
-	TDF::Type ObjectType() const { return TDF::Type::LineAttributeControl; };
+	H3DF::Type ObjectType() const { return H3DF::Type::LineAttributeControl; };
 
 	LineAttributeControl & SetPattern(CString strInPatternName);
 	LineAttributeControl & SetWeight(float fInWeight, Line::SizeUnits eInUnits = Line::SizeUnits::ScaleFactor);

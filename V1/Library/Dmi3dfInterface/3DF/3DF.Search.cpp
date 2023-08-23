@@ -6,25 +6,25 @@
 
 USING_3DF_NAMESPACE
 
-TDF::SearchOptionsKit::SearchOptionsKit()
+H3DF::SearchOptionsKit::SearchOptionsKit()
 {
 	m_pcImpl = new SearchOptionsKitPrivate();
 }
 
-TDF::SearchOptionsKit::SearchOptionsKit(SearchOptionsKit const & cInKit)
+H3DF::SearchOptionsKit::SearchOptionsKit(SearchOptionsKit const & cInKit)
 {
 	m_pcImpl = new SearchOptionsKitPrivate();
 	Set(cInKit);
 }
 
-void TDF::SearchOptionsKit::Set(SearchOptionsKit const & cInThat)
+void H3DF::SearchOptionsKit::Set(SearchOptionsKit const & cInThat)
 {
 	SearchOptionsKitPrivate * pcImpl = (SearchOptionsKitPrivate *)m_pcImpl;
 	SearchOptionsKitPrivate * pcInThatImpl = (SearchOptionsKitPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-SearchOptionsKit & TDF::SearchOptionsKit::operator=(SearchOptionsKit && cInThat)
+SearchOptionsKit & H3DF::SearchOptionsKit::operator=(SearchOptionsKit && cInThat)
 {
 	Set(cInThat);
 	return *this;

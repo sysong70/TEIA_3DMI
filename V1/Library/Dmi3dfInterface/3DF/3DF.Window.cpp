@@ -16,7 +16,7 @@ USING_3DF_NAMESPACE
 
 // public HBaseView, public HAnimationListener
 
-TDF::WindowKey::WindowKey(TDF::BaseView * pcBaseView)
+H3DF::WindowKey::WindowKey(H3DF::BaseView * pcBaseView)
 {
 	WindowKeyPrivate * pcImpl = new WindowKeyPrivate();
 	m_pcImpl = pcImpl;
@@ -42,14 +42,14 @@ TDF::WindowKey::WindowKey(TDF::BaseView * pcBaseView)
 	// Initialize();
 }
 
-TDF::WindowKey::WindowKey(WindowKey const & cInThat)
+H3DF::WindowKey::WindowKey(WindowKey const & cInThat)
 {
 	WindowKeyPrivate * pcImpl = new WindowKeyPrivate();
 	pcImpl->m_pcBaseView = ((WindowKeyPrivate *)cInThat.m_pcImpl)->m_pcBaseView;
 	m_pcImpl = pcImpl;
 }
 
-TDF::WindowKey::~WindowKey()
+H3DF::WindowKey::~WindowKey()
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 
@@ -72,60 +72,60 @@ TDF::WindowKey::~WindowKey()
 	}
 }
 
-const TDF::BaseView * TDF::WindowKey::GetBaseView() const
+const H3DF::BaseView * H3DF::WindowKey::GetBaseView() const
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return pcImpl->m_pcBaseView;
 }
 
-TDF::BaseView * TDF::WindowKey::GetBaseView()
+H3DF::BaseView * H3DF::WindowKey::GetBaseView()
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return pcImpl->GetBaseView();
 }
 
-HC_KEY TDF::WindowKey::GetSceneKey()
+HC_KEY H3DF::WindowKey::GetSceneKey()
 {
 	return GetBaseView()->GetSceneKey();
 }
 
-const HC_KEY TDF::WindowKey::GetSceneKey() const
+const HC_KEY H3DF::WindowKey::GetSceneKey() const
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return pcImpl->GetBaseView()->GetSceneKey();
 }
 
-void TDF::WindowKey::Update()
+void H3DF::WindowKey::Update()
 {
 	GetBaseView()->Update();
 }
 
-int TDF::WindowKey::ViewId()
+int H3DF::WindowKey::ViewId()
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return pcImpl->m_nViewId;
 }
 
-const int TDF::WindowKey::ViewId() const
+const int H3DF::WindowKey::ViewId() const
 { 
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return pcImpl->m_nViewId;
 }
 
-void TDF::WindowKey::SetViewId(int nViewId) 
+void H3DF::WindowKey::SetViewId(int nViewId) 
 { 
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	pcImpl->m_nViewId = nViewId;
 }
 
-void TDF::WindowKey::Initialize()
+void H3DF::WindowKey::Initialize()
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 
 //	HBaseView * pcBaseView = pcImpl->m_pcBaseView;
 }
 
-int TDF::WindowKey::OnMouseMove(HEventInfo & cEvent)
+int H3DF::WindowKey::OnMouseMove(HEventInfo & cEvent)
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 
@@ -156,37 +156,37 @@ int TDF::WindowKey::OnMouseMove(HEventInfo & cEvent)
 	return nResult;
 }
 
-SelectionOptionsControl & TDF::WindowKey::GetSelectionOptionsControl()
+SelectionOptionsControl & H3DF::WindowKey::GetSelectionOptionsControl()
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return * pcImpl->m_pcSelectionOptions;
 }
 
-SelectionOptionsControl const & TDF::WindowKey::GetSelectionOptionsControl() const
+SelectionOptionsControl const & H3DF::WindowKey::GetSelectionOptionsControl() const
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return *pcImpl->m_pcSelectionOptions;
 }
 
-SelectionControl & TDF::WindowKey::GetSelectionControl()
+SelectionControl & H3DF::WindowKey::GetSelectionControl()
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return *pcImpl->m_pcSelection;
 }
 
-SelectionControl const & TDF::WindowKey::GetSelectionControl() const
+SelectionControl const & H3DF::WindowKey::GetSelectionControl() const
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return *pcImpl->m_pcSelection;
 }
 
-HighlightControl & TDF::WindowKey::GetHighlightControl()
+HighlightControl & H3DF::WindowKey::GetHighlightControl()
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return *pcImpl->m_pcHighlight;
 }
 
-HighlightControl const & TDF::WindowKey::GetHighlightControl() const
+HighlightControl const & H3DF::WindowKey::GetHighlightControl() const
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
 	return *pcImpl->m_pcHighlight;

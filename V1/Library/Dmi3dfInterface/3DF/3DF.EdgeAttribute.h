@@ -38,7 +38,7 @@ public:
 	void Set(EdgeAttributeKit const & cInThat);
 	EdgeAttributeKit const & operator = (EdgeAttributeKit const & cInThat);
 
-	TDF::Type ObjectType() const { return TDF::Type::EdgeAttributeKit; };
+	H3DF::Type ObjectType() const { return H3DF::Type::EdgeAttributeKit; };
 
 	void Show(EdgeAttributeKit & cOutKit) const;
 
@@ -71,7 +71,7 @@ public:
 	void Set(EdgeAttributeControl const & cInThat);
 	EdgeAttributeControl & operator = (EdgeAttributeControl const & cInThat);
 
-	TDF::Type ObjectType() const { return TDF::Type::EdgeAttributeControl; };
+	H3DF::Type ObjectType() const { return H3DF::Type::EdgeAttributeControl; };
 
 	EdgeAttributeControl & SetPattern(CString strInPatternName);
 	EdgeAttributeControl & SetWeight(float fInWeight, Edge::SizeUnits eInUnits = Edge::SizeUnits::ScaleFactor);

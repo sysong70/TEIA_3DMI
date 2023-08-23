@@ -51,7 +51,7 @@ public:
 };
 */
 
-bool TDF::Math::GetCircle(WorldPointArray & cPoints, CircleKit & cCircle)
+bool H3DF::Math::GetCircle(WorldPointArray & cPoints, CircleKit & cCircle)
 {
 	//cPoints의 갯수가 4개 이상인 경우에만 계산한다.
 	if (4 > cPoints.size()) {
@@ -126,7 +126,7 @@ bool TDF::Math::GetCircle(WorldPointArray & cPoints, CircleKit & cCircle)
 }
 
 //  2D Point를 이용해서 Circle을 계산하기 때문에 2D Point만 사용해야 한다.
-bool TDF::Math::CircleFitByHyper(DPoint2DArray & cPoints, double & dCX, double & dCY, double & dRadius, double & dSigma)
+bool H3DF::Math::CircleFitByHyper(DPoint2DArray & cPoints, double & dCX, double & dCY, double & dRadius, double & dSigma)
 {
 	int nIter, nIterMax = 99;
 

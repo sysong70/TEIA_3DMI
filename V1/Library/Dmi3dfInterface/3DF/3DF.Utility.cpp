@@ -73,139 +73,139 @@ CString Utility::GetTypeString(Type eType)
 
 	switch (eType)
 	{
-		case TDF::Type::None:
+		case H3DF::Type::None:
 			strText = L"None";
 			break;
 
-		case TDF::Type::GenericMask:
+		case H3DF::Type::GenericMask:
 			strText = L"GenericMask";
 			break;
 
-		case TDF::Type::SelectionResults:
+		case H3DF::Type::SelectionResults:
 			strText = L"SelectionResults";
 			break;
 
-		case TDF::Type::SelectionItem:
+		case H3DF::Type::SelectionItem:
 			strText = L"SelectionItem";
 			break;
 
-		case TDF::Type::SelectionResultsIterator:
+		case H3DF::Type::SelectionResultsIterator:
 			strText = L"SelectionResultsIterator";
 			break;
 
-		case TDF::Type::Kit:
+		case H3DF::Type::Kit:
 			strText = L"Kit";
 			break;
 
-		case TDF::Type::CircleKit:
+		case H3DF::Type::CircleKit:
 			strText = L"CircleKit";
 			break;
 
-		case TDF::Type::LineKit:
+		case H3DF::Type::LineKit:
 			strText = L"LineKit";
 			break;
 
-		case TDF::Type::ShellKit:
+		case H3DF::Type::ShellKit:
 			strText = L"ShellKit";
 			break;
 
-		case TDF::Type::CameraKit:
+		case H3DF::Type::CameraKit:
 			strText = L"CameraKit";
 			break;
 
-		case TDF::Type::Key:
+		case H3DF::Type::Key:
 			strText = L"Key";
 			break;
 
-		case TDF::Type::IncludeKey:
+		case H3DF::Type::IncludeKey:
 			strText = L"IncludeKey";
 			break;
 
-		case TDF::Type::PortfolioKey:
+		case H3DF::Type::PortfolioKey:
 			strText = L"PortfolioKey";
 			break;
 
-		case TDF::Type::StyleKey:
+		case H3DF::Type::StyleKey:
 			strText = L"StyleKey";
 			break;
 
-		case TDF::Type::SegmentKey:
+		case H3DF::Type::SegmentKey:
 			strText = L"SegmentKey";
 			break;
 
-		case TDF::Type::WindowKey:
+		case H3DF::Type::WindowKey:
 			strText = L"WindowKey";
 			break;
 
-		case TDF::Type::GeometryKey:
+		case H3DF::Type::GeometryKey:
 			strText = L"GeometryKey";
 			break;
 
-		case TDF::Type::ReferenceKey:
+		case H3DF::Type::ReferenceKey:
 			strText = L"ReferenceKey";
 			break;
 
-		case TDF::Type::CircleKey:
+		case H3DF::Type::CircleKey:
 			strText = L"CircleKey";
 			break;
 
-		case TDF::Type::CircularArcKey:
+		case H3DF::Type::CircularArcKey:
 			strText = L"CircularArcKey";
 			break;
 
-		case TDF::Type::CircularWedgeKey:
+		case H3DF::Type::CircularWedgeKey:
 			strText = L"CircularWedgeKey";
 			break;
 
-		case TDF::Type::CuttingSectionKey:
+		case H3DF::Type::CuttingSectionKey:
 			strText = L"CuttingSectionKey";
 			break;
 
-		case TDF::Type::CylinderKey:
+		case H3DF::Type::CylinderKey:
 			strText = L"CylinderKey";
 			break;
 
-		case TDF::Type::EllipseKey:
+		case H3DF::Type::EllipseKey:
 			strText = L"EllipseKey";
 			break;
 
-		case TDF::Type::EllipticalArcKey:
+		case H3DF::Type::EllipticalArcKey:
 			strText = L"EllipticalArcKey";
 			break;
 
-		case TDF::Type::InfiniteLineKey:
+		case H3DF::Type::InfiniteLineKey:
 			strText = L"InfiniteLineKey";
 			break;
 
-		case TDF::Type::LineKey:
+		case H3DF::Type::LineKey:
 			strText = L"LineKey";
 			break;
 
-		case TDF::Type::PolygonKey:
+		case H3DF::Type::PolygonKey:
 			strText = L"PolygonKey";
 			break;
 
-		case TDF::Type::ShellKey:
+		case H3DF::Type::ShellKey:
 			strText = L"ShellKey";
 			break;
 
-		case TDF::Type::SphereKey:
+		case H3DF::Type::SphereKey:
 			strText = L"SphereKey";
 			break;
 
-		case TDF::Type::TextKey:
+		case H3DF::Type::TextKey:
 			strText = L"TextKey";
 			break;
 
-		case TDF::Type::Control:
+		case H3DF::Type::Control:
 			strText = L"Control";
 			break;
 
-		case TDF::Type::SelectionControl:
+		case H3DF::Type::SelectionControl:
 			strText = L"SelectionControl";
 			break;
 
-		case TDF::Type::HighlightControl:
+		case H3DF::Type::HighlightControl:
 			strText = L"HighlightControl";
 			break;
 
@@ -313,4 +313,21 @@ bool Utility::CharToUnicode(char * pchText, CString & strText)
 	delete [] pchBuffer;
 
 	return true;
+}
+
+CString Utility::GetExecuteDirectory()
+{
+	TCHAR szBuffer[MAX_PATH];
+	TCHAR Drive[_MAX_DRIVE];
+	TCHAR Path[_MAX_PATH];
+	TCHAR Filename[_MAX_FNAME];
+	TCHAR Ext[_MAX_EXT];
+
+	GetModuleFileName(NULL, szBuffer, sizeof(szBuffer)); // get process file name
+	_wsplitpath_s(szBuffer, Drive, _MAX_DRIVE, Path, _MAX_PATH, Filename, _MAX_FNAME, Ext, _MAX_EXT); // get drive, path, file, ext name
+
+	CString strFilePath;
+	strFilePath.Format(L"%s%s", Drive, Path);
+
+	return strFilePath;
 }

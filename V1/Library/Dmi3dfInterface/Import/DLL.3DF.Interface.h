@@ -8,7 +8,7 @@
 
 OPEN_DLL_NAMESPACE
 
-namespace TDF {
+namespace H3DF {
 
 	class Interface
 	{

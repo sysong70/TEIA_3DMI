@@ -71,7 +71,7 @@ CameraPos::CameraPos() {
 
 Canvas::Canvas(HBaseModel * pcBaseModel, void * pcWindowHandle)
 {
-	m_pcBaseView = new TDF::BaseView(pcBaseModel, nullptr, H_ASCII_TEXT(TheKenel.General.Display.Driver), nullptr,
+	m_pcBaseView = new H3DF::BaseView(pcBaseModel, nullptr, H_ASCII_TEXT(TheKenel.General.Display.Driver), nullptr,
 		reinterpret_cast<void *>(pcWindowHandle), nullptr);
 
 	m_pcWindow = new WindowKey(m_pcBaseView);
@@ -121,7 +121,7 @@ void Canvas::Init()
 
 	m_pcBaseView->GetModel()->GetEventManager()->RegisterHandler((HAnimationListener *)GetBaseView(), HAnimationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
 
-	TDF::DmiSelectionControl * pcSelection = new TDF::DmiSelectionControl(m_pcBaseView);
+	H3DF::DmiSelectionControl * pcSelection = new H3DF::DmiSelectionControl(m_pcBaseView);
 	pcSelection->SetAllowSubentityDeselection(true);
 
 	m_pcBaseView->SetSelection(pcSelection);

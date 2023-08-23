@@ -15,7 +15,7 @@ OPEN_3DF_NAMESPACE
 class LineAttributeKitPrivate : public PrivateImpl
 {
 public:
-	LineAttributeKitPrivate() { m_eType = TDF::Type::LineAttributeKit; }
+	LineAttributeKitPrivate() { m_eType = H3DF::Type::LineAttributeKit; }
 
 	void Copy(LineAttributeKitPrivate * pcInThat) {
 		m_strPatternName = pcInThat->m_strPatternName;
@@ -29,7 +29,7 @@ public:
 
 CLOSE_3DF_NAMESPACE
 
-using namespace TDF;
+using namespace H3DF;
 
 LineAttributeKit::LineAttributeKit()
 {
@@ -138,7 +138,7 @@ bool LineAttributeKit::ShowWeight(float & fOutWeight, Line::SizeUnits & eOutUnit
 class LineAttributeControlPrivate : public PrivateImpl
 {
 public:
-	LineAttributeControlPrivate() { m_eType = TDF::Type::LineAttributeControl; }
+	LineAttributeControlPrivate() { m_eType = H3DF::Type::LineAttributeControl; }
 
 	void Copy(LineAttributeControlPrivate * pcInThat) {
 		m_cParentSegmentKey = pcInThat->m_cParentSegmentKey;
@@ -200,27 +200,27 @@ LineAttributeControl & LineAttributeControl::SetWeight(float fInWeight, Line::Si
 
 			switch (eInUnits)
 			{
-				case TDF::Line::SizeUnits::ObjectSpace:
+				case H3DF::Line::SizeUnits::ObjectSpace:
 					strWeight.Format(_T("%f oru"), fInWeight);
 					break;
 
-				case TDF::Line::SizeUnits::SubscreenRelative:
+				case H3DF::Line::SizeUnits::SubscreenRelative:
 					strWeight.Format(_T("%f sru"), fInWeight);
 					break;
 
-				case TDF::Line::SizeUnits::WindowRelative:
+				case H3DF::Line::SizeUnits::WindowRelative:
 					strWeight.Format(_T("%f wru"), fInWeight);
 					break;
 
-				case TDF::Line::SizeUnits::WorldSpace:
+				case H3DF::Line::SizeUnits::WorldSpace:
 					strWeight.Format(_T("%f wsu"), fInWeight);
 					break;
 
-				case TDF::Line::SizeUnits::Points:
+				case H3DF::Line::SizeUnits::Points:
 					strWeight.Format(_T("%f points"), fInWeight);
 					break;
 
-				case TDF::Line::SizeUnits::Pixels:
+				case H3DF::Line::SizeUnits::Pixels:
 					strWeight.Format(_T("%f pixels"), fInWeight);
 					break;
 			}

@@ -23,7 +23,7 @@ public:
 	}
 
 	PointArray m_aPoints;
-	TDF::RGBColor m_cColor;
+	H3DF::RGBColor m_cColor;
 	char m_chPattern[PATTERN_BUFFER_SIZE];
 };
 
@@ -57,7 +57,7 @@ unsigned int LineKit::GetPointCount() const
 	return static_cast<unsigned int>(pcImpl->m_aPoints.size());
 }
 
-void LineKit::GetPoints(unsigned int & nOutCount, TDF::Point pcOutPoints[]) const
+void LineKit::GetPoints(unsigned int & nOutCount, H3DF::Point pcOutPoints[]) const
 {
 	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
 
@@ -82,7 +82,7 @@ void LineKit::SetPoints(unsigned int nInCount, Point const pcInPoints[])
 	}
 }
 
-void LineKit::GetRGBColor(TDF::RGBColor & cOutColor) const
+void LineKit::GetRGBColor(H3DF::RGBColor & cOutColor) const
 {
 	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
 	cOutColor = pcImpl->m_cColor;
@@ -101,12 +101,12 @@ void LineKit::GetLinePattern(char out_pattern[PATTERN_BUFFER_SIZE]) const
 }
 
 //== LineKey =======================================================================================
-namespace TDF {
+namespace H3DF {
 
-	class LineKeyPrivate : public TDF::KeyPrivate
+	class LineKeyPrivate : public H3DF::KeyPrivate
 	{
 	public:
-		LineKeyPrivate() { m_eType = TDF::Type::LineKey; }
+		LineKeyPrivate() { m_eType = H3DF::Type::LineKey; }
 
 		void Copy(LineKeyPrivate * pcInThat) {
 			KeyPrivate::Copy(pcInThat);
@@ -127,7 +127,7 @@ LineKey::LineKey(Key const & cInKey)
 	((KeyPrivate *)pcImpl)->Copy((KeyPrivate *)(cInKey.GetImpl()));
 
 	// 외부에서 들어오는 Key는 LineKey가 아닐 수 있으므로, LineKey로 변경한다.
-	pcImpl->SetType(TDF::Type::LineKey);
+	pcImpl->SetType(H3DF::Type::LineKey);
 }
 
 LineKey::LineKey(LineKey const & cInThat)

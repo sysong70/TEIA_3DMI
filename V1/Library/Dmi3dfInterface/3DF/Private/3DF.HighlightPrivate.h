@@ -35,7 +35,7 @@ public:
 class HighlightControlPrivate : public PrivateImpl
 {
 public:
-	HighlightControlPrivate() { m_eType = TDF::Type::HighlightControl; }
+	HighlightControlPrivate() { m_eType = H3DF::Type::HighlightControl; }
 
 	void Copy(HighlightControlPrivate * pcInThat) {
 		m_pcBaseView = pcInThat->m_pcBaseView;
@@ -49,8 +49,8 @@ public:
 	WindowKey * GetWindow() { return (WindowKey *)m_pcWindow; }
 	const WindowKey * m_pcWindow = nullptr;
 
-	TDF::BaseView * GetBaseView() { return (TDF::BaseView *)m_pcBaseView; }
-	const TDF::BaseView * m_pcBaseView = nullptr;
+	H3DF::BaseView * GetBaseView() { return (H3DF::BaseView *)m_pcBaseView; }
+	const H3DF::BaseView * m_pcBaseView = nullptr;
 
 	HSelectionSet * m_pcSelectionSet = nullptr;
 };

@@ -7,7 +7,7 @@ USING_3DF_NAMESPACE
 class ConnectorFunc
 {
 public:
-	Interface * GetInterface() { return m_pc3dfInterface; }
+	//Interface * GetInterface() { return m_pc3dfInterface; }
 
 	Signal::Delivery & GetDelivery(int nViewId) {
 		m_cDelivery.ViewId = nViewId;
@@ -19,16 +19,11 @@ public:
 	}
 
 private:
-	Interface * m_pc3dfInterface = nullptr;
+	//Interface * m_pc3dfInterface = nullptr;
 	Signal::Delivery m_cDelivery;
 };
 
 ConnectorFunc theConnectorFunc;
-
-SendSignalFunc Connector::GetSender()
-{
-	return theConnectorFunc.GetInterface()->GetSendSignalFunc();
-}
 
 Signal::Delivery & Connector::GetInstance(int nViewId)
 {

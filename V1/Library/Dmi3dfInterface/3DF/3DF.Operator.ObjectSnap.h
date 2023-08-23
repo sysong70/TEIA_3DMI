@@ -63,7 +63,7 @@ namespace Operator
 			bool operator == (const SnapItem & cInThat) const;
 
 			std::vector<SnapPoint> vcSnapPoints;
-			std::vector <TDF::SelectionItem> vcItems;
+			std::vector <H3DF::SelectionItem> vcItems;
 		};
 
 		ObjectSnap(WindowKey * pcWindow);
@@ -72,7 +72,7 @@ namespace Operator
 
 	protected:
 
-		void CalculationObjectSnapPoint(TDF::SelectionResults& cInItems);
+		void CalculationObjectSnapPoint(H3DF::SelectionResults& cInItems);
 		bool CalculationLienObjectSnapPoint(const SelectionItem * pcInSelectionItem, const WindowPoint & cInPoint);
 		void CalculationLienAndLineObjectSnapPoint(const SelectionItem * cInItems1, const SelectionItem * cInItems2, 
 			const MatrixKit & cMatrix1, const MatrixKit & cMatrix2);

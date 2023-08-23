@@ -5,11 +5,11 @@
 
 #include <HTools.h>
 
-namespace TDF {
+namespace H3DF {
 	class ControlPrivate : public PrivateImpl
 	{
 		public:
-		ControlPrivate() { m_eType = TDF::Type::Control; }
+		ControlPrivate() { m_eType = H3DF::Type::Control; }
 		void Copy(ControlPrivate * pcInThat) {
 			m_nKey = pcInThat->m_nKey;
 			m_nOwnerKey = pcInThat->m_nOwnerKey;

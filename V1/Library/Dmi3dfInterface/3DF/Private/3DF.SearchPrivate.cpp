@@ -10,494 +10,494 @@ CString SearchPrivate::GetSearchTypeString(Search::Type eType)
 
 	switch (eType)
 	{
-		case TDF::Search::Type::Everything:
+		case H3DF::Search::Type::Everything:
 			strType = _T("everything");
 			break;
 
-		case TDF::Search::Type::Include:
+		case H3DF::Search::Type::Include:
 			strType = _T("include");
 			break;
 
-		case TDF::Search::Type::Segment:
+		case H3DF::Search::Type::Segment:
 			strType = _T("segment");
 			break;
 
-		case TDF::Search::Type::Includer:
+		case H3DF::Search::Type::Includer:
 			break;
 
-		case TDF::Search::Type::Geometry:
+		case H3DF::Search::Type::Geometry:
 			strType = _T("geometry");
 			break;
 
-		case TDF::Search::Type::Shell:
+		case H3DF::Search::Type::Shell:
 			strType = _T("shell");	
 			break;
 
-		case TDF::Search::Type::Line:
+		case H3DF::Search::Type::Line:
 			strType = _T("lines, polylines");
 			break;
 
 /*
-		case TDF::Search::Type::CuttingSection:
+		case H3DF::Search::Type::CuttingSection:
 			break;
 
-		case TDF::Search::Type::Shell:
+		case H3DF::Search::Type::Shell:
 			break;
-		case TDF::Search::Type::Mesh:
+		case H3DF::Search::Type::Mesh:
 			break;
-		case TDF::Search::Type::Grid:
+		case H3DF::Search::Type::Grid:
 			break;
-		case TDF::Search::Type::NURBSSurface:
+		case H3DF::Search::Type::NURBSSurface:
 			break;
-		case TDF::Search::Type::Cylinder:
+		case H3DF::Search::Type::Cylinder:
 			break;
-		case TDF::Search::Type::Sphere:
+		case H3DF::Search::Type::Sphere:
 			break;
-		case TDF::Search::Type::Polygon:
+		case H3DF::Search::Type::Polygon:
 			break;
-		case TDF::Search::Type::Circle:
+		case H3DF::Search::Type::Circle:
 			break;
-		case TDF::Search::Type::CircularWedge:
+		case H3DF::Search::Type::CircularWedge:
 			break;
-		case TDF::Search::Type::Ellipse:
+		case H3DF::Search::Type::Ellipse:
 			break;
-		case TDF::Search::Type::NURBSCurve:
+		case H3DF::Search::Type::NURBSCurve:
 			break;
-		case TDF::Search::Type::CircularArc:
+		case H3DF::Search::Type::CircularArc:
 			break;
-		case TDF::Search::Type::EllipticalArc:
+		case H3DF::Search::Type::EllipticalArc:
 			break;
-		case TDF::Search::Type::InfiniteLine:
+		case H3DF::Search::Type::InfiniteLine:
 			break;
-		case TDF::Search::Type::Marker:
+		case H3DF::Search::Type::Marker:
 			break;
-		case TDF::Search::Type::Text:
+		case H3DF::Search::Type::Text:
 			break;
-		case TDF::Search::Type::Reference:
+		case H3DF::Search::Type::Reference:
 			break;
-		case TDF::Search::Type::DistantLight:
+		case H3DF::Search::Type::DistantLight:
 			break;
-		case TDF::Search::Type::Spotlight:
+		case H3DF::Search::Type::Spotlight:
 			break;
-		case TDF::Search::Type::InfiniteRay:
+		case H3DF::Search::Type::InfiniteRay:
 			break;
-		case TDF::Search::Type::Attribute:
+		case H3DF::Search::Type::Attribute:
 			break;
-		case TDF::Search::Type::Priority:
+		case H3DF::Search::Type::Priority:
 			break;
-		case TDF::Search::Type::Material:
+		case H3DF::Search::Type::Material:
 			break;
-		case TDF::Search::Type::PBRMaterial:
+		case H3DF::Search::Type::PBRMaterial:
 			break;
-		case TDF::Search::Type::Camera:
+		case H3DF::Search::Type::Camera:
 			break;
-		case TDF::Search::Type::ModellingMatrix:
+		case H3DF::Search::Type::ModellingMatrix:
 			break;
-		case TDF::Search::Type::UserData:
+		case H3DF::Search::Type::UserData:
 			break;
-		case TDF::Search::Type::TextureMatrix:
+		case H3DF::Search::Type::TextureMatrix:
 			break;
-		case TDF::Search::Type::Culling:
+		case H3DF::Search::Type::Culling:
 			break;
-		case TDF::Search::Type::CullingFace:
+		case H3DF::Search::Type::CullingFace:
 			break;
-		case TDF::Search::Type::CullingExtent:
+		case H3DF::Search::Type::CullingExtent:
 			break;
-		case TDF::Search::Type::CullingVector:
+		case H3DF::Search::Type::CullingVector:
 			break;
-		case TDF::Search::Type::CullingVectorTolerance:
+		case H3DF::Search::Type::CullingVectorTolerance:
 			break;
-		case TDF::Search::Type::CullingFrustum:
+		case H3DF::Search::Type::CullingFrustum:
 			break;
-		case TDF::Search::Type::CullingDeferralExtent:
+		case H3DF::Search::Type::CullingDeferralExtent:
 			break;
-		case TDF::Search::Type::CullingVolume:
+		case H3DF::Search::Type::CullingVolume:
 			break;
-		case TDF::Search::Type::CullingDistance:
+		case H3DF::Search::Type::CullingDistance:
 			break;
-		case TDF::Search::Type::CurveAttribute:
+		case H3DF::Search::Type::CurveAttribute:
 			break;
-		case TDF::Search::Type::CurveAttributeBudget:
+		case H3DF::Search::Type::CurveAttributeBudget:
 			break;
-		case TDF::Search::Type::CurveAttributeContinuedBudget:
+		case H3DF::Search::Type::CurveAttributeContinuedBudget:
 			break;
-		case TDF::Search::Type::CurveAttributeViewDependent:
+		case H3DF::Search::Type::CurveAttributeViewDependent:
 			break;
-		case TDF::Search::Type::CurveAttributeMaximumDeviation:
+		case H3DF::Search::Type::CurveAttributeMaximumDeviation:
 			break;
-		case TDF::Search::Type::CurveAttributeMaximumAngle:
+		case H3DF::Search::Type::CurveAttributeMaximumAngle:
 			break;
-		case TDF::Search::Type::CurveAttributeMaximumLength:
+		case H3DF::Search::Type::CurveAttributeMaximumLength:
 			break;
-		case TDF::Search::Type::CylinderAttribute:
+		case H3DF::Search::Type::CylinderAttribute:
 			break;
-		case TDF::Search::Type::CylinderAttributeTessellation:
+		case H3DF::Search::Type::CylinderAttributeTessellation:
 			break;
-		case TDF::Search::Type::CylinderAttributeOrientation:
+		case H3DF::Search::Type::CylinderAttributeOrientation:
 			break;
-		case TDF::Search::Type::EdgeAttribute:
+		case H3DF::Search::Type::EdgeAttribute:
 			break;
-		case TDF::Search::Type::EdgeAttributePattern:
+		case H3DF::Search::Type::EdgeAttributePattern:
 			break;
-		case TDF::Search::Type::EdgeAttributeWeight:
+		case H3DF::Search::Type::EdgeAttributeWeight:
 			break;
-		case TDF::Search::Type::EdgeAttributeHardAngle:
+		case H3DF::Search::Type::EdgeAttributeHardAngle:
 			break;
-		case TDF::Search::Type::LightingAttribute:
+		case H3DF::Search::Type::LightingAttribute:
 			break;
-		case TDF::Search::Type::LightingAttributeInterpolation:
+		case H3DF::Search::Type::LightingAttributeInterpolation:
 			break;
-		case TDF::Search::Type::LineAttribute:
+		case H3DF::Search::Type::LineAttribute:
 			break;
-		case TDF::Search::Type::LineAttributePattern:
+		case H3DF::Search::Type::LineAttributePattern:
 			break;
-		case TDF::Search::Type::LineAttributeWeight:
+		case H3DF::Search::Type::LineAttributeWeight:
 			break;
-		case TDF::Search::Type::MarkerAttribute:
+		case H3DF::Search::Type::MarkerAttribute:
 			break;
-		case TDF::Search::Type::MarkerAttributeGlyphRotation:
+		case H3DF::Search::Type::MarkerAttributeGlyphRotation:
 			break;
-		case TDF::Search::Type::MarkerAttributeSize:
+		case H3DF::Search::Type::MarkerAttributeSize:
 			break;
-		case TDF::Search::Type::MarkerAttributeSymbol:
+		case H3DF::Search::Type::MarkerAttributeSymbol:
 			break;
-		case TDF::Search::Type::MarkerAttributePreference:
+		case H3DF::Search::Type::MarkerAttributePreference:
 			break;
-		case TDF::Search::Type::SurfaceAttribute:
+		case H3DF::Search::Type::SurfaceAttribute:
 			break;
-		case TDF::Search::Type::SurfaceAttributeBudget:
+		case H3DF::Search::Type::SurfaceAttributeBudget:
 			break;
-		case TDF::Search::Type::SurfaceAttributeMaximumFacetDeviation:
+		case H3DF::Search::Type::SurfaceAttributeMaximumFacetDeviation:
 			break;
-		case TDF::Search::Type::SurfaceAttributeMaximumFacetAngle:
+		case H3DF::Search::Type::SurfaceAttributeMaximumFacetAngle:
 			break;
-		case TDF::Search::Type::SurfaceAttributeMaximumFacetWidth:
+		case H3DF::Search::Type::SurfaceAttributeMaximumFacetWidth:
 			break;
-		case TDF::Search::Type::SurfaceAttributeTrimCurveBudget:
+		case H3DF::Search::Type::SurfaceAttributeTrimCurveBudget:
 			break;
-		case TDF::Search::Type::SurfaceAttributeMaximumTrimCurveDeviation:
+		case H3DF::Search::Type::SurfaceAttributeMaximumTrimCurveDeviation:
 			break;
-		case TDF::Search::Type::Selectability:
+		case H3DF::Search::Type::Selectability:
 			break;
-		case TDF::Search::Type::SelectabilityWindows:
+		case H3DF::Search::Type::SelectabilityWindows:
 			break;
-		case TDF::Search::Type::SelectabilityEdges:
+		case H3DF::Search::Type::SelectabilityEdges:
 			break;
-		case TDF::Search::Type::SelectabilityFaces:
+		case H3DF::Search::Type::SelectabilityFaces:
 			break;
-		case TDF::Search::Type::SelectabilityLights:
+		case H3DF::Search::Type::SelectabilityLights:
 			break;
-		case TDF::Search::Type::SelectabilityLines:
+		case H3DF::Search::Type::SelectabilityLines:
 			break;
-		case TDF::Search::Type::SelectabilityMarkers:
+		case H3DF::Search::Type::SelectabilityMarkers:
 			break;
-		case TDF::Search::Type::SelectabilityVertices:
+		case H3DF::Search::Type::SelectabilityVertices:
 			break;
-		case TDF::Search::Type::SelectabilityText:
+		case H3DF::Search::Type::SelectabilityText:
 			break;
-		case TDF::Search::Type::SphereAttribute:
+		case H3DF::Search::Type::SphereAttribute:
 			break;
-		case TDF::Search::Type::SphereAttributeTessellation:
+		case H3DF::Search::Type::SphereAttributeTessellation:
 			break;
-		case TDF::Search::Type::Subwindow:
+		case H3DF::Search::Type::Subwindow:
 			break;
-		case TDF::Search::Type::SubwindowEitherType:
+		case H3DF::Search::Type::SubwindowEitherType:
 			break;
-		case TDF::Search::Type::SubwindowStandard:
+		case H3DF::Search::Type::SubwindowStandard:
 			break;
-		case TDF::Search::Type::SubwindowLightweight:
+		case H3DF::Search::Type::SubwindowLightweight:
 			break;
-		case TDF::Search::Type::SubwindowBackground:
+		case H3DF::Search::Type::SubwindowBackground:
 			break;
-		case TDF::Search::Type::SubwindowBorder:
+		case H3DF::Search::Type::SubwindowBorder:
 			break;
-		case TDF::Search::Type::SubwindowRenderingAlgorithm:
+		case H3DF::Search::Type::SubwindowRenderingAlgorithm:
 			break;
-		case TDF::Search::Type::TextAttribute:
+		case H3DF::Search::Type::TextAttribute:
 			break;
-		case TDF::Search::Type::TextAttributeAlignment:
+		case H3DF::Search::Type::TextAttributeAlignment:
 			break;
-		case TDF::Search::Type::TextAttributeBold:
+		case H3DF::Search::Type::TextAttributeBold:
 			break;
-		case TDF::Search::Type::TextAttributeItalic:
+		case H3DF::Search::Type::TextAttributeItalic:
 			break;
-		case TDF::Search::Type::TextAttributeOverline:
+		case H3DF::Search::Type::TextAttributeOverline:
 			break;
-		case TDF::Search::Type::TextAttributeStrikethrough:
+		case H3DF::Search::Type::TextAttributeStrikethrough:
 			break;
-		case TDF::Search::Type::TextAttributeUnderline:
+		case H3DF::Search::Type::TextAttributeUnderline:
 			break;
-		case TDF::Search::Type::TextAttributeSlant:
+		case H3DF::Search::Type::TextAttributeSlant:
 			break;
-		case TDF::Search::Type::TextAttributeLineSpacing:
+		case H3DF::Search::Type::TextAttributeLineSpacing:
 			break;
-		case TDF::Search::Type::TextAttributeRotation:
+		case H3DF::Search::Type::TextAttributeRotation:
 			break;
-		case TDF::Search::Type::TextAttributeExtraSpace:
+		case H3DF::Search::Type::TextAttributeExtraSpace:
 			break;
-		case TDF::Search::Type::TextAttributeGreeking:
+		case H3DF::Search::Type::TextAttributeGreeking:
 			break;
-		case TDF::Search::Type::TextAttributeSizeTolerance:
+		case H3DF::Search::Type::TextAttributeSizeTolerance:
 			break;
-		case TDF::Search::Type::TextAttributeSize:
+		case H3DF::Search::Type::TextAttributeSize:
 			break;
-		case TDF::Search::Type::TextAttributeFont:
+		case H3DF::Search::Type::TextAttributeFont:
 			break;
-		case TDF::Search::Type::TextAttributeTransform:
+		case H3DF::Search::Type::TextAttributeTransform:
 			break;
-		case TDF::Search::Type::TextAttributeRenderer:
+		case H3DF::Search::Type::TextAttributeRenderer:
 			break;
-		case TDF::Search::Type::TextAttributePreference:
+		case H3DF::Search::Type::TextAttributePreference:
 			break;
-		case TDF::Search::Type::TextAttributePath:
+		case H3DF::Search::Type::TextAttributePath:
 			break;
-		case TDF::Search::Type::TextAttributeSpacing:
+		case H3DF::Search::Type::TextAttributeSpacing:
 			break;
-		case TDF::Search::Type::TextAttributeBackground:
+		case H3DF::Search::Type::TextAttributeBackground:
 			break;
-		case TDF::Search::Type::TextAttributeBackgroundMargins:
+		case H3DF::Search::Type::TextAttributeBackgroundMargins:
 			break;
-		case TDF::Search::Type::TextAttributeBackgroundStyle:
+		case H3DF::Search::Type::TextAttributeBackgroundStyle:
 			break;
-		case TDF::Search::Type::TextAttributeLeaderLine:
+		case H3DF::Search::Type::TextAttributeLeaderLine:
 			break;
-		case TDF::Search::Type::Transparency:
+		case H3DF::Search::Type::Transparency:
 			break;
-		case TDF::Search::Type::TransparencyMethod:
+		case H3DF::Search::Type::TransparencyMethod:
 			break;
-		case TDF::Search::Type::TransparencyAlgorithm:
+		case H3DF::Search::Type::TransparencyAlgorithm:
 			break;
-		case TDF::Search::Type::TransparencyDepthPeelingLayers:
+		case H3DF::Search::Type::TransparencyDepthPeelingLayers:
 			break;
-		case TDF::Search::Type::TransparencyDepthPeelingMinimumArea:
+		case H3DF::Search::Type::TransparencyDepthPeelingMinimumArea:
 			break;
-		case TDF::Search::Type::TransparencyDepthWriting:
+		case H3DF::Search::Type::TransparencyDepthWriting:
 			break;
-		case TDF::Search::Type::Visibility:
+		case H3DF::Search::Type::Visibility:
 			break;
-		case TDF::Search::Type::VisibilityCuttingSections:
+		case H3DF::Search::Type::VisibilityCuttingSections:
 			break;
-		case TDF::Search::Type::VisibilityCutEdges:
+		case H3DF::Search::Type::VisibilityCutEdges:
 			break;
-		case TDF::Search::Type::VisibilityCutFaces:
+		case H3DF::Search::Type::VisibilityCutFaces:
 			break;
-		case TDF::Search::Type::VisibilityWindows:
+		case H3DF::Search::Type::VisibilityWindows:
 			break;
-		case TDF::Search::Type::VisibilityText:
+		case H3DF::Search::Type::VisibilityText:
 			break;
-		case TDF::Search::Type::VisibilityLines:
+		case H3DF::Search::Type::VisibilityLines:
 			break;
-		case TDF::Search::Type::VisibilityEdgeLights:
+		case H3DF::Search::Type::VisibilityEdgeLights:
 			break;
-		case TDF::Search::Type::VisibilityMarkerLights:
+		case H3DF::Search::Type::VisibilityMarkerLights:
 			break;
-		case TDF::Search::Type::VisibilityFaceLights:
+		case H3DF::Search::Type::VisibilityFaceLights:
 			break;
-		case TDF::Search::Type::VisibilityGenericEdges:
+		case H3DF::Search::Type::VisibilityGenericEdges:
 			break;
-		case TDF::Search::Type::VisibilityHardEdges:
+		case H3DF::Search::Type::VisibilityHardEdges:
 			break;
-		case TDF::Search::Type::VisibilityAdjacentEdges:
+		case H3DF::Search::Type::VisibilityAdjacentEdges:
 			break;
-		case TDF::Search::Type::VisibilityInteriorSilhouetteEdges:
+		case H3DF::Search::Type::VisibilityInteriorSilhouetteEdges:
 			break;
-		case TDF::Search::Type::VisibilityShadowEmitting:
+		case H3DF::Search::Type::VisibilityShadowEmitting:
 			break;
-		case TDF::Search::Type::VisibilityShadowReceiving:
+		case H3DF::Search::Type::VisibilityShadowReceiving:
 			break;
-		case TDF::Search::Type::VisibilityShadowCasting:
+		case H3DF::Search::Type::VisibilityShadowCasting:
 			break;
-		case TDF::Search::Type::VisibilityMarkers:
+		case H3DF::Search::Type::VisibilityMarkers:
 			break;
-		case TDF::Search::Type::VisibilityVertices:
+		case H3DF::Search::Type::VisibilityVertices:
 			break;
-		case TDF::Search::Type::VisibilityFaces:
+		case H3DF::Search::Type::VisibilityFaces:
 			break;
-		case TDF::Search::Type::VisibilityPerimeterEdges:
+		case H3DF::Search::Type::VisibilityPerimeterEdges:
 			break;
-		case TDF::Search::Type::VisibilityNonCulledEdges:
+		case H3DF::Search::Type::VisibilityNonCulledEdges:
 			break;
-		case TDF::Search::Type::VisibilityMeshQuadEdges:
+		case H3DF::Search::Type::VisibilityMeshQuadEdges:
 			break;
-		case TDF::Search::Type::VisibilityEdges:
+		case H3DF::Search::Type::VisibilityEdges:
 			break;
-		case TDF::Search::Type::VisibilityLeaderLines:
+		case H3DF::Search::Type::VisibilityLeaderLines:
 			break;
-		case TDF::Search::Type::VisualEffects:
+		case H3DF::Search::Type::VisualEffects:
 			break;
-		case TDF::Search::Type::VisualEffectsPostProcessEffectsEnabled:
+		case H3DF::Search::Type::VisualEffectsPostProcessEffectsEnabled:
 			break;
-		case TDF::Search::Type::VisualEffectsAntiAliasing:
+		case H3DF::Search::Type::VisualEffectsAntiAliasing:
 			break;
-		case TDF::Search::Type::VisualEffectsShadowMaps:
+		case H3DF::Search::Type::VisualEffectsShadowMaps:
 			break;
-		case TDF::Search::Type::VisualEffectsSimpleShadow:
+		case H3DF::Search::Type::VisualEffectsSimpleShadow:
 			break;
-		case TDF::Search::Type::VisualEffectsSimpleShadowPlane:
+		case H3DF::Search::Type::VisualEffectsSimpleShadowPlane:
 			break;
-		case TDF::Search::Type::VisualEffectsSimpleShadowLightDirection:
+		case H3DF::Search::Type::VisualEffectsSimpleShadowLightDirection:
 			break;
-		case TDF::Search::Type::VisualEffectsSimpleShadowColor:
+		case H3DF::Search::Type::VisualEffectsSimpleShadowColor:
 			break;
-		case TDF::Search::Type::VisualEffectsSimpleReflection:
+		case H3DF::Search::Type::VisualEffectsSimpleReflection:
 			break;
-		case TDF::Search::Type::VisualEffectsSimpleReflectionPlane:
+		case H3DF::Search::Type::VisualEffectsSimpleReflectionPlane:
 			break;
-		case TDF::Search::Type::VisualEffectsSimpleReflectionVisibility:
+		case H3DF::Search::Type::VisualEffectsSimpleReflectionVisibility:
 			break;
-		case TDF::Search::Type::VisualEffectsEyeDomeLightingBackColor:
+		case H3DF::Search::Type::VisualEffectsEyeDomeLightingBackColor:
 			break;
-		case TDF::Search::Type::Performance:
+		case H3DF::Search::Type::Performance:
 			break;
-		case TDF::Search::Type::PerformanceDisplayLists:
+		case H3DF::Search::Type::PerformanceDisplayLists:
 			break;
-		case TDF::Search::Type::PerformanceStaticModel:
+		case H3DF::Search::Type::PerformanceStaticModel:
 			break;
-		case TDF::Search::Type::PerformanceTextHardwareAcceleration:
+		case H3DF::Search::Type::PerformanceTextHardwareAcceleration:
 			break;
-		case TDF::Search::Type::StaticModelSegment:
+		case H3DF::Search::Type::StaticModelSegment:
 			break;
-		case TDF::Search::Type::DrawingAttribute:
+		case H3DF::Search::Type::DrawingAttribute:
 			break;
-		case TDF::Search::Type::DrawingAttributePolygonHandedness:
+		case H3DF::Search::Type::DrawingAttributePolygonHandedness:
 			break;
-		case TDF::Search::Type::DrawingAttributeDepthRange:
+		case H3DF::Search::Type::DrawingAttributeDepthRange:
 			break;
-		case TDF::Search::Type::DrawingAttributeFaceDisplacement:
+		case H3DF::Search::Type::DrawingAttributeFaceDisplacement:
 			break;
-		case TDF::Search::Type::DrawingAttributeGeneralDisplacement:
+		case H3DF::Search::Type::DrawingAttributeGeneralDisplacement:
 			break;
-		case TDF::Search::Type::DrawingAttributeVertexDisplacement:
+		case H3DF::Search::Type::DrawingAttributeVertexDisplacement:
 			break;
-		case TDF::Search::Type::DrawingAttributeOverlay:
+		case H3DF::Search::Type::DrawingAttributeOverlay:
 			break;
-		case TDF::Search::Type::DrawingAttributeDeferral:
+		case H3DF::Search::Type::DrawingAttributeDeferral:
 			break;
-		case TDF::Search::Type::DrawingAttributeVertexDecimation:
+		case H3DF::Search::Type::DrawingAttributeVertexDecimation:
 			break;
-		case TDF::Search::Type::DrawingAttributeVertexRandomization:
+		case H3DF::Search::Type::DrawingAttributeVertexRandomization:
 			break;
-		case TDF::Search::Type::DrawingAttributeOverrideInternalColor:
+		case H3DF::Search::Type::DrawingAttributeOverrideInternalColor:
 			break;
-		case TDF::Search::Type::DrawingAttributeClipRegion:
+		case H3DF::Search::Type::DrawingAttributeClipRegion:
 			break;
-		case TDF::Search::Type::DrawingAttributeWorldHandedness:
+		case H3DF::Search::Type::DrawingAttributeWorldHandedness:
 			break;
-		case TDF::Search::Type::HiddenLineAttribute:
+		case H3DF::Search::Type::HiddenLineAttribute:
 			break;
-		case TDF::Search::Type::HiddenLineAttributeAlgorithm:
+		case H3DF::Search::Type::HiddenLineAttributeAlgorithm:
 			break;
-		case TDF::Search::Type::HiddenLineAttributeColor:
+		case H3DF::Search::Type::HiddenLineAttributeColor:
 			break;
-		case TDF::Search::Type::HiddenLineAttributeDimFactor:
+		case H3DF::Search::Type::HiddenLineAttributeDimFactor:
 			break;
-		case TDF::Search::Type::HiddenLineAttributeFaceDisplacement:
+		case H3DF::Search::Type::HiddenLineAttributeFaceDisplacement:
 			break;
-		case TDF::Search::Type::HiddenLineAttributeLinePattern:
+		case H3DF::Search::Type::HiddenLineAttributeLinePattern:
 			break;
-		case TDF::Search::Type::HiddenLineAttributeLineSort:
+		case H3DF::Search::Type::HiddenLineAttributeLineSort:
 			break;
-		case TDF::Search::Type::HiddenLineAttributeRenderFaces:
+		case H3DF::Search::Type::HiddenLineAttributeRenderFaces:
 			break;
-		case TDF::Search::Type::HiddenLineAttributeRenderText:
+		case H3DF::Search::Type::HiddenLineAttributeRenderText:
 			break;
-		case TDF::Search::Type::HiddenLineAttributeSilhouetteCleanup:
+		case H3DF::Search::Type::HiddenLineAttributeSilhouetteCleanup:
 			break;
-		case TDF::Search::Type::HiddenLineAttributeTransparencyCutoff:
+		case H3DF::Search::Type::HiddenLineAttributeTransparencyCutoff:
 			break;
-		case TDF::Search::Type::HiddenLineAttributeVisibility:
+		case H3DF::Search::Type::HiddenLineAttributeVisibility:
 			break;
-		case TDF::Search::Type::HiddenLineAttributeWeight:
+		case H3DF::Search::Type::HiddenLineAttributeWeight:
 			break;
-		case TDF::Search::Type::SegmentStyle:
+		case H3DF::Search::Type::SegmentStyle:
 			break;
-		case TDF::Search::Type::NamedStyle:
+		case H3DF::Search::Type::NamedStyle:
 			break;
-		case TDF::Search::Type::MaterialPalette:
+		case H3DF::Search::Type::MaterialPalette:
 			break;
-		case TDF::Search::Type::Portfolio:
+		case H3DF::Search::Type::Portfolio:
 			break;
-		case TDF::Search::Type::ContourLine:
+		case H3DF::Search::Type::ContourLine:
 			break;
-		case TDF::Search::Type::ContourLineVisibility:
+		case H3DF::Search::Type::ContourLineVisibility:
 			break;
-		case TDF::Search::Type::ContourLinePosition:
+		case H3DF::Search::Type::ContourLinePosition:
 			break;
-		case TDF::Search::Type::ContourLineColor:
+		case H3DF::Search::Type::ContourLineColor:
 			break;
-		case TDF::Search::Type::ContourLinePattern:
+		case H3DF::Search::Type::ContourLinePattern:
 			break;
-		case TDF::Search::Type::ContourLineWeight:
+		case H3DF::Search::Type::ContourLineWeight:
 			break;
-		case TDF::Search::Type::ContourLineLighting:
+		case H3DF::Search::Type::ContourLineLighting:
 			break;
-		case TDF::Search::Type::Condition:
+		case H3DF::Search::Type::Condition:
 			break;
-		case TDF::Search::Type::Bounding:
+		case H3DF::Search::Type::Bounding:
 			break;
-		case TDF::Search::Type::BoundingVolume:
+		case H3DF::Search::Type::BoundingVolume:
 			break;
-		case TDF::Search::Type::BoundingExclusion:
+		case H3DF::Search::Type::BoundingExclusion:
 			break;
-		case TDF::Search::Type::AttributeLock:
+		case H3DF::Search::Type::AttributeLock:
 			break;
-		case TDF::Search::Type::AttributeLockSetting:
+		case H3DF::Search::Type::AttributeLockSetting:
 			break;
-		case TDF::Search::Type::AttributeLockSubsegmentOverride:
+		case H3DF::Search::Type::AttributeLockSubsegmentOverride:
 			break;
-		case TDF::Search::Type::TransformMask:
+		case H3DF::Search::Type::TransformMask:
 			break;
-		case TDF::Search::Type::TransformMaskCamera:
+		case H3DF::Search::Type::TransformMaskCamera:
 			break;
-		case TDF::Search::Type::TransformMaskCameraTranslation:
+		case H3DF::Search::Type::TransformMaskCameraTranslation:
 			break;
-		case TDF::Search::Type::TransformMaskCameraScale:
+		case H3DF::Search::Type::TransformMaskCameraScale:
 			break;
-		case TDF::Search::Type::TransformMaskCameraOffset:
+		case H3DF::Search::Type::TransformMaskCameraOffset:
 			break;
-		case TDF::Search::Type::TransformMaskCameraRotation:
+		case H3DF::Search::Type::TransformMaskCameraRotation:
 			break;
-		case TDF::Search::Type::TransformMaskCameraPerspectiveScale:
+		case H3DF::Search::Type::TransformMaskCameraPerspectiveScale:
 			break;
-		case TDF::Search::Type::TransformMaskCameraProjection:
+		case H3DF::Search::Type::TransformMaskCameraProjection:
 			break;
-		case TDF::Search::Type::TransformMaskModellingMatrix:
+		case H3DF::Search::Type::TransformMaskModellingMatrix:
 			break;
-		case TDF::Search::Type::TransformMaskModellingMatrixTranslation:
+		case H3DF::Search::Type::TransformMaskModellingMatrixTranslation:
 			break;
-		case TDF::Search::Type::TransformMaskModellingMatrixScale:
+		case H3DF::Search::Type::TransformMaskModellingMatrixScale:
 			break;
-		case TDF::Search::Type::TransformMaskModellingMatrixOffset:
+		case H3DF::Search::Type::TransformMaskModellingMatrixOffset:
 			break;
-		case TDF::Search::Type::TransformMaskModellingMatrixRotation:
+		case H3DF::Search::Type::TransformMaskModellingMatrixRotation:
 			break;
-		case TDF::Search::Type::ColorInterpolation:
+		case H3DF::Search::Type::ColorInterpolation:
 			break;
-		case TDF::Search::Type::ColorInterpolationFaceColor:
+		case H3DF::Search::Type::ColorInterpolationFaceColor:
 			break;
-		case TDF::Search::Type::ColorInterpolationEdgeColor:
+		case H3DF::Search::Type::ColorInterpolationEdgeColor:
 			break;
-		case TDF::Search::Type::ColorInterpolationMarkerColor:
+		case H3DF::Search::Type::ColorInterpolationMarkerColor:
 			break;
-		case TDF::Search::Type::ColorInterpolationFaceIndex:
+		case H3DF::Search::Type::ColorInterpolationFaceIndex:
 			break;
-		case TDF::Search::Type::ColorInterpolationEdgeIndex:
+		case H3DF::Search::Type::ColorInterpolationEdgeIndex:
 			break;
-		case TDF::Search::Type::ColorInterpolationMarkerIndex:
+		case H3DF::Search::Type::ColorInterpolationMarkerIndex:
 			break;
-		case TDF::Search::Type::CuttingSectionAttribute:
+		case H3DF::Search::Type::CuttingSectionAttribute:
 			break;
-		case TDF::Search::Type::CuttingSectionAttributeCuttingLevel:
+		case H3DF::Search::Type::CuttingSectionAttributeCuttingLevel:
 			break;
-		case TDF::Search::Type::CuttingSectionAttributeCappingLevel:
+		case H3DF::Search::Type::CuttingSectionAttributeCappingLevel:
 			break;
-		case TDF::Search::Type::CuttingSectionAttributeMaterialPreference:
+		case H3DF::Search::Type::CuttingSectionAttributeMaterialPreference:
 			break;
-		case TDF::Search::Type::CuttingSectionAttributeEdgeWeight:
+		case H3DF::Search::Type::CuttingSectionAttributeEdgeWeight:
 			break;
-		case TDF::Search::Type::CuttingSectionAttributeTolerance:
+		case H3DF::Search::Type::CuttingSectionAttributeTolerance:
 			break;
-		case TDF::Search::Type::CuttingSectionAttributeCappingUsage:
+		case H3DF::Search::Type::CuttingSectionAttributeCappingUsage:
 			break;
 */
 
@@ -515,15 +515,15 @@ CString SearchPrivate::GetSearchSpaceString(Search::Space eInSpace)
 
 	switch (eInSpace)
 	{
-		case TDF::Search::Space::SegmentOnly:
+		case H3DF::Search::Space::SegmentOnly:
 			strSpace = L".";
 			break;
 
-		case TDF::Search::Space::Subsegments:
+		case H3DF::Search::Space::Subsegments:
 			strSpace = L"...";
 			break;
 
-		case TDF::Search::Space::SubsegmentsAndIncludes:
+		case H3DF::Search::Space::SubsegmentsAndIncludes:
 			strSpace = L"....";
 			break;
 	}

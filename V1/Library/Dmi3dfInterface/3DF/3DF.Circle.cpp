@@ -94,12 +94,12 @@ bool CircleKit::ShowNormal(Vector & cOutNormal) const
 
 
 //== CircleKey =====================================================================================
-namespace TDF {
+namespace H3DF {
 
-	class CircleKeyPrivate : public TDF::KeyPrivate
+	class CircleKeyPrivate : public H3DF::KeyPrivate
 	{
 	public:
-		CircleKeyPrivate() { m_eType = TDF::Type::CircleKey; }
+		CircleKeyPrivate() { m_eType = H3DF::Type::CircleKey; }
 
 		void Copy(CircleKeyPrivate * pcInThat) {
 			KeyPrivate::Copy(pcInThat);
@@ -123,7 +123,7 @@ CircleKey::CircleKey(Key const & cInKey)
 	((KeyPrivate *)pcImpl)->Copy((KeyPrivate *)(cInKey.GetImpl()));
 
 	// 외부에서 들어오는 Key는 CircleKey가 아닐 수 있으므로, CircleKey로 변경한다.
-	pcImpl->SetType(TDF::Type::CircleKey);
+	pcImpl->SetType(H3DF::Type::CircleKey);
 }
 
 CircleKey::CircleKey(CircleKey const & cInThat)

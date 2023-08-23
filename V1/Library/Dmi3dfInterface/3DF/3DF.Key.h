@@ -15,7 +15,7 @@ public:
 	void Set(Key const & cInThat);
 	Key const & operator = (Key const & cInThat);
 
-	TDF::Type ObjectType() const { return TDF::Type::Key; };
+	H3DF::Type ObjectType() const { return H3DF::Type::Key; };
 
 	bool operator == (Key const & cInThat) const;
 

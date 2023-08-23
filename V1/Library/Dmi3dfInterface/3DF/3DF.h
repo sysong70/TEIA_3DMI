@@ -33,10 +33,10 @@
 #	define DLLEXPORT_TEMPLATE extern
 #endif
 
-#define OPEN_3DF_NAMESPACE namespace TDF {
+#define OPEN_3DF_NAMESPACE namespace H3DF {
 #define CLOSE_3DF_NAMESPACE }
 
-#define USING_3DF_NAMESPACE using namespace TDF;
+#define USING_3DF_NAMESPACE using namespace H3DF;
 
 #include <vector>
 
@@ -271,13 +271,13 @@ public:
 	PrivateImpl() {}
 	virtual ~PrivateImpl() {}
 
-	TDF::Type Type() const;
-	void SetType(TDF::Type eType);
+	H3DF::Type Type() const;
+	void SetType(H3DF::Type eType);
 
 	void SetImpl(Object * pcObject, PrivateImpl * pcImpl);
 
 protected:
-	TDF::Type m_eType = TDF::Type::None;
+	H3DF::Type m_eType = H3DF::Type::None;
 };
 
 

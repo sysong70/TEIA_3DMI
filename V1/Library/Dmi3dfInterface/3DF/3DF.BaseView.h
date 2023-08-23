@@ -62,7 +62,7 @@ public:
 
 	void UpdateInternal(bool antialias = false, bool force_update = false) override;
 
-	void SetViewMode(TDF::ViewMode mode, bool bFitWorld = true);
+	void SetViewMode(H3DF::ViewMode mode, bool bFitWorld = true);
 
 public:
 	void SetNavigationCube(NavigationCube * pcNaviCube);
@@ -72,7 +72,7 @@ public:
 private:
 	NavigationCube * m_pcNaviCube = nullptr;
 
-	TDF::ViewMode m_eViewMode = TDF::ViewMode::Unknown;
+	H3DF::ViewMode m_eViewMode = H3DF::ViewMode::Unknown;
 };
 
 CLOSE_3DF_NAMESPACE

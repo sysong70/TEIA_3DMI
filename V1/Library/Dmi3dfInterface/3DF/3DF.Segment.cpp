@@ -24,7 +24,7 @@
 
 USING_3DF_NAMESPACE
 
-TDF::SegmentKey::SegmentKey(CString strInName)
+H3DF::SegmentKey::SegmentKey(CString strInName)
 {
 	HC_KEY nKey = INVALID_KEY;
 
@@ -41,7 +41,7 @@ TDF::SegmentKey::SegmentKey(CString strInName)
 	m_pcImpl = pcImpl;
 }
 
-TDF::SegmentKey::SegmentKey(HC_KEY nInKey)
+H3DF::SegmentKey::SegmentKey(HC_KEY nInKey)
 {
 	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
 	pcImpl->SetKeyValue(nInKey);
@@ -49,7 +49,7 @@ TDF::SegmentKey::SegmentKey(HC_KEY nInKey)
 	m_pcImpl = pcImpl;
 }
 
-TDF::SegmentKey::SegmentKey(SegmentKey const & cInThat)
+H3DF::SegmentKey::SegmentKey(SegmentKey const & cInThat)
 {
 	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
 	m_pcImpl = pcImpl;
@@ -57,11 +57,11 @@ TDF::SegmentKey::SegmentKey(SegmentKey const & cInThat)
 	Set(cInThat);
 }
 
-TDF::SegmentKey::~SegmentKey()
+H3DF::SegmentKey::~SegmentKey()
 {
 }
 
-void TDF::SegmentKey::Set(SegmentKey const & cInThat)
+void H3DF::SegmentKey::Set(SegmentKey const & cInThat)
 {
 	Key::Set(cInThat);
 
@@ -71,7 +71,7 @@ void TDF::SegmentKey::Set(SegmentKey const & cInThat)
 	pcImpl->Copy(pcInThatImpl);
 }
 
-SegmentKey & TDF::SegmentKey::operator = (SegmentKey const & cInThat)
+SegmentKey & H3DF::SegmentKey::operator = (SegmentKey const & cInThat)
 {
 	Key::Set(cInThat);
 
@@ -81,32 +81,32 @@ SegmentKey & TDF::SegmentKey::operator = (SegmentKey const & cInThat)
 //== Segment 관련 함수 ===============================================================================
 
 /*
-void TDF::SegmentKey::Open()
+void H3DF::SegmentKey::Open()
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
 	pcImpl->LocalOpen();
 }
 
-void TDF::SegmentKey::Open() const
+void H3DF::SegmentKey::Open() const
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
 	pcImpl->LocalOpen();
 }
 
-void TDF::SegmentKey::Close()
+void H3DF::SegmentKey::Close()
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
 	pcImpl->LocalClose();
 }
 
-void TDF::SegmentKey::Close() const
+void H3DF::SegmentKey::Close() const
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
 	pcImpl->LocalClose();
 }
 */
 
-SegmentKey & TDF::SegmentKey::Open()
+SegmentKey & H3DF::SegmentKey::Open()
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
 	pcImpl->Open();
@@ -114,7 +114,7 @@ SegmentKey & TDF::SegmentKey::Open()
 	return *this;
 }
 
-SegmentKey & TDF::SegmentKey::Close()
+SegmentKey & H3DF::SegmentKey::Close()
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
 	pcImpl->Close();
@@ -122,7 +122,7 @@ SegmentKey & TDF::SegmentKey::Close()
 	return *this;
 }
 
-CString TDF::SegmentKey::Name() const
+CString H3DF::SegmentKey::Name() const
 {
 	CString strOutName;
 
@@ -132,12 +132,12 @@ CString TDF::SegmentKey::Name() const
 	char chIncludeSegName[MVO_BUFFER_SIZE] = "\n";
 	HC_Show_Include_Segment(KeyValue(), chIncludeSegName);
 
-	TDF::Utility::CharToUnicode(chSegName, strOutName);
+	H3DF::Utility::CharToUnicode(chSegName, strOutName);
 
 	return strOutName;
 }
 
-SegmentKey & TDF::SegmentKey::SetName(CString strInName)
+SegmentKey & H3DF::SegmentKey::SetName(CString strInName)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Rename_Segment(".", H_ASCII_TEXT(strInName));
@@ -147,7 +147,7 @@ SegmentKey & TDF::SegmentKey::SetName(CString strInName)
 }
 
 //== Sub Segment 관련 함수 ===========================================================================
-SegmentKey const TDF::SegmentKey::Subsegment()
+SegmentKey const H3DF::SegmentKey::Subsegment()
 {
 	CString strText;
 
@@ -162,7 +162,7 @@ SegmentKey const TDF::SegmentKey::Subsegment()
 	return cSubsegment;
 }
 
-SegmentKey const TDF::SegmentKey::Subsegment(LPCTSTR chFormat, ...)
+SegmentKey const H3DF::SegmentKey::Subsegment(LPCTSTR chFormat, ...)
 {
 	CString strText;
 	va_list argList;
@@ -182,7 +182,7 @@ SegmentKey const TDF::SegmentKey::Subsegment(LPCTSTR chFormat, ...)
 	return cSubsegment;
 }
 
-size_t TDF::SegmentKey::ShowSubsegments() const
+size_t H3DF::SegmentKey::ShowSubsegments() const
 {
 	int nSegmentCount = 0;
 
@@ -199,7 +199,7 @@ size_t TDF::SegmentKey::ShowSubsegments() const
 	return nSegmentCount;
 }
 
-size_t TDF::SegmentKey::ShowSubsegments(SegmentKeyArray & cOutChildren) const
+size_t H3DF::SegmentKey::ShowSubsegments(SegmentKeyArray & cOutChildren) const
 {
 	int nSegmentCount = 0;
 
@@ -233,7 +233,7 @@ size_t TDF::SegmentKey::ShowSubsegments(SegmentKeyArray & cOutChildren) const
 }
 
 //== Flush 관련 함수 =============================================================================
-void TDF::SegmentKey::Flush(Search::Type eInTypeToRemove, Search::Space eInSearchSpace)
+void H3DF::SegmentKey::Flush(Search::Type eInTypeToRemove, Search::Space eInSearchSpace)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -245,7 +245,7 @@ void TDF::SegmentKey::Flush(Search::Type eInTypeToRemove, Search::Space eInSearc
 	SegmentKeyPrivate::LocalClose(*this);
 }
 
-void TDF::SegmentKey::Flush(SearchTypeArray const & aInTypesToRemove, Search::Space eInSearchSpace)
+void H3DF::SegmentKey::Flush(SearchTypeArray const & aInTypesToRemove, Search::Space eInSearchSpace)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -267,7 +267,7 @@ void TDF::SegmentKey::Flush(SearchTypeArray const & aInTypesToRemove, Search::Sp
 	SegmentKeyPrivate::LocalClose(*this);
 }
 
-void TDF::SegmentKey::Flush(size_t nInTypesCount, Search::Type const peInTypesToRemove[], Search::Space eInSearchSpace)
+void H3DF::SegmentKey::Flush(size_t nInTypesCount, Search::Type const peInTypesToRemove[], Search::Space eInSearchSpace)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -290,7 +290,7 @@ void TDF::SegmentKey::Flush(size_t nInTypesCount, Search::Type const peInTypesTo
 }
 
 //== Include 관련 함수 ===============================================================================
-IncludeKey TDF::SegmentKey::IncludeSegment(SegmentKey const & cInSegment)
+IncludeKey H3DF::SegmentKey::IncludeSegment(SegmentKey const & cInSegment)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_KEY nIncludeKey = HC_Include_Segment_By_Key(cInSegment.KeyValue());
@@ -300,7 +300,7 @@ IncludeKey TDF::SegmentKey::IncludeSegment(SegmentKey const & cInSegment)
 	return cInclude;
 }
 
-size_t TDF::SegmentKey::ShowIncluders(SegmentKeyArray & aOutSegments) const
+size_t H3DF::SegmentKey::ShowIncluders(SegmentKeyArray & aOutSegments) const
 {
 	int nSegmentCount = 0;
 
@@ -331,7 +331,7 @@ size_t TDF::SegmentKey::ShowIncluders(SegmentKeyArray & aOutSegments) const
 	return nSegmentCount;
 }
 
-size_t TDF::SegmentKey::ShowIncluders(IncludeKeyArray & aOutIncludes) const
+size_t H3DF::SegmentKey::ShowIncluders(IncludeKeyArray & aOutIncludes) const
 {
 	int nIncludeCount = 0;
 
@@ -361,13 +361,13 @@ size_t TDF::SegmentKey::ShowIncluders(IncludeKeyArray & aOutIncludes) const
 
 
 //== Shell 관련 함수 =================================================================================
-ShellKey TDF::SegmentKey::InsertShell(ShellKit const & cInKit)
+ShellKey H3DF::SegmentKey::InsertShell(ShellKit const & cInKit)
 {
-	TDF::PointArray const * pacPoints = nullptr;
-	TDF::VectorArray const * pacNormals = nullptr;
-	TDF::IntArray const * pacFacelist = nullptr;
-	TDF::FloatArray const * paParameters = nullptr;
-	TDF::RGBAColorArray const * paColors = nullptr;
+	H3DF::PointArray const * pacPoints = nullptr;
+	H3DF::VectorArray const * pacNormals = nullptr;
+	H3DF::IntArray const * pacFacelist = nullptr;
+	H3DF::FloatArray const * paParameters = nullptr;
+	H3DF::RGBAColorArray const * paColors = nullptr;
 
 	cInKit.ShowPoints(pacPoints);
 	cInKit.ShowNormals(pacNormals);
@@ -411,14 +411,14 @@ ShellKey TDF::SegmentKey::InsertShell(ShellKit const & cInKit)
 }
 
 //== Edge 관련 함수 ==================================================================================
-EdgeAttributeControl TDF::SegmentKey::GetEdgeAttributeControl()
+EdgeAttributeControl H3DF::SegmentKey::GetEdgeAttributeControl()
 {
 	EdgeAttributeControl cControl(*this);
 	return cControl;
 }
 
 //== Line 관련 함수 ==================================================================================
-LineKey TDF::SegmentKey::InsertLine(size_t in_count, Point const pcInPoints[])
+LineKey H3DF::SegmentKey::InsertLine(size_t in_count, Point const pcInPoints[])
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_KEY nKey = HC_Insert_Polyline((int) in_count, pcInPoints);
@@ -428,20 +428,20 @@ LineKey TDF::SegmentKey::InsertLine(size_t in_count, Point const pcInPoints[])
 	return cLine;
 }
 
-LineAttributeControl TDF::SegmentKey::GetLineAttributeControl()
+LineAttributeControl H3DF::SegmentKey::GetLineAttributeControl()
 {
 	LineAttributeControl cControl(*this);
 	return cControl;
 }
 
-LineAttributeControl const TDF::SegmentKey::GetLineAttributeControl() const
+LineAttributeControl const H3DF::SegmentKey::GetLineAttributeControl() const
 {
 	LineAttributeControl cControl(*(SegmentKey *)this);
 	return cControl;
 }
 
 //== Circle 관련 함수 ============================================================================
-CircleKey TDF::SegmentKey::InsertCircle(Point const & cInCenter, float fInRadius, Vector const & cInNormal)
+CircleKey H3DF::SegmentKey::InsertCircle(Point const & cInCenter, float fInRadius, Vector const & cInNormal)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_KEY nKey = HC_Insert_Circle_By_Radius(&cInCenter, fInRadius, &cInNormal);
@@ -452,12 +452,12 @@ CircleKey TDF::SegmentKey::InsertCircle(Point const & cInCenter, float fInRadius
 }
 
 //== Marker 관련 함수 ================================================================================
-MarkerKey TDF::SegmentKey::InsertMarker(Point const & cInPosition)
+MarkerKey H3DF::SegmentKey::InsertMarker(Point const & cInPosition)
 {
 	return InsertMarker(cInPosition.x, cInPosition.y, cInPosition.z);
 }
 
-MarkerKey TDF::SegmentKey::InsertMarker(double x, double y, double z)
+MarkerKey H3DF::SegmentKey::InsertMarker(double x, double y, double z)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_KEY nKey = HC_Insert_Marker(x, y, z);
@@ -467,32 +467,32 @@ MarkerKey TDF::SegmentKey::InsertMarker(double x, double y, double z)
 	return cMarker;
 }
 
-MarkerAttributeControl TDF::SegmentKey::GetMarkerAttributeControl()
+MarkerAttributeControl H3DF::SegmentKey::GetMarkerAttributeControl()
 {
 	MarkerAttributeControl cMarkerAttributeControl(KeyValue());
 	return cMarkerAttributeControl;
 }
 
-MarkerAttributeControl const TDF::SegmentKey::GetMarkerAttributeControl() const
+MarkerAttributeControl const H3DF::SegmentKey::GetMarkerAttributeControl() const
 {
 	MarkerAttributeControl cMarkerAttributeControl(KeyValue());
 	return cMarkerAttributeControl;
 }
 
 //== Material Mapping 관련 함수 ======================================================================
-MaterialMappingControl TDF::SegmentKey::GetMaterialMappingControl()
+MaterialMappingControl H3DF::SegmentKey::GetMaterialMappingControl()
 {
 	MaterialMappingControl cMaterialMappingControl(*this);
 	return cMaterialMappingControl;
 }
 
-MaterialMappingControl const TDF::SegmentKey::GetMaterialMappingControl() const
+MaterialMappingControl const H3DF::SegmentKey::GetMaterialMappingControl() const
 {
 	MaterialMappingControl cMaterialMappingControl(*(SegmentKey *) this);
 	return cMaterialMappingControl;
 }
 
-SegmentKey & TDF::SegmentKey::SetMaterialMapping(TDF::MaterialMappingKit const & cInKit)
+SegmentKey & H3DF::SegmentKey::SetMaterialMapping(H3DF::MaterialMappingKit const & cInKit)
 {
 	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
 
@@ -552,19 +552,19 @@ SegmentKey & TDF::SegmentKey::SetMaterialMapping(TDF::MaterialMappingKit const &
 }
 
 //== Control 관련 함수 ===============================================================================
-SelectabilityControl TDF::SegmentKey::GetSelectabilityControl()
+SelectabilityControl H3DF::SegmentKey::GetSelectabilityControl()
 {
 	SelectabilityControl cSelectabilityControl(*this);
 	return cSelectabilityControl;
 }
 
-SelectabilityControl const TDF::SegmentKey::GetSelectabilityControl() const
+SelectabilityControl const H3DF::SegmentKey::GetSelectabilityControl() const
 {
 	SelectabilityControl cSelectabilityControl(*(SegmentKey *) this);
 	return cSelectabilityControl;
 }
 
-SegmentKey & TDF::SegmentKey::SetSelectability(CString strList)
+SegmentKey & H3DF::SegmentKey::SetSelectability(CString strList)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Selectability(H_ASCII_TEXT(strList));
@@ -573,19 +573,19 @@ SegmentKey & TDF::SegmentKey::SetSelectability(CString strList)
 }
 
 //== Visibility Control 관련 함수 ====================================================================
-VisibilityControl TDF::SegmentKey::GetVisibilityControl()
+VisibilityControl H3DF::SegmentKey::GetVisibilityControl()
 {
 	VisibilityControl cVisibilityControl(*this);
 	return cVisibilityControl;
 }
 
-VisibilityControl const TDF::SegmentKey::GetVisibilityControl() const
+VisibilityControl const H3DF::SegmentKey::GetVisibilityControl() const
 {
 	VisibilityControl cVisibilityControl(*(SegmentKey *)this);
 	return cVisibilityControl;
 }
 
-SegmentKey & TDF::SegmentKey::SetVisibility(CString strList)
+SegmentKey & H3DF::SegmentKey::SetVisibility(CString strList)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Visibility(H_ASCII_TEXT(strList));
@@ -594,20 +594,20 @@ SegmentKey & TDF::SegmentKey::SetVisibility(CString strList)
 }
 
 //== Visibility Control 관련 함수 ====================================================================
-VisualEffectsControl TDF::SegmentKey::GetVisualEffectsControl()
+VisualEffectsControl H3DF::SegmentKey::GetVisualEffectsControl()
 {
 	VisualEffectsControl cVisibilityControl(*this);
 	return cVisibilityControl;
 }
 
-VisualEffectsControl const TDF::SegmentKey::GetVisualEffectsControl() const
+VisualEffectsControl const H3DF::SegmentKey::GetVisualEffectsControl() const
 {
 	VisualEffectsControl cVisibilityControl(*(SegmentKey *)this);
 	return cVisibilityControl;
 }
 
 //== Condition 관련 함수 =============================================================================
-SegmentKey & TDF::SegmentKey::SetCondition(CString strInCondition)
+SegmentKey & H3DF::SegmentKey::SetCondition(CString strInCondition)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Conditions(H_ASCII_TEXT(strInCondition));
@@ -616,7 +616,7 @@ SegmentKey & TDF::SegmentKey::SetCondition(CString strInCondition)
 }
 
 //== Heuristics 관련 함수 ============================================================================
-SegmentKey & TDF::SegmentKey::SetHeuristics(CString strInHeuristics)
+SegmentKey & H3DF::SegmentKey::SetHeuristics(CString strInHeuristics)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Heuristics(H_ASCII_TEXT(strInHeuristics));
@@ -626,39 +626,39 @@ SegmentKey & TDF::SegmentKey::SetHeuristics(CString strInHeuristics)
 
 //== Portfolio Control 관련 함수 =====================================================================
 /*
-PortfolioControl TDF::SegmentKey::GetPortfolioControl()
+PortfolioControl H3DF::SegmentKey::GetPortfolioControl()
 {
 	return m_cPortfolioControl;
 }
 
-SelectabilityControl const TDF::SegmentKey::GetPortfolioControl() const
+SelectabilityControl const H3DF::SegmentKey::GetPortfolioControl() const
 {
 	return m_cPortfolioControl;
 }
 */
 
 //== StyleControl Control 관련 함수 ==================================================================
-StyleControl TDF::SegmentKey::GetStyleControl()
+StyleControl H3DF::SegmentKey::GetStyleControl()
 {
 	StyleControl cStyleControl(*this);
 	return cStyleControl;
 }
 
-void TDF::SegmentKey::SetRenderingOptions(CString strList)
+void H3DF::SegmentKey::SetRenderingOptions(CString strList)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Rendering_Options(H_ASCII_TEXT(strList));
 	SegmentKeyPrivate::LocalClose(*this);
 }
 
-void TDF::SegmentKey::SetColorByIndex(CString strList, int nIndex)
+void H3DF::SegmentKey::SetColorByIndex(CString strList, int nIndex)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Color_By_Index(H_ASCII_TEXT(strList), nIndex);
 	SegmentKeyPrivate::LocalClose(*this);
 }
 
-void TDF::SegmentKey::SetMarkerSymbol(CString strSymbol)
+void H3DF::SegmentKey::SetMarkerSymbol(CString strSymbol)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Marker_Symbol(H_ASCII_TEXT(strSymbol));
@@ -669,7 +669,7 @@ void TDF::SegmentKey::SetMarkerSymbol(CString strSymbol)
 // 	SegmentKey & SetCamera(CameraKit const & cInKit);
 // 	SegmentKey & UnsetCamera();
 
-bool TDF::SegmentKey::ShowCamera(CameraKit & cOutKit) const
+bool H3DF::SegmentKey::ShowCamera(CameraKit & cOutKit) const
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -705,7 +705,7 @@ bool TDF::SegmentKey::ShowCamera(CameraKit & cOutKit) const
 }
 
 //== Model Segment 관련 함수 =====================================================================
-SegmentKey & TDF::SegmentKey::SetModellingMatrix(MatrixKit const & cInKit)
+SegmentKey & H3DF::SegmentKey::SetModellingMatrix(MatrixKit const & cInKit)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Set_Modelling_Matrix(cInKit.m_fData);
@@ -714,7 +714,7 @@ SegmentKey & TDF::SegmentKey::SetModellingMatrix(MatrixKit const & cInKit)
 	return *this;
 }
 
-SegmentKey & TDF::SegmentKey::UnsetModellingMatrix()
+SegmentKey & H3DF::SegmentKey::UnsetModellingMatrix()
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_UnSet_Modelling_Matrix();
@@ -723,7 +723,7 @@ SegmentKey & TDF::SegmentKey::UnsetModellingMatrix()
 	return *this;
 }
 
-bool TDF::SegmentKey::ShowModellingMatrix(MatrixKit & cOutKit) const
+bool H3DF::SegmentKey::ShowModellingMatrix(MatrixKit & cOutKit) const
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 	HC_Show_Modelling_Matrix(cOutKit.m_fData);
@@ -733,7 +733,7 @@ bool TDF::SegmentKey::ShowModellingMatrix(MatrixKit & cOutKit) const
 }
 
 //== Bounding 관련 함수 ==============================================================================
-SegmentKey & TDF::SegmentKey::SetBounding(BoundingKit const & cInKit)
+SegmentKey & H3DF::SegmentKey::SetBounding(BoundingKit const & cInKit)
 {
 	bool bExclusion = false;
 
@@ -749,7 +749,7 @@ SegmentKey & TDF::SegmentKey::SetBounding(BoundingKit const & cInKit)
 }
 
 //== User Data 관련 함수 =============================================================================
-SegmentKey & TDF::SegmentKey::SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData)
+SegmentKey & H3DF::SegmentKey::SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData)
 {
 	if (aInIndices.size() == aInData.size()) {
 		for (size_t nIndex = 0; nIndex < aInIndices.size(); ++nIndex) {
@@ -760,7 +760,7 @@ SegmentKey & TDF::SegmentKey::SetUserData(IntPtrTArray const & aInIndices, ByteA
 	return *this;
 }
 
-SegmentKey & TDF::SegmentKey::SetUserData(intptr_t nInIndex, size_t nInBytes, BYTE const pnInData[])
+SegmentKey & H3DF::SegmentKey::SetUserData(intptr_t nInIndex, size_t nInBytes, BYTE const pnInData[])
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -771,7 +771,7 @@ SegmentKey & TDF::SegmentKey::SetUserData(intptr_t nInIndex, size_t nInBytes, BY
 	return *this;
 }
 
-SegmentKey & TDF::SegmentKey::SetUserData(intptr_t nInIndex, ByteArray const & aInData)
+SegmentKey & H3DF::SegmentKey::SetUserData(intptr_t nInIndex, ByteArray const & aInData)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -782,7 +782,7 @@ SegmentKey & TDF::SegmentKey::SetUserData(intptr_t nInIndex, ByteArray const & a
 	return *this;
 }
 
-SegmentKey & TDF::SegmentKey::UnsetUserData(intptr_t nInIndex)
+SegmentKey & H3DF::SegmentKey::UnsetUserData(intptr_t nInIndex)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -793,7 +793,7 @@ SegmentKey & TDF::SegmentKey::UnsetUserData(intptr_t nInIndex)
 	return *this;
 }
 
-SegmentKey & TDF::SegmentKey::UnsetUserData(size_t nInCount, intptr_t const pnInIndices[])
+SegmentKey & H3DF::SegmentKey::UnsetUserData(size_t nInCount, intptr_t const pnInIndices[])
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -806,7 +806,7 @@ SegmentKey & TDF::SegmentKey::UnsetUserData(size_t nInCount, intptr_t const pnIn
 	return *this;
 }
 
-SegmentKey & TDF::SegmentKey::UnsetUserData(IntPtrTArray const & pnInIndices)
+SegmentKey & H3DF::SegmentKey::UnsetUserData(IntPtrTArray const & pnInIndices)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -819,7 +819,7 @@ SegmentKey & TDF::SegmentKey::UnsetUserData(IntPtrTArray const & pnInIndices)
 	return *this;
 }
 
-SegmentKey & TDF::SegmentKey::UnsetAllUserData()
+SegmentKey & H3DF::SegmentKey::UnsetAllUserData()
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -831,7 +831,7 @@ SegmentKey & TDF::SegmentKey::UnsetAllUserData()
 
 }
 
-size_t TDF::SegmentKey::ShowUserDataCount() const
+size_t H3DF::SegmentKey::ShowUserDataCount() const
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -842,7 +842,7 @@ size_t TDF::SegmentKey::ShowUserDataCount() const
 	return nCount;
 }
 
-bool TDF::SegmentKey::ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray & aOutData) const
+bool H3DF::SegmentKey::ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray & aOutData) const
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -870,7 +870,7 @@ bool TDF::SegmentKey::ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray & 
 	return true;
 }
 
-bool TDF::SegmentKey::ShowUserDataIndices(IntPtrTArray & aOutIndices) const
+bool H3DF::SegmentKey::ShowUserDataIndices(IntPtrTArray & aOutIndices) const
 {	
 	SegmentKeyPrivate::LocalOpen(*this);
 
@@ -888,7 +888,7 @@ bool TDF::SegmentKey::ShowUserDataIndices(IntPtrTArray & aOutIndices) const
 	return true;
 }
 
-bool TDF::SegmentKey::ShowUserData(intptr_t nInIndex, ByteArray & aOutData) const
+bool H3DF::SegmentKey::ShowUserData(intptr_t nInIndex, ByteArray & aOutData) const
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 

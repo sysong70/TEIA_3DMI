@@ -7,7 +7,7 @@ extern "C" {
 #endif  /* __cplusplus */
 
 	_declspec (dllexport) void ExecuteCommand(const wchar_t * pchCommandText);
-	_declspec (dllexport) void SendCommand(void (*lpfnCallback)(const wchar_t *));
+	_declspec (dllexport) void AssignSendSignalFunc(void (*lpfnCallback)(const wchar_t *));
 
 #ifdef __cplusplus
 }

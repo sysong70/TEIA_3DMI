@@ -65,11 +65,11 @@ Memory::Memory() {}
 
 
 //== 객체 관리 ======================================================================================
-TDF::Type PrivateImpl::Type() const {
+H3DF::Type PrivateImpl::Type() const {
 	return m_eType;
 }
 
-void PrivateImpl::SetType(TDF::Type eType) {
+void PrivateImpl::SetType(H3DF::Type eType) {
 	m_eType = eType;
 }
 

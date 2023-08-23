@@ -43,7 +43,7 @@ public:
 	void Set(HighlightControl const & cInThat);
 	HighlightControl & operator=(HighlightControl const & cInThat);
 
-	TDF::Type ObjectType() const { return TDF::Type::HighlightControl; };
+	H3DF::Type ObjectType() const { return H3DF::Type::HighlightControl; };
 
 	HighlightControl & Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting = true);
 	HighlightControl & Highlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting = true);

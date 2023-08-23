@@ -9,7 +9,7 @@ OPEN_3DF_NAMESPACE
 
 namespace Connector
 {
-	SendSignalFunc GetSender();
+	//SendSignalFunc GetSender();
 	Signal::Delivery & GetInstance(int nViewId);
 	void SetSender(void (*func)(const wchar_t *));
 }

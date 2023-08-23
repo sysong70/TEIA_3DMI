@@ -11,7 +11,7 @@ class NavigationCube
 {
 public:
 
-	NavigationCube(TDF::BaseView * view = nullptr, WindowKey * pcInWindow = nullptr);
+	NavigationCube(H3DF::BaseView * view = nullptr, WindowKey * pcInWindow = nullptr);
 
 	~NavigationCube();
 
@@ -21,7 +21,7 @@ public:
 
 	int NoButtonDownAndMove(HEventInfo & cInEvent);
 
-	void SetView(TDF::BaseView * view, WindowKey * pcInWindow);
+	void SetView(H3DF::BaseView * view, WindowKey * pcInWindow);
 
 	void SetVisible(bool axis, bool cube);
 
@@ -69,13 +69,13 @@ private:
 	void SetWindowSize(double width, double height, bool openSegment = true);
 
 	WindowKey* m_pcWindow = nullptr;
-	TDF::BaseView* m_pView = nullptr;
-	TDF::Point2D m_windowSize;
+	H3DF::BaseView* m_pView = nullptr;
+	H3DF::Point2D m_windowSize;
 
 	HC_KEY m_parentSegment = HC_ERROR_KEY;
 	HC_KEY m_cubeSegment = HC_ERROR_KEY;
 
-	SegmentKey m_cSegments[(int)TDF::ViewMode::Count];
+	SegmentKey m_cSegments[(int)H3DF::ViewMode::Count];
 
 	SelectionResults m_cOldHighlightSelection;
 };

@@ -54,8 +54,8 @@ void Entity::SetFrame(Frame const & cInFrame)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
-	TDF::RGBColor cCurrentColor;
-	TDF::RGBColor cColor;
+	H3DF::RGBColor cCurrentColor;
+	H3DF::RGBColor cColor;
 	char pchPattern[1024] = { "" };
 	char pchCurrentPattern[1024] = { "" };
 
@@ -90,7 +90,7 @@ void Entity::SetFrame(Frame const & cInFrame)
 			}
 
 			unsigned int nPointCount = pcPolylines[i].GetPointCount();
-			TDF::Point * points = new TDF::Point[nPointCount];
+			H3DF::Point * points = new H3DF::Point[nPointCount];
 			pcPolylines[i].GetPoints(nPointCount, points);
 		
 			HC_Insert_Polyline(nPointCount, points);
@@ -164,14 +164,14 @@ void Entity::SetLeaderLines(unsigned int in_count, Polyline const * in_leader_li
 			HC_Open_Segment("");
 			{
 				unsigned int count = in_leader_lines[i].GetPointCount();
-				TDF::Point * points = new TDF::Point[count];
+				H3DF::Point * points = new H3DF::Point[count];
 				in_leader_lines[i].GetPoints(count, points);
 
 				HC_Insert_Polyline(count, points);
 
 				delete[] points;
 
-				TDF::RGBColor color;
+				H3DF::RGBColor color;
 				in_leader_lines[i].GetRGBColor(color);
 
 				if (color.red >= 0 && color.green >= 0 && color.blue >= 0)
@@ -191,18 +191,18 @@ void Entity::SetLeaderLines(unsigned int in_count, Polyline const * in_leader_li
 	SegmentKeyPrivate::LocalClose(*this);
 }
 
-void Entity::SetLeaderSymbols(unsigned int nInCount, TDF::Polygon const * pcInLeaderSymbols)
+void Entity::SetLeaderSymbols(unsigned int nInCount, H3DF::Polygon const * pcInLeaderSymbols)
 {
 	SetPolygons("leader/symbol", nInCount, pcInLeaderSymbols);
 }
 
-void Entity::SetPolygons(char const * pchInSegmentName, unsigned int nInCount, TDF::Polygon const * pcInPolygons)
+void Entity::SetPolygons(char const * pchInSegmentName, unsigned int nInCount, H3DF::Polygon const * pcInPolygons)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
 
 	HC_Open_Segment(pchInSegmentName);
 	{
-		TDF::RGBColor color_current;
+		H3DF::RGBColor color_current;
 
 		HC_Flush_Contents(".", "everything");
 
@@ -218,7 +218,7 @@ void Entity::SetPolygons(char const * pchInSegmentName, unsigned int nInCount, T
 				SetColor(pcInPolygons[0]);
 			}
 
-			TDF::RGBColor color;
+			H3DF::RGBColor color;
 			pcInPolygons[i].GetRGBColor(color);
 			if (color != color_current)
 			{
@@ -229,7 +229,7 @@ void Entity::SetPolygons(char const * pchInSegmentName, unsigned int nInCount, T
 			}
 
 			unsigned int nPointCount = pcInPolygons[i].GetPointCount();
-			TDF::Point * pcPoints = new TDF::Point[nPointCount];
+			H3DF::Point * pcPoints = new H3DF::Point[nPointCount];
 			pcInPolygons[i].GetPoints(nPointCount, pcPoints);
 			HC_Insert_Polygon(nPointCount, pcPoints);
 			delete[] pcPoints;
@@ -241,9 +241,9 @@ void Entity::SetPolygons(char const * pchInSegmentName, unsigned int nInCount, T
 	SegmentKeyPrivate::LocalClose(*this);
 }
 
-void Entity::SetColor(const TDF::Polyline & cPolyline)
+void Entity::SetColor(const H3DF::Polyline & cPolyline)
 {
-	TDF::RGBColor cColor;
+	H3DF::RGBColor cColor;
 	cPolyline.GetRGBColor(cColor);
 
 	if (cColor.red >= 0 && cColor.green >= 0 && cColor.blue >= 0) {
@@ -258,9 +258,9 @@ void Entity::SetColor(const TDF::Polyline & cPolyline)
 	}
 }
 
-void Entity::SetColor(const TDF::Polygon & cPolygon)
+void Entity::SetColor(const H3DF::Polygon & cPolygon)
 {
-	TDF::RGBColor cColor;
+	H3DF::RGBColor cColor;
 	cPolygon.GetRGBColor(cColor);
 
 	if (cColor.red >= 0 && cColor.green >= 0 && cColor.blue >= 0) {
@@ -368,7 +368,7 @@ void Entity::GetStringsAndTextAttributes(CString strInSegmentName, CString * pst
 					int length = 0;
 					HC_Show_Text_Length(key, &length);
 
-					TDF::Point cInsertionPoint;
+					H3DF::Point cInsertionPoint;
 					char * text = new char[length + 1];
 
 					HC_Show_Text(key, &cInsertionPoint.x, &cInsertionPoint.y, &cInsertionPoint.z, text);
@@ -398,7 +398,7 @@ void Entity::GetStringsAndTextAttributes(CString strInSegmentName, CString * pst
 						{
 							if (HC_Show_Existence("color = text"))
 							{
-								TDF::RGBColor color;
+								H3DF::RGBColor color;
 								char color_space[4] = { "" };
 								HC_Show_One_Color_By_Value("text", color_space, &color.red, &color.green, &color.blue);
 								pcOutTextAttributes[i].SetRGBColor(color);
@@ -481,7 +481,7 @@ void Entity::SetStringsAndTextAttributes(CString strInSegmentName, unsigned int 
 					bool const face_view_mode = is_parallel_to_screen && font_size_units == Font::Size::Units::WorldSpaceUnits;
 
 
-					TDF::Point cInsertionPoint;
+					H3DF::Point cInsertionPoint;
 					pcInTextAttributes[nIndex].GetInsertionPoint(cInsertionPoint);
 
 					H_UTF8 utf8(pstrInStrings[nIndex]);
@@ -541,7 +541,7 @@ void Entity::SetStringsAndTextAttributes(CString strInSegmentName, unsigned int 
 					if (pcInTextAttributes[nIndex].IsWired())
 						HC_Set_Text_Font("exterior = on");
 
-					TDF::RGBColor cColor;
+					H3DF::RGBColor cColor;
 					pcInTextAttributes[nIndex].GetRGBColor(cColor);
 
 					if (cColor.red >= 0 && cColor.green >= 0 && cColor.blue >= 0) {
@@ -1249,7 +1249,7 @@ void RoughnessEntity::SetFields(unsigned int nInCount, CString const * pstrInStr
 
 //== Orientation ===================================================================================
 
-class OrientationPrivate : public TDF::PrivateImpl
+class OrientationPrivate : public H3DF::PrivateImpl
 {
 public:
 	OrientationPrivate() {}
@@ -1259,7 +1259,7 @@ public:
 		m_cMatrix = pcInThat->m_cMatrix;
 	}
 
-	TDF::MatrixKit m_cMatrix;
+	H3DF::MatrixKit m_cMatrix;
 };
 
 Orientation::Orientation()
@@ -1305,7 +1305,7 @@ void Orientation::SetMatrix(MatrixKit const & cInMatrix)
 
 //== TextAttributes ================================================================================
 
-class TextAttributesPrivate : public TDF::PrivateImpl
+class TextAttributesPrivate : public H3DF::PrivateImpl
 {
 public:
 	TextAttributesPrivate()
@@ -1347,12 +1347,12 @@ public:
 		m_width_scale = pcInThat->m_width_scale;
 	}
 
-	TDF::Point m_insertion_point;
+	H3DF::Point m_insertion_point;
 	float m_font_size;
 	Font::Size::Units m_font_size_units;
 	char * m_font_name;
 	Orientation m_orientation;
-	TDF::RGBColor m_color;
+	H3DF::RGBColor m_color;
 	char m_format;
 	float m_width_scale;
 };
@@ -1381,13 +1381,13 @@ TextAttributes const & TextAttributes::operator=(TextAttributes const & cInThat)
 	return *this;
 }
 
-void TextAttributes::GetInsertionPoint(TDF::Point & cOutPoint) const
+void TextAttributes::GetInsertionPoint(H3DF::Point & cOutPoint) const
 {
 	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
 	cOutPoint = pcImpl->m_insertion_point;
 }
 
-void TextAttributes::SetInsertionPoint(TDF::Point const & cInPoint)
+void TextAttributes::SetInsertionPoint(H3DF::Point const & cInPoint)
 {
 	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
 	pcImpl->m_insertion_point = cInPoint;
@@ -1452,13 +1452,13 @@ void TextAttributes::SetOrientation(Orientation const & cInOrientation)
 	pcImpl->m_orientation = cInOrientation;
 }
 
-void TextAttributes::GetRGBColor(TDF::RGBColor & cOutColor) const
+void TextAttributes::GetRGBColor(H3DF::RGBColor & cOutColor) const
 {
 	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
 	cOutColor = pcImpl->m_color;
 }
 
-void TextAttributes::SetRGBColor(TDF::RGBColor const & cInColor)
+void TextAttributes::SetRGBColor(H3DF::RGBColor const & cInColor)
 {
 	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
 	pcImpl->m_color = cInColor;
@@ -1533,7 +1533,7 @@ void TextAttributes::SetWidthScale(const double dWidthScale)
 }
 
 //== Options =======================================================================================
-class OptionsPrivate : public TDF::PrivateImpl
+class OptionsPrivate : public H3DF::PrivateImpl
 {
 public:
 	OptionsPrivate()
@@ -1591,7 +1591,7 @@ void Options::SetDisplayParallelToScreen(const bool in_parallel)
 
 //== Frame =========================================================================================
 
-class FramePrivate : public TDF::PrivateImpl
+class FramePrivate : public H3DF::PrivateImpl
 {
 public:
 	void Copy(FramePrivate * that)
@@ -1599,7 +1599,7 @@ public:
 		m_aPolylines = that->m_aPolylines;
 	}
 
-	TDF::PolylineArray	m_aPolylines;
+	H3DF::PolylineArray	m_aPolylines;
 };
 
 Frame::Frame()
@@ -1632,7 +1632,7 @@ unsigned int Frame::GetPolylineCount() const
 	return static_cast<unsigned int>(pcImpl->m_aPolylines.size());
 }
 
-void Frame::GetPolylines(unsigned int & nOutCount, TDF::Polyline * pcOutPolylines) const
+void Frame::GetPolylines(unsigned int & nOutCount, H3DF::Polyline * pcOutPolylines) const
 {
 	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
 
@@ -1647,7 +1647,7 @@ void Frame::GetPolylines(unsigned int & nOutCount, TDF::Polyline * pcOutPolyline
 	}
 }
 
-void Frame::SetPolylines(unsigned int nInCount, TDF::Polyline const * pcInPolylines)
+void Frame::SetPolylines(unsigned int nInCount, H3DF::Polyline const * pcInPolylines)
 {
 	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
 	pcImpl->m_aPolylines.resize(nInCount);
@@ -1659,7 +1659,7 @@ void Frame::SetPolylines(unsigned int nInCount, TDF::Polyline const * pcInPolyli
 
 //== Drawing =======================================================================================
 
-class DrawingPrivate : public TDF::PrivateImpl
+class DrawingPrivate : public H3DF::PrivateImpl
 {
 public:
 	void Copy(DrawingPrivate * that)
@@ -1667,7 +1667,7 @@ public:
 		m_polygons = that->m_polygons;
 	}
 
-	TDF::PolygonArray m_polygons;
+	H3DF::PolygonArray m_polygons;
 };
 
 Drawing::Drawing()
@@ -1700,7 +1700,7 @@ unsigned int Drawing::GetPolygonCount() const
 	return static_cast<unsigned int>(pcImpl->m_polygons.size());
 }
 
-void Drawing::GetPolygons(unsigned int & nOutCount, TDF::Polygon * pcOutPolygons) const
+void Drawing::GetPolygons(unsigned int & nOutCount, H3DF::Polygon * pcOutPolygons) const
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
 	nOutCount = (unsigned int)pcImpl->m_polygons.size();
@@ -1714,7 +1714,7 @@ void Drawing::GetPolygons(unsigned int & nOutCount, TDF::Polygon * pcOutPolygons
 	}
 }
 
-void Drawing::SetPolygons(unsigned int nInCount, TDF::Polygon const * pcInPolygons)
+void Drawing::SetPolygons(unsigned int nInCount, H3DF::Polygon const * pcInPolygons)
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
 	pcImpl->m_polygons.resize(nInCount);

@@ -20,15 +20,15 @@ public:
 	void Set(LineKit const & cInThat);
 	LineKit const & operator=(LineKit const & cInThat);
 
-	TDF::Type ObjectType() const { return TDF::Type::LineKit; };
+	H3DF::Type ObjectType() const { return H3DF::Type::LineKit; };
 
 	unsigned int GetPointCount() const;
 
-	void GetPoints(unsigned int & nOutCount, TDF::Point pcOutPoints[]) const;
+	void GetPoints(unsigned int & nOutCount, H3DF::Point pcOutPoints[]) const;
 	void SetPoints(unsigned int nInCount, Point const pcInPoints[]);
 
-	void GetRGBColor(TDF::RGBColor & cOutColor) const;
-	void SetRGBColor(TDF::RGBColor const & cInColor);
+	void GetRGBColor(H3DF::RGBColor & cOutColor) const;
+	void SetRGBColor(H3DF::RGBColor const & cInColor);
 
 	void GetLinePattern(char out_pattern[PATTERN_BUFFER_SIZE]) const;
 };
@@ -43,7 +43,7 @@ public:
 	void Set(LineKey const & cInThat);
 	LineKey & operator=(LineKey const & cInThat);
 
-	TDF::Type ObjectType() const { return TDF::Type::LineKey; };
+	H3DF::Type ObjectType() const { return H3DF::Type::LineKey; };
 
 	int GetPointCount() const;
 

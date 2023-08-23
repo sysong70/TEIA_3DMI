@@ -26,7 +26,7 @@ ImportBase::~ImportBase()
 bool ImportBase::InitializeA3DLibrary(CString & strErrorMessage)
 {
 	// 3DX DLL 경로 설정
-	CString strDllPath = _3DX::GetExecuteDirectory() + L"3DX";
+	CString strDllPath = H3DX::GetExecuteDirectory() + L"3DX";
 
 	// Dll Load
 	if(A3D_FALSE == A3DSDKLoadLibrary(strDllPath)) {
@@ -127,7 +127,7 @@ bool ImportBase::SetCallbacksReport()
 A3DInt32 ImportBase::CallbackReportMessage(A3DUTF8Char * chMessage)
 {
 	CString strMsg;
-	_3DX::CharToCString(chMessage, strMsg, CP_UTF8);
+	H3DX::CharToCString(chMessage, strMsg, CP_UTF8);
 	g_vestrMessage.push_back(strMsg);
 	/*
 		int pos = strMsg.Find(_T("Version/Release"));
@@ -150,7 +150,7 @@ A3DInt32 ImportBase::CallbackReportMessage(A3DUTF8Char * chMessage)
 A3DInt32 ImportBase::CallbackReportWarning(A3DUTF8Char * pcCode, A3DUTF8Char * chMessage)
 {
 	CString strMsg;
-	_3DX::CharToCString(chMessage, strMsg, CP_UTF8);
+	H3DX::CharToCString(chMessage, strMsg, CP_UTF8);
 	g_vestrWarning.push_back(strMsg);
 
 	return 0;
@@ -159,7 +159,7 @@ A3DInt32 ImportBase::CallbackReportWarning(A3DUTF8Char * pcCode, A3DUTF8Char * c
 A3DInt32 ImportBase::CallbackReportError(A3DUTF8Char * pcCode, A3DUTF8Char * chMessage)
 {
 	CString strMsg;
-	_3DX::CharToCString(chMessage, strMsg, CP_UTF8);
+	H3DX::CharToCString(chMessage, strMsg, CP_UTF8);
 	g_vestrError.push_back(strMsg);
 
 	return 0;
@@ -204,5 +204,5 @@ bool ImportBase::CStringToUtf8(CString strText, A3DUTF8Char *& pchUtf8Text)
 
 bool ImportBase::Utf8ToCString(A3DUTF8Char * pchUtf8Text, CString & strText)
 {
-	return _3DX::CharToCString(pchUtf8Text, strText, CP_UTF8);
+	return H3DX::CharToCString(pchUtf8Text, strText, CP_UTF8);
 }

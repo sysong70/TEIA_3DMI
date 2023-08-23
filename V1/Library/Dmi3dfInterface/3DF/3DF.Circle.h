@@ -20,7 +20,7 @@ public:
 	void Set(CircleKit const & cInThat);
 	CircleKit const & operator=(CircleKit const & cInThat);
 
-	TDF::Type ObjectType() const { return TDF::Type::CircleKit; };
+	H3DF::Type ObjectType() const { return H3DF::Type::CircleKit; };
 
 	CircleKit & SetCenter(Point const & cInCenter);
 	CircleKit & SetRadius(double dInRadius);
@@ -41,7 +41,7 @@ public:
 	void Set(CircleKey const & cInThat);
 	CircleKey & operator=(CircleKey const & cInThat);
 
-	TDF::Type ObjectType() const { return TDF::Type::CircleKey; };
+	H3DF::Type ObjectType() const { return H3DF::Type::CircleKey; };
 
 	CircleKey & SetCenter(Point const & cInCenter);
 	CircleKey & SetRadius(double dInRadius);

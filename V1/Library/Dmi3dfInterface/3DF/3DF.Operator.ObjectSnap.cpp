@@ -40,14 +40,14 @@ USING_3DF_NAMESPACE
 #define TheEnvironment TheAppOptions.Preference.Environment
 #define TheSession TheAppOptions.Preference.Session
 
-TDF::Operator::ObjectSnap::SnapPoint::SnapPoint(TDF::Operator::ObjectSnap::SnapPoint const & cInThat)
+H3DF::Operator::ObjectSnap::SnapPoint::SnapPoint(H3DF::Operator::ObjectSnap::SnapPoint const & cInThat)
 {
 	cPoint = cInThat.cPoint;
 	eType = cInThat.eType;
 	eStatus = cInThat.eStatus;
 }
 
-TDF::Operator::ObjectSnap::SnapPoint & TDF::Operator::ObjectSnap::SnapPoint::operator = (TDF::Operator::ObjectSnap::SnapPoint const & cInThat)
+H3DF::Operator::ObjectSnap::SnapPoint & H3DF::Operator::ObjectSnap::SnapPoint::operator = (H3DF::Operator::ObjectSnap::SnapPoint const & cInThat)
 {
 	cPoint = cInThat.cPoint;
 	eType = cInThat.eType;
@@ -57,7 +57,7 @@ TDF::Operator::ObjectSnap::SnapPoint & TDF::Operator::ObjectSnap::SnapPoint::ope
 }
 
 // Select Item의 구성 요소가 같은지 확인한다.
-bool TDF::Operator::ObjectSnap::SnapItem::operator == (const SnapItem & cInThat) const
+bool H3DF::Operator::ObjectSnap::SnapItem::operator == (const SnapItem & cInThat) const
 {
 /*
 	if (vcSnapPoints.size() != cInThat.vcSnapPoints.size()) {
@@ -95,7 +95,7 @@ bool TDF::Operator::ObjectSnap::SnapItem::operator == (const SnapItem & cInThat)
 
 //== ObjectSnap class ==============================================================================
 
-TDF::Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
+H3DF::Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 {
 	m_pcWindow = pcWindow;
 
@@ -137,7 +137,7 @@ TDF::Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 }
 
 
-int TDF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
+int H3DF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 {
 	PixelPoint cMousePoint(cInEvent.GetMousePixelPos());
 
@@ -257,7 +257,7 @@ int TDF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 			pcItem->ShowSelectedItem(cSelectKey);
 
 			// 나오는 요소의 종류를 확인한다.
-			TDF::Type eType = cSelectKey.Type();
+			H3DF::Type eType = cSelectKey.Type();
 
 			//m_cNewHighlightSelection.PushBack(new SelectionItem(*pcItem));
 
@@ -291,11 +291,11 @@ int TDF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 				}
 			}*/
 
-			if (TDF::Type::LineKey == eType) {
+			if (H3DF::Type::LineKey == eType) {
 				//TRACE(L"SelectByPoint Line: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());
 				vLineSelectedItems.push_back(pcItem);
 			}
-			else if (TDF::Type::ShellKey == eType) {
+			else if (H3DF::Type::ShellKey == eType) {
 				//TRACE(L"SelectByPoint Shell: %d\t[%d]\n", nSelectedCount, cSelectKey.KeyValue());		
 				vShellSelectedItems.push_back(pcItem);
 			}
@@ -359,7 +359,7 @@ int TDF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 	bool bForceUpdate = false;
 
 	// 	새롭게 선택된 Selection Result에서 Line만 남기도록 한다.
-	// 	m_cNewHighlightSelection.LeaveType((DWORD)TDF::Type::LineKey);
+	// 	m_cNewHighlightSelection.LeaveType((DWORD)H3DF::Type::LineKey);
 
 	// 추가된것이 있는 경우에 Count를 검사해서 5개까지만 남기도록 한다.
 	if (true == m_cHighlightSelection.Union(m_cNewHighlightSelection)) {
@@ -433,7 +433,7 @@ int TDF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 
 //:TODO - remove later
 /*
-void HDraw::Test(HBaseView* view, TDF::Matrix& cMatrix, Point2D p1, Point2D p2)
+void HDraw::Test(HBaseView* view, H3DF::Matrix& cMatrix, Point2D p1, Point2D p2)
 {
 	SetView(view);
 
@@ -511,7 +511,7 @@ void HDraw::Test(HBaseView* view, TDF::Matrix& cMatrix, Point2D p1, Point2D p2)
 				fAngle = fAngle + 180.0f;
 			}
 
-			TDF::Matrix cRotation;
+			H3DF::Matrix cRotation;
 			cRotation.RotateOffAxis(Vector::ZAxis(), fAngle);
 			cRotation.Translate(center.x, center.y, 0.0f);
 
@@ -563,7 +563,7 @@ void HDraw::Test(HBaseView* view, TDF::Matrix& cMatrix, Point2D p1, Point2D p2)
 // 이 함수에서 개별요소의 Object Snap를 구하고, 연관된 요소들의 Object Snap를 구한다. 구하는 Object Snap은 각각의 
 // 요소에서 End, Mid, Near, Center등을 구하고 연관된 Entity에서 Intersection, Perpendicular, Tangent등을 구한다.
 // 구해진 값은 m_aSnapItems에 저장된다. SnapItem에는 연관된 Key값, Point, Snap Type등이 저장된다.
-void TDF::Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults & cInItems)
+void H3DF::Operator::ObjectSnap::CalculationObjectSnapPoint(H3DF::SelectionResults & cInItems)
 {
 	TRACE(L"ObjectSnap::Items Count: %d\n", m_vSnapItems.size());
 
@@ -579,7 +579,7 @@ void TDF::Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults
 
 		Key cKey;
 		pcItem->ShowSelectedItem(cKey);
-		TDF::Type eType = cKey.Type();
+		H3DF::Type eType = cKey.Type();
 
 		KeyPath cPath;
 		pcItem->ShowPath(cPath);
@@ -588,7 +588,7 @@ void TDF::Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults
 		cPath.ShowNetModellingMatrix(cMatrix);
 
 		// Line Key 처리
-		if (TDF::Type::LineKey == eType) {
+		if (H3DF::Type::LineKey == eType) {
 			// 사전 선택된 Object Snap Point 삭제
 			//ResetSnapItem();
 			CalculationLienObjectSnapPoint(pcItem, cWindowPoint);
@@ -632,7 +632,7 @@ void TDF::Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults
 
 		Key cNextSelection;
 		if (true == pcNextItem->ShowSelectedItem(cNextSelection)) {
-			if (TDF::Type::LineKey == cSelection.Type() && TDF::Type::LineKey == cNextSelection.Type()) {
+			if (H3DF::Type::LineKey == cSelection.Type() && H3DF::Type::LineKey == cNextSelection.Type()) {
 				CalculationLienAndLineObjectSnapPoint(pcItem, pcNextItem, cMatrix, cNextMatrix);
 			}
 		}
@@ -645,12 +645,12 @@ void TDF::Operator::ObjectSnap::CalculationObjectSnapPoint(TDF::SelectionResults
 //== 2. 단일 Geometry Object Snap 계산 ==============================================================
 
 // 2-1. Line Object Snap 계산 (EndPoint, MidPoint, NearPoint를 계산)
-bool TDF::Operator::ObjectSnap::CalculationLienObjectSnapPoint(const SelectionItem * pcInSelectionItem, const WindowPoint & cInPoint)
+bool H3DF::Operator::ObjectSnap::CalculationLienObjectSnapPoint(const SelectionItem * pcInSelectionItem, const WindowPoint & cInPoint)
 {
 	Key cKey;
 	pcInSelectionItem->ShowSelectedItem(cKey);
 
-	if (TDF::Type::LineKey != cKey.Type()) {
+	if (H3DF::Type::LineKey != cKey.Type()) {
 		return false;
 	}
 
@@ -698,7 +698,7 @@ bool TDF::Operator::ObjectSnap::CalculationLienObjectSnapPoint(const SelectionIt
 	}
 
 	CircleKit cCircle;
-	if (true == TDF::Math::GetCircle(aPoints, cCircle)) {
+	if (true == H3DF::Math::GetCircle(aPoints, cCircle)) {
 		Point cCenter;
 		cCircle.ShowCenter(cCenter);
 		cCenter = cMatrix.Transform(cCenter);
@@ -718,7 +718,7 @@ bool TDF::Operator::ObjectSnap::CalculationLienObjectSnapPoint(const SelectionIt
 //== 3. 2개의 Geometry Object Snap 계산 =============================================================
 
 // 3-1. Line & Line 관련 Object Snap을 계산, Intersection
-void TDF::Operator::ObjectSnap::CalculationLienAndLineObjectSnapPoint(const SelectionItem * pcInItems1, const SelectionItem * pcInItems2, 
+void H3DF::Operator::ObjectSnap::CalculationLienAndLineObjectSnapPoint(const SelectionItem * pcInItems1, const SelectionItem * pcInItems2, 
 	const MatrixKit & cMatrix1, const MatrixKit & cMatrix2)
 {
 	if (*pcInItems1 == *pcInItems2) {
@@ -762,7 +762,7 @@ void TDF::Operator::ObjectSnap::CalculationLienAndLineObjectSnapPoint(const Sele
 
 //== Object Snap Point를 그리는 함수 ==================================================================
 
-void TDF::Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
+void H3DF::Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 {
 	CamerInformation cCameraInfo;
 	ShowCameraInformation(m_fSnapRadius, cCameraInfo);
@@ -805,7 +805,7 @@ void Operator::ObjectSnap::DrawSnapItem(SnapItem * pcInItem, CamerInformation & 
 }
 */
 
-void TDF::Operator::ObjectSnap::DrawSnapPoint(Operator::ObjectSnap::SnapPoint & cSnapPoint, CamerInformation & cInCameraInfo)
+void H3DF::Operator::ObjectSnap::DrawSnapPoint(Operator::ObjectSnap::SnapPoint & cSnapPoint, CamerInformation & cInCameraInfo)
 {
 	m_cSnapPointSegment.Open(); {
 		m_cSnapPointSegment.SetModellingMatrix(cInCameraInfo.cMatrix);
@@ -815,7 +815,7 @@ void TDF::Operator::ObjectSnap::DrawSnapPoint(Operator::ObjectSnap::SnapPoint & 
 	} m_cSnapPointSegment.Close();
 }
 
-void TDF::Operator::ObjectSnap::DrawSnapPoint(Point2D center, ObjectSnap::Status eInStatus, ObjectSnap::Type eInType, double dUnit)
+void H3DF::Operator::ObjectSnap::DrawSnapPoint(Point2D center, ObjectSnap::Status eInStatus, ObjectSnap::Type eInType, double dUnit)
 {
 	using namespace Painter;
 
@@ -907,8 +907,8 @@ void TDF::Operator::ObjectSnap::DrawSnapPoint(Point2D center, ObjectSnap::Status
 
 			double padding = dUnit * 3;
 			Point size(width, height + padding);
-			TDF::Point p1(position.x - size.x / 2, position.y + size.y / 2);
-			TDF::Point p2(position.x + size.x / 2, position.y - size.y / 2);
+			H3DF::Point p1(position.x - size.x / 2, position.y + size.y / 2);
+			H3DF::Point p2(position.x + size.x / 2, position.y - size.y / 2);
 
 			Figure::CreateObround(p1, p2);
 		}
@@ -917,7 +917,7 @@ void TDF::Operator::ObjectSnap::DrawSnapPoint(Point2D center, ObjectSnap::Status
 	HC_Close_Segment();
 }
 
-double TDF::Operator::ObjectSnap::PixelToWorld(double unit)
+double H3DF::Operator::ObjectSnap::PixelToWorld(double unit)
 {
 	SegmentKey scene(m_pcWindow->GetSceneKey());
 
@@ -930,7 +930,7 @@ double TDF::Operator::ObjectSnap::PixelToWorld(double unit)
 	return vector.Length();
 }
 
-bool TDF::Operator::ObjectSnap::ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo)
+bool H3DF::Operator::ObjectSnap::ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo)
 {
 	if(nullptr == m_pcWindow) {
 		return false;
@@ -957,7 +957,7 @@ bool TDF::Operator::ObjectSnap::ShowCameraInformation(float fInRadius, CamerInfo
 }
 
 //== Utility Functions =============================================================================
-bool TDF::Operator::ObjectSnap::AddSnapItems(SnapItem * psInSnapItem)
+bool H3DF::Operator::ObjectSnap::AddSnapItems(SnapItem * psInSnapItem)
 {
 	if (nullptr == psInSnapItem) {
 		return false;
@@ -982,7 +982,7 @@ bool TDF::Operator::ObjectSnap::AddSnapItems(SnapItem * psInSnapItem)
 	return true;
 }
 
-bool TDF::Operator::ObjectSnap::AddSnapItem(SnapItem * psInSnapItem, Point cInSnapPoint, Type eInType)
+bool H3DF::Operator::ObjectSnap::AddSnapItem(SnapItem * psInSnapItem, Point cInSnapPoint, Type eInType)
 {
 	Operator::ObjectSnap::SnapPoint cSnapPoint;
 
@@ -994,7 +994,7 @@ bool TDF::Operator::ObjectSnap::AddSnapItem(SnapItem * psInSnapItem, Point cInSn
 	return true;
 }
 
-void TDF::Operator::ObjectSnap::ClearSnapItems(bool bUpdate)
+void H3DF::Operator::ObjectSnap::ClearSnapItems(bool bUpdate)
 {
 	m_cSnapPointSegment.Open();
 	{
@@ -1007,7 +1007,7 @@ void TDF::Operator::ObjectSnap::ClearSnapItems(bool bUpdate)
 	}
 }
 
-void TDF::Operator::ObjectSnap::ResetSnapItem()
+void H3DF::Operator::ObjectSnap::ResetSnapItem()
 {
 	// m_aSnapItems을 삭제
 	for (auto pcSnapItem : m_vSnapItems) {

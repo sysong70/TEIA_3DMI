@@ -8,29 +8,29 @@
 
 USING_3DF_NAMESPACE
 
-TDF::IncludeKey::IncludeKey(HC_KEY nInKey) :
+H3DF::IncludeKey::IncludeKey(HC_KEY nInKey) :
 	Key(nInKey)
 {
 	
 }
 
-TDF::IncludeKey::IncludeKey(IncludeKey const & cInThat):
+H3DF::IncludeKey::IncludeKey(IncludeKey const & cInThat):
 	Key(cInThat.KeyValue())
 {
 }
 
-void TDF::IncludeKey::Set(IncludeKey const & cInThat)
+void H3DF::IncludeKey::Set(IncludeKey const & cInThat)
 {
 	Key::Set(cInThat);
 }
 
-IncludeKey & TDF::IncludeKey::operator = (IncludeKey const & cInThat)
+IncludeKey & H3DF::IncludeKey::operator = (IncludeKey const & cInThat)
 {
 	Key::Set(cInThat);
 	return *this;
 }
 
-SegmentKey TDF::IncludeKey::GetTarget() const
+SegmentKey H3DF::IncludeKey::GetTarget() const
 {
 	HC_KEY nSegment = HC_Show_Include_Segment(KeyValue(), nullptr);
 

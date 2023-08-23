@@ -191,11 +191,11 @@ ShellKit & ShellKit::SetMaterialMapping(MaterialMappingKit const & cInkit)
 
 
 //== ShellKey Class ================================================================================
-namespace TDF {
+namespace H3DF {
 	class ShellKeyPrivate : public KeyPrivate
 	{
 	public:
-		ShellKeyPrivate() {m_eType = TDF::Type::ShellKey; }
+		ShellKeyPrivate() {m_eType = H3DF::Type::ShellKey; }
 
 		void Copy(ShellKeyPrivate * pcInThat) {
 			KeyPrivate::Copy(pcInThat);
@@ -215,7 +215,7 @@ ShellKey::ShellKey(Key const & cInKey)
 	((KeyPrivate *)pcImpl)->Copy((KeyPrivate *)(cInKey.GetImpl()));
 
 	// 외부에서 들어오는 Key는 ShellKey가 아닐 수 있으므로, ShellKey로 변경한다.
-	pcImpl->SetType(TDF::Type::ShellKey);
+	pcImpl->SetType(H3DF::Type::ShellKey);
 }
 
 ShellKey::ShellKey(ShellKey const & cInThat)
