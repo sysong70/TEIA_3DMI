@@ -2,7 +2,7 @@
 
 #include "../Signal/Signal.h"
 
-namespace SESSION
+namespace KERNEL
 {
 	namespace Connector
 	{

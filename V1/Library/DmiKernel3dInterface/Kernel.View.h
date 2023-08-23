@@ -4,7 +4,7 @@
 
 #include "../Dmi3dfInterface/3DF.Component.View.h"
 
-namespace SESSION
+namespace KERNEL
 {
 	class View
 	{

@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 
-#include "KernelInterfaceDll.h"
+#include "Session.Interface.h"
 
-#include "../Kernel.SignalAnalyzer.h"
+#include "Session.SignalAnalyzer.h"
 
 void ExecuteCommand(const wchar_t * pchCommandText)
 {

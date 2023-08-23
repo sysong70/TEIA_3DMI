@@ -1,11 +1,11 @@
 ﻿#include <StdAfx.h>
 
-#include "Session.Application.h"
+#include "Kernel.Application.h"
 
 #include "../Signal/Signal.h"
 #include "../Common/Common_Define.h"
 
-using namespace SESSION;
+using namespace KERNEL;
 
 Application::Application()
 {

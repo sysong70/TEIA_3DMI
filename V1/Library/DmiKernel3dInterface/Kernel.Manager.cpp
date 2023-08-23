@@ -1,18 +1,18 @@
 ﻿#include <StdAfx.h>
 
-#include "Session.Manager.h"
+#include "Kernel.Manager.h"
 
-#include "Session.h"
-#include "Session.Signal.Connector.h"
+#include "Kernel.h"
+#include "Kernel.Signal.Connector.h"
 
 #include "../Signal/Signal.h"
 #include "../Common/Common_Define.h"
 
-SESSION::Manager theSessionManager;
+KERNEL::Manager theKernelManager;
 
-using namespace SESSION;
+using namespace KERNEL;
 
-SESSION::Manager::Manager()
+KERNEL::Manager::Manager()
 {
 
 }
@@ -20,7 +20,7 @@ SESSION::Manager::Manager()
 //== 신호 처리 함수 ==================================================================================
 
 // 전달 받은 wchar 문자열을 Json::Object로 변환하여 신호를 처리한다.
-void SESSION::Manager::ExecuteSignal(const wchar_t * pchBuffer)
+void KERNEL::Manager::ExecuteSignal(const wchar_t * pchBuffer)
 {
 	Json::Object cObject;
 	Json::Reader::ReadObject((wchar_t *&)pchBuffer, cObject);
@@ -30,10 +30,10 @@ void SESSION::Manager::ExecuteSignal(const wchar_t * pchBuffer)
 
 	int nViewId = cObject.GetInteger(SKW_VIEWID);
 
-	Session * pcSession = m_mpcSessions[nViewId];
+	Kernel * pcSession = m_mpcSessions[nViewId];
 
 	if (nullptr == pcSession) {
-		pcSession = new Session();
+		pcSession = new Kernel();
 		if (nullptr == pcSession) {
 			assert(false);
 			return;
@@ -45,7 +45,7 @@ void SESSION::Manager::ExecuteSignal(const wchar_t * pchBuffer)
 	pcSession->ExecuteSignal(cObject);
 }
 
-void SESSION::Manager::SetSendSignalFunc(SendSignalFunc pcSendSignalFunc)
+void KERNEL::Manager::SetSendSignalFunc(SendSignalFunc pcSendSignalFunc)
 {
 	m_pcSendSignalFunc = pcSendSignalFunc;
 

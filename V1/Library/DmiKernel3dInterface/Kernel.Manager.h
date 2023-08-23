@@ -4,9 +4,9 @@
 
 #include <map>
 
-namespace SESSION
+namespace KERNEL
 {
-	class Session;
+	class Kernel;
 
 	using SendSignalFunc = void (*)(const wchar_t *);
 	using AssignSendSignalFunc = void (*)(SendSignalFunc);
@@ -25,8 +25,8 @@ namespace SESSION
 		SendSignalFunc m_pcSendSignalFunc = nullptr;
 
 		// 생성되는 Session들을 저장하는 Map 컨테이너
-		std::map<int, Session *> m_mpcSessions;
+		std::map<int, Kernel *> m_mpcSessions;
 	};
 };
 
-extern SESSION::Manager theSessionManager;
+extern KERNEL::Manager theKernelManager;

@@ -4,7 +4,7 @@
 
 #include "../Dmi3dfInterface/3DF.Component.Application.h"
 
-namespace SESSION
+namespace KERNEL
 {
 	class Application
 	{

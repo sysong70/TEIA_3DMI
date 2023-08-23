@@ -20,7 +20,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
     <SccProvider>SAK</SccProvider>
-    <ProjectName>KernelInterface</ProjectName>
+    <ProjectName>SessionInterface</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -78,7 +78,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(TargetProd)SessionInterface.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(DmiOutDir)</AdditionalLibraryDirectories>
       <ImportLibrary>$(DmiOutDir)\$(TargetName).lib</ImportLibrary>
       <ProgramDatabaseFile>$(DmiSymbolsDir)\$(TargetName).pdb</ProgramDatabaseFile>
@@ -117,25 +117,23 @@
     <ClInclude Include="..\Common\Fio.h" />
     <ClInclude Include="..\Common\Json.h" />
     <ClInclude Include="..\Common\WStr.h" />
-    <ClInclude Include="DLL\KernelInterfaceDll.h" />
+    <ClInclude Include="Session.Interface.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="Kernel.h" />
+    <ClInclude Include="Session.SignalAnalyzer.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Kernel.SignalAnalyzer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\Common_Define.cpp" />
     <ClCompile Include="..\Common\Fio.cpp" />
     <ClCompile Include="..\Common\Json.cpp" />
     <ClCompile Include="..\Common\WStr.cpp" />
-    <ClCompile Include="DLL\KernelInterfaceDll.cpp" />
+    <ClCompile Include="Session.Interface.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Kernel.cpp" />
+    <ClCompile Include="Session.SignalAnalyzer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Kernel.SignalAnalyzer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,13 +1,13 @@
 ﻿#include <StdAfx.h>
 
-#include "Session.View.h"
+#include "Kernel.View.h"
 
-#include "Session.Signal.Connector.h"
+#include "Kernel.Signal.Connector.h"
 
 #include "../Signal/Signal.h"
 #include "../Common/Common_Define.h"
 
-using namespace SESSION;
+using namespace KERNEL;
 
 View::View()
 {

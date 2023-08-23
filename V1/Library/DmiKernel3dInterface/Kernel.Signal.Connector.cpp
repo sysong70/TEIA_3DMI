@@ -1,8 +1,8 @@
 ﻿#include "StdAfx.h"
 
-#include "Session.Signal.Connector.h"
+#include "Kernel.Signal.Connector.h"
 
-using namespace SESSION;
+using namespace KERNEL;
 
 class ConnectorFunc
 {

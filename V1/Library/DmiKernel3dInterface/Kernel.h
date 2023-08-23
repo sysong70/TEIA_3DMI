@@ -2,21 +2,21 @@
 
 #include <Json.h>
 
-#include "Session.Application.h"
-#include "Session.View.h"
+#include "Kernel.Application.h"
+#include "Kernel.View.h"
 
-namespace SESSION
+namespace KERNEL
 {
-	class Session
+	class Kernel
 	{
 	public:
-		Session();
+		Kernel();
 
 		void ExecuteSignal(Json::Object & cInObject);
 
 	protected:
-		SESSION::Application m_cApplication;
-		SESSION::View m_cView;
+		KERNEL::Application m_cApplication;
+		KERNEL::View m_cView;
 
 	private:
 		//Interface * m_pc3dfInterface = nullptr;

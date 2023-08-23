@@ -22,11 +22,11 @@
     <Filter Include="_Common">
       <UniqueIdentifier>{77c7b70d-c426-4657-b3a0-3c5645d06a19}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Session">
-      <UniqueIdentifier>{d751b3d7-f946-4ee5-bbca-8c5ac048200c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="_Signal">
       <UniqueIdentifier>{5d11aacb-e91a-46c7-b75c-91011ddecd91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Kernel">
+      <UniqueIdentifier>{d751b3d7-f946-4ee5-bbca-8c5ac048200c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -39,7 +39,7 @@
     <ClInclude Include="DLL\Session.Interface.h">
       <Filter>DLL</Filter>
     </ClInclude>
-    <ClInclude Include="Session.SignalAnalyzer.h">
+    <ClInclude Include="Kernel.SignalAnalyzer.h">
       <Filter>Signal</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Common_Define.h">
@@ -54,19 +54,19 @@
     <ClInclude Include="..\Common\Fio.h">
       <Filter>_Common</Filter>
     </ClInclude>
-    <ClInclude Include="Session.h">
-      <Filter>Session</Filter>
+    <ClInclude Include="Kernel.h">
+      <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Session.Manager.h">
-      <Filter>Session</Filter>
+    <ClInclude Include="Kernel.Manager.h">
+      <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Session.Application.h">
-      <Filter>Session</Filter>
+    <ClInclude Include="Kernel.Application.h">
+      <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Session.View.h">
-      <Filter>Session</Filter>
+    <ClInclude Include="Kernel.View.h">
+      <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Session.Signal.Connector.h">
+    <ClInclude Include="Kernel.Signal.Connector.h">
       <Filter>Signal</Filter>
     </ClInclude>
     <ClInclude Include="..\Signal\Signal.h">
@@ -83,7 +83,7 @@
     <ClCompile Include="DLL\Session.Interface.cpp">
       <Filter>DLL</Filter>
     </ClCompile>
-    <ClCompile Include="Session.SignalAnalyzer.cpp">
+    <ClCompile Include="Kernel.SignalAnalyzer.cpp">
       <Filter>Signal</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Common_Define.cpp">
@@ -98,19 +98,19 @@
     <ClCompile Include="..\Common\Fio.cpp">
       <Filter>_Common</Filter>
     </ClCompile>
-    <ClCompile Include="Session.cpp">
-      <Filter>Session</Filter>
+    <ClCompile Include="Kernel.cpp">
+      <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="Session.Manager.cpp">
-      <Filter>Session</Filter>
+    <ClCompile Include="Kernel.Manager.cpp">
+      <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="Session.Application.cpp">
-      <Filter>Session</Filter>
+    <ClCompile Include="Kernel.Application.cpp">
+      <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="Session.View.cpp">
-      <Filter>Session</Filter>
+    <ClCompile Include="Kernel.View.cpp">
+      <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="Session.Signal.Connector.cpp">
+    <ClCompile Include="Kernel.Signal.Connector.cpp">
       <Filter>Signal</Filter>
     </ClCompile>
     <ClCompile Include="..\Signal\Signal.cpp">

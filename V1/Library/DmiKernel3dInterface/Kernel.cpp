@@ -1,15 +1,15 @@
 ﻿#include <StdAfx.h>
 
-#include "Session.h"
+#include "Kernel.h"
 
-using namespace SESSION;
+using namespace KERNEL;
 
-Session::Session()
+Kernel::Kernel()
 {
 
 }
 
-void Session::ExecuteSignal(Json::Object & cInObject)
+void Kernel::ExecuteSignal(Json::Object & cInObject)
 {
 	int nTarget = cInObject.GetInteger(SKW_TARGET);
 
