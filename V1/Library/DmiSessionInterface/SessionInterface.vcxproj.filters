@@ -22,6 +22,15 @@
     <Filter Include="_Common">
       <UniqueIdentifier>{77c7b70d-c426-4657-b3a0-3c5645d06a19}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Facility">
+      <UniqueIdentifier>{21c1f3b1-519e-4f1c-b396-61f6af3852aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Manager">
+      <UniqueIdentifier>{2e4e17c3-a6e6-4b8e-b306-3b14d138e65c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Command">
+      <UniqueIdentifier>{b3b8e6a4-8888-46d0-8f6e-a64d2bc80797}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -48,6 +57,36 @@
     <ClInclude Include="Session.SignalAnalyzer.h">
       <Filter>Signal</Filter>
     </ClInclude>
+    <ClInclude Include="Session.Facility.Preference.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="Session.Facility.ImportOption.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="Session.Facility.KernelOption.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="Session.Facility.AppOptions.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="Session.Facility.Base.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="Session.Facility.h">
+      <Filter>Facility</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager.Command.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager.Session.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager.Input.h">
+      <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.ViewControl.h">
+      <Filter>Command</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -73,6 +112,33 @@
     </ClCompile>
     <ClCompile Include="Session.SignalAnalyzer.cpp">
       <Filter>Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Session.Facility.Preference.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="Session.Facility.ImportOption.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="Session.Facility.KernelOption.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="Session.Facility.AppOptions.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="Session.Facility.Base.cpp">
+      <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager.Command.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager.Session.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager.Input.cpp">
+      <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.ViewControl.cpp">
+      <Filter>Command</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

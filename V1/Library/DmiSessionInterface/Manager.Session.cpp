@@ -1,32 +1,34 @@
-﻿#include "stdafx.h"
+﻿#include <StdAfx.h>
 
-#include "Session.SignalAnalyzer.h"
+#include "Manager.Session.h"
 
-#include "../Signal/Signal.h"
+ #include "../Signal/Signal.h"
 #include "../Common/Common_Define.h"
 
-using namespace Json;
-using namespace std::chrono;
+SESSION::Manager::Session theSessionManager;
 
-#define MSG_FILE_IMPORT_INFORMATION				(WM_USER + 1)
+using namespace SESSION;
 
-SESSION::SignalAnalyzer theSignalAnalyzer;
-
-SESSION::SignalAnalyzer::SignalAnalyzer()
+Manager::Session::Session()
 {
 	// Kernel DLL을 로드한다.
 	LoadSessionInterface("3DMIKernel3dInterface.DLL");
 }
 
-//== 명령어 처리 부분 =================================================================================
-
-void SESSION::SignalAnalyzer::ExecuteSignal(const wchar_t * pchBuffer)
+Manager::Session::~Session()
 {
-	m_pcSendSignal(pchBuffer);
- 	return;
+
 }
 
-void SESSION::SignalAnalyzer::SetSendSignalFunc(SendSignalFunc lpfnSignalCallback)
+//== 명령어 처리 부분 =================================================================================
+
+void Manager::Session::ExecuteSignal(const wchar_t * pchBuffer)
+{
+	m_pcSendSignal(pchBuffer);
+	return;
+}
+
+void Manager::Session::SetSendSignalFunc(SendSignalFunc lpfnSignalCallback)
 {
 	m_pcSetReceiver(lpfnSignalCallback);
 }
@@ -34,7 +36,7 @@ void SESSION::SignalAnalyzer::SetSendSignalFunc(SendSignalFunc lpfnSignalCallbac
 //== DLL 관련 함수 ===================================================================================
 
 // 1. DLL 로드
-bool SESSION::SignalAnalyzer::LoadSessionInterface(const CString & strFilePath)
+bool Manager::Session::LoadSessionInterface(const CString & strFilePath)
 {
 	m_hInstance = ::LoadLibrary(strFilePath);
 	if (m_hInstance == nullptr) {
