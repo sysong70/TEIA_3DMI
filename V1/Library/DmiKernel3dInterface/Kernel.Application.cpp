@@ -43,19 +43,5 @@ void Application::ExecuteSignal(Json::Object & cInObject)
 		default:
 			assert(false);
 			break;
-
-/*
-		case Signal::Target::Application:
-			m_cApplication.ExecuteSignal(cInObject);
-			break;
-
-		case Signal::Target::View:
-			m_cViewManager.ExecuteSignal(cInObject);
-			break;
-
-		default:
-			assert(false);
-			break;
-*/
 	}
 }

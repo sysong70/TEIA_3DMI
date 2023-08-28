@@ -100,7 +100,7 @@ public:
 
 	bool MouseMove(int nFlags, int x, int y);
 
-	bool MouseWheel(int nFlags, int zDelta, int x, int y, Json::Object & cInObject);
+	bool MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop);
 
 	//== Keyboard 관련 함수 ==========================================================================
 	bool Char(UINT nChar, UINT nRepCnt, UINT nFlags);

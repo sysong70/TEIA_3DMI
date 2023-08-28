@@ -4,7 +4,6 @@
 
 #include "Json.h"
 
-#include "../DmiKernel3dInterface/Kernel.SignalAnalyzer.h"
 #include "3DX.C3DImport.h"
 
 using namespace Json;

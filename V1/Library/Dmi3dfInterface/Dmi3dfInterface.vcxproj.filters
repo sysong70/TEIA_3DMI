@@ -87,15 +87,6 @@
     <ClInclude Include="..\Common\WStr.h">
       <Filter>_Common</Filter>
     </ClInclude>
-    <ClInclude Include="3DF.Signal.Manager.h">
-      <Filter>Signal</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF.Signal.ApplicationManager.h">
-      <Filter>Signal</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF.Signal.ViewManager.h">
-      <Filter>Signal</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\3DF.Canvas.h">
       <Filter>3DF\Base</Filter>
     </ClInclude>
@@ -103,9 +94,6 @@
       <Filter>3DF\Base</Filter>
     </ClInclude>
     <ClInclude Include="3DF.Signal.h">
-      <Filter>Signal</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF.Signal.Interface.h">
       <Filter>Signal</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.Selectability.h">
@@ -279,13 +267,10 @@
     <ClInclude Include="3DF\Private\3DF.HighlightPrivate.h">
       <Filter>3DF\Control\Private</Filter>
     </ClInclude>
-    <ClInclude Include="3DF.Component.Application.h">
+    <ClInclude Include="Component.Application.h">
       <Filter>Component</Filter>
     </ClInclude>
-    <ClInclude Include="3DF.Component.h">
-      <Filter>Component</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF.Component.View.h">
+    <ClInclude Include="Component.View.h">
       <Filter>Component</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.Facility.AppOptions.h">
@@ -332,23 +317,11 @@
     <ClCompile Include="..\Common\WStr.cpp">
       <Filter>_Common</Filter>
     </ClCompile>
-    <ClCompile Include="3DF.Signal.Manager.cpp">
-      <Filter>Signal</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF.Signal.ApplicationManager.cpp">
-      <Filter>Signal</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF.Signal.ViewManager.cpp">
-      <Filter>Signal</Filter>
-    </ClCompile>
     <ClCompile Include="3DF\3DF.Canvas.cpp">
       <Filter>3DF\Base</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Model.cpp">
       <Filter>3DF\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF.Signal.Interface.cpp">
-      <Filter>Signal</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Selectability.cpp">
       <Filter>3DF\Control</Filter>
@@ -512,10 +485,10 @@
     <ClCompile Include="3DF\Private\3DF.HighlightPrivate.cpp">
       <Filter>3DF\Control\Private</Filter>
     </ClCompile>
-    <ClCompile Include="3DF.Component.Application.cpp">
+    <ClCompile Include="Component.Application.cpp">
       <Filter>Component</Filter>
     </ClCompile>
-    <ClCompile Include="3DF.Component.View.cpp">
+    <ClCompile Include="Component.View.cpp">
       <Filter>Component</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Facility.AppOptions.cpp">

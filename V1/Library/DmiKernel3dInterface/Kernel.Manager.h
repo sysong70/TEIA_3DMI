@@ -9,7 +9,7 @@ namespace KERNEL
 	class Kernel;
 
 	using SendSignalFunc = void (*)(const wchar_t *);
-	using AssignSendSignalFunc = void (*)(SendSignalFunc);
+	//using AssignSendSignalFunc = void (*)(SendSignalFunc);
 
 	class Manager
 	{

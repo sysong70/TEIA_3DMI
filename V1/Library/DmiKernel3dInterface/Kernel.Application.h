@@ -2,7 +2,7 @@
 
 #include <Json.h>
 
-#include "../Dmi3dfInterface/3DF.Component.Application.h"
+#include "../Dmi3dfInterface/Component.Application.h"
 
 namespace KERNEL
 {

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "Manager.Base.h"
+
 #include "Json.h"
 
 #include <map>
@@ -8,7 +10,7 @@ namespace SESSION
 {
 	namespace Manager
 	{
-		class Input
+		class Input : public Base
 		{
 		public:
 			Input();

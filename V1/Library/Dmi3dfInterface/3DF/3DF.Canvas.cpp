@@ -1251,15 +1251,8 @@ bool Canvas::MouseMove(int nFlags, int x, int y)
 }
 
 // Mouse Wheel 대응
-bool Canvas::MouseWheel(int nFlags, int zDelta, int x, int y, Json::Object & cInObject)
+bool Canvas::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop)
 {
-	Json::Array & cArray = cInObject.GetArray(SKW_RECT);
-
-	int nLeft = cArray[0]->ToInteger();
-	int nTop = cArray[1]->ToInteger();
-
-	//HBaseOperator * pcOperator = GetBaseView()->GetOperator();
-
 	HEventInfo	cEvent(GetBaseView());
 	cEvent.SetPoint(HE_MouseWheel, x - nLeft, y - nTop, MouseMapFlags(nFlags));
 	cEvent.SetMouseWheelDelta(zDelta);

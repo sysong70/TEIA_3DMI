@@ -1,11 +1,11 @@
 ﻿#pragma once
 
+#include "3DF/3DF.h"
+
 #include <Json.h>
 
 #include <map>
 #include <chrono>
-
-#include "3DF.Component.h"
 
 #include "../Signal/Signal.h"
 

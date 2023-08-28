@@ -2,7 +2,7 @@
 
 #include "3DF.Signal.Connector.h"
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
 class ConnectorFunc
 {

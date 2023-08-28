@@ -118,6 +118,7 @@
     <ClInclude Include="..\Common\Json.h" />
     <ClInclude Include="..\Common\WStr.h" />
     <ClInclude Include="Command.ViewControl.h" />
+    <ClInclude Include="Manager.Base.h" />
     <ClInclude Include="Manager.Command.h" />
     <ClInclude Include="Manager.Input.h" />
     <ClInclude Include="Manager.Session.h" />
@@ -127,9 +128,8 @@
     <ClInclude Include="Session.Facility.ImportOption.h" />
     <ClInclude Include="Session.Facility.KernelOption.h" />
     <ClInclude Include="Session.Facility.Preference.h" />
-    <ClInclude Include="Session.Interface.h" />
+    <ClInclude Include="Interface.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="Session.SignalAnalyzer.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -138,6 +138,7 @@
     <ClCompile Include="..\Common\Json.cpp" />
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="Command.ViewControl.cpp" />
+    <ClCompile Include="Manager.Base.cpp" />
     <ClCompile Include="Manager.Command.cpp" />
     <ClCompile Include="Manager.Input.cpp" />
     <ClCompile Include="Manager.Session.cpp" />
@@ -146,9 +147,8 @@
     <ClCompile Include="Session.Facility.ImportOption.cpp" />
     <ClCompile Include="Session.Facility.KernelOption.cpp" />
     <ClCompile Include="Session.Facility.Preference.cpp" />
-    <ClCompile Include="Session.Interface.cpp" />
+    <ClCompile Include="Interface.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Session.SignalAnalyzer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>

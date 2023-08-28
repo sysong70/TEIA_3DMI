@@ -30,21 +30,20 @@ namespace H3DF
 			void CancelCommands();
 
 			//== Mouse 관련 함수 =============================================================================
-			bool ExecuteMouseSignal(int nAction, Json::Object & cInObject);
+			//bool ExecuteMouseSignal(int nAction, Json::Object & cInObject);
 
-		protected:
-			bool LButtonUp(H3DF::Canvas * pcCanvas, int nFlags, int x, int y);
-			bool LButtonDown(H3DF::Canvas * pcCanvas, int nFlags, int x, int y);
+			bool LButtonUp(int nFlags, int x, int y);
+			bool LButtonDown(int nFlags, int x, int y);
 
-			bool MButtonUp(H3DF::Canvas * pcCanvas, int nFlags, int x, int y);
-			bool MButtonDown(H3DF::Canvas * pcCanvas, int nFlags, int x, int y);
+			bool MButtonUp(int nFlags, int x, int y);
+			bool MButtonDown(int nFlags, int x, int y);
 
-			bool RButtonUp(H3DF::Canvas * pcCanvas, int nFlags, int x, int y);
-			bool RButtonDown(H3DF::Canvas * pcCanvas, int nFlags, int x, int y);
+			bool RButtonUp(int nFlags, int x, int y);
+			bool RButtonDown(int nFlags, int x, int y);
 
-			bool MouseMove(H3DF::Canvas * pcCanvas, int nFlags, int x, int y);
+			bool MouseMove(int nFlags, int x, int y);
 
-			bool MouseWheel(H3DF::Canvas * pcCanvas, int nFlags, int zDelta, int x, int y, Json::Object & cInObject);
+			bool MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop);
 
 		public:
 			//:Ken - 20230607

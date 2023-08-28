@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "3DF.Component.View.h"
+#include "Component.View.h"
 
 #include "3DF.Signal.Interface.h"
 #include "3DF.Signal.Manager.h"
@@ -267,6 +267,7 @@ void Component::View::CancelCommands()
 // == Action Function ==============================================================================
 
 // 1. Action Signal 처리 함수
+/*
 bool Component::View::ExecuteMouseSignal(int nAction, Json::Object & cInObject)
 {
 	H3DF::Canvas * pcCanvas = m_pcCanvas;
@@ -319,18 +320,19 @@ bool Component::View::ExecuteMouseSignal(int nAction, Json::Object & cInObject)
 
 	return false;
 }
+*/
 
 // 2. Left Button 처리 함수
-bool Component::View::LButtonDown(H3DF::Canvas* pcCanvas, int nFlags, int x, int y)
+bool Component::View::LButtonDown(int nFlags, int x, int y)
 {
-	assert(pcCanvas);
-	return pcCanvas->LButtonDown(nFlags, x, y);
+	assert(m_pcCanvas);
+	return m_pcCanvas->LButtonDown(nFlags, x, y);
 }
 
-bool Component::View::LButtonUp(H3DF::Canvas* pcCanvas, int nFlags, int x, int y)
+bool Component::View::LButtonUp(int nFlags, int x, int y)
 {
-	assert(pcCanvas);
-	return pcCanvas->LButtonUp(nFlags, x, y);
+	assert(m_pcCanvas);
+	return m_pcCanvas->LButtonUp(nFlags, x, y);
 	/*
 		DmiHpsView * pcHpsView = m_mapcModelHandlerMap[nId]->GetHpsView();
 		CHECK_DWORD_PTR(pcHpsView);
@@ -344,45 +346,45 @@ bool Component::View::LButtonUp(H3DF::Canvas* pcCanvas, int nFlags, int x, int y
 }
 
 // 3. Middle Button 처리 함수
-bool Component::View::MButtonDown(H3DF::Canvas* pcCanvas, int nFlags, int x, int y)
+bool Component::View::MButtonDown(int nFlags, int x, int y)
 {
-	assert(pcCanvas);
+	assert(m_pcCanvas);
 	return true;
 	//return pcCanvas->MButtonDown(nFlags, x, y);
 }
 
-bool Component::View::MButtonUp(H3DF::Canvas* pcCanvas, int nFlags, int x, int y)
+bool Component::View::MButtonUp(int nFlags, int x, int y)
 {
-	assert(pcCanvas);
+	assert(m_pcCanvas);
 	return true;
 	//return pcCanvas->MButtonUp(nFlags, x, y);
 }
 
 // 4. Right Button 처리 함수
-bool Component::View::RButtonUp(H3DF::Canvas* pcCanvas, int nFlags, int x, int y)
+bool Component::View::RButtonUp(int nFlags, int x, int y)
 {
-	assert(pcCanvas);
-	return pcCanvas->RButtonUp(nFlags, x, y);
+	assert(m_pcCanvas);
+	return m_pcCanvas->RButtonUp(nFlags, x, y);
 }
 
-bool Component::View::RButtonDown(H3DF::Canvas* pcCanvas, int nFlags, int x, int y)
+bool Component::View::RButtonDown(int nFlags, int x, int y)
 {
-	assert(pcCanvas);
-	return pcCanvas->RButtonDown(nFlags, x, y);
+	assert(m_pcCanvas);
+	return m_pcCanvas->RButtonDown(nFlags, x, y);
 }
 
 // 5. Mouse Move 처리 함수
-bool Component::View::MouseMove(H3DF::Canvas* pcCanvas, int nFlags, int x, int y)
+bool Component::View::MouseMove(int nFlags, int x, int y)
 {
-	assert(pcCanvas);
-	return pcCanvas->MouseMove(nFlags, x, y);
+	assert(m_pcCanvas);
+	return m_pcCanvas->MouseMove(nFlags, x, y);
 }
 
 // 6. Mouse Wheel 처리 함수
-bool Component::View::MouseWheel(H3DF::Canvas* pcCanvas, int nFlags, int zDelta, int x, int y, Json::Object& cInObject)
+bool Component::View::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop)
 {
-	assert(pcCanvas);
-	return pcCanvas->MouseWheel(nFlags, zDelta, x, y, cInObject);
+	assert(m_pcCanvas);
+	return m_pcCanvas->MouseWheel(nFlags, zDelta, x, y, nLeft, nTop);
 }
 
 bool Component::View::ExecuteKeyboardSignal(int nAction, Json::Object& cInObject)

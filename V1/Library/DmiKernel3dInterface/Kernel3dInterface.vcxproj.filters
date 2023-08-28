@@ -28,6 +28,9 @@
     <Filter Include="Kernel">
       <UniqueIdentifier>{d751b3d7-f946-4ee5-bbca-8c5ac048200c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Session">
+      <UniqueIdentifier>{f7853dbd-cb1d-43ca-a86c-8cd144e97793}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -35,12 +38,6 @@
     </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="DLL\Session.Interface.h">
-      <Filter>DLL</Filter>
-    </ClInclude>
-    <ClInclude Include="Kernel.SignalAnalyzer.h">
-      <Filter>Signal</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Common_Define.h">
       <Filter>_Common</Filter>
@@ -72,6 +69,12 @@
     <ClInclude Include="..\Signal\Signal.h">
       <Filter>_Signal</Filter>
     </ClInclude>
+    <ClInclude Include="Manager.Session.h">
+      <Filter>Session</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface.h">
+      <Filter>DLL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -79,12 +82,6 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="DLL\Session.Interface.cpp">
-      <Filter>DLL</Filter>
-    </ClCompile>
-    <ClCompile Include="Kernel.SignalAnalyzer.cpp">
-      <Filter>Signal</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Common_Define.cpp">
       <Filter>_Common</Filter>
@@ -115,6 +112,12 @@
     </ClCompile>
     <ClCompile Include="..\Signal\Signal.cpp">
       <Filter>_Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager.Session.cpp">
+      <Filter>Session</Filter>
+    </ClCompile>
+    <ClCompile Include="Interface.cpp">
+      <Filter>DLL</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
