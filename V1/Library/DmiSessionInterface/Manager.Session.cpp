@@ -24,21 +24,31 @@ Manager::Session::Session()
 
 Manager::Session::~Session()
 {
-
+	// DLL을 해제한다.
+	Free3dKernelInterface();
 }
 
 //== 명령어 처리 부분 =================================================================================
 
 void Manager::Session::ExecuteSignal(const wchar_t * pchBuffer)
 {
-// 	Json::Object cObject;
-// 	Json::Reader::ReadObject((wchar_t *&)pchBuffer, cObject);
-// 
-// 	int nViewId = cObject.GetInteger(SKW_VIEWID);
-// 	int nTarget = cObject.GetInteger(SKW_TARGET);
+	size_t nBufferSize = wcslen(pchBuffer) + 1; // 널 종료 문자('\0')를 포함해서 크기 계산
+
+	// 대상 문자열에 충분한 메모리 할당
+	wchar_t * pchCopyBuffer = new wchar_t[nBufferSize];
+	if (nullptr == pchCopyBuffer) {
+		wprintf(L"메모리 할당 실패\n");
+		return;
+	}
+
+	// 문자열 복사
+	wcscpy(pchCopyBuffer, pchBuffer);
+
+	Json::Object cObject;
+	// ReadObject에 buffer에 내용을 전달하고 나오면 buffer는 empty됨.
+	Json::Reader::ReadObject((wchar_t *&)pchBuffer, cObject);
 
 	m_pcSendSignalTo3dKernel(pchBuffer);
-	return;
 }
 
 void Manager::Session::SetSendSignalFunc(SendSignalFunc lpfnSignalCallback)
@@ -74,4 +84,11 @@ bool Manager::Session::Load3dKernelInterface(const CString & strFilePath)
 	m_bIsValid = true;
 
 	return true;
+}
+
+void Manager::Session::Free3dKernelInterface()
+{
+	if (nullptr != m_hInstance) {
+		::FreeLibrary(m_hInstance);
+	}
 }

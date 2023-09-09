@@ -29,7 +29,6 @@
 #include <HEventManager.h>
 #include <HConstantFrameRate.h>
 
-
 #include "3DF.Painter.h"
 #include "3DF.Facility.AppOptions.h"
 

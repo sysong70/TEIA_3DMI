@@ -25,6 +25,7 @@ namespace SESSION
 
 		protected:
 			bool Load3dKernelInterface(const CString & strFilePath);
+			void Free3dKernelInterface();
 
 		private:
 			bool m_bIsValid = false;

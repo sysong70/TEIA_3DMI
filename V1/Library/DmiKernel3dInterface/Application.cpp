@@ -1,6 +1,6 @@
 ﻿#include <StdAfx.h>
 
-#include "Kernel.Application.h"
+#include "Application.h"
 
 #include "../Signal/Signal.h"
 #include "../Common/Common_Define.h"

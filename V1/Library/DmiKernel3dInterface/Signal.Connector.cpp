@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "Kernel.Signal.Connector.h"
+#include "Signal.Connector.h"
 
 using namespace KERNEL;
 

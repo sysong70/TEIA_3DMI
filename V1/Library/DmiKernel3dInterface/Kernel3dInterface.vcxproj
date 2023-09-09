@@ -120,14 +120,14 @@
     <ClInclude Include="..\Signal\Signal.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Interface.h" />
-    <ClInclude Include="Kernel.Application.h" />
+    <ClInclude Include="Application.h" />
     <ClInclude Include="Kernel.h" />
-    <ClInclude Include="Kernel.Manager.h" />
-    <ClInclude Include="Kernel.Signal.Connector.h">
+    <ClInclude Include="Manager.h" />
+    <ClInclude Include="Signal.Connector.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="Kernel.View.h" />
-    <ClInclude Include="Manager.Session.h" />
+    <ClInclude Include="View.h" />
+    <ClInclude Include="Interface.Session.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -138,14 +138,14 @@
     <ClCompile Include="..\Signal\Signal.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Interface.cpp" />
-    <ClCompile Include="Kernel.Application.cpp" />
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="Kernel.cpp" />
-    <ClCompile Include="Kernel.Manager.cpp" />
-    <ClCompile Include="Kernel.Signal.Connector.cpp">
+    <ClCompile Include="Manager.cpp" />
+    <ClCompile Include="Signal.Connector.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Kernel.View.cpp" />
-    <ClCompile Include="Manager.Session.cpp" />
+    <ClCompile Include="View.cpp" />
+    <ClCompile Include="Interface.Session.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>

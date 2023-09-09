@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 #include "Component.View.h"
 
-#include "3DF.Signal.Interface.h"
-#include "3DF.Signal.Manager.h"
+// #include "3DF.Signal.Interface.h"
+// #include "3DF.Signal.Manager.h"
 #include "3DF.Signal.Connector.h"
 
 #include <Common_Define.h>

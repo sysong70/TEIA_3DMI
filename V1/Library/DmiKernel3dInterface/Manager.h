@@ -27,6 +27,6 @@ namespace KERNEL
 		// 생성되는 Session들을 저장하는 Map 컨테이너
 		std::map<int, Kernel *> m_mpcSessions;
 	};
-};
+}
 
 extern KERNEL::Manager theKernelManager;

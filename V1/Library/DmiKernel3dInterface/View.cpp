@@ -1,8 +1,8 @@
 ﻿#include <StdAfx.h>
 
-#include "Kernel.View.h"
+#include "View.h"
 
-#include "Kernel.Signal.Connector.h"
+#include "Signal.Connector.h"
 
 #include "../Signal/Signal.h"
 #include "../Common/Common_Define.h"

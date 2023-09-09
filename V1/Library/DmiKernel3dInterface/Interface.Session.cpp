@@ -1,22 +1,22 @@
 ﻿#include <StdAfx.h>
 
-#include "Manager.Session.h"
+#include "Interface.Session.h"
 
-#include "Kernel.Signal.Connector.h"
+#include "Signal.Connector.h"
 
  #include "../Signal/Signal.h"
 #include "../Common/Common_Define.h"
 
-KERNEL::Manager::Session theSessionManager;
+KERNEL::Interface::Session theSessionInterface;
 
 using namespace KERNEL;
 
-KERNEL::Manager::Session::Session()
+KERNEL::Interface::Session::Session()
 {
 
 }
 
-KERNEL::Manager::Session::~Session()
+KERNEL::Interface::Session::~Session()
 {
 
 }
@@ -24,7 +24,7 @@ KERNEL::Manager::Session::~Session()
 //== 명령어 처리 함수 =================================================================================
 
 // 1. 전달받은 신호를 처리하는 부분
-void KERNEL::Manager::Session::ExecuteSignal(const wchar_t * pchBuffer)
+void KERNEL::Interface::Session::ExecuteSignal(const wchar_t * pchBuffer)
 {
 	Json::Object cObject;
 	Json::Reader::ReadObject((wchar_t *&)pchBuffer, cObject);
@@ -48,7 +48,7 @@ void KERNEL::Manager::Session::ExecuteSignal(const wchar_t * pchBuffer)
 
 // 1-1. 전달받은 View Signal을 처리한다.
 // Map에서 View Id를 검색하고 없는 경우에 생성하고 있는 경우에는 Signal을 전달한다.
-void KERNEL::Manager::Session::ExecuteViewSignal(Json::Object & cObject)
+void KERNEL::Interface::Session::ExecuteViewSignal(Json::Object & cObject)
 {
 	int nViewId = cObject.GetInteger(SKW_VIEWID);
 
@@ -67,7 +67,7 @@ void KERNEL::Manager::Session::ExecuteViewSignal(Json::Object & cObject)
 	pcView->ExecuteSignal(cObject);
 }
 
-void KERNEL::Manager::Session::SetSendSignalFunc(SendSignalFunc pcSendSignalFunc)
+void KERNEL::Interface::Session::SetSendSignalFunc(SendSignalFunc pcSendSignalFunc)
 {
 	m_pcSendSignalFunc = pcSendSignalFunc;
 	Connector::SetSender(pcSendSignalFunc);

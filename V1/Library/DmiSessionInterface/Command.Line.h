@@ -9,11 +9,11 @@ namespace SESSION
 {
 	namespace Command
 	{
-		class ViewControl : public Root
+		class Line : public Root
 		{
 		public:
-			ViewControl();
-			~ViewControl();
+			Line();
+			~Line();
 		};
 	}
 }

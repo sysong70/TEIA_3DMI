@@ -54,22 +54,22 @@
     <ClInclude Include="Kernel.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Kernel.Manager.h">
+    <ClInclude Include="Manager.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Kernel.Application.h">
+    <ClInclude Include="Application.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Kernel.View.h">
+    <ClInclude Include="View.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Kernel.Signal.Connector.h">
+    <ClInclude Include="Signal.Connector.h">
       <Filter>Signal</Filter>
     </ClInclude>
     <ClInclude Include="..\Signal\Signal.h">
       <Filter>_Signal</Filter>
     </ClInclude>
-    <ClInclude Include="Manager.Session.h">
+    <ClInclude Include="Interface.Session.h">
       <Filter>Session</Filter>
     </ClInclude>
     <ClInclude Include="Interface.h">
@@ -98,22 +98,22 @@
     <ClCompile Include="Kernel.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="Kernel.Manager.cpp">
+    <ClCompile Include="Manager.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="Kernel.Application.cpp">
+    <ClCompile Include="Application.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="Kernel.View.cpp">
+    <ClCompile Include="View.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="Kernel.Signal.Connector.cpp">
+    <ClCompile Include="Signal.Connector.cpp">
       <Filter>Signal</Filter>
     </ClCompile>
     <ClCompile Include="..\Signal\Signal.cpp">
       <Filter>_Signal</Filter>
     </ClCompile>
-    <ClCompile Include="Manager.Session.cpp">
+    <ClCompile Include="Interface.Session.cpp">
       <Filter>Session</Filter>
     </ClCompile>
     <ClCompile Include="Interface.cpp">

@@ -2,8 +2,8 @@
 
 #include <Json.h>
 
-#include "Kernel.Application.h"
-#include "Kernel.View.h"
+#include "Application.h"
+#include "View.h"
 
 namespace KERNEL
 {

@@ -1,9 +1,9 @@
 ﻿#include <StdAfx.h>
 
-#include "Kernel.Manager.h"
+#include "Manager.h"
 
 #include "Kernel.h"
-#include "Kernel.Signal.Connector.h"
+#include "Signal.Connector.h"
 
 #include "../Signal/Signal.h"
 #include "../Common/Common_Define.h"

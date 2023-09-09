@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "Kernel.Application.h"
-#include "Kernel.View.h"
+#include "Application.h"
+#include "View.h"
 
 #include "Json.h"
 
@@ -9,7 +9,7 @@
 
 namespace KERNEL
 {
-	namespace Manager
+	namespace Interface
 	{
 		using SendSignalFunc = void (*)(const wchar_t *);
 
@@ -42,4 +42,4 @@ namespace KERNEL
 	}
 }
 
-extern KERNEL::Manager::Session theSessionManager;
+extern KERNEL::Interface::Session theSessionInterface;
