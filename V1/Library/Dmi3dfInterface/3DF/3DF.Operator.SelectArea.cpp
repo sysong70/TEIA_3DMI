@@ -2,7 +2,7 @@
 
 #include "3DF.Operator.SelectArea.h"
 
-#include "3DF.Canvas.h"
+#include "Canvas.h"
 #include "3DF.Selection.h"
 
 #include <HTools.h>

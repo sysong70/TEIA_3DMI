@@ -3,9 +3,9 @@
 #include <vector>
 #include <atlstr.h>
 
-#include "3DF.Math.h"
-#include "3DF.Math.Matrix.h"
-#include "3DF.Point.h"
+#include "Math.h"
+#include "Math.Matrix.h"
+#include "Point.h"
 
 class HBaseView;
 

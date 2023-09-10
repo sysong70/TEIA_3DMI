@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.Key.h"
+#include "Key.h"
 #include "Private/3DF.KeyPrivate.h"
 
 #include "3DF.Segment.h"

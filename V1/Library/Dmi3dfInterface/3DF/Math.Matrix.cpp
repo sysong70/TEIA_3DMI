@@ -1,8 +1,8 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.Math.Matrix.h"
+#include "Math.Matrix.h"
 
-#include "3DF.Point.h"
+#include "Point.h"
 
 #include <hc.h>
 

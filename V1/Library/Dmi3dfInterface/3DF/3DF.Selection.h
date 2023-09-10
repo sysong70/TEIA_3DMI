@@ -6,12 +6,12 @@
 #include <HSelectionSet.h>
 
 #include "3DF.h"
-#include "3DF.KeyPath.h"
-#include "3DF.Kit.h"
-#include "3DF.Control.h"
+#include "KeyPath.h"
+#include "Kit.h"
+#include "Control.h"
 
-#include "3DF.Math.h"
-#include "3DF.Point.h"
+#include "Math.h"
+#include "Point.h"
 
 #include <vector>
 

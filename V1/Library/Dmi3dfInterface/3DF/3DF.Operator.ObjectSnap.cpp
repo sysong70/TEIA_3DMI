@@ -1,16 +1,16 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.Window.h"
-#include "3DF.BaseView.h"
+#include "Window.h"
+#include "BaseView.h"
 
 #include "3DF.Line.h"
 #include "3DF.Circle.h"
-#include "3DF.Point.h"
+#include "Point.h"
 
-#include "3DF.Math.Matrix.h"
+#include "Math.Matrix.h"
 
-#include "3DF.Camera.h"
-#include "3DF.Color.h"
+#include "Camera.h"
+#include "Color.h"
 #include "3DF.Material.h"
 
 #include "3DF.Visibility.h"
@@ -29,7 +29,7 @@
 #include <HEventManager.h>
 #include <HConstantFrameRate.h>
 
-#include "3DF.Painter.h"
+#include "Painter.h"
 #include "3DF.Facility.AppOptions.h"
 
 #include <unordered_set>

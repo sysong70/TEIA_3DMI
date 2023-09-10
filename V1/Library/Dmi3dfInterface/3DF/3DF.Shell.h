@@ -2,7 +2,7 @@
 
 #include "3DF.Geometry.h"
 
-#include "3DF.Math.h"
+#include "Math.h"
 
 #include "3DF.Material.h"
 

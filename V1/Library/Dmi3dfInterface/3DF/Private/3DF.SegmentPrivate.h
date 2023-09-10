@@ -2,7 +2,7 @@
 
 #include "../3DF.h"
 #include "../3DF.Object.h"
-#include "../3DF.Color.h"
+#include "../Color.h"
 
 #include "3DF.KeyPrivate.h"
 

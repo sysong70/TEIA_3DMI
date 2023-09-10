@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include "../3DF.h"
-#include "../3DF.Kit.h"
-#include "../3DF.Control.h"
+#include "../Kit.h"
+#include "../Control.h"
 #include "../3DF.Search.h"
 
 OPEN_3DF_NAMESPACE

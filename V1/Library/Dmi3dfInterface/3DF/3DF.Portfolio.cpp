@@ -5,7 +5,7 @@
 #include "3DF.Segment.h"
 #include "./Private/3DF.SegmentPrivate.h"
 
-#include "3DF.Style.h"
+#include "Style.h"
 
 #include <HTools.h>
 

@@ -1,8 +1,8 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.BaseView.h"
+#include "BaseView.h"
 
-#include "3DF.NavigationCube.h"
+#include "NavigationCube.h"
 
 #include <HBaseModel.h>
 

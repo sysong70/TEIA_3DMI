@@ -1,17 +1,17 @@
 ﻿#pragma once
 
-#include "3DF.Key.h"
+#include "Key.h"
 
 #include "3DF.Include.h"
 #include "3DF.Shell.h"
 #include "3DF.EdgeAttribute.h"
 //#include "3DF.Portfolio.h"
-#include "3DF.Style.h"
+#include "Style.h"
 #include "3DF.Search.h"
 
 #include "3DF.Marker.h"
 
-#include "3DF.Math.Matrix.h"
+#include "Math.Matrix.h"
 
 OPEN_3DF_NAMESPACE
 

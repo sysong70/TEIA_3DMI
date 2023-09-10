@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "3DF.h"
-#include "3DF.BaseView.h"
+#include "BaseView.h"
 #include "3DF.Segment.h"
 #include "3DF.Selection.h"
 

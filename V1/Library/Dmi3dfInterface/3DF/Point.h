@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "3DF.h"
-#include "3DF.Math.h"
+#include "Math.h"
 
 #include "HTools.h"
 #include "HGlobals.h"

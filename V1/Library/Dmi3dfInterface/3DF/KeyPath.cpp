@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.KeyPath.h"
+#include "KeyPath.h"
 
 #include "3DF.Segment.h"
 #include "3DF.Selectability.h"

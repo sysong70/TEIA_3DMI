@@ -2,7 +2,7 @@
 
 #include "3DF.Polygon.h"
 
-#include "3DF.Math.h"
+#include "Math.h"
 
 USING_3DF_NAMESPACE
 

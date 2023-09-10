@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.Style.h"
+#include "Style.h"
 #include "3DF.Segment.h"
 #include "3DF.Portfolio.h"
 

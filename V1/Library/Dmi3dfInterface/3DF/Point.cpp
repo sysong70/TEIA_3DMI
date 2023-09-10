@@ -1,8 +1,8 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.Point.h"
+#include "Point.h"
 
-#include "3DF.Window.h"
+#include "Window.h"
 
 USING_3DF_NAMESPACE
 

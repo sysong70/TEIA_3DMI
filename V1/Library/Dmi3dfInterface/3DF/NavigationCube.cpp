@@ -1,9 +1,9 @@
 ﻿#include "StdAfx.h"
-#include "3DF.NavigationCube.h"
-#include "3DF.Painter.h"
+#include "NavigationCube.h"
+#include "Painter.h"
 
-#include "3DF.KeyPath.h"
-#include "3DF.Window.h"
+#include "KeyPath.h"
+#include "Window.h"
 
 #include "3DF.Selection.h"
 #include "3DF.Facility.AppOptions.h"

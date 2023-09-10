@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "3DF.h"
-#include "3DF.Control.h"
+#include "Control.h"
 
 #include "3DF.Marker.h"
 

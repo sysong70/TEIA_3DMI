@@ -2,10 +2,10 @@
 
 #include "3DF.h"
 #include "3DF.Segment.h"
-#include "3DF.Math.h"
-#include "3DF.Math.Matrix.h"
+#include "Math.h"
+#include "Math.Matrix.h"
 
-#include "3DF.Color.h"
+#include "Color.h"
 
 #include <atlstr.h>
 

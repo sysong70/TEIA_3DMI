@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "3DF.Segment.h"
-#include "3DF.Control.h"
+#include "Control.h"
 
 #include <deque>
 

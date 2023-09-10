@@ -2,12 +2,12 @@
 
 #include "3DF.h"
 
-#include "3DF.Kit.h"
+#include "Kit.h"
 #include "3DF.Geometry.h"
 
-#include "3DF.Math.h"
+#include "Math.h"
 
-#include "3DF.Color.h"
+#include "Color.h"
 
 
 #include <atlcoll.h>

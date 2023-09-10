@@ -3,10 +3,10 @@
 #include <Json.h>
 
 #include "3DF.h"
-#include "3DF.BaseView.h"
+#include "BaseView.h"
 #include "3DF.Facility.AppOptions.h"
 
-#include "3DF.NavigationCube.h"
+#include "NavigationCube.h"
 
 #include <HSelectionSet.h>
 

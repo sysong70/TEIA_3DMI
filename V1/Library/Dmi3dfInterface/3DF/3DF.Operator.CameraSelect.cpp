@@ -3,10 +3,10 @@
 #include "3DF.Operator.CameraSelect.h"
 #include "Private/3DF.SelectionPrivate.h"
 
-#include "3DF.Window.h"
+#include "Window.h"
 #include "3DF.Line.h"
 
-#include "3DF.Camera.h"
+#include "Camera.h"
 
 #include "3DF.Operator.ObjectSnap.h"
 

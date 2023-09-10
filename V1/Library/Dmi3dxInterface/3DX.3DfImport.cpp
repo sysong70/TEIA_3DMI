@@ -10,13 +10,13 @@
 
 #include <3DF/3DF.Material.h>
 #include <3DF/3DF.Portfolio.h>
-#include <3DF/3DF.Style.h>
+#include <3DF/Style.h>
 #include <3DF/3DF.Shell.h>
 #include <3DF/3DF.Line.h>
 #include <3DF/3DF.Polygon.h>
-#include <3DF/3DF.Bounding.h>
+#include <3DF/Bounding.h>
 
-#include <3DF/3DF.Math.Matrix.h>
+#include <3DF/Math.Matrix.h>
 
 #include <3DF/3DF.Visibility.h>
 #include <3DF/3DF.MarkerAttribute.h>

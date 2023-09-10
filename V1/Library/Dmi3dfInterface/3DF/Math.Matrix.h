@@ -2,7 +2,7 @@
 
 #include "3DF.h"
 
-#include "3DF.Math.h"
+#include "Math.h"
 
 OPEN_3DF_NAMESPACE
 

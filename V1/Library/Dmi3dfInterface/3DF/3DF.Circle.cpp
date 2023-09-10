@@ -2,8 +2,8 @@
 
 #include "3DF.Circle.h"
 
-#include "3DF.Math.h"
-#include "3DF.Point.h"
+#include "Math.h"
+#include "Point.h"
 
 #include "Private/3DF.KeyPrivate.h"
 

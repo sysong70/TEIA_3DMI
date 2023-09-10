@@ -1,12 +1,12 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.Window.h"
+#include "Window.h"
 #include "Private/3DF.WindowPrivate.h"
 
 #include "Private/3DF.SelectionPrivate.h"
 #include "Private/3DF.HighlightPrivate.h"
 
-#include "3DF.BaseView.h"
+#include "BaseView.h"
 
 #include <hc.h>
 #include <HBaseOperator.h>

@@ -1,8 +1,8 @@
 ﻿#include "StdAfx.h"
 #include "3DF.Operator.KeyboardTest.h"
-#include "3DF.Painter.h"
-#include "3DF.Window.h"
-#include "3DF.BaseView.h"
+#include "Painter.h"
+#include "Window.h"
+#include "BaseView.h"
 #include "../Signal/Signal.h"
 
 USING_3DF_NAMESPACE

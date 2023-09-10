@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.Bounding.h"
+#include "Bounding.h"
 
 USING_3DF_NAMESPACE
 

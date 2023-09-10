@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include "3DF.h"
-#include "3DF.Kit.h"
-#include "3DF.Color.h"
+#include "Kit.h"
+#include "Color.h"
 
 OPEN_3DF_NAMESPACE
 

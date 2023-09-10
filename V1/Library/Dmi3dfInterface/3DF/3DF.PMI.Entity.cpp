@@ -5,7 +5,7 @@
 #include "3DF.Line.h"
 #include "3DF.Polygon.h"
 
-#include "3DF.Math.Matrix.h"
+#include "Math.Matrix.h"
 
 #include <HTools.h>
 #include <utf_utils.h>

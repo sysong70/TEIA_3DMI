@@ -19,8 +19,8 @@
 #include <hic.h>
 #include <HConstantFrameRate.h>
 
-#include "3DF.Canvas.h"
-#include "3DF.Window.h"
+#include "Canvas.h"
+#include "Window.h"
 #include "3DF.Segment.h"
 #include "3DF.Selection.h"
 

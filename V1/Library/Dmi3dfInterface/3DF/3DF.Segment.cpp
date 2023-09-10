@@ -2,9 +2,9 @@
 
 #include <HTools.h>
 
-#include "3DF.Database.h"
+#include "Database.h"
 #include "3DF.Segment.h"
-#include "3DF.Bounding.h"
+#include "Bounding.h"
 #include "3DF.Line.h"
 #include "3DF.Circle.h"
 
@@ -15,7 +15,7 @@
 #include "3DF.MarkerAttribute.h"
 #include "3DF.LineAttribute.h"
 
-#include "3DF.Camera.h"
+#include "Camera.h"
 
 #include "3DF.Utility.h"
 

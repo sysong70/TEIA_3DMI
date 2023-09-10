@@ -2,8 +2,8 @@
 
 #include "3DF.SelectionPrivate.h"
 
-#include "../3DF.Window.h"
-#include "../3DF.BaseView.h"
+#include "../Window.h"
+#include "../BaseView.h"
 
 #include "../3DF.Line.h"
 #include "../3DF.Shell.h"

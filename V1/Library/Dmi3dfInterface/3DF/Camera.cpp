@@ -1,9 +1,9 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.Camera.h"
+#include "Camera.h"
 
-#include "3DF.Math.h"
-#include "3DF.Point.h"
+#include "Math.h"
+#include "Point.h"
 
 #include "Private/3DF.KeyPrivate.h"
 

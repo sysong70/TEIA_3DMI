@@ -1,8 +1,8 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.Math.h"
+#include "Math.h"
 
-#include "3DF.Window.h"
+#include "Window.h"
 
 #include "3DF.Circle.h"
 

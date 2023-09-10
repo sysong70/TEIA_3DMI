@@ -6,11 +6,11 @@
 #include <HSelectionSet.h>
 
 #include "3DF.h"
-#include "3DF.Kit.h"
-#include "3DF.Control.h"
+#include "Kit.h"
+#include "Control.h"
 #include "3DF.Selection.h"
 
-#include "3DF.Math.h"
+#include "Math.h"
 
 #include <vector>
 

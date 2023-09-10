@@ -87,10 +87,10 @@
     <ClInclude Include="..\Common\WStr.h">
       <Filter>_Common</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Canvas.h">
+    <ClInclude Include="3DF\Canvas.h">
       <Filter>3DF\Base</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Model.h">
+    <ClInclude Include="3DF\Model.h">
       <Filter>3DF\Base</Filter>
     </ClInclude>
     <ClInclude Include="3DF.Signal.h">
@@ -108,7 +108,7 @@
     <ClInclude Include="Import\DLL.h">
       <Filter>DLL</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Control.h">
+    <ClInclude Include="3DF\Control.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.Portfolio.h">
@@ -123,7 +123,7 @@
     <ClInclude Include="3DF\3DF.Segment.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Key.h">
+    <ClInclude Include="3DF\Key.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.Line.h">
@@ -153,7 +153,7 @@
     <ClInclude Include="3DF\3DF.Object.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Kit.h">
+    <ClInclude Include="3DF\Kit.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.Include.h">
@@ -171,7 +171,7 @@
     <ClInclude Include="3DF\3DF.Operator.SelectArea.h">
       <Filter>Operator</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Window.h">
+    <ClInclude Include="3DF\Window.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.Highlight.h">
@@ -192,7 +192,7 @@
     <ClInclude Include="dllmain.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Camera.h">
+    <ClInclude Include="3DF\Camera.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.Circle.h">
@@ -204,7 +204,7 @@
     <ClInclude Include="3DF\Private\3DF.KeyPrivate.h">
       <Filter>3DF\Key\Private</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Math.Matrix.h">
+    <ClInclude Include="3DF\Math.Matrix.h">
       <Filter>3DF</Filter>
     </ClInclude>
     <ClInclude Include="3DF\Private\3DF.WindowPrivate.h">
@@ -222,13 +222,13 @@
     <ClInclude Include="3DF\3DF.VisualEffects.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Painter.h">
+    <ClInclude Include="3DF\Painter.h">
       <Filter>3DF</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.NavigationCube.h">
+    <ClInclude Include="3DF\NavigationCube.h">
       <Filter>3DF</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.BaseView.h">
+    <ClInclude Include="3DF\BaseView.h">
       <Filter>3DF\Base</Filter>
     </ClInclude>
     <ClInclude Include="3DF\Private\3DF.SearchPrivate.h">
@@ -237,22 +237,22 @@
     <ClInclude Include="3DF\3DF.Search.h">
       <Filter>Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Style.h">
+    <ClInclude Include="3DF\Style.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Point.h">
+    <ClInclude Include="3DF\Point.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Math.h">
+    <ClInclude Include="3DF\Math.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Color.h">
+    <ClInclude Include="3DF\Color.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Bounding.h">
+    <ClInclude Include="3DF\Bounding.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Database.h">
+    <ClInclude Include="3DF\Database.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.h">
@@ -291,6 +291,9 @@
     <ClInclude Include="3DF\3DF.Facility.Preference.h">
       <Filter>Facility</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\KeyPath.h">
+      <Filter>3DF\Key</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -317,10 +320,10 @@
     <ClCompile Include="..\Common\WStr.cpp">
       <Filter>_Common</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Canvas.cpp">
+    <ClCompile Include="3DF\Canvas.cpp">
       <Filter>3DF\Base</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Model.cpp">
+    <ClCompile Include="3DF\Model.cpp">
       <Filter>3DF\Base</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Selectability.cpp">
@@ -329,7 +332,7 @@
     <ClCompile Include="Import\DLL.3DF.Interface.cpp">
       <Filter>DLL</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Control.cpp">
+    <ClCompile Include="3DF\Control.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Portfolio.cpp">
@@ -344,7 +347,7 @@
     <ClCompile Include="3DF\3DF.Segment.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Key.cpp">
+    <ClCompile Include="3DF\Key.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Line.cpp">
@@ -374,7 +377,7 @@
     <ClCompile Include="3DF\3DF.Object.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Kit.cpp">
+    <ClCompile Include="3DF\Kit.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Include.cpp">
@@ -392,7 +395,7 @@
     <ClCompile Include="3DF\3DF.Operator.SelectArea.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Window.cpp">
+    <ClCompile Include="3DF\Window.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Highlight.cpp">
@@ -407,7 +410,7 @@
     <ClCompile Include="3DF.Signal.Connector.cpp">
       <Filter>Signal</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Camera.cpp">
+    <ClCompile Include="3DF\Camera.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Circle.cpp">
@@ -419,7 +422,7 @@
     <ClCompile Include="3DF\Private\3DF.KeyPrivate.cpp">
       <Filter>3DF\Key\Private</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Math.Matrix.cpp">
+    <ClCompile Include="3DF\Math.Matrix.cpp">
       <Filter>3DF</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Private\3DF.WindowPrivate.cpp">
@@ -437,13 +440,13 @@
     <ClCompile Include="3DF\3DF.VisualEffects.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Painter.cpp">
+    <ClCompile Include="3DF\Painter.cpp">
       <Filter>3DF</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.NavigationCube.cpp">
+    <ClCompile Include="3DF\NavigationCube.cpp">
       <Filter>3DF</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.BaseView.cpp">
+    <ClCompile Include="3DF\BaseView.cpp">
       <Filter>3DF\Base</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Private\3DF.SearchPrivate.cpp">
@@ -452,25 +455,25 @@
     <ClCompile Include="3DF\3DF.Search.cpp">
       <Filter>Control</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.KeyPath.cpp">
+    <ClCompile Include="3DF\KeyPath.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Point.cpp">
+    <ClCompile Include="3DF\Point.cpp">
       <Filter>3DF\Object</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Math.cpp">
+    <ClCompile Include="3DF\Math.cpp">
       <Filter>3DF\Object</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Style.cpp">
+    <ClCompile Include="3DF\Style.cpp">
       <Filter>3DF\Object</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Bounding.cpp">
+    <ClCompile Include="3DF\Bounding.cpp">
       <Filter>3DF\Object</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Color.cpp">
+    <ClCompile Include="3DF\Color.cpp">
       <Filter>3DF\Object</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Database.cpp">
+    <ClCompile Include="3DF\Database.cpp">
       <Filter>3DF\Object</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.cpp">

@@ -2,9 +2,9 @@
 
 #include "3DF.h"
 
-#include "3DF.Kit.h"
-#include "3DF.Math.h"
-#include "3DF.Math.Matrix.h"
+#include "Kit.h"
+#include "Math.h"
+#include "Math.Matrix.h"
 
 OPEN_3DF_NAMESPACE
 

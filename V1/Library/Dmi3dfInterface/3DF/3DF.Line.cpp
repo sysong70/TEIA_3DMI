@@ -2,9 +2,9 @@
 
 #include "3DF.Line.h"
 
-#include "3DF.Math.h"
-#include "3DF.Math.Matrix.h"
-#include "3DF.Point.h"
+#include "Math.h"
+#include "Math.Matrix.h"
+#include "Point.h"
 
 #include "Private/3DF.KeyPrivate.h"
 
