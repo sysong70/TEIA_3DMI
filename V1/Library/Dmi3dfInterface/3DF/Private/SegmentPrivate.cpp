@@ -2,8 +2,8 @@
 
 #include <HTools.h>
 
-#include "3DF.SegmentPrivate.h"
-#include "../3DF.Segment.h"
+#include "SegmentPrivate.h"
+#include "../Segment.h"
 
 USING_3DF_NAMESPACE
 

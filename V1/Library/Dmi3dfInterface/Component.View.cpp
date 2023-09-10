@@ -11,8 +11,8 @@
 #include "3DF/Canvas.h"
 
 #include "3DF/Model.h"
-#include "3DF/3DF.Segment.h"
-#include "3DF/Private/3DF.SegmentPrivate.h"
+#include "3DF/Segment.h"
+#include "3DF/Private/SegmentPrivate.h"
 
 #include "3DF/3DF.Utility.h"
 

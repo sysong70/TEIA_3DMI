@@ -1,8 +1,8 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.Shell.h"
+#include "Shell.h"
 
-#include "Private/3DF.KeyPrivate.h"
+#include "Private/KeyPrivate.h"
 
 #include "3DF.Material.h"
 

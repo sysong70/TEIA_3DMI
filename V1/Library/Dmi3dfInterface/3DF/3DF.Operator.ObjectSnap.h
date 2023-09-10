@@ -4,7 +4,7 @@
 #include "Math.h"
 
 #include "3DF.Selection.h"
-#include "3DF.Segment.h"
+#include "Segment.h"
 
 #include <HOpCameraOrbit.h>
 

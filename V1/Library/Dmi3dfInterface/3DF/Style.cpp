@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #include "Style.h"
-#include "3DF.Segment.h"
+#include "Segment.h"
 #include "3DF.Portfolio.h"
 
 #include <hc.h>

@@ -1,10 +1,10 @@
 ﻿#pragma once
 
 #include "../3DF.h"
-#include "../3DF.Object.h"
+#include "../Object.h"
 #include "../Color.h"
 
-#include "3DF.KeyPrivate.h"
+#include "KeyPrivate.h"
 
 OPEN_3DF_NAMESPACE
 

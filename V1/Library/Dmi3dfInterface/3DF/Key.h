@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "3DF.h"
-#include "3DF.Object.h"
+#include "Object.h"
 
 OPEN_3DF_NAMESPACE
 

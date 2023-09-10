@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.Object.h"
+#include "Object.h"
 
 USING_3DF_NAMESPACE
 

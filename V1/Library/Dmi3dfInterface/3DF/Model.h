@@ -7,7 +7,7 @@
 #include <HUtility.h>
 
 #include "3DF.h"
-#include "3DF.Segment.h"
+#include "Segment.h"
 
 class HIOConnector;
 

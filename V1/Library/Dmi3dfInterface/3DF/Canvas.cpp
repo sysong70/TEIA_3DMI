@@ -21,11 +21,11 @@
 
 #include "Canvas.h"
 #include "Window.h"
-#include "3DF.Segment.h"
+#include "Segment.h"
 #include "3DF.Selection.h"
 
 #include "3DF.Selectability.h"
-#include "3DF.Visibility.h"
+#include "Visibility.h"
 #include "3DF.Material.h"
 #include "3DF.LineAttribute.h"
 

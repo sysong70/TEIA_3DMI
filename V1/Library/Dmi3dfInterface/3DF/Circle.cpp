@@ -1,11 +1,11 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.Circle.h"
+#include "Circle.h"
 
 #include "Math.h"
 #include "Point.h"
 
-#include "Private/3DF.KeyPrivate.h"
+#include "Private/KeyPrivate.h"
 
 #include <HTools.h>
 

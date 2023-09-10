@@ -9,7 +9,7 @@
 #include "../Kit.h"
 #include "../Control.h"
 
-#include "../3DF.Segment.h"
+#include "../Segment.h"
 #include "../3DF.Selection.h"
 
 #include "../Math.h"

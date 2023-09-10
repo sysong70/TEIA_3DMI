@@ -2,7 +2,7 @@
 
 #include "3DF.Operator.KinematicTest.h"
 
-#include "3DF.Segment.h"
+#include "Segment.h"
 
 #include <HUtilityGeometryCreation.h>
 

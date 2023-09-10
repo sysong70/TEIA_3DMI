@@ -2,7 +2,7 @@
 
 #include "3DF.h"
 #include "BaseView.h"
-#include "3DF.Segment.h"
+#include "Segment.h"
 #include "3DF.Selection.h"
 
 OPEN_3DF_NAMESPACE

@@ -2,8 +2,8 @@
 
 #include "3DF.LineAttribute.h"
 
-#include "3DF.Segment.h"
-#include "./Private/3DF.SegmentPrivate.h"
+#include "Segment.h"
+#include "./Private/SegmentPrivate.h"
 
 #include <hc.h>
 #include <HTools.h>

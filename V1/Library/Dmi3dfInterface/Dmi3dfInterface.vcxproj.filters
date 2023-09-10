@@ -117,22 +117,22 @@
     <ClInclude Include="3DF\3DF.Selection.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Shell.h">
+    <ClInclude Include="3DF\Shell.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Segment.h">
+    <ClInclude Include="3DF\Segment.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
     <ClInclude Include="3DF\Key.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Line.h">
+    <ClInclude Include="3DF\Line.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Marker.h">
+    <ClInclude Include="3DF\Marker.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Visibility.h">
+    <ClInclude Include="3DF\Visibility.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.MarkerAttribute.h">
@@ -141,22 +141,22 @@
     <ClInclude Include="3DF\3DF.Image.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.PMI.Entity.h">
+    <ClInclude Include="3DF\PMI.Entity.h">
       <Filter>3DF\Entity</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Polygon.h">
+    <ClInclude Include="3DF\Polygon.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Geometry.h">
+    <ClInclude Include="3DF\Geometry.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Object.h">
+    <ClInclude Include="3DF\Object.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
     <ClInclude Include="3DF\Kit.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Include.h">
+    <ClInclude Include="3DF\Include.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.Operator.CameraSelect.h">
@@ -177,9 +177,6 @@
     <ClInclude Include="3DF\3DF.Highlight.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Private\3DF.SelectionPrivate.h">
-      <Filter>3DF\Control</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\3DF.Operator.ObjectSnap.h">
       <Filter>Operator</Filter>
     </ClInclude>
@@ -195,19 +192,19 @@
     <ClInclude Include="3DF\Camera.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Circle.h">
+    <ClInclude Include="3DF\Circle.h">
       <Filter>3DF\Key</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Private\3DF.SegmentPrivate.h">
+    <ClInclude Include="3DF\Private\SegmentPrivate.h">
       <Filter>3DF\Key\Private</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Private\3DF.KeyPrivate.h">
+    <ClInclude Include="3DF\Private\KeyPrivate.h">
       <Filter>3DF\Key\Private</Filter>
     </ClInclude>
     <ClInclude Include="3DF\Math.Matrix.h">
       <Filter>3DF</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Private\3DF.WindowPrivate.h">
+    <ClInclude Include="3DF\Private\WindowPrivate.h">
       <Filter>3DF\Key\Private</Filter>
     </ClInclude>
     <ClInclude Include="3DF\3DF.Material.h">
@@ -219,7 +216,7 @@
     <ClInclude Include="3DF\3DF.LineAttribute.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.VisualEffects.h">
+    <ClInclude Include="3DF\VisualEffects.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
     <ClInclude Include="3DF\Painter.h">
@@ -264,7 +261,7 @@
     <ClInclude Include="3DF\3DF.Operator.KinematicTest.h">
       <Filter>Operator</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Private\3DF.HighlightPrivate.h">
+    <ClInclude Include="3DF\Private\HighlightPrivate.h">
       <Filter>3DF\Control\Private</Filter>
     </ClInclude>
     <ClInclude Include="Component.Application.h">
@@ -293,6 +290,9 @@
     </ClInclude>
     <ClInclude Include="3DF\KeyPath.h">
       <Filter>3DF\Key</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Private\SelectionPrivate.h">
+      <Filter>3DF\Control\Private</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -341,22 +341,22 @@
     <ClCompile Include="3DF\3DF.Selection.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Shell.cpp">
+    <ClCompile Include="3DF\Shell.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Segment.cpp">
+    <ClCompile Include="3DF\Segment.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Key.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Line.cpp">
+    <ClCompile Include="3DF\Line.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Marker.cpp">
+    <ClCompile Include="3DF\Marker.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Visibility.cpp">
+    <ClCompile Include="3DF\Visibility.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.MarkerAttribute.cpp">
@@ -365,22 +365,22 @@
     <ClCompile Include="3DF\3DF.Image.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.PMI.Entity.cpp">
+    <ClCompile Include="3DF\PMI.Entity.cpp">
       <Filter>3DF\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Polygon.cpp">
+    <ClCompile Include="3DF\Polygon.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Geometry.cpp">
+    <ClCompile Include="3DF\Geometry.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Object.cpp">
+    <ClCompile Include="3DF\Object.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Kit.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Include.cpp">
+    <ClCompile Include="3DF\Include.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Operator.CameraSelect.cpp">
@@ -401,9 +401,6 @@
     <ClCompile Include="3DF\3DF.Highlight.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Private\3DF.SelectionPrivate.cpp">
-      <Filter>3DF\Control</Filter>
-    </ClCompile>
     <ClCompile Include="3DF\3DF.Operator.ObjectSnap.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
@@ -413,19 +410,19 @@
     <ClCompile Include="3DF\Camera.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Circle.cpp">
+    <ClCompile Include="3DF\Circle.cpp">
       <Filter>3DF\Key</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Private\3DF.SegmentPrivate.cpp">
+    <ClCompile Include="3DF\Private\SegmentPrivate.cpp">
       <Filter>3DF\Key\Private</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Private\3DF.KeyPrivate.cpp">
+    <ClCompile Include="3DF\Private\KeyPrivate.cpp">
       <Filter>3DF\Key\Private</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Math.Matrix.cpp">
       <Filter>3DF</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Private\3DF.WindowPrivate.cpp">
+    <ClCompile Include="3DF\Private\WindowPrivate.cpp">
       <Filter>3DF\Key\Private</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Material.cpp">
@@ -437,7 +434,7 @@
     <ClCompile Include="3DF\3DF.LineAttribute.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.VisualEffects.cpp">
+    <ClCompile Include="3DF\VisualEffects.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Painter.cpp">
@@ -485,7 +482,7 @@
     <ClCompile Include="3DF\3DF.Operator.KinematicTest.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Private\3DF.HighlightPrivate.cpp">
+    <ClCompile Include="3DF\Private\HighlightPrivate.cpp">
       <Filter>3DF\Control\Private</Filter>
     </ClCompile>
     <ClCompile Include="Component.Application.cpp">
@@ -508,6 +505,9 @@
     </ClCompile>
     <ClCompile Include="3DF\3DF.Facility.Preference.cpp">
       <Filter>Facility</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Private\SelectionPrivate.cpp">
+      <Filter>3DF\Control\Private</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

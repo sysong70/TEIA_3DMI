@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.WindowPrivate.h"
+#include "WindowPrivate.h"
 
 USING_3DF_NAMESPACE
 

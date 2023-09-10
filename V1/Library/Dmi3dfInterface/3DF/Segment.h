@@ -2,14 +2,14 @@
 
 #include "Key.h"
 
-#include "3DF.Include.h"
-#include "3DF.Shell.h"
+#include "Include.h"
+#include "Shell.h"
 #include "3DF.EdgeAttribute.h"
 //#include "3DF.Portfolio.h"
 #include "Style.h"
 #include "3DF.Search.h"
 
-#include "3DF.Marker.h"
+#include "Marker.h"
 
 #include "Math.Matrix.h"
 

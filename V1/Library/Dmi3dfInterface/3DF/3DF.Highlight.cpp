@@ -2,13 +2,13 @@
 
 #include "3DF.Highlight.h"
 
-#include "Private/3DF.SelectionPrivate.h"
-#include "Private/3DF.HighlightPrivate.h"
+#include "Private/SelectionPrivate.h"
+#include "Private/HighlightPrivate.h"
 
 #include "Window.h"
 #include "BaseView.h"
 
-#include "3DF.Line.h"
+#include "Line.h"
 #include "3DF.LineAttribute.h"
 
 #include <vhash.h>

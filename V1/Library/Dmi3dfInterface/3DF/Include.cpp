@@ -1,8 +1,8 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.Include.h"
+#include "Include.h"
 
-#include "3DF.Segment.h"
+#include "Segment.h"
 
 #include <HTools.h>
 

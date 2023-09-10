@@ -1,9 +1,9 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.PMI.Entity.h"
+#include "PMI.Entity.h"
 
-#include "3DF.Line.h"
-#include "3DF.Polygon.h"
+#include "Line.h"
+#include "Polygon.h"
 
 #include "Math.Matrix.h"
 
@@ -12,7 +12,7 @@
 
 #include <WStr.h>
 
-#include "./Private/3DF.SegmentPrivate.h"
+#include "./Private/SegmentPrivate.h"
 
 USING_3DF_PMI_NAMESPACE
 

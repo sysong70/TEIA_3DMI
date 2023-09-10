@@ -2,7 +2,7 @@
 
 #include "3DF.Utility.h"
 
-#include "3DF.Segment.h"
+#include "Segment.h"
 
 #include <HUtility.h>
 #include <HTools.h>

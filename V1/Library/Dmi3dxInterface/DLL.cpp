@@ -4,7 +4,7 @@
 
 #include "3DX.3DFImport.h"
 
-#include <3DF/3DF.Segment.h>
+#include <3DF/Segment.h>
 
 bool TDFImportFile(CString pchFilePathName, H3DF::SegmentKey & cModelSegmentKey, Signal::Delivery & cInDelivery, CString & strErrorMessage)
 {

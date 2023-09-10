@@ -1,10 +1,10 @@
 ﻿#include "StdAfx.h"
 
 #include "Window.h"
-#include "Private/3DF.WindowPrivate.h"
+#include "Private/WindowPrivate.h"
 
-#include "Private/3DF.SelectionPrivate.h"
-#include "Private/3DF.HighlightPrivate.h"
+#include "Private/SelectionPrivate.h"
+#include "Private/HighlightPrivate.h"
 
 #include "BaseView.h"
 

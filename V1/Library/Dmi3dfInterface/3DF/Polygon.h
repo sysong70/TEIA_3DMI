@@ -3,7 +3,7 @@
 #include "3DF.h"
 
 #include "Kit.h"
-#include "3DF.Geometry.h"
+#include "Geometry.h"
 
 #include "Math.h"
 

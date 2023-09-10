@@ -3,14 +3,14 @@
 #include <HTools.h>
 
 #include "Database.h"
-#include "3DF.Segment.h"
+#include "Segment.h"
 #include "Bounding.h"
-#include "3DF.Line.h"
-#include "3DF.Circle.h"
+#include "Line.h"
+#include "Circle.h"
 
 #include "3DF.Selectability.h"
-#include "3DF.Visibility.h"
-#include "3DF.VisualEffects.h"
+#include "Visibility.h"
+#include "VisualEffects.h"
 #include "3DF.Material.h"
 #include "3DF.MarkerAttribute.h"
 #include "3DF.LineAttribute.h"
@@ -19,7 +19,7 @@
 
 #include "3DF.Utility.h"
 
-#include "./Private/3DF.SegmentPrivate.h"
+#include "./Private/SegmentPrivate.h"
 #include "./Private/3DF.SearchPrivate.h"
 
 USING_3DF_NAMESPACE

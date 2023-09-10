@@ -1,15 +1,15 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.SelectionPrivate.h"
+#include "SelectionPrivate.h"
 
 #include "../Window.h"
 #include "../BaseView.h"
 
-#include "../3DF.Line.h"
-#include "../3DF.Shell.h"
+#include "../Line.h"
+#include "../Shell.h"
 #include "../3DF.Utility.h"
 
-#include "3DF.WindowPrivate.h"
+#include "WindowPrivate.h"
 
 #include <vhash.h>
 #include <vlist.h>

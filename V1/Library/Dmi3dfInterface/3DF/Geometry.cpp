@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.Geometry.h"
+#include "Geometry.h"
 
 #include "Math.h"
 

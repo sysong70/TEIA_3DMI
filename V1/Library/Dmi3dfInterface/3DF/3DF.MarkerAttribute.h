@@ -3,7 +3,7 @@
 #include "3DF.h"
 #include "Control.h"
 
-#include "3DF.Marker.h"
+#include "Marker.h"
 
 OPEN_3DF_NAMESPACE
 

@@ -3,8 +3,8 @@
 #include "Window.h"
 #include "BaseView.h"
 
-#include "3DF.Line.h"
-#include "3DF.Circle.h"
+#include "Line.h"
+#include "Circle.h"
 #include "Point.h"
 
 #include "Math.Matrix.h"
@@ -13,11 +13,11 @@
 #include "Color.h"
 #include "3DF.Material.h"
 
-#include "3DF.Visibility.h"
-#include "3DF.VisualEffects.h"
+#include "Visibility.h"
+#include "VisualEffects.h"
 
 #include "3DF.Operator.ObjectSnap.h"
-#include "Private/3DF.SelectionPrivate.h"
+#include "Private/SelectionPrivate.h"
 #include "../3DF.Signal.Connector.h"
 
 #include <Common_Define.h>

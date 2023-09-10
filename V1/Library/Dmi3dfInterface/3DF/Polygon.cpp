@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.Polygon.h"
+#include "Polygon.h"
 
 #include "Math.h"
 

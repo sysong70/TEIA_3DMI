@@ -1,12 +1,12 @@
 ﻿#include "StdAfx.h"
 
 #include "Key.h"
-#include "Private/3DF.KeyPrivate.h"
+#include "Private/KeyPrivate.h"
 
-#include "3DF.Segment.h"
+#include "Segment.h"
 #include "3DF.Selectability.h"
 
-#include "3DF.Line.h"
+#include "Line.h"
 
 #include <HTools.h>
 

@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #include "Control.h"
-#include "3DF.Segment.h"
+#include "Segment.h"
 
 #include <HTools.h>
 

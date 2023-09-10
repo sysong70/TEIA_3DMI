@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "3DF.Segment.h"
+#include "Segment.h"
 #include "Control.h"
 
 #include <deque>

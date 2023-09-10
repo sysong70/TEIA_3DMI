@@ -1,12 +1,12 @@
 ﻿#include "StdAfx.h"
 
 #include "3DF.Selection.h"
-#include "Private/3DF.SelectionPrivate.h"
+#include "Private/SelectionPrivate.h"
 
 #include "Window.h"
 #include "BaseView.h"
 
-#include "3DF.Line.h"
+#include "Line.h"
 
 #include <vhash.h>
 #include <vlist.h>

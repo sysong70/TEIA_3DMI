@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "3DF.KeyPrivate.h"
+#include "KeyPrivate.h"
 
 #include <HTools.h>
 
