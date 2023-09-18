@@ -7,12 +7,27 @@
 
 using namespace SESSION;
 
-Command::Line::Line()
+SESSION::Command::Line::Line()
 {
 
 }
 
-Command::Line::~Line()
+SESSION::Command::Line::~Line()
 {
 
+}
+
+int SESSION::Command::Line::InputCount()
+{
+	return 2;
+}
+
+Manager::Input::InputType * SESSION::Command::Line::InputTypes()
+{
+	Manager::Input::InputType eType[2];
+
+	eType[0] = Manager::Input::InputType::Cordinate;
+	eType[1] = Manager::Input::InputType::Cordinate;
+
+	return eType;
 }

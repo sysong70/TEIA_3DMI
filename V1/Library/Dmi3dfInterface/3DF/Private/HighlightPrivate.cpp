@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "../3DF.Highlight.h"
+#include "../Highlight.h"
 
 #include "SelectionPrivate.h"
 
@@ -8,7 +8,7 @@
 #include "../BaseView.h"
 
 #include "../Line.h"
-#include "../3DF.LineAttribute.h"
+#include "../LineAttribute.h"
 
 #include <vhash.h>
 #include <vlist.h>

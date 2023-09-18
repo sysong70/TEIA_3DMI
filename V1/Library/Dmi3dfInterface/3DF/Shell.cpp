@@ -4,7 +4,7 @@
 
 #include "Private/KeyPrivate.h"
 
-#include "3DF.Material.h"
+#include "Material.h"
 
 USING_3DF_NAMESPACE
 

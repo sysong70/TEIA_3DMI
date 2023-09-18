@@ -3,7 +3,7 @@
 #include "Json.h"
 
 #include <3DF/Segment.h>
-#include <3DF/3DF.Material.h>
+#include <3DF/Material.h>
 
 #include <3DF/PMI.Entity.h>
 

@@ -1,71 +1,70 @@
 ﻿#pragma once
 
-#include "DLL.h"
-
 #include <type_traits>
 
 // 참조 문헌
 // https://blog.benoitblanchon.fr/getprocaddress-like-a-boss/
 
-OPEN_DLL_NAMESPACE
-
-class ProcPtr
+namespace DLL
 {
-public:
-	explicit ProcPtr(FARPROC ptr) { _ptr = ptr; }
-
-	template <typename T, typename = std::enable_if_t<std::is_function_v<T>>>
-
-	operator T * () const
+	class ProcPtr
 	{
-		return reinterpret_cast<T *>(_ptr);
-	}
+	public:
+		explicit ProcPtr(FARPROC ptr) { _ptr = ptr; }
 
-private:
-	FARPROC _ptr;
-};
+		template <typename T, typename = std::enable_if_t<std::is_function_v<T>>>
 
-class Helper
-{
-public:
-	explicit Helper(LPCTSTR strFileName)
-	{
-		SetLastError(0);
-
-		m_nLastErrorCode = 0;
-
-		m_hModule = LoadLibrary(strFileName);
-
-		if(nullptr == m_hModule) {
-			m_nLastErrorCode = GetLastError();
+		operator T * () const
+		{
+			return reinterpret_cast<T *>(_ptr);
 		}
-	}
 
-	~Helper()
+	private:
+		FARPROC _ptr;
+	};
+
+	class Helper
 	{
-		if(nullptr != m_hModule) {
-			FreeLibrary(m_hModule);
+	public:
+		explicit Helper(LPCTSTR strFileName)
+		{
+			SetLastError(0);
+
+			m_nLastErrorCode = 0;
+
+			m_hModule = LoadLibrary(strFileName);
+
+			if (nullptr == m_hModule) {
+				m_nLastErrorCode = GetLastError();
+			}
 		}
-	}
 
-	ProcPtr GetFunction(LPCSTR proc_name) const
-	{
-		return ProcPtr(GetProcAddress(m_hModule, proc_name));
-	}
+		~Helper()
+		{
+			if (nullptr != m_hModule) {
+				FreeLibrary(m_hModule);
+			}
+		}
 
-	ProcPtr operator[](LPCSTR proc_name) const
-	{
-		return ProcPtr(GetProcAddress(m_hModule, proc_name));
-	}
+		ProcPtr GetFunction(LPCSTR proc_name) const
+		{
+			return ProcPtr(GetProcAddress(m_hModule, proc_name));
+		}
 
-	DWORD GetErrorCode() { return m_nLastErrorCode; }
+		ProcPtr operator[](LPCSTR proc_name) const
+		{
+			return ProcPtr(GetProcAddress(m_hModule, proc_name));
+		}
 
-	HMODULE GetHmodule() { return m_hModule; }
+		DWORD GetErrorCode() { return m_nLastErrorCode; }
 
-private:
-	HMODULE m_hModule;
-	DWORD m_nLastErrorCode;
-};
+		HMODULE GetHmodule() { return m_hModule; }
+
+	private:
+		HMODULE m_hModule;
+		DWORD m_nLastErrorCode;
+	};
+} // namespace DLL
 
 //+ == 사용법 =============================================================
 /*
@@ -84,5 +83,3 @@ int main() {
 	testApi.cDLG(L"Test Dll Helper");
 }
 */
-
-CLOSE_DLL_NAMESPACE

@@ -22,22 +22,22 @@
 #include "Canvas.h"
 #include "Window.h"
 #include "Segment.h"
-#include "3DF.Selection.h"
+#include "Selection.h"
 
-#include "3DF.Selectability.h"
+#include "Selectability.h"
 #include "Visibility.h"
-#include "3DF.Material.h"
-#include "3DF.LineAttribute.h"
+#include "Material.h"
+#include "LineAttribute.h"
 
-#include "3DF.Operator.CameraSelect.h"
-#include "3DF.Operator.SelectArea.h"
-#include "3DF.Operator.ObjectSnap.h"
+#include "Operator.CameraSelect.h"
+#include "Operator.SelectArea.h"
+#include "Operator.ObjectSnap.h"
 
 #include "../Signal/Signal.h"
 
-#include "3DF.Facility.AppOptions.h"
+#include "Facility.AppOptions.h"
 
-#include "3DF.Operator.KinematicTest.h"
+#include "Operator.KinematicTest.h"
 
 #define SEGMENT_TYPE						1
 #define ENTITY_TYPE							2
@@ -1314,7 +1314,7 @@ DWORD Canvas::MouseMapFlags(DWORD state)
 	return nFlag;
 }
 
-#include "3DF.Operator.KeyboardTest.h"
+#include "Operator.KeyboardTest.h"
 //:TEMP
 Operator::KeyboardTest* g_pOperator = nullptr;
 

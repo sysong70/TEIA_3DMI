@@ -18,3 +18,8 @@ Manager::Highlight::~Highlight()
 {
 
 }
+
+Manager::Type SESSION::Manager::Highlight::Type()
+{
+	return SESSION::Manager::Type::Highlight;
+}

@@ -6,7 +6,7 @@
 
 #include <HIOManager.h>
 
-#include "3DF.Selection.h"
+#include "Selection.h"
 
 USING_3DF_NAMESPACE
 

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Manager.Base.h"
+#include "Manager.Root.h"
 
 #include "Json.h"
 #include <map>
@@ -12,11 +12,13 @@ namespace SESSION
 		using SendSignalFunc = void (*)(const wchar_t *);
 		using AssignSendSignalFunc = void (*)(SendSignalFunc);
 
-		class Session : public Base
+		class Session : public Root
 		{
 		public:
 			Session();
 			~Session();
+
+			Manager::Type Type() override;
 
 			void ExecuteSignal(const wchar_t * pchBuffer);
 			void SetSendSignalFunc(SendSignalFunc pcSendSignalFunc);

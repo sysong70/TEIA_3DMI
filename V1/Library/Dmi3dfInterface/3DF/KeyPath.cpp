@@ -3,7 +3,7 @@
 #include "KeyPath.h"
 
 #include "Segment.h"
-#include "3DF.Selectability.h"
+#include "Selectability.h"
 
 #include "Line.h"
 

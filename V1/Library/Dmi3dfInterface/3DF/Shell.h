@@ -4,7 +4,7 @@
 
 #include "Math.h"
 
-#include "3DF.Material.h"
+#include "Material.h"
 
 OPEN_3DF_NAMESPACE
 

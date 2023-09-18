@@ -18,3 +18,8 @@ Manager::ObjectSnap::~ObjectSnap()
 {
 
 }
+
+Manager::Type SESSION::Manager::ObjectSnap::Type()
+{
+	return SESSION::Manager::Type::ObjectSnap;
+}

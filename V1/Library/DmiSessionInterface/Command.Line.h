@@ -14,6 +14,10 @@ namespace SESSION
 		public:
 			Line();
 			~Line();
+
+			int InputCount() override;
+
+			Manager::Input::InputType * InputTypes() override;
 		};
 	}
 }

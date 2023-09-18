@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Manager.Base.h"
+#include "Manager.Root.h"
 
 #include <Json.h>
 #include <vector>
@@ -13,11 +13,13 @@ namespace SESSION
 
 	namespace Manager
 	{
-		class Command : public Base
+		class Command : public Root
 		{
 		public:
 			Command();
 			~Command();
+
+			Manager::Type Type() override;
 
 			//== Command 관리 함수 ===================================================================
 			void AddCommand(SESSION::Command::Root * pCommand);

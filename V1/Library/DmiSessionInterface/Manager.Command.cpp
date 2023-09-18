@@ -19,6 +19,11 @@ SESSION::Manager::Command::~Command()
 
 }
 
+Manager::Type SESSION::Manager::Command::Type()
+{
+	return SESSION::Manager::Type::Command;
+}
+
 //== Command 관리 함수 ===============================================================================
 
 // 1. Command를 추가한다.

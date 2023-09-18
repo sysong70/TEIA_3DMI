@@ -28,6 +28,11 @@ Manager::Session::~Session()
 	Free3dKernelInterface();
 }
 
+Manager::Type SESSION::Manager::Session::Type()
+{
+	return SESSION::Manager::Type::Session;
+}
+
 //== 명령어 처리 부분 =================================================================================
 
 void Manager::Session::ExecuteSignal(const wchar_t * pchBuffer)
@@ -46,7 +51,7 @@ void Manager::Session::ExecuteSignal(const wchar_t * pchBuffer)
 
 	Json::Object cObject;
 	// ReadObject에 buffer에 내용을 전달하고 나오면 buffer는 empty됨.
-	Json::Reader::ReadObject((wchar_t *&)pchBuffer, cObject);
+	Json::Reader::ReadObject((wchar_t *&)pchCopyBuffer, cObject);
 
 	m_pcSendSignalTo3dKernel(pchBuffer);
 }

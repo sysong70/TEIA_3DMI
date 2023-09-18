@@ -18,3 +18,8 @@ Manager::Tree::~Tree()
 {
 
 }
+
+Manager::Type SESSION::Manager::Tree::Type()
+{
+	return SESSION::Manager::Type::Tree;
+}

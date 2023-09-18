@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Manager.Base.h"
+#include "Manager.Root.h"
 
 #include "Json.h"
 
@@ -10,11 +10,13 @@ namespace SESSION
 {
 	namespace Manager
 	{
-		class Highlight : public Base
+		class Highlight : public Root
 		{
 		public:
 			Highlight();
 			~Highlight();
+
+			Manager::Type Type() override;
 		};
 	}
 }

@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include "Segment.h"
-#include "3DF.Selection.h"
-#include "3DF.Highlight.h"
+#include "Selection.h"
+#include "Highlight.h"
 
 OPEN_3DF_NAMESPACE
 

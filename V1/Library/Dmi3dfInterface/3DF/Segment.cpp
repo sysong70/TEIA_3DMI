@@ -8,19 +8,19 @@
 #include "Line.h"
 #include "Circle.h"
 
-#include "3DF.Selectability.h"
+#include "Selectability.h"
 #include "Visibility.h"
 #include "VisualEffects.h"
-#include "3DF.Material.h"
-#include "3DF.MarkerAttribute.h"
-#include "3DF.LineAttribute.h"
+#include "Material.h"
+#include "MarkerAttribute.h"
+#include "LineAttribute.h"
 
 #include "Camera.h"
 
 #include "3DF.Utility.h"
 
 #include "./Private/SegmentPrivate.h"
-#include "./Private/3DF.SearchPrivate.h"
+#include "./Private/SearchPrivate.h"
 
 USING_3DF_NAMESPACE
 
@@ -188,11 +188,9 @@ size_t H3DF::SegmentKey::ShowSubsegments() const
 
 	SegmentKeyPrivate::LocalOpen(*this);
 
-	HC_Begin_Contents_Search(".", "segments");
-	{
+	HC_Begin_Contents_Search(".", "segments"); {
 		HC_Show_Contents_Count(&nSegmentCount);
-	}
-	HC_End_Contents_Search();
+	} HC_End_Contents_Search();
 
 	SegmentKeyPrivate::LocalClose(*this);
 

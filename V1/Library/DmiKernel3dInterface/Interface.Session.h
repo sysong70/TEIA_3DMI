@@ -13,6 +13,7 @@ namespace KERNEL
 	{
 		using SendSignalFunc = void (*)(const wchar_t *);
 
+		// Session에서 받은 신호를 처리하는 class
 		class Session
 		{
 		public:

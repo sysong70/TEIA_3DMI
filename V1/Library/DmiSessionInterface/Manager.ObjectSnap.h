@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Manager.Base.h"
+#include "Manager.Root.h"
 
 #include "Json.h"
 
@@ -10,11 +10,13 @@ namespace SESSION
 {
 	namespace Manager
 	{
-		class ObjectSnap : public Base
+		class ObjectSnap : public Root
 		{
 		public:
 			ObjectSnap();
 			~ObjectSnap();
+
+			Manager::Type Type() override;
 		};
 	}
 }

@@ -28,9 +28,6 @@
     <Filter Include="Command">
       <UniqueIdentifier>{b3b8e6a4-8888-46d0-8f6e-a64d2bc80797}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Session">
-      <UniqueIdentifier>{d4125dc5-5c60-4b9f-bf7f-0112414aeb22}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -84,7 +81,7 @@
     <ClInclude Include="Command.ViewControl.h">
       <Filter>Command</Filter>
     </ClInclude>
-    <ClInclude Include="Manager.Base.h">
+    <ClInclude Include="Manager.Root.h">
       <Filter>Manager</Filter>
     </ClInclude>
     <ClInclude Include="Manager.Tree.h">
@@ -104,6 +101,9 @@
     </ClInclude>
     <ClInclude Include="Command.Line.h">
       <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Manager.Tracker.h">
+      <Filter>Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -155,7 +155,7 @@
     <ClCompile Include="Command.ViewControl.cpp">
       <Filter>Command</Filter>
     </ClCompile>
-    <ClCompile Include="Manager.Base.cpp">
+    <ClCompile Include="Manager.Root.cpp">
       <Filter>Manager</Filter>
     </ClCompile>
     <ClCompile Include="Manager.Tree.cpp">
@@ -175,6 +175,9 @@
     </ClCompile>
     <ClCompile Include="Command.Line.cpp">
       <Filter>Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Manager.Tracker.cpp">
+      <Filter>Manager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

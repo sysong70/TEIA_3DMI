@@ -7,7 +7,7 @@
 
 #include "3DF/3DF.h"
 
-#include "3DF.Signal.h"
+#include "Signal.h"
 #include "../Signal/Signal.h"
 
 namespace H3DF

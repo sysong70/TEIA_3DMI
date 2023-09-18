@@ -5,8 +5,8 @@
 #include "KeyPath.h"
 #include "Window.h"
 
-#include "3DF.Selection.h"
-#include "3DF.Facility.AppOptions.h"
+#include "Selection.h"
+#include "Facility.AppOptions.h"
 #include "./Private/SelectionPrivate.h"
 
 USING_3DF_NAMESPACE

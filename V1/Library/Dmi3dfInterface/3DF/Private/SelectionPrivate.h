@@ -10,7 +10,7 @@
 #include "../Control.h"
 
 #include "../Segment.h"
-#include "../3DF.Selection.h"
+#include "../Selection.h"
 
 #include "../Math.h"
 

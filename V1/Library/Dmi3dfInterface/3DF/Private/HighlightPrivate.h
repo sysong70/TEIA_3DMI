@@ -8,7 +8,7 @@
 #include "../3DF.h"
 #include "../Kit.h"
 #include "../Control.h"
-#include "../3DF.Selection.h"
+#include "../Selection.h"
 
 #include "../BaseView.h"
 

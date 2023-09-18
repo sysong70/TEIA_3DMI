@@ -8,7 +8,7 @@
 
 const double EPSILON = 1e-10; // 미세한 값
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
 MatrixKit::MatrixKit()
 {

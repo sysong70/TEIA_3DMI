@@ -40,8 +40,7 @@ boost::pool<> CBoostPool<T>::m_bpool(sizeof(T));
 // using PointArray = std::vector<_3DF::Point, boost::pool_allocator<Point>>;
 // using VectorArray = std::vector<_3DF::Vector, boost::pool_allocator<Vector>>;
 
-
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
 //== 메모리 관리 =====================================================================================
 

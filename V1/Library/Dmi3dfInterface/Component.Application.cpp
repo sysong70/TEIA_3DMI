@@ -17,7 +17,7 @@
 #include <HDB.h>
 
 //:Ken
-#include "3DF/3DF.Facility.AppOptions.h"
+#include "3DF/Facility.AppOptions.h"
 
 using namespace H3DF;
 

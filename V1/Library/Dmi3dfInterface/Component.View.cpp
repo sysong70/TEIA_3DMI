@@ -3,7 +3,7 @@
 
 // #include "3DF.Signal.Interface.h"
 // #include "3DF.Signal.Manager.h"
-#include "3DF.Signal.Connector.h"
+#include "Signal.Connector.h"
 
 #include <Common_Define.h>
 #include <Path.h>
@@ -16,7 +16,7 @@
 
 #include "3DF/3DF.Utility.h"
 
-#include "Import/DLL.3DF.Interface.h"
+#include "Import/DLL.Interface.h"
 
 #include <HIOUtilityHsf.h>
 #include <HConstantFrameRate.h>

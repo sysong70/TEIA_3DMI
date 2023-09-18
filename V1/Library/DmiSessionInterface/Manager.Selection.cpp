@@ -18,3 +18,8 @@ Manager::Selection::~Selection()
 {
 
 }
+
+Manager::Type SESSION::Manager::Selection::Type()
+{
+	return SESSION::Manager::Type::Selection;
+}
