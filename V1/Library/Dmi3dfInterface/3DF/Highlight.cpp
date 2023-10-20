@@ -6,7 +6,7 @@
 #include "Private/HighlightPrivate.h"
 
 #include "Window.h"
-#include "BaseView.h"
+#include "../Private/View.Private.h"
 
 #include "Line.h"
 #include "LineAttribute.h"

@@ -1,12 +1,19 @@
 ﻿#pragma once
 
 #include "3DF.h"
-#include "BaseView.h"
+
 #include "Segment.h"
 #include "Selection.h"
 
+#include <HBaseView.h>
+#include <HUtility.h>
+#include <HTools.h>
+#include <HSelectionSet.h>
+
 namespace H3DF
 {
+	class BaseView;
+
 	class NavigationCube
 	{
 	public:

@@ -28,11 +28,17 @@
     <Filter Include="Command">
       <UniqueIdentifier>{b3b8e6a4-8888-46d0-8f6e-a64d2bc80797}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Session">
+      <UniqueIdentifier>{3c64263f-cafb-4170-b487-8374023c38ff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Signal">
+      <UniqueIdentifier>{eb765525-9e37-41a7-99d2-e42a5d68cc4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Signal">
+      <UniqueIdentifier>{e16237be-9076-4bfe-bb4d-bb994d04546e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -104,6 +110,15 @@
     </ClInclude>
     <ClInclude Include="Manager.Tracker.h">
       <Filter>Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Session.h">
+      <Filter>Session</Filter>
+    </ClInclude>
+    <ClInclude Include="Signal.Connector.h">
+      <Filter>Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Signal\Signal.h">
+      <Filter>_Signal</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +193,15 @@
     </ClCompile>
     <ClCompile Include="Manager.Tracker.cpp">
       <Filter>Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Session.cpp">
+      <Filter>Session</Filter>
+    </ClCompile>
+    <ClCompile Include="Signal.Connector.cpp">
+      <Filter>Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Signal\Signal.cpp">
+      <Filter>_Signal</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

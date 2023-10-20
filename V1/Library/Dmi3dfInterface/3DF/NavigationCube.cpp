@@ -9,6 +9,8 @@
 #include "Facility.AppOptions.h"
 #include "./Private/SelectionPrivate.h"
 
+#include "../Private/View.Private.h"
+
 USING_3DF_NAMESPACE
 
 namespace NavigationCubePreset
@@ -98,7 +100,7 @@ NavigationCube::~NavigationCube()
 
 int NavigationCube::LButtonUp(HEventInfo & cInEvent)
 {
-	WindowPoint cPoint(cInEvent.GetMouseWindowPos());
+	WindowPoint cPoint(cInEvent.GetMouseWindowPos().x, cInEvent.GetMouseWindowPos().y, cInEvent.GetMouseWindowPos().z);
 
 	SelectionOptionsKit cSelectOption;
 	cSelectOption.SetLevel(Selection::Level::Segment).SetRelatedLimit(0);//.SetProximity(0.001);// SetSorting(Selection::Sorting::ZSorting);
@@ -143,7 +145,7 @@ int NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)
 
 int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 {
-	WindowPoint cPoint(cInEvent.GetMouseWindowPos());
+	WindowPoint cPoint(cInEvent.GetMouseWindowPos().x, cInEvent.GetMouseWindowPos().y, cInEvent.GetMouseWindowPos().z);
 
 	SelectionOptionsKit cSelectOption;
 	cSelectOption.SetLevel(Selection::Level::Segment).SetRelatedLimit(0);//.SetProximity(0.001);// SetSorting(Selection::Sorting::ZSorting);

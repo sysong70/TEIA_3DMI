@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 
-#include "Component.Application.h"
+#include "3DF.Application.h"
 
 #include <Common_Define.h>
 
@@ -64,7 +64,7 @@ void H3DF::Component::Application::ExecuteSignal(Json::Object & cInObject)
 //== CWinApp에서 전달되는 메시지 처리 ==================================================================
 
 // 1. Application이 실행될때 최초 처리 CWinApp::InitInstance에서 메시지 전달 받음.
-void H3DF::Component::Application::InitInstance()
+void H3DF::Application::InitInstance()
 {
 	//----- Construct에서 처리 하는 부분 -----
 	// HOOPS License 처리
@@ -108,7 +108,7 @@ void H3DF::Component::Application::InitInstance()
 }
 
 // 2. CWinApp::OnExitInstance() 처리
-void H3DF::Component::Application::ExitInstance()
+void H3DF::Application::ExitInstance()
 {
 	if (nullptr != m_pcHoopsDB) {
 		delete m_pcHoopsDB;

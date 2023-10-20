@@ -19,25 +19,34 @@
 #include <hic.h>
 #include <HConstantFrameRate.h>
 
-#include "Canvas.h"
-#include "Window.h"
-#include "Segment.h"
-#include "Selection.h"
+#include "3DF.Canvas.h"
+#include "Private/Canvas.Private.h"
 
-#include "Selectability.h"
-#include "Visibility.h"
-#include "Material.h"
-#include "LineAttribute.h"
+#include "3DF.View.h"
+#include "Private/View.Private.h"
 
-#include "Operator.CameraSelect.h"
-#include "Operator.SelectArea.h"
-#include "Operator.ObjectSnap.h"
+#include "3DF/Window.h"
+#include "3DF/Segment.h"
+#include "3DF/Selection.h"
+#include "3DF/SelectionSet.h"
+#include "3DF/Selectability.h"
+#include "3DF/Visibility.h"
+#include "3DF/Material.h"
+#include "3DF/LineAttribute.h"
+#include "3DF/NavigationCube.h"
+
+#include "3DF/Operator.CameraSelect.h"
+#include "3DF/Operator.SelectArea.h"
+#include "3DF/Operator.ObjectSnap.h"
+
+
+#include "3DF/Facility.AppOptions.h"
+
+#include "3DF/Operator.KinematicTest.h"
+
+#include <Common_Define.h>
 
 #include "../Signal/Signal.h"
-
-#include "Facility.AppOptions.h"
-
-#include "Operator.KinematicTest.h"
 
 #define SEGMENT_TYPE						1
 #define ENTITY_TYPE							2
@@ -54,7 +63,7 @@
 #define UINT2bool(__uint__val)  (__uint__val > 0) ?  true: false
 #define BOOL2bool(TRUE_Or_FALSE) (( TRUE_Or_FALSE == TRUE ) ? true : false)
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
 #define TheKenel TheAppOptions.Kernel
 #define ThePreset TheAppOptions.Preset
@@ -63,20 +72,30 @@ USING_3DF_NAMESPACE
 
 //== Camera 관련 Class ==============================================================================
 
-CameraPos::CameraPos() {
+H3DF::CameraPos::CameraPos() {
 	w = 0.0f;
 	h = 0.0f;
 	bActive = false;
 }
 
-Canvas::Canvas(HBaseModel * pcBaseModel, void * pcWindowHandle)
+//== Canvas 관련 Class ==============================================================================
+
+H3DF::Canvas::Canvas()
 {
-	m_pcBaseView = new H3DF::BaseView(pcBaseModel, nullptr, H_ASCII_TEXT(TheKenel.General.Display.Driver), nullptr,
-		reinterpret_cast<void *>(pcWindowHandle), nullptr);
+	CanvasPrivate * pcImpl = new CanvasPrivate();
+	if (nullptr == pcImpl) {
+		assert(false);
+	}
 
-	m_pcWindow = new WindowKey(m_pcBaseView);
+	m_pcImpl = pcImpl;
 
-	m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
+	//----- Model 생성 및 초기화 -----
+	pcImpl->m_pcModel = new H3DF::Model();
+	if (nullptr == pcImpl->m_pcModel) {
+		assert(false);
+	}
+
+	pcImpl->m_pcModel->Init();
 
 	m_bOocSelection = false;
 	m_bDeepSelection = false;
@@ -90,8 +109,158 @@ Canvas::Canvas(HBaseModel * pcBaseModel, void * pcWindowHandle)
 	m_pcKinematicTest = nullptr;
 }
 
-Canvas::~Canvas()
+H3DF::Canvas::Canvas(Canvas const & cInThat)
 {
+	m_pcImpl = new CanvasPrivate();
+	Set(cInThat);
+}
+
+void H3DF::Canvas::Destruct()
+{
+	CanvasPrivate * pcImpl = new CanvasPrivate();
+	if (nullptr == pcImpl) {
+		assert(false);
+	}
+
+	if (nullptr != pcImpl->m_pcModel) {
+		delete pcImpl->m_pcModel;
+		pcImpl->m_pcModel = nullptr;
+	}
+
+	if (nullptr != m_pcNaviCube) {
+		delete m_pcNaviCube;
+		m_pcNaviCube = nullptr;
+	}
+
+	for(auto & cView : pcImpl->m_vcViewArray) {
+		cView.Destruct();
+	}
+}
+
+void H3DF::Canvas::Set(Canvas const & cInThat)
+{
+	CanvasPrivate * pcImpl = (CanvasPrivate *)m_pcImpl;
+	CanvasPrivate * pcInThatImpl = (CanvasPrivate *)cInThat.m_pcImpl;
+	pcImpl->Copy(pcInThatImpl);
+}
+
+Canvas const & H3DF::Canvas::operator = (Canvas const & cInThat)
+{
+	Set(cInThat);
+	return *this;
+}
+
+// Attaches a View to this HPS::Canvas using an implicit Layout that covers the whole window.
+// 전체 창을 덮는 암시적 레이아웃을 사용하여 이 HPS:Canvas에 View 연결.
+// 여기서 BaseView를 생성한다.
+void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
+{
+	CanvasPrivate * pcCanvasImpl = static_cast<CanvasPrivate *>(m_pcImpl);
+	if(nullptr == pcCanvasImpl) {
+		DEBUG_RETURN;
+	}
+
+	H3DF::Model * pcModel = pcCanvasImpl->m_pcModel;
+	if (nullptr == pcModel) {
+		DEBUG_RETURN;
+	}
+
+	H3DF::WindowHandle nWindowHandle = pcCanvasImpl->m_nInWindowHandle;
+	if (0 == nWindowHandle) {
+		DEBUG_RETURN;
+	}
+
+	ViewPrivate * pcViewImpl = (ViewPrivate *)cInView.GetImpl();
+	if (nullptr == pcViewImpl) {
+		DEBUG_RETURN;
+	}
+
+	char * pchName = pcViewImpl->m_pchName;
+
+	// pcViewImpl에 포함되어 있는 HBaseView를 생성하고 초기화 한다.
+	pcViewImpl->Init(pcModel, H_ASCII_TEXT(TheKenel.General.Display.Driver), pchName, nWindowHandle);
+	m_pcBaseView = pcViewImpl->m_pcBaseView;
+
+// 	m_pcNaviCube = new NavigationCube();
+// 	m_pcNaviCube->SetView(m_pcBaseView, m_pcWindow);
+
+	pcCanvasImpl->m_vcViewArray.push_back(cInView);
+}
+
+H3DF::View H3DF::Canvas::GetFrontView() const
+{
+	CanvasPrivate * pcImpl = static_cast<CanvasPrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) {
+		assert(false);
+	}
+
+	if (pcImpl->m_vcViewArray.empty()) {
+		assert(false);
+	}
+
+	return pcImpl->m_vcViewArray.front();
+}
+
+void H3DF::Canvas::Update() const
+{
+	CanvasPrivate * pcImpl = static_cast<CanvasPrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) {
+		DEBUG_RETURN;
+	}
+
+	for (const auto & cView : pcImpl->m_vcViewArray) {
+		cView.Update();
+	}
+}
+
+void H3DF::Canvas::Update(Window::UpdateType eInType, H3DF::Time dInTimeLimit) const
+{
+	Update();
+}
+
+void H3DF::Canvas::Resize(int cx, int cy)
+{
+	View cView = GetFrontView();
+
+	H3DF::BaseView * pcBaseView = ((ViewPrivate *)cView.GetImpl())->GetBaseView();
+
+	pcBaseView->SetXYSizeOverride(cx, cy);
+
+	pcBaseView->SetXYSizeOverride(cx, cy);
+
+	if (cx > 0 && cy > 0 && m_pcNaviCube->IsValid()) {
+		m_pcNaviCube->OnSize(cx, cy);
+	}
+}
+
+//==================================================================================================
+
+H3DF::Canvas::Canvas(HBaseModel * pcBaseModel, void * pcWindowHandle)
+{
+	m_pcBaseView = new H3DF::BaseView(pcBaseModel, nullptr, H_ASCII_TEXT(TheKenel.General.Display.Driver), nullptr,
+		reinterpret_cast<void *>(pcWindowHandle), nullptr);
+
+	m_pcWindow = new WindowKey(m_pcBaseView);
+
+	m_pcNaviCube = new NavigationCube();
+	m_pcNaviCube->SetView(m_pcBaseView, m_pcWindow);
+
+	m_bOocSelection = false;
+	m_bDeepSelection = false;
+
+	m_pcCameraOrbitSelect = nullptr;
+	m_pcSelectArea = nullptr;
+
+	m_nCookieSelected = 0;
+	m_nCookieDeSelectedAll = 0;
+
+	m_pcKinematicTest = nullptr;
+}
+
+H3DF::Canvas::~Canvas()
+{
+	return;
+
 	HC_Relinquish_Memory();
 
 	if(nullptr != m_pnSweetenKeyList) {
@@ -112,8 +281,10 @@ Canvas::~Canvas()
 
 //== Hoops 설정 함수 =================================================================================
 
-void Canvas::Init()
+void H3DF::Canvas::Init()
 {
+	m_pcModel = new H3DF::Model();
+
 	char chDriverOpts[MVO_BUFFER_SIZE], chRenderingOpts[MVO_BUFFER_SIZE] = { 0 };
 
 	// call base's init function first to get the default HOOPS hierarchy for the Canvas
@@ -121,7 +292,7 @@ void Canvas::Init()
 
 	m_pcBaseView->GetModel()->GetEventManager()->RegisterHandler((HAnimationListener *)GetBaseView(), HAnimationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
 
-	H3DF::DmiSelectionControl * pcSelection = new H3DF::DmiSelectionControl(m_pcBaseView);
+	H3DF::SelectionSet * pcSelection = new H3DF::SelectionSet(m_pcBaseView);
 	pcSelection->SetAllowSubentityDeselection(true);
 
 	m_pcBaseView->SetSelection(pcSelection);
@@ -261,7 +432,7 @@ void Canvas::Init()
 		//if (!pDoc->IsFileReadDeferedForView() || CurrentFramerateMode == FramerateFixed)
 		if (FramerateFixed == TheKenel.Performance.FramerateOptimization.CurrentFramerateMode)
 		{
-			m_pcBaseView->SetFramerateMode(TheKenel.Performance.FramerateOptimization.CurrentFramerateMode,
+			m_pcBaseView->SetFramerateMode((FramerateMode)TheKenel.Performance.FramerateOptimization.CurrentFramerateMode,
 				TheKenel.Performance.FramerateOptimization.FramerateTime, TheKenel.Performance.FramerateOptimization.MaxThreshold,
 				UINT2bool(TheKenel.Performance.FramerateOptimization.UseLods), TheKenel.Performance.FramerateOptimization.DetailSteps,
 				TheKenel.Performance.FramerateOptimization.HardCutoff);
@@ -269,17 +440,19 @@ void Canvas::Init()
 	}
 	else if (TheKenel.Performance.FramerateOptimization.CullingThresholdSet)
 	{
-		m_pcBaseView->SetFramerateMode(FramerateOff);
+		m_pcBaseView->SetFramerateMode((FramerateMode)FramerateOff);
 		m_pcBaseView->SetCullingThreshold(TheKenel.Performance.FramerateOptimization.CullingThreshold);
 	}
 	else
 	{
-		m_pcBaseView->SetFramerateMode(FramerateOff);
+		m_pcBaseView->SetFramerateMode((FramerateMode)FramerateOff);
 		m_pcBaseView->SetCullingThreshold(0);
 	}
 
 	m_pcBaseView->SetSmoothTransition(false);
-	m_pcBaseView->SetShadowRenderingMode(TheKenel.Effects.SimpleShadow.ShadowRenderingMode);
+
+	m_pcBaseView->SetShadowRenderingMode((HShadowRenderingMode)TheKenel.Effects.SimpleShadow.ShadowRenderingMode);
+
 	SetViewAxis();
 
 	SetTransparency();
@@ -293,7 +466,7 @@ void Canvas::Init()
 	FakeHLRColor.Set(ColorValue(ThePreset.FakeHLRColor));
 
 	m_pcBaseView->SetFakeHLRColor(FakeHLRColor);
-	m_pcBaseView->SetProjMode(ThePreset.ProjectionMode);
+	m_pcBaseView->SetProjMode((ProjMode)ThePreset.ProjectionMode);
 	m_pcBaseView->SetSmoothTransition(ThePreset.SmoothTransition);
 	m_pcBaseView->SetSmoothTransitionDuration(0.5f);
 	m_pcBaseView->GetUndoManager()->Flush();			//don't care about this initial camera change
@@ -385,9 +558,9 @@ void Canvas::Init()
 	m_pcBaseView->GetSelection()->UpdateHighlightStyle();
 
 	// set the rendermode
-	m_pcBaseView->SetRenderMode(ThePreset.RenderMode, true);
+	m_pcBaseView->SetRenderMode((HRenderMode)ThePreset.RenderMode, true);
 
-	m_pcBaseView->SetEventCheckerCallback(event_checker);
+	//m_pcBaseView->SetEventCheckerCallback(event_checker);
 
 	char chRenderingOption[MVO_BUFFER_SIZE] = "0";
 	char chHeuristics[MVO_BUFFER_SIZE] = "0";
@@ -417,7 +590,6 @@ void Canvas::Init()
 	} HC_Close_Segment();
 */
 
-
 // 	SetDefaultOperator();
 // 	SetSuppressUpdate(false);
 // 
@@ -428,6 +600,7 @@ void Canvas::Init()
 
 	// initialize the QueryDialog and AdvancedQueryDialog
 	// Remark
+
 /*
 	m_query_dialog = new CQueryDialog();
 	m_query_dialog->Create(IDD_QUERYDIALOG);
@@ -525,7 +698,6 @@ void Canvas::Init()
 	// Remark
 // 	CSolidHoopsFrame * frame = (CSolidHoopsFrame *)AfxGetMainWnd();
 // 	frame->GetBhvToolbar()->m_wndBhvSlider.SetPos(0);
-
 
 	HC_Open_Segment_By_Key(m_pcBaseView->GetCuttingPlanesKey()); {
 		HC_Open_Segment("plane2"); {
@@ -685,7 +857,7 @@ void Canvas::Init()
 	m_pcBaseView->SetSuppressUpdate(false);
 }
 
-void Canvas::SetViewId(int nViewId) 
+void H3DF::Canvas::SetViewId(int nViewId) 
 { 
 	m_nViewId = nViewId; 
 
@@ -694,7 +866,7 @@ void Canvas::SetViewId(int nViewId)
 	}
 }
 
-void Canvas::SetGpu(CString strGpu)
+void H3DF::Canvas::SetGpu(CString strGpu)
 {
 	char gpu_to_use[256];
 	strcpy(gpu_to_use, (char const *) H_UTF8(strGpu).encodedText());
@@ -705,7 +877,7 @@ void Canvas::SetGpu(CString strGpu)
 	}
 }
 
-void Canvas::SetDriverOption()
+void H3DF::Canvas::SetDriverOption()
 {
 	char chDriverOpts[MVO_BUFFER_SIZE];
 
@@ -733,7 +905,7 @@ void Canvas::SetDriverOption()
 }
 
 // 투명도 적용 방법 설정
-void Canvas::SetTransparency()
+void H3DF::Canvas::SetTransparency()
 {
 	char text[4096];
 	char style[4096];
@@ -759,7 +931,7 @@ void Canvas::SetTransparency()
 	m_pcBaseView->SetTransparency(text, fast_z_sort);
 }
 
-void Canvas::SetViewAxis()
+void H3DF::Canvas::SetViewAxis()
 {
 	char text[4096];
 	HVector front, top;
@@ -771,19 +943,23 @@ void Canvas::SetViewAxis()
 	m_pcBaseView->SetViewAxis(&front, &top);
 }
 
-void Canvas::InitNavigationCube(int nWidth, int nHeight)
+void H3DF::Canvas::InitNavigationCube(int nWidth, int nHeight)
 {
-	m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
-	m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetModelKey());
-	m_cNaviCube.Transform();
+	if (nullptr == m_pcNaviCube) {
+		DEBUG_RETURN;
+	}
 
-	m_pcBaseView->SetNavigationCube(&m_cNaviCube);
+	m_pcNaviCube->SetView(m_pcBaseView, m_pcWindow);
+	m_pcNaviCube->Create(nWidth, nHeight, m_pcBaseView->GetModelKey());
+	m_pcNaviCube->Transform();
+
+	m_pcBaseView->SetNavigationCube(m_pcNaviCube);
 
 	m_bInitNaviCube = true;
 }
 
 // Select option 처리
-void Canvas::SetSelectOption()
+void H3DF::Canvas::SetSelectOption()
 {
 	MaterialMappingKit cMaterial;
 	cMaterial.SetFaceColor(RGBColor(1.0f, 0.5f, 0.0f));
@@ -840,9 +1016,9 @@ void Canvas::SetSelectOption()
 	m_pcBaseView->GetSelection()->SetUseDefinedHighlight(ThePreset.UseDefinedHighlighting);
 	m_pcBaseView->GetSelection()->SetAllowDisplacement(ThePreset.DisplaceSelection);
 	m_pcBaseView->GetSelection()->SetInvisible(ThePreset.InvisibleSelection);
-	m_pcBaseView->GetSelection()->SetHighlightMode(ThePreset.HighlightMode);
+	m_pcBaseView->GetSelection()->SetHighlightMode((HSelectionHighlightMode)ThePreset.HighlightMode);
 
-	m_pcBaseView->GetHighlightSelection()->SetHighlightMode(ThePreset.HighlightMode);
+	m_pcBaseView->GetHighlightSelection()->SetHighlightMode((HSelectionHighlightMode)ThePreset.HighlightMode);
 	m_pcBaseView->GetSelection()->SetHighlightTransparency(ThePreset.TransparencyLevel);
 
 	if (ThePreset.RefSelType == "Spriting")
@@ -855,7 +1031,7 @@ void Canvas::SetSelectOption()
 	m_pcBaseView->GetSelection()->UpdateHighlightStyle();
 }
 
-void Canvas::SetWindowBackGroundColor(COLORREF nNewTopColor, COLORREF nNewBottomColor, bool bEmitMessage)
+void H3DF::Canvas::SetWindowBackGroundColor(COLORREF nNewTopColor, COLORREF nNewBottomColor, bool bEmitMessage)
 {
 	HPoint nWindowTopColor;
 	nWindowTopColor.Set(ColorValue(nNewTopColor));
@@ -866,7 +1042,7 @@ void Canvas::SetWindowBackGroundColor(COLORREF nNewTopColor, COLORREF nNewBottom
 	m_pcBaseView->SetWindowColor(nWindowTopColor, nWindowBottomColor, bEmitMessage);
 }
 
-bool Canvas::GetKeyState(unsigned int key, int & flags)
+bool H3DF::Canvas::GetKeyState(unsigned int key, int & flags)
 {
 	unsigned char state[256];
 	flags = 0;
@@ -887,7 +1063,7 @@ bool Canvas::GetKeyState(unsigned int key, int & flags)
 		return false;
 }
 
-void Canvas::SetMarkupColor(COLORREF new_color, bool emit_message)
+void H3DF::Canvas::SetMarkupColor(COLORREF new_color, bool emit_message)
 {
 	UNREFERENCED(emit_message);
 
@@ -901,14 +1077,15 @@ void Canvas::SetMarkupColor(COLORREF new_color, bool emit_message)
 	m_pcBaseView->GetMarkupManager()->SetMarkupColor(new_mkp_color);
 }
 
-void Canvas::SetShadowColor(COLORREF new_color)
+void H3DF::Canvas::SetShadowColor(COLORREF new_color)
 {
 	HPoint new_shd_color;
 	new_shd_color.Set(ColorValue(new_color));
 	m_pcBaseView->SetShadowColor(new_shd_color);
 }
 
-void Canvas::event_checker(HIC_Rendition const * nr)
+/*
+void H3DF::Canvas::event_checker(HIC_Rendition const * nr)
 {
 	//MSG msg;
 	Canvas * pCurrentView = (Canvas *)HIC_Show_User_Index(nr, H_VIEW_POINTER_INDEX);
@@ -945,9 +1122,9 @@ void Canvas::event_checker(HIC_Rendition const * nr)
 		HIC_Abort_Update(nr);
 	}
 
-}
+}*/
 
-void Canvas::ViewReady()
+void H3DF::Canvas::ViewReady()
 {
 	HBaseModel * hmodel = GetBaseView()->GetModel();
 
@@ -997,10 +1174,9 @@ void Canvas::ViewReady()
 		HC_Set_Rendering_Options(opt);
 	} HC_Close_Segment();
 
-
-	GetBaseView()->SetShadowLightDirection(ThePreset.UseLightVector, &ThePreset.LightVector);
+	//GetBaseView()->SetShadowLightDirection(ThePreset.UseLightVector, *ThePreset.LightVector);
 	GetBaseView()->SetShadowIgnoresTransparency(ThePreset.IgnoreTransparency);
-	GetBaseView()->SetShadowMode(ThePreset.ShadowMode);
+	GetBaseView()->SetShadowMode((HShadowMode)ThePreset.ShadowMode);
 	GetBaseView()->SetOcclusionCullingMode(ThePreset.OcclusionCulling);
 	GetBaseView()->SetLineAntialiasing(TheKenel.Appearance.AntiAliasing.Line);
 	GetBaseView()->SetTextAntialiasing(TheKenel.Appearance.AntiAliasing.Text);
@@ -1020,7 +1196,7 @@ void Canvas::ViewReady()
 		GetBaseView()->SetDisplayListMode(false);
 	}
 	else {
-		GetBaseView()->SetDisplayListType(ThePreset.DisplayList);
+		GetBaseView()->SetDisplayListType((DisplayListType)ThePreset.DisplayList);
 		GetBaseView()->SetDisplayListMode(true);
 	}
 
@@ -1041,14 +1217,14 @@ void Canvas::ViewReady()
 	GetBaseView()->SetSuppressUpdate(false);
 }
 
-void Canvas::SetupViews()
+void H3DF::Canvas::SetupViews()
 {
-	GetBaseView()->SetRenderMode(ThePreset.RenderMode, true);
-	GetBaseView()->SetShadowMode(ThePreset.ShadowMode);
+	GetBaseView()->SetRenderMode((HRenderMode)ThePreset.RenderMode, true);
+	GetBaseView()->SetShadowMode((HShadowMode)ThePreset.ShadowMode);
 	GetBaseView()->SetOcclusionCullingMode(TheKenel.Performance.Optimization.OcclusionCulling, true);
 }
 
-void Canvas::EnableFrameRate(bool onoff)
+void H3DF::Canvas::EnableFrameRate(bool onoff)
 {
 	int nSteps = (ThePreset.DynamicAdjustment ? TheKenel.Performance.FramerateOptimization.DetailSteps : 0);
 
@@ -1061,7 +1237,7 @@ void Canvas::EnableFrameRate(bool onoff)
 	}
 }
 
-void Canvas::SetSceneFont(CString csFontName, CString csFontSize, CString csFontUnits)
+void H3DF::Canvas::SetSceneFont(CString csFontName, CString csFontSize, CString csFontUnits)
 {
 	HC_Open_Segment_By_Key(GetBaseView()->GetSceneKey()); {
 
@@ -1084,7 +1260,7 @@ void Canvas::SetSceneFont(CString csFontName, CString csFontSize, CString csFont
 	} HC_Close_Segment();
 }
 
-bool Canvas::signal_selected(int signal, void * signal_data, void * user_data)
+bool H3DF::Canvas::signal_selected(int signal, void * signal_data, void * user_data)
 {
 	return true;
 /*
@@ -1096,7 +1272,7 @@ bool Canvas::signal_selected(int signal, void * signal_data, void * user_data)
 /*!
   Receive the MVO event HSignalDeSelectedAll event here and call the appropriate handler
 */
-bool Canvas::signal_deselected_all(int signal, void * signal_data, void * user_data)
+bool H3DF::Canvas::signal_deselected_all(int signal, void * signal_data, void * user_data)
 {
 	return true;
 /*
@@ -1106,7 +1282,7 @@ bool Canvas::signal_deselected_all(int signal, void * signal_data, void * user_d
 	return OnSignalDeSelectedAll();*/
 }
 
-bool Canvas::OnSignalSelected()
+bool H3DF::Canvas::OnSignalSelected()
 {
 /*
 
@@ -1127,7 +1303,7 @@ bool Canvas::OnSignalSelected()
   HSignalDeSelectedAll MVO event handler. Update any dialog bars we have
   \return bool
 */
-bool Canvas::OnSignalDeSelectedAll()
+bool H3DF::Canvas::OnSignalDeSelectedAll()
 {
 /*
 	if (m_pDlgClashBrowser)
@@ -1143,22 +1319,14 @@ bool Canvas::OnSignalDeSelectedAll()
 
 
 //== Command 관련 함수 ===========================================================================
-void Canvas::Resize(int cx, int cy)
-{
-	GetBaseView()->SetXYSizeOverride(cx, cy);
 
-	if (cx > 0 && cy > 0 && m_cNaviCube.IsValid()) {
-		m_cNaviCube.OnSize(cx, cy);
-	}
-}
-
-void Canvas::CancelCommands()
+void H3DF::Canvas::CancelCommands()
 {
 	DeSelectAll();
 }
 
 //== Mouse 관련 함수 =============================================================================
-bool Canvas::LButtonDown(int nFlags, int x, int y)
+bool H3DF::Canvas::LButtonDown(int nFlags, int x, int y)
 {
 	// GetBaseView()->SetDynamicHighlighting(false);
 
@@ -1176,7 +1344,7 @@ bool Canvas::LButtonDown(int nFlags, int x, int y)
 	return true;
 }
 
-bool Canvas::LButtonUp(int nFlags, int x, int y)
+bool H3DF::Canvas::LButtonUp(int nFlags, int x, int y)
 {
 	// GetBaseView()->SetDynamicHighlighting(true);
 
@@ -1197,7 +1365,7 @@ bool Canvas::LButtonUp(int nFlags, int x, int y)
 	return true;
 }
 
-bool Canvas::RButtonDown(int nFlags, int x, int y)
+bool H3DF::Canvas::RButtonDown(int nFlags, int x, int y)
 {
 	//GetBaseView()->SetDynamicHighlighting(false);
 
@@ -1209,7 +1377,7 @@ bool Canvas::RButtonDown(int nFlags, int x, int y)
 	return true;
 }
 
-bool Canvas::RButtonUp(int nFlags, int x, int y)
+bool H3DF::Canvas::RButtonUp(int nFlags, int x, int y)
 {
 	//GetBaseView()->SetDynamicHighlighting(true);
 
@@ -1220,7 +1388,7 @@ bool Canvas::RButtonUp(int nFlags, int x, int y)
 	return true;
 }
 
-bool Canvas::MouseMove(int nFlags, int x, int y)
+bool H3DF::Canvas::MouseMove(int nFlags, int x, int y)
 {
 	// Control을 누른경우 Face 단위로 선택이 됨.
 /*
@@ -1232,6 +1400,7 @@ bool Canvas::MouseMove(int nFlags, int x, int y)
 		GetHighlightSelection()->SetSelectionLevel(HSelectLevel::HSelectSegment);
 	}
 */
+	BaseView * pcView = GetBaseView();
 
 	HEventInfo cEvent(GetBaseView());
 	cEvent.SetPoint(HE_MouseMove, x, y, MouseMapFlags(nFlags));
@@ -1251,7 +1420,7 @@ bool Canvas::MouseMove(int nFlags, int x, int y)
 }
 
 // Mouse Wheel 대응
-bool Canvas::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop)
+bool H3DF::Canvas::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop)
 {
 	HEventInfo	cEvent(GetBaseView());
 	cEvent.SetPoint(HE_MouseWheel, x - nLeft, y - nTop, MouseMapFlags(nFlags));
@@ -1264,7 +1433,7 @@ bool Canvas::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTo
 }
 
 //== Keyboard 관련 함수 ==============================================================================
-bool Canvas::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
+bool H3DF::Canvas::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	switch (nChar)
 	{
@@ -1300,7 +1469,7 @@ bool Canvas::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
 }
 
 
-DWORD Canvas::MouseMapFlags(DWORD state)
+DWORD H3DF::Canvas::MouseMapFlags(DWORD state)
 {
 	DWORD nFlag = 0;
 
@@ -1314,11 +1483,11 @@ DWORD Canvas::MouseMapFlags(DWORD state)
 	return nFlag;
 }
 
-#include "Operator.KeyboardTest.h"
+#include "3DF/Operator.KeyboardTest.h"
 //:TEMP
 Operator::KeyboardTest* g_pOperator = nullptr;
 
-bool Canvas::KeyboardInput(Json::Object& input)
+bool H3DF::Canvas::KeyboardInput(Json::Object& input)
 {
 	using namespace Signal;
 
@@ -1326,13 +1495,13 @@ bool Canvas::KeyboardInput(Json::Object& input)
 		g_pOperator = new Operator::KeyboardTest(this->m_pcWindow);
 	}
 
-	View::Action action = (View::Action)input.GetInteger(SKW_ACTION);
+	Signal::View::Action action = (Signal::View::Action)input.GetInteger(SKW_ACTION);
 
 	switch (action) {
-	case View::Action::OnChar:
-	case View::Action::OnKeyDown:
-	case View::Action::OnKeyUp:
-	case View::Action::OnInput:
+	case Signal::View::Action::OnChar:
+	case Signal::View::Action::OnKeyDown:
+	case Signal::View::Action::OnKeyUp:
+	case Signal::View::Action::OnInput:
 		g_pOperator->OnKeyboard(input);
 		break;
 
@@ -1345,13 +1514,13 @@ bool Canvas::KeyboardInput(Json::Object& input)
 
 //== Operator 관련 함수 ==============================================================================
 
-void Canvas::SetDefaultOperator()
+void H3DF::Canvas::SetDefaultOperator()
 {
 	//m_pcCameraManipulate = new HOpCameraManipulate(this, 0, 1, new OpCameraOrbitSelect(this), new OpCameraPan(this));
 // 		, new HSOpCameraPan(m_pHView),
 // 		new HSOpCameraZoom(m_pHView), 0, false))
 	
-	m_pcCameraOrbitSelect = new Operator::CameraSelect(m_pcWindow, m_cNaviCube);
+	m_pcCameraOrbitSelect = new Operator::CameraSelect(m_pcWindow, *m_pcNaviCube);
 	m_pcSelectArea = new Operator::SelectArea(GetBaseView());
 
 	GetBaseView()->SetOperator(m_pcCameraOrbitSelect);
@@ -1359,7 +1528,7 @@ void Canvas::SetDefaultOperator()
 	//LocalSetOperator(m_pcCameraManipulate);
 }
 
-void Canvas::LocalSetOperator(HBaseOperator * pcNewOperator)
+void H3DF::Canvas::LocalSetOperator(HBaseOperator * pcNewOperator)
 {
 	HBaseOperator * pcOperator = GetBaseView()->GetOperator();
 	GetBaseView()->SetOperator(pcNewOperator);
@@ -1382,7 +1551,7 @@ void Canvas::LocalSetOperator(HBaseOperator * pcNewOperator)
 }
 
 //== Model 관련 함수 =============================================================================
-SegmentKey Canvas::GetModelKey() 
+SegmentKey H3DF::Canvas::GetModelKey() 
 { 
 	return m_pcBaseView->GetModelKey(); 
 }
@@ -1390,7 +1559,7 @@ SegmentKey Canvas::GetModelKey()
 //== Select 관련 함수 ================================================================================
 
 // 선택된 Entity 선택 해제
-void Canvas::DeSelectAll()
+void H3DF::Canvas::DeSelectAll()
 {
 	if (0 < GetBaseView()->GetSelection()->GetSize()) {
 		GetBaseView()->GetSelection()->DeSelectAll();
@@ -1398,7 +1567,7 @@ void Canvas::DeSelectAll()
 	}
 }
 
-void Canvas::SetSubentitySelectLevel()
+void H3DF::Canvas::SetSubentitySelectLevel()
 {
 	HSelectionSet * pcSelection = GetBaseView()->GetSelection();
 
@@ -1413,7 +1582,7 @@ void Canvas::SetSubentitySelectLevel()
 
 //== Clash 관련 함수 =================================================================================
 
-void Canvas::ClearClashList()
+void H3DF::Canvas::ClearClashList()
 {
 	if(nullptr != m_pcClashList)
 	{

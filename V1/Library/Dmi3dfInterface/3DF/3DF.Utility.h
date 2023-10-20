@@ -27,5 +27,8 @@ namespace H3DF
 		API_3DF bool CharToUnicode(char * pchText, CString & strText);
 
 		CString GetExecuteDirectory();
+
+		//== String 관련 함수 ========================================================================
+		API_3DF bool CopyString(const char * pchSoruce, char *& pchDestination);
 	};
 };

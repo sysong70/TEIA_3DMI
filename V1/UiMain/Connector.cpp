@@ -73,7 +73,7 @@ Broker3d theBroker3d;
 
 bool Connector3d::Initialize()
 {
-	return theBroker3d.Load(L"3DMIKernelInterface.dll");
+	return theBroker3d.Load(L"3DMISessionInterface.dll");
 }
 
 

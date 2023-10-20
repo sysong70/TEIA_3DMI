@@ -14,6 +14,10 @@ namespace SESSION
 		public:
 			ViewControl();
 			~ViewControl();
+
+			// 일단 Keyboard Input 처리 부분이 필요함.
+// 			int InputCount() override;
+// 			Manager::Input::InputType * InputTypes() override;
 		};
 	}
 }

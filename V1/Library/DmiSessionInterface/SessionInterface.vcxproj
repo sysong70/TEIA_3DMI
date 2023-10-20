@@ -68,22 +68,26 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;3DMICOMMANDANALYZER_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>../Common</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(TargetProd)Kernel3dInterface.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(DmiOutDir)</AdditionalLibraryDirectories>
       <ImportLibrary>$(DmiOutDir)\$(TargetName).lib</ImportLibrary>
       <ProgramDatabaseFile>$(DmiSymbolsDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <ProfileGuidedDatabase>$(DmiSymbolsDir)\$(TargetName).pgd</ProfileGuidedDatabase>
     </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -105,7 +109,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(TargetProd)3dfInterface.lib;$(TargetProd)3dxInterface.lib;$(TargetProd)C3dInterface.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(TargetProd)Kernel3dInterface.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(DmiOutDir)</AdditionalLibraryDirectories>
       <ImportLibrary>$(DmiOutDir)\$(TargetName).lib</ImportLibrary>
       <ProgramDatabaseFile>$(DmiSymbolsDir)\$(TargetName).pdb</ProgramDatabaseFile>
@@ -117,6 +121,7 @@
     <ClInclude Include="..\Common\Fio.h" />
     <ClInclude Include="..\Common\Json.h" />
     <ClInclude Include="..\Common\WStr.h" />
+    <ClInclude Include="..\Signal\Signal.h" />
     <ClInclude Include="Command.Root.h" />
     <ClInclude Include="Command.Line.h" />
     <ClInclude Include="Command.ViewControl.h" />
@@ -136,7 +141,8 @@
     <ClInclude Include="Session.Facility.KernelOption.h" />
     <ClInclude Include="Session.Facility.Preference.h" />
     <ClInclude Include="Interface.h" />
-    <ClInclude Include="framework.h" />
+    <ClInclude Include="Session.h" />
+    <ClInclude Include="Signal.Connector.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +150,7 @@
     <ClCompile Include="..\Common\Fio.cpp" />
     <ClCompile Include="..\Common\Json.cpp" />
     <ClCompile Include="..\Common\WStr.cpp" />
+    <ClCompile Include="..\Signal\Signal.cpp" />
     <ClCompile Include="Command.Root.cpp" />
     <ClCompile Include="Command.Line.cpp" />
     <ClCompile Include="Command.ViewControl.cpp" />
@@ -156,6 +163,7 @@
     <ClCompile Include="Manager.Session.cpp" />
     <ClCompile Include="Manager.Tracker.cpp" />
     <ClCompile Include="Manager.Tree.cpp" />
+    <ClCompile Include="Session.cpp" />
     <ClCompile Include="Session.Facility.AppOptions.cpp" />
     <ClCompile Include="Session.Facility.Base.cpp" />
     <ClCompile Include="Session.Facility.ImportOption.cpp" />
@@ -163,6 +171,7 @@
     <ClCompile Include="Session.Facility.Preference.cpp" />
     <ClCompile Include="Interface.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Signal.Connector.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>

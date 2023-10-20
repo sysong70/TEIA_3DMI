@@ -1,0 +1,44 @@
+﻿#pragma once
+
+#include <Json.h>
+
+#include "Kernel.h"
+
+#include "Object.h"
+
+#include "../Dmi3dfInterface/3DF.View.h"
+
+namespace KERNEL
+{
+	// Kernel View는 CDocument의 CView의 신호를 처리하는 역활을 한다.
+	// CDoucment 대응하는 함수는 없기 때문에, Kernel View에서 처리하도록 한다.
+	class API_KERNEL View : public Object
+	{
+	public:
+		View();
+		KERNEL::Type ObjectType() const { return KERNEL::Type::View; };
+
+		void Initialize(Json::Object & cInObject, Signal::Delivery & cInstance);
+		void FileOpen(Json::Object & cInObject, Signal::Delivery & cInstance);
+		void Destruct();
+		void Paint(Json::Object & cInObject);
+		void Resize(Json::Object & cInObject);
+		void CancelCommands();
+
+		void ViewId(int nViewId);
+		int ViewId();
+	
+		//== Mouse 관련 함수 =========================================================================
+	public:
+		void MouseSignal(Json::Object & cInObject);
+
+		//== Keyboard 관련 함수 ======================================================================
+		void KeyboardSignal(Json::Object & cInObject);
+		
+	protected:
+		//H3DF::View m_cView;
+
+	private:
+		int m_nViewId = -1;
+	};
+};

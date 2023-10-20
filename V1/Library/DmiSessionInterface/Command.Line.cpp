@@ -24,10 +24,10 @@ int SESSION::Command::Line::InputCount()
 
 Manager::Input::InputType * SESSION::Command::Line::InputTypes()
 {
-	Manager::Input::InputType eType[2];
+	Manager::Input::InputType * peType = new Manager::Input::InputType[2];
 
-	eType[0] = Manager::Input::InputType::Cordinate;
-	eType[1] = Manager::Input::InputType::Cordinate;
+	peType[0] = Manager::Input::InputType::Cordinate;
+	peType[1] = Manager::Input::InputType::Cordinate;
 
-	return eType;
+	return peType;
 }

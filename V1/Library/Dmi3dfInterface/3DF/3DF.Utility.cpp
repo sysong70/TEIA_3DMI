@@ -11,7 +11,7 @@ using namespace std::chrono;
 
 USING_3DF_NAMESPACE
 
-bool Utility::ChangeSubSegmentColor(SegmentKey & cInTargetSegment, MaterialMappingKit const & cInKit, bool bRecursive)
+bool H3DF::Utility::ChangeSubSegmentColor(SegmentKey & cInTargetSegment, MaterialMappingKit const & cInKit, bool bRecursive)
 {
 	SegmentKeyArray cSubSegments;
 
@@ -27,7 +27,7 @@ bool Utility::ChangeSubSegmentColor(SegmentKey & cInTargetSegment, MaterialMappi
 	return true;
 }
 
-CString Utility::GetTimeSpanString(milliseconds & ms)
+CString H3DF::Utility::GetTimeSpanString(milliseconds & ms)
 {
 	auto secs = duration_cast<seconds>(ms);
 	ms -= duration_cast<milliseconds>(secs);
@@ -46,7 +46,7 @@ CString Utility::GetTimeSpanString(milliseconds & ms)
 	return strSpanText;
 }
 
-void Utility::Set3DfOptionString(char * chBuffer, char * chOption)
+void H3DF::Utility::Set3DfOptionString(char * chBuffer, char * chOption)
 {
 	if (0 == strlen(chOption)) {
 		return;
@@ -60,14 +60,14 @@ void Utility::Set3DfOptionString(char * chBuffer, char * chOption)
 	}
 }
 
-CString Utility::HexStr(DWORD_PTR nValue)
+CString H3DF::Utility::HexStr(DWORD_PTR nValue)
 {
 	CString strText;
 	strText.Format(L"0x%llx", nValue);
 	return strText;
 }
 
-CString Utility::GetTypeString(Type eType)
+CString H3DF::Utility::GetTypeString(Type eType)
 {
 	CString strText;
 
@@ -217,7 +217,7 @@ CString Utility::GetTypeString(Type eType)
 	return strText;
 }
 
-bool Utility::SetSegmentName(SegmentKey & cInSegment, CString strName)
+bool H3DF::Utility::SetSegmentName(SegmentKey & cInSegment, CString strName)
 {
 	char * pchName = nullptr;
 	int nSize = 0;
@@ -233,7 +233,7 @@ bool Utility::SetSegmentName(SegmentKey & cInSegment, CString strName)
 	return true;
 }
 
-bool Utility::ShowSegmentName(SegmentKey & cInSegment, CString & strName)
+bool H3DF::Utility::ShowSegmentName(SegmentKey & cInSegment, CString & strName)
 {
 	ByteArray aUserData;
 	if (false == cInSegment.ShowUserData((intptr_t)UserDataIndex::Name, aUserData)) {
@@ -247,13 +247,13 @@ bool Utility::ShowSegmentName(SegmentKey & cInSegment, CString & strName)
 	return true;
 }
 
-bool Utility::UnicodeToChar(CString strText, char *& pchBuffer)
+bool H3DF::Utility::UnicodeToChar(CString strText, char *& pchBuffer)
 {
 	int nBufferSize = 0;
 	return UnicodeToChar(strText, pchBuffer, nBufferSize);
 }
 
-bool Utility::UnicodeToChar(CString strText, char *& pchBuffer, int & nBufferSize)
+bool H3DF::Utility::UnicodeToChar(CString strText, char *& pchBuffer, int & nBufferSize)
 {
 	if (true == strText.IsEmpty()) {
 		return false;
@@ -277,7 +277,7 @@ bool Utility::UnicodeToChar(CString strText, char *& pchBuffer, int & nBufferSiz
 	return true;
 }
 
-bool Utility::CharToUnicode(char * pchText, CString & strText)
+bool H3DF::Utility::CharToUnicode(char * pchText, CString & strText)
 {
 	if (nullptr == pchText) {
 		return false;
@@ -315,7 +315,7 @@ bool Utility::CharToUnicode(char * pchText, CString & strText)
 	return true;
 }
 
-CString Utility::GetExecuteDirectory()
+CString H3DF::Utility::GetExecuteDirectory()
 {
 	TCHAR szBuffer[MAX_PATH];
 	TCHAR Drive[_MAX_DRIVE];
@@ -330,4 +330,36 @@ CString Utility::GetExecuteDirectory()
 	strFilePath.Format(L"%s%s", Drive, Path);
 
 	return strFilePath;
+}
+
+//== String 관련 함수 ===============================================================================
+bool H3DF::Utility::CopyString(const char * pchSoruce, char *& pchDestination)
+{
+	// 입력 문자열의 크기 계산
+	size_t nSourceSize = strlen(pchSoruce) + 1; // 널 종료 문자('\0')를 포함해서 크기 계산
+
+	// 대상 문자열에 충분한 메모리 할당
+	pchDestination = new char[nSourceSize * sizeof(char)];
+	if (nullptr == pchDestination) {
+		// 메모리 할당 실패 처리
+		return false;
+	}
+
+	// 문자열 복사
+	strcpy(pchDestination, pchSoruce);
+/*
+	size_t nBufferSize = wcslen(pchBuffer) + 1; // 널 종료 문자('\0')를 포함해서 크기 계산
+
+	// 대상 문자열에 충분한 메모리 할당
+	wchar_t * pchCopyBuffer = new wchar_t[nBufferSize];
+	if (nullptr == pchCopyBuffer) {
+		wprintf(L"메모리 할당 실패\n");
+		return;
+	}
+
+	// 문자열 복사
+	wcscpy(pchCopyBuffer, pchBuffer);
+*/
+
+	return true;
 }

@@ -2,7 +2,7 @@
 #include "Operator.KeyboardTest.h"
 #include "Painter.h"
 #include "Window.h"
-#include "BaseView.h"
+#include "../Private/View.Private.h"
 #include "../Signal/Signal.h"
 
 USING_3DF_NAMESPACE

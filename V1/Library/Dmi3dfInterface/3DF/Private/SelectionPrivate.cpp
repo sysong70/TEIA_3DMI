@@ -3,7 +3,7 @@
 #include "SelectionPrivate.h"
 
 #include "../Window.h"
-#include "../BaseView.h"
+#include "../../Private/View.Private.h"
 
 #include "../Line.h"
 #include "../Shell.h"

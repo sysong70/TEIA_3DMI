@@ -6,7 +6,7 @@
 #include "Private/SelectionPrivate.h"
 #include "Private/HighlightPrivate.h"
 
-#include "BaseView.h"
+#include "../Private/View.Private.h"
 
 #include <hc.h>
 #include <HBaseOperator.h>
@@ -125,6 +125,7 @@ void H3DF::WindowKey::Initialize()
 //	HBaseView * pcBaseView = pcImpl->m_pcBaseView;
 }
 
+/*
 int H3DF::WindowKey::OnMouseMove(HEventInfo & cEvent)
 {
 	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
@@ -155,6 +156,7 @@ int H3DF::WindowKey::OnMouseMove(HEventInfo & cEvent)
 
 	return nResult;
 }
+*/
 
 SelectionOptionsControl & H3DF::WindowKey::GetSelectionOptionsControl()
 {

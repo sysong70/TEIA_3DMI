@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="DLL">
-      <UniqueIdentifier>{8d7f4f37-4e4e-4837-b375-0f5393c5ef46}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Signal">
       <UniqueIdentifier>{6378a32f-9238-4ec7-90eb-15cfbe66d7d3}</UniqueIdentifier>
     </Filter>
@@ -28,14 +25,8 @@
     <Filter Include="Kernel">
       <UniqueIdentifier>{d751b3d7-f946-4ee5-bbca-8c5ac048200c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Session">
-      <UniqueIdentifier>{f7853dbd-cb1d-43ca-a86c-8cd144e97793}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
@@ -57,10 +48,10 @@
     <ClInclude Include="Manager.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Application.h">
+    <ClInclude Include="Kernel.Application.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="View.h">
+    <ClInclude Include="Kernel.View.h">
       <Filter>Kernel</Filter>
     </ClInclude>
     <ClInclude Include="Signal.Connector.h">
@@ -69,11 +60,8 @@
     <ClInclude Include="..\Signal\Signal.h">
       <Filter>_Signal</Filter>
     </ClInclude>
-    <ClInclude Include="Interface.Session.h">
-      <Filter>Session</Filter>
-    </ClInclude>
-    <ClInclude Include="Interface.h">
-      <Filter>DLL</Filter>
+    <ClInclude Include="Object.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -101,10 +89,10 @@
     <ClCompile Include="Manager.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="Application.cpp">
+    <ClCompile Include="Kernel.Application.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="View.cpp">
+    <ClCompile Include="Kernel.View.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
     <ClCompile Include="Signal.Connector.cpp">
@@ -113,11 +101,8 @@
     <ClCompile Include="..\Signal\Signal.cpp">
       <Filter>_Signal</Filter>
     </ClCompile>
-    <ClCompile Include="Interface.Session.cpp">
-      <Filter>Session</Filter>
-    </ClCompile>
-    <ClCompile Include="Interface.cpp">
-      <Filter>DLL</Filter>
+    <ClCompile Include="Object.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

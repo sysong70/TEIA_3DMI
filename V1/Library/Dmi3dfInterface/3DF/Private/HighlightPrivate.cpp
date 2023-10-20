@@ -5,7 +5,6 @@
 #include "SelectionPrivate.h"
 
 #include "../Window.h"
-#include "../BaseView.h"
 
 #include "../Line.h"
 #include "../LineAttribute.h"

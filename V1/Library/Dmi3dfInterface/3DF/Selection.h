@@ -1,10 +1,5 @@
 ﻿#pragma once
 
-#include <HBaseView.h>
-#include <HUtility.h>
-#include <HTools.h>
-#include <HSelectionSet.h>
-
 #include "3DF.h"
 #include "KeyPath.h"
 #include "Kit.h"
@@ -14,6 +9,8 @@
 #include "Point.h"
 
 #include <vector>
+
+class HBaseView;
 
 OPEN_3DF_NAMESPACE
 
@@ -307,8 +304,8 @@ public:
 
 	H3DF::Type ObjectType() const { return H3DF::Type::SelectionControl; };
 
-	size_t SelectByPoint(HEventInfo & cEvent, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const;
-	size_t SelectByPoint(HEventInfo & cEvent, SelectionResults & cOutResults) const;
+// 	size_t SelectByPoint(HEventInfo & cEvent, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const;
+// 	size_t SelectByPoint(HEventInfo & cEvent, SelectionResults & cOutResults) const;
 
 	// Point in window space at which to perform the selection.
 	size_t SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const;
@@ -319,25 +316,5 @@ private:
 	// Private default constructor to prevent instantiation without a window.
 	SelectionControl();
 };
-
-class DmiSelectionControl : public HSelectionSet
-{
-public:
-	DmiSelectionControl(HBaseView * pcView, bool bReferenceSelection = false);
-	~DmiSelectionControl();
-
-	// overloaded virtuals
-	void Init() override;
-
-	void Select(HC_KEY key, int num_include_keys, HC_KEY * include_keys, bool emit_message = true) override;
-
-private:
-	bool m_bShowFacesAsLines;
-
-	int	m_nSelectLevel;
-
-	struct vlist_s * m_pcSelection;
-};
-
 
 CLOSE_3DF_NAMESPACE

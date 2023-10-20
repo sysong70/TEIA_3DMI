@@ -3,8 +3,8 @@
 #include "3DF.h"
 #include "Math.h"
 
-#include "HTools.h"
-#include "HGlobals.h"
+// #include "HTools.h"
+// #include "HGlobals.h"
 
 OPEN_3DF_NAMESPACE
 
@@ -43,7 +43,7 @@ class WorldPoint : public Point
 public:
 	WorldPoint(float px = 0.0f, float py = 0.0f, float pz = 0.0f) : Point(px, py, pz) {}
 	WorldPoint(Point const & cInPoint) :Point(cInPoint) {}
-	WorldPoint(HPoint cInPoint) : Point(cInPoint.x, cInPoint.y, cInPoint.z) {}
+	//WorldPoint(HPoint cInPoint) : Point(cInPoint.x, cInPoint.y, cInPoint.z) {}
 
  	WorldPoint(WindowKey const & cInWindow, ObjectPoint const & cInPoint);
 // 	WorldPoint(WindowKey const & cInWindow, WorldPoint const & cInPoint);
@@ -53,7 +53,7 @@ public:
  	WorldPoint(WindowKey const & cInWindow, WindowPoint const & cInPoint);
  	WorldPoint(WindowKey const & cInWindow, PixelPoint const & cInPoint);
 
-	WorldPoint & operator = (HPoint const & cInPoint) { x = cInPoint.x, y = cInPoint.y, z = cInPoint.z; return *this; }
+	//WorldPoint & operator = (HPoint const & cInPoint) { x = cInPoint.x, y = cInPoint.y, z = cInPoint.z; return *this; }
 
 private:
  	WorldPoint(ObjectPoint const & cInPoint); // Prevents implicit conversion to other points
@@ -69,7 +69,7 @@ class InnerWindowPoint : public Point
 public:
 	InnerWindowPoint(float px = 0.0f, float py = 0.0f, float pz = 0.0f) : Point(px, py, pz) {}
 	InnerWindowPoint(Point const & cInPoint) :Point(cInPoint) {}
-	InnerWindowPoint(HPoint cInPoint) : Point(cInPoint.x, cInPoint.y, cInPoint.z) {}
+	//InnerWindowPoint(HPoint cInPoint) : Point(cInPoint.x, cInPoint.y, cInPoint.z) {}
 
 	InnerWindowPoint(WindowKey const & cInWindow, ObjectPoint const & cInPoint);
 	InnerWindowPoint(WindowKey const & cInWindow, WorldPoint const & cInPoint);
@@ -93,7 +93,7 @@ class WindowPoint : public Point
 public:
 	WindowPoint(float px = 0.0f, float py = 0.0f, float pz = 0.0f) : Point(px, py, pz) {}
 	WindowPoint(Point const & cInPoint) :Point(cInPoint) {}
-	WindowPoint(HPoint cInPoint) : Point(cInPoint.x, cInPoint.y, cInPoint.z) {}
+	//WindowPoint(HPoint cInPoint) : Point(cInPoint.x, cInPoint.y, cInPoint.z) {}
 
  	WindowPoint(WindowKey const & cInWindow, ObjectPoint const & cInPoint);
  	WindowPoint(WindowKey const & cInWindow, WorldPoint const & cInPoint);
@@ -103,7 +103,7 @@ public:
 // 	WindowPoint(WindowKey const & cInWindow, WindowPoint const & cInPoint);
  	WindowPoint(WindowKey const & cInWindow, PixelPoint const & cInPoint);
 
-	WindowPoint & operator = (HPoint const & cInPoint) { x = cInPoint.x, y = cInPoint.y, z = cInPoint.z; return *this; }
+	//WindowPoint & operator = (HPoint const & cInPoint) { x = cInPoint.x, y = cInPoint.y, z = cInPoint.z; return *this; }
 
 private:
  	WindowPoint(ObjectPoint const & cInPoint); // Prevents implicit conversion to other points
@@ -119,7 +119,7 @@ class PixelPoint : public Point
 public:
 	PixelPoint(float px = 0.0f, float py = 0.0f, float pz = 0.0f) : Point(px, py, pz) {}
 	PixelPoint(Point const & cInPoint) :Point(cInPoint) {}
-	PixelPoint(HPoint cInPoint) : Point(cInPoint.x, cInPoint.y, cInPoint.z) {}
+	//PixelPoint(HPoint cInPoint) : Point(cInPoint.x, cInPoint.y, cInPoint.z) {}
 	
 	PixelPoint(WindowKey const & cInWindow, ObjectPoint const & cInPoint);
 	PixelPoint(WindowKey const & cInWindow, WorldPoint const & cInPoint);
@@ -129,7 +129,7 @@ public:
 	PixelPoint(WindowKey const & cInWindow, WindowPoint const & cInPoint);
 //	PixelPoint(WindowKey const & cInWindow, PixelPoint const & cInPoint);
 
-	PixelPoint & operator = (HPoint const & cInPoint) { x = cInPoint.x, y = cInPoint.y, z = cInPoint.z; return *this; }
+	//PixelPoint & operator = (HPoint const & cInPoint) { x = cInPoint.x, y = cInPoint.y, z = cInPoint.z; return *this; }
 
 private:
 	PixelPoint(ObjectPoint const & cInPoint); // Prevents implicit conversion to other points

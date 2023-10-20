@@ -2,12 +2,27 @@
 
 #include <Json.h>
 
-#include "Application.h"
-#include "View.h"
+#ifdef KERNEL_EXPORTS
+#	define API_KERNEL __declspec (dllexport)
+#else
+#	define API_KERNEL __declspec (dllimport)
+#endif
 
 namespace KERNEL
 {
-	class Kernel
+	enum class Type : uint32_t
+	{
+		None									= 0x00000000,
+		GenericMask								= 0xffffff00,
+
+		Kernel									= 0x00000000,
+		Manager									= 0x00000001,
+		Object									= 0x00000002,
+		Application								= 0x00000003,
+		View									= 0x00000004,
+	};
+
+	class API_KERNEL Kernel
 	{
 	public:
 		Kernel();
@@ -15,14 +30,24 @@ namespace KERNEL
 		void ExecuteSignal(Json::Object & cInObject);
 
 	protected:
-		KERNEL::Application m_cApplication;
-		KERNEL::View m_cView;
+		//KERNEL::Application m_cApplication;
+		//KERNEL::View m_cView;
+	};
 
-	private:
-		//Interface * m_pc3dfInterface = nullptr;
+	class Object;
 
-		// Pointer to the HOOPS/MVO HDB object associated with this instance of the application
+	class PrivateImpl
+	{
+	public:
+		PrivateImpl() {}
+		virtual ~PrivateImpl() {}
 
-		//std::map<int, H3DF::Canvas *> m_mpcCanvas;
+		KERNEL::Type Type() const;
+		void SetType(KERNEL::Type eType);
+
+		void SetImpl(Object * pcObject, PrivateImpl * pcImpl);
+
+	protected:
+		KERNEL::Type m_eType = KERNEL::Type::None;
 	};
 };

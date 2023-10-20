@@ -10,10 +10,12 @@
 
 #include "Operator.ObjectSnap.h"
 
+#include "../Private/View.Private.h"
+
 #include <Common_Define.h>
 
-#include <HTools.h>
 #include <HBaseView.h>
+#include <HTools.h>
 #include <HSelectionSet.h>
 #include <HMarkupManager.h>
 #include <HEventManager.h>

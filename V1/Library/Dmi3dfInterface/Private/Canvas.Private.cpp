@@ -1,17 +1,16 @@
 ﻿#include "StdAfx.h"
 
-#include "Model.h"
+#include "Canvas.Private.h"
 
 #include "Common_Define.h"
 
-#include <HIOManager.h>
+#include "../3DF/3DF.Utility.h"
 
-#include "Selection.h"
+using namespace H3DF;
 
-USING_3DF_NAMESPACE
+//== Model Class ===================================================================================
 
-Model::Model() :
-	m_cSegmentKey(GetModelKey())
+H3DF::Model::Model()
 {
 	SetBRepGeometry(false);
 
@@ -23,28 +22,28 @@ Model::Model() :
 	m_pcPRCDeleteModelCallback = nullptr;
 }
 
-Model::~Model()
+H3DF::Model::~Model()
 {
-	if(nullptr != m_pcTopologyManager) {
+	if (nullptr != m_pcTopologyManager) {
 		REMOVE_POINTER(m_pcTopologyManager);
 	}
 
-	if(nullptr != m_pcConnector) {
+	if (nullptr != m_pcConnector) {
 		REMOVE_POINTER(m_pcConnector);
 	}
 
-	if(nullptr != m_pPMIConnector) {
+	if (nullptr != m_pPMIConnector) {
 		REMOVE_POINTER(m_pPMIConnector);
 	}
 
-	if(nullptr != m_pcPRCAsmModelFile && nullptr != m_pcPRCDeleteModelCallback) {
+	if (nullptr != m_pcPRCAsmModelFile && nullptr != m_pcPRCDeleteModelCallback) {
 		m_pcPRCDeleteModelCallback(m_pcPRCAsmModelFile);
 	}
 }
 
-void Model::SetBRepGeometry(bool bBrepFlag)
+void H3DF::Model::SetBRepGeometry(bool bBrepFlag)
 {
-	if(true == bBrepFlag)
+	if (true == bBrepFlag)
 	{
 		HC_KEY key = GetModelKey();
 		HC_Open_Segment_By_Key(key);
@@ -57,7 +56,7 @@ void Model::SetBRepGeometry(bool bBrepFlag)
 	HBaseModel::SetBRepGeometry(bBrepFlag);
 }
 
-void Model::UpdateModelHandedness()
+void H3DF::Model::UpdateModelHandedness()
 {
 	// see if handedness attribute was defined in the model,
 	// if yes set our member variable
@@ -86,4 +85,29 @@ void Model::UpdateModelHandedness()
 			m_eModelHandedness = ModelHandedness::NotSet;
 		}
 	} HC_Close_Segment();
+}
+
+//== CanvasPrivate Class ===========================================================================
+
+H3DF::CanvasPrivate::CanvasPrivate()
+{
+}
+
+H3DF::CanvasPrivate::~CanvasPrivate()
+{
+	if (nullptr != m_pchName) {
+		delete[] m_pchName;
+	}
+}
+
+void H3DF::CanvasPrivate::Copy(const CanvasPrivate * pcInThat)
+{
+	m_pcModel = pcInThat->m_pcModel;
+
+	if (nullptr != pcInThat->m_pchName) {
+		Utility::CopyString(pcInThat->m_pchName, m_pchName);
+	}
+
+	m_nInWindowHandle = pcInThat->m_nInWindowHandle;
+	m_cApplicationWindowOptionsKit = pcInThat->m_cApplicationWindowOptionsKit;
 }

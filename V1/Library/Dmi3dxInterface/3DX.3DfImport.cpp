@@ -2799,13 +2799,12 @@ UINT TdfImport::ConvertTessFaceDataTriangleStripe(ConvertFaceInfo & cInFaceInfo)
 	{
 		A3DUns32 nTriStripIndex = cInFaceInfo.nOutTriStartIndex;
 		A3DUns32 nPointCount = cInFaceInfo.pcInTessFaceData->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex];
+		cInFaceInfo.nOutTriSizeIndex++;
+
 		if(0 == nPointCount) {
-			cInFaceInfo.nOutTriSizeIndex++;
 			assert(false);
 			continue;
 		}
-
-		cInFaceInfo.nOutTriSizeIndex++;
 
 		for(A3DUns32 tri = 0; tri < nPointCount - 2; tri++)
 		{

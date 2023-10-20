@@ -4,7 +4,7 @@
 #include "Private/SelectionPrivate.h"
 
 #include "Window.h"
-#include "BaseView.h"
+#include "../Private/View.Private.h"
 
 #include "Line.h"
 
@@ -13,10 +13,16 @@
 
 #include <atlcoll.h>
 
+#include <HBaseView.h>
+#include <HUtility.h>
+#include <HTools.h>
+#include <HSelectionSet.h>
+
 #include <HBaseOperator.h>
 #include <HMarkupManager.h>
 #include <HEventManager.h>
 #include <HConstantFrameRate.h>
+
 
 #define		SEGMENT_TYPE		1
 #define		ENTITY_TYPE			2
@@ -1098,6 +1104,7 @@ SelectionControl & H3DF::SelectionControl::operator =(SelectionControl const & c
 	return *this;
 }
 
+/*
 size_t H3DF::SelectionControl::SelectByPoint(HEventInfo & cEvent, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const
 {
 	Point cInLocation;
@@ -1117,6 +1124,7 @@ size_t H3DF::SelectionControl::SelectByPoint(HEventInfo & cEvent, SelectionResul
 	SelectionOptionsKit cInOptions;
 	return SelectByPoint(cInLocation, cInOptions, cOutResults);
 }
+*/
 
 size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const
 {
@@ -1136,67 +1144,4 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, UINT con
 	pcImpl->SelectByPoint(cInLocation, nFlags, cInOptions, cOutResults);
 
 	return 0;
-}
-
-//== DmiSelectionControl ===========================================================================
-
-DmiSelectionControl::DmiSelectionControl(HBaseView * pcView, bool bReferenceSelection) :
-	HSelectionSet(pcView, bReferenceSelection)
-{
-	m_nSelectLevel = SEGMENT_TYPE;
-	m_pcSelection = nullptr;
-	m_bShowFacesAsLines = false;
-	//SetAllowEntitySelection(false);
-}
-
-DmiSelectionControl::~DmiSelectionControl()
-{
-	if (nullptr != m_pcSelection)
-	{
-		delete_vlist(m_pcSelection);
-		m_pcSelection = nullptr;
-	}
-}
-
-// create a new list  object
-void DmiSelectionControl::Init()
-{
-	m_pcSelection = new_vlist(malloc, free);
-	HSelectionSet::Init();
-}
-
-void DmiSelectionControl::Select(HC_KEY key, int num_include_keys, HC_KEY * include_keys, bool emit_message)
-{
-	char	keyType[MVO_BUFFER_SIZE];
-
-	if (!m_pView->GetEmitMessageFunction() || emit_message)	//disregard segment level setting if messsage
-		//from other client			
-	{
-		if (!GetAllowEntitySelection()) // nonzero if NOT a segment
-		{
-			// the key is to a geometric entity.  If we are in segment selection mode,
-			// then we need to get the key to its parent segment.
-
-			HC_Show_Key_Type(key, keyType);
-
-			if (!streq("segment", keyType))
-			{
-				char segname[MVO_BUFFER_SIZE];
-				HC_KEY segkey;
-
-				segkey = HC_KShow_Owner_Original_Key(key);
-				HC_Show_Owner_By_Key(key, segname);
-
-				// climb up one more level if this is the temporary highlight key
-				if (IsHighlightSegment(segkey))
-				{
-					segkey = HC_KShow_Owner_Original_Key(segkey);
-					HC_Show_Owner_By_Key(segkey, segname);
-				}
-				key = segkey;
-			}
-		}
-	}
-
-	HSelectionSet::Select(key, num_include_keys, include_keys, emit_message);
 }

@@ -13,16 +13,13 @@ class HDB;
 
 namespace H3DF
 {
-	namespace Component
+	class API_3DF Application
 	{
-		class API_3DF Application
-		{
-		public:
-			void InitInstance();
-			void ExitInstance();
+	public:
+		void InitInstance();
+		void ExitInstance();
 
-		protected:
-			HDB * m_pcHoopsDB = nullptr;
-		};
+	protected:
+		HDB * m_pcHoopsDB = nullptr;
 	};
 };

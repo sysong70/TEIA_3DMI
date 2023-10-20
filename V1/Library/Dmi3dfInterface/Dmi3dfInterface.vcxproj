@@ -70,12 +70,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_3DF_EXPORT;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;H3DF_EXPORT;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(Dmi3dfInclude);../../Library/Common;../../Library/C3D/Kernel/Include;../../Library/3DX/include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <BrowseInformation>true</BrowseInformation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -88,6 +89,9 @@
       <ProfileGuidedDatabase>$(DmiSymbolsDir)\$(TargetName).pgd</ProfileGuidedDatabase>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -97,7 +101,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_3DF_EXPORT;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;H3DF_EXPORT;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(Dmi3dfInclude);../../Library/Common;../../Library/C3D/Kernel/Include;../../Library/3DX/include</AdditionalIncludeDirectories>
@@ -125,11 +129,16 @@
     <ClInclude Include="..\Common\WStr.h" />
     <ClInclude Include="..\Dmi3dxInterface\LogManager.h" />
     <ClInclude Include="..\Signal\Signal.h" />
+    <ClInclude Include="3DF.Canvas.h" />
+    <ClInclude Include="3DF\ApplicationWindowOption.h" />
     <ClInclude Include="3DF\KeyPath.h" />
-    <ClInclude Include="Component.Application.h" />
-    <ClInclude Include="Component.View.h" />
+    <ClInclude Include="3DF.Application.h" />
+    <ClInclude Include="3DF.View.h" />
+    <ClInclude Include="3DF.Factory.h" />
+    <ClInclude Include="3DF\SelectionSet.h" />
+    <ClInclude Include="Private\Canvas.Private.h" />
+    <ClInclude Include="Private\View.Private.h" />
     <ClInclude Include="Signal.Connector.h" />
-    <ClInclude Include="3DF\BaseView.h" />
     <ClInclude Include="3DF\Camera.h" />
     <ClInclude Include="3DF\Circle.h" />
     <ClInclude Include="3DF\EdgeAttribute.h" />
@@ -168,7 +177,6 @@
     <ClInclude Include="3DF\Marker.h" />
     <ClInclude Include="3DF\Material.h" />
     <ClInclude Include="3DF\Math.h" />
-    <ClInclude Include="3DF\Model.h" />
     <ClInclude Include="3DF\Object.h" />
     <ClInclude Include="3DF\Operator.CameraSelect.h" />
     <ClInclude Include="3DF\Operator.ObjectSnap.h" />
@@ -182,9 +190,8 @@
     <ClInclude Include="3DF\Shell.h" />
     <ClInclude Include="3DF\Style.h" />
     <ClInclude Include="3DF\3DF.Utility.h" />
-    <ClInclude Include="3DF\Canvas.h" />
     <ClInclude Include="3DF\Segment.h" />
-    <ClInclude Include="Signal.h" />
+    <ClInclude Include="3DF.Signal.h" />
     <ClInclude Include="3DF\Visibility.h" />
     <ClInclude Include="3DF\MarkerAttribute.h" />
     <ClInclude Include="3DF\Window.h" />
@@ -192,6 +199,7 @@
     <ClInclude Include="3DF\Private\SelectionPrivate.h" />
     <ClInclude Include="Import\DLL.Interface.h" />
     <ClInclude Include="Import\DLL.Helper.h" />
+    <ClInclude Include="Sprocket.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -202,10 +210,15 @@
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\Dmi3dxInterface\LogManager.cpp" />
     <ClCompile Include="..\Signal\Signal.cpp" />
-    <ClCompile Include="Component.Application.cpp" />
-    <ClCompile Include="Component.View.cpp" />
+    <ClCompile Include="3DF.Application.cpp" />
+    <ClCompile Include="3DF.Canvas.cpp" />
+    <ClCompile Include="3DF.View.cpp" />
+    <ClCompile Include="3DF\ApplicationWindowOption.cpp" />
+    <ClCompile Include="3DF.Factory.cpp" />
+    <ClCompile Include="3DF\SelectionSet.cpp" />
+    <ClCompile Include="Private\Canvas.Private.cpp" />
+    <ClCompile Include="Private\View.Private.cpp" />
     <ClCompile Include="Signal.Connector.cpp" />
-    <ClCompile Include="3DF\BaseView.cpp" />
     <ClCompile Include="3DF\Bounding.cpp" />
     <ClCompile Include="3DF\Camera.cpp" />
     <ClCompile Include="3DF\Circle.cpp" />
@@ -231,7 +244,6 @@
     <ClCompile Include="3DF\Material.cpp" />
     <ClCompile Include="3DF\Math.cpp" />
     <ClCompile Include="3DF\Math.Matrix.cpp" />
-    <ClCompile Include="3DF\Model.cpp" />
     <ClCompile Include="3DF\NavigationCube.cpp" />
     <ClCompile Include="3DF\Object.cpp" />
     <ClCompile Include="3DF\Operator.CameraSelect.cpp" />
@@ -250,7 +262,6 @@
     <ClCompile Include="3DF\Shell.cpp" />
     <ClCompile Include="3DF\Style.cpp" />
     <ClCompile Include="3DF\3DF.Utility.cpp" />
-    <ClCompile Include="3DF\Canvas.cpp" />
     <ClCompile Include="3DF\Segment.cpp" />
     <ClCompile Include="3DF\Visibility.cpp" />
     <ClCompile Include="3DF\MarkerAttribute.cpp" />
@@ -265,6 +276,7 @@
     <ClCompile Include="3DF\Private\WindowPrivate.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Import\DLL.Interface.cpp" />
+    <ClCompile Include="Sprocket.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>

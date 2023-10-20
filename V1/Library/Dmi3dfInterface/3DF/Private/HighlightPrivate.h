@@ -10,7 +10,7 @@
 #include "../Control.h"
 #include "../Selection.h"
 
-#include "../BaseView.h"
+#include "../Private/View.Private.h"
 
 #include "../Math.h"
 

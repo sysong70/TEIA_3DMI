@@ -4,6 +4,9 @@
 
 #include "Window.h"
 
+#include "HTools.h"
+#include "HGlobals.h"
+
 USING_3DF_NAMESPACE
 
 //== ObjectPoint class =============================================================================

@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "3DF.h"
-#include <HBaseView.h>
 
 #include "Facility.h"
 

@@ -5,38 +5,41 @@
 #include "Manager.Command.h"
 #include "Manager.Input.h"
 
- #include "../Signal/Signal.h"
+#include "Signal.Connector.h"
+
+#include "Session.h"
+
+#include "../Signal/Signal.h"
 #include "../Common/Common_Define.h"
+
+#include "../../UiMain/Command.Resource.h"
 
 SESSION::Manager::Session theSessionManager;
 
 using namespace SESSION;
 
-Manager::Session::Session()
+SESSION::Manager::Session::Session()
 {
-	// Kernel DLL을 로드한다.
-	Load3dKernelInterface("3DMIKernel3dInterface.DLL");
-
 	theInputManager.SetSessionManager(this);
 
 	theCommandManager.SetSessionManager(this);
 }
 
-Manager::Session::~Session()
+SESSION::Manager::Session::~Session()
 {
-	// DLL을 해제한다.
-	Free3dKernelInterface();
 }
 
-Manager::Type SESSION::Manager::Session::Type()
+SESSION::Manager::Type SESSION::Manager::Session::Type()
 {
 	return SESSION::Manager::Type::Session;
 }
 
 //== 명령어 처리 부분 =================================================================================
 
-void Manager::Session::ExecuteSignal(const wchar_t * pchBuffer)
+// 1. 기본 신호 처리 (여기에서 신호 분기가 시작됨.)
+void SESSION::Manager::Session::ExecuteSignal(const wchar_t * pchBuffer)
 {
+/*
 	size_t nBufferSize = wcslen(pchBuffer) + 1; // 널 종료 문자('\0')를 포함해서 크기 계산
 
 	// 대상 문자열에 충분한 메모리 할당
@@ -48,52 +51,146 @@ void Manager::Session::ExecuteSignal(const wchar_t * pchBuffer)
 
 	// 문자열 복사
 	wcscpy(pchCopyBuffer, pchBuffer);
+*/
 
-	Json::Object cObject;
+	Json::Object cInObject;
 	// ReadObject에 buffer에 내용을 전달하고 나오면 buffer는 empty됨.
-	Json::Reader::ReadObject((wchar_t *&)pchCopyBuffer, cObject);
+	Json::Reader::ReadObject((wchar_t *&)pchBuffer, cInObject);
 
-	m_pcSendSignalTo3dKernel(pchBuffer);
+	// 들어오는 값을 순서대로 처리하도록 한다.
+	int nTarget = cInObject.GetInteger(SKW_TARGET);
+
+	switch ((Signal::Target)nTarget)
+	{
+		case Signal::Target::Application:
+			ExecuteApplicationSignal(cInObject);
+			break;
+
+		case Signal::Target::View:
+			ExecuteViewSignal(cInObject);
+			break;
+
+		default:
+			break;
+	}
 }
 
-void Manager::Session::SetSendSignalFunc(SendSignalFunc lpfnSignalCallback)
+void SESSION::Manager::Session::SetSendSignalFunc(SendSignalFunc lpfnSignalCallback)
 {
-	m_pcSetReceiverFrom3dKernel(lpfnSignalCallback);
+	m_pcSendSignal = lpfnSignalCallback;
+	Connector::SetSender(lpfnSignalCallback);
 }
 
-//== DLL 관련 함수 ===================================================================================
+//== Application 명령어 처리 부분 =====================================================================
 
-// 1. DLL 로드
-bool Manager::Session::Load3dKernelInterface(const CString & strFilePath)
+// 1. Application 명령어 처리
+// Application은 최초에 설정되는 값이기 때문에 저장하고 있다가 처리하도록 한다.
+void SESSION::Manager::Session::ExecuteApplicationSignal(Json::Object & cInObject)
 {
-	m_hInstance = ::LoadLibrary(strFilePath);
-	if (m_hInstance == nullptr) {
-		m_nErrorCode = ::GetLastError();
-		RETURN_FALSE;
+	int nAction = cInObject.GetInteger(SKW_ACTION);
+
+	switch ((Signal::Application::Action)nAction)
+	{
+		case Signal::Application::Action::OnInitInstance:
+			m_cApplication.InitInstance();
+			break;
+
+		case Signal::Application::Action::OnExitInstance:
+			m_cApplication.ExitInstance();
+			break;
+
+		case Signal::Application::Action::OnDpiAware:
+			break;
+
+		case Signal::Application::Action::OnUpdatePreference:
+			break;
+
+		case Signal::Application::Action::OnUpdateFileOption:
+			break;
+
+		default:
+			break;
 	}
-
-	// 호출 DLL에서 신호를 받아서 처리하는 함수를 가져온다. 
-	// 상대방에서 처리하는 함수는 여기에서는 명령어를 보내는 함수가 된다.
-	m_pcSendSignalTo3dKernel = (SendSignalFunc)GetProcAddress(m_hInstance, "ExecuteCommand");
-
-	// 호출 DLL에서 현제 DLL에 신호를 보내는 함수를 설정한다.
-	// 여기에서는 명령어를 받아서 처리하는 함수가 된다.
-	m_pcSetReceiverFrom3dKernel = (AssignSendSignalFunc)GetProcAddress(m_hInstance, "AssignSendSignalFunc");
-
-	if (nullptr == m_pcSendSignalTo3dKernel || nullptr == m_pcSetReceiverFrom3dKernel) {
-		m_bIsValid = true;
-		m_nErrorCode = ::GetLastError();
-		RETURN_FALSE;
-	}
-
-	m_bIsValid = true;
-
-	return true;
 }
 
-void Manager::Session::Free3dKernelInterface()
+//== View 명령어 처리 부분 ============================================================================
+
+// 1. View 명령어 처리
+void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 {
-	if (nullptr != m_hInstance) {
-		::FreeLibrary(m_hInstance);
+	int nAction = cInObject.GetInteger(SKW_ACTION);
+	int nViewId = cInObject.GetInteger(SKW_VIEWID);
+
+	SESSION::Session * pcSession = GetSession(nViewId);
+	
+	switch ((Signal::View::Action)nAction)
+	{
+		case Signal::View::Action::OnInitialize:
+			// nViewId를 넣는 이유는 Instnace에서 Signal을 보낼때 식별자로서 ViewId를 보내기 위해서 값을 넣어주는 것임.
+			// 실제로는 하나의 Instance를 사용하는 것임.
+			pcSession->ViewInitialize(cInObject, Connector::GetInstance(nViewId));
+			break;
+
+		case Signal::View::Action::OnDestruct:
+			pcSession->ViewDestruct();
+			break;
+
+		case Signal::View::Action::OnPaint:
+			pcSession->ViewPaint(cInObject);
+			break;
+
+		case Signal::View::Action::OnResize:
+			pcSession->ViewResize(cInObject);
+			break;
+
+		case Signal::View::Action::OnMouseMove:
+		case Signal::View::Action::OnLButtonDown:
+		case Signal::View::Action::OnLButtonUp:
+		case Signal::View::Action::OnMButtonDown:
+		case Signal::View::Action::OnMButtonUp:
+		case Signal::View::Action::OnRButtonDown:
+		case Signal::View::Action::OnRButtonUp:
+		case Signal::View::Action::OnMouseWheel:
+			pcSession->MouseSignal(cInObject);
+			break;
+
+			//:Ken - 20230607
+		case Signal::View::Action::OnInput:
+		case Signal::View::Action::OnChar:
+		case Signal::View::Action::OnKeyDown:
+		case Signal::View::Action::OnKeyUp:
+			pcSession->KeyboardSignal(cInObject);
+			break;
+
+		case Signal::View::Action::OnCancel:
+			pcSession->CancelCommands();
+			break;
+
+		case Signal::View::Action::OnCommand:
+			pcSession->ExecuteCommand(cInObject);
+			break;
+
+		default:
+			break;
 	}
+}
+
+// 1-1. Session을 가져옴 (없으면 생성)
+SESSION::Session * SESSION::Manager::Session::GetSession(int nViewId)
+{
+	SESSION::Session * pcSession = m_mpcSessions[nViewId];
+
+	if (nullptr == pcSession) {
+		pcSession = new SESSION::Session();
+		pcSession->SessionId(nViewId);
+		if (nullptr == pcSession) {
+			assert(false);
+			return nullptr;
+		}
+		else {
+			m_mpcSessions[nViewId] = pcSession;
+		}
+	}
+
+	return pcSession;
 }

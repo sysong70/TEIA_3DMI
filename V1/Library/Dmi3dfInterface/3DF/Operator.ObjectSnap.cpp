@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #include "Window.h"
-#include "BaseView.h"
+#include "../Private/View.Private.h"
 
 #include "Line.h"
 #include "Circle.h"
@@ -234,7 +234,12 @@ int H3DF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 	//cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(10).SetSorting(Selection::Sorting::ZSorting);
 
 	SelectionResults cHighlightSelection;
-	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cInEvent, cSelectOption, cHighlightSelection);
+
+	Point cLocation;
+	cLocation.x = cInEvent.GetMouseWindowPos().x;
+	cLocation.y = cInEvent.GetMouseWindowPos().y;
+
+	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cLocation, cSelectOption, cHighlightSelection);
 	cHighlightSelection.Sort();
 
 	// 신규 선택 요소 저장소는 초기화한다.

@@ -2,8 +2,9 @@
 
 #include "Operator.SelectArea.h"
 
-#include "Canvas.h"
+#include "../3DF.Canvas.h"
 #include "Selection.h"
+#include "SelectionSet.h"
 
 #include <HTools.h>
 #include <HBaseView.h>
@@ -71,7 +72,7 @@ int Operator::SelectArea::ButtonUp(HEventInfo & cEvent)
 
 	//GetView()->SetVisibilitySelectionMode(true);
 
-	DmiSelectionControl * pcSelection = (DmiSelectionControl *)GetView()->GetSelection();
+	H3DF::SelectionSet  * pcSelection = (H3DF::SelectionSet *)GetView()->GetSelection();
 
 	// Perform standard Windows explorer method of selecting and deselecting
 	// using Shift and Control keys
