@@ -37,15 +37,17 @@ int Operator::SelectArea::OnLButtonDown(HEventInfo & cEvent)
 	//Canvas * pcView = (Canvas *)GetView();
 	//pcView->SetSubentitySelectLevel();
 
+/*
 	// Control을 누른경우 Face 단위로 선택이 됨.
 	if (MK_CONTROL & cEvent.GetFlags()) {
-		Canvas * pcView = (Canvas *)GetView();
+		View * pcView = (View *)GetView();
 		pcView->SetSubentitySelectLevel();
 		GetView()->GetSelection()->SetSelectionLevel(HSelectLevel::HSelectEntity);
 	}
 	else {
 		GetView()->GetSelection()->SetSelectionLevel(HSelectLevel::HSelectSegment);
 	}
+*/
 
 	return HOpSelectArea::OnLButtonDown(cEvent);
 }

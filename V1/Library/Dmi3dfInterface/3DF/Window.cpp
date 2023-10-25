@@ -39,7 +39,7 @@ H3DF::WindowKey::WindowKey(H3DF::BaseView * pcBaseView)
 	SelectionOptionsControlPrivate * pcSelectionOptionsImpl = static_cast<SelectionOptionsControlPrivate *>(pcImpl->m_pcSelectionOptions->GetImpl());
 	pcSelectionOptionsImpl->m_pcSelectionSet = pcImpl->m_pcSelectionSet;
 
-	// Initialize();
+	Initialize();
 }
 
 H3DF::WindowKey::WindowKey(WindowKey const & cInThat)

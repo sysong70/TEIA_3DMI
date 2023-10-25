@@ -5,6 +5,8 @@
 #include <HBaseView.h>
 #include <HUtility.h>
 
+#include <Json.h>
+
 #include "../3DF/NavigationCube.h"
 
 namespace H3DF
@@ -54,11 +56,33 @@ namespace H3DF
 
 		bool Init(H3DF::Model * pcInModel, const char * pchInDriverType, const char * pchInInstanceName, H3DF::WindowHandle nInWindowHandle);
 
+		void ViewReady();
+
 		H3DF::BaseView * GetBaseView() { return m_pcBaseView; }
 
-		BaseView * m_pcBaseView = nullptr;
-		H3DF::WindowKey * m_pcWindow = nullptr;
-		char * m_pchName = nullptr;
+		void InitNavigationCube(int nWidth, int nHeight);
+		bool IsInitNavigationCube() { return m_bInitNaviCube; }
+
+		bool LButtonDown(int nFlags, int x, int y);
+		bool LButtonUp(int nFlags, int x, int y);
+
+		bool RButtonDown(int nFlags, int x, int y);
+		bool RButtonUp(int nFlags, int x, int y);
+
+		bool MouseMove(int nFlags, int x, int y);
+		bool MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop);
+
+		//== Keyboard 관련 함수 ======================================================================
+		bool Char(UINT nChar, UINT nRepCnt, UINT nFlags);
+		bool KeyboardInput(Json::Object & cInObject);
+
+		//== Select 관련 함수 ========================================================================
+	public:
+		void DeSelectAll();
+		void SetSubentitySelectLevel();
+
+	protected:
+		DWORD MouseMapFlags(DWORD nState);
 
 	protected:
 		static bool GetKeyState(unsigned int key, int & flags);
@@ -81,6 +105,11 @@ namespace H3DF
 		void SetDefaultOperator();
 		void LocalSetOperator(HBaseOperator * pcNewOperator);
 
+	public:
+		BaseView * m_pcBaseView = nullptr;
+		H3DF::WindowKey * m_pcWindow = nullptr;
+		char * m_pchName = nullptr;
+
 	private:
 		bool m_bShowCollisions = false;
 
@@ -88,5 +117,6 @@ namespace H3DF
 		Operator::SelectArea * m_pcSelectArea = nullptr;
 
 		NavigationCube m_cNaviCube;
+		bool m_bInitNaviCube = false;
 	};
 }

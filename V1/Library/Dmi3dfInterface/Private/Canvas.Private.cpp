@@ -41,6 +41,12 @@ H3DF::Model::~Model()
 	}
 }
 
+SegmentKey H3DF::Model::GetSegmentKey()
+{
+	SegmentKey cKey(GetModelKey());
+	return cKey;
+}
+
 void H3DF::Model::SetBRepGeometry(bool bBrepFlag)
 {
 	if (true == bBrepFlag)
@@ -110,4 +116,8 @@ void H3DF::CanvasPrivate::Copy(const CanvasPrivate * pcInThat)
 
 	m_nInWindowHandle = pcInThat->m_nInWindowHandle;
 	m_cApplicationWindowOptionsKit = pcInThat->m_cApplicationWindowOptionsKit;
+
+	for (auto pcView : pcInThat->m_vpcViewArray) {
+		m_vpcViewArray.push_back(pcView);
+	}
 }

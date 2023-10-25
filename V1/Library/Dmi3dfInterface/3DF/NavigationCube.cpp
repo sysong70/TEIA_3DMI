@@ -87,26 +87,81 @@ namespace NavigationCubePreset
 #define TheCube TheAppOptions.Preference.Views.NavCube
 
 
-NavigationCube::NavigationCube(H3DF::BaseView * view, WindowKey * pcInWindow) :
-	m_pView(view),
-	m_pcWindow(pcInWindow)
+class NavigationCubePrivate : public PrivateImpl
 {
-	m_pcWindow = pcInWindow;
+public:
+	void Copy(const NavigationCubePrivate * pcInThat) {
+		m_pcWindow = pcInThat->m_pcWindow;
+		m_pView = pcInThat->m_pView;
+
+		m_windowSize = pcInThat->m_windowSize;
+
+		m_parentSegment = pcInThat->m_parentSegment;
+		m_cubeSegment = pcInThat->m_cubeSegment;
+
+		for (int nIndex = 0; nIndex < (int)H3DF::ViewMode::Count; nIndex++) {
+			m_cSegments[nIndex] = pcInThat->m_cSegments[nIndex];
+		}
+
+		m_cOldHighlightSelection = pcInThat->m_cOldHighlightSelection;
+	}
+
+	WindowKey * m_pcWindow = nullptr;
+	H3DF::BaseView * m_pView = nullptr;
+	H3DF::Point2D m_windowSize;
+
+	HC_KEY m_parentSegment = HC_ERROR_KEY;
+	HC_KEY m_cubeSegment = HC_ERROR_KEY;
+
+	SegmentKey m_cSegments[(int)H3DF::ViewMode::Count];
+
+	SelectionResults m_cOldHighlightSelection;
+};
+
+NavigationCube::NavigationCube(H3DF::BaseView * view, WindowKey * pcInWindow)
+{
+	NavigationCubePrivate * pcImpl = new NavigationCubePrivate();
+	if (nullptr == pcImpl) { assert(false); }
+
+	m_pcImpl = pcImpl;
+
+	pcImpl->m_pView = view;
+	pcImpl->m_pcWindow = pcInWindow;
 }
 
 NavigationCube::~NavigationCube()
 {
 }
 
+void H3DF::NavigationCube::Set(NavigationCube const & cInThat)
+{
+	NavigationCubePrivate * pcImpl = (NavigationCubePrivate *)m_pcImpl;
+	NavigationCubePrivate * pcInThatImpl = (NavigationCubePrivate *)cInThat.m_pcImpl;
+	pcImpl->Copy(pcInThatImpl);
+
+	if (nullptr != pcImpl->m_pView) {
+		pcImpl->m_pView->SetNavigationCube(this);
+	}
+}
+
+NavigationCube const & H3DF::NavigationCube::operator = (NavigationCube const & cInThat)
+{
+	Set(cInThat);
+	return *this;
+}
+
 int NavigationCube::LButtonUp(HEventInfo & cInEvent)
 {
+	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) {  assert(false); }
+
 	WindowPoint cPoint(cInEvent.GetMouseWindowPos().x, cInEvent.GetMouseWindowPos().y, cInEvent.GetMouseWindowPos().z);
 
 	SelectionOptionsKit cSelectOption;
 	cSelectOption.SetLevel(Selection::Level::Segment).SetRelatedLimit(0);//.SetProximity(0.001);// SetSorting(Selection::Sorting::ZSorting);
 	
 	SelectionResults cSelection;
-	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cPoint, cSelectOption, cSelection);
+	size_t nSelectedCount = pcImpl->m_pcWindow->GetSelectionControl().SelectByPoint(cPoint, cSelectOption, cSelection);
 
 	if (0 == cSelection.GetCount()) {
 		return HLISTENER_PASS_EVENT;
@@ -120,12 +175,12 @@ int NavigationCube::LButtonUp(HEventInfo & cInEvent)
 	CString strName = cSelectKey.Name();
 	// TRACE(L"%s\n", strName);
 
-	m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
-	m_cOldHighlightSelection.Reset();
+	pcImpl->m_pcWindow->GetHighlightControl().Unhighlight(pcImpl->m_cOldHighlightSelection);
+	pcImpl->m_cOldHighlightSelection.Reset();
 
 	for (int nIndex = 0; nIndex < (int)H3DF::ViewMode::Count; nIndex++) {
-		if (m_cSegments[nIndex] == cSelectKey) {
-			m_pView->SetViewMode((H3DF::ViewMode)nIndex);
+		if (pcImpl->m_cSegments[nIndex] == cSelectKey) {
+			pcImpl->m_pView->SetViewMode((H3DF::ViewMode)nIndex);
 			break;
 		}
 	}
@@ -135,9 +190,12 @@ int NavigationCube::LButtonUp(HEventInfo & cInEvent)
 
 int NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)
 {
-	if (0 < m_cOldHighlightSelection.GetCount()) {
-		m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
-		m_cOldHighlightSelection.Reset();
+	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
+	if (0 < pcImpl->m_cOldHighlightSelection.GetCount()) {
+		pcImpl->m_pcWindow->GetHighlightControl().Unhighlight(pcImpl->m_cOldHighlightSelection);
+		pcImpl->m_cOldHighlightSelection.Reset();
 	}
 
 	return HLISTENER_PASS_EVENT;
@@ -145,6 +203,9 @@ int NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)
 
 int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 {
+	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
 	WindowPoint cPoint(cInEvent.GetMouseWindowPos().x, cInEvent.GetMouseWindowPos().y, cInEvent.GetMouseWindowPos().z);
 
 	SelectionOptionsKit cSelectOption;
@@ -153,19 +214,19 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 	int nEvent = HLISTENER_PASS_EVENT;
 	bool bUpdateFlag = false;
 
-	const SelectionControl * pcSelect = &m_pcWindow->GetSelectionControl();
+	const SelectionControl * pcSelect = &pcImpl->m_pcWindow->GetSelectionControl();
 
 	SelectionResults cSelection;
-	size_t nSelectedCount = m_pcWindow->GetSelectionControl().SelectByPoint(cPoint, cSelectOption, cSelection);
+	size_t nSelectedCount = pcImpl->m_pcWindow->GetSelectionControl().SelectByPoint(cPoint, cSelectOption, cSelection);
 
 	// 선택된 요소가 없은 경우
 	if (0 == nSelectedCount) {
 		//TRACE(L"NavigationCube No Selection\n");
 
 		// 기존에 선택된 요소가 있는 경우 처리
-		if (0 < m_cOldHighlightSelection.GetCount()) {
-			m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
-			m_cOldHighlightSelection.Reset();
+		if (0 < pcImpl->m_cOldHighlightSelection.GetCount()) {
+			pcImpl->m_pcWindow->GetHighlightControl().Unhighlight(pcImpl->m_cOldHighlightSelection);
+			pcImpl->m_cOldHighlightSelection.Reset();
 			bUpdateFlag = true;
 		}
 	}
@@ -173,8 +234,8 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 		//TRACE(L"NavigationCube Selection: %d\n", nSelectedCount);
 
 		// 이전에 선택된것과 다른 경우
-		if (m_cOldHighlightSelection != cSelection) {
-			m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection);
+		if (pcImpl->m_cOldHighlightSelection != cSelection) {
+			pcImpl->m_pcWindow->GetHighlightControl().Unhighlight(pcImpl->m_cOldHighlightSelection);
 			
 			SegmentKey cSelectKey;
 			cSelection.Front()->ShowSelectedItem(cSelectKey);
@@ -182,7 +243,7 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 			bool bFindFlag = false;
 
 			for (int nIndex = 0; nIndex < (int)H3DF::ViewMode::Count; nIndex++) {
-				if (m_cSegments[nIndex].KeyValue() == cSelectKey.KeyValue()) {
+				if (pcImpl->m_cSegments[nIndex].KeyValue() == cSelectKey.KeyValue()) {
 					bFindFlag = true;
 				}
 			}
@@ -191,13 +252,12 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 				//TRACE(L"NavigationCube Find\n");
 
 				HighlightOptionsKit cHighlightOptions;
-				m_pcWindow->GetHighlightControl().Highlight(cSelection, cHighlightOptions, true);
-				m_cOldHighlightSelection = cSelection;
+				pcImpl->m_pcWindow->GetHighlightControl().Highlight(cSelection, cHighlightOptions, true);
+				pcImpl->m_cOldHighlightSelection = cSelection;
 				nEvent = HLISTENER_CONSUME_EVENT;
 			}
 			else {
-				m_cOldHighlightSelection.Reset();
-
+				pcImpl->m_cOldHighlightSelection.Reset();
 				//TRACE(L"NavigationCube No Find\n");
 			}
 
@@ -209,40 +269,45 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 	}
 
 	if (true == bUpdateFlag) {
-		m_pcWindow->Update();
+		pcImpl->m_pcWindow->Update();
 	}
 
 	return nEvent;
 }
 
-
-
 void NavigationCube::SetView(H3DF::BaseView * view, WindowKey * pcInWindow) 
 {
-	m_pView = view;
-	m_pcWindow = pcInWindow;
+	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
+	pcImpl->m_pView = view;
+	pcImpl->m_pcWindow = pcInWindow;
 }
-
-
 
 bool NavigationCube::IsValid()
 {
-	return m_cubeSegment != HC_ERROR_KEY;
+	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
+	return pcImpl->m_cubeSegment != HC_ERROR_KEY;
 }
 
 
 void NavigationCube::Create(float width, float height, HC_KEY parent)
 {
-	m_windowSize.x = width;
-	m_windowSize.y = height;
-	m_parentSegment = parent;
-	ASSERT(m_parentSegment != HC_ERROR_KEY);
+	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
+	pcImpl->m_windowSize.x = width;
+	pcImpl->m_windowSize.y = height;
+	pcImpl->m_parentSegment = parent;
+	ASSERT(pcImpl->m_parentSegment != HC_ERROR_KEY);
 
 	if (TheCube.ShowAxis == false && TheCube.ShowCube == false) {
 		return;
 	}
 
-	HC_Open_Segment_By_Key(m_parentSegment);
+	HC_Open_Segment_By_Key(pcImpl->m_parentSegment);
 	{
 		OpenCubeSegment();
 		{
@@ -302,11 +367,14 @@ void NavigationCube::Create(float width, float height, HC_KEY parent)
 
 void NavigationCube::Recreate()
 {
-	HC_Open_Segment_By_Key(m_parentSegment);
-	HC_Delete_By_Key(m_cubeSegment);
+	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
+	HC_Open_Segment_By_Key(pcImpl->m_parentSegment);
+	HC_Delete_By_Key(pcImpl->m_cubeSegment);
 	HC_Close_Segment();
 
-	Create(m_windowSize.x, m_windowSize.y, m_parentSegment);
+	Create(pcImpl->m_windowSize.x, pcImpl->m_windowSize.y, pcImpl->m_parentSegment);
 }
 
 
@@ -321,16 +389,19 @@ HC_KEY NavigationCube::HitTest(float x, float y, float z)
 
 void NavigationCube::Transform()
 {
+	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
 	HPoint position, target, up_vector;
 
-	HC_Open_Segment_By_Key(m_pView->GetSceneKey()); {
+	HC_Open_Segment_By_Key(pcImpl->m_pView->GetSceneKey()); {
 		HC_Show_Net_Camera_Target(&target.x, &target.y, &target.z);
 		HC_Show_Net_Camera_Up_Vector(&up_vector.x, &up_vector.y, &up_vector.z);
 		HC_Show_Net_Camera_Position(&position.x, &position.y, &position.z);
 	} HC_Close_Segment();
 
-	HC_Open_Segment_By_Key(m_pView->GetSceneKey()); {
-		HC_Open_Segment_By_Key(m_cubeSegment); {
+	HC_Open_Segment_By_Key(pcImpl->m_pView->GetSceneKey()); {
+		HC_Open_Segment_By_Key(pcImpl->m_cubeSegment); {
 			HPoint oldposition;
 			HPoint old_up_vector;
 
@@ -368,11 +439,14 @@ void NavigationCube::OnSize(float width, float height)
 
 void NavigationCube::OpenCubeSegment()
 {
-	if (m_cubeSegment == HC_ERROR_KEY) {
-		m_cubeSegment = HC_Open_Segment("cube_window");
+	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
+	if (pcImpl->m_cubeSegment == HC_ERROR_KEY) {
+		pcImpl->m_cubeSegment = HC_Open_Segment("cube_window");
 	}
 	else {
-		HC_Open_Segment_By_Key(m_cubeSegment);
+		HC_Open_Segment_By_Key(pcImpl->m_cubeSegment);
 	}
 }
 
@@ -382,7 +456,6 @@ void NavigationCube::CloseCubeSegment()
 {
 	HC_Close_Segment();
 }
-
 
 
 void NavigationCube::CreateAxis()
@@ -404,47 +477,50 @@ void NavigationCube::CreateAxis()
 
 void NavigationCube::CreateCube()
 {
+	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
 	double unit = PRESET::PlaneUnit();
 
 	CreateCubeWire();
 
 	// Plane and text
 
-	m_cSegments[(int)H3DF::ViewMode::top]		= CreatePlaneShell("top", "TOP", { 0, 0, unit }, { 0, 0, 0 });
- 	m_cSegments[(int)H3DF::ViewMode::bottom]		= CreatePlaneShell("bottom", "BOTTOM", { 0, 0, -unit }, { 0, 180, 0 });
-	m_cSegments[(int)H3DF::ViewMode::front]		= CreatePlaneShell("front", "FRONT", { 0, -unit, 0 }, { 90, 0, 0 });
-	m_cSegments[(int)H3DF::ViewMode::back]		= CreatePlaneShell("back", "BACK", { 0, unit, 0 }, { 90, 0, 180 });
-	m_cSegments[(int)H3DF::ViewMode::left]		= CreatePlaneShell("left", "LEFT", { -unit, 0, 0 }, { 90, 0, -90 });
-	m_cSegments[(int)H3DF::ViewMode::right]		= CreatePlaneShell("right", "RIGHT", { unit, 0, 0 }, { 90, 0, 90 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::top] = CreatePlaneShell("top", "TOP", { 0, 0, unit }, { 0, 0, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::bottom]		= CreatePlaneShell("bottom", "BOTTOM", { 0, 0, -unit }, { 0, 180, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::front]		= CreatePlaneShell("front", "FRONT", { 0, -unit, 0 }, { 90, 0, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::back]		= CreatePlaneShell("back", "BACK", { 0, unit, 0 }, { 90, 0, 180 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::left]		= CreatePlaneShell("left", "LEFT", { -unit, 0, 0 }, { 90, 0, -90 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::right]		= CreatePlaneShell("right", "RIGHT", { unit, 0, 0 }, { 90, 0, 90 });
 
 	// Edges - n: negative, p: positive
 
-	m_cSegments[(int)H3DF::ViewMode::py_nz]		= CreateEdgeShell("py_nz", { 0, unit, -unit }, { 0, 0, 0 });
-	m_cSegments[(int)H3DF::ViewMode::py_pz]		= CreateEdgeShell("py_pz", { 0, unit, unit }, { 90, 0, 0 });
-	m_cSegments[(int)H3DF::ViewMode::ny_pz]		= CreateEdgeShell("ny_pz", { 0, -unit, unit }, { 180, 0, 0 });
-	m_cSegments[(int)H3DF::ViewMode::ny_nz]		= CreateEdgeShell("ny_nz", { 0, -unit, -unit }, { 270, 0, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::py_nz]		= CreateEdgeShell("py_nz", { 0, unit, -unit }, { 0, 0, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::py_pz]		= CreateEdgeShell("py_pz", { 0, unit, unit }, { 90, 0, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::ny_pz]		= CreateEdgeShell("ny_pz", { 0, -unit, unit }, { 180, 0, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::ny_nz]		= CreateEdgeShell("ny_nz", { 0, -unit, -unit }, { 270, 0, 0 });
 
-	m_cSegments[(int)H3DF::ViewMode::nx_nz]		= CreateEdgeShell("nx_nz", { -unit, 0, -unit }, { 0, 0, 90 });
-	m_cSegments[(int)H3DF::ViewMode::nx_pz]		= CreateEdgeShell("nx_pz", { -unit, 0, unit }, { 90, 0, 90 });
-	m_cSegments[(int)H3DF::ViewMode::px_pz]		= CreateEdgeShell("px_pz", { unit, 0, unit }, { 180, 0, 90 });
-	m_cSegments[(int)H3DF::ViewMode::px_nz]		= CreateEdgeShell("px_nz", { unit, 0, -unit }, { 270, 0, 90 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::nx_nz]		= CreateEdgeShell("nx_nz", { -unit, 0, -unit }, { 0, 0, 90 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::nx_pz]		= CreateEdgeShell("nx_pz", { -unit, 0, unit }, { 90, 0, 90 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::px_pz]		= CreateEdgeShell("px_pz", { unit, 0, unit }, { 180, 0, 90 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::px_nz]		= CreateEdgeShell("px_nz", { unit, 0, -unit }, { 270, 0, 90 });
 
-	m_cSegments[(int)H3DF::ViewMode::nx_py]		= CreateEdgeShell("nx_py", { -unit, unit, 0 }, { 0, 90, 0 });
-	m_cSegments[(int)H3DF::ViewMode::px_py]		= CreateEdgeShell("px_py", { unit, unit, 0 }, { 90, 90, 0 });
-	m_cSegments[(int)H3DF::ViewMode::px_ny]		= CreateEdgeShell("px_ny", { unit, -unit, 0 }, { 180, 90, 0 });
-	m_cSegments[(int)H3DF::ViewMode::nx_ny]		= CreateEdgeShell("nx_ny", { -unit, -unit, 0 }, { 270, 90, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::nx_py]		= CreateEdgeShell("nx_py", { -unit, unit, 0 }, { 0, 90, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::px_py]		= CreateEdgeShell("px_py", { unit, unit, 0 }, { 90, 90, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::px_ny]		= CreateEdgeShell("px_ny", { unit, -unit, 0 }, { 180, 90, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::nx_ny]		= CreateEdgeShell("nx_ny", { -unit, -unit, 0 }, { 270, 90, 0 });
 
 	// Corners - n: negative, p: positive
 
-	m_cSegments[(int)H3DF::ViewMode::nx_py_nz]	= CreateCornerShell("nx_py_nz", { -unit, unit, -unit }, { 0, 0, 0 });
-	m_cSegments[(int)H3DF::ViewMode::nx_py_pz]	= CreateCornerShell("nx_py_pz", { -unit, unit, unit }, { 90, 0, 0 });
-	m_cSegments[(int)H3DF::ViewMode::nx_ny_pz]	= CreateCornerShell("nx_ny_pz", { -unit, -unit, unit }, { 180, 0, 0 });
-	m_cSegments[(int)H3DF::ViewMode::nx_ny_nz]	= CreateCornerShell("nx_ny_nz", { -unit, -unit, -unit }, { 270, 0, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::nx_py_nz]	= CreateCornerShell("nx_py_nz", { -unit, unit, -unit }, { 0, 0, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::nx_py_pz]	= CreateCornerShell("nx_py_pz", { -unit, unit, unit }, { 90, 0, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::nx_ny_pz]	= CreateCornerShell("nx_ny_pz", { -unit, -unit, unit }, { 180, 0, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::nx_ny_nz]	= CreateCornerShell("nx_ny_nz", { -unit, -unit, -unit }, { 270, 0, 0 });
 
-	m_cSegments[(int)H3DF::ViewMode::px_py_pz]	= CreateCornerShell("px_py_pz", { unit, unit, unit }, { 0, 180, 0 });
-	m_cSegments[(int)H3DF::ViewMode::px_py_nz]	= CreateCornerShell("px_py_nz", { unit, unit, -unit }, { 90, 180, 0 });
-	m_cSegments[(int)H3DF::ViewMode::px_ny_nz]	= CreateCornerShell("px_ny_nz", { unit, -unit, -unit }, { 180, 180, 0 });
-	m_cSegments[(int)H3DF::ViewMode::px_ny_pz]	= CreateCornerShell("px_ny_pz", { unit, -unit, unit }, { 270, 180, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::px_py_pz]	= CreateCornerShell("px_py_pz", { unit, unit, unit }, { 0, 180, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::px_py_nz]	= CreateCornerShell("px_py_nz", { unit, unit, -unit }, { 90, 180, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::px_ny_nz]	= CreateCornerShell("px_ny_nz", { unit, -unit, -unit }, { 180, 180, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewMode::px_ny_pz]	= CreateCornerShell("px_ny_pz", { unit, -unit, unit }, { 270, 180, 0 });
 }
 
 
@@ -655,12 +731,13 @@ HC_KEY NavigationCube::CreateAxis(const char* name, const char* text, HPoint axi
 	return segKey;
 }
 
-
-
 void NavigationCube::SetWindowSize(double width, double height, bool openSegment)
 {
-	m_windowSize.x = width;
-	m_windowSize.y = height;
+	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
+	pcImpl->m_windowSize.x = width;
+	pcImpl->m_windowSize.y = height;
 
 	if (openSegment) {
 		OpenCubeSegment();

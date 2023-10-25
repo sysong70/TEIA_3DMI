@@ -11,6 +11,9 @@
 
 #include <HOpCameraOrbit.h>
 
+#include "HTools.h"
+#include "HGlobals.h"
+
 namespace H3DF
 {
 	class WindowKey;

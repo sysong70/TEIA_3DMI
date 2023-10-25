@@ -31,24 +31,12 @@ namespace H3DF
 
 		H3DF::Type ObjectType() const { return H3DF::Type::View; };
 
-		void Update() const;
-		void Update(Window::UpdateType eInType, H3DF::Time dInTimeLimit = -1.0) const;
-
-		//==========================================================================================
-
-		void Initialize(Json::Object & cInObject, Signal::Delivery & cInstance);
-		void Initialize_OLD(Json::Object & cInObject, Signal::Delivery & cInstance);
-		void Destruct();
-		void Destruct_OLD();
-		void Paint(Json::Object & cInObject);
-		void Resize(int x, int y);
-
-		void SaveHsfFile(CString strFilePathName, H3DF::Canvas * pcHoopsView);
-
-		void LoadPointCloudFile(CString strFilePathName, H3DF::Canvas * pcHoopsView);
+		void Update(Json::Object & cInObject) const;
+		void Update(Json::Object & cInObject, Window::UpdateType eInType, H3DF::Time dInTimeLimit = -1.0) const;
 
 		//== Command 관련 함수 =======================================================================
 		void CancelCommands();
+		void CancelCommands() const;
 
 		//== Mouse 관련 함수 =========================================================================
 		//bool ExecuteMouseSignal(int nAction, Json::Object & cInObject);
@@ -66,9 +54,29 @@ namespace H3DF
 
 		bool MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop);
 
-	public:
+		//== Keyboard 관련 함수 ======================================================================
+		bool Char(UINT nChar, UINT nRepCnt, UINT nFlags);
+		//:Ken - 20230607
+		bool KeyboardInput(Json::Object & input);
+
 		//:Ken - 20230607
 		bool ExecuteKeyboardSignal(int nAction, Json::Object & cInObject);
+
+		//== Select 관련 함수 ========================================================================
+		void SetSubentitySelectLevel();
+
+		//==========================================================================================
+	public:
+		void Initialize(Json::Object & cInObject, Signal::Delivery & cInstance);
+		void Destruct();
+		void Paint(Json::Object & cInObject);
+		void Resize(int x, int y);
+
+		void SaveHsfFile(CString strFilePathName, H3DF::Canvas * pcHoopsView);
+
+		void LoadPointCloudFile(CString strFilePathName);
+
+	public:
 
 	private:
 		H3DF::Canvas * m_pcCanvas = nullptr;

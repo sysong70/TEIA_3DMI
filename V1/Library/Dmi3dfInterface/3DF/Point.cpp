@@ -7,9 +7,16 @@
 #include "HTools.h"
 #include "HGlobals.h"
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
 //== ObjectPoint class =============================================================================
+H3DF::ObjectPoint::ObjectPoint(HPoint & cInPoint)
+{
+	x = cInPoint.x;
+	y = cInPoint.y;
+	z = cInPoint.z;
+}
+
 H3DF::ObjectPoint::ObjectPoint(WindowKey const & cInWindow, WorldPoint const & cInPoint)
 {
 	HC_Open_Segment_By_Key(cInWindow.GetSceneKey()); {
@@ -44,6 +51,12 @@ H3DF::ObjectPoint::ObjectPoint(WindowPoint const & cInPoint) {}
 H3DF::ObjectPoint::ObjectPoint(PixelPoint const & cInPoint) {}
 
 //== WorldPoint class ==============================================================================
+H3DF::WorldPoint::WorldPoint(HPoint & cInPoint)
+{
+	x = cInPoint.x;
+	y = cInPoint.y;
+	z = cInPoint.z;
+}
 
 H3DF::WorldPoint::WorldPoint(WindowKey const & cInWindow, ObjectPoint const & cInPoint)
 {
@@ -79,6 +92,12 @@ H3DF::WorldPoint::WorldPoint(WindowPoint const & cInPoint) {}
 H3DF::WorldPoint::WorldPoint(PixelPoint const & cInPoint) {}
 
 //== H3DF::InnerWindowPoint::InnerWindowPoint class ========================================================================
+H3DF::InnerWindowPoint::InnerWindowPoint(HPoint & cInPoint)
+{
+	x = cInPoint.x;
+	y = cInPoint.y;
+	z = cInPoint.z;
+}
 
 H3DF::InnerWindowPoint::InnerWindowPoint(WindowKey const & cInWindow, ObjectPoint const & cInPoint)
 {
@@ -113,6 +132,12 @@ H3DF::InnerWindowPoint::InnerWindowPoint(WindowPoint const & cInPoint) {}
 H3DF::InnerWindowPoint::InnerWindowPoint(PixelPoint const & cInPoint) {}
 
 //== WindowPoint class =============================================================================
+H3DF::WindowPoint::WindowPoint(HPoint & cInPoint)
+{
+	x = cInPoint.x;
+	y = cInPoint.y;
+	z = cInPoint.z;
+}
 
 H3DF::WindowPoint::WindowPoint(WindowKey const & cInWindow, ObjectPoint const & cInPoint)
 {
@@ -148,6 +173,12 @@ H3DF::WindowPoint::WindowPoint(InnerWindowPoint const & cInPoint) {}
 H3DF::WindowPoint::WindowPoint(PixelPoint const & cInPoint) {}
 
 //== PixelPoint class ==============================================================================
+H3DF::PixelPoint::PixelPoint(HPoint & cInPoint)
+{
+	x = cInPoint.x;
+	y = cInPoint.y;
+	z = cInPoint.z;
+}
 
 H3DF::PixelPoint::PixelPoint(WindowKey const & cInWindow, ObjectPoint const & cInPoint)
 {

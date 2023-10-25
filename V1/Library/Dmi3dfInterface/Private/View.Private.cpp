@@ -39,6 +39,8 @@
 #include "../3DF/Material.h"
 #include "../3DF/LineAttribute.h"
 
+#include "../Signal/Signal.h"
+
 #define SEGMENT_TYPE						1
 #define ENTITY_TYPE							2
 #define SUBENTITY_TYPE						3
@@ -604,9 +606,18 @@ void H3DF::ViewPrivate::Copy(const ViewPrivate * pcInThat)
 		// 문자열 복사
 		strcpy(m_pchName, pcInThat->m_pchName);
 
-
 		//H3DF::Utility::CopyString(pcInThat->m_pchName, m_pchName);
 	}
+
+	m_bShowCollisions = pcInThat->m_bShowCollisions;
+
+	m_pcCameraOrbitSelect = pcInThat->m_pcCameraOrbitSelect;
+	m_pcSelectArea = pcInThat->m_pcSelectArea;
+
+	if (nullptr != m_pcBaseView) {
+		m_pcBaseView->SetNavigationCube(&m_cNaviCube);
+	}
+	m_bInitNaviCube = pcInThat->m_bInitNaviCube;
 }
 
 // 1. BaseView를 초기화 하는 부분
@@ -623,9 +634,12 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 		return false;
 	}
 
+	m_pcBaseView->Init();
+
 	m_pcWindow = new WindowKey(m_pcBaseView);
 
-	m_pcBaseView->Init();
+	m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
+	m_pcBaseView->SetNavigationCube(&m_cNaviCube);
 
 	m_pcBaseView->GetModel()->GetEventManager()->RegisterHandler((HAnimationListener *)GetBaseView(), HAnimationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
 
@@ -1009,24 +1023,24 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 		}*/
 
 
-		/*
-			if (pDoc->IsFileReadDeferedForView())
-				LoadFile(pDoc->filename, hmodel->GetStreamFileTK());
-			else
-			{
-				SetLineAntialiasing(ThePreset.LineAntialiasing);
-				SetTextAntialiasing(ThePreset.TextAntialiasing);
+	/*
+		if (pDoc->IsFileReadDeferedForView())
+			LoadFile(pDoc->filename, hmodel->GetStreamFileTK());
+		else
+		{
+			SetLineAntialiasing(ThePreset.LineAntialiasing);
+			SetTextAntialiasing(ThePreset.TextAntialiasing);
 
-				EmitSegment(GetModel()->GetModelKey(), true);
+			EmitSegment(GetModel()->GetModelKey(), true);
 
-				SetupViews();
+			SetupViews();
 
-				if (ThePreset.UseFramerate && ThePreset.CurrentFramerateMode == FramerateTarget)
-					EnableFrameRate();
+			if (ThePreset.UseFramerate && ThePreset.CurrentFramerateMode == FramerateTarget)
+				EnableFrameRate();
 
-				ViewReady();
-			}
-		*/
+			ViewReady();
+		}
+	*/
 
 	SetSceneFont(ThePreset.FontName, ThePreset.FontSize, ThePreset.FontUnits);
 
@@ -1196,6 +1210,17 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 	m_pcBaseView->SetSuppressUpdate(false);
 
 	return true;
+}
+
+void H3DF::ViewPrivate::InitNavigationCube(int nWidth, int nHeight)
+{
+	//m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
+	m_cNaviCube.Create(nWidth, nHeight, m_pcBaseView->GetModelKey());
+	m_cNaviCube.Transform();
+
+	//m_pcBaseView->SetNavigationCube(&m_cNaviCube);
+
+	m_bInitNaviCube = true;
 }
 
 bool H3DF::ViewPrivate::GetKeyState(unsigned int key, int & flags)
@@ -1451,4 +1476,285 @@ void H3DF::ViewPrivate::LocalSetOperator(HBaseOperator * pcNewOperator)
 	if (nullptr != pcOperator) {
 		delete pcOperator;
 	}
+}
+
+//== Mouse Function ================================================================================
+
+bool H3DF::ViewPrivate::LButtonDown(int nFlags, int x, int y)
+{
+	// GetBaseView()->SetDynamicHighlighting(false);
+
+	// Shift & L Button 이벤트는 Area Select
+	if (MK_SHIFT & nFlags) {
+		GetBaseView()->SetOperator(m_pcSelectArea);
+	}
+	else {
+		GetBaseView()->SetOperator(m_pcCameraOrbitSelect);
+	}
+
+	HEventInfo cEvent(GetBaseView());
+	cEvent.SetPoint(HE_LButtonDown, x, y, MouseMapFlags(nFlags));
+	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnLButtonDown(cEvent));
+	return true;
+}
+
+bool H3DF::ViewPrivate::LButtonUp(int nFlags, int x, int y)
+{
+	// GetBaseView()->SetDynamicHighlighting(true);
+
+	HEventInfo cEvent(GetBaseView());
+	cEvent.SetPoint(HE_LButtonUp, x, y, MouseMapFlags(nFlags));
+	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnLButtonUp(cEvent));
+
+	HBaseOperator * op = GetBaseView()->GetCurrentOperator();
+
+	if (op) {
+		if (op->Capture()) {
+
+		}
+	}
+
+	GetBaseView()->SetOperator(m_pcCameraOrbitSelect);
+
+	return true;
+}
+
+
+bool H3DF::ViewPrivate::RButtonDown(int nFlags, int x, int y)
+{
+	//GetBaseView()->SetDynamicHighlighting(false);
+
+	GetBaseView()->SetOperator(m_pcCameraOrbitSelect);
+
+	HEventInfo cEvent(GetBaseView());
+	cEvent.SetPoint(HE_RButtonDown, x, y, MouseMapFlags(nFlags));
+	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnRButtonDown(cEvent));
+	return true;
+}
+
+bool H3DF::ViewPrivate::RButtonUp(int nFlags, int x, int y)
+{
+	//GetBaseView()->SetDynamicHighlighting(true);
+
+	HEventInfo cEvent(GetBaseView());
+	cEvent.SetPoint(HE_RButtonUp, x, y, MouseMapFlags(nFlags));
+	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnRButtonUp(cEvent));
+
+	return true;
+}
+
+bool H3DF::ViewPrivate::MouseMove(int nFlags, int x, int y)
+{
+	// Control을 누른경우 Face 단위로 선택이 됨.
+/*
+	if (nFlags & MK_CONTROL) {
+		// select on arbitrary subentities(face, edge, or vertex)
+		GetHighlightSelection()->SetSelectionLevel(HSelectLevel::HSelectEntity);
+	}
+	else {
+		GetHighlightSelection()->SetSelectionLevel(HSelectLevel::HSelectSegment);
+	}
+*/
+	BaseView * pcView = GetBaseView();
+
+	HEventInfo cEvent(GetBaseView());
+	cEvent.SetPoint(HE_MouseMove, x, y, MouseMapFlags(nFlags));
+
+	/*
+		if (MK_LBUTTON & nFlags || MK_RBUTTON & nFlags) {
+			GetBaseView()->GetOperator()->OnMouseMove(cEvent);
+		}
+		else {
+			m_pcWindow->OnMouseMove(cEvent);
+		}
+	*/
+
+	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnMouseMove(cEvent));
+
+	return true;
+}
+
+// Mouse Wheel 대응
+bool H3DF::ViewPrivate::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop)
+{
+	HEventInfo	cEvent(GetBaseView());
+	cEvent.SetPoint(HE_MouseWheel, x - nLeft, y - nTop, MouseMapFlags(nFlags));
+	cEvent.SetMouseWheelDelta(zDelta);
+	m_pcCameraOrbitSelect->OnMouseWheel(cEvent);
+
+	//HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnMouseWheel(cEvent));
+
+	return true;
+}
+
+//== Keyboard 관련 함수 ==============================================================================
+bool H3DF::ViewPrivate::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	switch (nChar)
+	{
+		default:
+			break;
+	}
+
+	return true;
+}
+
+void H3DF::ViewPrivate::ViewReady()
+{
+	HBaseModel * hmodel = GetBaseView()->GetModel();
+
+	GetBaseView()->SetSuppressUpdate(true);
+
+	GetBaseView()->SetSplatRendering(BOOL2bool(ThePreset.SplatRendering));
+
+	GetBaseView()->SetFastMarkerDrawing(ThePreset.FastMarkers);
+
+	HC_Open_Segment_By_Key(GetBaseView()->GetShadowMapSegmentKey()); {
+		char opt[MVO_BUFFER_SIZE];
+
+		sprintf(opt, "shadow map=(%s, resolution=%d, samples=%d, %s jitter)",
+			ThePreset.ShadowMap ? "on" : "off",
+			ThePreset.SMResolution, ThePreset.SMSamples, ThePreset.Jitter ? "" : "no");
+
+		HC_Set_Rendering_Options(opt);
+	} HC_Close_Segment();
+
+
+	HC_Open_Segment_By_Key(GetBaseView()->GetSceneKey()); {
+		if (ThePreset.ShadowMap) {
+			HC_Set_Visibility("shadows = (emitting, casting, receiving)");
+		}
+
+		char opt[MVO_BUFFER_SIZE] = "";
+		char refl_opt[MVO_BUFFER_SIZE];
+
+		HCLOCALE(sprintf(opt, "simple reflection=(%s, opacity=%f, fading= %s, ",
+			ThePreset.ReflectionPlane ? "on" : "off",
+			ThePreset.ReflectionOpacity, ThePreset.ReflectionFading ? "on" : "off"));
+
+		if (ThePreset.ReflectionUseAttenuation) {
+			HCLOCALE(sprintf(refl_opt, "attenuation = (hither=%f, yon=%f), ",
+				ThePreset.ReflectionHither, ThePreset.ReflectionYon));
+		}
+		else
+			sprintf(refl_opt, "no attenuation, ");
+		strcat(opt, refl_opt);
+
+		if (ThePreset.ReflectionUseBlur)
+			sprintf(refl_opt, "blur=%d)", ThePreset.ReflectionBlur);
+		else
+			sprintf(refl_opt, "no blur)");
+		strcat(opt, refl_opt);
+
+		HC_Set_Rendering_Options(opt);
+	} HC_Close_Segment();
+
+	GetBaseView()->SetShadowLightDirection(ThePreset.UseLightVector, (HPoint *)&ThePreset.LightVector);
+	GetBaseView()->SetShadowIgnoresTransparency(ThePreset.IgnoreTransparency);
+	GetBaseView()->SetShadowMode((HShadowMode)ThePreset.ShadowMode);
+	GetBaseView()->SetOcclusionCullingMode(ThePreset.OcclusionCulling);
+	GetBaseView()->SetLineAntialiasing(TheKenel.Appearance.AntiAliasing.Line);
+	GetBaseView()->SetTextAntialiasing(TheKenel.Appearance.AntiAliasing.Text);
+
+	SetTransparency();
+
+	//Turn on static model and display lists last, and in that order
+	hmodel->SetStaticModel(TheKenel.Performance.Optimization.StaticModel);
+
+	hmodel->SetLMVModel(TheKenel.Performance.Optimization.LMVModel);
+
+	if (ThePreset.RestoreAnnotations) {
+		GetBaseView()->SetAnnotationResize(true);
+	}
+
+	if (DisplayListOff == ThePreset.DisplayList) {
+		GetBaseView()->SetDisplayListMode(false);
+	}
+	else {
+		GetBaseView()->SetDisplayListType((DisplayListType)ThePreset.DisplayList);
+		GetBaseView()->SetDisplayListMode(true);
+	}
+
+	// Check whether this file contains layout, if yes, load them (applicable to dwg files, and hsfs saved from
+	// dwg files)
+/* // Remark
+	bool is_layouts = false;
+	is_layouts = HDWGLayoutLoadUtility::CheckForLayoutSegmentInThisModel(GetModelKey());
+	if (is_layouts)
+	{
+		m_pLayoutLoadUtility = new HDWGLayoutLoadUtility(m_pHView);
+		m_pLayoutLoadUtility->LoadLayoutList();
+	}
+*/
+
+	GetBaseView()->SetHandednessFromModel();
+
+	GetBaseView()->SetSuppressUpdate(false);
+}
+
+#include "../3DF/Operator.KeyboardTest.h"
+//:TEMP
+Operator::KeyboardTest * g_pOperator = nullptr;
+
+bool H3DF::ViewPrivate::KeyboardInput(Json::Object & cInObject)
+{
+	using namespace Signal;
+
+	if (g_pOperator == nullptr) {
+		g_pOperator = new Operator::KeyboardTest(this->m_pcWindow);
+	}
+
+	Signal::View::Action action = (Signal::View::Action)cInObject.GetInteger(SKW_ACTION);
+
+	switch (action) {
+		case Signal::View::Action::OnChar:
+		case Signal::View::Action::OnKeyDown:
+		case Signal::View::Action::OnKeyUp:
+		case Signal::View::Action::OnInput:
+			g_pOperator->OnKeyboard(cInObject);
+			break;
+
+		default:
+			return false;
+	}
+
+	return true;
+}
+
+DWORD H3DF::ViewPrivate::MouseMapFlags(DWORD nState)
+{
+	DWORD nFlag = 0;
+
+	// map the mfc events state to MVO
+	if (nState & MK_LBUTTON) nFlag |= MVO_LBUTTON;
+	if (nState & MK_RBUTTON) nFlag |= MVO_RBUTTON;
+	if (nState & MK_MBUTTON) nFlag |= MVO_MBUTTON;
+	if (nState & MK_SHIFT) nFlag |= MVO_SHIFT;
+	if (nState & MK_CONTROL) nFlag |= MVO_CONTROL;
+
+	return nFlag;
+}
+
+//== Select 관련 함수 ================================================================================
+
+// 선택된 Entity 선택 해제
+void H3DF::ViewPrivate::DeSelectAll()
+{
+	if (0 < GetBaseView()->GetSelection()->GetSize()) {
+		GetBaseView()->GetSelection()->DeSelectAll();
+		GetBaseView()->ForceUpdate();
+	}
+}
+
+void H3DF::ViewPrivate::SetSubentitySelectLevel()
+{
+	HSelectionSet * pcSelection = GetBaseView()->GetSelection();
+
+	if (HSelectLevel::HSelectSubentity != pcSelection->GetSelectionLevel()) {
+		pcSelection->DeSelectAll();
+		GetBaseView()->Update();
+	}
+	pcSelection->SetSelectionLevel(HSelectLevel::HSelectSubentity);
+	GetBaseView()->SetViewSelectionLevel(HSelectionLevelEntity);
+	GetBaseView()->Update();
 }

@@ -138,7 +138,7 @@ H3DF::Operator::ObjectSnap::ObjectSnap(WindowKey * pcWindow)
 
 int H3DF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 {
-	PixelPoint cMousePoint(cInEvent.GetMousePixelPos());
+	PixelPoint cMousePoint((HPoint &)cInEvent.GetMousePixelPos());
 
 // 	DWORD nMouseMoveTickCount = GetTickCount();
 // 	DWORD nTickCount = nMouseMoveTickCount - m_nPrevMouseMoveTickCount;

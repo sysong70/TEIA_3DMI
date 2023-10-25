@@ -23,6 +23,8 @@ namespace H3DF
 		Model();
 		virtual ~Model();
 
+		SegmentKey GetSegmentKey();
+
 		void SetBRepGeometry(bool brep) override;
 
 		H3DF::ModelHandedness GetModelHandedness() { return m_eModelHandedness; }
@@ -53,10 +55,9 @@ namespace H3DF
 		// 초기 입력 변수값
 		H3DF::WindowHandle m_nInWindowHandle = 0;
 		char * m_pchName = NULL;
-		//char m_pchName[256];// = nullptr;
 		H3DF::ApplicationWindowOptionsKit m_cApplicationWindowOptionsKit;
 
-		std::vector<H3DF::View> m_vcViewArray;
+		std::vector<H3DF::View * > m_vpcViewArray;
 
 		H3DF::Model * m_pcModel = nullptr;
 	};

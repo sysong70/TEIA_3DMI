@@ -49,36 +49,20 @@ void KERNEL::View::Initialize(Json::Object & cInObject, Signal::Delivery & cInst
 
 	H3DF::ApplicationWindowOptionsKit cOptions;
 
-	H3DF::Factory::CreateCanvas(nWindowHandle, "3DMI_Canvas", cOptions);
+	//H3DF::Factory::CreateCanvas(nWindowHandle, "3DMI_Canvas", cOptions);
+	H3DF::Factory::CreateCanvas(nWindowHandle, "", cOptions);
 
-	pcImpl->m_cCanvas = H3DF::Factory::CreateCanvas(nWindowHandle, "3DMI_Canvas", cOptions);
+	pcImpl->m_cCanvas = H3DF::Factory::CreateCanvas(nWindowHandle, "", cOptions);
+	//pcImpl->m_cCanvas = H3DF::Factory::CreateCanvas(nWindowHandle, "3DMI_Canvas", cOptions);
 
-	H3DF::View cView = H3DF::Factory::CreateView("3DMI_View");
+	H3DF::View cView = H3DF::Factory::CreateView("");
+	//H3DF::View cView = H3DF::Factory::CreateView("3DMI_View");
 
 	pcImpl->m_cCanvas.AttachViewAsLayout(cView);
 
-	cInstance.mainFrame.ShowProgress();
-
-	// File Open 처리 부분
-	FileOpen(cInObject, cInstance);
-
-	cInstance.mainFrame.HideProgress();
+	pcImpl->m_cCanvas.FileOpen(cInObject, cInstance);
 	
 	cInstance.view.SetValidation();
-
-	//m_cView.Initialize(cInObject, cInstance);
-}
-
-// 1-1. File Open 처리 함수
-void KERNEL::View::FileOpen(Json::Object & cInObject, Signal::Delivery & cInstance)
-{
-	CString strFilePathName = cInObject.GetString(SKW_FILEPATH);
-
-	if(true == strFilePathName.IsEmpty()) {
-		return;
-	}
-
-
 }
 
 // 2. H3DF View Destruct 함수
@@ -102,9 +86,7 @@ void KERNEL::View::Paint(Json::Object & cInObject)
 		DEBUG_RETURN;
 	}
 
-	pcImpl->m_cCanvas.Update();
-
-	//m_cView.Paint(cInObject);
+	pcImpl->m_cCanvas.Update(cInObject);
 }
 
 // 4. H3DF View Resize 함수

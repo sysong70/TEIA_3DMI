@@ -14,13 +14,16 @@ namespace H3DF
 {
 	class BaseView;
 
-	class NavigationCube
+	class NavigationCube : public Object
 	{
 	public:
 
 		NavigationCube(H3DF::BaseView * view = nullptr, WindowKey * pcInWindow = nullptr);
 
 		~NavigationCube();
+
+		void Set(NavigationCube const & cInThat);
+		NavigationCube const & operator = (NavigationCube const & cInThat);
 
 		int LButtonUp(HEventInfo & cInEvent);
 
@@ -74,16 +77,5 @@ namespace H3DF
 		HC_KEY CreateAxis(const char * name, const char * text, HPoint axisEnd, HPoint textCenter, COLORREF rgb);
 
 		void SetWindowSize(double width, double height, bool openSegment = true);
-
-		WindowKey * m_pcWindow = nullptr;
-		H3DF::BaseView * m_pView = nullptr;
-		H3DF::Point2D m_windowSize;
-
-		HC_KEY m_parentSegment = HC_ERROR_KEY;
-		HC_KEY m_cubeSegment = HC_ERROR_KEY;
-
-		SegmentKey m_cSegments[(int)H3DF::ViewMode::Count];
-
-		SelectionResults m_cOldHighlightSelection;
 	};
 }

@@ -63,11 +63,21 @@ View const & H3DF::View::operator = (View const & cInThat)
 	return *this;
 }
 
-void H3DF::View::Update() const
+void H3DF::View::Update(Json::Object & cInObject) const
 {
 	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
+	}
+
+	if (false == pcImpl->IsInitNavigationCube()) {
+		Json::Array & cArray = cInObject.GetArray(SKW_RECT);
+		int nLeft = cArray[0]->ToInteger();
+		int nTop = cArray[1]->ToInteger();
+		int nRight = cArray[2]->ToInteger();
+		int nBottom = cArray[3]->ToInteger();
+
+		pcImpl->InitNavigationCube(nRight, nBottom);
 	}
 
 	if (pcImpl->GetBaseView()->GetViewActive() && !pcImpl->GetBaseView()->GetSuppressUpdate())
@@ -88,9 +98,9 @@ void H3DF::View::Update() const
 	}
 }
 
-void H3DF::View::Update(Window::UpdateType eInType, H3DF::Time dInTimeLimit) const
+void H3DF::View::Update(Json::Object & cInObject, Window::UpdateType eInType, H3DF::Time dInTimeLimit) const
 {
-	Update();
+	Update(cInObject);
 }
 
 //== View 관련 함수 ==================================================================================
@@ -112,61 +122,6 @@ void H3DF::View::Destruct()
 	}
 }
 
-void H3DF::View::Destruct_OLD()
-{
-	if(nullptr != m_pcCanvas) {
-
-		Model * pcModel = (Model *) m_pcCanvas->GetBaseView()->GetModel();
-
-		delete m_pcCanvas;
-		m_pcCanvas = nullptr;
-
-		if(nullptr != pcModel) {
-			delete pcModel;
-		}
-	}
-}
-
-void H3DF::View::Paint(Json::Object & cInObject)
-{
-	if (nullptr == m_pcCanvas) {
-		DEBUG_RETURN;
-	}
-
-	if (false == m_pcCanvas->IsInitNavigationCube()) {
-		Json::Array & cArray = cInObject.GetArray(SKW_RECT);
-		int nLeft = cArray[0]->ToInteger();
-		int nTop = cArray[1]->ToInteger();
-		int nRight = cArray[2]->ToInteger();
-		int nBottom = cArray[3]->ToInteger();
-
-		m_pcCanvas->InitNavigationCube(nRight, nBottom);
-	}
-
-	//m_pcCanvas->SetClientRect(nWidth, nHeight);
-
-	//m_pcCanvas->SetClientRect(nWidth, nHeight);
-
-	// execute a HOOPS update if we have a valid HBaseView object
-	if (m_pcCanvas && m_pcCanvas->GetBaseView()->GetViewActive() && !m_pcCanvas->GetBaseView()->GetSuppressUpdate())
-	{
-		HC_Control_Update_By_Key(m_pcCanvas->GetBaseView()->GetViewKey(), "redraw everything");
-		m_pcCanvas->GetBaseView()->GetConstantFrameRateObject()->SetActivityType(GeneralActivity);
-
-		//		pcCanvas->GetIntRectangle(&rectangle);
-		// 		m_pHView->Notify(HSignalPaint, &rectangle);
-		// 		m_pHView->ResetIdleTime();
-
-		if (false == m_pcCanvas->GetBaseView()->GetFirstUpdate()) {
-			m_pcCanvas->GetBaseView()->ForceUpdate();
-		}
-		else {
-			m_pcCanvas->GetBaseView()->Update();
-
-		}
-	}
-}
-
 void H3DF::View::Resize(int x, int y)
 {
 	assert(m_pcCanvas);
@@ -181,88 +136,45 @@ void H3DF::View::Resize(int x, int y)
 // 명령어 취소 함수, Select된 Object도 취소됨.
 void H3DF::View::CancelCommands()
 {
-	m_pcCanvas->CancelCommands();
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) {
+		DEBUG_RETURN;
+	}
+
+	pcImpl->DeSelectAll();
+}
+
+void H3DF::View::CancelCommands() const
+{
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) {
+		DEBUG_RETURN;
+	}
+
+	pcImpl->DeSelectAll();
 }
 
 // == Action Function ==============================================================================
 
-// 1. Action Signal 처리 함수
-/*
-bool H3DF::View::ExecuteMouseSignal(int nAction, Json::Object & cInObject)
-{
-	H3DF::Canvas * pcCanvas = m_pcCanvas;
-
-	int nFlag = cInObject.GetInteger(SKW_FLAG);
-	int x = cInObject.GetInteger(SKW_X);
-	int y = cInObject.GetInteger(SKW_Y);
-
-	switch((Signal::View::Action) nAction)
-	{
-		case Signal::View::Action::OnMouseMove:
-			return MouseMove(pcCanvas, nFlag, x, y);
-			break;
-
-		case Signal::View::Action::OnLButtonDown:
-			return LButtonDown(pcCanvas, nFlag, x, y);
-			break;
-
-		case Signal::View::Action::OnLButtonUp:
-			return LButtonUp(pcCanvas, nFlag, x, y);
-			break;
-
-		case Signal::View::Action::OnMButtonDown:
-			return MButtonDown(pcCanvas, nFlag, x, y);
-			break;
-
-		case Signal::View::Action::OnMButtonUp:
-			return MButtonUp(pcCanvas, nFlag, x, y);
-			break;
-
-		case Signal::View::Action::OnRButtonDown:
-			return RButtonDown(pcCanvas, nFlag, x, y);
-			break;
-
-		case Signal::View::Action::OnRButtonUp:
-			return RButtonUp(pcCanvas, nFlag, x, y);
-			break;
-
-		case Signal::View::Action::OnMouseWheel:
-		{
-			int zDelta = cInObject.GetInteger(SKW_DELTA, -120);
-			return MouseWheel(pcCanvas, nFlag, zDelta, x, y, cInObject);
-		}
-		break;
-
-		default:
-			assert(false);
-			break;
-	}
-
-	return false;
-}
-*/
-
 // 2. Left Button 처리 함수
 bool H3DF::View::LButtonDown(int nFlags, int x, int y)
 {
-	assert(m_pcCanvas);
-	return m_pcCanvas->LButtonDown(nFlags, x, y);
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) {
+		RETURN_FALSE;
+	}
+
+	return pcImpl->LButtonDown(nFlags, x, y);
 }
 
 bool H3DF::View::LButtonUp(int nFlags, int x, int y)
 {
-	assert(m_pcCanvas);
-	return m_pcCanvas->LButtonUp(nFlags, x, y);
-	/*
-		DmiHpsView * pcHpsView = m_mapcModelHandlerMap[nId]->GetHpsView();
-		CHECK_DWORD_PTR(pcHpsView);
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) {
+		RETURN_FALSE;
+	}
 
-		HPS::View cView = pcCanvas->GetCanvas().GetFrontView();
-
-		HPS::CameraControl cCameraControl = cView.GetSegmentKey().GetCameraControl();
-	*/
-
-	//return pcCanvas->LButtonUp(nFlags, x, y);
+	return pcImpl->LButtonUp(nFlags, x, y);
 }
 
 // 3. Middle Button 처리 함수
@@ -283,42 +195,90 @@ bool H3DF::View::MButtonUp(int nFlags, int x, int y)
 // 4. Right Button 처리 함수
 bool H3DF::View::RButtonUp(int nFlags, int x, int y)
 {
-	assert(m_pcCanvas);
-	return m_pcCanvas->RButtonUp(nFlags, x, y);
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) {
+		RETURN_FALSE;
+	}
+
+	return pcImpl->RButtonUp(nFlags, x, y);
 }
 
 bool H3DF::View::RButtonDown(int nFlags, int x, int y)
 {
-	assert(m_pcCanvas);
-	return m_pcCanvas->RButtonDown(nFlags, x, y);
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) {
+		RETURN_FALSE;
+	}
+
+	return pcImpl->RButtonDown(nFlags, x, y);
 }
 
 // 5. Mouse Move 처리 함수
 bool H3DF::View::MouseMove(int nFlags, int x, int y)
 {
-	assert(m_pcCanvas);
-	return m_pcCanvas->MouseMove(nFlags, x, y);
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) {
+		RETURN_FALSE;
+	}
+
+	return pcImpl->MouseMove(nFlags, x, y);
 }
 
 // 6. Mouse Wheel 처리 함수
 bool H3DF::View::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop)
 {
-	assert(m_pcCanvas);
-	return m_pcCanvas->MouseWheel(nFlags, zDelta, x, y, nLeft, nTop);
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) {
+		RETURN_FALSE;
+	}
+
+	return pcImpl->MouseWheel(nFlags, zDelta, x, y, nLeft, nTop);
+}
+
+bool H3DF::View::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) {
+		RETURN_FALSE;
+	}
+
+	return pcImpl->Char(nChar, nRepCnt, nFlags);
+}
+
+bool H3DF::View::KeyboardInput(Json::Object & input)
+{
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) {
+		RETURN_FALSE;
+	}
+
+	return pcImpl->KeyboardInput(input);
 }
 
 bool H3DF::View::ExecuteKeyboardSignal(int nAction, Json::Object& cInObject)
 {
-	if (nullptr == m_pcCanvas) {
-		assert(false);
-		return false;
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) {
+		RETURN_FALSE;
 	}
 
-	return m_pcCanvas->KeyboardInput(cInObject);
+	return pcImpl->KeyboardInput(cInObject);
+}
+
+//== Select 관련 함수 ========================================================================
+void H3DF::View::SetSubentitySelectLevel()
+{
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) {
+		DEBUG_RETURN;
+	}
+
+	pcImpl->SetSubentitySelectLevel();
 }
 
 void H3DF::View::SaveHsfFile(CString strFilePathName, Canvas * pcHoopsView)
 {
+/*
 	HIOUtilityHsf cUtilityHsf;
 
 	HC_KEY nModelKey = pcHoopsView->GetBaseView()->GetModelKey();
@@ -341,24 +301,30 @@ void H3DF::View::SaveHsfFile(CString strFilePathName, Canvas * pcHoopsView)
 	HC_Close_Segment();
 
 	delete mytool;
+*/
 }
 
-void H3DF::View::LoadPointCloudFile(CString strFilePathName, Canvas * pcHoopsView)
+void H3DF::View::LoadPointCloudFile(CString strFilePathName)
 {
-	SegmentKey cViewKey(pcHoopsView->GetBaseView()->GetViewKey());
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) {
+		DEBUG_RETURN;
+	}
+
+	SegmentKey cViewKey(pcImpl->GetBaseView()->GetViewKey());
 	SegmentKeyPrivate::LocalOpen(cViewKey);
 	HC_Set_Driver_Options("eye dome lighting = (on, strength=1.0)");
 	SegmentKeyPrivate::LocalClose(cViewKey);
 
 	HInputHandlerOptions cOptions;
-	cOptions.m_tk = pcHoopsView->GetBaseView()->GetModel()->GetStreamFileTK();
-	cOptions.m_pHBaseView = pcHoopsView->GetBaseView();
+	cOptions.m_tk = pcImpl->GetBaseView()->GetModel()->GetStreamFileTK();
+	cOptions.m_pHBaseView = pcImpl->GetBaseView();
 	
 	//cOptions.m_pExtendedData = &cPointCloudOptions;
 
 	//m_point_cloud_options = (HPointCloudOptions *)options->m_pExtendedData;
 
-	SegmentKey cModelKey(pcHoopsView->GetBaseView()->GetModelKey());
+	SegmentKey cModelKey(pcImpl->GetBaseView()->GetModelKey());
 	SegmentKey cPointCloudSegment = cModelKey.Subsegment(L"_3dmi_point_cloud");
 
 	HIOUtilityPointCloud cPointCloud;
