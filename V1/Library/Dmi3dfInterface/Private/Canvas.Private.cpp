@@ -12,6 +12,8 @@ using namespace H3DF;
 
 H3DF::Model::Model()
 {
+	m_cSegmentKey.Set(GetModelKey());
+
 	SetBRepGeometry(false);
 
 	m_eModelHandedness = ModelHandedness::NotSet;
@@ -43,8 +45,7 @@ H3DF::Model::~Model()
 
 SegmentKey H3DF::Model::GetSegmentKey()
 {
-	SegmentKey cKey(GetModelKey());
-	return cKey;
+	return m_cSegmentKey;
 }
 
 void H3DF::Model::SetBRepGeometry(bool bBrepFlag)
@@ -96,7 +97,13 @@ void H3DF::Model::UpdateModelHandedness()
 //== CanvasPrivate Class ===========================================================================
 
 H3DF::CanvasPrivate::CanvasPrivate()
-{
+{	//----- Model 생성 및 초기화 -----
+	m_pcModel = new H3DF::Model();
+	if (nullptr == m_pcModel) {
+		assert(false);
+	}
+
+	m_pcModel->Init();
 }
 
 H3DF::CanvasPrivate::~CanvasPrivate()

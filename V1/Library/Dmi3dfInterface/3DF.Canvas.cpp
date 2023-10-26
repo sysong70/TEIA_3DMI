@@ -96,14 +96,6 @@ H3DF::Canvas::Canvas()
 	}
 
 	m_pcImpl = pcImpl;
-
-	//----- Model 생성 및 초기화 -----
-	pcImpl->m_pcModel = new H3DF::Model();
-	if (nullptr == pcImpl->m_pcModel) {
-		assert(false);
-	}
-
-	pcImpl->m_pcModel->Init();
 }
 
 H3DF::Canvas::Canvas(Canvas const & cInThat)
@@ -225,9 +217,9 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cInstan
 
 	if (false == bPointColudData) {
 		SegmentKey cViewKey(pcViewImpl->GetBaseView()->GetViewKey());
-		SegmentKeyPrivate::LocalOpen(cViewKey);
-		HC_Set_Driver_Options("eye dome lighting = off");
-		SegmentKeyPrivate::LocalClose(cViewKey);
+		SegmentKeyPrivate::LocalOpen(cViewKey); {
+			HC_Set_Driver_Options("eye dome lighting = off");
+		} SegmentKeyPrivate::LocalClose(cViewKey);
 
 		DLL::H3DF::Interface cInterfaace;
 		cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, cInstance, strErrorMessage);
@@ -249,8 +241,8 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cInstan
 
 	//HC_Define_System_Options("update control=thread");
 
-	pcViewImpl->GetBaseView()->SetSuppressUpdateTick(false);
-	pcViewImpl->GetBaseView()->SetSuppressUpdate(false);
+ 	pcViewImpl->GetBaseView()->SetSuppressUpdateTick(false);
+ 	pcViewImpl->GetBaseView()->SetSuppressUpdate(false);
 
 	bool bHasInitialView = pcViewImpl->GetBaseView()->HasInitialView();
 	pcViewImpl->GetBaseView()->GetModel()->SetFileLoadComplete(true);
@@ -278,6 +270,7 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cInstan
 	pcViewImpl->GetBaseView()->ExhaustiveUpdate();
 
 	pcViewImpl->GetBaseView()->SetSuppressUpdateTick(false);
+	pcViewImpl->GetBaseView()->SetSuppressUpdate(false);
 
 /*
 	HC_Open_Segment_By_Key(pcHoopsView->GetSceneKey()); {

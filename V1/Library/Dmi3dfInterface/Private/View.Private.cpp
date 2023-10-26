@@ -73,7 +73,9 @@ H3DF::BaseView::BaseView(HBaseModel * model, const char * alias, const char * dr
 void H3DF::BaseView::UpdateInternal(bool antialias, bool force_update)
 {
 	if (nullptr != m_pcNaviCube) {
-		m_pcNaviCube->Transform();
+		if (true == m_pcNaviCube->IsInitialized()) {
+			m_pcNaviCube->Transform();
+		}
 	}
 
 	HBaseView::UpdateInternal(antialias, force_update);
@@ -544,18 +546,16 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 		HC_Set_Camera_Position(cSetPosition.x, cSetPosition.y, cSetPosition.z);
 		HC_Set_Camera_Up_Vector(cSetUpVector.x, cSetUpVector.y, cSetUpVector.z);
 
-		if (GetSmoothTransition())
-		{
-			HPoint cn, tn, un;
-			float widthn, heightn;
-			char lprojection[MVO_BUFFER_SIZE];
+		HPoint cn, tn, un;
+		float widthn, heightn;
+		char lprojection[MVO_BUFFER_SIZE];
 
-			HC_Show_Net_Camera(&cn, &tn, &un, &widthn, &heightn, lprojection);
+		HC_Show_Net_Camera(&cn, &tn, &un, &widthn, &heightn, lprojection);
 
+		if (GetSmoothTransition()) {
 			HUtility::SmoothTransition(cPosition, cTarget, cUpVector, widtho, heighto, cn, tn, un, widthn, heightn, this);
 		}
-		else
-		{
+		else {
 			if (GetModel()->GetContainsDouble()) {
 				HC_Convert_Precision(GetSceneKey(), "double, camera");
 			}
@@ -617,7 +617,6 @@ void H3DF::ViewPrivate::Copy(const ViewPrivate * pcInThat)
 	if (nullptr != m_pcBaseView) {
 		m_pcBaseView->SetNavigationCube(&m_cNaviCube);
 	}
-	m_bInitNaviCube = pcInThat->m_bInitNaviCube;
 }
 
 // 1. BaseView를 초기화 하는 부분
@@ -634,12 +633,12 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 		return false;
 	}
 
-	m_pcBaseView->Init();
-
 	m_pcWindow = new WindowKey(m_pcBaseView);
 
 	m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
 	m_pcBaseView->SetNavigationCube(&m_cNaviCube);
+
+	m_pcBaseView->Init();
 
 	m_pcBaseView->GetModel()->GetEventManager()->RegisterHandler((HAnimationListener *)GetBaseView(), HAnimationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
 
@@ -1212,6 +1211,11 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 	return true;
 }
 
+bool H3DF::ViewPrivate::IsInitNavigationCube()
+{
+	return m_cNaviCube.IsInitialized();
+}
+
 void H3DF::ViewPrivate::InitNavigationCube(int nWidth, int nHeight)
 {
 	//m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
@@ -1219,8 +1223,6 @@ void H3DF::ViewPrivate::InitNavigationCube(int nWidth, int nHeight)
 	m_cNaviCube.Transform();
 
 	//m_pcBaseView->SetNavigationCube(&m_cNaviCube);
-
-	m_bInitNaviCube = true;
 }
 
 bool H3DF::ViewPrivate::GetKeyState(unsigned int key, int & flags)

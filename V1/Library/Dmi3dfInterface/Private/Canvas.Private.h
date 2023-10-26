@@ -32,6 +32,8 @@ namespace H3DF
 		void UpdateModelHandedness();
 
 	private:
+		SegmentKey m_cSegmentKey;
+
 		ModelHandedness m_eModelHandedness;
 
 		MultiSelectManager * m_pcMultiSelectManager;

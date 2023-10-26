@@ -21,46 +21,6 @@
 
 using namespace H3DF;
 
-//Application theApplicationManager;
-
-//== 전달 받은 명령어 분기 =============================================================================
-
-/*
-void H3DF::Component::Application::ExecuteSignal(Json::Object & cInObject)
-{
-	int nAction = cInObject.GetInteger(SKW_ACTION);
-
-	//Wrapper().m_pcHoopsDB = nullptr;
-
-	switch((Signal::Application::Action) nAction)
-	{
-		case Signal::Application::Action::OnInitInstance:
-			InitInstance();
-			break;
-
-		case Signal::Application::Action::OnExitInstance:
-			ExitInstance();
-			break;
-
-		//:Ken
-		case Signal::Application::Action::OnDpiAware:
-			TheAppOptions.Preference.Session.DpiScale = cInObject.GetReal(SKW_DPISCALE);
-			break;
-
-		case Signal::Application::Action::OnUpdatePreference:
-			TheAppOptions.Preference.Set(&cInObject);
-			break;
-
-		case Signal::Application::Action::OnUpdateFileOption:
-			break;
-
-		default:
-			assert(false);
-			break;
-	}
-}
-*/
-
 //== CWinApp에서 전달되는 메시지 처리 ==================================================================
 
 // 1. Application이 실행될때 최초 처리 CWinApp::InitInstance에서 메시지 전달 받음.

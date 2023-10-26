@@ -37,6 +37,8 @@ namespace H3DF
 
 		bool IsValid();
 
+		bool IsInitialized();
+
 	public:
 
 		void Create(float width, float height, HC_KEY parent);

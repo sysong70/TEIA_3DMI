@@ -91,6 +91,8 @@ class NavigationCubePrivate : public PrivateImpl
 {
 public:
 	void Copy(const NavigationCubePrivate * pcInThat) {
+		m_bInitialized = pcInThat->m_bInitialized;
+
 		m_pcWindow = pcInThat->m_pcWindow;
 		m_pView = pcInThat->m_pView;
 
@@ -105,6 +107,8 @@ public:
 
 		m_cOldHighlightSelection = pcInThat->m_cOldHighlightSelection;
 	}
+
+	bool m_bInitialized = false;
 
 	WindowKey * m_pcWindow = nullptr;
 	H3DF::BaseView * m_pView = nullptr;
@@ -292,6 +296,13 @@ bool NavigationCube::IsValid()
 	return pcImpl->m_cubeSegment != HC_ERROR_KEY;
 }
 
+bool NavigationCube::IsInitialized()
+{
+	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
+	return pcImpl->m_bInitialized;
+}
 
 void NavigationCube::Create(float width, float height, HC_KEY parent)
 {
@@ -361,8 +372,9 @@ void NavigationCube::Create(float width, float height, HC_KEY parent)
 		CloseCubeSegment();
 	}
 	HC_Close_Segment();
-}
 
+	pcImpl->m_bInitialized = true;
+}
 
 
 void NavigationCube::Recreate()
@@ -389,6 +401,8 @@ HC_KEY NavigationCube::HitTest(float x, float y, float z)
 
 void NavigationCube::Transform()
 {
+
+
 	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
@@ -398,9 +412,7 @@ void NavigationCube::Transform()
 		HC_Show_Net_Camera_Target(&target.x, &target.y, &target.z);
 		HC_Show_Net_Camera_Up_Vector(&up_vector.x, &up_vector.y, &up_vector.z);
 		HC_Show_Net_Camera_Position(&position.x, &position.y, &position.z);
-	} HC_Close_Segment();
 
-	HC_Open_Segment_By_Key(pcImpl->m_pView->GetSceneKey()); {
 		HC_Open_Segment_By_Key(pcImpl->m_cubeSegment); {
 			HPoint oldposition;
 			HPoint old_up_vector;

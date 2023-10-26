@@ -49,14 +49,9 @@ void KERNEL::View::Initialize(Json::Object & cInObject, Signal::Delivery & cInst
 
 	H3DF::ApplicationWindowOptionsKit cOptions;
 
-	//H3DF::Factory::CreateCanvas(nWindowHandle, "3DMI_Canvas", cOptions);
-	H3DF::Factory::CreateCanvas(nWindowHandle, "", cOptions);
+	pcImpl->m_cCanvas = H3DF::Factory::CreateCanvas(nWindowHandle, "3DMI_Canvas", cOptions);
 
-	pcImpl->m_cCanvas = H3DF::Factory::CreateCanvas(nWindowHandle, "", cOptions);
-	//pcImpl->m_cCanvas = H3DF::Factory::CreateCanvas(nWindowHandle, "3DMI_Canvas", cOptions);
-
-	H3DF::View cView = H3DF::Factory::CreateView("");
-	//H3DF::View cView = H3DF::Factory::CreateView("3DMI_View");
+	H3DF::View cView = H3DF::Factory::CreateView("3DMI_View");
 
 	pcImpl->m_cCanvas.AttachViewAsLayout(cView);
 

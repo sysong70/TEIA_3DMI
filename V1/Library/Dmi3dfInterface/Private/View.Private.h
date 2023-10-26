@@ -61,7 +61,7 @@ namespace H3DF
 		H3DF::BaseView * GetBaseView() { return m_pcBaseView; }
 
 		void InitNavigationCube(int nWidth, int nHeight);
-		bool IsInitNavigationCube() { return m_bInitNaviCube; }
+		bool IsInitNavigationCube();
 
 		bool LButtonDown(int nFlags, int x, int y);
 		bool LButtonUp(int nFlags, int x, int y);
@@ -117,6 +117,5 @@ namespace H3DF
 		Operator::SelectArea * m_pcSelectArea = nullptr;
 
 		NavigationCube m_cNaviCube;
-		bool m_bInitNaviCube = false;
 	};
 }
