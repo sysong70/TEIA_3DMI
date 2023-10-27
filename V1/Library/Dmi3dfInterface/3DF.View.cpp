@@ -124,11 +124,10 @@ void H3DF::View::Destruct()
 
 void H3DF::View::Resize(int x, int y)
 {
-	assert(m_pcCanvas);
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
-	m_pcCanvas->Resize(x, y);
-	//m_pcCanvas->GetBaseView()->SetXYSizeOverride(x, y);
-	//m_pHView->Notify( HSignalResize );
+	pcImpl->Resize(x, y);
 }
 
 //== Command 관련 함수 ===========================================================================

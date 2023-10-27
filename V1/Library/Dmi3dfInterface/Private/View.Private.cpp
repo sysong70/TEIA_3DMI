@@ -97,6 +97,10 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 	float widtho, heighto;
 	char projection[MVO_BUFFER_SIZE];
 
+	HPoint cn, tn, un;
+	float widthn, heightn;
+	char lprojection[MVO_BUFFER_SIZE];
+
 	HC_Open_Segment_By_Key(GetSceneKey()); {
 		HC_PShow_Net_Camera(0, 0, &cPosition, &cTarget, &cUpVector, &widtho, &heighto, projection);
 	}HC_Close_Segment();
@@ -546,26 +550,23 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 		HC_Set_Camera_Position(cSetPosition.x, cSetPosition.y, cSetPosition.z);
 		HC_Set_Camera_Up_Vector(cSetUpVector.x, cSetUpVector.y, cSetUpVector.z);
 
-		HPoint cn, tn, un;
-		float widthn, heightn;
-		char lprojection[MVO_BUFFER_SIZE];
-
 		HC_Show_Net_Camera(&cn, &tn, &un, &widthn, &heightn, lprojection);
 
-		if (GetSmoothTransition()) {
-			HUtility::SmoothTransition(cPosition, cTarget, cUpVector, widtho, heighto, cn, tn, un, widthn, heightn, this);
-		}
-		else {
-			if (GetModel()->GetContainsDouble()) {
-				HC_Convert_Precision(GetSceneKey(), "double, camera");
-			}
-		}
-
-		CameraPositionChanged(true, GetSmoothTransition());
-
-		Update();
-
 	} HC_Close_Segment();
+
+
+	if (GetSmoothTransition()) {
+		HUtility::SmoothTransition(cPosition, cTarget, cUpVector, widtho, heighto, cn, tn, un, widthn, heightn, this);
+	}
+	else {
+		if (GetModel()->GetContainsDouble()) {
+			HC_Convert_Precision(GetSceneKey(), "double, camera");
+		}
+	}
+
+	CameraPositionChanged(true, GetSmoothTransition());
+
+	Update();
 }
 
 void H3DF::BaseView::SetNavigationCube(NavigationCube * pcNaviCube)
@@ -1223,6 +1224,15 @@ void H3DF::ViewPrivate::InitNavigationCube(int nWidth, int nHeight)
 	m_cNaviCube.Transform();
 
 	//m_pcBaseView->SetNavigationCube(&m_cNaviCube);
+}
+
+void H3DF::ViewPrivate::Resize(int x, int y)
+{
+	GetBaseView()->SetXYSizeOverride(x, y);
+
+	if (x > 0 && y > 0 && true == IsInitNavigationCube()) {
+		m_cNaviCube.OnSize(x, y);
+	}
 }
 
 bool H3DF::ViewPrivate::GetKeyState(unsigned int key, int & flags)

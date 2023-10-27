@@ -63,6 +63,8 @@ namespace H3DF
 		void InitNavigationCube(int nWidth, int nHeight);
 		bool IsInitNavigationCube();
 
+		void Resize(int x, int y);
+
 		bool LButtonDown(int nFlags, int x, int y);
 		bool LButtonUp(int nFlags, int x, int y);
 
