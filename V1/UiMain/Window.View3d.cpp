@@ -174,7 +174,7 @@ void Window::View3d::OnCommand(UINT id)
 		switch (data.Type) {
 		case Facility::CommandIndexer::ListItem:
 		case Facility::CommandIndexer::Check: //:TEMP
-			m_delivery.view.OnCommand(id + pId);
+			m_delivery.view.OnCommand(id);
 			break;
 
 		case Facility::CommandIndexer::Unknown:

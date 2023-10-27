@@ -150,7 +150,7 @@ unsigned long File::GetFileSize(const wchar_t* path)
 	size.HighPart = fad.nFileSizeHigh;
 	size.LowPart = fad.nFileSizeLow;
 
-	return size.QuadPart;
+	return (unsigned long)size.QuadPart;
 }
 
 

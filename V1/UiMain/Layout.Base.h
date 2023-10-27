@@ -3,6 +3,7 @@
 #include "Layout.h"
 #include "Control.h"
 
+#define IMPLEMENT_THIS { DEBUG_STOP; }
 #define IMPLEMENT(x) { DEBUG_STOP; return x; }
 
 
@@ -24,24 +25,24 @@ namespace Layout
 
 		virtual void Style(CStringA name);
 
-		virtual void HorizontalAlignment(EHorizontalAlignment value) IMPLEMENT();
+		virtual void HorizontalAlignment(EHorizontalAlignment value) IMPLEMENT_THIS;
 		virtual EHorizontalAlignment HorizontalAlignment() IMPLEMENT(EHorizontalAlignment::Stretch);
 
-		virtual void HorizontalContentAlignment(EHorizontalAlignment value) IMPLEMENT();
+		virtual void HorizontalContentAlignment(EHorizontalAlignment value) IMPLEMENT_THIS;
 		virtual EHorizontalAlignment HorizontalContentAlignment() IMPLEMENT(EHorizontalAlignment::Stretch);
 
-		virtual void VerticalAlignment(EVerticalAlignment value) IMPLEMENT();
+		virtual void VerticalAlignment(EVerticalAlignment value) IMPLEMENT_THIS;
 		virtual EVerticalAlignment VerticalAlignment() IMPLEMENT(EVerticalAlignment::Stretch);
 
-		virtual void VerticalContentAlignment(EVerticalAlignment value) IMPLEMENT();
+		virtual void VerticalContentAlignment(EVerticalAlignment value) IMPLEMENT_THIS;
 		virtual EVerticalAlignment VerticalContentAlignment() IMPLEMENT(EVerticalAlignment::Stretch);
 
-		virtual void Alignment(EHorizontalAlignment h, EVerticalAlignment v) IMPLEMENT();
-		virtual void ContentAlignment(EHorizontalAlignment h, EVerticalAlignment v) IMPLEMENT();
+		virtual void Alignment(EHorizontalAlignment h, EVerticalAlignment v) IMPLEMENT_THIS;
+		virtual void ContentAlignment(EHorizontalAlignment h, EVerticalAlignment v) IMPLEMENT_THIS;
 
-		virtual void Visibility(EVisibility value) IMPLEMENT();
+		virtual void Visibility(EVisibility value) IMPLEMENT_THIS;
 
-		virtual void Color(Control::EColor value, EColorType type) IMPLEMENT();
+		virtual void Color(Control::EColor value, EColorType type) IMPLEMENT_THIS;
 
 		virtual void Width(int value);
 		virtual void Height(int value);
@@ -58,7 +59,7 @@ namespace Layout
 		virtual void Thickness(CRect value, EBoxModel type);
 		virtual CRect Thickness(EBoxModel type);
 
-		virtual void Update() IMPLEMENT();
+		virtual void Update() IMPLEMENT_THIS;
 
 	protected:
 
