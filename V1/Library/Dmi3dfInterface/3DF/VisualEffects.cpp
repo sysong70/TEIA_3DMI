@@ -67,7 +67,7 @@ VisualEffectsControl & VisualEffectsControl::SetAntiAliasing(bool bInState)
 			strOption = L"anti-alias = (screen = off)";
 		}
 
-		HC_Set_Rendering_Options(H_ASCII_TEXT(strOption));
+		HC_Set_Rendering_Options(Utility::ToChar(strOption));
 
 	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
 
@@ -88,7 +88,7 @@ VisualEffectsControl & VisualEffectsControl::SetTextAntiAliasing(bool bInState)
 			strOption = L"anti-alias = (text = off)";
 		}
 
-		HC_Set_Rendering_Options(H_ASCII_TEXT(strOption));
+		HC_Set_Rendering_Options(Utility::ToChar(strOption));
 
 	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
 
@@ -109,7 +109,7 @@ VisualEffectsControl & VisualEffectsControl::SetLineAntiAliasing(bool bInState)
 			strOption = L"anti-alias = (lines = off)";
 		}
 
-		HC_Set_Rendering_Options(H_ASCII_TEXT(strOption));
+		HC_Set_Rendering_Options(Utility::ToChar(strOption));
 
 	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
 

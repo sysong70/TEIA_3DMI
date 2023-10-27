@@ -277,6 +277,20 @@ bool H3DF::Utility::UnicodeToChar(CString strText, char *& pchBuffer, int & nBuf
 	return true;
 }
 
+CStringA H3DF::Utility::ToChar(CString strText)
+{
+	char * pchBuffer = nullptr;
+	if (false == UnicodeToChar(strText, pchBuffer)) {
+		return CStringA();
+	}
+
+	CStringA strResult(pchBuffer);
+
+	delete [] pchBuffer;
+
+	return strResult;
+}
+
 bool H3DF::Utility::CharToUnicode(char * pchText, CString & strText)
 {
 	if (nullptr == pchText) {

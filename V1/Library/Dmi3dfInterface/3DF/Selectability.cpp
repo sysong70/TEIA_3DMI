@@ -304,7 +304,7 @@ SelectabilityControl & SelectabilityControl::SetSelectability(CString strInType,
 
 	CString strList;
 	strList.Format(L"%s = %s", strInType, (true == bInValue ? L"on" : L"off"));
-	HC_Set_Selectability(H_ASCII_TEXT(strList));
+	HC_Set_Selectability(Utility::ToChar(strList));
 
 	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 
@@ -315,7 +315,7 @@ SelectabilityControl & SelectabilityControl::UnSetSelectability(CString strInTyp
 {
 	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
-	HC_UnSet_One_Selectability(H_ASCII_TEXT(strInType));
+	HC_UnSet_One_Selectability(Utility::ToChar(strInType));
 
 	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 

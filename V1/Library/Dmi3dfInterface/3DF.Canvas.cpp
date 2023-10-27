@@ -48,6 +48,7 @@
 
 #include <Common_Define.h>
 #include <Path.h>
+#include <WStr.h>
 
 #include "../Signal/Signal.h"
 
@@ -165,8 +166,10 @@ void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
 
 	char * pchName = pcViewImpl->m_pchName;
 
+	setlocale(LC_ALL, "ko_KR.utf8");
+
 	// pcViewImpl에 포함되어 있는 HBaseView를 생성하고 초기화 한다.
-	pcViewImpl->Init(pcModel, H_ASCII_TEXT(TheKenel.General.Display.Driver), pchName, nWindowHandle);
+	pcViewImpl->Init(pcModel, Utility::ToChar(TheKenel.General.Display.Driver), pchName, nWindowHandle);
 
 	pcCanvasImpl->m_vpcViewArray.push_back(pcView);
 }

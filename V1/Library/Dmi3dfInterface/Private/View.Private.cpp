@@ -720,7 +720,7 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 		sprintf(chDriverOpts, "%s, stereo", chDriverOpts);
 	}
 
-	sprintf(chDriverOpts, "%s, quick moves preference = %s", chDriverOpts, H_ASCII_TEXT(TheKenel.Selection.Highlight.QuickMovesType));
+	sprintf(chDriverOpts, "%s, quick moves preference = %s", chDriverOpts, Utility::ToChar(TheKenel.Selection.Highlight.QuickMovesType));
 
 	HCLOCALE(sprintf(chDriverOpts,
 		"%s, ambient occlusion = (%s, strength = %f, quality = %s), fast silhouette edges = (%s, tolerance = %f, %s heavy exterior)", chDriverOpts,
@@ -1079,8 +1079,8 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 	} HC_Close_Segment();
 
 	HC_Open_Segment_By_Key(m_pcBaseView->GetSceneKey()); {
-		HC_Set_Variable_Edge_Weight(H_ASCII_TEXT(ThePreset.LineWeight));
-		HC_Set_Variable_Line_Weight(H_ASCII_TEXT(ThePreset.LineWeight));
+		HC_Set_Variable_Edge_Weight(Utility::ToChar(ThePreset.LineWeight));
+		HC_Set_Variable_Line_Weight(Utility::ToChar(ThePreset.LineWeight));
 
 		//apply stereo mode
 		if (ThePreset.StereoMode) {
@@ -1103,7 +1103,7 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 		ThePreset.GoochColorMap = gooch_color_map;
 
 		HC_Open_Segment("./overwrite/lights/gooch_color_map_segment"); {
-			HC_Set_Color_Map(H_ASCII_TEXT(ThePreset.GoochColorMap));
+			HC_Set_Color_Map(Utility::ToChar(ThePreset.GoochColorMap));
 		}HC_Close_Segment();
 
 		HCLOCALE(sprintf(chRenderingOpts, "gooch options = (diffuse weight = %f, color range=(0.0, %f), color map segment = `./overwrite/lights/gooch_color_map_segment`)",
@@ -1181,7 +1181,7 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 			csGreekingSettings.Format(_T("greeking mode= %s, greeking limit= %f %s"),
 				ThePreset.GreekingMode, ThePreset.GreekingLimit / 1000.f,
 				ThePreset.GreekingUnits);
-			strcpy(cGreekingSettings, H_ASCII_TEXT(csGreekingSettings));
+			strcpy(cGreekingSettings, Utility::ToChar(csGreekingSettings));
 		}
 		HC_Set_Text_Font(cGreekingSettings);
 	} HC_Close_Segment();
@@ -1322,7 +1322,7 @@ void H3DF::ViewPrivate::SetViewAxis()
 	char text[4096];
 	HVector front, top;
 	CString strViewAxis = " 1  0  0  0  1  0  0  0  1";
-	strcpy(text, H_ASCII_TEXT(strViewAxis));
+	strcpy(text, Utility::ToChar(strViewAxis));
 	sscanf(text, "%f %f %f %f %f %f", &front.x, &front.y, &front.z,
 		&top.x, &top.y, &top.z);
 
@@ -1338,9 +1338,9 @@ void H3DF::ViewPrivate::SetTransparency()
 	char layers[4096];
 	bool fast_z_sort = false;
 
-	strcpy(style, H_ASCII_TEXT(TheKenel.General.Transparency.Style));
-	strcpy(sorting, H_ASCII_TEXT(TheKenel.General.Transparency.Sorting));
-	strcpy(layers, H_ASCII_TEXT(TheKenel.General.Transparency.DepthPeelingLayers));
+	strcpy(style, Utility::ToChar(TheKenel.General.Transparency.Style));
+	strcpy(sorting, Utility::ToChar(TheKenel.General.Transparency.Sorting));
+	strcpy(layers, Utility::ToChar(TheKenel.General.Transparency.DepthPeelingLayers));
 
 	if (strstr(sorting, "z-sort")) {
 		if (strstr(sorting, "fast")) {
@@ -1391,7 +1391,7 @@ void H3DF::ViewPrivate::SetSelectOption()
 	m_pcBaseView->GetHighlightSelection()->UpdateHighlightStyle();
 
 	char chDriverOpts[MVO_BUFFER_SIZE];
-	sprintf(chDriverOpts, "quick moves preference = %s", H_ASCII_TEXT(TheKenel.Selection.Highlight.QuickMovesType));
+	sprintf(chDriverOpts, "quick moves preference = %s", Utility::ToChar(TheKenel.Selection.Highlight.QuickMovesType));
 	HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
 		HC_Set_Driver_Options(chDriverOpts);
 	} HC_Close_Segment();
@@ -1445,19 +1445,19 @@ void H3DF::ViewPrivate::SetSceneFont(CString csFontName, CString csFontSize, CSt
 {
 	HC_Open_Segment_By_Key(GetBaseView()->GetSceneKey()); {
 		// first let's query the user's font size settings
-		float size = (float)atof(H_ASCII_TEXT(csFontSize));
+		float size = (float)atof(Utility::ToChar(csFontSize));
 		if (size < 0) {
 			size *= -1;
 		}
 
 		char cfname[MVO_BUFFER_SIZE];
-		sprintf(cfname, "name = \"%s\"", (const char *)H_ASCII_TEXT(csFontName));
+		sprintf(cfname, "name = \"%s\"", (const char *)Utility::ToChar(csFontName));
 		HC_Set_Text_Font(cfname);
 
 		// set the font size via MVO - to propogate it to the hnet clients
 		// hnet removed: do we still need to do this?
 		char cfsize[MVO_BUFFER_SIZE];
-		HCLOCALE(sprintf(cfsize, "%f %s", size, (const char *)H_ASCII_TEXT(csFontUnits)));
+		HCLOCALE(sprintf(cfsize, "%f %s", size, (const char *)Utility::ToChar(csFontUnits)));
 
 		GetBaseView()->SetFontSize(cfsize, true);
 

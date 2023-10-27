@@ -29,7 +29,7 @@ H3DF::SegmentKey::SegmentKey(CString strInName)
 	HC_KEY nKey = INVALID_KEY;
 
 	if(false == strInName.IsEmpty()) {
-		nKey = HC_Create_Segment(H_ASCII_TEXT(strInName));
+		nKey = HC_Create_Segment(Utility::ToChar(strInName));
 	}
 	else {
 		nKey = HC_Create_Segment(nullptr);
@@ -140,7 +140,7 @@ CString H3DF::SegmentKey::Name() const
 SegmentKey & H3DF::SegmentKey::SetName(CString strInName)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
-	HC_Rename_Segment(".", H_ASCII_TEXT(strInName));
+	HC_Rename_Segment(".", Utility::ToChar(strInName));
 	SegmentKeyPrivate::LocalClose(*this);
 
 	return *this;
@@ -171,7 +171,7 @@ SegmentKey const H3DF::SegmentKey::Subsegment(LPCTSTR chFormat, ...)
 	strText.FormatV(chFormat, argList);
 	va_end(argList);
 
-// 	HC_KEY nKey = HC_Create_Segment_Key_By_Key(KeyValue(), H_ASCII_TEXT(strText));
+// 	HC_KEY nKey = HC_Create_Segment_Key_By_Key(KeyValue(), Utility::ToChar(strText));
 // 
 // 	SegmentKey cSubsegment(nKey);
 
@@ -238,7 +238,7 @@ void H3DF::SegmentKey::Flush(Search::Type eInTypeToRemove, Search::Space eInSear
 	CString strType = SearchPrivate::GetSearchTypeString(eInTypeToRemove);
 	CString strSearchSpace = SearchPrivate::GetSearchSpaceString(eInSearchSpace);
 
-	HC_Flush_Contents(H_ASCII_TEXT(strSearchSpace), H_ASCII_TEXT(strType));
+	HC_Flush_Contents(Utility::ToChar(strSearchSpace), Utility::ToChar(strType));
 
 	SegmentKeyPrivate::LocalClose(*this);
 }
@@ -260,7 +260,7 @@ void H3DF::SegmentKey::Flush(SearchTypeArray const & aInTypesToRemove, Search::S
 
 	CString strSearchSpace = SearchPrivate::GetSearchSpaceString(eInSearchSpace);
 
-	HC_Flush_Contents(H_ASCII_TEXT(strSearchSpace), H_ASCII_TEXT(strType));
+	HC_Flush_Contents(Utility::ToChar(strSearchSpace), Utility::ToChar(strType));
 
 	SegmentKeyPrivate::LocalClose(*this);
 }
@@ -282,7 +282,7 @@ void H3DF::SegmentKey::Flush(size_t nInTypesCount, Search::Type const peInTypesT
 
 	CString strSearchSpace = SearchPrivate::GetSearchSpaceString(eInSearchSpace);
 
-	HC_Flush_Contents(H_ASCII_TEXT(strSearchSpace), H_ASCII_TEXT(strType));
+	HC_Flush_Contents(Utility::ToChar(strSearchSpace), Utility::ToChar(strType));
 
 	SegmentKeyPrivate::LocalClose(*this);
 }
@@ -510,7 +510,7 @@ SegmentKey & H3DF::SegmentKey::SetMaterialMapping(H3DF::MaterialMappingKit const
 		if (Material::Type::TextureName == eType) {
 			CString strText;
 			strText.Format(L"faces = (%s)", strTextureName);
-			HC_Set_Color(H_ASCII_TEXT(strText));
+			HC_Set_Color(Utility::ToChar(strText));
 		}
 		else if (Material::Type::ModulatedTexture == eType) {
 		}
@@ -520,7 +520,7 @@ SegmentKey & H3DF::SegmentKey::SetMaterialMapping(H3DF::MaterialMappingKit const
 		if (Material::Type::TextureName == eType) {
 			CString strText;
 			strText.Format(L"faces = (environment = %s, mirror = (r = 0.5 g = 0.5 b = 0.5))", strTextureName);
-			HC_Set_Color(H_ASCII_TEXT(strText));
+			HC_Set_Color(Utility::ToChar(strText));
 		}
 		else if (Material::Type::ModulatedTexture == eType) {
 		}
@@ -565,7 +565,7 @@ SelectabilityControl const H3DF::SegmentKey::GetSelectabilityControl() const
 SegmentKey & H3DF::SegmentKey::SetSelectability(CString strList)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
-	HC_Set_Selectability(H_ASCII_TEXT(strList));
+	HC_Set_Selectability(Utility::ToChar(strList));
 	SegmentKeyPrivate::LocalClose(*this);
 	return *this;
 }
@@ -586,7 +586,7 @@ VisibilityControl const H3DF::SegmentKey::GetVisibilityControl() const
 SegmentKey & H3DF::SegmentKey::SetVisibility(CString strList)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
-	HC_Set_Visibility(H_ASCII_TEXT(strList));
+	HC_Set_Visibility(Utility::ToChar(strList));
 	SegmentKeyPrivate::LocalClose(*this);
 	return *this;
 }
@@ -608,7 +608,7 @@ VisualEffectsControl const H3DF::SegmentKey::GetVisualEffectsControl() const
 SegmentKey & H3DF::SegmentKey::SetCondition(CString strInCondition)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
-	HC_Set_Conditions(H_ASCII_TEXT(strInCondition));
+	HC_Set_Conditions(Utility::ToChar(strInCondition));
 	SegmentKeyPrivate::LocalClose(*this);
 	return *this;
 }
@@ -617,7 +617,7 @@ SegmentKey & H3DF::SegmentKey::SetCondition(CString strInCondition)
 SegmentKey & H3DF::SegmentKey::SetHeuristics(CString strInHeuristics)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
-	HC_Set_Heuristics(H_ASCII_TEXT(strInHeuristics));
+	HC_Set_Heuristics(Utility::ToChar(strInHeuristics));
 	SegmentKeyPrivate::LocalClose(*this);
 	return *this;
 }
@@ -645,21 +645,21 @@ StyleControl H3DF::SegmentKey::GetStyleControl()
 void H3DF::SegmentKey::SetRenderingOptions(CString strList)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
-	HC_Set_Rendering_Options(H_ASCII_TEXT(strList));
+	HC_Set_Rendering_Options(Utility::ToChar(strList));
 	SegmentKeyPrivate::LocalClose(*this);
 }
 
 void H3DF::SegmentKey::SetColorByIndex(CString strList, int nIndex)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
-	HC_Set_Color_By_Index(H_ASCII_TEXT(strList), nIndex);
+	HC_Set_Color_By_Index(Utility::ToChar(strList), nIndex);
 	SegmentKeyPrivate::LocalClose(*this);
 }
 
 void H3DF::SegmentKey::SetMarkerSymbol(CString strSymbol)
 {
 	SegmentKeyPrivate::LocalOpen(*this);
-	HC_Set_Marker_Symbol(H_ASCII_TEXT(strSymbol));
+	HC_Set_Marker_Symbol(Utility::ToChar(strSymbol));
 	SegmentKeyPrivate::LocalClose(*this);
 }
 

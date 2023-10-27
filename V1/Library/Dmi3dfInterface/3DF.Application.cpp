@@ -61,7 +61,7 @@ void H3DF::Application::InitInstance()
 	CString strFontDirectory = Utility::GetExecuteDirectory() + L"Fonts";
 
 	char buf[4096];
- 	sprintf(buf, "font directory = (%s, .)", H_ASCII_TEXT(strFontDirectory));
+ 	sprintf(buf, "font directory = (%s, .)", Utility::ToChar(strFontDirectory));
 	sprintf(buf, "%s, multi-threading=%s", buf, "full");
 
 	HC_Define_System_Options(buf);

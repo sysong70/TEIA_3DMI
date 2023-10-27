@@ -324,7 +324,7 @@ unsigned int Entity::GetStringsAndTextAttributesCount(CString strInSegmentName) 
 
 	SegmentKeyPrivate::LocalOpen(*this);
 
-	HC_KEY nKey = HC_Open_Segment(H_FORMAT_TEXT("text/%s", H_ASCII_TEXT(strInSegmentName)));
+	HC_KEY nKey = HC_Open_Segment(H_FORMAT_TEXT("text/%s", Utility::ToChar(strInSegmentName)));
 	assert(INVALID_KEY != nKey);
 	{
 		HC_Begin_Contents_Search("...", "text");
@@ -359,7 +359,7 @@ void Entity::GetStringsAndTextAttributes(CString strInSegmentName, CString * pst
 			is_parallel_to_screen = streq(cval, "off");
 		}
 
-		HC_Open_Segment(H_ASCII_TEXT(strInSegmentName));
+		HC_Open_Segment(Utility::ToChar(strInSegmentName));
 		{
 			HC_Begin_Contents_Search("...", "text");
 			{
@@ -464,7 +464,7 @@ void Entity::SetStringsAndTextAttributes(CString strInSegmentName, unsigned int 
 		HC_Set_Text_Font(H_FORMAT_TEXT("transforms = %s", (is_parallel_to_screen ? "off" : "on")));
 		HC_Set_Heuristics("no culling");
 
-		HC_Open_Segment(H_ASCII_TEXT(strInSegmentName));
+		HC_Open_Segment(Utility::ToChar(strInSegmentName));
 		{
 			HC_Flush_Contents(".", "everything");
 

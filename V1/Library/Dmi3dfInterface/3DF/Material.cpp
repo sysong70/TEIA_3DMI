@@ -1043,7 +1043,7 @@ MaterialMappingControl & MaterialMappingControl::SetColor(CString strGeometry, C
 
 	CString strColorText;
 	strColorText.Format(L"%s = (%s = (r=%f g=%f b=%f))", strGeometry, strChannel, cInRgbaColor.red, cInRgbaColor.green, cInRgbaColor.blue);
-	HC_Set_Color(H_ASCII_TEXT(strColorText));
+	HC_Set_Color(Utility::ToChar(strColorText));
 
 	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 
@@ -1054,7 +1054,7 @@ MaterialMappingControl & MaterialMappingControl::UnSetColor(CString strInType)
 {
 	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
-	HC_UnSet_One_Selectability(H_ASCII_TEXT(strInType));
+	HC_UnSet_One_Selectability(Utility::ToChar(strInType));
 
 	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 
@@ -1138,7 +1138,7 @@ void MaterialMappingControl::SetDefineLocalTexture(UINT nIndex, CString strTextu
 
 	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
-	HC_Define_Local_Texture(H_ASCII_TEXT(strText), H_ASCII_TEXT(strTextureOptions));
+	HC_Define_Local_Texture(Utility::ToChar(strText), Utility::ToChar(strTextureOptions));
 
 	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 }

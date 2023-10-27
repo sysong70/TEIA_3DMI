@@ -199,7 +199,7 @@ EdgeAttributeControl & EdgeAttributeControl::SetPattern(CString strInPatternName
 	EdgeAttributeControlPrivate * pcImpl = (EdgeAttributeControlPrivate *)m_pcImpl;
 
 	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
-		HC_Set_Edge_Pattern(H_ASCII_TEXT(strInPatternName));
+		HC_Set_Edge_Pattern(Utility::ToChar(strInPatternName));
 	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;
@@ -244,7 +244,7 @@ EdgeAttributeControl & EdgeAttributeControl::SetWeight(float fInWeight, Edge::Si
 					break;
 			}
 			
-			HC_Set_Variable_Edge_Weight(H_ASCII_TEXT(strWeight));
+			HC_Set_Variable_Edge_Weight(Utility::ToChar(strWeight));
 		}
 
 	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
@@ -259,7 +259,7 @@ EdgeAttributeControl & EdgeAttributeControl::SetHardAngle(float fInAngle)
 	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		CString strOption;
 		strOption.Format(L"geometry options = (hard edge angle = %f, no invert polycylinders, no fea nodes)", fInAngle);
-		HC_Set_Rendering_Options(H_ASCII_TEXT(strOption));
+		HC_Set_Rendering_Options(Utility::ToChar(strOption));
 	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;

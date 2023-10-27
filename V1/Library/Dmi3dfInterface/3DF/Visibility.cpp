@@ -273,7 +273,7 @@ VisibilityControl & VisibilityControl::SetVisibility(CString strInType, bool bIn
 
 	CString strList;
 	strList.Format(L"%s = %s", strInType, (true == bInValue ? L"on" : L"off"));
-	HC_Set_Visibility(H_ASCII_TEXT(strList));
+	HC_Set_Visibility(Utility::ToChar(strList));
 
 	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
 
@@ -284,7 +284,7 @@ VisibilityControl & VisibilityControl::UnSetVisibility(CString strInType)
 {
 	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
 
-	HC_UnSet_One_Visibility(H_ASCII_TEXT(strInType));
+	HC_UnSet_One_Visibility(Utility::ToChar(strInType));
 
 	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);	
 

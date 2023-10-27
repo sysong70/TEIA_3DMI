@@ -24,6 +24,7 @@ namespace H3DF
 		// 사용후 Buffer를 삭제해야 함.
 		API_3DF bool UnicodeToChar(CString strText, char *& pchBuffer);
 		API_3DF bool UnicodeToChar(CString strText, char *& pchBuffer, int & nBufferSize);
+		API_3DF CStringA ToChar(CString strText);
 		API_3DF bool CharToUnicode(char * pchText, CString & strText);
 
 		CString GetExecuteDirectory();

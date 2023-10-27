@@ -89,7 +89,7 @@ StyleControl & StyleControl::operator = (StyleControl const & cInThat)
 StyleKey StyleControl::PushNamed(CString & strInStyleName)
 {
 	Open();
-	HC_KEY nStyleKey = HC_Style_Segment(H_ASCII_TEXT(strInStyleName));
+	HC_KEY nStyleKey = HC_Style_Segment(Utility::ToChar(strInStyleName));
 	Close();
 
 	StyleKey cStyle(nStyleKey);

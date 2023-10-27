@@ -180,7 +180,7 @@ LineAttributeControl & LineAttributeControl::SetPattern(CString strInPatternName
 	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
 
 	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
-		HC_Set_Line_Pattern(H_ASCII_TEXT(strInPatternName));
+		HC_Set_Line_Pattern(Utility::ToChar(strInPatternName));
 	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;
@@ -225,7 +225,7 @@ LineAttributeControl & LineAttributeControl::SetWeight(float fInWeight, Line::Si
 					break;
 			}
 			
-			HC_Set_Variable_Line_Weight(H_ASCII_TEXT(strWeight));
+			HC_Set_Variable_Line_Weight(Utility::ToChar(strWeight));
 		}
 
 	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);

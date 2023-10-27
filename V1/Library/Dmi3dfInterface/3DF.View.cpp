@@ -330,7 +330,7 @@ void H3DF::View::LoadPointCloudFile(CString strFilePathName)
 	
 	// 라이브러리를 사용해야 하므로 미리 cPointCloudSegment를 Open하도록 한다.
 	SegmentKeyPrivate::LocalOpen(cPointCloudSegment);
-	cPointCloud.FileInputByKey(H_ASCII_TEXT(strFilePathName), cPointCloudSegment.KeyValue(), &cOptions);
+	cPointCloud.FileInputByKey(Utility::ToChar(strFilePathName), cPointCloudSegment.KeyValue(), &cOptions);
 
 	HC_UnSet_Marker_Symbol();
 	HC_Set_Marker_Size(0.2);
