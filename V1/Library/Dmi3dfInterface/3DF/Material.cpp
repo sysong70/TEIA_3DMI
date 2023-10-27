@@ -5,6 +5,8 @@
 #include "Segment.h"
 #include "./Private/SegmentPrivate.h"
 
+#include "3DF.Utility.h"
+
 #include <hc.h>
 #include <HUtility.h>
 #include <HTools.h>
@@ -1031,11 +1033,16 @@ MaterialMappingControl::MaterialMappingControl(SegmentKey & cInSegmentKey) :
 }
 
 //== Color 설정 =====================================================================================
+
+MaterialMappingControl & MaterialMappingControl::SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel)
+{
+	return SetColor(L"faces", "diffuse", cInRgbaColor);
+}
+
 MaterialMappingControl & MaterialMappingControl::SetMarkerColor(RGBAColor const & cInRgbaColor)
 {
 	return SetColor(L"markers", "diffuse", cInRgbaColor);
 }
-
 
 MaterialMappingControl & MaterialMappingControl::SetColor(CString strGeometry, CString strChannel, RGBAColor const & cInRgbaColor)
 {

@@ -32,6 +32,9 @@ namespace KERNEL
 		//== Keyboard 관련 함수 ======================================================================
 		void KeyboardSignal(Json::Object & cInObject);
 
+		//== Style 관련 함수 =========================================================================
+		void SetViewStyle(int nStyleId);
+
 	private:
 		int m_nViewId = -1;
 	};

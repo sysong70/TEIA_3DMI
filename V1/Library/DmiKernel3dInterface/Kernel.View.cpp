@@ -10,6 +10,8 @@
 #include "../Signal/Signal.h"
 #include "../Common/Common_Define.h"
 
+#include "../../UiMain/Command.Resource.h"
+
 using namespace KERNEL;
 
 namespace KERNEL
@@ -186,3 +188,37 @@ void KERNEL::View::KeyboardSignal(Json::Object & cInObject)
 	pcImpl->m_cCanvas.KeyboardInput(cInObject);
 }
 
+//== Style 관련 함수 =========================================================================
+void KERNEL::View::SetViewStyle(int nStyleId)
+{
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) { DEBUG_RETURN; }
+
+	switch (nStyleId)
+	{
+		case HOME_3D_CMD_ViewStyle_Shade:
+			pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::Phong);
+			break;
+
+		case HOME_3D_CMD_ViewStyle_ShadeWithEdges:
+			pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::PhongWithLines);
+			break;
+
+		case HOME_3D_CMD_ViewStyle_Wireframe:
+			pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::Wireframe);
+			break;
+
+		case HOME_3D_CMD_ViewStyle_HiddenLineRemove:
+			pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::FastHiddenLine);
+			//pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::HiddenLine);
+			break;
+
+		case HOME_3D_CMD_ViewStyle_Tessellated:
+			pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::Tessellated);
+			break;
+
+		default:
+			assert(false);
+			break;
+	}
+}

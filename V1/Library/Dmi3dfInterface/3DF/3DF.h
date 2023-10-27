@@ -261,6 +261,28 @@ namespace H3DF
 		Unknown
 	};
 
+	class API_3DF Rendering
+	{
+	public:
+		enum class Mode
+		{
+			Gouraud,
+			GouraudWithLines,
+			Flat,
+			FlatWithLines,
+			Phong,
+			PhongWithLines,
+			HiddenLine,
+			FastHiddenLine,
+			Wireframe,
+			Tessellated,
+			Default = Phong
+		};
+
+	private:
+		Rendering() {}
+	};
+
 	using WindowHandle = DWORD_PTR;
 	using Time = double;
 

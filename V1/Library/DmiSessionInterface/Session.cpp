@@ -28,12 +28,6 @@ void SESSION::Session::SessionId(int nSessionId)
 	}
 }
 
-//== Canvas 관련 함수 ================================================================================
-void SESSION::Session::CanvasInitialize(Json::Object & cInObject, Signal::Delivery & cInstance)
-{
-
-}
-
 //== View 관련 함수 ==================================================================================
 
 void SESSION::Session::ViewInitialize(Json::Object & cInObject, Signal::Delivery & cInstance)
@@ -90,6 +84,7 @@ void SESSION::Session::ExecuteCommand(Json::Object & cInObject)
 		case HOME_3D_CMD_ViewStyle_Wireframe:
 		case HOME_3D_CMD_ViewStyle_HiddenLineRemove:
 		case HOME_3D_CMD_ViewStyle_Tessellated:
+			m_pcView->SetViewStyle(nId);
 			break;
 	}
 }

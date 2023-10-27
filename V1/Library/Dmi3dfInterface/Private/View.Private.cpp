@@ -2,6 +2,8 @@
 
 #include "View.Private.h"
 
+#include "Canvas.Private.h"
+
 #include <hc.h>
 #include <HTools.h>
 #include <HBaseModel.h>
@@ -633,6 +635,13 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 	if(nullptr == m_pcBaseView) {
 		return false;
 	}
+
+	// View Segment Key 설정
+	m_cKey.Set(m_pcBaseView->GetViewKey());
+
+	// Model 설정
+	m_pcModel = pcInModel;
+	m_cModelKey = m_pcModel->GetSegmentKey();
 
 	m_pcWindow = new WindowKey(m_pcBaseView);
 

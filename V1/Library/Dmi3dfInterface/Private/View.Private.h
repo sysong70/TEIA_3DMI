@@ -60,6 +60,9 @@ namespace H3DF
 
 		H3DF::BaseView * GetBaseView() { return m_pcBaseView; }
 
+		SegmentKey GetSegmentKey() { return m_cKey; }
+		SegmentKey GetModelKey() { return m_cModelKey; }
+
 		void InitNavigationCube(int nWidth, int nHeight);
 		bool IsInitNavigationCube();
 
@@ -111,8 +114,14 @@ namespace H3DF
 		BaseView * m_pcBaseView = nullptr;
 		H3DF::WindowKey * m_pcWindow = nullptr;
 		char * m_pchName = nullptr;
+		H3DF::Rendering::Mode m_eRenderingMode = H3DF::Rendering::Mode::Default;
 
 	private:
+		SegmentKey m_cKey;
+
+		H3DF::Model * m_pcModel = nullptr;
+		SegmentKey m_cModelKey;
+
 		bool m_bShowCollisions = false;
 
 		Operator::CameraSelect * m_pcCameraOrbitSelect = nullptr;

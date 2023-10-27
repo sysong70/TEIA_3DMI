@@ -34,6 +34,15 @@ namespace H3DF
 		void Update(Json::Object & cInObject) const;
 		void Update(Json::Object & cInObject, Window::UpdateType eInType, H3DF::Time dInTimeLimit = -1.0) const;
 
+		void Destruct();
+		void Resize(int x, int y);
+
+		SegmentKey GetSegmentKey();
+		SegmentKey const GetSegmentKey() const;
+
+		SegmentKey GetModelOverrideSegmentKey();
+		SegmentKey const GetModelOverrideSegmentKey() const;
+
 		//== Command 관련 함수 =======================================================================
 		void CancelCommands();
 		void CancelCommands() const;
@@ -65,24 +74,12 @@ namespace H3DF
 		//== Select 관련 함수 ========================================================================
 		void SetSubentitySelectLevel();
 
-		//==========================================================================================
-	public:
-		void Initialize(Json::Object & cInObject, Signal::Delivery & cInstance);
-		void Destruct();
-		void Paint(Json::Object & cInObject);
-		void Resize(int x, int y);
+		//== View Style 관련 함수 ====================================================================
+		void SetRenderingMode(Rendering::Mode eInMode);
+		Rendering::Mode GetRenderingMode() const;
 
+	public:
 		void SaveHsfFile(CString strFilePathName, H3DF::Canvas * pcHoopsView);
-
 		void LoadPointCloudFile(CString strFilePathName);
-
-	public:
-
-	private:
-		H3DF::Canvas * m_pcCanvas = nullptr;
-		H3DF::Model * m_pcModel = nullptr;
-
-		H3DF::BaseView * m_pcBaseView = nullptr;
-		H3DF::WindowKey * m_pcWindow = nullptr;
 	};
 };

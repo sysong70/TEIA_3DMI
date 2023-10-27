@@ -345,6 +345,7 @@ public:
 	MaterialMappingControl(SegmentKey & cInSegmentKey);
 
 	//== Color 설정 =================================================================================
+	MaterialMappingControl & SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel = Material::Color::Channel::DiffuseColor);
 	MaterialMappingControl & SetMarkerColor(RGBAColor const & cInRgbaColor);
 
 	//== Texture 설정 ===============================================================================

@@ -13,6 +13,7 @@
 
 #include "3DF/Segment.h"
 #include "3DF/Private/SegmentPrivate.h"
+#include "3DF/Visibility.h"
 
 #include "3DF/3DF.Utility.h"
 
@@ -103,9 +104,6 @@ void H3DF::View::Update(Json::Object & cInObject, Window::UpdateType eInType, H3
 	Update(cInObject);
 }
 
-//== View 관련 함수 ==================================================================================
-
-// 1. View 초기화, 전달받은 View Id를 이용해서 초기화 작업 실시하고 전달된 정보에 파일 정보가 있으면 File Open을 실시한다.
 void H3DF::View::Destruct()
 {
 	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
@@ -129,6 +127,39 @@ void H3DF::View::Resize(int x, int y)
 
 	pcImpl->Resize(x, y);
 }
+
+SegmentKey H3DF::View::GetSegmentKey()
+{
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) { assert(false); }
+
+	return pcImpl->GetSegmentKey();
+}
+
+SegmentKey const H3DF::View::GetSegmentKey() const
+{
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) { assert(false); }
+
+	return pcImpl->GetSegmentKey();
+}
+
+SegmentKey H3DF::View::GetModelOverrideSegmentKey()
+{
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) { assert(false); }
+
+	return pcImpl->GetModelKey();
+}
+
+SegmentKey const H3DF::View::GetModelOverrideSegmentKey() const
+{
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) { assert(false); }
+
+	return pcImpl->GetModelKey();
+}
+
 
 //== Command 관련 함수 ===========================================================================
 
@@ -179,14 +210,12 @@ bool H3DF::View::LButtonUp(int nFlags, int x, int y)
 // 3. Middle Button 처리 함수
 bool H3DF::View::MButtonDown(int nFlags, int x, int y)
 {
-	assert(m_pcCanvas);
 	return true;
 	//return pcCanvas->MButtonDown(nFlags, x, y);
 }
 
 bool H3DF::View::MButtonUp(int nFlags, int x, int y)
 {
-	assert(m_pcCanvas);
 	return true;
 	//return pcCanvas->MButtonUp(nFlags, x, y);
 }
@@ -275,6 +304,106 @@ void H3DF::View::SetSubentitySelectLevel()
 	pcImpl->SetSubentitySelectLevel();
 }
 
+//== View Style 관련 함수 ====================================================================
+void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
+{
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
+	BaseView * pcView = pcImpl->GetBaseView();
+	
+	SegmentKey cViewKey = pcImpl->GetSegmentKey();
+	SegmentKey cSceneKey(pcView->GetSceneKey());
+	
+	switch (eInMode)
+	{
+		case H3DF::Rendering::Mode::Gouraud:
+			break;
+
+		case H3DF::Rendering::Mode::GouraudWithLines:
+			break;
+
+		case H3DF::Rendering::Mode::Flat:
+			break;
+
+		case H3DF::Rendering::Mode::FlatWithLines:
+			break;
+
+		case H3DF::Rendering::Mode::Phong: {
+			pcView->RenderPhong();
+			GetModelOverrideSegmentKey().GetVisibilityControl().SetLines(false);
+			cSceneKey.GetVisibilityControl().SetEdges(false);
+
+// 			HC_Open_Segment_By_Key(pcView->GetSceneKey()); {
+// 				HC_Set_Visibility("faces = on, edges=off, lines = on");
+// 			} HC_Close_Segment();
+		} break;
+
+		case H3DF::Rendering::Mode::PhongWithLines:
+			pcView->RenderPhong();
+			GetModelOverrideSegmentKey().GetVisibilityControl().SetLines(true);
+			cSceneKey.GetVisibilityControl().SetEdges(false);
+			break;
+
+		case H3DF::Rendering::Mode::HiddenLine: {
+			HConstantFrameRate * pcFramerate = pcView->GetConstantFrameRateObject();
+			pcFramerate->Stop();
+			pcFramerate->Shutdown();
+
+			pcView->SetRenderMode(HRenderHiddenLine, true);
+			cSceneKey.GetVisibilityControl().SetEdges(false);
+			cViewKey.GetMaterialMappingControl().SetFaceColor(RGBAColor(1, 1, 1));
+/*
+			if (CAppSettings::HiddenLineMode == FastHiddenLine)
+				m_pHView->SetRenderMode(HRenderHiddenLineFast, true);
+			else if (CAppSettings::HiddenLineMode == FakeHiddenLine)
+				m_pHView->SetRenderMode(HRenderFakeHiddenLine, true);
+			else
+				m_pHView->SetRenderMode(HRenderHiddenLine, true);
+
+			m_pHView->Update();
+*/
+
+		} break;
+
+		case H3DF::Rendering::Mode::FastHiddenLine: {
+			HConstantFrameRate * pcFramerate = pcView->GetConstantFrameRateObject();
+			pcFramerate->Stop();
+			pcFramerate->Shutdown();
+
+			pcView->SetRenderMode(HRenderHiddenLineFast, true);
+			cSceneKey.GetVisibilityControl().SetEdges(false);
+			//cViewKey.GetMaterialMappingControl().SetFaceColor(RGBAColor(1, 1, 1));
+		} break;
+
+		case H3DF::Rendering::Mode::Wireframe: {
+			pcView->RenderBRepWireframe();
+			GetModelOverrideSegmentKey().GetVisibilityControl().SetLines(true);
+			cSceneKey.GetVisibilityControl().SetEdges(false);
+		} break;
+
+		case H3DF::Rendering::Mode::Tessellated:
+			pcView->RenderPhong();
+			cSceneKey.GetVisibilityControl().SetEdges(true);
+			break;
+
+		default:
+			assert(false);
+			break;
+	}
+
+	pcView->Update();
+}
+
+Rendering::Mode H3DF::View::GetRenderingMode() const
+{
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
+	return pcImpl->m_eRenderingMode;
+}
+
+
 void H3DF::View::SaveHsfFile(CString strFilePathName, Canvas * pcHoopsView)
 {
 /*
@@ -343,3 +472,4 @@ void H3DF::View::LoadPointCloudFile(CString strFilePathName)
 	cMaterialMapping.SetVertexColor(RGBAColor(0.75, 0.75, 0.75)); // Gray Color 설정
 	Utility::ChangeSubSegmentColor(cPointCloudSegment, cMaterialMapping, true);
 }
+

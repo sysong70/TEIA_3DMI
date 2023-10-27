@@ -21,9 +21,6 @@ namespace SESSION
 		int SessionId() const;
 		void SessionId(int nSessionId);
 
-		//== Canvas 관련 함수 ========================================================================
-		void CanvasInitialize(Json::Object & cInObject, Signal::Delivery & cInstance);
-
 		//== View 관련 함수 ==========================================================================
 		void ViewInitialize(Json::Object & cInObject, Signal::Delivery & cInstance);
 		void ViewDestruct();
