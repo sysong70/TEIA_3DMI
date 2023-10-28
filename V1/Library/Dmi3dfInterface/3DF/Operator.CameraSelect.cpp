@@ -25,7 +25,7 @@
 
 USING_3DF_NAMESPACE
 
-Operator::CameraSelect::CameraSelect(WindowKey * pcWindow, NavigationCube & cNaviCube, int DoRepeat, int DoCapture) :
+H3DF::Operator::CameraSelect::CameraSelect(WindowKey * pcWindow, NavigationCube & cNaviCube, int DoRepeat, int DoCapture) :
 	HOpCameraOrbit(pcWindow->GetBaseView(), DoRepeat, DoCapture),
 	m_cObjectSnapOperator(pcWindow)
 {
@@ -39,7 +39,7 @@ Operator::CameraSelect::CameraSelect(WindowKey * pcWindow, NavigationCube & cNav
 }
 
 /*
-Operator::CameraSelect::CameraSelect(HBaseView * view, int DoRepeat, int DoCapture) :
+H3DF::Operator::CameraSelect::CameraSelect(HBaseView * view, int DoRepeat, int DoCapture) :
 	HOpCameraOrbit(view, DoRepeat, DoCapture)
 {
 	m_nSelectPickCount = 200;
@@ -48,25 +48,25 @@ Operator::CameraSelect::CameraSelect(HBaseView * view, int DoRepeat, int DoCaptu
 }
 */
 
-Operator::CameraSelect::~CameraSelect()
+H3DF::Operator::CameraSelect::~CameraSelect()
 {
 	HC_Open_Segment_By_Key(GetView()->GetConstructionKey());
 	HC_Flush_Contents(".", "geometry");
 	HC_Close_Segment();
 }
 
-const char * Operator::CameraSelect::GetName()
+const char * H3DF::Operator::CameraSelect::GetName()
 {
 	return "TDF_Operator_CameraOrbitSelect";
 }
 
-HBaseOperator * Operator::CameraSelect::Clone()
+HBaseOperator * H3DF::Operator::CameraSelect::Clone()
 {
-	return new Operator::CameraSelect(m_pcWindow, *m_pcNaviCube);
+	return new H3DF::Operator::CameraSelect(m_pcWindow, *m_pcNaviCube);
 }
 //== Mouse Event 처리 ===============================================================================
 
-int Operator::CameraSelect::OnLButtonDown(HEventInfo & cInEvent)
+int H3DF::Operator::CameraSelect::OnLButtonDown(HEventInfo & cInEvent)
 {
 	m_cMouseDownPoint = cInEvent.GetMousePixelPos();
 	m_nMouseDownTickCount = GetTickCount();
@@ -79,7 +79,7 @@ int Operator::CameraSelect::OnLButtonDown(HEventInfo & cInEvent)
 	return HOpCameraOrbit::OnLButtonDown(cInEvent);
 }
 
-int Operator::CameraSelect::OnLButtonUp(HEventInfo & cInEvent)
+int H3DF::Operator::CameraSelect::OnLButtonUp(HEventInfo & cInEvent)
 {
 	if (nullptr != m_pcNaviCube) {
 		if (HLISTENER_CONSUME_EVENT == m_pcNaviCube->LButtonUp(cInEvent)) {
@@ -113,7 +113,7 @@ int Operator::CameraSelect::OnLButtonUp(HEventInfo & cInEvent)
 	return HOpCameraOrbit::OnLButtonUp(cInEvent);
 }
 
-int Operator::CameraSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
+int H3DF::Operator::CameraSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
 {
 	m_bOrbitMode = true;
 
@@ -134,23 +134,23 @@ int Operator::CameraSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
 	return nResult;
 }
 
-int Operator::CameraSelect::OnRButtonDown(HEventInfo & hevent)
+int H3DF::Operator::CameraSelect::OnRButtonDown(HEventInfo & hevent)
 {
 	return HOpCameraPan_OnLButtonDown(hevent);
 }
 
-int Operator::CameraSelect::OnRButtonDownAndMove(HEventInfo & hevent)
+int H3DF::Operator::CameraSelect::OnRButtonDownAndMove(HEventInfo & hevent)
 {
 	return HOpCameraPan_OnLButtonDownAndMove(hevent);
 }
 
-int Operator::CameraSelect::OnRButtonUp(HEventInfo & hevent)
+int H3DF::Operator::CameraSelect::OnRButtonUp(HEventInfo & hevent)
 {
 	return HOpCameraPan_OnLButtonUp(hevent);
 }
 
 // Dynamic Highlighting 처리
-int Operator::CameraSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
+int H3DF::Operator::CameraSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 {
 	if (nullptr != m_pcNaviCube) {
 		if (HLISTENER_CONSUME_EVENT == m_pcNaviCube->NoButtonDownAndMove(cInEvent)) {
@@ -163,7 +163,7 @@ int Operator::CameraSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 	return HLISTENER_PASS_EVENT;
 }
 
-int Operator::CameraSelect::OnMouseWheel(HEventInfo & cInEvent)
+int H3DF::Operator::CameraSelect::OnMouseWheel(HEventInfo & cInEvent)
 {
 	int nResult = HBaseView_OnMouseWheel(cInEvent, false);
 
@@ -172,7 +172,7 @@ int Operator::CameraSelect::OnMouseWheel(HEventInfo & cInEvent)
 	return nResult;
 }
 
-int Operator::CameraSelect::HOpCameraOrbit_OnLButtonDownAndMove(HEventInfo & event)
+int H3DF::Operator::CameraSelect::HOpCameraOrbit_OnLButtonDownAndMove(HEventInfo & event)
 {
 	HPoint first_point, new_point, axis, vtmp, m_real_new;
 	float theta, dist, tmp, vl;
@@ -181,7 +181,7 @@ int Operator::CameraSelect::HOpCameraOrbit_OnLButtonDownAndMove(HEventInfo & eve
 
 	m_bSingleClick = false;
 	GetView()->SetViewMode(HViewUnknown);
-	m_pcWindow->GetBaseView()->SetViewMode(H3DF::ViewMode::Unknown);
+	m_pcWindow->GetBaseView()->SetViewDirection(H3DF::ViewDirection::Mode::Unknown);
 
 	// read mouse position
 	SetNewPoint(event.GetMouseWindowPos());
@@ -302,7 +302,7 @@ int Operator::CameraSelect::HOpCameraOrbit_OnLButtonDownAndMove(HEventInfo & eve
 
 }
 
-int Operator::CameraSelect::HOpCameraPan_OnLButtonDown(HEventInfo & event)
+int H3DF::Operator::CameraSelect::HOpCameraPan_OnLButtonDown(HEventInfo & event)
 {
 	if (GetView()->GetModel()->GetBhvBehaviorManager()->IsPlaying() && GetView()->GetModel()->GetBhvBehaviorManager()->GetCameraUpdated())
 		return HOP_OK;
@@ -329,13 +329,13 @@ int Operator::CameraSelect::HOpCameraPan_OnLButtonDown(HEventInfo & event)
 	return HOP_OK;
 }
 
-int Operator::CameraSelect::HOpCameraPan_OnLButtonDownAndMove(HEventInfo & event)
+int H3DF::Operator::CameraSelect::HOpCameraPan_OnLButtonDownAndMove(HEventInfo & event)
 {
 	if (!OperatorStarted()) {
 		return HBaseOperator::OnLButtonDownAndMove(event);
 	}
 
-	m_pcWindow->GetBaseView()->SetViewMode(H3DF::ViewMode::Unknown);
+	m_pcWindow->GetBaseView()->SetViewDirection(H3DF::ViewDirection::Mode::Unknown);
 
 	SetNewPoint(event.GetMouseWorldPos());
 
@@ -389,7 +389,7 @@ int Operator::CameraSelect::HOpCameraPan_OnLButtonDownAndMove(HEventInfo & event
 	GetView()->Update();
 	return HOP_OK;
 }
-int Operator::CameraSelect::HOpCameraPan_OnLButtonUp(HEventInfo & event)
+int H3DF::Operator::CameraSelect::HOpCameraPan_OnLButtonUp(HEventInfo & event)
 {
 	if (!OperatorStarted())
 		return HBaseOperator::OnLButtonDownAndMove(event);
@@ -401,7 +401,7 @@ int Operator::CameraSelect::HOpCameraPan_OnLButtonUp(HEventInfo & event)
 }
 
 
-int Operator::CameraSelect::HBaseView_OnMouseWheel(HEventInfo & event, bool bUdpate)
+int H3DF::Operator::CameraSelect::HBaseView_OnMouseWheel(HEventInfo & event, bool bUdpate)
 {
 	float zDelta = static_cast<float>(event.GetMouseWheelDelta() / m_pcWindow->GetBaseView()->GetMouseWheelSensitivity() / 120.0 / 8.0);
 
@@ -409,7 +409,7 @@ int Operator::CameraSelect::HBaseView_OnMouseWheel(HEventInfo & event, bool bUdp
 		zDelta *= -1;
 	}
 
-	m_pcWindow->GetBaseView()->SetViewMode(H3DF::ViewMode::Unknown);
+	m_pcWindow->GetBaseView()->SetViewDirection(H3DF::ViewDirection::Mode::Unknown);
 
 	HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetSceneKey());
 
@@ -511,7 +511,7 @@ BAILOUT:
 	return HLISTENER_CONSUME_EVENT;
 }
 
-bool Operator::CameraSelect::valid_float(float f)
+bool H3DF::Operator::CameraSelect::valid_float(float f)
 {
 	if (isinf(f) || isnan(f)) {
 		return false;
@@ -519,7 +519,7 @@ bool Operator::CameraSelect::valid_float(float f)
 	return true;
 }
 
-bool Operator::CameraSelect::valid_point(HPoint const & p)
+bool H3DF::Operator::CameraSelect::valid_point(HPoint const & p)
 {
 	if (valid_float(p.x) && valid_float(p.y) && valid_float(p.z)) {
 		return true;

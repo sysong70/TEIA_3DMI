@@ -223,43 +223,51 @@ namespace H3DF
 		Name = 0x10000001,
 	};
 
-	enum class ViewMode
+	class API_3DF ViewDirection
 	{
-		top,
-		bottom,
-		front,
-		back,
-		left,
-		right,
+	public:
+		enum class Mode
+		{
+			top,
+			bottom,
+			front,
+			back,
+			left,
+			right,
 
-		py_nz,
-		py_pz,
-		ny_pz,
-		ny_nz,
+			py_nz,
+			py_pz,
+			ny_pz,
+			ny_nz,
 
-		nx_nz,
-		nx_pz,
-		px_pz,
-		px_nz,
+			nx_nz,
+			nx_pz,
+			px_pz,
+			px_nz,
 
-		nx_py,
-		px_py,
-		px_ny,
-		nx_ny,
+			nx_py,
+			px_py,
+			px_ny,
+			nx_ny,
 
-		nx_py_nz,
-		nx_py_pz,
-		nx_ny_pz,
-		nx_ny_nz,
+			nx_py_nz,
+			nx_py_pz,
+			nx_ny_pz,
+			nx_ny_nz,
 
-		px_py_pz, // ISO
-		px_py_nz,
-		px_ny_nz,
-		px_ny_pz,
+			px_py_pz, // ISO
+			px_py_nz,
+			px_ny_nz,
+			px_ny_pz,
 
-		Count,
-		Unknown
+			Count,
+			Unknown
+		};
+	private:
+		ViewDirection() {}
 	};
+
+
 
 	class API_3DF Rendering
 	{

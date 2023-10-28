@@ -209,8 +209,7 @@ void KERNEL::View::SetViewStyle(int nStyleId)
 			break;
 
 		case HOME_3D_CMD_ViewStyle_HiddenLineRemove:
-			pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::FastHiddenLine);
-			//pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::HiddenLine);
+			pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::HiddenLine);
 			break;
 
 		case HOME_3D_CMD_ViewStyle_Tessellated:
@@ -220,5 +219,51 @@ void KERNEL::View::SetViewStyle(int nStyleId)
 		default:
 			assert(false);
 			break;
+	}
+}
+
+void KERNEL::View::SetViewDirection(int nDirectionId)
+{
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) { DEBUG_RETURN; }
+
+	switch (nDirectionId)
+	{
+		case HOME_3D_CMD_ViewDirection_Top:
+			pcImpl->m_cCanvas.GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::top);
+			break;
+
+		case HOME_3D_CMD_ViewDirection_Front:
+			pcImpl->m_cCanvas.GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::front);
+			break;
+
+		case HOME_3D_CMD_ViewDirection_Left:
+			pcImpl->m_cCanvas.GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::left);
+			break;
+
+		case HOME_3D_CMD_ViewDirection_Bottom:
+			pcImpl->m_cCanvas.GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::bottom);
+			break;
+
+		case HOME_3D_CMD_ViewDirection_Back:
+			pcImpl->m_cCanvas.GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::back);
+			break;
+
+		case HOME_3D_CMD_ViewDirection_Right:
+			pcImpl->m_cCanvas.GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::right);
+			break;
+
+		case HOME_3D_CMD_ViewDirection_Iso:
+			pcImpl->m_cCanvas.GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::px_py_pz);
+			break;
+
+		case HOME_3D_CMD_ViewDirection_SeIso:
+			pcImpl->m_cCanvas.GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::nx_py_pz);
+			break;
+
+		case HOME_3D_CMD_ViewDirection_Perspective:
+			assert(false);
+			break;
+
 	}
 }

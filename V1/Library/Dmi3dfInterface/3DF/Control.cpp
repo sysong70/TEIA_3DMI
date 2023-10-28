@@ -1,64 +1,48 @@
 ﻿#include "StdAfx.h"
 
 #include "Control.h"
+#include "Private/ControlPrivate.h"
+
 #include "Segment.h"
 
 #include <HTools.h>
 
-namespace H3DF {
-	class ControlPrivate : public PrivateImpl
-	{
-		public:
-		ControlPrivate() { m_eType = H3DF::Type::Control; }
-		void Copy(ControlPrivate * pcInThat) {
-			m_nKey = pcInThat->m_nKey;
-			m_nOwnerKey = pcInThat->m_nOwnerKey;
-		}
-		// Key
-		HC_KEY m_nKey = INVALID_KEY;
-		// Owner Key
-		HC_KEY m_nOwnerKey = INVALID_KEY;
-	};
+using namespace H3DF;
+
+H3DF::Control::Control(HC_KEY nInKey)
+{
+	ControlPrivate * pcImpl = new ControlPrivate();
+	pcImpl->m_nOverrideKey = nInKey;
+
+	m_pcImpl = pcImpl;
 }
 
-USING_3DF_NAMESPACE
-
-Control::Control(HC_KEY nKey)
+H3DF::Control::Control(Control const & cInThat)
 {
-	m_nKey = nKey;
+	m_pcImpl = new ControlPrivate();
+	Set(cInThat);
 }
 
-void Control::Open() const
+H3DF::Control::~Control()
 {
-	HC_Open_Segment_By_Key(m_nKey);
 }
 
-void Control::Close() const
+void H3DF::Control::Set(Control const & cInThat)
 {
-	HC_Close_Segment();
+	ControlPrivate * pcImpl = (ControlPrivate *)m_pcImpl;
+	ControlPrivate * pcInThatImpl = (ControlPrivate *)cInThat.m_pcImpl;
+	pcImpl->Copy(pcInThatImpl);
 }
 
-bool Control::HasOwner() const
+Control const & H3DF::Control::operator = (Control const & cInThat)
 {
-	return (INVALID_KEY != m_nOwnerKey) ? true : false;
+	Set(cInThat);
+	return *this;
 }
 
-void Control::SetOwerKey(HC_KEY nInKey)
+bool H3DF::Control::operator == (Control const & cInThat) const
 {
-	m_nOwnerKey = nInKey;
-}
-
-SegmentKey Control::Owner() const
-{
-	if(INVALID_KEY == m_nOwnerKey) {
-		assert(false);
-	}
-
-	SegmentKey cOwner(m_nOwnerKey);
-	return cOwner;
-}
-
-void Control::Delete()
-{
-	assert(false);
+	ControlPrivate * pcImpl = (ControlPrivate *)m_pcImpl;
+	ControlPrivate * pcInThatImpl = (ControlPrivate *)cInThat.m_pcImpl;
+	return (pcImpl->m_nOverrideKey == pcInThatImpl->m_nOverrideKey);
 }

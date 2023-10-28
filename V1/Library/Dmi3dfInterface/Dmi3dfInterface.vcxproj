@@ -135,6 +135,7 @@
     <ClInclude Include="3DF.Application.h" />
     <ClInclude Include="3DF.View.h" />
     <ClInclude Include="3DF.Factory.h" />
+    <ClInclude Include="3DF\Private\ControlPrivate.h" />
     <ClInclude Include="3DF\SelectionSet.h" />
     <ClInclude Include="Private\Canvas.Private.h" />
     <ClInclude Include="Private\View.Private.h" />
@@ -215,6 +216,7 @@
     <ClCompile Include="3DF.View.cpp" />
     <ClCompile Include="3DF\ApplicationWindowOption.cpp" />
     <ClCompile Include="3DF.Factory.cpp" />
+    <ClCompile Include="3DF\Private\ControlPrivate.cpp" />
     <ClCompile Include="3DF\SelectionSet.cpp" />
     <ClCompile Include="Private\Canvas.Private.cpp" />
     <ClCompile Include="Private\View.Private.cpp" />

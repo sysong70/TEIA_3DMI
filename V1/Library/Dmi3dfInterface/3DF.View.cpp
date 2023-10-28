@@ -15,6 +15,8 @@
 #include "3DF/Private/SegmentPrivate.h"
 #include "3DF/Visibility.h"
 
+#include "3DF/Facility.AppOptions.h"
+
 #include "3DF/3DF.Utility.h"
 
 #include "Import/DLL.Interface.h"
@@ -27,6 +29,9 @@
 
 using namespace H3DF;
 using namespace std::chrono;
+
+#define TheKenel TheAppOptions.Kernel
+#define ThePreset TheAppOptions.Preset
 
 H3DF::View::View()
 {
@@ -307,13 +312,22 @@ void H3DF::View::SetSubentitySelectLevel()
 //== View Style 관련 함수 ====================================================================
 void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
+	ViewPrivate * pcViewImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcViewImpl);
 
-	BaseView * pcView = pcImpl->GetBaseView();
+	pcViewImpl->m_eRenderingMode = eInMode;
+
+	BaseView * pcView = pcViewImpl->GetBaseView();
 	
-	SegmentKey cViewKey = pcImpl->GetSegmentKey();
+	SegmentKey cViewKey = pcViewImpl->GetSegmentKey();
 	SegmentKey cSceneKey(pcView->GetSceneKey());
+
+	if (H3DF::Rendering::Mode::HiddenLine == eInMode) {
+		pcViewImpl->SetWindowBackGroundColor(RGB(255, 255, 255), RGB(255, 255, 255));
+	}
+	else {
+		pcViewImpl->SetWindowBackGroundColor(TheKenel.Appearance.BackgroundColor.Top, TheKenel.Appearance.BackgroundColor.Bottom);
+	}
 	
 	switch (eInMode)
 	{
@@ -333,10 +347,6 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 			pcView->RenderPhong();
 			GetModelOverrideSegmentKey().GetVisibilityControl().SetLines(false);
 			cSceneKey.GetVisibilityControl().SetEdges(false);
-
-// 			HC_Open_Segment_By_Key(pcView->GetSceneKey()); {
-// 				HC_Set_Visibility("faces = on, edges=off, lines = on");
-// 			} HC_Close_Segment();
 		} break;
 
 		case H3DF::Rendering::Mode::PhongWithLines:
@@ -350,20 +360,10 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 			pcFramerate->Stop();
 			pcFramerate->Shutdown();
 
-			pcView->SetRenderMode(HRenderHiddenLine, true);
-			cSceneKey.GetVisibilityControl().SetEdges(false);
-			cViewKey.GetMaterialMappingControl().SetFaceColor(RGBAColor(1, 1, 1));
-/*
-			if (CAppSettings::HiddenLineMode == FastHiddenLine)
-				m_pHView->SetRenderMode(HRenderHiddenLineFast, true);
-			else if (CAppSettings::HiddenLineMode == FakeHiddenLine)
-				m_pHView->SetRenderMode(HRenderFakeHiddenLine, true);
-			else
-				m_pHView->SetRenderMode(HRenderHiddenLine, true);
+			GetModelOverrideSegmentKey().GetVisibilityControl().SetLines(true);
 
-			m_pHView->Update();
-*/
-
+			pcView->SetRenderMode(HRenderBRepHiddenLine, true);
+			cSceneKey.GetMaterialMappingControl().SetEdgeColor(RGBAColor(0, 0, 0));
 		} break;
 
 		case H3DF::Rendering::Mode::FastHiddenLine: {
@@ -373,7 +373,6 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 
 			pcView->SetRenderMode(HRenderHiddenLineFast, true);
 			cSceneKey.GetVisibilityControl().SetEdges(false);
-			//cViewKey.GetMaterialMappingControl().SetFaceColor(RGBAColor(1, 1, 1));
 		} break;
 
 		case H3DF::Rendering::Mode::Wireframe: {
@@ -398,18 +397,27 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 Rendering::Mode H3DF::View::GetRenderingMode() const
 {
 	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
+	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_eRenderingMode;
 }
 
+void H3DF::View::SetViewDirection(ViewDirection::Mode eInMode)
+{
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->GetBaseView()->SetViewDirection(eInMode);
+}
 
 void H3DF::View::SaveHsfFile(CString strFilePathName, Canvas * pcHoopsView)
 {
-/*
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
 	HIOUtilityHsf cUtilityHsf;
 
-	HC_KEY nModelKey = pcHoopsView->GetBaseView()->GetModelKey();
+	HC_KEY nModelKey = pcImpl->m_pcBaseView->GetModelKey();
 
 	HC_Open_Segment_By_Key(nModelKey);
 
@@ -429,7 +437,6 @@ void H3DF::View::SaveHsfFile(CString strFilePathName, Canvas * pcHoopsView)
 	HC_Close_Segment();
 
 	delete mytool;
-*/
 }
 
 void H3DF::View::LoadPointCloudFile(CString strFilePathName)

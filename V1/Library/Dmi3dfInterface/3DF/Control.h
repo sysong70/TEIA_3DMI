@@ -3,30 +3,21 @@
 #include "3DF.h"
 #include "Object.h"
 
-OPEN_3DF_NAMESPACE
-
-class API_3DF Control : public Object
+namespace H3DF
 {
-public:
-	Control() {};
-	Control(HC_KEY nKey);
-	virtual ~Control() {};
+	class API_3DF Control : public Object
+	{
+	public:
+		Control(HC_KEY nInKey = INVALID_KEY);
+		Control(Control const & cInThat);
+		virtual ~Control();
 
-	virtual void Open() const;
-	virtual void Close() const;
+		void Set(Control const & cInThat);
+		Control const & operator = (Control const & cInThat);
 
-	HC_KEY KeyValue() const { return m_nKey; }
+		H3DF::Type ObjectType() const { return H3DF::Type::Control; };
 
-	bool HasOwner() const;
-	void SetOwerKey(HC_KEY nInKey);
+		bool operator == (Control const & cInThat) const;
 
-	SegmentKey Owner() const;
-
-	void Delete();
-
-protected:
-	HC_KEY m_nKey = INVALID_KEY;
-	HC_KEY m_nOwnerKey = INVALID_KEY;
-};
-
-CLOSE_3DF_NAMESPACE
+	};
+}

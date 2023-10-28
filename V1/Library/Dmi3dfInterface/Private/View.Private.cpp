@@ -61,6 +61,7 @@ using namespace H3DF;
 
 #define TheKenel TheAppOptions.Kernel
 #define ThePreset TheAppOptions.Preset
+
 #define ColorValue(x) GetRValue(x) / 255.0f, GetGValue(x) / 255.0f, GetBValue(x) / 255.0f
 #define ColorRGBA(x, alpha) GetRValue(x), GetGValue(x), GetBValue(x), (unsigned char)alpha
 
@@ -83,12 +84,12 @@ void H3DF::BaseView::UpdateInternal(bool antialias, bool force_update)
 	HBaseView::UpdateInternal(antialias, force_update);
 }
 
-void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
+void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool bFitWorld)
 {
-	H3DF::ViewMode eOldViewMode = m_eViewMode;
+	H3DF::ViewDirection::Mode eOldViewMode = m_eViewMode;
 	m_eViewMode = eViewMode;
 
-	if (H3DF::ViewMode::Unknown == eViewMode) {
+	if (H3DF::ViewDirection::Mode::Unknown == eViewMode) {
 		return;
 	}
 
@@ -149,7 +150,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 
 		switch (m_eViewMode) {
 
-			case H3DF::ViewMode::right: {
+			case H3DF::ViewDirection::Mode::right: {
 				cSetPosition.Set(target.x + cLenFrontAxis.x, target.y + cLenFrontAxis.y, target.z + cLenFrontAxis.z);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0, 0, 1);
@@ -159,7 +160,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::left: {
+			case H3DF::ViewDirection::Mode::left: {
 				cSetPosition.Set(target.x - cLenFrontAxis.x, target.y + cLenFrontAxis.y, target.z + cLenFrontAxis.z);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0, 0, 1);
@@ -169,7 +170,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::front: {
+			case H3DF::ViewDirection::Mode::front: {
 				cSetPosition.Set(target.x + cLenTopAxis.x, target.y - cLenTopAxis.y, target.z + cLenTopAxis.z);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0, 0, 1);
@@ -179,7 +180,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::back: {
+			case H3DF::ViewDirection::Mode::back: {
 				cSetPosition.Set(target.x + cLenTopAxis.x, target.y + cLenTopAxis.y, target.z + cLenTopAxis.z);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0, 0, 1);
@@ -189,7 +190,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::top: {
+			case H3DF::ViewDirection::Mode::top: {
 				cSetPosition.Set(target.x + cLenRightAxis.x, target.y + cLenRightAxis.y, target.z - cLenRightAxis.z);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0, 1, 0);
@@ -199,7 +200,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::bottom: {
+			case H3DF::ViewDirection::Mode::bottom: {
 				cSetPosition.Set(target.x + cLenRightAxis.x, target.y + cLenRightAxis.y, target.z + cLenRightAxis.z);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0, 1, 0);
@@ -209,7 +210,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::py_nz: { // Back - Bottom
+			case H3DF::ViewDirection::Mode::py_nz: { // Back - Bottom
 				cSetPosition.Set(target.x, target.y + fLenCos, target.z - fLenCos);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0, fCos45, fCos45);
@@ -230,7 +231,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::py_pz: { // Top - Back
+			case H3DF::ViewDirection::Mode::py_pz: { // Top - Back
 				cSetPosition.Set(target.x, target.y + fLenCos, target.z + fLenCos);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0, -fCos45, fCos45);
@@ -251,7 +252,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::ny_pz: { // Top - Front
+			case H3DF::ViewDirection::Mode::ny_pz: { // Top - Front
 				cSetPosition.Set(target.x, target.y - fLenCos, target.z + fLenCos);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0, fCos45, fCos45);
@@ -272,7 +273,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::ny_nz: { // Front - Bottom
+			case H3DF::ViewDirection::Mode::ny_nz: { // Front - Bottom
 				cSetPosition.Set(target.x, target.y - fLenCos, target.z - fLenCos);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0, -fCos45, fCos45);
@@ -293,7 +294,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::nx_nz: { // Left - Bottom
+			case H3DF::ViewDirection::Mode::nx_nz: { // Left - Bottom
 				cSetPosition.Set(target.x - fLenCos, target.y, target.z - fLenCos);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(-fCos45, 0, fCos45);
@@ -314,7 +315,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::nx_pz: { // top - Left
+			case H3DF::ViewDirection::Mode::nx_pz: { // top - Left
 				cSetPosition.Set(target.x - fLenCos, target.y, target.z + fLenCos);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(fCos45, 0, fCos45);
@@ -335,7 +336,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::px_pz: { // Top - Right
+			case H3DF::ViewDirection::Mode::px_pz: { // Top - Right
 				cSetPosition.Set(target.x + fLenCos, target.y, target.z + fLenCos);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(-fCos45, 0, fCos45);
@@ -356,7 +357,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::px_nz: { // Right - Bottom
+			case H3DF::ViewDirection::Mode::px_nz: { // Right - Bottom
 				cSetPosition.Set(target.x + fLenCos, target.y, target.z - fLenCos);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(fCos45, 0, fCos45);
@@ -377,7 +378,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::nx_py: { // Back - Left
+			case H3DF::ViewDirection::Mode::nx_py: { // Back - Left
 				cSetPosition.Set(target.x - fLenCos, target.y + fLenCos, target.z);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0, 0, 1);
@@ -398,7 +399,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::px_py: { // Right - Back
+			case H3DF::ViewDirection::Mode::px_py: { // Right - Back
 				cSetPosition.Set(target.x + fLenCos, target.y + fLenCos, target.z);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0, 0, 1);
@@ -419,7 +420,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::px_ny: { // Front - Right
+			case H3DF::ViewDirection::Mode::px_ny: { // Front - Right
 				cSetPosition.Set(target.x + fLenCos, target.y - fLenCos, target.z);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0, 0, 1);
@@ -440,7 +441,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::nx_ny: { // Left - Front
+			case H3DF::ViewDirection::Mode::nx_ny: { // Left - Front
 				cSetPosition.Set(target.x - fLenCos, target.y - fLenCos, target.z);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0, 0, 1);
@@ -461,7 +462,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::nx_py_nz: { // bottom - left - back
+			case H3DF::ViewDirection::Mode::nx_py_nz: { // bottom - left - back
 				cSetPosition.Set(target.x - cVertexVector.x, target.y + cVertexVector.y, -(target.z - cVertexVector.z));
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(-0.408248f, 0.408248f, 0.816497f);
@@ -471,7 +472,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::nx_py_pz: { // top - back - left
+			case H3DF::ViewDirection::Mode::nx_py_pz: { // top - back - left
 				cSetPosition.Set(target.x - cVertexVector.x, target.y + cVertexVector.y, target.z - cVertexVector.z);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0.408248f, -0.408248f, 0.816497f);
@@ -481,7 +482,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::nx_ny_pz: { // top - left - front
+			case H3DF::ViewDirection::Mode::nx_ny_pz: { // top - left - front
 				cSetPosition.Set(target.x - cVertexVector.x, -(target.y + cVertexVector.y), target.z - cVertexVector.z);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0.408248f, 0.408248f, 0.816497f);
@@ -491,7 +492,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::nx_ny_nz: { // bottom - front - left
+			case H3DF::ViewDirection::Mode::nx_ny_nz: { // bottom - front - left
 				cSetPosition.Set(target.x - cVertexVector.x, -(target.y + cVertexVector.y), -(target.z - cVertexVector.z));
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(-0.408248f, -0.408248f, 0.816497f);
@@ -501,7 +502,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::px_py_pz: { // ISO top - right - back
+			case H3DF::ViewDirection::Mode::px_py_pz: { // ISO top - right - back
 				cSetPosition.Set(target.x + cVertexVector.x, target.y + cVertexVector.y, target.z - cVertexVector.z);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(-0.408248f, -0.408248f, 0.816497f);
@@ -511,7 +512,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 				}
 			} break;
 
-			case H3DF::ViewMode::px_py_nz: { // bottom - back - right
+			case H3DF::ViewDirection::Mode::px_py_nz: { // bottom - back - right
 				cSetPosition.Set(target.x + cVertexVector.x, target.y + cVertexVector.y, -(target.z - cVertexVector.z));
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0.408248f, 0.408248f, 0.816497f);
@@ -522,7 +523,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 
 			} break;
 
-			case ViewMode::px_ny_nz: { // bottom - right - front
+			case H3DF::ViewDirection::Mode::px_ny_nz: { // bottom - right - front
 				cSetPosition.Set(target.x + cVertexVector.x, -(target.y + cVertexVector.y), -(target.z - cVertexVector.z));
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(0.408248f, -0.408248f, 0.816497f);
@@ -533,7 +534,7 @@ void H3DF::BaseView::SetViewMode(H3DF::ViewMode eViewMode, bool bFitWorld)
 
 			} break;
 
-			case ViewMode::px_ny_pz: { // top - front - right
+			case H3DF::ViewDirection::Mode::px_ny_pz: { // top - front - right
 				cSetPosition.Set(target.x + cVertexVector.x, -(target.y + cVertexVector.y), target.z - cVertexVector.z);
 				if (eViewMode != eOldViewMode) {
 					cSetUpVector.Set(-0.408248f, 0.408248f, 0.816497f);
@@ -672,6 +673,9 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 		HC_Set_Rendering_Options("no color interpolation, color index interpolation");
 		HC_Set_Visibility("lights = (faces = on, edges = off), markers = off, faces=on, edges=off, lines=on, text = on");
 	} HC_Close_Segment();
+
+	SegmentKey cSceneKey(m_pcBaseView->GetSceneKey());
+	cSceneKey.GetMaterialMappingControl().SetEdgeColor(RGBAColor(0, 0, 0));
 
 	// windowspace (overlay) defaults
 	HC_Open_Segment_By_Key(m_pcBaseView->GetWindowspaceKey()); {

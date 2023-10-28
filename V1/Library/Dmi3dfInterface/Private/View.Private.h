@@ -35,7 +35,7 @@ namespace H3DF
 
 		void UpdateInternal(bool antialias = false, bool force_update = false) override;
 
-		void SetViewMode(H3DF::ViewMode mode, bool bFitWorld = true);
+		void SetViewDirection(H3DF::ViewDirection::Mode mode, bool bFitWorld = true);
 
 	public:
 		void SetNavigationCube(NavigationCube * pcNaviCube);
@@ -43,7 +43,7 @@ namespace H3DF
 	private:
 		NavigationCube * m_pcNaviCube = nullptr;
 
-		H3DF::ViewMode m_eViewMode = H3DF::ViewMode::Unknown;
+		H3DF::ViewDirection::Mode m_eViewMode = H3DF::ViewDirection::Mode::Unknown;
 	};
 
 	class ViewPrivate : public PrivateImpl
@@ -62,6 +62,8 @@ namespace H3DF
 
 		SegmentKey GetSegmentKey() { return m_cKey; }
 		SegmentKey GetModelKey() { return m_cModelKey; }
+
+		void SetWindowBackGroundColor(COLORREF nNewTopColor, COLORREF nNewBottomColor, bool bEmitMessage = true);
 
 		void InitNavigationCube(int nWidth, int nHeight);
 		bool IsInitNavigationCube();
@@ -98,8 +100,6 @@ namespace H3DF
 		void SetViewAxis();
 		void SetTransparency();
 		void SetSelectOption();
-
-		void SetWindowBackGroundColor(COLORREF nNewTopColor, COLORREF nNewBottomColor, bool bEmitMessage = true);
 
 		void SetShowCollisions(bool sc) { m_bShowCollisions = sc; }
 

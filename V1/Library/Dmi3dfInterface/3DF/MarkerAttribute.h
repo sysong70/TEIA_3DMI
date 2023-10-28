@@ -5,13 +5,12 @@
 
 #include "Marker.h"
 
-OPEN_3DF_NAMESPACE
-
-class API_3DF MarkerAttributeControl : public Control
+namespace H3DF
 {
-public:
-	MarkerAttributeControl(HC_KEY nInKey);
-	MarkerAttributeControl & SetSize(float fInSize, Marker::SizeUnits nInUnits = Marker::SizeUnits::ScaleFactor);
-};
-
-CLOSE_3DF_NAMESPACE
+	class API_3DF MarkerAttributeControl : public Control
+	{
+	public:
+		MarkerAttributeControl(SegmentKey nInKey);
+		MarkerAttributeControl & SetSize(float fInSize, Marker::SizeUnits nInUnits = Marker::SizeUnits::ScaleFactor);
+	};
+}

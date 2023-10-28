@@ -2,29 +2,30 @@
 
 #include "Style.h"
 #include "Segment.h"
+#include "Private/SegmentPrivate.h"
 #include "Portfolio.h"
 
 #include <hc.h>
 #include <Htools.h>
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
 //== NamedStyleDefinition Function =================================================================
 
-NamedStyleDefinition::NamedStyleDefinition(SegmentKey cInSource)
+H3DF::NamedStyleDefinition::NamedStyleDefinition(SegmentKey cInSource)
 {
 	m_nSourceSegmentKey = cInSource.KeyValue();;
 
 }
 
-NamedStyleDefinition::NamedStyleDefinition(NamedStyleDefinition const & cInThat)
+H3DF::NamedStyleDefinition::NamedStyleDefinition(NamedStyleDefinition const & cInThat)
 {
 	//m_strName = cInThat.Name();
 	m_nSourceSegmentKey = cInThat.GetSource().KeyValue();
 	m_nOwnerPortfolioKey = cInThat.Owner().KeyValue();
 }
 
-NamedStyleDefinition & NamedStyleDefinition::operator = (NamedStyleDefinition const & cInThat)
+NamedStyleDefinition & H3DF::NamedStyleDefinition::operator = (NamedStyleDefinition const & cInThat)
 {
 	//m_strName = cInThat.Name();
 	m_nSourceSegmentKey = cInThat.GetSource().KeyValue();
@@ -33,35 +34,35 @@ NamedStyleDefinition & NamedStyleDefinition::operator = (NamedStyleDefinition co
 	return *this;
 }
 
-SegmentKey NamedStyleDefinition::GetSource() const
+SegmentKey H3DF::NamedStyleDefinition::GetSource() const
 {
 	SegmentKey cSegment(m_nSourceSegmentKey);
 	return cSegment;
 }
 
-PortfolioKey NamedStyleDefinition::Owner() const
+PortfolioKey H3DF::NamedStyleDefinition::Owner() const
 {
 	PortfolioKey cPortfolioKey(m_nOwnerPortfolioKey);
 	return cPortfolioKey;
 }
 
 //== StyleKey Function =============================================================================
-StyleKey::StyleKey(HC_KEY nInKey) :
+H3DF::StyleKey::StyleKey(HC_KEY nInKey) :
 	Key(nInKey)
 {
 }
 
-StyleKey::StyleKey(StyleKey const & cInThat) :
+H3DF::StyleKey::StyleKey(StyleKey const & cInThat) :
 	Key(cInThat)
 {
 }
 
-void StyleKey::Set(StyleKey const & cInThat)
+void H3DF::StyleKey::Set(StyleKey const & cInThat)
 {
 	Key::Set(cInThat);
 }
 
-StyleKey & StyleKey::operator = (StyleKey const & cInThat)
+StyleKey & H3DF::StyleKey::operator = (StyleKey const & cInThat)
 {
 	Set(cInThat);
 	return *this;
@@ -69,24 +70,57 @@ StyleKey & StyleKey::operator = (StyleKey const & cInThat)
 
 //== StyleControl Function =========================================================================
 
-StyleControl::StyleControl(SegmentKey & cInSegment)
+class StyleControlPrivate : public PrivateImpl
 {
-	m_nKey = cInSegment.KeyValue();
+public:
+	StyleControlPrivate() { m_eType = H3DF::Type::StyleControl; }
+
+	void Copy(StyleControlPrivate * pcInThat) {
+		m_cKey = pcInThat->GetSegmentKey();
+	}
+
+	SegmentKey & GetSegmentKey() { return m_cKey; }
+
+public:
+	SegmentKey m_cKey;
+};
+
+H3DF::StyleControl::StyleControl(SegmentKey & cInSegment)
+{
+	StyleControlPrivate * pcImpl = new StyleControlPrivate();
+	if (nullptr == pcImpl) { assert(false); }
+
+	m_pcImpl = pcImpl;
+
+	pcImpl->m_cKey = cInSegment;
 }
 
-StyleControl::StyleControl(StyleControl const & cInThat)
+H3DF::StyleControl::StyleControl(StyleControl const & cInThat)
 {
-	m_nKey = cInThat.KeyValue();
+	m_pcImpl = new StyleControlPrivate();
+	if (nullptr == m_pcImpl) { assert(false); }
+
+	Set(cInThat);
 }
 
-StyleControl & StyleControl::operator = (StyleControl const & cInThat)
+void H3DF::StyleControl::Set(StyleControl const & cInThat)
 {
-	m_nKey = cInThat.KeyValue();
+	StyleControlPrivate * pcImpl = (StyleControlPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) { assert(false); }
+	StyleControlPrivate * pcInThatImpl = (StyleControlPrivate *)cInThat.m_pcImpl;
+	if (nullptr == pcInThatImpl) { assert(false); }
+
+	pcImpl->Copy(pcInThatImpl);
+}
+
+StyleControl & H3DF::StyleControl::operator = (StyleControl const & cInThat)
+{
+	Set(cInThat);
 	return *this;
 }
 
 /*
-StyleKey StyleControl::PushNamed(CString & strInStyleName)
+StyleKey H3DF::StyleControl::PushNamed(CString & strInStyleName)
 {
 	Open();
 	HC_KEY nStyleKey = HC_Style_Segment(Utility::ToChar(strInStyleName));
@@ -97,11 +131,16 @@ StyleKey StyleControl::PushNamed(CString & strInStyleName)
 }
 */
 
-StyleKey StyleControl::PushSegment(SegmentKey const & cInStyleSource)
+StyleKey H3DF::StyleControl::PushSegment(SegmentKey const & cInStyleSource)
 {
-	Open();
+	StyleControlPrivate * pcImpl = (StyleControlPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) { assert(false); }
+
+	SegmentKeyPrivate::LocalOpen(pcImpl->GetSegmentKey());
+	
 	HC_KEY nStyleKey = HC_Style_Segment_By_Key(cInStyleSource.KeyValue());
-	Close();
+	
+	SegmentKeyPrivate::LocalClose(pcImpl->GetSegmentKey());
 
 	StyleKey cStyle(nStyleKey);
 	return cStyle;

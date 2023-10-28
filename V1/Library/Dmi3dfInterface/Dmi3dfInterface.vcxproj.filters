@@ -243,9 +243,6 @@
     <ClInclude Include="3DF\Window.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Camera.h">
-      <Filter>3DF\Object</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\Circle.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
@@ -299,6 +296,12 @@
     </ClInclude>
     <ClInclude Include="3DF\SelectionSet.h">
       <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Camera.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Private\ControlPrivate.h">
+      <Filter>3DF\Control\Private</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -467,9 +470,6 @@
     <ClCompile Include="Sprocket.cpp">
       <Filter>3DF\Sprocket</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Camera.cpp">
-      <Filter>3DF\Object</Filter>
-    </ClCompile>
     <ClCompile Include="3DF\Circle.cpp">
       <Filter>3DF\Object</Filter>
     </ClCompile>
@@ -526,6 +526,12 @@
     </ClCompile>
     <ClCompile Include="3DF\SelectionSet.cpp">
       <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Camera.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Private\ControlPrivate.cpp">
+      <Filter>3DF\Control\Private</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

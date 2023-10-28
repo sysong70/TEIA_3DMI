@@ -5,7 +5,11 @@
 #include "Segment.h"
 #include "./Private/SegmentPrivate.h"
 
+#include "./Private/ControlPrivate.h"
+
 #include "3DF.Utility.h"
+
+#include <Common_Define.h>
 
 #include <hc.h>
 #include <HUtility.h>
@@ -13,10 +17,9 @@
 #include <magick/api.h>
 #include <varray.h>
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
 //== MaterialKit ===================================================================================
-OPEN_3DF_NAMESPACE
 class MaterialKitPrivate : public PrivateImpl
 {
 public:
@@ -50,7 +53,6 @@ public:
 	CString m_strTextureNames[(int)Material::Channel::Count];;
 	CString m_strTextureOptions[(int)Material::Channel::Count];;
 };
-CLOSE_3DF_NAMESPACE
 
 bool MaterialKitPrivate::operator == (MaterialKitPrivate const & cInThat) const
 {
@@ -161,18 +163,18 @@ bool MaterialKitPrivate::ShowChannel(Material::Channel eInChannel, Material::Typ
 	return true;
 }
 
-MaterialKit::MaterialKit()
+H3DF::MaterialKit::MaterialKit()
 {
 	m_pcImpl = new MaterialKitPrivate();
 }
 
-MaterialKit::MaterialKit(MaterialKit const & cInKit)
+H3DF::MaterialKit::MaterialKit(MaterialKit const & cInKit)
 {
 	m_pcImpl = new MaterialKitPrivate();
 	Set(cInKit);
 }
 
-void MaterialKit::Set(MaterialKit const & cInThat)
+void H3DF::MaterialKit::Set(MaterialKit const & cInThat)
 {
 	MaterialKitPrivate * pcImpl = (MaterialKitPrivate *)m_pcImpl;
 	MaterialKitPrivate * pcInThatImpl = (MaterialKitPrivate *)cInThat.m_pcImpl;
@@ -198,7 +200,7 @@ bool H3DF::MaterialKit::operator != (MaterialKit const & cInThat) const
 	return !(*this == cInThat);
 }
 
-void MaterialKit::Show(MaterialKit & cOutKit) const
+void H3DF::MaterialKit::Show(MaterialKit & cOutKit) const
 {
 	cOutKit.Set(*this);
 }
@@ -628,25 +630,25 @@ bool MaterialMappingKitPrivate::ShowMaterial(MaterialMappingKitPrivate::Type eIn
 	return true;
 }
 
-MaterialMappingKit::MaterialMappingKit()
+H3DF::MaterialMappingKit::MaterialMappingKit()
 {
 	m_pcImpl = new MaterialMappingKitPrivate();
 }
 
-MaterialMappingKit::MaterialMappingKit(MaterialMappingKit const & cInKit)
+H3DF::MaterialMappingKit::MaterialMappingKit(MaterialMappingKit const & cInKit)
 {
 	m_pcImpl = new MaterialMappingKitPrivate();
 	Set(cInKit);
 }
 
-void MaterialMappingKit::Set(MaterialMappingKit const & cInThat)
+void H3DF::MaterialMappingKit::Set(MaterialMappingKit const & cInThat)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	MaterialMappingKitPrivate * pcInThatImpl = (MaterialMappingKitPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-MaterialMappingKit & MaterialMappingKit::operator = (MaterialMappingKit const & cInThat)
+MaterialMappingKit & H3DF::MaterialMappingKit::operator = (MaterialMappingKit const & cInThat)
 {
 	Set(cInThat);
 	return *this;
@@ -654,245 +656,245 @@ MaterialMappingKit & MaterialMappingKit::operator = (MaterialMappingKit const & 
 
 //== Color 설정 =====================================================================================
 
-MaterialMappingKit & MaterialMappingKit::SetAmbientLightUpColor(RGBAColor const & cInRgbaColor)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetAmbientLightUpColor(RGBAColor const & cInRgbaColor)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::AmbientLightUp].SetDiffuseColor(cInRgbaColor);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetAmbientLightDownColor(RGBAColor const & cInRgbaColor)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetAmbientLightDownColor(RGBAColor const & cInRgbaColor)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::AmbientLightDown].SetDiffuseColor(cInRgbaColor);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetBackFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->SetColor(cInRgbaColor, MaterialMappingKitPrivate::Type::BackFace, eInChannel);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetBackFaceAlpha(float fInAlpha)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceAlpha(float fInAlpha)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::BackFace].SetDiffuseAlpha(fInAlpha);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetBackFaceTexture(CString strTextureName)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceTexture(CString strTextureName)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::BackFace].SetDiffuseTexture(strTextureName);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetBackFaceTextureOption(CString strTextureOption)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceTextureOption(CString strTextureOption)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::BackFace].SetDiffuseTextureOption(strTextureOption);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetBackFaceGloss(float fInValue)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceGloss(float fInValue)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::BackFace].SetGloss(fInValue);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetBackFaceMaterial(MaterialKit const & cInMaterial)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceMaterial(MaterialKit const & cInMaterial)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::BackFace] = cInMaterial;
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetFrontFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->SetColor(cInRgbaColor, MaterialMappingKitPrivate::Type::FrontFace, eInChannel);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetFrontFaceAlpha(float fInAlpha)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceAlpha(float fInAlpha)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::FrontFace].SetDiffuseAlpha(fInAlpha);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetFrontFaceTexture(CString strTextureName)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceTexture(CString strTextureName)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::FrontFace].SetDiffuseTexture(strTextureName);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetFrontFaceTextureOption(CString strTextureOption)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceTextureOption(CString strTextureOption)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::FrontFace].SetDiffuseTextureOption(strTextureOption);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetFrontFaceGloss(float fInValue)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceGloss(float fInValue)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::FrontFace].SetGloss(fInValue);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetFrontFaceMaterial(MaterialKit const & cInMaterial)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceMaterial(MaterialKit const & cInMaterial)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::FrontFace] = cInMaterial;
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetEdgeAlpha(float fInAlpha)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetEdgeAlpha(float fInAlpha)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Edge].SetDiffuseAlpha(fInAlpha);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetEdgeColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetEdgeColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->SetColor(cInRgbaColor, MaterialMappingKitPrivate::Type::Edge, eInChannel);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetEdgeTexture(char const * strTextureName)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetEdgeTexture(char const * strTextureName)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Edge].SetDiffuseTexture(strTextureName);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetEdgeGloss(float fInValue)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetEdgeGloss(float fInValue)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Edge].SetGloss(fInValue);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetEdgeMaterial(MaterialKit const & cInMaterial)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetEdgeMaterial(MaterialKit const & cInMaterial)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Edge] = cInMaterial;
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->SetColor(cInRgbaColor, MaterialMappingKitPrivate::Type::Face, eInChannel);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetFaceAlpha(float fInAlpha)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceAlpha(float fInAlpha)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Face].SetDiffuseAlpha(fInAlpha);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetFaceTexture(CString strTextureName)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceTexture(CString strTextureName)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Face].SetDiffuseTexture(strTextureName);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetFaceTextureOption(CString strTextureOption)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceTextureOption(CString strTextureOption)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Face].SetDiffuseTextureOption(strTextureOption);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetFaceGloss(float fInValue)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceGloss(float fInValue)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Face].SetGloss(fInValue);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetFaceMaterial(MaterialKit const & cInMaterial)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceMaterial(MaterialKit const & cInMaterial)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Face] = cInMaterial;
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetLineAlpha(float fInAlpha)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetLineAlpha(float fInAlpha)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Line].SetDiffuseAlpha(fInAlpha);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetLineColor(RGBAColor const & cInRgbaColor)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetLineColor(RGBAColor const & cInRgbaColor)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Line].SetDiffuseColor(cInRgbaColor);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetMarkerColor(RGBAColor const & cInRgbaColor)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetMarkerColor(RGBAColor const & cInRgbaColor)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Marker].SetDiffuseColor(cInRgbaColor);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetTextColor(RGBAColor const & cInRgbaColor)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetTextColor(RGBAColor const & cInRgbaColor)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Text].SetDiffuseColor(cInRgbaColor);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetVertexAlpha(float fInAlpha)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetVertexAlpha(float fInAlpha)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Vertex].SetDiffuseAlpha(fInAlpha);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetVertexColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetVertexColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->SetColor(cInRgbaColor, MaterialMappingKitPrivate::Type::Vertex, eInChannel);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetVertexTexture(CString strTextureName)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetVertexTexture(CString strTextureName)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Vertex].SetDiffuseTexture(strTextureName);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetVertexGloss(float fInValue)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetVertexGloss(float fInValue)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Vertex].SetGloss(fInValue);
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetVertexMaterial(MaterialKit const & cInMaterial)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetVertexMaterial(MaterialKit const & cInMaterial)
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Vertex] = cInMaterial;
 	return *this;
 }
 
-MaterialMappingKit & MaterialMappingKit::SetGeometryColor(RGBAColor const & cInRgbaColor)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetGeometryColor(RGBAColor const & cInRgbaColor)
 {
 	SetEdgeColor(cInRgbaColor);
 	SetFaceColor(cInRgbaColor);
@@ -904,7 +906,7 @@ MaterialMappingKit & MaterialMappingKit::SetGeometryColor(RGBAColor const & cInR
 	return *this;
 }
 
-bool MaterialMappingKit::operator == (MaterialMappingKit const & cInThat) const
+bool H3DF::MaterialMappingKit::operator == (MaterialMappingKit const & cInThat) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	MaterialMappingKitPrivate * pcInThatImpl = (MaterialMappingKitPrivate *)cInThat.m_pcImpl;
@@ -918,7 +920,7 @@ bool MaterialMappingKit::operator == (MaterialMappingKit const & cInThat) const
 	return true;
 }
 
-bool MaterialMappingKit::operator != (MaterialMappingKit const & cInThat) const
+bool H3DF::MaterialMappingKit::operator != (MaterialMappingKit const & cInThat) const
 {
 	if (*this == cInThat) {
 		return false;
@@ -927,169 +929,240 @@ bool MaterialMappingKit::operator != (MaterialMappingKit const & cInThat) const
 	return true;
 }
 
-bool MaterialMappingKit::ShowAmbientLightUpColor(Material::Type & cOutType, RGBAColor & cOutColor) const
+bool H3DF::MaterialMappingKit::ShowAmbientLightUpColor(Material::Type & cOutType, RGBAColor & cOutColor) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	return pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::AmbientLightUp].ShowDiffuseColor(cOutColor);
 
 }
 
-bool MaterialMappingKit::ShowAmbientLightDownColor(Material::Type & cOutType, RGBAColor & cOutColor) const
+bool H3DF::MaterialMappingKit::ShowAmbientLightDownColor(Material::Type & cOutType, RGBAColor & cOutColor) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	return pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::AmbientLightDown].ShowDiffuseColor(cOutColor);
 }
 
-bool MaterialMappingKit::ShowBackFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialMappingKit::ShowBackFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	return pcImpl->ShowChannel(MaterialMappingKitPrivate::Type::BackFace, eInChannel, cOutType, cOutColor, strOutTextureName);
 }
 
-bool MaterialMappingKit::ShowBackFaceMaterial(MaterialKit & cOutKit) const
+bool H3DF::MaterialMappingKit::ShowBackFaceMaterial(MaterialKit & cOutKit) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	return pcImpl->ShowMaterial(MaterialMappingKitPrivate::Type::BackFace, cOutKit);
 }
 
-bool MaterialMappingKit::ShowFrontFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialMappingKit::ShowFrontFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	return pcImpl->ShowChannel(MaterialMappingKitPrivate::Type::FrontFace, eInChannel, cOutType, cOutColor, strOutTextureName);
 }
 
-bool MaterialMappingKit::ShowFrontFaceMaterial(MaterialKit & cOutKit) const
+bool H3DF::MaterialMappingKit::ShowFrontFaceMaterial(MaterialKit & cOutKit) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	return pcImpl->ShowMaterial(MaterialMappingKitPrivate::Type::FrontFace, cOutKit);
 }
 
-bool MaterialMappingKit::ShowEdgeChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialMappingKit::ShowEdgeChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	return pcImpl->ShowChannel(MaterialMappingKitPrivate::Type::Edge, eInChannel, cOutType, cOutColor, strOutTextureName);
 }
 
-bool MaterialMappingKit::ShowEdgeMaterial(MaterialKit & cOutKit) const
+bool H3DF::MaterialMappingKit::ShowEdgeMaterial(MaterialKit & cOutKit) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	return pcImpl->ShowMaterial(MaterialMappingKitPrivate::Type::Edge, cOutKit);
 }
 
-bool MaterialMappingKit::ShowFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialMappingKit::ShowFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	return pcImpl->ShowChannel(MaterialMappingKitPrivate::Type::Face, eInChannel, cOutType, cOutColor, strOutTextureName);
 }
 
-bool MaterialMappingKit::ShowFaceMaterial(MaterialKit & cOutKit) const
+bool H3DF::MaterialMappingKit::ShowFaceMaterial(MaterialKit & cOutKit) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	return pcImpl->ShowMaterial(MaterialMappingKitPrivate::Type::Face, cOutKit);
 }
 
-bool MaterialMappingKit::ShowLineAlpha(float & fOutAlpha) const
+bool H3DF::MaterialMappingKit::ShowLineAlpha(float & fOutAlpha) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	return pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Line].ShowDiffuseAlpha(fOutAlpha);
 }
 
-bool MaterialMappingKit::ShowLineColor(RGBAColor & cOutColor) const
+bool H3DF::MaterialMappingKit::ShowLineColor(RGBAColor & cOutColor) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	return pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Line].ShowDiffuseColor(cOutColor);
 }
 
-bool MaterialMappingKit::ShowMarkerColor(RGBAColor & cOutColor) const
+bool H3DF::MaterialMappingKit::ShowMarkerColor(RGBAColor & cOutColor) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	return pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Marker].ShowDiffuseColor(cOutColor);
 }
 
-bool MaterialMappingKit::ShowTextColor(RGBAColor & cOutColor) const
+bool H3DF::MaterialMappingKit::ShowTextColor(RGBAColor & cOutColor) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	return pcImpl->m_cMaterialKits[(int)MaterialMappingKitPrivate::Type::Text].ShowDiffuseColor(cOutColor);
 }
 
-bool MaterialMappingKit::ShowVertexChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialMappingKit::ShowVertexChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	return pcImpl->ShowChannel(MaterialMappingKitPrivate::Type::Vertex, eInChannel, cOutType, cOutColor, strOutTextureName);
 }
 
-bool MaterialMappingKit::ShowVertexMaterial(MaterialKit & cOutKit) const
+bool H3DF::MaterialMappingKit::ShowVertexMaterial(MaterialKit & cOutKit) const
 {
 	MaterialMappingKitPrivate * pcImpl = (MaterialMappingKitPrivate *)m_pcImpl;
 	return pcImpl->ShowMaterial(MaterialMappingKitPrivate::Type::Vertex, cOutKit);
 }
 
 //== MaterialMappingControl ========================================================================
-
-MaterialMappingControl::MaterialMappingControl(SegmentKey & cInSegmentKey) :
-	m_cInSegmentKey(cInSegmentKey)
+class MaterialMappingControlPrivate : public ControlPrivate
 {
+public:
+	void Copy(ControlPrivate * pcInThat)
+	{
+		ControlPrivate::Copy(pcInThat);
+	}
 
+	void SetColor(CString strGeometry, RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel);
+
+protected:
+	CString GetColorChannelString(Material::Color::Channel cInChannel);
+};
+
+CString MaterialMappingControlPrivate::GetColorChannelString(Material::Color::Channel cInChannel)
+{
+	switch (cInChannel)
+	{
+		case H3DF::Material::Color::Channel::DiffuseColor:
+			return L"diffuse";
+
+		case H3DF::Material::Color::Channel::Specular:
+			return L"specular";
+
+		case H3DF::Material::Color::Channel::Emission:
+			return L"emission";
+
+		case H3DF::Material::Color::Channel::Mirror:
+			return L"mirror";
+	}
+
+	return L"";
 }
 
-//== Color 설정 =====================================================================================
-
-MaterialMappingControl & MaterialMappingControl::SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel)
+void MaterialMappingControlPrivate::SetColor(CString strGeometry, RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel)
 {
-	return SetColor(L"faces", "diffuse", cInRgbaColor);
-}
-
-MaterialMappingControl & MaterialMappingControl::SetMarkerColor(RGBAColor const & cInRgbaColor)
-{
-	return SetColor(L"markers", "diffuse", cInRgbaColor);
-}
-
-MaterialMappingControl & MaterialMappingControl::SetColor(CString strGeometry, CString strChannel, RGBAColor const & cInRgbaColor)
-{
-	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
-
 	CString strColorText;
-	strColorText.Format(L"%s = (%s = (r=%f g=%f b=%f))", strGeometry, strChannel, cInRgbaColor.red, cInRgbaColor.green, cInRgbaColor.blue);
-	HC_Set_Color(Utility::ToChar(strColorText));
+	CString strColorChannel = GetColorChannelString(cInChannel);
+	strColorText.Format(L"%s = (%s = (r=%f g=%f b=%f))", strGeometry, strColorChannel, cInRgbaColor.red, cInRgbaColor.green, cInRgbaColor.blue);
+	
+	SegmentKeyPrivate::LocalOpen(m_nOverrideKey); {
+		HC_Set_Color(Utility::ToChar(strColorText));
+	} SegmentKeyPrivate::LocalClose(m_nOverrideKey);
+}
 
-	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
+H3DF::MaterialMappingControl::MaterialMappingControl(SegmentKey const & cInThat)
+{
+	MaterialMappingControlPrivate * pcImpl = new MaterialMappingControlPrivate();
+	m_pcImpl = pcImpl;
+	
+	pcImpl->m_nOverrideKey = cInThat;
+}
+
+void H3DF::MaterialMappingControl::Set(MaterialMappingControl const & cInThat)
+{
+	MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	MaterialMappingControlPrivate * pcInThatImpl = static_cast<MaterialMappingControlPrivate *>(cInThat.m_pcImpl);
+	DEBUG_VALID(pcInThatImpl);
+
+	pcImpl->Copy(pcInThatImpl);
+}
+
+MaterialMappingControl & H3DF::MaterialMappingControl::operator = (MaterialMappingControl const & cInThat)
+{
+	Set(cInThat);
+	return *this;
+}
+
+MaterialMappingControl & H3DF::MaterialMappingControl::SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel)
+{
+	MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
+	pcImpl->SetColor(L"faces", cInRgbaColor, cInChannel);
 
 	return *this;
 }
 
-MaterialMappingControl & MaterialMappingControl::UnSetColor(CString strInType)
+MaterialMappingControl & H3DF::MaterialMappingControl::SetEdgeColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel)
 {
-	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
+	MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
 
-	HC_UnSet_One_Selectability(Utility::ToChar(strInType));
-
-	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
+	pcImpl->SetColor(L"edges", cInRgbaColor, cInChannel);
 
 	return *this;
 }
 
-void MaterialMappingControl::InitPopulateTextures()
+MaterialMappingControl & H3DF::MaterialMappingControl::SetMarkerColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel)
 {
+	MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
+	pcImpl->SetColor(L"markers", cInRgbaColor, cInChannel);
+
+	return *this;
+}
+
+MaterialMappingControl & H3DF::MaterialMappingControl::UnSetColor(CString strInType)
+{
+	MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+		HC_UnSet_One_Selectability(Utility::ToChar(strInType));
+	}SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
+
+	return *this;
+}
+
+void H3DF::MaterialMappingControl::InitPopulateTextures()
+{
+	MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
 	InitializeMagick(".");
 
-	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
-
-	HC_Set_Visibility("image = off");
-
-	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+		HC_Set_Visibility("image = off");
+	} SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
 }
 
-void MaterialMappingControl::InsertPicture(UINT nIndex, UINT nPixelWidth, UINT nPixelHeight, UCHAR * pucBinaryData)
+void H3DF::MaterialMappingControl::InsertPicture(UINT nIndex, UINT nPixelWidth, UINT nPixelHeight, UCHAR * pucBinaryData)
 {
-	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
+	MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
 
-	//HC_KEY nKey = HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u, local = on", nIndex), nPixelWidth, nPixelHeight, pucBinaryData);
-	HC_KEY nKey = HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u", nIndex), nPixelWidth, nPixelHeight, pucBinaryData);
-
-	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+		//HC_KEY nKey = HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u, local = on", nIndex), nPixelWidth, nPixelHeight, pucBinaryData);
+		HC_KEY nKey = HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u", nIndex), nPixelWidth, nPixelHeight, pucBinaryData);
+	}SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
 }
 
-void MaterialMappingControl::InsertDifaultPicture(UINT nIndex, UINT nSize, UCHAR * pucBinaryData)
+void H3DF::MaterialMappingControl::InsertDifaultPicture(UINT nIndex, UINT nSize, UCHAR * pucBinaryData)
 {
 	VArray<unsigned char> anPixels;
 
@@ -1108,49 +1181,56 @@ void MaterialMappingControl::InsertDifaultPicture(UINT nIndex, UINT nSize, UCHAR
 		DestroyImageInfo(image_info);
 		DestroyExceptionInfo(&exception);
 
-		SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
+		MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
+		if (nullptr == pcImpl) { assert(false); }
 
-		//HC_KEY nKey = HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u, local = on", nIndex), width, height, &anPixels[0]);
-		HC_KEY nKey = HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u", nIndex), width, height, &anPixels[0]);
+		SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
 
-		SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
+			//HC_KEY nKey = HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u, local = on", nIndex), width, height, &anPixels[0]);
+			HC_KEY nKey = HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u", nIndex), width, height, &anPixels[0]);
+
+		} SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
 	}
 }
 
-void MaterialMappingControl::SetTextureMatrix(float * pfTextureMatrix, char * pchTextureTransformSegment)
+void H3DF::MaterialMappingControl::SetTextureMatrix(float * pfTextureMatrix, char * pchTextureTransformSegment)
 {
-	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
+	MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
 
-	HC_Compute_Matrix_Inverse(pfTextureMatrix, pfTextureMatrix);
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
 
-	char textureTransformSegment[4096] = "";
-	HC_Open_Segment("texture_transformations");
-	{
-		HC_Open_Segment("");
+		HC_Compute_Matrix_Inverse(pfTextureMatrix, pfTextureMatrix);
+
+		char textureTransformSegment[4096] = "";
+		HC_Open_Segment("texture_transformations");
 		{
-			HC_Show_Segment(HC_Create_Segment("."), pchTextureTransformSegment);
-			HC_Set_Texture_Matrix(pfTextureMatrix);
+			HC_Open_Segment("");
+			{
+				HC_Show_Segment(HC_Create_Segment("."), pchTextureTransformSegment);
+				HC_Set_Texture_Matrix(pfTextureMatrix);
+			}
+			HC_Close_Segment();
 		}
 		HC_Close_Segment();
-	}
-	HC_Close_Segment();
 
-	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
+	} SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
 }
 
-void MaterialMappingControl::SetDefineLocalTexture(UINT nIndex, CString strTextureOptions)
+void H3DF::MaterialMappingControl::SetDefineLocalTexture(UINT nIndex, CString strTextureOptions)
 {
+	MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
 	CString strText;
 	strText.Format(L"texture_%u", nIndex);
 
-	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
-
-	HC_Define_Local_Texture(Utility::ToChar(strText), Utility::ToChar(strTextureOptions));
-
-	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+		HC_Define_Local_Texture(Utility::ToChar(strText), Utility::ToChar(strTextureOptions));
+	} SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
 }
 
-void MaterialMappingControl::EndPopulateTextures()
+void H3DF::MaterialMappingControl::EndPopulateTextures()
 {
 	DestroyMagick();
 }

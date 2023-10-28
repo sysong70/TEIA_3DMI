@@ -78,6 +78,9 @@ namespace H3DF
 		void SetRenderingMode(Rendering::Mode eInMode);
 		Rendering::Mode GetRenderingMode() const;
 
+		void SetViewDirection(ViewDirection::Mode eInMode);
+		
+
 	public:
 		void SaveHsfFile(CString strFilePathName, H3DF::Canvas * pcHoopsView);
 		void LoadPointCloudFile(CString strFilePathName);

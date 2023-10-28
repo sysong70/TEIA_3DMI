@@ -267,7 +267,7 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cInstan
 
 	pcViewImpl->GetBaseView()->SetRenderMode(pcViewImpl->GetBaseView()->GetRenderMode(), true);
 
-	pcViewImpl->GetBaseView()->SetViewMode(H3DF::ViewMode::px_py_pz);
+	pcViewImpl->GetBaseView()->SetViewDirection(H3DF::ViewDirection::Mode::px_py_pz);
 
 	pcViewImpl->ViewReady();
 	pcViewImpl->GetBaseView()->ExhaustiveUpdate();

@@ -87,6 +87,21 @@ void SESSION::Session::ExecuteCommand(Json::Object & cInObject)
 			m_pcView->SetViewStyle(nId);
 			break;
 	}
+
+	switch (nId)
+	{
+		case HOME_3D_CMD_ViewDirection_Top:
+		case HOME_3D_CMD_ViewDirection_Front:
+		case HOME_3D_CMD_ViewDirection_Left:
+		case HOME_3D_CMD_ViewDirection_Bottom:
+		case HOME_3D_CMD_ViewDirection_Back:
+		case HOME_3D_CMD_ViewDirection_Right:
+		case HOME_3D_CMD_ViewDirection_Iso:
+		case HOME_3D_CMD_ViewDirection_SeIso:
+		case HOME_3D_CMD_ViewDirection_Perspective:
+			m_pcView->SetViewDirection(nId);
+			break;
+	}
 }
 
 void SESSION::Session::CancelCommands()
