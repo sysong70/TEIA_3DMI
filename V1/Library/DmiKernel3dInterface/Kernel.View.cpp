@@ -276,9 +276,11 @@ void KERNEL::View::SetVisualEffects(int nEffectId)
 			break;
 
 		case HOME_3D_CMD_VisualEffects_SilhouetteEdges:
+			pcImpl->SetVisualEffectsSilhouetteEdges();
 			break;
 
 		case HOME_3D_CMD_VisualEffects_Bloom:
+			pcImpl->SetVisualEffectsBloom();
 			break;
 	}
 }

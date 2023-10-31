@@ -21,6 +21,8 @@ namespace H3DF
 		H3DF::Type ObjectType() const { return H3DF::Type::VisualEffectsControl; };
 
 		VisualEffectsControl & SetAmbientOcclusionEnabled(bool bInState);
+		VisualEffectsControl & SetSilhouetteEdgesEnabled(bool bInState);
+		VisualEffectsControl & SetBloomEnabled(bool bInState);
 
 		VisualEffectsControl & SetAntiAliasing(bool bInState);
 		VisualEffectsControl & SetTextAntiAliasing(bool bInState);
@@ -51,6 +53,8 @@ namespace H3DF
 		VisualEffectsControl & UnsetAntiAliasing();
 
 		bool ShowAmbientOcclusionEnabled(bool & bOutState) const;
+		bool ShowSilhouetteEdgesEnabled(bool & bOutState) const;
+		bool ShowBloomEnabled(bool & bOutState) const;
 
 		bool ShowAntiAliasing(bool & bOutState) const;
 		bool ShowTextAntiAliasing(bool & bOutState) const;

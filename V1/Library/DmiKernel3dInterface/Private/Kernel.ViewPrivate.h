@@ -30,5 +30,7 @@ namespace KERNEL
 		void SetVisualEffectsShadow();
 		void SetVisualEffectsReflection();
 		void SetVisualEffectsAmbientOcclusion();
+		void SetVisualEffectsSilhouetteEdges();
+		void SetVisualEffectsBloom();
 	};
 }

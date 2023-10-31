@@ -39,9 +39,39 @@ void KERNEL::ViewPrivate::SetVisualEffectsAmbientOcclusion()
 	H3DF::SegmentKey cViewSegment = m_cCanvas.GetFrontView().GetSegmentKey();
 
 	bool bState = false;
-	cViewSegment.GetVisualEffectsControl().ShowAmbientOcclusionEnabled(bState);
+	if (false == cViewSegment.GetVisualEffectsControl().ShowAmbientOcclusionEnabled(bState)) {
+		DEBUG_RETURN;
+	}
 
 	cViewSegment.GetVisualEffectsControl().SetAmbientOcclusionEnabled(!bState);
+
+	m_cCanvas.Update();
+}
+
+void KERNEL::ViewPrivate::SetVisualEffectsSilhouetteEdges()
+{
+	H3DF::SegmentKey cViewSegment = m_cCanvas.GetFrontView().GetSegmentKey();
+
+	bool bState = false;
+	if (false == cViewSegment.GetVisualEffectsControl().ShowSilhouetteEdgesEnabled(bState)) {
+		DEBUG_RETURN;
+	}
+
+	cViewSegment.GetVisualEffectsControl().SetSilhouetteEdgesEnabled(!bState);
+
+	m_cCanvas.Update();
+}
+
+void KERNEL::ViewPrivate::SetVisualEffectsBloom()
+{
+	H3DF::SegmentKey cViewSegment = m_cCanvas.GetFrontView().GetSegmentKey();
+
+	bool bState = false;
+	if (false == cViewSegment.GetVisualEffectsControl().ShowBloomEnabled(bState)) {
+		DEBUG_RETURN;
+	}
+
+	cViewSegment.GetVisualEffectsControl().SetBloomEnabled(!bState);
 
 	m_cCanvas.Update();
 }
