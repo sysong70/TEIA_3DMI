@@ -349,8 +349,11 @@ namespace H3DF
 		MaterialMappingControl & operator = (MaterialMappingControl const & cInThat);
 
 		//== Color 설정 =============================================================================
+		MaterialMappingControl & SetFaceAlpha(float fInAlpha);
 		MaterialMappingControl & SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel = Material::Color::Channel::DiffuseColor);
+
 		MaterialMappingControl & SetEdgeColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel = Material::Color::Channel::DiffuseColor);
+
 		MaterialMappingControl & SetMarkerColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel = Material::Color::Channel::DiffuseColor);
 	
 		//== Texture 설정 ===========================================================================

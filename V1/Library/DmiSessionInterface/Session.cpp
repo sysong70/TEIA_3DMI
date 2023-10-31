@@ -102,6 +102,18 @@ void SESSION::Session::ExecuteCommand(Json::Object & cInObject)
 			m_pcView->SetViewDirection(nId);
 			break;
 	}
+
+	switch (nId)
+	{
+		case HOME_3D_CMD_VisualEffects_Shadow:
+		case HOME_3D_CMD_VisualEffects_Reflection:
+		case HOME_3D_CMD_VisualEffects_AmbientOcclusion:
+		case HOME_3D_CMD_VisualEffects_SilhouetteEdges:
+		case HOME_3D_CMD_VisualEffects_Bloom:
+			m_pcView->SetVisualEffects(nId);
+			break;
+	}
+
 }
 
 void SESSION::Session::CancelCommands()

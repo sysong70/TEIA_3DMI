@@ -335,12 +335,20 @@ H3DF::View & H3DF::Canvas::GetFrontView() const
 	return *pcImpl->m_vpcViewArray.front();
 }
 
+void H3DF::Canvas::Update() const
+{
+	CanvasPrivate * pcImpl = static_cast<CanvasPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	for (const auto pcView : pcImpl->m_vpcViewArray) {
+		pcView->Update();
+	}
+}
+
 void H3DF::Canvas::Update(Json::Object & cInObject) const
 {
 	CanvasPrivate * pcImpl = static_cast<CanvasPrivate *>(m_pcImpl);
-	if (nullptr == pcImpl) {
-		DEBUG_RETURN;
-	}
+	DEBUG_VALID(pcImpl);
 
 	for (const auto pcView : pcImpl->m_vpcViewArray) {
 		pcView->Update(cInObject);

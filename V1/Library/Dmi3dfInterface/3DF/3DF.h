@@ -267,8 +267,6 @@ namespace H3DF
 		ViewDirection() {}
 	};
 
-
-
 	class API_3DF Rendering
 	{
 	public:
@@ -289,6 +287,20 @@ namespace H3DF
 
 	private:
 		Rendering() {}
+	};
+
+	class API_3DF VisualEffects
+	{
+	public:
+		enum class ShadowMode // 숫자값을 바꾸면 않됨.
+		{
+			None = 1,  // no shadow
+			Soft = 2,  // soft shadow
+			Hard = 3   // hard shadow
+		};
+
+	private:
+		VisualEffects() {}
 	};
 
 	using WindowHandle = DWORD_PTR;

@@ -63,7 +63,7 @@ H3DF::SegmentKey::~SegmentKey()
 
 void H3DF::SegmentKey::Set(SegmentKey const & cInThat)
 {
-	Key::Set(cInThat);
+//	Key::Set(cInThat);
 
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
 	SegmentKeyPrivate * pcInThatImpl = (SegmentKeyPrivate *)cInThat.m_pcImpl;
@@ -73,7 +73,12 @@ void H3DF::SegmentKey::Set(SegmentKey const & cInThat)
 
 SegmentKey & H3DF::SegmentKey::operator = (SegmentKey const & cInThat)
 {
-	Key::Set(cInThat);
+//	Key::Set(cInThat);
+
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
+	SegmentKeyPrivate * pcInThatImpl = (SegmentKeyPrivate *)cInThat.m_pcImpl;
+
+	pcImpl->Copy(pcInThatImpl);
 
 	return *this;
 }
@@ -591,7 +596,7 @@ SegmentKey & H3DF::SegmentKey::SetVisibility(CString strList)
 	return *this;
 }
 
-//== Visibility Control 관련 함수 ====================================================================
+//== Visual Effects 관련 함수 ========================================================================
 VisualEffectsControl H3DF::SegmentKey::GetVisualEffectsControl()
 {
 	VisualEffectsControl cVisibilityControl(*this);

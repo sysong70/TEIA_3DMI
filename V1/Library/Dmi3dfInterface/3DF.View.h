@@ -31,6 +31,7 @@ namespace H3DF
 
 		H3DF::Type ObjectType() const { return H3DF::Type::View; };
 
+		void Update() const;
 		void Update(Json::Object & cInObject) const;
 		void Update(Json::Object & cInObject, Window::UpdateType eInType, H3DF::Time dInTimeLimit = -1.0) const;
 
@@ -79,7 +80,16 @@ namespace H3DF
 		Rendering::Mode GetRenderingMode() const;
 
 		void SetViewDirection(ViewDirection::Mode eInMode);
-		
+
+		// 그림자 관련 함수
+		void SetSimpleShadow(bool bInState, float fInPercentOffset = 5.0f);
+		bool GetSimpleShadow();
+
+		// 반사 관련 함수
+		void SetSimpleReflection(bool bInState, float fInPercentOffset = 5.0f);
+		bool GetSimpleReflection();
+
+
 
 	public:
 		void SaveHsfFile(CString strFilePathName, H3DF::Canvas * pcHoopsView);

@@ -1035,6 +1035,7 @@ public:
 		ControlPrivate::Copy(pcInThat);
 	}
 
+	void SetAlpha(CString strGeometry, float fInAlpha);
 	void SetColor(CString strGeometry, RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel);
 
 protected:
@@ -1061,11 +1062,29 @@ CString MaterialMappingControlPrivate::GetColorChannelString(Material::Color::Ch
 	return L"";
 }
 
+void MaterialMappingControlPrivate::SetAlpha(CString strGeometry, float fInAlpha)
+{
+	CString strColorText;
+	strColorText.Format(L"%s = (transmission = r=%f g=%f b=%f)", strGeometry, fInAlpha, fInAlpha, fInAlpha);
+
+	SegmentKeyPrivate::LocalOpen(m_nOverrideKey); {
+		HC_Set_Color(Utility::ToChar(strColorText));
+	} SegmentKeyPrivate::LocalClose(m_nOverrideKey);
+}
+
 void MaterialMappingControlPrivate::SetColor(CString strGeometry, RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel)
 {
 	CString strColorText;
 	CString strColorChannel = GetColorChannelString(cInChannel);
-	strColorText.Format(L"%s = (%s = (r=%f g=%f b=%f))", strGeometry, strColorChannel, cInRgbaColor.red, cInRgbaColor.green, cInRgbaColor.blue);
+
+	if (1.0f > cInRgbaColor.alpha) {
+		strColorText.Format(L"%s = (%s = (r=%f g=%f b=%f), (transmission = r=%f g=%f b=%f))", strGeometry, strColorChannel, 
+			cInRgbaColor.red, cInRgbaColor.green, cInRgbaColor.blue,
+			cInRgbaColor.alpha, cInRgbaColor.alpha, cInRgbaColor.alpha);
+	}
+	else {
+		strColorText.Format(L"%s = (%s = (r=%f g=%f b=%f))", strGeometry, strColorChannel, cInRgbaColor.red, cInRgbaColor.green, cInRgbaColor.blue);
+	}
 	
 	SegmentKeyPrivate::LocalOpen(m_nOverrideKey); {
 		HC_Set_Color(Utility::ToChar(strColorText));
@@ -1097,12 +1116,22 @@ MaterialMappingControl & H3DF::MaterialMappingControl::operator = (MaterialMappi
 	return *this;
 }
 
+MaterialMappingControl & H3DF::MaterialMappingControl::SetFaceAlpha(float fInAlpha)
+{
+	MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
+	pcImpl->SetAlpha("faces", fInAlpha);
+
+	return *this;
+}
+
 MaterialMappingControl & H3DF::MaterialMappingControl::SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel)
 {
 	MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
-	pcImpl->SetColor(L"faces", cInRgbaColor, cInChannel);
+	pcImpl->SetColor("faces", cInRgbaColor, cInChannel);
 
 	return *this;
 }
@@ -1112,7 +1141,7 @@ MaterialMappingControl & H3DF::MaterialMappingControl::SetEdgeColor(RGBAColor co
 	MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
-	pcImpl->SetColor(L"edges", cInRgbaColor, cInChannel);
+	pcImpl->SetColor("edges", cInRgbaColor, cInChannel);
 
 	return *this;
 }
@@ -1122,7 +1151,7 @@ MaterialMappingControl & H3DF::MaterialMappingControl::SetMarkerColor(RGBAColor 
 	MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
-	pcImpl->SetColor(L"markers", cInRgbaColor, cInChannel);
+	pcImpl->SetColor("markers", cInRgbaColor, cInChannel);
 
 	return *this;
 }

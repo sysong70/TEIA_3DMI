@@ -5,16 +5,19 @@
 #include "SegmentPrivate.h"
 #include "../Segment.h"
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
-void SegmentKeyPrivate::Copy(SegmentKeyPrivate * pcInThat)
+void H3DF::SegmentKeyPrivate::Copy(SegmentKeyPrivate * pcInThat)
 {
+	KeyPrivate::Copy(pcInThat);
+
 	m_bOpen = pcInThat->m_bOpen;
 	m_bForcedOpen = pcInThat->m_bForcedOpen;
+	m_pcBaseView = pcInThat->m_pcBaseView;
 }
 
 //== Segment 관련 함수 ===============================================================================
-void SegmentKeyPrivate::LocalOpen()
+void H3DF::SegmentKeyPrivate::LocalOpen()
 {
 	if (true == m_bForcedOpen) {
 		return;
@@ -30,7 +33,7 @@ void SegmentKeyPrivate::LocalOpen()
 	HC_Open_Segment_By_Key(m_nKey);
 }
 
-void SegmentKeyPrivate::LocalOpen() const
+void H3DF::SegmentKeyPrivate::LocalOpen() const
 {
 	if (true == m_bForcedOpen) {
 		return;
@@ -46,19 +49,19 @@ void SegmentKeyPrivate::LocalOpen() const
 	HC_Open_Segment_By_Key(m_nKey);
 }
 
-void SegmentKeyPrivate::LocalOpen(SegmentKey & cSegmentKey)
+void H3DF::SegmentKeyPrivate::LocalOpen(SegmentKey & cSegmentKey)
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)cSegmentKey.GetImpl();
 	pcImpl->LocalOpen();
 }
 
-void SegmentKeyPrivate::LocalOpen(SegmentKey const & cSegmentKey)
+void H3DF::SegmentKeyPrivate::LocalOpen(SegmentKey const & cSegmentKey)
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)cSegmentKey.GetImpl();
 	pcImpl->LocalOpen();
 }
 
-void SegmentKeyPrivate::LocalClose()
+void H3DF::SegmentKeyPrivate::LocalClose()
 {
 	if (true == m_bForcedOpen) {
 		return;
@@ -73,7 +76,7 @@ void SegmentKeyPrivate::LocalClose()
 	HC_Close_Segment();
 }
 
-void SegmentKeyPrivate::LocalClose() const
+void H3DF::SegmentKeyPrivate::LocalClose() const
 {
 	if (true == m_bForcedOpen) {
 		return;
@@ -88,7 +91,7 @@ void SegmentKeyPrivate::LocalClose() const
 	HC_Close_Segment();
 }
 
-void SegmentKeyPrivate::LocalClose(SegmentKey & cSegmentKey)
+void H3DF::SegmentKeyPrivate::LocalClose(SegmentKey & cSegmentKey)
 {
 	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)cSegmentKey.GetImpl();
 	pcImpl->LocalClose();
@@ -100,7 +103,7 @@ void H3DF::SegmentKeyPrivate::LocalClose(SegmentKey const & cSegmentKey)
 	pcImpl->LocalClose();
 }
 
-void SegmentKeyPrivate::Open()
+void H3DF::SegmentKeyPrivate::Open()
 {
 	m_bForcedOpen = true;
 
@@ -112,7 +115,7 @@ void SegmentKeyPrivate::Open()
 	HC_Open_Segment_By_Key(m_nKey);
 }
 
-void SegmentKeyPrivate::Close()
+void H3DF::SegmentKeyPrivate::Close()
 {
 	if (false == m_bOpen) {
 		return;
@@ -123,27 +126,27 @@ void SegmentKeyPrivate::Close()
 	HC_Close_Segment();
 }
 
-bool SegmentKeyPrivate::IsLocalOpen() const
+bool H3DF::SegmentKeyPrivate::IsLocalOpen() const
 {
 	return m_bOpen;
 }
 
-bool SegmentKeyPrivate::IsForcedOpen() const
+bool H3DF::SegmentKeyPrivate::IsForcedOpen() const
 {
 	return m_bForcedOpen;
 }
 
-HC_KEY const SegmentKeyPrivate::KeyValue() const
+HC_KEY const H3DF::SegmentKeyPrivate::KeyValue() const
 {
 	return m_nKey;
 }
 
-void SegmentKeyPrivate::SetKeyValue(HC_KEY nInKey)
+void H3DF::SegmentKeyPrivate::SetKeyValue(HC_KEY nInKey)
 {
 	m_nKey = nInKey;
 }
 
-void SegmentKeyPrivate::SetColor(CString strInGeometryName, RGBAColor cInColor)
+void H3DF::SegmentKeyPrivate::SetColor(CString strInGeometryName, RGBAColor cInColor)
 {
 	CString strColorText;
 	if (1.0f == cInColor.alpha) {
@@ -155,4 +158,14 @@ void SegmentKeyPrivate::SetColor(CString strInGeometryName, RGBAColor cInColor)
 	}
 
 	HC_Set_Color(Utility::ToChar(strColorText));
+}
+
+BaseView * H3DF::SegmentKeyPrivate::GetBaseView() const
+{
+	return m_pcBaseView;
+}
+
+void H3DF::SegmentKeyPrivate::SetBaseView(BaseView * pcInBaseView)
+{
+	m_pcBaseView = pcInBaseView;
 }

@@ -10,6 +10,9 @@
 
 USING_3DF_NAMESPACE
 
+const float H3DF::Float::Infinity = ((float)(_HUGE_ENUF * _HUGE_ENUF));
+const float H3DF::Float::NegativeInfinity = -H3DF::Float::Infinity;
+
 /*
 void MatrixCal::InverseMatrix(const float * matrix, float * out_matrix)
 {

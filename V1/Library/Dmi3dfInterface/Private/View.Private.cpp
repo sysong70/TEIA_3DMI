@@ -40,6 +40,7 @@
 #include "../3DF/Visibility.h"
 #include "../3DF/Material.h"
 #include "../3DF/LineAttribute.h"
+#include "../3DF/Private/SegmentPrivate.h"
 
 #include "../Signal/Signal.h"
 
@@ -637,8 +638,11 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 		return false;
 	}
 
-	// View Segment Key 설정
+	// View Segment Key 설정.View Segment에는 향후 사용하기 위한 Base View 정보를 추가해놓는다.
 	m_cKey.Set(m_pcBaseView->GetViewKey());
+	SegmentKeyPrivate * pcKeyImpl = static_cast<SegmentKeyPrivate *>(m_cKey.GetImpl());
+	DEBUG_VALID(pcKeyImpl);
+	pcKeyImpl->SetBaseView(m_pcBaseView);
 
 	// Model 설정
 	m_pcModel = pcInModel;
@@ -1610,6 +1614,26 @@ bool H3DF::ViewPrivate::MouseWheel(int nFlags, int zDelta, int x, int y, int nLe
 	//HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnMouseWheel(cEvent));
 
 	return true;
+}
+
+bool H3DF::ViewPrivate::GetSimpleShadow()
+{
+	return m_bSimpleShadowFlag;
+}
+
+void H3DF::ViewPrivate::SetSimpleShadow(bool bFlag)
+{
+	m_bSimpleShadowFlag = bFlag;
+}
+
+bool H3DF::ViewPrivate::GetSimpleReflection()
+{
+	return m_bSimpleReflection;
+}
+
+void H3DF::ViewPrivate::SetSimpleReflection(bool bFlag)
+{
+	m_bSimpleReflection = bFlag;
 }
 
 //== Keyboard 관련 함수 ==============================================================================

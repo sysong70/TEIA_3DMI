@@ -79,6 +79,12 @@ namespace H3DF
 		bool MouseMove(int nFlags, int x, int y);
 		bool MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop);
 
+		bool GetSimpleShadow();
+		void SetSimpleShadow(bool bFlag); 
+
+		bool GetSimpleReflection();
+		void SetSimpleReflection(bool bFlag);
+
 		//== Keyboard 관련 함수 ======================================================================
 		bool Char(UINT nChar, UINT nRepCnt, UINT nFlags);
 		bool KeyboardInput(Json::Object & cInObject);
@@ -128,5 +134,8 @@ namespace H3DF
 		Operator::SelectArea * m_pcSelectArea = nullptr;
 
 		NavigationCube m_cNaviCube;
+
+		bool m_bSimpleShadowFlag = false;
+		bool m_bSimpleReflection = false;
 	};
 }

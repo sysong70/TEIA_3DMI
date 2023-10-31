@@ -1,6 +1,7 @@
 ﻿#include <StdAfx.h>
 
 #include "Kernel.View.h"
+#include "./Private/Kernel.ViewPrivate.h"
 
 #include "../Dmi3dfInterface/3DF.Canvas.h"
 #include "../Dmi3dfInterface/3DF.Factory.h"
@@ -13,22 +14,6 @@
 #include "../../UiMain/Command.Resource.h"
 
 using namespace KERNEL;
-
-namespace KERNEL
-{
-	class ViewPrivate : public PrivateImpl
-	{
-	public:
-		void Copy(const ViewPrivate * pcInThat)
-		{
-			m_cCanvas = pcInThat->m_cCanvas;
-			m_nViewId = pcInThat->m_nViewId;
-		}
-
-		H3DF::Canvas m_cCanvas;
-		int m_nViewId = -1;
-	};
-}
 
 KERNEL::View::View()
 {
@@ -265,5 +250,35 @@ void KERNEL::View::SetViewDirection(int nDirectionId)
 			assert(false);
 			break;
 
+	}
+}
+
+//== Visual Effects 관련 함수 ========================================================================
+
+// 1. Visual Effects 설정
+void KERNEL::View::SetVisualEffects(int nEffectId)
+{
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) { DEBUG_RETURN; }
+
+	switch (nEffectId)
+	{
+		case HOME_3D_CMD_VisualEffects_Shadow:
+			pcImpl->SetVisualEffectsShadow();
+			break;
+
+		case HOME_3D_CMD_VisualEffects_Reflection:
+			pcImpl->SetVisualEffectsReflection();
+			break;
+
+		case HOME_3D_CMD_VisualEffects_AmbientOcclusion:
+			pcImpl->SetVisualEffectsAmbientOcclusion();
+			break;
+
+		case HOME_3D_CMD_VisualEffects_SilhouetteEdges:
+			break;
+
+		case HOME_3D_CMD_VisualEffects_Bloom:
+			break;
 	}
 }

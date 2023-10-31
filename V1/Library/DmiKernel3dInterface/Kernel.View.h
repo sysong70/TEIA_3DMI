@@ -35,6 +35,7 @@ namespace KERNEL
 		//== Style 관련 함수 =========================================================================
 		void SetViewStyle(int nStyleId);
 		void SetViewDirection(int nDirectionId);
+		void SetVisualEffects(int nEffectId);
 
 	private:
 		int m_nViewId = -1;

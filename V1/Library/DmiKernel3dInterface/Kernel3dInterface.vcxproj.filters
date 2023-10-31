@@ -25,6 +25,9 @@
     <Filter Include="Kernel">
       <UniqueIdentifier>{d751b3d7-f946-4ee5-bbca-8c5ac048200c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Kernel\Private">
+      <UniqueIdentifier>{a0a74036-15da-41a7-92b9-e49bf87a5172}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -62,6 +65,9 @@
     </ClInclude>
     <ClInclude Include="Object.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Kernel.ViewPrivate.h">
+      <Filter>Kernel\Private</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +109,9 @@
     </ClCompile>
     <ClCompile Include="Object.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Kernel.ViewPrivate.cpp">
+      <Filter>Kernel\Private</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

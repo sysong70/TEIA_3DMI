@@ -355,7 +355,7 @@ int Operator::SelectArea::ButtonUp(HEventInfo & cEvent)
 	GetView()->Update();
 
 	GetView()->GetConstantFrameRateObject()->SetDisableIncreaseTemp(false);
-
+/*
 	char chBufferHeuristics[MVO_BUFFER_SIZE] = "\0";
 	char chNetBufferHeuristics[MVO_BUFFER_SIZE] = "\0";
 
@@ -406,6 +406,6 @@ int Operator::SelectArea::ButtonUp(HEventInfo & cEvent)
 
 	char chSystemOption[MVO_BUFFER_SIZE];
 	HC_Show_System_Options(chSystemOption);
-
+*/
 	return HOP_READY;
 }

@@ -14,6 +14,7 @@
 #include "3DF/Segment.h"
 #include "3DF/Private/SegmentPrivate.h"
 #include "3DF/Visibility.h"
+#include "3DF/VisualEffects.h"
 
 #include "3DF/Facility.AppOptions.h"
 
@@ -69,12 +70,29 @@ View const & H3DF::View::operator = (View const & cInThat)
 	return *this;
 }
 
+void H3DF::View::Update() const
+{
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if (pcImpl->GetBaseView()->GetViewActive() && !pcImpl->GetBaseView()->GetSuppressUpdate())
+	{
+		HC_Control_Update_By_Key(pcImpl->GetBaseView()->GetViewKey(), "redraw everything");
+		pcImpl->GetBaseView()->GetConstantFrameRateObject()->SetActivityType(GeneralActivity);
+
+		if (false == pcImpl->GetBaseView()->GetFirstUpdate()) {
+			pcImpl->GetBaseView()->ForceUpdate();
+		}
+		else {
+			pcImpl->GetBaseView()->Update();
+		}
+	}
+}
+
 void H3DF::View::Update(Json::Object & cInObject) const
 {
 	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
-	if (nullptr == pcImpl) {
-		DEBUG_RETURN;
-	}
+	DEBUG_VALID(pcImpl);
 
 	if (false == pcImpl->IsInitNavigationCube()) {
 		Json::Array & cArray = cInObject.GetArray(SKW_RECT);
@@ -164,7 +182,6 @@ SegmentKey const H3DF::View::GetModelOverrideSegmentKey() const
 
 	return pcImpl->GetModelKey();
 }
-
 
 //== Command 관련 함수 ===========================================================================
 
@@ -438,6 +455,74 @@ void H3DF::View::SaveHsfFile(CString strFilePathName, Canvas * pcHoopsView)
 
 	delete mytool;
 }
+
+// Turns simple shadows on or off, automatically calculating shadow plane and light direction
+// param: in_state controls whether simple shadows are on or off
+// param: fInPercentOffset distance to add between the model's bounding box and the position of the shadow plane If not specified, it is set to 5%.
+void H3DF::View::SetSimpleShadow(bool bInState, float fInPercentOffset)
+{
+	ViewPrivate * pcViewImpl = (ViewPrivate *)m_pcImpl;
+	DEBUG_VALID(pcViewImpl);
+
+	SegmentKey cViewSegment = pcViewImpl->GetSegmentKey();
+
+	const float fOpacity = 1.0f;
+	const unsigned int nResolution = 512;
+	const unsigned int nBlurring = 20;
+
+	// Set opacity in simple shadow color
+	float fGray = 0.25f;
+	H3DF::RGBAColor cColor(fGray, fGray, fGray, fOpacity);
+// 	if (true == cViewSegment.GetVisualEffectsControl().ShowSimpleShadowColor(cColor)) {
+// 		cColor.alpha = fOpacity;
+// 	}
+
+	cViewSegment.GetVisualEffectsControl()
+		.SetSimpleShadow(bInState, nResolution, nBlurring)
+		.SetSimpleShadowColor(cColor);
+}
+
+// Returns the status of the simple shadows
+bool H3DF::View::GetSimpleShadow()
+{
+	ViewPrivate * pcViewImpl = (ViewPrivate *)m_pcImpl;
+	DEBUG_VALID(pcViewImpl);
+
+	if (H3DF::VisualEffects::ShadowMode::None == (H3DF::VisualEffects::ShadowMode)pcViewImpl->GetBaseView()->GetShadowMode()) {
+		return false;
+	}
+
+	return true;
+}
+
+// Turns simple reflection on or off, automatically calculating reflection plane and light direction
+// param: in_state controls whether simple reflection is on or off
+// param: in_percent_offset distance to add between the model's bounding box and the position of the reflection plane If not specified, it is set to 5%.
+void H3DF::View::SetSimpleReflection(bool bInState, float fInPercentOffset)
+{
+	ViewPrivate * pcViewImpl = (ViewPrivate *)m_pcImpl;
+	DEBUG_VALID(pcViewImpl);
+
+	pcViewImpl->SetSimpleReflection(bInState);
+
+	SegmentKey cViewSegment = pcViewImpl->GetSegmentKey();
+
+	cViewSegment.GetVisualEffectsControl().SetSimpleReflection(bInState,
+		0.5,		// fInOpacity
+		1,			// nInBlurring
+		true		// bInFading
+	);
+}
+
+/*! Returns the status of the simple reflection */
+bool H3DF::View::GetSimpleReflection()
+{
+	ViewPrivate * pcViewImpl = (ViewPrivate *)m_pcImpl;
+	DEBUG_VALID(pcViewImpl);
+
+	return pcViewImpl->GetSimpleReflection();
+}
+
 
 void H3DF::View::LoadPointCloudFile(CString strFilePathName)
 {
