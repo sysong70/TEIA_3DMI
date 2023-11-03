@@ -16,6 +16,15 @@
 #include "HTools.h"
 #include "HGlobals.h"
 
+class CameraZoomBox : public HOpCameraZoomBox
+{
+public:
+	CameraZoomBox(HBaseView * view, int DoRepeat = 0, int DoCapture = 1);
+
+	int OnLButtonUp(HEventInfo & hevent) override;
+};
+
+
 namespace H3DF
 {
 	class WindowKey;
@@ -74,7 +83,8 @@ namespace H3DF
 
 			HOpCameraOrbit m_cCameraOrbit;
 			HOpCameraPan m_cCameraPan;
-			HOpCameraZoomBox m_cCameraZoomBox;
+			// HOpCameraZoomBox m_cCameraZoomBox;
+			CameraZoomBox m_cCameraZoomBox;
 		};
 	}
 }

@@ -247,6 +247,7 @@ BOOL Window::Application::InitInstance()
 		RETURN_FALSE;
 	}
 
+/*
 	if (Connector2d::Initialize()) {
 		Signal::Application& app = Connector2d::GetInstance().application;
 		app.OnInitInstance();
@@ -256,6 +257,7 @@ BOOL Window::Application::InitInstance()
 	else {
 		RETURN_FALSE;
 	}
+*/
 
 	double dpi = globalUtils.GetDpiForWindow(nullptr) / 96.0;
 	Connector3d::GetInstance().application.OnDpiAware(dpi);
