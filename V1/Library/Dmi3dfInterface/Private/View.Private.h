@@ -70,6 +70,8 @@ namespace H3DF
 
 		void Resize(int x, int y);
 
+		//== View Control 관련 함수 ==================================================================
+	public:
 		bool LButtonDown(int nFlags, int x, int y);
 		bool LButtonUp(int nFlags, int x, int y);
 
@@ -79,6 +81,14 @@ namespace H3DF
 		bool MouseMove(int nFlags, int x, int y);
 		bool MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop);
 
+		ViewControl::Mode GetViewControlMode();
+		void SetViewControlMode(ViewControl::Mode eMode);
+
+	private:
+		ViewControl::Mode m_eViewControlMode = ViewControl::Mode::Multi;
+
+		//== Visual Effects 관련 함수 ================================================================
+	public:
 		bool GetSimpleShadow();
 		void SetSimpleShadow(bool bFlag); 
 
@@ -130,7 +140,7 @@ namespace H3DF
 
 		bool m_bShowCollisions = false;
 
-		Operator::CameraSelect * m_pcCameraOrbitSelect = nullptr;
+		Operator::CameraSelect * m_pcCameraSelect = nullptr;
 		Operator::SelectArea * m_pcSelectArea = nullptr;
 
 		NavigationCube m_cNaviCube;

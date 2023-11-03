@@ -616,7 +616,7 @@ void H3DF::ViewPrivate::Copy(const ViewPrivate * pcInThat)
 
 	m_bShowCollisions = pcInThat->m_bShowCollisions;
 
-	m_pcCameraOrbitSelect = pcInThat->m_pcCameraOrbitSelect;
+	m_pcCameraSelect = pcInThat->m_pcCameraSelect;
 	m_pcSelectArea = pcInThat->m_pcSelectArea;
 
 	if (nullptr != m_pcBaseView) {
@@ -1489,10 +1489,10 @@ void H3DF::ViewPrivate::SetDefaultOperator()
 // 		, new HSOpCameraPan(m_pHView),
 // 		new HSOpCameraZoom(m_pHView), 0, false))
 
-	m_pcCameraOrbitSelect = new Operator::CameraSelect(m_pcWindow, m_cNaviCube);
+	m_pcCameraSelect = new Operator::CameraSelect(m_pcWindow, m_cNaviCube);
 	m_pcSelectArea = new Operator::SelectArea(GetBaseView());
 
-	GetBaseView()->SetOperator(m_pcCameraOrbitSelect);
+	GetBaseView()->SetOperator(m_pcCameraSelect);
 
 	//LocalSetOperator(m_pcCameraManipulate);
 }
@@ -1518,7 +1518,7 @@ bool H3DF::ViewPrivate::LButtonDown(int nFlags, int x, int y)
 		GetBaseView()->SetOperator(m_pcSelectArea);
 	}
 	else {
-		GetBaseView()->SetOperator(m_pcCameraOrbitSelect);
+		GetBaseView()->SetOperator(m_pcCameraSelect);
 	}
 
 	HEventInfo cEvent(GetBaseView());
@@ -1535,15 +1535,7 @@ bool H3DF::ViewPrivate::LButtonUp(int nFlags, int x, int y)
 	cEvent.SetPoint(HE_LButtonUp, x, y, MouseMapFlags(nFlags));
 	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnLButtonUp(cEvent));
 
-	HBaseOperator * op = GetBaseView()->GetCurrentOperator();
-
-	if (op) {
-		if (op->Capture()) {
-
-		}
-	}
-
-	GetBaseView()->SetOperator(m_pcCameraOrbitSelect);
+	GetBaseView()->SetOperator(m_pcCameraSelect);
 
 	return true;
 }
@@ -1553,7 +1545,7 @@ bool H3DF::ViewPrivate::RButtonDown(int nFlags, int x, int y)
 {
 	//GetBaseView()->SetDynamicHighlighting(false);
 
-	GetBaseView()->SetOperator(m_pcCameraOrbitSelect);
+	GetBaseView()->SetOperator(m_pcCameraSelect);
 
 	HEventInfo cEvent(GetBaseView());
 	cEvent.SetPoint(HE_RButtonDown, x, y, MouseMapFlags(nFlags));
@@ -1609,7 +1601,8 @@ bool H3DF::ViewPrivate::MouseWheel(int nFlags, int zDelta, int x, int y, int nLe
 	HEventInfo	cEvent(GetBaseView());
 	cEvent.SetPoint(HE_MouseWheel, x - nLeft, y - nTop, MouseMapFlags(nFlags));
 	cEvent.SetMouseWheelDelta(zDelta);
-	m_pcCameraOrbitSelect->OnMouseWheel(cEvent);
+
+	m_pcCameraSelect->OnMouseWheel(cEvent);
 
 	//HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnMouseWheel(cEvent));
 
@@ -1634,6 +1627,18 @@ bool H3DF::ViewPrivate::GetSimpleReflection()
 void H3DF::ViewPrivate::SetSimpleReflection(bool bFlag)
 {
 	m_bSimpleReflection = bFlag;
+}
+
+//== View Control 관련 함수 ==================================================================
+ViewControl::Mode H3DF::ViewPrivate::GetViewControlMode()
+{
+	return m_eViewControlMode;
+}
+
+void H3DF::ViewPrivate::SetViewControlMode(ViewControl::Mode eMode)
+{
+	m_eViewControlMode = eMode;
+	m_pcCameraSelect->SetViewControlMode(m_eViewControlMode);
 }
 
 //== Keyboard 관련 함수 ==============================================================================

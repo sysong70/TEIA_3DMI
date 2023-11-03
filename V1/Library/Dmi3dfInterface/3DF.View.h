@@ -75,6 +75,13 @@ namespace H3DF
 		//== Select 관련 함수 ========================================================================
 		void SetSubentitySelectLevel();
 
+		//== View Control 관련 함수 ==================================================================
+		void SetPanViewControl();
+		void SetOrbitViewControl();
+
+		View & FitWorld();
+		View & SetZoomArea();
+
 		//== View Style 관련 함수 ====================================================================
 		void SetRenderingMode(Rendering::Mode eInMode);
 		Rendering::Mode GetRenderingMode() const;
@@ -88,8 +95,6 @@ namespace H3DF
 		// 반사 관련 함수
 		void SetSimpleReflection(bool bInState, float fInPercentOffset = 5.0f);
 		bool GetSimpleReflection();
-
-
 
 	public:
 		void SaveHsfFile(CString strFilePathName, H3DF::Canvas * pcHoopsView);

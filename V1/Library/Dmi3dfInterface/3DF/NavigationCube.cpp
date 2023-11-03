@@ -185,11 +185,11 @@ int NavigationCube::LButtonUp(HEventInfo & cInEvent)
 	for (int nIndex = 0; nIndex < (int)H3DF::ViewDirection::Mode::Count; nIndex++) {
 		if (pcImpl->m_cSegments[nIndex] == cSelectKey) {
 			pcImpl->m_pView->SetViewDirection((H3DF::ViewDirection::Mode)nIndex);
-			break;
+			return HLISTENER_CONSUME_EVENT;
 		}
 	}
 
-	return HLISTENER_CONSUME_EVENT;
+	return HLISTENER_PASS_EVENT;
 }
 
 int NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)

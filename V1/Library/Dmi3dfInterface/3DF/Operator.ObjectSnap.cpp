@@ -408,7 +408,7 @@ int H3DF::Operator::ObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 		CalculationObjectSnapPoint(m_cHighlightSelection);
 
 		// Snap Item을 그린다.
-		DrawSnapItems(false);
+		DrawSnapItems();
 
 		if (false == m_vSnapItems.empty()) {
 			bForceUpdate = true;
@@ -766,7 +766,7 @@ void H3DF::Operator::ObjectSnap::CalculationLienAndLineObjectSnapPoint(const Sel
 
 //== Object Snap Point를 그리는 함수 ==================================================================
 
-void H3DF::Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
+void H3DF::Operator::ObjectSnap::DrawSnapItems()
 {
 	CamerInformation cCameraInfo;
 	ShowCameraInformation(m_fSnapRadius, cCameraInfo);
@@ -784,10 +784,6 @@ void H3DF::Operator::ObjectSnap::DrawSnapItems(bool bUpdate)
 		}
 	}
 	m_cSnapPointSegment.Close();
-
-	if (true == bUpdate) {
-		m_pcWindow->GetBaseView()->Update();
-	}
 }
 
 /*

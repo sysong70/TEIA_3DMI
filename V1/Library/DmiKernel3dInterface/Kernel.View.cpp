@@ -173,6 +173,38 @@ void KERNEL::View::KeyboardSignal(Json::Object & cInObject)
 	pcImpl->m_cCanvas.KeyboardInput(cInObject);
 }
 
+//== View 관련 함수 ==========================================================================
+void KERNEL::View::SetViewControl(int nId)
+{
+	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) { DEBUG_RETURN; }
+
+	switch (nId)
+	{
+		case HOME_3D_CMD_Pan:
+			pcImpl->m_cCanvas.GetFrontView().SetPanViewControl();
+			break;
+
+		case HOME_3D_CMD_Zoom_Fit:
+			pcImpl->m_cCanvas.GetFrontView().FitWorld();
+			break;
+
+		case HOME_3D_CMD_Zoom_Area:
+			pcImpl->m_cCanvas.GetFrontView().SetZoomArea();
+			break;
+
+		case HOME_3D_CMD_Zoom_Object:
+		case HOME_3D_CMD_Rotate_Rotate:
+		case HOME_3D_CMD_Rotate_RotateCenter:
+		case HOME_3D_CMD_Rotate_Turntable:
+			break;
+
+		case HOME_3D_CMD_Rotate_Orbit:
+			pcImpl->m_cCanvas.GetFrontView().SetOrbitViewControl();
+			break;
+	}
+}
+
 //== Style 관련 함수 =========================================================================
 void KERNEL::View::SetViewStyle(int nStyleId)
 {

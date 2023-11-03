@@ -10,6 +10,8 @@
 #include "NavigationCube.h"
 
 #include <HOpCameraOrbit.h>
+#include <HOpCameraPan.h>
+#include <HOpCameraZoomBox.h>
 
 #include "HTools.h"
 #include "HGlobals.h"
@@ -20,7 +22,9 @@ namespace H3DF
 
 	namespace Operator
 	{
-		class CameraSelect : public HOpCameraOrbit
+		
+		class CameraSelect : public HBaseOperator
+		//class CameraSelect : public HOpCameraOrbit
 		{
 		public:
 			CameraSelect(WindowKey * pcWindow, NavigationCube & cNaviCube, int DoRepeat = 0, int DoCapture = 1);
@@ -29,6 +33,8 @@ namespace H3DF
 
 			const char * GetName() override;
 			HBaseOperator * Clone() override;
+
+			void SetViewControlMode(ViewControl::Mode eMode);
 
 			//== Mouse Event 처리 =======================================================================
 			int OnMouseWheel(HEventInfo & cInEvent) override;
@@ -42,20 +48,10 @@ namespace H3DF
 
 			int OnNoButtonDownAndMove(HEventInfo & cInEvent) override;
 
-		private:
-			int HOpCameraOrbit_OnLButtonDownAndMove(HEventInfo & event);
-
-			int HOpCameraPan_OnLButtonDown(HEventInfo & event);
-			int HOpCameraPan_OnLButtonDownAndMove(HEventInfo & event);
-			int HOpCameraPan_OnLButtonUp(HEventInfo & event);
-
-			int HBaseView_OnMouseWheel(HEventInfo & event, bool bUdpate);
-
-			bool valid_float(float f);
-			bool valid_point(HPoint const & p);
+		protected:
+			int OnZoomBoxLButtonUp(HEventInfo & cInEvent);
 
 		protected:
-			bool m_bOrbitMode;
 			DWORD m_nSelectPickCount;
 			DWORD m_nMouseDownTickCount;
 			HPoint m_cMouseDownPoint;
@@ -70,10 +66,15 @@ namespace H3DF
 
 			NavigationCube * m_pcNaviCube = nullptr;
 
+			ViewControl::Mode m_eViewControlMode = ViewControl::Mode::Multi;
+
 		private:
 			HPoint m_cClickPoint;
-
 			double  m_dFirstPoint[3];
+
+			HOpCameraOrbit m_cCameraOrbit;
+			HOpCameraPan m_cCameraPan;
+			HOpCameraZoomBox m_cCameraZoomBox;
 		};
 	}
 }

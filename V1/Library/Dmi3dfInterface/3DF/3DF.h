@@ -267,6 +267,19 @@ namespace H3DF
 		ViewDirection() {}
 	};
 
+	class API_3DF ViewControl
+	{
+	public:
+		enum class Mode
+		{
+			Multi,
+			Pan,
+			Orbit,
+			Zoom,
+			ZoomBox,
+		};
+	};
+
 	class API_3DF Rendering
 	{
 	public:

@@ -318,12 +318,66 @@ bool H3DF::View::ExecuteKeyboardSignal(int nAction, Json::Object& cInObject)
 //== Select 관련 함수 ========================================================================
 void H3DF::View::SetSubentitySelectLevel()
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
-	if (nullptr == pcImpl) {
-		DEBUG_RETURN;
-	}
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetSubentitySelectLevel();
+}
+
+//== View Control 관련 함수 ==================================================================
+void H3DF::View::SetPanViewControl()
+{
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	if (pcImpl->GetViewControlMode() != ViewControl::Mode::Pan) {
+		pcImpl->SetViewControlMode(ViewControl::Mode::Pan);
+		}
+	else {
+		pcImpl->SetViewControlMode(ViewControl::Mode::Multi);
+	}
+}
+
+void H3DF::View::SetOrbitViewControl()
+{
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	if (pcImpl->GetViewControlMode() != ViewControl::Mode::Orbit) {
+		pcImpl->SetViewControlMode(ViewControl::Mode::Orbit);
+	}
+	else {
+		pcImpl->SetViewControlMode(ViewControl::Mode::Multi);
+	}
+}
+
+View & H3DF::View::FitWorld()
+{
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->GetBaseView()->ZoomToExtents();
+
+	Update();
+
+	pcImpl->SetViewControlMode(ViewControl::Mode::Multi);
+
+	return *this;
+}
+
+View & H3DF::View::SetZoomArea()
+{
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	if (pcImpl->GetViewControlMode() != ViewControl::Mode::ZoomBox) {
+		pcImpl->SetViewControlMode(ViewControl::Mode::ZoomBox);
+	}
+	else {
+		pcImpl->SetViewControlMode(ViewControl::Mode::Multi);
+	}
+	
+	return *this;
 }
 
 //== View Style 관련 함수 ====================================================================

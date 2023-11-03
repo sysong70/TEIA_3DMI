@@ -114,6 +114,19 @@ void SESSION::Session::ExecuteCommand(Json::Object & cInObject)
 			break;
 	}
 
+	switch (nId)
+	{
+		case HOME_3D_CMD_Pan:
+		case HOME_3D_CMD_Zoom_Fit:
+		case HOME_3D_CMD_Zoom_Area:
+		case HOME_3D_CMD_Zoom_Object:
+		case HOME_3D_CMD_Rotate_Rotate:
+		case HOME_3D_CMD_Rotate_RotateCenter:
+		case HOME_3D_CMD_Rotate_Turntable:
+		case HOME_3D_CMD_Rotate_Orbit:
+			m_pcView->SetViewControl(nId);
+			break;
+	}
 }
 
 void SESSION::Session::CancelCommands()

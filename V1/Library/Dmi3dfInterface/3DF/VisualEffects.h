@@ -50,8 +50,16 @@ namespace H3DF
 
 		VisualEffectsControl & SetSimpleReflection(bool bInState, float fInOpacity = 0.5f, unsigned int nInBlurring = 1, bool bInFading = false, float fInAttenuationNearDistance = 0.0f, float fInAttenuationFarDistance = Float::Infinity);
 
+		//== Unset Functions =======================================================================
+		VisualEffectsControl & UnsetAmbientOcclusionEnabled();
+		VisualEffectsControl & UnsetSilhouetteEdgesEnabled();
+		VisualEffectsControl & UnsetBloomEnabled();
+
 		VisualEffectsControl & UnsetAntiAliasing();
 
+		VisualEffectsControl & UnsetSimpleShadow();
+
+		//== Show Functions ========================================================================
 		bool ShowAmbientOcclusionEnabled(bool & bOutState) const;
 		bool ShowSilhouetteEdgesEnabled(bool & bOutState) const;
 		bool ShowBloomEnabled(bool & bOutState) const;

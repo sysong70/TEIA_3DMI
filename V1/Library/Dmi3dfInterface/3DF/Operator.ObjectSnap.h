@@ -79,7 +79,7 @@ namespace H3DF
 
 		public:
 
-			void DrawSnapItems(bool bUpdate = true);
+			void DrawSnapItems();
 			//void DrawSnapItem(SnapItem * pcInItem, CamerInformation & cInCameraInfo, bool bUpdate = true);
 
 			void DrawSnapPoint(SnapPoint & cSnapPoint, CamerInformation & cInCameraInfo);

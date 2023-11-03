@@ -26,7 +26,10 @@
 USING_3DF_NAMESPACE
 
 H3DF::Operator::CameraSelect::CameraSelect(WindowKey * pcWindow, NavigationCube & cNaviCube, int DoRepeat, int DoCapture) :
-	HOpCameraOrbit(pcWindow->GetBaseView(), DoRepeat, DoCapture),
+	HBaseOperator(pcWindow->GetBaseView(), DoRepeat, DoCapture),
+	m_cCameraOrbit(pcWindow->GetBaseView(), DoRepeat, DoCapture),
+	m_cCameraPan(pcWindow->GetBaseView(), DoRepeat, DoCapture),
+	m_cCameraZoomBox(pcWindow->GetBaseView(), DoRepeat, DoCapture),
 	m_cObjectSnapOperator(pcWindow)
 {
 	m_pcWindow = pcWindow;
@@ -35,7 +38,6 @@ H3DF::Operator::CameraSelect::CameraSelect(WindowKey * pcWindow, NavigationCube 
 
 	m_nSelectPickCount = 200;
 	m_nMouseDownTickCount = 0;
-	m_bOrbitMode = false;
 }
 
 /*
@@ -44,15 +46,14 @@ H3DF::Operator::CameraSelect::CameraSelect(HBaseView * view, int DoRepeat, int D
 {
 	m_nSelectPickCount = 200;
 	m_nMouseDownTickCount = 0;
-	m_bOrbitMode = false;
 }
 */
 
 H3DF::Operator::CameraSelect::~CameraSelect()
 {
-	HC_Open_Segment_By_Key(GetView()->GetConstructionKey());
-	HC_Flush_Contents(".", "geometry");
-	HC_Close_Segment();
+	HC_Open_Segment_By_Key(GetView()->GetConstructionKey()); {
+		HC_Flush_Contents(".", "geometry");
+	} HC_Close_Segment();
 }
 
 const char * H3DF::Operator::CameraSelect::GetName()
@@ -64,27 +65,57 @@ HBaseOperator * H3DF::Operator::CameraSelect::Clone()
 {
 	return new H3DF::Operator::CameraSelect(m_pcWindow, *m_pcNaviCube);
 }
+
+void H3DF::Operator::CameraSelect::SetViewControlMode(ViewControl::Mode eMode)
+{
+	m_eViewControlMode = eMode;
+}
+
 //== Mouse Event 처리 ===============================================================================
 
+// 1. Left Button Down 처리
 int H3DF::Operator::CameraSelect::OnLButtonDown(HEventInfo & cInEvent)
 {
 	m_cMouseDownPoint = cInEvent.GetMousePixelPos();
 	m_nMouseDownTickCount = GetTickCount();
-	m_bOrbitMode = false;
 
 	// Shift & L Button 이벤트는 Area Select
 	if (MVO_SHIFT & cInEvent.GetFlags()) {
 	}
 
-	return HOpCameraOrbit::OnLButtonDown(cInEvent);
+	switch (m_eViewControlMode)
+	{
+		case H3DF::ViewControl::Mode::Pan:
+			return m_cCameraPan.OnLButtonDown(cInEvent);
+			break;
+		case H3DF::ViewControl::Mode::ZoomBox:
+			m_cCameraZoomBox.SetLightFollowsCamera(true);
+			return m_cCameraZoomBox.OnLButtonDown(cInEvent);
+			break;
+	}
+
+	return m_cCameraOrbit.OnLButtonDown(cInEvent);
 }
 
+// 2. Left Button Up 처리
+// L Button Up을 핱때 Objet를 선택함.
 int H3DF::Operator::CameraSelect::OnLButtonUp(HEventInfo & cInEvent)
 {
 	if (nullptr != m_pcNaviCube) {
 		if (HLISTENER_CONSUME_EVENT == m_pcNaviCube->LButtonUp(cInEvent)) {
 			return HLISTENER_CONSUME_EVENT;
 		}
+	}
+
+	switch (m_eViewControlMode)
+	{
+		case H3DF::ViewControl::Mode::Pan:
+			return m_cCameraPan.OnLButtonUp(cInEvent);
+			break;
+
+		case H3DF::ViewControl::Mode::ZoomBox:
+			return OnZoomBoxLButtonUp(cInEvent);
+			break;
 	}
 
 	DWORD nMouseUpTickCount = GetTickCount();
@@ -106,28 +137,59 @@ int H3DF::Operator::CameraSelect::OnLButtonUp(HEventInfo & cInEvent)
 		}
 	}
 
-	m_bOrbitMode = false;
-
 	m_cClickPoint = cInEvent.GetMouseWorldPos();
 
-	return HOpCameraOrbit::OnLButtonUp(cInEvent);
+	return m_cCameraOrbit.OnLButtonUp(cInEvent);
+}
+
+// 2.1 Zoom Box L Button Up 처리
+int H3DF::Operator::CameraSelect::OnZoomBoxLButtonUp(HEventInfo & cInEvent)
+{
+	m_pcWindow->GetBaseView()->SetSuppressUpdate(true);
+
+	int nResult = m_cCameraZoomBox.OnLButtonUp(cInEvent);
+
+	m_cObjectSnapOperator.DrawSnapItems();
+
+	m_pcWindow->GetBaseView()->SetSuppressUpdate(false);
+
+	m_pcWindow->GetBaseView()->Update();
+
+	return nResult;
 }
 
 int H3DF::Operator::CameraSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
 {
-	m_bOrbitMode = true;
-
 	if (nullptr != m_pcNaviCube) {
 		m_pcNaviCube->LButtonDownAndMove(cInEvent);
 	}
 
-	int nResult = HOpCameraOrbit_OnLButtonDownAndMove(cInEvent);
+	m_pcWindow->GetBaseView()->SetSuppressUpdate(true);
 
-	m_cObjectSnapOperator.DrawSnapItems(false);
+	m_cObjectSnapOperator.DrawSnapItems();
 
 // 	if (nullptr != m_pcNaviCube) {
 // 		m_pcNaviCube->Transform();
 // 	}
+
+	int nResult = 0;
+
+	switch (m_eViewControlMode)
+	{
+		case H3DF::ViewControl::Mode::Pan:
+			nResult = m_cCameraPan.OnLButtonDownAndMove(cInEvent);
+			break;
+
+		case H3DF::ViewControl::Mode::ZoomBox:
+			nResult = m_cCameraZoomBox.OnLButtonDownAndMove(cInEvent);
+			break;
+
+		default:
+			nResult = m_cCameraOrbit.OnLButtonDownAndMove(cInEvent);
+			break;
+	}
+
+	m_pcWindow->GetBaseView()->SetSuppressUpdate(false);
 
 	GetView()->Update();
 
@@ -136,17 +198,17 @@ int H3DF::Operator::CameraSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
 
 int H3DF::Operator::CameraSelect::OnRButtonDown(HEventInfo & hevent)
 {
-	return HOpCameraPan_OnLButtonDown(hevent);
+	return m_cCameraPan.OnLButtonDown(hevent);
 }
 
 int H3DF::Operator::CameraSelect::OnRButtonDownAndMove(HEventInfo & hevent)
 {
-	return HOpCameraPan_OnLButtonDownAndMove(hevent);
+	return m_cCameraPan.OnLButtonDownAndMove(hevent);
 }
 
 int H3DF::Operator::CameraSelect::OnRButtonUp(HEventInfo & hevent)
 {
-	return HOpCameraPan_OnLButtonUp(hevent);
+	return m_cCameraPan.OnLButtonUp(hevent);
 }
 
 // Dynamic Highlighting 처리
@@ -163,366 +225,18 @@ int H3DF::Operator::CameraSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 	return HLISTENER_PASS_EVENT;
 }
 
+//== Mouse Event 처리 ===============================================================================
 int H3DF::Operator::CameraSelect::OnMouseWheel(HEventInfo & cInEvent)
 {
-	int nResult = HBaseView_OnMouseWheel(cInEvent, false);
+	m_pcWindow->GetBaseView()->SetSuppressUpdate(true);
 
-	m_cObjectSnapOperator.DrawSnapItems(true);
+	int nResult = m_pcWindow->GetBaseView()->OnMouseWheel(cInEvent);
+
+	m_cObjectSnapOperator.DrawSnapItems();
+
+	m_pcWindow->GetBaseView()->SetSuppressUpdate(false);
+
+	m_pcWindow->GetBaseView()->Update();
 
 	return nResult;
-}
-
-int H3DF::Operator::CameraSelect::HOpCameraOrbit_OnLButtonDownAndMove(HEventInfo & event)
-{
-	HPoint first_point, new_point, axis, vtmp, m_real_new;
-	float theta, dist, tmp, vl;
-
-	if (!OperatorStarted()) return HBaseOperator::OnLButtonDownAndMove(event);
-
-	m_bSingleClick = false;
-	GetView()->SetViewMode(HViewUnknown);
-	m_pcWindow->GetBaseView()->SetViewDirection(H3DF::ViewDirection::Mode::Unknown);
-
-	// read mouse position
-	SetNewPoint(event.GetMouseWindowPos());
-
-	// remember the real mouse positions
-	m_real_new.x = GetNewPoint().x;
-	m_real_new.y = GetNewPoint().y;
-
-	// map screen mouse points to sphere mouse points
-	tmp = GetNewPoint().x * GetNewPoint().x + GetNewPoint().y * GetNewPoint().y;
-	vl = (float)sqrt(tmp);
-
-	new_point = GetNewPoint();
-	if (vl > 1.0f)
-	{
-		new_point.x /= vl;
-		new_point.y /= vl;
-		new_point.z = 0.0;
-	}
-	else {
-		new_point.z = (float)sqrt(1.0f - tmp);
-	}
-	SetNewPoint(new_point);
-
-	// get the axis of rotation
-	first_point = GetFirstPoint();
-	HC_Compute_Cross_Product(&first_point, &new_point, &axis);
-
-	// this is for screen mouse based movement
-	vtmp.x = m_real_new.x - m_ptRealOld.x;
-	vtmp.y = m_real_new.y - m_ptRealOld.y;
-	dist = (float)sqrt(vtmp.x * vtmp.x + vtmp.y * vtmp.y) * 90.0f;
-
-	if ((axis.x != 0.0 || axis.y != 0.0 || axis.z != 0)) {
-
-		if (GetView()->GetHandedness() == HandednessRight)
-		{
-			axis.y *= -1;
-			axis.z *= -1;
-		}
-
-		HC_Compute_Normalized_Vector(&axis, &axis);
-
-		HC_Open_Segment_By_Key(GetView()->GetSceneKey());
-
-		// project axis of rotation onto yz plane 
-		vtmp.x = 0.0;
-		vtmp.y = axis.y;
-		vtmp.z = axis.z;
-
-		// calculate angle of x orbit
-		tmp = (float)HC_Compute_Dot_Product(&axis, &vtmp);
-		if (fabs(tmp) > 1.001f || fabs(tmp) < 0.999f)
-			theta = (float)H_ACOS(tmp);
-		else
-			theta = 0.0f;
-
-
-		if (axis.x < 0.0)
-			m_Angle2 = -theta * dist;
-		else
-			m_Angle2 = theta * dist;
-
-		// project axis of rotation onto xz plane 
-		vtmp.x = axis.x;
-		vtmp.y = 0.0;
-		vtmp.z = axis.z;
-
-		// calculate angle of y orbit
-		tmp = (float)HC_Compute_Dot_Product(&axis, &vtmp);
-		if (fabs(tmp) > 1.001f || fabs(tmp) < 0.999f)
-			theta = (float)H_ACOS(tmp);
-		else
-			theta = 0.0f;
-
-		if (axis.y < 0.0)
-			m_Angle1 = theta * dist;
-		else
-			m_Angle1 = -theta * dist;
-
-		// project axis of rotation onto xy plane 
-		vtmp.x = axis.x;
-		vtmp.y = axis.y;
-		vtmp.z = 0.0;
-
-		// calculate angle of z orbit
-		tmp = (float)HC_Compute_Dot_Product(&axis, &vtmp);
-		if (fabs(tmp) > 1.001f || fabs(tmp) < 0.999f)
-			theta = (float)H_ACOS(tmp);
-		else
-			theta = 0.0f;
-
-		if (axis.z < 0.0)
-			m_Angle3 = theta * dist;
-		else
-			m_Angle3 = -theta * dist;
-
-		HC_Orbit_Camera(m_Angle1, 0);
-		HC_Orbit_Camera(0, m_Angle2);
-		HC_Roll_Camera(m_Angle3);
-
-		HC_Close_Segment();
-
-		// update default light
-		GetView()->CameraPositionChanged();
-
-	}
-
-	// update sphere space mouse
-	SetFirstPoint(GetNewPoint());
-
-	// update screen space mouse
-	m_ptRealOld.x = m_real_new.x;
-	m_ptRealOld.y = m_real_new.y;
-
-//	GetView()->Update();
-	return HOP_OK;
-
-}
-
-int H3DF::Operator::CameraSelect::HOpCameraPan_OnLButtonDown(HEventInfo & event)
-{
-	if (GetView()->GetModel()->GetBhvBehaviorManager()->IsPlaying() && GetView()->GetModel()->GetBhvBehaviorManager()->GetCameraUpdated())
-		return HOP_OK;
-
-	if (!OperatorStarted())
-		SetOperatorStarted(true);
-
-	SetNewPoint(event.GetMouseWorldPos());
-
-	SetFirstPoint(GetNewPoint());
-
-	if (GetView()->GetModel()->GetContainsDouble())
-	{
-		m_dFirstPoint[0] = event.GetMousePixelPos().x;
-		m_dFirstPoint[1] = event.GetMousePixelPos().y;
-		m_dFirstPoint[2] = event.GetMousePixelPos().z;
-		HC_Open_Segment_By_Key(GetView()->GetSceneKey());
-		HC_DCompute_Coordinates(".", "local pixels", &m_dFirstPoint, "world", &m_dFirstPoint);
-		HC_Close_Segment();
-	}
-
-	GetView()->PrepareForCameraChange();
-
-	return HOP_OK;
-}
-
-int H3DF::Operator::CameraSelect::HOpCameraPan_OnLButtonDownAndMove(HEventInfo & event)
-{
-	if (!OperatorStarted()) {
-		return HBaseOperator::OnLButtonDownAndMove(event);
-	}
-
-	m_pcWindow->GetBaseView()->SetViewDirection(H3DF::ViewDirection::Mode::Unknown);
-
-	SetNewPoint(event.GetMouseWorldPos());
-
-	HC_Open_Segment_By_Key(GetView()->GetSceneKey());
-	bool const set_default_camera = HC_Show_Existence("camera") == 0;
-
-	if (GetView()->GetModel()->GetContainsDouble())
-	{
-		if (set_default_camera)
-			HC_DSet_Camera_Target(0, 0, 0);
-
-		double dpoint[3] = {
-			event.GetMousePixelPos().x,
-			event.GetMousePixelPos().y,
-			event.GetMousePixelPos().z
-		};
-		HC_DCompute_Coordinates(".", "local pixels", &dpoint, "world", &dpoint);
-
-		double const delta[3] = {
-			dpoint[0] - m_dFirstPoint[0],
-			dpoint[1] - m_dFirstPoint[1],
-			dpoint[2] - m_dFirstPoint[2]
-		};
-
-		double camera[3], target[3];
-		HC_DShow_Camera_Target(&target[0], &target[1], &target[2]);
-		HC_DShow_Camera_Position(&camera[0], &camera[1], &camera[2]);
-
-		HC_DSet_Camera_Target(target[0] - delta[0], target[1] - delta[1], target[2] - delta[2]);
-		HC_DSet_Camera_Position(camera[0] - delta[0], camera[1] - delta[1], camera[2] - delta[2]);
-	}
-	else
-	{
-		if (set_default_camera)
-			HC_Set_Camera_Target(0, 0, 0);
-
-		HPoint const delta(GetNewPoint() - GetFirstPoint());
-
-		HPoint camera, target;
-		HC_Show_Camera_Target(&target.x, &target.y, &target.z);
-		HC_Show_Camera_Position(&camera.x, &camera.y, &camera.z);
-
-		HC_Set_Camera_Target(target.x - delta.x, target.y - delta.y, target.z - delta.z);
-		HC_Set_Camera_Position(camera.x - delta.x, camera.y - delta.y, camera.z - delta.z);
-	}
-
-	HC_Close_Segment();
-
-	GetView()->CameraPositionChanged();
-
-	GetView()->Update();
-	return HOP_OK;
-}
-int H3DF::Operator::CameraSelect::HOpCameraPan_OnLButtonUp(HEventInfo & event)
-{
-	if (!OperatorStarted())
-		return HBaseOperator::OnLButtonDownAndMove(event);
-
-	SetOperatorStarted(false);
-	GetView()->CameraPositionChanged(true, true);
-
-	return HOP_READY;
-}
-
-
-int H3DF::Operator::CameraSelect::HBaseView_OnMouseWheel(HEventInfo & event, bool bUdpate)
-{
-	float zDelta = static_cast<float>(event.GetMouseWheelDelta() / m_pcWindow->GetBaseView()->GetMouseWheelSensitivity() / 120.0 / 8.0);
-
-	if (m_pcWindow->GetBaseView()->GetInvertMouseWheelZoom()) {
-		zDelta *= -1;
-	}
-
-	m_pcWindow->GetBaseView()->SetViewDirection(H3DF::ViewDirection::Mode::Unknown);
-
-	HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetSceneKey());
-
-	/* Save the original camera for smooth transition. */
-	HCamera orig;
-	HC_Show_Net_Camera(&orig.position, &orig.target, &orig.up_vector, &orig.field_width, &orig.field_height, orig.projection);
-
-	/* We need to fill in these values with the new camera. */
-	HCamera adjusted = orig;
-
-	if (event.Shift()) {
-		if (zDelta >= 0) {
-			adjusted.field_width *= 2.0f;
-			adjusted.field_height *= 2.0f;
-		}
-		else {
-			adjusted.field_width *= 0.5f;
-			adjusted.field_height *= 0.5f;
-		}
-	}
-	else {
-
-		if (!event.Control()) {
-			m_pcWindow->GetBaseView()->ComputeReasonableTarget(adjusted.target, event.GetMouseWindowPos(), orig.target);
-			if (streq(orig.projection, "perspective"))
-				m_pcWindow->GetBaseView()->ComputeNewField(adjusted.field_width, adjusted.field_height, adjusted.target, orig);
-			adjusted.field_width *= fabs(1 + zDelta);
-			adjusted.field_height *= fabs(1 + zDelta);
-		}
-		else {
-			HVector const to_target = orig.target - orig.position;
-			adjusted.target = orig.position + to_target * (1 - zDelta);
-			if (streq(orig.projection, "orthographic")) {
-				adjusted.field_width *= fabs(1 + zDelta);
-				adjusted.field_height *= fabs(1 + zDelta);
-			}
-		}
-
-		double	position_scale = HC_Compute_Vector_Length(&orig.position);
-		double	target_scale = HC_Compute_Vector_Length(&orig.target);
-		double	camera_scale = MAX(position_scale, target_scale);
-
-		double	diagonal_len = sqrt(pow(adjusted.field_width, 2) + pow(adjusted.field_height, 2));
-
-		/* If the camera is about to be too small... */
-		if (diagonal_len < m_pcWindow->GetBaseView()->GetZoomLimit() || diagonal_len / camera_scale < 1.0e-6) {
-			if (zDelta < 0) {
-				goto BAILOUT;
-			}
-			adjusted.field_width = orig.field_width * fabs(1 + zDelta);
-			adjusted.field_height = orig.field_height * fabs(1 + zDelta);
-			diagonal_len = sqrt(pow(adjusted.field_width, 2) + pow(adjusted.field_height, 2));
-			adjusted.target = orig.target;
-		}
-		/* If the camera is about to be too big... */
-		if (diagonal_len > fabs(MVO_SQRT_MAX_FLOAT))
-			goto BAILOUT;
-
-		/* Shift the target slightly toward the mouse pointer. */
-		HVector mwp = event.GetMouseWorldPos();
-		HUtility::AdjustPositionToPlane(m_pcWindow->GetBaseView(), mwp, adjusted.target);
-		adjusted.target += (adjusted.target - mwp) * zDelta;
-
-		HVector dir_to_position = orig.position - orig.target;
-		double	old_diagonal_len = sqrt(pow(orig.field_width, 2) + pow(orig.field_height, 2));
-		double	old_ratio = HC_Compute_Vector_Length(&dir_to_position) / old_diagonal_len;
-		HC_Compute_Normalized_Vector(&dir_to_position, &dir_to_position);
-		adjusted.position = adjusted.target + dir_to_position * static_cast<float>(old_ratio * diagonal_len);
-	}
-
-	if (valid_point(adjusted.position) &&
-		valid_point(adjusted.target) &&
-		valid_point(adjusted.up_vector) &&
-		valid_float(adjusted.field_width) &&
-		valid_float(adjusted.field_height)) {
-		if (!adjusted.position.Equal(adjusted.target, m_pcWindow->GetBaseView()->GetZoomLimit())) {
-			m_pcWindow->GetBaseView()->PrepareForCameraChange(); {
-				HC_Set_Camera_Position(adjusted.position.x, adjusted.position.y, adjusted.position.z);
-				HC_Set_Camera_Target(adjusted.target.x, adjusted.target.y, adjusted.target.z);
-				HC_Set_Camera_Field(adjusted.field_width, adjusted.field_height);
-			}m_pcWindow->GetBaseView()->CameraPositionChanged(true, false);
-
-			if (m_pcWindow->GetBaseView()->GetModel()->GetContainsDouble())
-				HC_Convert_Precision(m_pcWindow->GetBaseView()->GetSceneKey(), "double, camera");
-
-			if (true == bUdpate) {
-				m_pcWindow->Update();
-			}
-
-			if (m_pcWindow->GetBaseView()->GetHandleOperator())
-				m_pcWindow->GetBaseView()->GetHandleOperator()->OnNoButtonDownAndMove(event);
-		}
-	}
-
-BAILOUT:
-
-	HC_Close_Segment();
-
-	return HLISTENER_CONSUME_EVENT;
-}
-
-bool H3DF::Operator::CameraSelect::valid_float(float f)
-{
-	if (isinf(f) || isnan(f)) {
-		return false;
-	}
-	return true;
-}
-
-bool H3DF::Operator::CameraSelect::valid_point(HPoint const & p)
-{
-	if (valid_float(p.x) && valid_float(p.y) && valid_float(p.z)) {
-		return true;
-	}
-	return false;
 }

@@ -75,15 +75,16 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetAmbientOcclusionEnabled(bo
 	BaseView * pcBaseView = pcImpl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
-	//CAppSettings::FastAmbientStrength = 1.0f;
-	float fStrength = 5.0f;
-	bool bFast = true;
-	HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
-		CString strOption;
-		strOption.Format(L"ambient occlusion = (%s, strength = %f, quality = %s)",
-						(bInState ? L"on" : L"off"), fStrength, bFast ? L"fast" : L"nicest");
-		HC_Set_Driver_Options(Utility::ToChar(strOption));
-	} HC_Close_Segment();
+	if (nullptr != pcBaseView) {
+		float fStrength = 5.0f;
+		bool bFast = true;
+		HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
+			CString strOption;
+			strOption.Format(L"ambient occlusion = (%s, strength = %f, quality = %s)",
+				(bInState ? L"on" : L"off"), fStrength, bFast ? L"fast" : L"nicest");
+			HC_Set_Driver_Options(Utility::ToChar(strOption));
+		} HC_Close_Segment();
+	}
 
 	return *this;
 }
@@ -96,17 +97,19 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSilhouetteEdgesEnabled(boo
 	BaseView * pcBaseView = pcImpl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
-	float fFastSilhouetteTolerance = 1.0f;
-	bool bHeavyExteriorSilhouette = true;
+	if (nullptr != pcBaseView) {
+		float fFastSilhouetteTolerance = 1.0f;
+		bool bHeavyExteriorSilhouette = true;
 
-	HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
-		CString strOption;
-		strOption.Format(L"fast silhouette edges = (%s, tolerance = %f, %s heavy exterior)", 
-			(bInState ? L"on" : L"off"),
-			fFastSilhouetteTolerance,
-			(bHeavyExteriorSilhouette ? L"" : L"no"));
-		HC_Set_Driver_Options(Utility::ToChar(strOption));
-	} HC_Close_Segment();
+		HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
+			CString strOption;
+			strOption.Format(L"fast silhouette edges = (%s, tolerance = %f, %s heavy exterior)",
+				(bInState ? L"on" : L"off"),
+				fFastSilhouetteTolerance,
+				(bHeavyExteriorSilhouette ? L"" : L"no"));
+			HC_Set_Driver_Options(Utility::ToChar(strOption));
+		} HC_Close_Segment();
+	}
 
 	return *this;
 }
@@ -119,20 +122,21 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetBloomEnabled(bool bInState
 	BaseView * pcBaseView = pcImpl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
-	float fBloomStrength = 1.0f;
-	int nBloomBlur = 5;
-	bool bHeavyExteriorSilhouette = true;
-	HBloomShape eBloomShape = RadialBloom;
+	if (nullptr != pcBaseView) {
+		float fBloomStrength = 1.0f;
+		int nBloomBlur = 5;
+		HBloomShape eBloomShape = RadialBloom;
 
-	HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
-		CString strOption;
-		strOption.Format(L"bloom = (%s, strength = %f, blur = %d, shape = %s)",
-			(bInState ? L"on" : L"off"),
-			fBloomStrength,
-			nBloomBlur,
-			(eBloomShape == RadialBloom ? L"radial" : L"star"));
-		HC_Set_Driver_Options(Utility::ToChar(strOption));
-	} HC_Close_Segment();
+		HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
+			CString strOption;
+			strOption.Format(L"bloom = (%s, strength = %f, blur = %d, shape = %s)",
+				(bInState ? L"on" : L"off"),
+				fBloomStrength,
+				nBloomBlur,
+				(eBloomShape == RadialBloom ? L"radial" : L"star"));
+			HC_Set_Driver_Options(Utility::ToChar(strOption));
+		} HC_Close_Segment();
+	}
 
 	return *this;
 }
@@ -214,23 +218,25 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleShadow(bool bInState
 	BaseView * pcBaseView = pcImpl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
-	if (true == bInState) {
-		//pcBaseView->SetShadowMode((HShadowMode)H3DF::VisualEffects::ShadowMode::Hard);
-		pcBaseView->SetShadowMode((HShadowMode)H3DF::VisualEffects::ShadowMode::Soft);
-	}
-	else {
-		pcBaseView->SetShadowMode((HShadowMode)H3DF::VisualEffects::ShadowMode::None);
-	}
+	if (nullptr != pcBaseView) {
+		if (true == bInState) {
+			//pcBaseView->SetShadowMode((HShadowMode)H3DF::VisualEffects::ShadowMode::Hard);
+			pcBaseView->SetShadowMode((HShadowMode)H3DF::VisualEffects::ShadowMode::Soft);
+		}
+		else {
+			pcBaseView->SetShadowMode((HShadowMode)H3DF::VisualEffects::ShadowMode::None);
+		}
 
-	if (32 <= nInResolution && nInResolution <= 1024) {
-		pcBaseView->SetShadowResolution(nInResolution);
-	}
+		if (32 <= nInResolution && nInResolution <= 1024) {
+			pcBaseView->SetShadowResolution(nInResolution);
+		}
 
-	if (1 <= nInBlurring && nInBlurring <= 31) {
-		pcBaseView->SetShadowBlurring(nInBlurring);
-	}
+		if (1 <= nInBlurring && nInBlurring <= 31) {
+			pcBaseView->SetShadowBlurring(nInBlurring);
+		}
 
-	pcBaseView->SetShadowIgnoresTransparency(bInIgnoreTransparency);
+		pcBaseView->SetShadowIgnoresTransparency(bInIgnoreTransparency);
+	}
 
 	return *this;
 }
@@ -245,13 +251,15 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleShadowColor(RGBAColo
 	BaseView * pcBaseView = pcImpl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
-	pcBaseView->SetShadowColor(HPoint(cInColor.red, cInColor.green, cInColor.blue));
+	if (nullptr != pcBaseView) {
+		pcBaseView->SetShadowColor(HPoint(cInColor.red, cInColor.green, cInColor.blue));
 
-	if (1.0f > cInColor.alpha) {
-		char chOption[MVO_BUFFER_SIZE];
-		HC_Open_Segment_By_Key(pcBaseView->GetSceneKey()); {
-			sprintf(chOption, "simple shadow = (opacity = %f)", cInColor.alpha);
-		} HC_Close_Segment();
+		if (1.0f > cInColor.alpha) {
+			char chOption[MVO_BUFFER_SIZE];
+			HC_Open_Segment_By_Key(pcBaseView->GetSceneKey()); {
+				sprintf(chOption, "simple shadow = (opacity = %f)", cInColor.alpha);
+			} HC_Close_Segment();
+		}
 	}
 
 	return *this;
@@ -275,26 +283,81 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleReflection(bool bInS
 	BaseView * pcBaseView = pcImpl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
-	bool bBlurring = false;
-	if (1 <= nInBlurring && nInBlurring <= 31) {
-		bBlurring = true;
-	}
+	if (nullptr != pcBaseView) {
+		bool bBlurring = false;
+		if (1 <= nInBlurring && nInBlurring <= 31) {
+			bBlurring = true;
+		}
 
-	bool bAttenuate = true;
-	
-	if (true == Float::IsInfinite(fInAttenuationFarDistance)) {
-		bAttenuate = false;
-	}
+		bool bAttenuate = true;
 
-	pcBaseView->SetReflectionPlane(bInState, fInOpacity, bInFading, bAttenuate, fInAttenuationNearDistance, fInAttenuationFarDistance, bBlurring, nInBlurring);
+		if (true == Float::IsInfinite(fInAttenuationFarDistance)) {
+			bAttenuate = false;
+		}
+
+		pcBaseView->SetReflectionPlane(bInState, fInOpacity, bInFading, bAttenuate, fInAttenuationNearDistance, fInAttenuationFarDistance, bBlurring, nInBlurring);
+	}
 
 	return *this;
 }
 
 //== Unset Functions ===============================================================================
+
+VisualEffectsControl & H3DF::VisualEffectsControl::UnsetAmbientOcclusionEnabled()
+{
+	VisualEffectsControlPrivate * pcImpl = static_cast<VisualEffectsControlPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	BaseView * pcBaseView = pcImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	if (nullptr != pcBaseView) {
+		HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
+			HC_UnSet_One_Driver_Option("ambient occlusion");
+		} HC_Close_Segment();
+	}
+
+	return *this;
+}
+
+VisualEffectsControl & H3DF::VisualEffectsControl::UnsetSilhouetteEdgesEnabled()
+{
+	VisualEffectsControlPrivate * pcImpl = static_cast<VisualEffectsControlPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	BaseView * pcBaseView = pcImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	if (nullptr != pcBaseView) {
+		HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
+			HC_UnSet_One_Driver_Option("fast silhouette edges");
+		} HC_Close_Segment();
+	}
+
+	return *this;
+}
+
+VisualEffectsControl & H3DF::VisualEffectsControl::UnsetBloomEnabled()
+{
+	VisualEffectsControlPrivate * pcImpl = static_cast<VisualEffectsControlPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	BaseView * pcBaseView = pcImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	if (nullptr != pcBaseView) {
+		HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
+			HC_UnSet_One_Driver_Option("bloom");
+		} HC_Close_Segment();
+	}
+
+	return *this;
+}
+
 VisualEffectsControl & H3DF::VisualEffectsControl::UnsetAntiAliasing()
 {
-	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *)m_pcImpl;
+	VisualEffectsControlPrivate * pcImpl = static_cast<VisualEffectsControlPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 
 	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
 		HC_UnSet_One_Rendering_Option("anti-alias");
@@ -303,6 +366,113 @@ VisualEffectsControl & H3DF::VisualEffectsControl::UnsetAntiAliasing()
 	return *this;
 }
 
+VisualEffectsControl & H3DF::VisualEffectsControl::UnsetSimpleShadow()
+{
+	VisualEffectsControlPrivate * pcImpl = static_cast<VisualEffectsControlPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	BaseView * pcBaseView = pcImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	if (nullptr != pcBaseView) {
+		HC_Open_Segment_By_Key(pcBaseView->GetSceneKey()); {
+			HC_UnSet_One_Rendering_Option("simple shadow");
+		}HC_Close_Segment();
+	}
+
+	return *this;
+}
+
+//== Show Functions ================================================================================
+
+bool H3DF::VisualEffectsControl::ShowAmbientOcclusionEnabled(bool & bOutState) const
+{
+	VisualEffectsControlPrivate * pcImpl = static_cast<VisualEffectsControlPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	BaseView * pcBaseView = pcImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	if (nullptr != pcBaseView) {
+		HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
+			char chValue[MVO_BUFFER_SIZE];
+			HC_Show_One_Driver_Option("ambient occlusion", chValue);
+			if (nullptr != strstr(chValue, "on")) {
+				bOutState = true;
+			}
+			else {
+				bOutState = false;
+			}
+		} HC_Close_Segment();
+	}
+	else {
+		return false;
+	}
+
+	return true;
+}
+
+bool H3DF::VisualEffectsControl::ShowSilhouetteEdgesEnabled(bool & bOutState) const
+{
+	VisualEffectsControlPrivate * pcImpl = static_cast<VisualEffectsControlPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	BaseView * pcBaseView = pcImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	bool bStatus = false;
+
+	if (nullptr != pcBaseView) {
+		HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
+			char chValue[MVO_BUFFER_SIZE];
+			HC_Show_One_Driver_Option("fast silhouette edges", chValue);
+
+			if (0 < strlen(chValue)) {
+				bStatus = true;
+			}
+
+			if (nullptr != strstr(chValue, "on")) {
+				bOutState = true;
+			}
+			else {
+				bOutState = false;
+			}
+		} HC_Close_Segment();
+	}
+
+	return bStatus;
+}
+
+bool H3DF::VisualEffectsControl::ShowBloomEnabled(bool & bOutState) const
+{
+	VisualEffectsControlPrivate * pcImpl = static_cast<VisualEffectsControlPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	BaseView * pcBaseView = pcImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	bool bStatus = false;
+
+	if (nullptr != pcBaseView) {
+		HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
+			char chValue[MVO_BUFFER_SIZE];
+			HC_Show_One_Driver_Option("bloom", chValue);
+
+			if (0 < strlen(chValue)) {
+				bStatus = true;
+			}
+
+			if (nullptr != strstr(chValue, "on")) {
+				bOutState = true;
+			}
+			else {
+				bOutState = false;
+			}
+		} HC_Close_Segment();
+	}
+
+	return bStatus;
+}
 bool H3DF::VisualEffectsControl::ShowAntiAliasing(bool & bOutState) const
 {
 	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *)m_pcImpl;
@@ -404,110 +574,28 @@ bool H3DF::VisualEffectsControl::ShowLineAntiAliasing(bool & bOutState) const
 	return bResult;
 }
 
-//== Show Functions ================================================================================
-
 bool H3DF::VisualEffectsControl::ShowSimpleShadowColor(RGBAColor & cOutColor) const
 {
 	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	SegmentKeyPrivate * pcKeyImpl = static_cast<SegmentKeyPrivate *>(pcImpl->m_nOverrideKey.GetImpl());
-	DEBUG_VALID(pcKeyImpl);
-
-	BaseView * pcBaseView = pcKeyImpl->GetBaseView();
+	BaseView * pcBaseView = pcImpl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
 	bool bResult = false;
-	char chColorSpace[4] = { "" };
 
-	SegmentKeyPrivate::LocalOpen(pcBaseView->GetSceneKey()); {
-		HC_Open_Segment("shadows"); {
-			if (TRUE == HC_Show_Existence("color")) {
-				HC_Show_One_Color_By_Value("faces", chColorSpace, &cOutColor.red, &cOutColor.green, &cOutColor.blue);
-				bResult = true;
-			}
+	if (nullptr != pcBaseView) {
+		char chColorSpace[4] = { "" };
+
+		HC_Open_Segment_By_Key(pcBaseView->GetSceneKey()); {
+			HC_Open_Segment("shadows"); {
+				if (TRUE == HC_Show_Existence("color")) {
+					HC_Show_One_Color_By_Value("faces", chColorSpace, &cOutColor.red, &cOutColor.green, &cOutColor.blue);
+					bResult = true;
+				}
+			} HC_Close_Segment();
 		} HC_Close_Segment();
-	} SegmentKeyPrivate::LocalClose(pcBaseView->GetSceneKey());
+	}
 
 	return bResult;
-}
-
-bool H3DF::VisualEffectsControl::ShowAmbientOcclusionEnabled(bool & bOutState) const
-{
-	VisualEffectsControlPrivate * pcImpl = static_cast<VisualEffectsControlPrivate *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	BaseView * pcBaseView = pcImpl->GetBaseView();
-	DEBUG_VALID(pcBaseView);
-
-	HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
-		char chValue[MVO_BUFFER_SIZE];
-		HC_Show_One_Driver_Option("ambient occlusion", chValue);
-		if (nullptr != strstr(chValue, "on")) {
-			bOutState = true;
-		}
-		else {
-			bOutState = false;
-		}
-	} HC_Close_Segment();
-
-	return true;
-}
-
-bool H3DF::VisualEffectsControl::ShowSilhouetteEdgesEnabled(bool & bOutState) const
-{
-	VisualEffectsControlPrivate * pcImpl = static_cast<VisualEffectsControlPrivate *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	BaseView * pcBaseView = pcImpl->GetBaseView();
-	DEBUG_VALID(pcBaseView);
-
-	bool bStatus = true;
-
-	HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
-		char chValue[MVO_BUFFER_SIZE];
-		HC_Show_One_Driver_Option("fast silhouette edges", chValue);
-
-		if (0 == strlen(chValue)) {
-			bStatus = false;
-		}
-
-		if (nullptr != strstr(chValue, "on")) {
-			bOutState = true;
-		}
-		else {
-			bOutState = false;
-		}
-	} HC_Close_Segment();
-
-	return bStatus;
-}
-
-bool H3DF::VisualEffectsControl::ShowBloomEnabled(bool & bOutState) const
-{
-	VisualEffectsControlPrivate * pcImpl = static_cast<VisualEffectsControlPrivate *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	BaseView * pcBaseView = pcImpl->GetBaseView();
-	DEBUG_VALID(pcBaseView);
-
-	bool bStatus = true;
-
-	HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
-		char chValue[MVO_BUFFER_SIZE];
-		HC_Show_One_Driver_Option("bloom", chValue);
-
-		if (0 == strlen(chValue)) {
-			bStatus = false;
-		}
-
-		if (nullptr != strstr(chValue, "on")) {
-			bOutState = true;
-		}
-		else {
-			bOutState = false;
-		}
-	} HC_Close_Segment();
-
-	return bStatus;
 }
