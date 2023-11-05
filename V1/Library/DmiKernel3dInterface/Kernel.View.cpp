@@ -196,11 +196,14 @@ void KERNEL::View::SetViewControl(int nId)
 		case HOME_3D_CMD_Zoom_Object:
 		case HOME_3D_CMD_Rotate_Rotate:
 		case HOME_3D_CMD_Rotate_RotateCenter:
-		case HOME_3D_CMD_Rotate_Turntable:
 			break;
 
 		case HOME_3D_CMD_Rotate_Orbit:
 			pcImpl->m_cCanvas.GetFrontView().SetOrbitViewControl();
+			break;
+
+		case HOME_3D_CMD_Rotate_Turntable:
+			pcImpl->m_cCanvas.GetFrontView().SetOrbitTurntableViewControl();
 			break;
 	}
 }

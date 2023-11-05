@@ -78,6 +78,7 @@ namespace H3DF
 		//== View Control 관련 함수 ==================================================================
 		void SetPanViewControl();
 		void SetOrbitViewControl();
+		void SetOrbitTurntableViewControl();
 
 		View & FitWorld();
 		View & SetZoomArea();

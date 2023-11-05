@@ -351,6 +351,19 @@ void H3DF::View::SetOrbitViewControl()
 	}
 }
 
+void H3DF::View::SetOrbitTurntableViewControl()
+{
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	if (pcImpl->GetViewControlMode() != ViewControl::Mode::OrbitTurntable) {
+		pcImpl->SetViewControlMode(ViewControl::Mode::OrbitTurntable);
+	}
+	else {
+		pcImpl->SetViewControlMode(ViewControl::Mode::Multi);
+	}
+}
+
 View & H3DF::View::FitWorld()
 {
 	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);

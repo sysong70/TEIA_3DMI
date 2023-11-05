@@ -1336,13 +1336,15 @@ void H3DF::ViewPrivate::event_checker(HIC_Rendition const * nr)
 
 void H3DF::ViewPrivate::SetViewAxis()
 {
+/*
 	char text[4096];
 	HVector front, top;
-	CString strViewAxis = " 1  0  0  0  1  0  0  0  1";
+	CString strViewAxis = "1  0  0  0  1  0  0  0  1";
 	strcpy(text, Utility::ToChar(strViewAxis));
-	sscanf(text, "%f %f %f %f %f %f", &front.x, &front.y, &front.z,
-		&top.x, &top.y, &top.z);
-
+	sscanf(text, "%f %f %f %f %f %f", 
+		front.x, &front.y, &front.z, &top.x, &top.y, &top.z);
+*/
+	HVector front(1, 0, 0), top(0, 1, 0);
 	m_pcBaseView->SetViewAxis(&front, &top);
 }
 

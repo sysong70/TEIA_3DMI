@@ -10,6 +10,7 @@
 #include "NavigationCube.h"
 
 #include <HOpCameraOrbit.h>
+#include <HOpCameraOrbitTurntable.h>
 #include <HOpCameraPan.h>
 #include <HOpCameraZoomBox.h>
 
@@ -20,8 +21,14 @@ class CameraZoomBox : public HOpCameraZoomBox
 {
 public:
 	CameraZoomBox(HBaseView * view, int DoRepeat = 0, int DoCapture = 1);
-
 	int OnLButtonUp(HEventInfo & hevent) override;
+};
+
+class CameraOrbitTurntable : public HOpCameraOrbitTurntable
+{
+public:
+	CameraOrbitTurntable(HBaseView * view, int DoRepeat = 0, int DoCapture = 1);
+	int OnLButtonDownAndMove(HEventInfo & hevent) override;
 };
 
 
@@ -82,8 +89,8 @@ namespace H3DF
 			double  m_dFirstPoint[3];
 
 			HOpCameraOrbit m_cCameraOrbit;
+			CameraOrbitTurntable m_cCameraOrbitTurntable;
 			HOpCameraPan m_cCameraPan;
-			// HOpCameraZoomBox m_cCameraZoomBox;
 			CameraZoomBox m_cCameraZoomBox;
 		};
 	}

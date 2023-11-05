@@ -23,8 +23,6 @@
 #include <HOpCameraPan.h>
 #include <HBhvBehaviorManager.h>
 
-USING_3DF_NAMESPACE
-
 CameraZoomBox::CameraZoomBox(HBaseView * view, int DoRepeat, int DoCapture) :
 	HOpCameraZoomBox(view, DoRepeat, DoCapture)
 {
@@ -80,13 +78,13 @@ int CameraZoomBox::OnLButtonUp(HEventInfo & event)
 		// 		HC_Set_Heuristics ("related selection limit = 0, internal selection limit=-1");
 		// 		HC_Set_Selectability ("geometry=on");
 
-		bool anything_selected = ComputeReasonableTarget(adjusted.target, m_ptRectangle[0], m_ptRectangle[1], orig.target);
+	bool anything_selected = ComputeReasonableTarget(adjusted.target, m_ptRectangle[0], m_ptRectangle[1], orig.target);
 
 		if(anything_selected) {
 			ComputeNewField(adjusted.field_width, adjusted.field_height, m_ptRectangle[0], m_ptRectangle[1], adjusted.target);
 
 			// #Error 3DF: 아래식을 이용해서 값을 계산하면 diagonal_len이 너무 큰값이 나와서 View가 이상해짐.
-			//float diagonal_len = static_cast<float>(sqrt(pow(adjusted.field_width, 2)) + static_cast<float>(pow(adjusted.field_height, 2)));
+			//float diagonal_len = static_cast<float>(sqrt(pow(adjusted.field_width, 2)) + pow(adjusted.field_height, 2));
 			double diagonal_len = sqrt(pow(adjusted.field_width, 2) + pow(adjusted.field_height, 2));
 
 			HVector viewingVector = orig.position - orig.target;
@@ -124,7 +122,7 @@ int CameraZoomBox::OnLButtonUp(HEventInfo & event)
 						adjusted.field_width,
 						adjusted.field_height,
 						GetView());
-				}
+			}
 				else {
 					HC_Set_Camera_Position(adjusted.position.x, adjusted.position.y, adjusted.position.z);
 					HC_Set_Camera_Target(adjusted.target.x, adjusted.target.y, adjusted.target.z);
@@ -152,9 +150,43 @@ int CameraZoomBox::OnLButtonUp(HEventInfo & event)
 	//return HOP_READY;
 }
 
+CameraOrbitTurntable::CameraOrbitTurntable(HBaseView * view, int DoRepeat, int DoCapture) :
+	HOpCameraOrbitTurntable(view, DoRepeat, DoCapture)
+{
+
+}
+
+int CameraOrbitTurntable::OnLButtonDownAndMove(HEventInfo & event)
+{
+	if (!OperatorStarted())
+		return HBaseOperator::OnLButtonDownAndMove(event);
+
+	SetNewPoint(event.GetMouseWindowPos());
+
+	HPoint delta2(GetNewPoint() - GetFirstPoint());
+
+	// Z축 방향으로 회전하도록 수정함.
+	HVector fa(1, 0, 0), ta(0, 0, 1);
+
+	// 지금 구성되어 있는 방식으로는 Y축 방향으로 회전이 됨.
+	// m_pView->GetViewAxis(&fa, &ta);
+
+	RotateAroundAxis(ta, -delta2.x * 250.0f);
+
+	GetView()->CameraPositionChanged();
+	SetFirstPoint(GetNewPoint());
+
+	GetView()->Update();
+	return HOP_OK;
+}
+
+
+using namespace H3DF;
+
 H3DF::Operator::CameraSelect::CameraSelect(WindowKey * pcWindow, NavigationCube & cNaviCube, int DoRepeat, int DoCapture) :
 	HBaseOperator(pcWindow->GetBaseView(), DoRepeat, DoCapture),
 	m_cCameraOrbit(pcWindow->GetBaseView(), DoRepeat, DoCapture),
+	m_cCameraOrbitTurntable(pcWindow->GetBaseView(), DoRepeat, DoCapture),
 	m_cCameraPan(pcWindow->GetBaseView(), DoRepeat, DoCapture),
 	m_cCameraZoomBox(pcWindow->GetBaseView(), DoRepeat, DoCapture),
 	m_cObjectSnapOperator(pcWindow)
@@ -166,15 +198,6 @@ H3DF::Operator::CameraSelect::CameraSelect(WindowKey * pcWindow, NavigationCube 
 	m_nSelectPickCount = 200;
 	m_nMouseDownTickCount = 0;
 }
-
-/*
-H3DF::Operator::CameraSelect::CameraSelect(HBaseView * view, int DoRepeat, int DoCapture) :
-	HOpCameraOrbit(view, DoRepeat, DoCapture)
-{
-	m_nSelectPickCount = 200;
-	m_nMouseDownTickCount = 0;
-}
-*/
 
 H3DF::Operator::CameraSelect::~CameraSelect()
 {
@@ -212,11 +235,15 @@ int H3DF::Operator::CameraSelect::OnLButtonDown(HEventInfo & cInEvent)
 
 	switch (m_eViewControlMode)
 	{
+		case H3DF::ViewControl::Mode::OrbitTurntable:
+			return m_cCameraOrbitTurntable.OnLButtonDown(cInEvent);
+			break;
+
 		case H3DF::ViewControl::Mode::Pan:
 			return m_cCameraPan.OnLButtonDown(cInEvent);
 			break;
+
 		case H3DF::ViewControl::Mode::ZoomBox:
-			m_cCameraZoomBox.SetLightFollowsCamera(true);
 			return m_cCameraZoomBox.OnLButtonDown(cInEvent);
 			break;
 	}
@@ -236,6 +263,10 @@ int H3DF::Operator::CameraSelect::OnLButtonUp(HEventInfo & cInEvent)
 
 	switch (m_eViewControlMode)
 	{
+		case H3DF::ViewControl::Mode::OrbitTurntable:
+			return m_cCameraOrbitTurntable.OnLButtonUp(cInEvent);
+			break;
+
 		case H3DF::ViewControl::Mode::Pan:
 			return m_cCameraPan.OnLButtonUp(cInEvent);
 			break;
@@ -305,6 +336,10 @@ int H3DF::Operator::CameraSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
 
 	switch (m_eViewControlMode)
 	{
+		case H3DF::ViewControl::Mode::OrbitTurntable:
+			nResult = m_cCameraOrbitTurntable.OnLButtonDownAndMove(cInEvent);
+			break;
+			
 		case H3DF::ViewControl::Mode::Pan:
 			nResult = m_cCameraPan.OnLButtonDownAndMove(cInEvent);
 			break;

@@ -275,6 +275,7 @@ namespace H3DF
 			Multi,
 			Pan,
 			Orbit,
+			OrbitTurntable,
 			Zoom,
 			ZoomBox,
 		};
