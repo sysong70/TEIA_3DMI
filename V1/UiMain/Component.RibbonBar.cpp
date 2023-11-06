@@ -229,56 +229,72 @@ bool Component::RibbonBar::CreateCategories()
 #pragma region Home Category
 	pCategory = AddCategory(Facility::GetTitle(HOME_3D_CAT), 0, 0);
 
-	pPanel = CreatePanel(pCategory, HOME_3D_PNL_Panels);
-	pPanel->Add(CreateButton(HOME_3D_CMD_Panels_Model));
-	pPanel->Add(CreateButton(HOME_3D_CMD_Panels_View));
-	pPanel->Add(CreateButton(HOME_3D_CMD_Panels_Layer));
-	pPanel->Add(CreateButton(HOME_3D_CMD_Panels_Scene));
+	pPanel = PRESET::CreatePanel(pCategory, HOME_3D_PNL_Panels);
+	pPanel->Add(PRESET::CreateButton(HOME_3D_CMD_Panels_Model));
+	pPanel->Add(PRESET::CreateButton(HOME_3D_CMD_Panels_View));
+	pPanel->Add(PRESET::CreateButton(HOME_3D_CMD_Panels_Layer));
+	pPanel->Add(PRESET::CreateButton(HOME_3D_CMD_Panels_Scene));
 
-	pPanel = CreatePanel(pCategory, HOME_3D_PNL_Focus);
-	pPanel->Add(CreateButton(HOME_3D_CMD_Pan));
-	pPanel->Add(CreatePalette(HOME_3D_LST_Zoom, HOME_3D_CMD_Zoom_Fit, HOME_3D_CMD_Zoom_Object));
-	pPanel->Add(CreatePalette(HOME_3D_LST_Rotate, HOME_3D_CMD_Rotate_Rotate, HOME_3D_CMD_Rotate_Orbit));
+	pPanel = PRESET::CreatePanel(pCategory, HOME_3D_PNL_Focus);
+	pPanel->Add(PRESET::CreateButton(HOME_3D_CMD_Pan));
+	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_Zoom, HOME_3D_CMD_Zoom_Fit, HOME_3D_CMD_Zoom_Object));
+	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_Rotate, HOME_3D_CMD_Rotate_Rotate, HOME_3D_CMD_Rotate_Orbit));
 
-	pPanel = CreatePanel(pCategory, HOME_3D_PNL_View);
-	pPanel->Add(CreatePalette(HOME_3D_LST_ViewStyle, HOME_3D_CMD_ViewStyle_Shade, HOME_3D_CMD_ViewStyle_Tessellated, false));
-	pPanel->Add(CreatePalette(HOME_3D_LST_ViewDirection, HOME_3D_CMD_ViewDirection_Top, HOME_3D_CMD_ViewDirection_Perspective, false));
-	pPanel->Add(CreatePalette(HOME_3D_LST_Visualize, HOME_3D_CMD_Visualize_ShowAll, HOME_3D_CMD_Visualize_Toggle, false));
-	pPanel->Add(CreatePalette(HOME_3D_LST_VisualEffects, HOME_3D_CMD_VisualEffects_Shadow, HOME_3D_CMD_VisualEffects_Bloom, false));
+	pPanel = PRESET::CreatePanel(pCategory, HOME_3D_PNL_View);
+	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_ViewStyle, HOME_3D_CMD_ViewStyle_Shade, HOME_3D_CMD_ViewStyle_Tessellated, true));
+	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_ViewDirection, HOME_3D_CMD_ViewDirection_Top, HOME_3D_CMD_ViewDirection_Perspective, true));
+	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_Visualize, HOME_3D_CMD_Visualize_ShowAll, HOME_3D_CMD_Visualize_Toggle, true));
+	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_VisualEffects, HOME_3D_CMD_VisualEffects_Shadow, HOME_3D_CMD_VisualEffects_Bloom, false));
 
-	pPanel = CreatePanel(pCategory, HOME_3D_PNL_SelectAndSnap);
-	pPanel->Add(CreatePalette(HOME_3D_LST_Select, HOME_3D_CMD_Select_All, HOME_3D_CMD_Select_Axis, false));
-	pPanel->Add(CreatePalette(HOME_3D_POP_SelectionFiter, HOME_3D_CMD_SelectionFiter_Point, HOME_3D_CMD_SelectionFiter_PMI, false));
-	pPanel->Add(CreatePalette(HOME_3D_POP_ObjectSnap, HOME_3D_CMD_ObjectSnap_Point, HOME_3D_CMD_ObjectSnap_ExpandLine, false));
+	pPanel = PRESET::CreatePanel(pCategory, HOME_3D_PNL_SelectAndSnap);
+	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_Select, HOME_3D_CMD_Select_All, HOME_3D_CMD_Select_Axis, false));
+	pPanel->Add(PRESET::CreatePalette(HOME_3D_POP_SelectionFiter, HOME_3D_CMD_SelectionFiter_Point, HOME_3D_CMD_SelectionFiter_PMI, false));
+	pPanel->Add(PRESET::CreatePalette(HOME_3D_POP_ObjectSnap, HOME_3D_CMD_ObjectSnap_Point, HOME_3D_CMD_ObjectSnap_ExpandLine, false));
 
-	pPanel = CreatePanel(pCategory, HOME_3D_PNL_Window);
-	pPanel->Add(CreateButton(HOME_3D_CMD_Window_Cascade));
-	pPanel->Add(CreateButton(HOME_3D_CMD_Window_TileHorizontal));
-	pPanel->Add(CreateButton(HOME_3D_CMD_Window_TileVertical));
+	pPanel = PRESET::CreatePanel(pCategory, HOME_3D_PNL_Window);
+	pPanel->Add(PRESET::CreateButton(HOME_3D_CMD_Window_Cascade));
+	pPanel->Add(PRESET::CreateButton(HOME_3D_CMD_Window_TileHorizontal));
+	pPanel->Add(PRESET::CreateButton(HOME_3D_CMD_Window_TileVertical));
 #pragma endregion //:REGION
 
 #pragma region Measure Category
 	pCategory = AddCategory(Facility::GetTitle(MEASURE_3D_CAT), 0, 0);
 
-	pPanel = CreatePanel(pCategory, MEASURE_3D_PNL_Basic);
-	pPanel->Add(CreateButton(MEASURE_3D_CMD_Basic_Coordinate));
-	pPanel->Add(CreateButton(MEASURE_3D_CMD_Basic_Distance));
-	pPanel->Add(CreateButton(MEASURE_3D_CMD_Basic_Length));
-	pPanel->Add(CreateButton(MEASURE_3D_CMD_Basic_Radius));
-	pPanel->Add(CreateButton(MEASURE_3D_CMD_Basic_Angle));
+	pPanel = PRESET::CreatePanel(pCategory, MEASURE_3D_PNL_Basic);
+	pPanel->Add(PRESET::CreateButton(MEASURE_3D_CMD_Basic_Coordinate));
+	pPanel->Add(PRESET::CreateButton(MEASURE_3D_CMD_Basic_Distance));
+	pPanel->Add(PRESET::CreateButton(MEASURE_3D_CMD_Basic_Length));
+	pPanel->Add(PRESET::CreateButton(MEASURE_3D_CMD_Basic_Radius));
+	pPanel->Add(PRESET::CreateButton(MEASURE_3D_CMD_Basic_Angle));
 
-	pPanel = CreatePanel(pCategory, MEASURE_3D_PNL_Physical);
-	pPanel->Add(CreateButton(MEASURE_3D_CMD_Physical_BoundBox));
-	pPanel->Add(CreateButton(MEASURE_3D_CMD_Physical_Area));
-	pPanel->Add(CreateButton(MEASURE_3D_CMD_Physical_VolumnWeight));
-	pPanel->Add(CreateButton(MEASURE_3D_CMD_Physical_CenterOfGravity));
-	pPanel->Add(CreateButton(MEASURE_3D_CMD_Physical_ProjectionArea));
+	pPanel = PRESET::CreatePanel(pCategory, MEASURE_3D_PNL_Physical);
+	pPanel->Add(PRESET::CreateButton(MEASURE_3D_CMD_Physical_BoundBox));
+	pPanel->Add(PRESET::CreateButton(MEASURE_3D_CMD_Physical_Area));
+	pPanel->Add(PRESET::CreateButton(MEASURE_3D_CMD_Physical_VolumnWeight));
+	pPanel->Add(PRESET::CreateButton(MEASURE_3D_CMD_Physical_CenterOfGravity));
+	pPanel->Add(PRESET::CreateButton(MEASURE_3D_CMD_Physical_ProjectionArea));
 
-	pPanel = CreatePanel(pCategory, MEASURE_3D_PNL_Annotation);
-	pPanel->Add(CreateButton(MEASURE_3D_CMD_Annotation));
+	pPanel = PRESET::CreatePanel(pCategory, MEASURE_3D_PNL_Annotation);
+	pPanel->Add(PRESET::CreateButton(MEASURE_3D_CMD_Annotation));
 
-	pPanel = CreatePanel(pCategory, MEASURE_3D_PNL_Settings);
-	pPanel->Add(CreateButton(MEASURE_3D_CMD_Settings));
+	pPanel = PRESET::CreatePanel(pCategory, MEASURE_3D_PNL_Settings);
+	pPanel->Add(PRESET::CreateButton(MEASURE_3D_CMD_Settings));
+#pragma endregion //:REGION
+
+	//:TEST - remove ids in Command.Resource.h
+#pragma region Custom Category
+	pCategory = AddCategory(Facility::GetTitle(CUSTOM_3D_CAT), 0, 0);
+
+	pPanel = PRESET::CreatePanel(pCategory, CUSTOM_3D_PNL_Test);
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test1));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test2));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test3));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test4));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test5));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test6));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test7));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test8));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test9));
 #pragma endregion //:REGION
 
 	return true;

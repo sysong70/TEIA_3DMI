@@ -131,6 +131,17 @@
 #define TOOLBAR_3D_CMD_Option_CheckBoxes                  20129
 #define TOOLBAR_3D_CMD_Option_GridLines                   20130
 #define TOOLBAR_3D_CMD_Option_AlternateRows               20131
+#define CUSTOM_3D_CAT                                     20132
+#define CUSTOM_3D_PNL_Test                                20133
+#define CUSTOM_3D_CMD_Test1                               20134
+#define CUSTOM_3D_CMD_Test2                               20135
+#define CUSTOM_3D_CMD_Test3                               20136
+#define CUSTOM_3D_CMD_Test4                               20137
+#define CUSTOM_3D_CMD_Test5                               20138
+#define CUSTOM_3D_CMD_Test6                               20139
+#define CUSTOM_3D_CMD_Test7                               20140
+#define CUSTOM_3D_CMD_Test8                               20141
+#define CUSTOM_3D_CMD_Test9                               20142
 
-#define COMMAND_END 20132
+#define COMMAND_END 20143
 

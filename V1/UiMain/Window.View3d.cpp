@@ -63,6 +63,7 @@ BEGIN_MESSAGE_MAP(View3d, View)
 	ON_WM_TIMER()
 
 	ON_COMMAND_RANGE(COMMAND_START, COMMAND_END, OnCommand)
+	ON_UPDATE_COMMAND_UI_RANGE(COMMAND_START, COMMAND_END, OnUpdateCommand)
 	ON_MESSAGE((UINT)EUserMessage::OnSignal, OnSignal)
 END_MESSAGE_MAP()
 
@@ -186,6 +187,20 @@ void Window::View3d::OnCommand(UINT id)
 			break;
 		}
 	}
+}
+
+
+
+void Window::View3d::OnUpdateCommand(CCmdUI* pCmdUI)
+{
+	//for (auto id : m_checkedCommands) {
+	//	if (id == pCmdUI->m_nID) {
+	//		pCmdUI->SetCheck(TRUE);
+	//		return;
+	//	}
+	//}
+
+	//pCmdUI->SetCheck(FALSE);
 }
 
 

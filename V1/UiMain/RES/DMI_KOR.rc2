@@ -128,5 +128,16 @@ BEGIN
     TOOLBAR_3D_CMD_Option_CheckBoxes                  "__#__\n체크박스 표시"
     TOOLBAR_3D_CMD_Option_GridLines                   "__#__\n격자 표시"
     TOOLBAR_3D_CMD_Option_AlternateRows               "__#__\n행 교차 색상 표시"
+    CUSTOM_3D_CAT                                     "__#__\n테스트"
+    CUSTOM_3D_PNL_Test                                "__#__\n테스트"
+    CUSTOM_3D_CMD_Test1                               "__#__\n테스트1"
+    CUSTOM_3D_CMD_Test2                               "__#__\n테스트2"
+    CUSTOM_3D_CMD_Test3                               "__#__\n테스트3"
+    CUSTOM_3D_CMD_Test4                               "__#__\n테스트4"
+    CUSTOM_3D_CMD_Test5                               "__#__\n테스트5"
+    CUSTOM_3D_CMD_Test6                               "__#__\n테스트6"
+    CUSTOM_3D_CMD_Test7                               "__#__\n테스트7"
+    CUSTOM_3D_CMD_Test8                               "__#__\n테스트8"
+    CUSTOM_3D_CMD_Test9                               "__#__\n테스트9"
 END
 

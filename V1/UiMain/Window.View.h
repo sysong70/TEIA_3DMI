@@ -136,11 +136,6 @@ namespace Window
 
 		Control::TabWnd m_tabs;
 
-		Component::ModelPanel m_modelPanel;
-		Component::ViewPanel m_viewPanel;
-		Component::LayerPanel m_layerPanel;
-		Component::ScenePanel m_scenePanel;
-
 		virtual void CreatePanelTabs();
 
 	protected: // TaskBar
