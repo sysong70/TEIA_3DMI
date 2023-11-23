@@ -25,6 +25,8 @@
 #include "3DF.View.h"
 #include "Private/View.Private.h"
 
+#include "3DF.Model.h"
+
 #include "3DF/Window.h"
 #include "3DF/Segment.h"
 #include "3DF/Private/SegmentPrivate.h"
@@ -172,6 +174,7 @@ void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
 	pcViewImpl->Init(pcModel, Utility::ToChar(TheKenel.General.Display.Driver), pchName, nWindowHandle);
 
 	pcCanvasImpl->m_vpcViewArray.push_back(pcView);
+	pcCanvasImpl->m_pcFrontView = pcCanvasImpl->m_vpcViewArray.front();
 }
 
 void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cInstance)
@@ -270,6 +273,7 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cInstan
 	pcViewImpl->GetBaseView()->SetViewDirection(H3DF::ViewDirection::Mode::px_py_pz);
 
 	pcViewImpl->ViewReady();
+	// ExhaustiveUpdate() 내부에서 FoceUpdate를 여러번 호출하기 때문에, Supress 시키도록 한다.
 	pcViewImpl->GetBaseView()->ExhaustiveUpdate();
 
 	pcViewImpl->GetBaseView()->SetSuppressUpdateTick(false);
@@ -324,15 +328,25 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cInstan
 H3DF::View & H3DF::Canvas::GetFrontView() const
 {
 	CanvasPrivate * pcImpl = static_cast<CanvasPrivate *>(m_pcImpl);
-	if (nullptr == pcImpl) {
-		assert(false);
-	}
+	DEBUG_VALID(pcImpl);
+
+	DEBUG_VALID(pcImpl->m_pcFrontView);
+	return *pcImpl->m_pcFrontView;
+/*
 
 	if (pcImpl->m_vpcViewArray.empty()) {
 		assert(false);
 	}
 
-	return *pcImpl->m_vpcViewArray.front();
+	return *pcImpl->m_vpcViewArray.front();*/
+}
+
+Model & H3DF::Canvas::GetModel() const
+{
+	CanvasPrivate * pcImpl = static_cast<CanvasPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	return *pcImpl->m_pcModel;
 }
 
 void H3DF::Canvas::Update() const
@@ -360,43 +374,10 @@ void H3DF::Canvas::Update(Json::Object & cInObject, Window::UpdateType eInType, 
 	Update(cInObject);
 }
 
-
 void H3DF::Canvas::Resize(int cx, int cy)
 {
 	View & cView = GetFrontView();
 	cView.Resize(cx, cy);
-}
-
-//== Mouse 관련 함수 =============================================================================
-bool H3DF::Canvas::LButtonDown(int nFlags, int x, int y)
-{
-	return GetFrontView().LButtonDown(nFlags, x, y);
-}
-
-bool H3DF::Canvas::LButtonUp(int nFlags, int x, int y)
-{
-	return GetFrontView().LButtonUp(nFlags, x, y);
-}
-
-bool H3DF::Canvas::RButtonDown(int nFlags, int x, int y)
-{
-	return GetFrontView().RButtonDown(nFlags, x, y);
-}
-
-bool H3DF::Canvas::RButtonUp(int nFlags, int x, int y)
-{
-	return GetFrontView().RButtonUp(nFlags, x, y);
-}
-
-bool H3DF::Canvas::MouseMove(int nFlags, int x, int y)
-{
-	return GetFrontView().MouseMove(nFlags, x, y);
-}
-
-// Mouse Wheel 대응
-bool H3DF::Canvas::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop)
-{
-	return GetFrontView().MouseWheel(nFlags, zDelta, x, y, nLeft, nTop);
 }
 
 //== Keyboard 관련 함수 ==============================================================================

@@ -59,7 +59,7 @@ H3DF::View::~View()
 
 void H3DF::View::Set(View const & cInThat)
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	ViewPrivate * pcInThatImpl = (ViewPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
@@ -72,7 +72,7 @@ View const & H3DF::View::operator = (View const & cInThat)
 
 void H3DF::View::Update() const
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	if (pcImpl->GetBaseView()->GetViewActive() && !pcImpl->GetBaseView()->GetSuppressUpdate())
@@ -91,7 +91,7 @@ void H3DF::View::Update() const
 
 void H3DF::View::Update(Json::Object & cInObject) const
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	if (false == pcImpl->IsInitNavigationCube()) {
@@ -129,7 +129,7 @@ void H3DF::View::Update(Json::Object & cInObject, Window::UpdateType eInType, H3
 
 void H3DF::View::Destruct()
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
@@ -145,7 +145,7 @@ void H3DF::View::Destruct()
 
 void H3DF::View::Resize(int x, int y)
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	pcImpl->Resize(x, y);
@@ -153,34 +153,60 @@ void H3DF::View::Resize(int x, int y)
 
 SegmentKey H3DF::View::GetSegmentKey()
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
-	if (nullptr == pcImpl) { assert(false); }
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetSegmentKey();
 }
 
 SegmentKey const H3DF::View::GetSegmentKey() const
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
-	if (nullptr == pcImpl) { assert(false); }
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetSegmentKey();
 }
 
 SegmentKey H3DF::View::GetModelOverrideSegmentKey()
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
-	if (nullptr == pcImpl) { assert(false); }
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetModelKey();
 }
 
 SegmentKey const H3DF::View::GetModelOverrideSegmentKey() const
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
-	if (nullptr == pcImpl) { assert(false); }
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetModelKey();
+}
+
+Model & H3DF::View::GetAttachedModel() const
+{
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+	
+	return pcImpl->GetAttachedModel();
+}
+
+WindowKey & H3DF::View::GetWindowKey() const 
+{
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	DEBUG_VALID(pcImpl->m_pcWindow);
+
+	return *pcImpl->m_pcWindow;
+}
+
+void H3DF::View::SetSuppressUpdate(bool bInState)
+{
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->GetBaseView()->SetSuppressUpdate(bInState);
 }
 
 //== Command 관련 함수 ===========================================================================
@@ -188,7 +214,7 @@ SegmentKey const H3DF::View::GetModelOverrideSegmentKey() const
 // 명령어 취소 함수, Select된 Object도 취소됨.
 void H3DF::View::CancelCommands()
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
@@ -198,7 +224,7 @@ void H3DF::View::CancelCommands()
 
 void H3DF::View::CancelCommands() const
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
@@ -211,7 +237,7 @@ void H3DF::View::CancelCommands() const
 // 2. Left Button 처리 함수
 bool H3DF::View::LButtonDown(int nFlags, int x, int y)
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -221,7 +247,7 @@ bool H3DF::View::LButtonDown(int nFlags, int x, int y)
 
 bool H3DF::View::LButtonUp(int nFlags, int x, int y)
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -245,7 +271,7 @@ bool H3DF::View::MButtonUp(int nFlags, int x, int y)
 // 4. Right Button 처리 함수
 bool H3DF::View::RButtonUp(int nFlags, int x, int y)
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -255,7 +281,7 @@ bool H3DF::View::RButtonUp(int nFlags, int x, int y)
 
 bool H3DF::View::RButtonDown(int nFlags, int x, int y)
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -266,7 +292,7 @@ bool H3DF::View::RButtonDown(int nFlags, int x, int y)
 // 5. Mouse Move 처리 함수
 bool H3DF::View::MouseMove(int nFlags, int x, int y)
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -277,7 +303,7 @@ bool H3DF::View::MouseMove(int nFlags, int x, int y)
 // 6. Mouse Wheel 처리 함수
 bool H3DF::View::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop)
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -287,7 +313,7 @@ bool H3DF::View::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int
 
 bool H3DF::View::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -297,7 +323,7 @@ bool H3DF::View::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 bool H3DF::View::KeyboardInput(Json::Object & input)
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -307,7 +333,7 @@ bool H3DF::View::KeyboardInput(Json::Object & input)
 
 bool H3DF::View::ExecuteKeyboardSignal(int nAction, Json::Object& cInObject)
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -325,7 +351,7 @@ void H3DF::View::SetSubentitySelectLevel()
 }
 
 //== View Control 관련 함수 ==================================================================
-void H3DF::View::SetPanViewControl()
+View & H3DF::View::SetPanViewControl()
 {
 	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -336,9 +362,11 @@ void H3DF::View::SetPanViewControl()
 	else {
 		pcImpl->SetViewControlMode(ViewControl::Mode::Multi);
 	}
+
+	return *this;
 }
 
-void H3DF::View::SetOrbitViewControl()
+View & H3DF::View::SetOrbitViewControl()
 {
 	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -349,9 +377,11 @@ void H3DF::View::SetOrbitViewControl()
 	else {
 		pcImpl->SetViewControlMode(ViewControl::Mode::Multi);
 	}
+
+	return *this;
 }
 
-void H3DF::View::SetOrbitTurntableViewControl()
+View & H3DF::View::SetOrbitTurntableViewControl()
 {
 	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -362,18 +392,6 @@ void H3DF::View::SetOrbitTurntableViewControl()
 	else {
 		pcImpl->SetViewControlMode(ViewControl::Mode::Multi);
 	}
-}
-
-View & H3DF::View::FitWorld()
-{
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	pcImpl->GetBaseView()->ZoomToExtents();
-
-	Update();
-
-	pcImpl->SetViewControlMode(ViewControl::Mode::Multi);
 
 	return *this;
 }
@@ -391,6 +409,28 @@ View & H3DF::View::SetZoomArea()
 	}
 	
 	return *this;
+}
+
+View & H3DF::View::FitWorld()
+{
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->GetBaseView()->ZoomToExtents();
+
+	Update();
+
+	pcImpl->SetViewControlMode(ViewControl::Mode::Multi);
+
+	return *this;
+}
+
+ViewControl::Mode H3DF::View::GetViewControlMode()
+{
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetViewControlMode();
 }
 
 //== View Style 관련 함수 ====================================================================
@@ -497,7 +537,7 @@ void H3DF::View::SetViewDirection(ViewDirection::Mode eInMode)
 void H3DF::View::SaveHsfFile(CString strFilePathName, Canvas * pcHoopsView)
 {
 	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
+	DEBUG_VALID(pcImpl);
 
 	HIOUtilityHsf cUtilityHsf;
 
@@ -593,7 +633,7 @@ bool H3DF::View::GetSimpleReflection()
 
 void H3DF::View::LoadPointCloudFile(CString strFilePathName)
 {
-	ViewPrivate * pcImpl = (ViewPrivate *)m_pcImpl;
+	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}

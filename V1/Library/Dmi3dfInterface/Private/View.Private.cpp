@@ -4,6 +4,9 @@
 
 #include "Canvas.Private.h"
 
+#include "../3DF.Model.h"
+#include "Model.Private.h"
+
 #include <hc.h>
 #include <HTools.h>
 #include <HBaseModel.h>
@@ -76,11 +79,13 @@ H3DF::BaseView::BaseView(HBaseModel * model, const char * alias, const char * dr
 
 void H3DF::BaseView::UpdateInternal(bool antialias, bool force_update)
 {
+/*
 	if (nullptr != m_pcNaviCube) {
 		if (true == m_pcNaviCube->IsInitialized()) {
 			m_pcNaviCube->Transform();
 		}
 	}
+*/
 
 	HBaseView::UpdateInternal(antialias, force_update);
 }
@@ -602,7 +607,7 @@ void H3DF::ViewPrivate::Copy(const ViewPrivate * pcInThat)
 		size_t nSourceSize = strlen(pcInThat->m_pchName) + 1; // 널 종료 문자('\0')를 포함해서 크기 계산
 
 		// 대상 문자열에 충분한 메모리 할당
-		m_pchName = new char(nSourceSize * sizeof(char));
+		m_pchName = new char[nSourceSize * sizeof(char)];
 		if (nullptr == m_pchName) {
 			// 메모리 할당 실패 처리
 			
@@ -627,12 +632,16 @@ void H3DF::ViewPrivate::Copy(const ViewPrivate * pcInThat)
 // 1. BaseView를 초기화 하는 부분
 bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverType, const char * pchInInstanceName, H3DF::WindowHandle nInWindowHandle)
 {
+	ModelPrivate * pcModelImpl = static_cast<ModelPrivate *>(pcInModel->GetImpl());
+	DEBUG_VALID(pcModelImpl);
+
 	// HBaseView 생성
-	m_pcBaseView = new H3DF::BaseView((HBaseModel*)pcInModel,
+	m_pcBaseView = new H3DF::BaseView((HBaseModel*)pcModelImpl,
 		nullptr,											// Alias
 		pchInDriverType,									// Driver Type
 		pchInInstanceName,									// Instance name
-		reinterpret_cast<void *>(nInWindowHandle));			// Window handle
+		reinterpret_cast<void *>(nInWindowHandle),			// Window handle
+		nullptr);
 
 	if(nullptr == m_pcBaseView) {
 		return false;
@@ -847,7 +856,7 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 
 	// The state of world today with polygon handedness is
 	// 1. Since we are using display lists by default, we want this setting.
-	// 2. We will have it only on the Canvas key. If required, model could have it's own
+	// 2. We will have it only on the view key. If required, model could have it's own
 	// Rajesh B (11-Apr-2003)
 	m_pcBaseView->SetPolygonHandednessMode(HandednessLeft);
 
@@ -988,7 +997,7 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 		{
 			// NOTE: I am setting these opcode handlers here, even if it is not a stream file. Who knows if we are in a
 			// collaborative session and someone loads an hsf file - Rajesh B
-			// install our custom TK_Initial_View opcode handler so that we set the initial Canvas appropriately
+			// install our custom TK_Initial_View opcode handler so that we set the initial view appropriately
 			tk->SetPrewalkHandler(new PartviewerHSFExtras(this));
 			tk->SetOpcodeHandler(TKE_View, new PartviewerHSFExtras(this));
 
@@ -1087,7 +1096,7 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 			sprintf(chRenderingOpts, "shadow map=(on, resolution=%d, samples=%d, %s jitter, %s)",
 				ThePreset.SMResolution, ThePreset.SMSamples,
 				(ThePreset.Jitter ? "" : "no"),
-				(ThePreset.ViewDependentShadowMap ? "Canvas dependent" : "Canvas independent"));
+				(ThePreset.ViewDependentShadowMap ? "view dependent" : "view independent"));
 		}
 		else {
 			sprintf(chRenderingOpts, "no shadow map");
@@ -1132,7 +1141,7 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 
 		//Apply curve geometry options
 		char curve_opt[4096];
-		HCLOCALE(sprintf(curve_opt, "general curve = (budget = %d, continued budget = %d, maximum deviation = %f, maximum angle = %f, maximum length = %f, %s Canvas independent)",
+		HCLOCALE(sprintf(curve_opt, "general curve = (budget = %d, continued budget = %d, maximum deviation = %f, maximum angle = %f, maximum length = %f, %s view independent)",
 			ThePreset.Budget, ThePreset.ContinuedBudget, ThePreset.MaxDeviation / 10000.f,
 			ThePreset.MaxAngle / 10000.f, ThePreset.MaxLength / 10000.f, ThePreset.ViewIndependent ? "" : "no"));
 
@@ -1542,7 +1551,6 @@ bool H3DF::ViewPrivate::LButtonUp(int nFlags, int x, int y)
 	return true;
 }
 
-
 bool H3DF::ViewPrivate::RButtonDown(int nFlags, int x, int y)
 {
 	//GetBaseView()->SetDynamicHighlighting(false);
@@ -1583,6 +1591,8 @@ bool H3DF::ViewPrivate::MouseMove(int nFlags, int x, int y)
 	HEventInfo cEvent(GetBaseView());
 	cEvent.SetPoint(HE_MouseMove, x, y, MouseMapFlags(nFlags));
 
+	m_pcCameraSelect->OnMouseMove(cEvent);
+
 	/*
 		if (MK_LBUTTON & nFlags || MK_RBUTTON & nFlags) {
 			GetBaseView()->GetOperator()->OnMouseMove(cEvent);
@@ -1592,7 +1602,8 @@ bool H3DF::ViewPrivate::MouseMove(int nFlags, int x, int y)
 		}
 	*/
 
-	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnMouseMove(cEvent));
+	// Temp
+// 	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnMouseMove(cEvent));
 
 	return true;
 }

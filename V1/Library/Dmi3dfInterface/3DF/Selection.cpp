@@ -29,7 +29,7 @@
 #define		SUBENTITY_TYPE		3
 #define		REGION_TYPE			4
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
 //== SelectionOptionsKit Class =====================================================================
 H3DF::SelectionOptionsKit::SelectionOptionsKit()
@@ -1103,28 +1103,6 @@ SelectionControl & H3DF::SelectionControl::operator =(SelectionControl const & c
 	Set(cInThat);
 	return *this;
 }
-
-/*
-size_t H3DF::SelectionControl::SelectByPoint(HEventInfo & cEvent, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const
-{
-	Point cInLocation;
-	cInLocation.x = cEvent.GetMouseWindowPos().x;
-	cInLocation.y = cEvent.GetMouseWindowPos().y;
-
-	//return SelectByPoint(cInLocation, cEvent.GetFlags(), cInOptions, cOutResults);
-	return SelectByPoint(cInLocation, cInOptions, cOutResults);
-}
-
-size_t H3DF::SelectionControl::SelectByPoint(HEventInfo & cEvent, SelectionResults & cOutResults) const
-{
-	Point cInLocation;
-	cInLocation.x = cEvent.GetMouseWindowPos().x;
-	cInLocation.y = cEvent.GetMouseWindowPos().y;
-
-	SelectionOptionsKit cInOptions;
-	return SelectByPoint(cInLocation, cInOptions, cOutResults);
-}
-*/
 
 size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const
 {

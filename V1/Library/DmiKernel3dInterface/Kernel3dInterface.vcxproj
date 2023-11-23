@@ -71,7 +71,7 @@
       <PreprocessorDefinitions>_DEBUG;KERNEL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(Dmi3dfInclude);../Common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Dmi3dfInclude);../Common;../Dmi3dfInterface</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <BrowseInformation>true</BrowseInformation>
     </ClCompile>
@@ -79,8 +79,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(TargetProd)3dfInterface.lib;$(TargetProd)C3dInterface.lib;$(TargetProd)3dxInterface.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(DmiOutDir)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(TargetProd)3dfInterface.lib;$(TargetProd)C3dInterface.lib;$(TargetProd)3dxInterface.lib;$(Dmi3dfLibaray);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(Dmi3dfLibarayPath);$(DmiOutDir)</AdditionalLibraryDirectories>
       <ImportLibrary>$(DmiOutDir)\$(TargetName).lib</ImportLibrary>
       <ProgramDatabaseFile>$(DmiSymbolsDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <ProfileGuidedDatabase>$(DmiSymbolsDir)\$(TargetName).pgd</ProfileGuidedDatabase>
@@ -100,7 +100,7 @@
       <PreprocessorDefinitions>NDEBUG;KERNEL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(Dmi3dfInclude);../Common</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Dmi3dfInclude);../Common;../Dmi3dfInterface</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -109,8 +109,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(TargetProd)3dfInterface.lib;$(TargetProd)3dxInterface.lib;$(TargetProd)C3dInterface.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(DmiOutDir)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(TargetProd)3dfInterface.lib;$(TargetProd)3dxInterface.lib;$(TargetProd)C3dInterface.lib;$(Dmi3dfLibaray);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(Dmi3dfLibarayPath);$(DmiOutDir)</AdditionalLibraryDirectories>
       <ImportLibrary>$(DmiOutDir)\$(TargetName).lib</ImportLibrary>
       <ProgramDatabaseFile>$(DmiSymbolsDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <ProfileGuidedDatabase>$(DmiSymbolsDir)\$(TargetName).pgd</ProfileGuidedDatabase>
@@ -124,13 +124,21 @@
     <ClInclude Include="..\Signal\Signal.h" />
     <ClInclude Include="Kernel.Application.h" />
     <ClInclude Include="Kernel.h" />
+    <ClInclude Include="Kernel.DocView.h" />
     <ClInclude Include="Manager.h" />
     <ClInclude Include="Object.h" />
-    <ClInclude Include="Private\Kernel.ViewPrivate.h" />
+    <ClInclude Include="Operator.ObjectSnap.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="Private\Kernel.DocViewPrivate.h" />
+    <ClInclude Include="Private\Operator.ObjectSnapPrivate.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Signal.Connector.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="Kernel.View.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -142,13 +150,21 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Kernel.Application.cpp" />
     <ClCompile Include="Kernel.cpp" />
+    <ClCompile Include="Kernel.DocView.cpp" />
     <ClCompile Include="Manager.cpp" />
     <ClCompile Include="Object.cpp" />
-    <ClCompile Include="Private\Kernel.ViewPrivate.cpp" />
+    <ClCompile Include="Operator.ObjectSnap.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="Private\Kernel.DocViewPrivate.cpp" />
+    <ClCompile Include="Private\Operator.ObjectSnapPrivate.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Signal.Connector.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Kernel.View.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>

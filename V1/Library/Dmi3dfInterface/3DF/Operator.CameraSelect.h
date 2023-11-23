@@ -65,9 +65,6 @@ namespace H3DF
 			int OnNoButtonDownAndMove(HEventInfo & cInEvent) override;
 
 		protected:
-			int OnZoomBoxLButtonUp(HEventInfo & cInEvent);
-
-		protected:
 			DWORD m_nSelectPickCount;
 			DWORD m_nMouseDownTickCount;
 			HPoint m_cMouseDownPoint;

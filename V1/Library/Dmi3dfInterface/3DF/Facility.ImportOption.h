@@ -6,7 +6,7 @@ namespace H3DF
 {
 	namespace Facility
 	{
-		class ImportOption : public Base
+		class API_3DF ImportOption : public Base
 		{
 		public:
 

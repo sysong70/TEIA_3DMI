@@ -12,11 +12,11 @@ public:
 	ControlPrivate() { m_eType = Type::Key; }
 	~ControlPrivate() {}
 
-	SegmentKey m_nOverrideKey;
+	SegmentKey m_cOverrideKey;
 
 	void Copy(ControlPrivate * pcInThat)
 	{
-		m_nOverrideKey = pcInThat->m_nOverrideKey;
+		m_cOverrideKey = pcInThat->m_cOverrideKey;
 		m_eType = pcInThat->Type();
 	}
 };

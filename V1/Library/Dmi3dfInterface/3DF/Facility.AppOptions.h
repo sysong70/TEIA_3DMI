@@ -8,7 +8,7 @@ namespace H3DF
 {
 	namespace Facility
 	{
-		class AppOptions : public Base
+		class API_3DF AppOptions : public Base
 		{
 		public:
 

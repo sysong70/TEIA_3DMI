@@ -14,7 +14,7 @@ namespace H3DF
 
 
 
-        class Format
+		class API_3DF Format
         {
         private:
 
@@ -37,7 +37,7 @@ namespace H3DF
             }
         };
 
-        class FormatW
+        class API_3DF FormatW
         {
         private:
 
@@ -62,7 +62,7 @@ namespace H3DF
 
 
 
-        bool CheckOption(const char* option, ...)
+        bool API_3DF CheckOption(const char* option, ...)
         {
             if (option == nullptr) {
                 return true;

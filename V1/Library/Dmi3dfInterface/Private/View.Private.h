@@ -63,6 +63,8 @@ namespace H3DF
 		SegmentKey GetSegmentKey() { return m_cKey; }
 		SegmentKey GetModelKey() { return m_cModelKey; }
 
+		Model & GetAttachedModel() {return *m_pcModel;}
+
 		void SetWindowBackGroundColor(COLORREF nNewTopColor, COLORREF nNewBottomColor, bool bEmitMessage = true);
 
 		void InitNavigationCube(int nWidth, int nHeight);

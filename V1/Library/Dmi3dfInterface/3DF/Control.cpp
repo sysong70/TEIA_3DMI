@@ -12,7 +12,7 @@ using namespace H3DF;
 H3DF::Control::Control(HC_KEY nInKey)
 {
 	ControlPrivate * pcImpl = new ControlPrivate();
-	pcImpl->m_nOverrideKey = nInKey;
+	pcImpl->m_cOverrideKey = nInKey;
 
 	m_pcImpl = pcImpl;
 }
@@ -44,5 +44,5 @@ bool H3DF::Control::operator == (Control const & cInThat) const
 {
 	ControlPrivate * pcImpl = (ControlPrivate *)m_pcImpl;
 	ControlPrivate * pcInThatImpl = (ControlPrivate *)cInThat.m_pcImpl;
-	return (pcImpl->m_nOverrideKey == pcInThatImpl->m_nOverrideKey);
+	return (pcImpl->m_cOverrideKey == pcInThatImpl->m_cOverrideKey);
 }

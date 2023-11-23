@@ -44,6 +44,12 @@ namespace H3DF
 		SegmentKey GetModelOverrideSegmentKey();
 		SegmentKey const GetModelOverrideSegmentKey() const;
 
+		Model & GetAttachedModel() const;
+
+		WindowKey & GetWindowKey() const;
+
+		void SetSuppressUpdate(bool bInState);
+
 		//== Command 관련 함수 =======================================================================
 		void CancelCommands();
 		void CancelCommands() const;
@@ -61,6 +67,7 @@ namespace H3DF
 		bool RButtonDown(int nFlags, int x, int y);
 
 		bool MouseMove(int nFlags, int x, int y);
+		// bool LButtonDownAndMove(int nFlags, int x, int y);
 
 		bool MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop);
 
@@ -76,13 +83,14 @@ namespace H3DF
 		void SetSubentitySelectLevel();
 
 		//== View Control 관련 함수 ==================================================================
-		void SetPanViewControl();
-		void SetOrbitViewControl();
-		void SetOrbitTurntableViewControl();
-
-		View & FitWorld();
+		View & SetPanViewControl();
+		View & SetOrbitViewControl();
+		View & SetOrbitTurntableViewControl();
 		View & SetZoomArea();
+		View & FitWorld();
 
+		ViewControl::Mode GetViewControlMode();
+	
 		//== View Style 관련 함수 ====================================================================
 		void SetRenderingMode(Rendering::Mode eInMode);
 		Rendering::Mode GetRenderingMode() const;

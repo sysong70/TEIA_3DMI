@@ -48,7 +48,7 @@ namespace H3DF
 
 		VisualEffectsControl & SetSimpleShadowColor(RGBAColor const & cInColor = RGBAColor(0.0f, 0.0f, 0.0f, 1.0f));
 
-		VisualEffectsControl & SetSimpleReflection(bool bInState, float fInOpacity = 0.5f, unsigned int nInBlurring = 1, bool bInFading = false, float fInAttenuationNearDistance = 0.0f, float fInAttenuationFarDistance = Float::Infinity);
+		VisualEffectsControl & SetSimpleReflection(bool bInState, float fInOpacity = 0.5f, unsigned int nInBlurring = 1, bool bInFading = false, float fInAttenuationNearDistance = -1.0f, float fInAttenuationFarDistance = -1.0f);
 
 		//== Unset Functions =======================================================================
 		VisualEffectsControl & UnsetAmbientOcclusionEnabled();

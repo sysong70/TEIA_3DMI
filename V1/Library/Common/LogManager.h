@@ -2,14 +2,19 @@
 
 #define LOGMANAGER_MAX_COUNT	10
 
+#define LOGMANAGER_3DF_ERROR_LOG_ID		5
+
 class LogManager
 {
 public:
 	~LogManager();
 
 	static void Log(LPCWSTR mesg, ...);
+	static void Log(LPCSTR chMessage, ...);
 	static void Log(int nId, LPCWSTR mesg, ...);
+	static void Log(int nId, LPCSTR mesg, ...);
 	static void Log(int nId, int nLogLevle, LPCWSTR mesg, ...);
+	static void Log(int nId, int nLogLevle, LPCSTR mesg, ...);
 
 	static LogManager * GetInstance();
 
@@ -66,10 +71,10 @@ public:
 		~Init();
 	};
 
+	static CString GetExecuteDirectory();
 
 protected:
 	bool CreateFolder(CString strPath);
-	CString GetExecuteDirectory();
 	CString GetAppDataFolderPath();
 
 	bool CStringToChar(CString strText, char *& pchText);

@@ -82,6 +82,13 @@ public:
 	MaterialMappingControl GetMaterialMappingControl();
 	MaterialMappingControl const GetMaterialMappingControl() const;
 
+	//== Performance Control 관련 함수 ===============================================================
+	SegmentKey & SetPerformance(PerformanceKit const & cInKit);
+	SegmentKey & UnsetPerformance();
+	bool ShowPerformance(PerformanceKit & cOutKit) const;
+	PerformanceControl GetPerformanceControl();
+	PerformanceControl const GetPerformanceControl() const;
+
 	//== Select Control 관련 함수 ====================================================================
 	SelectabilityControl GetSelectabilityControl();
 	SelectabilityControl const GetSelectabilityControl() const;

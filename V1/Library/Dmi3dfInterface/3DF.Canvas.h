@@ -62,27 +62,14 @@ namespace H3DF
 
 		H3DF::View & GetFrontView() const;
 
+		Model & GetModel() const;
+
 		void Update() const;
 
 		void Update(Json::Object & cInObject) const;
 		void Update(Json::Object & cInObject, Window::UpdateType eInType, H3DF::Time dInTimeLimit = -1.0) const;
 
 		void Resize(int cx, int cy);
-
-		//== Mouse 관련 함수 =========================================================================
-	public:
-		bool LButtonUp(int nFlags, int x, int y);
-		bool LButtonDown(int nFlags, int x, int y);
-
-		// bool MButtonUp(H3DF::View * pcView, int nFlags, int x, int y);
-		// bool MButtonDown(H3DF::View * pcView, int nFlags, int x, int y);
-
-		bool RButtonUp(int nFlags, int x, int y);
-		bool RButtonDown(int nFlags, int x, int y);
-
-		bool MouseMove(int nFlags, int x, int y);
-
-		bool MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop);
 
 		//== Keyboard 관련 함수 ======================================================================
 		bool Char(UINT nChar, UINT nRepCnt, UINT nFlags);

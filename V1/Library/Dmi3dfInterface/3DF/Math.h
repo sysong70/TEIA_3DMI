@@ -606,6 +606,8 @@ public:
 	static TDF_INLINE Point_2D	Zero() { return Point_2D(0, 0); }; //-V524
 
 	Point_3D<F> LiftPoint(Point_3D<F> cOrigin, Vector_3D<F> cXAxis, Vector_3D<F> cYAxis);
+
+	void Rotate(double dAngle, Point_2D cPivot) const;
 };
 
 using Point2D = Point_2D<float>		;
@@ -642,6 +644,15 @@ Point_3D<F> Point_2D<F>::LiftPoint(Point_3D<F> cOrigin, Vector_3D<F> cXAxis, Vec
 	cLiftPoint.z = x * cXAxis.z + y * cYAxis.z + cOrigin.z;
 
 	return cLiftPoint;
+}
+
+template <typename F>
+void Point_2D<F>::Rotate(double dAngle, Point_2D<F> cPivot) const {
+	x -= cPivot.x, y -= cPivot.y;
+	double ox = x, oy = y;
+	x = ox * cos(dAngle) - oy * sin(dAngle);
+	y = ox * sin(dAngle) + oy * cos(dAngle);
+	x += cPivot.x, y += cPivot.y;
 }
 
 template <typename F>
@@ -690,7 +701,7 @@ public:
 	Vector_3D &			operator/= (F s)				{ return operator*= (1.0f / s); }
 
 	template<typename D>
-	Vector_3D const		operator* (D s) const			{ return Vector_3D (x * s, y * s, z * s); }
+	Vector_3D const		operator* (D s) const			{ return Vector_3D (F(x * s), F(y * s), F(z * s)); }
 	//Vector_3D const		operator* (double s) const		{ return Vector_3D(x * s, y * s, z * s); }
 	template<typename D>
 	Vector_3D const		operator/ (D s) const			{ return operator* ((D)1.0 / s); }
@@ -733,30 +744,6 @@ public:
 	TDF_INLINE F Magnitude () const { return Max (Abs(x), Abs(y), Abs(z)); }
 	TDF_INLINE F Manhattan () const { return Abs(x)+Abs(y)+Abs(z); }
 
-	TDF_INLINE F AngleWith(Vector_3D const & v) const { 
-		F dot = Dot(v);
-		F len = Length() * v.Length();
-		F cos_angle = dot / len;
-		return acos(cos_angle) * (F)180 / M_PI;
-	}
-
-	TDF_INLINE F CCWAngleWith(Vector_3D const & v1, Vector_3D const & v2) const {
-		F dot = v1.Dot(v2);
-		F len = v1.Length() * v2.Length();
-		F cos_angle = dot / len;
-
-		//Vector_3D<F> cross = v1.Cross(*this);
-		Vector_3D<F> cross = this->Cross(v1);
-		F dot2 = cross.Dot(v2);
-		F angle = acos(cos_angle) * (F)180 / M_PI;
-
-		if (dot2 < 0) {
-			angle = 360.0 - angle;
-		}
-
-		return angle;
-	}
-
 	TDF_INLINE F Dot (Vector_3D const & v) const { return x * v.x  +  y * v.y  +  z * v.z; }
 
 	TDF_INLINE Vector_3D Cross (Vector_3D const & v) const { 
@@ -774,13 +761,37 @@ public:
 			return Vector_3D<F>::YAxis();
 	}
 
+	TDF_INLINE F AngleWith(Vector_3D const & v) const {
+		F dot = Dot(v);
+		F len = Length() * v.Length();
+		F cos_angle = dot / len;
+		return acos(cos_angle) * (F) 180 / M_PI;
+	}
+
+	TDF_INLINE F CCWAngleWith(Vector_3D const & v1, Vector_3D const & v2) const {
+		F dot = v1.Dot(v2);
+		F len = v1.Length() * v2.Length();
+		F cos_angle = dot / len;
+
+		//Vector_3D<F> cross = v1.Cross(*this);
+		Vector_3D<F> cross = this->Cross(v1);
+		F dot2 = cross.Dot(v2);
+		F angle = acos(cos_angle) * (F) 180 / M_PI;
+
+		if (dot2 < 0) {
+			angle = 360.0 - angle;
+		}
+
+		return angle;
+	}
+
+	void Rotate(Point_3D<F> cOrigin, Vector_3D cXAxis, Vector_3D cYAxis, double Angle) const;
 
 	static TDF_INLINE Vector_3D XAxis() { return Vector_3D(1, 0, 0); };
 	static TDF_INLINE Vector_3D YAxis() { return Vector_3D(0, 1, 0); };
 	static TDF_INLINE Vector_3D ZAxis() { return Vector_3D(0, 0, 1); };
 	static TDF_INLINE Vector_3D Zero() { return Vector_3D(0, 0, 0); };
 	static TDF_INLINE Vector_3D Unit() { return Vector_3D(1, 1, 1); };
-
 };
 
 template <typename F, typename S>
@@ -850,6 +861,17 @@ template <typename F>
 TDF_INLINE	Point_2D<F> const	Point_2D<F>::operator* (Vector_2D<F> const & v) const { return Point_2D<F>(x * v.x, y * v.y); }
 template <typename F>
 TDF_INLINE	Point_2D<F> const	Point_2D<F>::operator/ (Vector_2D<F> const & v) const { return Point_2D<F>(x / v.x, y / v.y); }
+
+template <typename F>
+void Vector_3D<F>::Rotate(Point_3D<F> cOrigin, Vector_3D<F> cXAxis, Vector_3D<F> cYAxis, double Angle) const
+{
+	Point_2D<F> cPoint = this->DropPoint(cOrigin, cXAxis, cYAxis);
+	Point_2D<F> cOrigin = cOrigin.DropPoint(cOrigin, cXAxis, cYAxis);
+
+	cPoint.Rotate(Angle, cOrigin);
+
+	*this = cPoint.LiftPoint(cOrigin, cXAxis, cYAxis);
+}
 
 using Vector = Vector_3D<float>;
 using DVector = Vector_3D<double>;
@@ -1485,18 +1507,18 @@ using Vector2DArray = std::vector<H3DF::Vector2D, Allocator<H3DF::Vector2D>>;
 namespace Math
 {
 	//----- Circle 관련 함수 -----
-	bool GetCircle(WorldPointArray & cPoints, CircleKit & cCircle);
-	bool CircleFitByHyper(DPoint2DArray & cPoints, double & dCX, double & dCY, double & dRadius, double & dSigma);
+	bool API_3DF GetCircle(WorldPointArray & cPoints, CircleKit & cCircle);
+	bool API_3DF CircleFitByHyper(DPoint2DArray & cPoints, double & dCX, double & dCY, double & dRadius, double & dSigma);
 
 	//----- Line 관련 함수 -----
-	bool NormalPointWithInRange(Point cSP, Point cEP, Point cOtherPoint, Point & cNormalPoint);
-	bool NormalPointWithInRange(Point cSP, Point cEP, Point cOtherPoint, Point & cNormalPoint, double & dPrameter);
+	bool API_3DF NormalPointWithInRange(Point cSP, Point cEP, Point cOtherPoint, Point & cNormalPoint);
+	bool API_3DF NormalPointWithInRange(Point cSP, Point cEP, Point cOtherPoint, Point & cNormalPoint, double & dPrameter);
 
-	bool IntersectionPoint(Point cSP1, Point cEP1, Point cSP2, Point cEP2, Point & cIntersectionPoint);
-	bool IntersectionPointInRange(Point cSP1, Point cEP1, Point cSP2, Point cEP2, Point & cIntersectionPoint);
+	bool API_3DF IntersectionPoint(Point cSP1, Point cEP1, Point cSP2, Point cEP2, Point & cIntersectionPoint);
+	bool API_3DF IntersectionPointInRange(Point cSP1, Point cEP1, Point cSP2, Point cEP2, Point & cIntersectionPoint);
 
-	bool GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, PixelPointArray & aOutPoints);
-	bool GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, WindowPointArray & aOutPoints);
+	bool API_3DF GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, PixelPointArray & aOutPoints);
+	bool API_3DF GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, WindowPointArray & aOutPoints);
 };
 
 CLOSE_3DF_NAMESPACE

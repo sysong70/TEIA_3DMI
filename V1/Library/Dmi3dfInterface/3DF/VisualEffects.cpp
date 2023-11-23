@@ -27,9 +27,9 @@ public:
 	BaseView * GetBaseView();
 };
 
-BaseView * VisualEffectsControlPrivate ::GetBaseView()
+BaseView * VisualEffectsControlPrivate::GetBaseView()
 {
-	SegmentKeyPrivate * pcKeyImpl = static_cast<SegmentKeyPrivate *>(m_nOverrideKey.GetImpl());
+	SegmentKeyPrivate * pcKeyImpl = static_cast<SegmentKeyPrivate *>(m_cOverrideKey.GetImpl());
 	DEBUG_VALID(pcKeyImpl);
 
 	return pcKeyImpl->GetBaseView();
@@ -39,7 +39,7 @@ BaseView * VisualEffectsControlPrivate ::GetBaseView()
 H3DF::VisualEffectsControl::VisualEffectsControl(SegmentKey & cInSegmentKey)
 {
 	VisualEffectsControlPrivate * pcImpl = new VisualEffectsControlPrivate();
-	pcImpl->m_nOverrideKey = cInSegmentKey;
+	pcImpl->m_cOverrideKey = cInSegmentKey;
 
 	m_pcImpl = pcImpl;
 }
@@ -52,8 +52,8 @@ H3DF::VisualEffectsControl::VisualEffectsControl(VisualEffectsControl const & cI
 
 void H3DF::VisualEffectsControl::Set(VisualEffectsControl const & cInThat)
 {
-	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *)m_pcImpl;
-	VisualEffectsControlPrivate * pcInThatImpl = (VisualEffectsControlPrivate *)cInThat.m_pcImpl;
+	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *) m_pcImpl;
+	VisualEffectsControlPrivate * pcInThatImpl = (VisualEffectsControlPrivate *) cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -144,9 +144,9 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetBloomEnabled(bool bInState
 // Manipulates the state of anti - aliasing(text and screen).
 VisualEffectsControl & H3DF::VisualEffectsControl::SetAntiAliasing(bool bInState)
 {
-	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *)m_pcImpl;
+	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *) m_pcImpl;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
 		CString strOption;
 
 		if (true == bInState) {
@@ -158,16 +158,16 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetAntiAliasing(bool bInState
 
 		HC_Set_Rendering_Options(Utility::ToChar(strOption));
 
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
+	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }
 
 VisualEffectsControl & H3DF::VisualEffectsControl::SetTextAntiAliasing(bool bInState)
 {
-	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *)m_pcImpl;
+	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *) m_pcImpl;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
 		CString strOption;
 
 		if (true == bInState) {
@@ -179,16 +179,16 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetTextAntiAliasing(bool bInS
 
 		HC_Set_Rendering_Options(Utility::ToChar(strOption));
 
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
+	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }
 
 VisualEffectsControl & H3DF::VisualEffectsControl::SetLineAntiAliasing(bool bInState)
 {
-	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *)m_pcImpl;
+	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *) m_pcImpl;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
 		CString strOption;
 
 		if (true == bInState) {
@@ -200,7 +200,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetLineAntiAliasing(bool bInS
 
 		HC_Set_Rendering_Options(Utility::ToChar(strOption));
 
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
+	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }
@@ -221,10 +221,10 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleShadow(bool bInState
 	if (nullptr != pcBaseView) {
 		if (true == bInState) {
 			//pcBaseView->SetShadowMode((HShadowMode)H3DF::VisualEffects::ShadowMode::Hard);
-			pcBaseView->SetShadowMode((HShadowMode)H3DF::VisualEffects::ShadowMode::Soft);
+			pcBaseView->SetShadowMode((HShadowMode) H3DF::VisualEffects::ShadowMode::Soft);
 		}
 		else {
-			pcBaseView->SetShadowMode((HShadowMode)H3DF::VisualEffects::ShadowMode::None);
+			pcBaseView->SetShadowMode((HShadowMode) H3DF::VisualEffects::ShadowMode::None);
 		}
 
 		if (32 <= nInResolution && nInResolution <= 1024) {
@@ -359,9 +359,9 @@ VisualEffectsControl & H3DF::VisualEffectsControl::UnsetAntiAliasing()
 	VisualEffectsControlPrivate * pcImpl = static_cast<VisualEffectsControlPrivate *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_UnSet_One_Rendering_Option("anti-alias");
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
+	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }
@@ -475,11 +475,11 @@ bool H3DF::VisualEffectsControl::ShowBloomEnabled(bool & bOutState) const
 }
 bool H3DF::VisualEffectsControl::ShowAntiAliasing(bool & bOutState) const
 {
-	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *)m_pcImpl;
+	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *) m_pcImpl;
 
 	bool bResult = false;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
 		char chValue[MVO_BUFFER_SIZE];
 		HC_Show_One_Rendering_Option("anti-alias", chValue);
 
@@ -499,18 +499,18 @@ bool H3DF::VisualEffectsControl::ShowAntiAliasing(bool & bOutState) const
 			bResult = true;
 		}
 
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
+	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
 
 	return bResult;
 }
 
 bool H3DF::VisualEffectsControl::ShowTextAntiAliasing(bool & bOutState) const
 {
-	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *)m_pcImpl;
+	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *) m_pcImpl;
 
 	bool bResult = false;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
 		char chValue[MVO_BUFFER_SIZE];
 		HC_Show_One_Rendering_Option("anti-alias = text", chValue);
 
@@ -534,18 +534,18 @@ bool H3DF::VisualEffectsControl::ShowTextAntiAliasing(bool & bOutState) const
 			bOutState = false;
 			bResult = true;
 		}
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
+	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
 
 	return bResult;
 }
 
 bool H3DF::VisualEffectsControl::ShowLineAntiAliasing(bool & bOutState) const
 {
-	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *)m_pcImpl;
+	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *) m_pcImpl;
 
 	bool bResult = false;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
 		char chValue[MVO_BUFFER_SIZE];
 		HC_Show_One_Rendering_Option("anti-alias", chValue);
 
@@ -569,14 +569,14 @@ bool H3DF::VisualEffectsControl::ShowLineAntiAliasing(bool & bOutState) const
 			bOutState = false;
 			bResult = true;
 		}
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
+	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
 
 	return bResult;
 }
 
 bool H3DF::VisualEffectsControl::ShowSimpleShadowColor(RGBAColor & cOutColor) const
 {
-	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *)m_pcImpl;
+	VisualEffectsControlPrivate * pcImpl = (VisualEffectsControlPrivate *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	BaseView * pcBaseView = pcImpl->GetBaseView();

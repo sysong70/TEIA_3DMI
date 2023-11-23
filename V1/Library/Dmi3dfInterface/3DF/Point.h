@@ -10,7 +10,7 @@ class HPoint;
 
 namespace H3DF
 {
-	class ObjectPoint : public Point
+	class API_3DF ObjectPoint : public Point
 	{
 	public:
 		ObjectPoint(float px = 0.0f, float py = 0.0f, float pz = 0.0f) : Point(px, py, pz) {}
@@ -36,7 +36,7 @@ namespace H3DF
 
 	};
 
-	class WorldPoint : public Point
+	class API_3DF WorldPoint : public Point
 	{
 	public:
 		WorldPoint(float px = 0.0f, float py = 0.0f, float pz = 0.0f) : Point(px, py, pz) {}
@@ -62,7 +62,7 @@ namespace H3DF
 		WorldPoint(PixelPoint const & cInPoint); // Prevents implicit conversion to other points
 	};
 
-	class InnerWindowPoint : public Point
+	class API_3DF InnerWindowPoint : public Point
 	{
 	public:
 		InnerWindowPoint(float px = 0.0f, float py = 0.0f, float pz = 0.0f) : Point(px, py, pz) {}
@@ -86,7 +86,7 @@ namespace H3DF
 		InnerWindowPoint(PixelPoint const & cInPoint); // Prevents implicit conversion to other points
 	};
 
-	class WindowPoint : public Point
+	class API_3DF WindowPoint : public Point
 	{
 	public:
 		WindowPoint(float px = 0.0f, float py = 0.0f, float pz = 0.0f) : Point(px, py, pz) {}
@@ -112,7 +112,7 @@ namespace H3DF
 		WindowPoint(PixelPoint const & cInPoint); // Prevents implicit conversion to other points
 	};
 
-	class PixelPoint : public Point
+	class API_3DF PixelPoint : public Point
 	{
 	public:
 		PixelPoint(float px = 0.0f, float py = 0.0f, float pz = 0.0f) : Point(px, py, pz) {}

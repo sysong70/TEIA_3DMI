@@ -30,3 +30,4 @@ namespace KERNEL
 }
 
 extern KERNEL::Manager theKernelManager;
+

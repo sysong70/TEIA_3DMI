@@ -1067,9 +1067,9 @@ void MaterialMappingControlPrivate::SetAlpha(CString strGeometry, float fInAlpha
 	CString strColorText;
 	strColorText.Format(L"%s = (transmission = r=%f g=%f b=%f)", strGeometry, fInAlpha, fInAlpha, fInAlpha);
 
-	SegmentKeyPrivate::LocalOpen(m_nOverrideKey); {
+	SegmentKeyPrivate::LocalOpen(m_cOverrideKey); {
 		HC_Set_Color(Utility::ToChar(strColorText));
-	} SegmentKeyPrivate::LocalClose(m_nOverrideKey);
+	} SegmentKeyPrivate::LocalClose(m_cOverrideKey);
 }
 
 void MaterialMappingControlPrivate::SetColor(CString strGeometry, RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel)
@@ -1086,9 +1086,9 @@ void MaterialMappingControlPrivate::SetColor(CString strGeometry, RGBAColor cons
 		strColorText.Format(L"%s = (%s = (r=%f g=%f b=%f))", strGeometry, strColorChannel, cInRgbaColor.red, cInRgbaColor.green, cInRgbaColor.blue);
 	}
 	
-	SegmentKeyPrivate::LocalOpen(m_nOverrideKey); {
+	SegmentKeyPrivate::LocalOpen(m_cOverrideKey); {
 		HC_Set_Color(Utility::ToChar(strColorText));
-	} SegmentKeyPrivate::LocalClose(m_nOverrideKey);
+	} SegmentKeyPrivate::LocalClose(m_cOverrideKey);
 }
 
 H3DF::MaterialMappingControl::MaterialMappingControl(SegmentKey const & cInThat)
@@ -1096,7 +1096,7 @@ H3DF::MaterialMappingControl::MaterialMappingControl(SegmentKey const & cInThat)
 	MaterialMappingControlPrivate * pcImpl = new MaterialMappingControlPrivate();
 	m_pcImpl = pcImpl;
 	
-	pcImpl->m_nOverrideKey = cInThat;
+	pcImpl->m_cOverrideKey = cInThat;
 }
 
 void H3DF::MaterialMappingControl::Set(MaterialMappingControl const & cInThat)
@@ -1161,9 +1161,9 @@ MaterialMappingControl & H3DF::MaterialMappingControl::UnSetColor(CString strInT
 	MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_UnSet_One_Selectability(Utility::ToChar(strInType));
-	}SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
+	}SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }
@@ -1175,9 +1175,9 @@ void H3DF::MaterialMappingControl::InitPopulateTextures()
 
 	InitializeMagick(".");
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_Set_Visibility("image = off");
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
+	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
 }
 
 void H3DF::MaterialMappingControl::InsertPicture(UINT nIndex, UINT nPixelWidth, UINT nPixelHeight, UCHAR * pucBinaryData)
@@ -1185,10 +1185,10 @@ void H3DF::MaterialMappingControl::InsertPicture(UINT nIndex, UINT nPixelWidth, 
 	MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
 		//HC_KEY nKey = HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u, local = on", nIndex), nPixelWidth, nPixelHeight, pucBinaryData);
 		HC_KEY nKey = HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u", nIndex), nPixelWidth, nPixelHeight, pucBinaryData);
-	}SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
+	}SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
 }
 
 void H3DF::MaterialMappingControl::InsertDifaultPicture(UINT nIndex, UINT nSize, UCHAR * pucBinaryData)
@@ -1213,12 +1213,12 @@ void H3DF::MaterialMappingControl::InsertDifaultPicture(UINT nIndex, UINT nSize,
 		MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
 		if (nullptr == pcImpl) { assert(false); }
 
-		SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+		SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
 
 			//HC_KEY nKey = HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u, local = on", nIndex), width, height, &anPixels[0]);
 			HC_KEY nKey = HC_Insert_Image(0.0, 0.0, 0.0, H_FORMAT_TEXT("rgba, name = image %u", nIndex), width, height, &anPixels[0]);
 
-		} SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
+		} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
 	}
 }
 
@@ -1227,7 +1227,7 @@ void H3DF::MaterialMappingControl::SetTextureMatrix(float * pfTextureMatrix, cha
 	MaterialMappingControlPrivate * pcImpl = static_cast<MaterialMappingControlPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
 
 		HC_Compute_Matrix_Inverse(pfTextureMatrix, pfTextureMatrix);
 
@@ -1243,7 +1243,7 @@ void H3DF::MaterialMappingControl::SetTextureMatrix(float * pfTextureMatrix, cha
 		}
 		HC_Close_Segment();
 
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
+	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
 }
 
 void H3DF::MaterialMappingControl::SetDefineLocalTexture(UINT nIndex, CString strTextureOptions)
@@ -1254,9 +1254,9 @@ void H3DF::MaterialMappingControl::SetDefineLocalTexture(UINT nIndex, CString st
 	CString strText;
 	strText.Format(L"texture_%u", nIndex);
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_nOverrideKey); {
+	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_Define_Local_Texture(Utility::ToChar(strText), Utility::ToChar(strTextureOptions));
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_nOverrideKey);
+	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
 }
 
 void H3DF::MaterialMappingControl::EndPopulateTextures()

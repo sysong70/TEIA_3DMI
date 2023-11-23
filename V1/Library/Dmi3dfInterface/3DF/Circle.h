@@ -9,43 +9,54 @@
 
 #include <atlcoll.h>
 
-OPEN_3DF_NAMESPACE
-
-class API_3DF CircleKit : public Kit
+namespace H3DF
 {
-public:
-	CircleKit();
-	CircleKit(CircleKit const & cInThat);
+	class API_3DF CircleKit : public Kit
+	{
+	public:
+		CircleKit();
+		CircleKit(CircleKit const & cInThat);
 
-	void Set(CircleKit const & cInThat);
-	CircleKit const & operator=(CircleKit const & cInThat);
+		void Set(CircleKit const & cInThat);
+		CircleKit const & operator=(CircleKit const & cInThat);
 
-	H3DF::Type ObjectType() const { return H3DF::Type::CircleKit; };
+		H3DF::Type ObjectType() const { return H3DF::Type::CircleKit; };
 
-	CircleKit & SetCenter(Point const & cInCenter);
-	CircleKit & SetRadius(double dInRadius);
-	CircleKit & SetNormal(Vector const & cInNormal);
+		CircleKit & SetCenter(Point const & cInCenter);
+		CircleKit & SetRadius(double dInRadius);
+		CircleKit & SetXAxis(Vector const & cInAxis);
+		CircleKit & SetYAxis(Vector const & cInAxis);
 
-	bool ShowCenter(Point & cOutCenter) const;
-	bool ShowRadius(float & cOutRadius) const;
-	bool ShowNormal(Vector & cOutNormal) const;
-};
+		bool ShowCenter(Point & cOutCenter) const;
+		bool ShowRadius(float & cOutRadius) const;
+		bool ShowXAxis(Vector & cOutAxis) const;
+		bool ShowYAxis(Vector & cOutAxis) const;
+		bool ShowNormal(Vector & cOutNormal) const;
 
-class API_3DF CircleKey : public GeometryKey
-{
-public:
-	CircleKey();
-	explicit CircleKey(Key const & cInKey);
-	CircleKey(CircleKey const & cInThat);
+		bool ShowPoint(float fInAngle, Point & cOutPoint) const;
+	};
 
-	void Set(CircleKey const & cInThat);
-	CircleKey & operator=(CircleKey const & cInThat);
+	class API_3DF CircleKey : public GeometryKey
+	{
+	public:
+		CircleKey();
+		explicit CircleKey(Key const & cInKey);
+		CircleKey(CircleKey const & cInThat);
 
-	H3DF::Type ObjectType() const { return H3DF::Type::CircleKey; };
+		void Set(CircleKey const & cInThat);
+		CircleKey & operator=(CircleKey const & cInThat);
 
-	CircleKey & SetCenter(Point const & cInCenter);
-	CircleKey & SetRadius(double dInRadius);
-	CircleKey & SetNormal(Vector const & cInNormal);
-};
+		H3DF::Type ObjectType() const { return H3DF::Type::CircleKey; };
 
-CLOSE_3DF_NAMESPACE
+		CircleKey & SetCenter(Point const & cInCenter);
+		CircleKey & SetRadius(double dInRadius);
+		CircleKey & SetXAxis(Vector const & cInAxis);
+		CircleKey & SetYAxis(Vector const & cInAxis);
+
+		bool ShowCenter(Point & cOutCenter) const;
+		bool ShowRadius(float & cOutRadius) const;
+		bool ShowXAxis(Vector & cOutAxis) const;
+		bool ShowYAxis(Vector & cOutAxis) const;
+		bool ShowNormal(Vector & cOutNormal) const;
+	};
+}

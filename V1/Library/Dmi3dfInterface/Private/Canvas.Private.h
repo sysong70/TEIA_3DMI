@@ -17,35 +17,6 @@ namespace H3DF
 {
 	class MultiSelectManager;
 
-	class Model : public HBaseModel, public PrivateImpl
-	{
-	public:
-		Model();
-		virtual ~Model();
-
-		SegmentKey GetSegmentKey();
-
-		void SetBRepGeometry(bool brep) override;
-
-		H3DF::ModelHandedness GetModelHandedness() { return m_eModelHandedness; }
-
-		void UpdateModelHandedness();
-
-	private:
-		SegmentKey m_cSegmentKey;
-
-		ModelHandedness m_eModelHandedness;
-
-		MultiSelectManager * m_pcMultiSelectManager;
-
-		BREP_Topology * m_pcTopologyManager;
-		HIOConnector * m_pPMIConnector;
-		HIOConnector * m_pcConnector;
-
-		void * m_pcPRCAsmModelFile;
-		void (*m_pcPRCDeleteModelCallback) (void *& pPRCAsmModelFile);
-	};
-
 	class CanvasPrivate : public PrivateImpl
 	{
 	public:
@@ -59,7 +30,8 @@ namespace H3DF
 		char * m_pchName = NULL;
 		H3DF::ApplicationWindowOptionsKit m_cApplicationWindowOptionsKit;
 
-		std::vector<H3DF::View * > m_vpcViewArray;
+		std::vector<H3DF::View *> m_vpcViewArray;
+		H3DF::View * m_pcFrontView = nullptr;
 
 		H3DF::Model * m_pcModel = nullptr;
 	};

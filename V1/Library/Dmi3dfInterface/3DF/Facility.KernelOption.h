@@ -92,7 +92,7 @@ namespace H3DF
 			DisplayListGeometry,	//!< Geometry-level display lists
 			DisplayListSegment		//!< Segment-level display lists
 		};
-		class KernelOption : public Base
+		class API_3DF KernelOption : public Base
 		{
 		public:
 
@@ -328,7 +328,7 @@ namespace H3DF
 
 
 
-		class KernelPreset : public Base
+		class API_3DF KernelPreset : public Base
 		{
 		public:
 

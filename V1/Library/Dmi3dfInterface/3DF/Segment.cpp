@@ -14,6 +14,7 @@
 #include "Material.h"
 #include "MarkerAttribute.h"
 #include "LineAttribute.h"
+#include "Performance.h"
 
 #include "Camera.h"
 
@@ -133,9 +134,6 @@ CString H3DF::SegmentKey::Name() const
 
 	char chSegName[MVO_BUFFER_SIZE] = "\n";
 	HC_Show_Segment(KeyValue(), chSegName);
-
-	char chIncludeSegName[MVO_BUFFER_SIZE] = "\n";
-	HC_Show_Include_Segment(KeyValue(), chIncludeSegName);
 
 	H3DF::Utility::CharToUnicode(chSegName, strOutName);
 
@@ -552,6 +550,41 @@ SegmentKey & H3DF::SegmentKey::SetMaterialMapping(H3DF::MaterialMappingKit const
 	SegmentKeyPrivate::LocalClose(*this);
 
 	return *this;
+}
+
+//== Performance Control 관련 함수 ===================================================================
+SegmentKey & H3DF::SegmentKey::SetPerformance(PerformanceKit const & cInKit)
+{
+	PerformanceControl cPerformanceControl(*this);
+
+	Performance::DisplayLists eDisplayList;
+	if (true == cInKit.ShowDisplayLists(eDisplayList)) {
+		cPerformanceControl.SetDisplayLists(eDisplayList);
+	}
+
+	return *this;
+}
+
+SegmentKey & H3DF::SegmentKey::UnsetPerformance()
+{
+	return *this;
+}
+
+bool H3DF::SegmentKey::ShowPerformance(PerformanceKit & cOutKit) const
+{
+	return true;
+}
+
+PerformanceControl H3DF::SegmentKey::GetPerformanceControl()
+{
+	PerformanceControl cPerformanceControl(*this);
+	return cPerformanceControl;
+}
+
+PerformanceControl const H3DF::SegmentKey::GetPerformanceControl() const
+{
+	PerformanceControl cPerformanceControl(*(SegmentKey *) this);
+	return cPerformanceControl;
 }
 
 //== Control 관련 함수 ===============================================================================

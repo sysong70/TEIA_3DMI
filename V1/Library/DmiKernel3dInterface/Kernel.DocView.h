@@ -11,10 +11,10 @@ namespace KERNEL
 {
 	// Kernel View는 CDocument의 CView의 신호를 처리하는 역활을 한다.
 	// CDoucment 대응하는 함수는 없기 때문에, Kernel View에서 처리하도록 한다.
-	class API_KERNEL View : public Object
+	class API_KERNEL DocView : public Object
 	{
 	public:
-		View();
+		DocView();
 		KERNEL::Type ObjectType() const { return KERNEL::Type::View; };
 
 		void Initialize(Json::Object & cInObject, Signal::Delivery & cInstance);
@@ -28,12 +28,25 @@ namespace KERNEL
 	
 		//== Mouse 관련 함수 =========================================================================
 		void MouseSignal(Json::Object & cInObject);
+		
+		void MouseMove(int nFlag, int x, int y);
+
+		void LButtonDown(int nFlag, int x, int y);
+		void LButtonUp(int nFlag, int x, int y);
+
+		void RButtonDown(int nFlag, int x, int y);
+		void RButtonUp(int nFlag, int x, int y);
+
+		void MouseWheel(int nFlag, int x, int y, Json::Object & cInObject);
 
 		//== Keyboard 관련 함수 ======================================================================
 		void KeyboardSignal(Json::Object & cInObject);
 
 		//== View 관련 함수 ==========================================================================
 		void SetViewControl(int nId);
+
+		//== Object Snap 관련 함수 ===================================================================
+		void SetObjectSnap(int nId);
 		
 		//== Style 관련 함수 =========================================================================
 		void SetViewStyle(int nStyleId);

@@ -66,9 +66,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="..\Dmi3dxInterface\LogManager.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\Common_Define.h">
       <Filter>_Common</Filter>
     </ClInclude>
@@ -303,6 +300,18 @@
     <ClInclude Include="3DF\Private\ControlPrivate.h">
       <Filter>3DF\Control\Private</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\Performance.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF.Model.h">
+      <Filter>3DF\Sprocket</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\Model.Private.h">
+      <Filter>3DF\Sprocket\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\LogManager.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -310,9 +319,6 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Dmi3dxInterface\LogManager.cpp">
-      <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Common_Define.cpp">
       <Filter>_Common</Filter>
@@ -532,6 +538,18 @@
     </ClCompile>
     <ClCompile Include="3DF\Private\ControlPrivate.cpp">
       <Filter>3DF\Control\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Performance.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF.Model.cpp">
+      <Filter>3DF\Sprocket</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\Model.Private.cpp">
+      <Filter>3DF\Sprocket\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\LogManager.cpp">
+      <Filter>Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

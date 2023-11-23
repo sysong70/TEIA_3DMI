@@ -41,7 +41,7 @@ H3DF::ObjectPoint::ObjectPoint(WindowKey const & cInWindow, WindowPoint const & 
 H3DF::ObjectPoint::ObjectPoint(WindowKey const & cInWindow, PixelPoint const & cInPoint)
 {
 	HC_Open_Segment_By_Key(cInWindow.GetSceneKey()); {
-		HC_Compute_Coordinates(".", "outer pixels", &cInPoint, "object", this);
+		HC_Compute_Coordinates(".", "local pixels", &cInPoint, "object", this);
 	} HC_Close_Segment();
 }
 
@@ -82,7 +82,7 @@ H3DF::WorldPoint::WorldPoint(WindowKey const & cInWindow, WindowPoint const & cI
 H3DF::WorldPoint::WorldPoint(WindowKey const & cInWindow, PixelPoint const & cInPoint)
 {
 	HC_Open_Segment_By_Key(cInWindow.GetSceneKey()); {
-		HC_Compute_Coordinates(".", "outer pixels", &cInPoint, "world", this);
+		HC_Compute_Coordinates(".", "local pixels", &cInPoint, "world", this);
 	} HC_Close_Segment();
 }
 
@@ -122,7 +122,7 @@ H3DF::InnerWindowPoint::InnerWindowPoint(WindowKey const & cInWindow, WindowPoin
 H3DF::InnerWindowPoint::InnerWindowPoint(WindowKey const & cInWindow, PixelPoint const & cInPoint)
 {
 	HC_Open_Segment_By_Key(cInWindow.KeyValue()); {
-		HC_Compute_Coordinates(".", "outer pixels", &cInPoint, "local window", this);
+		HC_Compute_Coordinates(".", "local pixels", &cInPoint, "local window", this);
 	} HC_Close_Segment();
 }
 
@@ -163,7 +163,7 @@ H3DF::WindowPoint::WindowPoint(WindowKey const & cInWindow, InnerWindowPoint con
 H3DF::WindowPoint::WindowPoint(WindowKey const & cInWindow, PixelPoint const & cInPoint)
 {
 	HC_Open_Segment_By_Key(cInWindow.GetSceneKey()); {
-		HC_Compute_Coordinates(".", "outer pixels", &cInPoint, "outer window", this);
+		HC_Compute_Coordinates(".", "local pixels", &cInPoint, "outer window", this);
 	} HC_Close_Segment();
 }
 
@@ -183,28 +183,28 @@ H3DF::PixelPoint::PixelPoint(HPoint & cInPoint)
 H3DF::PixelPoint::PixelPoint(WindowKey const & cInWindow, ObjectPoint const & cInPoint)
 {
 	HC_Open_Segment_By_Key(cInWindow.GetSceneKey()); {
-		HC_Compute_Coordinates(".", "object", &cInPoint, "outer pixels", this);
+		HC_Compute_Coordinates(".", "object", &cInPoint, "local pixels", this);
 	} HC_Close_Segment();
 }
 
 H3DF::PixelPoint::PixelPoint(WindowKey const & cInWindow, WorldPoint const & cInPoint)
 {
 	HC_Open_Segment_By_Key(cInWindow.GetSceneKey()); {
-		HC_Compute_Coordinates(".", "world", &cInPoint, "outer pixels", this);
+		HC_Compute_Coordinates(".", "world", &cInPoint, "local pixels", this);
 	} HC_Close_Segment();
 }
 
 H3DF::PixelPoint::PixelPoint(WindowKey const & cInWindow, InnerWindowPoint const & cInPoint)
 {
 	HC_Open_Segment_By_Key(cInWindow.GetSceneKey()); {
-		HC_Compute_Coordinates(".", "local window", &cInPoint, "outer pixels", this);
+		HC_Compute_Coordinates(".", "local window", &cInPoint, "local pixels", this);
 	} HC_Close_Segment();
 }
 
 H3DF::PixelPoint::PixelPoint(WindowKey const & cInWindow, WindowPoint const & cInPoint)
 {
 	HC_Open_Segment_By_Key(cInWindow.GetSceneKey()); {
-		HC_Compute_Coordinates(".", "outer window", &cInPoint, "outer pixels", this);
+		HC_Compute_Coordinates(".", "outer window", &cInPoint, "local pixels", this);
 	} HC_Close_Segment();
 }
 

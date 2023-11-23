@@ -66,9 +66,6 @@
     <ClInclude Include="C3dTracer.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="LogManager.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
     <ClInclude Include="Surface\DmiSurface.h">
       <Filter>Object\Surface</Filter>
     </ClInclude>
@@ -171,6 +168,9 @@
     <ClInclude Include="..\Signal\Signal.h">
       <Filter>_Signal</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\LogManager.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -189,9 +189,6 @@
       <Filter>Object\Surface</Filter>
     </ClCompile>
     <ClCompile Include="C3dTracer.cpp">
-      <Filter>Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="LogManager.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="Surface\DmiSurface.cpp">
@@ -289,6 +286,9 @@
     </ClCompile>
     <ClCompile Include="..\Signal\Signal.cpp">
       <Filter>_Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\LogManager.cpp">
+      <Filter>Utility</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

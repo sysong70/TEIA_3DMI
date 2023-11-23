@@ -6,7 +6,7 @@
 
 OPEN_3DF_NAMESPACE
 
-class KeyPath : public Object
+class API_3DF KeyPath : public Object
 {
 public:
 	KeyPath();

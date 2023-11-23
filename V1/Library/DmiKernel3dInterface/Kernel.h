@@ -22,6 +22,28 @@ namespace KERNEL
 		View									= 0x00000004,
 	};
 
+	class OSnap
+	{
+	public:
+		enum class Type : uint32_t
+		{
+			None								= 0x00000000,	
+			EndPoint							= 0x00000001,
+			MidPoint							= 0x00000002,
+			NearPoint							= 0x00000004,
+			Center								= 0x00000008,
+			Intersection						= 0x00000010,
+			Perpendicular						= 0x00000020,
+			Quadrant							= 0x00000040,
+			OnSurface							= 0x00000080,
+			BoundaryCenter						= 0x00000100,
+			Axis								= 0x00000200,
+		};
+
+	private:
+		OSnap() = default;
+	};
+
 	class API_KERNEL Kernel
 	{
 	public:

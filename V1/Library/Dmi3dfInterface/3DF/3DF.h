@@ -69,6 +69,7 @@ namespace H3DF
 
 	class MatrixKit;
 	class CameraKit;
+	class PerformanceKit;
 
 	class WorldPoint;
 	class InnerWindowPoint;
@@ -77,6 +78,9 @@ namespace H3DF
 
 	class NamedStyleDefinition;
 	class StyleKey;
+
+	class PerformanceKit;
+	class PerformanceControl;
 
 	class SelectabilityControl;
 	class SelectionOptionsControl;
@@ -118,6 +122,15 @@ namespace H3DF
 		MarkerAttributeKit						= 0x01000039,
 		MaterialMappingKit						= 0x0100003a,
 		ApplicationWindowOptionsKit				= 0x01000042,
+		HighlightOptionsKit						= 0x01000043,
+		LinePatternParallelKit					= 0x01000044,
+		SubwindowKit							= 0x01000045,
+		PerformanceKit							= 0x01000046,
+		HiddenLineAttributeKit					= 0x01000047,
+		DrawingAttributeKit						= 0x01000048,
+		LegacyShaderKit							= 0x01000049,
+		DebuggingKit							= 0x0100004a,
+		ContourLineKit							= 0x0100004b,
 
 		Key										= 0x10000000,
 		IncludeKey								= 0x10000001,
@@ -279,6 +292,9 @@ namespace H3DF
 			Zoom,
 			ZoomBox,
 		};
+		
+	private:
+		ViewControl() = default;
 	};
 
 	class API_3DF Rendering
@@ -301,6 +317,52 @@ namespace H3DF
 
 	private:
 		Rendering() {}
+	};
+
+	class API_3DF Performance
+	{
+	public:
+		enum class DisplayLists : uint32_t
+		{
+			None,		// Display Lists will not be used for rendering the scene.
+			Geometry,	// Display Lists will be created on a per-geometry basis. If the geometry is modified, the display list will be regenerated.
+			Segment		// Display Lists will be created on a per-segment basis. If any geometry in the segment is modified, the display list will be regenerated.
+		};
+
+		// StaticModel is a technique used for improving rendering performance.
+		// This setting tells the system that the segment tree affected by the attribute will remain 'static' or unchanging.
+		// The system will create an internal, optimized segment tree which is used for rendering in lieu of the normal tree.
+		// The original segment tree is untouched and can be used normally.
+
+		// If changes are made in a part of the segment tree that is subject to the static model attribute, the internal tree will be regenerated, with a few exceptions:
+		// If geometry is deleted or edited, the internal tree will not need to be regenerated.
+		enum class StaticModel : uint32_t
+		{
+			None,				// No static model will be used, rendering will be done from the segment tree.
+			Attribute,			// An optimized segment tree will be used for rendering. The tree will be sorted by attributes.  
+			AttributeSpatial	// An optimized segment tree will be used for rendering. The tree will be sorted based on both attributes and spatial locations of objects. This is particularly useful for very large, spatially dispersed models.
+		};
+
+		// StaticConditions indicates how conditional expressions will be handled inside a StaticModel.
+		// A model segment which has no conditionals expressions, or only has expressions satisfied by conditions
+		// set within the segment should not be affected by this.
+		enum class StaticConditions : uint32_t
+		{
+			// Conditional expressions will be maintained in the static tree. The tree may be referenced from multiple places (such as view) without forcing
+			// regeneration, but the static tree will be sub-optimal
+			Independent,
+
+			// Conditional expressions will be evaluated assuming the current condition state available when the static tree is generated is the only one of interest.  The static tree will resolve
+			// any use of conditions for better performance, but changes to this state will cause it to regenerate, and a static tree used in multiple places (such as different views) 
+			// may thrash (continuously regenerate multiple times every update).
+			Single
+
+			// placeholder.  Option would generate different optimized trees at the cost of memory.
+			//Multiple		//!< An optimized segment tree will be used for rendering. The tree will be sorted based on both attributes and spatial locations of objects.  This is particularly useful for very large, spatially dispersed models.
+		};
+
+	private:
+		Performance() {}
 	};
 
 	class API_3DF VisualEffects

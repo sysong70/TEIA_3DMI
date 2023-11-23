@@ -6,7 +6,7 @@ namespace H3DF
 {
 	namespace Facility
 	{
-		class Preference : public Base
+		class API_3DF Preference : public Base
 		{
 		public:
 
@@ -29,7 +29,7 @@ namespace H3DF
 
 			struct ENVIRONMENT
 			{
-				struct GENERAL
+				struct API_3DF GENERAL
 				{
 					const char * FontName();
 					double FontSize = 9;

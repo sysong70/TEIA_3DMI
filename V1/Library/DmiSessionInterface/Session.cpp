@@ -2,13 +2,13 @@
 
 #include "Session.h"
 
-#include "../DmiKernel3dInterface/Kernel.View.h"
+#include "../DmiKernel3dInterface/Kernel.DocView.h"
 
 #include "../../UiMain/Command.Resource.h"
 
 SESSION::Session::Session()
 {
-	m_pcView = new KERNEL::View();
+	m_pcDocView = new KERNEL::DocView();
 }
 
 SESSION::Session::~Session()
@@ -23,8 +23,8 @@ int SESSION::Session::SessionId() const
 void SESSION::Session::SessionId(int nSessionId)
 {
 	m_nSessionId = nSessionId;
-	if (nullptr != m_pcView) {
-		m_pcView->ViewId(nSessionId);
+	if (nullptr != m_pcDocView) {
+		m_pcDocView->ViewId(nSessionId);
 	}
 }
 
@@ -32,41 +32,41 @@ void SESSION::Session::SessionId(int nSessionId)
 
 void SESSION::Session::ViewInitialize(Json::Object & cInObject, Signal::Delivery & cInstance)
 {
-	m_pcView->Initialize(cInObject, cInstance);
+	m_pcDocView->Initialize(cInObject, cInstance);
 }
 
 void SESSION::Session::ViewDestruct()
 {
-	m_pcView->Destruct();
+	m_pcDocView->Destruct();
 }
 
 void SESSION::Session::ViewPaint(Json::Object & cInObject)
 {
-	m_pcView->Paint(cInObject);
+	m_pcDocView->Paint(cInObject);
 }
 
 void SESSION::Session::ViewResize(Json::Object & cInObject)
 {
-	m_pcView->Resize(cInObject);
+	m_pcDocView->Resize(cInObject);
 }
 
-KERNEL::View * SESSION::Session::GetView()
+KERNEL::DocView * SESSION::Session::GetView()
 {
-	return m_pcView;
+	return m_pcDocView;
 }
 
 //== Mouse 관련 함수 =================================================================================
 
 void SESSION::Session::MouseSignal(Json::Object & cInObject)
 {
-	m_pcView->MouseSignal(cInObject);
+	m_pcDocView->MouseSignal(cInObject);
 }
 
 //== Keyboard 관련 함수 ==============================================================================
 
 void SESSION::Session::KeyboardSignal(Json::Object & cInObject)
 {
-	m_pcView->KeyboardSignal(cInObject);
+	m_pcDocView->KeyboardSignal(cInObject);
 }
 
 //== Command 관련 함수 ===============================================================================
@@ -84,7 +84,7 @@ void SESSION::Session::ExecuteCommand(Json::Object & cInObject)
 		case HOME_3D_CMD_ViewStyle_Wireframe:
 		case HOME_3D_CMD_ViewStyle_HiddenLineRemove:
 		case HOME_3D_CMD_ViewStyle_Tessellated:
-			m_pcView->SetViewStyle(nId);
+			m_pcDocView->SetViewStyle(nId);
 			break;
 	}
 
@@ -99,7 +99,7 @@ void SESSION::Session::ExecuteCommand(Json::Object & cInObject)
 		case HOME_3D_CMD_ViewDirection_Iso:
 		case HOME_3D_CMD_ViewDirection_SeIso:
 		case HOME_3D_CMD_ViewDirection_Perspective:
-			m_pcView->SetViewDirection(nId);
+			m_pcDocView->SetViewDirection(nId);
 			break;
 	}
 
@@ -110,7 +110,7 @@ void SESSION::Session::ExecuteCommand(Json::Object & cInObject)
 		case HOME_3D_CMD_VisualEffects_AmbientOcclusion:
 		case HOME_3D_CMD_VisualEffects_SilhouetteEdges:
 		case HOME_3D_CMD_VisualEffects_Bloom:
-			m_pcView->SetVisualEffects(nId);
+			m_pcDocView->SetVisualEffects(nId);
 			break;
 	}
 
@@ -124,12 +124,35 @@ void SESSION::Session::ExecuteCommand(Json::Object & cInObject)
 		case HOME_3D_CMD_Rotate_RotateCenter:
 		case HOME_3D_CMD_Rotate_Turntable:
 		case HOME_3D_CMD_Rotate_Orbit:
-			m_pcView->SetViewControl(nId);
+			m_pcDocView->SetViewControl(nId);
 			break;
 	}
+
+	// Object Snap 설정
+	switch (nId) 
+	{
+		case HOME_3D_CMD_ObjectSnap_End:
+		case HOME_3D_CMD_ObjectSnap_Mid:
+		case HOME_3D_CMD_ObjectSnap_Intersection:
+		case HOME_3D_CMD_ObjectSnap_Perpendicular:
+		case HOME_3D_CMD_ObjectSnap_Center:
+		case HOME_3D_CMD_ObjectSnap_Quadrant:
+		case HOME_3D_CMD_ObjectSnap_Near:
+		case HOME_3D_CMD_ObjectSnap_OnSurface:
+		case HOME_3D_CMD_ObjectSnap_BoundaryCenter:
+		case HOME_3D_CMD_ObjectSnap_Axis:
+		case HOME_3D_CMD_ObjectSnap_Absolute:
+		case HOME_3D_CMD_ObjectSnap_Relative:
+		case HOME_3D_CMD_ObjectSnap_ExpandLine:
+			m_pcDocView->SetObjectSnap(nId);
+			break;
+	}
+
+
+
 }
 
 void SESSION::Session::CancelCommands()
 {
-	m_pcView->CancelCommands();
+	m_pcDocView->CancelCommands();
 }

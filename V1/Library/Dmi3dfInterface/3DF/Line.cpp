@@ -292,7 +292,7 @@ bool LineKey::GetMidPoint(Point & cMP)
 			Vector cVec = aPoints[nIndex + 1] - aPoints[nIndex];
 			cVec.Normalize();
 
-			cMP = aPoints[nIndex + 1] + (cVec * (float)dDiff);
+			cMP = aPoints[nIndex] + (cVec * (float)dDiff);
 
 			return true;
 		}

@@ -6,7 +6,7 @@
 
 namespace KERNEL 
 {
-	class View;
+	class DocView;
 }
 
 namespace SESSION
@@ -26,7 +26,7 @@ namespace SESSION
 		void ViewDestruct();
 		void ViewPaint(Json::Object & cInObject);
 		void ViewResize(Json::Object & cInObject);
-		KERNEL::View * GetView();
+		KERNEL::DocView * GetView();
 
 		void MouseSignal(Json::Object & cInObject);
 		void KeyboardSignal(Json::Object & cInObject);
@@ -37,6 +37,6 @@ namespace SESSION
 	private:
 		int m_nSessionId = -1;
 
-		KERNEL::View * m_pcView = nullptr;
+		KERNEL::DocView * m_pcDocView = nullptr;
 	};
 }

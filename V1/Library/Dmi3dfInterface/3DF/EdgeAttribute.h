@@ -7,7 +7,7 @@
 
 OPEN_3DF_NAMESPACE
 
-class Edge
+class API_3DF Edge
 {
 public:
 
@@ -26,10 +26,10 @@ public:
 	};
 
 private:
-	Edge() {}
+	Edge() = default;
 };
 
-class EdgeAttributeKit : public Kit
+class API_3DF EdgeAttributeKit : public Kit
 {
 public:
 	EdgeAttributeKit();
@@ -62,7 +62,7 @@ public:
 };
 
 
-class EdgeAttributeControl : public Control
+class API_3DF EdgeAttributeControl : public Control
 {
 public:
 	EdgeAttributeControl(SegmentKey & cInSegmentKey);

@@ -272,7 +272,7 @@ int H3DF::Operator::CameraSelect::OnLButtonUp(HEventInfo & cInEvent)
 			break;
 
 		case H3DF::ViewControl::Mode::ZoomBox:
-			return OnZoomBoxLButtonUp(cInEvent);
+			return m_cCameraZoomBox.OnLButtonUp(cInEvent);
 			break;
 	}
 
@@ -300,24 +300,6 @@ int H3DF::Operator::CameraSelect::OnLButtonUp(HEventInfo & cInEvent)
 	return m_cCameraOrbit.OnLButtonUp(cInEvent);
 }
 
-// 2.1 Zoom Box L Button Up 처리
-int H3DF::Operator::CameraSelect::OnZoomBoxLButtonUp(HEventInfo & cInEvent)
-{
-	m_pcWindow->GetBaseView()->SetSuppressUpdate(true);
-
-	m_pcWindow->GetBaseView()->SetSmoothTransition(false);
-
-	int nResult = m_cCameraZoomBox.OnLButtonUp(cInEvent);
-
-	m_cObjectSnapOperator.DrawSnapItems();
-
-	m_pcWindow->GetBaseView()->SetSuppressUpdate(false);
-
-	m_pcWindow->GetBaseView()->Update();
-
-	return nResult;
-}
-
 int H3DF::Operator::CameraSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
 {
 	if (nullptr != m_pcNaviCube) {
@@ -326,7 +308,7 @@ int H3DF::Operator::CameraSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
 
 	m_pcWindow->GetBaseView()->SetSuppressUpdate(true);
 
-	m_cObjectSnapOperator.DrawSnapItems();
+	// m_cObjectSnapOperator.DrawSnapItems();
 
 // 	if (nullptr != m_pcNaviCube) {
 // 		m_pcNaviCube->Transform();
@@ -384,23 +366,13 @@ int H3DF::Operator::CameraSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 		}
 	}
 
-	m_cObjectSnapOperator.NoButtonDownAndMove(cInEvent);
-
 	return HLISTENER_PASS_EVENT;
 }
 
 //== Mouse Event 처리 ===============================================================================
 int H3DF::Operator::CameraSelect::OnMouseWheel(HEventInfo & cInEvent)
 {
-	m_pcWindow->GetBaseView()->SetSuppressUpdate(true);
-
 	int nResult = m_pcWindow->GetBaseView()->OnMouseWheel(cInEvent);
-
-	m_cObjectSnapOperator.DrawSnapItems();
-
-	m_pcWindow->GetBaseView()->SetSuppressUpdate(false);
-
-	m_pcWindow->GetBaseView()->Update();
 
 	return nResult;
 }

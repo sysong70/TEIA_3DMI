@@ -123,6 +123,7 @@
     <ClInclude Include="..\Common\Common_Define.h" />
     <ClInclude Include="..\Common\Fio.h" />
     <ClInclude Include="..\Common\Json.h" />
+    <ClInclude Include="..\Common\LogManager.h" />
     <ClInclude Include="..\Common\Path.h" />
     <ClInclude Include="..\Common\WStr.h" />
     <ClInclude Include="..\Signal\Signal.h" />
@@ -144,7 +145,6 @@
     <ClInclude Include="Convert\ConvSurface.h" />
     <ClInclude Include="Convert\ConvVertex.h" />
     <ClInclude Include="DLL.h" />
-    <ClInclude Include="LogManager.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="3DX.C3dImport.h" />
     <ClInclude Include="Dmi3dx.h" />
@@ -165,6 +165,7 @@
     <ClCompile Include="..\Common\Common_Define.cpp" />
     <ClCompile Include="..\Common\Fio.cpp" />
     <ClCompile Include="..\Common\Json.cpp" />
+    <ClCompile Include="..\Common\LogManager.cpp" />
     <ClCompile Include="..\Common\Path.cpp" />
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\Signal\Signal.cpp" />
@@ -185,7 +186,6 @@
     <ClCompile Include="Convert\ConvVertex.cpp" />
     <ClCompile Include="DLL.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="LogManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>

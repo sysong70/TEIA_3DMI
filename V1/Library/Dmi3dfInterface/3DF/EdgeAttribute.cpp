@@ -154,7 +154,7 @@ bool EdgeAttributeKit::ShowHardAngle(float & fOutAngle) const
 
 //== EdgeAttributeControl class ====================================================================
 
-class EdgeAttributeControlPrivate : public PrivateImpl
+class API_3DF EdgeAttributeControlPrivate : public PrivateImpl
 {
 public:
 	EdgeAttributeControlPrivate() { m_eType = H3DF::Type::EdgeAttributeControl; }

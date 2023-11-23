@@ -75,6 +75,7 @@ bool H3DF::Math::GetCircle(WorldPointArray & cPoints, CircleKit & cCircle)
 
 	DVector cXAxis = cVec1;
 	cXAxis.Normalize();
+
 	DVector cYAxis = cXAxis.Cross(cNormal);
 
 	DPoint cOrigin = cPoints[0];	
@@ -124,6 +125,8 @@ bool H3DF::Math::GetCircle(WorldPointArray & cPoints, CircleKit & cCircle)
 	
 	cCircle.SetCenter(cCenterPoint);
 	cCircle.SetRadius(dRadius);
+	cCircle.SetXAxis(cXAxis);
+	cCircle.SetYAxis(cYAxis);
 
 	return true;
 }
@@ -248,13 +251,13 @@ bool H3DF::Math::CircleFitByHyper(DPoint2DArray & cPoints, double & dCX, double 
 
 
 // Line 범위내에 있는 경우에만 Normal Point 값을 계산.
-bool Math::NormalPointWithInRange(Point cSP, Point cEP, Point cOtherPoint, Point & cNormalPoint)
+bool H3DF::Math::NormalPointWithInRange(Point cSP, Point cEP, Point cOtherPoint, Point & cNormalPoint)
 {
 	double dPrameter;
 	return NormalPointWithInRange(cSP, cEP, cOtherPoint, cNormalPoint, dPrameter);
 }
 
-bool Math::NormalPointWithInRange(Point cSP, Point cEP, Point cOtherPoint, Point & cNormalPoint, double & dPrameter)
+bool H3DF::Math::NormalPointWithInRange(Point cSP, Point cEP, Point cOtherPoint, Point & cNormalPoint, double & dPrameter)
 {
 	Vector w = cOtherPoint - cSP;
 	Vector v = cEP - cSP;
@@ -271,7 +274,7 @@ bool Math::NormalPointWithInRange(Point cSP, Point cEP, Point cOtherPoint, Point
 	return true;
 }
 
-bool Math::IntersectionPoint(Point cSP1, Point cEP1, Point cSP2, Point cEP2, Point & cIntersectionPoint)
+bool H3DF::Math::IntersectionPoint(Point cSP1, Point cEP1, Point cSP2, Point cEP2, Point & cIntersectionPoint)
 {
 	DVector cVec1 = cEP1 - cSP1;
 	DVector cVec2 = cEP2 - cSP2;
@@ -298,7 +301,7 @@ bool Math::IntersectionPoint(Point cSP1, Point cEP1, Point cSP2, Point cEP2, Poi
 	return true;
 }
 
-bool Math::IntersectionPointInRange(Point cSP1, Point cEP1, Point cSP2, Point cEP2, Point & cIntersectionPoint)
+bool H3DF::Math::IntersectionPointInRange(Point cSP1, Point cEP1, Point cSP2, Point cEP2, Point & cIntersectionPoint)
 {
 	DVector cVec1 = cEP1 - cSP1;
 	DVector cVec2 = cEP2 - cSP2;
@@ -360,7 +363,7 @@ bool Math::IntersectionPointInRange(Point cSP1, Point cEP1, Point cSP2, Point cE
 	return true;
 }
 
-bool Math::GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, PixelPointArray & aOutPoints)
+bool H3DF::Math::GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, PixelPointArray & aOutPoints)
 {
 	size_t nCount = aInPoints.size();
 
@@ -372,14 +375,14 @@ bool Math::GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoin
 
 	HC_Open_Segment_By_Key(cInWindow.GetSceneKey()); {
 		for (size_t nIndex = 0; nIndex < nCount; nIndex++) {
-			HC_Compute_Coordinates(".", "world", &aInPoints[nIndex], "outer pixels", &aOutPoints[nIndex]);
+			HC_Compute_Coordinates(".", "world", &aInPoints[nIndex], "local pixels", &aOutPoints[nIndex]);
 		}
 	} HC_Close_Segment();
 
 	return true;
 }
 
-bool Math::GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, WindowPointArray & aOutPoints)
+bool H3DF::Math::GetPoint(WindowKey const & cInWindow, WorldPointArray const & aInPoints, WindowPointArray & aOutPoints)
 {
 	size_t nCount = aInPoints.size();
 

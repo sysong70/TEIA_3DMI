@@ -22,7 +22,7 @@ namespace H3DF
 {
 	namespace Facility
 	{
-		class Base
+		class API_3DF Base
 		{
 		public:
 

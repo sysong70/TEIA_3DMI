@@ -2,24 +2,16 @@
 
 #include "3DF/3DF.h"
 
-#include <Json.h>
-
-#include <map>
-#include <chrono>
+#include "Sprocket.h"
 
 #include "../Signal/Signal.h"
 
-class HDB;
-
 namespace H3DF
 {
-	class API_3DF Application
+	class API_3DF Application : public Sprocket
 	{
 	public:
 		void InitInstance();
 		void ExitInstance();
-
-	protected:
-		HDB * m_pcHoopsDB = nullptr;
 	};
 };

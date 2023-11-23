@@ -5,6 +5,8 @@
 
 #include "LogManager.h"
 
+#include "Path.h"
+
 #include <ShlObj_core.h>
 #include <ctime>
 #include <io.h>
@@ -97,6 +99,23 @@ void LogManager::Log(LPCWSTR chMessage, ...)
 	LogManager::GetInstance()->WriteLog(strBuffer);
 }
 
+void LogManager::Log(LPCSTR chMessage, ...)
+{
+	if (false == m_bWriteLogFlag[m_nCurrentId]) {
+		return;
+	}
+
+	va_list cArgList;
+	va_start(cArgList, chMessage);
+
+	CStringA strBuffer;
+	strBuffer.FormatV(chMessage, cArgList);
+
+	va_end(cArgList);
+
+	LogManager::GetInstance()->WriteLog(CString(strBuffer));
+}
+
 void LogManager::Log(int nId, LPCWSTR chMessage, ...)
 {
 	va_list cArgList;
@@ -108,6 +127,19 @@ void LogManager::Log(int nId, LPCWSTR chMessage, ...)
 	va_end(cArgList);
 
 	LogManager::GetInstance()->WriteLog(nId, strBuffer);
+}
+
+void LogManager::Log(int nId, LPCSTR chMessage, ...)
+{
+	va_list cArgList;
+	va_start(cArgList, chMessage);
+
+	CStringA strBuffer;
+	strBuffer.FormatV(chMessage, cArgList);
+
+	va_end(cArgList);
+
+	LogManager::GetInstance()->WriteLog(nId, CString(strBuffer));
 }
 
 void LogManager::Log(int nId, int nLogLevle, LPCWSTR chMessage, ...)
@@ -125,6 +157,23 @@ void LogManager::Log(int nId, int nLogLevle, LPCWSTR chMessage, ...)
 	va_end(cArgList);
 
 	LogManager::GetInstance()->WriteLog(nId, strBuffer);
+}
+
+void LogManager::Log(int nId, int nLogLevle, LPCSTR chMessage, ...)
+{
+	if (0 > m_nLogLevel[nId] || m_nLogLevel[nId] < nLogLevle) {
+		return;
+	}
+
+	va_list cArgList;
+	va_start(cArgList, chMessage);
+
+	CStringA strBuffer;
+	strBuffer.FormatV(chMessage, cArgList);
+
+	va_end(cArgList);
+
+	LogManager::GetInstance()->WriteLog(nId, CString(strBuffer));
 }
 
 void LogManager::WriteLog(CString strMessage)
@@ -156,7 +205,7 @@ void LogManager::WriteLog(int nId, CString strMessage)
 
 	CString strTabText;
 	for(int nIndex = 0; nIndex < m_nTabIndex[nId]; nIndex++) {
-		strTabText += L"\t";
+		strTabText += L"   ";
 	}
 
 	if(true == m_bWriteTimeFlag[nId]) {
@@ -165,10 +214,10 @@ void LogManager::WriteLog(int nId, CString strMessage)
 			cCurTime.tm_hour, cCurTime.tm_min, cCurTime.tm_sec);
 
 		if(true == m_strLogManagerComment[nId].IsEmpty()) {
-			strBuffer.Format(L"%s%s   %s", strTabText, strTimeText, strMessage);
+			strBuffer.Format(L"%s%s  %s", strTimeText, strTabText, strMessage);
 		}
 		else {
-			strBuffer.Format(L"%s%s   %s [%s]", strTabText, strTimeText, strMessage, m_strLogManagerComment[nId]);
+			strBuffer.Format(L"%s%s  %s [%s]", strTimeText, strTabText, strMessage, m_strLogManagerComment[nId]);
 			m_strLogManagerComment[nId].Empty();
 		}
 	}
@@ -213,7 +262,8 @@ int LogManager::Open(int nId)
 	WCHAR chReturn[255];
 	ZeroMemory(chReturn, sizeof(chReturn));
 
-	if(true == m_strFilePathName[nId].IsEmpty()) {
+	// 지정된 FilePathName이 없는 경우에는 AppData 폴더에 생성한다.
+	if (true == m_strFilePathName[nId].IsEmpty()) {
 		CString strAppDataDirectory = GetAppDataFolderPath();
 		strFilePath.Format(L"%sSystemLog\\", strAppDataDirectory);
 
@@ -221,25 +271,29 @@ int LogManager::Open(int nId)
 		time_t cLocalCurrentTime = time(nullptr);
 		_localtime64_s(&cCurTime, &cLocalCurrentTime);
 
-		::CreateDirectory(strFilePath, nullptr);
-
 		CString strTimeText;
 		strTimeText.Format(L"%04d%02d%02d", cCurTime.tm_year + 1900, cCurTime.tm_mon + 1, cCurTime.tm_mday);
 
-		if(true == m_strLogFileNamePrefix[nId].IsEmpty()) {
+		if (true == m_strLogFileNamePrefix[nId].IsEmpty()) {
 			strFileName.Format(L"%s.log", strTimeText);
 		}
 		else {
-			strFileName.Format(L"%s %s.log", m_strLogFileNamePrefix[nId], strTimeText);
+			strFileName.Format(L"%s_%s.log", m_strLogFileNamePrefix[nId], strTimeText);
 		}
-
-		strFilePathName = strFilePath + strFileName;
 	}
 	else {
 		strFilePathName = m_strFilePathName[nId];
+		strFilePath = Path::GetDirectory(strFilePathName);
+		strFileName = Path::GetFileName(strFilePathName);
 	}
 
+	::CreateDirectory(strFilePath, nullptr);
+
+	strFilePathName = strFilePath + strFileName;
+
+	// 파일이 존재하는 경우 파일을 새롭게 생성한다.
 	if(true == m_bCreateFileFlag[nId]) {
+		// 경로에 있는 파일을 삭제
 		_wremove(strFilePathName);
 		m_bCreateFileFlag[nId] = false;
 	}
@@ -298,8 +352,8 @@ CString LogManager::GetExecuteDirectory()
 	TCHAR Filename[_MAX_FNAME];
 	TCHAR Ext[_MAX_EXT];
 
-	GetModuleFileName(NULL, szBuffer, sizeof(szBuffer));	// get process file name
-	_wsplitpath_s(szBuffer, Drive, Path, Filename, Ext);	// get drive, path, file, ext name
+	GetModuleFileName(NULL, szBuffer, sizeof(szBuffer)); // get process file name
+	_wsplitpath_s(szBuffer, Drive, _MAX_DRIVE, Path, _MAX_PATH, Filename, _MAX_FNAME, Ext, _MAX_EXT); // get drive, path, file, ext name
 
 	CString strFilePath;
 	strFilePath.Format(L"%s%s", Drive, Path);
