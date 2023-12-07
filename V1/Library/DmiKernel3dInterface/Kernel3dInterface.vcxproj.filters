@@ -63,7 +63,7 @@
     <ClInclude Include="Private\Kernel.DocViewPrivate.h">
       <Filter>Kernel\Private</Filter>
     </ClInclude>
-    <ClInclude Include="Operator.ObjectSnap.h">
+    <ClInclude Include="Operator.HighlightObjectSnap.h">
       <Filter>Operator</Filter>
     </ClInclude>
     <ClInclude Include="Kernel.Application.h">
@@ -81,8 +81,11 @@
     <ClInclude Include="Manager.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Private\Operator.ObjectSnapPrivate.h">
+    <ClInclude Include="Private\Operator.HighlightObjectSnapPrivate.h">
       <Filter>Operator\Private</Filter>
+    </ClInclude>
+    <ClInclude Include="Operator.SelectionFilter.h">
+      <Filter>Operator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -113,7 +116,7 @@
     <ClCompile Include="Private\Kernel.DocViewPrivate.cpp">
       <Filter>Kernel\Private</Filter>
     </ClCompile>
-    <ClCompile Include="Operator.ObjectSnap.cpp">
+    <ClCompile Include="Operator.HighlightObjectSnap.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
     <ClCompile Include="Kernel.Application.cpp">
@@ -131,8 +134,11 @@
     <ClCompile Include="Manager.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Operator.ObjectSnapPrivate.cpp">
+    <ClCompile Include="Private\Operator.HighlightObjectSnapPrivate.cpp">
       <Filter>Operator\Private</Filter>
+    </ClCompile>
+    <ClCompile Include="Operator.SelectionFilter.cpp">
+      <Filter>Operator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

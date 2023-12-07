@@ -4,7 +4,6 @@
 #include "Private/KeyPrivate.h"
 
 #include "Segment.h"
-#include "Selectability.h"
 
 #include "Line.h"
 

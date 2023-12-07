@@ -28,6 +28,8 @@
 
 #include "Common_Define.h"
 
+#include "../3DF/Selection.h"
+#include "../3DF/Highlight.h"
 #include "../3DF/SelectionSet.h"
 
 #include "../3DF/NavigationCube.h"
@@ -36,10 +38,8 @@
 
 #include "../3DF/Operator.CameraSelect.h"
 #include "../3DF/Operator.SelectArea.h"
-#include "../3DF/Operator.ObjectSnap.h"
 
 #include "../3DF/Window.h"
-#include "../3DF/Selectability.h"
 #include "../3DF/Visibility.h"
 #include "../3DF/Material.h"
 #include "../3DF/LineAttribute.h"
@@ -79,13 +79,11 @@ H3DF::BaseView::BaseView(HBaseModel * model, const char * alias, const char * dr
 
 void H3DF::BaseView::UpdateInternal(bool antialias, bool force_update)
 {
-/*
 	if (nullptr != m_pcNaviCube) {
 		if (true == m_pcNaviCube->IsInitialized()) {
 			m_pcNaviCube->Transform();
 		}
 	}
-*/
 
 	HBaseView::UpdateInternal(antialias, force_update);
 }
@@ -653,11 +651,11 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 	DEBUG_VALID(pcKeyImpl);
 	pcKeyImpl->SetBaseView(m_pcBaseView);
 
+	m_pcWindow = new WindowKey(m_pcBaseView);
+
 	// Model 설정
 	m_pcModel = pcInModel;
 	m_cModelKey = m_pcModel->GetSegmentKey();
-
-	m_pcWindow = new WindowKey(m_pcBaseView);
 
 	m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
 	m_pcBaseView->SetNavigationCube(&m_cNaviCube);
@@ -682,7 +680,8 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 	// set up some scene defaults
 	HC_Open_Segment_By_Key(m_pcBaseView->GetSceneKey()); {
 		// #Selection: Line이 더 잘보이게 하고 선택이 잘되도록 하기 위해서 Face를 뒤로 보냄
-		HC_Set_Rendering_Options("face displacement = 16"); // 양수값이 Camera에서 멀어지는 방향임.
+		//HC_Set_Rendering_Options("face displacement = 16"); // 양수값이 Camera에서 멀어지는 방향임.
+		HC_Set_Rendering_Options("face displacement = 2"); // 양수값이 Camera에서 멀어지는 방향임.
 		HC_Set_Rendering_Options("no color interpolation, color index interpolation");
 		HC_Set_Visibility("lights = (faces = on, edges = off), markers = off, faces=on, edges=off, lines=on, text = on");
 	} HC_Close_Segment();
@@ -867,20 +866,23 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeColor(cHighlightSelectColor);
 	m_pcBaseView->GetHighlightSelection()->SetSelectionMarkerColor(cHighlightSelectColor);
 
-	m_pcBaseView->GetSelection()->SetSelectionEdgeWeight(5.0);
-	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeWeight(5.0);
-
 	// #Selection: Highlighting Line, Edge 두께 설정
+
+	// 아래 부분을 삭제하면 다음에 설정된 fLineWeight를 적용할 때 Segment 오류가 발생함.
+	m_pcBaseView->GetSelection()->SetSelectionEdgeWeight(1.0);
+	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeWeight(1.0);
+
+	float fLineWeight = 2.0;
 	HC_KEY nHighlightSelectionKey = m_pcBaseView->GetHighlightSelection()->GetSelectionSegment();
 	HC_Open_Segment_By_Key(nHighlightSelectionKey); {
-		HC_Set_Line_Weight(3.0);
-		HC_Set_Edge_Weight(3.0);
+		HC_Set_Line_Weight(fLineWeight);
+		HC_Set_Edge_Weight(fLineWeight);
 	} HC_Close_Segment();
 
 	HC_KEY nSelectionKey = m_pcBaseView->GetSelection()->GetSelectionSegment();
 	HC_Open_Segment_By_Key(nSelectionKey); {
-		HC_Set_Line_Weight(3.0);
-		HC_Set_Edge_Weight(3.0);
+		HC_Set_Line_Weight(fLineWeight);
+		HC_Set_Edge_Weight(fLineWeight);
 	} HC_Close_Segment();
 
 	m_pcBaseView->GetHighlightSelection()->SetGrayScale(false);// ThePreset.GrayScaleSelection);
@@ -1394,8 +1396,8 @@ void H3DF::ViewPrivate::SetSelectOption()
 
 	// #Selection: Selection Option 설정 
 	m_pcWindow->GetSelectionOptionsControl().SetLevel(Selection::Level::Entity);
-	m_pcWindow->GetSelectionOptionsControl().SetRelatedLimit(10);
-	m_pcWindow->GetSelectionOptionsControl().SetProximity(0.2f);
+	//m_pcWindow->GetSelectionOptionsControl().SetRelatedLimit(10);
+	//m_pcWindow->GetSelectionOptionsControl().SetProximity(0.05f);
 	//m_pcWindow->GetSelectionOptionsControl().SetBias(Selection::Bias::Lines);
 	//m_pcWindow->GetSelectionOptionsControl().SetSorting(Selection::Sorting::Proximity); // Sorting 해도 Z방향 Sort가 정확하게 되지는 않됨.
 

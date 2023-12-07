@@ -41,11 +41,10 @@ namespace H3DF
 			// Ties (items with equal proximity) will be further z-sorted. Note that Lines (and edges and all line-like geometry such as circular arcs)
 			// and Markers are biased to make them more easily selectable. This biasing is part of the proximity calculation, and it is therefore possible
 			// that Lines and Markers are sorted ahead of other geometry that is closer to the selection point.
-			// 
-			// Proximity sorting is only relevant for SelectByPoint. 
-			Proximity,
+			
+			Proximity,  // Proximity sorting is only relevant for SelectByPoint. 
 			ZSorting,	// Sort selection results from front to back.
-			Default		// Use Proximity sorting for SelectByPoint. Use ZSorting in all other cases.
+			Default 	// Use Proximity sorting for SelectByPoint. Use ZSorting in all other cases.
 		};
 
 		// Enumeration of the various selection algorithms. 
@@ -150,6 +149,7 @@ namespace H3DF
 		// return: A reference to this SelectionOptionsKit.
 		SelectionOptionsKit & SetScope(KeyPath const & cInStartPath, bool bInScopeOnly = false);
 
+
 		bool ShowProximity(float & fOutProximity) const;
 		bool ShowLevel(Selection::Level & eOutLevel) const;
 		bool ShowInternalLimit(size_t & nOutLimit) const;
@@ -167,7 +167,7 @@ namespace H3DF
 	public:
 		explicit SelectionOptionsControl(WindowKey const & cInWindow);
 		SelectionOptionsControl(SelectionOptionsControl const & cInThat);
-		~SelectionOptionsControl();
+		virtual ~SelectionOptionsControl();
 
 		void Set(SelectionOptionsControl const & cInThat);
 		SelectionOptionsControl & operator=(SelectionOptionsControl const & cInThat);
@@ -201,7 +201,7 @@ namespace H3DF
 
 	private:
 		// Private default constructor to prevent instantiation without a window.
-		SelectionOptionsControl();
+		SelectionOptionsControl() = default;
 	};
 
 	class API_3DF SelectionItem : public Object
@@ -210,6 +210,9 @@ namespace H3DF
 		// The default constructor creates an uninitialized SelectionItem object.  The Type() function will return Type::None.
 		SelectionItem();
 		SelectionItem(SelectionItem const & cInThat);
+
+		// 선택된 Item의 Type을 반환합니다.
+		H3DF::Type Type() const override;
 
 		H3DF::Type ObjectType() const { return H3DF::Type::SelectionItem; };
 
@@ -273,6 +276,7 @@ namespace H3DF
 		bool operator!=(SelectionResults const & cInThat) const;
 
 		void Reset();
+		void Reset() const;
 
 		size_t GetCount() const;
 		SelectionResultsIterator GetIterator() const;
@@ -306,6 +310,7 @@ namespace H3DF
 
 		// Point in window space at which to perform the selection.
 		size_t SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const;
+		size_t SelectByPoint(Point const & cInLocation, SelectionResults & cOutResults) const;
 		size_t SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const;
 		size_t SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults) const;
 

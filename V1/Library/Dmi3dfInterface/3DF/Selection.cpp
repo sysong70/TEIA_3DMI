@@ -23,7 +23,6 @@
 #include <HEventManager.h>
 #include <HConstantFrameRate.h>
 
-
 #define		SEGMENT_TYPE		1
 #define		ENTITY_TYPE			2
 #define		SUBENTITY_TYPE		3
@@ -265,8 +264,6 @@ SelectionOptionsControl::SelectionOptionsControl(SelectionOptionsControl const &
 	m_pcImpl = new SelectionOptionsControlPrivate();
 	Set(cInThat);
 }
-
-SelectionOptionsControl::SelectionOptionsControl() {}
 
 SelectionOptionsControl::~SelectionOptionsControl()
 {
@@ -541,6 +538,12 @@ H3DF::SelectionItem::SelectionItem(SelectionItem const & cInThat)
 	m_pcImpl = new SelectionItemPrivate();
 
 	Set(cInThat);
+}
+
+H3DF::Type H3DF::SelectionItem::Type() const
+{
+	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)m_pcImpl;
+	return pcImpl->cKey.Type();
 }
 
 void H3DF::SelectionItem::Set(SelectionItem const & cInThat)
@@ -852,6 +855,21 @@ void SelectionResults::Reset()
 	pcImpl->Clear();
 }
 
+void SelectionResults::Reset() const
+{
+	if (nullptr == m_pcImpl) {
+		return;
+	}
+
+	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *) m_pcImpl;
+
+	for (auto pcItem : pcImpl->GetItems()) {
+		delete pcItem;
+	}
+
+	pcImpl->Clear();
+}
+
 size_t SelectionResults::GetCount() const
 {
 	if (nullptr == m_pcImpl) {
@@ -1108,6 +1126,18 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 {
 	SelectionControlPrivate * pcImpl = (SelectionControlPrivate *)m_pcImpl;
 	return pcImpl->SelectByPoint(cInLocation, cInOptions, cOutResults);
+}
+
+size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, SelectionResults & cOutResults) const
+{
+	SelectionControlPrivate * pcImpl = (SelectionControlPrivate *) m_pcImpl;
+
+	SelectionOptionsKit cOptions;
+	if(false == pcImpl->GetWindow()->ShowSelectionOptions(cOptions)) {
+		return 0;
+	}
+
+	return pcImpl->SelectByPoint(cInLocation, cOptions, cOutResults);
 }
 
 size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const

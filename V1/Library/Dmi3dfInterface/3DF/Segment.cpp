@@ -8,7 +8,6 @@
 #include "Line.h"
 #include "Circle.h"
 
-#include "Selectability.h"
 #include "Visibility.h"
 #include "VisualEffects.h"
 #include "Material.h"
@@ -142,9 +141,9 @@ CString H3DF::SegmentKey::Name() const
 
 SegmentKey & H3DF::SegmentKey::SetName(CString strInName)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
-	HC_Rename_Segment(".", Utility::ToChar(strInName));
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyPrivate::LocalOpen(*this); {
+		HC_Rename_Segment(".", Utility::ToChar(strInName));
+	} SegmentKeyPrivate::LocalClose(*this);
 
 	return *this;
 }
@@ -152,14 +151,8 @@ SegmentKey & H3DF::SegmentKey::SetName(CString strInName)
 //== Sub Segment 관련 함수 ===========================================================================
 SegmentKey const H3DF::SegmentKey::Subsegment()
 {
-	CString strText;
-
-// 	HC_KEY nKey = HC_Create_Segment_Key_By_Key(KeyValue(), nullptr);
-// 
-// 	SegmentKey cSubsegment(nKey);
-
 	SegmentKeyPrivate::LocalOpen(*this);
-	SegmentKey cSubsegment(strText);
+	SegmentKey cSubsegment(L"");
 	SegmentKeyPrivate::LocalClose(*this);
 
 	return cSubsegment;
@@ -585,27 +578,6 @@ PerformanceControl const H3DF::SegmentKey::GetPerformanceControl() const
 {
 	PerformanceControl cPerformanceControl(*(SegmentKey *) this);
 	return cPerformanceControl;
-}
-
-//== Control 관련 함수 ===============================================================================
-SelectabilityControl H3DF::SegmentKey::GetSelectabilityControl()
-{
-	SelectabilityControl cSelectabilityControl(*this);
-	return cSelectabilityControl;
-}
-
-SelectabilityControl const H3DF::SegmentKey::GetSelectabilityControl() const
-{
-	SelectabilityControl cSelectabilityControl(*(SegmentKey *) this);
-	return cSelectabilityControl;
-}
-
-SegmentKey & H3DF::SegmentKey::SetSelectability(CString strList)
-{
-	SegmentKeyPrivate::LocalOpen(*this);
-	HC_Set_Selectability(Utility::ToChar(strList));
-	SegmentKeyPrivate::LocalClose(*this);
-	return *this;
 }
 
 //== Visibility Control 관련 함수 ====================================================================

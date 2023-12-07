@@ -22,6 +22,12 @@
 //:Ken
 #include "3DF/Facility.AppOptions.h"
 
+#ifdef _DEBUG
+#	define WRITE_3DF_LOG
+#endif
+
+//#define WRITE_3DF_LOG
+
 using namespace H3DF;
 
 namespace H3DF
@@ -87,63 +93,79 @@ CStringA H3DF::ApplicationPrivate::ErrorCategoryString(int nId)
 	switch (nId)
 	{
 		case HEC_UNDEFINED:
-			return strMessage = "Undefined";
+			strMessage = "Undefined";
 			break;
 
 		case HEC_DEBUG:
-			return strMessage = "Debug";
+			strMessage = "Debug";
 			break;
 
 		case HEC_INTERNAL_ERROR:
-			return strMessage = "Internal Error";
+			strMessage = "Internal Error";
 			break;
 
 		case HEC_MEMORY:
-			return strMessage = "Memory";
+			strMessage = "Memory";
 			break;
 
 		case HEC_CALLBACK:
-			return strMessage = "Callback";
+			strMessage = "Callback";
 			break;
 
 		case HEC_CAMERA:
-			return strMessage = "Camera";
+			strMessage = "Camera";
 			break;
 
 		case HEC_COLOR:
-			return strMessage = "Color";
+			strMessage = "Color";
 			break;
 
 		case HEC_COLOR_MAP:
-			return strMessage = "Color Map";
+			strMessage = "Color Map";
 			break;
 
 		case HEC_DRIVER:
-			return strMessage = "Driver";
+			strMessage = "Driver";
 			break;
 
 		case HEC_HANDEDNESS:
-			return strMessage = "Handedness";
+			strMessage = "Handedness";
 			break;
 
 		case HEC_HEURISTIC:
-			return strMessage = "Heuristic";
+			strMessage = "Heuristic";
 			break;
 
 		case HEC_HOOPS_SYSTEM:
-			return strMessage = "Hoops System";
+			strMessage = "Hoops System";
 			break;
 
 		case HEC_INVALID_KEY:
-			return strMessage = "Invalid key";
+			strMessage = "Invalid key";
+			break;
+
+		case HEC_SEGMENT: // 48
+			strMessage = "Segment";
+			break;
+
+		case HEC_SELECTION: // 49
+			strMessage = "Selection";
 			break;
 
 		case HEC_SYNTAX:
-			return strMessage = "Syntax";
+			strMessage = "Syntax";
 			break;
 
 		case HEC_INCLUDE:
-			return strMessage = "Include";
+			strMessage = "Include";
+			break;
+
+		case HEC_GEOMETRY_OR_SEGMENT: // 58
+			strMessage = "Geometry Or Segment";
+			break;
+
+		case HEC_LINE_STYLE: // 119
+			strMessage = "Line Style";
 			break;
 
 		default:
@@ -160,65 +182,194 @@ CStringA H3DF::ApplicationPrivate::ErrorSpecificString(int nId)
 	switch (nId)
 	{
 		case HES_UNDEFINED:
-			return strMessage = "Undefined";
+			strMessage = "Undefined";
 			break;
 
 		case HES_DEBUG:
-			return strMessage = "Debug";
+			strMessage = "Debug";
 			break;
 
 		case HES_PROCEDURAL_ERROR:
-			return strMessage = "Procedural Error";
+			strMessage = "Procedural Error";
 			break;
 
 		case HES_DATA_ERROR:
-			return strMessage = "Data Error";
+			strMessage = "Data Error";
 			break;
 		
 		case HES_OUT_OF_MEMORY:
-			return strMessage = "Out of Memory";
+			strMessage = "Out of Memory";
 			break;
 
 		case HES_BUFFER_OVERFLOW:
-			return strMessage = "Buffer Overflow";
+			strMessage = "Buffer Overflow";
 			break;
 
 		case HES_ALLOCATE_MEMORY_FAILED:
-			return strMessage = "Allocate Memory Failed";
+			strMessage = "Allocate Memory Failed";
 			break;
 
 		case HES_MEMORY_USAGE:
-			return strMessage = "Memory Usage";
+			strMessage = "Memory Usage";
 			break;
 
 		case HES_SYSTEM_REJECTED_FREED_MEMORY:
-			return strMessage = "System Rejected Freed Memory";
+			strMessage = "System Rejected Freed Memory";
 			break;
 
 		case HES_MEMORY_PROFILE_NOT_COMPILED:
-			return strMessage = "Memory Profile Not Compiled";
+			strMessage = "Memory Profile Not Compiled";
 			break;
 
 		case HES_ABORT_FUNCTION:
-			return strMessage = "Abort Function";
+			strMessage = "Abort Function";
 			break;
 
 		case HES_ABORT_REQUESTED_BY_APPLICATION:
-			return strMessage = "Abort Requested By Application";
+			strMessage = "Abort Requested By Application";
 			break;
 
-		case HES_INVALID_KEY:
-			return strMessage = "Invalid key";
+		case HES_INVALID_KEY: // 202
+			strMessage = "Invalid key";
+			break;
+		
+		case HES_NON_UNIFORM_HANDEDNESS: // 256
+			strMessage = "Non Uniform Handedness";
 			break;
 
-		case HES_PARSE_STRING:
-			return strMessage = "Parse string";
+		case HES_NORMAL: // 257
+			strMessage = "Normal";
+			break;
+
+		case HES_NOT_AVAILABLE: // 258
+			strMessage = "Not Available";
+			break;
+
+		case HES_NOT_A_CAMERA_VOLUME:
+			strMessage = "Not A Camera Volume";
+			break;
+
+		case HES_NO_LOCAL_SETTING: // 267
+			strMessage = "No Local Setting";
+			break;
+
+		case HES_NO_MAPPED_VISAUL_TYPE: // 268
+			strMessage = "No Mapped Visual Type";
+			break;
+
+		case HES_NO_OPEN_SEGMENT: // 269
+			strMessage = "No Open Segment";
+			break;
+
+		case HES_NO_X_WINDOW_FOR_GL_WINDOW: // 270
+			strMessage = "No X Window For GL Window";
+			break;
+
+		case HES_NULL_COLOR_NAME: // 271
+			strMessage = "Null Color Name";
+			break;
+
+		case HES_NULL_INPUT: // 272
+			strMessage = "Null Input";
+			break;
+
+		case HES_PARSE_STRING: // 309
+			strMessage = "Parse string";
+			break;
+
+		case HES_PATTERN: // 310
+			strMessage = "Pattern";
+			break;
+
+		case HES_PLAIN_TEXTURE_ONLY: // 311
+			strMessage = "Plain Texture Only";
+			break;
+
+		case HES_POLYGON: // 312
+			strMessage = "Polygon";
+			break;
+
+		case HES_POLYLINE: // 313
+			strMessage = "Polyline";
+			break;
+
+		case HES_PRINT_VERSION_MESSAGE: // 314
+			strMessage = "Print Version Message";
+			break;
+
+		case HES_PURE_COLOR_OR_TEXTURE_ONLY: // 315
+			strMessage = "Pure Color Or Texture Only";
+			break;
+
+		case HES_REBUILDING_TRISTRIP: // 316
+			strMessage = "Rebuilding Tristrip";
+			break;
+
+		case HES_RECEIVED_EXIT_REQUEST: // 317
+			strMessage = "Received Exit Request";
+			break;
+
+		case HES_REDEFINING_NAME: // 318
+			strMessage = "Redefining Name";
+			break;
+
+		case HES_RENDITION_FREED: // 319
+			strMessage = "Rendition Freed";
+			break;
+
+		case HES_RENDITION_NOT_FREED: // 320
+			strMessage = "Rendition Not Freed";
+			break;
+
+		case HES_REPLACEMENT_OVERFLOW: // 321
+			strMessage = "Replacement Overflow";
+			break;
+
+		case HES_REQUIRES_COLOR_MAP: // 322
+			strMessage = "Requires Color Map";
+			break;
+
+		case HES_RGB_TYPE_IMAGE_REQUIRED: // 323
+			strMessage = "RGB Type Image Required";
+			break;
+
+		case HES_SEGMENT: // 324
+			strMessage = "Segment";
+			break;
+
+		case HES_SEGMENT_EXISTS: // 325
+			strMessage = "Segment Exists";
+			break;
+
+		case HES_SELECTION_EVENT_NOT_ENABLED: // 326
+			strMessage = "Selection Event Not Enabled";
+			break;
+
+		case HES_SELF_INTERSECTING_FACE: // 327
+			strMessage = "Self Intersecting Face";
+			break;
+
+		case HES_SET_SB_X_SHARED_CMAP_ENV_VAR: // 328
+			strMessage = "Set SB X Shared Cmap Env Var";
+			break;
+
+		case HES_SINGULAR_MATRIX: // 329
+			strMessage = "Singular Matrix";
+			break;
+
+		case HES_SINGULAR_PLANE: // 330
+			strMessage = "Singular Plane";
+			break;
+
+		case HES_SIZE: // 331
+			strMessage = "Size";
 			break;
 
 		default:
 			strMessage.Format("%d", nId);
 			break;
 	}
+
 
 	return strMessage;
 }
@@ -239,15 +390,15 @@ void H3DF::Application::InitInstance()
 	// HOOPS License 처리
 	HC_Define_System_Options("license = `" HOOPS_LICENSE "`");
 
-	HDB::EnableErrorManager();
-
 	// Error 및 Warning 관련 설정
-#if defined( _DEBUG )
+#if defined( WRITE_3DF_LOG )
+	HDB::EnableErrorManager();
 	//HC_Define_System_Options("fatal errors, errors, warnings, info, no message limit");
 	HErrorManager::AllowAllErrors();
 	HErrorManager::SetErrorCallback(H3DF::ApplicationPrivate::ErrorCallback, this);
 	LogManager::SetCreateFile(LOGMANAGER_3DF_ERROR_LOG_ID, true);
 	LogManager::SetFilePathName(LOGMANAGER_3DF_ERROR_LOG_ID, LogManager::GetExecuteDirectory() + L"Log\\3DF_Error.txt");
+	LogManager::Log(LOGMANAGER_3DF_ERROR_LOG_ID, L"Log Create");
 #else
 	HC_Define_System_Options("errors, info, no message limit");
 	//HC_Define_System_Options("no warnings, no info, no errors, no fatal errors, no message limit");

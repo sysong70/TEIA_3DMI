@@ -8,8 +8,6 @@
 
 #include "Camera.h"
 
-#include "Operator.ObjectSnap.h"
-
 #include "../Private/View.Private.h"
 
 #include <Common_Define.h>
@@ -188,8 +186,7 @@ H3DF::Operator::CameraSelect::CameraSelect(WindowKey * pcWindow, NavigationCube 
 	m_cCameraOrbit(pcWindow->GetBaseView(), DoRepeat, DoCapture),
 	m_cCameraOrbitTurntable(pcWindow->GetBaseView(), DoRepeat, DoCapture),
 	m_cCameraPan(pcWindow->GetBaseView(), DoRepeat, DoCapture),
-	m_cCameraZoomBox(pcWindow->GetBaseView(), DoRepeat, DoCapture),
-	m_cObjectSnapOperator(pcWindow)
+	m_cCameraZoomBox(pcWindow->GetBaseView(), DoRepeat, DoCapture)
 {
 	m_pcWindow = pcWindow;
 
@@ -302,17 +299,15 @@ int H3DF::Operator::CameraSelect::OnLButtonUp(HEventInfo & cInEvent)
 
 int H3DF::Operator::CameraSelect::OnLButtonDownAndMove(HEventInfo & cInEvent)
 {
+	m_pcWindow->GetBaseView()->SetSuppressUpdate(true);
+
 	if (nullptr != m_pcNaviCube) {
 		m_pcNaviCube->LButtonDownAndMove(cInEvent);
 	}
 
-	m_pcWindow->GetBaseView()->SetSuppressUpdate(true);
-
-	// m_cObjectSnapOperator.DrawSnapItems();
-
-// 	if (nullptr != m_pcNaviCube) {
-// 		m_pcNaviCube->Transform();
-// 	}
+	if (nullptr != m_pcNaviCube) {
+		m_pcNaviCube->Transform();
+	}
 
 	int nResult = 0;
 
@@ -360,11 +355,13 @@ int H3DF::Operator::CameraSelect::OnRButtonUp(HEventInfo & hevent)
 // Dynamic Highlighting 처리
 int H3DF::Operator::CameraSelect::OnNoButtonDownAndMove(HEventInfo & cInEvent)
 {
+/*
 	if (nullptr != m_pcNaviCube) {
 		if (HLISTENER_CONSUME_EVENT == m_pcNaviCube->NoButtonDownAndMove(cInEvent)) {
 			return HLISTENER_CONSUME_EVENT;
 		}
 	}
+*/
 
 	return HLISTENER_PASS_EVENT;
 }

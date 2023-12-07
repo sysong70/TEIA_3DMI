@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "dllmain.h"
-#include "3DF/Operator.ObjectSnap.h"
 
 // #define _CRTDBG_MAP_ALLOC
 // #include <stdlib.h>

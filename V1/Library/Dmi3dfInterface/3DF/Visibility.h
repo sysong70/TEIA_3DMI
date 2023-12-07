@@ -24,7 +24,7 @@ public:
 
 	VisibilityKit();
 
-	const bool * GetSelectabilityFlag() const { return m_bVisibilityFlag; }
+	const bool * GetVisibilityFlag() const { return m_bVisibilityFlag; }
 
 	//== Set Visibility Kit ========================================================================
 	VisibilityKit & SetWindows(bool bInValue);

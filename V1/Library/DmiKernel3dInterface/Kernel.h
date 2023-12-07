@@ -44,6 +44,25 @@ namespace KERNEL
 		OSnap() = default;
 	};
 
+	class SelectionFilter
+	{
+	public:
+		enum class Type : uint32_t
+		{
+			None								= 0x00000000,
+			Point								= 0x00000001,
+			Curve								= 0x00000002,
+			Edge								= 0x00000004,
+			Face								= 0x00000008,
+			Solid								= 0x00000010,
+			Axis								= 0x00000020,
+			PMI									= 0x00000040,
+		};
+
+	private:
+		SelectionFilter() = default;
+	};
+
 	class API_KERNEL Kernel
 	{
 	public:

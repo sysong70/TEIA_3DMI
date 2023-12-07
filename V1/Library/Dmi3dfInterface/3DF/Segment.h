@@ -27,6 +27,8 @@ public:
 	void Set(SegmentKey const & cInThat);
 	SegmentKey & operator = (SegmentKey const & cInThat);
 
+	H3DF::Type ObjectType() const { return H3DF::Type::SegmentKey; };
+
 	//== Segment 관련 함수 ===========================================================================
 	SegmentKey & Open();
 	SegmentKey & Close();
@@ -88,11 +90,6 @@ public:
 	bool ShowPerformance(PerformanceKit & cOutKit) const;
 	PerformanceControl GetPerformanceControl();
 	PerformanceControl const GetPerformanceControl() const;
-
-	//== Select Control 관련 함수 ====================================================================
-	SelectabilityControl GetSelectabilityControl();
-	SelectabilityControl const GetSelectabilityControl() const;
-	SegmentKey & SetSelectability(CString strText);
 
 	//== Visibility Control 관련 함수 ================================================================
 	VisibilityControl GetVisibilityControl();

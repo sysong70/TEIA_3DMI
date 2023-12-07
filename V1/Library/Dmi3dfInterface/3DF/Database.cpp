@@ -22,8 +22,8 @@ SegmentKey Database::CreateRootSegment()
 PortfolioKey Database::CreatePortfolio()
 {
 	HC_KEY nPortfoliosKey = HC_Open_Segment("/portfolios");
-	HC_Set_Priority(nPortfoliosKey, 0);
-	HC_KEY nKey = HC_Create_Segment("");
+		HC_Set_Priority(nPortfoliosKey, 0);
+		HC_KEY nKey = HC_Create_Segment("");
 	HC_Close_Segment();
 
 	PortfolioKey cPortfolio(nKey);

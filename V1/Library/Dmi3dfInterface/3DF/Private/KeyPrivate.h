@@ -3,21 +3,20 @@
 #include "../3DF.h"
 #include "../Object.h"
 
-OPEN_3DF_NAMESPACE
-
-class KeyPrivate : public H3DF::PrivateImpl
+namespace H3DF
 {
-public:
-	KeyPrivate() { m_eType = Type::Key; }
-	~KeyPrivate() {}
-
-	HC_KEY m_nKey = INVALID_KEY;
-
-	void Copy(KeyPrivate * pcInThat)
+	class API_3DF KeyPrivate : public H3DF::PrivateImpl
 	{
-		m_nKey = pcInThat->m_nKey;
-		m_eType = pcInThat->Type();
-	}
-};
+	public:
+		KeyPrivate() { m_eType = Type::Key; }
+		~KeyPrivate() {}
 
-CLOSE_3DF_NAMESPACE
+		HC_KEY m_nKey = INVALID_KEY;
+
+		void Copy(KeyPrivate * pcInThat)
+		{
+			m_nKey = pcInThat->m_nKey;
+			m_eType = pcInThat->Type();
+		}
+	};
+}

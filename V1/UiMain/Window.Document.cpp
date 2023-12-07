@@ -48,6 +48,7 @@ bool Window::IsAllowed3d(const wchar_t* pFilePath)
 		L"X_B", L"X_T", L"XMT", L"XMT_TXT", // Parasolid
 		L"PDF", // PDF
 		L"PRC", // PRC
+		L"HSF", // HSF
 		L"RVT, RFA", // Revit
 		L"3DM", // Rhino3D
 		L"ASM", L"PAR", L"PWD", L"PSM", // Solid Edge

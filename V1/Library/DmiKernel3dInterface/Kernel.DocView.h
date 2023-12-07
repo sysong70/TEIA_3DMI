@@ -47,6 +47,9 @@ namespace KERNEL
 
 		//== Object Snap 관련 함수 ===================================================================
 		void SetObjectSnap(int nId);
+
+		//== Selection Fiter 관련 함수 ===============================================================
+		void SetSelectionFilter(int nId);
 		
 		//== Style 관련 함수 =========================================================================
 		void SetViewStyle(int nStyleId);

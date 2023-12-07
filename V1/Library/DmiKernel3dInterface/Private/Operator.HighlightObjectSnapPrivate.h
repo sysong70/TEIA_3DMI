@@ -17,7 +17,7 @@ namespace KERNEL
 	{
 		class SnapItem;
 
-		class ObjectSnapPrivate : public PrivateImpl
+		class HighlightObjectSnapPrivate : public PrivateImpl
 		{
 		public:
 			enum class Status
@@ -57,9 +57,12 @@ namespace KERNEL
 				std::vector <H3DF::SelectionItem> vcItems;
 			};
 
-			ObjectSnapPrivate(H3DF::WindowKey * pcWindow);
+			HighlightObjectSnapPrivate() = default;
+			HighlightObjectSnapPrivate(H3DF::WindowKey * pcWindow);
 
+			int LButtonDownAndMove(int nFlags, int x, int y);
 			int NoButtonDownAndMove(int nFlags, int x, int y);
+			bool DoDynamicHighlighting(H3DF::WindowPoint cMousePoint, H3DF::SelectionResults & cSelections);
 
 			void SetObjectSnapMode(DWORD nInSnapMode);
 
@@ -71,7 +74,6 @@ namespace KERNEL
 
 		public:
 			void DrawSnapItems();
-			//void DrawSnapItem(SnapItem * pcInItem, CamerInformation & cInCameraInfo, bool bUpdate = true);
 
 			void DrawSnapPoint(SnapPoint & cSnapPoint, CamerInformation & cInCameraInfo);
 			void DrawSnapPoint(H3DF::Point2D center, Status eInStatus, OSnap::Type eInType, double dUnit);
@@ -98,10 +100,10 @@ namespace KERNEL
 
 			H3DF::Point m_cPrevPoint;
 
-			DWORD m_nOSnapMode; // Object snap 
+			DWORD m_nOSnapMode{}; // Object snap 
 
-			DWORD m_nPrevMouseMoveTickCount;
-			DWORD m_nSelectPickCount;
+			DWORD m_nPrevMouseMoveTickCount{};
+			DWORD m_nSelectPickCount{};
 
 			std::vector<SnapItem *> m_vSnapItems;
 			SnapItem m_cNearSnapItem;

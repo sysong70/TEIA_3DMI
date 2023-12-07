@@ -6,6 +6,8 @@
 #include "Window.h"
 
 #include "Selection.h"
+#include "Highlight.h"
+
 #include "Facility.AppOptions.h"
 #include "./Private/SelectionPrivate.h"
 
@@ -162,7 +164,7 @@ int NavigationCube::LButtonUp(HEventInfo & cInEvent)
 	WindowPoint cPoint(cInEvent.GetMouseWindowPos().x, cInEvent.GetMouseWindowPos().y, cInEvent.GetMouseWindowPos().z);
 
 	SelectionOptionsKit cSelectOption;
-	cSelectOption.SetLevel(Selection::Level::Segment).SetRelatedLimit(0);//.SetProximity(0.001);// SetSorting(Selection::Sorting::ZSorting);
+	cSelectOption.SetLevel(Selection::Level::Segment).SetRelatedLimit(0);
 	
 	SelectionResults cSelection;
 	size_t nSelectedCount = pcImpl->m_pcWindow->GetSelectionControl().SelectByPoint(cPoint, cSelectOption, cSelection);
@@ -179,8 +181,7 @@ int NavigationCube::LButtonUp(HEventInfo & cInEvent)
 	CString strName = cSelectKey.Name();
 	// TRACE(L"%s\n", strName);
 
-	pcImpl->m_pcWindow->GetHighlightControl().Unhighlight(pcImpl->m_cOldHighlightSelection);
-	pcImpl->m_cOldHighlightSelection.Reset();
+	pcImpl->m_pcWindow->GetBaseView()->GetHighlightSelection()->DeSelectAll();
 
 	for (int nIndex = 0; nIndex < (int)H3DF::ViewDirection::Mode::Count; nIndex++) {
 		if (pcImpl->m_cSegments[nIndex] == cSelectKey) {
@@ -211,72 +212,14 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 	if (nullptr == pcImpl) { assert(false); }
 
 	WindowPoint cPoint(cInEvent.GetMouseWindowPos().x, cInEvent.GetMouseWindowPos().y, cInEvent.GetMouseWindowPos().z);
-
+	
 	SelectionOptionsKit cSelectOption;
 	cSelectOption.SetLevel(Selection::Level::Segment).SetRelatedLimit(0);//.SetProximity(0.001);// SetSorting(Selection::Sorting::ZSorting);
 
-	int nEvent = HLISTENER_PASS_EVENT;
-	bool bUpdateFlag = false;
+	SelectionResults cSelection1;
+	pcImpl->m_pcWindow->GetHighlightControl().NoButtonDownAndMove(cInEvent.GetFlags(), cInEvent.GetMousePixelPos().x, cInEvent.GetMousePixelPos().y, cSelection1);
 
-	const SelectionControl * pcSelect = &pcImpl->m_pcWindow->GetSelectionControl();
-
-	SelectionResults cSelection;
-	size_t nSelectedCount = pcImpl->m_pcWindow->GetSelectionControl().SelectByPoint(cPoint, cSelectOption, cSelection);
-
-	// 선택된 요소가 없은 경우
-	if (0 == nSelectedCount) {
-		//TRACE(L"NavigationCube No Selection\n");
-
-		// 기존에 선택된 요소가 있는 경우 처리
-		if (0 < pcImpl->m_cOldHighlightSelection.GetCount()) {
-			pcImpl->m_pcWindow->GetHighlightControl().Unhighlight(pcImpl->m_cOldHighlightSelection);
-			pcImpl->m_cOldHighlightSelection.Reset();
-			bUpdateFlag = true;
-		}
-	}
-	else {
-		//TRACE(L"NavigationCube Selection: %d\n", nSelectedCount);
-
-		// 이전에 선택된것과 다른 경우
-		if (pcImpl->m_cOldHighlightSelection != cSelection) {
-			pcImpl->m_pcWindow->GetHighlightControl().Unhighlight(pcImpl->m_cOldHighlightSelection);
-			
-			SegmentKey cSelectKey;
-			cSelection.Front()->ShowSelectedItem(cSelectKey);
-
-			bool bFindFlag = false;
-
-			for (int nIndex = 0; nIndex < (int)H3DF::ViewDirection::Mode::Count; nIndex++) {
-				if (pcImpl->m_cSegments[nIndex].KeyValue() == cSelectKey.KeyValue()) {
-					bFindFlag = true;
-				}
-			}
-
-			if (true == bFindFlag) {
-				//TRACE(L"NavigationCube Find\n");
-
-				HighlightOptionsKit cHighlightOptions;
-				pcImpl->m_pcWindow->GetHighlightControl().Highlight(cSelection, cHighlightOptions, true);
-				pcImpl->m_cOldHighlightSelection = cSelection;
-				nEvent = HLISTENER_CONSUME_EVENT;
-			}
-			else {
-				pcImpl->m_cOldHighlightSelection.Reset();
-				//TRACE(L"NavigationCube No Find\n");
-			}
-
-			bUpdateFlag = true;
-		}
-		else {
-			nEvent = HLISTENER_CONSUME_EVENT;
-		}
-	}
-
-	if (true == bUpdateFlag) {
-		pcImpl->m_pcWindow->Update();
-	}
-
-	return nEvent;
+	return HLISTENER_PASS_EVENT;
 }
 
 void NavigationCube::SetView(H3DF::BaseView * view, WindowKey * pcInWindow) 
@@ -401,7 +344,6 @@ HC_KEY NavigationCube::HitTest(float x, float y, float z)
 
 void NavigationCube::Transform()
 {
-
 
 	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }

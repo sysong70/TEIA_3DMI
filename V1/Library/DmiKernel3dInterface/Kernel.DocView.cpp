@@ -42,7 +42,7 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cI
 
 	pcImpl->m_cCanvas.AttachViewAsLayout(cView);
 
-	pcImpl->m_pcObjectSnapOperator = new KERNEL::Operator::ObjectSnap(&pcImpl->m_cCanvas.GetFrontView().GetWindowKey());
+	pcImpl->m_pcObjectSnapOperator = new KERNEL::Operator::HighlightObjectSnap(&pcImpl->m_cCanvas.GetFrontView().GetWindowKey());
 
 	pcImpl->m_cCanvas.FileOpen(cInObject, cInstance);
 	
@@ -169,6 +169,10 @@ void KERNEL::DocView::MouseMove(int nFlag, int x, int y)
 	if (!(MK_LBUTTON & nFlag) && !(MK_RBUTTON & nFlag)) {
 		pcImpl->m_pcObjectSnapOperator->NoButtonDownAndMove(nFlag, x, y);
 	}
+	else if(MK_LBUTTON & nFlag) {
+		pcImpl->m_pcObjectSnapOperator->LButtonDownAndMove(nFlag, x, y);
+	}
+
 /*
 	else if (!(MK_LBUTTON & nFlag)) {
 		//OnLButtonDownAndMove(HEventInfo & cInEvent)
@@ -346,6 +350,46 @@ void KERNEL::DocView::SetObjectSnap(int nId)
 			break;
 	}
 }
+
+//== Selection Fiter 관련 함수 ===============================================================
+void KERNEL::DocView::SetSelectionFilter(int nId)
+{
+	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) { DEBUG_RETURN; }
+
+	switch (nId)
+	{
+		case HOME_3D_CMD_SelectionFiter_Point:
+			pcImpl->SetSelectionFilter(SelectionFilter::Type::Point);
+			break;
+
+		case HOME_3D_CMD_SelectionFiter_Curve:
+			pcImpl->SetSelectionFilter(SelectionFilter::Type::Curve);
+			break;
+
+		case HOME_3D_CMD_SelectionFiter_Edge:
+			pcImpl->SetSelectionFilter(SelectionFilter::Type::Edge);
+			break;
+
+		case HOME_3D_CMD_SelectionFiter_Face:
+			pcImpl->SetSelectionFilter(SelectionFilter::Type::Face);
+			break;
+
+		case HOME_3D_CMD_SelectionFiter_Solid:
+			pcImpl->SetSelectionFilter(SelectionFilter::Type::Solid);
+			break;
+
+		case HOME_3D_CMD_SelectionFiter_Axis:
+			pcImpl->SetSelectionFilter(SelectionFilter::Type::Axis);
+			break;
+
+		case HOME_3D_CMD_SelectionFiter_PMI:
+			pcImpl->SetSelectionFilter(SelectionFilter::Type::PMI);
+			break;
+	}
+
+}
+
 
 //== Style 관련 함수 =========================================================================
 void KERNEL::DocView::SetViewStyle(int nStyleId)

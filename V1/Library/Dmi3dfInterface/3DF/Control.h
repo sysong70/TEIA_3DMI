@@ -18,6 +18,5 @@ namespace H3DF
 		H3DF::Type ObjectType() const { return H3DF::Type::Control; };
 
 		bool operator == (Control const & cInThat) const;
-
 	};
 }

@@ -8,10 +8,11 @@
 
 #include "../../../UiMain/Command.Resource.h"
 
-#include "../../Dmi3dfInterface/3DF/Segment.h"
-#include "../../Dmi3dfInterface/3DF/VisualEffects.h"
+#include <3DF/Segment.h>
+#include <3DF/VisualEffects.h>
 
 using namespace KERNEL;
+using namespace H3DF;
 
 //== Visual Effects 관련 함수 ========================================================================
 
@@ -102,4 +103,29 @@ void KERNEL::DocViewPrivate::SetObjectSnap(OSnap::Type eInType)
 	}
 
 	m_pcObjectSnapOperator->SetObjectSnapMode(m_nOSnapMode);
+}
+
+
+//== Selection Filter 관련 함수 ======================================================================
+void KERNEL::DocViewPrivate::SetSelectionFilter(SelectionFilter::Type eInType)
+{
+	// Selection filter type이 없는 경우 추가
+	if (0 == (m_nSelectionFilter & (DWORD) eInType)) {
+		m_nSelectionFilter += (DWORD) eInType;
+	}
+	else { // Selection filter type이 없는 경우 제거
+		m_nSelectionFilter -= (DWORD) eInType;
+	}
+
+/*
+	// Selectability는 Selection option에서 attribute lock을 설정해야 해서 속도가 많이 느림.
+	// 삭제해버림.
+	SelectabilityKit cSelectability;
+	cSelectability.SetLines(false);
+
+	SelectionOptionsKit cSelectionOptionsKit;
+	cSelectionOptionsKit.SetSelectability(cSelectability);
+
+	m_cCanvas.GetFrontView().GetWindowKey().SetSelectionOptions(cSelectionOptionsKit);
+*/
 }

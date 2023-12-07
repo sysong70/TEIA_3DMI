@@ -2,21 +2,23 @@
 
 #include "WindowPrivate.h"
 
+#include "../../Private/View.Private.h"
+
 USING_3DF_NAMESPACE
 
-WindowKeyPrivate::WindowKeyPrivate()
+H3DF::WindowKeyPrivate::WindowKeyPrivate()
 {
 	m_pnSelectBufferKey = new HC_KEY[m_nSelectBufferKeyCount];
 }
 
-WindowKeyPrivate::~WindowKeyPrivate()
+H3DF::WindowKeyPrivate::~WindowKeyPrivate()
 {
 	if (nullptr != m_pnSelectBufferKey) {
 		delete[] m_pnSelectBufferKey;
 	}
 }
 
-void WindowKeyPrivate::Copy(WindowKeyPrivate * pcInThat)
+void H3DF::WindowKeyPrivate::Copy(WindowKeyPrivate * pcInThat)
 {
 	m_pcBaseView = pcInThat->m_pcBaseView;
 	m_nViewId = pcInThat->m_nViewId;
@@ -24,11 +26,23 @@ void WindowKeyPrivate::Copy(WindowKeyPrivate * pcInThat)
 	m_pcSelection = pcInThat->m_pcSelection;
 	m_pcHighlight = pcInThat->m_pcHighlight;
 	m_pcSelectionOptions = pcInThat->m_pcSelectionOptions;
+
+	m_cSelectionOptionsKit = pcInThat->m_cSelectionOptionsKit;
+}
+
+HC_KEY H3DF::WindowKeyPrivate::GetSceneKey()
+{
+	return GetBaseView()->GetSceneKey();
+}
+
+const HC_KEY H3DF::WindowKeyPrivate::GetSceneKey() const
+{
+	return ((BaseView *) m_pcBaseView)->GetSceneKey();
 }
 
 // m_nSelectBufferKeyCount의 값이 nCount보다 작으면 m_pnSelectBufferKey를 재할당한다.
 // m_nSelectBufferKeyCount는 nCount가 됨.
-HC_KEY * WindowKeyPrivate::GetSelectBufferKey(int nCount)
+HC_KEY * H3DF::WindowKeyPrivate::GetSelectBufferKey(int nCount)
 {
 	if (m_nSelectBufferKeyCount < nCount) {
 		delete[] m_pnSelectBufferKey;

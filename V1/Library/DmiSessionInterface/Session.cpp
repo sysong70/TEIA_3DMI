@@ -148,8 +148,19 @@ void SESSION::Session::ExecuteCommand(Json::Object & cInObject)
 			break;
 	}
 
-
-
+	// Selection Filter 설정
+	switch (nId)
+	{
+		case HOME_3D_CMD_SelectionFiter_Point:
+		case HOME_3D_CMD_SelectionFiter_Curve:
+		case HOME_3D_CMD_SelectionFiter_Edge:
+		case HOME_3D_CMD_SelectionFiter_Face:
+		case HOME_3D_CMD_SelectionFiter_Solid:
+		case HOME_3D_CMD_SelectionFiter_Axis:
+		case HOME_3D_CMD_SelectionFiter_PMI:
+			m_pcDocView->SetSelectionFilter(nId);
+			break;
+	}
 }
 
 void SESSION::Session::CancelCommands()

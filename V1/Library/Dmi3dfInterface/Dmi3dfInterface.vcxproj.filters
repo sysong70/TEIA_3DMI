@@ -84,9 +84,6 @@
     <ClInclude Include="3DF.Signal.h">
       <Filter>Signal</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Selectability.h">
-      <Filter>3DF\Control</Filter>
-    </ClInclude>
     <ClInclude Include="Import\DLL.Helper.h">
       <Filter>DLL</Filter>
     </ClInclude>
@@ -128,9 +125,6 @@
     </ClInclude>
     <ClInclude Include="3DF\Highlight.h">
       <Filter>3DF\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\Operator.ObjectSnap.h">
-      <Filter>Operator</Filter>
     </ClInclude>
     <ClInclude Include="Signal.Connector.h">
       <Filter>Signal</Filter>
@@ -234,9 +228,6 @@
     <ClInclude Include="3DF.View.h">
       <Filter>3DF\Sprocket</Filter>
     </ClInclude>
-    <ClInclude Include="Sprocket.h">
-      <Filter>3DF\Sprocket</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\Window.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
@@ -312,6 +303,12 @@
     <ClInclude Include="..\Common\LogManager.h">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\Selectability.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket.h">
+      <Filter>3DF\Sprocket</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -334,9 +331,6 @@
     </ClCompile>
     <ClCompile Include="..\Common\WStr.cpp">
       <Filter>_Common</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\Selectability.cpp">
-      <Filter>3DF\Control</Filter>
     </ClCompile>
     <ClCompile Include="Import\DLL.Interface.cpp">
       <Filter>DLL</Filter>
@@ -376,9 +370,6 @@
     </ClCompile>
     <ClCompile Include="3DF\Highlight.cpp">
       <Filter>3DF\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\Operator.ObjectSnap.cpp">
-      <Filter>Operator</Filter>
     </ClCompile>
     <ClCompile Include="Signal.Connector.cpp">
       <Filter>Signal</Filter>
@@ -473,9 +464,6 @@
     <ClCompile Include="3DF.View.cpp">
       <Filter>3DF\Sprocket</Filter>
     </ClCompile>
-    <ClCompile Include="Sprocket.cpp">
-      <Filter>3DF\Sprocket</Filter>
-    </ClCompile>
     <ClCompile Include="3DF\Circle.cpp">
       <Filter>3DF\Object</Filter>
     </ClCompile>
@@ -550,6 +538,12 @@
     </ClCompile>
     <ClCompile Include="..\Common\LogManager.cpp">
       <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Selectability.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket.cpp">
+      <Filter>3DF\Sprocket</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -313,7 +313,7 @@ bool H3DF::Utility::CharToUnicode(char * pchText, CString & strText)
 		return false;
 	}
 
-	int nConvertSize = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pchText, strlen(pchText), pchBuffer, nBufferSize);
+	int nConvertSize = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED, pchText, (int)strlen(pchText), pchBuffer, nBufferSize);
 	if (0 == nConvertSize) {
 		ASSERT(FALSE);
 		delete [] pchBuffer;

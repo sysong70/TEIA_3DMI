@@ -5,7 +5,7 @@
 #include "../Kernel.h"
 #include "../Object.h"
 
-#include "../Operator.ObjectSnap.h"
+#include "../Operator.HighlightObjectSnap.h"
 
 #include <3DF.Factory.h>
 #include <3DF.Canvas.h>
@@ -41,9 +41,13 @@ namespace KERNEL
 		void SetVisualEffectsBloom();
 
 		//== Object Snap 관련 함수 ===================================================================
-		Operator::ObjectSnap * m_pcObjectSnapOperator = nullptr;
+		Operator::HighlightObjectSnap * m_pcObjectSnapOperator = nullptr;
 		DWORD m_nOSnapMode = 0;
 
 		void SetObjectSnap(OSnap::Type eInType);
+
+		//== Selection Filter 관련 함수 ==============================================================
+		DWORD m_nSelectionFilter = 0;
+		void SetSelectionFilter(SelectionFilter::Type eInType);
 	};
 }

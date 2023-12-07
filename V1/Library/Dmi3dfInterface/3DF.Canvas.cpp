@@ -32,7 +32,6 @@
 #include "3DF/Private/SegmentPrivate.h"
 #include "3DF/Selection.h"
 #include "3DF/SelectionSet.h"
-#include "3DF/Selectability.h"
 #include "3DF/Visibility.h"
 #include "3DF/Material.h"
 #include "3DF/LineAttribute.h"
@@ -41,8 +40,6 @@
 
 #include "3DF/Operator.CameraSelect.h"
 #include "3DF/Operator.SelectArea.h"
-#include "3DF/Operator.ObjectSnap.h"
-
 
 #include "3DF/Facility.AppOptions.h"
 
@@ -184,14 +181,6 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cInstan
 		return;
 	}
 
-	// Progress dialog 나타내기
-	cInstance.mainFrame.ShowProgress();
-
-	system_clock::time_point cTime1 = system_clock::now();
-
-	cInstance.progress.SetMessage(strFilePathName);
-	cInstance.progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/3 : Import and Tessellation");
-
 	ViewPrivate * pcViewImpl = (ViewPrivate *)GetFrontView().GetImpl();
 	if (nullptr == pcViewImpl) { DEBUG_RETURN; }
 
@@ -207,12 +196,33 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cInstan
 	ext.MakeUpper();
 
 	bool bPointColudData = false;
-	for (auto pre : EXTENSIONS) {
+	for (auto & pre : EXTENSIONS) {
 		if (pre == ext) {
 			bPointColudData = true;
 		}
 	}
 
+	bool bHsfFile = false;
+	if (false == bPointColudData) {
+		if (L"HSF" == ext) {
+			bHsfFile = true;
+		}
+	}
+
+	// Progress dialog 나타내기
+	cInstance.mainFrame.ShowProgress();
+	system_clock::time_point cTime1 = system_clock::now();
+	cInstance.progress.SetMessage(strFilePathName);
+
+	if (true == bPointColudData) {
+		cInstance.progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/2 : Loading point cloud data");
+	}
+	else if(true == bHsfFile) {
+		cInstance.progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/2 : Loading stream file");
+	}
+	else {
+		cInstance.progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/3 : Import and Tessellation");
+	}
 	// HC_Define_System_Options("update control=thread=off");
 
 	CString strErrorMessage;
@@ -221,7 +231,17 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cInstan
 
 	SegmentKey cModelSegmentKey = pcCanvasImpl->m_pcModel->GetSegmentKey();
 
-	if (false == bPointColudData) {
+	//----- File을 실제로 읽어 드리는 부분 -----
+	if (true == bPointColudData)
+	{
+		//LoadPointCloudFile(strFilePathName, m_pcCanvas);
+	}
+	else if (true == bHsfFile) {
+		HC_Open_Segment_By_Key(pcViewImpl->GetBaseView()->GetModel()->GetModelKey()); {
+			TK_Status read_status = HTK_Read_Stream_File(strFilePathName, pcViewImpl->GetBaseView()->GetModel()->GetStreamFileTK());
+		} HC_Close_Segment();
+	}
+	else {
 		SegmentKey cViewKey(pcViewImpl->GetBaseView()->GetViewKey());
 		SegmentKeyPrivate::LocalOpen(cViewKey); {
 			HC_Set_Driver_Options("eye dome lighting = off");
@@ -230,13 +250,17 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cInstan
 		DLL::H3DF::Interface cInterfaace;
 		cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, cInstance, strErrorMessage);
 	}
-	else {
-		// LoadPointCloudFile(strFilePathName, m_pcCanvas);
-	}
 
 	system_clock::time_point cTime2 = system_clock::now();
 
-	cInstance.progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 3/3 : Performing Initial Update");
+	if (false == bPointColudData) {
+		cInstance.progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 3/3 : Performing Initial Update");
+	}
+	else {
+		cInstance.progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 2/2 : Performing Initial Update");
+	}
+
+	pcViewImpl->ViewReady();
 
 	//cModelSegmentKey.ForcedClose();
 
@@ -251,6 +275,7 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cInstan
  	pcViewImpl->GetBaseView()->SetSuppressUpdate(false);
 
 	bool bHasInitialView = pcViewImpl->GetBaseView()->HasInitialView();
+
 	pcViewImpl->GetBaseView()->GetModel()->SetFileLoadComplete(true);
 	pcViewImpl->GetBaseView()->GetModel()->SetFirstFitComplete(true);
 
@@ -266,13 +291,13 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cInstan
 	}
 
 	pcViewImpl->GetBaseView()->SetZoomLimit();
+
 	pcCanvasImpl->m_pcModel->UpdateModelHandedness();
 
 	pcViewImpl->GetBaseView()->SetRenderMode(pcViewImpl->GetBaseView()->GetRenderMode(), true);
 
 	pcViewImpl->GetBaseView()->SetViewDirection(H3DF::ViewDirection::Mode::px_py_pz);
 
-	pcViewImpl->ViewReady();
 	// ExhaustiveUpdate() 내부에서 FoceUpdate를 여러번 호출하기 때문에, Supress 시키도록 한다.
 	pcViewImpl->GetBaseView()->ExhaustiveUpdate();
 
@@ -309,16 +334,20 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cInstan
 		HC_Show_Net_Driver_Options(chBuffer);
 	HC_Close_Segment();
 */
-
 	system_clock::time_point cTime3 = system_clock::now();
 	auto cMilliSec1 = duration_cast<milliseconds>(cTime3 - cTime2);
-
 	CString strMessage;
-	strMessage.Format(L"Stage 3/3 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec1));
-	cInstance.progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+
+	if (false == bPointColudData) {
+		strMessage.Format(L"Stage 3/3 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec1));
+		cInstance.progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+	}
+	else {
+		strMessage.Format(L"Stage 2/2 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec1));
+		cInstance.progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+	}
 
 	auto cMilliSec2 = duration_cast<milliseconds>(cTime3 - cTime1);
-	strMessage;
 	strMessage.Format(L"Total Load Time : [%s]", Utility::GetTimeSpanString(cMilliSec2));
 	cInstance.progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
 
