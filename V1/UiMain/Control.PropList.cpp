@@ -15,12 +15,11 @@ static char THIS_FILE[] = __FILE__;
 
 namespace PresetPropList
 {
-	int const Id = WM_USER;
 	int ControlId = 0;
 
 	void Initialize()
 	{
-		ControlId = Id + 1;
+		ControlId = WM_USER + 1;
 	}
 
 	UINT GetControlId()
@@ -35,8 +34,8 @@ using namespace Control;
 
 BEGIN_MESSAGE_MAP(PropList, CBCGPPropList)
 	ON_WM_CREATE()
+	ON_WM_MOUSEMOVE()
 	ON_WM_SIZE()
-	ON_WM_SETFOCUS()
 END_MESSAGE_MAP()
 
 
@@ -57,6 +56,22 @@ Control::PropList::PropList()
 
 Control::PropList::~PropList()
 {
+}
+
+
+
+bool Control::PropList::Initialize(CWnd* pParentWnd, UINT id, const RECT& rect)
+{
+	const DWORD dwStyle = WS_VISIBLE | WS_CHILD;
+	if (Create(dwStyle, rect, pParentWnd, id) == FALSE) {
+		RETURN_FALSE;
+	}
+
+	EnableDesciptionArea(TRUE);
+	//SetAlternateRowColor(TRUE);
+	//SetVSDotNetLook(TRUE);
+
+	return true;
 }
 
 
@@ -82,18 +97,64 @@ void Control::PropList::InitializeData(Json::Object& data)
 {
 	m_pData = &data;
 
+	m_bInitialized = false;
+
 	for (int i = 0; i < GetPropertyCount(); i++) {
 		CBCGPProp* pProp = GetProperty(i);
-		CString* pName = reinterpret_cast<CString*>(pProp->GetData());
+		CString name = pProp->GetXMLTagName();
 
-		if (pProp != nullptr && pName != nullptr) {
-			ReplacePropData(pProp, m_pData->FindValue((CStringA)*pName));
+		if (pProp != nullptr && name.IsEmpty() == false) {
+			SetPropData(pProp, m_pData->FindValue((CStringA)name));
 		}
 	}
 
 	m_bInitialized = true;
 	//:WARNING - update window
 	AdjustLayout();
+}
+
+
+
+void Control::PropList::Enable(bool value)
+{
+	for (POSITION pos = m_lstProps.GetHeadPosition(); pos != nullptr;) {
+		CBCGPProp* pProp = m_lstProps.GetNext(pos);
+		pProp->Enable((BOOL)value, TRUE);
+	}
+}
+
+
+
+CBCGPProp* Control::PropList::FindPropByName(const CString& name)
+{
+	for (int i = 0; i < GetPropertyCount(); i++) {
+		CBCGPProp* pFound = FindPropByName(GetProperty(i), name);
+		if (pFound != nullptr) {
+			return pFound;
+		}
+	}
+
+	RETURN_NULL;
+}
+
+
+
+CBCGPProp* Control::PropList::FindPropByName(CBCGPProp* pParent, const CString& name)
+{
+	for (int i = 0; i < pParent->GetSubItemsCount(); i++) {
+		CBCGPProp* pProp = pParent->GetSubItem(i);
+		//:WARNING - do not use Name, use XMLTagName
+		if (pProp->GetXMLTagName() == name) {
+			return pProp;
+		}
+
+		pProp = FindPropByName(pProp, name);
+		if (pProp != nullptr) {
+			return pProp;
+		}
+	}
+
+	return nullptr;
 }
 
 
@@ -126,18 +187,99 @@ CString Control::PropList::GetItemNamePath(CBCGPProp* pItem)
 	std::vector<CBCGPProp*>::reverse_iterator iter;
 	for (iter = items.rbegin(); iter != items.rend(); iter++) {
 		CBCGPProp* pParent = *iter;
-		CString* pName = reinterpret_cast<CString*>(pParent->GetData());
-		if (pName != nullptr) {
-			path += L'/' + *pName;
-		}
-		else {
-			DEBUG_STOP;
-		}
+		//:WARNING - do not use Name, use XMLTagName
+		path += L'/' + pParent->GetXMLTagName();
 	}
 
 	path.TrimLeft(L'/');
 
 	return path;
+}
+
+
+
+void Control::PropList::SetPropData(CBCGPProp* pProp, Json::Value* pValue)
+{
+	if (pProp == nullptr || pValue == nullptr) {
+		return;
+	}
+
+	if (pValue->GetType() == Json::EValueType::Object) {
+		ASSERT(pProp->IsGroup());
+		pProp->SetData((DWORD_PTR)pValue);
+		Json::Object& data = pValue->AsObject();
+
+		if (pProp->IsGroupWithCheckBox()) {
+			pProp->SetValue(data.GetBoolean("checked"));
+		}
+
+		for (int i = 0; i < pProp->GetSubItemsCount(); i++) {
+			CBCGPProp* pSubItem = pProp->GetSubItem(i);
+			DEBUG_VALID(pSubItem);
+
+			CString name = pSubItem->GetXMLTagName();
+			if (name.IsEmpty() == false) {
+				SetPropData(pSubItem, data.FindValue((CStringA)name));
+			}
+		}
+	}
+	else if (pValue->GetType() == Json::EValueType::Array) {
+		DEBUG_STOP;
+	}
+	else {
+		pProp->SetData((DWORD_PTR)pValue);
+		SetPropValue(pProp, pValue);
+	}
+}
+
+
+
+void Control::PropList::SetPropName(CBCGPProp* pProp, Json::Object& design)
+{
+	Json::Value* pValue = design.FindValue("name");
+	if (pValue != nullptr) {
+		//:WARNING - do not use Name, use XMLTagName
+		pProp->SetXMLTagName(pValue->AsString());
+	}
+	else {
+		DEBUG_STOP;
+	}
+}
+
+
+
+void Control::PropList::SetPropValue(CBCGPProp* pProp, Json::Value* pValue)
+{
+	DEBUG_VALID(pProp);
+	DEBUG_VALID(pValue);
+
+	Facility::SetValue(*pProp, *pValue);
+}
+
+
+
+void Control::PropList::OnPropertyChanged(CBCGPProp* pProp) const
+{
+	__super::OnPropertyChanged(pProp);
+
+	if (pProp->IsGroupWithCheckBox()) {
+		GetOwner()->SendMessage(BCGM_PROPERTY_CHANGED, GetDlgCtrlID(), LPARAM(pProp));
+	}
+}
+
+
+
+void Control::PropList::OnMouseMove(UINT nFlags, CPoint point)
+{
+	__super::OnMouseMove(nFlags, point);
+
+	if (m_pTracked != nullptr) {
+		Property::CommandButton* button = dynamic_cast<Property::CommandButton*>(m_pTracked);
+		if (button != nullptr) {
+			button->m_bHighlighted = true;
+			button->Redraw();
+		}
+	}
 }
 
 
@@ -149,6 +291,9 @@ CBCGPProp* Control::PropList::CreateProp(Json::Object& design)
 
 	if (type == L"group") {
 		pProp = CreateGroupProp(design);
+	}
+	else if (type == "button") {
+		pProp = CreateButtonProp(design);
 	}
 	else if (type == L"check") {
 		pProp = CreateCheckProp(design);
@@ -196,7 +341,8 @@ CBCGPProp* Control::PropList::CreateGroupProp(Json::Object& design, UINT id)
 {
 	id = (id != 0 ? id : PRESET::GetControlId());
 
-	CBCGPProp* pProp = new CBCGPProp(Facility::GetTitle(design));
+	BOOL hasCheck = design.GetBoolean("hasCheck", false) ? TRUE : FALSE;
+	CBCGPProp* pProp = new CBCGPProp(Facility::GetTitle(design), NULL, FALSE, hasCheck);
 	SetPropName(pProp, design);
 
 	Json::Array* pItems = Facility::GetItems(design);
@@ -208,6 +354,22 @@ CBCGPProp* Control::PropList::CreateGroupProp(Json::Object& design, UINT id)
 			}
 		}
 	}
+
+	return pProp;
+}
+
+
+
+CBCGPProp* Control::PropList::CreateButtonProp(Json::Object& design, UINT id)
+{
+	id = (id != 0 ? id : PRESET::GetControlId());
+
+	CBCGPProp* pProp = new Property::CommandButton(
+		Facility::GetTitle(design),
+		Facility::Local(design.GetString("command")),
+		Facility::GetId(design),
+		Facility::GetDesciption(design));
+	SetPropName(pProp, design);
 
 	return pProp;
 }
@@ -304,101 +466,10 @@ CBCGPProp* Control::PropList::CreateSliderProp(Json::Object& design, UINT id)
 	pProp->SetRange(
 		design.GetInteger("min"),
 		design.GetInteger("max"),
-		design.GetInteger("step")
+		design.GetInteger("step", 1)
 	);
 
 	return pProp;
-}
-
-
-
-CBCGPProp* Control::PropList::FindPropByData(CString& name)
-{
-	for (POSITION pos = m_lstProps.GetHeadPosition(); pos != nullptr;) {
-		CBCGPProp* pProp = m_lstProps.GetNext(pos);
-		CString* pName = reinterpret_cast<CString*>(pProp->GetData());
-		if (pName != nullptr && *pName == name) {
-			return pProp;
-		}
-	}
-
-	RETURN_NULL;
-}
-
-
-
-CBCGPProp* Control::PropList::FindPropByData(CBCGPProp* pParent, CString& name)
-{
-	for (int i = 0; i < pParent->GetSubItemsCount(); i++) {
-		CBCGPProp* pProp = pParent->GetSubItem(i);
-		CString* pName = reinterpret_cast<CString*>(pProp->GetData());
-		if (pName != nullptr && *pName == name) {
-			return pProp;
-		}
-	}
-
-	RETURN_NULL;
-}
-
-
-
-void Control::PropList::ReplacePropData(CBCGPProp* pProp, Json::Value* pValue)
-{
-	if (pProp == nullptr || pValue == nullptr) {
-		DEBUG_RETURN;
-	}
-
-	if (pValue->GetType() == Json::EValueType::Object) {
-		ASSERT(pProp->IsGroup());
-		Json::Object& data = pValue->AsObject();
-
-		for (int i = 0; i < pProp->GetSubItemsCount(); i++) {
-			CBCGPProp* pSubItem = pProp->GetSubItem(i);
-			CString* pName = reinterpret_cast<CString*>(pSubItem->GetData());
-			if (pName != nullptr) {
-				ReplacePropData(pSubItem, data.FindValue((CStringA)*pName));
-			}
-		}
-	}
-	else if (pValue->GetType() == Json::EValueType::Array) {
-		DEBUG_STOP;
-	}
-	else {
-		pProp->SetData((DWORD_PTR)pValue);
-
-		if (pProp->GetOptionCount() > 0) {
-			pProp->SelectOption(pValue->ToInteger());
-		}
-		else if (dynamic_cast<CBCGPColorProp*>(pProp) != nullptr) {
-			//:WARNING - not SetValue()
-			((CBCGPColorProp*)pProp)->SetColor(pValue->ToInteger());
-		}
-		else {
-			switch (pValue->GetType()) {
-			case Json::EValueType::Boolean:	pProp->SetValue(pValue->ToBoolean());			break;
-			case Json::EValueType::Int:		pProp->SetValue(pValue->ToInteger());			break;
-			case Json::EValueType::Uint:	pProp->SetValue(pValue->ToInteger());			break;
-			case Json::EValueType::Real:	pProp->SetValue(pValue->ToReal());				break;
-			case Json::EValueType::String:	pProp->SetValue((LPCTSTR)pValue->ToString());	break;
-
-			default:
-				DEBUG_STOP;
-			}
-		}
-	}
-}
-
-
-
-void Control::PropList::SetPropName(CBCGPProp* pProp, Json::Object& design)
-{
-	Json::Value* pValue = design.FindValue("name");
-	if (pValue != nullptr) {
-		pProp->SetData((DWORD_PTR)&(pValue->AsString()));
-	}
-	else {
-		DEBUG_STOP;
-	}
 }
 
 #undef PRESET

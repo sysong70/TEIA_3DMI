@@ -24,11 +24,6 @@ namespace PresetView2d
 		TabId = WM_USER,
 		Layer,
 	};
-
-	CSize TabImageSize()
-	{
-		return globalUtils.ScaleByDPI(CSize(24, 24));
-	}
 }
 
 
@@ -170,7 +165,7 @@ void Window::View2d::CreatePanelTabs()
 
 	m_layerPanel.Initialize(&m_tabs, this, PRESET::Layer);
 
-	m_tabs.SetImageList({ HOME_3D_CMD_Panels_Layer }, PRESET::TabImageSize());
+	m_tabs.SetImageList({ HOME_3D_CMD_Panels_Layer }, Control::ImageSize());
 	m_tabs.AddTab(&m_layerPanel, Facility::GetTitle(HOME_3D_CMD_Panels_Layer), 0);
 	m_tabs.SetActiveTab(0);
 }

@@ -19,9 +19,19 @@ namespace Control
 
 		~PropList() override;
 
+		bool Initialize(CWnd* pParentWnd, UINT id = WM_USER, const RECT& rect = {});
+
 		void InitializeDesign(Json::Object& design);
 
 		void InitializeData(Json::Object& data);
+
+	public:
+
+		void Enable(bool value);
+		// from root item
+		CBCGPProp* FindPropByName(const CString& name);
+		// sub items
+		CBCGPProp* FindPropByName(CBCGPProp* pParent, const CString& name);
 
 		void GetAncestor(CBCGPProp* pItem, std::vector<CBCGPProp*>& parent);
 
@@ -29,7 +39,17 @@ namespace Control
 		// from pItem->GetData()
 		CString GetItemNamePath(CBCGPProp* pItem);
 
+		void SetPropData(CBCGPProp* pProp, Json::Value* pValue);
+		//:WARNING - do not use Name, use XMLTagName
+		void SetPropName(CBCGPProp* pProp, Json::Object& design);
+
+		void SetPropValue(CBCGPProp* pProp, Json::Value* pValue);
+
 	protected:
+
+		void OnPropertyChanged(CBCGPProp* pProp) const override;
+
+		afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 
 		DECLARE_MESSAGE_MAP()
 
@@ -38,6 +58,8 @@ namespace Control
 		CBCGPProp* CreateProp(Json::Object& design);
 
 		CBCGPProp* CreateGroupProp(Json::Object& design, UINT id = 0);
+
+		CBCGPProp* CreateButtonProp(Json::Object& design, UINT id = 0);
 
 		CBCGPProp* CreateCheckProp(Json::Object& design, UINT id = 0);
 
@@ -58,14 +80,5 @@ namespace Control
 		bool m_bInitialized = false;
 		Json::Object* m_pDesign = nullptr;
 		Json::Object* m_pData = nullptr;
-
-		// root items
-		CBCGPProp* FindPropByData(CString& name);
-		// sub items
-		CBCGPProp* FindPropByData(CBCGPProp* pParent, CString& name);
-		// set value pointer to pProp->m_dwData
-		void ReplacePropData(CBCGPProp* pProp, Json::Value* pValue);
-		// set name to pProp->m_dwData
-		void SetPropName(CBCGPProp* pProp, Json::Object& design);
 	};
 }

@@ -267,7 +267,7 @@ void Component::ModelPanel::OnTreeDeleteItem(NMHDR* pNMHDR, LRESULT* pResult)
 	if (m_wndControl.GetItemText(pNMTreeView->itemOld.hItem) != PRESET::DummyName) {
 		DWORD_PTR key = m_wndControl.GetItemData(pNMTreeView->itemOld.hItem);
 		m_keyMap.erase(key);
-		m_pView->Delivery().modelPanel.OnDeleteItem(key);
+		m_pView->GetDelivery().modelPanel.OnDeleteItem(key);
 	}
 
 	*pResult = S_OK;
@@ -303,7 +303,7 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 			m_wndControl.DeleteItem(hItem);
 
 			DWORD_PTR key = m_wndControl.GetItemData(pNMTreeView->itemNew.hItem);
-			m_pView->Delivery().modelPanel.OnItemExpanded(key);
+			m_pView->GetDelivery().modelPanel.OnItemExpanded(key);
 		}
 	}
 
@@ -361,7 +361,7 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 
 
 	DWORD_PTR key = m_wndControl.GetItemData(pNMTreeView->itemNew.hItem);
-	m_pView->Delivery().modelPanel.OnSelChanged(key);
+	m_pView->GetDelivery().modelPanel.OnSelChanged(key);
 
 	*pResult = S_OK;
 }

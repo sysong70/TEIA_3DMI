@@ -1,13 +1,10 @@
 ﻿#pragma once
 
 #include "Window.h"
-#include "Component.Input.h"
-#include "Component.InputBar.h"
 #include "Component.LayerPanel.h"
 #include "Component.ModelPanel.h"
 #include "Component.PanelBar.h"
 #include "Component.ScenePanel.h"
-#include "Component.TaskBar.h"
 #include "Component.ViewPanel.h"
 #include "Control.HistoryBar.h"
 #include "Control.TabWnd.h"
@@ -15,12 +12,17 @@
 
 
 
+namespace Command
+{
+	class Base;
+}
+
+
+
 namespace Window
 {
 	class View : public CView
 	{
-		friend class Component::Input;
-
 	protected:
 
 		View();
@@ -40,13 +42,17 @@ namespace Window
 
 		~View() override;
 
+		virtual void ReceiveSignal(Json::Object* pData) {}
+
+	public:
+
+		void CancelCommand();
+
+		Signal::Delivery& GetDelivery();
+
 		Document* GetDocument() const;
 
 		int GetId();
-
-		virtual void ReceiveSignal(Json::Object* pData) {}
-
-		Signal::Delivery& Delivery();
 
 	protected:
 
@@ -123,6 +129,10 @@ namespace Window
 
 		bool IsValid();
 
+	protected: // Commands
+
+		Command::Base* m_pActiveCommand = nullptr;
+
 	protected: // ToolBar
 
 		Control::ToolBar m_toolBar;
@@ -137,17 +147,5 @@ namespace Window
 		Control::TabWnd m_tabs;
 
 		virtual void CreatePanelTabs();
-
-	protected: // TaskBar
-
-		Component::TaskBar m_taskBar;
-
-		void CreateTaskBar();
-
-		void ShowTaskBar(bool show = true);
-
-	protected: // InputBar
-
-		Component::Input m_input;
 	};
 }

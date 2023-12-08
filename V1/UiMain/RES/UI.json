@@ -1,14 +1,16 @@
 ﻿{
+
 "Styles":{
 	"Button":{
 	}
 },
 
-"Dialog":{
+"Dialogs":{
 	"DefaultButtons":{
 		"Ok":{"title":"Ok|확인", "id":1, "comment":"IDOK"},
 		"Cancel":{"title":"Cancel|취소", "id":2, "comment":"IDCANCEL"},
-		"Apply":{"title":"Apply|적용", "id":3, "comment":"IDAPPLY substitute IDYES"}
+		"Close":{"title":"Close|닫기", "id":8, "comment":"IDCLOSE"},
+		"Apply":{"title":"Apply|적용", "id":11, "comment":"IDCONTINUE"}
 	},
 
 	"FileOpen":{
@@ -81,7 +83,7 @@
 		"properties":{
 			"Environment":{"type":"root", "items":[
 				{"type":"group", "name":"General", "title":"General|일반", "items":[
-					{"type":"drop", "name":"Language", "title":"Language|언어", "desc":"_#_|_#_", "value":0, "items":[
+					{"type":"drop", "name":"Language", "title":"Language|언어", "desc":"__#__|__#__", "value":0, "items":[
 						"English|영어",
 						"Korean|한글"
 					]}
@@ -144,50 +146,50 @@
 		],
 		"__DEFAULT__":[
 			{"type":"group", "name":"General", "title":"General|일반", "items":[
-				{"type":"drop", "name":"ReadingMode", "title":"Reading Mode|_#_", "desc":"_#_|_#_", "value":0, "items":[
-					"Feature Trees|_#_",
-					"B-Rep|_#_",
-					"Tessellation Only|_#_"
+				{"type":"drop", "name":"ReadingMode", "title":"Reading Mode|__#__", "desc":"__#__|__#__", "value":0, "items":[
+					"Feature Trees|__#__",
+					"B-Rep|__#__",
+					"Tessellation Only|__#__"
 				]},
-				{"type":"check", "name":"Solids", "title":"Solid|_#_", "desc":"Allows reading of solid parts.|_#_"},
-				{"type":"check", "name":"Surfaces", "title":"Surfaces|_#_", "desc":"Allows reading of surfaces entities.|_#_"},
-				{"type":"check", "name":"Wireframes", "title":"Wireframes|_#_", "desc":"_#_|_#_"},
-				{"type":"check", "name":"Attributes", "title":"Attributes|_#_", "desc":"_#_|_#_"},
-				{"type":"check", "name":"HiddenObjects", "title":"Hidden Objects|_#_", "desc":"_#_|_#_"},
-				{"type":"check", "name":"References", "title":"Construction and References|_#_", "desc":"_#_|_#_"},
-				{"type":"check", "name":"ActiveFilter", "title":"Active Filter|_#_", "desc":"_#_|_#_"},
-				{"type":"check", "name":"SewModel", "title":"Sew Model|_#_", "desc":"_#_|_#_"},
-				{"type":"edit", "name":"SewingTolerance", "title":"Sewing Tolerance|_#_", "desc":"_#_|_#_", "value":"0.001"},
-				{"type":"check", "name":"ShellOrientation", "title":"Compute Non-Solid Shell Orientation|_#_", "desc":"_#_|_#_"},
-				{"type":"drop", "name":"LoadingMode", "title":"Loading Mode|_#_", "desc":"_#_|_#_", "value":0, "items":[
-					"Complete|_#_",
-					"Incremental|_#_"
+				{"type":"check", "name":"Solids", "title":"Solid|__#__", "desc":"Allows reading of solid parts.|__#__"},
+				{"type":"check", "name":"Surfaces", "title":"Surfaces|__#__", "desc":"Allows reading of surfaces entities.|__#__"},
+				{"type":"check", "name":"Wireframes", "title":"Wireframes|__#__", "desc":"__#__|__#__"},
+				{"type":"check", "name":"Attributes", "title":"Attributes|__#__", "desc":"__#__|__#__"},
+				{"type":"check", "name":"HiddenObjects", "title":"Hidden Objects|__#__", "desc":"__#__|__#__"},
+				{"type":"check", "name":"References", "title":"Construction and References|__#__", "desc":"__#__|__#__"},
+				{"type":"check", "name":"ActiveFilter", "title":"Active Filter|__#__", "desc":"__#__|__#__"},
+				{"type":"check", "name":"SewModel", "title":"Sew Model|__#__", "desc":"__#__|__#__"},
+				{"type":"edit", "name":"SewingTolerance", "title":"Sewing Tolerance|__#__", "desc":"__#__|__#__", "value":"0.001"},
+				{"type":"check", "name":"ShellOrientation", "title":"Compute Non-Solid Shell Orientation|__#__", "desc":"__#__|__#__"},
+				{"type":"drop", "name":"LoadingMode", "title":"Loading Mode|__#__", "desc":"__#__|__#__", "value":0, "items":[
+					"Complete|__#__",
+					"Incremental|__#__"
 				]}
 			]},
 			{"type":"group", "name":"Tessellation", "title":"Tessellation", "items":[
-				{"type":"drop", "name":"TessLevel", "title":"Predefined Tessellation Level|_#_", "value":2, "items":[
-					"Extra Low|_#_",
-					"Low|_#_",
-					"Medium|_#_",
-					"High|_#_",
-					"Extra High|_#_",
-					"Custom|_#_"
+				{"type":"drop", "name":"TessLevel", "title":"Predefined Tessellation Level|__#__", "value":2, "items":[
+					"Extra Low|__#__",
+					"Low|__#__",
+					"Medium|__#__",
+					"High|__#__",
+					"Extra High|__#__",
+					"Custom|__#__"
 				]},
 				{"type":"group", "name":"CustomTessLevel", "title":"Custom Tessellation Level", "items":[
-					{"type":"drop", "name":"ChordLimitType", "title":"Chord Limit|_#_", "desc":"_#_|_#_", "value":1, "items":[
-						"Ratio|_#_",
-						"Height|_#_"
+					{"type":"drop", "name":"ChordLimitType", "title":"Chord Limit|__#__", "desc":"__#__|__#__", "value":1, "items":[
+						"Ratio|__#__",
+						"Height|__#__"
 					]},
-					{"type":"edit", "name":"ChordLimit", "title":"Limit|_#_", "desc":"_#_|_#_", "value":10000},
-					{"type":"edit", "name":"AngleTolerance", "title":"Angle Tolerance|_#_", "desc":"_#_|_#_", "value":40}
+					{"type":"edit", "name":"ChordLimit", "title":"Limit|__#__", "desc":"__#__|__#__", "value":10000},
+					{"type":"edit", "name":"AngleTolerance", "title":"Angle Tolerance|__#__", "desc":"__#__|__#__", "value":40}
 				]},
-				{"type":"check", "name":"PreserveUV", "title":"Preserve UV Points|_#_", "desc":"_#_|_#_"},
-				{"type":"edit", "name":"MaxEdgeLength", "title":"Maximum Edge Length|_#_", "desc":"_#_|_#_", "value":"0"},
-				{"type":"group", "name":"Accurate", "title":"Accurate Tessellation|_#_", "items":[
-					{"type":"check", "name":"AccurateTess", "title":"Accurate Tessellation|_#_", "desc":"_#_|_#_"},
-					{"type":"check", "name":"GridAlignedTess", "title":"Grid Aligned Tessellation|_#_", "desc":"_#_|_#_"},
-					{"type":"edit", "name":"MaxStitchLength", "title":"Maximum Stitch Length|_#_", "value":"0.001", "desc":"_#_|_#_"},
-					{"type":"check", "name":"SurfaceCurvatures", "title":"Adapt to Surface Curvatures|_#_", "desc":"_#_|_#_"}
+				{"type":"check", "name":"PreserveUV", "title":"Preserve UV Points|__#__", "desc":"__#__|__#__"},
+				{"type":"edit", "name":"MaxEdgeLength", "title":"Maximum Edge Length|__#__", "desc":"__#__|__#__", "value":"0"},
+				{"type":"group", "name":"Accurate", "title":"Accurate Tessellation|__#__", "items":[
+					{"type":"check", "name":"AccurateTess", "title":"Accurate Tessellation|__#__", "desc":"__#__|__#__"},
+					{"type":"check", "name":"GridAlignedTess", "title":"Grid Aligned Tessellation|__#__", "desc":"__#__|__#__"},
+					{"type":"edit", "name":"MaxStitchLength", "title":"Maximum Stitch Length|__#__", "value":"0.001", "desc":"__#__|__#__"},
+					{"type":"check", "name":"SurfaceCurvatures", "title":"Adapt to Surface Curvatures|__#__", "desc":"__#__|__#__"}
 				]}
 			]}
 		]
@@ -202,5 +204,63 @@
 		"title":"Selection Filters|선택 필터",
 		"size":{"cx":400, "cy":600}
 	}
+},
+
+"Tasks":{
+	"VisualEffects3d":{
+		"header":{"title":"Visual Effects|__#__", "size":{"cx":350, "cy":570}},
+		"toolbar":{"itemSize":2},
+		"properties":{"type":"root", "items":[
+			{"type":"group", "name":"Shadow", "title":"Shadow|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+				{"type":"drop", "name":"Mode", "title":"Mode|__#__", "desc":"__#__|__#__", "value":1, "items":[
+					"None|__#__",
+					"Soft|__#__",
+					"Hard|__#__"
+				]},
+				{"type":"slider", "name":"Resolution", "title":"Resolution|__#__", "desc":"__#__|__#__", "min":1, "max":10, "value":3},
+				{"type":"slider", "name":"Blurring", "title":"Blurring|__#__", "desc":"__#__|__#__", "min":1, "max":10, "value":1},
+				{"type":"check", "name":"IgnoreTransparency", "title":"Ignore Transparency|__#__", "desc":"__#__|__#__", "value":false},
+				{"type":"color", "name":"Color", "title":"Color|__#__", "desc":"__#__|__#__", "value":"0x404040"},
+				{"type":"slider", "name":"Opacity", "title":"Opacity|__#__", "desc":"__#__|__#__", "min":1, "max":10, "value":10},
+				{"type":"button", "name":"ResetShadow", "title":"Reset to Default|__#__", "desc":"__#__|__#__", "command":"Reset|__#__", "id":1}
+			]},
+			{"type":"group", "name":"PlaneReflection", "title":"Plane Reflection|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+				{"type":"slider", "name":"Opacity", "title":"Opacity|__#__", "desc":"__#__|__#__", "min":1, "max":10, "value":5},
+				{"type":"slider", "name":"Blurring", "title":"Blurring|__#__", "desc":"__#__|__#__", "min":1, "max":10, "value":1},
+				{"type":"check", "name":"Fading", "title":"Fading|__#__", "desc":"__#__|__#__", "value":false},
+				{"type":"button", "name":"ResetPlaneReflection", "title":"Reset to Default|__#__", "desc":"__#__|__#__", "command":"Reset|__#__", "id":2}
+			]},
+			{"type":"group", "name":"AmbientOcclusion", "title":"Ambient Occlusion|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+				{"type":"slider", "name":"Strength", "title":"Strength|__#__", "desc":"__#__|__#__", "min":1, "max":20, "value":1},
+				{"type":"drop", "name":"Quality", "title":"Quality|__#__", "desc":"__#__|__#__", "value":0, "items":[
+					"Fast|__#__",
+					"Nicest|__#__"
+				]},
+				{"type":"button", "name":"ResetAmbientOcclusion", "title":"Reset to Default|__#__", "desc":"__#__|__#__", "command":"Reset|__#__", "id":3}
+			]},
+			{"type":"group", "name":"SilhouetteEdges", "title":"Silhouette Edges|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+				{"type":"slider", "name":"Tolerance", "title":"Tolerance|__#__", "desc":"__#__|__#__", "min":1, "max":20, "value":1},
+				{"type":"check", "name":"HeavyExterior", "title":"Heavy Exterior|__#__", "desc":"__#__|__#__", "value":true},
+				{"type":"button", "name":"ResetSilhouetteEdges", "title":"Reset to Default|__#__", "desc":"__#__|__#__", "command":"Reset|__#__", "id":4}
+			]},
+			{"type":"group", "name":"Bloom", "title":"Bloom|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+				{"type":"slider", "name":"Strength", "title":"Strength|__#__", "desc":"__#__|__#__", "min":1, "max":10, "value":1},
+				{"type":"slider", "name":"Blurring", "title":"Blurring|__#__", "desc":"__#__|__#__", "min":1, "max":10, "value":5},
+				{"type":"drop", "name":"Shape", "title":"Shape|__#__", "desc":"__#__|__#__", "value":0, "items":[
+					"Radial",
+					"Star"
+				]},
+				{"type":"button", "name":"ResetBloom", "title":"Reset to Default|__#__", "desc":"__#__|__#__", "command":"Reset|__#__", "id":5}
+			]}
+		]},
+		"default":{
+			"Shadow":{"checked":true, "Mode":1, "Resolution":3, "Blurring":1, "IgnoreTransparency":false, "Color":"0x404040", "Opacity":10},
+			"PlaneReflection":{"checked":true, "Opacity":5, "Blurring":1, "Fading":false},
+			"AmbientOcclusion":{"checked":true, "Strength":1, "Quality":0},
+			"SilhouetteEdges":{"checked":true, "Tolerance":1, "HeavyExterior":true},
+			"Bloom":{"checked":true, "Strength":1, "Blurring":5, "Shape":0}
+		}
+	}
 }
+
 }

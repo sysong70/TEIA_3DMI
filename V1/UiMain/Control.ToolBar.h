@@ -12,11 +12,18 @@ namespace Control
 	{
 	public:
 
+		enum class EItemSize
+		{
+			Small,
+			Medium,
+			Large,
+		};
+
 		ToolBar();
 
 		~ToolBar() override;
 
-		void Initialize(CWnd* pParentWnd, const RECT& rect = {});
+		bool Initialize(CWnd* pParentWnd, UINT id = WM_USER, const RECT& rect = {});
 
 		void SetPivot(EPivot pivot, bool expandSize = true);
 
@@ -33,6 +40,10 @@ namespace Control
 		CPoint AdjustLocation(CSize size);
 
 		CBCGPButton* GetButton(UINT id);
+
+		void SetSize(CSize buttonSize, CSize buttonMargin, CSize imageSize, CSize seperatorMargin, CSize toolBarPadding);
+		// image size, not button size
+		void SetSize(EItemSize size);
 
 	protected:
 
@@ -58,5 +69,23 @@ namespace Control
 		CBCGPButton* CreateButton(UINT id, bool menu);
 
 		bool IsHorizontal();
+
+	protected:
+
+		CSize m_buttonSize = CSize(28, 28);
+		CSize m_buttonMargin = CSize(2, 2);
+		CSize m_imageSize = CSize(24, 24);
+		CSize m_seperatorMargin = CSize(6, 6);
+		CSize m_toolBarPadding = CSize(3, 3);
+
+		CSize GetButtonSize();
+
+		CSize GetButtonMargin();
+
+		CSize GetImageSize();
+
+		CSize GetSeperatorMargin();
+
+		CSize GetPadding();
 	};
 }

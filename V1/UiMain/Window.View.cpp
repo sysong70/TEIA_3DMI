@@ -3,6 +3,7 @@
 #include "Window.View.h"
 #include "Window.Application.h"
 #include "Window.Document.h"
+#include "Command.Base.h"
 #include "Connector.h"
 #include "Facility.AppOptions.h"
 
@@ -57,6 +58,25 @@ Window::View::~View()
 
 
 
+void Window::View::CancelCommand()
+{
+	m_delivery.view.OnCancel();
+
+	if (m_pActiveCommand != nullptr) {
+		m_pActiveCommand->Cancel();
+		m_pActiveCommand = nullptr;
+	}
+}
+
+
+
+Signal::Delivery& Window::View::GetDelivery()
+{
+	return m_delivery;
+}
+
+
+
 Window::Document* Window::View::GetDocument() const // non-debug version is inline
 {
 	ASSERT(m_pDocument->IsKindOf(RUNTIME_CLASS(Document)));
@@ -68,13 +88,6 @@ Window::Document* Window::View::GetDocument() const // non-debug version is inli
 int Window::View::GetId()
 {
 	return m_nViewId;
-}
-
-
-
-Signal::Delivery& Window::View::Delivery()
-{
-	return m_delivery;
 }
 
 
@@ -101,7 +114,6 @@ void Window::View::OnInitialUpdate()
 	CreateHistoryBar();
 	CreateToolBar();
 	CreatePanelTabs();
-	CreateTaskBar();
 
 	m_delivery.view.OnInitialize((DWORD_PTR)m_hWnd, GetDocument()->GetPathName());
 }
@@ -144,7 +156,7 @@ LRESULT Window::View::OnSignal(WPARAM wp, LPARAM lp)
 
 void Window::View::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 {
-	CView::OnActivate(nState, pWndOther, bMinimized);
+	__super::OnActivate(nState, pWndOther, bMinimized);
 
 	Activate(nState == WA_ACTIVE);
 }
@@ -153,17 +165,7 @@ void Window::View::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
 
 void Window::View::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	switch (nChar) {
-	case VK_ESCAPE:
-		m_delivery.view.OnCancel();
-		return;
-
-	default:
-		m_input.OnChar(nChar, nRepCnt, nFlags);
-		break;
-	}
-
-	CView::OnChar(nChar, nRepCnt, nFlags);
+	__super::OnChar(nChar, nRepCnt, nFlags);
 }
 
 
@@ -174,7 +176,7 @@ void Window::View::OnContextMenu(CWnd*, CPoint point)
 		return;
 	}
 
-	TheAppication.ShowPopupMenu(IDR_CONTEXT_MENU, point, this);
+	TheApplication.ShowPopupMenu(IDR_CONTEXT_MENU, point, this);
 }
 
 
@@ -191,28 +193,11 @@ BOOL Window::View::OnEraseBkgnd(CDC* pDC)
 void Window::View::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	switch (nChar) {
-	case VK_F1:
-		m_input.SetView(this);
-		m_input.SetMode(Signal::EInputMode::Real);
-		return;
-
-	case VK_F2:
-		m_input.SetView(this);
-		m_input.SetMode(Signal::EInputMode::Integer);
-		return;
-
-	case VK_F3:
-		m_input.SetView(this);
-		m_input.SetMode(Signal::EInputMode::Point2d);
-		return;
-
-	case VK_F4:
-		m_input.SetView(this);
-		m_input.SetMode(Signal::EInputMode::Point3d);
+	case VK_ESCAPE:
+		CancelCommand();
 		return;
 
 	default:
-		m_input.OnKeyDown(nChar, nRepCnt, nFlags);
 		break;
 	}
 
@@ -223,7 +208,7 @@ void Window::View::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void Window::View::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	m_input.OnKeyUp(nChar, nRepCnt, nFlags);
+	//:TODO
 
 	__super::OnKeyUp(nChar, nRepCnt, nFlags);
 }
@@ -242,8 +227,6 @@ void Window::View::OnPaint()
 	else {
 		dc.FillSolidRect(rect, (COLORREF)Control::EColor::DarkBack);
 	}
-
-	// GetDC()->FillRect(CRect(500, 500, 1000, 1000), m_pcBrush);
 }
 
 
@@ -280,7 +263,7 @@ void Window::View::OnLButtonUp(UINT nFlags, CPoint point)
 		//}
 
 		ReleaseCapture();
-		SetCursor(TheAppication.LoadStandardCursor(IDC_ARROW));
+		SetCursor(TheApplication.LoadStandardCursor(IDC_ARROW));
 	}
 
 	__super::OnLButtonUp(nFlags, point);
@@ -308,7 +291,7 @@ void Window::View::OnMButtonUp(UINT nFlags, CPoint point)
 		m_delivery.view.OnMButtonUp(nFlags, point.x, point.y);
 
 		ReleaseCapture();
-		SetCursor(TheAppication.LoadStandardCursor(IDC_ARROW));
+		SetCursor(TheApplication.LoadStandardCursor(IDC_ARROW));
 	}
 
 	__super::OnMButtonUp(nFlags, point);
@@ -333,13 +316,9 @@ int Window::View::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message
 
 void Window::View::OnMouseMove(UINT nFlags, CPoint point)
 {
-	// GetDC()->FillRect(CRect(500, 500, 1000, 1000), m_pcBrush);
-
 	if (IsValid()) {
 		m_delivery.view.OnMouseMove(nFlags, point.x, point.y);
 	}
-
-	// GetDC()->FillRect(CRect(500, 500, 1000, 1000), m_pcBrush);
 
 	__super::OnMouseMove(nFlags, point);
 }
@@ -378,7 +357,7 @@ void Window::View::OnRButtonUp(UINT nFlags, CPoint point)
 		//}
 
 		ReleaseCapture();
-		SetCursor(TheAppication.LoadStandardCursor(IDC_ARROW));
+		SetCursor(TheApplication.LoadStandardCursor(IDC_ARROW));
 	}
 
 	__super::OnRButtonUp(nFlags, point);
@@ -393,7 +372,7 @@ void Window::View::OnSize(UINT nType, int cx, int cy)
 	if (cx > 0 && cy > 0) {
 		m_toolBar.AdjustLayout();
 		m_historyBar.AdjustLayout();
-		m_taskBar.AdjustLayout();
+		TheApplication.GetMainFrame().m_taskBar.AdjustLayout();
 	}
 
 	if (m_bRenderer) {
@@ -499,27 +478,6 @@ void Window::View::CreatePanelTabs()
 	m_tabs.SetTabHeight(Control::TabHeight());
 	m_tabs.SetLocation(CBCGPTabWnd::LOCATION_TOP);
 	m_tabs.SetIconLocation(CBCGPTabWnd::TAB_ICON_LEFT);
-}
-
-
-
-void Window::View::CreateTaskBar()
-{
-	m_taskBar.Initialize(this);
-//	ShowTaskBar();
-}
-
-
-
-void Window::View::ShowTaskBar(bool show)
-{
-	if (show) {
-		m_taskBar.ShowWindow(SW_SHOW);
-		m_taskBar.AdjustLayout();
-	}
-	else {
-		m_taskBar.ShowWindow(SW_HIDE);
-	}
 }
 
 #undef PRESET

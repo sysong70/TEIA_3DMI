@@ -17,110 +17,105 @@ static char THIS_FILE[] = __FILE__;
 
 namespace PresetStatusBar
 {
-	enum PaneId
+	enum EPaneId
 	{
 		Unknown = WM_USER,
 		Message,
 		Coordinate,
 	};
+}
 
-	CSize ImageSize()
+
+
+class StatusBarButton : public CBCGPRibbonStatusBarPane
+{
+public:
+
+	StatusBarButton(UINT nCmdID)
+		: CBCGPRibbonStatusBarPane(nCmdID, NULL)
 	{
-		return globalUtils.ScaleByDPI(CSize(24, 24));
+		SetIcon(Facility::CreateIcon(nCmdID, Control::ImageSize()));
 	}
 
-
-
-	class StatusBarButton : public CBCGPRibbonStatusBarPane
+	void DrawImage(CDC* pDC, RibbonImageType type, CRect rectImage) override
 	{
-	public:
+		HICON hIcon = m_hIcon;
+		CSize iconSize = Control::ImageSize();
+		CSize offset = globalUtils.ScaleByDPI(CSize(4, 3));
 
-		StatusBarButton(UINT nCmdID)
-			: CBCGPRibbonStatusBarPane(nCmdID, NULL)
-		{
-			SetIcon(Facility::CreateIcon(nCmdID, PRESET::ImageSize()));
-		}
+		//if (m_bIsDisabled) {
+		//	CBCGPToolBarImages icon;
+		//	icon.SetImageSize(iconSize);
+		//	icon.AddIcon(hIcon, FALSE);
 
-		void DrawImage(CDC* pDC, RibbonImageType type, CRect rectImage) override
-		{
-			HICON hIcon = m_hIcon;
-			CSize iconSize = ImageSize();
-			CSize offset = globalUtils.ScaleByDPI(CSize(4, 3));
-
-			//if (m_bIsDisabled) {
-			//	CBCGPToolBarImages icon;
-			//	icon.SetImageSize(iconSize);
-			//	icon.AddIcon(hIcon, FALSE);
-
-			//	CBCGPDrawState ds;
-			//	icon.PrepareDrawImage(ds, iconSize, TRUE);
-			//	icon.Draw(pDC, rectImage.left - offset.cx, rectImage.top - offset.cy, 0, FALSE, TRUE);
-			//	icon.EndDrawImage(ds);
-			//}
-			//else {
-			//	::DrawIconEx(pDC->GetSafeHdc(),
-			//		rectImage.left - offset.cx, rectImage.top - offset.cy,
-			//		hIcon, iconSize.cx, iconSize.cy, 0, NULL, DI_NORMAL);
-			//}
-
-			::DrawIconEx(pDC->GetSafeHdc(),
-				rectImage.left - offset.cx, rectImage.top - offset.cy,
-				hIcon, iconSize.cx, iconSize.cy, 0, NULL, DI_NORMAL);
-		}
-
-		CSize GetSize(CDC* pDC) override
-		{
-			return globalUtils.ScaleByDPI(CSize(28, 29));
-		}
-
-		//:WARNING - remove menu arrow
-		virtual void OnDrawMenuArrow(CDC* pDC, const CRect& rectMenuArrow) override
-		{
-		}
-
-		//:CHECK
-		//virtual COLORREF OnFillBackground(CDC* pDC) override
-		//{
-		//	ASSERT_VALID(this);
-		//	ASSERT_VALID(pDC);
-
-		//	BOOL bIsHighlighted = m_bIsHighlighted;
-		//	BOOL bIsPressed = m_bIsPressed;
-		//	BOOL bIsDisabled = m_bIsDisabled;
-
-		//	if (m_bIsStatic) {
-		//		m_bIsDisabled = FALSE;
-		//	}
-
-		//	if (m_bIsStatic || m_bIsDisabled) {
-		//		m_bIsHighlighted = FALSE;
-		//		m_bIsPressed = FALSE;
-		//	}
-
-		//	CRect rect = GetRect();
-
-		//	if (IsHighlighted()) {
-		//		if (IsPressed()) {
-		//			pDC->FillSolidRect(rect, globalData.clrBarDkShadow);
-		//		}
-		//		else {
-		//			pDC->FillSolidRect(rect, globalData.clrBarShadow);
-		//		}
-		//	}
-		//	else if (IsChecked()) {
-		//		pDC->FillSolidRect(rect, globalData.clrBarShadow);
-		//	}
-
-		//	COLORREF clrText = IsDisabled() ? (COLORREF)Component::EColor::OldSilver : globalData.clrBarText;
-
-		//	m_bIsHighlighted = bIsHighlighted;
-		//	m_bIsPressed = bIsPressed;
-		//	m_bIsDisabled = bIsDisabled;
-
-		//	return clrText;
+		//	CBCGPDrawState ds;
+		//	icon.PrepareDrawImage(ds, iconSize, TRUE);
+		//	icon.Draw(pDC, rectImage.left - offset.cx, rectImage.top - offset.cy, 0, FALSE, TRUE);
+		//	icon.EndDrawImage(ds);
 		//}
-	};
-}
+		//else {
+		//	::DrawIconEx(pDC->GetSafeHdc(),
+		//		rectImage.left - offset.cx, rectImage.top - offset.cy,
+		//		hIcon, iconSize.cx, iconSize.cy, 0, NULL, DI_NORMAL);
+		//}
+
+		::DrawIconEx(pDC->GetSafeHdc(),
+			rectImage.left - offset.cx, rectImage.top - offset.cy,
+			hIcon, iconSize.cx, iconSize.cy, 0, NULL, DI_NORMAL);
+	}
+
+	CSize GetSize(CDC* pDC) override
+	{
+		return globalUtils.ScaleByDPI(CSize(28, 29));
+	}
+
+	//:WARNING - remove menu arrow
+	virtual void OnDrawMenuArrow(CDC* pDC, const CRect& rectMenuArrow) override
+	{
+	}
+
+	//:CHECK
+	//virtual COLORREF OnFillBackground(CDC* pDC) override
+	//{
+	//	ASSERT_VALID(this);
+	//	ASSERT_VALID(pDC);
+
+	//	BOOL bIsHighlighted = m_bIsHighlighted;
+	//	BOOL bIsPressed = m_bIsPressed;
+	//	BOOL bIsDisabled = m_bIsDisabled;
+
+	//	if (m_bIsStatic) {
+	//		m_bIsDisabled = FALSE;
+	//	}
+
+	//	if (m_bIsStatic || m_bIsDisabled) {
+	//		m_bIsHighlighted = FALSE;
+	//		m_bIsPressed = FALSE;
+	//	}
+
+	//	CRect rect = GetRect();
+
+	//	if (IsHighlighted()) {
+	//		if (IsPressed()) {
+	//			pDC->FillSolidRect(rect, globalData.clrBarDkShadow);
+	//		}
+	//		else {
+	//			pDC->FillSolidRect(rect, globalData.clrBarShadow);
+	//		}
+	//	}
+	//	else if (IsChecked()) {
+	//		pDC->FillSolidRect(rect, globalData.clrBarShadow);
+	//	}
+
+	//	COLORREF clrText = IsDisabled() ? (COLORREF)Component::EColor::OldSilver : globalData.clrBarText;
+
+	//	m_bIsHighlighted = bIsHighlighted;
+	//	m_bIsPressed = bIsPressed;
+	//	m_bIsDisabled = bIsDisabled;
+
+	//	return clrText;
+	//}
+};
 
 
 
@@ -145,10 +140,10 @@ bool Component::StatusBar::Initialize(CWnd* pMainFrame)
 	AddElement(new CBCGPRibbonStatusBarPane(PRESET::Message, L"", TRUE), L"MessagePane");
 	AddExtendedElement(new CBCGPRibbonStatusBarPane(PRESET::Coordinate, L"", TRUE), L"CoordinatePane");
 
-	PRESET::StatusBarButton* sf = new PRESET::StatusBarButton(HOME_3D_POP_SelectionFiter);
+	StatusBarButton* sf = new StatusBarButton(HOME_3D_POP_SelectionFiter);
 	AddExtendedElement(sf, L"");
 
-	PRESET::StatusBarButton* os = new PRESET::StatusBarButton(HOME_3D_POP_ObjectSnap);
+	StatusBarButton* os = new StatusBarButton(HOME_3D_POP_ObjectSnap);
 	os->EnablePopupDialog(RUNTIME_CLASS(Dialog::ObjectSnaps), IDD_DMI_DROPDOWN, FALSE, FALSE, TRUE);
 	AddExtendedElement(os, L"");
 

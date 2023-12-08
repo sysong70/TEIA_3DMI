@@ -17,7 +17,7 @@ namespace PresetTreePropList
 {
 #define GetName(data) data.GetString("name")
 
-	enum ControlId
+	enum EControlId
 	{
 		Id = WM_USER,
 		Tree,
@@ -27,11 +27,6 @@ namespace PresetTreePropList
 	int TreeWidth()
 	{
 		return globalUtils.ScaleByDPI(200);
-	}
-
-	CSize Padding()
-	{
-		return globalUtils.ScaleByDPI(CSize(6, 6));
 	}
 }
 
@@ -61,14 +56,15 @@ Control::TreePropList::~TreePropList()
 
 
 
-bool Control::TreePropList::Initialize(CWnd* pParentWnd)
+bool Control::TreePropList::Initialize(CWnd* pParentWnd, UINT id, const RECT& rect)
 {
-	if (__super::Create(NULL, L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, {}, pParentWnd, PRESET::Id) == FALSE) {
-		return false;
+	const DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN;
+	if (Create(NULL, L"", dwStyle, rect, pParentWnd, PRESET::Id) == FALSE) {
+		RETURN_FALSE;
 	}
 
-	CreateTreeCtrl();
-	CreatePropList();
+	m_tree.Initialize(this, PRESET::Tree);
+	m_propList.Initialize(this, PRESET::PropList);
 
 	return true;
 }
@@ -110,7 +106,7 @@ void Control::TreePropList::OnSize(UINT nType, int cx, int cy)
 	__super::OnSize(nType, cx, cy);
 
 	if (cx > 0 && cy > 0) {
-		CSize padding = PRESET::Padding();
+		CSize padding = Gap();
 
 		int x = padding.cx;
 		int y = padding.cy;
@@ -142,49 +138,13 @@ LRESULT Control::TreePropList::OnPropertyChanged(WPARAM wp, LPARAM lp)
 	Json::Value* pValue = reinterpret_cast<Json::Value*>(pProp->GetData());
 
 	if (m_propList.m_bInitialized && pValue != nullptr) {
-		if (pProp->GetOptionCount() > 0) {
-			pValue->SetInteger(pProp->GetSelectedOption());
-		}
-		else {
-			switch (pValue->GetType()) {
-			case Json::EValueType::Boolean: pValue->SetBoolean(pProp->GetValue()); break;
-			case Json::EValueType::Int:     pValue->SetInteger(pProp->GetValue()); break;
-			case Json::EValueType::Uint:    pValue->SetInteger(pProp->GetValue()); break;
-			case Json::EValueType::Real:    pValue->SetReal(pProp->GetValue()); break;
-			case Json::EValueType::String:  pValue->SetString(pProp->GetValue().bstrVal); break;
-
-			default:
-				DEBUG_STOP;
-				return S_OK;
-			}
-		}
-
+		Facility::SetValue(*pValue, *pProp);
 		m_bModified = true;
 	}
 
 	return S_OK;
 }
 
-
-
-void Control::TreePropList::CreatePropList()
-{
-	const DWORD dwStyle = WS_VISIBLE | WS_CHILD;
-	if (m_propList.Create(dwStyle, {}, this, PRESET::PropList) == FALSE) {
-		DEBUG_RETURN;
-	}
-}
-
-
-
-void Control::TreePropList::CreateTreeCtrl()
-{
-	DWORD dwStyle = WS_CHILD | WS_VISIBLE |
-		TVS_FULLROWSELECT | TVS_HASBUTTONS | TVS_SHOWSELALWAYS;
-	if (m_tree.Create(dwStyle, {}, this, PRESET::Tree) == FALSE) {
-		DEBUG_RETURN;
-	}
-}
 
 
 void Control::TreePropList::ChangePropList(HTREEITEM pItem)

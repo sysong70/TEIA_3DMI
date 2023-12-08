@@ -15,7 +15,7 @@ static char THIS_FILE[] = __FILE__;
 
 namespace PresetRibbonBar
 {
-	CSize LargetIconSize()
+	CSize IconSize()
 	{
 		return globalUtils.ScaleByDPI(CSize(32, 32));
 	}
@@ -30,13 +30,13 @@ namespace PresetRibbonBar
 
 	CBCGPRibbonButton* CreateButton(int id)
 	{
-		Facility::CommandIndexer::Command& item = TheCommandIndexer.Get(id);
+		Facility::CommandIndexer::CommandInfo& item = TheCommandIndexer.Get(id);
 
 		CString title, tooltip;
 		Facility::GetResource(id, title, tooltip);
 
 		CBCGPRibbonButton* pButton = new CBCGPRibbonButton(id, title);
-		pButton->SetIcon(Facility::CreateIcon(id, PRESET::LargetIconSize()), TRUE, FALSE, TRUE);
+		pButton->SetIcon(Facility::CreateIcon(id, PRESET::IconSize()), TRUE, FALSE, TRUE);
 		pButton->SetToolTipText(tooltip);
 		pButton->SetAlwaysLargeImage();
 		pButton->SetData((DWORD_PTR)&item);
@@ -48,7 +48,7 @@ namespace PresetRibbonBar
 	{
 		// make image list
 		CBCGPToolBarImages images;
-		images.SetImageSize(PRESET::LargetIconSize());
+		images.SetImageSize(PRESET::IconSize());
 
 		for (int id = startId; id <= endId; id++) {
 			//:WARNING - do not use local variable
@@ -64,7 +64,7 @@ namespace PresetRibbonBar
 			images // sub item images
 		);
 
-		pButton->SetIcon(Facility::CreateIcon(baseId, PRESET::LargetIconSize()), TRUE, FALSE, TRUE);
+		pButton->SetIcon(Facility::CreateIcon(baseId, PRESET::IconSize()), TRUE, FALSE, TRUE);
 		pButton->SetButtonMode();
 		pButton->SetAlwaysLargeImage();
 		pButton->SetDefaultCommand(splitMode);
@@ -75,7 +75,7 @@ namespace PresetRibbonBar
 		CString title, tooltip;
 
 		for (int id = startId; id <= endId; id++) {
-			Facility::CommandIndexer::Command& item = TheCommandIndexer.Get(id);
+			Facility::CommandIndexer::CommandInfo& item = TheCommandIndexer.Get(id);
 			Facility::GetResource(id, title, tooltip);
 
 			pButton->SetItemToolTip(index, title + L"\n" + tooltip);
@@ -238,13 +238,16 @@ bool Component::RibbonBar::CreateCategories()
 	pPanel = PRESET::CreatePanel(pCategory, HOME_3D_PNL_Focus);
 	pPanel->Add(PRESET::CreateButton(HOME_3D_CMD_Pan));
 	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_Zoom, HOME_3D_CMD_Zoom_Fit, HOME_3D_CMD_Zoom_Object));
-	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_Rotate, HOME_3D_CMD_Rotate_Rotate, HOME_3D_CMD_Rotate_Orbit));
+	//pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_Rotate, HOME_3D_CMD_Rotate_Rotate, HOME_3D_CMD_Rotate_Orbit));
+	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_Rotate, HOME_3D_CMD_Rotate_Rotate, HOME_3D_CMD_Rotate_Turntable));
 
 	pPanel = PRESET::CreatePanel(pCategory, HOME_3D_PNL_View);
 	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_ViewStyle, HOME_3D_CMD_ViewStyle_Shade, HOME_3D_CMD_ViewStyle_Tessellated, true));
 	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_ViewDirection, HOME_3D_CMD_ViewDirection_Top, HOME_3D_CMD_ViewDirection_Perspective, true));
 	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_Visualize, HOME_3D_CMD_Visualize_ShowAll, HOME_3D_CMD_Visualize_Toggle, true));
-	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_VisualEffects, HOME_3D_CMD_VisualEffects_Shadow, HOME_3D_CMD_VisualEffects_Bloom, false));
+	//:CHECK
+	//pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_VisualEffects, HOME_3D_CMD_VisualEffects_Shadow, HOME_3D_CMD_VisualEffects_Bloom, false));
+	pPanel->Add(PRESET::CreateButton(HOME_3D_LST_VisualEffects));
 
 	pPanel = PRESET::CreatePanel(pCategory, HOME_3D_PNL_SelectAndSnap);
 	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_Select, HOME_3D_CMD_Select_All, HOME_3D_CMD_Select_Axis, false));
@@ -312,13 +315,13 @@ void Component::RibbonBar::Reload()
 
 
 
-Facility::CommandIndexer::Command& Component::RibbonBar::GetData(UINT id)
+Facility::CommandIndexer::CommandInfo& Component::RibbonBar::GetData(UINT id)
 {
 	CBCGPBaseRibbonElement* pElem = FindByID(id, FALSE);
 	if (pElem != nullptr) {
 		DWORD_PTR data = pElem->GetData();
 		if (data != 0) {
-			return *(Facility::CommandIndexer::Command*)data;
+			return *(Facility::CommandIndexer::CommandInfo*)data;
 		}
 	}
 
@@ -326,14 +329,14 @@ Facility::CommandIndexer::Command& Component::RibbonBar::GetData(UINT id)
 	return TheCommandIndexer.GetDummyData();
 }
 
-Facility::CommandIndexer::Command& Component::RibbonBar::GetData(CBCGPRibbonCategory* pCategory, UINT id)
+Facility::CommandIndexer::CommandInfo& Component::RibbonBar::GetData(CBCGPRibbonCategory* pCategory, UINT id)
 {
 	if (pCategory != nullptr) {
 		CBCGPBaseRibbonElement* pElem = pCategory->FindByID(id, FALSE);
 		if (pElem != nullptr) {
 			DWORD_PTR data = pElem->GetData();
 			if (data != 0) {
-				return *(Facility::CommandIndexer::Command*)data;
+				return *(Facility::CommandIndexer::CommandInfo*)data;
 			}
 		}
 	}

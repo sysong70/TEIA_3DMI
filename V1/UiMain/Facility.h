@@ -71,9 +71,11 @@ namespace Facility
 
 	Json::Object& SetData(Json::Object& target, UINT id = 0, const CString& title = L"", int ePivot = 0, const CRect& rect = {});
 
-	void SetValue(Json::Value& target, _variant_t& source);
+	void SetValue(Json::Value& target, CBCGPProp& source);
 
-	void SetValueByPath(Json::Object& object, CString& path, _variant_t& value);
+	void SetValue(CBCGPProp& target, Json::Value& source);
+
+	void SetValueByPath(Json::Object& object, CString& path, CBCGPProp& value);
 
 #pragma endregion //:REGION
 }

@@ -305,6 +305,8 @@ void Signal::View::OnCommand(UINT id)
 	Wrapper().SendData(data);
 }
 
+
+
 void Signal::View::OnCancel()
 {
 	SendActionDataOnly(Action::OnCancel);
@@ -320,6 +322,8 @@ void Signal::View::OnMouseMove(UINT flags, int x, int y)
 	SendMouseData(Action::OnMouseMove);
 }
 
+
+
 void Signal::View::OnLButtonDown(UINT flags, int x, int y, int osnapId)
 {
 	Json::Object data;
@@ -330,30 +334,42 @@ void Signal::View::OnLButtonDown(UINT flags, int x, int y, int osnapId)
 	Wrapper().SendData(data);
 }
 
+
+
 void Signal::View::OnLButtonUp(UINT flags, int x, int y)
 {
 	SendMouseData(Action::OnLButtonUp);
 }
+
+
 
 void Signal::View::OnMButtonDown(UINT flags, int x, int y)
 {
 	SendMouseData(Action::OnMButtonDown);
 }
 
+
+
 void Signal::View::OnMButtonUp(UINT flags, int x, int y)
 {
 	SendMouseData(Action::OnMButtonUp);
 }
+
+
 
 void Signal::View::OnRButtonDown(UINT flags, int x, int y)
 {
 	SendMouseData(Action::OnRButtonDown);
 }
 
+
+
 void Signal::View::OnRButtonUp(UINT flags, int x, int y)
 {
 	SendMouseData(Action::OnRButtonUp);
 }
+
+
 
 void Signal::View::OnMouseWheel(UINT flags, short delta, int x, int y)
 {
@@ -362,6 +378,8 @@ void Signal::View::OnMouseWheel(UINT flags, short delta, int x, int y)
 
 	Wrapper().SendData(data);
 }
+
+
 
 void Signal::View::OnMouseWheel(UINT flags, short delta, int x, int y, int left, int top, int right, int bottom)
 {
@@ -385,6 +403,8 @@ void Signal::View::OnPaint()
 {
 	SendActionDataOnly(Action::OnPaint);
 }
+
+
 
 void Signal::View::OnPaint(int left, int top, int right, int bottom)
 {
@@ -439,10 +459,14 @@ void Signal::View::OnChar(UINT chr, UINT repeat, UINT flags)
 	SendKeyData(Action::OnChar);
 }
 
+
+
 void Signal::View::OnKeyDown(UINT chr, UINT repeat, UINT flags)
 {
 	SendKeyData(Action::OnKeyDown);
 }
+
+
 
 void Signal::View::OnKeyUp(UINT chr, UINT repeat, UINT flags)
 {
@@ -564,6 +588,53 @@ void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items)
 
 #pragma endregion //:REGION
 
+#pragma region InteractiveCommand Class
+
+void Signal::InteractiveCommand::ConstructData(Json::Object& data, Action action)
+{
+	data.SetInteger(SKW_TARGET, (int)Target::Command);
+	data.SetInteger(SKW_ACTION, (int)action);
+}
+
+
+
+void Signal::InteractiveCommand::OnRequestValue(UINT commandId)
+{
+	Json::Object data;
+	ConstructData(data, Action::OnRequestValue);
+
+	data.SetInteger(SKW_ID, commandId);
+}
+
+
+
+void Signal::InteractiveCommand::OnChangedValue(UINT commandId, Json::Object& value)
+{
+	Json::Object data;
+	ConstructData(data, Action::OnRequestValue);
+
+	data.SetInteger(SKW_ID, commandId);
+	data.SetObject(SKW_VALUE, new Json::Object(value));
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::InteractiveCommand::ResponseValue(UINT commandId, Json::Object& value, Json::Object& defaultValue)
+{
+	Json::Object data;
+	ConstructData(data, Action::ResponseValue);
+
+	data.SetInteger(SKW_ID, commandId);
+	data.SetObject(SKW_VALUE, new Json::Object(value));
+	data.SetObject(SKW_DEFAULTVALUE, new Json::Object(defaultValue));
+
+	Wrapper().SendData(data);
+}
+
+#pragma endregion //:REGION
+
 #pragma region Delivery Class
 
 Signal::Delivery::Delivery()
@@ -576,6 +647,7 @@ Signal::Delivery::Delivery()
 	SetWrapper(progress);
 	SetWrapper(view);
 	SetWrapper(modelPanel);
+	SetWrapper(command);
 
 #undef SetWrapper
 }

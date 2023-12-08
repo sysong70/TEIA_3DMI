@@ -78,9 +78,13 @@ void Dialog::Base::ConstructHeader(const CRect& boundary)
 {
 }
 
+
+
 void Dialog::Base::ConstructBody(const CRect& boundary)
 {
 }
+
+
 
 void Dialog::Base::ConstructFooter(const CRect& boundary)
 {
@@ -234,9 +238,8 @@ CRect Dialog::Base::GetFramePadding()
 	};
 
 	if (padding.IsRectNull()) {
-		int dp = globalUtils.ScaleByDPI(6);
-
-		padding = { dp ,dp ,dp ,dp };
+		CSize dp = FramePadding();
+		padding = { dp.cx, dp.cy, dp.cx ,dp.cy };
 	}
 
 	return padding;

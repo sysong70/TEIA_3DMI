@@ -213,10 +213,10 @@ CComboBox* Property::ComboBoxEx::CreateCombo(CWnd* pWndParent, CRect rect)
 
 
 
-LPCTSTR Property::ComboBoxEx::GetXMLTagName() const
-{
-	return _T("comboBoxEx");
-}
+//LPCTSTR Property::ComboBoxEx::GetXMLTagName() const
+//{
+//	return _T("comboBoxEx");
+//}
 
 
 
@@ -276,10 +276,10 @@ void Property::ComboButton::AdjustButtonRect()
 
 
 
-LPCTSTR Property::ComboButton::GetXMLTagName() const
-{
-	return _T("comboButton");
-}
+//LPCTSTR Property::ComboButton::GetXMLTagName() const
+//{
+//	return _T("comboButton");
+//}
 
 
 
@@ -344,6 +344,77 @@ void Property::ComboButton::OnDrawButton(CDC* pDC, CRect rectButton)
 
 #pragma endregion //:REGION
 
+#pragma region CommandButton Class
+
+Property::CommandButton::CommandButton(const CString& name, const CString& title, UINT id, LPCTSTR lpDescr, DWORD_PTR data)
+	: CBCGPProp(name, id, (LPCTSTR)title, lpDescr)
+	, m_title(title)
+{
+}
+
+
+
+BOOL Property::CommandButton::OnClickValue(UINT uiMsg, CPoint point)
+{
+	m_pWndList->OnPropertyChanged(this);
+
+	return TRUE;
+}
+
+
+
+void Property::CommandButton::OnDrawValue(CDC* pDC, CRect rect)
+{
+	ASSERT_VALID(this);
+	ASSERT_VALID(pDC);
+	ASSERT_VALID(m_pWndList);
+
+#define TEXT_MARGIN(parent)	globalUtils.ScaleByDPI(4, parent)
+
+	COLORREF oldColor;
+	if (m_bHighlighted) {
+		oldColor = pDC->SetTextColor((COLORREF)Control::EColor::DeepSkyBlue);
+	}
+	else {
+		oldColor = pDC->SetTextColor((COLORREF)Control::EColor::NavyBlue);
+	}
+
+	rect.DeflateRect(TEXT_MARGIN(m_pWndList), 0);
+	UINT uiDTFlags = DT_LEFT | DT_NOPREFIX | DT_END_ELLIPSIS | DT_SINGLELINE | DT_VCENTER;
+	pDC->DrawText(m_title, rect, uiDTFlags);
+
+	pDC->SetTextColor(oldColor);
+
+#undef TEXT_MARGIN
+}
+
+
+
+BOOL Property::CommandButton::OnEdit(LPPOINT lptClick)
+{
+	m_pWndList->OnPropertyChanged(this);
+
+	return FALSE;
+}
+
+
+
+void Property::CommandButton::OnLeaveMouse()
+{
+	m_bHighlighted = false;
+
+	Redraw();
+}
+
+
+
+BOOL Property::CommandButton::OnSetCursor() const
+{
+	return FALSE;
+}
+
+#pragma endregion //:REGION
+
 #pragma region CustomColor Class
 
 Property::CustomColor::CustomColor(const CString& name, const COLORREF& color, LPCTSTR lpDescr)
@@ -357,10 +428,10 @@ Property::CustomColor::CustomColor(const CString& name, const COLORREF& color, L
 
 
 
-LPCTSTR Property::CustomColor::GetXMLTagName() const
-{
-	return _T("customColor");
-}
+//LPCTSTR Property::CustomColor::GetXMLTagName() const
+//{
+//	return _T("customColor");
+//}
 
 
 
@@ -383,10 +454,10 @@ Property::CustomDescription::CustomDescription(const CString& name, const _varia
 
 
 
-LPCTSTR Property::CustomDescription::GetXMLTagName() const
-{
-	return _T("customDescription");
-}
+//LPCTSTR Property::CustomDescription::GetXMLTagName() const
+//{
+//	return _T("customDescription");
+//}
 
 
 
@@ -418,10 +489,10 @@ Property::CustomDialog::CustomDialog(const CString& name, const _variant_t& valu
 
 
 
-LPCTSTR Property::CustomDialog::GetXMLTagName() const
-{
-	return _T("customDialog");
-}
+//LPCTSTR Property::CustomDialog::GetXMLTagName() const
+//{
+//	return _T("customDialog");
+//}
 
 
 
@@ -475,10 +546,10 @@ void Property::CustomState::AnimationStep()
 
 
 
-LPCTSTR Property::CustomState::GetXMLTagName() const
-{
-	return _T("customState");
-}
+//LPCTSTR Property::CustomState::GetXMLTagName() const
+//{
+//	return _T("customState");
+//}
 
 
 
@@ -594,10 +665,10 @@ BOOL Property::Duration::DoPaste()
 
 
 
-LPCTSTR Property::Duration::GetXMLTagName() const
-{
-	return _T("duration");
-}
+//LPCTSTR Property::Duration::GetXMLTagName() const
+//{
+//	return _T("duration");
+//}
 
 
 
@@ -782,10 +853,10 @@ CString Property::HexValue::FormatProperty()
 
 
 
-LPCTSTR Property::HexValue::GetXMLTagName() const
-{
-	return _T("hex");
-}
+//LPCTSTR Property::HexValue::GetXMLTagName() const
+//{
+//	return _T("hex");
+//}
 
 
 
@@ -875,10 +946,10 @@ CWnd* Property::IconList::CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultFormat
 
 
 
-LPCTSTR Property::IconList::GetXMLTagName() const
-{
-	return _T("iconList");
-}
+//LPCTSTR Property::IconList::GetXMLTagName() const
+//{
+//	return _T("iconList");
+//}
 
 
 
@@ -965,10 +1036,10 @@ CString Property::Password::FormatProperty()
 
 
 
-LPCTSTR Property::Password::GetXMLTagName() const
-{
-	return _T("password");
-}
+//LPCTSTR Property::Password::GetXMLTagName() const
+//{
+//	return _T("password");
+//}
 
 
 
@@ -1007,10 +1078,10 @@ void Property::RangeValidation::SetRange(long minValue, long maxValue)
 
 
 
-LPCTSTR Property::RangeValidation::GetXMLTagName() const
-{
-	return _T("rangeValidation");
-}
+//LPCTSTR Property::RangeValidation::GetXMLTagName() const
+//{
+//	return _T("rangeValidation");
+//}
 
 
 
@@ -1117,10 +1188,10 @@ BOOL Property::Slider::OnClickValue(UINT uiMsg, CPoint point)
 
 
 
-LPCTSTR Property::Slider::GetXMLTagName() const
-{
-	return _T("slider");
-}
+//LPCTSTR Property::Slider::GetXMLTagName() const
+//{
+//	return _T("slider");
+//}
 
 
 
@@ -1163,10 +1234,10 @@ void Property::TwoButtons::AdjustButtonRect()
 
 
 
-LPCTSTR Property::TwoButtons::GetXMLTagName() const
-{
-	return _T("twoButtons");
-}
+//LPCTSTR Property::TwoButtons::GetXMLTagName() const
+//{
+//	return _T("twoButtons");
+//}
 
 
 

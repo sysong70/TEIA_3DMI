@@ -4,6 +4,7 @@
 #include "Component.PanelBar.h"
 #include "Component.RibbonBar.h"
 #include "Component.StatusBar.h"
+#include "Component.TaskBar.h"
 #include "Dialog.h"
 
 
@@ -26,15 +27,23 @@ namespace Window
 
 		~MainFrame() override;
 
+	public:
+
+		Window::View* GetActiveView();
+
 		CRect GetMDIRect();
 
 		Component::PanelBar& GetPanelBar();
+
+		Component::TaskBar& GetTaskBar();
 
 		void ReceiveSignal(Json::Object* pData);
 
 		void ShowPanelBar();
 
 		void ShowProgress(bool bShow = true);
+
+		void ShowTaskBar(bool bShow = true);
 
 		void ViewChanged(UINT message, View* pView);
 
@@ -79,9 +88,11 @@ namespace Window
 		Component::RibbonBar m_ribbonBar;
 		Component::StatusBar m_statusBar;
 		Component::PanelBar m_panelBar;
+		Component::TaskBar m_taskBar;
 
-	private: // Dialogs
+	private: // Windows
 
+		Window::View* m_pActiveView = nullptr;
 		Dialog::Base* m_pDialog = nullptr;
 
 	private:

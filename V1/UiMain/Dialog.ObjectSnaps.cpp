@@ -16,11 +16,8 @@ namespace PresetObjectSnap
 {
 	const UINT Id = WM_USER;
 
-	CSize ImageSize() {
-		return globalUtils.ScaleByDPI(CSize(24, 24));
-	}
-
-	int ExtraHeight() {
+	int ExtraHeight()
+	{
 		return globalUtils.ScaleByDPI(6);
 	}
 }
@@ -109,7 +106,7 @@ void Dialog::ObjectSnaps::ConstructBody(const CRect& boundary)
 		HOME_3D_CMD_ObjectSnap_OnSurface,
 		HOME_3D_CMD_ObjectSnap_BoundaryCenter,
 		HOME_3D_CMD_ObjectSnap_Axis,
-	}, PRESET::ImageSize());
+	}, Control::ImageSize());
 }
 
 
@@ -117,21 +114,22 @@ void Dialog::ObjectSnaps::ConstructBody(const CRect& boundary)
 void Dialog::ObjectSnaps::ConstructFooter(const CRect& boundary)
 {
 	Json::Object& buttons = GetDefaultButtons();
-
+	CSize margin = Control::Gap();
+	CSize size;
 	int maxHeight = 0;
 
-	maxHeight = max(maxHeight, SetupControl(m_wndOk, buttons.GetAt("Ok")).cy);
-	maxHeight = max(maxHeight, SetupControl(m_wndCancel, buttons.GetAt("Cancel")).cy);
-
-	m_nFooterHeight = maxHeight + FooterPadding();
+	size = Control::Setup(m_wndOk, buttons.GetAt("Ok"), this); maxHeight = max(maxHeight, size.cy);
+	size = Control::Setup(m_wndCancel, buttons.GetAt("Cancel"), this); maxHeight = max(maxHeight, size.cy);
+	
+	m_nFooterHeight = maxHeight + margin.cy;
 
 	CPoint basePoint;
 	basePoint.y = boundary.bottom - maxHeight / 2;
 	basePoint.x = boundary.left;
 
-	AlignControls({ &m_wndCancel, &m_wndOk }, basePoint, Control::EAlign::VerticalCenter);
+	Control::Align({ &m_wndCancel, &m_wndOk }, basePoint, Control::EAlign::VerticalCenter, this);
 	basePoint.x = boundary.right;
-	DestributeControls({ &m_wndCancel, &m_wndOk }, basePoint, FooterPadding(), Control::EDirection::ToLeft);
+	Control::Destribute({ &m_wndCancel, &m_wndOk }, basePoint, margin.cx, Control::EDirection::ToLeft, this);
 }
 
 #undef PRESET

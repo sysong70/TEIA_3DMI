@@ -1,0 +1,55 @@
+// Signal::Interactive::OnRequestValue()
+{
+	"Target": 8, // Target::Command
+	"Action": 0, // Action::OnRequestValue
+	"Id": 20053, // HOME_3D_LST_VisualEffects
+},
+
+// Signal::Interactive::ResponseValue()
+{
+	"Target": 8, // Target::Command
+	"Action": 1, // Action::ResponseValue
+	"Id": 20053, // HOME_3D_LST_VisualEffects
+    "Value":
+    {
+        "Shadow":
+        {
+            "checked": true, // check, activated
+            "Mode": 1, // drop
+            "Resolution": 3, // slider
+            "Blurring": 1, // slider
+            "IgnoreTransparency": false, // check
+            "Color": "0x404040", //:WARNING - not COLORREF, 0xRRGGBB hex string
+            "Opacity": 10 // slider
+        },
+        "PlaneReflection":
+        {
+            "checked": true,
+            "Opacity": 5, // slider
+            "Blurring": 1, // slider
+            "Fading": false // check
+        },
+        "AmbientOcclusion":
+        {
+            "checked": true,
+            "Strength": 1, // slider
+            "Quality": 0 // drop
+        },
+        "SilhouetteEdges":
+        {
+            "checked": true,
+            "Tolerance": 1, // slider
+            "HeavyExterior": true // check
+        },
+        "Bloom":
+        {
+            "checked": true,
+            "Strength": 1, // slider
+            "Blurring": 5, // slider
+            "Shape": 0 // drop
+        }
+    },
+    "Default":{
+        // ...
+    }
+}

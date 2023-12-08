@@ -49,9 +49,16 @@ bool Facility::AppResources::Load()
 
 
 
+HBITMAP Facility::AppResources::GetBackground()
+{
+	return m_background;
+}
+
+
+
 Json::Object& Facility::AppResources::GetDialog(CStringA name)
 {
-	return m_ui.GetAt("Dialog").GetAt(name);
+	return m_ui.GetAt("Dialogs").GetAt(name);
 }
 
 
@@ -77,9 +84,9 @@ Json::Object& Facility::AppResources::GetStyles()
 
 
 
-HBITMAP Facility::AppResources::GetBackground()
+Json::Object& Facility::AppResources::GetTask(CStringA name)
 {
-	return m_background;
+	return m_ui.GetAt("Tasks").GetAt(name);
 }
 
 
@@ -92,7 +99,7 @@ bool Facility::AppResources::Initialize()
 		RETURN_FALSE;
 	}
 
-	Json::Object& fileOptions = m_ui.GetAt("Dialog").GetAt("FileOptions");
+	Json::Object& fileOptions = m_ui.GetAt("Dialogs").GetAt("FileOptions");
 	if (fileOptions.FindValue("properties") != nullptr) {
 		return true;
 	}
@@ -163,7 +170,7 @@ bool Facility::AppResources::InitFileOptions()
 		return true;
 	}
 
-	Json::Array& importTree = Json::Helper::FindValueByPath(m_ui, "Dialog/FileOptions/tree/0/items")->AsArray();
+	Json::Array& importTree = Json::Helper::FindValueByPath(m_ui, "Dialogs/FileOptions/tree/0/items")->AsArray();
 	for (auto item : importTree.GetBuffer()) {
 		CStringA name = (CStringA)item->AsObject().GetString("name");
 		import.CreateObject(name) = common;

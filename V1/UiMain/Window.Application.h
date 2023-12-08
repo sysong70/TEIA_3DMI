@@ -24,7 +24,7 @@ namespace Window
 
 		View* FindView(int id);
 
-		CString Path(bool bLastBackslash = true);
+		CString GetPath(bool bLastBackslash = true);
 
 	public:
 
@@ -50,4 +50,4 @@ namespace Window
 	};
 }
 
-extern Window::Application TheAppication;
+extern Window::Application TheApplication;

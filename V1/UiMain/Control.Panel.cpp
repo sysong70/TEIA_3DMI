@@ -49,7 +49,8 @@ bool Control::Panel::Initialize(CWnd* pParentWnd, Window::View* pView, UINT id)
 {
 	m_pView = pView;
 
-	if (__super::Create(NULL, L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, {}, pParentWnd, id) == FALSE) {
+	const DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN;
+	if (Create(NULL, L"", dwStyle, {}, pParentWnd, id) == FALSE) {
 		RETURN_FALSE;
 	}
 
@@ -68,7 +69,7 @@ bool Control::Panel::Initialize(CWnd* pParentWnd, Window::View* pView, UINT id)
 
 
 
-Window::View* Control::Panel::ParentView()
+Window::View* Control::Panel::GetParentView()
 {
 	return m_pView;
 }

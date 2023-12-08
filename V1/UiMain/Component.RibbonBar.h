@@ -30,9 +30,9 @@ namespace Component
 
 	public:
 
-		Facility::CommandIndexer::Command& GetData(UINT id);
+		Facility::CommandIndexer::CommandInfo& GetData(UINT id);
 
-		Facility::CommandIndexer::Command& GetData(CBCGPRibbonCategory* pCategory, UINT id);
+		Facility::CommandIndexer::CommandInfo& GetData(CBCGPRibbonCategory* pCategory, UINT id);
 
 	private:
 

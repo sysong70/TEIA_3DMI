@@ -16,7 +16,7 @@ static char THIS_FILE[] = __FILE__;
 
 namespace PresetProgressLog
 {
-	enum ControlId
+	enum EControlId
 	{
 		Unknown = WM_USER,
 		Message = IDC_DMI_CONTROL_01,
@@ -24,7 +24,7 @@ namespace PresetProgressLog
 		Log = IDC_DMI_CONTROL_03,
 	};
 
-	enum ListIndex
+	enum EListIndex
 	{
 		Status = 0,
 		File,
@@ -37,15 +37,18 @@ namespace PresetProgressLog
 		(COLORREF)Control::EColor::Red,
 	};
 
-	int MessageHeight() {
+	int MessageHeight()
+	{
 		return globalUtils.ScaleByDPI(24);
 	}
 
-	int ProgressHeight() {
+	int ProgressHeight()
+	{
 		return globalUtils.ScaleByDPI(8);
 	}
 
-	int ExtraHeight() {
+	int ExtraHeight()
+	{
 		return globalUtils.ScaleByDPI(2);
 	}
 
@@ -147,13 +150,13 @@ void Dialog::ProgressLog::ConstructBody(const CRect& boundary)
 	// Message
 
 	area.bottom = area.top + PRESET::MessageHeight();
-	CRect result = SetupControl(m_wndMessage, data.GetAt("Message"), Control::EPivot::TopLeft, area);
+	CRect result = Control::Setup(m_wndMessage, data.GetAt("Message"), Control::EPivot::TopLeft, area);
 
 	// Progress
 
 	area.top = result.bottom + PRESET::Gap();
 	area.bottom = area.top + PRESET::ProgressHeight();
-	Control::SetControlSize(&m_wndProgress, { area.Size().cx, PRESET::ProgressHeight() });
+	Control::SetSize(&m_wndProgress, { area.Size().cx, PRESET::ProgressHeight() });
 	result = Control::AdjustLayout(&m_wndProgress, area, area.Size(), Control::EPivot::TopLeft);
 
 	m_wndProgress.m_bSetPosSmoothAnimation = TRUE;

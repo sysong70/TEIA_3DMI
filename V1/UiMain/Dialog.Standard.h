@@ -26,24 +26,6 @@ namespace Dialog
 
 		DECLARE_MESSAGE_MAP()
 
-	protected: // Create and setup controls
-
-		CSize SetupControl(CBCGPButton& control, Json::Object& data);
-
-		CRect SetupControl(CBCGPStatic& control, Json::Object& data, Control::EPivot ePivot, CRect rect);
-
-	protected:
-
-		// align controls at base point
-		CRect AlignControls(Controls controls, CPoint basePoint, Control::EAlign eAlign);
-		// destribute controls from base point with gap
-		CRect DestributeControls(Controls controls, CPoint basePoint, int gap, Control::EDirection eDir);
-
-	protected:
-
-		// boundary on client area
-		CRect GetControlRect(CWnd* pControl);
-
 	protected:
 
 		// dialog structure information from TheResource

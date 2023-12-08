@@ -18,6 +18,8 @@ namespace Control
 
 		~TreeCtrlEx() override;
 
+		bool Initialize(CWnd* pParentWnd, UINT id = WM_USER, const RECT& rect = {});
+
 		void InitializeDesign(Json::Array& design);
 
 		void GetAncestor(HTREEITEM pItem, std::vector<HTREEITEM>& parent);
