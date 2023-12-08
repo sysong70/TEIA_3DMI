@@ -29,8 +29,9 @@ END_MESSAGE_MAP()
 
 
 
-Control::TaskPanel::TaskPanel(Json::Object* pUiData)
-	: m_pUiData(pUiData)
+Control::TaskPanel::TaskPanel(UINT commandId, Json::Object* pUiData)
+	: m_commandId(commandId)
+	, m_pUiData(pUiData)
 {
 }
 
@@ -189,8 +190,8 @@ LRESULT Control::TaskPanel::OnPropertyChanged(WPARAM wp, LPARAM lp)
 		}
 	}
 
-	//:TODO
-	//GetTaskBar().GetDelivery().view.OnCommand(0);
+	ASSERT(m_commandId > 0);
+	GetTaskBar().GetDelivery().command.OnChangedValue(m_commandId, m_data);
 
 	return S_OK;
 }

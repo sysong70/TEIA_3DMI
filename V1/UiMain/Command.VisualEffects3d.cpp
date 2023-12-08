@@ -40,7 +40,7 @@ class VisualEffects3dPanel : public Control::TaskPanel
 public:
 
 	VisualEffects3dPanel(Json::Object* pUiData)
-		: TaskPanel(pUiData)
+		: TaskPanel(PRESET::CommandId, pUiData)
 	{}
 
 ~VisualEffects3dPanel() override

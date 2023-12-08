@@ -608,6 +608,19 @@ void Signal::InteractiveCommand::OnRequestValue(UINT commandId)
 
 
 
+void Signal::InteractiveCommand::OnChangedValue(UINT commandId, Json::Object& value)
+{
+	Json::Object data;
+	ConstructData(data, Action::OnRequestValue);
+
+	data.SetInteger(SKW_ID, commandId);
+	data.SetObject(SKW_VALUE, new Json::Object(value));
+
+	Wrapper().SendData(data);
+}
+
+
+
 void Signal::InteractiveCommand::ResponseValue(UINT commandId, Json::Object& value, Json::Object& defaultValue)
 {
 	Json::Object data;

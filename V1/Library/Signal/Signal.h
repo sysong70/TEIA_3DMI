@@ -501,6 +501,7 @@ namespace Signal
 			Unknown = -1,
 
 			OnRequestValue,
+			OnChangedValue,
 
 			ResponseValue,
 		};
@@ -512,6 +513,8 @@ namespace Signal
 	public:
 
 		void OnRequestValue(UINT commandId);
+
+		void OnChangedValue(UINT coomandId, Json::Object& value);
 
 		void ResponseValue(UINT commandId, Json::Object& value, Json::Object& defaultValue);
 	};

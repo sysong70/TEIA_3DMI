@@ -15,7 +15,7 @@ namespace Control
 
 		friend class Component::TaskBar;
 
-		TaskPanel(Json::Object* pUiData);
+		TaskPanel(UINT commandId, Json::Object* pUiData);
 
 		~TaskPanel() override;
 
@@ -64,7 +64,9 @@ namespace Control
 		int m_nHeaderHeight = 0;
 		int m_nFooterHeight = 0;
 
+		UINT m_commandId = 0;
 		Json::Object* m_pUiData = nullptr;
+
 		Json::Object m_data;
 		Json::Object m_defaultData;
 		bool m_bInitialized = false;
