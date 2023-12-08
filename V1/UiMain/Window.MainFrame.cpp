@@ -44,6 +44,14 @@ Window::MainFrame::~MainFrame()
 
 
 
+Window::View* Window::MainFrame::GetActiveView()
+{
+	DEBUG_VALID(m_pActiveView);
+	return m_pActiveView;
+}
+
+
+
 CRect Window::MainFrame::GetMDIRect()
 {
 	CRect rect;
@@ -63,6 +71,13 @@ Component::PanelBar& Window::MainFrame::GetPanelBar()
 
 
 
+Component::TaskBar& Window::MainFrame::GetTaskBar()
+{
+	return m_taskBar;
+}
+
+
+
 void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 {
 	Json::Object& data = *pData;
@@ -70,15 +85,18 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 
 	switch (target) {
 	case Signal::Target::ModelPanel:
-	case Signal::Target::View: {
+	case Signal::Target::View:
+	case Signal::Target::Command:
+	{
 		int id = data.GetInteger(SKW_VIEWID);
-		View* pView = TheAppication.FindView(id);
+		View* pView = TheApplication.FindView(id);
 		if (pView != nullptr) {
 			pView->PostMessage((int)EUserMessage::OnSignal, (WPARAM)pData);
 		}
 	} break;
 
-	case Signal::Target::MainFrame: {
+	case Signal::Target::MainFrame:
+	{
 		Signal::MainFrame::Action action = (Signal::MainFrame::Action)data.GetInteger(SKW_ACTION);
 		switch (action) {
 		case Signal::MainFrame::Action::ShowProgress:
@@ -101,7 +119,8 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 		m_statusBar.ReceiveSignal(pData);
 		break;
 
-	case Signal::Target::Progress: {
+	case Signal::Target::Progress:
+	{
 		if (m_pDialog != nullptr && m_pDialog->GetSignalTargetId() == target) {
 			m_pDialog->ReceiveSignal(pData);
 		}
@@ -143,9 +162,23 @@ void Window::MainFrame::ShowProgress(bool bShow)
 
 
 
+void Window::MainFrame::ShowTaskBar(bool show)
+{
+	if (show) {
+		m_taskBar.ShowWindow(SW_SHOW);
+		m_taskBar.AdjustLayout();
+	}
+	else {
+		m_taskBar.ShowWindow(SW_HIDE);
+	}
+}
+
+
+
 void Window::MainFrame::ViewChanged(UINT message, View* pView)
 {
 	if (message == WM_ACTIVATE) {
+		m_pActiveView = pView;
 		m_panelBar.ViewChanged(&pView->m_tabs);
 	}
 }
@@ -263,7 +296,7 @@ LRESULT Window::MainFrame::OnNextFileOpen(WPARAM wp, LPARAM lp)
 
 void Window::MainFrame::OnClose()
 {
-	SaveMDIState(TheAppication.GetRegSectionPath());
+	SaveMDIState(TheApplication.GetRegSectionPath());
 	__super::OnClose();
 }
 
@@ -272,7 +305,7 @@ void Window::MainFrame::OnClose()
 void Window::MainFrame::OnCommand(UINT id)
 {
 	switch (id) {
-	case FILE_3D_CMD_New:					TheAppication.OnFileNew();								return;
+	case FILE_3D_CMD_New:					TheApplication.OnFileNew();								return;
 	case FILE_3D_CMD_Open:					OnFileOpen();											return;
 	case FILE_3D_CMD_Options:				OnAppOptions();											return;
 	case HOME_3D_CMD_Window_Cascade:		SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_CASCADE);		return;
@@ -306,6 +339,7 @@ int Window::MainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_ribbonBar.Initialize(this);
 	m_panelBar.Initialize(this);
 	m_statusBar.Initialize(this);
+	m_taskBar.Initialize(this);
 
 	DockControlBar(&m_panelBar);
 

@@ -5,10 +5,13 @@
 /// Delivery Keywords
 
 #define SKW_ACTION			"Action"
+#define SKW_CALLBACK		"Callback"
 #define SKW_CHAR			"Char"
 #define SKW_CHILDREN		"Children"
 #define SKW_COLUMN			"Column"
 #define SKW_DATA			"Data"
+#define SKW_DEFAULTDATA		"Default"
+#define SKW_DEFAULTVALUE	"Default"
 #define SKW_Delivery		"Delivery"
 #define SKW_DELTA			"Delta"
 #define SKW_DESCRIPTION		"Description"
@@ -140,6 +143,7 @@ namespace Signal
 	class Progress;
 	class View;
 	class ModelPanel;
+	class InteractiveCommand; // interactive command
 
 	enum class Target
 	{
@@ -154,7 +158,7 @@ namespace Signal
 		LayerPanel,
 		ScenePanel,
 		ModelPanel,
-		TaskBar,
+		Command,
 
 		Progress,
 	};
@@ -382,28 +386,48 @@ namespace Signal
 		void OnDestruct();
 
 		void OnInitialize(DWORD_PTR hWnd, CString path = L"");
+
+		// Command
+
 		// id: enum Command
 		void OnCommand(UINT id);
+
 		void OnCancel();
 
+		// Mouse
+
 		void OnMouseMove(UINT flags, int x, int y);
+
 		void OnLButtonDown(UINT flags, int x, int y, int osnapId = -1);
+
 		void OnLButtonUp(UINT flags, int x, int y);
+
 		void OnMButtonDown(UINT flags, int x, int y);
+
 		void OnMButtonUp(UINT flags, int x, int y);
+
 		void OnRButtonDown(UINT flags, int x, int y);
+
 		void OnRButtonUp(UINT flags, int x, int y);
+
 		void OnMouseWheel(UINT flags, short delta, int x, int y);
+
 		void OnMouseWheel(UINT flags, short delta, int x, int y, int left, int top, int right, int bottom);
 
 		void OnPaint();
+
 		void OnPaint(int left, int top, int right, int bottom);
 
 		void OnResize(int x, int y);
+
 		void OnInput(CString value, int row, int column);
 
+		// Keyboard
+
 		void OnChar(UINT chr, UINT repeat, UINT flags);
+
 		void OnKeyDown(UINT chr, UINT repeat, UINT flags);
+
 		void OnKeyUp(UINT chr, UINT repeat, UINT flags);
 
 	public:
@@ -466,6 +490,34 @@ namespace Signal
 
 
 
+	class InteractiveCommand
+	{
+	public:
+
+		CHILD_CONSTRUCTOR(InteractiveCommand);
+
+		enum class Action
+		{
+			Unknown = -1,
+
+			OnRequestValue,
+
+			ResponseValue,
+		};
+
+		DEFINE_WRAPPER;
+
+		void ConstructData(Json::Object& data, Action action);
+
+	public:
+
+		void OnRequestValue(UINT commandId);
+
+		void ResponseValue(UINT commandId, Json::Object& value, Json::Object& defaultValue);
+	};
+
+
+
 	class Delivery
 	{
 	public:
@@ -475,6 +527,7 @@ namespace Signal
 		friend class Progress;
 		friend class View;
 		friend class ModelPanel;
+		friend class InteractiveCommand;
 
 		Delivery();
 
@@ -492,6 +545,7 @@ namespace Signal
 		Progress progress;
 		View view;
 		ModelPanel modelPanel;
+		InteractiveCommand command;
 
 		void (*SendSignal)(const wchar_t*) = nullptr;
 

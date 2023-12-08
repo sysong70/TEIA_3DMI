@@ -18,7 +18,7 @@ namespace Control
 
 		bool Initialize(CWnd* pParentWnd, Window::View* pView, UINT id);
 
-		Window::View* ParentView();
+		Window::View* GetParentView();
 
 	public:
 

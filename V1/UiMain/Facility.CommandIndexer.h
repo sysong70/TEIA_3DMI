@@ -11,7 +11,7 @@ namespace Facility
 	{
 	public:
 
-		enum ItemType
+		enum EItemType
 		{
 			Unknown,
 			Button,
@@ -25,26 +25,27 @@ namespace Facility
 			Popup,
 		};
 
-		struct Command
+		struct CommandInfo
 		{
-			ItemType Type = Unknown;
-			bool Local = false;      // not send command to renderer
-			int Id = -1;             // File_3D_CMD_New
-			CString StringId;        // L"File_3D_CMD_New"
+			EItemType Type = Unknown;
+			int Id = -1;				// File_3D_CMD_New
+			CString StringId;			// L"File_3D_CMD_New"
+			void* Function = nullptr;	// Target function
 		};
 
 		CommandIndexer();
 
-		Command& Get(int id);
+		~CommandIndexer();
 
-		Command& GetDummyData();
+		CommandInfo& Get(int id);
+
+		CommandInfo& GetDummyData();
 
 	private:
 
 		void Initialize();
 
-		//typedef std::unordered_map<int, Command> CommandMap;
-		using CommandMap = std::unordered_map<int, Command>;
+		using CommandMap = std::unordered_map<int, CommandInfo>;
 
 		CommandMap& GetInstance();
 

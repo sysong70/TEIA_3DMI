@@ -269,6 +269,6 @@ void Component::Input::SendDataToRenderer(bool forced)
 		DEBUG_RETURN;
 	}
 
-	m_pView->m_delivery.view.OnInput(value, 0, m_cursorPos);
+	//m_pView->m_delivery.view.OnInput(value, 0, m_cursorPos);
 	m_changed = false;
 }

@@ -33,82 +33,79 @@ namespace PresetApplication
 
 		return appPath.Left(nPos);
 	}
-
-	//:REF - C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\atlmfc\src\mfc\doctempl.cpp
-
-	class DocTemplate3d : public CMultiDocTemplate
-	{
-	public:
-
-		DocTemplate3d()
-			: CMultiDocTemplate(IDR_DMITYPE_3D, RUNTIME_CLASS(Window::Document), RUNTIME_CLASS(Window::ChildFrame), RUNTIME_CLASS(Window::View3d)) {}
-
-		Confidence MatchDocType(LPCTSTR lpszPathName, CDocument*& rpDocMatch) override
-		{
-			ASSERT(lpszPathName != NULL);
-			rpDocMatch = NULL;
-
-			// go through all documents
-			POSITION pos = GetFirstDocPosition();
-			while (pos != NULL) {
-				CDocument* pDoc = GetNextDoc(pos);
-				if (pDoc->GetPathName() == lpszPathName) {
-					// already open
-					rpDocMatch = pDoc;
-					return yesAlreadyOpen;
-				}
-			}
-
-			if (Window::IsAllowed3d(lpszPathName)) {
-				return yesAttemptNative; // extension matches, looks like ours
-			}
-
-			// otherwise we will guess it may work
-			return yesAttemptForeign;
-		}
-	};
-
-
-
-	class DocTemplate2d : public CMultiDocTemplate
-	{
-	public:
-
-		DocTemplate2d()
-			: CMultiDocTemplate(IDR_DMITYPE_2D, RUNTIME_CLASS(Window::Document), RUNTIME_CLASS(Window::ChildFrame), RUNTIME_CLASS(Window::View2d)) {}
-
-		Confidence MatchDocType(LPCTSTR lpszPathName, CDocument*& rpDocMatch) override
-		{
-			ASSERT(lpszPathName != NULL);
-			rpDocMatch = NULL;
-
-			// go through all documents
-			POSITION pos = GetFirstDocPosition();
-			while (pos != NULL) {
-				CDocument* pDoc = GetNextDoc(pos);
-				if (pDoc->GetPathName() == lpszPathName) {
-					// already open
-					rpDocMatch = pDoc;
-					return yesAlreadyOpen;
-				}
-			}
-
-			if (Window::IsAllowed2d(lpszPathName)) {
-				return yesAttemptNative; // extension matches, looks like ours
-			}
-
-			// otherwise we will guess it may work
-			return yesAttemptForeign;
-		}
-	};
 }
 
+//:REF - C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\atlmfc\src\mfc\doctempl.cpp
 
+class DocTemplate3d : public CMultiDocTemplate
+{
+public:
+
+	DocTemplate3d()
+		: CMultiDocTemplate(IDR_DMITYPE_3D, RUNTIME_CLASS(Window::Document), RUNTIME_CLASS(Window::ChildFrame), RUNTIME_CLASS(Window::View3d)) {}
+
+	Confidence MatchDocType(LPCTSTR lpszPathName, CDocument*& rpDocMatch) override
+	{
+		ASSERT(lpszPathName != NULL);
+		rpDocMatch = NULL;
+
+		// go through all documents
+		POSITION pos = GetFirstDocPosition();
+		while (pos != NULL) {
+			CDocument* pDoc = GetNextDoc(pos);
+			if (pDoc->GetPathName() == lpszPathName) {
+				// already open
+				rpDocMatch = pDoc;
+				return yesAlreadyOpen;
+			}
+		}
+
+		if (Window::IsAllowed3d(lpszPathName)) {
+			return yesAttemptNative; // extension matches, looks like ours
+		}
+
+		// otherwise we will guess it may work
+		return yesAttemptForeign;
+	}
+};
+
+
+
+class DocTemplate2d : public CMultiDocTemplate
+{
+public:
+
+	DocTemplate2d()
+		: CMultiDocTemplate(IDR_DMITYPE_2D, RUNTIME_CLASS(Window::Document), RUNTIME_CLASS(Window::ChildFrame), RUNTIME_CLASS(Window::View2d)) {}
+
+	Confidence MatchDocType(LPCTSTR lpszPathName, CDocument*& rpDocMatch) override
+	{
+		ASSERT(lpszPathName != NULL);
+		rpDocMatch = NULL;
+
+		// go through all documents
+		POSITION pos = GetFirstDocPosition();
+		while (pos != NULL) {
+			CDocument* pDoc = GetNextDoc(pos);
+			if (pDoc->GetPathName() == lpszPathName) {
+				// already open
+				rpDocMatch = pDoc;
+				return yesAlreadyOpen;
+			}
+		}
+
+		if (Window::IsAllowed2d(lpszPathName)) {
+			return yesAttemptNative; // extension matches, looks like ours
+		}
+
+		// otherwise we will guess it may work
+		return yesAttemptForeign;
+	}
+};
 
 #pragma region About Dialog
 
-class CAboutDlg
-	: public CBCGPDialog
+class CAboutDlg	: public CBCGPDialog
 {
 public:
 
@@ -138,7 +135,7 @@ END_MESSAGE_MAP()
 
 #pragma endregion //:REGION
 
-Window::Application TheAppication;
+Window::Application TheApplication;
 
 using namespace Window;
 
@@ -196,7 +193,7 @@ Window::View* Window::Application::FindView(int id)
 
 
 
-CString Window::Application::Path(bool bLastBackslash)
+CString Window::Application::GetPath(bool bLastBackslash)
 {
 	CString sPath = PRESET::GetInitPath(m_hInstance);
 	if (bLastBackslash) {
@@ -234,7 +231,7 @@ BOOL Window::Application::InitInstance()
 	Facility::SetLanguage(Facility::ELanguage::English);
 
 	TheAppResources.Load();
-	TheAppOptions.SetFolderPath(Path());
+	TheAppOptions.SetFolderPath(GetPath());
 	TheAppOptions.Load();
 
 	if (Connector3d::Initialize()) {
@@ -287,12 +284,12 @@ BOOL Window::Application::InitInstance()
 
 	CMultiDocTemplate* pDocTemplate;
 
-	if ((pDocTemplate = new PRESET::DocTemplate3d()) == nullptr) {
+	if ((pDocTemplate = new DocTemplate3d()) == nullptr) {
 		RETURN_FALSE;
 	}
 	AddDocTemplate(pDocTemplate);
 
-	if ((pDocTemplate = new PRESET::DocTemplate2d()) == nullptr) {
+	if ((pDocTemplate = new DocTemplate2d()) == nullptr) {
 		RETURN_FALSE;
 	}
 	AddDocTemplate(pDocTemplate);
@@ -426,7 +423,7 @@ void Window::Application::InitializeBcg()
 
 	// Replace fonts
 
-	enum FontIndex
+	enum EFontIndex
 	{
 		fontRegular = 0,
 		fontCaption,
@@ -449,7 +446,7 @@ void Window::Application::InitializeBcg()
 	struct fontType
 	{
 		CString Varialbe;
-		FontIndex Index;
+		EFontIndex Index;
 		CFont& Font;
 		int Height = 0;
 	};

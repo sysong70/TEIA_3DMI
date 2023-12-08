@@ -2,6 +2,8 @@
 #include "Facility.CommandIndexer.h"
 #include "Command.Resource.h"
 
+#include "Command.VisualEffects3d.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -9,9 +11,12 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 
+// Global single instance
 
 Facility::CommandIndexer TheCommandIndexer;
-Facility::CommandIndexer::Command theDummy;
+Facility::CommandIndexer::CommandInfo theDummy;
+
+Command::VisualEffects3d theVisualEffects3d;
 
 
 
@@ -22,7 +27,13 @@ Facility::CommandIndexer::CommandIndexer()
 
 
 
-Facility::CommandIndexer::Command& Facility::CommandIndexer::Get(int id)
+Facility::CommandIndexer::~CommandIndexer()
+{
+}
+
+
+
+Facility::CommandIndexer::CommandInfo& Facility::CommandIndexer::Get(int id)
 {
 	CommandMap& map = GetInstance();
 
@@ -38,7 +49,7 @@ Facility::CommandIndexer::Command& Facility::CommandIndexer::Get(int id)
 
 
 
-Facility::CommandIndexer::Command& Facility::CommandIndexer::GetDummyData()
+Facility::CommandIndexer::CommandInfo& Facility::CommandIndexer::GetDummyData()
 {
 	return theDummy;
 }
@@ -47,7 +58,7 @@ Facility::CommandIndexer::Command& Facility::CommandIndexer::GetDummyData()
 
 void Facility::CommandIndexer::Initialize()
 {
-#define ITEM_DEF(type,id,stringId) { id, { type, false, id, stringId } },
+#define ITEM_DEF(type,id,stringId) { id, { type, id, stringId } },
 
 	m_commandMap = {
 #include "Command.Common.h"
@@ -55,7 +66,7 @@ void Facility::CommandIndexer::Initialize()
 
 #undef ITEM_DEF
 
-	Get(HOME_3D_POP_ObjectSnap).Local = true;
+	Get(HOME_3D_LST_VisualEffects).Function = &theVisualEffects3d;
 }
 
 

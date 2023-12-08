@@ -12,40 +12,6 @@ static char THIS_FILE[] = __FILE__;
 
 
 
-#define PRESET PresetToolBar
-
-namespace PresetToolBar
-{
-	const UINT Id = WM_USER;
-
-	CSize ButtonSize()
-	{
-		return globalUtils.ScaleByDPI(CSize(28, 28));
-	}
-
-	CSize ButtonMargin()
-	{
-		return globalUtils.ScaleByDPI(CSize(2, 2));
-	}
-
-	CSize ImageSize()
-	{
-		return globalUtils.ScaleByDPI(CSize(24, 24));
-	}
-
-	CSize SeperatorMargin()
-	{
-		return globalUtils.ScaleByDPI(CSize(6, 6));
-	}
-
-	CSize ToolBarPadding()
-	{
-		return globalUtils.ScaleByDPI(CSize(3, 3));
-	}
-}
-
-
-
 using namespace Control;
 
 BEGIN_MESSAGE_MAP(ToolBar, CWnd)
@@ -74,9 +40,14 @@ Control::ToolBar::~ToolBar()
 
 
 
-void Control::ToolBar::Initialize(CWnd* pParentWnd, const RECT& rect)
+bool Control::ToolBar::Initialize(CWnd* pParentWnd, UINT id, const RECT& rect)
 {
-	__super::Create(NULL, L"", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN, rect, pParentWnd, PRESET::Id);
+	const DWORD dwStyle = WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN;
+	if (Create(NULL, L"", dwStyle, rect, pParentWnd, id) == FALSE) {
+		RETURN_FALSE;
+	}
+
+	return true;
 }
 
 
@@ -128,9 +99,9 @@ CSize Control::ToolBar::AdjustLayout()
 		return {};
 	}
 
-	CSize buttonSize = PRESET::ButtonSize();
-	CSize buttonMargin = PRESET::ButtonMargin();
-	CSize padding = PRESET::ToolBarPadding();
+	CSize buttonSize = GetButtonSize();
+	CSize buttonMargin = GetButtonMargin();
+	CSize padding = GetPadding();
 	CPoint offset(padding.cx, padding.cy);
 	CSize size;
 
@@ -142,7 +113,7 @@ CSize Control::ToolBar::AdjustLayout()
 				offset.x += width + buttonMargin.cx;
 			}
 			else {
-				offset.x += PRESET::SeperatorMargin().cx;
+				offset.x += GetSeperatorMargin().cx;
 			}
 		}
 
@@ -157,7 +128,7 @@ CSize Control::ToolBar::AdjustLayout()
 				offset.y += height + buttonMargin.cy;
 			}
 			else {
-				offset.y += PRESET::SeperatorMargin().cy;
+				offset.y += GetSeperatorMargin().cy;
 			}
 		}
 
@@ -257,6 +228,39 @@ CBCGPButton* Control::ToolBar::GetButton(UINT id)
 
 
 
+void Control::ToolBar::SetSize(CSize buttonSize, CSize buttonMargin, CSize imageSize, CSize seperatorMargin, CSize toolBarPadding)
+{
+	m_buttonSize = buttonSize;
+	m_buttonMargin = buttonMargin;
+	m_imageSize = imageSize;
+	m_seperatorMargin = seperatorMargin;
+	m_toolBarPadding = toolBarPadding;
+}
+
+
+
+void Control::ToolBar::SetSize(EItemSize size)
+{
+	DEBUG_STOP;
+
+	switch (size) {
+	case EItemSize::Small:
+		m_imageSize = CSize(16, 16);
+		break;
+
+	case EItemSize::Large:
+		m_imageSize = CSize(32, 32);
+		break;
+
+	case EItemSize::Medium:
+	default:
+		m_imageSize = CSize(24, 24);
+		break;
+	}
+}
+
+
+
 void Control::ToolBar::PostNcDestroy()
 {
 	__super::PostNcDestroy();
@@ -317,7 +321,7 @@ CBCGPButton* Control::ToolBar::CreateButton(UINT id, bool menu)
 	button.m_bVisualManagerStyle = TRUE;
 
 	button.Create(L"", BS_PUSHBUTTON | BS_ICON | WS_CHILD | WS_VISIBLE, {}, this, id);
-	button.SetBitmap(Facility::CreateBitmap(id, PRESET::ImageSize()));
+	button.SetBitmap(Facility::CreateBitmap(id, GetImageSize()));
 	button.SetTooltip(Facility::GetTitle(id));
 
 	return pButton;
@@ -330,4 +334,37 @@ bool Control::ToolBar::IsHorizontal()
 	return !(m_ePivot == EPivot::MiddleLeft || m_ePivot == EPivot::MiddleRight);
 }
 
-#undef PRESET
+
+
+CSize Control::ToolBar::GetButtonSize()
+{
+	return globalUtils.ScaleByDPI(m_buttonSize);
+}
+
+
+
+CSize Control::ToolBar::GetButtonMargin()
+{
+	return globalUtils.ScaleByDPI(m_buttonMargin);
+}
+
+
+
+CSize Control::ToolBar::GetImageSize()
+{
+	return globalUtils.ScaleByDPI(m_imageSize);
+}
+
+
+
+CSize Control::ToolBar::GetSeperatorMargin()
+{
+	return globalUtils.ScaleByDPI(m_seperatorMargin);
+}
+
+
+
+CSize Control::ToolBar::GetPadding()
+{
+	return globalUtils.ScaleByDPI(m_toolBarPadding);
+}

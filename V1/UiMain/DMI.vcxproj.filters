@@ -100,9 +100,6 @@
     <ClCompile Include="Control.TabWnd.cpp">
       <Filter>Control</Filter>
     </ClCompile>
-    <ClCompile Include="Control.Panel.cpp">
-      <Filter>Control</Filter>
-    </ClCompile>
     <ClCompile Include="Control.CheckListBox.cpp">
       <Filter>Control</Filter>
     </ClCompile>
@@ -162,6 +159,18 @@
     </ClCompile>
     <ClCompile Include="Component.Input.cpp">
       <Filter>Component\View</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.VisualEffects3d.cpp">
+      <Filter>Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.Base.cpp">
+      <Filter>Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.Panel.cpp">
+      <Filter>Control\Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.TaskPanel.cpp">
+      <Filter>Control\Panel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -279,9 +288,6 @@
     <ClInclude Include="Control.TabWnd.h">
       <Filter>Control</Filter>
     </ClInclude>
-    <ClInclude Include="Control.Panel.h">
-      <Filter>Control</Filter>
-    </ClInclude>
     <ClInclude Include="Control.CheckListBox.h">
       <Filter>Control</Filter>
     </ClInclude>
@@ -338,6 +344,21 @@
     </ClInclude>
     <ClInclude Include="Component.Input.h">
       <Filter>Component\View</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.VisualEffects3d.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.Base.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.Panel.h">
+      <Filter>Control\Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.TaskPanel.h">
+      <Filter>Control\Panel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -424,6 +445,12 @@
     </Filter>
     <Filter Include="Component\View">
       <UniqueIdentifier>{02e349aa-e87e-4b99-9609-75debd2ed290}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Command">
+      <UniqueIdentifier>{64d47e27-6764-45be-a7d0-d9f90367c89d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Control\Panel">
+      <UniqueIdentifier>{e7a6640c-e4cd-4f57-92f9-29435cfaf150}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

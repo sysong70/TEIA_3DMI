@@ -9,20 +9,6 @@ static char THIS_FILE[] = __FILE__;
 
 
 
-CSize Dialog::ControlGap()
-{
-	return globalUtils.ScaleByDPI(CSize(6, 6));
-}
-
-
-
-int Dialog::FooterPadding()
-{
-	return globalUtils.ScaleByDPI(6);
-}
-
-
-
 CSize Dialog::FramePadding()
 {
 	return globalUtils.ScaleByDPI(CSize(6, 6));

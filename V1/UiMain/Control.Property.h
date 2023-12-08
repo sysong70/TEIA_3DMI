@@ -72,7 +72,7 @@ namespace Property
 	{
 	public:
 
-		ComboBoxEx(const CString& name, const CString& value, LPCTSTR lpDescr = NULL, DWORD_PTR data = 0, CBCGPToolBarImages* pImageList = NULL);
+		ComboBoxEx(const CString& name, const CString& value, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL, CBCGPToolBarImages* pImageList = NULL);
 
 		bool AddOption(LPCTSTR lpOption, int nIcon = -1, int nIndent = 0);
 
@@ -80,7 +80,7 @@ namespace Property
 
 		CComboBox* CreateCombo(CWnd* pWndParent, CRect rect) override;
 
-		LPCTSTR GetXMLTagName() const override;
+		//LPCTSTR GetXMLTagName() const override;
 
 		BOOL OnEdit(LPPOINT lpClick) override;
 
@@ -103,13 +103,41 @@ namespace Property
 
 		void AdjustButtonRect() override;
 
-		LPCTSTR GetXMLTagName() const override;
+		//LPCTSTR GetXMLTagName() const override;
 
 		BOOL HasButton() const override;
 
 		void OnClickButton(CPoint point) override;
 
 		void OnDrawButton(CDC* pDC, CRect rectButton) override;
+	};
+
+
+
+	class CommandButton : public CBCGPProp
+	{
+	public:
+
+		friend class Control::PropList;
+
+		CommandButton(const CString& name, const CString& title, UINT id, LPCTSTR lpDescr, DWORD_PTR data = NULL);
+
+	protected:
+
+		BOOL OnClickValue(UINT uiMsg, CPoint point) override;
+		
+		void OnDrawValue(CDC* pDC, CRect rect) override;
+
+		BOOL OnEdit(LPPOINT lptClick) override;
+
+		void OnLeaveMouse() override;
+
+		BOOL OnSetCursor() const override;
+
+	protected:
+
+		CString m_title;
+		bool m_bHighlighted = false;
 	};
 
 
@@ -122,7 +150,7 @@ namespace Property
 
 	protected:
 
-		LPCTSTR GetXMLTagName() const override;
+		//LPCTSTR GetXMLTagName() const override;
 
 		BOOL OnDrawPaletteColorBox(CDC* pDC, const CRect rectColor, COLORREF color, BOOL bIsAutomatic, BOOL bIsSelected, BOOL bOnPopupMenu) override;
 	};
@@ -137,7 +165,7 @@ namespace Property
 
 	protected:
 
-		virtual LPCTSTR GetXMLTagName() const;
+		//virtual LPCTSTR GetXMLTagName() const;
 
 		virtual void OnDrawDescription(CDC* pDC, CRect rect);
 	};
@@ -152,7 +180,7 @@ namespace Property
 
 	protected:
 
-		LPCTSTR GetXMLTagName() const override;
+		//LPCTSTR GetXMLTagName() const override;
 
 		BOOL HasButton() const override;
 
@@ -165,13 +193,13 @@ namespace Property
 	{
 	public:
 
-		CustomState(const CString& name, LPCTSTR lpValue, LPCTSTR lpDescr = NULL, DWORD_PTR data = 0);
+		CustomState(const CString& name, LPCTSTR lpValue, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL);
 
 		void AnimationStep();
 
 	protected:
 
-		LPCTSTR GetXMLTagName() const override;
+		//LPCTSTR GetXMLTagName() const override;
 
 		BOOL HasButton() const override;
 
@@ -192,7 +220,7 @@ namespace Property
 	{
 	public:
 
-		Duration(const CString& name, const COleDateTimeSpan& duration, LPCTSTR lpDescr = NULL, DWORD_PTR data = 0);
+		Duration(const CString& name, const COleDateTimeSpan& duration, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL);
 
 		~Duration() override;
 
@@ -208,7 +236,7 @@ namespace Property
 
 		BOOL DoPaste() override;
 
-		LPCTSTR GetXMLTagName() const override;
+		//LPCTSTR GetXMLTagName() const override;
 
 		void OnDrawValue(CDC* pDC, CRect rect) override;
 
@@ -235,13 +263,13 @@ namespace Property
 	{
 	public:
 
-		HexValue(const CString& name, long lValue, LPCTSTR lpDescr = NULL, DWORD_PTR data = 0);
+		HexValue(const CString& name, long lValue, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL);
 
 	protected:
 
 		CString FormatProperty() override;
 
-		LPCTSTR GetXMLTagName() const override;
+		//LPCTSTR GetXMLTagName() const override;
 
 		BOOL ParseValue(const CString& str) override;
 
@@ -256,7 +284,7 @@ namespace Property
 	{
 	public:
 
-		IconList(const CString& name, CBCGPToolBarImages& icons, int nSelected, CStringList* pNames = NULL, LPCTSTR lpDescr = NULL, DWORD_PTR data = 0);
+		IconList(const CString& name, CBCGPToolBarImages& icons, int nSelected, CStringList* pNames = NULL, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL);
 
 	protected:
 
@@ -264,7 +292,7 @@ namespace Property
 
 		CWnd* CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultFormat) override;
 
-		LPCTSTR GetXMLTagName() const override;
+		//LPCTSTR GetXMLTagName() const override;
 
 		void OnDrawValue(CDC* pDC, CRect rect) override;
 
@@ -282,7 +310,7 @@ namespace Property
 
 	public:
 
-		Password(const CString& name, const CString& password, LPCTSTR lpDescr = NULL, DWORD_PTR data = 0);
+		Password(const CString& name, const CString& password, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL);
 
 	protected:
 
@@ -290,7 +318,7 @@ namespace Property
 
 		CString FormatProperty() override;
 
-		LPCTSTR GetXMLTagName() const override;
+		//LPCTSTR GetXMLTagName() const override;
 		//:WARNING - Don't save password in XML!
 		CString GetXMLValue() const override;
 		//:WARNING - Don't copy password to the clipboard!
@@ -303,13 +331,13 @@ namespace Property
 	{
 	public:
 
-		RangeValidation(const CString& name, long value, LPCTSTR lpDescr = NULL, DWORD_PTR data = 0);
+		RangeValidation(const CString& name, long value, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL);
 
 		void SetRange(long minValue, long maxValue);
 
 	protected:
 
-		LPCTSTR GetXMLTagName() const override;
+		//LPCTSTR GetXMLTagName() const override;
 
 		BOOL OnEndEdit() override;
 
@@ -329,7 +357,7 @@ namespace Property
 
 		friend class SliderCtrl;
 
-		Slider(const CString& name, UINT id, long value, LPCTSTR lpDescr = NULL, DWORD_PTR data = 0);
+		Slider(const CString& name, UINT id, long value, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL);
 
 		void SetRange(int minValue, int maxValue, int step);
 
@@ -337,7 +365,7 @@ namespace Property
 
 		CWnd* CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultFormat) override;
 
-		LPCTSTR GetXMLTagName() const override;
+		//LPCTSTR GetXMLTagName() const override;
 
 		BOOL OnClickValue(UINT uiMsg, CPoint point) override;
 
@@ -366,7 +394,7 @@ namespace Property
 
 		void AdjustButtonRect() override;
 
-		LPCTSTR GetXMLTagName() const override;
+		//LPCTSTR GetXMLTagName() const override;
 
 		BOOL HasButton() const override;
 

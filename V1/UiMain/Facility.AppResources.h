@@ -15,6 +15,8 @@ namespace Facility
 
 		bool Load();
 
+		HBITMAP GetBackground();
+
 		Json::Object& GetDialog(CStringA name);
 
 		Json::Object& GetPreferences();
@@ -23,7 +25,7 @@ namespace Facility
 
 		Json::Object& GetStyles();
 
-		HBITMAP GetBackground();
+		Json::Object& GetTask(CStringA name);
 
 	private:
 

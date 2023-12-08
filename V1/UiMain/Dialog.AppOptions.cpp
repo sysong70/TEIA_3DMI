@@ -19,9 +19,7 @@ static char THIS_FILE[] = __FILE__;
 
 namespace PresetAppOptions
 {
-	const int IDAPPLY = 3;
-
-	enum ControlId
+	enum EControlId
 	{
 		Id = WM_USER,
 		PreferenceProp,
@@ -36,11 +34,11 @@ namespace PresetAppOptions
 using namespace Dialog;
 
 BEGIN_MESSAGE_MAP(AppOptions, Standard)
-	ON_COMMAND(PRESET::Initialize, OnInitialize)
-	ON_COMMAND(PRESET::Reset, OnReset)
-	ON_COMMAND(PRESET::IDAPPLY, OnApply)
-
 	ON_REGISTERED_MESSAGE(BCGM_CHANGE_ACTIVE_TAB, OnChangeActiveTab)
+
+	ON_BN_CLICKED(PRESET::Initialize, OnInitialize)
+	ON_BN_CLICKED(PRESET::Reset, OnReset)
+	ON_BN_CLICKED(IDCONTINUE, OnApply)
 END_MESSAGE_MAP()
 
 
@@ -54,16 +52,6 @@ Dialog::AppOptions::AppOptions()
 
 Dialog::AppOptions::~AppOptions()
 {
-}
-
-
-
-void Dialog::AppOptions::DoDataExchange(CDataExchange* pDX)
-{
-	__super::DoDataExchange(pDX);
-
-	//DDX_CONTROL(Initialize);
-	//DDX_CONTROL(Reset);
 }
 
 
@@ -131,6 +119,8 @@ LRESULT Dialog::AppOptions::OnChangeActiveTab(WPARAM wp, LPARAM lp)
 {
 	int index = (int)wp;
 
+	//:TODO
+
 	return S_OK;
 }
 
@@ -182,8 +172,6 @@ void Dialog::AppOptions::OnApply()
 
 void Dialog::AppOptions::ConstructBody(const CRect& boundary)
 {
-	Json::Object& data = GetUiData().GetAt("body");
-
 	//:WARNING - setting before Create()
 	m_tabs.SetTabHeight(Control::TabHeight());
 
@@ -208,27 +196,28 @@ void Dialog::AppOptions::ConstructFooter(const CRect& boundary)
 {
 	Json::Object& footer = GetUiData().GetAt("footer");
 	Json::Object& buttons = GetDefaultButtons();
-
+	CSize margin = Control::Gap();
+	CSize size;
 	int maxHeight = 0;
 
-	maxHeight = max(maxHeight, SetupControl(m_wndInitialize, Facility::SetData(footer.GetAt("Initialize"), PRESET::Initialize)).cy);
-	maxHeight = max(maxHeight, SetupControl(m_wndReset, Facility::SetData(footer.GetAt("Reset"), PRESET::Reset)).cy);
-	maxHeight = max(maxHeight, SetupControl(m_wndOk, buttons.GetAt("Ok")).cy);
-	maxHeight = max(maxHeight, SetupControl(m_wndApply, buttons.GetAt("Apply")).cy);
-	maxHeight = max(maxHeight, SetupControl(m_wndCancel, buttons.GetAt("Cancel")).cy);
+	size = Control::Setup(m_wndInitialize, Facility::SetData(footer.GetAt("Initialize"), PRESET::Initialize), this); maxHeight = max(maxHeight, size.cy);
+	size = Control::Setup(m_wndReset, Facility::SetData(footer.GetAt("Reset"), PRESET::Reset), this); maxHeight = max(maxHeight, size.cy);
+	size = Control::Setup(m_wndOk, buttons.GetAt("Ok"), this); maxHeight = max(maxHeight, size.cy);
+	size = Control::Setup(m_wndApply, buttons.GetAt("Apply"), this); maxHeight = max(maxHeight, size.cy);
+	size = Control::Setup(m_wndCancel, buttons.GetAt("Cancel"), this); maxHeight = max(maxHeight, size.cy);
 
-	m_nFooterHeight = maxHeight + FooterPadding();
+	m_nFooterHeight = maxHeight + margin.cy;
 
 	CPoint basePoint;
 	basePoint.y = boundary.bottom - maxHeight / 2;
 	basePoint.x = boundary.left;
 
-	AlignControls({ &m_wndInitialize, &m_wndReset }, basePoint, Control::EAlign::VerticalCenter);
-	DestributeControls({ &m_wndInitialize, &m_wndReset }, basePoint, FooterPadding(), Control::EDirection::ToRight);
+	Control::Align({ &m_wndInitialize, &m_wndReset }, basePoint, Control::EAlign::VerticalCenter, this);
+	Control::Destribute({ &m_wndInitialize, &m_wndReset }, basePoint, margin.cx, Control::EDirection::ToRight, this);
 
-	AlignControls({ &m_wndCancel, &m_wndApply, &m_wndOk }, basePoint, Control::EAlign::VerticalCenter);
+	Control::Align({ &m_wndCancel, &m_wndApply, &m_wndOk }, basePoint, Control::EAlign::VerticalCenter, this);
 	basePoint.x = boundary.right;
-	DestributeControls({ &m_wndCancel, &m_wndApply, &m_wndOk }, basePoint, FooterPadding(), Control::EDirection::ToLeft);
+	Control::Destribute({ &m_wndCancel, &m_wndApply, &m_wndOk }, basePoint, margin.cx, Control::EDirection::ToLeft, this);
 }
 
 #undef DDX_CONTROL

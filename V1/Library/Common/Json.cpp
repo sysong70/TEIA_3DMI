@@ -1888,6 +1888,31 @@ void Json::Helper::SetString(Object& object, UINT id, CString value)
 	object.SetValue(GetIdString(id), new Value(buffer));
 }
 
+
+
+COLORREF Json::Helper::ToColor(CString value)
+{
+	wchar_t* end;
+	DWORD cast = wcstoul(value, &end, 16);
+	BYTE* pCast = (BYTE*)&cast;
+
+	return RGB(pCast[2], pCast[1], pCast[0]);
+}
+
+
+
+CString Json::Helper::ToString(COLORREF value)
+{
+	BYTE red = GetRValue(value);
+	BYTE green = GetGValue(value);
+	BYTE blue = GetBValue(value);
+
+	CString buffer;
+	buffer.Format(L"0x%.2X%.2X%.2X", red, green, blue);
+
+	return buffer;
+}
+
 #pragma endregion //:REGION
 
 #pragma region Builder Namespace

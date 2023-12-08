@@ -54,7 +54,8 @@ CString Facility::Local(LPCTSTR value)
 {
 	CString found;
 	if (AfxExtractSubString(found, value, (int)PRESET::Language, '|')) {
-		ASSERT(found != L"__#__"); //:TODO
+		//:TODO
+		//ASSERT(found != L"__#__");
 		return found;
 	}
 
@@ -68,7 +69,8 @@ CString Facility::Local(CString& value)
 {
 	CString found;
 	if (AfxExtractSubString(found, value, (int)PRESET::Language, '|')) {
-		ASSERT(found != L"__#__"); //:TODO
+		//:TODO
+		//ASSERT(found != L"__#__");
 		return found;
 	}
 
@@ -176,7 +178,7 @@ bool Facility::LoadTextResource(UINT id, CString& result)
 
 CString Facility::GetDescription(Json::Object& source)
 {
-	return source.GetString("desc");
+	return Local(source.GetString("desc"));
 }
 
 
@@ -293,23 +295,57 @@ Json::Object& Facility::SetData(Json::Object& target, UINT id, const CString& ti
 
 
 
-void Facility::SetValue(Json::Value& target, _variant_t& source)
+void Facility::SetValue(Json::Value& target, CBCGPProp& source)
 {
-	switch (target.GetType()) {
-	case Json::EValueType::Boolean: target.SetBoolean(source); break;
-	case Json::EValueType::Int:     target.SetInteger(source); break;
-	case Json::EValueType::Uint:    target.SetInteger(source); break;
-	case Json::EValueType::Real:    target.SetReal(source);    break;
-	case Json::EValueType::String:  target.SetString(source);  break;
+	if (source.GetOptionCount() > 0) {
+		target.SetInteger(source.GetSelectedOption());
+	}
+	else if (dynamic_cast<CBCGPColorProp*>(&source) != nullptr) {
+		//:WARNING - not GetValue()
+		COLORREF color = ((CBCGPColorProp*)&source)->GetColor();
+		target.SetString(Json::Helper::ToString(color));
+	}
+	else {
+		switch (target.GetType()) {
+		case Json::EValueType::Boolean:	target.SetBoolean(source.GetValue());	break;
+		case Json::EValueType::Int:		target.SetInteger(source.GetValue());	break;
+		case Json::EValueType::Uint:	target.SetInteger(source.GetValue());	break;
+		case Json::EValueType::Real:	target.SetReal(source.GetValue());		break;
+		case Json::EValueType::String:	target.SetString(source.GetValue());	break;
 
-	default:
-		DEBUG_STOP;
+		default:
+			DEBUG_STOP;
+		}
+	}
+}
+
+void Facility::SetValue(CBCGPProp& target, Json::Value& source)
+{
+	if (target.GetOptionCount() > 0) {
+		target.SelectOption(source.ToInteger());
+	}
+	else if (dynamic_cast<CBCGPColorProp*>(&target) != nullptr) {
+		COLORREF color = Json::Helper::ToColor(source.ToString());
+		//:WARNING - not SetValue()
+		((CBCGPColorProp*)&target)->SetColor(color);
+	}
+	else {
+		switch (source.GetType()) {
+		case Json::EValueType::Boolean:	target.SetValue(source.ToBoolean());			break;
+		case Json::EValueType::Int:		target.SetValue(source.ToInteger());			break;
+		case Json::EValueType::Uint:	target.SetValue(source.ToInteger());			break;
+		case Json::EValueType::Real:	target.SetValue(source.ToReal());				break;
+		case Json::EValueType::String:	target.SetValue((LPCTSTR)source.ToString());	break;
+
+		default:
+			DEBUG_STOP;
+		}
 	}
 }
 
 
 
-void Facility::SetValueByPath(Json::Object& object, CString& path, _variant_t& value)
+void Facility::SetValueByPath(Json::Object& object, CString& path, CBCGPProp& value)
 {
 	Json::Value* pFound = Json::Helper::FindValueByPath(object, (CStringA)path);
 	if (pFound != nullptr) {

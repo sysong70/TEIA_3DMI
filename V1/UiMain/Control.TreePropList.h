@@ -16,7 +16,7 @@ namespace Control
 
 		~TreePropList() override;
 
-		bool Initialize(CWnd* pParentWnd);
+		bool Initialize(CWnd* pParentWnd, UINT id = WM_USER, const RECT& rect = {});
 
 		void InitializeDesign(Json::Object& design);
 
@@ -44,10 +44,6 @@ namespace Control
 		bool m_bModified = false;
 		Json::Object* m_pDesign = nullptr;
 		Json::Object* m_pData = nullptr;
-
-		void CreatePropList();
-
-		void CreateTreeCtrl();
 
 		void ChangePropList(HTREEITEM pItem);
 	};

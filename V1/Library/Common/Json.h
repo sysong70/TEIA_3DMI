@@ -412,6 +412,13 @@ namespace Json
 		void SetRealRawString(Object& object, UINT id, double value, bool allDigit = false);
 
 		void SetString(Object& object, UINT id, CString value);
+
+		// Color
+
+		// source: 3 byte Hex value, ex) 0x123456
+		COLORREF ToColor(CString value);
+		// target: Hex value, only RGB
+		CString ToString(COLORREF value);
 	}
 
 

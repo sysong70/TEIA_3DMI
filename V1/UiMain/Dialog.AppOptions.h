@@ -18,8 +18,6 @@ namespace Dialog
 
 	protected:
 
-		void DoDataExchange(CDataExchange* pDX) override;
-
 		void OnCancel() override;
 
 		BOOL OnInitDialog() override;

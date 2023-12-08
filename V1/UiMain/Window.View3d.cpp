@@ -3,6 +3,7 @@
 #include "Window.Document.h"
 #include "Window.MainFrame.h"
 #include "Window.View3d.h"
+#include "Command.Base.h"
 #include "Connector.h"
 #include "Facility.h"
 #include "Facility.AppOptions.h"
@@ -30,11 +31,6 @@ namespace PresetView3d
 		Layer,
 		Scene,
 	};
-
-	CSize TabImageSize()
-	{
-		return globalUtils.ScaleByDPI(CSize(24, 24));
-	}
 }
 
 
@@ -91,6 +87,7 @@ void Window::View3d::ReceiveSignal(Json::Object* pData)
 {
 	Json::Object& data = *pData;
 	Signal::Target target = (Signal::Target)data.GetInteger(SKW_TARGET);
+
 	if (target == Signal::Target::ModelPanel) {
 		m_modelPanel.ReceiveSignal(pData);
 		return;
@@ -120,6 +117,15 @@ void Window::View3d::ReceiveSignal(Json::Object* pData)
 		default:
 			DEBUG_STOP;
 			break;
+		}
+	}
+	else if (target == Signal::Target::Command) {
+		if (m_pActiveCommand != nullptr) {
+			m_pActiveCommand->ReceiveSignal(pData);
+			return;
+		}
+		else {
+			DEBUG_STOP;
 		}
 	}
 	else {
@@ -163,13 +169,11 @@ void Window::View3d::OnCommand(UINT id)
 	id += (pId >= 0 ? pId : 0);
 	m_historyBar.PushButton(id);
 
-	Facility::CommandIndexer::Command& data = TheCommandIndexer.Get(id);
+	Facility::CommandIndexer::CommandInfo& data = TheCommandIndexer.Get(id);
 
-	if (data.Local) {
-		//switch (id) {
-		//default:
-		//	break;
-		//}
+	if (data.Function != nullptr) {
+		m_pActiveCommand = (Command::Base*)data.Function;
+		m_pActiveCommand->Run(this);
 	}
 	else {
 		switch (data.Type) {
@@ -252,7 +256,7 @@ void Window::View3d::CreatePanelTabs()
 	int image = 0;
 
 	m_tabs.SetImageList({ HOME_3D_CMD_Panels_Model, HOME_3D_CMD_Panels_View, HOME_3D_CMD_Panels_Layer, HOME_3D_CMD_Panels_Scene, },
-		PRESET::TabImageSize());
+		Control::ImageSize());
 	m_tabs.AddTab(&m_modelPanel, Facility::GetTitle(HOME_3D_CMD_Panels_Model), image++);
 	m_tabs.AddTab(&m_viewPanel, Facility::GetTitle(HOME_3D_CMD_Panels_View), image++);
 	m_tabs.AddTab(&m_layerPanel, Facility::GetTitle(HOME_3D_CMD_Panels_Layer), image++);

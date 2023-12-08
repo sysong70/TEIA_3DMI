@@ -39,6 +39,19 @@ Control::TreeCtrlEx::~TreeCtrlEx()
 
 
 
+bool Control::TreeCtrlEx::Initialize(CWnd* pParentWnd, UINT id, const RECT& rect)
+{
+	DWORD dwStyle = WS_CHILD | WS_VISIBLE |
+		TVS_FULLROWSELECT | TVS_HASBUTTONS | TVS_SHOWSELALWAYS;
+	if (Create(dwStyle, rect, pParentWnd, id) == FALSE) {
+		RETURN_FALSE;
+	}
+
+	return true;
+}
+
+
+
 void Control::TreeCtrlEx::InitializeDesign(Json::Array& design)
 {
 	SetRedraw(FALSE);

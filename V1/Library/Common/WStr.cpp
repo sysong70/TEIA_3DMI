@@ -456,7 +456,7 @@ long WStr::ToLong(const wchar_t* value)
 int WStr::FromHex(const wchar_t* value)
 {
 	wchar_t* end;
-	return wcstoul(value, &end, 16);
+	return ::wcstoul(value, &end, 16);
 }
 
 
