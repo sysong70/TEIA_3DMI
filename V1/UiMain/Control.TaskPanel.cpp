@@ -54,6 +54,8 @@ bool Control::TaskPanel::Initialize(CWnd* pParentWnd)
 	ConstructFooter();
 	ConstructBody();
 
+	m_bInitialized = true;
+
 	return true;
 }
 
