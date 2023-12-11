@@ -604,6 +604,8 @@ void Signal::InteractiveCommand::OnRequestValue(UINT commandId)
 	ConstructData(data, Action::OnRequestValue);
 
 	data.SetInteger(SKW_ID, commandId);
+
+	Wrapper().SendData(data);
 }
 
 
