@@ -2,6 +2,7 @@
 
 #include "Control.h"
 #include "Control.PropList.h"
+#include "Control.ToolBar.h"
 #include "Component.TaskBar.h"
 #include <Json.h>
 
@@ -59,6 +60,7 @@ namespace Control
 
 	protected:
 
+		Control::ToolBar m_toolBar;
 		Control::PropList m_propList;
 
 		int m_nHeaderHeight = 0;

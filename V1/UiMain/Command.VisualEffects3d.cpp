@@ -2,10 +2,7 @@
 #include "Command.Resource.h"
 #include "Command.VisualEffects3d.h"
 #include "Component.TaskBar.h"
-#include "Control.Property.h"
-#include "Control.PropList.h"
 #include "Control.TaskPanel.h"
-#include "Control.ToolBar.h"
 #include "Facility.AppResources.h"
 #include "Window.Application.h"
 #include "Window.MainFrame.h"
@@ -59,6 +56,15 @@ protected:
 
 	void ConstructBody() override
 	{
+		if (m_propList.Initialize(this, PRESET::PropList) == false) {
+			DEBUG_RETURN;
+		}
+
+		m_propList.InitializeDesign(GetUiData().GetAt("properties"));
+	}
+
+	void ConstructHeader() override
+	{
 		m_toolBar.SetPivot(Control::EPivot::TopLeft);
 		m_toolBar.Initialize(this, PRESET::ToolBar);
 
@@ -67,14 +73,6 @@ protected:
 		m_toolBar.AddButton(HOME_3D_CMD_ViewStyle_Wireframe);
 		m_toolBar.AddButton(HOME_3D_CMD_ViewStyle_HiddenLineRemove);
 		m_toolBar.AddButton(HOME_3D_CMD_ViewStyle_Tessellated);
-
-		if (m_propList.Initialize(this, PRESET::PropList) == false) {
-			DEBUG_RETURN;
-		}
-
-		m_propList.InitializeDesign(GetUiData().GetAt("properties"));
-
-		m_bInitialized = true;
 	}
 
 protected:
@@ -105,20 +103,25 @@ protected:
 			return;
 		}
 
-		m_toolBar.AdjustLayout();
-		CSize toolBarSize = Control::GetSize(&m_toolBar);
-
 		int margin = Control::Gap().cy;
-		CPoint propTop = { 0, toolBarSize.cy + margin };
-		CSize propSize = { cx, cy - toolBarSize.cy - margin };
+		CPoint propTop;
+		CSize propSize;
+
+		if (m_toolBar.GetSafeHwnd() != nullptr) {
+			m_toolBar.AdjustLayout();
+			CSize toolBarSize = Control::GetSize(&m_toolBar);
+
+			propTop = { 0, toolBarSize.cy + margin };
+			propSize = { cx, cy - toolBarSize.cy - margin };
+		}
+		else {
+			propSize = { cx, cy };
+		}
+
 		m_propList.SetWindowPos(NULL, propTop.x, propTop.y, propSize.cx, propSize.cy, SWP_NOACTIVATE);
 	}
 
 	DECLARE_MESSAGE_MAP();
-
-private:
-
-	Control::ToolBar m_toolBar;
 };
 
 
@@ -181,6 +184,7 @@ void Command::VisualEffects3d::Run(Window::View* pView)
 	//taskBar.Show(m_pView);
 
 	Component::TaskBar& taskBar = TheApplication.GetMainFrame().GetTaskBar();
+	taskBar.SetParent((CWnd*)pView);
 	taskBar.GetDelivery().command.OnRequestValue(PRESET::CommandId);
 }
 
