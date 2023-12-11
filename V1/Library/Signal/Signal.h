@@ -504,6 +504,7 @@ namespace Signal
 			OnChangedValue,
 
 			ResponseValue,
+			UpdateValue,
 		};
 
 		DEFINE_WRAPPER;
@@ -517,6 +518,8 @@ namespace Signal
 		void OnChangedValue(UINT coomandId, Json::Object& value);
 
 		void ResponseValue(UINT commandId, Json::Object& value, Json::Object& defaultValue);
+		//:TODO
+		void UpdateValue(UINT commandId, Json::Array& values);
 	};
 
 
