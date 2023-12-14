@@ -133,7 +133,7 @@ VisibilityKit & VisibilityKit::operator = (VisibilityKit const & cInKit)
 {
 	int nIndex = 0;
 	for(bool & nFlag : m_bVisibilityFlag) {
-		nFlag = cInKit.GetSelectabilityFlag()[nIndex];
+		nFlag = cInKit.GetVisibilityFlag()[nIndex];
 		nIndex++;
 	}
 

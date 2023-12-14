@@ -11,9 +11,10 @@ USING_3DF_NAMESPACE
 
 SegmentKey Database::CreateRootSegment()
 {
-	HC_Open_Segment("/");
-		HC_KEY nKey = HC_Create_Segment("");
-	HC_Close_Segment();
+	HC_KEY nKey = INVALID_KEY;
+	HC_Open_Segment("/"); {
+		nKey = HC_Create_Segment("");
+	} HC_Close_Segment();
 
 	SegmentKey cSegment(nKey);
 	return cSegment;
@@ -21,10 +22,11 @@ SegmentKey Database::CreateRootSegment()
 
 PortfolioKey Database::CreatePortfolio()
 {
-	HC_KEY nPortfoliosKey = HC_Open_Segment("/portfolios");
-	HC_Set_Priority(nPortfoliosKey, 0);
-	HC_KEY nKey = HC_Create_Segment("");
-	HC_Close_Segment();
+	HC_KEY nKey = INVALID_KEY;
+	HC_KEY nPortfoliosKey = HC_Open_Segment("/portfolios"); {
+		HC_Set_Priority(nPortfoliosKey, 0);
+		nKey = HC_Create_Segment("");
+	} HC_Close_Segment();
 
 	PortfolioKey cPortfolio(nKey);
 	return cPortfolio;

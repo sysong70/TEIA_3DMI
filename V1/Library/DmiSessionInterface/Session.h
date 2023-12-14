@@ -28,11 +28,14 @@ namespace SESSION
 		void ViewResize(Json::Object & cInObject);
 		KERNEL::DocView * GetView();
 
-		void MouseSignal(Json::Object & cInObject);
-		void KeyboardSignal(Json::Object & cInObject);
+		void ViewMouseSignal(Json::Object & cInObject);
+		void ViewKeyboardSignal(Json::Object & cInObject);
 
-		void ExecuteCommand(Json::Object & cInObject);
-		void CancelCommands();
+		void ViewExecuteCommand(Json::Object & cInObject);
+		void ViewCancelCommands();
+
+		//== Command 관련 함수 =======================================================================
+		void CommandRequestValue(Json::Object & cInObject);
 
 	private:
 		int m_nSessionId = -1;

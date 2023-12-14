@@ -42,7 +42,7 @@ namespace H3DF
 		void Set(StyleControl const & cInThat);
 		StyleControl & operator = (StyleControl const & cInThat);
 
-		//StyleKey PushNamed(CString & strInStyleName);
+		StyleKey PushNamed(CString & strInStyleName);
 		StyleKey PushSegment(SegmentKey const & cInStyleSource);
 	};
 }

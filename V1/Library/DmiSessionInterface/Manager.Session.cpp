@@ -70,7 +70,12 @@ void SESSION::Manager::Session::ExecuteSignal(const wchar_t * pchBuffer)
 			ExecuteViewSignal(cInObject);
 			break;
 
+		case Signal::Target::Command:
+			ExecuteCommand(cInObject);
+			break;
+
 		default:
+			assert(false);
 			break;
 	}
 }
@@ -131,6 +136,9 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 			pcSession->ViewInitialize(cInObject, Connector::GetInstance(nViewId));
 			break;
 
+		case Signal::View::Action::OnConstruct:
+			break;
+
 		case Signal::View::Action::OnDestruct:
 			pcSession->ViewDestruct();
 			break;
@@ -151,7 +159,7 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 		case Signal::View::Action::OnRButtonDown:
 		case Signal::View::Action::OnRButtonUp:
 		case Signal::View::Action::OnMouseWheel:
-			pcSession->MouseSignal(cInObject);
+			pcSession->ViewMouseSignal(cInObject);
 			break;
 
 			//:Ken - 20230607
@@ -159,18 +167,19 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 		case Signal::View::Action::OnChar:
 		case Signal::View::Action::OnKeyDown:
 		case Signal::View::Action::OnKeyUp:
-			pcSession->KeyboardSignal(cInObject);
+			pcSession->ViewKeyboardSignal(cInObject);
 			break;
 
 		case Signal::View::Action::OnCancel:
-			pcSession->CancelCommands();
+			pcSession->ViewCancelCommands();
 			break;
 
 		case Signal::View::Action::OnCommand:
-			pcSession->ExecuteCommand(cInObject);
+			pcSession->ViewExecuteCommand(cInObject);
 			break;
 
 		default:
+			assert(false);
 			break;
 	}
 }
@@ -193,4 +202,25 @@ SESSION::Session * SESSION::Manager::Session::GetSession(int nViewId)
 	}
 
 	return pcSession;
+}
+
+//== Command 명령어 처리 부분 =========================================================================
+void SESSION::Manager::Session::ExecuteCommand(Json::Object & cInObject)
+{
+	int nAction = cInObject.GetInteger(SKW_ACTION);
+	int nViewId = cInObject.GetInteger(SKW_VIEWID);
+	int nId = cInObject.GetInteger(SKW_ID);
+
+	SESSION::Session * pcSession = GetSession(nViewId);
+
+	switch ((Signal::InteractiveCommand::Action) nAction)
+	{
+		case Signal::InteractiveCommand::Action::OnRequestValue:
+			pcSession->CommandRequestValue(cInObject);
+			break;
+
+		default:
+			assert(false);
+			break;
+	}
 }

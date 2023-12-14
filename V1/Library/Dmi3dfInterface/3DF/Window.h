@@ -1,8 +1,10 @@
 ﻿#pragma once
 
+#include "3DF.h"
+
 #include "Segment.h"
-#include "Selection.h"
-#include "Highlight.h"
+// #include "Selection.h"
+// #include "Highlight.h"
 
 namespace H3DF
 {
@@ -109,16 +111,14 @@ namespace H3DF
 		const H3DF::BaseView * GetBaseView() const;
 		H3DF::BaseView * GetBaseView();
 
-		HC_KEY GetSceneKey();
-		const HC_KEY GetSceneKey() const;
-
 		void Update();
 
 		int ViewId();
 		const int ViewId() const;
 		void SetViewId(int nViewId);
 
-		//int OnMouseMove(HEventInfo & cEvent);
+		WindowKey & SetSelectionOptions(SelectionOptionsKit const & cInKit);
+		bool ShowSelectionOptions(SelectionOptionsKit & cOutKit) const;
 
 		// Returns a control that allows the user to manipulate and query details of the selection options on this window.
 		SelectionOptionsControl & GetSelectionOptionsControl();

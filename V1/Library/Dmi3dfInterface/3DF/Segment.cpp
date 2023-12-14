@@ -8,7 +8,6 @@
 #include "Line.h"
 #include "Circle.h"
 
-#include "Selectability.h"
 #include "Visibility.h"
 #include "VisualEffects.h"
 #include "Material.h"
@@ -142,9 +141,9 @@ CString H3DF::SegmentKey::Name() const
 
 SegmentKey & H3DF::SegmentKey::SetName(CString strInName)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
-	HC_Rename_Segment(".", Utility::ToChar(strInName));
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyPrivate::LocalOpen(*this); {
+		HC_Rename_Segment(".", Utility::ToChar(strInName));
+	} SegmentKeyPrivate::LocalClose(*this);
 
 	return *this;
 }
@@ -152,14 +151,8 @@ SegmentKey & H3DF::SegmentKey::SetName(CString strInName)
 //== Sub Segment 관련 함수 ===========================================================================
 SegmentKey const H3DF::SegmentKey::Subsegment()
 {
-	CString strText;
-
-// 	HC_KEY nKey = HC_Create_Segment_Key_By_Key(KeyValue(), nullptr);
-// 
-// 	SegmentKey cSubsegment(nKey);
-
 	SegmentKeyPrivate::LocalOpen(*this);
-	SegmentKey cSubsegment(strText);
+	SegmentKey cSubsegment(L"");
 	SegmentKeyPrivate::LocalClose(*this);
 
 	return cSubsegment;
@@ -587,27 +580,6 @@ PerformanceControl const H3DF::SegmentKey::GetPerformanceControl() const
 	return cPerformanceControl;
 }
 
-//== Control 관련 함수 ===============================================================================
-SelectabilityControl H3DF::SegmentKey::GetSelectabilityControl()
-{
-	SelectabilityControl cSelectabilityControl(*this);
-	return cSelectabilityControl;
-}
-
-SelectabilityControl const H3DF::SegmentKey::GetSelectabilityControl() const
-{
-	SelectabilityControl cSelectabilityControl(*(SegmentKey *) this);
-	return cSelectabilityControl;
-}
-
-SegmentKey & H3DF::SegmentKey::SetSelectability(CString strList)
-{
-	SegmentKeyPrivate::LocalOpen(*this);
-	HC_Set_Selectability(Utility::ToChar(strList));
-	SegmentKeyPrivate::LocalClose(*this);
-	return *this;
-}
-
 //== Visibility Control 관련 함수 ====================================================================
 VisibilityControl H3DF::SegmentKey::GetVisibilityControl()
 {
@@ -678,6 +650,57 @@ StyleControl H3DF::SegmentKey::GetStyleControl()
 {
 	StyleControl cStyleControl(*this);
 	return cStyleControl;
+}
+
+//== Condition 관련 함수 =============================================================================
+// Sets chInCondition as the only condition on this segment, replacing any existing conditions.
+SegmentKey & H3DF::SegmentKey::SetCondition(char const * chInCondition)
+{
+	if (nullptr != chInCondition) {
+		SegmentKeyPrivate::LocalOpen(*this); {
+			HC_Set_Conditions(chInCondition);
+		}SegmentKeyPrivate::LocalClose(*this);
+	}
+
+	return *this;
+}
+
+// Sets astrInConditions as the only conditions on this segment, replacing any existing conditions.
+SegmentKey & H3DF::SegmentKey::SetConditions(AStringArray const & astrInConditions)
+{
+	if (false == astrInConditions.empty()) {
+		CStringA strConditions;
+
+		for (size_t nIndex = 0; nIndex < astrInConditions.size(); ++nIndex) {
+			if (0 < nIndex) {
+				strConditions += ", ";
+			}
+			strConditions += astrInConditions[nIndex];
+		}
+
+		SegmentKeyPrivate::LocalOpen(*this); {
+			HC_Set_Conditions(strConditions);
+		}SegmentKeyPrivate::LocalClose(*this);
+	}
+	return *this;
+}
+
+SegmentKey & H3DF::SegmentKey::SetConditions(size_t nInCount, CStringA const pchInConditions[])
+{
+	CStringA strConditions;
+
+	for (size_t nIndex = 0; nIndex < nInCount; ++nIndex) {
+		if (0 < nIndex) {
+			strConditions += ", ";
+		}
+		strConditions += pchInConditions[nIndex];
+	}
+
+	SegmentKeyPrivate::LocalOpen(*this); {
+		HC_Set_Conditions(strConditions);
+	}SegmentKeyPrivate::LocalClose(*this);
+
+	return *this;
 }
 
 void H3DF::SegmentKey::SetRenderingOptions(CString strList)

@@ -4772,7 +4772,6 @@ bool TdfImport::SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAt
 
 	cStyleSegment.SetMaterialMapping(cMaterialMapping);
 
-	H3DF::StyleControl cStyleControl = cSegment.GetStyleControl();
 	H3DF::StyleKey cStyle = cSegment.GetStyleControl().PushSegment(cStyleSegment);
 
 // 	if(INVALID_KEY == cStyle.KeyValue()) { 

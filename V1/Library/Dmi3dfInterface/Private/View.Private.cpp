@@ -28,6 +28,8 @@
 
 #include "Common_Define.h"
 
+#include "../3DF/Selection.h"
+#include "../3DF/Highlight.h"
 #include "../3DF/SelectionSet.h"
 
 #include "../3DF/NavigationCube.h"
@@ -36,10 +38,8 @@
 
 #include "../3DF/Operator.CameraSelect.h"
 #include "../3DF/Operator.SelectArea.h"
-#include "../3DF/Operator.ObjectSnap.h"
 
 #include "../3DF/Window.h"
-#include "../3DF/Selectability.h"
 #include "../3DF/Visibility.h"
 #include "../3DF/Material.h"
 #include "../3DF/LineAttribute.h"
@@ -79,13 +79,11 @@ H3DF::BaseView::BaseView(HBaseModel * model, const char * alias, const char * dr
 
 void H3DF::BaseView::UpdateInternal(bool antialias, bool force_update)
 {
-/*
 	if (nullptr != m_pcNaviCube) {
 		if (true == m_pcNaviCube->IsInitialized()) {
 			m_pcNaviCube->Transform();
 		}
 	}
-*/
 
 	HBaseView::UpdateInternal(antialias, force_update);
 }
@@ -653,11 +651,11 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 	DEBUG_VALID(pcKeyImpl);
 	pcKeyImpl->SetBaseView(m_pcBaseView);
 
+	m_pcWindow = new WindowKey(m_pcBaseView);
+
 	// Model 설정
 	m_pcModel = pcInModel;
 	m_cModelKey = m_pcModel->GetSegmentKey();
-
-	m_pcWindow = new WindowKey(m_pcBaseView);
 
 	m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
 	m_pcBaseView->SetNavigationCube(&m_cNaviCube);
@@ -682,7 +680,8 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 	// set up some scene defaults
 	HC_Open_Segment_By_Key(m_pcBaseView->GetSceneKey()); {
 		// #Selection: Line이 더 잘보이게 하고 선택이 잘되도록 하기 위해서 Face를 뒤로 보냄
-		HC_Set_Rendering_Options("face displacement = 16"); // 양수값이 Camera에서 멀어지는 방향임.
+		//HC_Set_Rendering_Options("face displacement = 16"); // 양수값이 Camera에서 멀어지는 방향임.
+		HC_Set_Rendering_Options("face displacement = 2"); // 양수값이 Camera에서 멀어지는 방향임.
 		HC_Set_Rendering_Options("no color interpolation, color index interpolation");
 		HC_Set_Visibility("lights = (faces = on, edges = off), markers = off, faces=on, edges=off, lines=on, text = on");
 	} HC_Close_Segment();
@@ -867,20 +866,23 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeColor(cHighlightSelectColor);
 	m_pcBaseView->GetHighlightSelection()->SetSelectionMarkerColor(cHighlightSelectColor);
 
-	m_pcBaseView->GetSelection()->SetSelectionEdgeWeight(5.0);
-	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeWeight(5.0);
-
 	// #Selection: Highlighting Line, Edge 두께 설정
+
+	// 아래 부분을 삭제하면 다음에 설정된 fLineWeight를 적용할 때 Segment 오류가 발생함.
+	m_pcBaseView->GetSelection()->SetSelectionEdgeWeight(1.0);
+	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeWeight(1.0);
+
+	float fLineWeight = 2.0;
 	HC_KEY nHighlightSelectionKey = m_pcBaseView->GetHighlightSelection()->GetSelectionSegment();
 	HC_Open_Segment_By_Key(nHighlightSelectionKey); {
-		HC_Set_Line_Weight(3.0);
-		HC_Set_Edge_Weight(3.0);
+		HC_Set_Line_Weight(fLineWeight);
+		HC_Set_Edge_Weight(fLineWeight);
 	} HC_Close_Segment();
 
 	HC_KEY nSelectionKey = m_pcBaseView->GetSelection()->GetSelectionSegment();
 	HC_Open_Segment_By_Key(nSelectionKey); {
-		HC_Set_Line_Weight(3.0);
-		HC_Set_Edge_Weight(3.0);
+		HC_Set_Line_Weight(fLineWeight);
+		HC_Set_Edge_Weight(fLineWeight);
 	} HC_Close_Segment();
 
 	m_pcBaseView->GetHighlightSelection()->SetGrayScale(false);// ThePreset.GrayScaleSelection);
@@ -905,11 +907,11 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 	// set markup color and weight
 	SetMarkupColor(ThePreset.MarkupColor);
 
-	SetShadowColor(ThePreset.ShadowColor);
+	SetShadowColor(TheKenel.VisualEffects.Shadow.GetColor());
 
 	m_pcBaseView->GetMarkupManager()->SetMarkupWeight(ThePreset.MarkupWeight / 100.0f);
-	m_pcBaseView->SetShadowResolution(ThePreset.ShadowRes);
-	m_pcBaseView->SetShadowBlurring(ThePreset.ShadowBlur);
+	m_pcBaseView->SetShadowResolution(TheKenel.VisualEffects.Shadow.Resolution);
+	m_pcBaseView->SetShadowBlurring(TheKenel.VisualEffects.Shadow.Blurring);
 
 	// set the color index interpolation settings
 	m_pcBaseView->SetColorInterpolation(ThePreset.CiByValue);
@@ -1114,7 +1116,7 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 			HC_Set_Rendering_Options(chRenderingOpts);
 		}
 
-		HCLOCALE(sprintf(chRenderingOpts, "simple shadow = (opacity = %f)", ThePreset.ShadowOpacity));
+		HCLOCALE(sprintf(chRenderingOpts, "simple shadow = (opacity = %f)", TheKenel.VisualEffects.Shadow.Opacity));
 		HC_Set_Rendering_Options(chRenderingOpts);
 
 		char gooch_color_map[4096];
@@ -1147,10 +1149,10 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 
 		HC_Set_Rendering_Options(curve_opt);
 
-		m_pcBaseView->SetReflectionPlane(ThePreset.ReflectionPlane, ThePreset.ReflectionOpacity,
-			ThePreset.ReflectionFading, ThePreset.ReflectionUseAttenuation,
-			ThePreset.ReflectionHither, ThePreset.ReflectionYon,
-			ThePreset.ReflectionUseBlur, ThePreset.ReflectionBlur);
+// 		m_pcBaseView->SetReflectionPlane(ThePreset.ReflectionPlane, ThePreset.ReflectionOpacity,
+// 			ThePreset.ReflectionFading, ThePreset.ReflectionUseAttenuation,
+// 			ThePreset.ReflectionHither, ThePreset.ReflectionYon,
+// 			ThePreset.ReflectionUseBlur, ThePreset.ReflectionBlur);
 
 		char ambient_color[MVO_BUFFER_SIZE];
 		if (ThePreset.HemisphericAmbient)
@@ -1394,8 +1396,8 @@ void H3DF::ViewPrivate::SetSelectOption()
 
 	// #Selection: Selection Option 설정 
 	m_pcWindow->GetSelectionOptionsControl().SetLevel(Selection::Level::Entity);
-	m_pcWindow->GetSelectionOptionsControl().SetRelatedLimit(10);
-	m_pcWindow->GetSelectionOptionsControl().SetProximity(0.2f);
+	//m_pcWindow->GetSelectionOptionsControl().SetRelatedLimit(10);
+	//m_pcWindow->GetSelectionOptionsControl().SetProximity(0.05f);
 	//m_pcWindow->GetSelectionOptionsControl().SetBias(Selection::Bias::Lines);
 	//m_pcWindow->GetSelectionOptionsControl().SetSorting(Selection::Sorting::Proximity); // Sorting 해도 Z방향 Sort가 정확하게 되지는 않됨.
 
@@ -1695,30 +1697,35 @@ void H3DF::ViewPrivate::ViewReady()
 		char opt[MVO_BUFFER_SIZE] = "";
 		char refl_opt[MVO_BUFFER_SIZE];
 
-		HCLOCALE(sprintf(opt, "simple reflection=(%s, opacity=%f, fading= %s, ",
-			ThePreset.ReflectionPlane ? "on" : "off",
-			ThePreset.ReflectionOpacity, ThePreset.ReflectionFading ? "on" : "off"));
+// 		HCLOCALE(sprintf(opt, "simple reflection=(%s, opacity=%f, fading= %s, ",
+// 			ThePreset.ReflectionPlane ? "on" : "off",
+// 			ThePreset.ReflectionOpacity, ThePreset.ReflectionFading ? "on" : "off"));
+// 
+// 		if (ThePreset.ReflectionUseAttenuation) {
+// 			HCLOCALE(sprintf(refl_opt, "attenuation = (hither=%f, yon=%f), ",
+// 				ThePreset.ReflectionHither, ThePreset.ReflectionYon));
+// 		}
+// 		else
+// 			sprintf(refl_opt, "no attenuation, ");
 
-		if (ThePreset.ReflectionUseAttenuation) {
-			HCLOCALE(sprintf(refl_opt, "attenuation = (hither=%f, yon=%f), ",
-				ThePreset.ReflectionHither, ThePreset.ReflectionYon));
-		}
-		else
-			sprintf(refl_opt, "no attenuation, ");
+		sprintf(refl_opt, "no attenuation, ");
 		strcat(opt, refl_opt);
 
-		if (ThePreset.ReflectionUseBlur)
-			sprintf(refl_opt, "blur=%d)", ThePreset.ReflectionBlur);
-		else
-			sprintf(refl_opt, "no blur)");
+// 		if (ThePreset.ReflectionUseBlur)
+// 			sprintf(refl_opt, "blur=%d)", ThePreset.ReflectionBlur);
+// 		else
+// 			sprintf(refl_opt, "no blur)");
+
+		sprintf(refl_opt, "no blur)");
 		strcat(opt, refl_opt);
 
 		HC_Set_Rendering_Options(opt);
 	} HC_Close_Segment();
 
 	GetBaseView()->SetShadowLightDirection(ThePreset.UseLightVector, (HPoint *)&ThePreset.LightVector);
-	GetBaseView()->SetShadowIgnoresTransparency(ThePreset.IgnoreTransparency);
-	GetBaseView()->SetShadowMode((HShadowMode)ThePreset.ShadowMode);
+	GetBaseView()->SetShadowIgnoresTransparency(TheKenel.VisualEffects.Shadow.IgnoreTransparency);
+	GetBaseView()->SetShadowMode((HShadowMode) TheKenel.VisualEffects.Shadow.Mode);
+
 	GetBaseView()->SetOcclusionCullingMode(ThePreset.OcclusionCulling);
 	GetBaseView()->SetLineAntialiasing(TheKenel.Appearance.AntiAliasing.Line);
 	GetBaseView()->SetTextAntialiasing(TheKenel.Appearance.AntiAliasing.Text);

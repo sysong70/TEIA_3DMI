@@ -45,6 +45,10 @@ namespace H3DF
 
 		H3DF::Type ObjectType() const { return H3DF::Type::HighlightControl; };
 
+		//== Mouse Event 처리 =======================================================================
+		int NoButtonDownAndMove(int nFlags, int x, int y, SelectionResults & cOutSelections);
+
+		//== Highlight 관련 함수 =====================================================================
 		HighlightControl & Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting = true);
 		HighlightControl & Highlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting = true);
 

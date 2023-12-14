@@ -17,6 +17,8 @@ void H3DF::SegmentKeyPrivate::Copy(SegmentKeyPrivate * pcInThat)
 }
 
 //== Segment 관련 함수 ===============================================================================
+
+// Local Open/Close Function 함수
 void H3DF::SegmentKeyPrivate::LocalOpen()
 {
 	if (true == m_bForcedOpen) {
@@ -103,6 +105,101 @@ void H3DF::SegmentKeyPrivate::LocalClose(SegmentKey const & cSegmentKey)
 	pcImpl->LocalClose();
 }
 
+// Forced Open/Close Function 함수
+void H3DF::SegmentKeyPrivate::ForcedOpen()
+{
+	if (true == m_bForcedOpen) {
+		return;
+	}
+
+	if (true == m_bOpen) {
+		return;
+	}
+
+	m_bOpen = true;
+	m_bForcedOpen = true;
+
+	assert(INVALID_KEY != m_nKey);
+	HC_Open_Segment_By_Key(m_nKey);
+}
+
+void H3DF::SegmentKeyPrivate::ForcedOpen() const
+{
+	if (true == m_bForcedOpen) {
+		return;
+	}
+
+	if (true == m_bOpen) {
+		return;
+	}
+
+	m_bOpen = true;
+	m_bForcedOpen = true;
+
+	assert(INVALID_KEY != m_nKey);
+	HC_Open_Segment_By_Key(m_nKey);
+}
+
+void H3DF::SegmentKeyPrivate::ForcedOpen(SegmentKey & cSegmentKey)
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *) cSegmentKey.GetImpl();
+	pcImpl->ForcedOpen();
+
+}
+
+void H3DF::SegmentKeyPrivate::ForcedOpen(SegmentKey const & cSegmentKey)
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *) cSegmentKey.GetImpl();
+	pcImpl->ForcedOpen();
+}
+
+void H3DF::SegmentKeyPrivate::ForcedClose()
+{
+	if (false == m_bForcedOpen) {
+		return;
+	}
+
+	if (false == m_bOpen) {
+		return;
+	}
+
+	m_bForcedOpen = false;
+	m_bOpen = false;
+
+	assert(INVALID_KEY != m_nKey);
+	HC_Close_Segment();
+}
+
+void H3DF::SegmentKeyPrivate::ForcedClose() const
+{
+	if (false == m_bForcedOpen) {
+		return;
+	}
+
+	if (false == m_bOpen) {
+		return;
+	}
+
+	m_bForcedOpen = false;
+	m_bOpen = false;
+
+	assert(INVALID_KEY != m_nKey);
+	HC_Close_Segment();
+}
+
+void H3DF::SegmentKeyPrivate::ForcedClose(SegmentKey & cSegmentKey)
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *) cSegmentKey.GetImpl();
+	pcImpl->ForcedClose();
+}
+
+void H3DF::SegmentKeyPrivate::ForcedClose(SegmentKey const & cSegmentKey)
+{
+	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *) cSegmentKey.GetImpl();
+	pcImpl->ForcedClose();
+}
+
+// Open/Close Function 함수
 void H3DF::SegmentKeyPrivate::Open()
 {
 	m_bForcedOpen = true;
@@ -126,6 +223,7 @@ void H3DF::SegmentKeyPrivate::Close()
 	HC_Close_Segment();
 }
 
+// 관련 함수
 bool H3DF::SegmentKeyPrivate::IsLocalOpen() const
 {
 	return m_bOpen;

@@ -27,33 +27,36 @@
 #define		SUBENTITY_TYPE		3
 #define		REGION_TYPE			4
 
-USING_3DF_NAMESPACE
+#define SELECTION_PRIVATE_TRACE
 
+using namespace H3DF;
 
 //== SelectionResultsPrivate class =================================================================
+
 bool H3DF::SelectionResultsPrivate::Sort()
 {
-	if (2 > deItems.size()) {
+	if (2 > m_deItems.size()) {
 		return false;
 	}
 
 	// 선택된 요소를 정렬하기 위해서 STL의 sort 함수를 사용
-	std::sort(deItems.begin(), deItems.end(), [] (SelectionItem * pcItem1, SelectionItem * pcItem2) {
+	std::sort(m_deItems.begin(), m_deItems.end(), [] (SelectionItem * pcItem1, SelectionItem * pcItem2) {
 		WindowPoint cP1, cP2;
 		pcItem1->ShowSelectionPosition(cP1);
 		pcItem2->ShowSelectionPosition(cP2);
 
-		if (cP1.z < cP2.z) return true;
+		if (cP1.z < cP2.z) {
+			return true;
+		}
+
 		return false;
 	});
-/*
+
+#ifdef SELECTION_PRIVATE_TRACE
 	TRACE(L"\n");
 
-	SelectionResultsIterator cIter = cOutResults.GetIterator();
 	int nIndex = 0;
-	while (true == cIter.IsValid()) {
-		SelectionItem * pcItem = cIter.GetItem();
-
+	for (SelectionItem * pcItem : m_deItems) {
 		Key cItemKey;
 
 		if (true == pcItem->ShowSelectedItem(cItemKey)) {
@@ -69,16 +72,15 @@ bool H3DF::SelectionResultsPrivate::Sort()
 
 			TRACE(L"%02d.%s[%d]\t\t%f\t%f\n", nIndex++, strTypeString, cItemKey.KeyValue(), cWindowPoint.z, cWorldPoint.z);
 		}
-
-		cIter.Next();
-	}*/
+	}
+#endif // SELECTION_PRIVATE_TRACE
 
 	return true;
 }
 
 //== SelectionControlPrivate class =================================================================
 
-// 주어진 Point와 Selection Option을 이용해서 선택 작업을 수행하고, 선택된 요소를 SelectionResults에 저장한다.
+// 1. 주어진 Point와 Selection Option을 이용해서 선택 작업을 수행하고, 선택된 요소를 SelectionResults에 저장한다.
 size_t H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
 {
 	int	 nResult = 0;
@@ -90,8 +92,6 @@ size_t H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, S
 
 	char chScope[MVO_BUFFER_SIZE] = "";
 	GetScope(cInOptions, chScope);
-
-	HSelectionSet * pcSelection = GetBaseView()->GetSelection();
 
 	// 선택 옵션에 따라 선택 작업 실시
 /*
@@ -111,7 +111,13 @@ size_t H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, S
 		} HC_Close_Segment();
 	}
 	else {
+		float fProximity = 0.0;
+		if (true == cInOptions.ShowProximity(fProximity)) {
+			GetBaseView()->SetDefaultSelectionProximity(fProximity);
+		}
+
 		HC_Open_Segment_By_Key(GetBaseView()->GetViewKey()); {
+			//nResult = HC_Compute_Selection(".", "./scene/overwrite", "v, selection level = entity", cInLocation.x, cInLocation.y);
 			nResult = HC_Compute_Selection(".", "./scene/overwrite", chAction, cInLocation.x, cInLocation.y);
 			//(pcSelection->GetSubwindowPenetration() ? "" : "./scene/overwrite"), chAction, cInLocation.x, cInLocation.y);
 			//"v, selection level = entity, related selection limit = 0, selection sorting, internal selection limit = 0", cInLocation.x, cInLocation.y);
@@ -137,6 +143,7 @@ size_t H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, S
 		// 선택된 요소를 저장하기 위해서 Item 생성
 		SelectionItem * pcItem = new SelectionItem();
 		SelectionItemPrivate * pcItemPrivate = (SelectionItemPrivate *)pcItem->GetImpl();
+		pcItemPrivate->m_pcWindow = m_pcWindow;
 
 		HC_Show_Selection_Element(&nKey, &nOffset1, &nOffset2, &nOffset3);
 		HC_Show_Selection_Original_Key(&nKey);
@@ -205,7 +212,11 @@ size_t H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, S
 
 			// But if it really is a shell, check for regions.
 			if (streq(chKeyType, "shell") && nOffset3 != -1) {
-				if (true == pcSelection->GetAllowRegionSelection()) {
+				Selection::Level cLevel;
+/*
+			if(true == cInOptions.ShowLevel(cLevel)) {
+				if (Selection::Level::Subentity == cLevel) {
+					//if (true ==  pcSelection->GetAllowRegionSelection()) {
 					int nRegion = 0;
 					int nLowest = 0;
 					int nHighest = 0;
@@ -226,6 +237,8 @@ size_t H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, S
 					}
 				}
 			}
+*/
+			}
 		}
 
 		pcResultsPrivate->PushBack(pcItem);
@@ -234,20 +247,6 @@ size_t H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, S
 
 	return pcResultsPrivate->Size();
 }
-
-bool H3DF::SelectionControlPrivate::SorterFunction(const void * pcArg1, const void * pcArg2)
-{
-	SelectionItem * pcItem1 = (SelectionItem *)pcArg1;
-	SelectionItem * pcItem2 = (SelectionItem *)pcArg2;
-
-	WindowPoint cP1, cP2;
-	pcItem1->ShowSelectionPosition(cP1);
-	pcItem2->ShowSelectionPosition(cP2);
-
-	if (cP1.z < cP2.z) return true;
-	return false;
-}
-
 
 int H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
 {
@@ -604,15 +603,14 @@ void H3DF::SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & 
 		Utility::Set3DfOptionString(pchOutOption, chOption);
 	}
 
-/*
 	// Proximity 관련 설정은 View의 Driver 옵션이기 때문에 별도 처리해야 함.
+
 	float fProximity = 0.0;
 	if (true == cInOptions.ShowProximity(fProximity)) {
 		sprintf(chOption, "selection proximity = %f", fProximity);
 
 		Utility::Set3DfOptionString(pchOutOption, chOption);
 	}
-*/
 
 	Selection::Bias eBias;
 	if (true == cInOptions.ShowBias(eBias)) {

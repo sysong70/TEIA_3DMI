@@ -4,8 +4,8 @@
 
 #include "Math.h"
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
-Kit::Kit()
+H3DF::Kit::Kit()
 {
 }

@@ -10,7 +10,7 @@ namespace H3DF
 {
 	class BaseView;
 
-	class SegmentKeyPrivate : public KeyPrivate
+	class API_3DF SegmentKeyPrivate : public KeyPrivate
 	{
 	public:
 		SegmentKeyPrivate() { m_eType = Type::SegmentKey; }
@@ -19,6 +19,8 @@ namespace H3DF
 		void Copy(SegmentKeyPrivate * pcInThat);
 
 		//== Segment 관련 함수 ===========================================================================
+		
+		// 부분 함수(Local Function)에서 사용하는 함수
 		void LocalOpen();
 		void LocalOpen() const;
 		static void LocalOpen(SegmentKey & cSegmentKey);
@@ -28,6 +30,16 @@ namespace H3DF
 		void LocalClose() const;
 		static void LocalClose(SegmentKey & cSegmentKey);
 		static void LocalClose(SegmentKey const & cSegmentKey);
+
+		void ForcedOpen();
+		void ForcedOpen() const;
+		static void ForcedOpen(SegmentKey & cSegmentKey);
+		static void ForcedOpen(SegmentKey const & cSegmentKey);
+
+		void ForcedClose();
+		void ForcedClose() const;
+		static void ForcedClose(SegmentKey & cSegmentKey);
+		static void ForcedClose(SegmentKey const & cSegmentKey);
 
 		void Open();
 		void Close();

@@ -5,8 +5,6 @@
 
 #include "Selection.h"
 
-#include "Operator.ObjectSnap.h"
-
 #include "NavigationCube.h"
 
 #include <HOpCameraOrbit.h>
@@ -44,7 +42,6 @@ namespace H3DF
 		{
 		public:
 			CameraSelect(WindowKey * pcWindow, NavigationCube & cNaviCube, int DoRepeat = 0, int DoCapture = 1);
-			//CameraSelect(HBaseView * view, int DoRepeat = 0, int DoCapture = 1);
 			~CameraSelect();
 
 			const char * GetName() override;
@@ -74,8 +71,6 @@ namespace H3DF
 			SelectionResults m_cNewHighlightSelection;
 			SelectionResults m_cOldHighlightSelection;
 			SelectionResults m_cHighlightSelection;
-
-			Operator::ObjectSnap m_cObjectSnapOperator;
 
 			NavigationCube * m_pcNaviCube = nullptr;
 

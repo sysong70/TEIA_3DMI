@@ -23,7 +23,6 @@
 #include <HEventManager.h>
 #include <HConstantFrameRate.h>
 
-
 #define		SEGMENT_TYPE		1
 #define		ENTITY_TYPE			2
 #define		SUBENTITY_TYPE		3
@@ -265,8 +264,6 @@ SelectionOptionsControl::SelectionOptionsControl(SelectionOptionsControl const &
 	m_pcImpl = new SelectionOptionsControlPrivate();
 	Set(cInThat);
 }
-
-SelectionOptionsControl::SelectionOptionsControl() {}
 
 SelectionOptionsControl::~SelectionOptionsControl()
 {
@@ -543,6 +540,12 @@ H3DF::SelectionItem::SelectionItem(SelectionItem const & cInThat)
 	Set(cInThat);
 }
 
+H3DF::Type H3DF::SelectionItem::Type() const
+{
+	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)m_pcImpl;
+	return pcImpl->cKey.Type();
+}
+
 void H3DF::SelectionItem::Set(SelectionItem const & cInThat)
 {
 	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)m_pcImpl;
@@ -642,13 +645,32 @@ const bool H3DF::SelectionItem::ShowSelectedItem(Key & cOutSelection) const
 
 bool H3DF::SelectionItem::ShowPath(KeyPath & cOutPath) const
 {
-	if (nullptr == m_pcImpl) {
-		return false;
+	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	int nIncludeCount = pcImpl->nIncludeCount;
+	size_t nPathCount = nIncludeCount + 2;
+	HC_KEY * pnPath = new HC_KEY[nPathCount];
+
+	HC_KEY nSegmentKey = pcImpl->cKey.KeyValue();
+
+	char chType[MVO_BUFFER_SIZE];
+	HC_Show_Key_Type(nSegmentKey, chType);
+
+	if (!streq(chType, "segment")) {
+		nSegmentKey = HC_KShow_Owner_Original_Key(nSegmentKey);
 	}
 
-	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)m_pcImpl;
+	pnPath[0] = nSegmentKey;
 
-	cOutPath = KeyPath(pcImpl->nIncludeCount, pcImpl->pnIncludeKeys);
+	for (int nIndex = 1; nIndex < nIncludeCount; ++nIndex) {
+		pnPath[nIndex] = pcImpl->pnIncludeKeys[nIncludeCount - nIndex];
+	}
+
+	pnPath[nPathCount - 2] = HC_KShow_Owner_Original_Key(pnPath[nPathCount - 3]);
+	pnPath[nPathCount - 1] = INVALID_KEY;
+
+	cOutPath = KeyPath(nPathCount, pnPath);
 
 	return true;
 }
@@ -844,6 +866,21 @@ void SelectionResults::Reset()
 	}
 
 	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *)m_pcImpl;
+
+	for (auto pcItem : pcImpl->GetItems()) {
+		delete pcItem;
+	}
+
+	pcImpl->Clear();
+}
+
+void SelectionResults::Reset() const
+{
+	if (nullptr == m_pcImpl) {
+		return;
+	}
+
+	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *) m_pcImpl;
 
 	for (auto pcItem : pcImpl->GetItems()) {
 		delete pcItem;
@@ -1108,6 +1145,18 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 {
 	SelectionControlPrivate * pcImpl = (SelectionControlPrivate *)m_pcImpl;
 	return pcImpl->SelectByPoint(cInLocation, cInOptions, cOutResults);
+}
+
+size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, SelectionResults & cOutResults) const
+{
+	SelectionControlPrivate * pcImpl = (SelectionControlPrivate *) m_pcImpl;
+
+	SelectionOptionsKit cOptions;
+	if(false == pcImpl->GetWindow()->ShowSelectionOptions(cOptions)) {
+		return 0;
+	}
+
+	return pcImpl->SelectByPoint(cInLocation, cOptions, cOutResults);
 }
 
 size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const

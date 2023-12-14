@@ -31,9 +31,6 @@ public:
 	bool ConvertCoordinate(Coordinate::Space eInSpace, Point const & cInpoint, Coordinate::Space eInOutputSpace, Point & cOutPoint) const;
 	bool ConvertCoordinate(Coordinate::Space eInSpace, PointArray const & aInPoints, Coordinate::Space eInOutputSpace, PointArray & aOutPoints) const;
 
-	// Shows the net selectability attribute settings along this key path.
-	bool ShowNetSelectability(SelectabilityKit & cOutKit) const;
-
 	// Shows the net modelling matrix attribute settings along this key path.
 	bool ShowNetModellingMatrix(MatrixKit & cOutKit) const;
 

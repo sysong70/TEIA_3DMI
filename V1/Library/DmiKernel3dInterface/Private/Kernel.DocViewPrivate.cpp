@@ -8,10 +8,13 @@
 
 #include "../../../UiMain/Command.Resource.h"
 
-#include "../../Dmi3dfInterface/3DF/Segment.h"
-#include "../../Dmi3dfInterface/3DF/VisualEffects.h"
+#include <3DF/Segment.h>
+#include <3DF/VisualEffects.h>
 
 using namespace KERNEL;
+using namespace H3DF;
+
+#define TheKenel TheAppOptions.Kernel
 
 //== Visual Effects 관련 함수 ========================================================================
 
@@ -25,6 +28,8 @@ KERNEL::DocViewPrivate::DocViewPrivate()
 	m_nOSnapMode += (DWORD) OSnap::Type::Quadrant;
 	m_nOSnapMode += (DWORD) OSnap::Type::OnSurface;
 	m_nOSnapMode += (DWORD) OSnap::Type::Axis;
+
+	m_pcVisualEffectsSetting = TheKenel.VisualEffects.Get();
 }
 
 //== Visual Effects 관련 함수 ========================================================================
@@ -103,3 +108,64 @@ void KERNEL::DocViewPrivate::SetObjectSnap(OSnap::Type eInType)
 
 	m_pcObjectSnapOperator->SetObjectSnapMode(m_nOSnapMode);
 }
+
+
+//== Selection Filter 관련 함수 ======================================================================
+void KERNEL::DocViewPrivate::SetSelectionFilter(SelectionFilter::Type eInType)
+{
+	// Selection filter type이 없는 경우 추가
+	if (0 == (m_nSelectionFilter & (DWORD) eInType)) {
+		m_nSelectionFilter += (DWORD) eInType;
+	}
+	else { // Selection filter type이 없는 경우 제거
+		m_nSelectionFilter -= (DWORD) eInType;
+	}
+
+/*
+	// Selectability는 Selection option에서 attribute lock을 설정해야 해서 속도가 많이 느림.
+	// 삭제해버림.
+	SelectabilityKit cSelectability;
+	cSelectability.SetLines(false);
+
+	SelectionOptionsKit cSelectionOptionsKit;
+	cSelectionOptionsKit.SetSelectability(cSelectability);
+
+	m_cCanvas.GetFrontView().GetWindowKey().SetSelectionOptions(cSelectionOptionsKit);
+*/
+}
+
+//== Command 관련 함수 ===============================================================================
+
+// 1. Visual Effects setting 요청 함수 처리
+void KERNEL::DocViewPrivate::RequestVisualEffectsSetting(Json::Object & cInObject)
+{
+	Json::Object cData;
+	
+	cData.SetInteger(SKW_TARGET, (int) Signal::Target::Command);
+	cData.SetInteger(SKW_ACTION, (int) Signal::InteractiveCommand::Action::ResponseValue);
+	cData.SetInteger(SKW_ID, HOME_3D_LST_VisualEffects);
+
+	// cInObject에 Value값이 있는 경우 처리 (UI에서 변경된 값을 전달한 경우 처리)
+	Json::Object & cInValue = cInObject.GetObject(SKW_VALUE);
+	if (false == cInValue.IsEmpty()) {
+		CString strText1;
+		cInValue.Stringify(strText1);
+	}
+
+	Json::Object * pcSetting = new Json::Object(*m_pcVisualEffectsSetting);
+	Json::Object * pcDefault = TheKenel.VisualEffects.Get();
+
+	cData.SetObject(SKW_VALUE, pcSetting);
+	cData.SetObject(SKW_DEFAULTDATA, pcDefault);
+
+	CString strText;
+	cInObject.Stringify(strText);
+
+	if(nullptr != m_pcDelivery) { 
+		m_pcDelivery->SendData(cData);
+	}
+	else {
+		DEBUG_RETURN;
+	}
+}
+

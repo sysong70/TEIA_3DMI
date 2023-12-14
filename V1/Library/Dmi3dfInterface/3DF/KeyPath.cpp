@@ -3,7 +3,6 @@
 #include "KeyPath.h"
 
 #include "Segment.h"
-#include "Selectability.h"
 
 #include "Line.h"
 
@@ -267,23 +266,6 @@ bool H3DF::KeyPath::ConvertCoordinate(Coordinate::Space eInSpace, PointArray con
 	return true;
 }
 
-bool H3DF::KeyPath::ShowNetSelectability(SelectabilityKit & cOutKit) const
-{
-	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
-	if (true == pcImpl->m_vKeys.empty()) {
-		return false;
-	}
-
-	char pchSelectability[MVO_BUFFER_SIZE];
-	if (0 == HC_PShow_Net_Selectability((int)pcImpl->m_aPaths.size(), pcImpl->m_vKeys.data(), pchSelectability)) {
-		return false;
-	}
-
-	cOutKit.Set(pchSelectability);
-
-	return true;
-}
-
 bool H3DF::KeyPath::ShowNetModellingMatrix(MatrixKit & cOutKit) const
 {
 	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
@@ -292,9 +274,9 @@ bool H3DF::KeyPath::ShowNetModellingMatrix(MatrixKit & cOutKit) const
 	}
 
 	float pfMatrix[16];
-	if (0 == HC_PShow_Net_Modelling_Matrix((int)pcImpl->m_aPaths.size(), pcImpl->m_vKeys.data(), pfMatrix)) {
-		return false;
-	}
+ 	if (0 == HC_PShow_Net_Modelling_Matrix((int) pcImpl->m_vKeys.size(), pcImpl->m_vKeys.data(), pfMatrix)) {
+ 		return false;
+ 	}
 
 	cOutKit = MatrixKit(pfMatrix);
 

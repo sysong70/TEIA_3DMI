@@ -9,11 +9,14 @@ namespace KERNEL
 {
 	namespace Operator
 	{
-		class ObjectSnap : public Object
+		class HighlightObjectSnap : public Object
 		{
 		public:
-			ObjectSnap(H3DF::WindowKey * pcWindow);
+			HighlightObjectSnap();
+			HighlightObjectSnap(H3DF::WindowKey * pcWindow);
 
+			int LButtonDownAndMove(int nFlags, int x, int y);
+			
 			int NoButtonDownAndMove(int nFlags, int x, int y);
 
 			void DrawSnapItems();

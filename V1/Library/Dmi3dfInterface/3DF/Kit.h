@@ -3,14 +3,13 @@
 #include "3DF.h"
 #include "Key.h"
 
-OPEN_3DF_NAMESPACE
-
-class API_3DF Kit : public Object
+namespace H3DF
 {
-public:
-	Kit();
+	class API_3DF Kit : public Object
+	{
+	public:
+		Kit();
 
-	H3DF::Type ObjectType() const { return H3DF::Type::Kit; };
-};
-
-CLOSE_3DF_NAMESPACE
+		H3DF::Type ObjectType() const { return H3DF::Type::Kit; };
+	};
+}

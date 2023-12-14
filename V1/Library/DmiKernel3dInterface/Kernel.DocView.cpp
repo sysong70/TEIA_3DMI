@@ -23,12 +23,11 @@ KERNEL::DocView::DocView()
 //== View 관련 함수 ==================================================================================
 
 // 1. H3DF View Initialize 함수
-void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cInstance)
+void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cDelivery)
 {
 	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
-	if (nullptr == pcImpl) {
-		DEBUG_RETURN;
-	}
+	if (nullptr == pcImpl) { DEBUG_RETURN; }
+	pcImpl->m_pcDelivery = &cDelivery;
 
 	H3DF::WindowHandle nWindowHandle = (H3DF::WindowHandle)cInObject.GetDwordPtr(SKW_HWND);
 	
@@ -42,11 +41,11 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cI
 
 	pcImpl->m_cCanvas.AttachViewAsLayout(cView);
 
-	pcImpl->m_pcObjectSnapOperator = new KERNEL::Operator::ObjectSnap(&pcImpl->m_cCanvas.GetFrontView().GetWindowKey());
+	pcImpl->m_pcObjectSnapOperator = new KERNEL::Operator::HighlightObjectSnap(&pcImpl->m_cCanvas.GetFrontView().GetWindowKey());
 
-	pcImpl->m_cCanvas.FileOpen(cInObject, cInstance);
+	pcImpl->m_cCanvas.FileOpen(cInObject, cDelivery);
 	
-	cInstance.view.SetValidation();
+	cDelivery.view.SetValidation();
 }
 
 // 2. H3DF View Destruct 함수
@@ -101,12 +100,16 @@ void KERNEL::DocView::CancelCommands()
 
 void KERNEL::DocView::ViewId(int nViewId)
 {
-	m_nViewId = nViewId;
+	DocViewPrivate * pcImpl = (DocViewPrivate *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	pcImpl->m_nViewId = nViewId;
 }
 
 int KERNEL::DocView::ViewId()
 {
-	return m_nViewId;
+	DocViewPrivate * pcImpl = (DocViewPrivate *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	return pcImpl->m_nViewId;
 }
 
 //== Mouse 관련 함수 =================================================================================
@@ -169,6 +172,10 @@ void KERNEL::DocView::MouseMove(int nFlag, int x, int y)
 	if (!(MK_LBUTTON & nFlag) && !(MK_RBUTTON & nFlag)) {
 		pcImpl->m_pcObjectSnapOperator->NoButtonDownAndMove(nFlag, x, y);
 	}
+	else if(MK_LBUTTON & nFlag) {
+		pcImpl->m_pcObjectSnapOperator->LButtonDownAndMove(nFlag, x, y);
+	}
+
 /*
 	else if (!(MK_LBUTTON & nFlag)) {
 		//OnLButtonDownAndMove(HEventInfo & cInEvent)
@@ -347,6 +354,46 @@ void KERNEL::DocView::SetObjectSnap(int nId)
 	}
 }
 
+//== Selection Fiter 관련 함수 ===============================================================
+void KERNEL::DocView::SetSelectionFilter(int nId)
+{
+	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
+	if (nullptr == pcImpl) { DEBUG_RETURN; }
+
+	switch (nId)
+	{
+		case HOME_3D_CMD_SelectionFiter_Point:
+			pcImpl->SetSelectionFilter(SelectionFilter::Type::Point);
+			break;
+
+		case HOME_3D_CMD_SelectionFiter_Curve:
+			pcImpl->SetSelectionFilter(SelectionFilter::Type::Curve);
+			break;
+
+		case HOME_3D_CMD_SelectionFiter_Edge:
+			pcImpl->SetSelectionFilter(SelectionFilter::Type::Edge);
+			break;
+
+		case HOME_3D_CMD_SelectionFiter_Face:
+			pcImpl->SetSelectionFilter(SelectionFilter::Type::Face);
+			break;
+
+		case HOME_3D_CMD_SelectionFiter_Solid:
+			pcImpl->SetSelectionFilter(SelectionFilter::Type::Solid);
+			break;
+
+		case HOME_3D_CMD_SelectionFiter_Axis:
+			pcImpl->SetSelectionFilter(SelectionFilter::Type::Axis);
+			break;
+
+		case HOME_3D_CMD_SelectionFiter_PMI:
+			pcImpl->SetSelectionFilter(SelectionFilter::Type::PMI);
+			break;
+	}
+
+}
+
+
 //== Style 관련 함수 =========================================================================
 void KERNEL::DocView::SetViewStyle(int nStyleId)
 {
@@ -455,6 +502,28 @@ void KERNEL::DocView::SetVisualEffects(int nEffectId)
 
 		case HOME_3D_CMD_VisualEffects_Bloom:
 			pcImpl->SetVisualEffectsBloom();
+			break;
+	}
+}
+
+//== Command 관련 함수 ===============================================================================
+
+// 1. Request Value 처리
+void KERNEL::DocView::CommandRequestValue(Json::Object & cInObject)
+{
+	DocViewPrivate * pcImpl = (DocViewPrivate *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	int nId = cInObject.GetInteger(SKW_ID);
+
+	switch (nId)
+	{
+		case HOME_3D_LST_VisualEffects:
+			pcImpl->RequestVisualEffectsSetting(cInObject);
+			break;
+
+		default:
+			assert(false);
 			break;
 	}
 }
