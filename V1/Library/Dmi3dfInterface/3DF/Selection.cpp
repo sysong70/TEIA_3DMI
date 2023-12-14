@@ -645,13 +645,32 @@ const bool H3DF::SelectionItem::ShowSelectedItem(Key & cOutSelection) const
 
 bool H3DF::SelectionItem::ShowPath(KeyPath & cOutPath) const
 {
-	if (nullptr == m_pcImpl) {
-		return false;
+	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	int nIncludeCount = pcImpl->nIncludeCount;
+	size_t nPathCount = nIncludeCount + 2;
+	HC_KEY * pnPath = new HC_KEY[nPathCount];
+
+	HC_KEY nSegmentKey = pcImpl->cKey.KeyValue();
+
+	char chType[MVO_BUFFER_SIZE];
+	HC_Show_Key_Type(nSegmentKey, chType);
+
+	if (!streq(chType, "segment")) {
+		nSegmentKey = HC_KShow_Owner_Original_Key(nSegmentKey);
 	}
 
-	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)m_pcImpl;
+	pnPath[0] = nSegmentKey;
 
-	cOutPath = KeyPath(pcImpl->nIncludeCount, pcImpl->pnIncludeKeys);
+	for (int nIndex = 1; nIndex < nIncludeCount; ++nIndex) {
+		pnPath[nIndex] = pcImpl->pnIncludeKeys[nIncludeCount - nIndex];
+	}
+
+	pnPath[nPathCount - 2] = HC_KShow_Owner_Original_Key(pnPath[nPathCount - 3]);
+	pnPath[nPathCount - 1] = INVALID_KEY;
+
+	cOutPath = KeyPath(nPathCount, pnPath);
 
 	return true;
 }

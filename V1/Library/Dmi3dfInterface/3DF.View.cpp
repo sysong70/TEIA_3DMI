@@ -614,11 +614,11 @@ void H3DF::View::SetSimpleReflection(bool bInState, float fInPercentOffset)
 
 	SegmentKey cViewSegment = pcViewImpl->GetSegmentKey();
 
-	cViewSegment.GetVisualEffectsControl().SetSimpleReflection(bInState,
-		0.5,		// fInOpacity
-		1,			// nInBlurring
-		true		// bInFading
-	);
+	float fOpacity = TheKenel.VisualEffects.PlaneReflection.GetOpacity();
+	int nBlurring = TheKenel.VisualEffects.PlaneReflection.GetBlurring();
+	bool bFading = TheKenel.VisualEffects.PlaneReflection.Fading;
+
+	cViewSegment.GetVisualEffectsControl().SetSimpleReflection(bInState, fOpacity, nBlurring, bFading);
 }
 
 /*! Returns the status of the simple reflection */

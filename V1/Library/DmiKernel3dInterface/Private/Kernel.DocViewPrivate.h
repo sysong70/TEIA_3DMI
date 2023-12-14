@@ -23,15 +23,14 @@ namespace KERNEL
 		{
 			m_cCanvas = pcInThat->m_cCanvas;
 			m_nViewId = pcInThat->m_nViewId;
+			m_pcDelivery = pcInThat->m_pcDelivery;
 		}
 
 		H3DF::Canvas & GetCanvas() { return m_cCanvas; }
-
 		H3DF::Canvas m_cCanvas;
-
 		H3DF::Model m_cModel;
-
 		int m_nViewId = -1;
+		Signal::Delivery * m_pcDelivery = nullptr;
 
 		//== Visual Effects 관련 함수 ================================================================
 		void SetVisualEffectsShadow();
@@ -49,5 +48,13 @@ namespace KERNEL
 		//== Selection Filter 관련 함수 ==============================================================
 		DWORD m_nSelectionFilter = 0;
 		void SetSelectionFilter(SelectionFilter::Type eInType);
+
+		//== Command 관련 함수 =======================================================================
+		void RequestVisualEffectsSetting(Json::Object & cInObject);
+	private:
+		Json::Object * m_pcVisualEffectsSetting = nullptr;
+
+
+
 	};
 }

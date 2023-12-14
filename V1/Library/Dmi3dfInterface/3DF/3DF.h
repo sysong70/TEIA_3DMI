@@ -413,6 +413,146 @@ namespace H3DF
 		SelectionHighlightMode() = default;
 	};
 
+	class AttributeLock
+	{
+	public:
+		enum class Type : uint32_t
+		{
+			Everything = 0x01000000,
+
+			Visibility = 0x02000000,
+
+			VisibilityCuttingSections,
+			VisibilityCutEdges,
+			VisibilityCutFaces,
+			VisibilityWindows,
+			VisibilityText,
+			VisibilityLines,
+			VisibilityEdgeLights,
+			VisibilityMarkerLights,
+			VisibilityFaceLights,
+			VisibilityGenericEdges,
+			VisibilityHardEdges,
+			VisibilityAdjacentEdges,
+			VisibilityInteriorSilhouetteEdges,
+			VisibilityShadowEmitting,
+			VisibilityShadowReceiving,
+			VisibilityShadowCasting,
+			VisibilityMarkers,
+			VisibilityVertices,
+			VisibilityFaces,
+			VisibilityPerimeterEdges,
+			VisibilityNonCulledEdges,
+			VisibilityMeshQuadEdges,
+			VisibilityCutGeometry,
+			VisibilityEdges,
+			VisibilityGeometry,
+			VisibilityLights,
+			VisibilityShadows,
+
+			Material = 0x03000000,
+
+			MaterialGeometry,
+			MaterialCutGeometry,
+
+			MaterialAmbientLightUpColor,
+			MaterialAmbientLightDownColor,
+			MaterialAmbientLightColor,
+
+			MaterialWindowColor,
+			MaterialWindowContrastColor,
+
+			MaterialLightColor,
+			MaterialLineColor,
+			MaterialMarkerColor,
+			MaterialTextColor,
+			MaterialCutEdgeColor,
+
+			MaterialVertex,
+			MaterialVertexDiffuse,
+			MaterialVertexDiffuseColor,
+			MaterialVertexDiffuseAlpha,
+			MaterialVertexDiffuseTexture,
+			MaterialVertexSpecular,
+			MaterialVertexMirror,
+			MaterialVertexTransmission,
+			MaterialVertexEmission,
+			MaterialVertexEnvironment,
+			MaterialVertexBump,
+			MaterialVertexGloss,
+
+			MaterialEdge,
+			MaterialEdgeDiffuse,
+			MaterialEdgeDiffuseColor,
+			MaterialEdgeDiffuseAlpha,
+			MaterialEdgeDiffuseTexture,
+			MaterialEdgeSpecular,
+			MaterialEdgeMirror,
+			MaterialEdgeTransmission,
+			MaterialEdgeEmission,
+			MaterialEdgeEnvironment,
+			MaterialEdgeBump,
+			MaterialEdgeGloss,
+
+			MaterialFace,
+			MaterialFaceDiffuse,
+			MaterialFaceDiffuseColor,
+			MaterialFaceDiffuseAlpha,
+			MaterialFaceDiffuseTexture,
+			MaterialFaceSpecular,
+			MaterialFaceMirror,
+			MaterialFaceTransmission,
+			MaterialFaceEmission,
+			MaterialFaceEnvironment,
+			MaterialFaceBump,
+			MaterialFaceGloss,
+
+			MaterialBackFace,
+			MaterialBackFaceDiffuse,
+			MaterialBackFaceDiffuseColor,
+			MaterialBackFaceDiffuseAlpha,
+			MaterialBackFaceDiffuseTexture,
+			MaterialBackFaceSpecular,
+			MaterialBackFaceMirror,
+			MaterialBackFaceTransmission,
+			MaterialBackFaceEmission,
+			MaterialBackFaceEnvironment,
+			MaterialBackFaceBump,
+			MaterialBackFaceGloss,
+
+			MaterialFrontFace,
+			MaterialFrontFaceDiffuse,
+			MaterialFrontFaceDiffuseColor,
+			MaterialFrontFaceDiffuseAlpha,
+			MaterialFrontFaceDiffuseTexture,
+			MaterialFrontFaceSpecular,
+			MaterialFrontFaceMirror,
+			MaterialFrontFaceTransmission,
+			MaterialFrontFaceEmission,
+			MaterialFrontFaceEnvironment,
+			MaterialFrontFaceBump,
+			MaterialFrontFaceGloss,
+
+			MaterialCutFace,
+			MaterialCutFaceDiffuse,
+			MaterialCutFaceDiffuseColor,
+			MaterialCutFaceDiffuseAlpha,
+			MaterialCutFaceDiffuseTexture,
+			MaterialCutFaceSpecular,
+			MaterialCutFaceMirror,
+			MaterialCutFaceTransmission,
+			MaterialCutFaceEmission,
+			MaterialCutFaceEnvironment,
+			MaterialCutFaceBump,
+			MaterialCutFaceGloss,
+
+			Camera = 0x04000000,
+		};
+
+	private:
+		AttributeLock() {}
+	};
+
 	using WindowHandle = DWORD_PTR;
 	using Time = double;
 
@@ -498,6 +638,7 @@ namespace H3DF
 	using PolygonArray = std::vector<PolygonKit, Allocator<PolygonKit>>;
 
 	using StringArray = std::vector<CString, Allocator<CString>>;
+	using AStringArray = std::vector<CStringA, Allocator<CStringA>>;
 
 	using IntPtrTArray = std::vector<intptr_t, Allocator<intptr_t>>;
 	using ByteArray = std::vector<BYTE, Allocator<BYTE>>;

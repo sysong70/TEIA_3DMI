@@ -17,7 +17,7 @@ namespace KERNEL
 		DocView();
 		KERNEL::Type ObjectType() const { return KERNEL::Type::View; };
 
-		void Initialize(Json::Object & cInObject, Signal::Delivery & cInstance);
+		void Initialize(Json::Object & cInObject, Signal::Delivery & cDelivery);
 		void Destruct();
 		void Paint(Json::Object & cInObject);
 		void Resize(Json::Object & cInObject);
@@ -55,8 +55,8 @@ namespace KERNEL
 		void SetViewStyle(int nStyleId);
 		void SetViewDirection(int nDirectionId);
 		void SetVisualEffects(int nEffectId);
-		
-	private:
-		int m_nViewId = -1;
+
+		//== Command 관련 함수 =======================================================================
+		void CommandRequestValue(Json::Object & cInObject);
 	};
 };

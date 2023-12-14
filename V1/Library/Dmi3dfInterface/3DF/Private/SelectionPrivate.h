@@ -114,6 +114,8 @@ namespace H3DF
 
 			cWorldPoint = pcInThat->cWorldPoint;
 			cWindowPoint = pcInThat->cWindowPoint;
+
+			m_pcWindow = pcInThat->m_pcWindow;
 		}
 
 		// LineKey 등이 저장되는 변수
@@ -132,6 +134,9 @@ namespace H3DF
 
 		WorldPoint cWorldPoint;
 		WindowPoint cWindowPoint;
+
+		WindowKey * GetWindow() { return (WindowKey *) m_pcWindow; }
+		const WindowKey * m_pcWindow = nullptr;
 	};
 
 	class SelectionResultsIteratorPrivate : public PrivateImpl

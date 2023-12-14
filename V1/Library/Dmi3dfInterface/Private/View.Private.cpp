@@ -907,11 +907,11 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 	// set markup color and weight
 	SetMarkupColor(ThePreset.MarkupColor);
 
-	SetShadowColor(ThePreset.ShadowColor);
+	SetShadowColor(TheKenel.VisualEffects.Shadow.GetColor());
 
 	m_pcBaseView->GetMarkupManager()->SetMarkupWeight(ThePreset.MarkupWeight / 100.0f);
-	m_pcBaseView->SetShadowResolution(ThePreset.ShadowRes);
-	m_pcBaseView->SetShadowBlurring(ThePreset.ShadowBlur);
+	m_pcBaseView->SetShadowResolution(TheKenel.VisualEffects.Shadow.Resolution);
+	m_pcBaseView->SetShadowBlurring(TheKenel.VisualEffects.Shadow.Blurring);
 
 	// set the color index interpolation settings
 	m_pcBaseView->SetColorInterpolation(ThePreset.CiByValue);
@@ -1116,7 +1116,7 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 			HC_Set_Rendering_Options(chRenderingOpts);
 		}
 
-		HCLOCALE(sprintf(chRenderingOpts, "simple shadow = (opacity = %f)", ThePreset.ShadowOpacity));
+		HCLOCALE(sprintf(chRenderingOpts, "simple shadow = (opacity = %f)", TheKenel.VisualEffects.Shadow.Opacity));
 		HC_Set_Rendering_Options(chRenderingOpts);
 
 		char gooch_color_map[4096];
@@ -1149,10 +1149,10 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 
 		HC_Set_Rendering_Options(curve_opt);
 
-		m_pcBaseView->SetReflectionPlane(ThePreset.ReflectionPlane, ThePreset.ReflectionOpacity,
-			ThePreset.ReflectionFading, ThePreset.ReflectionUseAttenuation,
-			ThePreset.ReflectionHither, ThePreset.ReflectionYon,
-			ThePreset.ReflectionUseBlur, ThePreset.ReflectionBlur);
+// 		m_pcBaseView->SetReflectionPlane(ThePreset.ReflectionPlane, ThePreset.ReflectionOpacity,
+// 			ThePreset.ReflectionFading, ThePreset.ReflectionUseAttenuation,
+// 			ThePreset.ReflectionHither, ThePreset.ReflectionYon,
+// 			ThePreset.ReflectionUseBlur, ThePreset.ReflectionBlur);
 
 		char ambient_color[MVO_BUFFER_SIZE];
 		if (ThePreset.HemisphericAmbient)
@@ -1697,30 +1697,35 @@ void H3DF::ViewPrivate::ViewReady()
 		char opt[MVO_BUFFER_SIZE] = "";
 		char refl_opt[MVO_BUFFER_SIZE];
 
-		HCLOCALE(sprintf(opt, "simple reflection=(%s, opacity=%f, fading= %s, ",
-			ThePreset.ReflectionPlane ? "on" : "off",
-			ThePreset.ReflectionOpacity, ThePreset.ReflectionFading ? "on" : "off"));
+// 		HCLOCALE(sprintf(opt, "simple reflection=(%s, opacity=%f, fading= %s, ",
+// 			ThePreset.ReflectionPlane ? "on" : "off",
+// 			ThePreset.ReflectionOpacity, ThePreset.ReflectionFading ? "on" : "off"));
+// 
+// 		if (ThePreset.ReflectionUseAttenuation) {
+// 			HCLOCALE(sprintf(refl_opt, "attenuation = (hither=%f, yon=%f), ",
+// 				ThePreset.ReflectionHither, ThePreset.ReflectionYon));
+// 		}
+// 		else
+// 			sprintf(refl_opt, "no attenuation, ");
 
-		if (ThePreset.ReflectionUseAttenuation) {
-			HCLOCALE(sprintf(refl_opt, "attenuation = (hither=%f, yon=%f), ",
-				ThePreset.ReflectionHither, ThePreset.ReflectionYon));
-		}
-		else
-			sprintf(refl_opt, "no attenuation, ");
+		sprintf(refl_opt, "no attenuation, ");
 		strcat(opt, refl_opt);
 
-		if (ThePreset.ReflectionUseBlur)
-			sprintf(refl_opt, "blur=%d)", ThePreset.ReflectionBlur);
-		else
-			sprintf(refl_opt, "no blur)");
+// 		if (ThePreset.ReflectionUseBlur)
+// 			sprintf(refl_opt, "blur=%d)", ThePreset.ReflectionBlur);
+// 		else
+// 			sprintf(refl_opt, "no blur)");
+
+		sprintf(refl_opt, "no blur)");
 		strcat(opt, refl_opt);
 
 		HC_Set_Rendering_Options(opt);
 	} HC_Close_Segment();
 
 	GetBaseView()->SetShadowLightDirection(ThePreset.UseLightVector, (HPoint *)&ThePreset.LightVector);
-	GetBaseView()->SetShadowIgnoresTransparency(ThePreset.IgnoreTransparency);
-	GetBaseView()->SetShadowMode((HShadowMode)ThePreset.ShadowMode);
+	GetBaseView()->SetShadowIgnoresTransparency(TheKenel.VisualEffects.Shadow.IgnoreTransparency);
+	GetBaseView()->SetShadowMode((HShadowMode) TheKenel.VisualEffects.Shadow.Mode);
+
 	GetBaseView()->SetOcclusionCullingMode(ThePreset.OcclusionCulling);
 	GetBaseView()->SetLineAntialiasing(TheKenel.Appearance.AntiAliasing.Line);
 	GetBaseView()->SetTextAntialiasing(TheKenel.Appearance.AntiAliasing.Text);

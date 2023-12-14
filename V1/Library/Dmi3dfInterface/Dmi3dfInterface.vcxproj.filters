@@ -309,6 +309,12 @@
     <ClInclude Include="Sprocket.h">
       <Filter>3DF\Sprocket</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\AttributeLock.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Condition.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -544,6 +550,12 @@
     </ClCompile>
     <ClCompile Include="Sprocket.cpp">
       <Filter>3DF\Sprocket</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\AttributeLock.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Condition.cpp">
+      <Filter>3DF\Control</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

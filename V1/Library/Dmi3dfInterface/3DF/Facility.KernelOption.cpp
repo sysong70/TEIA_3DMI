@@ -19,6 +19,14 @@ Json::Object* Facility::KernelOption::Get()
 {
 	Json::Object* pData = new Json::Object();
 
+	GetObjectValue(General);
+	GetObjectValue(Performance);
+	GetObjectValue(Interaction);
+	GetObjectValue(Appearance);
+	GetObjectValue(Selection);
+	GetObjectValue(Lighting);
+	GetObjectValue(VisualEffects);
+
 	return pData;
 }
 
@@ -28,8 +36,41 @@ bool Facility::KernelOption::Set(Json::Object* pData)
 		return false;
 	}
 
+	SetObjectValue(General);
+	SetObjectValue(Performance);
+	SetObjectValue(Interaction);
+	SetObjectValue(Appearance);
+	SetObjectValue(Selection);
+	SetObjectValue(Lighting);
+	SetObjectValue(VisualEffects);
+
 	return true;
 }
+
+CString Facility::KernelOption::ToHexString(COLORREF nColor)
+{
+	CString strHexString;
+	strHexString.Format(_T("0x%06X"), nColor & 0x00FFFFFF);
+	return strHexString;
+
+// 	CString strColor;
+// 	strColor.Format(L"0x%02X%02X%02X", GetRValue(nColor), GetGValue(nColor), GetBValue(nColor));
+// 	return strColor;
+}
+
+COLORREF Facility::KernelOption::ToColor(CString strHexString)
+{
+	COLORREF nColor;
+	_stscanf_s(strHexString, _T("0x%x"), &nColor);
+	return nColor;
+
+// 	strHexString.Replace(L"0x", L"");
+// 	int nRed = _wtoi(strHexString.Mid(0, 2));
+// 	int nGreen = _wtoi(strHexString.Mid(2, 2));
+// 	int nBlue = _wtoi(strHexString.Mid(4, 2));
+// 	return RGB(nRed, nGreen, nBlue);
+}
+
 
 #pragma region General
 
@@ -538,7 +579,7 @@ bool Facility::KernelOption::LIGHTING::BLOOM::Set(Json::Object* pData)
 	SetBooleanValue(Use);
 	SetRealValue(Strength);
 	SetIntegerValue(Blur);
-	SetEnumValue(Shape, HBloomShape);
+	SetEnumValue(Shape, BloomShape);
 
 	return true;
 }
@@ -570,3 +611,293 @@ bool Facility::KernelOption::LIGHTING::LIGHT::Set(Json::Object* pData)
 }
 
 #pragma endregion //:REGION
+
+#pragma region VisualEffects
+
+//== Visual effects 관련 함수 ========================================================================
+
+// 1-1. Visual Effects를 Json Object로 반환
+Json::Object * Facility::KernelOption::VISUALEFFECTS::Get()
+{
+	Json::Object * pData = new Json::Object();
+
+	GetObjectValue(Shadow);
+	GetObjectValue(PlaneReflection);
+	GetObjectValue(AmbientOcclusion);
+	GetObjectValue(SilhouetteEdges);
+	GetObjectValue(Bloom);
+
+	return pData;
+}
+
+// 1-2. Visual Effects를 저장
+bool Facility::KernelOption::VISUALEFFECTS::Set(Json::Object * pData)
+{
+	if (pData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetObjectValue(Shadow);
+	SetObjectValue(PlaneReflection);
+	SetObjectValue(AmbientOcclusion);
+	SetObjectValue(SilhouetteEdges);
+	SetObjectValue(Bloom);
+
+	return true;
+}
+
+// 2-1. Shadow를 Json Object로 반환
+Json::Object * Facility::KernelOption::VISUALEFFECTS::SHADOW::Get()
+{
+	Json::Object * pData = new Json::Object();
+
+	GetBooleanValue(checked);
+	GetEnumValue(Mode);
+	GetIntegerValue(Resolution);
+	GetIntegerValue(Blurring);
+	GetBooleanValue(IgnoreTransparency);
+	GetStringValue(Color);
+	GetIntegerValue(Opacity);
+
+	return pData;
+}
+
+// 2-2. Shadow를 저장
+bool Facility::KernelOption::VISUALEFFECTS::SHADOW::Set(Json::Object * pData)
+{
+	if (pData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetBooleanValue(checked);
+	SetEnumValue(Mode, ShadowMode);
+	SetIntegerValue(Resolution);
+	SetIntegerValue(Blurring);
+	SetBooleanValue(IgnoreTransparency);
+	SetStringValue(Color);
+	SetIntegerValue(Opacity);
+
+	return true;
+}
+
+// 2-3. 실제 적용가능한 Resolution 값 반환
+int Facility::KernelOption::VISUALEFFECTS::SHADOW::GetResolution()
+{
+	// Type: int (32~1024), default value: 256
+	// UI: default value: 3, range: 1 ~ 10
+	float fStep = (1024 - 32) / 10.0f;
+	int nValue = (int)(Resolution * fStep);
+	return nValue;
+}
+
+// 2-4. 실제 적용가능한 Blurring 값 반환
+int Facility::KernelOption::VISUALEFFECTS::SHADOW::GetBlurring()
+{
+	// Type: int (1~31), default value: 1
+	// UI: default value: 1, range: 1 ~ 10
+	float fStep = (31 - 1) / 10.0f;
+	int nValue = (int) (Blurring * fStep);
+	return nValue;
+}
+
+// 2-5. 실제 적용가능한 Opacity 값 반환
+float Facility::KernelOption::VISUALEFFECTS::SHADOW::GetOpacity()
+{
+	// Type: Type: float (0~1), default value: 1.0f
+	// UI: default value: 10, range: 1 ~ 10
+	float fStep = (1 - 0) / 10.0f;
+	int nValue = (int) (Opacity * fStep);
+	return nValue;
+}
+
+COLORREF Facility::KernelOption::VISUALEFFECTS::SHADOW::GetColor()
+{
+	COLORREF nColor = Json::Helper::ToColor(Color);
+	return nColor;
+}
+
+// 3-1. Plane Reflection을 Json Object로 반환
+Json::Object * Facility::KernelOption::VISUALEFFECTS::PLANEREFLECTION::Get()
+{
+	Json::Object * pData = new Json::Object();
+
+	GetBooleanValue(checked);
+	GetIntegerValue(Opacity);
+	GetIntegerValue(Blurring);
+	GetBooleanValue(Fading);
+
+	return pData;
+}
+
+// 3-2. Plane Reflection을 저장
+bool Facility::KernelOption::VISUALEFFECTS::PLANEREFLECTION::Set(Json::Object * pData)
+{
+	if (pData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetBooleanValue(checked);
+	SetIntegerValue(Opacity);
+	SetIntegerValue(Blurring);
+	SetBooleanValue(Fading);
+
+	return true;
+}
+
+// 3-3. 실제 적용가능한 Opacity 값 반환
+float Facility::KernelOption::VISUALEFFECTS::PLANEREFLECTION::GetOpacity()
+{
+	// Type: Type: float (0~1), default value: 0.5f
+	// UI: default value: 5, range: 1 ~ 10
+	float fStep = (1 - 0) / 10.0f;
+	int nValue = (int) (Opacity * fStep);
+	return nValue;
+}
+
+// 3-4. 실제 적용가능한 Blurring 값 반환
+int Facility::KernelOption::VISUALEFFECTS::PLANEREFLECTION::GetBlurring()
+{
+	// Type: int (1~31), default value: 1
+	// UI: default value: 1, range: 1 ~ 10
+	float fStep = (31 - 1) / 10.0f;
+	int nValue = (int) (Blurring * fStep);
+	return nValue;
+}
+
+// 4-1. Ambient Occlusion을 Json Object로 반환
+Json::Object * Facility::KernelOption::VISUALEFFECTS::AMBIENTOCCLUSION::Get()
+{
+	Json::Object * pData = new Json::Object();
+
+	GetBooleanValue(checked);
+	GetIntegerValue(Strength);
+	GetIntegerValue(Quality);
+
+	return pData;
+}
+
+// 4-2. Ambient Occlusion을 저장
+bool Facility::KernelOption::VISUALEFFECTS::AMBIENTOCCLUSION::Set(Json::Object * pData)
+{
+	if (pData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetBooleanValue(checked);
+	SetIntegerValue(Strength);
+	SetIntegerValue(Quality);
+
+	return true;
+}
+
+// 4-3. 실제 적용가능한 Strength 값 반환
+float Facility::KernelOption::VISUALEFFECTS::AMBIENTOCCLUSION::GetStrength()
+{
+	// Type: float(1 - 100), default value : 1.0f
+	// UI: default value: 20, range: 1 ~ 20
+	float fStep = (100 - 1) / 20.0f;
+	int nValue = (int) (Strength * fStep);
+	return nValue;
+}
+
+// 4-4. 실제 적용가능한 Quality 값 반환
+CStringA Facility::KernelOption::VISUALEFFECTS::AMBIENTOCCLUSION::GetQuality()
+{
+	CStringA strQuality = (Quality == 0) ? "Fast" : "Nicest";
+	return strQuality;
+}
+
+// 5-1. Silhouette Edges을 Json Object로 반환
+Json::Object * Facility::KernelOption::VISUALEFFECTS::SILHOUETTEEDGES::Get()
+{
+	Json::Object * pData = new Json::Object();
+
+	GetBooleanValue(checked);
+	GetIntegerValue(Tolerance);
+	GetBooleanValue(HeavyExterior);
+
+	return pData;
+}
+
+// 5-2. Silhouette Edges을 저장
+bool Facility::KernelOption::VISUALEFFECTS::SILHOUETTEEDGES::Set(Json::Object * pData)
+{
+	if (pData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetBooleanValue(checked);
+	SetIntegerValue(Tolerance);
+	SetBooleanValue(HeavyExterior);
+
+	return true;
+}
+
+// 5-3. 실제 적용가능한 Tolerance 값 반환
+float Facility::KernelOption::VISUALEFFECTS::SILHOUETTEEDGES::GetTolerance()
+{
+	// Type: float(1 - 100), default value : 1.0f
+	// UI: default value: 20, range: 1 ~ 20
+	float fStep = (100 - 1) / 20.0f;
+	int nValue = (int) (Tolerance * fStep);
+	return nValue;
+}
+
+// 6-1. Bloom을 Json Object로 반환
+Json::Object * Facility::KernelOption::VISUALEFFECTS::BLOOM::Get()
+{
+	Json::Object * pData = new Json::Object();
+
+	GetBooleanValue(checked);
+	GetRealValue(Strength);
+	GetIntegerValue(Blurring);
+	GetEnumValue(Shape);
+
+	return pData;
+}
+
+// 6-2. Bloom을 저장
+bool Facility::KernelOption::VISUALEFFECTS::BLOOM::Set(Json::Object * pData)
+{
+	if (pData == nullptr) {
+		RETURN_FALSE;
+	}
+
+	SetBooleanValue(checked);
+	SetRealValue(Strength);
+	SetIntegerValue(Blurring);
+	SetEnumValue(Shape, BloomShape);
+
+	return true;
+}
+
+// 6-3. 실제 적용가능한 Strength 값 반환
+float Facility::KernelOption::VISUALEFFECTS::BLOOM::GetStrength()
+{
+	// Type: float(1 - 100), default value : 1.0f
+	// UI: default value: 20, range: 1 ~ 20
+	float fStep = (100 - 1) / 20.0f;
+	int nValue = (int) (Strength * fStep);
+	return nValue;
+}
+
+// 6-4. 실제 적용가능한 Blurring 값 반환
+int Facility::KernelOption::VISUALEFFECTS::BLOOM::GetBlurring()
+{
+	// Type: int (1~31), default value: 1
+	// UI: default value: 1, range: 1 ~ 10
+	float fStep = (31 - 1) / 10.0f;
+	int nValue = (int) (Blurring * fStep);
+	return nValue;
+}
+
+// 6-5. 실제 적용가능한 Shape 값 반환
+CStringA Facility::KernelOption::VISUALEFFECTS::BLOOM::GetShape()
+{
+	CStringA strShape = (Shape == 0) ? "Radial" : "Star";
+	return strShape;
+}
+
+#pragma endregion //:REGION (VisualEffects)
+
+

@@ -57,24 +57,21 @@ KERNEL::DocView * SESSION::Session::GetView()
 
 //== Mouse 관련 함수 =================================================================================
 
-void SESSION::Session::MouseSignal(Json::Object & cInObject)
+void SESSION::Session::ViewMouseSignal(Json::Object & cInObject)
 {
 	m_pcDocView->MouseSignal(cInObject);
 }
 
 //== Keyboard 관련 함수 ==============================================================================
 
-void SESSION::Session::KeyboardSignal(Json::Object & cInObject)
+void SESSION::Session::ViewKeyboardSignal(Json::Object & cInObject)
 {
 	m_pcDocView->KeyboardSignal(cInObject);
 }
 
 //== Command 관련 함수 ===============================================================================
-void SESSION::Session::ExecuteCommand(Json::Object & cInObject)
+void SESSION::Session::ViewExecuteCommand(Json::Object & cInObject)
 {
-	CString strText;
-	cInObject.Stringify(strText);
-
 	int nId = cInObject.GetInteger(SKW_ID);
 
 	switch (nId)
@@ -85,6 +82,7 @@ void SESSION::Session::ExecuteCommand(Json::Object & cInObject)
 		case HOME_3D_CMD_ViewStyle_HiddenLineRemove:
 		case HOME_3D_CMD_ViewStyle_Tessellated:
 			m_pcDocView->SetViewStyle(nId);
+			return;
 			break;
 	}
 
@@ -100,6 +98,7 @@ void SESSION::Session::ExecuteCommand(Json::Object & cInObject)
 		case HOME_3D_CMD_ViewDirection_SeIso:
 		case HOME_3D_CMD_ViewDirection_Perspective:
 			m_pcDocView->SetViewDirection(nId);
+			return;
 			break;
 	}
 
@@ -111,6 +110,7 @@ void SESSION::Session::ExecuteCommand(Json::Object & cInObject)
 		case HOME_3D_CMD_VisualEffects_SilhouetteEdges:
 		case HOME_3D_CMD_VisualEffects_Bloom:
 			m_pcDocView->SetVisualEffects(nId);
+			return;
 			break;
 	}
 
@@ -125,6 +125,7 @@ void SESSION::Session::ExecuteCommand(Json::Object & cInObject)
 		case HOME_3D_CMD_Rotate_Turntable:
 		case HOME_3D_CMD_Rotate_Orbit:
 			m_pcDocView->SetViewControl(nId);
+			return;
 			break;
 	}
 
@@ -145,6 +146,7 @@ void SESSION::Session::ExecuteCommand(Json::Object & cInObject)
 		case HOME_3D_CMD_ObjectSnap_Relative:
 		case HOME_3D_CMD_ObjectSnap_ExpandLine:
 			m_pcDocView->SetObjectSnap(nId);
+			return;
 			break;
 	}
 
@@ -159,11 +161,20 @@ void SESSION::Session::ExecuteCommand(Json::Object & cInObject)
 		case HOME_3D_CMD_SelectionFiter_Axis:
 		case HOME_3D_CMD_SelectionFiter_PMI:
 			m_pcDocView->SetSelectionFilter(nId);
+			return;
 			break;
 	}
+
+	assert(false);
 }
 
-void SESSION::Session::CancelCommands()
+void SESSION::Session::ViewCancelCommands()
 {
 	m_pcDocView->CancelCommands();
+}
+//== Command 관련 함수 ===============================================================================
+
+void SESSION::Session::CommandRequestValue(Json::Object & cInObject)
+{
+	m_pcDocView->CommandRequestValue(cInObject);
 }

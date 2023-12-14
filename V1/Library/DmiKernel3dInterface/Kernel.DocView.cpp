@@ -23,12 +23,11 @@ KERNEL::DocView::DocView()
 //== View 관련 함수 ==================================================================================
 
 // 1. H3DF View Initialize 함수
-void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cInstance)
+void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cDelivery)
 {
 	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
-	if (nullptr == pcImpl) {
-		DEBUG_RETURN;
-	}
+	if (nullptr == pcImpl) { DEBUG_RETURN; }
+	pcImpl->m_pcDelivery = &cDelivery;
 
 	H3DF::WindowHandle nWindowHandle = (H3DF::WindowHandle)cInObject.GetDwordPtr(SKW_HWND);
 	
@@ -44,9 +43,9 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cI
 
 	pcImpl->m_pcObjectSnapOperator = new KERNEL::Operator::HighlightObjectSnap(&pcImpl->m_cCanvas.GetFrontView().GetWindowKey());
 
-	pcImpl->m_cCanvas.FileOpen(cInObject, cInstance);
+	pcImpl->m_cCanvas.FileOpen(cInObject, cDelivery);
 	
-	cInstance.view.SetValidation();
+	cDelivery.view.SetValidation();
 }
 
 // 2. H3DF View Destruct 함수
@@ -101,12 +100,16 @@ void KERNEL::DocView::CancelCommands()
 
 void KERNEL::DocView::ViewId(int nViewId)
 {
-	m_nViewId = nViewId;
+	DocViewPrivate * pcImpl = (DocViewPrivate *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	pcImpl->m_nViewId = nViewId;
 }
 
 int KERNEL::DocView::ViewId()
 {
-	return m_nViewId;
+	DocViewPrivate * pcImpl = (DocViewPrivate *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	return pcImpl->m_nViewId;
 }
 
 //== Mouse 관련 함수 =================================================================================
@@ -499,6 +502,28 @@ void KERNEL::DocView::SetVisualEffects(int nEffectId)
 
 		case HOME_3D_CMD_VisualEffects_Bloom:
 			pcImpl->SetVisualEffectsBloom();
+			break;
+	}
+}
+
+//== Command 관련 함수 ===============================================================================
+
+// 1. Request Value 처리
+void KERNEL::DocView::CommandRequestValue(Json::Object & cInObject)
+{
+	DocViewPrivate * pcImpl = (DocViewPrivate *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	int nId = cInObject.GetInteger(SKW_ID);
+
+	switch (nId)
+	{
+		case HOME_3D_LST_VisualEffects:
+			pcImpl->RequestVisualEffectsSetting(cInObject);
+			break;
+
+		default:
+			assert(false);
 			break;
 	}
 }

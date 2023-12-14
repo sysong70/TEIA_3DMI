@@ -216,8 +216,8 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 	SelectionOptionsKit cSelectOption;
 	cSelectOption.SetLevel(Selection::Level::Segment).SetRelatedLimit(0);//.SetProximity(0.001);// SetSorting(Selection::Sorting::ZSorting);
 
-	SelectionResults cSelection1;
-	pcImpl->m_pcWindow->GetHighlightControl().NoButtonDownAndMove(cInEvent.GetFlags(), cInEvent.GetMousePixelPos().x, cInEvent.GetMousePixelPos().y, cSelection1);
+	SelectionResults cSelection;
+	pcImpl->m_pcWindow->GetHighlightControl().NoButtonDownAndMove(cInEvent.GetFlags(), cInEvent.GetMousePixelPos().x, cInEvent.GetMousePixelPos().y, cSelection);
 
 	return HLISTENER_PASS_EVENT;
 }

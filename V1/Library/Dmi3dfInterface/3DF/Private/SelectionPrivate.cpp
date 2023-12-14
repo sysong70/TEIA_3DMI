@@ -143,6 +143,7 @@ size_t H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, S
 		// 선택된 요소를 저장하기 위해서 Item 생성
 		SelectionItem * pcItem = new SelectionItem();
 		SelectionItemPrivate * pcItemPrivate = (SelectionItemPrivate *)pcItem->GetImpl();
+		pcItemPrivate->m_pcWindow = m_pcWindow;
 
 		HC_Show_Selection_Element(&nKey, &nOffset1, &nOffset2, &nOffset3);
 		HC_Show_Selection_Original_Key(&nKey);

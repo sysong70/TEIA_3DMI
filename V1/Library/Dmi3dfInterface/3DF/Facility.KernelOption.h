@@ -10,87 +10,87 @@ namespace H3DF
 	{
 		enum HLRMode
 		{
-			AnalyticHiddenLine,		//!< Analytic hidden line
-			FastHiddenLine,			//!< Fast hidden line
-			FakeHiddenLine			//!< Fake hidden line
+			AnalyticHiddenLine,		// Analytic hidden line
+			FastHiddenLine,			// Fast hidden line
+			FakeHiddenLine			// Fake hidden line
 		};
 
 		enum FramerateMode
 		{
-			FramerateOff,  //!< unknown mode
-			FramerateFixed,  //!< self-explanatory
-			FramerateTarget     //!< self-explanatory
+			FramerateOff,			// unknown mode
+			FramerateFixed,			// self-explanatory
+			FramerateTarget			// self-explanatory
 		};
 
-		enum HBloomShape
+		enum BloomShape
 		{
-			RadialBloom,			//!< radial bloom
-			StarBloom				//!< star bloom
+			Radial,					// radial bloom
+			Star					// star bloom
 		};
 
 		enum HShadowRenderingMode
 		{
-			SoftwareShadow,             //!< image driver shadow generation
-			HardwareShadow,		    //!< opengl p-buffer shadow generation
-			SoftwareOpenglShadow        //!< opengl software shadow generation
+			SoftwareShadow,         // image driver shadow generation
+			HardwareShadow,		    // opengl p-buffer shadow generation
+			SoftwareOpenglShadow	// opengl software shadow generation
 		};
 
 		enum ProjMode
 		{
-			ProjUnknown,       //!< unknown mode
-			ProjPerspective,   //!< Objects which are close to the eye appear large, and objects which are far away appear small.
-			ProjOrthographic,  //!< The represented size of an object doesn't depend on how close or far it is---this can be handy in architecture and engineering.
-			ProjStretched      //!< In a "stretched" view, an orthographic projection is made, and then the view is "stretched" to fit exactly into the available screen window.
+			ProjUnknown,       // unknown mode
+			ProjPerspective,   // Objects which are close to the eye appear large, and objects which are far away appear small.
+			ProjOrthographic,  // The represented size of an object doesn't depend on how close or far it is---this can be handy in architecture and engineering.
+			ProjStretched      // In a "stretched" view, an orthographic projection is made, and then the view is "stretched" to fit exactly into the available screen window.
 		};
 
 		enum HSelectionHighlightMode {
-			HighlightDefault,	//!< use default conditional highlighting
-			HighlightQuickmoves, //!< use quick move reference highlighting
-			InverseTransparency,  //!< do nothing to the selected item, but make the rest of the model transparent.
-			ColoredInverseTransparency  //!< color the selected item and make the rest of the model transparent.
+			HighlightDefault,	// use default conditional highlighting
+			HighlightQuickmoves, // use quick move reference highlighting
+			InverseTransparency,  // do nothing to the selected item, but make the rest of the model transparent.
+			ColoredInverseTransparency  // color the selected item and make the rest of the model transparent.
 		};
 
 		enum HRenderMode
 		{
-			HRenderWireframe = 1,       //!< edges/lines only
-			HRenderTriangulation = 2,   //!< edges and non-lit faces
-			HRenderSilhouette = 3,      //!< shell/mesh silhouette edges
-			HRenderHiddenLine = 4,      //!< hidden line removal
-			HRenderHiddenLineHOOPS = 5, //!< currently does nothing
-			HRenderHiddenLineFast = 6,  //!< simulate hidden line (regular hardware z-buffer, with faces set to window background color)
-			HRenderFlat = 7,            //!< flat shading
-			HRenderGouraud = 8,         //!< gouraud (smooth) shading
-			HRenderGouraudWithEdges = 9,//!< gouraud (smooth) shading with edges turned on
-			HRenderPhong = 10,          //!< phong shading
-			HRenderShaded = 11,         //!< indicates shaded rendering; underlying code will use phong if hardware accel is avialable, otherwise gouraud will be used
-			HRenderShadedWithLines = 12,//!< same as HReanderShaded but with lines visible
-			HRenderWireframeWithSilhouette = 13, //!< wireframe + silhouette
-			HRenderShadedWireframe = 14,//!< wireframe, with shaded lines
-			HRenderVertices = 15,		//!< vertices only
-			HRenderShadedVertices = 16,	//!< vertices only (shaded)
-			HRenderGouraudWithLines = 17,//!< same as HReanderShaded but with lines visible
-			HRenderLOD1 = 18,//!< clamps to LOD1
-			HRenderLOD2 = 19,//!< clamps to LOD2
-			HRenderBRepHiddenLine = 20, //!<hidden line-ish removal
-			HRenderBRepHiddenLineFast = 21, //!<hidden line-ish removal
-			HRenderBRepWireframe = 22,  //!<brep wireframe
-			HRenderGoochShaded = 23,	//!<Gooch Shaded
-			HRenderFakeHiddenLine = 24, //!<fake hidden line
+			HRenderWireframe = 1,       // edges/lines only
+			HRenderTriangulation = 2,   // edges and non-lit faces
+			HRenderSilhouette = 3,      // shell/mesh silhouette edges
+			HRenderHiddenLine = 4,      // hidden line removal
+			HRenderHiddenLineHOOPS = 5, // currently does nothing
+			HRenderHiddenLineFast = 6,  // simulate hidden line (regular hardware z-buffer, with faces set to window background color)
+			HRenderFlat = 7,            // flat shading
+			HRenderGouraud = 8,         // gouraud (smooth) shading
+			HRenderGouraudWithEdges = 9,// gouraud (smooth) shading with edges turned on
+			HRenderPhong = 10,          // phong shading
+			HRenderShaded = 11,         // indicates shaded rendering; underlying code will use phong if hardware accel is avialable, otherwise gouraud will be used
+			HRenderShadedWithLines = 12,// same as HReanderShaded but with lines visible
+			HRenderWireframeWithSilhouette = 13, // wireframe + silhouette
+			HRenderShadedWireframe = 14,// wireframe, with shaded lines
+			HRenderVertices = 15,		// vertices only
+			HRenderShadedVertices = 16,	// vertices only (shaded)
+			HRenderGouraudWithLines = 17,// same as HReanderShaded but with lines visible
+			HRenderLOD1 = 18,			// clamps to LOD1
+			HRenderLOD2 = 19,			// clamps to LOD2
+			HRenderBRepHiddenLine = 20, //hidden line-ish removal
+			HRenderBRepHiddenLineFast = 21, //hidden line-ish removal
+			HRenderBRepWireframe = 22,  //brep wireframe
+			HRenderGoochShaded = 23,	//Gooch Shaded
+			HRenderFakeHiddenLine = 24, //fake hidden line
 			HRenderUnknown = 0
 		};
 
-		enum HShadowMode
+		enum ShadowMode
 		{
-			HShadowNone = 1,  //!< no shadow
-			HShadowSoft = 2,  //!< soft shadow
-			HShadowHard = 3   //!< hard shadow
+			HShadowNone = 1,  // no shadow
+			HShadowSoft = 2,  // soft shadow
+			HShadowHard = 3   // hard shadow
 		};
 
 		enum DisplayListType
 		{
-			DisplayListOff,			//!< No display lists
-			DisplayListGeometry,	//!< Geometry-level display lists
-			DisplayListSegment		//!< Segment-level display lists
+			DisplayListOff,			// No display lists
+			DisplayListGeometry,	// Geometry-level display lists
+			DisplayListSegment		// Segment-level display lists
 		};
 		class API_3DF KernelOption : public Base
 		{
@@ -103,6 +103,9 @@ namespace H3DF
 
 			Json::Object * Get() override;
 			bool Set(Json::Object * pData) override;
+
+			static CString ToHexString(COLORREF nColor);
+			static COLORREF ToColor(CString strHexString);
 
 			struct GENERAL
 			{
@@ -275,7 +278,7 @@ namespace H3DF
 					bool Use = false;					// CAppSettings::UseBloom
 					float Strength = 1.0;				// CAppSettings::BloomStrength
 					int Blur = 5;						// CAppSettings::BloomBlur
-					HBloomShape Shape = RadialBloom;	// CAppSettings::BloomShape
+					BloomShape Shape = Radial;			// CAppSettings::BloomShape
 
 					Json::Object * Get();
 					bool Set(Json::Object * pData);
@@ -324,9 +327,92 @@ namespace H3DF
 				// 			bool Set(Json::Object* pData);
 			}
 			Effects;
+
+			struct API_3DF VISUALEFFECTS
+			{
+				struct SHADOW
+				{
+					bool checked = false;
+					ShadowMode Mode = HShadowNone;
+					int	Resolution = 3;
+					int	Blurring = 1;
+					bool IgnoreTransparency = false;
+					CString Color = Json::Helper::ToString(RGB(45, 45, 45));
+					int Opacity = 10;
+
+					int GetResolution();
+					int GetBlurring();
+					COLORREF GetColor();
+					float GetOpacity();
+
+					Json::Object * Get();
+					bool Set(Json::Object * pData);
+				}
+				Shadow;
+
+				struct PLANEREFLECTION
+				{
+					bool checked = false;
+					int Opacity = 5;
+					int Blurring = 1;
+					bool Fading = false;
+
+					float GetOpacity();
+					int GetBlurring();
+
+					Json::Object * Get();
+					bool Set(Json::Object * pData);
+				}
+				PlaneReflection;
+
+				struct AMBIENTOCCLUSION
+				{
+					bool checked = false;
+					int Strength = 1;
+					int Quality = 0;	// Fast, Nicest
+
+					float GetStrength();
+					CStringA GetQuality();
+
+					Json::Object * Get();
+					bool Set(Json::Object * pData);
+				}
+				AmbientOcclusion;
+
+				struct SILHOUETTEEDGES
+				{
+					bool checked = false;
+					int Tolerance = 1;
+					bool HeavyExterior = true;
+
+					float GetTolerance();
+
+					Json::Object * Get();
+					bool Set(Json::Object * pData);
+				}
+				SilhouetteEdges;
+
+				struct BLOOM
+				{
+					bool checked = false;
+					int Strength = 1;
+					int Blurring = 5;
+					int Shape = 0;
+
+					float GetStrength();
+					int GetBlurring();
+					CStringA GetShape();
+
+					Json::Object * Get();
+					bool Set(Json::Object * pData);
+				}
+				Bloom;
+
+				Json::Object * Get();
+				bool Set(Json::Object * pData);
+			}
+			VisualEffects;
 		};
-
-
 
 		class API_3DF KernelPreset : public Base
 		{
@@ -362,10 +448,8 @@ namespace H3DF
 			COLORREF LineSelectionColor = RGB(255, 128, 0);
 			COLORREF MarkerSelectionColor = RGB(255, 128, 0);
 			COLORREF MarkupColor = RGB(255, 0, 0);
-			COLORREF ShadowColor = RGB(45, 45, 45);
+			
 			int	MarkupWeight = 400;	// Markup line weight * 100 (to store float as int)
-			int	ShadowRes = 64;
-			int	ShadowBlur = 4;
 			bool CiByValue = true;// color interpolation, by value
 			bool CiByColormapIndex = true;	// color interpolation, by colormap index
 			bool CiIsolines = false;	// color interpolation, isolines only
@@ -374,7 +458,7 @@ namespace H3DF
 			CString RefSelType = "Spriting";
 			HRenderMode RenderMode = HRenderGouraud;
 			bool ShowCollisions = false;
-			HShadowMode ShadowMode = HShadowNone;
+
 			bool ShadowMap = false;
 			int HardCutoff = 10;
 			bool SplatRendering = false;	//use splat rendering
@@ -383,24 +467,24 @@ namespace H3DF
 			int SMSamples = 4;
 			bool Jitter = false;
 
-			bool ReflectionPlane = false;
-			float ReflectionOpacity = 0.5;
-			bool ReflectionFading = true;
-			bool ReflectionUseAttenuation = false;
-			float ReflectionHither = 0.f;
-			float ReflectionYon = 1.f;
-			bool ReflectionUseBlur = false;
-			int ReflectionBlur = 1;
+/*
+			m_pcBaseView->SetReflectionPlane(ThePreset.ReflectionPlane, ThePreset.ReflectionOpacity,
+				ThePreset.ReflectionFading, ThePreset.ReflectionUseAttenuation,
+				ThePreset.ReflectionHither, ThePreset.ReflectionYon,
+				ThePreset.ReflectionUseBlur, ThePreset.ReflectionBlur);
+*/
+
+
 			bool UseLightVector = false;
 			Point LightVector = Point(0.0f, 0.0f, 1.0f);
-			bool IgnoreTransparency = false;
+			
 			bool StaticModel = true;
 			bool LMVModel = true;
 			bool RestoreAnnotations = false;
 			DisplayListType DisplayList = DisplayListSegment;
 			int	DynamicAdjustment = 1;
 
-			float ShadowOpacity = 1.f;
+			
 
 			CString FontName = "sans serif";
 			CString FontSize = "14";

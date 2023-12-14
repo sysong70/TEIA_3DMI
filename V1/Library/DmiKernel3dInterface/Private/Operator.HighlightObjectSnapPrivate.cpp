@@ -348,7 +348,7 @@ bool KERNEL::Operator::HighlightObjectSnapPrivate::DoDynamicHighlighting(WindowP
 
 	float fProximity = 0.2f;
 	SelectionOptionsKit cSelectOption;
-	cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(5).SetProximity(0.2f).SetBias(Selection::Bias::Lines);
+	cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(15).SetProximity(0.2f); // .SetBias(Selection::Bias::Lines);
 	SelectionResults cHighlightSelection;
 	size_t nResult = m_pcWindow->GetSelectionControl().SelectByPoint(cMousePoint, cSelectOption, cHighlightSelection);
 
@@ -501,21 +501,12 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::CalculationObjectSnapPoint(H3
 	SelectionItem * pcItem = cInItems.Front();
 
 	if (nullptr != pcItem) {
-		WorldPoint cWorldPoint;
 		WindowPoint cWindowPoint;
-
-		pcItem->ShowSelectionPosition(cWorldPoint);
 		pcItem->ShowSelectionPosition(cWindowPoint);
 
 		Key cKey;
 		pcItem->ShowSelectedItem(cKey);
 		H3DF::Type eType = cKey.Type();
-
-		KeyPath cPath;
-		pcItem->ShowPath(cPath);
-
-		Matrix cMatrix;
-		cPath.ShowNetModellingMatrix(cMatrix);
 
 		// Line Key 처리
 		if (H3DF::Type::LineKey == eType) {
@@ -524,6 +515,9 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::CalculationObjectSnapPoint(H3
 			CalculationLienObjectSnapPoint(pcItem, cWindowPoint);
 		}
 	}
+
+	// #Temp
+	return;
 
 	//----- 상호간의 Object Snap Point를 계산한다. -----
 
@@ -562,6 +556,7 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::CalculationObjectSnapPoint(H3
 
 		Key cNextSelection;
 		if (true == pcNextItem->ShowSelectedItem(cNextSelection)) {
+			// 다른 Line과 관련된 Object Snap point를 계산한다.
 			if (H3DF::Type::LineKey == cSelection.Type() && H3DF::Type::LineKey == cNextSelection.Type()) {
 				CalculationLienAndLineObjectSnapPoint(pcItem, pcNextItem, cMatrix, cNextMatrix);
 			}

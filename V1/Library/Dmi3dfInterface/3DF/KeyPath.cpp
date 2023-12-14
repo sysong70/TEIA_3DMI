@@ -274,9 +274,9 @@ bool H3DF::KeyPath::ShowNetModellingMatrix(MatrixKit & cOutKit) const
 	}
 
 	float pfMatrix[16];
-	if (0 == HC_PShow_Net_Modelling_Matrix((int)pcImpl->m_aPaths.size(), pcImpl->m_vKeys.data(), pfMatrix)) {
-		return false;
-	}
+ 	if (0 == HC_PShow_Net_Modelling_Matrix((int) pcImpl->m_vKeys.size(), pcImpl->m_vKeys.data(), pfMatrix)) {
+ 		return false;
+ 	}
 
 	cOutKit = MatrixKit(pfMatrix);
 

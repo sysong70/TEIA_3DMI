@@ -652,6 +652,57 @@ StyleControl H3DF::SegmentKey::GetStyleControl()
 	return cStyleControl;
 }
 
+//== Condition 관련 함수 =============================================================================
+// Sets chInCondition as the only condition on this segment, replacing any existing conditions.
+SegmentKey & H3DF::SegmentKey::SetCondition(char const * chInCondition)
+{
+	if (nullptr != chInCondition) {
+		SegmentKeyPrivate::LocalOpen(*this); {
+			HC_Set_Conditions(chInCondition);
+		}SegmentKeyPrivate::LocalClose(*this);
+	}
+
+	return *this;
+}
+
+// Sets astrInConditions as the only conditions on this segment, replacing any existing conditions.
+SegmentKey & H3DF::SegmentKey::SetConditions(AStringArray const & astrInConditions)
+{
+	if (false == astrInConditions.empty()) {
+		CStringA strConditions;
+
+		for (size_t nIndex = 0; nIndex < astrInConditions.size(); ++nIndex) {
+			if (0 < nIndex) {
+				strConditions += ", ";
+			}
+			strConditions += astrInConditions[nIndex];
+		}
+
+		SegmentKeyPrivate::LocalOpen(*this); {
+			HC_Set_Conditions(strConditions);
+		}SegmentKeyPrivate::LocalClose(*this);
+	}
+	return *this;
+}
+
+SegmentKey & H3DF::SegmentKey::SetConditions(size_t nInCount, CStringA const pchInConditions[])
+{
+	CStringA strConditions;
+
+	for (size_t nIndex = 0; nIndex < nInCount; ++nIndex) {
+		if (0 < nIndex) {
+			strConditions += ", ";
+		}
+		strConditions += pchInConditions[nIndex];
+	}
+
+	SegmentKeyPrivate::LocalOpen(*this); {
+		HC_Set_Conditions(strConditions);
+	}SegmentKeyPrivate::LocalClose(*this);
+
+	return *this;
+}
+
 void H3DF::SegmentKey::SetRenderingOptions(CString strList)
 {
 	SegmentKeyPrivate::LocalOpen(*this);

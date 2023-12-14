@@ -113,6 +113,11 @@ public:
 	//== Style Control 관련 함수 =====================================================================
 	StyleControl GetStyleControl();
 
+	//== Condition 관련 함수 =========================================================================
+	SegmentKey & SetCondition(char const * chInCondition);
+	SegmentKey & SetConditions(AStringArray const & astrInConditions);
+	SegmentKey & SetConditions(size_t nInCount, CStringA const pchInConditions[]);
+
 	void SetRenderingOptions(CString strList);
 	void SetColorByIndex(CString strList, int nIndex);
 	void SetMarkerSymbol(CString strSymbol);		
