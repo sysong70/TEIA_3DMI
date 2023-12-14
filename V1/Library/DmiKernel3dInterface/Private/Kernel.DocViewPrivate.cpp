@@ -141,8 +141,8 @@ void KERNEL::DocViewPrivate::RequestVisualEffectsSetting(Json::Object & cInObjec
 {
 	Json::Object cData;
 	
-	cData.SetInteger(SKW_TARGET, (int) Signal::Target::Command);
-	cData.SetInteger(SKW_ACTION, (int) Signal::InteractiveCommand::Action::ResponseValue);
+	cData.SetInteger(SKW_TARGET, (int) Signal::Target::TaskBar);
+	cData.SetInteger(SKW_ACTION, (int) Signal::TaskBar::Action::ResponseValue);
 	cData.SetInteger(SKW_ID, HOME_3D_LST_VisualEffects);
 
 	// cInObject에 Value값이 있는 경우 처리 (UI에서 변경된 값을 전달한 경우 처리)
