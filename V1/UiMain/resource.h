@@ -54,7 +54,7 @@
 
 #pragma endregion //:REGION
 
-#pragma region Command ID
+#pragma region TaskBar ID
 
 #include "Command.Resource.h"
 

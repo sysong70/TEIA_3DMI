@@ -6,16 +6,10 @@
 #include "Component.PanelBar.h"
 #include "Component.ScenePanel.h"
 #include "Component.ViewPanel.h"
+#include "Command.h"
 #include "Control.HistoryBar.h"
 #include "Control.TabWnd.h"
 #include <Signal.h>
-
-
-
-namespace Command
-{
-	class Base;
-}
 
 
 

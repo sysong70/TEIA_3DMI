@@ -16,6 +16,8 @@ namespace Component
 	{
 	public:
 
+		friend class Control::TaskPanel;
+
 		TaskBar();
 
 		~TaskBar() override;
@@ -41,6 +43,8 @@ namespace Component
 		void OnClose();
 
 	protected:
+
+		BOOL PreTranslateMessage(MSG* pMsg) override;
 
 		afx_msg LRESULT OnDPIChangedAfterParent(WPARAM, LPARAM);
 

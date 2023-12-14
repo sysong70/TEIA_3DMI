@@ -1,10 +1,9 @@
 ﻿#include "stdafx.h"
-#include "Command.VisualEffects3d.h"
 #include "Command.Resource.h"
+#include "Command.MeasureCoordinate3d.h"
 #include "Component.TaskBar.h"
 #include "Control.TaskPanel.h"
 #include "Facility.AppResources.h"
-#include "Facility.CommandIndexer.h"
 #include "Window.Application.h"
 #include "Window.MainFrame.h"
 #include "Signal.h"
@@ -17,12 +16,12 @@ static char THIS_FILE[] = __FILE__;
 
 
 
-#define PRESET PresetVisualEffects3d
+#define PRESET PresetMeasureCoordinate3d
 
-namespace PresetVisualEffects3d
+namespace PresetMeasureCoordinate3d
 {
 	const UINT CommandId = HOME_3D_LST_VisualEffects;
-	const CStringA TaskName = "VisualEffects3d";
+	const CStringA TaskName = "MeasureCoordinate3d";
 
 	enum EControlId
 	{
@@ -33,15 +32,15 @@ namespace PresetVisualEffects3d
 
 #pragma region Panel
 
-class VisualEffects3dPanel : public Control::TaskPanel
+class MeasureCoordinate3dPanel : public Control::TaskPanel
 {
 public:
 
-	VisualEffects3dPanel(Json::Object* pUiData)
+	MeasureCoordinate3dPanel(Json::Object* pUiData)
 		: TaskPanel(PRESET::CommandId, pUiData)
 	{}
 
-~VisualEffects3dPanel() override
+~MeasureCoordinate3dPanel() override
 {}
 
 void SetData(Json::Object& data) override
@@ -67,7 +66,6 @@ protected:
 	void ConstructHeader() override
 	{
 		m_toolBar.SetPivot(Control::EPivot::TopLeft);
-		m_toolBar.IsCheckButton(true);
 		m_toolBar.Initialize(this, PRESET::ToolBar);
 
 		m_toolBar.AddButton(HOME_3D_CMD_ViewStyle_Shade);
@@ -75,17 +73,12 @@ protected:
 		m_toolBar.AddButton(HOME_3D_CMD_ViewStyle_Wireframe);
 		m_toolBar.AddButton(HOME_3D_CMD_ViewStyle_HiddenLineRemove);
 		m_toolBar.AddButton(HOME_3D_CMD_ViewStyle_Tessellated);
-
-		m_toolBar.SetCheck(TheActiveCommand.Home.VisualEffects3d, true);
 	}
 
 protected:
 
-	afx_msg void OnCommand(UINT id)
+	void OnCommand(UINT id)
 	{
-		m_toolBar.SetCheck(id, true);
-		TheActiveCommand.Home.VisualEffects3d = id;
-
 		Component::TaskBar* taskBar = (Component::TaskBar*)GetParent();
 		taskBar->GetDelivery().view.OnCommand(id);
 
@@ -101,6 +94,8 @@ protected:
 			break;
 		}
 	}
+
+protected:
 
 	afx_msg void OnSize(UINT nType, int cx, int cy)
 	{
@@ -131,7 +126,7 @@ protected:
 
 
 
-BEGIN_MESSAGE_MAP(VisualEffects3dPanel, CWnd)
+BEGIN_MESSAGE_MAP(MeasureCoordinate3dPanel, CWnd)
 	ON_WM_SIZE()
 	ON_COMMAND_RANGE(HOME_3D_CMD_ViewStyle_Shade, HOME_3D_CMD_ViewStyle_Tessellated, OnCommand)
 	ON_REGISTERED_MESSAGE(BCGM_PROPERTY_CHANGED, OnPropertyChanged)
@@ -139,13 +134,13 @@ END_MESSAGE_MAP()
 
 #pragma endregion //:REGION
 
-Command::VisualEffects3d::VisualEffects3d()
+Command::MeasureCoordinate3d::MeasureCoordinate3d()
 {
 }
 
 
 
-bool Command::VisualEffects3d::ReceiveSignal(Json::Object* pData)
+bool Command::MeasureCoordinate3d::ReceiveSignal(Json::Object* pData)
 {
 	DEBUG_VALID(m_pView);
 
@@ -158,7 +153,7 @@ bool Command::VisualEffects3d::ReceiveSignal(Json::Object* pData)
 	Component::TaskBar& taskBar = TheApplication.GetMainFrame().GetTaskBar();
 	Json::Object& uiData = TheAppResources.GetTask(PRESET::TaskName);
 
-	VisualEffects3dPanel* pPanel = new VisualEffects3dPanel(&uiData);
+	MeasureCoordinate3dPanel* pPanel = new MeasureCoordinate3dPanel(&uiData);
 	pPanel->Initialize(&taskBar);
 	pPanel->SetDefaultData(data.GetAt(SKW_VALUE));
 	pPanel->SetData(data.GetAt(SKW_DEFAULTVALUE));
@@ -166,14 +161,12 @@ bool Command::VisualEffects3d::ReceiveSignal(Json::Object* pData)
 	taskBar.SetPanel(pPanel);
 	taskBar.Show(m_pView);
 
-	REMOVE_POINTER(pData);
-
 	return true;
 }
 
 
 
-void Command::VisualEffects3d::Run(Window::View* pView)
+void Command::MeasureCoordinate3d::Run(Window::View* pView)
 {
 	__super::Run(pView);
 
@@ -182,7 +175,7 @@ void Command::VisualEffects3d::Run(Window::View* pView)
 	//Component::TaskBar& taskBar = TheApplication.GetMainFrame().GetTaskBar();
 	//Json::Object& data = TheAppResources.GetTask(PRESET::TaskName);
 
-	//VisualEffects3dPanel* pPanel = new VisualEffects3dPanel(&data);
+	//MeasureCoordinate3dPanel* pPanel = new MeasureCoordinate3dPanel(&data);
 	//pPanel->Initialize(&taskBar);
 	//pPanel->SetDefaultData(data.GetAt("default"));
 	//pPanel->SetData(data.GetAt("default"));
@@ -192,12 +185,12 @@ void Command::VisualEffects3d::Run(Window::View* pView)
 
 	Component::TaskBar& taskBar = TheApplication.GetMainFrame().GetTaskBar();
 	taskBar.SetParent((CWnd*)pView);
-	taskBar.GetDelivery().taskBar.OnRequestValue(PRESET::CommandId);
+	taskBar.GetDelivery().command.OnRequestValue(PRESET::CommandId);
 }
 
 
 
-void Command::VisualEffects3d::Cancel()
+void Command::MeasureCoordinate3d::Cancel()
 {
 	__super::Cancel();
 

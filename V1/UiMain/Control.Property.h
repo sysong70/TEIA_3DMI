@@ -19,13 +19,13 @@ namespace Property
 
 
 
-	class IconComboBox : public CBCGPComboBox
+	class IconComboBoxCtrl : public CBCGPComboBox
 	{
 	public:
 
-		IconComboBox(CBCGPToolBarImages& icons, CStringList& iconNames);
+		IconComboBoxCtrl(CBCGPToolBarImages& icons, CStringList& iconNames);
 
-		virtual ~IconComboBox();
+		virtual ~IconComboBoxCtrl();
 
 	protected:
 
@@ -68,27 +68,17 @@ namespace Property
 
 #pragma endregion //:REGION
 
-	class ComboBoxEx : public CBCGPProp
+	class Color : public CBCGPColorProp
 	{
 	public:
 
-		ComboBoxEx(const CString& name, const CString& value, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL, CBCGPToolBarImages* pImageList = NULL);
+		Color::Color(const CString& name, UINT id, const COLORREF& color, LPCTSTR lpszDescr = NULL, DWORD_PTR dwData = NULL);
 
-		bool AddOption(LPCTSTR lpOption, int nIcon = -1, int nIndent = 0);
+	public:
 
-	protected:
+		BOOL IsDroppedDown() const override;
 
-		CComboBox* CreateCombo(CWnd* pWndParent, CRect rect) override;
-
-		//LPCTSTR GetXMLTagName() const override;
-
-		BOOL OnEdit(LPPOINT lpClick) override;
-
-	protected:
-
-		CImageList m_imageList;
-		std::vector<int> m_icons;
-		std::vector<int> m_indents;
+		void OnCloseCombo() override;
 	};
 
 
@@ -276,6 +266,31 @@ namespace Property
 		BOOL SerializeValue(CString& str) override;
 
 		BOOL TextToVar(const CString& strText) override;
+	};
+
+
+
+	class IconComboBox : public CBCGPProp
+	{
+	public:
+
+		IconComboBox(const CString& name, const CString& value, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL, CBCGPToolBarImages* pImageList = NULL);
+
+		bool AddOption(LPCTSTR lpOption, int nIcon = -1, int nIndent = 0);
+
+	protected:
+
+		CComboBox* CreateCombo(CWnd* pWndParent, CRect rect) override;
+
+		//LPCTSTR GetXMLTagName() const override;
+
+		BOOL OnEdit(LPPOINT lpClick) override;
+
+	protected:
+
+		CImageList m_imageList;
+		std::vector<int> m_icons;
+		std::vector<int> m_indents;
 	};
 
 

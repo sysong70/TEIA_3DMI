@@ -7,11 +7,11 @@
 
 namespace Command
 {
-	class VisualEffects3d : public Base
+	class MeasureCoordinate3d : public Base
 	{
 	public:
 
-		VisualEffects3d();
+		MeasureCoordinate3d();
 
 	public:
 

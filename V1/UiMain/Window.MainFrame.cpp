@@ -86,7 +86,7 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 	switch (target) {
 	case Signal::Target::ModelPanel:
 	case Signal::Target::View:
-	case Signal::Target::Command:
+	case Signal::Target::TaskBar:
 	{
 		int id = data.GetInteger(SKW_VIEWID);
 		View* pView = TheApplication.FindView(id);

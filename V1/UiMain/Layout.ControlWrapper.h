@@ -18,7 +18,7 @@ namespace Layout
 			Label,
 			CheckBox,
 			Radio,
-			ComboBox,
+			IconComboBox,
 			Tree,
 		};
 

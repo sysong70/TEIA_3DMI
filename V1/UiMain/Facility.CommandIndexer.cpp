@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "Facility.CommandIndexer.h"
-#include "Command.Resource.h"
 
 #include "Command.VisualEffects3d.h"
 
@@ -15,6 +14,7 @@ static char THIS_FILE[] = __FILE__;
 
 Facility::CommandIndexer TheCommandIndexer;
 Facility::CommandIndexer::CommandInfo theDummy;
+Facility::ActiveCommand TheActiveCommand;
 
 Command::VisualEffects3d theVisualEffects3d;
 
