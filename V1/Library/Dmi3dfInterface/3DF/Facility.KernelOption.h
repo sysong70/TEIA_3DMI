@@ -330,7 +330,7 @@ namespace H3DF
 
 			struct API_3DF VISUALEFFECTS
 			{
-				struct SHADOW
+				struct API_3DF SHADOW
 				{
 					bool checked = false;
 					ShadowMode Mode = HShadowNone;
@@ -350,7 +350,7 @@ namespace H3DF
 				}
 				Shadow;
 
-				struct PLANEREFLECTION
+				struct API_3DF PLANEREFLECTION
 				{
 					bool checked = false;
 					int Opacity = 5;
@@ -365,21 +365,21 @@ namespace H3DF
 				}
 				PlaneReflection;
 
-				struct AMBIENTOCCLUSION
+				struct API_3DF AMBIENTOCCLUSION
 				{
 					bool checked = false;
 					int Strength = 1;
 					int Quality = 0;	// Fast, Nicest
 
 					float GetStrength();
-					CStringA GetQuality();
+					bool GetQuality();
 
 					Json::Object * Get();
 					bool Set(Json::Object * pData);
 				}
 				AmbientOcclusion;
 
-				struct SILHOUETTEEDGES
+				struct API_3DF SILHOUETTEEDGES
 				{
 					bool checked = false;
 					int Tolerance = 1;
@@ -392,7 +392,7 @@ namespace H3DF
 				}
 				SilhouetteEdges;
 
-				struct BLOOM
+				struct API_3DF BLOOM
 				{
 					bool checked = false;
 					int Strength = 1;
@@ -401,7 +401,6 @@ namespace H3DF
 
 					float GetStrength();
 					int GetBlurring();
-					CStringA GetShape();
 
 					Json::Object * Get();
 					bool Set(Json::Object * pData);

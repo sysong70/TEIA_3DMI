@@ -22,7 +22,7 @@ namespace SESSION
 			FramerateTarget			// self-explanatory
 		};
 
-		enum HBloomShape
+		enum BloomShape
 		{
 			RadialBloom,			// radial bloom
 			StarBloom				// star bloom
@@ -276,7 +276,7 @@ namespace SESSION
 					bool Use = false;					// CAppSettings::UseBloom
 					float Strength = 1.0;				// CAppSettings::BloomStrength
 					int Blur = 5;						// CAppSettings::BloomBlur
-					HBloomShape Shape = RadialBloom;	// CAppSettings::BloomShape
+					BloomShape Shape = RadialBloom;		// CAppSettings::BloomShape
 
 					Json::Object * Get();
 					bool Set(Json::Object * pData);

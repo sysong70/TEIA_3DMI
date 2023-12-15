@@ -706,8 +706,8 @@ float Facility::KernelOption::VISUALEFFECTS::SHADOW::GetOpacity()
 	// Type: Type: float (0~1), default value: 1.0f
 	// UI: default value: 10, range: 1 ~ 10
 	float fStep = (1 - 0) / 10.0f;
-	int nValue = (int) (Opacity * fStep);
-	return nValue;
+	float fValue = Opacity * fStep;
+	return fValue;
 }
 
 COLORREF Facility::KernelOption::VISUALEFFECTS::SHADOW::GetColor()
@@ -750,8 +750,8 @@ float Facility::KernelOption::VISUALEFFECTS::PLANEREFLECTION::GetOpacity()
 	// Type: Type: float (0~1), default value: 0.5f
 	// UI: default value: 5, range: 1 ~ 10
 	float fStep = (1 - 0) / 10.0f;
-	int nValue = (int) (Opacity * fStep);
-	return nValue;
+	float fValue = Opacity * fStep;
+	return fValue;
 }
 
 // 3-4. 실제 적용가능한 Blurring 값 반환
@@ -796,15 +796,14 @@ float Facility::KernelOption::VISUALEFFECTS::AMBIENTOCCLUSION::GetStrength()
 	// Type: float(1 - 100), default value : 1.0f
 	// UI: default value: 20, range: 1 ~ 20
 	float fStep = (100 - 1) / 20.0f;
-	int nValue = (int) (Strength * fStep);
-	return nValue;
+	float fValue = Strength * fStep;
+	return fValue;
 }
 
 // 4-4. 실제 적용가능한 Quality 값 반환
-CStringA Facility::KernelOption::VISUALEFFECTS::AMBIENTOCCLUSION::GetQuality()
+bool Facility::KernelOption::VISUALEFFECTS::AMBIENTOCCLUSION::GetQuality()
 {
-	CStringA strQuality = (Quality == 0) ? "Fast" : "Nicest";
-	return strQuality;
+	return (Quality == 0) ? true : false;
 }
 
 // 5-1. Silhouette Edges을 Json Object로 반환
@@ -839,8 +838,8 @@ float Facility::KernelOption::VISUALEFFECTS::SILHOUETTEEDGES::GetTolerance()
 	// Type: float(1 - 100), default value : 1.0f
 	// UI: default value: 20, range: 1 ~ 20
 	float fStep = (100 - 1) / 20.0f;
-	int nValue = (int) (Tolerance * fStep);
-	return nValue;
+	float fValue = Tolerance * fStep;
+	return fValue;
 }
 
 // 6-1. Bloom을 Json Object로 반환
@@ -877,8 +876,8 @@ float Facility::KernelOption::VISUALEFFECTS::BLOOM::GetStrength()
 	// Type: float(1 - 100), default value : 1.0f
 	// UI: default value: 20, range: 1 ~ 20
 	float fStep = (100 - 1) / 20.0f;
-	int nValue = (int) (Strength * fStep);
-	return nValue;
+	float fValue = Strength * fStep;
+	return fValue;
 }
 
 // 6-4. 실제 적용가능한 Blurring 값 반환
@@ -889,13 +888,6 @@ int Facility::KernelOption::VISUALEFFECTS::BLOOM::GetBlurring()
 	float fStep = (31 - 1) / 10.0f;
 	int nValue = (int) (Blurring * fStep);
 	return nValue;
-}
-
-// 6-5. 실제 적용가능한 Shape 값 반환
-CStringA Facility::KernelOption::VISUALEFFECTS::BLOOM::GetShape()
-{
-	CStringA strShape = (Shape == 0) ? "Radial" : "Star";
-	return strShape;
 }
 
 #pragma endregion //:REGION (VisualEffects)

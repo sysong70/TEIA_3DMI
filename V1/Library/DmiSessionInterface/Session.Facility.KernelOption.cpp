@@ -538,7 +538,7 @@ bool Facility::KernelOption::LIGHTING::BLOOM::Set(Json::Object* pData)
 	SetBooleanValue(Use);
 	SetRealValue(Strength);
 	SetIntegerValue(Blur);
-	SetEnumValue(Shape, HBloomShape);
+	SetEnumValue(Shape, BloomShape);
 
 	return true;
 }

@@ -67,7 +67,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::operator = (VisualEffectsCont
 
 // Allows ambient occlusion to be enabled or disabled on a per segment basis.
 // param: in_state Whether ambient occlusion should be used.
-VisualEffectsControl & H3DF::VisualEffectsControl::SetAmbientOcclusionEnabled(bool bInState)
+VisualEffectsControl & H3DF::VisualEffectsControl::SetAmbientOcclusionEnabled(bool bInState, float fStrength, bool bFast)
 {
 	VisualEffectsControlPrivate * pcImpl = static_cast<VisualEffectsControlPrivate *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -76,20 +76,18 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetAmbientOcclusionEnabled(bo
 	DEBUG_VALID(pcBaseView);
 
 	if (nullptr != pcBaseView) {
-		float fStrength = 5.0f;
-		bool bFast = true;
 		HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
-			CString strOption;
-			strOption.Format(L"ambient occlusion = (%s, strength = %f, quality = %s)",
-				(bInState ? L"on" : L"off"), fStrength, bFast ? L"fast" : L"nicest");
-			HC_Set_Driver_Options(Utility::ToChar(strOption));
+			CStringA strOption;
+			strOption.Format("ambient occlusion = (%s, strength = %f, quality = %s)",
+				(bInState ? "on" : "off"), fStrength, bFast ? "fast" : "nicest");
+			HC_Set_Driver_Options(strOption);
 		} HC_Close_Segment();
 	}
 
 	return *this;
 }
 
-VisualEffectsControl & H3DF::VisualEffectsControl::SetSilhouetteEdgesEnabled(bool bInState)
+VisualEffectsControl & H3DF::VisualEffectsControl::SetSilhouetteEdgesEnabled(bool bInState, float fTolerance, bool bHeavyExterior)
 {
 	VisualEffectsControlPrivate * pcImpl = static_cast<VisualEffectsControlPrivate *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -98,23 +96,22 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSilhouetteEdgesEnabled(boo
 	DEBUG_VALID(pcBaseView);
 
 	if (nullptr != pcBaseView) {
-		float fFastSilhouetteTolerance = 1.0f;
 		bool bHeavyExteriorSilhouette = true;
 
 		HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
-			CString strOption;
-			strOption.Format(L"fast silhouette edges = (%s, tolerance = %f, %s heavy exterior)",
-				(bInState ? L"on" : L"off"),
-				fFastSilhouetteTolerance,
-				(bHeavyExteriorSilhouette ? L"" : L"no"));
-			HC_Set_Driver_Options(Utility::ToChar(strOption));
+			CStringA strOption;
+			strOption.Format("fast silhouette edges = (%s, tolerance = %f, %s heavy exterior)",
+				(bInState ? "on" : "off"),
+				fTolerance,
+				(bHeavyExterior ? "" : "no"));
+			HC_Set_Driver_Options(strOption);
 		} HC_Close_Segment();
 	}
 
 	return *this;
 }
 
-VisualEffectsControl & H3DF::VisualEffectsControl::SetBloomEnabled(bool bInState)
+VisualEffectsControl & H3DF::VisualEffectsControl::SetBloomEnabled(bool bInState, float fStrength, int nBlurring, int nShape)
 {
 	VisualEffectsControlPrivate * pcImpl = static_cast<VisualEffectsControlPrivate *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -128,13 +125,13 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetBloomEnabled(bool bInState
 		HBloomShape eBloomShape = RadialBloom;
 
 		HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
-			CString strOption;
-			strOption.Format(L"bloom = (%s, strength = %f, blur = %d, shape = %s)",
-				(bInState ? L"on" : L"off"),
-				fBloomStrength,
-				nBloomBlur,
-				(eBloomShape == RadialBloom ? L"radial" : L"star"));
-			HC_Set_Driver_Options(Utility::ToChar(strOption));
+			CStringA strOption;
+			strOption.Format("bloom = (%s, strength = %f, blur = %d, shape = %s)",
+				(bInState ? "on" : "off"),
+				fStrength,
+				nBlurring,
+				(nShape == (int)RadialBloom ? "radial" : "star"));
+			HC_Set_Driver_Options(strOption);
 		} HC_Close_Segment();
 	}
 

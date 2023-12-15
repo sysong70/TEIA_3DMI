@@ -20,9 +20,9 @@ namespace H3DF
 
 		H3DF::Type ObjectType() const { return H3DF::Type::VisualEffectsControl; };
 
-		VisualEffectsControl & SetAmbientOcclusionEnabled(bool bInState);
-		VisualEffectsControl & SetSilhouetteEdgesEnabled(bool bInState);
-		VisualEffectsControl & SetBloomEnabled(bool bInState);
+		VisualEffectsControl & SetAmbientOcclusionEnabled(bool bInState, float fStrength = 5.0f, bool bFast = true);
+		VisualEffectsControl & SetSilhouetteEdgesEnabled(bool bInState, float fTolerance = 1.0f, bool bHeavyExterior = true);
+		VisualEffectsControl & SetBloomEnabled(bool bInState, float fStrength = 1.f, int Blurring = 5, int nShape = 0);
 
 		VisualEffectsControl & SetAntiAliasing(bool bInState);
 		VisualEffectsControl & SetTextAntiAliasing(bool bInState);

@@ -215,7 +215,7 @@ void SESSION::Manager::Session::ExecuteCommand(Json::Object & cInObject)
 
 	switch ((Signal::TaskBar::Action) nAction)
 	{
-		case Signal::InteractiveCommand::Action::OnRequestValue:
+		case Signal::TaskBar::Action::OnRequestValue:
 			pcSession->CommandRequest(cInObject);
 			break;
 

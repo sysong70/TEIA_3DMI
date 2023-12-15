@@ -90,6 +90,7 @@ public:
 	TDF_INLINE RGBAColor() {}
 	explicit TDF_INLINE RGBAColor(float gray, float a = 1) : red(gray), green(gray), blue(gray), alpha(a) {}
 	TDF_INLINE RGBAColor(float r, float g, float b, float a = 1) : red(r), green(g), blue(b), alpha(a) {}
+	TDF_INLINE RGBAColor(COLORREF cColref) : red(GetRValue(cColref) / 255.f), green(GetGValue(cColref) / 255.f), blue(GetBValue(cColref) / 255.f), alpha(1.f) {}
 
 	TDF_INLINE void Set(float r, float g, float b, float a = 1) { red = r, green = g, blue = b, alpha = a; }
 	TDF_INLINE void SetRed(float r) { red = r; }

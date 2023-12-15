@@ -20,7 +20,7 @@ namespace H3DF
 		AttributeLockControlPrivate() { m_eType = H3DF::Type::AttributeLockControl; }
 
 		void Copy(AttributeLockControlPrivate * pcInThat) {
-			AttributeLockControlPrivate::Copy(pcInThat);
+			ControlPrivate::Copy(pcInThat);
 		}
 
 		CStringA GetTypeString(AttributeLock::Type eInType);
