@@ -518,3 +518,12 @@ void KERNEL::DocView::CommandRequest(Json::Object & cInObject)
 
 	pcImpl->CommandRequest(cInObject);
 }
+
+// 1. Change Value 처리
+void KERNEL::DocView::CommandChange(Json::Object & cInObject)
+{
+	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->CommandChange(cInObject);
+}

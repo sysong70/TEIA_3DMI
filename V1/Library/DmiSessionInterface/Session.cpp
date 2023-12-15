@@ -178,3 +178,9 @@ void SESSION::Session::CommandRequest(Json::Object & cInObject)
 {
 	m_pcDocView->CommandRequest(cInObject);
 }
+
+void SESSION::Session::CommandChange(Json::Object & cInObject)
+{
+	m_pcDocView->CommandChange(cInObject);
+}
+

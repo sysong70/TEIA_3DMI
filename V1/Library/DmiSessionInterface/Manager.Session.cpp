@@ -219,6 +219,10 @@ void SESSION::Manager::Session::ExecuteCommand(Json::Object & cInObject)
 			pcSession->CommandRequest(cInObject);
 			break;
 
+		case Signal::TaskBar::Action::OnChangedValue:
+			pcSession->CommandChange(cInObject);
+			break;
+
 		default:
 			assert(false);
 			break;

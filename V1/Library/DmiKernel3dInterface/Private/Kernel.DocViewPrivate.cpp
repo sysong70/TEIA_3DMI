@@ -168,6 +168,7 @@ void KERNEL::DocViewPrivate::SetSelectionFilter(SelectionFilter::Type eInType)
 
 //== Command 관련 함수 ===============================================================================
 
+// 1. Command Request 함수 처리
 void KERNEL::DocViewPrivate::CommandRequest(Json::Object & cInObject)
 {
 	int nId = cInObject.GetInteger(SKW_ID);
@@ -184,7 +185,7 @@ void KERNEL::DocViewPrivate::CommandRequest(Json::Object & cInObject)
 	}
 }
 
-// 1. Visual Effects setting 요청 함수 처리
+// 1-1. Visual Effects Request 요청 함수 처리
 void KERNEL::DocViewPrivate::RequestVisualEffects(Json::Object & cInObject)
 {
 	Operator::VisualEffects * pcOperator = (Operator::VisualEffects *) m_apcOperator[(int)KERNEL::Operator::Type::VisualEffects];
@@ -192,3 +193,27 @@ void KERNEL::DocViewPrivate::RequestVisualEffects(Json::Object & cInObject)
 	pcOperator->Request(cInObject);
 }
 
+// 2. Command Change 함수 처리
+void KERNEL::DocViewPrivate::CommandChange(Json::Object & cInObject)
+{
+	int nId = cInObject.GetInteger(SKW_ID);
+
+	switch (nId)
+	{
+		case HOME_3D_LST_VisualEffects:
+			ChangeVisualEffects(cInObject);
+			break;
+
+		default:
+			assert(false);
+			break;
+	}
+}
+
+// 2-1. Visual Effects Change 요청 함수 처리
+void KERNEL::DocViewPrivate::ChangeVisualEffects(Json::Object & cInObject)
+{
+	Operator::VisualEffects * pcOperator = (Operator::VisualEffects *)m_apcOperator[(int)KERNEL::Operator::Type::VisualEffects];
+	DEBUG_VALID(pcOperator);
+	pcOperator->Change(cInObject);
+}

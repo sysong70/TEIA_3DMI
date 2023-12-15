@@ -613,7 +613,7 @@ void Signal::TaskBar::OnRequestValue(UINT commandId)
 void Signal::TaskBar::OnChangedValue(UINT commandId, Json::Object& value)
 {
 	Json::Object data;
-	ConstructData(data, Action::OnRequestValue);
+	ConstructData(data, Action::OnChangedValue);
 
 	data.SetInteger(SKW_ID, commandId);
 	data.SetObject(SKW_VALUE, new Json::Object(value));

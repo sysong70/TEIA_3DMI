@@ -67,8 +67,10 @@ namespace KERNEL
 
 		//== Command 관련 함수 =======================================================================
 		void CommandRequest(Json::Object & cInObject);
+		void CommandChange(Json::Object & cInObject);
 
 	protected:
 		void RequestVisualEffects(Json::Object & cInObject);
+		void ChangeVisualEffects(Json::Object & cInObject);
 	};
 }

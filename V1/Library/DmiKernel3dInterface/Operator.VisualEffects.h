@@ -17,6 +17,8 @@ namespace KERNEL
 			VisualEffects(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
 
 			void Request(Json::Object & cInObject);
+
+			void Change(Json::Object & cInObject);
 		};
 	}
 }
