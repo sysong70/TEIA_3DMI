@@ -176,7 +176,7 @@ LRESULT Control::TaskPanel::OnPropertyChanged(WPARAM wp, LPARAM lp)
 
 	if (pValue != nullptr) {
 		if (pProp->IsGroupWithCheckBox()) {
-			pValue->AsObject().SetBoolean("check", (bool)pProp->IsGroupChecked());
+			pValue->AsObject().SetBoolean("checked", (bool)pProp->IsGroupChecked());
 		}
 		else {
 			Facility::SetValue(*pValue, *pProp);
@@ -193,7 +193,7 @@ LRESULT Control::TaskPanel::OnPropertyChanged(WPARAM wp, LPARAM lp)
 	}
 
 	ASSERT(m_commandId > 0);
-	GetTaskBar().GetDelivery().command.OnChangedValue(m_commandId, m_data);
+	GetTaskBar().GetDelivery().taskBar.OnChangedValue(m_commandId, m_data);
 
 	return S_OK;
 }

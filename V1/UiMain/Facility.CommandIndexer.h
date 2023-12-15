@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Facility.h"
+#include "Command.Resource.h"
 #include <unordered_map>
 
 
@@ -51,6 +52,31 @@ namespace Facility
 
 		CommandMap m_commandMap;
 	};
+
+
+
+	class ActiveCommand
+	{
+	public:
+
+		struct
+		{
+			UINT VisualEffects3d = HOME_3D_CMD_ViewStyle_ShadeWithEdges;
+		}
+		Home;
+
+		//:TODO
+		struct
+		{
+			UINT Angle3d = 0;
+			UINT Coordinate3d = 0;
+			UINT Distance3d = 0;
+			UINT Length = 0;
+			UINT Radius = 0;
+		}
+		Measure;
+	};
 }
 
 extern Facility::CommandIndexer TheCommandIndexer;
+extern Facility::ActiveCommand TheActiveCommand;

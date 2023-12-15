@@ -41,6 +41,10 @@ namespace Control
 
 		CBCGPButton* GetButton(UINT id);
 
+		void IsCheckButton(bool value);
+
+		void SetCheck(UINT id, bool value, bool uncheckOthers = true);
+
 		void SetSize(CSize buttonSize, CSize buttonMargin, CSize imageSize, CSize seperatorMargin, CSize toolBarPadding);
 		// image size, not button size
 		void SetSize(EItemSize size);
@@ -71,6 +75,8 @@ namespace Control
 		bool IsHorizontal();
 
 	protected:
+
+		bool m_bCheckButton = false;
 
 		CSize m_buttonSize = CSize(28, 28);
 		CSize m_buttonMargin = CSize(2, 2);

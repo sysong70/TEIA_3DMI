@@ -44,16 +44,16 @@ void Property::DurationCtrl::OnKillFocus(CWnd* pNewWnd)
 
 #pragma endregion //:REGION
 
-#pragma region IconComboBox Class
+#pragma region IconComboBoxCtrl Class
 
-BEGIN_MESSAGE_MAP(IconComboBox, CBCGPComboBox)
+BEGIN_MESSAGE_MAP(IconComboBoxCtrl, CBCGPComboBox)
 	ON_WM_DRAWITEM()
 	ON_WM_MEASUREITEM()
 END_MESSAGE_MAP()
 
 
 
-Property::IconComboBox::IconComboBox(CBCGPToolBarImages& imageListIcons, CStringList& lstIconNames)
+Property::IconComboBoxCtrl::IconComboBoxCtrl(CBCGPToolBarImages& imageListIcons, CStringList& lstIconNames)
 	: m_icons(imageListIcons)
 	, m_iconNames(lstIconNames)
 {
@@ -62,13 +62,13 @@ Property::IconComboBox::IconComboBox(CBCGPToolBarImages& imageListIcons, CString
 
 
 
-Property::IconComboBox::~IconComboBox()
+Property::IconComboBoxCtrl::~IconComboBoxCtrl()
 {
 }
 
 
 
-void Property::IconComboBox::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDIS)
+void Property::IconComboBoxCtrl::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDIS)
 {
 	CDC* pDC = CDC::FromHandle(lpDIS->hDC);
 	ASSERT_VALID(pDC);
@@ -97,7 +97,7 @@ void Property::IconComboBox::OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDIS)
 
 
 
-void Property::IconComboBox::OnMeasureItem(int /*nIDCtl*/, LPMEASUREITEMSTRUCT lpMeasureItemStruct)
+void Property::IconComboBoxCtrl::OnMeasureItem(int /*nIDCtl*/, LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 {
 	int nTextWidth = 0;
 	int nTextHeight = 0;
@@ -166,93 +166,33 @@ void Property::SliderCtrl::HScroll(UINT /*nSBCode*/, UINT /*nPos*/)
 
 #pragma endregion //:REGION
 
-#pragma region ComboBoxEx Class
+#pragma region Color Class
 
-Property::ComboBoxEx::ComboBoxEx(const CString& name, const CString& value, LPCTSTR lpDescr, DWORD_PTR data, CBCGPToolBarImages* pImageList)
-	: CBCGPProp(name, (LPCTSTR)value, lpDescr, data)
+Property::Color::Color(const CString& name, UINT id, const COLORREF& color, LPCTSTR lpszDescr, DWORD_PTR dwData)
+	: CBCGPColorProp(name, id, color, NULL, lpszDescr)
 {
-	if (pImageList != nullptr) {
-		pImageList->ExportToImageList(m_imageList);
-	}
 }
 
 
 
-bool Property::ComboBoxEx::AddOption(LPCTSTR lpOption, int nIcon, int nIndent)
+BOOL Property::Color::IsDroppedDown() const
 {
-	if (!__super::AddOption(lpOption)) {
-		RETURN_FALSE;
-	}
-
-	m_icons.push_back(nIcon);
-	m_indents.push_back(nIndent);
-
-	return true;
+	return m_pPopup != NULL;
 }
 
 
 
-CComboBox* Property::ComboBoxEx::CreateCombo(CWnd* pWndParent, CRect rect)
+void Property::Color::OnCloseCombo()
 {
-	const int HEIGHT = 400;
+	DEBUG_VALID(m_pPopup);
 
-	rect.bottom = rect.top + globalUtils.ScaleByDPI(HEIGHT, pWndParent);
+	m_pPopup->ShowWindow(SW_HIDE);
+	m_pPopup = NULL;
 
-	CComboBoxEx* pCombo = new CComboBoxEx;
-	if (pCombo->Create(WS_CHILD | WS_VSCROLL | CBS_DROPDOWNLIST, rect, pWndParent, BCGPROPLIST_ID_INPLACE_COMBO) == FALSE) {
-		REMOVE_POINTER(pCombo);
-		RETURN_NULL;
-	}
-
-	if (m_imageList.GetSafeHandle() != nullptr) {
-		pCombo->SetImageList(&m_imageList);
-	}
-
-	return pCombo;
+	__super::OnCloseCombo();
 }
 
-
-
-//LPCTSTR Property::ComboBoxEx::GetXMLTagName() const
-//{
-//	return _T("comboBoxEx");
-//}
-
-
-
-BOOL Property::ComboBoxEx::OnEdit(LPPOINT lpClick)
-{
-	if (__super::OnEdit(lpClick) == FALSE) {
-		return FALSE;
-	}
-
-	CComboBoxEx* pCombo = DYNAMIC_DOWNCAST(CComboBoxEx, m_pWndCombo);
-	if (pCombo == nullptr) {
-		RETURN(FALSE);
-	}
-	pCombo->ResetContent();
-
-	int index = 0;
-	COMBOBOXEXITEM item;
-	::ZeroMemory(&item, sizeof(item));
-	item.mask = CBEIF_IMAGE | CBEIF_INDENT | CBEIF_SELECTEDIMAGE | CBEIF_TEXT;
-
-	for (POSITION pos = m_lstOptions.GetHeadPosition(); pos != nullptr; index++) {
-		CString strItem = m_lstOptions.GetNext(pos);
-
-		item.iItem = index;
-		item.iSelectedImage = item.iImage = m_icons[index];
-		item.iIndent = m_indents[index];
-		item.pszText = (LPTSTR)(LPCTSTR)strItem;
-		item.cchTextMax = strItem.GetLength();
-
-		pCombo->InsertItem(&item);
-	}
-
-	return TRUE;
-}
-
-#pragma endregion //:REGION
+#pragma endregion: //:REGION
 
 #pragma region ComboButton Class
 
@@ -892,6 +832,94 @@ BOOL Property::HexValue::TextToVar(const CString& str)
 
 #pragma endregion //:REGION
 
+#pragma region IconComboBox Class
+
+Property::IconComboBox::IconComboBox(const CString& name, const CString& value, LPCTSTR lpDescr, DWORD_PTR data, CBCGPToolBarImages* pImageList)
+	: CBCGPProp(name, (LPCTSTR)value, lpDescr, data)
+{
+	if (pImageList != nullptr) {
+		pImageList->ExportToImageList(m_imageList);
+	}
+}
+
+
+
+bool Property::IconComboBox::AddOption(LPCTSTR lpOption, int nIcon, int nIndent)
+{
+	if (!__super::AddOption(lpOption)) {
+		RETURN_FALSE;
+	}
+
+	m_icons.push_back(nIcon);
+	m_indents.push_back(nIndent);
+
+	return true;
+}
+
+
+
+CComboBox* Property::IconComboBox::CreateCombo(CWnd* pWndParent, CRect rect)
+{
+	const int HEIGHT = 400;
+
+	rect.bottom = rect.top + globalUtils.ScaleByDPI(HEIGHT, pWndParent);
+
+	CComboBoxEx* pCombo = new CComboBoxEx;
+	if (pCombo->Create(WS_CHILD | WS_VSCROLL | CBS_DROPDOWNLIST, rect, pWndParent, BCGPROPLIST_ID_INPLACE_COMBO) == FALSE) {
+		REMOVE_POINTER(pCombo);
+		RETURN_NULL;
+	}
+
+	if (m_imageList.GetSafeHandle() != nullptr) {
+		pCombo->SetImageList(&m_imageList);
+	}
+
+	return pCombo;
+}
+
+
+
+//LPCTSTR Property::IconComboBox::GetXMLTagName() const
+//{
+//	return _T("comboBoxEx");
+//}
+
+
+
+BOOL Property::IconComboBox::OnEdit(LPPOINT lpClick)
+{
+	if (__super::OnEdit(lpClick) == FALSE) {
+		return FALSE;
+	}
+
+	CComboBoxEx* pCombo = DYNAMIC_DOWNCAST(CComboBoxEx, m_pWndCombo);
+	if (pCombo == nullptr) {
+		RETURN(FALSE);
+	}
+	pCombo->ResetContent();
+
+	int index = 0;
+	COMBOBOXEXITEM item;
+	::ZeroMemory(&item, sizeof(item));
+	item.mask = CBEIF_IMAGE | CBEIF_INDENT | CBEIF_SELECTEDIMAGE | CBEIF_TEXT;
+
+	for (POSITION pos = m_lstOptions.GetHeadPosition(); pos != nullptr; index++) {
+		CString strItem = m_lstOptions.GetNext(pos);
+
+		item.iItem = index;
+		item.iSelectedImage = item.iImage = m_icons[index];
+		item.iIndent = m_indents[index];
+		item.pszText = (LPTSTR)(LPCTSTR)strItem;
+		item.cchTextMax = strItem.GetLength();
+
+		pCombo->InsertItem(&item);
+	}
+
+	return TRUE;
+}
+
+#pragma endregion //:REGION
+
 #pragma region IconList Class
 
 Property::IconList::IconList(const CString& name, CBCGPToolBarImages& icons, int nSelected, CStringList* pNames, LPCTSTR lpDescr, DWORD_PTR data)
@@ -921,7 +949,7 @@ CComboBox* Property::IconList::CreateCombo(CWnd* pWndParent, CRect rect)
 
 	rect.bottom = rect.top + HEIGHT;
 
-	IconComboBox* pCombo = new IconComboBox(m_icons, m_iconNames);
+	IconComboBoxCtrl* pCombo = new IconComboBoxCtrl(m_icons, m_iconNames);
 	DWORD dwStyle = WS_CHILD | WS_VSCROLL | CBS_NOINTEGRALHEIGHT | CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS;
 
 	if (pCombo->Create(dwStyle, rect, pWndParent, BCGPROPLIST_ID_INPLACE_COMBO) == FALSE) {

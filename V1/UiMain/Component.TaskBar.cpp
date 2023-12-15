@@ -210,6 +210,18 @@ void Component::TaskBar::OnClose()
 
 
 
+BOOL Component::TaskBar::PreTranslateMessage(MSG* pMsg)
+{
+	BOOL process = __super::PreTranslateMessage(pMsg);
+	if (process == FALSE && pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE) {
+		PostMessage(WM_COMMAND, IDCLOSE);
+	}
+
+	return process;
+}
+
+
+
 LRESULT Component::TaskBar::OnDPIChangedAfterParent(WPARAM, LPARAM)
 {
 	LRESULT result = Default();

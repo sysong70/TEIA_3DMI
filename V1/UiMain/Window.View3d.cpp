@@ -119,7 +119,7 @@ void Window::View3d::ReceiveSignal(Json::Object* pData)
 			break;
 		}
 	}
-	else if (target == Signal::Target::Command) {
+	else if (target == Signal::Target::TaskBar) {
 		if (m_pActiveCommand != nullptr) {
 			m_pActiveCommand->ReceiveSignal(pData);
 			return;

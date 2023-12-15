@@ -7,6 +7,7 @@
 #define SKW_ACTION			"Action"
 #define SKW_CALLBACK		"Callback"
 #define SKW_CHAR			"Char"
+#define SKW_CHECKED			"checked" // lower case
 #define SKW_CHILDREN		"Children"
 #define SKW_COLUMN			"Column"
 #define SKW_DATA			"Data"
@@ -50,9 +51,9 @@
 #define SKW_VALUE			"Value"
 #define SKW_VIEWID			"ViewId"
 #define SKW_WIDTH			"Width"
-#define SKW_X				"x"
-#define SKW_Y				"y"
-#define SKW_Z				"z"
+#define SKW_X				"x"  // lower case
+#define SKW_Y				"y"  // lower case
+#define SKW_Z				"z"  // lower case
 
 #define SKW_CHAR			"Char"
 #define SKW_REPCNT			"RepCnt"
@@ -143,7 +144,7 @@ namespace Signal
 	class Progress;
 	class View;
 	class ModelPanel;
-	class InteractiveCommand; // interactive command
+	class TaskBar;
 
 	enum class Target
 	{
@@ -158,7 +159,7 @@ namespace Signal
 		LayerPanel,
 		ScenePanel,
 		ModelPanel,
-		Command,
+		TaskBar,
 
 		Progress,
 	};
@@ -490,11 +491,11 @@ namespace Signal
 
 
 
-	class InteractiveCommand
+	class TaskBar
 	{
 	public:
 
-		CHILD_CONSTRUCTOR(InteractiveCommand);
+		CHILD_CONSTRUCTOR(TaskBar);
 
 		enum class Action
 		{
@@ -533,7 +534,7 @@ namespace Signal
 		friend class Progress;
 		friend class View;
 		friend class ModelPanel;
-		friend class InteractiveCommand;
+		friend class TaskBar;
 
 		Delivery();
 
@@ -551,7 +552,7 @@ namespace Signal
 		Progress progress;
 		View view;
 		ModelPanel modelPanel;
-		InteractiveCommand command;
+		TaskBar taskBar;
 
 		void (*SendSignal)(const wchar_t*) = nullptr;
 

@@ -258,6 +258,26 @@ void Control::PropList::SetPropValue(CBCGPProp* pProp, Json::Value* pValue)
 
 
 
+BOOL Control::PropList::PreTranslateMessage(MSG* pMsg)
+{
+	BOOL process = __super::PreTranslateMessage(pMsg);
+	if (process == FALSE && pMsg->message == WM_KEYDOWN && pMsg->wParam == VK_ESCAPE) {
+		if (m_pSel == nullptr) {
+			return process;
+		}
+
+		if (m_pSel->IsDroppedDown()) {
+			OnCloseCombo();
+			SetFocus();
+			process = TRUE;
+		}
+	}
+
+	return process;
+}
+
+
+
 void Control::PropList::OnPropertyChanged(CBCGPProp* pProp) const
 {
 	__super::OnPropertyChanged(pProp);
@@ -393,8 +413,8 @@ CBCGPProp* Control::PropList::CreateColorProp(Json::Object& design, UINT id)
 {
 	id = (id != 0 ? id : PRESET::GetControlId());
 
-	CBCGPProp* pProp = new CBCGPColorProp(Facility::GetTitle(design), id,
-		(COLORREF)0, nullptr, Facility::GetDescription(design));
+	CBCGPProp* pProp = new Property::Color(Facility::GetTitle(design), id,
+		(COLORREF)0, Facility::GetDescription(design));
 	SetPropName(pProp, design);
 
 	return pProp;

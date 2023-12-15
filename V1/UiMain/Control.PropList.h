@@ -47,8 +47,10 @@ namespace Control
 
 	protected:
 
-		void OnPropertyChanged(CBCGPProp* pProp) const override;
+		BOOL PreTranslateMessage(MSG* pMsg) override;
 
+		void OnPropertyChanged(CBCGPProp* pProp) const override;
+		//:WARNING - for Property::CommandButton highlight
 		afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 
 		DECLARE_MESSAGE_MAP()

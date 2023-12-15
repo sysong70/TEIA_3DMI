@@ -228,6 +228,33 @@ CBCGPButton* Control::ToolBar::GetButton(UINT id)
 
 
 
+void Control::ToolBar::IsCheckButton(bool value)
+{
+	m_bCheckButton = value;
+}
+
+
+
+void Control::ToolBar::SetCheck(UINT id, bool value, bool uncheckOthers)
+{
+	if (uncheckOthers) {
+		for (auto button : m_buttons) {
+			if (button != nullptr) {
+				button->SetCheck(FALSE);
+			}
+		}
+	}
+
+	for (auto button : m_buttons) {
+		if (button != nullptr && button->GetDlgCtrlID() == id) {
+			button->SetCheck((BOOL)value);
+			return;
+		}
+	}
+}
+
+
+
 void Control::ToolBar::SetSize(CSize buttonSize, CSize buttonMargin, CSize imageSize, CSize seperatorMargin, CSize toolBarPadding)
 {
 	m_buttonSize = buttonSize;
@@ -320,7 +347,15 @@ CBCGPButton* Control::ToolBar::CreateButton(UINT id, bool menu)
 	button.m_bDrawFocus = FALSE;
 	button.m_bVisualManagerStyle = TRUE;
 
-	button.Create(L"", BS_PUSHBUTTON | BS_ICON | WS_CHILD | WS_VISIBLE, {}, this, id);
+	DWORD dwStyle;
+	if (m_bCheckButton) {
+		dwStyle = BS_AUTOCHECKBOX | BS_PUSHLIKE | BS_ICON | WS_CHILD | WS_VISIBLE;
+	}
+	else {
+		dwStyle = BS_PUSHBUTTON | BS_ICON | WS_CHILD | WS_VISIBLE;
+	}
+
+	button.Create(L"", dwStyle, {}, this, id);
 	button.SetBitmap(Facility::CreateBitmap(id, GetImageSize()));
 	button.SetTooltip(Facility::GetTitle(id));
 

@@ -70,7 +70,7 @@ void SESSION::Manager::Session::ExecuteSignal(const wchar_t * pchBuffer)
 			ExecuteViewSignal(cInObject);
 			break;
 
-		case Signal::Target::Command:
+		case Signal::Target::TaskBar:
 			ExecuteCommand(cInObject);
 			break;
 
@@ -213,7 +213,7 @@ void SESSION::Manager::Session::ExecuteCommand(Json::Object & cInObject)
 
 	SESSION::Session * pcSession = GetSession(nViewId);
 
-	switch ((Signal::InteractiveCommand::Action) nAction)
+	switch ((Signal::TaskBar::Action) nAction)
 	{
 		case Signal::InteractiveCommand::Action::OnRequestValue:
 			pcSession->CommandRequest(cInObject);

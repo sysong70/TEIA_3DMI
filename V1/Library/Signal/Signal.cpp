@@ -588,17 +588,17 @@ void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items)
 
 #pragma endregion //:REGION
 
-#pragma region InteractiveCommand Class
+#pragma region TaskBar Class
 
-void Signal::InteractiveCommand::ConstructData(Json::Object& data, Action action)
+void Signal::TaskBar::ConstructData(Json::Object& data, Action action)
 {
-	data.SetInteger(SKW_TARGET, (int)Target::Command);
+	data.SetInteger(SKW_TARGET, (int)Target::TaskBar);
 	data.SetInteger(SKW_ACTION, (int)action);
 }
 
 
 
-void Signal::InteractiveCommand::OnRequestValue(UINT commandId)
+void Signal::TaskBar::OnRequestValue(UINT commandId)
 {
 	Json::Object data;
 	ConstructData(data, Action::OnRequestValue);
@@ -610,7 +610,7 @@ void Signal::InteractiveCommand::OnRequestValue(UINT commandId)
 
 
 
-void Signal::InteractiveCommand::OnChangedValue(UINT commandId, Json::Object& value)
+void Signal::TaskBar::OnChangedValue(UINT commandId, Json::Object& value)
 {
 	Json::Object data;
 	ConstructData(data, Action::OnRequestValue);
@@ -623,7 +623,7 @@ void Signal::InteractiveCommand::OnChangedValue(UINT commandId, Json::Object& va
 
 
 
-void Signal::InteractiveCommand::ResponseValue(UINT commandId, Json::Object& value, Json::Object& defaultValue)
+void Signal::TaskBar::ResponseValue(UINT commandId, Json::Object& value, Json::Object& defaultValue)
 {
 	Json::Object data;
 	ConstructData(data, Action::ResponseValue);
@@ -649,7 +649,7 @@ Signal::Delivery::Delivery()
 	SetWrapper(progress);
 	SetWrapper(view);
 	SetWrapper(modelPanel);
-	SetWrapper(command);
+	SetWrapper(taskBar);
 
 #undef SetWrapper
 }
