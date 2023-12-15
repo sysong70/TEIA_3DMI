@@ -27,7 +27,7 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cD
 {
 	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
-	pcImpl->m_pcDelivery = &cDelivery;
+	pcImpl->SetDelivery(&cDelivery);
 
 	H3DF::WindowHandle nWindowHandle = (H3DF::WindowHandle)cInObject.GetDwordPtr(SKW_HWND);
 	
@@ -40,6 +40,8 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cD
 	H3DF::View cView = H3DF::Factory::CreateView("3DMI_View");
 
 	pcImpl->m_cCanvas.AttachViewAsLayout(cView);
+
+	pcImpl->AllocationOperator(&pcImpl->m_cCanvas.GetFrontView(), cDelivery);
 
 	pcImpl->m_pcObjectSnapOperator = new KERNEL::Operator::HighlightObjectSnap(&pcImpl->m_cCanvas.GetFrontView().GetWindowKey());
 
@@ -509,21 +511,10 @@ void KERNEL::DocView::SetVisualEffects(int nEffectId)
 //== Command 관련 함수 ===============================================================================
 
 // 1. Request Value 처리
-void KERNEL::DocView::CommandRequestValue(Json::Object & cInObject)
+void KERNEL::DocView::CommandRequest(Json::Object & cInObject)
 {
 	DocViewPrivate * pcImpl = (DocViewPrivate *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	int nId = cInObject.GetInteger(SKW_ID);
-
-	switch (nId)
-	{
-		case HOME_3D_LST_VisualEffects:
-			pcImpl->RequestVisualEffectsSetting(cInObject);
-			break;
-
-		default:
-			assert(false);
-			break;
-	}
+	pcImpl->CommandRequest(cInObject);
 }

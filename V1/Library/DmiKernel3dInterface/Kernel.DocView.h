@@ -57,6 +57,6 @@ namespace KERNEL
 		void SetVisualEffects(int nEffectId);
 
 		//== Command 관련 함수 =======================================================================
-		void CommandRequestValue(Json::Object & cInObject);
+		void CommandRequest(Json::Object & cInObject);
 	};
 };

@@ -216,7 +216,7 @@ void SESSION::Manager::Session::ExecuteCommand(Json::Object & cInObject)
 	switch ((Signal::InteractiveCommand::Action) nAction)
 	{
 		case Signal::InteractiveCommand::Action::OnRequestValue:
-			pcSession->CommandRequestValue(cInObject);
+			pcSession->CommandRequest(cInObject);
 			break;
 
 		default:

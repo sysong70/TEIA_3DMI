@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "Operator.HighlightObjectSnapPrivate.h"
+#include "OPERATOR.HighlightObjectSnapPrivate.h"
 
 #include <Private/View.Private.h>
 

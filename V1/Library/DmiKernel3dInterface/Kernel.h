@@ -20,6 +20,8 @@ namespace KERNEL
 		Object									= 0x00000002,
 		Application								= 0x00000003,
 		View									= 0x00000004,
+		
+		Operator								= 0x50000000,
 	};
 
 	class OSnap

@@ -5,6 +5,7 @@
 #include "../Kernel.h"
 #include "../Object.h"
 
+#include "../Operator.h"
 #include "../Operator.HighlightObjectSnap.h"
 
 #include <3DF.Factory.h>
@@ -30,9 +31,24 @@ namespace KERNEL
 		H3DF::Canvas m_cCanvas;
 		H3DF::Model m_cModel;
 		int m_nViewId = -1;
-		Signal::Delivery * m_pcDelivery = nullptr;
+
+		Signal::Delivery & Delivery();
+		const Signal::Delivery & Delivery() const;
+		void SetDelivery(const Signal::Delivery * pcInDelivery);
+
+	private:
+		const Signal::Delivery * m_pcDelivery = nullptr;
+
+		//== Operator 관련 함수 ======================================================================
+	public:
+		void AllocationOperator(H3DF::View * pcInView, Signal::Delivery & cDelivery);
+		Operator::OperatorBase * GetOperator(Operator::Type eInType);
+
+	private:
+		Operator::OperatorBase * m_apcOperator[(int)Operator::Type::Count];
 
 		//== Visual Effects 관련 함수 ================================================================
+	public:
 		void SetVisualEffectsShadow();
 		void SetVisualEffectsReflection();
 		void SetVisualEffectsAmbientOcclusion();
@@ -50,11 +66,9 @@ namespace KERNEL
 		void SetSelectionFilter(SelectionFilter::Type eInType);
 
 		//== Command 관련 함수 =======================================================================
-		void RequestVisualEffectsSetting(Json::Object & cInObject);
-	private:
-		Json::Object * m_pcVisualEffectsSetting = nullptr;
+		void CommandRequest(Json::Object & cInObject);
 
-
-
+	protected:
+		void RequestVisualEffects(Json::Object & cInObject);
 	};
 }

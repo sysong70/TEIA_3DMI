@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 
-#include "Operator.HighlightObjectSnap.h"
-#include "Private/Operator.HighlightObjectSnapPrivate.h"
+#include "OPERATOR.HighlightObjectSnap.h"
+#include "Private/OPERATOR.HighlightObjectSnapPrivate.h"
 
 #include <3DF/Window.h>
 

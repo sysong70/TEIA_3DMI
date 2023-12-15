@@ -127,16 +127,19 @@
     <ClInclude Include="Kernel.DocView.h" />
     <ClInclude Include="Manager.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="Operator.h" />
     <ClInclude Include="Operator.HighlightObjectSnap.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="Operator.SelectionFilter.h" />
+    <ClInclude Include="Operator.VisualEffects.h" />
     <ClInclude Include="Private\Kernel.DocViewPrivate.h" />
     <ClInclude Include="Private\Operator.HighlightObjectSnapPrivate.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Private\OperatorPrivate.h" />
     <ClInclude Include="Signal.Connector.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
@@ -154,16 +157,19 @@
     <ClCompile Include="Kernel.DocView.cpp" />
     <ClCompile Include="Manager.cpp" />
     <ClCompile Include="Object.cpp" />
+    <ClCompile Include="Operator.cpp" />
     <ClCompile Include="Operator.HighlightObjectSnap.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Operator.SelectionFilter.cpp" />
+    <ClCompile Include="Operator.VisualEffects.cpp" />
     <ClCompile Include="Private\Kernel.DocViewPrivate.cpp" />
     <ClCompile Include="Private\Operator.HighlightObjectSnapPrivate.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Private\OperatorPrivate.cpp" />
     <ClCompile Include="Signal.Connector.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>

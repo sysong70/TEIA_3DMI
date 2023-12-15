@@ -87,6 +87,15 @@
     <ClInclude Include="Operator.SelectionFilter.h">
       <Filter>Operator</Filter>
     </ClInclude>
+    <ClInclude Include="Operator.VisualEffects.h">
+      <Filter>Operator</Filter>
+    </ClInclude>
+    <ClInclude Include="Operator.h">
+      <Filter>Operator</Filter>
+    </ClInclude>
+    <ClInclude Include="Private\OperatorPrivate.h">
+      <Filter>Operator\Private</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -139,6 +148,15 @@
     </ClCompile>
     <ClCompile Include="Operator.SelectionFilter.cpp">
       <Filter>Operator</Filter>
+    </ClCompile>
+    <ClCompile Include="Operator.VisualEffects.cpp">
+      <Filter>Operator</Filter>
+    </ClCompile>
+    <ClCompile Include="Operator.cpp">
+      <Filter>Operator</Filter>
+    </ClCompile>
+    <ClCompile Include="Private\OperatorPrivate.cpp">
+      <Filter>Operator\Private</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

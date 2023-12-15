@@ -174,7 +174,7 @@ void SESSION::Session::ViewCancelCommands()
 }
 //== Command 관련 함수 ===============================================================================
 
-void SESSION::Session::CommandRequestValue(Json::Object & cInObject)
+void SESSION::Session::CommandRequest(Json::Object & cInObject)
 {
-	m_pcDocView->CommandRequestValue(cInObject);
+	m_pcDocView->CommandRequest(cInObject);
 }

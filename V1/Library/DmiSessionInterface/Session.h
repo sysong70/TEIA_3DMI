@@ -35,7 +35,7 @@ namespace SESSION
 		void ViewCancelCommands();
 
 		//== Command 관련 함수 =======================================================================
-		void CommandRequestValue(Json::Object & cInObject);
+		void CommandRequest(Json::Object & cInObject);
 
 	private:
 		int m_nSessionId = -1;

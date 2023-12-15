@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 
-#include "Operator.SelectionFilter.h"
-#include "Private/Operator.HighlightObjectSnapPrivate.h"
+#include "OPERATOR.SelectionFilter.h"
+#include "Private/OPERATOR.HighlightObjectSnapPrivate.h"
 
 #include <3DF/Window.h>
 
