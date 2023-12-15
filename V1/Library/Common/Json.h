@@ -12,7 +12,9 @@ namespace Json
 	class Pair;
 	class Object;
 
-
+#ifdef _DEBUG
+	void UnitTest();
+#endif
 
 	enum class EValueType
 	{
@@ -41,7 +43,14 @@ namespace Json
 
 		virtual ~Array();
 
+	public:
+
 		Array& operator =(const Array& other);
+		//:WARNING - hard compare by string
+		bool operator ==(Array& other);
+		bool operator !=(Array& other);
+		//:WARNING - contents compare (ignore order)
+		bool Compare(Array& other);
 
 	public:
 
@@ -115,6 +124,16 @@ namespace Json
 		Value(const Value& other);
 
 		~Value();
+
+	public:
+
+		//:CHECK
+		Value& operator =(const Value& other);
+		//:WARNING - hard compare by string
+		bool operator ==(Value& other);
+		bool operator !=(Value& other);
+		//:WARNING - contents compare (ignore order)
+		bool Compare(Value& other);
 
 	public: // get value
 
@@ -253,7 +272,14 @@ namespace Json
 
 		virtual ~Object();
 
+	public:
+
 		Object& operator =(const Object& other);
+		//:WARNING - hard compare by string
+		bool operator ==(Object& other);
+		bool operator !=(Object& other);
+		//:WARNING - contents compare (ignore order)
+		bool Compare(Object& other);
 
 		Value& operator [](const char* name);
 

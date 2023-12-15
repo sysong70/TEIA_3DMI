@@ -17,54 +17,65 @@ Json::Array theDummyArray;
 Json::Object theDummyObject;
 Json::Value theDummyValue;
 
+#ifdef _DEBUG
 
-
-namespace UnitTestJson
+void Json::UnitTest()
 {
-	using namespace Json;
+	// set data
 
-	void Test()
-	{
-		// set data
+	Object objectOut;
 
-		Object objectOut;
+	Object& outParent = objectOut.CreateObject("Parent");
+	outParent.SetBoolean("BoolValue", true);
+	outParent.SetInteger("IntegerValue", 0);
 
-		Object& outParent = objectOut.CreateObject("Parent");
-		outParent.SetBoolean("BoolValue", true);
-		outParent.SetInteger("IntegerValue", 0);
+	Object& outChild1 = outParent.CreateObject("Child1");
+	outChild1.SetReal("RaalValue", 1.0);
+	outChild1.SetString("StringValue", L"한글");
 
-		Object& outChild1 = outParent.CreateObject("Child1");
-		outChild1.SetReal("RaalValue", 1.0);
-		outChild1.SetString("StringValue", L"한글");
-
-		Array& outChild2Array = outParent.CreateArray("Child2");
-		for (int i = 0; i < 10; i++) {
-			Object& obj = outChild2Array.AddObject();
-			obj.SetInteger("Index", i);
-			obj.SetString("Name", L"Name" + WStr::ToString(i));
-		}
-
-		// add other types to array (composite type)
-		outChild2Array.AddInteger(1);
-		outChild2Array.AddReal(1.0);
-		outChild2Array.AddBoolean(true);
-
-		CString outBuffer;
-		objectOut.Serialize(outBuffer, 1);
-		TRACE(L"\nOUT-BUFFER\n%s\n", outBuffer);
-
-		// get data
-
-		Object objectIn;
-		wchar_t* pBuffer = (wchar_t*)outBuffer.GetBuffer();
-		Reader::ReadObject(pBuffer, objectIn);
-
-		CString inBuffer;
-		objectIn.Serialize(inBuffer, 1);
-
-		ASSERT(outBuffer == inBuffer);
+	Array& outChild2Array = outParent.CreateArray("Child2");
+	for (int i = 0; i < 10; i++) {
+		Object& obj = outChild2Array.AddObject();
+		obj.SetInteger("Index", i);
+		obj.SetString("Name", L"Name" + WStr::ToString(i));
 	}
+
+	// add other types to array (composite type)
+	outChild2Array.AddInteger(1);
+	outChild2Array.AddReal(1.0);
+	outChild2Array.AddBoolean(true);
+
+	CString outBuffer;
+	objectOut.Serialize(outBuffer, 1);
+	TRACE(L"\nOUT-BUFFER\n%s\n", outBuffer);
+
+	// get data
+
+	Object objectIn;
+	wchar_t* pBuffer = (wchar_t*)outBuffer.GetBuffer();
+	Reader::ReadObject(pBuffer, objectIn);
+
+	CString inBuffer;
+	objectIn.Serialize(inBuffer, 1);
+
+	// hard compare
+
+	ASSERT(outBuffer == inBuffer);
+	ASSERT(objectOut == objectIn);
+
+	// change order, contents compare
+
+	outParent.Remove("BoolValue");
+	outParent.SetBoolean("BoolValue", true);
+	ASSERT(objectOut.Compare(objectIn));
+	ASSERT(objectIn.Compare(objectOut));
+
+	outParent.SetBoolean("BoolValue", false);
+	ASSERT(objectOut.Compare(objectIn) == false);
+	ASSERT(objectIn.Compare(objectOut) == false);
 }
+
+#endif
 
 #pragma region Array Class
 
@@ -99,6 +110,49 @@ Json::Array& Json::Array::operator =(const Array& other)
 	Helper::Load(buffer, *this);
 
 	return *this;
+}
+
+
+
+bool Json::Array::operator==(Array& other)
+{
+	CString left, right;
+
+	Stringify(left);
+	other.Stringify(right);
+
+	return left == right;
+}
+
+
+
+bool Json::Array::operator!=(Array& other)
+{
+	return !(*this == other);
+}
+
+
+
+bool Json::Array::Compare(Array& other)
+{
+	if (m_buffer.size() != other.m_buffer.size()) {
+		return false;
+	}
+
+	for (size_t i = 0; i < m_buffer.size(); i++) {
+		Value* pLeft = m_buffer[i];
+		Value* pRight = other.m_buffer[i];
+
+		if (pLeft == nullptr && pRight == nullptr) {
+			continue;
+		}
+
+		if (pLeft->Compare(*pRight) == false) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 
@@ -398,6 +452,58 @@ Json::Value::Value(const Value& other)
 Json::Value::~Value()
 {
 	Clean();
+}
+
+
+
+Json::Value& Json::Value::operator=(const Value& other)
+{
+	DEBUG_STOP;
+
+	return *this;
+}
+
+
+
+bool Json::Value::operator==(Value& other)
+{
+	CString left, right;
+
+	Stringify(left);
+	other.Stringify(right);
+
+	return left == right;
+}
+
+
+
+bool Json::Value::operator!=(Value& other)
+{
+	return !(*this == other);
+}
+
+
+
+bool Json::Value::Compare(Value& other)
+{
+	if (m_eType != other.m_eType) {
+		return false;
+	}
+
+	switch (m_eType) {
+	case EValueType::Boolean: return m_valueHolder.vBoolean == other.m_valueHolder.vBoolean;
+	case EValueType::Int: return m_valueHolder.vInteger == other.m_valueHolder.vInteger;
+	case EValueType::Uint: return m_valueHolder.vInteger == other.m_valueHolder.vInteger;
+	case EValueType::Real: return m_valueHolder.vReal == other.m_valueHolder.vReal;
+	case EValueType::String: return *m_valueHolder.vString == *other.m_valueHolder.vString;
+	case EValueType::Array: return m_valueHolder.vArray->Compare(*other.m_valueHolder.vArray);
+	case EValueType::Object: return m_valueHolder.vObject->Compare(*other.m_valueHolder.vObject);
+
+	default:
+		RETURN_FALSE;
+	}
+
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -959,6 +1065,47 @@ Json::Object& Json::Object::operator =(const Object& other)
 	Helper::Load(buffer, *this);
 
 	return *this;
+}
+
+
+
+bool Json::Object::operator==(Object& other)
+{
+	CString left, right;
+
+	Stringify(left);
+	other.Stringify(right);
+
+	return left == right;
+}
+
+
+
+bool Json::Object::operator!=(Object& other)
+{
+	return !(*this == other);
+}
+
+
+
+bool Json::Object::Compare(Object& other)
+{
+	if (m_members.size() != other.m_members.size()) {
+		return false;
+	}
+
+	for (auto pair : m_members) {
+		Pair* pOtherValue = other.Look(pair->Name);
+		if (pOtherValue == nullptr) {
+			return false;
+		}
+
+		if (pair->pValue->Compare(*pOtherValue->pValue) == false) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 
