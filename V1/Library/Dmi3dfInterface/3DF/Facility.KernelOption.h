@@ -1,6 +1,8 @@
 ﻿#pragma once
 
+#include "3DF.h"
 #include "Math.h"
+#include "Color.h"
 
 #include "Facility.Base.h"
 
@@ -77,13 +79,6 @@ namespace H3DF
 			HRenderGoochShaded = 23,	//Gooch Shaded
 			HRenderFakeHiddenLine = 24, //fake hidden line
 			HRenderUnknown = 0
-		};
-
-		enum ShadowMode
-		{
-			HShadowNone = 1,  // no shadow
-			HShadowSoft = 2,  // soft shadow
-			HShadowHard = 3   // hard shadow
 		};
 
 		enum DisplayListType
@@ -333,16 +328,16 @@ namespace H3DF
 				struct API_3DF SHADOW
 				{
 					bool checked = false;
-					ShadowMode Mode = HShadowNone;
+					H3DF::VisualEffects::ShadowMode Mode = H3DF::VisualEffects::ShadowMode::Soft;
 					int	Resolution = 3;
 					int	Blurring = 1;
 					bool IgnoreTransparency = false;
-					CString Color = Json::Helper::ToString(RGB(45, 45, 45));
+					CString Color = Json::Helper::ToString(RGB(80, 80, 80));
 					int Opacity = 10;
 
 					int GetResolution();
 					int GetBlurring();
-					COLORREF GetColor();
+					H3DF::RGBAColor GetColor();
 					float GetOpacity();
 
 					Json::Object * Get();
@@ -395,8 +390,8 @@ namespace H3DF
 				struct API_3DF BLOOM
 				{
 					bool checked = false;
-					int Strength = 1;
-					int Blurring = 5;
+					int Strength = 2;
+					int Blurring = 7;
 					int Shape = 0;
 
 					float GetStrength();

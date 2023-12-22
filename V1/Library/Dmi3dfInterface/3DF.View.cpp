@@ -585,7 +585,7 @@ void H3DF::View::SetSimpleShadow(bool bInState, float fInPercentOffset)
 // 	}
 
 	cViewSegment.GetVisualEffectsControl()
-		.SetSimpleShadow(bInState, nResolution, nBlurring)
+		.SetSimpleShadow(bInState, VisualEffects::ShadowMode::Soft, nResolution, nBlurring)
 		.SetSimpleShadowColor(cColor);
 }
 

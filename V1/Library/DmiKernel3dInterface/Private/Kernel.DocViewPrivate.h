@@ -43,26 +43,21 @@ namespace KERNEL
 	public:
 		void AllocationOperator(H3DF::View * pcInView, Signal::Delivery & cDelivery);
 		Operator::OperatorBase * GetOperator(Operator::Type eInType);
+		Operator::HighlightObjectSnap & HighlightOSnapOperator();
 
 	private:
 		Operator::OperatorBase * m_apcOperator[(int)Operator::Type::Count];
 
-		//== Visual Effects 관련 함수 ================================================================
-	public:
-		void SetVisualEffectsShadow();
-		void SetVisualEffectsReflection();
-		void SetVisualEffectsAmbientOcclusion();
-		void SetVisualEffectsSilhouetteEdges();
-		void SetVisualEffectsBloom();
-
 		//== Object Snap 관련 함수 ===================================================================
-		Operator::HighlightObjectSnap * m_pcObjectSnapOperator = nullptr;
+	public:
 		DWORD m_nOSnapMode = 0;
 
+	public:
 		void SetObjectSnap(OSnap::Type eInType);
 
 		//== Selection Filter 관련 함수 ==============================================================
-		DWORD m_nSelectionFilter = 0;
+	public:
+		DWORD m_nSelFilter = 0;
 		void SetSelectionFilter(SelectionFilter::Type eInType);
 
 		//== Command 관련 함수 =======================================================================

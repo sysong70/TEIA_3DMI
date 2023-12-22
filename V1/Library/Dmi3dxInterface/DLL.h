@@ -17,6 +17,7 @@ extern "C" {
 
 	_declspec (dllexport) bool TDFImportFile(CString pchFilePathName, H3DF::SegmentKey & cModelSegmentKey, Signal::Delivery & cInDelivery, CString & strErrorMessage);
 
+
 #ifdef __cplusplus
 }
 #endif

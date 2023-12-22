@@ -28,7 +28,7 @@ namespace H3DF
 		VisualEffectsControl & SetTextAntiAliasing(bool bInState);
 		VisualEffectsControl & SetLineAntiAliasing(bool bInState);
 
-		VisualEffectsControl & SetSimpleShadow(bool bInState, UINT nInResolution = 256, UINT nInBlurring = 1, bool bInIgnoreTransparency = false);
+		VisualEffectsControl & SetSimpleShadow(bool bInState, H3DF::VisualEffects::ShadowMode eMode = H3DF::VisualEffects::ShadowMode::Soft, UINT nInResolution = 256, UINT nInBlurring = 1, bool bInIgnoreTransparency = false);
 
 		/*
 			// Manipulates the state of simple shadows, projected onto a plane.  The state is implicitly on.

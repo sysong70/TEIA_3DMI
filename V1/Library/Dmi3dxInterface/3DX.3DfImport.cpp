@@ -36,7 +36,6 @@
 #include <Path.h>
 
 #ifdef _DEBUG
-//#	define new DEBUG_NEW
 #	define USED_LOG_MANAGER
 #endif
 //#	define USED_LOG_MANAGER
@@ -1110,9 +1109,10 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 				eStatus = ParseRiBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
 			break;
 
-			case kA3DTypeRiPolyBrepModel:
+			case kA3DTypeRiPolyBrepModel: {
+				H3DF::Utility::SetTopologyType(cSegment, TopologyType::Solid);
 				eStatus = DrawRiPolyBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
-			break;
+			} break;
 
 			case kA3DTypeRiCurve:
 			case kA3DTypeRiPolyWire:
@@ -1181,7 +1181,6 @@ A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcRepItem,
 	A3D_INITIALIZE_DATA(A3DRootBaseData, cRootBaseData);
 	CHECK_A3D_RETURN(A3DRootBaseGet(pcRepItem, &cRootBaseData));
 	m_pchRepresentationItemName = cRootBaseData.m_pcName;
-
 
 /*
 	A3DRiBrepModelData cBrepModelData;
@@ -2579,7 +2578,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 				acWirePoints[k] = m_pcPoints[cTess3dData.m_puiWireIndexes[nStartWireIndex + index++] / 3];
 			}
 
-			cCurrnetSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
+			LineKey cLineKey = cCurrnetSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
 		}
 	
 		cConFaceInfo.nOutTriSizeIndex = 0;	// 한 Triangle Type당 하나씩
@@ -2668,7 +2667,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 
 	LogDecreaseTabIndex(2);
 
-	Log(2, L"DrawTess3D: %s, %d, Style Count: %d", LogHexStr((DWORD_PTR) pcTess3D), nTriangleFaceCount, m_mFaceMaterialMappingStyleMap.GetCount());
+	Log(2, L"DrawTess3D [InsertShell]: %s, %d, Style Count: %d", LogHexStr((DWORD_PTR) pcTess3D), nTriangleFaceCount, m_mFaceMaterialMappingStyleMap.GetCount());
 
 	CHECK_A3D_RETURN(A3DTess3DGet(nullptr, &cTess3dData));
 

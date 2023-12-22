@@ -648,31 +648,15 @@ bool H3DF::SelectionItem::ShowPath(KeyPath & cOutPath) const
 	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	int nIncludeCount = pcImpl->nIncludeCount;
-	size_t nPathCount = nIncludeCount + 2;
-	HC_KEY * pnPath = new HC_KEY[nPathCount];
+	return pcImpl->ShowPath(cOutPath);
+}
 
-	HC_KEY nSegmentKey = pcImpl->cKey.KeyValue();
+void H3DF::SelectionItem::ShowPathString(CString & strOutPath)
+{
+	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
 
-	char chType[MVO_BUFFER_SIZE];
-	HC_Show_Key_Type(nSegmentKey, chType);
-
-	if (!streq(chType, "segment")) {
-		nSegmentKey = HC_KShow_Owner_Original_Key(nSegmentKey);
-	}
-
-	pnPath[0] = nSegmentKey;
-
-	for (int nIndex = 1; nIndex < nIncludeCount; ++nIndex) {
-		pnPath[nIndex] = pcImpl->pnIncludeKeys[nIncludeCount - nIndex];
-	}
-
-	pnPath[nPathCount - 2] = HC_KShow_Owner_Original_Key(pnPath[nPathCount - 3]);
-	pnPath[nPathCount - 1] = INVALID_KEY;
-
-	cOutPath = KeyPath(nPathCount, pnPath);
-
-	return true;
+	pcImpl->ShowPathString(strOutPath);
 }
 
 bool H3DF::SelectionItem::ShowSelectionPosition(WindowPoint & cOutLocation) const

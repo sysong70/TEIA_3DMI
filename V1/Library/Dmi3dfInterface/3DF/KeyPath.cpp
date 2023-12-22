@@ -58,7 +58,7 @@ public:
 		m_vKeys.resize(nInKeyCount);
 
 		for (size_t nIndex = 0; nIndex < m_vKeys.size(); nIndex++) {
-			m_aPaths[nIndex].SetKeyValue(m_vKeys[nIndex]);
+			m_aPaths[nIndex].SetKeyValue(pInKeys[nIndex]);
 			m_vKeys[nIndex] = pInKeys[nIndex];
 		}
 	}
@@ -136,10 +136,22 @@ H3DF::KeyPath::KeyPath(size_t nInPathCount, Key const pInPath[])
 
 H3DF::KeyPath::KeyPath(size_t nInPathCount, HC_KEY const pInPath[])
 {
-	m_pcImpl = new KeyPathPrivate();
+	KeyPathPrivate * pcImpl = new KeyPathPrivate();
+	DEBUG_VALID(pcImpl);
 
-	KeyPathPrivate * pcImpl = (KeyPathPrivate *)m_pcImpl;
 	pcImpl->Set(nInPathCount, pInPath);
+
+	m_pcImpl = pcImpl;
+}
+
+H3DF::KeyPath::KeyPath(KeyPath const & cInThat)
+{
+	KeyPathPrivate * pcImpl = new KeyPathPrivate();
+	DEBUG_VALID(pcImpl);
+	m_pcImpl = pcImpl;
+
+	KeyPathPrivate * pcInThatImpl = (KeyPathPrivate *)cInThat.m_pcImpl;
+	pcImpl->Copy(pcInThatImpl);
 }
 
 H3DF::KeyPath::KeyPath(char chKeyPath[])

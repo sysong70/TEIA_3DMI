@@ -31,6 +31,69 @@
 
 using namespace H3DF;
 
+//== SelectionItemPrivate class ====================================================================
+
+bool H3DF::SelectionItemPrivate::ShowPath(KeyPath & cOutPath) const
+{
+	size_t nPathCount = nIncludeCount + 2;
+	HC_KEY * pnPath = new HC_KEY[nPathCount];
+
+	HC_KEY nSegmentKey = cKey.KeyValue();
+
+	char chType[MVO_BUFFER_SIZE];
+	HC_Show_Key_Type(nSegmentKey, chType);
+
+	if (!streq(chType, "segment")) {
+		nSegmentKey = HC_KShow_Owner_Original_Key(nSegmentKey);
+	}
+
+	pnPath[0] = nSegmentKey;
+
+	for (int nIndex = 1; nIndex < nIncludeCount; ++nIndex) {
+		pnPath[nIndex] = pnIncludeKeys[nIncludeCount - nIndex];
+	}
+
+	pnPath[nPathCount - 2] = HC_KShow_Owner_Original_Key(pnPath[nPathCount - 3]);
+	pnPath[nPathCount - 1] = INVALID_KEY;
+
+	cOutPath = KeyPath(nPathCount, pnPath);
+
+	return true;
+}
+
+bool H3DF::SelectionItemPrivate::ShowPathString(CString & strOutPath)
+{
+	KeyPath cPath;
+	if (false == ShowPath(cPath)) {
+		return false;
+	}
+
+	CString strText;
+	char chType[MVO_BUFFER_SIZE];
+
+	HC_KEY nKey = cKey.KeyValue();
+	HC_Show_Key_Type(nKey, chType);
+	strText.Format(L"Select Key: %d [%s]", nKey, Utility::ToString(chType));
+	strOutPath += strText;
+
+	nKey = cPath.At(0).KeyValue();
+	HC_Show_Key_Type(nKey, chType);
+	strText.Format(L"\nOwner of select key: %d [%s]", nKey, Utility::ToString(chType));
+	strOutPath += strText;
+
+	for (int nIndex = 1; nIndex < nIncludeCount; ++nIndex) {
+		nKey = cPath.At(nIndex).KeyValue();
+		HC_Show_Key_Type(nKey, chType);
+		strText.Format(L"\nInclude Key: %d [%s]", nKey, Utility::ToString(chType));
+		strOutPath += strText;
+	}
+
+	nKey = cPath.At(cPath.Size() - 2).KeyValue();
+	HC_Show_Key_Type(nKey, chType);
+	strText.Format(L"\nOwner of last include key: %d [%s]", nKey, Utility::ToString(chType));
+	strOutPath += strText;
+}
+
 //== SelectionResultsPrivate class =================================================================
 
 bool H3DF::SelectionResultsPrivate::Sort()
@@ -245,7 +308,7 @@ size_t H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, S
 
 	} while (HC_Find_Related_Selection());
 
-	return pcResultsPrivate->Size();
+	return cOutResults.GetCount();
 }
 
 int H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)

@@ -148,7 +148,8 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 			break;
 
 		case Signal::View::Action::OnResize:
-			pcSession->ViewResize(cInObject);
+			// Resize를 하면 속도 저하가 발생함. 그리고 할 필요가 없음.
+			//pcSession->ViewResize(cInObject);
 			break;
 
 		case Signal::View::Action::OnMouseMove:

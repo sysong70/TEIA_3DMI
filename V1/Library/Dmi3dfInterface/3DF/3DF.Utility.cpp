@@ -247,6 +247,26 @@ bool H3DF::Utility::ShowSegmentName(SegmentKey & cInSegment, CString & strName)
 	return true;
 }
 
+bool H3DF::Utility::SetTopologyType(SegmentKey & cInSegment, TopologyType eInType)
+{
+	int nSize = sizeof(USHORT);
+	cInSegment.SetUserData((intptr_t)UserDataIndex::Topology, sizeof(USHORT), (BYTE *)eInType);
+
+	return true;
+}
+
+bool H3DF::Utility::ShowTopologyType(SegmentKey & cInSegment, TopologyType & eOutType)
+{
+	ByteArray aUserData;
+	if (false == cInSegment.ShowUserData((intptr_t)UserDataIndex::Topology, aUserData)) {
+		return false;
+	}
+
+	eOutType = (TopologyType)((USHORT)aUserData.data());
+
+	return true;
+}
+
 bool H3DF::Utility::UnicodeToChar(CString strText, char *& pchBuffer)
 {
 	int nBufferSize = 0;
@@ -327,6 +347,16 @@ bool H3DF::Utility::CharToUnicode(char * pchText, CString & strText)
 	delete [] pchBuffer;
 
 	return true;
+}
+
+CString H3DF::Utility::ToString(char * pchText)
+{
+	CString strText;
+	if (false == CharToUnicode(pchText, strText)) {
+		return CString();
+	}
+
+	return strText;
 }
 
 CString H3DF::Utility::GetExecuteDirectory()

@@ -84,9 +84,6 @@
     <ClInclude Include="Private\Operator.HighlightObjectSnapPrivate.h">
       <Filter>Operator\Private</Filter>
     </ClInclude>
-    <ClInclude Include="Operator.SelectionFilter.h">
-      <Filter>Operator</Filter>
-    </ClInclude>
     <ClInclude Include="Operator.VisualEffects.h">
       <Filter>Operator</Filter>
     </ClInclude>
@@ -145,9 +142,6 @@
     </ClCompile>
     <ClCompile Include="Private\Operator.HighlightObjectSnapPrivate.cpp">
       <Filter>Operator\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="Operator.SelectionFilter.cpp">
-      <Filter>Operator</Filter>
     </ClCompile>
     <ClCompile Include="Operator.VisualEffects.cpp">
       <Filter>Operator</Filter>

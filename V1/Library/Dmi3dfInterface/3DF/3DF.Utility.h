@@ -17,15 +17,21 @@ namespace H3DF
 
 		CString GetTypeString(Type eType);
 
-
+		//== Segment User Data 관련 함수 ============================================================= 
 		API_3DF bool SetSegmentName(SegmentKey & cInSegment, CString strName);
 		API_3DF bool ShowSegmentName(SegmentKey & cInSegment, CString & strName);
 
+		API_3DF bool SetTopologyType(SegmentKey & cInSegment, TopologyType eInType);
+		API_3DF bool ShowTopologyType(SegmentKey & cInSegment, TopologyType & eOutType);
+
+		// == String 관련 함수 =======================================================================
 		// 사용후 Buffer를 삭제해야 함.
 		API_3DF bool UnicodeToChar(CString strText, char *& pchBuffer);
 		API_3DF bool UnicodeToChar(CString strText, char *& pchBuffer, int & nBufferSize);
 		API_3DF CStringA ToChar(CString strText);
+
 		API_3DF bool CharToUnicode(char * pchText, CString & strText);
+		API_3DF CString ToString(char * pchText);
 
 		CString GetExecuteDirectory();
 

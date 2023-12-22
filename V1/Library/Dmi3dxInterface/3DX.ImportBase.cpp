@@ -18,8 +18,8 @@ ImportBase::ImportBase(_3DXSignal::Interface * pc3dxInterface)
 
 ImportBase::~ImportBase()
 {
-	A3DDllTerminate();
-	A3DSDKUnloadLibrary();
+ 	A3DDllTerminate();
+ 	A3DSDKUnloadLibrary();
 }
 
 // == 3DX 설정 관련 함수 ==============================================================================

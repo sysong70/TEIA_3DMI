@@ -2,7 +2,13 @@
 
 #include "OPERATOR.HighlightObjectSnapPrivate.h"
 
+#include "../Signal/Signal.h"
+#include "../Common/Common_Define.h"
+
+
 #include <Private/View.Private.h>
+
+#include <3DF.View.h>
 
 #include <3DF/Window.h>
 #include <3DF/Private/WindowPrivate.h>
@@ -19,6 +25,7 @@
 #include <3DF/Material.h>
 
 #include <3DF/Selection.h>
+#include <3DF/Private/SelectionPrivate.h>
 
 #include <3DF/Highlight.h>
 #include <3DF/Visibility.h>
@@ -110,12 +117,10 @@ bool KERNEL::Operator::HighlightObjectSnapPrivate::SnapItem::operator == (const 
 
 
 //== ObjectSnap class ==============================================================================
-KERNEL::Operator::HighlightObjectSnapPrivate::HighlightObjectSnapPrivate(H3DF::WindowKey * pcWindow)
+KERNEL::Operator::HighlightObjectSnapPrivate::HighlightObjectSnapPrivate(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery) :
+	OperatorPrivate(pcInView, pcInDelivery)
 {
-	m_pcWindow = pcWindow;
-
-	SegmentKey cConstruction(m_pcWindow->GetBaseView()->GetConstructionKey());
-	//SegmentKey cConstruction(m_pcWindow->GetBaseView()->GetSceneKey());
+	SegmentKey cConstruction(Window().GetBaseView()->GetConstructionKey());
 
 	m_cSnapPointSegment = cConstruction.Subsegment(L"SnapPoint");
 
@@ -150,14 +155,8 @@ KERNEL::Operator::HighlightObjectSnapPrivate::HighlightObjectSnapPrivate(H3DF::W
 	m_nPrevMouseMoveTickCount = GetTickCount();
 	m_nSelectPickCount = 300;
 
-	m_nOSnapMode += (DWORD) OSnap::Type::EndPoint;
-	m_nOSnapMode += (DWORD) OSnap::Type::MidPoint;
-	m_nOSnapMode += (DWORD) OSnap::Type::Center;
-	m_nOSnapMode += (DWORD) OSnap::Type::Intersection;
-	m_nOSnapMode += (DWORD) OSnap::Type::Perpendicular;
-	m_nOSnapMode += (DWORD) OSnap::Type::Quadrant;
-	m_nOSnapMode += (DWORD) OSnap::Type::OnSurface;
-	m_nOSnapMode += (DWORD) OSnap::Type::Axis;
+	m_nOSnapMode = 0;
+	m_nSelFilter = 0;
 }
 
 //== Mouse Event ===================================================================================
@@ -191,7 +190,7 @@ int KERNEL::Operator::HighlightObjectSnapPrivate::NoButtonDownAndMove(int nFlags
 		return HLISTENER_PASS_EVENT;
 	}
 
-	WindowPoint cWindowPoint(*m_pcWindow, cMousePoint);
+	WindowPoint cWindowPoint(Window(), cMousePoint);
 
 	SelectionResults cSelections;
 	DoDynamicHighlighting(cWindowPoint, cSelections);
@@ -224,10 +223,11 @@ int KERNEL::Operator::HighlightObjectSnapPrivate::NoButtonDownAndMove(int nFlags
 				continue;
 			}
 
-			PixelPoint cPixelPoint(*m_pcWindow, cSnapPoint.cPoint);
+			PixelPoint cPixelPoint(Window(), cSnapPoint.cPoint);
 
 			double dDist = cPixelPoint.DistanceWith(cMousePoint);
 
+			// Object Snap Point가 선택된 경우 관련된 Entity를 선택한다.
 			if (15 > dDist) {
 				cSnapPoint.eStatus = HighlightObjectSnapPrivate::Status::Selected;
 
@@ -240,20 +240,28 @@ int KERNEL::Operator::HighlightObjectSnapPrivate::NoButtonDownAndMove(int nFlags
 				HighlightOptionsKit cHighlightOptions;
 				cHighlightOptions.SetNotification(false);
 
+				HC_KEY nHighlightSelectionKey = Window().GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
+				HC_Open_Segment_By_Key(nHighlightSelectionKey); {
+					HC_Set_Line_Weight(m_fLineWeight);
+				} HC_Close_Segment();
+
 				// 맨 처음에는 기존 Hightlight를 삭제한다.
+				if (0 < m_cOldHighlightSelection.GetCount()) {
+					Window().GetHighlightControl().Unhighlight(m_cOldHighlightSelection, cHighlightOptions);
+					m_cOldHighlightSelection.Reset();
+				}
+				
 				bool bInRemoveExisting = true;
 				for (auto & pcSelItem : pcSnapItem->vcItems) {
-					m_pcWindow->GetHighlightControl().Highlight(pcSelItem, cHighlightOptions, bInRemoveExisting);
+					Window().GetHighlightControl().Highlight(pcSelItem, cHighlightOptions, bInRemoveExisting);
+					// 추가를 해줘야 Unhighlight를 시킬수 있음.
+					m_cOldHighlightSelection.PushBack(new SelectionItem(pcSelItem));
 					bInRemoveExisting = false;
 				}
 
-				if (0 < m_cOldHighlightSelection.GetCount()) {
-					m_pcWindow->GetHighlightControl().Unhighlight(m_cOldHighlightSelection, cHighlightOptions);
-				}
+				Window().GetBaseView()->SetSuppressUpdate(false);
 
-				m_pcWindow->GetBaseView()->SetSuppressUpdate(false);
-
-				m_pcWindow->Update();
+				Window().Update();
 
 				return HLISTENER_PASS_EVENT;
 			}
@@ -293,7 +301,7 @@ int KERNEL::Operator::HighlightObjectSnapPrivate::NoButtonDownAndMove(int nFlags
 		}
 	}
 
-	// m_pcWindow->GetBaseView()->SetSuppressUpdate(false);
+	// Window().GetBaseView()->SetSuppressUpdate(false);
 
 	nMouseMoveTickCount = GetTickCount();
 	nTickCount = nMouseMoveTickCount - m_nPrevMouseMoveTickCount;
@@ -301,8 +309,8 @@ int KERNEL::Operator::HighlightObjectSnapPrivate::NoButtonDownAndMove(int nFlags
 	TRACE(L"Update Start, Tick: %d\n", nTickCount);
 
 	if (true == bForceUpdate) {
-		//m_pcWindow->Update();
-		m_pcWindow->GetBaseView()->ForceUpdate();
+		//Window().Update();
+		Window().GetBaseView()->ForceUpdate();
 
 		nMouseMoveTickCount = GetTickCount();
 		nTickCount = nMouseMoveTickCount - m_nPrevMouseMoveTickCount;
@@ -310,7 +318,7 @@ int KERNEL::Operator::HighlightObjectSnapPrivate::NoButtonDownAndMove(int nFlags
 		TRACE(L"ForceUpdate, Tick: %d\n", nTickCount);
 	}
 	else {
-		m_pcWindow->Update();
+		Window().Update();
 
 		nMouseMoveTickCount = GetTickCount();
 		nTickCount = nMouseMoveTickCount - m_nPrevMouseMoveTickCount;
@@ -322,11 +330,9 @@ int KERNEL::Operator::HighlightObjectSnapPrivate::NoButtonDownAndMove(int nFlags
 }
 
 // 2.1 Dynamic Highlight 처리
-bool KERNEL::Operator::HighlightObjectSnapPrivate::DoDynamicHighlighting(WindowPoint cMousePoint, SelectionResults & cSelections)
+bool KERNEL::Operator::HighlightObjectSnapPrivate::DoDynamicHighlighting(WindowPoint cMousePoint, SelectionResults & cOutSelections)
 {
-	DEBUG_VALID(m_pcWindow);
-
-	BaseView * pcView = m_pcWindow->GetBaseView();
+	BaseView * pcView = Window().GetBaseView();
 	DEBUG_VALID(pcView);
 
 	if (pcView->GetSuppressUpdateTick() || pcView->GetSuppressUpdate() || !pcView->GetModel()->GetFileLoadComplete()) {
@@ -339,7 +345,7 @@ bool KERNEL::Operator::HighlightObjectSnapPrivate::DoDynamicHighlighting(WindowP
 	// 전달되는 값에는 Line이 빠지지 않고 전달된다. Line은 Polyline을 함께 포함하고 있음.
 
 
-/*	HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetOverwriteKey()); {
+/*	HC_Open_Segment_By_Key(Window().GetBaseView()->GetOverwriteKey()); {
 		//HC_Set_Selectability("everything = off, lines = on");
 // 		HC_Set_Rendering_Options("attribute lock = (line weight)");
  		HC_Set_Line_Weight(1.9);
@@ -349,22 +355,31 @@ bool KERNEL::Operator::HighlightObjectSnapPrivate::DoDynamicHighlighting(WindowP
 	float fProximity = 0.2f;
 	SelectionOptionsKit cSelectOption;
 	cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(15).SetProximity(0.2f); // .SetBias(Selection::Bias::Lines);
-	SelectionResults cHighlightSelection;
-	size_t nResult = m_pcWindow->GetSelectionControl().SelectByPoint(cMousePoint, cSelectOption, cHighlightSelection);
 
-// 	HC_Open_Segment_By_Key(m_pcWindow->GetBaseView()->GetOverwriteKey()); {
+	SelectionResults cSelections;
+	size_t nResult = Window().GetSelectionControl().SelectByPoint(cMousePoint, cSelectOption, cSelections);
+	
+// 	cSelectOption.SetLevel(Selection::Level::Segment);
+// 	nResult = Window().GetSelectionControl().SelectByPoint(cMousePoint, cSelectOption, cSelections);
+
+	SelectionResults cHighlightSelection;
+	ApplySelectionFilter(cSelections, cHighlightSelection);
+
+// 	HC_Open_Segment_By_Key(Window().GetBaseView()->GetOverwriteKey()); {
 // 		HC_Set_Selectability("everything = off, faces = on");
 // 		HC_UnSet_Line_Weight();
 // 	} HC_Close_Segment();
 
 // 	cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(3).SetProximity(0.1f);// .SetBias(Selection::Bias::None);
-// 	nResult += m_pcWindow->GetSelectionControl().SelectByPoint(cMousePoint, cSelectOption, cHighlightSelection);
+// 	nResult += Window().GetSelectionControl().SelectByPoint(cMousePoint, cSelectOption, cHighlightSelection);
+
+	nResult = cHighlightSelection.GetCount();
 
 	// 선택된 요소가 없는 경우 Deselect All을 하고 Update를 한다.
 	if(0 == nResult) {
 		if(0 < m_cOldHighlightSelection.GetCount()) {
-			m_pcWindow->GetBaseView()->GetHighlightSelection()->DeSelectAll();
-			m_pcWindow->GetBaseView()->ForceUpdate();
+			Window().GetBaseView()->GetHighlightSelection()->DeSelectAll();
+			Window().GetBaseView()->ForceUpdate();
 			m_cOldHighlightSelection.Reset();
 		}
 
@@ -423,33 +438,85 @@ bool KERNEL::Operator::HighlightObjectSnapPrivate::DoDynamicHighlighting(WindowP
 		}
 	}
 
-	m_pcWindow->GetBaseView()->GetHighlightSelection()->DeSelectAll();
+	Window().GetBaseView()->GetHighlightSelection()->DeSelectAll();
 
 	H3DF::HighlightOptionsKit cOption;
 	if(0 < cHighlightSelection.GetCount()) {
 		if(H3DF::Type::LineKey == pcFrontItem->Type()) {
-			float fLineWeight = 3.0;
-			HC_KEY nHighlightSelectionKey = m_pcWindow->GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
+			HC_KEY nHighlightSelectionKey = Window().GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
 			HC_Open_Segment_By_Key(nHighlightSelectionKey); {
-				HC_Set_Line_Weight(fLineWeight);
+				HC_Set_Line_Weight(m_fLineWeight);
 			} HC_Close_Segment();
 		}
 		else {
 			float fLineWeight = 1.0;
-			HC_KEY nHighlightSelectionKey = m_pcWindow->GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
+			HC_KEY nHighlightSelectionKey = Window().GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
 			HC_Open_Segment_By_Key(nHighlightSelectionKey); {
 				HC_Set_Line_Weight(fLineWeight);
 			} HC_Close_Segment();
 		}
 
-		cSelections.PushBack(new SelectionItem(*pcFrontItem));
-		m_pcWindow->GetHighlightControl().Highlight(*pcFrontItem, cOption);
+		// CString strPath;
+		// pcFrontItem->ShowPathString(strPath);
+
+		cOutSelections.PushBack(new SelectionItem(*pcFrontItem));
+		Window().GetHighlightControl().Highlight(*pcFrontItem, cOption);
 		bNeedUpdate = true;
 	}
 
-	m_cOldHighlightSelection = cSelections;
+	m_cOldHighlightSelection = cOutSelections;
 
 	return true;
+}
+
+// 2.2 Selection filter 적용
+// 선택된 요소에서 Selection Filter를 적용해서 새로운 Selection을 만든다.
+void KERNEL::Operator::HighlightObjectSnapPrivate::ApplySelectionFilter(H3DF::SelectionResults & cInSelections, H3DF::SelectionResults & cOutSelections)
+{
+	SelectionResultsIterator cIter = cInSelections.GetIterator();
+
+// 	m_nSelFilter += (DWORD)SelectionFilter::Type::Point;
+// 	m_nSelFilter += (DWORD)SelectionFilter::Type::Curve;
+// 	m_nSelFilter += (DWORD)SelectionFilter::Type::Edge;
+// 	m_nSelFilter += (DWORD)SelectionFilter::Type::Face;
+// 	m_nSelFilter += (DWORD)SelectionFilter::Type::Solid;
+// 	m_nSelFilter += (DWORD)SelectionFilter::Type::Axis;
+// 	m_nSelFilter += (DWORD)SelectionFilter::Type::PMI;
+
+	while (true == cIter.IsValid()) {
+		SelectionItem * pcNextItem = cIter.GetItem();
+
+		if (H3DF::Type::LineKey == pcNextItem->Type()) {
+			if (m_nSelFilter & (DWORD)SelectionFilter::Type::Curve || m_nSelFilter & (DWORD)SelectionFilter::Type::Edge) {
+				cOutSelections.PushBack(new SelectionItem(*pcNextItem));
+			}
+		}
+		else if (H3DF::Type::ShellKey == pcNextItem->Type()) {
+			if (m_nSelFilter & (DWORD)SelectionFilter::Type::Solid) {
+
+				Key cItemKey;
+				pcNextItem->ShowSelectedItem(cItemKey);
+
+				// CString strPath;
+				// pcNextItem->ShowPathString(strPath);
+		
+				SegmentKey cOwner = cItemKey.Owner();
+
+				SelectionItem * pcOwnerItem = new SelectionItem(*pcNextItem);
+				SelectionItemPrivate * pcItemPrivate = (SelectionItemPrivate *)pcOwnerItem->GetImpl();
+
+				pcItemPrivate->cKey = cOwner;
+
+				cOutSelections.PushBack(pcOwnerItem);
+			}
+			else if (m_nSelFilter & (DWORD)SelectionFilter::Type::Face) {
+				cOutSelections.PushBack(new SelectionItem(*pcNextItem));
+			}
+		}
+
+		cIter.Next();
+	}
+
 }
 
 // 기존값과 다른 값이 입력되면 확인해서 삭제하거나 추가한다.
@@ -483,8 +550,13 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::SetObjectSnapMode(DWORD nInSn
 
 	if (true == bFindEraseType) {
 		DrawSnapItems();
-		// m_pcWindow->GetBaseView()->Update();
+		// Window().GetBaseView()->Update();
 	}
+}
+
+void KERNEL::Operator::HighlightObjectSnapPrivate::SetSelectionFilter(DWORD nInSelFilter)
+{
+	m_nSelFilter = nInSelFilter;
 }
 
 //== 1. Object Snap 계산 ============================================================================
@@ -635,7 +707,7 @@ bool KERNEL::Operator::HighlightObjectSnapPrivate::CalculationLienObjectSnapPoin
 	// Near Point는 별도값으로 저장해야 계속해서 나타나는 문제를 해결할 수 있다.
 	if (m_nOSnapMode & (DWORD) OSnap::Type::NearPoint) {
 		WorldPoint cNearPoint;
-		if (true == cLine.NearPoint(*m_pcWindow, cMatrix, cInPoint, cNearPoint)) {
+		if (true == cLine.NearPoint(Window(), cMatrix, cInPoint, cNearPoint)) {
 			//AddSnapItem(psSnapItem, cNearPoint, Type::NearPoint);
 		}
 	}
@@ -726,7 +798,7 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::DrawSnapItems()
 		} SegmentKeyPrivate::ForcedClose(m_cSnapPointSegment);
 		
 
-		m_pcWindow->GetBaseView()->ForceUpdate();
+		Window().GetBaseView()->ForceUpdate();
 	}
 }
 
@@ -846,8 +918,8 @@ double KERNEL::Operator::HighlightObjectSnapPrivate::PixelToWorld(double unit)
 {
 	PixelPoint pixel1;
 	PixelPoint pixel2(unit, 0, 0);
-	WorldPoint world1(*m_pcWindow, pixel1);
-	WorldPoint world2(*m_pcWindow, pixel2);
+	WorldPoint world1(Window(), pixel1);
+	WorldPoint world2(Window(), pixel2);
 	Vector vector = world2 - world1;
 
 	return vector.Length();
@@ -855,9 +927,7 @@ double KERNEL::Operator::HighlightObjectSnapPrivate::PixelToWorld(double unit)
 
 bool KERNEL::Operator::HighlightObjectSnapPrivate::ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo)
 {
-	DEBUG_VALID(m_pcWindow);
-
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(m_pcWindow->GetImpl());
+	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(Window().GetImpl());
 
 	SegmentKey cSecne(pcWindowKeyPrivate->GetSceneKey());
 
@@ -871,8 +941,8 @@ bool KERNEL::Operator::HighlightObjectSnapPrivate::ShowCameraInformation(float f
 
 	PixelPoint cPixelPoint1;
 	PixelPoint cPixelPoint2(fInRadius, 0, 0);
-	WorldPoint cWorldPoint1(*m_pcWindow, cPixelPoint1);
-	WorldPoint cWorldPoint2(*m_pcWindow, cPixelPoint2);
+	WorldPoint cWorldPoint1(Window(), cPixelPoint1);
+	WorldPoint cWorldPoint2(Window(), cPixelPoint2);
 	Vector cVector = cWorldPoint2 - cWorldPoint1;
 	cOutInfo.dObjectSnapRadius = cVector.Length();
 
@@ -926,7 +996,7 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::ClearSnapItems(bool bUpdate)
 	m_cSnapPointSegment.Close();
 
 	if (true == bUpdate) {
-		m_pcWindow->GetBaseView()->Update();
+		Window().GetBaseView()->Update();
 	}
 }
 
@@ -942,3 +1012,4 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::ResetSnapItem()
 
 #undef TheEnvironment
 #undef TheSession
+

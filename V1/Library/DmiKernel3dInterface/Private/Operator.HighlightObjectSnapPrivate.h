@@ -2,6 +2,8 @@
 
 #include "../Kernel.h"
 
+#include "OperatorPrivate.h"
+
 #include <3DF/3DF.h>
 #include <3DF/Math.h>
 
@@ -17,7 +19,7 @@ namespace KERNEL
 	{
 		class SnapItem;
 
-		class HighlightObjectSnapPrivate : public PrivateImpl
+		class HighlightObjectSnapPrivate : public OperatorPrivate
 		{
 		public:
 			enum class Status
@@ -57,16 +59,18 @@ namespace KERNEL
 				std::vector <H3DF::SelectionItem> vcItems;
 			};
 
-			HighlightObjectSnapPrivate() = default;
-			HighlightObjectSnapPrivate(H3DF::WindowKey * pcWindow);
+			HighlightObjectSnapPrivate(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
 
 			int LButtonDownAndMove(int nFlags, int x, int y);
 			int NoButtonDownAndMove(int nFlags, int x, int y);
-			bool DoDynamicHighlighting(H3DF::WindowPoint cMousePoint, H3DF::SelectionResults & cSelections);
+			bool DoDynamicHighlighting(H3DF::WindowPoint cMousePoint, H3DF::SelectionResults & cOutSelections);
 
 			void SetObjectSnapMode(DWORD nInSnapMode);
-
+			void SetSelectionFilter(DWORD nInSelFilter);
+		
 		protected:
+			void ApplySelectionFilter(H3DF::SelectionResults & cInSelections, H3DF::SelectionResults & cOutSelections);
+
 			void CalculationObjectSnapPoint(H3DF::SelectionResults & cInItems);
 			bool CalculationLienObjectSnapPoint(const H3DF::SelectionItem * pcInSelectionItem, const H3DF::WindowPoint & cInPoint);
 			void CalculationLienAndLineObjectSnapPoint(const H3DF::SelectionItem * cInItems1, const H3DF::SelectionItem * cInItems2,
@@ -90,20 +94,21 @@ namespace KERNEL
 		protected:
 			H3DF::SelectionResults m_cNewHighlightSelection;
 			H3DF::SelectionResults m_cOldHighlightSelection;
+			H3DF::SelectionResults m_cOldOSnapHighlightSelection;
 			H3DF::SelectionResults m_cHighlightSelection;
-
-			H3DF::WindowKey * m_pcWindow = nullptr;
 
 			H3DF::SegmentKey m_cSnapPointSegment;
 
 			float m_fSnapRadius = 8;
+			float m_fLineWeight = 3;
 
 			H3DF::Point m_cPrevPoint;
 
-			DWORD m_nOSnapMode{}; // Object snap 
+			DWORD m_nOSnapMode; // Object snap 
+			DWORD m_nSelFilter;
 
-			DWORD m_nPrevMouseMoveTickCount{};
-			DWORD m_nSelectPickCount{};
+			DWORD m_nPrevMouseMoveTickCount;
+			DWORD m_nSelectPickCount;
 
 			std::vector<SnapItem *> m_vSnapItems;
 			SnapItem m_cNearSnapItem;

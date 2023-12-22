@@ -8,21 +8,13 @@
 using namespace KERNEL;
 
 //== ObjectSnap class ==============================================================================
-
-KERNEL::Operator::HighlightObjectSnap::HighlightObjectSnap()
+KERNEL::Operator::HighlightObjectSnap::HighlightObjectSnap(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
 {
-	auto * pcImpl = new HighlightObjectSnapPrivate();
+	auto * pcImpl = new HighlightObjectSnapPrivate(pcInView, pcInDelivery);
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;
-}
 
-KERNEL::Operator::HighlightObjectSnap::HighlightObjectSnap(H3DF::WindowKey * pcWindow)
-{
-	auto * pcImpl = new HighlightObjectSnapPrivate(pcWindow);
-	DEBUG_VALID(pcImpl);
-
-	m_pcImpl = pcImpl;
 }
 
 int KERNEL::Operator::HighlightObjectSnap::LButtonDownAndMove(int nFlags, int x, int y)
@@ -57,4 +49,13 @@ void KERNEL::Operator::HighlightObjectSnap::SetObjectSnapMode(DWORD nInSnapMode)
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetObjectSnapMode(nInSnapMode);
+}
+
+
+void KERNEL::Operator::HighlightObjectSnap::SetSelectionFilter(DWORD nInSelFilter)
+{
+	auto * pcImpl = static_cast<HighlightObjectSnapPrivate *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->SetSelectionFilter(nInSelFilter);
 }

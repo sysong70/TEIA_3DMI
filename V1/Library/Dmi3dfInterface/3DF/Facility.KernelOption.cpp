@@ -670,7 +670,7 @@ bool Facility::KernelOption::VISUALEFFECTS::SHADOW::Set(Json::Object * pData)
 	}
 
 	SetBooleanValue(checked);
-	SetEnumValue(Mode, ShadowMode);
+	SetEnumValue(Mode, VisualEffects::ShadowMode);
 	SetIntegerValue(Resolution);
 	SetIntegerValue(Blurring);
 	SetBooleanValue(IgnoreTransparency);
@@ -685,8 +685,11 @@ int Facility::KernelOption::VISUALEFFECTS::SHADOW::GetResolution()
 {
 	// Type: int (32~1024), default value: 256
 	// UI: default value: 3, range: 1 ~ 10
-	float fStep = (1024 - 32) / 10.0f;
-	int nValue = (int)(Resolution * fStep);
+	int nStartValue = 32;
+	float fRange = 1024 - 32;
+	float fUiRange = 10 - 1;
+
+	int nValue = (int)(nStartValue + fRange / fUiRange * (Resolution - 1));
 	return nValue;
 }
 
@@ -695,8 +698,11 @@ int Facility::KernelOption::VISUALEFFECTS::SHADOW::GetBlurring()
 {
 	// Type: int (1~31), default value: 1
 	// UI: default value: 1, range: 1 ~ 10
-	float fStep = (31 - 1) / 10.0f;
-	int nValue = (int) (Blurring * fStep);
+	int nStartValue = 1;
+	float fRange = 31 - 1;
+	float fUiRange = 10 - 1;
+
+	int nValue = (int)(nStartValue + fRange / fUiRange * (Blurring - 1));
 	return nValue;
 }
 
@@ -705,15 +711,19 @@ float Facility::KernelOption::VISUALEFFECTS::SHADOW::GetOpacity()
 {
 	// Type: Type: float (0~1), default value: 1.0f
 	// UI: default value: 10, range: 1 ~ 10
-	float fStep = (1 - 0) / 10.0f;
-	float fValue = Opacity * fStep;
+	int nStartValue = 0;
+	float fRange = 1 - 0;
+	float fUiRange = 10 - 1;
+
+	float fValue = (float)(nStartValue + fRange / fUiRange * (Opacity - 1));
 	return fValue;
 }
 
-COLORREF Facility::KernelOption::VISUALEFFECTS::SHADOW::GetColor()
+H3DF::RGBAColor Facility::KernelOption::VISUALEFFECTS::SHADOW::GetColor()
 {
-	COLORREF nColor = Json::Helper::ToColor(Color);
-	return nColor;
+	RGBAColor cOutputColor(Json::Helper::ToColor(Color));
+	cOutputColor.alpha = GetOpacity();
+	return cOutputColor;
 }
 
 // 3-1. Plane Reflection을 Json Object로 반환
@@ -749,8 +759,11 @@ float Facility::KernelOption::VISUALEFFECTS::PLANEREFLECTION::GetOpacity()
 {
 	// Type: Type: float (0~1), default value: 0.5f
 	// UI: default value: 5, range: 1 ~ 10
-	float fStep = (1 - 0) / 10.0f;
-	float fValue = Opacity * fStep;
+	int nStartValue = 0;
+	float fRange = 1 - 0;
+	float fUiRange = 10 - 1;
+
+	float fValue = (float)(nStartValue + fRange / fUiRange * (Opacity - 1));
 	return fValue;
 }
 
@@ -759,8 +772,11 @@ int Facility::KernelOption::VISUALEFFECTS::PLANEREFLECTION::GetBlurring()
 {
 	// Type: int (1~31), default value: 1
 	// UI: default value: 1, range: 1 ~ 10
-	float fStep = (31 - 1) / 10.0f;
-	int nValue = (int) (Blurring * fStep);
+	int nStartValue = 1;
+	float fRange = 31 - 1;
+	float fUiRange = 10- 1;
+
+	int nValue = (int)(nStartValue + fRange / fUiRange * (Blurring - 1));
 	return nValue;
 }
 
@@ -795,8 +811,11 @@ float Facility::KernelOption::VISUALEFFECTS::AMBIENTOCCLUSION::GetStrength()
 {
 	// Type: float(1 - 100), default value : 1.0f
 	// UI: default value: 20, range: 1 ~ 20
-	float fStep = (100 - 1) / 20.0f;
-	float fValue = Strength * fStep;
+	int nStartValue = 1;
+	float fRange = 5 - 1;
+	float fUiRange = 20 - 1;
+
+	float fValue = (float)(nStartValue + fRange / fUiRange * (Strength - 1));
 	return fValue;
 }
 
@@ -836,9 +855,13 @@ bool Facility::KernelOption::VISUALEFFECTS::SILHOUETTEEDGES::Set(Json::Object * 
 float Facility::KernelOption::VISUALEFFECTS::SILHOUETTEEDGES::GetTolerance()
 {
 	// Type: float(1 - 100), default value : 1.0f
-	// UI: default value: 20, range: 1 ~ 20
-	float fStep = (100 - 1) / 20.0f;
-	float fValue = Tolerance * fStep;
+	// UI: default value: 1, range: 1 ~ 20
+
+	int nStartValue = 1;
+	float fRange = 100 - 1;
+	float fUiRange = 20 - 1;
+
+	float fValue = (float)(nStartValue + fRange / fUiRange * (Tolerance - 1));
 	return fValue;
 }
 
@@ -873,20 +896,26 @@ bool Facility::KernelOption::VISUALEFFECTS::BLOOM::Set(Json::Object * pData)
 // 6-3. 실제 적용가능한 Strength 값 반환
 float Facility::KernelOption::VISUALEFFECTS::BLOOM::GetStrength()
 {
-	// Type: float(1 - 100), default value : 1.0f
-	// UI: default value: 20, range: 1 ~ 20
-	float fStep = (100 - 1) / 20.0f;
-	float fValue = Strength * fStep;
+	// Type: float(0 - 10), default value : 1.0f
+	// UI: default value: 1, range: 1 ~ 10
+	int nStartValue = 0;
+	float fRange = 10 - 0;
+	float fUiRange = 10 - 1;
+
+	float fValue = (float)(nStartValue + fRange / fUiRange * (Strength - 1));
 	return fValue;
 }
 
-// 6-4. 실제 적용가능한 Blurring 값 반환
 int Facility::KernelOption::VISUALEFFECTS::BLOOM::GetBlurring()
 {
-	// Type: int (1~31), default value: 1
-	// UI: default value: 1, range: 1 ~ 10
-	float fStep = (31 - 1) / 10.0f;
-	int nValue = (int) (Blurring * fStep);
+	// Type: int (1~8), default value: 5
+	// UI: default value: 7, range: 1 ~ 10
+
+	int nStartValue = 0;
+	float fRange = 8 - 1;
+	float fUiRange = 10 - 1;
+
+	int nValue = (int)(nStartValue + fRange / fUiRange  * (Blurring - 1));
 	return nValue;
 }
 

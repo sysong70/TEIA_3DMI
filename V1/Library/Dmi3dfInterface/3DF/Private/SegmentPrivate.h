@@ -19,7 +19,7 @@ namespace H3DF
 		void Copy(SegmentKeyPrivate * pcInThat);
 
 		//== Segment 관련 함수 ===========================================================================
-		
+/*
 		// 부분 함수(Local Function)에서 사용하는 함수
 		void LocalOpen();
 		void LocalOpen() const;
@@ -49,6 +49,7 @@ namespace H3DF
 
 		HC_KEY const KeyValue() const;
 		void SetKeyValue(HC_KEY nInKey);
+*/
 
 		void SetColor(CString strInGeometryName, RGBAColor cInColor);
 
@@ -57,8 +58,7 @@ namespace H3DF
 
 	private:
 		BaseView * m_pcBaseView = nullptr;
-
-		mutable bool m_bOpen = false;
-		mutable bool m_bForcedOpen = false; // 개발자가 직접 Open해서 Close를 제어한다. 일반적인 Open과 Close는 적용되지 않는다.
+// 		mutable bool m_bOpen = false;
+// 		mutable bool m_bForcedOpen = false; // 개발자가 직접 Open해서 Close를 제어한다. 일반적인 Open과 Close는 적용되지 않는다.
 	};
 }

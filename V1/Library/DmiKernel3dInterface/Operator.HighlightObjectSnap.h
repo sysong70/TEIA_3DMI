@@ -3,17 +3,18 @@
 #include <3DF/3DF.h>
 #include <3DF/Math.h>
 
-#include "Object.h"
+#include "Operator.h"
+
+#include "../Signal/Signal.h"
 
 namespace KERNEL
 {
 	namespace Operator
 	{
-		class HighlightObjectSnap : public Object
+		class HighlightObjectSnap : public OperatorBase
 		{
 		public:
-			HighlightObjectSnap();
-			HighlightObjectSnap(H3DF::WindowKey * pcWindow);
+			HighlightObjectSnap(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
 
 			int LButtonDownAndMove(int nFlags, int x, int y);
 			
@@ -22,6 +23,8 @@ namespace KERNEL
 			void DrawSnapItems();
 
 			void SetObjectSnapMode(DWORD nInSnapMode);
+
+			void SetSelectionFilter(DWORD nInSelFilter);
 		};
 	}
 }

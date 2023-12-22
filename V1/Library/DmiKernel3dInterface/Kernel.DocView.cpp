@@ -43,11 +43,9 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cD
 
 	pcImpl->AllocationOperator(&pcImpl->m_cCanvas.GetFrontView(), cDelivery);
 
-	pcImpl->m_pcObjectSnapOperator = new KERNEL::Operator::HighlightObjectSnap(&pcImpl->m_cCanvas.GetFrontView().GetWindowKey());
+	//pcImpl->m_pcHighlightOSnapOperator = new KERNEL::Operator::HighlightObjectSnap(&pcImpl->m_cCanvas.GetFrontView().GetWindowKey());
 
 	pcImpl->m_cCanvas.FileOpen(cInObject, cDelivery);
-	
-	cDelivery.view.SetValidation();
 }
 
 // 2. H3DF View Destruct 함수
@@ -172,10 +170,10 @@ void KERNEL::DocView::MouseMove(int nFlag, int x, int y)
 	pcImpl->m_cCanvas.GetFrontView().MouseMove(nFlag, x, y);
 
 	if (!(MK_LBUTTON & nFlag) && !(MK_RBUTTON & nFlag)) {
-		pcImpl->m_pcObjectSnapOperator->NoButtonDownAndMove(nFlag, x, y);
+		pcImpl->HighlightOSnapOperator().NoButtonDownAndMove(nFlag, x, y);
 	}
 	else if(MK_LBUTTON & nFlag) {
-		pcImpl->m_pcObjectSnapOperator->LButtonDownAndMove(nFlag, x, y);
+		pcImpl->HighlightOSnapOperator().LButtonDownAndMove(nFlag, x, y);
 	}
 
 /*
@@ -208,7 +206,7 @@ void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 	pcImpl->m_cCanvas.GetFrontView().LButtonUp(nFlag, x, y);
 
 	if (H3DF::ViewControl::Mode::ZoomBox == eMode) {
-		pcImpl->m_pcObjectSnapOperator->DrawSnapItems();
+		pcImpl->HighlightOSnapOperator().DrawSnapItems();
 		pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(false);
 		pcImpl->m_cCanvas.GetFrontView().Update();
 	}
@@ -244,7 +242,7 @@ void KERNEL::DocView::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 
 	pcImpl->m_cCanvas.GetFrontView().MouseWheel(nFlag, zDelta, x, y, nLeft, nTop);
 
-	pcImpl->m_pcObjectSnapOperator->DrawSnapItems();
+	pcImpl->HighlightOSnapOperator().DrawSnapItems();
 
 	pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(false);
 
@@ -473,38 +471,6 @@ void KERNEL::DocView::SetViewDirection(int nDirectionId)
 			assert(false);
 			break;
 
-	}
-}
-
-//== Visual Effects 관련 함수 ========================================================================
-
-// 1. Visual Effects 설정
-void KERNEL::DocView::SetVisualEffects(int nEffectId)
-{
-	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
-	if (nullptr == pcImpl) { DEBUG_RETURN; }
-
-	switch (nEffectId)
-	{
-		case HOME_3D_CMD_VisualEffects_Shadow:
-			pcImpl->SetVisualEffectsShadow();
-			break;
-
-		case HOME_3D_CMD_VisualEffects_Reflection:
-			pcImpl->SetVisualEffectsReflection();
-			break;
-
-		case HOME_3D_CMD_VisualEffects_AmbientOcclusion:
-			pcImpl->SetVisualEffectsAmbientOcclusion();
-			break;
-
-		case HOME_3D_CMD_VisualEffects_SilhouetteEdges:
-			pcImpl->SetVisualEffectsSilhouetteEdges();
-			break;
-
-		case HOME_3D_CMD_VisualEffects_Bloom:
-			pcImpl->SetVisualEffectsBloom();
-			break;
 	}
 }
 

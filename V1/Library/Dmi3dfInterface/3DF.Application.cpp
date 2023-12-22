@@ -128,16 +128,28 @@ CStringA H3DF::ApplicationPrivate::ErrorCategoryString(int nId)
 			strMessage = "Driver";
 			break;
 
-		case HEC_HANDEDNESS:
+		case HEC_HANDEDNESS: // 9
 			strMessage = "Handedness";
 			break;
 
-		case HEC_HEURISTIC:
+		case HEC_HEURISTIC: // 10
 			strMessage = "Heuristic";
 			break;
 
-		case HEC_HOOPS_SYSTEM:
+		case HEC_HOOPS_SYSTEM: // 11
 			strMessage = "Hoops System";
+			break;
+
+		case HEC_METAFILE: // 12
+			strMessage = "Metafile";
+			break;
+
+		case HEC_MODELLING_MATRIX:  // 13
+			strMessage = "Modelling Matrix";
+			break;
+
+		case HEC_RENDERING: // 15
+			strMessage = "Rendering";
 			break;
 
 		case HEC_INVALID_KEY:
@@ -231,6 +243,18 @@ CStringA H3DF::ApplicationPrivate::ErrorSpecificString(int nId)
 
 		case HES_INVALID_KEY: // 202
 			strMessage = "Invalid key";
+			break;
+
+		case HES_INVALID_PROJECTION: // 213
+			strMessage = "Invalid Projection";
+			break;
+
+		case HES_INVALID_RANGE: // 214
+			strMessage = "Invalid Range";
+			break;
+
+		case HES_INVALID_REFERENCE: // 215
+			strMessage = "Invalid Reference";
 			break;
 		
 		case HES_NON_UNIFORM_HANDEDNESS: // 256

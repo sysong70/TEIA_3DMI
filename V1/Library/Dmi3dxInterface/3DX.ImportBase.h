@@ -23,6 +23,7 @@ private:
 	// == 3DX 설정 관련 함수 =========================================================================
 public:
 	bool InitializeA3DLibrary(CString & strErrorMessage);
+
 	bool SetLicense(CString & strErrorMessage);
 	bool Reset(CString & strErrorMessage);
 

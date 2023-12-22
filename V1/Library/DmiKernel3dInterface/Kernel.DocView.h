@@ -54,7 +54,6 @@ namespace KERNEL
 		//== Style 관련 함수 =========================================================================
 		void SetViewStyle(int nStyleId);
 		void SetViewDirection(int nDirectionId);
-		void SetVisualEffects(int nEffectId);
 
 		//== Command 관련 함수 =======================================================================
 		void CommandRequest(Json::Object & cInObject);

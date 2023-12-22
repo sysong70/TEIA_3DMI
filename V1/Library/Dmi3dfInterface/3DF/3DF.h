@@ -234,11 +234,21 @@ namespace H3DF
 
 	enum class UserDataIndex : uint32_t
 	{
-		None = 0x00000000,
+		None									= 0x00000000,
 
 		// Item 관련 User Data Index
-		Type = 0x10000000,
-		Name = 0x10000001,
+		Type									= 0x10000000,
+		Name									= 0x10000001,
+		Topology								= 0x10000002,
+	};
+
+	enum class TopologyType : uint32_t
+	{
+		None									= 0x00000000,
+
+		Type									= 0x10000000,
+		Solid									= 0x10000000,
+		Edge									= 0x10000001,
 	};
 
 	class API_3DF ViewDirection
@@ -373,11 +383,11 @@ namespace H3DF
 	class API_3DF VisualEffects
 	{
 	public:
-		enum class ShadowMode // 숫자값을 바꾸면 않됨.
+		enum class ShadowMode
 		{
-			None = 1,  // no shadow
-			Soft = 2,  // soft shadow
-			Hard = 3   // hard shadow
+			None = 0,
+			Soft = 1,
+			Hard = 2
 		};
 
 	private:

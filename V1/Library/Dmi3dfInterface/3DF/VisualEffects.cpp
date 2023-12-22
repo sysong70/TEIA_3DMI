@@ -120,10 +120,6 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetBloomEnabled(bool bInState
 	DEBUG_VALID(pcBaseView);
 
 	if (nullptr != pcBaseView) {
-		float fBloomStrength = 1.0f;
-		int nBloomBlur = 5;
-		HBloomShape eBloomShape = RadialBloom;
-
 		HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
 			CStringA strOption;
 			strOption.Format("bloom = (%s, strength = %f, blur = %d, shape = %s)",
@@ -207,7 +203,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetLineAntiAliasing(bool bInS
 //	param: in_resolution The width and height of the simple shadow.  Valid range is [32, 1024].
 //	param: in_blurring The level of blurring (softening) that is applied to the shadow.  Valid range is [1,31].
 //	param: in_ignore_transparency Whether any segment-level transparency setting should be ignored when rendering the simple shadow.
-VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleShadow(bool bInState, UINT nInResolution, UINT nInBlurring, bool bInIgnoreTransparency)
+VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleShadow(bool bInState, H3DF::VisualEffects::ShadowMode eMode, UINT nInResolution, UINT nInBlurring, bool bInIgnoreTransparency)
 {
 	VisualEffectsControlPrivate * pcImpl = static_cast<VisualEffectsControlPrivate *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -217,11 +213,21 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleShadow(bool bInState
 
 	if (nullptr != pcBaseView) {
 		if (true == bInState) {
-			//pcBaseView->SetShadowMode((HShadowMode)H3DF::VisualEffects::ShadowMode::Hard);
-			pcBaseView->SetShadowMode((HShadowMode) H3DF::VisualEffects::ShadowMode::Soft);
+			if (H3DF::VisualEffects::ShadowMode::Soft == eMode) {
+				// HShadowHard 모드에서 생성된 Segment를 Flush 하기 위해서 HShadowNone을 실행시켜야 함.
+				pcBaseView->SetShadowMode(HShadowMode::HShadowNone);
+
+				pcBaseView->SetShadowMode(HShadowMode::HShadowSoft);
+			}
+			else if(H3DF::VisualEffects::ShadowMode::Hard == eMode) {
+				pcBaseView->SetShadowMode(HShadowMode::HShadowHard);
+			}
+			else {	
+				pcBaseView->SetShadowMode(HShadowMode::HShadowNone);
+			}
 		}
 		else {
-			pcBaseView->SetShadowMode((HShadowMode) H3DF::VisualEffects::ShadowMode::None);
+			pcBaseView->SetShadowMode(HShadowMode::HShadowNone);
 		}
 
 		if (32 <= nInResolution && nInResolution <= 1024) {
@@ -251,12 +257,11 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleShadowColor(RGBAColo
 	if (nullptr != pcBaseView) {
 		pcBaseView->SetShadowColor(HPoint(cInColor.red, cInColor.green, cInColor.blue));
 
-		if (1.0f > cInColor.alpha) {
-			char chOption[MVO_BUFFER_SIZE];
-			HC_Open_Segment_By_Key(pcBaseView->GetSceneKey()); {
-				sprintf(chOption, "simple shadow = (opacity = %f)", cInColor.alpha);
-			} HC_Close_Segment();
-		}
+		char chOption[MVO_BUFFER_SIZE];
+		HC_Open_Segment_By_Key(pcBaseView->GetSceneKey()); {
+			sprintf(chOption, "simple shadow = (opacity = %f)", cInColor.alpha);
+			HC_Set_Rendering_Options(chOption);
+		} HC_Close_Segment();
 	}
 
 	return *this;

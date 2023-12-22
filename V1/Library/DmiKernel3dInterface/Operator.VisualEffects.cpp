@@ -71,6 +71,8 @@ KERNEL::Operator::VisualEffectsPrivate::VisualEffectsPrivate(const H3DF::View * 
 // 1. UI에서 전달되는 요청사항을 처리하는 최초 함수
 void KERNEL::Operator::VisualEffectsPrivate::Request(Json::Object & cInObject)
 {
+	int nViewId = cInObject.GetInteger(SKW_VIEWID);
+
 	Delivery().taskBar.ResponseValue(HOME_3D_LST_VisualEffects, *m_cOption.Get(), *m_pcDefaultSetting);
 }
 
@@ -117,7 +119,7 @@ void KERNEL::Operator::VisualEffectsPrivate::SetShadow(TheVisualEffects::SHADOW 
 	int nBlurring = cInOption.GetBlurring();
 
 	View().GetSegmentKey().GetVisualEffectsControl().SetSimpleShadow(
-		cInOption.checked, nResolution, nBlurring, cInOption.IgnoreTransparency)
+		cInOption.checked, cInOption.Mode, nResolution, nBlurring, cInOption.IgnoreTransparency)
 		.SetSimpleShadowColor(cInOption.GetColor());
 }
 
@@ -150,9 +152,9 @@ void KERNEL::Operator::VisualEffectsPrivate::SetBloom(TheVisualEffects::BLOOM & 
 {
 	float fStrength = cInOption.GetStrength();
 	int nBlurring = cInOption.GetBlurring();
-	int nShape = cInOption.Shape;
 
-	View().GetSegmentKey().GetVisualEffectsControl().SetBloomEnabled(cInOption.checked, fStrength, nBlurring, nShape);
+	View().GetSegmentKey().GetVisualEffectsControl().SetBloomEnabled(cInOption.checked, 
+		fStrength, nBlurring, cInOption.Shape);
 }
 
 //== Visual Effects class ==========================================================================

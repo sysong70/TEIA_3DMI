@@ -112,7 +112,7 @@ namespace H3DF
 	protected:
 		static bool GetKeyState(unsigned int key, int & flags);
 		void SetMarkupColor(COLORREF new_color, bool emit_message = true);
-		void SetShadowColor(COLORREF new_color);
+		void SetShadowColor(RGBAColor cInColor);
 		static void event_checker(HIC_Rendition const * nr);
 
 		void SetViewAxis();

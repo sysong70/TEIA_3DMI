@@ -910,8 +910,8 @@ bool H3DF::ViewPrivate::Init(H3DF::Model * pcInModel, const char * pchInDriverTy
 	SetShadowColor(TheKenel.VisualEffects.Shadow.GetColor());
 
 	m_pcBaseView->GetMarkupManager()->SetMarkupWeight(ThePreset.MarkupWeight / 100.0f);
-	m_pcBaseView->SetShadowResolution(TheKenel.VisualEffects.Shadow.Resolution);
-	m_pcBaseView->SetShadowBlurring(TheKenel.VisualEffects.Shadow.Blurring);
+// 	m_pcBaseView->SetShadowResolution(TheKenel.VisualEffects.Shadow.GetResolution());
+// 	m_pcBaseView->SetShadowBlurring(TheKenel.VisualEffects.Shadow.Blurring);
 
 	// set the color index interpolation settings
 	m_pcBaseView->SetColorInterpolation(ThePreset.CiByValue);
@@ -1298,10 +1298,10 @@ void H3DF::ViewPrivate::SetMarkupColor(COLORREF new_color, bool emit_message)
 	m_pcBaseView->GetMarkupManager()->SetMarkupColor(new_mkp_color);
 }
 
-void H3DF::ViewPrivate::SetShadowColor(COLORREF new_color)
+void H3DF::ViewPrivate::SetShadowColor(RGBAColor cInColor)
 {
 	HPoint new_shd_color;
-	new_shd_color.Set(ColorValue(new_color));
+	new_shd_color.Set(cInColor.red, cInColor.green, cInColor.blue);
 	m_pcBaseView->SetShadowColor(new_shd_color);
 }
 
@@ -1329,11 +1329,11 @@ void H3DF::ViewPrivate::event_checker(HIC_Rendition const * nr)
 			pCurrentView->SetUpdateInterrupted(true);
 		}
 
-		// 		if (PeekMessage(&msg, pCurrentView->m_hWnd, WM_MOUSEWHEEL, WM_MOUSEWHEEL, PM_NOREMOVE))
-		// 		{
-		// 			HIC_Abort_Update(nr);
-		// 			SetUpdateInterrupted(true);
-		// 		}
+// 		if (PeekMessage(&msg, pCurrentView->m_hWnd, WM_MOUSEWHEEL, WM_MOUSEWHEEL, PM_NOREMOVE))
+// 		{
+// 			HIC_Abort_Update(nr);
+// 			SetUpdateInterrupted(true);
+// 		}
 	}
 	int state = GetAsyncKeyState(VK_RBUTTON);
 	if (state & 32768)
@@ -1688,7 +1688,7 @@ void H3DF::ViewPrivate::ViewReady()
 		HC_Set_Rendering_Options(opt);
 	} HC_Close_Segment();
 
-
+/*
 	HC_Open_Segment_By_Key(GetBaseView()->GetSceneKey()); {
 		if (ThePreset.ShadowMap) {
 			HC_Set_Visibility("shadows = (emitting, casting, receiving)");
@@ -1721,6 +1721,7 @@ void H3DF::ViewPrivate::ViewReady()
 
 		HC_Set_Rendering_Options(opt);
 	} HC_Close_Segment();
+*/
 
 	GetBaseView()->SetShadowLightDirection(ThePreset.UseLightVector, (HPoint *)&ThePreset.LightVector);
 	GetBaseView()->SetShadowIgnoresTransparency(TheKenel.VisualEffects.Shadow.IgnoreTransparency);

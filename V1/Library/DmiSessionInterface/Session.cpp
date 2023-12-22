@@ -104,18 +104,6 @@ void SESSION::Session::ViewExecuteCommand(Json::Object & cInObject)
 
 	switch (nId)
 	{
-		case HOME_3D_CMD_VisualEffects_Shadow:
-		case HOME_3D_CMD_VisualEffects_Reflection:
-		case HOME_3D_CMD_VisualEffects_AmbientOcclusion:
-		case HOME_3D_CMD_VisualEffects_SilhouetteEdges:
-		case HOME_3D_CMD_VisualEffects_Bloom:
-			m_pcDocView->SetVisualEffects(nId);
-			return;
-			break;
-	}
-
-	switch (nId)
-	{
 		case HOME_3D_CMD_Pan:
 		case HOME_3D_CMD_Zoom_Fit:
 		case HOME_3D_CMD_Zoom_Area:
