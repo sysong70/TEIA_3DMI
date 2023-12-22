@@ -445,6 +445,28 @@ namespace Json
 		COLORREF ToColor(CString value);
 		// target: Hex value, only RGB
 		CString ToString(COLORREF value);
+
+		// Coordinate
+
+		/*
+			array or object type, fill in pTarget
+		
+			Object source; 
+			float coord[3] = {};
+
+			if (GetCoordinate(source.FindValue("POINT1), coord) == true) {
+				//:TODO
+			}
+		*/
+		bool GetCoordinate(Value* pSource, float* pTarget);
+		/*
+			return new value(array or object) of coordinate
+
+			float coord[3] = { 0.1, 0.2, 0.3 };
+			Object data;
+			data.SetValue("POINT1", GetCoordinate(coord));
+		*/
+		Value* GetCoordinate(float* pSource, bool useArray = true, bool is3d = true);
 	}
 
 

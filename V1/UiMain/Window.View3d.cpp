@@ -120,6 +120,8 @@ void Window::View3d::ReceiveSignal(Json::Object* pData)
 		}
 	}
 	else if (target == Signal::Target::TaskBar) {
+		ASSERT(data.GetInteger(SKW_VIEWID, -1) == m_nViewId);
+
 		if (m_pActiveCommand != nullptr) {
 			m_pActiveCommand->ReceiveSignal(pData);
 			return;

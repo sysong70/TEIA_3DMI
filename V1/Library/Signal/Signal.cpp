@@ -594,6 +594,7 @@ void Signal::TaskBar::ConstructData(Json::Object& data, Action action)
 {
 	data.SetInteger(SKW_TARGET, (int)Target::TaskBar);
 	data.SetInteger(SKW_ACTION, (int)action);
+	data.SetInteger(SKW_VIEWID, Wrapper().ViewId);
 }
 
 

@@ -174,6 +174,8 @@ namespace WStr
 		ASSERT(std::abs(result1 - 3.141592) < 0.0000001);
 		ASSERT(std::abs(result1 - result2) < 0.0000001);
 	*/
+	float ToFloat(const wchar_t* value);
+
 	double ToDouble(const wchar_t* value);
 
 	/*

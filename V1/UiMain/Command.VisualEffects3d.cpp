@@ -177,19 +177,6 @@ void Command::VisualEffects3d::Run(Window::View* pView)
 {
 	__super::Run(pView);
 
-	//:TEMP
-
-	//Component::TaskBar& taskBar = TheApplication.GetMainFrame().GetTaskBar();
-	//Json::Object& data = TheAppResources.GetTask(PRESET::TaskName);
-
-	//VisualEffects3dPanel* pPanel = new VisualEffects3dPanel(&data);
-	//pPanel->Initialize(&taskBar);
-	//pPanel->SetDefaultData(data.GetAt("default"));
-	//pPanel->SetData(data.GetAt("default"));
-
-	//taskBar.SetPanel(pPanel);
-	//taskBar.Show(m_pView);
-
 	Component::TaskBar& taskBar = TheApplication.GetMainFrame().GetTaskBar();
 	taskBar.SetParent((CWnd*)pView);
 	taskBar.GetDelivery().taskBar.OnRequestValue(PRESET::CommandId);

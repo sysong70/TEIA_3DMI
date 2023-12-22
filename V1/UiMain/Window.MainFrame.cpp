@@ -88,10 +88,13 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 	case Signal::Target::View:
 	case Signal::Target::TaskBar:
 	{
-		int id = data.GetInteger(SKW_VIEWID);
+		int id = data.GetInteger(SKW_VIEWID, -1);
 		View* pView = TheApplication.FindView(id);
 		if (pView != nullptr) {
 			pView->PostMessage((int)EUserMessage::OnSignal, (WPARAM)pData);
+		}
+		else {
+			DEBUG_STOP;
 		}
 	} break;
 
@@ -178,9 +181,10 @@ void Window::MainFrame::ShowTaskBar(bool show)
 void Window::MainFrame::ViewChanged(UINT message, View* pView)
 {
 	if (message == WM_ACTIVATE) {
-		m_pActiveView = pView;
 		m_panelBar.ViewChanged(&pView->m_tabs);
 	}
+
+	m_pActiveView = pView;
 }
 
 

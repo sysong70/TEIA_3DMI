@@ -20,7 +20,6 @@ static char THIS_FILE[] = __FILE__;
 namespace PresetView
 {
 	int ViewIndex = 0;
-	const UINT_PTR ActivateDelayTimer = 1234567;
 
 	enum EPanelId
 	{
@@ -382,19 +381,6 @@ void Window::View::OnSize(UINT nType, int cx, int cy)
 
 
 
-
-void Window::View::OnTimer(UINT_PTR nIDEvent)
-{
-	if (nIDEvent == PRESET::ActivateDelayTimer) {
-		KillTimer(nIDEvent);
-		m_bActivate = true;
-	}
-
-	__super::OnTimer(nIDEvent);
-}
-
-
-
 void Window::View::Activate(bool value)
 {
 	if (m_bRenderer) {
@@ -402,22 +388,16 @@ void Window::View::Activate(bool value)
 
 		if (value) {
 			GetMainFrame().ViewChanged(WM_ACTIVATE, this);
-			//DelayViewActivation();
 			m_toolBar.ShowWindow(SW_SHOW);
 			m_historyBar.ShowWindow(SW_SHOW);
 		}
 		else {
 			m_toolBar.ShowWindow(SW_HIDE);
 			m_historyBar.ShowWindow(SW_HIDE);
+			//:CHECK
+			CancelCommand();
 		}
 	}
-}
-
-
-
-void Window::View::DelayViewActivation()
-{
-	SetTimer(PRESET::ActivateDelayTimer, 100, nullptr);
 }
 
 

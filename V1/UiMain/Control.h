@@ -9,6 +9,7 @@
 namespace Control
 {
 	class CheckListBox;
+	class CoordEdit;
 	class HistoryBar;
 	class PropList;
 	class TabWnd;

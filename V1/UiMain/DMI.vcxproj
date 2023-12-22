@@ -181,6 +181,7 @@
     <ClInclude Include="Command.h" />
     <ClInclude Include="Command.VisualEffects3d.h" />
     <ClInclude Include="Component.Input.h" />
+    <ClInclude Include="Control.CoordEdit.h" />
     <ClInclude Include="Control.TaskPanel.h" />
     <ClInclude Include="Control.CheckListBox.h" />
     <ClInclude Include="Control.Property.h" />
@@ -243,6 +244,7 @@
     <ClCompile Include="Command.Base.cpp" />
     <ClCompile Include="Command.VisualEffects3d.cpp" />
     <ClCompile Include="Component.Input.cpp" />
+    <ClCompile Include="Control.CoordEdit.cpp" />
     <ClCompile Include="Control.TaskPanel.cpp" />
     <ClCompile Include="Control.CheckListBox.cpp" />
     <ClCompile Include="Control.cpp" />

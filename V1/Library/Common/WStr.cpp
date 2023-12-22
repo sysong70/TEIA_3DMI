@@ -432,6 +432,13 @@ void WStr::RemoveTo(CString& source, wchar_t ch)
 
 #pragma region Cast Functions
 
+float WStr::ToFloat(const wchar_t* value)
+{
+	return ::wcstof(value, nullptr);
+}
+
+
+
 double WStr::ToDouble(const wchar_t* value)
 {
 	return ::wcstod(value, nullptr);

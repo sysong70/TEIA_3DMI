@@ -98,8 +98,6 @@ namespace Window
 
 		afx_msg void OnSize(UINT nType, int cx, int cy);
 
-		afx_msg void OnTimer(UINT_PTR nIDEvent);
-
 		DECLARE_MESSAGE_MAP()
 
 	protected:
@@ -112,8 +110,6 @@ namespace Window
 		Signal::Delivery m_delivery;
 
 		void Activate(bool value);
-		// delay view activation by 0.1 seconds (for mouse)
-		void DelayViewActivation();
 
 		CRect GetClientArea();
 

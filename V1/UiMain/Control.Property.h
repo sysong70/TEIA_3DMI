@@ -390,8 +390,6 @@ namespace Property
 
 	private:
 
-		SliderCtrl* m_pSlider = nullptr;
-
 		int m_minValue = INT_MIN;
 		int m_maxValue = INT_MAX;
 		int m_step = 1;

@@ -2060,6 +2060,91 @@ CString Json::Helper::ToString(COLORREF value)
 	return buffer;
 }
 
+//:WARNING - Signal.h, Delivery Keywords
+#ifndef SKW_X
+#define SKW_X "x"
+#define SKW_Y "y"
+#define SKW_Z "z"
+#endif
+
+bool Json::Helper::GetCoordinate(Value* pSource, float* pTarget)
+{
+
+	if (pSource == nullptr || pTarget == nullptr) {
+		RETURN_FALSE;
+	}
+
+	CString x, y, z;
+
+	if (pSource->IsArray()) {
+		Array& array = pSource->AsArray();
+		switch (array.GetSize()) {
+		case 2:
+			x = array[0]->AsString();
+			y = array[1]->AsString();
+			break;
+
+		case 3:
+			x = array[0]->AsString();
+			y = array[1]->AsString();
+			z = array[2]->AsString();
+			break;
+
+		default:
+			RETURN_FALSE;
+		}
+	}
+	else if (pSource->IsObject()) {
+		Object& object = pSource->AsObject();
+
+		ASSERT(object.FindValue(SKW_X) != nullptr);
+		ASSERT(object.FindValue(SKW_Y) != nullptr);
+		ASSERT(object.GetValue(SKW_X).IsString());
+
+		x = object.GetString(SKW_X);
+		y = object.GetString(SKW_Y);
+		z = object.GetString(SKW_Z);
+	}
+
+	if (x.IsEmpty() || y.IsEmpty()) {
+		RETURN_FALSE;
+	}
+
+	pTarget[0] = WStr::ToFloat(x);
+	pTarget[1] = WStr::ToFloat(y);
+	pTarget[2] = WStr::ToFloat(z);
+
+	return true;
+}
+
+Json::Value* Json::Helper::GetCoordinate(float* pSource, bool useArray, bool is3d)
+{
+	Value& target = *(new Value());
+	CString x = WStr::ToString(pSource[0]);
+	CString y = WStr::ToString(pSource[1]);
+
+	if (useArray) {
+		Array& array = target.CreateArray();
+
+		array.AddString(x);
+		array.AddString(y);
+		if (is3d) {
+			array.AddString(WStr::ToString(pSource[2]));
+		}
+	}
+	else {
+		Object& object = target.CreateObject();
+
+		object.SetString(SKW_X, x);
+		object.SetString(SKW_Y, y);
+		if (is3d) {
+			object.SetString(SKW_Z, WStr::ToString(pSource[2]));
+		}
+	}
+
+	return &target;
+}
+
 #pragma endregion //:REGION
 
 #pragma region Builder Namespace

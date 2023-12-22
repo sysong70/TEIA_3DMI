@@ -172,6 +172,9 @@
     <ClCompile Include="Control.TaskPanel.cpp">
       <Filter>Control\Panel</Filter>
     </ClCompile>
+    <ClCompile Include="Control.CoordEdit.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.Common.h">
@@ -359,6 +362,9 @@
     </ClInclude>
     <ClInclude Include="Control.TaskPanel.h">
       <Filter>Control\Panel</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.CoordEdit.h">
+      <Filter>Control</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
