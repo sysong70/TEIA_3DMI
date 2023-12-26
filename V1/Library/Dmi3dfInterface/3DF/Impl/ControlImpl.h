@@ -6,15 +6,15 @@
 
 OPEN_3DF_NAMESPACE
 
-class ControlPrivate : public H3DF::PrivateImpl
+class ControlImpl : public H3DF::Impl
 {
 public:
-	ControlPrivate() { m_eType = Type::Key; }
-	~ControlPrivate() {}
+	ControlImpl() { m_eType = Type::Key; }
+	~ControlImpl() {}
 
 	SegmentKey m_cOverrideKey;
 
-	void Copy(ControlPrivate * pcInThat)
+	void Copy(ControlImpl * pcInThat)
 	{
 		m_cOverrideKey = pcInThat->m_cOverrideKey;
 		m_eType = pcInThat->Type();

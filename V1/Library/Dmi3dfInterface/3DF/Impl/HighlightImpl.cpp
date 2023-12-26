@@ -1,10 +1,10 @@
 ﻿#include "StdAfx.h"
 
-#include "HighlightPrivate.h"
+#include "HighlightImpl.h"
 #include "../Highlight.h"
 
 #include "../Selection.h"
-#include "SelectionPrivate.h"
+#include "SelectionImpl.h"
 
 #include "../Window.h"
 
@@ -37,34 +37,34 @@
 
 using namespace H3DF;
 
-H3DF::HighlightControlPrivate::HighlightControlPrivate()
+H3DF::HighlightControlImpl::HighlightControlImpl()
 {
 	m_eType = H3DF::Type::HighlightControl;
 }
 
-H3DF::HighlightControlPrivate::HighlightControlPrivate(WindowKey const & cInWindow)
+H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
 {
 	m_eType = H3DF::Type::HighlightControl;
 
 	m_pcWindow = (WindowKey *) &cInWindow;
 }
 
-BaseView * H3DF::HighlightControlPrivate::GetBaseView()
+BaseView * H3DF::HighlightControlImpl::GetBaseView()
 {
 	return (BaseView *)m_pcWindow->GetBaseView();
 }
 
-BaseView * H3DF::HighlightControlPrivate::GetBaseView() const
+BaseView * H3DF::HighlightControlImpl::GetBaseView() const
 {
 	return (BaseView *) m_pcWindow->GetBaseView();
 }
 
-HSelectionSet * H3DF::HighlightControlPrivate::GetHighlightSelection()
+HSelectionSet * H3DF::HighlightControlImpl::GetHighlightSelection()
 {
 	return GetBaseView()->GetHighlightSelection();
 }
 
-void H3DF::HighlightControlPrivate::Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting)
+void H3DF::HighlightControlImpl::Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting)
 {
 	HSelectionSet * pcHighlightSelection = GetHighlightSelection();
 
@@ -77,10 +77,10 @@ void H3DF::HighlightControlPrivate::Highlight(SelectionResults const & cInItems,
 		pcHighlightSelection->DeSelectAll();
 	}
 
-	SelectionResultsPrivate * pcSelectionResultsImpl = (SelectionResultsPrivate *) cInItems.GetImpl();
+	SelectionResultsImpl * pcSelectionResultsImpl = (SelectionResultsImpl *) cInItems.GetImpl();
 
 	for (auto pcItem : pcSelectionResultsImpl->GetItems()) {
-		SelectionItemPrivate * pcImpl = (SelectionItemPrivate *) pcItem->GetImpl();
+		SelectionItemImpl * pcImpl = (SelectionItemImpl *) pcItem->GetImpl();
 
 		HC_KEY nKey = pcImpl->cKey.KeyValue();
 
@@ -151,17 +151,17 @@ void H3DF::HighlightControlPrivate::Highlight(SelectionResults const & cInItems,
 	}
 }
 
-void H3DF::HighlightControlPrivate::Highlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting)
+void H3DF::HighlightControlImpl::Highlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting)
 {
 	HSelectionSet * pcSelection = GetHighlightSelection(); // HSelectionSet에서 Select 및 Highlight를 다 처리함.
 
-	SelectionItemPrivate * pcImpl = (SelectionItemPrivate *) cInItem.GetImpl();
+	SelectionItemImpl * pcImpl = (SelectionItemImpl *) cInItem.GetImpl();
 
 	HC_KEY nPrimitiveKey = pcImpl->cKey.KeyValue();
 	pcSelection->Select(nPrimitiveKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, false);
 }
 
-void H3DF::HighlightControlPrivate::Unhighlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions)
+void H3DF::HighlightControlImpl::Unhighlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions)
 {
 	if (0 == cInItems.GetCount()) {
 		return;
@@ -169,11 +169,11 @@ void H3DF::HighlightControlPrivate::Unhighlight(SelectionResults const & cInItem
 
 	HBaseView * pcView = GetBaseView();
 
-	SelectionResultsPrivate * pcImpl = (SelectionResultsPrivate *) cInItems.GetImpl();
+	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *) cInItems.GetImpl();
 
 	// cInItem를 순회하면서 Unhighlight를 수행한다.
 	for (auto pcItem : pcImpl->GetItems()) {
-		SelectionItemPrivate * pcItemImpl = (SelectionItemPrivate *) pcItem->GetImpl();
+		SelectionItemImpl * pcItemImpl = (SelectionItemImpl *) pcItem->GetImpl();
 		HC_KEY nKey = pcItemImpl->cKey.KeyValue();
 		pcView->GetHighlightSelection()->DeSelect(nKey, pcItemImpl->nIncludeCount, pcItemImpl->pnIncludeKeys, false);
 	}
@@ -186,10 +186,10 @@ void H3DF::HighlightControlPrivate::Unhighlight(SelectionResults const & cInItem
 	}
 }
 
-void H3DF::HighlightControlPrivate::Unhighlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions)
+void H3DF::HighlightControlImpl::Unhighlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions)
 {
 	// cInItem의 Impl을 가져와서 작업을 수행한다.
-	SelectionItemPrivate * pcSelectionItemImpl = (SelectionItemPrivate *) cInItem.GetImpl();
+	SelectionItemImpl * pcSelectionItemImpl = (SelectionItemImpl *) cInItem.GetImpl();
 	if (nullptr == pcSelectionItemImpl) {
 		return;
 	}
@@ -207,7 +207,7 @@ void H3DF::HighlightControlPrivate::Unhighlight(SelectionItem const & cInItem, H
 	}
 }
 
-int H3DF::HighlightControlPrivate::NoButtonDownAndMove(int nFlags, int x, int y, SelectionResults & cOutSelections)
+int H3DF::HighlightControlImpl::NoButtonDownAndMove(int nFlags, int x, int y, SelectionResults & cOutSelections)
 {
 	DEBUG_VALID(m_pcWindow);
 
@@ -220,7 +220,7 @@ int H3DF::HighlightControlPrivate::NoButtonDownAndMove(int nFlags, int x, int y,
 	return 0;
 }
 
-bool H3DF::HighlightControlPrivate::DoDynamicHighlighting(WindowPoint cMousePoint, SelectionResults & cOutSelections)
+bool H3DF::HighlightControlImpl::DoDynamicHighlighting(WindowPoint cMousePoint, SelectionResults & cOutSelections)
 {
 	DEBUG_VALID(m_pcWindow);
 

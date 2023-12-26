@@ -1,11 +1,11 @@
 ﻿#include "StdAfx.h"
 
-#include "Canvas.Private.h"
+#include "CanvasImpl.h"
 
 #include "Common_Define.h"
 
 #include "../3DF.Model.h"
-#include "Model.Private.h"
+#include "ModelImpl.h"
 
 #include "../3DF/3DF.Utility.h"
 
@@ -13,7 +13,7 @@ using namespace H3DF;
 
 //== CanvasPrivate Class ===========================================================================
 
-H3DF::CanvasPrivate::CanvasPrivate()
+H3DF::CanvasImpl::CanvasImpl()
 {	//----- Model 생성 및 초기화 -----
 	m_pcModel = new H3DF::Model();
 	if (nullptr == m_pcModel) {
@@ -22,14 +22,14 @@ H3DF::CanvasPrivate::CanvasPrivate()
 
 }
 
-H3DF::CanvasPrivate::~CanvasPrivate()
+H3DF::CanvasImpl::~CanvasImpl()
 {
 	if (nullptr != m_pchName) {
 		delete[] m_pchName;
 	}
 }
 
-void H3DF::CanvasPrivate::Copy(const CanvasPrivate * pcInThat)
+void H3DF::CanvasImpl::Copy(const CanvasImpl * pcInThat)
 {
 	if (nullptr != pcInThat->m_pchName) {
 		Utility::CopyString(pcInThat->m_pchName, m_pchName);

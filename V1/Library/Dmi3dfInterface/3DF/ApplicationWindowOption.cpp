@@ -4,7 +4,7 @@
 
 namespace H3DF
 {
-	class ApplicationWindowOptionsKitPrivate : public PrivateImpl
+	class ApplicationWindowOptionsKitPrivate : public Impl
 	{
 	public:
 		ApplicationWindowOptionsKitPrivate() { m_eType = H3DF::Type::ApplicationWindowOptionsKit; }

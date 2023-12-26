@@ -9,9 +9,9 @@
 #include "Highlight.h"
 
 #include "Facility.AppOptions.h"
-#include "./Private/SelectionPrivate.h"
+#include "./Impl/SelectionImpl.h"
 
-#include "../Private/View.Private.h"
+#include "../Impl/ViewImpl.h"
 
 USING_3DF_NAMESPACE
 
@@ -89,7 +89,7 @@ namespace NavigationCubePreset
 #define TheCube TheAppOptions.Preference.Views.NavCube
 
 
-class NavigationCubePrivate : public PrivateImpl
+class NavigationCubePrivate : public Impl
 {
 public:
 	void Copy(const NavigationCubePrivate * pcInThat) {

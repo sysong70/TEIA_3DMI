@@ -1,14 +1,14 @@
 ﻿#include "StdAfx.h"
 
 #include "Operator.CameraSelect.h"
-#include "Private/SelectionPrivate.h"
+#include "Impl/SelectionImpl.h"
 
 #include "Window.h"
 #include "Line.h"
 
 #include "Camera.h"
 
-#include "../Private/View.Private.h"
+#include "../Impl/ViewImpl.h"
 
 #include <Common_Define.h>
 

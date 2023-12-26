@@ -1,10 +1,10 @@
 ﻿#include "StdAfx.h"
 
-#include "SearchPrivate.h"
+#include "SearchImpl.h"
 
 using namespace H3DF;
 
-CString SearchPrivate::GetSearchTypeString(Search::Type eType)
+CString SearchImpl::GetSearchTypeString(Search::Type eType)
 {
 	CString strType;
 
@@ -509,7 +509,7 @@ CString SearchPrivate::GetSearchTypeString(Search::Type eType)
 	return strType;
 }
 
-CString SearchPrivate::GetSearchSpaceString(Search::Space eInSpace)
+CString SearchImpl::GetSearchSpaceString(Search::Space eInSpace)
 {
 	CString strSpace;
 

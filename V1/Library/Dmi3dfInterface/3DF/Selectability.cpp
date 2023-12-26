@@ -1,10 +1,10 @@
 ﻿#include "StdAfx.h"
 
 #include "Selectability.h"
-#include "Private/ControlPrivate.h"
+#include "Impl/ControlImpl.h"
 
 #include "Segment.h"
-#include "./Private/SegmentPrivate.h"
+#include "./Impl/SegmentImpl.h"
 
 #include <HUtility.h>
 #include <HTools.h>
@@ -14,7 +14,7 @@ using namespace H3DF;
 //== SelectabilityKitPrivate Class =================================================================
 namespace H3DF
 {
-	class SelectabilityKitPrivate : public PrivateImpl
+	class SelectabilityKitPrivate : public Impl
 	{
 	public:
 		SelectabilityKitPrivate();
@@ -350,7 +350,7 @@ bool H3DF::SelectabilityKit::ShowText(Selectability::Value & cOuValue) const
 
 namespace H3DF
 {
-	class SelectabilityControlPrivate : public ControlPrivate
+	class SelectabilityControlPrivate : public ControlImpl
 	{
 	public:
 		SelectabilityControlPrivate() = default;
@@ -364,22 +364,22 @@ namespace H3DF
 
 void H3DF::SelectabilityControlPrivate::SetSelectability(CString strInType, bool bInValue)
 {
-	SegmentKeyPrivate::LocalOpen(m_cOverrideKey);
+	SegmentKeyImpl::LocalOpen(m_cOverrideKey);
 
 	CString strList;
 	strList.Format(L"%s = %s", strInType, (true == bInValue ? L"on" : L"off"));
 	HC_Set_Selectability(Utility::ToChar(strList));
 
-	SegmentKeyPrivate::LocalClose(m_cOverrideKey);
+	SegmentKeyImpl::LocalClose(m_cOverrideKey);
 }
 
 void H3DF::SelectabilityControlPrivate::UnsetSelectability(CString strInType)
 {
-	SegmentKeyPrivate::LocalOpen(m_cOverrideKey);
+	SegmentKeyImpl::LocalOpen(m_cOverrideKey);
 
 	HC_UnSet_One_Selectability(Utility::ToChar(strInType));
 
-	SegmentKeyPrivate::LocalClose(m_cOverrideKey);
+	SegmentKeyImpl::LocalClose(m_cOverrideKey);
 }
 
 //== SelectabilityControl ==========================================================================
@@ -552,11 +552,11 @@ SelectabilityControl & H3DF::SelectabilityControl::UnsetEverything()
 {
 	SelectabilityControlPrivate * pcImpl = new SelectabilityControlPrivate();
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey);
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
 
 	HC_UnSet_Selectability();
 
-	SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
+	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }

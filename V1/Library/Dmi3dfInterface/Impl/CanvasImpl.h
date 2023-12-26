@@ -17,13 +17,13 @@ namespace H3DF
 {
 	class MultiSelectManager;
 
-	class CanvasPrivate : public PrivateImpl
+	class CanvasImpl : public Impl
 	{
 	public:
-		CanvasPrivate();
-		virtual ~CanvasPrivate();
+		CanvasImpl();
+		virtual ~CanvasImpl();
 
-		void Copy(const CanvasPrivate * pcInThat);
+		void Copy(const CanvasImpl * pcInThat);
 
 		// 초기 입력 변수값
 		H3DF::WindowHandle m_nInWindowHandle = 0;

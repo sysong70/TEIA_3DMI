@@ -49,17 +49,17 @@
     <Filter Include="3DF\Object">
       <UniqueIdentifier>{bcac17de-fcc0-4634-ab74-17a363d9339a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3DF\Control\Private">
-      <UniqueIdentifier>{afa63e5c-ba9b-4717-88ba-b3c4d3bc2184}</UniqueIdentifier>
-    </Filter>
     <Filter Include="3DF\Sprocket">
       <UniqueIdentifier>{93a88395-ea70-4807-b99a-a9c1d6b0f6d8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3DF\Sprocket\Private">
-      <UniqueIdentifier>{8bd7cc15-e18a-4e92-8ebc-1c43c4377e71}</UniqueIdentifier>
+    <Filter Include="3DF\Object\Impl">
+      <UniqueIdentifier>{429dee59-5b8c-4be6-a7c7-9823d75b5cf1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3DF\Object\Private">
-      <UniqueIdentifier>{b402e2ea-86b4-4b1a-ab07-3dfabf3d5e3a}</UniqueIdentifier>
+    <Filter Include="3DF\Control\Impl">
+      <UniqueIdentifier>{afa63e5c-ba9b-4717-88ba-b3c4d3bc2184}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3DF\Sprocket\Impl">
+      <UniqueIdentifier>{8bd7cc15-e18a-4e92-8ebc-1c43c4377e71}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -108,9 +108,6 @@
     <ClInclude Include="3DF\Image.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\PMI.Entity.h">
-      <Filter>3DF\Entity</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\Operator.CameraSelect.h">
       <Filter>Operator</Filter>
     </ClInclude>
@@ -135,17 +132,8 @@
     <ClInclude Include="dllmain.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Private\SegmentPrivate.h">
-      <Filter>3DF\Object\Private</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\Private\KeyPrivate.h">
-      <Filter>3DF\Object\Private</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\Math.Matrix.h">
       <Filter>3DF</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\Private\WindowPrivate.h">
-      <Filter>3DF\Object\Private</Filter>
     </ClInclude>
     <ClInclude Include="3DF\Material.h">
       <Filter>3DF\Control</Filter>
@@ -164,12 +152,6 @@
     </ClInclude>
     <ClInclude Include="3DF\NavigationCube.h">
       <Filter>3DF</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\Private\SearchPrivate.h">
-      <Filter>Control</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\Search.h">
-      <Filter>Control</Filter>
     </ClInclude>
     <ClInclude Include="3DF\Style.h">
       <Filter>3DF\Object</Filter>
@@ -198,9 +180,6 @@
     <ClInclude Include="3DF\Operator.KinematicTest.h">
       <Filter>Operator</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Private\HighlightPrivate.h">
-      <Filter>3DF\Control\Private</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\Facility.AppOptions.h">
       <Filter>Facility</Filter>
     </ClInclude>
@@ -218,9 +197,6 @@
     </ClInclude>
     <ClInclude Include="3DF\Facility.Preference.h">
       <Filter>Facility</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\Private\SelectionPrivate.h">
-      <Filter>3DF\Control\Private</Filter>
     </ClInclude>
     <ClInclude Include="3DF.Application.h">
       <Filter>3DF\Sprocket</Filter>
@@ -276,11 +252,11 @@
     <ClInclude Include="3DF.Canvas.h">
       <Filter>3DF\Sprocket</Filter>
     </ClInclude>
-    <ClInclude Include="Private\Canvas.Private.h">
-      <Filter>3DF\Sprocket\Private</Filter>
+    <ClInclude Include="Impl\CanvasImpl.h">
+      <Filter>3DF\Sprocket\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="Private\View.Private.h">
-      <Filter>3DF\Sprocket\Private</Filter>
+    <ClInclude Include="Impl\ViewImpl.h">
+      <Filter>3DF\Sprocket\Impl</Filter>
     </ClInclude>
     <ClInclude Include="3DF\SelectionSet.h">
       <Filter>3DF\Control</Filter>
@@ -288,17 +264,14 @@
     <ClInclude Include="3DF\Camera.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Private\ControlPrivate.h">
-      <Filter>3DF\Control\Private</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\Performance.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
     <ClInclude Include="3DF.Model.h">
       <Filter>3DF\Sprocket</Filter>
     </ClInclude>
-    <ClInclude Include="Private\Model.Private.h">
-      <Filter>3DF\Sprocket\Private</Filter>
+    <ClInclude Include="Impl\ModelImpl.h">
+      <Filter>3DF\Sprocket\Impl</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\LogManager.h">
       <Filter>Utility</Filter>
@@ -314,6 +287,36 @@
     </ClInclude>
     <ClInclude Include="3DF\Condition.h">
       <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Impl\GeometryImpl.h">
+      <Filter>3DF\Object\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Impl\KeyImpl.h">
+      <Filter>3DF\Object\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Impl\SegmentImpl.h">
+      <Filter>3DF\Object\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Impl\ControlImpl.h">
+      <Filter>3DF\Control\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Impl\WindowImpl.h">
+      <Filter>3DF\Object\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Impl\HighlightImpl.h">
+      <Filter>3DF\Control\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Impl\SelectionImpl.h">
+      <Filter>3DF\Control\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Search.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\PMI.Entity.h">
+      <Filter>3DF\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Impl\SearchImpl.h">
+      <Filter>3DF\Control\Impl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -380,17 +383,8 @@
     <ClCompile Include="Signal.Connector.cpp">
       <Filter>Signal</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Private\SegmentPrivate.cpp">
-      <Filter>3DF\Object\Private</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\Private\KeyPrivate.cpp">
-      <Filter>3DF\Object\Private</Filter>
-    </ClCompile>
     <ClCompile Include="3DF\Math.Matrix.cpp">
       <Filter>3DF</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\Private\WindowPrivate.cpp">
-      <Filter>3DF\Object\Private</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Material.cpp">
       <Filter>3DF\Control</Filter>
@@ -401,20 +395,11 @@
     <ClCompile Include="3DF\LineAttribute.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\VisualEffects.cpp">
-      <Filter>3DF\Control</Filter>
-    </ClCompile>
     <ClCompile Include="3DF\Painter.cpp">
       <Filter>3DF</Filter>
     </ClCompile>
     <ClCompile Include="3DF\NavigationCube.cpp">
       <Filter>3DF</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\Private\SearchPrivate.cpp">
-      <Filter>Control</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\Search.cpp">
-      <Filter>Control</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Point.cpp">
       <Filter>3DF\Object</Filter>
@@ -443,9 +428,6 @@
     <ClCompile Include="3DF\Operator.KinematicTest.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Private\HighlightPrivate.cpp">
-      <Filter>3DF\Control\Private</Filter>
-    </ClCompile>
     <ClCompile Include="3DF\Facility.AppOptions.cpp">
       <Filter>Facility</Filter>
     </ClCompile>
@@ -460,9 +442,6 @@
     </ClCompile>
     <ClCompile Include="3DF\Facility.Preference.cpp">
       <Filter>Facility</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\Private\SelectionPrivate.cpp">
-      <Filter>3DF\Control\Private</Filter>
     </ClCompile>
     <ClCompile Include="3DF.Application.cpp">
       <Filter>3DF\Sprocket</Filter>
@@ -518,11 +497,11 @@
     <ClCompile Include="3DF.Canvas.cpp">
       <Filter>3DF\Sprocket</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Canvas.Private.cpp">
-      <Filter>3DF\Sprocket\Private</Filter>
+    <ClCompile Include="Impl\CanvasImpl.cpp">
+      <Filter>3DF\Sprocket\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="Private\View.Private.cpp">
-      <Filter>3DF\Sprocket\Private</Filter>
+    <ClCompile Include="Impl\ViewImpl.cpp">
+      <Filter>3DF\Sprocket\Impl</Filter>
     </ClCompile>
     <ClCompile Include="3DF\SelectionSet.cpp">
       <Filter>3DF\Control</Filter>
@@ -530,17 +509,14 @@
     <ClCompile Include="3DF\Camera.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Private\ControlPrivate.cpp">
-      <Filter>3DF\Control\Private</Filter>
-    </ClCompile>
     <ClCompile Include="3DF\Performance.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
     <ClCompile Include="3DF.Model.cpp">
       <Filter>3DF\Sprocket</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Model.Private.cpp">
-      <Filter>3DF\Sprocket\Private</Filter>
+    <ClCompile Include="Impl\ModelImpl.cpp">
+      <Filter>3DF\Sprocket\Impl</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\LogManager.cpp">
       <Filter>Utility</Filter>
@@ -556,6 +532,36 @@
     </ClCompile>
     <ClCompile Include="3DF\Condition.cpp">
       <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\GeometryImpl.cpp">
+      <Filter>3DF\Object\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\KeyImpl.cpp">
+      <Filter>3DF\Object\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\SegmentImpl.cpp">
+      <Filter>3DF\Object\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\ControlImpl.cpp">
+      <Filter>3DF\Control\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\WindowImpl.cpp">
+      <Filter>3DF\Object\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\HighlightImpl.cpp">
+      <Filter>3DF\Control\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\SelectionImpl.cpp">
+      <Filter>3DF\Control\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Search.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\VisualEffects.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\SearchImpl.cpp">
+      <Filter>3DF\Control\Impl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

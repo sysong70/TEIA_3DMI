@@ -3,7 +3,7 @@
 #include "EdgeAttribute.h"
 
 #include "Segment.h"
-#include "./Private/SegmentPrivate.h"
+#include "./Impl/SegmentImpl.h"
 
 #include <hc.h>
 #include <HTools.h>
@@ -12,7 +12,7 @@ USING_3DF_NAMESPACE
 
 //== EdgeAttributeKit class ========================================================================
 
-class EdgeAttributeKitPrivate : public PrivateImpl
+class EdgeAttributeKitPrivate : public Impl
 {
 public:
 	EdgeAttributeKitPrivate() { m_eType = H3DF::Type::EdgeAttributeKit; }
@@ -154,7 +154,7 @@ bool EdgeAttributeKit::ShowHardAngle(float & fOutAngle) const
 
 //== EdgeAttributeControl class ====================================================================
 
-class EdgeAttributeControlPrivate : public PrivateImpl
+class EdgeAttributeControlPrivate : public Impl
 {
 public:
 	EdgeAttributeControlPrivate() { m_eType = H3DF::Type::EdgeAttributeControl; }
@@ -198,9 +198,9 @@ EdgeAttributeControl & EdgeAttributeControl::SetPattern(CString strInPatternName
 {
 	EdgeAttributeControlPrivate * pcImpl = (EdgeAttributeControlPrivate *)m_pcImpl;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		HC_Set_Edge_Pattern(Utility::ToChar(strInPatternName));
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;
 }
@@ -209,7 +209,7 @@ EdgeAttributeControl & EdgeAttributeControl::SetWeight(float fInWeight, Edge::Si
 {
 	EdgeAttributeControlPrivate * pcImpl = (EdgeAttributeControlPrivate *)m_pcImpl;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		
 		if (Edge::SizeUnits::ScaleFactor == eInUnits) {
 			HC_Set_Edge_Weight(fInWeight);
@@ -247,7 +247,7 @@ EdgeAttributeControl & EdgeAttributeControl::SetWeight(float fInWeight, Edge::Si
 			HC_Set_Variable_Edge_Weight(Utility::ToChar(strWeight));
 		}
 
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;
 }
@@ -256,11 +256,11 @@ EdgeAttributeControl & EdgeAttributeControl::SetHardAngle(float fInAngle)
 {
 	EdgeAttributeControlPrivate * pcImpl = (EdgeAttributeControlPrivate *)m_pcImpl;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		CString strOption;
 		strOption.Format(L"geometry options = (hard edge angle = %f, no invert polycylinders, no fea nodes)", fInAngle);
 		HC_Set_Rendering_Options(Utility::ToChar(strOption));
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;
 }
@@ -269,9 +269,9 @@ EdgeAttributeControl & EdgeAttributeControl::UnsetPattern()
 {
 	EdgeAttributeControlPrivate * pcImpl = (EdgeAttributeControlPrivate *)m_pcImpl;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		HC_UnSet_Edge_Pattern();
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;
 }
@@ -280,9 +280,9 @@ EdgeAttributeControl & EdgeAttributeControl::UnsetWeight()
 {
 	EdgeAttributeControlPrivate * pcImpl = (EdgeAttributeControlPrivate *)m_pcImpl;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		HC_UnSet_Edge_Weight();
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;
 }
@@ -291,9 +291,9 @@ EdgeAttributeControl & EdgeAttributeControl::UnsetHardAngle()
 {
 	EdgeAttributeControlPrivate * pcImpl = (EdgeAttributeControlPrivate *)m_pcImpl;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		HC_UnSet_One_Rendering_Option("geometry options");
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;
 }
@@ -301,11 +301,11 @@ EdgeAttributeControl & EdgeAttributeControl::UnsetHardAngle()
 EdgeAttributeControl & EdgeAttributeControl::UnsetEverything()
 {
 	EdgeAttributeControlPrivate * pcImpl = (EdgeAttributeControlPrivate *)m_pcImpl;
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		HC_UnSet_Edge_Pattern();
 		HC_UnSet_Edge_Weight();
 		HC_UnSet_One_Rendering_Option("geometry options");
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
 	return *this;
 }
 
@@ -313,11 +313,11 @@ bool EdgeAttributeControl::ShowPattern(CString & strOutPatternName) const
 {
 	EdgeAttributeControlPrivate * pcImpl = (EdgeAttributeControlPrivate *)m_pcImpl;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		char chBuffer[MVO_BUFFER_SIZE] = "\n";
 		HC_Show_Edge_Pattern(chBuffer);
 		strOutPatternName = chBuffer;
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return !strOutPatternName.IsEmpty();
 }
@@ -369,14 +369,14 @@ bool EdgeAttributeControl::ShowHardAngle(float & fOutAngle) const
 {
 	EdgeAttributeControlPrivate * pcImpl = (EdgeAttributeControlPrivate *)m_pcImpl;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		char chBuffer[MVO_BUFFER_SIZE] = "\n";
 		HC_Show_One_Rendering_Option("geometry options", chBuffer);
 		if (0 < strlen(chBuffer)) {
 			sscanf(chBuffer, "hard edge angle = %f", &fOutAngle);
 			return true;
 		}
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return false;
 }

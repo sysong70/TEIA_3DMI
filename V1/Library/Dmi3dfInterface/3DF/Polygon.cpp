@@ -7,7 +7,7 @@
 USING_3DF_NAMESPACE
 
 //== PolygonKey ====================================================================================
-class PolygonKitPrivate : public PrivateImpl
+class PolygonKitPrivate : public Impl
 {
 public:
 	PolygonKitPrivate()

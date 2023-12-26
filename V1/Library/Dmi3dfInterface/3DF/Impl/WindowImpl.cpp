@@ -1,24 +1,24 @@
 ﻿#include "StdAfx.h"
 
-#include "WindowPrivate.h"
+#include "WindowImpl.h"
 
-#include "../../Private/View.Private.h"
+#include "../../Impl/ViewImpl.h"
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
-H3DF::WindowKeyPrivate::WindowKeyPrivate()
+H3DF::WindowKeyImpl::WindowKeyImpl()
 {
 	m_pnSelectBufferKey = new HC_KEY[m_nSelectBufferKeyCount];
 }
 
-H3DF::WindowKeyPrivate::~WindowKeyPrivate()
+H3DF::WindowKeyImpl::~WindowKeyImpl()
 {
 	if (nullptr != m_pnSelectBufferKey) {
 		delete[] m_pnSelectBufferKey;
 	}
 }
 
-void H3DF::WindowKeyPrivate::Copy(WindowKeyPrivate * pcInThat)
+void H3DF::WindowKeyImpl::Copy(WindowKeyImpl * pcInThat)
 {
 	m_pcBaseView = pcInThat->m_pcBaseView;
 	m_nViewId = pcInThat->m_nViewId;
@@ -30,19 +30,19 @@ void H3DF::WindowKeyPrivate::Copy(WindowKeyPrivate * pcInThat)
 	m_cSelectionOptionsKit = pcInThat->m_cSelectionOptionsKit;
 }
 
-HC_KEY H3DF::WindowKeyPrivate::GetSceneKey()
+HC_KEY H3DF::WindowKeyImpl::GetSceneKey()
 {
 	return GetBaseView()->GetSceneKey();
 }
 
-const HC_KEY H3DF::WindowKeyPrivate::GetSceneKey() const
+const HC_KEY H3DF::WindowKeyImpl::GetSceneKey() const
 {
 	return ((BaseView *) m_pcBaseView)->GetSceneKey();
 }
 
 // m_nSelectBufferKeyCount의 값이 nCount보다 작으면 m_pnSelectBufferKey를 재할당한다.
 // m_nSelectBufferKeyCount는 nCount가 됨.
-HC_KEY * H3DF::WindowKeyPrivate::GetSelectBufferKey(int nCount)
+HC_KEY * H3DF::WindowKeyImpl::GetSelectBufferKey(int nCount)
 {
 	if (m_nSelectBufferKeyCount < nCount) {
 		delete[] m_pnSelectBufferKey;

@@ -3,9 +3,9 @@
 #include "Performance.h"
 
 #include "Segment.h"
-#include "./Private/SegmentPrivate.h"
-#include "./Private/ControlPrivate.h"
-#include "../Private/View.Private.h"
+#include "./Impl/SegmentImpl.h"
+#include "./Impl/ControlImpl.h"
+#include "../Impl/ViewImpl.h"
 
 #include <hc.h>
 #include <HTools.h>
@@ -16,7 +16,7 @@
 
 namespace H3DF
 {
-	class PerformanceKitPrivate : public PrivateImpl
+	class PerformanceKitPrivate : public Impl
 	{
 	public:
 		PerformanceKitPrivate() { m_eType = H3DF::Type::PerformanceKit; }
@@ -114,13 +114,13 @@ bool H3DF::PerformanceKit::ShowStaticModel(Performance::StaticModel & eOutModelT
 }
 
 //== PerformanceControl class ======================================================================
-class PerformanceControlPrivate : public ControlPrivate
+class PerformanceControlPrivate : public ControlImpl
 {
 public:
 	PerformanceControlPrivate() { m_eType = H3DF::Type::PerformanceControl; }
 
 	void Copy(PerformanceControlPrivate * pcInThat) {
-		ControlPrivate::Copy(pcInThat);
+		ControlImpl::Copy(pcInThat);
 	}
 };
 
@@ -156,7 +156,7 @@ PerformanceControl & H3DF::PerformanceControl::SetDisplayLists(Performance::Disp
 	PerformanceControlPrivate * pcImpl = static_cast<PerformanceControlPrivate *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		switch (eInDisplayList)
 		{
 			case H3DF::Performance::DisplayLists::None:
@@ -171,7 +171,7 @@ PerformanceControl & H3DF::PerformanceControl::SetDisplayLists(Performance::Disp
 				HC_Set_Rendering_Options("display lists = segment");
 				break;
 		}
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }
@@ -181,7 +181,7 @@ PerformanceControl & H3DF::PerformanceControl::SetStaticModel(Performance::Stati
 	PerformanceControlPrivate * pcImpl = static_cast<PerformanceControlPrivate *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		switch (eInModelType)
 		{
 			case H3DF::Performance::StaticModel::None:
@@ -196,7 +196,7 @@ PerformanceControl & H3DF::PerformanceControl::SetStaticModel(Performance::Stati
 				HC_Set_Heuristics("static model = (on, condition analysis = view independent)");
 				break;
 		}
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }
@@ -206,9 +206,9 @@ PerformanceControl & H3DF::PerformanceControl::UnsetDisplayLists()
 	PerformanceControlPrivate * pcImpl = static_cast<PerformanceControlPrivate *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_UnSet_One_Rendering_Option("display lists");
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }
@@ -218,9 +218,9 @@ PerformanceControl & H3DF::PerformanceControl::UnsetStaticModel()
 	PerformanceControlPrivate * pcImpl = static_cast<PerformanceControlPrivate *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_UnSet_One_Heuristic("static model");
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }
@@ -230,7 +230,7 @@ bool H3DF::PerformanceControl::ShowDisplayLists(Performance::DisplayLists & eOut
 	PerformanceControlPrivate * pcImpl = static_cast<PerformanceControlPrivate *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		if (HC_Show_Existence("rendering options = display lists")) {
 			char chValue[256] = { 0 };
 			if (TRUE == HC_PShow_One_Net_Rendering_Option(0, 0, "display lists", chValue)) {
@@ -248,7 +248,7 @@ bool H3DF::PerformanceControl::ShowDisplayLists(Performance::DisplayLists & eOut
 		else {
 			eOutDisplayList = Performance::DisplayLists::None;
 		}
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return true;
 }
@@ -258,7 +258,7 @@ bool H3DF::PerformanceControl::ShowStaticModel(Performance::StaticModel & eOutMo
 	PerformanceControlPrivate * pcImpl = static_cast<PerformanceControlPrivate *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		if (HC_Show_Existence("heuristics = static model")) {
 			char chValue[256] = { 0 };
 			HC_Show_One_Heuristic("static model", chValue);
@@ -276,7 +276,7 @@ bool H3DF::PerformanceControl::ShowStaticModel(Performance::StaticModel & eOutMo
 		else {
 			eOutModelType = Performance::StaticModel::None;
 		}
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return true;
 /*

@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #include "Key.h"
-#include "Private/KeyPrivate.h"
+#include "Impl/KeyImpl.h"
 
 #include "Segment.h"
 
@@ -11,28 +11,37 @@
 
 USING_3DF_NAMESPACE
 
+H3DF::Key::Key() 
+{
+	m_pcImpl = new KeyImpl();
+}
+
 H3DF::Key::Key(HC_KEY nInKey)
 {
-	KeyPrivate * pcImpl = new KeyPrivate();
-	pcImpl->m_nKey = nInKey;
+	if (INVALID_KEY == nInKey) {
+		return;
+	}
+
+	KeyImpl * pcImpl = new KeyImpl();
+	pcImpl->SetKeyValue(nInKey);
 
 	m_pcImpl = pcImpl;
 }
 
 H3DF::Key::Key(Key const & cInThat)
 {
-	m_pcImpl = new KeyPrivate();
-	Set(cInThat);
-}
+	if (INVALID_KEY == cInThat.KeyValue()) {
+		return;
+	}
 
-H3DF::Key::~Key()
-{
+	m_pcImpl = new KeyImpl();
+	Set(cInThat);
 }
 
 void H3DF::Key::Set(Key const & cInThat)
 {
-	KeyPrivate * pcImpl = (KeyPrivate *)m_pcImpl;
-	KeyPrivate * pcInThatImpl = (KeyPrivate *)cInThat.m_pcImpl;
+	KeyImpl * pcImpl = (KeyImpl *)m_pcImpl;
+	KeyImpl * pcInThatImpl = (KeyImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -44,27 +53,27 @@ Key const & H3DF::Key::operator = (Key const & cInThat)
 
 bool H3DF::Key::operator == (Key const & cInThat) const
 {
-	KeyPrivate * pcImpl = (KeyPrivate *)m_pcImpl;
-	KeyPrivate * pcInThatImpl = (KeyPrivate *)cInThat.m_pcImpl;
-	return (pcImpl->m_nKey == pcInThatImpl->m_nKey);
+	KeyImpl * pcImpl = (KeyImpl *)m_pcImpl;
+	KeyImpl * pcInThatImpl = (KeyImpl *)cInThat.m_pcImpl;
+	return (pcImpl->KeyValue() == pcInThatImpl->KeyValue());
 }
 
 HC_KEY H3DF::Key::KeyValue() const 
 { 
-	KeyPrivate * pcImpl = (KeyPrivate *)m_pcImpl;
-	return pcImpl->m_nKey;
+	KeyImpl * pcImpl = (KeyImpl *)m_pcImpl;
+	return pcImpl->KeyValue();
 }
 
 void H3DF::Key::SetKeyValue(HC_KEY nInKey)
 {
-	KeyPrivate * pcImpl = (KeyPrivate *)m_pcImpl;
-	pcImpl->m_nKey = nInKey;
+	KeyImpl * pcImpl = (KeyImpl *)m_pcImpl;
+	pcImpl->SetKeyValue(nInKey);
 }
 
 void H3DF::Key::SetKeyValue(HC_KEY nInKey) const
 {
-	KeyPrivate * pcImpl = (KeyPrivate *)m_pcImpl;
-	pcImpl->m_nKey = nInKey;
+	KeyImpl * pcImpl = (KeyImpl *)m_pcImpl;
+	pcImpl->SetKeyValue(nInKey);
 }
 
 void H3DF::Key::Delete()

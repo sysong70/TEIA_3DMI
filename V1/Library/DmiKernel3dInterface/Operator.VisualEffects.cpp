@@ -71,9 +71,13 @@ KERNEL::Operator::VisualEffectsPrivate::VisualEffectsPrivate(const H3DF::View * 
 // 1. UI에서 전달되는 요청사항을 처리하는 최초 함수
 void KERNEL::Operator::VisualEffectsPrivate::Request(Json::Object & cInObject)
 {
-	int nViewId = cInObject.GetInteger(SKW_VIEWID);
+	Json::Object cCopy(*m_cOption.Get());
 
-	Delivery().taskBar.ResponseValue(HOME_3D_LST_VisualEffects, *m_cOption.Get(), *m_pcDefaultSetting);
+	CString strText;
+	cCopy.Stringify(strText);
+
+	int nViewId = cInObject.GetInteger(SKW_VIEWID);
+	Delivery().taskBar.ResponseValue(nViewId, HOME_3D_LST_VisualEffects, *m_cOption.Get(), *m_pcDefaultSetting);
 }
 
 void KERNEL::Operator::VisualEffectsPrivate::Change(Json::Object & cInObject)

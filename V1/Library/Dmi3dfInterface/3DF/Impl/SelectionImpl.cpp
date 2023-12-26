@@ -1,15 +1,15 @@
 ﻿#include "StdAfx.h"
 
-#include "SelectionPrivate.h"
+#include "SelectionImpl.h"
 
 #include "../Window.h"
-#include "../../Private/View.Private.h"
+#include "../../Impl/ViewImpl.h"
 
 #include "../Line.h"
 #include "../Shell.h"
 #include "../3DF.Utility.h"
 
-#include "WindowPrivate.h"
+#include "WindowImpl.h"
 
 #include <vhash.h>
 #include <vlist.h>
@@ -33,7 +33,7 @@ using namespace H3DF;
 
 //== SelectionItemPrivate class ====================================================================
 
-bool H3DF::SelectionItemPrivate::ShowPath(KeyPath & cOutPath) const
+bool H3DF::SelectionItemImpl::ShowPath(KeyPath & cOutPath) const
 {
 	size_t nPathCount = nIncludeCount + 2;
 	HC_KEY * pnPath = new HC_KEY[nPathCount];
@@ -61,7 +61,7 @@ bool H3DF::SelectionItemPrivate::ShowPath(KeyPath & cOutPath) const
 	return true;
 }
 
-bool H3DF::SelectionItemPrivate::ShowPathString(CString & strOutPath)
+bool H3DF::SelectionItemImpl::ShowPathString(CString & strOutPath)
 {
 	KeyPath cPath;
 	if (false == ShowPath(cPath)) {
@@ -92,11 +92,13 @@ bool H3DF::SelectionItemPrivate::ShowPathString(CString & strOutPath)
 	HC_Show_Key_Type(nKey, chType);
 	strText.Format(L"\nOwner of last include key: %d [%s]", nKey, Utility::ToString(chType));
 	strOutPath += strText;
+
+	return true;
 }
 
 //== SelectionResultsPrivate class =================================================================
 
-bool H3DF::SelectionResultsPrivate::Sort()
+bool H3DF::SelectionResultsImpl::Sort()
 {
 	if (2 > m_deItems.size()) {
 		return false;
@@ -144,7 +146,7 @@ bool H3DF::SelectionResultsPrivate::Sort()
 //== SelectionControlPrivate class =================================================================
 
 // 1. 주어진 Point와 Selection Option을 이용해서 선택 작업을 수행하고, 선택된 요소를 SelectionResults에 저장한다.
-size_t H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
+size_t H3DF::SelectionControlImpl::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
 {
 	int	 nResult = 0;
 
@@ -200,12 +202,12 @@ size_t H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, S
 	int	nIncludeCount = 0;
 
 	// 선택된 요소를 SelectionResults에 저장하기 위해서 새롭게 생성
-	SelectionResultsPrivate * pcResultsPrivate = (SelectionResultsPrivate *)cOutResults.GetImpl();
+	SelectionResultsImpl * pcResultsPrivate = (SelectionResultsImpl *)cOutResults.GetImpl();
 
 	do {
 		// 선택된 요소를 저장하기 위해서 Item 생성
 		SelectionItem * pcItem = new SelectionItem();
-		SelectionItemPrivate * pcItemPrivate = (SelectionItemPrivate *)pcItem->GetImpl();
+		SelectionItemImpl * pcItemPrivate = (SelectionItemImpl *)pcItem->GetImpl();
 		pcItemPrivate->m_pcWindow = m_pcWindow;
 
 		HC_Show_Selection_Element(&nKey, &nOffset1, &nOffset2, &nOffset3);
@@ -227,7 +229,7 @@ size_t H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, S
 		HC_Show_Selection_Keys_Count(&nKeyCount);
 
 		if (0 < nKeyCount) {
-			WindowKeyPrivate * pcImpl = (WindowKeyPrivate *)m_pcWindow->GetImpl();
+			WindowKeyImpl * pcImpl = (WindowKeyImpl *)m_pcWindow->GetImpl();
 			HC_KEY * pnKeys = pcImpl->GetSelectBufferKey(nKeyCount);
 
 			pnIncludeKeys = new HC_KEY[nKeyCount];
@@ -311,7 +313,7 @@ size_t H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, S
 	return cOutResults.GetCount();
 }
 
-int H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
+int H3DF::SelectionControlImpl::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults)
 {
 	if (nullptr == m_pcSelectionSet) {
 		return HOP_NOT_HANDLED;
@@ -369,7 +371,7 @@ int H3DF::SelectionControlPrivate::SelectByPoint(Point const & cInLocation, UINT
 
 
 // 입력되는 Location은 MouseWindowPos을 이용한다. HEventInfo에서 GetMouseWindowPos() 함수를 이용해서 가져올 수 있음
-int H3DF::SelectionControlPrivate::SelectButtonDown_V1(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults)
+int H3DF::SelectionControlImpl::SelectButtonDown_V1(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults)
 {
 	HPoint  new_pos;
 	int		nResult = 0;
@@ -441,7 +443,7 @@ int H3DF::SelectionControlPrivate::SelectButtonDown_V1(Point const & cInLocation
 }
 
 // Select 처리, 재선택 및 최초 선택 Region, PMI 선택등을 처리.
-void H3DF::SelectionControlPrivate::HandleSelection(UINT const nFlags, SelectionResults & cOutResults)
+void H3DF::SelectionControlImpl::HandleSelection(UINT const nFlags, SelectionResults & cOutResults)
 {
 	HC_KEY  nKey = INVALID_KEY;
 	int nOffset1, nOffset2, nOffset3;
@@ -465,7 +467,7 @@ void H3DF::SelectionControlPrivate::HandleSelection(UINT const nFlags, Selection
 	}
 */
 
-	SelectionResultsPrivate * pcResultsPrivate = (SelectionResultsPrivate *)cOutResults.GetImpl();
+	SelectionResultsImpl * pcResultsPrivate = (SelectionResultsImpl *)cOutResults.GetImpl();
 
 	//don't notify in the selection set, we'll do that at the end
 	pcSelection->SetSelectWillNotify(false);
@@ -500,7 +502,7 @@ void H3DF::SelectionControlPrivate::HandleSelection(UINT const nFlags, Selection
 			eSelectedType = SelType::Line;
 
 			SelectionItem * pcItem = new SelectionItem();
-			SelectionItemPrivate * pcItemPrivate = (SelectionItemPrivate *)pcItem->GetImpl();
+			SelectionItemImpl * pcItemPrivate = (SelectionItemImpl *)pcItem->GetImpl();
 			pcItemPrivate->cKey = LineKey(Key(nKey));
 			
 			pcResultsPrivate->PushBack(pcItem);
@@ -598,7 +600,7 @@ void H3DF::SelectionControlPrivate::HandleSelection(UINT const nFlags, Selection
 	delete[] pnIncludeKeys;
 }
 
-void H3DF::SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & cInOptions, char * pchOutOption)
+void H3DF::SelectionControlImpl::GetSelectOption(SelectionOptionsKit const & cInOptions, char * pchOutOption)
 {
 	char chOption[MVO_BUFFER_SIZE] = "\0";
 
@@ -700,7 +702,7 @@ void H3DF::SelectionControlPrivate::GetSelectOption(SelectionOptionsKit const & 
 	}
 }
 
-void H3DF::SelectionControlPrivate::GetScope(SelectionOptionsKit const & cInOptions, char * pchOutScope)
+void H3DF::SelectionControlImpl::GetScope(SelectionOptionsKit const & cInOptions, char * pchOutScope)
 {
 	SegmentKey cStartSegment;
 	KeyPath cStartPath;
@@ -713,7 +715,7 @@ void H3DF::SelectionControlPrivate::GetScope(SelectionOptionsKit const & cInOpti
 	}
 }
 
-HBaseView * H3DF::SelectionControlPrivate::GetBaseView()
+HBaseView * H3DF::SelectionControlImpl::GetBaseView()
 { 
 	return (HBaseView *)m_pcWindow->GetBaseView(); 
 }

@@ -3,7 +3,7 @@
 #include "Math.h"
 
 #include "Window.h"
-#include "Private/WindowPrivate.h"
+#include "Impl/WindowImpl.h"
 
 #include "Circle.h"
 
@@ -374,7 +374,7 @@ bool H3DF::Math::GetPoint(WindowKey const & cInWindow, WorldPointArray const & a
 
 	aOutPoints.resize(nCount);
 
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		for (size_t nIndex = 0; nIndex < nCount; nIndex++) {
@@ -395,7 +395,7 @@ bool H3DF::Math::GetPoint(WindowKey const & cInWindow, WorldPointArray const & a
 
 	aOutPoints.resize(nCount);
 
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		for (size_t nIndex = 0; nIndex < nCount; nIndex++) {

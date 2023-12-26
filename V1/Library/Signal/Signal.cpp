@@ -623,12 +623,13 @@ void Signal::TaskBar::OnChangedValue(UINT commandId, Json::Object& value)
 }
 
 
-
-void Signal::TaskBar::ResponseValue(UINT commandId, Json::Object& value, Json::Object& defaultValue)
+// sysong: View Id 추가
+void Signal::TaskBar::ResponseValue(UINT nViewId, UINT commandId, Json::Object& value, Json::Object& defaultValue)
 {
 	Json::Object data;
 	ConstructData(data, Action::ResponseValue);
 
+	data.SetInteger(SKW_VIEWID, nViewId);
 	data.SetInteger(SKW_ID, commandId);
 	data.SetObject(SKW_VALUE, new Json::Object(value));
 	data.SetObject(SKW_DEFAULTVALUE, new Json::Object(defaultValue));

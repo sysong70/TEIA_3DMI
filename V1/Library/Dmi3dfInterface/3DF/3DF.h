@@ -96,6 +96,10 @@ namespace H3DF
 
 	class ApplicationWindowOptionsKit;
 
+	class GeometryKey;
+
+	class KeyImpl;
+
 	//==============================================================================================
 
 	// The Type class is a concept class that contains type information for all classes.
@@ -247,8 +251,8 @@ namespace H3DF
 		None									= 0x00000000,
 
 		Type									= 0x10000000,
-		Solid									= 0x10000000,
-		Edge									= 0x10000001,
+		Solid									= 0x10000001,
+		Edge									= 0x10000002,
 	};
 
 	class API_3DF ViewDirection
@@ -667,16 +671,16 @@ namespace H3DF
 		NotSet
 	};
 
-	class API_3DF PrivateImpl
+	class API_3DF Impl
 	{
 	public:
-		PrivateImpl() {}
-		virtual ~PrivateImpl() {}
+		Impl() {}
+		virtual ~Impl() {}
 
 		H3DF::Type Type() const;
 		void SetType(H3DF::Type eType);
 
-		void SetImpl(Object * pcObject, PrivateImpl * pcImpl);
+		void SetImpl(Object * pcObject, Impl * pcImpl);
 
 	protected:
 		H3DF::Type m_eType = H3DF::Type::None;

@@ -20,16 +20,16 @@
 #include <HConstantFrameRate.h>
 
 #include "3DF.Canvas.h"
-#include "Private/Canvas.Private.h"
+#include "Impl/CanvasImpl.h"
 
 #include "3DF.View.h"
-#include "Private/View.Private.h"
+#include "Impl/ViewImpl.h"
 
 #include "3DF.Model.h"
 
 #include "3DF/Window.h"
 #include "3DF/Segment.h"
-#include "3DF/Private/SegmentPrivate.h"
+#include "3DF/Impl/SegmentImpl.h"
 #include "3DF/Selection.h"
 #include "3DF/SelectionSet.h"
 #include "3DF/Visibility.h"
@@ -91,7 +91,7 @@ H3DF::CameraPos::CameraPos() {
 
 H3DF::Canvas::Canvas()
 {
-	CanvasPrivate * pcImpl = new CanvasPrivate();
+	CanvasImpl * pcImpl = new CanvasImpl();
 	if (nullptr == pcImpl) {
 		assert(false);
 	}
@@ -101,13 +101,13 @@ H3DF::Canvas::Canvas()
 
 H3DF::Canvas::Canvas(Canvas const & cInThat)
 {
-	m_pcImpl = new CanvasPrivate();
+	m_pcImpl = new CanvasImpl();
 	Set(cInThat);
 }
 
 void H3DF::Canvas::Destruct()
 {
-	CanvasPrivate * pcImpl = new CanvasPrivate();
+	CanvasImpl * pcImpl = new CanvasImpl();
 	if (nullptr == pcImpl) {
 		assert(false);
 	}
@@ -124,8 +124,8 @@ void H3DF::Canvas::Destruct()
 
 void H3DF::Canvas::Set(Canvas const & cInThat)
 {
-	CanvasPrivate * pcImpl = (CanvasPrivate *)m_pcImpl;
-	CanvasPrivate * pcInThatImpl = (CanvasPrivate *)cInThat.m_pcImpl;
+	CanvasImpl * pcImpl = (CanvasImpl *)m_pcImpl;
+	CanvasImpl * pcInThatImpl = (CanvasImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -140,7 +140,7 @@ Canvas const & H3DF::Canvas::operator = (Canvas const & cInThat)
 // 여기서 BaseView를 생성한다.
 void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
 {
-	CanvasPrivate * pcCanvasImpl = static_cast<CanvasPrivate *>(m_pcImpl);
+	CanvasImpl * pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl);
 	if(nullptr == pcCanvasImpl) {
 		DEBUG_RETURN;
 	}
@@ -159,7 +159,7 @@ void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
 	// 값을 Pointer 형태로 가지고 있어야 처리하기가 편하다.
 	View * pcView = new View(cInView);
 
-	ViewPrivate * pcViewImpl = (ViewPrivate *)pcView->GetImpl();
+	ViewImpl * pcViewImpl = (ViewImpl *)pcView->GetImpl();
 	if (nullptr == pcViewImpl) {
 		DEBUG_RETURN;
 	}
@@ -198,7 +198,7 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 		return;
 	}
 
-	ViewPrivate * pcViewImpl = (ViewPrivate *)GetFrontView().GetImpl();
+	ViewImpl * pcViewImpl = (ViewImpl *)GetFrontView().GetImpl();
 	if (nullptr == pcViewImpl) { DEBUG_RETURN; }
 
 	// 업데이트 강제 중지
@@ -244,7 +244,7 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 
 	CString strErrorMessage;
 
-	CanvasPrivate * pcCanvasImpl = static_cast<CanvasPrivate *>(m_pcImpl);
+	CanvasImpl * pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl);
 
 	SegmentKey cModelSegmentKey = pcCanvasImpl->m_pcModel->GetSegmentKey();
 
@@ -260,9 +260,9 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 	}
 	else {
 		SegmentKey cViewKey(pcViewImpl->GetBaseView()->GetViewKey());
-		SegmentKeyPrivate::LocalOpen(cViewKey); {
+		SegmentKeyImpl::LocalOpen(cViewKey); {
 			HC_Set_Driver_Options("eye dome lighting = off");
-		} SegmentKeyPrivate::LocalClose(cViewKey);
+		} SegmentKeyImpl::LocalClose(cViewKey);
 
 		DLL::H3DF::Interface cInterfaace;
 		cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, cDelivery, strErrorMessage);
@@ -380,7 +380,7 @@ void H3DF::Canvas::ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObje
 		return;
 	}
 
-	ViewPrivate * pcViewImpl = (ViewPrivate *)cCanvas.GetFrontView().GetImpl();
+	ViewImpl * pcViewImpl = (ViewImpl *)cCanvas.GetFrontView().GetImpl();
 	if (nullptr == pcViewImpl) { DEBUG_RETURN; }
 
 	// 업데이트 강제 중지
@@ -428,7 +428,7 @@ void H3DF::Canvas::ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObje
 
 	CString strErrorMessage;
 
-	CanvasPrivate * pcCanvasImpl = static_cast<CanvasPrivate *>(cCanvas.m_pcImpl);
+	CanvasImpl * pcCanvasImpl = static_cast<CanvasImpl *>(cCanvas.m_pcImpl);
 
 	SegmentKey cModelSegmentKey = pcCanvasImpl->m_pcModel->GetSegmentKey();
 
@@ -444,9 +444,9 @@ void H3DF::Canvas::ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObje
 	}
 	else {
 		SegmentKey cViewKey(pcViewImpl->GetBaseView()->GetViewKey());
-		SegmentKeyPrivate::LocalOpen(cViewKey); {
+		SegmentKeyImpl::LocalOpen(cViewKey); {
 			HC_Set_Driver_Options("eye dome lighting = off");
-		} SegmentKeyPrivate::LocalClose(cViewKey);
+		} SegmentKeyImpl::LocalClose(cViewKey);
 
 		DLL::H3DF::Interface cInterfaace;
 		cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, cDelivery, strErrorMessage);
@@ -536,7 +536,7 @@ void H3DF::Canvas::FileOpen_ORG(Json::Object & cInObject, Signal::Delivery & cDe
 		return;
 	}
 
-	ViewPrivate * pcViewImpl = (ViewPrivate *)GetFrontView().GetImpl();
+	ViewImpl * pcViewImpl = (ViewImpl *)GetFrontView().GetImpl();
 	if (nullptr == pcViewImpl) { DEBUG_RETURN; }
 
 	// 업데이트 강제 중지
@@ -582,7 +582,7 @@ void H3DF::Canvas::FileOpen_ORG(Json::Object & cInObject, Signal::Delivery & cDe
 
 	CString strErrorMessage;
 
-	CanvasPrivate * pcCanvasImpl = static_cast<CanvasPrivate *>(m_pcImpl);
+	CanvasImpl * pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl);
 
 	SegmentKey cModelSegmentKey = pcCanvasImpl->m_pcModel->GetSegmentKey();
 
@@ -598,9 +598,9 @@ void H3DF::Canvas::FileOpen_ORG(Json::Object & cInObject, Signal::Delivery & cDe
 	}
 	else {
 		SegmentKey cViewKey(pcViewImpl->GetBaseView()->GetViewKey());
-		SegmentKeyPrivate::LocalOpen(cViewKey); {
+		SegmentKeyImpl::LocalOpen(cViewKey); {
 			HC_Set_Driver_Options("eye dome lighting = off");
-		} SegmentKeyPrivate::LocalClose(cViewKey);
+		} SegmentKeyImpl::LocalClose(cViewKey);
 
 		DLL::H3DF::Interface cInterfaace;
 		cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, cDelivery, strErrorMessage);
@@ -713,7 +713,7 @@ void H3DF::Canvas::FileOpen_ORG(Json::Object & cInObject, Signal::Delivery & cDe
 
 H3DF::View & H3DF::Canvas::GetFrontView() const
 {
-	CanvasPrivate * pcImpl = static_cast<CanvasPrivate *>(m_pcImpl);
+	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	DEBUG_VALID(pcImpl->m_pcFrontView);
@@ -729,7 +729,7 @@ H3DF::View & H3DF::Canvas::GetFrontView() const
 
 Model & H3DF::Canvas::GetModel() const
 {
-	CanvasPrivate * pcImpl = static_cast<CanvasPrivate *>(m_pcImpl);
+	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	return *pcImpl->m_pcModel;
@@ -737,7 +737,7 @@ Model & H3DF::Canvas::GetModel() const
 
 void H3DF::Canvas::Update() const
 {
-	CanvasPrivate * pcImpl = static_cast<CanvasPrivate *>(m_pcImpl);
+	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	for (const auto pcView : pcImpl->m_vpcViewArray) {
@@ -747,7 +747,7 @@ void H3DF::Canvas::Update() const
 
 void H3DF::Canvas::Update(Json::Object & cInObject) const
 {
-	CanvasPrivate * pcImpl = static_cast<CanvasPrivate *>(m_pcImpl);
+	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	for (const auto pcView : pcImpl->m_vpcViewArray) {
@@ -776,7 +776,7 @@ bool H3DF::Canvas::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void H3DF::Canvas::CancelCommands()
 {
-	CanvasPrivate * pcImpl = static_cast<CanvasPrivate *>(m_pcImpl);
+	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}

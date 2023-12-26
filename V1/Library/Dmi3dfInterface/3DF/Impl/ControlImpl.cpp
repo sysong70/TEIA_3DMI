@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "KeyPrivate.h"
+#include "KeyImpl.h"
 
 #include <HTools.h>
 

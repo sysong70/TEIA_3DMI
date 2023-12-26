@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "Model.Private.h"
+#include "ModelImpl.h"
 
 #include "Common_Define.h"
 
@@ -10,7 +10,7 @@ using namespace H3DF;
 
 //== Model Class ===================================================================================
 
-H3DF::ModelPrivate::ModelPrivate()
+H3DF::ModelImpl::ModelImpl()
 	: HBaseModel()
 {
 	m_cSegmentKey.Set(GetModelKey());
@@ -25,7 +25,7 @@ H3DF::ModelPrivate::ModelPrivate()
 	m_pcPRCDeleteModelCallback = nullptr;
 }
 
-H3DF::ModelPrivate::~ModelPrivate()
+H3DF::ModelImpl::~ModelImpl()
 {
 	if (nullptr != m_pcTopologyManager) {
 		REMOVE_POINTER(m_pcTopologyManager);
@@ -44,17 +44,17 @@ H3DF::ModelPrivate::~ModelPrivate()
 	}
 }
 
-SegmentKey H3DF::ModelPrivate::GetSegmentKey()
+SegmentKey H3DF::ModelImpl::GetSegmentKey()
 {
 	return m_cSegmentKey;
 }
 
-SegmentKey const H3DF::ModelPrivate::GetSegmentKey() const
+SegmentKey const H3DF::ModelImpl::GetSegmentKey() const
 {
 	return m_cSegmentKey;
 }
 
-void H3DF::ModelPrivate::SetBRepGeometry(bool bBrepFlag)
+void H3DF::ModelImpl::SetBRepGeometry(bool bBrepFlag)
 {
 	if (true == bBrepFlag)
 	{
@@ -69,7 +69,7 @@ void H3DF::ModelPrivate::SetBRepGeometry(bool bBrepFlag)
 	HBaseModel::SetBRepGeometry(bBrepFlag);
 }
 
-void H3DF::ModelPrivate::UpdateModelHandedness()
+void H3DF::ModelImpl::UpdateModelHandedness()
 {
 	// see if handedness attribute was defined in the model,
 	// if yes set our member variable

@@ -1,12 +1,12 @@
 ﻿#include "StdAfx.h"
 
 #include "Condition.h"
-#include "./Private/ControlPrivate.h"
+#include "./Impl/ControlImpl.h"
 
 #include "Segment.h"
-#include "./Private/SegmentPrivate.h"
+#include "./Impl/SegmentImpl.h"
 
-#include "../Private/View.Private.h"
+#include "../Impl/ViewImpl.h"
 
 #include <Common_Define.h>
 
@@ -18,13 +18,13 @@ using namespace H3DF;
 //== ConditionControlPrivate class =================================================================
 namespace H3DF
 {
-	class ConditionControlPrivate : public ControlPrivate
+	class ConditionControlPrivate : public ControlImpl
 	{
 	public:
 		ConditionControlPrivate() { m_eType = H3DF::Type::ConditionControl; }
 
 		void Copy(ConditionControlPrivate * pcInThat) {
-			ControlPrivate::Copy(pcInThat);
+			ControlImpl::Copy(pcInThat);
 		}
 	};
 }
@@ -63,9 +63,9 @@ size_t H3DF::ConditionControl::GetCount() const
 	ConditionControlPrivate * pcImpl = (ConditionControlPrivate *) m_pcImpl;
 
 	char chList[MVO_BUFFER_SIZE];
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_Show_Conditions(chList);
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return 0;
 }

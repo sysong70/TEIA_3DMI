@@ -1,15 +1,15 @@
 ﻿#include "StdAfx.h"
 
 #include "Window.h"
-#include "Private/WindowPrivate.h"
+#include "Impl/WindowImpl.h"
 
 #include "Selection.h"
-#include "Private/SelectionPrivate.h"
+#include "Impl/SelectionImpl.h"
 
 #include "Highlight.h"
-#include "Private/HighlightPrivate.h"
+#include "Impl/HighlightImpl.h"
 
-#include "../Private/View.Private.h"
+#include "../Impl/ViewImpl.h"
 
 #include <hc.h>
 #include <HBaseOperator.h>
@@ -21,7 +21,7 @@ USING_3DF_NAMESPACE
 
 H3DF::WindowKey::WindowKey(H3DF::BaseView * pcBaseView)
 {
-	WindowKeyPrivate * pcImpl = new WindowKeyPrivate();
+	WindowKeyImpl * pcImpl = new WindowKeyImpl();
 	m_pcImpl = pcImpl;
 
 	pcImpl->m_pcBaseView = pcBaseView;
@@ -33,14 +33,14 @@ H3DF::WindowKey::WindowKey(H3DF::BaseView * pcBaseView)
 	pcImpl->m_pcSelectionSet = new HSelectionSet((HBaseView *)pcBaseView);
 
 	pcImpl->m_pcSelection = new SelectionControl(*this);
-	SelectionControlPrivate * pcSelectionImpl = static_cast<SelectionControlPrivate *>(pcImpl->m_pcSelection->GetImpl());
+	SelectionControlImpl * pcSelectionImpl = static_cast<SelectionControlImpl *>(pcImpl->m_pcSelection->GetImpl());
 	pcSelectionImpl->m_pcSelectionSet = GetBaseView()->GetSelection();
 
 	pcImpl->m_pcHighlight = new HighlightControl(*this);
-	HighlightControlPrivate * pcHighlightImpl = static_cast<HighlightControlPrivate *>(pcImpl->m_pcHighlight->GetImpl());
+	HighlightControlImpl * pcHighlightImpl = static_cast<HighlightControlImpl *>(pcImpl->m_pcHighlight->GetImpl());
 
 	pcImpl->m_pcSelectionOptions = new SelectionOptionsControl(*this);
-	SelectionOptionsControlPrivate * pcSelectionOptionsImpl = static_cast<SelectionOptionsControlPrivate *>(pcImpl->m_pcSelectionOptions->GetImpl());
+	SelectionOptionsControlImpl * pcSelectionOptionsImpl = static_cast<SelectionOptionsControlImpl *>(pcImpl->m_pcSelectionOptions->GetImpl());
 	pcSelectionOptionsImpl->m_pcSelectionSet = pcImpl->m_pcSelectionSet;
 
 	Initialize();
@@ -48,14 +48,14 @@ H3DF::WindowKey::WindowKey(H3DF::BaseView * pcBaseView)
 
 H3DF::WindowKey::WindowKey(WindowKey const & cInThat)
 {
-	WindowKeyPrivate * pcImpl = new WindowKeyPrivate();
-	pcImpl->m_pcBaseView = ((WindowKeyPrivate *)cInThat.m_pcImpl)->m_pcBaseView;
+	WindowKeyImpl * pcImpl = new WindowKeyImpl();
+	pcImpl->m_pcBaseView = ((WindowKeyImpl *)cInThat.m_pcImpl)->m_pcBaseView;
 	m_pcImpl = pcImpl;
 }
 
 H3DF::WindowKey::~WindowKey()
 {
-	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	WindowKeyImpl * pcImpl = static_cast<WindowKeyImpl *>(m_pcImpl);
 
 	if (nullptr != pcImpl->m_pcSelectionSet)
 	{
@@ -78,13 +78,13 @@ H3DF::WindowKey::~WindowKey()
 
 const H3DF::BaseView * H3DF::WindowKey::GetBaseView() const
 {
-	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	WindowKeyImpl * pcImpl = static_cast<WindowKeyImpl *>(m_pcImpl);
 	return pcImpl->m_pcBaseView;
 }
 
 H3DF::BaseView * H3DF::WindowKey::GetBaseView()
 {
-	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	WindowKeyImpl * pcImpl = static_cast<WindowKeyImpl *>(m_pcImpl);
 	return pcImpl->GetBaseView();
 }
 
@@ -95,32 +95,32 @@ void H3DF::WindowKey::Update()
 
 int H3DF::WindowKey::ViewId()
 {
-	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	WindowKeyImpl * pcImpl = static_cast<WindowKeyImpl *>(m_pcImpl);
 	return pcImpl->m_nViewId;
 }
 
 const int H3DF::WindowKey::ViewId() const
 { 
-	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	WindowKeyImpl * pcImpl = static_cast<WindowKeyImpl *>(m_pcImpl);
 	return pcImpl->m_nViewId;
 }
 
 void H3DF::WindowKey::SetViewId(int nViewId) 
 { 
-	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	WindowKeyImpl * pcImpl = static_cast<WindowKeyImpl *>(m_pcImpl);
 	pcImpl->m_nViewId = nViewId;
 }
 
 void H3DF::WindowKey::Initialize()
 {
-	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	WindowKeyImpl * pcImpl = static_cast<WindowKeyImpl *>(m_pcImpl);
 
 //	HBaseView * pcBaseView = pcImpl->m_pcBaseView;
 }
 
 WindowKey & H3DF::WindowKey::SetSelectionOptions(SelectionOptionsKit const & cInKit)
 {
-	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	WindowKeyImpl * pcImpl = static_cast<WindowKeyImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	//SegmentKey cViewSegment(pcImpl->GetBaseView()->GetViewKey());
@@ -130,7 +130,7 @@ WindowKey & H3DF::WindowKey::SetSelectionOptions(SelectionOptionsKit const & cIn
 
 bool H3DF::WindowKey::ShowSelectionOptions(SelectionOptionsKit & cOutKit) const
 {
-	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	WindowKeyImpl * pcImpl = static_cast<WindowKeyImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	return true;
@@ -138,37 +138,37 @@ bool H3DF::WindowKey::ShowSelectionOptions(SelectionOptionsKit & cOutKit) const
 
 SelectionOptionsControl & H3DF::WindowKey::GetSelectionOptionsControl()
 {
-	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	WindowKeyImpl * pcImpl = static_cast<WindowKeyImpl *>(m_pcImpl);
 	return * pcImpl->m_pcSelectionOptions;
 }
 
 SelectionOptionsControl const & H3DF::WindowKey::GetSelectionOptionsControl() const
 {
-	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	WindowKeyImpl * pcImpl = static_cast<WindowKeyImpl *>(m_pcImpl);
 	return *pcImpl->m_pcSelectionOptions;
 }
 
 SelectionControl & H3DF::WindowKey::GetSelectionControl()
 {
-	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	WindowKeyImpl * pcImpl = static_cast<WindowKeyImpl *>(m_pcImpl);
 	return *pcImpl->m_pcSelection;
 }
 
 SelectionControl const & H3DF::WindowKey::GetSelectionControl() const
 {
-	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	WindowKeyImpl * pcImpl = static_cast<WindowKeyImpl *>(m_pcImpl);
 	return *pcImpl->m_pcSelection;
 }
 
 HighlightControl & H3DF::WindowKey::GetHighlightControl()
 {
-	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	WindowKeyImpl * pcImpl = static_cast<WindowKeyImpl *>(m_pcImpl);
 	return *pcImpl->m_pcHighlight;
 }
 
 HighlightControl const & H3DF::WindowKey::GetHighlightControl() const
 {
-	WindowKeyPrivate * pcImpl = static_cast<WindowKeyPrivate *>(m_pcImpl);
+	WindowKeyImpl * pcImpl = static_cast<WindowKeyImpl *>(m_pcImpl);
 	return *pcImpl->m_pcHighlight;
 }
 

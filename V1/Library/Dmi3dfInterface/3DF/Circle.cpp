@@ -5,7 +5,7 @@
 #include "Math.h"
 #include "Point.h"
 
-#include "Private/KeyPrivate.h"
+#include "Impl/KeyImpl.h"
 
 #include <HTools.h>
 
@@ -13,7 +13,7 @@ using namespace H3DF;
 
 namespace H3DF
 {
-	class CircleKitPrivate : public PrivateImpl
+	class CircleKitPrivate : public Impl
 	{
 	public:
 		void Copy(CircleKitPrivate * pcInThat)
@@ -142,13 +142,13 @@ bool H3DF::CircleKit::ShowPoint(float fInAngle, Point & cOutPoint) const
 //== CircleKey =====================================================================================
 namespace H3DF {
 
-	class CircleKeyPrivate : public H3DF::KeyPrivate
+	class CircleKeyPrivate : public H3DF::KeyImpl
 	{
 	public:
 		CircleKeyPrivate() { m_eType = H3DF::Type::CircleKey; }
 
 		void Copy(CircleKeyPrivate * pcInThat) {
-			KeyPrivate::Copy(pcInThat);
+			KeyImpl::Copy(pcInThat);
 			m_cCircleKit = pcInThat->m_cCircleKit;
 		}
 
@@ -166,7 +166,7 @@ H3DF::CircleKey::CircleKey(Key const & cInKey)
 	CircleKeyPrivate * pcImpl = new CircleKeyPrivate();
 	m_pcImpl = pcImpl;
 
-	((KeyPrivate *)pcImpl)->Copy((KeyPrivate *)(cInKey.GetImpl()));
+	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInKey.GetImpl()));
 
 	// 외부에서 들어오는 Key는 CircleKey가 아닐 수 있으므로, CircleKey로 변경한다.
 	pcImpl->SetType(H3DF::Type::CircleKey);

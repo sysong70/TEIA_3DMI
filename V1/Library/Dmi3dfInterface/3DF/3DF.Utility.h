@@ -17,14 +17,7 @@ namespace H3DF
 
 		CString GetTypeString(Type eType);
 
-		//== Segment User Data 관련 함수 ============================================================= 
-		API_3DF bool SetSegmentName(SegmentKey & cInSegment, CString strName);
-		API_3DF bool ShowSegmentName(SegmentKey & cInSegment, CString & strName);
-
-		API_3DF bool SetTopologyType(SegmentKey & cInSegment, TopologyType eInType);
-		API_3DF bool ShowTopologyType(SegmentKey & cInSegment, TopologyType & eOutType);
-
-		// == String 관련 함수 =======================================================================
+		//== String 관련 함수 ========================================================================
 		// 사용후 Buffer를 삭제해야 함.
 		API_3DF bool UnicodeToChar(CString strText, char *& pchBuffer);
 		API_3DF bool UnicodeToChar(CString strText, char *& pchBuffer, int & nBufferSize);
@@ -33,9 +26,42 @@ namespace H3DF
 		API_3DF bool CharToUnicode(char * pchText, CString & strText);
 		API_3DF CString ToString(char * pchText);
 
-		CString GetExecuteDirectory();
-
-		//== String 관련 함수 ========================================================================
 		API_3DF bool CopyString(const char * pchSoruce, char *& pchDestination);
+
+		//== Raw Data와 숫자 변환 함수 ================================================================
+		CString DoubleToRawString(double dValue);
+		CStringA DoubleToRawStringA(double dValue);
+		double RawStringToDouble(CString strText);
+		double RawStringToDouble(CStringA strText);
+
+		CString IntToRawString(int nValue);
+		CStringA IntToRawStringA(int nValue);
+		int RawStringToInt(CString strText);
+		int RawStringToInt(CStringA strText);
+
+		int RawByteToInt(BYTE * pbData);
+
+		CString ShortToRawString(short nValue);
+		CStringA ShortToRawStringA(short nValue);
+		short RawStringToShort(CString strText);
+		short RawStringToShort(CStringA strText);
+
+		//== File 관련 함수 ==========================================================================
+		CString GetExecuteDirectory();
+	};
+
+	class API_3DF UserData
+	{
+	public:
+		//== Segment User Data 관련 함수 ============================================================= 
+		static bool SetSegmentName(SegmentKey & cInSegment, CString strName);
+		static bool ShowSegmentName(SegmentKey & cInSegment, CString & strName);
+
+		static bool SetTopologyType(SegmentKey & cInSegment, TopologyType eInType);
+		static bool ShowTopologyType(SegmentKey & cInSegment, TopologyType & eOutType);
+
+		//== Geomety User Data 관련 함수 ============================================================= 
+		static bool SetTopologyType(GeometryKey & cInGeometry, TopologyType eInType);
+		static bool ShowTopologyType(GeometryKey & cInGeometry, TopologyType & eOutType);
 	};
 };

@@ -5,13 +5,13 @@
 #include "Math.h"
 #include "Point.h"
 
-#include "Private/KeyPrivate.h"
+#include "Impl/KeyImpl.h"
 
 #include <HTools.h>
 
 USING_3DF_NAMESPACE
 
-class CameraKitPrivate : public PrivateImpl
+class CameraKitPrivate : public Impl
 {
 public:
 	void Copy(CameraKitPrivate * pcInThat)

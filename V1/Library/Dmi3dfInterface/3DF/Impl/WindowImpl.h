@@ -13,13 +13,13 @@ namespace H3DF
 {
 	class BaseView;
 
-	class API_3DF WindowKeyPrivate : public PrivateImpl
+	class API_3DF WindowKeyImpl : public Impl
 	{
 	public:
-		WindowKeyPrivate();
-		virtual ~WindowKeyPrivate();
+		WindowKeyImpl();
+		virtual ~WindowKeyImpl();
 
-		void Copy(WindowKeyPrivate * pcInThat);
+		void Copy(WindowKeyImpl * pcInThat);
 
 		HC_KEY GetSceneKey();
 		const HC_KEY GetSceneKey() const;

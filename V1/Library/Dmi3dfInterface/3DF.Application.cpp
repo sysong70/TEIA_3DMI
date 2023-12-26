@@ -32,7 +32,7 @@ using namespace H3DF;
 
 namespace H3DF
 {
-	class ApplicationPrivate : public PrivateImpl
+	class ApplicationPrivate : public Impl
 	{
 	public:
 		HDB * m_pcHoopsDB = nullptr;

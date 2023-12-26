@@ -6,58 +6,62 @@
 #include "Math.Matrix.h"
 #include "Point.h"
 
-#include "Private/KeyPrivate.h"
+#include "Impl/KeyImpl.h"
+#include "Impl/GeometryImpl.h"
 
 #include <HTools.h>
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
-class LineKitPrivate : public PrivateImpl
+namespace H3DF
 {
-public:
-	void Copy(LineKitPrivate * that)
+	class LineKitPrivate : public Impl
 	{
-		m_aPoints  = that->m_aPoints;
- 		m_cColor = that->m_cColor;
- 		strncpy(m_chPattern, that->m_chPattern, PATTERN_BUFFER_SIZE);
-	}
+	public:
+		void Copy(LineKitPrivate * that)
+		{
+			m_aPoints = that->m_aPoints;
+			m_cColor = that->m_cColor;
+			strncpy(m_chPattern, that->m_chPattern, PATTERN_BUFFER_SIZE);
+		}
 
-	PointArray m_aPoints;
-	H3DF::RGBColor m_cColor;
-	char m_chPattern[PATTERN_BUFFER_SIZE];
-};
+		PointArray m_aPoints;
+		H3DF::RGBColor m_cColor;
+		char m_chPattern[PATTERN_BUFFER_SIZE];
+	};
+}
 
-LineKit::LineKit()
+H3DF::LineKit::LineKit()
 {
 	m_pcImpl = new LineKitPrivate();
 }
 
-LineKit::LineKit(LineKit const & cInThat)
+H3DF::LineKit::LineKit(LineKit const & cInThat)
 {
 	m_pcImpl = new LineKitPrivate();
 	Set(cInThat);
 }
 
-void LineKit::Set(LineKit const & cInThat)
+void H3DF::LineKit::Set(LineKit const & cInThat)
 {
 	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
 	LineKitPrivate * pcInThatImpl = (LineKitPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-LineKit const & LineKit::operator=(LineKit const & cInThat)
+LineKit & H3DF::LineKit::operator = (LineKit const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-unsigned int LineKit::GetPointCount() const
+unsigned int H3DF::LineKit::GetPointCount() const
 {
 	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
 	return static_cast<unsigned int>(pcImpl->m_aPoints.size());
 }
 
-void LineKit::GetPoints(unsigned int & nOutCount, H3DF::Point pcOutPoints[]) const
+void H3DF::LineKit::GetPoints(unsigned int & nOutCount, H3DF::Point pcOutPoints[]) const
 {
 	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
 
@@ -72,7 +76,7 @@ void LineKit::GetPoints(unsigned int & nOutCount, H3DF::Point pcOutPoints[]) con
 	}
 }
 
-void LineKit::SetPoints(unsigned int nInCount, Point const pcInPoints[])
+void H3DF::LineKit::SetPoints(unsigned int nInCount, Point const pcInPoints[])
 {
 	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
 	pcImpl->m_aPoints.resize(nInCount);
@@ -82,19 +86,19 @@ void LineKit::SetPoints(unsigned int nInCount, Point const pcInPoints[])
 	}
 }
 
-void LineKit::GetRGBColor(H3DF::RGBColor & cOutColor) const
+void H3DF::LineKit::GetRGBColor(H3DF::RGBColor & cOutColor) const
 {
 	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
 	cOutColor = pcImpl->m_cColor;
 }
 
-void LineKit::SetRGBColor(RGBColor const & cInColor)
+void H3DF::LineKit::SetRGBColor(RGBColor const & cInColor)
 {
 	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
 	pcImpl->m_cColor = cInColor;
 }
 
-void LineKit::GetLinePattern(char out_pattern[PATTERN_BUFFER_SIZE]) const
+void H3DF::LineKit::GetLinePattern(char out_pattern[PATTERN_BUFFER_SIZE]) const
 {
 	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
 	strncpy(out_pattern, pcImpl->m_chPattern, PATTERN_BUFFER_SIZE);
@@ -103,46 +107,58 @@ void LineKit::GetLinePattern(char out_pattern[PATTERN_BUFFER_SIZE]) const
 //== LineKey =======================================================================================
 namespace H3DF {
 
-	class LineKeyPrivate : public H3DF::KeyPrivate
+	class LineKeyPrivate : public GeometryKeyImpl
 	{
 	public:
 		LineKeyPrivate() { m_eType = H3DF::Type::LineKey; }
+		~LineKeyPrivate();
 
 		void Copy(LineKeyPrivate * pcInThat) {
-			KeyPrivate::Copy(pcInThat);
+			KeyImpl::Copy(pcInThat);
 		}
 	};
 };
 
-LineKey::LineKey()
+H3DF::LineKeyPrivate::~LineKeyPrivate()
 {
-	m_pcImpl = new LineKeyPrivate();
+	int i = 0;
 }
 
-LineKey::LineKey(Key const & cInKey)
+H3DF::LineKey::LineKey(HC_KEY nInKey) : GeometryKey(INVALID_KEY)
+{
+	LineKeyPrivate * pcImpl = new LineKeyPrivate();
+	pcImpl->SetKeyValue(nInKey);
+
+	m_pcImpl = pcImpl;
+}
+
+H3DF::LineKey::LineKey(Key const & cInKey)
 {
 	LineKeyPrivate * pcImpl = new LineKeyPrivate();
 	m_pcImpl = pcImpl;
 
-	((KeyPrivate *)pcImpl)->Copy((KeyPrivate *)(cInKey.GetImpl()));
+	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInKey.GetImpl()));
 
 	// 외부에서 들어오는 Key는 LineKey가 아닐 수 있으므로, LineKey로 변경한다.
 	pcImpl->SetType(H3DF::Type::LineKey);
 }
 
-LineKey::LineKey(LineKey const & cInThat)
+H3DF::LineKey::LineKey(LineKey const & cInThat)
 {
 	m_pcImpl = new LineKeyPrivate();
 	Set(cInThat);
 }
 
-void LineKey::Set(LineKey const & cInThat)
+H3DF::LineKey::~LineKey()
+{
+	int i = 0;
+}
+
+void H3DF::LineKey::Set(LineKey const & cInThat)
 {
 	if (nullptr == m_pcImpl || nullptr == cInThat.m_pcImpl) {
 		return;
 	}
-
-	SetKeyValue(cInThat.KeyValue());
 
 	LineKeyPrivate * pcImpl = (LineKeyPrivate *)m_pcImpl;
 	LineKeyPrivate * pcInThatImpl = (LineKeyPrivate *)cInThat.m_pcImpl;
@@ -150,13 +166,13 @@ void LineKey::Set(LineKey const & cInThat)
 	pcImpl->Copy(pcInThatImpl);
 }
 
-LineKey & LineKey::operator=(LineKey const & cInThat)
+LineKey & H3DF::LineKey::operator=(LineKey const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-int LineKey::GetPointCount() const
+int H3DF::LineKey::GetPointCount() const
 {
 	int nCount = 0;
 	HC_Show_Polyline_Count(KeyValue(), &nCount);
@@ -164,7 +180,7 @@ int LineKey::GetPointCount() const
 	return nCount;
 }
 
-bool LineKey::ShowPoints(WorldPointArray & aOutPoints) const
+bool H3DF::LineKey::ShowPoints(WorldPointArray & aOutPoints) const
 {
 	int nCount = 0;
 	HC_Show_Polyline_Count(KeyValue(), &nCount);
@@ -187,7 +203,7 @@ bool LineKey::ShowPoints(WorldPointArray & aOutPoints) const
 	return true;
 }
 
-bool LineKey::IsCoincident(const LineKey & cInThat, const MatrixKit & cMatrix1, const MatrixKit & cMatrix2) const
+bool H3DF::LineKey::IsCoincident(const LineKey & cInThat, const MatrixKit & cMatrix1, const MatrixKit & cMatrix2) const
 {
 	WorldPointArray aPoints;
 	if (false == ShowPoints(aPoints)) {
@@ -235,7 +251,7 @@ bool LineKey::IsCoincident(const LineKey & cInThat, const MatrixKit & cMatrix1, 
 	return true;
 }
 
-bool LineKey::GetEndPoint(Point & cSP, Point & cEP)
+bool H3DF::LineKey::GetEndPoint(Point & cSP, Point & cEP)
 {
 	WorldPointArray aPoints;
 	if (false == ShowPoints(aPoints)) {
@@ -253,7 +269,7 @@ bool LineKey::GetEndPoint(Point & cSP, Point & cEP)
 	return true;
 }
 
-bool LineKey::GetMidPoint(Point & cMP)
+bool H3DF::LineKey::GetMidPoint(Point & cMP)
 {
 	WorldPointArray aPoints;
 	if (false == ShowPoints(aPoints)) {
@@ -301,7 +317,7 @@ bool LineKey::GetMidPoint(Point & cMP)
 	return false;
 }
 
-bool LineKey::GetIntersectionPoint(LineKey & cInLine, PointArray & aOutIntersectionPoints)
+bool H3DF::LineKey::GetIntersectionPoint(LineKey & cInLine, PointArray & aOutIntersectionPoints)
 {
 	WorldPointArray aPoints;
 	if (false == ShowPoints(aPoints)) {
@@ -322,7 +338,7 @@ bool LineKey::GetIntersectionPoint(LineKey & cInLine, PointArray & aOutIntersect
 }
 
 // Object Snap 계산을 위한 함수, 각 Line이 Modeling Matrix에 의해서 좌표가 변환되어 있기때문에, 이를 고려하여 계산한다.
-bool LineKey::GetIntersectionPoint(LineKey & cInLine, const MatrixKit & cMatrix1, const MatrixKit & cMatrix2, PointArray & aOutIntersectionPoints)
+bool H3DF::LineKey::GetIntersectionPoint(LineKey & cInLine, const MatrixKit & cMatrix1, const MatrixKit & cMatrix2, PointArray & aOutIntersectionPoints)
 {
 	WorldPointArray aPoints;
 	if (false == ShowPoints(aPoints)) {
@@ -345,7 +361,7 @@ bool LineKey::GetIntersectionPoint(LineKey & cInLine, const MatrixKit & cMatrix1
 	return GetIntersectionPoint(aPoints, aInPoints, aOutIntersectionPoints);
 }
 
-bool LineKey::GetIntersectionPoint(const WorldPointArray & aPoints1, const WorldPointArray & aPoints2, PointArray & aOutIntersectionPoints)
+bool H3DF::LineKey::GetIntersectionPoint(const WorldPointArray & aPoints1, const WorldPointArray & aPoints2, PointArray & aOutIntersectionPoints)
 {
 	bool bResult = false;
 	Point cSP[2], cEP[2], cIntersectionPoint;
@@ -386,7 +402,7 @@ bool LineKey::GetIntersectionPoint(const WorldPointArray & aPoints1, const World
 }
 
 //== 계산 함수 ===================================================================================
-bool LineKey::NearPoint(WindowKey const & cInWindow, const MatrixKit & cModelingMatrix, const WindowPoint & cInPoint, WorldPoint & cOutPoint) const
+bool H3DF::LineKey::NearPoint(WindowKey const & cInWindow, const MatrixKit & cModelingMatrix, const WindowPoint & cInPoint, WorldPoint & cOutPoint) const
 {
 	WorldPointArray aPoints;
 
@@ -426,7 +442,7 @@ bool LineKey::NearPoint(WindowKey const & cInWindow, const MatrixKit & cModeling
 	return bResultFlag;
 }
 
-bool LineKey::DistanceToPoint(const WorldPoint & cInPoint, double & nOutDistance) const
+bool H3DF::LineKey::DistanceToPoint(const WorldPoint & cInPoint, double & nOutDistance) const
 {
 /*
 	PointArray aPoints;
@@ -441,7 +457,7 @@ bool LineKey::DistanceToPoint(const WorldPoint & cInPoint, double & nOutDistance
 	return false;
 }
 
-bool LineKey::Length(double & dLength) const
+bool H3DF::LineKey::Length(double & dLength) const
 {
 	int nCount = 0;
 	HC_Show_Polyline_Count(KeyValue(), &nCount);

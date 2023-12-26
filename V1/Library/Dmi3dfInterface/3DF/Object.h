@@ -13,11 +13,13 @@ namespace H3DF
 		virtual H3DF::Type Type() const;
 
 		H3DF::Type ObjectType() const { return H3DF::Type::None; };
-		PrivateImpl * GetImpl() { return m_pcImpl; }
-		const PrivateImpl * GetImpl() const { return m_pcImpl; }
+		Impl * GetImpl() { return m_pcImpl; }
+		const Impl * GetImpl() const { return m_pcImpl; }
 
 	protected:
-		friend class PrivateImpl;
-		PrivateImpl * m_pcImpl = nullptr;
+		friend class Impl;
+		friend class KeyImpl;
+
+		Impl * m_pcImpl = nullptr;
 	};
 }

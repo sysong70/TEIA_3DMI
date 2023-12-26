@@ -3,7 +3,7 @@
 #include "Point.h"
 
 #include "Window.h"
-#include "Private/WindowPrivate.h"
+#include "Impl/WindowImpl.h"
 
 #include "HTools.h"
 #include "HGlobals.h"
@@ -20,7 +20,7 @@ H3DF::ObjectPoint::ObjectPoint(HPoint & cInPoint)
 
 H3DF::ObjectPoint::ObjectPoint(WindowKey const & cInWindow, WorldPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "world", &cInPoint, "object", this);
@@ -29,7 +29,7 @@ H3DF::ObjectPoint::ObjectPoint(WindowKey const & cInWindow, WorldPoint const & c
 
 H3DF::ObjectPoint::ObjectPoint(WindowKey const & cInWindow, InnerWindowPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "local window", &cInPoint, "object", this);
@@ -38,7 +38,7 @@ H3DF::ObjectPoint::ObjectPoint(WindowKey const & cInWindow, InnerWindowPoint con
 
 H3DF::ObjectPoint::ObjectPoint(WindowKey const & cInWindow, WindowPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "outer window", &cInPoint, "object", this);
@@ -47,7 +47,7 @@ H3DF::ObjectPoint::ObjectPoint(WindowKey const & cInWindow, WindowPoint const & 
 
 H3DF::ObjectPoint::ObjectPoint(WindowKey const & cInWindow, PixelPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "local pixels", &cInPoint, "object", this);
@@ -69,7 +69,7 @@ H3DF::WorldPoint::WorldPoint(HPoint & cInPoint)
 
 H3DF::WorldPoint::WorldPoint(WindowKey const & cInWindow, ObjectPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "object", &cInPoint, "world", this);
@@ -78,7 +78,7 @@ H3DF::WorldPoint::WorldPoint(WindowKey const & cInWindow, ObjectPoint const & cI
 
 H3DF::WorldPoint::WorldPoint(WindowKey const & cInWindow, InnerWindowPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "local window", &cInPoint, "world", this);
@@ -87,7 +87,7 @@ H3DF::WorldPoint::WorldPoint(WindowKey const & cInWindow, InnerWindowPoint const
 
 H3DF::WorldPoint::WorldPoint(WindowKey const & cInWindow, WindowPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "outer window", &cInPoint, "world", this);
@@ -96,7 +96,7 @@ H3DF::WorldPoint::WorldPoint(WindowKey const & cInWindow, WindowPoint const & cI
 
 H3DF::WorldPoint::WorldPoint(WindowKey const & cInWindow, PixelPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "local pixels", &cInPoint, "world", this);
@@ -118,7 +118,7 @@ H3DF::InnerWindowPoint::InnerWindowPoint(HPoint & cInPoint)
 
 H3DF::InnerWindowPoint::InnerWindowPoint(WindowKey const & cInWindow, ObjectPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "object", &cInPoint, "local window", this);
@@ -127,7 +127,7 @@ H3DF::InnerWindowPoint::InnerWindowPoint(WindowKey const & cInWindow, ObjectPoin
 
 H3DF::InnerWindowPoint::InnerWindowPoint(WindowKey const & cInWindow, WorldPoint const & cInPoint) 
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "world", &cInPoint, "local window", this);
@@ -136,7 +136,7 @@ H3DF::InnerWindowPoint::InnerWindowPoint(WindowKey const & cInWindow, WorldPoint
 
 H3DF::InnerWindowPoint::InnerWindowPoint(WindowKey const & cInWindow, WindowPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "outer window", &cInPoint, "local window", this);
@@ -145,7 +145,7 @@ H3DF::InnerWindowPoint::InnerWindowPoint(WindowKey const & cInWindow, WindowPoin
 
 H3DF::InnerWindowPoint::InnerWindowPoint(WindowKey const & cInWindow, PixelPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "local pixels", &cInPoint, "local window", this);
@@ -167,7 +167,7 @@ H3DF::WindowPoint::WindowPoint(HPoint & cInPoint)
 
 H3DF::WindowPoint::WindowPoint(WindowKey const & cInWindow, ObjectPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "object", &cInPoint, "outer window", this);
@@ -176,7 +176,7 @@ H3DF::WindowPoint::WindowPoint(WindowKey const & cInWindow, ObjectPoint const & 
 
 H3DF::WindowPoint::WindowPoint(WindowKey const & cInWindow, WorldPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "world", &cInPoint, "outer window", this);
@@ -185,7 +185,7 @@ H3DF::WindowPoint::WindowPoint(WindowKey const & cInWindow, WorldPoint const & c
 
 H3DF::WindowPoint::WindowPoint(WindowKey const & cInWindow, InnerWindowPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "local window", &cInPoint, "outer window", this);
@@ -194,7 +194,7 @@ H3DF::WindowPoint::WindowPoint(WindowKey const & cInWindow, InnerWindowPoint con
 
 H3DF::WindowPoint::WindowPoint(WindowKey const & cInWindow, PixelPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "local pixels", &cInPoint, "outer window", this);
@@ -216,7 +216,7 @@ H3DF::PixelPoint::PixelPoint(HPoint & cInPoint)
 
 H3DF::PixelPoint::PixelPoint(WindowKey const & cInWindow, ObjectPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "object", &cInPoint, "local pixels", this);
@@ -225,7 +225,7 @@ H3DF::PixelPoint::PixelPoint(WindowKey const & cInWindow, ObjectPoint const & cI
 
 H3DF::PixelPoint::PixelPoint(WindowKey const & cInWindow, WorldPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "world", &cInPoint, "local pixels", this);
@@ -234,7 +234,7 @@ H3DF::PixelPoint::PixelPoint(WindowKey const & cInWindow, WorldPoint const & cIn
 
 H3DF::PixelPoint::PixelPoint(WindowKey const & cInWindow, InnerWindowPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "local window", &cInPoint, "local pixels", this);
@@ -243,7 +243,7 @@ H3DF::PixelPoint::PixelPoint(WindowKey const & cInWindow, InnerWindowPoint const
 
 H3DF::PixelPoint::PixelPoint(WindowKey const & cInWindow, WindowPoint const & cInPoint)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(cInWindow.GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(cInWindow.GetImpl());
 
 	HC_Open_Segment_By_Key(pcWindowKeyPrivate->GetSceneKey()); {
 		HC_Compute_Coordinates(".", "outer window", &cInPoint, "local pixels", this);

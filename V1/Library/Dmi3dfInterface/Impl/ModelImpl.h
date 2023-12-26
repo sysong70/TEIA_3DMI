@@ -17,11 +17,11 @@ namespace H3DF
 {
 	class MultiSelectManager;
 
-	class ModelPrivate : public HBaseModel, public PrivateImpl
+	class ModelImpl : public HBaseModel, public Impl
 	{
 	public:
-		ModelPrivate();
-		virtual ~ModelPrivate();
+		ModelImpl();
+		virtual ~ModelImpl();
 
 		SegmentKey GetSegmentKey();
 		SegmentKey const GetSegmentKey() const;

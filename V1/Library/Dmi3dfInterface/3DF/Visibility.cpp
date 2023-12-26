@@ -3,7 +3,7 @@
 #include "Visibility.h"
 
 #include "Segment.h"
-#include "./Private/SegmentPrivate.h"
+#include "./Impl/SegmentImpl.h"
 
 #include <HUtility.h>
 #include <HTools.h>
@@ -258,35 +258,35 @@ VisibilityControl & VisibilityControl::UnsetGeometry()
 
 VisibilityControl & VisibilityControl::UnsetEverything()
 {
-	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
+	SegmentKeyImpl::LocalOpen(m_cInSegmentKey);
 
 	HC_UnSet_Visibility();
 
-	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
+	SegmentKeyImpl::LocalClose(m_cInSegmentKey);
 
 	return *this;
 }
 
 VisibilityControl & VisibilityControl::SetVisibility(CString strInType, bool bInValue)
 {
-	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
+	SegmentKeyImpl::LocalOpen(m_cInSegmentKey);
 
 	CString strList;
 	strList.Format(L"%s = %s", strInType, (true == bInValue ? L"on" : L"off"));
 	HC_Set_Visibility(Utility::ToChar(strList));
 
-	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);
+	SegmentKeyImpl::LocalClose(m_cInSegmentKey);
 
 	return *this;
 }
 
 VisibilityControl & VisibilityControl::UnSetVisibility(CString strInType)
 {
-	SegmentKeyPrivate::LocalOpen(m_cInSegmentKey);
+	SegmentKeyImpl::LocalOpen(m_cInSegmentKey);
 
 	HC_UnSet_One_Visibility(Utility::ToChar(strInType));
 
-	SegmentKeyPrivate::LocalClose(m_cInSegmentKey);	
+	SegmentKeyImpl::LocalClose(m_cInSegmentKey);	
 
 	return *this;
 }

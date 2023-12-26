@@ -6,10 +6,9 @@
 
 #include <HTools.h>
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
-H3DF::IncludeKey::IncludeKey(HC_KEY nInKey) :
-	Key(nInKey)
+H3DF::IncludeKey::IncludeKey(HC_KEY nInKey) : Key(nInKey)
 {
 	
 }

@@ -5,10 +5,10 @@
 #include <HBaseModel.h>
 
 #include "3DF.Canvas.h"
-#include "Private/Canvas.Private.h"
+#include "Impl/CanvasImpl.h"
 
 #include "3DF.View.h"
-#include "Private/View.Private.h"
+#include "Impl/ViewImpl.h"
 
 #include "3DF/3DF.Utility.h"
 
@@ -18,7 +18,7 @@ Canvas H3DF::Factory::CreateCanvas(H3DF::WindowHandle nInWindowHandle, char cons
 {
 	Canvas cCanvas;
 
-	CanvasPrivate * pcImpl = (CanvasPrivate *)cCanvas.GetImpl();;
+	CanvasImpl * pcImpl = (CanvasImpl *)cCanvas.GetImpl();;
 	if (nullptr == pcImpl) {
 		assert(false);
 	}
@@ -38,7 +38,7 @@ View H3DF::Factory::CreateView(char const * chInName)
 {
 	View cView;
 
-	ViewPrivate * pcImpl = (ViewPrivate *)cView.GetImpl();
+	ViewImpl * pcImpl = (ViewImpl *)cView.GetImpl();
 	if (nullptr == pcImpl) {
 		assert(false);
 	}

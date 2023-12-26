@@ -2,9 +2,9 @@
 
 #include "Marker.h"
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
-MarkerKey::MarkerKey(HC_KEY nInKey) :
+H3DF::MarkerKey::MarkerKey(HC_KEY nInKey) :
 	Key(nInKey)
 {
 }

@@ -8,9 +8,9 @@ OPEN_3DF_NAMESPACE
 class API_3DF Key : public Object
 {
 public:
-	Key(HC_KEY nInKey = INVALID_KEY);
+	Key();
+	Key(HC_KEY nInKey);
 	Key(Key const & cInThat);
-	virtual ~Key();
 
 	void Set(Key const & cInThat);
 	Key const & operator = (Key const & cInThat);

@@ -2,10 +2,10 @@
 
 #include "AttributeLock.h"
 
-#include "./Private/ControlPrivate.h"
+#include "./Impl/ControlImpl.h"
 
 #include "Segment.h"
-#include "./Private/SegmentPrivate.h"
+#include "./Impl/SegmentImpl.h"
 
 #include <HUtility.h>
 #include <HTools.h>
@@ -14,13 +14,13 @@ using namespace H3DF;
 
 namespace H3DF
 {
-	class AttributeLockControlPrivate : public ControlPrivate
+	class AttributeLockControlPrivate : public ControlImpl
 	{
 	public:
 		AttributeLockControlPrivate() { m_eType = H3DF::Type::AttributeLockControl; }
 
 		void Copy(AttributeLockControlPrivate * pcInThat) {
-			ControlPrivate::Copy(pcInThat);
+			ControlImpl::Copy(pcInThat);
 		}
 
 		CStringA GetTypeString(AttributeLock::Type eInType);
@@ -446,9 +446,9 @@ AttributeLockControl & H3DF::AttributeLockControl::SetLock(AttributeLock::Type e
 
 	strOption += pcImpl->GetTypeString(eInType);
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cOverrideKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_Set_Rendering_Options(strOption);
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cOverrideKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }

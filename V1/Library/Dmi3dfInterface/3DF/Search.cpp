@@ -2,25 +2,25 @@
 
 #include "Search.h"
 
-#include "./Private/SearchPrivate.h"
+#include "./Impl/SearchImpl.h"
 
 using namespace H3DF;
 
 H3DF::SearchOptionsKit::SearchOptionsKit()
 {
-	m_pcImpl = new SearchOptionsKitPrivate();
+	m_pcImpl = new SearchOptionsKitImpl();
 }
 
 H3DF::SearchOptionsKit::SearchOptionsKit(SearchOptionsKit const & cInKit)
 {
-	m_pcImpl = new SearchOptionsKitPrivate();
+	m_pcImpl = new SearchOptionsKitImpl();
 	Set(cInKit);
 }
 
 void H3DF::SearchOptionsKit::Set(SearchOptionsKit const & cInThat)
 {
-	SearchOptionsKitPrivate * pcImpl = (SearchOptionsKitPrivate *)m_pcImpl;
-	SearchOptionsKitPrivate * pcInThatImpl = (SearchOptionsKitPrivate *)cInThat.m_pcImpl;
+	SearchOptionsKitImpl * pcImpl = (SearchOptionsKitImpl *)m_pcImpl;
+	SearchOptionsKitImpl * pcInThatImpl = (SearchOptionsKitImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 

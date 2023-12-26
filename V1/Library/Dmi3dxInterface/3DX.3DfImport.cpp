@@ -232,7 +232,7 @@ void TdfImport::CreateBasicModelTree(CString strFilePathName, H3DF::SegmentKey &
 		SegmentKey cSegment = cInclude.GetTarget();
 
 		CString strName;
-		if (false == H3DF::Utility::ShowSegmentName(cSegment, strName)) {
+		if (false == H3DF::UserData::ShowSegmentName(cSegment, strName)) {
 			strName = cSegment.Name();
 		}
 
@@ -396,7 +396,7 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 
 	//cSegment.Open(); // Segment를 Open하면 문제가 생김. 검토가 필요함.
 
- 	H3DF::Utility::SetSegmentName(cSegment, strPoName);
+ 	H3DF::UserData::SetSegmentName(cSegment, strPoName);
 
 	// Attribute 생성
 	// Parent에서 받은(계단식으로) Attribute를 이용해서, Attribute를 생성
@@ -1106,11 +1106,12 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 			break;
 
 			case kA3DTypeRiBrepModel:
+				H3DF::UserData::SetTopologyType(cSegment, TopologyType::Solid);
 				eStatus = ParseRiBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
 			break;
 
 			case kA3DTypeRiPolyBrepModel: {
-				H3DF::Utility::SetTopologyType(cSegment, TopologyType::Solid);
+				H3DF::UserData::SetTopologyType(cSegment, TopologyType::Solid);
 				eStatus = DrawRiPolyBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
 			} break;
 
@@ -2365,6 +2366,15 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 {
 	LogIncreaseTabIndex(2);
 
+	bool bSolidSegmentFlag = false;
+
+	TopologyType eParentTopoType;
+	if (true == H3DF::UserData::ShowTopologyType(cParentSegment, eParentTopoType)) {
+		if(TopologyType::Solid == eParentTopoType) {
+			bSolidSegmentFlag = true;
+		}
+	}
+
 	double dUnitScale = 1.0;	// Tessellation은 1:1 비율로 들어온다 
 
 	H3DF::SegmentKey cCurrnetSegment = cParentSegment;
@@ -2578,7 +2588,11 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 				acWirePoints[k] = m_pcPoints[cTess3dData.m_puiWireIndexes[nStartWireIndex + index++] / 3];
 			}
 
-			LineKey cLineKey = cCurrnetSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
+			H3DF::LineKey cLineKey = cCurrnetSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
+
+			if (true == bSolidSegmentFlag) {
+				H3DF::UserData::SetTopologyType(cLineKey, TopologyType::Edge);
+			}
 		}
 	
 		cConFaceInfo.nOutTriSizeIndex = 0;	// 한 Triangle Type당 하나씩

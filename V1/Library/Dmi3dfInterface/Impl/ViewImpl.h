@@ -46,13 +46,13 @@ namespace H3DF
 		H3DF::ViewDirection::Mode m_eViewMode = H3DF::ViewDirection::Mode::Unknown;
 	};
 
-	class ViewPrivate : public PrivateImpl
+	class ViewImpl : public Impl
 	{
 	public:
-		ViewPrivate();
-		virtual ~ViewPrivate();
+		ViewImpl();
+		virtual ~ViewImpl();
 
-		void Copy(const ViewPrivate * pcInThat);
+		void Copy(const ViewImpl * pcInThat);
 
 		bool Init(H3DF::Model * pcInModel, const char * pchInDriverType, const char * pchInInstanceName, H3DF::WindowHandle nInWindowHandle);
 

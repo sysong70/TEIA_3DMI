@@ -3,7 +3,7 @@
 #include "Portfolio.h"
 
 #include "Segment.h"
-#include "./Private/SegmentPrivate.h"
+#include "./Impl/SegmentImpl.h"
 
 #include "Style.h"
 
@@ -40,11 +40,11 @@ PortfolioKey & PortfolioKey::operator = (PortfolioKey const & cInThat)
 
 NamedStyleDefinition PortfolioKey::DefineNamedStyle(CString strInName, SegmentKey const & cInStyleSource)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	SegmentKey cSubSegment = Subsegment(strInName);
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	NamedStyleDefinition cStyle(cSubSegment.KeyValue());
 	return cStyle;

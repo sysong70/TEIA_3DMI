@@ -8,7 +8,7 @@
 #include "../3DF.h"
 #include "../Kit.h"
 #include "../Highlight.h"
-#include "../../Private/View.Private.h"
+#include "../../Impl/ViewImpl.h"
 
 #include "../Math.h"
 
@@ -16,10 +16,10 @@
 
 namespace H3DF
 {
-	class HighlightOptionsKitPrivate : public PrivateImpl
+	class HighlightOptionsKitImpl : public Impl
 	{
 	public:
-		void Copy(HighlightOptionsKitPrivate * pcInThat) {
+		void Copy(HighlightOptionsKitImpl * pcInThat) {
 			strncpy(m_chInStyleName, pcInThat->m_chInStyleName, STYLE_BUFFER_SIZE);
 			strncpy(m_chInSecondaryStyleName, pcInThat->m_chInSecondaryStyleName, STYLE_BUFFER_SIZE);
 			m_nNotification = pcInThat->m_nNotification;
@@ -30,13 +30,13 @@ namespace H3DF
 		int m_nNotification = -1;
 	};
 
-	class HighlightControlPrivate : public PrivateImpl
+	class HighlightControlImpl : public Impl
 	{
 	public:
-		HighlightControlPrivate();
-		HighlightControlPrivate(WindowKey const & cInWindow);
+		HighlightControlImpl();
+		HighlightControlImpl(WindowKey const & cInWindow);
 
-		void Copy(HighlightControlPrivate * pcInThat) {
+		void Copy(HighlightControlImpl * pcInThat) {
 			m_pcWindow = pcInThat->m_pcWindow;
 		}
 

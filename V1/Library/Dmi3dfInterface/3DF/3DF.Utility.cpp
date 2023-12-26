@@ -217,56 +217,7 @@ CString H3DF::Utility::GetTypeString(Type eType)
 	return strText;
 }
 
-bool H3DF::Utility::SetSegmentName(SegmentKey & cInSegment, CString strName)
-{
-	char * pchName = nullptr;
-	int nSize = 0;
-
-	if (false == UnicodeToChar(strName, pchName, nSize)) {
-		return false;
-	}
-
-	cInSegment.SetUserData((intptr_t)UserDataIndex::Name, nSize, (BYTE *)pchName);
-
-	delete [] pchName;
-
-	return true;
-}
-
-bool H3DF::Utility::ShowSegmentName(SegmentKey & cInSegment, CString & strName)
-{
-	ByteArray aUserData;
-	if (false == cInSegment.ShowUserData((intptr_t)UserDataIndex::Name, aUserData)) {
-		return false;
-	}
-
-	if (false == CharToUnicode((char *)aUserData.data(), strName)) {
-		return false;
-	}
-
-	return true;
-}
-
-bool H3DF::Utility::SetTopologyType(SegmentKey & cInSegment, TopologyType eInType)
-{
-	int nSize = sizeof(USHORT);
-	cInSegment.SetUserData((intptr_t)UserDataIndex::Topology, sizeof(USHORT), (BYTE *)eInType);
-
-	return true;
-}
-
-bool H3DF::Utility::ShowTopologyType(SegmentKey & cInSegment, TopologyType & eOutType)
-{
-	ByteArray aUserData;
-	if (false == cInSegment.ShowUserData((intptr_t)UserDataIndex::Topology, aUserData)) {
-		return false;
-	}
-
-	eOutType = (TopologyType)((USHORT)aUserData.data());
-
-	return true;
-}
-
+//== String 관련 함수 ===============================================================================
 bool H3DF::Utility::UnicodeToChar(CString strText, char *& pchBuffer)
 {
 	int nBufferSize = 0;
@@ -359,24 +310,6 @@ CString H3DF::Utility::ToString(char * pchText)
 	return strText;
 }
 
-CString H3DF::Utility::GetExecuteDirectory()
-{
-	TCHAR szBuffer[MAX_PATH];
-	TCHAR Drive[_MAX_DRIVE];
-	TCHAR Path[_MAX_PATH];
-	TCHAR Filename[_MAX_FNAME];
-	TCHAR Ext[_MAX_EXT];
-
-	GetModuleFileName(NULL, szBuffer, sizeof(szBuffer)); // get process file name
-	_wsplitpath_s(szBuffer, Drive, _MAX_DRIVE, Path, _MAX_PATH, Filename, _MAX_FNAME, Ext, _MAX_EXT); // get drive, path, file, ext name
-
-	CString strFilePath;
-	strFilePath.Format(L"%s%s", Drive, Path);
-
-	return strFilePath;
-}
-
-//== String 관련 함수 ===============================================================================
 bool H3DF::Utility::CopyString(const char * pchSoruce, char *& pchDestination)
 {
 	// 입력 문자열의 크기 계산
@@ -404,6 +337,212 @@ bool H3DF::Utility::CopyString(const char * pchSoruce, char *& pchDestination)
 	// 문자열 복사
 	wcscpy(pchCopyBuffer, pchBuffer);
 */
+
+	return true;
+}
+
+//== Raw Data와 숫자 변환 함수 ========================================================================
+
+CString H3DF::Utility::DoubleToRawString(double dValue)
+{
+	// Assumes sizeof(long long) == 8.
+	CString strText;
+	strText.Format(L"%llx", *(ULONGLONG *) & dValue);
+
+	return strText;
+}
+
+CStringA H3DF::Utility::DoubleToRawStringA(double dValue)
+{
+	// Assumes sizeof(long long) == 8.
+	CStringA strText;
+	strText.Format("%llx", *(ULONGLONG *) & dValue);
+
+	return strText;
+}
+
+double H3DF::Utility::RawStringToDouble(CString strText)
+{
+	// Assumes sizeof(long long) == 8.
+	double dVaule = 0;
+	swscanf_s(strText, L"%llx", (ULONGLONG *) & dVaule);
+
+	return dVaule;
+}
+
+double H3DF::Utility::RawStringToDouble(CStringA strText)
+{
+	// Assumes sizeof(long long) == 8.
+	double dVaule = 0;
+	sscanf_s(strText, "%llx", (ULONGLONG *) & dVaule);
+
+	return dVaule;
+}
+
+CString H3DF::Utility::IntToRawString(int nValue)
+{
+	CString strText;
+	strText.Format(L"%lx", *(ULONG *) & nValue);
+
+	return strText;
+}
+
+CStringA H3DF::Utility::IntToRawStringA(int nValue)
+{
+	CStringA strText;
+	strText.Format("%lx", *(ULONG *)&nValue);
+
+	return strText;
+}
+
+int H3DF::Utility::RawStringToInt(CString strText)
+{
+	int nValue = 0;
+	swscanf_s(strText, L"%lx", (ULONG *)&nValue);
+
+	return nValue;
+}
+
+int H3DF::Utility::RawStringToInt(CStringA strText)
+{
+	int nValue = 0;
+	sscanf_s(strText, "%lx", (ULONG *)&nValue);
+
+	return nValue;
+}
+
+int H3DF::Utility::RawByteToInt(BYTE * pbData)
+{
+	int nValue = 0;
+	sscanf_s((char *)pbData, "%lx", (ULONG *)&nValue);
+
+	return nValue;
+}
+
+CString H3DF::Utility::ShortToRawString(short nValue)
+{
+	CString strText;
+	strText.Format(L"%hx", *(USHORT *) & nValue);
+
+	return strText;
+}
+
+CStringA H3DF::Utility::ShortToRawStringA(short nValue)
+{
+	CStringA strText;
+	strText.Format("%hx", *(USHORT *)&nValue);
+
+	return strText;
+}
+
+short H3DF::Utility::RawStringToShort(CString strText)
+{
+	short nValue = 0;
+	swscanf_s(strText, L"%hx", (USHORT *)&nValue);
+
+	return nValue;
+}
+
+short H3DF::Utility::RawStringToShort(CStringA strText)
+{
+	short nValue = 0;
+	sscanf_s(strText, "%hx", (USHORT *)&nValue);
+
+	return nValue;
+}
+
+//== File 관련 함수 ==================================================================================
+CString H3DF::Utility::GetExecuteDirectory()
+{
+	TCHAR szBuffer[MAX_PATH];
+	TCHAR Drive[_MAX_DRIVE];
+	TCHAR Path[_MAX_PATH];
+	TCHAR Filename[_MAX_FNAME];
+	TCHAR Ext[_MAX_EXT];
+
+	GetModuleFileName(NULL, szBuffer, sizeof(szBuffer)); // get process file name
+	_wsplitpath_s(szBuffer, Drive, _MAX_DRIVE, Path, _MAX_PATH, Filename, _MAX_FNAME, Ext, _MAX_EXT); // get drive, path, file, ext name
+
+	CString strFilePath;
+	strFilePath.Format(L"%s%s", Drive, Path);
+
+	return strFilePath;
+}
+
+//== Segment User Data 관련 함수 =====================================================================
+bool H3DF::UserData::SetSegmentName(SegmentKey & cInSegment, CString strName)
+{
+	char * pchName = nullptr;
+	int nSize = 0;
+
+	if (false == Utility::UnicodeToChar(strName, pchName, nSize)) {
+		return false;
+	}
+
+	cInSegment.SetUserData((intptr_t)UserDataIndex::Name, nSize, (BYTE *)pchName);
+
+	delete [] pchName;
+
+	return true;
+}
+
+bool H3DF::UserData::ShowSegmentName(SegmentKey & cInSegment, CString & strName)
+{
+	ByteArray aUserData;
+	if (false == cInSegment.ShowUserData((intptr_t)UserDataIndex::Name, aUserData)) {
+		return false;
+	}
+
+	if (false == Utility::CharToUnicode((char *)aUserData.data(), strName)) {
+		return false;
+	}
+
+	return true;
+}
+
+bool H3DF::UserData::SetTopologyType(SegmentKey & cInSegment, TopologyType eInType)
+{
+	CStringA strText = Utility::IntToRawStringA((int)eInType);
+
+	cInSegment.SetUserData((intptr_t)UserDataIndex::Topology, strText.GetLength(), (BYTE *)strText.GetBuffer());
+
+	strText.ReleaseBuffer();
+
+	return true;
+}
+
+bool H3DF::UserData::ShowTopologyType(SegmentKey & cInSegment, TopologyType & eOutType)
+{
+	ByteArray aUserData;
+	if (false == cInSegment.ShowUserData((intptr_t)UserDataIndex::Topology, aUserData)) {
+		return false;
+	}
+
+	eOutType = (TopologyType)Utility::RawByteToInt(aUserData.data());
+	
+	return true;
+}
+
+//== Geomety User Data 관련 함수 =====================================================================
+bool H3DF::UserData::SetTopologyType(GeometryKey & cInGeometry, TopologyType eInType)
+{
+	CStringA strText = Utility::IntToRawStringA((int)eInType);
+
+	cInGeometry.SetUserData((intptr_t)UserDataIndex::Topology, strText.GetLength(), (BYTE *)strText.GetBuffer());
+
+	strText.ReleaseBuffer();
+
+	return true;
+}
+
+bool H3DF::UserData::ShowTopologyType(GeometryKey & cInGeometry, TopologyType & eOutType)
+{
+	ByteArray aUserData;
+	if (false == cInGeometry.ShowUserData((intptr_t)UserDataIndex::Topology, aUserData)) {
+		return false;
+	}
+
+	eOutType = (TopologyType)Utility::RawByteToInt(aUserData.data());
 
 	return true;
 }

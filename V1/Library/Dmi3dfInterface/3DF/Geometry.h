@@ -10,6 +10,7 @@ namespace H3DF
 	{
 	public:
 		GeometryKey(HC_KEY nInKey = INVALID_KEY);
+		virtual ~GeometryKey();
 
 		H3DF::Type ObjectType() const { return H3DF::Type::GeometryKey; };
 
@@ -20,7 +21,7 @@ namespace H3DF
 
 		virtual bool ShowVolume(SimpleCuboid & out_cuboid) const;
 
-		//== User Data 관련 함수 =========================================================================
+		//== User Data 관련 함수 =====================================================================
 		GeometryKey & SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData);
 		GeometryKey & SetUserData(intptr_t nInIndex, size_t nInBytes, BYTE const pnInData[]);
 		GeometryKey & SetUserData(intptr_t nInIndex, ByteArray const & aInData);
@@ -29,10 +30,10 @@ namespace H3DF
 		// 	SegmentKey & UnsetUserData(size_t nInCount, intptr_t const pnInIndices[]);
 		// 	SegmentKey & UnsetUserData(IntPtrTArray const & pnInIndices);
 		// 	SegmentKey & UnsetAllUserData();
-		// 
-		// 	size_t ShowUserDataCount() const;
-		// 	bool ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray & aOutData) const;
-		// 	bool ShowUserDataIndices(IntPtrTArray & aOutIndices) const;
-		// 	bool ShowUserData(intptr_t nInIndex, ByteArray & aOutData) const;
+
+		size_t ShowUserDataCount() const;
+		bool ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray & aOutData) const;
+		bool ShowUserDataIndices(IntPtrTArray & aOutIndices) const;
+		bool ShowUserData(intptr_t nInIndex, ByteArray & aOutData) const;
 	};
 }

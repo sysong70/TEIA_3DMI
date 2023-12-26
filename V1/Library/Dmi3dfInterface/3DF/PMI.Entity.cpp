@@ -12,20 +12,20 @@
 
 #include <WStr.h>
 
-#include "./Private/SegmentPrivate.h"
+#include "./Impl/SegmentImpl.h"
 
 USING_3DF_PMI_NAMESPACE
 
 Entity::Entity(HC_KEY nInKey)
 {
-	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
+	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
 	pcImpl->SetKeyValue(nInKey);
 	m_pcImpl = pcImpl;
 }
 
 Entity::Entity(Key const & cInThat)
 {
-	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
+	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
 	m_pcImpl = pcImpl;
 
 	Key::Set(cInThat);
@@ -33,7 +33,7 @@ Entity::Entity(Key const & cInThat)
 
 Entity::Entity(Entity const & cInThat)
 {
-	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
+	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
 	m_pcImpl = pcImpl;
 
 	Set(cInThat);
@@ -52,7 +52,7 @@ Entity const & Entity::operator=(Entity const & cInThat)
 
 void Entity::SetFrame(Frame const & cInFrame)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	H3DF::RGBColor cCurrentColor;
 	H3DF::RGBColor cColor;
@@ -101,7 +101,7 @@ void Entity::SetFrame(Frame const & cInFrame)
 	}
 	HC_Close_Segment();
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 void Entity::GetDrawing(Drawing & cOutDrawing) const
@@ -136,7 +136,7 @@ void Entity::SetDrawing(Drawing const & cInDrawing)
 
 unsigned int Entity::GetLeaderLineCount() const
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	int count = 0;
 
@@ -146,14 +146,14 @@ unsigned int Entity::GetLeaderLineCount() const
 		} HC_End_Contents_Search();
 	} HC_Close_Segment();
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return static_cast<unsigned int>(count);
 }
 
 void Entity::SetLeaderLines(unsigned int in_count, Polyline const * in_leader_lines)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	HC_Open_Segment("leader");
 	{
@@ -188,7 +188,7 @@ void Entity::SetLeaderLines(unsigned int in_count, Polyline const * in_leader_li
 	}
 	HC_Close_Segment();
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 void Entity::SetLeaderSymbols(unsigned int nInCount, H3DF::Polygon const * pcInLeaderSymbols)
@@ -198,7 +198,7 @@ void Entity::SetLeaderSymbols(unsigned int nInCount, H3DF::Polygon const * pcInL
 
 void Entity::SetPolygons(char const * pchInSegmentName, unsigned int nInCount, H3DF::Polygon const * pcInPolygons)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	HC_Open_Segment(pchInSegmentName);
 	{
@@ -238,7 +238,7 @@ void Entity::SetPolygons(char const * pchInSegmentName, unsigned int nInCount, H
 	}
 	HC_Close_Segment();
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 void Entity::SetColor(const H3DF::Polyline & cPolyline)
@@ -270,7 +270,7 @@ void Entity::SetColor(const H3DF::Polygon & cPolygon)
 
 void Entity::SetDisplayParallelToScreen(bool const bInParallel)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	HC_Open_Segment("text");
 	{
@@ -284,14 +284,14 @@ void Entity::SetDisplayParallelToScreen(bool const bInParallel)
 	}
 	HC_Close_Segment();
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 bool Entity::IsDisplayParallelToScreen() const
 {
 	bool is_parallel_to_screen = false;
 
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	int text_segment_count = 0;
 	HC_Begin_Segment_Search("text");
@@ -313,7 +313,7 @@ bool Entity::IsDisplayParallelToScreen() const
 		HC_Close_Segment();
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return is_parallel_to_screen;
 }
@@ -322,7 +322,7 @@ unsigned int Entity::GetStringsAndTextAttributesCount(CString strInSegmentName) 
 {
 	int nCount = 0;
 
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	HC_KEY nKey = HC_Open_Segment(H_FORMAT_TEXT("text/%s", Utility::ToChar(strInSegmentName)));
 	assert(INVALID_KEY != nKey);
@@ -335,7 +335,7 @@ unsigned int Entity::GetStringsAndTextAttributesCount(CString strInSegmentName) 
 	}
 	HC_Close_Segment();
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return static_cast<unsigned int>(nCount);
 }
@@ -346,7 +346,7 @@ void Entity::GetStringsAndTextAttributes(CString strInSegmentName, CString * pst
 	HC_KEY key;
 	int i = 0;
 
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	HC_KEY nKey = HC_Open_Segment("text");
 	assert(INVALID_KEY != nKey);
@@ -449,13 +449,13 @@ void Entity::GetStringsAndTextAttributes(CString strInSegmentName, CString * pst
 	}
 	HC_Close_Segment();
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 void Entity::SetStringsAndTextAttributes(CString strInSegmentName, unsigned int nInCount,
 	CString const * pstrInStrings, TextAttributes const * pcInTextAttributes, bool is_parallel_to_screen)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	HC_KEY nKey = HC_Open_Segment("text");
 	assert(INVALID_KEY != nKey);
@@ -563,7 +563,7 @@ void Entity::SetStringsAndTextAttributes(CString strInSegmentName, unsigned int 
 	}
 	HC_Close_Segment();
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 
@@ -572,9 +572,9 @@ DatumEntity::DatumEntity(HC_KEY nInKey) :
 	Entity(nInKey)
 {
 	if (INVALID_KEY != nInKey) {
-		SegmentKeyPrivate::LocalOpen(*this);
+		SegmentKeyImpl::LocalOpen(*this);
 		HC_Set_User_Options("pmi_type = datum");
-		SegmentKeyPrivate::LocalClose(*this);
+		SegmentKeyImpl::LocalClose(*this);
 	}
 }
 
@@ -601,7 +601,7 @@ DatumEntity const & DatumEntity::operator=(DatumEntity const & cInThat)
 
 Datum::Type DatumEntity::GetDatumType() const
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	Datum::Type eDatumType = Datum::Type::Unknown;
 
@@ -625,14 +625,14 @@ Datum::Type DatumEntity::GetDatumType() const
 		}
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return eDatumType;
 }
 
 void DatumEntity::SetDatumType(Datum::Type const eInType)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	switch (eInType)
 	{
@@ -651,7 +651,7 @@ void DatumEntity::SetDatumType(Datum::Type const eInType)
 			break;
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 unsigned int DatumEntity::GetLabelCount() const
@@ -681,9 +681,9 @@ DimensionEntity::DimensionEntity(HC_KEY nInKey) :
 	Entity(nInKey)
 {
 	if (INVALID_KEY != nInKey) {
-		SegmentKeyPrivate::LocalOpen(*this);
+		SegmentKeyImpl::LocalOpen(*this);
 		HC_Set_User_Options("pmi_type = dimension");
-		SegmentKeyPrivate::LocalClose(*this);
+		SegmentKeyImpl::LocalClose(*this);
 	}
 }
 
@@ -691,9 +691,9 @@ DimensionEntity::DimensionEntity(Key const & cInThat) :
 	Entity(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
-		SegmentKeyPrivate::LocalOpen(*this);
+		SegmentKeyImpl::LocalOpen(*this);
 		HC_Set_User_Options("pmi_type = dimension");
-		SegmentKeyPrivate::LocalClose(*this);
+		SegmentKeyImpl::LocalClose(*this);
 	}
 }
 
@@ -701,9 +701,9 @@ DimensionEntity::DimensionEntity(DimensionEntity const & cInThat) :
 	Entity(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
-		SegmentKeyPrivate::LocalOpen(*this);
+		SegmentKeyImpl::LocalOpen(*this);
 		HC_Set_User_Options("pmi_type = dimension");
-		SegmentKeyPrivate::LocalClose(*this);
+		SegmentKeyImpl::LocalClose(*this);
 	}
 }
 
@@ -726,7 +726,7 @@ Dimension::Type DimensionEntity::GetDimensionType() const
 		return eDimensionType;
 	}
 
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	if (HC_Show_Existence("user options = dimension_type"))
 	{
@@ -744,7 +744,7 @@ Dimension::Type DimensionEntity::GetDimensionType() const
 			assert(0);
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return eDimensionType;
 }
@@ -755,7 +755,7 @@ void DimensionEntity::SetDimensionType(Dimension::Type const cInType)
 		return;
 	}
 
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	switch (cInType)
 	{
@@ -775,7 +775,7 @@ void DimensionEntity::SetDimensionType(Dimension::Type const cInType)
 			assert(0);
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 Dimension::SubType DimensionEntity::GetDimensionSubType() const
@@ -786,7 +786,7 @@ Dimension::SubType DimensionEntity::GetDimensionSubType() const
 		return eDimensionSubtype;
 	}
 
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	if (HC_Show_Existence("user options = dimension_subtype"))
 	{
@@ -812,7 +812,7 @@ Dimension::SubType DimensionEntity::GetDimensionSubType() const
 			assert(0);
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return eDimensionSubtype;
 }
@@ -823,7 +823,7 @@ void DimensionEntity::SetDimensionSubType(PMI::Dimension::SubType const eInSubTy
 		return;
 	}
 
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	switch (eInSubType)
 	{
@@ -855,7 +855,7 @@ void DimensionEntity::SetDimensionSubType(PMI::Dimension::SubType const eInSubTy
 			assert(0);
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 unsigned int DimensionEntity::GetStringCount() const
@@ -885,9 +885,9 @@ GenericEntity::GenericEntity(HC_KEY nInKey) :
 	Entity(nInKey)
 {
 	if (INVALID_KEY != nInKey) {
-		SegmentKeyPrivate::LocalOpen(*this);
+		SegmentKeyImpl::LocalOpen(*this);
 		HC_Set_User_Options("pmi_type = generic");
-		SegmentKeyPrivate::LocalClose(*this);
+		SegmentKeyImpl::LocalClose(*this);
 	}
 }
 
@@ -895,9 +895,9 @@ GenericEntity::GenericEntity(Key const & cInThat) :
 	Entity(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
-		SegmentKeyPrivate::LocalOpen(*this);
+		SegmentKeyImpl::LocalOpen(*this);
 		HC_Set_User_Options("pmi_type = generic");
-		SegmentKeyPrivate::LocalClose(*this);
+		SegmentKeyImpl::LocalClose(*this);
 	}
 }
 
@@ -905,9 +905,9 @@ GenericEntity::GenericEntity(GenericEntity const & cInThat) :
 	Entity(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
-		SegmentKeyPrivate::LocalOpen(*this);
+		SegmentKeyImpl::LocalOpen(*this);
 		HC_Set_User_Options("pmi_type = generic");
-		SegmentKeyPrivate::LocalClose(*this);
+		SegmentKeyImpl::LocalClose(*this);
 	}
 }
 
@@ -958,9 +958,9 @@ NoteEntity::NoteEntity(HC_KEY nInKey):
 	Entity(nInKey)
 {
 	if (INVALID_KEY != nInKey) {
-		SegmentKeyPrivate::LocalOpen(*this);
+		SegmentKeyImpl::LocalOpen(*this);
 		HC_Set_User_Options("pmi_type = note");
-		SegmentKeyPrivate::LocalClose(*this);
+		SegmentKeyImpl::LocalClose(*this);
 	}
 }
 
@@ -1013,9 +1013,9 @@ RoughnessEntity::RoughnessEntity(HC_KEY nInKey) :
 {
 	if (nInKey != INVALID_KEY)
 	{
-		SegmentKeyPrivate::LocalOpen(*this);
+		SegmentKeyImpl::LocalOpen(*this);
 			HC_Set_User_Options("pmi_type = roughness");
-		SegmentKeyPrivate::LocalClose(*this);
+		SegmentKeyImpl::LocalClose(*this);
 	}
 }
 
@@ -1042,7 +1042,7 @@ RoughnessEntity const & RoughnessEntity::operator=(RoughnessEntity const & that)
 
 Roughness::Obtention::Type RoughnessEntity::GetObtentionType() const
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	Roughness::Obtention::Type eObtentionType = Roughness::Obtention::Type::Unknown;
 
@@ -1062,14 +1062,14 @@ Roughness::Obtention::Type RoughnessEntity::GetObtentionType() const
 			assert(0);
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return eObtentionType;
 }
 
 void RoughnessEntity::SetObtentionType(Roughness::Obtention::Type const eInObtentionType)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	switch (eInObtentionType)
 	{
@@ -1089,14 +1089,14 @@ void RoughnessEntity::SetObtentionType(Roughness::Obtention::Type const eInObten
 			assert(0);
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 Roughness::Applicability::Type RoughnessEntity::GetApplicabilityType() const
 {
 	Roughness::Applicability::Type eApplicabilityType = Roughness::Applicability::Type::Unknown;
 
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	if (HC_Show_Existence("user options = applicability_type"))
 	{
@@ -1116,14 +1116,14 @@ Roughness::Applicability::Type RoughnessEntity::GetApplicabilityType() const
 			assert(0);
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return eApplicabilityType;
 }
 
 void RoughnessEntity::SetApplicabilityType(Roughness::Applicability::Type const in_applicability_type)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	switch (in_applicability_type)
 	{
@@ -1146,14 +1146,14 @@ void RoughnessEntity::SetApplicabilityType(Roughness::Applicability::Type const 
 			assert(0);
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 Roughness::Mode::Type RoughnessEntity::GetModeType() const
 {
 	Roughness::Mode::Type mode_type = Roughness::Mode::Type::Unknown;
 
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	if (HC_Show_Existence("user options = mode_type"))
 	{
@@ -1181,14 +1181,14 @@ Roughness::Mode::Type RoughnessEntity::GetModeType() const
 			assert(0);
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return mode_type;
 }
 
 void RoughnessEntity::SetModeType(Roughness::Mode::Type const eInModeType)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	switch (eInModeType)
 	{
@@ -1223,7 +1223,7 @@ void RoughnessEntity::SetModeType(Roughness::Mode::Type const eInModeType)
 			assert(0);
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 unsigned int RoughnessEntity::GetFieldCount() const
@@ -1249,7 +1249,7 @@ void RoughnessEntity::SetFields(unsigned int nInCount, CString const * pstrInStr
 
 //== Orientation ===================================================================================
 
-class OrientationPrivate : public H3DF::PrivateImpl
+class OrientationPrivate : public H3DF::Impl
 {
 public:
 	OrientationPrivate() {}
@@ -1305,7 +1305,7 @@ void Orientation::SetMatrix(MatrixKit const & cInMatrix)
 
 //== TextAttributes ================================================================================
 
-class TextAttributesPrivate : public H3DF::PrivateImpl
+class TextAttributesPrivate : public H3DF::Impl
 {
 public:
 	TextAttributesPrivate()
@@ -1533,7 +1533,7 @@ void TextAttributes::SetWidthScale(const double dWidthScale)
 }
 
 //== Options =======================================================================================
-class OptionsPrivate : public H3DF::PrivateImpl
+class OptionsPrivate : public H3DF::Impl
 {
 public:
 	OptionsPrivate()
@@ -1591,7 +1591,7 @@ void Options::SetDisplayParallelToScreen(const bool in_parallel)
 
 //== Frame =========================================================================================
 
-class FramePrivate : public H3DF::PrivateImpl
+class FramePrivate : public H3DF::Impl
 {
 public:
 	void Copy(FramePrivate * that)
@@ -1659,7 +1659,7 @@ void Frame::SetPolylines(unsigned int nInCount, H3DF::Polyline const * pcInPolyl
 
 //== Drawing =======================================================================================
 
-class DrawingPrivate : public H3DF::PrivateImpl
+class DrawingPrivate : public H3DF::Impl
 {
 public:
 	void Copy(DrawingPrivate * that)

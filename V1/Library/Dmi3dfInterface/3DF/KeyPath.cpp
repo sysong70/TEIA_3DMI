@@ -12,7 +12,7 @@ USING_3DF_NAMESPACE
 
 //== KeyPath Class =================================================================================
 
-class KeyPathPrivate : public H3DF::PrivateImpl
+class KeyPathPrivate : public H3DF::Impl
 {
 public:
 	void Copy(KeyPathPrivate * that)

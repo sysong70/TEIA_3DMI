@@ -2,7 +2,7 @@
 
 #include "Shell.h"
 
-#include "Private/KeyPrivate.h"
+#include "Impl/KeyImpl.h"
 
 #include "Material.h"
 
@@ -192,13 +192,13 @@ ShellKit & ShellKit::SetMaterialMapping(MaterialMappingKit const & cInkit)
 
 //== ShellKey Class ================================================================================
 namespace H3DF {
-	class ShellKeyPrivate : public KeyPrivate
+	class ShellKeyPrivate : public KeyImpl
 	{
 	public:
 		ShellKeyPrivate() {m_eType = H3DF::Type::ShellKey; }
 
 		void Copy(ShellKeyPrivate * pcInThat) {
-			KeyPrivate::Copy(pcInThat);
+			KeyImpl::Copy(pcInThat);
 		}
 	};
 };
@@ -212,7 +212,7 @@ ShellKey::ShellKey(Key const & cInKey)
 	ShellKeyPrivate * pcImpl = new ShellKeyPrivate();
 	m_pcImpl = pcImpl;
 
-	((KeyPrivate *)pcImpl)->Copy((KeyPrivate *)(cInKey.GetImpl()));
+	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInKey.GetImpl()));
 
 	// 외부에서 들어오는 Key는 ShellKey가 아닐 수 있으므로, ShellKey로 변경한다.
 	pcImpl->SetType(H3DF::Type::ShellKey);

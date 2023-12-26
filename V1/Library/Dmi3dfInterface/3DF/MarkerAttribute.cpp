@@ -3,7 +3,7 @@
 #include "MarkerAttribute.h"
 
 #include "Segment.h"
-#include "./Private/SegmentPrivate.h"
+#include "./Impl/SegmentImpl.h"
 
 #include "3DF.Utility.h"
 
@@ -11,7 +11,7 @@
 
 using namespace H3DF;
 
-class MarkerAttributeControlPrivate : public PrivateImpl
+class MarkerAttributeControlPrivate : public Impl
 {
 public:
 	SegmentKey & GetSegmentKey () { return m_cKey; }
@@ -34,9 +34,9 @@ MarkerAttributeControl & H3DF::MarkerAttributeControl::SetSize(float fInSize, Ma
 	MarkerAttributeControlPrivate * pcImpl = static_cast<MarkerAttributeControlPrivate *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->GetSegmentKey()); {
+	SegmentKeyImpl::LocalOpen(pcImpl->GetSegmentKey()); {
 		HC_Set_Marker_Size(fInSize);
-	} SegmentKeyPrivate::LocalClose(pcImpl->GetSegmentKey());
+	} SegmentKeyImpl::LocalClose(pcImpl->GetSegmentKey());
 
 	return *this;
 }

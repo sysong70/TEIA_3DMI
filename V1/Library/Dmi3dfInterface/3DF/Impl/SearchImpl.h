@@ -7,10 +7,10 @@
 
 namespace H3DF
 {
-	class SearchPrivate : public PrivateImpl
+	class SearchImpl : public Impl
 	{
 	public:
-		void Copy(SearchPrivate * pcInThat) {
+		void Copy(SearchImpl * pcInThat) {
 		}
 
 		static CString GetSearchTypeString(Search::Type eInType);
@@ -18,10 +18,10 @@ namespace H3DF
 		static CString GetSearchSpaceString(Search::Space eInSpace);
 	};
 
-	class SearchOptionsKitPrivate : public PrivateImpl
+	class SearchOptionsKitImpl : public Impl
 	{
 	public:
-		void Copy(SearchOptionsKitPrivate * pcInThat) {
+		void Copy(SearchOptionsKitImpl * pcInThat) {
 		}
 
 	};

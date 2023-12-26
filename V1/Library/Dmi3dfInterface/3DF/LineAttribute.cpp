@@ -3,7 +3,7 @@
 #include "LineAttribute.h"
 
 #include "Segment.h"
-#include "./Private/SegmentPrivate.h"
+#include "./Impl/SegmentImpl.h"
 
 #include <hc.h>
 #include <HTools.h>
@@ -12,7 +12,7 @@
 
 OPEN_3DF_NAMESPACE
 
-class LineAttributeKitPrivate : public PrivateImpl
+class LineAttributeKitPrivate : public Impl
 {
 public:
 	LineAttributeKitPrivate() { m_eType = H3DF::Type::LineAttributeKit; }
@@ -135,7 +135,7 @@ bool LineAttributeKit::ShowWeight(float & fOutWeight, Line::SizeUnits & eOutUnit
 
 //== LineAttributeControl class ====================================================================
 
-class LineAttributeControlPrivate : public PrivateImpl
+class LineAttributeControlPrivate : public Impl
 {
 public:
 	LineAttributeControlPrivate() { m_eType = H3DF::Type::LineAttributeControl; }
@@ -179,9 +179,9 @@ LineAttributeControl & LineAttributeControl::SetPattern(CString strInPatternName
 {
 	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		HC_Set_Line_Pattern(Utility::ToChar(strInPatternName));
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;
 }
@@ -190,7 +190,7 @@ LineAttributeControl & LineAttributeControl::SetWeight(float fInWeight, Line::Si
 {
 	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		
 		if (Line::SizeUnits::ScaleFactor == eInUnits) {
 			HC_Set_Line_Weight(fInWeight);
@@ -228,7 +228,7 @@ LineAttributeControl & LineAttributeControl::SetWeight(float fInWeight, Line::Si
 			HC_Set_Variable_Line_Weight(Utility::ToChar(strWeight));
 		}
 
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;
 }
@@ -237,9 +237,9 @@ LineAttributeControl & LineAttributeControl::UnsetPattern()
 {
 	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		HC_UnSet_Line_Pattern();
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;
 }
@@ -248,9 +248,9 @@ LineAttributeControl & LineAttributeControl::UnsetWeight()
 {
 	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		HC_UnSet_Line_Weight();
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;
 }
@@ -258,11 +258,11 @@ LineAttributeControl & LineAttributeControl::UnsetWeight()
 LineAttributeControl & LineAttributeControl::UnsetEverything()
 {
 	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		HC_UnSet_Line_Pattern();
 		HC_UnSet_Line_Weight();
 		HC_UnSet_One_Rendering_Option("geometry options");
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
 	return *this;
 }
 
@@ -270,11 +270,11 @@ bool LineAttributeControl::ShowPattern(CString & strOutPatternName) const
 {
 	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
 
-	SegmentKeyPrivate::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		char chBuffer[MVO_BUFFER_SIZE] = "\n";
 		HC_Show_Line_Pattern(chBuffer);
 		strOutPatternName = chBuffer;
-	} SegmentKeyPrivate::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return !strOutPatternName.IsEmpty();
 }

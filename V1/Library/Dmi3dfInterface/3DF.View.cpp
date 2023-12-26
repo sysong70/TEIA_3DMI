@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 
 #include "3DF.View.h"
-#include "Private/View.Private.h"
+#include "Impl/ViewImpl.h"
 
 #include "Signal.Connector.h"
 
@@ -9,10 +9,10 @@
 #include <Path.h>
 
 #include "3DF.Canvas.h"
-#include "Private/Canvas.Private.h"
+#include "Impl/CanvasImpl.h"
 
 #include "3DF/Segment.h"
-#include "3DF/Private/SegmentPrivate.h"
+#include "3DF/Impl/SegmentImpl.h"
 #include "3DF/Visibility.h"
 #include "3DF/VisualEffects.h"
 
@@ -36,7 +36,7 @@ using namespace std::chrono;
 
 H3DF::View::View()
 {
-	m_pcImpl = new ViewPrivate();
+	m_pcImpl = new ViewImpl();
 	if (nullptr == m_pcImpl) {
 		assert(false);
 	}
@@ -44,7 +44,7 @@ H3DF::View::View()
 
 H3DF::View::View(View const & cInThat)
 {
-	m_pcImpl = new ViewPrivate();
+	m_pcImpl = new ViewImpl();
 	if (nullptr == m_pcImpl) {
 		assert(false);
 	}
@@ -59,8 +59,8 @@ H3DF::View::~View()
 
 void H3DF::View::Set(View const & cInThat)
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
-	ViewPrivate * pcInThatImpl = (ViewPrivate *)cInThat.m_pcImpl;
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	ViewImpl * pcInThatImpl = (ViewImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -72,7 +72,7 @@ View const & H3DF::View::operator = (View const & cInThat)
 
 void H3DF::View::Update() const
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	if (pcImpl->GetBaseView()->GetViewActive() && !pcImpl->GetBaseView()->GetSuppressUpdate())
@@ -91,7 +91,7 @@ void H3DF::View::Update() const
 
 void H3DF::View::Update(Json::Object & cInObject) const
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	if (false == pcImpl->IsInitNavigationCube()) {
@@ -129,7 +129,7 @@ void H3DF::View::Update(Json::Object & cInObject, Window::UpdateType eInType, H3
 
 void H3DF::View::Destruct()
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
@@ -145,7 +145,7 @@ void H3DF::View::Destruct()
 
 void H3DF::View::Resize(int x, int y)
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	pcImpl->Resize(x, y);
@@ -153,7 +153,7 @@ void H3DF::View::Resize(int x, int y)
 
 SegmentKey H3DF::View::GetSegmentKey()
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetSegmentKey();
@@ -161,7 +161,7 @@ SegmentKey H3DF::View::GetSegmentKey()
 
 SegmentKey const H3DF::View::GetSegmentKey() const
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetSegmentKey();
@@ -169,7 +169,7 @@ SegmentKey const H3DF::View::GetSegmentKey() const
 
 SegmentKey H3DF::View::GetModelOverrideSegmentKey()
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetModelKey();
@@ -177,7 +177,7 @@ SegmentKey H3DF::View::GetModelOverrideSegmentKey()
 
 SegmentKey const H3DF::View::GetModelOverrideSegmentKey() const
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetModelKey();
@@ -185,7 +185,7 @@ SegmentKey const H3DF::View::GetModelOverrideSegmentKey() const
 
 Model & H3DF::View::GetAttachedModel() const
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 	
 	return pcImpl->GetAttachedModel();
@@ -193,7 +193,7 @@ Model & H3DF::View::GetAttachedModel() const
 
 WindowKey & H3DF::View::GetWindowKey() const 
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	DEBUG_VALID(pcImpl->m_pcWindow);
@@ -203,7 +203,7 @@ WindowKey & H3DF::View::GetWindowKey() const
 
 void H3DF::View::SetSuppressUpdate(bool bInState)
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->GetBaseView()->SetSuppressUpdate(bInState);
@@ -214,7 +214,7 @@ void H3DF::View::SetSuppressUpdate(bool bInState)
 // 명령어 취소 함수, Select된 Object도 취소됨.
 void H3DF::View::CancelCommands()
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
@@ -224,7 +224,7 @@ void H3DF::View::CancelCommands()
 
 void H3DF::View::CancelCommands() const
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
@@ -237,7 +237,7 @@ void H3DF::View::CancelCommands() const
 // 2. Left Button 처리 함수
 bool H3DF::View::LButtonDown(int nFlags, int x, int y)
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -247,7 +247,7 @@ bool H3DF::View::LButtonDown(int nFlags, int x, int y)
 
 bool H3DF::View::LButtonUp(int nFlags, int x, int y)
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -271,7 +271,7 @@ bool H3DF::View::MButtonUp(int nFlags, int x, int y)
 // 4. Right Button 처리 함수
 bool H3DF::View::RButtonUp(int nFlags, int x, int y)
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -281,7 +281,7 @@ bool H3DF::View::RButtonUp(int nFlags, int x, int y)
 
 bool H3DF::View::RButtonDown(int nFlags, int x, int y)
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -292,7 +292,7 @@ bool H3DF::View::RButtonDown(int nFlags, int x, int y)
 // 5. Mouse Move 처리 함수
 bool H3DF::View::MouseMove(int nFlags, int x, int y)
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -303,7 +303,7 @@ bool H3DF::View::MouseMove(int nFlags, int x, int y)
 // 6. Mouse Wheel 처리 함수
 bool H3DF::View::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop)
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -313,7 +313,7 @@ bool H3DF::View::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int
 
 bool H3DF::View::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -323,7 +323,7 @@ bool H3DF::View::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 bool H3DF::View::KeyboardInput(Json::Object & input)
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -333,7 +333,7 @@ bool H3DF::View::KeyboardInput(Json::Object & input)
 
 bool H3DF::View::ExecuteKeyboardSignal(int nAction, Json::Object& cInObject)
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -344,7 +344,7 @@ bool H3DF::View::ExecuteKeyboardSignal(int nAction, Json::Object& cInObject)
 //== Select 관련 함수 ========================================================================
 void H3DF::View::SetSubentitySelectLevel()
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetSubentitySelectLevel();
@@ -353,7 +353,7 @@ void H3DF::View::SetSubentitySelectLevel()
 //== View Control 관련 함수 ==================================================================
 View & H3DF::View::SetPanViewControl()
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	if (pcImpl->GetViewControlMode() != ViewControl::Mode::Pan) {
@@ -368,7 +368,7 @@ View & H3DF::View::SetPanViewControl()
 
 View & H3DF::View::SetOrbitViewControl()
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	if (pcImpl->GetViewControlMode() != ViewControl::Mode::Orbit) {
@@ -383,7 +383,7 @@ View & H3DF::View::SetOrbitViewControl()
 
 View & H3DF::View::SetOrbitTurntableViewControl()
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	if (pcImpl->GetViewControlMode() != ViewControl::Mode::OrbitTurntable) {
@@ -398,7 +398,7 @@ View & H3DF::View::SetOrbitTurntableViewControl()
 
 View & H3DF::View::SetZoomArea()
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	if (pcImpl->GetViewControlMode() != ViewControl::Mode::ZoomBox) {
@@ -413,7 +413,7 @@ View & H3DF::View::SetZoomArea()
 
 View & H3DF::View::FitWorld()
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->GetBaseView()->ZoomToExtents();
@@ -427,7 +427,7 @@ View & H3DF::View::FitWorld()
 
 ViewControl::Mode H3DF::View::GetViewControlMode()
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetViewControlMode();
@@ -436,7 +436,7 @@ ViewControl::Mode H3DF::View::GetViewControlMode()
 //== View Style 관련 함수 ====================================================================
 void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 {
-	ViewPrivate * pcViewImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcViewImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcViewImpl);
 
 	pcViewImpl->m_eRenderingMode = eInMode;
@@ -520,7 +520,7 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 
 Rendering::Mode H3DF::View::GetRenderingMode() const
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_eRenderingMode;
@@ -528,7 +528,7 @@ Rendering::Mode H3DF::View::GetRenderingMode() const
 
 void H3DF::View::SetViewDirection(ViewDirection::Mode eInMode)
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->GetBaseView()->SetViewDirection(eInMode);
@@ -536,7 +536,7 @@ void H3DF::View::SetViewDirection(ViewDirection::Mode eInMode)
 
 void H3DF::View::SaveHsfFile(CString strFilePathName, Canvas * pcHoopsView)
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	HIOUtilityHsf cUtilityHsf;
@@ -568,7 +568,7 @@ void H3DF::View::SaveHsfFile(CString strFilePathName, Canvas * pcHoopsView)
 // param: fInPercentOffset distance to add between the model's bounding box and the position of the shadow plane If not specified, it is set to 5%.
 void H3DF::View::SetSimpleShadow(bool bInState, float fInPercentOffset)
 {
-	ViewPrivate * pcViewImpl = (ViewPrivate *)m_pcImpl;
+	ViewImpl * pcViewImpl = (ViewImpl *)m_pcImpl;
 	DEBUG_VALID(pcViewImpl);
 
 	SegmentKey cViewSegment = pcViewImpl->GetSegmentKey();
@@ -592,7 +592,7 @@ void H3DF::View::SetSimpleShadow(bool bInState, float fInPercentOffset)
 // Returns the status of the simple shadows
 bool H3DF::View::GetSimpleShadow()
 {
-	ViewPrivate * pcViewImpl = (ViewPrivate *)m_pcImpl;
+	ViewImpl * pcViewImpl = (ViewImpl *)m_pcImpl;
 	DEBUG_VALID(pcViewImpl);
 
 	if (H3DF::VisualEffects::ShadowMode::None == (H3DF::VisualEffects::ShadowMode)pcViewImpl->GetBaseView()->GetShadowMode()) {
@@ -607,7 +607,7 @@ bool H3DF::View::GetSimpleShadow()
 // param: in_percent_offset distance to add between the model's bounding box and the position of the reflection plane If not specified, it is set to 5%.
 void H3DF::View::SetSimpleReflection(bool bInState, float fInPercentOffset)
 {
-	ViewPrivate * pcViewImpl = (ViewPrivate *)m_pcImpl;
+	ViewImpl * pcViewImpl = (ViewImpl *)m_pcImpl;
 	DEBUG_VALID(pcViewImpl);
 
 	pcViewImpl->SetSimpleReflection(bInState);
@@ -624,7 +624,7 @@ void H3DF::View::SetSimpleReflection(bool bInState, float fInPercentOffset)
 /*! Returns the status of the simple reflection */
 bool H3DF::View::GetSimpleReflection()
 {
-	ViewPrivate * pcViewImpl = (ViewPrivate *)m_pcImpl;
+	ViewImpl * pcViewImpl = (ViewImpl *)m_pcImpl;
 	DEBUG_VALID(pcViewImpl);
 
 	return pcViewImpl->GetSimpleReflection();
@@ -633,15 +633,15 @@ bool H3DF::View::GetSimpleReflection()
 
 void H3DF::View::LoadPointCloudFile(CString strFilePathName)
 {
-	ViewPrivate * pcImpl = static_cast<ViewPrivate *>(m_pcImpl);
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
 
 	SegmentKey cViewKey(pcImpl->GetBaseView()->GetViewKey());
-	SegmentKeyPrivate::LocalOpen(cViewKey);
+	SegmentKeyImpl::LocalOpen(cViewKey);
 	HC_Set_Driver_Options("eye dome lighting = (on, strength=1.0)");
-	SegmentKeyPrivate::LocalClose(cViewKey);
+	SegmentKeyImpl::LocalClose(cViewKey);
 
 	HInputHandlerOptions cOptions;
 	cOptions.m_tk = pcImpl->GetBaseView()->GetModel()->GetStreamFileTK();
@@ -657,13 +657,13 @@ void H3DF::View::LoadPointCloudFile(CString strFilePathName)
 	HIOUtilityPointCloud cPointCloud;
 	
 	// 라이브러리를 사용해야 하므로 미리 cPointCloudSegment를 Open하도록 한다.
-	SegmentKeyPrivate::LocalOpen(cPointCloudSegment);
+	SegmentKeyImpl::LocalOpen(cPointCloudSegment);
 	cPointCloud.FileInputByKey(Utility::ToChar(strFilePathName), cPointCloudSegment.KeyValue(), &cOptions);
 
 	HC_UnSet_Marker_Symbol();
 	HC_Set_Marker_Size(0.2);
 
-	SegmentKeyPrivate::LocalOpen(cPointCloudSegment);
+	SegmentKeyImpl::LocalOpen(cPointCloudSegment);
 
 	// Point Clouse Segment의 하부를 검색해서 색상을 변경함.
 	// Library에서 나오는 색상은 기본적으로 Black으로 나옴.

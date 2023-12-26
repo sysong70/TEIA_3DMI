@@ -6,13 +6,13 @@
 #include "../Common/Common_Define.h"
 
 
-#include <Private/View.Private.h>
+#include <Impl/ViewImpl.h>
 
 #include <3DF.View.h>
 
 #include <3DF/Window.h>
-#include <3DF/Private/WindowPrivate.h>
-#include <3DF/Private/SegmentPrivate.h>
+#include <3DF/Impl/WindowImpl.h>
+#include <3DF/Impl/SegmentImpl.h>
 
 #include <3DF/Line.h>
 #include <3DF/Circle.h>
@@ -25,7 +25,7 @@
 #include <3DF/Material.h>
 
 #include <3DF/Selection.h>
-#include <3DF/Private/SelectionPrivate.h>
+#include <3DF/Impl/SelectionImpl.h>
 
 #include <3DF/Highlight.h>
 #include <3DF/Visibility.h>
@@ -503,7 +503,7 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::ApplySelectionFilter(H3DF::Se
 				SegmentKey cOwner = cItemKey.Owner();
 
 				SelectionItem * pcOwnerItem = new SelectionItem(*pcNextItem);
-				SelectionItemPrivate * pcItemPrivate = (SelectionItemPrivate *)pcOwnerItem->GetImpl();
+				SelectionItemImpl * pcItemPrivate = (SelectionItemImpl *)pcOwnerItem->GetImpl();
 
 				pcItemPrivate->cKey = cOwner;
 
@@ -785,7 +785,7 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::DrawSnapItems()
 		CamerInformation cCameraInfo;
 		ShowCameraInformation(m_fSnapRadius, cCameraInfo);
 
-		SegmentKeyPrivate::ForcedOpen(m_cSnapPointSegment); {
+		SegmentKeyImpl::ForcedOpen(m_cSnapPointSegment); {
 			HC_Flush_Contents(".", "geometry, segment");
 
 			m_cSnapPointSegment.SetModellingMatrix(cCameraInfo.cMatrix);
@@ -795,7 +795,7 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::DrawSnapItems()
 					DrawSnapPoint(cSnapPoint, cCameraInfo);
 				}
 			}
-		} SegmentKeyPrivate::ForcedClose(m_cSnapPointSegment);
+		} SegmentKeyImpl::ForcedClose(m_cSnapPointSegment);
 		
 
 		Window().GetBaseView()->ForceUpdate();
@@ -927,7 +927,7 @@ double KERNEL::Operator::HighlightObjectSnapPrivate::PixelToWorld(double unit)
 
 bool KERNEL::Operator::HighlightObjectSnapPrivate::ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo)
 {
-	const WindowKeyPrivate * pcWindowKeyPrivate = static_cast<const WindowKeyPrivate *>(Window().GetImpl());
+	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(Window().GetImpl());
 
 	SegmentKey cSecne(pcWindowKeyPrivate->GetSceneKey());
 

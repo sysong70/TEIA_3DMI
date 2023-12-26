@@ -19,12 +19,12 @@
 
 #include "3DF.Utility.h"
 
-#include "./Private/SegmentPrivate.h"
-#include "./Private/SearchPrivate.h"
+#include "./Impl/SegmentImpl.h"
+#include "./Impl/SearchImpl.h"
 
 USING_3DF_NAMESPACE
 
-H3DF::SegmentKey::SegmentKey(CString strInName)
+H3DF::SegmentKey::SegmentKey(CString strInName) : Key(INVALID_KEY)
 {
 	HC_KEY nKey = INVALID_KEY;
 
@@ -35,23 +35,23 @@ H3DF::SegmentKey::SegmentKey(CString strInName)
 		nKey = HC_Create_Segment(nullptr);
 	}
 
-	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
+	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
 	pcImpl->SetKeyValue(nKey);
 	
 	m_pcImpl = pcImpl;
 }
 
-H3DF::SegmentKey::SegmentKey(HC_KEY nInKey)
+H3DF::SegmentKey::SegmentKey(HC_KEY nInKey) : Key(INVALID_KEY)
 {
-	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
+	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
 	pcImpl->SetKeyValue(nInKey);
 
 	m_pcImpl = pcImpl;
 }
 
-H3DF::SegmentKey::SegmentKey(SegmentKey const & cInThat)
+H3DF::SegmentKey::SegmentKey(SegmentKey const & cInThat) : Key(INVALID_KEY)
 {
-	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
+	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
 	m_pcImpl = pcImpl;
 
 	Set(cInThat);
@@ -65,8 +65,8 @@ void H3DF::SegmentKey::Set(SegmentKey const & cInThat)
 {
 //	Key::Set(cInThat);
 
-	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
-	SegmentKeyPrivate * pcInThatImpl = (SegmentKeyPrivate *)cInThat.m_pcImpl;
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	SegmentKeyImpl * pcInThatImpl = (SegmentKeyImpl *)cInThat.m_pcImpl;
 
 	pcImpl->Copy(pcInThatImpl);
 }
@@ -75,8 +75,8 @@ SegmentKey & H3DF::SegmentKey::operator = (SegmentKey const & cInThat)
 {
 //	Key::Set(cInThat);
 
-	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
-	SegmentKeyPrivate * pcInThatImpl = (SegmentKeyPrivate *)cInThat.m_pcImpl;
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	SegmentKeyImpl * pcInThatImpl = (SegmentKeyImpl *)cInThat.m_pcImpl;
 
 	pcImpl->Copy(pcInThatImpl);
 
@@ -113,7 +113,7 @@ void H3DF::SegmentKey::Close() const
 
 SegmentKey & H3DF::SegmentKey::Open()
 {
-	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
 	pcImpl->Open();
 
 	return *this;
@@ -121,7 +121,7 @@ SegmentKey & H3DF::SegmentKey::Open()
 
 SegmentKey & H3DF::SegmentKey::Close()
 {
-	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
 	pcImpl->Close();
 
 	return *this;
@@ -141,9 +141,9 @@ CString H3DF::SegmentKey::Name() const
 
 SegmentKey & H3DF::SegmentKey::SetName(CString strInName)
 {
-	SegmentKeyPrivate::LocalOpen(*this); {
+	SegmentKeyImpl::LocalOpen(*this); {
 		HC_Rename_Segment(".", Utility::ToChar(strInName));
-	} SegmentKeyPrivate::LocalClose(*this);
+	} SegmentKeyImpl::LocalClose(*this);
 
 	return *this;
 }
@@ -151,9 +151,9 @@ SegmentKey & H3DF::SegmentKey::SetName(CString strInName)
 //== Sub Segment 관련 함수 ===========================================================================
 SegmentKey const H3DF::SegmentKey::Subsegment()
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 	SegmentKey cSubsegment(L"");
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return cSubsegment;
 }
@@ -171,9 +171,9 @@ SegmentKey const H3DF::SegmentKey::Subsegment(LPCTSTR chFormat, ...)
 // 
 // 	SegmentKey cSubsegment(nKey);
 
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 	SegmentKey cSubsegment(strText);
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return cSubsegment;
 }
@@ -182,13 +182,13 @@ size_t H3DF::SegmentKey::ShowSubsegments() const
 {
 	int nSegmentCount = 0;
 
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	HC_Begin_Contents_Search(".", "segments"); {
 		HC_Show_Contents_Count(&nSegmentCount);
 	} HC_End_Contents_Search();
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return nSegmentCount;
 }
@@ -197,7 +197,7 @@ size_t H3DF::SegmentKey::ShowSubsegments(SegmentKeyArray & cOutChildren) const
 {
 	int nSegmentCount = 0;
 
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	HC_Begin_Contents_Search(".", "segments");
 	{
@@ -221,7 +221,7 @@ size_t H3DF::SegmentKey::ShowSubsegments(SegmentKeyArray & cOutChildren) const
 	}
 	HC_End_Contents_Search();
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return nSegmentCount;
 }
@@ -229,19 +229,19 @@ size_t H3DF::SegmentKey::ShowSubsegments(SegmentKeyArray & cOutChildren) const
 //== Flush 관련 함수 =============================================================================
 void H3DF::SegmentKey::Flush(Search::Type eInTypeToRemove, Search::Space eInSearchSpace)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
-	CString strType = SearchPrivate::GetSearchTypeString(eInTypeToRemove);
-	CString strSearchSpace = SearchPrivate::GetSearchSpaceString(eInSearchSpace);
+	CString strType = SearchImpl::GetSearchTypeString(eInTypeToRemove);
+	CString strSearchSpace = SearchImpl::GetSearchSpaceString(eInSearchSpace);
 
 	HC_Flush_Contents(Utility::ToChar(strSearchSpace), Utility::ToChar(strType));
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 void H3DF::SegmentKey::Flush(SearchTypeArray const & aInTypesToRemove, Search::Space eInSearchSpace)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	CString strType;
 	
@@ -251,19 +251,19 @@ void H3DF::SegmentKey::Flush(SearchTypeArray const & aInTypesToRemove, Search::S
 			strType += ", ";
 		}
 
-		strType += SearchPrivate::GetSearchTypeString(eType);
+		strType += SearchImpl::GetSearchTypeString(eType);
 	}
 
-	CString strSearchSpace = SearchPrivate::GetSearchSpaceString(eInSearchSpace);
+	CString strSearchSpace = SearchImpl::GetSearchSpaceString(eInSearchSpace);
 
 	HC_Flush_Contents(Utility::ToChar(strSearchSpace), Utility::ToChar(strType));
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 void H3DF::SegmentKey::Flush(size_t nInTypesCount, Search::Type const peInTypesToRemove[], Search::Space eInSearchSpace)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	CString strType;
 
@@ -273,23 +273,23 @@ void H3DF::SegmentKey::Flush(size_t nInTypesCount, Search::Type const peInTypesT
 			strType += ", ";
 		}
 
-		strType += SearchPrivate::GetSearchTypeString(peInTypesToRemove[nIndex]);
+		strType += SearchImpl::GetSearchTypeString(peInTypesToRemove[nIndex]);
 	}
 
-	CString strSearchSpace = SearchPrivate::GetSearchSpaceString(eInSearchSpace);
+	CString strSearchSpace = SearchImpl::GetSearchSpaceString(eInSearchSpace);
 
 	HC_Flush_Contents(Utility::ToChar(strSearchSpace), Utility::ToChar(strType));
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 //== Include 관련 함수 ===============================================================================
 IncludeKey H3DF::SegmentKey::IncludeSegment(SegmentKey const & cInSegment)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 	HC_KEY nIncludeKey = HC_Include_Segment_By_Key(cInSegment.KeyValue());
 	IncludeKey cInclude(nIncludeKey);
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return cInclude;
 }
@@ -298,7 +298,7 @@ size_t H3DF::SegmentKey::ShowIncluders(SegmentKeyArray & aOutSegments) const
 {
 	int nSegmentCount = 0;
 
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	HC_Begin_Contents_Search(".", "include");
 	{
@@ -320,7 +320,7 @@ size_t H3DF::SegmentKey::ShowIncluders(SegmentKeyArray & aOutSegments) const
 	}
 	HC_End_Contents_Search();
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return nSegmentCount;
 }
@@ -329,7 +329,7 @@ size_t H3DF::SegmentKey::ShowIncluders(IncludeKeyArray & aOutIncludes) const
 {
 	int nIncludeCount = 0;
 
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	HC_Begin_Contents_Search(".", "include");
 	{
@@ -348,7 +348,7 @@ size_t H3DF::SegmentKey::ShowIncluders(IncludeKeyArray & aOutIncludes) const
 	}
 	HC_End_Contents_Search();
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return nIncludeCount;
 }
@@ -369,7 +369,7 @@ ShellKey H3DF::SegmentKey::InsertShell(ShellKit const & cInKit)
 	cInKit.ShowParameters(paParameters);
 	cInKit.ShowColors(paColors);
 
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	HC_KEY nShellKey = INVALID_KEY;
 	if (nullptr != pacFacelist) {
@@ -398,7 +398,7 @@ ShellKey H3DF::SegmentKey::InsertShell(ShellKit const & cInKit)
 // 		}
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	ShellKey cShell(nShellKey);
 	return cShell;
@@ -414,9 +414,9 @@ EdgeAttributeControl H3DF::SegmentKey::GetEdgeAttributeControl()
 //== Line 관련 함수 ==================================================================================
 LineKey H3DF::SegmentKey::InsertLine(size_t in_count, Point const pcInPoints[])
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 	HC_KEY nKey = HC_Insert_Polyline((int) in_count, pcInPoints);
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	LineKey cLine(nKey);
 	return cLine;
@@ -437,9 +437,9 @@ LineAttributeControl const H3DF::SegmentKey::GetLineAttributeControl() const
 //== Circle 관련 함수 ============================================================================
 CircleKey H3DF::SegmentKey::InsertCircle(Point const & cInCenter, float fInRadius, Vector const & cInNormal)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 	HC_KEY nKey = HC_Insert_Circle_By_Radius(&cInCenter, fInRadius, &cInNormal);
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	CircleKey cCircle(nKey);
 	return cCircle;
@@ -453,9 +453,9 @@ MarkerKey H3DF::SegmentKey::InsertMarker(Point const & cInPosition)
 
 MarkerKey H3DF::SegmentKey::InsertMarker(double x, double y, double z)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 	HC_KEY nKey = HC_Insert_Marker(x, y, z);
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	MarkerKey cMarker(nKey);
 	return cMarker;
@@ -488,9 +488,9 @@ MaterialMappingControl const H3DF::SegmentKey::GetMaterialMappingControl() const
 
 SegmentKey & H3DF::SegmentKey::SetMaterialMapping(H3DF::MaterialMappingKit const & cInKit)
 {
-	SegmentKeyPrivate * pcImpl = new SegmentKeyPrivate();
+	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
 
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	Material::Type eType = Material::Type::None;
 	RGBAColor cRgbaColor;
@@ -540,7 +540,7 @@ SegmentKey & H3DF::SegmentKey::SetMaterialMapping(H3DF::MaterialMappingKit const
 		}
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return *this;
 }
@@ -595,9 +595,9 @@ VisibilityControl const H3DF::SegmentKey::GetVisibilityControl() const
 
 SegmentKey & H3DF::SegmentKey::SetVisibility(CString strList)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 	HC_Set_Visibility(Utility::ToChar(strList));
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 	return *this;
 }
 
@@ -617,18 +617,18 @@ VisualEffectsControl const H3DF::SegmentKey::GetVisualEffectsControl() const
 //== Condition 관련 함수 =============================================================================
 SegmentKey & H3DF::SegmentKey::SetCondition(CString strInCondition)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 	HC_Set_Conditions(Utility::ToChar(strInCondition));
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 	return *this;
 }
 
 //== Heuristics 관련 함수 ============================================================================
 SegmentKey & H3DF::SegmentKey::SetHeuristics(CString strInHeuristics)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 	HC_Set_Heuristics(Utility::ToChar(strInHeuristics));
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 	return *this;
 }
 
@@ -657,9 +657,9 @@ StyleControl H3DF::SegmentKey::GetStyleControl()
 SegmentKey & H3DF::SegmentKey::SetCondition(char const * chInCondition)
 {
 	if (nullptr != chInCondition) {
-		SegmentKeyPrivate::LocalOpen(*this); {
+		SegmentKeyImpl::LocalOpen(*this); {
 			HC_Set_Conditions(chInCondition);
-		}SegmentKeyPrivate::LocalClose(*this);
+		}SegmentKeyImpl::LocalClose(*this);
 	}
 
 	return *this;
@@ -678,9 +678,9 @@ SegmentKey & H3DF::SegmentKey::SetConditions(AStringArray const & astrInConditio
 			strConditions += astrInConditions[nIndex];
 		}
 
-		SegmentKeyPrivate::LocalOpen(*this); {
+		SegmentKeyImpl::LocalOpen(*this); {
 			HC_Set_Conditions(strConditions);
-		}SegmentKeyPrivate::LocalClose(*this);
+		}SegmentKeyImpl::LocalClose(*this);
 	}
 	return *this;
 }
@@ -696,32 +696,32 @@ SegmentKey & H3DF::SegmentKey::SetConditions(size_t nInCount, CStringA const pch
 		strConditions += pchInConditions[nIndex];
 	}
 
-	SegmentKeyPrivate::LocalOpen(*this); {
+	SegmentKeyImpl::LocalOpen(*this); {
 		HC_Set_Conditions(strConditions);
-	}SegmentKeyPrivate::LocalClose(*this);
+	}SegmentKeyImpl::LocalClose(*this);
 
 	return *this;
 }
 
 void H3DF::SegmentKey::SetRenderingOptions(CString strList)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 	HC_Set_Rendering_Options(Utility::ToChar(strList));
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 void H3DF::SegmentKey::SetColorByIndex(CString strList, int nIndex)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 	HC_Set_Color_By_Index(Utility::ToChar(strList), nIndex);
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 void H3DF::SegmentKey::SetMarkerSymbol(CString strSymbol)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 	HC_Set_Marker_Symbol(Utility::ToChar(strSymbol));
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 }
 
 //== Camera 관련 함수 ================================================================================
@@ -730,7 +730,7 @@ void H3DF::SegmentKey::SetMarkerSymbol(CString strSymbol)
 
 bool H3DF::SegmentKey::ShowCamera(CameraKit & cOutKit) const
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	Point cPosition;
 	Point cTarget;
@@ -758,7 +758,7 @@ bool H3DF::SegmentKey::ShowCamera(CameraKit & cOutKit) const
 
 	cOutKit.SetField(fWidth, fHeight);
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return true;
 }
@@ -766,27 +766,27 @@ bool H3DF::SegmentKey::ShowCamera(CameraKit & cOutKit) const
 //== Model Segment 관련 함수 =====================================================================
 SegmentKey & H3DF::SegmentKey::SetModellingMatrix(MatrixKit const & cInKit)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 	HC_Set_Modelling_Matrix(cInKit.m_fData);
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return *this;
 }
 
 SegmentKey & H3DF::SegmentKey::UnsetModellingMatrix()
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 	HC_UnSet_Modelling_Matrix();
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return *this;
 }
 
 bool H3DF::SegmentKey::ShowModellingMatrix(MatrixKit & cOutKit) const
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 	HC_Show_Modelling_Matrix(cOutKit.m_fData);
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return true;
 }
@@ -799,9 +799,9 @@ SegmentKey & H3DF::SegmentKey::SetBounding(BoundingKit const & cInKit)
 	cInKit.ShowExclusion(bExclusion);
 
 	if(true == bExclusion) {
-		SegmentKeyPrivate::LocalOpen(*this);
+		SegmentKeyImpl::LocalOpen(*this);
 		HC_Set_Heuristics("exclude bounding");
-		SegmentKeyPrivate::LocalClose(*this);
+		SegmentKeyImpl::LocalClose(*this);
 	}
 
 	return *this;
@@ -821,70 +821,70 @@ SegmentKey & H3DF::SegmentKey::SetUserData(IntPtrTArray const & aInIndices, Byte
 
 SegmentKey & H3DF::SegmentKey::SetUserData(intptr_t nInIndex, size_t nInBytes, BYTE const pnInData[])
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	HC_Set_User_Data(nInIndex, pnInData, (long)nInBytes);
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return *this;
 }
 
 SegmentKey & H3DF::SegmentKey::SetUserData(intptr_t nInIndex, ByteArray const & aInData)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	HC_Set_User_Data(nInIndex, aInData.data(), (long)aInData.size());
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return *this;
 }
 
 SegmentKey & H3DF::SegmentKey::UnsetUserData(intptr_t nInIndex)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	HC_UnSet_One_User_Data(nInIndex);
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return *this;
 }
 
 SegmentKey & H3DF::SegmentKey::UnsetUserData(size_t nInCount, intptr_t const pnInIndices[])
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	for (size_t nIndex = 0; nIndex < nInCount; ++nIndex) {
 		HC_UnSet_One_User_Data(pnInIndices[nIndex]);
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return *this;
 }
 
 SegmentKey & H3DF::SegmentKey::UnsetUserData(IntPtrTArray const & pnInIndices)
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	for (size_t nIndex = 0; nIndex < pnInIndices.size(); ++nIndex) {
 		HC_UnSet_One_User_Data(pnInIndices[nIndex]);
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return *this;
 }
 
 SegmentKey & H3DF::SegmentKey::UnsetAllUserData()
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	HC_UnSet_User_Data();
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return *this;
 
@@ -892,18 +892,18 @@ SegmentKey & H3DF::SegmentKey::UnsetAllUserData()
 
 size_t H3DF::SegmentKey::ShowUserDataCount() const
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	size_t nCount = abs(HC_Show_User_Data_Indices(nullptr, 0));
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return nCount;
 }
 
 bool H3DF::SegmentKey::ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray & aOutData) const
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	long nSize = HC_Show_User_Data_Indices(nullptr, 0);
 	nSize = abs(nSize);
@@ -924,14 +924,14 @@ bool H3DF::SegmentKey::ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray &
 		HC_Show_One_User_Data(aOutIndices[nIndex], aOutData[nIndex].data(), nBytes);
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return true;
 }
 
 bool H3DF::SegmentKey::ShowUserDataIndices(IntPtrTArray & aOutIndices) const
 {	
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	long nSize = HC_Show_User_Data_Indices(nullptr, 0);
 	nSize = abs(nSize);
@@ -942,14 +942,14 @@ bool H3DF::SegmentKey::ShowUserDataIndices(IntPtrTArray & aOutIndices) const
 		return false;
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return true;
 }
 
 bool H3DF::SegmentKey::ShowUserData(intptr_t nInIndex, ByteArray & aOutData) const
 {
-	SegmentKeyPrivate::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this);
 
 	long nSize = HC_Show_One_User_Data(nInIndex, nullptr, 0);
 	nSize = abs(nSize);
@@ -961,7 +961,7 @@ bool H3DF::SegmentKey::ShowUserData(intptr_t nInIndex, ByteArray & aOutData) con
 		return false;
 	}
 
-	SegmentKeyPrivate::LocalClose(*this);
+	SegmentKeyImpl::LocalClose(*this);
 
 	return true;
 }

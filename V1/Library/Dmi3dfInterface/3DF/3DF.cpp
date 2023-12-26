@@ -64,15 +64,15 @@ Memory::Memory() {}
 
 
 //== 객체 관리 ======================================================================================
-H3DF::Type PrivateImpl::Type() const {
+H3DF::Type Impl::Type() const {
 	return m_eType;
 }
 
-void PrivateImpl::SetType(H3DF::Type eType) {
+void Impl::SetType(H3DF::Type eType) {
 	m_eType = eType;
 }
 
-void PrivateImpl::SetImpl(Object * pcObject, PrivateImpl * pcImpl)
+void Impl::SetImpl(Object * pcObject, Impl * pcImpl)
 {
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;

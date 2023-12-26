@@ -18,10 +18,10 @@
 
 namespace H3DF
 {
-	class SelectionOptionsKitPrivate : public PrivateImpl
+	class SelectionOptionsKitImpl : public Impl
 	{
 	public:
-		void Copy(SelectionOptionsKitPrivate * pcInThat) {
+		void Copy(SelectionOptionsKitImpl * pcInThat) {
 			fProximity = pcInThat->fProximity;
 			bProximity = pcInThat->bProximity;
 			eLevel = pcInThat->eLevel;
@@ -66,10 +66,10 @@ namespace H3DF
 		bool bScopeOnly = false;
 	};
 
-	class SelectionOptionsControlPrivate : public PrivateImpl
+	class SelectionOptionsControlImpl : public Impl
 	{
 	public:
-		void Copy(SelectionOptionsControlPrivate * pcInThat) {
+		void Copy(SelectionOptionsControlImpl * pcInThat) {
 			m_pcWindow = pcInThat->m_pcWindow;
 			m_pcSelectionSet = pcInThat->m_pcSelectionSet;
 
@@ -81,18 +81,18 @@ namespace H3DF
 		HSelectionSet * m_pcSelectionSet = nullptr;
 	};
 
-	class SelectionItemPrivate : public PrivateImpl
+	class SelectionItemImpl : public Impl
 	{
 	public:
-		SelectionItemPrivate() { m_eType = H3DF::Type::SelectionItem; }
-		virtual ~SelectionItemPrivate()
+		SelectionItemImpl() { m_eType = H3DF::Type::SelectionItem; }
+		virtual ~SelectionItemImpl()
 		{
 			if (nullptr != pnIncludeKeys) {
 				delete pnIncludeKeys;
 			}
 		}
 
-		void Copy(SelectionItemPrivate * pcInThat) {
+		void Copy(SelectionItemImpl * pcInThat) {
 			cKey = pcInThat->cKey;
 
 			nIncludeCount = pcInThat->nIncludeCount;
@@ -142,12 +142,12 @@ namespace H3DF
 		bool ShowPathString(CString & strOutPath);
 	};
 
-	class SelectionResultsIteratorPrivate : public PrivateImpl
+	class SelectionResultsIteratorImpl : public Impl
 	{
 	public:
-		SelectionResultsIteratorPrivate() { m_eType = H3DF::Type::SelectionResultsIterator; }
+		SelectionResultsIteratorImpl() { m_eType = H3DF::Type::SelectionResultsIterator; }
 
-		void Copy(SelectionResultsIteratorPrivate * pcInThat) {
+		void Copy(SelectionResultsIteratorImpl * pcInThat) {
 			pcIterator = pcInThat->pcIterator;
 			pcBeginIterator = pcInThat->pcBeginIterator;
 			pcEndIterator = pcInThat->pcEndIterator;
@@ -158,12 +158,12 @@ namespace H3DF
 		std::deque<SelectionItem *>::iterator pcEndIterator;
 	};
 
-	class SelectionResultsPrivate : public PrivateImpl
+	class SelectionResultsImpl : public Impl
 	{
 	public:
-		SelectionResultsPrivate() { m_eType = H3DF::Type::SelectionResults; }
+		SelectionResultsImpl() { m_eType = H3DF::Type::SelectionResults; }
 
-		void Copy(SelectionResultsPrivate * pcInThat) {
+		void Copy(SelectionResultsImpl * pcInThat) {
 			m_deItems.clear();
 			for (auto pcItem : pcInThat->m_deItems) {
 				SelectionItem * pcNewItem = new SelectionItem(*pcItem);
@@ -197,12 +197,12 @@ namespace H3DF
 		std::deque<SelectionItem *> m_deItems;
 	};
 
-	class SelectionControlPrivate : public PrivateImpl
+	class SelectionControlImpl : public Impl
 	{
 	public:
-		SelectionControlPrivate() { m_eType = H3DF::Type::SelectionControl; }
+		SelectionControlImpl() { m_eType = H3DF::Type::SelectionControl; }
 
-		void Copy(SelectionControlPrivate * pcInThat) {
+		void Copy(SelectionControlImpl * pcInThat) {
 			m_pcWindow = pcInThat->m_pcWindow;
 			m_pcSelectionSet = pcInThat->m_pcSelectionSet;
 		}
