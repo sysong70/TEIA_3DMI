@@ -13,142 +13,142 @@
 
 #include "Math.Matrix.h"
 
-OPEN_3DF_NAMESPACE
-
-class API_3DF SegmentKey : public Key
+namespace H3DF
 {
-public:
-	SegmentKey(CString strInName);
-	SegmentKey(HC_KEY nInKey = INVALID_KEY);
-	SegmentKey(SegmentKey const & cInThat);
+	class API_3DF SegmentKey : public Key
+	{
+	public:
+		SegmentKey();
+		SegmentKey(CString strInName);
+		SegmentKey(HC_KEY nInKey);
+		SegmentKey(SegmentKey const & cInThat);
 
-	virtual ~SegmentKey();
+		virtual ~SegmentKey();
 
-	void Set(SegmentKey const & cInThat);
-	SegmentKey & operator = (SegmentKey const & cInThat);
+		void Set(SegmentKey const & cInThat);
+		SegmentKey & operator = (SegmentKey const & cInThat);
 
-	H3DF::Type ObjectType() const { return H3DF::Type::SegmentKey; };
+		H3DF::Type ObjectType() const { return H3DF::Type::SegmentKey; };
 
-	//== Segment 관련 함수 ===========================================================================
-	SegmentKey & Open();
-	SegmentKey & Close();
+		//== Segment 관련 함수 ===========================================================================
+		SegmentKey & Open();
+		SegmentKey & Close();
 
-	// Segment의 자체의 Title을 변경함.
-	CString Name() const;
-	SegmentKey & SetName(CString strInName);
+		// Segment의 자체의 Title을 변경함.
+		CString Name() const;
+		SegmentKey & SetName(CString strInName);
 
-	//== Sub Segment 관련 함수 =======================================================================
-	SegmentKey const Subsegment();
-	SegmentKey const Subsegment(LPCTSTR pszFromat, ...);
-	
-	size_t ShowSubsegments() const;
-	size_t ShowSubsegments(SegmentKeyArray & cOutChildren) const;
+		//== Sub Segment 관련 함수 =======================================================================
+		SegmentKey const Subsegment();
+		SegmentKey const Subsegment(LPCTSTR pszFromat, ...);
 
-	//== Flush 관련 함수 =============================================================================
-	void Flush(Search::Type eInTypeToRemove = Search::Type::Everything, Search::Space eInSearchSpace = Search::Space::SegmentOnly);
-	void Flush(SearchTypeArray const & aInTypesToRemove, Search::Space eInSearchSpace = Search::Space::SegmentOnly);
-	void Flush(size_t nInTypesCount, Search::Type const peInTypesToRemove[], Search::Space eInSearchSpace = Search::Space::SegmentOnly);
+		size_t ShowSubsegments() const;
+		size_t ShowSubsegments(SegmentKeyArray & cOutChildren) const;
 
-	//== Include 관련 함수 ===========================================================================
-	IncludeKey IncludeSegment(SegmentKey const & cInSegment);
+		//== Flush 관련 함수 =============================================================================
+		void Flush(Search::Type eInTypeToRemove = Search::Type::Everything, Search::Space eInSearchSpace = Search::Space::SegmentOnly);
+		void Flush(SearchTypeArray const & aInTypesToRemove, Search::Space eInSearchSpace = Search::Space::SegmentOnly);
+		void Flush(size_t nInTypesCount, Search::Type const peInTypesToRemove[], Search::Space eInSearchSpace = Search::Space::SegmentOnly);
 
-	size_t ShowIncluders(SegmentKeyArray & aOutSegments) const;
-	size_t ShowIncluders(IncludeKeyArray & aOutIncludes) const;
+		//== Include 관련 함수 ===========================================================================
+		IncludeKey IncludeSegment(SegmentKey const & cInSegment);
 
-	//== Shell 관련 함수 =============================================================================
-	ShellKey InsertShell(ShellKit const & cInKit);
-// 	ShellKey InsertShell(PointArray const & in_points, IntArray const & in_facelist);
-// 	ShellKey InsertShell(size_t in_point_count, Point const in_points[], size_t in_facelist_count, int const in_facelist[]);
+		size_t ShowIncluders(SegmentKeyArray & aOutSegments) const;
+		size_t ShowIncluders(IncludeKeyArray & aOutIncludes) const;
 
-	//== Edge 관련 함수 ==============================================================================
-	EdgeAttributeControl GetEdgeAttributeControl();
+		//== Shell 관련 함수 =============================================================================
+		ShellKey InsertShell(ShellKit const & cInKit);
+		// 	ShellKey InsertShell(PointArray const & in_points, IntArray const & in_facelist);
+		// 	ShellKey InsertShell(size_t in_point_count, Point const in_points[], size_t in_facelist_count, int const in_facelist[]);
 
-	//== Line 관련 함수 ==============================================================================
-	LineKey InsertLine(size_t nInCount, Point const pcInPoints[]);
+			//== Edge 관련 함수 ==============================================================================
+		EdgeAttributeControl GetEdgeAttributeControl();
 
-	LineAttributeControl GetLineAttributeControl();
-	LineAttributeControl const GetLineAttributeControl() const;
+		//== Line 관련 함수 ==============================================================================
+		LineKey InsertLine(size_t nInCount, Point const pcInPoints[]);
 
-	//== Circle 관련 함수 ============================================================================
-	CircleKey InsertCircle(Point const & cInCenter, float fInRadius, Vector const & cInNormal);
+		LineAttributeControl GetLineAttributeControl();
+		LineAttributeControl const GetLineAttributeControl() const;
 
-	//== Marker 관련 함수 ============================================================================
-	MarkerKey InsertMarker(Point const & in_position);
-	MarkerKey InsertMarker(double x, double y, double z);
+		//== Circle 관련 함수 ============================================================================
+		CircleKey InsertCircle(Point const & cInCenter, float fInRadius, Vector const & cInNormal);
 
-	MarkerAttributeControl GetMarkerAttributeControl();
-	MarkerAttributeControl const GetMarkerAttributeControl() const;
+		//== Marker 관련 함수 ============================================================================
+		MarkerKey InsertMarker(Point const & in_position);
+		MarkerKey InsertMarker(double x, double y, double z);
 
-	//== Material Mapping 관련 함수 ==================================================================
-	SegmentKey & SetMaterialMapping(MaterialMappingKit const & cInKit);
-	MaterialMappingControl GetMaterialMappingControl();
-	MaterialMappingControl const GetMaterialMappingControl() const;
+		MarkerAttributeControl GetMarkerAttributeControl();
+		MarkerAttributeControl const GetMarkerAttributeControl() const;
 
-	//== Performance Control 관련 함수 ===============================================================
-	SegmentKey & SetPerformance(PerformanceKit const & cInKit);
-	SegmentKey & UnsetPerformance();
-	bool ShowPerformance(PerformanceKit & cOutKit) const;
-	PerformanceControl GetPerformanceControl();
-	PerformanceControl const GetPerformanceControl() const;
+		//== Material Mapping 관련 함수 ==================================================================
+		SegmentKey & SetMaterialMapping(MaterialMappingKit const & cInKit);
+		MaterialMappingControl GetMaterialMappingControl();
+		MaterialMappingControl const GetMaterialMappingControl() const;
 
-	//== Visibility Control 관련 함수 ================================================================
-	VisibilityControl GetVisibilityControl();
-	VisibilityControl const GetVisibilityControl() const;
-	SegmentKey & SetVisibility(CString strList);
+		//== Performance Control 관련 함수 ===============================================================
+		SegmentKey & SetPerformance(PerformanceKit const & cInKit);
+		SegmentKey & UnsetPerformance();
+		bool ShowPerformance(PerformanceKit & cOutKit) const;
+		PerformanceControl GetPerformanceControl();
+		PerformanceControl const GetPerformanceControl() const;
 
-	//== Visual Effect Control 관련 함수 =============================================================
-	VisualEffectsControl GetVisualEffectsControl();
-	VisualEffectsControl const GetVisualEffectsControl() const;
+		//== Visibility Control 관련 함수 ================================================================
+		VisibilityControl GetVisibilityControl();
+		VisibilityControl const GetVisibilityControl() const;
+		SegmentKey & SetVisibility(CString strList);
 
-	//== Condition 관련 함수 =========================================================================
-	SegmentKey & SetCondition(CString strInCondition);
-	
-	//== Heuristics 관련 함수 ========================================================================
-	SegmentKey & SetHeuristics(CString strInHeuristics);
+		//== Visual Effect Control 관련 함수 =============================================================
+		VisualEffectsControl GetVisualEffectsControl();
+		VisualEffectsControl const GetVisualEffectsControl() const;
 
-	//== Portfolio Control 관련 함수 =================================================================
-	//PortfolioControl GetPortfolioControl();
-	//PortfolioControl const GetPortfolioControl() const;
+		//== Condition 관련 함수 =========================================================================
+		SegmentKey & SetCondition(CString strInCondition);
 
-	//== Style Control 관련 함수 =====================================================================
-	StyleControl GetStyleControl();
+		//== Heuristics 관련 함수 ========================================================================
+		SegmentKey & SetHeuristics(CString strInHeuristics);
 
-	//== Condition 관련 함수 =========================================================================
-	SegmentKey & SetCondition(char const * chInCondition);
-	SegmentKey & SetConditions(AStringArray const & astrInConditions);
-	SegmentKey & SetConditions(size_t nInCount, CStringA const pchInConditions[]);
+		//== Portfolio Control 관련 함수 =================================================================
+		//PortfolioControl GetPortfolioControl();
+		//PortfolioControl const GetPortfolioControl() const;
 
-	void SetRenderingOptions(CString strList);
-	void SetColorByIndex(CString strList, int nIndex);
-	void SetMarkerSymbol(CString strSymbol);		
+		//== Style Control 관련 함수 =====================================================================
+		StyleControl GetStyleControl();
 
-	//== Camera 관련 함수 ===========================================================================
-// 	SegmentKey & SetCamera(CameraKit const & cInKit);
-// 	SegmentKey & UnsetCamera();
-	bool ShowCamera(CameraKit & cOutKit) const;
+		//== Condition 관련 함수 =========================================================================
+		SegmentKey & SetCondition(char const * chInCondition);
+		SegmentKey & SetConditions(AStringArray const & astrInConditions);
+		SegmentKey & SetConditions(size_t nInCount, CStringA const pchInConditions[]);
 
-	//== Modelling Matrix 관련 함수 ==================================================================
-	SegmentKey & SetModellingMatrix(MatrixKit const & cInKit);
-	SegmentKey & UnsetModellingMatrix();
-	bool ShowModellingMatrix(MatrixKit & cOutKit) const;
+		void SetRenderingOptions(CString strList);
+		void SetColorByIndex(CString strList, int nIndex);
+		void SetMarkerSymbol(CString strSymbol);
 
-	//== Bounding 관련 함수 ==========================================================================
-	SegmentKey & SetBounding(BoundingKit const & cInKit);
+		//== Camera 관련 함수 ===========================================================================
+	// 	SegmentKey & SetCamera(CameraKit const & cInKit);
+	// 	SegmentKey & UnsetCamera();
+		bool ShowCamera(CameraKit & cOutKit) const;
 
-	//== User Data 관련 함수 =========================================================================
-	SegmentKey & SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData);
-	SegmentKey & SetUserData(intptr_t nInIndex, size_t nInBytes, BYTE const pnInData[]);
-	SegmentKey & SetUserData(intptr_t nInIndex, ByteArray const & aInData);
+		//== Modelling Matrix 관련 함수 ==================================================================
+		SegmentKey & SetModellingMatrix(MatrixKit const & cInKit);
+		SegmentKey & UnsetModellingMatrix();
+		bool ShowModellingMatrix(MatrixKit & cOutKit) const;
 
-	SegmentKey & UnsetUserData(intptr_t nInIndex);
-	SegmentKey & UnsetUserData(size_t nInCount, intptr_t const pnInIndices[]);
-	SegmentKey & UnsetUserData(IntPtrTArray const & pnInIndices);
-	SegmentKey & UnsetAllUserData();
+		//== Bounding 관련 함수 ==========================================================================
+		SegmentKey & SetBounding(BoundingKit const & cInKit);
 
-	size_t ShowUserDataCount() const;
-	bool ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray & aOutData) const;
-	bool ShowUserDataIndices(IntPtrTArray & aOutIndices) const;
-	bool ShowUserData(intptr_t nInIndex, ByteArray & aOutData) const;
-};
+		//== User Data 관련 함수 =========================================================================
+		SegmentKey & SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData);
+		SegmentKey & SetUserData(intptr_t nInIndex, size_t nInBytes, BYTE const pnInData[]);
+		SegmentKey & SetUserData(intptr_t nInIndex, ByteArray const & aInData);
 
-CLOSE_3DF_NAMESPACE
+		SegmentKey & UnsetUserData(intptr_t nInIndex);
+		SegmentKey & UnsetUserData(size_t nInCount, intptr_t const pnInIndices[]);
+		SegmentKey & UnsetUserData(IntPtrTArray const & pnInIndices);
+		SegmentKey & UnsetAllUserData();
+
+		size_t ShowUserDataCount() const;
+		bool ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray & aOutData) const;
+		bool ShowUserDataIndices(IntPtrTArray & aOutIndices) const;
+		bool ShowUserData(intptr_t nInIndex, ByteArray & aOutData) const;
+	};
+}

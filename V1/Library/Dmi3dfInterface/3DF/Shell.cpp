@@ -192,24 +192,33 @@ ShellKit & ShellKit::SetMaterialMapping(MaterialMappingKit const & cInkit)
 
 //== ShellKey Class ================================================================================
 namespace H3DF {
-	class ShellKeyPrivate : public KeyImpl
+	class ShellKeyImpl : public KeyImpl
 	{
 	public:
-		ShellKeyPrivate() {m_eType = H3DF::Type::ShellKey; }
+		ShellKeyImpl() {m_eType = H3DF::Type::ShellKey; }
 
-		void Copy(ShellKeyPrivate * pcInThat) {
+		void Copy(ShellKeyImpl * pcInThat) {
 			KeyImpl::Copy(pcInThat);
 		}
 	};
 };
 
-ShellKey::ShellKey()
+ShellKey::ShellKey() : GeometryKey(INVALID_KEY)
 {
+	m_pcImpl = new ShellKeyImpl();
 }
 
-ShellKey::ShellKey(Key const & cInKey)
+ShellKey::ShellKey(HC_KEY nInKey) : GeometryKey(INVALID_KEY)
 {
-	ShellKeyPrivate * pcImpl = new ShellKeyPrivate();
+	ShellKeyImpl * pcImpl = new ShellKeyImpl();
+	pcImpl->SetKeyValue(nInKey);
+
+	m_pcImpl = pcImpl;
+}
+
+ShellKey::ShellKey(Key const & cInKey) : GeometryKey(INVALID_KEY)
+{
+	ShellKeyImpl * pcImpl = new ShellKeyImpl();
 	m_pcImpl = pcImpl;
 
 	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInKey.GetImpl()));
@@ -220,7 +229,7 @@ ShellKey::ShellKey(Key const & cInKey)
 
 ShellKey::ShellKey(ShellKey const & cInThat)
 {
-	m_pcImpl = new ShellKeyPrivate();
+	m_pcImpl = new ShellKeyImpl();
 	Set(cInThat);
 }
 
@@ -230,8 +239,8 @@ void ShellKey::Set(ShellKey const & cInThat)
 		return;
 	}
 
-	ShellKeyPrivate * pcImpl = (ShellKeyPrivate *)m_pcImpl;
-	ShellKeyPrivate * pcInThatImpl = (ShellKeyPrivate *)cInThat.m_pcImpl;
+	ShellKeyImpl * pcImpl = (ShellKeyImpl *)m_pcImpl;
+	ShellKeyImpl * pcInThatImpl = (ShellKeyImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 

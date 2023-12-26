@@ -4,68 +4,72 @@
 
 #include "Math.h"
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
 //== PolygonKey ====================================================================================
-class PolygonKitPrivate : public Impl
+
+namespace H3DF
 {
-public:
-	PolygonKitPrivate()
+	class PolygonKitImpl : public Impl
 	{
- 		m_cColor.Set(-1, -1, -1);
-	}
+	public:
+		PolygonKitImpl()
+		{
+			m_cColor.Set(-1, -1, -1);
+		}
 
-	~PolygonKitPrivate() {}
+		~PolygonKitImpl() {}
 
-	void Copy(PolygonKitPrivate * pcInThat)
-	{
-		m_aPoints = pcInThat->m_aPoints;
-		m_cColor = pcInThat->m_cColor;
-	}
+		void Copy(PolygonKitImpl * pcInThat)
+		{
+			m_aPoints = pcInThat->m_aPoints;
+			m_cColor = pcInThat->m_cColor;
+		}
 
-	PointArray m_aPoints;
-	H3DF::RGBColor m_cColor;
-};
-
-PolygonKit::PolygonKit()
-{
-	m_pcImpl = new PolygonKitPrivate();
+		PointArray m_aPoints;
+		H3DF::RGBColor m_cColor;
+	};
 }
 
-PolygonKit::PolygonKit(PolygonKit const & cInThat)
+H3DF::PolygonKit::PolygonKit()
 {
-	m_pcImpl = new PolygonKitPrivate();
+	m_pcImpl = new PolygonKitImpl();
+}
+
+H3DF::PolygonKit::PolygonKit(PolygonKit const & cInThat)
+{
+	m_pcImpl = new PolygonKitImpl();
 	Set(cInThat);
 }
 
-void PolygonKit::Set(PolygonKit const & cInThat)
+void H3DF::PolygonKit::Set(PolygonKit const & cInThat)
 {
-	PolygonKitPrivate * pcImpl = (PolygonKitPrivate *)m_pcImpl;
-	PolygonKitPrivate * pcInThatImpl = (PolygonKitPrivate *)cInThat.m_pcImpl;
+	PolygonKitImpl * pcImpl = (PolygonKitImpl *)m_pcImpl;
+	PolygonKitImpl * pcInThatImpl = (PolygonKitImpl *)cInThat.m_pcImpl;
 
 	pcImpl->Copy(pcInThatImpl);
 }
 
-PolygonKit const & PolygonKit::operator=(PolygonKit const & cInThat)
+PolygonKit const & H3DF::PolygonKit::operator=(PolygonKit const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-unsigned int PolygonKit::GetPointCount() const
+unsigned int H3DF::PolygonKit::GetPointCount() const
 {
-	PolygonKitPrivate * pcImpl = (PolygonKitPrivate *)m_pcImpl;
+	PolygonKitImpl * pcImpl = (PolygonKitImpl *)m_pcImpl;
 	return static_cast<unsigned int>(pcImpl->m_aPoints.size());
 }
 
-void PolygonKit::GetPoints(unsigned int & nOutCount, H3DF::Point * pcOutPoints) const
+void H3DF::PolygonKit::GetPoints(unsigned int & nOutCount, H3DF::Point * pcOutPoints) const
 {
 	if (nullptr == pcOutPoints) {
 		nOutCount = 0;
 		return;
 	}
 
-	PolygonKitPrivate * pcImpl = (PolygonKitPrivate *)m_pcImpl;
+	PolygonKitImpl * pcImpl = (PolygonKitImpl *)m_pcImpl;
 	nOutCount = GetPointCount();
 
 	for (unsigned int i = 0; i < nOutCount; i++) {
@@ -74,32 +78,35 @@ void PolygonKit::GetPoints(unsigned int & nOutCount, H3DF::Point * pcOutPoints) 
 }
 
 // Replace the points on this PolygonKey with the specified points.
-PolygonKit & PolygonKit::SetPoints(size_t nInCount, Point const cInPoints[])
+PolygonKit & H3DF::PolygonKit::SetPoints(size_t nInCount, Point const cInPoints[])
 {
-	((PolygonKitPrivate *)m_pcImpl)->m_aPoints.clear();
+	((PolygonKitImpl *)m_pcImpl)->m_aPoints.clear();
 
 	for (size_t nIndex = 0; nIndex < nInCount; nIndex++) {
-		((PolygonKitPrivate *)m_pcImpl)->m_aPoints.push_back(cInPoints[nIndex]);
+		((PolygonKitImpl *)m_pcImpl)->m_aPoints.push_back(cInPoints[nIndex]);
 	}
 
 	return *this;
 }
 
-void PolygonKit::GetRGBColor(H3DF::RGBColor & cOutColor) const
+void H3DF::PolygonKit::GetRGBColor(H3DF::RGBColor & cOutColor) const
 {
-	PolygonKitPrivate * pcImpl = (PolygonKitPrivate *)m_pcImpl;
+	PolygonKitImpl * pcImpl = (PolygonKitImpl *)m_pcImpl;
 	cOutColor = pcImpl->m_cColor;
 }
 
-void PolygonKit::SetRGBColor(H3DF::RGBColor const & cInColor)
+void H3DF::PolygonKit::SetRGBColor(H3DF::RGBColor const & cInColor)
 {
-	PolygonKitPrivate * pcImpl = (PolygonKitPrivate *)m_pcImpl;
+	PolygonKitImpl * pcImpl = (PolygonKitImpl *)m_pcImpl;
 	pcImpl->m_cColor = cInColor;
 }
 
 
 //== PolygonKey ====================================================================================
-PolygonKey::PolygonKey(HC_KEY nInKey) :
-	GeometryKey(nInKey)
+H3DF::PolygonKey::PolygonKey() : GeometryKey()
+{
+}
+
+H3DF::PolygonKey::PolygonKey(HC_KEY nInKey) : GeometryKey(nInKey)
 {
 }

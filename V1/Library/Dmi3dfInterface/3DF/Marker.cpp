@@ -4,7 +4,6 @@
 
 using namespace H3DF;
 
-H3DF::MarkerKey::MarkerKey(HC_KEY nInKey) :
-	Key(nInKey)
+H3DF::MarkerKey::MarkerKey(HC_KEY nInKey) : Key(nInKey)
 {
 }

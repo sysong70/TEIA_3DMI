@@ -14,12 +14,12 @@ using namespace H3DF;
 
 namespace H3DF
 {
-	class AttributeLockControlPrivate : public ControlImpl
+	class AttributeLockControlImpl : public ControlImpl
 	{
 	public:
-		AttributeLockControlPrivate() { m_eType = H3DF::Type::AttributeLockControl; }
+		AttributeLockControlImpl() { m_eType = H3DF::Type::AttributeLockControl; }
 
-		void Copy(AttributeLockControlPrivate * pcInThat) {
+		void Copy(AttributeLockControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
 
@@ -27,7 +27,7 @@ namespace H3DF
 	};
 }
 
-CStringA H3DF::AttributeLockControlPrivate::GetTypeString(AttributeLock::Type eInType)
+CStringA H3DF::AttributeLockControlImpl::GetTypeString(AttributeLock::Type eInType)
 {
 	CStringA strTypeString;
 
@@ -407,7 +407,7 @@ CStringA H3DF::AttributeLockControlPrivate::GetTypeString(AttributeLock::Type eI
 
 H3DF::AttributeLockControl::AttributeLockControl(SegmentKey & cInSegmentKey)
 {
-	AttributeLockControlPrivate * pcImpl = new AttributeLockControlPrivate();
+	AttributeLockControlImpl * pcImpl = new AttributeLockControlImpl();
 	pcImpl->m_cOverrideKey = cInSegmentKey;
 
 	m_pcImpl = pcImpl;
@@ -415,14 +415,14 @@ H3DF::AttributeLockControl::AttributeLockControl(SegmentKey & cInSegmentKey)
 
 H3DF::AttributeLockControl::AttributeLockControl(AttributeLockControl const & cInThat)
 {
-	m_pcImpl = new AttributeLockControlPrivate();
+	m_pcImpl = new AttributeLockControlImpl();
 	Set(cInThat);
 }
 
 void H3DF::AttributeLockControl::Set(AttributeLockControl const & cInThat)
 {
-	AttributeLockControlPrivate * pcImpl = (AttributeLockControlPrivate *) m_pcImpl;
-	AttributeLockControlPrivate * pcInThatImpl = (AttributeLockControlPrivate *) cInThat.m_pcImpl;
+	AttributeLockControlImpl * pcImpl = (AttributeLockControlImpl *) m_pcImpl;
+	AttributeLockControlImpl * pcInThatImpl = (AttributeLockControlImpl *) cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -434,7 +434,7 @@ AttributeLockControl & H3DF::AttributeLockControl::operator = (AttributeLockCont
 
 AttributeLockControl & H3DF::AttributeLockControl::SetLock(AttributeLock::Type eInType, bool bInState)
 {
-	AttributeLockControlPrivate * pcImpl = (AttributeLockControlPrivate *) m_pcImpl;
+	AttributeLockControlImpl * pcImpl = (AttributeLockControlImpl *) m_pcImpl;
 
 	CStringA strOption;
 	if (true == bInState) {

@@ -5,39 +5,41 @@
 
 #include <deque>
 
-OPEN_3DF_NAMESPACE
-
-using PortfolioDeque = std::deque<PortfolioKey *>;
-
-class API_3DF PortfolioKey : public SegmentKey
+namespace H3DF
 {
-public:
-	PortfolioKey(CString strInName);
-	PortfolioKey(HC_KEY nInKey = INVALID_KEY);
-	PortfolioKey(PortfolioKey const & cInThat);
+	class API_3DF PortfolioKey : public SegmentKey
+	{
+	public:
+		PortfolioKey();
+		PortfolioKey(CString strInName);
+		PortfolioKey(HC_KEY nInKey);
+		PortfolioKey(PortfolioKey const & cInThat);
 
-	void Set(PortfolioKey const & cInThat);
-	PortfolioKey & operator = (PortfolioKey const & cInThat);
+		void Set(PortfolioKey const & cInThat);
+		PortfolioKey & operator = (PortfolioKey const & cInThat);
 
-	NamedStyleDefinition DefineNamedStyle(CString strInName, SegmentKey const & cInStyleSource);
-};
+		NamedStyleDefinition DefineNamedStyle(CString strInName, SegmentKey const & cInStyleSource);
+	};
 
+	class API_3DF PortfolioControl : public Control
+	{
+	public:
+		explicit PortfolioControl(SegmentKey & cInSegmentKey);
+		PortfolioControl(PortfolioControl const & cInThat);
 
-class API_3DF PortfolioControl : public Control
-{
-public:
-	virtual ~PortfolioControl();
+		void Set(PortfolioControl const & cInThat);
+		PortfolioControl & operator = (PortfolioControl const & cInThat);
 
-	size_t GetCount() const;
+		H3DF::Type ObjectType() const { return H3DF::Type::PortfolioControl; };
 
-	PortfolioControl & Push(PortfolioKey const & cInPortfolio);
-	bool Pop();
+		size_t GetCount() const;
 
-	bool ShowTop(PortfolioKey & cOutPortfolio) const;
+		PortfolioControl & Push(PortfolioKey const & cInPortfolio);
+		bool Pop();
 
-private:
-	PortfolioDeque * m_pdpcPortfolioDeque = nullptr;
-};
+		bool ShowTop(PortfolioKey & cOutPortfolio) const;
 
-
-CLOSE_3DF_NAMESPACE
+	private:
+		
+	};
+}

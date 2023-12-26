@@ -26,7 +26,8 @@ namespace H3DF
 	class API_3DF StyleKey : public Key
 	{
 	public:
-		StyleKey(HC_KEY cInKey = INVALID_KEY);
+		StyleKey();
+		StyleKey(HC_KEY cInKey);
 		StyleKey(StyleKey const & cInThat);
 
 		void Set(StyleKey const & cInThat);

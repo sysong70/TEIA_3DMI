@@ -13,10 +13,10 @@ using namespace H3DF;
 
 namespace H3DF
 {
-	class CircleKitPrivate : public Impl
+	class CircleKitImpl : public Impl
 	{
 	public:
-		void Copy(CircleKitPrivate * pcInThat)
+		void Copy(CircleKitImpl * pcInThat)
 		{
 			m_cCenter = pcInThat->m_cCenter;
 			m_dRadius = pcInThat->m_dRadius;
@@ -32,19 +32,19 @@ namespace H3DF
 
 H3DF::CircleKit::CircleKit()
 {
-	m_pcImpl = new CircleKitPrivate();
+	m_pcImpl = new CircleKitImpl();
 }
 
 H3DF::CircleKit::CircleKit(CircleKit const & cInThat)
 {
-	m_pcImpl = new CircleKitPrivate();
+	m_pcImpl = new CircleKitImpl();
 	Set(cInThat);
 }
 
 void H3DF::CircleKit::Set(CircleKit const & cInThat)
 {
-	CircleKitPrivate * pcImpl = static_cast<CircleKitPrivate *>(m_pcImpl);
-	CircleKitPrivate * pcInThatImpl = static_cast<CircleKitPrivate *>(cInThat.m_pcImpl);
+	CircleKitImpl * pcImpl = static_cast<CircleKitImpl *>(m_pcImpl);
+	CircleKitImpl * pcInThatImpl = static_cast<CircleKitImpl *>(cInThat.m_pcImpl);
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -56,49 +56,49 @@ CircleKit const & H3DF::CircleKit::operator = (CircleKit const & cInThat)
 
 CircleKit & H3DF::CircleKit::SetCenter(Point const & cInCenter)
 {
-	CircleKitPrivate * pcImpl = static_cast<CircleKitPrivate *>(m_pcImpl);
+	CircleKitImpl * pcImpl = static_cast<CircleKitImpl *>(m_pcImpl);
 	pcImpl->m_cCenter = cInCenter;
 	return *this;
 }
 
 CircleKit & H3DF::CircleKit::SetRadius(double dInRadius)
 {
-	CircleKitPrivate * pcImpl = static_cast<CircleKitPrivate *>(m_pcImpl);
+	CircleKitImpl * pcImpl = static_cast<CircleKitImpl *>(m_pcImpl);
 	pcImpl->m_dRadius = dInRadius;
 	return *this;
 }
 
 CircleKit & H3DF::CircleKit::SetXAxis(Vector const & cInAxis)
 {
-	CircleKitPrivate * pcImpl = static_cast<CircleKitPrivate *>(m_pcImpl);
+	CircleKitImpl * pcImpl = static_cast<CircleKitImpl *>(m_pcImpl);
 	pcImpl->m_cXAxis = cInAxis;
 	return *this;
 }
 
 CircleKit & H3DF::CircleKit::SetYAxis(Vector const & cInAxis)
 {
-	CircleKitPrivate * pcImpl = static_cast<CircleKitPrivate *>(m_pcImpl);
+	CircleKitImpl * pcImpl = static_cast<CircleKitImpl *>(m_pcImpl);
 	pcImpl->m_cYAxis = cInAxis;
 	return *this;
 }
 
 bool H3DF::CircleKit::ShowCenter(Point & cOutCenter) const
 {
-	CircleKitPrivate * pcImpl = static_cast<CircleKitPrivate *>(m_pcImpl);
+	CircleKitImpl * pcImpl = static_cast<CircleKitImpl *>(m_pcImpl);
 	cOutCenter = pcImpl->m_cCenter;
 	return true;
 }
 
 bool H3DF::CircleKit::ShowRadius(float & cOutRadius) const
 {
-	CircleKitPrivate * pcImpl = static_cast<CircleKitPrivate *>(m_pcImpl);
+	CircleKitImpl * pcImpl = static_cast<CircleKitImpl *>(m_pcImpl);
 	cOutRadius = (float)pcImpl->m_dRadius;
 	return true;
 }
 
 bool H3DF::CircleKit::ShowXAxis(Vector & cOutAxis) const
 {
-	CircleKitPrivate * pcImpl = static_cast<CircleKitPrivate *>(m_pcImpl);
+	CircleKitImpl * pcImpl = static_cast<CircleKitImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	cOutAxis = pcImpl->m_cXAxis;
@@ -107,7 +107,7 @@ bool H3DF::CircleKit::ShowXAxis(Vector & cOutAxis) const
 
 bool H3DF::CircleKit::ShowYAxis(Vector & cOutAxis) const
 {
-	CircleKitPrivate * pcImpl = static_cast<CircleKitPrivate *>(m_pcImpl);
+	CircleKitImpl * pcImpl = static_cast<CircleKitImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	cOutAxis = pcImpl->m_cYAxis;
@@ -116,7 +116,7 @@ bool H3DF::CircleKit::ShowYAxis(Vector & cOutAxis) const
 
 bool H3DF::CircleKit::ShowNormal(Vector & cOutNormal) const
 {
-	CircleKitPrivate * pcImpl = static_cast<CircleKitPrivate *>(m_pcImpl);
+	CircleKitImpl * pcImpl = static_cast<CircleKitImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	cOutNormal = pcImpl->m_cXAxis.Cross(pcImpl->m_cYAxis);
@@ -125,7 +125,7 @@ bool H3DF::CircleKit::ShowNormal(Vector & cOutNormal) const
 
 bool H3DF::CircleKit::ShowPoint(float fInAngle, Point & cOutPoint) const
 {
-	CircleKitPrivate * pcImpl = static_cast<CircleKitPrivate *>(m_pcImpl);
+	CircleKitImpl * pcImpl = static_cast<CircleKitImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	double dRadius = pcImpl->m_dRadius;
@@ -142,12 +142,12 @@ bool H3DF::CircleKit::ShowPoint(float fInAngle, Point & cOutPoint) const
 //== CircleKey =====================================================================================
 namespace H3DF {
 
-	class CircleKeyPrivate : public H3DF::KeyImpl
+	class CircleKeyImpl : public H3DF::KeyImpl
 	{
 	public:
-		CircleKeyPrivate() { m_eType = H3DF::Type::CircleKey; }
+		CircleKeyImpl() { m_eType = H3DF::Type::CircleKey; }
 
-		void Copy(CircleKeyPrivate * pcInThat) {
+		void Copy(CircleKeyImpl * pcInThat) {
 			KeyImpl::Copy(pcInThat);
 			m_cCircleKit = pcInThat->m_cCircleKit;
 		}
@@ -156,14 +156,22 @@ namespace H3DF {
 	};
 };
 
-H3DF::CircleKey::CircleKey()
+H3DF::CircleKey::CircleKey() : GeometryKey(INVALID_KEY)
 {
-	m_pcImpl = new CircleKeyPrivate();
+	m_pcImpl = new CircleKeyImpl();
 }
 
-H3DF::CircleKey::CircleKey(Key const & cInKey)
+H3DF::CircleKey::CircleKey(HC_KEY nInKey) : GeometryKey(INVALID_KEY)
 {
-	CircleKeyPrivate * pcImpl = new CircleKeyPrivate();
+	CircleKeyImpl * pcImpl = new CircleKeyImpl();
+	pcImpl->SetKeyValue(nInKey);
+
+	m_pcImpl = pcImpl;
+}
+
+H3DF::CircleKey::CircleKey(Key const & cInKey) : GeometryKey(INVALID_KEY)
+{
+	CircleKeyImpl * pcImpl = new CircleKeyImpl();
 	m_pcImpl = pcImpl;
 
 	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInKey.GetImpl()));
@@ -172,9 +180,9 @@ H3DF::CircleKey::CircleKey(Key const & cInKey)
 	pcImpl->SetType(H3DF::Type::CircleKey);
 }
 
-H3DF::CircleKey::CircleKey(CircleKey const & cInThat)
+H3DF::CircleKey::CircleKey(CircleKey const & cInThat) : GeometryKey(INVALID_KEY)
 {
-	m_pcImpl = new CircleKeyPrivate();
+	m_pcImpl = new CircleKeyImpl();
 	Set(cInThat);
 }
 
@@ -186,8 +194,8 @@ void H3DF::CircleKey::Set(CircleKey const & cInThat)
 
 	SetKeyValue(cInThat.KeyValue());
 
-	CircleKeyPrivate * pcImpl = static_cast<CircleKeyPrivate *>(m_pcImpl);
-	CircleKeyPrivate * pcInThatImpl = static_cast<CircleKeyPrivate *>(cInThat.m_pcImpl);
+	CircleKeyImpl * pcImpl = static_cast<CircleKeyImpl *>(m_pcImpl);
+	CircleKeyImpl * pcInThatImpl = static_cast<CircleKeyImpl *>(cInThat.m_pcImpl);
 
 	pcImpl->Copy(pcInThatImpl);
 }
@@ -200,58 +208,58 @@ CircleKey & H3DF::CircleKey::operator=(CircleKey const & cInThat)
 
 CircleKey & H3DF::CircleKey::SetCenter(Point const & cInCenter)
 {
-	CircleKeyPrivate * pcImpl = static_cast<CircleKeyPrivate *>(m_pcImpl);
+	CircleKeyImpl * pcImpl = static_cast<CircleKeyImpl *>(m_pcImpl);
 	pcImpl->m_cCircleKit.SetCenter(cInCenter);	
 	return *this;
 }
 
 CircleKey & H3DF::CircleKey::SetRadius(double dInRadius)
 {
-	CircleKeyPrivate * pcImpl = static_cast<CircleKeyPrivate *>(m_pcImpl);
+	CircleKeyImpl * pcImpl = static_cast<CircleKeyImpl *>(m_pcImpl);
 	pcImpl->m_cCircleKit.SetRadius(dInRadius);	
 	return *this;
 }
 
 CircleKey & H3DF::CircleKey::SetXAxis(Vector const & cInAxis)
 {
-	CircleKeyPrivate * pcImpl = static_cast<CircleKeyPrivate *>(m_pcImpl);
+	CircleKeyImpl * pcImpl = static_cast<CircleKeyImpl *>(m_pcImpl);
 	pcImpl->m_cCircleKit.SetXAxis(cInAxis);
 	return *this;
 }
 
 CircleKey & H3DF::CircleKey::SetYAxis(Vector const & cInAxis)
 {
-	CircleKeyPrivate * pcImpl = static_cast<CircleKeyPrivate *>(m_pcImpl);
+	CircleKeyImpl * pcImpl = static_cast<CircleKeyImpl *>(m_pcImpl);
 	pcImpl->m_cCircleKit.SetYAxis(cInAxis);
 	return *this;
 }
 
 bool H3DF::CircleKey::ShowCenter(Point & cOutCenter) const
 {
-	CircleKeyPrivate * pcImpl = static_cast<CircleKeyPrivate *>(m_pcImpl);
+	CircleKeyImpl * pcImpl = static_cast<CircleKeyImpl *>(m_pcImpl);
 	return pcImpl->m_cCircleKit.ShowCenter(cOutCenter);
 }
 
 bool H3DF::CircleKey::ShowRadius(float & cOutRadius) const
 {
-	CircleKeyPrivate * pcImpl = static_cast<CircleKeyPrivate *>(m_pcImpl);
+	CircleKeyImpl * pcImpl = static_cast<CircleKeyImpl *>(m_pcImpl);
 	return pcImpl->m_cCircleKit.ShowRadius(cOutRadius);
 }
 
 bool H3DF::CircleKey::ShowXAxis(Vector & cOutAxis) const
 {
-	CircleKeyPrivate * pcImpl = static_cast<CircleKeyPrivate *>(m_pcImpl);
+	CircleKeyImpl * pcImpl = static_cast<CircleKeyImpl *>(m_pcImpl);
 	return pcImpl->m_cCircleKit.ShowXAxis(cOutAxis);
 }
 
 bool H3DF::CircleKey::ShowYAxis(Vector & cOutAxis) const
 {
-	CircleKeyPrivate * pcImpl = static_cast<CircleKeyPrivate *>(m_pcImpl);
+	CircleKeyImpl * pcImpl = static_cast<CircleKeyImpl *>(m_pcImpl);
 	return pcImpl->m_cCircleKit.ShowYAxis(cOutAxis);
 }
 
 bool H3DF::CircleKey::ShowNormal(Vector & cOutNormal) const
 {
-	CircleKeyPrivate * pcImpl = static_cast<CircleKeyPrivate *>(m_pcImpl);
+	CircleKeyImpl * pcImpl = static_cast<CircleKeyImpl *>(m_pcImpl);
 	return pcImpl->m_cCircleKit.ShowNormal(cOutNormal);
 }

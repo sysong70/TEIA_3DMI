@@ -4,12 +4,12 @@
 
 namespace H3DF
 {
-	class ApplicationWindowOptionsKitPrivate : public Impl
+	class ApplicationWindowOptionsKitImpl : public Impl
 	{
 	public:
-		ApplicationWindowOptionsKitPrivate() { m_eType = H3DF::Type::ApplicationWindowOptionsKit; }
+		ApplicationWindowOptionsKitImpl() { m_eType = H3DF::Type::ApplicationWindowOptionsKit; }
 
-		void Copy(ApplicationWindowOptionsKitPrivate * pcInThat) {
+		void Copy(ApplicationWindowOptionsKitImpl * pcInThat) {
 			m_eDriver = pcInThat->m_eDriver;
 		}
 
@@ -23,19 +23,19 @@ using namespace H3DF;
 
 H3DF::ApplicationWindowOptionsKit::ApplicationWindowOptionsKit()
 {
-	m_pcImpl = new ApplicationWindowOptionsKitPrivate();
+	m_pcImpl = new ApplicationWindowOptionsKitImpl();
 }
 
 H3DF::ApplicationWindowOptionsKit::ApplicationWindowOptionsKit(ApplicationWindowOptionsKit const & cInThat)
 {
-	m_pcImpl = new ApplicationWindowOptionsKitPrivate();
+	m_pcImpl = new ApplicationWindowOptionsKitImpl();
 	Set(cInThat);
 }
 
 void H3DF::ApplicationWindowOptionsKit::Set(ApplicationWindowOptionsKit const & cInThat)
 {
-	ApplicationWindowOptionsKitPrivate * pcImpl = (ApplicationWindowOptionsKitPrivate *)m_pcImpl;
-	ApplicationWindowOptionsKitPrivate * pcInThatImpl = (ApplicationWindowOptionsKitPrivate *)cInThat.m_pcImpl;
+	ApplicationWindowOptionsKitImpl * pcImpl = (ApplicationWindowOptionsKitImpl *)m_pcImpl;
+	ApplicationWindowOptionsKitImpl * pcInThatImpl = (ApplicationWindowOptionsKitImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -47,21 +47,21 @@ ApplicationWindowOptionsKit const & H3DF::ApplicationWindowOptionsKit::operator 
 
 void H3DF::ApplicationWindowOptionsKit::Show(ApplicationWindowOptionsKit & cOutKit) const
 {
-	ApplicationWindowOptionsKitPrivate * pcImpl = (ApplicationWindowOptionsKitPrivate *)m_pcImpl;
-	ApplicationWindowOptionsKitPrivate * pcOutKitImpl = (ApplicationWindowOptionsKitPrivate *)cOutKit.m_pcImpl;
+	ApplicationWindowOptionsKitImpl * pcImpl = (ApplicationWindowOptionsKitImpl *)m_pcImpl;
+	ApplicationWindowOptionsKitImpl * pcOutKitImpl = (ApplicationWindowOptionsKitImpl *)cOutKit.m_pcImpl;
 	pcOutKitImpl->Copy(pcImpl);
 }
 
 ApplicationWindowOptionsKit & H3DF::ApplicationWindowOptionsKit::SetDriver(Window::Driver eInDriver)
 {
-	ApplicationWindowOptionsKitPrivate * pcImpl = (ApplicationWindowOptionsKitPrivate *)m_pcImpl;
+	ApplicationWindowOptionsKitImpl * pcImpl = (ApplicationWindowOptionsKitImpl *)m_pcImpl;
 	pcImpl->m_eDriver = eInDriver;
 	return *this;
 }
 
 ApplicationWindowOptionsKit & H3DF::ApplicationWindowOptionsKit::UnsetDriver()
 {
-	ApplicationWindowOptionsKitPrivate * pcImpl = (ApplicationWindowOptionsKitPrivate *)m_pcImpl;
+	ApplicationWindowOptionsKitImpl * pcImpl = (ApplicationWindowOptionsKitImpl *)m_pcImpl;
 	//pcImpl->m_eDriver = Window::Driver::Undefined;
 	return *this;
 }

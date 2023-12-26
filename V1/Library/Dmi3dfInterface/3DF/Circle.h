@@ -40,6 +40,7 @@ namespace H3DF
 	{
 	public:
 		CircleKey();
+		CircleKey(HC_KEY nInKey);
 		explicit CircleKey(Key const & cInKey);
 		CircleKey(CircleKey const & cInThat);
 

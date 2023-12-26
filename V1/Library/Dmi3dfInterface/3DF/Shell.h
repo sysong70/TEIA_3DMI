@@ -64,6 +64,7 @@ class API_3DF ShellKey : public GeometryKey
 {
 public:
 	ShellKey();
+	ShellKey(HC_KEY nInKey);
 	explicit ShellKey(Key const & cInKey);
 	ShellKey(ShellKey const & cInThat);
 

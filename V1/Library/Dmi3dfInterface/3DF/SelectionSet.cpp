@@ -22,7 +22,7 @@
 
 using namespace H3DF;
 
-//== SelectionSet ===========================================================================
+//== SelectionSet ==================================================================================
 
 H3DF::SelectionSet::SelectionSet(HBaseView * pcView, bool bReferenceSelection) :
 	HSelectionSet(pcView, bReferenceSelection)

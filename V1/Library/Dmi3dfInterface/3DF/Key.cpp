@@ -9,7 +9,7 @@
 
 #include <HTools.h>
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
 H3DF::Key::Key() 
 {

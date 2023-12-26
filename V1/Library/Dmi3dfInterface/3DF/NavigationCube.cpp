@@ -89,10 +89,10 @@ namespace NavigationCubePreset
 #define TheCube TheAppOptions.Preference.Views.NavCube
 
 
-class NavigationCubePrivate : public Impl
+class NavigationCubeImpl : public Impl
 {
 public:
-	void Copy(const NavigationCubePrivate * pcInThat) {
+	void Copy(const NavigationCubeImpl * pcInThat) {
 		m_bInitialized = pcInThat->m_bInitialized;
 
 		m_pcWindow = pcInThat->m_pcWindow;
@@ -126,7 +126,7 @@ public:
 
 NavigationCube::NavigationCube(H3DF::BaseView * view, WindowKey * pcInWindow)
 {
-	NavigationCubePrivate * pcImpl = new NavigationCubePrivate();
+	NavigationCubeImpl * pcImpl = new NavigationCubeImpl();
 	if (nullptr == pcImpl) { assert(false); }
 
 	m_pcImpl = pcImpl;
@@ -141,8 +141,8 @@ NavigationCube::~NavigationCube()
 
 void H3DF::NavigationCube::Set(NavigationCube const & cInThat)
 {
-	NavigationCubePrivate * pcImpl = (NavigationCubePrivate *)m_pcImpl;
-	NavigationCubePrivate * pcInThatImpl = (NavigationCubePrivate *)cInThat.m_pcImpl;
+	NavigationCubeImpl * pcImpl = (NavigationCubeImpl *)m_pcImpl;
+	NavigationCubeImpl * pcInThatImpl = (NavigationCubeImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 
 	if (nullptr != pcImpl->m_pView) {
@@ -158,7 +158,7 @@ NavigationCube const & H3DF::NavigationCube::operator = (NavigationCube const & 
 
 int NavigationCube::LButtonUp(HEventInfo & cInEvent)
 {
-	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {  assert(false); }
 
 	WindowPoint cPoint(cInEvent.GetMouseWindowPos().x, cInEvent.GetMouseWindowPos().y, cInEvent.GetMouseWindowPos().z);
@@ -195,7 +195,7 @@ int NavigationCube::LButtonUp(HEventInfo & cInEvent)
 
 int NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)
 {
-	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	if (0 < pcImpl->m_cOldHighlightSelection.GetCount()) {
@@ -208,7 +208,7 @@ int NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)
 
 int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 {
-	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	WindowPoint cPoint(cInEvent.GetMouseWindowPos().x, cInEvent.GetMouseWindowPos().y, cInEvent.GetMouseWindowPos().z);
@@ -224,7 +224,7 @@ int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
 
 void NavigationCube::SetView(H3DF::BaseView * view, WindowKey * pcInWindow) 
 {
-	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	pcImpl->m_pView = view;
@@ -233,7 +233,7 @@ void NavigationCube::SetView(H3DF::BaseView * view, WindowKey * pcInWindow)
 
 bool NavigationCube::IsValid()
 {
-	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	return pcImpl->m_cubeSegment != HC_ERROR_KEY;
@@ -241,7 +241,7 @@ bool NavigationCube::IsValid()
 
 bool NavigationCube::IsInitialized()
 {
-	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	return pcImpl->m_bInitialized;
@@ -249,7 +249,7 @@ bool NavigationCube::IsInitialized()
 
 void NavigationCube::Create(float width, float height, HC_KEY parent)
 {
-	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	pcImpl->m_windowSize.x = width;
@@ -322,7 +322,7 @@ void NavigationCube::Create(float width, float height, HC_KEY parent)
 
 void NavigationCube::Recreate()
 {
-	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	HC_Open_Segment_By_Key(pcImpl->m_parentSegment);
@@ -345,7 +345,7 @@ HC_KEY NavigationCube::HitTest(float x, float y, float z)
 void NavigationCube::Transform()
 {
 
-	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	HPoint position, target, up_vector;
@@ -393,7 +393,7 @@ void NavigationCube::OnSize(float width, float height)
 
 void NavigationCube::OpenCubeSegment()
 {
-	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	if (pcImpl->m_cubeSegment == HC_ERROR_KEY) {
@@ -431,7 +431,7 @@ void NavigationCube::CreateAxis()
 
 void NavigationCube::CreateCube()
 {
-	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	double unit = PRESET::PlaneUnit();
@@ -687,7 +687,7 @@ HC_KEY NavigationCube::CreateAxis(const char* name, const char* text, HPoint axi
 
 void NavigationCube::SetWindowSize(double width, double height, bool openSegment)
 {
-	NavigationCubePrivate * pcImpl = static_cast<NavigationCubePrivate *>(m_pcImpl);
+	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	pcImpl->m_windowSize.x = width;

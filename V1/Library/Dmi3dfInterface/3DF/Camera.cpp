@@ -11,10 +11,10 @@
 
 USING_3DF_NAMESPACE
 
-class CameraKitPrivate : public Impl
+class CameraKitImpl : public Impl
 {
 public:
-	void Copy(CameraKitPrivate * pcInThat)
+	void Copy(CameraKitImpl * pcInThat)
 	{
 		cUpVector = pcInThat->cUpVector;
 		bUpVectorFlag = pcInThat->bUpVectorFlag;
@@ -37,19 +37,19 @@ public:
 
 CameraKit::CameraKit()
 {
-	m_pcImpl = new CameraKitPrivate();
+	m_pcImpl = new CameraKitImpl();
 }
 
 CameraKit::CameraKit(CameraKit const & cInThat)
 {
-	m_pcImpl = new CameraKitPrivate();
+	m_pcImpl = new CameraKitImpl();
 	Set(cInThat);
 }
 
 void CameraKit::Set(CameraKit const & cInThat)
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
-	CameraKitPrivate * pcInThatImpl = (CameraKitPrivate *)cInThat.m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	CameraKitImpl * pcInThatImpl = (CameraKitImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -61,7 +61,7 @@ CameraKit const & CameraKit::operator=(CameraKit const & cInThat)
 //== Set ===========================================================================================
 CameraKit & CameraKit::SetUpVector(Vector const & cInUpVector)
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	pcImpl->cUpVector = cInUpVector;
 	pcImpl->bUpVectorFlag = true;
 
@@ -70,7 +70,7 @@ CameraKit & CameraKit::SetUpVector(Vector const & cInUpVector)
 
 CameraKit & CameraKit::SetPosition(Point const & cInPosition)
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	pcImpl->cPosition = cInPosition;
 	pcImpl->bPositionFlag = true;
 
@@ -79,7 +79,7 @@ CameraKit & CameraKit::SetPosition(Point const & cInPosition)
 
 CameraKit & CameraKit::SetTarget(Point const & cInTarget)
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	pcImpl->cTarget = cInTarget;
 	pcImpl->bTargetFlag = true;
 
@@ -88,7 +88,7 @@ CameraKit & CameraKit::SetTarget(Point const & cInTarget)
 
 CameraKit & CameraKit::SetProjection(Camera::Projection eInType, float fInOblique_Y_Skew, float fInOblique_X_Skew)
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	pcImpl->eType = eInType;
 	pcImpl->bTypeFlag = true;
 
@@ -103,7 +103,7 @@ CameraKit & CameraKit::SetProjection(Camera::Projection eInType, float fInObliqu
 
 CameraKit & CameraKit::SetField(float fInWidth, float fInHeight)
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	pcImpl->fWidth = fInWidth;
 	pcImpl->bWidthFlag = true;
 
@@ -115,7 +115,7 @@ CameraKit & CameraKit::SetField(float fInWidth, float fInHeight)
 
 CameraKit & CameraKit::SetNearLimit(float const fInLimit)
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	pcImpl->fNearLimit = fInLimit;
 	pcImpl->bNearLimitFlag = true;
 
@@ -127,7 +127,7 @@ CameraKit & CameraKit::SetNearLimit(float const fInLimit)
 //== Unset =========================================================================================
 CameraKit & CameraKit::UnsetUpVector()
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	pcImpl->bUpVectorFlag = false;
 
 	return *this;
@@ -135,7 +135,7 @@ CameraKit & CameraKit::UnsetUpVector()
 
 CameraKit & CameraKit::UnsetPosition()
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	pcImpl->bPositionFlag = false;
 
 	return *this;
@@ -143,7 +143,7 @@ CameraKit & CameraKit::UnsetPosition()
 
 CameraKit & CameraKit::UnsetTarget()
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	pcImpl->bTargetFlag = false;
 
 	return *this;
@@ -152,7 +152,7 @@ CameraKit & CameraKit::UnsetTarget()
 //== Show ===========================================================================================
 bool CameraKit::ShowUpVector(Vector & cOutUpVector) const
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	if (false == pcImpl->bUpVectorFlag) {
 		return false;
 	}
@@ -163,7 +163,7 @@ bool CameraKit::ShowUpVector(Vector & cOutUpVector) const
 
 bool CameraKit::ShowPosition(Point & cOutPosition) const
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	if (false == pcImpl->bPositionFlag) {
 		return false;
 	}
@@ -174,7 +174,7 @@ bool CameraKit::ShowPosition(Point & cOutPosition) const
 
 bool CameraKit::ShowTarget(Point & cOutTarget) const
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	if (false == pcImpl->bTargetFlag) {
 		return false;
 	}
@@ -185,7 +185,7 @@ bool CameraKit::ShowTarget(Point & cOutTarget) const
 
 bool CameraKit::ShowProjection(Camera::Projection & eOutType) const
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	if (false == pcImpl->bTargetFlag) {
 		return false;
 	}
@@ -196,7 +196,7 @@ bool CameraKit::ShowProjection(Camera::Projection & eOutType) const
 
 bool CameraKit::ShowProjection(Camera::Projection & eOutType, float & fOutOblique_Y_Skew, float & fOutOblique_X_Skew) const
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	if (false == pcImpl->bTypeFlag) {
 		return false;
 	}
@@ -218,7 +218,7 @@ bool CameraKit::ShowProjection(Camera::Projection & eOutType, float & fOutObliqu
 
 bool CameraKit::ShowWidth(float & fOutWidth) const
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	if (false == pcImpl->bWidthFlag) {
 		return false;
 	}
@@ -230,7 +230,7 @@ bool CameraKit::ShowWidth(float & fOutWidth) const
 
 bool CameraKit::ShowHeight(float & fOutHeight) const
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	if (false == pcImpl->bHeightFlag) {
 		return false;
 	}
@@ -242,7 +242,7 @@ bool CameraKit::ShowHeight(float & fOutHeight) const
 
 bool CameraKit::ShowField(float & fOutWidth, float & fOutHeight) const
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	if (false == pcImpl->bWidthFlag) {
 		return false;
 	}
@@ -260,7 +260,7 @@ bool CameraKit::ShowField(float & fOutWidth, float & fOutHeight) const
 // NearLimit Show
 bool CameraKit::ShowNearLimit(float & fOutNearLimit) const
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 	if (false == pcImpl->bNearLimitFlag) {
 		return false;
 	}
@@ -273,7 +273,7 @@ bool CameraKit::ShowNearLimit(float & fOutNearLimit) const
 // Show Matrix 생성
 bool CameraKit::ShowMatrix(MatrixKit & cMatrix) const
 {
-	CameraKitPrivate * pcImpl = (CameraKitPrivate *)m_pcImpl;
+	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
 
 	// Matrix를 생성하기 위해서 필요한 값들이 존재하는지 여부를 확인한다.
 	if (false == pcImpl->bUpVectorFlag) {

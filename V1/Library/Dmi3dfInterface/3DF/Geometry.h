@@ -9,8 +9,8 @@ namespace H3DF
 	class API_3DF GeometryKey : public Key
 	{
 	public:
-		GeometryKey(HC_KEY nInKey = INVALID_KEY);
-		virtual ~GeometryKey();
+		GeometryKey();
+		GeometryKey(HC_KEY nInKey);
 
 		H3DF::Type ObjectType() const { return H3DF::Type::GeometryKey; };
 

@@ -32,7 +32,7 @@ using namespace H3DF;
 
 namespace H3DF
 {
-	class ApplicationPrivate : public Impl
+	class ApplicationImpl : public Impl
 	{
 	public:
 		HDB * m_pcHoopsDB = nullptr;
@@ -42,7 +42,7 @@ namespace H3DF
 	};
 }
 
-void H3DF::ApplicationPrivate::ErrorCallback(HErrorNode * pcNode, void * pcUserData)
+void H3DF::ApplicationImpl::ErrorCallback(HErrorNode * pcNode, void * pcUserData)
 {
 	CStringA strMessage, strText;
 	
@@ -87,7 +87,7 @@ void H3DF::ApplicationPrivate::ErrorCallback(HErrorNode * pcNode, void * pcUserD
 	LogManager::DecreaseTabIndex(LOGMANAGER_3DF_ERROR_LOG_ID);
 }
 
-CStringA H3DF::ApplicationPrivate::ErrorCategoryString(int nId)
+CStringA H3DF::ApplicationImpl::ErrorCategoryString(int nId)
 {
 	CStringA strMessage;
 	switch (nId)
@@ -188,7 +188,7 @@ CStringA H3DF::ApplicationPrivate::ErrorCategoryString(int nId)
 	return strMessage;
 }
 
-CStringA H3DF::ApplicationPrivate::ErrorSpecificString(int nId)
+CStringA H3DF::ApplicationImpl::ErrorSpecificString(int nId)
 {
 	CStringA strMessage;
 	switch (nId)
@@ -403,7 +403,7 @@ CStringA H3DF::ApplicationPrivate::ErrorSpecificString(int nId)
 // 1. Application이 실행될때 최초 처리 CWinApp::InitInstance에서 메시지 전달 받음.
 void H3DF::Application::InitInstance()
 {
-	ApplicationPrivate * pcImpl = new ApplicationPrivate();
+	ApplicationImpl * pcImpl = new ApplicationImpl();
 	if (nullptr == pcImpl) {
 		assert(false);
 	}
@@ -419,7 +419,7 @@ void H3DF::Application::InitInstance()
 	HDB::EnableErrorManager();
 	//HC_Define_System_Options("fatal errors, errors, warnings, info, no message limit");
 	HErrorManager::AllowAllErrors();
-	HErrorManager::SetErrorCallback(H3DF::ApplicationPrivate::ErrorCallback, this);
+	HErrorManager::SetErrorCallback(H3DF::ApplicationImpl::ErrorCallback, this);
 	LogManager::SetCreateFile(LOGMANAGER_3DF_ERROR_LOG_ID, true);
 	LogManager::SetFilePathName(LOGMANAGER_3DF_ERROR_LOG_ID, LogManager::GetExecuteDirectory() + L"Log\\3DF_Error.txt");
 	LogManager::Log(LOGMANAGER_3DF_ERROR_LOG_ID, L"Log Create");
@@ -464,7 +464,7 @@ void H3DF::Application::InitInstance()
 // 2. CWinApp::OnExitInstance() 처리
 void H3DF::Application::ExitInstance()
 {
-	ApplicationPrivate * pcImpl = static_cast<ApplicationPrivate *>(m_pcImpl);
+	ApplicationImpl * pcImpl = static_cast<ApplicationImpl *>(m_pcImpl);
 
 	if (nullptr != pcImpl->m_pcHoopsDB) {
 		delete pcImpl->m_pcHoopsDB;

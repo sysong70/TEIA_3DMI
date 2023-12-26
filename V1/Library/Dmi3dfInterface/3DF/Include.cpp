@@ -8,6 +8,11 @@
 
 using namespace H3DF;
 
+H3DF::IncludeKey::IncludeKey() : Key()
+{
+	
+}
+
 H3DF::IncludeKey::IncludeKey(HC_KEY nInKey) : Key(nInKey)
 {
 	

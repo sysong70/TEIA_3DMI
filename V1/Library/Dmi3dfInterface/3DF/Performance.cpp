@@ -16,12 +16,12 @@
 
 namespace H3DF
 {
-	class PerformanceKitPrivate : public Impl
+	class PerformanceKitImpl : public Impl
 	{
 	public:
-		PerformanceKitPrivate() { m_eType = H3DF::Type::PerformanceKit; }
+		PerformanceKitImpl() { m_eType = H3DF::Type::PerformanceKit; }
 
-		void Copy(PerformanceKitPrivate * pcInThat) {
+		void Copy(PerformanceKitImpl * pcInThat) {
 			m_eInDisplayList = pcInThat->m_eInDisplayList;
 		}
 
@@ -39,19 +39,19 @@ using namespace H3DF;
 
 H3DF::PerformanceKit::PerformanceKit()
 {
-	m_pcImpl = new PerformanceKitPrivate();
+	m_pcImpl = new PerformanceKitImpl();
 }
 
 H3DF::PerformanceKit::PerformanceKit(PerformanceKit const & cInThat)
 {
-	m_pcImpl = new PerformanceKitPrivate();
+	m_pcImpl = new PerformanceKitImpl();
 	Set(cInThat);
 }
 
 void H3DF::PerformanceKit::Set(PerformanceKit const & cInThat)
 {
-	PerformanceKitPrivate * pcImpl = static_cast<PerformanceKitPrivate *>(m_pcImpl);
-	PerformanceKitPrivate * pcInThatImpl = static_cast<PerformanceKitPrivate *>(cInThat.m_pcImpl);
+	PerformanceKitImpl * pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl);
+	PerformanceKitImpl * pcInThatImpl = static_cast<PerformanceKitImpl *>(cInThat.m_pcImpl);
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -63,7 +63,7 @@ PerformanceKit const & H3DF::PerformanceKit::operator = (PerformanceKit const & 
 
 PerformanceKit & H3DF::PerformanceKit::SetDisplayLists(Performance::DisplayLists eInDisplayList)
 {
-	PerformanceKitPrivate * pcImpl = static_cast<PerformanceKitPrivate *>(m_pcImpl);
+	PerformanceKitImpl * pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl);
 	pcImpl->m_eInDisplayList = eInDisplayList;
 
 	return *this;
@@ -71,7 +71,7 @@ PerformanceKit & H3DF::PerformanceKit::SetDisplayLists(Performance::DisplayLists
 
 PerformanceKit & H3DF::PerformanceKit::SetStaticModel(Performance::StaticModel eInModelType)
 {
-	PerformanceKitPrivate * pcImpl = static_cast<PerformanceKitPrivate *>(m_pcImpl);
+	PerformanceKitImpl * pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl);
 	pcImpl->m_eInModelType = eInModelType;
 
 	return *this;
@@ -79,7 +79,7 @@ PerformanceKit & H3DF::PerformanceKit::SetStaticModel(Performance::StaticModel e
 
 PerformanceKit & H3DF::PerformanceKit::UnsetDisplayLists()
 {
-	PerformanceKitPrivate * pcImpl = static_cast<PerformanceKitPrivate *>(m_pcImpl);
+	PerformanceKitImpl * pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl);
 	pcImpl->m_eInDisplayList = Performance::DisplayLists::None;
 
 	return *this;
@@ -87,7 +87,7 @@ PerformanceKit & H3DF::PerformanceKit::UnsetDisplayLists()
 
 PerformanceKit & H3DF::PerformanceKit::UnsetStaticModel()
 {
-	PerformanceKitPrivate * pcImpl = static_cast<PerformanceKitPrivate *>(m_pcImpl);
+	PerformanceKitImpl * pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl);
 	pcImpl->m_eInModelType = Performance::StaticModel::None;
 
 	return *this;
@@ -95,7 +95,7 @@ PerformanceKit & H3DF::PerformanceKit::UnsetStaticModel()
 
 bool H3DF::PerformanceKit::ShowDisplayLists(Performance::DisplayLists & eOutDisplayList) const
 {
-	PerformanceKitPrivate * pcImpl = static_cast<PerformanceKitPrivate *>(m_pcImpl);
+	PerformanceKitImpl * pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); return false; }
 
 	eOutDisplayList = pcImpl->m_eInDisplayList;
@@ -105,7 +105,7 @@ bool H3DF::PerformanceKit::ShowDisplayLists(Performance::DisplayLists & eOutDisp
 
 bool H3DF::PerformanceKit::ShowStaticModel(Performance::StaticModel & eOutModelType) const
 {
-	PerformanceKitPrivate * pcImpl = static_cast<PerformanceKitPrivate *>(m_pcImpl);
+	PerformanceKitImpl * pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); return false; }
 
 	eOutModelType = pcImpl->m_eInModelType;
@@ -114,19 +114,19 @@ bool H3DF::PerformanceKit::ShowStaticModel(Performance::StaticModel & eOutModelT
 }
 
 //== PerformanceControl class ======================================================================
-class PerformanceControlPrivate : public ControlImpl
+class PerformanceControlImpl : public ControlImpl
 {
 public:
-	PerformanceControlPrivate() { m_eType = H3DF::Type::PerformanceControl; }
+	PerformanceControlImpl() { m_eType = H3DF::Type::PerformanceControl; }
 
-	void Copy(PerformanceControlPrivate * pcInThat) {
+	void Copy(PerformanceControlImpl * pcInThat) {
 		ControlImpl::Copy(pcInThat);
 	}
 };
 
 H3DF::PerformanceControl::PerformanceControl(SegmentKey & cInSegmentKey)
 {
-	PerformanceControlPrivate * pcImpl = new PerformanceControlPrivate();
+	PerformanceControlImpl * pcImpl = new PerformanceControlImpl();
 	pcImpl->m_cOverrideKey = cInSegmentKey;
 
 	m_pcImpl = pcImpl;
@@ -134,14 +134,14 @@ H3DF::PerformanceControl::PerformanceControl(SegmentKey & cInSegmentKey)
 
 H3DF::PerformanceControl::PerformanceControl(PerformanceControl const & cInThat)
 {
-	m_pcImpl = new PerformanceControlPrivate();
+	m_pcImpl = new PerformanceControlImpl();
 	Set(cInThat);
 }
 
 void H3DF::PerformanceControl::Set(PerformanceControl const & cInThat)
 {
-	PerformanceControlPrivate * pcImpl = static_cast<PerformanceControlPrivate *>(m_pcImpl);
-	PerformanceControlPrivate * pcInThatImpl = static_cast<PerformanceControlPrivate *>(cInThat.m_pcImpl);
+	PerformanceControlImpl * pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl);
+	PerformanceControlImpl * pcInThatImpl = static_cast<PerformanceControlImpl *>(cInThat.m_pcImpl);
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -153,7 +153,7 @@ PerformanceControl & H3DF::PerformanceControl::operator = (PerformanceControl co
 
 PerformanceControl & H3DF::PerformanceControl::SetDisplayLists(Performance::DisplayLists eInDisplayList)
 {
-	PerformanceControlPrivate * pcImpl = static_cast<PerformanceControlPrivate *>(m_pcImpl);
+	PerformanceControlImpl * pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -178,7 +178,7 @@ PerformanceControl & H3DF::PerformanceControl::SetDisplayLists(Performance::Disp
 
 PerformanceControl & H3DF::PerformanceControl::SetStaticModel(Performance::StaticModel eInModelType)
 {
-	PerformanceControlPrivate * pcImpl = static_cast<PerformanceControlPrivate *>(m_pcImpl);
+	PerformanceControlImpl * pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -203,7 +203,7 @@ PerformanceControl & H3DF::PerformanceControl::SetStaticModel(Performance::Stati
 
 PerformanceControl & H3DF::PerformanceControl::UnsetDisplayLists()
 {
-	PerformanceControlPrivate * pcImpl = static_cast<PerformanceControlPrivate *>(m_pcImpl);
+	PerformanceControlImpl * pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -215,7 +215,7 @@ PerformanceControl & H3DF::PerformanceControl::UnsetDisplayLists()
 
 PerformanceControl & H3DF::PerformanceControl::UnsetStaticModel()
 {
-	PerformanceControlPrivate * pcImpl = static_cast<PerformanceControlPrivate *>(m_pcImpl);
+	PerformanceControlImpl * pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -227,7 +227,7 @@ PerformanceControl & H3DF::PerformanceControl::UnsetStaticModel()
 
 bool H3DF::PerformanceControl::ShowDisplayLists(Performance::DisplayLists & eOutDisplayList) const
 {
-	PerformanceControlPrivate * pcImpl = static_cast<PerformanceControlPrivate *>(m_pcImpl);
+	PerformanceControlImpl * pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -255,7 +255,7 @@ bool H3DF::PerformanceControl::ShowDisplayLists(Performance::DisplayLists & eOut
 
 bool H3DF::PerformanceControl::ShowStaticModel(Performance::StaticModel & eOutModelType) const
 {
-	PerformanceControlPrivate * pcImpl = static_cast<PerformanceControlPrivate *>(m_pcImpl);
+	PerformanceControlImpl * pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {

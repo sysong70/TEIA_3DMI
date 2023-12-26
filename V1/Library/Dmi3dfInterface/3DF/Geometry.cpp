@@ -12,6 +12,11 @@ using namespace H3DF;
 
 //== GeometryKey 관련 함수 ===========================================================================
 
+H3DF::GeometryKey::GeometryKey() : Key(INVALID_KEY)
+{
+	m_pcImpl = new GeometryKeyImpl();
+}
+
 H3DF::GeometryKey::GeometryKey(HC_KEY nInKey) : Key(INVALID_KEY)
 {
 	if (INVALID_KEY == nInKey) {
@@ -22,11 +27,6 @@ H3DF::GeometryKey::GeometryKey(HC_KEY nInKey) : Key(INVALID_KEY)
 	pcImpl->SetKeyValue(nInKey);
 
 	m_pcImpl = pcImpl;
-}
-
-H3DF::GeometryKey::~GeometryKey()
-{
-	int i = 0;
 }
 
 bool H3DF::GeometryKey::NearPoint(WindowKey const & cInWindow, const MatrixKit & cModelingMatrix, const WindowPoint & cInPoint, WorldPoint & cOutPoint) const
@@ -75,15 +75,11 @@ GeometryKey & H3DF::GeometryKey::SetUserData(intptr_t nInIndex, size_t nInBytes,
 
 GeometryKey & H3DF::GeometryKey::SetUserData(intptr_t nInIndex, ByteArray const & aInData)
 {
-	//GeometryKeyPrivate::LocalOpen(*this);
-
-	HC_Open_Geometry(KeyValue());
+	GeometryKeyImpl::LocalOpen(*this);
 
 	HC_Set_User_Data(nInIndex, aInData.data(), (long)aInData.size());
 
-	HC_Close_Geometry();
-
-	//GeometryKeyPrivate::LocalClose(*this);
+	GeometryKeyImpl::LocalClose(*this);
 
 	return *this;
 }

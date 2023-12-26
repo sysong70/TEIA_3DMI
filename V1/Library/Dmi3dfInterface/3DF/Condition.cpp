@@ -18,12 +18,12 @@ using namespace H3DF;
 //== ConditionControlPrivate class =================================================================
 namespace H3DF
 {
-	class ConditionControlPrivate : public ControlImpl
+	class ConditionControlImpl : public ControlImpl
 	{
 	public:
-		ConditionControlPrivate() { m_eType = H3DF::Type::ConditionControl; }
+		ConditionControlImpl() { m_eType = H3DF::Type::ConditionControl; }
 
-		void Copy(ConditionControlPrivate * pcInThat) {
+		void Copy(ConditionControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
 	};
@@ -33,7 +33,7 @@ namespace H3DF
 
 H3DF::ConditionControl::ConditionControl(SegmentKey & cInSegmentKey)
 {
-	ConditionControlPrivate * pcImpl = new ConditionControlPrivate();
+	ConditionControlImpl * pcImpl = new ConditionControlImpl();
 	pcImpl->m_cOverrideKey = cInSegmentKey;
 
 	m_pcImpl = pcImpl;
@@ -41,14 +41,14 @@ H3DF::ConditionControl::ConditionControl(SegmentKey & cInSegmentKey)
 
 H3DF::ConditionControl::ConditionControl(ConditionControl const & cInThat)
 {
-	m_pcImpl = new ConditionControlPrivate();
+	m_pcImpl = new ConditionControlImpl();
 	Set(cInThat);
 }
 
 void H3DF::ConditionControl::Set(ConditionControl const & cInThat)
 {
-	ConditionControlPrivate * pcImpl = (ConditionControlPrivate *) m_pcImpl;
-	ConditionControlPrivate * pcInThatImpl = (ConditionControlPrivate *) cInThat.m_pcImpl;
+	ConditionControlImpl * pcImpl = (ConditionControlImpl *) m_pcImpl;
+	ConditionControlImpl * pcInThatImpl = (ConditionControlImpl *) cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -60,7 +60,7 @@ ConditionControl & H3DF::ConditionControl::operator = (ConditionControl const & 
 
 size_t H3DF::ConditionControl::GetCount() const
 {
-	ConditionControlPrivate * pcImpl = (ConditionControlPrivate *) m_pcImpl;
+	ConditionControlImpl * pcImpl = (ConditionControlImpl *) m_pcImpl;
 
 	char chList[MVO_BUFFER_SIZE];
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {

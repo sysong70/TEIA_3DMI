@@ -1305,10 +1305,10 @@ void Orientation::SetMatrix(MatrixKit const & cInMatrix)
 
 //== TextAttributes ================================================================================
 
-class TextAttributesPrivate : public H3DF::Impl
+class TextAttributesImpl : public H3DF::Impl
 {
 public:
-	TextAttributesPrivate()
+	TextAttributesImpl()
 	{
 		m_insertion_point.Set(0, 0, 0);
 		m_font_size = 0.0f;
@@ -1319,12 +1319,12 @@ public:
 		m_width_scale = 1.;
 	}
 
-	~TextAttributesPrivate()
+	~TextAttributesImpl()
 	{
 		delete[] m_font_name;
 	}
 
-	void Copy(TextAttributesPrivate * pcInThat)
+	void Copy(TextAttributesImpl * pcInThat)
 	{
 		m_insertion_point = pcInThat->m_insertion_point;
 		m_font_size = pcInThat->m_font_size;
@@ -1359,19 +1359,19 @@ public:
 
 TextAttributes::TextAttributes()
 {
-	m_pcImpl = new TextAttributesPrivate();
+	m_pcImpl = new TextAttributesImpl();
 }
 
 TextAttributes::TextAttributes(TextAttributes const & cInThat)
 {
-	m_pcImpl = new TextAttributesPrivate();
+	m_pcImpl = new TextAttributesImpl();
 	Set(cInThat);
 }
 
 void TextAttributes::Set(TextAttributes const & cInThat)
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
-	TextAttributesPrivate * pcInThatImpl = (TextAttributesPrivate *)cInThat.m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	TextAttributesImpl * pcInThatImpl = (TextAttributesImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -1383,43 +1383,43 @@ TextAttributes const & TextAttributes::operator=(TextAttributes const & cInThat)
 
 void TextAttributes::GetInsertionPoint(H3DF::Point & cOutPoint) const
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	cOutPoint = pcImpl->m_insertion_point;
 }
 
 void TextAttributes::SetInsertionPoint(H3DF::Point const & cInPoint)
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_insertion_point = cInPoint;
 }
 
 void TextAttributes::GetFontSize(float & fOutSize) const
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	fOutSize = pcImpl->m_font_size;
 }
 
 void TextAttributes::SetFontSize(float const nInSize)
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_font_size = nInSize;
 }
 
 void TextAttributes::GetFontSizeUnits(Font::Size::Units & eOutUnits) const
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	eOutUnits = pcImpl->m_font_size_units;
 }
 
 void TextAttributes::SetFontSizeUnits(Font::Size::Units const eInUnits)
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_font_size_units = eInUnits;
 }
 
 void TextAttributes::GetFontName(char * pchOutFontName) const
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	pchOutFontName[0] = '\0';
 
@@ -1430,7 +1430,7 @@ void TextAttributes::GetFontName(char * pchOutFontName) const
 
 void TextAttributes::SetFontName(char const * pchInFontName)
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	delete[] pcImpl->m_font_name;
 
@@ -1442,93 +1442,93 @@ void TextAttributes::SetFontName(char const * pchInFontName)
 
 void TextAttributes::GetOrientation(PMI::Orientation & cOutOrientation) const
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	cOutOrientation = pcImpl->m_orientation;
 }
 
 void TextAttributes::SetOrientation(Orientation const & cInOrientation)
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_orientation = cInOrientation;
 }
 
 void TextAttributes::GetRGBColor(H3DF::RGBColor & cOutColor) const
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	cOutColor = pcImpl->m_color;
 }
 
 void TextAttributes::SetRGBColor(H3DF::RGBColor const & cInColor)
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_color = cInColor;
 }
 
 bool TextAttributes::IsBold() const
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x02) == 0x02;
 }
 
 bool TextAttributes::IsItalic() const
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x04) == 0x04;
 }
 bool TextAttributes::IsUnderlined() const
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x08) == 0x08;
 }
 bool TextAttributes::IsStrikedThrough() const
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x10) == 0x10;
 }
 bool TextAttributes::IsOverlined() const
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x20) == 0x20;
 }
 bool TextAttributes::IsStreched() const
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x40) == 0x40;
 }
 bool TextAttributes::IsWired() const
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x80) == 0x80;
 }
 bool TextAttributes::IsFixedWidth() const
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x100) == 0x100;
 }
 
 void TextAttributes::SetFormat(char const & chInFormat)
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_format = chInFormat;
 }
 
 double TextAttributes::WidthScale() const
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	return pcImpl->m_width_scale;
 }
 
 void TextAttributes::SetWidthScale(const double dWidthScale)
 {
-	TextAttributesPrivate * pcImpl = (TextAttributesPrivate *)m_pcImpl;
+	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_width_scale = static_cast<float>(dWidthScale);
 }
 

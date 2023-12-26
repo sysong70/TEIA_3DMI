@@ -35,7 +35,8 @@ public:
 class API_3DF PolygonKey : public GeometryKey
 {
 public:
-	PolygonKey(HC_KEY nInKey = INVALID_KEY);
+	PolygonKey();
+	PolygonKey(HC_KEY nInKey);
 };
 
 CLOSE_3DF_NAMESPACE

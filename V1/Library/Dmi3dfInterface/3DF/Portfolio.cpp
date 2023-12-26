@@ -5,40 +5,45 @@
 #include "Segment.h"
 #include "./Impl/SegmentImpl.h"
 
+#include "./Impl/ControlImpl.h"
+
 #include "Style.h"
 
 #include <HTools.h>
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
-PortfolioKey::PortfolioKey(CString strInName)  :
-	SegmentKey(strInName)
-{
+using PortfolioDeque = std::deque<PortfolioKey *>;
 
-}
-
-PortfolioKey::PortfolioKey(HC_KEY nInKey) :
-	SegmentKey(nInKey)
+H3DF::PortfolioKey::PortfolioKey() : SegmentKey()
 {
 }
 
-PortfolioKey::PortfolioKey(PortfolioKey const & cInThat) :
-	SegmentKey(cInThat)
+
+H3DF::PortfolioKey::PortfolioKey(CString strInName) : SegmentKey(strInName)
 {
 }
 
-void PortfolioKey::Set(PortfolioKey const & cInThat)
+H3DF::PortfolioKey::PortfolioKey(HC_KEY nInKey) : SegmentKey(nInKey)
+{
+}
+
+H3DF::PortfolioKey::PortfolioKey(PortfolioKey const & cInThat) : SegmentKey(cInThat)
+{
+}
+
+void H3DF::PortfolioKey::Set(PortfolioKey const & cInThat)
 {
 	SegmentKey::Set(cInThat);
 }
 
-PortfolioKey & PortfolioKey::operator = (PortfolioKey const & cInThat)
+PortfolioKey & H3DF::PortfolioKey::operator = (PortfolioKey const & cInThat)
 {
 	SegmentKey::Set(cInThat);
 	return *this;
 }
 
-NamedStyleDefinition PortfolioKey::DefineNamedStyle(CString strInName, SegmentKey const & cInStyleSource)
+NamedStyleDefinition H3DF::PortfolioKey::DefineNamedStyle(CString strInName, SegmentKey const & cInStyleSource)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -50,12 +55,34 @@ NamedStyleDefinition PortfolioKey::DefineNamedStyle(CString strInName, SegmentKe
 	return cStyle;
 }
 
-//== PortfolioControl 관련 함수 ======================================================================
+//== PortfolioControlImpl 관련 함수 ==================================================================
 
-PortfolioControl::~PortfolioControl()
+namespace H3DF
 {
-	if(nullptr != m_pdpcPortfolioDeque) {
-		for(auto & pcPortfolioDeque : *m_pdpcPortfolioDeque) {
+	class PortfolioControlImpl : public ControlImpl
+	{
+	public:
+		PortfolioControlImpl();
+		virtual ~PortfolioControlImpl();
+
+		void Copy(PortfolioControlImpl * pcInThat) {
+			ControlImpl::Copy(pcInThat);
+		}
+
+		PortfolioDeque * m_pdpcPortfolioDeque = nullptr;
+	};
+}
+
+H3DF::PortfolioControlImpl::PortfolioControlImpl()
+{
+	m_pdpcPortfolioDeque = new PortfolioDeque();
+	m_eType = H3DF::Type::PortfolioControl;
+}
+
+H3DF::PortfolioControlImpl::~PortfolioControlImpl()
+{
+	if (nullptr != m_pdpcPortfolioDeque) {
+		for (auto & pcPortfolioDeque : *m_pdpcPortfolioDeque) {
 			delete pcPortfolioDeque;
 		}
 
@@ -63,55 +90,80 @@ PortfolioControl::~PortfolioControl()
 	}
 }
 
-size_t PortfolioControl::GetCount() const
-{
-	if(nullptr == m_pdpcPortfolioDeque) {
-		return 0;
-	}
+//== PortfolioControl 관련 함수 ======================================================================
 
-	return m_pdpcPortfolioDeque->size();
+H3DF::PortfolioControl::PortfolioControl(SegmentKey & cInSegmentKey)
+{
+	PortfolioControlImpl * pcImpl = new PortfolioControlImpl();
+	pcImpl->m_cOverrideKey = cInSegmentKey;
+
+	m_pcImpl = pcImpl;
 }
 
-PortfolioControl & PortfolioControl::Push(PortfolioKey const & cInPortfolio)
+H3DF::PortfolioControl::PortfolioControl(PortfolioControl const & cInThat)
 {
-	if(nullptr == m_pdpcPortfolioDeque) {
-		m_pdpcPortfolioDeque = new PortfolioDeque();
-	}
+	m_pcImpl = new PortfolioControlImpl();
+	Set(cInThat);
+}
 
-	PortfolioKey * pcPortfolioKey = new PortfolioKey();
-	*pcPortfolioKey = cInPortfolio;
-	m_pdpcPortfolioDeque->push_front(pcPortfolioKey);
+void H3DF::PortfolioControl::Set(PortfolioControl const & cInThat)
+{
+	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
+	PortfolioControlImpl * pcInThatImpl = (PortfolioControlImpl *)cInThat.m_pcImpl;
+	pcImpl->Copy(pcInThatImpl);
+}
+
+PortfolioControl & H3DF::PortfolioControl::operator = (PortfolioControl const & cInThat)
+{
+	Set(cInThat);
 	return *this;
 }
 
-bool PortfolioControl::Pop()
+size_t H3DF::PortfolioControl::GetCount() const
 {
-	if(nullptr == m_pdpcPortfolioDeque) {
+	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->m_pdpcPortfolioDeque->size();
+}
+
+PortfolioControl & H3DF::PortfolioControl::Push(PortfolioKey const & cInPortfolio)
+{
+	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	PortfolioKey * pcPortfolioKey = new PortfolioKey();
+	*pcPortfolioKey = cInPortfolio;
+	pcImpl->m_pdpcPortfolioDeque->push_front(pcPortfolioKey);
+	return *this;
+}
+
+bool H3DF::PortfolioControl::Pop()
+{
+	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if(true == pcImpl->m_pdpcPortfolioDeque->empty()) {
 		return false;
 	}
 
-	if(true == m_pdpcPortfolioDeque->empty()) {
-		return false;
-	}
-
-	PortfolioKey * pcPortfolioKey = m_pdpcPortfolioDeque->back();
+	PortfolioKey * pcPortfolioKey = pcImpl->m_pdpcPortfolioDeque->back();
 	delete pcPortfolioKey;
 
-	m_pdpcPortfolioDeque->pop_back();
+	pcImpl->m_pdpcPortfolioDeque->pop_back();
 
 	return true;
 }
 
-bool PortfolioControl::ShowTop(PortfolioKey & cOutPortfolio) const
+bool H3DF::PortfolioControl::ShowTop(PortfolioKey & cOutPortfolio) const
 {
-	if(nullptr == m_pdpcPortfolioDeque) {
+	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if(true == pcImpl->m_pdpcPortfolioDeque->empty()) {
 		return false;
 	}
 
-	if(true == m_pdpcPortfolioDeque->empty()) {
-		return false;
-	}
-
-	cOutPortfolio = *m_pdpcPortfolioDeque->front();
+	cOutPortfolio = *pcImpl->m_pdpcPortfolioDeque->front();
 	return true;
 }

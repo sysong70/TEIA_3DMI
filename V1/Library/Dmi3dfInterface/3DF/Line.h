@@ -36,7 +36,8 @@ namespace H3DF
 	class API_3DF LineKey : public H3DF::GeometryKey
 	{
 	public:
-		LineKey(HC_KEY nInKey = INVALID_KEY);
+		LineKey();
+		LineKey(HC_KEY nInKey);
 		explicit LineKey(Key const & cInKey);
 		LineKey(LineKey const & cInThat);
 

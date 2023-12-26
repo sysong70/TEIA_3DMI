@@ -9,8 +9,17 @@
 
 using namespace H3DF;
 
+H3DF::Control::Control()
+{
+	m_pcImpl = new ControlImpl();
+}
+
 H3DF::Control::Control(HC_KEY nInKey)
 {
+	if (INVALID_KEY == nInKey) {
+		return;
+	}
+
 	ControlImpl * pcImpl = new ControlImpl();
 	pcImpl->m_cOverrideKey = nInKey;
 
@@ -21,10 +30,6 @@ H3DF::Control::Control(Control const & cInThat)
 {
 	m_pcImpl = new ControlImpl();
 	Set(cInThat);
-}
-
-H3DF::Control::~Control()
-{
 }
 
 void H3DF::Control::Set(Control const & cInThat)

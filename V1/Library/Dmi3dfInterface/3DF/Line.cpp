@@ -15,10 +15,10 @@ using namespace H3DF;
 
 namespace H3DF
 {
-	class LineKitPrivate : public Impl
+	class LineKitImpl : public Impl
 	{
 	public:
-		void Copy(LineKitPrivate * that)
+		void Copy(LineKitImpl * that)
 		{
 			m_aPoints = that->m_aPoints;
 			m_cColor = that->m_cColor;
@@ -33,19 +33,19 @@ namespace H3DF
 
 H3DF::LineKit::LineKit()
 {
-	m_pcImpl = new LineKitPrivate();
+	m_pcImpl = new LineKitImpl();
 }
 
 H3DF::LineKit::LineKit(LineKit const & cInThat)
 {
-	m_pcImpl = new LineKitPrivate();
+	m_pcImpl = new LineKitImpl();
 	Set(cInThat);
 }
 
 void H3DF::LineKit::Set(LineKit const & cInThat)
 {
-	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
-	LineKitPrivate * pcInThatImpl = (LineKitPrivate *)cInThat.m_pcImpl;
+	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
+	LineKitImpl * pcInThatImpl = (LineKitImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -57,13 +57,13 @@ LineKit & H3DF::LineKit::operator = (LineKit const & cInThat)
 
 unsigned int H3DF::LineKit::GetPointCount() const
 {
-	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
+	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
 	return static_cast<unsigned int>(pcImpl->m_aPoints.size());
 }
 
 void H3DF::LineKit::GetPoints(unsigned int & nOutCount, H3DF::Point pcOutPoints[]) const
 {
-	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
+	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
 
 	nOutCount = GetPointCount();
 
@@ -78,7 +78,7 @@ void H3DF::LineKit::GetPoints(unsigned int & nOutCount, H3DF::Point pcOutPoints[
 
 void H3DF::LineKit::SetPoints(unsigned int nInCount, Point const pcInPoints[])
 {
-	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
+	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
 	pcImpl->m_aPoints.resize(nInCount);
 
 	for (size_t i = 0; i < nInCount; i++) {
@@ -88,45 +88,50 @@ void H3DF::LineKit::SetPoints(unsigned int nInCount, Point const pcInPoints[])
 
 void H3DF::LineKit::GetRGBColor(H3DF::RGBColor & cOutColor) const
 {
-	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
+	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
 	cOutColor = pcImpl->m_cColor;
 }
 
 void H3DF::LineKit::SetRGBColor(RGBColor const & cInColor)
 {
-	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
+	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
 	pcImpl->m_cColor = cInColor;
 }
 
 void H3DF::LineKit::GetLinePattern(char out_pattern[PATTERN_BUFFER_SIZE]) const
 {
-	LineKitPrivate * pcImpl = (LineKitPrivate *)m_pcImpl;
+	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
 	strncpy(out_pattern, pcImpl->m_chPattern, PATTERN_BUFFER_SIZE);
 }
 
 //== LineKey =======================================================================================
 namespace H3DF {
 
-	class LineKeyPrivate : public GeometryKeyImpl
+	class LineKeyImpl : public GeometryKeyImpl
 	{
 	public:
-		LineKeyPrivate() { m_eType = H3DF::Type::LineKey; }
-		~LineKeyPrivate();
+		LineKeyImpl() { m_eType = H3DF::Type::LineKey; }
+		~LineKeyImpl();
 
-		void Copy(LineKeyPrivate * pcInThat) {
+		void Copy(LineKeyImpl * pcInThat) {
 			KeyImpl::Copy(pcInThat);
 		}
 	};
 };
 
-H3DF::LineKeyPrivate::~LineKeyPrivate()
+H3DF::LineKeyImpl::~LineKeyImpl()
 {
 	int i = 0;
 }
 
+H3DF::LineKey::LineKey() : GeometryKey(INVALID_KEY)
+{
+	m_pcImpl = new LineKeyImpl();
+}
+
 H3DF::LineKey::LineKey(HC_KEY nInKey) : GeometryKey(INVALID_KEY)
 {
-	LineKeyPrivate * pcImpl = new LineKeyPrivate();
+	LineKeyImpl * pcImpl = new LineKeyImpl();
 	pcImpl->SetKeyValue(nInKey);
 
 	m_pcImpl = pcImpl;
@@ -134,7 +139,7 @@ H3DF::LineKey::LineKey(HC_KEY nInKey) : GeometryKey(INVALID_KEY)
 
 H3DF::LineKey::LineKey(Key const & cInKey)
 {
-	LineKeyPrivate * pcImpl = new LineKeyPrivate();
+	LineKeyImpl * pcImpl = new LineKeyImpl();
 	m_pcImpl = pcImpl;
 
 	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInKey.GetImpl()));
@@ -145,7 +150,7 @@ H3DF::LineKey::LineKey(Key const & cInKey)
 
 H3DF::LineKey::LineKey(LineKey const & cInThat)
 {
-	m_pcImpl = new LineKeyPrivate();
+	m_pcImpl = new LineKeyImpl();
 	Set(cInThat);
 }
 
@@ -160,8 +165,8 @@ void H3DF::LineKey::Set(LineKey const & cInThat)
 		return;
 	}
 
-	LineKeyPrivate * pcImpl = (LineKeyPrivate *)m_pcImpl;
-	LineKeyPrivate * pcInThatImpl = (LineKeyPrivate *)cInThat.m_pcImpl;
+	LineKeyImpl * pcImpl = (LineKeyImpl *)m_pcImpl;
+	LineKeyImpl * pcInThatImpl = (LineKeyImpl *)cInThat.m_pcImpl;
 
 	pcImpl->Copy(pcInThatImpl);
 }

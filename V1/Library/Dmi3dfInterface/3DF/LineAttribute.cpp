@@ -4,6 +4,7 @@
 
 #include "Segment.h"
 #include "./Impl/SegmentImpl.h"
+#include "./Impl/ControlImpl.h"
 
 #include <hc.h>
 #include <HTools.h>
@@ -12,12 +13,12 @@
 
 OPEN_3DF_NAMESPACE
 
-class LineAttributeKitPrivate : public Impl
+class LineAttributeKitImpl : public Impl
 {
 public:
-	LineAttributeKitPrivate() { m_eType = H3DF::Type::LineAttributeKit; }
+	LineAttributeKitImpl() { m_eType = H3DF::Type::LineAttributeKit; }
 
-	void Copy(LineAttributeKitPrivate * pcInThat) {
+	void Copy(LineAttributeKitImpl * pcInThat) {
 		m_strPatternName = pcInThat->m_strPatternName;
 		m_fWeight = pcInThat->m_fWeight;
 	}
@@ -33,19 +34,19 @@ using namespace H3DF;
 
 LineAttributeKit::LineAttributeKit()
 {
-	m_pcImpl = new LineAttributeKitPrivate();
+	m_pcImpl = new LineAttributeKitImpl();
 }
 
 LineAttributeKit::LineAttributeKit(LineAttributeKit const & cInThat)
 {
-	m_pcImpl = new LineAttributeKitPrivate();
+	m_pcImpl = new LineAttributeKitImpl();
 	Set(cInThat);
 }
 
 void LineAttributeKit::Set(LineAttributeKit const & cInThat)
 {
-	LineAttributeKitPrivate * pcImpl = (LineAttributeKitPrivate *)m_pcImpl;
-	LineAttributeKitPrivate * pcInThatImpl = (LineAttributeKitPrivate *)cInThat.m_pcImpl;
+	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
+	LineAttributeKitImpl * pcInThatImpl = (LineAttributeKitImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -57,21 +58,21 @@ LineAttributeKit const & LineAttributeKit::operator = (LineAttributeKit const & 
 
 void LineAttributeKit::Show(LineAttributeKit & cOutKit) const
 {
-	LineAttributeKitPrivate * pcImpl = (LineAttributeKitPrivate *)m_pcImpl;
-	LineAttributeKitPrivate * pcOutKitImpl = (LineAttributeKitPrivate *)cOutKit.m_pcImpl;
+	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
+	LineAttributeKitImpl * pcOutKitImpl = (LineAttributeKitImpl *)cOutKit.m_pcImpl;
 	pcOutKitImpl->Copy(pcImpl);
 }
 
 bool LineAttributeKit::Empty() const
 {
-	LineAttributeKitPrivate * pcImpl = (LineAttributeKitPrivate *)m_pcImpl;
+	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	return pcImpl->m_strPatternName.IsEmpty() && pcImpl->m_fWeight < 0;
 }
 
 bool LineAttributeKit::operator == (LineAttributeKit const & cInThat) const
 {
-	LineAttributeKitPrivate * pcImpl = (LineAttributeKitPrivate *)m_pcImpl;
-	LineAttributeKitPrivate * pcInThatImpl = (LineAttributeKitPrivate *)cInThat.m_pcImpl;
+	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
+	LineAttributeKitImpl * pcInThatImpl = (LineAttributeKitImpl *)cInThat.m_pcImpl;
 	return pcImpl->m_strPatternName == pcInThatImpl->m_strPatternName && pcImpl->m_fWeight == pcInThatImpl->m_fWeight;
 }
 
@@ -82,28 +83,28 @@ bool LineAttributeKit::operator != (LineAttributeKit const & cInThat) const
 
 LineAttributeKit & LineAttributeKit::SetPattern(CString strInPatternName)
 {
-	LineAttributeKitPrivate * pcImpl = (LineAttributeKitPrivate *)m_pcImpl;
+	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	pcImpl->m_strPatternName = strInPatternName;
 	return *this;
 }
 
 LineAttributeKit & LineAttributeKit::SetWeight(float fInWeight, Line::SizeUnits eInUnits)
 {
-	LineAttributeKitPrivate * pcImpl = (LineAttributeKitPrivate *)m_pcImpl;
+	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	pcImpl->m_fWeight = fInWeight;
 	return *this;
 }
 
 LineAttributeKit & LineAttributeKit::UnsetPattern()
 {
-	LineAttributeKitPrivate * pcImpl = (LineAttributeKitPrivate *)m_pcImpl;
+	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	pcImpl->m_strPatternName.Empty();
 	return *this;
 }
 
 LineAttributeKit & LineAttributeKit::UnsetWeight()
 {
-	LineAttributeKitPrivate * pcImpl = (LineAttributeKitPrivate *)m_pcImpl;
+	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	pcImpl->m_fWeight = -1;
 	pcImpl->m_eInUnits = Line::SizeUnits::ScaleFactor;
 	return *this;
@@ -111,7 +112,7 @@ LineAttributeKit & LineAttributeKit::UnsetWeight()
 
 LineAttributeKit & LineAttributeKit::UnsetEverything()
 {
-	LineAttributeKitPrivate * pcImpl = (LineAttributeKitPrivate *)m_pcImpl;
+	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	pcImpl->m_strPatternName.Empty();
 	pcImpl->m_fWeight = -1;
 	pcImpl->m_eInUnits = Line::SizeUnits::ScaleFactor;
@@ -120,14 +121,14 @@ LineAttributeKit & LineAttributeKit::UnsetEverything()
 
 bool LineAttributeKit::ShowPattern(CString & strOutPatternName) const
 {
-	LineAttributeKitPrivate * pcImpl = (LineAttributeKitPrivate *)m_pcImpl;
+	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	strOutPatternName = pcImpl->m_strPatternName;
 	return !strOutPatternName.IsEmpty();
 }
 
 bool LineAttributeKit::ShowWeight(float & fOutWeight, Line::SizeUnits & eOutUnits) const
 {
-	LineAttributeKitPrivate * pcImpl = (LineAttributeKitPrivate *)m_pcImpl;
+	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	fOutWeight = pcImpl->m_fWeight;
 	eOutUnits = pcImpl->m_eInUnits;
 	return fOutWeight >= 0;
@@ -135,12 +136,12 @@ bool LineAttributeKit::ShowWeight(float & fOutWeight, Line::SizeUnits & eOutUnit
 
 //== LineAttributeControl class ====================================================================
 
-class LineAttributeControlPrivate : public Impl
+class LineAttributeControlImpl : public ControlImpl
 {
 public:
-	LineAttributeControlPrivate() { m_eType = H3DF::Type::LineAttributeControl; }
+	LineAttributeControlImpl() { m_eType = H3DF::Type::LineAttributeControl; }
 
-	void Copy(LineAttributeControlPrivate * pcInThat) {
+	void Copy(LineAttributeControlImpl * pcInThat) {
 		m_cParentSegmentKey = pcInThat->m_cParentSegmentKey;
 	}
 
@@ -150,7 +151,7 @@ public:
 
 LineAttributeControl::LineAttributeControl(SegmentKey & cInSegmentKey)
 {
-	LineAttributeControlPrivate * pcImpl = new LineAttributeControlPrivate();
+	LineAttributeControlImpl * pcImpl = new LineAttributeControlImpl();
 	pcImpl->m_cParentSegmentKey = cInSegmentKey;
 
 	m_pcImpl = pcImpl;
@@ -158,14 +159,14 @@ LineAttributeControl::LineAttributeControl(SegmentKey & cInSegmentKey)
 
 LineAttributeControl::LineAttributeControl(LineAttributeControl const & cInThat)
 {
-	m_pcImpl = new LineAttributeControlPrivate();
+	m_pcImpl = new LineAttributeControlImpl();
 	Set(cInThat);
 }
 
 void LineAttributeControl::Set(LineAttributeControl const & cInThat)
 {
-	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
-	LineAttributeControlPrivate * pcInThatImpl = (LineAttributeControlPrivate *)cInThat.m_pcImpl;
+	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
+	LineAttributeControlImpl * pcInThatImpl = (LineAttributeControlImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -177,7 +178,7 @@ LineAttributeControl & LineAttributeControl::operator = (LineAttributeControl co
 
 LineAttributeControl & LineAttributeControl::SetPattern(CString strInPatternName)
 {
-	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
+	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		HC_Set_Line_Pattern(Utility::ToChar(strInPatternName));
@@ -188,7 +189,7 @@ LineAttributeControl & LineAttributeControl::SetPattern(CString strInPatternName
 
 LineAttributeControl & LineAttributeControl::SetWeight(float fInWeight, Line::SizeUnits eInUnits)
 {
-	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
+	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		
@@ -235,7 +236,7 @@ LineAttributeControl & LineAttributeControl::SetWeight(float fInWeight, Line::Si
 
 LineAttributeControl & LineAttributeControl::UnsetPattern()
 {
-	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
+	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		HC_UnSet_Line_Pattern();
@@ -246,7 +247,7 @@ LineAttributeControl & LineAttributeControl::UnsetPattern()
 
 LineAttributeControl & LineAttributeControl::UnsetWeight()
 {
-	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
+	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		HC_UnSet_Line_Weight();
@@ -257,7 +258,7 @@ LineAttributeControl & LineAttributeControl::UnsetWeight()
 
 LineAttributeControl & LineAttributeControl::UnsetEverything()
 {
-	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
+	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		HC_UnSet_Line_Pattern();
 		HC_UnSet_Line_Weight();
@@ -268,7 +269,7 @@ LineAttributeControl & LineAttributeControl::UnsetEverything()
 
 bool LineAttributeControl::ShowPattern(CString & strOutPatternName) const
 {
-	LineAttributeControlPrivate * pcImpl = (LineAttributeControlPrivate *)m_pcImpl;
+	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
 		char chBuffer[MVO_BUFFER_SIZE] = "\n";

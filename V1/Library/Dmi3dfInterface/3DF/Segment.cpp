@@ -22,7 +22,12 @@
 #include "./Impl/SegmentImpl.h"
 #include "./Impl/SearchImpl.h"
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
+
+H3DF::SegmentKey::SegmentKey() : Key(INVALID_KEY)
+{
+	m_pcImpl = new SegmentKeyImpl();
+}
 
 H3DF::SegmentKey::SegmentKey(CString strInName) : Key(INVALID_KEY)
 {

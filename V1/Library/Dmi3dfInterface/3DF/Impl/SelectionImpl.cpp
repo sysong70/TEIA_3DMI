@@ -207,22 +207,22 @@ size_t H3DF::SelectionControlImpl::SelectByPoint(Point const & cInLocation, Sele
 	do {
 		// 선택된 요소를 저장하기 위해서 Item 생성
 		SelectionItem * pcItem = new SelectionItem();
-		SelectionItemImpl * pcItemPrivate = (SelectionItemImpl *)pcItem->GetImpl();
-		pcItemPrivate->m_pcWindow = m_pcWindow;
+		SelectionItemImpl * pcItemImpl = (SelectionItemImpl *)pcItem->GetImpl();
+		pcItemImpl->m_pcWindow = m_pcWindow;
 
 		HC_Show_Selection_Element(&nKey, &nOffset1, &nOffset2, &nOffset3);
 		HC_Show_Selection_Original_Key(&nKey);
 		
-		pcItemPrivate->nOffset1 = nOffset1;
-		pcItemPrivate->nOffset2 = nOffset2;
-		pcItemPrivate->nOffset3 = nOffset3;
+		pcItemImpl->nOffset1 = nOffset1;
+		pcItemImpl->nOffset2 = nOffset2;
+		pcItemImpl->nOffset3 = nOffset3;
 
 		WindowPoint cWindowPoint;
 		WorldPoint cWorldPoint;
 		HC_Show_Selection_Position(&cWindowPoint.x, &cWindowPoint.y, &cWindowPoint.z, &cWorldPoint.x, &cWorldPoint.y, &cWorldPoint.z);
 
-		pcItemPrivate->cWindowPoint = cWindowPoint;
-		pcItemPrivate->cWorldPoint = cWorldPoint;
+		pcItemImpl->cWindowPoint = cWindowPoint;
+		pcItemImpl->cWorldPoint = cWorldPoint;
 		
 		// build up an array of include keys to pass with the selection
 		int nKeyCount = 0;
@@ -235,7 +235,7 @@ size_t H3DF::SelectionControlImpl::SelectByPoint(Point const & cInLocation, Sele
 			pnIncludeKeys = new HC_KEY[nKeyCount];
 			HC_Show_Selection_Original_Keys(&nKeyCount, pnKeys);
 
-			pcItemPrivate->pnIncludeKeys = pnIncludeKeys;
+			pcItemImpl->pnIncludeKeys = pnIncludeKeys;
 
 			nIncludeCount = 0;
 			for (int nIndex = nKeyCount - 1; nIndex >= 0; nIndex--)
@@ -251,7 +251,7 @@ size_t H3DF::SelectionControlImpl::SelectByPoint(Point const & cInLocation, Sele
 				}
 			}
 
-			pcItemPrivate->nIncludeCount = nIncludeCount;
+			pcItemImpl->nIncludeCount = nIncludeCount;
 		}
 
 		HC_Show_Key_Type(nKey, chKeyType);
@@ -261,7 +261,7 @@ size_t H3DF::SelectionControlImpl::SelectByPoint(Point const & cInLocation, Sele
 
 		if (streq(chKeyType, "line") || streq(chKeyType, "polyline") || streq(chKeyType, "circular arc") || streq(chKeyType, "elliptical arc")) {
 			eSelectedType = SelType::Line;
-			pcItemPrivate->cKey = LineKey(Key(nKey));
+			pcItemImpl->cKey = LineKey(Key(nKey));
 		}
 		else if (streq(chKeyType, "marker")) {
 			eSelectedType = SelType::Marker;
@@ -273,7 +273,7 @@ size_t H3DF::SelectionControlImpl::SelectByPoint(Point const & cInLocation, Sele
 		else {
 			// This may be shell, mesh, cyliner, etc...
 			eSelectedType = SelType::Shell;
-			pcItemPrivate->cKey = ShellKey(Key(nKey));
+			pcItemImpl->cKey = ShellKey(Key(nKey));
 
 			// But if it really is a shell, check for regions.
 			if (streq(chKeyType, "shell") && nOffset3 != -1) {
@@ -296,9 +296,9 @@ size_t H3DF::SelectionControlImpl::SelectByPoint(Point const & cInLocation, Sele
 							}HC_Close_Face();
 						}HC_Close_Geometry();
 
-						pcItemPrivate->nRegion = nRegion;
-						pcItemPrivate->nLowest = nLowest;
-						pcItemPrivate->nHighest = nHighest;
+						pcItemImpl->nRegion = nRegion;
+						pcItemImpl->nLowest = nLowest;
+						pcItemImpl->nHighest = nHighest;
 					}
 				}
 			}
@@ -502,8 +502,8 @@ void H3DF::SelectionControlImpl::HandleSelection(UINT const nFlags, SelectionRes
 			eSelectedType = SelType::Line;
 
 			SelectionItem * pcItem = new SelectionItem();
-			SelectionItemImpl * pcItemPrivate = (SelectionItemImpl *)pcItem->GetImpl();
-			pcItemPrivate->cKey = LineKey(Key(nKey));
+			SelectionItemImpl * pcItemImpl = (SelectionItemImpl *)pcItem->GetImpl();
+			pcItemImpl->cKey = LineKey(Key(nKey));
 			
 			pcResultsPrivate->PushBack(pcItem);
 		}
