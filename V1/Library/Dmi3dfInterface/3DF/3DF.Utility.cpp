@@ -451,6 +451,15 @@ short H3DF::Utility::RawStringToShort(CStringA strText)
 	return nValue;
 }
 
+short H3DF::Utility::RawByteToShort(BYTE * pbData)
+{
+	short nValue = 0;
+	sscanf_s((char *)pbData, "%hx", (USHORT *)&nValue);
+
+	return nValue;
+}
+
+
 //== File 관련 함수 ==================================================================================
 CString H3DF::Utility::GetExecuteDirectory()
 {
@@ -500,9 +509,9 @@ bool H3DF::UserData::ShowSegmentName(SegmentKey & cInSegment, CString & strName)
 	return true;
 }
 
-bool H3DF::UserData::SetTopologyType(SegmentKey & cInSegment, TopologyType eInType)
+bool H3DF::UserData::SetTopologyType(SegmentKey & cInSegment, DWORD nInType)
 {
-	CStringA strText = Utility::IntToRawStringA((int)eInType);
+	CStringA strText = Utility::ShortToRawStringA((short)nInType);
 
 	cInSegment.SetUserData((intptr_t)UserDataIndex::Topology, strText.GetLength(), (BYTE *)strText.GetBuffer());
 
@@ -511,22 +520,22 @@ bool H3DF::UserData::SetTopologyType(SegmentKey & cInSegment, TopologyType eInTy
 	return true;
 }
 
-bool H3DF::UserData::ShowTopologyType(SegmentKey & cInSegment, TopologyType & eOutType)
+bool H3DF::UserData::ShowTopologyType(SegmentKey & cInSegment, DWORD & nOutType)
 {
 	ByteArray aUserData;
 	if (false == cInSegment.ShowUserData((intptr_t)UserDataIndex::Topology, aUserData)) {
 		return false;
 	}
 
-	eOutType = (TopologyType)Utility::RawByteToInt(aUserData.data());
+	nOutType = Utility::RawByteToShort(aUserData.data());
 	
 	return true;
 }
 
 //== Geomety User Data 관련 함수 =====================================================================
-bool H3DF::UserData::SetTopologyType(GeometryKey & cInGeometry, TopologyType eInType)
+bool H3DF::UserData::SetTopologyType(GeometryKey & cInGeometry, DWORD nInType)
 {
-	CStringA strText = Utility::IntToRawStringA((int)eInType);
+	CStringA strText = Utility::ShortToRawStringA((short)nInType);
 
 	cInGeometry.SetUserData((intptr_t)UserDataIndex::Topology, strText.GetLength(), (BYTE *)strText.GetBuffer());
 
@@ -535,14 +544,24 @@ bool H3DF::UserData::SetTopologyType(GeometryKey & cInGeometry, TopologyType eIn
 	return true;
 }
 
-bool H3DF::UserData::ShowTopologyType(GeometryKey & cInGeometry, TopologyType & eOutType)
+bool H3DF::UserData::AddTopologyType(GeometryKey & cInGeometry, DWORD nInType)
+{
+	DWORD nExistType = 0;
+	if (true == ShowTopologyType(cInGeometry, nExistType)) {
+		nInType += nExistType;
+	}
+
+	return SetTopologyType(cInGeometry, nInType);
+}
+
+bool H3DF::UserData::ShowTopologyType(GeometryKey & cInGeometry, DWORD & nOutType)
 {
 	ByteArray aUserData;
 	if (false == cInGeometry.ShowUserData((intptr_t)UserDataIndex::Topology, aUserData)) {
 		return false;
 	}
 
-	eOutType = (TopologyType)Utility::RawByteToInt(aUserData.data());
+	nOutType = Utility::RawByteToShort(aUserData.data());
 
 	return true;
 }
