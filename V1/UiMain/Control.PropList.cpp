@@ -42,6 +42,10 @@ END_MESSAGE_MAP()
 
 Control::PropList::PropList()
 {
+	//:WARING - static members for Float/Double format (how to initialize?)
+	CBCGPProp::m_strFormatFloat = _T("%.4f");
+	CBCGPProp::m_strFormatDouble = _T("%.4lf");
+
 	m_bVisualManagerStyle = TRUE;
 
 	EnableHeaderCtrl(FALSE);

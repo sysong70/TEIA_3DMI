@@ -160,8 +160,8 @@ bool Command::VisualEffects3d::ReceiveSignal(Json::Object* pData)
 
 	VisualEffects3dPanel* pPanel = new VisualEffects3dPanel(&uiData);
 	pPanel->Initialize(&taskBar);
-	pPanel->SetDefaultData(data.GetAt(SKW_VALUE));
-	pPanel->SetData(data.GetAt(SKW_DEFAULTVALUE));
+	pPanel->SetDefaultData(data.GetAt(SKW_DEFAULTVALUE));
+	pPanel->SetData(data.GetAt(SKW_VALUE));
 
 	taskBar.SetPanel(pPanel);
 	taskBar.Show(m_pView);
