@@ -16,15 +16,15 @@ void Kernel::ExecuteSignal(Json::Object & cInObject)
 }
 
 //== 객체 관리 ======================================================================================
-KERNEL::Type KERNEL::PrivateImpl::Type() const {
+KERNEL::Type KERNEL::Impl::Type() const {
 	return m_eType;
 }
 
-void KERNEL::PrivateImpl::SetType(KERNEL::Type eType) {
+void KERNEL::Impl::SetType(KERNEL::Type eType) {
 	m_eType = eType;
 }
 
-void KERNEL::PrivateImpl::SetImpl(Object * pcObject, PrivateImpl * pcImpl)
+void KERNEL::Impl::SetImpl(Object * pcObject, Impl * pcImpl)
 {
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;

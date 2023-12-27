@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #include "Operator.h"
-#include "Private/OperatorPrivate.h"
+#include "Impl/OperatorImpl.h"
 
 #include <3DF/Window.h>
 

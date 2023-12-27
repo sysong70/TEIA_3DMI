@@ -25,17 +25,17 @@
     <Filter Include="Kernel">
       <UniqueIdentifier>{d751b3d7-f946-4ee5-bbca-8c5ac048200c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Kernel\Private">
-      <UniqueIdentifier>{a0a74036-15da-41a7-92b9-e49bf87a5172}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Operator">
       <UniqueIdentifier>{adbb77d6-04fa-49d2-b992-09d8f8b58488}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Operator\Private">
-      <UniqueIdentifier>{6a1a0a9c-47cf-471f-9e3f-dd4567b680f2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Facility">
       <UniqueIdentifier>{097f4284-c4aa-4f00-b724-7ae27c9375ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Kernel\Impl">
+      <UniqueIdentifier>{a0a74036-15da-41a7-92b9-e49bf87a5172}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Operator\Impl">
+      <UniqueIdentifier>{6a1a0a9c-47cf-471f-9e3f-dd4567b680f2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -60,9 +60,6 @@
     <ClInclude Include="..\Signal\Signal.h">
       <Filter>_Signal</Filter>
     </ClInclude>
-    <ClInclude Include="Private\Kernel.DocViewPrivate.h">
-      <Filter>Kernel\Private</Filter>
-    </ClInclude>
     <ClInclude Include="Operator.HighlightObjectSnap.h">
       <Filter>Operator</Filter>
     </ClInclude>
@@ -81,17 +78,20 @@
     <ClInclude Include="Manager.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Private\Operator.HighlightObjectSnapPrivate.h">
-      <Filter>Operator\Private</Filter>
-    </ClInclude>
     <ClInclude Include="Operator.VisualEffects.h">
       <Filter>Operator</Filter>
     </ClInclude>
     <ClInclude Include="Operator.h">
       <Filter>Operator</Filter>
     </ClInclude>
-    <ClInclude Include="Private\OperatorPrivate.h">
-      <Filter>Operator\Private</Filter>
+    <ClInclude Include="Impl\Kernel.DocViewImpl.h">
+      <Filter>Kernel\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="Impl\Operator.HighlightObjectSnapImpl.h">
+      <Filter>Operator\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="Impl\OperatorImpl.h">
+      <Filter>Operator\Impl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -119,9 +119,6 @@
     <ClCompile Include="..\Signal\Signal.cpp">
       <Filter>_Signal</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Kernel.DocViewPrivate.cpp">
-      <Filter>Kernel\Private</Filter>
-    </ClCompile>
     <ClCompile Include="Operator.HighlightObjectSnap.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
@@ -140,17 +137,20 @@
     <ClCompile Include="Manager.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="Private\Operator.HighlightObjectSnapPrivate.cpp">
-      <Filter>Operator\Private</Filter>
-    </ClCompile>
     <ClCompile Include="Operator.VisualEffects.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
     <ClCompile Include="Operator.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
-    <ClCompile Include="Private\OperatorPrivate.cpp">
-      <Filter>Operator\Private</Filter>
+    <ClCompile Include="Impl\Kernel.DocViewImpl.cpp">
+      <Filter>Kernel\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Impl\Operator.HighlightObjectSnapImpl.cpp">
+      <Filter>Operator\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Impl\OperatorImpl.cpp">
+      <Filter>Operator\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

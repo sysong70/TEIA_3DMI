@@ -15,12 +15,12 @@
 
 namespace KERNEL
 {
-	class DocViewPrivate : public PrivateImpl
+	class DocViewImpl : public Impl
 	{
 	public:
-		DocViewPrivate();
+		DocViewImpl();
 
-		void Copy(const DocViewPrivate * pcInThat)
+		void Copy(const DocViewImpl * pcInThat)
 		{
 			m_cCanvas = pcInThat->m_cCanvas;
 			m_nViewId = pcInThat->m_nViewId;

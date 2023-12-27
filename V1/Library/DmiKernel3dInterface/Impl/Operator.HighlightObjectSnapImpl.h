@@ -2,7 +2,7 @@
 
 #include "../Kernel.h"
 
-#include "OperatorPrivate.h"
+#include "OperatorImpl.h"
 
 #include <3DF/3DF.h>
 #include <3DF/Math.h>
@@ -19,7 +19,7 @@ namespace KERNEL
 	{
 		class SnapItem;
 
-		class HighlightObjectSnapPrivate : public OperatorPrivate
+		class HighlightObjectSnapImpl : public OperatorImpl
 		{
 		public:
 			enum class Status
@@ -59,7 +59,7 @@ namespace KERNEL
 				std::vector <H3DF::SelectionItem> vcItems;
 			};
 
-			HighlightObjectSnapPrivate(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			HighlightObjectSnapImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
 
 			int LButtonDownAndMove(int nFlags, int x, int y);
 			int NoButtonDownAndMove(int nFlags, int x, int y);

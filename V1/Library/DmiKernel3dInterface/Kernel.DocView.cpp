@@ -1,7 +1,7 @@
 ﻿#include <StdAfx.h>
 
 #include "Kernel.DocView.h"
-#include "./Private/Kernel.DocViewPrivate.h"
+#include "./Impl/Kernel.DocViewImpl.h"
 
 #include "../Dmi3dfInterface/3DF.Canvas.h"
 #include "../Dmi3dfInterface/3DF.Factory.h"
@@ -17,7 +17,7 @@ using namespace KERNEL;
 
 KERNEL::DocView::DocView()
 {
-	m_pcImpl = new DocViewPrivate();
+	m_pcImpl = new DocViewImpl();
 }
 
 //== View 관련 함수 ==================================================================================
@@ -25,7 +25,7 @@ KERNEL::DocView::DocView()
 // 1. H3DF View Initialize 함수
 void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cDelivery)
 {
-	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 	pcImpl->SetDelivery(&cDelivery);
 
@@ -51,7 +51,7 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cD
 // 2. H3DF View Destruct 함수
 void KERNEL::DocView::Destruct()
 {
-	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
@@ -64,7 +64,7 @@ void KERNEL::DocView::Destruct()
 // 3. H3DF View Paint 함수
 void KERNEL::DocView::Paint(Json::Object & cInObject)
 {
-	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
@@ -75,7 +75,7 @@ void KERNEL::DocView::Paint(Json::Object & cInObject)
 // 4. H3DF View Resize 함수
 void KERNEL::DocView::Resize(Json::Object & cInObject)
 {
-	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
@@ -89,7 +89,7 @@ void KERNEL::DocView::Resize(Json::Object & cInObject)
 // 5. 명령어 취소
 void KERNEL::DocView::CancelCommands()
 {
-	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
@@ -100,14 +100,14 @@ void KERNEL::DocView::CancelCommands()
 
 void KERNEL::DocView::ViewId(int nViewId)
 {
-	DocViewPrivate * pcImpl = (DocViewPrivate *) m_pcImpl;
+	DocViewImpl * pcImpl = (DocViewImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 	pcImpl->m_nViewId = nViewId;
 }
 
 int KERNEL::DocView::ViewId()
 {
-	DocViewPrivate * pcImpl = (DocViewPrivate *) m_pcImpl;
+	DocViewImpl * pcImpl = (DocViewImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 	return pcImpl->m_nViewId;
 }
@@ -116,7 +116,7 @@ int KERNEL::DocView::ViewId()
 
 void KERNEL::DocView::MouseSignal(Json::Object & cInObject)
 {
-	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
@@ -164,7 +164,7 @@ void KERNEL::DocView::MouseSignal(Json::Object & cInObject)
 
 void KERNEL::DocView::MouseMove(int nFlag, int x, int y)
 {
-	DocViewPrivate * pcImpl = static_cast<DocViewPrivate *>(m_pcImpl);
+	DocViewImpl * pcImpl = static_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	pcImpl->m_cCanvas.GetFrontView().MouseMove(nFlag, x, y);
@@ -186,7 +186,7 @@ void KERNEL::DocView::MouseMove(int nFlag, int x, int y)
 
 void KERNEL::DocView::LButtonDown(int nFlag, int x, int y)
 {
-	DocViewPrivate * pcImpl = static_cast<DocViewPrivate *>(m_pcImpl);
+	DocViewImpl * pcImpl = static_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	pcImpl->m_cCanvas.GetFrontView().LButtonDown(nFlag, x, y);
@@ -194,7 +194,7 @@ void KERNEL::DocView::LButtonDown(int nFlag, int x, int y)
 
 void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 {
-	DocViewPrivate * pcImpl = static_cast<DocViewPrivate *>(m_pcImpl);
+	DocViewImpl * pcImpl = static_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	H3DF::ViewControl::Mode eMode = pcImpl->m_cCanvas.GetFrontView().GetViewControlMode();
@@ -214,7 +214,7 @@ void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 
 void KERNEL::DocView::RButtonDown(int nFlag, int x, int y)
 {
-	DocViewPrivate * pcImpl = static_cast<DocViewPrivate *>(m_pcImpl);
+	DocViewImpl * pcImpl = static_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	pcImpl->m_cCanvas.GetFrontView().RButtonDown(nFlag, x, y);
@@ -222,7 +222,7 @@ void KERNEL::DocView::RButtonDown(int nFlag, int x, int y)
 
 void KERNEL::DocView::RButtonUp(int nFlag, int x, int y)
 {
-	DocViewPrivate * pcImpl = static_cast<DocViewPrivate *>(m_pcImpl);
+	DocViewImpl * pcImpl = static_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	pcImpl->m_cCanvas.GetFrontView().RButtonUp(nFlag, x, y);
@@ -230,7 +230,7 @@ void KERNEL::DocView::RButtonUp(int nFlag, int x, int y)
 
 void KERNEL::DocView::MouseWheel(int nFlag, int x, int y, Json::Object & cInObject)
 {
-	DocViewPrivate * pcImpl = static_cast<DocViewPrivate *>(m_pcImpl);
+	DocViewImpl * pcImpl = static_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	int zDelta = cInObject.GetInteger(SKW_DELTA, -120);
@@ -253,7 +253,7 @@ void KERNEL::DocView::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 
 void KERNEL::DocView::KeyboardSignal(Json::Object & cInObject)
 {
-	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	pcImpl->m_cCanvas.KeyboardInput(cInObject);
@@ -262,7 +262,7 @@ void KERNEL::DocView::KeyboardSignal(Json::Object & cInObject)
 //== View 관련 함수 ==========================================================================
 void KERNEL::DocView::SetViewControl(int nId)
 {
-	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	switch (nId)
@@ -302,7 +302,7 @@ void KERNEL::DocView::SetViewControl(int nId)
 //== Object Snap 관련 함수 ===================================================================
 void KERNEL::DocView::SetObjectSnap(int nId)
 {
-	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	if(nullptr == pcImpl) { DEBUG_RETURN; }
 
 	switch (nId)
@@ -357,7 +357,7 @@ void KERNEL::DocView::SetObjectSnap(int nId)
 //== Selection Fiter 관련 함수 ===============================================================
 void KERNEL::DocView::SetSelectionFilter(int nId)
 {
-	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	switch (nId)
@@ -397,7 +397,7 @@ void KERNEL::DocView::SetSelectionFilter(int nId)
 //== Style 관련 함수 =========================================================================
 void KERNEL::DocView::SetViewStyle(int nStyleId)
 {
-	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	switch (nStyleId)
@@ -430,7 +430,7 @@ void KERNEL::DocView::SetViewStyle(int nStyleId)
 
 void KERNEL::DocView::SetViewDirection(int nDirectionId)
 {
-	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	switch (nDirectionId)
@@ -479,7 +479,7 @@ void KERNEL::DocView::SetViewDirection(int nDirectionId)
 // 1. Request Value 처리
 void KERNEL::DocView::CommandRequest(Json::Object & cInObject)
 {
-	DocViewPrivate * pcImpl = (DocViewPrivate *) m_pcImpl;
+	DocViewImpl * pcImpl = (DocViewImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->CommandRequest(cInObject);
@@ -488,7 +488,7 @@ void KERNEL::DocView::CommandRequest(Json::Object & cInObject)
 // 1. Change Value 처리
 void KERNEL::DocView::CommandChange(Json::Object & cInObject)
 {
-	DocViewPrivate * pcImpl = (DocViewPrivate *)m_pcImpl;
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->CommandChange(cInObject);

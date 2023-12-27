@@ -2,7 +2,7 @@
 
 #include "OPERATOR.VisualEffects.h"
 
-#include "Private/OperatorPrivate.h"
+#include "Impl/OperatorImpl.h"
 
 #include "Signal.Connector.h"
 #include "../Signal/Signal.h"
@@ -26,13 +26,13 @@ namespace KERNEL
 {
 	namespace Operator
 	{
-		class VisualEffectsPrivate : public OperatorPrivate
+		class VisualEffectsPrivate : public OperatorImpl
 		{
 		public:
 			VisualEffectsPrivate(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
 
 			void Copy(VisualEffectsPrivate * pcInThat) {
-				OperatorPrivate::Copy(pcInThat);
+				OperatorImpl::Copy(pcInThat);
 			}
 
 			void Request(Json::Object & cInObject);
@@ -60,7 +60,7 @@ namespace KERNEL
 }
 
 KERNEL::Operator::VisualEffectsPrivate::VisualEffectsPrivate(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
-	: OperatorPrivate(pcInView, pcInDelivery)
+	: OperatorImpl(pcInView, pcInDelivery)
 {
 	m_cOption.Set(TheKenel.VisualEffects.Get());
 	m_pcDefaultSetting = (new TheVisualEffects)->Get();

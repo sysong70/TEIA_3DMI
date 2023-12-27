@@ -13,11 +13,11 @@ namespace KERNEL
 		KERNEL::Type Type() const;
 
 		KERNEL::Type ObjectType() const { return KERNEL::Type::None; };
-		PrivateImpl * GetImpl() { return m_pcImpl; }
-		const PrivateImpl * GetImpl() const { return m_pcImpl; }
+		Impl * GetImpl() { return m_pcImpl; }
+		const Impl * GetImpl() const { return m_pcImpl; }
 
 	protected:
-		friend class PrivateImpl;
-		PrivateImpl * m_pcImpl = nullptr;
+		friend class Impl;
+		Impl * m_pcImpl = nullptr;
 	};
 }

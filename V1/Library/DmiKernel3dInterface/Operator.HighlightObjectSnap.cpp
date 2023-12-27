@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 
-#include "OPERATOR.HighlightObjectSnap.h"
-#include "Private/OPERATOR.HighlightObjectSnapPrivate.h"
+#include "Operator.HighlightObjectSnap.h"
+#include "Impl/Operator.HighlightObjectSnapImpl.h"
 
 #include <3DF/Window.h>
 
@@ -10,7 +10,7 @@ using namespace KERNEL;
 //== ObjectSnap class ==============================================================================
 KERNEL::Operator::HighlightObjectSnap::HighlightObjectSnap(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
 {
-	auto * pcImpl = new HighlightObjectSnapPrivate(pcInView, pcInDelivery);
+	auto * pcImpl = new HighlightObjectSnapImpl(pcInView, pcInDelivery);
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;
@@ -19,7 +19,7 @@ KERNEL::Operator::HighlightObjectSnap::HighlightObjectSnap(const H3DF::View * pc
 
 int KERNEL::Operator::HighlightObjectSnap::LButtonDownAndMove(int nFlags, int x, int y)
 {
-	auto * pcImpl = static_cast<HighlightObjectSnapPrivate *>(m_pcImpl);
+	auto * pcImpl = static_cast<HighlightObjectSnapImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->LButtonDownAndMove(nFlags, x, y);
@@ -27,7 +27,7 @@ int KERNEL::Operator::HighlightObjectSnap::LButtonDownAndMove(int nFlags, int x,
 
 int KERNEL::Operator::HighlightObjectSnap::NoButtonDownAndMove(int nFlags, int x, int y)
 {
-	auto * pcImpl = static_cast<HighlightObjectSnapPrivate *>(m_pcImpl);
+	auto * pcImpl = static_cast<HighlightObjectSnapImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->NoButtonDownAndMove(nFlags, x, y);
@@ -37,7 +37,7 @@ int KERNEL::Operator::HighlightObjectSnap::NoButtonDownAndMove(int nFlags, int x
 
 void KERNEL::Operator::HighlightObjectSnap::DrawSnapItems()
 {
-	auto * pcImpl = static_cast<HighlightObjectSnapPrivate *>(m_pcImpl);
+	auto * pcImpl = static_cast<HighlightObjectSnapImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->DrawSnapItems();
@@ -45,7 +45,7 @@ void KERNEL::Operator::HighlightObjectSnap::DrawSnapItems()
 
 void KERNEL::Operator::HighlightObjectSnap::SetObjectSnapMode(DWORD nInSnapMode)
 {
-	auto * pcImpl = static_cast<HighlightObjectSnapPrivate *>(m_pcImpl);
+	auto * pcImpl = static_cast<HighlightObjectSnapImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetObjectSnapMode(nInSnapMode);
@@ -54,7 +54,7 @@ void KERNEL::Operator::HighlightObjectSnap::SetObjectSnapMode(DWORD nInSnapMode)
 
 void KERNEL::Operator::HighlightObjectSnap::SetSelectionFilter(DWORD nInSelFilter)
 {
-	auto * pcImpl = static_cast<HighlightObjectSnapPrivate *>(m_pcImpl);
+	auto * pcImpl = static_cast<HighlightObjectSnapImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetSelectionFilter(nInSelFilter);

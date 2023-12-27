@@ -1,6 +1,6 @@
 ﻿#include <StdAfx.h>
 
-#include "Kernel.DocViewPrivate.h"
+#include "Kernel.DocViewImpl.h"
 
 #include "../Operator.VisualEffects.h"
 
@@ -20,7 +20,7 @@ using namespace H3DF;
 
 //== Visual Effects 관련 함수 ========================================================================
 
-KERNEL::DocViewPrivate::DocViewPrivate()
+KERNEL::DocViewImpl::DocViewImpl()
 {
 	m_nOSnapMode += (DWORD) OSnap::Type::EndPoint;
 	m_nOSnapMode += (DWORD) OSnap::Type::MidPoint;
@@ -44,25 +44,25 @@ KERNEL::DocViewPrivate::DocViewPrivate()
 	}
 }
 
-Signal::Delivery & KERNEL::DocViewPrivate::Delivery() 
+Signal::Delivery & KERNEL::DocViewImpl::Delivery() 
 { 
 	return *(Signal::Delivery *)m_pcDelivery;
 }
 
-const Signal::Delivery & KERNEL::DocViewPrivate::Delivery() const 
+const Signal::Delivery & KERNEL::DocViewImpl::Delivery() const 
 { 
 	return *m_pcDelivery; 
 }
 
 
-void KERNEL::DocViewPrivate::SetDelivery(const Signal::Delivery * pcInDelivery)
+void KERNEL::DocViewImpl::SetDelivery(const Signal::Delivery * pcInDelivery)
 {
 	m_pcDelivery = pcInDelivery;
 }
 
 //== Operator 관련 함수 ==============================================================================
 
-void KERNEL::DocViewPrivate::AllocationOperator(H3DF::View * pcInView, Signal::Delivery & cDelivery)
+void KERNEL::DocViewImpl::AllocationOperator(H3DF::View * pcInView, Signal::Delivery & cDelivery)
 {
 	// Highlihgt Object Snap Operator 생성 및 설정
 	m_apcOperator[(int)KERNEL::Operator::Type::HighlightObjectSnap] = new KERNEL::Operator::HighlightObjectSnap(pcInView, &cDelivery);
@@ -73,18 +73,18 @@ void KERNEL::DocViewPrivate::AllocationOperator(H3DF::View * pcInView, Signal::D
 	m_apcOperator[(int)KERNEL::Operator::Type::VisualEffects] = new KERNEL::Operator::VisualEffects(pcInView, &cDelivery);
 }
 
-KERNEL::Operator::OperatorBase * KERNEL::DocViewPrivate::GetOperator(Operator::Type eInType)
+KERNEL::Operator::OperatorBase * KERNEL::DocViewImpl::GetOperator(Operator::Type eInType)
 { 
 	return m_apcOperator[(int)eInType]; 
 }
 
-KERNEL::Operator::HighlightObjectSnap & KERNEL::DocViewPrivate::HighlightOSnapOperator()
+KERNEL::Operator::HighlightObjectSnap & KERNEL::DocViewImpl::HighlightOSnapOperator()
 { 
 	return *(Operator::HighlightObjectSnap *)m_apcOperator[(int)Operator::Type::HighlightObjectSnap]; 
 }
 
 //== Object Snap 관련 함수 ===========================================================================
-void KERNEL::DocViewPrivate::SetObjectSnap(OSnap::Type eInType)
+void KERNEL::DocViewImpl::SetObjectSnap(OSnap::Type eInType)
 {
 	// Osnap type이 없는 경우 추가
 	if (0 == (m_nOSnapMode & (DWORD)eInType)) {
@@ -99,7 +99,7 @@ void KERNEL::DocViewPrivate::SetObjectSnap(OSnap::Type eInType)
 
 
 //== Selection Filter 관련 함수 ======================================================================
-void KERNEL::DocViewPrivate::SetSelectionFilter(SelectionFilter::Type eInType)
+void KERNEL::DocViewImpl::SetSelectionFilter(SelectionFilter::Type eInType)
 {
 	// Selection filter type이 없는 경우 추가
 	if (0 == (m_nSelFilter & (DWORD) eInType)) {
@@ -129,7 +129,7 @@ void KERNEL::DocViewPrivate::SetSelectionFilter(SelectionFilter::Type eInType)
 //== Command 관련 함수 ===============================================================================
 
 // 1. Command Request 함수 처리
-void KERNEL::DocViewPrivate::CommandRequest(Json::Object & cInObject)
+void KERNEL::DocViewImpl::CommandRequest(Json::Object & cInObject)
 {
 	int nId = cInObject.GetInteger(SKW_ID);
 
@@ -146,7 +146,7 @@ void KERNEL::DocViewPrivate::CommandRequest(Json::Object & cInObject)
 }
 
 // 1-1. Visual Effects Request 요청 함수 처리
-void KERNEL::DocViewPrivate::RequestVisualEffects(Json::Object & cInObject)
+void KERNEL::DocViewImpl::RequestVisualEffects(Json::Object & cInObject)
 {
 	Operator::VisualEffects * pcOperator = (Operator::VisualEffects *) m_apcOperator[(int)KERNEL::Operator::Type::VisualEffects];
 	DEBUG_VALID(pcOperator);
@@ -154,7 +154,7 @@ void KERNEL::DocViewPrivate::RequestVisualEffects(Json::Object & cInObject)
 }
 
 // 2. Command Change 함수 처리
-void KERNEL::DocViewPrivate::CommandChange(Json::Object & cInObject)
+void KERNEL::DocViewImpl::CommandChange(Json::Object & cInObject)
 {
 	int nId = cInObject.GetInteger(SKW_ID);
 
@@ -171,7 +171,7 @@ void KERNEL::DocViewPrivate::CommandChange(Json::Object & cInObject)
 }
 
 // 2-1. Visual Effects Change 요청 함수 처리
-void KERNEL::DocViewPrivate::ChangeVisualEffects(Json::Object & cInObject)
+void KERNEL::DocViewImpl::ChangeVisualEffects(Json::Object & cInObject)
 {
 	Operator::VisualEffects * pcOperator = (Operator::VisualEffects *)m_apcOperator[(int)KERNEL::Operator::Type::VisualEffects];
 	DEBUG_VALID(pcOperator);

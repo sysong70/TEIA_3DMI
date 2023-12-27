@@ -12,10 +12,10 @@ namespace KERNEL
 {
 	namespace Operator
 	{
-		class OperatorPrivate : public PrivateImpl
+		class OperatorImpl : public Impl
 		{
 		public:
-			OperatorPrivate(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			OperatorImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
 
 			H3DF::WindowKey & Window();
 			const H3DF::WindowKey & Window() const;
@@ -25,7 +25,7 @@ namespace KERNEL
 
 			void SetView(const H3DF::View * pcInView);
 
-			void Copy(OperatorPrivate * pcInThat);
+			void Copy(OperatorImpl * pcInThat);
 
 			Signal::Delivery & Delivery();
 			const Signal::Delivery & Delivery() const;

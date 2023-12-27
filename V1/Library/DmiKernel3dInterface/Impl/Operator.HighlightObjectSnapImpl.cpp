@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "OPERATOR.HighlightObjectSnapPrivate.h"
+#include "OPERATOR.HighlightObjectSnapImpl.h"
 
 #include "../Signal/Signal.h"
 #include "../Common/Common_Define.h"
@@ -61,14 +61,14 @@ using namespace H3DF;
 
 //== SnapPoint class ===============================================================================
 
-KERNEL::Operator::HighlightObjectSnapPrivate::SnapPoint::SnapPoint(KERNEL::Operator::HighlightObjectSnapPrivate::SnapPoint const & cInThat)
+KERNEL::Operator::HighlightObjectSnapImpl::SnapPoint::SnapPoint(KERNEL::Operator::HighlightObjectSnapImpl::SnapPoint const & cInThat)
 {
 	cPoint = cInThat.cPoint;
 	eType = cInThat.eType;
 	eStatus = cInThat.eStatus;
 }
 
-KERNEL::Operator::HighlightObjectSnapPrivate::SnapPoint & KERNEL::Operator::HighlightObjectSnapPrivate::SnapPoint::operator = (KERNEL::Operator::HighlightObjectSnapPrivate::SnapPoint const & cInThat)
+KERNEL::Operator::HighlightObjectSnapImpl::SnapPoint & KERNEL::Operator::HighlightObjectSnapImpl::SnapPoint::operator = (KERNEL::Operator::HighlightObjectSnapImpl::SnapPoint const & cInThat)
 {
 	cPoint = cInThat.cPoint;
 	eType = cInThat.eType;
@@ -80,7 +80,7 @@ KERNEL::Operator::HighlightObjectSnapPrivate::SnapPoint & KERNEL::Operator::High
 //== SnapItem class ================================================================================
 // 
 // Select Item의 구성 요소가 같은지 확인한다.
-bool KERNEL::Operator::HighlightObjectSnapPrivate::SnapItem::operator == (const SnapItem & cInThat) const
+bool KERNEL::Operator::HighlightObjectSnapImpl::SnapItem::operator == (const SnapItem & cInThat) const
 {
 /*
 	if (vcSnapPoints.size() != cInThat.vcSnapPoints.size()) {
@@ -117,8 +117,8 @@ bool KERNEL::Operator::HighlightObjectSnapPrivate::SnapItem::operator == (const 
 
 
 //== ObjectSnap class ==============================================================================
-KERNEL::Operator::HighlightObjectSnapPrivate::HighlightObjectSnapPrivate(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery) :
-	OperatorPrivate(pcInView, pcInDelivery)
+KERNEL::Operator::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery) :
+	OperatorImpl(pcInView, pcInDelivery)
 {
 	SegmentKey cConstruction(Window().GetBaseView()->GetConstructionKey());
 
@@ -162,7 +162,7 @@ KERNEL::Operator::HighlightObjectSnapPrivate::HighlightObjectSnapPrivate(const H
 //== Mouse Event ===================================================================================
 
 // 1. Left 버튼 눌림 있는 Mouse Move 처리
-int KERNEL::Operator::HighlightObjectSnapPrivate::LButtonDownAndMove(int nFlags, int x, int y)
+int KERNEL::Operator::HighlightObjectSnapImpl::LButtonDownAndMove(int nFlags, int x, int y)
 {
 	DrawSnapItems();
 
@@ -170,7 +170,7 @@ int KERNEL::Operator::HighlightObjectSnapPrivate::LButtonDownAndMove(int nFlags,
 }
 
 // 2. 버튼 눌림 없는 Mouse Move 처리
-int KERNEL::Operator::HighlightObjectSnapPrivate::NoButtonDownAndMove(int nFlags, int x, int y)
+int KERNEL::Operator::HighlightObjectSnapImpl::NoButtonDownAndMove(int nFlags, int x, int y)
 {
 	PixelPoint cMousePoint(x, y);
 
@@ -206,7 +206,7 @@ int KERNEL::Operator::HighlightObjectSnapPrivate::NoButtonDownAndMove(int nFlags
 	// 저장되어 있는 Snap Point를 그림.
 	for (auto & pcSnapItem : m_vSnapItems) {
 		for (auto & cSnapPoint : pcSnapItem->vcSnapPoints) {
-			cSnapPoint.eStatus = HighlightObjectSnapPrivate::Status::Normal;
+			cSnapPoint.eStatus = HighlightObjectSnapImpl::Status::Normal;
 
 			if (OSnap::Type::NearPoint == cSnapPoint.eType) {
 				continue;
@@ -229,7 +229,7 @@ int KERNEL::Operator::HighlightObjectSnapPrivate::NoButtonDownAndMove(int nFlags
 
 			// Object Snap Point가 선택된 경우 관련된 Entity를 선택한다.
 			if (15 > dDist) {
-				cSnapPoint.eStatus = HighlightObjectSnapPrivate::Status::Selected;
+				cSnapPoint.eStatus = HighlightObjectSnapImpl::Status::Selected;
 
 				// 기존에 선택된 Snap Point가 있으면 삭제한다.
 				// m_cSnapPointSegment.Flush(Search::Type::Segment);
@@ -330,7 +330,7 @@ int KERNEL::Operator::HighlightObjectSnapPrivate::NoButtonDownAndMove(int nFlags
 }
 
 // 2.1 Dynamic Highlight 처리
-bool KERNEL::Operator::HighlightObjectSnapPrivate::DoDynamicHighlighting(WindowPoint cMousePoint, SelectionResults & cOutSelections)
+bool KERNEL::Operator::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint cMousePoint, SelectionResults & cOutSelections)
 {
 	BaseView * pcView = Window().GetBaseView();
 	DEBUG_VALID(pcView);
@@ -471,7 +471,7 @@ bool KERNEL::Operator::HighlightObjectSnapPrivate::DoDynamicHighlighting(WindowP
 
 // 2.2 Selection filter 적용
 // 선택된 요소에서 Selection Filter를 적용해서 새로운 Selection을 만든다.
-void KERNEL::Operator::HighlightObjectSnapPrivate::ApplySelectionFilter(H3DF::SelectionResults & cInSelections, H3DF::SelectionResults & cOutSelections)
+void KERNEL::Operator::HighlightObjectSnapImpl::ApplySelectionFilter(H3DF::SelectionResults & cInSelections, H3DF::SelectionResults & cOutSelections)
 {
 	SelectionResultsIterator cIter = cInSelections.GetIterator();
 
@@ -520,7 +520,7 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::ApplySelectionFilter(H3DF::Se
 }
 
 // 기존값과 다른 값이 입력되면 확인해서 삭제하거나 추가한다.
-void KERNEL::Operator::HighlightObjectSnapPrivate::SetObjectSnapMode(DWORD nInSnapMode) 
+void KERNEL::Operator::HighlightObjectSnapImpl::SetObjectSnapMode(DWORD nInSnapMode) 
 {
 	if (m_nOSnapMode == nInSnapMode) {
 		return;
@@ -554,7 +554,7 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::SetObjectSnapMode(DWORD nInSn
 	}
 }
 
-void KERNEL::Operator::HighlightObjectSnapPrivate::SetSelectionFilter(DWORD nInSelFilter)
+void KERNEL::Operator::HighlightObjectSnapImpl::SetSelectionFilter(DWORD nInSelFilter)
 {
 	m_nSelFilter = nInSelFilter;
 }
@@ -565,7 +565,7 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::SetSelectionFilter(DWORD nInS
 // 이 함수에서 개별요소의 Object Snap를 구하고, 연관된 요소들의 Object Snap를 구한다. 구하는 Object Snap은 각각의 
 // 요소에서 End, Mid, Near, Center등을 구하고 연관된 Entity에서 Intersection, Perpendicular, Tangent 등을 구한다.
 // 구해진 값은 m_aSnapItems에 저장된다. SnapItem에는 연관된 Key값, Point, Snap Type등이 저장된다.
-void KERNEL::Operator::HighlightObjectSnapPrivate::CalculationObjectSnapPoint(H3DF::SelectionResults & cInItems)
+void KERNEL::Operator::HighlightObjectSnapImpl::CalculationObjectSnapPoint(H3DF::SelectionResults & cInItems)
 {
 	TRACE(L"ObjectSnapPrivate::Items Count: %d\n", m_vSnapItems.size());
 
@@ -642,7 +642,7 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::CalculationObjectSnapPoint(H3
 //== 2. 단일 Geometry Object Snap 계산 ==============================================================
 
 // 2-1. Line Object Snap 계산 (EndPoint, MidPoint, NearPoint를 계산)
-bool KERNEL::Operator::HighlightObjectSnapPrivate::CalculationLienObjectSnapPoint(const SelectionItem * pcInSelectionItem, const WindowPoint & cInPoint)
+bool KERNEL::Operator::HighlightObjectSnapImpl::CalculationLienObjectSnapPoint(const SelectionItem * pcInSelectionItem, const WindowPoint & cInPoint)
 {
 	Key cKey;
 	pcInSelectionItem->ShowSelectedItem(cKey);
@@ -730,7 +730,7 @@ bool KERNEL::Operator::HighlightObjectSnapPrivate::CalculationLienObjectSnapPoin
 //== 3. 2개의 Geometry Object Snap 계산 =============================================================
 
 // 3-1. Line & Line 관련 Object Snap을 계산, Intersection
-void KERNEL::Operator::HighlightObjectSnapPrivate::CalculationLienAndLineObjectSnapPoint(const SelectionItem * pcInItems1, const SelectionItem * pcInItems2, 
+void KERNEL::Operator::HighlightObjectSnapImpl::CalculationLienAndLineObjectSnapPoint(const SelectionItem * pcInItems1, const SelectionItem * pcInItems2, 
 	const MatrixKit & cMatrix1, const MatrixKit & cMatrix2)
 {
 	if (!(m_nOSnapMode & (DWORD) OSnap::Type::Intersection) && !(m_nOSnapMode & (DWORD) OSnap::Type::Perpendicular)) {
@@ -778,7 +778,7 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::CalculationLienAndLineObjectS
 
 //== Object Snap Point를 그리는 함수 ==================================================================
 
-void KERNEL::Operator::HighlightObjectSnapPrivate::DrawSnapItems()
+void KERNEL::Operator::HighlightObjectSnapImpl::DrawSnapItems()
 {
 	if (0 < m_vSnapItems.size())
 	{
@@ -802,7 +802,7 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::DrawSnapItems()
 	}
 }
 
-void KERNEL::Operator::HighlightObjectSnapPrivate::DrawSnapPoint(Operator::HighlightObjectSnapPrivate::SnapPoint & cSnapPoint, CamerInformation & cInCameraInfo)
+void KERNEL::Operator::HighlightObjectSnapImpl::DrawSnapPoint(Operator::HighlightObjectSnapImpl::SnapPoint & cSnapPoint, CamerInformation & cInCameraInfo)
 {
 	m_cSnapPointSegment.Open(); {
 		m_cSnapPointSegment.SetModellingMatrix(cInCameraInfo.cMatrix);
@@ -812,7 +812,7 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::DrawSnapPoint(Operator::Highl
 	} m_cSnapPointSegment.Close();
 }
 
-void KERNEL::Operator::HighlightObjectSnapPrivate::DrawSnapPoint(Point2D center, Status eInStatus, OSnap::Type eInType, double dUnit)
+void KERNEL::Operator::HighlightObjectSnapImpl::DrawSnapPoint(Point2D center, Status eInStatus, OSnap::Type eInType, double dUnit)
 {
 	using namespace Painter;
 
@@ -914,7 +914,7 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::DrawSnapPoint(Point2D center,
 	HC_Close_Segment();
 }
 
-double KERNEL::Operator::HighlightObjectSnapPrivate::PixelToWorld(double unit)
+double KERNEL::Operator::HighlightObjectSnapImpl::PixelToWorld(double unit)
 {
 	PixelPoint pixel1;
 	PixelPoint pixel2(unit, 0, 0);
@@ -925,7 +925,7 @@ double KERNEL::Operator::HighlightObjectSnapPrivate::PixelToWorld(double unit)
 	return vector.Length();
 }
 
-bool KERNEL::Operator::HighlightObjectSnapPrivate::ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo)
+bool KERNEL::Operator::HighlightObjectSnapImpl::ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo)
 {
 	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(Window().GetImpl());
 
@@ -950,7 +950,7 @@ bool KERNEL::Operator::HighlightObjectSnapPrivate::ShowCameraInformation(float f
 }
 
 //== Utility Functions =============================================================================
-bool KERNEL::Operator::HighlightObjectSnapPrivate::AddSnapItems(SnapItem * psInSnapItem)
+bool KERNEL::Operator::HighlightObjectSnapImpl::AddSnapItems(SnapItem * psInSnapItem)
 {
 	if (nullptr == psInSnapItem) {
 		return false;
@@ -975,9 +975,9 @@ bool KERNEL::Operator::HighlightObjectSnapPrivate::AddSnapItems(SnapItem * psInS
 	return true;
 }
 
-bool KERNEL::Operator::HighlightObjectSnapPrivate::AddSnapItem(SnapItem * psInSnapItem, Point cInSnapPoint, OSnap::Type eInType)
+bool KERNEL::Operator::HighlightObjectSnapImpl::AddSnapItem(SnapItem * psInSnapItem, Point cInSnapPoint, OSnap::Type eInType)
 {
-	Operator::HighlightObjectSnapPrivate::SnapPoint cSnapPoint;
+	Operator::HighlightObjectSnapImpl::SnapPoint cSnapPoint;
 
 	cSnapPoint.cPoint = cInSnapPoint;
 	cSnapPoint.eType = eInType;
@@ -987,7 +987,7 @@ bool KERNEL::Operator::HighlightObjectSnapPrivate::AddSnapItem(SnapItem * psInSn
 	return true;
 }
 
-void KERNEL::Operator::HighlightObjectSnapPrivate::ClearSnapItems(bool bUpdate)
+void KERNEL::Operator::HighlightObjectSnapImpl::ClearSnapItems(bool bUpdate)
 {
 	m_cSnapPointSegment.Open();
 	{
@@ -1000,7 +1000,7 @@ void KERNEL::Operator::HighlightObjectSnapPrivate::ClearSnapItems(bool bUpdate)
 	}
 }
 
-void KERNEL::Operator::HighlightObjectSnapPrivate::ResetSnapItem()
+void KERNEL::Operator::HighlightObjectSnapImpl::ResetSnapItem()
 {
 	// m_aSnapItems을 삭제
 	for (auto pcSnapItem : m_vSnapItems) {

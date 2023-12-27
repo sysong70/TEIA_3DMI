@@ -79,16 +79,16 @@ namespace KERNEL
 
 	class Object;
 
-	class PrivateImpl
+	class Impl
 	{
 	public:
-		PrivateImpl() {}
-		virtual ~PrivateImpl() {}
+		Impl() {}
+		virtual ~Impl() {}
 
 		KERNEL::Type Type() const;
 		void SetType(KERNEL::Type eType);
 
-		void SetImpl(Object * pcObject, PrivateImpl * pcImpl);
+		void SetImpl(Object * pcObject, Impl * pcImpl);
 
 	protected:
 		KERNEL::Type m_eType = KERNEL::Type::None;
