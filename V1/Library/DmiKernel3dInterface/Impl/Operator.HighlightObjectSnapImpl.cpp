@@ -30,6 +30,7 @@
 #include <3DF/Highlight.h>
 #include <3DF/Visibility.h>
 #include <3DF/VisualEffects.h>
+#include <3DF/3DF.Utility.h>
 
 #include <Signal.Connector.h>
 
@@ -487,8 +488,25 @@ void KERNEL::Operator::HighlightObjectSnapImpl::ApplySelectionFilter(H3DF::Selec
 		SelectionItem * pcNextItem = cIter.GetItem();
 
 		if (H3DF::Type::LineKey == pcNextItem->Type()) {
-			if (m_nSelFilter & (DWORD)SelectionFilter::Type::Curve || m_nSelFilter & (DWORD)SelectionFilter::Type::Edge) {
-				cOutSelections.PushBack(new SelectionItem(*pcNextItem));
+			Key cItemKey;
+			pcNextItem->ShowSelectedItem(cItemKey);
+
+			LineKey cLine(cItemKey);
+
+			DWORD nTopologyType;
+			H3DF::UserData::ShowTopologyType(cLine, nTopologyType);
+
+			if ((DWORD)SelectionFilter::Type::Curve & m_nSelFilter)
+			{
+				if (!((USHORT)H3DF::TopologyType::Edge & nTopologyType)) {
+					cOutSelections.PushBack(new SelectionItem(*pcNextItem));
+				}
+			}
+			
+			if((DWORD)SelectionFilter::Type::Edge & m_nSelFilter) {
+				if ((USHORT)H3DF::TopologyType::Edge & nTopologyType) {
+					cOutSelections.PushBack(new SelectionItem(*pcNextItem));
+				}
 			}
 		}
 		else if (H3DF::Type::ShellKey == pcNextItem->Type()) {
@@ -588,11 +606,7 @@ void KERNEL::Operator::HighlightObjectSnapImpl::CalculationObjectSnapPoint(H3DF:
 		}
 	}
 
-	// #Temp
-	return;
-
 	//----- 상호간의 Object Snap Point를 계산한다. -----
-
 	SelectionResultsIterator cIter = cInItems.GetIterator();
 
 	// 제일 첫번째 Item을 메인으로 해서 계산을 진행한다.
@@ -650,6 +664,10 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::CalculationLienObjectSnapPoint(c
 	if (H3DF::Type::LineKey != cKey.Type()) {
 		return false;
 	}
+
+	USHORT nTest = (USHORT)H3DF::TopologyType::Edge;
+
+	nTest += (USHORT)H3DF::TopologyType::Circle;
 
 	LineKey cLine = LineKey(cKey);
 

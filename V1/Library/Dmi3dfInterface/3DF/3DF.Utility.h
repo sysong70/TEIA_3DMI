@@ -46,6 +46,8 @@ namespace H3DF
 		short RawStringToShort(CString strText);
 		short RawStringToShort(CStringA strText);
 
+		short RawByteToShort(BYTE * pbData);
+
 		//== File 관련 함수 ==========================================================================
 		CString GetExecuteDirectory();
 	};
@@ -57,11 +59,12 @@ namespace H3DF
 		static bool SetSegmentName(SegmentKey & cInSegment, CString strName);
 		static bool ShowSegmentName(SegmentKey & cInSegment, CString & strName);
 
-		static bool SetTopologyType(SegmentKey & cInSegment, TopologyType eInType);
-		static bool ShowTopologyType(SegmentKey & cInSegment, TopologyType & eOutType);
+		static bool SetTopologyType(SegmentKey & cInSegment, DWORD nInType);
+		static bool ShowTopologyType(SegmentKey & cInSegment, DWORD & eOutType);
 
 		//== Geomety User Data 관련 함수 ============================================================= 
-		static bool SetTopologyType(GeometryKey & cInGeometry, TopologyType eInType);
-		static bool ShowTopologyType(GeometryKey & cInGeometry, TopologyType & eOutType);
+		static bool SetTopologyType(GeometryKey & cInGeometry, DWORD nInType);
+		static bool AddTopologyType(GeometryKey & cInGeometry, DWORD nInType);
+		static bool ShowTopologyType(GeometryKey & cInGeometry, DWORD & eOutType);
 	};
 };

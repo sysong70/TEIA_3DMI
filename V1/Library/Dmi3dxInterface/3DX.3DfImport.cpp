@@ -1106,12 +1106,12 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 			break;
 
 			case kA3DTypeRiBrepModel:
-				H3DF::UserData::SetTopologyType(cSegment, TopologyType::Solid);
+				H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Solid);
 				eStatus = ParseRiBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
 			break;
 
 			case kA3DTypeRiPolyBrepModel: {
-				H3DF::UserData::SetTopologyType(cSegment, TopologyType::Solid);
+				H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Solid);
 				eStatus = DrawRiPolyBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
 			} break;
 
@@ -2368,9 +2368,9 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 
 	bool bSolidSegmentFlag = false;
 
-	TopologyType eParentTopoType;
-	if (true == H3DF::UserData::ShowTopologyType(cParentSegment, eParentTopoType)) {
-		if(TopologyType::Solid == eParentTopoType) {
+	DWORD nParentTopoType;
+	if (true == H3DF::UserData::ShowTopologyType(cParentSegment, nParentTopoType)) {
+		if((USHORT)TopologyType::Solid & nParentTopoType) {
 			bSolidSegmentFlag = true;
 		}
 	}
@@ -2591,7 +2591,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 			H3DF::LineKey cLineKey = cCurrnetSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
 
 			if (true == bSolidSegmentFlag) {
-				H3DF::UserData::SetTopologyType(cLineKey, TopologyType::Edge);
+				H3DF::UserData::SetTopologyType(cLineKey, (DWORD)TopologyType::Edge);
 			}
 		}
 	
