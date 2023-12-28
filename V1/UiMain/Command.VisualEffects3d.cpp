@@ -97,7 +97,16 @@ protected:
 			break;
 
 		default:
-			m_propList.Enable(false);
+			if (id == HOME_3D_CMD_ViewStyle_Wireframe) {
+				m_propList.Enable(false);
+			}
+			else if (id == HOME_3D_CMD_ViewStyle_HiddenLineRemove) {
+				m_propList.Enable(L"Shadow", false);
+				m_propList.Enable(L"PlaneReflection", false);
+				m_propList.Enable(L"AmbientOcclusion", true);
+				m_propList.Enable(L"SilhouetteEdges", true);
+				m_propList.Enable(L"Bloom", false);
+			}
 			break;
 		}
 	}

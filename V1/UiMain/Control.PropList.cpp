@@ -127,11 +127,29 @@ void Control::PropList::Enable(bool value)
 	}
 }
 
+void Control::PropList::Enable(const CString& name, bool value)
+{
+	CBCGPProp* pFound = FindPropByName(name);
+	if (pFound != nullptr) {
+		pFound->Enable((BOOL)value, TRUE);
+	}
+	else {
+		DEBUG_STOP;
+	}
+}
+
 
 
 CBCGPProp* Control::PropList::FindPropByName(const CString& name)
 {
 	for (int i = 0; i < GetPropertyCount(); i++) {
+		CBCGPProp* pProp = GetProperty(i);
+		//:WARNING - do not use Name, use XMLTagName
+		if (pProp->GetXMLTagName() == name) {
+			return pProp;
+		}
+
+		// find children
 		CBCGPProp* pFound = FindPropByName(GetProperty(i), name);
 		if (pFound != nullptr) {
 			return pFound;
@@ -152,6 +170,7 @@ CBCGPProp* Control::PropList::FindPropByName(CBCGPProp* pParent, const CString& 
 			return pProp;
 		}
 
+		// find children
 		pProp = FindPropByName(pProp, name);
 		if (pProp != nullptr) {
 			return pProp;

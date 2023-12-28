@@ -180,8 +180,20 @@ void Window::MainFrame::ShowTaskBar(bool show)
 
 void Window::MainFrame::ViewChanged(UINT message, View* pView)
 {
+	DEBUG_TRACE(L"%d %d\n", pView->GetId(), message);
+
 	if (message == WM_ACTIVATE) {
 		m_panelBar.ViewChanged(&pView->m_tabs);
+		if (m_pActiveView != nullptr && m_pActiveView->GetId() != pView->GetId()) {
+			m_pActiveView->CancelCommand();
+		}
+	}
+	else if (message == WM_CREATE) {
+	}
+	else if (message == WM_DESTROY) {
+	}
+	else {
+		DEBUG_STOP;
 	}
 
 	m_pActiveView = pView;

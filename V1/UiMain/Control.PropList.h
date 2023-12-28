@@ -28,6 +28,8 @@ namespace Control
 	public:
 
 		void Enable(bool value);
+
+		void Enable(const CString& name, bool value);
 		// from root item
 		CBCGPProp* FindPropByName(const CString& name);
 		// sub items

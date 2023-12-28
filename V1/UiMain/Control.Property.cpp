@@ -312,7 +312,7 @@ void Property::CommandButton::OnDrawValue(CDC* pDC, CRect rect)
 #define TEXT_MARGIN(parent)	globalUtils.ScaleByDPI(4, parent)
 
 	COLORREF oldColor;
-	if (m_bHighlighted) {
+	if (m_bHighlighted && m_bEnabled) {
 		oldColor = pDC->SetTextColor((COLORREF)Control::EColor::DeepSkyBlue);
 	}
 	else {

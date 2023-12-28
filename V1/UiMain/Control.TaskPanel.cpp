@@ -185,7 +185,9 @@ LRESULT Control::TaskPanel::OnPropertyChanged(WPARAM wp, LPARAM lp)
 	else {
 		UINT id = pProp->GetID();
 		if (id < PRESET::ResetButtonIdMax) {
-			OnReset(pProp);
+			if (pProp->IsEnabled() == TRUE) {
+				OnReset(pProp);
+			}
 		}
 		else {
 			DEBUG_STOP;

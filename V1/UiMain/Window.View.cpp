@@ -394,8 +394,6 @@ void Window::View::Activate(bool value)
 		else {
 			m_toolBar.ShowWindow(SW_HIDE);
 			m_historyBar.ShowWindow(SW_HIDE);
-			//:CHECK
-			CancelCommand();
 		}
 	}
 }
