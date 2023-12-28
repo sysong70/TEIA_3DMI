@@ -30,6 +30,8 @@ namespace Control
 		void Enable(bool value);
 
 		void Enable(const CString& name, bool value);
+
+		void Expand(const CString& name, bool value);
 		// from root item
 		CBCGPProp* FindPropByName(const CString& name);
 		// sub items
@@ -46,6 +48,10 @@ namespace Control
 		void SetPropName(CBCGPProp* pProp, Json::Object& design);
 
 		void SetPropValue(CBCGPProp* pProp, Json::Value* pValue);
+
+		void Show(const CString& name, bool value);
+
+		void ShowAll(bool value);
 
 	protected:
 

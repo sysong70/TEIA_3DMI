@@ -140,6 +140,16 @@ void Control::PropList::Enable(const CString& name, bool value)
 
 
 
+void Control::PropList::Expand(const CString& name, bool value)
+{
+	for (POSITION pos = m_lstProps.GetHeadPosition(); pos != nullptr;) {
+		CBCGPProp* pProp = m_lstProps.GetNext(pos);
+		pProp->Expand((BOOL)value);
+	}
+}
+
+
+
 CBCGPProp* Control::PropList::FindPropByName(const CString& name)
 {
 	for (int i = 0; i < GetPropertyCount(); i++) {
@@ -277,6 +287,29 @@ void Control::PropList::SetPropValue(CBCGPProp* pProp, Json::Value* pValue)
 	DEBUG_VALID(pValue);
 
 	Facility::SetValue(*pProp, *pValue);
+}
+
+
+
+void Control::PropList::Show(const CString& name, bool value)
+{
+	CBCGPProp* pFound = FindPropByName(name);
+	if (pFound != nullptr) {
+		pFound->Show((BOOL)value);
+	}
+	else {
+		DEBUG_STOP;
+	}
+}
+
+
+
+void Control::PropList::ShowAll(bool value)
+{
+	for (POSITION pos = m_lstProps.GetHeadPosition(); pos != nullptr;) {
+		CBCGPProp* pProp = m_lstProps.GetNext(pos);
+		pProp->Show((BOOL)value);
+	}
 }
 
 

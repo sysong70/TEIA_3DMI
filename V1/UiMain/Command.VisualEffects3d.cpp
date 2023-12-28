@@ -89,25 +89,25 @@ protected:
 		Component::TaskBar* taskBar = (Component::TaskBar*)GetParent();
 		taskBar->GetDelivery().view.OnCommand(id);
 
-		switch (id) {
-		case HOME_3D_CMD_ViewStyle_Shade:
-		case HOME_3D_CMD_ViewStyle_ShadeWithEdges:
-		case HOME_3D_CMD_ViewStyle_Tessellated:
-			m_propList.Enable(true);
-			break;
+		if (id == HOME_3D_CMD_ViewStyle_HiddenLineRemove) {
+			m_propList.Show(L"Shadow", false);
+			m_propList.Show(L"PlaneReflection", false);
+			m_propList.Show(L"AmbientOcclusion", true);
+			m_propList.Show(L"SilhouetteEdges", true);
+			m_propList.Show(L"Bloom", false);
 
-		default:
-			if (id == HOME_3D_CMD_ViewStyle_Wireframe) {
-				m_propList.Enable(false);
-			}
-			else if (id == HOME_3D_CMD_ViewStyle_HiddenLineRemove) {
-				m_propList.Enable(L"Shadow", false);
-				m_propList.Enable(L"PlaneReflection", false);
-				m_propList.Enable(L"AmbientOcclusion", true);
-				m_propList.Enable(L"SilhouetteEdges", true);
-				m_propList.Enable(L"Bloom", false);
-			}
-			break;
+			m_propList.ExpandAll(true);
+			m_propList.EnableWindow(TRUE);
+		}
+		else if (id == HOME_3D_CMD_ViewStyle_Wireframe) {
+			m_propList.ShowAll(true);
+			m_propList.ExpandAll(false);
+			m_propList.EnableWindow(FALSE);
+		}
+		else {
+			m_propList.ShowAll(true);
+			m_propList.ExpandAll(true);
+			m_propList.EnableWindow(TRUE);
 		}
 	}
 

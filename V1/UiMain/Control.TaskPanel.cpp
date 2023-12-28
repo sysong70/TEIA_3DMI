@@ -87,9 +87,14 @@ void Control::TaskPanel::OnReset(CBCGPProp* pProp)
 	DEBUG_VALID(pParent);
 	ASSERT(pParent->IsGroup());
 
-	//:WARNING - copy data, do not use reference
 	CStringA name = (CStringA)pParent->GetXMLTagName();
-	m_data.GetAt(name) = m_defaultData.GetAt(name);
+	Json::Object& target = m_data.GetAt(name);
+	// grouped(checked) value
+	bool checked = target.GetBoolean("checked");
+
+	//:WARNING - copy data, do not use reference
+	target = m_defaultData.GetAt(name);
+	target.SetBoolean("checked", checked);
 
 	m_propList.InitializeData(m_data);
 

@@ -623,13 +623,14 @@ void Signal::TaskBar::OnChangedValue(UINT commandId, Json::Object& value)
 }
 
 
-// sysong: View Id 추가
-void Signal::TaskBar::ResponseValue(UINT nViewId, UINT commandId, Json::Object& value, Json::Object& defaultValue)
+
+void Signal::TaskBar::ResponseValue(UINT viewId, UINT commandId, Json::Object& value, Json::Object& defaultValue)
 {
 	Json::Object data;
 	ConstructData(data, Action::ResponseValue);
 
-	data.SetInteger(SKW_VIEWID, nViewId);
+	//:Ken - sysong, why not use Wrapper().ViewId?
+	data.SetInteger(SKW_VIEWID, viewId);
 	data.SetInteger(SKW_ID, commandId);
 	data.SetObject(SKW_VALUE, new Json::Object(value));
 	data.SetObject(SKW_DEFAULTVALUE, new Json::Object(defaultValue));
