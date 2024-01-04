@@ -32,6 +32,8 @@
 #include <3DF/VisualEffects.h>
 #include <3DF/3DF.Utility.h>
 
+#include <3DF/LineAttribute.h>
+
 #include <Signal.Connector.h>
 
 #include <Common_Define.h>
@@ -152,6 +154,12 @@ KERNEL::Operator::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const H3DF::V
 	//m_cSnapPointSegment.GetVisualEffectsControl().SetAntiAliasing(true);
 	m_cSnapPointSegment.GetVisualEffectsControl().SetLineAntiAliasing(true);
 	m_cSnapPointSegment.GetVisualEffectsControl().SetTextAntiAliasing(true);
+
+	MaterialMappingKit cHighlightMaterialMapping;
+	cHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(0, 0, 128)));
+	cHighlightMaterialMapping.SetEdgeColor(RGBAColor(0, 0, 0));
+	cHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(0, 162, 232)));
+	m_cDynamicHighlightControl.SetMaterialMapping(cHighlightMaterialMapping);
 
 	// Tick Count 초기화
 	m_nPrevMouseMoveTickCount = GetTickCount();
@@ -341,8 +349,6 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoin
 		return false;
 	}
 	
-	bool bNeedUpdate = true;
-
 	// SetBias(Selection::Bias::Lines)함수는 Line을 우선적으로 선택하도록 한다. 선택후에는 Sort함수를 통해서 Shell값과 Z값으로 정렬된다.
 	// 전달되는 값에는 Line이 빠지지 않고 전달된다. Line은 Polyline을 함께 포함하고 있음.
 
@@ -380,7 +386,8 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoin
 	// 선택된 요소가 없는 경우 Deselect All을 하고 Update를 한다.
 	if(0 == nResult) {
 		if(0 < m_cOldHighlightSelection.GetCount()) {
-			Window().GetBaseView()->GetHighlightSelection()->DeSelectAll();
+			//Window().GetBaseView()->GetHighlightSelection()->DeSelectAll();
+			m_cDynamicHighlightControl.UnhighlightEverything();
 			Window().GetBaseView()->ForceUpdate();
 			m_cOldHighlightSelection.Reset();
 		}
@@ -440,30 +447,34 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoin
 		}
 	}
 
-	Window().GetBaseView()->GetHighlightSelection()->DeSelectAll();
+	m_cDynamicHighlightControl.UnhighlightEverything();
+	//Window().GetBaseView()->GetHighlightSelection()->DeSelectAll();
 
 	H3DF::HighlightOptionsKit cOption;
 	if(0 < cHighlightSelection.GetCount()) {
 		if(H3DF::Type::LineKey == pcFrontItem->Type()) {
-			HC_KEY nHighlightSelectionKey = Window().GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
-			HC_Open_Segment_By_Key(nHighlightSelectionKey); {
-				HC_Set_Line_Weight(m_fLineWeight);
-			} HC_Close_Segment();
+			m_cDynamicHighlightControl.GetLineAttributeControl().SetWeight(m_fLineWeight);
+// 			HC_KEY nHighlightSelectionKey = Window().GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
+// 			HC_Open_Segment_By_Key(nHighlightSelectionKey); {
+// 				HC_Set_Line_Weight(m_fLineWeight);
+// 			} HC_Close_Segment();
 		}
 		else {
 			float fLineWeight = 1.0;
-			HC_KEY nHighlightSelectionKey = Window().GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
-			HC_Open_Segment_By_Key(nHighlightSelectionKey); {
-				HC_Set_Line_Weight(fLineWeight);
-			} HC_Close_Segment();
+			m_cDynamicHighlightControl.GetLineAttributeControl().SetWeight(fLineWeight);
+// 			HC_KEY nHighlightSelectionKey = Window().GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
+// 			HC_Open_Segment_By_Key(nHighlightSelectionKey); {
+// 				HC_Set_Line_Weight(fLineWeight);
+// 			} HC_Close_Segment();
 		}
 
 		// CString strPath;
 		// pcFrontItem->ShowPathString(strPath);
 
 		cOutSelections.PushBack(new SelectionItem(*pcFrontItem));
+		
+		// 선택된 요소를 Highlight한다.
 		m_cDynamicHighlightControl.Highlight(*pcFrontItem, cOption);
-		bNeedUpdate = true;
 	}
 
 	m_cOldHighlightSelection = cOutSelections;

@@ -15,43 +15,48 @@ using namespace H3DF;
 
 using PortfolioDeque = std::deque<PortfolioKey *>;
 
-H3DF::PortfolioKey::PortfolioKey() : SegmentKey()
+H3DF::PortfolioKey::PortfolioKey()
 {
 }
 
-
-H3DF::PortfolioKey::PortfolioKey(CString strInName) : SegmentKey(strInName)
+H3DF::PortfolioKey::PortfolioKey(HC_KEY nInKey) : Key(nInKey)
 {
 }
 
-H3DF::PortfolioKey::PortfolioKey(HC_KEY nInKey) : SegmentKey(nInKey)
+H3DF::PortfolioKey::PortfolioKey(Key const & cInThat) : Key(cInThat)
 {
 }
 
-H3DF::PortfolioKey::PortfolioKey(PortfolioKey const & cInThat) : SegmentKey(cInThat)
+H3DF::PortfolioKey::PortfolioKey(PortfolioKey const & cInThat) : Key(cInThat)
 {
 }
 
 void H3DF::PortfolioKey::Set(PortfolioKey const & cInThat)
 {
-	SegmentKey::Set(cInThat);
+	Key::Set(cInThat);
 }
 
 PortfolioKey & H3DF::PortfolioKey::operator = (PortfolioKey const & cInThat)
 {
-	SegmentKey::Set(cInThat);
+	Key::Set(cInThat);
 	return *this;
 }
 
 NamedStyleDefinition H3DF::PortfolioKey::DefineNamedStyle(CString strInName, SegmentKey const & cInStyleSource)
 {
-	SegmentKeyImpl::LocalOpen(*this);
+	if (INVALID_KEY == KeyValue()) {
+		DEBUG_STOP;
+	}
 
-	SegmentKey cSubSegment = Subsegment(strInName);
+	SegmentKey cPortfolio(KeyValue());
 
-	SegmentKeyImpl::LocalClose(*this);
+	SegmentKey cStyleSegment = cPortfolio.Subsegment(strInName);
 
-	NamedStyleDefinition cStyle(cSubSegment.KeyValue());
+	cStyleSegment.Open();
+	HC_KEY nStyleKey = HC_Style_Segment_By_Key(cInStyleSource.KeyValue());
+	cStyleSegment.Close();
+
+	NamedStyleDefinition cStyle(nStyleKey);
 	return cStyle;
 }
 

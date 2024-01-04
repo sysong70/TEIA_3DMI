@@ -2,18 +2,17 @@
 
 #include "3DF.h"
 
-OPEN_3DF_NAMESPACE
-
-class Database
+namespace H3DF
 {
-public:
-	Database() {};
+	class Database
+	{
+	public:
+		Database() {};
 
-	static SegmentKey CreateRootSegment();
+		static SegmentKey CreateRootSegment();
 
-	static PortfolioKey CreatePortfolio();
+		static PortfolioKey CreatePortfolio();
 
-	static void RelinquishMemory();
-};
-
-CLOSE_3DF_NAMESPACE
+		static void RelinquishMemory();
+	};
+}

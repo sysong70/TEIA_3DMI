@@ -106,22 +106,22 @@ SegmentKey & H3DF::SegmentKey::Close()
 	return *this;
 }
 
-CString H3DF::SegmentKey::Name() const
+CStringA H3DF::SegmentKey::Name() const
 {
-	CString strOutName;
+	CStringA strOutName;
 
 	char chSegName[MVO_BUFFER_SIZE] = "\n";
 	HC_Show_Segment(KeyValue(), chSegName);
 
-	H3DF::Utility::CharToUnicode(chSegName, strOutName);
+	strOutName = chSegName;
 
 	return strOutName;
 }
 
-SegmentKey & H3DF::SegmentKey::SetName(CString strInName)
+SegmentKey & H3DF::SegmentKey::SetName(CStringA strInName)
 {
 	SegmentKeyImpl::LocalOpen(*this); {
-		HC_Rename_Segment(".", Utility::ToChar(strInName));
+		HC_Rename_Segment(".", strInName);
 	} SegmentKeyImpl::LocalClose(*this);
 
 	return *this;

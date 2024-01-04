@@ -3,24 +3,23 @@
 #include "3DF.h"
 #include "Key.h"
 #include "Control.h"
+#include "Definition.h"
 
 namespace H3DF
 {
-	class API_3DF NamedStyleDefinition
+	class API_3DF NamedStyleDefinition : public Definition
 	{
 	public:
-		NamedStyleDefinition(SegmentKey cInSource);
+		NamedStyleDefinition();
+		NamedStyleDefinition(HC_KEY nInKey);
 		NamedStyleDefinition(NamedStyleDefinition const & cInThat);
 
+		void Set(NamedStyleDefinition const & cInThat);
 		NamedStyleDefinition & operator = (NamedStyleDefinition const & cInThat);
 
 		SegmentKey GetSource() const;
 
 		PortfolioKey Owner() const;
-
-	private:
-		HC_KEY m_nOwnerPortfolioKey = INVALID_KEY;
-		HC_KEY m_nSourceSegmentKey = INVALID_KEY;
 	};
 
 	class API_3DF StyleKey : public Key
@@ -43,7 +42,7 @@ namespace H3DF
 		void Set(StyleControl const & cInThat);
 		StyleControl & operator = (StyleControl const & cInThat);
 
-		StyleKey PushNamed(CString & strInStyleName);
+		StyleKey PushNamed(CStringA strInStyleName);
 		StyleKey PushSegment(SegmentKey const & cInStyleSource);
 	};
 }

@@ -151,6 +151,24 @@ void H3DF::View::Resize(int x, int y)
 	pcImpl->Resize(x, y);
 }
 
+Model & H3DF::View::GetAttachedModel() const
+{
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetAttachedModel();
+}
+
+WindowKey & H3DF::View::GetWindowKey() const
+{
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	DEBUG_VALID(pcImpl->m_pcWindow);
+
+	return *pcImpl->m_pcWindow;
+}
+
 SegmentKey H3DF::View::GetSegmentKey()
 {
 	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
@@ -183,22 +201,20 @@ SegmentKey const H3DF::View::GetModelOverrideSegmentKey() const
 	return pcImpl->GetModelKey();
 }
 
-Model & H3DF::View::GetAttachedModel() const
+PortfolioKey const H3DF::View::GetPortfolioKey() const
 {
 	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
-	
-	return pcImpl->GetAttachedModel();
+
+	return pcImpl->m_cPortfolioKey;
 }
 
-WindowKey & H3DF::View::GetWindowKey() const 
+PortfolioKey H3DF::View::GetPortfolioKey()
 {
 	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	DEBUG_VALID(pcImpl->m_pcWindow);
-
-	return *pcImpl->m_pcWindow;
+	return pcImpl->m_cPortfolioKey;
 }
 
 NavigationCube & H3DF::View::GetNavigationCube() const

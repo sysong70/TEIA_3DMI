@@ -8,6 +8,7 @@
 #include <Json.h>
 
 #include "../3DF/NavigationCube.h"
+#include "../3DF/Portfolio.h"
 
 namespace H3DF
 {
@@ -119,11 +120,12 @@ namespace H3DF
 		char * m_pchName = nullptr;
 		H3DF::Rendering::Mode m_eRenderingMode = H3DF::Rendering::Mode::Default;
 
-	private:
 		SegmentKey m_cKey;
 
 		H3DF::Model * m_pcModel = nullptr;
 		SegmentKey m_cModelKey;
+
+		PortfolioKey m_cPortfolioKey;
 
 		bool m_bShowCollisions = false;
 

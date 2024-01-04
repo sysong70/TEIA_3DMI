@@ -6,6 +6,7 @@
 #include "Portfolio.h"
 
 #include "Impl/ControlImpl.h"
+#include "Impl/DefinitionImpl.h"
 
 #include <hc.h>
 #include <Htools.h>
@@ -14,37 +15,63 @@ using namespace H3DF;
 
 //== NamedStyleDefinition Function =================================================================
 
-H3DF::NamedStyleDefinition::NamedStyleDefinition(SegmentKey cInSource)
+H3DF::NamedStyleDefinition::NamedStyleDefinition()
 {
-	m_nSourceSegmentKey = cInSource.KeyValue();;
+}
 
+H3DF::NamedStyleDefinition::NamedStyleDefinition(HC_KEY nInKey) : Definition(nInKey)
+{
 }
 
 H3DF::NamedStyleDefinition::NamedStyleDefinition(NamedStyleDefinition const & cInThat)
 {
-	//m_strName = cInThat.Name();
-	m_nSourceSegmentKey = cInThat.GetSource().KeyValue();
-	m_nOwnerPortfolioKey = cInThat.Owner().KeyValue();
+	Set(cInThat);
+}
+
+void H3DF::NamedStyleDefinition::Set(NamedStyleDefinition const & cInThat)
+{
+	auto * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+	auto * pcInThatImpl = dynamic_cast<DefinitionImpl *>(cInThat.m_pcImpl);
+	DEBUG_VALID(pcInThatImpl);
+
+	pcImpl->SetKeyValue(pcInThatImpl->KeyValue());
 }
 
 NamedStyleDefinition & H3DF::NamedStyleDefinition::operator = (NamedStyleDefinition const & cInThat)
 {
-	//m_strName = cInThat.Name();
-	m_nSourceSegmentKey = cInThat.GetSource().KeyValue();
-	m_nOwnerPortfolioKey = cInThat.Owner().KeyValue();
+	auto * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+	auto * pcInThatImpl = dynamic_cast<DefinitionImpl *>(cInThat.m_pcImpl);
+	DEBUG_VALID(pcInThatImpl);
+
+	pcImpl->SetKeyValue(pcInThatImpl->KeyValue());
 
 	return *this;
 }
 
 SegmentKey H3DF::NamedStyleDefinition::GetSource() const
 {
-	SegmentKey cSegment(m_nSourceSegmentKey);
+	auto * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	HC_KEY nKey = pcImpl->KeyValue();
+
+	SegmentKey cSegment(pcImpl->KeyValue());
 	return cSegment;
 }
 
 PortfolioKey H3DF::NamedStyleDefinition::Owner() const
 {
-	PortfolioKey cPortfolioKey(m_nOwnerPortfolioKey);
+	auto * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	SegmentKey cSegment(pcImpl->KeyValue());
+
+	SegmentKey cOwner = cSegment.Owner();
+	HC_KEY nOwner = cOwner.KeyValue();
+
+	PortfolioKey cPortfolioKey(cSegment.Owner());
 	return cPortfolioKey;
 }
 
@@ -116,13 +143,13 @@ StyleControl & H3DF::StyleControl::operator = (StyleControl const & cInThat)
 }
 
 
-StyleKey H3DF::StyleControl::PushNamed(CString & strInStyleName)
+StyleKey H3DF::StyleControl::PushNamed(CStringA strInStyleName)
 {
 	StyleControlImpl * pcImpl = (StyleControlImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
-	HC_KEY nStyleKey = HC_Style_Segment(Utility::ToChar(strInStyleName));
+	HC_KEY nStyleKey = HC_Style_Segment(strInStyleName);
 	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	StyleKey cStyle(nStyleKey);

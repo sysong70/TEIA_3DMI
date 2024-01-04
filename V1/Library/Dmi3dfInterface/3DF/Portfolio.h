@@ -7,12 +7,12 @@
 
 namespace H3DF
 {
-	class API_3DF PortfolioKey : public SegmentKey
+	class API_3DF PortfolioKey : public Key
 	{
 	public:
 		PortfolioKey();
-		PortfolioKey(CString strInName);
 		PortfolioKey(HC_KEY nInKey);
+		explicit PortfolioKey(Key const & cInThat);
 		PortfolioKey(PortfolioKey const & cInThat);
 
 		void Set(PortfolioKey const & cInThat);

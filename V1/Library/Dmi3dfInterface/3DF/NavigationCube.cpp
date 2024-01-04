@@ -178,7 +178,7 @@ int H3DF::NavigationCube::LButtonUp(HEventInfo & cInEvent)
 		return HLISTENER_PASS_EVENT;
 	}
 
-	CString strName = cSelectKey.Name();
+	CStringA strName = cSelectKey.Name();
 	// TRACE(L"%s\n", strName);
 
 	pcImpl->m_pcWindow->GetBaseView()->GetHighlightSelection()->DeSelectAll();

@@ -98,6 +98,8 @@ namespace H3DF
 
 	class GeometryKey;
 
+	class PortfolioKey;
+
 	class KeyImpl;
 
 	//==============================================================================================
@@ -172,6 +174,16 @@ namespace H3DF
 		TextKey									= 0x10100014,
 		GridKey									= 0x10100015,
 
+		Definition								= 0x20000000,
+		NamedStyleDefinition					= 0x20000001,
+		TextureDefinition						= 0x20000002,
+		LinePatternDefinition					= 0x20000003,
+		GlyphDefinition							= 0x20000004,
+		CubeMapDefinition						= 0x20000005,
+		ImageDefinition							= 0x20000006,
+		MaterialPaletteDefinition				= 0x20000007,
+		LegacyShaderDefinition					= 0x20000008,
+		ShapeDefinition							= 0x20000009,
 
 		Control									= 0x50000000,
 		CameraControl							= 0x50000001,

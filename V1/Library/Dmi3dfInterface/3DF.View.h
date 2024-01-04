@@ -40,15 +40,18 @@ namespace H3DF
 		void Destruct();
 		void Resize(int x, int y);
 
+		WindowKey & GetWindowKey() const;
+
+		Model & GetAttachedModel() const;
+
 		SegmentKey GetSegmentKey();
 		SegmentKey const GetSegmentKey() const;
 
 		SegmentKey GetModelOverrideSegmentKey();
 		SegmentKey const GetModelOverrideSegmentKey() const;
 
-		Model & GetAttachedModel() const;
-
-		WindowKey & GetWindowKey() const;
+		PortfolioKey const GetPortfolioKey() const;
+		PortfolioKey GetPortfolioKey();
 
 		NavigationCube & GetNavigationCube() const;
 

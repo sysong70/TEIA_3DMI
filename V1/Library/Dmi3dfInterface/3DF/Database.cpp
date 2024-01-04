@@ -7,9 +7,9 @@
 
 #include <hc.h>
 
-USING_3DF_NAMESPACE
+using namespace H3DF;
 
-SegmentKey Database::CreateRootSegment()
+SegmentKey H3DF::Database::CreateRootSegment()
 {
 	HC_KEY nKey = INVALID_KEY;
 	HC_Open_Segment("/"); {
@@ -20,7 +20,7 @@ SegmentKey Database::CreateRootSegment()
 	return cSegment;
 }
 
-PortfolioKey Database::CreatePortfolio()
+PortfolioKey H3DF::Database::CreatePortfolio()
 {
 	HC_KEY nKey = INVALID_KEY;
 	HC_KEY nPortfoliosKey = HC_Open_Segment("/portfolios"); {
@@ -32,7 +32,7 @@ PortfolioKey Database::CreatePortfolio()
 	return cPortfolio;
 }
 
-void Database::RelinquishMemory()
+void H3DF::Database::RelinquishMemory()
 {
 	HC_Relinquish_Memory();
 }

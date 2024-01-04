@@ -12,6 +12,9 @@
 
 #include "3DF/3DF.Utility.h"
 
+#include "3DF/Database.h"
+#include "3DF/Portfolio.h"
+
 // ----- HOOPS Header -----
 #include <hoops_license.h>
 
@@ -437,6 +440,7 @@ void H3DF::Application::InitInstance()
 		HeapSetInformation(heaps[i], HeapCompatibilityInformation, &HeapFragValue, sizeof(HeapFragValue));
 	}
 
+	// HOOPS DB 초기화
 	pcImpl->m_pcHoopsDB = new HDB;
 	pcImpl->m_pcHoopsDB->Init();
 

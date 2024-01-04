@@ -45,6 +45,9 @@
 #include "../3DF/LineAttribute.h"
 #include "../3DF/Impl/SegmentImpl.h"
 
+#include "../3DF/Database.h"
+#include "../3DF/Portfolio.h"
+
 #include "../Signal/Signal.h"
 
 #define SEGMENT_TYPE						1
@@ -1234,6 +1237,12 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	//Operator::ObjectSnap::CreateGlyph();
 
 	SetSelectOption();
+	
+	// Portfolio Key 생성
+// 	SegmentKey cPortfoliosKey = m_cKey.Subsegment(L"Portfolios");
+// 	m_cPortfolioKey.SetKeyValue(cPortfoliosKey.KeyValue());
+
+	m_cPortfolioKey = Database::CreatePortfolio();
 
 	// do all the setup with no updates
 	m_pcBaseView->SetSuppressUpdate(false);

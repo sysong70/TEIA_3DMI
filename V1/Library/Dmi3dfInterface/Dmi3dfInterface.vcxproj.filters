@@ -324,6 +324,12 @@
     <ClInclude Include="3DF\Impl\OperatorImpl.h">
       <Filter>Operator\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\Definition.h">
+      <Filter>3DF\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Impl\DefinitionImpl.h">
+      <Filter>3DF\Object\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -574,6 +580,12 @@
     </ClCompile>
     <ClCompile Include="3DF\Impl\OperatorImpl.cpp">
       <Filter>Operator\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Definition.cpp">
+      <Filter>3DF\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\DefinitionImpl.cpp">
+      <Filter>3DF\Object\Impl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

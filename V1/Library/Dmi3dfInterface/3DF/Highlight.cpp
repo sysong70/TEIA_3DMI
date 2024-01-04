@@ -220,8 +220,8 @@ HighlightControl & H3DF::HighlightControl::SetLineAttribute(LineAttributeKit con
 
 LineAttributeControl H3DF::HighlightControl::GetLineAttributeControl()
 {
-	HighlightControlImpl * pcHighlightControlImpl = (HighlightControlImpl *)m_pcImpl;
-	HC_KEY nKey = pcHighlightControlImpl->SelectionSet()->GetHighlightStyle();
+	auto * pcImpl = dynamic_cast<HighlightControlImpl *>(m_pcImpl);
+	HC_KEY nKey = pcImpl->GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
 
 	SegmentKey cSegmentKey(nKey);
 	LineAttributeControl cControl(cSegmentKey);
@@ -231,8 +231,8 @@ LineAttributeControl H3DF::HighlightControl::GetLineAttributeControl()
 
 LineAttributeControl const H3DF::HighlightControl::GetLineAttributeControl() const
 {
-	HighlightControlImpl * pcHighlightControlImpl = (HighlightControlImpl *)m_pcImpl;
-	HC_KEY nKey = pcHighlightControlImpl->SelectionSet()->GetHighlightStyle();
+	auto * pcImpl = dynamic_cast<HighlightControlImpl *>(m_pcImpl);
+	HC_KEY nKey = pcImpl->GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
 
 	SegmentKey cSegmentKey(nKey);
 	LineAttributeControl cControl(cSegmentKey);
