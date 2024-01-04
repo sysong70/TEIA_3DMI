@@ -20,20 +20,21 @@ namespace H3DF
 	{
 	public:
 		void Copy(HighlightOptionsKitImpl * pcInThat) {
-			strncpy(m_chInStyleName, pcInThat->m_chInStyleName, STYLE_BUFFER_SIZE);
-			strncpy(m_chInSecondaryStyleName, pcInThat->m_chInSecondaryStyleName, STYLE_BUFFER_SIZE);
+			m_strInStyleName = pcInThat->m_strInStyleName;
+			m_strInSecondaryStyleName = pcInThat->m_strInSecondaryStyleName;
 			m_nNotification = pcInThat->m_nNotification;
 		}
 
-		char m_chInStyleName[STYLE_BUFFER_SIZE];
-		char m_chInSecondaryStyleName[STYLE_BUFFER_SIZE];
+		CStringA m_strInStyleName;
+		CStringA m_strInSecondaryStyleName;
 		int m_nNotification = -1;
 	};
 
-	class HighlightControlImpl : public Impl
+
+
+	class API_3DF HighlightControlImpl : public Impl
 	{
 	public:
-		HighlightControlImpl();
 		HighlightControlImpl(WindowKey const & cInWindow);
 
 		void Copy(HighlightControlImpl * pcInThat) {
@@ -43,13 +44,12 @@ namespace H3DF
 		// 	int SelectButtonDown(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults);
 		// 	void HandleSelection(UINT const nFlags, SelectionResults & cOutResults);
 
-		WindowKey * GetWindow() { return (WindowKey *) m_pcWindow; }
-		const WindowKey * m_pcWindow = nullptr;
+		const WindowKey & Window() { return *m_pcWindow; }
 
 		BaseView * GetBaseView();
 		BaseView * GetBaseView() const;
 
-		HSelectionSet * GetHighlightSelection();
+		HSelectionSet * SelectionSet();
 
 		//== Highlight 관련 함수 =====================================================================
 		void Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting = true);
@@ -58,11 +58,10 @@ namespace H3DF
 		void Unhighlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions = HighlightOptionsKit());
 		void Unhighlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions = HighlightOptionsKit());
 
-		//== Mouse Event 처리 =======================================================================
-		int NoButtonDownAndMove(int nFlags, int x, int y, SelectionResults & cOutSelections);
-
-		bool DoDynamicHighlighting(WindowPoint cMousePoint, SelectionResults & cOutSelections);
-
 		H3DF::SelectionResults m_cOldHighlightSelection;
+
+	private:
+		const WindowKey * m_pcWindow = nullptr;
+		HSelectionSet * m_pcSelectionSet = nullptr;
 	};
 }

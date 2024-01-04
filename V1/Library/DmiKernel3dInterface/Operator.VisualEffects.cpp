@@ -26,12 +26,12 @@ namespace KERNEL
 {
 	namespace Operator
 	{
-		class VisualEffectsPrivate : public OperatorImpl
+		class VisualEffectsImpl : public OperatorImpl
 		{
 		public:
-			VisualEffectsPrivate(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			VisualEffectsImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
 
-			void Copy(VisualEffectsPrivate * pcInThat) {
+			void Copy(VisualEffectsImpl * pcInThat) {
 				OperatorImpl::Copy(pcInThat);
 			}
 
@@ -59,28 +59,33 @@ namespace KERNEL
 	}
 }
 
-KERNEL::Operator::VisualEffectsPrivate::VisualEffectsPrivate(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
+KERNEL::Operator::VisualEffectsImpl::VisualEffectsImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
 	: OperatorImpl(pcInView, pcInDelivery)
 {
+	// 변경된 전역 Visual Effect 값을 가져온다.
 	m_cOption.Set(TheKenel.VisualEffects.Get());
+
+	// 값들 중에서 checked 값들을 사용안함으로 수정한다.
+	m_cOption.SetChecked(false);
+
 	m_pcDefaultSetting = (new TheVisualEffects)->Get();
 }
 
 //== 전달된 명령어 처리 함수 ===========================================================================
 
 // 1. UI에서 전달되는 요청사항을 처리하는 최초 함수
-void KERNEL::Operator::VisualEffectsPrivate::Request(Json::Object & cInObject)
+void KERNEL::Operator::VisualEffectsImpl::Request(Json::Object & cInObject)
 {
 	Json::Object cCopy(*m_cOption.Get());
 
 	CString strText;
 	cCopy.Stringify(strText);
 
-	int nViewId = cInObject.GetInteger(SKW_VIEWID);
-	Delivery().taskBar.ResponseValue(nViewId, HOME_3D_LST_VisualEffects, *m_cOption.Get(), *m_pcDefaultSetting);
+	Delivery().ViewId = cInObject.GetInteger(SKW_VIEWID);
+	Delivery().taskBar.ResponseValue(HOME_3D_LST_VisualEffects, *m_cOption.Get(), *m_pcDefaultSetting);
 }
 
-void KERNEL::Operator::VisualEffectsPrivate::Change(Json::Object & cInObject)
+void KERNEL::Operator::VisualEffectsImpl::Change(Json::Object & cInObject)
 {
 	// cInObject에 Value값이 있는 경우 처리 (UI에서 변경된 값을 전달한 경우 처리)
 	// 변경값이 있는 경우에만, 변경값에 따라서 Visual Effect 변경을 처리한다.
@@ -109,7 +114,7 @@ void KERNEL::Operator::VisualEffectsPrivate::Change(Json::Object & cInObject)
 	View().Update();
 }
 
-bool KERNEL::Operator::VisualEffectsPrivate::SetSetting(Json::Object & cInObject)
+bool KERNEL::Operator::VisualEffectsImpl::SetSetting(Json::Object & cInObject)
 {
 	H3DF::Facility::KernelOption::VISUALEFFECTS cVisaulEffect;
 	cVisaulEffect.Set(&cInObject);
@@ -117,7 +122,7 @@ bool KERNEL::Operator::VisualEffectsPrivate::SetSetting(Json::Object & cInObject
 	return true;
 }
 
-void KERNEL::Operator::VisualEffectsPrivate::SetShadow(TheVisualEffects::SHADOW & cInOption)
+void KERNEL::Operator::VisualEffectsImpl::SetShadow(TheVisualEffects::SHADOW & cInOption)
 {
 	int nResolution = cInOption.GetResolution();
 	int nBlurring = cInOption.GetBlurring();
@@ -127,7 +132,7 @@ void KERNEL::Operator::VisualEffectsPrivate::SetShadow(TheVisualEffects::SHADOW 
 		.SetSimpleShadowColor(cInOption.GetColor());
 }
 
-void KERNEL::Operator::VisualEffectsPrivate::SetPlaneReflection(TheVisualEffects::PLANEREFLECTION & cInOption)
+void KERNEL::Operator::VisualEffectsImpl::SetPlaneReflection(TheVisualEffects::PLANEREFLECTION & cInOption)
 {
 	float fOpacity = cInOption.GetOpacity();
 	int nBlurring = cInOption.GetBlurring();
@@ -136,7 +141,7 @@ void KERNEL::Operator::VisualEffectsPrivate::SetPlaneReflection(TheVisualEffects
 	View().GetSegmentKey().GetVisualEffectsControl().SetSimpleReflection(cInOption.checked, fOpacity, nBlurring, bFading);
 }
 
-void KERNEL::Operator::VisualEffectsPrivate::SetAmbientOcclusion(TheVisualEffects::AMBIENTOCCLUSION & cInOption)
+void KERNEL::Operator::VisualEffectsImpl::SetAmbientOcclusion(TheVisualEffects::AMBIENTOCCLUSION & cInOption)
 {
 	float fStrength = cInOption.GetStrength();
 	bool bFast = cInOption.GetQuality();
@@ -144,7 +149,7 @@ void KERNEL::Operator::VisualEffectsPrivate::SetAmbientOcclusion(TheVisualEffect
 	View().GetSegmentKey().GetVisualEffectsControl().SetAmbientOcclusionEnabled(cInOption.checked, fStrength, bFast);
 }
 
-void KERNEL::Operator::VisualEffectsPrivate::SetSilhouetteEdges(TheVisualEffects::SILHOUETTEEDGES & cInOption)
+void KERNEL::Operator::VisualEffectsImpl::SetSilhouetteEdges(TheVisualEffects::SILHOUETTEEDGES & cInOption)
 {
 	float fTolerance = cInOption.GetTolerance();
 	bool bHeavyExterior = cInOption.HeavyExterior;
@@ -152,7 +157,7 @@ void KERNEL::Operator::VisualEffectsPrivate::SetSilhouetteEdges(TheVisualEffects
 	View().GetSegmentKey().GetVisualEffectsControl().SetSilhouetteEdgesEnabled(cInOption.checked, fTolerance, bHeavyExterior);
 }
 
-void KERNEL::Operator::VisualEffectsPrivate::SetBloom(TheVisualEffects::BLOOM & cInOption)
+void KERNEL::Operator::VisualEffectsImpl::SetBloom(TheVisualEffects::BLOOM & cInOption)
 {
 	float fStrength = cInOption.GetStrength();
 	int nBlurring = cInOption.GetBlurring();
@@ -165,7 +170,7 @@ void KERNEL::Operator::VisualEffectsPrivate::SetBloom(TheVisualEffects::BLOOM & 
 
 KERNEL::Operator::VisualEffects::VisualEffects(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
 {
-	VisualEffectsPrivate * pcImpl = new VisualEffectsPrivate(pcInView, pcInDelivery);
+	VisualEffectsImpl * pcImpl = new VisualEffectsImpl(pcInView, pcInDelivery);
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;
@@ -173,14 +178,14 @@ KERNEL::Operator::VisualEffects::VisualEffects(const H3DF::View * pcInView, cons
 
 void KERNEL::Operator::VisualEffects::Request(Json::Object & cInObject)
 {
-	VisualEffectsPrivate * pcImpl = (VisualEffectsPrivate *)m_pcImpl;
+	VisualEffectsImpl * pcImpl = (VisualEffectsImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 	pcImpl->Request(cInObject);
 }
 
 void KERNEL::Operator::VisualEffects::Change(Json::Object & cInObject)
 {
-	VisualEffectsPrivate * pcImpl = (VisualEffectsPrivate *)m_pcImpl;
+	VisualEffectsImpl * pcImpl = (VisualEffectsImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 	pcImpl->Change(cInObject);
 }

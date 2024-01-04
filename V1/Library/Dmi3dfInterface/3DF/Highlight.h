@@ -20,8 +20,8 @@ namespace H3DF
 	{
 	public:
 		explicit HighlightOptionsKit();
-		HighlightOptionsKit(char const * chInStyleName);
-		HighlightOptionsKit(char const * chInStyleName, char const * chInSecondaryStyleName);
+		HighlightOptionsKit(CStringA strInStyleName);
+		HighlightOptionsKit(CStringA strInStyleName, CStringA strInSecondaryStyleName);
 		HighlightOptionsKit(HighlightOptionsKit const & cInThat);
 
 		void Set(HighlightOptionsKit const & cInThat);
@@ -45,15 +45,15 @@ namespace H3DF
 
 		H3DF::Type ObjectType() const { return H3DF::Type::HighlightControl; };
 
-		//== Mouse Event 처리 =======================================================================
-		int NoButtonDownAndMove(int nFlags, int x, int y, SelectionResults & cOutSelections);
-
 		//== Highlight 관련 함수 =====================================================================
 		HighlightControl & Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting = true);
 		HighlightControl & Highlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting = true);
 
+		//== Unhighlight 관련 함수 ===================================================================
 		HighlightControl & Unhighlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions = HighlightOptionsKit());
 		HighlightControl & Unhighlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions = HighlightOptionsKit());
+
+		HighlightControl & UnhighlightEverything();
 
 		//== Material Mapping 관련 함수 ==================================================================
 		HighlightControl & SetMaterialMapping(MaterialMappingKit const & cInKit);

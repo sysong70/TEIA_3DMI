@@ -201,6 +201,14 @@ WindowKey & H3DF::View::GetWindowKey() const
 	return *pcImpl->m_pcWindow;
 }
 
+NavigationCube & H3DF::View::GetNavigationCube() const
+{
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetNavigationCube();
+}
+
 void H3DF::View::SetSuppressUpdate(bool bInState)
 {
 	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
@@ -233,83 +241,6 @@ void H3DF::View::CancelCommands() const
 }
 
 // == Action Function ==============================================================================
-
-// 2. Left Button 처리 함수
-bool H3DF::View::LButtonDown(int nFlags, int x, int y)
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) {
-		RETURN_FALSE;
-	}
-
-	return pcImpl->LButtonDown(nFlags, x, y);
-}
-
-bool H3DF::View::LButtonUp(int nFlags, int x, int y)
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) {
-		RETURN_FALSE;
-	}
-
-	return pcImpl->LButtonUp(nFlags, x, y);
-}
-
-// 3. Middle Button 처리 함수
-bool H3DF::View::MButtonDown(int nFlags, int x, int y)
-{
-	return true;
-	//return pcCanvas->MButtonDown(nFlags, x, y);
-}
-
-bool H3DF::View::MButtonUp(int nFlags, int x, int y)
-{
-	return true;
-	//return pcCanvas->MButtonUp(nFlags, x, y);
-}
-
-// 4. Right Button 처리 함수
-bool H3DF::View::RButtonUp(int nFlags, int x, int y)
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) {
-		RETURN_FALSE;
-	}
-
-	return pcImpl->RButtonUp(nFlags, x, y);
-}
-
-bool H3DF::View::RButtonDown(int nFlags, int x, int y)
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) {
-		RETURN_FALSE;
-	}
-
-	return pcImpl->RButtonDown(nFlags, x, y);
-}
-
-// 5. Mouse Move 처리 함수
-bool H3DF::View::MouseMove(int nFlags, int x, int y)
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) {
-		RETURN_FALSE;
-	}
-
-	return pcImpl->MouseMove(nFlags, x, y);
-}
-
-// 6. Mouse Wheel 처리 함수
-bool H3DF::View::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop)
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) {
-		RETURN_FALSE;
-	}
-
-	return pcImpl->MouseWheel(nFlags, zDelta, x, y, nLeft, nTop);
-}
 
 bool H3DF::View::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
@@ -350,88 +281,6 @@ void H3DF::View::SetSubentitySelectLevel()
 	pcImpl->SetSubentitySelectLevel();
 }
 
-//== View Control 관련 함수 ==================================================================
-View & H3DF::View::SetPanViewControl()
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	if (pcImpl->GetViewControlMode() != ViewControl::Mode::Pan) {
-		pcImpl->SetViewControlMode(ViewControl::Mode::Pan);
-		}
-	else {
-		pcImpl->SetViewControlMode(ViewControl::Mode::Multi);
-	}
-
-	return *this;
-}
-
-View & H3DF::View::SetOrbitViewControl()
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	if (pcImpl->GetViewControlMode() != ViewControl::Mode::Orbit) {
-		pcImpl->SetViewControlMode(ViewControl::Mode::Orbit);
-	}
-	else {
-		pcImpl->SetViewControlMode(ViewControl::Mode::Multi);
-	}
-
-	return *this;
-}
-
-View & H3DF::View::SetOrbitTurntableViewControl()
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	if (pcImpl->GetViewControlMode() != ViewControl::Mode::OrbitTurntable) {
-		pcImpl->SetViewControlMode(ViewControl::Mode::OrbitTurntable);
-	}
-	else {
-		pcImpl->SetViewControlMode(ViewControl::Mode::Multi);
-	}
-
-	return *this;
-}
-
-View & H3DF::View::SetZoomArea()
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	if (pcImpl->GetViewControlMode() != ViewControl::Mode::ZoomBox) {
-		pcImpl->SetViewControlMode(ViewControl::Mode::ZoomBox);
-	}
-	else {
-		pcImpl->SetViewControlMode(ViewControl::Mode::Multi);
-	}
-	
-	return *this;
-}
-
-View & H3DF::View::FitWorld()
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	pcImpl->GetBaseView()->ZoomToExtents();
-
-	Update();
-
-	pcImpl->SetViewControlMode(ViewControl::Mode::Multi);
-
-	return *this;
-}
-
-ViewControl::Mode H3DF::View::GetViewControlMode()
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	return pcImpl->GetViewControlMode();
-}
 
 //== View Style 관련 함수 ====================================================================
 void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)

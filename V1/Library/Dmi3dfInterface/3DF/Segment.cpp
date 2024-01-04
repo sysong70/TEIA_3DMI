@@ -90,32 +90,6 @@ SegmentKey & H3DF::SegmentKey::operator = (SegmentKey const & cInThat)
 
 //== Segment 관련 함수 ===============================================================================
 
-/*
-void H3DF::SegmentKey::Open()
-{
-	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
-	pcImpl->LocalOpen();
-}
-
-void H3DF::SegmentKey::Open() const
-{
-	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
-	pcImpl->LocalOpen();
-}
-
-void H3DF::SegmentKey::Close()
-{
-	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
-	pcImpl->LocalClose();
-}
-
-void H3DF::SegmentKey::Close() const
-{
-	SegmentKeyPrivate * pcImpl = (SegmentKeyPrivate *)m_pcImpl;
-	pcImpl->LocalClose();
-}
-*/
-
 SegmentKey & H3DF::SegmentKey::Open()
 {
 	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;

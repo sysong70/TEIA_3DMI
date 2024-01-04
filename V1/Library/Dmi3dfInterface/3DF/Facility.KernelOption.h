@@ -402,6 +402,8 @@ namespace H3DF
 				}
 				Bloom;
 
+				void SetChecked(bool bChecked);
+
 				Json::Object * Get();
 				bool Set(Json::Object * pData);
 			}

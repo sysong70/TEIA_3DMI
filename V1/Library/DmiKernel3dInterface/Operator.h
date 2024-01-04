@@ -13,6 +13,8 @@ namespace KERNEL
 		{
 			HighlightObjectSnap,
 			VisualEffects,
+			Visibility,
+			Camera,
 			Count
 		};
 

@@ -124,7 +124,7 @@ public:
 	SelectionResults m_cOldHighlightSelection;
 };
 
-NavigationCube::NavigationCube(H3DF::BaseView * view, WindowKey * pcInWindow)
+H3DF::NavigationCube::NavigationCube(H3DF::BaseView * view, WindowKey * pcInWindow)
 {
 	NavigationCubeImpl * pcImpl = new NavigationCubeImpl();
 	if (nullptr == pcImpl) { assert(false); }
@@ -135,7 +135,7 @@ NavigationCube::NavigationCube(H3DF::BaseView * view, WindowKey * pcInWindow)
 	pcImpl->m_pcWindow = pcInWindow;
 }
 
-NavigationCube::~NavigationCube()
+H3DF::NavigationCube::~NavigationCube()
 {
 }
 
@@ -156,7 +156,7 @@ NavigationCube const & H3DF::NavigationCube::operator = (NavigationCube const & 
 	return *this;
 }
 
-int NavigationCube::LButtonUp(HEventInfo & cInEvent)
+int H3DF::NavigationCube::LButtonUp(HEventInfo & cInEvent)
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {  assert(false); }
@@ -193,7 +193,7 @@ int NavigationCube::LButtonUp(HEventInfo & cInEvent)
 	return HLISTENER_PASS_EVENT;
 }
 
-int NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)
+int H3DF::NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
@@ -206,23 +206,7 @@ int NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)
 	return HLISTENER_PASS_EVENT;
 }
 
-int NavigationCube::NoButtonDownAndMove(HEventInfo & cInEvent)
-{
-	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
-
-	WindowPoint cPoint(cInEvent.GetMouseWindowPos().x, cInEvent.GetMouseWindowPos().y, cInEvent.GetMouseWindowPos().z);
-	
-	SelectionOptionsKit cSelectOption;
-	cSelectOption.SetLevel(Selection::Level::Segment).SetRelatedLimit(0);//.SetProximity(0.001);// SetSorting(Selection::Sorting::ZSorting);
-
-	SelectionResults cSelection;
-	pcImpl->m_pcWindow->GetHighlightControl().NoButtonDownAndMove(cInEvent.GetFlags(), cInEvent.GetMousePixelPos().x, cInEvent.GetMousePixelPos().y, cSelection);
-
-	return HLISTENER_PASS_EVENT;
-}
-
-void NavigationCube::SetView(H3DF::BaseView * view, WindowKey * pcInWindow) 
+void H3DF::NavigationCube::SetView(H3DF::BaseView * view, WindowKey * pcInWindow) 
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
@@ -231,7 +215,7 @@ void NavigationCube::SetView(H3DF::BaseView * view, WindowKey * pcInWindow)
 	pcImpl->m_pcWindow = pcInWindow;
 }
 
-bool NavigationCube::IsValid()
+bool H3DF::NavigationCube::IsValid()
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
@@ -239,7 +223,7 @@ bool NavigationCube::IsValid()
 	return pcImpl->m_cubeSegment != HC_ERROR_KEY;
 }
 
-bool NavigationCube::IsInitialized()
+bool H3DF::NavigationCube::IsInitialized()
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
@@ -247,7 +231,7 @@ bool NavigationCube::IsInitialized()
 	return pcImpl->m_bInitialized;
 }
 
-void NavigationCube::Create(float width, float height, HC_KEY parent)
+void H3DF::NavigationCube::Create(float width, float height, HC_KEY parent)
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
@@ -320,7 +304,7 @@ void NavigationCube::Create(float width, float height, HC_KEY parent)
 }
 
 
-void NavigationCube::Recreate()
+void H3DF::NavigationCube::Recreate()
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
@@ -334,7 +318,7 @@ void NavigationCube::Recreate()
 
 
 
-HC_KEY NavigationCube::HitTest(float x, float y, float z)
+HC_KEY H3DF::NavigationCube::HitTest(float x, float y, float z)
 {
 	ASSERT(FALSE);
 	return HC_ERROR_KEY;
@@ -342,7 +326,7 @@ HC_KEY NavigationCube::HitTest(float x, float y, float z)
 
 
 
-void NavigationCube::Transform()
+void H3DF::NavigationCube::Transform()
 {
 
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
@@ -384,14 +368,14 @@ void NavigationCube::Transform()
 
 
 
-void NavigationCube::OnSize(float width, float height)
+void H3DF::NavigationCube::OnSize(float width, float height)
 {
 	SetWindowSize(width, height);
 }
 
 
 
-void NavigationCube::OpenCubeSegment()
+void H3DF::NavigationCube::OpenCubeSegment()
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
@@ -406,13 +390,13 @@ void NavigationCube::OpenCubeSegment()
 
 
 
-void NavigationCube::CloseCubeSegment()
+void H3DF::NavigationCube::CloseCubeSegment()
 {
 	HC_Close_Segment();
 }
 
 
-void NavigationCube::CreateAxis()
+void H3DF::NavigationCube::CreateAxis()
 {
 	double plane = PRESET::PlaneUnit();
 	double axis = PRESET::AxisUnit() - 0.05;
@@ -429,7 +413,7 @@ void NavigationCube::CreateAxis()
 
 
 
-void NavigationCube::CreateCube()
+void H3DF::NavigationCube::CreateCube()
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
@@ -479,7 +463,7 @@ void NavigationCube::CreateCube()
 
 
 
-void NavigationCube::CreateCubeWire()
+void H3DF::NavigationCube::CreateCubeWire()
 {
 #define CreateCylinder(p1, p2) \
 	key = key = HC_Insert_Cylinder(&points[p1], &points[p2], 0.005, "none"); \
@@ -528,7 +512,7 @@ void NavigationCube::CreateCubeWire()
 //#define PLANE_EDGE
 //#define ROUND_EDGE
 
-HC_KEY NavigationCube::CreatePlaneShell(const char* name, const char* text, Triple pos, Triple angle)
+HC_KEY H3DF::NavigationCube::CreatePlaneShell(const char* name, const char* text, Triple pos, Triple angle)
 {
 	double unit = PRESET::PlaneUnit() - PRESET::CornerUnit();
 
@@ -565,7 +549,7 @@ HC_KEY NavigationCube::CreatePlaneShell(const char* name, const char* text, Trip
 
 
 
-HC_KEY NavigationCube::CreateEdgeShell(const char* name, Triple pos, Triple angle)
+HC_KEY H3DF::NavigationCube::CreateEdgeShell(const char* name, Triple pos, Triple angle)
 {
 	double width = PRESET::EdgeUnit();
 	double height = PRESET::CornerUnit();
@@ -613,7 +597,7 @@ HC_KEY NavigationCube::CreateEdgeShell(const char* name, Triple pos, Triple angl
 
 
 
-HC_KEY NavigationCube::CreateCornerShell(const char* name, Triple pos, Triple angle)
+HC_KEY H3DF::NavigationCube::CreateCornerShell(const char* name, Triple pos, Triple angle)
 {
 	double unit = PRESET::CornerUnit();
 
@@ -663,7 +647,7 @@ HC_KEY NavigationCube::CreateCornerShell(const char* name, Triple pos, Triple an
 
 
 
-HC_KEY NavigationCube::CreateAxis(const char* name, const char* text, HPoint axisEnd, HPoint textCenter, COLORREF rgb)
+HC_KEY H3DF::NavigationCube::CreateAxis(const char* name, const char* text, HPoint axisEnd, HPoint textCenter, COLORREF rgb)
 {
 	double unit = PRESET::PlaneUnit();
 	HPoint axisStart(-unit, -unit, -unit);
@@ -685,7 +669,7 @@ HC_KEY NavigationCube::CreateAxis(const char* name, const char* text, HPoint axi
 	return segKey;
 }
 
-void NavigationCube::SetWindowSize(double width, double height, bool openSegment)
+void H3DF::NavigationCube::SetWindowSize(double width, double height, bool openSegment)
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }

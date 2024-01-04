@@ -21,7 +21,7 @@ namespace H3DF
 {
 	namespace Operator
 	{
-		class CameraSelect;
+		class CameraControl;
 		class CameraPan;
 		class SelectArea;
 		class KinematicTest;

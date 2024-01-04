@@ -919,6 +919,15 @@ int Facility::KernelOption::VISUALEFFECTS::BLOOM::GetBlurring()
 	return nValue;
 }
 
+void Facility::KernelOption::VISUALEFFECTS::SetChecked(bool bChecked)
+{
+	Shadow.checked = bChecked;
+	PlaneReflection.checked = bChecked;
+	AmbientOcclusion.checked = bChecked;
+	SilhouetteEdges.checked = bChecked;
+	Bloom.checked = bChecked;
+}
+
 #pragma endregion //:REGION (VisualEffects)
 
 

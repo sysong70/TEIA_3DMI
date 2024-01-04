@@ -153,6 +153,17 @@ void SESSION::Session::ViewExecuteCommand(Json::Object & cInObject)
 			break;
 	}
 
+	switch (nId)
+	{
+		case HOME_3D_CMD_Visualize_ShowAll:
+		case HOME_3D_CMD_Visualize_Hide:
+		case HOME_3D_CMD_Visualize_ShowOnly:
+		case HOME_3D_CMD_Visualize_Toggle:
+			m_pcDocView->SetVisibility(nId);
+			return;
+			break;
+	}
+
 	assert(false);
 }
 

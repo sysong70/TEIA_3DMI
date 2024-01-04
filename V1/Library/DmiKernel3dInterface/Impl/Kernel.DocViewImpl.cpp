@@ -2,7 +2,9 @@
 
 #include "Kernel.DocViewImpl.h"
 
+#include "../Operator.Camera.h"
 #include "../Operator.VisualEffects.h"
+#include "../Operator.Visibility.h"
 
 #include "../Signal.Connector.h"
 #include "../../Signal/Signal.h"
@@ -71,6 +73,12 @@ void KERNEL::DocViewImpl::AllocationOperator(H3DF::View * pcInView, Signal::Deli
 
 	// VisualEffects Operator 생성 및 설정
 	m_apcOperator[(int)KERNEL::Operator::Type::VisualEffects] = new KERNEL::Operator::VisualEffects(pcInView, &cDelivery);
+
+	// Visibility Operator 생성 및 설정
+	m_apcOperator[(int)KERNEL::Operator::Type::Visibility] = new KERNEL::Operator::Visibility(pcInView, &cDelivery);
+
+	// Camera Operator 생성 및 설정
+	m_apcOperator[(int)KERNEL::Operator::Type::Camera] = new KERNEL::Operator::Camera(pcInView, &cDelivery);
 }
 
 KERNEL::Operator::OperatorBase * KERNEL::DocViewImpl::GetOperator(Operator::Type eInType)
@@ -81,6 +89,11 @@ KERNEL::Operator::OperatorBase * KERNEL::DocViewImpl::GetOperator(Operator::Type
 KERNEL::Operator::HighlightObjectSnap & KERNEL::DocViewImpl::HighlightOSnapOperator()
 { 
 	return *(Operator::HighlightObjectSnap *)m_apcOperator[(int)Operator::Type::HighlightObjectSnap]; 
+}
+
+KERNEL::Operator::Camera & KERNEL::DocViewImpl::Camera()
+{
+	return *(Operator::Camera *)m_apcOperator[(int)Operator::Type::Camera];
 }
 
 //== Object Snap 관련 함수 ===========================================================================
@@ -124,6 +137,38 @@ void KERNEL::DocViewImpl::SetSelectionFilter(SelectionFilter::Type eInType)
 
 	m_cCanvas.GetFrontView().GetWindowKey().SetSelectionOptions(cSelectionOptionsKit);
 */
+}
+
+//== Visibility 관련 함수 ============================================================================
+
+// 1. 전달받은 Visibility 명령어를 분기 처리하는 함수.
+void KERNEL::DocViewImpl::SetVisibility(int nId)
+{
+	Operator::Visibility * pcOperator = (Operator::Visibility *)m_apcOperator[(int)KERNEL::Operator::Type::Visibility];
+	DEBUG_VALID(pcOperator);
+
+	switch (nId)
+	{
+		case HOME_3D_CMD_Visualize_ShowAll:
+			pcOperator->ShowAll();
+			break;
+
+		case HOME_3D_CMD_Visualize_Hide:
+			pcOperator->Hide();
+			break;
+
+		case HOME_3D_CMD_Visualize_ShowOnly:
+			pcOperator->ShowOnly();
+			break;
+
+		case HOME_3D_CMD_Visualize_Toggle:
+			pcOperator->Toggle();
+			break;
+
+		default:
+			assert(false);
+			break;
+	}
 }
 
 //== Command 관련 함수 ===============================================================================

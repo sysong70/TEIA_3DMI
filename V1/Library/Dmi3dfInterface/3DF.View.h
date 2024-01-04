@@ -11,6 +11,7 @@
 
 #include "3DF/Window.h"
 
+
 #include "3DF.Signal.h"
 #include "../Signal/Signal.h"
 
@@ -18,6 +19,7 @@ namespace H3DF
 {
 	class BaseView;
 	class Canvas;
+	class NavigationCube;
 
 	class API_3DF View : public Sprocket
 	{
@@ -48,28 +50,13 @@ namespace H3DF
 
 		WindowKey & GetWindowKey() const;
 
+		NavigationCube & GetNavigationCube() const;
+
 		void SetSuppressUpdate(bool bInState);
 
 		//== Command 관련 함수 =======================================================================
 		void CancelCommands();
 		void CancelCommands() const;
-
-		//== Mouse 관련 함수 =========================================================================
-		//bool ExecuteMouseSignal(int nAction, Json::Object & cInObject);
-
-		bool LButtonUp(int nFlags, int x, int y);
-		bool LButtonDown(int nFlags, int x, int y);
-
-		bool MButtonUp(int nFlags, int x, int y);
-		bool MButtonDown(int nFlags, int x, int y);
-
-		bool RButtonUp(int nFlags, int x, int y);
-		bool RButtonDown(int nFlags, int x, int y);
-
-		bool MouseMove(int nFlags, int x, int y);
-		// bool LButtonDownAndMove(int nFlags, int x, int y);
-
-		bool MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop);
 
 		//== Keyboard 관련 함수 ======================================================================
 		bool Char(UINT nChar, UINT nRepCnt, UINT nFlags);
@@ -81,15 +68,6 @@ namespace H3DF
 
 		//== Select 관련 함수 ========================================================================
 		void SetSubentitySelectLevel();
-
-		//== View Control 관련 함수 ==================================================================
-		View & SetPanViewControl();
-		View & SetOrbitViewControl();
-		View & SetOrbitTurntableViewControl();
-		View & SetZoomArea();
-		View & FitWorld();
-
-		ViewControl::Mode GetViewControlMode();
 	
 		//== View Style 관련 함수 ====================================================================
 		void SetRenderingMode(Rendering::Mode eInMode);

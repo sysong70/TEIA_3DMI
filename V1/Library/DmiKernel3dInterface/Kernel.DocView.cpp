@@ -43,8 +43,6 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cD
 
 	pcImpl->AllocationOperator(&pcImpl->m_cCanvas.GetFrontView(), cDelivery);
 
-	//pcImpl->m_pcHighlightOSnapOperator = new KERNEL::Operator::HighlightObjectSnap(&pcImpl->m_cCanvas.GetFrontView().GetWindowKey());
-
 	pcImpl->m_cCanvas.FileOpen(cInObject, cDelivery);
 }
 
@@ -164,10 +162,11 @@ void KERNEL::DocView::MouseSignal(Json::Object & cInObject)
 
 void KERNEL::DocView::MouseMove(int nFlag, int x, int y)
 {
-	DocViewImpl * pcImpl = static_cast<DocViewImpl *>(m_pcImpl);
+	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
-	pcImpl->m_cCanvas.GetFrontView().MouseMove(nFlag, x, y);
+	// 카메라 Control 처리
+	pcImpl->Camera().MouseMove(nFlag, x, y);
 
 	if (!(MK_LBUTTON & nFlag) && !(MK_RBUTTON & nFlag)) {
 		pcImpl->HighlightOSnapOperator().NoButtonDownAndMove(nFlag, x, y);
@@ -186,26 +185,26 @@ void KERNEL::DocView::MouseMove(int nFlag, int x, int y)
 
 void KERNEL::DocView::LButtonDown(int nFlag, int x, int y)
 {
-	DocViewImpl * pcImpl = static_cast<DocViewImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { DEBUG_RETURN; }
+	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 
-	pcImpl->m_cCanvas.GetFrontView().LButtonDown(nFlag, x, y);
+	pcImpl->Camera().LButtonDown(nFlag, x, y);
 }
 
 void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 {
-	DocViewImpl * pcImpl = static_cast<DocViewImpl *>(m_pcImpl);
+	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
-	H3DF::ViewControl::Mode eMode = pcImpl->m_cCanvas.GetFrontView().GetViewControlMode();
+	H3DF::Camera::Mode eMode = pcImpl->Camera().CameraMode();
 
-	if (H3DF::ViewControl::Mode::ZoomBox == eMode) {
+	if (H3DF::Camera::Mode::ZoomBox == eMode) {
 		pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(true);
 	}
 
-	pcImpl->m_cCanvas.GetFrontView().LButtonUp(nFlag, x, y);
+	pcImpl->Camera().LButtonUp(nFlag, x, y);
 
-	if (H3DF::ViewControl::Mode::ZoomBox == eMode) {
+	if (H3DF::Camera::Mode::ZoomBox == eMode) {
 		pcImpl->HighlightOSnapOperator().DrawSnapItems();
 		pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(false);
 		pcImpl->m_cCanvas.GetFrontView().Update();
@@ -214,23 +213,23 @@ void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 
 void KERNEL::DocView::RButtonDown(int nFlag, int x, int y)
 {
-	DocViewImpl * pcImpl = static_cast<DocViewImpl *>(m_pcImpl);
+	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
-	pcImpl->m_cCanvas.GetFrontView().RButtonDown(nFlag, x, y);
+	pcImpl->Camera().RButtonDown(nFlag, x, y);
 }
 
 void KERNEL::DocView::RButtonUp(int nFlag, int x, int y)
 {
-	DocViewImpl * pcImpl = static_cast<DocViewImpl *>(m_pcImpl);
+	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
-	pcImpl->m_cCanvas.GetFrontView().RButtonUp(nFlag, x, y);
+	pcImpl->Camera().RButtonUp(nFlag, x, y);
 }
 
 void KERNEL::DocView::MouseWheel(int nFlag, int x, int y, Json::Object & cInObject)
 {
-	DocViewImpl * pcImpl = static_cast<DocViewImpl *>(m_pcImpl);
+	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	int zDelta = cInObject.GetInteger(SKW_DELTA, -120);
@@ -240,7 +239,7 @@ void KERNEL::DocView::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 
 	pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(true);
 
-	pcImpl->m_cCanvas.GetFrontView().MouseWheel(nFlag, zDelta, x, y, nLeft, nTop);
+	pcImpl->Camera().MouseWheel(nFlag, zDelta, x, y, nLeft, nTop);
 
 	pcImpl->HighlightOSnapOperator().DrawSnapItems();
 
@@ -268,33 +267,33 @@ void KERNEL::DocView::SetViewControl(int nId)
 	switch (nId)
 	{
 		case HOME_3D_CMD_Pan:
-			pcImpl->m_cCanvas.GetFrontView().SetPanViewControl();
+			pcImpl->Camera().SetPanViewControl();
 			break;
 
 		case HOME_3D_CMD_Zoom_Fit:
-			pcImpl->m_cCanvas.GetFrontView().FitWorld();
+			pcImpl->Camera().FitWorld();
 			break;
 
 		case HOME_3D_CMD_Zoom_Area:
-			pcImpl->m_cCanvas.GetFrontView().SetZoomArea();
+			pcImpl->Camera().SetZoomArea();
 			break;
 
 		case HOME_3D_CMD_Zoom_Object:
 			break;
 
 		case HOME_3D_CMD_Rotate_Rotate:
-			pcImpl->m_cCanvas.GetFrontView().SetOrbitViewControl();
+			pcImpl->Camera().SetOrbitViewControl();
 			break;
 
 		case HOME_3D_CMD_Rotate_RotateCenter:
 			break;
 
 		case HOME_3D_CMD_Rotate_Turntable:
-			pcImpl->m_cCanvas.GetFrontView().SetOrbitTurntableViewControl();
+			pcImpl->Camera().SetOrbitTurntableViewControl();
 			break;
 
 		case HOME_3D_CMD_Rotate_Orbit:
-			pcImpl->m_cCanvas.GetFrontView().SetOrbitViewControl();
+			pcImpl->Camera().SetOrbitViewControl();
 			break;
 	}
 }
@@ -427,6 +426,16 @@ void KERNEL::DocView::SetViewStyle(int nStyleId)
 			break;
 	}
 }
+
+//== Visibility 관련 함수 ============================================================================
+void KERNEL::DocView::SetVisibility(int nId)
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	if (nullptr == pcImpl) { DEBUG_RETURN; }
+
+	pcImpl->SetVisibility(nId);
+}
+
 
 void KERNEL::DocView::SetViewDirection(int nDirectionId)
 {

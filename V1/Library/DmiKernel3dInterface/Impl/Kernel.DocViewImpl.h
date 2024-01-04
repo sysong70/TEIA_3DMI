@@ -7,6 +7,7 @@
 
 #include "../Operator.h"
 #include "../Operator.HighlightObjectSnap.h"
+#include "../Operator.Camera.h"
 
 #include <3DF.Factory.h>
 #include <3DF.Canvas.h>
@@ -44,6 +45,7 @@ namespace KERNEL
 		void AllocationOperator(H3DF::View * pcInView, Signal::Delivery & cDelivery);
 		Operator::OperatorBase * GetOperator(Operator::Type eInType);
 		Operator::HighlightObjectSnap & HighlightOSnapOperator();
+		Operator::Camera & Camera();
 
 	private:
 		Operator::OperatorBase * m_apcOperator[(int)Operator::Type::Count];
@@ -59,6 +61,9 @@ namespace KERNEL
 	public:
 		DWORD m_nSelFilter = 0;
 		void SetSelectionFilter(SelectionFilter::Type eInType);
+
+		//== Visibility 관련 함수 ====================================================================
+		void SetVisibility(int nId);
 
 		//== Command 관련 함수 =======================================================================
 		void CommandRequest(Json::Object & cInObject);

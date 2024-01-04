@@ -22,26 +22,26 @@
 
 OPEN_3DF_NAMESPACE
 
-template <typename T>	TDF_INLINE	T		Abs(T const & a) { return  a < 0 ? -a : a; }
-template <typename T>	TDF_INLINE	int		Compare(T const & a, T const & b) { return a == b ? 0 : a < b ? -1 : 1; }
-template <typename T>	TDF_INLINE	int		Sign(T const & a) { return Compare(a, (T) 0); }
-template <typename T>	TDF_INLINE	void	Swap(T & a, T & b) { T temp = a; a = b; b = temp; }
-template <typename T>	TDF_INLINE	int		Floor(T const & a) { return ((a > 0 || (T) (int) a == a) ? (int) a : ((int) a - 1)); }
-template <typename T>	TDF_INLINE	int		Ceiling(T const & a) { return ((a < 0 || (T) (int) a == a) ? (int) a : ((int) a + 1)); }
+template <typename T>	H3DF_INLINE	T		Abs(T const & a) { return  a < 0 ? -a : a; }
+template <typename T>	H3DF_INLINE	int		Compare(T const & a, T const & b) { return a == b ? 0 : a < b ? -1 : 1; }
+template <typename T>	H3DF_INLINE	int		Sign(T const & a) { return Compare(a, (T) 0); }
+template <typename T>	H3DF_INLINE	void	Swap(T & a, T & b) { T temp = a; a = b; b = temp; }
+template <typename T>	H3DF_INLINE	int		Floor(T const & a) { return ((a > 0 || (T) (int) a == a) ? (int) a : ((int) a - 1)); }
+template <typename T>	H3DF_INLINE	int		Ceiling(T const & a) { return ((a < 0 || (T) (int) a == a) ? (int) a : ((int) a + 1)); }
 
-template <typename T>	TDF_INLINE	T const & Min(T const & a, T const & b) { return  a < b ? a : b; }
-template <typename T>	TDF_INLINE	T const & Min(T const & a, T const & b, T const & c) { return  Min(Min(a, b), c); }
-template <typename T>	TDF_INLINE	T const & Min(T const & a, T const & b, T const & c, T const & d) { return Min(Min(a, b, c), d); }
-template <typename T>	TDF_INLINE	T const & Min(T const & a, T const & b, T const & c, T const & d, T const & e) { return Min(Min(a, b, c, d), e); }
-template <typename T>	TDF_INLINE	T const & Min(T const & a, T const & b, T const & c, T const & d, T const & e, T const & f) { return Min(Min(a, b, c, d, e), f); }
+template <typename T>	H3DF_INLINE	T const & Min(T const & a, T const & b) { return  a < b ? a : b; }
+template <typename T>	H3DF_INLINE	T const & Min(T const & a, T const & b, T const & c) { return  Min(Min(a, b), c); }
+template <typename T>	H3DF_INLINE	T const & Min(T const & a, T const & b, T const & c, T const & d) { return Min(Min(a, b, c), d); }
+template <typename T>	H3DF_INLINE	T const & Min(T const & a, T const & b, T const & c, T const & d, T const & e) { return Min(Min(a, b, c, d), e); }
+template <typename T>	H3DF_INLINE	T const & Min(T const & a, T const & b, T const & c, T const & d, T const & e, T const & f) { return Min(Min(a, b, c, d, e), f); }
 
-template <typename T>	TDF_INLINE	T const & Max(T const & a, T const & b) { return  a > b ? a : b; }
-template <typename T>	TDF_INLINE	T const & Max(T const & a, T const & b, T const & c) { return  Max(Max(a, b), c); }
-template <typename T>	TDF_INLINE	T const & Max(T const & a, T const & b, T const & c, T const & d) { return Max(Max(a, b, c), d); }
-template <typename T>	TDF_INLINE	T const & Max(T const & a, T const & b, T const & c, T const & d, T const & e) { return Max(Max(a, b, c, d), e); }
-template <typename T>	TDF_INLINE	T const & Max(T const & a, T const & b, T const & c, T const & d, T const & e, T const & f) { return Max(Max(a, b, c, d, e), f); }
+template <typename T>	H3DF_INLINE	T const & Max(T const & a, T const & b) { return  a > b ? a : b; }
+template <typename T>	H3DF_INLINE	T const & Max(T const & a, T const & b, T const & c) { return  Max(Max(a, b), c); }
+template <typename T>	H3DF_INLINE	T const & Max(T const & a, T const & b, T const & c, T const & d) { return Max(Max(a, b, c), d); }
+template <typename T>	H3DF_INLINE	T const & Max(T const & a, T const & b, T const & c, T const & d, T const & e) { return Max(Max(a, b, c, d), e); }
+template <typename T>	H3DF_INLINE	T const & Max(T const & a, T const & b, T const & c, T const & d, T const & e, T const & f) { return Max(Max(a, b, c, d, e), f); }
 
-template <typename T>	TDF_INLINE	T const & Clamp(T const & x, T const & min, T const & max) { return x < min ? min : x > max ? max : x; }
+template <typename T>	H3DF_INLINE	T const & Clamp(T const & x, T const & min, T const & max) { return x < min ? min : x > max ? max : x; }
 
 //== Float Template Specializations ================================================================
 
@@ -73,32 +73,32 @@ private:
 	};
 
 	// & functions for a float represented in an int, * version for a double in an array of 2 ints
-	static TDF_INLINE bool is_infinite(int32_t const & v) { return (v & 0x7FFFFFFF) == 0x7F800000; }
-	static TDF_INLINE bool is_infinite(uint32_t const & v) { return (v & 0x7FFFFFFF) == 0x7F800000; }
-	static TDF_INLINE bool is_infinite(int32_t const * v) { return (v[High] & 0x7FFFFFFF) == 0x7FF00000 && v[Low] == 0; }
-	static TDF_INLINE bool is_infinite(uint32_t const * v) { return (v[High] & 0x7FFFFFFF) == 0x7FF00000 && v[Low] == 0; }
+	static H3DF_INLINE bool is_infinite(int32_t const & v) { return (v & 0x7FFFFFFF) == 0x7F800000; }
+	static H3DF_INLINE bool is_infinite(uint32_t const & v) { return (v & 0x7FFFFFFF) == 0x7F800000; }
+	static H3DF_INLINE bool is_infinite(int32_t const * v) { return (v[High] & 0x7FFFFFFF) == 0x7FF00000 && v[Low] == 0; }
+	static H3DF_INLINE bool is_infinite(uint32_t const * v) { return (v[High] & 0x7FFFFFFF) == 0x7FF00000 && v[Low] == 0; }
 
-	static TDF_INLINE bool is_nan(int32_t const & v) {
+	static H3DF_INLINE bool is_nan(int32_t const & v) {
 		uint32_t exp = v & 0x7F800000, mantissa = v & 0x007FFFFF;
 		return exp == 0x7F800000 && mantissa != 0;
 	}
-	static TDF_INLINE bool is_nan(uint32_t const & v) {
+	static H3DF_INLINE bool is_nan(uint32_t const & v) {
 		uint32_t exp = v & 0x7F800000, mantissa = v & 0x007FFFFF;
 		return exp == 0x7F800000 && mantissa != 0;
 	}
-	static TDF_INLINE bool is_nan(int32_t const * v) {
+	static H3DF_INLINE bool is_nan(int32_t const * v) {
 		uint32_t exp = v[High] & 0x7FF00000, mantissa_high = v[High] & 0x000FFFFF;
 		return exp == 0x7FF00000 && (mantissa_high | v[Low]) != 0;
 	}
-	static TDF_INLINE bool is_nan(uint32_t const * v) {
+	static H3DF_INLINE bool is_nan(uint32_t const * v) {
 		uint32_t exp = v[High] & 0x7FF00000, mantissa_high = v[High] & 0x000FFFFF;
 		return exp == 0x7FF00000 && (mantissa_high | v[Low]) != 0;
 	}
 
-	static TDF_INLINE bool is_special(int32_t const & v) { return (v & 0x7F800000) == 0x7F800000; }
-	static TDF_INLINE bool is_special(uint32_t const & v) { return (v & 0x7F800000) == 0x7F800000; }
-	static TDF_INLINE bool is_special(int32_t const * v) { return (v[High] & 0x7FF00000) == 0x7FF00000; }
-	static TDF_INLINE bool is_special(uint32_t const * v) { return (v[High] & 0x7FF00000) == 0x7FF00000; }
+	static H3DF_INLINE bool is_special(int32_t const & v) { return (v & 0x7F800000) == 0x7F800000; }
+	static H3DF_INLINE bool is_special(uint32_t const & v) { return (v & 0x7F800000) == 0x7F800000; }
+	static H3DF_INLINE bool is_special(int32_t const * v) { return (v[High] & 0x7FF00000) == 0x7FF00000; }
+	static H3DF_INLINE bool is_special(uint32_t const * v) { return (v[High] & 0x7FF00000) == 0x7FF00000; }
 public:
 
 	/*! The 32-bit float representation of infinity. */
@@ -107,24 +107,24 @@ public:
 	static const float NegativeInfinity;
 
 	/*! See if the value is either infinity */
-	static TDF_INLINE bool IsInfinite(float const & a) { return is_infinite(extract_uint32_t(a)); }
-	static TDF_INLINE bool IsInfinite(double const & a) {
+	static H3DF_INLINE bool IsInfinite(float const & a) { return is_infinite(extract_uint32_t(a)); }
+	static H3DF_INLINE bool IsInfinite(double const & a) {
 		uint32_t v[2];
 		memcpy(v, &a, sizeof(double));
 		return is_infinite(v);
 	}
 
 	/*! See if the value is Not-A-Number */
-	static TDF_INLINE bool IsNAN(float const & a) { return is_nan(extract_uint32_t(a)); }
-	static TDF_INLINE bool IsNAN(double const & a) {
+	static H3DF_INLINE bool IsNAN(float const & a) { return is_nan(extract_uint32_t(a)); }
+	static H3DF_INLINE bool IsNAN(double const & a) {
 		uint32_t v[2];
 		memcpy(v, &a, sizeof(double));
 		return is_nan(v);
 	}
 
 	/*! See if the value is not "normal" (infinite or NaN) */
-	static TDF_INLINE bool IsAbnormal(float const & a) { return is_special(extract_uint32_t(a)); }
-	static TDF_INLINE bool IsAbnormal(double const & a) {
+	static H3DF_INLINE bool IsAbnormal(float const & a) { return is_special(extract_uint32_t(a)); }
+	static H3DF_INLINE bool IsAbnormal(double const & a) {
 		uint32_t v[2];
 		memcpy(v, &a, sizeof(double));
 		return is_special(v);
@@ -132,11 +132,11 @@ public:
 
 	// Checks two floats for equality within a specified tolerance.
 	// The tolerance is specified in float increments that scale with the floats themselves.
-	static TDF_INLINE bool Equals(float const & a, float const & b, int tolerance = 32);
-	static TDF_INLINE bool Equals(double const & a, double const & b, int tolerance = 32);
+	static H3DF_INLINE bool Equals(float const & a, float const & b, int tolerance = 32);
+	static H3DF_INLINE bool Equals(double const & a, double const & b, int tolerance = 32);
 
 	template <typename Alloc>
-	static TDF_INLINE bool Equals(std::vector<float, Alloc> const & a, std::vector<float, Alloc> const & b, int tolerance = 32)
+	static H3DF_INLINE bool Equals(std::vector<float, Alloc> const & a, std::vector<float, Alloc> const & b, int tolerance = 32)
 	{
 		if(a.size() != b.size())
 			return false;
@@ -152,22 +152,22 @@ public:
 		return true;
 	}
 
-	static TDF_INLINE uint32_t extract_sign_bit(float const & a) {
+	static H3DF_INLINE uint32_t extract_sign_bit(float const & a) {
 		return extract_uint32_t(a) & 0x80000000;
 	}
-	static TDF_INLINE uint32_t extract_sign_bit(double const & a) {
+	static H3DF_INLINE uint32_t extract_sign_bit(double const & a) {
 		uint32_t v[2];
 		memcpy(v, &a, sizeof(double));
 		return v[High] & 0x80000000;
 	}
 
-	static TDF_INLINE void apply_sign_bit(float & a, uint32_t const & sign_bit) {
+	static H3DF_INLINE void apply_sign_bit(float & a, uint32_t const & sign_bit) {
 		uint32_t v = extract_uint32_t(a);
 		v &= 0x7FFFFFFF;
 		v |= sign_bit;
 		inject_uint32_t(a, v);
 	}
-	static TDF_INLINE void apply_sign_bit(double & a, uint32_t const & sign_bit) {
+	static H3DF_INLINE void apply_sign_bit(double & a, uint32_t const & sign_bit) {
 		uint32_t v[2];
 		memcpy(v, &a, sizeof(double));
 		v[High] &= 0x7FFFFFFF;
@@ -176,7 +176,7 @@ public:
 	}
 
 
-	static TDF_INLINE unsigned char unit_to_byte(float const & a) {
+	static H3DF_INLINE unsigned char unit_to_byte(float const & a) {
 		uint32_t v = extract_uint32_t(a);
 
 		v &= 0x7FFFFFFF;
@@ -191,7 +191,7 @@ public:
 		return (unsigned char) (man >> (16 + 126 - exp));
 	}
 
-	static TDF_INLINE unsigned char unit_to_byte_scaled(float const & a, unsigned char mix) {
+	static H3DF_INLINE unsigned char unit_to_byte_scaled(float const & a, unsigned char mix) {
 		uint32_t v = extract_uint32_t(a);
 
 		v &= 0x7FFFFFFF;
@@ -209,7 +209,7 @@ public:
 	}
 
 
-	static TDF_INLINE bool match(float const & a, float const & b) {
+	static H3DF_INLINE bool match(float const & a, float const & b) {
 		uint32_t va = extract_uint32_t(a);
 		uint32_t vb = extract_uint32_t(b);
 
@@ -218,64 +218,64 @@ public:
 
 		return va == vb;
 	}
-	static TDF_INLINE bool match(double const & a, double const & b) {
+	static H3DF_INLINE bool match(double const & a, double const & b) {
 		return a == b;
 	}
 
 
-	static TDF_INLINE void replace_if_smaller(float & a, float const & b) {
+	static H3DF_INLINE void replace_if_smaller(float & a, float const & b) {
 		if(b < a)
 			a = b;
 	}
-	static TDF_INLINE void replace_if_smaller(double & a, double const & b) {
+	static H3DF_INLINE void replace_if_smaller(double & a, double const & b) {
 		if(b < a)
 			a = b;
 	}
 
-	static TDF_INLINE void replace_if_larger(float & a, float const & b) {
+	static H3DF_INLINE void replace_if_larger(float & a, float const & b) {
 		if(b > a)
 			a = b;
 	}
-	static TDF_INLINE void replace_if_larger(double & a, double const & b) {
+	static H3DF_INLINE void replace_if_larger(double & a, double const & b) {
 		if(b > a)
 			a = b;
 	}
 
 
-	static TDF_INLINE uint32_t extract_uint32_t(float const & a) {
+	static H3DF_INLINE uint32_t extract_uint32_t(float const & a) {
 		uint32_t i;
 		memcpy(&i, &a, sizeof(float));
 		return i;
 	}
 
-	static TDF_INLINE void inject_uint32_t(float & a, uint32_t const & i) {
+	static H3DF_INLINE void inject_uint32_t(float & a, uint32_t const & i) {
 		memcpy(&a, &i, sizeof(float));
 	}
 
- 	static TDF_INLINE float C2F(unsigned char x) {
+ 	static H3DF_INLINE float C2F(unsigned char x) {
  		return (float)x * (1.0f/255.0f);
  	}
 
 	// SSE convenience functions
-	static TDF_INLINE void pack_4(float const & f, float * m) {
+	static H3DF_INLINE void pack_4(float const & f, float * m) {
 		memcpy(&m[0], &f, sizeof(float));
 		memcpy(&m[1], &f, sizeof(float));
 		memcpy(&m[2], &f, sizeof(float));
 		memcpy(&m[3], &f, sizeof(float));
 	}
 
-	static TDF_INLINE void pack_4(float const & f0, float const & f1, float const & f2, float const & f3, float * m) {
+	static H3DF_INLINE void pack_4(float const & f0, float const & f1, float const & f2, float const & f3, float * m) {
 		memcpy(&m[0], &f0, sizeof(float));
 		memcpy(&m[1], &f1, sizeof(float));
 		memcpy(&m[2], &f2, sizeof(float));
 		memcpy(&m[3], &f3, sizeof(float));
 	}
 
-	static TDF_INLINE void unpack_4(float * f0, float const * const m) {
+	static H3DF_INLINE void unpack_4(float * f0, float const * const m) {
 		memcpy(f0, m, sizeof(float) * 4);
 	}
 
-	static TDF_INLINE void unpack_4(float & f0, float & f1, float & f2, float & f3, float const * const m) {
+	static H3DF_INLINE void unpack_4(float & f0, float & f1, float & f2, float & f3, float const * const m) {
 		memcpy(&f0, &m[0], sizeof(float));
 		memcpy(&f1, &m[1], sizeof(float));
 		memcpy(&f2, &m[2], sizeof(float));
@@ -287,7 +287,7 @@ private:
 	Float();
 };
 
-TDF_INLINE bool Float::Equals(float const & a, float const & b, int tolerance) {
+H3DF_INLINE bool Float::Equals(float const & a, float const & b, int tolerance) {
 	int32_t va = Float::extract_uint32_t(a);
 	int32_t vb = Float::extract_uint32_t(b);
 
@@ -313,7 +313,7 @@ TDF_INLINE bool Float::Equals(float const & a, float const & b, int tolerance) {
 	return (v1 | v2) >= 0;
 }
 
-TDF_INLINE bool Float::Equals(double const & a, double const & b, int tolerance) {
+H3DF_INLINE bool Float::Equals(double const & a, double const & b, int tolerance) {
 	int32_t va[2], vb[2];
 	memcpy(va, &a, sizeof(double));
 	memcpy(vb, &b, sizeof(double));
@@ -406,10 +406,10 @@ public:
 	Vector_3D<F> const operator - (Point_3D const & p) const;
 
 	template <typename D>
-	TDF_INLINE Point_3D const operator + (Vector_3D<D> const & v) const { return Point_3D((F)(x + v.x), (F)(y + v.y), (F)(z + v.z)); }
+	H3DF_INLINE Point_3D const operator + (Vector_3D<D> const & v) const { return Point_3D((F)(x + v.x), (F)(y + v.y), (F)(z + v.z)); }
 
 	template <typename D>
-	TDF_INLINE Point_3D const operator - (Vector_3D<D> const & v) const {return Point_3D(x - v.x, y - v.y, z - v.z); }
+	H3DF_INLINE Point_3D const operator - (Vector_3D<D> const & v) const {return Point_3D(x - v.x, y - v.y, z - v.z); }
 
 	Point_3D & operator*= (F s) { x *= s; y *= s; z *= s;  return *this; }
 	Point_3D & operator/= (F s) { return operator*= ((F)1 / s); }
@@ -436,8 +436,8 @@ public:
 	Point_3D const operator+ (Vector_2D<F> const & v) const;
 	Point_3D const operator- (Vector_2D<F> const & v) const;
 
-	static TDF_INLINE Point_3D	Origin() {return Point_3D (0, 0, 0);};
-	static TDF_INLINE Point_3D	Zero() {return Point_3D (0, 0, 0);}; //-V524
+	static H3DF_INLINE Point_3D	Origin() {return Point_3D (0, 0, 0);};
+	static H3DF_INLINE Point_3D	Zero() {return Point_3D (0, 0, 0);}; //-V524
 
 	double	DistanceWith(Point_3D const & p) const;
 
@@ -452,45 +452,45 @@ using Point = Point_3D<float>;
 using DPoint = Point_3D<double>;
 
 template <typename F, typename S>
-TDF_INLINE Point_3D<F>	operator* (S s, Point_3D<F> const & a) { return Point_3D<F>(F(s * a.x), F(s * a.y), F(s * a.z)); }
+H3DF_INLINE Point_3D<F>	operator* (S s, Point_3D<F> const & a) { return Point_3D<F>(F(s * a.x), F(s * a.y), F(s * a.z)); }
 
 template <typename F>
-TDF_INLINE Point_3D<F> Midpoint(Point_3D<F> const & a, Point_3D<F> const & b) {
+H3DF_INLINE Point_3D<F> Midpoint(Point_3D<F> const & a, Point_3D<F> const & b) {
 	return Point_3D<F>(a.x + b.x, a.y + b.y, a.z + b.z) * 0.5f;
 }
 
 template <typename F>
-TDF_INLINE Point_3D<F> Midpoint(Point_3D<F> const & a, Point_3D<F> const & b, Point_3D<F> const & c) {
+H3DF_INLINE Point_3D<F> Midpoint(Point_3D<F> const & a, Point_3D<F> const & b, Point_3D<F> const & c) {
 	return Point_3D<F>(a.x + b.x + c.x, a.y + b.y + c.y, a.z + b.z + c.z) * (F)(1.0 / 3.0);
 }
 
 template <typename F>
-TDF_INLINE bool Is_Abnormal(Point_3D<F> const & p) {
+H3DF_INLINE bool Is_Abnormal(Point_3D<F> const & p) {
 	return Is_Abnormal(p.x) || Is_Abnormal(p.y) || Is_Abnormal(p.z);
 }
 
 template <typename F>
-TDF_INLINE	Point_3D<F>::Point_3D(Vector_3D<F> const & v) : x(v.x), y(v.y), z(v.z) {}
+H3DF_INLINE	Point_3D<F>::Point_3D(Vector_3D<F> const & v) : x(v.x), y(v.y), z(v.z) {}
 
 template <typename F>
-TDF_INLINE	Point_3D<F> & Point_3D<F>::operator+= (Vector_3D<F> const & v) { x += v.x; y += v.y; z += v.z;  return *this; }
+H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator+= (Vector_3D<F> const & v) { x += v.x; y += v.y; z += v.z;  return *this; }
 template <typename F>
-TDF_INLINE	Point_3D<F> & Point_3D<F>::operator-= (Vector_3D<F> const & v) { x -= v.x; y -= v.y; z -= v.z;  return *this; }
+H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator-= (Vector_3D<F> const & v) { x -= v.x; y -= v.y; z -= v.z;  return *this; }
 
 template <typename F>
-TDF_INLINE	Vector_3D<F> const	Point_3D<F>::operator- (Point_3D<F> const & p) const { return Vector_3D<F>(x - p.x, y - p.y, z - p.z); }
+H3DF_INLINE	Vector_3D<F> const	Point_3D<F>::operator- (Point_3D<F> const & p) const { return Vector_3D<F>(x - p.x, y - p.y, z - p.z); }
 
 // template <typename F>
 // TDF_INLINE	Point_3D<F> const	Point_3D<F>::operator- (Vector_3D<F> const & v) const { return Point_3D<F>(x - v.x, y - v.y, z - v.z); }
 
 template <typename F>
-TDF_INLINE	Point_3D<F> & Point_3D<F>::operator*= (Vector_3D<F> const & v) { x *= v.x; y *= v.y; z *= v.z;  return *this; }
+H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator*= (Vector_3D<F> const & v) { x *= v.x; y *= v.y; z *= v.z;  return *this; }
 template <typename F>
-TDF_INLINE	Point_3D<F> & Point_3D<F>::operator/= (Vector_3D<F> const & v) { x /= v.x; y /= v.y; z /= v.z;  return *this; }
+H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator/= (Vector_3D<F> const & v) { x /= v.x; y /= v.y; z /= v.z;  return *this; }
 template <typename F>
-TDF_INLINE	Point_3D<F> const	Point_3D<F>::operator* (Vector_3D<F> const & v) const { return Point_3D<F>(x * v.x, y * v.y, z * v.z); }
+H3DF_INLINE	Point_3D<F> const	Point_3D<F>::operator* (Vector_3D<F> const & v) const { return Point_3D<F>(x * v.x, y * v.y, z * v.z); }
 template <typename F>
-TDF_INLINE	Point_3D<F> const	Point_3D<F>::operator/ (Vector_3D<F> const & v) const { return Point_3D<F>(x / v.x, y / v.y, z / v.z); }
+H3DF_INLINE	Point_3D<F> const	Point_3D<F>::operator/ (Vector_3D<F> const & v) const { return Point_3D<F>(x / v.x, y / v.y, z / v.z); }
 
 template <typename F>
 double Point_3D<F>::DistanceWith(Point_3D const & p) const {
@@ -526,28 +526,28 @@ Point_3D<F> Point_3D<F>::ProjectionPoint(Point_3D<F> cOrigin, Vector_3D<F> cNorm
 }
 
 template <typename F>
-TDF_INLINE Point_3D<F> Interpolate(Point_3D<F> const & a, Point_3D<F> const & b, float t) {
+H3DF_INLINE Point_3D<F> Interpolate(Point_3D<F> const & a, Point_3D<F> const & b, float t) {
 	return a + (b - a) * t;
 }
 
 template <typename F>
-TDF_INLINE Vector_3D<F> Interpolate(Vector_3D<F> const & a, Vector_3D<F> const & b, float t) {
+H3DF_INLINE Vector_3D<F> Interpolate(Vector_3D<F> const & a, Vector_3D<F> const & b, float t) {
 	return Vector_3D<F>(a + (b - a) * t).Normalize();
 }
 
 
 template <typename F>
-TDF_INLINE	double PointToPointDistance(Point_3D<F> const & p1, Point_3D<F> const & p2) {
+H3DF_INLINE	double PointToPointDistance(Point_3D<F> const & p1, Point_3D<F> const & p2) {
 	return (p2 - p1).Length();
 }
 
 template <typename F>
-TDF_INLINE	double PointToPointDistanceSquared(Point_3D<F> const & p1, Point_3D<F> const & p2) {
+H3DF_INLINE	double PointToPointDistanceSquared(Point_3D<F> const & p1, Point_3D<F> const & p2) {
 	return (p2 - p1).LengthSquared();
 }
 
 template <typename F>
-TDF_INLINE Point_3D<F> Circumcenter(Point_3D<F> const & a, Point_3D<F> const & b, Point_3D<F> const & c) {
+H3DF_INLINE Point_3D<F> Circumcenter(Point_3D<F> const & a, Point_3D<F> const & b, Point_3D<F> const & c) {
 	F p = static_cast<F>((c - b).LengthSquared());
 	F q = static_cast<F>((c - a).LengthSquared());
 	F r = static_cast<F>((b - a).LengthSquared());
@@ -602,8 +602,8 @@ public:
 	Point_2D const		operator+ (Vector_2D<F> const & v) const;
 	Point_2D const		operator- (Vector_2D<F> const & v) const;
 
-	static TDF_INLINE Point_2D	Origin() { return Point_2D(0, 0); };
-	static TDF_INLINE Point_2D	Zero() { return Point_2D(0, 0); }; //-V524
+	static H3DF_INLINE Point_2D	Origin() { return Point_2D(0, 0); };
+	static H3DF_INLINE Point_2D	Zero() { return Point_2D(0, 0); }; //-V524
 
 	Point_3D<F> LiftPoint(Point_3D<F> cOrigin, Vector_3D<F> cXAxis, Vector_3D<F> cYAxis);
 
@@ -614,23 +614,23 @@ using Point2D = Point_2D<float>		;
 using DPoint2D = Point_2D<double>	;
 
 template <typename F>
-TDF_INLINE Point_3D<F>::Point_3D(Point_2D<F> const & that) : x(that.x), y(that.y), z(0) {}
+H3DF_INLINE Point_3D<F>::Point_3D(Point_2D<F> const & that) : x(that.x), y(that.y), z(0) {}
 
 template <typename F, typename S>
-TDF_INLINE Point_2D<F>	operator* (S s, Point_2D<F> const & a) { return Point_2D<F>(F(s * a.x), F(s * a.y)); }
+H3DF_INLINE Point_2D<F>	operator* (S s, Point_2D<F> const & a) { return Point_2D<F>(F(s * a.x), F(s * a.y)); }
 
 template <typename F>
-TDF_INLINE Point_2D<F> Midpoint(Point_2D<F> const & a, Point_2D<F> const & b) {
+H3DF_INLINE Point_2D<F> Midpoint(Point_2D<F> const & a, Point_2D<F> const & b) {
 	return Point_2D<F>(a.x + b.x, a.y + b.y) * 0.5f;
 }
 
 template <typename F>
-TDF_INLINE Point_2D<F> Midpoint(Point_2D<F> const & a, Point_2D<F> const & b, Point_2D<F> const & c) {
+H3DF_INLINE Point_2D<F> Midpoint(Point_2D<F> const & a, Point_2D<F> const & b, Point_2D<F> const & c) {
 	return Point_2D<F>(a.x + b.x + c.x, a.y + b.y + c.y, a.z + b.z + c.z) * (F)(1.0 / 3.0);
 }
 
 template <typename F>
-TDF_INLINE bool Is_Abnormal(Point_2D<F> const & p) {
+H3DF_INLINE bool Is_Abnormal(Point_2D<F> const & p) {
 	return Is_Abnormal(p.x) || Is_Abnormal(p.y);
 }
 
@@ -679,10 +679,10 @@ public:
 
 	Vector_3D const	operator- () const	{ return Vector_3D (-x, -y, -z); }
 
-	TDF_INLINE bool operator== (Vector_3D const & v) const { return  Float::match(x, v.x) && Float::match(y, v.y) && Float::match(z, v.z); }
-	TDF_INLINE bool operator!= (Vector_3D const & v) const { return  !(*this == v); }
+	H3DF_INLINE bool operator== (Vector_3D const & v) const { return  Float::match(x, v.x) && Float::match(y, v.y) && Float::match(z, v.z); }
+	H3DF_INLINE bool operator!= (Vector_3D const & v) const { return  !(*this == v); }
 
-	TDF_INLINE bool Equals(Vector_3D const & v, int in_tolerance = 32) const {
+	H3DF_INLINE bool Equals(Vector_3D const & v, int in_tolerance = 32) const {
 		return	Float::Equals(x, v.x, in_tolerance) && Float::Equals(y, v.y, in_tolerance) && Float::Equals(z, v.z, in_tolerance);
 	}
 
@@ -710,15 +710,15 @@ public:
 	F &					operator[] (size_t i)		{ return (&x)[i]; }
 	F const &			operator[] (size_t i) const	{ return (&x)[i]; }
 
-	TDF_INLINE double	Length () const { return sqrt (LengthSquared()); }
+	H3DF_INLINE double	Length () const { return sqrt (LengthSquared()); }
 
-	TDF_INLINE double	LengthSquared () const { return (double)x*(double)x + (double)y*(double)y + (double)z*(double)z; }
+	H3DF_INLINE double	LengthSquared () const { return (double)x*(double)x + (double)y*(double)y + (double)z*(double)z; }
 
-	TDF_INLINE double	Length2D () const { return sqrt (LengthSquared2D()); }
+	H3DF_INLINE double	Length2D () const { return sqrt (LengthSquared2D()); }
 
-	TDF_INLINE double	LengthSquared2D () const { return (double)x*(double)x + (double)y*(double)y;}
+	H3DF_INLINE double	LengthSquared2D () const { return (double)x*(double)x + (double)y*(double)y;}
 
-	TDF_INLINE Vector_3D &	Normalize (bool check_range = false, F epsilon = Float_Traits<F>::Epsilon()) {// not const &; allow V.normalize() *= S;
+	H3DF_INLINE Vector_3D &	Normalize (bool check_range = false, F epsilon = Float_Traits<F>::Epsilon()) {// not const &; allow V.normalize() *= S;
 		if (check_range) {
 			F	range = Max (Abs (x), Abs (y), Abs (z));
 			if (range > F(1.0e10))
@@ -732,25 +732,25 @@ public:
 			*this = Zero();
 		return *this;
 	}
-	TDF_INLINE Vector_3D &	Normalize (F epsilon) { return Normalize (false, epsilon); }
+	H3DF_INLINE Vector_3D &	Normalize (F epsilon) { return Normalize (false, epsilon); }
 
-	TDF_INLINE Vector_3D &	Clean_Zeroes (F epsilon = F(1.0e-4)) {
+	H3DF_INLINE Vector_3D &	Clean_Zeroes (F epsilon = F(1.0e-4)) {
 		if (Abs(x) < epsilon) x = 0;
 		if (Abs(y) < epsilon) y = 0;
 		if (Abs(z) < epsilon) z = 0;
 		return *this;
 	}
 
-	TDF_INLINE F Magnitude () const { return Max (Abs(x), Abs(y), Abs(z)); }
-	TDF_INLINE F Manhattan () const { return Abs(x)+Abs(y)+Abs(z); }
+	H3DF_INLINE F Magnitude () const { return Max (Abs(x), Abs(y), Abs(z)); }
+	H3DF_INLINE F Manhattan () const { return Abs(x)+Abs(y)+Abs(z); }
 
-	TDF_INLINE F Dot (Vector_3D const & v) const { return x * v.x  +  y * v.y  +  z * v.z; }
+	H3DF_INLINE F Dot (Vector_3D const & v) const { return x * v.x  +  y * v.y  +  z * v.z; }
 
-	TDF_INLINE Vector_3D Cross (Vector_3D const & v) const { 
+	H3DF_INLINE Vector_3D Cross (Vector_3D const & v) const { 
 		return Vector_3D (y * v.z - z * v.y, z * v.x - x * v.z, x * v.y - y * v.x); 
 	}
 
-	TDF_INLINE Vector_3D Scale(Vector_3D const & v) const {
+	H3DF_INLINE Vector_3D Scale(Vector_3D const & v) const {
 		return Vector_3D(x * v.x, y * v.y, z * v.z);
 	}
 
@@ -761,14 +761,14 @@ public:
 			return Vector_3D<F>::YAxis();
 	}
 
-	TDF_INLINE F AngleWith(Vector_3D const & v) const {
+	H3DF_INLINE F AngleWith(Vector_3D const & v) const {
 		F dot = Dot(v);
 		F len = Length() * v.Length();
 		F cos_angle = dot / len;
 		return acos(cos_angle) * (F) 180 / M_PI;
 	}
 
-	TDF_INLINE F CCWAngleWith(Vector_3D const & v1, Vector_3D const & v2) const {
+	H3DF_INLINE F CCWAngleWith(Vector_3D const & v1, Vector_3D const & v2) const {
 		F dot = v1.Dot(v2);
 		F len = v1.Length() * v2.Length();
 		F cos_angle = dot / len;
@@ -787,23 +787,23 @@ public:
 
 	void Rotate(Point_3D<F> cOrigin, Vector_3D cXAxis, Vector_3D cYAxis, double Angle) const;
 
-	static TDF_INLINE Vector_3D XAxis() { return Vector_3D(1, 0, 0); };
-	static TDF_INLINE Vector_3D YAxis() { return Vector_3D(0, 1, 0); };
-	static TDF_INLINE Vector_3D ZAxis() { return Vector_3D(0, 0, 1); };
-	static TDF_INLINE Vector_3D Zero() { return Vector_3D(0, 0, 0); };
-	static TDF_INLINE Vector_3D Unit() { return Vector_3D(1, 1, 1); };
+	static H3DF_INLINE Vector_3D XAxis() { return Vector_3D(1, 0, 0); };
+	static H3DF_INLINE Vector_3D YAxis() { return Vector_3D(0, 1, 0); };
+	static H3DF_INLINE Vector_3D ZAxis() { return Vector_3D(0, 0, 1); };
+	static H3DF_INLINE Vector_3D Zero() { return Vector_3D(0, 0, 0); };
+	static H3DF_INLINE Vector_3D Unit() { return Vector_3D(1, 1, 1); };
 };
 
 template <typename F, typename S>
-TDF_INLINE	Vector_3D<F>	operator* (S s, Vector_3D<F> const & v) { return Vector_3D<F>(F(s * v.x), F(s * v.y), F(s * v.z)); }
+H3DF_INLINE	Vector_3D<F>	operator* (S s, Vector_3D<F> const & v) { return Vector_3D<F>(F(s * v.x), F(s * v.y), F(s * v.z)); }
 
 template <typename F>
-TDF_INLINE bool Is_Abnormal(Vector_3D<F> const & v) {
+H3DF_INLINE bool Is_Abnormal(Vector_3D<F> const & v) {
 	return Is_Abnormal(v.x) || Is_Abnormal(v.y) || Is_Abnormal(v.z);
 }
 
 template <typename F>
-TDF_INLINE bool Normalize(size_t count, Vector_3D<F> * vectors) {
+H3DF_INLINE bool Normalize(size_t count, Vector_3D<F> * vectors) {
 	bool success = true;
 	for (size_t i = 0; i < count; ++i) {
 		if (vectors->Normalize() == Vector_3D<F>::Zero())
@@ -814,53 +814,53 @@ TDF_INLINE bool Normalize(size_t count, Vector_3D<F> * vectors) {
 }
 
 template <typename F>
-TDF_INLINE	Vector_3D<F>::Vector_3D(Vector_2D<F> const & that) : x(that.x), y(that.y), z(0) {}
+H3DF_INLINE	Vector_3D<F>::Vector_3D(Vector_2D<F> const & that) : x(that.x), y(that.y), z(0) {}
 
 template <typename F>
-TDF_INLINE	Point_3D<F>::Point_3D(Vector_2D<F> const & v) : x(v.x), y(v.y), z(0) {}
+H3DF_INLINE	Point_3D<F>::Point_3D(Vector_2D<F> const & v) : x(v.x), y(v.y), z(0) {}
 
 template <typename F>
-TDF_INLINE	Point_3D<F> & Point_3D<F>::operator+= (Vector_2D<F> const & v) { x += v.x; y += v.y; return *this; }
+H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator+= (Vector_2D<F> const & v) { x += v.x; y += v.y; return *this; }
 template <typename F>
-TDF_INLINE	Point_3D<F> & Point_3D<F>::operator-= (Vector_2D<F> const & v) { x -= v.x; y -= v.y; return *this; }
+H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator-= (Vector_2D<F> const & v) { x -= v.x; y -= v.y; return *this; }
 
 template <typename F>
-TDF_INLINE	Point_3D<F> const	Point_3D<F>::operator+ (Vector_2D<F> const & v) const { return Point_3D<F>(x + v.x, y + v.y, z); }
+H3DF_INLINE	Point_3D<F> const	Point_3D<F>::operator+ (Vector_2D<F> const & v) const { return Point_3D<F>(x + v.x, y + v.y, z); }
 template <typename F>
-TDF_INLINE	Point_3D<F> const	Point_3D<F>::operator- (Vector_2D<F> const & v) const { return Point_3D<F>(x - v.x, y - v.y, z); }
+H3DF_INLINE	Point_3D<F> const	Point_3D<F>::operator- (Vector_2D<F> const & v) const { return Point_3D<F>(x - v.x, y - v.y, z); }
 
 template <typename F>
-TDF_INLINE	Point_3D<F> & Point_3D<F>::operator*= (Vector_2D<F> const & v) { x *= v.x; y *= v.y; return *this; }
+H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator*= (Vector_2D<F> const & v) { x *= v.x; y *= v.y; return *this; }
 template <typename F>
-TDF_INLINE	Point_3D<F> & Point_3D<F>::operator/= (Vector_2D<F> const & v) { x /= v.x; y /= v.y; return *this; }
+H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator/= (Vector_2D<F> const & v) { x /= v.x; y /= v.y; return *this; }
 
 template <typename F>
-TDF_INLINE	Point_3D<F> const	Point_3D<F>::operator* (Vector_2D<F> const & v) const { return Point_3D<F>(x * v.x, y * v.y, z); }
+H3DF_INLINE	Point_3D<F> const	Point_3D<F>::operator* (Vector_2D<F> const & v) const { return Point_3D<F>(x * v.x, y * v.y, z); }
 template <typename F>
-TDF_INLINE	Point_3D<F> const	Point_3D<F>::operator/ (Vector_2D<F> const & v) const { return Point_3D<F>(x / v.x, y / v.y, z); }
+H3DF_INLINE	Point_3D<F> const	Point_3D<F>::operator/ (Vector_2D<F> const & v) const { return Point_3D<F>(x / v.x, y / v.y, z); }
 
 
 template <typename F>
-TDF_INLINE	Point_2D<F> & Point_2D<F>::operator+= (Vector_2D<F> const & v) { x += v.x; y += v.y; return *this; }
+H3DF_INLINE	Point_2D<F> & Point_2D<F>::operator+= (Vector_2D<F> const & v) { x += v.x; y += v.y; return *this; }
 template <typename F>
-TDF_INLINE	Point_2D<F> & Point_2D<F>::operator-= (Vector_2D<F> const & v) { x -= v.x; y -= v.y; return *this; }
+H3DF_INLINE	Point_2D<F> & Point_2D<F>::operator-= (Vector_2D<F> const & v) { x -= v.x; y -= v.y; return *this; }
 
 template <typename F>
-TDF_INLINE	Vector_2D<F> const	Point_2D<F>::operator- (Point_2D<F> const & p) const { return Vector_2D<F>(x - p.x, y - p.y); }
+H3DF_INLINE	Vector_2D<F> const	Point_2D<F>::operator- (Point_2D<F> const & p) const { return Vector_2D<F>(x - p.x, y - p.y); }
 
 template <typename F>
-TDF_INLINE	Point_2D<F> const	Point_2D<F>::operator+ (Vector_2D<F> const & v) const { return Point_2D<F>(x + v.x, y + v.y); }
+H3DF_INLINE	Point_2D<F> const	Point_2D<F>::operator+ (Vector_2D<F> const & v) const { return Point_2D<F>(x + v.x, y + v.y); }
 template <typename F>
-TDF_INLINE	Point_2D<F> const	Point_2D<F>::operator- (Vector_2D<F> const & v) const { return Point_2D<F>(x - v.x, y - v.y); }
+H3DF_INLINE	Point_2D<F> const	Point_2D<F>::operator- (Vector_2D<F> const & v) const { return Point_2D<F>(x - v.x, y - v.y); }
 
 template <typename F>
-TDF_INLINE	Point_2D<F> & Point_2D<F>::operator*= (Vector_2D<F> const & v) { x *= v.x; y *= v.y; return *this; }
+H3DF_INLINE	Point_2D<F> & Point_2D<F>::operator*= (Vector_2D<F> const & v) { x *= v.x; y *= v.y; return *this; }
 template <typename F>
-TDF_INLINE	Point_2D<F> & Point_2D<F>::operator/= (Vector_2D<F> const & v) { x /= v.x; y /= v.y; return *this; }
+H3DF_INLINE	Point_2D<F> & Point_2D<F>::operator/= (Vector_2D<F> const & v) { x /= v.x; y /= v.y; return *this; }
 template <typename F>
-TDF_INLINE	Point_2D<F> const	Point_2D<F>::operator* (Vector_2D<F> const & v) const { return Point_2D<F>(x * v.x, y * v.y); }
+H3DF_INLINE	Point_2D<F> const	Point_2D<F>::operator* (Vector_2D<F> const & v) const { return Point_2D<F>(x * v.x, y * v.y); }
 template <typename F>
-TDF_INLINE	Point_2D<F> const	Point_2D<F>::operator/ (Vector_2D<F> const & v) const { return Point_2D<F>(x / v.x, y / v.y); }
+H3DF_INLINE	Point_2D<F> const	Point_2D<F>::operator/ (Vector_2D<F> const & v) const { return Point_2D<F>(x / v.x, y / v.y); }
 
 template <typename F>
 void Vector_3D<F>::Rotate(Point_3D<F> cOrigin, Vector_3D<F> cXAxis, Vector_3D<F> cYAxis, double Angle) const
@@ -915,11 +915,11 @@ public:
 	F & operator[] (size_t i) { return (&x)[i]; }
 	F const & operator[] (size_t i) const { return (&x)[i]; }
 
-	TDF_INLINE double	Length() const { return sqrt(LengthSquared()); }
+	H3DF_INLINE double	Length() const { return sqrt(LengthSquared()); }
 
-	TDF_INLINE double	LengthSquared() const { return (double)x * (double)x + (double)y * (double)y; }
+	H3DF_INLINE double	LengthSquared() const { return (double)x * (double)x + (double)y * (double)y; }
 
-	TDF_INLINE Vector_2D & Normalize(bool check_range = false, F epsilon = Float_Traits<F>::Epsilon()) {// not const &; allow V.normalize() *= S;
+	H3DF_INLINE Vector_2D & Normalize(bool check_range = false, F epsilon = Float_Traits<F>::Epsilon()) {// not const &; allow V.normalize() *= S;
 		if (check_range) {
 			F	range = Max(Abs(x), Abs(y));
 			if (range > F(1.0e10))
@@ -933,19 +933,19 @@ public:
 			*this = Zero();
 		return *this;
 	}
-	TDF_INLINE Vector_2D & Normalize(F epsilon) { return Normalize(false, epsilon); }
+	H3DF_INLINE Vector_2D & Normalize(F epsilon) { return Normalize(false, epsilon); }
 
-	TDF_INLINE F		Magnitude() const { return Max(Abs(x), Abs(y)); }
-	TDF_INLINE F		Manhattan() const { return Abs(x) + Abs(y); }
+	H3DF_INLINE F		Magnitude() const { return Max(Abs(x), Abs(y)); }
+	H3DF_INLINE F		Manhattan() const { return Abs(x) + Abs(y); }
 
-	TDF_INLINE F AngleWith(Vector_2D const & v) const {
+	H3DF_INLINE F AngleWith(Vector_2D const & v) const {
 		F dot = Dot(v);
 		F len = Length() * v.Length();
 		F cos_angle = dot / len;
 		return acos(cos_angle) * (F)180 / M_PI;
 	}
 
-	TDF_INLINE F CCWAngleWith(Vector_2D const & v) const {
+	H3DF_INLINE F CCWAngleWith(Vector_2D const & v) const {
 		F dot = this->Dot(v);
 		F len = this->Length() * v.Length();
 		F cos_angle = dot / len;
@@ -962,26 +962,26 @@ public:
 		return angle;
 	}
 
-	TDF_INLINE F Dot(Vector_2D const & v) const { return x * v.x + y * v.y; }
-	TDF_INLINE F Cross(Vector_2D const & v) const { return x * v.y - y * v.x; }
+	H3DF_INLINE F Dot(Vector_2D const & v) const { return x * v.x + y * v.y; }
+	H3DF_INLINE F Cross(Vector_2D const & v) const { return x * v.y - y * v.x; }
 
-	TDF_INLINE Vector_2D Scale(Vector_2D const & v) const { return Vector_2D(x * v.x, y * v.y); }
+	H3DF_INLINE Vector_2D Scale(Vector_2D const & v) const { return Vector_2D(x * v.x, y * v.y); }
 
-	static TDF_INLINE Vector_2D	XAxis() { return Vector_2D(1, 0); };
-	static TDF_INLINE Vector_2D	YAxis() { return Vector_2D(0, 1); };
+	static H3DF_INLINE Vector_2D	XAxis() { return Vector_2D(1, 0); };
+	static H3DF_INLINE Vector_2D	YAxis() { return Vector_2D(0, 1); };
 
-	static TDF_INLINE Vector_2D	Zero() { return Vector_2D(0, 0); };
-	static TDF_INLINE Vector_2D	Unit() { return Vector_2D(1, 1); };
+	static H3DF_INLINE Vector_2D	Zero() { return Vector_2D(0, 0); };
+	static H3DF_INLINE Vector_2D	Unit() { return Vector_2D(1, 1); };
 };
 
 using Vector2D = Vector_2D<float>;
 using DVector2D = Vector_2D<double>;
 
 template <typename F, typename S>
-TDF_INLINE	Vector_2D<F>	operator* (S s, Vector_2D<F> const & v) { return Vector_2D<F>(F(s * v.x), F(s * v.y)); }
+H3DF_INLINE	Vector_2D<F>	operator* (S s, Vector_2D<F> const & v) { return Vector_2D<F>(F(s * v.x), F(s * v.y)); }
 
 template <typename F>
-TDF_INLINE bool Is_Abnormal(Vector_2D<F> const & v) {
+H3DF_INLINE bool Is_Abnormal(Vector_2D<F> const & v) {
 	return Is_Abnormal(v.x) || Is_Abnormal(v.y);
 }
 
@@ -1050,7 +1050,7 @@ public:
 	F & operator[] (size_t i) { return (&a)[i]; }
 	F const & operator[] (size_t i) const { return (&a)[i]; }
 
-	TDF_INLINE bool	Equals(Plane_3D const & p, int in_tolerance = 32) const {
+	H3DF_INLINE bool	Equals(Plane_3D const & p, int in_tolerance = 32) const {
 		return  Float::Equals(a, p.a, in_tolerance) && Float::Equals(b, p.b, in_tolerance) &&
 			Float::Equals(c, p.c, in_tolerance) && Float::Equals(d, p.d, in_tolerance);
 	}
@@ -1099,7 +1099,7 @@ public:
 	}
 
 
-	static TDF_INLINE Plane_3D Zero() { return Plane_3D(0.0f, 0.0f, 0.0f, 0.0f); };
+	static H3DF_INLINE Plane_3D Zero() { return Plane_3D(0.0f, 0.0f, 0.0f, 0.0f); };
 
 
 private:
@@ -1126,22 +1126,22 @@ typedef Plane_3D<double>	DPlane;
 
 
 template <typename F>
-TDF_INLINE bool Is_Abnormal(Plane_3D<F> const & p) {
+H3DF_INLINE bool Is_Abnormal(Plane_3D<F> const & p) {
 	return Is_Abnormal(p.a) || Is_Abnormal(p.b) || Is_Abnormal(p.c) || Is_Abnormal(p.d);
 }
 
 
 template <typename F>
-TDF_INLINE	F operator* (Plane_3D<F> const & plane, Point_3D<F> const & point) {
+H3DF_INLINE	F operator* (Plane_3D<F> const & plane, Point_3D<F> const & point) {
 	return plane.a * point.x + plane.b * point.y + plane.c * point.z + plane.d;
 }
 template <typename F>
-TDF_INLINE	F operator* (Point_3D<F> const & point, Plane_3D<F> const & plane) {
+H3DF_INLINE	F operator* (Point_3D<F> const & point, Plane_3D<F> const & plane) {
 	return plane * point;
 }
 
 template <typename F>
-TDF_INLINE Plane_3D<F> Interpolate(Plane_3D<F> const & a, Plane_3D<F> const & b, float t) {
+H3DF_INLINE Plane_3D<F> Interpolate(Plane_3D<F> const & a, Plane_3D<F> const & b, float t) {
 	return Plane_3D<F>(a.a + (b.a - a.a) * t, a.b + (b.b - a.b) * t, a.c + (b.c - a.c) * t, a.d + (b.d - a.d) * t);
 }
 
@@ -1200,21 +1200,21 @@ struct Cuboid_3D {
 	//Cuboid_3D(Rectangle const & that) : cMin(Point_3D<F>(that.left, that.bottom, 0)), cMax(Point_3D<F>(that.right, that.top, 0)) {}
 
 	// Tests whether this cuboid is valid. The cuboid is considered valid if the minimum point is less than or equal to the maximum point.
-	TDF_INLINE bool		IsValid() const {
+	H3DF_INLINE bool		IsValid() const {
 		return cMin.x <= cMax.x && cMin.y <= cMax.y && cMin.z <= cMax.z;
 	}
 
 	// Creates an invalid cuboid.
-	static TDF_INLINE Cuboid_3D Invalid() { return Cuboid_3D(); };
+	static H3DF_INLINE Cuboid_3D Invalid() { return Cuboid_3D(); };
 
 	// Invalidates this cuboid.
 	void Invalidate() { cMin = Limit_Point(); cMax = -Limit_Point(); }
 
 	// Determines if the maximum and minimum points of this cuboid are equal to the maximum and minimum points of another cuboid.
-	TDF_INLINE bool		operator== (Cuboid_3D const & cuboid) const { return  (cMin == cuboid.cMin && cMax == cuboid.cMax); }
+	H3DF_INLINE bool		operator== (Cuboid_3D const & cuboid) const { return  (cMin == cuboid.cMin && cMax == cuboid.cMax); }
 
 	// Determines if the maximum and minimum points of this cuboid are not equal to the maximum and minimum points of another cuboid.
-	TDF_INLINE bool		operator!= (Cuboid_3D const & cuboid) const { return  !(*this == cuboid); }
+	H3DF_INLINE bool		operator!= (Cuboid_3D const & cuboid) const { return  !(*this == cuboid); }
 
 	bool Equals(Cuboid_3D const & p, int in_tolerance = 32) const {
 		if (false == cMin.Equals(p.cMin, in_tolerance)) {
@@ -1229,7 +1229,7 @@ struct Cuboid_3D {
 	}
 
 	// Assigns the eight corners of the cuboid based on the points in the parameter array. The array must contain at least eight points.
-	TDF_INLINE void Generate_Cuboid_Points(Point_3D<F> * points) const {
+	H3DF_INLINE void Generate_Cuboid_Points(Point_3D<F> * points) const {
 		points[0] = Point_3D<F>(cMin.x, cMin.y, cMin.z);
 		points[1] = Point_3D<F>(cMin.x, cMin.y, cMax.z);
 		points[2] = Point_3D<F>(cMin.x, cMax.y, cMin.z);
@@ -1241,50 +1241,50 @@ struct Cuboid_3D {
 	}
 
 	// Returns the diagonal vector of the cuboid.
-	TDF_INLINE Vector_3D<F> Diagonal() const { return cMax - cMin; }
+	H3DF_INLINE Vector_3D<F> Diagonal() const { return cMax - cMin; }
 
 	// Returns the volume of this cuboid.
-	TDF_INLINE F Volume() const { return (cMax.x - cMin.x) * (cMax.y - cMin.y) * (cMax.z - cMin.z); }
+	H3DF_INLINE F Volume() const { return (cMax.x - cMin.x) * (cMax.y - cMin.y) * (cMax.z - cMin.z); }
 
 	// Determines whether this cuboid intersects with another cuboid.
-	TDF_INLINE bool Intersecting(Cuboid_3D const & cuboid) const {
+	H3DF_INLINE bool Intersecting(Cuboid_3D const & cuboid) const {
 		return	cMax.x >= cuboid.cMin.x && cMin.x <= cuboid.cMax.x &&
 			cMax.y >= cuboid.cMin.y && cMin.y <= cuboid.cMax.y &&
 			cMax.z >= cuboid.cMin.z && cMin.z <= cuboid.cMax.z;
 	}
 
 	// Determines whether this cuboid intersects with another cuboid. Allows for a tolerance value to be considered.
-	TDF_INLINE bool Intersecting(Cuboid_3D const & cuboid, F const allowance) const {
+	H3DF_INLINE bool Intersecting(Cuboid_3D const & cuboid, F const allowance) const {
 		return	cMax.x + allowance >= cuboid.cMin.x && cMin.x - allowance <= cuboid.cMax.x &&
 			cMax.y + allowance >= cuboid.cMin.y && cMin.y - allowance <= cuboid.cMax.y &&
 			cMax.z + allowance >= cuboid.cMin.z && cMin.z - allowance <= cuboid.cMax.z;
 	}
 
 	// Retuns true if this cuboid intersects with the parameter cuboid along a certain axis.
-	TDF_INLINE bool Intersecting(int dimension, Cuboid_3D const & cuboid) const {
+	H3DF_INLINE bool Intersecting(int dimension, Cuboid_3D const & cuboid) const {
 		//ASSERT (0 <= dimension && dimension <= 2);
 		return	cMax[dimension] >= cuboid.cMin[dimension] && cMin[dimension] <= cuboid.cMax[dimension];
 	}
 
 	// Returns true if this cuboid intersects with the parameter cuboid along a certain axis, and considers a tolerance value.
-	TDF_INLINE bool Intersecting(int dimension, Cuboid_3D const & cuboid, F const allowance) const {
+	H3DF_INLINE bool Intersecting(int dimension, Cuboid_3D const & cuboid, F const allowance) const {
 		//ASSERT (0 <= dimension && dimension <= 2);
 		return	cMax[dimension] + allowance >= cuboid.cMin[dimension] && cMin[dimension] - allowance <= cuboid.cMax[dimension];
 	}
 
 	// Determines whether this cuboid intersects with a ray.
-	TDF_INLINE bool Intersecting(Point_3D<F> const & start, Vector_3D<F> const & direction) const {
+	H3DF_INLINE bool Intersecting(Point_3D<F> const & start, Vector_3D<F> const & direction) const {
 		return LineIntersecting(start, direction, true);
 	}
 
 	// Determines whether this cuboid intersects with an infinite line.
-	TDF_INLINE bool Intersecting(Point_3D<F> const & point1, Point_3D<F> const & point2) const {
+	H3DF_INLINE bool Intersecting(Point_3D<F> const & point1, Point_3D<F> const & point2) const {
 		Vector_3D<F> const direction = point2 - point1;
 		return LineIntersecting(point1, direction, false);
 	}
 
 	// Merges this cuboid with another cuboid. Only the smallest and largest values of the cuboids are retained.
-	TDF_INLINE void Merge(Cuboid_3D const & cuboid) {
+	H3DF_INLINE void Merge(Cuboid_3D const & cuboid) {
 		Float::replace_if_smaller(cMin.x, cuboid.cMin.x);
 		Float::replace_if_smaller(cMin.y, cuboid.cMin.y);
 		Float::replace_if_smaller(cMin.z, cuboid.cMin.z);
@@ -1297,7 +1297,7 @@ struct Cuboid_3D {
 	//TDF_INLINE void Merge(Sphere_3D<F> const & sphere) { Merge(Cuboid_3D(sphere)); }
 
 	// Expands the cuboid to include a point.
-	TDF_INLINE void Merge(Point_3D<F> const & point) {
+	H3DF_INLINE void Merge(Point_3D<F> const & point) {
 		Float::replace_if_smaller(cMin.x, point.x);
 		Float::replace_if_smaller(cMin.y, point.y);
 		Float::replace_if_smaller(cMin.z, point.z);
@@ -1333,7 +1333,7 @@ struct Cuboid_3D {
 	}
 
 	// Returns true if the cuboid completely contains the parameter cuboid.
-	TDF_INLINE bool Contains(Cuboid_3D const & contained) const {
+	H3DF_INLINE bool Contains(Cuboid_3D const & contained) const {
 		return (contained.cMin.x >= cMin.x &&
 			contained.cMin.y >= cMin.y &&
 			contained.cMin.z >= cMin.z &&
@@ -1343,7 +1343,7 @@ struct Cuboid_3D {
 	}
 
 	// Returns true if the cuboid completely contains a cuboid based on the  parameter points.
-	TDF_INLINE bool Contains(Point_3D<F> const & contained) const {
+	H3DF_INLINE bool Contains(Point_3D<F> const & contained) const {
 		return (contained.x >= cMin.x &&
 			contained.y >= cMin.y &&
 			contained.z >= cMin.z &&
@@ -1353,7 +1353,7 @@ struct Cuboid_3D {
 	}
 
 	// Returns true if the cuboid completely contains a cuboid based on the  parameter points, with a tolerance value.
-	TDF_INLINE bool Contains(Point_3D<F> const & contained, F epsilon) const {
+	H3DF_INLINE bool Contains(Point_3D<F> const & contained, F epsilon) const {
 		return (contained.x >= cMin.x - epsilon &&
 			contained.y >= cMin.y - epsilon &&
 			contained.z >= cMin.z - epsilon &&
@@ -1363,7 +1363,7 @@ struct Cuboid_3D {
 	}
 
 	// Replaces this cuboid with the intersection of this cuboid and the parameter cuboid.
-	TDF_INLINE Cuboid_3D & Intersect(Cuboid_3D const & cuboid) {
+	H3DF_INLINE Cuboid_3D & Intersect(Cuboid_3D const & cuboid) {
 		Float::replace_if_larger(cMin.x, cuboid.cMin.x);
 		Float::replace_if_larger(cMin.y, cuboid.cMin.y);
 		Float::replace_if_larger(cMin.z, cuboid.cMin.z);
@@ -1374,7 +1374,7 @@ struct Cuboid_3D {
 	}
 
 	// Replaces this cuboid with the union of this cuboid and the parameter cuboid.
-	TDF_INLINE Cuboid_3D & Union(Cuboid_3D const & cuboid) {
+	H3DF_INLINE Cuboid_3D & Union(Cuboid_3D const & cuboid) {
 		Float::replace_if_smaller(cMin.x, cuboid.cMin.x);
 		Float::replace_if_smaller(cMin.y, cuboid.cMin.y);
 		Float::replace_if_smaller(cMin.z, cuboid.cMin.z);
@@ -1385,7 +1385,7 @@ struct Cuboid_3D {
 	}
 
 	// Expands both corners of this cuboid.
-	TDF_INLINE Cuboid_3D & Expand(F border) {
+	H3DF_INLINE Cuboid_3D & Expand(F border) {
 		Vector_3D<F>		delta(border, border, border);
 		cMin -= delta;
 		cMax += delta;
@@ -1393,7 +1393,7 @@ struct Cuboid_3D {
 	}
 
 	// Contracts both corners of this cuboid.
-	TDF_INLINE Cuboid_3D & Contract(F border) {
+	H3DF_INLINE Cuboid_3D & Contract(F border) {
 		Vector_3D<F>		delta(border, border, border);
 		cMin += delta;
 		cMax -= delta;
@@ -1430,7 +1430,7 @@ private:
 		}
 	}
 
-	TDF_INLINE static Point_3D<F> Limit_Point() {
+	H3DF_INLINE static Point_3D<F> Limit_Point() {
 		F const	x = (std::numeric_limits<F>::max)();
 		return Point_3D<F>(x, x, x);
 	}
@@ -1472,25 +1472,25 @@ using SimpleCuboid = Cuboid_3D<float>;
 using DSimpleCuboid = Cuboid_3D<double>;
 
 template <typename F>
-TDF_INLINE Cuboid_3D<F> Intersect(Cuboid_3D<F> const & a, Cuboid_3D<F> const & b) {
+H3DF_INLINE Cuboid_3D<F> Intersect(Cuboid_3D<F> const & a, Cuboid_3D<F> const & b) {
 	Cuboid_3D<F> temp = a;
 	return temp.Intersect(b);
 }
 
 template <typename F>
-TDF_INLINE Cuboid_3D<F> Union(Cuboid_3D<F> const & a, Cuboid_3D<F> const & b) {
+H3DF_INLINE Cuboid_3D<F> Union(Cuboid_3D<F> const & a, Cuboid_3D<F> const & b) {
 	Cuboid_3D<F> temp = a;
 	return temp.Union(b);
 }
 
 template <typename F>
-TDF_INLINE Cuboid_3D<F> Expand(Cuboid_3D<F> const & a, F border) {
+H3DF_INLINE Cuboid_3D<F> Expand(Cuboid_3D<F> const & a, F border) {
 	Cuboid_3D<F> temp = a;
 	return temp.Expand(border);
 }
 
 template <typename F>
-TDF_INLINE Cuboid_3D<F> Contract(Cuboid_3D<F> const & a, F border) {
+H3DF_INLINE Cuboid_3D<F> Contract(Cuboid_3D<F> const & a, F border) {
 	Cuboid_3D<F> temp = a;
 	return temp.Contract(border);
 }

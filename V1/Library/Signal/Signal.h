@@ -518,7 +518,7 @@ namespace Signal
 
 		void OnChangedValue(UINT coomandId, Json::Object& value);
 
-		void ResponseValue(UINT viewId, UINT commandId, Json::Object& value, Json::Object& defaultValue);
+		void ResponseValue(UINT commandId, Json::Object& value, Json::Object& defaultValue);
 		//:TODO
 		void UpdateValue(UINT commandId, Json::Array& values);
 	};

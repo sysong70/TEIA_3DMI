@@ -36,18 +36,18 @@ H3DF::HighlightOptionsKit::HighlightOptionsKit()
 	m_pcImpl = new HighlightOptionsKitImpl();
 }
 
-H3DF::HighlightOptionsKit::HighlightOptionsKit(char const * chInStyleName)
+H3DF::HighlightOptionsKit::HighlightOptionsKit(CStringA strInStyleName)
 {
 	HighlightOptionsKitImpl * pcImpl = new HighlightOptionsKitImpl();
-	strncpy(pcImpl->m_chInStyleName, chInStyleName, STYLE_BUFFER_SIZE);
+	pcImpl->m_strInStyleName = strInStyleName;
 	m_pcImpl = pcImpl;
 }
 
-H3DF::HighlightOptionsKit::HighlightOptionsKit(char const * chInStyleName, char const * chInSecondaryStyleName)
+H3DF::HighlightOptionsKit::HighlightOptionsKit(CStringA strInStyleName, CStringA strInSecondaryStyleName)
 {
 	HighlightOptionsKitImpl * pcImpl = new HighlightOptionsKitImpl();
-	strncpy(pcImpl->m_chInStyleName, chInStyleName, STYLE_BUFFER_SIZE);
-	strncpy(pcImpl->m_chInSecondaryStyleName, chInSecondaryStyleName, STYLE_BUFFER_SIZE);
+	pcImpl->m_strInStyleName = strInStyleName;
+	pcImpl->m_strInSecondaryStyleName = strInSecondaryStyleName;
 	m_pcImpl = pcImpl;
 }
 
@@ -133,15 +133,6 @@ HighlightControl & H3DF::HighlightControl::operator=(HighlightControl const & cI
 	return *this;
 }
 
-//== Mouse Event 처리 ===============================================================================
-int H3DF::HighlightControl::NoButtonDownAndMove(int nFlags, int x, int y, SelectionResults & cOutSelections)
-{
-	HighlightControlImpl * pcHighlightControlImpl = (HighlightControlImpl *) m_pcImpl;
-	DEBUG_VALID(pcHighlightControlImpl);
-
-	return pcHighlightControlImpl->NoButtonDownAndMove(nFlags, x, y, cOutSelections);
-}
-
 //== Highlight 관련 함수 =============================================================================
 HighlightControl & H3DF::HighlightControl::Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting)
 {
@@ -171,11 +162,19 @@ HighlightControl & H3DF::HighlightControl::Unhighlight(SelectionItem const & cIn
 	return *this;
 }
 
+HighlightControl & H3DF::HighlightControl::UnhighlightEverything()
+{
+	HighlightControlImpl * pcImpl = dynamic_cast<HighlightControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+	pcImpl->SelectionSet()->DeSelectAll();
+	return *this;
+}
+
 //== Material Mapping 관련 함수 ======================================================================
 HighlightControl & H3DF::HighlightControl::SetMaterialMapping(MaterialMappingKit const & cInKit)
 {
 	HighlightControlImpl * pcHighlightControlImpl = (HighlightControlImpl *)m_pcImpl;
-	HC_KEY nKey = pcHighlightControlImpl->GetHighlightSelection()->GetHighlightStyle();
+	HC_KEY nKey = pcHighlightControlImpl->SelectionSet()->GetHighlightStyle();
 	
 	SegmentKey cSegmentKey(nKey);
 	cSegmentKey.SetMaterialMapping(cInKit);
@@ -186,7 +185,7 @@ HighlightControl & H3DF::HighlightControl::SetMaterialMapping(MaterialMappingKit
 MaterialMappingControl H3DF::HighlightControl::GetMaterialMappingControl()
 {
 	HighlightControlImpl * pcHighlightControlImpl = (HighlightControlImpl *)m_pcImpl;
-	HC_KEY nKey = pcHighlightControlImpl->GetHighlightSelection()->GetHighlightStyle();
+	HC_KEY nKey = pcHighlightControlImpl->SelectionSet()->GetHighlightStyle();
 
 	SegmentKey cSegmentKey(nKey);
 	MaterialMappingControl cMaterialMappingControl(cSegmentKey);
@@ -197,7 +196,7 @@ MaterialMappingControl H3DF::HighlightControl::GetMaterialMappingControl()
 MaterialMappingControl const H3DF::HighlightControl::GetMaterialMappingControl() const
 {
 	HighlightControlImpl * pcHighlightControlImpl = (HighlightControlImpl *)m_pcImpl;
-	HC_KEY nKey = pcHighlightControlImpl->GetHighlightSelection()->GetHighlightStyle();
+	HC_KEY nKey = pcHighlightControlImpl->SelectionSet()->GetHighlightStyle();
 
 	SegmentKey cSegmentKey(nKey);
 	MaterialMappingControl cMaterialMappingControl(cSegmentKey);
@@ -222,7 +221,7 @@ HighlightControl & H3DF::HighlightControl::SetLineAttribute(LineAttributeKit con
 LineAttributeControl H3DF::HighlightControl::GetLineAttributeControl()
 {
 	HighlightControlImpl * pcHighlightControlImpl = (HighlightControlImpl *)m_pcImpl;
-	HC_KEY nKey = pcHighlightControlImpl->GetHighlightSelection()->GetHighlightStyle();
+	HC_KEY nKey = pcHighlightControlImpl->SelectionSet()->GetHighlightStyle();
 
 	SegmentKey cSegmentKey(nKey);
 	LineAttributeControl cControl(cSegmentKey);
@@ -233,7 +232,7 @@ LineAttributeControl H3DF::HighlightControl::GetLineAttributeControl()
 LineAttributeControl const H3DF::HighlightControl::GetLineAttributeControl() const
 {
 	HighlightControlImpl * pcHighlightControlImpl = (HighlightControlImpl *)m_pcImpl;
-	HC_KEY nKey = pcHighlightControlImpl->GetHighlightSelection()->GetHighlightStyle();
+	HC_KEY nKey = pcHighlightControlImpl->SelectionSet()->GetHighlightStyle();
 
 	SegmentKey cSegmentKey(nKey);
 	LineAttributeControl cControl(cSegmentKey);

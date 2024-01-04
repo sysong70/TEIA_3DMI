@@ -93,6 +93,12 @@
     <ClInclude Include="Impl\OperatorImpl.h">
       <Filter>Operator\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="Operator.Visibility.h">
+      <Filter>Operator</Filter>
+    </ClInclude>
+    <ClInclude Include="Operator.Camera.h">
+      <Filter>Operator</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -151,6 +157,12 @@
     </ClCompile>
     <ClCompile Include="Impl\OperatorImpl.cpp">
       <Filter>Operator\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Operator.Visibility.cpp">
+      <Filter>Operator</Filter>
+    </ClCompile>
+    <ClCompile Include="Operator.Camera.cpp">
+      <Filter>Operator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -8,8 +8,9 @@
 #include <3DF/Math.h>
 
 #include <3DF/Window.h>
-#include <3DF/Selection.h>
 #include <3DF/Segment.h>
+#include <3DF/Selection.h>
+#include <3DF/Highlight.h>
 
 #include <HOpCameraOrbit.h>
 
@@ -79,7 +80,7 @@ namespace KERNEL
 		public:
 			void DrawSnapItems();
 
-			void DrawSnapPoint(SnapPoint & cSnapPoint, CamerInformation & cInCameraInfo);
+			void DrawSnapPoint(SnapPoint & cSnapPoint, CamerInformation & cInCameraInfo, bool bOperateSemgment = true);
 			void DrawSnapPoint(H3DF::Point2D center, Status eInStatus, OSnap::Type eInType, double dUnit);
 
 			double PixelToWorld(double unit);
@@ -96,6 +97,9 @@ namespace KERNEL
 			H3DF::SelectionResults m_cOldHighlightSelection;
 			H3DF::SelectionResults m_cOldOSnapHighlightSelection;
 			H3DF::SelectionResults m_cHighlightSelection;
+
+			// DoDynamicHighlighting용 Highlight control
+			H3DF::HighlightControl m_cDynamicHighlightControl;
 
 			H3DF::SegmentKey m_cSnapPointSegment;
 

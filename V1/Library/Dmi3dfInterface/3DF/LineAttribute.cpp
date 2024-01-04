@@ -11,98 +11,97 @@
 
 //== LineAttributeKit class ========================================================================
 
-OPEN_3DF_NAMESPACE
-
-class LineAttributeKitImpl : public Impl
+namespace H3DF
 {
-public:
-	LineAttributeKitImpl() { m_eType = H3DF::Type::LineAttributeKit; }
+	class LineAttributeKitImpl : public Impl
+	{
+	public:
+		LineAttributeKitImpl() { m_eType = H3DF::Type::LineAttributeKit; }
 
-	void Copy(LineAttributeKitImpl * pcInThat) {
-		m_strPatternName = pcInThat->m_strPatternName;
-		m_fWeight = pcInThat->m_fWeight;
-	}
+		void Copy(LineAttributeKitImpl * pcInThat) {
+			m_strPatternName = pcInThat->m_strPatternName;
+			m_fWeight = pcInThat->m_fWeight;
+		}
 
-	CString m_strPatternName;
-	float m_fWeight = -1;
-	Line::SizeUnits m_eInUnits = Line::SizeUnits::ScaleFactor;
-};
-
-CLOSE_3DF_NAMESPACE
+		CString m_strPatternName;
+		float m_fWeight = -1;
+		Line::SizeUnits m_eInUnits = Line::SizeUnits::ScaleFactor;
+	};
+}
 
 using namespace H3DF;
 
-LineAttributeKit::LineAttributeKit()
+H3DF::LineAttributeKit::LineAttributeKit()
 {
 	m_pcImpl = new LineAttributeKitImpl();
 }
 
-LineAttributeKit::LineAttributeKit(LineAttributeKit const & cInThat)
+H3DF::LineAttributeKit::LineAttributeKit(LineAttributeKit const & cInThat)
 {
 	m_pcImpl = new LineAttributeKitImpl();
 	Set(cInThat);
 }
 
-void LineAttributeKit::Set(LineAttributeKit const & cInThat)
+void H3DF::LineAttributeKit::Set(LineAttributeKit const & cInThat)
 {
 	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	LineAttributeKitImpl * pcInThatImpl = (LineAttributeKitImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-LineAttributeKit const & LineAttributeKit::operator = (LineAttributeKit const & cInThat)
+LineAttributeKit const & H3DF::LineAttributeKit::operator = (LineAttributeKit const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-void LineAttributeKit::Show(LineAttributeKit & cOutKit) const
+void H3DF::LineAttributeKit::Show(LineAttributeKit & cOutKit) const
 {
 	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	LineAttributeKitImpl * pcOutKitImpl = (LineAttributeKitImpl *)cOutKit.m_pcImpl;
 	pcOutKitImpl->Copy(pcImpl);
 }
 
-bool LineAttributeKit::Empty() const
+bool H3DF::LineAttributeKit::Empty() const
 {
 	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	return pcImpl->m_strPatternName.IsEmpty() && pcImpl->m_fWeight < 0;
 }
 
-bool LineAttributeKit::operator == (LineAttributeKit const & cInThat) const
+bool H3DF::LineAttributeKit::operator == (LineAttributeKit const & cInThat) const
 {
 	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	LineAttributeKitImpl * pcInThatImpl = (LineAttributeKitImpl *)cInThat.m_pcImpl;
 	return pcImpl->m_strPatternName == pcInThatImpl->m_strPatternName && pcImpl->m_fWeight == pcInThatImpl->m_fWeight;
 }
 
-bool LineAttributeKit::operator != (LineAttributeKit const & cInThat) const
+bool H3DF::LineAttributeKit::operator != (LineAttributeKit const & cInThat) const
 {
 	return !(*this == cInThat);
 }
 
-LineAttributeKit & LineAttributeKit::SetPattern(CString strInPatternName)
+LineAttributeKit & H3DF::LineAttributeKit::SetPattern(CString strInPatternName)
 {
 	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	pcImpl->m_strPatternName = strInPatternName;
 	return *this;
 }
 
-LineAttributeKit & LineAttributeKit::SetWeight(float fInWeight, Line::SizeUnits eInUnits)
+LineAttributeKit & H3DF::LineAttributeKit::SetWeight(float fInWeight, Line::SizeUnits eInUnits)
 {
 	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	pcImpl->m_fWeight = fInWeight;
 	return *this;
 }
 
-LineAttributeKit & LineAttributeKit::UnsetPattern()
+LineAttributeKit & H3DF::LineAttributeKit::UnsetPattern()
 {
 	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	pcImpl->m_strPatternName.Empty();
 	return *this;
 }
 
-LineAttributeKit & LineAttributeKit::UnsetWeight()
+LineAttributeKit & H3DF::LineAttributeKit::UnsetWeight()
 {
 	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	pcImpl->m_fWeight = -1;
@@ -110,7 +109,7 @@ LineAttributeKit & LineAttributeKit::UnsetWeight()
 	return *this;
 }
 
-LineAttributeKit & LineAttributeKit::UnsetEverything()
+LineAttributeKit & H3DF::LineAttributeKit::UnsetEverything()
 {
 	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	pcImpl->m_strPatternName.Empty();
@@ -119,14 +118,14 @@ LineAttributeKit & LineAttributeKit::UnsetEverything()
 	return *this;
 }
 
-bool LineAttributeKit::ShowPattern(CString & strOutPatternName) const
+bool H3DF::LineAttributeKit::ShowPattern(CString & strOutPatternName) const
 {
 	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	strOutPatternName = pcImpl->m_strPatternName;
 	return !strOutPatternName.IsEmpty();
 }
 
-bool LineAttributeKit::ShowWeight(float & fOutWeight, Line::SizeUnits & eOutUnits) const
+bool H3DF::LineAttributeKit::ShowWeight(float & fOutWeight, Line::SizeUnits & eOutUnits) const
 {
 	LineAttributeKitImpl * pcImpl = (LineAttributeKitImpl *)m_pcImpl;
 	fOutWeight = pcImpl->m_fWeight;
@@ -136,20 +135,23 @@ bool LineAttributeKit::ShowWeight(float & fOutWeight, Line::SizeUnits & eOutUnit
 
 //== LineAttributeControl class ====================================================================
 
-class LineAttributeControlImpl : public ControlImpl
+namespace H3DF
 {
-public:
-	LineAttributeControlImpl() { m_eType = H3DF::Type::LineAttributeControl; }
+	class LineAttributeControlImpl : public ControlImpl
+	{
+	public:
+		LineAttributeControlImpl() { m_eType = H3DF::Type::LineAttributeControl; }
 
-	void Copy(LineAttributeControlImpl * pcInThat) {
-		m_cParentSegmentKey = pcInThat->m_cParentSegmentKey;
-	}
+		void Copy(LineAttributeControlImpl * pcInThat) {
+			m_cParentSegmentKey = pcInThat->m_cParentSegmentKey;
+		}
 
-	// Parent Segment Key
-	SegmentKey m_cParentSegmentKey;
-};
+		// Parent Segment Key
+		SegmentKey m_cParentSegmentKey;
+	};
+}
 
-LineAttributeControl::LineAttributeControl(SegmentKey & cInSegmentKey)
+H3DF::LineAttributeControl::LineAttributeControl(SegmentKey & cInSegmentKey)
 {
 	LineAttributeControlImpl * pcImpl = new LineAttributeControlImpl();
 	pcImpl->m_cParentSegmentKey = cInSegmentKey;
@@ -157,26 +159,26 @@ LineAttributeControl::LineAttributeControl(SegmentKey & cInSegmentKey)
 	m_pcImpl = pcImpl;
 }
 
-LineAttributeControl::LineAttributeControl(LineAttributeControl const & cInThat)
+H3DF::LineAttributeControl::LineAttributeControl(LineAttributeControl const & cInThat)
 {
 	m_pcImpl = new LineAttributeControlImpl();
 	Set(cInThat);
 }
 
-void LineAttributeControl::Set(LineAttributeControl const & cInThat)
+void H3DF::LineAttributeControl::Set(LineAttributeControl const & cInThat)
 {
 	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 	LineAttributeControlImpl * pcInThatImpl = (LineAttributeControlImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-LineAttributeControl & LineAttributeControl::operator = (LineAttributeControl const & cInThat)
+LineAttributeControl & H3DF::LineAttributeControl::operator = (LineAttributeControl const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-LineAttributeControl & LineAttributeControl::SetPattern(CString strInPatternName)
+LineAttributeControl & H3DF::LineAttributeControl::SetPattern(CString strInPatternName)
 {
 	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 
@@ -187,7 +189,7 @@ LineAttributeControl & LineAttributeControl::SetPattern(CString strInPatternName
 	return *this;
 }
 
-LineAttributeControl & LineAttributeControl::SetWeight(float fInWeight, Line::SizeUnits eInUnits)
+LineAttributeControl & H3DF::LineAttributeControl::SetWeight(float fInWeight, Line::SizeUnits eInUnits)
 {
 	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 
@@ -234,7 +236,7 @@ LineAttributeControl & LineAttributeControl::SetWeight(float fInWeight, Line::Si
 	return *this;
 }
 
-LineAttributeControl & LineAttributeControl::UnsetPattern()
+LineAttributeControl & H3DF::LineAttributeControl::UnsetPattern()
 {
 	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 
@@ -245,7 +247,7 @@ LineAttributeControl & LineAttributeControl::UnsetPattern()
 	return *this;
 }
 
-LineAttributeControl & LineAttributeControl::UnsetWeight()
+LineAttributeControl & H3DF::LineAttributeControl::UnsetWeight()
 {
 	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 
@@ -256,7 +258,7 @@ LineAttributeControl & LineAttributeControl::UnsetWeight()
 	return *this;
 }
 
-LineAttributeControl & LineAttributeControl::UnsetEverything()
+LineAttributeControl & H3DF::LineAttributeControl::UnsetEverything()
 {
 	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
@@ -267,7 +269,7 @@ LineAttributeControl & LineAttributeControl::UnsetEverything()
 	return *this;
 }
 
-bool LineAttributeControl::ShowPattern(CString & strOutPatternName) const
+bool H3DF::LineAttributeControl::ShowPattern(CString & strOutPatternName) const
 {
 	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 
@@ -280,7 +282,7 @@ bool LineAttributeControl::ShowPattern(CString & strOutPatternName) const
 	return !strOutPatternName.IsEmpty();
 }
 
-bool LineAttributeControl::ShowWeight(float & fOutWeight, Line::SizeUnits & eOutUnits) const
+bool H3DF::LineAttributeControl::ShowWeight(float & fOutWeight, Line::SizeUnits & eOutUnits) const
 {
 	char chBuffer[MVO_BUFFER_SIZE] = "\n";
 	HC_Show_Variable_Line_Weight(chBuffer);

@@ -18,7 +18,7 @@
 #endif
 
 #ifndef _3DF_INLINE
-#	define TDF_INLINE __forceinline
+#	define H3DF_INLINE __forceinline
 #endif
 
 #ifndef _3DF_UNREFERENCED
@@ -311,21 +311,29 @@ namespace H3DF
 		ViewDirection() {}
 	};
 
-	class API_3DF ViewControl
+	class API_3DF Camera
 	{
 	public:
-		enum class Mode
+		enum class Mode : uint32_t
 		{
-			Multi,
+			Multi = 1,
 			Pan,
 			Orbit,
 			OrbitTurntable,
 			Zoom,
 			ZoomBox,
 		};
+
+		enum class Projection : uint32_t
+		{
+			Default = 1,
+			Perspective,
+			Orthographic,
+			Stretched,
+		};
 		
 	private:
-		ViewControl() = default;
+		Camera() = default;
 	};
 
 	class API_3DF Rendering

@@ -43,9 +43,6 @@
     <Filter Include="Facility">
       <UniqueIdentifier>{85153672-7fe8-4121-95d3-6294d3c13e7d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Control">
-      <UniqueIdentifier>{94caf97e-5866-43e8-8edb-faa6983abdc6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="3DF\Object">
       <UniqueIdentifier>{bcac17de-fcc0-4634-ab74-17a363d9339a}</UniqueIdentifier>
     </Filter>
@@ -60,6 +57,9 @@
     </Filter>
     <Filter Include="3DF\Sprocket\Impl">
       <UniqueIdentifier>{8bd7cc15-e18a-4e92-8ebc-1c43c4377e71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Operator\Impl">
+      <UniqueIdentifier>{d548b32f-9f75-4756-b369-ba2158959777}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -108,7 +108,7 @@
     <ClInclude Include="3DF\Image.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Operator.CameraSelect.h">
+    <ClInclude Include="3DF\Operator.CameraControl.h">
       <Filter>Operator</Filter>
     </ClInclude>
     <ClInclude Include="..\Signal\Signal.h">
@@ -318,6 +318,12 @@
     <ClInclude Include="3DF\Impl\SearchImpl.h">
       <Filter>3DF\Control\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\Operator.Select.h">
+      <Filter>Operator</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Impl\OperatorImpl.h">
+      <Filter>Operator\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -365,7 +371,7 @@
     <ClCompile Include="3DF\PMI.Entity.cpp">
       <Filter>3DF\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Operator.CameraSelect.cpp">
+    <ClCompile Include="3DF\Operator.CameraControl.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
     <ClCompile Include="..\Signal\Signal.cpp">
@@ -562,6 +568,12 @@
     </ClCompile>
     <ClCompile Include="3DF\Impl\SearchImpl.cpp">
       <Filter>3DF\Control\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Operator.Select.cpp">
+      <Filter>Operator</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\OperatorImpl.cpp">
+      <Filter>Operator\Impl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -119,7 +119,8 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::SnapItem::operator == (const Sna
 
 //== ObjectSnap class ==============================================================================
 KERNEL::Operator::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery) :
-	OperatorImpl(pcInView, pcInDelivery)
+	OperatorImpl(pcInView, pcInDelivery),
+	m_cDynamicHighlightControl(pcInView->GetWindowKey())
 {
 	SegmentKey cConstruction(Window().GetBaseView()->GetConstructionKey());
 
@@ -248,13 +249,13 @@ int KERNEL::Operator::HighlightObjectSnapImpl::NoButtonDownAndMove(int nFlags, i
 
 				// 맨 처음에는 기존 Hightlight를 삭제한다.
 				if (0 < m_cOldHighlightSelection.GetCount()) {
-					Window().GetHighlightControl().Unhighlight(m_cOldHighlightSelection, cHighlightOptions);
+					m_cDynamicHighlightControl.Unhighlight(m_cOldHighlightSelection, cHighlightOptions);
 					m_cOldHighlightSelection.Reset();
 				}
 				
 				bool bInRemoveExisting = true;
 				for (auto & pcSelItem : pcSnapItem->vcItems) {
-					Window().GetHighlightControl().Highlight(pcSelItem, cHighlightOptions, bInRemoveExisting);
+					m_cDynamicHighlightControl.Highlight(pcSelItem, cHighlightOptions, bInRemoveExisting);
 					// 추가를 해줘야 Unhighlight를 시킬수 있음.
 					m_cOldHighlightSelection.PushBack(new SelectionItem(pcSelItem));
 					bInRemoveExisting = false;
@@ -461,7 +462,7 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoin
 		// pcFrontItem->ShowPathString(strPath);
 
 		cOutSelections.PushBack(new SelectionItem(*pcFrontItem));
-		Window().GetHighlightControl().Highlight(*pcFrontItem, cOption);
+		m_cDynamicHighlightControl.Highlight(*pcFrontItem, cOption);
 		bNeedUpdate = true;
 	}
 
@@ -820,14 +821,20 @@ void KERNEL::Operator::HighlightObjectSnapImpl::DrawSnapItems()
 	}
 }
 
-void KERNEL::Operator::HighlightObjectSnapImpl::DrawSnapPoint(Operator::HighlightObjectSnapImpl::SnapPoint & cSnapPoint, CamerInformation & cInCameraInfo)
+void KERNEL::Operator::HighlightObjectSnapImpl::DrawSnapPoint(Operator::HighlightObjectSnapImpl::SnapPoint & cSnapPoint, CamerInformation & cInCameraInfo, bool bOperateSemgment)
 {
-	m_cSnapPointSegment.Open(); {
-		m_cSnapPointSegment.SetModellingMatrix(cInCameraInfo.cMatrix);
+	if (true == bOperateSemgment) {
+		m_cSnapPointSegment.Open(); {
+			m_cSnapPointSegment.SetModellingMatrix(cInCameraInfo.cMatrix);
 
+			Point2D cDropPoint = cSnapPoint.cPoint.DropPoint(cInCameraInfo.cOrigin, cInCameraInfo.cXAixs, cInCameraInfo.cYAixs);
+			DrawSnapPoint(cDropPoint, cSnapPoint.eStatus, cSnapPoint.eType, cInCameraInfo.dObjectSnapRadius);
+		} m_cSnapPointSegment.Close();
+	}
+	else {
 		Point2D cDropPoint = cSnapPoint.cPoint.DropPoint(cInCameraInfo.cOrigin, cInCameraInfo.cXAixs, cInCameraInfo.cYAixs);
 		DrawSnapPoint(cDropPoint, cSnapPoint.eStatus, cSnapPoint.eType, cInCameraInfo.dObjectSnapRadius);
-	} m_cSnapPointSegment.Close();
+	}
 }
 
 void KERNEL::Operator::HighlightObjectSnapImpl::DrawSnapPoint(Point2D center, Status eInStatus, OSnap::Type eInType, double dUnit)

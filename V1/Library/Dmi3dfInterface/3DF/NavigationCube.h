@@ -29,8 +29,6 @@ namespace H3DF
 
 		int LButtonDownAndMove(HEventInfo & cInEvent);
 
-		int NoButtonDownAndMove(HEventInfo & cInEvent);
-
 		void SetView(H3DF::BaseView * view, WindowKey * pcInWindow);
 
 		void SetVisible(bool axis, bool cube);

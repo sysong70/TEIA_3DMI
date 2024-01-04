@@ -277,7 +277,7 @@ size_t H3DF::SelectionControlImpl::SelectByPoint(Point const & cInLocation, Sele
 
 			// But if it really is a shell, check for regions.
 			if (streq(chKeyType, "shell") && nOffset3 != -1) {
-				Selection::Level cLevel;
+				//Selection::Level cLevel;
 /*
 			if(true == cInOptions.ShowLevel(cLevel)) {
 				if (Selection::Level::Subentity == cLevel) {

@@ -36,7 +36,7 @@
 #include "../3DF/3DF.Utility.h"
 #include "../3DF/Facility.AppOptions.h"
 
-#include "../3DF/Operator.CameraSelect.h"
+#include "../3DF/Operator.CameraControl.h"
 #include "../3DF/Operator.SelectArea.h"
 
 #include "../3DF/Window.h"
@@ -645,29 +645,24 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 		return false;
 	}
 
+	m_pcBaseView->Init();
+
 	// View Segment Key 설정.View Segment에는 향후 사용하기 위한 Base View 정보를 추가해놓는다.
 	m_cKey.Set(m_pcBaseView->GetViewKey());
 	SegmentKeyImpl * pcKeyImpl = static_cast<SegmentKeyImpl *>(m_cKey.GetImpl());
 	DEBUG_VALID(pcKeyImpl);
 	pcKeyImpl->SetBaseView(m_pcBaseView);
 
-	m_pcWindow = new WindowKey(m_pcBaseView);
+	H3DF::SelectionSet * pcSelection = new H3DF::SelectionSet(m_pcBaseView);
+	pcSelection->SetAllowSubentityDeselection(true);
+
+	m_pcBaseView->SetSelection(pcSelection);
 
 	// Model 설정
 	m_pcModel = pcInModel;
 	m_cModelKey = m_pcModel->GetSegmentKey();
 
-	m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
-	m_pcBaseView->SetNavigationCube(&m_cNaviCube);
-
-	m_pcBaseView->Init();
-
 	m_pcBaseView->GetModel()->GetEventManager()->RegisterHandler((HAnimationListener *)GetBaseView(), HAnimationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
-
-	H3DF::SelectionSet * pcSelection = new H3DF::SelectionSet(m_pcBaseView);
-	pcSelection->SetAllowSubentityDeselection(true);
-
-	m_pcBaseView->SetSelection(pcSelection);
 
 	HMarkupManager * pcMarkupManager = new HMarkupManager(m_pcBaseView);
 	m_pcBaseView->SetMarkupManager(pcMarkupManager);
@@ -745,7 +740,7 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 		sprintf(chDriverOpts, "%s, stereo", chDriverOpts);
 	}
 
-	sprintf(chDriverOpts, "%s, quick moves preference = %s", chDriverOpts, Utility::ToChar(TheKenel.Selection.Highlight.QuickMovesType));
+	sprintf(chDriverOpts, "%s, quick moves preference = %s", chDriverOpts, Utility::ToChar(TheKenel.Selection.Highlight.QuickMovesType).GetBuffer());
 
 	HCLOCALE(sprintf(chDriverOpts,
 		"%s, ambient occlusion = (%s, strength = %f, quality = %s), fast silhouette edges = (%s, tolerance = %f, %s heavy exterior)", chDriverOpts,
@@ -1116,7 +1111,7 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 			HC_Set_Rendering_Options(chRenderingOpts);
 		}
 
-		HCLOCALE(sprintf(chRenderingOpts, "simple shadow = (opacity = %f)", TheKenel.VisualEffects.Shadow.Opacity));
+		HCLOCALE(sprintf(chRenderingOpts, "simple shadow = (opacity = %f)", TheKenel.VisualEffects.Shadow.GetOpacity()));
 		HC_Set_Rendering_Options(chRenderingOpts);
 
 		char gooch_color_map[4096];
@@ -1226,6 +1221,12 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 
 	m_pcBaseView->SetLightCount(ThePreset.LightCount);
 	m_pcBaseView->SetViewSelectionLevel(HSelectionLevelSegment);
+
+	// WindowKey 선언 위치가 변경되면 않됨. 주의할것.
+	m_pcWindow = new WindowKey(m_pcBaseView);
+
+	m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
+	m_pcBaseView->SetNavigationCube(&m_cNaviCube);
 
 	SetDefaultOperator();
 
@@ -1405,58 +1406,6 @@ void H3DF::ViewImpl::SetSelectOption()
 	m_pcWindow->GetHighlightControl().GetLineAttributeControl().SetWeight(5.0);
 
 	return;
-
-
-	HPixelRGBA cHighlightSelectColor;
-	cHighlightSelectColor.Set(255, 0, 0);
-	m_pcBaseView->GetHighlightSelection()->SetSelectionFaceColor(cHighlightSelectColor);
-	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeColor(cHighlightSelectColor);
-	m_pcBaseView->GetHighlightSelection()->SetSelectionMarkerColor(cHighlightSelectColor);
-
-	m_pcBaseView->GetHighlightSelection()->SetGrayScale(ThePreset.GrayScaleSelection);
-	m_pcBaseView->GetHighlightSelection()->SetUseDefinedHighlight(ThePreset.UseDefinedHighlighting);
-	m_pcBaseView->GetHighlightSelection()->SetInvisible(ThePreset.InvisibleSelection);
-	m_pcBaseView->GetHighlightSelection()->SetAllowDisplacement(ThePreset.DisplaceSelection);
-	m_pcBaseView->SetDynamicHighlighting(TheKenel.Selection.Behavior.DynamicHighlighting);
-	m_pcBaseView->GetHighlightSelection()->UpdateHighlightStyle();
-
-	char chDriverOpts[MVO_BUFFER_SIZE];
-	sprintf(chDriverOpts, "quick moves preference = %s", Utility::ToChar(TheKenel.Selection.Highlight.QuickMovesType));
-	HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
-		HC_Set_Driver_Options(chDriverOpts);
-	} HC_Close_Segment();
-
-	// set the selection color
-	HSelectionSet * sel_set = m_pcBaseView->GetSelection();
-	assert(sel_set);
-	HPixelRGBA sel_col;
-	int sel_alpha = (int)(ThePreset.SelectionColorTransparency * 2.56f);		// settings is a %, scale it to 256
-	sel_col.Set(ColorRGBA(ThePreset.PolygonSelectionColor, sel_alpha));
-	sel_set->SetSelectionFaceColor(sel_col);
-
-	sel_col.Set(ColorRGBA(ThePreset.LineSelectionColor, sel_alpha));
-	sel_set->SetSelectionEdgeColor(sel_col);
-
-	sel_col.Set(ColorRGBA(ThePreset.MarkerSelectionColor, sel_alpha));
-	sel_set->SetSelectionMarkerColor(sel_col);
-
-	m_pcBaseView->GetSelection()->SetGrayScale(ThePreset.GrayScaleSelection);
-	m_pcBaseView->GetSelection()->SetUseDefinedHighlight(ThePreset.UseDefinedHighlighting);
-	m_pcBaseView->GetSelection()->SetAllowDisplacement(ThePreset.DisplaceSelection);
-	m_pcBaseView->GetSelection()->SetInvisible(ThePreset.InvisibleSelection);
-	m_pcBaseView->GetSelection()->SetHighlightMode((HSelectionHighlightMode)ThePreset.HighlightMode);
-
-	m_pcBaseView->GetHighlightSelection()->SetHighlightMode((HSelectionHighlightMode)ThePreset.HighlightMode);
-	m_pcBaseView->GetSelection()->SetHighlightTransparency(ThePreset.TransparencyLevel);
-
-	if (ThePreset.RefSelType == "Spriting")
-		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelSpriting);
-	else if (ThePreset.RefSelType == "Off")
-		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelOff);
-	else
-		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelDefault);
-
-	m_pcBaseView->GetSelection()->UpdateHighlightStyle();
 }
 
 
@@ -1502,10 +1451,8 @@ void H3DF::ViewImpl::SetDefaultOperator()
 // 		, new HSOpCameraPan(m_pHView),
 // 		new HSOpCameraZoom(m_pHView), 0, false))
 
-	m_pcCameraSelect = new Operator::CameraSelect(m_pcWindow, m_cNaviCube);
+	m_pcCameraSelect = new Operator::CameraControl(*m_pcWindow, m_cNaviCube);
 	m_pcSelectArea = new Operator::SelectArea(GetBaseView());
-
-	GetBaseView()->SetOperator(m_pcCameraSelect);
 
 	//LocalSetOperator(m_pcCameraManipulate);
 }
@@ -1518,110 +1465,6 @@ void H3DF::ViewImpl::LocalSetOperator(HBaseOperator * pcNewOperator)
 	if (nullptr != pcOperator) {
 		delete pcOperator;
 	}
-}
-
-//== Mouse Function ================================================================================
-
-bool H3DF::ViewImpl::LButtonDown(int nFlags, int x, int y)
-{
-	// GetBaseView()->SetDynamicHighlighting(false);
-
-	// Shift & L Button 이벤트는 Area Select
-	if (MK_SHIFT & nFlags) {
-		GetBaseView()->SetOperator(m_pcSelectArea);
-	}
-	else {
-		GetBaseView()->SetOperator(m_pcCameraSelect);
-	}
-
-	HEventInfo cEvent(GetBaseView());
-	cEvent.SetPoint(HE_LButtonDown, x, y, MouseMapFlags(nFlags));
-	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnLButtonDown(cEvent));
-	return true;
-}
-
-bool H3DF::ViewImpl::LButtonUp(int nFlags, int x, int y)
-{
-	// GetBaseView()->SetDynamicHighlighting(true);
-
-	HEventInfo cEvent(GetBaseView());
-	cEvent.SetPoint(HE_LButtonUp, x, y, MouseMapFlags(nFlags));
-	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnLButtonUp(cEvent));
-
-	GetBaseView()->SetOperator(m_pcCameraSelect);
-
-	return true;
-}
-
-bool H3DF::ViewImpl::RButtonDown(int nFlags, int x, int y)
-{
-	//GetBaseView()->SetDynamicHighlighting(false);
-
-	GetBaseView()->SetOperator(m_pcCameraSelect);
-
-	HEventInfo cEvent(GetBaseView());
-	cEvent.SetPoint(HE_RButtonDown, x, y, MouseMapFlags(nFlags));
-	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnRButtonDown(cEvent));
-	return true;
-}
-
-bool H3DF::ViewImpl::RButtonUp(int nFlags, int x, int y)
-{
-	//GetBaseView()->SetDynamicHighlighting(true);
-
-	HEventInfo cEvent(GetBaseView());
-	cEvent.SetPoint(HE_RButtonUp, x, y, MouseMapFlags(nFlags));
-	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnRButtonUp(cEvent));
-
-	return true;
-}
-
-bool H3DF::ViewImpl::MouseMove(int nFlags, int x, int y)
-{
-	// Control을 누른경우 Face 단위로 선택이 됨.
-/*
-	if (nFlags & MK_CONTROL) {
-		// select on arbitrary subentities(face, edge, or vertex)
-		GetHighlightSelection()->SetSelectionLevel(HSelectLevel::HSelectEntity);
-	}
-	else {
-		GetHighlightSelection()->SetSelectionLevel(HSelectLevel::HSelectSegment);
-	}
-*/
-	BaseView * pcView = GetBaseView();
-
-	HEventInfo cEvent(GetBaseView());
-	cEvent.SetPoint(HE_MouseMove, x, y, MouseMapFlags(nFlags));
-
-	m_pcCameraSelect->OnMouseMove(cEvent);
-
-	/*
-		if (MK_LBUTTON & nFlags || MK_RBUTTON & nFlags) {
-			GetBaseView()->GetOperator()->OnMouseMove(cEvent);
-		}
-		else {
-			m_pcWindow->OnMouseMove(cEvent);
-		}
-	*/
-
-	// Temp
-// 	HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnMouseMove(cEvent));
-
-	return true;
-}
-
-// Mouse Wheel 대응
-bool H3DF::ViewImpl::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop)
-{
-	HEventInfo	cEvent(GetBaseView());
-	cEvent.SetPoint(HE_MouseWheel, x - nLeft, y - nTop, MouseMapFlags(nFlags));
-	cEvent.SetMouseWheelDelta(zDelta);
-
-	m_pcCameraSelect->OnMouseWheel(cEvent);
-
-	//HLISTENER_EVENT(HMouseListener, GetBaseView()->GetEventManager(), OnMouseWheel(cEvent));
-
-	return true;
 }
 
 bool H3DF::ViewImpl::GetSimpleShadow()
@@ -1644,33 +1487,15 @@ void H3DF::ViewImpl::SetSimpleReflection(bool bFlag)
 	m_bSimpleReflection = bFlag;
 }
 
-//== View Control 관련 함수 ==================================================================
-ViewControl::Mode H3DF::ViewImpl::GetViewControlMode()
-{
-	return m_eViewControlMode;
-}
-
-void H3DF::ViewImpl::SetViewControlMode(ViewControl::Mode eMode)
-{
-	m_eViewControlMode = eMode;
-	m_pcCameraSelect->SetViewControlMode(m_eViewControlMode);
-}
-
 //== Keyboard 관련 함수 ==============================================================================
 bool H3DF::ViewImpl::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	switch (nChar)
-	{
-		default:
-			break;
-	}
-
 	return true;
 }
 
 void H3DF::ViewImpl::ViewReady()
 {
-	HBaseModel * hmodel = GetBaseView()->GetModel();
+	HBaseModel * pcModel = GetBaseView()->GetModel();
 
 	GetBaseView()->SetSuppressUpdate(true);
 
@@ -1734,9 +1559,9 @@ void H3DF::ViewImpl::ViewReady()
 	SetTransparency();
 
 	//Turn on static model and display lists last, and in that order
-	hmodel->SetStaticModel(TheKenel.Performance.Optimization.StaticModel);
-
-	hmodel->SetLMVModel(TheKenel.Performance.Optimization.LMVModel);
+// 	pcModel->SetStaticModel(TheKenel.Performance.Optimization.StaticModel);
+// 
+// 	pcModel->SetLMVModel(TheKenel.Performance.Optimization.LMVModel);
 
 	if (ThePreset.RestoreAnnotations) {
 		GetBaseView()->SetAnnotationResize(true);
@@ -1762,7 +1587,7 @@ void H3DF::ViewImpl::ViewReady()
 	}
 */
 
-	GetBaseView()->SetHandednessFromModel();
+	// GetBaseView()->SetHandednessFromModel();
 
 	GetBaseView()->SetSuppressUpdate(false);
 }

@@ -6,6 +6,7 @@
 #include "Point.h"
 
 #include "Impl/KeyImpl.h"
+#include "Impl/GeometryImpl.h"
 
 #include <HTools.h>
 
@@ -142,7 +143,7 @@ bool H3DF::CircleKit::ShowPoint(float fInAngle, Point & cOutPoint) const
 //== CircleKey =====================================================================================
 namespace H3DF {
 
-	class CircleKeyImpl : public H3DF::KeyImpl
+	class CircleKeyImpl : public GeometryKeyImpl
 	{
 	public:
 		CircleKeyImpl() { m_eType = H3DF::Type::CircleKey; }

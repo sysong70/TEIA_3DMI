@@ -50,6 +50,9 @@ namespace KERNEL
 
 		//== Selection Fiter 관련 함수 ===============================================================
 		void SetSelectionFilter(int nId);
+
+		//== Visibility 관련 함수 ====================================================================
+		void SetVisibility(int nId);
 		
 		//== Style 관련 함수 =========================================================================
 		void SetViewStyle(int nStyleId);
