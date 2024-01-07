@@ -35,7 +35,7 @@ namespace H3DF
 	class API_3DF HighlightControlImpl : public Impl
 	{
 	public:
-		HighlightControlImpl(WindowKey const & cInWindow);
+		HighlightControlImpl(WindowKey const & cInWindow, bool bDynFlag);
 
 		void Copy(HighlightControlImpl * pcInThat) {
 			m_pcWindow = pcInThat->m_pcWindow;

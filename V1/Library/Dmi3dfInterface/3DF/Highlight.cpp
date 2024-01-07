@@ -104,9 +104,9 @@ bool H3DF::HighlightOptionsKit::ShowNotification(bool & bOutState) const
 
 //== HighlightControl Class ========================================================================
 
-H3DF::HighlightControl::HighlightControl(WindowKey const & cInWindow)
+H3DF::HighlightControl::HighlightControl(WindowKey const & cInWindow, bool bDynFlag)
 {
-	HighlightControlImpl * pcImpl = new HighlightControlImpl(cInWindow);
+	HighlightControlImpl * pcImpl = new HighlightControlImpl(cInWindow, bDynFlag);
 	m_pcImpl = pcImpl;
 }
 

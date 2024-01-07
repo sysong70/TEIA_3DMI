@@ -37,7 +37,7 @@ namespace H3DF
 	class API_3DF HighlightControl : public Control
 	{
 	public:
-		explicit HighlightControl(WindowKey const & cInWindow);
+		explicit HighlightControl(WindowKey const & cInWindow, bool bDynFlag);
 		//HighlightControl(HighlightControl const & cInThat);
 
 		void Set(HighlightControl const & cInThat);

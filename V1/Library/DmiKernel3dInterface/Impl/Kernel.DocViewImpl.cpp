@@ -46,6 +46,11 @@ KERNEL::DocViewImpl::DocViewImpl()
 	}
 }
 
+H3DF::BaseView * KERNEL::DocViewImpl::GetBaseView()
+{
+	return m_cCanvas.GetFrontView().GetWindowKey().GetBaseView();
+}
+
 Signal::Delivery & KERNEL::DocViewImpl::Delivery() 
 { 
 	return *(Signal::Delivery *)m_pcDelivery;
@@ -55,7 +60,6 @@ const Signal::Delivery & KERNEL::DocViewImpl::Delivery() const
 { 
 	return *m_pcDelivery; 
 }
-
 
 void KERNEL::DocViewImpl::SetDelivery(const Signal::Delivery * pcInDelivery)
 {
@@ -79,6 +83,22 @@ void KERNEL::DocViewImpl::AllocationOperator(H3DF::View * pcInView, Signal::Deli
 
 	// Camera Operator 생성 및 설정
 	m_apcOperator[(int)KERNEL::Operator::Type::Camera] = new KERNEL::Operator::Camera(pcInView, &cDelivery);
+
+	// Camera Operator 생성 및 설정
+	m_apcOperator[(int)KERNEL::Operator::Type::Select] = new KERNEL::Operator::Select(pcInView, &cDelivery);
+
+	m_pcHighlightControl = new H3DF::HighlightControl(pcInView->GetWindowKey(), false);
+
+	H3DF::MaterialMappingKit cHighlightMaterialMapping;
+	// 	cHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(0, 0, 128)));
+	// 	cHighlightMaterialMapping.SetEdgeColor(RGBAColor(0, 0, 0));
+	// 	cHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(0, 162, 232)));
+
+	cHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(150, 150, 150)));
+	cHighlightMaterialMapping.SetEdgeColor(RGBAColor(0, 0, 0));
+	cHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(150, 150, 150)));
+
+	m_pcHighlightControl->SetMaterialMapping(cHighlightMaterialMapping);
 }
 
 KERNEL::Operator::OperatorBase * KERNEL::DocViewImpl::GetOperator(Operator::Type eInType)
@@ -94,6 +114,25 @@ KERNEL::Operator::HighlightObjectSnap & KERNEL::DocViewImpl::HighlightOSnapOpera
 KERNEL::Operator::Camera & KERNEL::DocViewImpl::Camera()
 {
 	return *(Operator::Camera *)m_apcOperator[(int)Operator::Type::Camera];
+}
+
+KERNEL::Operator::Select & KERNEL::DocViewImpl::Select()
+{
+	return *(Operator::Select *)m_apcOperator[(int)Operator::Type::Select];
+}
+
+DWORD KERNEL::DocViewImpl::MouseMapFlags(DWORD nState)
+{
+	DWORD nFlag = 0;
+
+	// map the mfc events state to MVO
+	if (nState & MK_LBUTTON) nFlag |= MVO_LBUTTON;
+	if (nState & MK_RBUTTON) nFlag |= MVO_RBUTTON;
+	if (nState & MK_MBUTTON) nFlag |= MVO_MBUTTON;
+	if (nState & MK_SHIFT) nFlag |= MVO_SHIFT;
+	if (nState & MK_CONTROL) nFlag |= MVO_CONTROL;
+
+	return nFlag;
 }
 
 //== Object Snap 관련 함수 ===========================================================================

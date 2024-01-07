@@ -14,7 +14,7 @@
 #include <3DF/Window.h>
 #include <3DF/VisualEffects.h>
 #include <3DF/Facility.AppOptions.h>
-#include <3DF/Operator.CameraControl.h>
+#include <3DF/3DF.Operator.CameraControl.h>
 
 #include <Json.h>
 
@@ -33,13 +33,6 @@ namespace KERNEL
 				OperatorImpl::Copy(pcInThat);
 			}
 
-			int MouseMove(int nFlags, int x, int y);
-			int LButtonDown(int nFlags, int x, int y);
-			int LButtonUp(int nFlags, int x, int y);
-			int RButtonDown(int nFlags, int x, int y);
-			int RButtonUp(int nFlags, int x, int y);
-			int MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop);
-
 			H3DF::Operator::CameraControl & CameraControl() { return m_cCameraControl; }
 			H3DF::Camera::Mode CameraMode();
 
@@ -53,43 +46,6 @@ KERNEL::Operator::CameraImpl::CameraImpl(const H3DF::View * pcInView, const Sign
 	: OperatorImpl(pcInView, pcInDelivery),
 	m_cCameraControl(pcInView->GetWindowKey(), pcInView->GetNavigationCube())
 {
-}
-
-int KERNEL::Operator::CameraImpl::MouseMove(int nFlags, int x, int y)
-{
-	if (MK_LBUTTON & nFlags) {
-		return m_cCameraControl.LButtonDownAndMove(nFlags, x, y);
-	}
-	else if (MK_RBUTTON & nFlags) {
-		return m_cCameraControl.RButtonDownAndMove(nFlags, x, y);
-	}
-
-	return 0;
-}
-
-int KERNEL::Operator::CameraImpl::LButtonDown(int nFlags, int x, int y)
-{
-	return m_cCameraControl.LButtonDown(nFlags, x, y);
-}
-
-int KERNEL::Operator::CameraImpl::LButtonUp(int nFlags, int x, int y)
-{
-	return m_cCameraControl.LButtonUp(nFlags, x, y);
-}
-
-int KERNEL::Operator::CameraImpl::RButtonDown(int nFlags, int x, int y)
-{
-	return m_cCameraControl.RButtonDown(nFlags, x, y);
-}
-
-int KERNEL::Operator::CameraImpl::RButtonUp(int nFlags, int x, int y)
-{
-	return m_cCameraControl.RButtonUp(nFlags, x, y);
-}
-
-int KERNEL::Operator::CameraImpl::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop)
-{
-	return m_cCameraControl.MouseWheel(nFlags, zDelta, x, y, nLeft, nTop);
 }
 
 //== View Control 관련 함수 ==========================================================================
@@ -109,59 +65,59 @@ KERNEL::Operator::Camera::Camera(const H3DF::View * pcInView, const Signal::Deli
 	m_pcImpl = pcImpl;
 }
 
-int KERNEL::Operator::Camera::MouseMove(int nFlags, int x, int y)
+int KERNEL::Operator::Camera::MouseMove(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	if (MK_LBUTTON & nFlags) {
-		return pcImpl->CameraControl().LButtonDownAndMove(nFlags, x, y);
+	if (MVO_LBUTTON & cInEvent.GetFlags()) {
+		return pcImpl->CameraControl().LButtonDownAndMove(cInEvent);
 	}
-	else if (MK_RBUTTON & nFlags) {
-		return pcImpl->CameraControl().RButtonDownAndMove(nFlags, x, y);
+	else if (MVO_RBUTTON & cInEvent.GetFlags()) {
+		return pcImpl->CameraControl().RButtonDownAndMove(cInEvent);
 	}
 
 	return 0;
 }
 
-int KERNEL::Operator::Camera::LButtonDown(int nFlags, int x, int y)
+int KERNEL::Operator::Camera::LButtonDown(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->LButtonDown(nFlags, x, y);
+	return pcImpl->CameraControl().LButtonDown(cInEvent);
 }
 
-int KERNEL::Operator::Camera::LButtonUp(int nFlags, int x, int y)
+int KERNEL::Operator::Camera::LButtonUp(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->LButtonUp(nFlags, x, y);
+	return pcImpl->CameraControl().LButtonUp(cInEvent);
 }
 
-int KERNEL::Operator::Camera::RButtonDown(int nFlags, int x, int y)
+int KERNEL::Operator::Camera::RButtonDown(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->RButtonDown(nFlags, x, y);
+	return pcImpl->CameraControl().RButtonDown(cInEvent);
 }
 
-int KERNEL::Operator::Camera::RButtonUp(int nFlags, int x, int y)
+int KERNEL::Operator::Camera::RButtonUp(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->RButtonUp(nFlags, x, y);
+	return pcImpl->CameraControl().RButtonUp(cInEvent);
 }
 
-int KERNEL::Operator::Camera::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop)
+int KERNEL::Operator::Camera::MouseWheel(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->MouseWheel(nFlags, zDelta, x, y, nLeft, nTop);
+	return pcImpl->CameraControl().MouseWheel(cInEvent);
 }
 
 //== View Control 관련 함수 ==========================================================================

@@ -37,7 +37,7 @@
 
 using namespace H3DF;
 
-H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
+H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow, bool bDynFlag)
 {
 	m_eType = H3DF::Type::HighlightControl;
 
@@ -45,9 +45,24 @@ H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
 
 	// m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetHighlightSelection();
 
+	if (false == bDynFlag) {
+		m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetSelection();
+	}
+	else
+	{
+		m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetHighlightSelection();
+	}
+
+/*
 	m_pcSelectionSet = new HSelectionSet((HBaseView *)cInWindow.GetBaseView());
 	m_pcSelectionSet->Init();
+	
+	m_pcSelectionSet->SetHighlightMode(HighlightQuickmoves);
+	m_pcSelectionSet->SetReferenceSelectionType(RefSelOff);
+
 	m_pcSelectionSet->UpdateHighlightStyle();
+*/
+
 /*
 	m_pcSelectionSet->SetSelectionLevel(HSelectEntity);
 	
@@ -81,12 +96,9 @@ BaseView * H3DF::HighlightControlImpl::GetBaseView() const
 
 HSelectionSet * H3DF::HighlightControlImpl::SelectionSet()
 {
-	return GetBaseView()->GetHighlightSelection();
+	//return ((HBaseView *)m_pcWindow->GetBaseView())->GetHighlightSelection();
 
-	if (nullptr == m_pcSelectionSet) {
-		return GetBaseView()->GetHighlightSelection();
-	}
-
+	DEBUG_VALID(m_pcSelectionSet);
 	return m_pcSelectionSet;
 }
 

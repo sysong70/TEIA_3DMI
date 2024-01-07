@@ -17,20 +17,20 @@ KERNEL::Operator::HighlightObjectSnap::HighlightObjectSnap(const H3DF::View * pc
 
 }
 
-int KERNEL::Operator::HighlightObjectSnap::LButtonDownAndMove(int nFlags, int x, int y)
+int KERNEL::Operator::HighlightObjectSnap::LButtonDownAndMove(HEventInfo & cInEvent)
 {
 	auto * pcImpl = static_cast<HighlightObjectSnapImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->LButtonDownAndMove(nFlags, x, y);
+	return pcImpl->LButtonDownAndMove(cInEvent);
 }
 
-int KERNEL::Operator::HighlightObjectSnap::NoButtonDownAndMove(int nFlags, int x, int y)
+int KERNEL::Operator::HighlightObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
 {
 	auto * pcImpl = static_cast<HighlightObjectSnapImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->NoButtonDownAndMove(nFlags, x, y);
+	return pcImpl->NoButtonDownAndMove(cInEvent);
 }
 
 //== Object Snap Point를 그리는 함수 ==================================================================
@@ -58,4 +58,12 @@ void KERNEL::Operator::HighlightObjectSnap::SetSelectionFilter(DWORD nInSelFilte
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetSelectionFilter(nInSelFilter);
+}
+
+H3DF::SelectionResults & KERNEL::Operator::HighlightObjectSnap::HighlightSelectionResult()
+{
+	auto * pcImpl = static_cast<HighlightObjectSnapImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->HighlightSelectionResult();
 }

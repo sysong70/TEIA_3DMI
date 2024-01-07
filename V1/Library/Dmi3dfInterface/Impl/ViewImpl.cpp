@@ -36,7 +36,7 @@
 #include "../3DF/3DF.Utility.h"
 #include "../3DF/Facility.AppOptions.h"
 
-#include "../3DF/Operator.CameraControl.h"
+#include "../3DF/3DF.Operator.CameraControl.h"
 #include "../3DF/Operator.SelectArea.h"
 
 #include "../3DF/Window.h"
@@ -1642,28 +1642,4 @@ DWORD H3DF::ViewImpl::MouseMapFlags(DWORD nState)
 	if (nState & MK_CONTROL) nFlag |= MVO_CONTROL;
 
 	return nFlag;
-}
-
-//== Select 관련 함수 ================================================================================
-
-// 선택된 Entity 선택 해제
-void H3DF::ViewImpl::DeSelectAll()
-{
-	if (0 < GetBaseView()->GetSelection()->GetSize()) {
-		GetBaseView()->GetSelection()->DeSelectAll();
-		GetBaseView()->ForceUpdate();
-	}
-}
-
-void H3DF::ViewImpl::SetSubentitySelectLevel()
-{
-	HSelectionSet * pcSelection = GetBaseView()->GetSelection();
-
-	if (HSelectLevel::HSelectSubentity != pcSelection->GetSelectionLevel()) {
-		pcSelection->DeSelectAll();
-		GetBaseView()->Update();
-	}
-	pcSelection->SetSelectionLevel(HSelectLevel::HSelectSubentity);
-	GetBaseView()->SetViewSelectionLevel(HSelectionLevelEntity);
-	GetBaseView()->Update();
 }

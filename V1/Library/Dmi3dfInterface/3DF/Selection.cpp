@@ -993,51 +993,11 @@ bool SelectionResults::Union(SelectionResults const & cInThat)
 			}
 		}
 	}
-/*
-
-	// 기존에 List에서 같은 값이 있으면 삭제한다.
-	// 새롭게 들어오는 항목이 앞쪽에 있도록 정렬하기 위함.
-	POSITION pcInThatPosition = pcInThatImpl->aItemList.GetHeadPosition();
-	while (nullptr != pcInThatPosition)
-	{
-		SelectionItem * pcInThatItem = pcInThatImpl->aItemList.GetNext(pcInThatPosition);
-
-		POSITION pcCurrentPosition = nullptr;
-		POSITION pcPosition = pcImpl->aItemList.GetHeadPosition();
-
-		bool bFindFlag = false;
-		while (nullptr != pcPosition) {
-			
-			pcCurrentPosition = pcPosition;
-			SelectionItem * pcItem = pcImpl->aItemList.GetNext(pcPosition);
-
-			Key cItemKey, cInThatItemKey;
-			pcItem->ShowSelectedItem(cItemKey);
-			pcInThatItem->ShowSelectedItem(cInThatItemKey);
-
-			TRACE(L"Item Key: %d, InThat Item Key: %d\n", cItemKey.KeyValue(), cInThatItemKey.KeyValue());
-
-			// 들어온 요소에 대해서 기존에 있는 요소와 비교해서 같은 것이 있으면 삭제한다.
-			if (*pcItem == *pcInThatItem) {
-				pcImpl->aItemList.RemoveAt(pcCurrentPosition);
-			}
-		}
-	}*/
 
 	for (auto pcInThatItem : pcInThatImpl->GetItems()) {
 		SelectionItem * pcNewItem = new SelectionItem(*pcInThatItem);
 		pcImpl->PushFront(pcNewItem);
 	}
-/*
-
-	pcInThatPosition = pcInThatImpl->aItemList.GetHeadPosition();
-	while (nullptr != pcInThatPosition)
-	{
-		SelectionItem * pcInThatItem = pcInThatImpl->aItemList.GetNext(pcInThatPosition);
-		SelectionItem * pcNewItem = new SelectionItem(*pcInThatItem);
-		pcImpl->aItemList.AddHead(pcNewItem);
-	}
-*/
 
 	return true;
 }

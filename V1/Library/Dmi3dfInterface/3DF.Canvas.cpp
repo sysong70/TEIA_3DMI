@@ -38,7 +38,7 @@
 #include "3DF/NavigationCube.h"
 #include "3DF/3DF.Utility.h"
 
-#include "3DF/Operator.CameraControl.h"
+#include "3DF/3DF.Operator.CameraControl.h"
 #include "3DF/Operator.SelectArea.h"
 
 #include "3DF/Facility.AppOptions.h"

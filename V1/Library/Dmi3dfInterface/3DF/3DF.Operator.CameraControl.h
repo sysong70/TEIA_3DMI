@@ -25,15 +25,15 @@ namespace H3DF
 			void FitWorld();
 
 			//== Mouse Event 처리 ===================================================================
-			int LButtonDown(int nFlags, int x, int y);
-			int LButtonUp(int nFlags, int x, int y);
-			int LButtonDownAndMove(int nFlags, int x, int y);
+			int LButtonDown(HEventInfo & cInEvent);
+			int LButtonUp(HEventInfo & cInEvent);
+			int LButtonDownAndMove(HEventInfo & cInEvent);
 			
-			int RButtonDown(int nFlags, int x, int y);
-			int RButtonUp(int nFlags, int x, int y);
-			int RButtonDownAndMove(int nFlags, int x, int y);
+			int RButtonDown(HEventInfo & cInEvent);
+			int RButtonUp(HEventInfo & cInEvent);
+			int RButtonDownAndMove(HEventInfo & cInEvent);
 		
-			int MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop);
+			int MouseWheel(HEventInfo & cInEvent);
 		};
 	}
 }

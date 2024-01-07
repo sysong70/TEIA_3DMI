@@ -149,7 +149,6 @@
     <ClInclude Include="3DF.Application.h" />
     <ClInclude Include="3DF.View.h" />
     <ClInclude Include="3DF.Factory.h" />
-    <ClInclude Include="3DF\Operator.Select.h" />
     <ClInclude Include="3DF\Performance.h" />
     <ClInclude Include="3DF\Selectability.h" />
     <ClInclude Include="3DF\SelectionSet.h" />
@@ -192,7 +191,7 @@
     <ClInclude Include="3DF\Material.h" />
     <ClInclude Include="3DF\Math.h" />
     <ClInclude Include="3DF\Object.h" />
-    <ClInclude Include="3DF\Operator.CameraControl.h" />
+    <ClInclude Include="3DF\3DF.Operator.CameraControl.h" />
     <ClInclude Include="3DF\Operator.SelectArea.h" />
     <ClInclude Include="3DF\PMI.Entity.h" />
     <ClInclude Include="3DF\Point.h" />
@@ -239,7 +238,6 @@
     <ClCompile Include="3DF\Impl\SegmentImpl.cpp" />
     <ClCompile Include="3DF\Impl\SelectionImpl.cpp" />
     <ClCompile Include="3DF\Impl\WindowImpl.cpp" />
-    <ClCompile Include="3DF\Operator.Select.cpp" />
     <ClCompile Include="3DF\Performance.cpp" />
     <ClCompile Include="3DF\Selectability.cpp" />
     <ClCompile Include="3DF\SelectionSet.cpp" />
@@ -274,7 +272,7 @@
     <ClCompile Include="3DF\Math.Matrix.cpp" />
     <ClCompile Include="3DF\NavigationCube.cpp" />
     <ClCompile Include="3DF\Object.cpp" />
-    <ClCompile Include="3DF\Operator.CameraControl.cpp" />
+    <ClCompile Include="3DF\3DF.Operator.CameraControl.cpp" />
     <ClCompile Include="3DF\Operator.KeyboardTest.cpp" />
     <ClCompile Include="3DF\Operator.KinematicTest.cpp" />
     <ClCompile Include="3DF\Operator.SelectArea.cpp" />

@@ -158,7 +158,7 @@ H3DF::InnerWindowPoint::InnerWindowPoint(WindowPoint const & cInPoint) {}
 H3DF::InnerWindowPoint::InnerWindowPoint(PixelPoint const & cInPoint) {}
 
 //== WindowPoint class =============================================================================
-H3DF::WindowPoint::WindowPoint(HPoint & cInPoint)
+H3DF::WindowPoint::WindowPoint(HPoint const & cInPoint)
 {
 	x = cInPoint.x;
 	y = cInPoint.y;
@@ -207,7 +207,7 @@ H3DF::WindowPoint::WindowPoint(InnerWindowPoint const & cInPoint) {}
 H3DF::WindowPoint::WindowPoint(PixelPoint const & cInPoint) {}
 
 //== PixelPoint class ==============================================================================
-H3DF::PixelPoint::PixelPoint(HPoint & cInPoint)
+H3DF::PixelPoint::PixelPoint(HPoint const & cInPoint)
 {
 	x = cInPoint.x;
 	y = cInPoint.y;

@@ -243,7 +243,7 @@ void H3DF::View::CancelCommands()
 		DEBUG_RETURN;
 	}
 
-	pcImpl->DeSelectAll();
+	//pcImpl->DeSelectAll();
 }
 
 void H3DF::View::CancelCommands() const
@@ -253,7 +253,7 @@ void H3DF::View::CancelCommands() const
 		DEBUG_RETURN;
 	}
 
-	pcImpl->DeSelectAll();
+	//pcImpl->DeSelectAll();
 }
 
 // == Action Function ==============================================================================
@@ -294,7 +294,7 @@ void H3DF::View::SetSubentitySelectLevel()
 	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->SetSubentitySelectLevel();
+	//pcImpl->SetSubentitySelectLevel();
 }
 
 

@@ -36,7 +36,7 @@ H3DF::WindowKey::WindowKey(H3DF::BaseView * pcBaseView)
 	SelectionControlImpl * pcSelectionImpl = dynamic_cast<SelectionControlImpl *>(pcImpl->m_pcSelection->GetImpl());
 	pcSelectionImpl->m_pcSelectionSet = GetBaseView()->GetSelection();
 
-	pcImpl->m_pcHighlight = new HighlightControl(*this);
+	pcImpl->m_pcHighlight = new HighlightControl(*this, false);
 	HighlightControlImpl * pcHighlightImpl = dynamic_cast<HighlightControlImpl *>(pcImpl->m_pcHighlight->GetImpl());
 
 	pcImpl->m_pcSelectionOptions = new SelectionOptionsControl(*this);

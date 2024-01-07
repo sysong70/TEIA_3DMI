@@ -91,7 +91,7 @@ namespace H3DF
 	public:
 		WindowPoint(float px = 0.0f, float py = 0.0f, float pz = 0.0f) : Point(px, py, pz) {}
 		WindowPoint(Point const & cInPoint) :Point(cInPoint) {}
-		WindowPoint(HPoint & cInPoint);
+		WindowPoint(HPoint const & cInPoint);
 
 		WindowPoint(WindowKey const & cInWindow, ObjectPoint const & cInPoint);
 		WindowPoint(WindowKey const & cInWindow, WorldPoint const & cInPoint);
@@ -117,7 +117,7 @@ namespace H3DF
 	public:
 		PixelPoint(float px = 0.0f, float py = 0.0f, float pz = 0.0f) : Point(px, py, pz) {}
 		PixelPoint(Point const & cInPoint) :Point(cInPoint) {}
-		PixelPoint(HPoint & cInPoint);
+		PixelPoint(HPoint const & cInPoint);
 
 		PixelPoint(WindowKey const & cInWindow, ObjectPoint const & cInPoint);
 		PixelPoint(WindowKey const & cInWindow, WorldPoint const & cInPoint);

@@ -87,11 +87,6 @@ namespace H3DF
 		bool Char(UINT nChar, UINT nRepCnt, UINT nFlags);
 		bool KeyboardInput(Json::Object & cInObject);
 
-		//== Select 관련 함수 ========================================================================
-	public:
-		void DeSelectAll();
-		void SetSubentitySelectLevel();
-
 	protected:
 		DWORD MouseMapFlags(DWORD nState);
 

@@ -165,22 +165,19 @@ void KERNEL::DocView::MouseMove(int nFlag, int x, int y)
 	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
-	// 카메라 Control 처리
-	pcImpl->Camera().MouseMove(nFlag, x, y);
+	DWORD nNewFlags = pcImpl->MouseMapFlags(nFlag);
 
-	if (!(MK_LBUTTON & nFlag) && !(MK_RBUTTON & nFlag)) {
-		pcImpl->HighlightOSnapOperator().NoButtonDownAndMove(nFlag, x, y);
-	}
-	else if(MK_LBUTTON & nFlag) {
-		pcImpl->HighlightOSnapOperator().LButtonDownAndMove(nFlag, x, y);
-	}
+	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
+	cEvent.SetPoint(HE_MouseMove, x, y, nNewFlags);
 
-/*
-	else if (!(MK_LBUTTON & nFlag)) {
-		//OnLButtonDownAndMove(HEventInfo & cInEvent)
-		pcImpl->m_cCanvas.GetFrontView().LButtonDownAndMove(nFlag, x, y);
+	pcImpl->Camera().MouseMove(cEvent);
+
+	if (!(MVO_LBUTTON & nNewFlags) && !(MVO_LBUTTON & nNewFlags)) {
+		pcImpl->HighlightOSnapOperator().NoButtonDownAndMove(cEvent);
 	}
-*/
+	else if(MVO_LBUTTON & nNewFlags) {
+		pcImpl->HighlightOSnapOperator().LButtonDownAndMove(cEvent);
+	}
 }
 
 void KERNEL::DocView::LButtonDown(int nFlag, int x, int y)
@@ -188,7 +185,10 @@ void KERNEL::DocView::LButtonDown(int nFlag, int x, int y)
 	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->Camera().LButtonDown(nFlag, x, y);
+	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
+	cEvent.SetPoint(HE_LButtonDown, x, y, pcImpl->MouseMapFlags(nFlag));
+
+	pcImpl->Camera().LButtonDown(cEvent);
 }
 
 void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
@@ -196,19 +196,35 @@ void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
+	pcImpl->m_cCanvas.GetFrontView().GetWindowKey().GetBaseView();
+
+	// Camera 관련 처리
 	H3DF::Camera::Mode eMode = pcImpl->Camera().CameraMode();
 
 	if (H3DF::Camera::Mode::ZoomBox == eMode) {
 		pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(true);
 	}
 
-	pcImpl->Camera().LButtonUp(nFlag, x, y);
+	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
+	cEvent.SetPoint(HE_LButtonUp, x, y, pcImpl->MouseMapFlags(nFlag));
+
+	int nResult = pcImpl->Camera().LButtonUp(cEvent);
 
 	if (H3DF::Camera::Mode::ZoomBox == eMode) {
 		pcImpl->HighlightOSnapOperator().DrawSnapItems();
 		pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(false);
 		pcImpl->m_cCanvas.GetFrontView().Update();
 	}
+
+	H3DF::SelectionResults & cSelResult = pcImpl->HighlightOSnapOperator().HighlightSelectionResult();
+
+	if (0 < cSelResult.GetCount()) {
+		H3DF::HighlightOptionsKit cOptions;
+		pcImpl->HighlightControl().Highlight(cSelResult, cOptions, false);
+		pcImpl->m_cCanvas.GetFrontView().Update();
+	}
+
+//	pcImpl->Select().LButtonDown(cEvent);
 }
 
 void KERNEL::DocView::RButtonDown(int nFlag, int x, int y)
@@ -216,7 +232,10 @@ void KERNEL::DocView::RButtonDown(int nFlag, int x, int y)
 	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
-	pcImpl->Camera().RButtonDown(nFlag, x, y);
+	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
+	cEvent.SetPoint(HE_RButtonDown, x, y, pcImpl->MouseMapFlags(nFlag));
+
+	pcImpl->Camera().RButtonDown(cEvent);
 }
 
 void KERNEL::DocView::RButtonUp(int nFlag, int x, int y)
@@ -224,7 +243,10 @@ void KERNEL::DocView::RButtonUp(int nFlag, int x, int y)
 	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
-	pcImpl->Camera().RButtonUp(nFlag, x, y);
+	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
+	cEvent.SetPoint(HE_RButtonUp, x, y, pcImpl->MouseMapFlags(nFlag));
+
+	pcImpl->Camera().RButtonUp(cEvent);
 }
 
 void KERNEL::DocView::MouseWheel(int nFlag, int x, int y, Json::Object & cInObject)
@@ -239,7 +261,11 @@ void KERNEL::DocView::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 
 	pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(true);
 
-	pcImpl->Camera().MouseWheel(nFlag, zDelta, x, y, nLeft, nTop);
+	HEventInfo	cEvent((HBaseView *)pcImpl->GetBaseView());
+	cEvent.SetPoint(HE_MouseWheel, x - nLeft, y - nTop, pcImpl->MouseMapFlags(nFlag));
+	cEvent.SetMouseWheelDelta(zDelta);
+
+	pcImpl->Camera().MouseWheel(cEvent);
 
 	pcImpl->HighlightOSnapOperator().DrawSnapItems();
 

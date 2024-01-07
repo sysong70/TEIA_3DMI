@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "Operator.CameraControl.h"
+#include "3DF.Operator.CameraControl.h"
 #include "Impl/SelectionImpl.h"
 
 #include "Impl/OperatorImpl.h"
@@ -316,51 +316,46 @@ void H3DF::Operator::CameraControl::FitWorld()
 //== Mouse Event 처리 ===============================================================================
 
 // 1. Left Button Down 처리
-int H3DF::Operator::CameraControl::LButtonDown(int nFlags, int x, int y)
+int H3DF::Operator::CameraControl::LButtonDown(HEventInfo & cInEvent)
 {
 	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	HEventInfo cEvent(pcImpl->GetBaseView());
-	cEvent.SetPoint(HE_LButtonDown, x, y, pcImpl->MouseMapFlags(nFlags));
-
-	pcImpl->m_cMouseDownPoint = cEvent.GetMousePixelPos();
+	pcImpl->m_cMouseDownPoint = cInEvent.GetMousePixelPos();
 	pcImpl->m_nMouseDownTickCount = GetTickCount();
 
 	// Shift & L Button 이벤트는 Area Select
-	if (MVO_SHIFT & cEvent.GetFlags()) {
+	if (MVO_SHIFT & cInEvent.GetFlags()) {
 	}
 
 	switch (pcImpl->m_eCameraMode)
 	{
 		case Camera::Mode::OrbitTurntable:
-			return pcImpl->m_cCameraOrbitTurntable.OnLButtonDown(cEvent);
+			return pcImpl->m_cCameraOrbitTurntable.OnLButtonDown(cInEvent);
 			break;
 
 		case Camera::Mode::Pan:
-			return pcImpl->m_cCameraPan.OnLButtonDown(cEvent);
+			return pcImpl->m_cCameraPan.OnLButtonDown(cInEvent);
 			break;
 
 		case Camera::Mode::ZoomBox:
-			return pcImpl->m_cCameraZoomBox.OnLButtonDown(cEvent);
+			return pcImpl->m_cCameraZoomBox.OnLButtonDown(cInEvent);
 			break;
 	}
 
-	return pcImpl->m_cCameraOrbit.OnLButtonDown(cEvent);
+	return pcImpl->m_cCameraOrbit.OnLButtonDown(cInEvent);
 }
 
 // 2. Left Button Up 처리
 // L Button Up을 핱때 Objet를 선택함.
-int H3DF::Operator::CameraControl::LButtonUp(int nFlags, int x, int y)
+int H3DF::Operator::CameraControl::LButtonUp(HEventInfo & cInEvent)
 {
 	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	HEventInfo cEvent(pcImpl->GetBaseView());
-	cEvent.SetPoint(HE_LButtonUp, x, y, pcImpl->MouseMapFlags(nFlags));
-
+	// Nvigation Cube가 있으면 Navigation Cube의 이벤트를 처리함.
 	if (nullptr != pcImpl->m_pcNaviCube) {
-		if (HLISTENER_CONSUME_EVENT == pcImpl->m_pcNaviCube->LButtonUp(cEvent)) {
+		if (HLISTENER_CONSUME_EVENT == pcImpl->m_pcNaviCube->LButtonUp(cInEvent)) {
 			return HLISTENER_CONSUME_EVENT;
 		}
 	}
@@ -368,33 +363,30 @@ int H3DF::Operator::CameraControl::LButtonUp(int nFlags, int x, int y)
 	switch (pcImpl->m_eCameraMode)
 	{
 		case Camera::Mode::OrbitTurntable:
-			return pcImpl->m_cCameraOrbitTurntable.OnLButtonUp(cEvent);
+			return pcImpl->m_cCameraOrbitTurntable.OnLButtonUp(cInEvent);
 			break;
 
 		case Camera::Mode::Pan:
-			return pcImpl->m_cCameraPan.OnLButtonUp(cEvent);
+			return pcImpl->m_cCameraPan.OnLButtonUp(cInEvent);
 			break;
 
 		case Camera::Mode::ZoomBox:
-			return pcImpl->m_cCameraZoomBox.OnLButtonUp(cEvent);
+			return pcImpl->m_cCameraZoomBox.OnLButtonUp(cInEvent);
 			break;
 	}
 
-	return pcImpl->m_cCameraOrbit.OnLButtonUp(cEvent);
+	return pcImpl->m_cCameraOrbit.OnLButtonUp(cInEvent);
 }
 
-int H3DF::Operator::CameraControl::LButtonDownAndMove(int nFlags, int x, int y)
+int H3DF::Operator::CameraControl::LButtonDownAndMove(HEventInfo & cInEvent)
 {
 	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	HEventInfo cEvent(pcImpl->GetBaseView());
-	cEvent.SetPoint(HE_MouseMove, x, y, pcImpl->MouseMapFlags(nFlags));
-
 	pcImpl->GetBaseView()->SetSuppressUpdate(true);
 
 	if (nullptr != pcImpl->m_pcNaviCube) {
-		pcImpl->m_pcNaviCube->LButtonDownAndMove(cEvent);
+		pcImpl->m_pcNaviCube->LButtonDownAndMove(cInEvent);
 	}
 
 	if (nullptr != pcImpl->m_pcNaviCube) {
@@ -406,19 +398,19 @@ int H3DF::Operator::CameraControl::LButtonDownAndMove(int nFlags, int x, int y)
 	switch (pcImpl->m_eCameraMode)
 	{
 		case Camera::Mode::OrbitTurntable:
-			nResult = pcImpl->m_cCameraOrbitTurntable.OnLButtonDownAndMove(cEvent);
+			nResult = pcImpl->m_cCameraOrbitTurntable.OnLButtonDownAndMove(cInEvent);
 			break;
 
 		case Camera::Mode::Pan:
-			nResult = pcImpl->m_cCameraPan.OnLButtonDownAndMove(cEvent);
+			nResult = pcImpl->m_cCameraPan.OnLButtonDownAndMove(cInEvent);
 			break;
 
 		case Camera::Mode::ZoomBox:
-			nResult = pcImpl->m_cCameraZoomBox.OnLButtonDownAndMove(cEvent);
+			nResult = pcImpl->m_cCameraZoomBox.OnLButtonDownAndMove(cInEvent);
 			break;
 
 		default:
-			nResult = pcImpl->m_cCameraOrbit.OnLButtonDownAndMove(cEvent);
+			nResult = pcImpl->m_cCameraOrbit.OnLButtonDownAndMove(cInEvent);
 			break;
 	}
 
@@ -429,47 +421,34 @@ int H3DF::Operator::CameraControl::LButtonDownAndMove(int nFlags, int x, int y)
 	return nResult;
 }
 
-int H3DF::Operator::CameraControl::RButtonDown(int nFlags, int x, int y)
+int H3DF::Operator::CameraControl::RButtonDown(HEventInfo & cInEvent)
 {
 	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	HEventInfo cEvent(pcImpl->GetBaseView());
-	cEvent.SetPoint(HE_RButtonDown, x, y, pcImpl->MouseMapFlags(nFlags));
-
-	return pcImpl->m_cCameraPan.OnLButtonDown(cEvent);
+	return pcImpl->m_cCameraPan.OnLButtonDown(cInEvent);
 }
 
-int H3DF::Operator::CameraControl::RButtonUp(int nFlags, int x, int y)
+int H3DF::Operator::CameraControl::RButtonUp(HEventInfo & cInEvent)
 {
 	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	HEventInfo cEvent(pcImpl->GetBaseView());
-	cEvent.SetPoint(HE_RButtonUp, x, y, pcImpl->MouseMapFlags(nFlags));
-
-	return pcImpl->m_cCameraPan.OnLButtonUp(cEvent);
+	return pcImpl->m_cCameraPan.OnLButtonUp(cInEvent);
 }
 
-int H3DF::Operator::CameraControl::RButtonDownAndMove(int nFlags, int x, int y)
+int H3DF::Operator::CameraControl::RButtonDownAndMove(HEventInfo & cInEvent)
 {
 	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	HEventInfo cEvent(pcImpl->GetBaseView());
-	cEvent.SetPoint(HE_MouseMove, x, y, pcImpl->MouseMapFlags(nFlags));
-
-	return pcImpl->m_cCameraPan.OnLButtonDownAndMove(cEvent);
+	return pcImpl->m_cCameraPan.OnLButtonDownAndMove(cInEvent);
 }
 
-int H3DF::Operator::CameraControl::MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop)
+int H3DF::Operator::CameraControl::MouseWheel(HEventInfo & cInEvent)
 {
 	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	HEventInfo	cEvent(pcImpl->GetBaseView());
-	cEvent.SetPoint(HE_MouseWheel, x - nLeft, y - nTop, pcImpl->MouseMapFlags(nFlags));
-	cEvent.SetMouseWheelDelta(zDelta);
-
-	return pcImpl->GetBaseView()->OnMouseWheel(cEvent);
+	return pcImpl->GetBaseView()->OnMouseWheel(cInEvent);
 }

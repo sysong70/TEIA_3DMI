@@ -62,13 +62,15 @@ namespace KERNEL
 
 			HighlightObjectSnapImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
 
-			int LButtonDownAndMove(int nFlags, int x, int y);
-			int NoButtonDownAndMove(int nFlags, int x, int y);
+			int LButtonDownAndMove(HEventInfo & cInEvent);
+			int NoButtonDownAndMove(HEventInfo & cInEvent);
 			bool DoDynamicHighlighting(H3DF::WindowPoint cMousePoint, H3DF::SelectionResults & cOutSelections);
 
 			void SetObjectSnapMode(DWORD nInSnapMode);
 			void SetSelectionFilter(DWORD nInSelFilter);
-		
+
+			H3DF::SelectionResults & HighlightSelectionResult() { return m_cHighlightSelectionResult; }
+
 		protected:
 			void ApplySelectionFilter(H3DF::SelectionResults & cInSelections, H3DF::SelectionResults & cOutSelections);
 
@@ -96,7 +98,7 @@ namespace KERNEL
 			H3DF::SelectionResults m_cNewHighlightSelection;
 			H3DF::SelectionResults m_cOldHighlightSelection;
 			H3DF::SelectionResults m_cOldOSnapHighlightSelection;
-			H3DF::SelectionResults m_cHighlightSelection;
+			H3DF::SelectionResults m_cHighlightSelectionResult;
 
 			// DoDynamicHighlighting용 Highlight control
 			H3DF::HighlightControl m_cDynamicHighlightControl;

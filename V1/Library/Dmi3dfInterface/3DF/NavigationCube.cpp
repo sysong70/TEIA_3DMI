@@ -181,7 +181,7 @@ int H3DF::NavigationCube::LButtonUp(HEventInfo & cInEvent)
 	CStringA strName = cSelectKey.Name();
 	// TRACE(L"%s\n", strName);
 
-	pcImpl->m_pcWindow->GetBaseView()->GetHighlightSelection()->DeSelectAll();
+	// pcImpl->m_pcWindow->GetBaseView()->GetHighlightSelection()->DeSelectAll();
 
 	for (int nIndex = 0; nIndex < (int)H3DF::ViewDirection::Mode::Count; nIndex++) {
 		if (pcImpl->m_cSegments[nIndex] == cSelectKey) {

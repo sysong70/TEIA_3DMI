@@ -2,7 +2,7 @@
 
 #include <3DF/3DF.h>
 #include <3DF/Math.h>
-#include <3DF/Operator.CameraControl.h>
+#include <3DF/3DF.Operator.CameraControl.h>
 
 #include "Operator.h"
 
@@ -17,15 +17,15 @@ namespace KERNEL
 		public:
 			Camera(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
 
-			int MouseMove(int nFlags, int x, int y);
+			int MouseMove(HEventInfo & cInEvent);
 
-			int LButtonDown(int nFlags, int x, int y);
-			int LButtonUp(int nFlags, int x, int y);
+			int LButtonDown(HEventInfo & cInEvent);
+			int LButtonUp(HEventInfo & cInEvent);
 
-			int RButtonDown(int nFlags, int x, int y);
-			int RButtonUp(int nFlags, int x, int y);
+			int RButtonDown(HEventInfo & cInEvent);
+			int RButtonUp(HEventInfo & cInEvent);
 
-			int MouseWheel(int nFlags, int zDelta, int x, int y, int nLeft, int nTop);
+			int MouseWheel(HEventInfo & cInEvent);
 
 			//== View Control 관련 함수 ==============================================================
 			H3DF::Camera::Mode CameraMode();

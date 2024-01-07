@@ -15,6 +15,7 @@ namespace KERNEL
 			VisualEffects,
 			Visibility,
 			Camera,
+			Select,
 			Count
 		};
 

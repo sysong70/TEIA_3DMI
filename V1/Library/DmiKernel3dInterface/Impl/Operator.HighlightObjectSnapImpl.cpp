@@ -122,7 +122,7 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::SnapItem::operator == (const Sna
 //== ObjectSnap class ==============================================================================
 KERNEL::Operator::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery) :
 	OperatorImpl(pcInView, pcInDelivery),
-	m_cDynamicHighlightControl(pcInView->GetWindowKey())
+	m_cDynamicHighlightControl(pcInView->GetWindowKey(), true)
 {
 	SegmentKey cConstruction(Window().GetBaseView()->GetConstructionKey());
 
@@ -156,10 +156,19 @@ KERNEL::Operator::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const H3DF::V
 	m_cSnapPointSegment.GetVisualEffectsControl().SetTextAntiAliasing(true);
 
 	MaterialMappingKit cHighlightMaterialMapping;
-	cHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(0, 0, 128)));
+// 	cHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(0, 0, 128)));
+// 	cHighlightMaterialMapping.SetEdgeColor(RGBAColor(0, 0, 0));
+// 	cHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(0, 162, 232)));
+
+	cHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(80, 80, 230)));
 	cHighlightMaterialMapping.SetEdgeColor(RGBAColor(0, 0, 0));
-	cHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(0, 162, 232)));
+	cHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(125, 125, 230)));
+
+
 	m_cDynamicHighlightControl.SetMaterialMapping(cHighlightMaterialMapping);
+
+// 	m_cDynamicHighlightControl.
+// 	m_pcSelectionSet->SetReferenceSelectionType(RefSelOff);
 
 	// Tick Count 초기화
 	m_nPrevMouseMoveTickCount = GetTickCount();
@@ -172,7 +181,7 @@ KERNEL::Operator::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const H3DF::V
 //== Mouse Event ===================================================================================
 
 // 1. Left 버튼 눌림 있는 Mouse Move 처리
-int KERNEL::Operator::HighlightObjectSnapImpl::LButtonDownAndMove(int nFlags, int x, int y)
+int KERNEL::Operator::HighlightObjectSnapImpl::LButtonDownAndMove(HEventInfo & cInEvent)
 {
 	DrawSnapItems();
 
@@ -180,9 +189,10 @@ int KERNEL::Operator::HighlightObjectSnapImpl::LButtonDownAndMove(int nFlags, in
 }
 
 // 2. 버튼 눌림 없는 Mouse Move 처리
-int KERNEL::Operator::HighlightObjectSnapImpl::NoButtonDownAndMove(int nFlags, int x, int y)
+int KERNEL::Operator::HighlightObjectSnapImpl::NoButtonDownAndMove(HEventInfo & cInEvent)
 {
-	PixelPoint cMousePoint(x, y);
+	PixelPoint cMousePoint(cInEvent.GetMousePixelPos());
+	WindowPoint cWindowPoint(cInEvent.GetMouseWindowPos());
 
 	DWORD nMouseMoveTickCount = GetTickCount();
 	DWORD nTickCount = nMouseMoveTickCount - m_nPrevMouseMoveTickCount;
@@ -199,8 +209,6 @@ int KERNEL::Operator::HighlightObjectSnapImpl::NoButtonDownAndMove(int nFlags, i
 	if (3 < fDist || 0 == fDist) {
 		return HLISTENER_PASS_EVENT;
 	}
-
-	WindowPoint cWindowPoint(Window(), cMousePoint);
 
 	SelectionResults cSelections;
 	DoDynamicHighlighting(cWindowPoint, cSelections);
@@ -250,10 +258,7 @@ int KERNEL::Operator::HighlightObjectSnapImpl::NoButtonDownAndMove(int nFlags, i
 				HighlightOptionsKit cHighlightOptions;
 				cHighlightOptions.SetNotification(false);
 
-				HC_KEY nHighlightSelectionKey = Window().GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
-				HC_Open_Segment_By_Key(nHighlightSelectionKey); {
-					HC_Set_Line_Weight(m_fLineWeight);
-				} HC_Close_Segment();
+				m_cDynamicHighlightControl.GetLineAttributeControl().SetWeight(m_fLineWeight);
 
 				// 맨 처음에는 기존 Hightlight를 삭제한다.
 				if (0 < m_cOldHighlightSelection.GetCount()) {
@@ -289,9 +294,9 @@ int KERNEL::Operator::HighlightObjectSnapImpl::NoButtonDownAndMove(int nFlags, i
 	// 	m_cNewHighlightSelection.LeaveType((DWORD)H3DF::Type::LineKey);
 
 	// 추가된것이 있는 경우에 Count를 검사해서 5개까지만 남기도록 한다.
-	if (true == m_cHighlightSelection.Union(cSelections)) {
-		if (m_nTotalSnapItemCount < m_cHighlightSelection.GetCount()) {
-			m_cHighlightSelection.SetSize(m_nTotalSnapItemCount);
+	if (true == m_cHighlightSelectionResult.Union(cSelections)) {
+		if (m_nTotalSnapItemCount < m_cHighlightSelectionResult.GetCount()) {
+			m_cHighlightSelectionResult.SetSize(m_nTotalSnapItemCount);
 		}
 	}
 
@@ -386,7 +391,6 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoin
 	// 선택된 요소가 없는 경우 Deselect All을 하고 Update를 한다.
 	if(0 == nResult) {
 		if(0 < m_cOldHighlightSelection.GetCount()) {
-			//Window().GetBaseView()->GetHighlightSelection()->DeSelectAll();
 			m_cDynamicHighlightControl.UnhighlightEverything();
 			Window().GetBaseView()->ForceUpdate();
 			m_cOldHighlightSelection.Reset();
@@ -454,18 +458,10 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoin
 	if(0 < cHighlightSelection.GetCount()) {
 		if(H3DF::Type::LineKey == pcFrontItem->Type()) {
 			m_cDynamicHighlightControl.GetLineAttributeControl().SetWeight(m_fLineWeight);
-// 			HC_KEY nHighlightSelectionKey = Window().GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
-// 			HC_Open_Segment_By_Key(nHighlightSelectionKey); {
-// 				HC_Set_Line_Weight(m_fLineWeight);
-// 			} HC_Close_Segment();
 		}
 		else {
 			float fLineWeight = 1.0;
 			m_cDynamicHighlightControl.GetLineAttributeControl().SetWeight(fLineWeight);
-// 			HC_KEY nHighlightSelectionKey = Window().GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
-// 			HC_Open_Segment_By_Key(nHighlightSelectionKey); {
-// 				HC_Set_Line_Weight(fLineWeight);
-// 			} HC_Close_Segment();
 		}
 
 		// CString strPath;
@@ -822,7 +818,7 @@ void KERNEL::Operator::HighlightObjectSnapImpl::DrawSnapItems()
 
 			for (auto pcItem : m_vSnapItems) {
 				for (auto & cSnapPoint : pcItem->vcSnapPoints) {
-					DrawSnapPoint(cSnapPoint, cCameraInfo);
+					DrawSnapPoint(cSnapPoint, cCameraInfo, false);
 				}
 			}
 		} SegmentKeyImpl::ForcedClose(m_cSnapPointSegment);

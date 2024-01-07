@@ -108,7 +108,7 @@
     <ClInclude Include="3DF\Image.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Operator.CameraControl.h">
+    <ClInclude Include="3DF\3DF.Operator.CameraControl.h">
       <Filter>Operator</Filter>
     </ClInclude>
     <ClInclude Include="..\Signal\Signal.h">
@@ -318,9 +318,6 @@
     <ClInclude Include="3DF\Impl\SearchImpl.h">
       <Filter>3DF\Control\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Operator.Select.h">
-      <Filter>Operator</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\Impl\OperatorImpl.h">
       <Filter>Operator\Impl</Filter>
     </ClInclude>
@@ -377,7 +374,7 @@
     <ClCompile Include="3DF\PMI.Entity.cpp">
       <Filter>3DF\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Operator.CameraControl.cpp">
+    <ClCompile Include="3DF\3DF.Operator.CameraControl.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
     <ClCompile Include="..\Signal\Signal.cpp">
@@ -574,9 +571,6 @@
     </ClCompile>
     <ClCompile Include="3DF\Impl\SearchImpl.cpp">
       <Filter>3DF\Control\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\Operator.Select.cpp">
-      <Filter>Operator</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Impl\OperatorImpl.cpp">
       <Filter>Operator\Impl</Filter>
