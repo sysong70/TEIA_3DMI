@@ -64,12 +64,12 @@ namespace KERNEL
 
 			int LButtonDownAndMove(HEventInfo & cInEvent);
 			int NoButtonDownAndMove(HEventInfo & cInEvent);
-			bool DoDynamicHighlighting(H3DF::WindowPoint cMousePoint, H3DF::SelectionResults & cOutSelections);
+			bool DoDynamicHighlighting(H3DF::WindowPoint cMousePoint, H3DF::SelectionItem & cOutSelection);
 
 			void SetObjectSnapMode(DWORD nInSnapMode);
 			void SetSelectionFilter(DWORD nInSelFilter);
 
-			H3DF::SelectionResults & HighlightSelectionResult() { return m_cHighlightSelectionResult; }
+			H3DF::SelectionItem & HighlightSelectionItem();
 
 		protected:
 			void ApplySelectionFilter(H3DF::SelectionResults & cInSelections, H3DF::SelectionResults & cOutSelections);
@@ -94,7 +94,7 @@ namespace KERNEL
 			void ClearSnapItems(bool bUpdate);
 			void ResetSnapItem();
 
-		protected:
+		public:
 			H3DF::SelectionResults m_cNewHighlightSelection;
 			H3DF::SelectionResults m_cOldHighlightSelection;
 			H3DF::SelectionResults m_cOldOSnapHighlightSelection;

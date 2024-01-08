@@ -252,13 +252,13 @@ HighlightControl & H3DF::HighlightControl::Highlight_ORG(SelectionResults const 
 
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *) cInItems.GetImpl();
 
-	for (auto pcItem : pcImpl->GetItems()) {
-		SelectionItemImpl * pcImpl = (SelectionItemImpl *)pcItem->GetImpl();
+	for (auto cItem : pcImpl->GetItems()) {
+		SelectionItemImpl * pcImpl = (SelectionItemImpl *)cItem.GetImpl();
 
 		HC_KEY nKey = pcImpl->cKey.KeyValue();
 
 		// Region 선택 관련 처리 부분
-		if (H3DF::Type::ShellKey == pcItem->Type() && (pcImpl->nLowest != pcImpl->nHighest || pcImpl->nLowest > 0)) {
+		if (H3DF::Type::ShellKey == cItem.Type() && (pcImpl->nLowest != pcImpl->nHighest || pcImpl->nLowest > 0)) {
 			bNeedDeselect = false;
 
 			if (!pcView->GetHighlightSelection()->IsRegionSelected(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, pcImpl->nRegion))

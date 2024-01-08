@@ -29,7 +29,9 @@ namespace KERNEL
 
 			void SetSelectionFilter(DWORD nInSelFilter);
 
-			H3DF::SelectionResults & HighlightSelectionResult();
+			H3DF::SelectionItem & HighlightSelectionItem();
+
+			void UnhighlightEverything();
 		};
 	}
 }

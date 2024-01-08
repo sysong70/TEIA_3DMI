@@ -61,6 +61,7 @@ bool H3DF::SelectionItemImpl::ShowPath(KeyPath & cOutPath) const
 	return true;
 }
 
+// Debug용 함수
 bool H3DF::SelectionItemImpl::ShowPathString(CString & strOutPath)
 {
 	KeyPath cPath;
@@ -96,7 +97,27 @@ bool H3DF::SelectionItemImpl::ShowPathString(CString & strOutPath)
 	return true;
 }
 
-//== SelectionResultsPrivate class =================================================================
+void H3DF::SelectionItemImpl::Reset()
+{
+	cKey.SetKeyValue(INVALID_KEY);
+
+	if (nullptr != pnIncludeKeys) {
+		delete pnIncludeKeys;
+		pnIncludeKeys = nullptr;
+	}
+
+	nIncludeCount = 0;
+
+	nOffset1 = 0;
+	nOffset2 = 0;
+	nOffset3 = 0;
+
+	nRegion = 0;
+	nLowest = 0;
+	nHighest = 0;
+}
+
+//== SelectionResultsImpl class ====================================================================
 
 bool H3DF::SelectionResultsImpl::Sort()
 {
@@ -105,10 +126,10 @@ bool H3DF::SelectionResultsImpl::Sort()
 	}
 
 	// 선택된 요소를 정렬하기 위해서 STL의 sort 함수를 사용
-	std::sort(m_deItems.begin(), m_deItems.end(), [] (SelectionItem * pcItem1, SelectionItem * pcItem2) {
+	std::sort(m_deItems.begin(), m_deItems.end(), [] (SelectionItem & cItem1, SelectionItem & cItem2) {
 		WindowPoint cP1, cP2;
-		pcItem1->ShowSelectionPosition(cP1);
-		pcItem2->ShowSelectionPosition(cP2);
+		cItem1.ShowSelectionPosition(cP1);
+		cItem2.ShowSelectionPosition(cP2);
 
 		if (cP1.z < cP2.z) {
 			return true;
@@ -121,15 +142,15 @@ bool H3DF::SelectionResultsImpl::Sort()
 	TRACE(L"\n");
 
 	int nIndex = 0;
-	for (SelectionItem * pcItem : m_deItems) {
+	for (auto cItem : m_deItems) {
 		Key cItemKey;
 
-		if (true == pcItem->ShowSelectedItem(cItemKey)) {
+		if (true == cItem.ShowSelectedItem(cItemKey)) {
 			WorldPoint cWorldPoint;
-			pcItem->ShowSelectionPosition(cWorldPoint);
+			cItem.ShowSelectionPosition(cWorldPoint);
 
 			WindowPoint cWindowPoint;
-			pcItem->ShowSelectionPosition(cWindowPoint);
+			cItem.ShowSelectionPosition(cWindowPoint);
 
 			H3DF::Type eType = cItemKey.Type();
 
@@ -202,12 +223,12 @@ size_t H3DF::SelectionControlImpl::SelectByPoint(Point const & cInLocation, Sele
 	int	nIncludeCount = 0;
 
 	// 선택된 요소를 SelectionResults에 저장하기 위해서 새롭게 생성
-	SelectionResultsImpl * pcResultsPrivate = (SelectionResultsImpl *)cOutResults.GetImpl();
+	SelectionResultsImpl * pcResultsImpl = dynamic_cast<SelectionResultsImpl *>(cOutResults.GetImpl());
 
 	do {
 		// 선택된 요소를 저장하기 위해서 Item 생성
-		SelectionItem * pcItem = new SelectionItem();
-		SelectionItemImpl * pcItemImpl = (SelectionItemImpl *)pcItem->GetImpl();
+		SelectionItem cItem;
+		SelectionItemImpl * pcItemImpl = dynamic_cast<SelectionItemImpl *>(cItem.GetImpl());
 		pcItemImpl->m_pcWindow = m_pcWindow;
 
 		HC_Show_Selection_Element(&nKey, &nOffset1, &nOffset2, &nOffset3);
@@ -306,7 +327,7 @@ size_t H3DF::SelectionControlImpl::SelectByPoint(Point const & cInLocation, Sele
 			}
 		}
 
-		pcResultsPrivate->PushBack(pcItem);
+		pcResultsImpl->PushBack(cItem);
 
 	} while (HC_Find_Related_Selection());
 
@@ -501,11 +522,11 @@ void H3DF::SelectionControlImpl::HandleSelection(UINT const nFlags, SelectionRes
 		if (streq(chType, "line") || streq(chType, "polyline") || streq(chType, "circular arc") || streq(chType, "elliptical arc")) {
 			eSelectedType = SelType::Line;
 
-			SelectionItem * pcItem = new SelectionItem();
-			SelectionItemImpl * pcItemImpl = (SelectionItemImpl *)pcItem->GetImpl();
+			SelectionItem cItem;
+			SelectionItemImpl * pcItemImpl = dynamic_cast<SelectionItemImpl *>(cItem.GetImpl());
 			pcItemImpl->cKey = LineKey(Key(nKey));
 			
-			pcResultsPrivate->PushBack(pcItem);
+			pcResultsPrivate->PushBack(cItem);
 		}
 		else if (streq(chType, "marker")) {
 			eSelectedType = SelType::Marker;

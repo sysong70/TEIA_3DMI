@@ -43,6 +43,8 @@ namespace KERNEL
 		const Signal::Delivery & Delivery() const;
 		void SetDelivery(const Signal::Delivery * pcInDelivery);
 
+		void CancelCommands();
+
 		//== Operator 관련 함수 ======================================================================
 		void AllocationOperator(H3DF::View * pcInView, Signal::Delivery & cDelivery);
 		Operator::OperatorBase * GetOperator(Operator::Type eInType);
@@ -75,9 +77,14 @@ namespace KERNEL
 	private:
 		Operator::OperatorBase * m_apcOperator[(int)Operator::Type::Count];
 		const Signal::Delivery * m_pcDelivery = nullptr;
+
+	public:
 		DWORD m_nOSnapMode = 0;
 		// 화면에 선택된 상태를 표시하기 위한 Highlight control
 		H3DF::HighlightControl * m_pcHighlightControl = nullptr;
 		DWORD m_nSelFilter = 0;
+
+		// 현재 선택된 요소들이 저장되는 변수
+		H3DF::SelectionResults m_cSelectionResult;
 	};
 }

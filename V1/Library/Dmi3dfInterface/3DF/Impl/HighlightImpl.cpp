@@ -117,13 +117,13 @@ void H3DF::HighlightControlImpl::Highlight(SelectionResults const & cInItems, Hi
 
 	SelectionResultsImpl * pcSelectionResultsImpl = (SelectionResultsImpl *) cInItems.GetImpl();
 
-	for (auto pcItem : pcSelectionResultsImpl->GetItems()) {
-		SelectionItemImpl * pcImpl = (SelectionItemImpl *) pcItem->GetImpl();
+	for (auto & cItem : pcSelectionResultsImpl->GetItems()) {
+		SelectionItemImpl * pcImpl = (SelectionItemImpl *) cItem.GetImpl();
 
 		HC_KEY nKey = pcImpl->cKey.KeyValue();
 
 		// Region 선택 관련 처리 부분
-		if (H3DF::Type::ShellKey == pcItem->Type() && (pcImpl->nLowest != pcImpl->nHighest || pcImpl->nLowest > 0)) {
+		if (H3DF::Type::ShellKey == cItem.Type() && (pcImpl->nLowest != pcImpl->nHighest || pcImpl->nLowest > 0)) {
 			bNeedDeselect = false;
 
 			if (!pcSelSet->IsRegionSelected(nKey, pcImpl->nIncludeCount, pcImpl->pnIncludeKeys, pcImpl->nRegion))
@@ -211,8 +211,8 @@ void H3DF::HighlightControlImpl::Unhighlight(SelectionResults const & cInItems, 
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *) cInItems.GetImpl();
 
 	// cInItem를 순회하면서 Unhighlight를 수행한다.
-	for (auto pcItem : pcImpl->GetItems()) {
-		SelectionItemImpl * pcItemImpl = (SelectionItemImpl *) pcItem->GetImpl();
+	for (auto & pcItem : pcImpl->GetItems()) {
+		SelectionItemImpl * pcItemImpl = (SelectionItemImpl *) pcItem.GetImpl();
 		HC_KEY nKey = pcItemImpl->cKey.KeyValue();
 		pcSelection->DeSelect(nKey, pcItemImpl->nIncludeCount, pcItemImpl->pnIncludeKeys, false);
 	}

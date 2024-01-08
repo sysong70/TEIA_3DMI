@@ -92,6 +92,8 @@ void KERNEL::DocView::CancelCommands()
 		DEBUG_RETURN;
 	}
 
+	pcImpl->CancelCommands();
+
 	//m_cView.CancelCommands();
 }
 
@@ -216,12 +218,19 @@ void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 		pcImpl->m_cCanvas.GetFrontView().Update();
 	}
 
-	H3DF::SelectionResults & cSelResult = pcImpl->HighlightOSnapOperator().HighlightSelectionResult();
+	H3DF::SelectionItem & cSelItem = pcImpl->HighlightOSnapOperator().HighlightSelectionItem();
 
-	if (0 < cSelResult.GetCount()) {
+	if (true == cSelItem.IsValid()) {
+		// 기존에 선택되어 있는 Dynamic highlight를 모두 지움.
+		pcImpl->HighlightOSnapOperator().UnhighlightEverything();
+
 		H3DF::HighlightOptionsKit cOptions;
-		pcImpl->HighlightControl().Highlight(cSelResult, cOptions, false);
+		//pcImpl->HighlightControl().Highlight(cSelResult, cOptions, false);
+		pcImpl->HighlightControl().Highlight(cSelItem, cOptions, false);
 		pcImpl->m_cCanvas.GetFrontView().Update();
+
+		// 선택된 객체를 SelectionResult에 추가
+		pcImpl->m_cSelectionResult.PushBack(cSelItem);
 	}
 
 //	pcImpl->Select().LButtonDown(cEvent);

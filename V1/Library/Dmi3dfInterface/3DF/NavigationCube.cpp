@@ -174,7 +174,7 @@ int H3DF::NavigationCube::LButtonUp(HEventInfo & cInEvent)
 	}
 
 	SegmentKey cSelectKey;
-	if (false == cSelection.Front()->ShowSelectedItem(cSelectKey)) {
+	if (false == cSelection.Front().ShowSelectedItem(cSelectKey)) {
 		return HLISTENER_PASS_EVENT;
 	}
 

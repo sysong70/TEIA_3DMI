@@ -217,10 +217,16 @@ namespace H3DF
 		H3DF::Type ObjectType() const { return H3DF::Type::SelectionItem; };
 
 		void Set(SelectionItem const & cInThat);
-		SelectionItem & operator=(SelectionItem const & cInThat);
+		SelectionItem & operator = (SelectionItem const & cInThat);
 
 		bool operator==(SelectionItem const & cInThat) const;
 		bool operator!=(SelectionItem const & cInThat) const;
+
+		void Reset();
+		void Reset() const;
+
+		bool IsValid();
+		bool IsValid() const;
 
 		bool ShowSelectedItem(Key & cOutSelection);
 		const bool ShowSelectedItem(Key & cOutSelection) const;
@@ -255,9 +261,9 @@ namespace H3DF
 
 		void Reset();
 
-		SelectionItem * GetItem() const;
+		SelectionItem & GetItem() const;
 
-		SelectionItem * operator * () const;
+		SelectionItem & operator * () const;
 	};
 
 	class API_3DF SelectionResults : public Object
@@ -282,10 +288,11 @@ namespace H3DF
 		size_t GetCount() const;
 		SelectionResultsIterator GetIterator() const;
 
-		SelectionItem * Front();
-		SelectionItem * Front() const;
+		SelectionItem & Front();
+		SelectionItem & Front() const;
 
-		void PushBack(SelectionItem * pcInItem);
+		void PushFront(SelectionItem & cInItem);
+		void PushBack(SelectionItem & cInItem);
 
 		void SetSize(size_t nInSize);
 

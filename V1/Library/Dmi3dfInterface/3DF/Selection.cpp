@@ -618,6 +618,35 @@ bool H3DF::SelectionItem::operator!=(SelectionItem const & cInThat) const
 	return !(*this == cInThat);
 }
 
+void H3DF::SelectionItem::Reset()
+{
+	auto * pcImpl = dynamic_cast<SelectionItemImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->Reset();
+}
+
+void H3DF::SelectionItem::Reset() const
+{
+	auto * pcImpl = dynamic_cast<SelectionItemImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->Reset();
+}
+
+bool H3DF::SelectionItem::IsValid()
+{
+	auto * pcImpl = dynamic_cast<SelectionItemImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+	return (INVALID_KEY != pcImpl->cKey.KeyValue()) ? true : false;
+}
+
+bool H3DF::SelectionItem::IsValid() const
+{
+	auto * pcImpl = dynamic_cast<SelectionItemImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+	return (INVALID_KEY != pcImpl->cKey.KeyValue()) ? true : false;
+}
 
 bool H3DF::SelectionItem::ShowSelectedItem(Key & cOutSelection)
 {
@@ -763,13 +792,13 @@ void SelectionResultsIterator::Reset()
 	pcImpl->pcIterator = pcImpl->pcBeginIterator;
 }
 
-SelectionItem * SelectionResultsIterator::GetItem() const
+SelectionItem & SelectionResultsIterator::GetItem() const
 {
 	SelectionResultsIteratorImpl * pcImpl = (SelectionResultsIteratorImpl *)m_pcImpl;
 	return *pcImpl->pcIterator;
 }
 
-SelectionItem * SelectionResultsIterator::operator * () const
+SelectionItem & SelectionResultsIterator::operator * () const
 {
 	return GetItem();
 }
@@ -819,9 +848,9 @@ bool SelectionResults::operator==(SelectionResults const & cInThat) const
 
 	bool bSameFlag = false;
 
-	for (auto pcItem : pcImpl->GetItems()) {
-		for (auto pcInThatItem : pcInThatImpl->GetItems()) {
-			if (*pcItem == *pcInThatItem) {
+	for (auto cItem : pcImpl->GetItems()) {
+		for (auto cInThatItem : pcInThatImpl->GetItems()) {
+			if (cItem == cInThatItem) {
 				bSameFlag = true;
 			}
 			else {
@@ -851,9 +880,11 @@ void SelectionResults::Reset()
 
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
 
+/*
 	for (auto pcItem : pcImpl->GetItems()) {
 		delete pcItem;
 	}
+*/
 
 	pcImpl->Clear();
 }
@@ -866,9 +897,11 @@ void SelectionResults::Reset() const
 
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *) m_pcImpl;
 
+/*
 	for (auto pcItem : pcImpl->GetItems()) {
 		delete pcItem;
 	}
+*/
 
 	pcImpl->Clear();
 }
@@ -896,22 +929,28 @@ SelectionResultsIterator SelectionResults::GetIterator() const
 	return cIterator;
 }
 
-SelectionItem * SelectionResults::Front()
+SelectionItem & SelectionResults::Front()
 {
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
 	return pcImpl->Front();
 }
 
-SelectionItem * SelectionResults::Front() const
+SelectionItem & SelectionResults::Front() const
 {
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
 	return pcImpl->Front();
 }
 
-void SelectionResults::PushBack(SelectionItem * pcInItem)
+void SelectionResults::PushFront(SelectionItem & cInItem)
 {
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
-	pcImpl->PushBack(pcInItem);
+	pcImpl->PushFront(cInItem);
+}
+
+void SelectionResults::PushBack(SelectionItem & cInItem)
+{
+	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	pcImpl->PushBack(cInItem);
 }
 
 // 내부 요소가 Size보다 큰 경우 Size 보다 큰 부분은 삭제한다.
@@ -923,16 +962,6 @@ void SelectionResults::SetSize(size_t nInSize)
 
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
 	
-	size_t nIndex = 0;
-	for (auto pcItem : pcImpl->GetItems()) {
-		nIndex++;
-		if (nIndex <= nInSize) {
-			continue;
-		}
-
-		delete pcItem;
-	}
-
 	pcImpl->Resize(nInSize);
 
 /*
@@ -975,16 +1004,16 @@ bool SelectionResults::Union(SelectionResults const & cInThat)
 		return false;
 	}
 
-	for (auto pcInThatItem : pcInThatImpl->GetItems()) {
+	for (auto cInThatItem : pcInThatImpl->GetItems()) {
 		bool bFindFlag = false;
 
 		for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
 			Key cItemKey, cInThatItemKey;
-			(*pcItemIter)->ShowSelectedItem(cItemKey);
-			pcInThatItem->ShowSelectedItem(cInThatItemKey);
+			pcItemIter->ShowSelectedItem(cItemKey);
+			cInThatItem.ShowSelectedItem(cInThatItemKey);
 
 			// 들어온 요소에 대해서 기존에 있는 요소와 비교해서 같은 것이 있으면 삭제한다.
-			if (*(*pcItemIter) == *pcInThatItem) {
+			if (*pcItemIter == cInThatItem) {
 				//요소 삭제 후, 다음 iterator 반환
 				pcItemIter = pcImpl->Erase(pcItemIter);
 			}
@@ -994,9 +1023,8 @@ bool SelectionResults::Union(SelectionResults const & cInThat)
 		}
 	}
 
-	for (auto pcInThatItem : pcInThatImpl->GetItems()) {
-		SelectionItem * pcNewItem = new SelectionItem(*pcInThatItem);
-		pcImpl->PushFront(pcNewItem);
+	for (auto cInThatItem : pcInThatImpl->GetItems()) {
+		pcImpl->PushFront(cInThatItem);
 	}
 
 	return true;
@@ -1007,7 +1035,7 @@ void SelectionResults::LeaveType(DWORD nType)
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
 	for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
 		Key cItemKey;
-		if (true == (*pcItemIter)->ShowSelectedItem(cItemKey)) {
+		if (true == pcItemIter->ShowSelectedItem(cItemKey)) {
 			DWORD nItemType = (DWORD)cItemKey.Type();
 			// 원하는 Type이면 삭제하지 않는다.
 			if (nType == nItemType) {
@@ -1029,7 +1057,7 @@ void SelectionResults::RemoveType(DWORD nType)
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
 	for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
 		Key cItemKey;
-		if (true == (*pcItemIter)->ShowSelectedItem(cItemKey)) {
+		if (true == pcItemIter->ShowSelectedItem(cItemKey)) {
 			DWORD nItemType = (DWORD)cItemKey.Type();
 			// 원하는 Type이면 삭제한다.
 			if (nItemType == (nType & nItemType)) {

@@ -68,9 +68,16 @@ void KERNEL::DocViewImpl::SetDelivery(const Signal::Delivery * pcInDelivery)
 
 //== Operator 관련 함수 ==============================================================================
 
+void KERNEL::DocViewImpl::CancelCommands()
+{
+	m_cSelectionResult.Reset();
+	m_pcHighlightControl->UnhighlightEverything();
+	m_cCanvas.GetFrontView().GetWindowKey().Update();
+}
+
 void KERNEL::DocViewImpl::AllocationOperator(H3DF::View * pcInView, Signal::Delivery & cDelivery)
 {
-	// Highlihgt Object Snap Operator 생성 및 설정
+	// Highlight Object Snap Operator 생성 및 설정
 	m_apcOperator[(int)KERNEL::Operator::Type::HighlightObjectSnap] = new KERNEL::Operator::HighlightObjectSnap(pcInView, &cDelivery);
 	((Operator::HighlightObjectSnap *)m_apcOperator[(int)KERNEL::Operator::Type::HighlightObjectSnap])->SetObjectSnapMode(m_nOSnapMode);
 	((Operator::HighlightObjectSnap *)m_apcOperator[(int)KERNEL::Operator::Type::HighlightObjectSnap])->SetSelectionFilter(m_nSelFilter);
@@ -94,11 +101,11 @@ void KERNEL::DocViewImpl::AllocationOperator(H3DF::View * pcInView, Signal::Deli
 	// 	cHighlightMaterialMapping.SetEdgeColor(RGBAColor(0, 0, 0));
 	// 	cHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(0, 162, 232)));
 
-	cHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(150, 150, 150)));
+	cHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(255, 131, 145)));
 	cHighlightMaterialMapping.SetEdgeColor(RGBAColor(0, 0, 0));
-	cHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(150, 150, 150)));
+	cHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(255, 131, 145)));
 
-	m_pcHighlightControl->SetMaterialMapping(cHighlightMaterialMapping);
+	cHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(255, 131, 145)));
 }
 
 KERNEL::Operator::OperatorBase * KERNEL::DocViewImpl::GetOperator(Operator::Type eInType)

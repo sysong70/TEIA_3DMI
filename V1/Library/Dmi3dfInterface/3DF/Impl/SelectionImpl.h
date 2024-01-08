@@ -140,6 +140,8 @@ namespace H3DF
 
 		bool ShowPath(KeyPath & cOutPath) const;
 		bool ShowPathString(CString & strOutPath);
+
+		void Reset();
 	};
 
 	class SelectionResultsIteratorImpl : public Impl
@@ -153,9 +155,9 @@ namespace H3DF
 			pcEndIterator = pcInThat->pcEndIterator;
 		}
 
-		std::deque<SelectionItem *>::iterator pcIterator;
-		std::deque<SelectionItem *>::iterator pcBeginIterator;
-		std::deque<SelectionItem *>::iterator pcEndIterator;
+		std::deque<SelectionItem>::iterator pcIterator;
+		std::deque<SelectionItem>::iterator pcBeginIterator;
+		std::deque<SelectionItem>::iterator pcEndIterator;
 	};
 
 	class SelectionResultsImpl : public Impl
@@ -165,17 +167,16 @@ namespace H3DF
 
 		void Copy(SelectionResultsImpl * pcInThat) {
 			m_deItems.clear();
-			for (auto pcItem : pcInThat->m_deItems) {
-				SelectionItem * pcNewItem = new SelectionItem(*pcItem);
-				m_deItems.push_back(pcNewItem);
+			for (auto cItem : pcInThat->m_deItems) {
+				m_deItems.push_back(cItem);
 			}
 		}
 
-		void PushFront(SelectionItem *& pcInItem) { m_deItems.push_front(pcInItem); }
-		void PushBack(SelectionItem *& pcInItem) { m_deItems.push_back(pcInItem); }
+		void PushFront(SelectionItem & pcInItem) { m_deItems.push_front(pcInItem); }
+		void PushBack(SelectionItem & pcInItem) { m_deItems.push_back(pcInItem); }
 
-		SelectionItem * Front() { return m_deItems.front(); }
-		SelectionItem * Back() { return m_deItems.back(); }
+		SelectionItem & Front() { return m_deItems.front(); }
+		SelectionItem & Back() { return m_deItems.back(); }
 
 		auto Begin() { return m_deItems.begin(); }
 		auto End() { return m_deItems.end(); }
@@ -191,10 +192,10 @@ namespace H3DF
 
 		bool Sort();
 
-		std::deque<SelectionItem *> & GetItems() { return m_deItems; }
+		std::deque<SelectionItem> & GetItems() { return m_deItems; }
 
 	private:
-		std::deque<SelectionItem *> m_deItems;
+		std::deque<SelectionItem> m_deItems;
 	};
 
 	class SelectionControlImpl : public Impl
