@@ -69,8 +69,6 @@ namespace KERNEL
 			void SetObjectSnapMode(DWORD nInSnapMode);
 			void SetSelectionFilter(DWORD nInSelFilter);
 
-			H3DF::SelectionItem & HighlightSelectionItem();
-
 		protected:
 			void ApplySelectionFilter(H3DF::SelectionResults & cInSelections, H3DF::SelectionResults & cOutSelections);
 
@@ -95,10 +93,9 @@ namespace KERNEL
 			void ResetSnapItem();
 
 		public:
-			H3DF::SelectionResults m_cNewHighlightSelection;
-			H3DF::SelectionResults m_cOldHighlightSelection;
-			H3DF::SelectionResults m_cOldOSnapHighlightSelection;
-			H3DF::SelectionResults m_cHighlightSelectionResult;
+			H3DF::SelectionResults m_cOSnapRelationSelItem;
+			H3DF::SelectionResults m_cSelectionResult;
+			H3DF::SelectionItem m_cDynamicHighlightSelItem;
 
 			// DoDynamicHighlighting용 Highlight control
 			H3DF::HighlightControl m_cDynamicHighlightControl;

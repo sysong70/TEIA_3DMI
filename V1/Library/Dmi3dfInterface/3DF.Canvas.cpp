@@ -286,7 +286,7 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 	// GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
 #endif
 
-	//HC_Define_System_Options("update control=thread");
+	HC_Define_System_Options("update control=thread");
 
 	pcViewImpl->GetBaseView()->SetSuppressUpdateTick(false);
 	pcViewImpl->GetBaseView()->SetSuppressUpdate(false);

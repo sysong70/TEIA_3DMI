@@ -294,6 +294,8 @@ namespace H3DF
 		void PushFront(SelectionItem & cInItem);
 		void PushBack(SelectionItem & cInItem);
 
+		bool Erase(SelectionItem & cItem);
+
 		void SetSize(size_t nInSize);
 
 		bool Union(SelectionResults const & cInThat);
@@ -302,6 +304,8 @@ namespace H3DF
 		void RemoveType(DWORD nType);
 
 		bool Sort();
+
+		bool IsExist(SelectionItem & cInItem);
 	};
 
 	class API_3DF SelectionControl : public Control

@@ -206,12 +206,14 @@ int KERNEL::Operator::HighlightObjectSnapImpl::NoButtonDownAndMove(HEventInfo & 
 #endif
 
 	// 같은 Mouse Point가 계속 들어오는 경우는 처리하지 않는다.
-	if (3 < fDist || 0 == fDist) {
+	if (1 < fDist || 0 == fDist) {
 		return HLISTENER_PASS_EVENT;
 	}
 
-	SelectionItem cSelection;
-	DoDynamicHighlighting(cWindowPoint, cSelection);
+	m_cSelectionResult.Reset();
+
+	m_cDynamicHighlightSelItem.Reset();
+	DoDynamicHighlighting(cWindowPoint, m_cDynamicHighlightSelItem);
 
 	//TRACE(L"ObjectSnapPrivate::NoButtonDownAndMove, Dist: %f\n", fDist);
 
@@ -261,16 +263,16 @@ int KERNEL::Operator::HighlightObjectSnapImpl::NoButtonDownAndMove(HEventInfo & 
 				m_cDynamicHighlightControl.GetLineAttributeControl().SetWeight(m_fLineWeight);
 
 				// 맨 처음에는 기존 Hightlight를 삭제한다.
-				if (0 < m_cOldHighlightSelection.GetCount()) {
-					m_cDynamicHighlightControl.Unhighlight(m_cOldHighlightSelection, cHighlightOptions);
-					m_cOldHighlightSelection.Reset();
+				if (0 < m_cOSnapRelationSelItem.GetCount()) {
+					m_cDynamicHighlightControl.Unhighlight(m_cOSnapRelationSelItem, cHighlightOptions);
+					m_cOSnapRelationSelItem.Reset();
 				}
 				
 				bool bInRemoveExisting = true;
 				for (auto & cSelItem : pcSnapItem->vcItems) {
 					m_cDynamicHighlightControl.Highlight(cSelItem, cHighlightOptions, bInRemoveExisting);
 					// 추가를 해줘야 Unhighlight를 시킬수 있음.
-					m_cOldHighlightSelection.PushBack(cSelItem);
+					m_cOSnapRelationSelItem.PushBack(cSelItem);
 					bInRemoveExisting = false;
 				}
 
@@ -290,14 +292,11 @@ int KERNEL::Operator::HighlightObjectSnapImpl::NoButtonDownAndMove(HEventInfo & 
 
 	bool bForceUpdate = false;
 
-	// 	새롭게 선택된 Selection Result에서 Line만 남기도록 한다.
-	// 	m_cNewHighlightSelection.LeaveType((DWORD)H3DF::Type::LineKey);
-
 	// 추가된것이 있는 경우에 Count를 검사해서 5개까지만 남기도록 한다.
-	if (true == cSelection.IsValid()) {
-		m_cHighlightSelectionResult.PushFront(cSelection);
-		if (m_nTotalSnapItemCount < m_cHighlightSelectionResult.GetCount()) {
-			m_cHighlightSelectionResult.SetSize(m_nTotalSnapItemCount);
+	if (true == m_cDynamicHighlightSelItem.IsValid()) {
+		m_cSelectionResult.PushFront(m_cDynamicHighlightSelItem);
+		if (m_nTotalSnapItemCount < m_cSelectionResult.GetCount()) {
+			m_cSelectionResult.SetSize(m_nTotalSnapItemCount);
 		}
 	}
 
@@ -305,10 +304,10 @@ int KERNEL::Operator::HighlightObjectSnapImpl::NoButtonDownAndMove(HEventInfo & 
 	nTickCount = nMouseMoveTickCount - m_nPrevMouseMoveTickCount;
 	m_nPrevMouseMoveTickCount = nMouseMoveTickCount;
 
-	if (true == cSelection.IsValid()) {
+	if (true == m_cDynamicHighlightSelItem.IsValid()) {
 		// Object Snap Point를 계산한다.
 		//CalculationObjectSnapPoint(cSelection);
-		CalculationObjectSnapPoint(m_cHighlightSelectionResult);
+		CalculationObjectSnapPoint(m_cSelectionResult);
 
 		// Snap Item을 그린다.
 		DrawSnapItems();
@@ -392,10 +391,10 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoin
 
 	// 선택된 요소가 없는 경우 Deselect All을 하고 Update를 한다.
 	if(0 == nResult) {
-		if(0 < m_cOldHighlightSelection.GetCount()) {
+		if(0 < m_cOSnapRelationSelItem.GetCount()) {
 			m_cDynamicHighlightControl.UnhighlightEverything();
 			Window().GetBaseView()->ForceUpdate();
-			m_cOldHighlightSelection.Reset();
+			m_cOSnapRelationSelItem.Reset();
 		}
 
 		return false;
@@ -476,7 +475,7 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoin
 		m_cDynamicHighlightControl.Highlight(cFrontItem, cOption);
 	}
 
-	m_cOldHighlightSelection.PushFront(cOutSelection);
+	m_cOSnapRelationSelItem.PushFront(cOutSelection);
 
 	return true;
 }
@@ -587,11 +586,6 @@ void KERNEL::Operator::HighlightObjectSnapImpl::SetObjectSnapMode(DWORD nInSnapM
 void KERNEL::Operator::HighlightObjectSnapImpl::SetSelectionFilter(DWORD nInSelFilter)
 {
 	m_nSelFilter = nInSelFilter;
-}
-
-H3DF::SelectionItem & KERNEL::Operator::HighlightObjectSnapImpl::HighlightSelectionItem() 
-{ 
-	return m_cHighlightSelectionResult.Front(); 
 }
 
 //== 1. Object Snap 계산 ============================================================================

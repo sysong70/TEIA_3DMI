@@ -194,7 +194,6 @@ namespace H3DF
 
 		std::deque<SelectionItem> & GetItems() { return m_deItems; }
 
-	private:
 		std::deque<SelectionItem> m_deItems;
 	};
 

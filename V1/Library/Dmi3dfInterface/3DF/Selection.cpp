@@ -804,23 +804,23 @@ SelectionItem & SelectionResultsIterator::operator * () const
 }
 
 //== SelectionResults Class ========================================================================
-SelectionResults::SelectionResults()
+H3DF::SelectionResults::SelectionResults()
 {
 	m_pcImpl = new SelectionResultsImpl();
 }
 
-SelectionResults::SelectionResults(SelectionResults const & cInThat)
+H3DF::SelectionResults::SelectionResults(SelectionResults const & cInThat)
 {
 	m_pcImpl = new SelectionResultsImpl();
 	Set(cInThat);
 }
 
-SelectionResults::~SelectionResults()
+H3DF::SelectionResults::~SelectionResults()
 {
 	Reset();
 }
 
-void SelectionResults::Set(SelectionResults const & cInThat)
+void H3DF::SelectionResults::Set(SelectionResults const & cInThat)
 {
 	// 복사하기 전에 기존의 결과값을 삭제한다.
 	Reset();
@@ -831,13 +831,13 @@ void SelectionResults::Set(SelectionResults const & cInThat)
 	pcImpl->Copy(pcInThatImpl);
 }
 
-SelectionResults & SelectionResults::operator=(SelectionResults const & cInThat)
+SelectionResults & H3DF::SelectionResults::operator=(SelectionResults const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-bool SelectionResults::operator==(SelectionResults const & cInThat) const
+bool H3DF::SelectionResults::operator==(SelectionResults const & cInThat) const
 {
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
 	SelectionResultsImpl * pcInThatImpl = (SelectionResultsImpl *)cInThat.m_pcImpl;
@@ -862,7 +862,7 @@ bool SelectionResults::operator==(SelectionResults const & cInThat) const
 	return bSameFlag;
 }
 
-bool SelectionResults::operator!=(SelectionResults const & cInThat) const
+bool H3DF::SelectionResults::operator!=(SelectionResults const & cInThat) const
 {
 	if (*this == cInThat) {
 		return false;
@@ -872,7 +872,7 @@ bool SelectionResults::operator!=(SelectionResults const & cInThat) const
 }
 
 // 결과값을 삭제한다.
-void SelectionResults::Reset()
+void H3DF::SelectionResults::Reset()
 {
 	if (nullptr == m_pcImpl) {
 		return;
@@ -889,7 +889,7 @@ void SelectionResults::Reset()
 	pcImpl->Clear();
 }
 
-void SelectionResults::Reset() const
+void H3DF::SelectionResults::Reset() const
 {
 	if (nullptr == m_pcImpl) {
 		return;
@@ -906,7 +906,7 @@ void SelectionResults::Reset() const
 	pcImpl->Clear();
 }
 
-size_t SelectionResults::GetCount() const
+size_t H3DF::SelectionResults::GetCount() const
 {
 	if (nullptr == m_pcImpl) {
 		return 0;
@@ -916,7 +916,7 @@ size_t SelectionResults::GetCount() const
 	return  pcImpl->Size();
 }
 
-SelectionResultsIterator SelectionResults::GetIterator() const
+SelectionResultsIterator H3DF::SelectionResults::GetIterator() const
 {
 	SelectionResultsIterator cIterator;
 	SelectionResultsIteratorImpl * pcIteratorImpl = (SelectionResultsIteratorImpl *)cIterator.GetImpl();
@@ -929,32 +929,48 @@ SelectionResultsIterator SelectionResults::GetIterator() const
 	return cIterator;
 }
 
-SelectionItem & SelectionResults::Front()
+SelectionItem & H3DF::SelectionResults::Front()
 {
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
 	return pcImpl->Front();
 }
 
-SelectionItem & SelectionResults::Front() const
+SelectionItem & H3DF::SelectionResults::Front() const
 {
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
 	return pcImpl->Front();
 }
 
-void SelectionResults::PushFront(SelectionItem & cInItem)
+void H3DF::SelectionResults::PushFront(SelectionItem & cInItem)
 {
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
 	pcImpl->PushFront(cInItem);
 }
 
-void SelectionResults::PushBack(SelectionItem & cInItem)
+void H3DF::SelectionResults::PushBack(SelectionItem & cInItem)
 {
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
 	pcImpl->PushBack(cInItem);
 }
 
+bool H3DF::SelectionResults::Erase(SelectionItem & cItem)
+{
+	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
+		if (*pcItemIter == cItem) {
+			pcItemIter = pcImpl->Erase(pcItemIter);
+			return true;
+		}
+		else {
+			++pcItemIter; // 다음 요소로 이동
+		}
+	}
+
+	return false;
+}
+
 // 내부 요소가 Size보다 큰 경우 Size 보다 큰 부분은 삭제한다.
-void SelectionResults::SetSize(size_t nInSize)
+void H3DF::SelectionResults::SetSize(size_t nInSize)
 {
 	if (nullptr == m_pcImpl) {
 		return;
@@ -991,7 +1007,7 @@ void SelectionResults::SetSize(size_t nInSize)
 }
 
 // 들어오는 SelectionResults 값을 추가시킨다. 
-bool SelectionResults::Union(SelectionResults const & cInThat)
+bool H3DF::SelectionResults::Union(SelectionResults const & cInThat)
 {
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
 	SelectionResultsImpl * pcInThatImpl = (SelectionResultsImpl *)cInThat.m_pcImpl;
@@ -1030,7 +1046,7 @@ bool SelectionResults::Union(SelectionResults const & cInThat)
 	return true;
 }
 
-void SelectionResults::LeaveType(DWORD nType)
+void H3DF::SelectionResults::LeaveType(DWORD nType)
 {
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
 	for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
@@ -1052,7 +1068,7 @@ void SelectionResults::LeaveType(DWORD nType)
 	}
 }
 
-void SelectionResults::RemoveType(DWORD nType)
+void H3DF::SelectionResults::RemoveType(DWORD nType)
 {
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
 	for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
@@ -1074,10 +1090,25 @@ void SelectionResults::RemoveType(DWORD nType)
 }
 
 // Selection Item point의 Z값을 이용해서 정렬한다.
-bool SelectionResults::Sort()
+bool H3DF::SelectionResults::Sort()
 {
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
 	return pcImpl->Sort();
+}
+
+bool H3DF::SelectionResults::IsExist(SelectionItem & cInItem)
+{
+	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
+
+		if (*pcItemIter == cInItem) {
+			return true;
+		}
+
+		++pcItemIter; // 다음 요소로 이동
+	}
+
+	return false;
 }
 
 //== SelectionControl Class ========================================================================

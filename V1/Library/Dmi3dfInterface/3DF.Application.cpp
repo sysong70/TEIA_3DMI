@@ -29,7 +29,7 @@
 #	define WRITE_3DF_LOG
 #endif
 
-//#define WRITE_3DF_LOG
+#define WRITE_3DF_LOG
 
 using namespace H3DF;
 

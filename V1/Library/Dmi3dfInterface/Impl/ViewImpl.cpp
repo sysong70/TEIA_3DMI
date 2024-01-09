@@ -1506,76 +1506,37 @@ void H3DF::ViewImpl::ViewReady()
 {
 	HBaseModel * pcModel = GetBaseView()->GetModel();
 
-	GetBaseView()->SetSuppressUpdate(true);
+	// GetBaseView()->SetSuppressUpdate(true);
 
-	GetBaseView()->SetSplatRendering(BOOL2bool(ThePreset.SplatRendering));
+	//GetBaseView()->SetSplatRendering(BOOL2bool(ThePreset.SplatRendering));
 
 	GetBaseView()->SetFastMarkerDrawing(ThePreset.FastMarkers);
 
-	HC_Open_Segment_By_Key(GetBaseView()->GetShadowMapSegmentKey()); {
-		char opt[MVO_BUFFER_SIZE];
+	 // Temp Remark
+// 	GetBaseView()->SetShadowLightDirection(ThePreset.UseLightVector, (HPoint *)&ThePreset.LightVector);
+// 	GetBaseView()->SetShadowIgnoresTransparency(TheKenel.VisualEffects.Shadow.IgnoreTransparency);
+// 	GetBaseView()->SetShadowMode((HShadowMode) TheKenel.VisualEffects.Shadow.Mode);
 
-		sprintf(opt, "shadow map=(%s, resolution=%d, samples=%d, %s jitter)",
-			ThePreset.ShadowMap ? "on" : "off",
-			ThePreset.SMResolution, ThePreset.SMSamples, ThePreset.Jitter ? "" : "no");
-
-		HC_Set_Rendering_Options(opt);
-	} HC_Close_Segment();
-
-/*
-	HC_Open_Segment_By_Key(GetBaseView()->GetSceneKey()); {
-		if (ThePreset.ShadowMap) {
-			HC_Set_Visibility("shadows = (emitting, casting, receiving)");
-		}
-
-		char opt[MVO_BUFFER_SIZE] = "";
-		char refl_opt[MVO_BUFFER_SIZE];
-
-// 		HCLOCALE(sprintf(opt, "simple reflection=(%s, opacity=%f, fading= %s, ",
-// 			ThePreset.ReflectionPlane ? "on" : "off",
-// 			ThePreset.ReflectionOpacity, ThePreset.ReflectionFading ? "on" : "off"));
-// 
-// 		if (ThePreset.ReflectionUseAttenuation) {
-// 			HCLOCALE(sprintf(refl_opt, "attenuation = (hither=%f, yon=%f), ",
-// 				ThePreset.ReflectionHither, ThePreset.ReflectionYon));
-// 		}
-// 		else
-// 			sprintf(refl_opt, "no attenuation, ");
-
-		sprintf(refl_opt, "no attenuation, ");
-		strcat(opt, refl_opt);
-
-// 		if (ThePreset.ReflectionUseBlur)
-// 			sprintf(refl_opt, "blur=%d)", ThePreset.ReflectionBlur);
-// 		else
-// 			sprintf(refl_opt, "no blur)");
-
-		sprintf(refl_opt, "no blur)");
-		strcat(opt, refl_opt);
-
-		HC_Set_Rendering_Options(opt);
-	} HC_Close_Segment();
-*/
-
-	GetBaseView()->SetShadowLightDirection(ThePreset.UseLightVector, (HPoint *)&ThePreset.LightVector);
-	GetBaseView()->SetShadowIgnoresTransparency(TheKenel.VisualEffects.Shadow.IgnoreTransparency);
-	GetBaseView()->SetShadowMode((HShadowMode) TheKenel.VisualEffects.Shadow.Mode);
-
-	GetBaseView()->SetOcclusionCullingMode(ThePreset.OcclusionCulling);
-	GetBaseView()->SetLineAntialiasing(TheKenel.Appearance.AntiAliasing.Line);
+	// GetBaseView()->SetOcclusionCullingMode(ThePreset.OcclusionCulling);
+	//GetBaseView()->SetLineAntialiasing(TheKenel.Appearance.AntiAliasing.Line);
 	GetBaseView()->SetTextAntialiasing(TheKenel.Appearance.AntiAliasing.Text);
 
 	SetTransparency();
 
 	//Turn on static model and display lists last, and in that order
-// 	pcModel->SetStaticModel(TheKenel.Performance.Optimization.StaticModel);
+ 	//pcModel->SetStaticModel(TheKenel.Performance.Optimization.StaticModel);
+	pcModel->SetStaticModel(true);
 // 
-// 	pcModel->SetLMVModel(TheKenel.Performance.Optimization.LMVModel);
+ 	//pcModel->SetLMVModel(TheKenel.Performance.Optimization.LMVModel);
+	//pcModel->SetLMVModel(true);
 
+/*
 	if (ThePreset.RestoreAnnotations) {
 		GetBaseView()->SetAnnotationResize(true);
 	}
 
+*/
+/*
 	if (DisplayListOff == ThePreset.DisplayList) {
 		GetBaseView()->SetDisplayListMode(false);
 	}
@@ -1583,6 +1544,8 @@ void H3DF::ViewImpl::ViewReady()
 		GetBaseView()->SetDisplayListType((DisplayListType)ThePreset.DisplayList);
 		GetBaseView()->SetDisplayListMode(true);
 	}
+*/
+
 
 	// Check whether this file contains layout, if yes, load them (applicable to dwg files, and hsfs saved from
 	// dwg files)
@@ -1598,7 +1561,7 @@ void H3DF::ViewImpl::ViewReady()
 
 	// GetBaseView()->SetHandednessFromModel();
 
-	GetBaseView()->SetSuppressUpdate(false);
+	// GetBaseView()->SetSuppressUpdate(false);
 }
 
 #include "../3DF/Operator.KeyboardTest.h"

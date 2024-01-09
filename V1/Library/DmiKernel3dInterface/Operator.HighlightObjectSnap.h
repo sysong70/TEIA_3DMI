@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+
 #include <3DF/3DF.h>
 #include <3DF/Math.h>
 #include <3DF/Selection.h>
@@ -28,8 +29,8 @@ namespace KERNEL
 			void SetObjectSnapMode(DWORD nInSnapMode);
 
 			void SetSelectionFilter(DWORD nInSelFilter);
-
-			H3DF::SelectionItem & HighlightSelectionItem();
+						
+			H3DF::SelectionItem & DynamicHighlightSelectionItem();
 
 			void UnhighlightEverything();
 		};

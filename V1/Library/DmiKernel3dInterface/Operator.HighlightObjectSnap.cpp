@@ -60,12 +60,12 @@ void KERNEL::Operator::HighlightObjectSnap::SetSelectionFilter(DWORD nInSelFilte
 	pcImpl->SetSelectionFilter(nInSelFilter);
 }
 
-H3DF::SelectionItem & KERNEL::Operator::HighlightObjectSnap::HighlightSelectionItem()
+H3DF::SelectionItem & KERNEL::Operator::HighlightObjectSnap::DynamicHighlightSelectionItem()
 {
 	auto * pcImpl = static_cast<HighlightObjectSnapImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->HighlightSelectionItem();
+	return pcImpl->m_cDynamicHighlightSelItem;
 }
 
 void KERNEL::Operator::HighlightObjectSnap::UnhighlightEverything()
