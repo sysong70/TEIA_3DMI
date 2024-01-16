@@ -508,13 +508,13 @@ void KERNEL::Operator::HighlightObjectSnapImpl::ApplySelectionFilter(H3DF::Selec
 
 			if ((DWORD)SelectionFilter::Type::Curve & m_nSelFilter)
 			{
-				if (!((USHORT)H3DF::TopologyType::Edge & nTopologyType)) {
+				if (!((DWORD)H3DF::TopologyType::Edge & nTopologyType)) {
 					cOutSelections.PushBack(cNextItem);
 				}
 			}
 			
 			if((DWORD)SelectionFilter::Type::Edge & m_nSelFilter) {
-				if ((USHORT)H3DF::TopologyType::Edge & nTopologyType) {
+				if ((DWORD)H3DF::TopologyType::Edge & nTopologyType) {
 					cOutSelections.PushBack(cNextItem);
 				}
 			}

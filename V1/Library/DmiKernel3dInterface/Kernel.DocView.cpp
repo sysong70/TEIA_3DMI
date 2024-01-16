@@ -218,9 +218,12 @@ void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 		pcImpl->m_cCanvas.GetFrontView().Update();
 	}
 
+	// 1. Dynamic Highlight된 Item을 가져옴. 
 	H3DF::SelectionItem & cSelItem = pcImpl->HighlightOSnapOperator().DynamicHighlightSelectionItem();
 
+	// 2. Dynamic Highlight된 Item이 선택된 경우라면 다음 처리를 실시
 	if (true == cSelItem.IsValid()) {
+		// 기존에 선택되어 있는 Dynamic highlight를 모두 지움.
 		pcImpl->HighlightOSnapOperator().UnhighlightEverything();
 
 		H3DF::HighlightOptionsKit cOptions;

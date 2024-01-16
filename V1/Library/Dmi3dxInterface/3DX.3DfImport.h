@@ -149,22 +149,31 @@ protected:
 	A3DStatus DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
 
 	A3DStatus DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem, const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment);
+	A3DStatus DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem, const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment);
 
 	UINT ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo);
+	UINT ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo, H3DF::ShellKit & cInShellKit);
+
 	UINT ConvertTessFaceDataTriangleFan(ConvertFaceInfo & cInFaceInfo);
+	UINT ConvertTessFaceDataTriangleFan(ConvertFaceInfo & cInFaceInfo, H3DF::ShellKit & cInShellKit);
+
 	UINT ConvertTessFaceDataTriangleStripe(ConvertFaceInfo & cInFaceInfo);
+	UINT ConvertTessFaceDataTriangleStripe(ConvertFaceInfo & cInFaceInfo, H3DF::ShellKit & cInShellKit);
+
 	UINT ConvertTessFaceDataTriangleOneNormal(ConvertFaceInfo & cInFaceInfo);
+	UINT ConvertTessFaceDataTriangleOneNormal(ConvertFaceInfo & cInFaceInfo, H3DF::ShellKit & cInShellKit);
 
 	UINT ConvertTessFaceDataTriangleFanOneNormal(ConvertFaceInfo & cInFaceInfo);
-	UINT DrawTessFaceDataTriangleFanOneNormal(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
-		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, H3DF::IntArray & anFacelistArray, H3DF::IntArray & anNormalIndexArray);
+	UINT ConvertTessFaceDataTriangleFanOneNormal(ConvertFaceInfo & cInFaceInfo, H3DF::ShellKit & cInShellKit);
 
 	UINT ConvertTessFaceDataTriangleStripeOneNormal(ConvertFaceInfo & cInFaceInfo);
+	UINT ConvertTessFaceDataTriangleStripeOneNormal(ConvertFaceInfo & cInFaceInfo, H3DF::ShellKit & cInShellKit);
 
 	UINT ConveTessFaceDataTriangleTextured(ConvertFaceInfo & cInFaceInfo);
-	UINT DrawTessFaceDataTriangleTextured(A3DTessFaceData & cTessFaceData, A3DUns32 * pnTriIndices, A3DUns32 & nTriSizeIndex, A3DUns32 & nTriStartIndex,
-		TessIndexMap & maPointIndexMap, TessIndexMap & maNormalIndexMap, H3DF::IntArray & anFacelistArray, H3DF::IntArray & anNormalIndexArray);
-	
+	UINT ConveTessFaceDataTriangleTextured(ConvertFaceInfo & cInFaceInfo, H3DF::ShellKit & cInShellKit);
+
+	UINT ConveTessFaceDataTriangleStripeTextured(ConvertFaceInfo & cInFaceInfo, H3DF::ShellKit & cInShellKit);
+
 	A3DStatus DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
 		const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment);
 
@@ -276,6 +285,10 @@ private:
 	H3DF::Vector * m_pcNormals = nullptr;
 	A3DUns32 m_nNormalCount = 0;
 	A3DUns32 m_nMaxNormalCount = 0;
+
+	H3DF::Point * m_pcTextureCoords = nullptr;
+	A3DUns32 m_nTextureCoordCount = 0;
+	A3DUns32 m_nMaxTextureCoordCount = 0;
 
 	// Segment Key Name 뒤부분에 붙는 Id값
 	DWORD m_nIncrementalId = 0;

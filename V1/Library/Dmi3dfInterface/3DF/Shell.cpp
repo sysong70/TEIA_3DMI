@@ -6,189 +6,418 @@
 
 #include "Material.h"
 
-USING_3DF_NAMESPACE
+#include <HUtility.h>
+
+using namespace H3DF;
+
+namespace H3DF
+{
+	class ShellKitImpl : public Impl
+	{
+	public:
+		void Copy(ShellKitImpl * pcInThat)
+		{
+			m_pacPointArray = pcInThat->m_pacPointArray;
+			m_pacNormalArray = pcInThat->m_pacNormalArray;
+			m_panFacelistArray = pcInThat->m_panFacelistArray;
+			m_panTristripsArray = pcInThat->m_panTristripsArray;
+			m_paParameterArray = pcInThat->m_paParameterArray;
+			m_paColorArray = pcInThat->m_paColorArray;
+
+			m_nPointCount = pcInThat->m_nPointCount;
+			m_pcPoints = pcInThat->m_pcPoints;
+
+			m_nNormalCount = pcInThat->m_nNormalCount;
+
+			m_cMaterialMappingKit = pcInThat->m_cMaterialMappingKit;
+		}
+
+		PointArray const * m_pacPointArray = nullptr;
+		VectorArray const * m_pacNormalArray = nullptr;
+		IntArray const * m_panFacelistArray = nullptr;
+		IntArray const * m_panTristripsArray = nullptr;
+		FloatArray const * m_paParameterArray = nullptr;
+		RGBAColorArray const * m_paColorArray = nullptr;
+
+		int m_nPointCount = 0;
+		Point const * m_pcPoints = nullptr;
+
+		int m_nNormalCount = 0;
+
+		MaterialMappingKit m_cMaterialMappingKit;
+
+		HShellWrapper * m_pcCreatedShell = nullptr;
+	};
+}
 
 //== ShellKit Class ================================================================================
-
-size_t ShellKit::GetPointCount() const
+H3DF::ShellKit::ShellKit()
 {
-	if(nullptr == m_pacPointArray) {
+	ShellKitImpl * pcImpl = new ShellKitImpl();
+	DEBUG_VALID(pcImpl);
+
+	m_pcImpl = pcImpl;
+}
+
+H3DF::ShellKit::~ShellKit()
+{
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr != pcImpl->m_pcCreatedShell) {
+		delete pcImpl->m_pcCreatedShell;
+		pcImpl->m_pcCreatedShell = nullptr;
+	}
+}
+
+size_t H3DF::ShellKit::GetPointCount() const
+{
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr != pcImpl->m_pcCreatedShell) {
+		return pcImpl->m_pcCreatedShell->m_plen;
+	}
+
+	if(nullptr == pcImpl->m_pacPointArray) {
 		return -0;
 	}
 
-	return m_pacPointArray->size();
+	return pcImpl->m_pacPointArray->size();
 }
-size_t ShellKit::GetFacelistCount() const
+size_t H3DF::ShellKit::GetFacelistCount() const
 {
-	if(nullptr == m_panFacelistArray) {
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if(nullptr == pcImpl->m_panFacelistArray) {
 		return -0;
 	}
 
-	return m_panFacelistArray->size();
+	return pcImpl->m_panFacelistArray->size();
 }
 
-size_t ShellKit::GetTristripsCount() const
+size_t H3DF::ShellKit::GetTristripsCount() const
 {
-	if(nullptr == m_panTristripsArray) {
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if(nullptr == pcImpl->m_panTristripsArray) {
 		return -0;
 	}
 
-	return m_panTristripsArray->size();
+	return pcImpl->m_panTristripsArray->size();
 }
 
-ShellKit & ShellKit::SetPoints(int nInPointCount, Point const * pcInPoints)
+ShellKit & H3DF::ShellKit::SetPoints(int nInPointCount, Point const * pcInPoints)
 {
-	m_nPointCount = nInPointCount;
-	m_pcPoints = pcInPoints;
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_nPointCount = nInPointCount;
+	pcImpl->m_pcPoints = pcInPoints;
 	return *this;
 }
 
-ShellKit & ShellKit::SetPoints(int nInPointCount, PointArray const & acInPoints)
+ShellKit & H3DF::ShellKit::SetPoints(int nInPointCount, PointArray const & acInPoints)
 {
-	m_nPointCount = nInPointCount;
-	m_pacPointArray = &acInPoints;
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_nPointCount = nInPointCount;
+	pcImpl->m_pacPointArray = &acInPoints;
 	return *this;
 }
 
-ShellKit & ShellKit::SetPoints(PointArray const & acInPoints)
+ShellKit & H3DF::ShellKit::SetPoints(PointArray const & acInPoints)
 {
-	m_pacPointArray = &acInPoints;
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_pacPointArray = &acInPoints;
 	return *this;
 }
 
-ShellKit & ShellKit::SetNormals(int nInNormalCount, VectorArray const & acInVectors)
+ShellKit & H3DF::ShellKit::SetNormals(int nInNormalCount, VectorArray const & acInVectors)
 {
-	m_nNormalCount = nInNormalCount;
-	m_pacNormalArray = &acInVectors;
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_nNormalCount = nInNormalCount;
+	pcImpl->m_pacNormalArray = &acInVectors;
 	return *this;
 }
 
-ShellKit & ShellKit::SetNormals(VectorArray const & acInVectors)
+ShellKit & H3DF::ShellKit::SetNormals(VectorArray const & acInVectors)
 {
-	m_pacNormalArray = &acInVectors;
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_pacNormalArray = &acInVectors;
 	return *this;
 }
 
-ShellKit & ShellKit::SetFacelist(IntArray const & acInFacelist)
+ShellKit & H3DF::ShellKit::SetFacelist(IntArray const & acInFacelist)
 {
-	m_panFacelistArray = &acInFacelist;
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_panFacelistArray = &acInFacelist;
 	return *this;
 }
 
-ShellKit & ShellKit::SetTristrips(IntArray const & acInTristrips)
+ShellKit & H3DF::ShellKit::SetTristrips(IntArray const & acInTristrips)
 {
-	m_panTristripsArray = &acInTristrips;
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_panTristripsArray = &acInTristrips;
 	return *this;
 }
 
-ShellKit & ShellKit::SetParameters(FloatArray const & aInParameters)
+ShellKit & H3DF::ShellKit::SetParameters(FloatArray const & aInParameters)
 {
-	m_paParameterArray = &aInParameters;
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_paParameterArray = &aInParameters;
 	return *this;
 }
 
-ShellKit & ShellKit::SetColors(RGBAColorArray const & aInColors)
+ShellKit & H3DF::ShellKit::SetColors(RGBAColorArray const & aInColors)
 {
-	m_paColorArray = &aInColors;
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_paColorArray = &aInColors;
 	return *this;
 }
 
 //== Show 관련 함수 ==================================================================================
-bool ShellKit::ShowPoints(int & nOutPointCount, Point const *& pcOutPoints) const
+bool H3DF::ShellKit::ShowPoints(int & nOutPointCount, Point const *& pcOutPoints) const
 {
-	nOutPointCount = m_nPointCount;
-	pcOutPoints = m_pcPoints;
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	nOutPointCount = pcImpl->m_nPointCount;
+	pcOutPoints = pcImpl->m_pcPoints;
 	return true;
 }
 
-bool ShellKit::ShowPoints(int & nOutPointCount, PointArray const *& acOutPoints) const
+bool H3DF::ShellKit::ShowPoints(int & nOutPointCount, PointArray const *& acOutPoints) const
 {
-	if (nullptr == m_pacPointArray) {
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr == pcImpl->m_pacPointArray) {
 		return false;
 	}
 
-	nOutPointCount = m_nPointCount;
-	acOutPoints = m_pacPointArray;
+	nOutPointCount = pcImpl->m_nPointCount;
+	acOutPoints = pcImpl->m_pacPointArray;
 	return true;
 }
 
-bool ShellKit::ShowPoints(PointArray const *& acOutPoints) const
+bool H3DF::ShellKit::ShowPoints(PointArray const *& acOutPoints) const
 {
-	if(nullptr == m_pacPointArray) {
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if(nullptr == pcImpl->m_pacPointArray) {
 		return false;
 	}
 
-	acOutPoints = m_pacPointArray;
+	acOutPoints = pcImpl->m_pacPointArray;
 	return true;
 }
 
-bool ShellKit::ShowNormals(int & nOutNormalCount, VectorArray const *& acOutVectors) const
+bool H3DF::ShellKit::ShowNormals(int & nOutNormalCount, VectorArray const *& acOutVectors) const
 {
-	if (nullptr == m_pacNormalArray) {
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr == pcImpl->m_pacNormalArray) {
 		return false;
 	}
-	nOutNormalCount = m_nNormalCount;
-	acOutVectors = m_pacNormalArray;
+	nOutNormalCount = pcImpl->m_nNormalCount;
+	acOutVectors = pcImpl->m_pacNormalArray;
 	return true;
 }
 
-bool ShellKit::ShowNormals(VectorArray const *& acOutVectors) const
+bool H3DF::ShellKit::ShowNormals(VectorArray const *& acOutVectors) const
 {
-	if(nullptr == m_pacNormalArray) {
-		return false;
-	}
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
 
-	acOutVectors = m_pacNormalArray;
-	return true;
-}
 
-bool ShellKit::ShowFacelist(IntArray const *& acOutFacelist) const
-{
-	if(nullptr == m_panFacelistArray) {
+	if (nullptr == pcImpl->m_pacNormalArray) {
 		return false;
 	}
 
-	acOutFacelist = m_panFacelistArray;
+	acOutVectors = pcImpl->m_pacNormalArray;
 	return true;
 }
 
-
-bool ShellKit::ShowTristrips(IntArray const *& acOutTristrips) const
+bool H3DF::ShellKit::ShowFacelist(IntArray const *& acOutFacelist) const
 {
-	if(nullptr == m_panTristripsArray) {
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr == pcImpl->m_panFacelistArray) {
 		return false;
 	}
 
-	acOutTristrips = m_panTristripsArray;
+	acOutFacelist = pcImpl->m_panFacelistArray;
 	return true;
 }
 
-bool ShellKit::ShowParameters(FloatArray const *& aOutParameters) const
+
+bool H3DF::ShellKit::ShowTristrips(IntArray const *& acOutTristrips) const
 {
-	if(nullptr == m_paParameterArray) {
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if(nullptr == pcImpl->m_panTristripsArray) {
 		return false;
 	}
 
-	aOutParameters = m_paParameterArray;
+	acOutTristrips = pcImpl->m_panTristripsArray;
 	return true;
 }
 
-bool ShellKit::ShowColors(RGBAColorArray const *& aOutColors) const
+bool H3DF::ShellKit::ShowParameters(FloatArray const *& aOutParameters) const
 {
-	if(nullptr == m_paColorArray) {
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr == pcImpl->m_paParameterArray) {
 		return false;
 	}
 
-	aOutColors = m_paColorArray;
+	aOutParameters = pcImpl->m_paParameterArray;
 	return true;
 }
 
-ShellKit & ShellKit::SetMaterialMapping(MaterialMappingKit const & cInkit)
+bool H3DF::ShellKit::ShowColors(RGBAColorArray const *& aOutColors) const
 {
-	m_cMaterialMappingKit = cInkit;
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if(nullptr == pcImpl->m_paColorArray) {
+		return false;
+	}
+
+	aOutColors = pcImpl->m_paColorArray;
+	return true;
+}
+
+ShellKit & H3DF::ShellKit::SetMaterialMapping(MaterialMappingKit const & cInkit)
+{
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_cMaterialMappingKit = cInkit;
 	return *this;
 }
 
+//== Shell 생성용 함수 ===============================================================================
+bool H3DF::ShellKit::CreateShellWrapper()
+{
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	pcImpl->m_pcCreatedShell = new HShellWrapper(INVALID_KEY);
+	if (nullptr == pcImpl->m_pcCreatedShell) {
+		DEBUG_STOP;
+		return false;
+	}
+
+	return true;
+}
+
+void H3DF::ShellKit::BeginAddFaces(int nFaceCount)
+{
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	if (nullptr == pcImpl->m_pcCreatedShell) {
+		DEBUG_RETURN;
+	}
+
+	pcImpl->m_pcCreatedShell->BeginAddFaces(nFaceCount);
+}
+
+void H3DF::ShellKit::Regenerate()
+{
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	if (nullptr == pcImpl->m_pcCreatedShell) {
+		DEBUG_RETURN;
+	}
+
+	pcImpl->m_pcCreatedShell->Regenerate(INVALID_KEY, false, true);
+}
+
+void H3DF::ShellKit::EndAddFaces()
+{
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	if (nullptr == pcImpl->m_pcCreatedShell) {
+		DEBUG_RETURN;
+	}
+
+	pcImpl->m_pcCreatedShell->EndAddFaces();
+}
+
+void H3DF::ShellKit::SetRegionFaces(int nRegionIndex, int nFaceFirstIndex, int nFaceCount)
+{
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	if (nullptr == pcImpl->m_pcCreatedShell) {
+		DEBUG_RETURN;
+	}
+
+	if (INVALID_KEY == pcImpl->m_pcCreatedShell->m_Key) {
+		DEBUG_RETURN;
+	}
+
+	HC_MSet_Region_Faces(pcImpl->m_pcCreatedShell->m_Key, nRegionIndex, nFaceFirstIndex, nFaceCount);
+}
+
+void H3DF::ShellKit::DeleteShellWrapperKey()
+{
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	if (nullptr == pcImpl->m_pcCreatedShell) {
+		DEBUG_RETURN;
+	}
+
+	if (INVALID_KEY == pcImpl->m_pcCreatedShell->m_Key) {
+		DEBUG_RETURN;
+	}
+
+	HC_Delete_By_Key(pcImpl->m_pcCreatedShell->m_Key);
+}
+
+void H3DF::ShellKit::AddNextFaceWithDistinctNormals(Point const * pcInPoints, Vector const * pcInNormals, int const * pnFaceIndex, int const * pnNormalIndex, int nFaceCount)
+{
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	if (nullptr == pcImpl->m_pcCreatedShell) {
+		DEBUG_RETURN;
+	}
+
+	pcImpl->m_pcCreatedShell->AddNextFaceWithDistinctNormals((HPoint *)pcInPoints, (HPoint *)pcInNormals, pnFaceIndex, pnNormalIndex, nFaceCount);
+}
+
+void H3DF::ShellKit::AddNextFaceWithDistinctNormalsAndTexture(Point const * pcInPoints, Vector const * pcInNormals, Point const * pcInTextureCoord, int const * pnFaceIndex,
+	int const * pnNormalIndex, int const * pnTextureIndex, int nFaceCount)
+{
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	if (nullptr == pcImpl->m_pcCreatedShell) {
+		DEBUG_RETURN;
+	}
+
+	pcImpl->m_pcCreatedShell->AddNextFaceWithDistinctNormalsAndTexture((HPoint *)pcInPoints, (HPoint *)pcInNormals, (HPoint *)pcInTextureCoord, pnFaceIndex, pnNormalIndex, pnTextureIndex, nFaceCount);
+}
 
 //== ShellKey Class ================================================================================
 namespace H3DF {
@@ -203,12 +432,12 @@ namespace H3DF {
 	};
 };
 
-ShellKey::ShellKey() : GeometryKey(INVALID_KEY)
+H3DF::ShellKey::ShellKey() : GeometryKey(INVALID_KEY)
 {
 	m_pcImpl = new ShellKeyImpl();
 }
 
-ShellKey::ShellKey(HC_KEY nInKey) : GeometryKey(INVALID_KEY)
+H3DF::ShellKey::ShellKey(HC_KEY nInKey) : GeometryKey(INVALID_KEY)
 {
 	ShellKeyImpl * pcImpl = new ShellKeyImpl();
 	pcImpl->SetKeyValue(nInKey);
@@ -216,7 +445,7 @@ ShellKey::ShellKey(HC_KEY nInKey) : GeometryKey(INVALID_KEY)
 	m_pcImpl = pcImpl;
 }
 
-ShellKey::ShellKey(Key const & cInKey) : GeometryKey(INVALID_KEY)
+H3DF::ShellKey::ShellKey(Key const & cInKey) : GeometryKey(INVALID_KEY)
 {
 	ShellKeyImpl * pcImpl = new ShellKeyImpl();
 	m_pcImpl = pcImpl;
@@ -227,13 +456,13 @@ ShellKey::ShellKey(Key const & cInKey) : GeometryKey(INVALID_KEY)
 	pcImpl->SetType(H3DF::Type::ShellKey);
 }
 
-ShellKey::ShellKey(ShellKey const & cInThat)
+H3DF::ShellKey::ShellKey(ShellKey const & cInThat)
 {
 	m_pcImpl = new ShellKeyImpl();
 	Set(cInThat);
 }
 
-void ShellKey::Set(ShellKey const & cInThat)
+void H3DF::ShellKey::Set(ShellKey const & cInThat)
 {
 	if (nullptr == m_pcImpl || nullptr == cInThat.m_pcImpl) {
 		return;
@@ -244,7 +473,7 @@ void ShellKey::Set(ShellKey const & cInThat)
 	pcImpl->Copy(pcInThatImpl);
 }
 
-ShellKey & ShellKey::operator = (ShellKey const & cInThat)
+ShellKey & H3DF::ShellKey::operator = (ShellKey const & cInThat)
 {
 	Key::Set(cInThat);
 	return *this;

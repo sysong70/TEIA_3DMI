@@ -1525,7 +1525,13 @@ void H3DF::ViewImpl::ViewReady()
 
 	//Turn on static model and display lists last, and in that order
  	//pcModel->SetStaticModel(TheKenel.Performance.Optimization.StaticModel);
-	pcModel->SetStaticModel(true);
+	// 메모리 소모가 많고 속도에는 큰 도움이 되지 않으므로 사용하지 않는다.
+	pcModel->SetStaticModel(false);
+	pcModel->SetLMVModel(false);
+
+// 	HC_Open_Segment_By_Key(pcModel->GetModelKey());
+// 		HC_Set_Heuristics("static model = (on, condition analysis = view independent)");
+// 	HC_Close_Segment();
 // 
  	//pcModel->SetLMVModel(TheKenel.Performance.Optimization.LMVModel);
 	//pcModel->SetLMVModel(true);
@@ -1536,6 +1542,7 @@ void H3DF::ViewImpl::ViewReady()
 	}
 
 */
+
 /*
 	if (DisplayListOff == ThePreset.DisplayList) {
 		GetBaseView()->SetDisplayListMode(false);

@@ -7,6 +7,8 @@
 #include <HUtility.h>
 #include <HTools.h>
 
+#include <bit>
+
 using namespace std::chrono;
 
 USING_3DF_NAMESPACE
@@ -511,11 +513,7 @@ bool H3DF::UserData::ShowSegmentName(SegmentKey & cInSegment, CString & strName)
 
 bool H3DF::UserData::SetTopologyType(SegmentKey & cInSegment, DWORD nInType)
 {
-	CStringA strText = Utility::ShortToRawStringA((short)nInType);
-
-	cInSegment.SetUserData((intptr_t)UserDataIndex::Topology, strText.GetLength(), (BYTE *)strText.GetBuffer());
-
-	strText.ReleaseBuffer();
+	cInSegment.SetUserData((intptr_t)UserDataIndex::Topology, sizeof(DWORD), (BYTE *)&nInType);
 
 	return true;
 }
@@ -527,7 +525,7 @@ bool H3DF::UserData::ShowTopologyType(SegmentKey & cInSegment, DWORD & nOutType)
 		return false;
 	}
 
-	nOutType = Utility::RawByteToShort(aUserData.data());
+	CopyMemory(&nOutType, aUserData.data(), sizeof(DWORD));
 	
 	return true;
 }
@@ -535,11 +533,7 @@ bool H3DF::UserData::ShowTopologyType(SegmentKey & cInSegment, DWORD & nOutType)
 //== Geomety User Data 관련 함수 =====================================================================
 bool H3DF::UserData::SetTopologyType(GeometryKey & cInGeometry, DWORD nInType)
 {
-	CStringA strText = Utility::ShortToRawStringA((short)nInType);
-
-	cInGeometry.SetUserData((intptr_t)UserDataIndex::Topology, strText.GetLength(), (BYTE *)strText.GetBuffer());
-
-	strText.ReleaseBuffer();
+	cInGeometry.SetUserData((intptr_t)UserDataIndex::Topology, sizeof(DWORD), (BYTE *)&nInType);
 
 	return true;
 }
@@ -561,7 +555,7 @@ bool H3DF::UserData::ShowTopologyType(GeometryKey & cInGeometry, DWORD & nOutTyp
 		return false;
 	}
 
-	nOutType = Utility::RawByteToShort(aUserData.data());
+	CopyMemory(&nOutType, aUserData.data(), sizeof(DWORD));
 
 	return true;
 }

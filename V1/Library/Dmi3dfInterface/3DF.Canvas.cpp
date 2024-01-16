@@ -309,11 +309,15 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 
 	pcViewImpl->GetBaseView()->SetZoomLimit();
 
-	pcCanvasImpl->m_pcModel->UpdateModelHandedness();
+	//pcCanvasImpl->m_pcModel->UpdateModelHandedness();
 
 	pcViewImpl->GetBaseView()->SetRenderMode(pcViewImpl->GetBaseView()->GetRenderMode(), true);
 
 	pcViewImpl->GetBaseView()->SetViewDirection(H3DF::ViewDirection::Mode::px_py_pz);
+
+	HC_Relinquish_Memory();
+
+	//HC_Control_Update_By_Key(pcViewImpl->GetBaseView()->GetViewKey(), "refresh");
 
 	// ExhaustiveUpdate() 내부에서 FoceUpdate를 여러번 호출하기 때문에, Supress 시키도록 한다.
 	pcViewImpl->GetBaseView()->ExhaustiveUpdate();

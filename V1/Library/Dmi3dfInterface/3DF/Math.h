@@ -571,6 +571,8 @@ public:
 	explicit Point_2D(Point_3D<F> const & that) : x((F)that.x), y((F)that.y) {}
 	explicit Point_2D(Vector_2D<F> const & v);
 
+	void Set(F X, F Y) { x = X; y = Y; };
+
 	Point_2D const operator+ (const Point_2D & p) const { return Point_2D(x + p.x, y + p.y); }
 	Point_2D const	operator- () const { return Point_2D(-x, -y); }
 
@@ -1495,7 +1497,6 @@ H3DF_INLINE Cuboid_3D<F> Contract(Cuboid_3D<F> const & a, F border) {
 	return temp.Contract(border);
 }
 
-using ByteArray = std::vector<byte, Allocator<byte>>;
 using IntArray = std::vector<int, Allocator<int>>;
 using FloatArray = std::vector<float, Allocator<float>>;
 using PointArray = std::vector<H3DF::Point, Allocator<H3DF::Point>>;
