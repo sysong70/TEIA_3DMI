@@ -26,10 +26,10 @@
 #include "3DF/Facility.AppOptions.h"
 
 #ifdef _DEBUG
-#	define WRITE_3DF_LOG
+#	define WRITE_3DF_ERROR_LOG
 #endif
 
-#define WRITE_3DF_LOG
+#define WRITE_3DF_ERROR_LOG
 
 using namespace H3DF;
 
@@ -418,7 +418,7 @@ void H3DF::Application::InitInstance()
 	HC_Define_System_Options("license = `" HOOPS_LICENSE "`");
 
 	// Error 및 Warning 관련 설정
-#if defined( WRITE_3DF_LOG )
+#if defined( WRITE_3DF_ERROR_LOG )
 	HDB::EnableErrorManager();
 	//HC_Define_System_Options("fatal errors, errors, warnings, info, no message limit");
 	HErrorManager::AllowAllErrors();

@@ -24,9 +24,13 @@
 
 #include <HIOUtilityHsf.h>
 #include <HConstantFrameRate.h>
-#include <HIOUtilityPointCloud.h>
+//#include <HIOUtilityPointCloud.h>
 
 #include <chrono>
+
+#include "LogManager.h"
+
+#include "3DF/PointCloud.h"
 
 using namespace H3DF;
 using namespace std::chrono;
@@ -321,9 +325,15 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 	switch (eInMode)
 	{
 		case H3DF::Rendering::Mode::Gouraud:
+			pcView->RenderGouraud();
+			GetModelOverrideSegmentKey().GetVisibilityControl().SetLines(false);
+			cSceneKey.GetVisibilityControl().SetEdges(false);
 			break;
 
 		case H3DF::Rendering::Mode::GouraudWithLines:
+			pcView->RenderGouraud();
+			GetModelOverrideSegmentKey().GetVisibilityControl().SetLines(true);
+			cSceneKey.GetVisibilityControl().SetEdges(false);
 			break;
 
 		case H3DF::Rendering::Mode::Flat:
@@ -504,36 +514,38 @@ void H3DF::View::LoadPointCloudFile(CString strFilePathName)
 	}
 
 	SegmentKey cViewKey(pcImpl->GetBaseView()->GetViewKey());
-	SegmentKeyImpl::LocalOpen(cViewKey);
-	HC_Set_Driver_Options("eye dome lighting = (on, strength=1.0)");
-	SegmentKeyImpl::LocalClose(cViewKey);
+	SegmentKeyImpl::LocalOpen(cViewKey); {
+		HC_Set_Driver_Options("eye dome lighting = (on, strength=1.0)");
+	} SegmentKeyImpl::LocalClose(cViewKey);
+
+	HPointCloudOptions cPointCloudOptions;
+	cPointCloudOptions.m_maxShellSize = 10000;
 
 	HInputHandlerOptions cOptions;
-	cOptions.m_tk = pcImpl->GetBaseView()->GetModel()->GetStreamFileTK();
-	cOptions.m_pHBaseView = pcImpl->GetBaseView();
-	
-	//cOptions.m_pExtendedData = &cPointCloudOptions;
-
-	//m_point_cloud_options = (HPointCloudOptions *)options->m_pExtendedData;
+	cOptions.m_pExtendedData = &cPointCloudOptions;
 
 	SegmentKey cModelKey(pcImpl->GetBaseView()->GetModelKey());
-	SegmentKey cPointCloudSegment = cModelKey.Subsegment(L"_3dmi_point_cloud");
+	SegmentKey cPointCloudSegment = cModelKey.Subsegment(L"3dmi_point_cloud");
 
-	HIOUtilityPointCloud cPointCloud;
+	PointCloud cPointCloud;
 	
+	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"PointCloud Open");
+
 	// 라이브러리를 사용해야 하므로 미리 cPointCloudSegment를 Open하도록 한다.
-	SegmentKeyImpl::LocalOpen(cPointCloudSegment);
-	cPointCloud.FileInputByKey(Utility::ToChar(strFilePathName), cPointCloudSegment.KeyValue(), &cOptions);
+	SegmentKeyImpl::LocalOpen(cPointCloudSegment); {
+		cPointCloud.FileInputByKey(Utility::ToChar(strFilePathName), cPointCloudSegment.KeyValue(), &cOptions);
 
-	HC_UnSet_Marker_Symbol();
-	HC_Set_Marker_Size(0.2);
+ 		HC_UnSet_Marker_Symbol();
+ 		HC_Set_Marker_Size(0.2);
 
-	SegmentKeyImpl::LocalOpen(cPointCloudSegment);
+	} SegmentKeyImpl::LocalClose(cPointCloudSegment);
+
+	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"PointCloud Close");
 
 	// Point Clouse Segment의 하부를 검색해서 색상을 변경함.
 	// Library에서 나오는 색상은 기본적으로 Black으로 나옴.
 	MaterialMappingKit cMaterialMapping;
-	cMaterialMapping.SetVertexColor(RGBAColor(0.75, 0.75, 0.75)); // Gray Color 설정
+	cMaterialMapping.SetVertexColor(RGBAColor(0.75, 1.0, 0.75)); // Gray Color 설정
 	Utility::ChangeSubSegmentColor(cPointCloudSegment, cMaterialMapping, true);
 }
 

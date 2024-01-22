@@ -3,7 +3,6 @@
 #include "Highlight.h"
 
 #include "Impl/SelectionImpl.h"
-#include "Impl/HighlightImpl.h"
 
 #include "Window.h"
 #include "Impl/WindowImpl.h"
@@ -30,6 +29,22 @@
 using namespace H3DF;
 
 //== HighlightOptionsKit Class =====================================================================
+namespace H3DF
+{
+	class HighlightOptionsKitImpl : public Impl
+	{
+	public:
+		void Copy(HighlightOptionsKitImpl * pcInThat) {
+			m_strInStyleName = pcInThat->m_strInStyleName;
+			m_strInSecondaryStyleName = pcInThat->m_strInSecondaryStyleName;
+			m_nNotification = pcInThat->m_nNotification;
+		}
+
+		CStringA m_strInStyleName;
+		CStringA m_strInSecondaryStyleName;
+		int m_nNotification = -1;
+	};
+}
 
 H3DF::HighlightOptionsKit::HighlightOptionsKit()
 {
@@ -102,6 +117,104 @@ bool H3DF::HighlightOptionsKit::ShowNotification(bool & bOutState) const
 	return true;
 }
 
+//== HighlightControlImpl Class ====================================================================
+namespace H3DF
+{
+	class HighlightControlImpl : public Impl
+	{
+	public:
+		HighlightControlImpl(WindowKey const & cInWindow, bool bDynFlag);
+
+		void Copy(HighlightControlImpl * pcInThat) {
+			m_pcWindow = pcInThat->m_pcWindow;
+		}
+
+		// 	int SelectButtonDown(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults);
+		// 	void HandleSelection(UINT const nFlags, SelectionResults & cOutResults);
+
+		const WindowKey & Window() { return *m_pcWindow; }
+
+		BaseView * GetBaseView();
+		BaseView * GetBaseView() const;
+
+		HSelectionSet * SelectionSet();
+
+		H3DF::SelectionResults m_cOldHighlightSelection;
+
+	private:
+		const WindowKey * m_pcWindow = nullptr;
+		HSelectionSet * m_pcSelectionSet = nullptr;
+	};
+}
+
+H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow, bool bDynFlag)
+{
+	m_eType = H3DF::Type::HighlightControl;
+
+	m_pcWindow = (WindowKey *)&cInWindow;
+
+	// m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetHighlightSelection();
+
+	if (false == bDynFlag) {
+		m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetSelection();
+	}
+	else
+	{
+		m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetHighlightSelection();
+	}
+
+	m_pcSelectionSet->SetAllowRegionSelection(true);
+
+	/*
+		m_pcSelectionSet = new HSelectionSet((HBaseView *)cInWindow.GetBaseView());
+		m_pcSelectionSet->Init();
+
+		m_pcSelectionSet->SetHighlightMode(HighlightQuickmoves);
+		m_pcSelectionSet->SetReferenceSelectionType(RefSelOff);
+
+		m_pcSelectionSet->UpdateHighlightStyle();
+	*/
+
+	//m_pcSelectionSet->SetSelectionLevel(HSelectEntity);
+
+	m_pcSelectionSet->SetGrayScale(false);// ThePreset.GrayScaleSelection);
+	m_pcSelectionSet->SetUseDefinedHighlight(false);// ThePreset.UseDefinedHighlighting);
+	m_pcSelectionSet->SetAllowDisplacement(false);// ThePreset.DisplaceSelection);
+
+	HPixelRGBA cHighlightSelectColor;
+	cHighlightSelectColor.Set(255, 0, 0);
+	m_pcSelectionSet->SetSelectionEdgeWeight(1.0);
+
+	m_pcSelectionSet->SetSelectionFaceColor(cHighlightSelectColor);
+	m_pcSelectionSet->SetSelectionEdgeColor(cHighlightSelectColor);
+	m_pcSelectionSet->SetSelectionMarkerColor(cHighlightSelectColor);
+
+	m_pcSelectionSet->SetHighlightMode(HighlightQuickmoves);
+
+	m_pcSelectionSet->HighlightRegionEdgesAutoVisibility(false);
+
+	m_pcSelectionSet->UpdateHighlightStyle();
+}
+
+BaseView * H3DF::HighlightControlImpl::GetBaseView()
+{
+	return (BaseView *)m_pcWindow->GetBaseView();
+}
+
+BaseView * H3DF::HighlightControlImpl::GetBaseView() const
+{
+	DEBUG_VALID(m_pcWindow);
+	return (BaseView *)m_pcWindow->GetBaseView();
+}
+
+HSelectionSet * H3DF::HighlightControlImpl::SelectionSet()
+{
+	//return ((HBaseView *)m_pcWindow->GetBaseView())->GetHighlightSelection();
+
+	DEBUG_VALID(m_pcSelectionSet);
+	return m_pcSelectionSet;
+}
+
 //== HighlightControl Class ========================================================================
 
 H3DF::HighlightControl::HighlightControl(WindowKey const & cInWindow, bool bDynFlag)
@@ -136,29 +249,218 @@ HighlightControl & H3DF::HighlightControl::operator=(HighlightControl const & cI
 //== Highlight 관련 함수 =============================================================================
 HighlightControl & H3DF::HighlightControl::Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting)
 {
-	HighlightControlImpl * pcImpl = (HighlightControlImpl *)m_pcImpl;
-	pcImpl->Highlight(cInItems, cInOptions, bInRemoveExisting);
+	HighlightControlImpl * pcHighlightImpl = (HighlightControlImpl *)m_pcImpl;
+
+	HSelectionSet * pcSelSet = pcHighlightImpl->SelectionSet();
+
+	char chType[MVO_BUFFER_SIZE];
+
+	bool bNeedDeselect = true;
+	bool bNeedUpdate = true;
+
+	if (true == bInRemoveExisting) {
+		pcSelSet->DeSelectAll();
+	}
+
+	SelectionResultsImpl * pcSelectionResultsImpl = (SelectionResultsImpl *)cInItems.GetImpl();
+
+	for (auto & cItem : pcSelectionResultsImpl->GetItems()) {
+		SelectionItemImpl * pcItemImpl = (SelectionItemImpl *)cItem.GetImpl();
+
+		HC_KEY nKey = pcItemImpl->cKey.KeyValue();
+
+		// Region 선택 관련 처리 부분
+		if (H3DF::Type::ShellKey == cItem.Type() && (pcItemImpl->nLowest != pcItemImpl->nHighest || pcItemImpl->nLowest > 0)) {
+			bNeedDeselect = false;
+
+			if (!pcSelSet->IsRegionSelected(nKey, pcItemImpl->nIncludeCount, pcItemImpl->pnIncludeKeys, pcItemImpl->nRegion))
+			{
+				if (true == bInRemoveExisting) {
+					pcSelSet->DeSelectAll();
+				}
+
+				pcSelSet->SelectRegion(nKey, pcItemImpl->nIncludeCount, pcItemImpl->pnIncludeKeys, pcItemImpl->nRegion, false);
+			}
+			else {
+				bNeedUpdate = false;
+			}
+		}
+		else {
+			bNeedDeselect = false;
+
+			if (!pcSelSet->IsSelected(nKey, pcItemImpl->nIncludeCount, pcItemImpl->pnIncludeKeys)) {
+				HSelectLevel eSelectLevel = pcSelSet->GetSelectionLevel();
+
+				if (pcSelSet->GetSelectionLevel() != HSelectSegment) // never should fail for dynamic highlighting, but let's be nice and check
+				{
+					// the key is to a geometric entity.  If we are in segment selection mode,
+					// then we need to get the key to its parent segment.
+					HC_Show_Key_Type(nKey, chType);
+
+					if (!streq("segment", chType))
+					{
+						char segname[MVO_BUFFER_SIZE];
+						HC_KEY segkey;
+
+						segkey = HC_KShow_Owner_Original_Key(nKey);
+						HC_Show_Owner_By_Key(nKey, segname);
+
+						// climb up one more level if this is the temporary highlight key
+						if (pcSelSet->IsHighlightSegment(segkey))
+						{
+							segkey = HC_KShow_Owner_Original_Key(segkey);
+							HC_Show_Owner_By_Key(segkey, segname);
+						}
+					}
+				}
+
+				pcSelSet->Select(nKey, pcItemImpl->nIncludeCount, pcItemImpl->pnIncludeKeys, false);
+			}
+			else {
+				bNeedUpdate = false;
+			}
+		}
+	}
+
+	if (bNeedDeselect) {
+		pcSelSet->DeSelectAll();
+	}
+
+	if (bNeedUpdate) {
+		bool bShowNotification = false;
+		cInOptions.ShowNotification(bShowNotification);
+
+		if (true == bShowNotification) {
+			H3DF::BaseView * pcView = pcHighlightImpl->GetBaseView();
+			pcView->ForceUpdate();
+		}
+	}
+
 	return *this;
 }
 
 HighlightControl & H3DF::HighlightControl::Highlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting)
 {
-	HighlightControlImpl * pcImpl = (HighlightControlImpl *)m_pcImpl;
-	pcImpl->Highlight(cInItem, cInOptions, bInRemoveExisting);
+	HighlightControlImpl * pcHighlightImpl = (HighlightControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcHighlightImpl);
+
+	HSelectionSet * pcSelSet = pcHighlightImpl->SelectionSet(); // HSelectionSet에서 Select 및 Highlight를 다 처리함.
+	DEBUG_VALID(pcSelSet);
+
+	if (true == bInRemoveExisting) {
+		pcSelSet->DeSelectAll();
+	}
+
+	SelectionItemImpl * pcItemImpl = (SelectionItemImpl *)cInItem.GetImpl();
+
+	HC_KEY nKey = pcItemImpl->cKey.KeyValue();
+
+	bool bNeedUpdate = true;
+
+	H3DF::Type eType = cInItem.Type();
+
+	// Region 선택 관련 처리 부분
+	if (H3DF::Type::ShellKey == cInItem.Type() && (pcItemImpl->nLowest != pcItemImpl->nHighest || pcItemImpl->nLowest > 0)) {
+		if (!pcSelSet->IsRegionSelected(nKey, pcItemImpl->nIncludeCount, pcItemImpl->pnIncludeKeys, pcItemImpl->nRegion)) {
+			pcSelSet->SelectRegion(nKey, pcItemImpl->nIncludeCount, pcItemImpl->pnIncludeKeys, pcItemImpl->nRegion, false);
+		}
+		else {
+			bNeedUpdate = false;
+		}
+	}
+	else {
+		if (!pcSelSet->IsSelected(nKey, pcItemImpl->nIncludeCount, pcItemImpl->pnIncludeKeys)) {
+			HSelectLevel eSelectLevel = pcSelSet->GetSelectionLevel();
+
+			if (pcSelSet->GetSelectionLevel() != HSelectSegment) // never should fail for dynamic highlighting, but let's be nice and check
+			{
+				char chType[MVO_BUFFER_SIZE];
+				// the key is to a geometric entity.  If we are in segment selection mode,
+				// then we need to get the key to its parent segment.
+				HC_Show_Key_Type(nKey, chType);
+
+				if (!streq("segment", chType))
+				{
+					char segname[MVO_BUFFER_SIZE];
+					HC_KEY segkey;
+
+					segkey = HC_KShow_Owner_Original_Key(nKey);
+					HC_Show_Owner_By_Key(nKey, segname);
+
+					// climb up one more level if this is the temporary highlight key
+					if (true == pcSelSet->IsHighlightSegment(segkey))
+					{
+						segkey = HC_KShow_Owner_Original_Key(segkey);
+						HC_Show_Owner_By_Key(segkey, segname);
+					}
+				}
+			}
+
+			pcSelSet->Select(nKey, pcItemImpl->nIncludeCount, pcItemImpl->pnIncludeKeys, false);
+		}
+		else {
+			bNeedUpdate = false;
+		}
+	}
+
+	if (bNeedUpdate) {
+		bool bShowNotification = false;
+		cInOptions.ShowNotification(bShowNotification);
+
+		if (true == bShowNotification) {
+			H3DF::BaseView * pcView = pcHighlightImpl->GetBaseView();
+			pcView->ForceUpdate();
+		}
+	}
+
 	return *this;
 }
 
 HighlightControl & H3DF::HighlightControl::Unhighlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions)
 {
-	HighlightControlImpl * pcImpl = (HighlightControlImpl *) m_pcImpl;
-	pcImpl->Unhighlight(cInItems, cInOptions);
+	if (0 == cInItems.GetCount()) {
+		return *this;
+	}
+
+	HighlightControlImpl * pcHighlightImpl = (HighlightControlImpl *) m_pcImpl;
+
+	HSelectionSet * pcSelection = pcHighlightImpl->SelectionSet(); // HSelectionSet에서 Select 및 Highlight를 다 처리함.
+
+	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)cInItems.GetImpl();
+
+	// cInItem를 순회하면서 Unhighlight를 수행한다.
+	for (auto & pcItem : pcImpl->GetItems()) {
+		SelectionItemImpl * pcItemImpl = (SelectionItemImpl *)pcItem.GetImpl();
+		HC_KEY nKey = pcItemImpl->cKey.KeyValue();
+		pcSelection->DeSelect(nKey, pcItemImpl->nIncludeCount, pcItemImpl->pnIncludeKeys, false);
+	}
+
+	bool bShowNotification = false;
+	cInOptions.ShowNotification(bShowNotification);
+
+	if (true == bShowNotification) {
+		pcHighlightImpl->GetBaseView()->ForceUpdate();
+	}
 	return *this;
 }
 
 HighlightControl & H3DF::HighlightControl::Unhighlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions)
 {
-	HighlightControlImpl * pcImpl = (HighlightControlImpl *) m_pcImpl;
-	pcImpl->Unhighlight(cInItem, cInOptions);
+	HighlightControlImpl * pcHighlightImpl = (HighlightControlImpl *) m_pcImpl;
+
+	// cInItem의 Impl을 가져와서 작업을 수행한다.
+	SelectionItemImpl * pcItemImpl = (SelectionItemImpl *)cInItem.GetImpl();
+	DEBUG_VALID(pcItemImpl);
+
+	HC_KEY nKey = pcItemImpl->cKey.KeyValue();
+	pcHighlightImpl->SelectionSet()->DeSelect(nKey, pcItemImpl->nIncludeCount, pcItemImpl->pnIncludeKeys, false);
+
+	bool bShowNotification = false;
+	cInOptions.ShowNotification(bShowNotification);
+
+	if (true == bShowNotification) {
+		pcHighlightImpl->GetBaseView()->ForceUpdate();
+	}
 	return *this;
 }
 
@@ -221,7 +523,8 @@ HighlightControl & H3DF::HighlightControl::SetLineAttribute(LineAttributeKit con
 LineAttributeControl H3DF::HighlightControl::GetLineAttributeControl()
 {
 	auto * pcImpl = dynamic_cast<HighlightControlImpl *>(m_pcImpl);
-	HC_KEY nKey = pcImpl->GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
+	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
+	//HC_KEY nKey = pcImpl->GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
 
 	SegmentKey cSegmentKey(nKey);
 	LineAttributeControl cControl(cSegmentKey);
@@ -232,7 +535,8 @@ LineAttributeControl H3DF::HighlightControl::GetLineAttributeControl()
 LineAttributeControl const H3DF::HighlightControl::GetLineAttributeControl() const
 {
 	auto * pcImpl = dynamic_cast<HighlightControlImpl *>(m_pcImpl);
-	HC_KEY nKey = pcImpl->GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
+	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
+	//HC_KEY nKey = pcImpl->GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
 
 	SegmentKey cSegmentKey(nKey);
 	LineAttributeControl cControl(cSegmentKey);

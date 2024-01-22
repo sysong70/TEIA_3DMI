@@ -67,7 +67,7 @@ protected:
 		//H3DF::VectorArray aInNormals;					// "global" normal array
 		H3DF::FloatArray aInParams;						// optional "global" parameter array
 		H3DF::RGBAColorArray aInColors;					// optional RGBA color array
-		A3DTessFaceData * pcInTessFaceData;				// tessellation data for *this* (CAD) face
+		A3DTessFaceData * pnIndices;				// tessellation data for *this* (CAD) face
 		float fInNormalCosine;							// cosine limit for determining equal normals
 
 		A3DUns32 nOutTriSizeIndex;						// offset into A3DTessFaceData::m_puiSizesTriangulated
@@ -84,7 +84,7 @@ protected:
 
 		ConvertFaceInfo() {
 			pnInIndices = nullptr;
-			pcInTessFaceData = nullptr;
+			pnIndices = nullptr;
 		}
 	};
 

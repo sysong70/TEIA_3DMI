@@ -363,7 +363,7 @@ namespace H3DF
 			FastHiddenLine,
 			Wireframe,
 			Tessellated,
-			Default = Phong
+			Default = Gouraud
 		};
 
 	private:

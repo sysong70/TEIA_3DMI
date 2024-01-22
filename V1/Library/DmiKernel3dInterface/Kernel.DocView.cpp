@@ -167,6 +167,10 @@ void KERNEL::DocView::MouseMove(int nFlag, int x, int y)
 	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
+	if (200 > GetTickCount() - pcImpl->m_nMouseWhellStartTick) {
+		return;
+	}
+
 	DWORD nNewFlags = pcImpl->MouseMapFlags(nFlag);
 
 	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
@@ -276,6 +280,8 @@ void KERNEL::DocView::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
+	pcImpl->m_nMouseWhellStartTick = GetTickCount();
+
 	int zDelta = cInObject.GetInteger(SKW_DELTA, -120);
 	Json::Array & cArray = cInObject.GetArray(SKW_RECT);
 	int nLeft = cArray[0]->ToInteger();
@@ -289,11 +295,14 @@ void KERNEL::DocView::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 
 	pcImpl->Camera().MouseWheel(cEvent);
 
+	pcImpl->HighlightOSnapOperator().UnhighlightEverything();
+
 	pcImpl->HighlightOSnapOperator().DrawSnapItems();
 
 	pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(false);
 
 	pcImpl->m_cCanvas.GetFrontView().Update();
+	
 }
 
 //== Keyboard 관련 함수 ==============================================================================
@@ -450,11 +459,11 @@ void KERNEL::DocView::SetViewStyle(int nStyleId)
 	switch (nStyleId)
 	{
 		case HOME_3D_CMD_ViewStyle_Shade:
-			pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::Phong);
+			pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::Gouraud);
 			break;
 
 		case HOME_3D_CMD_ViewStyle_ShadeWithEdges:
-			pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::PhongWithLines);
+			pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::GouraudWithLines);
 			break;
 
 		case HOME_3D_CMD_ViewStyle_Wireframe:

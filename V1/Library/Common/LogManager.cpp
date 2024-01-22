@@ -176,6 +176,20 @@ void LogManager::Log(int nId, int nLogLevle, LPCSTR chMessage, ...)
 	LogManager::GetInstance()->WriteLog(nId, CString(strBuffer));
 }
 
+void LogManager::CreateLog(int nId, const WCHAR * pchFilePathName)
+{
+	SetCurrentId(nId);
+
+	SetFilePathName(nId, pchFilePathName);
+	SetCreateFile(nId, true);
+	SetWriteLog(nId, true);
+	ResetTabIndex(nId);
+
+	SetWriteTimeLog(nId, true);
+	Log(nId, L"Create Log");
+	SetWriteTimeLog(nId, false);
+}
+
 void LogManager::WriteLog(CString strMessage)
 {
 	WriteLog(m_nCurrentId, strMessage);

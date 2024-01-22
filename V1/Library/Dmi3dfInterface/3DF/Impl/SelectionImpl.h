@@ -202,14 +202,23 @@ namespace H3DF
 	public:
 		SelectionControlImpl() { m_eType = H3DF::Type::SelectionControl; }
 
+		// & 연산을 해야하므로 enum class를 사용하지 않는다.
+		enum SelType
+		{
+			None,
+			Shell,
+			Region,
+			Marker,
+			Line
+		};
+
 		void Copy(SelectionControlImpl * pcInThat) {
 			m_pcWindow = pcInThat->m_pcWindow;
 			m_pcSelectionSet = pcInThat->m_pcSelectionSet;
 		}
 
-		size_t SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults);
-		int SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults);
-		int SelectButtonDown_V1(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults);
+		HSelectionSet * SelectionSet();
+
 		void HandleSelection(UINT const nFlags, SelectionResults & cOutResults);
 
 		static void GetSelectOption(SelectionOptionsKit const & cInOptions, char * pchOutOption);
@@ -221,16 +230,5 @@ namespace H3DF
 		HBaseView * GetBaseView();
 
 		HSelectionSet * m_pcSelectionSet = nullptr;
-
-	private:
-		// & 연산을 해야하므로 enum class를 사용하지 않는다.
-		enum SelType
-		{
-			None,
-			Shell,
-			Region,
-			Marker,
-			Line
-		};
 	};
 }

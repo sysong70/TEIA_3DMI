@@ -86,5 +86,7 @@ namespace KERNEL
 
 		// 현재 선택된 요소들이 저장되는 변수
 		H3DF::SelectionResults m_cSelectionResult;
+
+		DWORD m_nMouseWhellStartTick;
 	};
 }

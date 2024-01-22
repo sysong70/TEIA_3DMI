@@ -16,6 +16,8 @@ public:
 	static void Log(int nId, int nLogLevle, LPCWSTR mesg, ...);
 	static void Log(int nId, int nLogLevle, LPCSTR mesg, ...);
 
+	static void CreateLog(int nId, const WCHAR * pchFilePathName);
+
 	static LogManager * GetInstance();
 
 	static void SetComment(CString strComment) { m_strLogManagerComment[m_nCurrentId] = strComment; }

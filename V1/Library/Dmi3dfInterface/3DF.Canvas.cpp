@@ -56,6 +56,8 @@
 
 #include "Import/DLL.Interface.h"
 
+#include "LogManager.h"
+
 #define SEGMENT_TYPE						1
 #define ENTITY_TYPE							2
 #define SUBENTITY_TYPE						3
@@ -166,7 +168,7 @@ void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
 
 	char * pchName = pcViewImpl->m_pchName;
 
-	setlocale(LC_ALL, "ko_KR.utf8");
+	// setlocale(LC_ALL, "ko_KR.utf8");
 
 	// pcViewImpl에 포함되어 있는 HBaseView를 생성하고 초기화 한다.
 	pcViewImpl->Init(pcModel, Utility::ToChar(TheKenel.General.Display.Driver), pchName, nWindowHandle);
@@ -177,6 +179,14 @@ void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
 
 void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelivery)
 {
+#ifdef DEBUG
+	LogManager::CreateLog(LOGMANAGER_3DF_LOG_ID, L"Z://3DF_Log.txt");
+	LogManager::SetWriteTimeLog(LOGMANAGER_3DF_LOG_ID, true);
+#endif // DEBUG
+
+// 	LogManager::CreateLog(3, L"Z://3DF_Log.txt");
+// 	LogManager::SetWriteTimeLog(true);
+
 // 	CString strErrorMessage1;
 // 	DLL::H3DF::Interface cInterfaace;
 // 	cInterfaace.TDFInitializeA3DLibrary(strErrorMessage1);
@@ -198,12 +208,15 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 		return;
 	}
 
+	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Open File: " + strFilePathName);
+
+
 	ViewImpl * pcViewImpl = (ViewImpl *)GetFrontView().GetImpl();
 	if (nullptr == pcViewImpl) { DEBUG_RETURN; }
 
 	// 업데이트 강제 중지
 	pcViewImpl->GetBaseView()->SetSuppressUpdate(true);
-	pcViewImpl->GetBaseView()->SetSuppressUpdateTick(true);
+	//pcViewImpl->GetBaseView()->SetSuppressUpdateTick(true);
 
 	const CString EXTENSIONS[] = {
 		L"PTS", L"PTX", L"XYZ", // Point Cloud
@@ -249,9 +262,12 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 	SegmentKey cModelSegmentKey = pcCanvasImpl->m_pcModel->GetSegmentKey();
 
 	//----- File을 실제로 읽어 드리는 부분 -----
-	if (true == bPointColudData)
-	{
-		//LoadPointCloudFile(strFilePathName, m_pcCanvas);
+	if (true == bPointColudData) {
+		LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Load Point Cloud File Start");
+
+		GetFrontView().LoadPointCloudFile(strFilePathName);
+
+		LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Load Point Cloud File End");
 	}
 	else if (true == bHsfFile) {
 		HC_Open_Segment_By_Key(pcViewImpl->GetBaseView()->GetModel()->GetModelKey()); {
@@ -277,33 +293,29 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 		cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 2/2 : Performing Initial Update");
 	}
 
-	pcViewImpl->ViewReady();
+	// pcViewImpl->ViewReady();
 
 	//cModelSegmentKey.ForcedClose();
 
 	// #3DF_Debug: Z://Test.hsf
 #ifdef _DEBUG
-	// GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
+	 //GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
 #endif
 
-	HC_Define_System_Options("update control=thread");
+	// HC_Define_System_Options("update control=thread");
 
-	pcViewImpl->GetBaseView()->SetSuppressUpdateTick(false);
-	pcViewImpl->GetBaseView()->SetSuppressUpdate(false);
+// 	pcViewImpl->GetBaseView()->SetSuppressUpdateTick(false);
+// 	pcViewImpl->GetBaseView()->SetSuppressUpdate(false);
 
 	bool bHasInitialView = pcViewImpl->GetBaseView()->HasInitialView();
 
 	pcViewImpl->GetBaseView()->GetModel()->SetFileLoadComplete(true);
 	pcViewImpl->GetBaseView()->GetModel()->SetFirstFitComplete(true);
 
-	pcViewImpl->GetBaseView()->SetGeometryChanged();
+	// pcViewImpl->GetBaseView()->SetGeometryChanged();
 
 	if (false == bHasInitialView) {
 		pcViewImpl->GetBaseView()->FitWorld();		// fit the camera to the scene extents
-		if (pcViewImpl->GetBaseView()->GetModel()->GetContainsDouble()) {
-			HC_Convert_Precision(pcViewImpl->GetBaseView()->GetSceneKey(), "double, camera");
-		}
-
 		pcViewImpl->GetBaseView()->CameraPositionChanged(true);
 	}
 
@@ -315,14 +327,14 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 
 	pcViewImpl->GetBaseView()->SetViewDirection(H3DF::ViewDirection::Mode::px_py_pz);
 
-	HC_Relinquish_Memory();
+	// HC_Relinquish_Memory();
 
 	//HC_Control_Update_By_Key(pcViewImpl->GetBaseView()->GetViewKey(), "refresh");
 
 	// ExhaustiveUpdate() 내부에서 FoceUpdate를 여러번 호출하기 때문에, Supress 시키도록 한다.
-	pcViewImpl->GetBaseView()->ExhaustiveUpdate();
+	// pcViewImpl->GetBaseView()->ExhaustiveUpdate();
 
-	pcViewImpl->GetBaseView()->SetSuppressUpdateTick(false);
+	//pcViewImpl->GetBaseView()->SetSuppressUpdateTick(false);
 	pcViewImpl->GetBaseView()->SetSuppressUpdate(false);
 
 	/*
@@ -375,6 +387,8 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 	cDelivery.mainFrame.HideProgress();
 
 	cDelivery.view.SetValidation();
+
+	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Update Complete");
 }
 
 void H3DF::Canvas::ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObject, Signal::Delivery & cDelivery)

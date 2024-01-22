@@ -4,6 +4,8 @@
 #include "Impl/SelectionImpl.h"
 
 #include "Window.h"
+#include "Impl/WindowImpl.h"
+
 #include "../Impl/ViewImpl.h"
 
 #include "Line.h"
@@ -1144,10 +1146,186 @@ SelectionControl & H3DF::SelectionControl::operator =(SelectionControl const & c
 	return *this;
 }
 
+// 1. 주어진 Point와 Selection Option을 이용해서 선택 작업을 수행하고, 선택된 요소를 SelectionResults에 저장한다.
 size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const
 {
-	SelectionControlImpl * pcImpl = (SelectionControlImpl *)m_pcImpl;
-	return pcImpl->SelectByPoint(cInLocation, cInOptions, cOutResults);
+	SelectionControlImpl * pcSelCtrlImpl = (SelectionControlImpl *)m_pcImpl;
+
+	int	 nResult = 0;
+
+	char chAction[MVO_BUFFER_SIZE] = "v";
+
+	// 선택 옵션을 문자열로 변환
+	pcSelCtrlImpl->GetSelectOption(cInOptions, chAction);
+
+	char chScope[MVO_BUFFER_SIZE] = "";
+	pcSelCtrlImpl->GetScope(cInOptions, chScope);
+
+	// 선택 옵션에 따라 선택 작업 실시
+	if (0 < strlen(chScope)) {
+		HC_Open_Segment(chScope); {
+			HC_Set_Rendering_Options("attribute lock=(selectability)");
+			HC_Set_Selectability("geometry = on");
+			//nResult = HC_Compute_Selection(GetBaseView()->GetDriverPath(), ".", "v, selection level = entity, no related selection limit, visual selection = off", cInLocation.x, cInLocation.y);
+			nResult = HC_Compute_Selection(pcSelCtrlImpl->GetBaseView()->GetDriverPath(), ".", chAction, cInLocation.x, cInLocation.y);
+			HC_Set_Selectability("everything = off");
+		} HC_Close_Segment();
+	}
+	else {
+// 		float fProximity = 0.0;
+// 		if (true == cInOptions.ShowProximity(fProximity)) {
+// 			GetBaseView()->SetDefaultSelectionProximity(fProximity);
+// 		}
+
+		HC_Open_Segment_By_Key(pcSelCtrlImpl->GetBaseView()->GetViewKey()); {
+			//nResult = HC_Compute_Selection(".", "./scene/overwrite", "v, selection level = entity", cInLocation.x, cInLocation.y);
+			nResult = HC_Compute_Selection(".", "./scene/overwrite", chAction, cInLocation.x, cInLocation.y);
+			//(pcSelection->GetSubwindowPenetration() ? "" : "./scene/overwrite"), chAction, cInLocation.x, cInLocation.y);
+			//"v, selection level = entity, related selection limit = 0, selection sorting, internal selection limit = 0", cInLocation.x, cInLocation.y);
+		} HC_Close_Segment();
+	}
+
+	// 선택된 요소가 없음
+	if (0 == nResult) {
+		return 0;
+	}
+
+	HC_KEY  nKey = INVALID_KEY;
+	HC_KEY * pnIncludeKeys = nullptr;
+	int	eSelectedType = SelectionControlImpl::SelType::None;
+	char chKeyType[MVO_BUFFER_SIZE];
+	int	nIncludeCount = 0;
+
+	// 선택된 요소를 SelectionResults에 저장하기 위해서 새롭게 생성
+	SelectionResultsImpl * pcResultsImpl = static_cast<SelectionResultsImpl *>(cOutResults.GetImpl());
+	DEBUG_VALID(pcResultsImpl);
+
+	do {
+		// 선택된 요소를 저장하기 위해서 Item 생성
+		SelectionItem cItem;
+		SelectionItemImpl * pcItemImpl = static_cast<SelectionItemImpl *>(cItem.GetImpl());
+		DEBUG_VALID(pcItemImpl);
+
+		pcItemImpl->m_pcWindow = pcSelCtrlImpl->m_pcWindow;
+
+		HC_Show_Selection_Element(&nKey, &pcItemImpl->nOffset1, &pcItemImpl->nOffset2, &pcItemImpl->nOffset3);
+		HC_Show_Selection_Original_Key(&nKey);
+
+		WindowPoint cWindowPoint;
+		WorldPoint cWorldPoint;
+		HC_Show_Selection_Position(&cWindowPoint.x, &cWindowPoint.y, &cWindowPoint.z, &cWorldPoint.x, &cWorldPoint.y, &cWorldPoint.z);
+
+		pcItemImpl->cWindowPoint = cWindowPoint;
+		pcItemImpl->cWorldPoint = cWorldPoint;
+		
+		// build up an array of include keys to pass with the selection
+		int nKeyCount = 0;
+		HC_Show_Selection_Keys_Count(&nKeyCount);
+
+		if (0 < nKeyCount) {
+			WindowKeyImpl * pcImpl = (WindowKeyImpl *)pcSelCtrlImpl->m_pcWindow->GetImpl();
+			HC_KEY * pnKeys = pcImpl->GetSelectBufferKey(nKeyCount);
+
+			pnIncludeKeys = new HC_KEY[nKeyCount];
+			HC_Show_Selection_Original_Keys(&nKeyCount, pnKeys);
+
+			pcItemImpl->pnIncludeKeys = pnIncludeKeys;
+
+			nIncludeCount = 0;
+			for (int nIndex = nKeyCount - 1; nIndex >= 0; nIndex--)
+			{
+				HC_Show_Key_Type(pnKeys[nIndex], chKeyType);
+				if (strstr(chKeyType, "include"))
+				{
+					pnIncludeKeys[nIncludeCount] = pnKeys[nIndex];
+					nIncludeCount++;
+				}
+				else if (streq(chKeyType, "reference")) {
+					nKey = pnKeys[nIndex];
+				}
+			}
+
+			pcItemImpl->nIncludeCount = nIncludeCount;
+		}
+
+		HC_Show_Key_Type(nKey, chKeyType);
+
+		HC_KEY nTestKey3 = INVALID_KEY;
+		HC_KEY nTestKey4 = INVALID_KEY;
+
+		if (streq(chKeyType, "line") || streq(chKeyType, "polyline") || streq(chKeyType, "circular arc") || streq(chKeyType, "elliptical arc")) {
+			eSelectedType = SelectionControlImpl::SelType::Line;
+			pcItemImpl->cKey = LineKey(Key(nKey));
+		}
+		else if (streq(chKeyType, "marker")) {
+			eSelectedType = SelectionControlImpl::SelType::Marker;
+		}
+		else if (streq(chKeyType, "text leader")) {
+			eSelectedType = SelectionControlImpl::SelType::Shell;	//?
+			nKey = HC_Show_Owner_Original_Key(nKey);		// move up to text;
+		}
+		else {
+			// This may be shell, mesh, cyliner, etc...
+			eSelectedType = SelectionControlImpl::SelType::Shell;
+			pcItemImpl->cKey = ShellKey(Key(nKey));
+
+			// But if it really is a shell, check for regions.
+			if (streq(chKeyType, "shell") && pcItemImpl->nOffset3 != -1) {
+
+				int nRegion = 0;
+				int nLowest = 0;
+				int nHighest = 0;
+
+				HC_Show_Region_Range(nKey, &nLowest, &nHighest);
+
+				if ((nLowest != nHighest || nLowest > 0)) {
+					// eSelectedType |= SelectionControlImpl::SelType::Region;
+
+					HC_Open_Geometry(nKey); {
+						HC_Open_Face(pcItemImpl->nOffset3); {
+							HC_Show_Region(&nRegion);
+						}HC_Close_Face();
+					}HC_Close_Geometry();
+
+					pcItemImpl->nRegion = nRegion;
+					pcItemImpl->nLowest = nLowest;
+					pcItemImpl->nHighest = nHighest;
+				}
+/*
+				//Selection::Level cLevel;
+
+			if(true == cInOptions.ShowLevel(cLevel)) {
+				if (Selection::Level::Subentity == cLevel) {
+					//if (true ==  pcSelection->GetAllowRegionSelection()) {
+					int nRegion = 0;
+					int nLowest = 0;
+					int nHighest = 0;
+
+					HC_Show_Region_Range(nKey, &nLowest, &nHighest);
+
+					if ((nLowest != nHighest || nLowest > 0)) {
+						eSelectedType |= SelType::Region;
+						HC_Open_Geometry(nKey); {
+							HC_Open_Face(nOffset3); {
+								HC_Show_Region(&nRegion);
+							}HC_Close_Face();
+						}HC_Close_Geometry();
+
+						pcItemImpl->nRegion = nRegion;
+						pcItemImpl->nLowest = nLowest;
+						pcItemImpl->nHighest = nHighest;
+					}
+				}
+			}
+*/
+			}
+		}
+
+		pcResultsImpl->PushBack(cItem);
+
+	} while (HC_Find_Related_Selection());
+
+	return cOutResults.GetCount();
 }
 
 size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, SelectionResults & cOutResults) const
@@ -1159,7 +1337,7 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 		return 0;
 	}
 
-	return pcImpl->SelectByPoint(cInLocation, cOptions, cOutResults);
+	return SelectByPoint(cInLocation, cOptions, cOutResults);
 }
 
 size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const
@@ -1169,9 +1347,63 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, UINT con
 
 size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults) const
 {
-	SelectionControlImpl * pcImpl = (SelectionControlImpl *)m_pcImpl;
+	SelectionControlImpl * pcSelCtrlImpl = (SelectionControlImpl *)m_pcImpl;
 	SelectionOptionsKit cInOptions;
-	pcImpl->SelectByPoint(cInLocation, nFlags, cInOptions, cOutResults);
+
+	if (nullptr == pcSelCtrlImpl->m_pcSelectionSet) {
+		return HOP_NOT_HANDLED;
+	}
+
+	HPoint  new_pos;
+	int		nResult = 0;
+	bool	need_update = false;
+
+	//HSelectionSet * pcSelection = GetBaseView()->GetSelection();
+
+	// Markup 선택
+	HMarkupManager * pcMarkupManager;
+	if (nullptr != (pcMarkupManager = pcSelCtrlImpl->GetBaseView()->GetMarkupManager())) {
+		HC_Open_Segment_By_Key(pcMarkupManager->GetMarkupKey()); {
+			// compute the selection using the HOOPS window coordinate of the the pick location
+			nResult = HC_Compute_Selection(pcSelCtrlImpl->GetBaseView()->GetDriverPath(),
+				(pcSelCtrlImpl->SelectionSet()->GetSubwindowPenetration() ? "" : "."),
+				//"v", cInLocation.x, cInLocation.y);
+				"v, selection level = entity, selection sorting, internal selection limit = 0", cInLocation.x, cInLocation.y);
+		} HC_Close_Segment();
+	}
+
+	if (nResult == 0) {
+		HC_Open_Segment_By_Key(pcSelCtrlImpl->GetBaseView()->GetViewKey()); {
+			nResult = HC_Compute_Selection(".",
+				(pcSelCtrlImpl->SelectionSet()->GetSubwindowPenetration() ? "" : "./scene/overwrite"),
+				//"v", cInLocation.x, cInLocation.y);
+				"v, selection level = entity, related selection limit = 0, selection sorting, internal selection limit = 0", cInLocation.x, cInLocation.y);
+		} HC_Close_Segment();
+	}
+
+	if (nResult > 0) {
+		pcSelCtrlImpl->HandleSelection(nFlags, cOutResults);
+		size_t nCount = cOutResults.GetCount();
+		need_update = true;
+	}
+
+	pcSelCtrlImpl->GetBaseView()->GetConstantFrameRateObject()->SetDisableIncreaseTemp(true);
+
+	//GetBaseView()->SetGeometryChanged();
+	if (need_update) {
+		pcSelCtrlImpl->GetBaseView()->Update();	// update the scene to reflect the new highlight attributes
+	}
+
+	pcSelCtrlImpl->GetBaseView()->GetConstantFrameRateObject()->SetDisableIncreaseTemp(false);
+
+	if (pcSelCtrlImpl->GetBaseView()->GetFocusOnSelection()) {
+		pcSelCtrlImpl->GetBaseView()->FocusOnSelection();
+	}
+
+	// of the selected items
+	return HOP_READY;
+
+	//pcImpl->SelectByPoint(cInLocation, nFlags, cInOptions, cOutResults);
 
 	return 0;
 }

@@ -303,9 +303,6 @@
     <ClInclude Include="3DF\Impl\WindowImpl.h">
       <Filter>3DF\Object\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Impl\HighlightImpl.h">
-      <Filter>3DF\Control\Impl</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\Impl\SelectionImpl.h">
       <Filter>3DF\Control\Impl</Filter>
     </ClInclude>
@@ -326,6 +323,9 @@
     </ClInclude>
     <ClInclude Include="3DF\Impl\DefinitionImpl.h">
       <Filter>3DF\Object\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\PointCloud.h">
+      <Filter>3DF\Control</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -557,9 +557,6 @@
     <ClCompile Include="3DF\Impl\WindowImpl.cpp">
       <Filter>3DF\Object\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Impl\HighlightImpl.cpp">
-      <Filter>3DF\Control\Impl</Filter>
-    </ClCompile>
     <ClCompile Include="3DF\Impl\SelectionImpl.cpp">
       <Filter>3DF\Control\Impl</Filter>
     </ClCompile>
@@ -580,6 +577,9 @@
     </ClCompile>
     <ClCompile Include="3DF\Impl\DefinitionImpl.cpp">
       <Filter>3DF\Object\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\PointCloud.cpp">
+      <Filter>3DF\Control</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

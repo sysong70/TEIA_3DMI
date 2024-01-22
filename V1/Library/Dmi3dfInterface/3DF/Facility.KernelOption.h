@@ -173,7 +173,7 @@ namespace H3DF
 					int	UseLods = 0;							// CAppSettings::UseLods
 					int	DetailSteps = 15;						// CAppSettings::DetailSteps
 					int HardCutoff = 10;						// CAppSettings::HardCutoff
-					int	CullingThresholdSet = 1;				// CAppSettings::CullingThresholdSet
+					int	CullingThresholdSet = 2;				// CAppSettings::CullingThresholdSet
 					int	CullingThreshold = 10;					// CAppSettings::CullingThreshold
 
 					Json::Object * Get();

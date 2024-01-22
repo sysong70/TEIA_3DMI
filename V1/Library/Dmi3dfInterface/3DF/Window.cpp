@@ -7,7 +7,6 @@
 #include "Impl/SelectionImpl.h"
 
 #include "Highlight.h"
-#include "Impl/HighlightImpl.h"
 
 #include "../Impl/ViewImpl.h"
 
@@ -37,8 +36,7 @@ H3DF::WindowKey::WindowKey(H3DF::BaseView * pcBaseView)
 	pcSelectionImpl->m_pcSelectionSet = GetBaseView()->GetSelection();
 
 	pcImpl->m_pcHighlight = new HighlightControl(*this, false);
-	HighlightControlImpl * pcHighlightImpl = dynamic_cast<HighlightControlImpl *>(pcImpl->m_pcHighlight->GetImpl());
-
+	
 	pcImpl->m_pcSelectionOptions = new SelectionOptionsControl(*this);
 	SelectionOptionsControlImpl * pcSelectionOptionsImpl = dynamic_cast<SelectionOptionsControlImpl *>(pcImpl->m_pcSelectionOptions->GetImpl());
 	pcSelectionOptionsImpl->m_pcSelectionSet = GetBaseView()->GetSelection();
