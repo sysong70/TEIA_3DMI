@@ -11,6 +11,10 @@
 #include "Line.h"
 #include "LineAttribute.h"
 
+#include "AttributeLock.h"
+
+#include "Visibility.h"
+
 #include <vhash.h>
 #include <vlist.h>
 
@@ -163,8 +167,6 @@ H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow, bo
 		m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetHighlightSelection();
 	}
 
-	m_pcSelectionSet->SetAllowRegionSelection(true);
-
 	/*
 		m_pcSelectionSet = new HSelectionSet((HBaseView *)cInWindow.GetBaseView());
 		m_pcSelectionSet->Init();
@@ -177,13 +179,14 @@ H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow, bo
 
 	//m_pcSelectionSet->SetSelectionLevel(HSelectEntity);
 
+	m_pcSelectionSet->SetAllowRegionSelection(true);
+
 	m_pcSelectionSet->SetGrayScale(false);// ThePreset.GrayScaleSelection);
 	m_pcSelectionSet->SetUseDefinedHighlight(false);// ThePreset.UseDefinedHighlighting);
 	m_pcSelectionSet->SetAllowDisplacement(false);// ThePreset.DisplaceSelection);
 
 	HPixelRGBA cHighlightSelectColor;
 	cHighlightSelectColor.Set(255, 0, 0);
-	m_pcSelectionSet->SetSelectionEdgeWeight(1.0);
 
 	m_pcSelectionSet->SetSelectionFaceColor(cHighlightSelectColor);
 	m_pcSelectionSet->SetSelectionEdgeColor(cHighlightSelectColor);
@@ -191,6 +194,7 @@ H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow, bo
 
 	m_pcSelectionSet->SetHighlightMode(HighlightQuickmoves);
 
+	// 선택될때 Face의 Edge를 표시여부 처리
 	m_pcSelectionSet->HighlightRegionEdgesAutoVisibility(false);
 
 	m_pcSelectionSet->UpdateHighlightStyle();
@@ -520,11 +524,58 @@ HighlightControl & H3DF::HighlightControl::SetLineAttribute(LineAttributeKit con
 }
 */
 
+VisibilityControl H3DF::HighlightControl::GetVisibilityControl()
+{
+	auto * pcImpl = (HighlightControlImpl *)m_pcImpl;
+
+	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
+
+	SegmentKey cSegmentKey(nKey);
+	VisibilityControl cControl(cSegmentKey);
+
+	return cControl;
+}
+
+VisibilityControl const H3DF::HighlightControl::GetVisibilityControl() const
+{
+	auto * pcImpl = (HighlightControlImpl *)m_pcImpl;
+
+	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
+
+	SegmentKey cSegmentKey(nKey);
+	VisibilityControl cControl(cSegmentKey);
+
+	return cControl;
+}
+
+AttributeLockControl H3DF::HighlightControl::GetAttributeLockControl()
+{
+	auto * pcImpl = (HighlightControlImpl *)m_pcImpl;
+
+	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
+
+	SegmentKey cSegmentKey(nKey);
+	AttributeLockControl cControl(cSegmentKey);
+
+	return cControl;
+}
+
+AttributeLockControl const H3DF::HighlightControl::GetAttributeLockControl() const
+{
+	auto * pcImpl = (HighlightControlImpl *)m_pcImpl;
+
+	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
+
+	SegmentKey cSegmentKey(nKey);
+	AttributeLockControl cControl(cSegmentKey);
+
+	return cControl;
+}
+
 LineAttributeControl H3DF::HighlightControl::GetLineAttributeControl()
 {
-	auto * pcImpl = dynamic_cast<HighlightControlImpl *>(m_pcImpl);
-	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
-	//HC_KEY nKey = pcImpl->GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
+	auto * pcImpl = (HighlightControlImpl *)m_pcImpl;
+	HC_KEY nKey = pcImpl->SelectionSet()->GetSelectionSegment();
 
 	SegmentKey cSegmentKey(nKey);
 	LineAttributeControl cControl(cSegmentKey);
@@ -534,9 +585,8 @@ LineAttributeControl H3DF::HighlightControl::GetLineAttributeControl()
 
 LineAttributeControl const H3DF::HighlightControl::GetLineAttributeControl() const
 {
-	auto * pcImpl = dynamic_cast<HighlightControlImpl *>(m_pcImpl);
-	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
-	//HC_KEY nKey = pcImpl->GetBaseView()->GetHighlightSelection()->GetSelectionSegment();
+	auto * pcImpl = (HighlightControlImpl *)m_pcImpl;
+	HC_KEY nKey = pcImpl->SelectionSet()->GetSelectionSegment();
 
 	SegmentKey cSegmentKey(nKey);
 	LineAttributeControl cControl(cSegmentKey);

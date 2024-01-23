@@ -140,16 +140,16 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetAntiAliasing(bool bInState
 	VisualEffectsControlImpl * pcImpl = (VisualEffectsControlImpl *) m_pcImpl;
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		CString strOption;
+		CStringA strOption;
 
 		if (true == bInState) {
-			strOption = L"anti-alias = (screen = on)";
+			strOption = "anti-alias = (screen = on)";
 		}
 		else {
-			strOption = L"anti-alias = (screen = off)";
+			strOption = "anti-alias = (screen = off)";
 		}
 
-		HC_Set_Rendering_Options(Utility::ToChar(strOption));
+		HC_Set_Rendering_Options(strOption);
 
 	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 

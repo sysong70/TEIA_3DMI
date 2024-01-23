@@ -55,12 +55,20 @@ namespace H3DF
 
 		HighlightControl & UnhighlightEverything();
 
-		//== Material Mapping 관련 함수 ==================================================================
+		//== Material Mapping 관련 함수 ==============================================================
 		HighlightControl & SetMaterialMapping(MaterialMappingKit const & cInKit);
 		MaterialMappingControl GetMaterialMappingControl();
 		MaterialMappingControl const GetMaterialMappingControl() const;
 
-		//== Line Attribute 관련 함수 ====================================================================
+		//== Visibility 관련 함수 ====================================================================
+		VisibilityControl GetVisibilityControl();
+		VisibilityControl const GetVisibilityControl() const;
+
+		//== Attribute Lock 관련 함수 ================================================================
+		AttributeLockControl GetAttributeLockControl();
+		AttributeLockControl const GetAttributeLockControl() const;
+
+		//== Line Attribute 관련 함수 ================================================================
 		//HighlightControl & SetLineAttribute(LineAttributeKit const & cInKit);
 
 		LineAttributeControl GetLineAttributeControl();

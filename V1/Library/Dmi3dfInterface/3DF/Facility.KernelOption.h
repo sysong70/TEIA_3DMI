@@ -87,6 +87,7 @@ namespace H3DF
 			DisplayListGeometry,	// Geometry-level display lists
 			DisplayListSegment		// Segment-level display lists
 		};
+
 		class API_3DF KernelOption : public Base
 		{
 		public:
@@ -121,7 +122,7 @@ namespace H3DF
 					CString Style = L"blended";
 					CString Sorting = L"depth peeling";
 					CString DepthPeelingLayers = L"3";
-					bool PixelOIT = false;
+					bool PixelOIT = true;
 					bool DepthWriting = false;
 
 					Json::Object * Get();

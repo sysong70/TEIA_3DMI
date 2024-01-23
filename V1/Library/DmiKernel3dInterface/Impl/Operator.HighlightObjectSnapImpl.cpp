@@ -30,6 +30,7 @@
 #include <3DF/Highlight.h>
 #include <3DF/Visibility.h>
 #include <3DF/VisualEffects.h>
+#include <3DF/AttributeLock.h>
 #include <3DF/3DF.Utility.h>
 
 #include <3DF/LineAttribute.h>
@@ -166,6 +167,8 @@ KERNEL::Operator::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const H3DF::V
 
 
 	m_cDynamicHighlightControl.SetMaterialMapping(cHighlightMaterialMapping);
+	// Shell 선택시에 Line Visibility를 설정한대로 적용하기 위해서 Lock을 걸도록 한다.
+	m_cDynamicHighlightControl.GetAttributeLockControl().SetLock(AttributeLock::Type::Visibility);
 
 // 	m_cDynamicHighlightControl.
 // 	m_pcSelectionSet->SetReferenceSelectionType(RefSelOff);
@@ -471,16 +474,18 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoin
 	H3DF::HighlightOptionsKit cOption;
 	if(0 < cFilteredSelResult.GetCount()) {
 		if(H3DF::Type::LineKey == cFrontItem.Type()) {
+			m_cDynamicHighlightControl.GetVisibilityControl().SetLines(true);
 			m_cDynamicHighlightControl.GetLineAttributeControl().SetWeight(m_fLineWeight);
 		}
 		else {
-			float fLineWeight = 1.0;
+			m_cDynamicHighlightControl.GetVisibilityControl().SetLines(false);
+			m_cDynamicHighlightControl.GetVisibilityControl().SetEdges(false);
+
+			float fLineWeight = 0.0;
 			m_cDynamicHighlightControl.GetLineAttributeControl().SetWeight(fLineWeight);
 		}
 
 		cOutSelection = cFrontItem;
-
-		//cOutSelections.PushBack(new SelectionItem(*pcFrontItem));
 		
 		// 선택된 요소를 Highlight한다.
 		m_cDynamicHighlightControl.Highlight(cFrontItem, cOption);

@@ -37,7 +37,7 @@ KERNEL::DocViewImpl::DocViewImpl()
 	m_nSelFilter += (DWORD)SelectionFilter::Type::Curve;
 	m_nSelFilter += (DWORD)SelectionFilter::Type::Edge;
 	m_nSelFilter += (DWORD)SelectionFilter::Type::Face;
-	m_nSelFilter += (DWORD)SelectionFilter::Type::Solid;
+	//m_nSelFilter += (DWORD)SelectionFilter::Type::Solid;
 	m_nSelFilter += (DWORD)SelectionFilter::Type::Axis;
 	m_nSelFilter += (DWORD)SelectionFilter::Type::PMI;
 

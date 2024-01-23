@@ -3,8 +3,13 @@
 #include "Kernel.DocView.h"
 #include "./Impl/Kernel.DocViewImpl.h"
 
-#include "../Dmi3dfInterface/3DF.Canvas.h"
-#include "../Dmi3dfInterface/3DF.Factory.h"
+#include <3DF.Canvas.h>
+#include <3DF.Factory.h>
+
+#include <3DF/Visibility.h>
+#include <3DF/LineAttribute.h>
+#include <3DF/AttributeLock.h>
+
 
 #include "Signal.Connector.h"
 
@@ -233,6 +238,20 @@ void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 		H3DF::HighlightOptionsKit cOptions;
 
 		if (false == pcImpl->m_cSelectionResult.IsExist(cSelItem)) {
+
+			if (H3DF::Type::LineKey == cSelItem.Type()) {
+				pcImpl->HighlightControl().GetVisibilityControl().SetLines(true);
+				pcImpl->HighlightControl().GetLineAttributeControl().SetWeight(3.0);
+			}
+			else {
+				pcImpl->HighlightControl().GetVisibilityControl().SetLines(false);
+				pcImpl->HighlightControl().GetVisibilityControl().SetEdges(false);
+				pcImpl->HighlightControl().GetAttributeLockControl().SetLock(H3DF::AttributeLock::Type::Visibility);
+
+				float fLineWeight = 0.0;
+				pcImpl->HighlightControl().GetLineAttributeControl().SetWeight(fLineWeight);
+			}
+
 			pcImpl->HighlightControl().Highlight(cSelItem, cOptions, false);
 
 			// 선택된 객체를 SelectionResult에 추가

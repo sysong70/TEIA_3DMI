@@ -60,7 +60,6 @@ namespace H3DF
 
 		void FileOpen(Json::Object & cInObject, Signal::Delivery & cDelivery);
 		static void ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObject, Signal::Delivery & cDelivery);
-		void FileOpen_ORG(Json::Object & cInObject, Signal::Delivery & cDelivery);
 
 		H3DF::View & GetFrontView() const;
 

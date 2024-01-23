@@ -94,6 +94,8 @@ namespace H3DF
 	class MarkerAttributeControl;
 	class MaterialMappingControl;
 
+	class AttributeLockControl;
+
 	class ApplicationWindowOptionsKit;
 
 	class GeometryKey;
@@ -116,6 +118,13 @@ namespace H3DF
 		SelectionResultsIterator				= 0x01000003,
 
 		Kit										= 0x01000000,
+		MarkerKit								= 0x01000010,
+		SphereAttributeKit						= 0x01000011,
+		TextAttributeKit						= 0x01000012,
+		TransparencyKit							= 0x01000013,
+		VisibilityKit							= 0x01000014,
+		VisualEffectsKit						= 0x01000015,
+		CuttingSectionAttributeKit				= 0x01000016,
 		CircleKit								= 0x01000017,
 		LineKit									= 0x01000020,
 		ShellKit								= 0x01000027,
