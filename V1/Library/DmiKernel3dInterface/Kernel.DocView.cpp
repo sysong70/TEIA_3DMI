@@ -1,4 +1,4 @@
-﻿#include <StdAfx.h>
+#include <StdAfx.h>
 
 #include "Kernel.DocView.h"
 #include "./Impl/Kernel.DocViewImpl.h"
@@ -307,6 +307,9 @@ void KERNEL::DocView::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 	int nTop = cArray[1]->ToInteger();
 
 	pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(true);
+
+	// Control Flag을 추가해서 ComputeReasonableTarget이란 함수를 사용해서 Whell Zomm할때 Entity를 선택하는 과정을 생략함.
+	nFlag |= MK_CONTROL;
 
 	HEventInfo	cEvent((HBaseView *)pcImpl->GetBaseView());
 	cEvent.SetPoint(HE_MouseWheel, x - nLeft, y - nTop, pcImpl->MouseMapFlags(nFlag));

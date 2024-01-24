@@ -119,10 +119,10 @@ namespace H3DF
 				Display;
 
 				struct TRANSPARENCY {
-					CString Style = L"blended";
-					CString Sorting = L"depth peeling";
-					CString DepthPeelingLayers = L"3";
-					bool PixelOIT = true;
+					CString Style = "blended";
+					CString Sorting = "depth peeling";
+					CString DepthPeelingLayers = "3";
+					bool PixelOIT = false;
 					bool DepthWriting = false;
 
 					Json::Object * Get();
@@ -216,7 +216,7 @@ namespace H3DF
 			{
 				struct ANTIALIASING {
 					bool Use = true;		// CAppSettings::bAntiAliasing
-					bool Line = true;		// CAppSettings::LineAntialiasing
+					bool Line = false;		// CAppSettings::LineAntialiasing
 					bool Text = true;		// CAppSettings::TextAntialiasing
 					int Level = 4;			// CAppSettings::AntialiasingLevel
 
@@ -525,12 +525,6 @@ namespace H3DF
 			int	GreekingLimit = 6000;	// Greeking limit * 1000 (to store float as int)
 
 			int LightCount = 1;
-
-			CString TransparencyStyle = "blended";
-			CString TransparencySorting = "depth peeling";
-			CString TransparencyDepthPeelingLayers = "3";
-			bool PixelOIT = false;
-			bool DepthWriting = false;
 		};
 	}
 }

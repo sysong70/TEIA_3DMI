@@ -445,12 +445,6 @@ namespace SESSION
 			int	GreekingLimit = 6000;	// Greeking limit * 1000 (to store float as int)
 
 			int LightCount = 1;
-
-			CString TransparencyStyle = "blended";
-			CString TransparencySorting = "depth peeling";
-			CString TransparencyDepthPeelingLayers = "3";
-			bool PixelOIT = false;
-			bool DepthWriting = false;
 		};
 	}
 }

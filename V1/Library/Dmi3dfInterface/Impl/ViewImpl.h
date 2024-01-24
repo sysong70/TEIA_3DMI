@@ -56,15 +56,11 @@ namespace H3DF
 		void Copy(const ViewImpl * pcInThat);
 
 		bool Init(H3DF::Model * pcInModel, const char * pchInDriverType, const char * pchInInstanceName, H3DF::WindowHandle nInWindowHandle);
-		bool Init_CUR(H3DF::Model * pcInModel, const char * pchInDriverType, const char * pchInInstanceName, H3DF::WindowHandle nInWindowHandle);
 
 	protected:
 		void SetGpu(CString strGpu);
 		void SetDriverOption();
 		void SetAntiAliasOption();
-		void SetViewTransparency();
-
-		bool Init_NEW(H3DF::Model * pcInModel, const char * pchInDriverType, const char * pchInInstanceName, H3DF::WindowHandle nInWindowHandle);
 
 	public:
 		void ViewReady();

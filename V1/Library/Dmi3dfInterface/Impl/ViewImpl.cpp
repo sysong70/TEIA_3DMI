@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 
 #include "ViewImpl.h"
 
@@ -699,11 +699,6 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 
 	sprintf(chDriverOpts, "quick moves preference = %s", Utility::ToChar(TheKenel.Selection.Highlight.QuickMovesType).GetBuffer());
 
-	// set anti-aliasing if set
-	if (true == TheKenel.Appearance.AntiAliasing.Use) {
-		sprintf(chDriverOpts, "%s, anti-alias=%d ", chDriverOpts, TheKenel.Appearance.AntiAliasing.Level);
-	}
-
 	if (true == TheKenel.General.Display.DriverDisplayStats) {
 		sprintf(chDriverOpts, "%s, display stats, display time stats, display memory stats", chDriverOpts);
 	}
@@ -723,18 +718,19 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 
 	HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
 		HC_Set_User_Index(H_VIEW_POINTER_INDEX, GetBaseView());  // This is used in the event_checker for constant framerate.
+
 		HC_Set_Driver_Options(chDriverOpts);
+
+/*
 		HCLOCALE(sprintf(chDriverOpts, "bloom = (%s, strength=%f, blur=%d, shape=%s)",
 			(TheKenel.Lighting.Bloom.Use ? "on" : "off"),
 			TheKenel.Lighting.Bloom.Strength,
 			TheKenel.Lighting.Bloom.Blur,
 			(TheKenel.Lighting.Bloom.Shape == RadialBloom ? "radial" : "star")));
+
 		HC_Set_Driver_Options(chDriverOpts);
-		// antialiasing needs rendering option in addition to driver option
-		if (true == TheKenel.Appearance.AntiAliasing.Use) {
-			// Rendering Option에서는 Screen On만 설정한다.
-			HC_Set_Rendering_Options("anti-alias = (screen = on)");
-		}
+*/
+		
 		HC_Set_Driver_Options("special events, update interrupts");
 		HC_Control_Update(".", "redraw everything");
 	} HC_Close_Segment();
@@ -745,6 +741,8 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 		// 			HC_Set_Rendering_Options("anti-alias = (screen = on)");
 		// 		}
 	} HC_Close_Segment();
+
+	SetAntiAliasOption();
 
 	if (false == TheKenel.Lighting.Light.Scaling) {
 		m_pcBaseView->SetLightScaling(0);
@@ -1089,276 +1087,9 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	m_pcBaseView->SetLightCount(ThePreset.LightCount);
 	m_pcBaseView->SetViewSelectionLevel(HSelectionLevelSegment);
 
-	// WindowKey 선언 위치가 변경되면 않됨. 주의할것.
-	m_pcWindow = new WindowKey(m_pcBaseView);
-
-	m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
-	m_pcBaseView->SetNavigationCube(&m_cNaviCube);
-
-	SetDefaultOperator();
-
-	// Object Snap용 Glyph 생성
-	//Operator::ObjectSnap::CreateGlyph();
-
-	SetSelectOption();
-
-	// Portfolio Key 생성
-// 	SegmentKey cPortfoliosKey = m_cKey.Subsegment(L"Portfolios");
-// 	m_cPortfolioKey.SetKeyValue(cPortfoliosKey.KeyValue());
-
-	m_cPortfolioKey = Database::CreatePortfolio();
-
-	// do all the setup with no updates
-	m_pcBaseView->SetSuppressUpdate(false);
-
-	return true;
-}
-
-bool H3DF::ViewImpl::Init_CUR(H3DF::Model * pcInModel, const char * pchInDriverType, const char * pchInInstanceName, H3DF::WindowHandle nInWindowHandle)
-{
-	ModelImpl * pcModelImpl = static_cast<ModelImpl *>(pcInModel->GetImpl());
-	DEBUG_VALID(pcModelImpl);
-
-	// HBaseView 생성
-	m_pcBaseView = new H3DF::BaseView((HBaseModel *)pcModelImpl,
-		nullptr,											// Alias
-		pchInDriverType,									// Driver Type
-		pchInInstanceName,									// Instance name
-		reinterpret_cast<void *>(nInWindowHandle),			// Window handle
-		nullptr);
-
-	if (nullptr == m_pcBaseView) {
-		return false;
-	}
-
-	m_pcBaseView->Init();
-
-	// View Segment Key 설정.View Segment에는 향후 사용하기 위한 Base View 정보를 추가해놓는다.
-	m_cKey.Set(m_pcBaseView->GetViewKey());
-	SegmentKeyImpl * pcKeyImpl = static_cast<SegmentKeyImpl *>(m_cKey.GetImpl());
-	DEBUG_VALID(pcKeyImpl);
-	pcKeyImpl->SetBaseView(m_pcBaseView);
-
-	H3DF::SelectionSet * pcSelection = new H3DF::SelectionSet(m_pcBaseView);
-	m_pcBaseView->SetSelection(pcSelection);
-
-	// Model 설정
-	m_pcModel = pcInModel;
-	m_cModelKey = m_pcModel->GetSegmentKey();
-
-	HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
-		HC_Set_Selectability("everything = off");
-	} HC_Close_Segment();
-
-	// set up some scene defaults
-	HC_Open_Segment_By_Key(m_pcBaseView->GetSceneKey()); {
-		// #Selection: Line이 더 잘보이게 하고 선택이 잘되도록 하기 위해서 Face를 뒤로 보냄
-		//HC_Set_Rendering_Options("face displacement = 16"); // 양수값이 Camera에서 멀어지는 방향임.
-		HC_Set_Rendering_Options("face displacement = 2"); // 양수값이 Camera에서 멀어지는 방향임.
-		//HC_Set_Rendering_Options("hlro = (face displacement = 5, visibility = off, pattern = 1, dim factor = 0.6)");
-		HC_Set_Rendering_Options("no color interpolation, color index interpolation");
-		HC_Set_Visibility("lights = (faces = on, edges = off), markers = off, faces=on, edges=off, lines=on, text = on");
-	} HC_Close_Segment();
-
-	// windowspace (overlay) defaults
-	HC_Open_Segment_By_Key(m_pcBaseView->GetWindowspaceKey()); {
-		HC_Set_Color_By_Index("geometry", 3);
-		HC_Set_Color_By_Index("window contrast", 1);
-		HC_Set_Color_By_Index("windows", 1);
-		HC_Set_Visibility("markers=on");
-		HC_Set_Marker_Symbol("+");
-		HC_Set_Selectability("off");
-	} HC_Close_Segment();
-	
-	// GPU 설정, Default값을 사용, Driver는 View가 생성될 때 설정함.
-	SetGpu(TheKenel.General.Display.Gpu);
-
-	// do all the setup with no updates
-	m_pcBaseView->SetSuppressUpdate(true);
-
-	SetDriverOption();
-
-	if (false == TheKenel.Lighting.Light.Scaling) {
-		m_pcBaseView->SetLightScaling(0);
-	}
-	else {
-		m_pcBaseView->SetLightScaling(TheKenel.Lighting.Light.ScaleFactor / 100000.f);
-	}
-
-	m_pcBaseView->SetLightFollowsCamera(TheKenel.Lighting.Light.FollowsCamera);
-	
-	//SetLightCount(LightCount); //defer until after camera is all set up
-	//SetDeepSelectionMode(DeepSelection); OCC를 사용할 때 대응하는 함수
-
-	m_pcBaseView->SetVisibilitySelectionMode(TheKenel.Selection.Behavior.VisibilitySelection);
-	
-// 	m_pcBaseView->SetDynamicHighlighting(TheKenel.Selection.Behavior.DynamicHighlighting);
-// 	m_pcBaseView->SetDetailSelection(TheKenel.Selection.Behavior.DetailSelection); // "Honor Line/Edge Weight/Pattern"
-// 	m_pcBaseView->SetRelatedSelectionLimit(TheKenel.Selection.Behavior.RelatedSelectionLimit);
-
-	m_pcBaseView->SetTransparentSelectionBoxMode(TheKenel.Selection.Behavior.UseSelectBox); // show a transparent box when selecting areas
-	m_pcBaseView->SetRespectSelectionCulling(TheKenel.Selection.Behavior.RespectCulling); // Respect Culling during selection.
-	m_pcBaseView->SetFastFitWorld(true);
-	m_pcBaseView->SetForceFastHiddenLine(TheKenel.Performance.Optimization.HiddenLineMode == FastHiddenLine);
-	m_pcBaseView->SetSpritingMode(TheKenel.Interaction.GeometryManipulation.Spriting);
-	m_pcBaseView->SetAllowInteractiveCutGeometry(TheKenel.Interaction.GeometryManipulation.UpdateCutGeometry);
-	m_pcBaseView->SetAllowInteractiveShadows(TheKenel.Interaction.GeometryManipulation.UpdateShadows);
-	m_pcBaseView->SetBackplaneCulling(TheKenel.General.Etc.BackplaneCulling);
-
-	m_pcBaseView->SetOcclusionCullingMode(TheKenel.Performance.Optimization.OcclusionCulling, true,
-		TheKenel.Performance.Optimization.OcclusionThreshold);
-
-	m_pcBaseView->SetDisplayListType(DisplayListSegment);// DisplayListOff);
-
-	if (true == TheKenel.Performance.FramerateOptimization.UseFramerate)
-	{
-		if (FramerateFixed == TheKenel.Performance.FramerateOptimization.CurrentFramerateMode)
-		{
-			m_pcBaseView->SetFramerateMode((FramerateMode)TheKenel.Performance.FramerateOptimization.CurrentFramerateMode,
-				TheKenel.Performance.FramerateOptimization.FramerateTime, TheKenel.Performance.FramerateOptimization.MaxThreshold,
-				UINT2bool(TheKenel.Performance.FramerateOptimization.UseLods), TheKenel.Performance.FramerateOptimization.DetailSteps,
-				TheKenel.Performance.FramerateOptimization.HardCutoff);
-		}
-	}
-	else if (TheKenel.Performance.FramerateOptimization.CullingThresholdSet)
-	{
-		m_pcBaseView->SetFramerateMode(FramerateOff);
-		m_pcBaseView->SetCullingThreshold(TheKenel.Performance.FramerateOptimization.CullingThreshold);
-	}
-	else
-	{
-		m_pcBaseView->SetFramerateMode(FramerateOff);
-		m_pcBaseView->SetCullingThreshold(0);
-	}
-
-	m_pcBaseView->SetSmoothTransition(false);
-
-	m_pcBaseView->SetShadowRenderingMode((HShadowRenderingMode)TheKenel.Effects.SimpleShadow.ShadowRenderingMode);
-
-	SetViewAxis();
-
-	SetTransparency();
-
-	//m_pcBaseView->SetAxisMode(TheKenel.General.Rendering.DisplayAxisTriad ? AxisOn : AxisOff);
-
-	// 배경화면 설정
-	SetWindowBackGroundColor(TheKenel.Appearance.BackgroundColor.Top, TheKenel.Appearance.BackgroundColor.Bottom);
-
-	HPoint FakeHLRColor;
-	FakeHLRColor.Set(ColorValue(ThePreset.FakeHLRColor));
-
-	m_pcBaseView->SetFakeHLRColor(FakeHLRColor);
-	m_pcBaseView->SetProjMode((ProjMode)ThePreset.ProjectionMode);
-	m_pcBaseView->SetSmoothTransition(ThePreset.SmoothTransition);
-	m_pcBaseView->SetSmoothTransitionDuration(0.5f);
-	m_pcBaseView->GetUndoManager()->Flush();			//don't care about this initial camera change
-	m_pcBaseView->SetDisplayHandlesOnDblClk(!ThePreset.DisableEditing);
-
-	//SetCoordinateSystemHandedness(bWorldHandedness ? HandednessRight : HandednessLeft, true);
-	m_pcBaseView->SetHandedness(ThePreset.WorldHandedness ? HandednessRight : HandednessLeft, true);
-
-	// The state of world today with polygon handedness is
-	// 1. Since we are using display lists by default, we want this setting.
-	// 2. We will have it only on the view key. If required, model could have it's own
-	// Rajesh B (11-Apr-2003)
-	m_pcBaseView->SetPolygonHandednessMode(HandednessLeft);
-
-	HPixelRGBA cHighlightSelectColor;
-	cHighlightSelectColor.Set(255, 0, 0);
-
-	m_pcBaseView->GetHighlightSelection()->SetSelectionFaceColor(cHighlightSelectColor);
-	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeColor(cHighlightSelectColor);
-	m_pcBaseView->GetHighlightSelection()->SetSelectionMarkerColor(cHighlightSelectColor);
-
-	// #Selection: Highlighting Line, Edge 두께 설정
-
-	// 아래 부분을 삭제하면 다음에 설정된 fLineWeight를 적용할 때 Segment 오류가 발생함.
-	m_pcBaseView->GetSelection()->SetSelectionEdgeWeight(1.0);
-	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeWeight(1.0);
-
-	float fLineWeight = 1.0;
-	HC_KEY nHighlightSelectionKey = m_pcBaseView->GetHighlightSelection()->GetSelectionSegment();
-	HC_Open_Segment_By_Key(nHighlightSelectionKey); {
-		HC_Set_Line_Weight(fLineWeight);
-		HC_Set_Edge_Weight(fLineWeight);
-	} HC_Close_Segment();
-
-	HC_KEY nSelectionKey = m_pcBaseView->GetSelection()->GetSelectionSegment();
-	HC_Open_Segment_By_Key(nSelectionKey); {
-		HC_Set_Line_Weight(fLineWeight);
-		HC_Set_Edge_Weight(fLineWeight);
-	} HC_Close_Segment();
-
-	m_pcBaseView->GetHighlightSelection()->SetGrayScale(false);// ThePreset.GrayScaleSelection);
-	m_pcBaseView->GetHighlightSelection()->SetUseDefinedHighlight(false);// ThePreset.UseDefinedHighlighting);
-	m_pcBaseView->GetHighlightSelection()->SetAllowDisplacement(false);// ThePreset.DisplaceSelection);
-	m_pcBaseView->GetHighlightSelection()->UpdateHighlightStyle();
-
-	// set the selection color
-	HSelectionSet * pcSelSet = m_pcBaseView->GetSelection();
-	assert(pcSelSet);
-	HPixelRGBA cSelectColor;
-	int sel_alpha = (int)(ThePreset.SelectionColorTransparency * 2.56f);		// settings is a %, scale it to 256
-	cSelectColor.Set(ColorRGBA(ThePreset.PolygonSelectionColor, sel_alpha));
-	pcSelSet->SetSelectionFaceColor(cSelectColor);
-
-	cSelectColor.Set(ColorRGBA(ThePreset.LineSelectionColor, sel_alpha));
-	pcSelSet->SetSelectionEdgeColor(cSelectColor);
-
-	cSelectColor.Set(ColorRGBA(ThePreset.MarkerSelectionColor, sel_alpha));
-	pcSelSet->SetSelectionMarkerColor(cSelectColor);
-
-	// set markup color and weight
-	SetMarkupColor(ThePreset.MarkupColor);
-
-	SetShadowColor(TheKenel.VisualEffects.Shadow.GetColor());
-
-	m_pcBaseView->GetMarkupManager()->SetMarkupWeight(ThePreset.MarkupWeight / 100.0f);
-
-		// set the color index interpolation settings
-	m_pcBaseView->SetColorInterpolation(ThePreset.CiByValue);
-	m_pcBaseView->SetColorIndexInterpolation(ThePreset.CiByColormapIndex, ThePreset.CiIsolines);
-
-	m_pcBaseView->GetSelection()->SetGrayScale(ThePreset.GrayScaleSelection);
-	m_pcBaseView->GetSelection()->SetUseDefinedHighlight(ThePreset.UseDefinedHighlighting);
-	m_pcBaseView->GetSelection()->SetAllowDisplacement(ThePreset.DisplaceSelection);
-	m_pcBaseView->GetSelection()->SetHighlightMode(HighlightQuickmoves);
-	m_pcBaseView->GetHighlightSelection()->SetHighlightMode(HighlightQuickmoves);
-
-	m_pcBaseView->GetSelection()->SetHighlightTransparency(ThePreset.TransparencyLevel);
-
-	if (ThePreset.RefSelType == "Spriting") {
-		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelSpriting);
-	}
-	else if (ThePreset.RefSelType == "Off") {
-		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelOff);
-	}
-	else {
-		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelDefault);
-	}
-
-	m_pcBaseView->GetHighlightSelection()->UpdateHighlightStyle();
-	m_pcBaseView->GetSelection()->UpdateHighlightStyle();
-
-	// set the rendermode
-	m_pcBaseView->SetRenderMode((HRenderMode)ThePreset.RenderMode, true);
-
-	m_pcBaseView->SetEventCheckerCallback(event_checker);
-
-	char chRenderingOption[MVO_BUFFER_SIZE] = "0";
-	char chHeuristics[MVO_BUFFER_SIZE] = "0";
-	char chNetHeuristics[MVO_BUFFER_SIZE] = "0";
-
-	SetShowCollisions(ThePreset.ShowCollisions);
-
-	SetSceneFont(ThePreset.FontName, ThePreset.FontSize, ThePreset.FontUnits);
-
-	//apply hiding of overlapped text (or not)
-	m_pcBaseView->SetHideOverlappedText(ThePreset.HideOverlappedText);
-
-	char chRenderingOpts[MVO_BUFFER_SIZE] = { 0 };
-
-	m_pcBaseView->SetLightCount(ThePreset.LightCount);
+	// 메모리 소모가 많고 속도에는 큰 도움이 되지 않으므로 사용하지 않는다.
+	m_pcBaseView->GetModel()->SetStaticModel(false);
+	m_pcBaseView->GetModel()->SetLMVModel(false);
 
 	// WindowKey 선언 위치가 변경되면 않됨. 주의할것.
 	m_pcWindow = new WindowKey(m_pcBaseView);
@@ -1378,108 +1109,6 @@ bool H3DF::ViewImpl::Init_CUR(H3DF::Model * pcInModel, const char * pchInDriverT
 // 	m_cPortfolioKey.SetKeyValue(cPortfoliosKey.KeyValue());
 
 	m_cPortfolioKey = Database::CreatePortfolio();
-
-	// do all the setup with no updates
-	m_pcBaseView->SetSuppressUpdate(false);
-
-	return true;
-}
-
-bool H3DF::ViewImpl::Init_NEW(H3DF::Model * pcInModel, const char * pchInDriverType, const char * pchInInstanceName, H3DF::WindowHandle nInWindowHandle)
-{
-	ModelImpl * pcModelImpl = static_cast<ModelImpl *>(pcInModel->GetImpl());
-	DEBUG_VALID(pcModelImpl);
-
-	// HBaseView 생성
-	m_pcBaseView = new H3DF::BaseView((HBaseModel *)pcModelImpl,
-		nullptr,											// Alias
-		pchInDriverType,									// Driver Type
-		pchInInstanceName,									// Instance name
-		reinterpret_cast<void *>(nInWindowHandle),			// Window handle
-		nullptr);
-
-	if (nullptr == m_pcBaseView) {
-		return false;
-	}
-
-	m_pcBaseView->Init();
-
-	// View Segment Key 설정.View Segment에는 향후 사용하기 위한 Base View 정보를 추가해놓는다.
-	m_cKey.Set(m_pcBaseView->GetViewKey());
-	SegmentKeyImpl * pcKeyImpl = static_cast<SegmentKeyImpl *>(m_cKey.GetImpl());
-	DEBUG_VALID(pcKeyImpl);
-	pcKeyImpl->SetBaseView(m_pcBaseView);
-
-	H3DF::SelectionSet * pcSelection = new H3DF::SelectionSet(m_pcBaseView);
-	//pcSelection->SetAllowSubentityDeselection(true);
-	pcSelection->Init();
-	m_pcBaseView->SetSelection(pcSelection);
-
-	// Model 설정
-	m_pcModel = pcInModel;
-	m_cModelKey = m_pcModel->GetSegmentKey();
-
-	m_pcBaseView->SetSuppressUpdate(true);
-
-	SetGpu("Default");
-
-	SetDriverOption();
-
-	m_pcBaseView->SetLightScaling(0);
-
-	m_pcBaseView->SetDisplayListType(DisplayListSegment);
-	m_pcBaseView->SetDisplayListMode(true);
-
-	// Setting Framerate Mode
-	m_pcBaseView->SetFramerateMode(FramerateOff);
-	m_pcBaseView->SetCullingThreshold(1);
-
-	m_pcBaseView->SetBackplaneCulling(false);
-
-	m_pcBaseView->SetProjMode(ProjOrthographic);
-
-	SetViewTransparency();
-
-	m_pcBaseView->SetSmoothTransition(false);
-
-	// app-specific scene Defaults
- 	H3DF::SegmentKey cViewSegment(m_pcBaseView->GetViewKey());
-	cViewSegment.SetRenderingOptions("no color interpolation, color index interpolation");
-	cViewSegment.SetVisibility("lights = (faces = on, edges = off), markers = off, faces=on, edges=off, lines=off, text = on");
-
-	// windowspace (overlay) defaults
-	H3DF::SegmentKey cWindowSpaceSegment(m_pcBaseView->GetWindowspaceKey());
-	cWindowSpaceSegment.SetColorByIndex("geometry", 3);
-	cWindowSpaceSegment.SetColorByIndex("window contrast", 1);
-	cWindowSpaceSegment.SetColorByIndex("windows", 1);
-	cWindowSpaceSegment.SetVisibility("markers=on");
-	cWindowSpaceSegment.SetMarkerSymbol("+");
-	//cWindowSpaceSegment.GetSelectabilityControl().SetEverything(false);
-
-	SetViewAxis();
-
-	m_pcBaseView->SetViewMode(HViewIso);		// fit the camera to the scene extents
-
-	m_pcBaseView->SetHandedness(HandednessRight, true);
-
-	// 배경화면 설정
-	SetWindowBackGroundColor(TheKenel.Appearance.BackgroundColor.Top, TheKenel.Appearance.BackgroundColor.Bottom);
-
-	m_pcBaseView->SetPolygonHandednessMode(HandednessLeft);
-
-	bool bFlag = m_pcBaseView->SetHandednessFromModel();
-
-	// WindowKey 선언 위치가 변경되면 않됨. 주의할것.
-	m_pcWindow = new WindowKey(m_pcBaseView);
-
-	m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
-	m_pcBaseView->SetNavigationCube(&m_cNaviCube);
-
-	m_cPortfolioKey = Database::CreatePortfolio();
-
-	SetDefaultOperator();
-
-	SetSelectOption();
 
 	// do all the setup with no updates
 	m_pcBaseView->SetSuppressUpdate(false);
@@ -1564,35 +1193,37 @@ void H3DF::ViewImpl::SetAntiAliasOption()
 	} HC_Close_Segment();
 
 	GetBaseView()->SetTextAntialiasing(TheKenel.Appearance.AntiAliasing.Text);
-	GetBaseView()->SetLineAntialiasing(TheKenel.Appearance.AntiAliasing.Line);
+
+	// Line에 대해서는 AntiAliasing을 적용하지 않는다. 적용하지 않아도, Line에 AntiAliasing이 적용됨.
+	// Line에 적용할 경우 Transparency가 적용된 Face의 색상이 Line에 잔상처럼 나타나는 문제가 있음.
+	GetBaseView()->SetLineAntialiasing(false);
+	//GetBaseView()->SetLineAntialiasing(TheKenel.Appearance.AntiAliasing.Line);
 }
 
 // 투명도 적용 방법 설정
-void H3DF::ViewImpl::SetViewTransparency()
+void H3DF::ViewImpl::SetTransparency()
 {
-	char text[4096];
-	char style[4096];
-	char sorting[4096];
-	char layers[4096];
-	bool fast_z_sort = false;
+	char chText[4096];
+	char chSorting[4096];
+	bool bFastZsort = false;
 
-	strcpy(style, "blended");
-	strcpy(sorting, "depth peeling");
-	strcpy(layers, "3");
+	strcpy(chSorting, Utility::ToChar(TheKenel.General.Transparency.Sorting));
 
-	if (strstr(sorting, "z-sort"))
-	{
-		if (strstr(sorting, "fast"))
-			fast_z_sort = true;
-		sprintf(sorting, "z-sort only");
+	if (strstr(chSorting, "z-sort")) {
+		if (strstr(chSorting, "fast")) {
+			bFastZsort = true;
+		}
+		sprintf(chSorting, "z-sort only");
 	}
 
-	sprintf(text, "style = %s, hsr algorithm = %s, depth peeling options = (layers= %s, algorithm=%s), depth writing = %s",
-		style, sorting, layers, false ? "pixel" : "buffer", false == TRUE ? "on" : "off");
+	sprintf(chText, "style = %s, hsr algorithm = %s, depth peeling options = (layers= %s, algorithm=%s), depth writing = %s",
+		Utility::ToChar(TheKenel.General.Transparency.Style),
+		chSorting,
+		Utility::ToChar(TheKenel.General.Transparency.DepthPeelingLayers),
+		TheKenel.General.Transparency.PixelOIT ? "pixel" : "buffer",
+		TheKenel.General.Transparency.DepthWriting == true ? "on" : "off");
 
-	//sprintf(text, "style = %s, hsr algorithm = %s,depth peeling options=(layers= %s)", style, sorting, layers);
-
-	m_pcBaseView->SetTransparency(text, fast_z_sort);
+	m_pcBaseView->SetTransparency(chText, bFastZsort);
 }
 
 bool H3DF::ViewImpl::IsInitNavigationCube()
@@ -1712,33 +1343,6 @@ void H3DF::ViewImpl::SetViewAxis()
 */
 	HVector front(1, 0, 0), top(0, 1, 0);
 	m_pcBaseView->SetViewAxis(&front, &top);
-}
-
-// 투명도 적용 방법 설정
-void H3DF::ViewImpl::SetTransparency()
-{
-	char text[4096];
-	char style[4096];
-	char sorting[4096];
-	char layers[4096];
-	bool fast_z_sort = false;
-
-	strcpy(style, Utility::ToChar(TheKenel.General.Transparency.Style));
-	strcpy(sorting, Utility::ToChar(TheKenel.General.Transparency.Sorting));
-	strcpy(layers, Utility::ToChar(TheKenel.General.Transparency.DepthPeelingLayers));
-
-	if (strstr(sorting, "z-sort")) {
-		if (strstr(sorting, "fast")) {
-			fast_z_sort = true;
-		}
-		sprintf(sorting, "z-sort only");
-	}
-
-	sprintf(text, "style = %s, hsr algorithm = %s, depth peeling options = (layers= %s, algorithm=%s), depth writing = %s",
-		style, sorting, layers, TheKenel.General.Transparency.PixelOIT ? "pixel" : "buffer",
-		TheKenel.General.Transparency.DepthWriting == true ? "on" : "off");
-
-	m_pcBaseView->SetTransparency(text, fast_z_sort);
 }
 
 // Select option 처리
@@ -1866,51 +1470,6 @@ void H3DF::ViewImpl::ViewReady()
 
 	//Turn on static model and display lists last, and in that order
  	//pcModel->SetStaticModel(TheKenel.Performance.Optimization.StaticModel);
-	// 메모리 소모가 많고 속도에는 큰 도움이 되지 않으므로 사용하지 않는다.
-	pcModel->SetStaticModel(false);
-	pcModel->SetLMVModel(false);
-
-// 	HC_Open_Segment_By_Key(pcModel->GetModelKey());
-// 		HC_Set_Heuristics("static model = (on, condition analysis = view independent)");
-// 	HC_Close_Segment();
-// 
- 	//pcModel->SetLMVModel(TheKenel.Performance.Optimization.LMVModel);
-	//pcModel->SetLMVModel(true);
-
-/*
-	if (ThePreset.RestoreAnnotations) {
-		GetBaseView()->SetAnnotationResize(true);
-	}
-
-*/
-
-/*
-	if (DisplayListOff == ThePreset.DisplayList) {
-		GetBaseView()->SetDisplayListMode(false);
-	}
-	else {
-		GetBaseView()->SetDisplayListType((DisplayListType)ThePreset.DisplayList);
-		GetBaseView()->SetDisplayListMode(true);
-	}
-*/
-
-	SetTransparency();
-
-	// Check whether this file contains layout, if yes, load them (applicable to dwg files, and hsfs saved from
-	// dwg files)
-/* // Remark
-	bool is_layouts = false;
-	is_layouts = HDWGLayoutLoadUtility::CheckForLayoutSegmentInThisModel(GetModelKey());
-	if (is_layouts)
-	{
-		m_pLayoutLoadUtility = new HDWGLayoutLoadUtility(m_pHView);
-		m_pLayoutLoadUtility->LoadLayoutList();
-	}
-*/
-
-	// GetBaseView()->SetHandednessFromModel();
-
-	// GetBaseView()->SetSuppressUpdate(false);
 }
 
 #include "../3DF/Operator.KeyboardTest.h"

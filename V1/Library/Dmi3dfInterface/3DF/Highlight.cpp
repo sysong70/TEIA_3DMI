@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 
 #include "Highlight.h"
 
@@ -159,31 +159,38 @@ H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow, bo
 
 	// m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetHighlightSelection();
 
-	if (false == bDynFlag) {
-		m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetSelection();
-	}
-	else
-	{
-		m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetHighlightSelection();
-	}
+// 	if (false == bDynFlag) {
+// 		m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetSelection();
+// 	}
+// 	else
+// 	{
+// 		m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetHighlightSelection();
+// 	}
 
-	/*
-		m_pcSelectionSet = new HSelectionSet((HBaseView *)cInWindow.GetBaseView());
-		m_pcSelectionSet->Init();
+	// HSelectionSet은 각각 선언될때, Style을 생성하게 된다.
+	//================================================================================================
 
-		m_pcSelectionSet->SetHighlightMode(HighlightQuickmoves);
-		m_pcSelectionSet->SetReferenceSelectionType(RefSelOff);
+	m_pcSelectionSet = new HSelectionSet((HBaseView *)cInWindow.GetBaseView());
+	m_pcSelectionSet->Init();
 
-		m_pcSelectionSet->UpdateHighlightStyle();
-	*/
+	m_pcSelectionSet->SetHighlightMode(HighlightQuickmoves);
+	m_pcSelectionSet->SetReferenceSelectionType(RefSelOff);
 
-	//m_pcSelectionSet->SetSelectionLevel(HSelectEntity);
+	m_pcSelectionSet->UpdateHighlightStyle();
+
+	m_pcSelectionSet->SetSelectionLevel(HSelectEntity);
+
+	m_pcSelectionSet->SetReferenceSelectionType(RefSelSpriting);
+
+	m_pcSelectionSet->SetSelectionEdgeWeight(1.0);
+
+	//================================================================================================
 
 	m_pcSelectionSet->SetAllowRegionSelection(true);
 
-	m_pcSelectionSet->SetGrayScale(false);// ThePreset.GrayScaleSelection);
-	m_pcSelectionSet->SetUseDefinedHighlight(false);// ThePreset.UseDefinedHighlighting);
-	m_pcSelectionSet->SetAllowDisplacement(false);// ThePreset.DisplaceSelection);
+	m_pcSelectionSet->SetGrayScale(false);
+	m_pcSelectionSet->SetUseDefinedHighlight(false);
+	m_pcSelectionSet->SetAllowDisplacement(false);
 
 	HPixelRGBA cHighlightSelectColor;
 	cHighlightSelectColor.Set(255, 0, 0);

@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 
 #include <hc.h>
 #include <HTools.h>
@@ -183,6 +183,8 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 	LogManager::CreateLog(LOGMANAGER_3DF_LOG_ID, L"Z://3DF_Log.txt");
 	LogManager::SetWriteTimeLog(LOGMANAGER_3DF_LOG_ID, true);
 #endif // DEBUG
+	LogManager::CreateLog(LOGMANAGER_3DF_LOG_ID, L"Z://3DF_Log.txt");
+	LogManager::SetWriteTimeLog(LOGMANAGER_3DF_LOG_ID, true);
 
 // 	LogManager::CreateLog(3, L"Z://3DF_Log.txt");
 // 	LogManager::SetWriteTimeLog(true);
@@ -293,7 +295,7 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 		cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 2/2 : Performing Initial Update");
 	}
 
-	pcViewImpl->ViewReady();
+	//pcViewImpl->ViewReady();
 
 	//cModelSegmentKey.ForcedClose();
 
@@ -301,7 +303,7 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 #ifdef _DEBUG
 	 //GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
 #endif
-	 GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
+	 // GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
 
 	// HC_Define_System_Options("update control=thread");
 
@@ -328,7 +330,7 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 
 	pcViewImpl->GetBaseView()->SetViewDirection(H3DF::ViewDirection::Mode::px_py_pz);
 
-	// HC_Relinquish_Memory();
+	HC_Relinquish_Memory();
 
 	//HC_Control_Update_By_Key(pcViewImpl->GetBaseView()->GetViewKey(), "refresh");
 
@@ -336,7 +338,6 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 	// pcViewImpl->GetBaseView()->ExhaustiveUpdate();
 
 	//pcViewImpl->GetBaseView()->SetSuppressUpdateTick(false);
-	pcViewImpl->GetBaseView()->SetSuppressUpdate(false);
 
 	/*
 		HC_Open_Segment_By_Key(pcHoopsView->GetSceneKey()); {
@@ -347,6 +348,8 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 	*/
 
 	pcViewImpl->GetBaseView()->ForceUpdate();
+
+	pcViewImpl->GetBaseView()->SetSuppressUpdate(false);
 
 	//pcHoopsView->SetSmoothTransition(true);
 	//pcHoopsView->ZoomToExtents();
