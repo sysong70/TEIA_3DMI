@@ -347,9 +347,9 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 		pcHoopsView->SetGeometryChanged();
 	*/
 
-	pcViewImpl->GetBaseView()->ForceUpdate();
-
 	pcViewImpl->GetBaseView()->SetSuppressUpdate(false);
+
+	pcViewImpl->GetBaseView()->ForceUpdate();
 
 	//pcHoopsView->SetSmoothTransition(true);
 	//pcHoopsView->ZoomToExtents();

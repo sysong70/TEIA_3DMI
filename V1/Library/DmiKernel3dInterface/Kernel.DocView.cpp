@@ -196,6 +196,8 @@ void KERNEL::DocView::LButtonDown(int nFlag, int x, int y)
 	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
+	pcImpl->m_cLButtonDownPosition.Set(x, y);
+
 	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
 	cEvent.SetPoint(HE_LButtonDown, x, y, pcImpl->MouseMapFlags(nFlag));
 
@@ -206,6 +208,8 @@ void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 {
 	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
+
+	H3DF::Point2D cLButtonUpPosition(x, y);
 
 	pcImpl->m_cCanvas.GetFrontView().GetWindowKey().GetBaseView();
 
@@ -225,6 +229,11 @@ void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 		pcImpl->HighlightOSnapOperator().DrawSnapItems();
 		pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(false);
 		pcImpl->m_cCanvas.GetFrontView().Update();
+	}
+
+	// 1 Pixel 보다 크면 선택을 하지 않는다.
+	if (1.0 < pcImpl->m_cLButtonDownPosition.DistanceWith(cLButtonUpPosition)) {
+		return;
 	}
 
 	// 1. Dynamic Highlight된 Item을 가져옴. 
@@ -268,8 +277,6 @@ void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 		
 		pcImpl->m_cCanvas.GetFrontView().Update();
 	}
-
-//	pcImpl->Select().LButtonDown(cEvent);
 }
 
 void KERNEL::DocView::RButtonDown(int nFlag, int x, int y)
@@ -309,7 +316,7 @@ void KERNEL::DocView::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 	pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(true);
 
 	// Control Flag을 추가해서 ComputeReasonableTarget이란 함수를 사용해서 Whell Zomm할때 Entity를 선택하는 과정을 생략함.
-	nFlag |= MK_CONTROL;
+	// nFlag |= MK_CONTROL;
 
 	HEventInfo	cEvent((HBaseView *)pcImpl->GetBaseView());
 	cEvent.SetPoint(HE_MouseWheel, x - nLeft, y - nTop, pcImpl->MouseMapFlags(nFlag));
@@ -324,7 +331,6 @@ void KERNEL::DocView::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 	pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(false);
 
 	pcImpl->m_cCanvas.GetFrontView().Update();
-	
 }
 
 //== Keyboard 관련 함수 ==============================================================================

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "3DF.h"
 
@@ -607,6 +607,8 @@ public:
 	static H3DF_INLINE Point_2D	Origin() { return Point_2D(0, 0); };
 	static H3DF_INLINE Point_2D	Zero() { return Point_2D(0, 0); }; //-V524
 
+	double DistanceWith(Point_2D const & p) const;
+
 	Point_3D<F> LiftPoint(Point_3D<F> cOrigin, Vector_3D<F> cXAxis, Vector_3D<F> cYAxis);
 
 	void Rotate(double dAngle, Point_2D cPivot) const;
@@ -634,6 +636,11 @@ H3DF_INLINE Point_2D<F> Midpoint(Point_2D<F> const & a, Point_2D<F> const & b, P
 template <typename F>
 H3DF_INLINE bool Is_Abnormal(Point_2D<F> const & p) {
 	return Is_Abnormal(p.x) || Is_Abnormal(p.y);
+}
+
+template <typename F>
+double Point_2D<F>::DistanceWith(Point_2D const & p) const {
+	return (*this - p).Length();
 }
 
 template <typename F>

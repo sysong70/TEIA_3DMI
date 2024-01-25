@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "3DF.h"
 #include "Math.h"
@@ -167,15 +167,15 @@ namespace H3DF
 				Optimization;
 
 				struct FRAMERATE_OPTIMIZATION {
-					bool UseFramerate = false;					// CAppSettings::UseFramerate
-					FramerateMode CurrentFramerateMode = FramerateFixed; // CAppSettings::CurrentFramerateMode
+					bool UseFramerate = false;					
+					FramerateMode CurrentFramerateMode = FramerateFixed;
 					float FramerateTime = 0.05f;				// CAppSettings::FramerateTime
 					int	MaxThreshold = 100;						// CAppSettings::MaxThreshold
 					int	UseLods = 0;							// CAppSettings::UseLods
 					int	DetailSteps = 15;						// CAppSettings::DetailSteps
 					int HardCutoff = 10;						// CAppSettings::HardCutoff
-					int	CullingThresholdSet = 2;				// CAppSettings::CullingThresholdSet
-					int	CullingThreshold = 10;					// CAppSettings::CullingThreshold
+					int	CullingThresholdSet = 1;				// CAppSettings::CullingThresholdSet
+					int	CullingThreshold = 5;					// CAppSettings::CullingThreshold
 
 					Json::Object * Get();
 					bool Set(Json::Object * pData);

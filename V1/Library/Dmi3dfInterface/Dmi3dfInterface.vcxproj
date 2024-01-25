@@ -174,7 +174,6 @@
     <ClInclude Include="3DF\VisualEffects.h" />
     <ClInclude Include="3DF\Painter.h" />
     <ClInclude Include="dllmain.h" />
-    <ClInclude Include="Resource.h" />
     <ClInclude Include="3DF\Bounding.h" />
     <ClInclude Include="3DF\Color.h" />
     <ClInclude Include="3DF\Control.h" />
@@ -299,9 +298,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Resource.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

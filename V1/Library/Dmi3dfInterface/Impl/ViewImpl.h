@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "../3DF/3DF.h"
 
@@ -61,6 +61,10 @@ namespace H3DF
 		void SetGpu(CString strGpu);
 		void SetDriverOption();
 		void SetAntiAliasOption();
+		void SetTransparency();
+		void SetupFrameRateMode();
+		void SetViewAxis();
+		void SetSelectOption();
 
 	public:
 		void ViewReady();
@@ -101,10 +105,6 @@ namespace H3DF
 		void SetMarkupColor(COLORREF new_color, bool emit_message = true);
 		void SetShadowColor(RGBAColor cInColor);
 		static void event_checker(HIC_Rendition const * nr);
-
-		void SetViewAxis();
-		void SetTransparency();
-		void SetSelectOption();
 
 		void SetShowCollisions(bool sc) { m_bShowCollisions = sc; }
 

@@ -696,44 +696,8 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	m_pcBaseView->SetSuppressUpdate(true);
 
 	char chDriverOpts[MVO_BUFFER_SIZE], chRenderingOpts[MVO_BUFFER_SIZE] = { 0 };
-
-	sprintf(chDriverOpts, "quick moves preference = %s", Utility::ToChar(TheKenel.Selection.Highlight.QuickMovesType).GetBuffer());
-
-	if (true == TheKenel.General.Display.DriverDisplayStats) {
-		sprintf(chDriverOpts, "%s, display stats, display time stats, display memory stats", chDriverOpts);
-	}
-
-	if (true == TheKenel.General.Display.StereoMode) {
-		sprintf(chDriverOpts, "%s, stereo", chDriverOpts);
-	}
-
-	HCLOCALE(sprintf(chDriverOpts,
-		"%s, ambient occlusion = (%s, strength = %f, quality = %s), fast silhouette edges = (%s, tolerance = %f, %s heavy exterior)", chDriverOpts,
-		(TheKenel.Effects.FrameBuffer.UseAmbient ? "on" : "off"), TheKenel.Effects.FrameBuffer.AmbientStrength,
-		(TheKenel.Effects.FrameBuffer.HighQualityAmbient ? "nicest" : "fast"),
-		(TheKenel.Effects.FrameBuffer.UseFastSilhouette ? "on" : "off"), TheKenel.Effects.FrameBuffer.FastSilhouetteTolerance,
-		(TheKenel.Effects.FrameBuffer.HeavyExteriorSilhouette ? "" : "no")));
-
-	m_pcBaseView->SetDoubleBuffering(TheKenel.General.Display.DoubleBuffer);
-
-	HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
-		HC_Set_User_Index(H_VIEW_POINTER_INDEX, GetBaseView());  // This is used in the event_checker for constant framerate.
-
-		HC_Set_Driver_Options(chDriverOpts);
-
-/*
-		HCLOCALE(sprintf(chDriverOpts, "bloom = (%s, strength=%f, blur=%d, shape=%s)",
-			(TheKenel.Lighting.Bloom.Use ? "on" : "off"),
-			TheKenel.Lighting.Bloom.Strength,
-			TheKenel.Lighting.Bloom.Blur,
-			(TheKenel.Lighting.Bloom.Shape == RadialBloom ? "radial" : "star")));
-
-		HC_Set_Driver_Options(chDriverOpts);
-*/
-		
-		HC_Set_Driver_Options("special events, update interrupts");
-		HC_Control_Update(".", "redraw everything");
-	} HC_Close_Segment();
+	
+	SetDriverOption();
 
 	HC_Open_Segment_By_Key(m_pcBaseView->GetConstructionKey()); {
 		// 		if (true == TheKenel.Appearance.AntiAliasing.Use) {
@@ -741,8 +705,6 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 		// 			HC_Set_Rendering_Options("anti-alias = (screen = on)");
 		// 		}
 	} HC_Close_Segment();
-
-	SetAntiAliasOption();
 
 	if (false == TheKenel.Lighting.Light.Scaling) {
 		m_pcBaseView->SetLightScaling(0);
@@ -754,6 +716,7 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	m_pcBaseView->SetLightFollowsCamera(TheKenel.Lighting.Light.FollowsCamera);
 	//SetLightCount(LightCount); //defer until after camera is all set up
 	// SetDeepSelectionMode(DeepSelection); OCC를 사용할 때 대응하는 함수
+
 	m_pcBaseView->SetVisibilitySelectionMode(TheKenel.Selection.Behavior.VisibilitySelection);
 	m_pcBaseView->SetDynamicHighlighting(TheKenel.Selection.Behavior.DynamicHighlighting);
 	m_pcBaseView->SetDetailSelection(TheKenel.Selection.Behavior.DetailSelection); // "Honor Line/Edge Weight/Pattern"
@@ -768,27 +731,7 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	m_pcBaseView->SetBackplaneCulling(TheKenel.General.Etc.BackplaneCulling);
 	m_pcBaseView->SetDisplayListType(DisplayListSegment);// DisplayListOff);
 
-	if (true == TheKenel.Performance.FramerateOptimization.UseFramerate)
-	{
-		//if (!pDoc->IsFileReadDeferedForView() || CurrentFramerateMode == FramerateFixed)
-		if (FramerateFixed == TheKenel.Performance.FramerateOptimization.CurrentFramerateMode)
-		{
-			m_pcBaseView->SetFramerateMode((FramerateMode)TheKenel.Performance.FramerateOptimization.CurrentFramerateMode,
-				TheKenel.Performance.FramerateOptimization.FramerateTime, TheKenel.Performance.FramerateOptimization.MaxThreshold,
-				UINT2bool(TheKenel.Performance.FramerateOptimization.UseLods), TheKenel.Performance.FramerateOptimization.DetailSteps,
-				TheKenel.Performance.FramerateOptimization.HardCutoff);
-		}
-	}
-	else if (TheKenel.Performance.FramerateOptimization.CullingThresholdSet)
-	{
-		m_pcBaseView->SetFramerateMode(FramerateOff);
-		m_pcBaseView->SetCullingThreshold(TheKenel.Performance.FramerateOptimization.CullingThreshold);
-	}
-	else
-	{
-		m_pcBaseView->SetFramerateMode(FramerateOff);
-		m_pcBaseView->SetCullingThreshold(0);
-	}
+	SetupFrameRateMode();
 
 	m_pcBaseView->SetSmoothTransition(false);
 
@@ -1129,7 +1072,7 @@ void H3DF::ViewImpl::SetGpu(CString strGpu)
 	}
 }
 
-// 1.2.1 Anti Alias Option 설정
+// 1.2 Driver Option 설정
 void H3DF::ViewImpl::SetDriverOption()
 {
 	char chDriverOpts[MVO_BUFFER_SIZE] = { 0 };
@@ -1157,15 +1100,6 @@ void H3DF::ViewImpl::SetDriverOption()
 		HC_Set_User_Index(H_VIEW_POINTER_INDEX, GetBaseView());  // This is used in the event_checker for constant framerate.
 
 		HC_Set_Driver_Options(chDriverOpts);
-
-		// Bloom 설정
-		HCLOCALE(sprintf(chDriverOpts, "bloom = (%s, strength=%f, blur=%d, shape=%s)",
-			(TheKenel.Lighting.Bloom.Use ? "on" : "off"),
-			TheKenel.Lighting.Bloom.Strength,
-			TheKenel.Lighting.Bloom.Blur,
-			(TheKenel.Lighting.Bloom.Shape == RadialBloom ? "radial" : "star")));
-		HC_Set_Driver_Options(chDriverOpts);
-		
 		HC_Set_Driver_Options("special events, update interrupts");
 		HC_Control_Update(".", "redraw everything");
 	} HC_Close_Segment();
@@ -1173,34 +1107,30 @@ void H3DF::ViewImpl::SetDriverOption()
 	SetAntiAliasOption();
 }
 
+// 1.2.1 Anti Alias Option 설정
 void H3DF::ViewImpl::SetAntiAliasOption()
 {
 	char chDriverOpts[MVO_BUFFER_SIZE] = { 0 };
 
 	// set anti-aliasing if set
 	if (true == TheKenel.Appearance.AntiAliasing.Use) {
-		sprintf(chDriverOpts, "anti-alias=%d ", chDriverOpts, TheKenel.Appearance.AntiAliasing.Level);
-	}
+		sprintf(chDriverOpts, "anti-alias = %d", TheKenel.Appearance.AntiAliasing.Level);
 
-	HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
-		HC_Set_Driver_Options(chDriverOpts);
-
-		// antialiasing needs rendering option in addition to driver option
-		if (true == TheKenel.Appearance.AntiAliasing.Use) {
+		HC_Open_Segment_By_Key(m_pcBaseView->GetViewKey()); {
+			HC_Set_Driver_Options(chDriverOpts);
 			// Rendering Option에서는 Screen On만 설정한다.
 			HC_Set_Rendering_Options("anti-alias = (screen = on)");
-		}
-	} HC_Close_Segment();
+		} HC_Close_Segment();
 
-	GetBaseView()->SetTextAntialiasing(TheKenel.Appearance.AntiAliasing.Text);
+		GetBaseView()->SetTextAntialiasing(TheKenel.Appearance.AntiAliasing.Text);
 
-	// Line에 대해서는 AntiAliasing을 적용하지 않는다. 적용하지 않아도, Line에 AntiAliasing이 적용됨.
-	// Line에 적용할 경우 Transparency가 적용된 Face의 색상이 Line에 잔상처럼 나타나는 문제가 있음.
-	GetBaseView()->SetLineAntialiasing(false);
-	//GetBaseView()->SetLineAntialiasing(TheKenel.Appearance.AntiAliasing.Line);
+		// Line에 대해서는 AntiAliasing을 적용하지 않는다. 적용하지 않아도, Line에 AntiAliasing이 적용됨.
+		// Line에 적용할 경우 Transparency가 적용된 Face의 색상이 Line에 잔상처럼 나타나는 문제가 있음.
+		GetBaseView()->SetLineAntialiasing(false);
+	}
 }
 
-// 투명도 적용 방법 설정
+// 1.3 투명도 적용 방법 설정
 void H3DF::ViewImpl::SetTransparency()
 {
 	char chText[4096];
@@ -1224,6 +1154,27 @@ void H3DF::ViewImpl::SetTransparency()
 		TheKenel.General.Transparency.DepthWriting == true ? "on" : "off");
 
 	m_pcBaseView->SetTransparency(chText, bFastZsort);
+}
+
+void H3DF::ViewImpl::SetupFrameRateMode()
+{
+	if (true == TheKenel.Performance.FramerateOptimization.UseFramerate)
+	{
+		m_pcBaseView->SetFramerateMode((FramerateMode)TheKenel.Performance.FramerateOptimization.CurrentFramerateMode,
+			TheKenel.Performance.FramerateOptimization.FramerateTime, TheKenel.Performance.FramerateOptimization.MaxThreshold,
+			UINT2bool(TheKenel.Performance.FramerateOptimization.UseLods), TheKenel.Performance.FramerateOptimization.DetailSteps,
+			TheKenel.Performance.FramerateOptimization.HardCutoff);
+	}
+	else if (TheKenel.Performance.FramerateOptimization.CullingThresholdSet)
+	{
+		m_pcBaseView->SetFramerateMode(FramerateOff);
+		m_pcBaseView->SetCullingThreshold(TheKenel.Performance.FramerateOptimization.CullingThreshold);
+	}
+	else
+	{
+		m_pcBaseView->SetFramerateMode(FramerateOff);
+		m_pcBaseView->SetCullingThreshold(0);
+	}
 }
 
 bool H3DF::ViewImpl::IsInitNavigationCube()
