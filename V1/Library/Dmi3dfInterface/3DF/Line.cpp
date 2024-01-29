@@ -317,6 +317,10 @@ bool H3DF::LineKey::GetMidPoint(Point & cMP)
 
 			return true;
 		}
+		else if (1e-6 > fabs(dMidLength - dLength)) {
+			cMP = aPoints[nIndex + 1];
+			return true;
+		}
 	}
 
 	return false;

@@ -20,9 +20,7 @@ namespace KERNEL
 		public:
 			HighlightObjectSnap(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
 
-			int LButtonDownAndMove(HEventInfo & cInEvent);
-			
-			int NoButtonDownAndMove(HEventInfo & cInEvent);
+			int MouseMove(HEventInfo & cInEvent);
 
 			void DrawSnapItems();
 

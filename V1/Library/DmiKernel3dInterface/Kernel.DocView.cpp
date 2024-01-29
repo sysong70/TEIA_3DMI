@@ -1,4 +1,4 @@
-#include <StdAfx.h>
+﻿#include <StdAfx.h>
 
 #include "Kernel.DocView.h"
 #include "./Impl/Kernel.DocViewImpl.h"
@@ -177,18 +177,12 @@ void KERNEL::DocView::MouseMove(int nFlag, int x, int y)
 	}
 
 	DWORD nNewFlags = pcImpl->MouseMapFlags(nFlag);
-
 	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
 	cEvent.SetPoint(HE_MouseMove, x, y, nNewFlags);
 
 	pcImpl->Camera().MouseMove(cEvent);
 
-	if (!(MVO_LBUTTON & nNewFlags) && !(MVO_LBUTTON & nNewFlags)) {
-		pcImpl->HighlightOSnapOperator().NoButtonDownAndMove(cEvent);
-	}
-	else if(MVO_LBUTTON & nNewFlags) {
-		pcImpl->HighlightOSnapOperator().LButtonDownAndMove(cEvent);
-	}
+	pcImpl->Select().MouseMove(cEvent);
 }
 
 void KERNEL::DocView::LButtonDown(int nFlag, int x, int y)
@@ -202,6 +196,8 @@ void KERNEL::DocView::LButtonDown(int nFlag, int x, int y)
 	cEvent.SetPoint(HE_LButtonDown, x, y, pcImpl->MouseMapFlags(nFlag));
 
 	pcImpl->Camera().LButtonDown(cEvent);
+
+	pcImpl->Select().LButtonDown(cEvent);
 }
 
 void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
@@ -226,57 +222,12 @@ void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 	int nResult = pcImpl->Camera().LButtonUp(cEvent);
 
 	if (H3DF::Camera::Mode::ZoomBox == eMode) {
-		pcImpl->HighlightOSnapOperator().DrawSnapItems();
+		pcImpl->Select().DrawSnapItems();
 		pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(false);
 		pcImpl->m_cCanvas.GetFrontView().Update();
 	}
 
-	// 1 Pixel 보다 크면 선택을 하지 않는다.
-	if (1.0 < pcImpl->m_cLButtonDownPosition.DistanceWith(cLButtonUpPosition)) {
-		return;
-	}
-
-	// 1. Dynamic Highlight된 Item을 가져옴. 
-	H3DF::SelectionItem & cSelItem = pcImpl->HighlightOSnapOperator().DynamicHighlightSelectionItem();
-
-	// 2. Dynamic Highlight된 Item이 선택된 경우라면 다음 처리를 실시
-	if (true == cSelItem.IsValid()) {
-		// 기존에 선택되어 있는 Dynamic highlight를 모두 지움.
-		pcImpl->HighlightOSnapOperator().UnhighlightEverything();
-
-		H3DF::HighlightOptionsKit cOptions;
-
-		if (false == pcImpl->m_cSelectionResult.IsExist(cSelItem)) {
-
-			if (H3DF::Type::LineKey == cSelItem.Type()) {
-				pcImpl->HighlightControl().GetVisibilityControl().SetLines(true);
-				pcImpl->HighlightControl().GetLineAttributeControl().SetWeight(3.0);
-			}
-			else {
-				pcImpl->HighlightControl().GetVisibilityControl().SetLines(false);
-				pcImpl->HighlightControl().GetVisibilityControl().SetEdges(false);
-				pcImpl->HighlightControl().GetAttributeLockControl().SetLock(H3DF::AttributeLock::Type::Visibility);
-
-				float fLineWeight = 0.0;
-				pcImpl->HighlightControl().GetLineAttributeControl().SetWeight(fLineWeight);
-			}
-
-			pcImpl->HighlightControl().Highlight(cSelItem, cOptions, false);
-
-			// 선택된 객체를 SelectionResult에 추가
-			pcImpl->m_cSelectionResult.PushFront(cSelItem);
-		}
-		else {
-			pcImpl->HighlightControl().Unhighlight(cSelItem, cOptions);
-
-			pcImpl->m_cSelectionResult.Erase(cSelItem);
-		}
-
-		// 기존에 선택되어 있는 Dynamic highlight를 모두 지움.
-		//pcImpl->HighlightOSnapOperator().UnhighlightEverything();
-		
-		pcImpl->m_cCanvas.GetFrontView().Update();
-	}
+	pcImpl->Select().LButtonUp(cEvent);
 }
 
 void KERNEL::DocView::RButtonDown(int nFlag, int x, int y)
@@ -324,9 +275,7 @@ void KERNEL::DocView::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 
 	pcImpl->Camera().MouseWheel(cEvent);
 
-	pcImpl->HighlightOSnapOperator().UnhighlightEverything();
-
-	pcImpl->HighlightOSnapOperator().DrawSnapItems();
+	pcImpl->Select().DrawSnapItems();
 
 	pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(false);
 
@@ -392,43 +341,43 @@ void KERNEL::DocView::SetObjectSnap(int nId)
 	switch (nId)
 	{
 		case HOME_3D_CMD_ObjectSnap_End:
-			pcImpl->SetObjectSnap(OSnap::Type::EndPoint);
+			pcImpl->Select().SetObjectSnapMode(OSnap::Type::EndPoint);
 			break;
 
 		case HOME_3D_CMD_ObjectSnap_Mid:
-			pcImpl->SetObjectSnap(OSnap::Type::MidPoint);
+			pcImpl->Select().SetObjectSnapMode(OSnap::Type::MidPoint);
 			break;
 
 		case HOME_3D_CMD_ObjectSnap_Intersection:
-			pcImpl->SetObjectSnap(OSnap::Type::Intersection);
+			pcImpl->Select().SetObjectSnapMode(OSnap::Type::Intersection);
 			break;
 
 		case HOME_3D_CMD_ObjectSnap_Perpendicular:
-			pcImpl->SetObjectSnap(OSnap::Type::Perpendicular);
+			pcImpl->Select().SetObjectSnapMode(OSnap::Type::Perpendicular);
 			break;
 
 		case HOME_3D_CMD_ObjectSnap_Center:
-			pcImpl->SetObjectSnap(OSnap::Type::Center);
+			pcImpl->Select().SetObjectSnapMode(OSnap::Type::Center);
 			break;
 
 		case HOME_3D_CMD_ObjectSnap_Quadrant:
-			pcImpl->SetObjectSnap(OSnap::Type::Quadrant);
+			pcImpl->Select().SetObjectSnapMode(OSnap::Type::Quadrant);
 			break;
 
 		case HOME_3D_CMD_ObjectSnap_Near:
-			pcImpl->SetObjectSnap(OSnap::Type::NearPoint);
+			pcImpl->Select().SetObjectSnapMode(OSnap::Type::NearPoint);
 			break;
 
 		case HOME_3D_CMD_ObjectSnap_OnSurface:
-			pcImpl->SetObjectSnap(OSnap::Type::OnSurface);
+			pcImpl->Select().SetObjectSnapMode(OSnap::Type::OnSurface);
 			break;
 
 		case HOME_3D_CMD_ObjectSnap_BoundaryCenter:
-			pcImpl->SetObjectSnap(OSnap::Type::BoundaryCenter);
+			pcImpl->Select().SetObjectSnapMode(OSnap::Type::BoundaryCenter);
 			break;
 
 		case HOME_3D_CMD_ObjectSnap_Axis:
-			pcImpl->SetObjectSnap(OSnap::Type::Axis);
+			pcImpl->Select().SetObjectSnapMode(OSnap::Type::Axis);
 			break;
 
 		case HOME_3D_CMD_ObjectSnap_Absolute:
@@ -447,31 +396,31 @@ void KERNEL::DocView::SetSelectionFilter(int nId)
 	switch (nId)
 	{
 		case HOME_3D_CMD_SelectionFiter_Point:
-			pcImpl->SetSelectionFilter(SelectionFilter::Type::Point);
+			pcImpl->Select().SetSelectionFilter(SelectionFilter::Type::Point);
 			break;
 
 		case HOME_3D_CMD_SelectionFiter_Curve:
-			pcImpl->SetSelectionFilter(SelectionFilter::Type::Curve);
+			pcImpl->Select().SetSelectionFilter(SelectionFilter::Type::Curve);
 			break;
 
 		case HOME_3D_CMD_SelectionFiter_Edge:
-			pcImpl->SetSelectionFilter(SelectionFilter::Type::Edge);
+			pcImpl->Select().SetSelectionFilter(SelectionFilter::Type::Edge);
 			break;
 
 		case HOME_3D_CMD_SelectionFiter_Face:
-			pcImpl->SetSelectionFilter(SelectionFilter::Type::Face);
+			pcImpl->Select().SetSelectionFilter(SelectionFilter::Type::Face);
 			break;
 
 		case HOME_3D_CMD_SelectionFiter_Solid:
-			pcImpl->SetSelectionFilter(SelectionFilter::Type::Solid);
+			pcImpl->Select().SetSelectionFilter(SelectionFilter::Type::Solid);
 			break;
 
 		case HOME_3D_CMD_SelectionFiter_Axis:
-			pcImpl->SetSelectionFilter(SelectionFilter::Type::Axis);
+			pcImpl->Select().SetSelectionFilter(SelectionFilter::Type::Axis);
 			break;
 
 		case HOME_3D_CMD_SelectionFiter_PMI:
-			pcImpl->SetSelectionFilter(SelectionFilter::Type::PMI);
+			pcImpl->Select().SetSelectionFilter(SelectionFilter::Type::PMI);
 			break;
 	}
 

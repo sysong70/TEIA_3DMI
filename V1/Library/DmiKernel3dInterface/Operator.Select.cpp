@@ -10,12 +10,21 @@
 
 #include "../../UiMain/Command.Resource.h"
 
+#include <3DF/Facility.AppOptions.h>
+
 #include <3DF.View.h>
 #include <3DF/Window.h>
 #include <3DF/Selection.h>
-#include <3DF/Facility.AppOptions.h>
+#include <3DF/Highlight.h>
+#include <3DF/Visibility.h>
+#include <3DF/LineAttribute.h>
+#include <3DF/AttributeLock.h>
 
 #include <Json.h>
+
+#include <HEventListener.h>
+
+#include "Operator.HighlightObjectSnap.h"
 
 using namespace KERNEL;
 
@@ -34,10 +43,24 @@ namespace KERNEL
 				OperatorImpl::Copy(pcInThat);
 			}
 
-			DWORD m_nSelectPickCount;
-			DWORD m_nMouseDownTickCount;
-			HPoint m_cMouseDownPoint;
+			DWORD m_nSelectPickCount = 200;
+			ULONGLONG m_nMouseDownTickCount = 0;
+			H3DF::Point2D m_cLButtonDownPosition;
 
+			// HighlightObjectSnap Operator
+			Operator::HighlightObjectSnap m_cHighlightOSnapOperator;
+
+			float m_fLineWeight = 3;
+			H3DF::HighlightControl m_cHighlightCtrl;
+			H3DF::HighlightControl m_cLineHighlightCtrl;
+
+			// 현재 선택된 요소들이 저장되는 변수
+			H3DF::SelectionResults m_cSelectionResult;
+
+			DWORD m_nOSnapMode = 0;
+			DWORD m_nSelFilter = 0;
+
+		protected:
 			H3DF::SelectionResults m_cNewHighlightSelection;
 			H3DF::SelectionResults m_cOldHighlightSelection;
 			H3DF::SelectionResults m_cHighlightSelection;
@@ -47,9 +70,50 @@ namespace KERNEL
 	}
 }
 
-KERNEL::Operator::SelectImpl::SelectImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
-	: OperatorImpl(pcInView, pcInDelivery)
+KERNEL::Operator::SelectImpl::SelectImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery) :
+	OperatorImpl(pcInView, pcInDelivery),
+	m_cHighlightOSnapOperator(pcInView, pcInDelivery),
+	m_cHighlightCtrl(pcInView->GetWindowKey()),
+	m_cLineHighlightCtrl(pcInView->GetWindowKey())
 {
+	m_nOSnapMode += (DWORD)OSnap::Type::EndPoint;
+	m_nOSnapMode += (DWORD)OSnap::Type::MidPoint;
+	m_nOSnapMode += (DWORD)OSnap::Type::Center;
+	m_nOSnapMode += (DWORD)OSnap::Type::Intersection;
+	m_nOSnapMode += (DWORD)OSnap::Type::Perpendicular;
+	m_nOSnapMode += (DWORD)OSnap::Type::Quadrant;
+	m_nOSnapMode += (DWORD)OSnap::Type::OnSurface;
+	m_nOSnapMode += (DWORD)OSnap::Type::Axis;
+
+	m_nSelFilter += (DWORD)SelectionFilter::Type::Point;
+	m_nSelFilter += (DWORD)SelectionFilter::Type::Curve;
+	m_nSelFilter += (DWORD)SelectionFilter::Type::Edge;
+	m_nSelFilter += (DWORD)SelectionFilter::Type::Face;
+	//m_nSelFilter += (DWORD)SelectionFilter::Type::Solid;
+	m_nSelFilter += (DWORD)SelectionFilter::Type::Axis;
+	m_nSelFilter += (DWORD)SelectionFilter::Type::PMI;
+
+	m_cHighlightOSnapOperator.SetObjectSnapMode(m_nOSnapMode);
+	m_cHighlightOSnapOperator.SetSelectionFilter(m_nSelFilter);
+
+	H3DF::MaterialMappingKit cHighlightMatMapping;
+
+	cHighlightMatMapping.SetLineColor(H3DF::RGBAColor(RGB(200, 20, 10)));
+	cHighlightMatMapping.SetFaceColor(H3DF::RGBAColor(RGB(250, 105, 95)));
+
+	m_cHighlightCtrl.SetMaterialMapping(cHighlightMatMapping);
+	// Shell 선택시에 Line Visibility를 설정한대로 적용하기 위해서 Lock을 걸도록 한다.
+	m_cHighlightCtrl.GetAttributeLockControl().SetLock(H3DF::AttributeLock::Type::Visibility);
+	m_cHighlightCtrl.GetVisibilityControl().SetLines(false);
+	m_cHighlightCtrl.GetVisibilityControl().SetEdges(false);
+
+	m_cLineHighlightCtrl.SetMaterialMapping(cHighlightMatMapping);
+	m_cLineHighlightCtrl.GetLineAttributeControl().SetWeight(m_fLineWeight);
+
+// 	m_cDynLineHighlightCtrl.SetMaterialMapping(cDynHighlightMaterialMapping);
+// 	m_cDynLineHighlightCtrl.GetLineAttributeControl().SetWeight(m_fLineWeight);
+
+	// m_cHighlightControl.Get
 }
 
 //== Select 관련 함수 ================================================================================
@@ -64,48 +128,133 @@ KERNEL::Operator::Select::Select(const H3DF::View * pcInView, const Signal::Deli
 
 int KERNEL::Operator::Select::MouseMove(HEventInfo & cInEvent)
 {
-	return 0;
+	auto * pcImpl = (SelectImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_cHighlightOSnapOperator.MouseMove(cInEvent);
+
+	return HLISTENER_PASS_EVENT;
 }
 
 int KERNEL::Operator::Select::LButtonDown(HEventInfo & cInEvent)
 {
-	auto * pcImpl = dynamic_cast<SelectImpl *>(m_pcImpl);
+	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->m_cMouseDownPoint = cInEvent.GetMousePixelPos();
-	pcImpl->m_nMouseDownTickCount = GetTickCount();
+	pcImpl->m_cLButtonDownPosition.Set(cInEvent.GetMousePixelPos().x, cInEvent.GetMousePixelPos().y);
+	pcImpl->m_nMouseDownTickCount = GetTickCount64();
 
 	return 0;
 }
 
 int KERNEL::Operator::Select::LButtonUp(HEventInfo & cInEvent)
 {
-	auto * pcImpl = dynamic_cast<SelectImpl *>(m_pcImpl);
+	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	DWORD nMouseUpTickCount = GetTickCount();
-	DWORD nTickCount = nMouseUpTickCount - pcImpl->m_nMouseDownTickCount;
+	H3DF::Point2D cMousePosition(cInEvent.GetMousePixelPos().x, cInEvent.GetMousePixelPos().y);
+	DWORD nMouseUpTickCount = GetTickCount64();
+	ULONGLONG nTickCount = nMouseUpTickCount - pcImpl->m_nMouseDownTickCount;
 
-	// 2 Pixel이하 200 Tick이하에서만 선택하는 것으로 판정한다.
+	// 1. 2 Pixel이하 200 Tick이하에서만 선택하는 것으로 판정한다.
 	if (pcImpl->m_nSelectPickCount > nTickCount) {
-		const HPoint & cMoustPoint = cInEvent.GetMousePixelPos();
-		HVector cVector = cMoustPoint - pcImpl->m_cMouseDownPoint;
-		double dLength = HC_Compute_Vector_Length(&cVector);
+		double dLength = pcImpl->m_cLButtonDownPosition.DistanceWith(cMousePosition);
 
-		if (2.0 > dLength) {
-			H3DF::Point cPoint;
-			cPoint.x = cInEvent.GetMouseWindowPos().x;
-			cPoint.y = cInEvent.GetMouseWindowPos().y;
-
-			H3DF::SelectionOptionsKit cSelectOption;
-			cSelectOption.SetLevel(H3DF::Selection::Level::Entity).SetRelatedLimit(15).SetProximity(0.2f);
-
-			H3DF::SelectionResults cResult;
-			size_t nResult = pcImpl->Window().GetSelectionControl().SelectByPoint(cPoint, cSelectOption, cResult);
+		if (2.0 < dLength) {
+			return HLISTENER_PASS_EVENT;
 		}
 	}
+	else {
+		return HLISTENER_PASS_EVENT;
+	}
 
-	pcImpl->m_cClickPoint = cInEvent.GetMouseWorldPos();
+	// 2. Dynamic Highlight된 Item을 가져옴. 
+	H3DF::SelectionItem & cSelItem = pcImpl->m_cHighlightOSnapOperator.DynamicHighlightSelectionItem();
+	if (false == cSelItem.IsValid()) {
+		return HLISTENER_PASS_EVENT;
+	}
 
-	return 0;
+	// 3. 기존에 선택되어 있는 Dynamic highlight를 모두 지움.
+	pcImpl->m_cHighlightOSnapOperator.UnhighlightEverything();
+
+	H3DF::HighlightOptionsKit cOptions;
+
+	if (false == pcImpl->m_cSelectionResult.IsExist(cSelItem)) {
+		if (H3DF::Type::LineKey == cSelItem.Type()) {
+			pcImpl->m_cLineHighlightCtrl.Highlight(cSelItem, cOptions, false);
+		}
+		else {
+			pcImpl->m_cHighlightCtrl.Highlight(cSelItem, cOptions, false);
+		}
+
+		// 선택된 객체를 SelectionResult에 추가
+		pcImpl->m_cSelectionResult.PushFront(cSelItem);
+	}
+	else {
+		if (H3DF::Type::LineKey == cSelItem.Type()) {
+			pcImpl->m_cLineHighlightCtrl.Unhighlight(cSelItem, cOptions);
+		}
+		else {
+			pcImpl->m_cHighlightCtrl.Unhighlight(cSelItem, cOptions);
+		}
+
+		pcImpl->m_cSelectionResult.Erase(cSelItem);
+	}
+
+	pcImpl->View().Update();
+
+	return HLISTENER_PASS_EVENT;
+}
+
+//== Object Snap 관련 함수 ===========================================================================
+
+void KERNEL::Operator::Select::DrawSnapItems()
+{
+	auto * pcImpl = (SelectImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_cHighlightOSnapOperator.DrawSnapItems();
+}
+
+void KERNEL::Operator::Select::SetObjectSnapMode(OSnap::Type eInType)
+{
+	auto * pcImpl = (SelectImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	// Osnap type이 없는 경우 추가
+	if (0 == (pcImpl->m_nOSnapMode & (DWORD)eInType)) {
+		pcImpl->m_nOSnapMode += (DWORD)eInType;
+	}
+	else { // Osnap type이 없는 경우 제거
+		pcImpl->m_nOSnapMode -= (DWORD)eInType;
+	}
+
+	pcImpl->m_cHighlightOSnapOperator.SetObjectSnapMode(pcImpl->m_nOSnapMode);
+}
+
+//== Select 관련 함수 ================================================================================
+void KERNEL::Operator::Select::SetSelectionFilter(SelectionFilter::Type eInType)
+{
+	auto * pcImpl = (Operator::SelectImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	// Selection filter type이 없는 경우 추가
+	if (0 == (pcImpl->m_nSelFilter & (DWORD)eInType)) {
+		pcImpl->m_nSelFilter += (DWORD)eInType;
+	}
+	else { // Selection filter type이 없는 경우 제거
+		pcImpl->m_nSelFilter -= (DWORD)eInType;
+	}
+
+	pcImpl->m_cHighlightOSnapOperator.SetSelectionFilter(pcImpl->m_nSelFilter);
+}
+
+//== Highlight 관련 함수 =============================================================================
+void KERNEL::Operator::Select::UnhighlightEverything()
+{
+	auto * pcImpl = (SelectImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_cHighlightOSnapOperator.UnhighlightEverything();
+	pcImpl->m_cHighlightCtrl.UnhighlightEverything();
 }

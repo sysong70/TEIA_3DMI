@@ -99,13 +99,14 @@ namespace KERNEL
 
 			// DoDynamicHighlighting용 Highlight control
 			H3DF::HighlightControl m_cDynamicHighlightControl;
+			H3DF::HighlightControl m_cDynLineHighlightCtrl;
 
 			H3DF::SegmentKey m_cSnapPointSegment;
 
 			float m_fSnapRadius = 8;
 			float m_fLineWeight = 3;
 
-			H3DF::Point m_cPrevPoint;
+			H3DF::Point m_cPrevMousePixelPoint;
 
 			DWORD m_nOSnapMode; // Object snap 
 			DWORD m_nSelFilter;

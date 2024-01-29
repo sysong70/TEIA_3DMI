@@ -11,7 +11,6 @@ namespace KERNEL
 	{
 		enum class Type
 		{
-			HighlightObjectSnap,
 			VisualEffects,
 			Visibility,
 			Camera,

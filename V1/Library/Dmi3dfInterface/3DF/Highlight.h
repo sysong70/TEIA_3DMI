@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // #include <HBaseView.h>
 // #include <HUtility.h>
@@ -37,7 +37,7 @@ namespace H3DF
 	class API_3DF HighlightControl : public Control
 	{
 	public:
-		explicit HighlightControl(WindowKey const & cInWindow, bool bDynFlag);
+		explicit HighlightControl(WindowKey const & cInWindow);
 		//HighlightControl(HighlightControl const & cInThat);
 
 		void Set(HighlightControl const & cInThat);

@@ -1,4 +1,4 @@
-//////////////#pragma once
+﻿//////////////#pragma once
 
 #include <Json.h>
 
@@ -48,20 +48,10 @@ namespace KERNEL
 		//== Operator 관련 함수 ======================================================================
 		void AllocationOperator(H3DF::View * pcInView, Signal::Delivery & cDelivery);
 		Operator::OperatorBase * GetOperator(Operator::Type eInType);
-		Operator::HighlightObjectSnap & HighlightOSnapOperator();
 		Operator::Camera & Camera();
 		Operator::Select & Select();
 
 		DWORD MouseMapFlags(DWORD nState);
-
-		//== Object Snap 관련 함수 ===================================================================
-		void SetObjectSnap(OSnap::Type eInType);
-
-		//== Select 관련 함수 ========================================================================
-		H3DF::HighlightControl & HighlightControl() { return *m_pcHighlightControl; }
-
-		//== Selection Filter 관련 함수 ==============================================================
-		void SetSelectionFilter(SelectionFilter::Type eInType);
 
 		//== Visibility 관련 함수 ====================================================================
 		void SetVisibility(int nId);
@@ -79,11 +69,6 @@ namespace KERNEL
 		const Signal::Delivery * m_pcDelivery = nullptr;
 
 	public:
-		DWORD m_nOSnapMode = 0;
-		// 화면에 선택된 상태를 표시하기 위한 Highlight control
-		H3DF::HighlightControl * m_pcHighlightControl = nullptr;
-		DWORD m_nSelFilter = 0;
-
 		// 현재 선택된 요소들이 저장되는 변수
 		H3DF::SelectionResults m_cSelectionResult;
 

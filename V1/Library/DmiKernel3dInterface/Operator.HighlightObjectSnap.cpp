@@ -17,20 +17,21 @@ KERNEL::Operator::HighlightObjectSnap::HighlightObjectSnap(const H3DF::View * pc
 
 }
 
-int KERNEL::Operator::HighlightObjectSnap::LButtonDownAndMove(HEventInfo & cInEvent)
+int KERNEL::Operator::HighlightObjectSnap::MouseMove(HEventInfo & cInEvent)
 {
 	auto * pcImpl = static_cast<HighlightObjectSnapImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->LButtonDownAndMove(cInEvent);
-}
+	UINT nFlags = cInEvent.GetFlags();
 
-int KERNEL::Operator::HighlightObjectSnap::NoButtonDownAndMove(HEventInfo & cInEvent)
-{
-	auto * pcImpl = static_cast<HighlightObjectSnapImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
+	if (!(MVO_LBUTTON & nFlags) && !(MVO_MBUTTON & nFlags) && !(MVO_RBUTTON & nFlags)) {
+		pcImpl->NoButtonDownAndMove(cInEvent);
+	}
+	else if (MVO_LBUTTON & nFlags) {
+		pcImpl->LButtonDownAndMove(cInEvent);
+	}
 
-	return pcImpl->NoButtonDownAndMove(cInEvent);
+	return HLISTENER_PASS_EVENT;
 }
 
 //== Object Snap Point를 그리는 함수 ==================================================================
@@ -74,4 +75,5 @@ void KERNEL::Operator::HighlightObjectSnap::UnhighlightEverything()
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cDynamicHighlightControl.UnhighlightEverything();
+	pcImpl->m_cDynLineHighlightCtrl.UnhighlightEverything();
 }

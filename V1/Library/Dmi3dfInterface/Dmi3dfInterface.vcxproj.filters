@@ -276,9 +276,6 @@
     <ClInclude Include="3DF\Selectability.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="Sprocket.h">
-      <Filter>3DF\Sprocket</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\AttributeLock.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
@@ -323,6 +320,9 @@
     </ClInclude>
     <ClInclude Include="3DF\PointCloud.h">
       <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket.h">
+      <Filter>3DF</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

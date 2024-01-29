@@ -136,6 +136,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Operator.ModelPanel.h" />
     <ClInclude Include="Operator.Select.h" />
     <ClInclude Include="Operator.Visibility.h" />
     <ClInclude Include="Operator.VisualEffects.h" />
@@ -165,6 +166,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Operator.ModelPanel.cpp" />
     <ClCompile Include="Operator.Select.cpp" />
     <ClCompile Include="Operator.Visibility.cpp" />
     <ClCompile Include="Operator.VisualEffects.cpp" />

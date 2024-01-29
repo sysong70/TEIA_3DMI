@@ -11,8 +11,6 @@
 
 namespace KERNEL
 {
-	class WindowKey;
-
 	namespace Operator
 	{
 		class Select : public OperatorBase
@@ -24,6 +22,16 @@ namespace KERNEL
 
 			int LButtonDown(HEventInfo & cInEvent);
 			int LButtonUp(HEventInfo & cInEvent);
+
+			//== Object Snap 관련 함수 ===============================================================
+			void DrawSnapItems();
+			void SetObjectSnapMode(OSnap::Type eInType);
+
+			//== Select 관련 함수 ====================================================================
+			void SetSelectionFilter(SelectionFilter::Type eInType);
+
+			//== Highlight 관련 함수 =================================================================
+			void UnhighlightEverything();
 		};
 	}
 }

@@ -48,7 +48,7 @@ namespace H3DF
 void H3DF::ApplicationImpl::ErrorCallback(HErrorNode * pcNode, void * pcUserData)
 {
 	CStringA strMessage, strText;
-	
+	CString strTraceMessage;
 
 	switch (pcNode->m_severity) {
 		case 0:
@@ -80,11 +80,15 @@ void H3DF::ApplicationImpl::ErrorCallback(HErrorNode * pcNode, void * pcUserData
 	for (int nIndex = 0; nIndex < pcNode->m_messagelength; nIndex++) {
 		strMessage.Format("ErrMsg: %s", pcNode->m_message[nIndex]);
 		LogManager::Log(LOGMANAGER_3DF_ERROR_LOG_ID, strMessage);
+		strTraceMessage.Format(L"%s\n", strMessage);
+		TRACE(strTraceMessage);
 	}
 
 	for (int nIndex = 0; nIndex < pcNode->m_stacklength; nIndex++) {
 		strMessage.Format("Stack: %s", pcNode->m_stack[nIndex]);
 		LogManager::Log(LOGMANAGER_3DF_ERROR_LOG_ID, strMessage);
+		strTraceMessage.Format(L"%s\n", strMessage);
+		TRACE(strTraceMessage);
 	}
 
 	LogManager::DecreaseTabIndex(LOGMANAGER_3DF_ERROR_LOG_ID);

@@ -14,6 +14,9 @@
 
 #include <3DF/Segment.h>
 #include <3DF/VisualEffects.h>
+#include <3DF/Visibility.h>
+#include <3DF/LineAttribute.h>
+#include <3DF/AttributeLock.h>
 
 using namespace KERNEL;
 using namespace H3DF;
@@ -24,23 +27,6 @@ using namespace H3DF;
 
 KERNEL::DocViewImpl::DocViewImpl()
 {
-	m_nOSnapMode += (DWORD) OSnap::Type::EndPoint;
-	m_nOSnapMode += (DWORD) OSnap::Type::MidPoint;
-	m_nOSnapMode += (DWORD) OSnap::Type::Center;
-	m_nOSnapMode += (DWORD) OSnap::Type::Intersection;
-	m_nOSnapMode += (DWORD) OSnap::Type::Perpendicular;
-	m_nOSnapMode += (DWORD) OSnap::Type::Quadrant;
-	m_nOSnapMode += (DWORD) OSnap::Type::OnSurface;
-	m_nOSnapMode += (DWORD) OSnap::Type::Axis;
-
-	m_nSelFilter += (DWORD)SelectionFilter::Type::Point;
-	m_nSelFilter += (DWORD)SelectionFilter::Type::Curve;
-	m_nSelFilter += (DWORD)SelectionFilter::Type::Edge;
-	m_nSelFilter += (DWORD)SelectionFilter::Type::Face;
-	//m_nSelFilter += (DWORD)SelectionFilter::Type::Solid;
-	m_nSelFilter += (DWORD)SelectionFilter::Type::Axis;
-	m_nSelFilter += (DWORD)SelectionFilter::Type::PMI;
-
 	for (auto & pcOperator : m_apcOperator) {
 		pcOperator = nullptr;
 	}
@@ -71,17 +57,12 @@ void KERNEL::DocViewImpl::SetDelivery(const Signal::Delivery * pcInDelivery)
 void KERNEL::DocViewImpl::CancelCommands()
 {
 	m_cSelectionResult.Reset();
-	m_pcHighlightControl->UnhighlightEverything();
+	Select().UnhighlightEverything();
 	m_cCanvas.GetFrontView().GetWindowKey().Update();
 }
 
 void KERNEL::DocViewImpl::AllocationOperator(H3DF::View * pcInView, Signal::Delivery & cDelivery)
 {
-	// Highlight Object Snap Operator 생성 및 설정
-	m_apcOperator[(int)KERNEL::Operator::Type::HighlightObjectSnap] = new KERNEL::Operator::HighlightObjectSnap(pcInView, &cDelivery);
-	((Operator::HighlightObjectSnap *)m_apcOperator[(int)KERNEL::Operator::Type::HighlightObjectSnap])->SetObjectSnapMode(m_nOSnapMode);
-	((Operator::HighlightObjectSnap *)m_apcOperator[(int)KERNEL::Operator::Type::HighlightObjectSnap])->SetSelectionFilter(m_nSelFilter);
-
 	// VisualEffects Operator 생성 및 설정
 	m_apcOperator[(int)KERNEL::Operator::Type::VisualEffects] = new KERNEL::Operator::VisualEffects(pcInView, &cDelivery);
 
@@ -93,29 +74,11 @@ void KERNEL::DocViewImpl::AllocationOperator(H3DF::View * pcInView, Signal::Deli
 
 	// Camera Operator 생성 및 설정
 	m_apcOperator[(int)KERNEL::Operator::Type::Select] = new KERNEL::Operator::Select(pcInView, &cDelivery);
-
-	m_pcHighlightControl = new H3DF::HighlightControl(pcInView->GetWindowKey(), false);
-
-	H3DF::MaterialMappingKit cHighlightMaterialMapping;
-	// 	cHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(0, 0, 128)));
-	// 	cHighlightMaterialMapping.SetEdgeColor(RGBAColor(0, 0, 0));
-	// 	cHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(0, 162, 232)));
-
-	cHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(255, 131, 145)));
-	cHighlightMaterialMapping.SetEdgeColor(RGBAColor(0, 0, 0));
-	cHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(255, 131, 145)));
-
-	cHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(255, 131, 145)));
 }
 
 KERNEL::Operator::OperatorBase * KERNEL::DocViewImpl::GetOperator(Operator::Type eInType)
 { 
 	return m_apcOperator[(int)eInType]; 
-}
-
-KERNEL::Operator::HighlightObjectSnap & KERNEL::DocViewImpl::HighlightOSnapOperator()
-{ 
-	return *(Operator::HighlightObjectSnap *)m_apcOperator[(int)Operator::Type::HighlightObjectSnap]; 
 }
 
 KERNEL::Operator::Camera & KERNEL::DocViewImpl::Camera()
@@ -140,49 +103,6 @@ DWORD KERNEL::DocViewImpl::MouseMapFlags(DWORD nState)
 	if (nState & MK_CONTROL) nFlag |= MVO_CONTROL;
 
 	return nFlag;
-}
-
-//== Object Snap 관련 함수 ===========================================================================
-void KERNEL::DocViewImpl::SetObjectSnap(OSnap::Type eInType)
-{
-	// Osnap type이 없는 경우 추가
-	if (0 == (m_nOSnapMode & (DWORD)eInType)) {
-		m_nOSnapMode += (DWORD)eInType;
-	}
-	else { // Osnap type이 없는 경우 제거
-		m_nOSnapMode -= (DWORD)eInType;
-	}
-
-	HighlightOSnapOperator().SetObjectSnapMode(m_nOSnapMode);
-}
-
-
-//== Selection Filter 관련 함수 ======================================================================
-void KERNEL::DocViewImpl::SetSelectionFilter(SelectionFilter::Type eInType)
-{
-	// Selection filter type이 없는 경우 추가
-	if (0 == (m_nSelFilter & (DWORD) eInType)) {
-		m_nSelFilter += (DWORD) eInType;
-	}
-	else { // Selection filter type이 없는 경우 제거
-		m_nSelFilter -= (DWORD) eInType;
-	}
-
-	HighlightOSnapOperator().SetSelectionFilter(m_nSelFilter);
-
-
-
-/*
-	// Selectability는 Selection option에서 attribute lock을 설정해야 해서 속도가 많이 느림.
-	// 삭제해버림.
-	SelectabilityKit cSelectability;
-	cSelectability.SetLines(false);
-
-	SelectionOptionsKit cSelectionOptionsKit;
-	cSelectionOptionsKit.SetSelectability(cSelectability);
-
-	m_cCanvas.GetFrontView().GetWindowKey().SetSelectionOptions(cSelectionOptionsKit);
-*/
 }
 
 //== Visibility 관련 함수 ============================================================================

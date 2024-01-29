@@ -234,7 +234,7 @@ void TdfImport::CreateBasicModelTree(CString strFilePathName, H3DF::SegmentKey &
 	cItem.Title = "Models";
 	cItem.HasChildren = true;
 	cItem.ParentKey = 0;
-	cItem.Key = 1;
+	cItem.Key = cModelSegment.KeyValue();
 	cTreeItems.push_back(cItem);
 	cInDelivery.modelPanel.AddItems(cTreeItems);
 

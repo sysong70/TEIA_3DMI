@@ -32,6 +32,7 @@ void H3DF::NamedStyleDefinition::Set(NamedStyleDefinition const & cInThat)
 {
 	auto * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
+
 	auto * pcInThatImpl = dynamic_cast<DefinitionImpl *>(cInThat.m_pcImpl);
 	DEBUG_VALID(pcInThatImpl);
 
@@ -42,6 +43,7 @@ NamedStyleDefinition & H3DF::NamedStyleDefinition::operator = (NamedStyleDefinit
 {
 	auto * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
+
 	auto * pcInThatImpl = dynamic_cast<DefinitionImpl *>(cInThat.m_pcImpl);
 	DEBUG_VALID(pcInThatImpl);
 

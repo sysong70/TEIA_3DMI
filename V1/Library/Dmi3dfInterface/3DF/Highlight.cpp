@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+﻿#include "StdAfx.h"
 
 #include "Highlight.h"
 
@@ -127,7 +127,7 @@ namespace H3DF
 	class HighlightControlImpl : public Impl
 	{
 	public:
-		HighlightControlImpl(WindowKey const & cInWindow, bool bDynFlag);
+		HighlightControlImpl(WindowKey const & cInWindow);
 
 		void Copy(HighlightControlImpl * pcInThat) {
 			m_pcWindow = pcInThat->m_pcWindow;
@@ -151,7 +151,7 @@ namespace H3DF
 	};
 }
 
-H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow, bool bDynFlag)
+H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
 {
 	m_eType = H3DF::Type::HighlightControl;
 
@@ -228,9 +228,9 @@ HSelectionSet * H3DF::HighlightControlImpl::SelectionSet()
 
 //== HighlightControl Class ========================================================================
 
-H3DF::HighlightControl::HighlightControl(WindowKey const & cInWindow, bool bDynFlag)
+H3DF::HighlightControl::HighlightControl(WindowKey const & cInWindow)
 {
-	HighlightControlImpl * pcImpl = new HighlightControlImpl(cInWindow, bDynFlag);
+	HighlightControlImpl * pcImpl = new HighlightControlImpl(cInWindow);
 	m_pcImpl = pcImpl;
 }
 

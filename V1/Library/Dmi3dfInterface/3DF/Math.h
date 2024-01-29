@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "3DF.h"
 
@@ -384,9 +384,9 @@ public:
 	template <typename D>
 	Point_3D(Point_3D<D> const & that) : x((F) that.x), y((F) that.y), z((F) that.z) {}
 
-	Point_3D(Vector_3D<F> const & v);
-	explicit Point_3D(Vector_2D<F> const & v);
-	explicit Point_3D(Point_2D<F> const & that);
+	Point_3D(Vector_3D<F> const & v) : x(v.x), y(v.y), z(v.z) {}
+	explicit Point_3D(Vector_2D<F> const & v) : x(v.x), y(v.y), z((F)0.0) {}
+	explicit Point_3D(Point_2D<F> const & that) : x(that.x), y(that.y), z((F)0.0) {}
 
 	void Set(F X, F Y, F Z) { x = X; y = Y; z = Z; };
 
@@ -469,8 +469,8 @@ H3DF_INLINE bool Is_Abnormal(Point_3D<F> const & p) {
 	return Is_Abnormal(p.x) || Is_Abnormal(p.y) || Is_Abnormal(p.z);
 }
 
-template <typename F>
-H3DF_INLINE	Point_3D<F>::Point_3D(Vector_3D<F> const & v) : x(v.x), y(v.y), z(v.z) {}
+// template <typename F>
+// H3DF_INLINE	Point_3D<F>::Point_3D(Vector_3D<F> const & v) : x(v.x), y(v.y), z(v.z) {}
 
 template <typename F>
 H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator+= (Vector_3D<F> const & v) { x += v.x; y += v.y; z += v.z;  return *this; }
@@ -569,7 +569,7 @@ public:
 	explicit Point_2D(Point_2D<D> const & that) : x((F)that.x), y((F)that.y) {}
 
 	explicit Point_2D(Point_3D<F> const & that) : x((F)that.x), y((F)that.y) {}
-	explicit Point_2D(Vector_2D<F> const & v);
+	explicit Point_2D(Vector_2D<F> const & that) : x((F)that.x), y((F)that.y) {}
 
 	void Set(F X, F Y) { x = X; y = Y; };
 
@@ -617,8 +617,8 @@ public:
 using Point2D = Point_2D<float>		;
 using DPoint2D = Point_2D<double>	;
 
-template <typename F>
-H3DF_INLINE Point_3D<F>::Point_3D(Point_2D<F> const & that) : x(that.x), y(that.y), z(0) {}
+// template <typename F>
+// H3DF_INLINE Point_3D<F>::Point_3D(Point_2D<F> const & that) : x(that.x), y(that.y), z(0) {}
 
 template <typename F, typename S>
 H3DF_INLINE Point_2D<F>	operator* (S s, Point_2D<F> const & a) { return Point_2D<F>(F(s * a.x), F(s * a.y)); }
@@ -825,8 +825,8 @@ H3DF_INLINE bool Normalize(size_t count, Vector_3D<F> * vectors) {
 template <typename F>
 H3DF_INLINE	Vector_3D<F>::Vector_3D(Vector_2D<F> const & that) : x(that.x), y(that.y), z(0) {}
 
-template <typename F>
-H3DF_INLINE	Point_3D<F>::Point_3D(Vector_2D<F> const & v) : x(v.x), y(v.y), z(0) {}
+// template <typename F>
+// H3DF_INLINE	Point_3D<F>::Point_3D(Vector_2D<F> const & v) : x(v.x), y(v.y), z(0) {}
 
 template <typename F>
 H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator+= (Vector_2D<F> const & v) { x += v.x; y += v.y; return *this; }
