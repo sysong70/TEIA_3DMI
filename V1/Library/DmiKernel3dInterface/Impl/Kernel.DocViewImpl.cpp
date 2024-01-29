@@ -74,6 +74,9 @@ void KERNEL::DocViewImpl::AllocationOperator(H3DF::View * pcInView, Signal::Deli
 
 	// Camera Operator 생성 및 설정
 	m_apcOperator[(int)KERNEL::Operator::Type::Select] = new KERNEL::Operator::Select(pcInView, &cDelivery);
+
+	// Camera Operator 생성 및 설정
+	m_apcOperator[(int)KERNEL::Operator::Type::ModelPanel] = new KERNEL::Operator::ModelPanel(pcInView, &cDelivery);
 }
 
 KERNEL::Operator::OperatorBase * KERNEL::DocViewImpl::GetOperator(Operator::Type eInType)
@@ -89,6 +92,11 @@ KERNEL::Operator::Camera & KERNEL::DocViewImpl::Camera()
 KERNEL::Operator::Select & KERNEL::DocViewImpl::Select()
 {
 	return *(Operator::Select *)m_apcOperator[(int)Operator::Type::Select];
+}
+
+KERNEL::Operator::ModelPanel & KERNEL::DocViewImpl::ModelPanel()
+{
+	return *(Operator::ModelPanel *)m_apcOperator[(int)Operator::Type::ModelPanel];
 }
 
 DWORD KERNEL::DocViewImpl::MouseMapFlags(DWORD nState)

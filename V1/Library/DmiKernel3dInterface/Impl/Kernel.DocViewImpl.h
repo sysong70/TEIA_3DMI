@@ -9,6 +9,7 @@
 #include "../Operator.HighlightObjectSnap.h"
 #include "../Operator.Camera.h"
 #include "../Operator.Select.h"
+#include "../Operator.ModelPanel.h"
 
 #include <3DF.Factory.h>
 #include <3DF.Canvas.h>
@@ -50,6 +51,7 @@ namespace KERNEL
 		Operator::OperatorBase * GetOperator(Operator::Type eInType);
 		Operator::Camera & Camera();
 		Operator::Select & Select();
+		Operator::ModelPanel & ModelPanel();
 
 		DWORD MouseMapFlags(DWORD nState);
 

@@ -28,12 +28,11 @@ namespace SESSION
 
 		protected:
 			void ExecuteApplicationSignal(Json::Object & cInObject);
-
 			void ExecuteViewSignal(Json::Object & cInObject);
-			SESSION::Session * GetSession(int nViewId);
-
+			void ModelPanelSignal(Json::Object & cInObject);
 			void ExecuteCommand(Json::Object & cInObject);
 
+			SESSION::Session * GetSession(int nViewId);
 		private:
 			bool m_bIsValid = false;
 

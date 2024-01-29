@@ -49,6 +49,11 @@ namespace Path
 	CString GetFileName(const wchar_t* path);
 
 	/*
+		ASSERT(GetFileName(L"c:\\temp\\log.txt") == L"log");
+	*/
+	CString GetFileTitle(const wchar_t * path);
+
+	/*
 		CString path = L"c:\\temp\\";
 
 		RemoveBackslash(path);

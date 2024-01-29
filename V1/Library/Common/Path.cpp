@@ -112,7 +112,15 @@ CString Path::GetFileName(const wchar_t* path)
 	return fileName;
 }
 
+CString Path::GetFileTitle(const wchar_t * path)
+{
+	CString dir, fileName;
+	Divide(path, dir, fileName);
 
+	TrimExtension(fileName);
+
+	return fileName;
+}
 
 void Path::RemoveBackslash(CString& path)
 {

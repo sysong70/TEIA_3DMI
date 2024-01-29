@@ -14,6 +14,10 @@ namespace KERNEL
 		{
 		public:
 			ModelPanel(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+
+			void Initialize(CString strFilePathName);
+
+			void Signal(Json::Object & cInObject);
 		};
 	}
 }	

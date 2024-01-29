@@ -166,12 +166,12 @@ void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
 		DEBUG_RETURN;
 	}
 
-	char * pchName = pcViewImpl->m_pchName;
+	CStringA strName = pcViewImpl->m_strName;
 
 	// setlocale(LC_ALL, "ko_KR.utf8");
 
 	// pcViewImpl에 포함되어 있는 HBaseView를 생성하고 초기화 한다.
-	pcViewImpl->Init(pcModel, Utility::ToChar(TheKenel.General.Display.Driver), pchName, nWindowHandle);
+	pcViewImpl->Init(pcModel, Utility::ToChar(TheKenel.General.Display.Driver), strName, nWindowHandle);
 
 	pcCanvasImpl->m_vpcViewArray.push_back(pcView);
 	pcCanvasImpl->m_pcFrontView = pcCanvasImpl->m_vpcViewArray.front();

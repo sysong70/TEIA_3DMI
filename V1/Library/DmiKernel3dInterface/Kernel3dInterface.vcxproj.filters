@@ -108,6 +108,9 @@
     <ClInclude Include="Operator.ModelPanel.h">
       <Filter>Operator\Panel</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\Path.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -178,6 +181,9 @@
     </ClCompile>
     <ClCompile Include="Operator.ModelPanel.cpp">
       <Filter>Operator\Panel</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Path.cpp">
+      <Filter>_Common</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

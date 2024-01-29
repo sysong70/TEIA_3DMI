@@ -61,5 +61,8 @@ namespace KERNEL
 		//== Command 관련 함수 =======================================================================
 		void CommandRequest(Json::Object & cInObject);
 		void CommandChange(Json::Object & cInObject);
+
+		//== Panel 관련 함수 =========================================================================
+		void ModelPanelSignal(Json::Object & cInObject);
 	};
 };

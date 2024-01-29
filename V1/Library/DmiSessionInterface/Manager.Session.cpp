@@ -70,6 +70,10 @@ void SESSION::Manager::Session::ExecuteSignal(const wchar_t * pchBuffer)
 			ExecuteViewSignal(cInObject);
 			break;
 
+		case Signal::Target::ModelPanel:
+			ModelPanelSignal(cInObject);
+			break;
+
 		case Signal::Target::TaskBar:
 			ExecuteCommand(cInObject);
 			break;
@@ -203,6 +207,15 @@ SESSION::Session * SESSION::Manager::Session::GetSession(int nViewId)
 	}
 
 	return pcSession;
+}
+
+//== Model Panel 명령어 처리 부분 =====================================================================
+void SESSION::Manager::Session::ModelPanelSignal(Json::Object & cInObject)
+{
+	int nViewId = cInObject.GetInteger(SKW_VIEWID);
+
+	SESSION::Session * pcSession = GetSession(nViewId);
+	pcSession->ModelPanelSignal(cInObject);
 }
 
 //== Command 명령어 처리 부분 =========================================================================

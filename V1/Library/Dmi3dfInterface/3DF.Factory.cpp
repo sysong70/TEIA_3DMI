@@ -34,7 +34,7 @@ Canvas H3DF::Factory::CreateCanvas(H3DF::WindowHandle nInWindowHandle, char cons
 	return cCanvas;
 }
 
-View H3DF::Factory::CreateView(char const * chInName)
+View H3DF::Factory::CreateView(CStringA strInName)
 {
 	View cView;
 
@@ -43,9 +43,7 @@ View H3DF::Factory::CreateView(char const * chInName)
 		assert(false);
 	}
 
-	if (nullptr != chInName) {
-		Utility::CopyString(chInName, pcImpl->m_pchName);
-	}
+	pcImpl->m_strName = strInName;
 
 	return cView;
 }

@@ -120,6 +120,7 @@
     <ClInclude Include="..\Common\Common_Define.h" />
     <ClInclude Include="..\Common\Fio.h" />
     <ClInclude Include="..\Common\Json.h" />
+    <ClInclude Include="..\Common\Path.h" />
     <ClInclude Include="..\Common\WStr.h" />
     <ClInclude Include="..\Signal\Signal.h" />
     <ClInclude Include="Impl\Kernel.DocViewImpl.h" />
@@ -149,6 +150,7 @@
     <ClCompile Include="..\Common\Common_Define.cpp" />
     <ClCompile Include="..\Common\Fio.cpp" />
     <ClCompile Include="..\Common\Json.cpp" />
+    <ClCompile Include="..\Common\Path.cpp" />
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\Signal\Signal.cpp" />
     <ClCompile Include="dllmain.cpp" />

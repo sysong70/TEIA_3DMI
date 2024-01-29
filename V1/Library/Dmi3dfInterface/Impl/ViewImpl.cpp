@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+﻿#include "StdAfx.h"
 
 #include "ViewImpl.h"
 
@@ -592,33 +592,21 @@ H3DF::ViewImpl::ViewImpl()
 
 H3DF::ViewImpl::~ViewImpl()
 {
-	if (nullptr != m_pchName) {
-		delete[] m_pchName;
-	}
 }
 
 void H3DF::ViewImpl::Copy(const ViewImpl * pcInThat)
 {
 	m_pcBaseView = pcInThat->m_pcBaseView;
 	m_pcWindow = pcInThat->m_pcWindow;
+	m_strName = pcInThat->m_strName;
+	m_eRenderingMode = pcInThat->m_eRenderingMode;
 
-	if (nullptr != pcInThat->m_pchName) {
+	m_cKey = pcInThat->m_cKey;
 
-		// 입력 문자열의 크기 계산
-		size_t nSourceSize = strlen(pcInThat->m_pchName) + 1; // 널 종료 문자('\0')를 포함해서 크기 계산
+	m_pcModel = pcInThat->m_pcModel;
+	m_cModelKey = pcInThat->m_cModelKey;
 
-		// 대상 문자열에 충분한 메모리 할당
-		m_pchName = new char[nSourceSize * sizeof(char)];
-		if (nullptr == m_pchName) {
-			// 메모리 할당 실패 처리
-			
-		}
-
-		// 문자열 복사
-		strcpy(m_pchName, pcInThat->m_pchName);
-
-		//H3DF::Utility::CopyString(pcInThat->m_pchName, m_pchName);
-	}
+	m_cPortfolioKey = pcInThat->m_cPortfolioKey;
 
 	m_bShowCollisions = pcInThat->m_bShowCollisions;
 
@@ -628,10 +616,13 @@ void H3DF::ViewImpl::Copy(const ViewImpl * pcInThat)
 	if (nullptr != m_pcBaseView) {
 		m_pcBaseView->SetNavigationCube(&m_cNaviCube);
 	}
+
+	m_bSimpleShadowFlag = pcInThat->m_bSimpleShadowFlag;
+	m_bSimpleReflection = pcInThat->m_bSimpleReflection;
 }
 
 // 1. BaseView를 초기화 하는 부분
-bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType, const char * pchInInstanceName, H3DF::WindowHandle nInWindowHandle)
+bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType, CStringA strInInstanceName, H3DF::WindowHandle nInWindowHandle)
 {
 	ModelImpl * pcModelImpl = static_cast<ModelImpl *>(pcInModel->GetImpl());
 	DEBUG_VALID(pcModelImpl);
@@ -640,7 +631,7 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	m_pcBaseView = new H3DF::BaseView((HBaseModel *)pcModelImpl,
 		nullptr,											// Alias
 		pchInDriverType,									// Driver Type
-		pchInInstanceName,									// Instance name
+		strInInstanceName,									// Instance name
 		reinterpret_cast<void *>(nInWindowHandle),			// Window handle
 		nullptr);
 
