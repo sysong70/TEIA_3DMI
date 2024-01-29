@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "../3DF/3DF.h"
 
@@ -55,7 +55,7 @@ namespace H3DF
 
 		void Copy(const ViewImpl * pcInThat);
 
-		bool Init(H3DF::Model * pcInModel, const char * pchInDriverType, const char * pchInInstanceName, H3DF::WindowHandle nInWindowHandle);
+		bool Init(H3DF::Model * pcInModel, const char * pchInDriverType, CStringA strInInstanceName, H3DF::WindowHandle nInWindowHandle);
 
 	protected:
 		void SetGpu(CString strGpu);
@@ -118,7 +118,7 @@ namespace H3DF
 	public:
 		BaseView * m_pcBaseView = nullptr;
 		H3DF::WindowKey * m_pcWindow = nullptr;
-		char * m_pchName = nullptr;
+		CStringA m_strName;
 		H3DF::Rendering::Mode m_eRenderingMode = H3DF::Rendering::Mode::Default;
 
 		SegmentKey m_cKey;

@@ -15,6 +15,7 @@ namespace KERNEL
 			Visibility,
 			Camera,
 			Select,
+			ModelPanel,
 			Count
 		};
 

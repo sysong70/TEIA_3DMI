@@ -49,6 +49,8 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cD
 	pcImpl->AllocationOperator(&pcImpl->m_cCanvas.GetFrontView(), cDelivery);
 
 	pcImpl->m_cCanvas.FileOpen(cInObject, cDelivery);
+
+	pcImpl->ModelPanel().Initialize(strFilePathName);
 }
 
 // 2. H3DF View Destruct 함수
@@ -535,4 +537,14 @@ void KERNEL::DocView::CommandChange(Json::Object & cInObject)
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->CommandChange(cInObject);
+}
+
+//== Panel 관련 함수 =================================================================================
+void KERNEL::DocView::ModelPanelSignal(Json::Object & cInObject)
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	// Delivery는 ModelPanel 선언할 때 이미 할당함.
+	pcImpl->ModelPanel().Signal(cInObject);
 }

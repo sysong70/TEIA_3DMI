@@ -205,7 +205,7 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 	strMessage.Format(L"Stage 2/3 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec2));
 	cInDelivery.progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
 
-	CreateBasicModelTree(strFilePathName, cModelSegment, cInDelivery);
+	// CreateBasicModelTree(strFilePathName, cModelSegment, cInDelivery);
 
 	m_vcMaterialMappingStyleVector.clear();
 	m_mFaceMaterialMappingStyleMap.RemoveAll();

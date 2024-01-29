@@ -130,13 +130,9 @@
     <ClInclude Include="Command.ViewControl.h" />
     <ClInclude Include="Manager.Root.h" />
     <ClInclude Include="Manager.Command.h" />
-    <ClInclude Include="Manager.Highlight.h" />
     <ClInclude Include="Manager.Input.h" />
-    <ClInclude Include="Manager.ObjectSnap.h" />
-    <ClInclude Include="Manager.Selection.h" />
     <ClInclude Include="Manager.Session.h" />
     <ClInclude Include="Manager.Tracker.h" />
-    <ClInclude Include="Manager.Tree.h" />
     <ClInclude Include="Session.Facility.AppOptions.h" />
     <ClInclude Include="Session.Facility.Base.h" />
     <ClInclude Include="Session.Facility.h" />
@@ -162,13 +158,9 @@
     <ClCompile Include="Command.ViewControl.cpp" />
     <ClCompile Include="Manager.Root.cpp" />
     <ClCompile Include="Manager.Command.cpp" />
-    <ClCompile Include="Manager.Highlight.cpp" />
     <ClCompile Include="Manager.Input.cpp" />
-    <ClCompile Include="Manager.ObjectSnap.cpp" />
-    <ClCompile Include="Manager.Selection.cpp" />
     <ClCompile Include="Manager.Session.cpp" />
     <ClCompile Include="Manager.Tracker.cpp" />
-    <ClCompile Include="Manager.Tree.cpp" />
     <ClCompile Include="Session.cpp" />
     <ClCompile Include="Session.Facility.AppOptions.cpp" />
     <ClCompile Include="Session.Facility.Base.cpp" />

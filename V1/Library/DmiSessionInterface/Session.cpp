@@ -183,3 +183,8 @@ void SESSION::Session::CommandChange(Json::Object & cInObject)
 	m_pcDocView->CommandChange(cInObject);
 }
 
+//== Panel 관련 함수 =================================================================================
+void SESSION::Session::ModelPanelSignal(Json::Object & cInObject)
+{
+	m_pcDocView->ModelPanelSignal(cInObject);
+}

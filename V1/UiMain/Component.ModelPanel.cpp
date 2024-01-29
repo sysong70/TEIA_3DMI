@@ -413,8 +413,6 @@ void Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, CString tit
 	}
 }
 
-
-
 void Component::ModelPanel::AddItems(Json::Object* pData)
 {
 	m_wndControl.SetRedraw(FALSE);
