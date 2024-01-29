@@ -131,6 +131,7 @@
     <ClInclude Include="..\Signal\Signal.h" />
     <ClInclude Include="3DX.3DfImport.h" />
     <ClInclude Include="3DX.ExchangeWrapper.h" />
+    <ClInclude Include="3DX.FileOptions.h" />
     <ClInclude Include="3DX.h" />
     <ClInclude Include="3DX.ImportBase.h" />
     <ClInclude Include="3DXSignal.h" />
@@ -175,6 +176,7 @@
     <ClCompile Include="..\Signal\Signal.cpp" />
     <ClCompile Include="3DX.3DfImport.cpp" />
     <ClCompile Include="3DX.cpp" />
+    <ClCompile Include="3DX.FileOptions.cpp" />
     <ClCompile Include="3DX.ImportBase.cpp" />
     <ClCompile Include="3DXSignal.Interface.cpp" />
     <ClCompile Include="A3dTracer.cpp" />
