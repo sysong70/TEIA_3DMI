@@ -17,6 +17,21 @@
 using namespace KERNEL;
 using namespace H3DF;
 
+namespace KERNEL
+{
+	namespace Operator
+	{
+		class ModelTreeItem
+		{
+		public:
+			H3DF::SegmentKey cParent;
+			H3DF::SegmentKey cKey;
+			H3DF::SegmentKeyArray caChildren;
+			int nStatus = 0;
+		};
+	}
+}
+
 //== ModelPanelImpl 관련 함수 ========================================================================
 
 namespace KERNEL
@@ -71,8 +86,6 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 	cItem.Key = (DWORD_PTR)pcImpl->View().GetModelOverrideSegmentKey().KeyValue();
 	cTreeItems.push_back(cItem);
 	pcImpl->Delivery().modelPanel.AddItems(cTreeItems);
-
-	return;
 
 	nParentKey = cItem.Key;
 
