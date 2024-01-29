@@ -705,6 +705,8 @@ void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items)
 
 		nodes.AddObject(*pChild);
 	}
+
+	Wrapper().SendData(data);
 }
 
 #pragma endregion //:REGION

@@ -291,18 +291,21 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
-	const CString action = pNMTreeView->action == TVE_EXPAND ? L"expand" :
-		pNMTreeView->action == TVE_COLLAPSE ? L"collapse" : L"unknown";
+	//const CString action = pNMTreeView->action == TVE_EXPAND ? L"expand" :
+	//	pNMTreeView->action == TVE_COLLAPSE ? L"collapse" : L"unknown";
 
-	DEBUG_TRACE(L"TVN_ITEMEXPANDED: item: %s; action: %s\r\n",
-		(LPCTSTR)m_wndControl.GetItemText(pNMTreeView->itemNew.hItem), (LPCTSTR)action);
+	//DEBUG_TRACE(L"TVN_ITEMEXPANDED: item: %s; action: %s\r\n",
+	//	(LPCTSTR)m_wndControl.GetItemText(pNMTreeView->itemNew.hItem), (LPCTSTR)action);
 
 	if (pNMTreeView->action == TVE_EXPAND) {
-		HTREEITEM hItem = m_wndControl.GetChildItem(pNMTreeView->itemNew.hItem);
-		if (m_wndControl.GetItemText(hItem) == PRESET::DummyName) {
-			m_wndControl.DeleteItem(hItem);
+		HTREEITEM hItem = pNMTreeView->itemNew.hItem;
+		HTREEITEM hChild = m_wndControl.GetChildItem(hItem);
 
-			DWORD_PTR key = m_wndControl.GetItemData(pNMTreeView->itemNew.hItem);
+		if (m_wndControl.GetItemText(hChild) == PRESET::DummyName) {
+			m_wndControl.DeleteItem(hChild);
+
+			DWORD_PTR key = m_wndControl.GetItemData(hItem);
+			ASSERT(key != 0);
 			m_pView->GetDelivery().modelPanel.OnItemExpanded(key);
 		}
 	}
@@ -401,7 +404,9 @@ void Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, CString tit
 	tvi.hParent = parent;
 	tvi.hInsertAfter = TVI_LAST;
 	tvi.item.pszText = (LPWSTR)(LPCTSTR)title;
-	tvi.item.mask = TVIF_TEXT;
+	//:WARNING - is not single flag!!! (combination)
+	tvi.item.mask = TVIF_TEXT | TVIF_PARAM;
+	// TVIF_PARAM: add data. if not set, lParam is not assigned
 	tvi.item.lParam = (LPARAM)key;
 
 	HTREEITEM hCurrent = m_wndControl.InsertItem(&tvi);

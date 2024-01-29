@@ -1,5 +1,5 @@
 {
-    "version":240126.1,
+    "version":"240126.1",
     "Import":{
         "3MF":{
             "General":{
@@ -9,7 +9,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -38,7 +38,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -85,7 +85,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -135,7 +135,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -164,7 +164,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -193,7 +193,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -243,7 +243,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -272,7 +272,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -327,7 +327,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -389,7 +389,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -426,7 +426,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -455,7 +455,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -526,7 +526,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -555,7 +555,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -592,7 +592,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -647,7 +647,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -694,7 +694,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -741,7 +741,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -799,7 +799,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -857,7 +857,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -904,7 +904,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -959,7 +959,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -1014,7 +1014,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -1043,7 +1043,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -1090,7 +1090,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -1137,7 +1137,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -1195,7 +1195,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -1250,7 +1250,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -1287,7 +1287,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -1324,7 +1324,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -1371,7 +1371,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,
@@ -1408,7 +1408,7 @@
                 "Wireframes":true,
                 "Attributes":true,
                 "HiddenObjects":true,
-                "Reference":false,
+                "ConstructionAndReferences":false,
                 "ActiveFilter":true,
                 "SewModel":{
                     "checked":false,

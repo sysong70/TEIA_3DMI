@@ -126,7 +126,7 @@
 				{"type":"check", "name":"Wireframes", "title":"Wireframes|__#__", "desc":"__#__|__#__"},
 				{"type":"check", "name":"Attributes", "title":"Attributes|__#__", "desc":"__#__|__#__"},
 				{"type":"check", "name":"HiddenObjects", "title":"Hidden Objects|__#__", "desc":"__#__|__#__"},
-				{"type":"check", "name":"References", "title":"Construction and References|__#__", "desc":"__#__|__#__"},
+				{"type":"check", "name":"ConstructionAndReferences", "title":"Construction and References|__#__", "desc":"__#__|__#__"},
 				{"type":"check", "name":"ActiveFilter", "title":"Active Filter|__#__", "desc":"__#__|__#__"},
 				{"type":"group", "name":"SewModel", "title":"Sew Model|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
 					{"type":"edit", "name":"SewingTolerance", "title":"Sewing Tolerance|__#__", "desc":"__#__|__#__", "value":"0.001"},

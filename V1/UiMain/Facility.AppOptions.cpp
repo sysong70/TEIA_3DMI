@@ -75,7 +75,7 @@ bool Facility::AppOptions::Load()
 	else {
 		m_preferences = TheAppResources.GetPreferences();
 	}
-	ASSERT(m_preferences.GetReal("version") == TheAppResources.GetPreferences().GetReal("version"));
+	ASSERT(m_preferences.GetString("version") == TheAppResources.GetPreferences().GetString("version"));
 
 	if (File::IsExist((LPCTSTR)FileOptionsPath)) {
 		m_fileOptions.Clean();
@@ -86,7 +86,7 @@ bool Facility::AppOptions::Load()
 	else {
 		m_fileOptions = TheAppResources.GetFileOptions();
 	}
-	ASSERT(m_fileOptions.GetReal("version") == TheAppResources.GetFileOptions().GetReal("version"));
+	ASSERT(m_fileOptions.GetString("version") == TheAppResources.GetFileOptions().GetString("version"));
 
 	return true;
 }
