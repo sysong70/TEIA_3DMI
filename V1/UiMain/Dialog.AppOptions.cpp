@@ -35,6 +35,7 @@ using namespace Dialog;
 
 BEGIN_MESSAGE_MAP(AppOptions, Standard)
 	ON_REGISTERED_MESSAGE(BCGM_CHANGE_ACTIVE_TAB, OnChangeActiveTab)
+	ON_REGISTERED_MESSAGE(BCGM_PROPERTY_CHANGED, OnChangedFileOption)
 
 	ON_BN_CLICKED(PRESET::Initialize, OnInitialize)
 	ON_BN_CLICKED(PRESET::Reset, OnReset)
@@ -77,6 +78,9 @@ BOOL Dialog::AppOptions::OnInitDialog()
 
 	m_windowSize = AdjustWindowSize(size);
 	SetSizeLimit(true, true);
+
+	//:WARNING
+	m_fileOptionsUi.OnPropertyChangedHandler(this);
 
 	// data initialize
 
@@ -164,8 +168,8 @@ void Dialog::AppOptions::OnApply()
 
 	Connector3d::GetInstance().application.OnUpdatePreference(m_preferences.Data);
 	Connector3d::GetInstance().application.OnUpdateFileOption(m_fileOptions.Data);
-	Connector2d::GetInstance().application.OnUpdatePreference(m_preferences.Data);
-	Connector2d::GetInstance().application.OnUpdatePreference(m_fileOptions.Data);
+	//Connector2d::GetInstance().application.OnUpdatePreference(m_preferences.Data);
+	//Connector2d::GetInstance().application.OnUpdatePreference(m_fileOptions.Data);
 }
 
 
@@ -218,6 +222,32 @@ void Dialog::AppOptions::ConstructFooter(const CRect& boundary)
 	Control::Align({ &m_wndCancel, &m_wndApply, &m_wndOk }, basePoint, Control::EAlign::VerticalCenter, this);
 	basePoint.x = boundary.right;
 	Control::Destribute({ &m_wndCancel, &m_wndApply, &m_wndOk }, basePoint, margin.cx, Control::EDirection::ToLeft, this);
+}
+
+
+
+LRESULT Dialog::AppOptions::OnChangedFileOption(WPARAM wp, LPARAM lp)
+{
+	Json::Value& target = *(Json::Value*)wp;
+	CBCGPProp& source = *(CBCGPProp*)lp;
+
+	// set value first
+	Facility::SetValue(target, source);
+
+	Control::PropList& propList = m_fileOptionsUi.GetPropList();
+	CBCGPProp* pParent = source.GetParent();
+
+	CString name = source.GetXMLTagName();
+
+	if (name == L"TessLevel") {
+		CBCGPProp* pCustom = propList.FindPropByName(pParent, L"CustomTessLevel");
+		DEBUG_VALID(pCustom);
+
+		int index = source.GetSelectedOption();
+		pCustom->Enable(index == 5 /* Custom */, TRUE);
+	}
+
+	return S_OK;
 }
 
 #undef DDX_CONTROL

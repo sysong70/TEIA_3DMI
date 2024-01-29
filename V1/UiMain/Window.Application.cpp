@@ -193,7 +193,7 @@ Window::View* Window::Application::FindView(int id)
 
 
 
-CString Window::Application::GetPath(bool bLastBackslash)
+CString Window::Application::GetAppPath(bool bLastBackslash)
 {
 	CString sPath = PRESET::GetInitPath(m_hInstance);
 	if (bLastBackslash) {
@@ -222,7 +222,7 @@ BOOL Window::Application::InitInstance()
 	//Data: < > 00 00 00 00 CD CD CD CD 00 00 00 00 00 00 00 00
 
 	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	//_CrtSetBreakAlloc(1359); // {1359}
+	//_CrtSetBreakAlloc(962454); // {1359}
 	//_CrtDumpMemoryLeaks();
 	//_CrtMemDumpAllObjectsSince(0);
 
@@ -231,7 +231,7 @@ BOOL Window::Application::InitInstance()
 	Facility::SetLanguage(Facility::ELanguage::English);
 
 	TheAppResources.Load();
-	TheAppOptions.SetFolderPath(GetPath());
+	TheAppOptions.SetFolderPath(GetAppPath() + L"Settings\\");
 	TheAppOptions.Load();
 
 	if (Connector3d::Initialize()) {

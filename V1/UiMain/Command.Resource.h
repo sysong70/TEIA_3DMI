@@ -132,16 +132,25 @@
 #define TOOLBAR_3D_CMD_Option_GridLines                   20130
 #define TOOLBAR_3D_CMD_Option_AlternateRows               20131
 #define CUSTOM_3D_CAT                                     20132
-#define CUSTOM_3D_PNL_Test                                20133
-#define CUSTOM_3D_CMD_Test1                               20134
-#define CUSTOM_3D_CMD_Test2                               20135
-#define CUSTOM_3D_CMD_Test3                               20136
-#define CUSTOM_3D_CMD_Test4                               20137
-#define CUSTOM_3D_CMD_Test5                               20138
-#define CUSTOM_3D_CMD_Test6                               20139
-#define CUSTOM_3D_CMD_Test7                               20140
-#define CUSTOM_3D_CMD_Test8                               20141
-#define CUSTOM_3D_CMD_Test9                               20142
+#define CUSTOM_3D_PNL_SYSONG                              20133
+#define CUSTOM_3D_CMD_SYSONG_Test1                        20134
+#define CUSTOM_3D_CMD_SYSONG_Test2                        20135
+#define CUSTOM_3D_CMD_SYSONG_Test3                        20136
+#define CUSTOM_3D_CMD_SYSONG_Test4                        20137
+#define CUSTOM_3D_CMD_SYSONG_Test5                        20138
+#define CUSTOM_3D_CMD_SYSONG_Test6                        20139
+#define CUSTOM_3D_CMD_SYSONG_Test7                        20140
+#define CUSTOM_3D_CMD_SYSONG_Test8                        20141
+#define CUSTOM_3D_CMD_SYSONG_Test9                        20142
+#define CUSTOM_3D_PNL_KEN                                 20143
+#define CUSTOM_3D_CMD_KEN_Test1                           20144
+#define CUSTOM_3D_CMD_KEN_Test2                           20145
+#define CUSTOM_3D_CMD_KEN_Test3                           20146
+#define CUSTOM_3D_CMD_KEN_Test4                           20147
+#define CUSTOM_3D_CMD_KEN_Test5                           20148
+#define CUSTOM_3D_CMD_KEN_Test6                           20149
+#define CUSTOM_3D_CMD_KEN_Test7                           20150
+#define CUSTOM_3D_CMD_KEN_Test8                           20151
+#define CUSTOM_3D_CMD_KEN_Test9                           20152
 
-#define COMMAND_END 20143
-
+#define COMMAND_END 20153

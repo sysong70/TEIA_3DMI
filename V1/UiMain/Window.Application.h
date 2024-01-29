@@ -24,7 +24,7 @@ namespace Window
 
 		View* FindView(int id);
 
-		CString GetPath(bool bLastBackslash = true);
+		CString GetAppPath(bool bLastBackslash = true);
 
 	public:
 

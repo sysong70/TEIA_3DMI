@@ -13,42 +13,12 @@
 		"Apply":{"title":"Apply|적용", "id":11, "comment":"IDCONTINUE"}
 	},
 
-	"FileOpen":{
-		"title":"Open File|파일 열기",
-		"filter": [
-			"All types (*.*)|*.*|",
-			"ACIS (*.sat, *.sab)|*.sat;*.sab|",
-			"3DS (*.3ds)|*.3ds|",
-			"3MF (*.3mf)|*.3mf|",
-			"Inventor (*.ipt, *.iam)|*.ipt;*.iam|",
-			"Navisworks (*.nwd)|*.nwd|",
-			"CATIA V4 (*.model, *.session, *.dlv, *.exp)|*.model;*.session;*.dlv;*.exp|",
-			"CATIA V5 (*.catpart, *.catproduct, *.catshape, *.cgr)|*.catpart;*.catproduct;*.catshape;*.cgr|",
-			"CATIA V6 / 3DExperience (*.3dxml)|*.3dxml|",
-			"COLLADA (*.dae)|*.dae|",
-			"Creo - Pro/E (*.asm, *.neu, *.prt, *.xas, *.xpr)|*.asm;*.neu;*.prt;*.xas;*.xpr|",
-			"FBX (*.fbx)|*.fbx|",
-			"GL Transmission Format (*.gltf, *.glb)|*.gltf;*.glb|",
-			"I-deas (*.mf1, *.arc, *.unv, *.pkg)|*.mf1;*.arc;*.unv;*.pkg|",
-			"IFC (*.ifc, *.ifczip)|*.ifc;*.ipczip|",
-			"IGES (*.igs, *.iges)|*.igs;*.iges|",
-			"JT (*.jt)|*.jt|",
-			"Microstation DGN (*.dgn)|*.dgn|",
-			"NX - Unigraphics (*.prt)|*.prt|",
-			"Parasolid (*.x_t, *.x_b, *.xmt, *.xmt_txt)|*.x_t;*.x_b;*.xmt;*.xmt_txt|",
-			"PRC (*.prc)|*.prc|",
-			"Revit (*.rvt, *.rfa)|*.rvt;*.rfa|",
-			"Rhino3D (*.3dm)|*.3dm|",
-			"Solid Edge (*.asm, *.par, *.pwd, *.psm)|*.asm;*.par;*.pwd;*.psm|",
-			"Solidworks (*.sldasm, *.sldprt)|*.sldasm;*.sldprt|",
-			"Steoeo Lithography (*.stl)|*.stl|",
-			"STEP (*.stp, *.step, *.stpz, *.stepx, *.stpxz)|*.stp;*.step;*.stpz;*.stepx;*.stpxz|",
-			"U3D (*.u3d)|*.u3d|",
-			"VDA-FS (*.vda)|*.vda|",
-			"VRML (*.wrl, *.vrml)|*.wrl;*.vrml|",
-			"Wavefront OBJ (*.obj)|*.obj|",
-			"|"
-		]
+	"DebugTracer":{
+		"title":"Debug Tracer",
+		"size":{"cx":800, "cy":600},
+		"body":{
+			"Log":{}
+		}
 	},
 
 	"Progress":{
@@ -110,60 +80,78 @@
 	"FileOptions":{
 		"tree":[
 			{"name":"Import", "title":"Import|가져오기", "items":[
-				{"name":"3DS", "title":"3DS"},
-				{"name":"3MF", "title":"3MF"},
-				{"name":"ACIS", "title":"ACIS"},
-				{"name":"CATIA4", "title":"CATIA V4"},
-				{"name":"CATIA5", "title":"CATIA V5"},
-				{"name":"CATIA6", "title":"CATIA V6"},
-				{"name":"CGR", "title":"CGR"},
-				{"name":"COLLADA", "title":"COLLADA"},
-				{"name":"DWG2D", "title":"DWG 2D"},
-				{"name":"DWG3D", "title":"DWG 3D"},
-				{"name":"FBX", "title":"FBX"},
-				{"name":"GLTF", "title":"GLTF"},
-				{"name":"IDEAS", "title":"I-deas"},
-				{"name":"IFC", "title":"IFC"},
-				{"name":"IGES", "title":"IGES"},
-				{"name":"Inventor", "title":"Inventor"},
-				{"name":"JT", "title":"JT"},
-				{"name":"Navisworks", "title":"Navisworks"},
-				{"name":"Parasolid", "title":"Parasolid"},
-				{"name":"PDF", "title":"PDF"},
-				{"name":"PRC", "title":"PRC"},
-				{"name":"ProEngineer", "title":"Pro/Engineer"},
-				{"name":"Revit", "title":"Revit"},
-				{"name":"Rhino", "title":"Rhino"},
-				{"name":"SolidEdge", "title":"SolidEdge"},
-				{"name":"Solidworks", "title":"Solidworks"},
-				{"name":"STEP", "title":"STEP"},
-				{"name":"STL", "title":"STL"},
-				{"name":"Unigraphics", "title":"Unigraphics"},
-				{"name":"Universal3D", "title":"Universal3D"},
-				{"name":"VDAFS", "title":"VDAFS"},
-				{"name":"VRML", "title":"VRML"}
+				{"name":"3MF", "title":"3MF", "ext":["3MF"],                                                            "group":[1,0,1,0,0], "General":[9,10]},
+				{"name":"ACIS", "title":"ACIS", "ext":["SAT", "SAB"],                                                   "group":[1,1,1,0,0], "General":[9,10]},
+				{"name":"ACAD", "title":"AutoCAD", "ext":["DWG", "DXF"],                                                "group":[1,1,1,0,1], "General":[9,10]},
+				{"name":"3DS", "title":"Autodesk 3DS", "ext":["3DS"],                                                   "group":[1,0,1,0,0], "General":[0,9]},
+				{"name":"DWF", "title":"Autodesk DWF", "ext":["DWF", "DWFX"],                                           "group":[1,0,1,0,0], "General":[0,9]},
+				{"name":"Inventor", "title":"Autodesk Inventor", "ext":["IPT", "IAM"],                                  "group":[1,1,1,0,1], "General":[9,10]},
+				{"name":"Navisworks", "title":"Autodesk Navisworks", "ext":["NWD"],                                     "group":[1,0,1,0,0], "General":[9,10]},
+				{"name":"CATIA4", "title":"CATIA V4", "ext":["MODEL", "SESSION", "DLV", "EXP"],                         "group":[1,1,1,1,0], "General":[9,10]},
+				{"name":"CATIA5", "title":"CATIA V5", "ext":["CATDrawing", "CATPart", "CATProduct", "CATShape", "CGR"], "group":[1,1,1,1,1], "General":[10]},
+				{"name":"CATIA6", "title":"CATIA V6/3DExperience", "ext":["3DXML"],                                     "group":[1,0,1,1,0], "General":[0,9,10]},
+				{"name":"COLLADA", "title":"COLLADA", "ext":["DAE"],                                                    "group":[1,0,1,0,0], "General":[0,9]},
+				{"name":"ProE", "title":"Creo/Pro-E", "ext":["ASM", "NEU", "PRT", "PRT.*", "XAS", "XPR"],               "group":[1,1,1,1,1], "General":[10]},
+				{"name":"FBX", "title":"FBX", "ext":["FBX"],                                                            "group":[1,0,1,0,0], "General":[0,9]},
+				{"name":"GLTF", "title":"GL Transmission Format", "ext":["GLTF", "GLB"],                                "group":[1,0,1,1,0], "General":[0,9,10]},
+				{"name":"Ideas", "title":"I-deas", "ext":["MF1", "ARC", "UNV", "PKG"],                                  "group":[1,1,1,1,0], "General":[9,10]},
+				{"name":"IFC", "title":"IFC", "ext":["IFC", "IFCZIP"],                                                  "group":[1,1,1,0,0], "General":[0,9,10]},
+				{"name":"IGES", "title":"IGES", "ext":["IGS", "IGES"],                                                  "group":[1,1,1,0,0], "General":[9,10]},
+				{"name":"JT", "title":"JT", "ext":["JT"],                                                               "group":[1,1,1,1,1], "General":[9,10]},
+				{"name":"NX", "title":"NX Unigraphics", "ext":["PRT"],                                                  "group":[1,1,1,1,1], "General":[10]},
+				{"name":"Parasolid", "title":"Parasolid", "ext":["X_B", "X_T", "XMT", "XMT_TXT"],                       "group":[1,1,1,0,0], "General":[9,10]},
+				{"name":"PDF", "title":"PDF", "ext":["PDF"],                                                            "group":[1,1,1,1,0], "General":[9,10]},
+				{"name":"PRC", "title":"PRC", "ext":["PRC"],                                                            "group":[1,1,1,1,0], "General":[9,10]},
+				{"name":"Revit", "title":"Revit", "ext":["RVT", "RFA"],                                                 "group":[1,0,1,0,0], "General":[9,10]},
+				{"name":"Rhino3D", "title":"Rhino3D", "ext":["3DM"],                                                    "group":[1,1,1,0,0], "General":[0,9,10]},
+				{"name":"SolidEdge", "title":"Solid Edge", "ext":["ASM", "PAR", "PWD", "PSM"],                          "group":[1,1,1,0,0], "General":[9,10]},
+				{"name":"SolidWorks", "title":"SolidWorks", "ext":["SLDASM", "SLDPRT"],                                 "group":[1,1,1,1,1], "General":[10]},
+				{"name":"STEP", "title":"STEP", "ext":["STP", "STEP", "STPZ", "STPX", "STPXZ"],                         "group":[1,1,1,1,0], "General":[9,10]},
+				{"name":"STL", "title":"Stereo Lithography", "ext":["STL"],                                             "group":[1,0,1,1,0], "General":[0,9]},
+				{"name":"U3D", "title":"U3D", "ext":["U3D"],                                                            "group":[1,0,1,1,0], "General":[0,9]},
+				{"name":"VDA", "title":"VDA-FS", "ext":["VDA"],                                                         "group":[1,1,1,0,0], "General":[0,9,10]},
+				{"name":"VRML", "title":"VRML", "ext":["WRL", "VRML"],                                                  "group":[1,0,1,1,0], "General":[0,9]},
+				{"name":"OBJ", "title":"Wavefront OBJ", "ext":["OBJ"],                                                  "group":[1,0,1,1,0], "General":[9,10]},
+				{"name":"dummy", "visible":false}
 			]}
 		],
-		"__DEFAULT__":[
+		"common":[
 			{"type":"group", "name":"General", "title":"General|일반", "items":[
 				{"type":"drop", "name":"ReadingMode", "title":"Reading Mode|__#__", "desc":"__#__|__#__", "value":0, "items":[
-					"Feature Trees|__#__",
-					"B-Rep|__#__",
+					"BRep & Tessellation|__#__",
 					"Tessellation Only|__#__"
 				]},
-				{"type":"check", "name":"Solids", "title":"Solid|__#__", "desc":"Allows reading of solid parts.|__#__"},
-				{"type":"check", "name":"Surfaces", "title":"Surfaces|__#__", "desc":"Allows reading of surfaces entities.|__#__"},
+				{"type":"check", "name":"Solids", "title":"Solid|__#__", "desc":"__#__|__#__"},
+				{"type":"check", "name":"Surfaces", "title":"Surfaces|__#__", "desc":"__#__|__#__"},
 				{"type":"check", "name":"Wireframes", "title":"Wireframes|__#__", "desc":"__#__|__#__"},
 				{"type":"check", "name":"Attributes", "title":"Attributes|__#__", "desc":"__#__|__#__"},
 				{"type":"check", "name":"HiddenObjects", "title":"Hidden Objects|__#__", "desc":"__#__|__#__"},
 				{"type":"check", "name":"References", "title":"Construction and References|__#__", "desc":"__#__|__#__"},
 				{"type":"check", "name":"ActiveFilter", "title":"Active Filter|__#__", "desc":"__#__|__#__"},
-				{"type":"check", "name":"SewModel", "title":"Sew Model|__#__", "desc":"__#__|__#__"},
-				{"type":"edit", "name":"SewingTolerance", "title":"Sewing Tolerance|__#__", "desc":"__#__|__#__", "value":"0.001"},
-				{"type":"check", "name":"ShellOrientation", "title":"Compute Non-Solid Shell Orientation|__#__", "desc":"__#__|__#__"},
+				{"type":"group", "name":"SewModel", "title":"Sew Model|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+					{"type":"edit", "name":"SewingTolerance", "title":"Sewing Tolerance|__#__", "desc":"__#__|__#__", "value":"0.001"},
+					{"type":"check", "name":"ShellOrientation", "title":"Compute Non-Solid Shell Orientation|__#__", "desc":"__#__|__#__"}
+				]},
 				{"type":"drop", "name":"LoadingMode", "title":"Loading Mode|__#__", "desc":"__#__|__#__", "value":0, "items":[
 					"Complete|__#__",
 					"Incremental|__#__"
+				]},
+				{"type":"drop", "name":"GeneralUnits", "title":"Units|__#__", "desc":"__#__|__#__", "value":0, "items":[
+					"Unknown|__#__",
+					"Point(pt)|__#__",
+					"Inch(in)|__#__",
+					"Millimeter(mm)|__#__",
+					"Centimeter(cm)|__#__",
+					"Picas(pica)|__#__",
+					"Foot(ft)|__#__",
+					"Yard(yd)|__#__",
+					"Meter(m)|__#__",
+					"Kilometer(km)|__#__",
+					"Mile(mi)|__#__"
+				]},
+				{"type":"check", "name":"TrueColorMode", "title":"True Color Mode|__#__", "desc":"__#__|__#__"},
+				{"type":"group", "name":"LargeTansformation", "title":"Extract Large Transformation|", "hasCheck":true, "items":[
+					{"type":"edit", "name":"Cutoff", "title":"Cutoff Value|__#__", "desc":"__#__|__#__", "value":"12000"}
 				]}
 			]},
 			{"type":"group", "name":"Tessellation", "title":"Tessellation", "items":[
@@ -175,24 +163,99 @@
 					"Extra High|__#__",
 					"Custom|__#__"
 				]},
-				{"type":"group", "name":"CustomTessLevel", "title":"Custom Tessellation Level", "items":[
-					{"type":"drop", "name":"ChordLimitType", "title":"Chord Limit|__#__", "desc":"__#__|__#__", "value":1, "items":[
+				{"type":"group", "name":"CustomTessLevel", "title":"Custom Tessellation Level", "enable":false, "items":[
+					{"type":"drop", "name":"ChordLimitType", "title":"Chord Limit|__#__", "desc":"__#__|__#__", "value":0, "items":[
 						"Ratio|__#__",
 						"Height|__#__"
 					]},
-					{"type":"edit", "name":"ChordLimit", "title":"Limit|__#__", "desc":"__#__|__#__", "value":10000},
-					{"type":"edit", "name":"AngleTolerance", "title":"Angle Tolerance|__#__", "desc":"__#__|__#__", "value":40}
+					{"type":"slider", "name":"ChordLimit", "title":"Limit|__#__", "desc":"__#__|__#__", "min":50, "max":10000, "value":2000},
+					{"type":"slider", "name":"AngleTolerance", "title":"Angle Tolerance|__#__", "desc":"__#__|__#__", "min":10, "max":40, "value":40}
 				]},
 				{"type":"check", "name":"PreserveUV", "title":"Preserve UV Points|__#__", "desc":"__#__|__#__"},
 				{"type":"edit", "name":"MaxEdgeLength", "title":"Maximum Edge Length|__#__", "desc":"__#__|__#__", "value":"0"},
-				{"type":"group", "name":"Accurate", "title":"Accurate Tessellation|__#__", "items":[
-					{"type":"check", "name":"AccurateTess", "title":"Accurate Tessellation|__#__", "desc":"__#__|__#__"},
-					{"type":"check", "name":"GridAlignedTess", "title":"Grid Aligned Tessellation|__#__", "desc":"__#__|__#__"},
-					{"type":"edit", "name":"MaxStitchLength", "title":"Maximum Stitch Length|__#__", "value":"0.001", "desc":"__#__|__#__"},
-					{"type":"check", "name":"SurfaceCurvatures", "title":"Adapt to Surface Curvatures|__#__", "desc":"__#__|__#__"}
+				{"type":"group", "name":"AccurateTess", "title":"Accurate Tessellation|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+					{"type":"group", "name":"GridAlignedTess", "title":"Grid Aligned Tessellation|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+						{"type":"edit", "name":"MaxStitchLength", "title":"Maximum Stitch Length|__#__", "desc":"__#__|__#__", "value":"0.001"},
+						{"type":"check", "name":"SurfaceCurvatures", "title":"Adapt to Surface Curvatures|__#__", "desc":"__#__|__#__"}
+					]}
 				]}
+			]},
+			{"type":"group", "name":"Search", "title":"Search|__#__", "items":[
+				{"type":"folder", "name":"Folders", "title":"Folders|__#__", "desc":"Select search folders for assemblies and textures|__#__"},
+				{"type":"check", "name":"RecursiveSearch", "title":"Recursive Search|__#__", "desc":"__#__|__#__"},
+				{"type":"edit", "name":"SearchMaxEdgeLength", "title":"Maximum Edge Length|__#__", "desc":"__#__|__#__", "value":"0"}
+			]},
+			{"type":"group", "name":"PMI", "title":"PMI|__#__", "hasCheck":true, "items":[
+				{"type":"check", "name":"AutomaticOrientation", "title":"Automatic Orientation|__#__", "desc":"__#__|__#__"},
+				{"type":"drop", "name":"PMIUnits", "title":"Units|__#__", "desc":"__#__|__#__", "value":0, "items":[
+					"Unknown|__#__",
+					"Point(pt)|__#__",
+					"Inch(in)|__#__",
+					"Millimeter(mm)|__#__",
+					"Centimeter(cm)|__#__",
+					"Picas(pica)|__#__",
+					"Foot(ft)|__#__",
+					"Yard(yd)|__#__",
+					"Meter(m)|__#__",
+					"Kilometer(km)|__#__",
+					"Mile(mi)|__#__"
+				]},
+				{"type":"color", "name":"PMIColor", "title":"Color|__#__", "desc":"__#__|__#__", "value":"0x000000"},
+				{"type":"check", "name":"SubstituteFont", "title":"Always Substitute Font|__#__", "desc":"__#__|__#__"},
+				{"type":"font", "name":"PMIFont", "title":"Substitution Font|__#__", "desc":"__#__|__#__", "value":"Myraid Pro"}
 			]}
-		]
+		],
+		"special":{
+			"ACAD":{"type":"group", "items":[
+				{"type":"check", "name":"AsDrawing", "title":"Import as 2D Drawing|__#__", "desc":"__#__|__#__"}
+			]},
+			"Inventor":{"type":"group", "items":[
+				{"type":"check", "name":"EmbededTess", "title":"Use Embeded Tessellation|__#__", "desc":"__#__|__#__"}
+			]},
+			"CATIA5":{"type":"group", "items":[
+				{"type":"group", "name":"DiskCache", "title":"Use Disk Cache|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+					{"type":"folder", "name":"CacheLocation", "title":"Cache Location|__#__", "desc":"__#__|__#__"}
+				]},
+				{"type":"check", "name":"MaterialRendering", "title":"Use Material Rendering|__#__", "desc":"__#__|__#__"}
+			]},
+			"ProE":{"type":"group", "items":[
+				{"type":"group", "name":"Display", "title":"Display|__#__", "items":[
+					{"type":"check", "name":"DimensionTolerance", "title":"Dimension Tolerance|__#__", "desc":"__#__|__#__"},
+					{"type":"check", "name":"MissingBoolean", "title":"Missing Boolean Components|__#__", "desc":"__#__|__#__"},
+					{"type":"check", "name":"MissingFlexible", "title":"Missing Flexible Components|__#__", "desc":"__#__|__#__"}
+				]},
+				{"type":"group", "name":"Import", "title":"Import|__#__", "items":[
+					{"type":"check", "name":"SubPartPMI", "title":"Sub-Part PMI|__#__", "desc":"__#__|__#__"},
+					{"type":"check", "name":"Datum", "title":"Datum|__#__", "desc":"__#__|__#__"},
+					{"type":"check", "name":"Skeletons", "title":"Skeletons|__#__", "desc":"__#__|__#__"},
+					{"type":"check", "name":"Construction", "title":"Construction Geometry|__#__", "desc":"__#__|__#__"}
+				]},
+				{"type":"drop", "name":"FamilyTable", "title":"Family Table Settings|__#__", "desc":"__#__|__#__", "value":2, "items":[
+					"User XPR/XAS File Only|__#__",
+					"if XPR/XAS is not Available, Use Available Tessellation|__#__",
+					"if Neither is Available, Use Generic Representation|__#__"
+				]},
+				{"type":"edit", "name":"CodePageName", "title":"Code Page Name|__#__", "desc":"__#__|__#__"},
+				{"type":"drop", "name":"SessionColor", "title":"Session Color|__#__", "desc":"__#__|__#__", "value":0, "items":[
+					"Exchange Default|__#__",
+					"Last Creo Version|__#__",
+					"PMI Color|__#__"
+				]}
+			]},
+			"JT":{"type":"group", "items":[
+				{"type":"drop", "name":"LevelOfDetail", "title":"Level of Detail|__#__", "desc":"__#__|__#__", "value":2, "items":[
+					"Low|__#__",
+					"Medium|__#__",
+					"High|__#__"
+				]}
+			]},
+			"NX":{"type":"group", "items":[
+				{"type":"check", "name":"RecomputeCameras", "title":"Re-Compute Cameras for Views|__#__", "desc":"__#__|__#__"}
+			]},
+			"SolidWorks":{"type":"group", "items":[
+				{"type":"check", "name":"VisibleDatum", "title":"Display Visible Datum|__#__", "desc":"__#__|__#__"}
+			]}
+		}
 	},
 
 	"ObjectSnaps":{
@@ -260,6 +323,14 @@
 			"SilhouetteEdges":{"checked":true, "Tolerance":1, "HeavyExterior":true},
 			"Bloom":{"checked":true, "Strength":1, "Blurring":5, "Shape":0}
 		}
+	},
+	"Test":{
+		"header":{"title":"Test coordinate input|__#__", "size":{"cx":350, "cy":570}},
+		"properties":{"type":"root", "items":[
+			{"type":"coord", "name":"1stPoint", "title":"Dimension Line 1 Point|__#__", "desc":"__#__|__#__", "format":3, "digit":4, "value":["1.0", "2.0", "3.0"]},
+			{"type":"coord", "name":"2ndPoint", "title":"Dimension Line 2 Point|__#__", "desc":"__#__|__#__", "format":3, "digit":4, "value":["4.0", "5.0", "6.0"]},
+			{"type":"coord", "name":"3rdPoint", "title":"Text Point|__#__", "desc":"__#__|__#__", "format":3, "digit":4, "value":["7.0", "8.0", "9.0"]}
+		]}
 	}
 }
 

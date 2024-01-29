@@ -8,14 +8,21 @@
 
 namespace Control
 {
-	class CheckListBox;
-	class CoordEdit;
-	class HistoryBar;
-	class PropList;
-	class TabWnd;
-	class ToolBar;
-	class TreeCtrlEx;
-	class TreePropList;
+	// Other
+	class CheckListBox;		// CBCGPCheckListBox
+	class TabWnd;			// CBCGPTabWnd
+	// Panel
+	class Panel;			// CWnd
+	class TaskPanel;		// CWnd
+	// Property
+	// namespace Property	// Control.Property.h
+	class PropList;			// CBCGPPropList
+	// ToolBar
+	class HistoryBar;		// Control::ToolBar
+	class ToolBar;			// CWnd
+	// Tree
+	class TreeCtrlEx;		// CBCGPTreeCtrlEx
+	class TreePropList;		// CWnd
 
 
 
@@ -88,6 +95,8 @@ namespace Control
 
 
 	CSize Setup(CBCGPButton& control, Json::Object& data, CWnd* pParent = nullptr);
+
+	CRect Setup(CBCGPEdit& control, Json::Object& data, EPivot ePivot, CRect rect, CWnd* pParent = nullptr);
 
 	CRect Setup(CBCGPStatic& control, Json::Object& data, EPivot ePivot, CRect rect, CWnd* pParent = nullptr);
 

@@ -1,7 +1,8 @@
 ﻿#include "stdafx.h"
 #include "Facility.CommandIndexer.h"
-
 #include "Command.VisualEffects3d.h"
+//:TEST
+#include "Command.Test.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -17,6 +18,8 @@ Facility::CommandIndexer::CommandInfo theDummy;
 Facility::ActiveCommand TheActiveCommand;
 
 Command::VisualEffects3d theVisualEffects3d;
+//:TEST
+Command::Test9 theTestCommand9;
 
 
 
@@ -67,6 +70,8 @@ void Facility::CommandIndexer::Initialize()
 #undef ITEM_DEF
 
 	Get(HOME_3D_LST_VisualEffects).Function = &theVisualEffects3d;
+	//:TEST
+	Get(CUSTOM_3D_CMD_KEN_Test9).Function = &theTestCommand9;
 }
 
 

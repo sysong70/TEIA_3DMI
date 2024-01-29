@@ -102,12 +102,15 @@ void Connector3d::ReceiveSignal(const wchar_t* content)
 	Signal::Target target = (Signal::Target)data.GetInteger(SKW_TARGET, -1);
 
 	switch (target) {
+	case Signal::Target::Application:
 	case Signal::Target::MainFrame:
 	case Signal::Target::StatusBar:
 	case Signal::Target::View:
 	case Signal::Target::ModelPanel:
 	case Signal::Target::Progress:
 	case Signal::Target::TaskBar:
+	case Signal::Target::Command:
+	case Signal::Target::DebugTracer:
 		TheApplication.GetMainFrame().SendMessage((UINT)Window::EUserMessage::OnSignal, (WPARAM)pData);
 		break;
 

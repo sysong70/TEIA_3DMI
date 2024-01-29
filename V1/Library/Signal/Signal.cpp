@@ -6,7 +6,7 @@ Json::Object data; \
 ConstructData(data, action); \
 Wrapper().SendData(data);
 
-
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Application Class
 
@@ -54,6 +54,61 @@ void Signal::Application::OnUpdateFileOption(Json::Object& value)
 
 
 
+void Signal::Application::AddTraceLog(CString log)
+{
+	Json::Object data;
+
+	data.SetInteger(SKW_TARGET, (int)Target::DebugTracer);
+	data.SetInteger(SKW_ACTION, (int)Action::AddTraceLog);
+	data.SetString(SKW_VALUE, log);
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::Application::AddTraceLogV(const wchar_t* pFormat, ...)
+{
+	CString stream;
+	va_list argList;
+
+	va_start(argList, pFormat);
+	stream.FormatV(pFormat, argList);
+	va_end(argList);
+
+	AddTraceLog(stream);
+}
+
+
+
+void Signal::Application::ClearTraceLog()
+{
+	Json::Object data;
+
+	data.SetInteger(SKW_TARGET, (int)Target::DebugTracer);
+	data.SetInteger(SKW_ACTION, (int)Action::ClearTraceLog);
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::Application::SaveTraceLog(const wchar_t* pPath, bool saveAndClear)
+{
+	Json::Object data;
+
+	data.SetInteger(SKW_TARGET, (int)Target::DebugTracer);
+	data.SetInteger(SKW_ACTION, (int)Action::SaveTraceLog);
+	if (pPath != nullptr) {
+		data.SetString(SKW_VALUE, pPath);
+	}
+	data.SetBoolean(SKW_CLEAR, saveAndClear);
+
+	Wrapper().SendData(data);
+}
+
+
+
 void Signal::Application::OnDpiAware(double scale)
 {
 	Json::Object data;
@@ -65,6 +120,8 @@ void Signal::Application::OnDpiAware(double scale)
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region MainFrame Class
 
@@ -96,6 +153,8 @@ void Signal::MainFrame::HideProgress()
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region StatusBar Class
 
@@ -145,6 +204,8 @@ void Signal::StatusBar::ShowCoordinate(double x, double y, double z)
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Progress Class
 
@@ -226,6 +287,64 @@ void Signal::Progress::ClearLog()
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
+
+#pragma region Command Class
+
+void Signal::Command::ConstructData(Json::Object& data, Action action)
+{
+	data.SetInteger(SKW_TARGET, (int)Target::Command);
+	data.SetInteger(SKW_ACTION, (int)action);
+}
+
+
+
+void Signal::Command::OnRequestPreference()
+{
+	SendActionDataOnly(Action::OnRequestPreference);
+}
+
+
+
+void Signal::Command::OnRequestFileOption()
+{
+	SendActionDataOnly(Action::OnRequestFileOption);
+}
+
+
+
+void Signal::Command::ResponsePreference(Json::Object& value, Json::Object& defaultValue)
+{
+	Json::Object data;
+	ConstructData(data, Action::ResponsePreference);
+
+	//:WARNING - Window.MainFrame
+	data.SetInteger(SKW_VIEWID, -1);
+	data.SetObject(SKW_VALUE, new Json::Object(value));
+	data.SetObject(SKW_DEFAULTVALUE, new Json::Object(defaultValue));
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::Command::ResponseFileOption(Json::Object& value, Json::Object& defaultValue)
+{
+	Json::Object data;
+	ConstructData(data, Action::ResponseFileOption);
+
+	//:WARNING - Window.MainFrame
+	data.SetInteger(SKW_VIEWID, -1);
+	data.SetObject(SKW_VALUE, new Json::Object(value));
+	data.SetObject(SKW_DEFAULTVALUE, new Json::Object(defaultValue));
+
+	Wrapper().SendData(data);
+}
+
+#pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region View Class
 
@@ -506,6 +625,8 @@ void Signal::View::SetInputMode(EInputMode mode)
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region ModelPanel
 
 void Signal::ModelPanel::ConstructData(Json::Object& data, Action action)
@@ -588,6 +709,8 @@ void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items)
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region TaskBar Class
 
 void Signal::TaskBar::ConstructData(Json::Object& data, Action action)
@@ -638,6 +761,8 @@ void Signal::TaskBar::ResponseValue(UINT commandId, Json::Object& value, Json::O
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region Delivery Class
 
 Signal::Delivery::Delivery()
@@ -651,6 +776,7 @@ Signal::Delivery::Delivery()
 	SetWrapper(view);
 	SetWrapper(modelPanel);
 	SetWrapper(taskBar);
+	SetWrapper(command);
 
 #undef SetWrapper
 }
@@ -684,3 +810,4 @@ void Signal::Delivery::SendData(Json::Object& data)
 #pragma endregion //:REGION
 
 #undef SendActionDataOnly
+

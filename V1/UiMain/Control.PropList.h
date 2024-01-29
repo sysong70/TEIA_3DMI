@@ -44,6 +44,8 @@ namespace Control
 		CString GetItemNamePath(CBCGPProp* pItem);
 
 		void SetPropData(CBCGPProp* pProp, Json::Value* pValue);
+
+		void SetPropEnable(CBCGPProp* pProp, Json::Object& design);
 		//:WARNING - do not use Name, use XMLTagName
 		void SetPropName(CBCGPProp* pProp, Json::Object& design);
 
@@ -75,6 +77,8 @@ namespace Control
 
 		CBCGPProp* CreateColorProp(Json::Object& design, UINT id = 0);
 
+		CBCGPProp* CreateCoordProp(Json::Object& design, UINT id = 0);
+
 		CBCGPProp* CreateDropdownProp(Json::Object& design, UINT id = 0);
 
 		CBCGPProp* CreateEditProp(Json::Object& design, UINT id = 0);
@@ -82,6 +86,10 @@ namespace Control
 		CBCGPProp* CreateFileProp(Json::Object& design, UINT id = 0);
 
 		CBCGPProp* CreateFolderProp(Json::Object& design, UINT id = 0);
+
+		CBCGPProp* CreateFoldersProp(Json::Object& design, UINT id = 0);
+
+		CBCGPProp* CreateFontProp(Json::Object& design, UINT id = 0);
 
 		CBCGPProp* CreateSliderProp(Json::Object& design, UINT id = 0);
 

@@ -24,7 +24,27 @@ CSize Control::Setup(CBCGPButton& control, Json::Object& data, CWnd* pParent)
 	control.m_bVisualManagerStyle = TRUE;
 	control.SizeToContent();
 
-	return Control::AdjustSize(&control, globalUtils.ScaleByDPI(defaultSize));
+	return AdjustSize(&control, globalUtils.ScaleByDPI(defaultSize));
+}
+
+
+
+CRect Control::Setup(CBCGPEdit& control, Json::Object& data, EPivot ePivot, CRect rect, CWnd* pParent)
+{
+	//:TODO - check style
+	DEBUG_STOP;
+
+	const DWORD dwStyle = WS_CHILD | WS_VISIBLE;
+
+	if (control.GetSafeHwnd() == nullptr) {
+		if (control.Create(dwStyle, {}, pParent, Facility::GetId(data)) == FALSE) {
+			RETURN({});
+		}
+	}
+
+	control.m_bVisualManagerStyle = TRUE;
+
+	return AdjustLayout(&control, rect, CSize(rect.Width(), 0), ePivot);
 }
 
 

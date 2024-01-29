@@ -1,13 +1,5 @@
 ﻿#include "stdafx.h"
 #include "Command.VisualEffects3d.h"
-#include "Command.Resource.h"
-#include "Component.TaskBar.h"
-#include "Control.TaskPanel.h"
-#include "Facility.AppResources.h"
-#include "Facility.CommandIndexer.h"
-#include "Window.Application.h"
-#include "Window.MainFrame.h"
-#include "Signal.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -38,20 +30,22 @@ class VisualEffects3dPanel : public Control::TaskPanel
 public:
 
 	VisualEffects3dPanel(Json::Object* pUiData)
-		: TaskPanel(PRESET::CommandId, pUiData)
-	{}
+		: TaskPanel(PRESET::CommandId, pUiData) {}
 
-~VisualEffects3dPanel() override
-{}
 
-void SetData(Json::Object& data) override
-{
-	__super::SetData(data);
 
-	m_bInitialized = false;
-	m_propList.InitializeData(m_data);
-	m_bInitialized = true;
-}
+	~VisualEffects3dPanel() override {}
+
+
+
+	void SetData(Json::Object& data) override
+	{
+		__super::SetData(data);
+
+		m_bInitialized = false;
+		m_propList.InitializeData(m_data);
+		m_bInitialized = true;
+	}
 
 protected:
 
@@ -63,6 +57,8 @@ protected:
 
 		m_propList.InitializeDesign(GetUiData().GetAt("properties"));
 	}
+
+
 
 	void ConstructHeader() override
 	{
@@ -77,6 +73,9 @@ protected:
 		m_toolBar.AddButton(HOME_3D_CMD_ViewStyle_Tessellated);
 
 		m_toolBar.SetCheck(TheActiveCommand.Home.VisualEffects3d, true);
+
+		//m_toolBar.GetButton(HOME_3D_CMD_ViewStyle_Wireframe)->EnableWindow(FALSE);
+		//m_toolBar.GetButton(HOME_3D_CMD_ViewStyle_Tessellated)->EnableWindow(FALSE);
 	}
 
 protected:
@@ -88,6 +87,8 @@ protected:
 
 		Component::TaskBar* taskBar = (Component::TaskBar*)GetParent();
 		taskBar->GetDelivery().view.OnCommand(id);
+
+		m_propList.SetCurSel(NULL);
 
 		if (id == HOME_3D_CMD_ViewStyle_HiddenLineRemove) {
 			m_propList.Show(L"Shadow", false);
@@ -110,6 +111,8 @@ protected:
 			m_propList.EnableWindow(TRUE);
 		}
 	}
+
+
 
 	afx_msg void OnSize(UINT nType, int cx, int cy)
 	{
@@ -134,6 +137,8 @@ protected:
 
 		m_propList.SetWindowPos(NULL, propTop.x, propTop.y, propSize.cx, propSize.cy, SWP_NOACTIVATE);
 	}
+
+
 
 	DECLARE_MESSAGE_MAP();
 };

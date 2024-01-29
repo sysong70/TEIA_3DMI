@@ -32,7 +32,6 @@ bool Command::Base::ReceiveSignal(Json::Object* pData)
 
 void Command::Base::Run(Window::View* pView)
 {
-	DEBUG_VALID(pView);
 	m_pView = pView;
 }
 

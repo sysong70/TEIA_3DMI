@@ -138,7 +138,12 @@ LRESULT Control::TreePropList::OnPropertyChanged(WPARAM wp, LPARAM lp)
 	Json::Value* pValue = reinterpret_cast<Json::Value*>(pProp->GetData());
 
 	if (m_propList.m_bInitialized && pValue != nullptr) {
-		Facility::SetValue(*pValue, *pProp);
+		if (m_onPropertyChangedHandler != nullptr) {
+			m_onPropertyChangedHandler->SendMessage(BCGM_PROPERTY_CHANGED, (WPARAM)pValue, (LPARAM)pProp);
+		}
+		else {
+			Facility::SetValue(*pValue, *pProp);
+		}
 		m_bModified = true;
 	}
 
@@ -164,9 +169,17 @@ void Control::TreePropList::ChangePropList(HTREEITEM pItem)
 	Json::Object* pData = Json::Helper::FindObjectByPath(*m_pData, path);
 
 	if (pDesign != nullptr) {
-		DEBUG_VALID(pData);
 		m_propList.InitializeDesign(*pDesign);
-		m_propList.InitializeData(*pData);
+
+		if (pData != nullptr) {
+			m_propList.InitializeData(*pData);
+		}
+		else {
+			DEBUG_STOP;
+		}
+	}
+	else {
+		DEBUG_STOP;
 	}
 }
 

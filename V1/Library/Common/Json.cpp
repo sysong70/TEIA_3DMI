@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
 #include "Json.h"
+#include "Dir.h"
 #include "Fio.h"
+#include "Path.h"
 #include "WStr.h"
 
 #ifdef _DEBUG
@@ -99,6 +101,13 @@ Json::Array::Array(const Array& other)
 
 
 
+Json::Array::~Array()
+{
+	Clean();
+}
+
+
+
 Json::Array& Json::Array::operator =(const Array& other)
 {
 	Clean();
@@ -155,11 +164,18 @@ bool Json::Array::Compare(Array& other)
 	return true;
 }
 
+//--------------------------------------------------------------------------------------------------
 
-
-Json::Array::~Array()
+int Json::Array::GetSize()
 {
-	Clean();
+	return (int)m_buffer.size();
+}
+
+
+
+std::vector<Json::Value*>& Json::Array::GetBuffer()
+{
+	return m_buffer;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -178,18 +194,70 @@ Json::Value* Json::Array::operator [](int i)
 	return GetAt(i);
 }
 
+//--------------------------------------------------------------------------------------------------
 
-
-int Json::Array::GetSize()
+Json::Array& Json::Array::GetArray(int i)
 {
-	return (int)m_buffer.size();
+	Json::Value* pValue = GetAt(i);
+	DEBUG_VALID(pValue);
+	ASSERT(pValue->IsArray());
+
+	return pValue->AsArray();
 }
 
 
 
-std::vector<Json::Value*>& Json::Array::GetBuffer()
+bool Json::Array::GetBoolean(int i)
 {
-	return m_buffer;
+	Json::Value* pValue = GetAt(i);
+	DEBUG_VALID(pValue);
+	ASSERT(pValue->IsBoolean());
+
+	return pValue->AsBoolean();
+}
+
+
+
+int Json::Array::GetInteger(int i)
+{
+	Json::Value* pValue = GetAt(i);
+	DEBUG_VALID(pValue);
+	ASSERT(pValue->IsInteger());
+
+	return pValue->AsInteger();
+}
+
+
+
+Json::Object& Json::Array::GetObject(int i)
+{
+	Json::Value* pValue = GetAt(i);
+	DEBUG_VALID(pValue);
+	ASSERT(pValue->IsObject());
+
+	return pValue->AsObject();
+}
+
+
+
+double Json::Array::GetReal(int i)
+{
+	Json::Value* pValue = GetAt(i);
+	DEBUG_VALID(pValue);
+	ASSERT(pValue->IsReal());
+
+	return pValue->AsReal();
+}
+
+
+
+CString& Json::Array::GetString(int i)
+{
+	Json::Value* pValue = GetAt(i);
+	DEBUG_VALID(pValue);
+	ASSERT(pValue->IsString());
+
+	return pValue->AsString();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -313,7 +381,6 @@ void Json::Array::Serialize(CString& buffer, int indent)
 			buffer += L",\n";
 		}
 	}
-
 
 	buffer.TrimRight(L",\n");
 	buffer += L'\n';
@@ -1447,10 +1514,7 @@ void Json::Object::Stringify(CString& buffer)
 
 	for (auto* pPair : m_members) {
 		if (pPair->pValue) {
-			//buffer += L"\"" + WStr::ToUtf16(pPair->Name.GetBuffer()) + L"\":";
-			buffer += L"\"";
-			buffer += WStr::ToUtf16(pPair->Name.GetBuffer());
-			buffer += L"\":";
+			buffer += L"\"" + WStr::ToUtf16(pPair->Name.GetBuffer()) + L"\":";
 			pPair->pValue->Stringify(buffer);
 		}
 		else {
@@ -1653,6 +1717,7 @@ bool Json::Reader::ReadString(wchar_t*& pStream, CString& value)
 
 	int nCount = pEnd - pStream - 1;
 	::wcsncpy(value.GetBufferSetLength(nCount), pStream + 1, nCount);
+	value.ReleaseBuffer();
 
 	//:CHECK
 	value.Replace(L"\\\"", L"\"");
@@ -1816,6 +1881,10 @@ bool Json::Helper::Read(CString path, Object& object)
 
 bool Json::Helper::Write(CString path, Object& object, bool bSerialize /*= true*/)
 {
+	// make path first
+	CString dir = Path::GetDirectory(path.GetBuffer());
+	Dir::Create(dir.GetBuffer());
+
 	Fio::TextFile file;
 
 	if (file.Open(path.GetBuffer(), Fio::EMode::Write, Fio::EEncoding::UTF16LE) == false) {
@@ -2069,7 +2138,6 @@ CString Json::Helper::ToString(COLORREF value)
 
 bool Json::Helper::GetCoordinate(Value* pSource, float* pTarget)
 {
-
 	if (pSource == nullptr || pTarget == nullptr) {
 		RETURN_FALSE;
 	}
@@ -2116,6 +2184,8 @@ bool Json::Helper::GetCoordinate(Value* pSource, float* pTarget)
 
 	return true;
 }
+
+
 
 Json::Value* Json::Helper::GetCoordinate(float* pSource, bool useArray, bool is3d)
 {

@@ -6,17 +6,18 @@
 
 namespace Component
 {
+	// MainFrame
+	class PanelBar;		// CBCGPDockingControlBar
+	class RibbonBar;	// CBCGPRibbonBar
+	class StatusBar;	// CBCGPRibbonStatusBar
+	class TaskBar;		// CWnd
+	// Panel
+	class LayerPanel;	// Control::Panel
+	class ModelPanel;	// Control::Panel
+	class ScenePanel;	// Control::Panel
+	class ViewPanel;	// Control::Panel
+	// View
 	class Input;
-	class InputBar;
-	class LayerPanel;
-	class ModelPanel;
-	class PanelBar;
-	class RibbonBar;
-	class ScenePanel;
-	class StatusBar;
-	class TaskBar;
-	class TaskPanel;
-	class ViewPanel;
 
 
 

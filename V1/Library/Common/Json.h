@@ -54,13 +54,31 @@ namespace Json
 
 	public:
 
+		int GetSize();
+
+		std::vector<Value*>& GetBuffer();
+
+	public:
+
 		Value* GetAt(int i);
 
 		Value* operator [](int i);
 
-		int GetSize();
+	public: //:WARNING - no type check
 
-		std::vector<Value*>& GetBuffer();
+		Array& GetArray(int i);
+
+		bool GetBoolean(int i);
+
+		int GetInteger(int i);
+
+		Object& GetObject(int i);
+
+		double GetReal(int i);
+
+		CString& GetString(int i);
+
+	public:
 
 		void AddBoolean(bool value);
 
@@ -292,7 +310,7 @@ namespace Json
 		// return new string
 		CString& CreateString(CStringA name);
 
-	public: // use only when certain or FindValue()
+	public: // get child value, use only when certain or FindValue()
 
 		// use when uncertain
 		Value* FindValue(CStringA name);
@@ -305,7 +323,7 @@ namespace Json
 
 		Value& GetValue(CStringA name);
 
-	public: // get single value. direct access
+	public: // get child single value. direct access
 
 		bool GetBoolean(CStringA name, bool defaultValue = false);
 

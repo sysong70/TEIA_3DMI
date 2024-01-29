@@ -6,6 +6,10 @@
 
 
 
+using OnPropertyChangedFunc = void (CWnd::*)(Json::Value& target, CBCGPProp& source);
+
+
+
 namespace Control
 {
 	class TreePropList : public CWnd
@@ -16,6 +20,16 @@ namespace Control
 
 		~TreePropList() override;
 
+		TreeCtrlEx& GetTree() {
+			return m_tree;
+		}
+
+		PropList& GetPropList() {
+			return m_propList;
+		}
+
+	public:
+
 		bool Initialize(CWnd* pParentWnd, UINT id = WM_USER, const RECT& rect = {});
 
 		void InitializeDesign(Json::Object& design);
@@ -23,6 +37,10 @@ namespace Control
 		void InitializeData(Json::Object& data);
 
 		void RefreshData();
+
+		void OnPropertyChangedHandler(CWnd* pTarget) {
+			m_onPropertyChangedHandler = pTarget;
+		}
 
 	protected:
 
@@ -40,6 +58,8 @@ namespace Control
 
 		TreeCtrlEx m_tree;
 		PropList m_propList;
+
+		CWnd* m_onPropertyChangedHandler = nullptr;
 
 		bool m_bModified = false;
 		Json::Object* m_pDesign = nullptr;

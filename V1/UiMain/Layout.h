@@ -6,9 +6,9 @@
 
 namespace Layout
 {
-	class Base;
-	class ControlWrapper;
-	class Stack;
+	class Base;				// CWnd
+	class ControlWrapper;	// Layout::Base
+	class Stack;			// Layout::Base
 
 
 
