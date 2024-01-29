@@ -179,9 +179,10 @@
     <ClInclude Include="Command.Base.h" />
     <ClInclude Include="Command.Common.h" />
     <ClInclude Include="Command.h" />
+    <ClInclude Include="Command.Test.h" />
     <ClInclude Include="Command.VisualEffects3d.h" />
     <ClInclude Include="Component.Input.h" />
-    <ClInclude Include="Control.CoordEdit.h" />
+    <ClInclude Include="Control.FloatValueEdit.h" />
     <ClInclude Include="Control.TaskPanel.h" />
     <ClInclude Include="Control.CheckListBox.h" />
     <ClInclude Include="Control.Property.h" />
@@ -193,6 +194,7 @@
     <ClInclude Include="Component.TaskBar.h" />
     <ClInclude Include="Control.ToolBar.h" />
     <ClInclude Include="Dialog.AppOptions.h" />
+    <ClInclude Include="Dialog.DebugTracer.h" />
     <ClInclude Include="Dialog.ObjectSnaps.h" />
     <ClInclude Include="Facility.Base.h" />
     <ClInclude Include="Facility.CommandIndexer.h" />
@@ -215,7 +217,7 @@
     <ClInclude Include="Dialog.h" />
     <ClInclude Include="Dialog.ProgressLog.h" />
     <ClInclude Include="Dialog.Standard.h" />
-    <ClInclude Include="Component.InputBar.h" />
+    <ClInclude Include="Component.CoordEdit.h" />
     <ClInclude Include="Layout.Base.h" />
     <ClInclude Include="Layout.h" />
     <ClInclude Include="Layout.ControlWrapper.h" />
@@ -242,9 +244,10 @@
     <ClCompile Include="..\Library\Common\WStr.cpp" />
     <ClCompile Include="..\Library\Signal\Signal.cpp" />
     <ClCompile Include="Command.Base.cpp" />
+    <ClCompile Include="Command.Test.cpp" />
     <ClCompile Include="Command.VisualEffects3d.cpp" />
     <ClCompile Include="Component.Input.cpp" />
-    <ClCompile Include="Control.CoordEdit.cpp" />
+    <ClCompile Include="Control.FloatValueEdit.cpp" />
     <ClCompile Include="Control.TaskPanel.cpp" />
     <ClCompile Include="Control.CheckListBox.cpp" />
     <ClCompile Include="Control.cpp" />
@@ -257,6 +260,7 @@
     <ClCompile Include="Control.ToolBar.cpp" />
     <ClCompile Include="Dialog.AppOptions.cpp" />
     <ClCompile Include="Dialog.cpp" />
+    <ClCompile Include="Dialog.DebugTracer.cpp" />
     <ClCompile Include="Dialog.ObjectSnaps.cpp" />
     <ClCompile Include="Facility.Base.cpp" />
     <ClCompile Include="Facility.CommandIndexer.cpp" />
@@ -277,7 +281,7 @@
     <ClCompile Include="Dialog.Base.cpp" />
     <ClCompile Include="Dialog.ProgressLog.cpp" />
     <ClCompile Include="Dialog.Standard.cpp" />
-    <ClCompile Include="Component.InputBar.cpp" />
+    <ClCompile Include="Component.CoordEdit.cpp" />
     <ClCompile Include="Layout.Base.cpp" />
     <ClCompile Include="Layout.cpp" />
     <ClCompile Include="Layout.ControlWrapper.cpp" />

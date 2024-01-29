@@ -138,6 +138,11 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 			// nViewId를 넣는 이유는 Instnace에서 Signal을 보낼때 식별자로서 ViewId를 보내기 위해서 값을 넣어주는 것임.
 			// 실제로는 하나의 Instance를 사용하는 것임.
 			pcSession->ViewInitialize(cInObject, Connector::GetInstance(nViewId));
+			//:Ken - TEST
+			Connector::GetInstance(-1).application.AddTraceLogV(L"View initialized %d", nViewId);
+			Connector::GetInstance(-1).application.AddTraceLog(L"next message");
+			//Connector::GetInstance(-1).application.SaveTraceLog(nullptr);
+			Connector::GetInstance(-1).application.SaveTraceLog(L"c:\\temp\\test.log", false);
 			break;
 
 		case Signal::View::Action::OnConstruct:

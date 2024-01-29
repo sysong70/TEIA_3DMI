@@ -9,9 +9,8 @@
 #define SKW_CHAR			"Char"
 #define SKW_CHECKED			"checked" // lower case
 #define SKW_CHILDREN		"Children"
+#define SKW_CLEAR			"Clear"
 #define SKW_COLUMN			"Column"
-#define SKW_DATA			"Data"
-#define SKW_DEFAULTDATA		"Default"
 #define SKW_DEFAULTVALUE	"Default"
 #define SKW_Delivery		"Delivery"
 #define SKW_DELTA			"Delta"
@@ -139,13 +138,6 @@ public:
 
 namespace Signal
 {
-	class Application;
-	class MainFrame;
-	class Progress;
-	class View;
-	class ModelPanel;
-	class TaskBar;
-
 	enum class Target
 	{
 		Unknown = -1,
@@ -162,6 +154,8 @@ namespace Signal
 		TaskBar,
 
 		Progress,
+		Command,
+		DebugTracer, //:TEMP
 	};
 
 
@@ -181,6 +175,10 @@ namespace Signal
 			OnDpiAware,
 			OnUpdatePreference,
 			OnUpdateFileOption,
+
+			AddTraceLog,
+			ClearTraceLog,
+			SaveTraceLog,
 		};
 
 		DEFINE_WRAPPER;
@@ -198,6 +196,17 @@ namespace Signal
 		void OnUpdatePreference(Json::Object& value);
 
 		void OnUpdateFileOption(Json::Object& value);
+
+	public:
+
+		// Single log
+		void AddTraceLog(CString log);
+		// formatted log (like TRACE)
+		void AddTraceLogV(const wchar_t* pFormat, ...);
+
+		void ClearTraceLog();
+		// pPath or NULL(show file dialog)
+		void SaveTraceLog(const wchar_t* pPath, bool saveAndClear = true);
 	};
 
 
@@ -223,7 +232,7 @@ namespace Signal
 
 	public:
 
-		//:TODO - message box
+		//:TODO
 		void ShowNotice();
 
 		void ShowProgress();
@@ -328,6 +337,42 @@ namespace Signal
 		void SetLogStatus(Status status);
 
 		void ClearLog();
+	};
+
+
+
+	class Command
+	{
+	public:
+
+		CHILD_CONSTRUCTOR(Command);
+
+		enum class Action
+		{
+			Unknown = -1,
+
+			OnRequestPreference,
+			OnRequestFileOption,
+
+			ResponsePreference,
+			ResponseFileOption,
+		};
+
+		DEFINE_WRAPPER;
+
+		void ConstructData(Json::Object& data, Action action);
+
+	public:
+
+		void OnRequestPreference();
+
+		void OnRequestFileOption();
+
+	public:
+
+		void ResponsePreference(Json::Object& value, Json::Object& defaultValue);
+
+		void ResponseFileOption(Json::Object& value, Json::Object& defaultValue);
 	};
 
 
@@ -518,6 +563,8 @@ namespace Signal
 
 		void OnChangedValue(UINT coomandId, Json::Object& value);
 
+	public:
+
 		void ResponseValue(UINT commandId, Json::Object& value, Json::Object& defaultValue);
 		//:TODO
 		void UpdateValue(UINT commandId, Json::Array& values);
@@ -553,6 +600,7 @@ namespace Signal
 		View view;
 		ModelPanel modelPanel;
 		TaskBar taskBar;
+		Command command;
 
 		void (*SendSignal)(const wchar_t*) = nullptr;
 

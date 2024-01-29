@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Facility.AppResources.cpp">
-      <Filter>Facility</Filter>
-    </ClCompile>
     <ClCompile Include="Dialog.Base.cpp">
       <Filter>Dialog</Filter>
     </ClCompile>
@@ -11,49 +8,31 @@
       <Filter>Dialog</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Json.cpp">
-      <Filter>_Common</Filter>
+      <Filter>Main\Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\WStr.cpp">
-      <Filter>_Common</Filter>
+      <Filter>Main\Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Path.cpp">
-      <Filter>_Common</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.Application.cpp">
-      <Filter>Window</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.ChildFrame.cpp">
-      <Filter>Window</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.Document.cpp">
-      <Filter>Window</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.MainFrame.cpp">
-      <Filter>Window</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.View.cpp">
-      <Filter>Window</Filter>
+      <Filter>Main\Common</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
-      <Filter>_Main</Filter>
+      <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Common_Define.cpp">
-      <Filter>_Common</Filter>
+      <Filter>Main\Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Fio.cpp">
-      <Filter>_Common</Filter>
+      <Filter>Main\Common</Filter>
     </ClCompile>
     <ClCompile Include="Connector.cpp">
-      <Filter>Connector</Filter>
+      <Filter>Signal\Connector</Filter>
     </ClCompile>
     <ClCompile Include="Window.cpp">
       <Filter>Window</Filter>
     </ClCompile>
-    <ClCompile Include="Dialog.ProgressLog.cpp">
-      <Filter>Dialog</Filter>
-    </ClCompile>
     <ClCompile Include="..\Library\Signal\Signal.cpp">
-      <Filter>_Signal</Filter>
+      <Filter>Signal</Filter>
     </ClCompile>
     <ClCompile Include="Component.LayerPanel.cpp">
       <Filter>Component\Panel</Filter>
@@ -77,61 +56,40 @@
       <Filter>Facility</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Dir.cpp">
-      <Filter>_Common</Filter>
+      <Filter>Main\Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\File.cpp">
-      <Filter>_Common</Filter>
-    </ClCompile>
-    <ClCompile Include="Dialog.AppOptions.cpp">
-      <Filter>Dialog</Filter>
+      <Filter>Main\Common</Filter>
     </ClCompile>
     <ClCompile Include="Dialog.cpp">
       <Filter>Dialog</Filter>
-    </ClCompile>
-    <ClCompile Include="Dialog.ObjectSnaps.cpp">
-      <Filter>Dialog</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.View3d.cpp">
-      <Filter>Window</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.View2d.cpp">
-      <Filter>Window</Filter>
-    </ClCompile>
-    <ClCompile Include="Control.TabWnd.cpp">
-      <Filter>Control</Filter>
-    </ClCompile>
-    <ClCompile Include="Control.CheckListBox.cpp">
-      <Filter>Control</Filter>
     </ClCompile>
     <ClCompile Include="Control.cpp">
       <Filter>Control</Filter>
     </ClCompile>
     <ClCompile Include="Component.RibbonBar.cpp">
-      <Filter>Component\Main Frame</Filter>
+      <Filter>Component\MainFrame</Filter>
     </ClCompile>
     <ClCompile Include="Component.StatusBar.cpp">
-      <Filter>Component\Main Frame</Filter>
+      <Filter>Component\MainFrame</Filter>
     </ClCompile>
     <ClCompile Include="Component.TaskBar.cpp">
-      <Filter>Component\Main Frame</Filter>
-    </ClCompile>
-    <ClCompile Include="Control.PropList.cpp">
-      <Filter>Control\Tree And Property</Filter>
+      <Filter>Component\MainFrame</Filter>
     </ClCompile>
     <ClCompile Include="Control.TreeCtrlEx.cpp">
-      <Filter>Control\Tree And Property</Filter>
+      <Filter>Control\Tree</Filter>
     </ClCompile>
     <ClCompile Include="Control.TreePropList.cpp">
-      <Filter>Control\Tree And Property</Filter>
+      <Filter>Control\Tree</Filter>
     </ClCompile>
     <ClCompile Include="Control.ToolBar.cpp">
-      <Filter>Control\Tool Bar</Filter>
+      <Filter>Control\ToolBar</Filter>
     </ClCompile>
     <ClCompile Include="Control.HistoryBar.cpp">
-      <Filter>Control\Tool Bar</Filter>
+      <Filter>Control\ToolBar</Filter>
     </ClCompile>
     <ClCompile Include="Component.PanelBar.cpp">
-      <Filter>Component\Main Frame</Filter>
+      <Filter>Component\MainFrame</Filter>
     </ClCompile>
     <ClCompile Include="Layout.ControlWrapper.cpp">
       <Filter>Layout</Filter>
@@ -145,23 +103,11 @@
     <ClCompile Include="Layout.Stack.cpp">
       <Filter>Layout</Filter>
     </ClCompile>
-    <ClCompile Include="Component.InputBar.cpp">
-      <Filter>Component\View</Filter>
-    </ClCompile>
     <ClCompile Include="Facility.Base.cpp">
       <Filter>Facility</Filter>
     </ClCompile>
-    <ClCompile Include="Facility.AppOptions.cpp">
-      <Filter>Facility</Filter>
-    </ClCompile>
-    <ClCompile Include="Control.Property.cpp">
-      <Filter>Control\Tree And Property</Filter>
-    </ClCompile>
     <ClCompile Include="Component.Input.cpp">
       <Filter>Component\View</Filter>
-    </ClCompile>
-    <ClCompile Include="Command.VisualEffects3d.cpp">
-      <Filter>Command</Filter>
     </ClCompile>
     <ClCompile Include="Command.Base.cpp">
       <Filter>Command</Filter>
@@ -172,8 +118,68 @@
     <ClCompile Include="Control.TaskPanel.cpp">
       <Filter>Control\Panel</Filter>
     </ClCompile>
-    <ClCompile Include="Control.CoordEdit.cpp">
-      <Filter>Control</Filter>
+    <ClCompile Include="Control.FloatValueEdit.cpp">
+      <Filter>Working</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.CoordEdit.cpp">
+      <Filter>Working</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.Test.cpp">
+      <Filter>Working</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.AppOptions.cpp">
+      <Filter>Dialog\Modal</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.ObjectSnaps.cpp">
+      <Filter>Dialog\Modaless</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.ProgressLog.cpp">
+      <Filter>Dialog\Modaless</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.Application.cpp">
+      <Filter>Window\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.ChildFrame.cpp">
+      <Filter>Window\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.MainFrame.cpp">
+      <Filter>Window\Main</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.Document.cpp">
+      <Filter>Window\View</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.View.cpp">
+      <Filter>Window\View</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.View2d.cpp">
+      <Filter>Window\View</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.View3d.cpp">
+      <Filter>Window\View</Filter>
+    </ClCompile>
+    <ClCompile Include="Facility.AppOptions.cpp">
+      <Filter>Facility\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Facility.AppResources.cpp">
+      <Filter>Facility\Data</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.Property.cpp">
+      <Filter>Control\Property</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.PropList.cpp">
+      <Filter>Control\Property</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.VisualEffects3d.cpp">
+      <Filter>Command\3D</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.CheckListBox.cpp">
+      <Filter>Control\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.TabWnd.cpp">
+      <Filter>Control\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="Dialog.DebugTracer.cpp">
+      <Filter>Dialog\Modaless</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -182,9 +188,6 @@
     </ClInclude>
     <ClInclude Include="Component.h">
       <Filter>Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Facility.AppResources.h">
-      <Filter>Facility</Filter>
     </ClInclude>
     <ClInclude Include="Facility.h">
       <Filter>Facility</Filter>
@@ -199,58 +202,40 @@
       <Filter>Dialog</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Json.h">
-      <Filter>_Common</Filter>
+      <Filter>Main\Common</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>_Resource</Filter>
+      <Filter>Main\Resource</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\WStr.h">
-      <Filter>_Common</Filter>
+      <Filter>Main\Common</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>_Resource</Filter>
+      <Filter>Main\Resource</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Path.h">
-      <Filter>_Common</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.Application.h">
-      <Filter>Window</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.ChildFrame.h">
-      <Filter>Window</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.Document.h">
-      <Filter>Window</Filter>
+      <Filter>Main\Common</Filter>
     </ClInclude>
     <ClInclude Include="Window.h">
       <Filter>Window</Filter>
     </ClInclude>
-    <ClInclude Include="Window.MainFrame.h">
-      <Filter>Window</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.View.h">
-      <Filter>Window</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
-      <Filter>_Main</Filter>
+      <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Common_Define.h">
-      <Filter>_Common</Filter>
+      <Filter>Main\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Fio.h">
-      <Filter>_Common</Filter>
+      <Filter>Main\Common</Filter>
     </ClInclude>
     <ClInclude Include="Connector.h">
-      <Filter>Connector</Filter>
+      <Filter>Signal\Connector</Filter>
     </ClInclude>
     <ClInclude Include="Command.Resource.h">
       <Filter>Facility\Command</Filter>
     </ClInclude>
-    <ClInclude Include="Dialog.ProgressLog.h">
-      <Filter>Dialog</Filter>
-    </ClInclude>
     <ClInclude Include="..\Library\Signal\Signal.h">
-      <Filter>_Signal</Filter>
+      <Filter>Signal</Filter>
     </ClInclude>
     <ClInclude Include="Component.LayerPanel.h">
       <Filter>Component\Panel</Filter>
@@ -268,58 +253,37 @@
       <Filter>Facility\Command</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Dir.h">
-      <Filter>_Common</Filter>
+      <Filter>Main\Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\File.h">
-      <Filter>_Common</Filter>
-    </ClInclude>
-    <ClInclude Include="Dialog.AppOptions.h">
-      <Filter>Dialog</Filter>
-    </ClInclude>
-    <ClInclude Include="Dialog.ObjectSnaps.h">
-      <Filter>Dialog</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.View2d.h">
-      <Filter>Window</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.View3d.h">
-      <Filter>Window</Filter>
+      <Filter>Main\Common</Filter>
     </ClInclude>
     <ClInclude Include="Control.h">
       <Filter>Control</Filter>
     </ClInclude>
-    <ClInclude Include="Control.TabWnd.h">
-      <Filter>Control</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.CheckListBox.h">
-      <Filter>Control</Filter>
-    </ClInclude>
     <ClInclude Include="Component.RibbonBar.h">
-      <Filter>Component\Main Frame</Filter>
+      <Filter>Component\MainFrame</Filter>
     </ClInclude>
     <ClInclude Include="Component.StatusBar.h">
-      <Filter>Component\Main Frame</Filter>
+      <Filter>Component\MainFrame</Filter>
     </ClInclude>
     <ClInclude Include="Component.TaskBar.h">
-      <Filter>Component\Main Frame</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.PropList.h">
-      <Filter>Control\Tree And Property</Filter>
+      <Filter>Component\MainFrame</Filter>
     </ClInclude>
     <ClInclude Include="Control.TreeCtrlEx.h">
-      <Filter>Control\Tree And Property</Filter>
+      <Filter>Control\Tree</Filter>
     </ClInclude>
     <ClInclude Include="Control.TreePropList.h">
-      <Filter>Control\Tree And Property</Filter>
+      <Filter>Control\Tree</Filter>
     </ClInclude>
     <ClInclude Include="Control.ToolBar.h">
-      <Filter>Control\Tool Bar</Filter>
+      <Filter>Control\ToolBar</Filter>
     </ClInclude>
     <ClInclude Include="Control.HistoryBar.h">
-      <Filter>Control\Tool Bar</Filter>
+      <Filter>Control\ToolBar</Filter>
     </ClInclude>
     <ClInclude Include="Component.PanelBar.h">
-      <Filter>Component\Main Frame</Filter>
+      <Filter>Component\MainFrame</Filter>
     </ClInclude>
     <ClInclude Include="Layout.Base.h">
       <Filter>Layout</Filter>
@@ -333,23 +297,11 @@
     <ClInclude Include="Layout.Stack.h">
       <Filter>Layout</Filter>
     </ClInclude>
-    <ClInclude Include="Component.InputBar.h">
-      <Filter>Component\View</Filter>
-    </ClInclude>
     <ClInclude Include="Facility.Base.h">
       <Filter>Facility</Filter>
     </ClInclude>
-    <ClInclude Include="Facility.AppOptions.h">
-      <Filter>Facility</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.Property.h">
-      <Filter>Control\Tree And Property</Filter>
-    </ClInclude>
     <ClInclude Include="Component.Input.h">
       <Filter>Component\View</Filter>
-    </ClInclude>
-    <ClInclude Include="Command.VisualEffects3d.h">
-      <Filter>Command</Filter>
     </ClInclude>
     <ClInclude Include="Command.h">
       <Filter>Command</Filter>
@@ -363,41 +315,101 @@
     <ClInclude Include="Control.TaskPanel.h">
       <Filter>Control\Panel</Filter>
     </ClInclude>
-    <ClInclude Include="Control.CoordEdit.h">
-      <Filter>Control</Filter>
+    <ClInclude Include="Control.FloatValueEdit.h">
+      <Filter>Working</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.CoordEdit.h">
+      <Filter>Working</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.Test.h">
+      <Filter>Working</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.AppOptions.h">
+      <Filter>Dialog\Modal</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.ObjectSnaps.h">
+      <Filter>Dialog\Modaless</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.ProgressLog.h">
+      <Filter>Dialog\Modaless</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.Application.h">
+      <Filter>Window\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.ChildFrame.h">
+      <Filter>Window\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.MainFrame.h">
+      <Filter>Window\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.Document.h">
+      <Filter>Window\View</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.View.h">
+      <Filter>Window\View</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.View2d.h">
+      <Filter>Window\View</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.View3d.h">
+      <Filter>Window\View</Filter>
+    </ClInclude>
+    <ClInclude Include="Facility.AppOptions.h">
+      <Filter>Facility\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Facility.AppResources.h">
+      <Filter>Facility\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.Property.h">
+      <Filter>Control\Property</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.PropList.h">
+      <Filter>Control\Property</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.VisualEffects3d.h">
+      <Filter>Command\3D</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.CheckListBox.h">
+      <Filter>Control\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.TabWnd.h">
+      <Filter>Control\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.DebugTracer.h">
+      <Filter>Dialog\Modaless</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="TODO.xml">
-      <Filter>_Resource</Filter>
+      <Filter>Main\Resource</Filter>
     </Xml>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\DMI.ico">
-      <Filter>_Resource</Filter>
+      <Filter>Main\Resource</Filter>
     </Image>
     <Image Include="res\DMIDoc.ico">
-      <Filter>_Resource</Filter>
+      <Filter>Main\Resource</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="RES\UI.json">
-      <Filter>_Resource</Filter>
+      <Filter>Main\Resource</Filter>
     </None>
     <None Include="RES\DMI_ENU.rc2">
-      <Filter>_Resource</Filter>
+      <Filter>Main\Resource</Filter>
     </None>
     <None Include="RES\DMI_KOR.rc2">
-      <Filter>_Resource</Filter>
+      <Filter>Main\Resource</Filter>
     </None>
     <None Include="RES\DMI.rc2">
-      <Filter>_Resource</Filter>
+      <Filter>Main\Resource</Filter>
     </None>
     <None Include="RES\Data.Preferences.json">
-      <Filter>_Resource</Filter>
+      <Filter>Main\Resource</Filter>
     </None>
     <None Include="RES\Data.FileOptions.json">
-      <Filter>_Resource</Filter>
+      <Filter>Main\Resource</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -410,12 +422,6 @@
     <Filter Include="Window">
       <UniqueIdentifier>{de91bf0f-f3ed-49a6-8ff6-11682b4caf5f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Connector">
-      <UniqueIdentifier>{548c7e7f-a4c4-46f5-87a3-25aed4147b06}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="_Signal">
-      <UniqueIdentifier>{3fa6ca85-306e-4855-8675-3bbd31f1539e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Facility">
       <UniqueIdentifier>{c01d14a0-5142-4118-a49b-dd83bfce121e}</UniqueIdentifier>
     </Filter>
@@ -425,29 +431,11 @@
     <Filter Include="Control">
       <UniqueIdentifier>{54e5b7f9-b1c6-4146-9960-ef402a5e0520}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Component\Main Frame">
-      <UniqueIdentifier>{8cff23ec-11e5-4f51-a933-7b8a2f2d9fac}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Control\Tree And Property">
-      <UniqueIdentifier>{3d17d7b6-2a80-4d06-a5c9-0cdaf14dc8bd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Control\Tool Bar">
-      <UniqueIdentifier>{cbf0972b-db82-4dd9-a406-974efbc9634b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="_Common">
-      <UniqueIdentifier>{fb2d04f0-eb3c-414a-af01-e993443a5070}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Component\Panel">
       <UniqueIdentifier>{17e426a6-77e8-4a55-a4e4-86e17ed068a0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Layout">
       <UniqueIdentifier>{dcd9ed46-81ef-4f39-81e3-b0e41b745e1c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="_Main">
-      <UniqueIdentifier>{5626235d-04b2-48ff-aa6a-b189a3f69c04}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="_Resource">
-      <UniqueIdentifier>{c42b87a4-4dc7-4b9a-9df2-192721ac7010}</UniqueIdentifier>
     </Filter>
     <Filter Include="Component\View">
       <UniqueIdentifier>{02e349aa-e87e-4b99-9609-75debd2ed290}</UniqueIdentifier>
@@ -458,10 +446,61 @@
     <Filter Include="Control\Panel">
       <UniqueIdentifier>{e7a6640c-e4cd-4f57-92f9-29435cfaf150}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{5626235d-04b2-48ff-aa6a-b189a3f69c04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\Common">
+      <UniqueIdentifier>{fb2d04f0-eb3c-414a-af01-e993443a5070}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\Resource">
+      <UniqueIdentifier>{c42b87a4-4dc7-4b9a-9df2-192721ac7010}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Signal">
+      <UniqueIdentifier>{3fa6ca85-306e-4855-8675-3bbd31f1539e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Signal\Connector">
+      <UniqueIdentifier>{548c7e7f-a4c4-46f5-87a3-25aed4147b06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialog\Modal">
+      <UniqueIdentifier>{2483c7ef-ee9e-4014-8f82-5d92b3adf1aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Dialog\Modaless">
+      <UniqueIdentifier>{bb1b9bb5-fe6d-47d6-b000-4797969f627f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Window\Main">
+      <UniqueIdentifier>{cd438507-f617-4e11-ab29-920a1019947b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Window\View">
+      <UniqueIdentifier>{4de0644d-3076-4abf-9df7-de3ab8d4112d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Facility\Data">
+      <UniqueIdentifier>{38aede9a-7346-4dcd-8dd3-ec0fb85b2074}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Control\Tree">
+      <UniqueIdentifier>{3d17d7b6-2a80-4d06-a5c9-0cdaf14dc8bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Control\Property">
+      <UniqueIdentifier>{d5f01667-5334-4a2b-aedb-ddd6355ad409}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Control\ToolBar">
+      <UniqueIdentifier>{cbf0972b-db82-4dd9-a406-974efbc9634b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\MainFrame">
+      <UniqueIdentifier>{8cff23ec-11e5-4f51-a933-7b8a2f2d9fac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Command\3D">
+      <UniqueIdentifier>{3dbe6d30-500a-4462-addc-2a0d0d2957ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Control\Other">
+      <UniqueIdentifier>{1cbd6f4d-9366-4e60-89b9-bbab87803bde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Working">
+      <UniqueIdentifier>{4d7c4082-24b8-4594-a68a-7b5f780f85b0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DMI.rc">
-      <Filter>_Resource</Filter>
+      <Filter>Main\Resource</Filter>
     </ResourceCompile>
   </ItemGroup>
 </Project>

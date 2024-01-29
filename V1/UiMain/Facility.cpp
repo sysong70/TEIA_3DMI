@@ -293,17 +293,31 @@ Json::Object& Facility::SetData(Json::Object& target, UINT id, const CString& ti
 	return target;
 }
 
-
+#include <WStr.h>
 
 void Facility::SetValue(Json::Value& target, CBCGPProp& source)
 {
 	if (source.GetOptionCount() > 0) {
 		target.SetInteger(source.GetSelectedOption());
 	}
+	else if (source.IsGroupWithCheckBox()) {
+		ASSERT(target.GetType() == Json::EValueType::Object);
+		target.AsObject().SetBoolean("checked", (bool)source.IsGroupChecked());
+	}
 	else if (dynamic_cast<CBCGPColorProp*>(&source) != nullptr) {
 		//:WARNING - not GetValue()
 		COLORREF color = ((CBCGPColorProp*)&source)->GetColor();
 		target.SetString(Json::Helper::ToString(color));
+	}
+	else if (dynamic_cast<CBCGPFileProp*>(&source) != nullptr) {
+		CString value = source.GetValue();
+		value.Replace(L"\\", L"/");
+		target.SetString(value);
+	}
+	else if (dynamic_cast<CBCGPFontProp*>(&source) != nullptr) {
+		CString value = source.GetValue();
+		WStr::RemoveFrom(value, L'(');
+		target.SetString(value);
 	}
 	else {
 		switch (target.GetType()) {
@@ -328,6 +342,11 @@ void Facility::SetValue(CBCGPProp& target, Json::Value& source)
 		COLORREF color = Json::Helper::ToColor(source.ToString());
 		//:WARNING - not SetValue()
 		((CBCGPColorProp*)&target)->SetColor(color);
+	}
+	else if (dynamic_cast<CBCGPFileProp*>(&target) != nullptr) {
+		CString value = source.ToString();
+		value.Replace(L"/", L"\\");
+		target.SetValue((LPCTSTR)value);
 	}
 	else {
 		switch (source.GetType()) {

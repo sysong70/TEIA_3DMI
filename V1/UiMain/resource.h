@@ -29,6 +29,7 @@
 #define IDD_DMI_DROPDOWN        10012
 #define IDD_DMI_FORMVIEW        10013
 #define IDD_DMI_PROGRESS_LOG	10014
+#define IDD_DMI_DEBUG_TRACER	10015
 // Special controls
 #define IDC_INNERFRAME          10100
 #define IDC_DMI_SIZE_CHECKER    10101

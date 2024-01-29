@@ -123,6 +123,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\Common_Define.h" />
+    <ClInclude Include="..\Common\Dir.h" />
+    <ClInclude Include="..\Common\File.h" />
     <ClInclude Include="..\Common\Fio.h" />
     <ClInclude Include="..\Common\Json.h" />
     <ClInclude Include="..\Common\LogManager.h" />
@@ -212,6 +214,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\Common_Define.cpp" />
+    <ClCompile Include="..\Common\Dir.cpp" />
+    <ClCompile Include="..\Common\File.cpp" />
     <ClCompile Include="..\Common\Fio.cpp" />
     <ClCompile Include="..\Common\Json.cpp" />
     <ClCompile Include="..\Common\LogManager.cpp" />

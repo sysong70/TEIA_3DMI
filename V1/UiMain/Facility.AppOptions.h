@@ -6,6 +6,8 @@
 
 namespace Facility
 {
+	// AppOtions data of Local/Default
+
 	class AppOptions
 	{
 	public:

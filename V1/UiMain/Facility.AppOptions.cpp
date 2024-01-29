@@ -75,6 +75,7 @@ bool Facility::AppOptions::Load()
 	else {
 		m_preferences = TheAppResources.GetPreferences();
 	}
+	ASSERT(m_preferences.GetReal("version") == TheAppResources.GetPreferences().GetReal("version"));
 
 	if (File::IsExist((LPCTSTR)FileOptionsPath)) {
 		m_fileOptions.Clean();
@@ -85,6 +86,7 @@ bool Facility::AppOptions::Load()
 	else {
 		m_fileOptions = TheAppResources.GetFileOptions();
 	}
+	ASSERT(m_fileOptions.GetReal("version") == TheAppResources.GetFileOptions().GetReal("version"));
 
 	return true;
 }
@@ -93,6 +95,12 @@ bool Facility::AppOptions::Load()
 
 bool Facility::AppOptions::Save()
 {
+#ifdef _DEBUG
+	bool serialize = true;
+#else
+	bool serialize = false;
+#endif
+
 	if (Json::Helper::Write(m_sFolderPath + PRESET::PreferencesName, m_preferences) == false) {
 		RETURN_FALSE;
 	}

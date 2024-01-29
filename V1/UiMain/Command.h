@@ -5,5 +5,6 @@
 namespace Command
 {
 	class Base;
-	class VisualEffects3d;
+	// 3D
+	class VisualEffects3d; // Base
 }

@@ -40,15 +40,13 @@ namespace Dialog
 
 		void ConstructFooter(const CRect& boundary) override;
 
-	private:
-
-		void CreateTabs();
-
 	private: // Body controls
 
 		Control::TabWnd m_tabs;
 		Control::TreePropList m_preferencesUi;
 		Control::TreePropList m_fileOptionsUi;
+
+		afx_msg LRESULT OnChangedFileOption(WPARAM wp, LPARAM lp);
 
 	private: // Footer controls
 

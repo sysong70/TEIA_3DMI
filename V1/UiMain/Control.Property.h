@@ -83,6 +83,23 @@ namespace Property
 
 
 
+	class Coordinate : public CBCGPProp
+	{
+	public:
+
+		Coordinate(const CString& name, UINT id, const CString& value, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL);
+
+	protected:
+
+		CWnd* CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultFormat) override;
+
+		BOOL HasButton() const override;
+
+		void OnClickButton(CPoint point) override;
+	};
+
+
+
 	class ComboButton : public CBCGPProp
 	{
 	public:

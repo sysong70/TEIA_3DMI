@@ -192,7 +192,60 @@ void Property::Color::OnCloseCombo()
 	__super::OnCloseCombo();
 }
 
-#pragma endregion: //:REGION
+#pragma endregion //:REGION
+
+#pragma region Coordinate
+
+#include "Component.CoordEdit.h"
+
+Property::Coordinate::Coordinate(const CString& name, UINT id, const CString& value, LPCTSTR lpDescr, DWORD_PTR data)
+	: CBCGPProp(name, id, (LPCTSTR)value, lpDescr)
+{
+}
+
+
+
+CWnd* Property::Coordinate::CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultFormat)
+{
+	DEBUG_VALID(this);
+	DEBUG_VALID(m_pWndList);
+
+	Component::CoordEdit* pControl = new Component::CoordEdit;
+	DEBUG_VALID(pControl);
+
+	//:CHECK
+	rectEdit.top -= globalUtils.ScaleByDPI(4);
+	rectEdit.left -= globalUtils.ScaleByDPI(4);
+
+	const DWORD dwStyle = WS_CHILD | WS_VISIBLE;
+	if (pControl->Create(NULL, L"", dwStyle, rectEdit, m_pWndList, BCGPROPLIST_ID_INPLACE) == FALSE) {
+		REMOVE_POINTER(pControl);
+		RETURN_FALSE;
+	}
+
+	//pControl->SetFont(GetFont());
+	pControl->SetValue((CString)m_varValue);
+	pControl->EnableWindow(m_bEnabled);
+
+	bDefaultFormat = FALSE;
+
+	return pControl;
+}
+
+
+
+BOOL Property::Coordinate::HasButton() const
+{
+	return FALSE;
+}
+
+
+
+void Property::Coordinate::OnClickButton(CPoint point)
+{
+}
+
+#pragma endregion //:REGION
 
 #pragma region ComboButton Class
 
@@ -562,29 +615,30 @@ void Property::Duration::AdjustInPlaceEditRect(CRect& rectEdit, CRect& rectSpin)
 
 CWnd* Property::Duration::CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultFormat)
 {
+	DEBUG_VALID(this);
 	DEBUG_VALID(m_pWndList);
 
-	DurationCtrl* pDuration = new DurationCtrl;
-	DEBUG_VALID(pDuration);
+	DurationCtrl* pControl = new DurationCtrl;
+	DEBUG_VALID(pControl);
 
-	pDuration->EnableVisualManagerStyle();
-	pDuration->SetAutoResize(FALSE);
-	pDuration->SetBackgroundColor(m_pWndList->GetBkColor(), FALSE);
-	pDuration->SetTextColor(m_bEnabled ? m_pWndList->GetTextColor() : globalData.clrGrayedText, FALSE);
+	pControl->EnableVisualManagerStyle();
+	pControl->SetAutoResize(FALSE);
+	pControl->SetBackgroundColor(m_pWndList->GetBkColor(), FALSE);
+	pControl->SetTextColor(m_bEnabled ? m_pWndList->GetTextColor() : globalData.clrGrayedText, FALSE);
 
 	CRect rectSpin;
 	AdjustInPlaceEditRect(rectEdit, rectSpin);
 	rectEdit.DeflateRect(1, 1);
 
-	pDuration->Create(_T(""), WS_CHILD | WS_VISIBLE, rectEdit, m_pWndList, BCGPROPLIST_ID_INPLACE);
-	pDuration->SetFont(GetFont());
-	pDuration->SetState(CBCGPDurationCtrl::DRTN_DAYS | CBCGPDurationCtrl::DRTN_HOURS_MINS, CBCGPDurationCtrl::DRTN_DAYS | CBCGPDurationCtrl::DRTN_HOURS_MINS);
-	pDuration->SetDuration(GetDuration());
-	pDuration->EnableWindow(m_bEnabled);
+	pControl->Create(_T(""), WS_CHILD | WS_VISIBLE, rectEdit, m_pWndList, BCGPROPLIST_ID_INPLACE);
+	pControl->SetFont(GetFont());
+	pControl->SetState(CBCGPDurationCtrl::DRTN_DAYS | CBCGPDurationCtrl::DRTN_HOURS_MINS, CBCGPDurationCtrl::DRTN_DAYS | CBCGPDurationCtrl::DRTN_HOURS_MINS);
+	pControl->SetDuration(GetDuration());
+	pControl->EnableWindow(m_bEnabled);
 
 	bDefaultFormat = FALSE;
 
-	return pDuration;
+	return pControl;
 }
 
 
@@ -703,6 +757,7 @@ BOOL Property::Duration::OnUpdateValue()
 		m_pWndInPlace->GetWindowRect(rect);
 
 		CBCGPPopupWindow* pPopup = new CBCGPPopupWindow();
+		DEBUG_VALID(pPopup);
 
 		pPopup->EnableCloseButton(FALSE);
 		pPopup->SetCloseOnOwnerChange();
@@ -864,17 +919,19 @@ CComboBox* Property::IconComboBox::CreateCombo(CWnd* pWndParent, CRect rect)
 
 	rect.bottom = rect.top + globalUtils.ScaleByDPI(HEIGHT, pWndParent);
 
-	CComboBoxEx* pCombo = new CComboBoxEx;
-	if (pCombo->Create(WS_CHILD | WS_VSCROLL | CBS_DROPDOWNLIST, rect, pWndParent, BCGPROPLIST_ID_INPLACE_COMBO) == FALSE) {
-		REMOVE_POINTER(pCombo);
+	CComboBoxEx* pControl = new CComboBoxEx;
+	DEBUG_VALID(pControl);
+
+	if (pControl->Create(WS_CHILD | WS_VSCROLL | CBS_DROPDOWNLIST, rect, pWndParent, BCGPROPLIST_ID_INPLACE_COMBO) == FALSE) {
+		REMOVE_POINTER(pControl);
 		RETURN_NULL;
 	}
 
 	if (m_imageList.GetSafeHandle() != nullptr) {
-		pCombo->SetImageList(&m_imageList);
+		pControl->SetImageList(&m_imageList);
 	}
 
-	return pCombo;
+	return pControl;
 }
 
 
@@ -949,21 +1006,25 @@ CComboBox* Property::IconList::CreateCombo(CWnd* pWndParent, CRect rect)
 
 	rect.bottom = rect.top + HEIGHT;
 
-	IconComboBoxCtrl* pCombo = new IconComboBoxCtrl(m_icons, m_iconNames);
-	DWORD dwStyle = WS_CHILD | WS_VSCROLL | CBS_NOINTEGRALHEIGHT | CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS;
+	IconComboBoxCtrl* pControl = new IconComboBoxCtrl(m_icons, m_iconNames);
+	DEBUG_VALID(pControl);
 
-	if (pCombo->Create(dwStyle, rect, pWndParent, BCGPROPLIST_ID_INPLACE_COMBO) == FALSE) {
-		REMOVE_POINTER(pCombo);
+	DWORD dwStyle = WS_CHILD | WS_VSCROLL | CBS_NOINTEGRALHEIGHT | CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS;
+	if (pControl->Create(dwStyle, rect, pWndParent, BCGPROPLIST_ID_INPLACE_COMBO) == FALSE) {
+		REMOVE_POINTER(pControl);
 		RETURN_NULL;
 	}
 
-	return pCombo;
+	return pControl;
 }
 
 
 
 CWnd* Property::IconList::CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultFormat)
 {
+	DEBUG_VALID(this);
+	DEBUG_VALID(m_pWndList);
+
 	CWnd* pWnd = __super::CreateInPlaceEdit(rectEdit, bDefaultFormat);
 	if (pWnd != nullptr) {
 		pWnd->ShowWindow(SW_HIDE);
@@ -1028,21 +1089,26 @@ Property::Password::Password(const CString& name, const CString& password, LPCTS
 
 CWnd* Property::Password::CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultFormat)
 {
+	DEBUG_VALID(this);
+	DEBUG_VALID(m_pWndList);
+
 	DWORD dwStyle = WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL | ES_PASSWORD;
 	if (!m_bEnabled || !m_bAllowEdit) {
 		dwStyle |= ES_READONLY;
 	}
 
-	CEdit* pEdit = new CEdit;
-	if (pEdit->Create(dwStyle, rectEdit, m_pWndList, BCGPROPLIST_ID_INPLACE) == FALSE) {
-		REMOVE_POINTER(pEdit);
+	CEdit* pControl = new CEdit;
+	DEBUG_VALID(pControl);
+
+	if (pControl->Create(dwStyle, rectEdit, m_pWndList, BCGPROPLIST_ID_INPLACE) == FALSE) {
+		REMOVE_POINTER(pControl);
 		RETURN_NULL;
 	}
 
-	pEdit->SetPasswordChar(DefaultChar);
+	pControl->SetPasswordChar(DefaultChar);
 	bDefaultFormat = TRUE;
 
-	return pEdit;
+	return pControl;
 }
 
 
@@ -1171,32 +1237,34 @@ void Property::Slider::SetRange(int minValue, int maxValue, int step)
 
 CWnd* Property::Slider::CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultFormat)
 {
-	ASSERT_VALID(this);
-	ASSERT_VALID(m_pWndList);
+	DEBUG_VALID(this);
+	DEBUG_VALID(m_pWndList);
 
 	CBCGPClientDC dc(m_pWndList);
 
-	CString strLabel(L"0000");
+	CString strLabel(L"000000"); //:CHECK
 	rectEdit.left += dc.GetTextExtent(strLabel).cx;
 
-	SliderCtrl* pSlider = new SliderCtrl(this, m_pWndList->GetBkColor());
-	if (pSlider->Create(WS_VISIBLE | WS_CHILD | TBS_NOTICKS, rectEdit, m_pWndList, BCGPROPLIST_ID_INPLACE) == FALSE) {
-		REMOVE_POINTER(pSlider);
+	SliderCtrl* pControl = new SliderCtrl(this, m_pWndList->GetBkColor());
+	DEBUG_VALID(pControl);
+
+	if (pControl->Create(WS_VISIBLE | WS_CHILD | TBS_NOTICKS, rectEdit, m_pWndList, BCGPROPLIST_ID_INPLACE) == FALSE) {
+		REMOVE_POINTER(pControl);
 		RETURN_NULL;
 	};
 
-	pSlider->SetRange(m_minValue, m_maxValue, TRUE);
-	pSlider->SetTicFreq(m_step);
-	pSlider->SetLineSize(m_step); // move to cursor
-	pSlider->SetPageSize(m_step); // move to PgUp/PgDn
+	pControl->SetRange(m_minValue, m_maxValue, TRUE);
+	pControl->SetTicFreq(m_step);
+	pControl->SetLineSize(m_step); // move to cursor
+	pControl->SetPageSize(m_step); // move to PgUp/PgDn
 
-	pSlider->SetPos((long)m_varValue);
-	pSlider->EnableProgressMode();
-	pSlider->EnableWindow(m_bEnabled);
+	pControl->SetPos((long)m_varValue);
+	pControl->EnableProgressMode();
+	pControl->EnableWindow(m_bEnabled);
 
 	bDefaultFormat = TRUE;
 
-	return pSlider;
+	return pControl;
 }
 
 

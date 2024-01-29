@@ -174,8 +174,12 @@ void Window::View3d::OnCommand(UINT id)
 	Facility::CommandIndexer::CommandInfo& data = TheCommandIndexer.Get(id);
 
 	if (data.Function != nullptr) {
-		m_pActiveCommand = (Command::Base*)data.Function;
-		m_pActiveCommand->Run(this);
+		Command::Base* pCommand = (Command::Base*)data.Function;
+		if (pCommand->IsRunOnlyOnce() == false) {
+			m_pActiveCommand = pCommand;
+		}
+
+		pCommand->Run(this);
 	}
 	else {
 		switch (data.Type) {

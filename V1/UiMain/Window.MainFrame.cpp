@@ -76,7 +76,7 @@ Component::TaskBar& Window::MainFrame::GetTaskBar()
 	return m_taskBar;
 }
 
-
+#include "Dialog.DebugTracer.h"
 
 void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 {
@@ -84,23 +84,24 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 	Signal::Target target = (Signal::Target)data.GetInteger(SKW_TARGET);
 
 	switch (target) {
-	case Signal::Target::ModelPanel:
-	case Signal::Target::View:
-	case Signal::Target::TaskBar:
+	case Signal::Target::DebugTracer:
 	{
-		int id = data.GetInteger(SKW_VIEWID, -1);
-		View* pView = TheApplication.FindView(id);
-		if (pView != nullptr) {
-			pView->PostMessage((int)EUserMessage::OnSignal, (WPARAM)pData);
+		Dialog::Base* pDialog = m_dialogs.Get((int)target);
+		if (pDialog == nullptr) {
+			pDialog = new Dialog::DebugTracer;
+			pDialog->Create(IDD_DMI_DEBUG_TRACER);
+			m_dialogs.Add(pDialog);
 		}
-		else {
-			DEBUG_STOP;
-		}
+
+		pDialog->ShowWindow(SW_SHOW);
+		pDialog->ReceiveSignal(pData);
+
+		REMOVE_POINTER(pData);
 	} break;
 
 	case Signal::Target::MainFrame:
 	{
-		Signal::MainFrame::Action action = (Signal::MainFrame::Action)data.GetInteger(SKW_ACTION);
+		Signal::MainFrame::Action action = (Signal::MainFrame::Action)data.GetInteger(SKW_ACTION, -1);
 		switch (action) {
 		case Signal::MainFrame::Action::ShowProgress:
 			ShowProgress(true);
@@ -122,13 +123,47 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 		m_statusBar.ReceiveSignal(pData);
 		break;
 
-	case Signal::Target::Progress:
+	case Signal::Target::View:
+	case Signal::Target::ModelPanel:
+	case Signal::Target::TaskBar:
 	{
-		if (m_pDialog != nullptr && m_pDialog->GetSignalTargetId() == target) {
-			m_pDialog->ReceiveSignal(pData);
+		int id = data.GetInteger(SKW_VIEWID, -1);
+		View* pView = TheApplication.FindView(id);
+		if (pView != nullptr) {
+			pView->PostMessage((int)EUserMessage::OnSignal, (WPARAM)pData);
 		}
 		else {
+			DEBUG_STOP;
 			REMOVE_POINTER(pData);
+		}
+	} break;
+
+	case Signal::Target::Progress:
+	{
+		if (auto pDialog = m_dialogs.Get((int)target)) {
+			pDialog->ReceiveSignal(pData);
+		}
+		else {
+			DEBUG_STOP;
+			REMOVE_POINTER(pData);
+		}
+	} break;
+
+	case Signal::Target::Command: 
+	{
+		int id = data.GetInteger(SKW_VIEWID, -1);
+		if (id == -1) {
+			//:TODO - active command
+		}
+		else {
+			View* pView = TheApplication.FindView(id);
+			if (pView != nullptr) {
+				pView->PostMessage((int)EUserMessage::OnSignal, (WPARAM)pData);
+			}
+			else {
+				DEBUG_STOP;
+				REMOVE_POINTER(pData);
+			}
 		}
 	} break;
 
@@ -151,15 +186,16 @@ void Window::MainFrame::ShowPanelBar()
 void Window::MainFrame::ShowProgress(bool bShow)
 {
 	if (bShow) {
-		DEBUG_INVALID(m_pDialog);
-		m_pDialog = new Dialog::ProgressLog(this);
-		m_pDialog->DoModaless();
+		Dialog::Base* pDialog = m_dialogs.Get((int)Signal::Target::Progress);
+		if (pDialog == nullptr) {
+			pDialog = new Dialog::ProgressLog(this);
+			m_dialogs.Add(pDialog);
+		}
+
+		pDialog->DoModaless();
 	}
 	else {
-		if (m_pDialog != nullptr) {
-			m_pDialog->DestroyWindow();
-			REMOVE_POINTER(m_pDialog);
-		}
+		m_dialogs.Remove((int)Signal::Target::Progress);
 	}
 }
 
@@ -393,18 +429,43 @@ void Window::MainFrame::OnDropFiles(HDROP hDropInfo)
 
 void Window::MainFrame::OnFileOpen()
 {
-	const DWORD SHOW_OPTION = WM_USER;
+	Json::Object& dialog = TheAppResources.GetDialog("FileOptions");
+	Json::Array& arr = dialog.GetArray("tree").GetObject(0).GetArray("items");
 
-	Json::Object& dialog = TheAppResources.GetDialog("FileOpen");
-	Json::Array& arr = dialog.GetArray("filter");
-	CString filter;
+	CString filters = L"All types (*.*)|*.*|";
+
 	for (Json::Value* pValue : arr.GetBuffer()) {
-		filter += pValue->AsString();
+		Json::Object& object = pValue->AsObject();
+		if (object.GetBoolean("visible", true) == false) {
+			continue;
+		}
+
+		// "ACIS "
+		filters += object.GetString("title") + L" ";
+		// "*.SAT, *.SAB, "
+		Json::Array& ext = object.GetArray("ext");
+		CString extensions;
+		for (Json::Value* pExt : ext.GetBuffer()) {
+			extensions += L"*." + pExt->AsString() + L", ";
+		}
+		// "(*.sat, *.sab)"
+		extensions.TrimRight(L", ");
+		// "ACIS (*.sat, *.sab)
+		filters += L"(" + extensions.MakeLower() + L")";
+		// |*.sat;*.sab|
+		extensions.Replace(L", ", L";");
+		// "ACIS (*.sat, *.sab)|*.sat;*.sab|
+		filters += L"|" + extensions + L"|";
 	}
+
+	// add end mark, "All types (*.*)|*.*|ACIS (*.sat, *.sab)|*.sat;*.sab||"
+	filters += L"|";
 
 //#define USE_OPTION_DLG
 
 #ifdef USE_OPTION_DLG
+	const DWORD SHOW_OPTION = WM_USER;
+
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY, filter, this);
 	//:WARNING
 	dlg.AddCheckButton(SHOW_OPTION, Facility::Local(L"Show import option|파일 옵션 보기"), TRUE);
@@ -426,7 +487,7 @@ void Window::MainFrame::OnFileOpen()
 		PostMessage((UINT)EUserMessage::OnNextFileOpen);
 	}
 #else
-	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT, filter, this);
+	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY | OFN_ALLOWMULTISELECT, filters, this);
 
 	if (dlg.DoModal() == IDOK) {
 		POSITION pos = dlg.GetStartPosition();

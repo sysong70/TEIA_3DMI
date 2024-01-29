@@ -28,12 +28,16 @@ namespace PresetRibbonBar
 		return pPanel;
 	}
 
-	CBCGPRibbonButton* CreateButton(int id)
+	CBCGPRibbonButton* CreateButton(int id, CString otherTitle = L"")
 	{
 		Facility::CommandIndexer::CommandInfo& item = TheCommandIndexer.Get(id);
 
 		CString title, tooltip;
 		Facility::GetResource(id, title, tooltip);
+		//:CHECK
+		if (otherTitle.IsEmpty() == false) {
+			title = otherTitle;
+		}
 
 		CBCGPRibbonButton* pButton = new CBCGPRibbonButton(id, title);
 		pButton->SetIcon(Facility::CreateIcon(id, PRESET::IconSize()), TRUE, FALSE, TRUE);
@@ -284,20 +288,30 @@ bool Component::RibbonBar::CreateCategories()
 	pPanel->Add(PRESET::CreateButton(MEASURE_3D_CMD_Settings));
 #pragma endregion //:REGION
 
-	//:TEST - remove ids in Command.Resource.h
-#pragma region Custom Category
+#pragma region Custom Category - remove ids in Command.Resource.h later
 	pCategory = AddCategory(Facility::GetTitle(CUSTOM_3D_CAT), 0, 0);
 
-	pPanel = PRESET::CreatePanel(pCategory, CUSTOM_3D_PNL_Test);
-	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test1));
-	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test2));
-	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test3));
-	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test4));
-	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test5));
-	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test6));
-	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test7));
-	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test8));
-	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_Test9));
+	pPanel = PRESET::CreatePanel(pCategory, CUSTOM_3D_PNL_SYSONG);
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_SYSONG_Test1));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_SYSONG_Test2));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_SYSONG_Test3));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_SYSONG_Test4));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_SYSONG_Test5));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_SYSONG_Test6));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_SYSONG_Test7));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_SYSONG_Test8));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_SYSONG_Test9));
+
+	pPanel = PRESET::CreatePanel(pCategory, CUSTOM_3D_PNL_KEN);
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test1));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test2));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test3));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test4));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test5));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test6));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test7));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test8));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test9, L"Coordinate"));
 #pragma endregion //:REGION
 
 	return true;

@@ -108,6 +108,15 @@
     <ClInclude Include="..\Signal\Signal.h">
       <Filter>_Signal</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\Dir.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\File.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Path.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -178,6 +187,15 @@
     </ClCompile>
     <ClCompile Include="..\Signal\Signal.cpp">
       <Filter>_Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Dir.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\File.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Path.cpp">
+      <Filter>_Common</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

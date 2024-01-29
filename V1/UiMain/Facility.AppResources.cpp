@@ -99,25 +99,92 @@ bool Facility::AppResources::Initialize()
 		RETURN_FALSE;
 	}
 
+	// Dialogs/FileOptions
 	Json::Object& fileOptions = m_ui.GetAt("Dialogs").GetAt("FileOptions");
 	if (fileOptions.FindValue("properties") != nullptr) {
 		return true;
 	}
 
-	Json::Object& prop = fileOptions.CreateObject("properties");
-	Json::Object& importProp = prop.CreateObject("Import");
-
-	CString commonStream;
-	Json::Array& common = fileOptions.GetArray("__DEFAULT__");
-	common.Stringify(commonStream);
-
+	// Dialogs/FileOptions/common
+	Json::Array& common = fileOptions.GetArray("common");
+	// Dialogs/FileOptions/special
+	Json::Object& special = fileOptions.GetAt("special");
+	// Dialogs/FileOptions/tree/0(Import)/items
 	Json::Array& importTree = Json::Helper::FindValueByPath(fileOptions, "tree/0/items")->AsArray();
-	for (auto item : importTree.GetBuffer()) {
-		CString name = item->AsObject().GetString("name");
 
-		Json::Object& sub = importProp.CreateObject((CStringA)name);
-		sub.SetString("type", L"root");
-		sub.SetArray("items", new Json::Array(commonStream));
+	// create object - Dialogs/FileOptions/properties
+	Json::Object& newProp = fileOptions.CreateObject("properties");
+	// create object - Dialogs/FileOptions/properties/Import
+	Json::Object& newImportProp = newProp.CreateObject("Import");
+
+	for (auto item : importTree.GetBuffer()) {
+		// {"name":"3MF", "title":"3MF", "ext":["3MF"], "group":[1,0,1,0,0], "General":["ReadingMode"]}
+		Json::Object& treeItem = item->AsObject();
+		if (treeItem.GetBoolean("visible", true) == false) {
+			continue;
+		}
+
+		// "group":[1,0,1,0,0]
+		Json::Array& group = treeItem.GetArray("group");
+		// "name":"3MF"
+		CString name = treeItem.GetString("name");
+
+		// create object - Dialogs/FileOptions/properties/Import/3MF
+		Json::Object& root = newImportProp.CreateObject((CStringA)name);
+		root.SetString("type", L"root");
+		// create array - Dialogs/FileOptions/properties/Import/3MF/items
+		Json::Array& propItems = root.CreateArray("items");
+
+		// add common category - from Dialogs/FileOptions/common, exclude last one(special)
+		for (int i = 0; i < group.GetSize() - 1; i++) {
+			// 1:visible
+			if (group.GetInteger(i) != 0) {
+				// append cateogry
+				propItems.AddValue(common.GetAt(i)->DeepCopy());
+			}
+		}
+
+		// add special cateogry - from Dialogs/FileOptions/special
+		if (group.GetInteger(group.GetSize() - 1) != 0) {
+			// find category - Dialogs/FileOptions/special/3MF
+			Json::Object& target = special.GetAt((CStringA)name);
+			target.SetString("name", L"Special");
+			target.SetString("title", treeItem.GetString("title"));
+
+			// append cateogry
+			CString buffer;
+			target.Stringify(buffer);
+			propItems.AddObject(*(new Json::Object(buffer)));
+		}
+
+		// enable check
+
+		std::vector<CStringA> categories = {
+			"General",
+			"Tessellation",
+			"Search",
+			"PMI",
+			"Special"
+		};
+
+		int catIndex = 0;
+		for (auto category : categories) {
+			if (treeItem.FindValue(category) == nullptr ||
+				treeItem.GetArray(category).GetSize() == 0) {
+				continue;
+			}
+
+			Json::Array& enables = treeItem.GetArray(category);
+			Json::Array& general = propItems.GetObject(catIndex).GetArray("items");
+
+			for (auto enable : enables.GetBuffer()) {
+				int index = enable->AsInteger();
+				Json::Object& target = general.GetObject(index);
+				target.SetBoolean("enable", false);
+			}
+
+			catIndex++;
+		}
 	}
 
 	//:TODO
@@ -138,6 +205,8 @@ bool Facility::AppResources::InitPreferences()
 
 	return true;
 }
+
+
 
 bool Facility::AppResources::InitImages()
 {
@@ -163,20 +232,6 @@ bool Facility::AppResources::InitFileOptions()
 		Json::Helper::Load(stream, m_fileOptions) == false) {
 		RETURN_FALSE;
 	}
-
-	Json::Object& import = m_fileOptions.GetAt("Import");
-	Json::Object& common = import.GetAt("__DEFAULT__");
-	if (common.IsEmpty()) {
-		return true;
-	}
-
-	Json::Array& importTree = Json::Helper::FindValueByPath(m_ui, "Dialogs/FileOptions/tree/0/items")->AsArray();
-	for (auto item : importTree.GetBuffer()) {
-		CStringA name = (CStringA)item->AsObject().GetString("name");
-		import.CreateObject(name) = common;
-	}
-
-	import.Remove("__DEFAULT__");
 
 	return true;
 }

@@ -27,40 +27,40 @@ bool Window::IsAllowed3d(const wchar_t* pFilePath)
 	//:WARNING - check formats
 
 	const CString EXTENSIONS[] = {
-		L"3MF", // 3MF
-		L"SAT", L"SAB", // ACIS
-		L"3DS", // Autodesk 3DS
-		L"IPT", L"IAM", // Autodesk Inventor
-		L"NWD", // Autodesk Navisworks
-		L"MODEL", L"SESSION", L"DLV", L"EXP", // Catia V4
-		L"CATPART", L"CATPRODUCT", L"CATSHAPE", L"CGR", // Catia V5
-		L"3DXML", // Catia V6 / 3DExperience
-		L"DAE", // COLLADA
-		L"ASM", L"NEU", L"PRT", L"XAS", L"XPR", // Creo - Pro/E
-		L"FBX", // FBX
-		L"GLTF", L"GLB", // GL Transmission Format
-		L"MF1", L"ARC", L"UNV", L"PKG", // I-deas
-		L"IFC", L"IFCZIP", // IFC
-		L"IGS", L"IGES", // IGES
-		L"JT", // JT
-		L"DGN", // Microstation DGN
-		L"PRT", // NX - Unigraphics
-		L"X_B", L"X_T", L"XMT", L"XMT_TXT", // Parasolid
-		L"PDF", // PDF
-		L"PRC", // PRC
-		L"HSF", // HSF
-		L"RVT, RFA", // Revit
-		L"3DM", // Rhino3D
-		L"ASM", L"PAR", L"PWD", L"PSM", // Solid Edge
-		L"SLDASM", L"SLDPRT", // SolidWorks
-		L"STP", L"STEP", L"STPZ", // STEP
-		L"STPX", L"STPXZ", // STEP/XML
-		L"STL", // Stereo Lithography (STL)
-		L"U3D", // U3D
-		L"VDA", // VDA-FS
-		L"WRL", L"VRML", // VRML
-		L"OBJ", // Wavefront OBJ
-		L"PTS", L"PTX", L"XYZ", // Point Cloud
+		L"3MF",											// 3MF
+		L"SAT", L"SAB",									// ACIS
+		L"DWG", L"DXF",									// AutoCAD
+		L"3DS",											// Autodesk 3DS
+		L"DWF",											// Autodesk DWF
+		L"IPT", L"IAM",									// Autodesk Inventor
+		L"NWD",											// Autodesk Navisworks
+		L"MODEL", L"SESSION", L"DLV", L"EXP",			// Catia V4
+		L"CATPART", L"CATPRODUCT", L"CATSHAPE", L"CGR",	// Catia V5
+		L"3DXML",										// Catia V6/3DExperience
+		L"DAE",											// COLLADA
+		L"ASM", L"NEU", L"PRT", L"XAS", L"XPR",			// Creo/ProE
+		L"FBX",											// FBX
+		L"GLTF", L"GLB",								// GL Transmission Format
+		L"MF1", L"ARC", L"UNV", L"PKG",					// I-deas
+		L"IFC", L"IFCZIP",								// IFC
+		L"IGS", L"IGES",								// IGES
+		L"JT",											// JT
+		L"PRT",											// NX Unigraphics
+		L"X_B", L"X_T", L"XMT", L"XMT_TXT",				// Parasolid
+		L"PDF",											// PDF
+		L"PRC",											// PRC
+		L"RVT, RFA",									// Revit
+		L"3DM",											// Rhino3D
+		L"ASM", L"PAR", L"PWD", L"PSM",					// Solid Edge
+		L"SLDASM", L"SLDPRT",							// SolidWorks
+		L"STP", L"STEP", L"STPZ", L"STPX", L"STPXZ",	// STEP
+		L"STL",											// Stereo Lithography
+		L"U3D",											// U3D
+		L"VDA",											// VDA-FS
+		L"WRL", L"VRML",								// VRML
+		L"OBJ",											// Wavefront OBJ
+
+		L"PTS", L"PTX", L"XYZ",							// Point Cloud
 	};
 
 	CString ext = Path::GetExtension(pFilePath);
@@ -85,9 +85,7 @@ bool Window::IsAllowed3d(const wchar_t* pFilePath)
 bool Window::IsAllowed2d(const wchar_t* pFilePath)
 {
 	const CString EXTENSIONS[] = {
-		L"DWG", L"DXF" // AutoCAD
-		//L"DWF", L"DWFX", // Autodesk DWF
-		//L"CATDRAWING",
+		L"DWG", L"DXF"	// AutoCAD
 	};
 
 	CString ext = Path::GetExtension(pFilePath);

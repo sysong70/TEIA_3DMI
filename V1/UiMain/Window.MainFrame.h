@@ -93,7 +93,7 @@ namespace Window
 	private: // Windows
 
 		Window::View* m_pActiveView = nullptr;
-		Dialog::Base* m_pDialog = nullptr;
+		Dialog::Instances m_dialogs;
 
 	private:
 

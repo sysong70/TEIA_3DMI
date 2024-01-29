@@ -6,10 +6,14 @@
 
 namespace Facility
 {
-	class AppResource;
-	class AppOptions;
 	class Base;
+	// Command
+	// Command.Common.h,
+	// Command.Resource.h
 	class CommandIndexer;
+	// Data
+	class AppOptions;
+	class AppResource;
 
 
 

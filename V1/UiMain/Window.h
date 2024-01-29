@@ -4,13 +4,15 @@
 
 namespace Window
 {
-	class Application;
-	class ChildFrame;
-	class Document;
-	class MainFrame;
-	class View;
-	class View2d;
-	class View3d;
+	// Main
+	class Application;	// CBCGPWinApp
+	class ChildFrame;	// CBCGPMDIChildWnd
+	class MainFrame;	// CBCGPMDIFrameWnd
+	// View
+	class Document;		// CDocument
+	class View;			// CView
+	class View2d;		// Window::View
+	class View3d;		// Window::View
 
 
 
