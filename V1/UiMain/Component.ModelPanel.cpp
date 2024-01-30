@@ -447,7 +447,7 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 	m_wndControl.SetRedraw(FALSE);
 
 	Json::Object& data = *pData;
-	Json::Array& items = data.GetArray(SKW_ITEMS);
+	Json::Array& items = data.GetArray(SKW_CHILDREN);
 
 	HTREEITEM hParent = GetItem(data.GetDwordPtr(SKW_PARENT));
 

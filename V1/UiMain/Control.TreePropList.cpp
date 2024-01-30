@@ -179,6 +179,8 @@ void Control::TreePropList::ChangePropList(HTREEITEM pItem)
 		}
 	}
 	else {
+		m_propList.RemoveAll();
+		//:TODO - update window, why not woking?
 		DEBUG_STOP;
 	}
 }

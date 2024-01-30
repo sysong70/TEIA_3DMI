@@ -236,8 +236,17 @@ BOOL Window::Application::InitInstance()
 
 	if (Connector3d::Initialize()) {
 		Signal::Application& app = Connector3d::GetInstance().application;
+
 		app.OnInitInstance();
 		app.OnUpdatePreference(TheAppOptions.GetPreferences());
+
+		Json::Array& tree = TheAppResources.GetDialog("FileOptions").GetArray("tree");
+		Json::Object reference;
+		reference.CreateObject("Import") = tree.GetObject(0);
+		reference.CreateObject("Export") = tree.GetObject(1);
+		//:TODO
+		//app.OnFileOptionReference(reference);
+
 		app.OnUpdateFileOption(TheAppOptions.GetFileOptions());
 	}
 	else {

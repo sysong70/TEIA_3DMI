@@ -17,8 +17,8 @@ namespace H3DX
 		JsonWrapper();
 
 		virtual ~JsonWrapper();
-		// from Signal
-		bool SetRootObject(const wchar_t* pSource);
+
+		virtual bool Set(Json::Object& value);
 
 	protected:
 
@@ -27,19 +27,21 @@ namespace H3DX
 
 
 
-	class FileOptions : public JsonWrapper
+	class ImportOptions : public JsonWrapper
 	{
 	public:
 
-		FileOptions();
+		ImportOptions();
 
-		virtual ~FileOptions();
+		virtual ~ImportOptions();
 
-	public: // Import options
+	public:
 
-		//:WARNING - use A3D_INITIALIZE_DATA before call function
-		// call GetImport("3MF")
-		bool GetImport(CStringA fileTypeName, A3DRWParamsLoadData& param);
+		bool Set(Json::Object& value) override;
+
+		bool SetReference(Json::Object& value);
+
+		bool Get(CStringA fileTypeName, A3DRWParamsLoadData& param);
 
 	protected:
 
@@ -55,9 +57,58 @@ namespace H3DX
 
 	private:
 
+		CStringA m_activeType;
+		Json::Object m_reference;
+
 		bool IsValidFileTypeName(CStringA name);
 
+		CStringA GetFileTypeName(CString filePath);
+
+		A3DGraphRgbColorData ToHoopsColor(CString value);
+	};
+
+	//:TODO
+
+	class ExportOptions : public JsonWrapper
+	{
+	public:
+
+		ExportOptions();
+
+		virtual ~ExportOptions();
+
+	public:
+
+		bool Set(Json::Object& value) override;
+
+		bool SetReference(Json::Object& value);
+		// A3DRWParamsExportPrcData??
+		bool Get(CStringA fileTypeName, A3DRWParamsExportPrcData& param) {
+			return true;
+		}
+
+	private:
+
 		CStringA m_activeType;
+		Json::Object m_reference;
+	};
+
+
+
+	class FileOptions
+	{
+	public:
+		
+		FileOptions();
+
+		~FileOptions();
+
+		bool Set(Json::Object& value);
+
+		bool SetReference(Json::Object& value);
+
+		ImportOptions Import;
+		ExportOptions Export;
 	};
 }
 

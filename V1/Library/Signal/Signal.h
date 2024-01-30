@@ -39,6 +39,7 @@
 #define SKW_PARENT			"Parent"
 #define SKW_POSITION		"Position"
 #define SKW_RECT			"Rect"
+#define SKW_REFERENCE		"reference" // UI, ...
 #define SKW_ROW				"Row"
 #define SKW_STATUS			"Status"
 #define SKW_TARGET			"Target"
@@ -175,6 +176,7 @@ namespace Signal
 			OnDpiAware,
 			OnUpdatePreference,
 			OnUpdateFileOption,
+			OnFileOptionReference,
 
 			AddTraceLog,
 			ClearTraceLog,
@@ -196,6 +198,8 @@ namespace Signal
 		void OnUpdatePreference(Json::Object& value);
 
 		void OnUpdateFileOption(Json::Object& value);
+
+		void OnFileOptionReference(Json::Object& value);
 
 	public:
 

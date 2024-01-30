@@ -113,7 +113,8 @@
 				{"name":"VRML", "title":"VRML", "ext":["WRL", "VRML"],                                                  "group":[1,0,1,1,0], "General":[0,9]},
 				{"name":"OBJ", "title":"Wavefront OBJ", "ext":["OBJ"],                                                  "group":[1,0,1,1,0], "General":[9,10]},
 				{"name":"dummy", "visible":false}
-			]}
+			]},
+			{"name":"Export", "title":"Export|내보내기", "items":[]}
 		],
 		"common":[
 			{"type":"group", "name":"General", "title":"General|일반", "items":[

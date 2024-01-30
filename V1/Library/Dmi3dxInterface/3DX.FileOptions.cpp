@@ -1,6 +1,7 @@
 ﻿#include "StdAfx.h"
 #include "3DX.h"
 #include "3DX.FileOptions.h"
+#include <Path.h>
 
 //--------------------------------------------------------------------------------------------------
 
@@ -20,37 +21,69 @@ H3DX::JsonWrapper::~JsonWrapper()
 {
 }
 
-
-
-bool H3DX::JsonWrapper::SetRootObject(const wchar_t* pSource)
+bool H3DX::JsonWrapper::Set(Json::Object& value)
 {
-	wchar_t* pStream = (wchar_t*)pSource;
-	bool success = Json::Reader::ReadObject(pStream, m_root);
-	//:TODO - version check
-	//ASSERT(m_root.GetString("version") == L"240126.1");
-
-	return success;
+	m_root = value;
+	return m_root.IsEmpty() == false;
 }
 
 #pragma endregion //:REGION
 
 //--------------------------------------------------------------------------------------------------
 
-#pragma region FileOptions Class
+#pragma region ImportOptions Class
 
-H3DX::FileOptions::FileOptions()
+H3DX::ImportOptions::ImportOptions()
 {
 }
 
 
 
-H3DX::FileOptions::~FileOptions()
+H3DX::ImportOptions::~ImportOptions()
 {
 }
 
 
 
-bool H3DX::FileOptions::GetImport(CStringA fileTypeName, A3DRWParamsLoadData& param)
+bool H3DX::ImportOptions::Set(Json::Object& value)
+{
+	const CStringA category = "Import";
+	const CStringA reference = "reference";
+
+	if (value.FindValue(category) != nullptr) {
+		RETURN_FALSE;
+	}
+
+	Json::Object& data = value.GetAt(category);
+	__super::Set(data);
+
+	// SKW_REFERENCE, OnInitInstance only once
+	if (data.FindValue(reference) != nullptr) {
+		m_reference = data.GetAt(reference);
+	}
+	else {
+		ASSERT(m_reference.IsEmpty() == false);
+	}
+
+	//:TODO - version check
+	//ASSERT(m_root.GetString("version") == L"240126.1");
+
+	return true;
+}
+
+
+
+bool H3DX::ImportOptions::SetReference(Json::Object& value)
+{
+	ASSERT(value.IsEmpty() == false && m_reference.IsEmpty());
+	m_reference = value;
+
+	return true;
+}
+
+
+
+bool H3DX::ImportOptions::Get(CStringA fileTypeName, A3DRWParamsLoadData& param)
 {
 	if (IsValidFileTypeName(fileTypeName) == false) {
 		return false;
@@ -77,14 +110,16 @@ bool H3DX::FileOptions::GetImport(CStringA fileTypeName, A3DRWParamsLoadData& pa
 
 
 
-bool H3DX::FileOptions::GetGeneral(Json::Object& source, A3DRWParamsLoadData& target)
+bool H3DX::ImportOptions::GetGeneral(Json::Object& source, A3DRWParamsLoadData& target)
 {
+	const CStringA category = "General";
+
 	//:WARNING - essential
-	if (source.FindValue("General") == nullptr) {
+	if (source.FindValue(category) == nullptr) {
 		RETURN_FALSE;
 	}
 
-	Json::Object& data = source.GetAt("General");
+	Json::Object& data = source.GetAt(category);
 	A3DRWParamsGeneralData& param = target.m_sGeneral;
 
 	int readingMode = data.GetInteger("ReadingMode");
@@ -113,10 +148,12 @@ bool H3DX::FileOptions::GetGeneral(Json::Object& source, A3DRWParamsLoadData& ta
 
 
 
-bool H3DX::FileOptions::GetTessellation(Json::Object& source, A3DRWParamsLoadData& target)
+bool H3DX::ImportOptions::GetTessellation(Json::Object& source, A3DRWParamsLoadData& target)
 {
-	if (source.FindValue("Tessellation")) {
-		Json::Object& data = source.GetAt("Tessellation");
+	const CStringA category = "Tessellation";
+
+	if (source.FindValue(category)) {
+		Json::Object& data = source.GetAt(category);
 		A3DRWParamsTessellationData& param = target.m_sTessellation;
 
 		Json::Object& custom = data.GetAt("CustomTessLevel");
@@ -133,7 +170,7 @@ bool H3DX::FileOptions::GetTessellation(Json::Object& source, A3DRWParamsLoadDat
 		param.m_bAccurateTessellationWithGrid = gridAlignedTess.GetBoolean("checked");
 		param.m_dAccurateTessellationWithGridMaximumStitchLength = gridAlignedTess.GetReal("MaxStitchLength");
 		param.m_bAccurateSurfaceCurvatures = gridAlignedTess.GetReal("SurfaceCurvatures");
-		param.m_bDoNotComputeNormalsInAccurateTessellation;
+		//param.m_bDoNotComputeNormalsInAccurateTessellation;
 		param.m_bKeepUVPoints = data.GetBoolean("PreserveUV");
 		param.m_bUseHeightInsteadOfRatio = custom.GetInteger("ChordLimitType") == 1; //:CHECK
 		param.m_dMaximalTriangleEdgeLength = (double)data.GetInteger("TessMaxEdgeLength"); //:CHECK
@@ -147,27 +184,46 @@ bool H3DX::FileOptions::GetTessellation(Json::Object& source, A3DRWParamsLoadDat
 
 
 
-bool H3DX::FileOptions::GetSearch(Json::Object& source, A3DRWParamsLoadData& target)
+bool H3DX::ImportOptions::GetSearch(Json::Object& source, A3DRWParamsLoadData& target)
 {
+	const CStringA category = "Search";
+
 	//:WARNING - essential
-	if (source.FindValue("Search") == nullptr) {
+	if (source.FindValue(category) == nullptr) {
 		RETURN_FALSE;
 	}
 
 	//:TODO
+	Json::Object& data = source.GetAt(category);
 
 	return true;
 }
 
 
 
-bool H3DX::FileOptions::GetPMI(Json::Object& source, A3DRWParamsLoadData& target)
+bool H3DX::ImportOptions::GetPMI(Json::Object& source, A3DRWParamsLoadData& target)
 {
-	if (source.FindValue("PMI")) {
-		Json::Object& data = source.GetAt("PMI");
+	const CStringA category = "PMI";
+
+	if (source.FindValue(category)) {
+		Json::Object& data = source.GetAt(category);
+		if (data.GetBoolean("checked") == false) {
+			return true;
+		}
+
 		A3DRWParamsPmiData& param = target.m_sPmi;
 
+		int unit = data.GetInteger("TessUnits");
 
+		//param.m_usStructSize;
+		param.m_bAlwaysSubstituteFont = data.GetBoolean("SubstituteFont");
+		//param.m_pcSubstitutionFont;
+		//param.m_iNumberOfDigitsAfterDot;
+		param.m_eDefaultUnit = unit == 0 ? kA3DUnitUnknown : (A3DEUnits)(unit - 1);
+		//param.m_uiProprietaryFontDirectoriesSize;
+		//param.m_ppcProprietaryFontDirectories;
+		param.m_sDefaultColor = ToHoopsColor(data.GetString("PMIColor"));
+		//param.m_bAlwaysUseDefaultColor;
 	}
 	else {
 		//:TODO - default?
@@ -178,9 +234,58 @@ bool H3DX::FileOptions::GetPMI(Json::Object& source, A3DRWParamsLoadData& target
 
 
 
-bool H3DX::FileOptions::GetSpecial(Json::Object& source, A3DRWParamsLoadData& target)
+bool H3DX::ImportOptions::GetSpecial(Json::Object& source, A3DRWParamsLoadData& target)
 {
-	return false;
+	const CStringA category = "Special";
+
+	if (source.FindValue(category) == nullptr) {
+		return true;
+	}
+
+	//m_usStructSize
+	//? A3DRWParamsCatiaV4Data m_sCatiaV4;
+	//	A3DRWParamsCatiaV5Data m_sCatiaV5;
+	//	A3DRWParamsUnigraphicsData m_sUnigraphics;
+	//	A3DRWParamsProEData m_sProE;
+	//? A3DRWParamsStepData m_sStep;
+	//? A3DRWParamsIGESData m_sIGES;
+	//? A3DRWParamsIFCData m_sIFC; // V5.2
+	//	A3DRWParamsJTData m_sJT; // V8.0
+	//? A3DRWParamsParasolidData m_sParasolid; // V8.1
+	//	A3DRWParamsSolidworksData m_sSolidworks; // V8.2
+	//	A3DRWParamsInventorData m_sInventor; // V9.0
+	//? A3DRWParamsRhinoData m_sRhino; // V11.2
+	//? A3DRWParamsRevitData m_sRevit; // V13.1
+	//? A3DRWParamsSolidEdgeData m_sSolidEdge; // V23.1
+
+	Json::Object& data = source.GetAt(category);
+	A3DRWParamsSpecificLoadData& special = target.m_sSpecifics;
+
+	if (m_activeType == "") {
+		return true;
+	}
+	else if (m_activeType == "ACAD") {
+	}
+	else if (m_activeType == "Inventor") {
+		A3DRWParamsInventorData& param = special.m_sInventor;
+	}
+	else if (m_activeType == "CATIA5") {
+		A3DRWParamsCatiaV5Data& param = special.m_sCatiaV5;
+	}
+	else if (m_activeType == "ProE") {
+		A3DRWParamsProEData& param = special.m_sProE;
+	}
+	else if (m_activeType == "JT") {
+		A3DRWParamsJTData& param = special.m_sJT;
+	}
+	else if (m_activeType == "NX") {
+		A3DRWParamsUnigraphicsData& param = special.m_sUnigraphics;
+	}
+	else if (m_activeType == "SolidWorks") {
+		A3DRWParamsSolidworksData& param = special.m_sSolidworks;
+	}
+		
+	return true;
 }
 
 /*
@@ -220,7 +325,7 @@ bool H3DX::FileOptions::GetSpecial(Json::Object& source, A3DRWParamsLoadData& ta
 	{"name":"OBJ", "title":"Wavefront OBJ", "ext":["OBJ"],                                                  "group":[1,0,1,1,0], "General":[9,10]},
 */
 
-bool H3DX::FileOptions::IsValidFileTypeName(CStringA name)
+bool H3DX::ImportOptions::IsValidFileTypeName(CStringA name)
 {
 	const CStringA categories[] = {
 		"3MF", "ACIS", "ACAD", "3DS", "DWF", "Inventor", "Navisworks", "CATIA4", "CATIA5", "CATIA6",
@@ -237,4 +342,89 @@ bool H3DX::FileOptions::IsValidFileTypeName(CStringA name)
 	RETURN_FALSE;
 }
 
-#pragma endretion //:REGION
+
+
+CStringA H3DX::ImportOptions::GetFileTypeName(CString filePath)
+{
+	return CStringA();
+}
+
+
+
+A3DGraphRgbColorData H3DX::ImportOptions::ToHoopsColor(CString value)
+{
+	A3DGraphRgbColorData data;
+	A3D_INITIALIZE_DATA(A3DGraphRgbColorData, data);
+
+	COLORREF color = Json::Helper::ToColor(value);
+	data.m_dRed = GetRValue(color) / 255.0;
+	data.m_dGreen = GetGValue(color) / 255.0;
+	data.m_dBlue = GetBValue(color) / 255.0;
+
+	return data;
+}
+
+#pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
+
+#pragma region ExportOptions Class
+
+H3DX::ExportOptions::ExportOptions()
+{
+}
+
+
+
+H3DX::ExportOptions::~ExportOptions()
+{
+}
+
+
+
+bool H3DX::ExportOptions::Set(Json::Object& value)
+{
+	return true;
+}
+
+
+
+bool H3DX::ExportOptions::SetReference(Json::Object& value)
+{
+	ASSERT(value.IsEmpty() == false && m_reference.IsEmpty());
+	m_reference = value;
+
+	return true;
+}
+
+#pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
+
+#pragma region FileOptions Class
+
+H3DX::FileOptions::FileOptions()
+{
+}
+
+
+
+H3DX::FileOptions::~FileOptions()
+{
+}
+
+
+
+bool H3DX::FileOptions::Set(Json::Object& value)
+{
+	return Import.Set(value.GetAt("Import")) && Export.Set(value.GetAt("Export"));
+}
+
+
+
+bool H3DX::FileOptions::SetReference(Json::Object& value)
+{
+	return Import.SetReference(value.GetAt("Import")) && Export.SetReference(value.GetAt("Export"));
+}
+
+#pragma endregion //:REGION
