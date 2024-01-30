@@ -87,6 +87,8 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 	cTreeItems.push_back(cItem);
 	pcImpl->Delivery().modelPanel.AddItems(cTreeItems);
 
+	return;
+
 	nParentKey = cItem.Key;
 
 	cTreeItems.clear();
@@ -141,10 +143,13 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 // 1. Signal 처리
 void KERNEL::Operator::ModelPanel::Signal(Json::Object & cInObject)
 {
+	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	int nViewId = cInObject.GetInteger(SKW_VIEWID);
 	int nAction = cInObject.GetInteger(SKW_ACTION);
 
-	CString strText;
-	cInObject.Stringify(strText);
+	/*pcImpl->Delivery().modelPanel.ViewId = nViewId;*/
 
 	switch ((Signal::ModelPanel::Action)nAction)
 	{
@@ -167,6 +172,7 @@ void KERNEL::Operator::ModelPanel::Signal(Json::Object & cInObject)
 			break;
 
 		case Signal::ModelPanel::Action::OnItemExpanded:
+			ItemExpanded(cInObject);
 			break;
 
 		case Signal::ModelPanel::Action::OnItemExpanding:
@@ -197,4 +203,52 @@ void KERNEL::Operator::ModelPanel::Signal(Json::Object & cInObject)
 			assert(false);
 			break;
 	}
+}
+
+// 2. Item Expanded 처리
+void KERNEL::Operator::ModelPanel::ItemExpanded(Json::Object & cInObject)
+{
+	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+// 	CString strText;
+// 	cInObject.Stringify(strText);
+
+	// 대소문자 구별함. 주의할 것.
+	HC_KEY nInKey = (HC_KEY)cInObject.GetDwordPtr("Key");
+
+	HC_KEY nModelKey = pcImpl->View().GetModelOverrideSegmentKey().KeyValue();
+
+	if (nInKey == nModelKey) {
+		ModelItemExpanded(nModelKey);
+	}
+}
+
+// 2. Item Expanded 처리
+void KERNEL::Operator::ModelPanel::ModelItemExpanded(HC_KEY nModelKey)
+{
+	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+	
+	Signal::TreeItems cTreeItems;
+	Signal::TreeItem cItem;
+
+	cItem.Title = L"Models";
+	cItem.HasChildren = true;
+	cItem.Key = 1;
+	cTreeItems.push_back(cItem);
+
+	// Measure Item 생성, 이하에 CAD Model data를 저장한다.
+	cItem.Title = L"Measurements";
+	cItem.HasChildren = false;
+	cItem.Key = 2;
+	cTreeItems.push_back(cItem);
+
+	// Measure Item 생성, 이하에 CAD Model data를 저장한다.
+	cItem.Title = L"Markups";
+	cItem.HasChildren = false;
+	cItem.Key = 3;
+	cTreeItems.push_back(cItem);
+
+	pcImpl->Delivery().modelPanel.AddChildren(nModelKey, cTreeItems);
 }

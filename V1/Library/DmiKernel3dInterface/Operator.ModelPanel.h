@@ -18,6 +18,10 @@ namespace KERNEL
 			void Initialize(CString strFilePathName);
 
 			void Signal(Json::Object & cInObject);
+
+		protected:
+			void ItemExpanded(Json::Object & cInObject);
+			void ModelItemExpanded(HC_KEY nModelKey);
 		};
 	}
 }	

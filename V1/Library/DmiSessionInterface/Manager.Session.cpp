@@ -139,10 +139,10 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 			// 실제로는 하나의 Instance를 사용하는 것임.
 			pcSession->ViewInitialize(cInObject, Connector::GetInstance(nViewId));
 			//:Ken - TEST
-			Connector::GetInstance(-1).application.AddTraceLogV(L"View initialized %d", nViewId);
-			Connector::GetInstance(-1).application.AddTraceLog(L"next message");
+			//Connector::GetInstance(-1).application.AddTraceLogV(L"View initialized %d", nViewId);
+			//Connector::GetInstance(-1).application.AddTraceLog(L"next message");
 			//Connector::GetInstance(-1).application.SaveTraceLog(nullptr);
-			Connector::GetInstance(-1).application.SaveTraceLog(L"c:\\temp\\test.log", false);
+			//Connector::GetInstance(-1).application.SaveTraceLog(L"c:\\temp\\test.log", false);
 			break;
 
 		case Signal::View::Action::OnConstruct:
@@ -210,6 +210,8 @@ SESSION::Session * SESSION::Manager::Session::GetSession(int nViewId)
 			m_mpcSessions[nViewId] = pcSession;
 		}
 	}
+
+	Connector::GetInstance(nViewId);
 
 	return pcSession;
 }
