@@ -14,6 +14,10 @@
 
 #include <Path.h>
 
+#define MODELS_GROUP_KEY				1
+#define MEASUREMENTS_GROUP_KEY			2
+#define MARKUPS_GROUP_KEY				3
+
 using namespace KERNEL;
 using namespace H3DF;
 
@@ -57,6 +61,7 @@ KERNEL::Operator::ModelPanelImpl::ModelPanelImpl(const H3DF::View * pcInView, co
 }
 
 //== ModelPanel 관련 함수 ============================================================================
+
 KERNEL::Operator::ModelPanel::ModelPanel(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
 {
 	auto pcImpl = new ModelPanelImpl(pcInView, pcInDelivery);
@@ -96,21 +101,21 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 	// Model Item 생성, 이하에 CAD Model data를 저장한다.
 	cItem.Title = L"Models";
 	cItem.HasChildren = true;
-	cItem.Key = 1;
+	cItem.Key = MODELS_GROUP_KEY;
 	cTreeItems.push_back(cItem);
 
 	nModelParentKey = cItem.Key;
 
 	// Measure Item 생성, 이하에 CAD Model data를 저장한다.
-	cItem.Title = L"Measurments";
+	cItem.Title = L"Measurements";
 	cItem.HasChildren = false;
-	cItem.Key = 2;
+	cItem.Key = MEASUREMENTS_GROUP_KEY;
 	cTreeItems.push_back(cItem);
 
 	// Measure Item 생성, 이하에 CAD Model data를 저장한다.
 	cItem.Title = L"Markups";
 	cItem.HasChildren = false;
-	cItem.Key = 3;
+	cItem.Key = MARKUPS_GROUP_KEY;
 	cTreeItems.push_back(cItem);
 
 	pcImpl->Delivery().modelPanel.AddChildren(nParentKey, cTreeItems);
@@ -172,7 +177,7 @@ void KERNEL::Operator::ModelPanel::Signal(Json::Object & cInObject)
 			break;
 
 		case Signal::ModelPanel::Action::OnItemExpanded:
-			ItemExpanded(cInObject);
+			ItemExpandedSignal(cInObject);
 			break;
 
 		case Signal::ModelPanel::Action::OnItemExpanding:
@@ -206,7 +211,7 @@ void KERNEL::Operator::ModelPanel::Signal(Json::Object & cInObject)
 }
 
 // 2. Item Expanded 처리
-void KERNEL::Operator::ModelPanel::ItemExpanded(Json::Object & cInObject)
+void KERNEL::Operator::ModelPanel::ItemExpandedSignal(Json::Object & cInObject)
 {
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -222,9 +227,21 @@ void KERNEL::Operator::ModelPanel::ItemExpanded(Json::Object & cInObject)
 	if (nInKey == nModelKey) {
 		ModelItemExpanded(nModelKey);
 	}
+	else if (MODELS_GROUP_KEY == nInKey) {
+		ModelGroupItemExpanded();
+	}
+	else if (MEASUREMENTS_GROUP_KEY == nInKey) {
+		MeasurementsGroupItemExpanded();
+	}
+	else if (MARKUPS_GROUP_KEY == nInKey) {
+		MarkupsGroupItemExpanded();
+	}
+	else {
+		ItemExpanded(nInKey);
+	}
 }
 
-// 2. Item Expanded 처리
+// 2.1 Model Item Expanded 처리
 void KERNEL::Operator::ModelPanel::ModelItemExpanded(HC_KEY nModelKey)
 {
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
@@ -235,20 +252,66 @@ void KERNEL::Operator::ModelPanel::ModelItemExpanded(HC_KEY nModelKey)
 
 	cItem.Title = L"Models";
 	cItem.HasChildren = true;
-	cItem.Key = 1;
+	cItem.Key = MODELS_GROUP_KEY;
 	cTreeItems.push_back(cItem);
 
 	// Measure Item 생성, 이하에 CAD Model data를 저장한다.
 	cItem.Title = L"Measurements";
 	cItem.HasChildren = false;
-	cItem.Key = 2;
+	cItem.Key = MEASUREMENTS_GROUP_KEY;
 	cTreeItems.push_back(cItem);
 
 	// Measure Item 생성, 이하에 CAD Model data를 저장한다.
 	cItem.Title = L"Markups";
 	cItem.HasChildren = false;
-	cItem.Key = 3;
+	cItem.Key = MARKUPS_GROUP_KEY;
 	cTreeItems.push_back(cItem);
 
 	pcImpl->Delivery().modelPanel.AddChildren(nModelKey, cTreeItems);
+}
+
+// 2.1.1 Model Group Item Expanded 처리
+void KERNEL::Operator::ModelPanel::ModelGroupItemExpanded()
+{
+	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	Signal::TreeItems cTreeItems;
+	Signal::TreeItem cItem;
+
+	H3DF::IncludeKeyArray cChildren;
+	pcImpl->View().GetModelOverrideSegmentKey().ShowIncluders(cChildren);
+
+	for (auto cInclude : cChildren) {
+		SegmentKey cSegment = cInclude.GetTarget();
+
+		CString strName;
+		if (false == H3DF::UserData::ShowSegmentName(cSegment, strName)) {
+			strName = cSegment.Name();
+		}
+
+		size_t nCount = cSegment.ShowSubsegments();
+
+		cItem.Title = strName;
+		cItem.Key = cInclude.KeyValue();
+		cItem.HasChildren = (0 < nCount) ? true : false;
+		cTreeItems.push_back(cItem);
+	}
+
+	pcImpl->Delivery().modelPanel.AddChildren(MODELS_GROUP_KEY, cTreeItems);
+}
+
+// 2.1.2 Measurements Group Item Expanded 처리
+void KERNEL::Operator::ModelPanel::MeasurementsGroupItemExpanded()
+{
+}
+
+// 2.1.3 Markups Group Item Expanded 처리
+void KERNEL::Operator::ModelPanel::MarkupsGroupItemExpanded()
+{
+}
+
+// 2.2 일반 Item Expanded 처리
+void KERNEL::Operator::ModelPanel::ItemExpanded(HC_KEY nItemKey)
+{
 }

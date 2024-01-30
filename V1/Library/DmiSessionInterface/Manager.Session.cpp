@@ -211,6 +211,7 @@ SESSION::Session * SESSION::Manager::Session::GetSession(int nViewId)
 		}
 	}
 
+	// 이 함수를 호출해야 Delivery에 ViewId가 설정됨.
 	Connector::GetInstance(nViewId);
 
 	return pcSession;
