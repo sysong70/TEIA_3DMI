@@ -8,6 +8,8 @@
 
 #include <3DF/Facility.AppOptions.h>
 
+#include <3DF/Impl/SegmentImpl.h>
+
 #include <3DF.View.h>
 
 #include <3DF/3DF.Utility.h>
@@ -250,24 +252,28 @@ void KERNEL::Operator::ModelPanel::ModelItemExpanded(HC_KEY nModelKey)
 	Signal::TreeItems cTreeItems;
 	Signal::TreeItem cItem;
 
+	cItem.ParentKey = nModelKey;
+
+	// Model Group Item 생성, 이하에 CAD Model data를 저장한다.
 	cItem.Title = L"Models";
 	cItem.HasChildren = true;
 	cItem.Key = MODELS_GROUP_KEY;
 	cTreeItems.push_back(cItem);
 
-	// Measure Item 생성, 이하에 CAD Model data를 저장한다.
+	// Measure Group Item 생성.
 	cItem.Title = L"Measurements";
 	cItem.HasChildren = false;
 	cItem.Key = MEASUREMENTS_GROUP_KEY;
 	cTreeItems.push_back(cItem);
 
-	// Measure Item 생성, 이하에 CAD Model data를 저장한다.
+	// Measure Group Item 생성.
 	cItem.Title = L"Markups";
 	cItem.HasChildren = false;
 	cItem.Key = MARKUPS_GROUP_KEY;
 	cTreeItems.push_back(cItem);
 
-	pcImpl->Delivery().modelPanel.AddChildren(nModelKey, cTreeItems);
+	pcImpl->Delivery().modelPanel.AddItems(cTreeItems);
+	//pcImpl->Delivery().modelPanel.AddChildren(nModelKey, cTreeItems);
 }
 
 // 2.1.1 Model Group Item Expanded 처리
@@ -279,18 +285,24 @@ void KERNEL::Operator::ModelPanel::ModelGroupItemExpanded()
 	Signal::TreeItems cTreeItems;
 	Signal::TreeItem cItem;
 
+	cItem.ParentKey = MODELS_GROUP_KEY;
+
 	H3DF::IncludeKeyArray cChildren;
 	pcImpl->View().GetModelOverrideSegmentKey().ShowIncluders(cChildren);
 
-	for (auto cInclude : cChildren) {
+	for (auto & cInclude : cChildren) {
 		SegmentKey cSegment = cInclude.GetTarget();
+
+		SegmentKeyImpl::ForcedOpen(cSegment);
 
 		CString strName;
 		if (false == H3DF::UserData::ShowSegmentName(cSegment, strName)) {
 			strName = cSegment.Name();
 		}
 
-		size_t nCount = cSegment.ShowSubsegments();
+		size_t nCount = cSegment.ShowSubsegments() + cSegment.ShowIncluders();
+
+		SegmentKeyImpl::ForcedClose(cSegment);
 
 		cItem.Title = strName;
 		cItem.Key = cInclude.KeyValue();
@@ -298,7 +310,7 @@ void KERNEL::Operator::ModelPanel::ModelGroupItemExpanded()
 		cTreeItems.push_back(cItem);
 	}
 
-	pcImpl->Delivery().modelPanel.AddChildren(MODELS_GROUP_KEY, cTreeItems);
+	pcImpl->Delivery().modelPanel.AddItems(cTreeItems);
 }
 
 // 2.1.2 Measurements Group Item Expanded 처리
@@ -312,6 +324,90 @@ void KERNEL::Operator::ModelPanel::MarkupsGroupItemExpanded()
 }
 
 // 2.2 일반 Item Expanded 처리
-void KERNEL::Operator::ModelPanel::ItemExpanded(HC_KEY nItemKey)
+void KERNEL::Operator::ModelPanel::ItemExpanded(HC_KEY nInItemKey)
 {
+	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	H3DF::Type eType = H3DF::Utility::GetType(nInItemKey);
+
+	SegmentKey cInSegment;
+
+	if (H3DF::Type::SegmentKey == eType) {
+		cInSegment = SegmentKey(nInItemKey);
+	}
+	else if (H3DF::Type::IncludeKey == eType) {
+		IncludeExpanded(nInItemKey);
+		return;
+	}
+
+	Signal::TreeItems cTreeItems;
+	Signal::TreeItem cItem;
+
+	cItem.ParentKey = nInItemKey;
+
+	H3DF::IncludeKeyArray cChildren;
+	cInSegment.ShowIncluders(cChildren);
+
+	H3DF::SegmentKeyArray cChildren1;
+	cInSegment.ShowSubsegments(cChildren1);
+
+	for (auto cInclude : cChildren) {
+		SegmentKey cSegment = cInclude.GetTarget();
+
+		CString strName;
+		if (false == H3DF::UserData::ShowSegmentName(cSegment, strName)) {
+			strName = cSegment.Name();
+		}
+
+		size_t nCount = cSegment.ShowIncluders();
+
+		cItem.Title = strName;
+		cItem.Key = cInclude.KeyValue();
+		cItem.HasChildren = (0 < nCount) ? true : false;
+		cTreeItems.push_back(cItem);
+	}
+
+	pcImpl->Delivery().modelPanel.AddItems(cTreeItems);
+}
+
+// 2.2.1 Include Item Expanded 처리
+void KERNEL::Operator::ModelPanel::IncludeExpanded(HC_KEY nInItemKey)
+{
+	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	IncludeKey cInInclude(nInItemKey);
+	SegmentKey cInSegment = cInInclude.GetTarget();
+
+	Signal::TreeItems cTreeItems;
+	Signal::TreeItem cItem;
+
+	cItem.ParentKey = nInItemKey;
+
+	H3DF::IncludeKeyArray cChildren;
+	cInSegment.ShowIncluders(cChildren);
+
+	H3DF::SegmentKeyArray cChildren1;
+	cInSegment.ShowSubsegments(cChildren1);
+
+	for (auto cInclude : cChildren) {
+		SegmentKey cSegment = cInclude.GetTarget();
+
+		CString strName;
+		if (false == H3DF::UserData::ShowSegmentName(cSegment, strName)) {
+			strName = cSegment.Name();
+		}
+
+		// strName = cSegment.Name();
+
+		size_t nCount = cSegment.ShowIncluders();
+
+		cItem.Title = strName;
+		cItem.Key = cInclude.KeyValue();
+		cItem.HasChildren = (0 < nCount) ? true : false;
+		cTreeItems.push_back(cItem);
+	}
+
+	pcImpl->Delivery().modelPanel.AddItems(cTreeItems);
 }

@@ -26,7 +26,8 @@ namespace KERNEL
 			void MeasurementsGroupItemExpanded();
 			void MarkupsGroupItemExpanded();
 
-			void ItemExpanded(HC_KEY nItemKey);
+			void ItemExpanded(HC_KEY nInItemKey);
+			void IncludeExpanded(HC_KEY nInItemKey);
 		};
 	}
 }	
