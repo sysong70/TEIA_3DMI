@@ -266,6 +266,21 @@ namespace Property
 
 
 
+	class FoldersDialog : public CBCGPProp
+	{
+	public:
+
+		FoldersDialog(const CString& name, const CString value, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL);
+
+	protected:
+
+		BOOL HasButton() const override;
+
+		void OnClickButton(CPoint point) override;
+	};
+
+
+
 	class HexValue : public CBCGPProp
 	{
 	public:

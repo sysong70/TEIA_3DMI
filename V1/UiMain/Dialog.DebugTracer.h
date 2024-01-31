@@ -8,13 +8,15 @@ namespace Dialog
 {
 	class DebugTracer : public Standard
 	{
-		DECLARE_DYNAMIC(DebugTracer)
+	protected:
 
-	public:
+		DECLARE_DYNAMIC(DebugTracer)
 
 		DebugTracer(CWnd* pParent = nullptr);
 
 		~DebugTracer() override;
+
+	public:
 
 		Signal::Target GetSignalTargetId() override;
 

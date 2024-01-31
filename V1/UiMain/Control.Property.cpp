@@ -13,7 +13,7 @@ static char THIS_FILE[] = __FILE__;
 
 using namespace Property;
 
-
+//--------------------------------------------------------------------------------------------------
 
 #pragma region DurationCtrl Class
 
@@ -43,6 +43,8 @@ void Property::DurationCtrl::OnKillFocus(CWnd* pNewWnd)
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region IconComboBoxCtrl Class
 
@@ -120,6 +122,8 @@ void Property::IconComboBoxCtrl::OnMeasureItem(int /*nIDCtl*/, LPMEASUREITEMSTRU
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region SliderCtrl Class
 
 BEGIN_MESSAGE_MAP(SliderCtrl, CBCGPSliderCtrl)
@@ -166,6 +170,8 @@ void Property::SliderCtrl::HScroll(UINT /*nSBCode*/, UINT /*nPos*/)
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region Color Class
 
 Property::Color::Color(const CString& name, UINT id, const COLORREF& color, LPCTSTR lpszDescr, DWORD_PTR dwData)
@@ -193,6 +199,8 @@ void Property::Color::OnCloseCombo()
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Coordinate
 
@@ -246,6 +254,8 @@ void Property::Coordinate::OnClickButton(CPoint point)
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region ComboButton Class
 
@@ -337,6 +347,8 @@ void Property::ComboButton::OnDrawButton(CDC* pDC, CRect rectButton)
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region CommandButton Class
 
 Property::CommandButton::CommandButton(const CString& name, const CString& title, UINT id, LPCTSTR lpDescr, DWORD_PTR data)
@@ -408,6 +420,8 @@ BOOL Property::CommandButton::OnSetCursor() const
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region CustomColor Class
 
 Property::CustomColor::CustomColor(const CString& name, const COLORREF& color, LPCTSTR lpDescr)
@@ -437,6 +451,8 @@ BOOL Property::CustomColor::OnDrawPaletteColorBox(CDC* pDC, const CRect rectColo
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region CustomDescription Class
 
@@ -473,6 +489,8 @@ void Property::CustomDescription::OnDrawDescription(CDC* pDC, CRect rect)
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region CustomDialog Class
 
 Property::CustomDialog::CustomDialog(const CString& name, const _variant_t& value) :
@@ -504,6 +522,8 @@ BOOL Property::CustomDialog::HasButton() const
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region CustomState Class
 
@@ -571,6 +591,8 @@ void Property::CustomState::OnDrawStateIndicator(CDC* pDC, CRect rect)
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Duration Class
 
@@ -827,6 +849,33 @@ void Property::Duration::SetValue(const _variant_t& varValue)
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
+#pragma region FoldersDialog Class
+
+Property::FoldersDialog::FoldersDialog(const CString& name, const CString value, LPCTSTR lpDescr, DWORD_PTR data)
+	: CBCGPProp(name, (LPCTSTR)value, lpDescr, data)
+{
+}
+
+
+
+BOOL Property::FoldersDialog::HasButton() const
+{
+	return TRUE;
+}
+
+
+
+void Property::FoldersDialog::OnClickButton(CPoint point)
+{
+	//SetValue
+}
+
+#pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
+
 #pragma region HexValue Class
 
 Property::HexValue::HexValue(const CString& name, long lValue, LPCTSTR lpDescr, DWORD_PTR data)
@@ -886,6 +935,8 @@ BOOL Property::HexValue::TextToVar(const CString& str)
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region IconComboBox Class
 
@@ -976,6 +1027,8 @@ BOOL Property::IconComboBox::OnEdit(LPPOINT lpClick)
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region IconList Class
 
@@ -1078,6 +1131,8 @@ void Property::IconList::OnDrawValue(CDC* pDC, CRect rect)
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region Password Class
 
 Property::Password::Password(const CString& name, const CString& password, LPCTSTR lpDescr, DWORD_PTR data)
@@ -1151,6 +1206,8 @@ BOOL Property::Password::IsCopyAvailable() const
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region RangeValidation Class
 
 Property::RangeValidation::RangeValidation(const CString& name, long value, LPCTSTR lpDescr, DWORD_PTR data)
@@ -1213,6 +1270,8 @@ BOOL Property::RangeValidation::OnUpdateValue()
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Slider Class
 
@@ -1309,6 +1368,8 @@ BOOL Property::Slider::OnUpdateValue()
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region TwoButton Class
 

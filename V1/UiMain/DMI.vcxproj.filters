@@ -181,6 +181,9 @@
     <ClCompile Include="Dialog.DebugTracer.cpp">
       <Filter>Dialog\Modaless</Filter>
     </ClCompile>
+    <ClCompile Include="Dialog.Folders.cpp">
+      <Filter>Dialog\Modal</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.Common.h">
@@ -377,6 +380,9 @@
     </ClInclude>
     <ClInclude Include="Dialog.DebugTracer.h">
       <Filter>Dialog\Modaless</Filter>
+    </ClInclude>
+    <ClInclude Include="Dialog.Folders.h">
+      <Filter>Dialog\Modal</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

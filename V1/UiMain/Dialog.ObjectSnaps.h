@@ -9,9 +9,9 @@ namespace Dialog
 {
 	class ObjectSnaps : public Standard
 	{
-		DECLARE_DYNCREATE(ObjectSnaps);
+	protected:
 
-	public:
+		DECLARE_DYNCREATE(ObjectSnaps);
 
 		ObjectSnaps();
 

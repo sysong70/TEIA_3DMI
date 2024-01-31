@@ -183,15 +183,15 @@ void Window::View3d::OnCommand(UINT id)
 	}
 	else {
 		switch (data.Type) {
-		case Facility::CommandIndexer::ListItem:
-		case Facility::CommandIndexer::Check: //:TEMP
-			m_delivery.view.OnCommand(id);
+		case Facility::CommandIndexer::Popup:
 			break;
 
 		case Facility::CommandIndexer::Unknown:
 			DEBUG_STOP;
 			break;
 
+		case Facility::CommandIndexer::ListItem:
+		case Facility::CommandIndexer::Check: //:TEMP
 		default:
 			m_delivery.view.OnCommand(id);
 			break;

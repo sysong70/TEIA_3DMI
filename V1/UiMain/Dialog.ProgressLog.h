@@ -10,11 +10,11 @@ namespace Dialog
 	{
 		DECLARE_DYNAMIC(ProgressLog)
 
-	public:
-
 		ProgressLog(CWnd* pParent = nullptr);
 
 		~ProgressLog() override;
+
+	public:
 
 		Signal::Target GetSignalTargetId() override;
 

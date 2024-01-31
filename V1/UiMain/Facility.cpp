@@ -180,6 +180,9 @@ bool Facility::LoadTextResource(UINT id, CString& result)
 
 CString Facility::GetDescription(Json::Object& source)
 {
+	//return Local(source.GetString("desc"));
+
+	//:TEST - dictionary test
 	Json::Value* pValue = source.FindValue("desc");
 	if (pValue == nullptr) {
 		return L"";

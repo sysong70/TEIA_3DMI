@@ -195,6 +195,7 @@
     <ClInclude Include="Control.ToolBar.h" />
     <ClInclude Include="Dialog.AppOptions.h" />
     <ClInclude Include="Dialog.DebugTracer.h" />
+    <ClInclude Include="Dialog.Folders.h" />
     <ClInclude Include="Dialog.ObjectSnaps.h" />
     <ClInclude Include="Facility.Base.h" />
     <ClInclude Include="Facility.CommandIndexer.h" />
@@ -261,6 +262,7 @@
     <ClCompile Include="Dialog.AppOptions.cpp" />
     <ClCompile Include="Dialog.cpp" />
     <ClCompile Include="Dialog.DebugTracer.cpp" />
+    <ClCompile Include="Dialog.Folders.cpp" />
     <ClCompile Include="Dialog.ObjectSnaps.cpp" />
     <ClCompile Include="Facility.Base.cpp" />
     <ClCompile Include="Facility.CommandIndexer.cpp" />
