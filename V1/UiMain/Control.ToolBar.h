@@ -51,8 +51,6 @@ namespace Control
 
 	protected:
 
-		void PostNcDestroy() override;
-
 		afx_msg void OnCommand(UINT id);
 
 		afx_msg LRESULT OnDPIChangedAfterParent(WPARAM, LPARAM);

@@ -1,7 +1,8 @@
 ﻿#include "StdAfx.h"
-#include "3DX.Base.h"
+#include "3DX.ImportBase.h"
 #include "3DX.FileOptions.h"
 #include <Path.h>
+#include <WStr.h>
 
 //--------------------------------------------------------------------------------------------------
 
@@ -51,15 +52,14 @@ bool H3DX::ImportOptions::Set(Json::Object& value)
 {
 	const CStringA category = "Import";
 
-	if (value.FindValue(category) != nullptr) {
+	if (value.FindValue(category) == nullptr) {
 		RETURN_FALSE;
 	}
 
-	JsonWrapper::Set(value.GetAt(category));
-	//:TODO - version check
-	//ASSERT(m_root.GetString("version") == L"240126.1");
+	bool success = JsonWrapper::Set(value.GetAt(category));
+	ASSERT(success);
 
-	return true;
+	return success;
 }
 
 
@@ -76,16 +76,16 @@ bool H3DX::ImportOptions::SetReference(Json::Object& value)
 
 bool H3DX::ImportOptions::Get(CString& filePath, A3DRWParamsLoadData& param)
 {
+	//:CHECK
+	A3D_INITIALIZE_DATA(A3DRWParamsLoadData, param);
+
 	CStringA fileType = (CStringA)GetFileTypeName(filePath);
 	if (fileType.IsEmpty()) {
 		return false;
 	}
 
-	Json::Object& data = m_root.GetAt("Import").GetAt(fileType);
+	Json::Object& data = m_root.GetAt(fileType);
 	bool success = true;
-
-	//:CHECK
-	A3D_INITIALIZE_DATA(A3DRWParamsLoadData, param);
 
 	success &= GetGeneral(data, param);
 	success &= GetTessellation(data, param);
@@ -236,7 +236,7 @@ bool H3DX::ImportOptions::GetTessellation(Json::Object& source, A3DRWParamsLoadD
 {
 	const CStringA category = "Tessellation";
 
-	if (source.FindValue(category)) {
+	if (source.FindValue(category) != nullptr) {
 		Json::Object& data = source.GetAt(category);
 		A3DRWParamsTessellationData& param = target.m_sTessellation;
 
@@ -326,7 +326,7 @@ bool H3DX::ImportOptions::GetPMI(Json::Object& source, A3DRWParamsLoadData& targ
 {
 	const CStringA category = "PMI";
 
-	if (source.FindValue(category)) {
+	if (source.FindValue(category) != nullptr) {
 		Json::Object& data = source.GetAt(category);
 		if (data.GetBoolean("checked") == false) {
 			return true;
@@ -524,8 +524,6 @@ bool H3DX::ImportOptions::GetSpecial(CStringA fileType, Json::Object& source, A3
 	{"name":"OBJ", "title":"Wavefront OBJ", "ext":["OBJ"],                                                  "group":[1,0,1,1,0], "General":[9,10]},
 */
 
-#include <WStr.h>
-
 CString H3DX::ImportOptions::GetFileTypeName(CString filePath)
 {
 	CString extension = Path::GetExtension(filePath.GetBuffer());
@@ -571,14 +569,42 @@ A3DGraphRgbColorData H3DX::ImportOptions::ToHoopsColor(CString value)
 
 A3DUTF8Char* H3DX::ImportOptions::ToHoopsString(CString value)
 {
-	RETURN_NULL;
+	A3DUTF8Char* pBuffer = nullptr;
+	if (value.IsEmpty()) {
+		return NULL;
+	}
+
+	int length = value.GetLength() * sizeof(WCHAR);
+	pBuffer = new A3DUTF8Char[length];
+	::ZeroMemory(pBuffer, 0, length);
+
+	A3DStatus eStatus = A3DMiscUnicodeToUTF8((A3DUTF8Char*)(LPCTSTR)value, pBuffer);
+	if (A3D_SUCCESS != eStatus) {
+		REMOVE_ARRAY(pBuffer);
+		RETURN_NULL;
+	}
+
+	return NULL;
 }
 
 
 
 A3DUTF8Char** H3DX::ImportOptions::ToHoopsStrings(CString value)
 {
-	RETURN_NULL;
+	WStringArray buffer;
+	if (WStr::Split(value.GetBuffer(), L';', buffer) == false || buffer.size() == 0) {
+		return NULL;
+	}
+
+	A3DUTF8Char** pBuffer = new A3DUTF8Char*[buffer.size()];
+	::ZeroMemory(pBuffer, sizeof(A3DUTF8Char*) * buffer.size());
+
+	for (int i = 0; i < buffer.size(); i++) {
+		pBuffer[i] = ToHoopsString(buffer[i]);
+		DEBUG_VALID(pBuffer[i]);
+	}
+
+	return pBuffer;
 }
 
 #pragma endregion //:REGION
@@ -603,7 +629,7 @@ bool H3DX::ExportOptions::Set(Json::Object& value)
 {
 	const CStringA category = "Export";
 
-	if (value.FindValue(category) != nullptr) {
+	if (value.FindValue(category) == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -642,14 +668,27 @@ H3DX::FileOptions::~FileOptions()
 
 bool H3DX::FileOptions::Set(Json::Object& value)
 {
-	return Import.Set(value.GetAt("Import")) && Export.Set(value.GetAt("Export"));
+	//:TODO - version check
+	ASSERT(value.GetString("version") == L"240126.1");
+
+	bool success = true;
+	success &= Import.Set(value.GetAt("Import"));
+	//:TODO
+	//success &= Export.Set(value.GetAt("Export"));
+
+	return success;
 }
 
 
 
 bool H3DX::FileOptions::SetReference(Json::Object& value)
 {
-	return Import.SetReference(value.GetAt("Import")) && Export.SetReference(value.GetAt("Export"));
+	bool success = true;
+	success &= Import.SetReference(value.GetAt("Import"));
+	//:TODO
+	//success &= Export.SetReference(value.GetAt("Export"));
+	
+	return success;
 }
 
 #pragma endregion //:REGION

@@ -27,7 +27,7 @@ namespace H3DX
 		Json::Object m_root;
 	};
 
-	class API_3DX FileOptions : public JsonWrapper
+	class API_3DX ImportOptions : public JsonWrapper
 	{
 	public:
 
@@ -70,7 +70,7 @@ namespace H3DX
 
 	//:TODO
 
-	class ExportOptions : public JsonWrapper
+	class API_3DX ExportOptions : public JsonWrapper
 	{
 	public:
 
@@ -95,7 +95,7 @@ namespace H3DX
 
 
 
-	class FileOptions
+	class API_3DX FileOptions
 	{
 	public:
 		

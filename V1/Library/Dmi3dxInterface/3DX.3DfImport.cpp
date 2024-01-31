@@ -1,8 +1,9 @@
 ﻿#include "stdafx.h"
 
 #include "3DX.3DfImport.h"
-
 #include "3DX.ExchangeWrapper.h"
+//:Ken - 20240131
+#include "3DX.FileOptions.h"
 
 #include "LogManager.h"
 
@@ -74,6 +75,8 @@ TdfImport::~TdfImport()
 	m_vcMaterialMappingStyleVector.clear();
 }
 
+
+
 bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSegment, Signal::Delivery & cInDelivery, CString & strErrorMessage)
 {
 	if(false == InitializeA3DLibrary(strErrorMessage)) {
@@ -91,6 +94,10 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 
 	m_strCadFileName = strFilePathName.Right(strFilePathName.GetLength() - strFilePathName.ReverseFind('\\') - 1);
 
+//:Ken - 20240131, sample test. remove later
+#define KEN
+
+#ifndef KEN
 	// ===== TdfImport 옵션을 설정 =====
 	A3DRWParamsLoadData cParamsLoadData;
 	A3D_INITIALIZE_DATA(A3DRWParamsLoadData, cParamsLoadData);
@@ -101,6 +108,11 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 	//cParamsLoadData.m_sGeneral.m_eReadGeomTessMode = kA3DReadGeomOnly;
 	//cParamsLoadData.m_sGeneral.m_eReadGeomTessMode = kA3DReadGeomAndTess;
 	cParamsLoadData.m_sGeneral.m_eReadGeomTessMode = kA3DReadTessOnly;
+#else
+	//:WARNING - do not initialize
+	A3DRWParamsLoadData cParamsLoadData;
+	TheFileOptions.Import.Get(strFilePathName, cParamsLoadData);
+#endif
 
 	// Report용 Callback 함수 설정
 	//SetCallbacksReport();
