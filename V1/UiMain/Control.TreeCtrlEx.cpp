@@ -123,6 +123,10 @@ void Control::TreeCtrlEx::OnLButtonDown(UINT nFlags, CPoint point)
 
 HTREEITEM Control::TreeCtrlEx::CreateItem(Json::Object& design, HTREEITEM pParent)
 {
+	if (design.GetBoolean("visible", true) == false) {
+		return nullptr;
+	}
+
 	HTREEITEM pItem = InsertItem(Facility::GetTitle(design), pParent);
 	if (GetSelectedItem() == nullptr) {
 		SelectItem(pItem);

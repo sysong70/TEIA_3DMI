@@ -32,11 +32,24 @@ void Signal::Application::OnExitInstance()
 
 
 
+void Signal::Application::OnDpiAware(double scale)
+{
+	Json::Object data;
+	ConstructData(data, Action::OnDpiAware);
+
+	data.SetReal(SKW_DPISCALE, scale);
+
+	Wrapper().SendData(data);
+}
+
+
+
 void Signal::Application::OnUpdatePreference(Json::Object& value)
 {
-	//:WARNING - append construction to value
-	Json::Object data = value;
+	Json::Object data;
 	ConstructData(data, Action::OnUpdatePreference);
+
+	data.SetObject(SKW_VALUE, new Json::Object(value));
 
 	Wrapper().SendData(data);
 }
@@ -45,9 +58,22 @@ void Signal::Application::OnUpdatePreference(Json::Object& value)
 
 void Signal::Application::OnUpdateFileOption(Json::Object& value)
 {
-	//:WARNING - append construction to value
-	Json::Object data = value;
+	Json::Object data;
 	ConstructData(data, Action::OnUpdateFileOption);
+
+	data.SetObject(SKW_VALUE, new Json::Object(value));
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::Application::OnFileOptionReference(Json::Object& value)
+{
+	Json::Object data;
+	ConstructData(data, Action::OnFileOptionReference);
+
+	data.SetObject(SKW_VALUE, new Json::Object(value));
 
 	Wrapper().SendData(data);
 }
@@ -103,18 +129,6 @@ void Signal::Application::SaveTraceLog(const wchar_t* pPath, bool saveAndClear)
 		data.SetString(SKW_VALUE, pPath);
 	}
 	data.SetBoolean(SKW_CLEAR, saveAndClear);
-
-	Wrapper().SendData(data);
-}
-
-
-
-void Signal::Application::OnDpiAware(double scale)
-{
-	Json::Object data;
-	ConstructData(data, Action::OnDpiAware);
-
-	data.SetReal(SKW_DPISCALE, scale);
 
 	Wrapper().SendData(data);
 }

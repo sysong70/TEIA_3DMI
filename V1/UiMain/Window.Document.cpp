@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "Window.Document.h"
 #include "Window.View.h"
+#include "Facility.AppResources.h"
 #include <File.h>
 #include <Path.h>
 #include <WStr.h>
@@ -12,69 +13,74 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 
+#define PRESET WindowPreset
+
+namespace WindowPreset
+{
+	using Extensions = std::vector<CString>;
+
+	Extensions Extensions3d;
+	Extensions Extensions2d;
+
+	Extensions& Get3dExtensions() {
+		// generate extensions
+		if (Extensions3d.size() == 0) {
+			Json::Array& items = TheAppResources
+				.GetDialog("FileOptions")
+				.GetArray("tree")
+				.GetObject(0)
+				.GetArray("items");
+
+			for (auto item : items.GetBuffer()) {
+				Json::Object& target = item->AsObject();
+				if (target.GetBoolean("visible", true) == false) {
+					continue;
+				}
+
+				Json::Array& extensions = target.GetArray("ext");
+				for (auto ext : extensions.GetBuffer()) {
+					Extensions3d.push_back(ext->AsString());
+				}
+			}
+		}
+
+		return Extensions3d;
+	}
+
+	Extensions& Get2dExtensions() {
+		//:TODO
+		if (Extensions2d.size() == 0) {
+			Extensions2d.push_back(L"DWG");
+			Extensions2d.push_back(L"DXF");
+		}
+
+		return Extensions2d;
+	}
+}
+
+
 
 bool Window::IsAllowedFile(const wchar_t* pFilePath)
 {
 	return IsAllowed3d(pFilePath) || IsAllowed2d(pFilePath);
 }
 
-
+//:REF - https://docs.techsoft3d.com/exchange/latest/start/supported-formats.html
 
 bool Window::IsAllowed3d(const wchar_t* pFilePath)
 {
-	//:REF - https://docs.techsoft3d.com/exchange/latest/start/supported-formats.html
+	CString extension = Path::GetExtension(pFilePath);
+	extension.MakeUpper();
 
-	//:WARNING - check formats
-
-	const CString EXTENSIONS[] = {
-		L"3MF",											// 3MF
-		L"SAT", L"SAB",									// ACIS
-		L"DWG", L"DXF",									// AutoCAD
-		L"3DS",											// Autodesk 3DS
-		L"DWF",											// Autodesk DWF
-		L"IPT", L"IAM",									// Autodesk Inventor
-		L"NWD",											// Autodesk Navisworks
-		L"MODEL", L"SESSION", L"DLV", L"EXP",			// Catia V4
-		L"CATPART", L"CATPRODUCT", L"CATSHAPE", L"CGR",	// Catia V5
-		L"3DXML",										// Catia V6/3DExperience
-		L"DAE",											// COLLADA
-		L"ASM", L"NEU", L"PRT", L"XAS", L"XPR",			// Creo/ProE
-		L"FBX",											// FBX
-		L"GLTF", L"GLB",								// GL Transmission Format
-		L"MF1", L"ARC", L"UNV", L"PKG",					// I-deas
-		L"IFC", L"IFCZIP",								// IFC
-		L"IGS", L"IGES",								// IGES
-		L"JT",											// JT
-		L"PRT",											// NX Unigraphics
-		L"X_B", L"X_T", L"XMT", L"XMT_TXT",				// Parasolid
-		L"PDF",											// PDF
-		L"PRC",											// PRC
-		L"RVT, RFA",									// Revit
-		L"3DM",											// Rhino3D
-		L"ASM", L"PAR", L"PWD", L"PSM",					// Solid Edge
-		L"SLDASM", L"SLDPRT",							// SolidWorks
-		L"STP", L"STEP", L"STPZ", L"STPX", L"STPXZ",	// STEP
-		L"STL",											// Stereo Lithography
-		L"U3D",											// U3D
-		L"VDA",											// VDA-FS
-		L"WRL", L"VRML",								// VRML
-		L"OBJ",											// Wavefront OBJ
-
-		L"PTS", L"PTX", L"XYZ",							// Point Cloud
-	};
-
-	CString ext = Path::GetExtension(pFilePath);
-	ext.MakeUpper();
-
-	for (auto pre : EXTENSIONS) {
-		if (pre == ext) {
-			return true;
-		}
+	//:WARNING - Creo/ProE (case *.1)
+	if (WStr::IsDigit(extension)) {
+		return true;
 	}
 
-	//:WARNING - Creo - Pro/E (case *.1)
-	if (WStr::IsDigit(ext)) {
-		return true;
+	for (auto& item : PRESET::Get3dExtensions()) {
+		if (item == extension) {
+			return true;
+		}
 	}
 
 	return false;
@@ -84,20 +90,16 @@ bool Window::IsAllowed3d(const wchar_t* pFilePath)
 
 bool Window::IsAllowed2d(const wchar_t* pFilePath)
 {
-	const CString EXTENSIONS[] = {
-		L"DWG", L"DXF"	// AutoCAD
-	};
+	CString extension = Path::GetExtension(pFilePath);
+	extension.MakeUpper();
 
-	CString ext = Path::GetExtension(pFilePath);
-	ext.MakeUpper();
-
-	for (auto pre : EXTENSIONS) {
-		if (pre == ext) {
+	for (auto& item : PRESET::Get2dExtensions()) {
+		if (item == extension) {
 			return true;
 		}
 	}
 
-	return false;
+	return true;
 }
 
 
@@ -224,3 +226,5 @@ void Window::Document::Dump(CDumpContext& dc) const
 }
 
 #endif //_DEBUG
+
+#undef PRESET

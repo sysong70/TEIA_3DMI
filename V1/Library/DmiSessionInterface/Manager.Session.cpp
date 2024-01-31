@@ -112,9 +112,17 @@ void SESSION::Manager::Session::ExecuteApplicationSignal(Json::Object & cInObjec
 			break;
 
 		case Signal::Application::Action::OnUpdatePreference:
+			//:TODO
 			break;
 
+		//:Ken - 20240131
 		case Signal::Application::Action::OnUpdateFileOption:
+			m_cApplication.OnUpdateFileOption(cInObject.GetAt(SKW_VALUE));
+			break;
+
+		//:Ken - 20240131
+		case Signal::Application::Action::OnFileOptionReference:
+			m_cApplication.OnFileOptionReference(cInObject.GetAt(SKW_VALUE));
 			break;
 
 		default:

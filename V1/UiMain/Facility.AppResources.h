@@ -18,9 +18,9 @@ namespace Facility
 		HBITMAP GetBackground();
 
 		Json::Object& GetDialog(CStringA name);
-
+		// default value
 		Json::Object& GetPreferences();
-
+		// default value
 		Json::Object& GetFileOptions();
 
 		Json::Object& GetStyles();

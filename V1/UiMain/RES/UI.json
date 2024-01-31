@@ -88,7 +88,7 @@
 				{"name":"Inventor", "title":"Autodesk Inventor", "ext":["IPT", "IAM"],                                  "group":[1,1,1,0,1], "General":[9,10]},
 				{"name":"Navisworks", "title":"Autodesk Navisworks", "ext":["NWD"],                                     "group":[1,0,1,0,0], "General":[9,10]},
 				{"name":"CATIA4", "title":"CATIA V4", "ext":["MODEL", "SESSION", "DLV", "EXP"],                         "group":[1,1,1,1,0], "General":[9,10]},
-				{"name":"CATIA5", "title":"CATIA V5", "ext":["CATDrawing", "CATPart", "CATProduct", "CATShape", "CGR"], "group":[1,1,1,1,1], "General":[10]},
+				{"name":"CATIA5", "title":"CATIA V5", "ext":["CATDRAWING", "CATPART", "CATPRODUCT", "CATShape", "CGR"], "group":[1,1,1,1,1], "General":[10]},
 				{"name":"CATIA6", "title":"CATIA V6/3DExperience", "ext":["3DXML"],                                     "group":[1,0,1,1,0], "General":[0,9,10]},
 				{"name":"COLLADA", "title":"COLLADA", "ext":["DAE"],                                                    "group":[1,0,1,0,0], "General":[0,9]},
 				{"name":"ProE", "title":"Creo/Pro-E", "ext":["ASM", "NEU", "PRT", "PRT.*", "XAS", "XPR"],               "group":[1,1,1,1,1], "General":[10]},
@@ -113,7 +113,8 @@
 				{"name":"VRML", "title":"VRML", "ext":["WRL", "VRML"],                                                  "group":[1,0,1,1,0], "General":[0,9]},
 				{"name":"OBJ", "title":"Wavefront OBJ", "ext":["OBJ"],                                                  "group":[1,0,1,1,0], "General":[9,10]},
 				{"name":"dummy", "visible":false}
-			]}
+			]},
+			{"name":"Export", "title":"Export|내보내기", "items":[]}
 		],
 		"common":[
 			{"type":"group", "name":"General", "title":"General|일반", "items":[

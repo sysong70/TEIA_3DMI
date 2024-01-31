@@ -5,7 +5,7 @@
 #include "3DX.h"
 
 #ifndef INITIALIZE_A3D_API
-#	include <A3DSDKIncludes.h>
+#include <A3DSDKIncludes.h>
 #endif
 
 namespace H3DX
@@ -19,27 +19,29 @@ namespace H3DX
 		JsonWrapper();
 
 		virtual ~JsonWrapper();
-		// from Signal
-		bool SetRootObject(const wchar_t* pSource);
+
+		virtual bool Set(Json::Object& value);
 
 	protected:
 
 		Json::Object m_root;
 	};
 
-	class API_3DX FileOptions : public JsonWrapper
+	class API_3DX ImportOptions : public JsonWrapper
 	{
 	public:
 
-		FileOptions();
+		ImportOptions();
 
-		virtual ~FileOptions();
+		virtual ~ImportOptions();
 
-	public: // Import options
+	public:
 
-		//:WARNING - use A3D_INITIALIZE_DATA before call function
-		// call GetImport("3MF")
-		bool GetImport(CStringA fileTypeName, A3DRWParamsLoadData& param);
+		bool Set(Json::Object& value) override;
+
+		bool SetReference(Json::Object& value);
+
+		bool Get(CString& filePath, A3DRWParamsLoadData& param);
 
 	protected:
 
@@ -51,13 +53,62 @@ namespace H3DX
 
 		bool GetPMI(Json::Object& source, A3DRWParamsLoadData& target);
 
-		bool GetSpecial(Json::Object& source, A3DRWParamsLoadData& target);
+		bool GetSpecial(CStringA fileType, Json::Object& source, A3DRWParamsLoadData& target);
 
 	private:
 
-		bool IsValidFileTypeName(CStringA name);
+		Json::Object m_reference;
 
-		CStringA m_activeType;
+		CString GetFileTypeName(CString filePath);
+
+		A3DGraphRgbColorData ToHoopsColor(CString value);
+
+		A3DUTF8Char* ToHoopsString(CString value);
+		// split string by ';'
+		A3DUTF8Char** ToHoopsStrings(CString value);
+	};
+
+	//:TODO
+
+	class API_3DX ExportOptions : public JsonWrapper
+	{
+	public:
+
+		ExportOptions();
+
+		virtual ~ExportOptions();
+
+	public:
+
+		bool Set(Json::Object& value) override;
+
+		bool SetReference(Json::Object& value);
+		// A3DRWParamsExportPrcData??
+		bool Get(CString& filePath, A3DRWParamsExportPrcData& param) {
+			RETURN_TRUE;
+		}
+
+	private:
+
+		Json::Object m_reference;
+	};
+
+
+
+	class API_3DX FileOptions
+	{
+	public:
+		
+		FileOptions();
+
+		~FileOptions();
+
+		bool Set(Json::Object& value);
+
+		bool SetReference(Json::Object& value);
+
+		ImportOptions Import;
+		ExportOptions Export;
 	};
 }
 

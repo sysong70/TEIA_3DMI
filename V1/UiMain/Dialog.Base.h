@@ -48,8 +48,6 @@ namespace Dialog
 
 		BOOL OnInitDialog() override;
 
-		void PostNcDestroy() override;
-
 		afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 
 		DECLARE_MESSAGE_MAP()

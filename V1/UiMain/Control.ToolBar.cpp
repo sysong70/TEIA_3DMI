@@ -288,13 +288,6 @@ void Control::ToolBar::SetSize(EItemSize size)
 
 
 
-void Control::ToolBar::PostNcDestroy()
-{
-	__super::PostNcDestroy();
-}
-
-
-
 void Control::ToolBar::OnCommand(UINT id)
 {
 	GetParent()->SendMessage(WM_COMMAND, (WPARAM)id);

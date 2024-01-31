@@ -162,13 +162,6 @@ BOOL Dialog::Base::OnInitDialog()
 
 
 
-void Dialog::Base::PostNcDestroy()
-{
-	__super::PostNcDestroy();
-}
-
-
-
 void Dialog::Base::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 {
 	if (m_sizeLimit.ptMinTrackSize.x > 0 && m_sizeLimit.ptMinTrackSize.y > 0) {

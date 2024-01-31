@@ -129,13 +129,6 @@ CSize Control::Panel::GetBodySize()
 
 
 
-void Control::Panel::PostNcDestroy()
-{
-	__super::PostNcDestroy();
-}
-
-
-
 LRESULT Control::Panel::OnDPIChangedAfterParent(WPARAM, LPARAM)
 {
 	LRESULT result = Default();

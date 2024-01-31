@@ -11,13 +11,19 @@ namespace KERNEL
 	class API_KERNEL Application
 	{
 	public:
+
 		Application();
 
 		void InitInstance();
 
 		void ExitInstance();
+		//:Ken - 20240131
+		void OnUpdateFileOption(Json::Object& data);
+		//:Ken - 20240131
+		void OnFileOptionReference(Json::Object& data);
 
 	protected:
+
 		H3DF::Application m_cApplication;
 	};
 };
