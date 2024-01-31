@@ -545,7 +545,7 @@ H3DF::SelectionItem::SelectionItem(SelectionItem const & cInThat)
 H3DF::Type H3DF::SelectionItem::Type() const
 {
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
-	return pcImpl->cKey.Type();
+	return pcImpl->m_cKey.Type();
 }
 
 void H3DF::SelectionItem::Set(SelectionItem const & cInThat)
@@ -570,16 +570,16 @@ bool H3DF::SelectionItem::operator==(SelectionItem const & cInThat) const
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
 	SelectionItemImpl * pcInThatImpl = (SelectionItemImpl *)cInThat.m_pcImpl;
 
-	if (pcImpl->cKey.KeyValue() != pcInThatImpl->cKey.KeyValue()) {
+	if (pcImpl->m_cKey.KeyValue() != pcInThatImpl->m_cKey.KeyValue()) {
 		return false;
 	}
 
-	if (pcImpl->nIncludeCount != pcInThatImpl->nIncludeCount) {
+	if (pcImpl->m_nIncludeCount != pcInThatImpl->m_nIncludeCount) {
 		return false;
 	}
 
-	for (int nIndex = 0; nIndex < pcImpl->nIncludeCount; nIndex++) {
-		if (pcImpl->pnIncludeKeys[nIndex] != pcInThatImpl->pnIncludeKeys[nIndex]) {
+	for (int nIndex = 0; nIndex < pcImpl->m_nIncludeCount; nIndex++) {
+		if (pcImpl->m_pnIncludeKeys[nIndex] != pcInThatImpl->m_pnIncludeKeys[nIndex]) {
 			return false;
 		}
 	}
@@ -600,15 +600,15 @@ bool H3DF::SelectionItem::operator==(SelectionItem const & cInThat) const
 	}
 */
 
-	if (pcImpl->nRegion != pcInThatImpl->nRegion) {
+	if (pcImpl->m_nRegion != pcInThatImpl->m_nRegion) {
 		return false;
 	}
 
-	if (pcImpl->nLowest != pcInThatImpl->nLowest) {
+	if (pcImpl->m_nLowest != pcInThatImpl->m_nLowest) {
 		return false;
 	}
 
-	if (pcImpl->nHighest != pcInThatImpl->nHighest) {
+	if (pcImpl->m_nHighest != pcInThatImpl->m_nHighest) {
 		return false;
 	}
 
@@ -640,14 +640,14 @@ bool H3DF::SelectionItem::IsValid()
 {
 	auto * pcImpl = dynamic_cast<SelectionItemImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
-	return (INVALID_KEY != pcImpl->cKey.KeyValue()) ? true : false;
+	return (INVALID_KEY != pcImpl->m_cKey.KeyValue()) ? true : false;
 }
 
 bool H3DF::SelectionItem::IsValid() const
 {
 	auto * pcImpl = dynamic_cast<SelectionItemImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
-	return (INVALID_KEY != pcImpl->cKey.KeyValue()) ? true : false;
+	return (INVALID_KEY != pcImpl->m_cKey.KeyValue()) ? true : false;
 }
 
 bool H3DF::SelectionItem::ShowSelectedItem(Key & cOutSelection)
@@ -657,7 +657,7 @@ bool H3DF::SelectionItem::ShowSelectedItem(Key & cOutSelection)
 	}
 
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
-	cOutSelection = pcImpl->cKey;
+	cOutSelection = pcImpl->m_cKey;
 
 	return true;
 }
@@ -669,7 +669,7 @@ const bool H3DF::SelectionItem::ShowSelectedItem(Key & cOutSelection) const
 	}
 
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
-	cOutSelection = pcImpl->cKey;
+	cOutSelection = pcImpl->m_cKey;
 
 	return true;
 }
@@ -697,7 +697,7 @@ bool H3DF::SelectionItem::ShowSelectionPosition(WindowPoint & cOutLocation) cons
 	}
 
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
-	cOutLocation = pcImpl->cWindowPoint;
+	cOutLocation = pcImpl->m_cWindowPoint;
 
 	return true;
 }
@@ -709,7 +709,7 @@ bool H3DF::SelectionItem::ShowSelectionPosition(WorldPoint & cOutLocation) const
 	}
 
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
-	cOutLocation = pcImpl->cWorldPoint;
+	cOutLocation = pcImpl->m_cWorldPoint;
 
 	return true;
 }
@@ -881,13 +881,6 @@ void H3DF::SelectionResults::Reset()
 	}
 
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
-
-/*
-	for (auto pcItem : pcImpl->GetItems()) {
-		delete pcItem;
-	}
-*/
-
 	pcImpl->Clear();
 }
 
@@ -898,13 +891,6 @@ void H3DF::SelectionResults::Reset() const
 	}
 
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *) m_pcImpl;
-
-/*
-	for (auto pcItem : pcImpl->GetItems()) {
-		delete pcItem;
-	}
-*/
-
 	pcImpl->Clear();
 }
 
@@ -1208,15 +1194,15 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 
 		pcItemImpl->m_pcWindow = pcSelCtrlImpl->m_pcWindow;
 
-		HC_Show_Selection_Element(&nKey, &pcItemImpl->nOffset1, &pcItemImpl->nOffset2, &pcItemImpl->nOffset3);
+		HC_Show_Selection_Element(&nKey, &pcItemImpl->m_nOffset1, &pcItemImpl->m_nOffset2, &pcItemImpl->m_nOffset3);
 		HC_Show_Selection_Original_Key(&nKey);
 
 		WindowPoint cWindowPoint;
 		WorldPoint cWorldPoint;
 		HC_Show_Selection_Position(&cWindowPoint.x, &cWindowPoint.y, &cWindowPoint.z, &cWorldPoint.x, &cWorldPoint.y, &cWorldPoint.z);
 
-		pcItemImpl->cWindowPoint = cWindowPoint;
-		pcItemImpl->cWorldPoint = cWorldPoint;
+		pcItemImpl->m_cWindowPoint = cWindowPoint;
+		pcItemImpl->m_cWorldPoint = cWorldPoint;
 		
 		// build up an array of include keys to pass with the selection
 		int nKeyCount = 0;
@@ -1229,7 +1215,7 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 			pnIncludeKeys = new HC_KEY[nKeyCount];
 			HC_Show_Selection_Original_Keys(&nKeyCount, pnKeys);
 
-			pcItemImpl->pnIncludeKeys = pnIncludeKeys;
+			pcItemImpl->m_pnIncludeKeys = pnIncludeKeys;
 
 			nIncludeCount = 0;
 			for (int nIndex = nKeyCount - 1; nIndex >= 0; nIndex--)
@@ -1245,7 +1231,7 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 				}
 			}
 
-			pcItemImpl->nIncludeCount = nIncludeCount;
+			pcItemImpl->m_nIncludeCount = nIncludeCount;
 		}
 
 		HC_Show_Key_Type(nKey, chKeyType);
@@ -1255,7 +1241,7 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 
 		if (streq(chKeyType, "line") || streq(chKeyType, "polyline") || streq(chKeyType, "circular arc") || streq(chKeyType, "elliptical arc")) {
 			eSelectedType = SelectionControlImpl::SelType::Line;
-			pcItemImpl->cKey = LineKey(Key(nKey));
+			pcItemImpl->m_cKey = LineKey(Key(nKey));
 		}
 		else if (streq(chKeyType, "marker")) {
 			eSelectedType = SelectionControlImpl::SelType::Marker;
@@ -1267,10 +1253,10 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 		else {
 			// This may be shell, mesh, cyliner, etc...
 			eSelectedType = SelectionControlImpl::SelType::Shell;
-			pcItemImpl->cKey = ShellKey(Key(nKey));
+			pcItemImpl->m_cKey = ShellKey(Key(nKey));
 
 			// But if it really is a shell, check for regions.
-			if (streq(chKeyType, "shell") && pcItemImpl->nOffset3 != -1) {
+			if (streq(chKeyType, "shell") && pcItemImpl->m_nOffset3 != -1) {
 
 				int nRegion = 0;
 				int nLowest = 0;
@@ -1282,14 +1268,14 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 					// eSelectedType |= SelectionControlImpl::SelType::Region;
 
 					HC_Open_Geometry(nKey); {
-						HC_Open_Face(pcItemImpl->nOffset3); {
+						HC_Open_Face(pcItemImpl->m_nOffset3); {
 							HC_Show_Region(&nRegion);
 						}HC_Close_Face();
 					}HC_Close_Geometry();
 
-					pcItemImpl->nRegion = nRegion;
-					pcItemImpl->nLowest = nLowest;
-					pcItemImpl->nHighest = nHighest;
+					pcItemImpl->m_nRegion = nRegion;
+					pcItemImpl->m_nLowest = nLowest;
+					pcItemImpl->m_nHighest = nHighest;
 				}
 /*
 				//Selection::Level cLevel;

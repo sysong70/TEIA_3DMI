@@ -59,6 +59,7 @@ namespace H3DF
 		//== Segment User Data 관련 함수 ============================================================= 
 		static bool SetSegmentName(SegmentKey & cInSegment, CString strName);
 		static bool ShowSegmentName(SegmentKey & cInSegment, CString & strName);
+		static bool ShowSegmentName(HC_KEY nInKey, CString & strOutName);
 
 		static bool SetTopologyType(SegmentKey & cInSegment, DWORD nInType);
 		static bool ShowTopologyType(SegmentKey & cInSegment, DWORD & eOutType);

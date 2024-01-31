@@ -530,6 +530,22 @@ bool H3DF::UserData::ShowSegmentName(SegmentKey & cInSegment, CString & strName)
 	return true;
 }
 
+bool H3DF::UserData::ShowSegmentName(HC_KEY nInKey, CString & strOutName)
+{
+	SegmentKey cSegment(nInKey);
+
+	ByteArray aUserData;
+	if (false == cSegment.ShowUserData((intptr_t)UserDataIndex::Name, aUserData)) {
+		return false;
+	}
+
+	if (false == Utility::CharToUnicode((char *)aUserData.data(), strOutName)) {
+		return false;
+	}
+
+	return true;
+}
+
 bool H3DF::UserData::SetTopologyType(SegmentKey & cInSegment, DWORD nInType)
 {
 	cInSegment.SetUserData((intptr_t)UserDataIndex::Topology, sizeof(DWORD), (BYTE *)&nInType);

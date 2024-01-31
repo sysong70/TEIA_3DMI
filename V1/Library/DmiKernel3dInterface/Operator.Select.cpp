@@ -89,7 +89,7 @@ KERNEL::Operator::SelectImpl::SelectImpl(const H3DF::View * pcInView, const Sign
 	m_nSelFilter += (DWORD)SelectionFilter::Type::Curve;
 	m_nSelFilter += (DWORD)SelectionFilter::Type::Edge;
 	m_nSelFilter += (DWORD)SelectionFilter::Type::Face;
-	//m_nSelFilter += (DWORD)SelectionFilter::Type::Solid;
+	m_nSelFilter += (DWORD)SelectionFilter::Type::Solid;
 	m_nSelFilter += (DWORD)SelectionFilter::Type::Axis;
 	m_nSelFilter += (DWORD)SelectionFilter::Type::PMI;
 
@@ -174,6 +174,9 @@ int KERNEL::Operator::Select::LButtonUp(HEventInfo & cInEvent)
 		return HLISTENER_PASS_EVENT;
 	}
 
+	CString strPath;
+	cSelItem.ShowPathString(strPath);
+
 	// 3. 기존에 선택되어 있는 Dynamic highlight를 모두 지움.
 	pcImpl->m_cHighlightOSnapOperator.UnhighlightEverything();
 
@@ -233,6 +236,41 @@ void KERNEL::Operator::Select::SetObjectSnapMode(OSnap::Type eInType)
 }
 
 //== Select 관련 함수 ================================================================================
+
+bool KERNEL::Operator::Select::SelectByItem(H3DF::SelectionItem & cInSelItem)
+{
+	auto * pcImpl = (Operator::SelectImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	H3DF::HighlightOptionsKit cOptions;
+
+	if (false == pcImpl->m_cSelectionResult.IsExist(cInSelItem)) {
+		if (H3DF::Type::LineKey == cInSelItem.Type()) {
+			pcImpl->m_cLineHighlightCtrl.Highlight(cInSelItem, cOptions, false);
+		}
+		else {
+			pcImpl->m_cHighlightCtrl.Highlight(cInSelItem, cOptions, false);
+		}
+
+		// 선택된 객체를 SelectionResult에 추가
+		pcImpl->m_cSelectionResult.PushFront(cInSelItem);
+	}
+	else {
+		if (H3DF::Type::LineKey == cInSelItem.Type()) {
+			pcImpl->m_cLineHighlightCtrl.Unhighlight(cInSelItem, cOptions);
+		}
+		else {
+			pcImpl->m_cHighlightCtrl.Unhighlight(cInSelItem, cOptions);
+		}
+
+		pcImpl->m_cSelectionResult.Erase(cInSelItem);
+	}
+
+	pcImpl->View().Update();
+
+	return true;
+}
+
 void KERNEL::Operator::Select::SetSelectionFilter(SelectionFilter::Type eInType)
 {
 	auto * pcImpl = (Operator::SelectImpl *)m_pcImpl;
@@ -257,4 +295,5 @@ void KERNEL::Operator::Select::UnhighlightEverything()
 
 	pcImpl->m_cHighlightOSnapOperator.UnhighlightEverything();
 	pcImpl->m_cHighlightCtrl.UnhighlightEverything();
+	pcImpl->m_cSelectionResult.Reset();
 }
