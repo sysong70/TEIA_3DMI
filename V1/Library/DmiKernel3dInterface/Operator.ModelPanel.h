@@ -27,7 +27,7 @@ namespace KERNEL
 			void MarkupsGroupItemExpanded();
 
 			void ItemExpanded(HC_KEY nInItemKey);
-			void IncludeExpanded(HC_KEY nInItemKey);
+			void IncludeExpanded(HC_KEY nInItemKey, HC_KEY nInParentKey = INVALID_KEY);
 		};
 	}
 }	

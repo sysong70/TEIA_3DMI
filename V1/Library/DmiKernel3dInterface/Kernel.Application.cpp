@@ -19,8 +19,8 @@ void KERNEL::Application::InitInstance()
 {
 	m_cApplication.InitInstance();
 
-	A3DRWParamsLoadData param;
-	TheFileOptions.GetImport("CATIA5", param);
+// 	A3DRWParamsLoadData param;
+// 	TheFileOptions.GetImport("CATIA5", param);
 }
 
 void KERNEL::Application::ExitInstance()

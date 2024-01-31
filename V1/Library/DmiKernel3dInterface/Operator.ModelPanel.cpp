@@ -16,6 +16,8 @@
 
 #include <Path.h>
 
+#include <ranges>
+
 #define MODELS_GROUP_KEY				1
 #define MEASUREMENTS_GROUP_KEY			2
 #define MARKUPS_GROUP_KEY				3
@@ -372,7 +374,7 @@ void KERNEL::Operator::ModelPanel::ItemExpanded(HC_KEY nInItemKey)
 }
 
 // 2.2.1 Include Item Expanded 처리
-void KERNEL::Operator::ModelPanel::IncludeExpanded(HC_KEY nInItemKey)
+void KERNEL::Operator::ModelPanel::IncludeExpanded(HC_KEY nInItemKey, HC_KEY nInParentKey)
 {
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -383,7 +385,13 @@ void KERNEL::Operator::ModelPanel::IncludeExpanded(HC_KEY nInItemKey)
 	Signal::TreeItems cTreeItems;
 	Signal::TreeItem cItem;
 
-	cItem.ParentKey = nInItemKey;
+	// 입력된 Parent Key가 유효하지 않으면 nInItemKey값을 Parent Key로 사용한다.
+	if (INVALID_KEY == nInParentKey) {
+		cItem.ParentKey = nInItemKey;
+	}
+	else {
+		cItem.ParentKey = nInParentKey;
+	}
 
 	H3DF::IncludeKeyArray cChildren;
 	cInSegment.ShowIncluders(cChildren);
@@ -391,19 +399,24 @@ void KERNEL::Operator::ModelPanel::IncludeExpanded(HC_KEY nInItemKey)
 	H3DF::SegmentKeyArray cChildren1;
 	cInSegment.ShowSubsegments(cChildren1);
 
-	for (auto cInclude : cChildren) {
+	for (auto & cInclude : std::ranges::reverse_view(cChildren)) {
 		SegmentKey cSegment = cInclude.GetTarget();
 
-		CString strName;
-		if (false == H3DF::UserData::ShowSegmentName(cSegment, strName)) {
-			strName = cSegment.Name();
+		// Segment의 이름에 part가 포함되어 있는 경우는 표시하지 않고 바로 하부 Item을 표시한다.
+		CStringA strName = cSegment.Name(false);
+		if ("part" == strName.Left(4)) {
+			IncludeExpanded(cInclude.KeyValue(), nInItemKey);
+			continue;
 		}
 
-		// strName = cSegment.Name();
+		CString strUserName;
+		if (false == H3DF::UserData::ShowSegmentName(cSegment, strUserName)) {
+			strUserName = cSegment.Name();
+		}
 
 		size_t nCount = cSegment.ShowIncluders();
 
-		cItem.Title = strName;
+		cItem.Title = strUserName;
 		cItem.Key = cInclude.KeyValue();
 		cItem.HasChildren = (0 < nCount) ? true : false;
 		cTreeItems.push_back(cItem);

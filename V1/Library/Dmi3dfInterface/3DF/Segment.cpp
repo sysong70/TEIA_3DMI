@@ -106,12 +106,16 @@ SegmentKey & H3DF::SegmentKey::Close()
 	return *this;
 }
 
-CStringA H3DF::SegmentKey::Name() const
+CStringA H3DF::SegmentKey::Name(bool bIncludePath) const
 {
 	CStringA strOutName;
 
 	char chSegName[MVO_BUFFER_SIZE] = "\n";
 	HC_Show_Segment(KeyValue(), chSegName);
+
+	if (false == bIncludePath) {
+		HC_Parse_String(chSegName, "/", -1, chSegName);
+	}
 
 	strOutName = chSegName;
 
