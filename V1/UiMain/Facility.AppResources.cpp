@@ -56,6 +56,13 @@ HBITMAP Facility::AppResources::GetBackground()
 
 
 
+Json::Object& Facility::AppResources::GetDescription()
+{
+	return m_ui.GetAt("Description");
+}
+
+
+
 Json::Object& Facility::AppResources::GetDialog(CStringA name)
 {
 	return m_ui.GetAt("Dialogs").GetAt(name);

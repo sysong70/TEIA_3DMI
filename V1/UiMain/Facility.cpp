@@ -176,9 +176,25 @@ bool Facility::LoadTextResource(UINT id, CString& result)
 
 #pragma region Json
 
+#include "Facility.AppResources.h"
+
 CString Facility::GetDescription(Json::Object& source)
 {
-	return Local(source.GetString("desc"));
+	Json::Value* pValue = source.FindValue("desc");
+	if (pValue == nullptr) {
+		return L"";
+	}
+
+	if (pValue->IsInteger()) {
+		CStringA code = (CStringA)pValue->ToString();
+		CString desc = TheAppResources.GetDescription().GetString(code);
+		desc.Replace(L"<br>", L"\n");
+
+		return Local(desc);
+	}
+	else {
+		return Local(pValue->AsString());
+	}
 }
 
 
