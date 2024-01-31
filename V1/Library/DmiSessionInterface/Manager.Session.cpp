@@ -111,11 +111,19 @@ void SESSION::Manager::Session::ExecuteApplicationSignal(Json::Object & cInObjec
 		case Signal::Application::Action::OnDpiAware:
 			break;
 
-		case Signal::Application::Action::OnUpdatePreference:
-			break;
+		case Signal::Application::Action::OnUpdatePreference: {
+			//:TODO
+		} break;
 
-		case Signal::Application::Action::OnUpdateFileOption:
-			break;
+		case Signal::Application::Action::OnUpdateFileOption: {
+			//:TODO
+			// H3DX - TheFileOptions.Set(cInObject.GetAt(SKW_VALUE));
+		} break;
+
+		case Signal::Application::Action::OnFileOptionReference: {
+			//:TODO
+			// H3DX - TheFileOptions.SetReference(cInObject.GetAt(SKW_VALUE));
+		} break;
 
 		default:
 			break;

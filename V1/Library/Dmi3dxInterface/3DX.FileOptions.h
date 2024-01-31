@@ -41,7 +41,7 @@ namespace H3DX
 
 		bool SetReference(Json::Object& value);
 
-		bool Get(CStringA fileTypeName, A3DRWParamsLoadData& param);
+		bool Get(CString& filePath, A3DRWParamsLoadData& param);
 
 	protected:
 
@@ -53,18 +53,19 @@ namespace H3DX
 
 		bool GetPMI(Json::Object& source, A3DRWParamsLoadData& target);
 
-		bool GetSpecial(Json::Object& source, A3DRWParamsLoadData& target);
+		bool GetSpecial(CStringA fileType, Json::Object& source, A3DRWParamsLoadData& target);
 
 	private:
 
-		CStringA m_activeType;
 		Json::Object m_reference;
 
-		bool IsValidFileTypeName(CStringA name);
-
-		CStringA GetFileTypeName(CString filePath);
+		CString GetFileTypeName(CString filePath);
 
 		A3DGraphRgbColorData ToHoopsColor(CString value);
+
+		A3DUTF8Char* ToHoopsString(CString value);
+		// split string by ';'
+		A3DUTF8Char** ToHoopsStrings(CString value);
 	};
 
 	//:TODO
@@ -83,13 +84,12 @@ namespace H3DX
 
 		bool SetReference(Json::Object& value);
 		// A3DRWParamsExportPrcData??
-		bool Get(CStringA fileTypeName, A3DRWParamsExportPrcData& param) {
-			return true;
+		bool Get(CString& filePath, A3DRWParamsExportPrcData& param) {
+			RETURN_TRUE;
 		}
 
 	private:
 
-		CStringA m_activeType;
 		Json::Object m_reference;
 	};
 

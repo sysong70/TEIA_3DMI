@@ -46,9 +46,10 @@ void Signal::Application::OnDpiAware(double scale)
 
 void Signal::Application::OnUpdatePreference(Json::Object& value)
 {
-	//:WARNING - append construction to value
-	Json::Object data = value;
+	Json::Object data;
 	ConstructData(data, Action::OnUpdatePreference);
+
+	data.SetObject(SKW_VALUE, new Json::Object(value));
 
 	Wrapper().SendData(data);
 }
@@ -57,9 +58,10 @@ void Signal::Application::OnUpdatePreference(Json::Object& value)
 
 void Signal::Application::OnUpdateFileOption(Json::Object& value)
 {
-	//:WARNING - append construction to value
-	Json::Object data = value;
+	Json::Object data;
 	ConstructData(data, Action::OnUpdateFileOption);
+
+	data.SetObject(SKW_VALUE, new Json::Object(value));
 
 	Wrapper().SendData(data);
 }
@@ -68,9 +70,10 @@ void Signal::Application::OnUpdateFileOption(Json::Object& value)
 
 void Signal::Application::OnFileOptionReference(Json::Object& value)
 {
-	//:WARNING - append construction to value
-	Json::Object data = value;
+	Json::Object data;
 	ConstructData(data, Action::OnFileOptionReference);
+
+	data.SetObject(SKW_VALUE, new Json::Object(value));
 
 	Wrapper().SendData(data);
 }

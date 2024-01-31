@@ -242,11 +242,10 @@ BOOL Window::Application::InitInstance()
 
 		Json::Array& tree = TheAppResources.GetDialog("FileOptions").GetArray("tree");
 		Json::Object reference;
-		reference.CreateObject("Import") = tree.GetObject(0);
-		reference.CreateObject("Export") = tree.GetObject(1);
-		//:TODO
-		//app.OnFileOptionReference(reference);
+		reference.SetObject("Import", new Json::Object(tree.GetObject(0)));
+		reference.SetObject("Export", new Json::Object(tree.GetObject(1)));
 
+		app.OnFileOptionReference(reference);
 		app.OnUpdateFileOption(TheAppOptions.GetFileOptions());
 	}
 	else {

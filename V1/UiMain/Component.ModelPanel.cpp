@@ -38,11 +38,11 @@ BEGIN_MESSAGE_MAP(ModelPanel, Panel)
 	ON_NOTIFY(TVN_DELETEITEM, PRESET::Id, OnTreeDeleteItem)
 	ON_NOTIFY(TVN_ENDLABELEDIT, PRESET::Id, OnTreeEndLabelEdit)
 	ON_NOTIFY(TVN_ITEMEXPANDED, PRESET::Id, OnTreeItemExpanded)
-	ON_NOTIFY(TVN_ITEMEXPANDING, PRESET::Id, OnTreeItemExpanding)
+	//ON_NOTIFY(TVN_ITEMEXPANDING, PRESET::Id, OnTreeItemExpanding)
 	ON_NOTIFY(NM_RCLICK, PRESET::Id, OnTreeRClick)
 	ON_NOTIFY(NM_RDBLCLK, PRESET::Id, OnTreeRDbClick)
 	ON_NOTIFY(TVN_SELCHANGED, PRESET::Id, OnTreeSelChanged)
-	ON_NOTIFY(TVN_SELCHANGING, PRESET::Id, OnTreeSelChanging)
+	//ON_NOTIFY(TVN_SELCHANGING, PRESET::Id, OnTreeSelChanging)
 	ON_NOTIFY(NM_SETFOCUS, PRESET::Id, OnTreeSetFocus)
 
 	//ON_MESSAGE(WM_DPICHANGED_AFTERPARENT, OnDPIChangedAfterParent)
@@ -199,9 +199,8 @@ void Component::ModelPanel::OnTreeBeginDrag(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
-	DEBUG_TRACE(L"TVN_BEGINDRAG: item: %s; x: %d, y: %d\r\n",
-		(LPCTSTR)m_wndControl.GetItemText(pNMTreeView->itemNew.hItem),
-		pNMTreeView->ptDrag.x, pNMTreeView->ptDrag.y);
+	//CString text = m_wndControl.GetItemText(pNMTreeView->itemNew.hItem);
+	//POINT pos = pNMTreeView->ptDrag;
 
 	*pResult = S_OK;
 }
@@ -212,12 +211,11 @@ void Component::ModelPanel::OnTreeBeginLabelEdit(NMHDR* pNMHDR, LRESULT* pResult
 {
 	TV_DISPINFO* pTVDispInfo = (TV_DISPINFO*)pNMHDR;
 
+	//CString text = pTVDispInfo->item.pszText;
 	CEdit* pEdit = (CEdit*)CWnd::FromHandle((HWND)m_wndControl.SendMessage(TVM_GETEDITCONTROL));
 	if (pEdit->GetSafeHwnd() != nullptr) {
 		pEdit->PostMessage(EM_SETSEL, 0, (LPARAM)-1);
 	}
-
-	DEBUG_TRACE(L"TVN_BEGINLABELEDIT: item: %s\r\n", pTVDispInfo->item.pszText);
 
 	*pResult = S_OK;
 }
@@ -260,12 +258,10 @@ void Component::ModelPanel::OnTreeDblClick(NMHDR* pNMHDR, LRESULT* pResult)
 void Component::ModelPanel::OnTreeDeleteItem(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
+	HTREEITEM hItem = pNMTreeView->itemOld.hItem;
 
-	DEBUG_TRACE(L"TVN_DELETEITEM: item: %s\r\n",
-		(LPCTSTR)m_wndControl.GetItemText(pNMTreeView->itemOld.hItem));
-
-	if (m_wndControl.GetItemText(pNMTreeView->itemOld.hItem) != PRESET::DummyName) {
-		DWORD_PTR key = m_wndControl.GetItemData(pNMTreeView->itemOld.hItem);
+	if (m_wndControl.GetItemText(hItem) != PRESET::DummyName) {
+		DWORD_PTR key = m_wndControl.GetItemData(hItem);
 		m_keyMap.erase(key);
 		m_pView->GetDelivery().modelPanel.OnDeleteItem(key);
 	}
@@ -279,8 +275,12 @@ void Component::ModelPanel::OnTreeEndLabelEdit(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	TV_DISPINFO* pTVDispInfo = (TV_DISPINFO*)pNMHDR;
 
-	DEBUG_TRACE(L"TVN_ENDLABELEDIT: item: %s\r\n",
-		pTVDispInfo->item.pszText == nullptr ? L"CANCELED" : pTVDispInfo->item.pszText);
+	if (pTVDispInfo->item.pszText == nullptr) {
+		// canceled
+	}
+	else {
+		//CString text = pTVDispInfo->item.pszText;
+	}
 
 	*pResult = S_OK;
 }
@@ -291,14 +291,9 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
-	//const CString action = pNMTreeView->action == TVE_EXPAND ? L"expand" :
-	//	pNMTreeView->action == TVE_COLLAPSE ? L"collapse" : L"unknown";
-
-	//DEBUG_TRACE(L"TVN_ITEMEXPANDED: item: %s; action: %s\r\n",
-	//	(LPCTSTR)m_wndControl.GetItemText(pNMTreeView->itemNew.hItem), (LPCTSTR)action);
-
 	if (pNMTreeView->action == TVE_EXPAND) {
 		HTREEITEM hItem = pNMTreeView->itemNew.hItem;
+		// get first child item
 		HTREEITEM hChild = m_wndControl.GetChildItem(hItem);
 
 		if (m_wndControl.GetItemText(hChild) == PRESET::DummyName) {
@@ -309,21 +304,22 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 			m_pView->GetDelivery().modelPanel.OnItemExpanded(key);
 		}
 	}
+	else {
+		ASSERT(pNMTreeView->action == TVE_COLLAPSE);
+	}
 
 	*pResult = S_OK;
 }
 
-
+//:WARNING - not use
 
 void Component::ModelPanel::OnTreeItemExpanding(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
-	const CString action = pNMTreeView->action == TVE_EXPAND ? L"expand" :
-		pNMTreeView->action == TVE_COLLAPSE ? L"collapse" : L"unknown";
-
-	DEBUG_TRACE(L"TVN_ITEMEXPANDING: item: %s; action: %s\r\n",
-		(LPCTSTR)m_wndControl.GetItemText(pNMTreeView->itemNew.hItem), (LPCTSTR)action);
+	//if (pNMTreeView->action == TVE_EXPAND) {}
+	//else if (pNMTreeView->action == TVE_COLLAPSE) {}
+	//else {}
 
 	*pResult = S_OK;
 }
@@ -354,34 +350,31 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
-	const CString oldItem = pNMTreeView->itemOld.hItem == nullptr ? L"(none)" : m_wndControl.GetItemText(pNMTreeView->itemOld.hItem);
-	const CString newItem = pNMTreeView->itemNew.hItem == nullptr ? L"(none)" : m_wndControl.GetItemText(pNMTreeView->itemNew.hItem);
-	const CString action = pNMTreeView->action == TVC_BYMOUSE ? L"by mouse" :
-		pNMTreeView->action == TVC_BYKEYBOARD ? L"by keyboard" : L"unknown";
+	//if (pNMTreeView->action == TVC_BYMOUSE) {}
+	//else if (pNMTreeView->action == TVC_BYKEYBOARD) {}
+	//else {}
 
-	DEBUG_TRACE(L"TVN_SELCHANGED: Old item: %s New item: %s; action: %s\r\n",
-		(LPCTSTR)oldItem, (LPCTSTR)newItem, (LPCTSTR)action);
+	//:CHECK - pNMTreeView->itemOld.hItem == nullptr
 
-
-	DWORD_PTR key = m_wndControl.GetItemData(pNMTreeView->itemNew.hItem);
-	m_pView->GetDelivery().modelPanel.OnSelChanged(key);
+	if (pNMTreeView->itemNew.hItem != nullptr) {
+		DWORD_PTR key = m_wndControl.GetItemData(pNMTreeView->itemNew.hItem);
+		m_pView->GetDelivery().modelPanel.OnSelChanged(key);
+	}
 
 	*pResult = S_OK;
 }
 
-
+//:WARNING - not use
 
 void Component::ModelPanel::OnTreeSelChanging(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
-	const CString oldItem = pNMTreeView->itemOld.hItem == nullptr ? L"(none)" : m_wndControl.GetItemText(pNMTreeView->itemOld.hItem);
-	const CString newItem = pNMTreeView->itemNew.hItem == nullptr ? L"(none)" : m_wndControl.GetItemText(pNMTreeView->itemNew.hItem);
-	const CString action = pNMTreeView->action == TVC_BYMOUSE ? L"by mouse" :
-		pNMTreeView->action == TVC_BYKEYBOARD ? L"by keyboard" : L"unknown";
+	//if (pNMTreeView->action == TVC_BYMOUSE) {}
+	//else if (pNMTreeView->action == TVC_BYKEYBOARD) {}
+	//else {}
 
-	DEBUG_TRACE(L"TVN_SELCHANGING: Old item: %s New item: %s; action: %s\r\n",
-		(LPCTSTR)oldItem, (LPCTSTR)newItem, (LPCTSTR)action);
+	//:CHECK - pNMTreeView->itemOld.hItem == nullptr
 
 	*pResult = S_OK;
 }
@@ -403,11 +396,14 @@ void Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, CString tit
 	TVINSERTSTRUCT tvi;
 	tvi.hParent = parent;
 	tvi.hInsertAfter = TVI_LAST;
-	tvi.item.pszText = (LPWSTR)(LPCTSTR)title;
+
+	//:CHECK - item or itemex
+	tvi.itemex.pszText = (LPWSTR)(LPCTSTR)title;
 	//:WARNING - is not single flag!!! (combination)
-	tvi.item.mask = TVIF_TEXT | TVIF_PARAM;
+	tvi.itemex.mask = TVIF_TEXT | TVIF_PARAM;
 	// TVIF_PARAM: add data. if not set, lParam is not assigned
-	tvi.item.lParam = (LPARAM)key;
+	tvi.itemex.lParam = (LPARAM)key;
+	//:CHECK - how to use tvi.itemex.cChildren?
 
 	HTREEITEM hCurrent = m_wndControl.InsertItem(&tvi);
 	m_keyMap[key] = hCurrent;

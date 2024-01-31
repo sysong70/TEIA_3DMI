@@ -21,6 +21,8 @@ H3DX::JsonWrapper::~JsonWrapper()
 {
 }
 
+
+
 bool H3DX::JsonWrapper::Set(Json::Object& value)
 {
 	m_root = value;
@@ -48,23 +50,12 @@ H3DX::ImportOptions::~ImportOptions()
 bool H3DX::ImportOptions::Set(Json::Object& value)
 {
 	const CStringA category = "Import";
-	const CStringA reference = "reference";
 
 	if (value.FindValue(category) != nullptr) {
 		RETURN_FALSE;
 	}
 
-	Json::Object& data = value.GetAt(category);
-	__super::Set(data);
-
-	// SKW_REFERENCE, OnInitInstance only once
-	if (data.FindValue(reference) != nullptr) {
-		m_reference = data.GetAt(reference);
-	}
-	else {
-		ASSERT(m_reference.IsEmpty() == false);
-	}
-
+	JsonWrapper::Set(value.GetAt(category));
 	//:TODO - version check
 	//ASSERT(m_root.GetString("version") == L"240126.1");
 
@@ -83,32 +74,86 @@ bool H3DX::ImportOptions::SetReference(Json::Object& value)
 
 
 
-bool H3DX::ImportOptions::Get(CStringA fileTypeName, A3DRWParamsLoadData& param)
+bool H3DX::ImportOptions::Get(CString& filePath, A3DRWParamsLoadData& param)
 {
-	if (IsValidFileTypeName(fileTypeName) == false) {
+	CStringA fileType = (CStringA)GetFileTypeName(filePath);
+	if (fileType.IsEmpty()) {
 		return false;
 	}
 
-	// set category for sub functions
-	m_activeType = fileTypeName;
-
-	Json::Object& data = m_root.GetAt("Import").GetAt(fileTypeName);
+	Json::Object& data = m_root.GetAt("Import").GetAt(fileType);
 	bool success = true;
+
+	//:CHECK
+	A3D_INITIALIZE_DATA(A3DRWParamsLoadData, param);
 
 	success &= GetGeneral(data, param);
 	success &= GetTessellation(data, param);
 	success &= GetSearch(data, param);
 	success &= GetPMI(data, param);
-	success &= GetSpecial(data, param);
+	success &= GetSpecial(fileType, data, param);
 	ASSERT(success);
-
-	// reset cateogry
-	m_activeType.Empty();
 
 	return success;
 }
 
+/*
+{"type":"group", "name":"General", "title":"General|일반", "items":[
+	{"type":"drop", "name":"ReadingMode", "title":"Reading Mode|__#__", "desc":"__#__|__#__", "value":0, "items":[
+		"BRep & Tessellation|__#__",
+		"Tessellation Only|__#__"
+	]},
+	{"type":"check", "name":"Solids", "title":"Solid|__#__", "desc":"__#__|__#__"},
+	{"type":"check", "name":"Surfaces", "title":"Surfaces|__#__", "desc":"__#__|__#__"},
+	{"type":"check", "name":"Wireframes", "title":"Wireframes|__#__", "desc":"__#__|__#__"},
+	{"type":"check", "name":"Attributes", "title":"Attributes|__#__", "desc":"__#__|__#__"},
+	{"type":"check", "name":"HiddenObjects", "title":"Hidden Objects|__#__", "desc":"__#__|__#__"},
+	{"type":"check", "name":"ConstructionAndReferences", "title":"Construction and References|__#__", "desc":"__#__|__#__"},
+	{"type":"check", "name":"ActiveFilter", "title":"Active Filter|__#__", "desc":"__#__|__#__"},
+	{"type":"group", "name":"SewModel", "title":"Sew Model|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+		{"type":"edit", "name":"SewingTolerance", "title":"Sewing Tolerance|__#__", "desc":"__#__|__#__", "value":"0.001"},
+		{"type":"check", "name":"ShellOrientation", "title":"Compute Non-Solid Shell Orientation|__#__", "desc":"__#__|__#__"}
+	]},
+	{"type":"drop", "name":"LoadingMode", "title":"Loading Mode|__#__", "desc":"__#__|__#__", "value":0, "items":[
+		"Complete|__#__",
+		"Incremental|__#__"
+	]},
+	{"type":"drop", "name":"GeneralUnits", "title":"Units|__#__", "desc":"__#__|__#__", "value":0, "items":[
+		"Unknown|__#__",
+		"Point(pt)|__#__",
+		"Inch(in)|__#__",
+		"Millimeter(mm)|__#__",
+		"Centimeter(cm)|__#__",
+		"Picas(pica)|__#__",
+		"Foot(ft)|__#__",
+		"Yard(yd)|__#__",
+		"Meter(m)|__#__",
+		"Kilometer(km)|__#__",
+		"Mile(mi)|__#__"
+	]},
+	{"type":"check", "name":"TrueColorMode", "title":"True Color Mode|__#__", "desc":"__#__|__#__"},
+	{"type":"group", "name":"LargeTansformation", "title":"Extract Large Transformation|", "hasCheck":true, "items":[
+		{"type":"edit", "name":"Cutoff", "title":"Cutoff Value|__#__", "desc":"__#__|__#__", "value":"12000"}
+	]}
+]}
+*/
 
+// + "ReadingMode"
+// + "Solids"
+// + "Surfaces"
+// + "Wireframes"
+// + "Attributes"
+// + "HiddenObjects"
+// + "ConstructionAndReferences"
+// + "ActiveFilter"
+// - "SewModel"
+// - "SewingTolerance"
+// - "ShellOrientation"
+// - "LoadingMode"
+// - "GeneralUnits"
+// - "TrueColorMode"
+// - "LargeTansformation"
+// - "Cutoff"
 
 bool H3DX::ImportOptions::GetGeneral(Json::Object& source, A3DRWParamsLoadData& target)
 {
@@ -146,7 +191,46 @@ bool H3DX::ImportOptions::GetGeneral(Json::Object& source, A3DRWParamsLoadData& 
 	return true;
 }
 
+/*
+{"type":"group", "name":"Tessellation", "title":"Tessellation", "items":[
+	{"type":"drop", "name":"TessLevel", "title":"Predefined Tessellation Level|__#__", "value":2, "items":[
+		"Extra Low|__#__",
+		"Low|__#__",
+		"Medium|__#__",
+		"High|__#__",
+		"Extra High|__#__",
+		"Custom|__#__"
+	]},
+	{"type":"group", "name":"CustomTessLevel", "title":"Custom Tessellation Level", "enable":false, "items":[
+		{"type":"drop", "name":"ChordLimitType", "title":"Chord Limit|__#__", "desc":"__#__|__#__", "value":0, "items":[
+			"Ratio|__#__",
+			"Height|__#__"
+		]},
+		{"type":"slider", "name":"ChordLimit", "title":"Limit|__#__", "desc":"__#__|__#__", "min":50, "max":10000, "value":2000},
+		{"type":"slider", "name":"AngleTolerance", "title":"Angle Tolerance|__#__", "desc":"__#__|__#__", "min":10, "max":40, "value":40}
+	]},
+	{"type":"check", "name":"PreserveUV", "title":"Preserve UV Points|__#__", "desc":"__#__|__#__"},
+	{"type":"edit", "name":"MaxEdgeLength", "title":"Maximum Edge Length|__#__", "desc":"__#__|__#__", "value":"0"},
+	{"type":"group", "name":"AccurateTess", "title":"Accurate Tessellation|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+		{"type":"group", "name":"GridAlignedTess", "title":"Grid Aligned Tessellation|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+			{"type":"edit", "name":"MaxStitchLength", "title":"Maximum Stitch Length|__#__", "desc":"__#__|__#__", "value":"0.001"},
+			{"type":"check", "name":"SurfaceCurvatures", "title":"Adapt to Surface Curvatures|__#__", "desc":"__#__|__#__"}
+		]}
+	]}
+]}
+*/
 
+// + "TessLevel"
+// + "CustomTessLevel"
+// + "ChordLimitType"
+// + "ChordLimit"
+// + "AngleTolerance"
+// + "PreserveUV"
+// + "MaxEdgeLength"
+// + "AccurateTess"
+// + "GridAlignedTess"
+// + "MaxStitchLength"
+// + "SurfaceCurvatures"
 
 bool H3DX::ImportOptions::GetTessellation(Json::Object& source, A3DRWParamsLoadData& target)
 {
@@ -182,7 +266,17 @@ bool H3DX::ImportOptions::GetTessellation(Json::Object& source, A3DRWParamsLoadD
 	return true;
 }
 
+/*
+{"type":"group", "name":"Search", "title":"Search|__#__", "items":[
+	{"type":"folder", "name":"Folders", "title":"Folders|__#__", "desc":"Select search folders for assemblies and textures|__#__"},
+	{"type":"check", "name":"RecursiveSearch", "title":"Recursive Search|__#__", "desc":"__#__|__#__"},
+	{"type":"edit", "name":"SearchMaxEdgeLength", "title":"Maximum Edge Length|__#__", "desc":"__#__|__#__", "value":"0"}
+]}
+*/
 
+// - "Folders"
+// - "RecursiveSearch"
+// - "SearchMaxEdgeLength"
 
 bool H3DX::ImportOptions::GetSearch(Json::Object& source, A3DRWParamsLoadData& target)
 {
@@ -193,13 +287,40 @@ bool H3DX::ImportOptions::GetSearch(Json::Object& source, A3DRWParamsLoadData& t
 		RETURN_FALSE;
 	}
 
-	//:TODO
 	Json::Object& data = source.GetAt(category);
+	//:TODO
+	A3DRWParamsAssemblyData& param = target.m_sAssembly;
 
 	return true;
 }
 
+/*
+{"type":"group", "name":"PMI", "title":"PMI|__#__", "hasCheck":true, "items":[
+	{"type":"check", "name":"AutomaticOrientation", "title":"Automatic Orientation|__#__", "desc":"__#__|__#__"},
+	{"type":"drop", "name":"PMIUnits", "title":"Units|__#__", "desc":"__#__|__#__", "value":0, "items":[
+		"Unknown|__#__",
+		"Point(pt)|__#__",
+		"Inch(in)|__#__",
+		"Millimeter(mm)|__#__",
+		"Centimeter(cm)|__#__",
+		"Picas(pica)|__#__",
+		"Foot(ft)|__#__",
+		"Yard(yd)|__#__",
+		"Meter(m)|__#__",
+		"Kilometer(km)|__#__",
+		"Mile(mi)|__#__"
+	]},
+	{"type":"color", "name":"PMIColor", "title":"Color|__#__", "desc":"__#__|__#__", "value":"0x000000"},
+	{"type":"check", "name":"SubstituteFont", "title":"Always Substitute Font|__#__", "desc":"__#__|__#__"},
+	{"type":"font", "name":"PMIFont", "title":"Substitution Font|__#__", "desc":"__#__|__#__", "value":"Myraid Pro"}
+]}
+*/
 
+// - "AutomaticOrientation"
+// + "PMIUnits"
+// + "PMIColor"
+// + "SubstituteFont"
+// + "PMIFont"
 
 bool H3DX::ImportOptions::GetPMI(Json::Object& source, A3DRWParamsLoadData& target)
 {
@@ -217,7 +338,7 @@ bool H3DX::ImportOptions::GetPMI(Json::Object& source, A3DRWParamsLoadData& targ
 
 		//param.m_usStructSize;
 		param.m_bAlwaysSubstituteFont = data.GetBoolean("SubstituteFont");
-		//param.m_pcSubstitutionFont;
+		param.m_pcSubstitutionFont = ToHoopsString(data.GetString("PMIFont"));
 		//param.m_iNumberOfDigitsAfterDot;
 		param.m_eDefaultUnit = unit == 0 ? kA3DUnitUnknown : (A3DEUnits)(unit - 1);
 		//param.m_uiProprietaryFontDirectoriesSize;
@@ -234,7 +355,7 @@ bool H3DX::ImportOptions::GetPMI(Json::Object& source, A3DRWParamsLoadData& targ
 
 
 
-bool H3DX::ImportOptions::GetSpecial(Json::Object& source, A3DRWParamsLoadData& target)
+bool H3DX::ImportOptions::GetSpecial(CStringA fileType, Json::Object& source, A3DRWParamsLoadData& target)
 {
 	const CStringA category = "Special";
 
@@ -242,55 +363,133 @@ bool H3DX::ImportOptions::GetSpecial(Json::Object& source, A3DRWParamsLoadData& 
 		return true;
 	}
 
-	//m_usStructSize
-	//? A3DRWParamsCatiaV4Data m_sCatiaV4;
-	//	A3DRWParamsCatiaV5Data m_sCatiaV5;
-	//	A3DRWParamsUnigraphicsData m_sUnigraphics;
-	//	A3DRWParamsProEData m_sProE;
-	//? A3DRWParamsStepData m_sStep;
-	//? A3DRWParamsIGESData m_sIGES;
-	//? A3DRWParamsIFCData m_sIFC; // V5.2
-	//	A3DRWParamsJTData m_sJT; // V8.0
-	//? A3DRWParamsParasolidData m_sParasolid; // V8.1
-	//	A3DRWParamsSolidworksData m_sSolidworks; // V8.2
-	//	A3DRWParamsInventorData m_sInventor; // V9.0
-	//? A3DRWParamsRhinoData m_sRhino; // V11.2
-	//? A3DRWParamsRevitData m_sRevit; // V13.1
-	//? A3DRWParamsSolidEdgeData m_sSolidEdge; // V23.1
+	//target.m_usStructSize;
+	//   A3DRWParamsCatiaV4Data m_sCatiaV4;
+	// + A3DRWParamsCatiaV5Data m_sCatiaV5;
+	// + A3DRWParamsUnigraphicsData m_sUnigraphics;
+	// + A3DRWParamsProEData m_sProE;
+	//   A3DRWParamsStepData m_sStep;
+	//   A3DRWParamsIGESData m_sIGES;
+	//   A3DRWParamsIFCData m_sIFC; // V5.2
+	// + A3DRWParamsJTData m_sJT; // V8.0
+	//   A3DRWParamsParasolidData m_sParasolid; // V8.1
+	// + A3DRWParamsSolidworksData m_sSolidworks; // V8.2
+	//   A3DRWParamsInventorData m_sInventor; // V9.0
+	//   A3DRWParamsRhinoData m_sRhino; // V11.2
+	//   A3DRWParamsRevitData m_sRevit; // V13.1
+	//   A3DRWParamsSolidEdgeData m_sSolidEdge; // V23.1
 
 	Json::Object& data = source.GetAt(category);
 	A3DRWParamsSpecificLoadData& special = target.m_sSpecifics;
 
-	if (m_activeType == "") {
+	//:TODO
+
+	if (fileType == "") {
 		return true;
 	}
-	else if (m_activeType == "ACAD") {
+	else if (fileType == "ACAD") {
+		//:TODO
+		// - "AsDrawing"
 	}
-	else if (m_activeType == "Inventor") {
+	else if (fileType == "Inventor") {
+		// + "EmbededTess"
+
 		A3DRWParamsInventorData& param = special.m_sInventor;
+
+		//param.m_usStructSize;
+		param.m_bUseTessForFile = data.GetBoolean("EmbededTess");
 	}
-	else if (m_activeType == "CATIA5") {
+	else if (fileType == "CATIA5") {
+		// + "DiskCache"
+		// + "CacheLocation"
+		// + "MaterialRendering"
+
 		A3DRWParamsCatiaV5Data& param = special.m_sCatiaV5;
+
+		//param.m_usStructSize;
+		param.m_bCacheActivation = data.GetAt("DiskCache").GetBoolean("checked");
+		param.m_pcCachePath = ToHoopsString(data.GetString("CacheLocation"));
+		param.m_bUseMaterialRendering = data.GetBoolean("MaterialRendering");
 	}
-	else if (m_activeType == "ProE") {
+	else if (fileType == "ProE") {
+		// + "DimensionTolerance"
+		// + "MissingBoolean"
+		// + "MissingFlexible"
+		// + "SubPartPMI"
+		// + "Datum"
+		// + "Skeletons"
+		// + "Construction"
+		// + "FamilyTable"
+		// + "CodePageName"
+		// + "SessionColor"
+
 		A3DRWParamsProEData& param = special.m_sProE;
+
+		Json::Object& display = data.GetAt("Display");
+		Json::Object& import = data.GetAt("Import");
+		int sessionColor = data.GetInteger("SessionColor");
+
+		//param.m_usStructSize;
+		param.m_pcCodePageName = ToHoopsString(data.GetString("CodePageName"));
+		param.m_bDisplayTolerance = display.GetBoolean("DimensionTolerance");
+		param.m_bDisplaySubpartAnnotations = import.GetBoolean("SubPartPMI");
+
+		switch (sessionColor) {
+		case 0: param.m_eSessionColorType = kA3DHExchangeSessionColor; break;
+		case 1: param.m_eSessionColorType = kA3DLastCreoVersionSessionColor; break;
+		case 2: param.m_eSessionColorType = kA3DFileVersionSessionColor; break; //:CHECK
+
+		default:
+			DEBUG_STOP;
+			break;
+		}
+
+		param.m_eFamilyTables = (A3DProEFamilyTables)data.GetInteger("FamilyTable");
+		param.m_bBoolOpUseGenericIfNoTess = display.GetBoolean("MissingBoolean");
+		param.m_bFlexCompUseGenericIfNoTess = display.GetBoolean("MissingFlexible");
+		param.m_bHideSkeletons = !import.GetBoolean("Skeletons"); //:WARNING - reverse value
+		//param.m_bReadExplodeStateAsView;
+		param.m_bDisplayVisibleDatum = import.GetBoolean("Datum");
+		param.m_eReadConstructEntities = import.GetBoolean("Construction")
+			? A3DProEReadConstructEntities_Yes : A3DProEReadConstructEntities_No; //:CHECK
+		//param.m_bComputeHomeView;
+		//param.m_bHandlePMIScreenLocation;
+		//param.m_bIsometricDefaultView;
 	}
-	else if (m_activeType == "JT") {
+	else if (fileType == "JT") {
+		// + "LevelOfDetail"
+
 		A3DRWParamsJTData& param = special.m_sJT;
+
+		//param.m_usStructSize;
+		param.m_eReadTessellationLevelOfDetail = (A3DEJTReadTessellationLevelOfDetail)data.GetInteger("LevelOfDetail");
 	}
-	else if (m_activeType == "NX") {
+	else if (fileType == "NX") {
+		// + "RecomputeCameras"
+
 		A3DRWParamsUnigraphicsData& param = special.m_sUnigraphics;
+
+		//param.m_usStructSize;
+		//param.m_bApplyToAllLevels;
+		//param.m_uiPreferredReferenceSetsSize;
+		//param.m_ppcPreferredReferenceSets;
+		param.m_bFitAllToUpdateViewCameras = data.GetBoolean("RecomputeCameras");
 	}
-	else if (m_activeType == "SolidWorks") {
+	else if (fileType == "SolidWorks") {
+		// + "VisibleDatum"
+
 		A3DRWParamsSolidworksData& param = special.m_sSolidworks;
+
+		//param.m_usStructSize;
+		//param.m_bLoadAllConfigsData;
+		param.m_usDisplayVisibleDatum = data.GetBoolean("VisibleDatum") ? 1 : 0;
+
 	}
 		
 	return true;
 }
 
 /*
-	UI structures - UiMain/RES/UI.json (Dialogs/FileOptions/tree/0)
-
 	{"name":"3MF", "title":"3MF", "ext":["3MF"],                                                            "group":[1,0,1,0,0], "General":[9,10]},
 	{"name":"ACIS", "title":"ACIS", "ext":["SAT", "SAB"],                                                   "group":[1,1,1,0,0], "General":[9,10]},
 	{"name":"ACAD", "title":"AutoCAD", "ext":["DWG", "DXF"],                                                "group":[1,1,1,0,1], "General":[9,10]},
@@ -325,28 +524,32 @@ bool H3DX::ImportOptions::GetSpecial(Json::Object& source, A3DRWParamsLoadData& 
 	{"name":"OBJ", "title":"Wavefront OBJ", "ext":["OBJ"],                                                  "group":[1,0,1,1,0], "General":[9,10]},
 */
 
-bool H3DX::ImportOptions::IsValidFileTypeName(CStringA name)
-{
-	const CStringA categories[] = {
-		"3MF", "ACIS", "ACAD", "3DS", "DWF", "Inventor", "Navisworks", "CATIA4", "CATIA5", "CATIA6",
-		"COLLADA", "ProE", "FBX", "GLTF", "Ideas", "IFC", "IGES", "JT", "NX", "Parasolid", "PDF",
-		"PRC", "Revit", "Rhino3D", "SolidEdge", "SolidWorks", "STEP", "STL", "U3D", "VDA", "VRML", "OBJ"
-	};
+#include <WStr.h>
 
-	for (auto cat : categories) {
-		if (cat == name) {
-			return true;
+CString H3DX::ImportOptions::GetFileTypeName(CString filePath)
+{
+	CString extension = Path::GetExtension(filePath.GetBuffer());
+	extension.MakeUpper();
+
+	if (WStr::IsDigit(extension)) {
+		return "ProE";
+	}
+
+	for (auto item : m_reference.GetArray("items").GetBuffer()) {
+		Json::Object& import = item->AsObject();
+		if (import.GetBoolean("visible", true) == false) {
+			continue;
+		}
+
+		for (auto ext : import.GetArray("ext").GetBuffer()) {
+			if (ext->AsString() == extension) {
+				return import.GetString("name");
+			}
 		}
 	}
 
-	RETURN_FALSE;
-}
-
-
-
-CStringA H3DX::ImportOptions::GetFileTypeName(CString filePath)
-{
-	return CStringA();
+	DEBUG_STOP;
+	return L"";
 }
 
 
@@ -362,6 +565,20 @@ A3DGraphRgbColorData H3DX::ImportOptions::ToHoopsColor(CString value)
 	data.m_dBlue = GetBValue(color) / 255.0;
 
 	return data;
+}
+
+
+
+A3DUTF8Char* H3DX::ImportOptions::ToHoopsString(CString value)
+{
+	RETURN_NULL;
+}
+
+
+
+A3DUTF8Char** H3DX::ImportOptions::ToHoopsStrings(CString value)
+{
+	RETURN_NULL;
 }
 
 #pragma endregion //:REGION
@@ -384,6 +601,14 @@ H3DX::ExportOptions::~ExportOptions()
 
 bool H3DX::ExportOptions::Set(Json::Object& value)
 {
+	const CStringA category = "Export";
+
+	if (value.FindValue(category) != nullptr) {
+		RETURN_FALSE;
+	}
+
+	JsonWrapper::Set(value.GetAt(category));
+
 	return true;
 }
 
@@ -394,7 +619,7 @@ bool H3DX::ExportOptions::SetReference(Json::Object& value)
 	ASSERT(value.IsEmpty() == false && m_reference.IsEmpty());
 	m_reference = value;
 
-	return true;
+	RETURN_TRUE;
 }
 
 #pragma endregion //:REGION
