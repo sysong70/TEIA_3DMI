@@ -71,7 +71,7 @@
       <PreprocessorDefinitions>_DEBUG;KERNEL_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(Dmi3dfInclude);../Common;../Dmi3dfInterface</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(Dmi3dfInclude);../Common;../Dmi3dfInterface;../3DX/include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <BrowseInformation>true</BrowseInformation>
     </ClCompile>

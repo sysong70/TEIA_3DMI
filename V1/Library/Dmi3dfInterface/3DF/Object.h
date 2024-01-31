@@ -11,6 +11,7 @@ namespace H3DF
 		virtual ~Object();
 
 		virtual H3DF::Type Type() const;
+		H3DF::Type Type(HC_KEY nKey) const;
 
 		H3DF::Type ObjectType() const { return H3DF::Type::None; };
 		Impl * GetImpl() { return m_pcImpl; }

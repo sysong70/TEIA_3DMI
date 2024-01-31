@@ -2,15 +2,17 @@
 
 #include <Json.h>
 
+#include "3DX.h"
+
 #ifndef INITIALIZE_A3D_API
-#include <A3DSDKIncludes.h>
+#	include <A3DSDKIncludes.h>
 #endif
 
 namespace H3DX
 {
 	// root of Json using class
 
-	class JsonWrapper
+	class API_3DX JsonWrapper
 	{
 	public:
 
@@ -25,9 +27,7 @@ namespace H3DX
 		Json::Object m_root;
 	};
 
-
-
-	class FileOptions : public JsonWrapper
+	class API_3DX FileOptions : public JsonWrapper
 	{
 	public:
 
@@ -61,4 +61,4 @@ namespace H3DX
 	};
 }
 
-extern H3DX::FileOptions TheFileOptions;
+extern API_3DX H3DX::FileOptions TheFileOptions;

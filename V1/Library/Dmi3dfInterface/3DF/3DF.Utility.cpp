@@ -219,6 +219,25 @@ CString H3DF::Utility::GetTypeString(Type eType)
 	return strText;
 }
 
+Type H3DF::Utility::GetType(HC_KEY nKey)
+{
+	CStringA strType;
+	HC_Show_Key_Type(nKey, strType.GetBuffer());
+	strType.ReleaseBuffer();
+
+	if ("segment" == strType) {
+		return H3DF::Type::SegmentKey;
+	}
+	else if ("include" == strType) {
+		return H3DF::Type::IncludeKey;
+	}
+	else {
+		assert(false);
+	}
+
+	return H3DF::Type::None;
+}
+
 //== String 관련 함수 ===============================================================================
 bool H3DF::Utility::UnicodeToChar(CString strText, char *& pchBuffer)
 {

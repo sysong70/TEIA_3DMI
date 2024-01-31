@@ -1072,6 +1072,11 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 	SegmentKey cSegment = m_cRisIncludeSegment.Subsegment(L"ri%d", m_nIncrementalId++);
 	cParentSegment.IncludeSegment(cSegment);
 
+	CString strPartName;
+	GetName(pcRepItem, strPartName);
+
+	H3DF::UserData::SetSegmentName(cSegment, strPartName);
+
 	A3DMiscCascadedAttributes * pcAttr;
 	A3DMiscCascadedAttributesData cAttrData;
 	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcRepItem, pcParentAttr, &pcAttr, &cAttrData));

@@ -273,21 +273,36 @@ IncludeKey H3DF::SegmentKey::IncludeSegment(SegmentKey const & cInSegment)
 	return cInclude;
 }
 
+size_t H3DF::SegmentKey::ShowIncluders() const
+{
+	int nIncludeCount = 0;
+
+	SegmentKeyImpl::LocalOpen(*this);
+
+	HC_Begin_Contents_Search(".", "include"); {
+		HC_Show_Contents_Count(&nIncludeCount);
+	} HC_End_Contents_Search();
+
+	SegmentKeyImpl::LocalClose(*this);
+
+	return nIncludeCount;
+}
+
 size_t H3DF::SegmentKey::ShowIncluders(SegmentKeyArray & aOutSegments) const
 {
-	int nSegmentCount = 0;
+	int nIncludeCount = 0;
 
 	SegmentKeyImpl::LocalOpen(*this);
 
 	HC_Begin_Contents_Search(".", "include");
 	{
-		HC_Show_Contents_Count(&nSegmentCount);
+		HC_Show_Contents_Count(&nIncludeCount);
 
 		HC_KEY nIncludeKey;
 		char chType[MVO_BUFFER_SIZE];
 		char chPathName[MVO_BUFFER_SIZE];
 
-		for (int i = 0; i < nSegmentCount; i++)
+		for (int i = 0; i < nIncludeCount; i++)
 		{
 			HC_Find_Contents(chType, &nIncludeKey);
 
@@ -301,7 +316,7 @@ size_t H3DF::SegmentKey::ShowIncluders(SegmentKeyArray & aOutSegments) const
 
 	SegmentKeyImpl::LocalClose(*this);
 
-	return nSegmentCount;
+	return nIncludeCount;
 }
 
 size_t H3DF::SegmentKey::ShowIncluders(IncludeKeyArray & aOutIncludes) const

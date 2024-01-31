@@ -2,7 +2,7 @@
 
 #include "Json.h"
 
-#include "3DX.h"
+#include "3DX.Base.h"
 
 #include "3DXSignal.h"
 
