@@ -76,7 +76,9 @@ void KERNEL::DocViewImpl::AllocationOperator(H3DF::View * pcInView, Signal::Deli
 	m_apcOperator[(int)KERNEL::Operator::Type::Select] = new KERNEL::Operator::Select(pcInView, &cDelivery);
 
 	// Camera Operator 생성 및 설정
-	m_apcOperator[(int)KERNEL::Operator::Type::ModelPanel] = new KERNEL::Operator::ModelPanel(pcInView, &cDelivery);
+	KERNEL::Operator::ModelPanel * pcModelPanel = new KERNEL::Operator::ModelPanel(pcInView, &cDelivery);
+	pcModelPanel->SetSelect((KERNEL::Operator::Select *)m_apcOperator[(int)KERNEL::Operator::Type::Select]);
+	m_apcOperator[(int)KERNEL::Operator::Type::ModelPanel] = pcModelPanel;
 }
 
 KERNEL::Operator::OperatorBase * KERNEL::DocViewImpl::GetOperator(Operator::Type eInType)

@@ -28,6 +28,8 @@ namespace KERNEL
 			void SetObjectSnapMode(OSnap::Type eInType);
 
 			//== Select 관련 함수 ====================================================================
+			bool SelectByItem(H3DF::SelectionItem & cInSelItem);
+
 			void SetSelectionFilter(SelectionFilter::Type eInType);
 
 			//== Highlight 관련 함수 =================================================================

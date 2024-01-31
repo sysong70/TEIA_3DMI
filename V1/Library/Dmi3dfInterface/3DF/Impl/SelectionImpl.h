@@ -87,53 +87,53 @@ namespace H3DF
 		SelectionItemImpl() { m_eType = H3DF::Type::SelectionItem; }
 		virtual ~SelectionItemImpl()
 		{
-			if (nullptr != pnIncludeKeys) {
-				delete pnIncludeKeys;
+			if (nullptr != m_pnIncludeKeys) {
+				delete m_pnIncludeKeys;
 			}
 		}
 
 		void Copy(SelectionItemImpl * pcInThat) {
-			cKey = pcInThat->cKey;
+			m_cKey = pcInThat->m_cKey;
 
-			nIncludeCount = pcInThat->nIncludeCount;
+			m_nIncludeCount = pcInThat->m_nIncludeCount;
 			// pnIncludeKeys값 복사
-			if (0 < nIncludeCount) {
-				pnIncludeKeys = new HC_KEY[nIncludeCount];
-				for (int i = 0; i < nIncludeCount; i++) {
-					pnIncludeKeys[i] = pcInThat->pnIncludeKeys[i];
+			if (0 < m_nIncludeCount) {
+				m_pnIncludeKeys = new HC_KEY[m_nIncludeCount];
+				for (int i = 0; i < m_nIncludeCount; i++) {
+					m_pnIncludeKeys[i] = pcInThat->m_pnIncludeKeys[i];
 				}
 			}
 
-			nOffset1 = pcInThat->nOffset1;
-			nOffset2 = pcInThat->nOffset2;
-			nOffset3 = pcInThat->nOffset3;
+			m_nOffset1 = pcInThat->m_nOffset1;
+			m_nOffset2 = pcInThat->m_nOffset2;
+			m_nOffset3 = pcInThat->m_nOffset3;
 
-			nRegion = pcInThat->nRegion;
-			nLowest = pcInThat->nLowest;
-			nHighest = pcInThat->nHighest;
+			m_nRegion = pcInThat->m_nRegion;
+			m_nLowest = pcInThat->m_nLowest;
+			m_nHighest = pcInThat->m_nHighest;
 
-			cWorldPoint = pcInThat->cWorldPoint;
-			cWindowPoint = pcInThat->cWindowPoint;
+			m_cWorldPoint = pcInThat->m_cWorldPoint;
+			m_cWindowPoint = pcInThat->m_cWindowPoint;
 
 			m_pcWindow = pcInThat->m_pcWindow;
 		}
 
 		// LineKey 등이 저장되는 변수
-		Key cKey;
+		Key m_cKey;
 
-		int nIncludeCount = 0;
-		HC_KEY * pnIncludeKeys = nullptr;
+		int m_nIncludeCount = 0;
+		HC_KEY * m_pnIncludeKeys = nullptr;
 
-		int nOffset1 = 0;
-		int nOffset2 = 0;
-		int nOffset3 = 0;
+		int m_nOffset1 = 0;
+		int m_nOffset2 = 0;
+		int m_nOffset3 = 0;
 
-		int nRegion = 0;
-		int nLowest = 0;
-		int nHighest = 0;
+		int m_nRegion = 0;
+		int m_nLowest = 0;
+		int m_nHighest = 0;
 
-		WorldPoint cWorldPoint;
-		WindowPoint cWindowPoint;
+		WorldPoint m_cWorldPoint;
+		WindowPoint m_cWindowPoint;
 
 		WindowKey * GetWindow() { return (WindowKey *) m_pcWindow; }
 		const WindowKey * m_pcWindow = nullptr;

@@ -3,18 +3,24 @@
 #include "Operator.ModelPanel.h"
 
 #include "Impl/OperatorImpl.h"
+#include "Operator.Select.h"
 
 #include "Signal.Connector.h"
 
+#include <3DF/KeyPath.h>
+#include <3DF/Selection.h>
+#include <3DF/Impl/SelectionImpl.h>
 #include <3DF/Facility.AppOptions.h>
+#include <3DF/3DF.Utility.h>
 
 #include <3DF/Impl/SegmentImpl.h>
 
 #include <3DF.View.h>
 
-#include <3DF/3DF.Utility.h>
-
 #include <Path.h>
+
+#include <ranges>
+#include <unordered_map>
 
 #define MODELS_GROUP_KEY				1
 #define MEASUREMENTS_GROUP_KEY			2
@@ -30,12 +36,171 @@ namespace KERNEL
 		class ModelTreeItem
 		{
 		public:
-			H3DF::SegmentKey cParent;
-			H3DF::SegmentKey cKey;
-			H3DF::SegmentKeyArray caChildren;
-			int nStatus = 0;
+			ModelTreeItem(HC_KEY nInKey);
+			~ModelTreeItem();
+
+			ModelTreeItem * AddChild(HC_KEY nInKey);
+
+			HC_KEY m_cKey = INVALID_KEY;
+			int m_nStatus = 0;
+
+			ModelTreeItem * m_pcParent = nullptr;
+			std::vector<ModelTreeItem *> vpnChildren;
+		};
+
+		class ModelTree
+		{
+		public:
+			ModelTree() = default;
+			~ModelTree();
+
+			bool AddItem(HC_KEY nInKey, HC_KEY nInParentKey);
+
+			bool ShowSelectionItem(HC_KEY nInkey, H3DF::SelectionItem & cSelItem);
+			bool ShowPath(HC_KEY nInkey, H3DF::KeyPath & cOutPath);
+
+			ModelTreeItem * m_pcRoot = nullptr;
+			std::unordered_map<HC_KEY, ModelTreeItem *> m_cItems;
 		};
 	}
+}
+
+KERNEL::Operator::ModelTreeItem::ModelTreeItem(HC_KEY nInKey)
+{
+	m_cKey = nInKey;
+}
+
+KERNEL::Operator::ModelTreeItem::~ModelTreeItem()
+{
+	for (auto pcChild : vpnChildren) {
+		delete pcChild;
+	}
+}
+
+KERNEL::Operator::ModelTreeItem * KERNEL::Operator::ModelTreeItem::AddChild(HC_KEY nInKey)
+{
+	Operator::ModelTreeItem * pcItem = new Operator::ModelTreeItem(nInKey);
+	DEBUG_VALID(pcItem);
+
+	pcItem->m_pcParent = this;
+	pcItem->m_cKey = nInKey;
+
+	vpnChildren.push_back(pcItem);
+
+	return pcItem;
+}
+
+KERNEL::Operator::ModelTree::~ModelTree()
+{
+	if (nullptr != m_pcRoot) {
+		delete m_pcRoot;
+	}
+
+	m_cItems.clear();
+}
+
+bool KERNEL::Operator::ModelTree::AddItem(HC_KEY nInKey, HC_KEY nInParentKey)
+{
+	if (0 == nInParentKey) {
+		m_pcRoot = new ModelTreeItem(nInKey);
+		DEBUG_VALID(m_pcRoot);
+		m_cItems.insert(std::make_pair(nInKey, m_pcRoot));
+		return true;
+	}
+
+	auto pcParentItem = m_cItems[nInParentKey];
+	if (nullptr == pcParentItem) {
+		return false;
+	}
+	
+	ModelTreeItem * pcItem = pcParentItem->AddChild(nInKey);
+	DEBUG_VALID(pcItem);
+
+	m_cItems.insert(std::make_pair(nInKey, pcItem));
+
+	return true;
+}
+
+bool KERNEL::Operator::ModelTree::ShowSelectionItem(HC_KEY nInkey, H3DF::SelectionItem & cSelItem)
+{
+	ModelTreeItem * pcTargetItem = m_cItems[nInkey];
+	if (nullptr == pcTargetItem) {
+		return false;
+	}
+
+	H3DF::SelectionItemImpl * pcImpl = dynamic_cast<H3DF::SelectionItemImpl *>(cSelItem.GetImpl());
+	DEBUG_VALID(pcImpl);
+
+	ModelTreeItem * pcItem = pcTargetItem;
+	while (nullptr != pcItem->m_pcParent) {
+		pcImpl->m_nIncludeCount++;
+		pcItem = pcItem->m_pcParent;
+	}
+
+	HC_KEY nSegmentKey = nInkey;
+
+	char chType[MVO_BUFFER_SIZE];
+	HC_Show_Key_Type(nSegmentKey, chType);
+
+	if (streq(chType, "include")) {
+		nSegmentKey = HC_Show_Include_Segment(nInkey, nullptr);
+	}
+
+	pcImpl->m_cKey = SegmentKey(nSegmentKey);
+
+	pcImpl->m_pnIncludeKeys = new HC_KEY[pcImpl->m_nIncludeCount];
+
+	pcItem = pcTargetItem;
+
+	for (int nIndex = 0; nIndex < pcImpl->m_nIncludeCount; nIndex++) {
+		pcImpl->m_pnIncludeKeys[nIndex] = pcItem->m_cKey;
+		pcItem = pcItem->m_pcParent;
+	}
+
+	return true;
+}
+
+bool KERNEL::Operator::ModelTree::ShowPath(HC_KEY nInkey, H3DF::KeyPath & cOutPath)
+{
+	ModelTreeItem * pcTargetItem = m_cItems[nInkey];
+	if (nullptr == pcTargetItem) {
+		return false;
+	}
+
+	size_t nIncludeCount = 1;
+
+	ModelTreeItem * pcItem = pcTargetItem;
+	while (nullptr != pcItem->m_pcParent) {
+		nIncludeCount++;
+		pcItem = pcItem->m_pcParent;
+	}
+
+	size_t nPathCount = nIncludeCount + 2;
+	HC_KEY * pnPath = new HC_KEY[nPathCount];
+
+	HC_KEY nSegmentKey = nInkey;
+
+	char chType[MVO_BUFFER_SIZE];
+	HC_Show_Key_Type(nSegmentKey, chType);
+
+	if (streq(chType, "include")) {
+		nSegmentKey = HC_Show_Include_Segment(nInkey, nullptr);
+	}
+
+	pnPath[0] = nSegmentKey;
+	
+	pcItem = pcTargetItem;
+
+	for (int nIndex = 1; nIndex < nIncludeCount + 1; ++nIndex) {
+		pnPath[nIndex] = pcItem->m_cKey;
+		pcItem = pcItem->m_pcParent;
+	}
+
+	pnPath[nPathCount - 1] = INVALID_KEY;
+
+	cOutPath = KeyPath(nPathCount, pnPath);
+
+	return true;
 }
 
 //== ModelPanelImpl 관련 함수 ========================================================================
@@ -52,6 +217,13 @@ namespace KERNEL
 			void Copy(ModelPanelImpl * pcInThat) {
 				OperatorImpl::Copy(pcInThat);
 			}
+
+
+			KERNEL::Operator::ModelTree & ModelTree() { return m_cModelTree; }
+			KERNEL::Operator::ModelTree m_cModelTree;
+
+			KERNEL::Operator::Select & Select() { return *m_pcSelect; }
+			KERNEL::Operator::Select * m_pcSelect = nullptr;
 		};
 	}
 }
@@ -83,9 +255,6 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 
 	Signal::TreeItems cTreeItems;
 
-	DWORD_PTR nParentKey = 0;
-	DWORD_PTR nModelParentKey = 0;
-
 	// Root Item 생성
 	Signal::TreeItem cItem;
 	cItem.Title = strFileTitle;
@@ -94,55 +263,16 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 	cTreeItems.push_back(cItem);
 	pcImpl->Delivery().modelPanel.AddItems(cTreeItems);
 
-	return;
+	// 내부 Tree 생성
+	pcImpl->m_cModelTree.AddItem(cItem.Key, 0);
+}
 
-	nParentKey = cItem.Key;
+void KERNEL::Operator::ModelPanel::SetSelect(Select * pcInSelect)
+{
+	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 
-	cTreeItems.clear();
-
-	// Model Item 생성, 이하에 CAD Model data를 저장한다.
-	cItem.Title = L"Models";
-	cItem.HasChildren = true;
-	cItem.Key = MODELS_GROUP_KEY;
-	cTreeItems.push_back(cItem);
-
-	nModelParentKey = cItem.Key;
-
-	// Measure Item 생성, 이하에 CAD Model data를 저장한다.
-	cItem.Title = L"Measurements";
-	cItem.HasChildren = false;
-	cItem.Key = MEASUREMENTS_GROUP_KEY;
-	cTreeItems.push_back(cItem);
-
-	// Measure Item 생성, 이하에 CAD Model data를 저장한다.
-	cItem.Title = L"Markups";
-	cItem.HasChildren = false;
-	cItem.Key = MARKUPS_GROUP_KEY;
-	cTreeItems.push_back(cItem);
-
-	pcImpl->Delivery().modelPanel.AddChildren(nParentKey, cTreeItems);
-
-	H3DF::IncludeKeyArray cChildren;
-	pcImpl->View().GetModelOverrideSegmentKey().ShowIncluders(cChildren);
-
-	for (auto cInclude : cChildren) {
-		SegmentKey cSegment = cInclude.GetTarget();
-
-		CString strName;
-		if (false == H3DF::UserData::ShowSegmentName(cSegment, strName)) {
-			strName = cSegment.Name();
-		}
-
-		size_t nCount = cSegment.ShowSubsegments();
-
-		cItem.Title = strName;
-		cItem.Key = cInclude.KeyValue();
-		cItem.HasChildren = (0 < nCount) ? true : false;
-		cTreeItems.push_back(cItem);
-	}
-
-	pcImpl->Delivery().modelPanel.AddChildren(nModelParentKey, cTreeItems);
-
+	pcImpl->m_pcSelect = pcInSelect;
 }
 
 //== Signal 처리 관련 함수 ============================================================================
@@ -153,10 +283,7 @@ void KERNEL::Operator::ModelPanel::Signal(Json::Object & cInObject)
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	int nViewId = cInObject.GetInteger(SKW_VIEWID);
 	int nAction = cInObject.GetInteger(SKW_ACTION);
-
-	/*pcImpl->Delivery().modelPanel.ViewId = nViewId;*/
 
 	switch ((Signal::ModelPanel::Action)nAction)
 	{
@@ -192,6 +319,7 @@ void KERNEL::Operator::ModelPanel::Signal(Json::Object & cInObject)
 			break;
 
 		case Signal::ModelPanel::Action::OnSelChanged:
+			SelChangedSignal(cInObject);
 			break;
 
 		case Signal::ModelPanel::Action::OnSelChanging:
@@ -207,12 +335,14 @@ void KERNEL::Operator::ModelPanel::Signal(Json::Object & cInObject)
 			break;
 
 		default:
-			assert(false);
+			ASSERT(false);
 			break;
 	}
 }
 
-// 2. Item Expanded 처리
+//== Item Expanded 관련 함수 =========================================================================
+
+// 1. Item Expanded Signal 처리
 void KERNEL::Operator::ModelPanel::ItemExpandedSignal(Json::Object & cInObject)
 {
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
@@ -243,7 +373,7 @@ void KERNEL::Operator::ModelPanel::ItemExpandedSignal(Json::Object & cInObject)
 	}
 }
 
-// 2.1 Model Item Expanded 처리
+// 2. Model Item Expanded 처리
 void KERNEL::Operator::ModelPanel::ModelItemExpanded(HC_KEY nModelKey)
 {
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
@@ -276,7 +406,7 @@ void KERNEL::Operator::ModelPanel::ModelItemExpanded(HC_KEY nModelKey)
 	//pcImpl->Delivery().modelPanel.AddChildren(nModelKey, cTreeItems);
 }
 
-// 2.1.1 Model Group Item Expanded 처리
+// 2.1 Model Group Item Expanded 처리
 void KERNEL::Operator::ModelPanel::ModelGroupItemExpanded()
 {
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
@@ -289,6 +419,7 @@ void KERNEL::Operator::ModelPanel::ModelGroupItemExpanded()
 
 	H3DF::IncludeKeyArray cChildren;
 	pcImpl->View().GetModelOverrideSegmentKey().ShowIncluders(cChildren);
+	HC_KEY nModelKey = pcImpl->View().GetModelOverrideSegmentKey().KeyValue();
 
 	for (auto & cInclude : cChildren) {
 		SegmentKey cSegment = cInclude.GetTarget();
@@ -308,22 +439,25 @@ void KERNEL::Operator::ModelPanel::ModelGroupItemExpanded()
 		cItem.Key = cInclude.KeyValue();
 		cItem.HasChildren = (0 < nCount) ? true : false;
 		cTreeItems.push_back(cItem);
+
+		// 내부 Tree 생성
+		pcImpl->m_cModelTree.AddItem(cItem.Key, nModelKey);
 	}
 
 	pcImpl->Delivery().modelPanel.AddItems(cTreeItems);
 }
 
-// 2.1.2 Measurements Group Item Expanded 처리
+// 3. Measurements Group Item Expanded 처리
 void KERNEL::Operator::ModelPanel::MeasurementsGroupItemExpanded()
 {
 }
 
-// 2.1.3 Markups Group Item Expanded 처리
+// 4. Markups Group Item Expanded 처리
 void KERNEL::Operator::ModelPanel::MarkupsGroupItemExpanded()
 {
 }
 
-// 2.2 일반 Item Expanded 처리
+// 5. 일반 Item Expanded 처리
 void KERNEL::Operator::ModelPanel::ItemExpanded(HC_KEY nInItemKey)
 {
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
@@ -349,8 +483,8 @@ void KERNEL::Operator::ModelPanel::ItemExpanded(HC_KEY nInItemKey)
 	H3DF::IncludeKeyArray cChildren;
 	cInSegment.ShowIncluders(cChildren);
 
-	H3DF::SegmentKeyArray cChildren1;
-	cInSegment.ShowSubsegments(cChildren1);
+// 	H3DF::SegmentKeyArray cChildren1;
+// 	cInSegment.ShowSubsegments(cChildren1);
 
 	for (auto cInclude : cChildren) {
 		SegmentKey cSegment = cInclude.GetTarget();
@@ -366,13 +500,16 @@ void KERNEL::Operator::ModelPanel::ItemExpanded(HC_KEY nInItemKey)
 		cItem.Key = cInclude.KeyValue();
 		cItem.HasChildren = (0 < nCount) ? true : false;
 		cTreeItems.push_back(cItem);
+
+		// 내부 Tree 생성
+		pcImpl->m_cModelTree.AddItem(cItem.Key, cItem.ParentKey);
 	}
 
 	pcImpl->Delivery().modelPanel.AddItems(cTreeItems);
 }
 
-// 2.2.1 Include Item Expanded 처리
-void KERNEL::Operator::ModelPanel::IncludeExpanded(HC_KEY nInItemKey)
+// 5.1 Include Item Expanded 처리
+void KERNEL::Operator::ModelPanel::IncludeExpanded(HC_KEY nInItemKey, HC_KEY nInParentKey)
 {
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -383,31 +520,67 @@ void KERNEL::Operator::ModelPanel::IncludeExpanded(HC_KEY nInItemKey)
 	Signal::TreeItems cTreeItems;
 	Signal::TreeItem cItem;
 
-	cItem.ParentKey = nInItemKey;
+	// 입력된 Parent Key가 유효하지 않으면 nInItemKey값을 Parent Key로 사용한다.
+	if (INVALID_KEY == nInParentKey) {
+		cItem.ParentKey = nInItemKey;
+	}
+	else {
+		cItem.ParentKey = nInParentKey;
+	}
 
 	H3DF::IncludeKeyArray cChildren;
 	cInSegment.ShowIncluders(cChildren);
 
-	H3DF::SegmentKeyArray cChildren1;
-	cInSegment.ShowSubsegments(cChildren1);
-
-	for (auto cInclude : cChildren) {
+	for (auto & cInclude : std::ranges::reverse_view(cChildren)) {
 		SegmentKey cSegment = cInclude.GetTarget();
 
-		CString strName;
-		if (false == H3DF::UserData::ShowSegmentName(cSegment, strName)) {
-			strName = cSegment.Name();
+		// Segment의 이름에 part가 포함되어 있는 경우는 표시하지 않고 바로 하부 Item을 표시한다.
+		CStringA strName = cSegment.Name(false);
+		if ("part" == strName.Left(4)) {
+			IncludeExpanded(cInclude.KeyValue(), nInItemKey);
+			continue;
 		}
 
-		// strName = cSegment.Name();
+		CString strUserName;
+		if (false == H3DF::UserData::ShowSegmentName(cSegment, strUserName)) {
+			strUserName = cSegment.Name();
+		}
 
 		size_t nCount = cSegment.ShowIncluders();
 
-		cItem.Title = strName;
+		cItem.Title = strUserName;
 		cItem.Key = cInclude.KeyValue();
 		cItem.HasChildren = (0 < nCount) ? true : false;
 		cTreeItems.push_back(cItem);
+		pcImpl->m_cModelTree.AddItem(cItem.Key, cItem.ParentKey);
 	}
 
 	pcImpl->Delivery().modelPanel.AddItems(cTreeItems);
+}
+
+//== Item Selelect Changed 관련 함수 =================================================================
+
+// 1. Item Select Changed Signal 처리
+void KERNEL::Operator::ModelPanel::SelChangedSignal(Json::Object & cInObject)
+{
+	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	// 대소문자 구별함. 주의할 것.
+	HC_KEY nInKey = (HC_KEY)cInObject.GetDwordPtr("Key", INVALID_KEY);
+	if (INVALID_KEY == nInKey) {
+		return;
+	}
+
+	H3DF::Type eType = H3DF::Utility::GetType(nInKey);
+
+	H3DF::KeyPath cPath;
+	pcImpl->ModelTree().ShowPath(nInKey, cPath);
+
+	H3DF::SelectionItem cItem;
+	pcImpl->ModelTree().ShowSelectionItem(nInKey, cItem);
+
+	pcImpl->Select().SelectByItem(cItem);
+
+	return;
 }

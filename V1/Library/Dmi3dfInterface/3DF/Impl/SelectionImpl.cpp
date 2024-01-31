@@ -35,10 +35,10 @@ using namespace H3DF;
 
 bool H3DF::SelectionItemImpl::ShowPath(KeyPath & cOutPath) const
 {
-	size_t nPathCount = nIncludeCount + 2;
+	size_t nPathCount = m_nIncludeCount + 2;
 	HC_KEY * pnPath = new HC_KEY[nPathCount];
 
-	HC_KEY nSegmentKey = cKey.KeyValue();
+	HC_KEY nSegmentKey = m_cKey.KeyValue();
 
 	char chType[MVO_BUFFER_SIZE];
 	HC_Show_Key_Type(nSegmentKey, chType);
@@ -49,8 +49,8 @@ bool H3DF::SelectionItemImpl::ShowPath(KeyPath & cOutPath) const
 
 	pnPath[0] = nSegmentKey;
 
-	for (int nIndex = 1; nIndex < nIncludeCount; ++nIndex) {
-		pnPath[nIndex] = pnIncludeKeys[nIncludeCount - nIndex];
+	for (int nIndex = 1; nIndex < m_nIncludeCount; ++nIndex) {
+		pnPath[nIndex] = m_pnIncludeKeys[m_nIncludeCount - nIndex];
 	}
 
 	pnPath[nPathCount - 2] = HC_KShow_Owner_Original_Key(pnPath[nPathCount - 3]);
@@ -72,26 +72,56 @@ bool H3DF::SelectionItemImpl::ShowPathString(CString & strOutPath)
 	CString strText;
 	char chType[MVO_BUFFER_SIZE];
 
-	HC_KEY nKey = cKey.KeyValue();
+	HC_KEY nKey = m_cKey.KeyValue();
 	HC_Show_Key_Type(nKey, chType);
-	strText.Format(L"Select Key: %d [%s]", nKey, Utility::ToString(chType));
+	
+	CString strName;
+
+	SegmentKey cSegmentKey(nKey);
+	if (false == UserData::ShowSegmentName(cSegmentKey, strName)) {
+		strName = cSegmentKey.Name(false);
+	}
+
+	strText.Format(L"Select Key: %d [%s], %s", nKey, Utility::ToString(chType), strName);
 	strOutPath += strText;
 
-	nKey = cPath.At(0).KeyValue();
-	HC_Show_Key_Type(nKey, chType);
-	strText.Format(L"\nOwner of select key: %d [%s]", nKey, Utility::ToString(chType));
-	strOutPath += strText;
+	if (nKey != cPath.At(0).KeyValue()) {
+		nKey = cPath.At(0).KeyValue();
+		HC_Show_Key_Type(nKey, chType);
 
-	for (int nIndex = 1; nIndex < nIncludeCount; ++nIndex) {
+		SegmentKey cSegmentKey(nKey);
+		if (false == UserData::ShowSegmentName(cSegmentKey, strName)) {
+			strName = cSegmentKey.Name(false);
+		}
+
+		strText.Format(L"\nOwner of select key: %d [%s], %s", nKey, Utility::ToString(chType), strName);
+		strOutPath += strText;
+	}
+
+	for (int nIndex = 1; nIndex < m_nIncludeCount; ++nIndex) {
 		nKey = cPath.At(nIndex).KeyValue();
 		HC_Show_Key_Type(nKey, chType);
-		strText.Format(L"\nInclude Key: %d [%s]", nKey, Utility::ToString(chType));
+
+		IncludeKey cIncludeKey(nKey);
+		SegmentKey cSegmentKey = cIncludeKey.GetTarget();
+
+		if (false == UserData::ShowSegmentName(cSegmentKey, strName)) {
+			strName = cSegmentKey.Name(false);
+		}
+
+		strText.Format(L"\nInclude Key: %d [%s], %s", nKey, Utility::ToString(chType), strName);
 		strOutPath += strText;
 	}
 
 	nKey = cPath.At(cPath.Size() - 2).KeyValue();
 	HC_Show_Key_Type(nKey, chType);
-	strText.Format(L"\nOwner of last include key: %d [%s]", nKey, Utility::ToString(chType));
+
+	SegmentKey cSegmentKey1(nKey);
+	if (false == UserData::ShowSegmentName(cSegmentKey1, strName)) {
+		strName = cSegmentKey1.Name(false);
+	}
+
+	strText.Format(L"\nOwner of last include key: %d [%s], %s", nKey, Utility::ToString(chType));
 	strOutPath += strText;
 
 	return true;
@@ -99,22 +129,22 @@ bool H3DF::SelectionItemImpl::ShowPathString(CString & strOutPath)
 
 void H3DF::SelectionItemImpl::Reset()
 {
-	cKey.SetKeyValue(INVALID_KEY);
+	m_cKey.SetKeyValue(INVALID_KEY);
 
-	if (nullptr != pnIncludeKeys) {
-		delete pnIncludeKeys;
-		pnIncludeKeys = nullptr;
+	if (nullptr != m_pnIncludeKeys) {
+		delete m_pnIncludeKeys;
+		m_pnIncludeKeys = nullptr;
 	}
 
-	nIncludeCount = 0;
+	m_nIncludeCount = 0;
 
-	nOffset1 = 0;
-	nOffset2 = 0;
-	nOffset3 = 0;
+	m_nOffset1 = 0;
+	m_nOffset2 = 0;
+	m_nOffset3 = 0;
 
-	nRegion = 0;
-	nLowest = 0;
-	nHighest = 0;
+	m_nRegion = 0;
+	m_nLowest = 0;
+	m_nHighest = 0;
 }
 
 //== SelectionResultsImpl class ====================================================================
@@ -233,7 +263,7 @@ void H3DF::SelectionControlImpl::HandleSelection(UINT const nFlags, SelectionRes
 
 			SelectionItem cItem;
 			SelectionItemImpl * pcItemImpl = dynamic_cast<SelectionItemImpl *>(cItem.GetImpl());
-			pcItemImpl->cKey = LineKey(Key(nKey));
+			pcItemImpl->m_cKey = LineKey(Key(nKey));
 			
 			pcResultsPrivate->PushBack(cItem);
 		}

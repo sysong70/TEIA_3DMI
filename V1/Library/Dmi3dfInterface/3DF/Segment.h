@@ -35,7 +35,7 @@ namespace H3DF
 		SegmentKey & Close();
 
 		// Segment의 자체의 Title을 변경함.
-		CStringA Name() const;
+		CStringA Name(bool bIncludePath = true) const;
 		SegmentKey & SetName(CStringA strInName);
 
 		//== Sub Segment 관련 함수 =======================================================================

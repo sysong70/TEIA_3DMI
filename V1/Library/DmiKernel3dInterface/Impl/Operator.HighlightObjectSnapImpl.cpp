@@ -537,7 +537,7 @@ void KERNEL::Operator::HighlightObjectSnapImpl::ApplySelectionFilter(H3DF::Selec
 				SelectionItem cOwnerItem(cNextItem);
 				SelectionItemImpl * pcItemPrivate = (SelectionItemImpl *)cOwnerItem.GetImpl();
 
-				pcItemPrivate->cKey = cOwner;
+				pcItemPrivate->m_cKey = cOwner;
 
 				cOutSelections.PushBack(cOwnerItem);
 			}

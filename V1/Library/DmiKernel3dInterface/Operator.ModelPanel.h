@@ -10,6 +10,8 @@ namespace KERNEL
 {
 	namespace Operator
 	{
+		class Select;
+
 		class ModelPanel : public OperatorBase
 		{
 		public:
@@ -17,7 +19,10 @@ namespace KERNEL
 
 			void Initialize(CString strFilePathName);
 
+			void SetSelect(Select * pcInSelect);
+
 			void Signal(Json::Object & cInObject);
+			
 
 		protected:
 			void ItemExpandedSignal(Json::Object & cInObject);
@@ -27,7 +32,9 @@ namespace KERNEL
 			void MarkupsGroupItemExpanded();
 
 			void ItemExpanded(HC_KEY nInItemKey);
-			void IncludeExpanded(HC_KEY nInItemKey);
+			void IncludeExpanded(HC_KEY nInItemKey, HC_KEY nInParentKey = INVALID_KEY);
+
+			void SelChangedSignal(Json::Object & cInObject);
 		};
 	}
 }	

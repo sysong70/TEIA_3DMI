@@ -1084,10 +1084,10 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 	SegmentKey cSegment = m_cRisIncludeSegment.Subsegment(L"ri%d", m_nIncrementalId++);
 	cParentSegment.IncludeSegment(cSegment);
 
-	CString strPartName;
-	GetName(pcRepItem, strPartName);
-
-	H3DF::UserData::SetSegmentName(cSegment, strPartName);
+	// Ri Rep에 설정된 이름을 확인해서 저장한다.
+	// 저장된 이름이 없는 경우 각 요소의 특성값을 저장하도록 한다. (Surface, Curve, Point 등)
+	CString strRiName;
+	GetName(pcRepItem, strRiName);
 
 	A3DMiscCascadedAttributes * pcAttr;
 	A3DMiscCascadedAttributesData cAttrData;
@@ -1140,14 +1140,16 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 			break;
 
 			case kA3DTypeRiBrepModel:
-				H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Solid);
+				// Solid인지 Surface인지 알 수 없음.
+				// H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Solid);
 				eStatus = ParseRiBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
 			break;
 
-			case kA3DTypeRiPolyBrepModel: {
-				H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Solid);
+			case kA3DTypeRiPolyBrepModel:
+				// Solid인지 Surface인지 알 수 없음.
+				// H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Solid);
 				eStatus = DrawRiPolyBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
-			} break;
+			break;
 
 			case kA3DTypeRiCurve:
 			case kA3DTypeRiPolyWire:
@@ -1163,10 +1165,38 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 			break;
 		}
 
+		if (true == strRiName.IsEmpty()) {
+			switch (eType)
+			{
+				case kA3DTypeRiSet:
+					break;
+
+				case kA3DTypeRiBrepModel:
+					strRiName = "Solid";
+					break;
+
+				case kA3DTypeRiPolyBrepModel:
+					break;
+
+				case kA3DTypeRiCurve:
+				case kA3DTypeRiPolyWire:
+					strRiName = "Curve";
+					break;
+
+				case kA3DTypeRiPointSet:
+					strRiName = "Point";
+					break;
+			}
+		}
+
 		A3DRiRepresentationItemGet(nullptr, &cRepItemData);
 	}
 
 	cSegment.Close();
+
+	if (false == strRiName.IsEmpty()) {
+		H3DF::UserData::SetSegmentName(cSegment, strRiName);
+	}
 
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttr));
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrData));
