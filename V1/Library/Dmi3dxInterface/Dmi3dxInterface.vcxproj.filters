@@ -147,7 +147,7 @@
     <ClInclude Include="3DXSignal.Interface.h">
       <Filter>Signal</Filter>
     </ClInclude>
-    <ClInclude Include="3DX.h">
+    <ClInclude Include="3DX.Base.h">
       <Filter>3DX</Filter>
     </ClInclude>
     <ClInclude Include="3DX.C3dImport.h">
@@ -179,6 +179,9 @@
     </ClInclude>
     <ClInclude Include="3DX.FileOptions.h">
       <Filter>Import</Filter>
+    </ClInclude>
+    <ClInclude Include="3DX.h">
+      <Filter>3DX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -278,7 +281,7 @@
     <ClCompile Include="3DXSignal.Interface.cpp">
       <Filter>Signal</Filter>
     </ClCompile>
-    <ClCompile Include="3DX.cpp">
+    <ClCompile Include="3DX.Base.cpp">
       <Filter>3DX</Filter>
     </ClCompile>
     <ClCompile Include="3DX.C3dImport.cpp">

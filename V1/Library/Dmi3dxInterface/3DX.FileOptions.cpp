@@ -1,5 +1,5 @@
 ﻿#include "StdAfx.h"
-#include "3DX.h"
+#include "3DX.Base.h"
 #include "3DX.FileOptions.h"
 #include <Path.h>
 

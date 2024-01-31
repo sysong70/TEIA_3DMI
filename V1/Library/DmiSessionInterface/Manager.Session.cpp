@@ -111,19 +111,11 @@ void SESSION::Manager::Session::ExecuteApplicationSignal(Json::Object & cInObjec
 		case Signal::Application::Action::OnDpiAware:
 			break;
 
-		case Signal::Application::Action::OnUpdatePreference: {
-			//:TODO
-		} break;
+		case Signal::Application::Action::OnUpdatePreference:
+			break;
 
-		case Signal::Application::Action::OnUpdateFileOption: {
-			//:TODO
-			// H3DX - TheFileOptions.Set(cInObject.GetAt(SKW_VALUE));
-		} break;
-
-		case Signal::Application::Action::OnFileOptionReference: {
-			//:TODO
-			// H3DX - TheFileOptions.SetReference(cInObject.GetAt(SKW_VALUE));
-		} break;
+		case Signal::Application::Action::OnUpdateFileOption:
+			break;
 
 		default:
 			break;
@@ -219,6 +211,7 @@ SESSION::Session * SESSION::Manager::Session::GetSession(int nViewId)
 		}
 	}
 
+	// 이 함수를 호출해야 Delivery에 ViewId가 설정됨.
 	Connector::GetInstance(nViewId);
 
 	return pcSession;

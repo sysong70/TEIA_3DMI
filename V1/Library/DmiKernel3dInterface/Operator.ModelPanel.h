@@ -20,8 +20,14 @@ namespace KERNEL
 			void Signal(Json::Object & cInObject);
 
 		protected:
-			void ItemExpanded(Json::Object & cInObject);
+			void ItemExpandedSignal(Json::Object & cInObject);
 			void ModelItemExpanded(HC_KEY nModelKey);
+			void ModelGroupItemExpanded();
+			void MeasurementsGroupItemExpanded();
+			void MarkupsGroupItemExpanded();
+
+			void ItemExpanded(HC_KEY nInItemKey);
+			void IncludeExpanded(HC_KEY nInItemKey);
 		};
 	}
 }	
