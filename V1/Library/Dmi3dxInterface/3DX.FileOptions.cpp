@@ -1,5 +1,4 @@
 ﻿#include "StdAfx.h"
-#include "3DX.ImportBase.h"
 #include "3DX.FileOptions.h"
 #include <Path.h>
 #include <WStr.h>
@@ -576,7 +575,7 @@ A3DUTF8Char* H3DX::ImportOptions::ToHoopsString(CString value)
 
 	int length = value.GetLength() * sizeof(WCHAR);
 	pBuffer = new A3DUTF8Char[length];
-	::ZeroMemory(pBuffer, 0, length);
+	::ZeroMemory(pBuffer, length);
 
 	A3DStatus eStatus = A3DMiscUnicodeToUTF8((A3DUTF8Char*)(LPCTSTR)value, pBuffer);
 	if (A3D_SUCCESS != eStatus) {

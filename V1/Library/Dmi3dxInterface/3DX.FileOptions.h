@@ -27,6 +27,8 @@ namespace H3DX
 		Json::Object m_root;
 	};
 
+
+
 	class API_3DX ImportOptions : public JsonWrapper
 	{
 	public:
@@ -38,9 +40,9 @@ namespace H3DX
 	public:
 
 		bool Set(Json::Object& value) override;
-
+		//:WARNING - setting from UI
 		bool SetReference(Json::Object& value);
-
+		// Assign A3DRWParamsLoadData(3DX parameter) by extension of filePath(import file)
 		bool Get(CString& filePath, A3DRWParamsLoadData& param);
 
 	protected:
@@ -81,7 +83,7 @@ namespace H3DX
 	public:
 
 		bool Set(Json::Object& value) override;
-
+		//:WARNING - setting from UI
 		bool SetReference(Json::Object& value);
 		// A3DRWParamsExportPrcData??
 		bool Get(CString& filePath, A3DRWParamsExportPrcData& param) {
@@ -104,7 +106,7 @@ namespace H3DX
 		~FileOptions();
 
 		bool Set(Json::Object& value);
-
+		//:WARNING - setting from UI
 		bool SetReference(Json::Object& value);
 
 		ImportOptions Import;

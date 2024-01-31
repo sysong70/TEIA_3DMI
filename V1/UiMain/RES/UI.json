@@ -5,6 +5,10 @@
 	}
 },
 
+"Description":{
+	"10101001":"* BRep & Tessellation<br> Mixed mode. In this mode, the B-rep and faceted elements are read from the native file. Tessellation is then generated from B-rep elements.<br>* Tessellation Only<br> In this mode, all faceted elements from the native file are read. If present, the native tessellation of the B-rep is read exclusively. Native tessellation is the display list integrated in the CAD file (only available for CATIA V5, Solidworks, 3DXML, and Inventor).|__#__"
+},
+
 "Dialogs":{
 	"DefaultButtons":{
 		"Ok":{"title":"Ok|확인", "id":1, "comment":"IDOK"},
@@ -118,7 +122,7 @@
 		],
 		"common":[
 			{"type":"group", "name":"General", "title":"General|일반", "items":[
-				{"type":"drop", "name":"ReadingMode", "title":"Reading Mode|__#__", "desc":"__#__|__#__", "value":0, "items":[
+				{"type":"drop", "name":"ReadingMode", "title":"Reading Mode|__#__", "desc":10101001, "value":0, "items":[
 					"BRep & Tessellation|__#__",
 					"Tessellation Only|__#__"
 				]},
@@ -151,12 +155,12 @@
 					"Mile(mi)|__#__"
 				]},
 				{"type":"check", "name":"TrueColorMode", "title":"True Color Mode|__#__", "desc":"__#__|__#__"},
-				{"type":"group", "name":"LargeTansformation", "title":"Extract Large Transformation|", "hasCheck":true, "items":[
+				{"type":"group", "name":"LargeTansformation", "title":"Extract Large Transformation|", "desc":"__#__|__#__", "hasCheck":true, "items":[
 					{"type":"edit", "name":"Cutoff", "title":"Cutoff Value|__#__", "desc":"__#__|__#__", "value":"12000"}
 				]}
 			]},
 			{"type":"group", "name":"Tessellation", "title":"Tessellation", "items":[
-				{"type":"drop", "name":"TessLevel", "title":"Predefined Tessellation Level|__#__", "value":2, "items":[
+				{"type":"drop", "name":"TessLevel", "title":"Predefined Tessellation Level|__#__", "desc":"__#__|__#__", "value":2, "items":[
 					"Extra Low|__#__",
 					"Low|__#__",
 					"Medium|__#__",
@@ -164,7 +168,7 @@
 					"Extra High|__#__",
 					"Custom|__#__"
 				]},
-				{"type":"group", "name":"CustomTessLevel", "title":"Custom Tessellation Level", "enable":false, "items":[
+				{"type":"group", "name":"CustomTessLevel", "title":"Custom Tessellation Level", "desc":"__#__|__#__", "enable":false, "items":[
 					{"type":"drop", "name":"ChordLimitType", "title":"Chord Limit|__#__", "desc":"__#__|__#__", "value":0, "items":[
 						"Ratio|__#__",
 						"Height|__#__"
