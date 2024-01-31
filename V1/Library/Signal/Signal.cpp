@@ -656,6 +656,19 @@ ConstructData(data, action); \
 data.SetDwordPtr(SKW_KEY, key); \
 Wrapper().SendData(data);
 
+void Signal::ModelPanel::OnItemChecked(DWORD_PTR key, bool checked)
+{
+	Json::Object data;
+	ConstructData(data, Action::OnItemChecked);
+
+	data.SetDwordPtr(SKW_KEY, key);
+	data.SetBoolean(SKW_CHECKED, checked);
+
+	Wrapper().SendData(data);
+}
+
+
+
 void Signal::ModelPanel::OnDeleteItem(DWORD_PTR key)
 {
 	SendKeyData(Action::OnDeleteItem);

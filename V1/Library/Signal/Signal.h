@@ -507,6 +507,7 @@ namespace Signal
 			OnDblClick,
 			OnDeleteItem,
 			OnEndLabelEdit,
+			OnItemChecked,
 			OnItemExpanded,
 			OnItemExpanding,
 			OnRClick,
@@ -524,6 +525,8 @@ namespace Signal
 		void ConstructData(Json::Object& data, Action action);
 
 	public:
+
+		void OnItemChecked(DWORD_PTR key, bool checked);
 
 		void OnDeleteItem(DWORD_PTR key);
 		// response AddChildren();

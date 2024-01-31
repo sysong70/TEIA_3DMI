@@ -171,10 +171,14 @@ void Component::ModelPanel::OnCommand(UINT id)
 	m_wndControl.RedrawWindow();
 }
 
-
+//:WARNING
+// m_wndControl.EnableTreeCtrlNotifications(FALSE)
+// use 
 
 LRESULT Component::ModelPanel::OnTreeCheckClick(WPARAM wp, LPARAM lp)
 {
+	DEBUG_STOP;
+
 	CBCGPGridRow* pRow = (CBCGPGridRow*)lp;
 	if (pRow == nullptr) {
 		return 0;
@@ -182,12 +186,15 @@ LRESULT Component::ModelPanel::OnTreeCheckClick(WPARAM wp, LPARAM lp)
 
 	if (pRow->HasCheckBox()) {
 		//:CHECK
-		BOOL checked = pRow->GetCheck();
-		pRow->SetCheck(!checked);
-		pRow->CheckSubItems(!checked);
+		BOOL checked = !pRow->GetCheck();
+		pRow->SetCheck(checked);
+		pRow->CheckSubItems(checked);
 		pRow->UpdateParentCheckbox(TRUE);
 
 		m_wndControl.RedrawWindow();
+
+		DWORD_PTR key = pRow->GetData();
+		m_pView->GetDelivery().modelPanel.OnItemChecked(key, (bool)checked);
 	}
 
 	return TRUE; // disable the default implementation
@@ -236,10 +243,49 @@ void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 		return;
 	}
 
-	if (flag & TVHT_ONITEMBUTTON) {
+	if (flag & TVHT_NOWHERE) {
+		//DEBUG_TRACE(L"NM_CLICK: TVHT_NOWHERE\r\n");
+	}
+	else if (flag & TVHT_ONITEMICON) {
+		//DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMICON\r\n");
+	}
+	else if (flag & TVHT_ONITEMLABEL) {
+		//DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMLABEL\r\n");
+	}
+	else if (flag & TVHT_ONITEMINDENT) {
+		//DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMINDENT\r\n");
+	}
+	else if (flag & TVHT_ONITEMBUTTON) {
+		// clicked expand button
 		UINT state = m_wndControl.GetItemState(hItem, TVIS_EXPANDED);
 		m_wndControl.Expand(hItem, (state & TVIS_EXPANDED ? TVE_COLLAPSE : TVE_EXPAND));
+
+		//:WARNING - prevent OnTreeSelChanged()
 		*pResult = S_FALSE;
+	}
+	else if (flag & TVHT_ONITEMRIGHT) {
+		//DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMRIGHT\r\n");
+	}
+	else if (flag & TVHT_ONITEMBUTTON) {
+		//DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMBUTTON\r\n");
+	}
+	else if (flag & TVHT_ONITEMSTATEICON) {
+		// clicked check box
+		CBCGPGridRow* pRow = m_wndControl.TreeItem(hItem);
+
+		BOOL checked = !pRow->GetCheck();
+		pRow->SetCheck(checked);
+		pRow->CheckSubItems(checked);
+		pRow->UpdateParentCheckbox(TRUE);
+
+		DWORD_PTR key = m_wndControl.GetItemData(hItem);
+		m_pView->GetDelivery().modelPanel.OnItemChecked(key, (bool)checked);
+
+		//:WARNING - prevent OnTreeSelChanged()
+		*pResult = S_FALSE;
+	}
+	else {
+		//DEBUG_TRACE(L"NM_CLICK: other\r\n");
 	}
 }
 
