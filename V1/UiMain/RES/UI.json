@@ -34,6 +34,11 @@
 		}
 	},
 
+	"Folders":{
+		"title":"Select Folders|폴더 선택",
+		"size":{"cx":400, "cy":300}
+	},
+
 	"AppOptions":{
 		"title":"Options|옵션",
 		"size":{"cx":800, "cy":600},

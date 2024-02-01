@@ -69,6 +69,8 @@ namespace Component
 
 		void AddChildren(Json::Object* pData);
 
+		void GetAncestorData(HTREEITEM pItem, std::list<DWORD_PTR>& list);
+
 		HTREEITEM GetItem(DWORD_PTR key);
 
 	private:

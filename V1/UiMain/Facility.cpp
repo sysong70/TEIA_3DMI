@@ -145,25 +145,45 @@ CString Facility::GetTooltip(UINT id)
 bool Facility::LoadTextResource(UINT id, CString& result)
 {
 	HRSRC hRes = ::FindResource(NULL, MAKEINTRESOURCE(id), L"TEXT");
+	if (hRes == nullptr) {
+		RETURN_FALSE;
+	}
+
 	DWORD dwResourceSize = ::SizeofResource(NULL, hRes);
+	if (dwResourceSize == 0) {
+		RETURN_FALSE;
+	}
+
 	HGLOBAL hGlobal = ::LoadResource(NULL, hRes);
+	if (hGlobal == nullptr) {
+		RETURN_FALSE;
+	}
+
 	LPVOID pData = ::LockResource(hGlobal);
+	if (pData == nullptr) {
+		RETURN_FALSE;
+	}
 
 	char* pChar = new char[dwResourceSize + 1];
+	DEBUG_VALID(pChar);
+	wchar_t* pWide = nullptr;
+
 	memcpy_s(pChar, dwResourceSize, pData, dwResourceSize);
 	pChar[dwResourceSize] = _T('\0');
 
 	int nSize = ::MultiByteToWideChar(CP_UTF8, 0, pChar, -1, NULL, 0);
 	if (nSize == 0) {
-		RETURN_FALSE;
+		goto EXIT;
 	}
 
-	wchar_t* pWide = new wchar_t[nSize];
+	pWide = new wchar_t[nSize];
 	DEBUG_VALID(pWide);
 
 	::MultiByteToWideChar(CP_UTF8, 0, pChar, -1, pWide, nSize);
 	// UTF-8 BOM or UTF-8
 	result = (pWide[0] == 0xFEFF ? pWide + 1 : pWide);
+
+EXIT:
 
 	REMOVE_ARRAY(pChar);
 	REMOVE_ARRAY(pWide);

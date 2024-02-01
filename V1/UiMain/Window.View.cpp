@@ -49,7 +49,10 @@ Window::View::View()
 
 Window::View::~View()
 {
+	m_toolBar.DestroyWindow();
+	m_historyBar.DestroyWindow();
 	m_tabs.DestroyWindow();
+
 	m_delivery.view.OnDestruct();
 
 	GetMainFrame().ViewChanged(WM_DESTROY, this);

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Json.h"
+#include <list>
 
 /// Delivery Keywords
 
@@ -532,7 +533,8 @@ namespace Signal
 		// response AddChildren();
 		void OnItemExpanded(DWORD_PTR key);
 
-		void OnSelChanged(DWORD_PTR key);
+		//void OnSelChanged(DWORD_PTR key);
+		void OnSelChanged(std::list<DWORD_PTR>& keyList);
 
 	public:
 

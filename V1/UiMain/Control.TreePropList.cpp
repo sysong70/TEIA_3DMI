@@ -180,7 +180,8 @@ void Control::TreePropList::ChangePropList(HTREEITEM pItem)
 	}
 	else {
 		m_propList.RemoveAll();
-		//:TODO - update window, why not woking?
+		//:WARNING - UpdateWindow or RedrawWindow not working 
+		m_propList.AdjustLayout();
 		DEBUG_STOP;
 	}
 }

@@ -139,13 +139,6 @@ void Component::ModelPanel::ConstructBody()
 	m_wndControl.SetOutOfFilterLabel(Facility::Local(L"No items match your search.|일치하는 항목을 찾을 수 없습니다."));
 	m_wndControl.EnableFilterBar(TRUE, filter);
 	m_wndControl.OnFilterBarUpdate(0);
-
-	//m_wndControl.SetRedraw(FALSE);
-	//CString fileName = Path::GetFileName(m_pView->GetDocument()->GetPathName());
-	//AddItem(nullptr, 0, fileName, true, 0);
-	//m_wndControl.SetRedraw(TRUE);
-	//:WARNING - UpdateWindow or RedrawWindow not working 
-	//m_wndControl.AdjustLayout();
 }
 
 
@@ -403,8 +396,10 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 	//:CHECK - pNMTreeView->itemOld.hItem == nullptr
 
 	if (pNMTreeView->itemNew.hItem != nullptr) {
-		DWORD_PTR key = m_wndControl.GetItemData(pNMTreeView->itemNew.hItem);
-		m_pView->GetDelivery().modelPanel.OnSelChanged(key);
+		//DWORD_PTR key = m_wndControl.GetItemData(pNMTreeView->itemNew.hItem);
+		std::list<DWORD_PTR> list;
+		GetAncestorData(pNMTreeView->itemNew.hItem, list);
+		m_pView->GetDelivery().modelPanel.OnSelChanged(list);
 	}
 
 	*pResult = S_OK;
@@ -506,6 +501,17 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 
 	m_wndControl.SetRedraw(TRUE);
 	m_wndControl.AdjustLayout();
+}
+
+
+
+void Component::ModelPanel::GetAncestorData(HTREEITEM pItem, std::list<DWORD_PTR>& ancestor)
+{
+	HTREEITEM pParent = pItem;
+	while (pParent != nullptr) {
+		ancestor.push_front(m_wndControl.GetItemData(pParent));
+		pParent = m_wndControl.GetParentItem(pParent);
+	}
 }
 
 

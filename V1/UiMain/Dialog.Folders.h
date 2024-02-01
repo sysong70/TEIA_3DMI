@@ -12,6 +12,12 @@ namespace Dialog
 
 		class EditListBox : public CBCGPEditListBox
 		{
+		public:
+
+			EditListBox();
+
+		protected:
+
 			void OnBrowse() override;
 
 			void OnClickButton(int iButton) override;
@@ -28,6 +34,8 @@ namespace Dialog
 		Json::Object* GetResult() override;
 
 	protected:
+
+		//void DoDataExchange(CDataExchange* pDX) override;
 
 		void OnCancel() override;
 

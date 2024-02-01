@@ -19,6 +19,8 @@ static char THIS_FILE[] = __FILE__;
 
 namespace PresetAppOptions
 {
+	const int CustomTessLevel = 5;
+
 	enum EControlId
 	{
 		Id = WM_USER,
@@ -104,6 +106,9 @@ BOOL Dialog::AppOptions::OnInitDialog()
 
 	m_preferencesUi.InitializeDesign(m_preferences.Design);
 	m_fileOptionsUi.InitializeDesign(m_fileOptions.Design);
+
+	//:CHECK - from Window::MainFrame::OnAppOptions()
+	EndWaitCursor();
 
 	return TRUE;
 }
@@ -244,7 +249,7 @@ LRESULT Dialog::AppOptions::OnChangedFileOption(WPARAM wp, LPARAM lp)
 		DEBUG_VALID(pCustom);
 
 		int index = source.GetSelectedOption();
-		pCustom->Enable(index == 5 /* Custom */, TRUE);
+		pCustom->Enable(index == PRESET::CustomTessLevel, TRUE);
 	}
 
 	return S_OK;

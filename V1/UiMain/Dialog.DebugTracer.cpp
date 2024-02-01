@@ -45,6 +45,7 @@ Dialog::DebugTracer::DebugTracer(CWnd* pParent /*=nullptr*/)
 
 Dialog::DebugTracer::~DebugTracer()
 {
+	DestroyWindow();
 }
 
 
@@ -107,13 +108,6 @@ void Dialog::DebugTracer::ConstructBody(const CRect& boundary)
 	//:WARNING - create before using (why?)
 	pLayout->Create(this);
 	pLayout->AddAnchor(IDC_DMI_CONTROL_01, CBCGPStaticLayout::e_MoveTypeNone, CBCGPStaticLayout::e_SizeTypeBoth);
-}
-
-
-
-BOOL Dialog::DebugTracer::DestroyWindow()
-{
-	return CBCGPDialog::DestroyWindow();
 }
 
 

@@ -819,7 +819,7 @@ Json::Object& Json::Value::CreateObject()
 CString& Json::Value::CreateString()
 {
 	Clean();
-	m_valueHolder.vString = new CString();
+	SetString(L"");
 
 	return *m_valueHolder.vString;
 }

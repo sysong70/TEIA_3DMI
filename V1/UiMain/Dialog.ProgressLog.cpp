@@ -114,7 +114,7 @@ void Dialog::ProgressLog::ReceiveSignal(Json::Object* pData)
 
 void Dialog::ProgressLog::DoDataExchange(CDataExchange* pDX)
 {
-	__super::DoDataExchange(pDX);
+	CBCGPDialog::DoDataExchange(pDX);
 
 	DDX_CONTROL(Progress);
 	DDX_CONTROL(Message);

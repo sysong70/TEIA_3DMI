@@ -34,8 +34,6 @@ namespace Dialog
 
 		void ConstructBody(const CRect& boundary) override;
 
-		BOOL DestroyWindow() override;
-
 	private:
 
 		void AddLog(Json::Object& data);

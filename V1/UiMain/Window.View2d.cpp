@@ -71,6 +71,7 @@ Window::View2d::View2d()
 
 Window::View2d::~View2d()
 {
+	m_layerPanel.DestroyWindow();
 }
 
 

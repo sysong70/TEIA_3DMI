@@ -510,11 +510,15 @@ void Window::MainFrame::OnFileOpen()
 #undef USE_OPTION_DLG
 }
 
-
+#include "Dialog.Folders.h"
 
 void Window::MainFrame::OnAppOptions()
 {
+	//:CHECK - to Dialog::AppOptions::OnInitDialog() 
+	BeginWaitCursor();
+
 	Dialog::AppOptions dlg;
+	//Dialog::Folders dlg;
 	dlg.DoModal();
 }
 

@@ -79,6 +79,10 @@ Window::View3d::View3d()
 
 Window::View3d::~View3d()
 {
+	m_modelPanel.DestroyWindow();
+	m_viewPanel.DestroyWindow();
+	m_layerPanel.DestroyWindow();
+	m_scenePanel.DestroyWindow();
 }
 
 
