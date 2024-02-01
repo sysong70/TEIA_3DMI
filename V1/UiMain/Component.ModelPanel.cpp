@@ -246,15 +246,15 @@ void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 	if (flag & TVHT_NOWHERE) {
 		//DEBUG_TRACE(L"NM_CLICK: TVHT_NOWHERE\r\n");
 	}
-	else if (flag & TVHT_ONITEMICON) {
-		//DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMICON\r\n");
-	}
-	else if (flag & TVHT_ONITEMLABEL) {
-		//DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMLABEL\r\n");
-	}
-	else if (flag & TVHT_ONITEMINDENT) {
-		//DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMINDENT\r\n");
-	}
+	//else if (flag & TVHT_ONITEMICON) {
+	//	DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMICON\r\n");
+	//}
+	//else if (flag & TVHT_ONITEMLABEL) {
+	//	DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMLABEL\r\n");
+	//}
+	//else if (flag & TVHT_ONITEMINDENT) {
+	//	DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMINDENT\r\n");
+	//}
 	else if (flag & TVHT_ONITEMBUTTON) {
 		// clicked expand button
 		UINT state = m_wndControl.GetItemState(hItem, TVIS_EXPANDED);
@@ -263,12 +263,12 @@ void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 		//:WARNING - prevent OnTreeSelChanged()
 		*pResult = S_FALSE;
 	}
-	else if (flag & TVHT_ONITEMRIGHT) {
-		//DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMRIGHT\r\n");
-	}
-	else if (flag & TVHT_ONITEMBUTTON) {
-		//DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMBUTTON\r\n");
-	}
+	//else if (flag & TVHT_ONITEMRIGHT) {
+	//	DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMRIGHT\r\n");
+	//}
+	//else if (flag & TVHT_ONITEMBUTTON) {
+	//	DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMBUTTON\r\n");
+	//}
 	else if (flag & TVHT_ONITEMSTATEICON) {
 		// clicked check box
 		CBCGPGridRow* pRow = m_wndControl.TreeItem(hItem);
@@ -284,9 +284,9 @@ void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 		//:WARNING - prevent OnTreeSelChanged()
 		*pResult = S_FALSE;
 	}
-	else {
-		//DEBUG_TRACE(L"NM_CLICK: other\r\n");
-	}
+	//else {
+	//	DEBUG_TRACE(L"NM_CLICK: other\r\n");
+	//}
 }
 
 

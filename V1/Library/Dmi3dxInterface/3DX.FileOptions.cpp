@@ -273,8 +273,8 @@ bool H3DX::ImportOptions::GetTessellation(Json::Object& source, A3DRWParamsLoadD
 ]}
 */
 
-// - "Folders"
-// - "RecursiveSearch"
+// + "Folders"
+// + "RecursiveSearch"
 // - "SearchMaxEdgeLength"
 
 bool H3DX::ImportOptions::GetSearch(Json::Object& source, A3DRWParamsLoadData& target)
@@ -287,8 +287,44 @@ bool H3DX::ImportOptions::GetSearch(Json::Object& source, A3DRWParamsLoadData& t
 	}
 
 	Json::Object& data = source.GetAt(category);
-	//:TODO
 	A3DRWParamsAssemblyData& param = target.m_sAssembly;
+
+	bool recursive = data.GetBoolean("RecursiveSearch");
+
+	//param.m_usStructSize;
+	param.m_bUseRootDirectory = recursive; //:CHECK
+	param.m_bRootDirRecursive = recursive;
+
+	WStringArray strings;
+	if (WStr::Split(data.GetString("Folders").GetBuffer(), L';', strings) && strings.size() > 0) {
+		int length = strings.size();
+		param.m_uiSearchDirectoriesSize = length;
+
+		A3DRWParamsSearchDirData** pBuffer
+			= param.m_ppcSearchDirectories
+			= new A3DRWParamsSearchDirData*[length];
+		DEBUG_VALID(pBuffer);
+		::ZeroMemory(pBuffer, sizeof(A3DRWParamsSearchDirData*) * length);
+
+		for (int i = 0; i < strings.size(); i++) {
+			CString dir = strings[i];
+			dir.Replace(L'/', L'\\');
+
+			A3DRWParamsSearchDirData* pDir
+				= pBuffer[i]
+				= new A3DRWParamsSearchDirData;
+			DEBUG_VALID(pDir);
+			::ZeroMemory(pDir, sizeof(A3DRWParamsSearchDirData));
+
+			//pDir->m_usStructSize;
+			pDir->m_pcPhysicalPath = ToHoopsString(dir);
+			//pDir->m_pcLogicalName
+			pDir->m_bRecursive = recursive; //:CHECK
+		}
+	}
+
+	//param.m_uiPathDefinitionsSize;
+	//param.m_ppcPathDefinitions;
 
 	return true;
 }
@@ -575,15 +611,16 @@ A3DUTF8Char* H3DX::ImportOptions::ToHoopsString(CString value)
 
 	int length = value.GetLength() * sizeof(WCHAR);
 	pBuffer = new A3DUTF8Char[length];
+	DEBUG_VALID(pBuffer);
 	::ZeroMemory(pBuffer, length);
 
 	A3DStatus eStatus = A3DMiscUnicodeToUTF8((A3DUTF8Char*)(LPCTSTR)value, pBuffer);
 	if (A3D_SUCCESS != eStatus) {
 		REMOVE_ARRAY(pBuffer);
-		RETURN_NULL;
+		DEBUG_STOP;
 	}
 
-	return NULL;
+	return pBuffer;
 }
 
 
@@ -596,6 +633,7 @@ A3DUTF8Char** H3DX::ImportOptions::ToHoopsStrings(CString value)
 	}
 
 	A3DUTF8Char** pBuffer = new A3DUTF8Char*[buffer.size()];
+	DEBUG_VALID(pBuffer);
 	::ZeroMemory(pBuffer, sizeof(A3DUTF8Char*) * buffer.size());
 
 	for (int i = 0; i < buffer.size(); i++) {
