@@ -26,13 +26,12 @@ namespace KERNEL
 
 		protected:
 			void ItemExpandedSignal(Json::Object & cInObject);
-			void ModelItemExpanded(HC_KEY nModelKey);
 			void ModelGroupItemExpanded();
 			void MeasurementsGroupItemExpanded();
 			void MarkupsGroupItemExpanded();
 
-			void ItemExpanded(HC_KEY nInItemKey);
-			void IncludeExpanded(HC_KEY nInItemKey, HC_KEY nInParentKey = INVALID_KEY);
+			void ItemExpanded(DWORD_PTR nInItemKey, DWORD_PTR nInParentItem = 0);
+			void IncludeExpanded(DWORD_PTR nInItem, DWORD_PTR nInParentItem = 0);
 
 			void SelChangedSignal(Json::Object & cInObject);
 		};

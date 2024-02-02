@@ -237,33 +237,31 @@ void KERNEL::Operator::Select::SetObjectSnapMode(OSnap::Type eInType)
 
 //== Select 관련 함수 ================================================================================
 
-bool KERNEL::Operator::Select::SelectByItem(H3DF::SelectionItem & cInSelItem)
+bool KERNEL::Operator::Select::SelectByResult(H3DF::SelectionResults & cInResults)
 {
 	auto * pcImpl = (Operator::SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	H3DF::HighlightOptionsKit cOptions;
 
-	if (false == pcImpl->m_cSelectionResult.IsExist(cInSelItem)) {
-		if (H3DF::Type::LineKey == cInSelItem.Type()) {
-			pcImpl->m_cLineHighlightCtrl.Highlight(cInSelItem, cOptions, false);
-		}
-		else {
-			pcImpl->m_cHighlightCtrl.Highlight(cInSelItem, cOptions, false);
+	H3DF::SelectionResultsIterator cIter = cInResults.GetIterator();
+
+	while (true == cIter.IsValid()) {
+		H3DF::SelectionItem cItem = cIter.GetItem();
+
+		if (false == pcImpl->m_cSelectionResult.IsExist(cItem)) {
+			if (H3DF::Type::LineKey == cItem.Type()) {
+				pcImpl->m_cLineHighlightCtrl.Highlight(cItem, cOptions, false);
+			}
+			else {
+				pcImpl->m_cHighlightCtrl.Highlight(cItem, cOptions, false);
+			}
+
+			// 선택된 객체를 SelectionResult에 추가
+			pcImpl->m_cSelectionResult.PushFront(cItem);
 		}
 
-		// 선택된 객체를 SelectionResult에 추가
-		pcImpl->m_cSelectionResult.PushFront(cInSelItem);
-	}
-	else {
-		if (H3DF::Type::LineKey == cInSelItem.Type()) {
-			pcImpl->m_cLineHighlightCtrl.Unhighlight(cInSelItem, cOptions);
-		}
-		else {
-			pcImpl->m_cHighlightCtrl.Unhighlight(cInSelItem, cOptions);
-		}
-
-		pcImpl->m_cSelectionResult.Erase(cInSelItem);
+		cIter.Next();
 	}
 
 	pcImpl->View().Update();

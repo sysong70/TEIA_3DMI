@@ -162,6 +162,10 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 	SegmentKey cModelInclude = cModelSegment.Subsegment(L"model_include");
 	cModelInclude.SetVisibility(L"off");
 
+	SegmentKey cModels = cModelSegment.Subsegment(L"models");
+	SegmentKey cMeasurements = cModelSegment.Subsegment(L"measurements");
+	SegmentKey cMarkups = cModelSegment.Subsegment(L"markups");
+
 	BoundingKit cBounding;
 	cBounding.SetExclusion(true);
 	cModelInclude.SetBounding(cBounding);
@@ -182,20 +186,20 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 	ImportOption sImportOption;
 
 	// 처음부터 
-	sImportOption.cParentSegment = cModelSegment;
+	sImportOption.cParentSegment = cModels;
 
 	LoadMatrixIdentity();
 
-	cModelSegment.SetVisibility(L"lines=on");
+	cModels.SetVisibility(L"lines=on");
 	
 	MaterialMappingKit cMaterialMapping;
 	cMaterialMapping.SetLineColor(RGBAColor(0, 0, 0));
 	cMaterialMapping.SetEdgeColor(RGBAColor(0, 0, 0));
-	cModelSegment.SetMaterialMapping(cMaterialMapping);
+	cModels.SetMaterialMapping(cMaterialMapping);
 
-	cModelSegment.GetMarkerAttributeControl().SetSize(0.2f);
+	cModels.GetMarkerAttributeControl().SetSize(0.2f);
 
-	bool bStatus = ParseModelFile(pcAsmModelFile, cModelSegment);
+	bool bStatus = ParseModelFile(pcAsmModelFile, cModels);
 
 	A3DAsmModelFileDelete(pcAsmModelFile);
 
@@ -217,62 +221,15 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 	strMessage.Format(L"Stage 2/3 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec2));
 	cInDelivery.progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
 
-	// CreateBasicModelTree(strFilePathName, cModelSegment, cInDelivery);
-
 	m_vcMaterialMappingStyleVector.clear();
 	m_mFaceMaterialMappingStyleMap.RemoveAll();
 	m_mLineMaterialMappingStyleMap.clear();
 	m_mMarkerMaterialMappingStyleMap.clear();
 
+	size_t nCount1 = cModels.ShowSubsegments();
+	size_t nCount2 = cModels.ShowIncluders();
+
 	return bStatus;
-}
-
-// File Open후에 Basic Model Tree 생성 함수 
-void TdfImport::CreateBasicModelTree(CString strFilePathName, H3DF::SegmentKey & cModelSegment, Signal::Delivery & cInDelivery)
-{
-	CString strFileName = Path::GetFileName(strFilePathName);
-	
-	Signal::TreeItems cTreeItems;
-
-	Signal::TreeItem cItem;
-	cItem.Title = strFileName;
-	cItem.HasChildren = true;
-	cItem.Key = 0;
-	cTreeItems.push_back(cItem);
-	cInDelivery.modelPanel.AddItems(cTreeItems);
-
-	cTreeItems.clear();
-
-	cItem.Title = "Models";
-	cItem.HasChildren = true;
-	cItem.ParentKey = 0;
-	cItem.Key = cModelSegment.KeyValue();
-	cTreeItems.push_back(cItem);
-	cInDelivery.modelPanel.AddItems(cTreeItems);
-
-	cTreeItems.clear();
-
-	IncludeKeyArray cChildren;
-	cModelSegment.ShowIncluders(cChildren);
-
-	for (auto cInclude : cChildren) {
-		SegmentKey cSegment = cInclude.GetTarget();
-
-		CString strName;
-		if (false == H3DF::UserData::ShowSegmentName(cSegment, strName)) {
-			strName = cSegment.Name();
-		}
-
-		size_t nCount = cSegment.ShowSubsegments();
-
-		cItem.Title = strName;
-		cItem.ParentKey = 1;
-		cItem.Key = cInclude.KeyValue();
-		cItem.HasChildren = (0 < nCount) ? true : false;
-		cTreeItems.push_back(cItem);
-	}
-
-	cInDelivery.modelPanel.AddItems(cTreeItems);
 }
 
 // == 3DX 설정 관련 함수 ==============================================================================

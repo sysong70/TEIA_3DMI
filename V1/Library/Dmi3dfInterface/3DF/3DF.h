@@ -83,6 +83,7 @@ namespace H3DF
 	class PerformanceControl;
 
 	class SelectionItem;
+	class SelectionResults;
 	class SelectionOptionsKit;
 	class SelectionControl;
 	class HighlightControl;

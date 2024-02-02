@@ -619,8 +619,9 @@ bool PointCloud::Initialize(wchar_t const* filename)
                     cpt.rgb_color.red = (unsigned char)cpt.intensity;
                     valid_point = true;
                 }
-                else if (result == 7)
+                else if (result == 7) {
                     valid_point = true;
+                }
             }
 
             if (valid_point) {

@@ -499,6 +499,27 @@ CString H3DF::Utility::GetExecuteDirectory()
 	return strFilePath;
 }
 
+//== Segment 관련 함수 =======================================================================
+
+// 주어진 Segment의 하부 Segment 중에서 지정된 이름을 가진 Segment를 찾아서 반환한다. 여기서 이름은 User define name이 아니라 Segment의 이름이다.
+bool H3DF::Utility::ShowSubSegment(SegmentKey & cInTargetSegment, CStringA strInSegmentName, SegmentKey & cOutSegment)
+{
+	SegmentKeyArray cSubSegments;
+
+	size_t nSubCount = cInTargetSegment.ShowSubsegments(cSubSegments);
+
+	for (size_t nIndex = 0; nIndex < nSubCount; nIndex++) {
+		CStringA strName = cSubSegments[nIndex].Name(false);
+		if (0 == strInSegmentName.CompareNoCase(strName)) {
+			cOutSegment = cSubSegments[nIndex];
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 //== Segment User Data 관련 함수 =====================================================================
 bool H3DF::UserData::SetSegmentName(SegmentKey & cInSegment, CString strName)
 {
