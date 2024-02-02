@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "Json.h"
-#include <list>
 
 /// Delivery Keywords
 
@@ -519,6 +518,7 @@ namespace Signal
 
 			AddItems,
 			AddChildren,
+			ExpandItem,
 		};
 
 		DEFINE_WRAPPER;
@@ -533,14 +533,15 @@ namespace Signal
 		// response AddChildren();
 		void OnItemExpanded(DWORD_PTR key);
 
-		//void OnSelChanged(DWORD_PTR key);
-		void OnSelChanged(std::list<DWORD_PTR>& keyList);
+		void OnSelChanged(DWORD_PTR key);
 
 	public:
 
 		void AddItems(TreeItems& items);
 		// ignore TreeItem.Parent
 		void AddChildren(DWORD_PTR parentKey, TreeItems& items);
+
+		void ExpandItem(DWORD_PTR key);
 	};
 
 

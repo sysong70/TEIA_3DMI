@@ -77,6 +77,10 @@ void Component::ModelPanel::ReceiveSignal(Json::Object* pData)
 		AddChildren(pData);
 		break;
 
+	case Signal::ModelPanel::Action::ExpandItem:
+		ExpandItem(pData);
+		break;
+
 	default:
 		DEBUG_STOP;
 	}
@@ -396,10 +400,8 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 	//:CHECK - pNMTreeView->itemOld.hItem == nullptr
 
 	if (pNMTreeView->itemNew.hItem != nullptr) {
-		//DWORD_PTR key = m_wndControl.GetItemData(pNMTreeView->itemNew.hItem);
-		std::list<DWORD_PTR> list;
-		GetAncestorData(pNMTreeView->itemNew.hItem, list);
-		m_pView->GetDelivery().modelPanel.OnSelChanged(list);
+		DWORD_PTR key = m_wndControl.GetItemData(pNMTreeView->itemNew.hItem);
+		m_pView->GetDelivery().modelPanel.OnSelChanged(key);
 	}
 
 	*pResult = S_OK;
@@ -432,14 +434,21 @@ void Component::ModelPanel::OnTreeSetFocus(NMHDR* pNMHDR, LRESULT* pResult)
 
 
 
-void Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, CString title, bool hasChildren, int type)
+void Component::ModelPanel::AddItem(Json::Object* pData)
 {
+	Json::Object& data = *pData;
+
+	DWORD_PTR parentKey = data.GetDwordPtr(SKW_PARENT);
+	DWORD_PTR key = data.GetDwordPtr(SKW_KEY);
+	bool hasChildren = data.GetBoolean(SKW_HASCHILDREN);
+	int type = data.GetInteger(SKW_TYPE);
+
 	TVINSERTSTRUCT tvi;
-	tvi.hParent = parent;
+	tvi.hParent = GetItem(parentKey);
 	tvi.hInsertAfter = TVI_LAST;
 
 	//:CHECK - item or itemex
-	tvi.itemex.pszText = (LPWSTR)(LPCTSTR)title;
+	tvi.itemex.pszText = (LPWSTR)(LPCTSTR)data.GetString(SKW_TITLE);
 	//:WARNING - is not single flag!!! (combination)
 	tvi.itemex.mask = TVIF_TEXT | TVIF_PARAM;
 	// TVIF_PARAM: add data. if not set, lParam is not assigned
@@ -455,6 +464,33 @@ void Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, CString tit
 	}
 }
 
+
+
+void Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool hasChildren, int type)
+{
+	TVINSERTSTRUCT tvi;
+	tvi.hParent = parent;
+	tvi.hInsertAfter = TVI_LAST;
+
+	//:CHECK - item or itemex
+	tvi.itemex.pszText = title;
+	//:WARNING - is not single flag!!! (combination)
+	tvi.itemex.mask = TVIF_TEXT | TVIF_PARAM;
+	// TVIF_PARAM: add data. if not set, lParam is not assigned
+	tvi.itemex.lParam = (LPARAM)key;
+	//:CHECK - how to use tvi.itemex.cChildren?
+
+	HTREEITEM hCurrent = m_wndControl.InsertItem(&tvi);
+	m_keyMap[key] = hCurrent;
+
+	if (hasChildren) {
+		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
+		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
+	}
+}
+
+
+
 void Component::ModelPanel::AddItems(Json::Object* pData)
 {
 	m_wndControl.SetRedraw(FALSE);
@@ -463,14 +499,7 @@ void Component::ModelPanel::AddItems(Json::Object* pData)
 	Json::Array& items = data.GetArray(SKW_ITEMS);
 
 	for (auto item : items.GetBuffer()) {
-		Json::Object& target = item->AsObject();
-
-		AddItem(GetItem(target.GetDwordPtr(SKW_PARENT)),
-			target.GetDwordPtr(SKW_KEY),
-			target.GetString(SKW_TITLE),
-			target.GetBoolean(SKW_HASCHILDREN),
-			target.GetInteger(SKW_TYPE)
-		);
+		AddItem(item->ToObject());
 	}
 
 	m_wndControl.SetRedraw(TRUE);
@@ -487,20 +516,34 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 	Json::Array& items = data.GetArray(SKW_CHILDREN);
 
 	HTREEITEM hParent = GetItem(data.GetDwordPtr(SKW_PARENT));
-
+	
 	for (auto item : items.GetBuffer()) {
-		Json::Object& target = item->AsObject();
+		Json::Object& child = item->AsObject();
 
 		AddItem(hParent,
-			target.GetDwordPtr(SKW_KEY),
-			target.GetString(SKW_TITLE),
-			target.GetBoolean(SKW_HASCHILDREN),
-			target.GetInteger(SKW_TYPE)
+			child.GetDwordPtr(SKW_KEY),
+			(LPWSTR)(LPCTSTR)child.GetString(SKW_TITLE),
+			child.GetBoolean(SKW_HASCHILDREN),
+			child.GetInteger(SKW_TYPE)
 		);
 	}
 
 	m_wndControl.SetRedraw(TRUE);
 	m_wndControl.AdjustLayout();
+}
+
+
+
+void Component::ModelPanel::ExpandItem(Json::Object* pData)
+{
+	Json::Object& data = *pData;
+	HTREEITEM hItem = GetItem(data.GetDwordPtr(SKW_KEY));
+	if (hItem != nullptr) {
+		m_wndControl.Expand(hItem, TVE_EXPAND);
+	}
+	else {
+		DEBUG_STOP;
+	}
 }
 
 

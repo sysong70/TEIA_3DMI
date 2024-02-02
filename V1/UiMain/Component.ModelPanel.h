@@ -63,11 +63,15 @@ namespace Component
 
 		DECLARE_MESSAGE_MAP()
 
-		void AddItem(HTREEITEM parent, DWORD_PTR key, CString title, bool hasChildren, int type);
+		void AddItem(Json::Object* pData);
+
+		void AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool hasChildren, int type);
 
 		void AddItems(Json::Object* pData);
 
 		void AddChildren(Json::Object* pData);
+
+		void ExpandItem(Json::Object* pData);
 
 		void GetAncestorData(HTREEITEM pItem, std::list<DWORD_PTR>& list);
 

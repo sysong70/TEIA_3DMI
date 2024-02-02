@@ -679,28 +679,12 @@ void Signal::ModelPanel::OnItemExpanded(DWORD_PTR key)
 
 
 
-//void Signal::ModelPanel::OnSelChanged(DWORD_PTR key)
-//{
-//	SendKeyData(Action::OnSelChanged);
-//}
-
-void Signal::ModelPanel::OnSelChanged(std::list<DWORD_PTR>& keyList)
+void Signal::ModelPanel::OnSelChanged(DWORD_PTR key)
 {
-	Json::Object data;
-	ConstructData(data, Action::OnSelChanged);
-
-	Json::Array& keyArray = data.CreateArray(SKW_KEY);
-
-	for (auto key : keyList) {
-		CString& item = keyArray.AddString();
-		//:WARNING - DWORD_PTR string
-		item.Format(L"%llx", key);
-	}
-
-	Wrapper().SendData(data);
+	SendKeyData(Action::OnSelChanged);
 }
 
-#undef SendKeyData
+
 
 void Signal::ModelPanel::AddItems(TreeItems& items)
 {
@@ -743,6 +727,15 @@ void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items)
 
 	Wrapper().SendData(data);
 }
+
+
+
+void Signal::ModelPanel::ExpandItem(DWORD_PTR key)
+{
+	SendKeyData(Action::ExpandItem);
+}
+
+#undef SendKeyData
 
 #pragma endregion //:REGION
 

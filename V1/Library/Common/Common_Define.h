@@ -53,6 +53,7 @@ void Trace(const wchar_t* pFormat, ...);
 //--------------------------------------------------------------------------------------------------
 
 #include <vector>
+#include <list>
 
 typedef std::vector<CStringA> AStringArray;
 typedef std::vector<char> ACharArray;
