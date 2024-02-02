@@ -52,17 +52,17 @@ Signal::Target Dialog::Base::GetSignalTargetId()
 
 
 
-Facility::Base* Dialog::Base::GetResultData(bool bNewInstance)
-{
-	RETURN_NULL;
-}
+//Facility::Base* Dialog::Base::GetResultData(bool bNewInstance)
+//{
+//	RETURN_NULL;
+//}
 
 // delete after using this data
 
-Json::Object* Dialog::Base::GetResult()
-{
-	RETURN_NULL;
-}
+//Json::Object* Dialog::Base::GetResult()
+//{
+//	RETURN_NULL;
+//}
 
 
 

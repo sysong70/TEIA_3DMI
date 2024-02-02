@@ -8,7 +8,8 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 
-
+// in BCGPPropList.cpp
+#define PROP_HAS_LIST 0x0001
 #define ICON_PADDING(parent) globalUtils.ScaleByDPI(3, parent)
 
 using namespace Property;
@@ -174,8 +175,8 @@ void Property::SliderCtrl::HScroll(UINT /*nSBCode*/, UINT /*nPos*/)
 
 #pragma region Color Class
 
-Property::Color::Color(const CString& name, UINT id, const COLORREF& color, LPCTSTR lpszDescr, DWORD_PTR dwData)
-	: CBCGPColorProp(name, id, color, NULL, lpszDescr)
+Property::Color::Color(const CString& name, const COLORREF& color, LPCTSTR lpszDescr, DWORD_PTR dwData)
+	: CBCGPColorProp(name, 0, color, NULL, lpszDescr)
 {
 }
 
@@ -206,8 +207,8 @@ void Property::Color::OnCloseCombo()
 
 #include "Component.CoordEdit.h"
 
-Property::Coordinate::Coordinate(const CString& name, UINT id, const CString& value, LPCTSTR lpDescr, DWORD_PTR data)
-	: CBCGPProp(name, id, (LPCTSTR)value, lpDescr)
+Property::Coordinate::Coordinate(const CString& name, const CString& value, LPCTSTR lpDescr, DWORD_PTR data)
+	: CBCGPProp(name, 0, (LPCTSTR)value, lpDescr)
 {
 }
 
@@ -258,8 +259,6 @@ void Property::Coordinate::OnClickButton(CPoint point)
 //--------------------------------------------------------------------------------------------------
 
 #pragma region ComboButton Class
-
-#define PROP_HAS_LIST 0x0001
 
 Property::ComboButton::ComboButton(const CString& name, const _variant_t& value) :
 	CBCGPProp(name, value)
@@ -343,16 +342,14 @@ void Property::ComboButton::OnDrawButton(CDC* pDC, CRect rectButton)
 	}
 }
 
-#undef PROP_HAS_LIST
-
 #pragma endregion //:REGION
 
 //--------------------------------------------------------------------------------------------------
 
 #pragma region CommandButton Class
 
-Property::CommandButton::CommandButton(const CString& name, const CString& title, UINT id, LPCTSTR lpDescr, DWORD_PTR data)
-	: CBCGPProp(name, id, (LPCTSTR)title, lpDescr)
+Property::CommandButton::CommandButton(const CString& name, const CString& title, LPCTSTR lpDescr, DWORD_PTR data)
+	: CBCGPProp(name, 0, (LPCTSTR)title, lpDescr)
 	, m_title(title)
 {
 }
@@ -850,12 +847,13 @@ void Property::Duration::SetValue(const _variant_t& varValue)
 #pragma endregion //:REGION
 
 //--------------------------------------------------------------------------------------------------
-
+#include "Dialog.Folders.h"
 #pragma region FoldersDialog Class
 
 Property::FoldersDialog::FoldersDialog(const CString& name, const CString value, LPCTSTR lpDescr, DWORD_PTR data)
 	: CBCGPProp(name, (LPCTSTR)value, lpDescr, data)
 {
+	m_bAllowEdit = FALSE;
 }
 
 
@@ -869,10 +867,65 @@ BOOL Property::FoldersDialog::HasButton() const
 
 void Property::FoldersDialog::OnClickButton(CPoint point)
 {
-	//SetValue
+	Dialog::Folders dlg;
+	dlg.SetValue(GetValue());
+	
+	if (dlg.DoModal() == IDOK) {
+		SetValue((LPCTSTR)dlg.GetValue());
+	}
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
+
+#pragma region FoldersDialog Class
+
+Property::FontCombo::FontCombo(const CString& name, const CString value, LPCTSTR lpDescr, DWORD_PTR data)
+	: CBCGPProp(name, (LPCTSTR)value, lpDescr, data)
+{
+	m_dwFlags = PROP_HAS_LIST;
+}
+
+
+
+CComboBox* Property::FontCombo::CreateCombo(CWnd* pWndParent, CRect rect)
+{
+	const int HEIGHT = 400;
+
+	rect.bottom = rect.top + HEIGHT;
+
+	CBCGPFontComboBox* pControl = new CBCGPFontComboBox;
+	DEBUG_VALID(pControl);
+	pControl->m_bVisualManagerStyle = TRUE;
+
+	DWORD dwStyle = WS_CHILD | WS_VSCROLL | CBS_NOINTEGRALHEIGHT | CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS;
+	if (pControl->Create(dwStyle, rect, pWndParent, BCGPROPLIST_ID_INPLACE_COMBO) == FALSE) {
+		REMOVE_POINTER(pControl);
+		RETURN_NULL;
+	}
+
+	//:WARNING - static var, vary slow
+	//CBCGPFontComboBox::m_bDrawUsingFont = TRUE;
+	pControl->SelectFont((CString)m_varValue);
+
+	return pControl;
+}
+
+
+
+CWnd* Property::FontCombo::CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultFormat)
+{
+	DEBUG_VALID(this);
+	DEBUG_VALID(m_pWndList);
+
+	CWnd* pWnd = __super::CreateInPlaceEdit(rectEdit, bDefaultFormat);
+	if (pWnd != nullptr) {
+		pWnd->ShowWindow(SW_HIDE);
+	}
+
+	return pWnd;
+}
 
 //--------------------------------------------------------------------------------------------------
 
@@ -938,9 +991,9 @@ BOOL Property::HexValue::TextToVar(const CString& str)
 
 //--------------------------------------------------------------------------------------------------
 
-#pragma region IconComboBox Class
+#pragma region IconCombo Class
 
-Property::IconComboBox::IconComboBox(const CString& name, const CString& value, LPCTSTR lpDescr, DWORD_PTR data, CBCGPToolBarImages* pImageList)
+Property::IconCombo::IconCombo(const CString& name, const CString& value, LPCTSTR lpDescr, DWORD_PTR data, CBCGPToolBarImages* pImageList)
 	: CBCGPProp(name, (LPCTSTR)value, lpDescr, data)
 {
 	if (pImageList != nullptr) {
@@ -950,7 +1003,7 @@ Property::IconComboBox::IconComboBox(const CString& name, const CString& value, 
 
 
 
-bool Property::IconComboBox::AddOption(LPCTSTR lpOption, int nIcon, int nIndent)
+bool Property::IconCombo::AddOption(LPCTSTR lpOption, int nIcon, int nIndent)
 {
 	if (!__super::AddOption(lpOption)) {
 		RETURN_FALSE;
@@ -964,7 +1017,7 @@ bool Property::IconComboBox::AddOption(LPCTSTR lpOption, int nIcon, int nIndent)
 
 
 
-CComboBox* Property::IconComboBox::CreateCombo(CWnd* pWndParent, CRect rect)
+CComboBox* Property::IconCombo::CreateCombo(CWnd* pWndParent, CRect rect)
 {
 	const int HEIGHT = 400;
 
@@ -994,7 +1047,7 @@ CComboBox* Property::IconComboBox::CreateCombo(CWnd* pWndParent, CRect rect)
 
 
 
-BOOL Property::IconComboBox::OnEdit(LPPOINT lpClick)
+BOOL Property::IconCombo::OnEdit(LPPOINT lpClick)
 {
 	if (__super::OnEdit(lpClick) == FALSE) {
 		return FALSE;
@@ -1275,8 +1328,8 @@ BOOL Property::RangeValidation::OnUpdateValue()
 
 #pragma region Slider Class
 
-Property::Slider::Slider(const CString& name, UINT id, long value, LPCTSTR lpDescr, DWORD_PTR data) :
-	CBCGPProp(name, id, value, lpDescr, data)
+Property::Slider::Slider(const CString& name, long value, LPCTSTR lpDescr, DWORD_PTR data) :
+	CBCGPProp(name, 0, value, lpDescr, data)
 {
 	m_bIsVisible = true;
 }
@@ -1470,3 +1523,5 @@ void Property::TwoButtons::LoadImages()
 }
 
 #pragma endregion //:REGION
+
+#undef PROP_HAS_LIST

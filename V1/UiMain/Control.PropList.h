@@ -46,6 +46,8 @@ namespace Control
 		void SetPropData(CBCGPProp* pProp, Json::Value* pValue);
 
 		void SetPropEnable(CBCGPProp* pProp, Json::Object& design);
+
+		void SetPropId(CBCGPProp* pProp, Json::Object& design);
 		//:WARNING - do not use Name, use XMLTagName
 		void SetPropName(CBCGPProp* pProp, Json::Object& design);
 
@@ -67,31 +69,33 @@ namespace Control
 
 	protected:
 
+		void SetProperty(CBCGPProp* pProp, Json::Object& design);
+
 		CBCGPProp* CreateProp(Json::Object& design);
 
-		CBCGPProp* CreateGroupProp(Json::Object& design, UINT id = 0);
+		CBCGPProp* CreateGroupProp(Json::Object& design);
 
-		CBCGPProp* CreateButtonProp(Json::Object& design, UINT id = 0);
+		CBCGPProp* CreateButtonProp(Json::Object& design);
 
-		CBCGPProp* CreateCheckProp(Json::Object& design, UINT id = 0);
+		CBCGPProp* CreateCheckProp(Json::Object& design);
 
-		CBCGPProp* CreateColorProp(Json::Object& design, UINT id = 0);
+		CBCGPProp* CreateColorProp(Json::Object& design);
 
-		CBCGPProp* CreateCoordProp(Json::Object& design, UINT id = 0);
+		CBCGPProp* CreateCoordProp(Json::Object& design);
 
-		CBCGPProp* CreateDropdownProp(Json::Object& design, UINT id = 0);
+		CBCGPProp* CreateDropdownProp(Json::Object& design);
 
-		CBCGPProp* CreateEditProp(Json::Object& design, UINT id = 0);
+		CBCGPProp* CreateEditProp(Json::Object& design);
 
-		CBCGPProp* CreateFileProp(Json::Object& design, UINT id = 0);
+		CBCGPProp* CreateFileProp(Json::Object& design);
 
-		CBCGPProp* CreateFolderProp(Json::Object& design, UINT id = 0);
+		CBCGPProp* CreateFolderProp(Json::Object& design);
 
-		CBCGPProp* CreateFoldersProp(Json::Object& design, UINT id = 0);
+		CBCGPProp* CreateFoldersProp(Json::Object& design);
 
-		CBCGPProp* CreateFontProp(Json::Object& design, UINT id = 0);
+		CBCGPProp* CreateFontProp(Json::Object& design);
 
-		CBCGPProp* CreateSliderProp(Json::Object& design, UINT id = 0);
+		CBCGPProp* CreateSliderProp(Json::Object& design);
 
 	protected:
 

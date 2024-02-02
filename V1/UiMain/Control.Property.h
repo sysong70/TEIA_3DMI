@@ -6,7 +6,28 @@
 
 namespace Property
 {
+	// Controls in Property
+	class DurationCtrl;
+	class IconComboBoxCtrl;
+	class SliderCtrl;
+	// Property
+	class Color;		// CBCGPColorProp
+	class Coordinate;
+	class ComboButton;
+	class CommandButton;
+	class CustomColor;	// sample CBCGPColorProp
+	class CustomDialog;	// sample
+	class CustomState;	// sample
+	class Duration;
+	class FoldersDialog;
+	class FontCombo;
+	class HexValue;
+	class IconCombo;
+	class IconList;
+	class Password;
+	class RangeValidation;
 	class Slider;
+	class TwoButtons;
 
 #pragma region Custom Controls
 
@@ -72,7 +93,7 @@ namespace Property
 	{
 	public:
 
-		Color::Color(const CString& name, UINT id, const COLORREF& color, LPCTSTR lpszDescr = NULL, DWORD_PTR dwData = NULL);
+		Color::Color(const CString& name, const COLORREF& color, LPCTSTR lpszDescr = NULL, DWORD_PTR dwData = NULL);
 
 	public:
 
@@ -87,7 +108,7 @@ namespace Property
 	{
 	public:
 
-		Coordinate(const CString& name, UINT id, const CString& value, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL);
+		Coordinate(const CString& name, const CString& value, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL);
 
 	protected:
 
@@ -127,7 +148,7 @@ namespace Property
 
 		friend class Control::PropList;
 
-		CommandButton(const CString& name, const CString& title, UINT id, LPCTSTR lpDescr, DWORD_PTR data = NULL);
+		CommandButton(const CString& name, const CString& title, LPCTSTR lpDescr, DWORD_PTR data = NULL);
 
 	protected:
 
@@ -235,7 +256,7 @@ namespace Property
 
 		void SetDuration(COleDateTimeSpan duration);
 
-	public:
+	protected:
 
 		void AdjustInPlaceEditRect(CRect& rectEdit, CRect& rectSpin) override;
 
@@ -281,6 +302,21 @@ namespace Property
 
 
 
+	class FontCombo : public CBCGPProp
+	{
+	public:
+
+		FontCombo(const CString& name, const CString value, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL);
+
+	protected:
+
+		CComboBox* CreateCombo(CWnd* pWndParent, CRect rect) override;
+
+		CWnd* CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultFormat) override;
+	};
+
+
+
 	class HexValue : public CBCGPProp
 	{
 	public:
@@ -302,11 +338,11 @@ namespace Property
 
 
 
-	class IconComboBox : public CBCGPProp
+	class IconCombo : public CBCGPProp
 	{
 	public:
 
-		IconComboBox(const CString& name, const CString& value, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL, CBCGPToolBarImages* pImageList = NULL);
+		IconCombo(const CString& name, const CString& value, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL, CBCGPToolBarImages* pImageList = NULL);
 
 		bool AddOption(LPCTSTR lpOption, int nIcon = -1, int nIndent = 0);
 
@@ -404,7 +440,7 @@ namespace Property
 
 		friend class SliderCtrl;
 
-		Slider(const CString& name, UINT id, long value, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL);
+		Slider(const CString& name, long value, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL);
 
 		void SetRange(int minValue, int maxValue, int step);
 

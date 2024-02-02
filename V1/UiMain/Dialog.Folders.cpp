@@ -1,5 +1,7 @@
 ﻿#include "stdafx.h"
 #include "Dialog.Folders.h"
+#include "Window.Application.h"
+#include <WStr.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -15,27 +17,48 @@ static char THIS_FILE[] = __FILE__;
 
 Dialog::Folders::EditListBox::EditListBox()
 {
-	//m_bVisualManagerStyle(TRUE)
-	SetGrayDisabledButtons(TRUE);
+	m_bVisualManagerStyle = TRUE;
+
 	EnableBrowseButton(TRUE);
+	SetGrayDisabledButtons(TRUE);
 }
 
 
 
 void Dialog::Folders::EditListBox::OnBrowse()
 {
+	int index = GetSelItem();
+
+	CString folder = GetItemText(index);
+	if (TheApplication.GetShellManager()->BrowseForFolder(folder, NULL, folder) == FALSE) {
+		return;
+	}
+
+	if (index == GetCount()) {
+		SelectItem(AddItem(folder));
+	}
+	else {
+		SetItemText(index, folder);
+	}
 }
 
 
 
 void Dialog::Folders::EditListBox::OnClickButton(int iButton)
 {
+	//:TODO
+	UINT id = GetButtonID(iButton);
+
+	CBCGPEditListBox::OnClickButton(iButton);
 }
 
 
 
 void Dialog::Folders::EditListBox::OnSelectionChanged()
 {
+	CBCGPEditListBox::OnSelectionChanged();
+
+	//:TODO
 }
 
 #pragma endregion //:REGION
@@ -75,20 +98,17 @@ Dialog::Folders::~Folders()
 
 
 
-Json::Object* Dialog::Folders::GetResult()
+CString& Dialog::Folders::GetValue()
 {
-	// create Json::Object, and return
-	return nullptr;
+	return m_value;
 }
 
 
 
-//void Dialog::Folders::DoDataExchange(CDataExchange* pDX)
-//{
-//	CBCGPDialog::DoDataExchange(pDX);
-//
-//	DDX_Control(pDX, PRESET::ListBox, m_listBox);
-//}
+void Dialog::Folders::SetValue(CString value)
+{
+	m_value = value;
+}
 
 
 
@@ -121,7 +141,14 @@ BOOL Dialog::Folders::OnInitDialog()
 
 void Dialog::Folders::OnOK()
 {
-	//:TODO
+	// Reset value
+
+	WStringArray directories;
+	for (int i = 0; i < m_listBox.GetCount(); i++) {
+		directories.push_back(m_listBox.GetItemText(i));
+	}
+
+	m_value = WStr::Join(directories, L';');
 
 	__super::OnOK();
 }
@@ -135,10 +162,18 @@ void Dialog::Folders::ConstructBody(const CRect& boundary)
 		DEBUG_RETURN;
 	}
 
-	//:TEST
-	m_listBox.AddItem(_T("Item 1"));
-	m_listBox.AddItem(_T("Item 2"));
-	m_listBox.AddItem(_T("Item 3"));
+	m_listBox.SetStandardButtons();
+
+	// Add Items
+
+	if (m_value.IsEmpty() == false) {
+		WStringArray directories;
+		WStr::Split(m_value.GetBuffer(), L';', directories);
+
+		for (auto& dir : directories) {
+			m_listBox.AddItem(dir);
+		}
+	}
 }
 
 
