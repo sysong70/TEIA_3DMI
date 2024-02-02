@@ -432,44 +432,32 @@ void Component::ModelPanel::OnTreeSetFocus(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = S_OK;
 }
 
-
+//:REF - https://learn.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-tvitemexw
+//:REF - https://learn.microsoft.com/en-us/windows/win32/controls/tree-view-control-item-states
 
 void Component::ModelPanel::AddItem(Json::Object* pData)
 {
 	Json::Object& data = *pData;
 
+	HTREEITEM hCurrent = m_wndControl.InsertItem(data.GetString(SKW_TITLE), GetItem(data.GetDwordPtr(SKW_PARENT)));
+	DWORD_PTR key = data.GetDwordPtr(SKW_KEY);
+	m_wndControl.SetItemData(hCurrent, key);
+	m_keyMap[key] = hCurrent;
+
+	if (data.GetBoolean(SKW_HASCHILDREN)) {
+		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
+		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
+	}
+
+	/*
 	DWORD_PTR parentKey = data.GetDwordPtr(SKW_PARENT);
 	DWORD_PTR key = data.GetDwordPtr(SKW_KEY);
+	LPWSTR title = (LPWSTR)(LPCTSTR)data.GetString(SKW_TITLE);
 	bool hasChildren = data.GetBoolean(SKW_HASCHILDREN);
 	int type = data.GetInteger(SKW_TYPE);
 
 	TVINSERTSTRUCT tvi;
 	tvi.hParent = GetItem(parentKey);
-	tvi.hInsertAfter = TVI_LAST;
-
-	//:CHECK - item or itemex
-	tvi.itemex.pszText = (LPWSTR)(LPCTSTR)data.GetString(SKW_TITLE);
-	//:WARNING - is not single flag!!! (combination)
-	tvi.itemex.mask = TVIF_TEXT | TVIF_PARAM;
-	// TVIF_PARAM: add data. if not set, lParam is not assigned
-	tvi.itemex.lParam = (LPARAM)key;
-	//:CHECK - how to use tvi.itemex.cChildren?
-
-	HTREEITEM hCurrent = m_wndControl.InsertItem(&tvi);
-	m_keyMap[key] = hCurrent;
-
-	if (hasChildren) {
-		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
-		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
-	}
-}
-
-
-
-void Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool hasChildren, int type)
-{
-	TVINSERTSTRUCT tvi;
-	tvi.hParent = parent;
 	tvi.hInsertAfter = TVI_LAST;
 
 	//:CHECK - item or itemex
@@ -487,6 +475,43 @@ void Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR titl
 		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
 		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
 	}
+	*/
+}
+
+
+
+void Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool hasChildren, int type)
+{
+	HTREEITEM hCurrent = m_wndControl.InsertItem(title, parent);
+	m_wndControl.SetItemData(hCurrent, key);
+	m_keyMap[key] = hCurrent;
+
+	if (hasChildren) {
+		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
+		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
+	}
+
+	/*
+	TVINSERTSTRUCT tvi;
+	tvi.hParent = parent;
+	tvi.hInsertAfter = TVI_LAST;
+
+	//:WARNING - is not single flag!!! (combination)
+	tvi.itemex.mask = TVIF_TEXT | TVIF_PARAM; // | TVIF_STATE;
+	tvi.itemex.pszText = title;
+	// TVIF_PARAM: add data. if not set, lParam is not assigned
+	tvi.itemex.lParam = (LPARAM)key;
+	//tvi.itemex.stateMask = TVIS_EXPANDED;
+	//tvi.itemex.state = TVE_EXPAND;
+
+	HTREEITEM hCurrent = m_wndControl.InsertItem(&tvi);
+	m_keyMap[key] = hCurrent;
+
+	if (hasChildren) {
+		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
+		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
+	}
+	*/
 }
 
 
