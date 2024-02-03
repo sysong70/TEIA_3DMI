@@ -100,16 +100,28 @@ bool H3DF::SelectionItemImpl::ShowPathString(CString & strOutPath)
 
 	for (int nIndex = 1; nIndex < m_nIncludeCount; ++nIndex) {
 		nKey = cPath.At(nIndex).KeyValue();
-		HC_Show_Key_Type(nKey, chType);
 
-		IncludeKey cIncludeKey(nKey);
-		SegmentKey cSegmentKey = cIncludeKey.GetTarget();
+		H3DF::Type eType = H3DF::Utility::GetType(nKey);
+
+		SegmentKey cSegmentKey;
+
+		if (H3DF::Type::IncludeKey == eType) {
+			IncludeKey cIncludeKey(nKey);
+			cSegmentKey = cIncludeKey.GetTarget();
+		}
+		else {
+			cSegmentKey = SegmentKey(nKey);
+		}
 
 		if (false == UserData::ShowSegmentName(cSegmentKey, strName)) {
 			strName = cSegmentKey.Name(false);
 		}
-
-		strText.Format(L"\nInclude Key: %d [%s], %s", nKey, Utility::ToString(chType), strName);
+		if (H3DF::Type::IncludeKey == eType) {
+			strText.Format(L"\nInclude Key: %d [%s], %s", nKey, L"include", strName);
+		}
+		else {
+			strText.Format(L"\nSegment Key: %d [%s], %s", nKey, L"segment", strName);
+		}
 		strOutPath += strText;
 	}
 

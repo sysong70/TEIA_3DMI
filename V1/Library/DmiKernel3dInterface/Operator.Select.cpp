@@ -174,8 +174,10 @@ int KERNEL::Operator::Select::LButtonUp(HEventInfo & cInEvent)
 		return HLISTENER_PASS_EVENT;
 	}
 
+#ifdef _DEBUG
 	CString strPath;
 	cSelItem.ShowPathString(strPath);
+#endif
 
 	// 3. 기존에 선택되어 있는 Dynamic highlight를 모두 지움.
 	pcImpl->m_cHighlightOSnapOperator.UnhighlightEverything();
