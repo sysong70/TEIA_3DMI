@@ -248,35 +248,6 @@ bool KERNEL::Operator::ModelTree::ShowSelectionEndItems(ModelTreeItem * pcInItem
 // 		CString strPath;
 // 		cSelItem.ShowPathString(strPath);
 #endif
-	/*	SelectionItem cSelItem1;
-		SelectionItemImpl * pcImpl1 = dynamic_cast<SelectionItemImpl *>(cSelItem1.GetImpl());
-		DEBUG_VALID(pcImpl1);
-
-		ModelTreeItem * pcItem = pcInItem;
-		while (nullptr != pcItem->m_pcParent) {
-			pcImpl1->m_nIncludeCount++;
-			pcItem = pcItem->m_pcParent;
-		}
-
-		HC_KEY nSegmentKey = pcInItem->m_nKey;
-
-		char chType[MVO_BUFFER_SIZE];
-		HC_Show_Key_Type(nSegmentKey, chType);
-
-		if (streq(chType, "include")) {
-			nSegmentKey = HC_Show_Include_Segment(nSegmentKey, nullptr);
-		}
-
-		pcImpl1->m_cKey = SegmentKey(nSegmentKey);
-
-		pcImpl1->m_pnIncludeKeys = new HC_KEY[pcImpl1->m_nIncludeCount];
-
-		pcItem = pcInItem;
-
-		for (int nIndex = 0; nIndex < pcImpl1->m_nIncludeCount; nIndex++) {
-			pcImpl1->m_pnIncludeKeys[nIndex] = pcItem->m_nKey;
-			pcItem = pcItem->m_pcParent;
-		}*/
 
 		cOutResults.PushFront(cSelItem);
 
@@ -508,22 +479,8 @@ void KERNEL::Operator::ModelPanel::Signal(Json::Object & cInObject)
 
 	switch ((Signal::ModelPanel::Action)nAction)
 	{
-		case Signal::ModelPanel::Action::OnBeginDrag:
-			break;
-
-		case Signal::ModelPanel::Action::OnBeginLabelEdit:
-			break;
-
-		case Signal::ModelPanel::Action::OnClick:
-			break;
-
-		case Signal::ModelPanel::Action::OnDblClick:
-			break;
-
-		case Signal::ModelPanel::Action::OnDeleteItem:
-			break;
-
-		case Signal::ModelPanel::Action::OnEndLabelEdit:
+		case Signal::ModelPanel::Action::OnItemClicked:
+			OnItemClickedSignal(cInObject);
 			break;
 
 		case Signal::ModelPanel::Action::OnItemChecked:
@@ -532,31 +489,6 @@ void KERNEL::Operator::ModelPanel::Signal(Json::Object & cInObject)
 
 		case Signal::ModelPanel::Action::OnItemExpanded:
 			OnItemExpandedSignal(cInObject);
-			break;
-
-		case Signal::ModelPanel::Action::OnItemExpanding:
-			break;
-
-		case Signal::ModelPanel::Action::OnRClick:
-			break;
-
-		case Signal::ModelPanel::Action::OnRDbClick:
-			break;
-
-		case Signal::ModelPanel::Action::OnSelChanged:
-			OnSelChangedSignal(cInObject);
-			break;
-
-		case Signal::ModelPanel::Action::OnSelChanging:
-			break;
-
-		case Signal::ModelPanel::Action::OnSetFocus:
-			break;
-
-		case Signal::ModelPanel::Action::AddItems:
-			break;
-
-		case Signal::ModelPanel::Action::AddChildren:
 			break;
 
 		default:
@@ -827,7 +759,7 @@ void KERNEL::Operator::ModelPanel::ItemExpanded(ModelTreeItem * pcInItem, ModelT
 //== Item Selelect Changed 관련 함수 =================================================================
 
 // 1. Item Select Changed Signal 처리
-void KERNEL::Operator::ModelPanel::OnSelChangedSignal(Json::Object & cInObject)
+void KERNEL::Operator::ModelPanel::OnItemClickedSignal(Json::Object & cInObject)
 {
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);

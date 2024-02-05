@@ -10,6 +10,8 @@
 
 #include "Line.h"
 
+#include "3DF.Utility.h"
+
 #include <vhash.h>
 #include <vlist.h>
 
@@ -679,7 +681,29 @@ bool H3DF::SelectionItem::ShowPath(KeyPath & cOutPath) const
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->ShowPath(cOutPath);
+	size_t nPathCount = pcImpl->m_nIncludeCount + 1;
+	HC_KEY * pnPath = new HC_KEY[nPathCount];
+
+	HC_KEY nSegmentKey = pcImpl->m_cKey.KeyValue();
+
+	char chType[MVO_BUFFER_SIZE];
+	HC_Show_Key_Type(nSegmentKey, chType);
+
+	if (!streq(chType, "segment")) {
+		nSegmentKey = HC_KShow_Owner_Original_Key(nSegmentKey);
+	}
+
+	pnPath[0] = nSegmentKey;
+
+	for (int nIndex = 1; nIndex < pcImpl->m_nIncludeCount; ++nIndex) {
+		pnPath[nIndex] = pcImpl->m_pnIncludeKeys[pcImpl->m_nIncludeCount - nIndex];
+	}
+
+	pnPath[nPathCount - 1] = HC_KShow_Owner_Original_Key(pnPath[nPathCount - 2]);
+
+	cOutPath = KeyPath(nPathCount, pnPath);
+
+	return true;
 }
 
 void H3DF::SelectionItem::ShowPathString(CString & strOutPath)
@@ -687,7 +711,78 @@ void H3DF::SelectionItem::ShowPathString(CString & strOutPath)
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->ShowPathString(strOutPath);
+	KeyPath cPath;
+	if (false == ShowPath(cPath)) {
+		DEBUG_STOP;
+		return;
+	}
+
+	CString strText;
+	char chType[MVO_BUFFER_SIZE];
+
+	HC_KEY nKey = pcImpl->m_cKey.KeyValue();
+	HC_Show_Key_Type(nKey, chType);
+
+	CString strName;
+
+	SegmentKey cSegmentKey(nKey);
+	if (false == UserData::ShowSegmentName(cSegmentKey, strName)) {
+		strName = cSegmentKey.Name(false);
+	}
+
+	strText.Format(L"Select Key: %d [%s], %s", nKey, Utility::ToString(chType), strName);
+	strOutPath += strText;
+
+	if (nKey != cPath.At(0).KeyValue()) {
+		nKey = cPath.At(0).KeyValue();
+		HC_Show_Key_Type(nKey, chType);
+
+		SegmentKey cSegmentKey(nKey);
+		if (false == UserData::ShowSegmentName(cSegmentKey, strName)) {
+			strName = cSegmentKey.Name(false);
+		}
+
+		strText.Format(L"\nOwner of select key: %d [%s], %s", nKey, Utility::ToString(chType), strName);
+		strOutPath += strText;
+	}
+
+	for (int nIndex = 1; nIndex < pcImpl->m_nIncludeCount; ++nIndex) {
+		nKey = cPath.At(nIndex).KeyValue();
+
+		H3DF::Type eType = H3DF::Utility::GetType(nKey);
+
+		SegmentKey cSegmentKey;
+
+		if (H3DF::Type::IncludeKey == eType) {
+			IncludeKey cIncludeKey(nKey);
+			cSegmentKey = cIncludeKey.GetTarget();
+		}
+		else {
+			cSegmentKey = SegmentKey(nKey);
+		}
+
+		if (false == UserData::ShowSegmentName(cSegmentKey, strName)) {
+			strName = cSegmentKey.Name(false);
+		}
+		if (H3DF::Type::IncludeKey == eType) {
+			strText.Format(L"\nInclude Key: %d [%s], %s", nKey, L"include", strName);
+		}
+		else {
+			strText.Format(L"\nSegment Key: %d [%s], %s", nKey, L"segment", strName);
+		}
+		strOutPath += strText;
+	}
+
+	nKey = cPath.Back().KeyValue();
+	HC_Show_Key_Type(nKey, chType);
+
+	SegmentKey cSegmentKey1(nKey);
+	if (false == UserData::ShowSegmentName(cSegmentKey1, strName)) {
+		strName = cSegmentKey1.Name(false);
+	}
+
+	strText.Format(L"\nOwner of last include key: %d [%s], %s", nKey, Utility::ToString(chType));
+	strOutPath += strText;
 }
 
 bool H3DF::SelectionItem::ShowSelectionPosition(WindowPoint & cOutLocation) const

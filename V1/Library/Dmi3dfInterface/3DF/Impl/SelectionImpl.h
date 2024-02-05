@@ -138,9 +138,6 @@ namespace H3DF
 		WindowKey * GetWindow() { return (WindowKey *) m_pcWindow; }
 		const WindowKey * m_pcWindow = nullptr;
 
-		bool ShowPath(KeyPath & cOutPath) const;
-		bool ShowPathString(CString & strOutPath);
-
 		void Reset();
 	};
 

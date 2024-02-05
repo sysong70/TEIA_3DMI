@@ -41,7 +41,7 @@ BEGIN_MESSAGE_MAP(ModelPanel, Panel)
 	//ON_NOTIFY(TVN_ITEMEXPANDING, PRESET::Id, OnTreeItemExpanding)
 	ON_NOTIFY(NM_RCLICK, PRESET::Id, OnTreeRClick)
 	ON_NOTIFY(NM_RDBLCLK, PRESET::Id, OnTreeRDbClick)
-	ON_NOTIFY(TVN_SELCHANGED, PRESET::Id, OnTreeSelChanged)
+	ON_NOTIFY(TVN_SELCHANGED, PRESET::Id, OnItemClicked) // #sysong
 	//ON_NOTIFY(TVN_SELCHANGING, PRESET::Id, OnTreeSelChanging)
 	ON_NOTIFY(NM_SETFOCUS, PRESET::Id, OnTreeSetFocus)
 
@@ -306,7 +306,7 @@ void Component::ModelPanel::OnTreeDeleteItem(NMHDR* pNMHDR, LRESULT* pResult)
 	if (m_wndControl.GetItemText(hItem) != PRESET::DummyName) {
 		DWORD_PTR key = m_wndControl.GetItemData(hItem);
 		m_keyMap.erase(key);
-		m_pView->GetDelivery().modelPanel.OnDeleteItem(key);
+		m_pView->GetDelivery().modelPanel.DeleteItem(key);
 	}
 
 	*pResult = S_OK;
@@ -389,7 +389,7 @@ void Component::ModelPanel::OnTreeRDbClick(NMHDR* pNMHDR, LRESULT* pResult)
 
 
 
-void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
+void Component::ModelPanel::OnItemClicked(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
@@ -401,7 +401,7 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 
 	if (pNMTreeView->itemNew.hItem != nullptr) {
 		DWORD_PTR key = m_wndControl.GetItemData(pNMTreeView->itemNew.hItem);
-		m_pView->GetDelivery().modelPanel.OnSelChanged(key);
+		m_pView->GetDelivery().modelPanel.OnItemClicked(key);
 	}
 
 	*pResult = S_OK;

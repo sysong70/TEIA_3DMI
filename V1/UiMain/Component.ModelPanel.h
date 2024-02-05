@@ -52,8 +52,8 @@ namespace Component
 		afx_msg void OnTreeRClick(NMHDR* pNMHDR, LRESULT* pResult);
 
 		afx_msg void OnTreeRDbClick(NMHDR* pNMHDR, LRESULT* pResult);
-
-		afx_msg void OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult);
+		 
+		afx_msg void OnItemClicked(NMHDR* pNMHDR, LRESULT* pResult);
 
 		afx_msg void OnTreeSelChanging(NMHDR* pNMHDR, LRESULT* pResult);
 
