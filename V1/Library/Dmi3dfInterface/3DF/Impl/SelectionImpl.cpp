@@ -35,6 +35,29 @@ using namespace H3DF;
 
 bool H3DF::SelectionItemImpl::ShowPath(KeyPath & cOutPath) const
 {
+	size_t nPathCount = m_nIncludeCount + 1;
+	HC_KEY * pnPath = new HC_KEY[nPathCount];
+
+	HC_KEY nSegmentKey = m_cKey.KeyValue();
+
+	char chType[MVO_BUFFER_SIZE];
+	HC_Show_Key_Type(nSegmentKey, chType);
+
+	if (!streq(chType, "segment")) {
+		nSegmentKey = HC_KShow_Owner_Original_Key(nSegmentKey);
+	}
+
+	pnPath[0] = nSegmentKey;
+
+	for (int nIndex = 1; nIndex < m_nIncludeCount; ++nIndex) {
+		pnPath[nIndex] = m_pnIncludeKeys[m_nIncludeCount - nIndex];
+	}
+
+	pnPath[nPathCount - 1] = HC_KShow_Owner_Original_Key(pnPath[nPathCount - 2]);
+
+	cOutPath = KeyPath(nPathCount, pnPath);
+
+/*
 	size_t nPathCount = m_nIncludeCount + 2;
 	HC_KEY * pnPath = new HC_KEY[nPathCount];
 
@@ -57,7 +80,7 @@ bool H3DF::SelectionItemImpl::ShowPath(KeyPath & cOutPath) const
 	pnPath[nPathCount - 1] = INVALID_KEY;
 
 	cOutPath = KeyPath(nPathCount, pnPath);
-
+*/
 	return true;
 }
 
@@ -125,7 +148,7 @@ bool H3DF::SelectionItemImpl::ShowPathString(CString & strOutPath)
 		strOutPath += strText;
 	}
 
-	nKey = cPath.At(cPath.Size() - 2).KeyValue();
+	nKey = cPath.Back().KeyValue();
 	HC_Show_Key_Type(nKey, chType);
 
 	SegmentKey cSegmentKey1(nKey);

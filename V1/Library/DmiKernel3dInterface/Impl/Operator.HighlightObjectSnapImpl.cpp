@@ -123,7 +123,7 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::SnapItem::operator == (const Sna
 //== ObjectSnap class ==============================================================================
 KERNEL::Operator::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery) :
 	OperatorImpl(pcInView, pcInDelivery),
-	m_cDynamicHighlightControl(pcInView->GetWindowKey()),
+	m_cDynHighlightControl(pcInView->GetWindowKey()),
 	m_cDynLineHighlightCtrl(pcInView->GetWindowKey())
 {
 	SegmentKey cConstruction(Window().GetBaseView()->GetConstructionKey());
@@ -171,11 +171,11 @@ KERNEL::Operator::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const H3DF::V
 // 	cDynHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(80, 80, 230)));
 // 	cDynHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(125, 125, 230)));
 
-	m_cDynamicHighlightControl.SetMaterialMapping(cDynHighlightMaterialMapping);
+	m_cDynHighlightControl.SetMaterialMapping(cDynHighlightMaterialMapping);
 	// Shell 선택시에 Line Visibility를 설정한대로 적용하기 위해서 Lock을 걸도록 한다.
-	m_cDynamicHighlightControl.GetAttributeLockControl().SetLock(AttributeLock::Type::Visibility);
-	m_cDynamicHighlightControl.GetVisibilityControl().SetLines(false);
-	m_cDynamicHighlightControl.GetVisibilityControl().SetEdges(false);
+	m_cDynHighlightControl.GetAttributeLockControl().SetLock(AttributeLock::Type::Visibility);
+	m_cDynHighlightControl.GetVisibilityControl().SetLines(false);
+	m_cDynHighlightControl.GetVisibilityControl().SetEdges(false);
 
 	m_cDynLineHighlightCtrl.SetMaterialMapping(cDynHighlightMaterialMapping);
 	m_cDynLineHighlightCtrl.GetLineAttributeControl().SetWeight(m_fLineWeight);
@@ -264,7 +264,7 @@ int KERNEL::Operator::HighlightObjectSnapImpl::NoButtonDownAndMove(HEventInfo & 
 
 			// Object Snap Point가 선택된 경우 관련된 Entity를 선택한다.
 			if (10 > dDist) {
-				m_cDynamicHighlightControl.UnhighlightEverything();
+				m_cDynHighlightControl.UnhighlightEverything();
 
 				cSnapPoint.eStatus = HighlightObjectSnapImpl::Status::Selected;
 
@@ -277,7 +277,7 @@ int KERNEL::Operator::HighlightObjectSnapImpl::NoButtonDownAndMove(HEventInfo & 
 				HighlightOptionsKit cHighlightOptions;
 				cHighlightOptions.SetNotification(false);
 
-				m_cDynamicHighlightControl.GetLineAttributeControl().SetWeight(m_fLineWeight);
+				m_cDynHighlightControl.GetLineAttributeControl().SetWeight(m_fLineWeight);
 
 				// 맨 처음에는 기존 Hightlight를 삭제한다.
 				if (0 < m_cOSnapRelationSelItem.GetCount()) {
@@ -402,7 +402,7 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoin
 	nResult = cFilteredSelResult.GetCount();
 
 	m_cDynLineHighlightCtrl.UnhighlightEverything();
-	m_cDynamicHighlightControl.UnhighlightEverything();
+	m_cDynHighlightControl.UnhighlightEverything();
 
 	// 선택된 요소가 없는 경우 Deselect All을 하고 Update를 한다.
 	if(0 == nResult) {
@@ -473,7 +473,7 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoin
 // 			float fLineWeight = 0.0;
 // 			m_cDynamicHighlightControl.GetLineAttributeControl().SetWeight(fLineWeight);
 			// 선택된 요소를 Highlight한다.
-			m_cDynamicHighlightControl.Highlight(cFrontItem, cOption);
+			m_cDynHighlightControl.Highlight(cFrontItem, cOption);
 		}
 	}
 
