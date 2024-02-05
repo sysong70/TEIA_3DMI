@@ -665,9 +665,16 @@ void Signal::ModelPanel::OnItemChecked(DWORD_PTR key, bool checked)
 
 
 
-void Signal::ModelPanel::OnDeleteItem(DWORD_PTR key)
+void Signal::ModelPanel::OnItemClicked(DWORD_PTR key)
 {
-	SendKeyData(Action::OnDeleteItem);
+	SendKeyData(Action::OnItemClicked);
+}
+
+
+
+void Signal::ModelPanel::OnItemDeleted(DWORD_PTR key)
+{
+	SendKeyData(Action::OnItemDeleted);
 }
 
 
@@ -675,13 +682,6 @@ void Signal::ModelPanel::OnDeleteItem(DWORD_PTR key)
 void Signal::ModelPanel::OnItemExpanded(DWORD_PTR key)
 {
 	SendKeyData(Action::OnItemExpanded);
-}
-
-
-
-void Signal::ModelPanel::OnSelChanged(DWORD_PTR key)
-{
-	SendKeyData(Action::OnSelChanged);
 }
 
 
@@ -726,6 +726,33 @@ void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items)
 	}
 
 	Wrapper().SendData(data);
+}
+
+
+
+void Signal::ModelPanel::CheckItem(DWORD_PTR key, bool checked)
+{
+	Json::Object data;
+	ConstructData(data, Action::CheckItem);
+
+	data.SetDwordPtr(SKW_KEY, key);
+	data.SetBoolean(SKW_CHECKED, checked);
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::ModelPanel::CollapseItem(DWORD_PTR key)
+{
+	SendKeyData(Action::CollapseItem);
+}
+
+
+
+void Signal::ModelPanel::DeleteItem(DWORD_PTR key)
+{
+	SendKeyData(Action::DeleteItem);
 }
 
 

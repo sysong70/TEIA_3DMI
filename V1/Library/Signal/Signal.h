@@ -501,23 +501,27 @@ namespace Signal
 		{
 			Unknown = -1,
 
-			OnBeginDrag,
-			OnBeginLabelEdit,
-			OnClick,
-			OnDblClick,
-			OnDeleteItem,
-			OnEndLabelEdit,
+			OnItemClicked,		// OnClick,
+			OnItemDblClicked,	// OnDblClick,
+			OnItemDeleted,		// OnDeleteItem,
 			OnItemChecked,
 			OnItemExpanded,
 			OnItemExpanding,
-			OnRClick,
-			OnRDbClick,
-			OnSelChanged,
-			OnSelChanging,
-			OnSetFocus,
+			OnItemRClicked,		// OnRClick,
+			OnItemRDbCliced,	// OnRDbClick,
+			//:WAIT
+			//OnSetFocus,
+			//OnBeginDrag,
+			//OnBeginLabelEdit,
+			//OnEndLabelEdit,
+			//OnSelChanged,
+			//OnSelChanging,
 
 			AddItems,
 			AddChildren,
+			CheckItem,
+			CollapseItem,
+			DeleteItem,
 			ExpandItem,
 		};
 
@@ -529,17 +533,23 @@ namespace Signal
 
 		void OnItemChecked(DWORD_PTR key, bool checked);
 
-		void OnDeleteItem(DWORD_PTR key);
+		void OnItemClicked(DWORD_PTR key);
+
+		void OnItemDeleted(DWORD_PTR key);
 		// response AddChildren();
 		void OnItemExpanded(DWORD_PTR key);
-
-		void OnSelChanged(DWORD_PTR key);
 
 	public:
 
 		void AddItems(TreeItems& items);
 		// ignore TreeItem.Parent
 		void AddChildren(DWORD_PTR parentKey, TreeItems& items);
+
+		void CheckItem(DWORD_PTR key, bool checked);
+
+		void CollapseItem(DWORD_PTR key);
+
+		void DeleteItem(DWORD_PTR key);
 
 		void ExpandItem(DWORD_PTR key);
 	};

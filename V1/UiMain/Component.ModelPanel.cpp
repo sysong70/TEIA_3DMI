@@ -263,9 +263,9 @@ void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 	//else if (flag & TVHT_ONITEMRIGHT) {
 	//	DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMRIGHT\r\n");
 	//}
-	//else if (flag & TVHT_ONITEMBUTTON) {
-	//	DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMBUTTON\r\n");
-	//}
+	else if (flag & TVHT_ONITEMBUTTON) {
+		DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMBUTTON\r\n");
+	}
 	else if (flag & TVHT_ONITEMSTATEICON) {
 		// clicked check box
 		CBCGPGridRow* pRow = m_wndControl.TreeItem(hItem);
