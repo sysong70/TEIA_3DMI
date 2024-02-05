@@ -221,7 +221,11 @@ void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
 	cEvent.SetPoint(HE_LButtonUp, x, y, pcImpl->MouseMapFlags(nFlag));
 
-	int nResult = pcImpl->Camera().LButtonUp(cEvent);
+	// NavigationCube가 선택된 경우를 처리한다. NavigationCube가 선택되어 View를 변경한 경우에는 
+	// HLISTENER_CONSUME_EVENT값을 리턴한다.
+	if (HLISTENER_CONSUME_EVENT == pcImpl->Camera().LButtonUp(cEvent)) {
+		return;
+	}
 
 	if (H3DF::Camera::Mode::ZoomBox == eMode) {
 		pcImpl->Select().DrawSnapItems();

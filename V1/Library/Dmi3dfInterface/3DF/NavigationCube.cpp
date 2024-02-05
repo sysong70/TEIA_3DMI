@@ -185,6 +185,8 @@ int H3DF::NavigationCube::LButtonUp(HEventInfo & cInEvent)
 
 	for (int nIndex = 0; nIndex < (int)H3DF::ViewDirection::Mode::Count; nIndex++) {
 		if (pcImpl->m_cSegments[nIndex] == cSelectKey) {
+			// 선택이 되었다면 Unhighlight하도록 한다.
+			pcImpl->m_pcWindow->GetHighlightControl().UnhighlightEverything();
 			pcImpl->m_pView->SetViewDirection((H3DF::ViewDirection::Mode)nIndex);
 			return HLISTENER_CONSUME_EVENT;
 		}

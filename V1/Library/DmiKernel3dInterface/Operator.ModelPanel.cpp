@@ -536,18 +536,7 @@ void KERNEL::Operator::ModelPanel::SetSelectItem(H3DF::SelectionItem & cSelItem)
 
 			// 찾은 경우는 UI Tree Item이 전개되어 있지 않은 경우이기 때문에 전개한다.
 			if (nullptr != pcFindItem) {
-/*
-				Signal::TreeItems cTreeItems;
-				Signal::TreeItem cItem;
-
-				cItem.Title = L"Test";
-				cItem.HasChildren = true;;
-				cItem.ParentKey = (DWORD_PTR)pcItem;
-				cItem.Key = (DWORD_PTR)pcFindItem;
-				cTreeItems.push_back(cItem);
-
-				pcImpl->Delivery().modelPanel.AddChildren((DWORD_PTR)pcItem, cTreeItems);
-*/
+				ItemExpanded(pcItem);
 			}
 		}
 
@@ -557,12 +546,12 @@ void KERNEL::Operator::ModelPanel::SetSelectItem(H3DF::SelectionItem & cSelItem)
 			continue;
 		}
 
+		pcImpl->Delivery().modelPanel.ExpandItem((DWORD_PTR)pcItem);
+
 		vpcItems.push_back(pcFindItem);
 
 		pcItem = pcFindItem;
 	}
-
-	int i = 0;
 }
 
 //== Item Expanded 관련 함수 =========================================================================
@@ -582,23 +571,6 @@ void KERNEL::Operator::ModelPanel::OnItemExpandedSignal(Json::Object & cInObject
 	}
 
 	ItemExpanded(pcItem);
-
-/*
-	if ((DWORD_PTR)ModelTree().Root() == nInItemKey) {
-		return;
-	}
-	else if (pcImpl->m_nModelsGroupItem == nInItemKey) {
-		ModelGroupItemExpanded();
-	}
-	else if (pcImpl->m_nMeasurementsGroupItem == nInItemKey) {
-		MeasurementsGroupItemExpanded();
-	}
-	else if (pcImpl->m_nMarkupsGroupItem == nInItemKey) {
-		MarkupsGroupItemExpanded();
-	}
-	else {
-		ItemExpanded(nInItemKey);
-	}*/
 }
 
 // 2.1 Model Group Item Expanded 처리
@@ -648,7 +620,7 @@ void KERNEL::Operator::ModelPanel::ModelGroupItemExpanded()
 		cTreeItems.push_back(cItem);
 	}
 
-	pcImpl->Delivery().modelPanel.AddItems(cTreeItems);
+	pcImpl->Delivery().modelPanel.AddChildren((DWORD_PTR)pcItem, cTreeItems);
 }
 
 // 3. Measurements Group Item Expanded 처리

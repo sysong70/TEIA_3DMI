@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+﻿#include "StdAfx.h"
 
 #include "3DF.Operator.CameraControl.h"
 #include "Impl/SelectionImpl.h"
