@@ -191,7 +191,7 @@
 				]}
 			]},
 			{"type":"group", "name":"Search", "title":"Search|__#__", "items":[
-				{"type":"folder", "name":"Folders", "title":"Folders|__#__", "desc":"Select search folders for assemblies and textures|__#__"},
+				{"type":"folders", "name":"Folders", "title":"Folders|__#__", "desc":"Select search folders for assemblies and textures|__#__"},
 				{"type":"check", "name":"RecursiveSearch", "title":"Recursive Search|__#__", "desc":"__#__|__#__"},
 				{"type":"edit", "name":"SearchMaxEdgeLength", "title":"Maximum Edge Length|__#__", "desc":"__#__|__#__", "value":"0"}
 			]},

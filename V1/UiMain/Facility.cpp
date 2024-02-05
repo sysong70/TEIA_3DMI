@@ -333,6 +333,7 @@ Json::Object& Facility::SetData(Json::Object& target, UINT id, const CString& ti
 }
 
 #include <WStr.h>
+#include "Control.Property.h"
 
 void Facility::SetValue(Json::Value& target, CBCGPProp& source)
 {
@@ -348,7 +349,8 @@ void Facility::SetValue(Json::Value& target, CBCGPProp& source)
 		COLORREF color = ((CBCGPColorProp*)&source)->GetColor();
 		target.SetString(Json::Helper::ToString(color));
 	}
-	else if (dynamic_cast<CBCGPFileProp*>(&source) != nullptr) {
+	else if (dynamic_cast<CBCGPFileProp*>(&source) != nullptr ||
+		dynamic_cast<Property::FoldersDialog*>(&source) != nullptr) {
 		CString value = source.GetValue();
 		value.Replace(L"\\", L"/");
 		target.SetString(value);
@@ -382,7 +384,8 @@ void Facility::SetValue(CBCGPProp& target, Json::Value& source)
 		//:WARNING - not SetValue()
 		((CBCGPColorProp*)&target)->SetColor(color);
 	}
-	else if (dynamic_cast<CBCGPFileProp*>(&target) != nullptr) {
+	else if (dynamic_cast<CBCGPFileProp*>(&target) != nullptr ||
+		dynamic_cast<Property::FoldersDialog*>(&target) != nullptr) {
 		CString value = source.ToString();
 		value.Replace(L"/", L"\\");
 		target.SetValue((LPCTSTR)value);

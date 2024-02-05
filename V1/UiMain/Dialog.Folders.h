@@ -31,11 +31,11 @@ namespace Dialog
 
 		~Folders() override;
 
-		Json::Object* GetResult() override;
+		CString& GetValue();
+
+		void SetValue(CString value);
 
 	protected:
-
-		//void DoDataExchange(CDataExchange* pDX) override;
 
 		void OnCancel() override;
 
@@ -54,6 +54,7 @@ namespace Dialog
 	private: // Body controls
 
 		EditListBox m_listBox;
+		CString m_value; // setting before OnInitDialog
 
 	private: // Footer controls
 

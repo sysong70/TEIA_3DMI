@@ -12,8 +12,6 @@ static char THIS_FILE[] = __FILE__;
 
 
 
-#define SetControlId(x) x = (x != 0 ? x : PRESET::GetControlId());
-
 #define PRESET PresetPropList
 
 namespace PresetPropList
@@ -279,6 +277,14 @@ void Control::PropList::SetPropEnable(CBCGPProp* pProp, Json::Object& design)
 
 
 
+void Control::PropList::SetPropId(CBCGPProp* pProp, Json::Object& design)
+{
+	UINT id = Facility::GetId(design);
+	pProp->SetID(id != 0 ? id : PRESET::GetControlId());
+}
+
+
+
 void Control::PropList::SetPropName(CBCGPProp* pProp, Json::Object& design)
 {
 	Json::Value* pValue = design.FindValue("name");
@@ -372,6 +378,15 @@ void Control::PropList::OnMouseMove(UINT nFlags, CPoint point)
 
 
 
+void Control::PropList::SetProperty(CBCGPProp* pProp, Json::Object& design)
+{
+	SetPropId(pProp, design);
+	SetPropName(pProp, design);
+	SetPropEnable(pProp, design);
+}
+
+
+
 CBCGPProp* Control::PropList::CreateProp(Json::Object& design)
 {
 	CBCGPProp* pProp = nullptr;
@@ -433,12 +448,11 @@ CBCGPProp* Control::PropList::CreateProp(Json::Object& design)
 
 
 
-CBCGPProp* Control::PropList::CreateGroupProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateGroupProp(Json::Object& design)
 {
-	SetControlId(id);
-
 	BOOL hasCheck = design.GetBoolean("hasCheck", false) ? TRUE : FALSE;
 	CBCGPProp* pProp = new CBCGPProp(Facility::GetTitle(design), NULL, FALSE, hasCheck);
+	SetPropId(pProp, design);
 	SetPropName(pProp, design);
 
 	Json::Array* pItems = Facility::GetItems(design);
@@ -458,55 +472,50 @@ CBCGPProp* Control::PropList::CreateGroupProp(Json::Object& design, UINT id)
 
 
 
-CBCGPProp* Control::PropList::CreateButtonProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateButtonProp(Json::Object& design)
 {
-	SetControlId(id);
-
 	CBCGPProp* pProp = new Property::CommandButton(
 		Facility::GetTitle(design),
 		Facility::Local(design.GetString("command")),
-		Facility::GetId(design),
 		Facility::GetDesciption(design));
-	SetPropName(pProp, design);
-	SetPropEnable(pProp, design);
+	SetProperty(pProp, design);
 
 	return pProp;
 }
 
 
 
-CBCGPProp* Control::PropList::CreateCheckProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateCheckProp(Json::Object& design)
 {
-	SetControlId(id);
-
-	CBCGPProp* pProp = new CBCGPProp(Facility::GetTitle(design), id,
-		false, Facility::GetDesciption(design));
-	SetPropName(pProp, design);
-	SetPropEnable(pProp, design);
+	CBCGPProp* pProp = new CBCGPProp(Facility::GetTitle(design), 0,
+		design.GetBoolean("value"), Facility::GetDesciption(design));
+	SetProperty(pProp, design);
 
 	return pProp;
 }
 
 
 
-CBCGPProp* Control::PropList::CreateColorProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateColorProp(Json::Object& design)
 {
-	SetControlId(id);
+	COLORREF value = 0;
+	Json::Value* pValue = design.FindValue("value");
+	if (pValue != nullptr) {
+		ASSERT(pValue->IsString());
+		value = Json::Helper::ToColor(pValue->AsString());
+	}
 
-	CBCGPProp* pProp = new Property::Color(Facility::GetTitle(design), id,
-		(COLORREF)0, Facility::GetDescription(design));
-	SetPropName(pProp, design);
-	SetPropEnable(pProp, design);
+	CBCGPProp* pProp = new Property::Color(Facility::GetTitle(design),
+		value, Facility::GetDescription(design));
+	SetProperty(pProp, design);
 
 	return pProp;
 }
 
 
 
-CBCGPProp* Control::PropList::CreateCoordProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateCoordProp(Json::Object& design)
 {
-	SetControlId(id);
-
 	int format = design.GetInteger("format", 3);
 	int digit = design.GetInteger("digit", 4);
 	float coord[3] = {};
@@ -517,24 +526,21 @@ CBCGPProp* Control::PropList::CreateCoordProp(Json::Object& design, UINT id)
 		value += L"," + WStr::ToString(coord[2], digit);
 	}
 
-	CBCGPProp* pProp = new Property::Coordinate(Facility::GetTitle(design), id,
+	CBCGPProp* pProp = new Property::Coordinate(Facility::GetTitle(design),
 		value, Facility::GetDescription(design));
-	SetPropName(pProp, design);
-	SetPropEnable(pProp, design);
+	SetProperty(pProp, design);
 
 	return pProp;
 }
 
 
 
-CBCGPProp* Control::PropList::CreateDropdownProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateDropdownProp(Json::Object& design)
 {
-	SetControlId(id);
-
-	CBCGPProp* pProp = new CBCGPProp(Facility::GetTitle(design), id,
+	//:CHECK - int value?
+	CBCGPProp* pProp = new CBCGPProp(Facility::GetTitle(design), 0,
 		(LPCTSTR)L"", Facility::GetDesciption(design));
-	SetPropName(pProp, design);
-	SetPropEnable(pProp, design);
+	SetProperty(pProp, design);
 
 	std::vector<CString> items;
 	Facility::GetItems(design, items);
@@ -550,69 +556,77 @@ CBCGPProp* Control::PropList::CreateDropdownProp(Json::Object& design, UINT id)
 
 
 
-CBCGPProp* Control::PropList::CreateEditProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateEditProp(Json::Object& design)
 {
-	SetControlId(id);
-
-	CString sValue;
+	CString value;
 	Json::Value* pValue = design.FindValue("value");
 	if (pValue != nullptr) {
-		sValue = pValue->ToString();
+		value = pValue->AsString();
 	}
 
-	CBCGPProp* pProp = new CBCGPProp(Facility::GetTitle(design), id,
-		(LPCTSTR)sValue, Facility::GetDesciption(design));
-	SetPropName(pProp, design);
-	SetPropEnable(pProp, design);
+	CBCGPProp* pProp = new CBCGPProp(Facility::GetTitle(design), 0,
+		(LPCTSTR)value, Facility::GetDesciption(design));
+	SetProperty(pProp, design);
 
 	return pProp;
 }
 
 
 
-CBCGPProp* Control::PropList::CreateFileProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateFileProp(Json::Object& design)
 {
-	SetControlId(id);
-
-	CString sValue;
+	CString value;
 	Json::Value* pValue = design.FindValue("value");
 	if (pValue != nullptr) {
-		sValue = pValue->ToString();
+		value = pValue->AsString();
 	}
 
-	CBCGPProp* pProp = new CBCGPProp(Facility::GetTitle(design), id,
-		(LPCTSTR)sValue, Facility::GetDesciption(design));
-	SetPropName(pProp, design);
-	SetPropEnable(pProp, design);
+	CBCGPProp* pProp = new CBCGPProp(Facility::GetTitle(design), 0,
+		(LPCTSTR)value, Facility::GetDesciption(design));
+	SetProperty(pProp, design);
 
 	return pProp;
 }
 
 
 
-CBCGPProp* Control::PropList::CreateFolderProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateFolderProp(Json::Object& design)
 {
-	SetControlId(id);
+	CString value;
+	Json::Value* pValue = design.FindValue("value");
+	if (pValue != nullptr) {
+		value = pValue->AsString();
+	}
 
-	CBCGPFileProp* pProp = new CBCGPFileProp(Facility::GetTitle(design), id,
-		L"", NULL, Facility::GetDescription(design));
-	SetPropName(pProp, design);
-	SetPropEnable(pProp, design);
+	CBCGPFileProp* pProp = new CBCGPFileProp(Facility::GetTitle(design), 0,
+		(LPCTSTR)value, NULL, Facility::GetDescription(design));
+	SetProperty(pProp, design);
 
 	return pProp;
 }
 
 
 
-CBCGPProp* Control::PropList::CreateFoldersProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateFoldersProp(Json::Object& design)
 {
-	RETURN_NULL;
+	CString value;
+	Json::Value* pValue = design.FindValue("value");
+	if (pValue != nullptr) {
+		value = pValue->AsString();
+	}
+
+	Property::FoldersDialog* pProp = new Property::FoldersDialog(Facility::GetTitle(design),
+		value, Facility::GetDescription(design));
+	SetProperty(pProp, design);
+
+	return pProp;
 }
 
 
 
-CBCGPProp* Control::PropList::CreateFontProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateFontProp(Json::Object& design)
 {
+	/*
 	SetControlId(id);
 
 	LOGFONT lf;
@@ -626,24 +640,37 @@ CBCGPProp* Control::PropList::CreateFontProp(Json::Object& design, UINT id)
 	SetPropEnable(pProp, design);
 
 	pProp->SetDescription(Facility::GetDescription(design));
+	*/
+
+	CString value;
+	Json::Value* pValue = design.FindValue("value");
+	if (pValue != nullptr) {
+		value = pValue->AsString();
+	}
+
+	Property::FontCombo* pProp = new Property::FontCombo(Facility::GetTitle(design),
+		value, Facility::GetDescription(design));
+	SetProperty(pProp, design);
 
 	return pProp;
 }
 
 
 
-CBCGPProp* Control::PropList::CreateSliderProp(Json::Object& design, UINT id)
+CBCGPProp* Control::PropList::CreateSliderProp(Json::Object& design)
 {
-	Property::Slider* pProp = new Property::Slider(Facility::GetTitle(design), id,
+	Property::Slider* pProp = new Property::Slider(Facility::GetTitle(design),
 		0, Facility::GetDescription(design));
-	SetPropName(pProp, design);
-	SetPropEnable(pProp, design);
+	SetProperty(pProp, design);
 
-	pProp->SetRange(
-		design.GetInteger("min"),
-		design.GetInteger("max"),
-		design.GetInteger("step", 1)
-	);
+	int min = design.GetInteger("min", -1);
+	ASSERT(min >= 0);
+	int max = design.GetInteger("max", -1);
+	ASSERT(max >= 0);
+	int step = design.GetInteger("step", 1);
+	ASSERT(step < max);
+
+	pProp->SetRange(min, max, step);
 
 	return pProp;
 }

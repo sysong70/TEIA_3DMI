@@ -24,9 +24,9 @@ namespace Dialog
 
 		virtual Signal::Target GetSignalTargetId();
 		// return dialog result
-		virtual Facility::Base* GetResultData(bool bNewInstance = false);
+		//virtual Facility::Base* GetResultData(bool bNewInstance = false);
 		// delete after using this data
-		virtual Json::Object* GetResult();
+		//virtual Json::Object* GetResult();
 
 		virtual void ReceiveSignal(Json::Object* pData);
 
