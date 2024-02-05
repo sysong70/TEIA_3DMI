@@ -18,6 +18,7 @@
 #define SKW_DOCID			"DocId"
 #define SKW_DPISCALE		"DpiScale"
 #define SKW_EVENT			"Event"
+#define SKW_EXPANDED		"Expanded"
 #define SKW_FILEPATH		"FilePath"
 #define SKW_FLAG			"Flag"
 #define SKW_GLOBALNAME		"GlobalName"
@@ -517,12 +518,13 @@ namespace Signal
 			//OnSelChanged,
 			//OnSelChanging,
 
-			AddItems,
+			AddItem,
 			AddChildren,
 			CheckItem,
 			CollapseItem,
 			DeleteItem,
 			ExpandItem,
+			ExpandParent,
 		};
 
 		DEFINE_WRAPPER;
@@ -541,17 +543,21 @@ namespace Signal
 
 	public:
 
-		void AddItems(TreeItems& items);
+		void AddItem(TreeItem& item);
 		// ignore TreeItem.Parent
-		void AddChildren(DWORD_PTR parentKey, TreeItems& items);
+		void AddChildren(DWORD_PTR parentKey, TreeItems& items, bool expanded = false);
 
 		void CheckItem(DWORD_PTR key, bool checked);
 
 		void CollapseItem(DWORD_PTR key);
 
 		void DeleteItem(DWORD_PTR key);
-
+		// expand children
 		void ExpandItem(DWORD_PTR key);
+		// expand from root to item
+		void ExpandParent(DWORD_PTR key);
+
+		//void RedrawTree();
 	};
 
 

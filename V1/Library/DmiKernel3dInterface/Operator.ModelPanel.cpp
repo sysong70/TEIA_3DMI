@@ -420,9 +420,11 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 	cItem.HasChildren = false;
 	ModelTreeItem * pcRootItem = pcImpl->m_cModelTree.AddItem(nModelKey, nullptr, true); // 내부 Tree 생성
 	cItem.Key = (DWORD_PTR)pcRootItem;
-	cTreeItems.push_back(cItem);
+	//:Ken - 20240205
+	//cTreeItems.push_back(cItem);
+	//cItem.ParentKey = (DWORD_PTR)pcRootItem;
 
-	cItem.ParentKey = (DWORD_PTR)pcRootItem;
+	pcImpl->Delivery().modelPanel.AddItem(cItem);
 
 	SegmentKeyArray cChildren;
 	cModelSegment.ShowSubsegments(cChildren);
@@ -456,7 +458,7 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 		cTreeItems.push_back(cItem);
 	}
 
-	pcImpl->Delivery().modelPanel.AddItems(cTreeItems);
+	pcImpl->Delivery().modelPanel.AddChildren((DWORD_PTR)pcRootItem, cTreeItems);
 }
 
 void KERNEL::Operator::ModelPanel::SetSelect(Select * pcInSelect)
@@ -530,7 +532,8 @@ void KERNEL::Operator::ModelPanel::SetSelectItem(H3DF::SelectionItem & cSelItem)
 		// 하부 아이템을 찾지 못한 경우는 전개를 해서 다시 검색한다.
 		if (nullptr == pcFindItem) {
 			// 찾지 못한 경우는 전개를 한다.
-			pcImpl->ModelTree().ExpandItem(pcItem, false);
+			//:Ken - 20240205
+			//pcImpl->ModelTree().ExpandItem(pcItem, false);
 			// 전개된 후에 다시 찾는다.
 			pcItem->ShowChild(cKey, pcFindItem);
 
@@ -543,10 +546,12 @@ void KERNEL::Operator::ModelPanel::SetSelectItem(H3DF::SelectionItem & cSelItem)
 		// Selection Item의 맨 마지막은 Sgement이기 때문에 Tree에서 찾을 수 없다 그런 경우 다음으로 넘어간다.
 		// 이런 경우 탐색이 끝나게 될것이다. Model Tree와 UI Tree의 형태가 다르기 때문이다.
 		if (nullptr == pcFindItem) {
+			pcImpl->Delivery().modelPanel.ExpandItem((DWORD_PTR)pcItem);
 			continue;
 		}
 
-		pcImpl->Delivery().modelPanel.ExpandItem((DWORD_PTR)pcItem);
+		//:Ken - 20240205
+		//pcImpl->Delivery().modelPanel.ExpandItem((DWORD_PTR)pcItem);
 
 		vpcItems.push_back(pcFindItem);
 

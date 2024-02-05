@@ -175,7 +175,7 @@ bool WStr::Split(const wchar_t* pSource, wchar_t token, WStringArray& atomArray)
 {
 	CString source(pSource);
 	if (source.GetLength() == 0) {
-		RETURN_FALSE;
+		return false;
 	}
 
 	CString atom;

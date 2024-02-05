@@ -73,14 +73,19 @@ namespace Component
 
 		void ExpandItem(Json::Object* pData);
 
+		void ExpandParent(Json::Object* pData);
+
 		void GetAncestorData(HTREEITEM pItem, std::list<DWORD_PTR>& list);
 
 		HTREEITEM GetItem(DWORD_PTR key);
+
+		void RedrawTree();
 
 	private:
 
 		std::unordered_map<DWORD_PTR, HTREEITEM> m_keyMap;
 		CBCGPTreeCtrlEx m_wndControl;
+		bool m_bSignal = false;
 
 		CString m_sFilterMessage = L"";
 		bool m_bAlternateRows = false;

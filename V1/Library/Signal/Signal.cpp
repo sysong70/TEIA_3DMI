@@ -686,33 +686,29 @@ void Signal::ModelPanel::OnItemExpanded(DWORD_PTR key)
 
 
 
-void Signal::ModelPanel::AddItems(TreeItems& items)
+void Signal::ModelPanel::AddItem(TreeItem& item)
 {
 	Json::Object data;
-	ConstructData(data, Action::AddItems);
+	ConstructData(data, Action::AddItem);
 
-	Json::Array& nodes = data.CreateArray(SKW_ITEMS);
-	for (auto& item : items) {
-		Json::Object& child = nodes.AddObject();
-
-		child.SetDwordPtr(SKW_PARENT, item.ParentKey);
-		child.SetDwordPtr(SKW_KEY, item.Key);
-		child.SetString(SKW_TITLE, item.Title);
-		child.SetBoolean(SKW_HASCHILDREN, item.HasChildren);
-		child.SetInteger(SKW_TYPE, (int)item.Type);
-	}
+	data.SetDwordPtr(SKW_PARENT, item.ParentKey);
+	data.SetDwordPtr(SKW_KEY, item.Key);
+	data.SetString(SKW_TITLE, item.Title);
+	data.SetBoolean(SKW_HASCHILDREN, item.HasChildren);
+	data.SetInteger(SKW_TYPE, (int)item.Type);
 
 	Wrapper().SendData(data);
 }
 
 
 
-void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items)
+void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items, bool expanded)
 {
 	Json::Object data;
 	ConstructData(data, Action::AddChildren);
 
 	data.SetDwordPtr(SKW_PARENT, parentKey);
+	data.SetBoolean(SKW_EXPANDED, expanded);
 
 	Json::Array& nodes = data.CreateArray(SKW_CHILDREN);
 	for (auto& item : items) {
@@ -760,6 +756,13 @@ void Signal::ModelPanel::DeleteItem(DWORD_PTR key)
 void Signal::ModelPanel::ExpandItem(DWORD_PTR key)
 {
 	SendKeyData(Action::ExpandItem);
+}
+
+
+
+void Signal::ModelPanel::ExpandParent(DWORD_PTR key)
+{
+	SendKeyData(Action::ExpandParent);
 }
 
 #undef SendKeyData

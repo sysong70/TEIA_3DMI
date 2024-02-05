@@ -69,16 +69,26 @@ void Component::ModelPanel::ReceiveSignal(Json::Object* pData)
 	Signal::ModelPanel::Action action = (Signal::ModelPanel::Action)data.GetInteger(SKW_ACTION);
 
 	switch (action) {
-	case Signal::ModelPanel::Action::AddItems:
-		AddItems(pData);
+	case Signal::ModelPanel::Action::AddItem:
+		AddItem(pData);
 		break;
 
 	case Signal::ModelPanel::Action::AddChildren:
 		AddChildren(pData);
 		break;
 
+	case Signal::ModelPanel::Action::CheckItem:
+	case Signal::ModelPanel::Action::CollapseItem:
+	case Signal::ModelPanel::Action::DeleteItem:
+		DEBUG_STOP;
+		break;
+
 	case Signal::ModelPanel::Action::ExpandItem:
 		ExpandItem(pData);
+		break;
+
+	case Signal::ModelPanel::Action::ExpandParent:
+		ExpandParent(pData);
 		break;
 
 	default:
@@ -174,8 +184,7 @@ void Component::ModelPanel::OnCommand(UINT id)
 
 LRESULT Component::ModelPanel::OnTreeCheckClick(WPARAM wp, LPARAM lp)
 {
-	DEBUG_STOP;
-
+	/*
 	CBCGPGridRow* pRow = (CBCGPGridRow*)lp;
 	if (pRow == nullptr) {
 		return 0;
@@ -194,7 +203,10 @@ LRESULT Component::ModelPanel::OnTreeCheckClick(WPARAM wp, LPARAM lp)
 		m_pView->GetDelivery().modelPanel.OnItemChecked(key, (bool)checked);
 	}
 
-	return TRUE; // disable the default implementation
+	return S_FALSE; // disable the default implementation
+	*/
+	DEBUG_STOP;
+	return S_FALSE;
 }
 
 
@@ -305,8 +317,10 @@ void Component::ModelPanel::OnTreeDeleteItem(NMHDR* pNMHDR, LRESULT* pResult)
 
 	if (m_wndControl.GetItemText(hItem) != PRESET::DummyName) {
 		DWORD_PTR key = m_wndControl.GetItemData(hItem);
+		m_wndControl.DeleteItem(hItem);
+
 		m_keyMap.erase(key);
-		m_pView->GetDelivery().modelPanel.DeleteItem(key);
+		m_pView->GetDelivery().modelPanel.OnItemDeleted(key);
 	}
 
 	*pResult = S_OK;
@@ -437,19 +451,9 @@ void Component::ModelPanel::OnTreeSetFocus(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::AddItem(Json::Object* pData)
 {
+	/*
 	Json::Object& data = *pData;
 
-	HTREEITEM hCurrent = m_wndControl.InsertItem(data.GetString(SKW_TITLE), GetItem(data.GetDwordPtr(SKW_PARENT)));
-	DWORD_PTR key = data.GetDwordPtr(SKW_KEY);
-	m_wndControl.SetItemData(hCurrent, key);
-	m_keyMap[key] = hCurrent;
-
-	if (data.GetBoolean(SKW_HASCHILDREN)) {
-		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
-		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
-	}
-
-	/*
 	DWORD_PTR parentKey = data.GetDwordPtr(SKW_PARENT);
 	DWORD_PTR key = data.GetDwordPtr(SKW_KEY);
 	LPWSTR title = (LPWSTR)(LPCTSTR)data.GetString(SKW_TITLE);
@@ -476,21 +480,24 @@ void Component::ModelPanel::AddItem(Json::Object* pData)
 		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
 	}
 	*/
+
+	Json::Object& data = *pData;
+
+	HTREEITEM hCurrent = m_wndControl.InsertItem(data.GetString(SKW_TITLE), GetItem(data.GetDwordPtr(SKW_PARENT)));
+	DWORD_PTR key = data.GetDwordPtr(SKW_KEY);
+	m_wndControl.SetItemData(hCurrent, key);
+	m_keyMap[key] = hCurrent;
+
+	if (data.GetBoolean(SKW_HASCHILDREN)) {
+		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
+		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
+	}
 }
 
 
 
 void Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool hasChildren, int type)
 {
-	HTREEITEM hCurrent = m_wndControl.InsertItem(title, parent);
-	m_wndControl.SetItemData(hCurrent, key);
-	m_keyMap[key] = hCurrent;
-
-	if (hasChildren) {
-		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
-		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
-	}
-
 	/*
 	TVINSERTSTRUCT tvi;
 	tvi.hParent = parent;
@@ -512,6 +519,15 @@ void Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR titl
 		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
 	}
 	*/
+
+	HTREEITEM hCurrent = m_wndControl.InsertItem(title, parent);
+	m_wndControl.SetItemData(hCurrent, key);
+	m_keyMap[key] = hCurrent;
+
+	if (hasChildren) {
+		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
+		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
+	}
 }
 
 
@@ -563,6 +579,22 @@ void Component::ModelPanel::ExpandItem(Json::Object* pData)
 {
 	Json::Object& data = *pData;
 	HTREEITEM hItem = GetItem(data.GetDwordPtr(SKW_KEY));
+
+	if (hItem != nullptr) {
+		m_wndControl.Expand(hItem, TVE_EXPAND);
+	}
+	else {
+		DEBUG_STOP;
+	}
+}
+
+
+
+void Component::ModelPanel::ExpandParent(Json::Object* pData)
+{
+	Json::Object& data = *pData;
+	HTREEITEM hItem = GetItem(data.GetDwordPtr(SKW_KEY));
+
 	if (hItem != nullptr) {
 		m_wndControl.Expand(hItem, TVE_EXPAND);
 	}
