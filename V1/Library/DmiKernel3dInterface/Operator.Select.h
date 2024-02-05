@@ -13,10 +13,13 @@ namespace KERNEL
 {
 	namespace Operator
 	{
+		class ModelPanel;
+
 		class Select : public OperatorBase
 		{
 		public:
 			Select(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			void SetModelPanel(ModelPanel * pcInModelPanel);
 
 			int MouseMove(HEventInfo & cInEvent);
 
@@ -28,7 +31,8 @@ namespace KERNEL
 			void SetObjectSnapMode(OSnap::Type eInType);
 
 			//== Select 관련 함수 ====================================================================
-			bool SelectByItem(H3DF::SelectionItem & cInSelItem);
+			bool SelectByResult(H3DF::SelectionResults & cInResults);
+			bool DynamicSelectByResult(H3DF::SelectionResults & cInResults);
 
 			void SetSelectionFilter(SelectionFilter::Type eInType);
 

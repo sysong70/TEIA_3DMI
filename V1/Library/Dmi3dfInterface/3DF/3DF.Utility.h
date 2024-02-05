@@ -51,6 +51,9 @@ namespace H3DF
 
 		//== File 관련 함수 ==========================================================================
 		CString GetExecuteDirectory();
+
+		//== Segment 관련 함수 =======================================================================
+		API_3DF bool ShowSubSegment(SegmentKey & cInTargetSegment, CStringA strInSegmentName, SegmentKey & cOutSegment);
 	};
 
 	class API_3DF UserData

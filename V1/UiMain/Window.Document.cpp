@@ -42,6 +42,12 @@ namespace WindowPreset
 					Extensions3d.push_back(ext->AsString());
 				}
 			}
+
+			// #sysong 
+			// Point Cloud Data 
+			Extensions3d.push_back(L"PTS");
+			Extensions3d.push_back(L"PTX");
+			Extensions3d.push_back(L"XYZ");
 		}
 
 		return Extensions3d;

@@ -51,8 +51,6 @@ public:
 	// == File TdfImport 관련 함수 =================================================================
 	bool FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSegment, Signal::Delivery & cInDelivery, CString & strErrorMessage);
 
-	void CreateBasicModelTree(CString strFilePathName, H3DF::SegmentKey & cModelSegment, Signal::Delivery & cInDelivery);
-
 	// == 3DX 설정 관련 함수 =====================================================================
 protected:
 	bool SetDefaultParamsLoadData(A3DRWParamsLoadData & cParamsLoadData);

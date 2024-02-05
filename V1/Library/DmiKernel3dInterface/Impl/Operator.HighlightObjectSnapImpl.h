@@ -98,7 +98,7 @@ namespace KERNEL
 			H3DF::SelectionItem m_cDynamicHighlightSelItem;
 
 			// DoDynamicHighlighting용 Highlight control
-			H3DF::HighlightControl m_cDynamicHighlightControl;
+			H3DF::HighlightControl m_cDynHighlightControl;
 			H3DF::HighlightControl m_cDynLineHighlightCtrl;
 
 			H3DF::SegmentKey m_cSnapPointSegment;

@@ -519,6 +519,8 @@ void H3DF::View::LoadPointCloudFile(CString strFilePathName)
 	} SegmentKeyImpl::LocalClose(cViewKey);
 
 	HPointCloudOptions cPointCloudOptions;
+	cPointCloudOptions.m_highIntensityValue = 0;
+	cPointCloudOptions.m_lowIntensityValue = -2000;
 	cPointCloudOptions.m_maxShellSize = 10000;
 
 	HInputHandlerOptions cOptions;

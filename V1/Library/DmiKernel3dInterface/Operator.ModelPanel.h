@@ -10,31 +10,30 @@ namespace KERNEL
 {
 	namespace Operator
 	{
+		class ModelTreeItem;
 		class Select;
 
 		class ModelPanel : public OperatorBase
 		{
 		public:
 			ModelPanel(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
-
 			void Initialize(CString strFilePathName);
-
 			void SetSelect(Select * pcInSelect);
 
 			void Signal(Json::Object & cInObject);
-			
+
+			void SetSelectItem(H3DF::SelectionItem & cSelItem);
 
 		protected:
-			void ItemExpandedSignal(Json::Object & cInObject);
-			void ModelItemExpanded(HC_KEY nModelKey);
+			void OnItemExpandedSignal(Json::Object & cInObject);
 			void ModelGroupItemExpanded();
 			void MeasurementsGroupItemExpanded();
 			void MarkupsGroupItemExpanded();
 
-			void ItemExpanded(HC_KEY nInItemKey);
-			void IncludeExpanded(HC_KEY nInItemKey, HC_KEY nInParentKey = INVALID_KEY);
+			void ItemExpanded(ModelTreeItem * pcInItem, ModelTreeItem * pcInParentItem = nullptr);
 
-			void SelChangedSignal(Json::Object & cInObject);
+			void OnSelChangedSignal(Json::Object & cInObject);
+			void OnItemCheckedSignal(Json::Object & cInObject);
 		};
 	}
 }	
