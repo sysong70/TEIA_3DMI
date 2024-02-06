@@ -15,6 +15,11 @@ static char THIS_FILE[] = __FILE__;
 
 
 
+#define DisableNotification(func) \
+m_wndControl.EnableTreeCtrlNotifications(FALSE); \
+func; \
+m_wndControl.EnableTreeCtrlNotifications(TRUE)
+
 #define PRESET PresetModelPanel
 
 namespace PresetModelPanel
@@ -31,19 +36,20 @@ using namespace Component;
 BEGIN_MESSAGE_MAP(ModelPanel, Panel)
 	ON_REGISTERED_MESSAGE(BCGM_GRID_ROW_CHECKBOX_CLICK, OnTreeCheckClick)
 
-	ON_NOTIFY(TVN_BEGINDRAG, PRESET::Id, OnTreeBeginDrag)
-	ON_NOTIFY(TVN_BEGINLABELEDIT, PRESET::Id, OnTreeBeginLabelEdit)
 	ON_NOTIFY(NM_CLICK, PRESET::Id, OnTreeClick)
 	ON_NOTIFY(NM_DBLCLK, PRESET::Id, OnTreeDblClick)
+	ON_NOTIFY(NM_RCLICK, PRESET::Id, OnTreeRClick)
+	ON_NOTIFY(NM_RDBLCLK, PRESET::Id, OnTreeRDbClick)
+	ON_NOTIFY(NM_SETFOCUS, PRESET::Id, OnTreeSetFocus)
+
+	ON_NOTIFY(TVN_BEGINDRAG, PRESET::Id, OnTreeBeginDrag)
+	ON_NOTIFY(TVN_BEGINLABELEDIT, PRESET::Id, OnTreeBeginLabelEdit)
 	ON_NOTIFY(TVN_DELETEITEM, PRESET::Id, OnTreeDeleteItem)
 	ON_NOTIFY(TVN_ENDLABELEDIT, PRESET::Id, OnTreeEndLabelEdit)
 	ON_NOTIFY(TVN_ITEMEXPANDED, PRESET::Id, OnTreeItemExpanded)
 	//ON_NOTIFY(TVN_ITEMEXPANDING, PRESET::Id, OnTreeItemExpanding)
-	ON_NOTIFY(NM_RCLICK, PRESET::Id, OnTreeRClick)
-	ON_NOTIFY(NM_RDBLCLK, PRESET::Id, OnTreeRDbClick)
-	ON_NOTIFY(TVN_SELCHANGED, PRESET::Id, OnItemClicked) // #sysong
+	ON_NOTIFY(TVN_SELCHANGED, PRESET::Id, OnTreeSelChanged)
 	//ON_NOTIFY(TVN_SELCHANGING, PRESET::Id, OnTreeSelChanging)
-	ON_NOTIFY(NM_SETFOCUS, PRESET::Id, OnTreeSetFocus)
 
 	//ON_MESSAGE(WM_DPICHANGED_AFTERPARENT, OnDPIChangedAfterParent)
 	ON_COMMAND_RANGE(TOOLBAR_3D_CMD_Sort_ByOriginal, TOOLBAR_3D_CMD_Option_AlternateRows, OnCommand)
@@ -69,27 +75,13 @@ void Component::ModelPanel::ReceiveSignal(Json::Object* pData)
 	Signal::ModelPanel::Action action = (Signal::ModelPanel::Action)data.GetInteger(SKW_ACTION);
 
 	switch (action) {
-	case Signal::ModelPanel::Action::AddItem:
-		AddItem(pData);
-		break;
-
-	case Signal::ModelPanel::Action::AddChildren:
-		AddChildren(pData);
-		break;
-
-	case Signal::ModelPanel::Action::CheckItem:
-	case Signal::ModelPanel::Action::CollapseItem:
-	case Signal::ModelPanel::Action::DeleteItem:
-		DEBUG_STOP;
-		break;
-
-	case Signal::ModelPanel::Action::ExpandItem:
-		ExpandItem(pData);
-		break;
-
-	case Signal::ModelPanel::Action::ExpandParent:
-		ExpandParent(pData);
-		break;
+	case Signal::ModelPanel::Action::AddItem:		AddItem(pData);			break;
+	case Signal::ModelPanel::Action::AddChildren:	AddChildren(pData);		break;
+	case Signal::ModelPanel::Action::CheckItem:		CheckItem(pData);		break;
+	case Signal::ModelPanel::Action::CollapseItem:	CollapseItem(pData);	break;
+	case Signal::ModelPanel::Action::DeleteItem:	DeleteItem(pData);		break;
+	case Signal::ModelPanel::Action::ExpandItem:	ExpandItem(pData);		break;
+	case Signal::ModelPanel::Action::ExpandParent:	ExpandParent(pData);	break;
 
 	default:
 		DEBUG_STOP;
@@ -178,34 +170,22 @@ void Component::ModelPanel::OnCommand(UINT id)
 	m_wndControl.RedrawWindow();
 }
 
-//:WARNING
-// m_wndControl.EnableTreeCtrlNotifications(FALSE)
-// use 
+//--------------------------------------------------------------------------------------------------
 
 LRESULT Component::ModelPanel::OnTreeCheckClick(WPARAM wp, LPARAM lp)
 {
-	/*
 	CBCGPGridRow* pRow = (CBCGPGridRow*)lp;
-	if (pRow == nullptr) {
-		return 0;
-	}
 
-	if (pRow->HasCheckBox()) {
-		//:CHECK
-		BOOL checked = !pRow->GetCheck();
-		pRow->SetCheck(checked);
-		pRow->CheckSubItems(checked);
-		pRow->UpdateParentCheckbox(TRUE);
+	BOOL checked = !pRow->GetCheck();
+	pRow->SetCheck(checked);
+	pRow->CheckSubItems(checked);
+	pRow->UpdateParentCheckbox(TRUE);
 
-		m_wndControl.RedrawWindow();
+	m_wndControl.RedrawWindow();
 
-		DWORD_PTR key = pRow->GetData();
-		m_pView->GetDelivery().modelPanel.OnItemChecked(key, (bool)checked);
-	}
+	DWORD_PTR key = m_wndControl.GetItemData(m_wndControl.TreeItem(pRow));
+	m_pView->GetDelivery().modelPanel.OnItemChecked(key, (bool)checked);
 
-	return S_FALSE; // disable the default implementation
-	*/
-	DEBUG_STOP;
 	return S_FALSE;
 }
 
@@ -213,6 +193,7 @@ LRESULT Component::ModelPanel::OnTreeCheckClick(WPARAM wp, LPARAM lp)
 
 void Component::ModelPanel::OnTreeBeginDrag(NMHDR* pNMHDR, LRESULT* pResult)
 {
+	DEBUG_STOP;
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
 	//CString text = m_wndControl.GetItemText(pNMTreeView->itemNew.hItem);
@@ -225,6 +206,7 @@ void Component::ModelPanel::OnTreeBeginDrag(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeBeginLabelEdit(NMHDR* pNMHDR, LRESULT* pResult)
 {
+	DEBUG_STOP;
 	TV_DISPINFO* pTVDispInfo = (TV_DISPINFO*)pNMHDR;
 
 	//CString text = pTVDispInfo->item.pszText;
@@ -252,60 +234,88 @@ void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 		return;
 	}
 
+	DWORD_PTR key = m_wndControl.GetItemData(hItem);
+	ASSERT(key != 0);
+	/*
 	if (flag & TVHT_NOWHERE) {
-		//DEBUG_TRACE(L"NM_CLICK: TVHT_NOWHERE\r\n");
+		DEBUG_TRACE(L"NM_CLICK: TVHT_NOWHERE\r\n");
 	}
-	//else if (flag & TVHT_ONITEMICON) {
-	//	DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMICON\r\n");
-	//}
-	//else if (flag & TVHT_ONITEMLABEL) {
-	//	DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMLABEL\r\n");
-	//}
-	//else if (flag & TVHT_ONITEMINDENT) {
-	//	DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMINDENT\r\n");
-	//}
+	else if (flag & TVHT_ONITEMICON) {
+		DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMICON\r\n");
+	}
+	// Label
+	else if (flag & TVHT_ONITEMLABEL) {
+		m_pView->GetDelivery().modelPanel.OnItemSelected(key);
+	}
+	else if (flag & TVHT_ONITEMINDENT) {
+		DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMINDENT\r\n");
+	}
+	// Expand button
 	else if (flag & TVHT_ONITEMBUTTON) {
-		// clicked expand button
 		UINT state = m_wndControl.GetItemState(hItem, TVIS_EXPANDED);
-		m_wndControl.Expand(hItem, (state & TVIS_EXPANDED ? TVE_COLLAPSE : TVE_EXPAND));
+		//m_wndControl.Expand(hItem, (state & TVIS_EXPANDED ? TVE_COLLAPSE : TVE_EXPAND));
 
-		//:WARNING - prevent OnTreeSelChanged()
+		if (state & TVIS_EXPANDED) {
+			m_wndControl.Expand(hItem, TVE_COLLAPSE);
+		}
+		else {
+			m_wndControl.Expand(hItem, TVE_EXPAND);
+
+			// check first child item
+			HTREEITEM hChild = m_wndControl.GetChildItem(hItem);
+			if (m_wndControl.GetItemText(hChild) == PRESET::DummyName) {
+				DisableNotification(m_wndControl.DeleteItem(hChild));
+				m_pView->GetDelivery().modelPanel.OnItemExpanded(key);
+			}
+		}
+		
 		*pResult = S_FALSE;
 	}
-	//else if (flag & TVHT_ONITEMRIGHT) {
-	//	DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMRIGHT\r\n");
-	//}
+	else if (flag & TVHT_ONITEMRIGHT) {
+		DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMRIGHT\r\n");
+	}
 	else if (flag & TVHT_ONITEMBUTTON) {
 		DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMBUTTON\r\n");
 	}
+	// Check box
 	else if (flag & TVHT_ONITEMSTATEICON) {
-		// clicked check box
 		CBCGPGridRow* pRow = m_wndControl.TreeItem(hItem);
-
 		BOOL checked = !pRow->GetCheck();
 		pRow->SetCheck(checked);
 		pRow->CheckSubItems(checked);
 		pRow->UpdateParentCheckbox(TRUE);
+		m_wndControl.RedrawWindow();
 
-		DWORD_PTR key = m_wndControl.GetItemData(hItem);
 		m_pView->GetDelivery().modelPanel.OnItemChecked(key, (bool)checked);
 
-		//:WARNING - prevent OnTreeSelChanged()
 		*pResult = S_FALSE;
 	}
-	//else {
-	//	DEBUG_TRACE(L"NM_CLICK: other\r\n");
-	//}
+	else {
+		DEBUG_TRACE(L"NM_CLICK: other\r\n");
+	}
+	*/
 }
 
 
 
 void Component::ModelPanel::OnTreeDblClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	UNREFERENCED_PARAMETER(pNMHDR);
-	DEBUG_TRACE(L"NM_DBLCLICK\r\n");
+	UINT flag = 0;
+	CPoint point;
+	GetCursorPos(&point);
+	m_wndControl.ScreenToClient(&point);
 
-	*pResult = S_OK;
+	HTREEITEM hItem = m_wndControl.HitTest(point, &flag);
+	if (hItem == nullptr) {
+		return;
+	}
+
+	DWORD_PTR key = m_wndControl.GetItemData(hItem);
+	ASSERT(key != 0);
+
+	m_pView->GetDelivery().modelPanel.OnItemDblClicked(key);
+	//:CHECK - if S_OK, tree expand the item
+	*pResult = S_FALSE;
 }
 
 
@@ -315,13 +325,11 @@ void Component::ModelPanel::OnTreeDeleteItem(NMHDR* pNMHDR, LRESULT* pResult)
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 	HTREEITEM hItem = pNMTreeView->itemOld.hItem;
 
-	if (m_wndControl.GetItemText(hItem) != PRESET::DummyName) {
-		DWORD_PTR key = m_wndControl.GetItemData(hItem);
-		m_wndControl.DeleteItem(hItem);
+	DWORD_PTR key = m_wndControl.GetItemData(hItem);
+	m_wndControl.DeleteItem(hItem);
 
-		m_keyMap.erase(key);
-		m_pView->GetDelivery().modelPanel.OnItemDeleted(key);
-	}
+	m_keyMap.erase(key);
+	m_pView->GetDelivery().modelPanel.OnItemDeleted(key);
 
 	*pResult = S_OK;
 }
@@ -330,6 +338,7 @@ void Component::ModelPanel::OnTreeDeleteItem(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeEndLabelEdit(NMHDR* pNMHDR, LRESULT* pResult)
 {
+	DEBUG_STOP;
 	TV_DISPINFO* pTVDispInfo = (TV_DISPINFO*)pNMHDR;
 
 	if (pTVDispInfo->item.pszText == nullptr) {
@@ -354,7 +363,7 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 		HTREEITEM hChild = m_wndControl.GetChildItem(hItem);
 
 		if (m_wndControl.GetItemText(hChild) == PRESET::DummyName) {
-			m_wndControl.DeleteItem(hChild);
+			DisableNotification(m_wndControl.DeleteItem(hChild));
 
 			DWORD_PTR key = m_wndControl.GetItemData(hItem);
 			ASSERT(key != 0);
@@ -372,7 +381,7 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeItemExpanding(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
+	//NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
 	//if (pNMTreeView->action == TVE_EXPAND) {}
 	//else if (pNMTreeView->action == TVE_COLLAPSE) {}
@@ -385,8 +394,8 @@ void Component::ModelPanel::OnTreeItemExpanding(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeRClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
+	DEBUG_STOP;
 	UNREFERENCED_PARAMETER(pNMHDR);
-	DEBUG_TRACE(L"NM_RCLICK\r\n");
 
 	*pResult = S_OK;
 }
@@ -395,27 +404,23 @@ void Component::ModelPanel::OnTreeRClick(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeRDbClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
+	DEBUG_STOP;
 	UNREFERENCED_PARAMETER(pNMHDR);
-	DEBUG_TRACE(L"NM_RDBLCLICK\r\n");
 
 	*pResult = S_OK;
 }
 
 
 
-void Component::ModelPanel::OnItemClicked(NMHDR* pNMHDR, LRESULT* pResult)
+void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
-	//if (pNMTreeView->action == TVC_BYMOUSE) {}
-	//else if (pNMTreeView->action == TVC_BYKEYBOARD) {}
-	//else {}
-
-	//:CHECK - pNMTreeView->itemOld.hItem == nullptr
-
-	if (pNMTreeView->itemNew.hItem != nullptr) {
-		DWORD_PTR key = m_wndControl.GetItemData(pNMTreeView->itemNew.hItem);
-		m_pView->GetDelivery().modelPanel.OnItemClicked(key);
+	HTREEITEM hItem = pNMTreeView->itemNew.hItem;
+	DWORD_PTR key = m_wndControl.GetItemData(hItem);
+	//:WARNING - dummy (by keyboard selection)
+	if (key != 0) {
+		m_pView->GetDelivery().modelPanel.OnItemSelected(key);
 	}
 
 	*pResult = S_OK;
@@ -425,13 +430,15 @@ void Component::ModelPanel::OnItemClicked(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeSelChanging(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
+	//NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
-	//if (pNMTreeView->action == TVC_BYMOUSE) {}
-	//else if (pNMTreeView->action == TVC_BYKEYBOARD) {}
-	//else {}
-
-	//:CHECK - pNMTreeView->itemOld.hItem == nullptr
+	//if (pNMTreeView->action == TVC_BYMOUSE) {
+	//}
+	//else if (pNMTreeView->action == TVC_BYKEYBOARD) {
+	//	DEBUG_STOP;
+	//}
+	//else {
+	//}
 
 	*pResult = S_OK;
 }
@@ -441,15 +448,61 @@ void Component::ModelPanel::OnTreeSelChanging(NMHDR* pNMHDR, LRESULT* pResult)
 void Component::ModelPanel::OnTreeSetFocus(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	UNREFERENCED_PARAMETER(pNMHDR);
-	DEBUG_TRACE(L"NM_SETFOCUS\r\n");
 
 	*pResult = S_OK;
 }
 
+//--------------------------------------------------------------------------------------------------
+
 //:REF - https://learn.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-tvitemexw
 //:REF - https://learn.microsoft.com/en-us/windows/win32/controls/tree-view-control-item-states
 
-void Component::ModelPanel::AddItem(Json::Object* pData)
+HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool hasChildren, int type)
+{
+	/*
+	TVINSERTSTRUCT tvi;
+	tvi.hParent = parent;
+	tvi.hInsertAfter = TVI_LAST;
+
+	//:WARNING - is not single flag!!! (combination)
+	tvi.itemex.mask = TVIF_TEXT | TVIF_PARAM; // | TVIF_STATE;
+	tvi.itemex.pszText = title;
+	// TVIF_PARAM: add data. if not set, lParam is not assigned
+	tvi.itemex.lParam = (LPARAM)key;
+	//tvi.itemex.stateMask = TVIS_EXPANDED;
+	//tvi.itemex.state = TVE_EXPAND;
+
+	HTREEITEM hCurrent = m_wndControl.InsertItem(&tvi);
+	m_keyMap[key] = hCurrent;
+
+	if (hasChildren) {
+		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
+		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
+	}
+	*/
+
+	HTREEITEM hItem = m_wndControl.InsertItem(title, parent);
+	DEBUG_VALID(hItem);
+
+	m_wndControl.SetItemData(hItem, key);
+	m_keyMap[key] = hItem;
+
+	if (hasChildren) {
+		m_wndControl.InsertItem(PRESET::DummyName, hItem);
+		m_wndControl.Expand(hItem, TVE_COLLAPSE);
+	}
+
+	// parent checked state
+	if (m_wndControl.GetCheck(parent)) {
+		m_wndControl.SetCheck(hItem);
+	}
+
+	return hItem;
+}
+
+
+
+HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 {
 	/*
 	Json::Object& data = *pData;
@@ -481,126 +534,122 @@ void Component::ModelPanel::AddItem(Json::Object* pData)
 	}
 	*/
 
-	Json::Object& data = *pData;
+	RedrawTree(false);
 
-	HTREEITEM hCurrent = m_wndControl.InsertItem(data.GetString(SKW_TITLE), GetItem(data.GetDwordPtr(SKW_PARENT)));
+	Json::Object& data = *pData;
 	DWORD_PTR key = data.GetDwordPtr(SKW_KEY);
-	m_wndControl.SetItemData(hCurrent, key);
-	m_keyMap[key] = hCurrent;
+
+	HTREEITEM hItem = m_wndControl.InsertItem(data.GetString(SKW_TITLE), GetItem(data.GetDwordPtr(SKW_PARENT)));
+	DEBUG_VALID(hItem);
+
+	m_wndControl.SetItemData(hItem, key);
+	m_keyMap[key] = hItem;
 
 	if (data.GetBoolean(SKW_HASCHILDREN)) {
-		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
-		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
-	}
-}
-
-
-
-void Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool hasChildren, int type)
-{
-	/*
-	TVINSERTSTRUCT tvi;
-	tvi.hParent = parent;
-	tvi.hInsertAfter = TVI_LAST;
-
-	//:WARNING - is not single flag!!! (combination)
-	tvi.itemex.mask = TVIF_TEXT | TVIF_PARAM; // | TVIF_STATE;
-	tvi.itemex.pszText = title;
-	// TVIF_PARAM: add data. if not set, lParam is not assigned
-	tvi.itemex.lParam = (LPARAM)key;
-	//tvi.itemex.stateMask = TVIS_EXPANDED;
-	//tvi.itemex.state = TVE_EXPAND;
-
-	HTREEITEM hCurrent = m_wndControl.InsertItem(&tvi);
-	m_keyMap[key] = hCurrent;
-
-	if (hasChildren) {
-		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
-		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
-	}
-	*/
-
-	HTREEITEM hCurrent = m_wndControl.InsertItem(title, parent);
-	m_wndControl.SetItemData(hCurrent, key);
-	m_keyMap[key] = hCurrent;
-
-	if (hasChildren) {
-		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
-		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
-	}
-}
-
-
-
-void Component::ModelPanel::AddItems(Json::Object* pData)
-{
-	m_wndControl.SetRedraw(FALSE);
-
-	Json::Object& data = *pData;
-	Json::Array& items = data.GetArray(SKW_ITEMS);
-
-	for (auto item : items.GetBuffer()) {
-		AddItem(item->ToObject());
+		m_wndControl.InsertItem(PRESET::DummyName, hItem);
+		m_wndControl.Expand(hItem, TVE_COLLAPSE);
 	}
 
-	m_wndControl.SetRedraw(TRUE);
-	m_wndControl.AdjustLayout();
+	RedrawTree(true);
+
+	return hItem;
 }
 
 
 
 void Component::ModelPanel::AddChildren(Json::Object* pData)
 {
-	m_wndControl.SetRedraw(FALSE);
+	RedrawTree(false);
 
 	Json::Object& data = *pData;
 	Json::Array& items = data.GetArray(SKW_CHILDREN);
 
 	HTREEITEM hParent = GetItem(data.GetDwordPtr(SKW_PARENT));
-	
+	//:WARNING - remove dummy first
+	HTREEITEM hChild = m_wndControl.GetChildItem(hParent);
+	if (m_wndControl.GetItemText(hChild) == PRESET::DummyName) {
+		m_wndControl.DeleteItem(hChild);
+	}
+
+	BOOL checked = m_wndControl.GetCheck(hParent);
+
 	for (auto item : items.GetBuffer()) {
 		Json::Object& child = item->AsObject();
 
-		AddItem(hParent,
+		hChild = AddItem(hParent,
 			child.GetDwordPtr(SKW_KEY),
 			(LPWSTR)(LPCTSTR)child.GetString(SKW_TITLE),
 			child.GetBoolean(SKW_HASCHILDREN),
 			child.GetInteger(SKW_TYPE)
 		);
+
+		// parent checked state
+		if (checked) {
+			m_wndControl.SetCheck(hChild);
+		}
 	}
 
-	m_wndControl.SetRedraw(TRUE);
-	m_wndControl.AdjustLayout();
+	//:WARNING - if single child, select
+	if (items.GetSize() == 1) {
+		m_wndControl.SelectItem(hChild);
+	}
+
+	RedrawTree(true);
+}
+
+
+
+void Component::ModelPanel::CheckItem(Json::Object* pData)
+{
+	DisableNotification(
+		m_wndControl.SetCheck(GetItem(pData->GetDwordPtr(SKW_KEY)), pData->GetBoolean(SKW_CHECKED))
+	);
+}
+
+
+
+void Component::ModelPanel::CollapseItem(Json::Object* pData)
+{
+	DisableNotification(
+		m_wndControl.Expand(GetItem(pData->GetDwordPtr(SKW_KEY)), TVE_COLLAPSE)
+	);
+}
+
+
+
+void Component::ModelPanel::DeleteItem(Json::Object* pData)
+{
+	DisableNotification(
+		m_wndControl.DeleteItem(GetItem(pData->GetDwordPtr(SKW_KEY)))
+	);
 }
 
 
 
 void Component::ModelPanel::ExpandItem(Json::Object* pData)
 {
-	Json::Object& data = *pData;
-	HTREEITEM hItem = GetItem(data.GetDwordPtr(SKW_KEY));
-
-	if (hItem != nullptr) {
-		m_wndControl.Expand(hItem, TVE_EXPAND);
-	}
-	else {
-		DEBUG_STOP;
-	}
+	DisableNotification(
+		m_wndControl.Expand(GetItem(pData->GetDwordPtr(SKW_KEY)), TVE_EXPAND)
+	);
 }
 
 
 
 void Component::ModelPanel::ExpandParent(Json::Object* pData)
 {
-	Json::Object& data = *pData;
-	HTREEITEM hItem = GetItem(data.GetDwordPtr(SKW_KEY));
+	RedrawTree(false);
 
-	if (hItem != nullptr) {
-		m_wndControl.Expand(hItem, TVE_EXPAND);
+	HTREEITEM hItem = GetItem(pData->GetDwordPtr(SKW_KEY));
+	HTREEITEM pParent = hItem;
+
+	while (pParent != nullptr) {
+		m_wndControl.Expand(pParent, TVE_EXPAND);
+		pParent = m_wndControl.GetParentItem(pParent);
 	}
-	else {
-		DEBUG_STOP;
-	}
+
+	m_wndControl.SelectItem(hItem);
+
+	RedrawTree(true);
 }
 
 
@@ -623,6 +672,18 @@ HTREEITEM Component::ModelPanel::GetItem(DWORD_PTR key)
 	}
 	else {
 		return nullptr;
+	}
+}
+
+
+
+void Component::ModelPanel::RedrawTree(bool value)
+{
+	m_wndControl.SetRedraw(value);
+	m_wndControl.EnableTreeCtrlNotifications(value);
+
+	if (value) {
+		m_wndControl.RedrawWindow();
 	}
 }
 

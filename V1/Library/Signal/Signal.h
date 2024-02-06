@@ -502,7 +502,9 @@ namespace Signal
 		{
 			Unknown = -1,
 
-			OnItemClicked,		// OnClick,
+			//OnBeginDrag,
+			//OnBeginLabelEdit,
+			//OnEndLabelEdit,
 			OnItemDblClicked,	// OnDblClick,
 			OnItemDeleted,		// OnDeleteItem,
 			OnItemChecked,
@@ -510,12 +512,8 @@ namespace Signal
 			OnItemExpanding,
 			OnItemRClicked,		// OnRClick,
 			OnItemRDbCliced,	// OnRDbClick,
-			//:WAIT
 			//OnSetFocus,
-			//OnBeginDrag,
-			//OnBeginLabelEdit,
-			//OnEndLabelEdit,
-			//OnSelChanged,
+			OnItemSelected,		//OnSelChanged, OnClick
 			//OnSelChanging,
 
 			AddItem,
@@ -533,13 +531,16 @@ namespace Signal
 
 	public:
 
+		// select item?
 		void OnItemChecked(DWORD_PTR key, bool checked);
 
-		void OnItemClicked(DWORD_PTR key);
+		void OnItemDblClicked(DWORD_PTR key);
 
 		void OnItemDeleted(DWORD_PTR key);
 		// response AddChildren();
 		void OnItemExpanded(DWORD_PTR key);
+		// highlight item?
+		void OnItemSelected(DWORD_PTR key);
 
 	public:
 

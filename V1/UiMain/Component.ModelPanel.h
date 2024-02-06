@@ -53,7 +53,7 @@ namespace Component
 
 		afx_msg void OnTreeRDbClick(NMHDR* pNMHDR, LRESULT* pResult);
 		 
-		afx_msg void OnItemClicked(NMHDR* pNMHDR, LRESULT* pResult);
+		afx_msg void OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult);
 
 		afx_msg void OnTreeSelChanging(NMHDR* pNMHDR, LRESULT* pResult);
 
@@ -63,23 +63,32 @@ namespace Component
 
 		DECLARE_MESSAGE_MAP()
 
-		void AddItem(Json::Object* pData);
+	private: // Signal responser
 
-		void AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool hasChildren, int type);
+		// use in AddChildren()
+		HTREEITEM AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool hasChildren, int type);
 
-		void AddItems(Json::Object* pData);
+		HTREEITEM AddItem(Json::Object* pData);
 
 		void AddChildren(Json::Object* pData);
+
+		void CheckItem(Json::Object* pData);
+
+		void CollapseItem(Json::Object* pData);
+
+		void DeleteItem(Json::Object* pData);
 
 		void ExpandItem(Json::Object* pData);
 
 		void ExpandParent(Json::Object* pData);
 
+	private:
+
 		void GetAncestorData(HTREEITEM pItem, std::list<DWORD_PTR>& list);
 
 		HTREEITEM GetItem(DWORD_PTR key);
 
-		void RedrawTree();
+		void RedrawTree(bool value);
 
 	private:
 

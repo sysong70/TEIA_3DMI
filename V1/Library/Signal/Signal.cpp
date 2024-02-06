@@ -665,9 +665,9 @@ void Signal::ModelPanel::OnItemChecked(DWORD_PTR key, bool checked)
 
 
 
-void Signal::ModelPanel::OnItemClicked(DWORD_PTR key)
+void Signal::ModelPanel::OnItemDblClicked(DWORD_PTR key)
 {
-	SendKeyData(Action::OnItemClicked);
+	SendKeyData(Action::OnItemDblClicked);
 }
 
 
@@ -682,6 +682,13 @@ void Signal::ModelPanel::OnItemDeleted(DWORD_PTR key)
 void Signal::ModelPanel::OnItemExpanded(DWORD_PTR key)
 {
 	SendKeyData(Action::OnItemExpanded);
+}
+
+
+
+void Signal::ModelPanel::OnItemSelected(DWORD_PTR key)
+{
+	SendKeyData(Action::OnItemSelected);
 }
 
 

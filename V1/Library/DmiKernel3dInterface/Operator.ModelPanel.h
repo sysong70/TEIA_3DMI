@@ -32,7 +32,7 @@ namespace KERNEL
 
 			void ItemExpanded(ModelTreeItem * pcInItem, ModelTreeItem * pcInParentItem = nullptr);
 
-			void OnItemClickedSignal(Json::Object & cInObject);
+			void OnItemSelectedSignal(Json::Object& cInObject);
 			void OnItemCheckedSignal(Json::Object & cInObject);
 		};
 	}
