@@ -23,6 +23,13 @@ namespace PresetDebugTracer
 	{
 		return globalUtils.ScaleByDPI(8);
 	}
+
+	enum EControlId
+	{
+		Id = WM_USER + 1,
+		Clear,
+		Save,
+	};
 }
 
 
@@ -32,6 +39,9 @@ using namespace Dialog;
 IMPLEMENT_DYNAMIC(DebugTracer, CBCGPDialog)
 
 BEGIN_MESSAGE_MAP(DebugTracer, CBCGPDialog)
+	ON_WM_CONTEXTMENU()
+
+	ON_COMMAND_RANGE(PRESET::Clear, PRESET::Save, OnContextCommand)
 END_MESSAGE_MAP()
 
 
@@ -93,6 +103,33 @@ BOOL Dialog::DebugTracer::OnInitDialog()
 	ConstructBody({});
 
 	return TRUE;
+}
+
+//#include "Window.Application.h"
+
+void Dialog::DebugTracer::OnContextMenu(CWnd* pWnd, CPoint pos)
+{
+	CMenu menu;
+	menu.CreatePopupMenu();
+	
+	menu.AppendMenu(MF_STRING, PRESET::Clear, L"Clear");
+	menu.AppendMenu(MF_STRING, PRESET::Save, L"Save...");
+
+	menu.TrackPopupMenu(TPM_LEFTALIGN, pos.x, pos.y, this);
+}
+
+
+
+void Dialog::DebugTracer::OnContextCommand(UINT id)
+{
+	switch (id) {
+	case PRESET::Clear:	ClearLog(); break;
+	case PRESET::Save:	SaveLog(L"", true); break;
+
+	default:
+		DEBUG_STOP;
+		break;
+	}
 }
 
 

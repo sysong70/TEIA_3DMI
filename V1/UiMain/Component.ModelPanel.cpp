@@ -195,6 +195,7 @@ void Component::ModelPanel::OnCommand(UINT id)
 
 LRESULT Component::ModelPanel::OnTreeCheckClick(WPARAM wp, LPARAM lp)
 {
+	DEBUG_LOG(L"* OnTreeCheckClick");
 	CBCGPGridRow* pRow = (CBCGPGridRow*)lp;
 
 	BOOL checked = !pRow->GetCheck();
@@ -243,6 +244,8 @@ void Component::ModelPanel::OnTreeBeginLabelEdit(NMHDR* pNMHDR, LRESULT* pResult
 
 void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
+	DEBUG_LOG(L"* OnTreeClick");
+
 	*pResult = S_OK;
 
 	UINT flag = 0;
@@ -292,6 +295,8 @@ void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeDblClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
+	DEBUG_LOG(L"* OnTreeDblClick");
+
 	UINT flag = 0;
 	CPoint point;
 	GetCursorPos(&point);
@@ -314,6 +319,8 @@ void Component::ModelPanel::OnTreeDblClick(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeDeleteItem(NMHDR* pNMHDR, LRESULT* pResult)
 {
+	DEBUG_LOG(L"* OnTreeDeleteItem");
+
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 	HTREEITEM hItem = pNMTreeView->itemOld.hItem;
 
@@ -350,6 +357,8 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
 	if (pNMTreeView->action == TVE_EXPAND) {
+		DEBUG_LOG(L"* OnTreeItemExpanded");
+
 		HTREEITEM hItem = pNMTreeView->itemNew.hItem;
 		// get first child item
 		HTREEITEM hChild = m_wndControl.GetChildItem(hItem);
@@ -411,6 +420,8 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 	if (hItem == nullptr) {
 	}
 	else {
+		DEBUG_LOG(L"* OnTreeSelChanged");
+
 		DWORD_PTR key = m_wndControl.GetItemData(hItem);
 		m_pView->GetDelivery().modelPanel.OnItemSelected(key);
 	}

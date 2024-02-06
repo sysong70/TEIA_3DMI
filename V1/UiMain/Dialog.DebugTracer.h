@@ -28,6 +28,10 @@ namespace Dialog
 
 		BOOL OnInitDialog() override;
 
+		afx_msg void OnContextMenu(CWnd* pWnd, CPoint pos);
+
+		void OnContextCommand(UINT id);
+
 		DECLARE_MESSAGE_MAP()
 
 	protected:
