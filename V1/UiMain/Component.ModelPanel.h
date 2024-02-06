@@ -94,7 +94,7 @@ namespace Component
 
 		std::unordered_map<DWORD_PTR, HTREEITEM> m_keyMap;
 		CBCGPTreeCtrlEx m_wndControl;
-		bool m_bSignal = false;
+		bool m_bExpanding = false;
 
 		CString m_sFilterMessage = L"";
 		bool m_bAlternateRows = false;

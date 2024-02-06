@@ -26,7 +26,7 @@ namespace PresetModelPanel
 {
 	const UINT Id = WM_USER;
 
-	WCHAR DummyName[] = L"_$_DUMMY_$_";
+	WCHAR DummyName[] = L"Expanding...";
 }
 
 
@@ -362,8 +362,10 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 		// get first child item
 		HTREEITEM hChild = m_wndControl.GetChildItem(hItem);
 
-		if (m_wndControl.GetItemText(hChild) == PRESET::DummyName) {
+		if (m_wndControl.GetItemData(hChild) == 0) {
+			ASSERT(m_wndControl.GetItemText(hChild) == PRESET::DummyName);
 			DisableNotification(m_wndControl.DeleteItem(hChild));
+			m_bExpanding = true;
 
 			DWORD_PTR key = m_wndControl.GetItemData(hItem);
 			ASSERT(key != 0);
@@ -381,11 +383,7 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeItemExpanding(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	//NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
-
-	//if (pNMTreeView->action == TVE_EXPAND) {}
-	//else if (pNMTreeView->action == TVE_COLLAPSE) {}
-	//else {}
+	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
 	*pResult = S_OK;
 }
@@ -417,9 +415,11 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
 	HTREEITEM hItem = pNMTreeView->itemNew.hItem;
-	DWORD_PTR key = m_wndControl.GetItemData(hItem);
-	//:WARNING - dummy (by keyboard selection)
-	if (key != 0) {
+	//:WARNING - dummy (by keyboard expanding)
+	if (hItem == nullptr) {
+	}
+	else {
+		DWORD_PTR key = m_wndControl.GetItemData(hItem);
 		m_pView->GetDelivery().modelPanel.OnItemSelected(key);
 	}
 
@@ -430,15 +430,7 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeSelChanging(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	//NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
-
-	//if (pNMTreeView->action == TVC_BYMOUSE) {
-	//}
-	//else if (pNMTreeView->action == TVC_BYKEYBOARD) {
-	//	DEBUG_STOP;
-	//}
-	//else {
-	//}
+	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
 	*pResult = S_OK;
 }
@@ -567,7 +559,8 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 	HTREEITEM hParent = GetItem(data.GetDwordPtr(SKW_PARENT));
 	//:WARNING - remove dummy first
 	HTREEITEM hChild = m_wndControl.GetChildItem(hParent);
-	if (m_wndControl.GetItemText(hChild) == PRESET::DummyName) {
+	if (hChild != nullptr && m_wndControl.GetItemData(hChild) == 0) {
+		ASSERT(m_wndControl.GetItemText(hChild) == PRESET::DummyName);
 		m_wndControl.DeleteItem(hChild);
 	}
 
@@ -589,9 +582,10 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 		}
 	}
 
-	//:WARNING - if single child, select
-	if (items.GetSize() == 1) {
-		m_wndControl.SelectItem(hChild);
+	//:WARNING - select first (keyboard expanding)
+	if (m_bExpanding) {
+		m_wndControl.SelectItem(m_wndControl.GetChildItem(hParent));
+		m_bExpanding = false;
 	}
 
 	RedrawTree(true);
