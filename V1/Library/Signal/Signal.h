@@ -505,15 +505,17 @@ namespace Signal
 			//OnBeginDrag,
 			//OnBeginLabelEdit,
 			//OnEndLabelEdit,
+			//OnClick
 			OnItemDblClicked,	// OnDblClick,
 			OnItemDeleted,		// OnDeleteItem,
 			OnItemChecked,
 			OnItemExpanded,
 			OnItemExpanding,
 			OnItemRClicked,		// OnRClick,
-			OnItemRDbCliced,	// OnRDbClick,
+			OnItemRDbCliced,	// OnRDbClick
 			//OnSetFocus,
-			OnItemSelected,		//OnSelChanged, OnClick
+			OnItemSelected,		// OnSelChanged
+			OnItemShow,			// OnClick
 			//OnSelChanging,
 
 			AddItem,
@@ -541,6 +543,8 @@ namespace Signal
 		void OnItemExpanded(DWORD_PTR key);
 		// highlight item?
 		void OnItemSelected(DWORD_PTR key);
+
+		void OnItemShow(DWORD_PTR key, bool show);
 
 	public:
 

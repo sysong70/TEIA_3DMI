@@ -36,7 +36,7 @@ using namespace Component;
 BEGIN_MESSAGE_MAP(ModelPanel, Panel)
 	ON_REGISTERED_MESSAGE(BCGM_GRID_ROW_CHECKBOX_CLICK, OnTreeCheckClick)
 
-	ON_NOTIFY(NM_CLICK, PRESET::Id, OnTreeClick)
+	//ON_NOTIFY(NM_CLICK, PRESET::Id, OnTreeClick)
 	ON_NOTIFY(NM_DBLCLK, PRESET::Id, OnTreeDblClick)
 	ON_NOTIFY(NM_RCLICK, PRESET::Id, OnTreeRClick)
 	ON_NOTIFY(NM_RDBLCLK, PRESET::Id, OnTreeRDbClick)
@@ -145,6 +145,22 @@ void Component::ModelPanel::ConstructBody()
 	m_wndControl.SetOutOfFilterLabel(Facility::Local(L"No items match your search.|일치하는 항목을 찾을 수 없습니다."));
 	m_wndControl.EnableFilterBar(TRUE, filter);
 	m_wndControl.OnFilterBarUpdate(0);
+
+	//:TEST - item image
+	/*
+	CImageList* pImages = new CImageList;
+	CBCGPToolBarImages images;
+	images.SetImageSize(globalUtils.ScaleByDPI(CSize(16, 16)));
+
+	for (int id = CUSTOM_3D_CMD_KEN_Test1; id <= CUSTOM_3D_CMD_KEN_Test9; id++) {
+		CBCGPSVGImage* pImage = new CBCGPSVGImage();
+		pImage->Load(id);
+		images.AddSVG(pImage);
+	}
+
+	images.ExportToImageList(*pImages, TRUE);
+	m_wndControl.SetImageList(pImages, TVSIL_NORMAL);
+	*/
 }
 
 
@@ -236,40 +252,22 @@ void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 
 	DWORD_PTR key = m_wndControl.GetItemData(hItem);
 	ASSERT(key != 0);
-	/*
+
 	if (flag & TVHT_NOWHERE) {
 		DEBUG_TRACE(L"NM_CLICK: TVHT_NOWHERE\r\n");
 	}
 	else if (flag & TVHT_ONITEMICON) {
 		DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMICON\r\n");
 	}
-	// Label
 	else if (flag & TVHT_ONITEMLABEL) {
-		m_pView->GetDelivery().modelPanel.OnItemSelected(key);
+		DEBUG_TRACE(L"NM_CLICK: Label\r\n");
 	}
 	else if (flag & TVHT_ONITEMINDENT) {
 		DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMINDENT\r\n");
 	}
 	// Expand button
 	else if (flag & TVHT_ONITEMBUTTON) {
-		UINT state = m_wndControl.GetItemState(hItem, TVIS_EXPANDED);
-		//m_wndControl.Expand(hItem, (state & TVIS_EXPANDED ? TVE_COLLAPSE : TVE_EXPAND));
-
-		if (state & TVIS_EXPANDED) {
-			m_wndControl.Expand(hItem, TVE_COLLAPSE);
-		}
-		else {
-			m_wndControl.Expand(hItem, TVE_EXPAND);
-
-			// check first child item
-			HTREEITEM hChild = m_wndControl.GetChildItem(hItem);
-			if (m_wndControl.GetItemText(hChild) == PRESET::DummyName) {
-				DisableNotification(m_wndControl.DeleteItem(hChild));
-				m_pView->GetDelivery().modelPanel.OnItemExpanded(key);
-			}
-		}
-		
-		*pResult = S_FALSE;
+		DEBUG_TRACE(L"NM_CLICK: Expand button\r\n");
 	}
 	else if (flag & TVHT_ONITEMRIGHT) {
 		DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMRIGHT\r\n");
@@ -277,23 +275,12 @@ void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 	else if (flag & TVHT_ONITEMBUTTON) {
 		DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMBUTTON\r\n");
 	}
-	// Check box
 	else if (flag & TVHT_ONITEMSTATEICON) {
-		CBCGPGridRow* pRow = m_wndControl.TreeItem(hItem);
-		BOOL checked = !pRow->GetCheck();
-		pRow->SetCheck(checked);
-		pRow->CheckSubItems(checked);
-		pRow->UpdateParentCheckbox(TRUE);
-		m_wndControl.RedrawWindow();
-
-		m_pView->GetDelivery().modelPanel.OnItemChecked(key, (bool)checked);
-
-		*pResult = S_FALSE;
+		DEBUG_TRACE(L"NM_CLICK: Check box\r\n");
 	}
 	else {
-		DEBUG_TRACE(L"NM_CLICK: other\r\n");
+		DEBUG_TRACE(L"NM_CLICK: Other\r\n");
 	}
-	*/
 }
 
 
@@ -476,6 +463,8 @@ HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR
 	HTREEITEM hItem = m_wndControl.InsertItem(title, parent);
 	DEBUG_VALID(hItem);
 
+	//:TEST - no avilable, TVHT_ONITEMLABEL
+	//m_wndControl.SetItemImage(hItem, 0, 1);
 	m_wndControl.SetItemData(hItem, key);
 	m_keyMap[key] = hItem;
 
@@ -534,6 +523,8 @@ HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 	HTREEITEM hItem = m_wndControl.InsertItem(data.GetString(SKW_TITLE), GetItem(data.GetDwordPtr(SKW_PARENT)));
 	DEBUG_VALID(hItem);
 
+	//:TEST - no available, TVHT_ONITEMLABEL
+	//m_wndControl.SetItemNotificationBadge(hItem, L"[HIDE]");
 	m_wndControl.SetItemData(hItem, key);
 	m_keyMap[key] = hItem;
 
@@ -634,13 +625,24 @@ void Component::ModelPanel::ExpandParent(Json::Object* pData)
 	RedrawTree(false);
 
 	HTREEITEM hItem = GetItem(pData->GetDwordPtr(SKW_KEY));
-	HTREEITEM pParent = hItem;
+	HTREEITEM hParent = hItem;
+	std::list<HTREEITEM> ancestor;
 
-	while (pParent != nullptr) {
-		m_wndControl.Expand(pParent, TVE_EXPAND);
-		pParent = m_wndControl.GetParentItem(pParent);
+	while (hParent != nullptr) {
+		DEBUG_TRACE(L"%s\r\n", (LPCTSTR)m_wndControl.GetItemText(hParent));
+		ancestor.push_front(hParent);
+		hParent = m_wndControl.GetParentItem(hParent);
 	}
 
+	//:CHECK - remove last one
+	ancestor.pop_back();
+	// Expand root to child
+	for (auto item : ancestor) {
+		ASSERT(m_wndControl.GetItemText(item) != PRESET::DummyName);
+		m_wndControl.Expand(item, TVE_EXPAND);
+	}
+
+	//:CHECK
 	m_wndControl.SelectItem(hItem);
 
 	RedrawTree(true);
@@ -650,10 +652,10 @@ void Component::ModelPanel::ExpandParent(Json::Object* pData)
 
 void Component::ModelPanel::GetAncestorData(HTREEITEM pItem, std::list<DWORD_PTR>& ancestor)
 {
-	HTREEITEM pParent = pItem;
-	while (pParent != nullptr) {
-		ancestor.push_front(m_wndControl.GetItemData(pParent));
-		pParent = m_wndControl.GetParentItem(pParent);
+	HTREEITEM hParent = pItem;
+	while (hParent != nullptr) {
+		ancestor.push_front(m_wndControl.GetItemData(hParent));
+		hParent = m_wndControl.GetParentItem(hParent);
 	}
 }
 

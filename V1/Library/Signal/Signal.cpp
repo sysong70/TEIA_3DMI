@@ -693,6 +693,19 @@ void Signal::ModelPanel::OnItemSelected(DWORD_PTR key)
 
 
 
+void Signal::ModelPanel::OnItemShow(DWORD_PTR key, bool show)
+{
+	Json::Object data;
+	ConstructData(data, Action::OnItemShow);
+
+	data.SetDwordPtr(SKW_KEY, key);
+	data.SetBoolean(SKW_CHECKED, show);
+
+	Wrapper().SendData(data);
+}
+
+
+
 void Signal::ModelPanel::AddItem(TreeItem& item)
 {
 	Json::Object data;
