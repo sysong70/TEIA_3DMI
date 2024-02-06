@@ -6,6 +6,7 @@
 #include "Component.StatusBar.h"
 #include "Component.TaskBar.h"
 #include "Dialog.h"
+#include "Dialog.DebugTracer.h"
 
 
 
@@ -28,6 +29,8 @@ namespace Window
 		~MainFrame() override;
 
 	public:
+
+		Dialog::DebugTracer& GetDebugTracer();
 
 		Window::View* GetActiveView();
 

@@ -44,6 +44,23 @@ Window::MainFrame::~MainFrame()
 
 
 
+Dialog::DebugTracer& Window::MainFrame::GetDebugTracer()
+{
+	Dialog::Base* pDialog = m_dialogs.Get((int)Signal::Target::DebugTracer);
+	if (pDialog == nullptr) {
+		pDialog = new Dialog::DebugTracer;
+		pDialog->Create(IDD_DMI_DEBUG_TRACER);
+
+		m_dialogs.Add(pDialog);
+	}
+
+	pDialog->ShowWindow(SW_SHOW);
+
+	return *(Dialog::DebugTracer*)pDialog;
+}
+
+
+
 Window::View* Window::MainFrame::GetActiveView()
 {
 	DEBUG_VALID(m_pActiveView);
@@ -76,7 +93,7 @@ Component::TaskBar& Window::MainFrame::GetTaskBar()
 	return m_taskBar;
 }
 
-#include "Dialog.DebugTracer.h"
+
 
 void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 {
@@ -86,15 +103,9 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 	switch (target) {
 	case Signal::Target::DebugTracer:
 	{
-		Dialog::Base* pDialog = m_dialogs.Get((int)target);
-		if (pDialog == nullptr) {
-			pDialog = new Dialog::DebugTracer;
-			pDialog->Create(IDD_DMI_DEBUG_TRACER);
-			m_dialogs.Add(pDialog);
-		}
-
-		pDialog->ShowWindow(SW_SHOW);
-		pDialog->ReceiveSignal(pData);
+		Dialog::Base& dlg = GetDebugTracer();
+		dlg.ShowWindow(SW_SHOW);
+		dlg.ReceiveSignal(pData);
 
 		REMOVE_POINTER(pData);
 	} break;
@@ -216,8 +227,6 @@ void Window::MainFrame::ShowTaskBar(bool show)
 
 void Window::MainFrame::ViewChanged(UINT message, View* pView)
 {
-	DEBUG_TRACE(L"%d %d\n", pView->GetId(), message);
-
 	if (message == WM_ACTIVATE) {
 		m_panelBar.ViewChanged(&pView->m_tabs);
 		if (m_pActiveView != nullptr && m_pActiveView->GetId() != pView->GetId()) {

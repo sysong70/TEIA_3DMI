@@ -15,6 +15,11 @@ static char THIS_FILE[] = __FILE__;
 
 
 
+#include "Window.Application.h"
+#include <WStr.h>
+//#define DEBUG_LOG(s) TheApplication.GetMainFrame().GetDebugTracer().AddLog(s)
+#define DEBUG_LOG DEBUG_TRACE
+
 #define DisableNotification(func) \
 m_wndControl.EnableTreeCtrlNotifications(FALSE); \
 func; \
@@ -254,32 +259,32 @@ void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 	ASSERT(key != 0);
 
 	if (flag & TVHT_NOWHERE) {
-		DEBUG_TRACE(L"NM_CLICK: TVHT_NOWHERE\r\n");
+		DEBUG_LOG(L"NM_CLICK: TVHT_NOWHERE");
 	}
 	else if (flag & TVHT_ONITEMICON) {
-		DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMICON\r\n");
+		DEBUG_LOG(L"NM_CLICK: TVHT_ONITEMICON");
 	}
 	else if (flag & TVHT_ONITEMLABEL) {
-		DEBUG_TRACE(L"NM_CLICK: Label\r\n");
+		DEBUG_LOG(L"NM_CLICK: Label");
 	}
 	else if (flag & TVHT_ONITEMINDENT) {
-		DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMINDENT\r\n");
+		DEBUG_LOG(L"NM_CLICK: TVHT_ONITEMINDENT");
 	}
 	// Expand button
 	else if (flag & TVHT_ONITEMBUTTON) {
-		DEBUG_TRACE(L"NM_CLICK: Expand button\r\n");
+		DEBUG_LOG(L"NM_CLICK: Expand button");
 	}
 	else if (flag & TVHT_ONITEMRIGHT) {
-		DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMRIGHT\r\n");
+		DEBUG_LOG(L"NM_CLICK: TVHT_ONITEMRIGHT");
 	}
 	else if (flag & TVHT_ONITEMBUTTON) {
-		DEBUG_TRACE(L"NM_CLICK: TVHT_ONITEMBUTTON\r\n");
+		DEBUG_LOG(L"NM_CLICK: TVHT_ONITEMBUTTON");
 	}
 	else if (flag & TVHT_ONITEMSTATEICON) {
-		DEBUG_TRACE(L"NM_CLICK: Check box\r\n");
+		DEBUG_LOG(L"NM_CLICK: Check box");
 	}
 	else {
-		DEBUG_TRACE(L"NM_CLICK: Other\r\n");
+		DEBUG_LOG(L"NM_CLICK: Other");
 	}
 }
 
@@ -462,6 +467,7 @@ HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR
 
 	HTREEITEM hItem = m_wndControl.InsertItem(title, parent);
 	DEBUG_VALID(hItem);
+	DEBUG_LOG(WStr::Format(L"\t- %s", title));
 
 	//:TEST - no avilable, TVHT_ONITEMLABEL
 	//m_wndControl.SetItemImage(hItem, 0, 1);
@@ -522,6 +528,7 @@ HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 
 	HTREEITEM hItem = m_wndControl.InsertItem(data.GetString(SKW_TITLE), GetItem(data.GetDwordPtr(SKW_PARENT)));
 	DEBUG_VALID(hItem);
+	DEBUG_LOG(WStr::Format(L"AddItem: %s", m_wndControl.GetItemText(hItem)));
 
 	//:TEST - no available, TVHT_ONITEMLABEL
 	//m_wndControl.SetItemNotificationBadge(hItem, L"[HIDE]");
@@ -548,6 +555,8 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 	Json::Array& items = data.GetArray(SKW_CHILDREN);
 
 	HTREEITEM hParent = GetItem(data.GetDwordPtr(SKW_PARENT));
+	DEBUG_LOG(WStr::Format(L"AddChildren: %s", m_wndControl.GetItemText(hParent)));
+
 	//:WARNING - remove dummy first
 	HTREEITEM hChild = m_wndControl.GetChildItem(hParent);
 	if (hChild != nullptr && m_wndControl.GetItemData(hChild) == 0) {
@@ -629,7 +638,7 @@ void Component::ModelPanel::ExpandParent(Json::Object* pData)
 	std::list<HTREEITEM> ancestor;
 
 	while (hParent != nullptr) {
-		DEBUG_TRACE(L"%s\r\n", (LPCTSTR)m_wndControl.GetItemText(hParent));
+		DEBUG_LOG(WStr::Format(L"Expand %s", (LPCTSTR)m_wndControl.GetItemText(hParent)));
 		ancestor.push_front(hParent);
 		hParent = m_wndControl.GetParentItem(hParent);
 	}
@@ -700,3 +709,4 @@ void Component::ModelPanel::EnableGridLines()
 }
 
 #undef PRESET
+#undef DEBUG_LOG

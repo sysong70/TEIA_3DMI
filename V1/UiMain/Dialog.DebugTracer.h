@@ -34,13 +34,19 @@ namespace Dialog
 
 		void ConstructBody(const CRect& boundary) override;
 
-	private:
+	public:
 
 		void AddLog(Json::Object& data);
+		// local
+		void AddLog(const wchar_t* pFormat, ...);
+
+		void AddLog(CString log);
 
 		void ClearLog();
 
 		void SaveLog(Json::Object& data);
+
+		void SaveLog(CString path, bool clear = true);
 
 	private: // Body controls
 

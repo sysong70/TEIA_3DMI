@@ -114,7 +114,24 @@ void Dialog::DebugTracer::ConstructBody(const CRect& boundary)
 
 void Dialog::DebugTracer::AddLog(Json::Object& data)
 {
-	m_wndLog.AddString(data.GetString(SKW_VALUE));
+	AddLog(data.GetString(SKW_VALUE));
+}
+
+void Dialog::DebugTracer::AddLog(const wchar_t* pFormat, ...)
+{
+	CString stream;
+	va_list argList;
+
+	va_start(argList, pFormat);
+	stream.FormatV(pFormat, argList);
+	va_end(argList);
+
+	AddLog(stream);
+}
+
+void Dialog::DebugTracer::AddLog(CString log)
+{
+	m_wndLog.AddString(log);
 }
 
 
@@ -128,13 +145,12 @@ void Dialog::DebugTracer::ClearLog()
 
 void Dialog::DebugTracer::SaveLog(Json::Object& data)
 {
-	Json::Value* pValue = data.FindValue(SKW_VALUE);
-	CString path;
+	SaveLog(data.GetString(SKW_VALUE), data.GetBoolean(SKW_CLEAR));
+}
 
-	if (pValue != nullptr) {
-		path = pValue->AsString();
-	}
-	else {
+void Dialog::DebugTracer::SaveLog(CString path, bool clear)
+{
+	if (path.IsEmpty()) {
 		CFileDialog dlg(FALSE, NULL, NULL, 0, NULL, this);
 		if (dlg.DoModal() == IDOK) {
 			path = dlg.GetPathName();
@@ -158,7 +174,7 @@ void Dialog::DebugTracer::SaveLog(Json::Object& data)
 		DEBUG_STOP;
 	}
 
-	if (data.GetBoolean(SKW_CLEAR)) {
+	if (clear) {
 		ClearLog();
 	}
 }
