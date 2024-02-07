@@ -525,6 +525,7 @@ namespace Signal
 			DeleteItem,
 			ExpandItem,
 			ExpandParent,
+			SelectItem,
 		};
 
 		DEFINE_WRAPPER;
@@ -562,7 +563,7 @@ namespace Signal
 		// expand from root to item
 		void ExpandParent(DWORD_PTR key);
 
-		//void RedrawTree();
+		void SelectItem(DWORD_PTR key);
 	};
 
 

@@ -137,7 +137,7 @@ BOOL Window::View2d::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 	if (m_bRenderer) {
 		ScreenToClient(&point);
 
-		zDelta *= TheAppOptions.BooleanValue("Environment/Mouse/ReverseWheelDirection") ? -1 : 1;
+		zDelta *= TheAppOptions.GetBoolean("Environment/Mouse/ReverseWheelDirection") ? -1 : 1;
 		m_delivery.view.OnMouseWheel(nFlags, zDelta, point.x, point.y);
 	}
 

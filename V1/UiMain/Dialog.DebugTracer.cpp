@@ -105,7 +105,7 @@ BOOL Dialog::DebugTracer::OnInitDialog()
 	return TRUE;
 }
 
-//#include "Window.Application.h"
+
 
 void Dialog::DebugTracer::OnContextMenu(CWnd* pWnd, CPoint pos)
 {

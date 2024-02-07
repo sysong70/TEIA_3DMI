@@ -785,6 +785,13 @@ void Signal::ModelPanel::ExpandParent(DWORD_PTR key)
 	SendKeyData(Action::ExpandParent);
 }
 
+
+
+void Signal::ModelPanel::SelectItem(DWORD_PTR key)
+{
+	SendKeyData(Action::SelectItem);
+}
+
 #undef SendKeyData
 
 #pragma endregion //:REGION

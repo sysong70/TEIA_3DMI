@@ -28,7 +28,11 @@ namespace Facility
 
 	public: // Preference Values
 
-		bool BooleanValue(const char* path);
+		bool GetBoolean(const char* path);
+
+		COLORREF GetColor(const char* path);
+
+		int GetInteger(const char* path);
 
 	private:
 

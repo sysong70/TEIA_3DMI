@@ -238,7 +238,7 @@ void Window::View::OnLButtonDown(UINT nFlags, CPoint point)
 	if (IsValid()) {
 		SetCapture();
 
-		//if (TheAppOptions.BooleanValue("Environment/Mouse/SwapPanAndRotate")) {
+		//if (TheAppOptions.GetBoolean("Environment/Mouse/SwapPanAndRotate")) {
 		//	nFlags |= (nFlags & ~MK_LBUTTON) | MK_RBUTTON;
 		//	m_delivery.view.OnRButtonDown(nFlags, point.x, point.y);
 		//}
@@ -255,7 +255,7 @@ void Window::View::OnLButtonDown(UINT nFlags, CPoint point)
 void Window::View::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	if (IsValid()) {
-		//if (TheAppOptions.BooleanValue("Environment/Mouse/SwapPanAndRotate")) {
+		//if (TheAppOptions.GetBoolean("Environment/Mouse/SwapPanAndRotate")) {
 		//	nFlags |= MK_RBUTTON;
 		//	m_delivery.view.OnRButtonUp(nFlags, point.x, point.y);
 		//}
@@ -332,7 +332,7 @@ void Window::View::OnRButtonDown(UINT nFlags, CPoint point)
 	if (IsValid()) {
 		SetCapture();
 
-		//if (TheAppOptions.BooleanValue("Environment/Mouse/SwapPanAndRotate")) {
+		//if (TheAppOptions.GetBoolean("Environment/Mouse/SwapPanAndRotate")) {
 		//	nFlags != (nFlags & ~MK_LBUTTON) | MK_RBUTTON;
 		//	m_delivery.view.OnLButtonDown(nFlags, point.x, point.y);
 		//}
@@ -349,7 +349,7 @@ void Window::View::OnRButtonDown(UINT nFlags, CPoint point)
 void Window::View::OnRButtonUp(UINT nFlags, CPoint point)
 {
 	if (IsValid()) {
-		//if (TheAppOptions.BooleanValue("Environment/Mouse/SwapPanAndRotate")) {
+		//if (TheAppOptions.GetBoolean("Environment/Mouse/SwapPanAndRotate")) {
 		//	nFlags |= MK_LBUTTON;
 		//	m_delivery.view.OnLButtonUp(nFlags, point.x, point.y);
 		//}

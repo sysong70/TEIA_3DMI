@@ -2,6 +2,7 @@
 #include "resource.h"
 #include "Component.ModelPanel.h"
 #include "Facility.h"
+#include "Facility.AppOptions.h"
 #include "Window.Document.h"
 #include "Window.View.h"
 #include <Path.h>
@@ -17,8 +18,13 @@ static char THIS_FILE[] = __FILE__;
 
 #include "Window.Application.h"
 #include <WStr.h>
-//#define DEBUG_LOG(s) TheApplication.GetMainFrame().GetDebugTracer().AddLog(s)
+
+#define _LOG
+#ifdef _LOG
+#define DEBUG_LOG(s) TheApplication.GetMainFrame().GetDebugTracer().AddLog(s)
+#else
 #define DEBUG_LOG DEBUG_TRACE
+#endif
 
 #define DisableNotification(func) \
 m_wndControl.EnableTreeCtrlNotifications(FALSE); \
@@ -87,6 +93,7 @@ void Component::ModelPanel::ReceiveSignal(Json::Object* pData)
 	case Signal::ModelPanel::Action::DeleteItem:	DeleteItem(pData);		break;
 	case Signal::ModelPanel::Action::ExpandItem:	ExpandItem(pData);		break;
 	case Signal::ModelPanel::Action::ExpandParent:	ExpandParent(pData);	break;
+	case Signal::ModelPanel::Action::SelectItem:	SelectItem(pData);		break;
 
 	default:
 		DEBUG_STOP;
@@ -122,12 +129,46 @@ int Component::ModelPanel::ConstructHeader(int cx)
 	return m_nHeaderHeight = m_toolBar.AdjustLayout().cy;
 }
 
-
+//:REF - https://learn.microsoft.com/ko-kr/windows/win32/controls/tree-view-control-window-styles
 
 void Component::ModelPanel::ConstructBody()
 {
-	DWORD dwStyle = WS_CHILD | WS_VISIBLE |
-		TVS_CHECKBOXES | TVS_FULLROWSELECT | TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | TVS_SHOWSELALWAYS;
+	DWORD dwStyle = WS_CHILD | WS_VISIBLE
+		/// Enables check boxes for items in a tree - view control.
+		| TVS_CHECKBOXES
+		/// Prevents the tree-view control from sending TVN_BEGINDRAG notification codes.
+//		| TVS_DISABLEDRAGDROP
+		/// Allows the user to edit the labels of tree - view items.
+//		| TVM_EDITLABEL
+		/// Enables full-row selection in the tree view.
+		/// This style cannot be used in conjunction with the TVS_HASLINES style.
+//		| TVS_FULLROWSELECT
+		/// Displays plus (+) and minus (-) buttons next to parent items.
+		/// To include buttons with items at the root of the tree view, TVS_LINESATROOT must also be specified.
+		| TVS_HASBUTTONS
+		/// Uses lines to show the hierarchy of items.
+		| TVS_HASLINES
+		/// Obtains tooltip information by sending the TVN_GETINFOTIP notification.
+//		| TVS_INFOTIP
+		/// Uses lines to link items at the root of the tree-view control.
+		/// This value is ignored if TVS_HASLINES is not also specified.
+		| TVS_LINESATROOT
+		/// Disables horizontal scrolling in the control.
+		/// The control will not display any horizontal scroll bars.
+		| TVS_NOHSCROLL
+		/// Disables tooltips.
+		| TVS_NOTOOLTIPS
+		/// Causes text to be displayed from right-to-left (RTL).
+//		| TVS_RTLREADING
+		/// Causes a selected item to remain selected when the tree-view control loses focus.
+//		| TVS_SHOWSELALWAYS
+		/// Causes the item being selected to expand and the item being unselected to collapse upon selection in the tree view.
+		/// If the user holds down the CTRL key while selecting an item, the item being unselected will not be collapsed.
+//		| TVS_SINGLEEXPAND
+		/// Enables hot tracking in a tree-view control.
+//		| TVS_TRACKSELECT
+		;
+
 	if (m_wndControl.Create(dwStyle, GetBodyRect(), this, PRESET::Id) == FALSE) {
 		DEBUG_RETURN;
 	}
@@ -151,8 +192,13 @@ void Component::ModelPanel::ConstructBody()
 	m_wndControl.EnableFilterBar(TRUE, filter);
 	m_wndControl.OnFilterBarUpdate(0);
 
+	//:TODO - from Control::EColor
+	//int backColor = TheAppOptions.GetInteger("ModelTree/Colors/Backgound");
+	//COLORREF background = 0;
+	//m_wndControl.SetCustomColors(background, -1, -1, -1, -1, -1);
+
 	//:TEST - item image
-	/*
+	//*
 	CImageList* pImages = new CImageList;
 	CBCGPToolBarImages images;
 	images.SetImageSize(globalUtils.ScaleByDPI(CSize(16, 16)));
@@ -165,7 +211,7 @@ void Component::ModelPanel::ConstructBody()
 
 	images.ExportToImageList(*pImages, TRUE);
 	m_wndControl.SetImageList(pImages, TVSIL_NORMAL);
-	*/
+	//*/
 }
 
 
@@ -244,8 +290,6 @@ void Component::ModelPanel::OnTreeBeginLabelEdit(NMHDR* pNMHDR, LRESULT* pResult
 
 void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	DEBUG_LOG(L"* OnTreeClick");
-
 	*pResult = S_OK;
 
 	UINT flag = 0;
@@ -254,40 +298,45 @@ void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 	m_wndControl.ScreenToClient(&point);
 
 	HTREEITEM hItem = m_wndControl.HitTest(point, &flag);
-	if (hItem == nullptr) {
-		return;
+	if (hItem != nullptr) {
+		DWORD_PTR key = m_wndControl.GetItemData(hItem);
+		ASSERT(key != 0);
 	}
-
-	DWORD_PTR key = m_wndControl.GetItemData(hItem);
-	ASSERT(key != 0);
 
 	if (flag & TVHT_NOWHERE) {
-		DEBUG_LOG(L"NM_CLICK: TVHT_NOWHERE");
+		DEBUG_LOG(L"* OnTreeClick: TVHT_NOWHERE");
 	}
-	else if (flag & TVHT_ONITEMICON) {
-		DEBUG_LOG(L"NM_CLICK: TVHT_ONITEMICON");
+	if (flag & TVHT_ONITEMICON) {
+		//:WARNING - no avialable in CBCGPTreeCtrlEx! only TVHT_ONITEMLABEL
+		DEBUG_LOG(L"* OnTreeClick: TVHT_ONITEMICON");
 	}
-	else if (flag & TVHT_ONITEMLABEL) {
-		DEBUG_LOG(L"NM_CLICK: Label");
+	if (flag & TVHT_ONITEMLABEL) {
+		DEBUG_LOG(L"* OnTreeClick: Label");
 	}
-	else if (flag & TVHT_ONITEMINDENT) {
-		DEBUG_LOG(L"NM_CLICK: TVHT_ONITEMINDENT");
+	if (flag & TVHT_ONITEMINDENT) {
+		DEBUG_LOG(L"* OnTreeClick: TVHT_ONITEMINDENT");
 	}
-	// Expand button
-	else if (flag & TVHT_ONITEMBUTTON) {
-		DEBUG_LOG(L"NM_CLICK: Expand button");
+	if (flag & TVHT_ONITEMBUTTON) {
+		DEBUG_LOG(L"* OnTreeClick: Expand button");
 	}
-	else if (flag & TVHT_ONITEMRIGHT) {
-		DEBUG_LOG(L"NM_CLICK: TVHT_ONITEMRIGHT");
+	if (flag & TVHT_ONITEMRIGHT) {
+		DEBUG_LOG(L"* OnTreeClick: TVHT_ONITEMRIGHT");
 	}
-	else if (flag & TVHT_ONITEMBUTTON) {
-		DEBUG_LOG(L"NM_CLICK: TVHT_ONITEMBUTTON");
+	if (flag & TVHT_ONITEMSTATEICON) {
+		DEBUG_LOG(L"* OnTreeClick: Check box");
 	}
-	else if (flag & TVHT_ONITEMSTATEICON) {
-		DEBUG_LOG(L"NM_CLICK: Check box");
+
+	if (flag & TVHT_ABOVE) {
+		DEBUG_LOG(L"* OnTreeClick: TVHT_ABOVE");
 	}
-	else {
-		DEBUG_LOG(L"NM_CLICK: Other");
+	if (flag & TVHT_BELOW) {
+		DEBUG_LOG(L"* OnTreeClick: TVHT_BELOW");
+	}
+	if (flag & TVHT_TORIGHT) {
+		DEBUG_LOG(L"* OnTreeClick: TVHT_TORIGHT");
+	}
+	if (flag & TVHT_TOLEFT) {
+		DEBUG_LOG(L"* OnTreeClick: TVHT_TOLEFT");
 	}
 }
 
@@ -393,8 +442,19 @@ void Component::ModelPanel::OnTreeItemExpanding(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeRClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	DEBUG_STOP;
 	UNREFERENCED_PARAMETER(pNMHDR);
+
+	CPoint point;
+	GetCursorPos(&point);
+	m_wndControl.ScreenToClient(&point);
+
+	CMenu menu;
+	menu.CreatePopupMenu();
+
+	menu.AppendMenu(MF_STRING, 111, L"Clear");
+	menu.AppendMenu(MF_STRING, 222, L"Save...");
+
+	menu.TrackPopupMenu(TPM_LEFTALIGN, point.x, point.y, this);
 
 	*pResult = S_OK;
 }
@@ -413,6 +473,16 @@ void Component::ModelPanel::OnTreeRDbClick(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 {
+	//:WARNING - range selection, skip signal
+	if (::GetAsyncKeyState(VK_SHIFT) & 0x8000) {
+		*pResult = S_OK;
+		return;
+	}
+	//:WARNING - multi selection
+	if (::GetAsyncKeyState(VK_CONTROL) & 0x8080) {
+		//:TODO - how
+	}
+
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
 	HTREEITEM hItem = pNMTreeView->itemNew.hItem;
@@ -481,7 +551,7 @@ HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR
 	DEBUG_LOG(WStr::Format(L"\t- %s", title));
 
 	//:TEST - no avilable, TVHT_ONITEMLABEL
-	//m_wndControl.SetItemImage(hItem, 0, 1);
+	m_wndControl.SetItemImage(hItem, 0, 1);
 	m_wndControl.SetItemData(hItem, key);
 	m_keyMap[key] = hItem;
 
@@ -663,6 +733,19 @@ void Component::ModelPanel::ExpandParent(Json::Object* pData)
 	}
 
 	//:CHECK
+	m_wndControl.SelectItem(hItem);
+
+	RedrawTree(true);
+}
+
+
+
+void Component::ModelPanel::SelectItem(Json::Object* pData)
+{
+	RedrawTree(false);
+
+	HTREEITEM hItem = GetItem(pData->GetDwordPtr(SKW_KEY));
+	DEBUG_VALID(hItem);
 	m_wndControl.SelectItem(hItem);
 
 	RedrawTree(true);

@@ -66,27 +66,41 @@ bool Facility::AppOptions::Load()
 	const CString PreferencesPath = m_sFolderPath + PRESET::PreferencesName;
 	const CString FileOptionsPath = m_sFolderPath + PRESET::FileOpeionsName;
 
+	// Preferences
+
 	if (File::IsExist((LPCTSTR)PreferencesPath)) {
 		m_preferences.Clean();
 		if (Json::Helper::Read(PreferencesPath, m_preferences) == false) {
-			return false;
+			m_preferences = TheAppResources.GetPreferences();
+		}
+		else {
+			if (m_preferences.GetString("version") != TheAppResources.GetPreferences().GetString("version")) {
+				//:TODO - remove file
+				m_preferences = TheAppResources.GetPreferences();
+			}
 		}
 	}
 	else {
 		m_preferences = TheAppResources.GetPreferences();
 	}
-	ASSERT(m_preferences.GetString("version") == TheAppResources.GetPreferences().GetString("version"));
+
+	// FileOptions
 
 	if (File::IsExist((LPCTSTR)FileOptionsPath)) {
 		m_fileOptions.Clean();
 		if (Json::Helper::Read(FileOptionsPath, m_fileOptions) == false) {
-			return false;
+			m_fileOptions = TheAppResources.GetFileOptions();
+		}
+		else {
+			if (m_fileOptions.GetString("version") != TheAppResources.GetFileOptions().GetString("version")) {
+				//:TODO - remove file
+				m_fileOptions = TheAppResources.GetFileOptions();
+			}
 		}
 	}
 	else {
 		m_fileOptions = TheAppResources.GetFileOptions();
 	}
-	ASSERT(m_fileOptions.GetString("version") == TheAppResources.GetFileOptions().GetString("version"));
 
 	return true;
 }
@@ -113,7 +127,7 @@ bool Facility::AppOptions::Save()
 
 
 
-bool Facility::AppOptions::BooleanValue(const char* path)
+bool Facility::AppOptions::GetBoolean(const char* path)
 {
 	Json::Value* pValue = Json::Helper::FindValueByPath(m_preferences, path);
 	if (pValue != nullptr) {
@@ -121,6 +135,32 @@ bool Facility::AppOptions::BooleanValue(const char* path)
 	}
 	else {
 		RETURN_FALSE;
+	}
+}
+
+
+
+COLORREF Facility::AppOptions::GetColor(const char* path)
+{
+	Json::Value* pValue = Json::Helper::FindValueByPath(m_preferences, path);
+	if (pValue != nullptr) {
+		return Json::Helper::ToColor(pValue->AsString());
+	}
+	else {
+		RETURN(-1);
+	}
+}
+
+
+
+int Facility::AppOptions::GetInteger(const char* path)
+{
+	Json::Value* pValue = Json::Helper::FindValueByPath(m_preferences, path);
+	if (pValue != nullptr) {
+		return pValue->AsInteger();
+	}
+	else {
+		RETURN(-1);
 	}
 }
 

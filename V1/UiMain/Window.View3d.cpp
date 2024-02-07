@@ -225,7 +225,7 @@ BOOL Window::View3d::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 		CRect rect;
 		GetWindowRect(rect);
 
-		zDelta *= TheAppOptions.BooleanValue("Environment/Mouse/ReverseWheelDirection") ? -1 : 1;
+		zDelta *= TheAppOptions.GetBoolean("Environment/Mouse/ReverseWheelDirection") ? -1 : 1;
 		m_delivery.view.OnMouseWheel(nFlags, zDelta, point.x, point.y, rect.left, rect.top, rect.right, rect.bottom);
 	}
 

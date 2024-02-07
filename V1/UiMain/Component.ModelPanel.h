@@ -82,6 +82,8 @@ namespace Component
 
 		void ExpandParent(Json::Object* pData);
 
+		void SelectItem(Json::Object* pData);
+
 	private:
 
 		void GetAncestorData(HTREEITEM pItem, std::list<DWORD_PTR>& list);

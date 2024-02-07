@@ -37,12 +37,28 @@ Control::TreeCtrlEx::~TreeCtrlEx()
 {
 }
 
-
+//:REF - https://learn.microsoft.com/ko-kr/windows/win32/controls/tree-view-control-window-styles
+// Component::ModelPanel::ConstructBody()
 
 bool Control::TreeCtrlEx::Initialize(CWnd* pParentWnd, UINT id, const RECT& rect)
 {
-	DWORD dwStyle = WS_CHILD | WS_VISIBLE |
-		TVS_FULLROWSELECT | TVS_HASBUTTONS | TVS_SHOWSELALWAYS;
+	DWORD dwStyle = WS_CHILD | WS_VISIBLE
+//		| TVS_CHECKBOXES
+//		| TVS_DISABLEDRAGDROP
+//		| TVM_EDITLABEL
+		| TVS_FULLROWSELECT
+		| TVS_HASBUTTONS
+		| TVS_HASLINES
+//		| TVS_LINESATROOT
+//		| TVS_INFOTIP
+//		| TVS_NOHSCROLL
+//		| TVS_NOTOOLTIPS
+//		| TVS_RTLREADING
+		| TVS_SHOWSELALWAYS
+//		| TVS_SINGLEEXPAND
+//		| TVS_TRACKSELECT
+		;
+
 	if (Create(dwStyle, rect, pParentWnd, id) == FALSE) {
 		RETURN_FALSE;
 	}

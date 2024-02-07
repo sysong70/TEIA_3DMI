@@ -57,7 +57,8 @@
 	"Preferences":{
 		"tree":[
 			{"name":"Environment", "title":"Environment|환경"},
-			{"name":"Views", "title":"Views|뷰"}
+			{"name":"Views", "title":"Views|뷰"},
+			{"name":"ModelTree", "title":"Model Tree|모델 트리"}
 		],
 		"properties":{
 			"Environment":{"type":"root", "items":[
@@ -74,13 +75,20 @@
 			]},
 			"Views":{"type":"root", "items":[
 				{"type":"group", "name":"Colors", "title":"Colors|색상", "items":[
-					{"type":"color", "name":"BackTop", "title":"Background-Top|배경 상부", "desc":"__#__|__#__"},
-					{"type":"color", "name":"BackBottom", "title":"Background-Bottom|배경 하부", "desc":"__#__|__#__"}
+					{"type":"color", "name":"BackTop", "title":"Background Top|배경 상부", "desc":"__#__|__#__"},
+					{"type":"color", "name":"BackBottom", "title":"Background Bottom|배경 하부", "desc":"__#__|__#__"},
+					{"type":"color", "name":"Highlight", "title":"Highlight Entity|", "desc":"__#__|__#__"},
+					{"type":"color", "name":"Selection", "title":"Selected Entity|선택된 개체", "desc":"__#__|__#__"}
 				]},
 				{"type":"group", "name":"NavCube", "title":"Navigation Cube|네비케이션 큐브", "items":[
 					{"type":"slider", "name":"Size", "title":"Size|크기", "desc":"__#__|__#__", "min":100, "max":300, "step":50},
 					{"type":"check", "name":"ShowAxis", "title":"Show Axis|축 보기", "desc":"__#__|__#__"},
 					{"type":"check", "name":"ShowCube", "title":"Show Cube|큐브 보기", "desc":"__#__|__#__"}
+				]}
+			]},
+			"ModelTree":{"type":"root", "items":[
+				{"type":"group", "name":"Colors", "title":"Colors|색상", "items":[
+					{"type":"slider", "name":"Background", "title":"Background|배경", "desc":"__#__|__#__", "min":0, "max":2}
 				]}
 			]}
 		}
