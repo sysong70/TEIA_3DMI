@@ -294,6 +294,9 @@ bool KERNEL::Operator::Select::SelectByResult(H3DF::SelectionResults & cInResult
 		cIter.Next();
 	}
 
+	pcImpl->DynHighlightControl().UnhighlightEverything();
+	pcImpl->DynLineHighlightControl().UnhighlightEverything();
+
 	pcImpl->View().Update();
 
 	return true;
@@ -352,10 +355,41 @@ void KERNEL::Operator::Select::SetSelectionFilter(SelectionFilter::Type eInType)
 }
 
 //== Highlight 관련 함수 =============================================================================
+H3DF::HighlightControl & KERNEL::Operator::Select::DynHighlightControl()
+{
+	auto * pcImpl = (Operator::SelectImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->DynHighlightControl();
+}
+
+void KERNEL::Operator::Select::Unhighlight(H3DF::SelectionResults const & cInItems)
+{
+	auto * pcImpl = (SelectImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->View().SuppressUpdate(true);
+
+	pcImpl->m_cHighlightCtrl.Unhighlight(cInItems);
+	pcImpl->m_cLineHighlightCtrl.Unhighlight(cInItems);
+
+	// 선택한 후에 Unhighlight 제거
+	pcImpl->DynHighlightControl().UnhighlightEverything();
+	pcImpl->DynLineHighlightControl().UnhighlightEverything();
+
+	pcImpl->m_cSelectionResult.Erase(cInItems);
+
+	pcImpl->View().SuppressUpdate(false);
+
+	pcImpl->View().Update();
+}
+
 void KERNEL::Operator::Select::UnhighlightEverything()
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
+
+	pcImpl->View().SuppressUpdate(true);
 
 	pcImpl->m_cHighlightOSnapOperator.UnhighlightEverything();
 	
@@ -367,4 +401,8 @@ void KERNEL::Operator::Select::UnhighlightEverything()
 
 	pcImpl->m_cSelectionResult.Reset();
 	pcImpl->m_cDynSelectionResult.Reset();
+
+	pcImpl->View().SuppressUpdate(false);
+
+	pcImpl->View().Update();
 }

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <Json.h>
 
@@ -36,6 +36,8 @@ namespace H3DF
 		void Update() const;
 		void Update(Json::Object & cInObject) const;
 		void Update(Json::Object & cInObject, Window::UpdateType eInType, H3DF::Time dInTimeLimit = -1.0) const;
+
+		void SuppressUpdate(bool bSuppress);
 
 		void Destruct();
 		void Resize(int x, int y);

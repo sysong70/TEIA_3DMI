@@ -219,10 +219,10 @@ CString H3DF::Utility::GetTypeString(Type eType)
 	return strText;
 }
 
-Type H3DF::Utility::GetType(HC_KEY nKey)
+Type H3DF::Utility::GetType(HC_KEY nInKey)
 {
 	CStringA strType;
-	HC_Show_Key_Type(nKey, strType.GetBuffer());
+	HC_Show_Key_Type(nInKey, strType.GetBuffer());
 	strType.ReleaseBuffer();
 
 	if ("segment" == strType) {
@@ -237,6 +237,28 @@ Type H3DF::Utility::GetType(HC_KEY nKey)
 
 	return H3DF::Type::None;
 }
+
+CStringA H3DF::Utility::GetName(HC_KEY nInKey)
+{
+	CStringA strName;
+	if (H3DF::Type::IncludeKey == GetType(nInKey)) {
+		IncludeKey cInclude(nInKey);
+		SegmentKey cSegment = cInclude.GetTarget();
+		strName = cSegment.Name(false);
+	}
+	else {
+		SegmentKey cSegment(nInKey);
+		strName = cSegment.Name(false);
+	}
+
+	return strName;
+}
+
+CStringA H3DF::Utility::GetName(Key & cInKey)
+{
+	return GetName(cInKey.KeyValue());
+}
+
 
 //== String 관련 함수 ===============================================================================
 bool H3DF::Utility::UnicodeToChar(CString strText, char *& pchBuffer)
@@ -553,7 +575,15 @@ bool H3DF::UserData::ShowSegmentName(SegmentKey & cInSegment, CString & strName)
 
 bool H3DF::UserData::ShowSegmentName(HC_KEY nInKey, CString & strOutName)
 {
-	SegmentKey cSegment(nInKey);
+	SegmentKey cSegment;
+
+	if (Type::IncludeKey == Utility::GetType(nInKey)) {
+		IncludeKey cInclude(nInKey);
+		cSegment = cInclude.GetTarget();
+	}
+	else {
+		cSegment = SegmentKey(nInKey);
+	}
 
 	ByteArray aUserData;
 	if (false == cSegment.ShowUserData((intptr_t)UserDataIndex::Name, aUserData)) {

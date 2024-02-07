@@ -63,6 +63,8 @@ KERNEL::Operator::Camera::Camera(const H3DF::View * pcInView, const Signal::Deli
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;
+
+	pcImpl->CameraControl();
 }
 
 int KERNEL::Operator::Camera::MouseMove(HEventInfo & cInEvent)

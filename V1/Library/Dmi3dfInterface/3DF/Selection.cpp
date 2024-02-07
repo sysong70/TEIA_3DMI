@@ -1036,11 +1036,11 @@ void H3DF::SelectionResults::PushBack(SelectionItem & cInItem)
 	pcImpl->PushBack(cInItem);
 }
 
-bool H3DF::SelectionResults::Erase(SelectionItem & cItem)
+bool H3DF::SelectionResults::Erase(SelectionItem & cInItem)
 {
 	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
 	for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
-		if (*pcItemIter == cItem) {
+		if (*pcItemIter == cInItem) {
 			pcItemIter = pcImpl->Erase(pcItemIter);
 			return true;
 		}
@@ -1050,6 +1050,29 @@ bool H3DF::SelectionResults::Erase(SelectionItem & cItem)
 	}
 
 	return false;
+}
+
+bool H3DF::SelectionResults::Erase(SelectionResults const & cInResults)
+{
+	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	SelectionResultsImpl * pcInThatImpl = (SelectionResultsImpl *)cInResults.m_pcImpl;
+
+	if (nullptr == pcImpl || nullptr == pcInThatImpl) {
+		return false;
+	}
+
+	for (auto & cInThatItem : pcInThatImpl->GetItems()) {
+		for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
+			if (*pcItemIter == cInThatItem) {
+				pcItemIter = pcImpl->Erase(pcItemIter);
+			}
+			else {
+				++pcItemIter; // 다음 요소로 이동
+			}
+		}
+	}
+
+	return true;
 }
 
 // 내부 요소가 Size보다 큰 경우 Size 보다 큰 부분은 삭제한다.

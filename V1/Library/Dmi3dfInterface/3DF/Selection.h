@@ -294,7 +294,8 @@ namespace H3DF
 		void PushFront(SelectionItem & cInItem);
 		void PushBack(SelectionItem & cInItem);
 
-		bool Erase(SelectionItem & cItem);
+		bool Erase(SelectionItem & cInItem);
+		bool Erase(SelectionResults const & cInResults);
 
 		void SetSize(size_t nInSize);
 

@@ -826,12 +826,20 @@ HFileInputResult PointCloud::SpatiallySortPointCloud(HC_KEY seg_key)
             if (cpt.bit_field & VALID_POINT) {
                 valid_point_count++;
                 point_count++;
+
+                // fIntensity 적용하는 부분
+                float fIntensity = GetScaledIntensity(&cpt);
+				cpt.rgb_color.red = fIntensity;
+				cpt.rgb_color.green = fIntensity;
+				cpt.rgb_color.blue = fIntensity;
+
                 PCPoint* new_cpt = point_pool->GetNewPoint(cpt);
                 if (cpt.bit_field & VALID_RGB) {
                     if (!has_rgb_points)
                         color_point_bsp =
                             new VBSP<PCPoint*>(m_std_bbox, -1, m_point_cloud_options->m_maxShellSize, true, 0.50f, 0.50f);
                     has_rgb_points = true;
+
                     color_point_bsp->Insert(new_cpt, (double*)new_cpt);
                 }
                 else if (cpt.bit_field & VALID_INTENSITY) {
@@ -1053,14 +1061,14 @@ bool PointCloud::InsertShells(BSPData* bsp_data)
     float inv_file_size = 1.0f / (float)file_size;
 
     int bucket;
-    int point_list_len = 0;
+    int nPointListLength = 0;
     float* point_list = new float[3 * bsp_data->m_point_cloud_options->m_maxShellSize];
     float* colors = new float[3 * bsp_data->m_point_cloud_options->m_maxShellSize];
 
     ReadWriteStatus status = OK;
     bool has_rgb_colors;
     HC_KEY shell_key;
-    unsigned long total_point_count = 0;
+    unsigned long nTotalPointCount = 0;
     while (true) {
         has_rgb_colors = false;
         bsp_data->m_reader->Read(&bucket, sizeof(int));
@@ -1079,12 +1087,12 @@ bool PointCloud::InsertShells(BSPData* bsp_data)
 
         HC_Open_Segment_By_Key(bucket_seg_key);
         {
-            bsp_data->m_reader->Read(&point_list_len, sizeof(int));
+            bsp_data->m_reader->Read(&nPointListLength, sizeof(int));
 
             curr_pos += 2 * sizeof(int);
 
-            total_point_count += point_list_len;
-            for (int i = 0; i < point_list_len; ++i) {
+            nTotalPointCount += nPointListLength;
+            for (int i = 0; i < nPointListLength; ++i) {
                 status = bsp_data->m_reader->Read(&(point_list[3 * i]), 3 * sizeof(float));
 
                 curr_pos += 3 * sizeof(float);
@@ -1096,7 +1104,7 @@ bool PointCloud::InsertShells(BSPData* bsp_data)
             }
 
             if (has_rgb_colors) {
-                for (int i = 0; i < point_list_len; ++i) {
+                for (int i = 0; i < nPointListLength; ++i) {
                     status = bsp_data->m_reader->Read(&(colors[3 * i]), 3 * sizeof(float));
 
                     curr_pos += 3 * sizeof(float);
@@ -1108,10 +1116,10 @@ bool PointCloud::InsertShells(BSPData* bsp_data)
                 }
             }
 
-            if (point_list_len > bsp_data->m_point_cloud_options->m_minShellSize) {
-                shell_key = HC_KInsert_Shell(point_list_len, point_list, 0, 0);
+            if (nPointListLength > bsp_data->m_point_cloud_options->m_minShellSize) {
+                shell_key = HC_KInsert_Shell(nPointListLength, point_list, 0, 0);
                 if (has_rgb_colors)
-                    HC_MSet_Vertex_Colors_By_Value(shell_key, "vertices", 0, "RGB", point_list_len, colors);
+                    HC_MSet_Vertex_Colors_By_Value(shell_key, "vertices", 0, "RGB", nPointListLength, colors);
             }
             else {
                 BSPData::BadShell* bad_shell = 0;
@@ -1122,9 +1130,9 @@ bool PointCloud::InsertShells(BSPData* bsp_data)
                 HC_Open_Segment("bad_shells");
                 {
                     if (has_rgb_colors)
-                        bad_shell->AddPoints(point_list_len, point_list, colors);
+                        bad_shell->AddPoints(nPointListLength, point_list, colors);
                     else
-                        bad_shell->AddPoints(point_list_len, point_list);
+                        bad_shell->AddPoints(nPointListLength, point_list);
                 }
                 HC_Close_Segment();
             }

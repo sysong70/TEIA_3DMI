@@ -26,11 +26,8 @@ namespace KERNEL
 
 		protected:
 			void OnItemExpandedSignal(Json::Object & cInObject);
-			void ModelGroupItemExpanded();
-			void MeasurementsGroupItemExpanded();
-			void MarkupsGroupItemExpanded();
 
-			void ItemExpanded(ModelTreeItem * pcInItem, ModelTreeItem * pcInParentItem = nullptr);
+			void UserInterfaceItemExpanded(ModelTreeItem * pcInItem);
 
 			void OnItemSelectedSignal(Json::Object& cInObject);
 			void OnItemCheckedSignal(Json::Object & cInObject);

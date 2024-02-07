@@ -37,6 +37,9 @@ namespace KERNEL
 			void SetSelectionFilter(SelectionFilter::Type eInType);
 
 			//== Highlight 관련 함수 =================================================================
+			H3DF::HighlightControl & DynHighlightControl();
+
+			void Unhighlight(H3DF::SelectionResults const & cInItems);
 			void UnhighlightEverything();
 		};
 	}
