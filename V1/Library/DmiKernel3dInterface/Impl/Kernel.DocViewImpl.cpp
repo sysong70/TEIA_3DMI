@@ -17,6 +17,7 @@
 #include <3DF/Visibility.h>
 #include <3DF/LineAttribute.h>
 #include <3DF/AttributeLock.h>
+#include <3DF/NavigationCube.h>
 
 using namespace KERNEL;
 using namespace H3DF;
@@ -75,13 +76,21 @@ void KERNEL::DocViewImpl::AllocationOperator(H3DF::View * pcInView, Signal::Deli
 	// Camera Operator 생성 및 설정
 	KERNEL::Operator::Select * pcSelect = new KERNEL::Operator::Select(pcInView, &cDelivery);
 	m_apcOperator[(int)KERNEL::Operator::Type::Select] = pcSelect;
+	
 
-	// Camera Operator 생성 및 설정
+	// Model Panel Operator 생성 및 설정
 	KERNEL::Operator::ModelPanel * pcModelPanel = new KERNEL::Operator::ModelPanel(pcInView, &cDelivery);
 	pcModelPanel->SetSelect((KERNEL::Operator::Select *)m_apcOperator[(int)KERNEL::Operator::Type::Select]);
 	m_apcOperator[(int)KERNEL::Operator::Type::ModelPanel] = pcModelPanel;
 
 	pcSelect->SetModelPanel(pcModelPanel);
+
+	// Navigation Cube에서 사용하는 DynHighlightControl을 설정한다. Cube에서 선택된 부분을 Unhighlight하기 위함.
+	pcInView->GetNavigationCube().SetHighlightControl(pcSelect->DynHighlightControl());
+
+	for(auto & pcOperator : m_apcOperator) {
+		pcOperator->SetDocViewImpl(this);
+	}
 }
 
 KERNEL::Operator::OperatorBase * KERNEL::DocViewImpl::GetOperator(Operator::Type eInType)

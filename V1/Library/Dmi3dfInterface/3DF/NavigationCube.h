@@ -14,7 +14,7 @@ namespace H3DF
 {
 	class BaseView;
 
-	class NavigationCube : public Object
+	class API_3DF NavigationCube : public Object
 	{
 	public:
 
@@ -36,6 +36,8 @@ namespace H3DF
 		bool IsValid();
 
 		bool IsInitialized();
+
+		void SetHighlightControl(H3DF::HighlightControl & cInHighlightCtrl);
 
 	public:
 

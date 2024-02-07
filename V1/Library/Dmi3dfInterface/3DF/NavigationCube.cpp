@@ -107,6 +107,8 @@ public:
 			m_cSegments[nIndex] = pcInThat->m_cSegments[nIndex];
 		}
 
+		m_pcHighlightCtrl = pcInThat->m_pcHighlightCtrl;
+
 		m_cOldHighlightSelection = pcInThat->m_cOldHighlightSelection;
 	}
 
@@ -121,13 +123,15 @@ public:
 
 	SegmentKey m_cSegments[(int)H3DF::ViewDirection::Mode::Count];
 
+	H3DF::HighlightControl * m_pcHighlightCtrl = nullptr;
+
 	SelectionResults m_cOldHighlightSelection;
 };
 
 H3DF::NavigationCube::NavigationCube(H3DF::BaseView * view, WindowKey * pcInWindow)
 {
 	NavigationCubeImpl * pcImpl = new NavigationCubeImpl();
-	if (nullptr == pcImpl) { assert(false); }
+	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;
 
@@ -181,13 +185,15 @@ int H3DF::NavigationCube::LButtonUp(HEventInfo & cInEvent)
 	CStringA strName = cSelectKey.Name();
 	// TRACE(L"%s\n", strName);
 
-	// pcImpl->m_pcWindow->GetBaseView()->GetHighlightSelection()->DeSelectAll();
-
 	for (int nIndex = 0; nIndex < (int)H3DF::ViewDirection::Mode::Count; nIndex++) {
 		if (pcImpl->m_cSegments[nIndex] == cSelectKey) {
 			// 선택이 되었다면 Unhighlight하도록 한다.
-			pcImpl->m_pcWindow->GetHighlightControl().UnhighlightEverything();
+			if (nullptr != pcImpl->m_pcHighlightCtrl) {
+				pcImpl->m_pcHighlightCtrl->UnhighlightEverything();
+			}
+
 			pcImpl->m_pView->SetViewDirection((H3DF::ViewDirection::Mode)nIndex);
+
 			return HLISTENER_CONSUME_EVENT;
 		}
 	}
@@ -198,7 +204,7 @@ int H3DF::NavigationCube::LButtonUp(HEventInfo & cInEvent)
 int H3DF::NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
+	DEBUG_VALID(pcImpl);
 
 	if (0 < pcImpl->m_cOldHighlightSelection.GetCount()) {
 		pcImpl->m_pcWindow->GetHighlightControl().Unhighlight(pcImpl->m_cOldHighlightSelection);
@@ -211,7 +217,7 @@ int H3DF::NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)
 void H3DF::NavigationCube::SetView(H3DF::BaseView * view, WindowKey * pcInWindow) 
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
+	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_pView = view;
 	pcImpl->m_pcWindow = pcInWindow;
@@ -220,7 +226,7 @@ void H3DF::NavigationCube::SetView(H3DF::BaseView * view, WindowKey * pcInWindow
 bool H3DF::NavigationCube::IsValid()
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
+	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cubeSegment != HC_ERROR_KEY;
 }
@@ -228,15 +234,23 @@ bool H3DF::NavigationCube::IsValid()
 bool H3DF::NavigationCube::IsInitialized()
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
+	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_bInitialized;
+}
+
+void H3DF::NavigationCube::SetHighlightControl(H3DF::HighlightControl & cInHighlightCtrl)
+{
+	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_pcHighlightCtrl = &cInHighlightCtrl;
 }
 
 void H3DF::NavigationCube::Create(float width, float height, HC_KEY parent)
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
+	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_windowSize.x = width;
 	pcImpl->m_windowSize.y = height;
@@ -309,7 +323,7 @@ void H3DF::NavigationCube::Create(float width, float height, HC_KEY parent)
 void H3DF::NavigationCube::Recreate()
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
+	DEBUG_VALID(pcImpl);
 
 	HC_Open_Segment_By_Key(pcImpl->m_parentSegment);
 	HC_Delete_By_Key(pcImpl->m_cubeSegment);
@@ -332,7 +346,7 @@ void H3DF::NavigationCube::Transform()
 {
 
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
+	DEBUG_VALID(pcImpl);
 
 	HPoint position, target, up_vector;
 
@@ -380,7 +394,7 @@ void H3DF::NavigationCube::OnSize(float width, float height)
 void H3DF::NavigationCube::OpenCubeSegment()
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
+	DEBUG_VALID(pcImpl);
 
 	if (pcImpl->m_cubeSegment == HC_ERROR_KEY) {
 		pcImpl->m_cubeSegment = HC_Open_Segment("cube_window");
@@ -418,7 +432,7 @@ void H3DF::NavigationCube::CreateAxis()
 void H3DF::NavigationCube::CreateCube()
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
+	DEBUG_VALID(pcImpl);
 
 	double unit = PRESET::PlaneUnit();
 
@@ -674,7 +688,7 @@ HC_KEY H3DF::NavigationCube::CreateAxis(const char* name, const char* text, HPoi
 void H3DF::NavigationCube::SetWindowSize(double width, double height, bool openSegment)
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
+	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_windowSize.x = width;
 	pcImpl->m_windowSize.y = height;

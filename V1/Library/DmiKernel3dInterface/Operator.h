@@ -7,6 +7,8 @@
 
 namespace KERNEL
 {
+	class DocViewImpl;
+
 	namespace Operator
 	{
 		enum class Type
@@ -23,6 +25,9 @@ namespace KERNEL
 		{
 		public:
 			OperatorBase();
+
+			void SetDocViewImpl(KERNEL::DocViewImpl * pcInDocView);
+			KERNEL::DocViewImpl & DocViewImpl();
 		};
 	}
 }

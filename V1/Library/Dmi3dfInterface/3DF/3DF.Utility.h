@@ -15,8 +15,10 @@ namespace H3DF
 
 		CString HexStr(DWORD_PTR nValue);
 
-		CString GetTypeString(Type eType);
-		API_3DF Type GetType(HC_KEY nKey);
+		API_3DF CString GetTypeString(Type eType);
+		API_3DF Type GetType(HC_KEY nInKey);
+		API_3DF CStringA GetName(HC_KEY nInKey);
+		API_3DF CStringA GetName(Key & cInKey);
 
 		//== String 관련 함수 ========================================================================
 		// 사용후 Buffer를 삭제해야 함.

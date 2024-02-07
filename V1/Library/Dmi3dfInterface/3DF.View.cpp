@@ -131,6 +131,14 @@ void H3DF::View::Update(Json::Object & cInObject, Window::UpdateType eInType, H3
 	Update(cInObject);
 }
 
+void H3DF::View::SuppressUpdate(bool bSuppress)
+{
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->GetBaseView()->SetSuppressUpdate(bSuppress);
+}
+
 void H3DF::View::Destruct()
 {
 	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
