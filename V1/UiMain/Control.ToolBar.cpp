@@ -60,9 +60,9 @@ void Control::ToolBar::SetPivot(EPivot pivot, bool expandSize)
 
 
 
-CBCGPButton* Control::ToolBar::AddButton(UINT id, bool menu)
+CBCGPButton* Control::ToolBar::AddButton(UINT id, bool menu, bool toggle)
 {
-	CBCGPButton* button = CreateButton(id, menu);
+	CBCGPButton* button = CreateButton(id, menu, toggle);
 	m_buttons.push_back(button);
 
 	return button;
@@ -228,9 +228,14 @@ CBCGPButton* Control::ToolBar::GetButton(UINT id)
 
 
 
-void Control::ToolBar::IsCheckButton(bool value)
+bool Control::ToolBar::GetCheck(UINT id)
 {
-	m_bCheckButton = value;
+	CBCGPButton* pButton = GetButton(id);
+	if (pButton != nullptr) {
+		return pButton->IsChecked();
+	}
+
+	return false;
 }
 
 
@@ -240,16 +245,14 @@ void Control::ToolBar::SetCheck(UINT id, bool value, bool uncheckOthers)
 	if (uncheckOthers) {
 		for (auto button : m_buttons) {
 			if (button != nullptr) {
-				button->SetCheck(FALSE);
+				button->SendMessage(BM_SETCHECK, BST_UNCHECKED);
 			}
 		}
 	}
 
-	for (auto button : m_buttons) {
-		if (button != nullptr && button->GetDlgCtrlID() == id) {
-			button->SetCheck((BOOL)value);
-			return;
-		}
+	CBCGPButton* pButton = GetButton(id);
+	if (pButton != nullptr) {
+		pButton->SendMessage(BM_SETCHECK, value ? BST_CHECKED : BST_UNCHECKED);
 	}
 }
 
@@ -283,6 +286,15 @@ void Control::ToolBar::SetSize(EItemSize size)
 	default:
 		m_imageSize = CSize(24, 24);
 		break;
+	}
+}
+
+
+
+void Control::ToolBar::SetToggle(UINT id)
+{
+	CBCGPButton* pButton = GetButton(id);
+	if (pButton != nullptr) {
 	}
 }
 
@@ -330,7 +342,7 @@ void Control::ToolBar::OnSize(UINT nType, int cx, int cy)
 
 
 
-CBCGPButton* Control::ToolBar::CreateButton(UINT id, bool menu)
+CBCGPButton* Control::ToolBar::CreateButton(UINT id, bool menu, bool toggle)
 {
 	CBCGPButton* pButton = menu ? new CBCGPMenuButton() : new CBCGPButton();
 	DEBUG_VALID(pButton);
@@ -341,7 +353,7 @@ CBCGPButton* Control::ToolBar::CreateButton(UINT id, bool menu)
 	button.m_bVisualManagerStyle = TRUE;
 
 	DWORD dwStyle;
-	if (m_bCheckButton) {
+	if (toggle) {
 		dwStyle = BS_AUTOCHECKBOX | BS_PUSHLIKE | BS_ICON | WS_CHILD | WS_VISIBLE;
 	}
 	else {

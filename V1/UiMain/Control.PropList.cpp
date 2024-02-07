@@ -663,12 +663,9 @@ CBCGPProp* Control::PropList::CreateSliderProp(Json::Object& design)
 		0, Facility::GetDescription(design));
 	SetProperty(pProp, design);
 
-	int min = design.GetInteger("min", -1);
-	ASSERT(min >= 0);
-	int max = design.GetInteger("max", -1);
-	ASSERT(max >= 0);
+	int min = design.GetInteger("min");
+	int max = design.GetInteger("max");
 	int step = design.GetInteger("step", 1);
-	ASSERT(step < max);
 
 	pProp->SetRange(min, max, step);
 

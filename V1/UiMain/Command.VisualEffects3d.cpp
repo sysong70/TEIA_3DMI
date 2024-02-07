@@ -63,7 +63,6 @@ protected:
 	void ConstructHeader() override
 	{
 		m_toolBar.SetPivot(Control::EPivot::TopLeft);
-		m_toolBar.IsCheckButton(true);
 		m_toolBar.Initialize(this, PRESET::ToolBar);
 
 		m_toolBar.AddButton(HOME_3D_CMD_ViewStyle_Shade);

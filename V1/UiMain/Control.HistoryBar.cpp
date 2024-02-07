@@ -32,7 +32,7 @@ void Control::HistoryBar::PushButton(UINT id)
 	}
 
 	// insert front
-	m_buttons.insert(m_buttons.begin(), CreateButton(id, false));
+	m_buttons.insert(m_buttons.begin(), CreateButton(id, false, false));
 	AdjustLayout();
 	ShowWindow(SW_SHOW);
 }

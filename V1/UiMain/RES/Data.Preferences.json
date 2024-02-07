@@ -1,5 +1,5 @@
 ﻿{
-	"version":"240207.1",
+	"version":"240207.6",
 	"Environment":{
 		"General":{
 			"Language":0
@@ -23,8 +23,12 @@
 		}
 	},
 	"ModelTree":{
+		"General":{
+			"GridLines":false,
+			"AlternateRows":false
+		},
 		"Colors":{
-			"Backgound":1
+			"Background":0
 		}
 	}
 }

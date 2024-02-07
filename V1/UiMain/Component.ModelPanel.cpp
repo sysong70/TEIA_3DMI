@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "resource.h"
 #include "Component.ModelPanel.h"
+#include "Control.h"
 #include "Facility.h"
 #include "Facility.AppOptions.h"
 #include "Window.Document.h"
@@ -19,7 +20,7 @@ static char THIS_FILE[] = __FILE__;
 #include "Window.Application.h"
 #include <WStr.h>
 
-#define _LOG
+//#define _LOG
 #ifdef _LOG
 #define DEBUG_LOG(s) TheApplication.GetMainFrame().GetDebugTracer().AddLog(s)
 #else
@@ -58,7 +59,7 @@ BEGIN_MESSAGE_MAP(ModelPanel, Panel)
 	ON_NOTIFY(TVN_DELETEITEM, PRESET::Id, OnTreeDeleteItem)
 	ON_NOTIFY(TVN_ENDLABELEDIT, PRESET::Id, OnTreeEndLabelEdit)
 	ON_NOTIFY(TVN_ITEMEXPANDED, PRESET::Id, OnTreeItemExpanded)
-	//ON_NOTIFY(TVN_ITEMEXPANDING, PRESET::Id, OnTreeItemExpanding)
+	ON_NOTIFY(TVN_ITEMEXPANDING, PRESET::Id, OnTreeItemExpanding)
 	ON_NOTIFY(TVN_SELCHANGED, PRESET::Id, OnTreeSelChanged)
 	//ON_NOTIFY(TVN_SELCHANGING, PRESET::Id, OnTreeSelChanging)
 
@@ -123,8 +124,11 @@ int Component::ModelPanel::ConstructHeader(int cx)
 	m_toolBar.AddButton(TOOLBAR_3D_CMD_Sort_ByAscending);
 	m_toolBar.AddButton(TOOLBAR_3D_CMD_Sort_ByDescending);
 	m_toolBar.AddSeperator();
-	m_toolBar.AddButton(TOOLBAR_3D_CMD_Option_GridLines);
-	m_toolBar.AddButton(TOOLBAR_3D_CMD_Option_AlternateRows);
+	m_toolBar.AddButton(TOOLBAR_3D_CMD_Option_GridLines, false, true);
+	m_toolBar.AddButton(TOOLBAR_3D_CMD_Option_AlternateRows, false, true);
+
+	m_toolBar.SetCheck(TOOLBAR_3D_CMD_Option_GridLines, TheAppOptions.GetBoolean("ModelTree/General/GridLines"), false);
+	m_toolBar.SetCheck(TOOLBAR_3D_CMD_Option_AlternateRows, TheAppOptions.GetBoolean("ModelTree/General/AlternateRows"), false);
 
 	return m_nHeaderHeight = m_toolBar.AdjustLayout().cy;
 }
@@ -142,7 +146,7 @@ void Component::ModelPanel::ConstructBody()
 //		| TVM_EDITLABEL
 		/// Enables full-row selection in the tree view.
 		/// This style cannot be used in conjunction with the TVS_HASLINES style.
-//		| TVS_FULLROWSELECT
+		| TVS_FULLROWSELECT
 		/// Displays plus (+) and minus (-) buttons next to parent items.
 		/// To include buttons with items at the root of the tree view, TVS_LINESATROOT must also be specified.
 		| TVS_HASBUTTONS
@@ -175,8 +179,8 @@ void Component::ModelPanel::ConstructBody()
 
 	m_wndControl.SetVisualManagerColorTheme();
 	m_wndControl.EnableColumnAutoSize();
-	m_wndControl.EnableAlternateRows(FALSE);
-	m_wndControl.EnableGridLines(FALSE);
+	m_wndControl.EnableAlternateRows(m_toolBar.GetCheck(TOOLBAR_3D_CMD_Option_AlternateRows));
+	m_wndControl.EnableGridLines(m_toolBar.GetCheck(TOOLBAR_3D_CMD_Option_GridLines));
 	m_wndControl.ModifyStyle(0, TVS_CHECKBOXES); // EnableCheckBoxes() not working
 	//m_wndControl.SetCustomRowHeight(TreeRowHeight());
 	m_wndControl.SetSingleSel(FALSE);
@@ -192,13 +196,36 @@ void Component::ModelPanel::ConstructBody()
 	m_wndControl.EnableFilterBar(TRUE, filter);
 	m_wndControl.OnFilterBarUpdate(0);
 
-	//:TODO - from Control::EColor
-	//int backColor = TheAppOptions.GetInteger("ModelTree/Colors/Backgound");
-	//COLORREF background = 0;
-	//m_wndControl.SetCustomColors(background, -1, -1, -1, -1, -1);
+	// Set color theme
+
+	int backColor = TheAppOptions.GetInteger("ModelTree/Colors/Background");
+
+	if (backColor != 0) {
+		COLORREF clrBackground;
+		COLORREF clrText;
+		COLORREF clrGroupBackground;
+		COLORREF clrGroupText;
+		COLORREF clrLeftOffset;
+		COLORREF clrLine;
+		m_wndControl.GetCustomColors(clrBackground, clrText, clrGroupBackground, clrGroupText, clrLeftOffset, clrLine);
+
+		switch (backColor) {
+		case -2:	clrBackground = RGB(0x20, 0x20, 0x20); break;
+		case -1:	clrBackground = RGB(0x25, 0x25, 0x25); break;
+		case 1:		clrBackground = RGB(0x35, 0x35, 0x35); break;
+		case 2:		clrBackground = RGB(0x40, 0x40, 0x40); break;
+
+		default:
+			// 0 - 0x303030
+			DEBUG_STOP;
+		}
+
+		//:WARNING - (COLORREF)-1 not available
+		m_wndControl.SetCustomColors(clrBackground, clrText, clrGroupBackground, clrGroupText, clrLeftOffset, clrLine);
+	}
 
 	//:TEST - item image
-	//*
+	/*
 	CImageList* pImages = new CImageList;
 	CBCGPToolBarImages images;
 	images.SetImageSize(globalUtils.ScaleByDPI(CSize(16, 16)));
@@ -223,18 +250,36 @@ void Component::ModelPanel::OnCommand(UINT id)
 	}
 
 	switch (id) {
-	case TOOLBAR_3D_CMD_Sort_ByOriginal:      m_wndControl.RemoveSortColumn(0);     break;
-	case TOOLBAR_3D_CMD_Sort_ByAscending:     m_wndControl.SetSortColumn(0, TRUE);  break;
-	case TOOLBAR_3D_CMD_Sort_ByDescending:    m_wndControl.SetSortColumn(0, FALSE); break;
-	case TOOLBAR_3D_CMD_Option_GridLines:     EnableGridLines();                    break;
-	case TOOLBAR_3D_CMD_Option_AlternateRows: EnableAlternateRows();                break;
+	case TOOLBAR_3D_CMD_Sort_ByOriginal:
+		m_wndControl.RemoveSortColumn(0);
+		m_wndControl.AdjustLayout();
+		break;
+
+	case TOOLBAR_3D_CMD_Sort_ByAscending:
+		m_wndControl.SetSortColumn(0, TRUE);
+		m_wndControl.AdjustLayout();
+		break;
+
+	case TOOLBAR_3D_CMD_Sort_ByDescending:
+		m_wndControl.SetSortColumn(0, FALSE);
+		m_wndControl.AdjustLayout();
+		break;
+
+	case TOOLBAR_3D_CMD_Option_GridLines:
+		m_wndControl.EnableGridLines(m_toolBar.GetCheck(id));
+		break;
+
+	case TOOLBAR_3D_CMD_Option_AlternateRows:
+		m_wndControl.EnableAlternateRows(m_toolBar.GetCheck(id));
+		break;
 
 	default:
-		DEBUG_RETURN;
+		DEBUG_STOP;
+		break;
 	}
 
-	m_wndControl.AdjustLayout();
 	m_wndControl.RedrawWindow();
+	m_wndControl.SetFocus();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -551,7 +596,7 @@ HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR
 	DEBUG_LOG(WStr::Format(L"\t- %s", title));
 
 	//:TEST - no avilable, TVHT_ONITEMLABEL
-	m_wndControl.SetItemImage(hItem, 0, 1);
+	//m_wndControl.SetItemImage(hItem, 0, 1);
 	m_wndControl.SetItemData(hItem, key);
 	m_keyMap[key] = hItem;
 
@@ -784,22 +829,6 @@ void Component::ModelPanel::RedrawTree(bool value)
 	if (value) {
 		m_wndControl.RedrawWindow();
 	}
-}
-
-
-
-void Component::ModelPanel::EnableAlternateRows()
-{
-	m_bAlternateRows = !m_bAlternateRows;
-	m_wndControl.EnableAlternateRows(m_bAlternateRows);
-}
-
-
-
-void Component::ModelPanel::EnableGridLines()
-{
-	m_bGridLines = !m_bGridLines;
-	m_wndControl.EnableGridLines(m_bGridLines);
 }
 
 #undef PRESET

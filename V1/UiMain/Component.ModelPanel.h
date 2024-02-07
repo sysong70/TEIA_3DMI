@@ -27,9 +27,9 @@ namespace Component
 		// Create toolbar
 		int ConstructHeader(int cx) override;
 
-		void OnCommand(UINT id);
-
 	private:
+
+		afx_msg void OnCommand(UINT id);
 
 		afx_msg LRESULT OnTreeCheckClick(WPARAM wp, LPARAM lp);
 
@@ -99,12 +99,5 @@ namespace Component
 		bool m_bExpanding = false;
 
 		CString m_sFilterMessage = L"";
-		bool m_bAlternateRows = false;
-		bool m_bCheckBoxes = false;
-		bool m_bGridLines = false;
-
-		void EnableAlternateRows();
-
-		void EnableGridLines();
 	};
 }
