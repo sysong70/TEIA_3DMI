@@ -85,15 +85,6 @@
 					{"type":"check", "name":"ShowAxis", "title":"Show Axis|축 보기", "desc":"__#__|__#__"},
 					{"type":"check", "name":"ShowCube", "title":"Show Cube|큐브 보기", "desc":"__#__|__#__"}
 				]}
-			]},
-			"ModelTree":{"type":"root", "items":[
-				{"type":"group", "name":"General", "title":"General|일반", "items":[
-					{"type":"check", "name":"GridLines", "title":"Grid Lines|__#__", "desc":"__#__|__#__"},
-					{"type":"check", "name":"AlternateRows", "title":"Alternate Rows|__#__", "desc":"__#__|__#__"}
-				]},
-				{"type":"group", "name":"Colors", "title":"Colors|색상", "items":[
-					{"type":"slider", "name":"Background", "title":"Background|배경", "desc":"__#__|__#__", "min":-2, "max":2}
-				]}
 			]}
 		}
 	},

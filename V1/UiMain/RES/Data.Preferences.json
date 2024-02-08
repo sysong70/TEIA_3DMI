@@ -21,14 +21,5 @@
 			"ShowAxis":true,
 			"ShowCube":true
 		}
-	},
-	"ModelTree":{
-		"General":{
-			"GridLines":false,
-			"AlternateRows":false
-		},
-		"Colors":{
-			"Background":0
-		}
 	}
 }

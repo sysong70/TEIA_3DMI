@@ -16,7 +16,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetApplication
 
@@ -34,6 +34,38 @@ namespace PresetApplication
 		return appPath.Left(nPos);
 	}
 }
+
+//--------------------------------------------------------------------------------------------------
+
+class VisualManagerCustom : public CBCGPVisualManager2019
+{
+public:
+
+	DECLARE_DYNCREATE(VisualManagerCustom);
+
+public:
+
+	VisualManagerCustom() : CBCGPVisualManager2019() {}
+
+public:
+
+	//:WANING - replace check box(line) color
+	BOOL DrawCheckBox(CDC* pDC, CRect rect, BOOL bHighlighted, int nState, BOOL bEnabled, BOOL bPressed) override
+	{
+		COLORREF prev = globalData.clrBarDkShadow;
+		globalData.clrBarDkShadow = RGB(0xA0, 0xA0, 0xA0);
+
+		__super::DrawCheckBox(pDC, rect, bHighlighted, nState, bEnabled, bPressed);
+
+		globalData.clrBarDkShadow = prev;
+
+		return TRUE;
+	}
+};
+
+IMPLEMENT_DYNCREATE(VisualManagerCustom, CBCGPVisualManager2019)
+
+//--------------------------------------------------------------------------------------------------
 
 //:REF - C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\atlmfc\src\mfc\doctempl.cpp
 
@@ -103,6 +135,8 @@ public:
 	}
 };
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region About Dialog
 
 class CAboutDlg	: public CBCGPDialog
@@ -135,6 +169,8 @@ END_MESSAGE_MAP()
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
 Window::Application TheApplication;
 
 using namespace Window;
@@ -154,7 +190,9 @@ Window::Application::Application()
 
 	// Support Restart Manager
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_ALL_ASPECTS;
-	SetVisualTheme(BCGP_VISUAL_THEME_OFFICE_2019_BLACK);
+
+	//:WARNING - use SetCustomVisualManger()
+	//SetVisualTheme(BCGP_VISUAL_THEME_OFFICE_2019_BLACK);
 }
 
 
@@ -276,7 +314,7 @@ BOOL Window::Application::InitInstance()
 	InitCommonControlsEx(&InitCtrls);
 
 	__super::InitInstance();
-	InitializeBcg();
+	SetCustomVisualManager();
 
 	// Initialize OLE libraries
 	if (AfxOleInit() == FALSE) {
@@ -379,45 +417,68 @@ void Window::Application::OnAppAbout()
 
 
 
-void Window::Application::InitializeBcg()
+void Window::Application::SetCustomVisualManager()
 {
-	//COLORREF clrActiveBorder = globalData.clrActiveBorder;
-	//COLORREF clrActiveCaption = globalData.clrActiveCaption;
-	//COLORREF clrActiveCaptionGradient = globalData.clrActiveCaptionGradient;
-	//COLORREF clrBarDkShadow = globalData.clrBarDkShadow;
-	//COLORREF clrBarFace = globalData.clrBarFace;
-	//COLORREF clrBarHilite = globalData.clrBarHilite;
-	//COLORREF clrBarLight = globalData.clrBarLight;
-	//COLORREF clrBarShadow = globalData.clrBarShadow;
-	//COLORREF clrBarText = globalData.clrBarText;
-	//COLORREF clrBarWindow = globalData.clrBarWindow;
-	//COLORREF clrBtnDkShadow = globalData.clrBtnDkShadow;
-	//COLORREF clrBtnFace = globalData.clrBtnFace;
-	//COLORREF clrBtnHilite = globalData.clrBtnHilite;
-	//COLORREF clrBtnLight = globalData.clrBtnLight;
-	//COLORREF clrBtnShadow = globalData.clrBtnShadow;
-	//COLORREF clrBtnText = globalData.clrBtnText;
-	//COLORREF clrCaptionText = globalData.clrCaptionText;
-	//COLORREF clrGrayedText = globalData.clrGrayedText;
-	//COLORREF clrHilite = globalData.clrHilite;
-	//COLORREF clrHotLinkText = globalData.clrHotLinkText;
-	//COLORREF clrHotText = globalData.clrHotText;
-	//COLORREF clrInactiveBorder = globalData.clrInactiveBorder;
-	//COLORREF clrInactiveCaption = globalData.clrInactiveCaption;
-	//COLORREF clrInactiveCaptionGradient = globalData.clrInactiveCaptionGradient;
-	//COLORREF clrInactiveCaptionText = globalData.clrInactiveCaptionText;
-	//COLORREF clrMenuText = globalData.clrMenuText;
-	//COLORREF clrPrompt = globalData.clrPrompt;
-	//COLORREF clrTextHilite = globalData.clrTextHilite;
-	//COLORREF clrWindow = globalData.clrWindow;
-	//COLORREF clrWindowFrame = globalData.clrWindowFrame;
-	//COLORREF clrWindowText = globalData.clrWindowText;
+#pragma region Create visual manager - based BCGP_VISUAL_THEME_OFFICE_2019_BLACK;
+	m_ActiveTheme = BCGP_VISUAL_THEME_CUSTOM;
+
+	//:WARNING - copy from CBCGPWinApp::SetVisualTheme(), BCGP_VISUAL_THEME_OFFICE_2019_BLACK
+	CBCGPVisualManager2019::SetStyle(CBCGPVisualManager2019::Office2016_Black);
+	CBCGPVisualManager::SetDefaultManager(RUNTIME_CLASS(VisualManagerCustom));
+
+	m_AppOptions.m_bMDIActiveTabBold = FALSE;
+	m_AppOptions.m_MDITabsCloseButtonMode = CBCGPTabWnd::TAB_CLOSE_BUTTON_ACTIVE;
+	m_AppOptions.m_bMDITabsLargeFont = TRUE;
+
+	m_AppOptions.m_strScenicRibbonLabel = _T("File");
+	m_AppOptions.m_bScenicRibbon = TRUE;
+	m_AppOptions.m_bRibbonMinimizeButton = TRUE;
+
+	CBCGPTabbedControlBar::ResetTabs();
+	CBCGPDockManager::SetDockMode(BCGP_DT_SMART);
+	CBCGPThemeSelectorComboBox::SelectActiveThemeInAllControls(this);
+
+#pragma endregion //:REGION
+
+	/// Colors
+
+	//globalData.clrActiveBorder;
+	//globalData.clrActiveCaption;
+	//globalData.clrActiveCaptionGradient;
+	//globalData.clrBarDkShadow;				// for CBCGPTreeCtrlEx check box, expand button, switch, ...
+	//globalData.clrBarFace;
+	//globalData.clrBarHilite;
+	//globalData.clrBarLight;
+	//globalData.clrBarShadow;
+	//globalData.clrBarText;
+	//globalData.clrBarWindow;
+	//globalData.clrBtnDkShadow;
+	//globalData.clrBtnFace;
+	//globalData.clrBtnHilite;
+	//globalData.clrBtnLight;
+	//globalData.clrBtnShadow;
+	//globalData.clrBtnText;
+	//globalData.clrCaptionText;
+	//globalData.clrGrayedText;
+	//globalData.clrHilite;
+	//globalData.clrHotLinkText;
+	//globalData.clrHotText;
+	//globalData.clrInactiveBorder;
+	//globalData.clrInactiveCaption;
+	//globalData.clrInactiveCaptionGradient;
+	//globalData.clrInactiveCaptionText;
+	//globalData.clrMenuText;
+	//globalData.clrPrompt;
+	//globalData.clrTextHilite;
+	//globalData.clrWindow;
+	//globalData.clrWindowFrame;
+	//globalData.clrWindowText;
+
+#pragma region // Visual manager-based tooltip
 
 	globalData.m_bIsDlgWsCaptionStyle = TRUE;
 	globalData.m_bUseDlgFontInControls = TRUE;
 	globalData.m_bUseVisualManagerInBuiltInDialogs = TRUE;
-
-	// Visual manager-based tooltip
 
 	CBCGPToolTipParams params;
 	params.m_bBoldLabel = FALSE;
@@ -429,7 +490,11 @@ void Window::Application::InitializeBcg()
 
 	GetTooltipManager()->SetTooltipParams(BCGP_TOOLTIP_TYPE_ALL, RUNTIME_CLASS(CBCGPToolTipCtrl), &params);
 
-	// Replace fonts
+#pragma endregion //:REGION
+
+#pragma region // Replace all fonts
+
+	const wchar_t DEFAULT_FONTNAME[] = L"Segoe UI";
 
 	enum EFontIndex
 	{
@@ -485,13 +550,14 @@ void Window::Application::InitializeBcg()
 		LOGFONT lf;
 		type.Font.GetLogFont(&lf);
 
-		//TRACE(L"%s, %s, %d\n", (LPCTSTR)type.Varialbe, lf.lfFaceName, lf.lfHeight);
-		::lstrcpy(lf.lfFaceName, L"Segoe UI");
+		::lstrcpy(lf.lfFaceName, DEFAULT_FONTNAME);
 		lf.lfHeight = appCaption.lfHeight;
 
 		type.Font.DeleteObject();
 		type.Font.CreateFontIndirect(&lf);
 	}
+
+#pragma endregion //:REGION
 }
 
 #undef PRESET

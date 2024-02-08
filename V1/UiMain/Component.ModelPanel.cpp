@@ -123,12 +123,12 @@ int Component::ModelPanel::ConstructHeader(int cx)
 	m_toolBar.AddButton(TOOLBAR_3D_CMD_Sort_ByOriginal);
 	m_toolBar.AddButton(TOOLBAR_3D_CMD_Sort_ByAscending);
 	m_toolBar.AddButton(TOOLBAR_3D_CMD_Sort_ByDescending);
-	m_toolBar.AddSeperator();
-	m_toolBar.AddButton(TOOLBAR_3D_CMD_Option_GridLines, false, true);
-	m_toolBar.AddButton(TOOLBAR_3D_CMD_Option_AlternateRows, false, true);
+	//m_toolBar.AddSeperator();
+	//m_toolBar.AddButton(TOOLBAR_3D_CMD_Option_GridLines, false, true);
+	//m_toolBar.AddButton(TOOLBAR_3D_CMD_Option_AlternateRows, false, true);
 
-	m_toolBar.SetCheck(TOOLBAR_3D_CMD_Option_GridLines, TheAppOptions.GetBoolean("ModelTree/General/GridLines"), false);
-	m_toolBar.SetCheck(TOOLBAR_3D_CMD_Option_AlternateRows, TheAppOptions.GetBoolean("ModelTree/General/AlternateRows"), false);
+	//m_toolBar.SetCheck(TOOLBAR_3D_CMD_Option_GridLines, TheAppOptions.GetBoolean("ModelTree/General/GridLines"), false);
+	//m_toolBar.SetCheck(TOOLBAR_3D_CMD_Option_AlternateRows, TheAppOptions.GetBoolean("ModelTree/General/AlternateRows"), false);
 
 	return m_nHeaderHeight = m_toolBar.AdjustLayout().cy;
 }
@@ -197,7 +197,7 @@ void Component::ModelPanel::ConstructBody()
 	m_wndControl.OnFilterBarUpdate(0);
 
 	// Set color theme
-
+	/*
 	int backColor = TheAppOptions.GetInteger("ModelTree/Colors/Background");
 
 	if (backColor != 0) {
@@ -223,7 +223,7 @@ void Component::ModelPanel::ConstructBody()
 		//:WARNING - (COLORREF)-1 not available
 		m_wndControl.SetCustomColors(clrBackground, clrText, clrGroupBackground, clrGroupText, clrLeftOffset, clrLine);
 	}
-
+	*/
 	//:TEST - item image
 	/*
 	CImageList* pImages = new CImageList;
@@ -252,34 +252,31 @@ void Component::ModelPanel::OnCommand(UINT id)
 	switch (id) {
 	case TOOLBAR_3D_CMD_Sort_ByOriginal:
 		m_wndControl.RemoveSortColumn(0);
-		m_wndControl.AdjustLayout();
 		break;
 
 	case TOOLBAR_3D_CMD_Sort_ByAscending:
 		m_wndControl.SetSortColumn(0, TRUE);
-		m_wndControl.AdjustLayout();
 		break;
 
 	case TOOLBAR_3D_CMD_Sort_ByDescending:
 		m_wndControl.SetSortColumn(0, FALSE);
-		m_wndControl.AdjustLayout();
 		break;
 
-	case TOOLBAR_3D_CMD_Option_GridLines:
-		m_wndControl.EnableGridLines(m_toolBar.GetCheck(id));
-		break;
+	//case TOOLBAR_3D_CMD_Option_GridLines:
+	//	m_wndControl.EnableGridLines(m_toolBar.GetCheck(id));
+	//	break;
 
-	case TOOLBAR_3D_CMD_Option_AlternateRows:
-		m_wndControl.EnableAlternateRows(m_toolBar.GetCheck(id));
-		break;
+	//case TOOLBAR_3D_CMD_Option_AlternateRows:
+	//	m_wndControl.EnableAlternateRows(m_toolBar.GetCheck(id));
+	//	break;
 
 	default:
 		DEBUG_STOP;
 		break;
 	}
 
+	m_wndControl.AdjustLayout();
 	m_wndControl.RedrawWindow();
-	m_wndControl.SetFocus();
 }
 
 //--------------------------------------------------------------------------------------------------
