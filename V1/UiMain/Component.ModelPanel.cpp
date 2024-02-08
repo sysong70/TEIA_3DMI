@@ -15,22 +15,26 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #include "Window.Application.h"
 #include <WStr.h>
 
-//#define _LOG
+#define _LOG
 #ifdef _LOG
 #define DEBUG_LOG(s) TheApplication.GetMainFrame().GetDebugTracer().AddLog(s)
 #else
 #define DEBUG_LOG DEBUG_TRACE
 #endif
 
+#define Control() (*m_pControl)
+
 #define DisableNotification(func) \
-m_wndControl.EnableTreeCtrlNotifications(FALSE); \
+Control().EnableTreeCtrlNotifications(FALSE); \
 func; \
-m_wndControl.EnableTreeCtrlNotifications(TRUE)
+Control().EnableTreeCtrlNotifications(TRUE)
+
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetModelPanel
 
@@ -41,14 +45,110 @@ namespace PresetModelPanel
 	WCHAR DummyName[] = L"Expanding...";
 }
 
+//--------------------------------------------------------------------------------------------------
 
+class ModelTree : public CBCGPTreeCtrlEx
+{
+public:
+
+	ModelTree()
+		: CBCGPTreeCtrlEx()
+	{
+		m_filterMessage = Facility::Local(L"Search models...|모델 검색...");
+		//:WANING - SetOutOfFilterLabel();
+		m_strOutOfFilter = Facility::Local(L"No items match your search.|일치하는 항목을 찾을 수 없습니다.");
+	}
+
+public:
+
+	void Initialize(CWnd* pParent, CRect rect)
+	{
+		//:REF - https://learn.microsoft.com/ko-kr/windows/win32/controls/tree-view-control-window-styles
+		DWORD dwStyle = WS_CHILD | WS_VISIBLE
+			/// Enables check boxes for items in a tree - view control.
+			| TVS_CHECKBOXES
+			/// Prevents the tree-view control from sending TVN_BEGINDRAG notification codes.
+	//		| TVS_DISABLEDRAGDROP
+			/// Allows the user to edit the labels of tree - view items.
+	//		| TVM_EDITLABEL
+			/// Enables full-row selection in the tree view.
+			/// This style cannot be used in conjunction with the TVS_HASLINES style.
+			| TVS_FULLROWSELECT
+			/// Displays plus (+) and minus (-) buttons next to parent items.
+			/// To include buttons with items at the root of the tree view, TVS_LINESATROOT must also be specified.
+			| TVS_HASBUTTONS
+			/// Uses lines to show the hierarchy of items.
+			| TVS_HASLINES
+			/// Obtains tooltip information by sending the TVN_GETINFOTIP notification.
+	//		| TVS_INFOTIP
+			/// Uses lines to link items at the root of the tree-view control.
+			/// This value is ignored if TVS_HASLINES is not also specified.
+			| TVS_LINESATROOT
+			/// Disables horizontal scrolling in the control.
+			/// The control will not display any horizontal scroll bars.
+			| TVS_NOHSCROLL
+			/// Disables tooltips.
+			| TVS_NOTOOLTIPS
+			/// Causes text to be displayed from right-to-left (RTL).
+	//		| TVS_RTLREADING
+			/// Causes a selected item to remain selected when the tree-view control loses focus.
+	//		| TVS_SHOWSELALWAYS
+			/// Causes the item being selected to expand and the item being unselected to collapse upon selection in the tree view.
+			/// If the user holds down the CTRL key while selecting an item, the item being unselected will not be collapsed.
+	//		| TVS_SINGLEEXPAND
+			/// Enables hot tracking in a tree-view control.
+	//		| TVS_TRACKSELECT
+			;
+
+		if (Create(dwStyle, rect, pParent, PRESET::Id) == FALSE) {
+			DEBUG_RETURN;
+		}
+
+		SetVisualManagerColorTheme();
+		EnableColumnAutoSize();
+		ModifyStyle(0, TVS_CHECKBOXES); //:WARNING - EnableCheckBoxes() not working
+		//SetCustomRowHeight(TreeRowHeight());
+		SetSingleSel(FALSE);
+		//:CHECK
+		SetShowInPlaceToolTip(TRUE);
+
+		//:WARNING - do not use local string
+		BCGP_GRID_FILTERBAR_OPTIONS filter(m_filterMessage);
+		filter.m_clrMarkBackground = (COLORREF)Control::EColor::White;
+		filter.m_clrMarkText = 0;
+		filter.m_bAutoExpandGroups = TRUE;
+		filter.m_bIncludeGroups = TRUE;
+
+		EnableFilterBar(TRUE, filter);
+		OnFilterBarUpdate(0);
+	}
+
+
+
+	HTREEITEM CustomHitTest(UINT& flag)
+	{
+		CPoint point;
+		::GetCursorPos(&point);
+		ScreenToClient(&point);
+
+		//:TODO - check image
+		return HitTest(point, &flag);
+	}
+
+
+private:
+
+	CString m_filterMessage;
+};
+
+//--------------------------------------------------------------------------------------------------
 
 using namespace Component;
 
 BEGIN_MESSAGE_MAP(ModelPanel, Panel)
 	ON_REGISTERED_MESSAGE(BCGM_GRID_ROW_CHECKBOX_CLICK, OnTreeCheckClick)
 
-	//ON_NOTIFY(NM_CLICK, PRESET::Id, OnTreeClick)
+	ON_NOTIFY(NM_CLICK, PRESET::Id, OnTreeClick)
 	ON_NOTIFY(NM_DBLCLK, PRESET::Id, OnTreeDblClick)
 	ON_NOTIFY(NM_RCLICK, PRESET::Id, OnTreeRClick)
 	ON_NOTIFY(NM_RDBLCLK, PRESET::Id, OnTreeRDbClick)
@@ -71,12 +171,14 @@ END_MESSAGE_MAP()
 
 Component::ModelPanel::ModelPanel()
 {
+	m_pControl = new ModelTree();
 }
 
 
 
 Component::ModelPanel::~ModelPanel()
 {
+	REMOVE_POINTER(m_pControl);
 }
 
 
@@ -110,107 +212,49 @@ void Component::ModelPanel::AdjustLayout(int cx, int cy)
 	__super::AdjustLayout(cx, cy);
 
 	CRect rect = GetBodyRect();
-	m_wndControl.SetWindowPos(NULL, rect.left, rect.top, rect.Width(), rect.Height(), SWP_NOACTIVATE);
+	Control().SetWindowPos(NULL, rect.left, rect.top, rect.Width(), rect.Height(), SWP_NOACTIVATE);
 }
 
 
 
 int Component::ModelPanel::ConstructHeader(int cx)
 {
-	m_toolBar.SetPivot(Control::EPivot::TopLeft);
-	m_toolBar.Initialize(this);
+	ToolBar().SetPivot(Control::EPivot::TopLeft);
+	ToolBar().Initialize(this);
 
-	m_toolBar.AddToggle(TOOLBAR_3D_CMD_Sort_ByOriginal);
-	m_toolBar.AddToggle(TOOLBAR_3D_CMD_Sort_ByAscending);
-	m_toolBar.AddToggle(TOOLBAR_3D_CMD_Sort_ByDescending);
+	ToolBar().AddToggle(TOOLBAR_3D_CMD_Sort_ByOriginal);
+	ToolBar().AddToggle(TOOLBAR_3D_CMD_Sort_ByAscending);
+	ToolBar().AddToggle(TOOLBAR_3D_CMD_Sort_ByDescending);
 
-	//m_toolBar.SetCheck(TOOLBAR_3D_CMD_Option_GridLines, TheAppOptions.GetBoolean("ModelTree/General/GridLines"), false);
-	//m_toolBar.SetCheck(TOOLBAR_3D_CMD_Option_AlternateRows, TheAppOptions.GetBoolean("ModelTree/General/AlternateRows"), false);
-
-	return m_nHeaderHeight = m_toolBar.AdjustLayout().cy;
+	return m_nHeaderHeight = ToolBar().AdjustLayout().cy;
 }
 
-//:REF - https://learn.microsoft.com/ko-kr/windows/win32/controls/tree-view-control-window-styles
+
 
 void Component::ModelPanel::ConstructBody()
 {
-	DWORD dwStyle = WS_CHILD | WS_VISIBLE
-		/// Enables check boxes for items in a tree - view control.
-		| TVS_CHECKBOXES
-		/// Prevents the tree-view control from sending TVN_BEGINDRAG notification codes.
-//		| TVS_DISABLEDRAGDROP
-		/// Allows the user to edit the labels of tree - view items.
-//		| TVM_EDITLABEL
-		/// Enables full-row selection in the tree view.
-		/// This style cannot be used in conjunction with the TVS_HASLINES style.
-		| TVS_FULLROWSELECT
-		/// Displays plus (+) and minus (-) buttons next to parent items.
-		/// To include buttons with items at the root of the tree view, TVS_LINESATROOT must also be specified.
-		| TVS_HASBUTTONS
-		/// Uses lines to show the hierarchy of items.
-		| TVS_HASLINES
-		/// Obtains tooltip information by sending the TVN_GETINFOTIP notification.
-//		| TVS_INFOTIP
-		/// Uses lines to link items at the root of the tree-view control.
-		/// This value is ignored if TVS_HASLINES is not also specified.
-		| TVS_LINESATROOT
-		/// Disables horizontal scrolling in the control.
-		/// The control will not display any horizontal scroll bars.
-		| TVS_NOHSCROLL
-		/// Disables tooltips.
-		| TVS_NOTOOLTIPS
-		/// Causes text to be displayed from right-to-left (RTL).
-//		| TVS_RTLREADING
-		/// Causes a selected item to remain selected when the tree-view control loses focus.
-//		| TVS_SHOWSELALWAYS
-		/// Causes the item being selected to expand and the item being unselected to collapse upon selection in the tree view.
-		/// If the user holds down the CTRL key while selecting an item, the item being unselected will not be collapsed.
-//		| TVS_SINGLEEXPAND
-		/// Enables hot tracking in a tree-view control.
-//		| TVS_TRACKSELECT
-		;
-
-	if (m_wndControl.Create(dwStyle, GetBodyRect(), this, PRESET::Id) == FALSE) {
-		DEBUG_RETURN;
-	}
-
-	m_wndControl.SetVisualManagerColorTheme();
-	m_wndControl.EnableColumnAutoSize();
-	m_wndControl.ModifyStyle(0, TVS_CHECKBOXES); //:WARNING - EnableCheckBoxes() not working
-	//m_wndControl.SetCustomRowHeight(TreeRowHeight());
-	m_wndControl.SetSingleSel(FALSE);
-
-	//:WARNING - do not use local string
-	BCGP_GRID_FILTERBAR_OPTIONS filter(m_sFilterMessage = Facility::Local(L"Search models...|모델 검색..."));
-	filter.m_clrMarkBackground = (COLORREF)Control::EColor::White;
-	filter.m_clrMarkText = 0;
-	filter.m_bAutoExpandGroups = TRUE;
-	filter.m_bIncludeGroups = TRUE;
-
-	m_wndControl.SetOutOfFilterLabel(Facility::Local(L"No items match your search.|일치하는 항목을 찾을 수 없습니다."));
-	m_wndControl.EnableFilterBar(TRUE, filter);
-	m_wndControl.OnFilterBarUpdate(0);
+	Control().Initialize(this, GetBodyRect());
 }
 
 
 
 void Component::ModelPanel::OnCommand(UINT id)
 {
-	if (m_wndControl.GetSafeHwnd() == nullptr) {
+	if (Control().GetSafeHwnd() == nullptr) {
 		return;
 	}
 
 	switch (id) {
 	case TOOLBAR_3D_CMD_Sort_ByOriginal:
-		m_wndControl.RemoveSortColumn(0);
+		Control().RemoveSortColumn(0);
 		break;
 
 	case TOOLBAR_3D_CMD_Sort_ByAscending:
-		m_wndControl.SetSortColumn(0, TRUE);
+		Control().SetSortColumn(0, TRUE);
 		break;
 
 	case TOOLBAR_3D_CMD_Sort_ByDescending:
-		m_wndControl.SetSortColumn(0, FALSE);
+		Control().SetSortColumn(0, FALSE);
 		break;
 
 	default:
@@ -219,12 +263,12 @@ void Component::ModelPanel::OnCommand(UINT id)
 	}
 
 	//:WARNING - single type commands
-	m_toolBar.SetUncheckOthers(id);
+	ToolBar().SetUncheckOthers(id);
 
-	m_wndControl.AdjustLayout();
-	m_wndControl.RedrawWindow();
+	Control().AdjustLayout();
+	Control().RedrawWindow();
 	// Button update
-	m_wndControl.SetFocus();
+	Control().SetFocus();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -239,9 +283,9 @@ LRESULT Component::ModelPanel::OnTreeCheckClick(WPARAM wp, LPARAM lp)
 	pRow->CheckSubItems(checked);
 	pRow->UpdateParentCheckbox(TRUE);
 
-	m_wndControl.RedrawWindow();
+	Control().RedrawWindow();
 
-	DWORD_PTR key = m_wndControl.GetItemData(m_wndControl.TreeItem(pRow));
+	DWORD_PTR key = Control().GetItemData(Control().TreeItem(pRow));
 	m_pView->GetDelivery().modelPanel.OnItemChecked(key, (bool)checked);
 
 	return S_FALSE;
@@ -254,7 +298,7 @@ void Component::ModelPanel::OnTreeBeginDrag(NMHDR* pNMHDR, LRESULT* pResult)
 	DEBUG_STOP;
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
-	//CString text = m_wndControl.GetItemText(pNMTreeView->itemNew.hItem);
+	//CString text = Control().GetItemText(pNMTreeView->itemNew.hItem);
 	//POINT pos = pNMTreeView->ptDrag;
 
 	*pResult = S_OK;
@@ -268,7 +312,7 @@ void Component::ModelPanel::OnTreeBeginLabelEdit(NMHDR* pNMHDR, LRESULT* pResult
 	TV_DISPINFO* pTVDispInfo = (TV_DISPINFO*)pNMHDR;
 
 	//CString text = pTVDispInfo->item.pszText;
-	CEdit* pEdit = (CEdit*)CWnd::FromHandle((HWND)m_wndControl.SendMessage(TVM_GETEDITCONTROL));
+	CEdit* pEdit = (CEdit*)CWnd::FromHandle((HWND)Control().SendMessage(TVM_GETEDITCONTROL));
 	if (pEdit->GetSafeHwnd() != nullptr) {
 		pEdit->PostMessage(EM_SETSEL, 0, (LPARAM)-1);
 	}
@@ -283,13 +327,10 @@ void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = S_OK;
 
 	UINT flag = 0;
-	CPoint point;
-	GetCursorPos(&point);
-	m_wndControl.ScreenToClient(&point);
+	HTREEITEM hItem = Control().CustomHitTest(flag);
 
-	HTREEITEM hItem = m_wndControl.HitTest(point, &flag);
 	if (hItem != nullptr) {
-		DWORD_PTR key = m_wndControl.GetItemData(hItem);
+		DWORD_PTR key = Control().GetItemData(hItem);
 		ASSERT(key != 0);
 	}
 
@@ -337,16 +378,13 @@ void Component::ModelPanel::OnTreeDblClick(NMHDR* pNMHDR, LRESULT* pResult)
 	DEBUG_LOG(L"* OnTreeDblClick");
 
 	UINT flag = 0;
-	CPoint point;
-	GetCursorPos(&point);
-	m_wndControl.ScreenToClient(&point);
+	HTREEITEM hItem = Control().CustomHitTest(flag);
 
-	HTREEITEM hItem = m_wndControl.HitTest(point, &flag);
 	if (hItem == nullptr) {
 		return;
 	}
 
-	DWORD_PTR key = m_wndControl.GetItemData(hItem);
+	DWORD_PTR key = Control().GetItemData(hItem);
 	ASSERT(key != 0);
 
 	m_pView->GetDelivery().modelPanel.OnItemDblClicked(key);
@@ -363,8 +401,8 @@ void Component::ModelPanel::OnTreeDeleteItem(NMHDR* pNMHDR, LRESULT* pResult)
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 	HTREEITEM hItem = pNMTreeView->itemOld.hItem;
 
-	DWORD_PTR key = m_wndControl.GetItemData(hItem);
-	m_wndControl.DeleteItem(hItem);
+	DWORD_PTR key = Control().GetItemData(hItem);
+	Control().DeleteItem(hItem);
 
 	m_keyMap.erase(key);
 	m_pView->GetDelivery().modelPanel.OnItemDeleted(key);
@@ -400,14 +438,14 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 
 		HTREEITEM hItem = pNMTreeView->itemNew.hItem;
 		// get first child item
-		HTREEITEM hChild = m_wndControl.GetChildItem(hItem);
+		HTREEITEM hChild = Control().GetChildItem(hItem);
 
-		if (m_wndControl.GetItemData(hChild) == 0) {
-			ASSERT(m_wndControl.GetItemText(hChild) == PRESET::DummyName);
-			DisableNotification(m_wndControl.DeleteItem(hChild));
+		if (Control().GetItemData(hChild) == 0) {
+			ASSERT(Control().GetItemText(hChild) == PRESET::DummyName);
+			DisableNotification(Control().DeleteItem(hChild));
 			m_bExpanding = true;
 
-			DWORD_PTR key = m_wndControl.GetItemData(hItem);
+			DWORD_PTR key = Control().GetItemData(hItem);
 			ASSERT(key != 0);
 			m_pView->GetDelivery().modelPanel.OnItemExpanded(key);
 		}
@@ -436,7 +474,7 @@ void Component::ModelPanel::OnTreeRClick(NMHDR* pNMHDR, LRESULT* pResult)
 
 	CPoint point;
 	GetCursorPos(&point);
-	m_wndControl.ScreenToClient(&point);
+	Control().ScreenToClient(&point);
 
 	CMenu menu;
 	menu.CreatePopupMenu();
@@ -482,7 +520,7 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 	else {
 		DEBUG_LOG(L"* OnTreeSelChanged");
 
-		DWORD_PTR key = m_wndControl.GetItemData(hItem);
+		DWORD_PTR key = Control().GetItemData(hItem);
 		m_pView->GetDelivery().modelPanel.OnItemSelected(key);
 	}
 
@@ -527,32 +565,32 @@ HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR
 	//tvi.itemex.stateMask = TVIS_EXPANDED;
 	//tvi.itemex.state = TVE_EXPAND;
 
-	HTREEITEM hCurrent = m_wndControl.InsertItem(&tvi);
+	HTREEITEM hCurrent = Control().InsertItem(&tvi);
 	m_keyMap[key] = hCurrent;
 
 	if (hasChildren) {
-		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
-		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
+		Control().InsertItem(PRESET::DummyName, hCurrent);
+		Control().Expand(hCurrent, TVE_COLLAPSE);
 	}
 	*/
 
-	HTREEITEM hItem = m_wndControl.InsertItem(title, parent);
+	HTREEITEM hItem = Control().InsertItem(title, parent);
 	DEBUG_VALID(hItem);
 	DEBUG_LOG(WStr::Format(L"\t- %s", title));
 
 	//:TEST - no avilable, TVHT_ONITEMLABEL
-	//m_wndControl.SetItemImage(hItem, 0, 1);
-	m_wndControl.SetItemData(hItem, key);
+	//Control().SetItemImage(hItem, 0, 1);
+	Control().SetItemData(hItem, key);
 	m_keyMap[key] = hItem;
 
 	if (hasChildren) {
-		m_wndControl.InsertItem(PRESET::DummyName, hItem);
-		m_wndControl.Expand(hItem, TVE_COLLAPSE);
+		Control().InsertItem(PRESET::DummyName, hItem);
+		Control().Expand(hItem, TVE_COLLAPSE);
 	}
 
 	// parent checked state
-	if (m_wndControl.GetCheck(parent)) {
-		m_wndControl.SetCheck(hItem);
+	if (Control().GetCheck(parent)) {
+		Control().SetCheck(hItem);
 	}
 
 	return hItem;
@@ -583,12 +621,12 @@ HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 	tvi.itemex.lParam = (LPARAM)key;
 	//:CHECK - how to use tvi.itemex.cChildren?
 
-	HTREEITEM hCurrent = m_wndControl.InsertItem(&tvi);
+	HTREEITEM hCurrent = Control().InsertItem(&tvi);
 	m_keyMap[key] = hCurrent;
 
 	if (hasChildren) {
-		m_wndControl.InsertItem(PRESET::DummyName, hCurrent);
-		m_wndControl.Expand(hCurrent, TVE_COLLAPSE);
+		Control().InsertItem(PRESET::DummyName, hCurrent);
+		Control().Expand(hCurrent, TVE_COLLAPSE);
 	}
 	*/
 
@@ -597,18 +635,18 @@ HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 	Json::Object& data = *pData;
 	DWORD_PTR key = data.GetDwordPtr(SKW_KEY);
 
-	HTREEITEM hItem = m_wndControl.InsertItem(data.GetString(SKW_TITLE), GetItem(data.GetDwordPtr(SKW_PARENT)));
+	HTREEITEM hItem = Control().InsertItem(data.GetString(SKW_TITLE), GetItem(data.GetDwordPtr(SKW_PARENT)));
 	DEBUG_VALID(hItem);
-	DEBUG_LOG(WStr::Format(L"AddItem: %s", m_wndControl.GetItemText(hItem)));
+	DEBUG_LOG(WStr::Format(L"AddItem: %s", Control().GetItemText(hItem)));
 
 	//:TEST - no available, TVHT_ONITEMLABEL
-	//m_wndControl.SetItemNotificationBadge(hItem, L"[HIDE]");
-	m_wndControl.SetItemData(hItem, key);
+	//Control().SetItemNotificationBadge(hItem, L"[HIDE]");
+	Control().SetItemData(hItem, key);
 	m_keyMap[key] = hItem;
 
 	if (data.GetBoolean(SKW_HASCHILDREN)) {
-		m_wndControl.InsertItem(PRESET::DummyName, hItem);
-		m_wndControl.Expand(hItem, TVE_COLLAPSE);
+		Control().InsertItem(PRESET::DummyName, hItem);
+		Control().Expand(hItem, TVE_COLLAPSE);
 	}
 
 	RedrawTree(true);
@@ -626,16 +664,16 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 	Json::Array& items = data.GetArray(SKW_CHILDREN);
 
 	HTREEITEM hParent = GetItem(data.GetDwordPtr(SKW_PARENT));
-	DEBUG_LOG(WStr::Format(L"AddChildren: %s", m_wndControl.GetItemText(hParent)));
+	DEBUG_LOG(WStr::Format(L"AddChildren: %s", Control().GetItemText(hParent)));
 
 	//:WARNING - remove dummy first
-	HTREEITEM hChild = m_wndControl.GetChildItem(hParent);
-	if (hChild != nullptr && m_wndControl.GetItemData(hChild) == 0) {
-		ASSERT(m_wndControl.GetItemText(hChild) == PRESET::DummyName);
-		m_wndControl.DeleteItem(hChild);
+	HTREEITEM hChild = Control().GetChildItem(hParent);
+	if (hChild != nullptr && Control().GetItemData(hChild) == 0) {
+		ASSERT(Control().GetItemText(hChild) == PRESET::DummyName);
+		Control().DeleteItem(hChild);
 	}
 
-	BOOL checked = m_wndControl.GetCheck(hParent);
+	BOOL checked = Control().GetCheck(hParent);
 
 	for (auto item : items.GetBuffer()) {
 		Json::Object& child = item->AsObject();
@@ -649,13 +687,13 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 
 		// parent checked state
 		if (checked) {
-			m_wndControl.SetCheck(hChild);
+			Control().SetCheck(hChild);
 		}
 	}
 
 	//:WARNING - select first (keyboard expanding)
 	if (m_bExpanding) {
-		m_wndControl.SelectItem(m_wndControl.GetChildItem(hParent));
+		Control().SelectItem(Control().GetChildItem(hParent));
 		m_bExpanding = false;
 	}
 
@@ -667,7 +705,7 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 void Component::ModelPanel::CheckItem(Json::Object* pData)
 {
 	DisableNotification(
-		m_wndControl.SetCheck(GetItem(pData->GetDwordPtr(SKW_KEY)), pData->GetBoolean(SKW_CHECKED))
+		Control().SetCheck(GetItem(pData->GetDwordPtr(SKW_KEY)), pData->GetBoolean(SKW_CHECKED))
 	);
 }
 
@@ -676,7 +714,7 @@ void Component::ModelPanel::CheckItem(Json::Object* pData)
 void Component::ModelPanel::CollapseItem(Json::Object* pData)
 {
 	DisableNotification(
-		m_wndControl.Expand(GetItem(pData->GetDwordPtr(SKW_KEY)), TVE_COLLAPSE)
+		Control().Expand(GetItem(pData->GetDwordPtr(SKW_KEY)), TVE_COLLAPSE)
 	);
 }
 
@@ -685,7 +723,7 @@ void Component::ModelPanel::CollapseItem(Json::Object* pData)
 void Component::ModelPanel::DeleteItem(Json::Object* pData)
 {
 	DisableNotification(
-		m_wndControl.DeleteItem(GetItem(pData->GetDwordPtr(SKW_KEY)))
+		Control().DeleteItem(GetItem(pData->GetDwordPtr(SKW_KEY)))
 	);
 }
 
@@ -694,7 +732,7 @@ void Component::ModelPanel::DeleteItem(Json::Object* pData)
 void Component::ModelPanel::ExpandItem(Json::Object* pData)
 {
 	DisableNotification(
-		m_wndControl.Expand(GetItem(pData->GetDwordPtr(SKW_KEY)), TVE_EXPAND)
+		Control().Expand(GetItem(pData->GetDwordPtr(SKW_KEY)), TVE_EXPAND)
 	);
 }
 
@@ -709,21 +747,21 @@ void Component::ModelPanel::ExpandParent(Json::Object* pData)
 	std::list<HTREEITEM> ancestor;
 
 	while (hParent != nullptr) {
-		DEBUG_LOG(WStr::Format(L"Expand %s", (LPCTSTR)m_wndControl.GetItemText(hParent)));
+		DEBUG_LOG(WStr::Format(L"Expand %s", (LPCTSTR)Control().GetItemText(hParent)));
 		ancestor.push_front(hParent);
-		hParent = m_wndControl.GetParentItem(hParent);
+		hParent = Control().GetParentItem(hParent);
 	}
 
 	//:CHECK - remove last one
 	ancestor.pop_back();
 	// Expand root to child
 	for (auto item : ancestor) {
-		ASSERT(m_wndControl.GetItemText(item) != PRESET::DummyName);
-		m_wndControl.Expand(item, TVE_EXPAND);
+		ASSERT(Control().GetItemText(item) != PRESET::DummyName);
+		Control().Expand(item, TVE_EXPAND);
 	}
 
 	//:CHECK
-	m_wndControl.SelectItem(hItem);
+	Control().SelectItem(hItem);
 
 	RedrawTree(true);
 }
@@ -736,19 +774,19 @@ void Component::ModelPanel::SelectItem(Json::Object* pData)
 
 	HTREEITEM hItem = GetItem(pData->GetDwordPtr(SKW_KEY));
 	DEBUG_VALID(hItem);
-	m_wndControl.SelectItem(hItem);
+	Control().SelectItem(hItem);
 
 	RedrawTree(true);
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 void Component::ModelPanel::GetAncestorData(HTREEITEM pItem, std::list<DWORD_PTR>& ancestor)
 {
 	HTREEITEM hParent = pItem;
 	while (hParent != nullptr) {
-		ancestor.push_front(m_wndControl.GetItemData(hParent));
-		hParent = m_wndControl.GetParentItem(hParent);
+		ancestor.push_front(Control().GetItemData(hParent));
+		hParent = Control().GetParentItem(hParent);
 	}
 }
 
@@ -768,11 +806,11 @@ HTREEITEM Component::ModelPanel::GetItem(DWORD_PTR key)
 
 void Component::ModelPanel::RedrawTree(bool value)
 {
-	m_wndControl.SetRedraw(value);
-	m_wndControl.EnableTreeCtrlNotifications(value);
+	Control().SetRedraw(value);
+	Control().EnableTreeCtrlNotifications(value);
 
 	if (value) {
-		m_wndControl.RedrawWindow();
+		Control().RedrawWindow();
 	}
 }
 

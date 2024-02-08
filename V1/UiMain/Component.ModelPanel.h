@@ -7,6 +7,10 @@
 
 
 
+class ModelTree;
+
+
+
 namespace Component
 {
 	class ModelPanel : public Control::Panel
@@ -95,9 +99,7 @@ namespace Component
 	private:
 
 		std::unordered_map<DWORD_PTR, HTREEITEM> m_keyMap;
-		CBCGPTreeCtrlEx m_wndControl;
+		ModelTree* m_pControl = nullptr;
 		bool m_bExpanding = false;
-
-		CString m_sFilterMessage = L"";
 	};
 }

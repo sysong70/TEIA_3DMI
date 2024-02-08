@@ -37,6 +37,8 @@ namespace PresetApplication
 
 //--------------------------------------------------------------------------------------------------
 
+#include <Template.h>
+
 class VisualManagerCustom : public CBCGPVisualManager2019
 {
 public:
@@ -49,17 +51,12 @@ public:
 
 public:
 
-	//:WANING - replace check box(line) color
 	BOOL DrawCheckBox(CDC* pDC, CRect rect, BOOL bHighlighted, int nState, BOOL bEnabled, BOOL bPressed) override
 	{
-		COLORREF prev = globalData.clrBarDkShadow;
-		globalData.clrBarDkShadow = RGB(0xA0, 0xA0, 0xA0);
-
-		__super::DrawCheckBox(pDC, rect, bHighlighted, nState, bEnabled, bPressed);
-
-		globalData.clrBarDkShadow = prev;
-
-		return TRUE;
+		const COLORREF BorderColor = RGB(0xC0, 0xC0, 0xC0);
+		//:WANING - replace check box(border) color
+		CLocalState<COLORREF> color(globalData.clrBarDkShadow, BorderColor);
+		return CBCGPVisualManagerVS2012::DrawCheckBox(pDC, rect, bHighlighted, nState, bEnabled, bPressed);
 	}
 };
 
@@ -75,6 +72,8 @@ public:
 
 	DocTemplate3d()
 		: CMultiDocTemplate(IDR_DMITYPE_3D, RUNTIME_CLASS(Window::Document), RUNTIME_CLASS(Window::ChildFrame), RUNTIME_CLASS(Window::View3d)) {}
+
+
 
 	Confidence MatchDocType(LPCTSTR lpszPathName, CDocument*& rpDocMatch) override
 	{
@@ -109,6 +108,8 @@ public:
 
 	DocTemplate2d()
 		: CMultiDocTemplate(IDR_DMITYPE_2D, RUNTIME_CLASS(Window::Document), RUNTIME_CLASS(Window::ChildFrame), RUNTIME_CLASS(Window::View2d)) {}
+
+
 
 	Confidence MatchDocType(LPCTSTR lpszPathName, CDocument*& rpDocMatch) override
 	{

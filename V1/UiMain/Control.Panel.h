@@ -52,5 +52,14 @@ namespace Control
 		int m_nHeaderHeight = 0;
 		int m_nFooterHeight = 0;
 		CSize m_oldSize; // OnSize()
+
+		Window::View& View() {
+			DEBUG_VALID(m_pView);
+			return *m_pView;
+		}
+
+		ToolBar& ToolBar() {
+			return m_toolBar;
+		}
 	};
 }
