@@ -13,8 +13,8 @@
 		"Colors":{
 			"BackTop":"0x303030",
 			"BackBottom":"0x303030",
-			"Highlight":"0x000000",
-			"Selection":"0x000000"
+			"Highlighted":"0x000000",
+			"Selected":"0x000000"
 		},
 		"NavCube":{
 			"Size":200,

@@ -120,12 +120,9 @@ int Component::ModelPanel::ConstructHeader(int cx)
 	m_toolBar.SetPivot(Control::EPivot::TopLeft);
 	m_toolBar.Initialize(this);
 
-	m_toolBar.AddButton(TOOLBAR_3D_CMD_Sort_ByOriginal);
-	m_toolBar.AddButton(TOOLBAR_3D_CMD_Sort_ByAscending);
-	m_toolBar.AddButton(TOOLBAR_3D_CMD_Sort_ByDescending);
-	//m_toolBar.AddSeperator();
-	//m_toolBar.AddButton(TOOLBAR_3D_CMD_Option_GridLines, false, true);
-	//m_toolBar.AddButton(TOOLBAR_3D_CMD_Option_AlternateRows, false, true);
+	m_toolBar.AddToggle(TOOLBAR_3D_CMD_Sort_ByOriginal);
+	m_toolBar.AddToggle(TOOLBAR_3D_CMD_Sort_ByAscending);
+	m_toolBar.AddToggle(TOOLBAR_3D_CMD_Sort_ByDescending);
 
 	//m_toolBar.SetCheck(TOOLBAR_3D_CMD_Option_GridLines, TheAppOptions.GetBoolean("ModelTree/General/GridLines"), false);
 	//m_toolBar.SetCheck(TOOLBAR_3D_CMD_Option_AlternateRows, TheAppOptions.GetBoolean("ModelTree/General/AlternateRows"), false);
@@ -179,9 +176,7 @@ void Component::ModelPanel::ConstructBody()
 
 	m_wndControl.SetVisualManagerColorTheme();
 	m_wndControl.EnableColumnAutoSize();
-	m_wndControl.EnableAlternateRows(m_toolBar.GetCheck(TOOLBAR_3D_CMD_Option_AlternateRows));
-	m_wndControl.EnableGridLines(m_toolBar.GetCheck(TOOLBAR_3D_CMD_Option_GridLines));
-	m_wndControl.ModifyStyle(0, TVS_CHECKBOXES); // EnableCheckBoxes() not working
+	m_wndControl.ModifyStyle(0, TVS_CHECKBOXES); //:WARNING - EnableCheckBoxes() not working
 	//m_wndControl.SetCustomRowHeight(TreeRowHeight());
 	m_wndControl.SetSingleSel(FALSE);
 
@@ -195,50 +190,6 @@ void Component::ModelPanel::ConstructBody()
 	m_wndControl.SetOutOfFilterLabel(Facility::Local(L"No items match your search.|일치하는 항목을 찾을 수 없습니다."));
 	m_wndControl.EnableFilterBar(TRUE, filter);
 	m_wndControl.OnFilterBarUpdate(0);
-
-	// Set color theme
-	/*
-	int backColor = TheAppOptions.GetInteger("ModelTree/Colors/Background");
-
-	if (backColor != 0) {
-		COLORREF clrBackground;
-		COLORREF clrText;
-		COLORREF clrGroupBackground;
-		COLORREF clrGroupText;
-		COLORREF clrLeftOffset;
-		COLORREF clrLine;
-		m_wndControl.GetCustomColors(clrBackground, clrText, clrGroupBackground, clrGroupText, clrLeftOffset, clrLine);
-
-		switch (backColor) {
-		case -2:	clrBackground = RGB(0x20, 0x20, 0x20); break;
-		case -1:	clrBackground = RGB(0x25, 0x25, 0x25); break;
-		case 1:		clrBackground = RGB(0x35, 0x35, 0x35); break;
-		case 2:		clrBackground = RGB(0x40, 0x40, 0x40); break;
-
-		default:
-			// 0 - 0x303030
-			DEBUG_STOP;
-		}
-
-		//:WARNING - (COLORREF)-1 not available
-		m_wndControl.SetCustomColors(clrBackground, clrText, clrGroupBackground, clrGroupText, clrLeftOffset, clrLine);
-	}
-	*/
-	//:TEST - item image
-	/*
-	CImageList* pImages = new CImageList;
-	CBCGPToolBarImages images;
-	images.SetImageSize(globalUtils.ScaleByDPI(CSize(16, 16)));
-
-	for (int id = CUSTOM_3D_CMD_KEN_Test1; id <= CUSTOM_3D_CMD_KEN_Test9; id++) {
-		CBCGPSVGImage* pImage = new CBCGPSVGImage();
-		pImage->Load(id);
-		images.AddSVG(pImage);
-	}
-
-	images.ExportToImageList(*pImages, TRUE);
-	m_wndControl.SetImageList(pImages, TVSIL_NORMAL);
-	//*/
 }
 
 
@@ -262,21 +213,18 @@ void Component::ModelPanel::OnCommand(UINT id)
 		m_wndControl.SetSortColumn(0, FALSE);
 		break;
 
-	//case TOOLBAR_3D_CMD_Option_GridLines:
-	//	m_wndControl.EnableGridLines(m_toolBar.GetCheck(id));
-	//	break;
-
-	//case TOOLBAR_3D_CMD_Option_AlternateRows:
-	//	m_wndControl.EnableAlternateRows(m_toolBar.GetCheck(id));
-	//	break;
-
 	default:
 		DEBUG_STOP;
 		break;
 	}
 
+	//:WARNING - single type commands
+	m_toolBar.SetUncheckOthers(id);
+
 	m_wndControl.AdjustLayout();
 	m_wndControl.RedrawWindow();
+	// Button update
+	m_wndControl.SetFocus();
 }
 
 //--------------------------------------------------------------------------------------------------

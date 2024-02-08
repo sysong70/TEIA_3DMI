@@ -60,9 +60,9 @@ void Control::ToolBar::SetPivot(EPivot pivot, bool expandSize)
 
 
 
-CBCGPButton* Control::ToolBar::AddButton(UINT id, bool menu, bool toggle)
+CBCGPButton* Control::ToolBar::AddButton(UINT id, bool menu)
 {
-	CBCGPButton* button = CreateButton(id, menu, toggle);
+	CBCGPButton* button = CreateButton(id, menu);
 	m_buttons.push_back(button);
 
 	return button;
@@ -87,6 +87,16 @@ void Control::ToolBar::AddButtons(std::vector<UINT> ids)
 void Control::ToolBar::AddSeperator()
 {
 	m_buttons.push_back(nullptr);
+}
+
+
+
+CBCGPButton* Control::ToolBar::AddToggle(UINT id, bool checked)
+{
+	CBCGPButton* button = CreateButton(id, false, true, checked);
+	m_buttons.push_back(button);
+
+	return button;
 }
 
 
@@ -258,6 +268,17 @@ void Control::ToolBar::SetCheck(UINT id, bool value, bool uncheckOthers)
 
 
 
+void Control::ToolBar::SetUncheckOthers(UINT id)
+{
+	for (auto button : m_buttons) {
+		if (button != nullptr && button->GetDlgCtrlID() != id) {
+			button->SendMessage(BM_SETCHECK, BST_UNCHECKED);
+		}
+	}
+}
+
+
+
 void Control::ToolBar::SetSize(CSize buttonSize, CSize buttonMargin, CSize imageSize, CSize seperatorMargin, CSize toolBarPadding)
 {
 	m_buttonSize = buttonSize;
@@ -286,15 +307,6 @@ void Control::ToolBar::SetSize(EItemSize size)
 	default:
 		m_imageSize = CSize(24, 24);
 		break;
-	}
-}
-
-
-
-void Control::ToolBar::SetToggle(UINT id)
-{
-	CBCGPButton* pButton = GetButton(id);
-	if (pButton != nullptr) {
 	}
 }
 
@@ -342,7 +354,7 @@ void Control::ToolBar::OnSize(UINT nType, int cx, int cy)
 
 
 
-CBCGPButton* Control::ToolBar::CreateButton(UINT id, bool menu, bool toggle)
+CBCGPButton* Control::ToolBar::CreateButton(UINT id, bool menu, bool toggle, bool checked)
 {
 	CBCGPButton* pButton = menu ? new CBCGPMenuButton() : new CBCGPButton();
 	DEBUG_VALID(pButton);
@@ -352,17 +364,14 @@ CBCGPButton* Control::ToolBar::CreateButton(UINT id, bool menu, bool toggle)
 	button.m_bDrawFocus = FALSE;
 	button.m_bVisualManagerStyle = TRUE;
 
-	DWORD dwStyle;
-	if (toggle) {
-		dwStyle = BS_AUTOCHECKBOX | BS_PUSHLIKE | BS_ICON | WS_CHILD | WS_VISIBLE;
-	}
-	else {
-		dwStyle = BS_PUSHBUTTON | BS_ICON | WS_CHILD | WS_VISIBLE;
-	}
-
+	DWORD dwStyle = (toggle ? BS_AUTOCHECKBOX | BS_PUSHLIKE : 0) | BS_ICON | WS_CHILD | WS_VISIBLE;
 	button.Create(L"", dwStyle, {}, this, id);
 	button.SetBitmap(Facility::CreateBitmap(id, GetImageSize()));
 	button.SetTooltip(Facility::GetTitle(id));
+
+	if (toggle && checked) {
+		button.SendMessage(BM_SETCHECK, checked ? BST_CHECKED : BST_UNCHECKED);
+	}
 
 	return pButton;
 }

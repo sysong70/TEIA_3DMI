@@ -29,11 +29,13 @@ namespace Control
 
 	public:
 
-		CBCGPButton* AddButton(UINT id, bool menu = false, bool toggle = false);
+		CBCGPButton* AddButton(UINT id, bool menu = false);
 
 		void AddButtons(std::vector<UINT> ids);
 
 		void AddSeperator();
+
+		CBCGPButton* AddToggle(UINT id, bool checked = false);
 
 		CSize AdjustLayout();
 
@@ -45,11 +47,11 @@ namespace Control
 
 		void SetCheck(UINT id, bool value, bool uncheckOthers = true);
 
+		void SetUncheckOthers(UINT id);
+
 		void SetSize(CSize buttonSize, CSize buttonMargin, CSize imageSize, CSize seperatorMargin, CSize toolBarPadding);
 		// image size, not button size
 		void SetSize(EItemSize size);
-
-		void SetToggle(UINT id);
 
 	protected:
 
@@ -70,7 +72,7 @@ namespace Control
 
 		std::vector<CBCGPButton*> m_buttons;
 
-		CBCGPButton* CreateButton(UINT id, bool menu, bool toggle);
+		CBCGPButton* CreateButton(UINT id, bool menu, bool toggle = false, bool checked = false);
 
 		bool IsHorizontal();
 
