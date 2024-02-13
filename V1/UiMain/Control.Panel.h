@@ -2,9 +2,12 @@
 
 #include "Control.h"
 #include "Control.ToolBar.h"
-#include <unordered_map>
 
+//--------------------------------------------------------------------------------------------------
 
+namespace Window { class View; }
+
+//--------------------------------------------------------------------------------------------------
 
 namespace Control
 {
@@ -17,8 +20,6 @@ namespace Control
 		~Panel() override;
 
 		bool Initialize(CWnd* pParentWnd, Window::View* pView, UINT id);
-
-		Window::View* GetParentView();
 
 	public:
 
@@ -54,7 +55,6 @@ namespace Control
 		CSize m_oldSize; // OnSize()
 
 		Window::View& View() {
-			DEBUG_VALID(m_pView);
 			return *m_pView;
 		}
 

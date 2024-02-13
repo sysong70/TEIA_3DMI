@@ -1,10 +1,10 @@
 ﻿#pragma once
 
 #include "Dialog.Standard.h"
-#include "Control.TreePropList.h"
 #include "Control.TabWnd.h"
+#include "Control.TreePropList.h"
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Dialog
 {

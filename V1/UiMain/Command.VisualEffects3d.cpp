@@ -7,7 +7,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetVisualEffects3d
 
@@ -22,6 +22,8 @@ namespace PresetVisualEffects3d
 		PropList,
 	};
 }
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Panel
 
@@ -151,6 +153,8 @@ BEGIN_MESSAGE_MAP(VisualEffects3dPanel, CWnd)
 END_MESSAGE_MAP()
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 Command::VisualEffects3d::VisualEffects3d()
 {

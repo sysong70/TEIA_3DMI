@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Json.h"
+#include <Json.h>
 
 /// Delivery Keywords
 
@@ -60,7 +60,7 @@
 #define SKW_REPCNT			"RepCnt"
 #define SKW_FLAGS			"Flags"
 
-// enum, struct
+//--------------------------------------------------------------------------------------------------
 
 namespace Signal
 {
@@ -125,7 +125,7 @@ namespace Signal
 	using TreeItems = std::vector<TreeItem>;
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define CHILD_CONSTRUCTOR(className) \
 friend class Delivery; \
@@ -137,6 +137,8 @@ private: \
 Delivery* m_pWrapper = nullptr; \
 Delivery& Wrapper() { return *m_pWrapper; } \
 public:
+
+//--------------------------------------------------------------------------------------------------
 
 namespace Signal
 {

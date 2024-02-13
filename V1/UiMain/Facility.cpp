@@ -8,7 +8,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetFacility
 
@@ -18,7 +18,7 @@ namespace PresetFacility
 	Json::Value DummyValue;
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Language
 
@@ -79,6 +79,8 @@ CString Facility::Local(CString& value)
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Resource
 
@@ -193,6 +195,8 @@ EXIT:
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Json
 
@@ -332,7 +336,6 @@ Json::Object& Facility::SetData(Json::Object& target, UINT id, const CString& ti
 	return target;
 }
 
-#include <WStr.h>
 #include "Control.Property.h"
 
 void Facility::SetValue(Json::Value& target, CBCGPProp& source)

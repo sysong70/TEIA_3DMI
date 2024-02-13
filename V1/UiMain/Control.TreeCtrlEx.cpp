@@ -8,15 +8,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
-
-#define PRESET PresetTreeCtrlEx
-
-namespace PresetTreeCtrlEx
-{
-}
-
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Control;
 
@@ -175,5 +167,3 @@ void Control::TreeCtrlEx::CreateItem(Json::Array& design, HTREEITEM pParent)
 		}
 	}
 }
-
-#undef PRESET

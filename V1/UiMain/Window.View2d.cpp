@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 #include "resource.h"
+#include "Window.View2d.h"
 #include "Window.Document.h"
 #include "Window.MainFrame.h"
-#include "Window.View2d.h"
 #include "Connector.h"
 #include "Facility.h"
 #include "Facility.AppOptions.h"
@@ -13,7 +13,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetView2d
 
@@ -26,7 +26,7 @@ namespace PresetView2d
 	};
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Window;
 

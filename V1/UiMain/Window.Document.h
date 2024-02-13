@@ -2,18 +2,10 @@
 
 #include "Window.h"
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Window
 {
-	bool IsAllowedFile(const wchar_t* pFilePath);
-
-	bool IsAllowed3d(const wchar_t* pFilePath);
-
-	bool IsAllowed2d(const wchar_t* pFilePath);
-
-
-
 	class Document : public CDocument
 	{
 	protected:

@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "Dialog.AppOptions.h"
-#include "Component.h"
 #include "Connector.h"
 #include "Facility.AppResources.h"
 #include "Facility.AppOptions.h"
@@ -11,9 +10,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
-
-#define DDX_CONTROL(x) DDX_Control(pDX, (int)PRESET::x, m_wnd##x);
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetAppOptions
 
@@ -31,7 +28,7 @@ namespace PresetAppOptions
 	};
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Dialog;
 
@@ -255,5 +252,4 @@ LRESULT Dialog::AppOptions::OnChangedFileOption(WPARAM wp, LPARAM lp)
 	return S_OK;
 }
 
-#undef DDX_CONTROL
 #undef PRESET

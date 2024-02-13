@@ -3,7 +3,7 @@
 #include "Component.h"
 #include "Facility.CommandIndexer.h"
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Component
 {

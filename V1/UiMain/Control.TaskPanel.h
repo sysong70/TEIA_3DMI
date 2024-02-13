@@ -4,9 +4,8 @@
 #include "Control.PropList.h"
 #include "Control.ToolBar.h"
 #include "Component.TaskBar.h"
-#include <Json.h>
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Control
 {

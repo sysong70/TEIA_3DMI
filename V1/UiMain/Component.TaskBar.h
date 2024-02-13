@@ -1,14 +1,10 @@
 ﻿#pragma once
 
 #include "Component.h"
-#include "Signal.h"
+#include "Control.TaskPanel.h"
+#include "Window.View.h"
 
-
-
-namespace Control { class TaskPanel; }
-namespace Window { class View; }
-
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Component
 {

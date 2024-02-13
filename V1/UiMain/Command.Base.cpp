@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "Command.Base.h"
-#include "Window.View.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -8,7 +7,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 Command::Base::Base()
 {

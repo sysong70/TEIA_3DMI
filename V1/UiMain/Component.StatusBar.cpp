@@ -1,9 +1,9 @@
 ﻿#include "stdafx.h"
 #include "resource.h"
 #include "Component.StatusBar.h"
+#include "Control.h"
 #include "Dialog.ObjectSnaps.h"
 #include "Facility.h"
-#include <Signal.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -11,7 +11,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetStatusBar
 
@@ -25,7 +25,7 @@ namespace PresetStatusBar
 	};
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 class StatusBarButton : public CBCGPRibbonStatusBarPane
 {

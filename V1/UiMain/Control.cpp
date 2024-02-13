@@ -8,7 +8,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 CSize Control::Setup(CBCGPButton& control, Json::Object& data, CWnd* pParent)
 {

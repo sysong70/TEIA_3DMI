@@ -1,9 +1,8 @@
 ﻿#pragma once
 
 #include "Facility.h"
-#include <Json.h>
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Facility
 {

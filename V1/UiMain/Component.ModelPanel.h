@@ -2,14 +2,13 @@
 
 #include "Component.h"
 #include "Control.Panel.h"
-#include <Json.h>
-#include <unordered_map>
 
+//--------------------------------------------------------------------------------------------------
 
-
+// class in Component.ModelPanel.cpp
 class ModelTree;
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Component
 {

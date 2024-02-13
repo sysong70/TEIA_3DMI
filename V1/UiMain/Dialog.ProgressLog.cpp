@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "Dialog.ProgressLog.h"
-#include "Control.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -8,9 +7,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
-
-#define DDX_CONTROL(x) DDX_Control(pDX, (int)PRESET::x, m_wnd##x);
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetProgressLog
 
@@ -37,20 +34,28 @@ namespace PresetProgressLog
 		(COLORREF)Control::EColor::Red,
 	};
 
+
+
 	int MessageHeight()
 	{
 		return globalUtils.ScaleByDPI(24);
 	}
+
+
 
 	int ProgressHeight()
 	{
 		return globalUtils.ScaleByDPI(8);
 	}
 
+
+
 	int ExtraHeight()
 	{
 		return globalUtils.ScaleByDPI(2);
 	}
+
+
 
 	int Gap()
 	{
@@ -58,7 +63,7 @@ namespace PresetProgressLog
 	}
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Dialog;
 
@@ -114,11 +119,15 @@ void Dialog::ProgressLog::ReceiveSignal(Json::Object* pData)
 
 void Dialog::ProgressLog::DoDataExchange(CDataExchange* pDX)
 {
+#define DDX_CONTROL(x) DDX_Control(pDX, (int)PRESET::x, m_wnd##x);
+
 	CBCGPDialog::DoDataExchange(pDX);
 
 	DDX_CONTROL(Progress);
 	DDX_CONTROL(Message);
 	DDX_CONTROL(Log);
+
+#undef DDX_CONTROL
 }
 
 
@@ -242,5 +251,4 @@ void Dialog::ProgressLog::ClearLog()
 	RedrawWindow();
 }
 
-#undef DDX_CONTROL
 #undef PRESET

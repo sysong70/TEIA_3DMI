@@ -91,23 +91,8 @@
     <ClCompile Include="Component.PanelBar.cpp">
       <Filter>Component\MainFrame</Filter>
     </ClCompile>
-    <ClCompile Include="Layout.ControlWrapper.cpp">
-      <Filter>Layout</Filter>
-    </ClCompile>
-    <ClCompile Include="Layout.Base.cpp">
-      <Filter>Layout</Filter>
-    </ClCompile>
-    <ClCompile Include="Layout.cpp">
-      <Filter>Layout</Filter>
-    </ClCompile>
-    <ClCompile Include="Layout.Stack.cpp">
-      <Filter>Layout</Filter>
-    </ClCompile>
     <ClCompile Include="Facility.Base.cpp">
       <Filter>Facility</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.Input.cpp">
-      <Filter>Component\View</Filter>
     </ClCompile>
     <ClCompile Include="Command.Base.cpp">
       <Filter>Command</Filter>
@@ -288,23 +273,8 @@
     <ClInclude Include="Component.PanelBar.h">
       <Filter>Component\MainFrame</Filter>
     </ClInclude>
-    <ClInclude Include="Layout.Base.h">
-      <Filter>Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Layout.ControlWrapper.h">
-      <Filter>Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Layout.h">
-      <Filter>Layout</Filter>
-    </ClInclude>
-    <ClInclude Include="Layout.Stack.h">
-      <Filter>Layout</Filter>
-    </ClInclude>
     <ClInclude Include="Facility.Base.h">
       <Filter>Facility</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.Input.h">
-      <Filter>Component\View</Filter>
     </ClInclude>
     <ClInclude Include="Command.h">
       <Filter>Command</Filter>
@@ -439,12 +409,6 @@
     </Filter>
     <Filter Include="Component\Panel">
       <UniqueIdentifier>{17e426a6-77e8-4a55-a4e4-86e17ed068a0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Layout">
-      <UniqueIdentifier>{dcd9ed46-81ef-4f39-81e3-b0e41b745e1c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\View">
-      <UniqueIdentifier>{02e349aa-e87e-4b99-9609-75debd2ed290}</UniqueIdentifier>
     </Filter>
     <Filter Include="Command">
       <UniqueIdentifier>{64d47e27-6764-45be-a7d0-d9f90367c89d}</UniqueIdentifier>

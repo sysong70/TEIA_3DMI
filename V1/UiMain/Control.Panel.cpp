@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "Control.Panel.h"
-#include "Window.View.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -8,7 +7,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetPanel
 
@@ -20,7 +19,7 @@ namespace PresetPanel
 	}
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Control;
 
@@ -65,13 +64,6 @@ bool Control::Panel::Initialize(CWnd* pParentWnd, Window::View* pView, UINT id)
 	ConstructBody();
 
 	return true;
-}
-
-
-
-Window::View* Control::Panel::GetParentView()
-{
-	return m_pView;
 }
 
 

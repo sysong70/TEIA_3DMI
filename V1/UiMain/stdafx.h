@@ -24,24 +24,27 @@
 
 #include <BCGCBProInc.h>			// BCGPro Control Bar
 
-#include "Common_Define.h"
-/*
-// namespace
-#define ROOT Dmi
-#define OPEN_ROOT_NAMESPACE namespace ROOT {
-#define CLOSE_ROOT_NAMESPACE }
-#define DECLARE_ROOT_NAMESPACE namespace ROOT {}
-#define USING_ROOT_NAMESPACE using namespace ROOT;
-// Empty Root namespace
-DECLARE_ROOT_NAMESPACE
-// add root names
-USING_ROOT_NAMESPACE
-*/
+#include <list>
+#include <vector>
+#include <unordered_map>
 
-namespace Component { }
-namespace Dialog { }
-namespace Facility { }
-namespace Window { }
+#include <Common_Define.h>
+#include <Dir.h>
+#include <File.h>
+#include <Fio.h>
+#include <Json.h>
+#include <Path.h>
+#include <Template.h>
+#include <WStr.h>
+
+#include <Signal.h>
+
+namespace Command {}
+namespace Component {}
+namespace Control {}
+namespace Dialog {}
+namespace Facility {}
+namespace Window {}
 
 #ifdef _UNICODE
 #if defined _M_IX86

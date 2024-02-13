@@ -9,7 +9,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetPanelBar
 
@@ -17,13 +17,15 @@ namespace PresetPanelBar
 {
 	const UINT Id = WM_USER;
 
+
+
 	CSize MinBarSize()
 	{
 		return globalUtils.ScaleByDPI(CSize(270, 600));
 	}
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Component;
 

@@ -1,13 +1,8 @@
 ﻿#include "stdafx.h"
 #include "resource.h"
 #include "Component.ModelPanel.h"
-#include "Control.h"
 #include "Facility.h"
-#include "Facility.AppOptions.h"
-#include "Window.Document.h"
 #include "Window.View.h"
-#include <Path.h>
-#include <Signal.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -17,11 +12,9 @@ static char THIS_FILE[] = __FILE__;
 
 //--------------------------------------------------------------------------------------------------
 
-#include "Window.Application.h"
-#include <WStr.h>
-
-#define _LOG
+//#define _LOG
 #ifdef _LOG
+#include "Window.Application.h"
 #define DEBUG_LOG(s) TheApplication.GetMainFrame().GetDebugTracer().AddLog(s)
 #else
 #define DEBUG_LOG DEBUG_TRACE
@@ -41,7 +34,6 @@ Control().EnableTreeCtrlNotifications(TRUE)
 namespace PresetModelPanel
 {
 	const UINT Id = WM_USER;
-
 	WCHAR DummyName[] = L"Expanding...";
 }
 
@@ -286,7 +278,7 @@ LRESULT Component::ModelPanel::OnTreeCheckClick(WPARAM wp, LPARAM lp)
 	Control().RedrawWindow();
 
 	DWORD_PTR key = Control().GetItemData(Control().TreeItem(pRow));
-	m_pView->GetDelivery().modelPanel.OnItemChecked(key, (bool)checked);
+	View().GetDelivery().modelPanel.OnItemChecked(key, (bool)checked);
 
 	return S_FALSE;
 }
@@ -387,7 +379,7 @@ void Component::ModelPanel::OnTreeDblClick(NMHDR* pNMHDR, LRESULT* pResult)
 	DWORD_PTR key = Control().GetItemData(hItem);
 	ASSERT(key != 0);
 
-	m_pView->GetDelivery().modelPanel.OnItemDblClicked(key);
+	View().GetDelivery().modelPanel.OnItemDblClicked(key);
 	//:CHECK - if S_OK, tree expand the item
 	*pResult = S_FALSE;
 }
@@ -405,7 +397,7 @@ void Component::ModelPanel::OnTreeDeleteItem(NMHDR* pNMHDR, LRESULT* pResult)
 	Control().DeleteItem(hItem);
 
 	m_keyMap.erase(key);
-	m_pView->GetDelivery().modelPanel.OnItemDeleted(key);
+	View().GetDelivery().modelPanel.OnItemDeleted(key);
 
 	*pResult = S_OK;
 }
@@ -447,7 +439,7 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 
 			DWORD_PTR key = Control().GetItemData(hItem);
 			ASSERT(key != 0);
-			m_pView->GetDelivery().modelPanel.OnItemExpanded(key);
+			View().GetDelivery().modelPanel.OnItemExpanded(key);
 		}
 	}
 	else {
@@ -521,7 +513,7 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 		DEBUG_LOG(L"* OnTreeSelChanged");
 
 		DWORD_PTR key = Control().GetItemData(hItem);
-		m_pView->GetDelivery().modelPanel.OnItemSelected(key);
+		View().GetDelivery().modelPanel.OnItemSelected(key);
 	}
 
 	*pResult = S_OK;

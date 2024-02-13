@@ -10,11 +10,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
-
-#define MAX_BUFFER	1024
-
-
+//--------------------------------------------------------------------------------------------------
 
 namespace UnitTestFio
 {
@@ -127,6 +123,8 @@ namespace UnitTestFio
 		}
 	}
 }
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region BinFile Class
 
@@ -247,7 +245,13 @@ CString Fio::BinFile::GetMode(EMode e)
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region TextFile Class
+
+#define MAX_BUFFER	1024
+
+
 
 Fio::TextFile::TextFile()
 	: BinFile()

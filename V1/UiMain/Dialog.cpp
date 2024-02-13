@@ -8,6 +8,8 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region Instances Class
 
 Dialog::Instances::Instances()
@@ -68,6 +70,8 @@ void Dialog::Instances::Remove(int id)
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 CSize Dialog::FramePadding()
 {

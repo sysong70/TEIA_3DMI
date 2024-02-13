@@ -2,6 +2,8 @@
 
 #include "Facility.h"
 
+//--------------------------------------------------------------------------------------------------
+
 #define GetBooleanValue(name)	pData->SetBoolean(#name, name)
 #define GetEnumValue(name)		pData->SetInteger(#name, (int)name)
 #define GetIntegerValue(name)	pData->SetInteger(#name, name)
@@ -16,7 +18,7 @@
 #define SetRealValue(name)			name = pData->GetReal(#name, name)
 #define SetStringValue(name)		name = pData->GetString(#name, name)
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Facility
 {

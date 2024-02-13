@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Control.TreePropList.h"
 #include "Facility.h"
-#include <Json.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -9,14 +8,12 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetTreePropList
 
 namespace PresetTreePropList
 {
-#define GetName(data) data.GetString("name")
-
 	enum EControlId
 	{
 		Id = WM_USER,
@@ -24,13 +21,15 @@ namespace PresetTreePropList
 		PropList,
 	};
 
+
+
 	int TreeWidth()
 	{
 		return globalUtils.ScaleByDPI(200);
 	}
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Control;
 

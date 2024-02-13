@@ -10,9 +10,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
-
-#define WSTR_EMPTY L""
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Stream Functions
 
@@ -199,6 +197,8 @@ bool WStr::Split(const wchar_t* pSource, wchar_t token, WStringArray& atomArray)
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region Startdard Functions
 
 void WStr::Add(CString& source, wchar_t ch, int count)
@@ -282,7 +282,7 @@ CString WStr::Get(CString& source, int start, wchar_t toCh, bool includeCh, bool
 {
 	int pos = source.Find(toCh, start);
 	if (pos == -1) {
-		return WSTR_EMPTY;
+		return L"";
 	}
 
 	int index = start;
@@ -299,12 +299,12 @@ CString WStr::Get(CString& source, int start, wchar_t fromCh, wchar_t toCh, bool
 {
 	int from = source.Find(fromCh, start);
 	if (from == -1) {
-		return WSTR_EMPTY;
+		return L"";
 	}
 
 	int to = source.Find(toCh, from + 1);
 	if (to == -1) {
-		return WSTR_EMPTY;
+		return L"";
 	}
 
 	int index = 0;
@@ -328,6 +328,8 @@ CString WStr::Get(CString& source, int start, wchar_t fromCh, wchar_t toCh, bool
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region Extended Functions
 
 CString WStr::Back(CString& source, int count, bool erase)
@@ -345,7 +347,7 @@ CString WStr::Back(CString& source, wchar_t toCh, bool includeCh, bool erase)
 {
 	int pos = source.ReverseFind(toCh);
 	if (pos == -1) {
-		return WSTR_EMPTY;
+		return L"";
 	}
 
 	int index = pos + (includeCh ? 0 : 1);
@@ -365,7 +367,7 @@ CString WStr::Back(CString& source, wchar_t fromCh, wchar_t toCh, bool includeCh
 	while ((pos = source.Find(fromCh, from + 1)) > -1 && 0 <= pos && pos < to);
 
 	if (to == -1 || from == -1 || to == from) {
-		return WSTR_EMPTY;
+		return L"";
 	}
 
 	int index = 0;
@@ -429,6 +431,8 @@ void WStr::RemoveTo(CString& source, wchar_t ch)
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Cast Functions
 
@@ -545,6 +549,8 @@ CString WStr::ToUtf16(const char* value)
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Helper Functions
 

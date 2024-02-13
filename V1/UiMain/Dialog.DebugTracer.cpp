@@ -8,31 +8,35 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetDebugTracer
 
 namespace PresetDebugTracer
 {
-	int ExtraHeight()
-	{
-		return globalUtils.ScaleByDPI(2);
-	}
-
-	int Gap()
-	{
-		return globalUtils.ScaleByDPI(8);
-	}
-
 	enum EControlId
 	{
 		Id = WM_USER + 1,
 		Clear,
 		Save,
 	};
+
+
+
+	int ExtraHeight()
+	{
+		return globalUtils.ScaleByDPI(2);
+	}
+
+
+
+	int Gap()
+	{
+		return globalUtils.ScaleByDPI(8);
+	}
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Dialog;
 
@@ -178,7 +182,7 @@ void Dialog::DebugTracer::ClearLog()
 	m_wndLog.ResetContent();
 }
 
-#include "Fio.h"
+
 
 void Dialog::DebugTracer::SaveLog(Json::Object& data)
 {

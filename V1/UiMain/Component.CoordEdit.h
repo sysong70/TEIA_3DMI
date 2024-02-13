@@ -3,9 +3,8 @@
 #include "Component.h"
 #include "Control.FloatValueEdit.h"
 #include "Window.h"
-#include <vector>
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Component
 {

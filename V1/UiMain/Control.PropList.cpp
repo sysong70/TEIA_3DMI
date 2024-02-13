@@ -2,7 +2,6 @@
 #include "Control.PropList.h"
 #include "Control.Property.h"
 #include "Facility.h"
-#include <WStr.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -10,7 +9,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetPropList
 
@@ -18,10 +17,14 @@ namespace PresetPropList
 {
 	int ControlId = 0;
 
+
+
 	void Initialize()
 	{
 		ControlId = WM_USER + 1;
 	}
+
+
 
 	UINT GetControlId()
 	{
@@ -29,7 +32,7 @@ namespace PresetPropList
 	}
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Control;
 

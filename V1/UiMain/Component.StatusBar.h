@@ -1,9 +1,8 @@
 ﻿#pragma once
 
 #include "Component.h"
-#include <Json.h>
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Component
 {

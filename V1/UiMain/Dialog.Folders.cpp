@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Dialog.Folders.h"
 #include "Window.Application.h"
-#include <WStr.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -12,8 +11,6 @@ static char THIS_FILE[] = __FILE__;
 //--------------------------------------------------------------------------------------------------
 
 #pragma region EditListBox Control
-
-//--------------------------------------------------------------------------------------------------
 
 Dialog::Folders::EditListBox::EditListBox()
 {
@@ -76,7 +73,7 @@ namespace PresetAppOptions
 	};
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Dialog;
 

@@ -1,18 +1,12 @@
 ﻿#pragma once
 
 #include "Command.h"
-#include <Json.h>
-
 #include "Command.Resource.h"
-#include "Component.TaskBar.h"
-#include "Control.TaskPanel.h"
 #include "Facility.AppResources.h"
-#include "Facility.CommandIndexer.h"
 #include "Window.Application.h"
-#include "Window.MainFrame.h"
-#include "Signal.h"
+#include "Window.View.h"
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Command
 {

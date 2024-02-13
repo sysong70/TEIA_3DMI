@@ -8,28 +8,31 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetCoordEdit
 
 namespace PresetCoordEdit
 {
 	const UINT Id = WM_USER + 1;
+	std::vector<Control::FloatValueEdit*> Controls;
+
+
 
 	CSize ControlSize()
 	{
 		return globalUtils.ScaleByDPI(CSize(72, 20));
 	}
 
+
+
 	CPoint Offset()
 	{
 		return globalUtils.ScaleByDPI(CPoint(16, 16));
 	}
-
-	std::vector<Control::FloatValueEdit*> Controls;
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Component;
 

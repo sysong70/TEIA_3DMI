@@ -5,6 +5,8 @@
 #include "Path.h"
 #include "WStr.h"
 
+#pragma warning(disable : 4996)
+
 #ifdef _DEBUG
 #ifndef DEBUG_NEW
 #define DEBUG_NEW new(_CLIENT_BLOCK, __FILE__, __LINE__)
@@ -15,9 +17,13 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+//--------------------------------------------------------------------------------------------------
+
 Json::Array theDummyArray;
 Json::Object theDummyObject;
 Json::Value theDummyValue;
+
+//--------------------------------------------------------------------------------------------------
 
 #ifdef _DEBUG
 
@@ -78,6 +84,8 @@ void Json::UnitTest()
 }
 
 #endif
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Array Class
 
@@ -406,6 +414,8 @@ void Json::Array::Stringify(CString& buffer)
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Value Class
 
@@ -1060,6 +1070,8 @@ void Json::Value::Stringify(CString& buffer)
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region Pair Class
 
 Json::Pair::Pair()
@@ -1091,6 +1103,8 @@ Json::Pair::~Pair()
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Object Class
 
@@ -1568,6 +1582,8 @@ bool Json::Object::Look(const char* pName, Value*& pValue) const
 
 #pragma endregion //:REGION
 
+//--------------------------------------------------------------------------------------------------
+
 #pragma region Reader Namespace
 
 bool Json::Reader::ReadArray(wchar_t*& pStream, Array& arrayData)
@@ -1829,6 +1845,8 @@ bool Json::Reader::SkipNull(wchar_t*& pStream)
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Helper Namespace
 
@@ -2216,6 +2234,8 @@ Json::Value* Json::Helper::GetCoordinate(float* pSource, bool useArray, bool is3
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Builder Namespace
 

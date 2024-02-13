@@ -8,15 +8,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
-
-#define PRESET PresetListBox
-
-namespace PresetListBox
-{
-}
-
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Control;
 
@@ -94,5 +86,3 @@ void Control::CheckListBox::OnClickItem(int index)
 	int check = GetCheck(index);
 	SetCheck(index, check == BST_CHECKED ? BST_UNCHECKED : BST_CHECKED);
 }
-
-#undef PRESET

@@ -2,7 +2,6 @@
 #include "resource.h"
 #include "Control.ToolBar.h"
 #include "Facility.h"
-#include "Window.View.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -10,7 +9,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Control;
 

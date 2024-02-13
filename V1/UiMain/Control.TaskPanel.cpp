@@ -8,7 +8,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET TaskPanelPreset
 
@@ -18,7 +18,7 @@ namespace TaskPanelPreset
 	const int ResetButtonIdMax = 10;
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Control;
 

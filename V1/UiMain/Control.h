@@ -1,10 +1,6 @@
 ﻿#pragma once
 
-#include <Json.h>
-#include <list>
-#include <BCGCBProInc.h>
-
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Control
 {

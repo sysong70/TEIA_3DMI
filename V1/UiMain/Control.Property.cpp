@@ -7,7 +7,8 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
+// 
 // in BCGPPropList.cpp
 #define PROP_HAS_LIST 0x0001
 #define ICON_PADDING(parent) globalUtils.ScaleByDPI(3, parent)
@@ -847,8 +848,10 @@ void Property::Duration::SetValue(const _variant_t& varValue)
 #pragma endregion //:REGION
 
 //--------------------------------------------------------------------------------------------------
-#include "Dialog.Folders.h"
+
 #pragma region FoldersDialog Class
+
+#include "Dialog.Folders.h"
 
 Property::FoldersDialog::FoldersDialog(const CString& name, const CString value, LPCTSTR lpDescr, DWORD_PTR data)
 	: CBCGPProp(name, (LPCTSTR)value, lpDescr, data)
@@ -926,6 +929,8 @@ CWnd* Property::FontCombo::CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultForma
 
 	return pWnd;
 }
+
+#pragma endregion //:REGION
 
 //--------------------------------------------------------------------------------------------------
 
@@ -1525,3 +1530,4 @@ void Property::TwoButtons::LoadImages()
 #pragma endregion //:REGION
 
 #undef PROP_HAS_LIST
+#undef ICON_PADDING

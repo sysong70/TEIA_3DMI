@@ -1,16 +1,11 @@
 ﻿#pragma once
 
-#include <Json.h>
-#include <Signal.h>
+//--------------------------------------------------------------------------------------------------
 
-
-
-//typedef void (*SendSignalFunc)(const wchar_t* content);
-//typedef void (*AssignSendSignalFunc)(SendSignalFunc fp);
 using SendSignalFunc = void (*)(const wchar_t* content);
 using AssignSendSignalFunc = void (*)(SendSignalFunc fp);
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Connector3d
 {
@@ -23,7 +18,7 @@ namespace Connector3d
 	void ReceiveSignal(const wchar_t* content);
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Connector2d
 {

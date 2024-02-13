@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Window
 {
@@ -41,4 +41,12 @@ namespace Window
 		OnSignal = WM_USER,
 		OnNextFileOpen,
 	};
+
+
+
+	bool IsAllowedFile(const wchar_t* pFilePath);
+
+	bool IsAllowed3d(const wchar_t* pFilePath);
+
+	bool IsAllowed2d(const wchar_t* pFilePath);
 }

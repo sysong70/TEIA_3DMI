@@ -2,11 +2,8 @@
 
 #include "Dialog.h"
 #include "resource.h"
-#include "Facility.Base.h"
-#include <Json.h>
-#include <Signal.h>
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Dialog
 {
@@ -23,10 +20,6 @@ namespace Dialog
 	public:
 
 		virtual Signal::Target GetSignalTargetId();
-		// return dialog result
-		//virtual Facility::Base* GetResultData(bool bNewInstance = false);
-		// delete after using this data
-		//virtual Json::Object* GetResult();
 
 		virtual void ReceiveSignal(Json::Object* pData);
 

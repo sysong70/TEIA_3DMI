@@ -4,11 +4,11 @@
 #include "Control.PropList.h"
 #include "Control.TreeCtrlEx.h"
 
-
+//--------------------------------------------------------------------------------------------------
 
 using OnPropertyChangedFunc = void (CWnd::*)(Json::Value& target, CBCGPProp& source);
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Control
 {

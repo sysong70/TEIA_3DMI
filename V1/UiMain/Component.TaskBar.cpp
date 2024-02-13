@@ -1,9 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Component.TaskBar.h"
-#include "Control.TaskPanel.h"
 #include "Facility.AppResources.h"
-#include "Window.MainFrame.h"
-#include "Window.View.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -11,7 +8,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetTaskBar
 
@@ -22,10 +19,14 @@ namespace PresetTaskBar
 		Id = WM_USER,
 	};
 
+
+
 	CRect BarMargin()
 	{
 		return globalUtils.ScaleByDPI(CRect(4, 38, 0, 38));
 	}
+
+
 
 	CSize CloseHandleSize()
 	{
@@ -33,7 +34,7 @@ namespace PresetTaskBar
 	}
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Component;
 

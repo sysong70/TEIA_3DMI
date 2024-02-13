@@ -3,7 +3,7 @@
 #include "Component.h"
 #include "Control.Panel.h"
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Component
 {

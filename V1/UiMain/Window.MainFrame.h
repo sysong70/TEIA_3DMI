@@ -8,7 +8,7 @@
 #include "Dialog.h"
 #include "Dialog.DebugTracer.h"
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Window
 {
@@ -101,7 +101,6 @@ namespace Window
 	private:
 
 		std::vector<CString> m_fileNames;
-		//Json::Object m_importOption;
 
 		bool HasNextFile();
 

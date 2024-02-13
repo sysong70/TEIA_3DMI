@@ -7,7 +7,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Dialog;
 
@@ -49,20 +49,6 @@ Signal::Target Dialog::Base::GetSignalTargetId()
 {
 	return Signal::Target::Unknown;
 }
-
-
-
-//Facility::Base* Dialog::Base::GetResultData(bool bNewInstance)
-//{
-//	RETURN_NULL;
-//}
-
-// delete after using this data
-
-//Json::Object* Dialog::Base::GetResult()
-//{
-//	RETURN_NULL;
-//}
 
 
 

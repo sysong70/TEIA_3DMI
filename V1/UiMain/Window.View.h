@@ -9,9 +9,8 @@
 #include "Command.h"
 #include "Control.HistoryBar.h"
 #include "Control.TabWnd.h"
-#include <Signal.h>
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Window
 {

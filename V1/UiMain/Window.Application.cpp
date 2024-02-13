@@ -8,7 +8,6 @@
 #include "Connector.h"
 #include "Facility.AppResources.h"
 #include "Facility.AppOptions.h"
-#include <Path.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -36,8 +35,6 @@ namespace PresetApplication
 }
 
 //--------------------------------------------------------------------------------------------------
-
-#include <Template.h>
 
 class VisualManagerCustom : public CBCGPVisualManager2019
 {

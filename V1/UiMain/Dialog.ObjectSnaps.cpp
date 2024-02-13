@@ -8,7 +8,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetObjectSnap
 
@@ -16,13 +16,15 @@ namespace PresetObjectSnap
 {
 	const UINT Id = WM_USER;
 
+
+
 	int ExtraHeight()
 	{
 		return globalUtils.ScaleByDPI(6);
 	}
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Dialog;
 

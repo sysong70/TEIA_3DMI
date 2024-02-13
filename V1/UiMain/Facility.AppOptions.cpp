@@ -2,8 +2,6 @@
 #include "resource.h"
 #include "Facility.AppOptions.h"
 #include "Facility.AppResources.h"
-#include <File.h>
-#include <Path.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -11,11 +9,11 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 Facility::AppOptions TheAppOptions;
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetAppOptions
 
@@ -25,7 +23,7 @@ namespace PresetAppOptions
 	const CString FileOpeionsName = L"FileOptions.Json";
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 Facility::AppOptions::AppOptions()
 {

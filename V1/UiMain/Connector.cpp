@@ -8,14 +8,12 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+//--------------------------------------------------------------------------------------------------
 
-
-//typedef bool (*InitializeFunc)(void);
-//typedef bool (*TerminateFunc)(void);
 using InitializeFunc = bool (*)(void);
 using TerminateFunc = bool (*)(void);
 
-
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Connector3d Namespace
 
@@ -69,7 +67,7 @@ public:
 
 Broker3d theBroker3d;
 
-
+//--------------------------------------------------------------------------------------------------
 
 bool Connector3d::Initialize()
 {
@@ -122,6 +120,8 @@ void Connector3d::ReceiveSignal(const wchar_t* content)
 }
 
 #pragma endregion //:REGION
+
+//--------------------------------------------------------------------------------------------------
 
 #pragma region Connector2d Namespace
 
@@ -184,7 +184,7 @@ public:
 
 Broker2d theBroker2d;
 
-
+//--------------------------------------------------------------------------------------------------
 
 bool Connector2d::Initialize()
 {

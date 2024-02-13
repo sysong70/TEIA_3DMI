@@ -1,10 +1,8 @@
 ﻿#pragma once
 
 #include "Control.h"
-#include "Window.h"
-#include <vector>
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Control
 {

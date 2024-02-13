@@ -3,7 +3,7 @@
 #include "Dialog.Standard.H"
 #include "Control.CheckListBox.h"
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace Dialog
 {

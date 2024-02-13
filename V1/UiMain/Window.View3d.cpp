@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 #include "resource.h"
+#include "Window.View3d.h"
 #include "Window.Document.h"
 #include "Window.MainFrame.h"
-#include "Window.View3d.h"
 #include "Command.Base.h"
 #include "Connector.h"
 #include "Facility.h"
@@ -14,7 +14,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetView3d
 
@@ -33,7 +33,7 @@ namespace PresetView3d
 	};
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 using namespace Window;
 

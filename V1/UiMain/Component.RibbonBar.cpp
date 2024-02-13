@@ -9,7 +9,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
+//--------------------------------------------------------------------------------------------------
 
 #define PRESET PresetRibbonBar
 
@@ -20,6 +20,8 @@ namespace PresetRibbonBar
 		return globalUtils.ScaleByDPI(CSize(32, 32));
 	}
 
+
+
 	CBCGPRibbonPanel* CreatePanel(CBCGPRibbonCategory* pCategory, int id)
 	{
 		CBCGPRibbonPanel* pPanel = pCategory->AddPanel(Facility::GetTitle(id));
@@ -27,6 +29,8 @@ namespace PresetRibbonBar
 
 		return pPanel;
 	}
+
+
 
 	CBCGPRibbonButton* CreateButton(int id, CString otherTitle = L"")
 	{
@@ -47,6 +51,8 @@ namespace PresetRibbonBar
 
 		return pButton;
 	}
+
+
 
 	CBCGPRibbonPaletteButton* CreatePalette(int baseId, int startId, int endId, bool splitMode = true)
 	{
@@ -97,7 +103,7 @@ namespace PresetRibbonBar
 	}
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 Component::RibbonBar::RibbonBar()
 {
