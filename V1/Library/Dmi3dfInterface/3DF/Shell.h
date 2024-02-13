@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "3DF.h"
 #include "Geometry.h"
 
 #include "Math.h"
@@ -51,6 +52,7 @@ namespace H3DF
 		void EndAddFaces();
 
 		void SetRegionFaces(int nRegionIndex, int nFaceFirstIndex, int nFaceCount);
+		void SetRegionMaterial(int nInRegionIndex, H3DF::MaterialKit & cInMaterial);
 
 		void DeleteShellWrapperKey();
 

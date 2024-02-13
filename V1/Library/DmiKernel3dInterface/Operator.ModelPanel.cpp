@@ -82,6 +82,8 @@ namespace KERNEL
 		
 			bool ExpandItem(ModelTreeItem * pcInItem, bool bRecursiveExpand);
 
+			bool GetItemName(HC_KEY nInKey, CString & strOutName);
+
 		protected:
 			bool ShowSelectionEndItems(ModelTreeItem * pcInTreeItem, H3DF::SelectionResults & cOutResults);
 
@@ -90,6 +92,9 @@ namespace KERNEL
 			ModelTreeItem * m_pcModelsGroupItem = nullptr;
 			ModelTreeItem * m_pcMeasurementsGroupItem = nullptr;
 			ModelTreeItem * m_pcMarkupsGroupItem = nullptr;
+
+			DWORD m_nSolidIndex = 1;
+			DWORD m_nSurfaceIndex = 1;
 
 			//std::unordered_map<DWORD_PTR, ModelTreeItem *> m_cItems;
 		};
@@ -311,7 +316,8 @@ bool KERNEL::Operator::ModelTree::ShowPath(ModelTreeItem * pcInItem, H3DF::KeyPa
 }
 */
 
-// 3. 주어진 Item을 전개한다.
+// 3. 주어진 Item을 전개한다. 
+// 입력값은 Include값이거나 Segment값이 들어올수 있다. 입력되는 값들의 규칙은 중간값은 Include, 마지막 값은 Segment이다.
 bool KERNEL::Operator::ModelTree::ExpandItem(ModelTreeItem * pcInItem, bool bRecursiveExpand)
 {
 	if (TreeItemStatus::End & pcInItem->m_nStatus) {
@@ -365,6 +371,46 @@ bool KERNEL::Operator::ModelTree::ExpandItem(ModelTreeItem * pcInItem, bool bRec
 
 	return true;
 }
+
+// 4. 주어진 Key값의 Item Name을 가져온다.
+bool KERNEL::Operator::ModelTree::GetItemName(HC_KEY nInKey, CString & strOutName)
+{
+	DWORD nType;
+
+	H3DF::Type eType = H3DF::Utility::GetType(nInKey);
+
+	H3DF::SegmentKey cSegment;
+	if (H3DF::Type::IncludeKey == eType) {
+		IncludeKey cInInclude(nInKey);
+		cSegment = cInInclude.GetTarget().KeyValue();
+	}
+	else if (H3DF::Type::SegmentKey == eType) {
+		cSegment = H3DF::SegmentKey(nInKey);
+	}
+
+	if (true == H3DF::UserData::ShowTopologyType(cSegment, nType)) {
+		if ((DWORD)TopologyType::Solid == nType) {
+			strOutName.Format(L"Solid %d", m_nSolidIndex++);
+
+		}
+		else if ((DWORD)TopologyType::Surface == nType) {
+			strOutName.Format(L"Surface %d", m_nSurfaceIndex++);
+		}
+	}
+	else {
+		if (false == H3DF::UserData::ShowSegmentName(nInKey, strOutName)) {
+			strOutName = H3DF::Utility::GetName(nInKey);
+		}
+	}
+
+	if (true == strOutName.IsEmpty()) {
+		return false;
+	}
+
+	return true;
+}
+
+
 
 //== ModelPanelImpl 관련 함수 ========================================================================
 
@@ -481,6 +527,7 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 	pcImpl->Delivery().modelPanel.AddChildren((DWORD_PTR)pcRootItem, cTreeItems);
 }
 
+// 2. Select 관련 Control 설정 함수
 void KERNEL::Operator::ModelPanel::SetSelect(Select * pcInSelect)
 {
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
@@ -605,6 +652,14 @@ void KERNEL::Operator::ModelPanel::SetSelectItem(H3DF::SelectionItem & cSelItem)
 	pcImpl->Delivery().modelPanel.ExpandParent((DWORD_PTR)pcItem);
 }
 
+// 2. Key값을 이용해서 Key값과 관련된, Name을 가져옴.
+CString KERNEL::Operator::ModelPanel::GetKeyName(HC_KEY nInKey)
+{
+	CString strName;
+	H3DF::UserData::ShowSegmentName(nInKey, strName);
+	return strName;
+}
+
 //== Item Expanded 관련 함수 =========================================================================
 
 // 1. Item Expanded Signal 처리
@@ -672,13 +727,28 @@ void KERNEL::Operator::ModelPanel::UserInterfaceItemExpanded(ModelTreeItem * pcI
 			}
 
 			CString strUserName;
-			if (false == H3DF::UserData::ShowSegmentName(pcChildItem->m_nKey, strUserName)) {
-				strUserName = H3DF::Utility::GetName(pcChildItem->m_nKey);
+			pcImpl->ModelTree().GetItemName(pcChildItem->m_nKey, strUserName);
+
+#if 0
+			HC_KEY nSegKey = INVALID_KEY, nIncKey = INVALID_KEY;
+			H3DF::Type eType = H3DF::Utility::GetType(pcChildItem->m_nKey);
+			if (H3DF::Type::IncludeKey == eType) {
+				nIncKey = pcChildItem->m_nKey;
+				IncludeKey cInInclude(nIncKey);
+				nSegKey = cInInclude.GetTarget().KeyValue();
+			}
+			else if (H3DF::Type::SegmentKey == eType) {
+				nSegKey = pcChildItem->m_nKey;
 			}
 
-#ifdef _DEBUG
 			CString strText;
-			strText.Format(L": Inc [%d], Seg [%d]", pcChildItem->m_nKey, pcChildItem->m_nKey);
+			if (INVALID_KEY == nIncKey) {
+				strText.Format(L": Seg [%d]", nSegKey);
+			}
+			else {
+				strText.Format(L": Inc [%d], Seg [%d]", nIncKey, nSegKey);
+			}
+			
 			strUserName += strText;
 #endif
 

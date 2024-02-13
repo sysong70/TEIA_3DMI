@@ -252,6 +252,8 @@ namespace H3DF
 		bool ShowEnvironment(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
 		bool ShowBump(CString & strOutTextureName) const;
 		bool ShowGloss(float & fOutGloss) const;
+
+		void SetMaterial(CStringA strInGeometryName);
 	};
 
 	class API_3DF MaterialMappingKit : public Kit
