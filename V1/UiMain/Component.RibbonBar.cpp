@@ -1,13 +1,126 @@
 ﻿#include "stdafx.h"
 #include "resource.h"
 #include "Component.RibbonBar.h"
-#include "Window.h"
+#include "Window.Application.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+//--------------------------------------------------------------------------------------------------
+
+class RibbonSplitButton : public CBCGPRibbonButton
+{
+public:
+
+	RibbonSplitButton()
+	{
+		CommonInit();
+	}
+
+	RibbonSplitButton(int id, LPCTSTR lpszText)
+		: CBCGPRibbonButton(id, lpszText)
+	{
+		//:WARNING - split button mode
+		SetDefaultCommand(TRUE);
+	}
+
+public:
+
+	void SelectChild(int index)
+	{
+		SelectChild((CBCGPRibbonButton*)m_arSubItems[index]);
+	}
+
+	void SelectChild(CBCGPRibbonButton* pChild)
+	{
+		auto& cmd = TheCommandIndexer.Get(GetID());
+		ASSERT(cmd.Id != -1); // Not dummy
+		cmd.ChildId = pChild->GetID();
+
+		//:WARNING - bAlphaBlendIcon == TRUE
+		SetIcon(pChild->GetIcon(), TRUE, FALSE, TRUE);
+		//:CHECK - can not change size...
+		//SetText(pChild->GetText());
+		//SetToolTipText(pChild->GetToolTipText());
+	}
+};
+
+//--------------------------------------------------------------------------------------------------
+
+class RibbonChildItem : public CBCGPRibbonButton
+{
+	DECLARE_DYNCREATE(RibbonChildItem)
+
+public:
+
+	RibbonChildItem()
+	{
+		CommonInit();
+	}
+
+	RibbonChildItem(int id, LPCTSTR lpszText)
+		: CBCGPRibbonButton(id, lpszText)
+	{}
+
+public: // CBCGPBaseRibbonElement
+
+	void OnAfterAddToParent(CBCGPBaseRibbonElement* pParentElem) override
+	{
+		m_pParentElem = (RibbonSplitButton*)pParentElem;
+	}
+
+public: // CBCGPRibbonButton
+
+	void OnClick(CPoint point) override
+	{
+		if (m_pParentElem == nullptr) {
+			//:WARNING - this is a new dynamically created entity! why??
+			RibbonChildItem* inRibbon = (RibbonChildItem*)TheApplication.GetMainFrame().GetRibbonBar().FindByID(GetID());
+			DEBUG_VALID(inRibbon);
+			inRibbon->m_pParentElem->SelectChild(inRibbon);
+		}
+		else {
+			m_pParentElem->SelectChild(this);
+		}
+
+		CBCGPRibbonButton::OnClick(point);
+	}
+
+private:
+
+	RibbonSplitButton* m_pParentElem = nullptr;
+};
+
+IMPLEMENT_DYNCREATE(RibbonChildItem, CBCGPRibbonButton)
+
+//--------------------------------------------------------------------------------------------------
+
+class RibbonButton : public CBCGPRibbonButton
+{
+public:
+
+	RibbonButton()
+	{
+		CommonInit();
+	}
+
+	RibbonButton(int id, LPCTSTR lpszText)
+		: CBCGPRibbonButton(id, lpszText)
+	{}
+
+public: // CBCGPBaseRibbonElement
+
+	// For icon size of context menu
+
+	//BOOL OnDrawMenuImage(CDC* pDC, CRect rect) override
+	//{
+	//	DrawImage(pDC, RibbonImageLarge, rect);
+	//	return TRUE;
+	//}
+};
 
 //--------------------------------------------------------------------------------------------------
 
@@ -30,12 +143,10 @@ namespace PresetRibbonBar
 		return pPanel;
 	}
 
-
+	// Single button
 
 	CBCGPRibbonButton* CreateButton(int id, CString otherTitle = L"")
 	{
-		Facility::CommandIndexer::CommandInfo& item = TheCommandIndexer.Get(id);
-
 		CString title, tooltip;
 		Facility::GetResource(id, title, tooltip);
 		//:CHECK
@@ -43,17 +154,61 @@ namespace PresetRibbonBar
 			title = otherTitle;
 		}
 
-		CBCGPRibbonButton* pButton = new CBCGPRibbonButton(id, title);
+		//CBCGPRibbonButton* pButton = new CBCGPRibbonButton(id, title);
+		CBCGPRibbonButton* pButton = new RibbonButton(id, title);
 		pButton->SetIcon(Facility::CreateIcon(id, PRESET::IconSize()), TRUE, FALSE, TRUE);
 		pButton->SetToolTipText(tooltip);
 		pButton->SetAlwaysLargeImage();
-		pButton->SetData((DWORD_PTR)&item);
 
 		return pButton;
 	}
 
+	// Drop-down style button
+
+	CBCGPRibbonButton* CreateButton(int baseId, int startId, int endId)
+	{
+		CBCGPRibbonButton* pParent = CreateButton(baseId);
+		// not split mode
+		pParent->SetDefaultCommand(FALSE);
+
+		for (int id = startId; id <= endId; id++) {
+			pParent->AddSubItem(CreateButton(id));
+		}
+
+		return pParent;
+	}
+
+	// Drop-down style button with splite mode
+
+	CBCGPRibbonButton* CreateSplitButton(int baseId, int startId, int endId)
+	{
+		CString title, tooltip;
+		Facility::GetResource(baseId, title, tooltip);
+
+		RibbonSplitButton* pParent = new RibbonSplitButton(baseId, title);
+		pParent->SetIcon(Facility::CreateIcon(baseId, PRESET::IconSize()), TRUE, FALSE, TRUE);
+		pParent->SetToolTipText(tooltip);
+		pParent->SetAlwaysLargeImage();
+
+		for (int id = startId; id <= endId; id++) {
+			Facility::GetResource(id, title, tooltip);
+
+			RibbonChildItem* pItem = new RibbonChildItem(id, title);
+			pItem->SetIcon(Facility::CreateIcon(id, PRESET::IconSize()), TRUE, FALSE, TRUE);
+			pItem->SetToolTipText(tooltip);
+			pItem->SetAlwaysLargeImage();
+
+			pParent->AddSubItem(pItem);
+		}
+
+		//:WARNING - select first item
+		pParent->SelectChild(0);
+
+		return pParent;
+	}
 
 
+	/*
 	CBCGPRibbonPaletteButton* CreatePalette(int baseId, int startId, int endId, bool splitMode = true)
 	{
 		// make image list
@@ -101,6 +256,7 @@ namespace PresetRibbonBar
 
 		return pButton;
 	}
+	*/
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -126,7 +282,7 @@ bool Component::RibbonBar::Initialize(CWnd* pMainFrame)
 	//EnableCustomization();
 	//EnableKeyTips();
 	EnableMinimizeButton();
-	EnableToolTips(FALSE, FALSE);
+	EnableToolTips(TRUE, TRUE);
 
 	SetApplicationModes((UINT)Window::EAppMode::Standard);
 	SetMinimizeButtonLocation(BCGPRibbonMinimizeButtonLocation_RightOfCategory);
@@ -136,7 +292,10 @@ bool Component::RibbonBar::Initialize(CWnd* pMainFrame)
 	//ShowContextCategories();
 	ToggleMinimizeState();
 
-	return CreateMainCategory() && CreateCategories();
+	bool success = CreateMainCategory() && CreateCategories();
+	RedrawWindow();
+
+	return success;
 }
 
 
@@ -247,22 +406,19 @@ bool Component::RibbonBar::CreateCategories()
 
 	pPanel = PRESET::CreatePanel(pCategory, HOME_3D_PNL_Focus);
 	pPanel->Add(PRESET::CreateButton(HOME_3D_CMD_Pan));
-	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_Zoom, HOME_3D_CMD_Zoom_Fit, HOME_3D_CMD_Zoom_Object));
-	//pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_Rotate, HOME_3D_CMD_Rotate_Rotate, HOME_3D_CMD_Rotate_Orbit));
-	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_Rotate, HOME_3D_CMD_Rotate_Rotate, HOME_3D_CMD_Rotate_Turntable));
+	pPanel->Add(PRESET::CreateSplitButton(HOME_3D_LST_Zoom, HOME_3D_CMD_Zoom_Fit, HOME_3D_CMD_Zoom_Object));
+	pPanel->Add(PRESET::CreateSplitButton(HOME_3D_LST_Rotate, HOME_3D_CMD_Rotate_Rotate, HOME_3D_CMD_Rotate_Turntable));
 
 	pPanel = PRESET::CreatePanel(pCategory, HOME_3D_PNL_View);
-	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_ViewStyle, HOME_3D_CMD_ViewStyle_Shade, HOME_3D_CMD_ViewStyle_Tessellated, true));
-	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_ViewDirection, HOME_3D_CMD_ViewDirection_Top, HOME_3D_CMD_ViewDirection_Perspective, true));
-	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_Visualize, HOME_3D_CMD_Visualize_ShowAll, HOME_3D_CMD_Visualize_Toggle, true));
-	//:CHECK
-	//pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_VisualEffects, HOME_3D_CMD_VisualEffects_Shadow, HOME_3D_CMD_VisualEffects_Bloom, false));
+	pPanel->Add(PRESET::CreateSplitButton(HOME_3D_LST_ViewStyle, HOME_3D_CMD_ViewStyle_Shade, HOME_3D_CMD_ViewStyle_Tessellated));
+	pPanel->Add(PRESET::CreateButton(HOME_3D_LST_ViewDirection, HOME_3D_CMD_ViewDirection_Top, HOME_3D_CMD_ViewDirection_Perspective));
+	pPanel->Add(PRESET::CreateButton(HOME_3D_LST_Visualize, HOME_3D_CMD_Visualize_ShowAll, HOME_3D_CMD_Visualize_Toggle));
 	pPanel->Add(PRESET::CreateButton(HOME_3D_LST_VisualEffects));
 
 	pPanel = PRESET::CreatePanel(pCategory, HOME_3D_PNL_SelectAndSnap);
-	pPanel->Add(PRESET::CreatePalette(HOME_3D_LST_Select, HOME_3D_CMD_Select_All, HOME_3D_CMD_Select_Axis, false));
-	pPanel->Add(PRESET::CreatePalette(HOME_3D_POP_SelectionFiter, HOME_3D_CMD_SelectionFiter_Point, HOME_3D_CMD_SelectionFiter_PMI, false));
-	pPanel->Add(PRESET::CreatePalette(HOME_3D_POP_ObjectSnap, HOME_3D_CMD_ObjectSnap_Point, HOME_3D_CMD_ObjectSnap_ExpandLine, false));
+	pPanel->Add(PRESET::CreateButton(HOME_3D_LST_Select, HOME_3D_CMD_Select_All, HOME_3D_CMD_Select_Axis));
+	pPanel->Add(PRESET::CreateButton(HOME_3D_POP_SelectionFiter, HOME_3D_CMD_SelectionFiter_Point, HOME_3D_CMD_SelectionFiter_PMI));
+	pPanel->Add(PRESET::CreateButton(HOME_3D_POP_ObjectSnap, HOME_3D_CMD_ObjectSnap_Point, HOME_3D_CMD_ObjectSnap_ExpandLine));
 
 	pPanel = PRESET::CreatePanel(pCategory, HOME_3D_PNL_Window);
 	pPanel->Add(PRESET::CreateButton(HOME_3D_CMD_Window_Cascade));
@@ -331,38 +487,6 @@ void Component::RibbonBar::Reload()
 
 	CreateCategories();
 	CreateMainCategory();
-}
-
-
-
-Facility::CommandIndexer::CommandInfo& Component::RibbonBar::GetData(UINT id)
-{
-	CBCGPBaseRibbonElement* pElem = FindByID(id, FALSE);
-	if (pElem != nullptr) {
-		DWORD_PTR data = pElem->GetData();
-		if (data != 0) {
-			return *(Facility::CommandIndexer::CommandInfo*)data;
-		}
-	}
-
-	DEBUG_STOP;
-	return TheCommandIndexer.GetDummyData();
-}
-
-Facility::CommandIndexer::CommandInfo& Component::RibbonBar::GetData(CBCGPRibbonCategory* pCategory, UINT id)
-{
-	if (pCategory != nullptr) {
-		CBCGPBaseRibbonElement* pElem = pCategory->FindByID(id, FALSE);
-		if (pElem != nullptr) {
-			DWORD_PTR data = pElem->GetData();
-			if (data != 0) {
-				return *(Facility::CommandIndexer::CommandInfo*)data;
-			}
-		}
-	}
-
-	DEBUG_STOP;
-	return TheCommandIndexer.GetDummyData();
 }
 
 #undef PRESET

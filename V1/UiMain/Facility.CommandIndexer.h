@@ -11,6 +11,7 @@ namespace Facility
 	{
 	public:
 
+		//:WARNING - do not use enum class
 		enum EItemType
 		{
 			Unknown,
@@ -28,8 +29,10 @@ namespace Facility
 		struct CommandInfo
 		{
 			EItemType Type = Unknown;
-			int Id = -1;				// File_3D_CMD_New
-			CString StringId;			// L"File_3D_CMD_New"
+
+			int Id = -1;				// HOME_3D_LST_Zoom
+			int ChildId = -1;			// HOME_3D_CMD_Zoom_Fit
+			CString StringId;			// L"HOME_3D_LST_Zoom"
 			void* Function = nullptr;	// Target function
 		};
 

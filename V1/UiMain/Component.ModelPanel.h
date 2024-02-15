@@ -34,6 +34,10 @@ namespace Component
 
 		afx_msg void OnCommand(UINT id);
 
+		afx_msg void OnRButtonDown(UINT nFlags, CPoint point);
+
+		afx_msg void OnRButtonUp(UINT nFlags, CPoint point);
+
 		afx_msg LRESULT OnTreeCheckClick(WPARAM wp, LPARAM lp);
 
 		afx_msg void OnTreeBeginDrag(NMHDR* pNMHDR, LRESULT* pResult);

@@ -33,6 +33,7 @@ void Facility::SetLanguage(ELanguage value)
 {
 	PRESET::Language = value;
 
+	//:WARNING - change UI(resource) language
 	BOOL success = FALSE;
 	switch (value) {
 	case ELanguage::Korean:

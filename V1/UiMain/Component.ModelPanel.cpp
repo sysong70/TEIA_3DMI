@@ -2,6 +2,7 @@
 #include "resource.h"
 #include "Component.ModelPanel.h"
 #include "Facility.h"
+#include "Window.Application.h"
 #include "Window.View.h"
 
 #ifdef _DEBUG
@@ -12,9 +13,10 @@ static char THIS_FILE[] = __FILE__;
 
 //--------------------------------------------------------------------------------------------------
 
+//#define _TEST
 //#define _LOG
+
 #ifdef _LOG
-#include "Window.Application.h"
 #define DEBUG_LOG(s) TheApplication.GetMainFrame().GetDebugTracer().AddLog(s)
 #else
 #define DEBUG_LOG DEBUG_TRACE
@@ -65,7 +67,7 @@ public:
 	//		| TVM_EDITLABEL
 			/// Enables full-row selection in the tree view.
 			/// This style cannot be used in conjunction with the TVS_HASLINES style.
-			| TVS_FULLROWSELECT
+	//		| TVS_FULLROWSELECT
 			/// Displays plus (+) and minus (-) buttons next to parent items.
 			/// To include buttons with items at the root of the tree view, TVS_LINESATROOT must also be specified.
 			| TVS_HASBUTTONS
@@ -78,9 +80,9 @@ public:
 			| TVS_LINESATROOT
 			/// Disables horizontal scrolling in the control.
 			/// The control will not display any horizontal scroll bars.
-			| TVS_NOHSCROLL
+	//		| TVS_NOHSCROLL
 			/// Disables tooltips.
-			| TVS_NOTOOLTIPS
+	//		| TVS_NOTOOLTIPS
 			/// Causes text to be displayed from right-to-left (RTL).
 	//		| TVS_RTLREADING
 			/// Causes a selected item to remain selected when the tree-view control loses focus.
@@ -97,12 +99,10 @@ public:
 		}
 
 		SetVisualManagerColorTheme();
-		EnableColumnAutoSize();
-		ModifyStyle(0, TVS_CHECKBOXES); //:WARNING - EnableCheckBoxes() not working
-		//SetCustomRowHeight(TreeRowHeight());
+		EnableDragSelection(FALSE);
 		SetSingleSel(FALSE);
 		//:CHECK
-		SetShowInPlaceToolTip(TRUE);
+		//SetShowInPlaceToolTip(FALSE);
 
 		//:WARNING - do not use local string
 		BCGP_GRID_FILTERBAR_OPTIONS filter(m_filterMessage);
@@ -113,25 +113,125 @@ public:
 
 		EnableFilterBar(TRUE, filter);
 		OnFilterBarUpdate(0);
+	#ifdef _TEST
+		CreateIcons();
+	#endif
 	}
 
 
-
+#ifdef _TEST
 	HTREEITEM CustomHitTest(UINT& flag)
 	{
 		CPoint point;
 		::GetCursorPos(&point);
 		ScreenToClient(&point);
 
-		//:TODO - check image
-		return HitTest(point, &flag);
+		HTREEITEM hItem = HitTest(point, &flag);
+
+		//:WARING - check image clicked(row has check box and image)
+		if (hItem != nullptr) {
+			CBCGPGridRow* pRow = TreeItem(hItem);
+			ASSERT(pRow != nullptr && pRow->HasCheckBox());
+
+			int dx = GetHierarchyOffset(pRow);
+			CRect check = pRow->GetCheckBoxRect(dx);
+
+			int margin = globalUtils.ScaleByDPI(GetImageMargin());
+			check.left = check.right + margin;
+			check.right = check.left + GetScaledImageSize().cx + margin;
+
+			//:CHECK
+			if (check.PtInRect(point)) {
+				flag = TVHT_ONITEMICON;
+			}
+		}
+
+		return hItem;
+	}
+#endif
+
+protected:
+
+	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point)
+	{
+		//:TEST
+		return;
+
+	#define AddMenu(id) AppendMenu(MF_STRING, id, Facility::GetTitle(id))
+
+		CMenu menu;
+		menu.CreatePopupMenu();
+
+		menu.AddMenu(HOME_3D_CMD_Zoom_Object);
+		menu.AppendMenu(MF_SEPARATOR);
+		menu.AddMenu(HOME_3D_CMD_Visualize_ShowAll);
+		menu.AddMenu(HOME_3D_CMD_Visualize_Hide);
+		menu.AddMenu(HOME_3D_CMD_Visualize_ShowOnly);
+		menu.AppendMenu(MF_SEPARATOR);
+		menu.AddMenu(HOME_3D_CMD_Visualize_Toggle);
+
+		UINT id = TheApplication.GetContextMenuManager()->TrackPopupMenu(menu.Detach(), point.x, point.y, this);
+		((Component::ModelPanel*)GetParent())->GetView().SendMessage(WM_COMMAND, (WPARAM)id);
+
+	#undef AddMenu
 	}
 
+
+
+	afx_msg void OnRButtonDown(UINT nFlags, CPoint point)
+	{
+	}
+
+
+
+	afx_msg void OnRButtonUp(UINT nFlags, CPoint point)
+	{
+	}
+
+
+
+	DECLARE_MESSAGE_MAP()
 
 private:
 
 	CString m_filterMessage;
+
+#ifdef _TEST
+private:
+
+	void CreateIcons()
+	{
+		CImageList* pImages = new CImageList;
+		CBCGPToolBarImages images;
+		images.SetImageSize(GetScaledImageSize());
+
+		for (int id = CUSTOM_3D_CMD_KEN_Test1; id <= CUSTOM_3D_CMD_KEN_Test9; id++) {
+			CBCGPSVGImage* pImage = new CBCGPSVGImage();
+			pImage->Load(id);
+			images.AddSVG(pImage);
+		}
+
+		images.ExportToImageList(*pImages, TRUE);
+		SetImageList(pImages, TVSIL_NORMAL);
+	}
+
+
+
+	CSize GetScaledImageSize()
+	{
+		//:WARNING - 20, maximum height
+		return globalUtils.ScaleByDPI(CSize(20, 20));
+	}
+#endif
 };
+
+
+
+BEGIN_MESSAGE_MAP(ModelTree, CBCGPGridCtrl)
+	ON_WM_CONTEXTMENU()
+	//ON_WM_RBUTTONDOWN()
+	//ON_WM_RBUTTONUP()
+END_MESSAGE_MAP()
 
 //--------------------------------------------------------------------------------------------------
 
@@ -140,11 +240,11 @@ using namespace Component;
 BEGIN_MESSAGE_MAP(ModelPanel, Panel)
 	ON_REGISTERED_MESSAGE(BCGM_GRID_ROW_CHECKBOX_CLICK, OnTreeCheckClick)
 
-	ON_NOTIFY(NM_CLICK, PRESET::Id, OnTreeClick)
+	//ON_NOTIFY(NM_CLICK, PRESET::Id, OnTreeClick)
 	ON_NOTIFY(NM_DBLCLK, PRESET::Id, OnTreeDblClick)
-	ON_NOTIFY(NM_RCLICK, PRESET::Id, OnTreeRClick)
-	ON_NOTIFY(NM_RDBLCLK, PRESET::Id, OnTreeRDbClick)
-	ON_NOTIFY(NM_SETFOCUS, PRESET::Id, OnTreeSetFocus)
+	//ON_NOTIFY(NM_RCLICK, PRESET::Id, OnTreeRClick)
+	//ON_NOTIFY(NM_RDBLCLK, PRESET::Id, OnTreeRDbClick)
+	//ON_NOTIFY(NM_SETFOCUS, PRESET::Id, OnTreeSetFocus)
 
 	ON_NOTIFY(TVN_BEGINDRAG, PRESET::Id, OnTreeBeginDrag)
 	ON_NOTIFY(TVN_BEGINLABELEDIT, PRESET::Id, OnTreeBeginLabelEdit)
@@ -319,7 +419,12 @@ void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = S_OK;
 
 	UINT flag = 0;
+#ifdef _TEST
+	//:WARNING - TVHT_ONITEMICON no avialable in CBCGPTreeCtrlEx! only TVHT_ONITEMLABEL
 	HTREEITEM hItem = Control().CustomHitTest(flag);
+#else
+	HTREEITEM hItem = Control().HitTest(flag);
+#endif
 
 	if (hItem != nullptr) {
 		DWORD_PTR key = Control().GetItemData(hItem);
@@ -330,8 +435,15 @@ void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 		DEBUG_LOG(L"* OnTreeClick: TVHT_NOWHERE");
 	}
 	if (flag & TVHT_ONITEMICON) {
-		//:WARNING - no avialable in CBCGPTreeCtrlEx! only TVHT_ONITEMLABEL
 		DEBUG_LOG(L"* OnTreeClick: TVHT_ONITEMICON");
+#ifdef _TEST
+		int image;
+		BOOL success = Control().GetItemImage(hItem, image, image);
+		ASSERT(success);
+
+		image = (image == 0 ? 1 : 0);
+		Control().SetItemImage(hItem, image, image);
+#endif
 	}
 	if (flag & TVHT_ONITEMLABEL) {
 		DEBUG_LOG(L"* OnTreeClick: Label");
@@ -370,7 +482,11 @@ void Component::ModelPanel::OnTreeDblClick(NMHDR* pNMHDR, LRESULT* pResult)
 	DEBUG_LOG(L"* OnTreeDblClick");
 
 	UINT flag = 0;
+#ifdef _TEST
 	HTREEITEM hItem = Control().CustomHitTest(flag);
+#else
+	HTREEITEM hItem = Control().HitTest(flag);
+#endif
 
 	if (hItem == nullptr) {
 		return;
@@ -532,7 +648,7 @@ void Component::ModelPanel::OnTreeSelChanging(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeSetFocus(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	UNREFERENCED_PARAMETER(pNMHDR);
+	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
 	*pResult = S_OK;
 }
@@ -570,8 +686,9 @@ HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR
 	DEBUG_VALID(hItem);
 	DEBUG_LOG(WStr::Format(L"\t- %s", title));
 
-	//:TEST - no avilable, TVHT_ONITEMLABEL
-	//Control().SetItemImage(hItem, 0, 1);
+#ifdef _TEST
+	Control().SetItemImage(hItem, 0, 0);
+#endif
 	Control().SetItemData(hItem, key);
 	m_keyMap[key] = hItem;
 
@@ -631,8 +748,6 @@ HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 	DEBUG_VALID(hItem);
 	DEBUG_LOG(WStr::Format(L"AddItem: %s", Control().GetItemText(hItem)));
 
-	//:TEST - no available, TVHT_ONITEMLABEL
-	//Control().SetItemNotificationBadge(hItem, L"[HIDE]");
 	Control().SetItemData(hItem, key);
 	m_keyMap[key] = hItem;
 

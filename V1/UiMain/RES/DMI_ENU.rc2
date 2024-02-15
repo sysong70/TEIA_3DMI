@@ -49,7 +49,7 @@ BEGIN
     HOME_3D_CMD_ViewDirection_Perspective             "__#__\nPerspective"
     HOME_3D_LST_Visualize                             "__#__\nVisualize"
     HOME_3D_CMD_Visualize_ShowAll                     "__#__\nShow All"
-    HOME_3D_CMD_Visualize_Hide                        "__#__\nHide"
+    HOME_3D_CMD_Visualize_Hide                        "__#__\nHide Only"
     HOME_3D_CMD_Visualize_ShowOnly                    "__#__\nShow Only"
     HOME_3D_CMD_Visualize_Toggle                      "__#__\nToggle"
     HOME_3D_LST_VisualEffects                         "__#__\nEffects"

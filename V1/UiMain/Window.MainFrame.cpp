@@ -88,6 +88,13 @@ Component::PanelBar& Window::MainFrame::GetPanelBar()
 
 
 
+Component::RibbonBar& Window::MainFrame::GetRibbonBar()
+{
+	return m_ribbonBar;
+}
+
+
+
 Component::TaskBar& Window::MainFrame::GetTaskBar()
 {
 	return m_taskBar;

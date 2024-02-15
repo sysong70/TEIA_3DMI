@@ -28,7 +28,7 @@ namespace Dialog
 
 		BOOL OnInitDialog() override;
 
-		afx_msg void OnContextMenu(CWnd* pWnd, CPoint pos);
+		afx_msg void OnContextMenu(CWnd* pWnd, CPoint point);
 
 		void OnContextCommand(UINT id);
 

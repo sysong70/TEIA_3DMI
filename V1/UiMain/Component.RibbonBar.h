@@ -28,12 +28,6 @@ namespace Component
 
 		void Reload();
 
-	public:
-
-		Facility::CommandIndexer::CommandInfo& GetData(UINT id);
-
-		Facility::CommandIndexer::CommandInfo& GetData(CBCGPRibbonCategory* pCategory, UINT id);
-
 	private:
 
 		CBCGPRibbonMainButton m_wndMainButton;

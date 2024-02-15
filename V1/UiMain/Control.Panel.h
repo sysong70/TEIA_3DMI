@@ -35,6 +35,10 @@ namespace Control
 		// include margin
 		virtual CSize GetBodySize();
 
+		Window::View& GetView() {
+			return *m_pView;
+		}
+
 	protected:
 
 		afx_msg LRESULT OnDPIChangedAfterParent(WPARAM wp, LPARAM lp);

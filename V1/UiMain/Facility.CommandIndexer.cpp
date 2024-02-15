@@ -61,7 +61,7 @@ Facility::CommandIndexer::CommandInfo& Facility::CommandIndexer::GetDummyData()
 
 void Facility::CommandIndexer::Initialize()
 {
-#define ITEM_DEF(type,id,stringId) { id, { type, id, stringId } },
+#define ITEM_DEF(type,id,stringId) { id, { type, id, -1, stringId } },
 
 	m_commandMap = {
 #include "Command.Common.h"

@@ -38,6 +38,8 @@ namespace Window
 
 		Component::PanelBar& GetPanelBar();
 
+		Component::RibbonBar& GetRibbonBar();
+
 		Component::TaskBar& GetTaskBar();
 
 		void ReceiveSignal(Json::Object* pData);
