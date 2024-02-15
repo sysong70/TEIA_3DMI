@@ -1,5 +1,7 @@
 ﻿#include "StdAfx.h"
 
+#include "Segment.h"
+
 #include "Shell.h"
 
 #include "Impl/KeyImpl.h"
@@ -379,6 +381,25 @@ void H3DF::ShellKit::SetRegionFaces(int nRegionIndex, int nFaceFirstIndex, int n
 	}
 
 	HC_MSet_Region_Faces(pcImpl->m_pcCreatedShell->m_Key, nRegionIndex, nFaceFirstIndex, nFaceCount);
+}
+
+void H3DF::ShellKit::SetRegionMaterial(int nInRegionIndex, H3DF::MaterialKit & cInMaterial)
+{
+	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	if (nullptr == pcImpl->m_pcCreatedShell) {
+		DEBUG_RETURN;
+	}
+
+	if (INVALID_KEY == pcImpl->m_pcCreatedShell->m_Key) {
+		DEBUG_RETURN;
+	}
+
+	HC_Open_Geometry(pcImpl->m_pcCreatedShell->m_Key); {
+		HC_Open_Region(nInRegionIndex); {
+			cInMaterial.SetMaterial("faces");
+		} HC_Close_Region();
+	} HC_Close_Geometry();
 }
 
 void H3DF::ShellKit::DeleteShellWrapperKey()

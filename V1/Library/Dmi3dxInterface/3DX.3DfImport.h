@@ -144,10 +144,10 @@ protected:
 		H3DF::StringArray & aOutStrings, H3DF::PMI::TextAttributesArray & cOutTextAttributes, H3DF::PMI::Options * pcOutPmiOptions = nullptr);
 	A3DStatus GetLeaderLinesAndSymbols(const A3DMkpLeader * pMarkup, H3DF::PolylineArray & out_leader_lines, H3DF::PolygonArray & out_leader_symbols);
 
-	A3DStatus DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+	A3DStatus DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
 
 	A3DStatus DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem, const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment);
-	A3DStatus DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem, const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment);
+	A3DStatus DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem, const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cSegment);
 
 	UINT ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo);
 	UINT ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo, H3DF::ShellKit & cInShellKit);
@@ -195,6 +195,7 @@ protected:
 	A3DStatus SetFaceStyle(const A3DRootBaseWithGraphics * pcBase, H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
 	A3DStatus SetFaceStyle(H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
 	A3DStatus SetFaceStyle(H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData);
+	A3DStatus SetFaceStyle(H3DF::SegmentKey & cSegment, const A3DGraphStyleData cStyleData);
 
 	A3DStatus SetLineStyle(const A3DRootBaseWithGraphics * pcBase, H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
 	A3DStatus SetLineStyle(H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
@@ -203,9 +204,11 @@ protected:
 	A3DStatus SetMarkerStyle(const A3DRootBaseWithGraphics * pcBase, H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
 	A3DStatus SetMarkerStyle(H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
 	A3DStatus SetMarkerStyle(H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData);
-
+	
 	A3DStatus GetMaterial(const A3DMiscCascadedAttributesData & cAttrsData, A3DInt32 * pnUVCoordinatesIndex, A3DUns8 * pucTextureDimension, H3DF::MaterialKit & cMaterialKit);
-	A3DStatus GetMaterial(const A3DMiscCascadedAttributesData & cAttrsData, H3DF::MaterialKit & cMaterialKit);
+	A3DStatus GetMaterial(const A3DGraphStyleData & cInStyleData, H3DF::MaterialKit & cOutMaterial);
+	bool FindMaterial(const A3DGraphStyleData & cInStyleData, H3DF::MaterialKit & cOutMaterial);
+	bool CreateMaterial(const A3DGraphStyleData & cInStyleData, H3DF::MaterialKit & cOutMaterial);
 
 	bool ParseTopoContextScale(const A3DTopoBody * pcBody, double & dTopoContextScale);
 
@@ -228,12 +231,13 @@ protected:
 
 	A3DStatus IsShow(const A3DRootBaseWithGraphics * pGraphics);
 
-	bool SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, H3DF::MaterialKit const & cInKit, H3DF::SegmentKey & cSegment);
+	bool SetFaceMaterialMapping(const A3DGraphStyleData & sStyleData, H3DF::MaterialKit const & cInKit, H3DF::SegmentKey & cSegment);
 	bool SetLineMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, H3DF::MaterialKit const & cInKit, H3DF::SegmentKey & cSegment);
 	bool SetMarkerMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, H3DF::MaterialKit const & cInKit, H3DF::SegmentKey & cSegment);
 
+	bool CreateFaceStyleSegment(const A3DGraphStyleData & sStyleData, H3DF::MaterialKit const & cInKit, H3DF::SegmentKey & cOutStyleSegment);
 	bool SetStyle(H3DF::SegmentKey & cSegment, H3DF::SegmentKey & cStyleSegment);
-	bool FindFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, H3DF::SegmentKey & cOutStyleSegment);
+	bool FindMaterialMapping(const A3DGraphStyleData & sStyleData, H3DF::SegmentKey & cOutStyleSegment);
 	bool FindLineMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, H3DF::SegmentKey & cOutStyleSegment);
 	bool FindMarkerMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, H3DF::SegmentKey & cOutStyleSegment);
 	bool FindMaterialMapping(CString strGeometry, H3DF::MaterialMappingKit const & cInKit, H3DF::SegmentKey & cOutStyleSegment);
@@ -271,7 +275,8 @@ private:
 	// MaterialMap Style 키를 저장하는 Vector
 	std::vector<MaterialMappingStyleKit> m_vcMaterialMappingStyleVector;
 
-	CAtlMap<CString, H3DF::SegmentKey> m_mFaceMaterialMappingStyleMap;
+	CAtlMap<CString, H3DF::MaterialKit> m_mMaterialMap;
+	CAtlMap<CString, H3DF::SegmentKey> m_mMaterialMappingStyleMap;
 	std::unordered_map<A3DUns32, H3DF::SegmentKey> m_mLineMaterialMappingStyleMap;
 	std::unordered_map<A3DUns32, H3DF::SegmentKey> m_mMarkerMaterialMappingStyleMap;
 

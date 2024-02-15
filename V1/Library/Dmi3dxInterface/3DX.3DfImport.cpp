@@ -9,6 +9,8 @@
 
 #include <mb_matrix3d.h>
 
+#include <3DF/Impl/SegmentImpl.h>
+
 #include <3DF/Material.h>
 #include <3DF/Portfolio.h>
 #include <3DF/Style.h>
@@ -113,6 +115,9 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 	A3DRWParamsLoadData cParamsLoadData;
 	TheFileOptions.Import.Get(strFilePathName, cParamsLoadData);
 #endif
+
+	// 이 부분을 True로 만들어야, 파일 내부에 있는 Assy File 정보와 일치하지 않는 경우도 같은 하부 Directory를 찾아서 로드한다.
+	cParamsLoadData.m_sAssembly.m_bUseRootDirectory = true;
 
 	// Report용 Callback 함수 설정
 	//SetCallbacksReport();
@@ -222,7 +227,7 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 	cInDelivery.progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
 
 	m_vcMaterialMappingStyleVector.clear();
-	m_mFaceMaterialMappingStyleMap.RemoveAll();
+	m_mMaterialMappingStyleMap.RemoveAll();
 	m_mLineMaterialMappingStyleMap.clear();
 	m_mMarkerMaterialMappingStyleMap.clear();
 
@@ -900,6 +905,7 @@ A3DStatus TdfImport::ProductOccurrenceGetPart(const A3DAsmProductOccurrenceData 
 	{
 		A3DAsmProductOccurrenceData cProductPrototypeData;
 		A3D_INITIALIZE_DATA(A3DAsmProductOccurrenceData, cProductPrototypeData);
+
 		CHECK_A3D_RETURN(A3DAsmProductOccurrenceGet(pcProductPrototype, &cProductPrototypeData));
 
 		if(cProductPrototypeData.m_pPart != nullptr)
@@ -1007,11 +1013,10 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 {
 	LogIncreaseTabIndex(2);
 
+/*
 	if(m_nIncrementalId == 3485) {
 		int i = 0;
-	}
-
-	Log(2, L"DrawRiRepresentationItem: ri%d", m_nIncrementalId);
+	}*/
 
 	// Segment를 생성하고 생성된 Segment를 Parent Segment에 Include한다.
 
@@ -1038,13 +1043,23 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 // //		m_nIncrementalId = m_nIncrementalId;
 // 	}
 
-	SegmentKey cSegment = m_cRisIncludeSegment.Subsegment(L"ri%d", m_nIncrementalId++);
-	cParentSegment.IncludeSegment(cSegment);
+	CString strRiName;
+	GetName(pcRepItem, strRiName);
+
+	CString strSegmentName;
+	strSegmentName.Format(L"ri%d", m_nIncrementalId++);
+	SegmentKey cSegment = m_cRisIncludeSegment.Subsegment(strSegmentName);
+	IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
+
+	if (true == strRiName.IsEmpty()) {
+		Log(2, L"DrawRiRepresentationItem: %s, Include: %d, Segment: %d", strSegmentName, cInclude.KeyValue(), cSegment.KeyValue());
+	}
+	else {
+		Log(2, L"DrawRiRepresentationItem: %s, Include: %d, Segment: %d, [%s]", strSegmentName, cInclude.KeyValue(), cSegment.KeyValue(), strRiName);
+	}
 
 	// Ri Rep에 설정된 이름을 확인해서 저장한다.
 	// 저장된 이름이 없는 경우 각 요소의 특성값을 저장하도록 한다. (Surface, Curve, Point 등)
-	CString strRiName;
-	GetName(pcRepItem, strRiName);
 
 	A3DMiscCascadedAttributes * pcAttr;
 	A3DMiscCascadedAttributesData cAttrData;
@@ -1097,9 +1112,13 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 			break;
 
 			case kA3DTypeRiBrepModel:
+			{
 				// Solid인지 Surface인지 알 수 없음.
 				// H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Solid);
 				eStatus = ParseRiBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
+
+				
+			}
 			break;
 
 			case kA3DTypeRiPolyBrepModel:
@@ -1129,8 +1148,10 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 					break;
 
 				case kA3DTypeRiBrepModel:
-					strRiName = "Solid";
-					break;
+				{
+
+				}
+				break;
 
 				case kA3DTypeRiPolyBrepModel:
 					break;
@@ -1154,6 +1175,29 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 	if (false == strRiName.IsEmpty()) {
 		H3DF::UserData::SetSegmentName(cSegment, strRiName);
 	}
+
+	// Solid, Surface 판정
+	A3DRiBrepModelData cBrepModelData;
+	A3D_INITIALIZE_DATA(A3DRiBrepModelData, cBrepModelData);
+	A3DStatus nResult = A3DRiBrepModelGet(pcRepItem, &cBrepModelData);
+
+	LogIncreaseTabIndex(2);
+
+	if (A3D_SUCCESS == nResult) {
+		HC_KEY nKey = cSegment.KeyValue();
+		if (true == cBrepModelData.m_bSolid) {
+			H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Solid);
+			Log(2, L"SetTopologyType: %d, Type: %s", cSegment.KeyValue(), L"Solid");
+		}
+		else {
+			H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Surface);
+			Log(2, L"SetTopologyType: %d, Type: %s", cSegment.KeyValue(), L"Surface");
+		}
+	}
+
+	LogDecreaseTabIndex(2);
+
+	A3DRiBrepModelGet(nullptr, &cBrepModelData);
 
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttr));
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrData));
@@ -1204,11 +1248,16 @@ A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcRepItem,
 	CHECK_A3D_RETURN(A3DRootBaseGet(pcRepItem, &cRootBaseData));
 	m_pchRepresentationItemName = cRootBaseData.m_pcName;
 
+
 /*
 	A3DRiBrepModelData cBrepModelData;
 	A3D_INITIALIZE_DATA(A3DRiBrepModelData, cBrepModelData);
 	A3DStatus nResult = A3DRiBrepModelGet(pcRepItem, &cBrepModelData);
 
+	A3DRiBrepModelGet(nullptr, &cBrepModelData);
+*/
+	
+/*
 	// Scale을 구하기 위해서 Context Data에서 값을 가져온다.
 	double m_dContextScale = 1.0;
 	ParseTopoContextScale(cBrepModelData.m_pBrepData, m_dContextScale);
@@ -1575,7 +1624,7 @@ A3DStatus TdfImport::DrawAnnotationItem(const A3DMkpAnnotationItem * pcAnnotatio
 	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcAnnotationItem, pcParentAttr, &pcAttr, &cAttrData));
 
 	MaterialKit cMaterial;
-	GetMaterial(cAttrData, cMaterial);
+	GetMaterial(cAttrData.m_sStyle, cMaterial);
 
 	if(cAttrData.m_bShow && !cAttrData.m_bRemoved)
 	{
@@ -2339,7 +2388,7 @@ A3DStatus TdfImport::GetLeaderLinesAndSymbols(const A3DMkpLeader * pMarkup, Poly
 }
 
 // 8. Draw Tessellation Base
-A3DStatus TdfImport::DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cParentSegment, 
+A3DStatus TdfImport::DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cSegment, 
 	const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	if(pcTessBase == nullptr) {
@@ -2359,15 +2408,15 @@ A3DStatus TdfImport::DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresent
 	{
 		case kA3DTypeTess3D:
 			//eStatus = DrawTess3D((A3DTess3D *) pcTessBase, &sTessBaseData, pcRepItem, pcParentAttr, cParentSegment);
-			eStatus = DrawTess3DFaceRegion((A3DTess3D *)pcTessBase, &sTessBaseData, pcRepItem, pcParentAttr, cParentSegment);
+			eStatus = DrawTess3DFaceRegion((A3DTess3D *)pcTessBase, &sTessBaseData, pcRepItem, pcParentAttr, cSegment);
 		break;
 
 		case kA3DTypeTess3DWire:
-			eStatus = DrawTess3DWire((A3DTess3DWire *) pcTessBase, &sTessBaseData, pcRepItem, pcParentAttr, cParentSegment);
+			eStatus = DrawTess3DWire((A3DTess3DWire *) pcTessBase, &sTessBaseData, pcRepItem, pcParentAttr, cSegment);
 		break;
 
 		case kA3DTypeTessMarkup:
-			eStatus = BuildMarkup((A3DTessMarkup *) pcTessBase, &sTessBaseData, cParentSegment);
+			eStatus = BuildMarkup((A3DTessMarkup *) pcTessBase, &sTessBaseData, cSegment);
 		break;
 
 
@@ -2497,7 +2546,9 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 	DWORD nMaxCount = 0;
 
 
-	//----- Style 관련 정보 수집 -----
+	//== Style 관련 정보 수집 ========================================================================
+
+	// 각각 Face의 Color Index를 이용해서 Style map을 생성한다.
 	for (A3DUns32 nFaceIndex = 0; nFaceIndex < nFacesCount; nFaceIndex++) {
 		A3DTessFaceData & cTessFaceData = cTess3dData.m_psFaceTessData[nFaceIndex];
 		CreateAndPushCascadedAttributesTessFace(pcRepItem, pcTess3D, &cTessFaceData, nFaceIndex, pcParentAttr, &pcAttribute, &psAttrData[nFaceIndex]);
@@ -2514,6 +2565,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 			sStyleDefine.nCount = 1;
 			sStyleDefine.nRgbColorIndex = nRgbColorIndex;
 			sStyleDefine.nFirstFaceIndex = nFaceIndex;
+
 			mStyleDefineMap.SetAt(nRgbColorIndex, sStyleDefine);
 		}
 
@@ -2542,11 +2594,14 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 	Log(2, L"max_style_face_%d, count: %d", nMaxRgbColorIndex, nMaxCount);
 
 	// Max Color Index를 제외한 나머지 Color Index들은 각각의 Style Face Segment를 생성해서 집어 넣도록 한다.
+	// 각각 Face의 Color Index가 Max Index가 아닌 경우는 Color Index를 적용하기 위해서 별도의 Face Segment를 생성하고 Style을 적용시킨다.
 	POSITION pcPos = mStyleDefineMap.GetStartPosition();
 	while (nullptr != pcPos)
 	{
+		// 사전에 탐색해 놓은 Style Map 검색
 		StyleDefine sStyleDefine = mStyleDefineMap.GetNextValue(pcPos);
 
+		// Face Segment를 별도로 생성하고, Style을 적용시킨다. 이 Face에 Insert Shell을 하게 된다.
 		H3DF::SegmentKey cSubSegment = cParentSegment.Subsegment(L"style_face_%d", sStyleDefine.nRgbColorIndex).KeyValue();
 		SetFaceStyle(cSubSegment, psAttrData[sStyleDefine.nFirstFaceIndex]);
 
@@ -2581,7 +2636,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 			}
 		}
 
-		//---- Draw Edge Line -----
+		//== Draw Edge Line ========================================================================
 		A3DUns32 nStartWireIndex = cTessFaceData.m_uiStartWire;
 		int index = 0;
 		for (A3DUns32 j = 0; j < cTessFaceData.m_uiSizesWiresSize; ++j)
@@ -2695,7 +2750,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 
 	LogDecreaseTabIndex(2);
 
-	Log(2, L"DrawTess3D [InsertShell]: %s, %d, Style Count: %d", LogHexStr((DWORD_PTR)pcTess3D), nTriangleFaceCount, m_mFaceMaterialMappingStyleMap.GetCount());
+	Log(2, L"DrawTess3D [InsertShell]: %s, %d, Style Count: %d", LogHexStr((DWORD_PTR)pcTess3D), nTriangleFaceCount, m_mMaterialMappingStyleMap.GetCount());
 
 	CHECK_A3D_RETURN(A3DTess3DGet(nullptr, &cTess3dData));
 
@@ -2705,13 +2760,11 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 }
 
 A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
-	const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment)
+	const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cSegment)
 {
 	LogIncreaseTabIndex(2);
 
 	double dUnitScale = 1.0;	// Tessellation은 1:1 비율로 들어온다 
-
-	H3DF::SegmentKey cCurrnetSegment = cParentSegment;
 
 	A3DTess3DData cTess3dData;
 	A3D_INITIALIZE_DATA(A3DTess3DData, cTess3dData);
@@ -2727,16 +2780,23 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DT
 	A3DTessFaceData & cTessFaceData = cTess3dData.m_psFaceTessData[0];
 
 /*
-	A3DMiscCascadedAttributes * pcAttribute;
-	A3DMiscCascadedAttributesData sFistAttrData;
-	CreateAndPushCascadedAttributesTessFace(pcRepItem, pcTess3D, &cTessFaceData, 0, pcParentAttr, &pcAttribute, &sFistAttrData);
+	// Solid, Surface 판정
+	A3DRiBrepModelData cBrepModelData;
+	A3D_INITIALIZE_DATA(A3DRiBrepModelData, cBrepModelData);
+	A3DStatus nResult = A3DRiBrepModelGet(pcRepItem, &cBrepModelData);
 
-	//Log(2, L"pcAttribute: %s, sFistAttrData: %s,, m_uiRgbColorIndex: %d", LogHexStr((DWORD_PTR) pcAttribute), LogHexStr((DWORD_PTR) &sFistAttrData), sFistAttrData.m_sStyle.m_uiRgbColorIndex);
+	if (A3D_SUCCESS == nResult) {
+		HC_KEY nKey = cSegment.KeyValue();
+		if (true == cBrepModelData.m_bSolid) {
+			H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Solid);
+		}
+		else {
+			H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Surface);
+		}
+	}
 
-	SetFaceStyle(cParentSegment, sFistAttrData);
-
-	A3DMiscCascadedAttributesDelete(pcAttribute);
-	A3DMiscCascadedAttributesGet(nullptr, &sFistAttrData);*/
+	A3DRiBrepModelGet(nullptr, &cBrepModelData);
+*/
 
 	const double cBigValue = 1.0e+12;
 	bool bStrange = false;
@@ -2812,29 +2872,37 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DT
 	}
 
 	// Attribute를 계산해서 처리하는 부분, 전체 Attribute를 찾아서 가장 많은 종류의 Index를 찾아서 처리한다.
-	A3DMiscCascadedAttributesData * psAttrData = new A3DMiscCascadedAttributesData[nFacesCount];
 	A3DMiscCascadedAttributes * pcAttribute;
 
 	struct StyleDefine
 	{
 		DWORD nCount = 0;
 		A3DUns32 nRgbColorIndex = 0;
-		A3DUns32 nFirstFaceIndex = 0; // nRgbColorIndex가 처음 나타나는 Face Index;
+		A3DGraphStyleData cStyleData;
 	};
 
-	CAtlMap<A3DUns32, StyleDefine> mStyleDefineMap;
 
+	//== Style 관련 정보 수집 ========================================================================
+
+	// A3DUns32값은 RGB Color Index 값이다.
+	CAtlMap<A3DUns32, StyleDefine> mStyleDefineMap;
 	A3DUns32 nMaxRgbColorIndex = 0;
 	A3DUns32 nMaxFaceIndex = 0;
 	DWORD nMaxCount = 0;
 
+	// Region에 Style을 적용시킬때 사용하기 위해서 Face Rgb Color Index를 저장한다.
+	A3DUns32 * pnFaceRgbColorIndex = new A3DUns32[nFacesCount];
+	A3DMiscCascadedAttributesData psMaxAttrData;
 
-	//----- Style 관련 정보 수집 -----
+	// nMaxRgbColorIndex를 찾아 낸다. 
 	for(A3DUns32 nFaceIndex = 0; nFaceIndex < nFacesCount; nFaceIndex++) {
 		A3DTessFaceData & cTessFaceData = cTess3dData.m_psFaceTessData[nFaceIndex];
-		CreateAndPushCascadedAttributesTessFace(pcRepItem, pcTess3D, &cTessFaceData, nFaceIndex, pcParentAttr, &pcAttribute, &psAttrData[nFaceIndex]);
+		A3DMiscCascadedAttributesData psAttrData;
+		CreateAndPushCascadedAttributesTessFace(pcRepItem, pcTess3D, &cTessFaceData, nFaceIndex, pcParentAttr, &pcAttribute, &psAttrData);
 
-		A3DUns32 nRgbColorIndex = psAttrData[nFaceIndex].m_sStyle.m_uiRgbColorIndex;
+		A3DUns32 nRgbColorIndex = psAttrData.m_sStyle.m_uiRgbColorIndex;
+		
+		pnFaceRgbColorIndex[nFaceIndex] = nRgbColorIndex;
 
 		StyleDefine sStyleDefine;
 		// 찾은 경우 Count 증가
@@ -2845,48 +2913,26 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DT
 		else { // 새로 삽입하는 경우 Count는 1, 나중에 사용하기 위해서 필요한 값들을 저장해 놓는다.
 			sStyleDefine.nCount = 1;
 			sStyleDefine.nRgbColorIndex = nRgbColorIndex;
-			sStyleDefine.nFirstFaceIndex = nFaceIndex;
+			CopyMemory(&sStyleDefine.cStyleData, &psAttrData.m_sStyle, sizeof(A3DGraphStyleData));
 			mStyleDefineMap.SetAt(nRgbColorIndex, sStyleDefine);
 		}
 
 		// Max Count Style을 찾아내서 대표 Style로 지정할 준비를 한다.
 		if(nMaxCount < sStyleDefine.nCount) {
 			nMaxRgbColorIndex = sStyleDefine.nRgbColorIndex;
+			nMaxFaceIndex = nFaceIndex;
 			nMaxCount = sStyleDefine.nCount;
-			nMaxFaceIndex = sStyleDefine.nFirstFaceIndex;
+			CopyMemory(&psMaxAttrData, &psAttrData, sizeof(A3DMiscCascadedAttributesData));
 		}
 
 		A3DMiscCascadedAttributesDelete(pcAttribute);
 	}
 
-	// Max Key는 삭제한다.
-	mStyleDefineMap.RemoveKey(nMaxRgbColorIndex);
-
-	CAtlMap<A3DUns32, HC_KEY> mFaceSegmentStyleMap;
+	//mStyleDefineMap.RemoveAll();
 
 	// Max Color Index 값을 Parent Segment에 적용시켜 대표 Color Style로 지정한다.
-	SetFaceStyle(cParentSegment, psAttrData[nMaxFaceIndex]);
-
-	// Texture Mapping 설정
-	//SetTextureMapping(cParentSegment, psAttrData[nMaxFaceIndex]);
-
-	mFaceSegmentStyleMap.SetAt(nMaxRgbColorIndex, cParentSegment.KeyValue());
-	Log(2, L"max_style_face_%d, count: %d", nMaxRgbColorIndex, nMaxCount);
-
-	// Max Color Index를 제외한 나머지 Color Index들은 각각의 Style Face Segment를 생성해서 집어 넣도록 한다.
-
-	POSITION pcPos = mStyleDefineMap.GetStartPosition();
-	while(nullptr != pcPos)
-	{
-		StyleDefine sStyleDefine = mStyleDefineMap.GetNextValue(pcPos);
-
-		H3DF::SegmentKey cSubSegment = cParentSegment.Subsegment(L"style_face_%d", sStyleDefine.nRgbColorIndex).KeyValue();
-		SetFaceStyle(cSubSegment, psAttrData[sStyleDefine.nFirstFaceIndex]);
-
-		mFaceSegmentStyleMap.SetAt(sStyleDefine.nRgbColorIndex, cSubSegment.KeyValue());
-	}
-
-	mStyleDefineMap.RemoveAll();
+	// 또한 내부에서 Style Segment를 생성하고 Map 저장한다.
+	SetFaceStyle(cSegment, psMaxAttrData);
 
 	LogIncreaseTabIndex(2);
 
@@ -2902,7 +2948,7 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DT
 		A3DTessFaceData & cTessFaceData = cTess3dData.m_psFaceTessData[nFaceIndex];
 		cConFaceInfo.pnIndices = &cTessFaceData;
 
-		//---- Draw Edge Line -----
+		//== Draw Edge Line ========================================================================
 		A3DUns32 nStartWireIndex = cTessFaceData.m_uiStartWire;
 		int index = 0;
 		for (A3DUns32 j = 0; j < cTessFaceData.m_uiSizesWiresSize; ++j)
@@ -2922,7 +2968,7 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DT
 				acWirePoints[k] = m_pcPoints[cTess3dData.m_puiWireIndexes[nStartWireIndex + index++] / 3];
 			}
 
-			H3DF::LineKey cLineKey = cCurrnetSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
+			H3DF::LineKey cLineKey = cSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
 
 			// 대용량 파일에서 메모리 소모가 심하므로 사용하지 않은다. 심한 경우 20%이상 메모리를 소모한다.
 // 			if (true == bSolidSegmentFlag) {
@@ -3009,39 +3055,48 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DT
 
 	cShellKit.EndAddFaces();
 
-/*
-	A3DUns32 nRgbColorIndex = psAttrData[nFaceIndex].m_sStyle.m_uiRgbColorIndex;
-
-	// 가장 많은 Color값과 다른 경우 처리
-	bool bForceOpenFlag = false;
-	if (nMaxRgbColorIndex != nRgbColorIndex)
-	{
-		// 앞쪽에서 생성된 Style을 이용해서 처리한다.
-		HC_KEY nKey;
-		if (true == mFaceSegmentStyleMap.Lookup(nRgbColorIndex, nKey)) {
-			H3DF::SegmentKey cSubSegment(nKey);
-			cCurrnetSegment = cSubSegment;
-			bForceOpenFlag = true;
-			cCurrnetSegment.Open();
-
-			//----- Texture Mapping 설정 -----
-			//SetTextureMapping(cCurrnetSegment, psAttrData[nFaceIndex]);
-
-			Log(2, L"style_face_%d", nRgbColorIndex);
-		}
-	}
-*/
-
 	if (0 < cShellKit.GetPointCount()) {
+		// Region 설정
 		A3DUns32 nRegionIndex = 1;
-
-		for (A3DUns32 j = 0; j < nFacesCount; j++)
-		{
-			int nFaceStartIndex = pnFaceStartIndexes[j];
-			int nFaceEndIndex = pnFaceStartIndexes[j + 1];
+		for (A3DUns32 nFaceIndex = 0; nFaceIndex < nFacesCount; nFaceIndex++) {
+			int nFaceStartIndex = pnFaceStartIndexes[nFaceIndex];
+			int nFaceEndIndex = pnFaceStartIndexes[nFaceIndex + 1];
 
 			cShellKit.SetRegionFaces(nRegionIndex, nFaceStartIndex, nFaceEndIndex - nFaceStartIndex);
 			nRegionIndex++;
+		}
+
+		//== StyleMap이 있는 경우 처리 ================================================================
+
+		if (0 < mStyleDefineMap.GetCount()) {
+			nRegionIndex = 1;
+			for (A3DUns32 nFaceIndex = 0; nFaceIndex < nFacesCount; nFaceIndex++) {
+
+				// Color Index값을 이용해서 Region을 Style을 적용한다.
+				A3DUns32 nRgbColorIndex = pnFaceRgbColorIndex[nFaceIndex];
+
+				// Max Color Index가 아니면 개별 Region에 Style을 적용한다.
+				if (nMaxRgbColorIndex != nRgbColorIndex) {
+					// nRgbColorIndex를 이용해서 Style을 검색 찾은 경우 Style을 젹용한다.
+					bool bSucessFlag = true;
+
+					StyleDefine sStyleDefine;
+					// 사전에 등록되어 있는 Style값을 찾는다.
+					if (true == mStyleDefineMap.Lookup(nRgbColorIndex, sStyleDefine)) {
+						H3DF::MaterialKit cMaterial;
+						if (false == FindMaterial(sStyleDefine.cStyleData, cMaterial)) {
+							if (false == CreateMaterial(sStyleDefine.cStyleData, cMaterial)) {
+								continue;
+							}
+						}
+
+						cShellKit.SetRegionMaterial(nRegionIndex, cMaterial);
+					}
+
+				}
+
+				nRegionIndex++;
+			}
 		}
 	}
 	else {
@@ -3050,15 +3105,14 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DT
 
 	//cCurrnetSegment.Close();
 
-	for(A3DUns32 nFaceIndex = 0; nFaceIndex < nFacesCount; nFaceIndex++) {
-		A3DMiscCascadedAttributesGet(nullptr, &psAttrData[nFaceIndex]);
-	}
+	mStyleDefineMap.RemoveAll();
 
-	REMOVE_ARRAY(psAttrData);
+	REMOVE_ARRAY(pnFaceStartIndexes);
+	REMOVE_ARRAY(pnFaceRgbColorIndex);
 
 	LogDecreaseTabIndex(2);
 
-	Log(2, L"DrawTess3D [InsertShell]: %s, %d, Style Count: %d", LogHexStr((DWORD_PTR) pcTess3D), nTriangleFaceCount, m_mFaceMaterialMappingStyleMap.GetCount());
+	Log(2, L"DrawTess3DFaceRegion: %s, %d, Style Count: %d", LogHexStr((DWORD_PTR) pcTess3D), nTriangleFaceCount, m_mMaterialMappingStyleMap.GetCount());
 
 	CHECK_A3D_RETURN(A3DTess3DGet(nullptr, &cTess3dData));
 
@@ -4533,14 +4587,19 @@ A3DStatus TdfImport::SetFaceStyle(H3DF::SegmentKey & cSegment, const A3DMiscCasc
 
 A3DStatus TdfImport::SetFaceStyle(H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributesData & cAttrsData)
 {
+	return SetFaceStyle(cSegment, cAttrsData.m_sStyle);
+}
+
+A3DStatus TdfImport::SetFaceStyle(H3DF::SegmentKey & cSegment, const A3DGraphStyleData cStyleData)
+{
 	SegmentKey cStyleSegment;
-	if(true == FindFaceMaterialMapping(cAttrsData, cStyleSegment)) {
+	if (true == FindMaterialMapping(cStyleData, cStyleSegment)) {
 		SetStyle(cSegment, cStyleSegment);
 	}
 	else {
 		H3DF::MaterialKit cMaterial;
-		if(A3D_SUCCESS == GetMaterial(cAttrsData, cMaterial)) {
-			SetFaceMaterialMapping(cAttrsData, cMaterial, cSegment);
+		if (A3D_SUCCESS == GetMaterial(cStyleData, cMaterial)) {
+			SetFaceMaterialMapping(cStyleData, cMaterial, cSegment);
 		}
 	}
 
@@ -4582,7 +4641,7 @@ A3DStatus TdfImport::SetLineStyle(H3DF::SegmentKey & cSegment, const A3DMiscCasc
 	}
 	else {
 		H3DF::MaterialKit cMaterial;
-		if(A3D_SUCCESS == GetMaterial(cAttrsData, cMaterial)) {
+		if(A3D_SUCCESS == GetMaterial(cAttrsData.m_sStyle, cMaterial)) {
 			SetLineMaterialMapping(cAttrsData, cMaterial, cSegment);
 		}
 	}
@@ -4625,7 +4684,7 @@ A3DStatus TdfImport::SetMarkerStyle(H3DF::SegmentKey & cSegment, const A3DMiscCa
 	}
 	else {
 		H3DF::MaterialKit cMaterial;
-		if(A3D_SUCCESS == GetMaterial(cAttrsData, cMaterial)) {
+		if(A3D_SUCCESS == GetMaterial(cAttrsData.m_sStyle, cMaterial)) {
 			SetMarkerMaterialMapping(cAttrsData, cMaterial, cSegment);
 		}
 	}
@@ -4784,29 +4843,23 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 }
 
 // 8-1. 일반 DrawStyle 정의 
-A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsData, H3DF::MaterialKit & cMaterialKit)
+A3DStatus TdfImport::GetMaterial(const A3DGraphStyleData & cInStyleData, H3DF::MaterialKit & cOutMaterial)
 {
-	const A3DGraphStyleData * pcStyleData = &cAttrsData.m_sStyle;
+	LogIncreaseTabIndex(2); 
 
-	if(pcStyleData == nullptr) {
-		return A3D_ERROR;
-	}
-
-	LogIncreaseTabIndex(2);
-
-	bool bTransparencyDefined = (1 == cAttrsData.m_sStyle.m_bIsTransparencyDefined) ? true : false;
-	float fTransparency = cAttrsData.m_sStyle.m_ucTransparency / 255.0f;
+	bool bTransparencyDefined = (1 == cInStyleData.m_bIsTransparencyDefined) ? true : false;
+	float fTransparency = cInStyleData.m_ucTransparency / 255.0f;
 
 	A3DStatus nRetStatus = A3D_SUCCESS;
 
-	if(A3D_TRUE == pcStyleData->m_bMaterial)
+	if(A3D_TRUE == cInStyleData.m_bMaterial)
 	{
 		A3DGraphMaterialData cMaterialData;
 		A3D_INITIALIZE_DATA(A3DGraphMaterialData, cMaterialData);
 
-		nRetStatus = A3DGlobalGetGraphMaterialData(pcStyleData->m_uiRgbColorIndex, &cMaterialData);
+		nRetStatus = A3DGlobalGetGraphMaterialData(cInStyleData.m_uiRgbColorIndex, &cMaterialData);
 		A3DBool bMaterialIsTexture = A3D_FALSE;
-		A3DGlobalIsMaterialTexture(pcStyleData->m_uiRgbColorIndex, &bMaterialIsTexture);
+		A3DGlobalIsMaterialTexture(cInStyleData.m_uiRgbColorIndex, &bMaterialIsTexture);
 
 		if(A3D_TRUE == bMaterialIsTexture)
 		{
@@ -4816,7 +4869,7 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 
 			A3DGraphTextureApplicationData sTextureAppData;
 			A3D_INITIALIZE_DATA(A3DGraphTextureApplicationData, sTextureAppData);
-			A3DGlobalGetGraphTextureApplicationData(pcStyleData->m_uiRgbColorIndex, &sTextureAppData);
+			A3DGlobalGetGraphTextureApplicationData(cInStyleData.m_uiRgbColorIndex, &sTextureAppData);
 
 			A3DGraphTextureDefinitionData sTextureData;
 			A3D_INITIALIZE_DATA(A3DGraphTextureDefinitionData, sTextureData);
@@ -4828,10 +4881,10 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 			strTextureName.Format(L"texture_%d", sTextureAppData.m_uiTextureDefinitionIndex);
 
 			if(sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
-				cMaterialKit.SetMirror(strTextureName, cDiffuseColor);
+				cOutMaterial.SetMirror(strTextureName, cDiffuseColor);
 			}
 			else {
-				cMaterialKit.SetDiffuseTexture(strTextureName, cDiffuseColor);
+				cOutMaterial.SetDiffuseTexture(strTextureName, cDiffuseColor);
 			}
 
 /*
@@ -4855,7 +4908,7 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 				strTextureOption.Append(L", parameterization source = uv");
 			}
 
-			cMaterialKit.SetDiffuseTextureOption(strTextureOption);
+			cOutMaterial.SetDiffuseTextureOption(strTextureOption);
 		}
 		else
 		{
@@ -4865,11 +4918,11 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 			A3DGraphMaterialData sMaterialData;
 			A3D_INITIALIZE_DATA(A3DGraphMaterialData, sMaterialData);
 
-			CHECK_A3D_RETURN(A3DGlobalGetGraphMaterialData(pcStyleData->m_uiRgbColorIndex, &sMaterialData));
+			CHECK_A3D_RETURN(A3DGlobalGetGraphMaterialData(cInStyleData.m_uiRgbColorIndex, &sMaterialData));
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiDiffuse, &sRgbColorData));
 			H3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dDiffuseAlpha);
 			if(true == bTransparencyDefined) {  cDiffuseColor.alpha = fTransparency; }
-			cMaterialKit.SetDiffuseColor(cDiffuseColor);
+			cOutMaterial.SetDiffuseColor(cDiffuseColor);
 
 			//Log(2, L"DrawStyle: DiffuseColor R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
 /*
@@ -4883,31 +4936,31 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiEmissive, &sRgbColorData));
 			H3DF::RGBAColor cEmissiveColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dEmissiveAlpha);
 			if(true == bTransparencyDefined) { cEmissiveColor.alpha = fTransparency; }
-			cMaterialKit.SetEmission(cEmissiveColor);
+			cOutMaterial.SetEmission(cEmissiveColor);
 
 			//nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiSpecular, &sRgbColorData));
 			H3DF::RGBAColor cSpecularColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dSpecularAlpha);
 			if(true == bTransparencyDefined) { cSpecularColor.alpha = fTransparency; }
-			cMaterialKit.SetSpecular(cSpecularColor);
+			cOutMaterial.SetSpecular(cSpecularColor);
 
  			nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
  			nRetStatus = A3DGlobalGetGraphMaterialData(A3D_DEFAULT_MATERIAL_INDEX, &sMaterialData);
-			cMaterialKit.SetGloss(sMaterialData.m_dShininess);
+			cOutMaterial.SetGloss(sMaterialData.m_dShininess);
 		}
 	}
 	else 
 	{
 		// m_uiRgbColorIndex : A global index to either an `A3DGraphMaterialData` or an `A3DGraphRgbColorData` according to the value of `m_bMaterial`.
-		if(A3D_DEFAULT_COLOR_INDEX != pcStyleData->m_uiRgbColorIndex)
+		if(A3D_DEFAULT_COLOR_INDEX != cInStyleData.m_uiRgbColorIndex)
 		{
 			A3DGraphRgbColorData sRgbColorData;
 			A3D_INITIALIZE_DATA(A3DGraphRgbColorData, sRgbColorData);
-			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(pcStyleData->m_uiRgbColorIndex, &sRgbColorData));
+			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(cInStyleData.m_uiRgbColorIndex, &sRgbColorData));
 
 			H3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
 			if(true == bTransparencyDefined) { cDiffuseColor.alpha = fTransparency; }
-			cMaterialKit.SetDiffuseColor(cDiffuseColor);
+			cOutMaterial.SetDiffuseColor(cDiffuseColor);
 
 			//Log(2, L"DrawStyle: R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
 
@@ -4919,6 +4972,34 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 
 	return A3D_SUCCESS;
 }
+
+bool TdfImport::FindMaterial(const A3DGraphStyleData & cInStyleData, H3DF::MaterialKit & cOutMaterial)
+{
+	CString strStyleText;
+	strStyleText.Format(L"%d_%d", cInStyleData.m_uiRgbColorIndex, cInStyleData.m_ucTransparency);
+
+	if (true == m_mMaterialMap.Lookup(strStyleText, cOutMaterial)) {
+		return true;
+	}
+
+	return false;
+}
+
+bool TdfImport::CreateMaterial(const A3DGraphStyleData & cInStyleData, H3DF::MaterialKit & cOutMaterial)
+{
+	H3DF::MaterialKit cMaterialKit;
+	if (A3D_SUCCESS == GetMaterial(cInStyleData, cMaterialKit)) {
+		CString strStyleText;
+		strStyleText.Format(L"%d_%d", cInStyleData.m_uiRgbColorIndex, cInStyleData.m_ucTransparency);
+
+		m_mMaterialMap.SetAt(strStyleText, cMaterialKit);
+		cOutMaterial = cMaterialKit;
+
+		return true;
+	}
+
+	return false;
+}	
 
 // 9. Context Scale 구하는 함수
 bool TdfImport::ParseTopoContextScale(const A3DTopoBody * pcBody, double & dTopoContextScale)
@@ -5311,7 +5392,7 @@ A3DStatus TdfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cAt
 A3DStatus TdfImport::SetTextureMapping(H3DF::SegmentKey cSegment, A3DMiscCascadedAttributesData & sAttrData) 
 {
 	H3DF::MaterialKit cMaterial;
-	if (A3D_SUCCESS != GetMaterial(sAttrData, cMaterial)) {
+	if (A3D_SUCCESS != GetMaterial(sAttrData.m_sStyle, cMaterial)) {
 		return A3D_ERROR;
 	}
 
@@ -5406,10 +5487,10 @@ A3DStatus TdfImport::IsShow(const A3DRootBaseWithGraphics * pGraphics)
 	return A3D_ERROR;
 }
 
-// 5. 주어진 Material Mapping을 이용해서 
-bool TdfImport::SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, H3DF::MaterialKit const & cInKit, H3DF::SegmentKey & cSegment)
+// 5. 주어진 Material Mapping을 이용해서 StylesIncludeKey에 새로운 Style을 추가하고 주어진 Segment에 적용.
+bool TdfImport::SetFaceMaterialMapping(const A3DGraphStyleData & sStyleData, H3DF::MaterialKit const & cInKit, H3DF::SegmentKey & cSegment)
 {
-	H3DF::SegmentKey cStyleSegment = m_nStylesIncludeKey.Subsegment(L"face_mat_%d_%d", cAttrData.m_sStyle.m_uiRgbColorIndex, cAttrData.m_sStyle.m_ucTransparency);
+	H3DF::SegmentKey cStyleSegment = m_nStylesIncludeKey.Subsegment(L"%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
 	
 	// 입력된 Matrial을 Face에 적용한다.
 	MaterialMappingKit cMaterialMapping;
@@ -5424,8 +5505,8 @@ bool TdfImport::SetFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAt
 // 	}
 
 	CString strStyleText;
-	strStyleText.Format(L"%d_%d", cAttrData.m_sStyle.m_uiRgbColorIndex, cAttrData.m_sStyle.m_ucTransparency);
-	m_mFaceMaterialMappingStyleMap.SetAt(strStyleText, cStyleSegment);
+	strStyleText.Format(L"%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
+	m_mMaterialMappingStyleMap.SetAt(strStyleText, cStyleSegment);
 
 	return true;
 }
@@ -5482,8 +5563,27 @@ bool TdfImport::SetMarkerMaterialMapping(const A3DMiscCascadedAttributesData & c
 	return true;
 }
 
+// 5-1. 주어진 스타일을 이용해서 새로운 Face Style Segment를 생성
+// 각각의 Style은 line, face 별로 적용할 수 있기 때문에, 별도로 생성한다.
+bool TdfImport::CreateFaceStyleSegment(const A3DGraphStyleData & sStyleData, H3DF::MaterialKit const & cInKit, H3DF::SegmentKey & cOutStyleSegment)
+{
+	CString strStyleText;
+	strStyleText.Format(L"%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
 
-// 5-1. 주어진 Material Mapping을 이용해서 
+	cOutStyleSegment = m_nStylesIncludeKey.Subsegment(strStyleText);
+
+	// 입력된 Matrial을 Face에 적용한다.
+	MaterialMappingKit cMaterialMapping;
+	cMaterialMapping.SetFaceMaterial(cInKit);
+
+	cOutStyleSegment.SetMaterialMapping(cMaterialMapping);
+
+	m_mMaterialMappingStyleMap.SetAt(strStyleText, cOutStyleSegment);
+
+	return true;
+}
+
+// 5-2. 주어진 Material Mapping을 이용해서 
 bool TdfImport::SetStyle(H3DF::SegmentKey & cSegment, H3DF::SegmentKey & cStyleSegment)
 {
 	H3DF::StyleKey cStyle = cSegment.GetStyleControl().PushSegment(cStyleSegment);
@@ -5496,12 +5596,12 @@ bool TdfImport::SetStyle(H3DF::SegmentKey & cSegment, H3DF::SegmentKey & cStyleS
 }
 
 // 6. 미리 저장되어 있는 Material Mapping Kit을 찾아오는 함수
-bool TdfImport::FindFaceMaterialMapping(const A3DMiscCascadedAttributesData & cAttrData, SegmentKey & cOutStyleSegment)
+bool TdfImport::FindMaterialMapping(const A3DGraphStyleData & sStyleData, SegmentKey & cOutStyleSegment)
 {
 	CString strStyleText;
-	strStyleText.Format(L"%d_%d", cAttrData.m_sStyle.m_uiRgbColorIndex, cAttrData.m_sStyle.m_ucTransparency);
+	strStyleText.Format(L"%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
 
-	if (true == m_mFaceMaterialMappingStyleMap.Lookup(strStyleText, cOutStyleSegment)) {
+	if (true == m_mMaterialMappingStyleMap.Lookup(strStyleText, cOutStyleSegment)) {
 		return true;
 	}
 

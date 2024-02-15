@@ -765,10 +765,10 @@ void H3DF::SelectionItem::ShowPathString(CString & strOutPath)
 			strName = cSegmentKey.Name(false);
 		}
 		if (H3DF::Type::IncludeKey == eType) {
-			strText.Format(L"\nInclude Key: %d [%s], %s", nKey, L"include", strName);
+			strText.Format(L"\nInclude: %d, Segment: %d [%s]", nKey, cSegmentKey.KeyValue(), strName);
 		}
 		else {
-			strText.Format(L"\nSegment Key: %d [%s], %s", nKey, L"segment", strName);
+			strText.Format(L"\nSegment: %d [%s], %s", nKey, L"segment", strName);
 		}
 		strOutPath += strText;
 	}
