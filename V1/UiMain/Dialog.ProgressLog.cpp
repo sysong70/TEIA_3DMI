@@ -100,8 +100,8 @@ void Dialog::ProgressLog::ReceiveSignal(Json::Object* pData)
 
 	Signal::Progress::Action action = (Signal::Progress::Action)data.GetInteger(SKW_ACTION);
 	switch (action) {
-	case Signal::Progress::Action::SetRange:     SetRange(data);      break;
-	case Signal::Progress::Action::SetPosition:  SetPosition(data);   break;
+	//case Signal::Progress::Action::SetRange:     SetRange(data);      break;
+	//case Signal::Progress::Action::SetPosition:  SetPosition(data);   break;
 	case Signal::Progress::Action::SetMessage:   SetMessage(data);    break;
 	case Signal::Progress::Action::AddLog:       AddLog(data);        break;
 	case Signal::Progress::Action::SetLogStatus: SetLogStatus(data);  break;
@@ -162,7 +162,7 @@ void Dialog::ProgressLog::ConstructBody(const CRect& boundary)
 	CRect result = Control::Setup(m_wndMessage, data.GetAt("Message"), Control::EPivot::TopLeft, area);
 
 	// Progress
-
+	/*
 	area.top = result.bottom + PRESET::Gap();
 	area.bottom = area.top + PRESET::ProgressHeight();
 	Control::SetSize(&m_wndProgress, { area.Size().cx, PRESET::ProgressHeight() });
@@ -171,6 +171,8 @@ void Dialog::ProgressLog::ConstructBody(const CRect& boundary)
 	m_wndProgress.m_bSetPosSmoothAnimation = TRUE;
 	m_wndProgress.m_bSetPosLighting = TRUE;
 	m_wndProgress.m_bDrawFrame = TRUE;
+	*/
+	m_wndProgress.ShowWindow(SW_HIDE);
 
 	// Log
 
@@ -198,6 +200,7 @@ BOOL Dialog::ProgressLog::DestroyWindow()
 void Dialog::ProgressLog::SetRange(Json::Object& data)
 {
 	m_wndProgress.SetRange32(data.GetInteger(SKW_MIN), data.GetInteger(SKW_MAX));
+	m_wndProgress.UpdateWindow();
 }
 
 
@@ -205,6 +208,7 @@ void Dialog::ProgressLog::SetRange(Json::Object& data)
 void Dialog::ProgressLog::SetPosition(Json::Object& data)
 {
 	m_wndProgress.SetPos(data.GetInteger(SKW_POSITION));
+	m_wndProgress.UpdateWindow();
 }
 
 

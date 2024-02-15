@@ -179,12 +179,9 @@ void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
 
 void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelivery)
 {
-#ifdef DEBUG
-	LogManager::CreateLog(LOGMANAGER_3DF_LOG_ID, L"Z://3DF_Log.txt");
-	LogManager::SetWriteTimeLog(LOGMANAGER_3DF_LOG_ID, true);
-#endif // DEBUG
-	LogManager::CreateLog(LOGMANAGER_3DF_LOG_ID, L"Z://3DF_Log.txt");
-	LogManager::SetWriteTimeLog(LOGMANAGER_3DF_LOG_ID, true);
+	//:Ken - 20240215
+	//LogManager::CreateLog(LOGMANAGER_3DF_LOG_ID, L"Z://3DF_Log.txt");
+	//LogManager::SetWriteTimeLog(LOGMANAGER_3DF_LOG_ID, true);
 
 // 	LogManager::CreateLog(3, L"Z://3DF_Log.txt");
 // 	LogManager::SetWriteTimeLog(true);
