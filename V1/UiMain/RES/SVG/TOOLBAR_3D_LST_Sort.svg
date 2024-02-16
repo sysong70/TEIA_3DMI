@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="32px"
+	 height="32px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
+<g id="Background" display="none">
+	<rect x="-452" y="-31" display="inline" fill="#363636" width="500" height="97"/>
+</g>
+<g id="Layer_1">
+	<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="16" y1="5" x2="16" y2="27.0005">
+		<stop  offset="0" style="stop-color:#F2F2F2"/>
+		<stop  offset="1" style="stop-color:#B3B3B3"/>
+	</linearGradient>
+	<linearGradient id="SVGID_2_" gradientUnits="userSpaceOnUse" x1="16" y1="4" x2="16" y2="28.0005">
+		<stop  offset="0" style="stop-color:#F2F2F2"/>
+		<stop  offset="1" style="stop-color:#B3B3B3"/>
+	</linearGradient>
+	<polygon fill="url(#SVGID_1_)" stroke="url(#SVGID_2_)" stroke-width="2" stroke-linejoin="round" stroke-miterlimit="10" points="
+		29,24 19,24 16,27 13,24 3,24 3,8 13,8 16,5 19,8 29,8 	"/>
+	<polygon fill="#0063B1" points="18,12 20,12 16,7.5 12,12 14,12 14,21 12,21 16,25.5 20,21 18,21 	"/>
+</g>
+</svg>

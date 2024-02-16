@@ -14,7 +14,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 #define PRESET PresetView3d
 
@@ -33,7 +33,7 @@ namespace PresetView3d
 	};
 }
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 using namespace Window;
 
@@ -170,12 +170,6 @@ void Window::View3d::OnCommand(UINT id)
 			return;
 		}
 	}
-
-	//int pId = CBCGPRibbonPaletteButton::GetLastSelectedItem(id);
-	//id += (pId >= 0 ? pId : 0);
-	//m_historyBar.PushButton(id);
-
-	//Facility::CommandIndexer::CommandInfo& cmd = TheCommandIndexer.Get(id);
 
 	Facility::CommandIndexer::CommandInfo& cmd = TheCommandIndexer.Get(id);
 	id = (cmd.ChildId >= 0 ? cmd.ChildId : id);

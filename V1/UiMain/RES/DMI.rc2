@@ -108,6 +108,7 @@ MEASURE_3D_PNL_Annotation                         SVG       "res/svg/MEASURE_3D_
 MEASURE_3D_CMD_Annotation                         SVG       "res/svg/MEASURE_3D_CMD_Annotation.svg"
 MEASURE_3D_PNL_Settings                           SVG       "res/svg/MEASURE_3D_PNL_Settings.svg"
 MEASURE_3D_CMD_Settings                           SVG       "res/svg/MEASURE_3D_CMD_Settings.svg"
+TOOLBAR_3D_LST_Sort                               SVG       "res/svg/TOOLBAR_3D_LST_Sort.svg"
 TOOLBAR_3D_CMD_Sort_ByOriginal                    SVG       "res/svg/TOOLBAR_3D_CMD_Sort_ByOriginal.svg"
 TOOLBAR_3D_CMD_Sort_ByAscending                   SVG       "res/svg/TOOLBAR_3D_CMD_Sort_ByAscending.svg"
 TOOLBAR_3D_CMD_Sort_ByDescending                  SVG       "res/svg/TOOLBAR_3D_CMD_Sort_ByDescending.svg"
