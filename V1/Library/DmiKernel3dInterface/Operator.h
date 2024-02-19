@@ -14,7 +14,7 @@ namespace KERNEL
 		enum class Type
 		{
 			VisualEffects,
-			Visibility,
+			Attribute,
 			Camera,
 			Select,
 			ModelPanel,

@@ -87,6 +87,7 @@ namespace H3DF
 	class SelectionOptionsKit;
 	class SelectionControl;
 	class HighlightControl;
+	class ConditionControl;
 
 	class SelectionOptionsControl;
 
@@ -153,6 +154,7 @@ namespace H3DF
 		LegacyShaderKit							= 0x01000049,
 		DebuggingKit							= 0x0100004a,
 		ContourLineKit							= 0x0100004b,
+		AttributeLockKit						= 0x01000056,
 
 		Key										= 0x10000000,
 		IncludeKey								= 0x10000001,
@@ -256,6 +258,18 @@ namespace H3DF
 		AnimationControl						= 0xD000000B,
 
 		SprocketKit								= 0x81000000,
+
+		ConditionalExpression					= 0x09000000,
+		NOTCondition							= 0x09000001,
+		ANDCondition							= 0x09000002,
+		ORCondition								= 0x09000003,
+		XORCondition							= 0x09000004,
+		EQCondition								= 0x09000005,
+		NEQCondition							= 0x09000006,
+		GTCondition								= 0x09000007,
+		LTCondition								= 0x09000008,
+		GTEQCondition							= 0x09000009,
+		LTEQCondition							= 0x0900000A,
 
 	};
 
@@ -700,6 +714,10 @@ namespace H3DF
 	using IntPtrTArray = std::vector<intptr_t, Allocator<intptr_t>>;
 	using ByteArray = std::vector<BYTE, Allocator<BYTE>>;
 	using ByteArrayArray = std::vector<ByteArray, Allocator<ByteArray>>;
+
+	using BoolArray = std::vector<bool, Allocator<bool>>;
+	
+	using AttributeLockTypeArray = std::vector<AttributeLock::Type, Allocator<AttributeLock::Type>>;
 
 	namespace PMI {
 		class TextAttributes;

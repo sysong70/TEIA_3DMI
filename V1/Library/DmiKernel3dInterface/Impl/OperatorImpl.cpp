@@ -42,6 +42,11 @@ const H3DF::View & KERNEL::Operator::OperatorImpl::View() const
 	return *m_pcView;
 }
 
+void KERNEL::Operator::OperatorImpl::SetDocView(const DocView * pcInDocView)
+{
+	m_pcDocView = pcInDocView;
+}
+
 void KERNEL::Operator::OperatorImpl::SetView(const H3DF::View * pcInView)
 {
 	m_pcView = pcInView;

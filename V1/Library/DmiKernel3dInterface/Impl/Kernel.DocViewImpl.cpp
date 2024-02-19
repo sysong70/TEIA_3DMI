@@ -4,7 +4,7 @@
 
 #include "../Operator.Camera.h"
 #include "../Operator.VisualEffects.h"
-#include "../Operator.Visibility.h"
+#include "../Operator.Attribute.h"
 
 #include "../Signal.Connector.h"
 #include "../../Signal/Signal.h"
@@ -67,8 +67,8 @@ void KERNEL::DocViewImpl::AllocationOperator(H3DF::View * pcInView, Signal::Deli
 	// VisualEffects Operator 생성 및 설정
 	m_apcOperator[(int)KERNEL::Operator::Type::VisualEffects] = new KERNEL::Operator::VisualEffects(pcInView, &cDelivery);
 
-	// Visibility Operator 생성 및 설정
-	m_apcOperator[(int)KERNEL::Operator::Type::Visibility] = new KERNEL::Operator::Visibility(pcInView, &cDelivery);
+	// Attribute Operator 생성 및 설정
+	m_apcOperator[(int)KERNEL::Operator::Type::Attribute] = new KERNEL::Operator::Attribute(pcInView, &cDelivery);
 
 	// Camera Operator 생성 및 설정
 	m_apcOperator[(int)KERNEL::Operator::Type::Camera] = new KERNEL::Operator::Camera(pcInView, &cDelivery);
@@ -88,6 +88,7 @@ void KERNEL::DocViewImpl::AllocationOperator(H3DF::View * pcInView, Signal::Deli
 	// Navigation Cube에서 사용하는 DynHighlightControl을 설정한다. Cube에서 선택된 부분을 Unhighlight하기 위함.
 	pcInView->GetNavigationCube().SetHighlightControl(pcSelect->DynHighlightControl());
 
+	// Operator에 DocViewImpl 연결
 	for(auto & pcOperator : m_apcOperator) {
 		pcOperator->SetDocViewImpl(this);
 	}
@@ -127,12 +128,12 @@ DWORD KERNEL::DocViewImpl::MouseMapFlags(DWORD nState)
 	return nFlag;
 }
 
-//== Visibility 관련 함수 ============================================================================
+//== Attribute 관련 함수 ============================================================================
 
-// 1. 전달받은 Visibility 명령어를 분기 처리하는 함수.
+// 1. 전달받은 Attribute 명령어를 분기 처리하는 함수.
 void KERNEL::DocViewImpl::SetVisibility(int nId)
 {
-	Operator::Visibility * pcOperator = (Operator::Visibility *)m_apcOperator[(int)KERNEL::Operator::Type::Visibility];
+	Operator::Attribute * pcOperator = (Operator::Attribute *)m_apcOperator[(int)KERNEL::Operator::Type::Attribute];
 	DEBUG_VALID(pcOperator);
 
 	switch (nId)
@@ -150,7 +151,7 @@ void KERNEL::DocViewImpl::SetVisibility(int nId)
 			break;
 
 		case HOME_3D_CMD_Visualize_Toggle:
-			pcOperator->Toggle();
+			pcOperator->ShowToggle();
 			break;
 
 		default:

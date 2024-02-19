@@ -23,6 +23,8 @@ namespace H3DF
 		ModelImpl();
 		virtual ~ModelImpl();
 
+		void Init() override;
+
 		SegmentKey GetSegmentKey();
 		SegmentKey const GetSegmentKey() const;
 
@@ -31,6 +33,19 @@ namespace H3DF
 		H3DF::ModelHandedness GetModelHandedness() { return m_eModelHandedness; }
 
 		void UpdateModelHandedness();
+
+		SegmentKey m_cInclude;
+
+		SegmentKey m_cModels;
+		SegmentKey m_cMeasurements;
+		SegmentKey m_cMarkups;
+
+		SegmentKey m_cIncludeSegment;
+		SegmentKey m_cIncludeModel;
+		SegmentKey m_cIncludeStyles;
+
+		SegmentKey m_cShowStyle;
+		SegmentKey m_cNoShowStyle;
 
 	private:
 		SegmentKey m_cSegmentKey;

@@ -141,7 +141,7 @@
     </ClInclude>
     <ClInclude Include="Operator.ModelPanel.h" />
     <ClInclude Include="Operator.Select.h" />
-    <ClInclude Include="Operator.Visibility.h" />
+    <ClInclude Include="Operator.Attribute.h" />
     <ClInclude Include="Operator.VisualEffects.h" />
     <ClInclude Include="Signal.Connector.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
@@ -174,7 +174,7 @@
     </ClCompile>
     <ClCompile Include="Operator.ModelPanel.cpp" />
     <ClCompile Include="Operator.Select.cpp" />
-    <ClCompile Include="Operator.Visibility.cpp" />
+    <ClCompile Include="Operator.Attribute.cpp" />
     <ClCompile Include="Operator.VisualEffects.cpp" />
     <ClCompile Include="Signal.Connector.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>

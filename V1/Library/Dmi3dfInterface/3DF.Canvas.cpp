@@ -183,8 +183,6 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 	LogManager::CreateLog(LOGMANAGER_3DF_LOG_ID, L"Z://3DF_Log.txt");
 	LogManager::SetWriteTimeLog(LOGMANAGER_3DF_LOG_ID, true);
 #endif // DEBUG
-	LogManager::CreateLog(LOGMANAGER_3DF_LOG_ID, L"Z://3DF_Log.txt");
-	LogManager::SetWriteTimeLog(LOGMANAGER_3DF_LOG_ID, true);
 
 // 	LogManager::CreateLog(3, L"Z://3DF_Log.txt");
 // 	LogManager::SetWriteTimeLog(true);
@@ -259,9 +257,7 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 
 	CString strErrorMessage;
 
-	CanvasImpl * pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl);
-
-	SegmentKey cModelSegmentKey = pcCanvasImpl->m_pcModel->GetSegmentKey();
+	SegmentKey cModelSegmentKey = GetModel().GetSegmentKey();
 
 	//----- File을 실제로 읽어 드리는 부분 -----
 	if (true == bPointColudData) {

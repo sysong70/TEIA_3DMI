@@ -164,9 +164,7 @@ StyleKey H3DF::StyleControl::PushSegment(SegmentKey const & cInStyleSource)
 	if (nullptr == pcImpl) { assert(false); }
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
-	
 	HC_KEY nStyleKey = HC_Style_Segment_By_Key(cInStyleSource.KeyValue());
-	
 	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	StyleKey cStyle(nStyleKey);

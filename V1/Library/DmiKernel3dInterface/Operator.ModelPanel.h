@@ -25,14 +25,11 @@ namespace KERNEL
 			void SetSelectItem(H3DF::SelectionItem & cSelItem);
 
 		protected:
-			CString GetKeyName(HC_KEY nInKey);
-
 			void OnItemExpandedSignal(Json::Object & cInObject);
-
-			void UserInterfaceItemExpanded(ModelTreeItem * pcInItem);
 
 			void OnItemSelectedSignal(Json::Object& cInObject);
 			void OnItemCheckedSignal(Json::Object & cInObject);
+			void OnItemCheckedSignalSelect(Json::Object & cInObject);
 		};
 	}
 }	

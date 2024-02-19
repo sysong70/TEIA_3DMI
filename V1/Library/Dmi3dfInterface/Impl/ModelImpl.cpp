@@ -4,6 +4,10 @@
 
 #include "Common_Define.h"
 
+#include "../3DF/Bounding.h"
+#include "../3DF/AttributeLock.h"
+#include "../3DF/Visibility.h"
+
 #include "../3DF/3DF.Utility.h"
 
 using namespace H3DF;
@@ -42,6 +46,44 @@ H3DF::ModelImpl::~ModelImpl()
 	if (nullptr != m_pcPRCAsmModelFile && nullptr != m_pcPRCDeleteModelCallback) {
 		m_pcPRCDeleteModelCallback(m_pcPRCAsmModelFile);
 	}
+}
+
+void H3DF::ModelImpl::Init()
+{
+	HBaseModel::Init();
+
+	m_cInclude = m_cSegmentKey.Subsegment("model_include");
+	m_cInclude.SetVisibility(L"off");
+
+	m_cModels = m_cSegmentKey.Subsegment("models");
+	m_cMeasurements = m_cSegmentKey.Subsegment("measurements");
+	m_cMarkups = m_cSegmentKey.Subsegment("markups");
+
+	BoundingKit cBounding;
+	cBounding.SetExclusion(true);
+	m_cInclude.SetBounding(cBounding);
+
+	m_cIncludeSegment = m_cInclude.Subsegment("include");
+	m_cIncludeModel = m_cIncludeSegment.Subsegment("model");
+	m_cIncludeStyles = m_cIncludeModel.Subsegment("styles");
+
+	// Show/No Show Condtion용 Style 생성
+	m_cShowStyle = m_cIncludeStyles.Subsegment("show");
+	m_cNoShowStyle = m_cIncludeStyles.Subsegment("noshow");
+
+	m_cNoShowStyle.GetAttributeLockControl().SetLock(H3DF::AttributeLock::Type::VisibilityFaces, true);
+	m_cNoShowStyle.GetAttributeLockControl().SetLock(H3DF::AttributeLock::Type::VisibilityLines, true);
+	m_cNoShowStyle.GetVisibilityControl().SetFaces(false);
+	m_cNoShowStyle.GetVisibilityControl().SetLines(false);
+
+// 	// 입력된 Matrial을 Face에 적용한다.
+// 	MaterialMappingKit cMaterialMapping;
+// 	cMaterialMapping.SetFaceMaterial(cInKit);
+// 
+// 	cStyleSegment.SetMaterialMapping(cMaterialMapping);
+// 
+// 	H3DF::StyleKey cStyle = cSegment.GetStyleControl().PushSegment(cStyleSegment);
+
 }
 
 SegmentKey H3DF::ModelImpl::GetSegmentKey()

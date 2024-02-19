@@ -11,15 +11,20 @@ namespace KERNEL
 {
 	namespace Operator
 	{
-		class Visibility : public OperatorBase
+		class Attribute : public OperatorBase
 		{
 		public:
-			Visibility(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			Attribute(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
 
 			bool ShowAll();
+			bool Show();
+			bool Show(H3DF::SelectionItem & cSelItem);
+
 			bool Hide();
+			bool Hide(H3DF::SelectionItem & cSelItem);
+
 			bool ShowOnly();
-			bool Toggle();
+			bool ShowToggle();
 
 			// void Request(Json::Object & cInObject);
 			// void Change(Json::Object & cInObject);

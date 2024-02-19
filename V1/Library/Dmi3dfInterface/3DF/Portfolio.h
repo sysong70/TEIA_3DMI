@@ -18,7 +18,7 @@ namespace H3DF
 		void Set(PortfolioKey const & cInThat);
 		PortfolioKey & operator = (PortfolioKey const & cInThat);
 
-		NamedStyleDefinition DefineNamedStyle(CString strInName, SegmentKey const & cInStyleSource);
+		NamedStyleDefinition DefineNamedStyle(CStringA strInName, SegmentKey const & cInStyleSource);
 	};
 
 	class API_3DF PortfolioControl : public Control
