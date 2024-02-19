@@ -11,6 +11,44 @@ static char THIS_FILE[] = __FILE__;
 
 //**************************************************************************************************
 
+static const COLORREF clrDefault = (COLORREF)-1;
+
+
+
+class Button : public CBCGPButton
+{
+protected:
+	/*
+	void DoDrawItem(CDC* pDCPaint, CRect rectClient, UINT itemState) override
+	{
+		CBCGPWindowDpiState state(this);
+
+		CBCGPMemDC memDC(*pDCPaint, this);
+		CDC* pDC = &memDC.GetDC();
+
+		//m_clrText = clrDefault;
+
+		BOOL bDefaultCheckRadio = (m_bCheckButton || m_bRadioButton) && (GetStyle() & BS_PUSHLIKE) == 0;
+		double dblScaleRatio = 1.0;
+
+		if (((m_bVisualManagerStyle && !m_bDontSkin) || bDefaultCheckRadio) && !m_bTransparent) {
+			if (CBCGPVisualManager::GetInstance()->OnDrawPushButton(pDC, rectClient, this, m_clrText)) {
+				const int nPad = globalUtils.ScaleByDPI(2, this);
+				rectClient.DeflateRect(nPad, nPad);
+			}
+		}
+
+		// Draw button content:
+		OnDraw(pDC, rectClient, itemState);
+
+		if ((itemState & ODS_FOCUS) && ((itemState & ODS_NOFOCUSRECT) == 0) && m_bDrawFocus) {
+			OnDrawFocusRect(pDC, rectClient);
+		}
+	}*/
+};
+
+//**************************************************************************************************
+
 class ButtonWithMenu : public CBCGPMenuButton
 {
 public:
@@ -44,12 +82,10 @@ public:
 			for (int i = 0; i < m_menu.GetMenuItemCount(); i++) {
 				UINT itemId = m_menu.GetMenuItemID(i);
 				m_menu.CheckMenuItem(itemId, id == itemId ? MF_CHECKED : MF_UNCHECKED);
-				//::CheckMenuItem(m_menu.m_hMenu, itemId, id == itemId ? MF_CHECKED : MF_UNCHECKED);
 			}
 		}
 		else {
 			m_menu.CheckMenuItem(id, MF_CHECKED);
-			//::CheckMenuItem(m_menu.m_hMenu, id, MF_CHECKED);
 		}
 	}
 
@@ -166,14 +202,14 @@ void Control::ToolBar::SetCheck(UINT id, bool value, bool uncheckOthers)
 	if (uncheckOthers) {
 		for (auto button : m_buttons) {
 			if (button != nullptr) {
-				button->SendMessage(BM_SETCHECK, BST_UNCHECKED);
+				button->SetCheck(BST_UNCHECKED);
 			}
 		}
 	}
 
 	CBCGPButton* pButton = GetButton(id);
 	if (pButton != nullptr) {
-		pButton->SendMessage(BM_SETCHECK, value ? BST_CHECKED : BST_UNCHECKED);
+		pButton->SetCheck(value ? BST_CHECKED : BST_UNCHECKED);
 	}
 }
 
@@ -183,7 +219,7 @@ void Control::ToolBar::SetUncheckOthers(UINT id)
 {
 	for (auto button : m_buttons) {
 		if (button != nullptr && button->GetDlgCtrlID() != id) {
-			button->SendMessage(BM_SETCHECK, BST_UNCHECKED);
+			button->SetCheck(BST_UNCHECKED);
 		}
 	}
 }
@@ -433,8 +469,13 @@ void Control::ToolBar::OnSize(UINT nType, int cx, int cy)
 
 CBCGPButton* Control::ToolBar::CreateButton(UINT id, bool menu, bool toggle, bool checked)
 {
-	//CBCGPButton* pButton = menu ? new CBCGPMenuButton() : new CBCGPButton();
-	CBCGPButton* pButton = menu ? new ButtonWithMenu() : new CBCGPButton();
+	CBCGPButton* pButton = nullptr;
+	if (menu) {
+		pButton = new ButtonWithMenu();
+	}
+	else {
+		pButton = new Button();
+	}
 	DEBUG_VALID(pButton);
 
 	CBCGPButton& button = *pButton;
@@ -448,7 +489,7 @@ CBCGPButton* Control::ToolBar::CreateButton(UINT id, bool menu, bool toggle, boo
 	button.SetTooltip(Facility::GetTitle(id));
 
 	if (toggle) {
-		button.SendMessage(BM_SETCHECK, checked ? BST_CHECKED : BST_UNCHECKED);
+		button.SetCheck(checked ? BST_CHECKED : BST_UNCHECKED);
 	}
 
 	return pButton;
