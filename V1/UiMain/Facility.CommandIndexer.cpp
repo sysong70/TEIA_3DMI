@@ -10,7 +10,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 // Global single instance
 
 Facility::CommandIndexer TheCommandIndexer;
@@ -21,7 +21,7 @@ Command::VisualEffects3d theVisualEffects3d;
 //:TEST
 Command::Test9 theTestCommand9;
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 Facility::CommandIndexer::CommandIndexer()
 {
@@ -61,7 +61,7 @@ Facility::CommandIndexer::CommandInfo& Facility::CommandIndexer::GetDummyData()
 
 void Facility::CommandIndexer::Initialize()
 {
-#define ITEM_DEF(type,id,stringId) { id, { type, id, stringId } },
+#define ITEM_DEF(type,id,stringId) { id, { type, id, -1, stringId } },
 
 	m_commandMap = {
 #include "Command.Common.h"

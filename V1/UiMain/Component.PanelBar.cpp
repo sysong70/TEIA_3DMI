@@ -9,7 +9,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 #define PRESET PresetPanelBar
 
@@ -25,14 +25,13 @@ namespace PresetPanelBar
 	}
 }
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 using namespace Component;
 
 BEGIN_MESSAGE_MAP(PanelBar, CBCGPDockingControlBar)
 	ON_WM_SIZE()
 	ON_WM_ERASEBKGND()
-	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
 
@@ -52,7 +51,7 @@ Component::PanelBar::~PanelBar()
 bool Component::PanelBar::Initialize(CWnd* pMainFrame)
 {
 	if (Create(Facility::Local(L"PANELS|패널"), pMainFrame, CSize(600, 100), TRUE,
-		PRESET::Id, WS_CHILD | WS_VISIBLE /* | WS_DISABLED */ | CBRS_LEFT) == FALSE) {
+		PRESET::Id, WS_CHILD | WS_VISIBLE | WS_DISABLED | CBRS_LEFT) == FALSE) {
 		RETURN_FALSE;
 	}
 
@@ -63,9 +62,7 @@ bool Component::PanelBar::Initialize(CWnd* pMainFrame)
 	RemoveCaptionButtons();
 	m_arrButtons.Add(new CBCGPCaptionButton(HTCLOSE_BCG, FALSE, this));
 	//:WARNING - set child style
-	SendMessageToDescendants(BCGM_ONSETCONTROLVMMODE, TRUE, 0, TRUE, FALSE);
-
-	EnableWindow(FALSE);
+	//SendMessageToDescendants(BCGM_ONSETCONTROLVMMODE, TRUE, 0, TRUE, FALSE);
 
 	return true;
 }

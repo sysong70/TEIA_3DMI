@@ -25,27 +25,39 @@ namespace Control
 
 		void SetPivot(EPivot pivot, bool expandSize = true);
 
-	public:
+	public: // CBCGPButton
 
 		CBCGPButton* AddButton(UINT id, bool menu = false);
 
-		void AddButtons(std::vector<UINT> ids);
+		void AddButtons(const std::vector<UINT>& ids);
 
 		void AddSeperator();
 
+	public: // CBCGPButton (toggle)
+
 		CBCGPButton* AddToggle(UINT id, bool checked = false);
-
-		CSize AdjustLayout();
-
-		CPoint AdjustLocation(CSize size);
-
-		CBCGPButton* GetButton(UINT id);
 
 		bool GetCheck(UINT id);
 
 		void SetCheck(UINT id, bool value, bool uncheckOthers = true);
 
 		void SetUncheckOthers(UINT id);
+
+	public: // ButtonWithMenu
+
+		CBCGPButton* AddButtonWithMenu(UINT id, const std::vector<UINT>& menus);
+
+		void CheckMenu(UINT id, UINT menuId, bool radioType = false);
+
+		UINT GetMenuResult(UINT id);
+
+	public:
+
+		CSize AdjustLayout();
+
+		CPoint AdjustLocation(CSize size);
+
+		CBCGPButton* GetButton(UINT id);
 
 		void SetSize(CSize buttonSize, CSize buttonMargin, CSize imageSize, CSize seperatorMargin, CSize toolBarPadding);
 		// image size, not button size
@@ -67,9 +79,11 @@ namespace Control
 
 		EPivot m_ePivot = EPivot::TopCenter;
 		bool m_bExpandSize = false;
+		bool m_bTransparent = false;
 
 		std::vector<CBCGPButton*> m_buttons;
 
+		// return CBCGPButton or ButtonWithMenu
 		CBCGPButton* CreateButton(UINT id, bool menu, bool toggle = false, bool checked = false);
 
 		bool IsHorizontal();

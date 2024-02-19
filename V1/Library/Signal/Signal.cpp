@@ -6,7 +6,7 @@ Json::Object data; \
 ConstructData(data, action); \
 Wrapper().SendData(data);
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 #pragma region Application Class
 
@@ -135,7 +135,7 @@ void Signal::Application::SaveTraceLog(const wchar_t* pPath, bool saveAndClear)
 
 #pragma endregion //:REGION
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 #pragma region MainFrame Class
 
@@ -168,7 +168,7 @@ void Signal::MainFrame::HideProgress()
 
 #pragma endregion //:REGION
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 #pragma region StatusBar Class
 
@@ -219,7 +219,7 @@ void Signal::StatusBar::ShowCoordinate(double x, double y, double z)
 
 #pragma endregion //:REGION
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 #pragma region Progress Class
 
@@ -302,7 +302,7 @@ void Signal::Progress::ClearLog()
 
 #pragma endregion //:REGION
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 #pragma region Command Class
 
@@ -358,7 +358,7 @@ void Signal::Command::ResponseFileOption(Json::Object& value, Json::Object& defa
 
 #pragma endregion //:REGION
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 #pragma region View Class
 
@@ -635,9 +635,9 @@ void Signal::View::SetInputMode(EInputMode mode)
 
 #pragma endregion //:REGION
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
-#pragma region ModelPanel
+#pragma region ModelPanel Class
 
 void Signal::ModelPanel::ConstructData(Json::Object& data, Action action)
 {
@@ -796,7 +796,7 @@ void Signal::ModelPanel::SelectItem(DWORD_PTR key)
 
 #pragma endregion //:REGION
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 #pragma region TaskBar Class
 
@@ -848,7 +848,7 @@ void Signal::TaskBar::ResponseValue(UINT commandId, Json::Object& value, Json::O
 
 #pragma endregion //:REGION
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 #pragma region Delivery Class
 
@@ -897,4 +897,3 @@ void Signal::Delivery::SendData(Json::Object& data)
 #pragma endregion //:REGION
 
 #undef SendActionDataOnly
-

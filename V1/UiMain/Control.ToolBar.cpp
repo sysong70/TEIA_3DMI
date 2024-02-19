@@ -9,7 +9,56 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
+
+class ButtonWithMenu : public CBCGPMenuButton
+{
+public:
+
+	void AddMenu(const std::vector<UINT>& menus)
+	{
+		BOOL success = m_menu.CreateMenu();
+		ASSERT(success);
+
+		for (auto id : menus) {
+			if (id == 0) {
+				success = m_menu.AppendMenu(MF_SEPARATOR);
+			}
+			else {
+				success = m_menu.AppendMenu(MF_STRING, id, Facility::GetTitle(id));
+			}
+
+			ASSERT(success);
+		}
+
+		m_bOSMenu = FALSE;
+		m_hMenu = m_menu.m_hMenu;
+		DEBUG_VALID(m_hMenu);
+	}
+
+
+
+	void CheckMenu(UINT id, bool radioType)
+	{
+		if (radioType) {
+			for (int i = 0; i < m_menu.GetMenuItemCount(); i++) {
+				UINT itemId = m_menu.GetMenuItemID(i);
+				m_menu.CheckMenuItem(itemId, id == itemId ? MF_CHECKED : MF_UNCHECKED);
+				//::CheckMenuItem(m_menu.m_hMenu, itemId, id == itemId ? MF_CHECKED : MF_UNCHECKED);
+			}
+		}
+		else {
+			m_menu.CheckMenuItem(id, MF_CHECKED);
+			//::CheckMenuItem(m_menu.m_hMenu, id, MF_CHECKED);
+		}
+	}
+
+private:
+
+	CMenu m_menu;
+};
+
+//**************************************************************************************************
 
 using namespace Control;
 
@@ -57,7 +106,7 @@ void Control::ToolBar::SetPivot(EPivot pivot, bool expandSize)
 	m_bExpandSize = expandSize;
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 CBCGPButton* Control::ToolBar::AddButton(UINT id, bool menu)
 {
@@ -69,7 +118,7 @@ CBCGPButton* Control::ToolBar::AddButton(UINT id, bool menu)
 
 
 
-void Control::ToolBar::AddButtons(std::vector<UINT> ids)
+void Control::ToolBar::AddButtons(const std::vector<UINT>& ids)
 {
 	for (auto id : ids) {
 		if (id != 0) {
@@ -88,7 +137,7 @@ void Control::ToolBar::AddSeperator()
 	m_buttons.push_back(nullptr);
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 CBCGPButton* Control::ToolBar::AddToggle(UINT id, bool checked)
 {
@@ -99,6 +148,76 @@ CBCGPButton* Control::ToolBar::AddToggle(UINT id, bool checked)
 }
 
 
+
+bool Control::ToolBar::GetCheck(UINT id)
+{
+	CBCGPButton* pButton = GetButton(id);
+	if (pButton != nullptr) {
+		return pButton->IsChecked();
+	}
+
+	return false;
+}
+
+
+
+void Control::ToolBar::SetCheck(UINT id, bool value, bool uncheckOthers)
+{
+	if (uncheckOthers) {
+		for (auto button : m_buttons) {
+			if (button != nullptr) {
+				button->SendMessage(BM_SETCHECK, BST_UNCHECKED);
+			}
+		}
+	}
+
+	CBCGPButton* pButton = GetButton(id);
+	if (pButton != nullptr) {
+		pButton->SendMessage(BM_SETCHECK, value ? BST_CHECKED : BST_UNCHECKED);
+	}
+}
+
+
+
+void Control::ToolBar::SetUncheckOthers(UINT id)
+{
+	for (auto button : m_buttons) {
+		if (button != nullptr && button->GetDlgCtrlID() != id) {
+			button->SendMessage(BM_SETCHECK, BST_UNCHECKED);
+		}
+	}
+}
+
+//--------------------------------------------------------------------------------------------------
+
+CBCGPButton* Control::ToolBar::AddButtonWithMenu(UINT id, const std::vector<UINT>& menus)
+{
+	ButtonWithMenu* button = (ButtonWithMenu*)CreateButton(id, true);
+	m_buttons.push_back(button);
+
+	//button->m_bRightArrow = TRUE;
+	button->AddMenu(menus);
+
+	return button;
+}
+
+
+
+void Control::ToolBar::CheckMenu(UINT id, UINT menuId, bool radioType)
+{
+	ButtonWithMenu* button = (ButtonWithMenu*)GetButton(id);
+	button->CheckMenu(menuId, radioType);
+}
+
+
+
+UINT Control::ToolBar::GetMenuResult(UINT id)
+{
+	ButtonWithMenu* button = (ButtonWithMenu*)GetButton(id);
+	return button->m_nMenuResult;
+}
+
+//--------------------------------------------------------------------------------------------------
 
 CSize Control::ToolBar::AdjustLayout()
 {
@@ -237,47 +356,6 @@ CBCGPButton* Control::ToolBar::GetButton(UINT id)
 
 
 
-bool Control::ToolBar::GetCheck(UINT id)
-{
-	CBCGPButton* pButton = GetButton(id);
-	if (pButton != nullptr) {
-		return pButton->IsChecked();
-	}
-
-	return false;
-}
-
-
-
-void Control::ToolBar::SetCheck(UINT id, bool value, bool uncheckOthers)
-{
-	if (uncheckOthers) {
-		for (auto button : m_buttons) {
-			if (button != nullptr) {
-				button->SendMessage(BM_SETCHECK, BST_UNCHECKED);
-			}
-		}
-	}
-
-	CBCGPButton* pButton = GetButton(id);
-	if (pButton != nullptr) {
-		pButton->SendMessage(BM_SETCHECK, value ? BST_CHECKED : BST_UNCHECKED);
-	}
-}
-
-
-
-void Control::ToolBar::SetUncheckOthers(UINT id)
-{
-	for (auto button : m_buttons) {
-		if (button != nullptr && button->GetDlgCtrlID() != id) {
-			button->SendMessage(BM_SETCHECK, BST_UNCHECKED);
-		}
-	}
-}
-
-
-
 void Control::ToolBar::SetSize(CSize buttonSize, CSize buttonMargin, CSize imageSize, CSize seperatorMargin, CSize toolBarPadding)
 {
 	m_buttonSize = buttonSize;
@@ -309,7 +387,7 @@ void Control::ToolBar::SetSize(EItemSize size)
 	}
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 void Control::ToolBar::OnCommand(UINT id)
 {
@@ -351,11 +429,12 @@ void Control::ToolBar::OnSize(UINT nType, int cx, int cy)
 	}
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 CBCGPButton* Control::ToolBar::CreateButton(UINT id, bool menu, bool toggle, bool checked)
 {
-	CBCGPButton* pButton = menu ? new CBCGPMenuButton() : new CBCGPButton();
+	//CBCGPButton* pButton = menu ? new CBCGPMenuButton() : new CBCGPButton();
+	CBCGPButton* pButton = menu ? new ButtonWithMenu() : new CBCGPButton();
 	DEBUG_VALID(pButton);
 
 	CBCGPButton& button = *pButton;
@@ -368,7 +447,7 @@ CBCGPButton* Control::ToolBar::CreateButton(UINT id, bool menu, bool toggle, boo
 	button.SetBitmap(Facility::CreateBitmap(id, GetImageSize()));
 	button.SetTooltip(Facility::GetTitle(id));
 
-	if (toggle && checked) {
+	if (toggle) {
 		button.SendMessage(BM_SETCHECK, checked ? BST_CHECKED : BST_UNCHECKED);
 	}
 

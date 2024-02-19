@@ -13,7 +13,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 using namespace Window;
 
@@ -84,6 +84,13 @@ CRect Window::MainFrame::GetMDIRect()
 Component::PanelBar& Window::MainFrame::GetPanelBar()
 {
 	return m_panelBar;
+}
+
+
+
+Component::RibbonBar& Window::MainFrame::GetRibbonBar()
+{
+	return m_ribbonBar;
 }
 
 
@@ -197,6 +204,8 @@ void Window::MainFrame::ShowPanelBar()
 void Window::MainFrame::ShowProgress(bool bShow)
 {
 	if (bShow) {
+		BeginWaitCursor();
+
 		Dialog::Base* pDialog = m_dialogs.Get((int)Signal::Target::Progress);
 		if (pDialog == nullptr) {
 			pDialog = new Dialog::ProgressLog(this);
@@ -207,6 +216,8 @@ void Window::MainFrame::ShowProgress(bool bShow)
 	}
 	else {
 		m_dialogs.Remove((int)Signal::Target::Progress);
+
+		EndWaitCursor();
 	}
 }
 

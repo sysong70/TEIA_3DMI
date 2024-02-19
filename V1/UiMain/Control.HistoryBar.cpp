@@ -8,7 +8,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 Control::HistoryBar::HistoryBar()
 {
@@ -27,12 +27,11 @@ void Control::HistoryBar::PushButton(UINT id)
 	RemoveButton(id);
 
 	if (m_buttons.size() >= m_nMaxCount) {
-		REMOVE_POINTER(m_buttons.front());
-		m_buttons.erase(m_buttons.begin());
+		REMOVE_POINTER(m_buttons.back());
+		m_buttons.pop_back();
 	}
 
-	// insert front
-	m_buttons.insert(m_buttons.begin(), CreateButton(id, false, false));
+	m_buttons.push_back(CreateButton(id, false, false));
 	AdjustLayout();
 	ShowWindow(SW_SHOW);
 }

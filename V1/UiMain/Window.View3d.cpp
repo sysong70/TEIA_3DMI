@@ -14,7 +14,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 #define PRESET PresetView3d
 
@@ -33,7 +33,7 @@ namespace PresetView3d
 	};
 }
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 using namespace Window;
 
@@ -171,14 +171,13 @@ void Window::View3d::OnCommand(UINT id)
 		}
 	}
 
-	int pId = CBCGPRibbonPaletteButton::GetLastSelectedItem(id);
-	id += (pId >= 0 ? pId : 0);
+	Facility::CommandIndexer::CommandInfo& cmd = TheCommandIndexer.Get(id);
+	id = (cmd.ChildId >= 0 ? cmd.ChildId : id);
+
 	m_historyBar.PushButton(id);
 
-	Facility::CommandIndexer::CommandInfo& data = TheCommandIndexer.Get(id);
-
-	if (data.Function != nullptr) {
-		Command::Base* pCommand = (Command::Base*)data.Function;
+	if (cmd.Function != nullptr) {
+		Command::Base* pCommand = (Command::Base*)cmd.Function;
 		if (pCommand->IsRunOnlyOnce() == false) {
 			m_pActiveCommand = pCommand;
 		}
@@ -186,7 +185,7 @@ void Window::View3d::OnCommand(UINT id)
 		pCommand->Run(this);
 	}
 	else {
-		switch (data.Type) {
+		switch (cmd.Type) {
 		case Facility::CommandIndexer::Popup:
 			break;
 

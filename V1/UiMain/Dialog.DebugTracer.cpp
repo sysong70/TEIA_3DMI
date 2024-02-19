@@ -8,7 +8,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 #define PRESET PresetDebugTracer
 
@@ -36,7 +36,7 @@ namespace PresetDebugTracer
 	}
 }
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 using namespace Dialog;
 
@@ -44,8 +44,7 @@ IMPLEMENT_DYNAMIC(DebugTracer, CBCGPDialog)
 
 BEGIN_MESSAGE_MAP(DebugTracer, CBCGPDialog)
 	ON_WM_CONTEXTMENU()
-
-	ON_COMMAND_RANGE(PRESET::Clear, PRESET::Save, OnContextCommand)
+	//ON_COMMAND_RANGE(PRESET::Clear, PRESET::Save, OnContextCommand)
 END_MESSAGE_MAP()
 
 
@@ -109,17 +108,19 @@ BOOL Dialog::DebugTracer::OnInitDialog()
 	return TRUE;
 }
 
+#include "Window.Application.h"
 
-
-void Dialog::DebugTracer::OnContextMenu(CWnd* pWnd, CPoint pos)
+void Dialog::DebugTracer::OnContextMenu(CWnd* pWnd, CPoint point)
 {
 	CMenu menu;
 	menu.CreatePopupMenu();
-	
 	menu.AppendMenu(MF_STRING, PRESET::Clear, L"Clear");
 	menu.AppendMenu(MF_STRING, PRESET::Save, L"Save...");
+	//menu.TrackPopupMenu(TPM_LEFTALIGN, pos.x, pos.y, this);
 
-	menu.TrackPopupMenu(TPM_LEFTALIGN, pos.x, pos.y, this);
+	//:CHECK - visual theme
+	UINT id = TheApplication.GetContextMenuManager()->TrackPopupMenu(menu.Detach(), point.x, point.y, this);
+	OnContextCommand(id);
 }
 
 

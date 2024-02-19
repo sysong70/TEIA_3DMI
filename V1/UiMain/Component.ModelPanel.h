@@ -32,7 +32,7 @@ namespace Component
 
 	private:
 
-		afx_msg void OnCommand(UINT id);
+		afx_msg void OnCommandSort();
 
 		afx_msg LRESULT OnTreeCheckClick(WPARAM wp, LPARAM lp);
 

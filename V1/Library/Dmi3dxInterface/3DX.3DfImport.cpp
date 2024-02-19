@@ -287,7 +287,8 @@ bool TdfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, H3DF::Seg
 	// #Import_Log : ExcuteFunction.log
 #ifdef USED_LOG_MANAGER
 	//LogManager::SetWriteTimeLog(2, true);
-	CreateLog(2, L"z:\\3DX_ExcuteFunction.log");
+	//:Ken 
+	//CreateLog(2, L"z:\\3DX_ExcuteFunction.log");
 
 	//m_cA3dTracer.CreateLog(L"D:\\Temp\\A3dXInfo.log");
 	//CreateLog(1, L"d:\\Temp\\AssyStruct.log");

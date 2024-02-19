@@ -15,7 +15,42 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
+
+class VisualManagerCustom : public CBCGPVisualManager2019
+{
+public:
+
+	DECLARE_DYNCREATE(VisualManagerCustom);
+
+public:
+
+	VisualManagerCustom()
+		: CBCGPVisualManager2019()
+	{
+		//:WARNING - change context menu height
+		//CBCGPToolBar::SetSizes(
+		//	globalUtils.ScaleByDPI(CSize(38, 38)),
+		//	globalUtils.ScaleByDPI(CSize(32, 32))
+		//);
+	}
+
+public:
+
+	BOOL DrawCheckBox(CDC* pDC, CRect rect, BOOL bHighlighted, int nState, BOOL bEnabled, BOOL bPressed) override
+	{
+		const COLORREF BorderColor = RGB(0xC0, 0xC0, 0xC0);
+		//:WANING - replace check box(border) color
+		CLocalState<COLORREF> color(globalData.clrBarDkShadow, BorderColor);
+		return CBCGPVisualManagerVS2012::DrawCheckBox(pDC, rect, bHighlighted, nState, bEnabled, bPressed);
+	}
+};
+
+
+
+IMPLEMENT_DYNCREATE(VisualManagerCustom, CBCGPVisualManager2019)
+
+//**************************************************************************************************
 
 #define PRESET PresetApplication
 
@@ -34,32 +69,7 @@ namespace PresetApplication
 	}
 }
 
-//--------------------------------------------------------------------------------------------------
-
-class VisualManagerCustom : public CBCGPVisualManager2019
-{
-public:
-
-	DECLARE_DYNCREATE(VisualManagerCustom);
-
-public:
-
-	VisualManagerCustom() : CBCGPVisualManager2019() {}
-
-public:
-
-	BOOL DrawCheckBox(CDC* pDC, CRect rect, BOOL bHighlighted, int nState, BOOL bEnabled, BOOL bPressed) override
-	{
-		const COLORREF BorderColor = RGB(0xC0, 0xC0, 0xC0);
-		//:WANING - replace check box(border) color
-		CLocalState<COLORREF> color(globalData.clrBarDkShadow, BorderColor);
-		return CBCGPVisualManagerVS2012::DrawCheckBox(pDC, rect, bHighlighted, nState, bEnabled, bPressed);
-	}
-};
-
-IMPLEMENT_DYNCREATE(VisualManagerCustom, CBCGPVisualManager2019)
-
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 //:REF - C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\atlmfc\src\mfc\doctempl.cpp
 
@@ -133,7 +143,7 @@ public:
 	}
 };
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 #pragma region About Dialog
 
@@ -167,7 +177,7 @@ END_MESSAGE_MAP()
 
 #pragma endregion //:REGION
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 Window::Application TheApplication;
 
