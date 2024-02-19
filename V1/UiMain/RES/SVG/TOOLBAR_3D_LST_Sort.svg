@@ -17,6 +17,7 @@
 	</linearGradient>
 	<polygon fill="url(#SVGID_1_)" stroke="url(#SVGID_2_)" stroke-width="2" stroke-linejoin="round" stroke-miterlimit="10" points="
 		29,24 19,24 16,27 13,24 3,24 3,8 13,8 16,5 19,8 29,8 	"/>
-	<polygon fill="#0063B1" points="18,12 20,12 16,7.5 12,12 14,12 14,21 12,21 16,25.5 20,21 18,21 	"/>
+	<polyline fill="#0063B1" points="20,12 16,7.5 12,12 	"/>
+	<polyline fill="#0063B1" points="12,21 16,25.5 20,21 	"/>
 </g>
 </svg>
