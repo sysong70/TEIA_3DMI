@@ -164,25 +164,25 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 
 	//----- Model 관련 Include 선언 -----
 
-	SegmentKey cModelInclude = cModelSegment.Subsegment(L"model_include");
+	SegmentKey cModelInclude = cModelSegment.Subsegment("model_include");
 	cModelInclude.SetVisibility(L"off");
 
-	SegmentKey cModels = cModelSegment.Subsegment(L"models");
-	SegmentKey cMeasurements = cModelSegment.Subsegment(L"measurements");
-	SegmentKey cMarkups = cModelSegment.Subsegment(L"markups");
+	SegmentKey cModels = cModelSegment.Subsegment("models");
+	SegmentKey cMeasurements = cModelSegment.Subsegment("measurements");
+	SegmentKey cMarkups = cModelSegment.Subsegment("markups");
 
 	BoundingKit cBounding;
 	cBounding.SetExclusion(true);
 	cModelInclude.SetBounding(cBounding);
 
-	SegmentKey cIncludeSegment = cModelInclude.Subsegment();
-	m_nModelIncludeKey = cIncludeSegment.Subsegment();
-	m_nStylesIncludeKey = m_nModelIncludeKey.Subsegment(L"styles").KeyValue();
+	SegmentKey cIncludeSegment = cModelInclude.Subsegment("include");
+	m_cModelIncludeKey = cIncludeSegment.Subsegment("model");
+	m_cStylesIncludeKey = m_cModelIncludeKey.Subsegment("styles");
 
-	m_cPartsIncludeSegment = m_nModelIncludeKey.Subsegment(L"parts");
-	m_cPoccsIncludeSegment = m_nModelIncludeKey.Subsegment(L"poccs");
-	m_cRisIncludeSegment = m_nModelIncludeKey.Subsegment(L"ris");
-	m_cPmiIncludeSegment = m_nModelIncludeKey.Subsegment(L"pmi");
+	m_cPartsIncludeSegment = m_cModelIncludeKey.Subsegment("parts");
+	m_cPoccsIncludeSegment = m_cModelIncludeKey.Subsegment("poccs");
+	m_cRisIncludeSegment = m_cModelIncludeKey.Subsegment("ris");
+	m_cPmiIncludeSegment = m_cModelIncludeKey.Subsegment("pmi");
 
 	m_cPmiIncludeSegment.SetVisibility(L"everything = off");
 	m_cPmiIncludeSegment.SetHeuristics(L"exclude bounding");
@@ -335,7 +335,7 @@ bool TdfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, H3DF::Seg
 		}
 	}
 
- 	H3DF::SegmentKey cTextureDefineSegment = cModelSegment.Subsegment(L"texture_define");
+ 	H3DF::SegmentKey cTextureDefineSegment = cModelSegment.Subsegment("texture_define");
 // 	// Texture 관련 사항 정의
  	PopulateTextures(cTextureDefineSegment);
 
@@ -381,8 +381,8 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 	Log(2, L"ParseProductOccurrence: pocc%d, Name: %s", m_nIncrementalId, strPoName);
 
 	// Segment를 생성하고 생성된 Segment를 Parent Segment에 Include한다.
-	CString strSegmentName;
-	strSegmentName.Format(L"pocc%d", m_nIncrementalId++);
+	CStringA strSegmentName;
+	strSegmentName.Format("pocc%d", m_nIncrementalId++);
 	H3DF::SegmentKey cSegment = m_cPoccsIncludeSegment.Subsegment(strSegmentName);
 	IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
 
@@ -968,7 +968,7 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 	Log(2, L"ParsePart: part%d", m_nIncrementalId);
 
 	// Segment를 생성하고 생성된 Segment를 Parent Segment에 Include한다.
-	SegmentKey cSegment = m_cPartsIncludeSegment.Subsegment(L"part%d", m_nIncrementalId++);
+	SegmentKey cSegment = m_cPartsIncludeSegment.Subsegment("part%d", m_nIncrementalId++);
 	cParentSegment.IncludeSegment(cSegment);
 	m_mPartsMap.SetAt((DWORD_PTR) pcPart, cSegment.KeyValue());
 
@@ -1047,16 +1047,16 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 	CString strRiName;
 	GetName(pcRepItem, strRiName);
 
-	CString strSegmentName;
-	strSegmentName.Format(L"ri%d", m_nIncrementalId++);
+	CStringA strSegmentName;
+	strSegmentName.Format("ri%d", m_nIncrementalId++);
 	SegmentKey cSegment = m_cRisIncludeSegment.Subsegment(strSegmentName);
 	IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
 
 	if (true == strRiName.IsEmpty()) {
-		Log(2, L"DrawRiRepresentationItem: %s, Include: %d, Segment: %d", strSegmentName, cInclude.KeyValue(), cSegment.KeyValue());
+		Log(2, "DrawRiRepresentationItem: %s, Include: %d, Segment: %d", strSegmentName, cInclude.KeyValue(), cSegment.KeyValue());
 	}
 	else {
-		Log(2, L"DrawRiRepresentationItem: %s, Include: %d, Segment: %d, [%s]", strSegmentName, cInclude.KeyValue(), cSegment.KeyValue(), strRiName);
+		Log(2, "DrawRiRepresentationItem: %s, Include: %d, Segment: %d, [%s]", strSegmentName, cInclude.KeyValue(), cSegment.KeyValue(), strRiName);
 	}
 
 	// Ri Rep에 설정된 이름을 확인해서 저장한다.
@@ -1106,27 +1106,38 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 			CHECK_A3D_RETURN(A3DRiCoordinateSystemGet(nullptr, &sCSysData));
 		}
 
+		bool bSolidFlag = false;
+
 		switch(eType)
 		{
 			case kA3DTypeRiSet:
 				eStatus = DrawSet((A3DRiSet *) pcRepItem, cSegment, pcAttr);
 			break;
 
-			case kA3DTypeRiBrepModel:
-			{
-				// Solid인지 Surface인지 알 수 없음.
-				// H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Solid);
+			case kA3DTypeRiBrepModel: {
 				eStatus = ParseRiBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
 
-				
-			}
-			break;
+				// Solid, Surface 판정
+				A3DRiBrepModelData cData;
+				A3D_INITIALIZE_DATA(A3DRiBrepModelData, cData);
+				A3DStatus nResult = A3DRiBrepModelGet(pcRepItem, &cData);
 
-			case kA3DTypeRiPolyBrepModel:
-				// Solid인지 Surface인지 알 수 없음.
-				// H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Solid);
+				bSolidFlag = (A3D_TRUE == cData.m_bSolid) ? true : false;
+
+				A3DRiBrepModelGet(nullptr, &cData);
+			} break;
+
+			case kA3DTypeRiPolyBrepModel: {
 				eStatus = DrawRiPolyBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
-			break;
+
+				A3DRiPolyBrepModelData cData;
+				A3D_INITIALIZE_DATA(A3DRiPolyBrepModelData, cData);
+				A3DStatus nResult = A3DRiPolyBrepModelGet(pcRepItem, &cData);
+
+				bSolidFlag = (A3D_TRUE == cData.m_bIsClosed) ? true : false;
+
+				A3DRiPolyBrepModelGet(nullptr, &cData);
+			} break;
 
 			case kA3DTypeRiCurve:
 			case kA3DTypeRiPolyWire:
@@ -1169,36 +1180,27 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 		}
 
 		A3DRiRepresentationItemGet(nullptr, &cRepItemData);
-	}
 
-	cSegment.Close();
+		cSegment.Close();
 
-	if (false == strRiName.IsEmpty()) {
-		H3DF::UserData::SetSegmentName(cSegment, strRiName);
-	}
+		LogIncreaseTabIndex(2);
 
-	// Solid, Surface 판정
-	A3DRiBrepModelData cBrepModelData;
-	A3D_INITIALIZE_DATA(A3DRiBrepModelData, cBrepModelData);
-	A3DStatus nResult = A3DRiBrepModelGet(pcRepItem, &cBrepModelData);
-
-	LogIncreaseTabIndex(2);
-
-	if (A3D_SUCCESS == nResult) {
-		HC_KEY nKey = cSegment.KeyValue();
-		if (true == cBrepModelData.m_bSolid) {
-			H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Solid);
-			Log(2, L"SetTopologyType: %d, Type: %s", cSegment.KeyValue(), L"Solid");
+		if (false == strRiName.IsEmpty()) {
+			H3DF::UserData::SetSegmentName(cSegment, strRiName);
 		}
 		else {
-			H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Surface);
-			Log(2, L"SetTopologyType: %d, Type: %s", cSegment.KeyValue(), L"Surface");
+			if (true == bSolidFlag) {
+				H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Solid);
+				Log(2, L"SetTopologyType: %d, Type: %s", cSegment.KeyValue(), L"Solid");
+			}
+			else {
+				H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Surface);
+				Log(2, L"SetTopologyType: %d, Type: %s", cSegment.KeyValue(), L"Surface");
+			}
 		}
+
+		LogDecreaseTabIndex(2);
 	}
-
-	LogDecreaseTabIndex(2);
-
-	A3DRiBrepModelGet(nullptr, &cBrepModelData);
 
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttr));
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrData));
@@ -1673,7 +1675,7 @@ A3DStatus TdfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascad
 */
 
 
-	SegmentKey cMarkupSegment = cParentSegment.Subsegment(L"Markup%d", m_nMarkupId++);
+	SegmentKey cMarkupSegment = cParentSegment.Subsegment("Markup%d", m_nMarkupId++);
 	assert(INVALID_KEY != cMarkupSegment.KeyValue());
 
 	A3DMkpMarkupGet(pcMarkup, &sData);
@@ -2603,7 +2605,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 		StyleDefine sStyleDefine = mStyleDefineMap.GetNextValue(pcPos);
 
 		// Face Segment를 별도로 생성하고, Style을 적용시킨다. 이 Face에 Insert Shell을 하게 된다.
-		H3DF::SegmentKey cSubSegment = cParentSegment.Subsegment(L"style_face_%d", sStyleDefine.nRgbColorIndex).KeyValue();
+		H3DF::SegmentKey cSubSegment = cParentSegment.Subsegment("style_face_%d", sStyleDefine.nRgbColorIndex).KeyValue();
 		SetFaceStyle(cSubSegment, psAttrData[sStyleDefine.nFirstFaceIndex]);
 
 		mFaceSegmentStyleMap.SetAt(sStyleDefine.nRgbColorIndex, cSubSegment.KeyValue());
@@ -3164,8 +3166,8 @@ UINT TdfImport::ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo, H3DF:
 {
 	int nFaceLispnIndices[3];			// facelist indices into the "global" point array
 	int nFaceVertexNormalIndices[3];	// vertex normal indices into the "global" normal array
-	int nFaceVertexParamIndices[3];		// vertex parameter indices into the "global" parameter array
-	int nFaceVertexColorIndices[3];		// vertex color indices into the RGBA color array
+	//int nFaceVertexParamIndices[3];		// vertex parameter indices into the "global" parameter array
+	//int nFaceVertexColorIndices[3];		// vertex color indices into the RGBA color array
 	A3DUns32  nInVertexParamSize = 0;
 
 	A3DUns32 nTriangleCount = cInFaceInfo.pnIndices->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
@@ -3502,7 +3504,7 @@ UINT TdfImport::ConvertTessFaceDataTriangleOneNormal(ConvertFaceInfo & cInFaceIn
 	int nFaceLispnIndices[3];			// facelist indices into the "global" point array
 	int nFaceVertexNormalIndices[3];	// vertex normal indices into the "global" normal array
 	int nFaceVertexParamIndices[3];		// vertex parameter indices into the "global" parameter array
-	int nFaceVertexColorIndices[3];		// vertex color indices into the RGBA color array
+	//int nFaceVertexColorIndices[3];		// vertex color indices into the RGBA color array
 	A3DUns32 nInVertexParamSize = 0;
 
 	A3DUns32 nTriangleCount = cInFaceInfo.pnIndices->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
@@ -3959,8 +3961,8 @@ UINT TdfImport::ConveTessFaceDataTriangleTextured(ConvertFaceInfo & cInFaceInfo,
 	int nFaceNormalIndices[3]; // vertex normal indices into the "global" normal array
 	int nFaceTextrueCoordIndices[3]; // vertex normal indices into the "global" texture coordinate array
 
-	int nFaceVertexParamIndices[3]; // vertex parameter indices into the "global" parameter array
-	int nFaceVertexColorIndices[3]; // vertex color indices into the RGBA color array
+	//int nFaceVertexParamIndices[3]; // vertex parameter indices into the "global" parameter array
+	//int nFaceVertexColorIndices[3]; // vertex color indices into the RGBA color array
 
 	A3DUns32 nTriangleCount = cInFaceInfo.pnIndices->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
 	A3DUns32 nTextureCoordSize = cInFaceInfo.pnIndices->m_uiTextureCoordIndexesSize;
@@ -4976,8 +4978,8 @@ A3DStatus TdfImport::GetMaterial(const A3DGraphStyleData & cInStyleData, H3DF::M
 
 bool TdfImport::FindMaterial(const A3DGraphStyleData & cInStyleData, H3DF::MaterialKit & cOutMaterial)
 {
-	CString strStyleText;
-	strStyleText.Format(L"%d_%d", cInStyleData.m_uiRgbColorIndex, cInStyleData.m_ucTransparency);
+	CStringA strStyleText;
+	strStyleText.Format("%d_%d", cInStyleData.m_uiRgbColorIndex, cInStyleData.m_ucTransparency);
 
 	if (true == m_mMaterialMap.Lookup(strStyleText, cOutMaterial)) {
 		return true;
@@ -4990,8 +4992,8 @@ bool TdfImport::CreateMaterial(const A3DGraphStyleData & cInStyleData, H3DF::Mat
 {
 	H3DF::MaterialKit cMaterialKit;
 	if (A3D_SUCCESS == GetMaterial(cInStyleData, cMaterialKit)) {
-		CString strStyleText;
-		strStyleText.Format(L"%d_%d", cInStyleData.m_uiRgbColorIndex, cInStyleData.m_ucTransparency);
+		CStringA strStyleText;
+		strStyleText.Format("%d_%d", cInStyleData.m_uiRgbColorIndex, cInStyleData.m_ucTransparency);
 
 		m_mMaterialMap.SetAt(strStyleText, cMaterialKit);
 		cOutMaterial = cMaterialKit;
@@ -5491,7 +5493,7 @@ A3DStatus TdfImport::IsShow(const A3DRootBaseWithGraphics * pGraphics)
 // 5. 주어진 Material Mapping을 이용해서 StylesIncludeKey에 새로운 Style을 추가하고 주어진 Segment에 적용.
 bool TdfImport::SetFaceMaterialMapping(const A3DGraphStyleData & sStyleData, H3DF::MaterialKit const & cInKit, H3DF::SegmentKey & cSegment)
 {
-	H3DF::SegmentKey cStyleSegment = m_nStylesIncludeKey.Subsegment(L"%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
+	H3DF::SegmentKey cStyleSegment = m_cStylesIncludeKey.Subsegment("%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
 	
 	// 입력된 Matrial을 Face에 적용한다.
 	MaterialMappingKit cMaterialMapping;
@@ -5505,8 +5507,8 @@ bool TdfImport::SetFaceMaterialMapping(const A3DGraphStyleData & sStyleData, H3D
 // 		return false;
 // 	}
 
-	CString strStyleText;
-	strStyleText.Format(L"%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
+	CStringA strStyleText;
+	strStyleText.Format("%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
 	m_mMaterialMappingStyleMap.SetAt(strStyleText, cStyleSegment);
 
 	return true;
@@ -5519,7 +5521,7 @@ bool TdfImport::SetLineMaterialMapping(const A3DMiscCascadedAttributesData & cAt
 		return false;
 	}
 
-	H3DF::SegmentKey cStyleSegment = m_nStylesIncludeKey.Subsegment(L"line_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
+	H3DF::SegmentKey cStyleSegment = m_cStylesIncludeKey.Subsegment("line_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
 
 	MaterialMappingKit cMaterialMapping;
 	cMaterialMapping.SetLineColor(cDiffuseColor);
@@ -5545,7 +5547,7 @@ bool TdfImport::SetMarkerMaterialMapping(const A3DMiscCascadedAttributesData & c
 		return false;
 	}
 
-	H3DF::SegmentKey cStyleSegment = m_nStylesIncludeKey.Subsegment(L"marker_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
+	H3DF::SegmentKey cStyleSegment = m_cStylesIncludeKey.Subsegment("marker_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
 
 	MaterialMappingKit cMaterialMapping;
 	cMaterialMapping.SetMarkerColor(cDiffuseColor);
@@ -5568,10 +5570,10 @@ bool TdfImport::SetMarkerMaterialMapping(const A3DMiscCascadedAttributesData & c
 // 각각의 Style은 line, face 별로 적용할 수 있기 때문에, 별도로 생성한다.
 bool TdfImport::CreateFaceStyleSegment(const A3DGraphStyleData & sStyleData, H3DF::MaterialKit const & cInKit, H3DF::SegmentKey & cOutStyleSegment)
 {
-	CString strStyleText;
-	strStyleText.Format(L"%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
+	CStringA strStyleText;
+	strStyleText.Format("%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
 
-	cOutStyleSegment = m_nStylesIncludeKey.Subsegment(strStyleText);
+	cOutStyleSegment = m_cStylesIncludeKey.Subsegment(strStyleText);
 
 	// 입력된 Matrial을 Face에 적용한다.
 	MaterialMappingKit cMaterialMapping;
@@ -5599,8 +5601,8 @@ bool TdfImport::SetStyle(H3DF::SegmentKey & cSegment, H3DF::SegmentKey & cStyleS
 // 6. 미리 저장되어 있는 Material Mapping Kit을 찾아오는 함수
 bool TdfImport::FindMaterialMapping(const A3DGraphStyleData & sStyleData, SegmentKey & cOutStyleSegment)
 {
-	CString strStyleText;
-	strStyleText.Format(L"%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
+	CStringA strStyleText;
+	strStyleText.Format("%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
 
 	if (true == m_mMaterialMappingStyleMap.Lookup(strStyleText, cOutStyleSegment)) {
 		return true;
@@ -5961,6 +5963,22 @@ void TdfImport::Log(int nId, LPCWSTR chMessage, ...)
 	va_end(cArgList);
 
 	LogManager::GetInstance()->WriteLog(nId, strBuffer);
+#endif
+}
+
+void TdfImport::Log(int nId, LPCSTR chMessage, ...)
+{
+#ifdef USED_LOG_MANAGER
+	va_list cArgList;
+	va_start(cArgList, chMessage);
+
+	CStringA strBuffer;
+	strBuffer.FormatV(chMessage, cArgList);
+
+	va_end(cArgList);
+
+	CString strText(strBuffer);
+	LogManager::GetInstance()->WriteLog(nId, strText);
 #endif
 }
 

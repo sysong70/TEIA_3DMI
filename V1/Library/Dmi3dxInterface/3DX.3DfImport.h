@@ -263,8 +263,8 @@ private:
 
 	//----- Segment Header -----
 	H3DF::SegmentKey * m_pcModelSegment = nullptr;
-	H3DF::SegmentKey m_nModelIncludeKey;
-	H3DF::SegmentKey m_nStylesIncludeKey;
+	H3DF::SegmentKey m_cModelIncludeKey;
+	H3DF::SegmentKey m_cStylesIncludeKey;
 	H3DF::SegmentKey m_cPartsIncludeSegment;
 	H3DF::SegmentKey m_cPoccsIncludeSegment;
 	H3DF::SegmentKey m_cRisIncludeSegment;
@@ -275,8 +275,8 @@ private:
 	// MaterialMap Style 키를 저장하는 Vector
 	std::vector<MaterialMappingStyleKit> m_vcMaterialMappingStyleVector;
 
-	CAtlMap<CString, H3DF::MaterialKit> m_mMaterialMap;
-	CAtlMap<CString, H3DF::SegmentKey> m_mMaterialMappingStyleMap;
+	CAtlMap<CStringA, H3DF::MaterialKit> m_mMaterialMap;
+	CAtlMap<CStringA, H3DF::SegmentKey> m_mMaterialMappingStyleMap;
 	std::unordered_map<A3DUns32, H3DF::SegmentKey> m_mLineMaterialMappingStyleMap;
 	std::unordered_map<A3DUns32, H3DF::SegmentKey> m_mMarkerMaterialMappingStyleMap;
 
@@ -337,6 +337,7 @@ private:
 	//== Log 관련 함수 ==========================================================================
 	void CreateLog(int nId, const WCHAR * pchFilePathName);
 	void Log(int nId, LPCWSTR chMessage, ...);
+	void Log(int nId, LPCSTR chMessage, ...);
 	void LogIncreaseTabIndex(int nId);
 	void LogDecreaseTabIndex(int nId);
 	CString LogHexStr(DWORD_PTR nValue);

@@ -14,7 +14,8 @@ using namespace H3DF;
 //== CanvasPrivate Class ===========================================================================
 
 H3DF::CanvasImpl::CanvasImpl()
-{	//----- Model 생성 및 초기화 -----
+{	
+	//----- Model 생성 및 초기화 -----
 	m_pcModel = new H3DF::Model();
 	if (nullptr == m_pcModel) {
 		assert(false);

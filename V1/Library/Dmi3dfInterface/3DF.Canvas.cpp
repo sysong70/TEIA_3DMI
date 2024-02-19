@@ -256,9 +256,7 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 
 	CString strErrorMessage;
 
-	CanvasImpl * pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl);
-
-	SegmentKey cModelSegmentKey = pcCanvasImpl->m_pcModel->GetSegmentKey();
+	SegmentKey cModelSegmentKey = GetModel().GetSegmentKey();
 
 	//----- File을 실제로 읽어 드리는 부분 -----
 	if (true == bPointColudData) {

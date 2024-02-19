@@ -301,9 +301,14 @@ CStringA H3DF::AttributeLockControlImpl::GetTypeString(AttributeLock::Type eInTy
 			break;
 
 		case H3DF::AttributeLock::Type::MaterialFaceDiffuse:
+			strTypeString = "faces = diffuse";
 			break;
+
 		case H3DF::AttributeLock::Type::MaterialFaceDiffuseColor:
+			strTypeString = "color = (faces = diffuse)";
 			break;
+/*
+
 		case H3DF::AttributeLock::Type::MaterialFaceDiffuseAlpha:
 			break;
 		case H3DF::AttributeLock::Type::MaterialFaceDiffuseTexture:
@@ -396,6 +401,7 @@ CStringA H3DF::AttributeLockControlImpl::GetTypeString(AttributeLock::Type eInTy
 			break;
 		case H3DF::AttributeLock::Type::Camera:
 			break;
+*/
 
 		default:
 			ASSERT(false);
@@ -434,22 +440,66 @@ AttributeLockControl & H3DF::AttributeLockControl::operator = (AttributeLockCont
 
 AttributeLockControl & H3DF::AttributeLockControl::SetLock(AttributeLock::Type eInType, bool bInState)
 {
-	AttributeLockControlImpl * pcImpl = (AttributeLockControlImpl *) m_pcImpl;
+	AttributeLockControlImpl * pcImpl = dynamic_cast<AttributeLockControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 
-	CStringA strOption;
-	if (true == bInState) {
-		strOption = "attribute lock = ";
-	}
-	else {
-		strOption = "no attribute lock = ";
-	}
-
+	CStringA strOption = "attribute lock = (";
 	strOption += pcImpl->GetTypeString(eInType);
+	strOption += ")";
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_Set_Rendering_Options(strOption);
+		if (true == bInState) {
+			HC_Set_Rendering_Options(strOption);
+		}
+		else {
+			HC_UnSet_One_Rendering_Option(strOption);
+		}
+	
 	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }
 
+AttributeLockControl & H3DF::AttributeLockControl::SetLock(AttributeLockTypeArray const & eInTypes, BoolArray const & bInStates)
+{
+	AttributeLockControlImpl * pcImpl = dynamic_cast<AttributeLockControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	if(eInTypes.size() != bInStates.size()) {
+		ASSERT(false);
+		return *this;
+	}
+
+	for (size_t nIndex = 0; nIndex < eInTypes.size(); nIndex++) {
+		SetLock(eInTypes[nIndex], bInStates[nIndex]);
+	}
+
+	return *this;
+}
+
+bool H3DF::AttributeLockControl::ShowLock(AttributeLock::Type eInType, bool & bOutState) const
+{
+	AttributeLockControlImpl * pcImpl = dynamic_cast<AttributeLockControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	CStringA strOption = "attribute lock = (";
+	strOption += pcImpl->GetTypeString(eInType);
+	strOption += ")";
+	
+	CStringA strAttributeLock;
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		HC_Show_One_Rendering_Option(strOption, strAttributeLock.GetBuffer(MVO_BUFFER_SIZE));
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	if ("on" == strAttributeLock) {
+		bOutState = true;
+	}
+	else {
+		bOutState = false;
+	}
+
+	strAttributeLock.ReleaseBuffer();
+
+	return true;
+}

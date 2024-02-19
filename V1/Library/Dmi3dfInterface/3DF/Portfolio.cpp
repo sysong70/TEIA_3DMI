@@ -42,7 +42,7 @@ PortfolioKey & H3DF::PortfolioKey::operator = (PortfolioKey const & cInThat)
 	return *this;
 }
 
-NamedStyleDefinition H3DF::PortfolioKey::DefineNamedStyle(CString strInName, SegmentKey const & cInStyleSource)
+NamedStyleDefinition H3DF::PortfolioKey::DefineNamedStyle(CStringA strInName, SegmentKey const & cInStyleSource)
 {
 	if (INVALID_KEY == KeyValue()) {
 		DEBUG_STOP;

@@ -128,7 +128,7 @@ KERNEL::Operator::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const H3DF::V
 {
 	SegmentKey cConstruction(Window().GetBaseView()->GetConstructionKey());
 
-	m_cSnapPointSegment = cConstruction.Subsegment(L"SnapPoint");
+	m_cSnapPointSegment = cConstruction.Subsegment("SnapPoint");
 
 	m_cSnapPointSegment.Open();
 		HC_Set_Heuristics("quick moves, no backplane culling, no hidden surfaces");

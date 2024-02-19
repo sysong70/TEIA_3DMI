@@ -10,6 +10,8 @@
 
 namespace KERNEL
 {
+	class DocView;
+
 	namespace Operator
 	{
 		class OperatorImpl : public Impl
@@ -23,6 +25,7 @@ namespace KERNEL
 			H3DF::View & View();
 			const H3DF::View & View() const;
 
+			void SetDocView(const DocView * pcInDocView);
 			void SetView(const H3DF::View * pcInView);
 
 			void Copy(OperatorImpl * pcInThat);
@@ -33,6 +36,7 @@ namespace KERNEL
 		private:
 			const H3DF::View * m_pcView = nullptr;
 			const Signal::Delivery * m_pcDelivery = nullptr;
+			const KERNEL::DocView * m_pcDocView = nullptr;
 		};
 	}
 }

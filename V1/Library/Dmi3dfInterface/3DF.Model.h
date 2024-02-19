@@ -28,5 +28,12 @@ namespace H3DF
 
 		H3DF::ModelHandedness GetModelHandedness();
 		void UpdateModelHandedness();
+
+		SegmentKey & Models() const;
+		SegmentKey & Measurements() const;
+		SegmentKey & Markups() const;
+
+		SegmentKey & IncludeModel() const;
+		SegmentKey & IncludeStyles() const;
 	};
 }

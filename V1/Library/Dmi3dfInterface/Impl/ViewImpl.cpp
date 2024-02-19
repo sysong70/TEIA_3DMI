@@ -1023,7 +1023,7 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 
 	// 메모리 소모가 많고 속도에는 큰 도움이 되지 않으므로 사용하지 않는다.
 	m_pcBaseView->GetModel()->SetStaticModel(false);
-	m_pcBaseView->GetModel()->SetLMVModel(false);
+	m_pcBaseView->GetModel()->SetLMVModel(true);
 
 	// WindowKey 선언 위치가 변경되면 않됨. 주의할것.
 	m_pcWindow = new WindowKey(m_pcBaseView);

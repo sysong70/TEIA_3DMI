@@ -13,7 +13,7 @@ bool H3DF::Operator::KinematicTest::CreateTestModel(SegmentKey cModelKey)
 	MaterialMappingKit cMaterialMappingKit;
 	cMaterialMappingKit.SetFaceColor(RGBColor(1, 0, 0));
 
-	SegmentKey cBaseKey = cModelKey.Subsegment(L"Base");
+	SegmentKey cBaseKey = cModelKey.Subsegment("Base");
 	cBaseKey.SetMaterialMapping(cMaterialMappingKit);
 
 	Point cCenter;
@@ -22,14 +22,14 @@ bool H3DF::Operator::KinematicTest::CreateTestModel(SegmentKey cModelKey)
 
 	CreateCylinder(cBaseKey, cCenter, 150, 100, cXAxis, cZAxis);
 
-	SegmentKey cArm1Key = cBaseKey.Subsegment(L"Arm1");
+	SegmentKey cArm1Key = cBaseKey.Subsegment("Arm1");
 
 	cMaterialMappingKit.SetFaceColor(RGBColor(0, 1, 0));
 	cArm1Key.SetMaterialMapping(cMaterialMappingKit);
 
 	cCenter.Set(0, 0, 150);
 	CreateCylinder(cArm1Key, cCenter, 30, 500, cXAxis, cZAxis);
-	SegmentKey cArm2Key = cArm1Key.Subsegment(L"Arm2");
+	SegmentKey cArm2Key = cArm1Key.Subsegment("Arm2");
 
 	cMaterialMappingKit.SetFaceColor(RGBColor(0, 0, 1));
 	cArm2Key.SetMaterialMapping(cMaterialMappingKit);

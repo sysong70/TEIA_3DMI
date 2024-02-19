@@ -37,9 +37,6 @@
     <Filter Include="Operator\Impl">
       <UniqueIdentifier>{6a1a0a9c-47cf-471f-9e3f-dd4567b680f2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Operator\Panel">
-      <UniqueIdentifier>{95df8f92-8767-4a69-be5b-68837f305436}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -96,7 +93,7 @@
     <ClInclude Include="Impl\OperatorImpl.h">
       <Filter>Operator\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="Operator.Visibility.h">
+    <ClInclude Include="Operator.Attribute.h">
       <Filter>Operator</Filter>
     </ClInclude>
     <ClInclude Include="Operator.Camera.h">
@@ -104,9 +101,6 @@
     </ClInclude>
     <ClInclude Include="Operator.Select.h">
       <Filter>Operator</Filter>
-    </ClInclude>
-    <ClInclude Include="Operator.ModelPanel.h">
-      <Filter>Operator\Panel</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\File.h">
       <Filter>_Common</Filter>
@@ -116,6 +110,9 @@
     </ClInclude>
     <ClInclude Include="..\Common\Dir.h">
       <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Operator.ModelPanel.h">
+      <Filter>Operator</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -176,7 +173,7 @@
     <ClCompile Include="Impl\OperatorImpl.cpp">
       <Filter>Operator\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="Operator.Visibility.cpp">
+    <ClCompile Include="Operator.Attribute.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
     <ClCompile Include="Operator.Camera.cpp">
@@ -184,9 +181,6 @@
     </ClCompile>
     <ClCompile Include="Operator.Select.cpp">
       <Filter>Operator</Filter>
-    </ClCompile>
-    <ClCompile Include="Operator.ModelPanel.cpp">
-      <Filter>Operator\Panel</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\File.cpp">
       <Filter>_Common</Filter>
@@ -196,6 +190,9 @@
     </ClCompile>
     <ClCompile Include="..\Common\Dir.cpp">
       <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Operator.ModelPanel.cpp">
+      <Filter>Operator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

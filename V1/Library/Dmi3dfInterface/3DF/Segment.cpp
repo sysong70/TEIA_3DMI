@@ -14,6 +14,8 @@
 #include "MarkerAttribute.h"
 #include "LineAttribute.h"
 #include "Performance.h"
+#include "AttributeLock.h"
+#include "Condition.h"
 
 #include "Camera.h"
 
@@ -29,15 +31,19 @@ H3DF::SegmentKey::SegmentKey() : Key(INVALID_KEY)
 	m_pcImpl = new SegmentKeyImpl();
 }
 
-H3DF::SegmentKey::SegmentKey(CString strInName) : Key(INVALID_KEY)
+H3DF::SegmentKey::SegmentKey(CStringA strInName) : Key(INVALID_KEY)
 {
 	HC_KEY nKey = INVALID_KEY;
 
 	if(false == strInName.IsEmpty()) {
-		nKey = HC_Create_Segment(Utility::ToChar(strInName));
+		nKey = HC_Create_Segment(strInName);
 	}
 	else {
 		nKey = HC_Create_Segment(nullptr);
+	}
+
+	if (INVALID_KEY == nKey) {
+		DEBUG_STOP;
 	}
 
 	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
@@ -141,9 +147,9 @@ SegmentKey const H3DF::SegmentKey::Subsegment()
 	return cSubsegment;
 }
 
-SegmentKey const H3DF::SegmentKey::Subsegment(LPCTSTR chFormat, ...)
+SegmentKey const H3DF::SegmentKey::Subsegment(LPCSTR chFormat, ...)
 {
-	CString strText;
+	CStringA strText;
 	va_list argList;
 
 	va_start(argList, chFormat);
@@ -593,9 +599,9 @@ VisibilityControl const H3DF::SegmentKey::GetVisibilityControl() const
 
 SegmentKey & H3DF::SegmentKey::SetVisibility(CString strList)
 {
-	SegmentKeyImpl::LocalOpen(*this);
-	HC_Set_Visibility(Utility::ToChar(strList));
-	SegmentKeyImpl::LocalClose(*this);
+	SegmentKeyImpl::LocalOpen(*this); {
+		HC_Set_Visibility(Utility::ToChar(strList));
+	} SegmentKeyImpl::LocalClose(*this);
 	return *this;
 }
 
@@ -610,15 +616,6 @@ VisualEffectsControl const H3DF::SegmentKey::GetVisualEffectsControl() const
 {
 	VisualEffectsControl cVisibilityControl(*(SegmentKey *)this);
 	return cVisibilityControl;
-}
-
-//== Condition 관련 함수 =============================================================================
-SegmentKey & H3DF::SegmentKey::SetCondition(CString strInCondition)
-{
-	SegmentKeyImpl::LocalOpen(*this);
-	HC_Set_Conditions(Utility::ToChar(strInCondition));
-	SegmentKeyImpl::LocalClose(*this);
-	return *this;
 }
 
 //== Heuristics 관련 함수 ============================================================================
@@ -652,11 +649,11 @@ StyleControl H3DF::SegmentKey::GetStyleControl()
 
 //== Condition 관련 함수 =============================================================================
 // Sets chInCondition as the only condition on this segment, replacing any existing conditions.
-SegmentKey & H3DF::SegmentKey::SetCondition(char const * chInCondition)
+SegmentKey & H3DF::SegmentKey::SetCondition(CStringA strInCondition)
 {
-	if (nullptr != chInCondition) {
+	if (false == strInCondition.IsEmpty()) {
 		SegmentKeyImpl::LocalOpen(*this); {
-			HC_Set_Conditions(chInCondition);
+			HC_Set_Conditions(strInCondition);
 		}SegmentKeyImpl::LocalClose(*this);
 	}
 
@@ -683,22 +680,25 @@ SegmentKey & H3DF::SegmentKey::SetConditions(AStringArray const & astrInConditio
 	return *this;
 }
 
-SegmentKey & H3DF::SegmentKey::SetConditions(size_t nInCount, CStringA const pchInConditions[])
+SegmentKey & H3DF::SegmentKey::UnsetConditions()
 {
-	CStringA strConditions;
-
-	for (size_t nIndex = 0; nIndex < nInCount; ++nIndex) {
-		if (0 < nIndex) {
-			strConditions += ", ";
-		}
-		strConditions += pchInConditions[nIndex];
-	}
-
 	SegmentKeyImpl::LocalOpen(*this); {
-		HC_Set_Conditions(strConditions);
+		HC_UnSet_Conditions();
 	}SegmentKeyImpl::LocalClose(*this);
 
 	return *this;
+}
+
+ConditionControl H3DF::SegmentKey::GetConditionControl()
+{
+	ConditionControl cControl(*this);
+	return cControl;
+}
+
+ConditionControl const H3DF::SegmentKey::GetConditionControl() const
+{
+	ConditionControl cControl(*(SegmentKey *)this);
+	return cControl;
 }
 
 void H3DF::SegmentKey::SetRenderingOptions(CString strList)
@@ -803,6 +803,22 @@ SegmentKey & H3DF::SegmentKey::SetBounding(BoundingKit const & cInKit)
 	}
 
 	return *this;
+}
+
+//== Attribute Lock 관련 함수 ================================================================
+// 		SegmentKey & SetAttributeLock(AttributeLockKit const & in_kit);
+// 		SegmentKey & UnsetAttributeLock();
+// 		bool ShowAttributeLock(AttributeLockKit & out_kit) const;
+AttributeLockControl H3DF::SegmentKey::GetAttributeLockControl()
+{
+	AttributeLockControl cControl(*this);
+	return cControl;
+}
+
+AttributeLockControl const H3DF::SegmentKey::GetAttributeLockControl() const
+{
+	AttributeLockControl cControl(*(SegmentKey *)this);
+	return cControl;
 }
 
 //== User Data 관련 함수 =============================================================================

@@ -535,7 +535,7 @@ void H3DF::View::LoadPointCloudFile(CString strFilePathName)
 	cOptions.m_pExtendedData = &cPointCloudOptions;
 
 	SegmentKey cModelKey(pcImpl->GetBaseView()->GetModelKey());
-	SegmentKey cPointCloudSegment = cModelKey.Subsegment(L"3dmi_point_cloud");
+	SegmentKey cPointCloudSegment = cModelKey.Subsegment("3dmi_point_cloud");
 
 	PointCloud cPointCloud;
 	
