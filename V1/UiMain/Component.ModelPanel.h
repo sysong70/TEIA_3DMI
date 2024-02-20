@@ -99,6 +99,5 @@ namespace Component
 
 		std::unordered_map<DWORD_PTR, HTREEITEM> m_keyMap;
 		ModelTree* m_pControl = nullptr;
-		bool m_bExpanding = false;
 	};
 }
