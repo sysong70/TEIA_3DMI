@@ -35,13 +35,13 @@ namespace Window
 
 		~View() override;
 
+		virtual Signal::Delivery& GetDelivery();
+
 		virtual void ReceiveSignal(Json::Object* pData) {}
 
 	public:
 
 		void CancelCommand();
-
-		Signal::Delivery& GetDelivery();
 
 		Document* GetDocument() const;
 
@@ -106,7 +106,7 @@ namespace Window
 		bool m_bRenderer = false;
 		bool m_bActivate = false;
 
-		Signal::Delivery m_delivery;
+		//Signal::Delivery m_delivery;
 
 		void Activate(bool value);
 

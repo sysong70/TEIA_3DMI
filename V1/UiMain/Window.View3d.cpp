@@ -70,9 +70,7 @@ Window::View3d::View3d()
 {
 	m_eType = EType::View3d;
 
-	m_delivery.SetSender(Connector3d::GetSender());
-	m_delivery.ViewId = m_nViewId;
-	m_delivery.view.OnConstruct();
+	GetDelivery().view.OnConstruct();
 }
 
 
@@ -104,7 +102,7 @@ void Window::View3d::ReceiveSignal(Json::Object* pData)
 			m_bRenderer = data.GetBoolean(SKW_VALID);
 			if (m_bRenderer) {
 				CRect rect = GetClientArea();
-				m_delivery.view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
+				GetDelivery().view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
 
 				if (GetMainFrame().HasNextFile()) {
 					GetMainFrame().PostMessage((UINT)EUserMessage::OnNextFileOpen);
@@ -196,7 +194,7 @@ void Window::View3d::OnCommand(UINT id)
 		case Facility::CommandIndexer::ListItem:
 		case Facility::CommandIndexer::Check: //:TEMP
 		default:
-			m_delivery.view.OnCommand(id);
+			GetDelivery().view.OnCommand(id);
 			break;
 		}
 	}
@@ -225,7 +223,7 @@ BOOL Window::View3d::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 		GetWindowRect(rect);
 
 		zDelta *= TheAppOptions.GetBoolean("Environment/Mouse/ReverseWheelDirection") ? -1 : 1;
-		m_delivery.view.OnMouseWheel(nFlags, zDelta, point.x, point.y, rect.left, rect.top, rect.right, rect.bottom);
+		GetDelivery().view.OnMouseWheel(nFlags, zDelta, point.x, point.y, rect.left, rect.top, rect.right, rect.bottom);
 	}
 
 	return __super::OnMouseWheel(nFlags, zDelta, point);
