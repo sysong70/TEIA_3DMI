@@ -62,9 +62,7 @@ Window::View2d::View2d()
 {
 	m_eType = EType::View2d;
 
-	m_delivery.SetSender(Connector2d::GetSender());
-	m_delivery.ViewId = m_nViewId;
-	m_delivery.view.OnConstruct();
+	GetDelivery().view.OnConstruct();
 }
 
 
@@ -72,6 +70,13 @@ Window::View2d::View2d()
 Window::View2d::~View2d()
 {
 	m_layerPanel.DestroyWindow();
+}
+
+
+
+Signal::Delivery& Window::View2d::GetDelivery()
+{
+	return Connector2d::GetInstance(m_nViewId);
 }
 
 
@@ -138,7 +143,7 @@ BOOL Window::View2d::OnMouseWheel(UINT nFlags, short zDelta, CPoint point)
 		ScreenToClient(&point);
 
 		zDelta *= TheAppOptions.GetBoolean("Environment/Mouse/ReverseWheelDirection") ? -1 : 1;
-		m_delivery.view.OnMouseWheel(nFlags, zDelta, point.x, point.y);
+		GetDelivery().view.OnMouseWheel(nFlags, zDelta, point.x, point.y);
 	}
 
 	return __super::OnMouseWheel(nFlags, zDelta, point);

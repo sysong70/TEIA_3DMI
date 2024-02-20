@@ -15,6 +15,8 @@ namespace Connector3d
 
 	Signal::Delivery& GetInstance();
 
+	Signal::Delivery& GetInstance(int viewId);
+
 	void ReceiveSignal(const wchar_t* content);
 }
 
@@ -27,6 +29,8 @@ namespace Connector2d
 	SendSignalFunc GetSender();
 
 	Signal::Delivery& GetInstance();
+
+	Signal::Delivery& GetInstance(int viewId);
 
 	void ReceiveSignal(const wchar_t* content);
 }

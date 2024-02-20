@@ -544,6 +544,8 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 	cItem.Title = strFileTitle;
 	cItem.HasChildren = false;
 
+	//:Ken - 20240219, lock tree
+	pcImpl->Delivery().modelPanel.RedrawTree(false);
 	//:Ken - 20240205, Add root item
 	pcImpl->Delivery().modelPanel.AddItem(cItem);
 
@@ -599,6 +601,9 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 	DEBUG_VALID(pcModelsGroupItem);
 
 	pcImpl->UserInterfaceItemExpanded(pcModelsGroupItem, true);
+
+	//:Ken - 20240219, unlock and update tree
+	pcImpl->Delivery().modelPanel.RedrawTree(true);
 }
 
 // 2. Select 관련 Control 설정 함수

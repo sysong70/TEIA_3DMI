@@ -705,6 +705,17 @@ void Signal::ModelPanel::OnItemShow(DWORD_PTR key, bool show)
 }
 
 
+void Signal::ModelPanel::RedrawTree(bool value)
+{
+	Json::Object data;
+	ConstructData(data, Action::RedrawTree);
+
+	data.SetBoolean(SKW_REDRAW, value);
+
+	Wrapper().SendData(data);
+}
+
+
 
 void Signal::ModelPanel::AddItem(TreeItem& item)
 {

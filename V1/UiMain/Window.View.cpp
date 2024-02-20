@@ -53,28 +53,29 @@ Window::View::~View()
 	m_historyBar.DestroyWindow();
 	m_tabs.DestroyWindow();
 
-	m_delivery.view.OnDestruct();
+	GetDelivery().view.OnDestruct();
 
 	GetMainFrame().ViewChanged(WM_DESTROY, this);
 }
 
 
 
+Signal::Delivery& Window::View::GetDelivery()
+{
+	return Connector3d::GetInstance(m_nViewId);
+	//return m_delivery;
+}
+
+
+
 void Window::View::CancelCommand()
 {
-	m_delivery.view.OnCancel();
+	GetDelivery().view.OnCancel();
 
 	if (m_pActiveCommand != nullptr) {
 		m_pActiveCommand->Cancel();
 		m_pActiveCommand = nullptr;
 	}
-}
-
-
-
-Signal::Delivery& Window::View::GetDelivery()
-{
-	return m_delivery;
 }
 
 
@@ -117,7 +118,7 @@ void Window::View::OnInitialUpdate()
 	CreateToolBar();
 	CreatePanelTabs();
 
-	m_delivery.view.OnInitialize((DWORD_PTR)m_hWnd, GetDocument()->GetPathName());
+	GetDelivery().view.OnInitialize((DWORD_PTR)m_hWnd, GetDocument()->GetPathName());
 }
 
 
@@ -224,7 +225,7 @@ void Window::View::OnPaint()
 	CRect rect = GetClientArea();
 
 	if (m_bRenderer) {
-		m_delivery.view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
+		GetDelivery().view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
 	}
 	else {
 		dc.FillSolidRect(rect, (COLORREF)Control::EColor::DarkBack);
@@ -240,10 +241,10 @@ void Window::View::OnLButtonDown(UINT nFlags, CPoint point)
 
 		//if (TheAppOptions.GetBoolean("Environment/Mouse/SwapPanAndRotate")) {
 		//	nFlags |= (nFlags & ~MK_LBUTTON) | MK_RBUTTON;
-		//	m_delivery.view.OnRButtonDown(nFlags, point.x, point.y);
+		//	GetDelivery().view.OnRButtonDown(nFlags, point.x, point.y);
 		//}
 		//else {
-			m_delivery.view.OnLButtonDown(nFlags, point.x, point.y);
+			GetDelivery().view.OnLButtonDown(nFlags, point.x, point.y);
 		//}
 	}
 
@@ -257,11 +258,11 @@ void Window::View::OnLButtonUp(UINT nFlags, CPoint point)
 	if (IsValid()) {
 		//if (TheAppOptions.GetBoolean("Environment/Mouse/SwapPanAndRotate")) {
 		//	nFlags |= MK_RBUTTON;
-		//	m_delivery.view.OnRButtonUp(nFlags, point.x, point.y);
+		//	GetDelivery().view.OnRButtonUp(nFlags, point.x, point.y);
 		//}
 		//else {
 			nFlags |= MK_LBUTTON;
-			m_delivery.view.OnLButtonUp(nFlags, point.x, point.y);
+			GetDelivery().view.OnLButtonUp(nFlags, point.x, point.y);
 		//}
 
 		ReleaseCapture();
@@ -278,7 +279,7 @@ void Window::View::OnMButtonDown(UINT nFlags, CPoint point)
 	if (IsValid()) {
 		SetCapture();
 
-		m_delivery.view.OnLButtonDown(nFlags, point.x, point.y);
+		GetDelivery().view.OnLButtonDown(nFlags, point.x, point.y);
 	}
 
 	__super::OnMButtonDown(nFlags, point);
@@ -290,7 +291,7 @@ void Window::View::OnMButtonUp(UINT nFlags, CPoint point)
 {
 	if (IsValid()) {
 		nFlags |= MK_MBUTTON;
-		m_delivery.view.OnMButtonUp(nFlags, point.x, point.y);
+		GetDelivery().view.OnMButtonUp(nFlags, point.x, point.y);
 
 		ReleaseCapture();
 		SetCursor(TheApplication.LoadStandardCursor(IDC_ARROW));
@@ -319,7 +320,7 @@ int Window::View::OnMouseActivate(CWnd* pDesktopWnd, UINT nHitTest, UINT message
 void Window::View::OnMouseMove(UINT nFlags, CPoint point)
 {
 	if (IsValid()) {
-		m_delivery.view.OnMouseMove(nFlags, point.x, point.y);
+		GetDelivery().view.OnMouseMove(nFlags, point.x, point.y);
 	}
 
 	__super::OnMouseMove(nFlags, point);
@@ -334,10 +335,10 @@ void Window::View::OnRButtonDown(UINT nFlags, CPoint point)
 
 		//if (TheAppOptions.GetBoolean("Environment/Mouse/SwapPanAndRotate")) {
 		//	nFlags != (nFlags & ~MK_LBUTTON) | MK_RBUTTON;
-		//	m_delivery.view.OnLButtonDown(nFlags, point.x, point.y);
+		//	GetDelivery().view.OnLButtonDown(nFlags, point.x, point.y);
 		//}
 		//else {
-			m_delivery.view.OnRButtonDown(nFlags, point.x, point.y);
+		GetDelivery().view.OnRButtonDown(nFlags, point.x, point.y);
 		//}
 	}
 
@@ -351,11 +352,11 @@ void Window::View::OnRButtonUp(UINT nFlags, CPoint point)
 	if (IsValid()) {
 		//if (TheAppOptions.GetBoolean("Environment/Mouse/SwapPanAndRotate")) {
 		//	nFlags |= MK_LBUTTON;
-		//	m_delivery.view.OnLButtonUp(nFlags, point.x, point.y);
+		//	GetDelivery().view.OnLButtonUp(nFlags, point.x, point.y);
 		//}
 		//else {
 			nFlags |= MK_RBUTTON;
-			m_delivery.view.OnRButtonUp(nFlags, point.x, point.y);
+			GetDelivery().view.OnRButtonUp(nFlags, point.x, point.y);
 		//}
 
 		ReleaseCapture();
@@ -378,7 +379,7 @@ void Window::View::OnSize(UINT nType, int cx, int cy)
 	}
 
 	if (m_bRenderer) {
-		m_delivery.view.OnResize(cx, cy);
+		GetDelivery().view.OnResize(cx, cy);
 	}
 }
 

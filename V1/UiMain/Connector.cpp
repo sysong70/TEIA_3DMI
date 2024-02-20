@@ -88,6 +88,12 @@ Signal::Delivery& Connector3d::GetInstance()
 	return theBroker3d.TheDelivery;
 }
 
+Signal::Delivery& Connector3d::GetInstance(int viewId)
+{
+	theBroker3d.TheDelivery.ViewId = viewId;
+	return theBroker3d.TheDelivery;
+}
+
 
 
 void Connector3d::ReceiveSignal(const wchar_t* content)
@@ -203,6 +209,12 @@ SendSignalFunc Connector2d::GetSender()
 
 Signal::Delivery& Connector2d::GetInstance()
 {
+	return theBroker2d.TheDelivery;
+}
+
+Signal::Delivery& Connector2d::GetInstance(int viewId)
+{
+	theBroker2d.TheDelivery.ViewId = viewId;
 	return theBroker2d.TheDelivery;
 }
 

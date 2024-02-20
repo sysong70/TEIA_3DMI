@@ -20,6 +20,8 @@ namespace Window
 
 		~View2d() override;
 
+		Signal::Delivery& GetDelivery() override;
+
 		void ReceiveSignal(Json::Object* pData) override;
 
 	protected:

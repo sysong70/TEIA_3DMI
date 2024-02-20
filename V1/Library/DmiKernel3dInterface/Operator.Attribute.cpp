@@ -79,6 +79,7 @@ bool KERNEL::Operator::Attribute::Show()
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
+
 	return true;
 }
 
