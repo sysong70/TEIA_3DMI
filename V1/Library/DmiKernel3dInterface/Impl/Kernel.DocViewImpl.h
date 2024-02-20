@@ -47,7 +47,7 @@ namespace KERNEL
 		void CancelCommands();
 
 		//== Operator 관련 함수 ======================================================================
-		void AllocationOperator(H3DF::View * pcInView, Signal::Delivery & cDelivery);
+		void AllocationOperator(const DocView * pcInDocView);
 		Operator::OperatorBase * GetOperator(Operator::Type eInType);
 		Operator::Camera & Camera();
 		Operator::Select & Select();

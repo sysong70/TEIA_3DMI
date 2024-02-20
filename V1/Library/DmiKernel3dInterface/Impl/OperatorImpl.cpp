@@ -2,6 +2,9 @@
 
 #include "OperatorImpl.h"
 
+#include "../Kernel.DocView.h"
+#include "Kernel.DocViewImpl.h"
+
 #include <3DF/Window.h>
 #include <3DF.View.h>
 
@@ -9,47 +12,52 @@ using namespace KERNEL;
 
 //== Visual Effects class ==========================================================================
 
-KERNEL::Operator::OperatorImpl::OperatorImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
+KERNEL::Operator::OperatorImpl::OperatorImpl(const KERNEL::DocView * pcInDocView)
 {
-	DEBUG_VALID(pcInView);
+	DEBUG_VALID(pcInDocView);
 
 	m_eType = KERNEL::Type::Operator;
-	m_pcView = pcInView;
-	m_pcDelivery = pcInDelivery;
+	m_pcDocView = pcInDocView;
 }
 
 H3DF::WindowKey & KERNEL::Operator::OperatorImpl::Window()
 {
-	DEBUG_VALID(m_pcView);
-	return m_pcView->GetWindowKey();
+	DEBUG_VALID(m_pcDocView);
+
+	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>((DocViewImpl *)m_pcDocView->GetImpl());
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetCanvas().GetFrontView().GetWindowKey();
 }
 
 const H3DF::WindowKey & KERNEL::Operator::OperatorImpl::Window() const
 {
-	DEBUG_VALID(m_pcView);
-	return m_pcView->GetWindowKey();
+	DEBUG_VALID(m_pcDocView);
+
+	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>((DocViewImpl *)m_pcDocView->GetImpl());
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetCanvas().GetFrontView().GetWindowKey();
 }
 
 H3DF::View & KERNEL::Operator::OperatorImpl::View()
 {
-	DEBUG_VALID(m_pcView);
-	return *(H3DF::View *)m_pcView;
+	DEBUG_VALID(m_pcDocView);
+
+	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>((DocViewImpl *)m_pcDocView->GetImpl());
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetCanvas().GetFrontView();
 }
 
 const H3DF::View & KERNEL::Operator::OperatorImpl::View() const
 {
-	DEBUG_VALID(m_pcView);
-	return *m_pcView;
-}
+	DEBUG_VALID(m_pcDocView);
 
-void KERNEL::Operator::OperatorImpl::SetDocView(const DocView * pcInDocView)
-{
-	m_pcDocView = pcInDocView;
-}
+	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>((DocViewImpl *)m_pcDocView->GetImpl());
+	DEBUG_VALID(pcImpl);
 
-void KERNEL::Operator::OperatorImpl::SetView(const H3DF::View * pcInView)
-{
-	m_pcView = pcInView;
+	return pcImpl->GetCanvas().GetFrontView();
 }
 
 void KERNEL::Operator::OperatorImpl::Copy(OperatorImpl * pcInThat)
@@ -57,16 +65,37 @@ void KERNEL::Operator::OperatorImpl::Copy(OperatorImpl * pcInThat)
 	DEBUG_VALID(pcInThat);
 
 	m_eType = pcInThat->m_eType;
-	SetView(&pcInThat->View());
-	m_pcDelivery = &pcInThat->Delivery();
+	m_pcDocView = pcInThat->m_pcDocView;
 }
 
 Signal::Delivery & KERNEL::Operator::OperatorImpl::Delivery()
 {
-	return *(Signal::Delivery *)m_pcDelivery;
+	DEBUG_VALID(m_pcDocView);
+
+	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>((DocViewImpl *)m_pcDocView->GetImpl());
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->Delivery();
 }
 
 const Signal::Delivery & KERNEL::Operator::OperatorImpl::Delivery() const
 {
-	return *m_pcDelivery;
+	DEBUG_VALID(m_pcDocView);
+
+	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>((DocViewImpl *)m_pcDocView->GetImpl());
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->Delivery();
+}
+
+DocView & KERNEL::Operator::OperatorImpl::GetDocView()
+{
+	DEBUG_VALID(m_pcDocView);
+	return *((KERNEL::DocView *)m_pcDocView);
+}
+
+const DocView & KERNEL::Operator::OperatorImpl::GetDocView() const
+{
+	DEBUG_VALID(m_pcDocView);
+	return *m_pcDocView;
 }

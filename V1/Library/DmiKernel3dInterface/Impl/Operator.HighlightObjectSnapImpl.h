@@ -60,7 +60,7 @@ namespace KERNEL
 				std::vector <H3DF::SelectionItem> vcItems;
 			};
 
-			HighlightObjectSnapImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			HighlightObjectSnapImpl(const DocView * pcInDocView);
 
 			int LButtonDownAndMove(HEventInfo & cInEvent);
 			int NoButtonDownAndMove(HEventInfo & cInEvent);

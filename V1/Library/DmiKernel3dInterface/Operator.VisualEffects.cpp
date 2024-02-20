@@ -29,7 +29,7 @@ namespace KERNEL
 		class VisualEffectsImpl : public OperatorImpl
 		{
 		public:
-			VisualEffectsImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			VisualEffectsImpl(const DocView * pcInDocView);
 
 			void Copy(VisualEffectsImpl * pcInThat) {
 				OperatorImpl::Copy(pcInThat);
@@ -59,8 +59,8 @@ namespace KERNEL
 	}
 }
 
-KERNEL::Operator::VisualEffectsImpl::VisualEffectsImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
-	: OperatorImpl(pcInView, pcInDelivery)
+KERNEL::Operator::VisualEffectsImpl::VisualEffectsImpl(const DocView * pcInDocView)
+	: OperatorImpl(pcInDocView)
 {
 	// 변경된 전역 Visual Effect 값을 가져온다.
 	m_cOption.Set(TheKenel.VisualEffects.Get());
@@ -168,9 +168,9 @@ void KERNEL::Operator::VisualEffectsImpl::SetBloom(TheVisualEffects::BLOOM & cIn
 
 //== Visual Effects class ==========================================================================
 
-KERNEL::Operator::VisualEffects::VisualEffects(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
+KERNEL::Operator::VisualEffects::VisualEffects(const DocView * pcInDocView)
 {
-	VisualEffectsImpl * pcImpl = new VisualEffectsImpl(pcInView, pcInDelivery);
+	VisualEffectsImpl * pcImpl = new VisualEffectsImpl(pcInDocView);
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;

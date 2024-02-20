@@ -87,6 +87,8 @@ namespace H3DF
 	class SelectionOptionsKit;
 	class SelectionControl;
 	class HighlightControl;
+
+	class ConditionalExpression;
 	class ConditionControl;
 
 	class SelectionOptionsControl;

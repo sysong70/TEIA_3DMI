@@ -121,10 +121,10 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::SnapItem::operator == (const Sna
 
 
 //== ObjectSnap class ==============================================================================
-KERNEL::Operator::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery) :
-	OperatorImpl(pcInView, pcInDelivery),
-	m_cDynHighlightControl(pcInView->GetWindowKey()),
-	m_cDynLineHighlightCtrl(pcInView->GetWindowKey())
+KERNEL::Operator::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const DocView * pcInDocView) :
+	OperatorImpl(pcInDocView),
+	m_cDynHighlightControl(Window()),
+	m_cDynLineHighlightCtrl(Window())
 {
 	SegmentKey cConstruction(Window().GetBaseView()->GetConstructionKey());
 

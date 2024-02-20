@@ -18,7 +18,7 @@ namespace KERNEL
 		class HighlightObjectSnap : public OperatorBase
 		{
 		public:
-			HighlightObjectSnap(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			HighlightObjectSnap(const DocView * pcInDocView);
 
 			int MouseMove(HEventInfo & cInEvent);
 

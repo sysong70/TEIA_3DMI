@@ -39,7 +39,7 @@ namespace KERNEL
 		class SelectImpl : public OperatorImpl
 		{
 		public:
-			SelectImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			SelectImpl(const DocView * pcInDocView);
 
 			void Copy(SelectImpl * pcInThat) {
 				OperatorImpl::Copy(pcInThat);
@@ -82,11 +82,11 @@ namespace KERNEL
 	}
 }
 
-KERNEL::Operator::SelectImpl::SelectImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery) :
-	OperatorImpl(pcInView, pcInDelivery),
-	m_cHighlightOSnapOperator(pcInView, pcInDelivery),
-	m_cHighlightCtrl(pcInView->GetWindowKey()),
-	m_cLineHighlightCtrl(pcInView->GetWindowKey())
+KERNEL::Operator::SelectImpl::SelectImpl(const DocView * pcInDocView) :
+	OperatorImpl(pcInDocView),
+	m_cHighlightOSnapOperator(pcInDocView),
+	m_cHighlightCtrl(Window()),
+	m_cLineHighlightCtrl(Window())
 {
 	m_nOSnapMode += (DWORD)OSnap::Type::EndPoint;
 	m_nOSnapMode += (DWORD)OSnap::Type::MidPoint;
@@ -134,9 +134,9 @@ KERNEL::Operator::SelectImpl::SelectImpl(const H3DF::View * pcInView, const Sign
 
 //== Select 관련 함수 ================================================================================
 
-KERNEL::Operator::Select::Select(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
+KERNEL::Operator::Select::Select(const DocView * pcInDocView)
 {
-	SelectImpl * pcImpl = new SelectImpl(pcInView, pcInDelivery);
+	SelectImpl * pcImpl = new SelectImpl(pcInDocView);
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;
@@ -352,6 +352,14 @@ void KERNEL::Operator::Select::SetSelectionFilter(SelectionFilter::Type eInType)
 	}
 
 	pcImpl->m_cHighlightOSnapOperator.SetSelectionFilter(pcImpl->m_nSelFilter);
+}
+
+H3DF::SelectionResults & KERNEL::Operator::Select::Results()
+{
+	auto * pcImpl = (Operator::SelectImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->m_cSelectionResult;
 }
 
 //== Highlight 관련 함수 =============================================================================

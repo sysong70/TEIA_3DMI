@@ -14,7 +14,7 @@ namespace KERNEL
 		class VisualEffects : public OperatorBase
 		{
 		public:
-			VisualEffects(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			VisualEffects(const DocView * pcInDocView);
 
 			void Request(Json::Object & cInObject);
 

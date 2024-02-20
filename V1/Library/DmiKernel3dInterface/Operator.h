@@ -24,10 +24,7 @@ namespace KERNEL
 		class OperatorBase : public Object
 		{
 		public:
-			OperatorBase();
-
-			void SetDocViewImpl(KERNEL::DocViewImpl * pcInDocView);
-			KERNEL::DocViewImpl & DocViewImpl();
+			OperatorBase() = default;
 		};
 	}
 }

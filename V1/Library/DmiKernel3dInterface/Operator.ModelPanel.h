@@ -16,7 +16,7 @@ namespace KERNEL
 		class ModelPanel : public OperatorBase
 		{
 		public:
-			ModelPanel(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			ModelPanel(const DocView * pcInDocView);
 			void Initialize(CString strFilePathName);
 			void SetSelect(Select * pcInSelect);
 

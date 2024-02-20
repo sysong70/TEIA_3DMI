@@ -386,7 +386,7 @@ namespace KERNEL
 		class ModelPanelImpl : public OperatorImpl
 		{
 		public:
-			ModelPanelImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			ModelPanelImpl(const DocView * pcInDocView);
 
 			void Copy(ModelPanelImpl * pcInThat) {
 				OperatorImpl::Copy(pcInThat);
@@ -406,8 +406,8 @@ namespace KERNEL
 	}
 }
 
-KERNEL::Operator::ModelPanelImpl::ModelPanelImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery) :
-	OperatorImpl(pcInView, pcInDelivery)
+KERNEL::Operator::ModelPanelImpl::ModelPanelImpl(const DocView * pcInDocView) :
+	OperatorImpl(pcInDocView)
 {
 
 }
@@ -512,9 +512,9 @@ void KERNEL::Operator::ModelPanelImpl::NoShow(ModelTreeItem * pcInItem)
 
 //== ModelPanel 관련 함수 ============================================================================
 
-KERNEL::Operator::ModelPanel::ModelPanel(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
+KERNEL::Operator::ModelPanel::ModelPanel(const DocView * pcInDocView)
 {
-	auto pcImpl = new ModelPanelImpl(pcInView, pcInDelivery);
+	auto pcImpl = new ModelPanelImpl(pcInDocView);
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;
@@ -651,8 +651,10 @@ void KERNEL::Operator::ModelPanel::SetSelectItem(H3DF::SelectionItem & cSelItem)
 	H3DF::KeyPath cPath;
 	cSelItem.ShowPath(cPath);
 
+#ifdef _DEBUG
 	CString strText;
 	cSelItem.ShowPathString(strText);
+#endif
 
 	// 키값 배열을 가져온다.
 	H3DF::KeyArray cKeys;

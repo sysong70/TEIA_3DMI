@@ -15,7 +15,7 @@ namespace KERNEL
 		class Camera : public OperatorBase
 		{
 		public:
-			Camera(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			Camera(const DocView * pcInDocView);
 
 			int MouseMove(HEventInfo & cInEvent);
 
