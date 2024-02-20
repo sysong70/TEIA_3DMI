@@ -35,8 +35,6 @@ Control().EnableTreeCtrlNotifications(TRUE)
 
 namespace PresetModelPanel
 {
-	const WCHAR DummyName[] = L"Expanding...";
-
 	enum EControlId
 	{
 		Tree = WM_USER,
@@ -91,7 +89,7 @@ public:
 			/// Causes text to be displayed from right-to-left (RTL).
 			//| TVS_RTLREADING
 			/// Causes a selected item to remain selected when the tree-view control loses focus.
-			//| TVS_SHOWSELALWAYS
+			| TVS_SHOWSELALWAYS
 			/// Causes the item being selected to expand and the item being unselected to collapse upon selection in the tree view.
 			/// If the user holds down the CTRL key while selecting an item, the item being unselected will not be collapsed.
 			//| TVS_SINGLEEXPAND
@@ -118,7 +116,6 @@ public:
 		filter.m_bAutoExpandGroups = TRUE;
 
 		EnableFilterBar(TRUE, filter);
-		OnFilterBarUpdate(-1);
 
 		CreateIcons();
 	}
@@ -282,6 +279,8 @@ void Component::ModelPanel::ReceiveSignal(Json::Object* pData)
 	case Signal::ModelPanel::Action::ExpandItem:	ExpandItem(pData);		break;
 	case Signal::ModelPanel::Action::ExpandParent:	ExpandParent(pData);	break;
 	case Signal::ModelPanel::Action::SelectItem:	SelectItem(pData);		break;
+
+	case Signal::ModelPanel::Action::RedrawTree:	RedrawTree(pData->GetBoolean(SKW_REDRAW)); break;
 
 	default:
 		DEBUG_STOP;
@@ -536,18 +535,9 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 		DEBUG_LOG(L"* OnTreeItemExpanded");
 
 		HTREEITEM hItem = pNMTreeView->itemNew.hItem;
-		// get first child item
-		HTREEITEM hChild = Control().GetChildItem(hItem);
-
-		if (Control().GetItemData(hChild) == 0) {
-			ASSERT(Control().GetItemText(hChild) == PRESET::DummyName);
-			DisableNotification(Control().DeleteItem(hChild));
-			m_bExpanding = true;
-
-			DWORD_PTR key = Control().GetItemData(hItem);
-			ASSERT(key != 0);
-			View().GetDelivery().modelPanel.OnItemExpanded(key);
-		}
+		DWORD_PTR key = Control().GetItemData(hItem);
+		ASSERT(key != 0);
+		//View().GetDelivery().modelPanel.OnItemExpanded(key);
 	}
 	else {
 		ASSERT(pNMTreeView->action == TVE_COLLAPSE);
@@ -613,7 +603,6 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
 	HTREEITEM hItem = pNMTreeView->itemNew.hItem;
-	//:WARNING - dummy (by keyboard expanding)
 	if (hItem == nullptr) {
 	}
 	else {
@@ -683,11 +672,6 @@ HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR
 	Control().SetItemData(hItem, key);
 	m_keyMap[key] = hItem;
 
-	if (hasChildren) {
-		Control().InsertItem(PRESET::DummyName, hItem);
-		Control().Expand(hItem, TVE_COLLAPSE);
-	}
-
 	// parent checked state
 	if (Control().GetCheck(parent)) {
 		Control().SetCheck(hItem);
@@ -730,8 +714,6 @@ HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 	}
 	*/
 
-	RedrawTree(false);
-
 	Json::Object& data = *pData;
 	DWORD_PTR key = data.GetDwordPtr(SKW_KEY);
 
@@ -742,13 +724,6 @@ HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 	Control().SetItemData(hItem, key);
 	m_keyMap[key] = hItem;
 
-	if (data.GetBoolean(SKW_HASCHILDREN)) {
-		Control().InsertItem(PRESET::DummyName, hItem);
-		Control().Expand(hItem, TVE_COLLAPSE);
-	}
-
-	RedrawTree(true);
-
 	return hItem;
 }
 
@@ -756,27 +731,18 @@ HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 
 void Component::ModelPanel::AddChildren(Json::Object* pData)
 {
-	RedrawTree(false);
-
 	Json::Object& data = *pData;
 	Json::Array& items = data.GetArray(SKW_CHILDREN);
 
 	HTREEITEM hParent = GetItem(data.GetDwordPtr(SKW_PARENT));
 	DEBUG_LOG(WStr::Format(L"AddChildren: %s", Control().GetItemText(hParent)));
 
-	//:WARNING - remove dummy first
-	HTREEITEM hChild = Control().GetChildItem(hParent);
-	if (hChild != nullptr && Control().GetItemData(hChild) == 0) {
-		ASSERT(Control().GetItemText(hChild) == PRESET::DummyName);
-		Control().DeleteItem(hChild);
-	}
-
 	BOOL checked = Control().GetCheck(hParent);
 
 	for (auto item : items.GetBuffer()) {
 		Json::Object& child = item->AsObject();
 
-		hChild = AddItem(hParent,
+		HTREEITEM hChild = AddItem(hParent,
 			child.GetDwordPtr(SKW_KEY),
 			(LPWSTR)(LPCTSTR)child.GetString(SKW_TITLE),
 			child.GetBoolean(SKW_HASCHILDREN),
@@ -788,14 +754,6 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 			Control().SetCheck(hChild);
 		}
 	}
-
-	//:WARNING - select first (keyboard expanding)
-	if (m_bExpanding) {
-		Control().SelectItem(Control().GetChildItem(hParent));
-		m_bExpanding = false;
-	}
-
-	RedrawTree(true);
 }
 
 
@@ -838,8 +796,6 @@ void Component::ModelPanel::ExpandItem(Json::Object* pData)
 
 void Component::ModelPanel::ExpandParent(Json::Object* pData)
 {
-	RedrawTree(false);
-
 	HTREEITEM hItem = GetItem(pData->GetDwordPtr(SKW_KEY));
 	HTREEITEM hParent = hItem;
 	std::list<HTREEITEM> ancestor;
@@ -850,31 +806,27 @@ void Component::ModelPanel::ExpandParent(Json::Object* pData)
 		hParent = Control().GetParentItem(hParent);
 	}
 
-	//:CHECK - remove last one
 	ancestor.pop_back();
 	// Expand root to child
 	for (auto item : ancestor) {
-		ASSERT(Control().GetItemText(item) != PRESET::DummyName);
 		Control().Expand(item, TVE_EXPAND);
 	}
 
-	//:CHECK
-	Control().SelectItem(hItem);
-
-	RedrawTree(true);
+	DisableNotification(
+		Control().SelectItem(hItem)
+	);
 }
 
 
 
 void Component::ModelPanel::SelectItem(Json::Object* pData)
 {
-	RedrawTree(false);
-
 	HTREEITEM hItem = GetItem(pData->GetDwordPtr(SKW_KEY));
 	DEBUG_VALID(hItem);
-	Control().SelectItem(hItem);
 
-	RedrawTree(true);
+	DisableNotification(
+		Control().SelectItem(hItem)
+	);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -908,6 +860,7 @@ void Component::ModelPanel::RedrawTree(bool value)
 	Control().EnableTreeCtrlNotifications(value);
 
 	if (value) {
+		Control().AdjustLayout();
 		Control().RedrawWindow();
 	}
 }

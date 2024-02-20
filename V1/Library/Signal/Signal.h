@@ -38,6 +38,7 @@
 #define SKW_OPTIONS			"Options"
 #define SKW_OSNAPID			"OsnapId"
 #define SKW_PARENT			"Parent"
+#define SKW_REDRAW			"Redraw"
 #define SKW_POSITION		"Position"
 #define SKW_RECT			"Rect"
 #define SKW_REFERENCE		"reference" // UI, ...
@@ -520,6 +521,8 @@ namespace Signal
 			OnItemShow,			// OnClick
 			//OnSelChanging,
 
+			RedrawTree,
+
 			AddItem,
 			AddChildren,
 			CheckItem,
@@ -548,6 +551,10 @@ namespace Signal
 		void OnItemSelected(DWORD_PTR key);
 
 		void OnItemShow(DWORD_PTR key, bool show);
+
+	public:
+
+		void RedrawTree(bool value);
 
 	public:
 
