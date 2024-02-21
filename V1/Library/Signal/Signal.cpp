@@ -6,6 +6,11 @@ Json::Object data; \
 ConstructData(data, action); \
 Wrapper().SendData(data);
 
+#define PostActionDataOnly(action) \
+Json::Object data; \
+ConstructData(data, action); \
+Wrapper().PostData(data);
+
 //**************************************************************************************************
 
 #pragma region Application Class
@@ -423,7 +428,8 @@ void Signal::View::OnInitialize(DWORD_PTR hWnd, CString path)
 	data.SetDwordPtr(SKW_HWND, hWnd);
 	data.SetString(SKW_FILEPATH, path);
 
-	Wrapper().SendData(data);
+	//Wrapper().SendData(data);
+	Wrapper().PostData(data);
 }
 
 
@@ -798,9 +804,15 @@ void Signal::ModelPanel::ExpandParent(DWORD_PTR key)
 
 
 
-void Signal::ModelPanel::SelectItem(DWORD_PTR key)
+void Signal::ModelPanel::SelectItem(DWORD_PTR key, bool select)
 {
-	SendKeyData(Action::SelectItem);
+	Json::Object data;
+	ConstructData(data, Action::SelectItem);
+
+	data.SetDwordPtr(SKW_KEY, key);
+	data.SetBoolean(SKW_VALUE, select);
+
+	Wrapper().SendData(data);
 }
 
 #undef SendKeyData
@@ -889,6 +901,12 @@ Signal::Delivery::Delivery(int viewId, void(*sender)(const wchar_t*))
 
 
 
+Signal::Delivery::~Delivery()
+{
+}
+
+
+
 void Signal::Delivery::SetSender(void (*func)(const wchar_t*))
 {
 	SendSignal = func;
@@ -899,10 +917,31 @@ void Signal::Delivery::SetSender(void (*func)(const wchar_t*))
 void Signal::Delivery::SendData(Json::Object& data)
 {
 	DEBUG_VALID(SendSignal);
-
 	if (SendSignal != nullptr) {
 		SendSignal(data.ToString().GetBuffer());
 	}
+}
+
+#include <thread>
+#pragma warning(disable : 4996)
+
+void Signal::Delivery::PostData(Json::Object& data)
+{
+	CString stream = data.ToString();
+	const wchar_t* pStream = stream.GetBuffer();
+
+	size_t length = ::wcslen(pStream);
+	wchar_t* pData = new wchar_t[length + 1];
+	::wcsncpy(pData, pStream, length);
+	pData[length] = 0;
+
+	std::thread([this, pData]() {
+		if (SendSignal != nullptr) {
+			SendSignal(pData);
+		}
+
+		delete [] pData;
+	}).detach();
 }
 
 #pragma endregion //:REGION

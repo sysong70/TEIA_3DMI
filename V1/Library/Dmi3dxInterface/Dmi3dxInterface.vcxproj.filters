@@ -183,6 +183,9 @@
     <ClInclude Include="3DX.h">
       <Filter>3DX</Filter>
     </ClInclude>
+    <ClInclude Include="..\Signal\WorkerThread.h">
+      <Filter>_Signal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -310,6 +313,9 @@
     </ClCompile>
     <ClCompile Include="3DX.FileOptions.cpp">
       <Filter>Import</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Signal\WorkerThread.cpp">
+      <Filter>_Signal</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

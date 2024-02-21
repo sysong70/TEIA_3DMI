@@ -129,6 +129,7 @@
     <ClInclude Include="..\Common\Path.h" />
     <ClInclude Include="..\Common\WStr.h" />
     <ClInclude Include="..\Signal\Signal.h" />
+    <ClInclude Include="..\Signal\WorkerThread.h" />
     <ClInclude Include="3DX.3DfImport.h" />
     <ClInclude Include="3DX.ExchangeWrapper.h" />
     <ClInclude Include="3DX.FileOptions.h" />
@@ -175,6 +176,7 @@
     <ClCompile Include="..\Common\Path.cpp" />
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\Signal\Signal.cpp" />
+    <ClCompile Include="..\Signal\WorkerThread.cpp" />
     <ClCompile Include="3DX.3DfImport.cpp" />
     <ClCompile Include="3DX.Base.cpp" />
     <ClCompile Include="3DX.FileOptions.cpp" />

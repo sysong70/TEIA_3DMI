@@ -330,6 +330,9 @@
     <ClInclude Include="..\Common\File.h">
       <Filter>_Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\Signal\WorkerThread.h">
+      <Filter>_Signal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -589,6 +592,9 @@
     </ClCompile>
     <ClCompile Include="..\Common\File.cpp">
       <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Signal\WorkerThread.cpp">
+      <Filter>_Signal</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

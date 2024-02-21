@@ -572,7 +572,7 @@ namespace Signal
 		// expand from root to item
 		void ExpandParent(DWORD_PTR key);
 
-		void SelectItem(DWORD_PTR key);
+		void SelectItem(DWORD_PTR key, bool select = true);
 	};
 
 
@@ -628,7 +628,7 @@ namespace Signal
 
 		Delivery(int viewId, void (*sender)(const wchar_t*));
 
-		~Delivery() {}
+		virtual ~Delivery();
 
 	public:
 
@@ -648,6 +648,8 @@ namespace Signal
 		void SetSender(void (*func)(const wchar_t*));
 
 		void SendData(Json::Object& data);
+
+		void PostData(Json::Object& data);
 	};
 };
 

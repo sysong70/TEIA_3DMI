@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "Common_Define.h"
-
 #include <atomic>
 #include <condition_variable>
 #include <map>
@@ -10,22 +9,22 @@
 #include <thread>
 #include <functional>
 
+//--------------------------------------------------------------------------------------------------
 //:REF - https://www.codeproject.com/Articles/1169105/Cplusplus-std-thread-Event-Loop-with-Message-Queue
-
-
 
 struct EventWrapper
 {
-    int Type;    // WorkerThread::Event
-    int Id = -1; // any id
-    void* EventData = nullptr;
+    int Type;                   // WorkerThread::Event
+    int Id = -1;                // Any id
+    void* EventData = nullptr;  // Data buffer
+    bool Array = false;         // Is EventData array?
 
-    EventWrapper(int type, int id = -1, void* pEventData = nullptr);
+    EventWrapper(int type, int id = -1, void* pEventData = nullptr, void* pArrayData = nullptr);
 
     ~EventWrapper();
 };
 
-
+//--------------------------------------------------------------------------------------------------
 
 class WorkerThread
 {
@@ -40,7 +39,7 @@ public:
         User,
     };
 
-    WorkerThread(bool create = true);
+    WorkerThread();
 
     virtual ~WorkerThread();
     // Get the ID of the currently executing thread
@@ -54,19 +53,21 @@ protected: //:WARNING - disabed
 public:
 
     // Called once to create the worker thread
-    bool Initialize();
+    bool CreateThread();
     // Called once a program exit to exit the worker thread
-    void Exit();
+    void TerminateThread();
     // Get the ID of this thread instance
     std::thread::id GetThreadId();
 
     void PostEvent(Event type, int id = -1, void* pEventData = nullptr);
-    /*
-        WorkerThread worker;
-        worker.SetTimerProcess(std::bind(&className::method, this));
-        worker.SetTimerProcess(&funcName);
-    */
-    void SetTimerProcess(std::function<void()> func);
+
+    void PostEvent(const wchar_t* pEventData, bool copyData = true);
+
+    void SetSignalFunc(std::function<void(const wchar_t*)> func);
+
+    void SetTimerFunc(std::function<void()> func);
+
+    void SetUserFunc(std::function<void(const wchar_t*)> func);
 
     void StartTimer(UINT milliseconds = 0);
 
@@ -87,20 +88,28 @@ protected: // Process switch
 protected:
 
     // main thread
-    std::unique_ptr<std::thread> m_thread;
+    std::unique_ptr<std::thread> m_thread = nullptr;
     // main signal queue
     std::queue<std::shared_ptr<EventWrapper> > m_queue;
     // class for mutual exclusion
     std::mutex m_mutex;
     // class for waiting for conditions
     std::condition_variable m_condition;
+    // signal process function
+    std::function<void(const wchar_t*)> m_pSignalFunc = nullptr;
+    // user process function
+    std::function<void(const wchar_t*)> m_pUserFunc = nullptr;
 
 protected: // Single Timer
 
+    // thread safe variable
     std::atomic<int> m_timerInterver;
+    // thread safe variable
     std::atomic<bool> m_timerExit;
+    // time thread
     std::unique_ptr<std::thread> m_timer;
-    std::function<void()> m_pTimerProcess = nullptr;
+    // timer process function
+    std::function<void()> m_pTimerFunc = nullptr;
 
     void TimerThread();
 };

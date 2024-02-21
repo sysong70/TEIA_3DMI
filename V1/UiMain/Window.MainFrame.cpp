@@ -199,12 +199,13 @@ void Window::MainFrame::ShowPanelBar()
 	RecalcLayout();
 }
 
-
+#include "Connector.h"
 
 void Window::MainFrame::ShowProgress(bool bShow)
 {
 	if (bShow) {
 		BeginWaitCursor();
+		UpdateWindow();
 
 		Dialog::Base* pDialog = m_dialogs.Get((int)Signal::Target::Progress);
 		if (pDialog == nullptr) {
@@ -218,6 +219,7 @@ void Window::MainFrame::ShowProgress(bool bShow)
 		m_dialogs.Remove((int)Signal::Target::Progress);
 
 		EndWaitCursor();
+		UpdateWindow();
 	}
 }
 

@@ -125,6 +125,7 @@
     <ClInclude Include="..\Common\Path.h" />
     <ClInclude Include="..\Common\WStr.h" />
     <ClInclude Include="..\Signal\Signal.h" />
+    <ClInclude Include="..\Signal\WorkerThread.h" />
     <ClInclude Include="Command.Root.h" />
     <ClInclude Include="Command.Line.h" />
     <ClInclude Include="Command.ViewControl.h" />
@@ -153,6 +154,7 @@
     <ClCompile Include="..\Common\Path.cpp" />
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\Signal\Signal.cpp" />
+    <ClCompile Include="..\Signal\WorkerThread.cpp" />
     <ClCompile Include="Command.Root.cpp" />
     <ClCompile Include="Command.Line.cpp" />
     <ClCompile Include="Command.ViewControl.cpp" />

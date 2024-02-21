@@ -176,6 +176,7 @@
     <ClInclude Include="..\Library\Common\Path.h" />
     <ClInclude Include="..\Library\Common\WStr.h" />
     <ClInclude Include="..\Library\Signal\Signal.h" />
+    <ClInclude Include="..\Library\Signal\WorkerThread.h" />
     <ClInclude Include="Command.Base.h" />
     <ClInclude Include="Command.Common.h" />
     <ClInclude Include="Command.h" />
@@ -239,6 +240,7 @@
     <ClCompile Include="..\Library\Common\Path.cpp" />
     <ClCompile Include="..\Library\Common\WStr.cpp" />
     <ClCompile Include="..\Library\Signal\Signal.cpp" />
+    <ClCompile Include="..\Library\Signal\WorkerThread.cpp" />
     <ClCompile Include="Command.Base.cpp" />
     <ClCompile Include="Command.Test.cpp" />
     <ClCompile Include="Command.VisualEffects3d.cpp" />

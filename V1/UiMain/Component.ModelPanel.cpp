@@ -70,7 +70,7 @@ public:
 			//| TVM_EDITLABEL
 			/// Enables full-row selection in the tree view.
 			/// This style cannot be used in conjunction with the TVS_HASLINES style.
-			//| TVS_FULLROWSELECT
+			| TVS_FULLROWSELECT
 			/// Displays plus (+) and minus (-) buttons next to parent items.
 			/// To include buttons with items at the root of the tree view, TVS_LINESATROOT must also be specified.
 			| TVS_HASBUTTONS
@@ -796,6 +796,7 @@ void Component::ModelPanel::ExpandItem(Json::Object* pData)
 
 void Component::ModelPanel::ExpandParent(Json::Object* pData)
 {
+	/*
 	HTREEITEM hItem = GetItem(pData->GetDwordPtr(SKW_KEY));
 	HTREEITEM hParent = hItem;
 	std::list<HTREEITEM> ancestor;
@@ -815,6 +816,15 @@ void Component::ModelPanel::ExpandParent(Json::Object* pData)
 	DisableNotification(
 		Control().SelectItem(hItem)
 	);
+	*/
+
+	HTREEITEM hItem = GetItem(pData->GetDwordPtr(SKW_KEY));
+	DEBUG_VALID(hItem);
+
+	Control().EnsureVisible(hItem);
+	DisableNotification(
+		Control().SelectItem(hItem)
+	);
 }
 
 
@@ -824,9 +834,8 @@ void Component::ModelPanel::SelectItem(Json::Object* pData)
 	HTREEITEM hItem = GetItem(pData->GetDwordPtr(SKW_KEY));
 	DEBUG_VALID(hItem);
 
-	DisableNotification(
-		Control().SelectItem(hItem)
-	);
+	CBCGPGridRow* pRow = Control().TreeItem(hItem);
+	pRow->Select(pData->GetDwordPtr(SKW_VALUE));
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -862,6 +871,10 @@ void Component::ModelPanel::RedrawTree(bool value)
 	if (value) {
 		Control().AdjustLayout();
 		Control().RedrawWindow();
+		EndWaitCursor();
+	}
+	else {
+		BeginWaitCursor();
 	}
 }
 
