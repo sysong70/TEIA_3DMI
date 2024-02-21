@@ -46,7 +46,7 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cD
 
 	pcImpl->m_cCanvas.AttachViewAsLayout(cView);
 
-	pcImpl->AllocationOperator(&pcImpl->m_cCanvas.GetFrontView(), cDelivery);
+	pcImpl->AllocationOperator(this);
 
 	pcImpl->m_cCanvas.FileOpen(cInObject, cDelivery);
 

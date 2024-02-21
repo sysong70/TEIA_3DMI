@@ -10,14 +10,12 @@
 
 namespace KERNEL
 {
-	class DocView;
-
 	namespace Operator
 	{
 		class OperatorImpl : public Impl
 		{
 		public:
-			OperatorImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			OperatorImpl(const DocView * pcInDocView);
 
 			H3DF::WindowKey & Window();
 			const H3DF::WindowKey & Window() const;
@@ -25,18 +23,16 @@ namespace KERNEL
 			H3DF::View & View();
 			const H3DF::View & View() const;
 
-			void SetDocView(const DocView * pcInDocView);
-			void SetView(const H3DF::View * pcInView);
-
 			void Copy(OperatorImpl * pcInThat);
 
 			Signal::Delivery & Delivery();
 			const Signal::Delivery & Delivery() const;
 
+			DocView & GetDocView();
+			const DocView & GetDocView() const;
+
 		private:
-			const H3DF::View * m_pcView = nullptr;
-			const Signal::Delivery * m_pcDelivery = nullptr;
-			const KERNEL::DocView * m_pcDocView = nullptr;
+			const DocView * m_pcDocView = nullptr;
 		};
 	}
 }

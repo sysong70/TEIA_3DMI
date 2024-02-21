@@ -4,6 +4,9 @@
 
 #include "Impl/OperatorImpl.h"
 
+#include "Kernel.DocView.h"
+#include "Impl/Kernel.DocViewImpl.h"
+
 #include "Signal.Connector.h"
 #include "../Signal/Signal.h"
 #include "../Common/Common_Define.h"
@@ -15,11 +18,14 @@
 #include <3DF/Key.h>
 #include <3DF/Selection.h>
 #include <3DF/Visibility.h>
+#include <3DF/Condition.h>
 #include <3DF/Facility.AppOptions.h>
+#include <3DF/3DF.Utility.h>
 
 #include <Json.h>
 
 using namespace KERNEL;
+using namespace H3DF;
 
 #define TheKenel TheAppOptions.Kernel
 #define TheVisualEffects H3DF::Facility::KernelOption::Attribute
@@ -31,7 +37,7 @@ namespace KERNEL
 		class AttributeImpl : public OperatorImpl
 		{
 		public:
-			AttributeImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			AttributeImpl(const DocView * pcInDocView);
 
 			void Copy(AttributeImpl * pcInThat) {
 				OperatorImpl::Copy(pcInThat);
@@ -43,16 +49,16 @@ namespace KERNEL
 	}
 }
 
-KERNEL::Operator::AttributeImpl::AttributeImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
-	: OperatorImpl(pcInView, pcInDelivery)
+KERNEL::Operator::AttributeImpl::AttributeImpl(const DocView * pcInDocView)
+	: OperatorImpl(pcInDocView)
 {
 }
 
 //== Attribute class ==============================================================================
 
-KERNEL::Operator::Attribute::Attribute(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
+KERNEL::Operator::Attribute::Attribute(const DocView * pcInDocView)
 {
-	AttributeImpl * pcImpl = new AttributeImpl(pcInView, pcInDelivery);
+	AttributeImpl * pcImpl = new AttributeImpl(pcInDocView);
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;
@@ -91,8 +97,37 @@ bool KERNEL::Operator::Attribute::Hide()
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
+	DocViewImpl * pcDocViewImpl = dynamic_cast<DocViewImpl *>(pcImpl->GetDocView().GetImpl());
+	DEBUG_VALID(pcDocViewImpl);
 
+	size_t nCount = pcDocViewImpl->Select().Results().GetCount();
+	if (0 == nCount) {
+		return false;
+	}
 
+	SelectionResults cResult = pcDocViewImpl->Select().Results();
+
+	SelectionResultsIterator cIter = cResult.GetIterator();
+
+	while (true == cIter.IsValid()) {
+		SelectionItem cItem = cIter.GetItem();
+
+		KeyPath cPath;
+		if (true == cItem.ShowPath(cPath)) {
+			Key cKey = cPath.At(1);
+			H3DF::Type eType = Utility::GetType(cKey.KeyValue());
+
+			if (H3DF::Type::IncludeKey == eType) {
+				IncludeKey cIncludeKey(cKey.KeyValue());
+				ConditionalExpression cCondExp("noshow");
+				cIncludeKey.SetConditionalExpression(cCondExp);
+			}
+		}
+
+		cIter.Next();
+	}
+
+	//H3DF::ConditionalExpression cCondExp(;
 
 	return true;
 }

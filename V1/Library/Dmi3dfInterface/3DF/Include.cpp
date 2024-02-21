@@ -4,6 +4,8 @@
 
 #include "Segment.h"
 
+#include "Condition.h"
+
 #include <HTools.h>
 
 using namespace H3DF;
@@ -40,4 +42,24 @@ SegmentKey H3DF::IncludeKey::GetTarget() const
 
 	SegmentKey cSegment(nSegment);
 	return cSegment;
+}
+
+IncludeKey & H3DF::IncludeKey::SetConditionalExpression(ConditionalExpression const & cInConditional)
+{
+	CStringA strCondition;
+	cInConditional.ShowCondition(strCondition);
+	
+	HC_Conditional_Include_By_Key(KeyValue(), strCondition);
+
+	return *this;
+}
+
+IncludeKey & H3DF::IncludeKey::UnsetConditionalExpression()
+{
+	return *this;
+}
+
+bool H3DF::IncludeKey::ShowConditionalExpression(ConditionalExpression & cOutConditional) const
+{
+	return true;
 }

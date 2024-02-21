@@ -27,39 +27,48 @@ namespace KERNEL
 		class CameraImpl : public OperatorImpl
 		{
 		public:
-			CameraImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			CameraImpl(const DocView * pcInDocView);
+			~CameraImpl();
 
 			void Copy(CameraImpl * pcInThat) {
 				OperatorImpl::Copy(pcInThat);
 			}
 
-			H3DF::Operator::CameraControl & CameraControl() { return m_cCameraControl; }
+			H3DF::Operator::CameraControl & CameraControl() { return *m_pcCameraControl; }
 			H3DF::Camera::Mode CameraMode();
 
 		protected:
-			H3DF::Operator::CameraControl m_cCameraControl;
+			H3DF::Operator::CameraControl * m_pcCameraControl = nullptr;
 		};
 	}
 }
 
-KERNEL::Operator::CameraImpl::CameraImpl(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
-	: OperatorImpl(pcInView, pcInDelivery),
-	m_cCameraControl(pcInView->GetWindowKey(), pcInView->GetNavigationCube())
+KERNEL::Operator::CameraImpl::CameraImpl(const DocView * pcInDocView)
+	: OperatorImpl(pcInDocView)
 {
+	m_pcCameraControl = new H3DF::Operator::CameraControl(Window(), View().GetNavigationCube());
+}
+
+KERNEL::Operator::CameraImpl::~CameraImpl()
+{
+	if (nullptr != m_pcCameraControl) {
+		delete m_pcCameraControl;
+		m_pcCameraControl = nullptr;
+	}
 }
 
 //== View Control 관련 함수 ==========================================================================
 
 H3DF::Camera::Mode KERNEL::Operator::CameraImpl::CameraMode()
 {
-	return m_cCameraControl.CameraMode();
+	return CameraControl().CameraMode();
 }
 
 //== Camera class ==================================================================================
 
-KERNEL::Operator::Camera::Camera(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
+KERNEL::Operator::Camera::Camera(const DocView * pcInDocView)
 {
-	CameraImpl * pcImpl = new CameraImpl(pcInView, pcInDelivery);
+	CameraImpl * pcImpl = new CameraImpl(pcInDocView);
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;

@@ -18,7 +18,7 @@ namespace KERNEL
 		class Select : public OperatorBase
 		{
 		public:
-			Select(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			Select(const DocView * pcInDocView);
 			void SetModelPanel(ModelPanel * pcInModelPanel);
 
 			int MouseMove(HEventInfo & cInEvent);
@@ -35,6 +35,8 @@ namespace KERNEL
 			bool DynamicSelectByResult(H3DF::SelectionResults & cInResults);
 
 			void SetSelectionFilter(SelectionFilter::Type eInType);
+
+			H3DF::SelectionResults & Results();
 
 			//== Highlight 관련 함수 =================================================================
 			H3DF::HighlightControl & DynHighlightControl();

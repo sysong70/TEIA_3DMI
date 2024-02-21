@@ -751,21 +751,21 @@ void H3DF::SelectionItem::ShowPathString(CString & strOutPath)
 
 		H3DF::Type eType = H3DF::Utility::GetType(nKey);
 
-		SegmentKey cSegmentKey;
+		SegmentKey cSegment;
 
 		if (H3DF::Type::IncludeKey == eType) {
-			IncludeKey cIncludeKey(nKey);
-			cSegmentKey = cIncludeKey.GetTarget();
+			IncludeKey cInclude(nKey);
+			cSegment = cInclude.GetTarget();
 		}
 		else {
-			cSegmentKey = SegmentKey(nKey);
+			cSegment = SegmentKey(nKey);
 		}
 
-		if (false == UserData::ShowSegmentName(cSegmentKey, strName)) {
-			strName = cSegmentKey.Name(false);
+		if (false == UserData::ShowSegmentName(cSegment, strName)) {
+			strName = cSegment.Name(false);
 		}
 		if (H3DF::Type::IncludeKey == eType) {
-			strText.Format(L"\nInclude: %d, Segment: %d [%s]", nKey, cSegmentKey.KeyValue(), strName);
+			strText.Format(L"\nInclude: %d, Segment: %d [%s]", nKey, cSegment.KeyValue(), strName);
 		}
 		else {
 			strText.Format(L"\nSegment: %d [%s], %s", nKey, L"segment", strName);

@@ -14,7 +14,7 @@ namespace KERNEL
 		class Attribute : public OperatorBase
 		{
 		public:
-			Attribute(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery);
+			Attribute(const DocView * pcInDocView);
 
 			bool ShowAll();
 			bool Show();

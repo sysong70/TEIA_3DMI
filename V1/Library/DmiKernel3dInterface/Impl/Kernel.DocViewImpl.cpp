@@ -1,6 +1,7 @@
 ﻿#include <StdAfx.h>
 
 #include "Kernel.DocViewImpl.h"
+#include "../Kernel.DocView.h"
 
 #include "../Operator.Camera.h"
 #include "../Operator.VisualEffects.h"
@@ -62,36 +63,30 @@ void KERNEL::DocViewImpl::CancelCommands()
 	m_cCanvas.GetFrontView().GetWindowKey().Update();
 }
 
-void KERNEL::DocViewImpl::AllocationOperator(H3DF::View * pcInView, Signal::Delivery & cDelivery)
+void KERNEL::DocViewImpl::AllocationOperator(const DocView * pcInDocView)
 {
 	// VisualEffects Operator 생성 및 설정
-	m_apcOperator[(int)KERNEL::Operator::Type::VisualEffects] = new KERNEL::Operator::VisualEffects(pcInView, &cDelivery);
+	m_apcOperator[(int)KERNEL::Operator::Type::VisualEffects] = new KERNEL::Operator::VisualEffects(pcInDocView);
 
 	// Attribute Operator 생성 및 설정
-	m_apcOperator[(int)KERNEL::Operator::Type::Attribute] = new KERNEL::Operator::Attribute(pcInView, &cDelivery);
+	m_apcOperator[(int)KERNEL::Operator::Type::Attribute] = new KERNEL::Operator::Attribute(pcInDocView);
 
 	// Camera Operator 생성 및 설정
-	m_apcOperator[(int)KERNEL::Operator::Type::Camera] = new KERNEL::Operator::Camera(pcInView, &cDelivery);
+	m_apcOperator[(int)KERNEL::Operator::Type::Camera] = new KERNEL::Operator::Camera(pcInDocView);
 
 	// Camera Operator 생성 및 설정
-	KERNEL::Operator::Select * pcSelect = new KERNEL::Operator::Select(pcInView, &cDelivery);
+	KERNEL::Operator::Select * pcSelect = new KERNEL::Operator::Select(pcInDocView);
 	m_apcOperator[(int)KERNEL::Operator::Type::Select] = pcSelect;
 	
-
 	// Model Panel Operator 생성 및 설정
-	KERNEL::Operator::ModelPanel * pcModelPanel = new KERNEL::Operator::ModelPanel(pcInView, &cDelivery);
+	KERNEL::Operator::ModelPanel * pcModelPanel = new KERNEL::Operator::ModelPanel(pcInDocView);
 	pcModelPanel->SetSelect((KERNEL::Operator::Select *)m_apcOperator[(int)KERNEL::Operator::Type::Select]);
 	m_apcOperator[(int)KERNEL::Operator::Type::ModelPanel] = pcModelPanel;
 
 	pcSelect->SetModelPanel(pcModelPanel);
 
 	// Navigation Cube에서 사용하는 DynHighlightControl을 설정한다. Cube에서 선택된 부분을 Unhighlight하기 위함.
-	pcInView->GetNavigationCube().SetHighlightControl(pcSelect->DynHighlightControl());
-
-	// Operator에 DocViewImpl 연결
-	for(auto & pcOperator : m_apcOperator) {
-		pcOperator->SetDocViewImpl(this);
-	}
+	m_cCanvas.GetFrontView().GetNavigationCube().SetHighlightControl(pcSelect->DynHighlightControl());
 }
 
 KERNEL::Operator::OperatorBase * KERNEL::DocViewImpl::GetOperator(Operator::Type eInType)

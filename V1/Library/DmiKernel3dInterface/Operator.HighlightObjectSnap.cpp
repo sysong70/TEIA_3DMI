@@ -8,9 +8,9 @@
 using namespace KERNEL;
 
 //== ObjectSnap class ==============================================================================
-KERNEL::Operator::HighlightObjectSnap::HighlightObjectSnap(const H3DF::View * pcInView, const Signal::Delivery * pcInDelivery)
+KERNEL::Operator::HighlightObjectSnap::HighlightObjectSnap(const DocView * pcInDocView)
 {
-	auto * pcImpl = new HighlightObjectSnapImpl(pcInView, pcInDelivery);
+	auto * pcImpl = new HighlightObjectSnapImpl(pcInDocView);
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;
