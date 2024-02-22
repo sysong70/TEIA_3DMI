@@ -484,7 +484,7 @@ void KERNEL::Operator::ModelPanelImpl::UserInterfaceItemExpanded(ModelTreeItem *
 #endif
 
 			cItem.Title = strUserName;
-			cItem.HasChildren = (TreeItemStatus::End & pcChildItem->m_nStatus) ? false : true;
+			//cItem.HasChildren = (TreeItemStatus::End & pcChildItem->m_nStatus) ? false : true;
 			cItem.Key = (DWORD_PTR)pcChildItem;
 			cTreeItems.push_back(cItem);
 		}
@@ -542,7 +542,7 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 	cItem.ParentKey = 0;
 	cItem.Key = (DWORD_PTR)pcRootItem;
 	cItem.Title = strFileTitle;
-	cItem.HasChildren = false;
+	//cItem.HasChildren = false;
 
 	//:Ken - 20240219, lock tree
 	pcImpl->Delivery().modelPanel.RedrawTree(false);
@@ -557,9 +557,11 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 	// Model Group Item 생성, 이하에 CAD Model data를 저장한다.
 	if (true == Utility::ShowSubSegment(cModelSegment, "models", cSegment)) {
 		cItem.Title = L"Models";
-		cItem.HasChildren = (0 < cSegment.ShowIncluders()) ? true : false;
+		//cItem.HasChildren = (0 < cSegment.ShowIncluders()) ? true : false;
+		bool hasChildren = (0 < cSegment.ShowIncluders()) ? true : false;
 
-		ModelTreeItem * pcItem = pcImpl->m_cModelTree.AddItem(cSegment.KeyValue(), pcRootItem, cItem.HasChildren); // 내부 Tree 생성
+		//ModelTreeItem * pcItem = pcImpl->m_cModelTree.AddItem(cSegment.KeyValue(), pcRootItem, cItem.HasChildren); // 내부 Tree 생성
+		ModelTreeItem * pcItem = pcImpl->m_cModelTree.AddItem(cSegment.KeyValue(), pcRootItem, hasChildren);
 		pcItem->m_nStatus |= TreeItemStatus::UiUpdate;
 		cItem.Key = (DWORD_PTR)pcItem;
 
@@ -570,7 +572,7 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 	// Measure Group Item 생성.
 	if (true == Utility::ShowSubSegment(cModelSegment, "measurements", cSegment)) {
 		cItem.Title = L"Measurements";
-		cItem.HasChildren = false;
+		//cItem.HasChildren = false;
 		
 		ModelTreeItem * pcItem = pcImpl->m_cModelTree.AddItem(cSegment.KeyValue(), pcRootItem, false); // 내부 Tree 생성
 		pcItem->m_nStatus |= TreeItemStatus::UiUpdate;
@@ -583,7 +585,7 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 	// Markup Group Item 생성.
 	if (true == Utility::ShowSubSegment(cModelSegment, "markups", cSegment)) {
 		cItem.Title = L"Markups";
-		cItem.HasChildren = false;
+		//cItem.HasChildren = false;
 
 		ModelTreeItem * pcItem = pcImpl->m_cModelTree.AddItem(cSegment.KeyValue(), pcRootItem, false); // 내부 Tree 생성
 		pcItem->m_nStatus |= TreeItemStatus::UiUpdate;

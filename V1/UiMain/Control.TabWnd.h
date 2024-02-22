@@ -12,7 +12,7 @@ namespace Control
 
 		TabWnd();
 
-		void SetImageList(std::vector<UINT> ids, CSize imageSize);
+		void SetImageList(const ResourceIds& ids, CSize imageSize);
 		//:WARNING - use image size, setting before Create()
 		void SetTabHeight(int height);
 

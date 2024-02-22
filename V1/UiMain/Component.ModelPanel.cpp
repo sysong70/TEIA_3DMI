@@ -19,7 +19,8 @@ static char THIS_FILE[] = __FILE__;
 #ifdef _LOG
 #define DEBUG_LOG(s) TheApplication.GetMainFrame().GetDebugTracer().AddLog(s)
 #else
-#define DEBUG_LOG DEBUG_TRACE
+//#define DEBUG_LOG DEBUG_TRACE
+#define DEBUG_LOG
 #endif
 
 #define Control() (*m_pControl)
@@ -274,13 +275,12 @@ void Component::ModelPanel::ReceiveSignal(Json::Object* pData)
 	case Signal::ModelPanel::Action::AddItem:		AddItem(pData);			break;
 	case Signal::ModelPanel::Action::AddChildren:	AddChildren(pData);		break;
 	case Signal::ModelPanel::Action::CheckItem:		CheckItem(pData);		break;
-	case Signal::ModelPanel::Action::CollapseItem:	CollapseItem(pData);	break;
 	case Signal::ModelPanel::Action::DeleteItem:	DeleteItem(pData);		break;
 	case Signal::ModelPanel::Action::ExpandItem:	ExpandItem(pData);		break;
 	case Signal::ModelPanel::Action::ExpandParent:	ExpandParent(pData);	break;
 	case Signal::ModelPanel::Action::SelectItem:	SelectItem(pData);		break;
 
-	case Signal::ModelPanel::Action::RedrawTree:	RedrawTree(pData->GetBoolean(SKW_REDRAW)); break;
+	case Signal::ModelPanel::Action::RedrawTree:	RedrawTree(pData->GetBoolean(SKW_FLAG)); break;
 
 	default:
 		DEBUG_STOP;
@@ -638,44 +638,19 @@ void Component::ModelPanel::OnTreeSetFocus(NMHDR* pNMHDR, LRESULT* pResult)
 //:REF - https://learn.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-tvitemexw
 //:REF - https://learn.microsoft.com/en-us/windows/win32/controls/tree-view-control-item-states
 
-HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool hasChildren, int type)
+HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool checked, int type)
 {
-	/*
-	TVINSERTSTRUCT tvi;
-	tvi.hParent = parent;
-	tvi.hInsertAfter = TVI_LAST;
-
-	//:WARNING - is not single flag!!! (combination)
-	tvi.itemex.mask = TVIF_TEXT | TVIF_PARAM; // | TVIF_STATE;
-	tvi.itemex.pszText = title;
-	// TVIF_PARAM: add data. if not set, lParam is not assigned
-	tvi.itemex.lParam = (LPARAM)key;
-	//tvi.itemex.stateMask = TVIS_EXPANDED;
-	//tvi.itemex.state = TVE_EXPAND;
-
-	HTREEITEM hCurrent = Control().InsertItem(&tvi);
-	m_keyMap[key] = hCurrent;
-
-	if (hasChildren) {
-		Control().InsertItem(PRESET::DummyName, hCurrent);
-		Control().Expand(hCurrent, TVE_COLLAPSE);
-	}
-	*/
-
 	HTREEITEM hItem = Control().InsertItem(title, parent);
 	DEBUG_VALID(hItem);
 	DEBUG_LOG(WStr::Format(L"\t- %s", title));
+
+	m_keyMap[key] = hItem;
 
 #ifdef _TEST
 	Control().SetItemImage(hItem, 0, 0);
 #endif
 	Control().SetItemData(hItem, key);
-	m_keyMap[key] = hItem;
-
-	// parent checked state
-	if (Control().GetCheck(parent)) {
-		Control().SetCheck(hItem);
-	}
+	Control().SetCheck(hItem, checked);
 
 	return hItem;
 }
@@ -684,36 +659,6 @@ HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR
 
 HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 {
-	/*
-	Json::Object& data = *pData;
-
-	DWORD_PTR parentKey = data.GetDwordPtr(SKW_PARENT);
-	DWORD_PTR key = data.GetDwordPtr(SKW_KEY);
-	LPWSTR title = (LPWSTR)(LPCTSTR)data.GetString(SKW_TITLE);
-	bool hasChildren = data.GetBoolean(SKW_HASCHILDREN);
-	int type = data.GetInteger(SKW_TYPE);
-
-	TVINSERTSTRUCT tvi;
-	tvi.hParent = GetItem(parentKey);
-	tvi.hInsertAfter = TVI_LAST;
-
-	//:CHECK - item or itemex
-	tvi.itemex.pszText = title;
-	//:WARNING - is not single flag!!! (combination)
-	tvi.itemex.mask = TVIF_TEXT | TVIF_PARAM;
-	// TVIF_PARAM: add data. if not set, lParam is not assigned
-	tvi.itemex.lParam = (LPARAM)key;
-	//:CHECK - how to use tvi.itemex.cChildren?
-
-	HTREEITEM hCurrent = Control().InsertItem(&tvi);
-	m_keyMap[key] = hCurrent;
-
-	if (hasChildren) {
-		Control().InsertItem(PRESET::DummyName, hCurrent);
-		Control().Expand(hCurrent, TVE_COLLAPSE);
-	}
-	*/
-
 	Json::Object& data = *pData;
 	DWORD_PTR key = data.GetDwordPtr(SKW_KEY);
 
@@ -721,8 +666,10 @@ HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 	DEBUG_VALID(hItem);
 	DEBUG_LOG(WStr::Format(L"AddItem: %s", Control().GetItemText(hItem)));
 
-	Control().SetItemData(hItem, key);
 	m_keyMap[key] = hItem;
+
+	Control().SetItemData(hItem, key);
+	Control().SetCheck(hItem, pData->GetBoolean(SKW_CHECKED));
 
 	return hItem;
 }
@@ -745,7 +692,7 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 		HTREEITEM hChild = AddItem(hParent,
 			child.GetDwordPtr(SKW_KEY),
 			(LPWSTR)(LPCTSTR)child.GetString(SKW_TITLE),
-			child.GetBoolean(SKW_HASCHILDREN),
+			child.GetBoolean(SKW_CHECKED),
 			child.GetInteger(SKW_TYPE)
 		);
 
@@ -767,15 +714,6 @@ void Component::ModelPanel::CheckItem(Json::Object* pData)
 
 
 
-void Component::ModelPanel::CollapseItem(Json::Object* pData)
-{
-	DisableNotification(
-		Control().Expand(GetItem(pData->GetDwordPtr(SKW_KEY)), TVE_COLLAPSE)
-	);
-}
-
-
-
 void Component::ModelPanel::DeleteItem(Json::Object* pData)
 {
 	DisableNotification(
@@ -788,7 +726,10 @@ void Component::ModelPanel::DeleteItem(Json::Object* pData)
 void Component::ModelPanel::ExpandItem(Json::Object* pData)
 {
 	DisableNotification(
-		Control().Expand(GetItem(pData->GetDwordPtr(SKW_KEY)), TVE_EXPAND)
+		Control().Expand(GetItem(
+			pData->GetDwordPtr(SKW_KEY)),
+			pData->GetBoolean(SKW_EXPAND) ? TVE_EXPAND : TVE_COLLAPSE
+		)
 	);
 }
 
@@ -796,28 +737,6 @@ void Component::ModelPanel::ExpandItem(Json::Object* pData)
 
 void Component::ModelPanel::ExpandParent(Json::Object* pData)
 {
-	/*
-	HTREEITEM hItem = GetItem(pData->GetDwordPtr(SKW_KEY));
-	HTREEITEM hParent = hItem;
-	std::list<HTREEITEM> ancestor;
-
-	while (hParent != nullptr) {
-		DEBUG_LOG(WStr::Format(L"Expand %s", (LPCTSTR)Control().GetItemText(hParent)));
-		ancestor.push_front(hParent);
-		hParent = Control().GetParentItem(hParent);
-	}
-
-	ancestor.pop_back();
-	// Expand root to child
-	for (auto item : ancestor) {
-		Control().Expand(item, TVE_EXPAND);
-	}
-
-	DisableNotification(
-		Control().SelectItem(hItem)
-	);
-	*/
-
 	HTREEITEM hItem = GetItem(pData->GetDwordPtr(SKW_KEY));
 	DEBUG_VALID(hItem);
 
@@ -835,7 +754,7 @@ void Component::ModelPanel::SelectItem(Json::Object* pData)
 	DEBUG_VALID(hItem);
 
 	CBCGPGridRow* pRow = Control().TreeItem(hItem);
-	pRow->Select(pData->GetDwordPtr(SKW_VALUE));
+	pRow->Select(pData->GetDwordPtr(SKW_FLAG));
 }
 
 //--------------------------------------------------------------------------------------------------

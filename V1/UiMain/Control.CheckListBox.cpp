@@ -24,15 +24,15 @@ Control::CheckListBox::CheckListBox()
 
 
 
-void Control::CheckListBox::AddItem(UINT resourceId)
+void Control::CheckListBox::AddItem(UINT id)
 {
 	CString title, desc;
-	Facility::GetResource(resourceId, title, desc);
+	Facility::GetResource(id, title, desc);
 	int index = AddString(title);
 	SetItemDescription(index, desc);
 
 	CBCGPSVGImage* pImage = new CBCGPSVGImage();
-	BOOL success = pImage->Load(resourceId);
+	BOOL success = pImage->Load(id);
 	m_ImageList.AddSVG(pImage);
 
 	ASSERT(success);
@@ -43,7 +43,7 @@ void Control::CheckListBox::AddItem(UINT resourceId)
 
 
 
-void Control::CheckListBox::AddItems(std::vector<UINT> ids, CSize imageSize)
+void Control::CheckListBox::AddItems(const ResourceIds& ids, CSize imageSize)
 {
 	m_hImageList = NULL;
 	m_ImageList.Clear();
@@ -59,7 +59,7 @@ void Control::CheckListBox::AddItems(std::vector<UINT> ids, CSize imageSize)
 
 
 
-void Control::CheckListBox::SetImageList(std::vector<UINT> ids, CSize imageSize)
+void Control::CheckListBox::SetImageList(const ResourceIds& ids, CSize imageSize)
 {
 	m_hImageList = NULL;
 	m_ImageList.Clear();

@@ -17,7 +17,7 @@ struct EventWrapper
     int Type;                   // WorkerThread::Event
     int Id = -1;                // Any id
     void* EventData = nullptr;  // Data buffer
-    bool Array = false;         // Is EventData array?
+    bool IsArray = false;         // Is EventData array?
 
     EventWrapper(int type, int id = -1, void* pEventData = nullptr, void* pArrayData = nullptr);
 

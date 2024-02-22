@@ -428,8 +428,8 @@ void Signal::View::OnInitialize(DWORD_PTR hWnd, CString path)
 	data.SetDwordPtr(SKW_HWND, hWnd);
 	data.SetString(SKW_FILEPATH, path);
 
-	//Wrapper().SendData(data);
-	Wrapper().PostData(data);
+	Wrapper().SendData(data);
+	//Wrapper().PostData(data);
 }
 
 
@@ -711,12 +711,13 @@ void Signal::ModelPanel::OnItemShow(DWORD_PTR key, bool show)
 }
 
 
+
 void Signal::ModelPanel::RedrawTree(bool value)
 {
 	Json::Object data;
 	ConstructData(data, Action::RedrawTree);
 
-	data.SetBoolean(SKW_REDRAW, value);
+	data.SetBoolean(SKW_FLAG, value);
 
 	Wrapper().SendData(data);
 }
@@ -731,7 +732,7 @@ void Signal::ModelPanel::AddItem(TreeItem& item)
 	data.SetDwordPtr(SKW_PARENT, item.ParentKey);
 	data.SetDwordPtr(SKW_KEY, item.Key);
 	data.SetString(SKW_TITLE, item.Title);
-	data.SetBoolean(SKW_HASCHILDREN, item.HasChildren);
+	data.SetBoolean(SKW_CHECKED, item.Checked);
 	data.SetInteger(SKW_TYPE, (int)item.Type);
 
 	Wrapper().SendData(data);
@@ -739,13 +740,12 @@ void Signal::ModelPanel::AddItem(TreeItem& item)
 
 
 
-void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items, bool expanded)
+void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items)
 {
 	Json::Object data;
 	ConstructData(data, Action::AddChildren);
 
 	data.SetDwordPtr(SKW_PARENT, parentKey);
-	data.SetBoolean(SKW_EXPANDED, expanded);
 
 	Json::Array& nodes = data.CreateArray(SKW_CHILDREN);
 	for (auto& item : items) {
@@ -754,7 +754,7 @@ void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items, bool
 		// ignore TreeItem.Parent
 		child.SetDwordPtr(SKW_KEY, item.Key);
 		child.SetString(SKW_TITLE, item.Title);
-		child.SetBoolean(SKW_HASCHILDREN, item.HasChildren);
+		child.SetBoolean(SKW_CHECKED, item.Checked);
 		child.SetInteger(SKW_TYPE, (int)item.Type);
 	}
 
@@ -776,13 +776,6 @@ void Signal::ModelPanel::CheckItem(DWORD_PTR key, bool checked)
 
 
 
-void Signal::ModelPanel::CollapseItem(DWORD_PTR key)
-{
-	SendKeyData(Action::CollapseItem);
-}
-
-
-
 void Signal::ModelPanel::DeleteItem(DWORD_PTR key)
 {
 	SendKeyData(Action::DeleteItem);
@@ -790,9 +783,13 @@ void Signal::ModelPanel::DeleteItem(DWORD_PTR key)
 
 
 
-void Signal::ModelPanel::ExpandItem(DWORD_PTR key)
+void Signal::ModelPanel::ExpandItem(DWORD_PTR key, bool expand)
 {
-	SendKeyData(Action::ExpandItem);
+	Json::Object data;
+	ConstructData(data, Action::ExpandItem);
+
+	data.SetDwordPtr(SKW_KEY, key);
+	data.SetBoolean(SKW_EXPAND, expand);
 }
 
 
@@ -810,7 +807,7 @@ void Signal::ModelPanel::SelectItem(DWORD_PTR key, bool select)
 	ConstructData(data, Action::SelectItem);
 
 	data.SetDwordPtr(SKW_KEY, key);
-	data.SetBoolean(SKW_VALUE, select);
+	data.SetBoolean(SKW_FLAG, select);
 
 	Wrapper().SendData(data);
 }

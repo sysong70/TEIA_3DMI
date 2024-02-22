@@ -29,7 +29,7 @@ namespace Control
 
 		CBCGPButton* AddButton(UINT id, bool menu = false);
 
-		void AddButtons(const std::vector<UINT>& ids);
+		void AddButtons(const ResourceIds& ids);
 
 		void AddSeperator();
 
@@ -45,7 +45,7 @@ namespace Control
 
 	public: // ButtonWithMenu
 
-		CBCGPButton* AddButtonWithMenu(UINT id, const std::vector<UINT>& menus);
+		CBCGPButton* AddButtonWithMenu(UINT id, const ResourceIds& menus);
 
 		void CheckMenu(UINT id, UINT menuId, bool radioType = false);
 

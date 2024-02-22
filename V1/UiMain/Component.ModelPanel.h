@@ -69,15 +69,13 @@ namespace Component
 	private: // Signal responser
 
 		// use in AddChildren()
-		HTREEITEM AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool hasChildren, int type);
+		HTREEITEM AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool checked, int type);
 
 		HTREEITEM AddItem(Json::Object* pData);
 
 		void AddChildren(Json::Object* pData);
 
 		void CheckItem(Json::Object* pData);
-
-		void CollapseItem(Json::Object* pData);
 
 		void DeleteItem(Json::Object* pData);
 

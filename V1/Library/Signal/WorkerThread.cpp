@@ -18,7 +18,7 @@ EventWrapper::EventWrapper(int type, int id, void* pEventData, void* pArrayData)
 	
 	if (pArrayData != nullptr) {
 		EventData = pArrayData;
-		Array = true;
+		IsArray = true;
 	}
 }
 
@@ -26,7 +26,7 @@ EventWrapper::EventWrapper(int type, int id, void* pEventData, void* pArrayData)
 
 EventWrapper::~EventWrapper()
 {
-	if (Array) {
+	if (IsArray) {
 		REMOVE_ARRAY(EventData);
 	}
 	else {

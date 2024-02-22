@@ -53,7 +53,7 @@ class ButtonWithMenu : public CBCGPMenuButton
 {
 public:
 
-	void AddMenu(const std::vector<UINT>& menus)
+	void AddMenu(const Control::ResourceIds& menus)
 	{
 		BOOL success = m_menu.CreateMenu();
 		ASSERT(success);
@@ -154,7 +154,7 @@ CBCGPButton* Control::ToolBar::AddButton(UINT id, bool menu)
 
 
 
-void Control::ToolBar::AddButtons(const std::vector<UINT>& ids)
+void Control::ToolBar::AddButtons(const ResourceIds& ids)
 {
 	for (auto id : ids) {
 		if (id != 0) {
@@ -226,7 +226,7 @@ void Control::ToolBar::SetUncheckOthers(UINT id)
 
 //--------------------------------------------------------------------------------------------------
 
-CBCGPButton* Control::ToolBar::AddButtonWithMenu(UINT id, const std::vector<UINT>& menus)
+CBCGPButton* Control::ToolBar::AddButtonWithMenu(UINT id, const ResourceIds& menus)
 {
 	ButtonWithMenu* button = (ButtonWithMenu*)CreateButton(id, true);
 	m_buttons.push_back(button);
