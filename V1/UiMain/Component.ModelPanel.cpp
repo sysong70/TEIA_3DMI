@@ -659,10 +659,9 @@ HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR
 
 HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 {
-	Json::Object& data = *pData;
-	DWORD_PTR key = data.GetDwordPtr(SKW_KEY);
+	DWORD_PTR key = pData->GetDwordPtr(SKW_KEY);
 
-	HTREEITEM hItem = Control().InsertItem(data.GetString(SKW_TITLE), GetItem(data.GetDwordPtr(SKW_PARENT)));
+	HTREEITEM hItem = Control().InsertItem(pData->GetString(SKW_TITLE), GetItem(pData->GetDwordPtr(SKW_PARENT)));
 	DEBUG_VALID(hItem);
 	DEBUG_LOG(WStr::Format(L"AddItem: %s", Control().GetItemText(hItem)));
 
@@ -678,10 +677,9 @@ HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 
 void Component::ModelPanel::AddChildren(Json::Object* pData)
 {
-	Json::Object& data = *pData;
-	Json::Array& items = data.GetArray(SKW_CHILDREN);
+	Json::Array& items = pData->GetArray(SKW_CHILDREN);
 
-	HTREEITEM hParent = GetItem(data.GetDwordPtr(SKW_PARENT));
+	HTREEITEM hParent = GetItem(pData->GetDwordPtr(SKW_PARENT));
 	DEBUG_LOG(WStr::Format(L"AddChildren: %s", Control().GetItemText(hParent)));
 
 	BOOL checked = Control().GetCheck(hParent);
@@ -689,17 +687,13 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 	for (auto item : items.GetBuffer()) {
 		Json::Object& child = item->AsObject();
 
-		HTREEITEM hChild = AddItem(hParent,
+		HTREEITEM hChild = AddItem(
+			hParent,
 			child.GetDwordPtr(SKW_KEY),
 			(LPWSTR)(LPCTSTR)child.GetString(SKW_TITLE),
 			child.GetBoolean(SKW_CHECKED),
 			child.GetInteger(SKW_TYPE)
 		);
-
-		// parent checked state
-		if (checked) {
-			Control().SetCheck(hChild);
-		}
 	}
 }
 
