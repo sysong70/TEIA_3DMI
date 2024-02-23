@@ -5,31 +5,22 @@
 /// Delivery Keywords
 
 #define SKW_ACTION			"Action"
-#define SKW_CALLBACK		"Callback"
 #define SKW_CHAR			"Char"
 #define SKW_CHECKED			"checked" // lower case
 #define SKW_CHILDREN		"Children"
 #define SKW_CLEAR			"Clear"
 #define SKW_COLUMN			"Column"
 #define SKW_DEFAULTVALUE	"Default"
-#define SKW_Delivery		"Delivery"
 #define SKW_DELTA			"Delta"
 #define SKW_DESCRIPTION		"Description"
-#define SKW_DOCID			"DocId"
 #define SKW_DPISCALE		"DpiScale"
-#define SKW_EVENT			"Event"
-#define SKW_EXPANDED		"Expanded"
+#define SKW_EXPAND			"Expand"
 #define SKW_FILEPATH		"FilePath"
 #define SKW_FLAG			"Flag"
 #define SKW_GLOBALNAME		"GlobalName"
 #define SKW_GROUPNAME		"GroupName"
-#define SKW_HASCHILDREN		"HasChildren"
-#define SKW_HEIGHT			"Height"
 #define SKW_HWND			"HWND"
 #define SKW_ID				"Id"
-#define SKW_INITIALIZE		"Initialize"
-#define SKW_ITEM			"Item"
-#define SKW_ITEMS			"Items"
 #define SKW_KEY				"Key"
 #define SKW_MAX				"Max"
 #define SKW_MESSAGE			"Message"
@@ -38,28 +29,21 @@
 #define SKW_OPTIONS			"Options"
 #define SKW_OSNAPID			"OsnapId"
 #define SKW_PARENT			"Parent"
-#define SKW_REDRAW			"Redraw"
 #define SKW_POSITION		"Position"
 #define SKW_RECT			"Rect"
-#define SKW_REFERENCE		"reference" // UI, ...
+#define SKW_REPCNT			"RepCnt"
 #define SKW_ROW				"Row"
 #define SKW_STATUS			"Status"
 #define SKW_TARGET			"Target"
 #define SKW_TITLE			"Title"
 #define SKW_TOOLTIP			"Tooltip"
 #define SKW_TYPE			"Type"
-#define SKW_USERDATA		"UserData"
 #define SKW_VALID			"Valid"
 #define SKW_VALUE			"Value"
 #define SKW_VIEWID			"ViewId"
-#define SKW_WIDTH			"Width"
 #define SKW_X				"x"  // lower case
 #define SKW_Y				"y"  // lower case
 #define SKW_Z				"z"  // lower case
-
-#define SKW_CHAR			"Char"
-#define SKW_REPCNT			"RepCnt"
-#define SKW_FLAGS			"Flags"
 
 //--------------------------------------------------------------------------------------------------
 
@@ -119,7 +103,7 @@ namespace Signal
 		DWORD_PTR ParentKey = 0;
 		DWORD_PTR Key = 0;
 		CString Title;
-		bool HasChildren = false;
+		bool Checked = true;
 		ETreeItem Type = ETreeItem::Unknown;
 	};
 
@@ -545,9 +529,9 @@ namespace Signal
 		void OnItemDblClicked(DWORD_PTR key);
 
 		void OnItemDeleted(DWORD_PTR key);
-		// response AddChildren();
+
 		void OnItemExpanded(DWORD_PTR key);
-		// highlight item?
+
 		void OnItemSelected(DWORD_PTR key);
 
 		void OnItemShow(DWORD_PTR key, bool show);
@@ -560,19 +544,17 @@ namespace Signal
 
 		void AddItem(TreeItem& item);
 		// ignore TreeItem.Parent
-		void AddChildren(DWORD_PTR parentKey, TreeItems& items, bool expanded = false);
+		void AddChildren(DWORD_PTR parentKey, TreeItems& items);
 
 		void CheckItem(DWORD_PTR key, bool checked);
 
-		void CollapseItem(DWORD_PTR key);
-
 		void DeleteItem(DWORD_PTR key);
-		// expand children
-		void ExpandItem(DWORD_PTR key);
+		// expand or collapse
+		void ExpandItem(DWORD_PTR key, bool expand = true);
 		// expand from root to item
 		void ExpandParent(DWORD_PTR key);
 
-		void SelectItem(DWORD_PTR key);
+		void SelectItem(DWORD_PTR key, bool select = true);
 	};
 
 
@@ -628,7 +610,7 @@ namespace Signal
 
 		Delivery(int viewId, void (*sender)(const wchar_t*));
 
-		~Delivery() {}
+		virtual ~Delivery();
 
 	public:
 
@@ -648,6 +630,8 @@ namespace Signal
 		void SetSender(void (*func)(const wchar_t*));
 
 		void SendData(Json::Object& data);
+
+		void PostData(Json::Object& data);
 	};
 };
 

@@ -176,12 +176,14 @@
     <ClInclude Include="..\Library\Common\Path.h" />
     <ClInclude Include="..\Library\Common\WStr.h" />
     <ClInclude Include="..\Library\Signal\Signal.h" />
+    <ClInclude Include="..\Library\Signal\WorkerThread.h" />
     <ClInclude Include="Command.Base.h" />
     <ClInclude Include="Command.Common.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="Command.Test.h" />
     <ClInclude Include="Command.VisualEffects3d.h" />
     <ClInclude Include="Control.FloatValueEdit.h" />
+    <ClInclude Include="Control.PopupMenu.h" />
     <ClInclude Include="Control.TaskPanel.h" />
     <ClInclude Include="Control.CheckListBox.h" />
     <ClInclude Include="Control.Property.h" />
@@ -239,10 +241,12 @@
     <ClCompile Include="..\Library\Common\Path.cpp" />
     <ClCompile Include="..\Library\Common\WStr.cpp" />
     <ClCompile Include="..\Library\Signal\Signal.cpp" />
+    <ClCompile Include="..\Library\Signal\WorkerThread.cpp" />
     <ClCompile Include="Command.Base.cpp" />
     <ClCompile Include="Command.Test.cpp" />
     <ClCompile Include="Command.VisualEffects3d.cpp" />
     <ClCompile Include="Control.FloatValueEdit.cpp" />
+    <ClCompile Include="Control.PopupMenu.cpp" />
     <ClCompile Include="Control.TaskPanel.cpp" />
     <ClCompile Include="Control.CheckListBox.cpp" />
     <ClCompile Include="Control.cpp" />

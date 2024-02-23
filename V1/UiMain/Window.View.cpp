@@ -63,7 +63,6 @@ Window::View::~View()
 Signal::Delivery& Window::View::GetDelivery()
 {
 	return Connector3d::GetInstance(m_nViewId);
-	//return m_delivery;
 }
 
 

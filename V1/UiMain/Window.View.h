@@ -106,8 +106,6 @@ namespace Window
 		bool m_bRenderer = false;
 		bool m_bActivate = false;
 
-		//Signal::Delivery m_delivery;
-
 		void Activate(bool value);
 
 		CRect GetClientArea();

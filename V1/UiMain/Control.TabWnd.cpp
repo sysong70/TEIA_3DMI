@@ -25,7 +25,7 @@ Control::TabWnd::TabWnd()
 
 
 
-void Control::TabWnd::SetImageList(std::vector<UINT> ids, CSize imageSize)
+void Control::TabWnd::SetImageList(const ResourceIds& ids, CSize imageSize)
 {
 	m_sizeImage = imageSize;
 

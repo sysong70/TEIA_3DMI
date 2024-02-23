@@ -131,6 +131,7 @@
     <ClInclude Include="..\Common\Path.h" />
     <ClInclude Include="..\Common\WStr.h" />
     <ClInclude Include="..\Signal\Signal.h" />
+    <ClInclude Include="..\Signal\WorkerThread.h" />
     <ClInclude Include="3DF.Canvas.h" />
     <ClInclude Include="3DF.Model.h" />
     <ClInclude Include="3DF\ApplicationWindowOption.h" />
@@ -223,6 +224,7 @@
     <ClCompile Include="..\Common\Path.cpp" />
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\Signal\Signal.cpp" />
+    <ClCompile Include="..\Signal\WorkerThread.cpp" />
     <ClCompile Include="3DF.Application.cpp" />
     <ClCompile Include="3DF.Canvas.cpp" />
     <ClCompile Include="3DF.Model.cpp" />

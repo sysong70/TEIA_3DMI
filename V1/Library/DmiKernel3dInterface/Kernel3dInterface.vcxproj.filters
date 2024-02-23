@@ -114,6 +114,9 @@
     <ClInclude Include="Operator.ModelPanel.h">
       <Filter>Operator</Filter>
     </ClInclude>
+    <ClInclude Include="..\Signal\WorkerThread.h">
+      <Filter>_Signal</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -193,6 +196,9 @@
     </ClCompile>
     <ClCompile Include="Operator.ModelPanel.cpp">
       <Filter>Operator</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Signal\WorkerThread.cpp">
+      <Filter>_Signal</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -6,20 +6,19 @@
 
 namespace Control
 {
-	class CheckListBox : public CBCGPCheckListBox
+	class PopupMenu : public CBCGPListBox
 	{
 	public:
 
-		CheckListBox();
+		PopupMenu();
 
 	public:
 
-		// Get image, string, tooltip from resource
-		void AddItem(UINT resourceId);
+		void AddItem(UINT id);
 
 		void AddItems(const ResourceIds& ids, CSize imageSize);
 
-		void SetImageList(const ResourceIds& ids, CSize imageSize);
+		void SetCheckItems(const ResourceIds& ids);
 
 	protected:
 

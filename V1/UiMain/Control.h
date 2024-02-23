@@ -6,6 +6,7 @@ namespace Control
 {
 	// Other
 	class CheckListBox;		// CBCGPCheckListBox
+	class PopupMenu;		// CBCGPListBox
 	class TabWnd;			// CBCGPTabWnd
 	// Panel
 	class Panel;			// CWnd
@@ -23,6 +24,7 @@ namespace Control
 
 
 	using Controls = std::list<CWnd*>;
+	using ResourceIds = std::vector<UINT>;
 
 
 

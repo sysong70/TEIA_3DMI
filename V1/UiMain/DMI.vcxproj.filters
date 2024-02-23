@@ -169,6 +169,12 @@
     <ClCompile Include="Dialog.Folders.cpp">
       <Filter>Dialog\Modal</Filter>
     </ClCompile>
+    <ClCompile Include="..\Library\Signal\WorkerThread.cpp">
+      <Filter>Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.PopupMenu.cpp">
+      <Filter>Control\Other</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.Common.h">
@@ -353,6 +359,12 @@
     </ClInclude>
     <ClInclude Include="Dialog.Folders.h">
       <Filter>Dialog\Modal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Library\Signal\WorkerThread.h">
+      <Filter>Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.PopupMenu.h">
+      <Filter>Control\Other</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

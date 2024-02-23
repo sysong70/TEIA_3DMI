@@ -6,6 +6,11 @@ Json::Object data; \
 ConstructData(data, action); \
 Wrapper().SendData(data);
 
+#define PostActionDataOnly(action) \
+Json::Object data; \
+ConstructData(data, action); \
+Wrapper().PostData(data);
+
 //**************************************************************************************************
 
 #pragma region Application Class
@@ -424,6 +429,7 @@ void Signal::View::OnInitialize(DWORD_PTR hWnd, CString path)
 	data.SetString(SKW_FILEPATH, path);
 
 	Wrapper().SendData(data);
+	//Wrapper().PostData(data);
 }
 
 
@@ -705,12 +711,13 @@ void Signal::ModelPanel::OnItemShow(DWORD_PTR key, bool show)
 }
 
 
+
 void Signal::ModelPanel::RedrawTree(bool value)
 {
 	Json::Object data;
 	ConstructData(data, Action::RedrawTree);
 
-	data.SetBoolean(SKW_REDRAW, value);
+	data.SetBoolean(SKW_FLAG, value);
 
 	Wrapper().SendData(data);
 }
@@ -725,7 +732,7 @@ void Signal::ModelPanel::AddItem(TreeItem& item)
 	data.SetDwordPtr(SKW_PARENT, item.ParentKey);
 	data.SetDwordPtr(SKW_KEY, item.Key);
 	data.SetString(SKW_TITLE, item.Title);
-	data.SetBoolean(SKW_HASCHILDREN, item.HasChildren);
+	data.SetBoolean(SKW_CHECKED, item.Checked);
 	data.SetInteger(SKW_TYPE, (int)item.Type);
 
 	Wrapper().SendData(data);
@@ -733,13 +740,12 @@ void Signal::ModelPanel::AddItem(TreeItem& item)
 
 
 
-void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items, bool expanded)
+void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items)
 {
 	Json::Object data;
 	ConstructData(data, Action::AddChildren);
 
 	data.SetDwordPtr(SKW_PARENT, parentKey);
-	data.SetBoolean(SKW_EXPANDED, expanded);
 
 	Json::Array& nodes = data.CreateArray(SKW_CHILDREN);
 	for (auto& item : items) {
@@ -748,7 +754,7 @@ void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items, bool
 		// ignore TreeItem.Parent
 		child.SetDwordPtr(SKW_KEY, item.Key);
 		child.SetString(SKW_TITLE, item.Title);
-		child.SetBoolean(SKW_HASCHILDREN, item.HasChildren);
+		child.SetBoolean(SKW_CHECKED, item.Checked);
 		child.SetInteger(SKW_TYPE, (int)item.Type);
 	}
 
@@ -770,13 +776,6 @@ void Signal::ModelPanel::CheckItem(DWORD_PTR key, bool checked)
 
 
 
-void Signal::ModelPanel::CollapseItem(DWORD_PTR key)
-{
-	SendKeyData(Action::CollapseItem);
-}
-
-
-
 void Signal::ModelPanel::DeleteItem(DWORD_PTR key)
 {
 	SendKeyData(Action::DeleteItem);
@@ -784,9 +783,13 @@ void Signal::ModelPanel::DeleteItem(DWORD_PTR key)
 
 
 
-void Signal::ModelPanel::ExpandItem(DWORD_PTR key)
+void Signal::ModelPanel::ExpandItem(DWORD_PTR key, bool expand)
 {
-	SendKeyData(Action::ExpandItem);
+	Json::Object data;
+	ConstructData(data, Action::ExpandItem);
+
+	data.SetDwordPtr(SKW_KEY, key);
+	data.SetBoolean(SKW_EXPAND, expand);
 }
 
 
@@ -798,9 +801,15 @@ void Signal::ModelPanel::ExpandParent(DWORD_PTR key)
 
 
 
-void Signal::ModelPanel::SelectItem(DWORD_PTR key)
+void Signal::ModelPanel::SelectItem(DWORD_PTR key, bool select)
 {
-	SendKeyData(Action::SelectItem);
+	Json::Object data;
+	ConstructData(data, Action::SelectItem);
+
+	data.SetDwordPtr(SKW_KEY, key);
+	data.SetBoolean(SKW_FLAG, select);
+
+	Wrapper().SendData(data);
 }
 
 #undef SendKeyData
@@ -889,6 +898,12 @@ Signal::Delivery::Delivery(int viewId, void(*sender)(const wchar_t*))
 
 
 
+Signal::Delivery::~Delivery()
+{
+}
+
+
+
 void Signal::Delivery::SetSender(void (*func)(const wchar_t*))
 {
 	SendSignal = func;
@@ -899,10 +914,31 @@ void Signal::Delivery::SetSender(void (*func)(const wchar_t*))
 void Signal::Delivery::SendData(Json::Object& data)
 {
 	DEBUG_VALID(SendSignal);
-
 	if (SendSignal != nullptr) {
 		SendSignal(data.ToString().GetBuffer());
 	}
+}
+
+#include <thread>
+#pragma warning(disable : 4996)
+
+void Signal::Delivery::PostData(Json::Object& data)
+{
+	CString stream = data.ToString();
+	const wchar_t* pStream = stream.GetBuffer();
+
+	size_t length = ::wcslen(pStream);
+	wchar_t* pData = new wchar_t[length + 1];
+	::wcsncpy(pData, pStream, length);
+	pData[length] = 0;
+
+	std::thread([this, pData]() {
+		if (SendSignal != nullptr) {
+			SendSignal(pData);
+		}
+
+		delete [] pData;
+	}).detach();
 }
 
 #pragma endregion //:REGION

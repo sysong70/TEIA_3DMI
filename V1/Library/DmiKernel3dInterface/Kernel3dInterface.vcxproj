@@ -125,6 +125,7 @@
     <ClInclude Include="..\Common\Path.h" />
     <ClInclude Include="..\Common\WStr.h" />
     <ClInclude Include="..\Signal\Signal.h" />
+    <ClInclude Include="..\Signal\WorkerThread.h" />
     <ClInclude Include="Impl\Kernel.DocViewImpl.h" />
     <ClInclude Include="Impl\Operator.HighlightObjectSnapImpl.h" />
     <ClInclude Include="Impl\OperatorImpl.h" />
@@ -157,6 +158,7 @@
     <ClCompile Include="..\Common\Path.cpp" />
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\Signal\Signal.cpp" />
+    <ClCompile Include="..\Signal\WorkerThread.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Impl\Kernel.DocViewImpl.cpp" />
     <ClCompile Include="Impl\Operator.HighlightObjectSnapImpl.cpp" />
