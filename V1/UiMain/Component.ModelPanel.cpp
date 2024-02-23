@@ -682,18 +682,32 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 	HTREEITEM hParent = GetItem(pData->GetDwordPtr(SKW_PARENT));
 	DEBUG_LOG(WStr::Format(L"AddChildren: %s", Control().GetItemText(hParent)));
 
-	BOOL checked = Control().GetCheck(hParent);
+	//bool checked = Control().GetCheck(hParent);
+
+	int childCount = 0;
+	int checkedCount = 0;
+	HTREEITEM hChild = nullptr;
 
 	for (auto item : items.GetBuffer()) {
 		Json::Object& child = item->AsObject();
 
-		HTREEITEM hChild = AddItem(
+		bool checked = child.GetBoolean(SKW_CHECKED);
+		childCount++;
+		checkedCount += checked ? 1 : 0;
+
+		hChild = AddItem(
 			hParent,
 			child.GetDwordPtr(SKW_KEY),
 			(LPWSTR)(LPCTSTR)child.GetString(SKW_TITLE),
-			child.GetBoolean(SKW_CHECKED),
+			checked,
 			child.GetInteger(SKW_TYPE)
 		);
+	}
+
+	if (childCount != checkedCount) {
+		// use last item
+		auto row = Control().TreeItem(hChild);
+		row->UpdateParentCheckbox();
 	}
 }
 
