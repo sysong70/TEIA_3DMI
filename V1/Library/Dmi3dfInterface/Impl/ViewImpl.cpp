@@ -12,7 +12,6 @@
 #include <HBaseModel.h>
 #include <HEventManager.h>
 #include <HBhvBehaviorManager.h>
-#include <HEventManager.h>
 #include <HMarkupManager.h>
 #include <HSharedKey.h>
 #include <HUtilityGeomHandle.h>
@@ -579,19 +578,26 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 	Update();
 }
 
+void H3DF::BaseView::SetModel(H3DF::Model * model)
+{
+	m_pModel = (HBaseModel *)model;
+}
+
 void H3DF::BaseView::SetNavigationCube(NavigationCube * pcNaviCube)
 {
 	m_pcNaviCube = pcNaviCube;
 }
 
 //== ViewPrivate Class =============================================================================
-
-H3DF::ViewImpl::ViewImpl()
-{
-}
-
 H3DF::ViewImpl::~ViewImpl()
 {
+	if (nullptr != m_pcBaseView) {
+		m_pcBaseView->SetSuppressUpdate(true);
+
+		// 삭제할때 문제가 EventManager에서 문제가 발생해서 model을 null로 설정하고 삭제함.
+		m_pcBaseView->SetModel(nullptr);
+		delete m_pcBaseView;
+ 	}
 }
 
 void H3DF::ViewImpl::Copy(const ViewImpl * pcInThat)
@@ -640,6 +646,17 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	}
 
 	m_pcBaseView->Init();
+
+// 	HSOpMoveHandle * handleoperator = new HSOpMoveHandle(m_pcBaseView, this, false);
+// 	m_pHView->SetHandleOperator(handleoperator);
+// 	m_pHView->GetEventManager()->RegisterHandler(
+// 		(HObjectManipulationListener *)handleoperator, HObjectManipulationListener::GetType(), HLISTENER_PRIORITY_NORMAL);
+// 
+// 
+// 	m_pcBaseView->GetEventManager()->RegisterHandler(
+// 		(HJoyStickListener *)this, HJoyStickListener::GetType(), HLISTENER_PRIORITY_NORMAL);
+
+	pcModelImpl->GetEventManager()->RegisterHandler((HUpdateListener *)m_pcBaseView, HUpdateListener::GetType(), HLISTENER_PRIORITY_NORMAL);
 
 	// View Segment Key 설정.View Segment에는 향후 사용하기 위한 Base View 정보를 추가해놓는다.
 	m_cKey.Set(m_pcBaseView->GetViewKey());
@@ -690,12 +707,12 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	
 	SetDriverOption();
 
-	HC_Open_Segment_By_Key(m_pcBaseView->GetConstructionKey()); {
-		// 		if (true == TheKenel.Appearance.AntiAliasing.Use) {
-		// 			// Rendering Option에서는 Screen On만 설정한다.
-		// 			HC_Set_Rendering_Options("anti-alias = (screen = on)");
-		// 		}
-	} HC_Close_Segment();
+//	HC_Open_Segment_By_Key(m_pcBaseView->GetConstructionKey()); {
+// 		if (true == TheKenel.Appearance.AntiAliasing.Use) {
+// 			// Rendering Option에서는 Screen On만 설정한다.
+// 			HC_Set_Rendering_Options("anti-alias = (screen = on)");
+// 		}
+//	} HC_Close_Segment();
 
 	if (false == TheKenel.Lighting.Light.Scaling) {
 		m_pcBaseView->SetLightScaling(0);
@@ -844,29 +861,29 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	char chHeuristics[MVO_BUFFER_SIZE] = "0";
 	char chNetHeuristics[MVO_BUFFER_SIZE] = "0";
 
-	/*
-		HC_KEY nHighlightStyleKey = m_pcBaseView->GetHighlightSelection()->GetHighlightStyle();
-		HC_Open_Segment_By_Key(nHighlightStyleKey); {
-			HC_Show_Rendering_Options(chRenderingOption);
-			HC_Show_Heuristics(chHeuristics);
-		} HC_Close_Segment();
+/*
+	HC_KEY nHighlightStyleKey = m_pcBaseView->GetHighlightSelection()->GetHighlightStyle();
+	HC_Open_Segment_By_Key(nHighlightStyleKey); {
+		HC_Show_Rendering_Options(chRenderingOption);
+		HC_Show_Heuristics(chHeuristics);
+	} HC_Close_Segment();
 
-		HC_KEY nSelectionSegmentKey = m_pcBaseView->GetHighlightSelection()->GetSelectionSegment();
-		HC_Open_Segment_By_Key(nSelectionSegmentKey); {
-			HC_Show_Rendering_Options(chRenderingOption);
-			HC_Show_Heuristics(chHeuristics);
-		} HC_Close_Segment();
+	HC_KEY nSelectionSegmentKey = m_pcBaseView->GetHighlightSelection()->GetSelectionSegment();
+	HC_Open_Segment_By_Key(nSelectionSegmentKey); {
+		HC_Show_Rendering_Options(chRenderingOption);
+		HC_Show_Heuristics(chHeuristics);
+	} HC_Close_Segment();
 
-		HC_KEY nSceneKey = m_pcBaseView->GetSceneKey();
-		HC_Open_Segment_By_Key(nSceneKey); {
-			HC_Open_Segment("./overwrite/lights/selection_segment"); {
-				HC_Show_Net_Heuristics(chNetHeuristics);
-			}HC_Close_Segment();
+	HC_KEY nSceneKey = m_pcBaseView->GetSceneKey();
+	HC_Open_Segment_By_Key(nSceneKey); {
+		HC_Open_Segment("./overwrite/lights/selection_segment"); {
+			HC_Show_Net_Heuristics(chNetHeuristics);
+		}HC_Close_Segment();
 
-			HC_Show_Rendering_Options(chRenderingOption);
-			HC_Show_Heuristics(chHeuristics);
-		} HC_Close_Segment();
-	*/
+		HC_Show_Rendering_Options(chRenderingOption);
+		HC_Show_Heuristics(chHeuristics);
+	} HC_Close_Segment();
+*/
 
 	SetShowCollisions(ThePreset.ShowCollisions);
 
@@ -885,20 +902,20 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	//apply hiding of overlapped text (or not)
 	m_pcBaseView->SetHideOverlappedText(ThePreset.HideOverlappedText);
 
-	/*
-		HC_Open_Segment_By_Key(m_pcBaseView->GetShadowMapSegmentKey()); {
-			if (ThePreset.ShadowMap) {
-				sprintf(chRenderingOpts, "shadow map=(on, resolution=%d, samples=%d, %s jitter, %s)",
-					ThePreset.SMResolution, ThePreset.SMSamples,
-					(ThePreset.Jitter ? "" : "no"),
-					(ThePreset.ViewDependentShadowMap ? "view dependent" : "view independent"));
-			}
-			else {
-				sprintf(chRenderingOpts, "no shadow map");
-			}
-			HC_Set_Rendering_Options(chRenderingOpts);
-		} HC_Close_Segment();
-	*/
+/*
+	HC_Open_Segment_By_Key(m_pcBaseView->GetShadowMapSegmentKey()); {
+		if (ThePreset.ShadowMap) {
+			sprintf(chRenderingOpts, "shadow map=(on, resolution=%d, samples=%d, %s jitter, %s)",
+				ThePreset.SMResolution, ThePreset.SMSamples,
+				(ThePreset.Jitter ? "" : "no"),
+				(ThePreset.ViewDependentShadowMap ? "view dependent" : "view independent"));
+		}
+		else {
+			sprintf(chRenderingOpts, "no shadow map");
+		}
+		HC_Set_Rendering_Options(chRenderingOpts);
+	} HC_Close_Segment();
+*/
 
 	HC_Open_Segment_By_Key(m_pcBaseView->GetSceneKey()); {
 		HC_Set_Variable_Edge_Weight(Utility::ToChar(ThePreset.LineWeight));
@@ -1023,11 +1040,12 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 
 	// 메모리 소모가 많고 속도에는 큰 도움이 되지 않으므로 사용하지 않는다.
 	m_pcBaseView->GetModel()->SetStaticModel(false);
-	m_pcBaseView->GetModel()->SetLMVModel(true);
+	m_pcBaseView->GetModel()->SetLMVModel(false);
 
 	// WindowKey 선언 위치가 변경되면 않됨. 주의할것.
 	m_pcWindow = new WindowKey(m_pcBaseView);
 
+	// Navigation Cube 설정
 	m_cNaviCube.SetView(m_pcBaseView, m_pcWindow);
 	m_pcBaseView->SetNavigationCube(&m_cNaviCube);
 

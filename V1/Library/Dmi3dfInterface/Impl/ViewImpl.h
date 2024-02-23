@@ -38,6 +38,8 @@ namespace H3DF
 
 		void SetViewDirection(H3DF::ViewDirection::Mode mode, bool bFitWorld = true);
 
+		void SetModel(H3DF::Model * model);
+
 	public:
 		void SetNavigationCube(NavigationCube * pcNaviCube);
 
@@ -50,9 +52,7 @@ namespace H3DF
 	class ViewImpl : public Impl
 	{
 	public:
-		ViewImpl();
 		virtual ~ViewImpl();
-
 		void Copy(const ViewImpl * pcInThat);
 
 		bool Init(H3DF::Model * pcInModel, const char * pchInDriverType, CStringA strInInstanceName, H3DF::WindowHandle nInWindowHandle);

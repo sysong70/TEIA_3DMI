@@ -34,9 +34,30 @@ KERNEL::DocViewImpl::DocViewImpl()
 	}
 }
 
+KERNEL::DocViewImpl::~DocViewImpl()
+{
+	// Operator를 먼저 삭제해야 함.
+	for (auto & pcOperator : m_apcOperator) {
+		if (nullptr != pcOperator) {
+			delete pcOperator;
+		}
+	}
+
+	if (nullptr != m_pcCanvas) {
+		delete m_pcCanvas;
+	}
+}
+
+H3DF::Model & KERNEL::DocViewImpl::GetModel()
+{
+	DEBUG_VALID(m_pcCanvas);
+
+	return m_pcCanvas->GetModel();
+}
+
 H3DF::BaseView * KERNEL::DocViewImpl::GetBaseView()
 {
-	return m_cCanvas.GetFrontView().GetWindowKey().GetBaseView();
+	return GetCanvas().GetFrontView().GetWindowKey().GetBaseView();
 }
 
 Signal::Delivery & KERNEL::DocViewImpl::Delivery() 
@@ -60,7 +81,7 @@ void KERNEL::DocViewImpl::CancelCommands()
 {
 	m_cSelectionResult.Reset();
 	Select().UnhighlightEverything();
-	m_cCanvas.GetFrontView().GetWindowKey().Update();
+	GetCanvas().GetFrontView().GetWindowKey().Update();
 }
 
 void KERNEL::DocViewImpl::AllocationOperator(const DocView * pcInDocView)
@@ -86,7 +107,7 @@ void KERNEL::DocViewImpl::AllocationOperator(const DocView * pcInDocView)
 	pcSelect->SetModelPanel(pcModelPanel);
 
 	// Navigation Cube에서 사용하는 DynHighlightControl을 설정한다. Cube에서 선택된 부분을 Unhighlight하기 위함.
-	m_cCanvas.GetFrontView().GetNavigationCube().SetHighlightControl(pcSelect->DynHighlightControl());
+	GetCanvas().GetFrontView().GetNavigationCube().SetHighlightControl(pcSelect->DynHighlightControl());
 }
 
 KERNEL::Operator::OperatorBase * KERNEL::DocViewImpl::GetOperator(Operator::Type eInType)

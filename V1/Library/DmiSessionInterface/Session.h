@@ -23,7 +23,6 @@ namespace SESSION
 
 		//== View 관련 함수 ==========================================================================
 		void ViewInitialize(Json::Object & cInObject, Signal::Delivery & cInstance);
-		void ViewDestruct();
 		void ViewPaint(Json::Object & cInObject);
 		void ViewResize(Json::Object & cInObject);
 		KERNEL::DocView * GetView();

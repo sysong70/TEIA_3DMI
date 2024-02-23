@@ -330,6 +330,9 @@
     <ClInclude Include="..\Common\File.h">
       <Filter>_Common</Filter>
     </ClInclude>
+    <ClInclude Include="Entity.ModelTree.h">
+      <Filter>3DF\Entity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -589,6 +592,9 @@
     </ClCompile>
     <ClCompile Include="..\Common\File.cpp">
       <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.ModelTree.cpp">
+      <Filter>3DF\Entity</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

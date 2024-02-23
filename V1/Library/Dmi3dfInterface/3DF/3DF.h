@@ -76,8 +76,9 @@ namespace H3DF
 	class WindowPoint;
 	class PixelPoint;
 
-	class NamedStyleDefinition;
+	class Style;
 	class StyleKey;
+	class NamedStyleDefinition;
 
 	class PerformanceKit;
 	class PerformanceControl;
@@ -721,6 +722,10 @@ namespace H3DF
 	
 	using AttributeLockTypeArray = std::vector<AttributeLock::Type, Allocator<AttributeLock::Type>>;
 
+	using StyleKeyArray = std::vector<StyleKey, Allocator<StyleKey>>;
+
+	using ConditionalExpressionArray = std::vector<ConditionalExpression, Allocator<ConditionalExpression>>;
+
 	namespace PMI {
 		class TextAttributes;
 		using TextAttributesArray = std::vector<TextAttributes, Allocator<TextAttributes>>;
@@ -737,8 +742,8 @@ namespace H3DF
 	class API_3DF Impl
 	{
 	public:
-		Impl() {}
-		virtual ~Impl() {}
+		Impl() = default;
+		virtual ~Impl() = default;
 
 		H3DF::Type Type() const;
 		void SetType(H3DF::Type eType);

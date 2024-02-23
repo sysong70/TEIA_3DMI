@@ -157,7 +157,7 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 			break;
 
 		case Signal::View::Action::OnDestruct:
-			pcSession->ViewDestruct();
+			RemoveSession(nViewId);
 			break;
 
 		case Signal::View::Action::OnPaint:
@@ -223,6 +223,16 @@ SESSION::Session * SESSION::Manager::Session::GetSession(int nViewId)
 	Connector::GetInstance(nViewId);
 
 	return pcSession;
+}
+
+void SESSION::Manager::Session::RemoveSession(int nViewId)
+{
+	SESSION::Session * pcSession = m_mpcSessions[nViewId];
+
+	if (nullptr != pcSession) {
+		delete pcSession;
+		m_mpcSessions.erase(nViewId);
+	}
 }
 
 //== Model Panel 명령어 처리 부분 =====================================================================

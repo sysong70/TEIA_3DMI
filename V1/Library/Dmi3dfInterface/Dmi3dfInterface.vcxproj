@@ -154,6 +154,7 @@
     <ClInclude Include="3DF\PointCloud.h" />
     <ClInclude Include="3DF\Selectability.h" />
     <ClInclude Include="3DF\SelectionSet.h" />
+    <ClInclude Include="Entity.ModelTree.h" />
     <ClInclude Include="Impl\CanvasImpl.h" />
     <ClInclude Include="Impl\ModelImpl.h" />
     <ClInclude Include="Impl\ViewImpl.h" />
@@ -244,6 +245,7 @@
     <ClCompile Include="3DF\PointCloud.cpp" />
     <ClCompile Include="3DF\Selectability.cpp" />
     <ClCompile Include="3DF\SelectionSet.cpp" />
+    <ClCompile Include="Entity.ModelTree.cpp" />
     <ClCompile Include="Impl\CanvasImpl.cpp" />
     <ClCompile Include="Impl\ModelImpl.cpp" />
     <ClCompile Include="Impl\ViewImpl.cpp" />

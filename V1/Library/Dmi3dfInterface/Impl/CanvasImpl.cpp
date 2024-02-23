@@ -28,6 +28,15 @@ H3DF::CanvasImpl::~CanvasImpl()
 	if (nullptr != m_pchName) {
 		delete[] m_pchName;
 	}
+
+	if (nullptr != m_pcModel) {
+		delete m_pcModel;
+		m_pcModel = nullptr;
+	}
+
+	for (auto pcView : m_vpcViewArray) {
+		delete pcView;
+	}
 }
 
 void H3DF::CanvasImpl::Copy(const CanvasImpl * pcInThat)
@@ -35,6 +44,8 @@ void H3DF::CanvasImpl::Copy(const CanvasImpl * pcInThat)
 	if (nullptr != pcInThat->m_pchName) {
 		Utility::CopyString(pcInThat->m_pchName, m_pchName);
 	}
+
+	m_pcModel = pcInThat->m_pcModel;
 
 	m_nInWindowHandle = pcInThat->m_nInWindowHandle;
 	m_cApplicationWindowOptionsKit = pcInThat->m_cApplicationWindowOptionsKit;

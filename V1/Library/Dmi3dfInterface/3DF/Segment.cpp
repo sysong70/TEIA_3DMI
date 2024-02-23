@@ -156,10 +156,6 @@ SegmentKey const H3DF::SegmentKey::Subsegment(LPCSTR chFormat, ...)
 	strText.FormatV(chFormat, argList);
 	va_end(argList);
 
-// 	HC_KEY nKey = HC_Create_Segment_Key_By_Key(KeyValue(), Utility::ToChar(strText));
-// 
-// 	SegmentKey cSubsegment(nKey);
-
 	SegmentKeyImpl::LocalOpen(*this);
 	SegmentKey cSubsegment(strText);
 	SegmentKeyImpl::LocalClose(*this);
@@ -277,9 +273,22 @@ IncludeKey H3DF::SegmentKey::IncludeSegment(SegmentKey const & cInSegment)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 	HC_KEY nIncludeKey = HC_Include_Segment_By_Key(cInSegment.KeyValue());
-	IncludeKey cInclude(nIncludeKey);
 	SegmentKeyImpl::LocalClose(*this);
 
+	IncludeKey cInclude(nIncludeKey);
+	return cInclude;
+}
+
+IncludeKey H3DF::SegmentKey::IncludeSegment(SegmentKey const & cInSegment, ConditionalExpression const & cInConditional)
+{
+	CStringA strCodition;
+	cInConditional.ShowCondition(strCodition);
+
+	SegmentKeyImpl::LocalOpen(*this);
+	HC_KEY nIncludeKey = HC_Conditional_Include_By_Key(cInSegment.KeyValue(), strCodition);
+	SegmentKeyImpl::LocalClose(*this);
+
+	IncludeKey cInclude(nIncludeKey);
 	return cInclude;
 }
 

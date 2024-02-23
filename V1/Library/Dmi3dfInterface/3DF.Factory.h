@@ -14,9 +14,9 @@ namespace H3DF
 	class API_3DF Factory : public Sprocket
 	{
 	public:
-		static Canvas CreateCanvas(H3DF::WindowHandle nInWindowHandle, char const * chInName = nullptr, H3DF::ApplicationWindowOptionsKit const & cInOptions = H3DF::ApplicationWindowOptionsKit());
+		static Canvas * CreateCanvas(H3DF::WindowHandle nInWindowHandle, char const * chInName = nullptr, H3DF::ApplicationWindowOptionsKit const & cInOptions = H3DF::ApplicationWindowOptionsKit());
 
-		static View CreateView(CStringA strInName);
+		static View * CreateView(CStringA strInName);
 
 	private:
 		Factory() {}

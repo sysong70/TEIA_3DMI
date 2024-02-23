@@ -7,6 +7,7 @@
 #include "../3DF/Bounding.h"
 #include "../3DF/AttributeLock.h"
 #include "../3DF/Visibility.h"
+#include "../3DF/Condition.h"
 
 #include "../3DF/3DF.Utility.h"
 
@@ -67,14 +68,15 @@ void H3DF::ModelImpl::Init()
 	m_cIncludeModel = m_cIncludeSegment.Subsegment("model");
 	m_cIncludeStyles = m_cIncludeModel.Subsegment("styles");
 
-	// Show/No Show Condtion용 Style 생성
-	m_cShowStyle = m_cIncludeStyles.Subsegment("show");
-	m_cNoShowStyle = m_cIncludeStyles.Subsegment("noshow");
+	// Show Condtion용 Style 생성
+	m_cShowStyle = m_cIncludeStyles.Subsegment("show_style");
+	m_cShowStyle.GetVisibilityControl().SetFaces(true).SetLines(true);
 
-	m_cNoShowStyle.GetAttributeLockControl().SetLock(H3DF::AttributeLock::Type::VisibilityFaces, true);
-	m_cNoShowStyle.GetAttributeLockControl().SetLock(H3DF::AttributeLock::Type::VisibilityLines, true);
-	m_cNoShowStyle.GetVisibilityControl().SetFaces(false);
-	m_cNoShowStyle.GetVisibilityControl().SetLines(false);
+	// No Show Condtion용 Style 생성
+	m_cNoShowStyle = m_cIncludeStyles.Subsegment("noshow_style");
+	m_cNoShowStyle.GetVisibilityControl().SetFaces(false).SetLines(false);
+
+	m_cModels.GetStyleControl().PushSegment(m_cShowStyle);
 
 // 	// 입력된 Matrial을 Face에 적용한다.
 // 	MaterialMappingKit cMaterialMapping;

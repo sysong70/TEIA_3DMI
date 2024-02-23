@@ -18,7 +18,6 @@
 #include <HTools.h>
 #include <HSelectionSet.h>
 #include <HMarkupManager.h>
-#include <HEventManager.h>
 #include <HConstantFrameRate.h>
 #include <HBhvBehaviorManager.h>
 

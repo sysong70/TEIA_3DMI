@@ -39,7 +39,7 @@ namespace H3DF
 
 		void SuppressUpdate(bool bSuppress);
 
-		void Destruct();
+		void Destruct() const;
 		void Resize(int x, int y);
 
 		WindowKey & GetWindowKey() const;

@@ -7,6 +7,25 @@
 
 namespace H3DF
 {
+	class API_3DF Style {
+	public:
+		enum class Type : uint32_t {
+			Segment,
+			Named
+		};
+
+		enum class AppendMode : uint32_t {
+			None,
+			And,
+			Or
+		};
+
+	private:
+		Style() {}
+	};
+
+	using StyleTypeArray = std::vector<Style::Type, Allocator<Style::Type>>;
+
 	class API_3DF NamedStyleDefinition : public Definition
 	{
 	public:
@@ -43,6 +62,15 @@ namespace H3DF
 		StyleControl & operator = (StyleControl const & cInThat);
 
 		StyleKey PushNamed(CStringA strInStyleName);
+		StyleKey PushNamed(CStringA strInStyleName, ConditionalExpression const & cInConditional);
+
 		StyleKey PushSegment(SegmentKey const & cInStyleSource);
+		StyleKey PushSegment(SegmentKey const & cInStyleSource, ConditionalExpression const & cInConditional);
+
+		bool Show(StyleKeyArray & acOutStyles) const;
+		bool Show(StyleTypeArray & cOutTypes, SegmentKeyArray & cOutSegmentSources, AStringArray & astrOutStyleNames, ConditionalExpressionArray & acOutConditions) const;
+
+		bool ShowAllSegment(StyleKeyArray & acOutStyles) const;
+
 	};
 }

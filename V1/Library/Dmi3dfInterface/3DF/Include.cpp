@@ -46,6 +46,9 @@ SegmentKey H3DF::IncludeKey::GetTarget() const
 
 IncludeKey & H3DF::IncludeKey::SetConditionalExpression(ConditionalExpression const & cInConditional)
 {
+	CStringA strText;
+	HC_Show_Include_Segment(KeyValue(), strText.GetBuffer(MVO_BUFFER_SIZE));
+
 	CStringA strCondition;
 	cInConditional.ShowCondition(strCondition);
 	

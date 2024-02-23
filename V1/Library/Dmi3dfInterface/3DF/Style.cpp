@@ -4,6 +4,7 @@
 #include "Segment.h"
 #include "Impl/SegmentImpl.h"
 #include "Portfolio.h"
+#include "Condition.h"
 
 #include "Impl/ControlImpl.h"
 #include "Impl/DefinitionImpl.h"
@@ -158,6 +159,24 @@ StyleKey H3DF::StyleControl::PushNamed(CStringA strInStyleName)
 	return cStyle;
 }
 
+StyleKey H3DF::StyleControl::PushNamed(CStringA strInStyleName, ConditionalExpression const & cInConditional)
+{
+	StyleControlImpl * pcImpl = (StyleControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	CStringA strCondition;
+	if (false == cInConditional.ShowCondition(strCondition)) {
+		DEBUG_STOP;
+	}
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
+	HC_KEY nStyleKey = HC_Conditional_Style(strInStyleName, strCondition);
+	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	StyleKey cStyle(nStyleKey);
+	return cStyle;
+}
+
 StyleKey H3DF::StyleControl::PushSegment(SegmentKey const & cInStyleSource)
 {
 	StyleControlImpl * pcImpl = (StyleControlImpl *)m_pcImpl;
@@ -171,3 +190,92 @@ StyleKey H3DF::StyleControl::PushSegment(SegmentKey const & cInStyleSource)
 	return cStyle;
 }
 
+StyleKey H3DF::StyleControl::PushSegment(SegmentKey const & cInStyleSource, ConditionalExpression const & cInConditional)
+{
+	StyleControlImpl * pcImpl = (StyleControlImpl *)m_pcImpl;
+	if (nullptr == pcImpl) { assert(false); }
+
+	CStringA strCondition;
+	if (false == cInConditional.ShowCondition(strCondition)) {
+		DEBUG_STOP;
+	}
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
+	HC_KEY nStyleKey = HC_Conditional_Style_By_Key(cInStyleSource.KeyValue(), strCondition);
+	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	StyleKey cStyle(nStyleKey);
+	return cStyle;
+}
+
+bool H3DF::StyleControl::Show(StyleKeyArray & acOutStyles) const
+{
+	StyleControlImpl * pcImpl = dynamic_cast<StyleControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	CStringA strStyle;
+	int nStyleCount = 0;
+	char chType[MVO_BUFFER_SIZE];
+	HC_KEY nSegmentKey;
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		HC_Begin_Contents_Search(".", "styles"); {
+			HC_Show_Contents_Count(&nStyleCount);
+
+			for (int nIndex = 0; nIndex < nStyleCount; nIndex++) {
+				HC_Find_Contents(chType, &nSegmentKey);
+
+				StyleKey cStyle(nSegmentKey);
+				acOutStyles.push_back(cStyle);
+			}
+
+		} HC_End_Contents_Search();
+	}
+	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return !acOutStyles.empty();
+}
+
+bool H3DF::StyleControl::Show(StyleTypeArray & cOutTypes, SegmentKeyArray & cOutSegmentSources, AStringArray & astrOutStyleNames, ConditionalExpressionArray & acOutConditions) const
+{
+	StyleControlImpl * pcImpl = dynamic_cast<StyleControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	CStringA strStyle;
+	int nStyleCount = 0;
+	char chType[MVO_BUFFER_SIZE];
+	HC_KEY nKey;
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		HC_Begin_Contents_Search(".", "styles"); {
+			HC_Show_Contents_Count(&nStyleCount);
+
+			for (int nIndex = 0; nIndex < nStyleCount; nIndex++) {
+				HC_Find_Contents(chType, &nKey);
+
+				Style::Type eType = Style::Type::Segment;
+				cOutTypes.push_back(eType);
+
+				SegmentKey cSegment(nKey);
+				cOutSegmentSources.push_back(cSegment);
+
+				CStringA strStyleName;
+				HC_Show_Style_Segment(nKey, strStyleName.GetBuffer(MVO_BUFFER_SIZE));
+				astrOutStyleNames.push_back(strStyleName);
+
+				ConditionalExpression cCondition;
+				acOutConditions.push_back(cCondition);
+			}
+
+		} HC_End_Contents_Search();
+	}
+	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return !cOutTypes.empty();
+}
+
+bool H3DF::StyleControl::ShowAllSegment(StyleKeyArray & acOutStyles) const
+{
+	DEBUG_STOP;
+	return false;
+}

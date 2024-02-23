@@ -40,30 +40,17 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cD
 
 	H3DF::ApplicationWindowOptionsKit cOptions;
 
-	pcImpl->m_cCanvas = H3DF::Factory::CreateCanvas(nWindowHandle, "3DMI_Canvas", cOptions);
+	pcImpl->m_pcCanvas = H3DF::Factory::CreateCanvas(nWindowHandle, "3DMI_Canvas", cOptions);
 
-	H3DF::View cView = H3DF::Factory::CreateView("3DMI_View");
+	H3DF::View * pcView = H3DF::Factory::CreateView("3DMI_View");
 
-	pcImpl->m_cCanvas.AttachViewAsLayout(cView);
+	pcImpl->m_pcCanvas->AttachViewAsLayout(pcView);
 
 	pcImpl->AllocationOperator(this);
 
-	pcImpl->m_cCanvas.FileOpen(cInObject, cDelivery);
+	pcImpl->m_pcCanvas->FileOpen(cInObject, cDelivery);
 
 	pcImpl->ModelPanel().Initialize(strFilePathName);
-}
-
-// 2. H3DF View Destruct 함수
-void KERNEL::DocView::Destruct()
-{
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
-	if (nullptr == pcImpl) {
-		DEBUG_RETURN;
-	}
-
-	pcImpl->m_cCanvas.Destruct();
-
-	//m_cView.Destruct();
 }
 
 // 3. H3DF View Paint 함수
@@ -74,7 +61,7 @@ void KERNEL::DocView::Paint(Json::Object & cInObject)
 		DEBUG_RETURN;
 	}
 
-	pcImpl->m_cCanvas.Update(cInObject);
+	pcImpl->GetCanvas().Update(cInObject);
 }
 
 // 4. H3DF View Resize 함수
@@ -88,7 +75,7 @@ void KERNEL::DocView::Resize(Json::Object & cInObject)
 	int nX = cInObject.GetInteger(SKW_X);
 	int nY = cInObject.GetInteger(SKW_Y);
 
-	pcImpl->m_cCanvas.Resize(nX, nY);
+	pcImpl->GetCanvas().Resize(nX, nY);
 }
 
 // 5. 명령어 취소
@@ -148,11 +135,11 @@ void KERNEL::DocView::MouseSignal(Json::Object & cInObject)
 			break;
 
 		case Signal::View::Action::OnMButtonDown:
-			//pcImpl->m_cCanvas.MButtonDown(nFlag, x, y);
+			//pcImpl->GetCanvas().MButtonDown(nFlag, x, y);
 			break;
 
 		case Signal::View::Action::OnMButtonUp:
-			//pcImpl->m_cCanvas.MButtonUp(nFlag, x, y);
+			//pcImpl->GetCanvas().MButtonUp(nFlag, x, y);
 			break;
 
 		case Signal::View::Action::OnRButtonDown:
@@ -209,13 +196,13 @@ void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 
 	H3DF::Point2D cLButtonUpPosition(x, y);
 
-	pcImpl->m_cCanvas.GetFrontView().GetWindowKey().GetBaseView();
+	pcImpl->GetCanvas().GetFrontView().GetWindowKey().GetBaseView();
 
 	// Camera 관련 처리
 	H3DF::Camera::Mode eMode = pcImpl->Camera().CameraMode();
 
 	if (H3DF::Camera::Mode::ZoomBox == eMode) {
-		pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(true);
+		pcImpl->GetCanvas().GetFrontView().SetSuppressUpdate(true);
 	}
 
 	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
@@ -229,8 +216,8 @@ void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 
 	if (H3DF::Camera::Mode::ZoomBox == eMode) {
 		pcImpl->Select().DrawSnapItems();
-		pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(false);
-		pcImpl->m_cCanvas.GetFrontView().Update();
+		pcImpl->GetCanvas().GetFrontView().SetSuppressUpdate(false);
+		pcImpl->GetCanvas().GetFrontView().Update();
 	}
 
 	pcImpl->Select().LButtonUp(cEvent);
@@ -270,7 +257,7 @@ void KERNEL::DocView::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 	int nLeft = cArray[0]->ToInteger();
 	int nTop = cArray[1]->ToInteger();
 
-	pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(true);
+	pcImpl->GetCanvas().GetFrontView().SetSuppressUpdate(true);
 
 	// Control Flag을 추가해서 ComputeReasonableTarget이란 함수를 사용해서 Whell Zomm할때 Entity를 선택하는 과정을 생략함.
 	// nFlag |= MK_CONTROL;
@@ -283,9 +270,9 @@ void KERNEL::DocView::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 
 	pcImpl->Select().DrawSnapItems();
 
-	pcImpl->m_cCanvas.GetFrontView().SetSuppressUpdate(false);
+	pcImpl->GetCanvas().GetFrontView().SetSuppressUpdate(false);
 
-	pcImpl->m_cCanvas.GetFrontView().Update();
+	pcImpl->GetCanvas().GetFrontView().Update();
 }
 
 //== Keyboard 관련 함수 ==============================================================================
@@ -295,7 +282,7 @@ void KERNEL::DocView::KeyboardSignal(Json::Object & cInObject)
 	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
-	pcImpl->m_cCanvas.KeyboardInput(cInObject);
+	pcImpl->GetCanvas().KeyboardInput(cInObject);
 }
 
 //== View 관련 함수 ==========================================================================
@@ -442,23 +429,23 @@ void KERNEL::DocView::SetViewStyle(int nStyleId)
 	switch (nStyleId)
 	{
 		case HOME_3D_CMD_ViewStyle_Shade:
-			pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::Gouraud);
+			pcImpl->GetCanvas().GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::Gouraud);
 			break;
 
 		case HOME_3D_CMD_ViewStyle_ShadeWithEdges:
-			pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::GouraudWithLines);
+			pcImpl->GetCanvas().GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::GouraudWithLines);
 			break;
 
 		case HOME_3D_CMD_ViewStyle_Wireframe:
-			pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::Wireframe);
+			pcImpl->GetCanvas().GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::Wireframe);
 			break;
 
 		case HOME_3D_CMD_ViewStyle_HiddenLineRemove:
-			pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::HiddenLine);
+			pcImpl->GetCanvas().GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::HiddenLine);
 			break;
 
 		case HOME_3D_CMD_ViewStyle_Tessellated:
-			pcImpl->m_cCanvas.GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::Tessellated);
+			pcImpl->GetCanvas().GetFrontView().SetRenderingMode(H3DF::Rendering::Mode::Tessellated);
 			break;
 
 		default:
@@ -485,35 +472,35 @@ void KERNEL::DocView::SetViewDirection(int nDirectionId)
 	switch (nDirectionId)
 	{
 		case HOME_3D_CMD_ViewDirection_Top:
-			pcImpl->m_cCanvas.GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::top);
+			pcImpl->GetCanvas().GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::top);
 			break;
 
 		case HOME_3D_CMD_ViewDirection_Front:
-			pcImpl->m_cCanvas.GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::front);
+			pcImpl->GetCanvas().GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::front);
 			break;
 
 		case HOME_3D_CMD_ViewDirection_Left:
-			pcImpl->m_cCanvas.GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::left);
+			pcImpl->GetCanvas().GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::left);
 			break;
 
 		case HOME_3D_CMD_ViewDirection_Bottom:
-			pcImpl->m_cCanvas.GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::bottom);
+			pcImpl->GetCanvas().GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::bottom);
 			break;
 
 		case HOME_3D_CMD_ViewDirection_Back:
-			pcImpl->m_cCanvas.GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::back);
+			pcImpl->GetCanvas().GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::back);
 			break;
 
 		case HOME_3D_CMD_ViewDirection_Right:
-			pcImpl->m_cCanvas.GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::right);
+			pcImpl->GetCanvas().GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::right);
 			break;
 
 		case HOME_3D_CMD_ViewDirection_Iso:
-			pcImpl->m_cCanvas.GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::px_py_pz);
+			pcImpl->GetCanvas().GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::px_py_pz);
 			break;
 
 		case HOME_3D_CMD_ViewDirection_SeIso:
-			pcImpl->m_cCanvas.GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::nx_py_pz);
+			pcImpl->GetCanvas().GetFrontView().SetViewDirection(H3DF::ViewDirection::Mode::nx_py_pz);
 			break;
 
 		case HOME_3D_CMD_ViewDirection_Perspective:

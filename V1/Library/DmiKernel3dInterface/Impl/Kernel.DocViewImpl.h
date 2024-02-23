@@ -24,19 +24,21 @@ namespace KERNEL
 	{
 	public:
 		DocViewImpl();
+		~DocViewImpl();
 
 		void Copy(const DocViewImpl * pcInThat)
 		{
-			m_cCanvas = pcInThat->m_cCanvas;
+			m_pcCanvas = pcInThat->m_pcCanvas;
 			m_nViewId = pcInThat->m_nViewId;
 			m_pcDelivery = pcInThat->m_pcDelivery;
 		}
 
 		int m_nViewId = -1;
 
-		H3DF::Canvas & GetCanvas() { return m_cCanvas; }
-		H3DF::Canvas m_cCanvas;
-		H3DF::Model m_cModel;
+		H3DF::Canvas & GetCanvas() { return *m_pcCanvas; }
+		H3DF::Canvas * m_pcCanvas = nullptr;
+
+		H3DF::Model & GetModel();
 	
 		H3DF::BaseView * GetBaseView();
 

@@ -33,6 +33,7 @@ namespace SESSION
 			void ExecuteCommand(Json::Object & cInObject);
 
 			SESSION::Session * GetSession(int nViewId);
+			void RemoveSession(int nViewId);
 		private:
 			bool m_bIsValid = false;
 

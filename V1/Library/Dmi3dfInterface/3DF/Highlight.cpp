@@ -22,7 +22,6 @@
 
 #include <HBaseOperator.h>
 #include <HMarkupManager.h>
-#include <HEventManager.h>
 #include <HConstantFrameRate.h>
 
 #define		SEGMENT_TYPE		1

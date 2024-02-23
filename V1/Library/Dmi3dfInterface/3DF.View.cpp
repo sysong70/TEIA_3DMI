@@ -24,6 +24,7 @@
 
 #include <HIOUtilityHsf.h>
 #include <HConstantFrameRate.h>
+#include <HEventManager.h>
 //#include <HIOUtilityPointCloud.h>
 
 #include <chrono>
@@ -139,7 +140,7 @@ void H3DF::View::SuppressUpdate(bool bSuppress)
 	pcImpl->GetBaseView()->SetSuppressUpdate(bSuppress);
 }
 
-void H3DF::View::Destruct()
+void H3DF::View::Destruct() const
 {
 	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {
@@ -147,6 +148,8 @@ void H3DF::View::Destruct()
 	}
 
 	if (nullptr != pcImpl->m_pcBaseView) {
+		pcImpl->m_pcBaseView->SetSuppressUpdate(true);
+		pcImpl->m_pcBaseView->SetModel(nullptr);
 		delete pcImpl->m_pcBaseView;
 	}
 

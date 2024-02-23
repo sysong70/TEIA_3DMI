@@ -13,8 +13,11 @@ SESSION::Session::Session()
 
 SESSION::Session::~Session()
 {
-
+	if (nullptr != m_pcDocView) {
+		delete m_pcDocView;
+	}
 }
+
 int SESSION::Session::SessionId() const
 {
 	return m_nSessionId;
@@ -33,11 +36,6 @@ void SESSION::Session::SessionId(int nSessionId)
 void SESSION::Session::ViewInitialize(Json::Object & cInObject, Signal::Delivery & cInstance)
 {
 	m_pcDocView->Initialize(cInObject, cInstance);
-}
-
-void SESSION::Session::ViewDestruct()
-{
-	m_pcDocView->Destruct();
 }
 
 void SESSION::Session::ViewPaint(Json::Object & cInObject)

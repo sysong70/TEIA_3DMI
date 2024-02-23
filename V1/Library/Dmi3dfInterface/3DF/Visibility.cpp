@@ -556,3 +556,30 @@ VisibilityControl & VisibilityControl::UnsetEverything()
 
 	return *this;
 }
+
+bool VisibilityControl::ShowFaces(bool & bOutState) const
+{
+	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+// 		if (FALSE == HC_Show_Existence("visibility")) {
+// 			return false;
+// 		}
+
+		CStringA strValue;
+		HC_Show_Visibility(strValue.GetBuffer());
+		//HC_Show_One_Visibility("faces", strValue.GetBuffer());
+		strValue.ReleaseBuffer();
+
+		if ("on" == strValue.MakeLower()) {
+			bOutState = true;
+		}
+		else {
+			bOutState = false;
+		}
+
+	}SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return true;
+}

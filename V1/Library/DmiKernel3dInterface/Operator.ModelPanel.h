@@ -10,7 +10,6 @@ namespace KERNEL
 {
 	namespace Operator
 	{
-		class ModelTreeItem;
 		class Select;
 
 		class ModelPanel : public OperatorBase

@@ -18,7 +18,6 @@ namespace KERNEL
 		KERNEL::Type ObjectType() const { return KERNEL::Type::View; };
 
 		void Initialize(Json::Object & cInObject, Signal::Delivery & cDelivery);
-		void Destruct();
 		void Paint(Json::Object & cInObject);
 		void Resize(Json::Object & cInObject);
 		void CancelCommands();

@@ -7,13 +7,6 @@
 
 #include <atlcoll.h>
 
-/*
-#include <HBaseOperator.h>
-#include <HMarkupManager.h>
-#include <HEventManager.h>
-#include <HConstantFrameRate.h>
-*/
-
 
 #define		SEGMENT_TYPE		1
 #define		ENTITY_TYPE			2

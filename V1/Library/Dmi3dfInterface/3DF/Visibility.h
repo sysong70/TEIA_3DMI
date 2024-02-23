@@ -94,5 +94,7 @@ namespace H3DF
 		VisibilityControl & UnsetText();
 		VisibilityControl & UnsetGeometry();
 		VisibilityControl & UnsetEverything();
+
+		bool ShowFaces(bool & bOutState) const;
 	};
 }

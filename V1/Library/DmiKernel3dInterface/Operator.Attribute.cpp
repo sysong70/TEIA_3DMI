@@ -22,6 +22,8 @@
 #include <3DF/Facility.AppOptions.h>
 #include <3DF/3DF.Utility.h>
 
+#include <Impl/ModelImpl.h>
+
 #include <Json.h>
 
 using namespace KERNEL;
@@ -100,20 +102,31 @@ bool KERNEL::Operator::Attribute::Hide()
 	DocViewImpl * pcDocViewImpl = dynamic_cast<DocViewImpl *>(pcImpl->GetDocView().GetImpl());
 	DEBUG_VALID(pcDocViewImpl);
 
+	H3DF::ModelImpl * pcModelImpl = dynamic_cast<ModelImpl *>(pcDocViewImpl->GetModel().GetImpl());
+	DEBUG_VALID(pcModelImpl);
+
 	size_t nCount = pcDocViewImpl->Select().Results().GetCount();
 	if (0 == nCount) {
 		return false;
 	}
 
+
 	SelectionResults cResult = pcDocViewImpl->Select().Results();
 
 	SelectionResultsIterator cIter = cResult.GetIterator();
+
+	//ConditionalExpression cNoShowCond("noshow");
 
 	while (true == cIter.IsValid()) {
 		SelectionItem cItem = cIter.GetItem();
 
 		KeyPath cPath;
 		if (true == cItem.ShowPath(cPath)) {
+			Key cKey1 = cPath.At(0);
+			SegmentKey cSegment(cKey1.KeyValue());
+			//cSegment.GetStyleControl().PushSegment(pcModelImpl->NoShowStyleSegment(), cNoShowCond);
+			//cSegment.SetCondition("noshow");
+
 			Key cKey = cPath.At(1);
 			H3DF::Type eType = Utility::GetType(cKey.KeyValue());
 
@@ -126,6 +139,9 @@ bool KERNEL::Operator::Attribute::Hide()
 
 		cIter.Next();
 	}
+
+	pcDocViewImpl->GetCanvas().GetFrontView().Update();
+
 
 	//H3DF::ConditionalExpression cCondExp(;
 

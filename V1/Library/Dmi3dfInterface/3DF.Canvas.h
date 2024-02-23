@@ -56,7 +56,7 @@ namespace H3DF
 
 		H3DF::Type ObjectType() const { return H3DF::Type::Canvas; };
 
-		void AttachViewAsLayout(View const & cInView);
+		void AttachViewAsLayout(View const * pcInView);
 
 		void FileOpen(Json::Object & cInObject, Signal::Delivery & cDelivery);
 		static void ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObject, Signal::Delivery & cDelivery);

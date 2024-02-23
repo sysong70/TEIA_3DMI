@@ -14,11 +14,11 @@
 
 using namespace H3DF;
 
-Canvas H3DF::Factory::CreateCanvas(H3DF::WindowHandle nInWindowHandle, char const * chInName, H3DF::ApplicationWindowOptionsKit const & cInOptions)
+Canvas * H3DF::Factory::CreateCanvas(H3DF::WindowHandle nInWindowHandle, char const * chInName, H3DF::ApplicationWindowOptionsKit const & cInOptions)
 {
-	Canvas cCanvas;
+	Canvas * pcCanvas = new Canvas();
 
-	CanvasImpl * pcImpl = (CanvasImpl *)cCanvas.GetImpl();;
+	CanvasImpl * pcImpl = (CanvasImpl *)pcCanvas->GetImpl();;
 	if (nullptr == pcImpl) {
 		assert(false);
 	}
@@ -31,19 +31,19 @@ Canvas H3DF::Factory::CreateCanvas(H3DF::WindowHandle nInWindowHandle, char cons
 
 	pcImpl->m_cApplicationWindowOptionsKit = cInOptions;
 
-	return cCanvas;
+	return pcCanvas;
 }
 
-View H3DF::Factory::CreateView(CStringA strInName)
+View * H3DF::Factory::CreateView(CStringA strInName)
 {
-	View cView;
+	View * pcView = new View();
 
-	ViewImpl * pcImpl = (ViewImpl *)cView.GetImpl();
+	ViewImpl * pcImpl = (ViewImpl *)pcView->GetImpl();
 	if (nullptr == pcImpl) {
 		assert(false);
 	}
 
 	pcImpl->m_strName = strInName;
 
-	return cView;
+	return pcView;
 }

@@ -44,11 +44,14 @@ namespace H3DF
 		SegmentKey m_cIncludeModel;
 		SegmentKey m_cIncludeStyles;
 
-		SegmentKey m_cShowStyle;
-		SegmentKey m_cNoShowStyle;
+		SegmentKey & ShowStyleSegment() { return m_cShowStyle; }
+		SegmentKey & NoShowStyleSegment() { return m_cNoShowStyle; }
 
 	private:
 		SegmentKey m_cSegmentKey;
+
+		SegmentKey m_cShowStyle;
+		SegmentKey m_cNoShowStyle;
 
 		ModelHandedness m_eModelHandedness;
 

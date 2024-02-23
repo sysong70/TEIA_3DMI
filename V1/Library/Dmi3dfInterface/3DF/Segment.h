@@ -52,6 +52,7 @@ namespace H3DF
 
 		//== Include 관련 함수 =======================================================================
 		IncludeKey IncludeSegment(SegmentKey const & cInSegment);
+		IncludeKey IncludeSegment(SegmentKey const & cInSegment, ConditionalExpression const & cInConditional);
 
 		size_t ShowIncluders() const;
 		size_t ShowIncluders(SegmentKeyArray & aOutSegments) const;

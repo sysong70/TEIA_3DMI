@@ -3,9 +3,7 @@
 #include <hc.h>
 #include <HTools.h>
 #include <HBaseModel.h>
-#include <HEventManager.h>
 #include <HBhvBehaviorManager.h>
-#include <HEventManager.h>
 #include <HMarkupManager.h>
 #include <HSharedKey.h>
 #include <HUtilityGeomHandle.h>
@@ -107,23 +105,6 @@ H3DF::Canvas::Canvas(Canvas const & cInThat)
 	Set(cInThat);
 }
 
-void H3DF::Canvas::Destruct()
-{
-	CanvasImpl * pcImpl = new CanvasImpl();
-	if (nullptr == pcImpl) {
-		assert(false);
-	}
-
-	if (nullptr != pcImpl->m_pcModel) {
-		delete pcImpl->m_pcModel;
-		pcImpl->m_pcModel = nullptr;
-	}
-
-	for(auto pcView : pcImpl->m_vpcViewArray) {
-		pcView->Destruct();
-	}
-}
-
 void H3DF::Canvas::Set(Canvas const & cInThat)
 {
 	CanvasImpl * pcImpl = (CanvasImpl *)m_pcImpl;
@@ -140,7 +121,7 @@ Canvas const & H3DF::Canvas::operator = (Canvas const & cInThat)
 // Attaches a View to this HPS::Canvas using an implicit Layout that covers the whole window.
 // 전체 창을 덮는 암시적 레이아웃을 사용하여 이 HPS:Canvas에 View 연결.
 // 여기서 BaseView를 생성한다.
-void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
+void H3DF::Canvas::AttachViewAsLayout(View const * pcInView)
 {
 	CanvasImpl * pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl);
 	if(nullptr == pcCanvasImpl) {
@@ -157,11 +138,7 @@ void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
 		DEBUG_RETURN;
 	}
 
-	// 새롭게 View를 생성시키고 입력받은 View정보를 복사한다.
-	// 값을 Pointer 형태로 가지고 있어야 처리하기가 편하다.
-	View * pcView = new View(cInView);
-
-	ViewImpl * pcViewImpl = (ViewImpl *)pcView->GetImpl();
+	ViewImpl * pcViewImpl = (ViewImpl *)pcInView->GetImpl();
 	if (nullptr == pcViewImpl) {
 		DEBUG_RETURN;
 	}
@@ -173,7 +150,7 @@ void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
 	// pcViewImpl에 포함되어 있는 HBaseView를 생성하고 초기화 한다.
 	pcViewImpl->Init(pcModel, Utility::ToChar(TheKenel.General.Display.Driver), strName, nWindowHandle);
 
-	pcCanvasImpl->m_vpcViewArray.push_back(pcView);
+	pcCanvasImpl->m_vpcViewArray.push_back(pcInView);
 	pcCanvasImpl->m_pcFrontView = pcCanvasImpl->m_vpcViewArray.front();
 }
 
@@ -552,7 +529,7 @@ H3DF::View & H3DF::Canvas::GetFrontView() const
 	DEBUG_VALID(pcImpl);
 
 	DEBUG_VALID(pcImpl->m_pcFrontView);
-	return *pcImpl->m_pcFrontView;
+	return *((View *)pcImpl->m_pcFrontView);
 /*
 
 	if (pcImpl->m_vpcViewArray.empty()) {
@@ -623,8 +600,7 @@ void H3DF::Canvas::CancelCommands()
 
 H3DF::Canvas::~Canvas()
 {
-	return;
-	// HC_Relinquish_Memory();
+	HC_Relinquish_Memory();
 }
 
 bool H3DF::Canvas::KeyboardInput(Json::Object& input)

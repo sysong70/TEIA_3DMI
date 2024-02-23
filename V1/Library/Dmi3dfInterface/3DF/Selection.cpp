@@ -24,7 +24,6 @@
 
 #include <HBaseOperator.h>
 #include <HMarkupManager.h>
-#include <HEventManager.h>
 #include <HConstantFrameRate.h>
 
 #define		SEGMENT_TYPE		1
@@ -725,9 +724,11 @@ void H3DF::SelectionItem::ShowPathString(CString & strOutPath)
 
 	CString strName;
 
-	SegmentKey cSegmentKey(nKey);
-	if (false == UserData::ShowSegmentName(cSegmentKey, strName)) {
-		strName = cSegmentKey.Name(false);
+	if (streq("segment", chType)) {
+		SegmentKey cSegmentKey(nKey);
+		if (false == UserData::ShowSegmentName(cSegmentKey, strName)) {
+			strName = cSegmentKey.Name(false);
+		}
 	}
 
 	strText.Format(L"Select Key: %d [%s], %s", nKey, Utility::ToString(chType), strName);

@@ -30,8 +30,8 @@ namespace H3DF
 		char * m_pchName = NULL;
 		H3DF::ApplicationWindowOptionsKit m_cApplicationWindowOptionsKit;
 
-		std::vector<H3DF::View *> m_vpcViewArray;
-		H3DF::View * m_pcFrontView = nullptr;
+		std::vector<const H3DF::View *> m_vpcViewArray;
+		const H3DF::View * m_pcFrontView = nullptr;
 
 		H3DF::Model * m_pcModel = nullptr;
 	};
