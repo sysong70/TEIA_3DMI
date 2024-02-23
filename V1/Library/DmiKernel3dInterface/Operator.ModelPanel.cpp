@@ -99,7 +99,7 @@ void KERNEL::Operator::ModelPanelImpl::UserInterfaceItemExpanded(ModelTreeItem *
 				continue;
 			}
 
-			pcChildItem->Status() |= ModelTreeItemStatus::UiUpdate;
+			pcChildItem->AddStatus(ModelTreeItemStatus::UiUpdate);
 
 			if (pcChildItem->Status() & ModelTreeItemStatus::Invisible) {
 				UserInterfaceItemExpanded(pcChildItem, bRecursiveExpand);
@@ -142,7 +142,7 @@ void KERNEL::Operator::ModelPanelImpl::UserInterfaceItemExpanded(ModelTreeItem *
 #endif
 
 			cItem.Title = strUserName;
-			//cItem.HasChildren = (TreeItemStatus::End & pcChildItem->m_nStatus) ? false : true;
+			cItem.Checked = (ModelTreeItemStatus::NoShow & pcChildItem->Status()) ? false : true;
 			cItem.Key = (DWORD_PTR)pcChildItem;
 			cTreeItems.push_back(cItem);
 		}
@@ -194,7 +194,7 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 	HC_KEY nModelKey = cModelSegment.KeyValue();
 
 	ModelTreeItem* pcRootItem = pcImpl->m_cModelTree.AddItem(nModelKey, nullptr, true); // 내부 Tree 생성
-	pcRootItem->Status() |= ModelTreeItemStatus::UiUpdate;
+	pcRootItem->AddStatus(ModelTreeItemStatus::UiUpdate);
 
 	Signal::TreeItem cItem;
 	cItem.ParentKey = 0;
@@ -220,7 +220,7 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 
 		//ModelTreeItem * pcItem = pcImpl->m_cModelTree.AddItem(cSegment.KeyValue(), pcRootItem, cItem.HasChildren); // 내부 Tree 생성
 		ModelTreeItem * pcItem = pcImpl->m_cModelTree.AddItem(cSegment.KeyValue(), pcRootItem, hasChildren);
-		pcItem->m_nStatus |= TreeItemStatus::UiUpdate;
+		pcItem->AddStatus(ModelTreeItemStatus::UiUpdate);
 		cItem.Key = (DWORD_PTR)pcItem;
 
 		pcImpl->ModelTree().SetModelsGroupItem(pcItem);
@@ -233,7 +233,7 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 		//cItem.HasChildren = false;
 		
 		ModelTreeItem * pcItem = pcImpl->m_cModelTree.AddItem(cSegment.KeyValue(), pcRootItem, false); // 내부 Tree 생성
-		pcItem->Status() |= ModelTreeItemStatus::UiUpdate;
+		pcItem->AddStatus(ModelTreeItemStatus::UiUpdate);
 		cItem.Key = (DWORD_PTR) pcItem;
 
 		pcImpl->ModelTree().SetMeasurementsGroupItem(pcItem);
@@ -246,7 +246,7 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 		//cItem.HasChildren = false;
 
 		ModelTreeItem * pcItem = pcImpl->m_cModelTree.AddItem(cSegment.KeyValue(), pcRootItem, false); // 내부 Tree 생성
-		pcItem->Status() |= ModelTreeItemStatus::UiUpdate;
+		pcItem->AddStatus(ModelTreeItemStatus::UiUpdate);
 		cItem.Key = (DWORD_PTR)pcItem;
 
 		pcImpl->ModelTree().SetMarkupsGroupItem(pcItem);

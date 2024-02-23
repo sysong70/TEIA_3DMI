@@ -50,6 +50,8 @@ namespace H3DF
 
 		void Set(StyleKey const & cInThat);
 		StyleKey & operator = (StyleKey const & cInThat);
+
+		CStringA Name(bool bIncludePath = true) const;
 	};
 
 	class API_3DF StyleControl : public Control
@@ -69,8 +71,5 @@ namespace H3DF
 
 		bool Show(StyleKeyArray & acOutStyles) const;
 		bool Show(StyleTypeArray & cOutTypes, SegmentKeyArray & cOutSegmentSources, AStringArray & astrOutStyleNames, ConditionalExpressionArray & acOutConditions) const;
-
-		bool ShowAllSegment(StyleKeyArray & acOutStyles) const;
-
 	};
 }

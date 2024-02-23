@@ -103,6 +103,22 @@ StyleKey & H3DF::StyleKey::operator = (StyleKey const & cInThat)
 	return *this;
 }
 
+CStringA H3DF::StyleKey::Name(bool bIncludePath) const
+{
+	auto * pcImpl = dynamic_cast<KeyImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	char chName[MVO_BUFFER_SIZE] = "\n";
+	HC_Show_Style_Segment(pcImpl->KeyValue(), chName);
+
+	if (false == bIncludePath) {
+		HC_Parse_String(chName, "/", -1, chName);
+	}
+
+	CStringA strOutName = chName;
+	return strOutName;
+}
+
 //== StyleControl Function =========================================================================
 
 class StyleControlImpl : public ControlImpl
@@ -272,10 +288,4 @@ bool H3DF::StyleControl::Show(StyleTypeArray & cOutTypes, SegmentKeyArray & cOut
 	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return !cOutTypes.empty();
-}
-
-bool H3DF::StyleControl::ShowAllSegment(StyleKeyArray & acOutStyles) const
-{
-	DEBUG_STOP;
-	return false;
 }

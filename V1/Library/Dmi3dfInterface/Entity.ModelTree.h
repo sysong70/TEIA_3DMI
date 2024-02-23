@@ -13,10 +13,16 @@ namespace H3DF
 			End				= 0x0002,
 			UiUpdate		= 0x0004,
 			Invisible		= 0x0008,
-			Solid			= 0x0010,
-			Surface			= 0x0020,
-			Curve			= 0x0040,
-			Point			= 0x0080,
+			NoShow			= 0x0010,
+		};
+
+		enum API_3DF ModelTreeItemType
+		{
+			None,
+			Solid,
+			Surface,
+			Curve,
+			Point,
 		};
 
 		class API_3DF ModelTreeItem : public Object
@@ -25,7 +31,13 @@ namespace H3DF
 			ModelTreeItem(HC_KEY nInKey);
 
 			HC_KEY KeyValue();
-			DWORD & Status();
+			
+			DWORD Status();
+			DWORD AddStatus(ModelTreeItemStatus eStatus);
+			DWORD RemoveStatus(ModelTreeItemStatus eStatus);
+
+			ModelTreeItemType Type();
+
 			ModelTreeItem * Parent();
 			std::vector<ModelTreeItem *> & Children();
 

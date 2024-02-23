@@ -330,12 +330,11 @@
     <ClInclude Include="..\Common\File.h">
       <Filter>_Common</Filter>
     </ClInclude>
-      <ClInclude Include="Entity.ModelTree.h">
-      <Filter>3DF\Entity</Filter>
-    </ClInclude>
-    </ClInclude> 
     <ClInclude Include="..\Signal\WorkerThread.h">
       <Filter>_Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.ModelTree.h">
+      <Filter>3DF\Entity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -599,6 +598,9 @@
     </ClCompile>
     <ClCompile Include="..\Signal\WorkerThread.cpp">
       <Filter>_Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.ModelTree.cpp">
+      <Filter>3DF\Entity</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

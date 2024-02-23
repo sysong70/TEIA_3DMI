@@ -2746,25 +2746,6 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DT
 
 	A3DTessFaceData & cTessFaceData = cTess3dData.m_psFaceTessData[0];
 
-	/*
-		// Solid, Surface 판정
-		A3DRiBrepModelData cBrepModelData;
-		A3D_INITIALIZE_DATA(A3DRiBrepModelData, cBrepModelData);
-		A3DStatus nResult = A3DRiBrepModelGet(pcRepItem, &cBrepModelData);
-
-		if (A3D_SUCCESS == nResult) {
-			HC_KEY nKey = cSegment.KeyValue();
-			if (true == cBrepModelData.m_bSolid) {
-				H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Solid);
-			}
-			else {
-				H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Surface);
-			}
-		}
-
-		A3DRiBrepModelGet(nullptr, &cBrepModelData);
-	*/
-
 	const double cBigValue = 1.0e+12;
 	bool bStrange = false;
 
@@ -3022,7 +3003,7 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DT
 
 	cShellKit.EndAddFaces();
 
-/*
+
 	if (0 < cShellKit.GetPointCount()) {
 		// Region 설정
 		A3DUns32 nRegionIndex = 1;
@@ -3070,7 +3051,6 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DT
 	else {
 		cShellKit.DeleteShellWrapperKey();
 	}
-*/
 
 	mStyleDefineMap.RemoveAll();
 

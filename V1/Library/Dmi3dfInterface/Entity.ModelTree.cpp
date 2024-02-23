@@ -26,6 +26,7 @@ namespace H3DF
 			void Copy(ModelTreeItemImpl * pcInThat);
 
 			HC_KEY m_nKey = INVALID_KEY;
+			ModelTreeItemType m_eType = ModelTreeItemType::None;
 			DWORD m_nStatus = ModelTreeItemStatus::Normal;
 
 			ModelTreeItem * m_pcParent = nullptr;
@@ -61,12 +62,40 @@ HC_KEY H3DF::Entity::ModelTreeItem::KeyValue()
 	return pcImpl->m_nKey;
 }
 
-DWORD & H3DF::Entity::ModelTreeItem::Status()
+DWORD H3DF::Entity::ModelTreeItem::Status()
 {
 	ModelTreeItemImpl * pcImpl = (ModelTreeItemImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_nStatus;
+}
+
+DWORD H3DF::Entity::ModelTreeItem::AddStatus(ModelTreeItemStatus eStatus)
+{
+	ModelTreeItemImpl * pcImpl = (ModelTreeItemImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_nStatus |= eStatus;
+
+	return pcImpl->m_nStatus;
+}
+
+DWORD H3DF::Entity::ModelTreeItem::RemoveStatus(ModelTreeItemStatus eStatus)
+{
+	ModelTreeItemImpl * pcImpl = (ModelTreeItemImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_nStatus &= ~eStatus;
+
+	return pcImpl->m_nStatus;
+}
+
+ModelTreeItemType H3DF::Entity::ModelTreeItem::Type()
+{
+	ModelTreeItemImpl * pcImpl = (ModelTreeItemImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->m_eType;
 }
 
 ModelTreeItem * H3DF::Entity::ModelTreeItem::Parent()
@@ -341,9 +370,11 @@ ModelTreeItem * H3DF::Entity::ModelTree::AddItem(HC_KEY nInKey, ModelTreeItem * 
 		return pcImpl->m_pcRoot;
 	}
 
+	ModelTreeItemImpl * pcInParentItemImpl = dynamic_cast<ModelTreeItemImpl *>(pcInParentItem->GetImpl());
+
 	// 하부 Item이 추가되면 상태를 Normal로 변경한다. End는 삭제한다.
-	pcInParentItem->Status() &= ~ModelTreeItemStatus::End;
-	pcInParentItem->Status() |= ModelTreeItemStatus::Normal;
+	pcInParentItemImpl->m_nStatus &= ~ModelTreeItemStatus::End;
+	pcInParentItemImpl->m_nStatus |= ModelTreeItemStatus::Normal;
 
 	ModelTreeItem * pcItem = pcInParentItem->AddChild(nInKey, bHasChild);
 	DEBUG_VALID(pcItem);
@@ -407,8 +438,6 @@ bool H3DF::Entity::ModelTree::ExpandItem(ModelTreeItem * pcInItem, bool bRecursi
 	H3DF::IncludeKeyArray cChildren;
 	cInSegment.ShowIncluders(cChildren);
 
-	size_t nCount = cInSegment.ShowSubsegments();
-
 	for (auto & cInclude : std::ranges::reverse_view(cChildren)) {
 
 		SegmentKey cSegment = cInclude.GetTarget();
@@ -419,26 +448,45 @@ bool H3DF::Entity::ModelTree::ExpandItem(ModelTreeItem * pcInItem, bool bRecursi
 		ModelTreeItem * pcItem = pcInItem->AddChild(cInclude.KeyValue(), bHasChildren);
 		DEBUG_VALID(pcItem);
 
+		ModelTreeItemImpl * pcItemImpl = (ModelTreeItemImpl *)pcItem->GetImpl();
+		DEBUG_VALID(pcItemImpl);
+
 		// part## 항목은 UI Tree에 표시하지 않으므로 처리하기 위해서 key값의 이름을 가져온다.
 		// 여기서 이름은 User Defined Name이 아니라 Segment의 이름이다.
 		CStringA strName = H3DF::Utility::GetName(cSegment);
 		if ("part" == strName.Left(4)) {
-			pcItem->Status() |= ModelTreeItemStatus::Invisible;
+			pcItemImpl->m_nStatus |= ModelTreeItemStatus::Invisible;
+		}
+
+		bool bNoShowFlag = false;
+		StyleKeyArray cArray;
+		if (true == cSegment.GetStyleControl().Show(cArray)) {
+			for (auto & cKey : cArray) {
+				CStringA strName = cKey.Name(false);
+				if (0 == strName.CompareNoCase("noshow_style")) {
+					bNoShowFlag = true;
+					break;
+				}
+			}
+		}
+
+		if (true == bNoShowFlag) {
+			pcItemImpl->m_nStatus |= ModelTreeItemStatus::NoShow;
 		}
 
 		DWORD nType;
 		if (true == H3DF::UserData::ShowTopologyType(cSegment, nType)) {
 			if ((DWORD)TopologyType::Solid == nType) {
-				pcItem->Status() |= ModelTreeItemStatus::Solid;
+				pcItemImpl->m_eType = ModelTreeItemType::Solid;
 			}
 			else if ((DWORD)TopologyType::Surface == nType) {
-				pcItem->Status() |= ModelTreeItemStatus::Surface;
+				pcItemImpl->m_eType = ModelTreeItemType::Surface;
 			}
 			else if ((DWORD)TopologyType::Curve	 == nType) {
-				pcItem->Status() |= ModelTreeItemStatus::Curve;
+				pcItemImpl->m_eType = ModelTreeItemType::Curve;
 			}
 			else if ((DWORD)TopologyType::Point == nType) {
-				pcItem->Status() |= ModelTreeItemStatus::Point;
+				pcItemImpl->m_eType = ModelTreeItemType::Point;
 			}
 		}
 
