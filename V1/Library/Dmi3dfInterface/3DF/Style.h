@@ -5,6 +5,8 @@
 #include "Control.h"
 #include "Definition.h"
 
+#include <Common_Define.h>
+
 namespace H3DF
 {
 	class API_3DF Style {
