@@ -101,7 +101,10 @@ void Connector3d::ReceiveSignal(const wchar_t* content)
 	//:WARNING - delete this pointer after use
 	Json::Object* pData = new Json::Object();
 	Json::Object& data = *pData;
-	Json::Helper::Load(content, data);
+	if (Json::Helper::Load(content, data) == false) {
+		REMOVE_POINTER(pData);
+		DEBUG_RETURN;
+	}
 
 	Signal::Target target = (Signal::Target)data.GetInteger(SKW_TARGET, -1);
 

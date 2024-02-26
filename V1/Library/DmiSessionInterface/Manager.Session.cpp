@@ -55,7 +55,15 @@ void SESSION::Manager::Session::ExecuteSignal(const wchar_t * pchBuffer)
 
 	Json::Object cInObject;
 	// ReadObject에 buffer에 내용을 전달하고 나오면 buffer는 empty됨.
-	Json::Reader::ReadObject((wchar_t *&)pchBuffer, cInObject);
+	bool success = Json::Reader::ReadObject((wchar_t *&)pchBuffer, cInObject);
+#ifdef _DEBUG
+	//:Ken - 20240223, echo data
+	if (success == false) {
+		Json::Object msg;
+		msg.SetString("Echo", CString(pchBuffer));
+		Connector::GetInstance(-1).SendData(msg);
+	}
+#endif
 
 	// 들어오는 값을 순서대로 처리하도록 한다.
 	int nTarget = cInObject.GetInteger(SKW_TARGET);
