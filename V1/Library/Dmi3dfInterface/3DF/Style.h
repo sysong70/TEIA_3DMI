@@ -5,6 +5,8 @@
 #include "Control.h"
 #include "Definition.h"
 
+#include <Common_Define.h>
+
 namespace H3DF
 {
 	class API_3DF Style {
@@ -68,6 +70,8 @@ namespace H3DF
 
 		StyleKey PushSegment(SegmentKey const & cInStyleSource);
 		StyleKey PushSegment(SegmentKey const & cInStyleSource, ConditionalExpression const & cInConditional);
+
+		void Flush(SegmentKey const & cInStyleSource);
 
 		bool Show(StyleKeyArray & acOutStyles) const;
 		bool Show(StyleTypeArray & cOutTypes, SegmentKeyArray & cOutSegmentSources, AStringArray & astrOutStyleNames, ConditionalExpressionArray & acOutConditions) const;

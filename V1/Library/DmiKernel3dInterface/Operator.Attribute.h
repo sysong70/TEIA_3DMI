@@ -18,10 +18,12 @@ namespace KERNEL
 
 			bool ShowAll();
 			bool Show();
+			bool Show(H3DF::Key & cKey);
 			bool Show(H3DF::SelectionItem & cSelItem);
 
-			bool Hide();
-			bool Hide(H3DF::SelectionItem & cSelItem);
+			bool NoShow();
+			bool NoShow(H3DF::Key & cKey);
+			bool NoShow(H3DF::SelectionItem & cSelItem);
 
 			bool ShowOnly();
 			bool ShowToggle();

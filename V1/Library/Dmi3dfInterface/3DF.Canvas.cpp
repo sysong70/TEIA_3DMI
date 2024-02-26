@@ -273,7 +273,7 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, Signal::Delivery & cDelive
 
 	// #3DF_Debug: Z://Test.hsf
 #ifdef _DEBUG
-	 //GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
+	 GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
 #endif
 	 // GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
 

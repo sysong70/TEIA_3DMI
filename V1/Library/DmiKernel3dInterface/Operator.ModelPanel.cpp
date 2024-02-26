@@ -3,7 +3,12 @@
 #include "Operator.ModelPanel.h"
 
 #include "Impl/OperatorImpl.h"
+
+#include "Operator.Attribute.h"
 #include "Operator.Select.h"
+
+#include "Kernel.DocView.h"
+#include "Impl/Kernel.DocViewImpl.h"
 
 #include "Signal.Connector.h"
 
@@ -50,8 +55,8 @@ namespace KERNEL
 			H3DF::Entity::ModelTree & ModelTree() { return m_cModelTree; }
 			H3DF::Entity::ModelTree m_cModelTree;
 
-			KERNEL::Operator::Select & Select() { return *m_pcSelect; }
-			KERNEL::Operator::Select * m_pcSelect = nullptr;
+			KERNEL::Operator::Select & Select();
+			KERNEL::Operator::Attribute & Attribute();
 
 			void UserInterfaceItemExpanded(ModelTreeItem * pcInItem, bool bRecursiveExpand = false);
 
@@ -67,7 +72,23 @@ KERNEL::Operator::ModelPanelImpl::ModelPanelImpl(const DocView * pcInDocView) :
 
 }
 
-// 5. 일반 Item Expanded 처리
+KERNEL::Operator::Select & KERNEL::Operator::ModelPanelImpl::Select()
+{ 
+	DocViewImpl * pcImpl = (DocViewImpl *)GetDocView().GetImpl();
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->Select();
+}
+
+KERNEL::Operator::Attribute & KERNEL::Operator::ModelPanelImpl::Attribute()
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)GetDocView().GetImpl();
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->Attribute();
+}
+
+// 2. User Interface에 Item Expanded 처리
 void KERNEL::Operator::ModelPanelImpl::UserInterfaceItemExpanded(ModelTreeItem * pcInItem, bool bRecursiveExpand)
 {
 	ModelTree().ExpandItem(pcInItem, false);
@@ -137,7 +158,7 @@ void KERNEL::Operator::ModelPanelImpl::UserInterfaceItemExpanded(ModelTreeItem *
 			else {
 				strText.Format(L": %s, Inc [%d], Seg [%d]", strName, nIncKey, nSegKey);
 			}
-			
+
 			strUserName += strText;
 #endif
 
@@ -264,15 +285,6 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 
 	//:Ken - 20240219, unlock and update tree
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
-}
-
-// 2. Select 관련 Control 설정 함수
-void KERNEL::Operator::ModelPanel::SetSelect(Select * pcInSelect)
-{
-	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	pcImpl->m_pcSelect = pcInSelect;
 }
 
 //== Signal 처리 관련 함수 ============================================================================
@@ -454,40 +466,30 @@ void KERNEL::Operator::ModelPanel::OnItemCheckedSignal(Json::Object & cInObject)
 	//:Ken - checked or unchecked...
 	bool bChecked = cInObject.GetBoolean(SKW_CHECKED);
 
-	ModelTreeItem * pcItem = dynamic_cast<ModelTreeItem *>((ModelTreeItem *)nInItem);
-	if (nullptr == pcItem) {
+	ModelTreeItem * pcTreeItem = dynamic_cast<ModelTreeItem *>((ModelTreeItem *)nInItem);
+	if (nullptr == pcTreeItem) {
 		DEBUG_STOP;
 		return;
 	}
 
-	H3DF::SelectionResults cResults;
-	pcImpl->ModelTree().ShowSelectionResult(pcItem, cResults);
+	HC_KEY nKey = pcTreeItem->KeyValue();
+	if (INVALID_KEY == nKey) {
+		return;
+	}
 
+	H3DF::Key cKey(nKey);
 	if (true == bChecked) {
-		pcImpl->Select().SelectByResult(cResults);
+		pcImpl->Attribute().Show(cKey);
 	}
 	else {
-		pcImpl->Select().Unhighlight(cResults);
+		pcImpl->Attribute().NoShow(cKey);
 	}
-}
 
-void KERNEL::Operator::ModelPanel::OnItemCheckedSignalSelect(Json::Object & cInObject)
-{
-	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	DWORD_PTR nInItem = cInObject.GetDwordPtr(SKW_KEY);
-	//:Ken - checked or unchecked...
-	bool bChecked = cInObject.GetBoolean(SKW_CHECKED);
-
-	ModelTreeItem * pcItem = dynamic_cast<ModelTreeItem *>((ModelTreeItem *)nInItem);
-	if (nullptr == pcItem) {
-		DEBUG_STOP;
-		return;
-	}
+	return;
 
 	H3DF::SelectionResults cResults;
-	pcImpl->ModelTree().ShowSelectionResult(pcItem, cResults);
+	// 주어진 Item을 이용해서 Last Child까지 검색해서 결과값을 가져온다.
+	pcImpl->ModelTree().ShowSelectionResult(pcTreeItem, cResults);
 
 	if (true == bChecked) {
 		pcImpl->Select().SelectByResult(cResults);

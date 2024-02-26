@@ -19,7 +19,6 @@ namespace KERNEL
 		{
 		public:
 			Select(const DocView * pcInDocView);
-			void SetModelPanel(ModelPanel * pcInModelPanel);
 
 			int MouseMove(HEventInfo & cInEvent);
 

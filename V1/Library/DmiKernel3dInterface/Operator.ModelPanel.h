@@ -17,7 +17,6 @@ namespace KERNEL
 		public:
 			ModelPanel(const DocView * pcInDocView);
 			void Initialize(CString strFilePathName);
-			void SetSelect(Select * pcInSelect);
 
 			void Signal(Json::Object & cInObject);
 
@@ -28,7 +27,6 @@ namespace KERNEL
 
 			void OnItemSelectedSignal(Json::Object& cInObject);
 			void OnItemCheckedSignal(Json::Object & cInObject);
-			void OnItemCheckedSignalSelect(Json::Object & cInObject);
 		};
 	}
 }	

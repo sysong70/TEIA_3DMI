@@ -16,6 +16,7 @@ namespace H3DF
 		CString HexStr(DWORD_PTR nValue);
 
 		API_3DF CString GetTypeString(Type eType);
+		API_3DF Type GetType(Key & cKey);
 		API_3DF Type GetType(HC_KEY nInKey);
 		API_3DF CStringA GetName(HC_KEY nInKey);
 		API_3DF CStringA GetName(Key & cInKey);

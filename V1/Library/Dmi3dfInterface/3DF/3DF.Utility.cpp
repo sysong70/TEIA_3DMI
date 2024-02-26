@@ -219,6 +219,11 @@ CString H3DF::Utility::GetTypeString(Type eType)
 	return strText;
 }
 
+Type H3DF::Utility::GetType(Key & cKey)
+{
+	return GetType(cKey.KeyValue());
+}
+
 Type H3DF::Utility::GetType(HC_KEY nInKey)
 {
 	CStringA strType;
@@ -230,6 +235,12 @@ Type H3DF::Utility::GetType(HC_KEY nInKey)
 	}
 	else if ("include" == strType) {
 		return H3DF::Type::IncludeKey;
+	}
+	else if ("style" == strType) {
+		return H3DF::Type::SegmentStyle;
+	}
+	else if ("named style" == strType) {
+		return H3DF::Type::NamedStyle;
 	}
 	else {
 		assert(false);

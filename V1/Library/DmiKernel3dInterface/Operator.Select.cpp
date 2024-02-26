@@ -4,6 +4,9 @@
 
 #include "Impl/OperatorImpl.h"
 
+#include "Kernel.DocView.h"
+#include "Impl/Kernel.DocViewImpl.h"
+
 #include "Signal.Connector.h"
 #include "../Signal/Signal.h"
 #include "../Common/Common_Define.h"
@@ -66,8 +69,7 @@ namespace KERNEL
 			H3DF::HighlightControl & DynHighlightControl() { return *m_pcDynHighlightControl; }
 			H3DF::HighlightControl & DynLineHighlightControl() { return *m_pcDynLineHighlightControl; }
 
-			KERNEL::Operator::ModelPanel & ModelPanel() { return *m_pcModelPanel; }
-			KERNEL::Operator::ModelPanel * m_pcModelPanel = nullptr;
+			KERNEL::Operator::ModelPanel & ModelPanel();
 
 		protected:
 			H3DF::SelectionResults m_cNewHighlightSelection;
@@ -132,6 +134,14 @@ KERNEL::Operator::SelectImpl::SelectImpl(const DocView * pcInDocView) :
 	DEBUG_VALID(m_pcDynLineHighlightControl);
 }
 
+KERNEL::Operator::ModelPanel & KERNEL::Operator::SelectImpl::ModelPanel()
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)GetDocView().GetImpl();
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->ModelPanel();
+}
+
 //== Select 관련 함수 ================================================================================
 
 KERNEL::Operator::Select::Select(const DocView * pcInDocView)
@@ -140,14 +150,6 @@ KERNEL::Operator::Select::Select(const DocView * pcInDocView)
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;
-}
-
-void KERNEL::Operator::Select::SetModelPanel(ModelPanel * pcInModelPanel)
-{
-	auto * pcImpl = (SelectImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
-	pcImpl->m_pcModelPanel = pcInModelPanel;
 }
 
 //== Mouse Event 관련 함수 ===========================================================================

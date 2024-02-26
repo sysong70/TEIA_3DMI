@@ -201,6 +201,11 @@ namespace H3DF
 		LegacyShaderDefinition					= 0x20000008,
 		ShapeDefinition							= 0x20000009,
 
+		SegmentStyle							= 0x20013001,
+		NamedStyle								= 0x20013002,
+		MaterialPalette							= 0x20013003,
+		Portfolio								= 0x20013004,
+
 		Control									= 0x50000000,
 		CameraControl							= 0x50000001,
 		SelectabilityControl					= 0x50000002,
@@ -712,8 +717,7 @@ namespace H3DF
 	using PolygonArray = std::vector<PolygonKit, Allocator<PolygonKit>>;
 
 	using StringArray = std::vector<CString, Allocator<CString>>;
-	using AStringArray = std::vector<CStringA, Allocator<CStringA>>;
-
+	
 	using IntPtrTArray = std::vector<intptr_t, Allocator<intptr_t>>;
 	using ByteArray = std::vector<BYTE, Allocator<BYTE>>;
 	using ByteArrayArray = std::vector<ByteArray, Allocator<ByteArray>>;

@@ -10,6 +10,7 @@
 #include "../Operator.Camera.h"
 #include "../Operator.Select.h"
 #include "../Operator.ModelPanel.h"
+#include "../Operator.Attribute.h"
 
 #include <3DF.Factory.h>
 #include <3DF.Canvas.h>
@@ -51,6 +52,8 @@ namespace KERNEL
 		//== Operator 관련 함수 ======================================================================
 		void AllocationOperator(const DocView * pcInDocView);
 		Operator::OperatorBase * GetOperator(Operator::Type eInType);
+
+		Operator::Attribute & Attribute();
 		Operator::Camera & Camera();
 		Operator::Select & Select();
 		Operator::ModelPanel & ModelPanel();
