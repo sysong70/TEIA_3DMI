@@ -178,7 +178,9 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 	m_cIncludeStyles = m_cModelIncludeKey.Subsegment("styles");
 
 	m_cShowStyle = m_cIncludeStyles.Subsegment("show_style");
+	m_cShowVertexStyle = m_cIncludeStyles.Subsegment("show_vertex_style");
 	m_cNoShowStyle = m_cIncludeStyles.Subsegment("noshow_style");
+	m_cNoShowVertexStyle = m_cIncludeStyles.Subsegment("noshow_vertex_style");
 
 	m_cPoccsIncludeSegment = m_cModelIncludeKey.Subsegment("poccs");
 	m_cPartsIncludeSegment = m_cModelIncludeKey.Subsegment("parts");
@@ -1042,19 +1044,24 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 
 	A3DStatus eStatus = A3D_SUCCESS;
 
-	bool bShowFlag = true;
+	A3DEEntityType eType = kA3DTypeUnknown;
+	CHECK_A3D_RETURN(A3DEntityGetType(pcRepItem, &eType));
 
 	// #3DX : Show / Noshw 처리
 	if (cAttrData.m_bShow && !cAttrData.m_bRemoved && A3D_SUCCESS == IsShow(pcRepItem)) {
-		bShowFlag = true;
+		// Ri Point Set인 경우는 별도로 Show Vertex Style을 적용한다.
+		if(kA3DTypeRiPointSet == eType) {
+			cSegment.GetStyleControl().PushSegment(m_cShowVertexStyle);
+		}
 	}
 	else {
-		cSegment.GetStyleControl().PushSegment(m_cNoShowStyle);
-		bShowFlag = false;
+		if (kA3DTypeRiPointSet == eType) {
+			cSegment.GetStyleControl().PushSegment(m_cNoShowVertexStyle);
+		}
+		else {
+			cSegment.GetStyleControl().PushSegment(m_cNoShowStyle);
+		}
 	}
-
-	A3DEEntityType eType = kA3DTypeUnknown;
-	CHECK_A3D_RETURN(A3DEntityGetType(pcRepItem, &eType));
 
 	A3DRiRepresentationItemData cRepItemData;
 	A3D_INITIALIZE_DATA(A3DRiRepresentationItemData, cRepItemData);
@@ -1122,7 +1129,7 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 
 		case kA3DTypeRiPointSet:
 			eStatus = DrawRiPointSet(pcRepItem, cSegment, pcAttr);
-			break;
+		break;
 
 		default:
 			assert(false);
@@ -1182,7 +1189,9 @@ A3DStatus TdfImport::DrawSet(const A3DRiSet * pSet, H3DF::SegmentKey & cParentSe
 	A3DMiscCascadedAttributesData cAttrData;
 	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pSet, pcParentAttr, &pcAttr, &cAttrData));
 
-	if (cAttrData.m_bShow && !cAttrData.m_bRemoved && A3D_SUCCESS == IsShow(pSet))
+	
+	// #3DX : Show / Noshw 처리
+	// if (cAttrData.m_bShow && !cAttrData.m_bRemoved && A3D_SUCCESS == IsShow(pSet))
 	{
 		A3DRiSetData sData;
 		A3D_INITIALIZE_DATA(A3DRiSetData, sData);
@@ -1293,13 +1302,13 @@ A3DStatus TdfImport::DrawRiPointSet(const A3DRiRepresentationItem * pcRepItem, H
 
 	A3DStatus nStatus = A3DRiPointSetGet((A3DRiPointSet *)pcRepItem, &sData);
 	if (A3D_SUCCESS == nStatus) {
+		// 앞쪽에서 Vertex Style을 이용해서 처리함.
 		//cSegment.GetVisibilityControl().SetMarkers(true);
-		cSegment.GetVisibilityControl().SetVertices(true);
+		//cSegment.GetVisibilityControl().SetVertices(true);
 
 		PointArray cPointArray;
 		for (unsigned int i = 0; i < sData.m_uiSize; ++i) {
 			cPointArray.push_back(Point(sData.m_pPts[i].m_dX, sData.m_pPts[i].m_dY, sData.m_pPts[i].m_dZ));
-			//cSegment.InsertMarker(sData.m_pPts[i].m_dX, sData.m_pPts[i].m_dY, sData.m_pPts[i].m_dZ);
 		}
 
 		H3DF::ShellKit cShellKit;

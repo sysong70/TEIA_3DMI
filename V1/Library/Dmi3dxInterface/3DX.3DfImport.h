@@ -267,7 +267,9 @@ private:
 
 	H3DF::SegmentKey m_cIncludeStyles;
 	H3DF::SegmentKey m_cShowStyle;
+	H3DF::SegmentKey m_cShowVertexStyle;
 	H3DF::SegmentKey m_cNoShowStyle;
+	H3DF::SegmentKey m_cNoShowVertexStyle;
 
 	H3DF::SegmentKey m_cPartsIncludeSegment;
 	H3DF::SegmentKey m_cPoccsIncludeSegment;
