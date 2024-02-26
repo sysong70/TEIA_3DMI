@@ -85,6 +85,49 @@ bool KERNEL::Operator::Attribute::Show()
 	return true;
 }
 
+bool KERNEL::Operator::Attribute::Show(H3DF::Key & cKey)
+{
+	H3DF::Type eType = H3DF::Utility::GetType(cKey);
+
+	SegmentKey cSegment;
+	if (H3DF::Type::IncludeKey == eType) {
+		IncludeKey cIncludeKey(cKey.KeyValue());
+		cSegment = cIncludeKey.GetTarget();
+	}
+	else {
+		cSegment = SegmentKey(cKey.KeyValue());
+	}
+
+	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	DocViewImpl * pcDocImpl = (DocViewImpl *)pcImpl->GetDocView().GetImpl();
+	DEBUG_VALID(pcDocImpl);
+
+	ModelImpl * pcModelImpl = (ModelImpl *)pcDocImpl->GetModel().GetImpl();
+	DEBUG_VALID(pcModelImpl);
+
+	StyleTypeArray cTypes;
+	SegmentKeyArray cSegmentSources;
+	AStringArray astrStyleNames;
+	ConditionalExpressionArray acOutConditions;
+
+	if (true == cSegment.GetStyleControl().Show(cTypes, cSegmentSources, astrStyleNames, acOutConditions)) {
+		for (size_t nIndex = 0; nIndex < cSegmentSources.size(); nIndex++) {
+			if ("noshow_style" == astrStyleNames[nIndex]) {
+				cSegment.GetStyleControl().Flush(cSegmentSources[nIndex]);
+			}
+		}
+	}
+
+	// cSegment.GetStyleControl().PushSegment(pcModelImpl->NoShowStyleSegment());
+
+	pcDocImpl->GetCanvas().GetFrontView().Update();
+
+	return true;
+}
+
+
 bool KERNEL::Operator::Attribute::Show(H3DF::SelectionItem & cSelItem)
 {
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
@@ -94,7 +137,7 @@ bool KERNEL::Operator::Attribute::Show(H3DF::SelectionItem & cSelItem)
 	return true;
 }
 
-bool KERNEL::Operator::Attribute::Hide()
+bool KERNEL::Operator::Attribute::NoShow()
 {
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -109,7 +152,6 @@ bool KERNEL::Operator::Attribute::Hide()
 	if (0 == nCount) {
 		return false;
 	}
-
 
 	SelectionResults cResult = pcDocViewImpl->Select().Results();
 
@@ -148,7 +190,36 @@ bool KERNEL::Operator::Attribute::Hide()
 	return true;
 }
 
-bool KERNEL::Operator::Attribute::Hide(H3DF::SelectionItem & cSelItem)
+bool KERNEL::Operator::Attribute::NoShow(H3DF::Key & cKey)
+{
+	H3DF::Type eType = H3DF::Utility::GetType(cKey);
+
+	SegmentKey cSegment;
+	if (H3DF::Type::IncludeKey == eType) {
+		IncludeKey cIncludeKey(cKey.KeyValue());
+		cSegment = cIncludeKey.GetTarget();
+	}
+	else {
+		cSegment = SegmentKey(cKey.KeyValue());
+	}
+
+	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	DocViewImpl * pcDocImpl = (DocViewImpl *)pcImpl->GetDocView().GetImpl();
+	DEBUG_VALID(pcDocImpl);
+
+	ModelImpl * pcModelImpl = (ModelImpl *)pcDocImpl->GetModel().GetImpl();
+	DEBUG_VALID(pcModelImpl);
+
+	cSegment.GetStyleControl().PushSegment(pcModelImpl->NoShowStyleSegment());
+
+	pcDocImpl->GetCanvas().GetFrontView().Update();
+
+	return true;
+}
+
+bool KERNEL::Operator::Attribute::NoShow(H3DF::SelectionItem & cSelItem)
 {
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);

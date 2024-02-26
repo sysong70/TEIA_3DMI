@@ -9,6 +9,8 @@
 #include "Impl/ControlImpl.h"
 #include "Impl/DefinitionImpl.h"
 
+#include "3DF.Utility.h"
+
 #include <hc.h>
 #include <Htools.h>
 
@@ -168,7 +170,7 @@ StyleKey H3DF::StyleControl::PushNamed(CStringA strInStyleName)
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
-	HC_KEY nStyleKey = HC_Style_Segment(strInStyleName);
+	HC_KEY nStyleKey = HC_Named_Style_Segment(strInStyleName);
 	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	StyleKey cStyle(nStyleKey);
@@ -186,7 +188,7 @@ StyleKey H3DF::StyleControl::PushNamed(CStringA strInStyleName, ConditionalExpre
 	}
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
-	HC_KEY nStyleKey = HC_Conditional_Style(strInStyleName, strCondition);
+	HC_KEY nStyleKey = HC_Conditional_Named_Style(strInStyleName, strCondition);
 	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	StyleKey cStyle(nStyleKey);
@@ -224,6 +226,23 @@ StyleKey H3DF::StyleControl::PushSegment(SegmentKey const & cInStyleSource, Cond
 	return cStyle;
 }
 
+void H3DF::StyleControl::Flush(SegmentKey const & cInStyleSource)
+{
+	StyleControlImpl * pcImpl = (StyleControlImpl *)m_pcImpl;
+	if (nullptr == pcImpl) { assert(false); }
+
+	H3DF::Type eType = Utility::GetType(cInStyleSource.KeyValue());
+
+	if (H3DF::Type::SegmentStyle != eType && H3DF::Type::NamedStyle != eType) {
+		DEBUG_STOP;
+		return;
+	}
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		HC_Delete_By_Key(cInStyleSource.KeyValue());
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+}
+
 bool H3DF::StyleControl::Show(StyleKeyArray & acOutStyles) const
 {
 	StyleControlImpl * pcImpl = dynamic_cast<StyleControlImpl *>(m_pcImpl);
@@ -232,16 +251,16 @@ bool H3DF::StyleControl::Show(StyleKeyArray & acOutStyles) const
 	CStringA strStyle;
 	int nStyleCount = 0;
 	char chType[MVO_BUFFER_SIZE];
-	HC_KEY nSegmentKey;
+	HC_KEY nKey;
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_Begin_Contents_Search(".", "styles"); {
+		HC_Begin_Contents_Search(".", "styles, named styles"); {
 			HC_Show_Contents_Count(&nStyleCount);
 
 			for (int nIndex = 0; nIndex < nStyleCount; nIndex++) {
-				HC_Find_Contents(chType, &nSegmentKey);
+				HC_Find_Contents(chType, &nKey);
 
-				StyleKey cStyle(nSegmentKey);
+				StyleKey cStyle(nKey);
 				acOutStyles.push_back(cStyle);
 			}
 
@@ -252,6 +271,7 @@ bool H3DF::StyleControl::Show(StyleKeyArray & acOutStyles) const
 	return !acOutStyles.empty();
 }
 
+// ConditionalExpressionArray는 구현 않됨.
 bool H3DF::StyleControl::Show(StyleTypeArray & cOutTypes, SegmentKeyArray & cOutSegmentSources, AStringArray & astrOutStyleNames, ConditionalExpressionArray & acOutConditions) const
 {
 	StyleControlImpl * pcImpl = dynamic_cast<StyleControlImpl *>(m_pcImpl);
@@ -263,21 +283,34 @@ bool H3DF::StyleControl::Show(StyleTypeArray & cOutTypes, SegmentKeyArray & cOut
 	HC_KEY nKey;
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_Begin_Contents_Search(".", "styles"); {
+		HC_Begin_Contents_Search(".", "styles, named styles"); {
 			HC_Show_Contents_Count(&nStyleCount);
 
 			for (int nIndex = 0; nIndex < nStyleCount; nIndex++) {
 				HC_Find_Contents(chType, &nKey);
 
-				Style::Type eType = Style::Type::Segment;
-				cOutTypes.push_back(eType);
-
 				SegmentKey cSegment(nKey);
 				cOutSegmentSources.push_back(cSegment);
 
-				CStringA strStyleName;
-				HC_Show_Style_Segment(nKey, strStyleName.GetBuffer(MVO_BUFFER_SIZE));
-				astrOutStyleNames.push_back(strStyleName);
+				char chName[MVO_BUFFER_SIZE];
+				Style::Type eType;
+				if (0 == strcmp("style", chType)) {
+					cOutTypes.push_back(Style::Type::Segment);
+					HC_Show_Style_Segment(nKey, chName);
+					HC_Parse_String(chName, "/", -1, chName);
+				}
+				else if (0 == strcmp("named style", chType)) {
+					cOutTypes.push_back(Style::Type::Named);
+					HC_Show_Named_Style_Segment(nKey, chName);
+				}
+				else {
+					DEBUG_STOP;
+				}
+
+				cOutTypes.push_back(eType);
+
+				CStringA strName(chName);
+				astrOutStyleNames.push_back(strName);
 
 				ConditionalExpression cCondition;
 				acOutConditions.push_back(cCondition);

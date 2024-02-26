@@ -86,33 +86,29 @@ void KERNEL::DocViewImpl::CancelCommands()
 
 void KERNEL::DocViewImpl::AllocationOperator(const DocView * pcInDocView)
 {
-	// VisualEffects Operator 생성 및 설정
 	m_apcOperator[(int)KERNEL::Operator::Type::VisualEffects] = new KERNEL::Operator::VisualEffects(pcInDocView);
 
-	// Attribute Operator 생성 및 설정
 	m_apcOperator[(int)KERNEL::Operator::Type::Attribute] = new KERNEL::Operator::Attribute(pcInDocView);
 
-	// Camera Operator 생성 및 설정
 	m_apcOperator[(int)KERNEL::Operator::Type::Camera] = new KERNEL::Operator::Camera(pcInDocView);
 
-	// Camera Operator 생성 및 설정
-	KERNEL::Operator::Select * pcSelect = new KERNEL::Operator::Select(pcInDocView);
-	m_apcOperator[(int)KERNEL::Operator::Type::Select] = pcSelect;
+	m_apcOperator[(int)KERNEL::Operator::Type::Select] = new KERNEL::Operator::Select(pcInDocView);
 	
-	// Model Panel Operator 생성 및 설정
-	KERNEL::Operator::ModelPanel * pcModelPanel = new KERNEL::Operator::ModelPanel(pcInDocView);
-	pcModelPanel->SetSelect((KERNEL::Operator::Select *)m_apcOperator[(int)KERNEL::Operator::Type::Select]);
-	m_apcOperator[(int)KERNEL::Operator::Type::ModelPanel] = pcModelPanel;
-
-	pcSelect->SetModelPanel(pcModelPanel);
+	m_apcOperator[(int)KERNEL::Operator::Type::ModelPanel] = new KERNEL::Operator::ModelPanel(pcInDocView);
 
 	// Navigation Cube에서 사용하는 DynHighlightControl을 설정한다. Cube에서 선택된 부분을 Unhighlight하기 위함.
+	KERNEL::Operator::Select * pcSelect = (KERNEL::Operator::Select *)m_apcOperator[(int)KERNEL::Operator::Type::Select];
 	GetCanvas().GetFrontView().GetNavigationCube().SetHighlightControl(pcSelect->DynHighlightControl());
 }
 
 KERNEL::Operator::OperatorBase * KERNEL::DocViewImpl::GetOperator(Operator::Type eInType)
 { 
 	return m_apcOperator[(int)eInType]; 
+}
+
+KERNEL::Operator::Attribute & KERNEL::DocViewImpl::Attribute()
+{
+	return *(Operator::Attribute *)m_apcOperator[(int)Operator::Type::Attribute];
 }
 
 KERNEL::Operator::Camera & KERNEL::DocViewImpl::Camera()
@@ -159,7 +155,7 @@ void KERNEL::DocViewImpl::SetVisibility(int nId)
 			break;
 
 		case HOME_3D_CMD_Visualize_Hide:
-			pcOperator->Hide();
+			pcOperator->NoShow();
 			break;
 
 		case HOME_3D_CMD_Visualize_ShowOnly:

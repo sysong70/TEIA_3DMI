@@ -69,6 +69,8 @@ namespace H3DF
 		StyleKey PushSegment(SegmentKey const & cInStyleSource);
 		StyleKey PushSegment(SegmentKey const & cInStyleSource, ConditionalExpression const & cInConditional);
 
+		void Flush(SegmentKey const & cInStyleSource);
+
 		bool Show(StyleKeyArray & acOutStyles) const;
 		bool Show(StyleTypeArray & cOutTypes, SegmentKeyArray & cOutSegmentSources, AStringArray & astrOutStyleNames, ConditionalExpressionArray & acOutConditions) const;
 	};
