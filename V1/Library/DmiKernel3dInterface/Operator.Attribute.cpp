@@ -266,6 +266,7 @@ bool KERNEL::Operator::Attribute::ShowToggle()
 		pcImpl->m_bToogled = false;
 	}
 
+	// Zoom 하기전에 다시 계산할 수 있도록 초기화 한다.
 	pcDocImpl->GetBaseView()->InvalidateSceneBounding();
 
 	pcDocImpl->GetBaseView()->FitWorld();

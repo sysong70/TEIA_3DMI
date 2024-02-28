@@ -139,6 +139,8 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 	int nViewId = cInObject.GetInteger(SKW_VIEWID);
 
 	SESSION::Session * pcSession = GetSession(nViewId);
+
+	TRACE(L"View Signal: ViewId %d, Action: %d", nViewId, nAction);
 	
 	switch ((Signal::View::Action)nAction)
 	{

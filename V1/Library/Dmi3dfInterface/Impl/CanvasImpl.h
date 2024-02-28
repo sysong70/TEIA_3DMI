@@ -25,6 +25,10 @@ namespace H3DF
 
 		void Copy(const CanvasImpl * pcInThat);
 
+		Signal::Delivery & Delivery();
+		const Signal::Delivery & Delivery() const;
+		void SetDelivery(const Signal::Delivery * pcInDelivery, int nViewId);
+
 		// 초기 입력 변수값
 		H3DF::WindowHandle m_nInWindowHandle = 0;
 		char * m_pchName = NULL;
@@ -34,5 +38,8 @@ namespace H3DF
 		const H3DF::View * m_pcFrontView = nullptr;
 
 		H3DF::Model * m_pcModel = nullptr;
+
+		int m_nViewId = -1;
+		const Signal::Delivery * m_pcDelivery = nullptr;
 	};
 }

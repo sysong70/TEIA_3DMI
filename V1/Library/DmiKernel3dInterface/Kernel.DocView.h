@@ -17,7 +17,9 @@ namespace KERNEL
 		DocView();
 		KERNEL::Type ObjectType() const { return KERNEL::Type::View; };
 
-		void Initialize(Json::Object & cInObject, Signal::Delivery & cDelivery);
+		void SetDelivery(Signal::Delivery & cDelivery);
+
+		void Initialize(Json::Object & cInObject);
 		void Paint(Json::Object & cInObject);
 		void Resize(Json::Object & cInObject);
 		void CancelCommands();
