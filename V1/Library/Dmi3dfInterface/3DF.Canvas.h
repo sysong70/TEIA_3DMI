@@ -58,7 +58,8 @@ namespace H3DF
 
 		void AttachViewAsLayout(View const * pcInView);
 
-		void FileOpen(Json::Object & cInObject, Signal::Delivery & cDelivery);
+		void SetDelivery(Signal::Delivery & cDelivery, int nViewId);
+		void FileOpen(Json::Object & cInObject);
 		static void ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObject, Signal::Delivery & cDelivery);
 
 		H3DF::View & GetFrontView() const;

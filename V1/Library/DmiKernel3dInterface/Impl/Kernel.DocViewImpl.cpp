@@ -62,11 +62,13 @@ H3DF::BaseView * KERNEL::DocViewImpl::GetBaseView()
 
 Signal::Delivery & KERNEL::DocViewImpl::Delivery() 
 { 
+	((Signal::Delivery *)m_pcDelivery)->ViewId = m_nViewId;
 	return *(Signal::Delivery *)m_pcDelivery;
 }
 
 const Signal::Delivery & KERNEL::DocViewImpl::Delivery() const 
 { 
+	((Signal::Delivery *)m_pcDelivery)->ViewId = m_nViewId;
 	return *m_pcDelivery; 
 }
 

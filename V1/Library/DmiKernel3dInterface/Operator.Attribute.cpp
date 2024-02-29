@@ -23,6 +23,7 @@
 #include <3DF/3DF.Utility.h>
 
 #include <Impl/ModelImpl.h>
+#include <Impl/ViewImpl.h>
 
 #include <Json.h>
 
@@ -43,10 +44,11 @@ namespace KERNEL
 
 			void Copy(AttributeImpl * pcInThat) {
 				OperatorImpl::Copy(pcInThat);
+
+				m_bToogled = pcInThat->m_bToogled;
 			}
 
-			// void Request(Json::Object & cInObject);
-			// void Change(Json::Object & cInObject);
+			bool m_bToogled = false;
 		};
 	}
 }
@@ -242,6 +244,37 @@ bool KERNEL::Operator::Attribute::ShowToggle()
 {
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
+
+	DocViewImpl * pcDocImpl = (DocViewImpl *)pcImpl->GetDocView().GetImpl();
+	DEBUG_VALID(pcDocImpl);
+
+	ModelImpl * pcModelImpl = (ModelImpl *)pcDocImpl->GetModel().GetImpl();
+	DEBUG_VALID(pcModelImpl);
+
+	if(false == pcImpl->m_bToogled) {
+		pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(false).SetLines(false);
+		pcModelImpl->ShowVertexStyleSegment().GetVisibilityControl().SetVertices(false);
+		pcModelImpl->NoShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
+		pcModelImpl->NoShowVertexStyleSegment().GetVisibilityControl().SetVertices(true);
+		pcImpl->m_bToogled = true;
+	}
+	else {
+		pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
+		pcModelImpl->ShowVertexStyleSegment().GetVisibilityControl().SetVertices(true);
+		pcModelImpl->NoShowStyleSegment().GetVisibilityControl().SetFaces(false).SetLines(false);
+		pcModelImpl->NoShowVertexStyleSegment().GetVisibilityControl().SetVertices(false);
+		pcImpl->m_bToogled = false;
+	}
+
+	// Zoom 하기전에 다시 계산할 수 있도록 초기화 한다.
+	pcDocImpl->GetBaseView()->InvalidateSceneBounding();
+
+	pcDocImpl->GetBaseView()->FitWorld();
+	pcDocImpl->GetBaseView()->CameraPositionChanged();
+
+	pcDocImpl->GetBaseView()->SetZoomLimit();
+
+	pcDocImpl->GetCanvas().GetFrontView().Update();
 
 	return true;
 }

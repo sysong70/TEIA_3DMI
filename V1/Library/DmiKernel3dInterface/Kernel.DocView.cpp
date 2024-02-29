@@ -25,14 +25,21 @@ KERNEL::DocView::DocView()
 	m_pcImpl = new DocViewImpl();
 }
 
-//== View 관련 함수 ==================================================================================
-
-// 1. H3DF View Initialize 함수
-void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cDelivery)
+void KERNEL::DocView::SetDelivery(Signal::Delivery & cDelivery)
 {
 	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
+
 	pcImpl->SetDelivery(&cDelivery);
+}
+
+//== View 관련 함수 ==================================================================================
+
+// 1. H3DF View Initialize 함수
+void KERNEL::DocView::Initialize(Json::Object & cInObject)
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	H3DF::WindowHandle nWindowHandle = (H3DF::WindowHandle)cInObject.GetDwordPtr(SKW_HWND);
 	
@@ -48,7 +55,8 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject, Signal::Delivery & cD
 
 	pcImpl->AllocationOperator(this);
 
-	pcImpl->m_pcCanvas->FileOpen(cInObject, cDelivery);
+	pcImpl->m_pcCanvas->SetDelivery(pcImpl->Delivery(), pcImpl->m_nViewId);
+	pcImpl->m_pcCanvas->FileOpen(cInObject);
 
 	pcImpl->ModelPanel().Initialize(strFilePathName);
 }

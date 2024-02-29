@@ -45,13 +45,18 @@ namespace H3DF
 		SegmentKey m_cIncludeStyles;
 
 		SegmentKey & ShowStyleSegment() { return m_cShowStyle; }
+		SegmentKey & ShowVertexStyleSegment() { return m_cShowVertexStyle; }
 		SegmentKey & NoShowStyleSegment() { return m_cNoShowStyle; }
+		SegmentKey & NoShowVertexStyleSegment() { return m_cNoShowVertexStyle; }
 
 	private:
 		SegmentKey m_cSegmentKey;
 
 		SegmentKey m_cShowStyle;
+		SegmentKey m_cShowVertexStyle;
 		SegmentKey m_cNoShowStyle;
+		SegmentKey m_cNoShowVertexStyle;
+
 
 		ModelHandedness m_eModelHandedness;
 

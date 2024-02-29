@@ -72,9 +72,15 @@ void H3DF::ModelImpl::Init()
 	m_cShowStyle = m_cIncludeStyles.Subsegment("show_style");
 	m_cShowStyle.GetVisibilityControl().SetFaces(true).SetLines(true);
 
+	m_cShowVertexStyle = m_cIncludeStyles.Subsegment("show_vertex_style");
+	m_cShowVertexStyle.GetVisibilityControl().SetVertices(true);
+
 	// No Show Condtion용 Style 생성
 	m_cNoShowStyle = m_cIncludeStyles.Subsegment("noshow_style");
-	m_cNoShowStyle.GetVisibilityControl().SetFaces(false).SetLines(false);
+	m_cNoShowStyle.GetVisibilityControl().SetFaces(false).SetLines(false).SetVertices(false);
+
+	m_cNoShowVertexStyle = m_cIncludeStyles.Subsegment("noshow_vertex_style");
+	m_cNoShowVertexStyle.GetVisibilityControl().SetVertices(false);
 
 	m_cModels.GetStyleControl().PushSegment(m_cShowStyle);
 

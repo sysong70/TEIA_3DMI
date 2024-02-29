@@ -35,7 +35,8 @@ void SESSION::Session::SessionId(int nSessionId)
 
 void SESSION::Session::ViewInitialize(Json::Object & cInObject, Signal::Delivery & cInstance)
 {
-	m_pcDocView->Initialize(cInObject, cInstance);
+	m_pcDocView->SetDelivery(cInstance);
+	m_pcDocView->Initialize(cInObject);
 }
 
 void SESSION::Session::ViewPaint(Json::Object & cInObject)
