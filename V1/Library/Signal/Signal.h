@@ -134,12 +134,12 @@ namespace Signal
 		Application,
 		MainFrame,
 		StatusBar,
-		View,
 
+		View,
+		ModelPanel,
 		ViewPanel,
 		LayerPanel,
 		ScenePanel,
-		ModelPanel,
 		TaskBar,
 
 		Progress,
@@ -605,6 +605,7 @@ namespace Signal
 		friend class View;
 		friend class ModelPanel;
 		friend class TaskBar;
+		friend class Command;
 
 		Delivery();
 
