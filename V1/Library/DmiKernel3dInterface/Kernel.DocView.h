@@ -26,6 +26,8 @@ namespace KERNEL
 
 		void ViewId(int nViewId);
 		int ViewId();
+
+		bool Save(CString strFilePathName);
 	
 		//== Mouse 관련 함수 =========================================================================
 		void MouseSignal(Json::Object & cInObject);
