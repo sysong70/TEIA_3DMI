@@ -297,28 +297,27 @@ bool H3DF::LineKey::GetMidPoint(Point & cMP)
 	}
 
 	// 전체 길이 계산
-	double dLength = 0.0;
+	double dTotalLength = 0.0;
 	for (size_t nIndex = 0; nIndex < aPoints.size() - 1; nIndex++) {
-		dLength += aPoints[nIndex].DistanceWith(aPoints[nIndex + 1]);
+		dTotalLength += aPoints[nIndex].DistanceWith(aPoints[nIndex + 1]);
 	}
 
-	double dMidLength = dLength / 2.0;
-	dLength = 0;
-
+	double dMidLength = dTotalLength / 2.0;
+	double dLength = 0;
+	dTotalLength = 0;
+ 
 	for (size_t nIndex = 0; nIndex < aPoints.size() - 1; nIndex++) {
-		dLength += aPoints[nIndex].DistanceWith(aPoints[nIndex + 1]);
-		if (dMidLength < dLength) {
-			double dDiff = dLength - dMidLength;
+		dLength = aPoints[nIndex].DistanceWith(aPoints[nIndex + 1]);
+		dTotalLength += dLength;
+
+		if (dMidLength < dTotalLength) {
+			double dDiff = dMidLength - (dTotalLength - dLength);
 
 			Vector cVec = aPoints[nIndex + 1] - aPoints[nIndex];
 			cVec.Normalize();
 
 			cMP = aPoints[nIndex] + (cVec * (float)dDiff);
 
-			return true;
-		}
-		else if (1e-6 > fabs(dMidLength - dLength)) {
-			cMP = aPoints[nIndex + 1];
 			return true;
 		}
 	}

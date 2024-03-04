@@ -254,6 +254,7 @@ bool KERNEL::Operator::Attribute::ShowToggle()
 	if(false == pcImpl->m_bToogled) {
 		pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(false).SetLines(false);
 		pcModelImpl->ShowVertexStyleSegment().GetVisibilityControl().SetVertices(false);
+
 		pcModelImpl->NoShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
 		pcModelImpl->NoShowVertexStyleSegment().GetVisibilityControl().SetVertices(true);
 		pcImpl->m_bToogled = true;
@@ -261,6 +262,7 @@ bool KERNEL::Operator::Attribute::ShowToggle()
 	else {
 		pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
 		pcModelImpl->ShowVertexStyleSegment().GetVisibilityControl().SetVertices(true);
+
 		pcModelImpl->NoShowStyleSegment().GetVisibilityControl().SetFaces(false).SetLines(false);
 		pcModelImpl->NoShowVertexStyleSegment().GetVisibilityControl().SetVertices(false);
 		pcImpl->m_bToogled = false;

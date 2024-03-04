@@ -116,6 +116,19 @@ int KERNEL::DocView::ViewId()
 	return pcImpl->m_nViewId;
 }
 
+bool KERNEL::DocView::Save(CString strFilePathName)
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+
+	if (true == strFilePathName.IsEmpty()) {
+		strFilePathName = L"Z://Test.hsf";
+	}
+	
+	pcImpl->GetCanvas().GetFrontView().SaveHsfFile(strFilePathName, &pcImpl->GetCanvas());
+
+	return true;
+}
+
 //== Mouse 관련 함수 =================================================================================
 
 void KERNEL::DocView::MouseSignal(Json::Object & cInObject)

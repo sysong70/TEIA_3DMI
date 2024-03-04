@@ -286,9 +286,8 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject)
 	//cModelSegmentKey.ForcedClose();
 
 	// #3DF_Debug: Z://Test.hsf
-	//:Ken - 20240229
-#ifdef SAVE_HSF_FILE
-	 GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
+#ifdef _DEBUG
+	 //GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
 #endif
 	 // GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
 

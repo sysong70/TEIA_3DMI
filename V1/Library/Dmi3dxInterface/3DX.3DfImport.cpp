@@ -16,6 +16,7 @@
 #include <3DF/Style.h>
 #include <3DF/Shell.h>
 #include <3DF/Line.h>
+#include <3DF/LineAttribute.h>
 #include <3DF/Polygon.h>
 #include <3DF/Bounding.h>
 
@@ -4016,7 +4017,7 @@ A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3D
 
 	LogIncreaseTabIndex(2);
 
-	Log(2, L"DrawTess3DWire: %s, %s", LogHexStr((DWORD_PTR)pTess3DWire), Dmi3dx::GetA3dEntityTypeString(eType).c_str());
+	Log(2, L"DrawTess3DWire: %s, %s", LogHexStr((DWORD_PTR)pTess3DWire), Dmi3dx::GetA3dEntityTypeString(eType));
 
 	switch (eType)
 	{
@@ -4055,7 +4056,7 @@ A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3D
 		A3DEEntityType eEntityType = kA3DTypeUnknown;
 		CHECK_A3D_RETURN(A3DEntityGetType(cWireEdgeData.m_p3dCurve, &eEntityType));
 
-		Log(2, L"3dCurve type: %s, %s", LogHexStr((DWORD_PTR)cWireEdgeData.m_p3dCurve), Dmi3dx::GetA3dEntityTypeString(eEntityType).c_str());
+		Log(2, L"3dCurve type: %s, %s", LogHexStr((DWORD_PTR)cWireEdgeData.m_p3dCurve), Dmi3dx::GetA3dEntityTypeString(eEntityType));
 	}
 
 	SetLineStyle(pTess3DWire, cParentSegment, pcParentAttr);
@@ -5484,9 +5485,74 @@ bool TdfImport::SetLineMaterialMapping(const A3DMiscCascadedAttributesData & cAt
 	H3DF::StyleControl cStyleControl = cSegment.GetStyleControl();
 	H3DF::StyleKey cStyle = cSegment.GetStyleControl().PushSegment(cStyleSegment);
 
-	// 	if(INVALID_KEY == cStyle.KeyValue()) {
-	// 		return false;
-	// 	}
+	// line pattern 관련 설정
+	A3DUns32 nLinePatternIndex = cAttrData.m_sStyle.m_uiLinePatternIndex;
+	A3DGraphLinePatternData cLinePatternData;
+	A3D_INITIALIZE_DATA(A3DGraphLinePatternData, cLinePatternData);
+	if (A3D_SUCCESS == A3DGlobalGetGraphLinePatternData(nLinePatternIndex, &cLinePatternData)) {
+		bool bStatus = false;
+		H3DF::LinePattern::Default eLineType = H3DF::LinePattern::Default::None;
+		switch (cLinePatternData.m_uiNumberOfLengths)
+		{
+			case 2:
+			{
+				double d1 = cLinePatternData.m_pdLengths[0];
+				double d2 = cLinePatternData.m_pdLengths[1];
+				if (0.0 != d2)
+				{
+					if (fabs(d1 / d2 - 1) < 1e-3) {
+						eLineType = H3DF::LinePattern::Default::Dotted; // HC_Set_Line_Pattern("...");	// 짧은 점선
+					}
+					else {
+						eLineType = H3DF::LinePattern::Default::Dashed; // HC_Set_Line_Pattern("- -");	// 긴 점선
+					}
+				}
+			}
+			break;
+
+			case 4:
+				eLineType = H3DF::LinePattern::Default::DashDot; // HC_Set_Line_Pattern("-.");	// 일점쇄선
+				break;
+
+			default:
+			{
+				if (cLinePatternData.m_uiNumberOfLengths > 4) {
+					eLineType = H3DF::LinePattern::Default::Dash2Dot; // HC_Set_Line_Pattern("-..");	// 이점쇄선
+				}
+			}
+			break;
+		}
+
+		if (H3DF::LinePattern::Default::None != eLineType) {
+
+			switch (eLineType)
+			{
+				case H3DF::LinePattern::Default::None:
+				case H3DF::LinePattern::Default::Solid:
+					break;
+
+				case H3DF::LinePattern::Default::DashDot:
+					cStyleSegment.GetLineAttributeControl().SetPattern("-.");
+					break;
+
+				case H3DF::LinePattern::Default::Dashed:
+					cStyleSegment.GetLineAttributeControl().SetPattern("- -");
+					break;
+
+				case H3DF::LinePattern::Default::Dotted:
+					cStyleSegment.GetLineAttributeControl().SetPattern("...");
+					break;
+
+				case H3DF::LinePattern::Default::Dash2Dot:
+					cStyleSegment.GetLineAttributeControl().SetPattern("-..");
+					break;
+
+				default:
+					DEBUG_STOP;
+					break;
+			}
+		}
+	}
 
 	m_mLineMaterialMappingStyleMap.insert(std::make_pair(cAttrData.m_sStyle.m_uiRgbColorIndex, cStyleSegment));
 

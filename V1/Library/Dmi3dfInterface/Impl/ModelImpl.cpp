@@ -54,6 +54,7 @@ void H3DF::ModelImpl::Init()
 	HBaseModel::Init();
 
 	m_cInclude = m_cSegmentKey.Subsegment("model_include");
+	m_cInclude.GetAttributeLockControl().SetLock(AttributeLock::Type::Visibility);
 	m_cInclude.SetVisibility(L"off");
 
 	m_cModels = m_cSegmentKey.Subsegment("models");
