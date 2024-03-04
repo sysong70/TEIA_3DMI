@@ -18,6 +18,7 @@
 #include <3DF.View.h>
 #include <3DF/Selection.h>
 #include <3DF/Highlight.h>
+#include <CADModel.h>
 
 namespace KERNEL
 {
@@ -40,6 +41,7 @@ namespace KERNEL
 		H3DF::Canvas * m_pcCanvas = nullptr;
 
 		H3DF::Model & GetModel();
+		H3DF::CADModel & GetCADModel();
 	
 		H3DF::BaseView * GetBaseView();
 
@@ -74,6 +76,8 @@ namespace KERNEL
 	private:
 		Operator::OperatorBase * m_apcOperator[(int)Operator::Type::Count];
 		const Signal::Delivery * m_pcDelivery = nullptr;
+
+		H3DF::CADModel m_cCADModel;
 
 	public:
 		// 현재 선택된 요소들이 저장되는 변수

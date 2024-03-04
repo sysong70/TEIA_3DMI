@@ -1,6 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #include "Component.h"
+#include "Impl/ComponentImpl.h"
 
 #include "Common_Define.h"
 
@@ -13,42 +14,6 @@
 #include <ranges>
 
 using namespace H3DF;
-
-//== ComponentImpl Class ===========================================================================
-
-namespace H3DF
-{
-	class ComponentImpl : public Impl
-	{
-	public:
-		enum API_3DF ComponentStatus
-		{
-			Normal			= 0x0001,
-			End				= 0x0002,
-			UiUpdate		= 0x0004,
-			Invisible		= 0x0008,		// Tree에 나타나면 않되는 요소
-			Hide			= 0x0010,		// 원래 Hide된 경우
-			NoShow			= 0x0020,		// NoShow된 경우
-		};
-
-		void Copy(ComponentImpl * pcInThat);
-
-		HC_KEY m_nKey = INVALID_KEY;
-		Component::ComponentType m_eType = Component::ComponentType::None;
-		DWORD m_nStatus = ComponentStatus::Normal;
-
-		Component * m_pcParent = nullptr;
-		std::vector<Component *> m_vpnChildren;
-	};
-}
-
-void H3DF::ComponentImpl::Copy(ComponentImpl * pcInThat)
-{
-	m_nKey = pcInThat->m_nKey;
-	m_nStatus = pcInThat->m_nStatus;
-	m_pcParent = pcInThat->m_pcParent;
-	m_vpnChildren = pcInThat->m_vpnChildren;
-}
 
 //== Component Class ===============================================================================
 H3DF::Component::Component()
@@ -101,4 +66,34 @@ Key H3DF::Component::GetKey() const
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_nKey;
+}
+
+Component & H3DF::Component::GetOwner() const
+{
+	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return *pcImpl->m_pcOwner;
+}
+
+ComponentArray & H3DF::Component::GetSubcomponents() const
+{
+	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return *pcImpl->m_vpnSubcomponents;
+}
+
+KeyPath H3DF::Component::GetKeyPath(Component const & cInComponent)
+{
+	KeyArray cKeyArray;
+	
+	Component const * pcComponent = &cInComponent;
+	while (nullptr != pcComponent) {
+		cKeyArray.push_back(pcComponent->GetKey());
+		pcComponent = &pcComponent->GetOwner();
+	}
+
+	KeyPath cKeyPath(cKeyArray);
+	return cKeyPath;
 }

@@ -7,6 +7,8 @@
 
 #include <3DF/PMI.Entity.h>
 
+#include <CADModel.h>
+
 #include <Entity.ModelTree.h>
 
 #include "../Signal/Signal.h"
@@ -51,7 +53,7 @@ public:
 	} A3DPointerArray;
 
 	// == File TdfImport 관련 함수 =================================================================
-	bool FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSegment, Signal::Delivery & cInDelivery, CString & strErrorMessage);
+	bool FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSegment, H3DF::CADModel & cInCADModel, Signal::Delivery & cInDelivery, CString & strErrorMessage);
 
 	// == 3DX 설정 관련 함수 =====================================================================
 protected:

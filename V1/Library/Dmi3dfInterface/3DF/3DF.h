@@ -27,8 +27,10 @@
 
 #ifdef H3DF_EXPORT
 #	define API_3DF __declspec (dllexport)
+#	define DLLEXPORT_TEMPLATE
 #else
 #	define API_3DF __declspec (dllimport)
+#	define DLLEXPORT_TEMPLATE extern
 #endif
 
 #define OPEN_3DF_NAMESPACE namespace H3DF {
@@ -37,6 +39,8 @@
 #define USING_3DF_NAMESPACE using namespace H3DF;
 
 #include <vector>
+
+
 
 namespace H3DF
 {
@@ -109,6 +113,7 @@ namespace H3DF
 	class PortfolioKey;
 
 	class Component;
+	class CADModel;
 
 	class KeyImpl;
 
@@ -500,7 +505,7 @@ namespace H3DF
 		SelectionHighlightMode() = default;
 	};
 
-	class AttributeLock
+	class API_3DF AttributeLock
 	{
 	public:
 		enum class Type : uint32_t
@@ -737,8 +742,6 @@ namespace H3DF
 	using StyleKeyArray = std::vector<StyleKey, Allocator<StyleKey>>;
 
 	using ConditionalExpressionArray = std::vector<ConditionalExpression, Allocator<ConditionalExpression>>;
-
-	using ComponentArray = std::vector<Component, Allocator<Component>> ;
 
 	namespace PMI {
 		class TextAttributes;

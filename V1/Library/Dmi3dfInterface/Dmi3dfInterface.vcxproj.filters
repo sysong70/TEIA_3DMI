@@ -58,8 +58,14 @@
     <Filter Include="Operator\Impl">
       <UniqueIdentifier>{d548b32f-9f75-4756-b369-ba2158959777}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3DF\Component">
+    <Filter Include="3DF\CADModel">
       <UniqueIdentifier>{f1662886-5b26-443f-9b56-3e38f64383d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CADModel">
+      <UniqueIdentifier>{0ee727bf-84bb-4c15-ace6-79c1a068392d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CADModel\Impl">
+      <UniqueIdentifier>{1ca8803a-8861-49a0-8146-800fdeff283b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -303,9 +309,6 @@
     <ClInclude Include="3DF\Search.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\PMI.Entity.h">
-      <Filter>3DF\Component</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\Impl\SearchImpl.h">
       <Filter>3DF\Control\Impl</Filter>
     </ClInclude>
@@ -333,11 +336,20 @@
     <ClInclude Include="..\Signal\WorkerThread.h">
       <Filter>_Signal</Filter>
     </ClInclude>
-    <ClInclude Include="Entity.ModelTree.h">
-      <Filter>3DF\Component</Filter>
+    <ClInclude Include="3DF\PMI.Entity.h">
+      <Filter>3DF\Object</Filter>
     </ClInclude>
     <ClInclude Include="Component.h">
-      <Filter>3DF\Component</Filter>
+      <Filter>CADModel</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.ModelTree.h">
+      <Filter>CADModel</Filter>
+    </ClInclude>
+    <ClInclude Include="Impl\ComponentImpl.h">
+      <Filter>CADModel\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="CADModel.h">
+      <Filter>CADModel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -382,9 +394,6 @@
     </ClCompile>
     <ClCompile Include="3DF\Image.cpp">
       <Filter>3DF\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\PMI.Entity.cpp">
-      <Filter>3DF\Component</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Operator.CameraControl.cpp">
       <Filter>Operator</Filter>
@@ -602,11 +611,20 @@
     <ClCompile Include="..\Signal\WorkerThread.cpp">
       <Filter>_Signal</Filter>
     </ClCompile>
-    <ClCompile Include="Entity.ModelTree.cpp">
-      <Filter>3DF\Component</Filter>
+    <ClCompile Include="3DF\PMI.Entity.cpp">
+      <Filter>3DF\Object</Filter>
     </ClCompile>
     <ClCompile Include="Component.cpp">
-      <Filter>3DF\Component</Filter>
+      <Filter>CADModel</Filter>
+    </ClCompile>
+    <ClCompile Include="Entity.ModelTree.cpp">
+      <Filter>CADModel</Filter>
+    </ClCompile>
+    <ClCompile Include="Impl\ComponentImpl.cpp">
+      <Filter>CADModel\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="CADModel.cpp">
+      <Filter>CADModel</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

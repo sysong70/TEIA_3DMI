@@ -58,7 +58,7 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject)
 	pcImpl->AllocationOperator(this);
 
 	pcImpl->m_pcCanvas->SetDelivery(pcImpl->Delivery(), pcImpl->m_nViewId);
-	pcImpl->m_pcCanvas->FileOpen(cInObject);
+	pcImpl->m_pcCanvas->FileOpen(cInObject, pcImpl->GetCADModel());
 
 	pcImpl->ModelPanel().Initialize(strFilePathName);
 }

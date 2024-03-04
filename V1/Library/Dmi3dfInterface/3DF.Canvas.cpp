@@ -166,7 +166,7 @@ void H3DF::Canvas::SetDelivery(Signal::Delivery & cDelivery, int nViewId)
 }
 
 // #Import: File Open
-void H3DF::Canvas::FileOpen(Json::Object & cInObject)
+void H3DF::Canvas::FileOpen(Json::Object & cInObject, H3DF::CADModel & cInCADModel)
 {
 	CanvasImpl * pcImpl = (CanvasImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -269,7 +269,7 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject)
 		} SegmentKeyImpl::LocalClose(cViewKey);
 
 		DLL::H3DF::Interface cInterfaace;
-		cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, pcImpl->Delivery(), strErrorMessage);
+		cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, cInCADModel, pcImpl->Delivery(), strErrorMessage);
 	}
 
 	system_clock::time_point cTime2 = system_clock::now();
@@ -381,8 +381,10 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject)
 	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Update Complete");
 }
 
-void H3DF::Canvas::ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObject, Signal::Delivery & cDelivery)
+void H3DF::Canvas::ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObject, H3DF::CADModel & cInCADModel)
 {
+	CanvasImpl * pcImpl = (CanvasImpl *)cCanvas.GetImpl();
+
 	CString strFilePathName = cInObject.GetString(SKW_FILEPATH);
 	if (true == strFilePathName.IsEmpty()) {
 		return;
@@ -421,16 +423,16 @@ void H3DF::Canvas::ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObje
 	// Progress dialog 나타내기
 	//cDelivery.mainFrame.ShowProgress();
 	system_clock::time_point cTime1 = system_clock::now();
-	cDelivery.progress.SetMessage(strFilePathName);
+	pcImpl->Delivery().progress.SetMessage(strFilePathName);
 
 	if (true == bPointColudData) {
-		cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/2 : Loading point cloud data");
+		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/2 : Loading point cloud data");
 	}
 	else if(true == bHsfFile) {
-		cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/2 : Loading stream file");
+		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/2 : Loading stream file");
 	}
 	else {
-		cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/3 : Import and Tessellation");
+		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/3 : Import and Tessellation");
 	}
 	// HC_Define_System_Options("update control=thread=off");
 
@@ -457,16 +459,16 @@ void H3DF::Canvas::ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObje
 		} SegmentKeyImpl::LocalClose(cViewKey);
 
 		DLL::H3DF::Interface cInterfaace;
-		cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, cDelivery, strErrorMessage);
+		cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, cInCADModel, pcImpl->Delivery(), strErrorMessage);
 	}
 
 	system_clock::time_point cTime2 = system_clock::now();
 
 	if (false == bPointColudData) {
-		cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 3/3 : Performing Initial Update");
+		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 3/3 : Performing Initial Update");
 	}
 	else {
-		cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 2/2 : Performing Initial Update");
+		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 2/2 : Performing Initial Update");
 	}
 
 	pcViewImpl->ViewReady();
@@ -521,20 +523,20 @@ void H3DF::Canvas::ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObje
 
 	if (false == bPointColudData) {
 		strMessage.Format(L"Stage 3/3 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec1));
-		cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
 	}
 	else {
 		strMessage.Format(L"Stage 2/2 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec1));
-		cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
 	}
 
 	auto cMilliSec2 = duration_cast<milliseconds>(cTime3 - cTime1);
 	strMessage.Format(L"Total Load Time : [%s]", Utility::GetTimeSpanString(cMilliSec2));
-	cDelivery.progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+	pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
 
-	cDelivery.mainFrame.HideProgress();
+	pcImpl->Delivery().mainFrame.HideProgress();
 
-	cDelivery.view.SetValidation();
+	pcImpl->Delivery().view.SetValidation();
 }
 
 H3DF::View & H3DF::Canvas::GetFrontView() const

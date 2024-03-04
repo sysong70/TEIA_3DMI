@@ -3,9 +3,13 @@
 #include "3DF/3DF.h"
 #include "3DF/Object.h"
 
+#include "3DF/KeyPath.h"
+
 namespace H3DF
 {
-	class API_3DF Component : public Object
+    using ComponentArray = std::vector<Component *>;
+
+    class API_3DF Component : public Object
 	{
 	public:
         enum class ComponentType : uint32_t {
@@ -157,8 +161,10 @@ namespace H3DF
 
         Key GetKey() const;
 
-        ComponentArray GetSubcomponents() const;
+        Component & GetOwner() const;
 
-        
+        ComponentArray & GetSubcomponents() const;
+
+        static KeyPath GetKeyPath(Component const & cInComponent);
 	};
 }

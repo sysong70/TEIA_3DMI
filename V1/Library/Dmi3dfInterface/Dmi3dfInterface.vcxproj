@@ -133,6 +133,7 @@
     <ClInclude Include="..\Signal\Signal.h" />
     <ClInclude Include="..\Signal\WorkerThread.h" />
     <ClInclude Include="3DF.Canvas.h" />
+    <ClInclude Include="CADModel.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="3DF.Model.h" />
     <ClInclude Include="3DF\ApplicationWindowOption.h" />
@@ -158,6 +159,7 @@
     <ClInclude Include="3DF\SelectionSet.h" />
     <ClInclude Include="Entity.ModelTree.h" />
     <ClInclude Include="Impl\CanvasImpl.h" />
+    <ClInclude Include="Impl\ComponentImpl.h" />
     <ClInclude Include="Impl\ModelImpl.h" />
     <ClInclude Include="Impl\ViewImpl.h" />
     <ClInclude Include="Signal.Connector.h" />
@@ -228,6 +230,7 @@
     <ClCompile Include="..\Signal\WorkerThread.cpp" />
     <ClCompile Include="3DF.Application.cpp" />
     <ClCompile Include="3DF.Canvas.cpp" />
+    <ClCompile Include="CADModel.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="3DF.Model.cpp" />
     <ClCompile Include="3DF.View.cpp" />
@@ -251,6 +254,7 @@
     <ClCompile Include="3DF\SelectionSet.cpp" />
     <ClCompile Include="Entity.ModelTree.cpp" />
     <ClCompile Include="Impl\CanvasImpl.cpp" />
+    <ClCompile Include="Impl\ComponentImpl.cpp" />
     <ClCompile Include="Impl\ModelImpl.cpp" />
     <ClCompile Include="Impl\ViewImpl.cpp" />
     <ClCompile Include="Signal.Connector.cpp" />

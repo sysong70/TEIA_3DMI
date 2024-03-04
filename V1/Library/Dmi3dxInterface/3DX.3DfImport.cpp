@@ -34,7 +34,6 @@
 #include <utility>
 
 #include "A3DSDKIncludes.h"
-
 #include "Dmi3dx.h"
 
 #include <Signal.h>
@@ -83,7 +82,7 @@ TdfImport::~TdfImport()
 
 
 
-bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSegment, Signal::Delivery & cInDelivery, CString & strErrorMessage)
+bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSegment, H3DF::CADModel & cInCADModel, Signal::Delivery & cInDelivery, CString & strErrorMessage)
 {
 	if (false == InitializeA3DLibrary(strErrorMessage)) {
 		return false;
