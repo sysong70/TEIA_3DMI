@@ -42,6 +42,8 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject)
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	H3DF::WindowHandle nWindowHandle = (H3DF::WindowHandle)cInObject.GetDwordPtr(SKW_HWND);
+	//:Ken - 20240229
+	ASSERT(::IsWindow((HWND)nWindowHandle) == TRUE);
 	
 	CString strFilePathName = cInObject.GetString(SKW_FILEPATH);
 
@@ -112,6 +114,19 @@ int KERNEL::DocView::ViewId()
 	DocViewImpl * pcImpl = (DocViewImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 	return pcImpl->m_nViewId;
+}
+
+bool KERNEL::DocView::Save(CString strFilePathName)
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+
+	if (true == strFilePathName.IsEmpty()) {
+		strFilePathName = L"Z://Test.hsf";
+	}
+	
+	pcImpl->GetCanvas().GetFrontView().SaveHsfFile(strFilePathName, &pcImpl->GetCanvas());
+
+	return true;
 }
 
 //== Mouse 관련 함수 =================================================================================

@@ -12,8 +12,9 @@ namespace H3DF
 			Normal			= 0x0001,
 			End				= 0x0002,
 			UiUpdate		= 0x0004,
-			Invisible		= 0x0008,
-			NoShow			= 0x0010,
+			Invisible		= 0x0008,		// Tree에 나타나면 않되는 요소
+			Hide			= 0x0010,		// 원래 Hide된 경우
+			NoShow			= 0x0020,		// NoShow된 경우
 		};
 
 		enum API_3DF ModelTreeItemType

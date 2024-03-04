@@ -7,6 +7,8 @@
 
 #include <3DF/PMI.Entity.h>
 
+#include <Entity.ModelTree.h>
+
 #include "../Signal/Signal.h"
 
 #include "3DX.ImportBase.h"

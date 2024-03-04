@@ -31,9 +31,6 @@
     <Filter Include="3DF\Control">
       <UniqueIdentifier>{39a8d4b3-e1e2-4397-9863-2ab00624e3bc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3DF\Entity">
-      <UniqueIdentifier>{f1662886-5b26-443f-9b56-3e38f64383d3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="DLL">
       <UniqueIdentifier>{24a38bfd-32e2-42dc-b512-c2de10707db1}</UniqueIdentifier>
     </Filter>
@@ -60,6 +57,9 @@
     </Filter>
     <Filter Include="Operator\Impl">
       <UniqueIdentifier>{d548b32f-9f75-4756-b369-ba2158959777}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3DF\Component">
+      <UniqueIdentifier>{f1662886-5b26-443f-9b56-3e38f64383d3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -304,7 +304,7 @@
       <Filter>3DF\Control</Filter>
     </ClInclude>
     <ClInclude Include="3DF\PMI.Entity.h">
-      <Filter>3DF\Entity</Filter>
+      <Filter>3DF\Component</Filter>
     </ClInclude>
     <ClInclude Include="3DF\Impl\SearchImpl.h">
       <Filter>3DF\Control\Impl</Filter>
@@ -334,7 +334,10 @@
       <Filter>_Signal</Filter>
     </ClInclude>
     <ClInclude Include="Entity.ModelTree.h">
-      <Filter>3DF\Entity</Filter>
+      <Filter>3DF\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>3DF\Component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -381,7 +384,7 @@
       <Filter>3DF\Control</Filter>
     </ClCompile>
     <ClCompile Include="3DF\PMI.Entity.cpp">
-      <Filter>3DF\Entity</Filter>
+      <Filter>3DF\Component</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Operator.CameraControl.cpp">
       <Filter>Operator</Filter>
@@ -600,7 +603,10 @@
       <Filter>_Signal</Filter>
     </ClCompile>
     <ClCompile Include="Entity.ModelTree.cpp">
-      <Filter>3DF\Entity</Filter>
+      <Filter>3DF\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>3DF\Component</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

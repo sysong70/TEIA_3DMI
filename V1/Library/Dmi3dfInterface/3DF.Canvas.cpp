@@ -79,6 +79,9 @@ using namespace std::chrono;
 #define ColorValue(x) GetRValue(x) / 255.0f, GetGValue(x) / 255.0f, GetBValue(x) / 255.0f
 #define ColorRGBA(x, alpha) GetRValue(x), GetGValue(x), GetBValue(x), (unsigned char)alpha
 
+//:Ken - 20240229
+//#define SAVE_HSF_FILE
+
 //== Camera 관련 Class ==============================================================================
 
 H3DF::CameraPos::CameraPos() {
@@ -284,7 +287,7 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject)
 
 	// #3DF_Debug: Z://Test.hsf
 #ifdef _DEBUG
-	 GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
+	 //GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
 #endif
 	 // GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
 

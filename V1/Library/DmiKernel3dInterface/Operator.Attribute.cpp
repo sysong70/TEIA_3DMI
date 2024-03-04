@@ -49,6 +49,11 @@ namespace KERNEL
 			}
 
 			bool m_bToogled = false;
+
+			void ShowToNoShow();
+			void NoShowToShow();
+
+			void ZoomFit();
 		};
 	}
 }
@@ -56,6 +61,51 @@ namespace KERNEL
 KERNEL::Operator::AttributeImpl::AttributeImpl(const DocView * pcInDocView)
 	: OperatorImpl(pcInDocView)
 {
+}
+
+void KERNEL::Operator::AttributeImpl::ShowToNoShow()
+{
+	DocViewImpl * pcDocImpl = (DocViewImpl *)GetDocView().GetImpl();
+	DEBUG_VALID(pcDocImpl);
+
+	ModelImpl * pcModelImpl = (ModelImpl *)pcDocImpl->GetModel().GetImpl();
+	DEBUG_VALID(pcModelImpl);
+
+	pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(false).SetLines(false);
+	pcModelImpl->ShowVertexStyleSegment().GetVisibilityControl().SetVertices(false);
+
+	pcModelImpl->NoShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
+	pcModelImpl->NoShowVertexStyleSegment().GetVisibilityControl().SetVertices(true);
+}
+
+void KERNEL::Operator::AttributeImpl::NoShowToShow()
+{
+	DocViewImpl * pcDocImpl = (DocViewImpl *)GetDocView().GetImpl();
+	DEBUG_VALID(pcDocImpl);
+
+	ModelImpl * pcModelImpl = (ModelImpl *)pcDocImpl->GetModel().GetImpl();
+	DEBUG_VALID(pcModelImpl);
+
+	pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
+	pcModelImpl->ShowVertexStyleSegment().GetVisibilityControl().SetVertices(true);
+
+	pcModelImpl->NoShowStyleSegment().GetVisibilityControl().SetFaces(false).SetLines(false);
+	pcModelImpl->NoShowVertexStyleSegment().GetVisibilityControl().SetVertices(false);
+}
+
+void KERNEL::Operator::AttributeImpl::ZoomFit()
+{
+	DocViewImpl * pcDocImpl = (DocViewImpl *)GetDocView().GetImpl();
+	DEBUG_VALID(pcDocImpl);
+
+	pcDocImpl->GetBaseView()->InvalidateSceneBounding();
+
+	pcDocImpl->GetBaseView()->FitWorld();
+	pcDocImpl->GetBaseView()->CameraPositionChanged();
+
+	pcDocImpl->GetBaseView()->SetZoomLimit();
+
+	pcDocImpl->GetCanvas().GetFrontView().Update();
 }
 
 //== Attribute class ==============================================================================
@@ -73,15 +123,6 @@ bool KERNEL::Operator::Attribute::ShowAll()
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-
-
-	return true;
-}
-
-bool KERNEL::Operator::Attribute::Show()
-{
-	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
 
 
 	return true;
@@ -135,60 +176,6 @@ bool KERNEL::Operator::Attribute::Show(H3DF::SelectionItem & cSelItem)
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-
-	return true;
-}
-
-bool KERNEL::Operator::Attribute::NoShow()
-{
-	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
-	DocViewImpl * pcDocViewImpl = dynamic_cast<DocViewImpl *>(pcImpl->GetDocView().GetImpl());
-	DEBUG_VALID(pcDocViewImpl);
-
-	H3DF::ModelImpl * pcModelImpl = dynamic_cast<ModelImpl *>(pcDocViewImpl->GetModel().GetImpl());
-	DEBUG_VALID(pcModelImpl);
-
-	size_t nCount = pcDocViewImpl->Select().Results().GetCount();
-	if (0 == nCount) {
-		return false;
-	}
-
-	SelectionResults cResult = pcDocViewImpl->Select().Results();
-
-	SelectionResultsIterator cIter = cResult.GetIterator();
-
-	//ConditionalExpression cNoShowCond("noshow");
-
-	while (true == cIter.IsValid()) {
-		SelectionItem cItem = cIter.GetItem();
-
-		KeyPath cPath;
-		if (true == cItem.ShowPath(cPath)) {
-			Key cKey1 = cPath.At(0);
-			SegmentKey cSegment(cKey1.KeyValue());
-			//cSegment.GetStyleControl().PushSegment(pcModelImpl->NoShowStyleSegment(), cNoShowCond);
-			//cSegment.SetCondition("noshow");
-
-			Key cKey = cPath.At(1);
-			H3DF::Type eType = Utility::GetType(cKey.KeyValue());
-
-			if (H3DF::Type::IncludeKey == eType) {
-				IncludeKey cIncludeKey(cKey.KeyValue());
-				ConditionalExpression cCondExp("noshow");
-				cIncludeKey.SetConditionalExpression(cCondExp);
-			}
-		}
-
-		cIter.Next();
-	}
-
-	pcDocViewImpl->GetCanvas().GetFrontView().Update();
-
-
-	//H3DF::ConditionalExpression cCondExp(;
-
 	return true;
 }
 
@@ -240,10 +227,21 @@ bool KERNEL::Operator::Attribute::ShowOnly()
 	return true;
 }
 
-bool KERNEL::Operator::Attribute::ShowToggle()
+bool KERNEL::Operator::Attribute::ShowOnly(H3DF::Key & cKey)
 {
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
+
+	H3DF::Type eType = H3DF::Utility::GetType(cKey);
+
+	SegmentKey cSegment;
+	if (H3DF::Type::IncludeKey == eType) {
+		IncludeKey cIncludeKey(cKey.KeyValue());
+		cSegment = cIncludeKey.GetTarget();
+	}
+	else {
+		cSegment = SegmentKey(cKey.KeyValue());
+	}
 
 	DocViewImpl * pcDocImpl = (DocViewImpl *)pcImpl->GetDocView().GetImpl();
 	DEBUG_VALID(pcDocImpl);
@@ -251,30 +249,39 @@ bool KERNEL::Operator::Attribute::ShowToggle()
 	ModelImpl * pcModelImpl = (ModelImpl *)pcDocImpl->GetModel().GetImpl();
 	DEBUG_VALID(pcModelImpl);
 
+	// 보이는 부분들을 모두 NoShow로 변경
+	pcImpl->ShowToNoShow();
+
+	cSegment.GetStyleControl().PushSegment(pcModelImpl->ShowOnlyStyleSegment());
+
+	pcImpl->ZoomFit();
+
+	return true;
+}
+
+bool KERNEL::Operator::Attribute::ShowOnly(H3DF::SelectionItem & cSelItem)
+{
+	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return true;
+}
+
+bool KERNEL::Operator::Attribute::ShowToggle()
+{
+	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
 	if(false == pcImpl->m_bToogled) {
-		pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(false).SetLines(false);
-		pcModelImpl->ShowVertexStyleSegment().GetVisibilityControl().SetVertices(false);
-		pcModelImpl->NoShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
-		pcModelImpl->NoShowVertexStyleSegment().GetVisibilityControl().SetVertices(true);
+		pcImpl->ShowToNoShow();
 		pcImpl->m_bToogled = true;
 	}
 	else {
-		pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
-		pcModelImpl->ShowVertexStyleSegment().GetVisibilityControl().SetVertices(true);
-		pcModelImpl->NoShowStyleSegment().GetVisibilityControl().SetFaces(false).SetLines(false);
-		pcModelImpl->NoShowVertexStyleSegment().GetVisibilityControl().SetVertices(false);
+		pcImpl->NoShowToShow();
 		pcImpl->m_bToogled = false;
 	}
 
-	// Zoom 하기전에 다시 계산할 수 있도록 초기화 한다.
-	pcDocImpl->GetBaseView()->InvalidateSceneBounding();
-
-	pcDocImpl->GetBaseView()->FitWorld();
-	pcDocImpl->GetBaseView()->CameraPositionChanged();
-
-	pcDocImpl->GetBaseView()->SetZoomLimit();
-
-	pcDocImpl->GetCanvas().GetFrontView().Update();
+	pcImpl->ZoomFit();
 
 	return true;
 }

@@ -242,13 +242,20 @@ void Window::MainFrame::ViewChanged(UINT message, View* pView)
 {
 	if (message == WM_ACTIVATE) {
 		m_panelBar.ViewChanged(&pView->m_tabs);
-		if (m_pActiveView != nullptr && m_pActiveView->GetId() != pView->GetId()) {
+		if (m_pActiveView != nullptr &&
+			m_pActiveView->GetId() != -1 &&
+			m_pActiveView->GetId() != pView->GetId()) {
 			m_pActiveView->CancelCommand();
 		}
 	}
 	else if (message == WM_CREATE) {
 	}
 	else if (message == WM_DESTROY) {
+		if (m_pActiveView == pView) {
+			m_pActiveView = nullptr;
+		}
+
+		return;
 	}
 	else {
 		DEBUG_STOP;

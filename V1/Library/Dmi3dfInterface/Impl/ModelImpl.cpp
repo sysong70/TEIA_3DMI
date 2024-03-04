@@ -54,6 +54,7 @@ void H3DF::ModelImpl::Init()
 	HBaseModel::Init();
 
 	m_cInclude = m_cSegmentKey.Subsegment("model_include");
+	m_cInclude.GetAttributeLockControl().SetLock(AttributeLock::Type::Visibility);
 	m_cInclude.SetVisibility(L"off");
 
 	m_cModels = m_cSegmentKey.Subsegment("models");
@@ -81,6 +82,13 @@ void H3DF::ModelImpl::Init()
 
 	m_cNoShowVertexStyle = m_cIncludeStyles.Subsegment("noshow_vertex_style");
 	m_cNoShowVertexStyle.GetVisibilityControl().SetVertices(false);
+
+	// Show Only Condtion용 Style 생성
+	m_cShowOnlyStyle = m_cIncludeStyles.Subsegment("show_only_style");
+	m_cShowOnlyStyle.GetVisibilityControl().SetFaces(true).SetLines(true);
+
+	m_cShowOnlyVertexStyle = m_cIncludeStyles.Subsegment("show_only_vertex_style");
+	m_cShowOnlyVertexStyle.GetVisibilityControl().SetVertices(true);
 
 	m_cModels.GetStyleControl().PushSegment(m_cShowStyle);
 

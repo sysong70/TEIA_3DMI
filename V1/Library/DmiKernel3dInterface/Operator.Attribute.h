@@ -17,15 +17,16 @@ namespace KERNEL
 			Attribute(const DocView * pcInDocView);
 
 			bool ShowAll();
-			bool Show();
 			bool Show(H3DF::Key & cKey);
 			bool Show(H3DF::SelectionItem & cSelItem);
 
-			bool NoShow();
 			bool NoShow(H3DF::Key & cKey);
 			bool NoShow(H3DF::SelectionItem & cSelItem);
 
 			bool ShowOnly();
+			bool ShowOnly(H3DF::Key & cKey);
+			bool ShowOnly(H3DF::SelectionItem & cSelItem);
+
 			bool ShowToggle();
 
 			// void Request(Json::Object & cInObject);

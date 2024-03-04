@@ -1,0 +1,164 @@
+﻿#pragma once
+
+#include "3DF/3DF.h"
+#include "3DF/Object.h"
+
+namespace H3DF
+{
+	class API_3DF Component : public Object
+	{
+	public:
+        enum class ComponentType : uint32_t {
+            None = 0x00000000,
+            GenericMask = 0xfffff000,
+
+            ExchangeComponentMask = 0x00001000, // Mask for any Exchange components.
+            ExchangeModelFile =
+                0x00001001, // Represents an A3DAsmModelFile in Exchange.  This will be represented by an Exchange::CADModel.
+            ExchangeProductOccurrence = 0x00001002, // Represents an A3DAsmProductOccurrence in Exchange.  This will be
+                                                    // represented by an Exchange::Component.
+            ExchangePartDefinition = 0x00001003, // Represents an A3DAsmPartDefinition in Exchange.  This will be represented by
+                                                 // an Exchange::Component.
+
+            ExchangeView = 0x00001004, // Represents an A3DMkpView in Exchange.  This will be represented by an
+                                       // Exchange::Capture component.
+            ExchangeFilter = 0x00001005, // Represents an A3DMkpFilter in Exchange.  This will be represented by an
+                                         // Exchange::Filter component.
+
+            ExchangeRepresentationItemMask = 0x00003000, // Mask for any Exchange representation items.
+            ExchangeRIBRepModel =
+                0x00003001, // Represents an A3DRiBrepModel in Exchange.  This will be represented by an Exchange::Component.
+            ExchangeRICurve =
+                0x00003002, // Represents an A3DRiCurve in Exchange.  This will be represented by an Exchange::Component.
+            ExchangeRIDirection =
+                0x00003003, // Represents an A3DRiDirection in Exchange.  This will be represented by an Exchange::Component.
+            ExchangeRIPlane =
+                0x00003004, // Represents an A3DRiPlane in Exchange.  This will be represented by an Exchange::Component.
+            ExchangeRIPointSet =
+                0x00003005, // Represents an A3DRiPointSet in Exchange.  This will be represented by an Exchange::Component.
+            ExchangeRIPolyBRepModel = 0x00003006, // Represents an A3DRiPolyBrepModel in Exchange.  This will be represented by
+                                                  // an Exchange::Component.
+            ExchangeRIPolyWire =
+                0x00003007, // Represents an A3DRiPolyWire in Exchange.  This will be represented by an Exchange::Component.
+            ExchangeRISet =
+                0x00003008, // Represents an A3DRiSet in Exchange.  This will be represented by an Exchange::Component.
+            ExchangeRICoordinateSystem = 0x00003009, // Represents an A3DRiCoordinateSystem in Exchange.  This will be
+                                                     // represented by an Exchange::Component.
+
+            ExchangeTopologyMask = 0x00005000, // Mask for any Exchange topology items.
+            ExchangeTopoBody =
+                0x00005001, // Represents an A3DTopoBody in Exchange.  This will be represented by an Exchange::Component.
+            ExchangeTopoConnex =
+                0x00005002, // Represents an A3DTopoConnex in Exchange.  This will be represented by an Exchange::Component.
+            ExchangeTopoShell =
+                0x00005003, // Represents an A3DTopoShell in Exchange.  This will be represented by an Exchange::Component.
+            ExchangeTopoFace =
+                0x00005004, // Represents an A3DTopoFace in Exchange.  This will be represented by an Exchange::Component.
+            ExchangeTopoLoop =
+                0x00005005, // Represents an A3DTopoLoop in Exchange.  This will be represented by an Exchange::Component.
+            ExchangeTopoCoEdge =
+                0x00005006, // Represents an A3DTopoCoEdge in Exchange.  This will be represented by an Exchange::Component.
+            ExchangeTopoEdge =
+                0x00005007, // Represents an A3DTopoEdge in Exchange.  This will be represented by an Exchange::Component.
+            ExchangeTopoVertex =
+                0x00005008, // Represents an A3DTopoVertex in Exchange.  This will be represented by an Exchange::Component.
+            ExchangeTopoSingleWireBody = 0x00005009, // Represents an A3DTopoSingleWireBody in Exchange.  This will be
+                                                     // represented by an Exchange::Component.
+            ExchangeTopoWireEdge =
+                0x0000500a, // Represents an A3DTopoWireEdge in Exchange.  This will be represented by an Exchange::Component.
+
+            ExchangeDrawingMask = 0x00009000, // Mask for any Exchange drawing item.
+            ExchangeDrawingModel =
+                0x00009001, // Represents an A3DDrawingModel in Exchange. This is the starting point of a drawing. It is found
+                            // under a product occurrence. Generally there is only one Drawing Model per file, but it is
+                            // possible to have more than one. This will be represented by an Exchange::Component.
+            ExchangeDrawingView =
+                0x00009002, // Represents an A3DDrawingView in Exchange. A Drawing Sheet can contain views. Views are basically
+                            // snapshot of the model from a particular angle. Each view has a name and a type, for example,
+                            // front view, side view, section, etc. This will be represented by an Exchange::Component.
+            ExchangeDrawingSheet =
+                0x00009003, // Represents an A3DDrawingSheet in Exchange. A DrawingModel contains one or more sheets. Each sheet
+                            // represents a physical sheet of paper. Generally a sheet defines the frame of the drawing,
+                            // contains the name of the paper format it reproduces, and contains a transform. One of the sheets
+                            // is classified as the "active sheet" by the model, and this one will be what you see when you
+                            // first load a drawing. There can only be one active sheet at the time, with all the inactive ones
+                            // being hidden. Drawing sheets have metadata associated with them called 'IsDefaultSheet'. This is
+                            // a BooleanMetadata. It will return true if the sheet is the active sheet, and false otherwise.
+                            // This will be represented by an Exchange::Component.
+            ExchangeBasicDrawingBlock =
+                0x00009004, // Represents an A3DDrawingBlockBasic in Exchange. Sheets and views contain blocks. Blocks can be of
+                            // two types: basic or operator blocks. Operator blocks are blocks which reference a particular
+                            // view. These two types are internally treated as the same thing. Blocks contain the actual
+                            // representation items which will be tessellated and drawn on the screen. This will be represented
+                            // by an Exchange::Component.
+            ExchangeOperatorDrawingBlock =
+                0x00009005, // Represents an A3DDrawingBlockOperator in Exchange. Sheets and views contain blocks. Blocks can be
+                            // of two types: basic or operator blocks. Operator blocks are blocks which reference a particular
+                            // view. These two types are internally treated as the same thing. Blocks contain the actual
+                            // representation items which will be tessellated and drawn on the screen. This will be represented
+                            // by an Exchange::Component.
+
+            ExchangePMIMask = 0x00011000, // Mask for any Exchange PMI items.
+            ExchangePMI = ExchangePMIMask, // Represents a generic A3DMkpMarkup in Exchange.  This will be represented by an
+                                           // Exchange::Component.
+            ExchangePMIText =
+                0x00011100, // Represents an A3DMarkupText in Exchange.  This will be represented by an Exchange::Component.
+            ExchangePMIRichText =
+                0x00011200, // Represents an A3DMarkupRichText in Exchange.  This will be represented by an Exchange::Component.
+            ExchangePMIRoughness = 0x00011300, // Represents an A3DMarkupRoughness in Exchange.  This will be represented by an
+                                               // Exchange::Component.
+            ExchangePMIGDT =
+                0x00011400, // Represents an A3DMarkupGDT in Exchange.  This will be represented by an Exchange::Component.
+            ExchangePMIDatum =
+                0x00011500, // Represents an A3DMarkupDatum in Exchange.  This will be represented by an Exchange::Component.
+            ExchangePMILineWelding = 0x00011600, // Represents an A3DMarkupLineWelding in Exchange.  This will be represented by
+                                                 // an Exchange::Component.
+            ExchangePMISpotWelding = 0x00011700, // Represents an A3DMarkupSpotWelding in Exchange.  This will be represented by
+                                                 // an Exchange::Component.
+            ExchangePMIDimension = 0x00011800, // Represents an A3DMarkupDimension in Exchange.  This will be represented by an
+                                               // Exchange::Component.
+            ExchangePMIBalloon =
+                0x00011900, // Represents an A3DMarkupBalloon in Exchange.  This will be represented by an Exchange::Component.
+            ExchangePMICoordinate = 0x00011a00, // Represents an A3DMarkupCoordinate in Exchange.  This will be represented by
+                                                // an Exchange::Component.
+            ExchangePMIFastener =
+                0x00011b00, // Represents an A3DMarkupFastener in Exchange.  This will be represented by an Exchange::Component.
+            ExchangePMILocator =
+                0x00011c00, // Represents an A3DMarkupLocator in Exchange.  This will be represented by an Exchange::Component.
+            ExchangePMIMeasurementPoint = 0x00011d00, // Represents an A3DMarkupMeasurementPoint in Exchange.  This will be
+                                                      // represented by an Exchange::Component.
+
+            DWGComponentMask = 0x00100000, // Mask for any DWG components.
+            DWGModelFile = 0x00100001, // Represents an AcDbDatabase in RealDWG.  This will be represented by a DWG::CADModel.
+            DWGLayout = 0x00100002, // Represents an AcDbLayout in RealDWG.
+            DWGBlockTable = 0x00100003, // Represents an AcDbBlockTable in RealDWG.
+            DWGBlockTableRecord = 0x00100004, // Represents an AcDbBlockTableRecord in RealDWG.
+            DWGEntity = 0x00100005, // Represents an AcDbEntity in RealDWG.
+            DWGLayerTable = 0x00100006, // Represents an AcDbLayerTable in RealDWG.
+            DWGLayer = 0x00100007, // Represents an AcDbLayer in RealDWG.
+
+            UserComponent = 0x01000000, // Represents a user created component
+        };
+
+		Component();
+		Component(Component const & cInThat);
+
+		void Set(Component const & cInThat);
+		Component & operator = (Component const & cInThat);
+
+		H3DF::Type ObjectType() const { return H3DF::Type::Component; };
+
+        ComponentType GetComponentType() const;
+
+        // bool Equals(Component const & cInThat) const;
+        
+
+        bool HasComponentType(ComponentType eInMask) const;
+
+        Key GetKey() const;
+
+        ComponentArray GetSubcomponents() const;
+
+        
+	};
+}

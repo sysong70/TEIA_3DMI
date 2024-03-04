@@ -178,12 +178,12 @@ LineAttributeControl & H3DF::LineAttributeControl::operator = (LineAttributeCont
 	return *this;
 }
 
-LineAttributeControl & H3DF::LineAttributeControl::SetPattern(CString strInPatternName)
+LineAttributeControl & H3DF::LineAttributeControl::SetPattern(CStringA strInPatternName)
 {
 	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
-		HC_Set_Line_Pattern(Utility::ToChar(strInPatternName));
+		HC_Set_Line_Pattern(strInPatternName);
 	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
 
 	return *this;
@@ -269,7 +269,7 @@ LineAttributeControl & H3DF::LineAttributeControl::UnsetEverything()
 	return *this;
 }
 
-bool H3DF::LineAttributeControl::ShowPattern(CString & strOutPatternName) const
+bool H3DF::LineAttributeControl::ShowPattern(CStringA & strOutPatternName) const
 {
 	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 

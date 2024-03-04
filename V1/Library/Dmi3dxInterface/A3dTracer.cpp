@@ -221,8 +221,7 @@ void A3dTracer::A3DSurfBaseLog(const A3DSurfBase * pcSurfBase)
 						break;*/
 
 		default:
-			std::wstring strType = Dmi3dx::GetA3dEntityTypeString(eType);
-			Log(L"A3DSurfBase: %s, Type %s", HexStr((DWORD_PTR) pcSurfBase), strType.c_str());
+			Log(L"A3DSurfBase: %s, Type %s", HexStr((DWORD_PTR) pcSurfBase), Dmi3dx::GetA3dEntityTypeString(eType));
 			break;
 	}
 }

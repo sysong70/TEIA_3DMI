@@ -206,9 +206,9 @@ bool Dmi3dx::GetPlacement3d(const A3DMiscCartesianTransformationData & cTransfor
 // == A3D 관련 함수 ==================================================================================
 
 // 1. A3D Entity의 이름을 돌려준다.
-std::wstring Dmi3dx::GetA3dEntityTypeString(A3DEEntityType eType)
+CString Dmi3dx::GetA3dEntityTypeString(A3DEEntityType eType)
 {
-	std::wstring strText;
+	CString strText;
 
 	switch(eType)
 	{
@@ -269,7 +269,7 @@ std::wstring Dmi3dx::GetA3dEntityTypeString(A3DEEntityType eType)
 			break;
 
 		default:
-			strText = std::format(L"A3dEntityType: {}", (int)eType);
+			strText.Format(L"A3dEntityType: {}", (int)eType);
 			break;
 	}
 

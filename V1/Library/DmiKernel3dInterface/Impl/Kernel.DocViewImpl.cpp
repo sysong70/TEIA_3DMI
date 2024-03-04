@@ -157,7 +157,7 @@ void KERNEL::DocViewImpl::SetVisibility(int nId)
 			break;
 
 		case HOME_3D_CMD_Visualize_Hide:
-			pcOperator->NoShow();
+			// pcOperator->NoShow();
 			break;
 
 		case HOME_3D_CMD_Visualize_ShowOnly:

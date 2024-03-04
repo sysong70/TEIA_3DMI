@@ -214,7 +214,7 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 
 	HC_KEY nModelKey = cModelSegment.KeyValue();
 
-	ModelTreeItem* pcRootItem = pcImpl->m_cModelTree.AddItem(nModelKey, nullptr, true); // 내부 Tree 생성
+	ModelTreeItem * pcRootItem = pcImpl->m_cModelTree.AddItem(nModelKey, nullptr, true); // 내부 Tree 생성
 	pcRootItem->AddStatus(ModelTreeItemStatus::UiUpdate);
 
 	Signal::TreeItem cItem;

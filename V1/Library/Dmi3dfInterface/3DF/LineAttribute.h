@@ -119,6 +119,7 @@ namespace H3DF
 			LongDashShortDash,		// A repeating pattern of 100 solid pixels, 10 blank pixels, 20 solid pixels, and 10 blank pixels.
 			LongDash2ShortDash,		// A repeating pattern of 86 solid pixels, 8 blank pixels, 15 solid pixels, 8 blank pixels, 15 solid pixels, and 8 blank pixels.
 			FineDot,				// A repeating pattern of 1 solid pixel and 3 blank pixels.
+			None
 		};
 
 	private:
@@ -166,14 +167,14 @@ namespace H3DF
 
 		H3DF::Type ObjectType() const { return H3DF::Type::LineAttributeControl; };
 
-		LineAttributeControl & SetPattern(CString strInPatternName);
+		LineAttributeControl & SetPattern(CStringA strInPatternName);
 		LineAttributeControl & SetWeight(float fInWeight, Line::SizeUnits eInUnits = Line::SizeUnits::ScaleFactor);
 
 		LineAttributeControl & UnsetPattern();
 		LineAttributeControl & UnsetWeight();
 		LineAttributeControl & UnsetEverything();
 
-		bool ShowPattern(CString & strOutPatternName) const;
+		bool ShowPattern(CStringA & strOutPatternName) const;
 		bool ShowWeight(float & fOutWeight, Line::SizeUnits & eOutUnits) const;
 
 	private:
