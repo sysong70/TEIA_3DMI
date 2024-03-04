@@ -62,6 +62,8 @@ void SESSION::Manager::Session::ExecuteSignal(const wchar_t * pchBuffer)
 		Json::Object msg;
 		msg.SetString("Echo", CString(pchBuffer));
 		Connector::GetInstance(-1).SendData(msg);
+
+		return;
 	}
 #endif
 
@@ -148,7 +150,7 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 
 	SESSION::Session * pcSession = GetSession(nViewId);
 
-	TRACE(L"View Signal: ViewId %d, Action: %d", nViewId, nAction);
+	//TRACE(L"View Signal: ViewId %d, Action: %d", nViewId, nAction);
 	
 	switch ((Signal::View::Action)nAction)
 	{

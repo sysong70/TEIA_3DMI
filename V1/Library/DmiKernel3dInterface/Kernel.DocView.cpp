@@ -42,6 +42,8 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject)
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	H3DF::WindowHandle nWindowHandle = (H3DF::WindowHandle)cInObject.GetDwordPtr(SKW_HWND);
+	//:Ken - 20240229
+	ASSERT(::IsWindow((HWND)nWindowHandle) == TRUE);
 	
 	CString strFilePathName = cInObject.GetString(SKW_FILEPATH);
 

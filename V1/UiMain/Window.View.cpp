@@ -49,6 +49,8 @@ Window::View::View()
 
 Window::View::~View()
 {
+	m_nViewId = -1;
+
 	m_toolBar.DestroyWindow();
 	m_historyBar.DestroyWindow();
 	m_tabs.DestroyWindow();
