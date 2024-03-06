@@ -12,13 +12,14 @@
 #include "../Operator.ModelPanel.h"
 #include "../Operator.Attribute.h"
 
-#include <3DF.Factory.h>
-#include <3DF.Canvas.h>
-#include <3DF.Model.h>
-#include <3DF.View.h>
+#include <Sprocket/3DF.Factory.h>
+#include <Sprocket/3DF.Canvas.h>
+#include <Sprocket/3DF.Model.h>
+#include <Sprocket/3DF.View.h>
 #include <3DF/Selection.h>
 #include <3DF/Highlight.h>
-#include <CADModel.h>
+
+#include <Sprocket/3DF.CADModel.h>
 
 namespace KERNEL
 {

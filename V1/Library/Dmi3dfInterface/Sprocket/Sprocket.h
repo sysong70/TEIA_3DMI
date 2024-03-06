@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#include "3DF/3DF.h"
-#include "3DF/Key.h"
+#include "../3DF/3DF.h"
+#include "../3DF/Key.h"
 
 namespace H3DF
 {

@@ -5,7 +5,7 @@
 #include "Kernel.h"
 #include "Object.h"
 
-#include "../Dmi3dfInterface/3DF.View.h"
+#include "../Dmi3dfInterface/Sprocket/3DF.View.h"
 
 namespace KERNEL
 {

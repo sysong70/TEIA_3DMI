@@ -25,34 +25,34 @@
 
 #include "3DF.Model.h"
 
-#include "3DF/Window.h"
-#include "3DF/Segment.h"
-#include "3DF/Impl/SegmentImpl.h"
-#include "3DF/Selection.h"
-#include "3DF/SelectionSet.h"
-#include "3DF/Visibility.h"
-#include "3DF/Material.h"
-#include "3DF/LineAttribute.h"
-#include "3DF/NavigationCube.h"
-#include "3DF/3DF.Utility.h"
+#include "../3DF/Window.h"
+#include "../3DF/Segment.h"
+#include "../3DF/Impl/SegmentImpl.h"
+#include "../3DF/Selection.h"
+#include "../3DF/SelectionSet.h"
+#include "../3DF/Visibility.h"
+#include "../3DF/Material.h"
+#include "../3DF/LineAttribute.h"
+#include "../3DF/NavigationCube.h"
+#include "../3DF/3DF.Utility.h"
 
-#include "3DF/3DF.Operator.CameraControl.h"
-#include "3DF/Operator.SelectArea.h"
+#include "../3DF/3DF.Operator.CameraControl.h"
+#include "../3DF/Operator.SelectArea.h"
 
-#include "3DF/Facility.AppOptions.h"
+#include "../3DF/Facility.AppOptions.h"
 
-#include "3DF/Operator.KinematicTest.h"
+#include "../3DF/Operator.KinematicTest.h"
 
 #include <Common_Define.h>
 #include <Path.h>
 #include <WStr.h>
 
-#include "../Signal/Signal.h"
+#include "../../Signal/Signal.h"
 
 #include <chrono>
 #include <thread>
 
-#include "Import/DLL.Interface.h"
+#include "../Import/DLL.Interface.h"
 
 #include "LogManager.h"
 

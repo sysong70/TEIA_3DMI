@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include "../3DF/3DF.h"
+#include "../../3DF/3DF.h"
 
-#include "../3DF/ApplicationWindowOption.h"
+#include "../../3DF/ApplicationWindowOption.h"
 
 #include <HDB.h>
 #include <HBaseModel.h>

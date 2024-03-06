@@ -1,14 +1,14 @@
 ﻿#pragma once
 
-#include "../3DF/3DF.h"
+#include "../../3DF/3DF.h"
 
 #include <HBaseView.h>
 #include <HUtility.h>
 
 #include <Json.h>
 
-#include "../3DF/NavigationCube.h"
-#include "../3DF/Portfolio.h"
+#include "../../3DF/NavigationCube.h"
+#include "../../3DF/Portfolio.h"
 
 namespace H3DF
 {

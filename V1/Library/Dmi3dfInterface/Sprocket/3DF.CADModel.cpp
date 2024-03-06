@@ -1,10 +1,10 @@
 ﻿#include "StdAfx.h"
 
-#include "CADModel.h"
+#include "3DF.CADModel.h"
 
-#include "Component.h"
+#include "3DF.Component.h"
 
-#include "Common_Define.h"
+#include <Common_Define.h>
 
 using namespace H3DF;
 
@@ -48,7 +48,6 @@ H3DF::CADModel::CADModel()
 {
 	m_pcImpl = new CADModelImpl();
 	DEBUG_VALID(m_pcImpl);
-
 }
 
 H3DF::CADModel::CADModel(Component const & cInThat)
@@ -106,4 +105,12 @@ Component & H3DF::CADModel::MarkupsGroupComponent()
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cMarkupsGroupItem;
+}
+
+CString H3DF::CADModel::GetName() const
+{
+	CADModelImpl * pcImpl = (CADModelImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->m_cRoot.GetName();
 }

@@ -6,9 +6,9 @@
 #include "../Common/Common_Define.h"
 
 
-#include <Impl/ViewImpl.h>
+#include <Sprocket/Impl/ViewImpl.h>
 
-#include <3DF.View.h>
+#include <Sprocket/3DF.View.h>
 
 #include <3DF/Window.h>
 #include <3DF/Impl/WindowImpl.h>

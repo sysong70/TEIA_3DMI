@@ -1,15 +1,15 @@
 ﻿#pragma once
 
-#include "3DF/3DF.h"
-#include "3DF/Object.h"
+#include "../3DF/3DF.h"
+#include "Sprocket.h"
 
-#include "3DF/KeyPath.h"
+#include "../3DF/KeyPath.h"
 
 namespace H3DF
 {
     using ComponentArray = std::vector<Component *>;
 
-    class API_3DF Component : public Object
+    class API_3DF Component : public Sprocket
 	{
 	public:
         enum class ComponentType : uint32_t {
@@ -164,6 +164,8 @@ namespace H3DF
         Component & GetOwner() const;
 
         ComponentArray & GetSubcomponents() const;
+
+        CString GetName() const;
 
         static KeyPath GetKeyPath(Component const & cInComponent);
 	};

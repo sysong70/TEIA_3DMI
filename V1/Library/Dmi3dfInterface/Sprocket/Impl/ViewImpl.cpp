@@ -27,27 +27,27 @@
 
 #include "Common_Define.h"
 
-#include "../3DF/Selection.h"
-#include "../3DF/Highlight.h"
-#include "../3DF/SelectionSet.h"
+#include "../../3DF/Selection.h"
+#include "../../3DF/Highlight.h"
+#include "../../3DF/SelectionSet.h"
 
-#include "../3DF/NavigationCube.h"
-#include "../3DF/3DF.Utility.h"
-#include "../3DF/Facility.AppOptions.h"
+#include "../../3DF/NavigationCube.h"
+#include "../../3DF/3DF.Utility.h"
+#include "../../3DF/Facility.AppOptions.h"
 
-#include "../3DF/3DF.Operator.CameraControl.h"
-#include "../3DF/Operator.SelectArea.h"
+#include "../../3DF/3DF.Operator.CameraControl.h"
+#include "../../3DF/Operator.SelectArea.h"
 
-#include "../3DF/Window.h"
-#include "../3DF/Visibility.h"
-#include "../3DF/Material.h"
-#include "../3DF/LineAttribute.h"
-#include "../3DF/Impl/SegmentImpl.h"
+#include "../../3DF/Window.h"
+#include "../../3DF/Visibility.h"
+#include "../../3DF/Material.h"
+#include "../../3DF/LineAttribute.h"
+#include "../../3DF/Impl/SegmentImpl.h"
 
-#include "../3DF/Database.h"
-#include "../3DF/Portfolio.h"
+#include "../../3DF/Database.h"
+#include "../../3DF/Portfolio.h"
 
-#include "../Signal/Signal.h"
+#include "../../Signal/Signal.h"
 
 #define SEGMENT_TYPE						1
 #define ENTITY_TYPE							2
@@ -703,7 +703,7 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	// do all the setup with no updates
 	m_pcBaseView->SetSuppressUpdate(true);
 
-	char chDriverOpts[MVO_BUFFER_SIZE], chRenderingOpts[MVO_BUFFER_SIZE] = { 0 };
+	char chRenderingOpts[MVO_BUFFER_SIZE] = { 0 };
 	
 	SetDriverOption();
 
@@ -1156,9 +1156,9 @@ void H3DF::ViewImpl::SetTransparency()
 	}
 
 	sprintf(chText, "style = %s, hsr algorithm = %s, depth peeling options = (layers= %s, algorithm=%s), depth writing = %s",
-		Utility::ToChar(TheKenel.General.Transparency.Style),
+		Utility::ToChar(TheKenel.General.Transparency.Style).GetBuffer(),
 		chSorting,
-		Utility::ToChar(TheKenel.General.Transparency.DepthPeelingLayers),
+		Utility::ToChar(TheKenel.General.Transparency.DepthPeelingLayers).GetBuffer(),
 		TheKenel.General.Transparency.PixelOIT ? "pixel" : "buffer",
 		TheKenel.General.Transparency.DepthWriting == true ? "on" : "off");
 
@@ -1432,7 +1432,7 @@ void H3DF::ViewImpl::ViewReady()
  	//pcModel->SetStaticModel(TheKenel.Performance.Optimization.StaticModel);
 }
 
-#include "../3DF/Operator.KeyboardTest.h"
+#include "../../3DF/Operator.KeyboardTest.h"
 //:TEMP
 Operator::KeyboardTest * g_pOperator = nullptr;
 

@@ -7,7 +7,7 @@
 
 #include <3DF/PMI.Entity.h>
 
-#include <CADModel.h>
+#include <Sprocket/3DF.CADModel.h>
 
 #include <Entity.ModelTree.h>
 

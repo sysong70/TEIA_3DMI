@@ -3,8 +3,8 @@
 #include "Kernel.DocView.h"
 #include "./Impl/Kernel.DocViewImpl.h"
 
-#include <3DF.Canvas.h>
-#include <3DF.Factory.h>
+#include <Sprocket/3DF.Canvas.h>
+#include <Sprocket/3DF.Factory.h>
 
 #include <3DF/Visibility.h>
 #include <3DF/LineAttribute.h>

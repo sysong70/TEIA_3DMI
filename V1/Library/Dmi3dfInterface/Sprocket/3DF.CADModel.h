@@ -1,11 +1,10 @@
 ﻿#pragma once
 
-#include "3DF/3DF.h"
-#include "3DF/Object.h"
+#include "Sprocket.h"
 
 namespace H3DF
 {
-	class API_3DF CADModel : public Object
+	class API_3DF CADModel : public Sprocket
 	{
 	public:
 		CADModel();
@@ -21,6 +20,8 @@ namespace H3DF
 		Component & ModelsGroupComponent();
 		Component & MeasurementsGroupComponent();
 		Component & MarkupsGroupComponent();
+
+		CString GetName() const;
 // 
 // 		ComponentPath GetComponentPath(SelectionItem const & in_item,
 // 			ComponentPath::PathType in_path_type = ComponentPath::PathType::Unique) const;

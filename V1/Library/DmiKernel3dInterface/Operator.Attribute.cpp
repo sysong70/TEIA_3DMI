@@ -13,7 +13,7 @@
 
 #include "../../UiMain/Command.Resource.h"
 
-#include <3DF.View.h>
+#include <Sprocket/3DF.View.h>
 #include <3DF/Window.h>
 #include <3DF/Key.h>
 #include <3DF/Selection.h>
@@ -22,8 +22,8 @@
 #include <3DF/Facility.AppOptions.h>
 #include <3DF/3DF.Utility.h>
 
-#include <Impl/ModelImpl.h>
-#include <Impl/ViewImpl.h>
+#include <Sprocket/Impl/ModelImpl.h>
+#include <Sprocket/Impl/ViewImpl.h>
 
 #include <Json.h>
 

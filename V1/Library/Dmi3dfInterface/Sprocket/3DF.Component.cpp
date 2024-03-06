@@ -1,15 +1,15 @@
 ﻿#include "StdAfx.h"
 
-#include "Component.h"
+#include "3DF.Component.h"
 #include "Impl/ComponentImpl.h"
 
 #include "Common_Define.h"
 
-#include "3DF/Segment.h"
-#include "3DF/3DF.Utility.h"
-#include "3DF/KeyPath.h"
-#include "3DF/Selection.h"
-#include "3DF/Impl/SelectionImpl.h"
+#include "../3DF/Segment.h"
+#include "../3DF/3DF.Utility.h"
+#include "../3DF/KeyPath.h"
+#include "../3DF/Selection.h"
+#include "../3DF/Impl/SelectionImpl.h"
 
 #include <ranges>
 
@@ -81,7 +81,15 @@ ComponentArray & H3DF::Component::GetSubcomponents() const
 	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	return *pcImpl->m_vpnSubcomponents;
+	return *pcImpl->m_pvSubcomponents;
+}
+
+CString H3DF::Component::GetName() const
+{
+	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return *pcImpl->m_pstrName;
 }
 
 KeyPath H3DF::Component::GetKeyPath(Component const & cInComponent)

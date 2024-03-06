@@ -10,7 +10,7 @@
 
 #include "../../UiMain/Command.Resource.h"
 
-#include <3DF.View.h>
+#include <Sprocket/3DF.View.h>
 #include <3DF/Window.h>
 #include <3DF/VisualEffects.h>
 #include <3DF/Facility.AppOptions.h>

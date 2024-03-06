@@ -20,7 +20,7 @@
 
 #include <3DF/Impl/SegmentImpl.h>
 
-#include <3DF.View.h>
+#include <Sprocket/3DF.View.h>
 
 #include <Entity.ModelTree.h>
 

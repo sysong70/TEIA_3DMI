@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include "../3DF/3DF.h"
-#include "../3DF/Object.h"
+#include "../../3DF/3DF.h"
+#include "../../3DF/Object.h"
 
-#include "../Component.h"
+#include "../3DF.Component.h"
 
 namespace H3DF
 {
@@ -30,6 +30,8 @@ namespace H3DF
 		DWORD m_nStatus = ComponentStatus::Normal;
 
 		Component * m_pcOwner = nullptr;
-		ComponentArray * m_vpnSubcomponents = nullptr;
+		ComponentArray * m_pvSubcomponents = nullptr;
+
+		CString * m_pstrName = nullptr;
 	};
 }

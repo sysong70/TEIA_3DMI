@@ -2,10 +2,10 @@
 
 #include <Json.h>
 
-#include "3DF/3DF.h"
+#include "../3DF/3DF.h"
 
-#include "3DF/Facility.AppOptions.h"
-#include "3DF/Window.h"
+#include "../3DF/Facility.AppOptions.h"
+#include "../3DF/Window.h"
 
 #include "Sprocket.h"
 
@@ -14,7 +14,7 @@
 class HBaseModel;
 class HBaseOperator;
 
-#include "3DF.Signal.h"
+#include "../3DF.Signal.h"
 #include "../Signal/Signal.h"
 
 namespace H3DF

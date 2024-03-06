@@ -15,7 +15,7 @@
 
 #include <3DF/Facility.AppOptions.h>
 
-#include <3DF.View.h>
+#include <Sprocket/3DF.View.h>
 #include <3DF/Window.h>
 #include <3DF/Selection.h>
 #include <3DF/Highlight.h>

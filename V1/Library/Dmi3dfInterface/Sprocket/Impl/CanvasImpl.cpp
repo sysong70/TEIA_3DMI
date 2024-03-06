@@ -7,7 +7,7 @@
 #include "../3DF.Model.h"
 #include "ModelImpl.h"
 
-#include "../3DF/3DF.Utility.h"
+#include "../../3DF/3DF.Utility.h"
 
 using namespace H3DF;
 

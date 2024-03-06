@@ -4,12 +4,12 @@
 
 #include "Common_Define.h"
 
-#include "../3DF/Bounding.h"
-#include "../3DF/AttributeLock.h"
-#include "../3DF/Visibility.h"
-#include "../3DF/Condition.h"
+#include "../../3DF/Bounding.h"
+#include "../../3DF/AttributeLock.h"
+#include "../../3DF/Visibility.h"
+#include "../../3DF/Condition.h"
 
-#include "../3DF/3DF.Utility.h"
+#include "../../3DF/3DF.Utility.h"
 
 using namespace H3DF;
 
