@@ -266,6 +266,8 @@ void Signal::Progress::SetMessage(CString message)
 	Json::Object data;
 	ConstructData(data, Action::SetMessage);
 
+	//:WARNING - check file path
+	message.Replace(L"\\", L"/");
 	data.SetString(SKW_MESSAGE, message);
 
 	Wrapper().SendData(data);
