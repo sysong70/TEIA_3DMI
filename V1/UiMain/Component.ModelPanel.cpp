@@ -709,6 +709,10 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 		auto row = Control().TreeItem(hChild);
 		row->UpdateParentCheckbox();
 	}
+
+	if (pData->GetBoolean(SKW_EXPAND) == false) {
+		Control().Expand(hParent, TVE_COLLAPSE);
+	}
 }
 
 
