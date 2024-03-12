@@ -742,12 +742,13 @@ void Signal::ModelPanel::AddItem(TreeItem& item)
 
 
 
-void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items)
+void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items, bool expand)
 {
 	Json::Object data;
 	ConstructData(data, Action::AddChildren);
 
 	data.SetDwordPtr(SKW_PARENT, parentKey);
+	data.SetBoolean(SKW_EXPAND, expand);
 
 	Json::Array& nodes = data.CreateArray(SKW_CHILDREN);
 	for (auto& item : items) {

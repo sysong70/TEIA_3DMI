@@ -544,7 +544,7 @@ namespace Signal
 
 		void AddItem(TreeItem& item);
 		// ignore TreeItem.Parent
-		void AddChildren(DWORD_PTR parentKey, TreeItems& items);
+		void AddChildren(DWORD_PTR parentKey, TreeItems& items, bool expand = true);
 
 		void CheckItem(DWORD_PTR key, bool checked);
 
