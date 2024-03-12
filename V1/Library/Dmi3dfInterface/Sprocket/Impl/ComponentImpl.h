@@ -10,28 +10,39 @@ namespace H3DF
 	class API_3DF ComponentImpl : public Impl
 	{
 	public:
-		enum API_3DF ComponentStatus
-		{
-			Normal = 0x0001,
-			End = 0x0002,
-			UiUpdate = 0x0004,
-			Invisible = 0x0008,		// Tree에 나타나면 않되는 요소
-			Hide = 0x0010,		// 원래 Hide된 경우
-			NoShow = 0x0020,		// NoShow된 경우
-		};
-
 		ComponentImpl();
 		~ComponentImpl();
 
 		void Copy(ComponentImpl * pcInThat);
 
-		HC_KEY m_nKey = INVALID_KEY;
-		Component::ComponentType m_eType = Component::ComponentType::None;
-		DWORD m_nStatus = ComponentStatus::Normal;
+		void SetName(CString strInName);
+
+		CString TypeName();
+
+		void AddSubComponent(Component & cInSubComponent);
+
+		HC_KEY m_nSegmentKey = INVALID_KEY;
+		HC_KEY m_nIncludeKey = INVALID_KEY;
+
+		Component::Type m_eType = Component::Type::None;
+
+		DWORD Status();
+		DWORD AddStatus(H3DF::Component::Status eStatus);
+		DWORD RemoveStatus(H3DF::Component::Status eStatus);
 
 		Component * m_pcOwner = nullptr;
-		ComponentArray * m_pvSubcomponents = nullptr;
+		ComponentArray * m_pvSubComponents = nullptr;
 
 		CString * m_pstrName = nullptr;
+
+		//== Utility Functions =====================================================================
+		static bool SetData(Component & cInComponent, CString strInName, HC_KEY nKey, HC_KEY nIncludeKey, Component::Type eInType = Component::Type::None);
+		static bool SetName(Component & cInComponent, CString strInName);
+		static bool AddSubComponent(Component & cInParentComponent, Component & pcInComponent);
+		static bool AddComponentStatus(Component & cInComponent, H3DF::Component::Status eInStatus);
+		static bool RemoveComponentStatus(Component & cInComponent, H3DF::Component::Status eInStatus);
+
+	private:
+		DWORD m_nStatus = Component::Status::Normal;
 	};
 }

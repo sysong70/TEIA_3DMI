@@ -346,6 +346,7 @@ namespace H3DF
 	{
 	public:
 		MaterialMappingControl(SegmentKey const & cInThat);
+		MaterialMappingControl(MaterialMappingControl const & cInThat);
 
 		void Set(MaterialMappingControl const & cInThat);
 		MaterialMappingControl & operator = (MaterialMappingControl const & cInThat);
@@ -368,6 +369,5 @@ namespace H3DF
 
 	private:
 		MaterialMappingControl & UnSetColor(CString strInType);
-		
 	};
 }

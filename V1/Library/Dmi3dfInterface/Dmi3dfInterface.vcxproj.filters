@@ -348,6 +348,9 @@
     <ClInclude Include="Sprocket\3DF.Component.h">
       <Filter>Sprocket</Filter>
     </ClInclude>
+    <ClInclude Include="Sprocket\Impl\CADModelImpl.h">
+      <Filter>Sprocket\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -622,6 +625,9 @@
     </ClCompile>
     <ClCompile Include="Sprocket\3DF.Component.cpp">
       <Filter>Sprocket</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\Impl\CADModelImpl.cpp">
+      <Filter>Sprocket\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

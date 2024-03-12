@@ -24,8 +24,11 @@ H3DF::Component::Component()
 
 H3DF::Component::Component(Component const & cInThat)
 {
-	m_pcImpl = new ComponentImpl();
-	DEBUG_VALID(m_pcImpl);
+	ComponentImpl * pcImpl = new ComponentImpl();
+	DEBUG_VALID(pcImpl);
+
+	m_pcImpl = pcImpl;
+
 	Set(cInThat);
 }
 
@@ -44,7 +47,7 @@ Component & H3DF::Component::operator = (Component const & cInThat)
 	return *this;
 }
 
-Component::ComponentType H3DF::Component::GetComponentType() const
+Component::Type H3DF::Component::GetType() const
 {
 	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -52,20 +55,20 @@ Component::ComponentType H3DF::Component::GetComponentType() const
 	return pcImpl->m_eType;
 }
 
-bool H3DF::Component::HasComponentType(ComponentType eInMask) const
+HC_KEY H3DF::Component::GetSegmentKey() const
 {
 	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	return (pcImpl->m_eType == eInMask);
+	return pcImpl->m_nSegmentKey;
 }
 
-Key H3DF::Component::GetKey() const
+HC_KEY H3DF::Component::GetIncludeKey() const
 {
 	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->m_nKey;
+	return pcImpl->m_nIncludeKey;
 }
 
 Component & H3DF::Component::GetOwner() const
@@ -81,7 +84,7 @@ ComponentArray & H3DF::Component::GetSubcomponents() const
 	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	return *pcImpl->m_pvSubcomponents;
+	return *pcImpl->m_pvSubComponents;
 }
 
 CString H3DF::Component::GetName() const
@@ -92,13 +95,21 @@ CString H3DF::Component::GetName() const
 	return *pcImpl->m_pstrName;
 }
 
+DWORD H3DF::Component::GetStatus()
+{
+	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->Status();
+}
+
 KeyPath H3DF::Component::GetKeyPath(Component const & cInComponent)
 {
 	KeyArray cKeyArray;
 	
 	Component const * pcComponent = &cInComponent;
 	while (nullptr != pcComponent) {
-		cKeyArray.push_back(pcComponent->GetKey());
+		cKeyArray.push_back(pcComponent->GetSegmentKey());
 		pcComponent = &pcComponent->GetOwner();
 	}
 

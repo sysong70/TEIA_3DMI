@@ -60,7 +60,9 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject)
 	pcImpl->m_pcCanvas->SetDelivery(pcImpl->Delivery(), pcImpl->m_nViewId);
 	pcImpl->m_pcCanvas->FileOpen(cInObject, pcImpl->GetCADModel());
 
-	pcImpl->ModelPanel().Initialize(strFilePathName);
+	// #ModelPanel: File Open한 후에, CADModel을 이용해서 ModelPanel을 초기화한다.
+	pcImpl->ModelPanel().Initialize(pcImpl->GetCADModel());
+	//pcImpl->ModelPanel().Initialize(strFilePathName);
 }
 
 // 3. H3DF View Paint 함수

@@ -1135,6 +1135,12 @@ H3DF::MaterialMappingControl::MaterialMappingControl(SegmentKey const & cInThat)
 	pcImpl->m_cOverrideKey = cInThat;
 }
 
+H3DF::MaterialMappingControl::MaterialMappingControl(MaterialMappingControl const & cInThat)
+{
+	m_pcImpl = new MaterialMappingControlImpl();
+	Set(cInThat);
+}
+
 void H3DF::MaterialMappingControl::Set(MaterialMappingControl const & cInThat)
 {
 	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);

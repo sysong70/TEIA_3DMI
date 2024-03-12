@@ -59,7 +59,7 @@ H3DF::View::View(View const & cInThat)
 
 H3DF::View::~View()
 {
-
+	
 }
 
 void H3DF::View::Set(View const & cInThat)

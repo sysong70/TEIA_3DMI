@@ -595,7 +595,7 @@ H3DF::ViewImpl::~ViewImpl()
 		m_pcBaseView->SetSuppressUpdate(true);
 
 		// 삭제할때 문제가 EventManager에서 문제가 발생해서 model을 null로 설정하고 삭제함.
-		m_pcBaseView->SetModel(nullptr);
+		//m_pcBaseView->SetModel(nullptr);
 		delete m_pcBaseView;
  	}
 }

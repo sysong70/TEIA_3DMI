@@ -8,6 +8,7 @@
 #include "../3DF.h"
 #include "../Kit.h"
 #include "../Control.h"
+#include "../Impl/ControlImpl.h"
 
 #include "../Segment.h"
 #include "../Selection.h"
@@ -66,7 +67,7 @@ namespace H3DF
 		bool bScopeOnly = false;
 	};
 
-	class SelectionOptionsControlImpl : public Impl
+	class SelectionOptionsControlImpl : public ControlImpl
 	{
 	public:
 		void Copy(SelectionOptionsControlImpl * pcInThat) {
@@ -194,7 +195,7 @@ namespace H3DF
 		std::deque<SelectionItem> m_deItems;
 	};
 
-	class SelectionControlImpl : public Impl
+	class SelectionControlImpl : public ControlImpl
 	{
 	public:
 		SelectionControlImpl() { m_eType = H3DF::Type::SelectionControl; }

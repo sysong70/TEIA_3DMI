@@ -301,28 +301,7 @@ namespace H3DF
 		// Item 관련 User Data Index
 		Type									= 0x10000000,
 		Name									= 0x10000001,
-		Topology								= 0x10000002,
-	};
-
-	enum class TopologyType : uint32_t
-	{
-		None									= 0x00000000,
-
-		Type									= 0x00000001,
-		Solid									= 0x00000002,
-		Edge									= 0x00000004,
-
-		Point									= 0x20000000,
-		
-		Curve									= 0x40000000,
-		Line									= 0x40000001,
-		Circle									= 0x40000002,
-		Ellips									= 0x40000004,
-		Polyline								= 0x40000008,
-		NurbsCurve								= 0x40000010,
-
-		Surface									= 0x41000000,
-		NurbsSurface							= 0x41000001,
+		ComponentType							= 0x10000002,
 	};
 
 	class API_3DF ViewDirection

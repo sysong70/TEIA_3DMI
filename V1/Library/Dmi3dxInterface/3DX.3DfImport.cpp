@@ -28,10 +28,13 @@
 
 #include <3DF/3DF.Utility.h>
 
+#include <Sprocket/Impl/CADModelImpl.h>
+
 #include <WStr.h>
 
 #include <chrono>
 #include <utility>
+#include <memory>
 
 #include "A3DSDKIncludes.h"
 #include "Dmi3dx.h"
@@ -89,6 +92,8 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 	}
 
 	m_pcInDelivery = &cInDelivery;
+
+	m_pcCADModel = &cInCADModel;
 
 	m_nIncrementalId = 0;
 
@@ -166,7 +171,6 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 	}
 
 	//----- Model 관련 Include 선언 -----
-
 	SegmentKey cModelInclude = cModelSegment.Subsegment("model_include");
 
 	SegmentKey cModels = cModelSegment.Subsegment("models");
@@ -189,6 +193,30 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 
 	m_cPmiIncludeSegment.SetVisibility(L"everything = off");
 	m_cPmiIncludeSegment.SetHeuristics(L"exclude bounding");
+
+	// #CADModel: CAD Model 초기화
+	CString strFileTitle = Path::GetFileTitle(strFilePathName);
+
+	H3DF::CADModelImpl * pcCdModelImpl = dynamic_cast<H3DF::CADModelImpl *>(cInCADModel.GetImpl());
+	DEBUG_VALID(pcCdModelImpl);
+
+	// CAD Model 기본이름 설정
+	H3DF::ComponentImpl::SetData(cInCADModel, strFileTitle, cModelSegment.KeyValue(), INVALID_KEY);
+
+	// Models Component 생성
+	H3DF::Component * pcModelsComponent = AddComponent(cModels, L"Models", H3DF::Component::Type::ModelsComponent, cInCADModel);
+	m_pcModelsComponent = pcModelsComponent;
+	pcCdModelImpl->m_pcModels = pcModelsComponent;
+
+	// Measurements Component 생성
+	H3DF::Component * pcMeasurementsComponent = AddComponent(cMeasurements, L"Measurements", H3DF::Component::Type::MeasurementsComponent, cInCADModel);
+	m_pcMeasurementsComponent = pcMeasurementsComponent;
+	pcCdModelImpl->m_pcMeasurements = pcMeasurementsComponent;
+
+	// Measurements Component 생성
+	H3DF::Component * pcMarkupsComponent = AddComponent(cMarkups, L"Markups", H3DF::Component::Type::MarkupsComponent, cInCADModel);
+	m_pcMarkups = pcMarkupsComponent;
+	pcCdModelImpl->m_pcMarkups = pcMarkupsComponent;
 
 	// Import 관련 Option 설정
 	ImportOption sImportOption;
@@ -347,7 +375,7 @@ bool TdfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, H3DF::Seg
 
 	A3DUns32 nSize = cModelFileData.m_uiPOccurrencesSize;
 	for (A3DUns32 nIndex = 0; nIndex < nSize; ++nIndex) {
-		ParseProductOccurrence(cModelFileData.m_ppPOccurrences[nIndex], pcAttrs, dModelScale, cModelSegment);
+		ParseProductOccurrence(cModelFileData.m_ppPOccurrences[nIndex], pcAttrs, dModelScale, cModelSegment, *m_pcModelsComponent);
 	}
 
 	A3DAsmModelFileGet(nullptr, &cModelFileData);
@@ -365,7 +393,7 @@ bool TdfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, H3DF::Seg
 
 // 2-1. Product Occurrence 처리
 A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurrence, A3DMiscCascadedAttributes * pcParentAttr, double dModelScale,
-	H3DF::SegmentKey & cParentSegment)
+	H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComponent)
 {
 	if (nullptr == pcOccurrence) {
 		return A3D_ERROR;
@@ -383,6 +411,9 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 	strSegmentName.Format("pocc%d", m_nIncrementalId++);
 	H3DF::SegmentKey cSegment = m_cPoccsIncludeSegment.Subsegment(strSegmentName);
 	IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
+
+	// #CADModel: ProductOccurrence 추가
+	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, strPoName, H3DF::Component::Type::ExchangeProductOccurrence, cParentComponent);
 
 	//cSegment.Open(); // Segment를 Open하면 문제가 생김. 검토가 필요함.
 
@@ -402,22 +433,22 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 
 		if (cData.m_ucBehaviour != 1)
 		{
-			/*
-						A3DRootBaseData cRootBaseData;
-						A3D_INITIALIZE_DATA(A3DRootBaseData, cRootBaseData);
-						CHECK_A3D_RETURN(A3DRootBaseGet(pcOccurrence, &cRootBaseData));
+/*
+			A3DRootBaseData cRootBaseData;
+			A3D_INITIALIZE_DATA(A3DRootBaseData, cRootBaseData);
+			CHECK_A3D_RETURN(A3DRootBaseGet(pcOccurrence, &cRootBaseData));
 
-						if(cRootBaseData.m_uiSize > 0)
-						{
-							for(A3DUns32 ui = 0; ui < cRootBaseData.m_uiSize; ui++)
-							{
-								A3DMiscAttributeData sMiscAttrData;
-								A3D_INITIALIZE_DATA(A3DMiscAttributeData, sMiscAttrData);
-								CHECK_A3D_RETURN(A3DMiscAttributeGet(cRootBaseData.m_ppAttributes[ui], &sMiscAttrData));
-								CHECK_A3D_RETURN(A3DMiscAttributeGet(nullptr, &sMiscAttrData));
-							}
-						}
-			*/
+			if(cRootBaseData.m_uiSize > 0)
+			{
+				for(A3DUns32 ui = 0; ui < cRootBaseData.m_uiSize; ui++)
+				{
+					A3DMiscAttributeData sMiscAttrData;
+					A3D_INITIALIZE_DATA(A3DMiscAttributeData, sMiscAttrData);
+					CHECK_A3D_RETURN(A3DMiscAttributeGet(cRootBaseData.m_ppAttributes[ui], &sMiscAttrData));
+					CHECK_A3D_RETURN(A3DMiscAttributeGet(nullptr, &sMiscAttrData));
+				}
+			}
+*/
 
 			H3DF::MatrixKit cMatrix;
 			if (A3D_SUCCESS == ProductOccurrenceGetLocation(&cData, cMatrix)) {
@@ -430,7 +461,7 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 			CHECK_A3D_RETURN(ProductOccurrenceGetPart(&cData, &pcPart));
 			if (nullptr != pcPart)
 			{
-				CHECK_A3D_RETURN(ParsePart(pcPart, pcAttrs, dModelScale, cSegment));
+				CHECK_A3D_RETURN(ParsePart(pcPart, pcAttrs, dModelScale, cSegment, *pcComponent));
 			}
 
 			A3DPointerArray apcChildArray;
@@ -440,7 +471,7 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 			A3DUns32 nSize = apcChildArray.m_uiSize;
 
 			for (A3DUns32 nIndex = 0; nIndex < nSize; nIndex++) {
-				CHECK_A3D_RETURN(ParseProductOccurrence(apcChildArray.m_ppPointers[nIndex], pcAttrs, dModelScale, cSegment));
+				CHECK_A3D_RETURN(ParseProductOccurrence(apcChildArray.m_ppPointers[nIndex], pcAttrs, dModelScale, cSegment, *pcComponent));
 			}
 
 			PointerArrayTerminate(&apcChildArray);
@@ -454,7 +485,7 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 				PointerArrayInitialize(&cViews);
 
 				// Product Occurrence Markup 정보 수집
-				//ProductOccurrenceGetMarkups(&cData, &cMarkups);
+				// ProductOccurrenceGetMarkups(&cData, &cMarkups);
 				// Product Occurrence View 정보 수집
 				ProductOccurrenceGetViews(&cData, &cViews);
 
@@ -465,13 +496,13 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 
 				ParseAnnotations(cData.m_ppAnnotations, cData.m_uiAnnotationsSize, cSegment);
 
-				// 				nSize = cMarkups.m_uiSize;
-				// 				for(UINT nIndex = 0; nIndex < nSize; nIndex++) {
-				// 					ParseAnnotation(cMarkups.m_ppPointers[nIndex], pcAttrs, cSegment);
-				// 					//CHECK_A3D_RETURN(BuildMarkup(cMarkups.m_ppPointers[nIndex], pcAttrs, cSegment));
-				// 				}
+// 				nSize = cMarkups.m_uiSize;
+// 				for(UINT nIndex = 0; nIndex < nSize; nIndex++) {
+// 					ParseAnnotation(cMarkups.m_ppPointers[nIndex], pcAttrs, cSegment);
+// 					//CHECK_A3D_RETURN(BuildMarkup(cMarkups.m_ppPointers[nIndex], pcAttrs, cSegment));
+// 				}
 
-								// PointerArrayTerminate(&cMarkups);
+				// PointerArrayTerminate(&cMarkups);
 				PointerArrayTerminate(&cViews);
 			}
 
@@ -945,17 +976,26 @@ A3DStatus TdfImport::ProductOccurrenceGetPart(const A3DAsmProductOccurrenceData 
 //== Parse 관련 함수 =================================================================================
 
 // 1. Parse Part Definition
-A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, H3DF::SegmentKey & cParentSegment)
+A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, 
+	H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComponent)
 {
 	LogIncreaseTabIndex(2);
 
 	// 기존에 생성된 Part를 찾은 경우 Include로 Parent에 추가 시킨다.
-
 	HC_KEY nSegmentKey = INVALID_KEY;
 	if (true == m_mPartsMap.Lookup((DWORD_PTR)pcPart, nSegmentKey))
 	{
 		H3DF::SegmentKey cSegment(nSegmentKey);
-		cParentSegment.IncludeSegment(cSegment);
+		H3DF::IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
+
+		// #CADModel: ParsePart 추가. 값은 새롭게 생성해서 넣도록 한다.
+		H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, L"", H3DF::Component::Type::ExchangePartDefinition, cParentComponent);
+		DEBUG_VALID(pcComponent);
+
+ 		if (nullptr != pcComponent) {
+			H3DF::ComponentImpl::AddSubComponent(cParentComponent, *pcComponent);
+ 		}
+
 		Log(2, L"ParsePart Map: %s", CString(cSegment.Name()));
 
 		LogDecreaseTabIndex(2);
@@ -967,8 +1007,11 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 
 	// Segment를 생성하고 생성된 Segment를 Parent Segment에 Include한다.
 	SegmentKey cSegment = m_cPartsIncludeSegment.Subsegment("part%d", m_nIncrementalId++);
-	cParentSegment.IncludeSegment(cSegment);
+	H3DF::IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
 	m_mPartsMap.SetAt((DWORD_PTR)pcPart, cSegment.KeyValue());
+
+	// #CADModel: ParsePart 추가. 값은 새롭게 생성해서 넣도록 한다.
+	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, L"", H3DF::Component::Type::ExchangePartDefinition, cParentComponent);
 
 	cSegment.Open();
 
@@ -985,7 +1028,7 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 		if (0 < sData.m_uiRepItemsSize)
 		{
 			for (A3DUns32 nIndex = 0; nIndex < sData.m_uiRepItemsSize; nIndex++) {
-				CHECK_A3D_RETURN(ParseRiRepresentationItem(sData.m_ppRepItems[nIndex], cSegment, pcAttr));
+				CHECK_A3D_RETURN(ParseRiRepresentationItem(sData.m_ppRepItems[nIndex], cSegment, pcAttr, *pcComponent));
 			}
 		}
 
@@ -1006,9 +1049,9 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 	return A3D_SUCCESS;
 }
 
-// 2. Draw Representation Item
+// 2. Parse RI Representation Item
 A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cParentSegment,
-	const A3DMiscCascadedAttributes * pcParentAttr)
+	const A3DMiscCascadedAttributes * pcParentAttr, H3DF::Component & cParentComponent)
 {
 	LogIncreaseTabIndex(2);
 
@@ -1020,13 +1063,72 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 	SegmentKey cSegment = m_cRisIncludeSegment.Subsegment(strSegmentName);
 	IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
 
+	A3DEEntityType eType = kA3DTypeUnknown;
+	CHECK_A3D_RETURN(A3DEntityGetType(pcRepItem, &eType));
+
+	// #CADModel: ParseRiRepresentationItem 추가
+
+	H3DF::Component::Type eComponentType = H3DF::Component::Type::ExchangeRepresentationItemMask;
+
+	switch (eType)
+	{
+		case kA3DTypeRiSet:
+			eComponentType = H3DF::Component::Type::ExchangeRISet;
+			break;
+
+		case kA3DTypeRiBrepModel: {
+			// Solid, Surface 판정
+			A3DRiBrepModelData cData;
+			A3D_INITIALIZE_DATA(A3DRiBrepModelData, cData);
+			A3DStatus nResult = A3DRiBrepModelGet(pcRepItem, &cData);
+
+			bool bSolidFlag = (A3D_TRUE == cData.m_bSolid) ? true : false;
+
+			A3DRiBrepModelGet(nullptr, &cData);
+
+			eComponentType = (true == bSolidFlag) ? H3DF::Component::Type::ExchangeRIBRepModelSolid : H3DF::Component::Type::ExchangeRIBRepModelSurface;
+		} break;
+
+		case kA3DTypeRiPolyBrepModel: {
+			A3DRiPolyBrepModelData cData;
+			A3D_INITIALIZE_DATA(A3DRiPolyBrepModelData, cData);
+			A3DStatus nResult = A3DRiPolyBrepModelGet(pcRepItem, &cData);
+
+			bool bSolidFlag = (A3D_TRUE == cData.m_bIsClosed) ? true : false;
+
+			A3DRiPolyBrepModelGet(nullptr, &cData);
+
+			eComponentType = (true == bSolidFlag) ? H3DF::Component::Type::ExchangeRIPolyBRepModelSolid : H3DF::Component::Type::ExchangeRIPolyBRepModelSurface;
+		} break;
+
+		case kA3DTypeRiCurve:
+			eComponentType = H3DF::Component::Type::ExchangeRICurve;
+			break;
+
+		case kA3DTypeRiPolyWire:
+			eComponentType = H3DF::Component::Type::ExchangeRIPolyWire;
+			break;
+
+		case kA3DTypeRiPointSet:
+			eComponentType = H3DF::Component::Type::ExchangeRIPointSet;
+			break;
+
+		default:
+			assert(false);
+			break;
+	}
+
+	H3DF::UserData::SetComponentType(cSegment, (DWORD)eComponentType);
+
+	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, strRiName, eComponentType, cParentComponent);
+
 	if (true == strRiName.IsEmpty()) {
-		Log(2, "DrawRiRepresentationItem: %s, Include: %d, Segment: %d", strSegmentName, cInclude.KeyValue(), cSegment.KeyValue());
+		Log(2, "ParseRiRepresentationItem: %s, Include: %d, Segment: %d", strSegmentName, cInclude.KeyValue(), cSegment.KeyValue());
 	}
 	else {
 		CStringA strText;
 		strText = strRiName;
-		Log(2, "DrawRiRepresentationItem: %s, Include: %d, Segment: %d, [%s]", strSegmentName, cInclude.KeyValue(), cSegment.KeyValue(), strText);
+		Log(2, "ParseRiRepresentationItem: %s, Include: %d, Segment: %d, [%s]", strSegmentName, cInclude.KeyValue(), cSegment.KeyValue(), strText);
 	}
 
 	// Ri Rep에 설정된 이름을 확인해서 저장한다.
@@ -1044,9 +1146,6 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 
 	A3DStatus eStatus = A3D_SUCCESS;
 
-	A3DEEntityType eType = kA3DTypeUnknown;
-	CHECK_A3D_RETURN(A3DEntityGetType(pcRepItem, &eType));
-
 	// #3DX : Show / Noshw 처리
 	if (cAttrData.m_bShow && !cAttrData.m_bRemoved && A3D_SUCCESS == IsShow(pcRepItem)) {
 		// Ri Point Set인 경우는 별도로 Show Vertex Style을 적용한다.
@@ -1061,6 +1160,9 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 		else {
 			cSegment.GetStyleControl().PushSegment(m_cNoShowStyle);
 		}
+
+		H3DF::CADModelImpl::AddComponentStatus(*pcComponent, H3DF::Component::Status::Hide);
+		H3DF::CADModelImpl::AddComponentStatus(*pcComponent, H3DF::Component::Status::NoShow);
 	}
 
 	A3DRiRepresentationItemData cRepItemData;
@@ -1089,38 +1191,19 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 		CHECK_A3D_RETURN(A3DRiCoordinateSystemGet(nullptr, &sCSysData));
 	}
 
-	bool bSolidFlag = false;
-
 	switch (eType)
 	{
 		case kA3DTypeRiSet:
-			eStatus = DrawSet((A3DRiSet *)pcRepItem, cSegment, pcAttr);
+			eStatus = ParseRiSet((A3DRiSet *)pcRepItem, cSegment, pcAttr, *pcComponent);
 			break;
 
-		case kA3DTypeRiBrepModel: {
+		case kA3DTypeRiBrepModel:
 			eStatus = ParseRiBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
+			break;
 
-			// Solid, Surface 판정
-			A3DRiBrepModelData cData;
-			A3D_INITIALIZE_DATA(A3DRiBrepModelData, cData);
-			A3DStatus nResult = A3DRiBrepModelGet(pcRepItem, &cData);
-
-			bSolidFlag = (A3D_TRUE == cData.m_bSolid) ? true : false;
-
-			A3DRiBrepModelGet(nullptr, &cData);
-		} break;
-
-		case kA3DTypeRiPolyBrepModel: {
+		case kA3DTypeRiPolyBrepModel:
 			eStatus = DrawRiPolyBrepModel(pcRepItem, cRepItemData, cSegment, pcAttr, cAttrData);
-
-			A3DRiPolyBrepModelData cData;
-			A3D_INITIALIZE_DATA(A3DRiPolyBrepModelData, cData);
-			A3DStatus nResult = A3DRiPolyBrepModelGet(pcRepItem, &cData);
-
-			bSolidFlag = (A3D_TRUE == cData.m_bIsClosed) ? true : false;
-
-			A3DRiPolyBrepModelGet(nullptr, &cData);
-		} break;
+			break;
 
 		case kA3DTypeRiCurve:
 		case kA3DTypeRiPolyWire:
@@ -1143,32 +1226,6 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 	if (false == strRiName.IsEmpty()) {
 		H3DF::UserData::SetSegmentName(cSegment, strRiName);
 	}
-	else {
-		switch (eType)
-		{
-			case kA3DTypeRiCurve:
-			case kA3DTypeRiPolyWire:
-				H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Curve);
-				Log(2, L"SetTopologyType: %d, Type: %s", cSegment.KeyValue(), Dmi3dx::GetA3dEntityTypeString(eType));
-				break;
-
-			case kA3DTypeRiPointSet:
-				H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Point);
-				Log(2, L"SetTopologyType: %d, Type: %s", cSegment.KeyValue(), Dmi3dx::GetA3dEntityTypeString(eType));
-				break;
-
-			default: {
-				if (true == bSolidFlag) {
-					H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Solid);
-					Log(2, L"SetTopologyType: %d, Type: %s", cSegment.KeyValue(), L"Solid");
-				}
-				else {
-					H3DF::UserData::SetTopologyType(cSegment, (DWORD)TopologyType::Surface);
-					Log(2, L"SetTopologyType: %d, Type: %s", cSegment.KeyValue(), L"Surface");
-				}
-			} break;
-		}
-	}
 
 	LogDecreaseTabIndex(2);
 
@@ -1183,7 +1240,7 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 }
 
 // 2-2. Draw Set
-A3DStatus TdfImport::DrawSet(const A3DRiSet * pSet, H3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+A3DStatus TdfImport::ParseRiSet(const A3DRiSet * pSet, H3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr, H3DF::Component & cParentComponent)
 {
 	A3DMiscCascadedAttributes * pcAttr;
 	A3DMiscCascadedAttributesData cAttrData;
@@ -1198,9 +1255,8 @@ A3DStatus TdfImport::DrawSet(const A3DRiSet * pSet, H3DF::SegmentKey & cParentSe
 		CHECK_A3D_RETURN(A3DRiSetGet(pSet, &sData));
 
 		A3DUns32 ui;
-		for (ui = 0; ui < sData.m_uiRepItemsSize; ui++)
-		{
-			CHECK_A3D_RETURN(ParseRiRepresentationItem(sData.m_ppRepItems[ui], cParentSegment, pcAttr));
+		for (ui = 0; ui < sData.m_uiRepItemsSize; ui++) {
+			CHECK_A3D_RETURN(ParseRiRepresentationItem(sData.m_ppRepItems[ui], cParentSegment, pcAttr, cParentComponent));
 		}
 
 		CHECK_A3D_RETURN(A3DRiSetGet(nullptr, &sData));
@@ -1214,7 +1270,7 @@ A3DStatus TdfImport::DrawSet(const A3DRiSet * pSet, H3DF::SegmentKey & cParentSe
 
 // 2-1. Draw Ri Brep Model (B-Rep Model 및 Tessellation Model도 함께 처리된다.)
 A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData,
-	H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData)
+	H3DF::SegmentKey & cInSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData)
 {
 	LogIncreaseTabIndex(2);
 
@@ -1240,7 +1296,7 @@ A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcRepItem,
 */
 
 	if (cRepItemData.m_pTessBase != nullptr) {
-		CHECK_A3D_RETURN(DrawTessBase(cRepItemData.m_pTessBase, pcRepItem, cSegment, pcAttr));
+		CHECK_A3D_RETURN(DrawTessBase(cRepItemData.m_pTessBase, pcRepItem, cInSegment, pcAttr));
 	}
 	else {
 		A3DRWParamsTessellationData sTesselationData;
@@ -1249,7 +1305,7 @@ A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcRepItem,
 		CHECK_A3D_RETURN(A3DRiRepresentationItemComputeTessellation((A3DRiRepresentationItem *)pcRepItem, &sTesselationData));
 
 		if (cRepItemData.m_pTessBase != nullptr) {
-			CHECK_A3D_RETURN(DrawTessBase(cRepItemData.m_pTessBase, pcRepItem, cSegment, pcAttr));
+			CHECK_A3D_RETURN(DrawTessBase(cRepItemData.m_pTessBase, pcRepItem, cInSegment, pcAttr));
 		}
 	}
 
@@ -4009,7 +4065,7 @@ UINT TdfImport::ConveTessFaceDataTriangleStripeTextured(ConvertFaceInfo & cInFac
 
 // 8-2-1. Tess3D Wire 처리
 A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
-	const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment)
+	const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cInSegment)
 {
 	A3DEEntityType eType;
 	CHECK_A3D_RETURN(A3DEntityGetType(pcRepItem, &eType));
@@ -4022,7 +4078,7 @@ A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3D
 	{
 		// kA3DReadTessOnly Mode로 읽을 경우, kA3DTypeRiPolyWire로 바로 들어옴. Curve의 형식을 알수는 없음.
 		case kA3DTypeRiPolyWire:
-			return DrawPolyWires(pTess3DWire, pcTessBaseData, pcRepItem, pcParentAttr, cParentSegment);
+			return DrawPolyWires(pTess3DWire, pcTessBaseData, pcRepItem, pcParentAttr, cInSegment);
 			break;
 
 			/*
@@ -4058,7 +4114,7 @@ A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3D
 		Log(2, L"3dCurve type: %s, %s", LogHexStr((DWORD_PTR)cWireEdgeData.m_p3dCurve), Dmi3dx::GetA3dEntityTypeString(eEntityType));
 	}
 
-	SetLineStyle(pTess3DWire, cParentSegment, pcParentAttr);
+	SetLineStyle(pTess3DWire, cInSegment, pcParentAttr);
 
 	const A3DDouble * pdCoord = &pcTessBaseData->m_pdCoords[0];
 
@@ -4074,7 +4130,7 @@ A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3D
 		acWirePoints[nIndex].z = pcTessBaseData->m_pdCoords[(nIndex * 3) + 2];
 	}
 
-	cParentSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
+	cInSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
 
 	LogDecreaseTabIndex(2);
 
@@ -4082,7 +4138,7 @@ A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3D
 }
 
 A3DStatus TdfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
-	const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cSegment)
+	const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cInSegment)
 {
 	LogIncreaseTabIndex(2);
 
@@ -4094,7 +4150,7 @@ A3DStatus TdfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBase
 	A3D_INITIALIZE_DATA(A3DTess3DWireData, sWireData);
 	CHECK_A3D_RETURN(A3DTess3DWireGet(pcTess3D, &sWireData));
 
-	cSegment.GetVisibilityControl().SetLines(true);
+	cInSegment.GetVisibilityControl().SetLines(true);
 
 	if (nullptr == sWireData.m_puiSizesWires) {
 		A3DUns32 nPointCount = pcTessBaseData->m_uiCoordSize / 3;
@@ -4109,7 +4165,7 @@ A3DStatus TdfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBase
 			aPoints[nIndex].z = pcTessBaseData->m_pdCoords[nPointIndex + 2];
 		}
 
-		cSegment.InsertLine(aPoints.size(), aPoints.data());
+		cInSegment.InsertLine(aPoints.size(), aPoints.data());
 	}
 	else
 	{
@@ -4134,7 +4190,7 @@ A3DStatus TdfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBase
 			{
 				if (0 < aPoints.size())
 				{
-					cSegment.InsertLine(aPoints.size(), aPoints.data());
+					cInSegment.InsertLine(aPoints.size(), aPoints.data());
 					aPoints.resize(0);
 				}
 			}
@@ -4159,7 +4215,7 @@ A3DStatus TdfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBase
 				cPoint.z = pcTessBaseData->m_pdCoords[nPointIndex + 2];
 				aPoints.push_back(cPoint);
 
-				cSegment.InsertLine(aPoints.size(), aPoints.data());
+				cInSegment.InsertLine(aPoints.size(), aPoints.data());
 				aPoints.resize(0);
 			}
 
@@ -4167,7 +4223,7 @@ A3DStatus TdfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBase
 		}
 	}
 
-	SetLineStyle(cSegment, pcParentAttr);
+	SetLineStyle(cInSegment, pcParentAttr);
 
 	return A3D_SUCCESS;
 }
@@ -6030,207 +6086,40 @@ CString TdfImport::LogBoolStr(bool bValue)
 	return L"";
 }
 
-#define MVO_BUFFER_SIZE 4096
 
-void  TdfImport::parseAttributes(const A3DEntity * pEntity)
+//== CAD Model 관련 함수 ========================================================================
+H3DF::Component * TdfImport::AddComponent(SegmentKey & cInSegment, IncludeKey & cInInclude, CString strInName, H3DF::Component::Type eInType, H3DF::Component & cInParentComponent)
 {
-	A3DRootBaseData rootbaseData;
-	A3D_INITIALIZE_DATA(A3DRootBaseData, rootbaseData);
+	DEBUG_VALID(m_pcCADModel);
 
-	A3DRootBaseGet(pEntity, &rootbaseData);
+// 	H3DF::CADModelImpl * pcCdModelImpl = dynamic_cast<H3DF::CADModelImpl *>(m_pcCADModel->GetImpl());
+// 	DEBUG_VALID(pcCdModelImpl);
 
-	std::vector<char> title;
-	std::vector<char> collect;
-	std::vector<char> processed;
+	H3DF::Component * pcComponent = new H3DF::Component();
+	DEBUG_VALID(pcComponent);
 
-	char scratch[MVO_BUFFER_SIZE];
+	H3DF::ComponentImpl::SetData(*pcComponent, strInName, cInSegment.KeyValue(), cInInclude.KeyValue(), eInType);
+	H3DF::ComponentImpl::AddSubComponent(cInParentComponent, *pcComponent);
 
-	for (unsigned int i = 0; i < rootbaseData.m_uiSize; i++)
-	{
-		if (title.capacity() < MVO_BUFFER_SIZE)
-			title.reserve(MVO_BUFFER_SIZE);
-		title.resize(0);
+	//pcCdModelImpl->MapSetAt(cInSegment.KeyValue(), pcComponent);
 
-		A3DMiscAttributeData attributeData;
-		A3D_INITIALIZE_DATA(A3DMiscAttributeData, attributeData);
+	return pcComponent;
+}
 
-		A3DMiscAttributeGet(rootbaseData.m_ppAttributes[i], &attributeData);
+H3DF::Component * TdfImport::AddComponent(SegmentKey & cInSegment, CString strInName, H3DF::Component::Type eInType, H3DF::Component & cInParentComponent)
+{
+	DEBUG_VALID(m_pcCADModel);
 
-		//		H_UTF16 utf16_title_attributes;
-		if (attributeData.m_bTitleIsInt)
-		{
-			A3DUns32 uiVal;
-			memcpy(&uiVal, attributeData.m_pcTitle, sizeof(A3DUns32));
-			sprintf(scratch, "%u", uiVal);
-			std::copy(scratch, scratch + strlen(scratch), std::back_inserter(title));
-			//			utf16_title_attributes.append( H_FORMAT_TEXT("%d", (char*)(intptr_t)uiVal)); // Is this actually what the coder wanted?
-		}
-		else if (attributeData.m_pcTitle)
-		{
-			const char * s = attributeData.m_pcTitle;
-			std::copy(s, s + strlen(s), std::back_inserter(title));
-			//stvAppendA3DUTF8String( attributeData.m_pcTitle, utf16_title_attributes);
-		}
-		else {
-			const char * no_title = "no Title";
-			std::copy(no_title, no_title + strlen(no_title), std::back_inserter(title));
-			//utf16_title_attributes.append(H_FORMAT_TEXT("no Title"));
-		}
+	// 	H3DF::CADModelImpl * pcCdModelImpl = dynamic_cast<H3DF::CADModelImpl *>(m_pcCADModel->GetImpl());
+	// 	DEBUG_VALID(pcCdModelImpl);
 
-		if (attributeData.m_uiSize == 0)
-		{
-			const char * no_value = " = no value";
-			std::copy(no_value, no_value + strlen(no_value), std::back_inserter(title));
+	H3DF::Component * pcComponent = new H3DF::Component();
+	DEBUG_VALID(pcComponent);
 
-			// 			escape_user_option(title, processed);
-			// 			HC_Set_User_Options((const char *) processed.data());
-						//utf16_title_attributes.append(H_FORMAT_TEXT("no value"));
-					//	HC_Set_Unicode_Options((unsigned short*)utf16_title_attributes.encodedText());
-			continue;
-		}
+	H3DF::ComponentImpl::SetData(*pcComponent, strInName, cInSegment.KeyValue(), INVALID_KEY, eInType);
+	H3DF::ComponentImpl::AddSubComponent(cInParentComponent, *pcComponent);
 
-		if (collect.capacity() < MVO_BUFFER_SIZE)
-			collect.reserve(MVO_BUFFER_SIZE);
+	//pcCdModelImpl->MapSetAt(cInSegment.KeyValue(), pcComponent);
 
-		for (unsigned int j = 0; j < attributeData.m_uiSize; j++)
-		{
-			collect.resize(0);
-
-			std::copy(title.cbegin(), title.cend(), std::back_inserter(collect));
-
-			//			H_UTF16 utf16_attributes = utf16_title_attributes;
-			if (attributeData.m_asSingleAttributesData[j].m_bTitleIsInt)
-			{
-				A3DUns32 uiVal;
-				memcpy(&uiVal, attributeData.m_asSingleAttributesData[j].m_pcTitle, sizeof(A3DUns32));
-				sprintf(scratch, "/%u", uiVal);
-				std::copy(scratch, scratch + strlen(scratch), std::back_inserter(collect));
-				//utf16_attributes.append(H_FORMAT_TEXT("'/'%d", (char*)(intptr_t)uiVal)); // Is this actually what the coder wanted?
-			}
-			else if (attributeData.m_asSingleAttributesData[j].m_pcTitle)
-			{
-				collect.push_back('/');
-				const char * s = attributeData.m_asSingleAttributesData[j].m_pcTitle;
-				std::copy(s, s + strlen(s), std::back_inserter(collect));
-				//				utf16_attributes.append("'/'");
-				//				stvAppendA3DUTF8String( attributeData.m_pSingleAttributesData[j].m_pcTitle, utf16_attributes);
-			}
-
-			if (attributeData.m_asSingleAttributesData[j].m_pcData == NULL)
-			{
-				// 				escape_user_option(collect, processed);
-				// 				HC_Set_User_Options((const char *) processed.data());
-								//	HC_Set_Unicode_Options((unsigned short*)utf16_attributes.encodedText());
-				continue;
-			}
-
-			collect.push_back(' ');
-			collect.push_back('=');
-			collect.push_back(' ');
-			//utf16_attributes.append(H_FORMAT_TEXT(" = "));
-
-			if (attributeData.m_asSingleAttributesData[j].m_eType == kA3DModellerAttributeTypeString)
-			{
-				const char * s = attributeData.m_asSingleAttributesData[j].m_pcData;
-				std::copy(s, s + strlen(s), std::back_inserter(collect));
-				//stvAppendA3DUTF8String( attributeData.m_pSingleAttributesData[j].m_pcData, utf16_attributes);
-			}
-			else if (attributeData.m_asSingleAttributesData[j].m_eType == kA3DModellerAttributeTypeInt)
-			{
-				A3DUns32 uiVal;
-				memcpy(&uiVal, attributeData.m_asSingleAttributesData[j].m_pcData, sizeof(A3DUns32));
-				sprintf(scratch, "%u", uiVal);
-				std::copy(scratch, scratch + strlen(scratch), std::back_inserter(collect));
-				//			utf16_attributes.append(H_FORMAT_TEXT("%d", uiVal));
-			}
-			else if (attributeData.m_asSingleAttributesData[j].m_eType == kA3DModellerAttributeTypeReal)
-			{
-				A3DDouble dVal;
-				memcpy(&dVal, attributeData.m_asSingleAttributesData[j].m_pcData, sizeof(A3DDouble));
-				// 				H_FORMAT_TEXT	d_formated("%g", dVal);
-				// 				const char * s = d_formated.c_str();
-				// 				std::copy(s, s + strlen(s), std::back_inserter(collect));
-								//				utf16_attributes.append(H_FORMAT_TEXT("%g", dVal));
-			}
-			else if (attributeData.m_asSingleAttributesData[j].m_eType == kA3DModellerAttributeTypeTime)
-			{
-				A3DUns32 uiVal;
-				memcpy(&uiVal, attributeData.m_asSingleAttributesData[j].m_pcData, sizeof(A3DUns32));
-#ifdef _MSC_VER			
-				time_t time = uiVal;
-				struct tm * tmTime = gmtime(&time);
-				if (tmTime)
-				{
-					char * pcTime = asctime(tmTime);
-					if (pcTime)
-					{
-						char * pc = strchr(pcTime, '\n');
-						if (pc)
-							*pc = '\0';
-
-						std::copy(pc, pc + strlen(pc), std::back_inserter(collect));
-						//utf16_title_attributes.append(pcTime);
-					}
-				}
-#else
-				{
-					const char * time_error = "time reading error";
-					std::copy(time_error, time_error + strlen(time_error), std::back_inserter(collect));
-					//utf16_title_attributes.append(H_FORMAT_TEXT("time reading error"));
-				}
-#endif
-			}
-			else if (attributeData.m_asSingleAttributesData[j].m_eType == kA3DModellerAttributeTypeNull)
-			{
-				const char * null_value = "NULL";
-				std::copy(null_value, null_value + strlen(null_value), std::back_inserter(collect));
-				//utf16_title_attributes.append(H_FORMAT_TEXT("NULL"));
-			}
-			else {
-				const char * unexpected_value = "unexpected value type";
-				std::copy(unexpected_value, unexpected_value + strlen(unexpected_value), std::back_inserter(collect));
-				//utf16_attributes.append(H_FORMAT_TEXT("unexpected value type"));
-			}
-
-			// 			escape_user_option(collect, processed);
-			// 			HC_Set_User_Options((const char *) processed.data());
-
-						// 			H_UTF8 utf8(utf16_attributes);
-						// 			HC_Set_User_Options((char*)utf8.encodedText());
-		}
-		A3DMiscAttributeGet(NULL, &attributeData);
-	}
-	A3DRootBaseGet(NULL, &rootbaseData);
-
-	// Getting the layer list : for smoke test N. 21598_HIO_Exchange_Layer_ifc_lost_info
-	// Tung: Currently I restore the previously accepted behavior: 
-	// We will set the user options to LayerList/<LayerName> = 2
-	// However I think that the expected result LayerList/<LayerName> = 1,2 should be simple to implement
-	A3DAsmLayer * pLayerList = NULL;
-	A3DUns32 LayerNb = 0;
-	A3DInt32 iRet = A3DAsmProductOccurrenceGetLayerList((A3DAsmProductOccurrence *)pEntity, &LayerNb, &pLayerList);
-	if (iRet == A3D_SUCCESS && pLayerList)
-	{
-		for (A3DUns32 layerIdx = 0; layerIdx < LayerNb; layerIdx++)
-		{
-			collect.resize(0);
-			const char * s = "__prc_reserved_attribute_layerslist/";
-			std::copy(s, s + strlen(s), std::back_inserter(collect));
-			const char * layerName = (pLayerList[layerIdx]).m_pcLayerName;
-			if (layerName)
-			{
-				std::copy(layerName, layerName + strlen(layerName), std::back_inserter(collect));
-				collect.push_back(' ');
-				collect.push_back('=');
-				collect.push_back(' ');
-				sprintf(scratch, "%u", (pLayerList[layerIdx]).m_usLayer);
-				std::copy(scratch, scratch + strlen(scratch), std::back_inserter(collect));
-
-				// 				escape_user_option(collect, processed);
-				// 				HC_Set_User_Options((const char *) processed.data());
-			}
-		}
-	}
-	//Clean the struct
-	A3DAsmProductOccurrenceGetLayerList(NULL, &LayerNb, &pLayerList);
-};
+	return pcComponent;
+}

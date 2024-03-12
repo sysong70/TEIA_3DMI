@@ -35,6 +35,8 @@
 
 #include <3DF/LineAttribute.h>
 
+#include <Sprocket/3DF.Component.h>
+
 #include <Signal.Connector.h>
 
 #include <Common_Define.h>
@@ -500,26 +502,32 @@ void KERNEL::Operator::HighlightObjectSnapImpl::ApplySelectionFilter(H3DF::Selec
 		SelectionItem cNextItem = cIter.GetItem();
 
 		if (H3DF::Type::LineKey == cNextItem.Type()) {
+
+			cOutSelections.PushBack(cNextItem);
+
+/*
 			Key cItemKey;
 			cNextItem.ShowSelectedItem(cItemKey);
-
 			LineKey cLine(cItemKey);
 
+			
+
 			DWORD nTopologyType;
-			H3DF::UserData::ShowTopologyType(cLine, nTopologyType);
+			H3DF::UserData::ShowComponentType(cLine, nTopologyType);
 
 			if ((DWORD)SelectionFilter::Type::Curve & m_nSelFilter)
 			{
-				if (!((DWORD)H3DF::TopologyType::Edge & nTopologyType)) {
+				if ((DWORD)H3DF::Component::Type::ExchangeRICurve == nTopologyType) {
 					cOutSelections.PushBack(cNextItem);
 				}
 			}
-			
-			if((DWORD)SelectionFilter::Type::Edge & m_nSelFilter) {
-				if ((DWORD)H3DF::TopologyType::Edge & nTopologyType) {
-					cOutSelections.PushBack(cNextItem);
-				}
-			}
+
+// 			if ((DWORD)SelectionFilter::Type::Edge & m_nSelFilter) {
+// 				if ((DWORD)H3DF::TopologyType::Edge & nTopologyType) {
+// 					cOutSelections.PushBack(cNextItem);
+// 				}
+//			}
+*/
 		}
 		else if (H3DF::Type::ShellKey == cNextItem.Type()) {
 			if (m_nSelFilter & (DWORD)SelectionFilter::Type::Solid) {
@@ -675,10 +683,6 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::CalculationLienObjectSnapPoint(c
 	if (H3DF::Type::LineKey != cKey.Type()) {
 		return false;
 	}
-
-	USHORT nTest = (USHORT)H3DF::TopologyType::Edge;
-
-	nTest += (USHORT)H3DF::TopologyType::Circle;
 
 	LineKey cLine = LineKey(cKey);
 

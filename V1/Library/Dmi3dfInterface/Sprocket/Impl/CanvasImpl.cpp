@@ -29,14 +29,17 @@ H3DF::CanvasImpl::~CanvasImpl()
 		delete[] m_pchName;
 	}
 
-	if (nullptr != m_pcModel) {
-		delete m_pcModel;
-		m_pcModel = nullptr;
-	}
+	// H3DF::ViewImpl::~ViewImpl()에서 m_pcBaseView가 삭제될때 model도 삭제되므로 여기서는 삭제하지 않는다.
+// 	if (nullptr != m_pcModel) {
+// 		delete m_pcModel;
+// 		m_pcModel = nullptr;
+// 	}
 
 	for (auto pcView : m_vpcViewArray) {
 		delete pcView;
 	}
+
+	HC_Relinquish_Memory();
 }
 
 void H3DF::CanvasImpl::Copy(const CanvasImpl * pcInThat)

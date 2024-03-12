@@ -67,12 +67,16 @@ namespace H3DF
 		static bool ShowSegmentName(SegmentKey & cInSegment, CString & strName);
 		static bool ShowSegmentName(HC_KEY nInKey, CString & strOutName);
 
-		static bool SetTopologyType(SegmentKey & cInSegment, DWORD nInType);
-		static bool ShowTopologyType(SegmentKey & cInSegment, DWORD & eOutType);
+		static bool SetComponentType(SegmentKey & cInSegment, DWORD nInType);
+		static bool ShowComponentType(SegmentKey & cInSegment, DWORD & eOutType);
+
+		static bool AddStatus(SegmentKey & cInSegment, DWORD & eInStatus);
+		static bool RemoveStatus(SegmentKey & cInSegment, DWORD & eInStatus);
+		static bool ShowStatus(SegmentKey & cInSegment, DWORD & eOutStatus);
 
 		//== Geomety User Data 관련 함수 ============================================================= 
-		static bool SetTopologyType(GeometryKey & cInGeometry, DWORD nInType);
+		static bool SetComponentType(GeometryKey & cInGeometry, DWORD nInType);
 		static bool AddTopologyType(GeometryKey & cInGeometry, DWORD nInType);
-		static bool ShowTopologyType(GeometryKey & cInGeometry, DWORD & eOutType);
+		static bool ShowComponentType(GeometryKey & cInGeometry, DWORD & eOutType);
 	};
 };

@@ -8,15 +8,11 @@ namespace H3DF
 	class API_3DF Control : public Object
 	{
 	public:
-		Control();
-		Control(HC_KEY nInKey);
-		Control(Control const & cInThat);
-
-		void Set(Control const & cInThat);
-		Control const & operator = (Control const & cInThat);
-
 		H3DF::Type ObjectType() const { return H3DF::Type::Control; };
 
-		bool operator == (Control const & cInThat) const;
+	protected:
+		Control() = default;
+		Control(Control && cInThat);
+		Control & operator=(Control && cInThat);
 	};
 }

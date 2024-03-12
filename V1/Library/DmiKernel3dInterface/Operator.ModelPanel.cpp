@@ -21,6 +21,8 @@
 #include <3DF/Impl/SegmentImpl.h>
 
 #include <Sprocket/3DF.View.h>
+#include <Sprocket/3DF.CADModel.h>
+#include <Sprocket/Impl/CADModelImpl.h>
 
 #include <Entity.ModelTree.h>
 
@@ -52,16 +54,23 @@ namespace KERNEL
 				OperatorImpl::Copy(pcInThat);
 			}
 
+			H3DF::CADModel & CadModel() { return *m_pcCadModel; }
+			H3DF::CADModel * m_pcCadModel = nullptr;
+
 			H3DF::Entity::ModelTree & ModelTree() { return m_cModelTree; }
 			H3DF::Entity::ModelTree m_cModelTree;
 
 			KERNEL::Operator::Select & Select();
 			KERNEL::Operator::Attribute & Attribute();
 
+			void ComponentExpanded(Component & cInComponent, bool bRecursiveExpand = false, bool bTreeExpand = true);
+
 			void UserInterfaceItemExpanded(ModelTreeItem * pcInItem, bool bRecursiveExpand = false);
 
 			void Show(ModelTreeItem * pcInItem);
 			void NoShow(ModelTreeItem * pcInItem);
+
+			bool IsVisible(Component & cInComponent);
 		};
 	}
 }
@@ -86,6 +95,76 @@ KERNEL::Operator::Attribute & KERNEL::Operator::ModelPanelImpl::Attribute()
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->Attribute();
+}
+
+// 2. Component 전개 처리
+// bRecursiveExpand 계속해서 하부 전개를 하고, bTreeExpand는 Tree에 나타낼때 펼쳐진 상태인지 아닌지를 설정한다.
+void KERNEL::Operator::ModelPanelImpl::ComponentExpanded(H3DF::Component & cInComponent, bool bRecursiveExpand, bool bTreeExpand)
+{
+	ComponentArray & cSubComponents = cInComponent.GetSubcomponents();
+
+	Signal::TreeItems cTreeItems;
+	Signal::TreeItem cItem;
+
+	H3DF::Component * pcParentItem = &cInComponent;
+
+	// 입력받은 Item이 Tree에 표시되지 않는 Component면 Parent로 사용하지 않고 상위 Parent를 찾는다.
+
+	bool bInVisibleComponent = false;
+	while (nullptr != pcParentItem) {
+		// 부모가 Invisible이면 상위 Parent를 찾는다. 찾은 상위 Parent에 하부 Component를 추가한다.
+		if (false == IsVisible(*pcParentItem)) {
+			pcParentItem = &pcParentItem->GetOwner();
+			bInVisibleComponent = true;
+		}
+		else {
+			break;
+		}
+	}
+
+	cItem.ParentKey = (DWORD_PTR)pcParentItem;
+
+	H3DF::CADModelImpl * pcImpl = dynamic_cast<H3DF::CADModelImpl *>(m_pcCadModel->GetImpl());
+
+	for (auto pcSubComponent : cSubComponents) {
+		if (false == IsVisible(*pcSubComponent)) {
+			continue;
+		}
+
+		CString strText = pcSubComponent->GetName();
+		if (L"OP10_DIE_Split_Surface" == strText) {
+			int i = 0;
+		}
+
+		cItem.Checked = (H3DF::Component::Status::NoShow & pcSubComponent->GetStatus()) ? false : true;
+
+		if (false == cItem.Checked) {
+			int i = 0;
+		}
+
+		cItem.Key = (DWORD_PTR)pcSubComponent;
+		cItem.Title = pcSubComponent->GetName();
+
+		if (true == cItem.Title.IsEmpty()) {
+			cItem.Title = pcImpl->TypeName(*pcSubComponent);
+		}
+
+		cTreeItems.push_back(cItem);
+	}
+
+	if (true == bInVisibleComponent) {
+		bTreeExpand = false;
+	}
+
+	if (false == cTreeItems.empty()) {
+		Delivery().modelPanel.AddChildren((DWORD_PTR)pcParentItem, cTreeItems, bTreeExpand);
+	}
+
+	if (true == bRecursiveExpand) {
+		for (auto pcSubComponent : cSubComponents) {
+			ComponentExpanded(*pcSubComponent, bRecursiveExpand, bTreeExpand);
+		}
+	}
 }
 
 // 2. User Interface에 Item Expanded 처리
@@ -161,6 +240,9 @@ void KERNEL::Operator::ModelPanelImpl::UserInterfaceItemExpanded(ModelTreeItem *
 
 			strUserName += strText;
 #endif
+			if (true == strUserName.IsEmpty()) {
+				strUserName = L"Unknown";
+			}
 
 			cItem.Title = strUserName;
 			cItem.Checked = (ModelTreeItemStatus::NoShow & pcChildItem->Status()) ? false : true;
@@ -188,6 +270,20 @@ void KERNEL::Operator::ModelPanelImpl::NoShow(ModelTreeItem * pcInItem)
 
 }
 
+bool KERNEL::Operator::ModelPanelImpl::IsVisible(Component & cInComponent)
+{
+	ComponentImpl * pcImpl = dynamic_cast<ComponentImpl *>(cInComponent.GetImpl());
+	DEBUG_VALID(pcImpl);
+
+	switch (pcImpl->m_eType)
+	{
+		case Component::Type::ExchangePartDefinition:
+			return false;
+			break;
+	}
+
+	return true;
+}
 
 //== ModelPanel 관련 함수 ============================================================================
 
@@ -197,6 +293,30 @@ KERNEL::Operator::ModelPanel::ModelPanel(const DocView * pcInDocView)
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;
+}
+
+// #ModelPanel: Initialize
+void KERNEL::Operator::ModelPanel::Initialize(H3DF::CADModel & cInCadModel)
+{
+	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_pcCadModel = &cInCadModel;
+
+	// Tree를 Update를 하지 않도록 설정
+	pcImpl->Delivery().modelPanel.RedrawTree(false);
+
+	Signal::TreeItem cItem;
+	cItem.ParentKey = 0;
+	cItem.Key = (DWORD_PTR)&cInCadModel;
+	cItem.Title = cInCadModel.GetName();
+
+	// Root Item을 추가
+	pcImpl->Delivery().modelPanel.AddItem(cItem);
+
+	pcImpl->ComponentExpanded(cInCadModel, true);
+
+	pcImpl->Delivery().modelPanel.RedrawTree(true);
 }
 
 // 1. 초기화 함수
@@ -329,8 +449,8 @@ void KERNEL::Operator::ModelPanel::SetSelectItem(H3DF::SelectionItem & cSelItem)
 	cSelItem.ShowPath(cPath);
 
 #ifdef _DEBUG
-// 	CString strText;
-// 	cSelItem.ShowPathString(strText);
+	CString strText;
+	cSelItem.ShowPathString(strText);
 #endif
 
 	// 키값 배열을 가져온다.
@@ -339,70 +459,37 @@ void KERNEL::Operator::ModelPanel::SetSelectItem(H3DF::SelectionItem & cSelItem)
 
 	std::reverse(cKeys.begin(), cKeys.end());
 
-	ModelTreeItem * pcItem = &pcImpl->ModelTree().Root();
-	ModelTreeItem * pcChildItem = nullptr;
+	Component * pcComponent = &pcImpl->CadModel();
+	Component * pcFindSubComponent = nullptr;
 
-	std::vector<ModelTreeItem *> vpcItems;
+	ComponentArray cFindSubcomponents;
 
-	// 키값을 이용해서 하부 Child Tree Item을 찾기전에 전개를 한다. 전개가 이미 되어 있으면 전개를 하지 않는다.
-	// Model Tree를 전개하는 것이기 때문에, UI Tree에 나타는 것과 상관없이 전개한다.
-	for (auto cKey : cKeys) {
-		pcChildItem = nullptr;
-		pcItem->ShowChild(cKey, pcChildItem);
+	// 가져온 키값을 이용해서 Component를 찾는다.
+	for (auto & cKey : cKeys) {
+		ComponentArray & cSubcomponents = pcComponent->GetSubcomponents();
 
-		// 하부 아이템을 찾지 못한 경우는 전개를 해서 다시 검색한다.
-		if (nullptr == pcChildItem) {
-			// 찾지 못한 경우는 전개를 한다.
-			pcImpl->ModelTree().ExpandItem(pcItem, false);
-
-			// 전개된 후에 다시 찾는다.
-			pcItem->ShowChild(cKey, pcChildItem);
-		}
-
-		// Selection Item의 맨 마지막은 Sgement이기 때문에 Tree에서 찾을 수 없다 그런 경우 다음으로 넘어간다.
-		// 이런 경우 탐색이 끝나게 될것이다. Model Tree와 UI Tree의 형태가 다르기 때문이다.
-		if (nullptr == pcChildItem) {
+		if (true == cSubcomponents.empty()) {
 			continue;
 		}
 
-		vpcItems.push_back(pcChildItem);
+		for (auto pcSubComponent : cSubcomponents) {
+			if (cKey.KeyValue() == pcSubComponent->GetIncludeKey() || cKey.KeyValue() == pcSubComponent->GetSegmentKey()) {
+				pcFindSubComponent = pcSubComponent;
+				break;
+			}
+		}
 
-		pcItem = pcChildItem;
-	}
-	
-	// Model Tree Root를 기준으로 값을 찾는다.
-	pcItem = &pcImpl->ModelTree().Root();
-	ModelTreeItem * pcParentItem = nullptr;
-
-	for (size_t nIndex = 0; nIndex < cKeys.size() - 1; nIndex++) {
-		Key cChildKey = cKeys[nIndex];
-		HC_KEY nChildKey = cChildKey.KeyValue();
-
-		// 주어진 Key값을 이용해서 pcItem 하부에 있는 ChildItem을 찾는다.
-		pcChildItem = nullptr;
-		pcItem->ShowChild(cChildKey, pcChildItem);
-
-		// part## 항목은 UI Tree에 표시하지 않으므로 처리하기 위해서 key값의 이름을 가져온다.
-		// 여기서 이름은 User Defined Name이 아니라 Segment의 이름이다.
-		CStringA strName = H3DF::Utility::GetName(cChildKey);
-		CString strUserName;
-		H3DF::UserData::ShowSegmentName(nChildKey, strUserName);
-
-		if (pcItem->Status() & ModelTreeItemStatus::Invisible) {
-			pcItem = pcChildItem;
+		if (nullptr == pcFindSubComponent) {
+			DEBUG_STOP;
 			continue;
 		}
 
-		if (nullptr != pcChildItem) {
-			pcImpl->UserInterfaceItemExpanded(pcItem);
-		}
-
-		vpcItems.push_back(pcChildItem);
-
- 		pcItem = pcChildItem;
+		pcComponent = pcFindSubComponent;
 	}
 
-	pcImpl->Delivery().modelPanel.ExpandParent((DWORD_PTR)pcItem);
+	pcImpl->Delivery().modelPanel.ExpandParent((DWORD_PTR)pcComponent);
+
+	return;
 }
 
 //== Item Expanded 관련 함수 =========================================================================
@@ -415,6 +502,7 @@ void KERNEL::Operator::ModelPanel::OnItemExpandedSignal(Json::Object & cInObject
 
 	DWORD_PTR nInItemKey = cInObject.GetDwordPtr(SKW_KEY);
 
+/*
 	ModelTreeItem * pcItem = dynamic_cast<ModelTreeItem *>((ModelTreeItem *)nInItemKey);
 	if (nullptr == pcItem) {
 		DEBUG_STOP;
@@ -422,6 +510,7 @@ void KERNEL::Operator::ModelPanel::OnItemExpandedSignal(Json::Object & cInObject
 	}
 
 	pcImpl->UserInterfaceItemExpanded(pcItem);
+*/
 }
 
 //== Item Selelect Changed 관련 함수 =================================================================
@@ -462,17 +551,17 @@ void KERNEL::Operator::ModelPanel::OnItemCheckedSignal(Json::Object & cInObject)
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	DWORD_PTR nInItem = cInObject.GetDwordPtr(SKW_KEY);
+	DWORD_PTR nInComponent = cInObject.GetDwordPtr(SKW_KEY);
 	//:Ken - checked or unchecked...
 	bool bChecked = cInObject.GetBoolean(SKW_CHECKED);
 
-	ModelTreeItem * pcTreeItem = dynamic_cast<ModelTreeItem *>((ModelTreeItem *)nInItem);
-	if (nullptr == pcTreeItem) {
+	Component * pcComponent = dynamic_cast<Component *>((Component *)nInComponent);
+	if (nullptr == pcComponent) {
 		DEBUG_STOP;
 		return;
 	}
 
-	HC_KEY nKey = pcTreeItem->KeyValue();
+	HC_KEY nKey = pcComponent->GetSegmentKey();
 	if (INVALID_KEY == nKey) {
 		return;
 	}
@@ -489,7 +578,8 @@ void KERNEL::Operator::ModelPanel::OnItemCheckedSignal(Json::Object & cInObject)
 
 	H3DF::SelectionResults cResults;
 	// 주어진 Item을 이용해서 Last Child까지 검색해서 결과값을 가져온다.
-	pcImpl->ModelTree().ShowSelectionResult(pcTreeItem, cResults);
+	pcImpl->CadModel().ShowSelectionResult(pcComponent, cResults);
+	//pcImpl->ModelTree().ShowSelectionResult(pcComponent, cResults);
 
 	if (true == bChecked) {
 		pcImpl->Select().SelectByResult(cResults);

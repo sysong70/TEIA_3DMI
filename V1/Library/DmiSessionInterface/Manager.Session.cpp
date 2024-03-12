@@ -149,6 +149,7 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 	int nViewId = cInObject.GetInteger(SKW_VIEWID);
 
 	SESSION::Session * pcSession = GetSession(nViewId);
+	DEBUG_VALID(pcSession);
 
 	//TRACE(L"View Signal: ViewId %d, Action: %d", nViewId, nAction);
 	
@@ -217,6 +218,10 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 // 1-1. Session을 가져옴 (없으면 생성)
 SESSION::Session * SESSION::Manager::Session::GetSession(int nViewId)
 {
+	if (0 > nViewId) {
+		return nullptr;
+	}
+
 	SESSION::Session * pcSession = m_mpcSessions[nViewId];
 
 	if (nullptr == pcSession) {

@@ -210,6 +210,7 @@
     <ClInclude Include="Sprocket\3DF.View.h" />
     <ClInclude Include="Sprocket\3DF.CADModel.h" />
     <ClInclude Include="Sprocket\3DF.Component.h" />
+    <ClInclude Include="Sprocket\Impl\CADModelImpl.h" />
     <ClInclude Include="Sprocket\Impl\CanvasImpl.h" />
     <ClInclude Include="Sprocket\Impl\ComponentImpl.h" />
     <ClInclude Include="Sprocket\Impl\ModelImpl.h" />
@@ -303,6 +304,7 @@
     <ClCompile Include="Sprocket\3DF.View.cpp" />
     <ClCompile Include="Sprocket\3DF.CADModel.cpp" />
     <ClCompile Include="Sprocket\3DF.Component.cpp" />
+    <ClCompile Include="Sprocket\Impl\CADModelImpl.cpp" />
     <ClCompile Include="Sprocket\Impl\CanvasImpl.cpp" />
     <ClCompile Include="Sprocket\Impl\ComponentImpl.cpp" />
     <ClCompile Include="Sprocket\Impl\ModelImpl.cpp" />

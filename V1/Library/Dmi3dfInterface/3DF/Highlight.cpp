@@ -3,6 +3,7 @@
 #include "Highlight.h"
 
 #include "Impl/SelectionImpl.h"
+#include "Impl/ControlImpl.h"
 
 #include "Window.h"
 #include "Impl/WindowImpl.h"
@@ -123,7 +124,7 @@ bool H3DF::HighlightOptionsKit::ShowNotification(bool & bOutState) const
 //== HighlightControlImpl Class ====================================================================
 namespace H3DF
 {
-	class HighlightControlImpl : public Impl
+	class HighlightControlImpl : public ControlImpl
 	{
 	public:
 		HighlightControlImpl(WindowKey const & cInWindow);

@@ -7,12 +7,12 @@
 
 namespace H3DF
 {
-    using ComponentArray = std::vector<Component *>;
+    using ComponentArray = std::vector<Component *, Allocator<Component *>>;
 
     class API_3DF Component : public Sprocket
 	{
 	public:
-        enum class ComponentType : uint32_t {
+        enum class Type : uint32_t {
             None = 0x00000000,
             GenericMask = 0xfffff000,
 
@@ -30,24 +30,17 @@ namespace H3DF
                                          // Exchange::Filter component.
 
             ExchangeRepresentationItemMask = 0x00003000, // Mask for any Exchange representation items.
-            ExchangeRIBRepModel =
-                0x00003001, // Represents an A3DRiBrepModel in Exchange.  This will be represented by an Exchange::Component.
-            ExchangeRICurve =
-                0x00003002, // Represents an A3DRiCurve in Exchange.  This will be represented by an Exchange::Component.
-            ExchangeRIDirection =
-                0x00003003, // Represents an A3DRiDirection in Exchange.  This will be represented by an Exchange::Component.
-            ExchangeRIPlane =
-                0x00003004, // Represents an A3DRiPlane in Exchange.  This will be represented by an Exchange::Component.
-            ExchangeRIPointSet =
-                0x00003005, // Represents an A3DRiPointSet in Exchange.  This will be represented by an Exchange::Component.
-            ExchangeRIPolyBRepModel = 0x00003006, // Represents an A3DRiPolyBrepModel in Exchange.  This will be represented by
-                                                  // an Exchange::Component.
-            ExchangeRIPolyWire =
-                0x00003007, // Represents an A3DRiPolyWire in Exchange.  This will be represented by an Exchange::Component.
-            ExchangeRISet =
-                0x00003008, // Represents an A3DRiSet in Exchange.  This will be represented by an Exchange::Component.
-            ExchangeRICoordinateSystem = 0x00003009, // Represents an A3DRiCoordinateSystem in Exchange.  This will be
-                                                     // represented by an Exchange::Component.
+            ExchangeRIBRepModelSolid = 0x00003001,
+            ExchangeRIBRepModelSurface = 0x00003002,
+            ExchangeRICurve = 0x00003003,
+            ExchangeRIDirection = 0x00003004,
+            ExchangeRIPlane = 0x00003005,
+            ExchangeRIPointSet = 0x00003006,
+            ExchangeRIPolyBRepModelSolid = 0x00003007,
+            ExchangeRIPolyBRepModelSurface = 0x00003008,
+            ExchangeRIPolyWire = 0x00003009,
+            ExchangeRISet = 0x0000300a,
+            ExchangeRICoordinateSystem = 0x0000300b,
 
             ExchangeTopologyMask = 0x00005000, // Mask for any Exchange topology items.
             ExchangeTopoBody =
@@ -142,7 +135,20 @@ namespace H3DF
             DWGLayer = 0x00100007, // Represents an AcDbLayer in RealDWG.
 
             UserComponent = 0x01000000, // Represents a user created component
+
+            ModelsComponent = 0x01000001, // Represents a model component
+            MeasurementsComponent = 0x01000002, // Represents a model component
+            MarkupsComponent = 0x01000003, // Represents a model component
         };
+
+		enum API_3DF Status
+		{
+			Normal = 0x0001,
+			End = 0x0002,
+			UiUpdate = 0x0004,
+			Hide = 0x0008,			// 원래 Hide된 경우, Reset할때 사용하기 위한 Status
+			NoShow = 0x0010,		// NoShow된 경우
+		};
 
 		Component();
 		Component(Component const & cInThat);
@@ -152,20 +158,20 @@ namespace H3DF
 
 		H3DF::Type ObjectType() const { return H3DF::Type::Component; };
 
-        ComponentType GetComponentType() const;
-
         // bool Equals(Component const & cInThat) const;
-        
 
-        bool HasComponentType(ComponentType eInMask) const;
+        Type GetType() const;
 
-        Key GetKey() const;
+        HC_KEY GetSegmentKey() const;
+        HC_KEY GetIncludeKey() const;
 
         Component & GetOwner() const;
 
         ComponentArray & GetSubcomponents() const;
 
         CString GetName() const;
+
+        DWORD GetStatus();
 
         static KeyPath GetKeyPath(Component const & cInComponent);
 	};
