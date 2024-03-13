@@ -55,6 +55,11 @@ H3DF::Model & KERNEL::DocViewImpl::GetModel()
 	return m_pcCanvas->GetModel();
 }
 
+H3DF::CADModel & KERNEL::DocViewImpl::GetCADModel()
+{
+	return m_cCADModel;
+}
+
 H3DF::BaseView * KERNEL::DocViewImpl::GetBaseView()
 {
 	return GetCanvas().GetFrontView().GetWindowKey().GetBaseView();

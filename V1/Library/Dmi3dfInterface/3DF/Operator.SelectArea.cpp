@@ -2,7 +2,7 @@
 
 #include "Operator.SelectArea.h"
 
-#include "../3DF.Canvas.h"
+#include "../Sprocket/3DF.Canvas.h"
 #include "Selection.h"
 #include "SelectionSet.h"
 

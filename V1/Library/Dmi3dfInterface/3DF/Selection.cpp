@@ -6,7 +6,7 @@
 #include "Window.h"
 #include "Impl/WindowImpl.h"
 
-#include "../Impl/ViewImpl.h"
+#include "../Sprocket/Impl/ViewImpl.h"
 
 #include "Line.h"
 
@@ -775,14 +775,20 @@ void H3DF::SelectionItem::ShowPathString(CString & strOutPath)
 	}
 
 	nKey = cPath.Back().KeyValue();
-	HC_Show_Key_Type(nKey, chType);
+	H3DF::Type eType = H3DF::Utility::GetType(nKey);
 
 	SegmentKey cSegmentKey1(nKey);
 	if (false == UserData::ShowSegmentName(cSegmentKey1, strName)) {
 		strName = cSegmentKey1.Name(false);
 	}
 
-	strText.Format(L"\nOwner of last include key: %d [%s], %s", nKey, Utility::ToString(chType));
+	if (H3DF::Type::IncludeKey == eType) {
+		strText.Format(L"\nInclude: %d, Segment: %d [%s]", nKey, nKey, strName);
+	}
+	else {
+		strText.Format(L"\nSegment: %d [%s]", nKey, strName);
+	}
+
 	strOutPath += strText;
 }
 

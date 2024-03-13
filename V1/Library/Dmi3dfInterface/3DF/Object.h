@@ -2,12 +2,15 @@
 
 #include "3DF.h"
 
+#include <memory>
+
 namespace H3DF
 {
 	class API_3DF Object
 	{
 	public:
 		Object();
+		Object(Object const & cInThat);
 		virtual ~Object();
 
 		virtual H3DF::Type Type() const;

@@ -473,9 +473,10 @@ bool H3DF::Entity::ModelTree::ExpandItem(ModelTreeItem * pcInItem, bool bRecursi
 		if (true == bNoShowFlag) {
 			pcItemImpl->m_nStatus |= ModelTreeItemStatus::NoShow;
 		}
+/*
 
 		DWORD nType;
-		if (true == H3DF::UserData::ShowTopologyType(cSegment, nType)) {
+		if (true == H3DF::UserData::ShowComponentType(cSegment, nType)) {
 			if ((DWORD)TopologyType::Solid == nType) {
 				pcItemImpl->m_eType = ModelTreeItemType::Solid;
 			}
@@ -489,6 +490,7 @@ bool H3DF::Entity::ModelTree::ExpandItem(ModelTreeItem * pcInItem, bool bRecursi
 				pcItemImpl->m_eType = ModelTreeItemType::Point;
 			}
 		}
+*/
 
 		if (true == bRecursiveExpand) {
 			ExpandItem(pcItem, bRecursiveExpand);
@@ -517,7 +519,8 @@ bool H3DF::Entity::ModelTree::GetItemName(HC_KEY nInKey, CString & strOutName)
 		cSegment = H3DF::SegmentKey(nInKey);
 	}
 
-	if (true == H3DF::UserData::ShowTopologyType(cSegment, nType)) {
+	if (true == H3DF::UserData::ShowComponentType(cSegment, nType)) {
+/*
 		if ((DWORD)TopologyType::Solid == nType) {
 			strOutName.Format(L"Solid %d", pcImpl->m_nSolidIndex++);
 
@@ -531,6 +534,7 @@ bool H3DF::Entity::ModelTree::GetItemName(HC_KEY nInKey, CString & strOutName)
 		else if ((DWORD)TopologyType::Point == nType) {
 			strOutName.Format(L"Curve %d", pcImpl->m_nPointIndex++);
 		}
+*/
 	}
 	else {
 		if (false == H3DF::UserData::ShowSegmentName(nInKey, strOutName)) {

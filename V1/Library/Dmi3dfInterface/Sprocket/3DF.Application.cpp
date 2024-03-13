@@ -10,10 +10,10 @@
 // #include "3DF.Signal.Manager.h"
 // #include "3DF.Signal.Interface.h"
 
-#include "3DF/3DF.Utility.h"
+#include "../3DF/3DF.Utility.h"
 
-#include "3DF/Database.h"
-#include "3DF/Portfolio.h"
+#include "../3DF/Database.h"
+#include "../3DF/Portfolio.h"
 
 // ----- HOOPS Header -----
 #include <hoops_license.h>
@@ -23,7 +23,7 @@
 #include <hpserror.h>
 
 //:Ken
-#include "3DF/Facility.AppOptions.h"
+#include "../3DF/Facility.AppOptions.h"
 
 #ifdef _DEBUG
 #	define WRITE_3DF_ERROR_LOG

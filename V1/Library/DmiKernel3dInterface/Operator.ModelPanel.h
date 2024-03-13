@@ -16,6 +16,8 @@ namespace KERNEL
 		{
 		public:
 			ModelPanel(const DocView * pcInDocView);
+
+			void Initialize(H3DF::CADModel & cInCadModel);
 			void Initialize(CString strFilePathName);
 
 			void Signal(Json::Object & cInObject);

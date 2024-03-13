@@ -4,7 +4,7 @@
 
 #include "Kernel.h"
 
-#include "../Dmi3dfInterface/3DF.Application.h"
+#include "../Dmi3dfInterface/Sprocket/3DF.Application.h"
 
 namespace KERNEL
 {

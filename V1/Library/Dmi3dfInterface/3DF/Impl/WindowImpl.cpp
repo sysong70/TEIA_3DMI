@@ -2,7 +2,7 @@
 
 #include "WindowImpl.h"
 
-#include "../../Impl/ViewImpl.h"
+#include "../../Sprocket/Impl/ViewImpl.h"
 
 using namespace H3DF;
 

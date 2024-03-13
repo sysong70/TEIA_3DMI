@@ -7,6 +7,8 @@
 
 #include <3DF/PMI.Entity.h>
 
+#include <Sprocket/3DF.CADModel.h>
+
 #include <Entity.ModelTree.h>
 
 #include "../Signal/Signal.h"
@@ -51,7 +53,7 @@ public:
 	} A3DPointerArray;
 
 	// == File TdfImport 관련 함수 =================================================================
-	bool FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSegment, Signal::Delivery & cInDelivery, CString & strErrorMessage);
+	bool FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSegment, H3DF::CADModel & cInCADModel, Signal::Delivery & cInDelivery, CString & strErrorMessage);
 
 	// == 3DX 설정 관련 함수 =====================================================================
 protected:
@@ -91,7 +93,8 @@ protected:
 	bool ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, H3DF::SegmentKey & cModelSegment);
 
 	// == Product Occurrences 관련 함수 =========================================================
-	A3DStatus ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurrence, A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, H3DF::SegmentKey & cParentSegment);
+	A3DStatus ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurrence, A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, 
+		H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComponent);
 
 	A3DStatus ProductOccurrenceGetLocation(const A3DAsmProductOccurrenceData * pcPoData, H3DF::MatrixKit & cTransMatrix);
 	A3DStatus ProductOccurrenceGetLocation(const A3DAsmProductOccurrenceData * psPOccData, A3DMiscCartesianTransformation ** ppLocation);
@@ -112,12 +115,13 @@ protected:
 	A3DStatus ProductOccurrenceGetPart(const A3DAsmProductOccurrenceData * pcPOccData, A3DAsmPartDefinition ** ppcPart);
 
 	//== Draw 관련 함수 =========================================================================
-	A3DStatus ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, H3DF::SegmentKey & cParentSegment);
+	A3DStatus ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, 
+		H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComponent);
 
 	A3DStatus ParseRiRepresentationItem(const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cParentSegment,
-		const A3DMiscCascadedAttributes * pcParentAttr);
+		const A3DMiscCascadedAttributes * pcParentAttr, H3DF::Component & cParentComponent);
 
-	A3DStatus DrawSet(const A3DRiSet * pSet, H3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+	A3DStatus ParseRiSet(const A3DRiSet * pSet, H3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr, H3DF::Component & cParentComponent);
 
 	A3DStatus ParseRiBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData,
 		H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData);
@@ -175,7 +179,7 @@ protected:
 	UINT ConveTessFaceDataTriangleStripeTextured(ConvertFaceInfo & cInFaceInfo, H3DF::ShellKit & cInShellKit);
 
 	A3DStatus DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
-		const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment);
+		const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cInSegment);
 
 	A3DStatus DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
 		const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cSegment);
@@ -249,6 +253,10 @@ protected:
 	A3DStatus GetMatrix(A3DMiscTransformation * pcLocation, MbMatrix3D & cMatrix);
 	A3DStatus GetMatrix(A3DMiscTransformation * pcLocation, H3DF::MatrixKit & cOutMatrix);
 
+	//== CAD Model 관련 함수 ========================================================================
+	H3DF::Component * AddComponent(H3DF::SegmentKey & cInSegment, H3DF::IncludeKey & cInInclude, CString strInName, H3DF::Component::Type eInType, H3DF::Component & cInParentComponent);
+	H3DF::Component * AddComponent(H3DF::SegmentKey & cInSegment, CString strInName, H3DF::Component::Type eInType, H3DF::Component & cInParentComponent);
+
 private:
 	CString m_strCadFileName;
 
@@ -277,6 +285,11 @@ private:
 	H3DF::SegmentKey m_cPoccsIncludeSegment;
 	H3DF::SegmentKey m_cRisIncludeSegment;
 	H3DF::SegmentKey m_cPmiIncludeSegment;
+
+	H3DF::CADModel * m_pcCADModel = nullptr;
+	H3DF::Component * m_pcModelsComponent = nullptr;
+	H3DF::Component * m_pcMeasurementsComponent = nullptr;
+	H3DF::Component * m_pcMarkups = nullptr;
 
 	CAtlMap<DWORD_PTR, HC_KEY> m_mPartsMap;
 
@@ -350,8 +363,6 @@ private:
 	void LogDecreaseTabIndex(int nId);
 	CString LogHexStr(DWORD_PTR nValue);
 	CString LogBoolStr(bool bValue);
-
-	void  parseAttributes(const A3DEntity * pEntity);
 };
 
 CLOSE_3DX_NAMESPACE

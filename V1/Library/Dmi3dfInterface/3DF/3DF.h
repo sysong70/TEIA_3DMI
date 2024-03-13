@@ -27,8 +27,10 @@
 
 #ifdef H3DF_EXPORT
 #	define API_3DF __declspec (dllexport)
+#	define DLLEXPORT_TEMPLATE
 #else
 #	define API_3DF __declspec (dllimport)
+#	define DLLEXPORT_TEMPLATE extern
 #endif
 
 #define OPEN_3DF_NAMESPACE namespace H3DF {
@@ -37,6 +39,8 @@
 #define USING_3DF_NAMESPACE using namespace H3DF;
 
 #include <vector>
+
+
 
 namespace H3DF
 {
@@ -109,6 +113,7 @@ namespace H3DF
 	class PortfolioKey;
 
 	class Component;
+	class CADModel;
 
 	class KeyImpl;
 
@@ -296,28 +301,7 @@ namespace H3DF
 		// Item 관련 User Data Index
 		Type									= 0x10000000,
 		Name									= 0x10000001,
-		Topology								= 0x10000002,
-	};
-
-	enum class TopologyType : uint32_t
-	{
-		None									= 0x00000000,
-
-		Type									= 0x00000001,
-		Solid									= 0x00000002,
-		Edge									= 0x00000004,
-
-		Point									= 0x20000000,
-		
-		Curve									= 0x40000000,
-		Line									= 0x40000001,
-		Circle									= 0x40000002,
-		Ellips									= 0x40000004,
-		Polyline								= 0x40000008,
-		NurbsCurve								= 0x40000010,
-
-		Surface									= 0x41000000,
-		NurbsSurface							= 0x41000001,
+		ComponentType							= 0x10000002,
 	};
 
 	class API_3DF ViewDirection
@@ -500,7 +484,7 @@ namespace H3DF
 		SelectionHighlightMode() = default;
 	};
 
-	class AttributeLock
+	class API_3DF AttributeLock
 	{
 	public:
 		enum class Type : uint32_t
@@ -737,8 +721,6 @@ namespace H3DF
 	using StyleKeyArray = std::vector<StyleKey, Allocator<StyleKey>>;
 
 	using ConditionalExpressionArray = std::vector<ConditionalExpression, Allocator<ConditionalExpression>>;
-
-	using ComponentArray = std::vector<Component, Allocator<Component>> ;
 
 	namespace PMI {
 		class TextAttributes;

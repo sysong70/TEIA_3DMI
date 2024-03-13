@@ -43,23 +43,26 @@
     <Filter Include="3DF\Object">
       <UniqueIdentifier>{bcac17de-fcc0-4634-ab74-17a363d9339a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3DF\Sprocket">
-      <UniqueIdentifier>{93a88395-ea70-4807-b99a-a9c1d6b0f6d8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="3DF\Object\Impl">
       <UniqueIdentifier>{429dee59-5b8c-4be6-a7c7-9823d75b5cf1}</UniqueIdentifier>
     </Filter>
     <Filter Include="3DF\Control\Impl">
       <UniqueIdentifier>{afa63e5c-ba9b-4717-88ba-b3c4d3bc2184}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3DF\Sprocket\Impl">
-      <UniqueIdentifier>{8bd7cc15-e18a-4e92-8ebc-1c43c4377e71}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Operator\Impl">
       <UniqueIdentifier>{d548b32f-9f75-4756-b369-ba2158959777}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3DF\Component">
+    <Filter Include="3DF\CADModel">
       <UniqueIdentifier>{f1662886-5b26-443f-9b56-3e38f64383d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CADModel">
+      <UniqueIdentifier>{0ee727bf-84bb-4c15-ace6-79c1a068392d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sprocket">
+      <UniqueIdentifier>{98d0f924-c61c-4ca0-980d-72095f9de4b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sprocket\Impl">
+      <UniqueIdentifier>{f5dd20ec-ccfb-4d2b-b1d6-16b0a8271b8e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -195,12 +198,6 @@
     <ClInclude Include="3DF\Facility.Preference.h">
       <Filter>Facility</Filter>
     </ClInclude>
-    <ClInclude Include="3DF.Application.h">
-      <Filter>3DF\Sprocket</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF.View.h">
-      <Filter>3DF\Sprocket</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\Window.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
@@ -243,18 +240,6 @@
     <ClInclude Include="3DF\ApplicationWindowOption.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF.Factory.h">
-      <Filter>3DF\Sprocket</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF.Canvas.h">
-      <Filter>3DF\Sprocket</Filter>
-    </ClInclude>
-    <ClInclude Include="Impl\CanvasImpl.h">
-      <Filter>3DF\Sprocket\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="Impl\ViewImpl.h">
-      <Filter>3DF\Sprocket\Impl</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\SelectionSet.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
@@ -263,12 +248,6 @@
     </ClInclude>
     <ClInclude Include="3DF\Performance.h">
       <Filter>3DF\Control</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF.Model.h">
-      <Filter>3DF\Sprocket</Filter>
-    </ClInclude>
-    <ClInclude Include="Impl\ModelImpl.h">
-      <Filter>3DF\Sprocket\Impl</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\LogManager.h">
       <Filter>Utility</Filter>
@@ -303,9 +282,6 @@
     <ClInclude Include="3DF\Search.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\PMI.Entity.h">
-      <Filter>3DF\Component</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\Impl\SearchImpl.h">
       <Filter>3DF\Control\Impl</Filter>
     </ClInclude>
@@ -321,9 +297,6 @@
     <ClInclude Include="3DF\PointCloud.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="Sprocket.h">
-      <Filter>3DF</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\Dir.h">
       <Filter>_Common</Filter>
     </ClInclude>
@@ -333,11 +306,50 @@
     <ClInclude Include="..\Signal\WorkerThread.h">
       <Filter>_Signal</Filter>
     </ClInclude>
-    <ClInclude Include="Entity.ModelTree.h">
-      <Filter>3DF\Component</Filter>
+    <ClInclude Include="3DF\PMI.Entity.h">
+      <Filter>3DF\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>3DF\Component</Filter>
+    <ClInclude Include="Entity.ModelTree.h">
+      <Filter>CADModel</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\3DF.Application.h">
+      <Filter>Sprocket</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\3DF.Canvas.h">
+      <Filter>Sprocket</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\3DF.Factory.h">
+      <Filter>Sprocket</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\3DF.Model.h">
+      <Filter>Sprocket</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\3DF.View.h">
+      <Filter>Sprocket</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\Sprocket.h">
+      <Filter>Sprocket</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\Impl\CanvasImpl.h">
+      <Filter>Sprocket\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\Impl\ComponentImpl.h">
+      <Filter>Sprocket\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\Impl\ModelImpl.h">
+      <Filter>Sprocket\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\Impl\ViewImpl.h">
+      <Filter>Sprocket\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\3DF.CADModel.h">
+      <Filter>Sprocket</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\3DF.Component.h">
+      <Filter>Sprocket</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\Impl\CADModelImpl.h">
+      <Filter>Sprocket\Impl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -382,9 +394,6 @@
     </ClCompile>
     <ClCompile Include="3DF\Image.cpp">
       <Filter>3DF\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\PMI.Entity.cpp">
-      <Filter>3DF\Component</Filter>
     </ClCompile>
     <ClCompile Include="3DF\3DF.Operator.CameraControl.cpp">
       <Filter>Operator</Filter>
@@ -464,12 +473,6 @@
     <ClCompile Include="3DF\Facility.Preference.cpp">
       <Filter>Facility</Filter>
     </ClCompile>
-    <ClCompile Include="3DF.Application.cpp">
-      <Filter>3DF\Sprocket</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF.View.cpp">
-      <Filter>3DF\Sprocket</Filter>
-    </ClCompile>
     <ClCompile Include="3DF\Circle.cpp">
       <Filter>3DF\Object</Filter>
     </ClCompile>
@@ -512,18 +515,6 @@
     <ClCompile Include="3DF\ApplicationWindowOption.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
-    <ClCompile Include="3DF.Factory.cpp">
-      <Filter>3DF\Sprocket</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF.Canvas.cpp">
-      <Filter>3DF\Sprocket</Filter>
-    </ClCompile>
-    <ClCompile Include="Impl\CanvasImpl.cpp">
-      <Filter>3DF\Sprocket\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="Impl\ViewImpl.cpp">
-      <Filter>3DF\Sprocket\Impl</Filter>
-    </ClCompile>
     <ClCompile Include="3DF\SelectionSet.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
@@ -533,20 +524,11 @@
     <ClCompile Include="3DF\Performance.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
-    <ClCompile Include="3DF.Model.cpp">
-      <Filter>3DF\Sprocket</Filter>
-    </ClCompile>
-    <ClCompile Include="Impl\ModelImpl.cpp">
-      <Filter>3DF\Sprocket\Impl</Filter>
-    </ClCompile>
     <ClCompile Include="..\Common\LogManager.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Selectability.cpp">
       <Filter>3DF\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="Sprocket.cpp">
-      <Filter>3DF\Sprocket</Filter>
     </ClCompile>
     <ClCompile Include="3DF\AttributeLock.cpp">
       <Filter>3DF\Control</Filter>
@@ -602,11 +584,50 @@
     <ClCompile Include="..\Signal\WorkerThread.cpp">
       <Filter>_Signal</Filter>
     </ClCompile>
-    <ClCompile Include="Entity.ModelTree.cpp">
-      <Filter>3DF\Component</Filter>
+    <ClCompile Include="3DF\PMI.Entity.cpp">
+      <Filter>3DF\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>3DF\Component</Filter>
+    <ClCompile Include="Entity.ModelTree.cpp">
+      <Filter>CADModel</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\3DF.Application.cpp">
+      <Filter>Sprocket</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\3DF.Canvas.cpp">
+      <Filter>Sprocket</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\3DF.Factory.cpp">
+      <Filter>Sprocket</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\3DF.Model.cpp">
+      <Filter>Sprocket</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\3DF.View.cpp">
+      <Filter>Sprocket</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\Sprocket.cpp">
+      <Filter>Sprocket</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\Impl\CanvasImpl.cpp">
+      <Filter>Sprocket\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\Impl\ComponentImpl.cpp">
+      <Filter>Sprocket\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\Impl\ModelImpl.cpp">
+      <Filter>Sprocket\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\Impl\ViewImpl.cpp">
+      <Filter>Sprocket\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\3DF.CADModel.cpp">
+      <Filter>Sprocket</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\3DF.Component.cpp">
+      <Filter>Sprocket</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\Impl\CADModelImpl.cpp">
+      <Filter>Sprocket\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -2,10 +2,10 @@
 
 #include <Json.h>
 
-#include "3DF/3DF.h"
+#include "../3DF/3DF.h"
 
-#include "3DF/Facility.AppOptions.h"
-#include "3DF/Window.h"
+#include "../3DF/Facility.AppOptions.h"
+#include "../3DF/Window.h"
 
 #include "Sprocket.h"
 
@@ -14,7 +14,7 @@
 class HBaseModel;
 class HBaseOperator;
 
-#include "3DF.Signal.h"
+#include "../3DF.Signal.h"
 #include "../Signal/Signal.h"
 
 namespace H3DF
@@ -59,8 +59,8 @@ namespace H3DF
 		void AttachViewAsLayout(View const * pcInView);
 
 		void SetDelivery(Signal::Delivery & cDelivery, int nViewId);
-		void FileOpen(Json::Object & cInObject);
-		static void ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObject, Signal::Delivery & cDelivery);
+		void FileOpen(Json::Object & cInObject, CADModel & cInCADModel);
+		static void ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObject, CADModel & cInCADModel);
 
 		H3DF::View & GetFrontView() const;
 

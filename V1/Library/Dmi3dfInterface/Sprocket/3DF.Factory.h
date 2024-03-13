@@ -1,10 +1,10 @@
 ﻿#pragma once
 
-#include "3DF/3DF.h"
+#include "../3DF/3DF.h"
 
 #include "Sprocket.h"
 
-#include "3DF/ApplicationWindowOption.h"
+#include "../3DF/ApplicationWindowOption.h"
 
 namespace H3DF
 {

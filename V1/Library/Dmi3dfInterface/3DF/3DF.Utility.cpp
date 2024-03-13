@@ -608,17 +608,17 @@ bool H3DF::UserData::ShowSegmentName(HC_KEY nInKey, CString & strOutName)
 	return true;
 }
 
-bool H3DF::UserData::SetTopologyType(SegmentKey & cInSegment, DWORD nInType)
+bool H3DF::UserData::SetComponentType(SegmentKey & cInSegment, DWORD nInType)
 {
-	cInSegment.SetUserData((intptr_t)UserDataIndex::Topology, sizeof(DWORD), (BYTE *)&nInType);
+	cInSegment.SetUserData((intptr_t)UserDataIndex::ComponentType, sizeof(DWORD), (BYTE *)&nInType);
 
 	return true;
 }
 
-bool H3DF::UserData::ShowTopologyType(SegmentKey & cInSegment, DWORD & nOutType)
+bool H3DF::UserData::ShowComponentType(SegmentKey & cInSegment, DWORD & nOutType)
 {
 	ByteArray aUserData;
-	if (false == cInSegment.ShowUserData((intptr_t)UserDataIndex::Topology, aUserData)) {
+	if (false == cInSegment.ShowUserData((intptr_t)UserDataIndex::ComponentType, aUserData)) {
 		return false;
 	}
 
@@ -627,10 +627,25 @@ bool H3DF::UserData::ShowTopologyType(SegmentKey & cInSegment, DWORD & nOutType)
 	return true;
 }
 
-//== Geomety User Data 관련 함수 =====================================================================
-bool H3DF::UserData::SetTopologyType(GeometryKey & cInGeometry, DWORD nInType)
+bool H3DF::UserData::AddStatus(SegmentKey & cInSegment, DWORD & eInStatus)
 {
-	cInGeometry.SetUserData((intptr_t)UserDataIndex::Topology, sizeof(DWORD), (BYTE *)&nInType);
+	return true;
+}
+
+bool H3DF::UserData::RemoveStatus(SegmentKey & cInSegment, DWORD & eInStatus)
+{
+	return true;
+}
+
+bool H3DF::UserData::ShowStatus(SegmentKey & cInSegment, DWORD & eOutStatus)
+{
+	return true;
+}
+
+//== Geomety User Data 관련 함수 =====================================================================
+bool H3DF::UserData::SetComponentType(GeometryKey & cInGeometry, DWORD nInType)
+{
+	cInGeometry.SetUserData((intptr_t)UserDataIndex::ComponentType, sizeof(DWORD), (BYTE *)&nInType);
 
 	return true;
 }
@@ -638,17 +653,17 @@ bool H3DF::UserData::SetTopologyType(GeometryKey & cInGeometry, DWORD nInType)
 bool H3DF::UserData::AddTopologyType(GeometryKey & cInGeometry, DWORD nInType)
 {
 	DWORD nExistType = 0;
-	if (true == ShowTopologyType(cInGeometry, nExistType)) {
+	if (true == ShowComponentType(cInGeometry, nExistType)) {
 		nInType += nExistType;
 	}
 
-	return SetTopologyType(cInGeometry, nInType);
+	return SetComponentType(cInGeometry, nInType);
 }
 
-bool H3DF::UserData::ShowTopologyType(GeometryKey & cInGeometry, DWORD & nOutType)
+bool H3DF::UserData::ShowComponentType(GeometryKey & cInGeometry, DWORD & nOutType)
 {
 	ByteArray aUserData;
-	if (false == cInGeometry.ShowUserData((intptr_t)UserDataIndex::Topology, aUserData)) {
+	if (false == cInGeometry.ShowUserData((intptr_t)UserDataIndex::ComponentType, aUserData)) {
 		return false;
 	}
 

@@ -2,8 +2,8 @@
 #include "Operator.KeyboardTest.h"
 #include "Painter.h"
 #include "Window.h"
-#include "../Impl/ViewImpl.h"
-#include "../Signal/Signal.h"
+#include "../Sprocket/Impl/ViewImpl.h"
+#include "../../Signal/Signal.h"
 
 USING_3DF_NAMESPACE
 

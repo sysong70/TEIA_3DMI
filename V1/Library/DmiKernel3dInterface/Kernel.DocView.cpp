@@ -3,8 +3,8 @@
 #include "Kernel.DocView.h"
 #include "./Impl/Kernel.DocViewImpl.h"
 
-#include <3DF.Canvas.h>
-#include <3DF.Factory.h>
+#include <Sprocket/3DF.Canvas.h>
+#include <Sprocket/3DF.Factory.h>
 
 #include <3DF/Visibility.h>
 #include <3DF/LineAttribute.h>
@@ -58,9 +58,11 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject)
 	pcImpl->AllocationOperator(this);
 
 	pcImpl->m_pcCanvas->SetDelivery(pcImpl->Delivery(), pcImpl->m_nViewId);
-	pcImpl->m_pcCanvas->FileOpen(cInObject);
+	pcImpl->m_pcCanvas->FileOpen(cInObject, pcImpl->GetCADModel());
 
-	pcImpl->ModelPanel().Initialize(strFilePathName);
+	// #ModelPanel: File Open한 후에, CADModel을 이용해서 ModelPanel을 초기화한다.
+	pcImpl->ModelPanel().Initialize(pcImpl->GetCADModel());
+	//pcImpl->ModelPanel().Initialize(strFilePathName);
 }
 
 // 3. H3DF View Paint 함수

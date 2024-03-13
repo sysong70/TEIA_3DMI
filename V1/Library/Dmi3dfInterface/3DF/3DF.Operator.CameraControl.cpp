@@ -10,7 +10,7 @@
 
 #include "Camera.h"
 
-#include "../Impl/ViewImpl.h"
+#include "../Sprocket/Impl/ViewImpl.h"
 
 #include <Common_Define.h>
 

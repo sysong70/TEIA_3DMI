@@ -10,7 +10,7 @@
 #include "3DF.View.h"
 #include "Impl/ViewImpl.h"
 
-#include "3DF/3DF.Utility.h"
+#include "../3DF/3DF.Utility.h"
 
 using namespace H3DF;
 

@@ -8,7 +8,7 @@
 
 #include "Highlight.h"
 
-#include "../Impl/ViewImpl.h"
+#include "../Sprocket/Impl/ViewImpl.h"
 
 #include <hc.h>
 #include <HBaseOperator.h>
