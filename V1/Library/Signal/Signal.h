@@ -514,6 +514,7 @@ namespace Signal
 			DeleteItem,
 			ExpandItem,
 			ExpandParent,
+			InverseCheckedStatus,
 			SelectItem,
 		};
 
@@ -553,6 +554,8 @@ namespace Signal
 		void ExpandItem(DWORD_PTR key, bool expand = true);
 		// expand from root to item
 		void ExpandParent(DWORD_PTR key);
+
+		void InverseCheckedStatus();
 
 		void SelectItem(DWORD_PTR key, bool select = true);
 	};

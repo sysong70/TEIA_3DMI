@@ -156,6 +156,27 @@ public:
 	#endif
 	}
 
+
+
+	void InverseCheckedStatus()
+	{
+		EnableTreeCtrlNotifications(FALSE);
+
+		//:CHECK
+		const CList<CBCGPGridRow*, CBCGPGridRow*>& list = m_lstItems;
+
+		POSITION pos = list.GetHeadPosition();
+		while (pos != nullptr) {
+			auto item = list.GetNext(pos);
+			item->ToggleCheck();
+			item->UpdateParentCheckbox();
+		}
+
+		RedrawWindow();
+
+		EnableTreeCtrlNotifications(TRUE);
+	}
+
 protected:
 
 	afx_msg void OnContextMenu(CWnd* pWnd, CPoint point)
@@ -280,10 +301,17 @@ void Component::ModelPanel::ReceiveSignal(Json::Object* pData)
 	case Signal::ModelPanel::Action::ExpandParent:	ExpandParent(pData);	break;
 	case Signal::ModelPanel::Action::SelectItem:	SelectItem(pData);		break;
 
-	case Signal::ModelPanel::Action::RedrawTree:	RedrawTree(pData->GetBoolean(SKW_FLAG)); break;
+	case Signal::ModelPanel::Action::InverseCheckedStatus:
+		Control().InverseCheckedStatus();
+		break;
+
+	case Signal::ModelPanel::Action::RedrawTree:
+		RedrawTree(pData->GetBoolean(SKW_FLAG));
+		break;
 
 	default:
 		DEBUG_STOP;
+		break;
 	}
 
 	REMOVE_POINTER(pData);
@@ -808,6 +836,15 @@ void Component::ModelPanel::RedrawTree(bool value)
 		BeginWaitCursor();
 	}
 }
+
+#ifdef _DEBUG
+
+void Component::ModelPanel::TestFunction()
+{
+	Control().InverseCheckedStatus();
+}
+
+#endif
 
 #undef PRESET
 #undef DEBUG_LOG

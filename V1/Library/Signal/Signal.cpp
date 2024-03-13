@@ -804,6 +804,13 @@ void Signal::ModelPanel::ExpandParent(DWORD_PTR key)
 
 
 
+void Signal::ModelPanel::InverseCheckedStatus()
+{
+	SendActionDataOnly(Action::InverseCheckedStatus);
+}
+
+
+
 void Signal::ModelPanel::SelectItem(DWORD_PTR key, bool select)
 {
 	Json::Object data;

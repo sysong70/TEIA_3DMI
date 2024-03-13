@@ -93,6 +93,10 @@ namespace Component
 
 		void RedrawTree(bool value);
 
+	#ifdef _DEBUG
+		void TestFunction();
+	#endif
+
 	private:
 
 		std::unordered_map<DWORD_PTR, HTREEITEM> m_keyMap;
