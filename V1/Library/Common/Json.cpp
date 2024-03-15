@@ -334,6 +334,27 @@ void Json::Array::AddValue(Value* pValue)
 
 
 
+void Json::Array::AddDwordPtr(DWORD_PTR value)
+{
+	AddString().Format(L"%llx", value);
+}
+
+
+
+DWORD_PTR Json::Array::GetDwordPtr(int i)
+{
+	Json::Value* pValue = GetAt(i);
+	DEBUG_VALID(pValue);
+	ASSERT(pValue->IsString());
+
+	DWORD_PTR value;
+	::swscanf_s(pValue->AsString(), L"%llx", &value);
+
+	return value;
+}
+
+
+
 bool Json::Array::ToArray(int& count, int*& pValues)
 {
 	count = GetSize();
@@ -360,6 +381,21 @@ bool Json::Array::ToArray(WStringArray& values)
 	for (int i = 0; i < GetSize(); i++) {
 		Json::Value* pValue = m_buffer[i];
 		values.push_back(pValue->ToString());
+	}
+
+	return true;
+}
+
+bool Json::Array::ToArray(std::vector<DWORD_PTR>& values)
+{
+	values.clear();
+
+	for (int i = 0; i < GetSize(); i++) {
+		Json::Value* pValue = m_buffer[i];
+
+		DWORD_PTR value;
+		::swscanf_s(pValue->AsString(), L"%llx", &value);
+		values.push_back(value);
 	}
 
 	return true;

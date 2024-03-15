@@ -96,11 +96,20 @@ namespace Json
 		// standard type
 		void AddValue(Value* pValue);
 
+	public:
+
+		//:WARNING - special
+		void AddDwordPtr(DWORD_PTR value);
+
+		DWORD_PTR GetDwordPtr(int i);
+
 	public: // casting
 
 		bool ToArray(int& count, int*& pValues);
 
 		bool ToArray(WStringArray& values);
+
+		bool ToArray(std::vector<DWORD_PTR>& values);
 
 	public:
 

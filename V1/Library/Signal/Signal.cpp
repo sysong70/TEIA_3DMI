@@ -779,6 +779,23 @@ void Signal::ModelPanel::CheckItem(DWORD_PTR key, bool checked)
 
 
 
+void Signal::ModelPanel::CheckItems(const KeyItems& items, bool checked)
+{
+	Json::Object data;
+	ConstructData(data, Action::CheckItems);
+
+	data.SetBoolean(SKW_CHECKED, checked);
+	
+	Json::Array& children = data.CreateArray(SKW_ITEMS);
+	for (auto item : items) {
+		children.AddDwordPtr(item);
+	}
+
+	Wrapper().SendData(data);
+}
+
+
+
 void Signal::ModelPanel::DeleteItem(DWORD_PTR key)
 {
 	SendKeyData(Action::DeleteItem);

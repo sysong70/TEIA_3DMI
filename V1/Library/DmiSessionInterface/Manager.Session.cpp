@@ -175,6 +175,8 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 
 		case Signal::View::Action::OnPaint:
 			pcSession->ViewPaint(cInObject);
+			//:Ken - TEST
+			//Connector::GetInstance(nViewId).view.PaintOverlap();
 			break;
 
 		case Signal::View::Action::OnResize:

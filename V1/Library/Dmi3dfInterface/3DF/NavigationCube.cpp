@@ -92,6 +92,7 @@ namespace NavigationCubePreset
 class NavigationCubeImpl : public Impl
 {
 public:
+
 	void Copy(const NavigationCubeImpl * pcInThat) {
 		m_bInitialized = pcInThat->m_bInitialized;
 
@@ -128,6 +129,8 @@ public:
 	SelectionResults m_cOldHighlightSelection;
 };
 
+
+
 H3DF::NavigationCube::NavigationCube(H3DF::BaseView * view, WindowKey * pcInWindow)
 {
 	NavigationCubeImpl * pcImpl = new NavigationCubeImpl();
@@ -143,6 +146,8 @@ H3DF::NavigationCube::~NavigationCube()
 {
 }
 
+
+
 void H3DF::NavigationCube::Set(NavigationCube const & cInThat)
 {
 	NavigationCubeImpl * pcImpl = (NavigationCubeImpl *)m_pcImpl;
@@ -154,11 +159,15 @@ void H3DF::NavigationCube::Set(NavigationCube const & cInThat)
 	}
 }
 
+
+
 NavigationCube const & H3DF::NavigationCube::operator = (NavigationCube const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
+
+
 
 int H3DF::NavigationCube::LButtonUp(HEventInfo & cInEvent)
 {
@@ -201,6 +210,8 @@ int H3DF::NavigationCube::LButtonUp(HEventInfo & cInEvent)
 	return HLISTENER_PASS_EVENT;
 }
 
+
+
 int H3DF::NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
@@ -214,6 +225,8 @@ int H3DF::NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)
 	return HLISTENER_PASS_EVENT;
 }
 
+
+
 void H3DF::NavigationCube::SetView(H3DF::BaseView * view, WindowKey * pcInWindow) 
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
@@ -223,6 +236,8 @@ void H3DF::NavigationCube::SetView(H3DF::BaseView * view, WindowKey * pcInWindow
 	pcImpl->m_pcWindow = pcInWindow;
 }
 
+
+
 bool H3DF::NavigationCube::IsValid()
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
@@ -230,6 +245,8 @@ bool H3DF::NavigationCube::IsValid()
 
 	return pcImpl->m_cubeSegment != HC_ERROR_KEY;
 }
+
+
 
 bool H3DF::NavigationCube::IsInitialized()
 {
@@ -239,6 +256,8 @@ bool H3DF::NavigationCube::IsInitialized()
 	return pcImpl->m_bInitialized;
 }
 
+
+
 void H3DF::NavigationCube::SetHighlightControl(H3DF::HighlightControl & cInHighlightCtrl)
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
@@ -246,6 +265,8 @@ void H3DF::NavigationCube::SetHighlightControl(H3DF::HighlightControl & cInHighl
 
 	pcImpl->m_pcHighlightCtrl = &cInHighlightCtrl;
 }
+
+
 
 void H3DF::NavigationCube::Create(float width, float height, HC_KEY parent)
 {
@@ -318,6 +339,7 @@ void H3DF::NavigationCube::Create(float width, float height, HC_KEY parent)
 
 	pcImpl->m_bInitialized = true;
 }
+
 
 
 void H3DF::NavigationCube::Recreate()
@@ -412,6 +434,7 @@ void H3DF::NavigationCube::CloseCubeSegment()
 }
 
 
+
 void H3DF::NavigationCube::CreateAxis()
 {
 	double plane = PRESET::PlaneUnit();
@@ -440,7 +463,7 @@ void H3DF::NavigationCube::CreateCube()
 
 	// Plane and text
 
-	pcImpl->m_cSegments[(int)H3DF::ViewDirection::Mode::top] = CreatePlaneShell("top", "TOP", { 0, 0, unit }, { 0, 0, 0 });
+	pcImpl->m_cSegments[(int)H3DF::ViewDirection::Mode::top]		= CreatePlaneShell("top", "TOP", { 0, 0, unit }, { 0, 0, 0 });
 	pcImpl->m_cSegments[(int)H3DF::ViewDirection::Mode::bottom]		= CreatePlaneShell("bottom", "BOTTOM", { 0, 0, -unit }, { 0, 180, 0 });
 	pcImpl->m_cSegments[(int)H3DF::ViewDirection::Mode::front]		= CreatePlaneShell("front", "FRONT", { 0, -unit, 0 }, { 90, 0, 0 });
 	pcImpl->m_cSegments[(int)H3DF::ViewDirection::Mode::back]		= CreatePlaneShell("back", "BACK", { 0, unit, 0 }, { 90, 0, 180 });
@@ -684,6 +707,8 @@ HC_KEY H3DF::NavigationCube::CreateAxis(const char* name, const char* text, HPoi
 
 	return segKey;
 }
+
+
 
 void H3DF::NavigationCube::SetWindowSize(double width, double height, bool openSegment)
 {

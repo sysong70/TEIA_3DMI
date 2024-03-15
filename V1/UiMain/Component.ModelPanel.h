@@ -77,6 +77,8 @@ namespace Component
 
 		void CheckItem(Json::Object* pData);
 
+		void CheckItems(Json::Object* pData);
+
 		void DeleteItem(Json::Object* pData);
 
 		void ExpandItem(Json::Object* pData);

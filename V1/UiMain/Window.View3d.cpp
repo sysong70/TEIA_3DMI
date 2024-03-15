@@ -116,6 +116,10 @@ void Window::View3d::ReceiveSignal(Json::Object* pData)
 			}
 			break;
 
+		case Signal::View::Action::PaintOverlap: {
+			//:TODO
+		} break;
+
 		default:
 			DEBUG_STOP;
 			break;

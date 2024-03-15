@@ -296,6 +296,7 @@ void Component::ModelPanel::ReceiveSignal(Json::Object* pData)
 	case Signal::ModelPanel::Action::AddItem:		AddItem(pData);			break;
 	case Signal::ModelPanel::Action::AddChildren:	AddChildren(pData);		break;
 	case Signal::ModelPanel::Action::CheckItem:		CheckItem(pData);		break;
+	case Signal::ModelPanel::Action::CheckItems:	CheckItems(pData);		break;
 	case Signal::ModelPanel::Action::DeleteItem:	DeleteItem(pData);		break;
 	case Signal::ModelPanel::Action::ExpandItem:	ExpandItem(pData);		break;
 	case Signal::ModelPanel::Action::ExpandParent:	ExpandParent(pData);	break;
@@ -732,10 +733,9 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 		);
 	}
 
+	// Use last item
 	if (childCount != checkedCount) {
-		// use last item
-		auto row = Control().TreeItem(hChild);
-		row->UpdateParentCheckbox();
+		Control().TreeItem(hChild)->UpdateParentCheckbox();
 	}
 
 	if (pData->GetBoolean(SKW_EXPAND) == false) {
@@ -750,6 +750,29 @@ void Component::ModelPanel::CheckItem(Json::Object* pData)
 	DisableNotification(
 		Control().SetCheck(GetItem(pData->GetDwordPtr(SKW_KEY)), pData->GetBoolean(SKW_CHECKED))
 	);
+}
+
+
+
+void Component::ModelPanel::CheckItems(Json::Object* pData)
+{
+	RedrawTree(false);
+
+	bool check = pData->GetBoolean(SKW_CHECKED);
+
+	std::vector<DWORD_PTR> keys;
+	pData->GetArray(SKW_ITEMS).ToArray(keys);
+
+	HTREEITEM item = nullptr;
+	for (auto key : keys) {
+		item = GetItem(key);
+		DEBUG_VALID(item);
+
+		Control().SetCheck(item, check);
+		Control().TreeItem(item)->UpdateParentCheckbox();
+	}
+
+	RedrawTree(true);
 }
 
 

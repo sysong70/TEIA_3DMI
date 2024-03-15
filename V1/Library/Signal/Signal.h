@@ -21,6 +21,7 @@
 #define SKW_GROUPNAME		"GroupName"
 #define SKW_HWND			"HWND"
 #define SKW_ID				"Id"
+#define SKW_ITEMS			"Items"
 #define SKW_KEY				"Key"
 #define SKW_MAX				"Max"
 #define SKW_MESSAGE			"Message"
@@ -108,6 +109,7 @@ namespace Signal
 	};
 
 	using TreeItems = std::vector<TreeItem>;
+	using KeyItems = std::vector<DWORD_PTR>;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -510,6 +512,7 @@ namespace Signal
 			AddItem,
 			AddChildren,
 			CheckItem,
+			CheckItems,
 			CollapseItem,
 			DeleteItem,
 			ExpandItem,
@@ -548,6 +551,8 @@ namespace Signal
 		void AddChildren(DWORD_PTR parentKey, TreeItems& items, bool expand = true);
 
 		void CheckItem(DWORD_PTR key, bool checked);
+
+		void CheckItems(const KeyItems& items, bool checked);
 
 		void DeleteItem(DWORD_PTR key);
 		// expand or collapse
