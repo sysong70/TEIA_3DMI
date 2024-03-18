@@ -17,7 +17,7 @@ namespace H3DF
 {
 	class MultiSelectManager;
 
-	class ModelImpl : public HBaseModel, public Impl
+	class API_3DF ModelImpl : public HBaseModel, public Impl
 	{
 	public:
 		ModelImpl();
@@ -50,9 +50,6 @@ namespace H3DF
 		SegmentKey & NoShowStyleSegment() { return m_cNoShowStyle; }
 		SegmentKey & NoShowVertexStyleSegment() { return m_cNoShowVertexStyle; }
 
-		SegmentKey & ShowOnlyStyleSegment() { return m_cShowOnlyStyle; }
-		SegmentKey & ShowOnlyVertexStyleSegment() { return m_cShowOnlyVertexStyle; }
-
 	private:
 		SegmentKey m_cSegmentKey;
 
@@ -61,9 +58,6 @@ namespace H3DF
 
 		SegmentKey m_cNoShowStyle;
 		SegmentKey m_cNoShowVertexStyle;
-
-		SegmentKey m_cShowOnlyStyle;
-		SegmentKey m_cShowOnlyVertexStyle;
 
 		ModelHandedness m_eModelHandedness;
 

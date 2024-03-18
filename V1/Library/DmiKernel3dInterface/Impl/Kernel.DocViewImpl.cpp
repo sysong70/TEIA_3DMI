@@ -55,7 +55,7 @@ H3DF::Model & KERNEL::DocViewImpl::GetModel()
 	return m_pcCanvas->GetModel();
 }
 
-H3DF::CADModel & KERNEL::DocViewImpl::GetCADModel()
+H3DF::CADModel & KERNEL::DocViewImpl::CADModel()
 {
 	return m_cCADModel;
 }
@@ -162,7 +162,7 @@ void KERNEL::DocViewImpl::SetVisibility(int nId)
 			break;
 
 		case HOME_3D_CMD_Visualize_Hide:
-			// pcOperator->NoShow();
+			pcOperator->HideOnly();
 			break;
 
 		case HOME_3D_CMD_Visualize_ShowOnly:

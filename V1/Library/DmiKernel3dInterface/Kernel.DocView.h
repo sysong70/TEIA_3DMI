@@ -27,8 +27,17 @@ namespace KERNEL
 		void ViewId(int nViewId);
 		int ViewId();
 
+		H3DF::Canvas & Canvas() const;
+		H3DF::CADModel & CADModel() const;
+
 		bool Save(CString strFilePathName);
-	
+
+		//== Operator 관련 함수 ======================================================================
+		Operator::Attribute & Attribute();
+		Operator::Camera & Camera();
+		Operator::Select & Select();
+		Operator::ModelPanel & ModelPanel();
+
 		//== Mouse 관련 함수 =========================================================================
 		void MouseSignal(Json::Object & cInObject);
 		

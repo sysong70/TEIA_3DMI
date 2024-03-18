@@ -42,7 +42,7 @@ namespace KERNEL
 		H3DF::Canvas * m_pcCanvas = nullptr;
 
 		H3DF::Model & GetModel();
-		H3DF::CADModel & GetCADModel();
+		H3DF::CADModel & CADModel();
 	
 		H3DF::BaseView * GetBaseView();
 

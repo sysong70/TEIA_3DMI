@@ -83,13 +83,6 @@ void H3DF::ModelImpl::Init()
 	m_cNoShowVertexStyle = m_cIncludeStyles.Subsegment("noshow_vertex_style");
 	m_cNoShowVertexStyle.GetVisibilityControl().SetVertices(false);
 
-	// Show Only Condtion용 Style 생성
-	m_cShowOnlyStyle = m_cIncludeStyles.Subsegment("show_only_style");
-	m_cShowOnlyStyle.GetVisibilityControl().SetFaces(true).SetLines(true);
-
-	m_cShowOnlyVertexStyle = m_cIncludeStyles.Subsegment("show_only_vertex_style");
-	m_cShowOnlyVertexStyle.GetVisibilityControl().SetVertices(true);
-
 	m_cModels.GetStyleControl().PushSegment(m_cShowStyle);
 
 // 	// 입력된 Matrial을 Face에 적용한다.

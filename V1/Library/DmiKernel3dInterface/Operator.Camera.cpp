@@ -201,3 +201,12 @@ void KERNEL::Operator::Camera::FitWorld()
 	pcImpl->CameraControl().SetCameraMode(H3DF::Camera::Mode::Multi);
 	pcImpl->CameraControl().FitWorld();
 }
+
+void KERNEL::Operator::Camera::FitWorldOnly()
+{
+	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->CameraControl().FitWorld();
+}
+

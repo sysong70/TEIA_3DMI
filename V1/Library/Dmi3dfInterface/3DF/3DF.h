@@ -296,12 +296,12 @@ namespace H3DF
 
 	enum class UserDataIndex : uint32_t
 	{
-		None									= 0x00000000,
+		Type									= 0x01000001,
+		Name									= 0x01000002,
 
-		// Item 관련 User Data Index
-		Type									= 0x10000000,
-		Name									= 0x10000001,
-		ComponentType							= 0x10000002,
+		// Component 관련 Data Index
+		ComponentType							= 0x02000001,
+		ComponentStatus							= 0x02000002,
 	};
 
 	class API_3DF ViewDirection

@@ -8,13 +8,13 @@ using namespace H3DF;
 
 H3DF::CADModelImpl::CADModelImpl()
 {
-	//m_pmComponentMap = new CAtlMap<HC_KEY, Component *>;
+	m_pmComponentMap = new CAtlMap<HC_KEY, Component *>;
 }
 
 H3DF::CADModelImpl::~CADModelImpl()
 {
-// 	if (nullptr != m_pmComponentMap) {
-// 
+	if (nullptr != m_pmComponentMap) {
+
 // 		POSITION pcPosition = m_pmComponentMap->GetStartPosition();
 // 
 // 		while (nullptr != pcPosition)
@@ -22,10 +22,10 @@ H3DF::CADModelImpl::~CADModelImpl()
 // 			Component * pcComponent = m_pmComponentMap->GetNextValue(pcPosition);
 // 			delete pcComponent;
 // 		}
-// 
-// 		m_pmComponentMap->RemoveAll();
-// 		delete m_pmComponentMap;
-// 	}
+
+		m_pmComponentMap->RemoveAll();
+		delete m_pmComponentMap;
+	}
 }
 
 void H3DF::CADModelImpl::Copy(CADModelImpl * pcInThat)
@@ -64,6 +64,15 @@ CString H3DF::CADModelImpl::TypeName(const Component & cInComponent)
 			strTypeName.Format(L"%s %d", strTypeName, m_nSurfaceIndex++);
 			break;
 
+		case Component::Type::ExchangeRISet:
+			strTypeName.Format(L"%s %d", strTypeName, m_nGroupIndex++);
+			break;
+
+		case Component::Type::ExchangeRIPointSet:
+			strTypeName.Format(L"%s %d", strTypeName, m_nPointSetIndex
+				++);
+			break;
+
 		default:
 			break;
 	}
@@ -71,7 +80,12 @@ CString H3DF::CADModelImpl::TypeName(const Component & cInComponent)
 	return strTypeName;
 }
 
-// void H3DF::CADModelImpl::MapSetAt(HC_KEY nInKey, Component * pcInComponent)
-// {
-// 	m_pmComponentMap->SetAt(nInKey, pcInComponent);
-// }
+Component & H3DF::CADModelImpl::ModelComponent()
+{
+	return *m_pcModels;
+}
+
+void H3DF::CADModelImpl::MapSetAt(HC_KEY nInKey, Component * pcInComponent)
+{
+	m_pmComponentMap->SetAt(nInKey, pcInComponent);
+}

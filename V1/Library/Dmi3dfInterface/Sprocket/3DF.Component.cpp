@@ -79,7 +79,7 @@ Component & H3DF::Component::GetOwner() const
 	return *pcImpl->m_pcOwner;
 }
 
-ComponentArray & H3DF::Component::GetSubcomponents() const
+ComponentArray & H3DF::Component::GetSubComponents() const
 {
 	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -100,7 +100,46 @@ DWORD H3DF::Component::GetStatus()
 	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->Status();
+	return pcImpl->m_nStatus;
+}
+
+DWORD H3DF::Component::AddStatus(Component::Status eStatus)
+{
+	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_nStatus |= eStatus;
+	return pcImpl->m_nStatus;
+}
+
+DWORD H3DF::Component::RemoveStatus(Component::Status eStatus)
+{
+	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_nStatus &= ~eStatus;
+	return pcImpl->m_nStatus;
+}
+
+bool H3DF::Component::IsRepresentationItem()
+{
+	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	switch (pcImpl->m_eType)
+	{
+		case H3DF::Component::Type::ExchangeRIPointSet:
+		case H3DF::Component::Type::ExchangeRICurve:
+		case H3DF::Component::Type::ExchangeRIPolyWire:
+		case H3DF::Component::Type::ExchangeRIBRepModelSolid:
+		case H3DF::Component::Type::ExchangeRIPolyBRepModelSolid:
+		case H3DF::Component::Type::ExchangeRIBRepModelSurface:
+		case H3DF::Component::Type::ExchangeRIPolyBRepModelSurface:
+			return true;
+			break;
+	}
+
+	return false;
 }
 
 KeyPath H3DF::Component::GetKeyPath(Component const & cInComponent)

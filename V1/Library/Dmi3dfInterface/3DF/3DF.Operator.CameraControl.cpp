@@ -371,7 +371,11 @@ void H3DF::Operator::CameraControl::FitWorld()
 	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
+	pcImpl->GetBaseView()->InvalidateSceneBounding();
+
 	pcImpl->GetBaseView()->ZoomToExtents();
+
+	pcImpl->GetBaseView()->SetZoomLimit();
 }
 
 //== Mouse cInEvent 처리 ===============================================================================

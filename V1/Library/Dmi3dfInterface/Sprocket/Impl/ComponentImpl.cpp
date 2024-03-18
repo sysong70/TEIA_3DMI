@@ -23,10 +23,10 @@ H3DF::ComponentImpl::ComponentImpl()
 
 H3DF::ComponentImpl::~ComponentImpl()
 {
-	// Sub Compoent는 삭제하지 않는다. CADModel에서 한꺼번에 삭제한다.
-	// Include 구조에 의해서 한꺼번에 삭	제해야 한다.
-	// 여기서는 Array만 삭제한다.
 	if (nullptr != m_pvSubComponents) {
+		for (auto * pcSubComponent : *m_pvSubComponents) {
+			delete pcSubComponent;
+		}
 		delete m_pvSubComponents;
 	}
 
@@ -42,8 +42,12 @@ void H3DF::ComponentImpl::Copy(ComponentImpl * pcInThat)
 	m_eType = pcInThat->m_eType;
 	m_nStatus = pcInThat->m_nStatus;
 	m_pcOwner = pcInThat->m_pcOwner;
-	m_pvSubComponents = pcInThat->m_pvSubComponents;
 	*m_pstrName = *pcInThat->m_pstrName;
+
+	for (auto * pcSubComponent : *pcInThat->m_pvSubComponents) {
+		Component * pcComponent = new Component(*pcSubComponent);
+		m_pvSubComponents->push_back(pcComponent);
+	}
 }
 
 void H3DF::ComponentImpl::SetName(CString strInName)
@@ -74,6 +78,13 @@ CString H3DF::ComponentImpl::TypeName()
 		case H3DF::Component::Type::ExchangeRICurve:
 		case H3DF::Component::Type::ExchangeRIPolyWire:
 			strTypeName = L"Curve";
+			break;
+
+		case H3DF::Component::Type::ExchangeRISet:
+			strTypeName = L"Group";
+			break;
+		case H3DF::Component::Type::ExchangeRIPointSet:
+			strTypeName = L"Point Set";
 			break;
 
 		default:
@@ -133,49 +144,6 @@ bool H3DF::ComponentImpl::AddSubComponent(Component & cInParentComponent, Compon
  	DEBUG_VALID(pcImpl);
  
  	pcImpl->m_pcOwner = &cInParentComponent;
-
-	return true;
-}
-
-DWORD H3DF::ComponentImpl::Status()
-{
-	return m_nStatus;
-}
-
-DWORD H3DF::ComponentImpl::AddStatus(H3DF::Component::Status eStatus)
-{
-	m_nStatus |= eStatus;
-	return m_nStatus;
-}
-
-DWORD H3DF::ComponentImpl::RemoveStatus(H3DF::Component::Status eStatus)
-{
-	m_nStatus &= ~eStatus;
-	return m_nStatus;
-}
-
-bool H3DF::ComponentImpl::AddComponentStatus(Component & cInComponent, H3DF::Component::Status eInStatus)
-{
-	ComponentImpl * pcImpl = dynamic_cast<ComponentImpl *>(cInComponent.GetImpl());
-	if (nullptr == pcImpl) {
-		DEBUG_STOP;
-		return false;
-	}
-
-	pcImpl->AddStatus(eInStatus);
-
-	return true;
-}
-
-bool H3DF::ComponentImpl::RemoveComponentStatus(Component & cInComponent, H3DF::Component::Status eInStatus)
-{
-	ComponentImpl * pcImpl = dynamic_cast<ComponentImpl *>(cInComponent.GetImpl());
-	if (nullptr == pcImpl) {
-		DEBUG_STOP;
-		return false;
-	}
-
-	pcImpl->RemoveStatus(eInStatus);
 
 	return true;
 }

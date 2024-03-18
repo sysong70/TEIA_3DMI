@@ -56,17 +56,79 @@ CADModel & H3DF::CADModel::operator = (CADModel const & cInThat)
 	return *this;
 }
 
-Component * H3DF::CADModel::GetComponentFromKey(HC_KEY cInKey) const
+Component * H3DF::CADModel::GetComponent(HC_KEY cInKey) const
 {
 	CADModelImpl * pcImpl = (CADModelImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
-
+	
 // 	Component * pcOutComponent = nullptr;
 // 	if (true == pcImpl->m_pmComponentMap->Lookup(cInKey, pcOutComponent)) {
 // 		return pcOutComponent;
 // 	}
 
 	return nullptr;
+}
+
+Component * H3DF::CADModel::GetComponent(H3DF::SelectionItem & cInItem) const
+{
+	CADModelImpl * pcImpl = (CADModelImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	H3DF::KeyPath cPath;
+	cInItem.ShowPath(cPath);
+
+#ifdef _DEBUG
+	CString strText;
+	cInItem.ShowPathString(strText);
+#endif
+
+	// 키값 배열을 가져온다.
+	H3DF::KeyArray cKeys;
+	cPath.ShowKeys(cKeys);
+
+	std::reverse(cKeys.begin(), cKeys.end());
+
+	Component * pcComponent = (Component *)this;
+	Component * pcFindSubComponent = nullptr;
+
+	// 가져온 키값을 이용해서 Component를 찾는다.
+	for (auto & cKey : cKeys) {
+		ComponentArray & cSubcomponentArray = pcComponent->GetSubComponents();
+
+		if (true == cSubcomponentArray.empty()) {
+			continue;
+		}
+
+		pcFindSubComponent = nullptr;
+
+		for (auto pcSubComponent : cSubcomponentArray) {
+#ifdef _DEBUG
+			CString strName = pcSubComponent->GetName();
+			H3DF::Component::Type eType = pcSubComponent->GetType();
+#endif // _DEBUG
+
+			HC_KEY nSegmentKey = pcSubComponent->GetSegmentKey();
+			HC_KEY nIncludeKey = pcSubComponent->GetIncludeKey();
+
+			if (INVALID_KEY != nIncludeKey && cKey.KeyValue() == nIncludeKey) {
+				pcFindSubComponent = pcSubComponent;
+				break;
+			}
+			else if (INVALID_KEY == nIncludeKey && cKey.KeyValue() == nSegmentKey) {
+				pcFindSubComponent = pcSubComponent;
+				break;
+			}
+		}
+
+		if (nullptr == pcFindSubComponent) {
+			DEBUG_STOP;
+			continue;
+		}
+
+		pcComponent = pcFindSubComponent;
+	}
+
+	return pcComponent;
 }
 
 // 1. 주어진 Component를 이용해서, End Item을 찾아서 Selection Item을 생성한다.
@@ -79,8 +141,8 @@ bool H3DF::CADModel::ShowSelectionResult(Component * pcInComponent, H3DF::Select
 	CADModelImpl * pcImpl = (CADModelImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	// Component 구조상 맨 마지막 Item은 Segment로 Include Key값이 INVALID_KEY이다.
-	if (INVALID_KEY == pcInComponent->GetIncludeKey()) {
+	// RepresentationItem이면 마지막 하부까지 탐색한걸로 간주한다.
+	if (true == pcInComponent->IsRepresentationItem()) {
 
 		// 선택된 Item을 상위 탐색을 통해서, Models Group Item까지 값을 저장한다.
 		std::vector<HC_KEY> vnKeys;
@@ -97,8 +159,8 @@ bool H3DF::CADModel::ShowSelectionResult(Component * pcInComponent, H3DF::Select
 			return false;
 		}
 
-		SelectionItem cSelItem;
-		SelectionItemImpl * pcImpl = dynamic_cast<SelectionItemImpl *>(cSelItem.GetImpl());
+		SelectionItem cInItem;
+		SelectionItemImpl * pcImpl = dynamic_cast<SelectionItemImpl *>(cInItem.GetImpl());
 		DEBUG_VALID(pcImpl);
 
 		H3DF::Type eType = H3DF::Utility::GetType(vnKeys[0]);
@@ -129,15 +191,15 @@ bool H3DF::CADModel::ShowSelectionResult(Component * pcInComponent, H3DF::Select
 
 #ifdef _DEBUG
 // 		CString strPath;
-// 		cSelItem.ShowPathString(strPath);
+// 		cInItem.ShowPathString(strPath);
 #endif
 
-		cOutResults.PushFront(cSelItem);
+		cOutResults.PushFront(cInItem);
 
 		return true;
 	}
 
-	for (auto pcSubcomponents : pcInComponent->GetSubcomponents()) {
+	for (auto pcSubcomponents : pcInComponent->GetSubComponents()) {
 		ShowSelectionResult(pcSubcomponents, cOutResults);
 	}
 

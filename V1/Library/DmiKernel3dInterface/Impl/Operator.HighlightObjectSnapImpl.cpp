@@ -811,6 +811,7 @@ void KERNEL::Operator::HighlightObjectSnapImpl::CalculationLienAndLineObjectSnap
 
 //== Object Snap Point를 그리는 함수 ==================================================================
 
+// 1. Object Snap Item들을 Draw.
 void KERNEL::Operator::HighlightObjectSnapImpl::DrawSnapItems()
 {
 	if (0 < m_vSnapItems.size())
@@ -835,6 +836,7 @@ void KERNEL::Operator::HighlightObjectSnapImpl::DrawSnapItems()
 	}
 }
 
+// 1-1. Snap Point를 Draw
 void KERNEL::Operator::HighlightObjectSnapImpl::DrawSnapPoint(Operator::HighlightObjectSnapImpl::SnapPoint & cSnapPoint, CamerInformation & cInCameraInfo, bool bOperateSemgment)
 {
 	if (true == bOperateSemgment) {
@@ -851,6 +853,7 @@ void KERNEL::Operator::HighlightObjectSnapImpl::DrawSnapPoint(Operator::Highligh
 	}
 }
 
+// 1-1-1. Point에 Snap Point와 글자를 Draw
 void KERNEL::Operator::HighlightObjectSnapImpl::DrawSnapPoint(Point2D center, Status eInStatus, OSnap::Type eInType, double dUnit)
 {
 	using namespace Painter;
@@ -953,17 +956,6 @@ void KERNEL::Operator::HighlightObjectSnapImpl::DrawSnapPoint(Point2D center, St
 	HC_Close_Segment();
 }
 
-double KERNEL::Operator::HighlightObjectSnapImpl::PixelToWorld(double unit)
-{
-	PixelPoint pixel1;
-	PixelPoint pixel2(unit, 0, 0);
-	WorldPoint world1(Window(), pixel1);
-	WorldPoint world2(Window(), pixel2);
-	Vector vector = world2 - world1;
-
-	return vector.Length();
-}
-
 bool KERNEL::Operator::HighlightObjectSnapImpl::ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo)
 {
 	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(Window().GetImpl());
@@ -1026,6 +1018,12 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::AddSnapItem(SnapItem * psInSnapI
 	return true;
 }
 
+void KERNEL::Operator::HighlightObjectSnapImpl::Reset(bool bUpdate)
+{
+	ResetSnapItem();
+	ClearSnapItems(bUpdate);
+}
+
 void KERNEL::Operator::HighlightObjectSnapImpl::ClearSnapItems(bool bUpdate)
 {
 	m_cSnapPointSegment.Open();
@@ -1047,6 +1045,17 @@ void KERNEL::Operator::HighlightObjectSnapImpl::ResetSnapItem()
 	}
 
 	m_vSnapItems.clear();
+}
+
+double KERNEL::Operator::HighlightObjectSnapImpl::PixelToWorld(double unit)
+{
+	PixelPoint pixel1;
+	PixelPoint pixel2(unit, 0, 0);
+	WorldPoint world1(Window(), pixel1);
+	WorldPoint world2(Window(), pixel2);
+	Vector vector = world2 - world1;
+
+	return vector.Length();
 }
 
 #undef TheEnvironment

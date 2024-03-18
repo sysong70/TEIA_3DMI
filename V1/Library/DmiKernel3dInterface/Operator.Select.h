@@ -28,6 +28,7 @@ namespace KERNEL
 			//== Object Snap 관련 함수 ===============================================================
 			void DrawSnapItems();
 			void SetObjectSnapMode(OSnap::Type eInType);
+			void ResetSnapItems(bool bUpdate = true);
 
 			//== Select 관련 함수 ====================================================================
 			bool SelectByResult(H3DF::SelectionResults & cInResults);

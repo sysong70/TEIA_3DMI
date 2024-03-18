@@ -70,9 +70,9 @@ namespace H3DF
 		static bool SetComponentType(SegmentKey & cInSegment, DWORD nInType);
 		static bool ShowComponentType(SegmentKey & cInSegment, DWORD & eOutType);
 
-		static bool AddStatus(SegmentKey & cInSegment, DWORD & eInStatus);
-		static bool RemoveStatus(SegmentKey & cInSegment, DWORD & eInStatus);
-		static bool ShowStatus(SegmentKey & cInSegment, DWORD & eOutStatus);
+		static bool AddComponentStatus(SegmentKey & cInSegment, DWORD nInStatus);
+		static bool RemoveComponentStatus(SegmentKey & cInSegment, DWORD nInStatus);
+		static bool ShowComponentStatus(SegmentKey & cInSegment, DWORD & nOutStatus);
 
 		//== Geomety User Data 관련 함수 ============================================================= 
 		static bool SetComponentType(GeometryKey & cInGeometry, DWORD nInType);

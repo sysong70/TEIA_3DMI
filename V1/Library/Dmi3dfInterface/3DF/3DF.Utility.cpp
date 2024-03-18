@@ -10,6 +10,7 @@
 #include <bit>
 
 using namespace std::chrono;
+using namespace H3DF;
 
 USING_3DF_NAMESPACE
 
@@ -627,18 +628,43 @@ bool H3DF::UserData::ShowComponentType(SegmentKey & cInSegment, DWORD & nOutType
 	return true;
 }
 
-bool H3DF::UserData::AddStatus(SegmentKey & cInSegment, DWORD & eInStatus)
+bool H3DF::UserData::AddComponentStatus(SegmentKey & cInSegment, DWORD nInStatus)
 {
+	DWORD nExistStatus = 0;
+	if (false == ShowComponentStatus(cInSegment, nExistStatus)) {
+		return false;
+	}
+
+	nExistStatus |= nInStatus;
+
+	cInSegment.SetUserData((intptr_t)UserDataIndex::ComponentStatus, sizeof(DWORD), (BYTE *)&nExistStatus);
+
 	return true;
 }
 
-bool H3DF::UserData::RemoveStatus(SegmentKey & cInSegment, DWORD & eInStatus)
+bool H3DF::UserData::RemoveComponentStatus(SegmentKey & cInSegment, DWORD nInStatus)
 {
+	DWORD nExistStatus = 0;
+	if (false == ShowComponentStatus(cInSegment, nExistStatus)) {
+		return false;
+	}
+
+	nExistStatus &= ~nInStatus;
+
+	cInSegment.SetUserData((intptr_t)UserDataIndex::ComponentStatus, sizeof(DWORD), (BYTE *)&nExistStatus);
+
 	return true;
 }
 
-bool H3DF::UserData::ShowStatus(SegmentKey & cInSegment, DWORD & eOutStatus)
+bool H3DF::UserData::ShowComponentStatus(SegmentKey & cInSegment, DWORD & nOutStatus)
 {
+	ByteArray aUserData;
+	if (false == cInSegment.ShowUserData((intptr_t)UserDataIndex::ComponentStatus, aUserData)) {
+		return false;
+	}
+
+	CopyMemory(&nOutStatus, aUserData.data(), sizeof(DWORD));
+
 	return true;
 }
 

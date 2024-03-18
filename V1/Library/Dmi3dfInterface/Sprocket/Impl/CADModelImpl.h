@@ -15,16 +15,20 @@ namespace H3DF
 
 		CString TypeName(const Component & cInComponent);
 
+		Component & ModelComponent();
+
 		Component * m_pcModels = nullptr;
 		Component * m_pcMeasurements = nullptr;
 		Component * m_pcMarkups = nullptr;
 
 		DWORD m_nSolidIndex = 1;
 		DWORD m_nSurfaceIndex = 1;
+		DWORD m_nGroupIndex = 1;
+		DWORD m_nPointSetIndex = 1;
 		DWORD m_nCurveIndex = 1;
 		DWORD m_nPointIndex = 1;
 
-// 		void MapSetAt(HC_KEY nInKey, Component * pcInComponent);
-// 		CAtlMap<HC_KEY, Component *> * m_pmComponentMap = nullptr;
+		void MapSetAt(HC_KEY nInKey, Component * pcInComponent);
+		CAtlMap<HC_KEY, Component *> * m_pmComponentMap = nullptr;
 	};
 }
