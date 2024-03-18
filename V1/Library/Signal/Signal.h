@@ -108,7 +108,14 @@ namespace Signal
 		ETreeItem Type = ETreeItem::Unknown;
 	};
 
+	struct TreeItemStatus
+	{
+		DWORD_PTR Key = 0;
+		bool Flag = true; // Multi-purpose (checked, selected, ...)
+	};
+
 	using TreeItems = std::vector<TreeItem>;
+	using TreeItemStatuses = std::vector<TreeItemStatus>;
 	using KeyItems = std::vector<DWORD_PTR>;
 }
 
@@ -553,6 +560,8 @@ namespace Signal
 		void CheckItem(DWORD_PTR key, bool checked);
 
 		void CheckItems(const KeyItems& items, bool checked);
+
+		void CheckItems(const TreeItemStatuses& items);
 
 		void DeleteItem(DWORD_PTR key);
 		// expand or collapse

@@ -175,6 +175,12 @@
     <ClCompile Include="Control.PopupMenu.cpp">
       <Filter>Control\Other</Filter>
     </ClCompile>
+    <ClCompile Include="Graphic.cpp">
+      <Filter>Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphic.Manager.cpp">
+      <Filter>Graphic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.Common.h">
@@ -366,6 +372,12 @@
     <ClInclude Include="Control.PopupMenu.h">
       <Filter>Control\Other</Filter>
     </ClInclude>
+    <ClInclude Include="Graphic.h">
+      <Filter>Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphic.Manager.h">
+      <Filter>Graphic</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="TODO.xml">
@@ -478,6 +490,9 @@
     </Filter>
     <Filter Include="Working">
       <UniqueIdentifier>{4d7c4082-24b8-4594-a68a-7b5f780f85b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphic">
+      <UniqueIdentifier>{1e4d06cf-b066-4830-9114-d05eecd2f387}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -116,12 +116,6 @@ namespace Window
 
 		bool IsValid();
 
-	protected: // Drawing
-
-		CBCGPGraphicsManager* m_pGraphics = nullptr;
-		//:TEST - sample drawing (OnPaint or OnMouseMove)
-		void DrawCircleOnView(const CPoint center, const CSize radiusSize, COLORREF color);
-
 	protected: // Commands
 
 		Command::Base* m_pActiveCommand = nullptr;

@@ -752,13 +752,13 @@ void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items, bool
 
 	Json::Array& nodes = data.CreateArray(SKW_CHILDREN);
 	for (auto& item : items) {
-		Json::Object& child = nodes.AddObject();
+		Json::Object& node = nodes.AddObject();
 
 		// ignore TreeItem.Parent
-		child.SetDwordPtr(SKW_KEY, item.Key);
-		child.SetString(SKW_TITLE, item.Title);
-		child.SetBoolean(SKW_CHECKED, item.Checked);
-		child.SetInteger(SKW_TYPE, (int)item.Type);
+		node.SetDwordPtr(SKW_KEY, item.Key);
+		node.SetString(SKW_TITLE, item.Title);
+		node.SetBoolean(SKW_CHECKED, item.Checked);
+		node.SetInteger(SKW_TYPE, (int)item.Type);
 	}
 
 	Wrapper().SendData(data);
@@ -789,6 +789,22 @@ void Signal::ModelPanel::CheckItems(const KeyItems& items, bool checked)
 	Json::Array& children = data.CreateArray(SKW_ITEMS);
 	for (auto item : items) {
 		children.AddDwordPtr(item);
+	}
+
+	Wrapper().SendData(data);
+}
+
+void Signal::ModelPanel::CheckItems(const TreeItemStatuses& items)
+{
+	Json::Object data;
+	ConstructData(data, Action::CheckItems);
+
+	Json::Array& nodes = data.CreateArray(SKW_ITEMS);
+	for (auto item : items) {
+		Json::Object& node = nodes.AddObject();
+
+		node.SetDwordPtr(SKW_KEY, item.Key);
+		node.SetBoolean(SKW_FLAG, item.Flag);
 	}
 
 	Wrapper().SendData(data);

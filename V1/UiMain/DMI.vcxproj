@@ -220,6 +220,8 @@
     <ClInclude Include="Dialog.ProgressLog.h" />
     <ClInclude Include="Dialog.Standard.h" />
     <ClInclude Include="Component.CoordEdit.h" />
+    <ClInclude Include="Graphic.h" />
+    <ClInclude Include="Graphic.Manager.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
@@ -282,6 +284,8 @@
     <ClCompile Include="Dialog.ProgressLog.cpp" />
     <ClCompile Include="Dialog.Standard.cpp" />
     <ClCompile Include="Component.CoordEdit.cpp" />
+    <ClCompile Include="Graphic.cpp" />
+    <ClCompile Include="Graphic.Manager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdafx.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

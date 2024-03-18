@@ -758,18 +758,37 @@ void Component::ModelPanel::CheckItems(Json::Object* pData)
 {
 	RedrawTree(false);
 
-	bool check = pData->GetBoolean(SKW_CHECKED);
+	if (pData->FindValue(SKW_CHECKED) == nullptr) {
+		// Multi-purpose
+		Json::Array& items = pData->GetArray(SKW_ITEMS);
 
-	std::vector<DWORD_PTR> keys;
-	pData->GetArray(SKW_ITEMS).ToArray(keys);
+		HTREEITEM treeItem = nullptr;
+		for (auto item : items.GetBuffer()) {
+			Json::Object& node = item->AsObject();
 
-	HTREEITEM item = nullptr;
-	for (auto key : keys) {
-		item = GetItem(key);
-		DEBUG_VALID(item);
+			bool check = node.GetBoolean(SKW_FLAG);
+			treeItem = GetItem(node.GetDwordPtr(SKW_KEY));
+			DEBUG_VALID(treeItem);
 
-		Control().SetCheck(item, check);
-		Control().TreeItem(item)->UpdateParentCheckbox();
+			Control().SetCheck(treeItem, check);
+			Control().TreeItem(treeItem)->UpdateParentCheckbox();
+		}
+	}
+	else {
+		// Single status
+		bool check = pData->GetBoolean(SKW_CHECKED);
+
+		std::vector<DWORD_PTR> keys;
+		pData->GetArray(SKW_ITEMS).ToArray(keys);
+
+		HTREEITEM item = nullptr;
+		for (auto key : keys) {
+			item = GetItem(key);
+			DEBUG_VALID(item);
+
+			Control().SetCheck(item, check);
+			Control().TreeItem(item)->UpdateParentCheckbox();
+		}
 	}
 
 	RedrawTree(true);
