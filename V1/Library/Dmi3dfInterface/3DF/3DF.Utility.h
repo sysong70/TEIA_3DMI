@@ -74,6 +74,9 @@ namespace H3DF
 		static bool RemoveComponentStatus(SegmentKey & cInSegment, DWORD nInStatus);
 		static bool ShowComponentStatus(SegmentKey & cInSegment, DWORD & nOutStatus);
 
+		static bool SetIncludedCount(SegmentKey & cInSegment, DWORD nInCount);
+		static bool ShowIncludedCount(SegmentKey & cInSegment, DWORD & nOutCount);
+
 		//== Geomety User Data 관련 함수 ============================================================= 
 		static bool SetComponentType(GeometryKey & cInGeometry, DWORD nInType);
 		static bool AddTopologyType(GeometryKey & cInGeometry, DWORD nInType);

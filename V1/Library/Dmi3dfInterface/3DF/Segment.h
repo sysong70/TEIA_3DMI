@@ -50,6 +50,9 @@ namespace H3DF
 		void Flush(SearchTypeArray const & aInTypesToRemove, Search::Space eInSearchSpace = Search::Space::SegmentOnly);
 		void Flush(size_t nInTypesCount, Search::Type const peInTypesToRemove[], Search::Space eInSearchSpace = Search::Space::SegmentOnly);
 
+		//== Find 관련 함수 ==========================================================================
+		size_t Find(Search::Type eInRequest, Search::Space eInSearchSpace, SearchResults & cOutResults) const;
+
 		//== Include 관련 함수 =======================================================================
 		IncludeKey IncludeSegment(SegmentKey const & cInSegment);
 		IncludeKey IncludeSegment(SegmentKey const & cInSegment, ConditionalExpression const & cInConditional);

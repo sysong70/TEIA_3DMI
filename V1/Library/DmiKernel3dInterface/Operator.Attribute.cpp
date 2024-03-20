@@ -106,37 +106,53 @@ void KERNEL::Operator::AttributeImpl::SetShowComponent(H3DF::Component & cInComp
 {
 	ModelImpl & cModelImpl = GetModelImpl();
 
-	if (true == cInComponent.GetSubComponents().empty()) {
+	H3DF::Component::Type eType = cInComponent.GetType();
 
+	// PartDefinition Component가 다중으로 Include되어 있으면, PartDefinition을 Clone을 만들도록 한다. 
+	// Clone은 Part부터 하부 RI Segment까지의 모든 Segment를 복사하고, 최하부의 Geometry는 Reference로 변경한다.
+	// 이렇게 해서, 다중으로 영향을 미치는 것을 최소하 하도록 하다.
+	Component cPartDefComponent;
+	if (H3DF::ComponentImpl::FindParentPartDefinition(cInComponent, cPartDefComponent)) {
+		SegmentKey cPartSegment(cPartDefComponent.GetSegmentKey());
+
+		DWORD nCount = 0;
+		if (true == H3DF::UserData::ShowIncludedCount(cPartSegment, nCount)) {
+			nCount = nCount;
+		}
+	}
+
+	if (true == cInComponent.GetSubComponents().empty()) {
 		SegmentKey cSegment(cInComponent.GetSegmentKey());
 
-		H3DF::Component::Type eType = cInComponent.GetType();
-
 		if (true == bShowFlag) {
-			// Show Style이 있으면 삭제하고 No Show Style로 변경
-			if (H3DF::Component::Type::ExchangeRIPointSet == eType) {
-				cSegment.GetStyleControl().Flush(cModelImpl.NoShowVertexStyleSegment());
-				cSegment.GetStyleControl().PushSegment(cModelImpl.ShowVertexStyleSegment());
-			}
-			else {
-				cSegment.GetStyleControl().Flush(cModelImpl.NoShowStyleSegment());
-				cSegment.GetStyleControl().PushSegment(cModelImpl.ShowStyleSegment());
-			}
+			if (H3DF::Component::NoShow & cInComponent.GetStatus()) {
+				// Show Style이 있으면 삭제하고 No Show Style로 변경
+				if (H3DF::Component::Type::ExchangeRIPointSet == eType) {
+					cSegment.GetStyleControl().Flush(cModelImpl.NoShowVertexStyleSegment());
+					cSegment.GetStyleControl().PushSegment(cModelImpl.ShowVertexStyleSegment());
+				}
+				else {
+					cSegment.GetStyleControl().Flush(cModelImpl.NoShowStyleSegment());
+					cSegment.GetStyleControl().PushSegment(cModelImpl.ShowStyleSegment());
+				}
 
-			cInComponent.RemoveStatus(H3DF::Component::NoShow);
+				cInComponent.RemoveStatus(H3DF::Component::NoShow);
+			}
 		}
 		else {
-			// Show Style이 있으면 삭제하고 No Show Style로 변경
-			if (H3DF::Component::Type::ExchangeRIPointSet == eType) {
-				cSegment.GetStyleControl().Flush(cModelImpl.ShowVertexStyleSegment());
-				cSegment.GetStyleControl().PushSegment(cModelImpl.NoShowVertexStyleSegment());
-			}
-			else {
-				cSegment.GetStyleControl().Flush(cModelImpl.ShowStyleSegment());
-				cSegment.GetStyleControl().PushSegment(cModelImpl.NoShowStyleSegment());
-			}
+			if (!(H3DF::Component::NoShow & cInComponent.GetStatus())) {
+				// Show Style이 있으면 삭제하고 No Show Style로 변경
+				if (H3DF::Component::Type::ExchangeRIPointSet == eType) {
+					cSegment.GetStyleControl().Flush(cModelImpl.ShowVertexStyleSegment());
+					cSegment.GetStyleControl().PushSegment(cModelImpl.NoShowVertexStyleSegment());
+				}
+				else {
+					cSegment.GetStyleControl().Flush(cModelImpl.ShowStyleSegment());
+					cSegment.GetStyleControl().PushSegment(cModelImpl.NoShowStyleSegment());
+				}
 
-			cInComponent.AddStatus(H3DF::Component::NoShow);
+				cInComponent.AddStatus(H3DF::Component::NoShow);
+			}
 		}
 	}
 

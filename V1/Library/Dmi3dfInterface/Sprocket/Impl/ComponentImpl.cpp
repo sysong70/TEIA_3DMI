@@ -61,6 +61,10 @@ CString H3DF::ComponentImpl::TypeName()
 
 	switch (m_eType)
 	{
+		case H3DF::Component::Type::ExchangeProductOccurrence:
+			strTypeName = L"ProductOccurrence";
+			break;
+
 		case H3DF::Component::Type::ExchangePartDefinition:
 			strTypeName = L"PartDefinition";
 			break;
@@ -88,6 +92,7 @@ CString H3DF::ComponentImpl::TypeName()
 			break;
 
 		default:
+			strTypeName.Format(L"Type: 0x%x", (int)m_eType);
 			break;
 	};
 
@@ -146,4 +151,31 @@ bool H3DF::ComponentImpl::AddSubComponent(Component & cInParentComponent, Compon
  	pcImpl->m_pcOwner = &cInParentComponent;
 
 	return true;
+}
+
+CString H3DF::ComponentImpl::TypeName(Component & cInComponent)
+{
+	ComponentImpl * pcImpl = dynamic_cast<ComponentImpl *>(cInComponent.GetImpl());
+	if (nullptr == pcImpl) {
+		DEBUG_STOP;
+		return L"";
+	}
+
+	return pcImpl->TypeName();
+}
+
+// 주어진 Component를 기준으로 상위에 있는 PartDefinition를 찾는다.
+bool H3DF::ComponentImpl::FindParentPartDefinition(Component & cInComponent, Component & cOutComponent)
+{
+	if (nullptr == &cInComponent) {
+		DEBUG_STOP
+		return false;
+	}
+
+	if (H3DF::Component::Type::ExchangePartDefinition == cInComponent.GetType()) {
+		cOutComponent = cInComponent;
+		return true;
+	}
+
+	return FindParentPartDefinition(cInComponent.GetOwner(), cOutComponent);
 }

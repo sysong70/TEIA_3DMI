@@ -125,10 +125,27 @@ namespace H3DF
 		None = 0x00000000,
 		GenericMask = 0xffffff00,
 
+		World = 0x00000001,
+		UTF8 = 0x00000002,
+		EventDispatcher = 0x00000003,
+		EventHandler = 0x00000004,
+		EventNotifier = 0x00000005,
+		UpdateNotifier = 0x00000006,
+		SearchResults = 0x00000008,
+		FontSearchResults = 0x00000009,
 		SelectionResults = 0x0000000a,
 		SelectionItem = 0x0000000b,
+		TreeContext = 0x0000000c,
+		StreamToolkit = 0x0000000d,
+		DriverEventHandler = 0x0000000e,
+		HighlightSearchResults = 0x0000000f,
+		OptimizeMappingResults = 0x00000010,
 
+		SearchResultsIterator = 0x01000001,
+		FontSearchResultsIterator = 0x01000002,
 		SelectionResultsIterator = 0x01000003,
+		HighlightSearchResultsIterator = 0x01000004,
+		OptimizeMappingResultsIterator = 0x01000005,
 
 		Kit = 0x01000000,
 		MarkerKit = 0x01000010,
@@ -302,6 +319,7 @@ namespace H3DF
 		// Component 관련 Data Index
 		ComponentType							= 0x02000001,
 		ComponentStatus							= 0x02000002,
+		IncludedCount							= 0x02000003,
 	};
 
 	class API_3DF ViewDirection

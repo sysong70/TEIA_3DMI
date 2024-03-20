@@ -125,17 +125,30 @@ void KERNEL::Operator::ModelPanelImpl::ComponentExpanded(H3DF::Component & cInCo
 
 	H3DF::CADModelImpl * pcImpl = dynamic_cast<H3DF::CADModelImpl *>(m_pcCadModel->GetImpl());
 
-	for (auto pcSubComponent : cSubComponents) {
-		if (false == IsVisible(*pcSubComponent)) {
+	for (auto pcComponent : cSubComponents) {
+		if (false == IsVisible(*pcComponent)) {
 			continue;
 		}
 
-		cItem.Checked = (H3DF::Component::Status::NoShow & pcSubComponent->GetStatus()) ? false : true;
-		cItem.Key = (DWORD_PTR)pcSubComponent;
-		cItem.Title = pcSubComponent->GetName();
+		cItem.Checked = (H3DF::Component::Status::NoShow & pcComponent->GetStatus()) ? false : true;
+		cItem.Key = (DWORD_PTR)pcComponent;
+#ifdef _DEBUG
+		CString strText;
+		if (INVALID_KEY == pcComponent->GetIncludeKey()) {
+			strText.Format(L"%s : %s, Seg [%d]:", pcComponent->GetName(), H3DF::ComponentImpl::TypeName(*pcComponent), pcComponent->GetSegmentKey());
+		}
+		else {
+			strText.Format(L"%s : %s, Seg [%d], Inc [%d]", pcComponent->GetName(), H3DF::ComponentImpl::TypeName(*pcComponent), pcComponent->GetSegmentKey(), pcComponent->GetIncludeKey());
+		}
+		
+		cItem.Title = strText;
+#else
+		cItem.Title = pcComponent->GetName();
+#endif
+		
 
 		if (true == cItem.Title.IsEmpty()) {
-			cItem.Title = pcImpl->TypeName(*pcSubComponent);
+			cItem.Title = pcImpl->TypeName(*pcComponent);
 		}
 
 		cTreeItems.push_back(cItem);
@@ -202,6 +215,10 @@ void KERNEL::Operator::ModelPanelImpl::GetCheckedItemStatuses(Component & cInCom
 // 3. Component가 Visible인지 확인한다.
 bool KERNEL::Operator::ModelPanelImpl::IsVisible(Component & cInComponent)
 {
+#ifdef _DEBUG
+	return true;
+#endif
+
 	ComponentImpl * pcImpl = dynamic_cast<ComponentImpl *>(cInComponent.GetImpl());
 	DEBUG_VALID(pcImpl);
 

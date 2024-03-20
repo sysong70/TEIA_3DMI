@@ -248,24 +248,54 @@ void H3DF::SegmentKey::Flush(SearchTypeArray const & aInTypesToRemove, Search::S
 
 void H3DF::SegmentKey::Flush(size_t nInTypesCount, Search::Type const peInTypesToRemove[], Search::Space eInSearchSpace)
 {
-	SegmentKeyImpl::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this); {
 
-	CString strType;
+		CString strType;
 
-	for (size_t nIndex = 0 ; nIndex < nInTypesCount ; nIndex++)
-	{
-		if (false == strType.IsEmpty()) {
-			strType += ", ";
+		for (size_t nIndex = 0; nIndex < nInTypesCount; nIndex++) {
+			if (false == strType.IsEmpty()) {
+				strType += ", ";
+			}
+
+			strType += SearchImpl::GetSearchTypeString(peInTypesToRemove[nIndex]);
 		}
 
-		strType += SearchImpl::GetSearchTypeString(peInTypesToRemove[nIndex]);
-	}
+		CString strSearchSpace = SearchImpl::GetSearchSpaceString(eInSearchSpace);
 
+		HC_Flush_Contents(Utility::ToChar(strSearchSpace), Utility::ToChar(strType));
+
+	} SegmentKeyImpl::LocalClose(*this);
+}
+
+size_t H3DF::SegmentKey::Find(Search::Type eInRequest, Search::Space eInSearchSpace, SearchResults & cOutResults) const
+{
+	SegmentKeyImpl::LocalOpen(*this);
+
+	CString strType = SearchImpl::GetSearchTypeString(eInRequest);
 	CString strSearchSpace = SearchImpl::GetSearchSpaceString(eInSearchSpace);
 
-	HC_Flush_Contents(Utility::ToChar(strSearchSpace), Utility::ToChar(strType));
+	SearchResultsImpl * pcResultsImpl = static_cast<SearchResultsImpl *>(cOutResults.GetImpl());
+	DEBUG_VALID(pcResultsImpl);
+
+	HC_Begin_Contents_Search(Utility::ToChar(strSearchSpace), Utility::ToChar(strType));
+	{
+		int nCount = 0;
+		HC_Show_Contents_Count(&nCount);
+
+		HC_KEY nKey;
+		char chType[MVO_BUFFER_SIZE];
+
+		for (int nIndex = 0; nIndex < nCount; nIndex++) {
+			HC_Find_Contents(chType, &nKey);
+			Key cKey = H3DF::SearchResultsImpl::GetKey(chType, nKey);
+			pcResultsImpl->PushBack(cKey);
+		}
+	}
+	HC_End_Contents_Search();
 
 	SegmentKeyImpl::LocalClose(*this);
+
+	return cOutResults.GetCount();
 }
 
 //== Include 관련 함수 ===============================================================================

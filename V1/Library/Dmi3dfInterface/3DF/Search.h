@@ -343,4 +343,50 @@ namespace H3DF
 		void Set(SearchOptionsKit const & cInThat);
 		SearchOptionsKit & operator=(SearchOptionsKit && cInThat);
 	};
+
+	class API_3DF SearchResultsIterator : public Object {
+	public:
+		SearchResultsIterator();
+		SearchResultsIterator(SearchResultsIterator const & cInThat);
+
+		H3DF::Type ObjectType() const { return H3DF::Type::SearchResultsIterator; };
+
+		void Set(SearchResultsIterator const & cInThat);
+		SearchResultsIterator & operator=(SearchResultsIterator const & cInThat);
+
+		void Next();
+
+		SearchResultsIterator & operator++();
+		SearchResultsIterator operator++(int nInValue);
+
+		bool operator == (SearchResultsIterator const & cInSearchResultsIterator);
+		bool operator != (SearchResultsIterator const & cInSearchResultsIterator);
+
+		bool IsValid() const;
+
+		void Reset();
+
+		Key GetItem() const;
+
+		Key operator * () const;
+	};
+
+	class API_3DF SearchResults : public Object {
+	public:
+		SearchResults();
+		SearchResults(SearchResults const & cInThat);
+		~SearchResults();
+
+		H3DF::Type ObjectType() const { return H3DF::Type::SearchResults; };
+
+		void Set(SearchResults const & cInThat);
+		SearchResults & operator=(SearchResults const & cInThat);
+
+		virtual void Reset();
+
+		size_t GetCount() const;
+
+		SearchResultsIterator GetIterator() const;
+	};
+
 }

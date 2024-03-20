@@ -33,10 +33,11 @@ namespace H3DF
 
 		CString * m_pstrName = nullptr;
 
-
 		//== Utility Functions =====================================================================
 		static bool SetData(Component & cInComponent, CString strInName, HC_KEY nKey, HC_KEY nIncludeKey, Component::Type eInType = Component::Type::None);
 		static bool SetName(Component & cInComponent, CString strInName);
 		static bool AddSubComponent(Component & cInParentComponent, Component & pcInComponent);
+		static CString TypeName(Component & cInComponent);
+		static bool FindParentPartDefinition(Component & cInComponent, Component & cOutComponent);
 	};
 }

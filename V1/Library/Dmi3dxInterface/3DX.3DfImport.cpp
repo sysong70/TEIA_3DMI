@@ -988,6 +988,18 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 		H3DF::SegmentKey cSegment(nSegmentKey);
 		H3DF::IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
 
+		DWORD nIncludeCount = 0;
+
+		if (true == H3DF::UserData::ShowIncludedCount(cSegment, nIncludeCount)) {
+			nIncludeCount++;
+		}
+		else {
+			// 저장된 Include Count가 없는 경우는 2로 설정한다. 처음 1번, 이제 다시 Include되었으므로 2번이 된다.
+			nIncludeCount = 2;
+		}
+
+		H3DF::UserData::SetIncludedCount(cSegment, nIncludeCount);
+
 		// #CADModel: ParsePart 추가. 값은 새롭게 생성해서 넣도록 한다.
 		H3DF::CADModelImpl * pcCdModelImpl = dynamic_cast<H3DF::CADModelImpl *>(m_pcCADModel->GetImpl());
 		DEBUG_VALID(pcCdModelImpl);

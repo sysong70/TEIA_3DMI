@@ -668,6 +668,25 @@ bool H3DF::UserData::ShowComponentStatus(SegmentKey & cInSegment, DWORD & nOutSt
 	return true;
 }
 
+bool H3DF::UserData::SetIncludedCount(SegmentKey & cInSegment, DWORD nInCount)
+{
+	cInSegment.SetUserData((intptr_t)UserDataIndex::IncludedCount, sizeof(DWORD), (BYTE *)&nInCount);
+
+	return true;
+}
+
+bool H3DF::UserData::ShowIncludedCount(SegmentKey & cInSegment, DWORD & nOutCount)
+{
+	ByteArray aUserData;
+	if (false == cInSegment.ShowUserData((intptr_t)UserDataIndex::IncludedCount, aUserData)) {
+		return false;
+	}
+
+	CopyMemory(&nOutCount, aUserData.data(), sizeof(DWORD));
+
+	return true;
+}
+
 //== Geomety User Data 관련 함수 =====================================================================
 bool H3DF::UserData::SetComponentType(GeometryKey & cInGeometry, DWORD nInType)
 {

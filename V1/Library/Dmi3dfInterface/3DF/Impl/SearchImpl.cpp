@@ -2,6 +2,8 @@
 
 #include "SearchImpl.h"
 
+#include "KeyImpl.h"
+
 using namespace H3DF;
 
 CString SearchImpl::GetSearchTypeString(Search::Type eType)
@@ -41,8 +43,6 @@ CString SearchImpl::GetSearchTypeString(Search::Type eType)
 		case H3DF::Search::Type::CuttingSection:
 			break;
 
-		case H3DF::Search::Type::Shell:
-			break;
 		case H3DF::Search::Type::Mesh:
 			break;
 		case H3DF::Search::Type::Grid:
@@ -529,4 +529,33 @@ CString SearchImpl::GetSearchSpaceString(Search::Space eInSpace)
 	}
 
 	return strSpace;
+}
+
+//== SearchResultsImpl Class =======================================================================
+
+Key H3DF::SearchResultsImpl::GetKey(CStringA strType, HC_KEY nInKey)
+{
+	Key cKey(nInKey);
+	KeyImpl * pcKeyImpl = (KeyImpl *)cKey.GetImpl();
+
+	if (strType == _T("include")) {
+		pcKeyImpl->SetType(H3DF::Type::IncludeKey);
+	}
+	else if (strType == _T("segment")) {
+		pcKeyImpl->SetType(H3DF::Type::SegmentKey);
+	}
+	else if (strType == _T("geometry")) {
+		pcKeyImpl->SetType(H3DF::Type::GeometryKey);
+	}
+	else if (strType == _T("shell")) {
+		pcKeyImpl->SetType(H3DF::Type::ShellKey);
+	}
+	else if (strType == _T("lines") || strType == _T("polylines")) {
+		pcKeyImpl->SetType(H3DF::Type::LineKey);
+	}
+	else {
+		DEBUG_STOP;
+	}
+
+	return cKey;
 }
