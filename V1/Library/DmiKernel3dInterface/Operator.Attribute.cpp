@@ -104,6 +104,15 @@ void KERNEL::Operator::AttributeImpl::NoShowStyleToShowStyle()
 // 입력된 Component및 하위 Component들을 검색해서, RepresentationItem이 나올때까지 하부 검색을 해서 NoShow로 변경
 void KERNEL::Operator::AttributeImpl::SetShowComponent(H3DF::Component & cInComponent, bool bShowFlag, bool bRecursive)
 {
+	// 1. Show/Noshow는 실질적으로 RI Component에만 적용된다.
+	// 2. 이를 위해서는 RI Component를 찾아서 적용해야 한다. 그런데 RI Component는 하위에 다른 Component를 가질 수 없기 때문에,
+	//    Sub Component의 갯수가 Zero인 Component를 찾아서 적용해야 한다.
+	// 3. 이때, PartDefinition Component가 다중으로 Include되어 있으면, PartDefinition을 Clone을 만들도록 한다. 
+	//    바로 적용하면 Component에 연결되어 있는 Segment의 Show/NoShow 속성을 변경하면 다른 Componet에서 연결되어 있는 부분까지 Visiblity가 변경되기 때문에,
+	//    Segment를 Clone하도록 한다.
+	// 4. 이 때 중요한것은 Segment가 몇번이나, Include되어 있고, Visibility 속성이 Input된 속성과 다를때만, Cloning을 해야 한다는 것이다.
+	//    의미없는 PartDefinition을 계속해서 늘리면 않된다.
+
 	ModelImpl & cModelImpl = GetModelImpl();
 
 	H3DF::Component::Type eType = cInComponent.GetType();
@@ -111,13 +120,29 @@ void KERNEL::Operator::AttributeImpl::SetShowComponent(H3DF::Component & cInComp
 	// PartDefinition Component가 다중으로 Include되어 있으면, PartDefinition을 Clone을 만들도록 한다. 
 	// Clone은 Part부터 하부 RI Segment까지의 모든 Segment를 복사하고, 최하부의 Geometry는 Reference로 변경한다.
 	// 이렇게 해서, 다중으로 영향을 미치는 것을 최소하 하도록 하다.
-	Component cPartDefComponent;
-	if (H3DF::ComponentImpl::FindParentPartDefinition(cInComponent, cPartDefComponent)) {
-		SegmentKey cPartSegment(cPartDefComponent.GetSegmentKey());
+	Component * pcPartDefComponent = nullptr;
+	if (H3DF::ComponentImpl::FindParentPartDefinition(cInComponent, pcPartDefComponent)) {
+		SegmentKey cPartSegment(pcPartDefComponent->GetSegmentKey());
 
+		// 몇번이나 Include되어 있는지 확인
 		DWORD nCount = 0;
 		if (true == H3DF::UserData::ShowIncludedCount(cPartSegment, nCount)) {
-			nCount = nCount;
+			// 2번 이상 Include되어 있으면 Clone을 만들도록 한다.
+			if (2 <= nCount) {
+				// Count를 하나 줄인다.
+				nCount--;
+				// 더 이상 복수로 Include되어 있지 않으면, Include Count를 삭제한다.
+				if (1 == nCount) {
+					H3DF::UserData::UnsetIncludedCount(cPartSegment);
+				}
+				// 줄어든 숫자만큼 Include Count를 저장한다.
+				else {
+					H3DF::UserData::SetIncludedCount(cPartSegment, nCount);
+				}
+
+				// 찾은 Part Definition Component를 Clone한다.
+				H3DF::ComponentImpl::ClonedParentPartDefinition(*pcPartDefComponent);
+			}
 		}
 	}
 
@@ -129,11 +154,11 @@ void KERNEL::Operator::AttributeImpl::SetShowComponent(H3DF::Component & cInComp
 				// Show Style이 있으면 삭제하고 No Show Style로 변경
 				if (H3DF::Component::Type::ExchangeRIPointSet == eType) {
 					cSegment.GetStyleControl().Flush(cModelImpl.NoShowVertexStyleSegment());
-					cSegment.GetStyleControl().PushSegment(cModelImpl.ShowVertexStyleSegment());
+					//cSegment.GetStyleControl().PushSegment(cModelImpl.ShowVertexStyleSegment());
 				}
 				else {
 					cSegment.GetStyleControl().Flush(cModelImpl.NoShowStyleSegment());
-					cSegment.GetStyleControl().PushSegment(cModelImpl.ShowStyleSegment());
+					//cSegment.GetStyleControl().PushSegment(cModelImpl.ShowStyleSegment());
 				}
 
 				cInComponent.RemoveStatus(H3DF::Component::NoShow);

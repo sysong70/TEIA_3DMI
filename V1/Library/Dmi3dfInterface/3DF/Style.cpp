@@ -121,6 +121,46 @@ CStringA H3DF::StyleKey::Name(bool bIncludePath) const
 	return strOutName;
 }
 
+bool H3DF::StyleKey::ShowSource(SegmentKey & cOutSegment) const
+{
+	auto * pcImpl = dynamic_cast<KeyImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	HC_KEY nKey = HC_Show_Style_Segment(pcImpl->KeyValue(), nullptr);
+
+	SegmentKey cSegment(nKey);
+	cOutSegment = cSegment;
+
+	return true;
+}
+
+bool H3DF::StyleKey::ShowSource(Style::Type & cOutType, SegmentKey & cOutSegment, CStringA & strOutName) const
+{
+	auto * pcImpl = dynamic_cast<KeyImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	HC_KEY nKey = HC_Show_Style_Segment(pcImpl->KeyValue(), strOutName.GetBuffer(MVO_BUFFER_SIZE));
+	strOutName.ReleaseBuffer();
+
+	H3DF::Type eType = H3DF::Utility::GetType(pcImpl->KeyValue());
+
+	if (H3DF::Type::SegmentStyle == eType) {
+		cOutType = Style::Type::Segment;
+	}
+	else if (H3DF::Type::NamedStyle == eType) {
+		cOutType = Style::Type::Named;
+	}
+	else {
+		DEBUG_STOP;
+		cOutType = Style::Type::None;
+	}
+
+	SegmentKey cSegment(nKey);
+	cOutSegment = cSegment;
+
+	return true;
+}
+
 //== StyleControl Function =========================================================================
 
 class StyleControlImpl : public ControlImpl

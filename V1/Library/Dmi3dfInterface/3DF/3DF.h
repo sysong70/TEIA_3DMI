@@ -109,6 +109,7 @@ namespace H3DF
 	class ApplicationWindowOptionsKit;
 
 	class GeometryKey;
+	class ReferenceKey;
 
 	class PortfolioKey;
 
@@ -320,6 +321,7 @@ namespace H3DF
 		ComponentType							= 0x02000001,
 		ComponentStatus							= 0x02000002,
 		IncludedCount							= 0x02000003,
+		ReferenceCount							= 0x02000004,
 	};
 
 	class API_3DF ViewDirection
@@ -714,7 +716,8 @@ namespace H3DF
 	//== Type Definitions ==========================================================================
 	using SegmentKeyArray = std::vector<SegmentKey, Allocator<SegmentKey>>;
 	using IncludeKeyArray = std::vector<IncludeKey, Allocator<IncludeKey>>;
-
+	
+	using ReferenceKeyArray = std::vector<ReferenceKey, Allocator<ReferenceKey>>;
 	using LineArray = std::vector<LineKit, Allocator<LineKit>>;
 	using PolylineArray = LineArray;
 	using Polyline = LineKit;

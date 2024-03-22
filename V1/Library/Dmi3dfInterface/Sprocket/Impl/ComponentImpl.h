@@ -38,6 +38,9 @@ namespace H3DF
 		static bool SetName(Component & cInComponent, CString strInName);
 		static bool AddSubComponent(Component & cInParentComponent, Component & pcInComponent);
 		static CString TypeName(Component & cInComponent);
-		static bool FindParentPartDefinition(Component & cInComponent, Component & cOutComponent);
+		static bool FindParentPartDefinition(Component & cInComponent, Component *& pcOutComponent);
+
+		static bool ClonedParentPartDefinition(Component & cInComponent);
+		static bool ClonedComponent(Component & cInComponent, Component & cInOwnerComponent, bool bDeleteInclude);
 	};
 }

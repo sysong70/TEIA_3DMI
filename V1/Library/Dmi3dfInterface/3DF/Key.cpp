@@ -78,7 +78,12 @@ void H3DF::Key::SetKeyValue(HC_KEY nInKey) const
 
 void H3DF::Key::Delete()
 {
-	assert(false);
+	KeyImpl * pcImpl = (KeyImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	HC_Delete_By_Key(pcImpl->KeyValue());
+
+	pcImpl->SetKeyValue(INVALID_KEY);
 }
 
 bool H3DF::Key::HasOwner() const

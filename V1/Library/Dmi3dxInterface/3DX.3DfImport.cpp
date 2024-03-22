@@ -1001,21 +1001,23 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 		H3DF::UserData::SetIncludedCount(cSegment, nIncludeCount);
 
 		// #CADModel: ParsePart 추가. 값은 새롭게 생성해서 넣도록 한다.
+
+		// 1. CADModel에 들어있는 Component맵에서 Key값을 이용해서 Component를 찾도록 한다.
 		H3DF::CADModelImpl * pcCdModelImpl = dynamic_cast<H3DF::CADModelImpl *>(m_pcCADModel->GetImpl());
 		DEBUG_VALID(pcCdModelImpl);
 
 		H3DF::Component * pcFindComponent = nullptr;
 		pcCdModelImpl->m_pmComponentMap->Lookup(nSegmentKey, pcFindComponent);
 
+		// 2. 찾은 Component를 복사해서 새로운 Component를 생성한다. 이렇게 해야 tree에서 별도의 Component로 인식해서 UI와 연동해서 작업할 수 있음.
 		H3DF::Component * pcComponent = new H3DF::Component(*pcFindComponent);
+
 		// 새롭게 생성된 Component에서 Include Key를 변경한다.
 		H3DF::ComponentImpl * pcComponentImpl = dynamic_cast<H3DF::ComponentImpl *>(pcComponent->GetImpl());
+		pcComponentImpl->m_pcOwner = &cParentComponent;
 		pcComponentImpl->m_nIncludeKey = cInclude.KeyValue();
 
-// 		H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, L"", H3DF::Component::Type::ExchangePartDefinition, cParentComponent);
-// 		DEBUG_VALID(pcComponent);
-
- 		if (nullptr != pcComponent) {
+ 		if (nullptr != pcFindComponent) {
 			H3DF::ComponentImpl::AddSubComponent(cParentComponent, *pcComponent);
  		}
 
@@ -1037,6 +1039,8 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, L"", H3DF::Component::Type::ExchangePartDefinition, cParentComponent);
 
 	cSegment.Open();
+
+	H3DF::UserData::SetComponentType(cSegment, (DWORD)H3DF::Component::Type::ExchangePartDefinition);
 
 	A3DMiscCascadedAttributes * pcAttr;
 	A3DMiscCascadedAttributesData cAttrData;

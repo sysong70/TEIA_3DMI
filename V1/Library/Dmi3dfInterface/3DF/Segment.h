@@ -61,6 +61,11 @@ namespace H3DF
 		size_t ShowIncluders(SegmentKeyArray & aOutSegments) const;
 		size_t ShowIncluders(IncludeKeyArray & aOutIncludes) const;
 
+		//== Reference 관련 함수 =====================================================================
+		ReferenceKey ReferenceGeometry(Key const & cInKey);
+		//size_t ShowReferrers(SegmentKeyArray & aOutSegments) const;
+		size_t ShowReferrers(ReferenceKeyArray & aOutReferences) const;
+
 		//== Shell 관련 함수 =========================================================================
 		ShellKey InsertShell(ShellKit const & cInKit);
 		// 	ShellKey InsertShell(PointArray const & in_points, IntArray const & in_facelist);

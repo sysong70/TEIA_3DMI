@@ -13,7 +13,8 @@ namespace H3DF
 	public:
 		enum class Type : uint32_t {
 			Segment,
-			Named
+			Named,
+			None
 		};
 
 		enum class AppendMode : uint32_t {
@@ -54,6 +55,9 @@ namespace H3DF
 		StyleKey & operator = (StyleKey const & cInThat);
 
 		CStringA Name(bool bIncludePath = true) const;
+
+		bool ShowSource(SegmentKey & cOutSegment) const;
+		bool ShowSource(Style::Type & cOutType, SegmentKey & cOutSegment, CStringA & strOutName) const;
 	};
 
 	class API_3DF StyleControl : public Control

@@ -348,6 +348,9 @@
     <ClInclude Include="Sprocket\Impl\CADModelImpl.h">
       <Filter>Sprocket\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\Reference.h">
+      <Filter>3DF\Object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -625,6 +628,9 @@
     </ClCompile>
     <ClCompile Include="Sprocket\Impl\CADModelImpl.cpp">
       <Filter>Sprocket\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Reference.cpp">
+      <Filter>3DF\Object</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

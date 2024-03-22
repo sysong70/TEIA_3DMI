@@ -47,6 +47,27 @@ Component & H3DF::Component::operator = (Component const & cInThat)
 	return *this;
 }
 
+bool H3DF::Component::Equals(Component const & cInThat) const
+{
+	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	
+	ComponentImpl * pcInThatImpl = (ComponentImpl *)cInThat.m_pcImpl;
+	DEBUG_VALID(pcInThatImpl);
+
+	if (pcImpl->m_nSegmentKey != pcInThatImpl->m_nSegmentKey) {
+		return false;
+	}
+
+	if (pcImpl->m_nIncludeKey != pcInThatImpl->m_nIncludeKey) {
+		return false;
+	}
+
+
+
+	return (pcImpl->m_nSegmentKey == pcInThatImpl->m_nSegmentKey);
+}
+
 Component::Type H3DF::Component::GetType() const
 {
 	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;

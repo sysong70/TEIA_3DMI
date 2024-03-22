@@ -148,6 +148,7 @@
     <ClInclude Include="3DF\KeyPath.h" />
     <ClInclude Include="3DF\Performance.h" />
     <ClInclude Include="3DF\PointCloud.h" />
+    <ClInclude Include="3DF\Reference.h" />
     <ClInclude Include="3DF\Selectability.h" />
     <ClInclude Include="3DF\SelectionSet.h" />
     <ClInclude Include="Entity.ModelTree.h" />
@@ -244,6 +245,7 @@
     <ClCompile Include="3DF\Impl\WindowImpl.cpp" />
     <ClCompile Include="3DF\Performance.cpp" />
     <ClCompile Include="3DF\PointCloud.cpp" />
+    <ClCompile Include="3DF\Reference.cpp" />
     <ClCompile Include="3DF\Selectability.cpp" />
     <ClCompile Include="3DF\SelectionSet.cpp" />
     <ClCompile Include="Entity.ModelTree.cpp" />

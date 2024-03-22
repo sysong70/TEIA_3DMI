@@ -550,7 +550,7 @@ Key H3DF::SearchResultsImpl::GetKey(CStringA strType, HC_KEY nInKey)
 	else if (strType == _T("shell")) {
 		pcKeyImpl->SetType(H3DF::Type::ShellKey);
 	}
-	else if (strType == _T("lines") || strType == _T("polylines")) {
+	else if (strType == _T("lines") || strType == _T("polylines") || strType == _T("polyline")) {
 		pcKeyImpl->SetType(H3DF::Type::LineKey);
 	}
 	else {

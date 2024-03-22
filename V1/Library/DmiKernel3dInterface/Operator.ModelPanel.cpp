@@ -135,10 +135,16 @@ void KERNEL::Operator::ModelPanelImpl::ComponentExpanded(H3DF::Component & cInCo
 #ifdef _DEBUG
 		CString strText;
 		if (INVALID_KEY == pcComponent->GetIncludeKey()) {
-			strText.Format(L"%s : %s, Seg [%d]:", pcComponent->GetName(), H3DF::ComponentImpl::TypeName(*pcComponent), pcComponent->GetSegmentKey());
+			SegmentKey cSegment(pcComponent->GetSegmentKey());
+			CString strName;
+			strName = cSegment.Name(false);
+			strText.Format(L"%s : %s, %s, Seg [%d]:", pcComponent->GetName(), strName, H3DF::ComponentImpl::TypeName(*pcComponent), pcComponent->GetSegmentKey());
 		}
 		else {
-			strText.Format(L"%s : %s, Seg [%d], Inc [%d]", pcComponent->GetName(), H3DF::ComponentImpl::TypeName(*pcComponent), pcComponent->GetSegmentKey(), pcComponent->GetIncludeKey());
+			SegmentKey cSegment(pcComponent->GetSegmentKey());
+			CString strName;
+			strName = cSegment.Name(false);
+			strText.Format(L"%s : %s, %s, Seg [%d], Inc [%d]", pcComponent->GetName(), strName, H3DF::ComponentImpl::TypeName(*pcComponent), pcComponent->GetSegmentKey(), pcComponent->GetIncludeKey());
 		}
 		
 		cItem.Title = strText;
@@ -525,6 +531,8 @@ void KERNEL::Operator::ModelPanel::OnItemCheckedSignal(Json::Object & cInObject)
 	}
 
 	pcImpl->Updated();
+
+	pcImpl->GetDocView().Camera().FitWorldOnly();
 
 	pcImpl->GetDocView().Save(L"Z:/OnItemCheckedSignal.hsf");
 }
