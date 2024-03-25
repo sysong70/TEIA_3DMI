@@ -120,6 +120,7 @@ void KERNEL::Operator::AttributeImpl::SetShowComponent(H3DF::Component & cInComp
 	// PartDefinition Component가 다중으로 Include되어 있으면, PartDefinition을 Clone을 만들도록 한다. 
 	// Clone은 Part부터 하부 RI Segment까지의 모든 Segment를 복사하고, 최하부의 Geometry는 Reference로 변경한다.
 	// 이렇게 해서, 다중으로 영향을 미치는 것을 최소하 하도록 하다.
+
 	Component * pcPartDefComponent = nullptr;
 	if (H3DF::ComponentImpl::FindParentPartDefinition(cInComponent, pcPartDefComponent)) {
 		SegmentKey cPartSegment(pcPartDefComponent->GetSegmentKey());
@@ -149,16 +150,18 @@ void KERNEL::Operator::AttributeImpl::SetShowComponent(H3DF::Component & cInComp
 	if (true == cInComponent.GetSubComponents().empty()) {
 		SegmentKey cSegment(cInComponent.GetSegmentKey());
 
+		CStringA strName = cSegment.Name();
+
 		if (true == bShowFlag) {
 			if (H3DF::Component::NoShow & cInComponent.GetStatus()) {
 				// Show Style이 있으면 삭제하고 No Show Style로 변경
 				if (H3DF::Component::Type::ExchangeRIPointSet == eType) {
 					cSegment.GetStyleControl().Flush(cModelImpl.NoShowVertexStyleSegment());
-					//cSegment.GetStyleControl().PushSegment(cModelImpl.ShowVertexStyleSegment());
+					cSegment.GetStyleControl().PushSegment(cModelImpl.ShowVertexStyleSegment());
 				}
 				else {
 					cSegment.GetStyleControl().Flush(cModelImpl.NoShowStyleSegment());
-					//cSegment.GetStyleControl().PushSegment(cModelImpl.ShowStyleSegment());
+					cSegment.GetStyleControl().PushSegment(cModelImpl.ShowStyleSegment());
 				}
 
 				cInComponent.RemoveStatus(H3DF::Component::NoShow);
@@ -205,10 +208,18 @@ bool KERNEL::Operator::Attribute::ShowAll()
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
+	DocViewImpl * pcDocViewImpl = dynamic_cast<DocViewImpl *>(pcImpl->GetDocView().GetImpl());
+	DEBUG_VALID(pcDocViewImpl);
+
 	pcImpl->PrepareUpdate();
 
+	pcImpl->SetShowComponent(pcImpl->GetDocView().CADModel(), true);
+
+	pcDocViewImpl->ModelPanel().CheckedUpdate(pcImpl->GetDocView().CADModel());
 
 	pcImpl->Updated();
+
+	pcDocViewImpl->Camera().FitWorldOnly();
 
 	return true;
 }
@@ -266,37 +277,26 @@ bool KERNEL::Operator::Attribute::HideOnly()
 
 	pcImpl->PrepareUpdate();
 
-	H3DF::ModelImpl cModelImpl = pcImpl->GetModelImpl();
-
 	SelectionResultsIterator cIter = cResults.GetIterator();
 
 	while (true == cIter.IsValid()) {
 		SelectionItem cItem = cIter.GetItem();
 
-		Key cSelectionKey;
-		if (true == cItem.ShowSelectedItem(cSelectionKey)) {
-
-			H3DF::Type eType = H3DF::Utility::GetType(cSelectionKey);
-
-			SegmentKey cSegment;
-			if (H3DF::Type::IncludeKey == eType) {
-				IncludeKey cIncludeKey(cSelectionKey.KeyValue());
-				cSegment = cIncludeKey.GetTarget();
-			}
-			else {
-				cSegment = SegmentKey(cSelectionKey.KeyValue());
-			}
-						
-			cSegment.GetStyleControl().Flush(cModelImpl.ShowStyleSegment());
-			cSegment.GetStyleControl().PushSegment(cModelImpl.NoShowStyleSegment());
+		Component * pcComponent = pcImpl->GetDocView().CADModel().GetComponent(cItem);
+		if (nullptr != pcComponent) {
+			pcImpl->SetShowComponent(*pcComponent, false, true);
+			pcDocViewImpl->ModelPanel().CheckedUpdate(*pcComponent);
+		}
+		else {
+			DEBUG_STOP;
 		}
 
 		cIter.Next();
 	}
 
-	pcDocViewImpl->Camera().FitWorldOnly();
-
 	pcImpl->Updated();
+
+	pcDocViewImpl->Camera().FitWorldOnly();
 
 	return true;
 }
@@ -306,6 +306,9 @@ bool KERNEL::Operator::Attribute::ShowOnly()
 {
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
+
+	DocViewImpl * pcDocViewImpl = dynamic_cast<DocViewImpl *>(pcImpl->GetDocView().GetImpl());
+	DEBUG_VALID(pcDocViewImpl);
 
 	H3DF::SelectionResults cResults = pcImpl->GetDocView().Select().Results();
 	if (0 == cResults.GetCount()) {
@@ -323,19 +326,12 @@ bool KERNEL::Operator::Attribute::ShowOnly()
 		SelectionItem cItem = cIter.GetItem();
 
 		Component * pcComponent = pcImpl->GetDocView().CADModel().GetComponent(cItem);
-		if (nullptr == pcComponent) {
-			DEBUG_STOP;
-			cIter.Next();
-			continue;
+		if (nullptr != pcComponent) {
+			pcImpl->SetShowComponent(*pcComponent, true, true);
 		}
-
-		SegmentKey cSegment(pcComponent->GetSegmentKey());
-
-		// 기존에 있을지 모르는 NoShowStyle을 삭제하고 ShowStyle로 변경
-		cSegment.GetStyleControl().Flush(pcImpl->GetModelImpl().NoShowStyleSegment());
-		cSegment.GetStyleControl().PushSegment(pcImpl->GetModelImpl().ShowStyleSegment());
-
-		pcComponent->RemoveStatus(H3DF::Component::NoShow);
+		else {
+			DEBUG_STOP;
+		}
 
 		cIter.Next();
 	}

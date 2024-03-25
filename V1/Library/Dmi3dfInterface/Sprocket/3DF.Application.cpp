@@ -304,6 +304,10 @@ CStringA H3DF::ApplicationImpl::ErrorSpecificString(int nId)
 			strMessage = "Null Input";
 			break;
 
+		case HES_OPEN_SEGMENT: // 282
+			strMessage = "Open Segment";
+			break;
+
 		case HES_PARSE_STRING: // 309
 			strMessage = "Parse string";
 			break;

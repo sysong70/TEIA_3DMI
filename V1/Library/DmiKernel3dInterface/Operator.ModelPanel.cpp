@@ -199,6 +199,12 @@ void KERNEL::Operator::ModelPanelImpl::ComponentChecked(H3DF::Component & cInCom
 // 2. Component Checked Update를 위해서 Component의 Checked 상태를 전송하기 위한 KeyItems를 구한다.
 void KERNEL::Operator::ModelPanelImpl::GetCheckedItemStatuses(Component & cInComponent, Signal::TreeItemStatuses & cInItemStatuses, bool bInRecursive)
 {
+	Signal::TreeItemStatus cItemStatus;
+	cItemStatus.Key = (DWORD_PTR)&cInComponent;
+	cItemStatus.Flag = (H3DF::Component::Status::NoShow & cInComponent.GetStatus()) ? false : true;
+	
+	cInItemStatuses.push_back(cItemStatus);
+
 	ComponentArray & cSubComponents = cInComponent.GetSubComponents();
 
 	for (auto pcSubComponent : cSubComponents) {
