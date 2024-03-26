@@ -215,14 +215,12 @@ size_t H3DF::SegmentKey::ShowSubsegments(SegmentKeyArray & cOutChildren) const
 //== Flush 관련 함수 =============================================================================
 void H3DF::SegmentKey::Flush(Search::Type eInTypeToRemove, Search::Space eInSearchSpace)
 {
-	SegmentKeyImpl::LocalOpen(*this);
-
 	CString strType = SearchImpl::GetSearchTypeString(eInTypeToRemove);
 	CString strSearchSpace = SearchImpl::GetSearchSpaceString(eInSearchSpace);
 
-	HC_Flush_Contents(Utility::ToChar(strSearchSpace), Utility::ToChar(strType));
-
-	SegmentKeyImpl::LocalClose(*this);
+	SegmentKeyImpl::LocalOpen(*this); {
+		HC_Flush_Contents(Utility::ToChar(strSearchSpace), Utility::ToChar(strType));
+	} SegmentKeyImpl::LocalClose(*this);
 }
 
 void H3DF::SegmentKey::Flush(SearchTypeArray const & aInTypesToRemove, Search::Space eInSearchSpace)

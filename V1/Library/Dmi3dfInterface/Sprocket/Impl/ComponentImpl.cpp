@@ -193,31 +193,6 @@ bool H3DF::ComponentImpl::ClonedParentPartDefinition(Component & cInComponent)
 	ClonedComponent(cInComponent, cInComponent.GetOwner(), true);
 
 	return true;
-
-	// Parent Segment에서 Include를 생성하고, Segment를 만들어서 원본의 정보를 복사한다.
-	
-	// 1. Parent Segment 설정
-	HC_KEY nOwnerKey = cInComponent.GetOwner().GetSegmentKey();
-	SegmentKey cParentSegment(cInComponent.GetOwner().GetSegmentKey());
-
-	// 2. 원본 Segment의 정보를 수집하고 Include키는 삭제.
-	IncludeKey cOriginInclude(cInComponent.GetIncludeKey());
-	SegmentKey cOirignSegment(cInComponent.GetSegmentKey());
-	CStringA strOirignSegmentName = cOirignSegment.Name();
-
-	cOriginInclude.Delete(); // Include를 삭제해서 기본에 있던 PartDefinition의 연결을 제거한다.
-
-	// 3. 새로운 Segment를 생성하고, 원본 Segment의 정보를 복사한다.
-	strOirignSegmentName.Format("%s_c%d", strOirignSegmentName, HDB::GetUniqueID());
-
-	H3DF::SegmentKey cSegment(strOirignSegmentName);
-	H3DF::IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
-
-	// 4. User Data 및 Style을 복사.
-
-	// 5. 하부 Include 정보 복사
-
-	return true;
 }
 
 // 주어진 Component를 복제

@@ -173,6 +173,19 @@ void SESSION::Session::ViewExecuteCommand(Json::Object & cInObject)
 			break;
 	}
 
+	switch (nId)
+	{
+		//case MEASURE_3D_CMD_Basic_Coordinate:
+		case MEASURE_3D_CMD_Basic_Distance:
+		//case MEASURE_3D_CMD_Basic_Length:
+		//case MEASURE_3D_CMD_Basic_Radius:
+		//case MEASURE_3D_CMD_Basic_Angle:
+			m_pcDocView->SetMeasure(nId);
+			return;
+			break;
+	}
+
+
 	assert(false);
 }
 

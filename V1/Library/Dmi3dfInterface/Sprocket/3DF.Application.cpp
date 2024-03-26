@@ -280,6 +280,14 @@ CStringA H3DF::ApplicationImpl::ErrorSpecificString(int nId)
 			strMessage = "Not A Camera Volume";
 			break;
 
+		case HES_NO_COLOR_TYPE_FOR_DISPLAY: // 265
+			strMessage = "No Color Type For Display";
+			break;
+
+		case HES_NO_DIFFUSE_COLOR_COMPONENT: // 266
+			strMessage = "No Diffuse Color Component";
+			break;
+
 		case HES_NO_LOCAL_SETTING: // 267
 			strMessage = "No Local Setting";
 			break;

@@ -699,13 +699,16 @@ void H3DF::UserData::Copy(SegmentKey & cInSourceSegment, SegmentKey & cInTargetS
 		cInTargetSegment.SetUserData((intptr_t)UserDataIndex::ComponentStatus, aUserData.size(), aUserData.data());
 	}
 
-	if (true == cInSourceSegment.ShowUserData((intptr_t)UserDataIndex::IncludedCount, aUserData)) {
-		cInTargetSegment.SetUserData((intptr_t)UserDataIndex::IncludedCount, aUserData.size(), aUserData.data());
-	}
+	// 4. Incldued Count는 복사하지 않는다.
+// 	if (true == cInSourceSegment.ShowUserData((intptr_t)UserDataIndex::IncludedCount, aUserData)) {
+// 		cInTargetSegment.SetUserData((intptr_t)UserDataIndex::IncludedCount, aUserData.size(), aUserData.data());
+// 	}
 
-	if (true == cInSourceSegment.ShowUserData((intptr_t)UserDataIndex::ReferenceCount, aUserData)) {
-		cInTargetSegment.SetUserData((intptr_t)UserDataIndex::ReferenceCount, aUserData.size(), aUserData.data());
-	}
+	// 4. Reference Count는 복사하지 않는다.
+// 	if (true == cInSourceSegment.ShowUserData((intptr_t)UserDataIndex::ReferenceCount, aUserData)) {
+// 		cInTargetSegment.SetUserData((intptr_t)UserDataIndex::ReferenceCount, aUserData.size(), aUserData.data());
+// 	}
+
 }
 
 //== Geomety User Data 관련 함수 =====================================================================

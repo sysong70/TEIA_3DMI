@@ -124,7 +124,9 @@ void KERNEL::Operator::AttributeImpl::SetShowComponent(H3DF::Component & cInComp
 	Component * pcPartDefComponent = nullptr;
 	if (H3DF::ComponentImpl::FindParentPartDefinition(cInComponent, pcPartDefComponent)) {
 		SegmentKey cPartSegment(pcPartDefComponent->GetSegmentKey());
-
+#ifdef _DEBUG
+		CStringA strName = cPartSegment.Name();
+#endif
 		// 몇번이나 Include되어 있는지 확인
 		DWORD nCount = 0;
 		if (true == H3DF::UserData::ShowIncludedCount(cPartSegment, nCount)) {
@@ -221,18 +223,22 @@ bool KERNEL::Operator::Attribute::ShowAll()
 
 	pcDocViewImpl->Camera().FitWorldOnly();
 
+#ifdef _DEBUG
+	//pcImpl->GetDocView().Save(L"Z:/ShowAll.hsf");
+#endif
+
 	return true;
 }
 
 bool KERNEL::Operator::Attribute::Show(H3DF::Component * pcInComponent)
 {
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetShowComponent(*pcInComponent, true);
 
 	return true;
 }
-
 
 bool KERNEL::Operator::Attribute::Show(H3DF::SelectionItem & cSelItem)
 {
@@ -296,7 +302,7 @@ bool KERNEL::Operator::Attribute::HideOnly()
 
 	pcImpl->Updated();
 
-	pcDocViewImpl->Camera().FitWorldOnly();
+	// pcDocViewImpl->Camera().FitWorldOnly();
 
 	return true;
 }

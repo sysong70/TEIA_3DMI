@@ -187,7 +187,16 @@ void KERNEL::Operator::ModelPanelImpl::ComponentChecked(H3DF::Component & cInCom
 		}
 	}
 
-	Delivery().modelPanel.CheckItems(cItems, bChecked);
+	if (false == cItems.empty()) {
+
+		for (auto Item : cItems) {
+			if (0 == Item) {
+				DEBUG_STOP;
+			}
+		}
+
+		Delivery().modelPanel.CheckItems(cItems, bChecked);
+	}
 
 	if (true == bRecursiveExpand) {
 		for (auto pcSubComponent : cSubComponents) {
@@ -199,16 +208,18 @@ void KERNEL::Operator::ModelPanelImpl::ComponentChecked(H3DF::Component & cInCom
 // 2. Component Checked Update를 위해서 Component의 Checked 상태를 전송하기 위한 KeyItems를 구한다.
 void KERNEL::Operator::ModelPanelImpl::GetCheckedItemStatuses(Component & cInComponent, Signal::TreeItemStatuses & cInItemStatuses, bool bInRecursive)
 {
-	Signal::TreeItemStatus cItemStatus;
-	cItemStatus.Key = (DWORD_PTR)&cInComponent;
-	cItemStatus.Flag = (H3DF::Component::Status::NoShow & cInComponent.GetStatus()) ? false : true;
-	
-	cInItemStatuses.push_back(cItemStatus);
+	if(cInComponent.GetSubComponents().empty() && true == IsVisible(cInComponent)) {
+		Signal::TreeItemStatus cItemStatus;
+		cItemStatus.Key = (DWORD_PTR)&cInComponent;
+		cItemStatus.Flag = (H3DF::Component::Status::NoShow & cInComponent.GetStatus()) ? false : true;
+		cInItemStatuses.push_back(cItemStatus);
+	}
 
 	ComponentArray & cSubComponents = cInComponent.GetSubComponents();
 
 	for (auto pcSubComponent : cSubComponents) {
-		if (true == pcSubComponent->GetSubComponents().empty()) {
+		// 최하단 Ri Item만 처리한다.
+		if (true == pcSubComponent->GetSubComponents().empty() && true == IsVisible(*pcSubComponent)) {
 			Signal::TreeItemStatus cItemStatus;
 			cItemStatus.Key = (DWORD_PTR)pcSubComponent;
 			cItemStatus.Flag = (H3DF::Component::Status::NoShow & pcSubComponent->GetStatus()) ? false : true;
@@ -228,7 +239,7 @@ void KERNEL::Operator::ModelPanelImpl::GetCheckedItemStatuses(Component & cInCom
 bool KERNEL::Operator::ModelPanelImpl::IsVisible(Component & cInComponent)
 {
 #ifdef _DEBUG
-	return true;
+	//return true;
 #endif
 
 	ComponentImpl * pcImpl = dynamic_cast<ComponentImpl *>(cInComponent.GetImpl());
@@ -440,7 +451,15 @@ void KERNEL::Operator::ModelPanel::Checked(H3DF::SelectionResults & cInResults, 
 		cIter.Next();
 	}
 
-	pcImpl->Delivery().modelPanel.CheckItems(cItems, bInChecked);
+	if (false == cItems.empty()) {
+		for (auto Item : cItems) {
+			if (0 == Item) {
+				DEBUG_STOP;
+			}
+		}
+
+		pcImpl->Delivery().modelPanel.CheckItems(cItems, bInChecked);
+	}
 }
 
 
@@ -465,7 +484,16 @@ void KERNEL::Operator::ModelPanel::CheckedUpdate(Component & cInComponent)
 
 	pcImpl->GetCheckedItemStatuses(cInComponent, cItemStatuses, true);
 
-	pcImpl->Delivery().modelPanel.CheckItems(cItemStatuses);
+	if (false == cItemStatuses.empty()) {
+
+		for (auto cStatus : cItemStatuses) {
+			if (0 == cStatus.Key) {
+				DEBUG_STOP;
+			}
+		}
+
+		pcImpl->Delivery().modelPanel.CheckItems(cItemStatuses);
+	}
 }
 
 //== Item Expanded 관련 함수 =========================================================================
@@ -538,7 +566,7 @@ void KERNEL::Operator::ModelPanel::OnItemCheckedSignal(Json::Object & cInObject)
 
 	pcImpl->Updated();
 
-	pcImpl->GetDocView().Camera().FitWorldOnly();
+	//pcImpl->GetDocView().Camera().FitWorldOnly();
 
-	pcImpl->GetDocView().Save(L"Z:/OnItemCheckedSignal.hsf");
+	//pcImpl->GetDocView().Save(L"Z:/OnItemCheckedSignal.hsf");
 }

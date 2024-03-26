@@ -553,6 +553,9 @@ Key H3DF::SearchResultsImpl::GetKey(CStringA strType, HC_KEY nInKey)
 	else if (strType == _T("lines") || strType == _T("polylines") || strType == _T("polyline")) {
 		pcKeyImpl->SetType(H3DF::Type::LineKey);
 	}
+	else if (strType == _T("reference")) {
+		pcKeyImpl->SetType(H3DF::Type::ReferenceKey);
+	}
 	else {
 		DEBUG_STOP;
 	}

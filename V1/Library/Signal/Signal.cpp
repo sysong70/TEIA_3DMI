@@ -807,6 +807,10 @@ void Signal::ModelPanel::CheckItems(const TreeItemStatuses& items)
 		node.SetBoolean(SKW_FLAG, item.Flag);
 	}
 
+	Json::Object copydata = data;
+	CString strText;
+	copydata.Stringify(strText);
+
 	Wrapper().SendData(data);
 }
 

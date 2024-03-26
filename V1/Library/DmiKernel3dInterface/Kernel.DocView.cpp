@@ -359,7 +359,7 @@ void KERNEL::DocView::KeyboardSignal(Json::Object & cInObject)
 	pcImpl->GetCanvas().KeyboardInput(cInObject);
 }
 
-//== View 관련 함수 ==========================================================================
+//== View 관련 함수 ==================================================================================
 void KERNEL::DocView::SetViewControl(int nId)
 {
 	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
@@ -399,7 +399,7 @@ void KERNEL::DocView::SetViewControl(int nId)
 	}
 }
 
-//== Object Snap 관련 함수 ===================================================================
+//== Object Snap 관련 함수 ===========================================================================
 void KERNEL::DocView::SetObjectSnap(int nId)
 {
 	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
@@ -454,7 +454,7 @@ void KERNEL::DocView::SetObjectSnap(int nId)
 	}
 }
 
-//== Selection Fiter 관련 함수 ===============================================================
+//== Selection Fiter 관련 함수 =======================================================================
 void KERNEL::DocView::SetSelectionFilter(int nId)
 {
 	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
@@ -493,8 +493,17 @@ void KERNEL::DocView::SetSelectionFilter(int nId)
 
 }
 
+//== Measure 관련 함수 ===============================================================================
+void KERNEL::DocView::SetMeasure(int nId)
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
 
-//== Style 관련 함수 =========================================================================
+
+}
+
+
+//== Style 관련 함수 =================================================================================
 void KERNEL::DocView::SetViewStyle(int nStyleId)
 {
 	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;

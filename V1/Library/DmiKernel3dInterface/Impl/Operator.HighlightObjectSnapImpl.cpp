@@ -240,6 +240,8 @@ int KERNEL::Operator::HighlightObjectSnapImpl::NoButtonDownAndMove(HEventInfo & 
 	// 기존에 선택된 Snap Point가 있으면 삭제한다. Segment를 Flush한다.
 	m_cSnapPointSegment.Flush(Search::Type::Segment);
 
+	Window().GetBaseView()->SetSuppressUpdate(true);
+
 	// 저장되어 있는 Snap Point를 그림.
 	for (auto & pcSnapItem : m_vSnapItems) {
 		for (auto & cSnapPoint : pcSnapItem->vcSnapPoints) {
@@ -339,7 +341,7 @@ int KERNEL::Operator::HighlightObjectSnapImpl::NoButtonDownAndMove(HEventInfo & 
 		}
 	}
 
-	// Window().GetBaseView()->SetSuppressUpdate(false);
+	Window().GetBaseView()->SetSuppressUpdate(false);
 
 	nMouseMoveTickCount = GetTickCount();
 	nTickCount = nMouseMoveTickCount - m_nPrevMouseMoveTickCount;

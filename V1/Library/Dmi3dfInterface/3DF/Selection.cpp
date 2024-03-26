@@ -1352,7 +1352,8 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 					nIncludeCount++;
 				}
 				else if (streq(chKeyType, "reference")) {
-					nKey = pnKeys[nIndex];
+					// nKey = pnKeys[nIndex];
+					//nKey = HC_Show_Reference_Geometry(pnKeys[nIndex]);
 				}
 			}
 
