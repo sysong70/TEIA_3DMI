@@ -414,7 +414,7 @@ bool Component::RibbonBar::CreateCategories()
 	pPanel = PRESET::CreatePanel(pCategory, HOME_3D_PNL_View);
 	pPanel->Add(PRESET::CreateSplitButton(HOME_3D_LST_ViewStyle, HOME_3D_CMD_ViewStyle_Shade, HOME_3D_CMD_ViewStyle_Tessellated));
 	pPanel->Add(PRESET::CreateButton(HOME_3D_LST_ViewDirection, HOME_3D_CMD_ViewDirection_Top, HOME_3D_CMD_ViewDirection_Perspective));
-	pPanel->Add(PRESET::CreateButton(HOME_3D_LST_Visualize, HOME_3D_CMD_Visualize_ShowAll, HOME_3D_CMD_Visualize_Toggle));
+	pPanel->Add(PRESET::CreateButton(HOME_3D_LST_Visualize, HOME_3D_CMD_Visualize_ShowAll, HOME_3D_CMD_Visualize_Reset));
 	pPanel->Add(PRESET::CreateButton(HOME_3D_LST_VisualEffects));
 
 	pPanel = PRESET::CreatePanel(pCategory, HOME_3D_PNL_SelectAndSnap);
