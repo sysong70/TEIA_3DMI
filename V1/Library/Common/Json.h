@@ -119,7 +119,7 @@ namespace Json
 		// compact format
 		void Stringify(CString& buffer);
 
-	private:
+	protected:
 
 		std::vector<Value*> m_buffer;
 	};
@@ -156,6 +156,10 @@ namespace Json
 
 		//:CHECK
 		Value& operator =(const Value& other);
+		Value& operator =(bool value);
+		Value& operator =(int value);
+		Value& operator =(double value);
+		Value& operator =(CString value);
 		//:WARNING - hard compare by string
 		bool operator ==(Value& other);
 		bool operator !=(Value& other);
@@ -248,7 +252,7 @@ namespace Json
 		// compact format
 		void Stringify(CString& buffer);
 
-	private:
+	protected:
 
 		EValueType m_eType;
 
@@ -385,7 +389,7 @@ namespace Json
 
 		CString ToString();
 
-	private:
+	protected:
 
 		Pair* Look(const char* pName) const;
 

@@ -52,6 +52,7 @@ BEGIN
     HOME_3D_CMD_Visualize_Hide                        "__#__\n__#__"
     HOME_3D_CMD_Visualize_ShowOnly                    "__#__\n__#__"
     HOME_3D_CMD_Visualize_Toggle                      "__#__\n__#__"
+    HOME_3D_CMD_Visualize_Reset                       "__#__\n__#__"
     HOME_3D_LST_VisualEffects                         "__#__\n__#__"
     HOME_3D_CMD_VisualEffects_Shadow                  "__#__\n__#__"
     HOME_3D_CMD_VisualEffects_Reflection              "__#__\n__#__"

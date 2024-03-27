@@ -61,10 +61,14 @@ namespace H3DF
 		namespace Figure
 		{
 			HC_KEY API_3DF CreateDonut(H3DF::Point center, double inner, double outer);
+
+			HC_KEY API_3DF CreatePlus(H3DF::Point center, double size);
 			// Left & Right Half Circle
 			HC_KEY API_3DF CreateObround(H3DF::Point topLeft, H3DF::Point bottomRight);
 
 			HC_KEY API_3DF CreateRectangle(H3DF::Point topLeft, H3DF::Point bottomRight);
+
+			HC_KEY API_3DF CreateSquare(H3DF::Point center, double size);
 		};
 
 		//:REF - https://docs.techsoft3d.com/3df/latest/api_ref/3dgs/HC_Set_Text_Font.html
@@ -93,6 +97,7 @@ namespace H3DF
 			};
 
 			void API_3DF SetAlignment(const char* value);
+
 			void API_3DF SetAlignment(EPivot value);
 			// bold = [on | off]
 			void API_3DF SetBold(bool value = true);
@@ -106,6 +111,7 @@ namespace H3DF
 			void API_3DF SetRotation(double degree);
 			// transforms = [on | off | character position only | character position adjusted]
 			void API_3DF SetTransform(bool value = true);
+
 			void API_3DF SetTransform(const char* value);
 		}
 
@@ -135,6 +141,7 @@ namespace H3DF
 		namespace Segment
 		{
 			void API_3DF SetColor(const char* type, COLORREF color);
+
 			void API_3DF SetColor(const char* type, COLORREF color, double alpha);
 
 			void API_3DF SetEdgePattern(const char* value);
@@ -150,6 +157,7 @@ namespace H3DF
 			void API_3DF SetLineType(double weight, const char* pattern, COLORREF color);
 
 			void API_3DF SetVisibility(const char* type, bool value = true);
+
 			void API_3DF SetVisibility(const char* option, const char* sub = nullptr, bool value = true);
 		};
 

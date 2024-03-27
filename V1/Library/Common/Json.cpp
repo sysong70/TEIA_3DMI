@@ -131,7 +131,7 @@ Json::Array& Json::Array::operator =(const Array& other)
 
 
 
-bool Json::Array::operator==(Array& other)
+bool Json::Array::operator ==(Array& other)
 {
 	CString left, right;
 
@@ -143,7 +143,7 @@ bool Json::Array::operator==(Array& other)
 
 
 
-bool Json::Array::operator!=(Array& other)
+bool Json::Array::operator !=(Array& other)
 {
 	return !(*this == other);
 }
@@ -569,16 +569,40 @@ Json::Value::~Value()
 
 
 
-Json::Value& Json::Value::operator=(const Value& other)
+Json::Value& Json::Value::operator =(const Value& other)
 {
 	DEBUG_STOP;
 
 	return *this;
 }
 
+Json::Value& Json::Value::operator =(bool value)
+{
+	SetBoolean(value);
+	return *this;
+}
+
+Json::Value& Json::Value::operator =(int value)
+{
+	SetInteger(value);
+	return *this;
+}
+
+Json::Value& Json::Value::operator =(double value)
+{
+	SetReal(value);
+	return *this;
+}
+
+Json::Value& Json::Value::operator =(CString value)
+{
+	SetString(value);
+	return *this;
+}
 
 
-bool Json::Value::operator==(Value& other)
+
+bool Json::Value::operator ==(Value& other)
 {
 	CString left, right;
 
@@ -590,7 +614,7 @@ bool Json::Value::operator==(Value& other)
 
 
 
-bool Json::Value::operator!=(Value& other)
+bool Json::Value::operator !=(Value& other)
 {
 	return !(*this == other);
 }
@@ -1186,7 +1210,7 @@ Json::Object& Json::Object::operator =(const Object& other)
 
 
 
-bool Json::Object::operator==(Object& other)
+bool Json::Object::operator ==(Object& other)
 {
 	CString left, right;
 
@@ -1198,7 +1222,7 @@ bool Json::Object::operator==(Object& other)
 
 
 
-bool Json::Object::operator!=(Object& other)
+bool Json::Object::operator !=(Object& other)
 {
 	return !(*this == other);
 }

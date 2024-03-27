@@ -181,6 +181,12 @@
     <ClCompile Include="Graphic.Manager.cpp">
       <Filter>Graphic</Filter>
     </ClCompile>
+    <ClCompile Include="Geometry.cpp">
+      <Filter>Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry.UserDataFiler.cpp">
+      <Filter>Graphic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.Common.h">
@@ -376,6 +382,12 @@
       <Filter>Graphic</Filter>
     </ClInclude>
     <ClInclude Include="Graphic.Manager.h">
+      <Filter>Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry.h">
+      <Filter>Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry.UserDataFiler.h">
       <Filter>Graphic</Filter>
     </ClInclude>
   </ItemGroup>
