@@ -5,6 +5,7 @@
 #include "Database.h"
 #include "Segment.h"
 #include "Bounding.h"
+#include "Reference.h"
 #include "Line.h"
 #include "Circle.h"
 
@@ -248,24 +249,54 @@ void H3DF::SegmentKey::Flush(SearchTypeArray const & aInTypesToRemove, Search::S
 
 void H3DF::SegmentKey::Flush(size_t nInTypesCount, Search::Type const peInTypesToRemove[], Search::Space eInSearchSpace)
 {
-	SegmentKeyImpl::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this); {
 
-	CString strType;
+		CString strType;
 
-	for (size_t nIndex = 0 ; nIndex < nInTypesCount ; nIndex++)
-	{
-		if (false == strType.IsEmpty()) {
-			strType += ", ";
+		for (size_t nIndex = 0; nIndex < nInTypesCount; nIndex++) {
+			if (false == strType.IsEmpty()) {
+				strType += ", ";
+			}
+
+			strType += SearchImpl::GetSearchTypeString(peInTypesToRemove[nIndex]);
 		}
 
-		strType += SearchImpl::GetSearchTypeString(peInTypesToRemove[nIndex]);
-	}
+		CString strSearchSpace = SearchImpl::GetSearchSpaceString(eInSearchSpace);
 
+		HC_Flush_Contents(Utility::ToChar(strSearchSpace), Utility::ToChar(strType));
+
+	} SegmentKeyImpl::LocalClose(*this);
+}
+
+size_t H3DF::SegmentKey::Find(Search::Type eInRequest, Search::Space eInSearchSpace, SearchResults & cOutResults) const
+{
+	SegmentKeyImpl::LocalOpen(*this);
+
+	CString strType = SearchImpl::GetSearchTypeString(eInRequest);
 	CString strSearchSpace = SearchImpl::GetSearchSpaceString(eInSearchSpace);
 
-	HC_Flush_Contents(Utility::ToChar(strSearchSpace), Utility::ToChar(strType));
+	SearchResultsImpl * pcResultsImpl = static_cast<SearchResultsImpl *>(cOutResults.GetImpl());
+	DEBUG_VALID(pcResultsImpl);
+
+	HC_Begin_Contents_Search(Utility::ToChar(strSearchSpace), Utility::ToChar(strType));
+	{
+		int nCount = 0;
+		HC_Show_Contents_Count(&nCount);
+
+		HC_KEY nKey;
+		char chType[MVO_BUFFER_SIZE];
+
+		for (int nIndex = 0; nIndex < nCount; nIndex++) {
+			HC_Find_Contents(chType, &nKey);
+			Key cKey = H3DF::SearchResultsImpl::GetKey(chType, nKey);
+			pcResultsImpl->PushBack(cKey);
+		}
+	}
+	HC_End_Contents_Search();
 
 	SegmentKeyImpl::LocalClose(*this);
+
+	return cOutResults.GetCount();
 }
 
 //== Include 관련 함수 ===============================================================================
@@ -357,6 +388,114 @@ size_t H3DF::SegmentKey::ShowIncluders(IncludeKeyArray & aOutIncludes) const
 
 			IncludeKey cInclude(nIncludeKey);
 			aOutIncludes.push_back(cInclude);
+		}
+	}
+	HC_End_Contents_Search();
+
+	SegmentKeyImpl::LocalClose(*this);
+
+	return nIncludeCount;
+}
+
+//== Reference 관련 함수 =============================================================================
+
+ReferenceKey H3DF::SegmentKey::ReferenceGeometry(Key const & cInKey)
+{
+// 	SegmentKeyImpl::LocalOpen(*this);
+// 	HC_KEY nReferenceKey = HC_Reference_Geometry_By_Key(cInKey.KeyValue());
+// 	SegmentKeyImpl::LocalClose(*this);
+
+	HC_KEY nReferenceKey = HC_Reference_Geometry_Key_By_Key(KeyValue(), cInKey.KeyValue());
+	ReferenceKey cReference(nReferenceKey);
+
+	return cReference;
+}
+
+/*
+size_t H3DF::SegmentKey::ShowReferrers(SegmentKeyArray & aOutSegments) const
+{
+	SegmentKeyImpl::LocalOpen(*this);
+
+	int nCount = 0;
+	HC_Show_Referrers_Count(KeyValue(), &nCount);
+
+	HC_KEY nKey;
+	char chType[MVO_BUFFER_SIZE];
+
+	for (int nIndex = 0; nIndex < nCount; nIndex++) {
+		HC_Show_Referrer(KeyValue(), nIndex, chType, &nKey);
+		SegmentKey cSegment(nKey);
+		aOutSegments.push_back(cSegment);
+	}
+
+	SegmentKeyImpl::LocalClose(*this);
+
+	return nCount;
+}
+
+int FindInSegmentReferencesInternal(HC_KEY startkey, vlist_s * foundlist)
+{
+	HC_KEY search_key, seg_key;
+	char type[64];
+	int ret = true;;
+
+	HC_Open_Segment_By_Key(startkey);
+	HC_Begin_Contents_Search(".", "segments, includes, reference");
+	while (HC_Find_Contents(type, &search_key)) {
+		if (streq(type, "include") || streq(type, "segment")) {
+			HC_KEY key = search_key;
+
+			if (streq(type, "include")) {
+				key = HC_KShow_Include_Segment(search_key);
+			}
+
+			if (FindInSegmentReferencesInternal(text, key, keys, keynum, keypos, foundlist) == FIND_RESULT_ERROR_PATH_SIZE)
+				ret = FIND_RESULT_ERROR_PATH_SIZE;
+			}
+
+		}
+		else if (streq(type, "reference")) {
+			static char segname[4096];
+			seg_key = HC_KShow_Reference_Geometry(search_key);
+			HC_Show_Key_Type(seg_key, type);
+			if (streq(type, "segment")) {
+				HC_Show_Segment(seg_key, segname);
+				if (strstr(segname, text)) {
+					Keylist * klitem = new Keylist;
+					for (int i = 0; i < keypos; i++)
+						klitem->keys[i] = keys[i];
+					klitem->keys[keypos] = search_key;
+					klitem->keynum = keypos + 1;
+					vlist_add_last(foundlist, klitem);
+				}
+			}
+		}
+	}
+	HC_End_Contents_Search();
+	HC_Close_Segment();
+
+	return ret;
+}
+*/
+size_t H3DF::SegmentKey::ShowReferrers(ReferenceKeyArray & aOutReferences) const
+{
+	int nIncludeCount = 0;
+
+	SegmentKeyImpl::LocalOpen(*this);
+
+	HC_Begin_Contents_Search(".", "reference");// reference geometry");
+	{
+		HC_Show_Contents_Count(&nIncludeCount);
+
+		HC_KEY nKey;
+		char chType[MVO_BUFFER_SIZE];
+
+		for (int i = 0; i < nIncludeCount; i++)
+		{
+			HC_Find_Contents(chType, &nKey);
+
+			ReferenceKey cReference(nKey);
+			aOutReferences.push_back(cReference);
 		}
 	}
 	HC_End_Contents_Search();

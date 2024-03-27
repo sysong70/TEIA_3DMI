@@ -99,3 +99,48 @@ const DocView & KERNEL::Operator::OperatorImpl::GetDocView() const
 	DEBUG_VALID(m_pcDocView);
 	return *m_pcDocView;
 }
+
+H3DF::ModelImpl & KERNEL::Operator::OperatorImpl::GetModelImpl()
+{
+	DEBUG_VALID(m_pcDocView);
+
+	DocViewImpl * pcDocImpl = (DocViewImpl *)GetDocView().GetImpl();
+	DEBUG_VALID(pcDocImpl);
+
+	H3DF::ModelImpl * pcModelImpl = (H3DF::ModelImpl *)pcDocImpl->GetModel().GetImpl();
+	DEBUG_VALID(pcModelImpl);
+
+	return *pcModelImpl;
+}
+
+const H3DF::ModelImpl & KERNEL::Operator::OperatorImpl::GetModelImpl() const
+{
+	DEBUG_VALID(m_pcDocView);
+
+	DocViewImpl * pcDocImpl = (DocViewImpl *)GetDocView().GetImpl();
+	DEBUG_VALID(pcDocImpl);
+
+	H3DF::ModelImpl * pcModelImpl = (H3DF::ModelImpl *)pcDocImpl->GetModel().GetImpl();
+	DEBUG_VALID(pcModelImpl);
+
+	return *pcModelImpl;
+}
+
+// Update하기전에 Hightlight된 것들을 모두 Unhighlight하고, SnapItem을 모두 Reset한다.
+void KERNEL::Operator::OperatorImpl::PrepareUpdate()
+{
+	GetDocView().Canvas().GetFrontView().SuppressUpdate(true);
+
+	DocViewImpl * pcDocViewImpl = dynamic_cast<DocViewImpl *>(GetDocView().GetImpl());
+	pcDocViewImpl->Select().UnhighlightEverything();
+	pcDocViewImpl->Select().ResetSnapItems(false);
+}
+
+// Update가 완료되면, View를 Update한다.
+void KERNEL::Operator::OperatorImpl::Updated()
+{
+	GetDocView().Canvas().GetFrontView().SuppressUpdate(false);
+	GetDocView().Canvas().GetFrontView().Update();
+}
+
+

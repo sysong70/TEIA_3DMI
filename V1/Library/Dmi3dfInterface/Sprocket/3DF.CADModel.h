@@ -15,7 +15,8 @@ namespace H3DF
 
 		H3DF::Type ObjectType() const { return H3DF::Type::CADModel; };
 
-		Component * GetComponentFromKey(HC_KEY cInKey) const;
+		Component * GetComponent(HC_KEY cInKey) const;
+		Component * GetComponent(H3DF::SelectionItem & cInItem) const;
 
 		bool ShowSelectionResult(Component * pcInComponent, H3DF::SelectionResults & cOutResults);
 /*

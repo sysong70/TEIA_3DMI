@@ -58,10 +58,10 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject)
 	pcImpl->AllocationOperator(this);
 
 	pcImpl->m_pcCanvas->SetDelivery(pcImpl->Delivery(), pcImpl->m_nViewId);
-	pcImpl->m_pcCanvas->FileOpen(cInObject, pcImpl->GetCADModel());
+	pcImpl->m_pcCanvas->FileOpen(cInObject, pcImpl->CADModel());
 
 	// #ModelPanel: File Open한 후에, CADModel을 이용해서 ModelPanel을 초기화한다.
-	pcImpl->ModelPanel().Initialize(pcImpl->GetCADModel());
+	pcImpl->ModelPanel().Initialize(pcImpl->CADModel());
 	//pcImpl->ModelPanel().Initialize(strFilePathName);
 }
 
@@ -118,6 +118,22 @@ int KERNEL::DocView::ViewId()
 	return pcImpl->m_nViewId;
 }
 
+H3DF::Canvas & KERNEL::DocView::Canvas() const
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetCanvas();
+}
+
+H3DF::CADModel & KERNEL::DocView::CADModel() const
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->CADModel();
+}
+
 bool KERNEL::DocView::Save(CString strFilePathName)
 {
 	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
@@ -129,6 +145,39 @@ bool KERNEL::DocView::Save(CString strFilePathName)
 	pcImpl->GetCanvas().GetFrontView().SaveHsfFile(strFilePathName, &pcImpl->GetCanvas());
 
 	return true;
+}
+
+//== Operator 관련 함수 ======================================================================
+Operator::Attribute & KERNEL::DocView::Attribute()
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->Attribute();
+}
+
+Operator::Camera & KERNEL::DocView::Camera()
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->Camera();
+}
+
+Operator::Select & KERNEL::DocView::Select()
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->Select();
+}
+
+Operator::ModelPanel & KERNEL::DocView::ModelPanel()
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->ModelPanel();
 }
 
 //== Mouse 관련 함수 =================================================================================

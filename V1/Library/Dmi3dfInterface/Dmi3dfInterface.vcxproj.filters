@@ -52,9 +52,6 @@
     <Filter Include="Operator\Impl">
       <UniqueIdentifier>{d548b32f-9f75-4756-b369-ba2158959777}</UniqueIdentifier>
     </Filter>
-    <Filter Include="3DF\CADModel">
-      <UniqueIdentifier>{f1662886-5b26-443f-9b56-3e38f64383d3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="CADModel">
       <UniqueIdentifier>{0ee727bf-84bb-4c15-ace6-79c1a068392d}</UniqueIdentifier>
     </Filter>
@@ -351,6 +348,9 @@
     <ClInclude Include="Sprocket\Impl\CADModelImpl.h">
       <Filter>Sprocket\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\Reference.h">
+      <Filter>3DF\Object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -628,6 +628,9 @@
     </ClCompile>
     <ClCompile Include="Sprocket\Impl\CADModelImpl.cpp">
       <Filter>Sprocket\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Reference.cpp">
+      <Filter>3DF\Object</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

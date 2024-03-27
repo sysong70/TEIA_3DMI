@@ -69,6 +69,8 @@ namespace KERNEL
 			void SetObjectSnapMode(DWORD nInSnapMode);
 			void SetSelectionFilter(DWORD nInSelFilter);
 
+			void Reset(bool bUpdate);
+
 		protected:
 			void ApplySelectionFilter(H3DF::SelectionResults & cInSelections, H3DF::SelectionResults & cOutSelections);
 

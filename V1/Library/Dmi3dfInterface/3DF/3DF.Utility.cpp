@@ -10,6 +10,7 @@
 #include <bit>
 
 using namespace std::chrono;
+using namespace H3DF;
 
 USING_3DF_NAMESPACE
 
@@ -608,11 +609,9 @@ bool H3DF::UserData::ShowSegmentName(HC_KEY nInKey, CString & strOutName)
 	return true;
 }
 
-bool H3DF::UserData::SetComponentType(SegmentKey & cInSegment, DWORD nInType)
+void H3DF::UserData::SetComponentType(SegmentKey & cInSegment, DWORD nInType)
 {
 	cInSegment.SetUserData((intptr_t)UserDataIndex::ComponentType, sizeof(DWORD), (BYTE *)&nInType);
-
-	return true;
 }
 
 bool H3DF::UserData::ShowComponentType(SegmentKey & cInSegment, DWORD & nOutType)
@@ -627,37 +626,92 @@ bool H3DF::UserData::ShowComponentType(SegmentKey & cInSegment, DWORD & nOutType
 	return true;
 }
 
-bool H3DF::UserData::AddStatus(SegmentKey & cInSegment, DWORD & eInStatus)
+void H3DF::UserData::AddComponentStatus(SegmentKey & cInSegment, DWORD nInStatus)
 {
+	DWORD nExistStatus = 0;
+	ShowComponentStatus(cInSegment, nExistStatus);
+
+	nExistStatus |= nInStatus;
+
+	cInSegment.SetUserData((intptr_t)UserDataIndex::ComponentStatus, sizeof(DWORD), (BYTE *)&nExistStatus);
+}
+
+void H3DF::UserData::RemoveComponentStatus(SegmentKey & cInSegment, DWORD nInStatus)
+{
+	DWORD nExistStatus = 0;
+	ShowComponentStatus(cInSegment, nExistStatus);
+
+	nExistStatus &= ~nInStatus;
+
+	cInSegment.SetUserData((intptr_t)UserDataIndex::ComponentStatus, sizeof(DWORD), (BYTE *)&nExistStatus);
+}
+
+bool H3DF::UserData::ShowComponentStatus(SegmentKey & cInSegment, DWORD & nOutStatus)
+{
+	ByteArray aUserData;
+	if (false == cInSegment.ShowUserData((intptr_t)UserDataIndex::ComponentStatus, aUserData)) {
+		return false;
+	}
+
+	CopyMemory(&nOutStatus, aUserData.data(), sizeof(DWORD));
+
 	return true;
 }
 
-bool H3DF::UserData::RemoveStatus(SegmentKey & cInSegment, DWORD & eInStatus)
+void H3DF::UserData::SetIncludedCount(SegmentKey & cInSegment, DWORD nInCount)
 {
+	cInSegment.SetUserData((intptr_t)UserDataIndex::IncludedCount, sizeof(DWORD), (BYTE *)&nInCount);
+}
+
+bool H3DF::UserData::ShowIncludedCount(SegmentKey & cInSegment, DWORD & nOutCount)
+{
+	ByteArray aUserData;
+	if (false == cInSegment.ShowUserData((intptr_t)UserDataIndex::IncludedCount, aUserData)) {
+		return false;
+	}
+
+	CopyMemory(&nOutCount, aUserData.data(), sizeof(DWORD));
+
 	return true;
 }
 
-bool H3DF::UserData::ShowStatus(SegmentKey & cInSegment, DWORD & eOutStatus)
+void H3DF::UserData::UnsetIncludedCount(SegmentKey & cInSegment)
 {
-	return true;
+	cInSegment.UnsetUserData((intptr_t)UserDataIndex::IncludedCount);
+}
+
+void H3DF::UserData::Copy(SegmentKey & cInSourceSegment, SegmentKey & cInTargetSegment)
+{
+	ByteArray aUserData;
+	
+	// 1. 이름 복사
+	if (true == cInSourceSegment.ShowUserData((intptr_t)UserDataIndex::Name, aUserData)) {
+		cInTargetSegment.SetUserData((intptr_t)UserDataIndex::Name, aUserData.size(), aUserData.data());
+	}
+
+	// 2. Component Type 복사
+	if (true == cInSourceSegment.ShowUserData((intptr_t)UserDataIndex::ComponentType, aUserData)) {
+		cInTargetSegment.SetUserData((intptr_t)UserDataIndex::ComponentType, aUserData.size(), aUserData.data());
+	}
+
+	// 3. Component Status 복사
+	if (true == cInSourceSegment.ShowUserData((intptr_t)UserDataIndex::ComponentStatus, aUserData)) {
+		cInTargetSegment.SetUserData((intptr_t)UserDataIndex::ComponentStatus, aUserData.size(), aUserData.data());
+	}
+
+	if (true == cInSourceSegment.ShowUserData((intptr_t)UserDataIndex::IncludedCount, aUserData)) {
+		cInTargetSegment.SetUserData((intptr_t)UserDataIndex::IncludedCount, aUserData.size(), aUserData.data());
+	}
+
+	if (true == cInSourceSegment.ShowUserData((intptr_t)UserDataIndex::ReferenceCount, aUserData)) {
+		cInTargetSegment.SetUserData((intptr_t)UserDataIndex::ReferenceCount, aUserData.size(), aUserData.data());
+	}
 }
 
 //== Geomety User Data 관련 함수 =====================================================================
-bool H3DF::UserData::SetComponentType(GeometryKey & cInGeometry, DWORD nInType)
+void H3DF::UserData::SetComponentType(GeometryKey & cInGeometry, DWORD nInType)
 {
 	cInGeometry.SetUserData((intptr_t)UserDataIndex::ComponentType, sizeof(DWORD), (BYTE *)&nInType);
-
-	return true;
-}
-
-bool H3DF::UserData::AddTopologyType(GeometryKey & cInGeometry, DWORD nInType)
-{
-	DWORD nExistType = 0;
-	if (true == ShowComponentType(cInGeometry, nExistType)) {
-		nInType += nExistType;
-	}
-
-	return SetComponentType(cInGeometry, nInType);
 }
 
 bool H3DF::UserData::ShowComponentType(GeometryKey & cInGeometry, DWORD & nOutType)

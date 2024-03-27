@@ -27,6 +27,7 @@ namespace KERNEL
 
 			int MouseWheel(HEventInfo & cInEvent);
 
+			
 			//== View Control 관련 함수 ==============================================================
 			H3DF::Camera::Mode CameraMode();
 			void SetPanViewControl();
@@ -34,6 +35,7 @@ namespace KERNEL
 			void SetOrbitTurntableViewControl();
 			void SetZoomArea();
 			void FitWorld();
+			void FitWorldOnly();
 		};
 	}
 }

@@ -80,6 +80,14 @@ namespace KERNEL
 	class Object;
 	class DocView;
 
+	namespace Operator
+	{
+		class Attribute;
+		class Camera;
+		class Select;
+		class ModelPanel;
+	}
+
 	class Impl
 	{
 	public:

@@ -50,6 +50,9 @@ namespace H3DF
 		void Flush(SearchTypeArray const & aInTypesToRemove, Search::Space eInSearchSpace = Search::Space::SegmentOnly);
 		void Flush(size_t nInTypesCount, Search::Type const peInTypesToRemove[], Search::Space eInSearchSpace = Search::Space::SegmentOnly);
 
+		//== Find 관련 함수 ==========================================================================
+		size_t Find(Search::Type eInRequest, Search::Space eInSearchSpace, SearchResults & cOutResults) const;
+
 		//== Include 관련 함수 =======================================================================
 		IncludeKey IncludeSegment(SegmentKey const & cInSegment);
 		IncludeKey IncludeSegment(SegmentKey const & cInSegment, ConditionalExpression const & cInConditional);
@@ -57,6 +60,11 @@ namespace H3DF
 		size_t ShowIncluders() const;
 		size_t ShowIncluders(SegmentKeyArray & aOutSegments) const;
 		size_t ShowIncluders(IncludeKeyArray & aOutIncludes) const;
+
+		//== Reference 관련 함수 =====================================================================
+		ReferenceKey ReferenceGeometry(Key const & cInKey);
+		//size_t ShowReferrers(SegmentKeyArray & aOutSegments) const;
+		size_t ShowReferrers(ReferenceKeyArray & aOutReferences) const;
 
 		//== Shell 관련 함수 =========================================================================
 		ShellKey InsertShell(ShellKit const & cInKit);

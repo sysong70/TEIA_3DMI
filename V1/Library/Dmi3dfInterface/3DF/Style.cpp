@@ -121,6 +121,46 @@ CStringA H3DF::StyleKey::Name(bool bIncludePath) const
 	return strOutName;
 }
 
+bool H3DF::StyleKey::ShowSource(SegmentKey & cOutSegment) const
+{
+	auto * pcImpl = dynamic_cast<KeyImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	HC_KEY nKey = HC_Show_Style_Segment(pcImpl->KeyValue(), nullptr);
+
+	SegmentKey cSegment(nKey);
+	cOutSegment = cSegment;
+
+	return true;
+}
+
+bool H3DF::StyleKey::ShowSource(Style::Type & cOutType, SegmentKey & cOutSegment, CStringA & strOutName) const
+{
+	auto * pcImpl = dynamic_cast<KeyImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	HC_KEY nKey = HC_Show_Style_Segment(pcImpl->KeyValue(), strOutName.GetBuffer(MVO_BUFFER_SIZE));
+	strOutName.ReleaseBuffer();
+
+	H3DF::Type eType = H3DF::Utility::GetType(pcImpl->KeyValue());
+
+	if (H3DF::Type::SegmentStyle == eType) {
+		cOutType = Style::Type::Segment;
+	}
+	else if (H3DF::Type::NamedStyle == eType) {
+		cOutType = Style::Type::Named;
+	}
+	else {
+		DEBUG_STOP;
+		cOutType = Style::Type::None;
+	}
+
+	SegmentKey cSegment(nKey);
+	cOutSegment = cSegment;
+
+	return true;
+}
+
 //== StyleControl Function =========================================================================
 
 class StyleControlImpl : public ControlImpl
@@ -231,15 +271,42 @@ void H3DF::StyleControl::Flush(SegmentKey const & cInStyleSource)
 	StyleControlImpl * pcImpl = (StyleControlImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { assert(false); }
 
-	H3DF::Type eType = Utility::GetType(cInStyleSource.KeyValue());
-
-	if (H3DF::Type::SegmentStyle != eType && H3DF::Type::NamedStyle != eType) {
-		DEBUG_STOP;
-		return;
-	}
+	CStringA strName = cInStyleSource.Name();
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_Delete_By_Key(cInStyleSource.KeyValue());
+
+		std::vector<CStringA> vStyleStrings;
+		int nCount = 0;
+
+		// style 검색
+		HC_Begin_Contents_Search(".", "styles");
+		{
+			HC_Show_Contents_Count(&nCount);
+
+			HC_KEY nKey;
+			char chType[MVO_BUFFER_SIZE];
+			char chPathName[MVO_BUFFER_SIZE];
+
+			for (int nIndex = 0; nIndex < nCount; nIndex++) {
+				HC_Find_Contents(chType, &nKey);
+				HC_Show_Style_Segment(nKey, chPathName);
+
+				// 삭제하지 않을 style을 검색
+				if (0 != strName.Compare(chPathName)) {
+					vStyleStrings.push_back(chPathName);
+				}
+			}
+		}
+		HC_End_Contents_Search();
+
+		// 모든 Style을 삭제
+		HC_Flush_Contents(".", "styles");
+
+		// Style 재생성
+		for (auto strStyle : vStyleStrings) {
+			HC_Style_Segment(strStyle);
+		}
+
 	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 }
 

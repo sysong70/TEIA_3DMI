@@ -31,6 +31,8 @@ namespace KERNEL
 			H3DF::SelectionItem & DynamicHighlightSelectionItem();
 
 			void UnhighlightEverything();
+
+			void Reset(bool bUpdate = true);
 		};
 	}
 }

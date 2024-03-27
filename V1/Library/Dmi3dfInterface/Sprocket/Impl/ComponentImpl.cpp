@@ -4,6 +4,7 @@
 
 
 #include "../../3DF/Segment.h"
+#include "../../3DF/Reference.h"
 #include "../../3DF/3DF.Utility.h"
 #include "../../3DF/KeyPath.h"
 #include "../../3DF/Selection.h"
@@ -23,10 +24,11 @@ H3DF::ComponentImpl::ComponentImpl()
 
 H3DF::ComponentImpl::~ComponentImpl()
 {
-	// Sub Compoent는 삭제하지 않는다. CADModel에서 한꺼번에 삭제한다.
-	// Include 구조에 의해서 한꺼번에 삭	제해야 한다.
-	// 여기서는 Array만 삭제한다.
 	if (nullptr != m_pvSubComponents) {
+		for (auto * pcSubComponent : *m_pvSubComponents) {
+			delete pcSubComponent;
+		}
+
 		delete m_pvSubComponents;
 	}
 
@@ -42,8 +44,12 @@ void H3DF::ComponentImpl::Copy(ComponentImpl * pcInThat)
 	m_eType = pcInThat->m_eType;
 	m_nStatus = pcInThat->m_nStatus;
 	m_pcOwner = pcInThat->m_pcOwner;
-	m_pvSubComponents = pcInThat->m_pvSubComponents;
 	*m_pstrName = *pcInThat->m_pstrName;
+
+	for (auto * pcSubComponent : *pcInThat->m_pvSubComponents) {
+		Component * pcComponent = new Component(*pcSubComponent);
+		m_pvSubComponents->push_back(pcComponent);
+	}
 }
 
 void H3DF::ComponentImpl::SetName(CString strInName)
@@ -57,6 +63,10 @@ CString H3DF::ComponentImpl::TypeName()
 
 	switch (m_eType)
 	{
+		case H3DF::Component::Type::ExchangeProductOccurrence:
+			strTypeName = L"ProductOccurrence";
+			break;
+
 		case H3DF::Component::Type::ExchangePartDefinition:
 			strTypeName = L"PartDefinition";
 			break;
@@ -76,7 +86,15 @@ CString H3DF::ComponentImpl::TypeName()
 			strTypeName = L"Curve";
 			break;
 
+		case H3DF::Component::Type::ExchangeRISet:
+			strTypeName = L"Group";
+			break;
+		case H3DF::Component::Type::ExchangeRIPointSet:
+			strTypeName = L"Point Set";
+			break;
+
 		default:
+			strTypeName.Format(L"Type: 0x%x", (int)m_eType);
 			break;
 	};
 
@@ -137,45 +155,153 @@ bool H3DF::ComponentImpl::AddSubComponent(Component & cInParentComponent, Compon
 	return true;
 }
 
-DWORD H3DF::ComponentImpl::Status()
-{
-	return m_nStatus;
-}
-
-DWORD H3DF::ComponentImpl::AddStatus(H3DF::Component::Status eStatus)
-{
-	m_nStatus |= eStatus;
-	return m_nStatus;
-}
-
-DWORD H3DF::ComponentImpl::RemoveStatus(H3DF::Component::Status eStatus)
-{
-	m_nStatus &= ~eStatus;
-	return m_nStatus;
-}
-
-bool H3DF::ComponentImpl::AddComponentStatus(Component & cInComponent, H3DF::Component::Status eInStatus)
+CString H3DF::ComponentImpl::TypeName(Component & cInComponent)
 {
 	ComponentImpl * pcImpl = dynamic_cast<ComponentImpl *>(cInComponent.GetImpl());
 	if (nullptr == pcImpl) {
 		DEBUG_STOP;
+		return L"";
+	}
+
+	return pcImpl->TypeName();
+}
+
+// 주어진 Component를 기준으로 상위에 있는 PartDefinition를 찾는다.
+bool H3DF::ComponentImpl::FindParentPartDefinition(Component & cInComponent, Component *& pcOutComponent)
+{
+	// In Component가 NULL이면 Parent에 PartDefinition이 없는 것으로 한다.
+	if (nullptr == &cInComponent) {
 		return false;
 	}
 
-	pcImpl->AddStatus(eInStatus);
+	if (H3DF::Component::Type::ExchangePartDefinition == cInComponent.GetType()) {
+		pcOutComponent = &cInComponent;
+		return true;
+	}
+
+	return FindParentPartDefinition(cInComponent.GetOwner(), pcOutComponent);
+}
+
+// Part Definition을 복제한다.
+bool H3DF::ComponentImpl::ClonedParentPartDefinition(Component & cInComponent)
+{
+	if (H3DF::Component::Type::ExchangePartDefinition != cInComponent.GetType()) {
+		DEBUG_STOP;
+		return false;
+	}
+
+	ClonedComponent(cInComponent, cInComponent.GetOwner(), true);
+
+	return true;
+
+	// Parent Segment에서 Include를 생성하고, Segment를 만들어서 원본의 정보를 복사한다.
+	
+	// 1. Parent Segment 설정
+	HC_KEY nOwnerKey = cInComponent.GetOwner().GetSegmentKey();
+	SegmentKey cParentSegment(cInComponent.GetOwner().GetSegmentKey());
+
+	// 2. 원본 Segment의 정보를 수집하고 Include키는 삭제.
+	IncludeKey cOriginInclude(cInComponent.GetIncludeKey());
+	SegmentKey cOirignSegment(cInComponent.GetSegmentKey());
+	CStringA strOirignSegmentName = cOirignSegment.Name();
+
+	cOriginInclude.Delete(); // Include를 삭제해서 기본에 있던 PartDefinition의 연결을 제거한다.
+
+	// 3. 새로운 Segment를 생성하고, 원본 Segment의 정보를 복사한다.
+	strOirignSegmentName.Format("%s_c%d", strOirignSegmentName, HDB::GetUniqueID());
+
+	H3DF::SegmentKey cSegment(strOirignSegmentName);
+	H3DF::IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
+
+	// 4. User Data 및 Style을 복사.
+
+	// 5. 하부 Include 정보 복사
 
 	return true;
 }
 
-bool H3DF::ComponentImpl::RemoveComponentStatus(Component & cInComponent, H3DF::Component::Status eInStatus)
+// 주어진 Component를 복제
+bool H3DF::ComponentImpl::ClonedComponent(Component & cInComponent, Component & cInOwnerComponent, bool bDeleteInclude)
 {
-	ComponentImpl * pcImpl = dynamic_cast<ComponentImpl *>(cInComponent.GetImpl());
-	if (nullptr == pcImpl) {
-		DEBUG_STOP;
-		return false;
+	// 1. Parent Segment 설정
+	SegmentKey cParentSegment(cInOwnerComponent.GetSegmentKey());
+	CStringA strParentName = cParentSegment.Name();
+
+	// 2. 원본 Segment의 정보를 수집한다.
+	IncludeKey cOriginInclude(cInComponent.GetIncludeKey());
+	SegmentKey cOirignSegment(cInComponent.GetSegmentKey());
+
+	// 3. Include를 삭제한다.
+	if (true == bDeleteInclude) {
+		cParentSegment.Flush(Search::Type::Include, Search::Space::SegmentOnly);
+
+		// 3-1. 입력받은 Component가 아닌 다른 Component는 Include 관계를 재설정한다.
+		ComponentArray & aOwnerSubComponents = cInOwnerComponent.GetSubComponents();
+		for (auto * pcSubComponent : aOwnerSubComponents) {
+			// 입력 받은 Component가 아닌 SubComponent를 찾는다.
+			if (pcSubComponent != &cInComponent) {
+				SegmentKey cSubSegment(pcSubComponent->GetSegmentKey());
+				// 새롭게 Include를 생성한다.
+				H3DF::IncludeKey cInclude = cParentSegment.IncludeSegment(cSubSegment);
+
+				ComponentImpl * pcSubImpl = dynamic_cast<ComponentImpl *>(pcSubComponent->GetImpl());
+				DEBUG_VALID(pcSubImpl);
+
+				pcSubImpl->m_nIncludeKey = cInclude.KeyValue();
+			}
+		}
 	}
 
-	pcImpl->RemoveStatus(eInStatus);
+	// 4. 새로운 Segment와 Parent Segment에서 새로운 Include를 생성.
+	CStringA strName;
+	strName.Format("%s_c%d", cOirignSegment.Name(), HDB::GetUniqueID());
+
+	H3DF::SegmentKey cSegment(strName);
+	H3DF::IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
+
+	// 5. Component의 Segment 및 Include 정보를 교체.
+	ComponentImpl * pcImpl = dynamic_cast<ComponentImpl *>(cInComponent.GetImpl());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_nSegmentKey = cSegment.KeyValue();
+	pcImpl->m_nIncludeKey = cInclude.KeyValue();
+
+	// 6. User Data 및 Style을 복사.
+	// 6-1. Style 복사
+	StyleKeyArray aOirignStyles;
+	cOirignSegment.GetStyleControl().Show(aOirignStyles);
+
+	for (auto & cStyle : aOirignStyles) {
+		SegmentKey cStyleSegment;
+		if (true == cStyle.ShowSource(cStyleSegment)) {
+			cSegment.GetStyleControl().PushSegment(cStyleSegment);
+		}
+	}
+
+	// 6-2. User Data 복사
+	H3DF::UserData::Copy(cOirignSegment, cSegment);
+
+	// 7. Goeometry 정보 Reference로 저장.
+	// 원본 Segment의 Geometry 정보를 찾는다.
+	SearchResults cResults;
+	cOirignSegment.Find(Search::Type::Geometry, Search::Space::SegmentOnly, cResults);
+
+	SearchResultsIterator cIterator = cResults.GetIterator();
+
+	while (true == cIterator.IsValid()) {
+		Key cKey = cIterator.GetItem();
+		H3DF::Type eType = cKey.Type();
+
+		cSegment.ReferenceGeometry(cKey);
+
+		cIterator.Next();
+	}
+
+	// 7. 하부 Include 정보 복사
+	ComponentArray & aSubComponents = cInComponent.GetSubComponents();
+	for (auto * pcSubComponent : aSubComponents) {
+		ClonedComponent(*pcSubComponent, cInComponent, false);
+	}
 
 	return true;
 }

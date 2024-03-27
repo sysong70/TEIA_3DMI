@@ -109,6 +109,7 @@ namespace H3DF
 	class ApplicationWindowOptionsKit;
 
 	class GeometryKey;
+	class ReferenceKey;
 
 	class PortfolioKey;
 
@@ -125,10 +126,27 @@ namespace H3DF
 		None = 0x00000000,
 		GenericMask = 0xffffff00,
 
+		World = 0x00000001,
+		UTF8 = 0x00000002,
+		EventDispatcher = 0x00000003,
+		EventHandler = 0x00000004,
+		EventNotifier = 0x00000005,
+		UpdateNotifier = 0x00000006,
+		SearchResults = 0x00000008,
+		FontSearchResults = 0x00000009,
 		SelectionResults = 0x0000000a,
 		SelectionItem = 0x0000000b,
+		TreeContext = 0x0000000c,
+		StreamToolkit = 0x0000000d,
+		DriverEventHandler = 0x0000000e,
+		HighlightSearchResults = 0x0000000f,
+		OptimizeMappingResults = 0x00000010,
 
+		SearchResultsIterator = 0x01000001,
+		FontSearchResultsIterator = 0x01000002,
 		SelectionResultsIterator = 0x01000003,
+		HighlightSearchResultsIterator = 0x01000004,
+		OptimizeMappingResultsIterator = 0x01000005,
 
 		Kit = 0x01000000,
 		MarkerKit = 0x01000010,
@@ -296,12 +314,14 @@ namespace H3DF
 
 	enum class UserDataIndex : uint32_t
 	{
-		None									= 0x00000000,
+		Type									= 0x01000001,
+		Name									= 0x01000002,
 
-		// Item 관련 User Data Index
-		Type									= 0x10000000,
-		Name									= 0x10000001,
-		ComponentType							= 0x10000002,
+		// Component 관련 Data Index
+		ComponentType							= 0x02000001,
+		ComponentStatus							= 0x02000002,
+		IncludedCount							= 0x02000003,
+		ReferenceCount							= 0x02000004,
 	};
 
 	class API_3DF ViewDirection
@@ -696,7 +716,8 @@ namespace H3DF
 	//== Type Definitions ==========================================================================
 	using SegmentKeyArray = std::vector<SegmentKey, Allocator<SegmentKey>>;
 	using IncludeKeyArray = std::vector<IncludeKey, Allocator<IncludeKey>>;
-
+	
+	using ReferenceKeyArray = std::vector<ReferenceKey, Allocator<ReferenceKey>>;
 	using LineArray = std::vector<LineKit, Allocator<LineKit>>;
 	using PolylineArray = LineArray;
 	using Polyline = LineKit;

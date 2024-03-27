@@ -67,16 +67,21 @@ namespace H3DF
 		static bool ShowSegmentName(SegmentKey & cInSegment, CString & strName);
 		static bool ShowSegmentName(HC_KEY nInKey, CString & strOutName);
 
-		static bool SetComponentType(SegmentKey & cInSegment, DWORD nInType);
+		static void SetComponentType(SegmentKey & cInSegment, DWORD nInType);
 		static bool ShowComponentType(SegmentKey & cInSegment, DWORD & eOutType);
 
-		static bool AddStatus(SegmentKey & cInSegment, DWORD & eInStatus);
-		static bool RemoveStatus(SegmentKey & cInSegment, DWORD & eInStatus);
-		static bool ShowStatus(SegmentKey & cInSegment, DWORD & eOutStatus);
+		static void AddComponentStatus(SegmentKey & cInSegment, DWORD nInStatus);
+		static void RemoveComponentStatus(SegmentKey & cInSegment, DWORD nInStatus);
+		static bool ShowComponentStatus(SegmentKey & cInSegment, DWORD & nOutStatus);
+
+		static void SetIncludedCount(SegmentKey & cInSegment, DWORD nInCount);
+		static bool ShowIncludedCount(SegmentKey & cInSegment, DWORD & nOutCount);
+		static void UnsetIncludedCount(SegmentKey & cInSegment);
+
+		static void Copy(SegmentKey & cInSourceSegment, SegmentKey & cInTargetSegment);
 
 		//== Geomety User Data 관련 함수 ============================================================= 
-		static bool SetComponentType(GeometryKey & cInGeometry, DWORD nInType);
-		static bool AddTopologyType(GeometryKey & cInGeometry, DWORD nInType);
+		static void SetComponentType(GeometryKey & cInGeometry, DWORD nInType);
 		static bool ShowComponentType(GeometryKey & cInGeometry, DWORD & eOutType);
 	};
 };

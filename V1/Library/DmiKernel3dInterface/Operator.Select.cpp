@@ -234,7 +234,7 @@ int KERNEL::Operator::Select::LButtonUp(HEventInfo & cInEvent)
 	}
 
 	// 4. ModelPanel에 선택된 객체를 전달
-	pcImpl->ModelPanel().SetSelectItem(cSelItem);
+	pcImpl->ModelPanel().SelectItem(cSelItem);
 
 	pcImpl->View().Update();
 
@@ -265,6 +265,14 @@ void KERNEL::Operator::Select::SetObjectSnapMode(OSnap::Type eInType)
 	}
 
 	pcImpl->m_cHighlightOSnapOperator.SetObjectSnapMode(pcImpl->m_nOSnapMode);
+}
+
+void KERNEL::Operator::Select::ResetSnapItems(bool bUpdate)
+{
+	auto * pcImpl = (SelectImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_cHighlightOSnapOperator.Reset(bUpdate);
 }
 
 //== Select 관련 함수 ================================================================================

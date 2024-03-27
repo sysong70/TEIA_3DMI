@@ -988,11 +988,36 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 		H3DF::SegmentKey cSegment(nSegmentKey);
 		H3DF::IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
 
-		// #CADModel: ParsePart 추가. 값은 새롭게 생성해서 넣도록 한다.
-		H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, L"", H3DF::Component::Type::ExchangePartDefinition, cParentComponent);
-		DEBUG_VALID(pcComponent);
+		DWORD nIncludeCount = 0;
 
- 		if (nullptr != pcComponent) {
+		if (true == H3DF::UserData::ShowIncludedCount(cSegment, nIncludeCount)) {
+			nIncludeCount++;
+		}
+		else {
+			// 저장된 Include Count가 없는 경우는 2로 설정한다. 처음 1번, 이제 다시 Include되었으므로 2번이 된다.
+			nIncludeCount = 2;
+		}
+
+		H3DF::UserData::SetIncludedCount(cSegment, nIncludeCount);
+
+		// #CADModel: ParsePart 추가. 값은 새롭게 생성해서 넣도록 한다.
+
+		// 1. CADModel에 들어있는 Component맵에서 Key값을 이용해서 Component를 찾도록 한다.
+		H3DF::CADModelImpl * pcCdModelImpl = dynamic_cast<H3DF::CADModelImpl *>(m_pcCADModel->GetImpl());
+		DEBUG_VALID(pcCdModelImpl);
+
+		H3DF::Component * pcFindComponent = nullptr;
+		pcCdModelImpl->m_pmComponentMap->Lookup(nSegmentKey, pcFindComponent);
+
+		// 2. 찾은 Component를 복사해서 새로운 Component를 생성한다. 이렇게 해야 tree에서 별도의 Component로 인식해서 UI와 연동해서 작업할 수 있음.
+		H3DF::Component * pcComponent = new H3DF::Component(*pcFindComponent);
+
+		// 새롭게 생성된 Component에서 Include Key를 변경한다.
+		H3DF::ComponentImpl * pcComponentImpl = dynamic_cast<H3DF::ComponentImpl *>(pcComponent->GetImpl());
+		pcComponentImpl->m_pcOwner = &cParentComponent;
+		pcComponentImpl->m_nIncludeKey = cInclude.KeyValue();
+
+ 		if (nullptr != pcFindComponent) {
 			H3DF::ComponentImpl::AddSubComponent(cParentComponent, *pcComponent);
  		}
 
@@ -1015,29 +1040,38 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 
 	cSegment.Open();
 
+	H3DF::UserData::SetComponentType(cSegment, (DWORD)H3DF::Component::Type::ExchangePartDefinition);
+
 	A3DMiscCascadedAttributes * pcAttr;
 	A3DMiscCascadedAttributesData cAttrData;
 	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcPart, pcParentAttr, &pcAttr, &cAttrData));
 
-	if (cAttrData.m_bShow && !cAttrData.m_bRemoved && A3D_SUCCESS == IsShow(pcPart))
-	{
-		A3DAsmPartDefinitionData sData;
-		A3D_INITIALIZE_DATA(A3DAsmPartDefinitionData, sData);
-		CHECK_A3D_RETURN(A3DAsmPartDefinitionGet(pcPart, &sData));
-
-		if (0 < sData.m_uiRepItemsSize)
-		{
-			for (A3DUns32 nIndex = 0; nIndex < sData.m_uiRepItemsSize; nIndex++) {
-				CHECK_A3D_RETURN(ParseRiRepresentationItem(sData.m_ppRepItems[nIndex], cSegment, pcAttr, *pcComponent));
-			}
-		}
-
-		if (0 < sData.m_uiAnnotationsSize) {
-			ParseAnnotations(sData.m_ppAnnotations, sData.m_uiAnnotationsSize, cSegment);
-		}
-
-		CHECK_A3D_RETURN(A3DAsmPartDefinitionGet(nullptr, &sData));
+	if (cAttrData.m_bShow && !cAttrData.m_bRemoved && A3D_SUCCESS == IsShow(pcPart)) {
+		// Show 상태에서는 별도 처리하지 않는다.
 	}
+	else {
+		cSegment.GetStyleControl().PushSegment(m_cNoShowStyle);
+
+		pcComponent->AddStatus(H3DF::Component::Status::Hide);
+		pcComponent->AddStatus(H3DF::Component::Status::NoShow);
+	}
+
+	A3DAsmPartDefinitionData sData;
+	A3D_INITIALIZE_DATA(A3DAsmPartDefinitionData, sData);
+	CHECK_A3D_RETURN(A3DAsmPartDefinitionGet(pcPart, &sData));
+
+	if (0 < sData.m_uiRepItemsSize)
+	{
+		for (A3DUns32 nIndex = 0; nIndex < sData.m_uiRepItemsSize; nIndex++) {
+			CHECK_A3D_RETURN(ParseRiRepresentationItem(sData.m_ppRepItems[nIndex], cSegment, pcAttr, *pcComponent));
+		}
+	}
+
+	if (0 < sData.m_uiAnnotationsSize) {
+		ParseAnnotations(sData.m_ppAnnotations, sData.m_uiAnnotationsSize, cSegment);
+	}
+
+	CHECK_A3D_RETURN(A3DAsmPartDefinitionGet(nullptr, &sData));
 
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttr));
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrData));
@@ -1161,8 +1195,8 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 			cSegment.GetStyleControl().PushSegment(m_cNoShowStyle);
 		}
 
-		H3DF::CADModelImpl::AddComponentStatus(*pcComponent, H3DF::Component::Status::Hide);
-		H3DF::CADModelImpl::AddComponentStatus(*pcComponent, H3DF::Component::Status::NoShow);
+		pcComponent->AddStatus(H3DF::Component::Status::Hide);
+		pcComponent->AddStatus(H3DF::Component::Status::NoShow);
 	}
 
 	A3DRiRepresentationItemData cRepItemData;
@@ -6092,8 +6126,8 @@ H3DF::Component * TdfImport::AddComponent(SegmentKey & cInSegment, IncludeKey & 
 {
 	DEBUG_VALID(m_pcCADModel);
 
-// 	H3DF::CADModelImpl * pcCdModelImpl = dynamic_cast<H3DF::CADModelImpl *>(m_pcCADModel->GetImpl());
-// 	DEBUG_VALID(pcCdModelImpl);
+	H3DF::CADModelImpl * pcCdModelImpl = dynamic_cast<H3DF::CADModelImpl *>(m_pcCADModel->GetImpl());
+	DEBUG_VALID(pcCdModelImpl);
 
 	H3DF::Component * pcComponent = new H3DF::Component();
 	DEBUG_VALID(pcComponent);
@@ -6101,7 +6135,7 @@ H3DF::Component * TdfImport::AddComponent(SegmentKey & cInSegment, IncludeKey & 
 	H3DF::ComponentImpl::SetData(*pcComponent, strInName, cInSegment.KeyValue(), cInInclude.KeyValue(), eInType);
 	H3DF::ComponentImpl::AddSubComponent(cInParentComponent, *pcComponent);
 
-	//pcCdModelImpl->MapSetAt(cInSegment.KeyValue(), pcComponent);
+	pcCdModelImpl->MapSetAt(cInSegment.KeyValue(), pcComponent);
 
 	return pcComponent;
 }
@@ -6110,8 +6144,8 @@ H3DF::Component * TdfImport::AddComponent(SegmentKey & cInSegment, CString strIn
 {
 	DEBUG_VALID(m_pcCADModel);
 
-	// 	H3DF::CADModelImpl * pcCdModelImpl = dynamic_cast<H3DF::CADModelImpl *>(m_pcCADModel->GetImpl());
-	// 	DEBUG_VALID(pcCdModelImpl);
+	H3DF::CADModelImpl * pcCdModelImpl = dynamic_cast<H3DF::CADModelImpl *>(m_pcCADModel->GetImpl());
+	DEBUG_VALID(pcCdModelImpl);
 
 	H3DF::Component * pcComponent = new H3DF::Component();
 	DEBUG_VALID(pcComponent);
@@ -6119,7 +6153,7 @@ H3DF::Component * TdfImport::AddComponent(SegmentKey & cInSegment, CString strIn
 	H3DF::ComponentImpl::SetData(*pcComponent, strInName, cInSegment.KeyValue(), INVALID_KEY, eInType);
 	H3DF::ComponentImpl::AddSubComponent(cInParentComponent, *pcComponent);
 
-	//pcCdModelImpl->MapSetAt(cInSegment.KeyValue(), pcComponent);
+	pcCdModelImpl->MapSetAt(cInSegment.KeyValue(), pcComponent);
 
 	return pcComponent;
 }

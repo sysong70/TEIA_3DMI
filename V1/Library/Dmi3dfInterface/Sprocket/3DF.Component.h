@@ -141,13 +141,13 @@ namespace H3DF
             MarkupsComponent = 0x01000003, // Represents a model component
         };
 
-		enum API_3DF Status
+		enum Status
 		{
-			Normal = 0x0001,
-			End = 0x0002,
-			UiUpdate = 0x0004,
-			Hide = 0x0008,			// 원래 Hide된 경우, Reset할때 사용하기 위한 Status
-			NoShow = 0x0010,		// NoShow된 경우
+            None = 0x0000,
+			End = 0x0001,
+			UiUpdate = 0x0002,
+			Hide = 0x0004,			// 원래 Hide된 경우, Reset할때 사용하기 위한 Status
+			NoShow = 0x0008,		// NoShow된 경우
 		};
 
 		Component();
@@ -156,22 +156,26 @@ namespace H3DF
 		void Set(Component const & cInThat);
 		Component & operator = (Component const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::Component; };
+        H3DF::Type ObjectType() const { return H3DF::Type::Component; };
 
-        // bool Equals(Component const & cInThat) const;
+        bool Equals(Component const & cInThat) const;
 
-        Type GetType() const;
+        H3DF::Component::Type GetType() const;
 
         HC_KEY GetSegmentKey() const;
         HC_KEY GetIncludeKey() const;
 
         Component & GetOwner() const;
 
-        ComponentArray & GetSubcomponents() const;
+        ComponentArray & GetSubComponents() const;
 
         CString GetName() const;
 
         DWORD GetStatus();
+		DWORD AddStatus(Component::Status eStatus);
+		DWORD RemoveStatus(Component::Status eStatus);
+
+        bool IsRepresentationItem();
 
         static KeyPath GetKeyPath(Component const & cInComponent);
 	};

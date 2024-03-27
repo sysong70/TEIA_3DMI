@@ -8,24 +8,26 @@ using namespace H3DF;
 
 H3DF::CADModelImpl::CADModelImpl()
 {
-	//m_pmComponentMap = new CAtlMap<HC_KEY, Component *>;
+	m_pmComponentMap = new CAtlMap<HC_KEY, Component *>;
 }
 
 H3DF::CADModelImpl::~CADModelImpl()
 {
-// 	if (nullptr != m_pmComponentMap) {
-// 
-// 		POSITION pcPosition = m_pmComponentMap->GetStartPosition();
-// 
-// 		while (nullptr != pcPosition)
-// 		{
-// 			Component * pcComponent = m_pmComponentMap->GetNextValue(pcPosition);
-// 			delete pcComponent;
-// 		}
-// 
-// 		m_pmComponentMap->RemoveAll();
-// 		delete m_pmComponentMap;
-// 	}
+	if (nullptr != m_pmComponentMap) {
+/*
+		// 각각의 Component에서 삭제하기 때문에 여기서는 삭제하지 않음.
+		// Map에서 찾은 Component를 복사해서 Sub Component로 사용하고 있기 때문에 여기서 삭제하면 안됨.
+		POSITION pcPosition = m_pmComponentMap->GetStartPosition();
+
+		while (nullptr != pcPosition) {
+			Component * pcComponent = m_pmComponentMap->GetNextValue(pcPosition);
+			delete pcComponent;
+		}
+
+		m_pmComponentMap->RemoveAll();
+*/
+		delete m_pmComponentMap;
+	}
 }
 
 void H3DF::CADModelImpl::Copy(CADModelImpl * pcInThat)
@@ -64,6 +66,15 @@ CString H3DF::CADModelImpl::TypeName(const Component & cInComponent)
 			strTypeName.Format(L"%s %d", strTypeName, m_nSurfaceIndex++);
 			break;
 
+		case Component::Type::ExchangeRISet:
+			strTypeName.Format(L"%s %d", strTypeName, m_nGroupIndex++);
+			break;
+
+		case Component::Type::ExchangeRIPointSet:
+			strTypeName.Format(L"%s %d", strTypeName, m_nPointSetIndex
+				++);
+			break;
+
 		default:
 			break;
 	}
@@ -71,7 +82,12 @@ CString H3DF::CADModelImpl::TypeName(const Component & cInComponent)
 	return strTypeName;
 }
 
-// void H3DF::CADModelImpl::MapSetAt(HC_KEY nInKey, Component * pcInComponent)
-// {
-// 	m_pmComponentMap->SetAt(nInKey, pcInComponent);
-// }
+Component & H3DF::CADModelImpl::ModelComponent()
+{
+	return *m_pcModels;
+}
+
+void H3DF::CADModelImpl::MapSetAt(HC_KEY nInKey, Component * pcInComponent)
+{
+	m_pmComponentMap->SetAt(nInKey, pcInComponent);
+}
