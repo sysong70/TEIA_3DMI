@@ -441,6 +441,14 @@ HC_KEY H3DF::Painter::Figure::CreateDonut(H3DF::Point center, double inner, doub
 
 
 
+HC_KEY API_3DF H3DF::Painter::Figure::CreatePlus(H3DF::Point center, double size)
+{
+    DEBUG_STOP;
+    return HC_ERROR_KEY;
+}
+
+
+
 HC_KEY H3DF::Painter::Figure::CreateObround(H3DF::Point topLeft, H3DF::Point bottomRight)
 {
     Points points;
@@ -463,15 +471,27 @@ HC_KEY H3DF::Painter::Figure::CreateRectangle(H3DF::Point topLeft, H3DF::Point b
     H3DF::Point points[5];
 
     points[0] = topLeft;
-    points[1].x = bottomRight.x; points[1].y = topLeft.y;
+    points[1].Set(bottomRight.x, topLeft.y, 0);
     points[2] = bottomRight;
-    points[3].x = topLeft.x; points[3].y = bottomRight.y;
-    points[4] = topLeft;
+    points[3].Set(topLeft.x, bottomRight.y, 0);
+    points[4] = points[0];
 
     HC_KEY key = HC_Insert_Polygon(5, points);
     ASSERT(key != HC_ERROR_KEY);
 
     return key;
+}
+
+
+
+HC_KEY API_3DF H3DF::Painter::Figure::CreateSquare(H3DF::Point center, double size)
+{
+    float edge = size / 2;
+
+    return CreateRectangle(
+        H3DF::Point(center.x - size, center.y - size, 0),
+        H3DF::Point(center.x + size, center.y + size, 0)
+   );
 }
 
 #pragma endregion //:REGION

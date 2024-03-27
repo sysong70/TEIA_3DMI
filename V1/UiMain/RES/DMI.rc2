@@ -47,6 +47,7 @@ HOME_3D_CMD_Visualize_ShowAll                     SVG       "res/svg/HOME_3D_CMD
 HOME_3D_CMD_Visualize_Hide                        SVG       "res/svg/HOME_3D_CMD_Visualize_Hide.svg"
 HOME_3D_CMD_Visualize_ShowOnly                    SVG       "res/svg/HOME_3D_CMD_Visualize_ShowOnly.svg"
 HOME_3D_CMD_Visualize_Toggle                      SVG       "res/svg/HOME_3D_CMD_Visualize_Toggle.svg"
+HOME_3D_CMD_Visualize_Reset                       SVG       "res/svg/HOME_3D_CMD_Visualize_Reset.svg"
 HOME_3D_LST_VisualEffects                         SVG       "res/svg/HOME_3D_LST_VisualEffects.svg"
 HOME_3D_CMD_VisualEffects_Shadow                  SVG       "res/svg/HOME_3D_CMD_VisualEffects_Shadow.svg"
 HOME_3D_CMD_VisualEffects_Reflection              SVG       "res/svg/HOME_3D_CMD_VisualEffects_Reflection.svg"

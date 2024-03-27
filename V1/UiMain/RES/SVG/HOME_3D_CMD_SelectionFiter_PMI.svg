@@ -4,15 +4,22 @@
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="32px"
 	 height="32px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
 <g id="Background" display="none">
-	<rect x="-225.667" y="-262.333" display="inline" fill="#363636" width="540" height="407.333"/>
+	<rect x="-265.667" y="-262.333" display="inline" fill="#363636" width="540" height="407.333"/>
 </g>
 <g id="Layer_1">
+	<g display="none">
+		<path display="inline" fill="#F2F2F2" d="M16,41c-2.757,0-5-2.243-5-5s2.243-5,5-5s5,2.243,5,5S18.757,41,16,41z"/>
+		<g display="inline">
+			<path fill="#3B9ADC" d="M16,32c2.206,0,4,1.794,4,4s-1.794,4-4,4s-4-1.794-4-4S13.794,32,16,32 M16,30c-3.313,0-6,2.688-6,6
+				s2.688,6,6,6s6-2.688,6-6S19.313,30,16,30L16,30z"/>
+		</g>
+	</g>
 	<g>
 		<g>
 			<g>
 				<polyline fill="none" stroke="#F2F2F2" stroke-width="2" stroke-miterlimit="10" points="5,23 10,10 15,10 				"/>
 				<g>
-					<polygon fill="#F2F2F2" points="7.738,22.354 2.456,29.615 3.4,20.687 					"/>
+					<polygon fill="#F2F2F2" points="7.738,22.354 2.455,29.615 3.4,20.687 					"/>
 				</g>
 			</g>
 		</g>

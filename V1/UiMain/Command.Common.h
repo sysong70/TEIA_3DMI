@@ -50,6 +50,7 @@ ITEM_DEF(ListItem            , HOME_3D_CMD_Visualize_ShowAll                    
 ITEM_DEF(ListItem            , HOME_3D_CMD_Visualize_Hide                        , L"HOME_3D_CMD_Visualize_Hide")
 ITEM_DEF(ListItem            , HOME_3D_CMD_Visualize_ShowOnly                    , L"HOME_3D_CMD_Visualize_ShowOnly")
 ITEM_DEF(ListItem            , HOME_3D_CMD_Visualize_Toggle                      , L"HOME_3D_CMD_Visualize_Toggle")
+ITEM_DEF(ListItem            , HOME_3D_CMD_Visualize_Reset                       , L"HOME_3D_CMD_Visualize_Reset")
 ITEM_DEF(List                , HOME_3D_LST_VisualEffects                         , L"HOME_3D_LST_VisualEffects")
 ITEM_DEF(ListItem            , HOME_3D_CMD_VisualEffects_Shadow                  , L"HOME_3D_CMD_VisualEffects_Shadow")
 ITEM_DEF(ListItem            , HOME_3D_CMD_VisualEffects_Reflection              , L"HOME_3D_CMD_VisualEffects_Reflection")
