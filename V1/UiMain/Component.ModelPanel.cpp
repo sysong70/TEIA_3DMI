@@ -740,7 +740,8 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 	}
 
 	if (pData->GetBoolean(SKW_EXPAND) == false) {
-		Control().Expand(hParent, TVE_COLLAPSE);
+		//:TEST
+		//Control().Expand(hParent, TVE_COLLAPSE);
 	}
 }
 
