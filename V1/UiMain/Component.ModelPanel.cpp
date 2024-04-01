@@ -735,7 +735,8 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 
 	// Use last item
 	if (childCount != checkedCount) {
-		Control().TreeItem(hChild)->UpdateParentCheckbox();
+		//:TEST
+		//Control().TreeItem(hChild)->UpdateParentCheckbox();
 	}
 
 	if (pData->GetBoolean(SKW_EXPAND) == false) {
