@@ -735,13 +735,11 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 
 	// Use last item
 	if (childCount != checkedCount) {
-		//:TEST
-		//Control().TreeItem(hChild)->UpdateParentCheckbox();
+		Control().TreeItem(hChild)->UpdateParentCheckbox();
 	}
 
 	if (pData->GetBoolean(SKW_EXPAND) == false) {
-		//:TEST
-		//Control().Expand(hParent, TVE_COLLAPSE);
+		Control().Expand(hParent, TVE_COLLAPSE);
 	}
 }
 
@@ -868,6 +866,8 @@ HTREEITEM Component::ModelPanel::GetItem(DWORD_PTR key)
 
 void Component::ModelPanel::RedrawTree(bool value)
 {
+	DEBUG_TRACE(L"RedrawTree: %s", value ? L"true" : L"false");
+
 	Control().SetRedraw(value);
 	Control().EnableTreeCtrlNotifications(value);
 
