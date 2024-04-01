@@ -132,7 +132,6 @@
     <ClInclude Include="Kernel.Application.h" />
     <ClInclude Include="Kernel.h" />
     <ClInclude Include="Kernel.DocView.h" />
-    <ClInclude Include="Manager.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Operator.Camera.h" />
     <ClInclude Include="Operator.h" />
@@ -166,7 +165,6 @@
     <ClCompile Include="Kernel.Application.cpp" />
     <ClCompile Include="Kernel.cpp" />
     <ClCompile Include="Kernel.DocView.cpp" />
-    <ClCompile Include="Manager.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Operator.Camera.cpp" />
     <ClCompile Include="Operator.cpp" />

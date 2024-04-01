@@ -2,9 +2,13 @@
 
 #include "Session.h"
 
+#include "Manager.Session.h"
+
 #include "../DmiKernel3dInterface/Kernel.DocView.h"
 
 #include "../../UiMain/Command.Resource.h"
+
+#define FILE_OPEN_TIMER_ID		100001
 
 SESSION::Session::Session()
 {
@@ -37,6 +41,9 @@ void SESSION::Session::ViewInitialize(Json::Object & cInObject, Signal::Delivery
 {
 	m_pcDocView->SetDelivery(cInstance);
 	m_pcDocView->Initialize(cInObject);
+
+	HWND hWnd = (HWND)cInObject.GetDwordPtr(SKW_HWND);
+	SetTimer(hWnd, FILE_OPEN_TIMER_ID, 100, OnTimerCallback);
 }
 
 void SESSION::Session::ViewPaint(Json::Object & cInObject)
@@ -49,9 +56,25 @@ void SESSION::Session::ViewResize(Json::Object & cInObject)
 	m_pcDocView->Resize(cInObject);
 }
 
-KERNEL::DocView * SESSION::Session::GetView()
+KERNEL::DocView * SESSION::Session::GetDocView()
 {
 	return m_pcDocView;
+}
+
+void CALLBACK SESSION::Session::OnTimerCallback(HWND hWnd, UINT nMsg, UINT_PTR nTimerId, DWORD dwTime)
+{
+	Session * pcSession = theSessionManager.GetSession(hWnd);
+	if (nullptr == pcSession) {
+		DEBUG_STOP;
+		return;
+	}
+
+	if (FILE_OPEN_TIMER_ID == nTimerId) {
+		KERNEL::DocView * pcDocView = pcSession->GetDocView();
+		pcDocView->FileOpenTimer();
+	}
+
+	KillTimer(hWnd, nTimerId);
 }
 
 //== Mouse 관련 함수 =================================================================================
@@ -184,7 +207,14 @@ void SESSION::Session::ViewExecuteCommand(Json::Object & cInObject)
 			return;
 			break;
 	}
+	switch (nId)
+	{
+		case CUSTOM_3D_CMD_SYSONG_Test1:
+			m_pcDocView->TestCommand(nId);
+			return;
+			break;
 
+	}
 
 	assert(false);
 }

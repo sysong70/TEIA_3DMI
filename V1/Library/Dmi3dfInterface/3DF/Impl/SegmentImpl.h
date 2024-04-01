@@ -47,7 +47,7 @@ namespace H3DF
 		bool IsLocalOpen() const;
 		bool IsForcedOpen() const;
 
-		void SetColor(CString strInGeometryName, RGBAColor cInColor);
+		void SetColor(CStringA strInGeometryName, RGBAColor cInColor);
 
 		BaseView * GetBaseView() const;
 		void SetBaseView(BaseView * pcInBaseView);

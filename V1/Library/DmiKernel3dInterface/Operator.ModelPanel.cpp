@@ -268,7 +268,7 @@ KERNEL::Operator::ModelPanel::ModelPanel(const DocView * pcInDocView)
 // #ModelPanel: Initialize
 void KERNEL::Operator::ModelPanel::Initialize(H3DF::CADModel & cInCadModel)
 {
-	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
+	auto * pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_pcCadModel = &cInCadModel;

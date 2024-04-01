@@ -56,6 +56,8 @@ namespace KERNEL
 			void NoShowStyleToShowStyle();
 
 			void SetShowComponent(H3DF::Component & cInComponent, bool bShowFlag, bool bRecursive = true);
+
+			void ResetShowComponent(H3DF::Component & cInComponent, bool bRecursive = true);
 		};
 	}
 }
@@ -191,6 +193,25 @@ void KERNEL::Operator::AttributeImpl::SetShowComponent(H3DF::Component & cInComp
 	
 		if (true == bRecursive) {
 			SetShowComponent(*pcSubComponent, bShowFlag, bRecursive);
+		}
+	}
+}
+
+void KERNEL::Operator::AttributeImpl::ResetShowComponent(H3DF::Component & cInComponent, bool bRecursive)
+{
+	ModelImpl & cModelImpl = GetModelImpl();
+
+	bool bShowFlag = true;
+
+	if (H3DF::Component::Hide == cInComponent.GetStatus()) {
+		bShowFlag = false;
+	}
+
+	SetShowComponent(cInComponent, bShowFlag, false);
+
+	if (true == bRecursive) {
+		for (H3DF::Component * pcSubComponent : cInComponent.GetSubComponents()) {
+			ResetShowComponent(*pcSubComponent, bRecursive);
 		}
 	}
 }
@@ -382,6 +403,27 @@ bool KERNEL::Operator::Attribute::ShowToggle()
 	pcDocViewImpl->Camera().FitWorldOnly();
 
 	pcImpl->Updated();
+
+	return true;
+}
+
+bool KERNEL::Operator::Attribute::ShowReset()
+{
+	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	DocViewImpl * pcDocViewImpl = dynamic_cast<DocViewImpl *>(pcImpl->GetDocView().GetImpl());
+	DEBUG_VALID(pcDocViewImpl);
+
+	pcImpl->PrepareUpdate();
+
+	pcImpl->ResetShowComponent(pcImpl->GetDocView().CADModel(), true);
+
+	pcDocViewImpl->ModelPanel().CheckedUpdate(pcImpl->GetDocView().CADModel());
+
+	pcImpl->Updated();
+
+	pcDocViewImpl->Camera().FitWorldOnly();
 
 	return true;
 }

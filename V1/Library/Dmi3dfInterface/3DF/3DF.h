@@ -84,6 +84,11 @@ namespace H3DF
 	class StyleKey;
 	class NamedStyleDefinition;
 
+	class CuttingSectionKit;
+	class CuttingSectionKey;
+	class CuttingSectionAttributeKit;
+	class CuttingSectionAttributeControl;
+
 	class PerformanceKit;
 	class PerformanceControl;
 
@@ -157,6 +162,14 @@ namespace H3DF
 		VisualEffectsKit = 0x01000015,
 		CuttingSectionAttributeKit = 0x01000016,
 		CircleKit = 0x01000017,
+		CircularArcKit = 0x01000018,
+		CircularWedgeKit = 0x01000019,
+		CuttingSectionKit = 0x0100001a,
+		CylinderKit = 0x0100001b,
+		DistantLightKit = 0x0100001c,
+		EllipseKit = 0x0100001d,
+		EllipticalArcKit = 0x0100001e,
+		InfiniteLineKit = 0x0100001f,
 		LineKit = 0x01000020,
 		ShellKit = 0x01000027,
 		MaterialKit = 0x01000029,

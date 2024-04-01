@@ -45,8 +45,6 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject)
 	//:Ken - 20240229
 	ASSERT(::IsWindow((HWND)nWindowHandle) == TRUE);
 	
-	CString strFilePathName = cInObject.GetString(SKW_FILEPATH);
-
 	H3DF::ApplicationWindowOptionsKit cOptions;
 
 	pcImpl->m_pcCanvas = H3DF::Factory::CreateCanvas(nWindowHandle, "3DMI_Canvas", cOptions);
@@ -58,11 +56,31 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject)
 	pcImpl->AllocationOperator(this);
 
 	pcImpl->m_pcCanvas->SetDelivery(pcImpl->Delivery(), pcImpl->m_nViewId);
+
+	// Timer를 이용해서 File을 Open하기 위해서, File Path Name을 저장한다.
+	CString strFilePathName = cInObject.GetString(SKW_FILEPATH);
+	if (true != strFilePathName.IsEmpty()) {
+		pcImpl->m_strFilePathName = strFilePathName;
+	}
+
+/*
 	pcImpl->m_pcCanvas->FileOpen(cInObject, pcImpl->CADModel());
 
 	// #ModelPanel: File Open한 후에, CADModel을 이용해서 ModelPanel을 초기화한다.
 	pcImpl->ModelPanel().Initialize(pcImpl->CADModel());
+*/
 	//pcImpl->ModelPanel().Initialize(strFilePathName);
+}
+
+void KERNEL::DocView::FileOpenTimer()
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_pcCanvas->FileOpen(pcImpl->m_strFilePathName, pcImpl->CADModel());
+
+	// #ModelPanel: File Open한 후에, CADModel을 이용해서 ModelPanel을 초기화한다.
+	pcImpl->ModelPanel().Initialize(pcImpl->CADModel());
 }
 
 // 3. H3DF View Paint 함수
@@ -116,6 +134,14 @@ int KERNEL::DocView::ViewId()
 	DocViewImpl * pcImpl = (DocViewImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 	return pcImpl->m_nViewId;
+}
+
+HWND KERNEL::DocView::GetHwnd()
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetCanvas().GetHwnd();
 }
 
 H3DF::Canvas & KERNEL::DocView::Canvas() const
@@ -502,8 +528,8 @@ void KERNEL::DocView::SetMeasure(int nId)
 
 }
 
+//== View Style 관련 함수 ============================================================================
 
-//== Style 관련 함수 =================================================================================
 void KERNEL::DocView::SetViewStyle(int nStyleId)
 {
 	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
@@ -546,6 +572,7 @@ void KERNEL::DocView::SetVisibility(int nId)
 	pcImpl->SetVisibility(nId);
 }
 
+//== View Direction 관련 함수 =======================================================================
 
 void KERNEL::DocView::SetViewDirection(int nDirectionId)
 {
@@ -621,4 +648,21 @@ void KERNEL::DocView::ModelPanelSignal(Json::Object & cInObject)
 
 	// Delivery는 ModelPanel 선언할 때 이미 할당함.
 	pcImpl->ModelPanel().Signal(cInObject);
+}
+
+//== 임시 Test용 함수 ================================================================================
+void KERNEL::DocView::TestCommand(int nId)
+{
+	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	switch (nId)
+	{
+		case CUSTOM_3D_CMD_SYSONG_Test1:
+			pcImpl->SetVisibility(nId);
+			break;
+
+		default:
+			break;
+	}
 }

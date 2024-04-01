@@ -82,14 +82,14 @@ void KERNEL::DocViewImpl::SetDelivery(const Signal::Delivery * pcInDelivery)
 	m_pcDelivery = pcInDelivery;
 }
 
-//== Operator 관련 함수 ==============================================================================
-
 void KERNEL::DocViewImpl::CancelCommands()
 {
 	m_cSelectionResult.Reset();
 	Select().UnhighlightEverything();
 	GetCanvas().GetFrontView().GetWindowKey().Update();
 }
+
+//== Operator 관련 함수 ==============================================================================
 
 void KERNEL::DocViewImpl::AllocationOperator(const DocView * pcInDocView)
 {
@@ -171,6 +171,10 @@ void KERNEL::DocViewImpl::SetVisibility(int nId)
 
 		case HOME_3D_CMD_Visualize_Toggle:
 			pcOperator->ShowToggle();
+			break;
+
+		case HOME_3D_CMD_Visualize_Reset:
+			pcOperator->ShowReset();
 			break;
 
 		default:

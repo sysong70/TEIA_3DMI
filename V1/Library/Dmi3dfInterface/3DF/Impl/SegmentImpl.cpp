@@ -233,18 +233,18 @@ bool H3DF::SegmentKeyImpl::IsForcedOpen() const
 	return m_bForcedOpen;
 }
 
-void H3DF::SegmentKeyImpl::SetColor(CString strInGeometryName, RGBAColor cInColor)
+void H3DF::SegmentKeyImpl::SetColor(CStringA strInGeometryName, RGBAColor cInColor)
 {
-	CString strColorText;
+	CStringA strColorText;
 	if (1.0f == cInColor.alpha) {
-		strColorText.Format(L"%s = (diffuse = (r=%f g=%f b=%f))", strInGeometryName, cInColor.red, cInColor.green, cInColor.blue);
+		strColorText.Format("%s = (diffuse = (r=%f g=%f b=%f))", strInGeometryName, cInColor.red, cInColor.green, cInColor.blue);
 	}
 	else {
 		float fTransparency = 1.0f - cInColor.alpha;
-		strColorText.Format(L"%s = (diffuse = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", strInGeometryName, cInColor.red, cInColor.green, cInColor.blue, fTransparency, fTransparency, fTransparency);
+		strColorText.Format("%s = (diffuse = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", strInGeometryName, cInColor.red, cInColor.green, cInColor.blue, fTransparency, fTransparency, fTransparency);
 	}
 
-	HC_Set_Color(Utility::ToChar(strColorText));
+	HC_Set_Color(strColorText);
 }
 
 BaseView * H3DF::SegmentKeyImpl::GetBaseView() const

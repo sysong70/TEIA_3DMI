@@ -20,12 +20,16 @@ namespace KERNEL
 		void SetDelivery(Signal::Delivery & cDelivery);
 
 		void Initialize(Json::Object & cInObject);
+		void FileOpenTimer();
+
 		void Paint(Json::Object & cInObject);
 		void Resize(Json::Object & cInObject);
 		void CancelCommands();
 
 		void ViewId(int nViewId);
 		int ViewId();
+
+		HWND GetHwnd();
 
 		H3DF::Canvas & Canvas() const;
 		H3DF::CADModel & CADModel() const;
@@ -79,5 +83,8 @@ namespace KERNEL
 
 		//== Panel 관련 함수 =========================================================================
 		void ModelPanelSignal(Json::Object & cInObject);
+
+		//== 임시 Test용 함수 ========================================================================
+		void TestCommand(int nId);
 	};
 };

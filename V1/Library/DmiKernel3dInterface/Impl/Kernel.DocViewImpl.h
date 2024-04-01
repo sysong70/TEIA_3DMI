@@ -34,6 +34,7 @@ namespace KERNEL
 			m_pcCanvas = pcInThat->m_pcCanvas;
 			m_nViewId = pcInThat->m_nViewId;
 			m_pcDelivery = pcInThat->m_pcDelivery;
+			m_strFilePathName = pcInThat->m_strFilePathName;
 		}
 
 		int m_nViewId = -1;
@@ -87,5 +88,7 @@ namespace KERNEL
 		H3DF::Point2D m_cLButtonDownPosition;
 
 		DWORD m_nMouseWhellStartTick;
+
+		CString m_strFilePathName;
 	};
 }

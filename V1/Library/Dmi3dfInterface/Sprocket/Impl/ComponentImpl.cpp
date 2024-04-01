@@ -64,7 +64,8 @@ CString H3DF::ComponentImpl::TypeName()
 	switch (m_eType)
 	{
 		case H3DF::Component::Type::ExchangeProductOccurrence:
-			strTypeName = L"ProductOccurrence";
+			//strTypeName = L"ProductOccurrence";
+			strTypeName = L"Product";
 			break;
 
 		case H3DF::Component::Type::ExchangePartDefinition:

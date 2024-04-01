@@ -12,10 +12,6 @@ Kernel::Kernel()
 
 }
 
-void Kernel::ExecuteSignal(Json::Object & cInObject)
-{
-}
-
 //== 객체 관리 ======================================================================================
 KERNEL::Type KERNEL::Impl::Type() const {
 	return m_eType;

@@ -351,6 +351,9 @@
     <ClInclude Include="3DF\Reference.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\CuttingSection.h">
+      <Filter>3DF\Object</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -630,6 +633,9 @@
       <Filter>Sprocket\Impl</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Reference.cpp">
+      <Filter>3DF\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\CuttingSection.cpp">
       <Filter>3DF\Object</Filter>
     </ClCompile>
   </ItemGroup>

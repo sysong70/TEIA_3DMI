@@ -136,7 +136,8 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 	}
 
 	A3DAsmModelFile * pcAsmModelFile = nullptr;
-	A3DStatus eStatus = A3DAsmModelFileLoadFromFile(pchUtf8Path, &cParamsLoadData, &pcAsmModelFile);
+	A3DStatus eStatus = A3D_ERROR;
+	eStatus = A3DAsmModelFileLoadFromFile(pchUtf8Path, &cParamsLoadData, &pcAsmModelFile);
 	delete[] pchUtf8Path;
 
 	system_clock::time_point cTime2 = system_clock::now();
@@ -459,8 +460,7 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 
 			A3DAsmPartDefinition * pcPart = nullptr;
 			CHECK_A3D_RETURN(ProductOccurrenceGetPart(&cData, &pcPart));
-			if (nullptr != pcPart)
-			{
+			if (nullptr != pcPart) {
 				CHECK_A3D_RETURN(ParsePart(pcPart, pcAttrs, dModelScale, cSegment, *pcComponent));
 			}
 
@@ -469,6 +469,8 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 			CHECK_A3D_RETURN(ProductOccurrenceGetChild(&cData, &apcChildArray));
 
 			A3DUns32 nSize = apcChildArray.m_uiSize;
+
+			Log(2, L"ParseProductOccurrence Child Count: %d", nSize);
 
 			for (A3DUns32 nIndex = 0; nIndex < nSize; nIndex++) {
 				CHECK_A3D_RETURN(ParseProductOccurrence(apcChildArray.m_ppPointers[nIndex], pcAttrs, dModelScale, cSegment, *pcComponent));
@@ -1092,6 +1094,10 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 	CString strRiName;
 	GetName(pcRepItem, strRiName);
 
+	if (m_nIncrementalId == 956) {
+		int i = 0;
+	}
+
 	CStringA strSegmentName;
 	strSegmentName.Format("ri%d", m_nIncrementalId++);
 	SegmentKey cSegment = m_cRisIncludeSegment.Subsegment(strSegmentName);
@@ -1101,7 +1107,6 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 	CHECK_A3D_RETURN(A3DEntityGetType(pcRepItem, &eType));
 
 	// #CADModel: ParseRiRepresentationItem 추가
-
 	H3DF::Component::Type eComponentType = H3DF::Component::Type::ExchangeRepresentationItemMask;
 
 	switch (eType)
@@ -1222,6 +1227,8 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 		GetMatrix(sCSysData.m_pTransformation, cMatrix);
 		cSegment.SetModellingMatrix(cMatrix);
 
+		Log(2, "SetModellingMatrix");
+
 		CHECK_A3D_RETURN(A3DRiCoordinateSystemGet(nullptr, &sCSysData));
 	}
 
@@ -1333,10 +1340,14 @@ A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcRepItem,
 		CHECK_A3D_RETURN(DrawTessBase(cRepItemData.m_pTessBase, pcRepItem, cInSegment, pcAttr));
 	}
 	else {
+		A3DRiRepresentationItemData sData;
+		A3D_INITIALIZE_DATA(A3DRiRepresentationItemData, sData);
+
 		A3DRWParamsTessellationData sTesselationData;
 		A3D_INITIALIZE_DATA(A3DRWParamsTessellationData, sTesselationData);
 		sTesselationData.m_eTessellationLevelOfDetail = kA3DTessLODMedium;
 		CHECK_A3D_RETURN(A3DRiRepresentationItemComputeTessellation((A3DRiRepresentationItem *)pcRepItem, &sTesselationData));
+		A3DRiRepresentationItemGet((A3DRiRepresentationItem *)pcRepItem, (A3DRiRepresentationItemData *)&cRepItemData);
 
 		if (cRepItemData.m_pTessBase != nullptr) {
 			CHECK_A3D_RETURN(DrawTessBase(cRepItemData.m_pTessBase, pcRepItem, cInSegment, pcAttr));
@@ -2899,8 +2910,9 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DT
 	}
 
 	// ----- Texture Parameter 활당 -----
-	A3DUns32 nTextureCoordCount = cTess3dData.m_uiTextureCoordSize;
+	A3DUns32 nTextureCoordCount = cTess3dData.m_uiTextureCoordSize / 2;
 
+	// Texture Buffer 활당
 	if (nTextureCoordCount > m_nMaxTextureCoordCount) {
 		if (nullptr != m_pcTextureCoords) {
 			delete[] m_pcTextureCoords;
@@ -2952,7 +2964,7 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DT
 		pnFaceRgbColorIndex[nFaceIndex] = nRgbColorIndex;
 
 		StyleDefine sStyleDefine;
-		// 찾은 경우 Count 증가
+		// 찾은 경우 Count 증가, 나중에 가장 많이 사용되는 Style을 찾기 위해서 저장한다.
 		if (true == mStyleDefineMap.Lookup(nRgbColorIndex, sStyleDefine)) {
 			sStyleDefine.nCount++;
 			mStyleDefineMap.SetAt(nRgbColorIndex, sStyleDefine);
@@ -4013,20 +4025,20 @@ UINT TdfImport::ConveTessFaceDataTriangleTextured(ConvertFaceInfo & cInFaceInfo,
 
 	for (A3DUns32 nIndex = 0; nIndex < nTriangleCount; nIndex++)
 	{
-		nFaceLispnIndices[0] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriSizeIndex + 1 + nTextureCoordSize] / 3;
-		nFaceNormalIndices[0] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriSizeIndex] / 3;
-		nFaceTextrueCoordIndices[0] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriSizeIndex + 1] / 2;
-		cInFaceInfo.nOutTriSizeIndex += nAddCount;
+		nFaceLispnIndices[0] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex + 1 + nTextureCoordSize] / 3;
+		nFaceNormalIndices[0] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex] / 3;
+		nFaceTextrueCoordIndices[0] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex + 1] / 2;
+		cInFaceInfo.nOutTriStartIndex += nAddCount;
 
-		nFaceLispnIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriSizeIndex + 1 + nTextureCoordSize] / 3;
-		nFaceNormalIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriSizeIndex] / 3;
-		nFaceTextrueCoordIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriSizeIndex + 1] / 2;
-		cInFaceInfo.nOutTriSizeIndex += nAddCount;
+		nFaceLispnIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex + 1 + nTextureCoordSize] / 3;
+		nFaceNormalIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex] / 3;
+		nFaceTextrueCoordIndices[1] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex + 1] / 2;
+		cInFaceInfo.nOutTriStartIndex += nAddCount;
 
-		nFaceLispnIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriSizeIndex + 1 + nTextureCoordSize] / 3;
-		nFaceNormalIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriSizeIndex] / 3;
-		nFaceTextrueCoordIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriSizeIndex + 1] / 2;
-		cInFaceInfo.nOutTriSizeIndex += nAddCount;
+		nFaceLispnIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex + 1 + nTextureCoordSize] / 3;
+		nFaceNormalIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex] / 3;
+		nFaceTextrueCoordIndices[2] = cInFaceInfo.pnInIndices[cInFaceInfo.nOutTriStartIndex + 1] / 2;
+		cInFaceInfo.nOutTriStartIndex += nAddCount;
 
 		cInShellKit.AddNextFaceWithDistinctNormalsAndTexture(m_pcPoints, m_pcNormals, m_pcTextureCoords, nFaceLispnIndices, nFaceNormalIndices, nFaceTextrueCoordIndices, 3);
 	}
@@ -4779,18 +4791,18 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 			A3D_INITIALIZE_DATA(A3DGraphTextureDefinitionData, sTextureData);
 			A3DGlobalGetGraphTextureDefinitionData(sTextureAppData.m_uiTextureDefinitionIndex, &sTextureData);
 
-			CString strTextureName;
-			strTextureName.Format(L"texture_%d", sTextureAppData.m_uiTextureDefinitionIndex);
+			CStringA strTextureName;
+			strTextureName.Format("texture_%d", sTextureAppData.m_uiTextureDefinitionIndex);
 			H3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
 
-			CString strTextureOption;
-			strTextureOption.Format(L"source = image %u", sTextureData.m_uiPictureIndex);
+			CStringA strTextureOption;
+			strTextureOption.Format("source = image %u", sTextureData.m_uiPictureIndex);
 
 			if (sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
-				strTextureOption.Append(L", parameterization source = reflection vector");
+				strTextureOption.Append(", parameterization source = reflection vector");
 			}
 			else {
-				strTextureOption.Append(L", parameterization source = uv");
+				strTextureOption.Append(", parameterization source = uv");
 			}
 
 			if (sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
@@ -4800,6 +4812,7 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 				cMaterialKit.SetDiffuseTexture(strTextureName, cDiffuseColor);
 				cMaterialKit.SetDiffuseTextureOption(strTextureOption);
 			}
+
 			/*
 			A3DGraphTextureApplicationData sTextureAppplicationData;
 			A3D_INITIALIZE_DATA(A3DGraphTextureApplicationData, sTextureAppplicationData);
@@ -4904,6 +4917,7 @@ A3DStatus TdfImport::GetMaterial(const A3DGraphStyleData & cInStyleData, H3DF::M
 		A3D_INITIALIZE_DATA(A3DGraphMaterialData, cMaterialData);
 
 		nRetStatus = A3DGlobalGetGraphMaterialData(cInStyleData.m_uiRgbColorIndex, &cMaterialData);
+
 		A3DBool bMaterialIsTexture = A3D_FALSE;
 		A3DGlobalIsMaterialTexture(cInStyleData.m_uiRgbColorIndex, &bMaterialIsTexture);
 
@@ -4923,8 +4937,8 @@ A3DStatus TdfImport::GetMaterial(const A3DGraphStyleData & cInStyleData, H3DF::M
 
 			H3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
 
-			CString strTextureName;
-			strTextureName.Format(L"texture_%d", sTextureAppData.m_uiTextureDefinitionIndex);
+			CStringA strTextureName;
+			strTextureName.Format("texture_%d", sTextureAppData.m_uiTextureDefinitionIndex);
 
 			if (sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
 				cOutMaterial.SetMirror(strTextureName, cDiffuseColor);
@@ -4933,41 +4947,49 @@ A3DStatus TdfImport::GetMaterial(const A3DGraphStyleData & cInStyleData, H3DF::M
 				cOutMaterial.SetDiffuseTexture(strTextureName, cDiffuseColor);
 			}
 
-			/*
-						if(sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
-							strTextureName.Format(L"environment = texture_%d, mirror = (r = 0.5 g = 0.5 b = 0.5))",
-								sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sTextureAppData.m_uiTextureDefinitionIndex);
-						}
-						else {
-							strTextureName.Format(L"environment = texture_%d",
-								sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sTextureAppData.m_uiTextureDefinitionIndex);
-						}
-			*/
-
-			CString strTextureOption;
-			strTextureOption.Format(L"source = image %u", sTextureData.m_uiPictureIndex);
-
-			if (sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
-				strTextureOption.Append(L", parameterization source = reflection vector");
+/*
+			if(sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
+				strTextureName.Format(L"environment = texture_%d, mirror = (r = 0.5 g = 0.5 b = 0.5))",
+					sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sTextureAppData.m_uiTextureDefinitionIndex);
 			}
 			else {
-				strTextureOption.Append(L", parameterization source = uv");
+				strTextureName.Format(L"environment = texture_%d",
+					sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sTextureAppData.m_uiTextureDefinitionIndex);
+			}
+*/
+
+			CStringA strTextureOption;
+			strTextureOption.Format("source = image %u", sTextureData.m_uiPictureIndex);
+
+			if (sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
+				strTextureOption.Append(", parameterization source = reflection vector");
+			}
+			else {
+				strTextureOption.Append(", parameterization source = uv");
 			}
 
 			cOutMaterial.SetDiffuseTextureOption(strTextureOption);
 		}
 		else
 		{
+			// 변수 초기화
 			A3DGraphRgbColorData sRgbColorData;
 			A3D_INITIALIZE_DATA(A3DGraphRgbColorData, sRgbColorData);
 
+			// 변수 초기화
 			A3DGraphMaterialData sMaterialData;
 			A3D_INITIALIZE_DATA(A3DGraphMaterialData, sMaterialData);
 
+			// Color Index를 이용해서 Color 정보 수집
 			CHECK_A3D_RETURN(A3DGlobalGetGraphMaterialData(cInStyleData.m_uiRgbColorIndex, &sMaterialData));
+
+			// Diffuse Color 정보 수집
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiDiffuse, &sRgbColorData));
+
 			H3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dDiffuseAlpha);
-			if (true == bTransparencyDefined) { cDiffuseColor.alpha = fTransparency; }
+			if (true == bTransparencyDefined) { 
+				cDiffuseColor.alpha = fTransparency; 
+			}
 			cOutMaterial.SetDiffuseColor(cDiffuseColor);
 
 			//Log(2, L"DrawStyle: DiffuseColor R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
@@ -4978,7 +5000,7 @@ A3DStatus TdfImport::GetMaterial(const A3DGraphStyleData & cInStyleData, H3DF::M
 			cMaterialKit.SetFaceColor(cAmbientColor, H3DF::Material::Color::Channel::);
 */
 
-//nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
+			//nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiEmissive, &sRgbColorData));
 			H3DF::RGBAColor cEmissiveColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sMaterialData.m_dEmissiveAlpha);
 			if (true == bTransparencyDefined) { cEmissiveColor.alpha = fTransparency; }
@@ -5022,8 +5044,14 @@ A3DStatus TdfImport::GetMaterial(const A3DGraphStyleData & cInStyleData, H3DF::M
 bool TdfImport::FindMaterial(const A3DGraphStyleData & cInStyleData, H3DF::MaterialKit & cOutMaterial)
 {
 	CStringA strStyleText;
-	strStyleText.Format("%d_%d", cInStyleData.m_uiRgbColorIndex, cInStyleData.m_ucTransparency);
 
+	if (false == cInStyleData.m_bMaterial) {
+		strStyleText.Format("%d_%d", cInStyleData.m_uiRgbColorIndex, cInStyleData.m_ucTransparency);
+	}
+	else {
+		strStyleText.Format("mat_%d_%d", cInStyleData.m_uiRgbColorIndex, cInStyleData.m_ucTransparency);
+	}
+		
 	if (true == m_mMaterialMap.Lookup(strStyleText, cOutMaterial)) {
 		return true;
 	}
@@ -5036,7 +5064,13 @@ bool TdfImport::CreateMaterial(const A3DGraphStyleData & cInStyleData, H3DF::Mat
 	H3DF::MaterialKit cMaterialKit;
 	if (A3D_SUCCESS == GetMaterial(cInStyleData, cMaterialKit)) {
 		CStringA strStyleText;
-		strStyleText.Format("%d_%d", cInStyleData.m_uiRgbColorIndex, cInStyleData.m_ucTransparency);
+		if (false == cInStyleData.m_bMaterial) {
+			strStyleText.Format("%d_%d", cInStyleData.m_uiRgbColorIndex, cInStyleData.m_ucTransparency);
+		}
+		else {
+			strStyleText.Format("mat_%d_%d", cInStyleData.m_uiRgbColorIndex, cInStyleData.m_ucTransparency);
+		}
+		
 
 		m_mMaterialMap.SetAt(strStyleText, cMaterialKit);
 		cOutMaterial = cMaterialKit;
@@ -5339,8 +5373,8 @@ A3DStatus TdfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cAt
 
 			H3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
 
-			CString strTextureName;
-			strTextureName.Format(L"texture_%d", sTextureAppData.m_uiTextureDefinitionIndex);
+			CStringA strTextureName;
+			strTextureName.Format("texture_%d", sTextureAppData.m_uiTextureDefinitionIndex);
 
 			if (sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
 				cMaterialKit.SetMirror(strTextureName, cDiffuseColor);
@@ -5349,25 +5383,25 @@ A3DStatus TdfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cAt
 				cMaterialKit.SetDiffuseTexture(strTextureName, cDiffuseColor);
 			}
 
-			/*
-						if(sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
-							strTextureName.Format(L"environment = texture_%d, mirror = (r = 0.5 g = 0.5 b = 0.5))",
-								sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sTextureAppData.m_uiTextureDefinitionIndex);
-						}
-						else {
-							strTextureName.Format(L"environment = texture_%d",
-								sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sTextureAppData.m_uiTextureDefinitionIndex);
-						}
-			*/
-
-			CString strTextureOption;
-			strTextureOption.Format(L"source = image %u", sTextureData.m_uiPictureIndex);
-
-			if (sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
-				strTextureOption.Append(L", parameterization source = reflection vector");
+/*
+			if(sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
+				strTextureName.Format(L"environment = texture_%d, mirror = (r = 0.5 g = 0.5 b = 0.5))",
+					sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sTextureAppData.m_uiTextureDefinitionIndex);
 			}
 			else {
-				strTextureOption.Append(L", parameterization source = uv");
+				strTextureName.Format(L"environment = texture_%d",
+					sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue, sTextureAppData.m_uiTextureDefinitionIndex);
+			}
+*/
+
+			CStringA strTextureOption;
+			strTextureOption.Format("source = image %u", sTextureData.m_uiPictureIndex);
+
+			if (sTextureData.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection) {
+				strTextureOption.Append(", parameterization source = reflection vector");
+			}
+			else {
+				strTextureOption.Append(", parameterization source = uv");
 			}
 
 			cMaterialKit.SetDiffuseTextureOption(strTextureOption);
@@ -5536,7 +5570,16 @@ A3DStatus TdfImport::IsShow(const A3DRootBaseWithGraphics * pGraphics)
 // 5. 주어진 Material Mapping을 이용해서 StylesIncludeKey에 새로운 Style을 추가하고 주어진 Segment에 적용.
 bool TdfImport::SetFaceMaterialMapping(const A3DGraphStyleData & sStyleData, H3DF::MaterialKit const & cInKit, H3DF::SegmentKey & cSegment)
 {
-	H3DF::SegmentKey cStyleSegment = m_cIncludeStyles.Subsegment("%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
+	CStringA strStyleText;
+
+	if (false == sStyleData.m_bMaterial) {
+		strStyleText.Format("%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
+	}
+	else {
+		strStyleText.Format("mat_%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
+	}
+
+	H3DF::SegmentKey cStyleSegment = m_cIncludeStyles.Subsegment(strStyleText);
 
 	// 입력된 Matrial을 Face에 적용한다.
 	MaterialMappingKit cMaterialMapping;
@@ -5550,8 +5593,6 @@ bool TdfImport::SetFaceMaterialMapping(const A3DGraphStyleData & sStyleData, H3D
 	// 		return false;
 	// 	}
 
-	CStringA strStyleText;
-	strStyleText.Format("%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
 	m_mMaterialMappingStyleMap.SetAt(strStyleText, cStyleSegment);
 
 	return true;
@@ -5679,7 +5720,13 @@ bool TdfImport::SetMarkerMaterialMapping(const A3DMiscCascadedAttributesData & c
 bool TdfImport::CreateFaceStyleSegment(const A3DGraphStyleData & sStyleData, H3DF::MaterialKit const & cInKit, H3DF::SegmentKey & cOutStyleSegment)
 {
 	CStringA strStyleText;
-	strStyleText.Format("%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
+
+	if (false == sStyleData.m_bMaterial) {
+		strStyleText.Format("%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
+	}
+	else {
+		strStyleText.Format("mat_%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
+	}
 
 	cOutStyleSegment = m_cIncludeStyles.Subsegment(strStyleText);
 
@@ -5710,7 +5757,13 @@ bool TdfImport::SetStyle(H3DF::SegmentKey & cSegment, H3DF::SegmentKey & cStyleS
 bool TdfImport::FindMaterialMapping(const A3DGraphStyleData & sStyleData, SegmentKey & cOutStyleSegment)
 {
 	CStringA strStyleText;
-	strStyleText.Format("%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
+
+	if (false == sStyleData.m_bMaterial) {
+		strStyleText.Format("%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
+	}
+	else {
+		strStyleText.Format("mat_%d_%d", sStyleData.m_uiRgbColorIndex, sStyleData.m_ucTransparency);
+	}
 
 	if (true == m_mMaterialMappingStyleMap.Lookup(strStyleText, cOutStyleSegment)) {
 		return true;

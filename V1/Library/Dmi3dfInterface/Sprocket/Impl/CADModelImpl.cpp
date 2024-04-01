@@ -36,6 +36,7 @@ void H3DF::CADModelImpl::Copy(CADModelImpl * pcInThat)
 	m_pcMeasurements = pcInThat->m_pcMeasurements;
 	m_pcMarkups = pcInThat->m_pcMarkups;
 
+	m_nProductOccurrenceIndex = pcInThat->m_nProductOccurrenceIndex;
 	m_nSolidIndex = pcInThat->m_nSolidIndex;
 	m_nSurfaceIndex = pcInThat->m_nSurfaceIndex;
 	m_nCurveIndex = pcInThat->m_nCurveIndex;
@@ -51,6 +52,10 @@ CString H3DF::CADModelImpl::TypeName(const Component & cInComponent)
 
 	switch (pcImpl->m_eType)
 	{
+		case Component::Type::ExchangeProductOccurrence:
+			strTypeName.Format(L"%s %d", strTypeName, m_nProductOccurrenceIndex++);
+			break;
+
 		case Component::Type::ExchangeRICurve:
 		case Component::Type::ExchangeRIPolyWire:
 			strTypeName.Format(L"%s %d", strTypeName, m_nCurveIndex++);

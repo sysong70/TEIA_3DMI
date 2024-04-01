@@ -49,17 +49,16 @@ namespace H3DF
 		Canvas(Canvas const & cInThat);
 		virtual ~Canvas();
 
-		void Destruct();
-
 		void Set(Canvas const & cInThat);
 		Canvas const & operator = (Canvas const & cInThat);
 
 		H3DF::Type ObjectType() const { return H3DF::Type::Canvas; };
 
 		void AttachViewAsLayout(View const * pcInView);
+		HWND GetHwnd();
 
 		void SetDelivery(Signal::Delivery & cDelivery, int nViewId);
-		void FileOpen(Json::Object & cInObject, CADModel & cInCADModel);
+		void FileOpen(CString strFilePathName, CADModel & cInCADModel);
 		static void ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObject, CADModel & cInCADModel);
 
 		H3DF::View & GetFrontView() const;

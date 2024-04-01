@@ -2,7 +2,7 @@
 
 #include "Manager.Root.h"
 
-#include "..\DmiKernel3dInterface\Kernel.Application.h"
+#include "../DmiKernel3dInterface/Kernel.Application.h"
 
 #include "Json.h"
 #include <map>
@@ -26,14 +26,16 @@ namespace SESSION
 			void ExecuteSignal(const wchar_t * pchBuffer);
 			void SetSendSignalFunc(SendSignalFunc pcSendSignalFunc);
 
+			SESSION::Session * GetSession(HWND hWnd);
+			SESSION::Session * GetSession(int nViewId);
+			void RemoveSession(int nViewId);
+
 		protected:
 			void ExecuteApplicationSignal(Json::Object & cInObject);
 			void ExecuteViewSignal(Json::Object & cInObject);
 			void ModelPanelSignal(Json::Object & cInObject);
 			void ExecuteCommand(Json::Object & cInObject);
 
-			SESSION::Session * GetSession(int nViewId);
-			void RemoveSession(int nViewId);
 		private:
 			bool m_bIsValid = false;
 

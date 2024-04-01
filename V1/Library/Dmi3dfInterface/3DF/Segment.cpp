@@ -644,31 +644,60 @@ SegmentKey & H3DF::SegmentKey::SetMaterialMapping(H3DF::MaterialMappingKit const
 
 	Material::Type eType = Material::Type::None;
 	RGBAColor cRgbaColor;
-	CString strTextureName;
+	CStringA strTextureName, strTextureOptions;
 
-	if (true == cInKit.ShowFaceChannel(Material::Channel::DiffuseColor, eType, cRgbaColor, strTextureName)) {
+	if (true == cInKit.ShowFaceChannel(Material::Channel::DiffuseColor, eType, cRgbaColor, strTextureName, strTextureOptions)) {
 		if (Material::Type::RGBAColor == eType) {
 			pcImpl->SetColor(L"faces", cRgbaColor);
 		}
 	}
 
-	if (true == cInKit.ShowFaceChannel(Material::Channel::DiffuseTexture, eType, cRgbaColor, strTextureName)) {
+	if (true == cInKit.ShowFaceChannel(Material::Channel::DiffuseTexture, eType, cRgbaColor, strTextureName, strTextureOptions)) {
 		if (Material::Type::TextureName == eType) {
 			CString strText;
 			strText.Format(L"faces = (%s)", strTextureName);
 			HC_Set_Color(Utility::ToChar(strText));
 		}
 		else if (Material::Type::ModulatedTexture == eType) {
+			CStringA strText;
+			strText.Format("faces = (diffuse = (r=%f g=%f b=%f) %s)", cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue, strTextureName);
+			HC_Set_Color(strText);
 		}
+
+		if (false == strTextureName.IsEmpty() && false == strTextureOptions.IsEmpty()) {
+			HC_Define_Local_Texture(strTextureName, strTextureOptions);
+		}
+		
+/*
+		// 말단 노드에 texture를 생성해야 보기 좋게 된다 
+		H_FORMAT_TEXT texture_options("source = image %u", tdata.m_uiPictureIndex);
+
+		if (tdata.m_uiMappingAttributes & kA3DTextureMappingSphericalReflection)
+		{
+			texture_options.Append(", parameterization source = reflection vector");
+		}
+		else
+		{
+			texture_options.Append(", parameterization source = uv");
+		}
+
+		HC_Define_Local_Texture(H_FORMAT_TEXT("texture_%u", adata.m_uiTextureDefinitionIndex), texture_options);*/
 	}
 
-	if (true == cInKit.ShowFaceChannel(Material::Channel::Mirror, eType, cRgbaColor, strTextureName)) {
+	if (true == cInKit.ShowFaceChannel(Material::Channel::Mirror, eType, cRgbaColor, strTextureName, strTextureOptions)) {
 		if (Material::Type::TextureName == eType) {
-			CString strText;
-			strText.Format(L"faces = (environment = %s, mirror = (r = 0.5 g = 0.5 b = 0.5))", strTextureName);
-			HC_Set_Color(Utility::ToChar(strText));
+			CStringA strText;
+			strText.Format("faces = (environment = %s, mirror = (r = 0.5 g = 0.5 b = 0.5))", strTextureName);
+			HC_Set_Color(strText);
 		}
 		else if (Material::Type::ModulatedTexture == eType) {
+			CStringA strText;
+			strText.Format("faces = (environment = %s, diffuse = (r=%f g=%f b=%f), mirror = (r = 0.5 g = 0.5 b = 0.5))", strTextureName, cRgbaColor.red, cRgbaColor.green, cRgbaColor.blue);
+			HC_Set_Color(strText);
+		}
+
+		if (false == strTextureName.IsEmpty() && false == strTextureOptions.IsEmpty()) {
+			HC_Define_Local_Texture(strTextureName, strTextureOptions);
 		}
 	}
 
@@ -684,7 +713,7 @@ SegmentKey & H3DF::SegmentKey::SetMaterialMapping(H3DF::MaterialMappingKit const
 		pcImpl->SetColor(L"text", cRgbaColor);
 	}
 
-	if (true == cInKit.ShowVertexChannel(Material::Channel::DiffuseColor, eType, cRgbaColor, strTextureName)) {
+	if (true == cInKit.ShowVertexChannel(Material::Channel::DiffuseColor, eType, cRgbaColor, strTextureName, strTextureOptions)) {
 		if (Material::Type::RGBAColor == eType) {
 			pcImpl->SetColor(L"vertex", cRgbaColor);
 		}

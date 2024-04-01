@@ -168,6 +168,7 @@ namespace H3DF
         Component & GetOwner() const;
 
         ComponentArray & GetSubComponents() const;
+        size_t GetAllSubComponentCount() const;
 
         CString GetName() const;
 

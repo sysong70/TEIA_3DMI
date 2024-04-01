@@ -200,28 +200,28 @@ namespace H3DF
 		//Applies an alpha channel the diffuse color channel.
 		MaterialKit & SetDiffuseAlpha(float fInAlpha);
 
-		MaterialKit & SetDiffuseTexture(CString strTextureName);
-		MaterialKit & SetDiffuseTexture(CString strTextureName, RGBAColor const & cInModulatingColor);
-		MaterialKit & SetDiffuseTextureOption(CString strTextureOption);
+		MaterialKit & SetDiffuseTexture(CStringA strTextureName);
+		MaterialKit & SetDiffuseTexture(CStringA strTextureName, RGBAColor const & cInModulatingColor);
+		MaterialKit & SetDiffuseTextureOption(CStringA strTextureOption);
 
 		MaterialKit & SetSpecular(RGBAColor const & cInColor);
-		MaterialKit & SetSpecular(CString strTextureName, RGBAColor const & cInModulatingColor);
+		MaterialKit & SetSpecular(CStringA strTextureName, RGBAColor const & cInModulatingColor);
 
 		MaterialKit & SetMirror(RGBAColor const & cInColor);
-		MaterialKit & SetMirror(CString strTextureName, RGBAColor const & cInModulatingColor);
+		MaterialKit & SetMirror(CStringA strTextureName, RGBAColor const & cInModulatingColor);
 
-		MaterialKit & SetTransmission(CString strTextureName, RGBAColor const & cInModulatingColor);
+		MaterialKit & SetTransmission(CStringA strTextureName, RGBAColor const & cInModulatingColor);
 
 		MaterialKit & SetEmission(RGBAColor const & cInColor);
-		MaterialKit & SetEmission(CString strTextureName, RGBAColor const & cInModulatingColor);
+		MaterialKit & SetEmission(CStringA strTextureName, RGBAColor const & cInModulatingColor);
 
-		MaterialKit & SetEnvironmentTexture(CString strTextureName);
-		MaterialKit & SetEnvironmentTexture(CString strTextureName, RGBAColor const & cInModulatingColor);
+		MaterialKit & SetEnvironmentTexture(CStringA strTextureName);
+		MaterialKit & SetEnvironmentTexture(CStringA strTextureName, RGBAColor const & cInModulatingColor);
 
-		MaterialKit & SetEnvironmentCubeMap(CString strTextureName);
-		MaterialKit & SetEnvironmentCubeMap(CString strTextureName, RGBAColor const & cInModulatingColor);
+		MaterialKit & SetEnvironmentCubeMap(CStringA strTextureName);
+		MaterialKit & SetEnvironmentCubeMap(CStringA strTextureName, RGBAColor const & cInModulatingColor);
 
-		MaterialKit & SetBump(CString strTextureName);
+		MaterialKit & SetBump(CStringA strTextureName);
 		MaterialKit & SetGloss(float fInGloss);
 
 
@@ -243,14 +243,14 @@ namespace H3DF
 		bool ShowDiffuseColor(RGBColor & cOutColor) const;
 		bool ShowDiffuseColor(RGBAColor & cOutColor) const;
 		bool ShowDiffuseAlpha(float & fOutAlpha) const;
-		bool ShowDiffuseTexture(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
-		bool ShowSpecular(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+		bool ShowDiffuseTexture(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const;
+		bool ShowSpecular(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const;
 
-		bool ShowMirror(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
-		bool ShowTransmission(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
-		bool ShowEmission(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
-		bool ShowEnvironment(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
-		bool ShowBump(CString & strOutTextureName) const;
+		bool ShowMirror(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const;
+		bool ShowTransmission(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const;
+		bool ShowEmission(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const;
+		bool ShowEnvironment(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const;
+		bool ShowBump(CStringA & strOutTextureName, CStringA & strOutTextureOptions) const;
 		bool ShowGloss(float & fOutGloss) const;
 
 		void SetMaterial(CStringA strInGeometryName);
@@ -271,15 +271,15 @@ namespace H3DF
 
 		MaterialMappingKit & SetBackFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
 		MaterialMappingKit & SetBackFaceAlpha(float fInAlpha);
-		MaterialMappingKit & SetBackFaceTexture(CString strTextureName);
-		MaterialMappingKit & SetBackFaceTextureOption(CString strTextureOption);
+		MaterialMappingKit & SetBackFaceTexture(CStringA strTextureName);
+		MaterialMappingKit & SetBackFaceTextureOption(CStringA strTextureOption);
 		MaterialMappingKit & SetBackFaceGloss(float fInValue);
 		MaterialMappingKit & SetBackFaceMaterial(MaterialKit const & cInMaterial);
 
 		MaterialMappingKit & SetFrontFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
 		MaterialMappingKit & SetFrontFaceAlpha(float fInAlpha);
-		MaterialMappingKit & SetFrontFaceTexture(CString strTextureName);
-		MaterialMappingKit & SetFrontFaceTextureOption(CString strTextureOption);
+		MaterialMappingKit & SetFrontFaceTexture(CStringA strTextureName);
+		MaterialMappingKit & SetFrontFaceTextureOption(CStringA strTextureOption);
 		MaterialMappingKit & SetFrontFaceGloss(float fInValue);
 		MaterialMappingKit & SetFrontFaceMaterial(MaterialKit const & cInMaterial);
 
@@ -291,8 +291,8 @@ namespace H3DF
 
 		MaterialMappingKit & SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
 		MaterialMappingKit & SetFaceAlpha(float fInAlpha);
-		MaterialMappingKit & SetFaceTexture(CString strTextureName);
-		MaterialMappingKit & SetFaceTextureOption(CString strTextureOption);
+		MaterialMappingKit & SetFaceTexture(CStringA strTextureName);
+		MaterialMappingKit & SetFaceTextureOption(CStringA strTextureOption);
 		MaterialMappingKit & SetFaceGloss(float fInValue);
 		MaterialMappingKit & SetFaceMaterial(MaterialKit const & cInMaterial);
 
@@ -305,7 +305,7 @@ namespace H3DF
 
 		MaterialMappingKit & SetVertexAlpha(float fInAlpha);
 		MaterialMappingKit & SetVertexColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
-		MaterialMappingKit & SetVertexTexture(CString strTextureName);
+		MaterialMappingKit & SetVertexTexture(CStringA strTextureName);
 		MaterialMappingKit & SetVertexGloss(float fInValue);
 		MaterialMappingKit & SetVertexMaterial(MaterialKit const & cInMaterial);
 
@@ -318,16 +318,17 @@ namespace H3DF
 		bool ShowAmbientLightUpColor(Material::Type & cOutType, RGBAColor & cOutColor) const;
 		bool ShowAmbientLightDownColor(Material::Type & cOutType, RGBAColor & cOutColor) const;
 
-		bool ShowBackFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+		bool ShowBackFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const;
 		bool ShowBackFaceMaterial(MaterialKit & cOutKit) const;
 
-		bool ShowFrontFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+		bool ShowFrontFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const;
 		bool ShowFrontFaceMaterial(MaterialKit & cOutKit) const;
 
-		bool ShowEdgeChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+		bool ShowEdgeChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const;
 		bool ShowEdgeMaterial(MaterialKit & cOutKit) const;
 
-		bool ShowFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+		bool ShowFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const;
+		//bool ShowTextureOptions(Material::Channel eInChannel, CStringA & strOutTextureOptions);
 		bool ShowFaceMaterial(MaterialKit & cOutKit) const;
 
 		bool ShowLineAlpha(float & fOutAlpha) const;
@@ -338,7 +339,7 @@ namespace H3DF
 
 		bool ShowTextColor(RGBAColor & cOutColor) const;
 
-		bool ShowVertexChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+		bool ShowVertexChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const;
 		bool ShowVertexMaterial(MaterialKit & cOutKit) const;
 	};
 
@@ -364,10 +365,10 @@ namespace H3DF
 		void InsertPicture(UINT nIndex, UINT nPixelWidth, UINT nPixelHeight, UCHAR * pucBinaryData);
 		void InsertDifaultPicture(UINT nIndex, UINT nSize, UCHAR * pucBinaryData);
 		void SetTextureMatrix(float * pfTextureMatrix, char * pchTextureTransformSegment);
-		void SetDefineLocalTexture(UINT nIndex, CString strTextureOptions);
+		void SetDefineLocalTexture(UINT nIndex, CStringA strTextureOptions);
 		void EndPopulateTextures();
 
 	private:
-		MaterialMappingControl & UnSetColor(CString strInType);
+		MaterialMappingControl & UnSetColor(CStringA strInType);
 	};
 }

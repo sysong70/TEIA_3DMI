@@ -69,12 +69,6 @@ namespace KERNEL
 	{
 	public:
 		Kernel();
-
-		void ExecuteSignal(Json::Object & cInObject);
-
-	protected:
-		//KERNEL::Application m_cApplication;
-		//KERNEL::View m_cView;
 	};
 
 	class Object;

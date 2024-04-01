@@ -28,6 +28,8 @@ namespace KERNEL
 
 			bool ShowToggle();
 
+			bool ShowReset();
+
 			// void Request(Json::Object & cInObject);
 			// void Change(Json::Object & cInObject);
 		};

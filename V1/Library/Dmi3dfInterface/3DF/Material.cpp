@@ -43,15 +43,15 @@ public:
 
 	bool ShowColor(Material::Channel eInChannel, RGBAColor & cOutColor) const;
 	bool ShowAlpah(Material::Channel eInChannel, float & fOutAlpah) const;
-	bool ShowTexture(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
-	bool ShowChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+	bool ShowTexture(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const;
+	bool ShowChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const;
 
 	RGBAColor m_pcColors[(int)Material::Channel::Count];
 	float m_fGloss = -1.f;
 
 	bool m_bTextureMirrors[(int)Material::Channel::Count];
-	CString m_strTextureNames[(int)Material::Channel::Count];;
-	CString m_strTextureOptions[(int)Material::Channel::Count];;
+	CStringA m_strTextureNames[(int)Material::Channel::Count];;
+	CStringA m_strTextureOptions[(int)Material::Channel::Count];;
 };
 
 bool MaterialKitImpl::operator == (MaterialKitImpl const & cInThat) const
@@ -121,7 +121,7 @@ bool MaterialKitImpl::ShowAlpah(Material::Channel eInChannel, float & fOutAlpah)
 	return true;
 }
 
-bool MaterialKitImpl::ShowTexture(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool MaterialKitImpl::ShowTexture(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
 	if (true == m_strTextureNames[(int)eInChannel].IsEmpty()) {
 		return false;
@@ -135,10 +135,12 @@ bool MaterialKitImpl::ShowTexture(Material::Channel eInChannel, Material::Type &
 		cOutColor = m_pcColors[(int)eInChannel];
 	}
 
+	strOutTextureOptions = m_strTextureOptions[(int)eInChannel];
+
 	return true;
 }
 
-bool MaterialKitImpl::ShowChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool MaterialKitImpl::ShowChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
 	// Texture Name이 없는 경우 처리
 	if (true == m_strTextureNames[(int)eInChannel].IsEmpty()) {
@@ -159,6 +161,8 @@ bool MaterialKitImpl::ShowChannel(Material::Channel eInChannel, Material::Type &
 		cOutType = Material::Type::ModulatedTexture;
 		cOutColor = m_pcColors[(int)eInChannel];
 	}
+
+	strOutTextureOptions = m_strTextureOptions[(int)eInChannel];
 
 	return true;
 }
@@ -248,14 +252,14 @@ MaterialKit & H3DF::MaterialKit::SetDiffuseAlpha(float fInAlpha)
 	return *this;
 }
 
-MaterialKit & H3DF::MaterialKit::SetDiffuseTexture(CString strTextureName)
+MaterialKit & H3DF::MaterialKit::SetDiffuseTexture(CStringA strTextureName)
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
 	pcImpl->m_strTextureNames[(int)Material::Channel::DiffuseTexture] = strTextureName;
 	return *this;
 }
 
-MaterialKit & H3DF::MaterialKit::SetDiffuseTexture(CString strTextureName, RGBAColor const & cInModulatingColor)
+MaterialKit & H3DF::MaterialKit::SetDiffuseTexture(CStringA strTextureName, RGBAColor const & cInModulatingColor)
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
 	pcImpl->m_strTextureNames[(int)Material::Channel::DiffuseTexture] = strTextureName;
@@ -263,7 +267,7 @@ MaterialKit & H3DF::MaterialKit::SetDiffuseTexture(CString strTextureName, RGBAC
 	return *this;
 }
 
-MaterialKit & H3DF::MaterialKit::SetDiffuseTextureOption(CString strTextureOption)
+MaterialKit & H3DF::MaterialKit::SetDiffuseTextureOption(CStringA strTextureOption)
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
 	pcImpl->m_strTextureOptions[(int)Material::Channel::DiffuseTexture] = strTextureOption;
@@ -277,7 +281,7 @@ MaterialKit & H3DF::MaterialKit::SetSpecular(RGBAColor const & cInColor)
 	return *this;
 }
 
-MaterialKit & H3DF::MaterialKit::SetSpecular(CString strTextureName, RGBAColor const & cInModulatingColor)
+MaterialKit & H3DF::MaterialKit::SetSpecular(CStringA strTextureName, RGBAColor const & cInModulatingColor)
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
 	pcImpl->m_strTextureNames[(int)Material::Channel::Specular] = strTextureName;
@@ -292,7 +296,7 @@ MaterialKit & H3DF::MaterialKit::SetMirror(RGBAColor const & cInColor)
 	return *this;
 }
 
-MaterialKit & H3DF::MaterialKit::SetMirror(CString strTextureName, RGBAColor const & cInModulatingColor)
+MaterialKit & H3DF::MaterialKit::SetMirror(CStringA strTextureName, RGBAColor const & cInModulatingColor)
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
 	pcImpl->m_strTextureNames[(int)Material::Channel::Mirror] = strTextureName;
@@ -300,7 +304,7 @@ MaterialKit & H3DF::MaterialKit::SetMirror(CString strTextureName, RGBAColor con
 	return *this;
 }
 
-MaterialKit & H3DF::MaterialKit::SetTransmission(CString strTextureName, RGBAColor const & cInModulatingColor)
+MaterialKit & H3DF::MaterialKit::SetTransmission(CStringA strTextureName, RGBAColor const & cInModulatingColor)
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
 	pcImpl->m_strTextureNames[(int)Material::Channel::Transmission] = strTextureName;
@@ -315,7 +319,7 @@ MaterialKit & H3DF::MaterialKit::SetEmission(RGBAColor const & cInColor)
 	return *this;
 }
 
-MaterialKit & H3DF::MaterialKit::SetEmission(CString strTextureName, RGBAColor const & cInModulatingColor)
+MaterialKit & H3DF::MaterialKit::SetEmission(CStringA strTextureName, RGBAColor const & cInModulatingColor)
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
 	pcImpl->m_strTextureNames[(int)Material::Channel::Emission] = strTextureName;
@@ -323,14 +327,14 @@ MaterialKit & H3DF::MaterialKit::SetEmission(CString strTextureName, RGBAColor c
 	return *this;
 }
 
-MaterialKit & H3DF::MaterialKit::SetEnvironmentTexture(CString strTextureName)
+MaterialKit & H3DF::MaterialKit::SetEnvironmentTexture(CStringA strTextureName)
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
 	pcImpl->m_strTextureNames[(int)Material::Channel::EnvironmentTexture] = strTextureName;
 	return *this;
 }
 
-MaterialKit & H3DF::MaterialKit::SetEnvironmentTexture(CString strTextureName, RGBAColor const & cInModulatingColor)
+MaterialKit & H3DF::MaterialKit::SetEnvironmentTexture(CStringA strTextureName, RGBAColor const & cInModulatingColor)
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
 	pcImpl->m_strTextureNames[(int)Material::Channel::EnvironmentTexture] = strTextureName;
@@ -338,14 +342,14 @@ MaterialKit & H3DF::MaterialKit::SetEnvironmentTexture(CString strTextureName, R
 	return *this;
 }
 
-MaterialKit & H3DF::MaterialKit::SetEnvironmentCubeMap(CString strTextureName)
+MaterialKit & H3DF::MaterialKit::SetEnvironmentCubeMap(CStringA strTextureName)
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
 	pcImpl->m_strTextureNames[(int)Material::Channel::EnvironmentCubeMap] = strTextureName;
 	return *this;
 }
 
-MaterialKit & H3DF::MaterialKit::SetEnvironmentCubeMap(CString strTextureName, RGBAColor const & cInModulatingColor)
+MaterialKit & H3DF::MaterialKit::SetEnvironmentCubeMap(CStringA strTextureName, RGBAColor const & cInModulatingColor)
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
 	pcImpl->m_strTextureNames[(int)Material::Channel::EnvironmentCubeMap] = strTextureName;
@@ -353,7 +357,7 @@ MaterialKit & H3DF::MaterialKit::SetEnvironmentCubeMap(CString strTextureName, R
 	return *this;
 }
 
-MaterialKit & H3DF::MaterialKit::SetBump(CString strTextureName)
+MaterialKit & H3DF::MaterialKit::SetBump(CStringA strTextureName)
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
 	pcImpl->m_strTextureNames[(int)Material::Channel::Bump] = strTextureName;
@@ -493,43 +497,43 @@ bool H3DF::MaterialKit::ShowDiffuseAlpha(float & fOutAlpha) const
 	return pcImpl->ShowAlpah(Material::Channel::DiffuseColor, fOutAlpha);
 }
 
-bool H3DF::MaterialKit::ShowDiffuseTexture(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialKit::ShowDiffuseTexture(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
-	return pcImpl->ShowTexture(Material::Channel::DiffuseTexture, cOutType, cOutColor, strOutTextureName);
+	return pcImpl->ShowTexture(Material::Channel::DiffuseTexture, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
-bool H3DF::MaterialKit::ShowSpecular(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialKit::ShowSpecular(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
-	return pcImpl->ShowTexture(Material::Channel::Specular, cOutType, cOutColor, strOutTextureName);
+	return pcImpl->ShowTexture(Material::Channel::Specular, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
-bool H3DF::MaterialKit::ShowMirror(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialKit::ShowMirror(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
-	return pcImpl->ShowTexture(Material::Channel::Mirror, cOutType, cOutColor, strOutTextureName);
+	return pcImpl->ShowTexture(Material::Channel::Mirror, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
-bool H3DF::MaterialKit::ShowTransmission(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialKit::ShowTransmission(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
-	return pcImpl->ShowTexture(Material::Channel::Transmission, cOutType, cOutColor, strOutTextureName);
+	return pcImpl->ShowTexture(Material::Channel::Transmission, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
-bool H3DF::MaterialKit::ShowEmission(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialKit::ShowEmission(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
-	return pcImpl->ShowTexture(Material::Channel::Emission, cOutType, cOutColor, strOutTextureName);
+	return pcImpl->ShowTexture(Material::Channel::Emission, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
-bool H3DF::MaterialKit::ShowEnvironment(Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialKit::ShowEnvironment(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
-	return pcImpl->ShowTexture(Material::Channel::EnvironmentTexture, cOutType, cOutColor, strOutTextureName);
+	return pcImpl->ShowTexture(Material::Channel::EnvironmentTexture, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
-bool H3DF::MaterialKit::ShowBump(CString & strOutTextureName) const
+bool H3DF::MaterialKit::ShowBump(CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
 	if (true == pcImpl->m_strTextureNames[(int)Material::Channel::Bump].IsEmpty()) {
@@ -537,6 +541,8 @@ bool H3DF::MaterialKit::ShowBump(CString & strOutTextureName) const
 	}
 
 	strOutTextureName = pcImpl->m_strTextureNames[(int)Material::Channel::Bump];
+
+	strOutTextureOptions = pcImpl->m_strTextureOptions[(int)Material::Channel::Bump];
 
 	return true;
 }
@@ -608,8 +614,8 @@ namespace H3DF
 		}
 
 		void SetColor(RGBAColor const & cInRgbaColor, H3DF::MaterialMappingKitImpl::Type eType, Material::Color::Channel eChannel);
-
-		bool ShowChannel(H3DF::MaterialMappingKitImpl::Type eInType, Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const;
+		bool ShowChannel(H3DF::MaterialMappingKitImpl::Type eInType, Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, 
+			CStringA & strOutTextureName, CStringA & strOutTextureOptions) const;
 		bool ShowMaterial(H3DF::MaterialMappingKitImpl::Type eInType, MaterialKit & cOutKit) const;
 
 		MaterialKit m_cMaterial[(int) Type::Count];
@@ -650,10 +656,11 @@ void H3DF::MaterialMappingKitImpl::SetColor(RGBAColor const & cInRgbaColor, H3DF
 	m_bMaterialFlag[(int)eType] = true;
 }
 
-bool H3DF::MaterialMappingKitImpl::ShowChannel(H3DF::MaterialMappingKitImpl::Type eInType, Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialMappingKitImpl::ShowChannel(H3DF::MaterialMappingKitImpl::Type eInType, Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, 
+	CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_cMaterial[(int)eInType].GetImpl();
-	return pcImpl->ShowChannel(eInChannel, cOutType, cOutColor, strOutTextureName);
+	return pcImpl->ShowChannel(eInChannel, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialMappingKitImpl::ShowMaterial(H3DF::MaterialMappingKitImpl::Type eInType, MaterialKit & cOutKit) const
@@ -720,14 +727,14 @@ MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceAlpha(float fInAlpha)
 	return *this;
 }
 
-MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceTexture(CString strTextureName)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceTexture(CStringA strTextureName)
 {
 	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::BackFace].SetDiffuseTexture(strTextureName);
 	return *this;
 }
 
-MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceTextureOption(CString strTextureOption)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceTextureOption(CStringA strTextureOption)
 {
 	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::BackFace].SetDiffuseTextureOption(strTextureOption);
@@ -762,14 +769,14 @@ MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceAlpha(float fInAlpha)
 	return *this;
 }
 
-MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceTexture(CString strTextureName)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceTexture(CStringA strTextureName)
 {
 	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::FrontFace].SetDiffuseTexture(strTextureName);
 	return *this;
 }
 
-MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceTextureOption(CString strTextureOption)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceTextureOption(CStringA strTextureOption)
 {
 	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::FrontFace].SetDiffuseTextureOption(strTextureOption);
@@ -839,14 +846,14 @@ MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceAlpha(float fInAlpha)
 	return *this;
 }
 
-MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceTexture(CString strTextureName)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceTexture(CStringA strTextureName)
 {
 	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Face].SetDiffuseTexture(strTextureName);
 	return *this;
 }
 
-MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceTextureOption(CString strTextureOption)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceTextureOption(CStringA strTextureOption)
 {
 	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Face].SetDiffuseTextureOption(strTextureOption);
@@ -909,7 +916,7 @@ MaterialMappingKit & H3DF::MaterialMappingKit::SetVertexColor(RGBAColor const & 
 	return *this;
 }
 
-MaterialMappingKit & H3DF::MaterialMappingKit::SetVertexTexture(CString strTextureName)
+MaterialMappingKit & H3DF::MaterialMappingKit::SetVertexTexture(CStringA strTextureName)
 {
 	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Vertex].SetDiffuseTexture(strTextureName);
@@ -978,10 +985,10 @@ bool H3DF::MaterialMappingKit::ShowAmbientLightDownColor(Material::Type & cOutTy
 	return pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::AmbientLightDown].ShowDiffuseColor(cOutColor);
 }
 
-bool H3DF::MaterialMappingKit::ShowBackFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialMappingKit::ShowBackFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
 	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
-	return pcImpl->ShowChannel(H3DF::MaterialMappingKitImpl::Type::BackFace, eInChannel, cOutType, cOutColor, strOutTextureName);
+	return pcImpl->ShowChannel(H3DF::MaterialMappingKitImpl::Type::BackFace, eInChannel, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialMappingKit::ShowBackFaceMaterial(MaterialKit & cOutKit) const
@@ -990,10 +997,10 @@ bool H3DF::MaterialMappingKit::ShowBackFaceMaterial(MaterialKit & cOutKit) const
 	return pcImpl->ShowMaterial(H3DF::MaterialMappingKitImpl::Type::BackFace, cOutKit);
 }
 
-bool H3DF::MaterialMappingKit::ShowFrontFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialMappingKit::ShowFrontFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
 	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
-	return pcImpl->ShowChannel(H3DF::MaterialMappingKitImpl::Type::FrontFace, eInChannel, cOutType, cOutColor, strOutTextureName);
+	return pcImpl->ShowChannel(H3DF::MaterialMappingKitImpl::Type::FrontFace, eInChannel, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialMappingKit::ShowFrontFaceMaterial(MaterialKit & cOutKit) const
@@ -1002,10 +1009,10 @@ bool H3DF::MaterialMappingKit::ShowFrontFaceMaterial(MaterialKit & cOutKit) cons
 	return pcImpl->ShowMaterial(H3DF::MaterialMappingKitImpl::Type::FrontFace, cOutKit);
 }
 
-bool H3DF::MaterialMappingKit::ShowEdgeChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialMappingKit::ShowEdgeChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
 	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
-	return pcImpl->ShowChannel(H3DF::MaterialMappingKitImpl::Type::Edge, eInChannel, cOutType, cOutColor, strOutTextureName);
+	return pcImpl->ShowChannel(H3DF::MaterialMappingKitImpl::Type::Edge, eInChannel, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialMappingKit::ShowEdgeMaterial(MaterialKit & cOutKit) const
@@ -1014,10 +1021,10 @@ bool H3DF::MaterialMappingKit::ShowEdgeMaterial(MaterialKit & cOutKit) const
 	return pcImpl->ShowMaterial(H3DF::MaterialMappingKitImpl::Type::Edge, cOutKit);
 }
 
-bool H3DF::MaterialMappingKit::ShowFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialMappingKit::ShowFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
 	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
-	return pcImpl->ShowChannel(H3DF::MaterialMappingKitImpl::Type::Face, eInChannel, cOutType, cOutColor, strOutTextureName);
+	return pcImpl->ShowChannel(H3DF::MaterialMappingKitImpl::Type::Face, eInChannel, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialMappingKit::ShowFaceMaterial(MaterialKit & cOutKit) const
@@ -1050,10 +1057,10 @@ bool H3DF::MaterialMappingKit::ShowTextColor(RGBAColor & cOutColor) const
 	return pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Text].ShowDiffuseColor(cOutColor);
 }
 
-bool H3DF::MaterialMappingKit::ShowVertexChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CString & strOutTextureName) const
+bool H3DF::MaterialMappingKit::ShowVertexChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
 	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
-	return pcImpl->ShowChannel(H3DF::MaterialMappingKitImpl::Type::Vertex, eInChannel, cOutType, cOutColor, strOutTextureName);
+	return pcImpl->ShowChannel(H3DF::MaterialMappingKitImpl::Type::Vertex, eInChannel, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialMappingKit::ShowVertexMaterial(MaterialKit & cOutKit) const
@@ -1071,14 +1078,14 @@ public:
 		ControlImpl::Copy(pcInThat);
 	}
 
-	void SetAlpha(CString strGeometry, float fInAlpha);
-	void SetColor(CString strGeometry, RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel);
+	void SetAlpha(CStringA strGeometry, float fInAlpha);
+	void SetColor(CStringA strGeometry, RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel);
 
 protected:
-	CString GetColorChannelString(Material::Color::Channel cInChannel);
+	CStringA GetColorChannelString(Material::Color::Channel cInChannel);
 };
 
-CString MaterialMappingControlImpl::GetColorChannelString(Material::Color::Channel cInChannel)
+CStringA MaterialMappingControlImpl::GetColorChannelString(Material::Color::Channel cInChannel)
 {
 	switch (cInChannel)
 	{
@@ -1098,32 +1105,32 @@ CString MaterialMappingControlImpl::GetColorChannelString(Material::Color::Chann
 	return L"";
 }
 
-void MaterialMappingControlImpl::SetAlpha(CString strGeometry, float fInAlpha)
+void MaterialMappingControlImpl::SetAlpha(CStringA strGeometry, float fInAlpha)
 {
-	CString strColorText;
-	strColorText.Format(L"%s = (transmission = r=%f g=%f b=%f)", strGeometry, fInAlpha, fInAlpha, fInAlpha);
+	CStringA strColorText;
+	strColorText.Format("%s = (transmission = r=%f g=%f b=%f)", strGeometry, fInAlpha, fInAlpha, fInAlpha);
 
 	SegmentKeyImpl::LocalOpen(m_cOverrideKey); {
-		HC_Set_Color(Utility::ToChar(strColorText));
+		HC_Set_Color(strColorText);
 	} SegmentKeyImpl::LocalClose(m_cOverrideKey);
 }
 
-void MaterialMappingControlImpl::SetColor(CString strGeometry, RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel)
+void MaterialMappingControlImpl::SetColor(CStringA strGeometry, RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel)
 {
-	CString strColorText;
-	CString strColorChannel = GetColorChannelString(cInChannel);
+	CStringA strColorText;
+	CStringA strColorChannel = GetColorChannelString(cInChannel);
 
 	if (1.0f > cInRgbaColor.alpha) {
-		strColorText.Format(L"%s = (%s = (r=%f g=%f b=%f), (transmission = r=%f g=%f b=%f))", strGeometry, strColorChannel, 
+		strColorText.Format("%s = (%s = (r=%f g=%f b=%f), (transmission = r=%f g=%f b=%f))", strGeometry, strColorChannel, 
 			cInRgbaColor.red, cInRgbaColor.green, cInRgbaColor.blue,
 			cInRgbaColor.alpha, cInRgbaColor.alpha, cInRgbaColor.alpha);
 	}
 	else {
-		strColorText.Format(L"%s = (%s = (r=%f g=%f b=%f))", strGeometry, strColorChannel, cInRgbaColor.red, cInRgbaColor.green, cInRgbaColor.blue);
+		strColorText.Format("%s = (%s = (r=%f g=%f b=%f))", strGeometry, strColorChannel, cInRgbaColor.red, cInRgbaColor.green, cInRgbaColor.blue);
 	}
 	
 	SegmentKeyImpl::LocalOpen(m_cOverrideKey); {
-		HC_Set_Color(Utility::ToChar(strColorText));
+		HC_Set_Color(strColorText);
 	} SegmentKeyImpl::LocalClose(m_cOverrideKey);
 }
 
@@ -1198,13 +1205,13 @@ MaterialMappingControl & H3DF::MaterialMappingControl::SetMarkerColor(RGBAColor 
 	return *this;
 }
 
-MaterialMappingControl & H3DF::MaterialMappingControl::UnSetColor(CString strInType)
+MaterialMappingControl & H3DF::MaterialMappingControl::UnSetColor(CStringA strInType)
 {
 	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_UnSet_One_Selectability(Utility::ToChar(strInType));
+		HC_UnSet_One_Selectability(strInType);
 	}SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
@@ -1288,16 +1295,16 @@ void H3DF::MaterialMappingControl::SetTextureMatrix(float * pfTextureMatrix, cha
 	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 }
 
-void H3DF::MaterialMappingControl::SetDefineLocalTexture(UINT nIndex, CString strTextureOptions)
+void H3DF::MaterialMappingControl::SetDefineLocalTexture(UINT nIndex, CStringA strTextureOptions)
 {
 	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
-	CString strText;
-	strText.Format(L"texture_%u", nIndex);
+	CStringA strText;
+	strText.Format("texture_%u", nIndex);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_Define_Local_Texture(Utility::ToChar(strText), Utility::ToChar(strTextureOptions));
+		HC_Define_Local_Texture(strText, strTextureOptions);
 	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 }
 

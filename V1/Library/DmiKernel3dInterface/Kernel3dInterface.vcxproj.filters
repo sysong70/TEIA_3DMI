@@ -75,9 +75,6 @@
     <ClInclude Include="Object.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Manager.h">
-      <Filter>Kernel</Filter>
-    </ClInclude>
     <ClInclude Include="Operator.VisualEffects.h">
       <Filter>Operator</Filter>
     </ClInclude>
@@ -156,9 +153,6 @@
       <Filter>Kernel</Filter>
     </ClCompile>
     <ClCompile Include="Object.cpp">
-      <Filter>Kernel</Filter>
-    </ClCompile>
-    <ClCompile Include="Manager.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
     <ClCompile Include="Operator.VisualEffects.cpp">

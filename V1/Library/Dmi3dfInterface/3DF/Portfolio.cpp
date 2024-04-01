@@ -23,7 +23,7 @@ H3DF::PortfolioKey::PortfolioKey(HC_KEY nInKey) : Key(nInKey)
 {
 }
 
-H3DF::PortfolioKey::PortfolioKey(Key const & cInThat) : Key(cInThat)
+H3DF::PortfolioKey::PortfolioKey(Key const & cInThat) : Key(cInThat) 
 {
 }
 

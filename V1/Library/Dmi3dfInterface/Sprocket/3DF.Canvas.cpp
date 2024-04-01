@@ -157,6 +157,14 @@ void H3DF::Canvas::AttachViewAsLayout(View const * pcInView)
 	pcCanvasImpl->m_pcFrontView = pcCanvasImpl->m_vpcViewArray.front();
 }
 
+HWND H3DF::Canvas::GetHwnd()
+{
+	CanvasImpl * pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl);
+	DEBUG_VALID(pcCanvasImpl);
+
+	return (HWND)pcCanvasImpl->m_nInWindowHandle;
+}
+
 void H3DF::Canvas::SetDelivery(Signal::Delivery & cDelivery, int nViewId)
 {
 	CanvasImpl * pcImpl = (CanvasImpl *)m_pcImpl;
@@ -166,7 +174,7 @@ void H3DF::Canvas::SetDelivery(Signal::Delivery & cDelivery, int nViewId)
 }
 
 // #Import: File Open
-void H3DF::Canvas::FileOpen(Json::Object & cInObject, H3DF::CADModel & cInCADModel)
+void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADModel)
 {
 	CanvasImpl * pcImpl = (CanvasImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -193,10 +201,10 @@ void H3DF::Canvas::FileOpen(Json::Object & cInObject, H3DF::CADModel & cInCADMod
 
 	return;
 */
-	CString strFilePathName = cInObject.GetString(SKW_FILEPATH);
-	if (true == strFilePathName.IsEmpty()) {
-		return;
-	}
+// 	CString strFilePathName = cInObject.GetString(SKW_FILEPATH);
+// 	if (true == strFilePathName.IsEmpty()) {
+// 		return;
+// 	}
 
 	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Open File: " + strFilePathName);
 

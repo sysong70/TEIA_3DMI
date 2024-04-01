@@ -1130,9 +1130,10 @@ private:
 	}
 };
 
-typedef Plane_3D<float>		Plane;
-typedef Plane_3D<double>	DPlane;
+using Plane = Plane_3D<float>;
+using DPlane = Plane_3D<double>;
 
+using PlaneArray = std::vector<Plane, Allocator<Plane>>; //!< Array of type HPS::Plane
 
 template <typename F>
 H3DF_INLINE bool Is_Abnormal(Plane_3D<F> const & p) {
@@ -1156,7 +1157,6 @@ H3DF_INLINE Plane_3D<F> Interpolate(Plane_3D<F> const & a, Plane_3D<F> const & b
 
 template <typename F>
 Vector_3D<F>::Vector_3D(Plane_3D<F> const & p) : x(p.a), y(p.b), z(p.c) {}
-
 
 //== Cuboid_3D Class ===============================================================================
 

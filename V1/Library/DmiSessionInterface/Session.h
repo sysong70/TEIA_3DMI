@@ -25,7 +25,9 @@ namespace SESSION
 		void ViewInitialize(Json::Object & cInObject, Signal::Delivery & cInstance);
 		void ViewPaint(Json::Object & cInObject);
 		void ViewResize(Json::Object & cInObject);
-		KERNEL::DocView * GetView();
+		KERNEL::DocView * GetDocView();
+
+		static void CALLBACK OnTimerCallback(HWND hWnd, UINT nMsg, UINT_PTR nTimerId, DWORD dwTime);
 
 		void ViewMouseSignal(Json::Object & cInObject);
 		void ViewKeyboardSignal(Json::Object & cInObject);
@@ -39,7 +41,7 @@ namespace SESSION
 
 		//== Panel 관련 함수 ========================================================================
 		void ModelPanelSignal(Json::Object & cInObject);
-	
+
 	private:
 		int m_nSessionId = -1;
 

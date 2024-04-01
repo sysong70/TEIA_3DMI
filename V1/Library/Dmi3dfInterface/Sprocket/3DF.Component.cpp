@@ -108,6 +108,20 @@ ComponentArray & H3DF::Component::GetSubComponents() const
 	return *pcImpl->m_pvSubComponents;
 }
 
+size_t H3DF::Component::GetAllSubComponentCount() const
+{
+	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	size_t nCount = GetSubComponents().size();
+
+	for (auto * pcComponent : GetSubComponents()) {
+		nCount += pcComponent->GetAllSubComponentCount();
+	}
+
+	return nCount;
+}
+
 CString H3DF::Component::GetName() const
 {
 	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;

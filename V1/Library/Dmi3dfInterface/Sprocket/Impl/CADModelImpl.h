@@ -21,6 +21,7 @@ namespace H3DF
 		Component * m_pcMeasurements = nullptr;
 		Component * m_pcMarkups = nullptr;
 
+		DWORD m_nProductOccurrenceIndex = 1;
 		DWORD m_nSolidIndex = 1;
 		DWORD m_nSurfaceIndex = 1;
 		DWORD m_nGroupIndex = 1;

@@ -9,6 +9,8 @@
 
 #include "Session.h"
 
+#include "../DmiKernel3dInterface/Kernel.DocView.h"
+
 #include "../Signal/Signal.h"
 #include "../Common/Common_Define.h"
 
@@ -159,6 +161,7 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 			// nViewId를 넣는 이유는 Instnace에서 Signal을 보낼때 식별자로서 ViewId를 보내기 위해서 값을 넣어주는 것임.
 			// 실제로는 하나의 Instance를 사용하는 것임.
 			pcSession->ViewInitialize(cInObject, Connector::GetInstance(nViewId));
+
 			//:Ken - TEST
 			//Connector::GetInstance(-1).application.AddTraceLogV(L"View initialized %d", nViewId);
 			//Connector::GetInstance(-1).application.AddTraceLog(L"next message");
@@ -242,6 +245,21 @@ SESSION::Session * SESSION::Manager::Session::GetSession(int nViewId)
 	Connector::GetInstance(nViewId);
 
 	return pcSession;
+}
+
+// 1-2. 생성된 Session을 HWND를 이용해서 찾아옴.
+SESSION::Session * SESSION::Manager::Session::GetSession(HWND hWnd)
+{
+	for (auto & cIterator : m_mpcSessions) {
+		SESSION::Session * pcSession = cIterator.second;
+		if (nullptr == pcSession) { continue; }
+
+		if (hWnd == pcSession->GetDocView()->GetHwnd()) {
+			return pcSession;
+		}
+}
+
+	return nullptr;
 }
 
 void SESSION::Manager::Session::RemoveSession(int nViewId)
