@@ -758,6 +758,7 @@ void Signal::ModelPanel::AddChildren(DWORD_PTR parentKey, TreeItems& items, bool
 		node.SetDwordPtr(SKW_KEY, item.Key);
 		node.SetString(SKW_TITLE, item.Title);
 		node.SetBoolean(SKW_CHECKED, item.Checked);
+		node.SetBoolean(SKW_HASCHILDREN, item.HasChildren);
 		node.SetInteger(SKW_TYPE, (int)item.Type);
 	}
 

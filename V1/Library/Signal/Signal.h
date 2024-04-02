@@ -19,6 +19,7 @@
 #define SKW_FLAG			"Flag"
 #define SKW_GLOBALNAME		"GlobalName"
 #define SKW_GROUPNAME		"GroupName"
+#define SKW_HASCHILDREN		"HasChildren"
 #define SKW_HWND			"HWND"
 #define SKW_ID				"Id"
 #define SKW_ITEMS			"Items"
@@ -105,6 +106,7 @@ namespace Signal
 		DWORD_PTR Key = 0;
 		CString Title;
 		bool Checked = true;
+		bool HasChildren = false;
 		ETreeItem Type = ETreeItem::Unknown;
 	};
 

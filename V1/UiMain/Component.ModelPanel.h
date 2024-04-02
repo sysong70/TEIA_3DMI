@@ -68,8 +68,9 @@ namespace Component
 
 	private: // Signal responser
 
+		void AddDummyItem(HTREEITEM parent, bool checked);
 		// use in AddChildren()
-		HTREEITEM AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool checked, int type);
+		HTREEITEM AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool checked, bool hasChildren, int type);
 
 		HTREEITEM AddItem(Json::Object* pData);
 

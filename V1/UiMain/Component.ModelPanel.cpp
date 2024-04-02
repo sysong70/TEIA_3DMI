@@ -41,6 +41,8 @@ namespace PresetModelPanel
 		Tree = WM_USER,
 		SortButton = TOOLBAR_3D_LST_Sort,
 	};
+
+	const CString DummyName = L"_$_DUMMY_$_";
 }
 
 //**************************************************************************************************
@@ -66,7 +68,7 @@ public:
 			/// Enables check boxes for items in a tree - view control.
 			| TVS_CHECKBOXES
 			/// Prevents the tree-view control from sending TVN_BEGINDRAG notification codes.
-			//| TVS_DISABLEDRAGDROP
+			| TVS_DISABLEDRAGDROP
 			/// Allows the user to edit the labels of tree - view items.
 			//| TVM_EDITLABEL
 			/// Enables full-row selection in the tree view.
@@ -108,6 +110,7 @@ public:
 		//:CHECK
 		//SetShowInPlaceToolTip(FALSE);
 
+		/*
 		//:WARNING - do not use local string
 		BCGP_GRID_FILTERBAR_OPTIONS filter(m_filterMessage);
 		//filter.m_clrMarkBackground = (COLORREF)Control::EColor::White;
@@ -119,6 +122,7 @@ public:
 		EnableFilterBar(TRUE, filter);
 
 		CreateIcons();
+		*/
 	}
 
 
@@ -289,10 +293,6 @@ Component::ModelPanel::~ModelPanel()
 
 void Component::ModelPanel::ReceiveSignal(Json::Object* pData)
 {
-// 	//:TEST
-// 	REMOVE_POINTER(pData);
-// 	return;
-
 	Json::Object& data = *pData;
 	Signal::ModelPanel::Action action = (Signal::ModelPanel::Action)data.GetInteger(SKW_ACTION);
 
@@ -568,9 +568,16 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 		DEBUG_LOG(L"* OnTreeItemExpanded");
 
 		HTREEITEM hItem = pNMTreeView->itemNew.hItem;
-		DWORD_PTR key = Control().GetItemData(hItem);
-		ASSERT(key != 0);
-		//View().GetDelivery().modelPanel.OnItemExpanded(key);
+
+		// get first child item
+		HTREEITEM hChild = Control().GetChildItem(hItem);
+		if (Control().GetItemText(hChild) == PRESET::DummyName) {
+			Control().DeleteItem(hChild);
+
+			DWORD_PTR key = Control().GetItemData(hItem);
+			ASSERT(key != 0);
+			View().GetDelivery().modelPanel.OnItemExpanded(key);
+		}
 	}
 	else {
 		ASSERT(pNMTreeView->action == TVE_COLLAPSE);
@@ -668,10 +675,16 @@ void Component::ModelPanel::OnTreeSetFocus(NMHDR* pNMHDR, LRESULT* pResult)
 
 //--------------------------------------------------------------------------------------------------
 
-//:REF - https://learn.microsoft.com/en-us/windows/win32/api/commctrl/ns-commctrl-tvitemexw
-//:REF - https://learn.microsoft.com/en-us/windows/win32/controls/tree-view-control-item-states
+void Component::ModelPanel::AddDummyItem(HTREEITEM parent, bool checked)
+{
+	HTREEITEM hDummy = Control().InsertItem(PRESET::DummyName, parent);
+	Control().SetCheck(hDummy, checked);
+	Control().Expand(parent, TVE_COLLAPSE);
+}
 
-HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool checked, int type)
+
+
+HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool checked, bool hasChildren, int type)
 {
 	HTREEITEM hItem = Control().InsertItem(title, parent);
 	DEBUG_VALID(hItem);
@@ -685,6 +698,10 @@ HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR
 	Control().SetItemData(hItem, key);
 	Control().SetCheck(hItem, checked);
 
+	if (hasChildren) {
+		AddDummyItem(hItem, checked);
+	}
+
 	return hItem;
 }
 
@@ -693,6 +710,7 @@ HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR
 HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 {
 	DWORD_PTR key = pData->GetDwordPtr(SKW_KEY);
+	bool checked = pData->GetBoolean(SKW_CHECKED);
 
 	HTREEITEM hItem = Control().InsertItem(pData->GetString(SKW_TITLE), GetItem(pData->GetDwordPtr(SKW_PARENT)));
 	DEBUG_VALID(hItem);
@@ -701,7 +719,11 @@ HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 	m_keyMap[key] = hItem;
 
 	Control().SetItemData(hItem, key);
-	Control().SetCheck(hItem, pData->GetBoolean(SKW_CHECKED));
+	Control().SetCheck(hItem, checked);
+
+	if (pData->GetBoolean(SKW_HASCHILDREN)) {
+		AddDummyItem(hItem, checked);
+	}
 
 	return hItem;
 }
@@ -733,6 +755,7 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 			child.GetDwordPtr(SKW_KEY),
 			(LPWSTR)(LPCTSTR)child.GetString(SKW_TITLE),
 			checked,
+			child.GetBoolean(SKW_HASCHILDREN),
 			child.GetInteger(SKW_TYPE)
 		);
 	}
