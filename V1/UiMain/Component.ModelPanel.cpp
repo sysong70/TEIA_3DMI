@@ -14,7 +14,7 @@ static char THIS_FILE[] = __FILE__;
 //**************************************************************************************************
 
 //#define _TEST
-//#define _LOG
+#define _LOG
 
 #ifdef _LOG
 #define DEBUG_LOG(s) TheApplication.GetMainFrame().GetDebugTracer().AddLog(s)
@@ -54,9 +54,11 @@ public:
 	ModelTree()
 		: CBCGPTreeCtrlEx()
 	{
+		/*
 		m_filterMessage = Facility::Local(L"Search models...|모델 검색...");
 		//:WANING - SetOutOfFilterLabel();
 		m_strOutOfFilter = Facility::Local(L"No items match your search.|일치하는 항목을 찾을 수 없습니다.");
+		*/
 	}
 
 public:
@@ -68,7 +70,7 @@ public:
 			/// Enables check boxes for items in a tree - view control.
 			| TVS_CHECKBOXES
 			/// Prevents the tree-view control from sending TVN_BEGINDRAG notification codes.
-			| TVS_DISABLEDRAGDROP
+			//| TVS_DISABLEDRAGDROP
 			/// Allows the user to edit the labels of tree - view items.
 			//| TVM_EDITLABEL
 			/// Enables full-row selection in the tree view.
@@ -256,7 +258,7 @@ using namespace Component;
 BEGIN_MESSAGE_MAP(ModelPanel, Panel)
 	ON_REGISTERED_MESSAGE(BCGM_GRID_ROW_CHECKBOX_CLICK, OnTreeCheckClick)
 
-	//ON_NOTIFY(NM_CLICK, PRESET::Tree, OnTreeClick)
+	ON_NOTIFY(NM_CLICK, PRESET::Tree, OnTreeClick)
 	ON_NOTIFY(NM_DBLCLK, PRESET::Tree, OnTreeDblClick)
 	//ON_NOTIFY(NM_RCLICK, PRESET::Tree, OnTreeRClick)
 	//ON_NOTIFY(NM_RDBLCLK, PRESET::Tree, OnTreeRDbClick)
@@ -267,7 +269,7 @@ BEGIN_MESSAGE_MAP(ModelPanel, Panel)
 	ON_NOTIFY(TVN_DELETEITEM, PRESET::Tree, OnTreeDeleteItem)
 	ON_NOTIFY(TVN_ENDLABELEDIT, PRESET::Tree, OnTreeEndLabelEdit)
 	ON_NOTIFY(TVN_ITEMEXPANDED, PRESET::Tree, OnTreeItemExpanded)
-	ON_NOTIFY(TVN_ITEMEXPANDING, PRESET::Tree, OnTreeItemExpanding)
+	//ON_NOTIFY(TVN_ITEMEXPANDING, PRESET::Tree, OnTreeItemExpanding)
 	ON_NOTIFY(TVN_SELCHANGED, PRESET::Tree, OnTreeSelChanged)
 	//ON_NOTIFY(TVN_SELCHANGING, PRESET::Tree, OnTreeSelChanging)
 
@@ -390,7 +392,6 @@ void Component::ModelPanel::OnCommandSort()
 
 LRESULT Component::ModelPanel::OnTreeCheckClick(WPARAM wp, LPARAM lp)
 {
-	DEBUG_LOG(L"* OnTreeCheckClick");
 	CBCGPGridRow* pRow = (CBCGPGridRow*)lp;
 
 	BOOL checked = !pRow->GetCheck();
@@ -401,6 +402,9 @@ LRESULT Component::ModelPanel::OnTreeCheckClick(WPARAM wp, LPARAM lp)
 	Control().RedrawWindow();
 
 	DWORD_PTR key = Control().GetItemData(Control().TreeItem(pRow));
+	ASSERT(key != 0);
+
+	DEBUG_LOG(L"* OnItemChecked activated");
 	View().GetDelivery().modelPanel.OnItemChecked(key, (bool)checked);
 
 	return S_FALSE;
@@ -502,8 +506,6 @@ void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeDblClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	DEBUG_LOG(L"* OnTreeDblClick");
-
 	UINT flag = 0;
 #ifdef _TEST
 	HTREEITEM hItem = Control().CustomHitTest(flag);
@@ -518,6 +520,7 @@ void Component::ModelPanel::OnTreeDblClick(NMHDR* pNMHDR, LRESULT* pResult)
 	DWORD_PTR key = Control().GetItemData(hItem);
 	ASSERT(key != 0);
 
+	DEBUG_LOG(L"* OnItemDblClicked activated");
 	View().GetDelivery().modelPanel.OnItemDblClicked(key);
 	//:CHECK - if S_OK, tree expand the item
 	*pResult = S_FALSE;
@@ -527,15 +530,16 @@ void Component::ModelPanel::OnTreeDblClick(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeDeleteItem(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	DEBUG_LOG(L"* OnTreeDeleteItem");
-
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 	HTREEITEM hItem = pNMTreeView->itemOld.hItem;
 
 	DWORD_PTR key = Control().GetItemData(hItem);
-	Control().DeleteItem(hItem);
+	ASSERT(key != 0);
 
+	Control().DeleteItem(hItem);
 	m_keyMap.erase(key);
+
+	DEBUG_LOG(L"* OnItemDeleted activated");
 	View().GetDelivery().modelPanel.OnItemDeleted(key);
 
 	*pResult = S_OK;
@@ -565,8 +569,6 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
 	if (pNMTreeView->action == TVE_EXPAND) {
-		DEBUG_LOG(L"* OnTreeItemExpanded");
-
 		HTREEITEM hItem = pNMTreeView->itemNew.hItem;
 
 		// get first child item
@@ -576,6 +578,8 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 
 			DWORD_PTR key = Control().GetItemData(hItem);
 			ASSERT(key != 0);
+
+			DEBUG_LOG(L"* OnItemExpanded activated");
 			View().GetDelivery().modelPanel.OnItemExpanded(key);
 		}
 	}
@@ -646,10 +650,23 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 	if (hItem == nullptr) {
 	}
 	else {
-		DEBUG_LOG(L"* OnTreeSelChanged");
+		CPoint point;
+		::GetCursorPos(&point);
+		Control().ScreenToClient(&point);
 
-		DWORD_PTR key = Control().GetItemData(hItem);
-		View().GetDelivery().modelPanel.OnItemSelected(key);
+		UINT flag = 0;
+		HTREEITEM hSelected = Control().HitTest(point, &flag);
+
+		if (flag & TVHT_ONITEMBUTTON) {
+			//:WARNING - expand box clicked, skip signal
+		}
+		else {
+			DWORD_PTR key = Control().GetItemData(hItem);
+			ASSERT(key != 0);
+
+			DEBUG_LOG(L"* OnItemSelected activated");
+			View().GetDelivery().modelPanel.OnItemSelected(key);
+		}
 	}
 
 	*pResult = S_OK;
