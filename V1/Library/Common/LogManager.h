@@ -74,9 +74,9 @@ public:
 	};
 
 	static CString GetExecuteDirectory();
-
+	static bool CreateFolder(CString strPath);
 protected:
-	bool CreateFolder(CString strPath);
+	
 	CString GetAppDataFolderPath();
 
 	bool CStringToChar(CString strText, char *& pchText);

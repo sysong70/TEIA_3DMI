@@ -124,7 +124,6 @@ namespace H3DF
                 0x00011c00, // Represents an A3DMarkupLocator in Exchange.  This will be represented by an Exchange::Component.
             ExchangePMIMeasurementPoint = 0x00011d00, // Represents an A3DMarkupMeasurementPoint in Exchange.  This will be
                                                       // represented by an Exchange::Component.
-
             DWGComponentMask = 0x00100000, // Mask for any DWG components.
             DWGModelFile = 0x00100001, // Represents an AcDbDatabase in RealDWG.  This will be represented by a DWG::CADModel.
             DWGLayout = 0x00100002, // Represents an AcDbLayout in RealDWG.
@@ -139,6 +138,9 @@ namespace H3DF
             ModelsComponent = 0x01000001, // Represents a model component
             MeasurementsComponent = 0x01000002, // Represents a model component
             MarkupsComponent = 0x01000003, // Represents a model component
+            ViewGroupComponent = 0x01000004, // UI에서 View를 Group으로 나타내기 위한 Type;
+            PMIGroupComponent = 0x01000005, // UI에서 Pmi를 Group으로 나타내기 위한 Type;
+
         };
 
 		enum Status

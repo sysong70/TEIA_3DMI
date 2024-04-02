@@ -112,7 +112,8 @@ void SESSION::Session::ViewExecuteCommand(Json::Object & cInObject)
 		case FILE_3D_CMD_Save:
 		case FILE_3D_CMD_SaveAs: {
 			CString strFilePath = cInObject.GetString(SKW_FILEPATH);
-			//m_pcDocView->Save(strFilePath);
+			m_pcDocView->Save(strFilePath.GetBuffer());
+			strFilePath.ReleaseBuffer();
 			return;
 		} break;
 	}

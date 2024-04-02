@@ -49,6 +49,7 @@ H3DF::ModelImpl::~ModelImpl()
 	}
 }
 
+// #Model: Init 및 Style 정의 (Show, NoShow)
 void H3DF::ModelImpl::Init()
 {
 	HBaseModel::Init();
@@ -71,14 +72,14 @@ void H3DF::ModelImpl::Init()
 
 	// Show Condtion용 Style 생성
 	m_cShowStyle = m_cIncludeStyles.Subsegment("show_style");
-	m_cShowStyle.GetVisibilityControl().SetFaces(true).SetLines(true);
+	m_cShowStyle.GetVisibilityControl().SetFaces(true).SetLines(true).SetText(true);
 
 	m_cShowVertexStyle = m_cIncludeStyles.Subsegment("show_vertex_style");
 	m_cShowVertexStyle.GetVisibilityControl().SetVertices(true);
 
 	// No Show Condtion용 Style 생성
 	m_cNoShowStyle = m_cIncludeStyles.Subsegment("noshow_style");
-	m_cNoShowStyle.GetVisibilityControl().SetFaces(false).SetLines(false).SetVertices(false);
+	m_cNoShowStyle.GetVisibilityControl().SetFaces(false).SetLines(false).SetVertices(false).SetText(false);
 
 	m_cNoShowVertexStyle = m_cIncludeStyles.Subsegment("noshow_vertex_style");
 	m_cNoShowVertexStyle.GetVisibilityControl().SetVertices(false);

@@ -125,13 +125,52 @@ void KERNEL::Operator::ModelPanelImpl::ComponentExpanded(H3DF::Component & cInCo
 
 	H3DF::CADModelImpl * pcImpl = dynamic_cast<H3DF::CADModelImpl *>(m_pcCadModel->GetImpl());
 
+	// View Group 및 PMI Group을 우선적으로 표시한다.
+	if (H3DF::Component::Type::ExchangeProductOccurrence == cInComponent.GetType()) {
+		// View Group Item 생성.
+		for (auto pcComponent : cSubComponents) {
+			if (H3DF::Component::Type::ViewGroupComponent == pcComponent->GetType()) {
+				if (0 < pcComponent->GetSubComponents().size()) {
+					cItem.Key = (DWORD_PTR)pcComponent;
+					cItem.Title = pcComponent->GetName();
+					cItem.HasChildren = true;
+					cTreeItems.push_back(cItem);
+				}
+				break;
+			}
+		}
+
+		// PMI Group Item 생성.
+		for (auto pcComponent : cSubComponents) {
+			if (H3DF::Component::Type::PMIGroupComponent == pcComponent->GetType()) {
+				if (0 < pcComponent->GetSubComponents().size()) {
+					cItem.Key = (DWORD_PTR)pcComponent;
+					cItem.Title = pcComponent->GetName();
+					cItem.HasChildren = true;
+					cTreeItems.push_back(cItem);
+				}
+				break;
+			}
+		}
+	}
+
 	for (auto pcComponent : cSubComponents) {
 		if (false == IsVisible(*pcComponent)) {
 			continue;
 		}
 
+		if (H3DF::Component::Type::ExchangeProductOccurrence == cInComponent.GetType()) {
+			if (H3DF::Component::Type::ViewGroupComponent == pcComponent->GetType() ||
+				H3DF::Component::Type::PMIGroupComponent == pcComponent->GetType()) {
+				continue;
+			}
+		}
+
+		// Show/NoShow 상태를 설정.
 		cItem.Checked = (H3DF::Component::Status::NoShow & pcComponent->GetStatus()) ? false : true;
 		cItem.Key = (DWORD_PTR)pcComponent;
+
+		// Title 설정
 #ifdef _DEBUG
 		CString strText;
 		if (INVALID_KEY == pcComponent->GetIncludeKey()) {
@@ -151,7 +190,8 @@ void KERNEL::Operator::ModelPanelImpl::ComponentExpanded(H3DF::Component & cInCo
 #else
 		cItem.Title = pcComponent->GetName();
 #endif
-		
+		// 하부 Child가 있는 확인.
+		cItem.HasChildren = (0 < pcComponent->GetSubComponents().size()) ? true : false;
 
 		if (true == cItem.Title.IsEmpty()) {
 			cItem.Title = pcImpl->TypeName(*pcComponent);
@@ -284,7 +324,7 @@ void KERNEL::Operator::ModelPanel::Initialize(H3DF::CADModel & cInCadModel)
 	// Root Item을 추가
 	pcImpl->Delivery().modelPanel.AddItem(cItem);
 
-	pcImpl->ComponentExpanded(cInCadModel, true);
+	pcImpl->ComponentExpanded(cInCadModel, false);
 
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
 }
@@ -402,7 +442,7 @@ void KERNEL::Operator::ModelPanel::Signal(Json::Object & cInObject)
 			break;
 
 		default:
-			ASSERT(false);
+			DEBUG_STOP;
 			break;
 	}
 }
@@ -498,17 +538,23 @@ void KERNEL::Operator::ModelPanel::CheckedUpdate(Component & cInComponent)
 
 //== Item Expanded 관련 함수 =========================================================================
 
-// 1. Item Expanded Signal 처리
 //== Item Selelect Changed 관련 함수 =================================================================
 
+// 1. Item Expanded Signal 처리
 void KERNEL::Operator::ModelPanel::OnItemExpandedSignal(Json::Object & cInObject)
 {
-	// 이미 전개되어 있기때문에 특별히 할일이 없음.
-
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	DWORD_PTR nInItemKey = cInObject.GetDwordPtr(SKW_KEY);
+	Component * pcComponent = dynamic_cast<Component *>((Component *)cInObject.GetDwordPtr(SKW_KEY));
+	if (nullptr == pcComponent) {
+		DEBUG_STOP;
+		return;
+	}
+
+	pcImpl->ComponentExpanded(*pcComponent);
+
+	// bool bExpanded = cInObject.GetBoolean(SKW_EXPANDED);
 }
 
 // 1. Item Select Changed Signal 처리

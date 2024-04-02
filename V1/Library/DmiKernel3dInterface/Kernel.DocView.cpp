@@ -160,9 +160,11 @@ H3DF::CADModel & KERNEL::DocView::CADModel() const
 	return pcImpl->CADModel();
 }
 
-bool KERNEL::DocView::Save(CString strFilePathName)
+bool KERNEL::DocView::Save(WCHAR * pstrInFilePathName)
 {
 	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+
+	CString strFilePathName = pstrInFilePathName;
 
 	if (true == strFilePathName.IsEmpty()) {
 		strFilePathName = L"Z://Test.hsf";

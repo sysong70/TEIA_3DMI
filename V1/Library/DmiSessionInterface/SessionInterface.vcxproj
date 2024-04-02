@@ -176,10 +176,6 @@
     <ClCompile Include="Session.Facility.KernelOption.cpp" />
     <ClCompile Include="Session.Facility.Preference.cpp" />
     <ClCompile Include="Interface.cpp" />
-    <ClCompile Include="dllmain.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="SessionInterface.cpp" />
     <ClCompile Include="Signal.Connector.cpp" />
     <ClCompile Include="stdafx.cpp">

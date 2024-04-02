@@ -34,7 +34,7 @@ namespace KERNEL
 		H3DF::Canvas & Canvas() const;
 		H3DF::CADModel & CADModel() const;
 
-		bool Save(CString strFilePathName);
+		bool Save(WCHAR * pstrInFilePathName);
 
 		//== Operator 관련 함수 ======================================================================
 		Operator::Attribute & Attribute();
