@@ -148,7 +148,9 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 		int id = data.GetInteger(SKW_VIEWID, -1);
 		View* pView = TheApplication.FindView(id);
 		if (pView != nullptr) {
-			pView->PostMessage((int)EUserMessage::OnSignal, (WPARAM)pData);
+			//:TEST
+			//pView->PostMessage((int)EUserMessage::OnSignal, (WPARAM)pData);
+			pView->SendMessage((int)EUserMessage::OnSignal, (WPARAM)pData);
 		}
 		else {
 			DEBUG_STOP;

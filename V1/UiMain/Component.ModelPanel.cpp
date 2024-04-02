@@ -289,6 +289,10 @@ Component::ModelPanel::~ModelPanel()
 
 void Component::ModelPanel::ReceiveSignal(Json::Object* pData)
 {
+	//:TEST
+	REMOVE_POINTER(pData);
+	return;
+
 	Json::Object& data = *pData;
 	Signal::ModelPanel::Action action = (Signal::ModelPanel::Action)data.GetInteger(SKW_ACTION);
 
@@ -866,8 +870,6 @@ HTREEITEM Component::ModelPanel::GetItem(DWORD_PTR key)
 
 void Component::ModelPanel::RedrawTree(bool value)
 {
-	DEBUG_TRACE(L"RedrawTree: %s", value ? L"true" : L"false");
-
 	Control().SetRedraw(value);
 	Control().EnableTreeCtrlNotifications(value);
 
