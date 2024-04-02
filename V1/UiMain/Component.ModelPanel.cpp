@@ -14,7 +14,7 @@ static char THIS_FILE[] = __FILE__;
 //**************************************************************************************************
 
 //#define _TEST
-#define _LOG
+//#define _LOG
 
 #ifdef _LOG
 #define DEBUG_LOG(s) TheApplication.GetMainFrame().GetDebugTracer().AddLog(s)
