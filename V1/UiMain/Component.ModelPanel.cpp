@@ -534,7 +534,6 @@ void Component::ModelPanel::OnTreeDeleteItem(NMHDR* pNMHDR, LRESULT* pResult)
 	HTREEITEM hItem = pNMTreeView->itemOld.hItem;
 
 	DWORD_PTR key = Control().GetItemData(hItem);
-	ASSERT(key != 0);
 
 	Control().DeleteItem(hItem);
 	m_keyMap.erase(key);
@@ -574,7 +573,9 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 		// get first child item
 		HTREEITEM hChild = Control().GetChildItem(hItem);
 		if (Control().GetItemText(hChild) == PRESET::DummyName) {
-			Control().DeleteItem(hChild);
+			DisableNotification(
+				Control().DeleteItem(hChild);
+			);
 
 			DWORD_PTR key = Control().GetItemData(hItem);
 			ASSERT(key != 0);
