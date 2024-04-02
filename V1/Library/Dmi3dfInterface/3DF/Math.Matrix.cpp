@@ -218,3 +218,76 @@ Point MatrixKit::Origin() const
 {
 	return Point(m_fData[12], m_fData[13], m_fData[14]);
 }
+
+MatrixKit & MatrixKit::SetXAxis(Vector cInVector)
+{
+	m_fData[0] = cInVector.x;
+	m_fData[1] = cInVector.y;
+	m_fData[2] = cInVector.z;
+
+	return *this;
+}
+
+MatrixKit & MatrixKit::SetYAxis(Vector cInVector)
+{
+	m_fData[4] = cInVector.x;
+	m_fData[5] = cInVector.y;
+	m_fData[6] = cInVector.z;
+
+	return *this;
+}
+
+MatrixKit & MatrixKit::SetZAxis(Vector cInVector)
+{
+	m_fData[8] = cInVector.x;
+	m_fData[9] = cInVector.y;
+	m_fData[10] = cInVector.z;
+
+	return *this;
+}
+
+MatrixKit & MatrixKit::SetOrigin(Point cInOrigin)
+{
+	m_fData[12] = cInOrigin.x;
+	m_fData[13] = cInOrigin.y;
+	m_fData[14] = cInOrigin.z;
+
+	return *this;
+}
+
+MatrixKit & MatrixKit::SetXAxis(float fInX, float fInY, float fInZ)
+{
+	m_fData[0] = fInX;
+	m_fData[1] = fInY;
+	m_fData[2] = fInZ;
+
+	return *this;
+}
+
+MatrixKit & MatrixKit::SetYAxis(float fInX, float fInY, float fInZ)
+{
+	m_fData[4] = fInX;
+	m_fData[5] = fInY;
+	m_fData[6] = fInZ;
+
+	return *this;
+}
+
+MatrixKit & MatrixKit::SetZAxis(float fInX, float fInY, float fInZ)
+{
+	m_fData[8] = fInX;
+	m_fData[9] = fInY;
+	m_fData[10] = fInZ;
+
+	return *this;
+}
+
+MatrixKit & MatrixKit::SetOrigin(float fInX, float fInY, float fInZ)
+{
+	m_fData[12] = fInX;
+	m_fData[13] = fInY;
+	m_fData[14] = fInZ;
+
+	return *this;
+}
+

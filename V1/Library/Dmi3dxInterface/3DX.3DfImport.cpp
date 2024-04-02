@@ -407,6 +407,10 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 
 	Log(2, L"ParseProductOccurrence: pocc%d, Name: %s", m_nIncrementalId, strPoName);
 
+	if(2257 == m_nIncrementalId) {
+		int a = 0;
+	}
+
 	// Segment를 생성하고 생성된 Segment를 Parent Segment에 Include한다.
 	CStringA strSegmentName;
 	strSegmentName.Format("pocc%d", m_nIncrementalId++);
@@ -5878,28 +5882,63 @@ A3DStatus TdfImport::GetMatrix(A3DMiscTransformation * pcLocation, MbMatrix3D & 
 
 A3DStatus TdfImport::GetMatrix(A3DMiscTransformation * pcLocation, H3DF::MatrixKit & cOutMatrix)
 {
-	MbMatrix3D cMatrix;
-	CHECK_A3D_RETURN(GetMatrix(pcLocation, cMatrix));
+	if (nullptr == pcLocation) {
+		return A3D_ERROR;
+	}
 
-	// X-Axis
-	cOutMatrix[0][0] = cMatrix.GetAxisX().x;
-	cOutMatrix[0][1] = cMatrix.GetAxisX().y;
-	cOutMatrix[0][2] = cMatrix.GetAxisX().z;
+	A3DEEntityType eType;
+	A3DEntityGetType(pcLocation, &eType);
 
-	// Y-Axis
-	cOutMatrix[1][0] = cMatrix.GetAxisY().x;
-	cOutMatrix[1][1] = cMatrix.GetAxisY().y;
-	cOutMatrix[1][2] = cMatrix.GetAxisY().z;
+	if (eType == kA3DTypeMiscCartesianTransformation)
+	{
+		A3DMiscCartesianTransformationData sData;
+		A3D_INITIALIZE_DATA(A3DMiscCartesianTransformationData, sData);
 
-	// Z-Axis
-	cOutMatrix[2][0] = cMatrix.GetAxisZ().x;
-	cOutMatrix[2][1] = cMatrix.GetAxisZ().y;
-	cOutMatrix[2][2] = cMatrix.GetAxisZ().z;
+		CHECK_A3D_RETURN(A3DMiscCartesianTransformationGet(pcLocation, &sData));
 
-	// Origin
-	cOutMatrix[3][0] = cMatrix.GetOrigin().x;
-	cOutMatrix[3][1] = cMatrix.GetOrigin().y;
-	cOutMatrix[3][2] = cMatrix.GetOrigin().z;
+		H3DF::Vector cXAxis(sData.m_sXVector.m_dX, sData.m_sXVector.m_dY, sData.m_sXVector.m_dZ);
+		H3DF::Vector cYAxis(sData.m_sYVector.m_dX, sData.m_sYVector.m_dY, sData.m_sYVector.m_dZ);
+		H3DF::Vector cZAxis;
+		H3DF::Point cOrigin(sData.m_sOrigin.m_dX, sData.m_sOrigin.m_dY, sData.m_sOrigin.m_dZ);
+
+		if (sData.m_ucBehaviour & kA3DTransformationMirror) {
+			cZAxis = cYAxis.Cross(cXAxis);
+		}
+		else {
+			cZAxis = cXAxis.Cross(cYAxis);
+		}
+
+		cXAxis *= sData.m_sScale.m_dX;
+		cYAxis *= sData.m_sScale.m_dY;
+		cZAxis *= sData.m_sScale.m_dZ;
+
+		cOutMatrix.SetXAxis(cXAxis);
+		cOutMatrix.SetYAxis(cYAxis);
+		cOutMatrix.SetZAxis(cZAxis);
+		cOutMatrix.SetOrigin(cOrigin);
+
+		CHECK_A3D_RETURN(A3DMiscCartesianTransformationGet(nullptr, &sData));
+	}
+	else if (eType == kA3DTypeMiscGeneralTransformation)
+	{
+		A3DMiscGeneralTransformationData cTransformationData;
+		A3D_INITIALIZE_DATA(A3DMiscGeneralTransformationData, cTransformationData);
+
+		CHECK_A3D_RETURN(A3DMiscGeneralTransformationGet(pcLocation, &cTransformationData));
+
+		cOutMatrix.SetXAxis(cTransformationData.m_adCoeff[0], cTransformationData.m_adCoeff[1], cTransformationData.m_adCoeff[2]);
+		cOutMatrix.SetYAxis(cTransformationData.m_adCoeff[4], cTransformationData.m_adCoeff[5], cTransformationData.m_adCoeff[6]);
+		cOutMatrix.SetZAxis(cTransformationData.m_adCoeff[8], cTransformationData.m_adCoeff[9], cTransformationData.m_adCoeff[10]);
+		cOutMatrix.SetOrigin(cTransformationData.m_adCoeff[12], cTransformationData.m_adCoeff[13], cTransformationData.m_adCoeff[14]);
+
+		// Memory Free
+		CHECK_A3D_RETURN(A3DMiscGeneralTransformationGet(nullptr, &cTransformationData));
+	}
+	else
+	{
+		ASSERT(false);
+		return A3D_ERROR;
+	}
 
 	return A3D_SUCCESS;
 }

@@ -189,11 +189,14 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 // 	CString strErrorMessage1;
 // 	DLL::H3DF::Interface cInterfaace;
 // 	cInterfaace.TDFInitializeA3DLibrary(strErrorMessage1);
+
+//	cDelivery.mainFrame.ShowProgress();
+
 /*
-
-	cDelivery.mainFrame.ShowProgress();
-
-	std::thread cFileOpenThread(ThreadFileOpen, std::ref(*this), std::ref(cInObject), std::ref(cDelivery));
+	std::thread cFileOpenThread(ThreadFileOpen, std::ref(*this), strFilePathName, std::ref(cInCADModel));
+	if (true == cFileOpenThread.joinable()) {
+		cFileOpenThread.join();
+	}
 	
 	if(true == cFileOpenThread.joinable()) {
 		cFileOpenThread.join();
@@ -201,13 +204,13 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 
 	return;
 */
+
 // 	CString strFilePathName = cInObject.GetString(SKW_FILEPATH);
 // 	if (true == strFilePathName.IsEmpty()) {
 // 		return;
 // 	}
 
 	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Open File: " + strFilePathName);
-
 
 	ViewImpl * pcViewImpl = (ViewImpl *)GetFrontView().GetImpl();
 	if (nullptr == pcViewImpl) { DEBUG_RETURN; }
@@ -351,7 +354,6 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 	//pcHoopsView->ForceUpdate();
 
 /*
-
 	char chBuffer[MVO_BUFFER_SIZE];
 	HC_Open_Segment("/");
 		HC_Show_Net_Heuristics(chBuffer);
@@ -389,162 +391,10 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Update Complete");
 }
 
-void H3DF::Canvas::ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObject, H3DF::CADModel & cInCADModel)
+void H3DF::Canvas::ThreadFileOpen(Canvas * pcCanvas, CString strFilePathName, H3DF::CADModel & cInCADModel)
 {
-	CanvasImpl * pcImpl = (CanvasImpl *)cCanvas.GetImpl();
-
-	CString strFilePathName = cInObject.GetString(SKW_FILEPATH);
-	if (true == strFilePathName.IsEmpty()) {
-		return;
-	}
-
-	ViewImpl * pcViewImpl = (ViewImpl *)cCanvas.GetFrontView().GetImpl();
-	if (nullptr == pcViewImpl) { DEBUG_RETURN; }
-
-	// 업데이트 강제 중지
-	pcViewImpl->GetBaseView()->SetSuppressUpdate(true);
-	pcViewImpl->GetBaseView()->SetSuppressUpdateTick(true);
-
-	const CString EXTENSIONS[] = {
-		L"PTS", L"PTX", L"XYZ", // Point Cloud
-	};
-
-	CString ext = Path::GetExtension(strFilePathName);
-	ext.MakeUpper();
-
-	bool bPointColudData = false;
-	for (auto & pre : EXTENSIONS) {
-		if (pre == ext) {
-			bPointColudData = true;
-		}
-	}
-
-	bool bHsfFile = false;
-	if (false == bPointColudData) {
-		if (L"HSF" == ext) {
-			bHsfFile = true;
-		}
-	}
-
-	//std::this_thread::sleep();
-
-	// Progress dialog 나타내기
-	//cDelivery.mainFrame.ShowProgress();
-	system_clock::time_point cTime1 = system_clock::now();
-	pcImpl->Delivery().progress.SetMessage(strFilePathName);
-
-	if (true == bPointColudData) {
-		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/2 : Loading point cloud data");
-	}
-	else if(true == bHsfFile) {
-		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/2 : Loading stream file");
-	}
-	else {
-		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/3 : Import and Tessellation");
-	}
-	// HC_Define_System_Options("update control=thread=off");
-
-	CString strErrorMessage;
-
-	CanvasImpl * pcCanvasImpl = static_cast<CanvasImpl *>(cCanvas.m_pcImpl);
-
-	SegmentKey cModelSegmentKey = pcCanvasImpl->m_pcModel->GetSegmentKey();
-
-	//----- File을 실제로 읽어 드리는 부분 -----
-	if (true == bPointColudData)
-	{
-		//LoadPointCloudFile(strFilePathName, m_pcCanvas);
-	}
-	else if (true == bHsfFile) {
-		HC_Open_Segment_By_Key(pcViewImpl->GetBaseView()->GetModel()->GetModelKey()); {
-			TK_Status read_status = HTK_Read_Stream_File(strFilePathName, pcViewImpl->GetBaseView()->GetModel()->GetStreamFileTK());
-		} HC_Close_Segment();
-	}
-	else {
-		SegmentKey cViewKey(pcViewImpl->GetBaseView()->GetViewKey());
-		SegmentKeyImpl::LocalOpen(cViewKey); {
-			HC_Set_Driver_Options("eye dome lighting = off");
-		} SegmentKeyImpl::LocalClose(cViewKey);
-
-		DLL::H3DF::Interface cInterfaace;
-		cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, cInCADModel, pcImpl->Delivery(), strErrorMessage);
-	}
-
-	system_clock::time_point cTime2 = system_clock::now();
-
-	if (false == bPointColudData) {
-		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 3/3 : Performing Initial Update");
-	}
-	else {
-		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 2/2 : Performing Initial Update");
-	}
-
-	pcViewImpl->ViewReady();
-
-	//cModelSegmentKey.ForcedClose();
-
-	// #3DF_Debug: Z://Test.hsf
-#ifdef _DEBUG
-	//SaveHsfFile(L"Z://Test.hsf", m_pcCanvas);
-#endif
-
-	//HC_Define_System_Options("update control=thread");
-
- 	pcViewImpl->GetBaseView()->SetSuppressUpdateTick(false);
- 	pcViewImpl->GetBaseView()->SetSuppressUpdate(false);
-
-	bool bHasInitialView = pcViewImpl->GetBaseView()->HasInitialView();
-
-	pcViewImpl->GetBaseView()->GetModel()->SetFileLoadComplete(true);
-	pcViewImpl->GetBaseView()->GetModel()->SetFirstFitComplete(true);
-
-	pcViewImpl->GetBaseView()->SetGeometryChanged();
-
-	if (false == bHasInitialView) {
-		pcViewImpl->GetBaseView()->FitWorld();		// fit the camera to the scene extents
-		if (pcViewImpl->GetBaseView()->GetModel()->GetContainsDouble()) {
-			HC_Convert_Precision(pcViewImpl->GetBaseView()->GetSceneKey(), "double, camera");
-		}
-
-		pcViewImpl->GetBaseView()->CameraPositionChanged(true);
-	}
-
-	pcViewImpl->GetBaseView()->SetZoomLimit();
-
-	pcCanvasImpl->m_pcModel->UpdateModelHandedness();
-
-	pcViewImpl->GetBaseView()->SetRenderMode(pcViewImpl->GetBaseView()->GetRenderMode(), true);
-
-	pcViewImpl->GetBaseView()->SetViewDirection(H3DF::ViewDirection::Mode::px_py_pz);
-
-	// ExhaustiveUpdate() 내부에서 FoceUpdate를 여러번 호출하기 때문에, Supress 시키도록 한다.
-	pcViewImpl->GetBaseView()->ExhaustiveUpdate();
-
-	pcViewImpl->GetBaseView()->SetSuppressUpdateTick(false);
-	pcViewImpl->GetBaseView()->SetSuppressUpdate(false);
-
-	pcViewImpl->GetBaseView()->ForceUpdate();
-
-	system_clock::time_point cTime3 = system_clock::now();
-	auto cMilliSec1 = duration_cast<milliseconds>(cTime3 - cTime2);
-	CString strMessage;
-
-	if (false == bPointColudData) {
-		strMessage.Format(L"Stage 3/3 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec1));
-		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
-	}
-	else {
-		strMessage.Format(L"Stage 2/2 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec1));
-		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
-	}
-
-	auto cMilliSec2 = duration_cast<milliseconds>(cTime3 - cTime1);
-	strMessage.Format(L"Total Load Time : [%s]", Utility::GetTimeSpanString(cMilliSec2));
-	pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
-
-	pcImpl->Delivery().mainFrame.HideProgress();
-
-	pcImpl->Delivery().view.SetValidation();
+	pcCanvas->FileOpen(strFilePathName, cInCADModel);
+	return;
 }
 
 H3DF::View & H3DF::Canvas::GetFrontView() const

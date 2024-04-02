@@ -59,7 +59,7 @@ namespace H3DF
 
 		void SetDelivery(Signal::Delivery & cDelivery, int nViewId);
 		void FileOpen(CString strFilePathName, CADModel & cInCADModel);
-		static void ThreadFileOpen(const Canvas & cCanvas, Json::Object & cInObject, CADModel & cInCADModel);
+		static void ThreadFileOpen(Canvas * pcCanvas, CString strFilePathName, CADModel & cInCADModel);
 
 		H3DF::View & GetFrontView() const;
 

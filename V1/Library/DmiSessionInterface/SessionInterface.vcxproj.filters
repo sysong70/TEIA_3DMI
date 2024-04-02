@@ -120,6 +120,9 @@
     <ClInclude Include="..\Signal\WorkerThread.h">
       <Filter>_Signal</Filter>
     </ClInclude>
+    <ClInclude Include="SessionInterface.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -203,5 +206,13 @@
     <ClCompile Include="..\Signal\WorkerThread.cpp">
       <Filter>_Signal</Filter>
     </ClCompile>
+    <ClCompile Include="SessionInterface.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SessionInterface.def">
+      <Filter>소스 파일</Filter>
+    </None>
   </ItemGroup>
 </Project>

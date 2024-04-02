@@ -28,6 +28,8 @@ namespace SESSION
 		KERNEL::DocView * GetDocView();
 
 		static void CALLBACK OnTimerCallback(HWND hWnd, UINT nMsg, UINT_PTR nTimerId, DWORD dwTime);
+		static UINT ThreadFileOpen(LPVOID pcParam);
+		
 
 		void ViewMouseSignal(Json::Object & cInObject);
 		void ViewKeyboardSignal(Json::Object & cInObject);

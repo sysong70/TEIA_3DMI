@@ -372,7 +372,7 @@ namespace SESSION
 			bool CiIsolines = false;	// color interpolation, isolines only
 			HSelectionHighlightMode HighlightMode = HighlightQuickmoves;
 			float TransparencyLevel = 0.9f;
-			CString RefSelType = "Spriting";
+			CString RefSelType = L"Spriting";
 			HRenderMode RenderMode = HRenderGouraud;
 			bool ShowCollisions = false;
 			HShadowMode ShadowMode = HShadowNone;
@@ -403,18 +403,18 @@ namespace SESSION
 
 			float ShadowOpacity = 1.f;
 
-			CString FontName = "sans serif";
-			CString FontSize = "14";
-			CString FontUnits = "pts";
+			CString FontName = L"sans serif";
+			CString FontSize = L"14";
+			CString FontUnits = L"pts";
 
 			bool HideOverlappedText = false;	//hide overlapped text?
 			bool ViewDependentShadowMap = true;
 
-			CString LineWeight = "1 pixels";
+			CString LineWeight = L"1 pixels";
 			bool StereoMode = false;
 			int StereoSeparation = 30000;
 
-			CString GoochColorMap = "blue, red";
+			CString GoochColorMap = L"blue, red";
 
 			COLORREF GoochColor1 = RGB(255.0, 105.0, 180.0);
 			COLORREF GoochColor2 = RGB(60.0, 179.0, 113.0);
@@ -440,8 +440,8 @@ namespace SESSION
 			bool UseAmbientUpVector = false;
 			float AmbientUpVector[3] = { 0.0f, 1.0f, 0.0f };
 			bool UseGreeking = false;	//use text greeking
-			CString GreekingMode = "Box";
-			CString GreekingUnits = "px";
+			CString GreekingMode = L"Box";
+			CString GreekingUnits = L"px";
 			int	GreekingLimit = 6000;	// Greeking limit * 1000 (to store float as int)
 
 			int LightCount = 1;

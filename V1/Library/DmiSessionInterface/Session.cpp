@@ -1,4 +1,4 @@
-﻿#include <StdAfx.h>
+﻿#include "StdAfx.h"
 
 #include "Session.h"
 
@@ -42,8 +42,10 @@ void SESSION::Session::ViewInitialize(Json::Object & cInObject, Signal::Delivery
 	m_pcDocView->SetDelivery(cInstance);
 	m_pcDocView->Initialize(cInObject);
 
-	HWND hWnd = (HWND)cInObject.GetDwordPtr(SKW_HWND);
-	SetTimer(hWnd, FILE_OPEN_TIMER_ID, 100, OnTimerCallback);
+	AfxBeginThread(ThreadFileOpen, this);
+
+// 	HWND hWnd = (HWND)cInObject.GetDwordPtr(SKW_HWND);
+// 	SetTimer(hWnd, FILE_OPEN_TIMER_ID, 100, OnTimerCallback);
 }
 
 void SESSION::Session::ViewPaint(Json::Object & cInObject)
@@ -77,6 +79,15 @@ void CALLBACK SESSION::Session::OnTimerCallback(HWND hWnd, UINT nMsg, UINT_PTR n
 	KillTimer(hWnd, nTimerId);
 }
 
+UINT SESSION::Session::ThreadFileOpen(LPVOID pcParam)
+{
+	Session * pcSession = (Session *)pcParam;
+	KERNEL::DocView * pcDocView = pcSession->GetDocView();
+	pcDocView->FileOpenTimer();
+
+	return 0;
+}
+
 //== Mouse 관련 함수 =================================================================================
 
 void SESSION::Session::ViewMouseSignal(Json::Object & cInObject)
@@ -101,7 +112,7 @@ void SESSION::Session::ViewExecuteCommand(Json::Object & cInObject)
 		case FILE_3D_CMD_Save:
 		case FILE_3D_CMD_SaveAs: {
 			CString strFilePath = cInObject.GetString(SKW_FILEPATH);
-			m_pcDocView->Save(strFilePath);
+			//m_pcDocView->Save(strFilePath);
 			return;
 		} break;
 	}
@@ -216,7 +227,7 @@ void SESSION::Session::ViewExecuteCommand(Json::Object & cInObject)
 
 	}
 
-	assert(false);
+	DEBUG_STOP;
 }
 
 void SESSION::Session::ViewCancelCommands()

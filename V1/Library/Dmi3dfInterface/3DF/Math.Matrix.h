@@ -53,6 +53,8 @@ namespace H3DF
 
 		MatrixKit Multiply(float fInScalar) const;
 
+		MatrixKit & SetElement(size_t nInRow, size_t nInColumn, float fInValue);
+
 		Point Transform(Point const & cInSource) const;
 		PointArray Transform(PointArray const & cInSource) const;
 		WorldPointArray Transform(WorldPointArray const & cInSource) const;
@@ -61,6 +63,16 @@ namespace H3DF
 		Vector YAxis() const;
 		Vector ZAxis() const;
 		Point Origin() const;
+
+		MatrixKit & SetXAxis(Vector cInVector);
+		MatrixKit & SetYAxis(Vector cInVector);
+		MatrixKit & SetZAxis(Vector cInVector);
+		MatrixKit & SetOrigin(Point cInOrigin);
+
+		MatrixKit & SetXAxis(float fInX, float fInY, float fInZ);
+		MatrixKit & SetYAxis(float fInX, float fInY, float fInZ);
+		MatrixKit & SetZAxis(float fInX, float fInY, float fInZ);
+		MatrixKit & SetOrigin(float fInX, float fInY, float fInZ);
 	};
 
 	using Matrix = MatrixKit;

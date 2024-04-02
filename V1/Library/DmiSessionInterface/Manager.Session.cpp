@@ -91,7 +91,7 @@ void SESSION::Manager::Session::ExecuteSignal(const wchar_t * pchBuffer)
 			break;
 
 		default:
-			assert(false);
+			DEBUG_STOP;
 			break;
 	}
 }
@@ -215,7 +215,7 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 			break;
 
 		default:
-			assert(false);
+			DEBUG_STOP;
 			break;
 	}
 }
@@ -233,7 +233,7 @@ SESSION::Session * SESSION::Manager::Session::GetSession(int nViewId)
 		pcSession = new SESSION::Session();
 		pcSession->SessionId(nViewId);
 		if (nullptr == pcSession) {
-			assert(false);
+			DEBUG_STOP;
 			return nullptr;
 		}
 		else {
@@ -301,7 +301,7 @@ void SESSION::Manager::Session::ExecuteCommand(Json::Object & cInObject)
 			break;
 
 		default:
-			assert(false);
+			DEBUG_STOP;
 			break;
 	}
 }
