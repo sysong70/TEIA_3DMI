@@ -78,8 +78,8 @@ Component * H3DF::CADModel::GetComponent(H3DF::SelectionItem & cInItem) const
 	cInItem.ShowPath(cPath);
 
 #ifdef _DEBUG
-// 	CString strText;
-// 	cInItem.ShowPathString(strText);
+	CString strText;
+	cInItem.ShowPathString(strText);
 #endif
 
 	// 키값 배열을 가져온다.

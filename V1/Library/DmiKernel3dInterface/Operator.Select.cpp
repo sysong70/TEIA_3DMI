@@ -234,7 +234,7 @@ int KERNEL::Operator::Select::LButtonUp(HEventInfo & cInEvent)
 	}
 
 	// 4. ModelPanel에 선택된 객체를 전달
-	pcImpl->ModelPanel().SelectItem(cSelItem);
+	pcImpl->ModelPanel().SelectTreeItem(cSelItem);
 
 	pcImpl->View().Update();
 

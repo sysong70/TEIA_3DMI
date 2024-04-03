@@ -1798,21 +1798,21 @@ A3DStatus TdfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascad
 		return A3D_ERROR;
 	}
 
-	CString strMarkupName;
-	GetName(pcMarkup, strMarkupName);
+	CString strPmiName;
+	GetName(pcMarkup, strPmiName);
 
-	Log(2, L"TraverseMarkup: %s, Markup%d", strMarkupName, m_nMarkupId);
+	Log(2, L"TraverseMarkup: %s, Markup%d", strPmiName, m_nMarkupId);
 
 	SegmentKey cPmiGroupSegment(pcPmiGroupComponent->GetSegmentKey());
 
-	SegmentKey cMarkupSegment = cPmiGroupSegment.Subsegment("Markup%d", m_nMarkupId++);
-	assert(INVALID_KEY != cMarkupSegment.KeyValue());
+	H3DF::SegmentKey cPmiSegment = m_cPmiIncludeSegment.Subsegment("pmi%d", m_nMarkupId++);
+	IncludeKey cInclude = cPmiGroupSegment.IncludeSegment(cPmiSegment);
 
 	// #CADModel: PMI 추가
-	H3DF::Component * pcComponent = AddComponent(cMarkupSegment, strMarkupName, H3DF::Component::Type::ExchangeProductOccurrence, *pcPmiGroupComponent);
+	H3DF::Component * pcComponent = AddComponent(cPmiSegment, cInclude, strPmiName, H3DF::Component::Type::ExchangeProductOccurrence, *pcPmiGroupComponent);
 
 	if (A3D_FALSE == psAttribData->m_bShow || A3D_TRUE == psAttribData->m_bRemoved) {
-		cMarkupSegment.GetStyleControl().PushSegment(m_cNoShowStyle);
+		cPmiSegment.GetStyleControl().PushSegment(m_cNoShowStyle);
 
 		pcComponent->AddStatus(H3DF::Component::Status::Hide);
 		pcComponent->AddStatus(H3DF::Component::Status::NoShow);
@@ -1826,7 +1826,7 @@ A3DStatus TdfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascad
 	{
 		case kA3DMarkupTypeDatum:
 		{
-			pcEntity = new H3DF::PMI::DatumEntity(cMarkupSegment);
+			pcEntity = new H3DF::PMI::DatumEntity(cPmiSegment);
 			H3DF::PMI::DatumEntity * pcDatum = (PMI::DatumEntity *)pcEntity;
 
 			switch (sData.m_eSubType)
@@ -1847,7 +1847,7 @@ A3DStatus TdfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascad
 
 		case kA3DMarkupTypeDimension:
 		{
-			pcEntity = new H3DF::PMI::DimensionEntity(cMarkupSegment);
+			pcEntity = new H3DF::PMI::DimensionEntity(cPmiSegment);
 			PMI::DimensionEntity * pcDimension = (PMI::DimensionEntity *)pcEntity;
 
 			pcDimension->SetDimensionType(PMI::Dimension::Type::UnknownType);
@@ -1896,13 +1896,13 @@ A3DStatus TdfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascad
 		{
 			// current data coming out of 3DX for FCFs makes it quite difficult to accurately determine components
 			// of a FCF, so we just insert a generic entity (just text strings and polylines, no extra information)
-			pcEntity = new PMI::GenericEntity(cMarkupSegment);
+			pcEntity = new PMI::GenericEntity(cPmiSegment);
 		}
 		break;
 
 		case kA3DMarkupTypeRoughness:
 		{
-			pcEntity = new PMI::RoughnessEntity(cMarkupSegment);
+			pcEntity = new PMI::RoughnessEntity(cPmiSegment);
 
 			PMI::RoughnessEntity * pcRoughness = (PMI::RoughnessEntity *)pcEntity;
 
@@ -1914,13 +1914,13 @@ A3DStatus TdfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascad
 
 		case kA3DMarkupTypeText:
 		{
-			pcEntity = new PMI::NoteEntity(cMarkupSegment);
+			pcEntity = new PMI::NoteEntity(cPmiSegment);
 		}
 		break;
 
 		default:
 		{
-			pcEntity = new PMI::GenericEntity(cMarkupSegment);
+			pcEntity = new PMI::GenericEntity(cPmiSegment);
 		}
 	}
 

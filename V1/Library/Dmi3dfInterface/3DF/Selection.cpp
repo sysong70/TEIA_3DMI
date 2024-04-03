@@ -765,6 +765,7 @@ void H3DF::SelectionItem::ShowPathString(CString & strOutPath)
 		if (false == UserData::ShowSegmentName(cSegment, strName)) {
 			strName = cSegment.Name(false);
 		}
+
 		if (H3DF::Type::IncludeKey == eType) {
 			strText.Format(L"\nInclude: %d, Segment: %d [%s]", nKey, cSegment.KeyValue(), strName);
 		}
