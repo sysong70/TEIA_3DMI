@@ -23,13 +23,11 @@ namespace SESSION
 
 		//== View 관련 함수 ==========================================================================
 		void ViewInitialize(Json::Object & cInObject, Signal::Delivery & cInstance);
+		static UINT ThreadFileOpen(LPVOID pcParam);
+
 		void ViewPaint(Json::Object & cInObject);
 		void ViewResize(Json::Object & cInObject);
 		KERNEL::DocView * GetDocView();
-
-		static void CALLBACK OnTimerCallback(HWND hWnd, UINT nMsg, UINT_PTR nTimerId, DWORD dwTime);
-		static UINT ThreadFileOpen(LPVOID pcParam);
-		
 
 		void ViewMouseSignal(Json::Object & cInObject);
 		void ViewKeyboardSignal(Json::Object & cInObject);

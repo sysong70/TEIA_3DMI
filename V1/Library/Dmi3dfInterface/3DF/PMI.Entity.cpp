@@ -14,16 +14,16 @@
 
 #include "./Impl/SegmentImpl.h"
 
-USING_3DF_PMI_NAMESPACE
+using namespace H3DF::PMI;
 
-Entity::Entity(HC_KEY nInKey)
+H3DF::PMI::Entity::Entity(HC_KEY nInKey)
 {
 	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
 	pcImpl->SetKeyValue(nInKey);
 	m_pcImpl = pcImpl;
 }
 
-Entity::Entity(Key const & cInThat)
+H3DF::PMI::Entity::Entity(Key const & cInThat)
 {
 	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
 	m_pcImpl = pcImpl;
@@ -31,7 +31,7 @@ Entity::Entity(Key const & cInThat)
 	Key::Set(cInThat);
 }
 
-Entity::Entity(Entity const & cInThat)
+H3DF::PMI::Entity::Entity(Entity const & cInThat)
 {
 	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
 	m_pcImpl = pcImpl;
@@ -39,18 +39,18 @@ Entity::Entity(Entity const & cInThat)
 	Set(cInThat);
 }
 
-void Entity::Set(Entity const & cInThat)
+void H3DF::PMI::Entity::Set(Entity const & cInThat)
 {
 	Key::Set(cInThat);
 }
 
-Entity const & Entity::operator=(Entity const & cInThat)
+Entity const & H3DF::PMI::Entity::operator=(Entity const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-void Entity::SetFrame(Frame const & cInFrame)
+void H3DF::PMI::Entity::SetFrame(Frame const & cInFrame)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -104,7 +104,7 @@ void Entity::SetFrame(Frame const & cInFrame)
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-void Entity::GetDrawing(Drawing & cOutDrawing) const
+void H3DF::PMI::Entity::GetDrawing(Drawing & cOutDrawing) const
 {
 /*
 	cOutDrawing = Drawing();
@@ -122,7 +122,7 @@ void Entity::GetDrawing(Drawing & cOutDrawing) const
 */
 }
 
-void Entity::SetDrawing(Drawing const & cInDrawing)
+void H3DF::PMI::Entity::SetDrawing(Drawing const & cInDrawing)
 {
 	unsigned int nCount = cInDrawing.GetPolygonCount();
 	
@@ -134,7 +134,7 @@ void Entity::SetDrawing(Drawing const & cInDrawing)
 	SetPolygons("drawing", nCount, aPolygons.data());
 }
 
-unsigned int Entity::GetLeaderLineCount() const
+unsigned int H3DF::PMI::Entity::GetLeaderLineCount() const
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -151,7 +151,7 @@ unsigned int Entity::GetLeaderLineCount() const
 	return static_cast<unsigned int>(count);
 }
 
-void Entity::SetLeaderLines(unsigned int in_count, Polyline const * in_leader_lines)
+void H3DF::PMI::Entity::SetLeaderLines(unsigned int in_count, Polyline const * in_leader_lines)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -191,12 +191,12 @@ void Entity::SetLeaderLines(unsigned int in_count, Polyline const * in_leader_li
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-void Entity::SetLeaderSymbols(unsigned int nInCount, H3DF::Polygon const * pcInLeaderSymbols)
+void H3DF::PMI::Entity::SetLeaderSymbols(unsigned int nInCount, H3DF::Polygon const * pcInLeaderSymbols)
 {
 	SetPolygons("leader/symbol", nInCount, pcInLeaderSymbols);
 }
 
-void Entity::SetPolygons(char const * pchInSegmentName, unsigned int nInCount, H3DF::Polygon const * pcInPolygons)
+void H3DF::PMI::Entity::SetPolygons(char const * pchInSegmentName, unsigned int nInCount, H3DF::Polygon const * pcInPolygons)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -241,7 +241,7 @@ void Entity::SetPolygons(char const * pchInSegmentName, unsigned int nInCount, H
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-void Entity::SetColor(const H3DF::Polyline & cPolyline)
+void H3DF::PMI::Entity::SetColor(const H3DF::Polyline & cPolyline)
 {
 	H3DF::RGBColor cColor;
 	cPolyline.GetRGBColor(cColor);
@@ -258,7 +258,7 @@ void Entity::SetColor(const H3DF::Polyline & cPolyline)
 	}
 }
 
-void Entity::SetColor(const H3DF::Polygon & cPolygon)
+void H3DF::PMI::Entity::SetColor(const H3DF::Polygon & cPolygon)
 {
 	H3DF::RGBColor cColor;
 	cPolygon.GetRGBColor(cColor);
@@ -268,7 +268,7 @@ void Entity::SetColor(const H3DF::Polygon & cPolygon)
 	}
 }
 
-void Entity::SetDisplayParallelToScreen(bool const bInParallel)
+void H3DF::PMI::Entity::SetDisplayParallelToScreen(bool const bInParallel)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -287,7 +287,7 @@ void Entity::SetDisplayParallelToScreen(bool const bInParallel)
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-bool Entity::IsDisplayParallelToScreen() const
+bool H3DF::PMI::Entity::IsDisplayParallelToScreen() const
 {
 	bool is_parallel_to_screen = false;
 
@@ -318,7 +318,7 @@ bool Entity::IsDisplayParallelToScreen() const
 	return is_parallel_to_screen;
 }
 
-unsigned int Entity::GetStringsAndTextAttributesCount(CString strInSegmentName) const
+unsigned int H3DF::PMI::Entity::GetStringsAndTextAttributesCount(CString strInSegmentName) const
 {
 	int nCount = 0;
 
@@ -340,7 +340,7 @@ unsigned int Entity::GetStringsAndTextAttributesCount(CString strInSegmentName) 
 	return static_cast<unsigned int>(nCount);
 }
 
-void Entity::GetStringsAndTextAttributes(CString strInSegmentName, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
+void H3DF::PMI::Entity::GetStringsAndTextAttributes(CString strInSegmentName, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
 {
 	char type[64];
 	HC_KEY key;
@@ -452,7 +452,7 @@ void Entity::GetStringsAndTextAttributes(CString strInSegmentName, CString * pst
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-void Entity::SetStringsAndTextAttributes(CString strInSegmentName, unsigned int nInCount,
+void H3DF::PMI::Entity::SetStringsAndTextAttributes(CString strInSegmentName, unsigned int nInCount,
 	CString const * pstrInStrings, TextAttributes const * pcInTextAttributes, bool is_parallel_to_screen)
 {
 	SegmentKeyImpl::LocalOpen(*this);
@@ -568,7 +568,7 @@ void Entity::SetStringsAndTextAttributes(CString strInSegmentName, unsigned int 
 
 
 //== Datum =========================================================================================
-DatumEntity::DatumEntity(HC_KEY nInKey) :
+H3DF::PMI::DatumEntity::DatumEntity(HC_KEY nInKey) :
 	Entity(nInKey)
 {
 	if (INVALID_KEY != nInKey) {
@@ -578,28 +578,28 @@ DatumEntity::DatumEntity(HC_KEY nInKey) :
 	}
 }
 
-DatumEntity::DatumEntity(Key const & cInThat) :
+H3DF::PMI::DatumEntity::DatumEntity(Key const & cInThat) :
 	Entity(cInThat)
 {
 }
 
-DatumEntity::DatumEntity(DatumEntity const & cInThat) :
+H3DF::PMI::DatumEntity::DatumEntity(DatumEntity const & cInThat) :
 	Entity(cInThat)
 {
 }
 
-void DatumEntity::Set(DatumEntity const & cInThat)
+void H3DF::PMI::DatumEntity::Set(DatumEntity const & cInThat)
 {
 	Key::Set(cInThat);
 }
 
-DatumEntity const & DatumEntity::operator=(DatumEntity const & cInThat)
+DatumEntity const & H3DF::PMI::DatumEntity::operator=(DatumEntity const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-Datum::Type DatumEntity::GetDatumType() const
+Datum::Type H3DF::PMI::DatumEntity::GetDatumType() const
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -630,7 +630,7 @@ Datum::Type DatumEntity::GetDatumType() const
 	return eDatumType;
 }
 
-void DatumEntity::SetDatumType(Datum::Type const eInType)
+void H3DF::PMI::DatumEntity::SetDatumType(Datum::Type const eInType)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -654,12 +654,12 @@ void DatumEntity::SetDatumType(Datum::Type const eInType)
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-unsigned int DatumEntity::GetLabelCount() const
+unsigned int H3DF::PMI::DatumEntity::GetLabelCount() const
 {
 	return GetStringsAndTextAttributesCount(L"labels");
 }
 
-void DatumEntity::GetLabels(unsigned int & nOutCount, CString * pstrOutLabels, TextAttributes * pcOutTextAttributes) const
+void H3DF::PMI::DatumEntity::GetLabels(unsigned int & nOutCount, CString * pstrOutLabels, TextAttributes * pcOutTextAttributes) const
 {
 	nOutCount = GetLabelCount();
 
@@ -670,14 +670,14 @@ void DatumEntity::GetLabels(unsigned int & nOutCount, CString * pstrOutLabels, T
 	GetStringsAndTextAttributes(L"labels", pstrOutLabels, pcOutTextAttributes);
 }
 
-void DatumEntity::SetLabels(unsigned int nInCount, CString const * pstrInlabels, TextAttributes const * pcInTextAttributes)
+void H3DF::PMI::DatumEntity::SetLabels(unsigned int nInCount, CString const * pstrInlabels, TextAttributes const * pcInTextAttributes)
 {
 	SetStringsAndTextAttributes(L"labels", nInCount, pstrInlabels, pcInTextAttributes, this->IsDisplayParallelToScreen());
 }
 
 
 //== DimensionEntity ===============================================================================
-DimensionEntity::DimensionEntity(HC_KEY nInKey) :
+H3DF::PMI::DimensionEntity::DimensionEntity(HC_KEY nInKey) :
 	Entity(nInKey)
 {
 	if (INVALID_KEY != nInKey) {
@@ -687,7 +687,7 @@ DimensionEntity::DimensionEntity(HC_KEY nInKey) :
 	}
 }
 
-DimensionEntity::DimensionEntity(Key const & cInThat) :
+H3DF::PMI::DimensionEntity::DimensionEntity(Key const & cInThat) :
 	Entity(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
@@ -697,7 +697,7 @@ DimensionEntity::DimensionEntity(Key const & cInThat) :
 	}
 }
 
-DimensionEntity::DimensionEntity(DimensionEntity const & cInThat) :
+H3DF::PMI::DimensionEntity::DimensionEntity(DimensionEntity const & cInThat) :
 	Entity(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
@@ -707,18 +707,18 @@ DimensionEntity::DimensionEntity(DimensionEntity const & cInThat) :
 	}
 }
 
-void DimensionEntity::Set(DimensionEntity const & cInThat)
+void H3DF::PMI::DimensionEntity::Set(DimensionEntity const & cInThat)
 {
-	Entity::Set(cInThat);
+	H3DF::PMI::Entity::Set(cInThat);
 }
 
-DimensionEntity const & DimensionEntity::operator=(DimensionEntity const & cInThat)
+DimensionEntity const & H3DF::PMI::DimensionEntity::operator=(DimensionEntity const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-Dimension::Type DimensionEntity::GetDimensionType() const
+Dimension::Type H3DF::PMI::DimensionEntity::GetDimensionType() const
 {
 	PMI::Dimension::Type eDimensionType = PMI::Dimension::Type::UnknownType;
 
@@ -749,7 +749,7 @@ Dimension::Type DimensionEntity::GetDimensionType() const
 	return eDimensionType;
 }
 
-void DimensionEntity::SetDimensionType(Dimension::Type const cInType)
+void H3DF::PMI::DimensionEntity::SetDimensionType(Dimension::Type const cInType)
 {
 	if (INVALID_KEY == KeyValue()) {
 		return;
@@ -778,7 +778,7 @@ void DimensionEntity::SetDimensionType(Dimension::Type const cInType)
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-Dimension::SubType DimensionEntity::GetDimensionSubType() const
+Dimension::SubType H3DF::PMI::DimensionEntity::GetDimensionSubType() const
 {
 	PMI::Dimension::SubType eDimensionSubtype = PMI::Dimension::SubType::UnknownSubType;
 
@@ -817,7 +817,7 @@ Dimension::SubType DimensionEntity::GetDimensionSubType() const
 	return eDimensionSubtype;
 }
 
-void DimensionEntity::SetDimensionSubType(PMI::Dimension::SubType const eInSubType)
+void H3DF::PMI::DimensionEntity::SetDimensionSubType(PMI::Dimension::SubType const eInSubType)
 {
 	if (INVALID_KEY == KeyValue()) {
 		return;
@@ -858,12 +858,12 @@ void DimensionEntity::SetDimensionSubType(PMI::Dimension::SubType const eInSubTy
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-unsigned int DimensionEntity::GetStringCount() const
+unsigned int H3DF::PMI::DimensionEntity::GetStringCount() const
 {
 	return GetStringsAndTextAttributesCount(L"strings");
 }
 
-void DimensionEntity::GetStrings(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
+void H3DF::PMI::DimensionEntity::GetStrings(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
 {
 	nOutCount = GetStringCount();
 
@@ -874,14 +874,14 @@ void DimensionEntity::GetStrings(unsigned int & nOutCount, CString * pstrOutStri
 	GetStringsAndTextAttributes(L"strings", pstrOutStrings, pcOutTextAttributes);
 }
 
-void DimensionEntity::SetStrings(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes)
+void H3DF::PMI::DimensionEntity::SetStrings(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes)
 {
 	SetStringsAndTextAttributes(L"strings", nInCount, pstrInStrings, pcInTextAttributes, IsDisplayParallelToScreen());
 }
 
 //== GenericEntity =================================================================================
 
-GenericEntity::GenericEntity(HC_KEY nInKey) :
+H3DF::PMI::GenericEntity::GenericEntity(HC_KEY nInKey) :
 	Entity(nInKey)
 {
 	if (INVALID_KEY != nInKey) {
@@ -891,7 +891,7 @@ GenericEntity::GenericEntity(HC_KEY nInKey) :
 	}
 }
 
-GenericEntity::GenericEntity(Key const & cInThat) :
+H3DF::PMI::GenericEntity::GenericEntity(Key const & cInThat) :
 	Entity(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
@@ -901,7 +901,7 @@ GenericEntity::GenericEntity(Key const & cInThat) :
 	}
 }
 
-GenericEntity::GenericEntity(GenericEntity const & cInThat) :
+H3DF::PMI::GenericEntity::GenericEntity(GenericEntity const & cInThat) :
 	Entity(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
@@ -911,23 +911,23 @@ GenericEntity::GenericEntity(GenericEntity const & cInThat) :
 	}
 }
 
-void GenericEntity::Set(GenericEntity const & cInThat)
+void H3DF::PMI::GenericEntity::Set(GenericEntity const & cInThat)
 {
-	Entity::Set(cInThat);
+	H3DF::PMI::Entity::Set(cInThat);
 }
 
-GenericEntity const & GenericEntity::operator=(GenericEntity const & cInThat)
+GenericEntity const & H3DF::PMI::GenericEntity::operator=(GenericEntity const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-unsigned int GenericEntity::GetStringCount() const
+unsigned int H3DF::PMI::GenericEntity::GetStringCount() const
 {
 	return GetStringsAndTextAttributesCount("strings");
 }
 
-void GenericEntity::GetStrings(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
+void H3DF::PMI::GenericEntity::GetStrings(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
 {
 	nOutCount = GetStringCount();
 
@@ -938,23 +938,23 @@ void GenericEntity::GetStrings(unsigned int & nOutCount, CString * pstrOutString
 	GetStringsAndTextAttributes(L"strings", pstrOutStrings, pcOutTextAttributes);
 }
 
-void GenericEntity::SetStrings(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes)
+void H3DF::PMI::GenericEntity::SetStrings(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes)
 {
 	SetStringsAndTextAttributes(L"strings", nInCount, pstrInStrings, pcInTextAttributes);
 }
 
-void GenericEntity::SetDisplayParallelToScreen(bool const in_parallel)
+void H3DF::PMI::GenericEntity::SetDisplayParallelToScreen(bool const in_parallel)
 {
-	Entity::SetDisplayParallelToScreen(in_parallel);
+	H3DF::PMI::Entity::SetDisplayParallelToScreen(in_parallel);
 }
 
-bool GenericEntity::IsDisplayParallelToScreen() const
+bool H3DF::PMI::GenericEntity::IsDisplayParallelToScreen() const
 {
-	return Entity::IsDisplayParallelToScreen();
+	return H3DF::PMI::Entity::IsDisplayParallelToScreen();
 }
 
 //== NoteEntity ====================================================================================
-NoteEntity::NoteEntity(HC_KEY nInKey):
+H3DF::PMI::NoteEntity::NoteEntity(HC_KEY nInKey):
 	Entity(nInKey)
 {
 	if (INVALID_KEY != nInKey) {
@@ -964,34 +964,34 @@ NoteEntity::NoteEntity(HC_KEY nInKey):
 	}
 }
 
-NoteEntity::NoteEntity(Key const & cInThat) :
+H3DF::PMI::NoteEntity::NoteEntity(Key const & cInThat) :
 	Entity(cInThat)
 {
 
 }
 
-NoteEntity::NoteEntity(NoteEntity const & cInThat) :
+H3DF::PMI::NoteEntity::NoteEntity(NoteEntity const & cInThat) :
 	Entity(cInThat)
 {
 }
 
-void NoteEntity::Set(NoteEntity const & cInThat)
+void H3DF::PMI::NoteEntity::Set(NoteEntity const & cInThat)
 {
-	Entity::Set(cInThat);
+	H3DF::PMI::Entity::Set(cInThat);
 }
 
-NoteEntity const & NoteEntity::operator=(NoteEntity const & cInThat)
+NoteEntity const & H3DF::PMI::NoteEntity::operator=(NoteEntity const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-unsigned int NoteEntity::GetStringCount() const
+unsigned int H3DF::PMI::NoteEntity::GetStringCount() const
 {
 	return GetStringsAndTextAttributesCount(L"strings");
 }
 
-void NoteEntity::GetStrings(unsigned int & nOutCount, CString pstrOutStrings[], TextAttributes pcOutTextAttributes[]) const
+void H3DF::PMI::NoteEntity::GetStrings(unsigned int & nOutCount, CString pstrOutStrings[], TextAttributes pcOutTextAttributes[]) const
 {
 	nOutCount = GetStringCount();
 
@@ -1001,14 +1001,14 @@ void NoteEntity::GetStrings(unsigned int & nOutCount, CString pstrOutStrings[], 
 	GetStringsAndTextAttributes(L"strings", pstrOutStrings, pcOutTextAttributes);
 }
 
-void NoteEntity::SetStrings(unsigned int nInCount, CString const pstrInStrings[], TextAttributes const pcInTextAttributes[])
+void H3DF::PMI::NoteEntity::SetStrings(unsigned int nInCount, CString const pstrInStrings[], TextAttributes const pcInTextAttributes[])
 {
 	SetStringsAndTextAttributes(L"strings", nInCount, pstrInStrings, pcInTextAttributes, this->IsDisplayParallelToScreen());
 }
 
 //== RoughnessEntity ===============================================================================
 
-RoughnessEntity::RoughnessEntity(HC_KEY nInKey) : 
+H3DF::PMI::RoughnessEntity::RoughnessEntity(HC_KEY nInKey) : 
 	Entity(nInKey)
 {
 	if (nInKey != INVALID_KEY)
@@ -1019,28 +1019,28 @@ RoughnessEntity::RoughnessEntity(HC_KEY nInKey) :
 	}
 }
 
-RoughnessEntity::RoughnessEntity(Key const & cInThat) :
+H3DF::PMI::RoughnessEntity::RoughnessEntity(Key const & cInThat) :
 	Entity(cInThat)
 {
 }
 
-RoughnessEntity::RoughnessEntity(RoughnessEntity const & cInThat):
+H3DF::PMI::RoughnessEntity::RoughnessEntity(RoughnessEntity const & cInThat):
 	Entity(cInThat)
 {
 }
 
-void RoughnessEntity::Set(RoughnessEntity const & cInThat)
+void H3DF::PMI::RoughnessEntity::Set(RoughnessEntity const & cInThat)
 {
-	Entity::Set(cInThat);
+	H3DF::PMI::Entity::Set(cInThat);
 }
 
-RoughnessEntity const & RoughnessEntity::operator=(RoughnessEntity const & that)
+RoughnessEntity const & H3DF::PMI::RoughnessEntity::operator=(RoughnessEntity const & that)
 {
 	Set(that);
 	return *this;
 }
 
-Roughness::Obtention::Type RoughnessEntity::GetObtentionType() const
+Roughness::Obtention::Type H3DF::PMI::RoughnessEntity::GetObtentionType() const
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -1067,7 +1067,7 @@ Roughness::Obtention::Type RoughnessEntity::GetObtentionType() const
 	return eObtentionType;
 }
 
-void RoughnessEntity::SetObtentionType(Roughness::Obtention::Type const eInObtentionType)
+void H3DF::PMI::RoughnessEntity::SetObtentionType(Roughness::Obtention::Type const eInObtentionType)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -1092,7 +1092,7 @@ void RoughnessEntity::SetObtentionType(Roughness::Obtention::Type const eInObten
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-Roughness::Applicability::Type RoughnessEntity::GetApplicabilityType() const
+Roughness::Applicability::Type H3DF::PMI::RoughnessEntity::GetApplicabilityType() const
 {
 	Roughness::Applicability::Type eApplicabilityType = Roughness::Applicability::Type::Unknown;
 
@@ -1121,7 +1121,7 @@ Roughness::Applicability::Type RoughnessEntity::GetApplicabilityType() const
 	return eApplicabilityType;
 }
 
-void RoughnessEntity::SetApplicabilityType(Roughness::Applicability::Type const in_applicability_type)
+void H3DF::PMI::RoughnessEntity::SetApplicabilityType(Roughness::Applicability::Type const in_applicability_type)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -1149,7 +1149,7 @@ void RoughnessEntity::SetApplicabilityType(Roughness::Applicability::Type const 
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-Roughness::Mode::Type RoughnessEntity::GetModeType() const
+Roughness::Mode::Type H3DF::PMI::RoughnessEntity::GetModeType() const
 {
 	Roughness::Mode::Type mode_type = Roughness::Mode::Type::Unknown;
 
@@ -1186,7 +1186,7 @@ Roughness::Mode::Type RoughnessEntity::GetModeType() const
 	return mode_type;
 }
 
-void RoughnessEntity::SetModeType(Roughness::Mode::Type const eInModeType)
+void H3DF::PMI::RoughnessEntity::SetModeType(Roughness::Mode::Type const eInModeType)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -1226,12 +1226,12 @@ void RoughnessEntity::SetModeType(Roughness::Mode::Type const eInModeType)
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-unsigned int RoughnessEntity::GetFieldCount() const
+unsigned int H3DF::PMI::RoughnessEntity::GetFieldCount() const
 {
 	return GetStringsAndTextAttributesCount(L"fields");
 }
 
-void RoughnessEntity::GetFields(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
+void H3DF::PMI::RoughnessEntity::GetFields(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
 {
 	nOutCount = GetFieldCount();
 
@@ -1242,7 +1242,7 @@ void RoughnessEntity::GetFields(unsigned int & nOutCount, CString * pstrOutStrin
 	GetStringsAndTextAttributes(L"fields", pstrOutStrings, pcOutTextAttributes);
 }
 
-void RoughnessEntity::SetFields(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes)
+void H3DF::PMI::RoughnessEntity::SetFields(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes)
 {
 	SetStringsAndTextAttributes(L"fields", nInCount, pstrInStrings, pcInTextAttributes);
 }
@@ -1262,31 +1262,31 @@ public:
 	H3DF::MatrixKit m_cMatrix;
 };
 
-Orientation::Orientation()
+H3DF::PMI::Orientation::Orientation()
 {
 	m_pcImpl = new OrientationPrivate();
 }
 
-Orientation::Orientation(Orientation const & cInThat)
+H3DF::PMI::Orientation::Orientation(Orientation const & cInThat)
 {
 	m_pcImpl = new OrientationPrivate();
 	Set(cInThat);
 }
 
-void Orientation::Set(Orientation const & cInThat)
+void H3DF::PMI::Orientation::Set(Orientation const & cInThat)
 {
 	OrientationPrivate * pcImpl = (OrientationPrivate *)m_pcImpl;
 	OrientationPrivate * pcInThatImpl = (OrientationPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-Orientation const & Orientation::operator=(Orientation const & cInThat)
+H3DF::PMI::Orientation const & H3DF::PMI::Orientation::operator=(Orientation const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-void Orientation::GetMatrix(float out_matrix[16]) const
+void H3DF::PMI::Orientation::GetMatrix(float out_matrix[16]) const
 {
 	OrientationPrivate * pcImpl = (OrientationPrivate *)m_pcImpl;
 
@@ -1297,7 +1297,7 @@ void Orientation::GetMatrix(float out_matrix[16]) const
 	// memcpy(out_matrix, pcImpl->m_cMatrix.GetData(), 16 * sizeof(float));
 }
 
-void Orientation::SetMatrix(MatrixKit const & cInMatrix)
+void H3DF::PMI::Orientation::SetMatrix(MatrixKit const & cInMatrix)
 {
 	OrientationPrivate * pcImpl = (OrientationPrivate *)m_pcImpl;
 	pcImpl->m_cMatrix = cInMatrix;
@@ -1357,67 +1357,67 @@ public:
 	float m_width_scale;
 };
 
-TextAttributes::TextAttributes()
+H3DF::PMI::TextAttributes::TextAttributes()
 {
 	m_pcImpl = new TextAttributesImpl();
 }
 
-TextAttributes::TextAttributes(TextAttributes const & cInThat)
+H3DF::PMI::TextAttributes::TextAttributes(TextAttributes const & cInThat)
 {
 	m_pcImpl = new TextAttributesImpl();
 	Set(cInThat);
 }
 
-void TextAttributes::Set(TextAttributes const & cInThat)
+void H3DF::PMI::TextAttributes::Set(TextAttributes const & cInThat)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	TextAttributesImpl * pcInThatImpl = (TextAttributesImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-TextAttributes const & TextAttributes::operator=(TextAttributes const & cInThat)
+TextAttributes const & H3DF::PMI::TextAttributes::operator=(TextAttributes const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-void TextAttributes::GetInsertionPoint(H3DF::Point & cOutPoint) const
+void H3DF::PMI::TextAttributes::GetInsertionPoint(H3DF::Point & cOutPoint) const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	cOutPoint = pcImpl->m_insertion_point;
 }
 
-void TextAttributes::SetInsertionPoint(H3DF::Point const & cInPoint)
+void H3DF::PMI::TextAttributes::SetInsertionPoint(H3DF::Point const & cInPoint)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_insertion_point = cInPoint;
 }
 
-void TextAttributes::GetFontSize(float & fOutSize) const
+void H3DF::PMI::TextAttributes::GetFontSize(float & fOutSize) const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	fOutSize = pcImpl->m_font_size;
 }
 
-void TextAttributes::SetFontSize(float const nInSize)
+void H3DF::PMI::TextAttributes::SetFontSize(float const nInSize)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_font_size = nInSize;
 }
 
-void TextAttributes::GetFontSizeUnits(Font::Size::Units & eOutUnits) const
+void H3DF::PMI::TextAttributes::GetFontSizeUnits(Font::Size::Units & eOutUnits) const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	eOutUnits = pcImpl->m_font_size_units;
 }
 
-void TextAttributes::SetFontSizeUnits(Font::Size::Units const eInUnits)
+void H3DF::PMI::TextAttributes::SetFontSizeUnits(Font::Size::Units const eInUnits)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_font_size_units = eInUnits;
 }
 
-void TextAttributes::GetFontName(char * pchOutFontName) const
+void H3DF::PMI::TextAttributes::GetFontName(char * pchOutFontName) const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
@@ -1428,7 +1428,7 @@ void TextAttributes::GetFontName(char * pchOutFontName) const
 	}
 }
 
-void TextAttributes::SetFontName(char const * pchInFontName)
+void H3DF::PMI::TextAttributes::SetFontName(char const * pchInFontName)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
@@ -1440,93 +1440,93 @@ void TextAttributes::SetFontName(char const * pchInFontName)
 	strcpy(pcImpl->m_font_name, pchInFontName);
 }
 
-void TextAttributes::GetOrientation(PMI::Orientation & cOutOrientation) const
+void H3DF::PMI::TextAttributes::GetOrientation(PMI::Orientation & cOutOrientation) const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	cOutOrientation = pcImpl->m_orientation;
 }
 
-void TextAttributes::SetOrientation(Orientation const & cInOrientation)
+void H3DF::PMI::TextAttributes::SetOrientation(Orientation const & cInOrientation)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_orientation = cInOrientation;
 }
 
-void TextAttributes::GetRGBColor(H3DF::RGBColor & cOutColor) const
+void H3DF::PMI::TextAttributes::GetRGBColor(H3DF::RGBColor & cOutColor) const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	cOutColor = pcImpl->m_color;
 }
 
-void TextAttributes::SetRGBColor(H3DF::RGBColor const & cInColor)
+void H3DF::PMI::TextAttributes::SetRGBColor(H3DF::RGBColor const & cInColor)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_color = cInColor;
 }
 
-bool TextAttributes::IsBold() const
+bool H3DF::PMI::TextAttributes::IsBold() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x02) == 0x02;
 }
 
-bool TextAttributes::IsItalic() const
+bool H3DF::PMI::TextAttributes::IsItalic() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x04) == 0x04;
 }
-bool TextAttributes::IsUnderlined() const
+bool H3DF::PMI::TextAttributes::IsUnderlined() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x08) == 0x08;
 }
-bool TextAttributes::IsStrikedThrough() const
+bool H3DF::PMI::TextAttributes::IsStrikedThrough() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x10) == 0x10;
 }
-bool TextAttributes::IsOverlined() const
+bool H3DF::PMI::TextAttributes::IsOverlined() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x20) == 0x20;
 }
-bool TextAttributes::IsStreched() const
+bool H3DF::PMI::TextAttributes::IsStreched() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x40) == 0x40;
 }
-bool TextAttributes::IsWired() const
+bool H3DF::PMI::TextAttributes::IsWired() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x80) == 0x80;
 }
-bool TextAttributes::IsFixedWidth() const
+bool H3DF::PMI::TextAttributes::IsFixedWidth() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x100) == 0x100;
 }
 
-void TextAttributes::SetFormat(char const & chInFormat)
+void H3DF::PMI::TextAttributes::SetFormat(char const & chInFormat)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_format = chInFormat;
 }
 
-double TextAttributes::WidthScale() const
+double H3DF::PMI::TextAttributes::WidthScale() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	return pcImpl->m_width_scale;
 }
 
-void TextAttributes::SetWidthScale(const double dWidthScale)
+void H3DF::PMI::TextAttributes::SetWidthScale(const double dWidthScale)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_width_scale = static_cast<float>(dWidthScale);
@@ -1552,38 +1552,38 @@ public:
 	bool m_bDisplayParallelToScreen;
 };
 
-Options::Options()
+H3DF::PMI::Options::Options()
 {
 	m_pcImpl = new OptionsPrivate();
 }
 
-Options::Options(Options const & cInThat)
+H3DF::PMI::Options::Options(Options const & cInThat)
 {
 	m_pcImpl = new OptionsPrivate();
 	Set(cInThat);
 }
 
-void Options::Set(Options const & cInThat)
+void H3DF::PMI::Options::Set(Options const & cInThat)
 {
 	OptionsPrivate * pcImpl = (OptionsPrivate *)m_pcImpl;
 	OptionsPrivate * pcInThatImpl = (OptionsPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-Options const & Options::operator=(Options const & cInThat)
+Options const & H3DF::PMI::Options::operator=(Options const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
 
-bool Options::IsDisplayParallelToScreen() const
+bool H3DF::PMI::Options::IsDisplayParallelToScreen() const
 {
 	OptionsPrivate * pcImpl = (OptionsPrivate *)m_pcImpl;
 	return pcImpl->m_bDisplayParallelToScreen;
 }
 
-void Options::SetDisplayParallelToScreen(const bool in_parallel)
+void H3DF::PMI::Options::SetDisplayParallelToScreen(const bool in_parallel)
 {
 	OptionsPrivate * pcImpl = (OptionsPrivate *)m_pcImpl;
 	pcImpl->m_bDisplayParallelToScreen = in_parallel;
@@ -1602,37 +1602,37 @@ public:
 	H3DF::PolylineArray	m_aPolylines;
 };
 
-Frame::Frame()
+H3DF::PMI::Frame::Frame()
 {
 	m_pcImpl = new FramePrivate();
 }
 
-Frame::Frame(Frame const & cInThat)
+H3DF::PMI::Frame::Frame(Frame const & cInThat)
 {
 	m_pcImpl = new FramePrivate();
 	Set(cInThat);
 }
 
-void Frame::Set(Frame const & cInThat)
+void H3DF::PMI::Frame::Set(Frame const & cInThat)
 {
 	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
 	FramePrivate * pcInThatImpl = (FramePrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-Frame const & Frame::operator=(Frame const & cInThat)
+Frame const & H3DF::PMI::Frame::operator=(Frame const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-unsigned int Frame::GetPolylineCount() const
+unsigned int H3DF::PMI::Frame::GetPolylineCount() const
 {
 	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
 	return static_cast<unsigned int>(pcImpl->m_aPolylines.size());
 }
 
-void Frame::GetPolylines(unsigned int & nOutCount, H3DF::Polyline * pcOutPolylines) const
+void H3DF::PMI::Frame::GetPolylines(unsigned int & nOutCount, H3DF::Polyline * pcOutPolylines) const
 {
 	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
 
@@ -1647,7 +1647,7 @@ void Frame::GetPolylines(unsigned int & nOutCount, H3DF::Polyline * pcOutPolylin
 	}
 }
 
-void Frame::SetPolylines(unsigned int nInCount, H3DF::Polyline const * pcInPolylines)
+void H3DF::PMI::Frame::SetPolylines(unsigned int nInCount, H3DF::Polyline const * pcInPolylines)
 {
 	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
 	pcImpl->m_aPolylines.resize(nInCount);
@@ -1670,37 +1670,37 @@ public:
 	H3DF::PolygonArray m_polygons;
 };
 
-Drawing::Drawing()
+H3DF::PMI::Drawing::Drawing()
 {
 	m_pcImpl = new DrawingPrivate();
 }
 
-Drawing::Drawing(Drawing const & cInThat)
+H3DF::PMI::Drawing::Drawing(Drawing const & cInThat)
 {
 	m_pcImpl = new DrawingPrivate();
 	Set(cInThat);
 }
 
-void Drawing::Set(Drawing const & cInThat)
+void H3DF::PMI::Drawing::Set(Drawing const & cInThat)
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
 	DrawingPrivate * pcInThatImpl = (DrawingPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-Drawing const & Drawing::operator=(Drawing const & cInThat)
+Drawing const & H3DF::PMI::Drawing::operator=(Drawing const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-unsigned int Drawing::GetPolygonCount() const
+unsigned int H3DF::PMI::Drawing::GetPolygonCount() const
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
 	return static_cast<unsigned int>(pcImpl->m_polygons.size());
 }
 
-void Drawing::GetPolygons(unsigned int & nOutCount, H3DF::Polygon * pcOutPolygons) const
+void H3DF::PMI::Drawing::GetPolygons(unsigned int & nOutCount, H3DF::Polygon * pcOutPolygons) const
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
 	nOutCount = (unsigned int)pcImpl->m_polygons.size();
@@ -1714,11 +1714,12 @@ void Drawing::GetPolygons(unsigned int & nOutCount, H3DF::Polygon * pcOutPolygon
 	}
 }
 
-void Drawing::SetPolygons(unsigned int nInCount, H3DF::Polygon const * pcInPolygons)
+void H3DF::PMI::Drawing::SetPolygons(unsigned int nInCount, H3DF::Polygon const * pcInPolygons)
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
 	pcImpl->m_polygons.resize(nInCount);
 
-	for (unsigned int i = 0; i < nInCount; i++)
+	for (unsigned int i = 0; i < nInCount; i++) {
 		pcImpl->m_polygons[i] = pcInPolygons[i];
+	}
 }

@@ -72,7 +72,7 @@ void KERNEL::DocView::Initialize(Json::Object & cInObject)
 	//pcImpl->ModelPanel().Initialize(strFilePathName);
 }
 
-void KERNEL::DocView::FileOpenTimer()
+void KERNEL::DocView::ThreadFileOpen()
 {
 	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);

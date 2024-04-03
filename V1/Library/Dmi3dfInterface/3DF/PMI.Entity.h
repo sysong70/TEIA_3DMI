@@ -9,358 +9,352 @@
 
 #include <atlstr.h>
 
-#define OPEN_3DF_PMI_NAMESPACE namespace H3DF { namespace PMI {
-#define CLOSE_3DF_PMI_NAMESPACE } }
-
-#define USING_3DF_PMI_NAMESPACE using namespace H3DF::PMI;
-
-OPEN_3DF_PMI_NAMESPACE
-
-enum class Type
-{
-	UnknownType,
-	DatumType,
-	DimensionType,
-	FeatureControlFrameType,
-	GenericType,
-	NoteType,
-	RoughnessType
-};
-
-namespace Datum
-{
-	enum class Type
-	{
-		Unknown,
-		Identifier,
-		Target
-	};
-};
-
-namespace Dimension
-{
-	enum class Type
-	{
-		UnknownType,
-		BasicType,
-		ReferenceType,
-		ToleranceType
-	};
-
-	enum class SubType
-	{
-		UnknownSubType,
-		AngleSubType,
-		ChamferSubType,
-		DiameterSubType,
-		DistanceSubType,
-		LengthSubType,
-		RadiusSubType,
-		SlopeSubType
-	};
-
-};
-
-namespace Roughness
-{
-	namespace Obtention
-	{
+namespace H3DF {
+	namespace PMI {
 		enum class Type
 		{
-			Unknown,
-			NotDefined,
-			MachiningMandatory,
-			MachiningForbidden
+			UnknownType,
+			DatumType,
+			DimensionType,
+			FeatureControlFrameType,
+			GenericType,
+			NoteType,
+			RoughnessType
 		};
-	};
 
-	namespace Applicability
-	{
-		enum class Type
+		namespace Datum
 		{
-			Unknown,
-			SpecifiedSurface,
-			SurroundingSurfaces,
-			BasicSurface,
-			AllSurfaces
+			enum class Type
+			{
+				Unknown,
+				Identifier,
+				Target
+			};
 		};
-	};
 
-	namespace Mode
-	{
-		enum class Type
+		namespace Dimension
 		{
-			Unknown,
-			None,
-			MultiDirectional,
-			Circular,
-			Radial,
-			Particular,
-			WithAngles,
-			Parallel,
-			Perpendicular
-		};
-	};
-};
+			enum class Type
+			{
+				UnknownType,
+				BasicType,
+				ReferenceType,
+				ToleranceType
+			};
 
-namespace Font
-{
-	namespace Size
-	{
-		enum class Units
+			enum class SubType
+			{
+				UnknownSubType,
+				AngleSubType,
+				ChamferSubType,
+				DiameterSubType,
+				DistanceSubType,
+				LengthSubType,
+				RadiusSubType,
+				SlopeSubType
+			};
+
+		};
+
+		namespace Roughness
 		{
-			UnknownUnits,
-			WorldSpaceUnits,
-			PixelUnits
+			namespace Obtention
+			{
+				enum class Type
+				{
+					Unknown,
+					NotDefined,
+					MachiningMandatory,
+					MachiningForbidden
+				};
+			};
+
+			namespace Applicability
+			{
+				enum class Type
+				{
+					Unknown,
+					SpecifiedSurface,
+					SurroundingSurfaces,
+					BasicSurface,
+					AllSurfaces
+				};
+			};
+
+			namespace Mode
+			{
+				enum class Type
+				{
+					Unknown,
+					None,
+					MultiDirectional,
+					Circular,
+					Radial,
+					Particular,
+					WithAngles,
+					Parallel,
+					Perpendicular
+				};
+			};
 		};
-	};
-};
 
-class Frame;
-class Drawing;
+		namespace Font
+		{
+			namespace Size
+			{
+				enum class Units
+				{
+					UnknownUnits,
+					WorldSpaceUnits,
+					PixelUnits
+				};
+			};
+		};
 
-class API_3DF Entity : public SegmentKey
-{
-public:
-	Entity(HC_KEY nInKey = INVALID_KEY);
-	Entity(Key const & cInThat);
-	Entity(Entity const & cInThat);
+		class Frame;
+		class Drawing;
 
-	void Set(Entity const & cInThat);
-	Entity const & operator=(Entity const & cInThat);
+		class API_3DF Entity : public SegmentKey
+		{
+		public:
+			Entity(HC_KEY nInKey = INVALID_KEY);
+			Entity(Key const & cInThat);
+			Entity(Entity const & cInThat);
 
-	// return the PMI::Type for this entity. Overridden by subclasses.
-	virtual PMI::Type GetType() const { return PMI::Type::UnknownType; };
+			void Set(Entity const & cInThat);
+			Entity const & operator=(Entity const & cInThat);
 
-	void SetFrame(Frame const & cInFrame);
+			// return the PMI::Type for this entity. Overridden by subclasses.
+			virtual PMI::Type GetType() const { return PMI::Type::UnknownType; };
 
-	void GetDrawing(Drawing & cOutDrawing) const;
-	void SetDrawing(Drawing const & cInDrawing);
+			void SetFrame(Frame const & cInFrame);
 
-	unsigned int GetLeaderLineCount() const;
-	void SetLeaderLines(unsigned int in_count, Polyline const * in_leader_lines);
+			void GetDrawing(Drawing & cOutDrawing) const;
+			void SetDrawing(Drawing const & cInDrawing);
 
-	void SetLeaderSymbols(unsigned int nInCount, H3DF::Polygon const * pcInLeaderSymbols);
+			unsigned int GetLeaderLineCount() const;
+			void SetLeaderLines(unsigned int in_count, Polyline const * in_leader_lines);
 
-	void SetDisplayParallelToScreen(bool const bInParallel);
-	bool IsDisplayParallelToScreen() const;
+			void SetLeaderSymbols(unsigned int nInCount, H3DF::Polygon const * pcInLeaderSymbols);
 
-protected:
-	void SetPolygons(char const * pchInSegmentName, unsigned int nInCount, H3DF::Polygon const * pcInPolygons);
+			void SetDisplayParallelToScreen(bool const bInParallel);
+			bool IsDisplayParallelToScreen() const;
 
-	void SetColor(const H3DF::Polyline & cPolyline);
-	void SetColor(const H3DF::Polygon & cPolygon);
+		protected:
+			void SetPolygons(char const * pchInSegmentName, unsigned int nInCount, H3DF::Polygon const * pcInPolygons);
 
-	unsigned int GetStringsAndTextAttributesCount(CString strInSegmentName) const;
-	void GetStringsAndTextAttributes(CString strInSegmentName, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const;
-	void SetStringsAndTextAttributes(CString strInSegmentName, unsigned int in_count, CString const * in_strings,
-		TextAttributes const * in_text_attributes, bool is_parallel_to_screen = false);
-};
+			void SetColor(const H3DF::Polyline & cPolyline);
+			void SetColor(const H3DF::Polygon & cPolygon);
 
-class API_3DF DatumEntity : public Entity
-{
-public:
-	DatumEntity(HC_KEY nInKey = INVALID_KEY);
-	DatumEntity(Key const & cInThat);
-	DatumEntity(DatumEntity const & cInThat);
+			unsigned int GetStringsAndTextAttributesCount(CString strInSegmentName) const;
+			void GetStringsAndTextAttributes(CString strInSegmentName, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const;
+			void SetStringsAndTextAttributes(CString strInSegmentName, unsigned int in_count, CString const * in_strings,
+				TextAttributes const * in_text_attributes, bool is_parallel_to_screen = false);
+		};
 
-	void Set(DatumEntity const & cInThat);
-	DatumEntity const & operator=(DatumEntity const & cInThat);
+		class API_3DF DatumEntity : public Entity
+		{
+		public:
+			DatumEntity(HC_KEY nInKey = INVALID_KEY);
+			DatumEntity(Key const & cInThat);
+			DatumEntity(DatumEntity const & cInThat);
 
-	PMI::Type GetType() const override { return PMI::Type::DatumType; };
+			void Set(DatumEntity const & cInThat);
+			DatumEntity const & operator=(DatumEntity const & cInThat);
 
-	Datum::Type GetDatumType() const;
-	void SetDatumType(Datum::Type const eInType);
-	
-	unsigned int GetLabelCount() const;
-	void GetLabels(unsigned int & nOutCount, CString * pstrOutLabels, TextAttributes * pcOutTextAttributes) const;
-	void SetLabels(unsigned int in_count, CString const * pstrInlabels, TextAttributes const * in_text_attributes);
-};
+			PMI::Type GetType() const override { return PMI::Type::DatumType; };
 
-class API_3DF DimensionEntity : public Entity
-{
-public:
-	DimensionEntity(HC_KEY nInKey = INVALID_KEY);
-	DimensionEntity(Key const & cInThat);
-	DimensionEntity(DimensionEntity const & cInThat);
+			Datum::Type GetDatumType() const;
+			void SetDatumType(Datum::Type const eInType);
 
-	void Set(DimensionEntity const & cInThat);
-	DimensionEntity const & operator=(DimensionEntity const & cInThat);
+			unsigned int GetLabelCount() const;
+			void GetLabels(unsigned int & nOutCount, CString * pstrOutLabels, TextAttributes * pcOutTextAttributes) const;
+			void SetLabels(unsigned int in_count, CString const * pstrInlabels, TextAttributes const * in_text_attributes);
+		};
 
-	PMI::Type GetType() const override { return Type::DimensionType; };
+		class API_3DF DimensionEntity : public Entity
+		{
+		public:
+			DimensionEntity(HC_KEY nInKey = INVALID_KEY);
+			DimensionEntity(Key const & cInThat);
+			DimensionEntity(DimensionEntity const & cInThat);
 
-	Dimension::Type GetDimensionType() const;
-	void SetDimensionType(Dimension::Type const cInType);
+			void Set(DimensionEntity const & cInThat);
+			DimensionEntity const & operator=(DimensionEntity const & cInThat);
 
-	Dimension::SubType GetDimensionSubType() const;
-	void SetDimensionSubType(Dimension::SubType const cInSubType);
+			PMI::Type GetType() const override { return Type::DimensionType; };
 
-	unsigned int GetStringCount() const;
-	void GetStrings(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const;
-	void SetStrings(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes);
-};
+			Dimension::Type GetDimensionType() const;
+			void SetDimensionType(Dimension::Type const cInType);
 
-class API_3DF GenericEntity : public Entity
-{
-public:
-	GenericEntity(HC_KEY nInKey = INVALID_KEY);
-	GenericEntity(Key const & cInThat);
-	GenericEntity(GenericEntity const & cInThat);
+			Dimension::SubType GetDimensionSubType() const;
+			void SetDimensionSubType(Dimension::SubType const cInSubType);
 
-	void Set(GenericEntity const & cInThat);
-	GenericEntity const & operator=(GenericEntity const & cInThat);
+			unsigned int GetStringCount() const;
+			void GetStrings(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const;
+			void SetStrings(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes);
+		};
 
-	PMI::Type GetType() const override { return PMI::Type::GenericType; };
+		class API_3DF GenericEntity : public Entity
+		{
+		public:
+			GenericEntity(HC_KEY nInKey = INVALID_KEY);
+			GenericEntity(Key const & cInThat);
+			GenericEntity(GenericEntity const & cInThat);
 
-	unsigned int GetStringCount() const;
-	void GetStrings(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const;
-	void SetStrings(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes);
+			void Set(GenericEntity const & cInThat);
+			GenericEntity const & operator=(GenericEntity const & cInThat);
 
-	void SetDisplayParallelToScreen(bool const in_parallel = true);
-	bool IsDisplayParallelToScreen() const;
-};
+			PMI::Type GetType() const override { return PMI::Type::GenericType; };
 
-class API_3DF NoteEntity : public Entity
-{
-public:
-	NoteEntity(HC_KEY nInKey = INVALID_KEY);
-	NoteEntity(Key const & cInThat);
-	NoteEntity(NoteEntity const & cInThat);
+			unsigned int GetStringCount() const;
+			void GetStrings(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const;
+			void SetStrings(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes);
 
-	void Set(NoteEntity const & cInThat);
-	NoteEntity const & operator=(NoteEntity const & cInThat);
+			void SetDisplayParallelToScreen(bool const in_parallel = true);
+			bool IsDisplayParallelToScreen() const;
+		};
 
-	PMI::Type GetType() const override { return PMI::Type::NoteType; };
+		class API_3DF NoteEntity : public Entity
+		{
+		public:
+			NoteEntity(HC_KEY nInKey = INVALID_KEY);
+			NoteEntity(Key const & cInThat);
+			NoteEntity(NoteEntity const & cInThat);
 
-	unsigned int GetStringCount() const;
-	void GetStrings(unsigned int & nOutCount, CString pstrOutStrings[], TextAttributes pcOutTextAttributes[]) const;
-	void SetStrings(unsigned int nInCount, CString const pstrInStrings[], TextAttributes const pcInTextAttributes[]);
-};
+			void Set(NoteEntity const & cInThat);
+			NoteEntity const & operator=(NoteEntity const & cInThat);
 
-class API_3DF RoughnessEntity : public Entity
-{
-public:
-	RoughnessEntity(HC_KEY nInKey = INVALID_KEY);
-	RoughnessEntity(Key const & cInThat);
-	RoughnessEntity(RoughnessEntity const & cInThat);
+			PMI::Type GetType() const override { return PMI::Type::NoteType; };
 
-	void Set(RoughnessEntity const & cInThat);
-	RoughnessEntity const & operator=(RoughnessEntity const & cInThat);
+			unsigned int GetStringCount() const;
+			void GetStrings(unsigned int & nOutCount, CString pstrOutStrings[], TextAttributes pcOutTextAttributes[]) const;
+			void SetStrings(unsigned int nInCount, CString const pstrInStrings[], TextAttributes const pcInTextAttributes[]);
+		};
 
-	virtual PMI::Type GetType() const { return PMI::Type::RoughnessType; };
+		class API_3DF RoughnessEntity : public Entity
+		{
+		public:
+			RoughnessEntity(HC_KEY nInKey = INVALID_KEY);
+			RoughnessEntity(Key const & cInThat);
+			RoughnessEntity(RoughnessEntity const & cInThat);
 
-	Roughness::Obtention::Type GetObtentionType() const;
-	void SetObtentionType(Roughness::Obtention::Type const in_obtention_type);
+			void Set(RoughnessEntity const & cInThat);
+			RoughnessEntity const & operator=(RoughnessEntity const & cInThat);
 
-	Roughness::Applicability::Type GetApplicabilityType() const;
-	void SetApplicabilityType(Roughness::Applicability::Type const in_applicability_type);
+			virtual PMI::Type GetType() const { return PMI::Type::RoughnessType; };
 
-	Roughness::Mode::Type GetModeType() const;
-	void SetModeType(Roughness::Mode::Type const in_mode_type);
+			Roughness::Obtention::Type GetObtentionType() const;
+			void SetObtentionType(Roughness::Obtention::Type const in_obtention_type);
 
-	unsigned int GetFieldCount() const;
-	void GetFields(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const;
-	void SetFields(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes);
-};
+			Roughness::Applicability::Type GetApplicabilityType() const;
+			void SetApplicabilityType(Roughness::Applicability::Type const in_applicability_type);
 
-class API_3DF Orientation : public Entity
-{
-public:
-	Orientation();
-	Orientation(Orientation const & cInThat);
+			Roughness::Mode::Type GetModeType() const;
+			void SetModeType(Roughness::Mode::Type const in_mode_type);
 
-	void Set(Orientation const & cInThat);
-	Orientation const & operator=(Orientation const & cInThat);
+			unsigned int GetFieldCount() const;
+			void GetFields(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const;
+			void SetFields(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes);
+		};
 
-	void GetMatrix(float out_matrix[16]) const;
-	void SetMatrix(H3DF::MatrixKit const & cInMatrix);
-};
+		class API_3DF Orientation : public Entity
+		{
+		public:
+			Orientation();
+			Orientation(Orientation const & cInThat);
 
-class API_3DF TextAttributes : public Entity
-{
-public:
-	TextAttributes();
-	TextAttributes(TextAttributes const & cInThat);
+			void Set(Orientation const & cInThat);
+			Orientation const & operator=(Orientation const & cInThat);
 
-	void Set(TextAttributes const & cInThat);
-	TextAttributes const & operator=(TextAttributes const & cInThat);
+			void GetMatrix(float out_matrix[16]) const;
+			void SetMatrix(H3DF::MatrixKit const & cInMatrix);
+		};
 
-	void GetInsertionPoint(H3DF::Point & out_point) const;
-	void SetInsertionPoint(H3DF::Point const & in_point);
+		class API_3DF TextAttributes : public Entity
+		{
+		public:
+			TextAttributes();
+			TextAttributes(TextAttributes const & cInThat);
 
-	void GetFontSize(float & fOutSize) const;
-	void SetFontSize(float const nInSize);
+			void Set(TextAttributes const & cInThat);
+			TextAttributes const & operator=(TextAttributes const & cInThat);
 
-	void GetFontSizeUnits(Font::Size::Units & eOutUnits) const;
-	void SetFontSizeUnits(Font::Size::Units const eInUnits);
+			void GetInsertionPoint(H3DF::Point & out_point) const;
+			void SetInsertionPoint(H3DF::Point const & in_point);
 
-	void GetFontName(char * pchOutFontName) const;
-	void SetFontName(char const * pchInFontName);
+			void GetFontSize(float & fOutSize) const;
+			void SetFontSize(float const nInSize);
 
-	void GetOrientation(Orientation & cOutOrientation) const;
-	void SetOrientation(Orientation const & cInOrientation);
+			void GetFontSizeUnits(Font::Size::Units & eOutUnits) const;
+			void SetFontSizeUnits(Font::Size::Units const eInUnits);
 
-	void GetRGBColor(H3DF::RGBColor & cOutColor) const;
-	void SetRGBColor(H3DF::RGBColor const & cInColor);
+			void GetFontName(char * pchOutFontName) const;
+			void SetFontName(char const * pchInFontName);
 
-	bool IsBold() const;
-	bool IsItalic() const;
-	bool IsUnderlined() const;
-	bool IsStrikedThrough() const;
-	bool IsOverlined() const;
-	bool IsStreched() const;
-	bool IsWired() const;
-	bool IsFixedWidth() const;
+			void GetOrientation(Orientation & cOutOrientation) const;
+			void SetOrientation(Orientation const & cInOrientation);
 
-	void SetFormat(char const & chInFormat);
-	
-	double WidthScale() const;
-	void SetWidthScale(const double dWidthScale);
-};
+			void GetRGBColor(H3DF::RGBColor & cOutColor) const;
+			void SetRGBColor(H3DF::RGBColor const & cInColor);
 
-class API_3DF Options : public Entity
-{
-public:
-	Options();
-	Options(Options const & cInThat);
+			bool IsBold() const;
+			bool IsItalic() const;
+			bool IsUnderlined() const;
+			bool IsStrikedThrough() const;
+			bool IsOverlined() const;
+			bool IsStreched() const;
+			bool IsWired() const;
+			bool IsFixedWidth() const;
 
-	void Set(Options const & cInThat);
-	Options const & operator=(Options const & cInThat);
+			void SetFormat(char const & chInFormat);
 
-	// Set the option parallel to screen. The pmi is display parallel to screen and is not impacted by any rotation
-	void SetDisplayParallelToScreen(bool const in_parallel = true);
-	// Return the option parallel to screen value.
-	bool IsDisplayParallelToScreen() const;
-};
+			double WidthScale() const;
+			void SetWidthScale(const double dWidthScale);
+		};
 
-class API_3DF Frame : public Entity
-{
-public:
-	Frame();
-	Frame(Frame const & cInThat);
+		class API_3DF Options : public Entity
+		{
+		public:
+			Options();
+			Options(Options const & cInThat);
 
-	void Set(Frame const & cInThat);
-	Frame const & operator=(Frame const & cInThat);
+			void Set(Options const & cInThat);
+			Options const & operator=(Options const & cInThat);
 
-	unsigned int GetPolylineCount() const;
-	void GetPolylines(unsigned int & nOutCount, H3DF::Polyline * pcOutPolylines) const;
-	void SetPolylines(unsigned int nInCount, H3DF::Polyline const * pcInPolylines);
-};
+			// Set the option parallel to screen. The pmi is display parallel to screen and is not impacted by any rotation
+			void SetDisplayParallelToScreen(bool const in_parallel = true);
+			// Return the option parallel to screen value.
+			bool IsDisplayParallelToScreen() const;
+		};
 
-class API_3DF Drawing : public Entity
-{
-public:
-	Drawing();
-	Drawing(Drawing const & cInThat);
+		class API_3DF Frame : public Entity
+		{
+		public:
+			Frame();
+			Frame(Frame const & cInThat);
 
-	void Set(Drawing const & cInThat);
-	Drawing const & operator=(Drawing const & cInThat);
+			void Set(Frame const & cInThat);
+			Frame const & operator=(Frame const & cInThat);
 
-	unsigned int GetPolygonCount() const;
+			unsigned int GetPolylineCount() const;
+			void GetPolylines(unsigned int & nOutCount, H3DF::Polyline * pcOutPolylines) const;
+			void SetPolylines(unsigned int nInCount, H3DF::Polyline const * pcInPolylines);
+		};
 
-	void GetPolygons(unsigned int & nOutCount, H3DF::Polygon pcOutPolygons[]) const;
-	void SetPolygons(unsigned int nInCount, H3DF::Polygon const pcInPolygons[]);
-};
+		class API_3DF Drawing : public Entity
+		{
+		public:
+			Drawing();
+			Drawing(Drawing const & cInThat);
 
+			void Set(Drawing const & cInThat);
+			Drawing const & operator=(Drawing const & cInThat);
 
-CLOSE_3DF_PMI_NAMESPACE
+			unsigned int GetPolygonCount() const;
+
+			void GetPolygons(unsigned int & nOutCount, H3DF::Polygon pcOutPolygons[]) const;
+			void SetPolygons(unsigned int nInCount, H3DF::Polygon const pcInPolygons[]);
+		};
+	}
+}

@@ -20,7 +20,7 @@ namespace KERNEL
 		void SetDelivery(Signal::Delivery & cDelivery);
 
 		void Initialize(Json::Object & cInObject);
-		void FileOpenTimer();
+		void ThreadFileOpen();
 
 		void Paint(Json::Object & cInObject);
 		void Resize(Json::Object & cInObject);
