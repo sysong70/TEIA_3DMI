@@ -173,6 +173,7 @@ bool H3DX::ImportOptions::GetGeneral(Json::Object& source, A3DRWParamsLoadData& 
 	param.m_bReadSolids = data.GetBoolean("Solids");
 	param.m_bReadSurfaces = data.GetBoolean("Surfaces");
 	param.m_bReadWireframes = data.GetBoolean("Wireframes");
+	//:WARNING - process in GetPMI()
 	//param.m_bReadPmis;
 	param.m_bReadAttributes = data.GetBoolean("Attributes");
 	param.m_bReadHiddenObjects = data.GetBoolean("HiddenObjects");
@@ -366,6 +367,9 @@ bool H3DX::ImportOptions::GetPMI(Json::Object& source, A3DRWParamsLoadData& targ
 		if (data.GetBoolean("checked") == false) {
 			return true;
 		}
+
+		//:CHECK
+		target.m_sGeneral.m_bReadPmis = true;
 
 		A3DRWParamsPmiData& param = target.m_sPmi;
 

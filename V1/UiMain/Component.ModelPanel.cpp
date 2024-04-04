@@ -24,6 +24,7 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 #define Control() (*m_pControl)
+#define FindTreeItem(x) FindItem(pData->GetDwordPtr(x))
 
 #define DisableNotification(func) \
 Control().EnableTreeCtrlNotifications(FALSE); \
@@ -42,7 +43,7 @@ namespace PresetModelPanel
 		SortButton = TOOLBAR_3D_LST_Sort,
 	};
 
-	const CString DummyName = L"_$_DUMMY_$_";
+	WCHAR DummyName[] = L"Working...";
 }
 
 //**************************************************************************************************
@@ -75,7 +76,7 @@ public:
 			//| TVM_EDITLABEL
 			/// Enables full-row selection in the tree view.
 			/// This style cannot be used in conjunction with the TVS_HASLINES style.
-			| TVS_FULLROWSELECT
+			//| TVS_FULLROWSELECT
 			/// Displays plus (+) and minus (-) buttons next to parent items.
 			/// To include buttons with items at the root of the tree view, TVS_LINESATROOT must also be specified.
 			| TVS_HASBUTTONS
@@ -109,6 +110,7 @@ public:
 		SetVisualManagerColorTheme();
 		EnableDragSelection(FALSE);
 		SetSingleSel(FALSE);
+		
 		//:CHECK
 		//SetShowInPlaceToolTip(FALSE);
 
@@ -164,9 +166,71 @@ public:
 
 
 
+	void AddDummyItem(HTREEITEM hParent, bool checked)
+	{
+		HTREEITEM hDummy = InsertItem(PRESET::DummyName, hParent);
+		SetCheck(hDummy, checked);
+		Expand(hParent, TVE_COLLAPSE);
+	}
+
+
+
+	bool RemoveDummyItem(HTREEITEM hParent)
+	{
+		// Check first child item
+		HTREEITEM hChild = GetChildItem(hParent);
+		if (GetItemText(hChild) == PRESET::DummyName) {
+			CLocalState<BOOL> notify(m_bTreeCtrlNotifications, FALSE);
+			DeleteItem(hChild);
+
+			return true;
+		}
+
+		return false;
+	}
+
+
+
+	HTREEITEM AddItem(HTREEITEM hParent, DWORD_PTR key, LPWSTR title, bool checked, bool hasChildren, int type)
+	{
+		HTREEITEM hItem = InsertItem(title, hParent);
+		DEBUG_VALID(hItem);
+		DEBUG_LOG(WStr::Format(L"\t- %s", title));
+
+	#ifdef _TEST
+		SetItemImage(hItem, 0, 0);
+	#endif
+		SetItemData(hItem, key);
+		SetCheck(hItem, checked);
+
+		if (hasChildren) {
+			AddDummyItem(hItem, checked);
+		}
+
+		return hItem;
+	}
+
+
+
+	void ClearSelection()
+	{
+		CList<CBCGPGridItem*, CBCGPGridItem*> selected;
+		GetSelectedItems(selected);
+
+		POSITION pos = selected.GetHeadPosition();
+		while (pos != NULL) {
+			CBCGPGridItem* pItem = selected.GetNext(pos);
+			if (pItem != nullptr) {
+				pItem->Select(FALSE);
+			}
+		}
+	}
+
+
+
 	void InverseCheckedStatus()
 	{
-		EnableTreeCtrlNotifications(FALSE);
+		CLocalState<BOOL> notify(m_bTreeCtrlNotifications, FALSE);
 
 		//:CHECK
 		const CList<CBCGPGridRow*, CBCGPGridRow*>& list = m_lstItems;
@@ -179,8 +243,34 @@ public:
 		}
 
 		RedrawWindow();
+	}
 
-		EnableTreeCtrlNotifications(TRUE);
+
+
+	void GetAncestorData(HTREEITEM pItem, std::list<DWORD_PTR>& ancestor)
+	{
+		HTREEITEM hParent = pItem;
+		while (hParent != nullptr) {
+			ancestor.push_front(GetItemData(hParent));
+			hParent = GetParentItem(hParent);
+		}
+	}
+
+
+
+	void Redraw(bool value)
+	{
+		SetRedraw(value);
+		EnableTreeCtrlNotifications(value);
+
+		if (value) {
+			AdjustLayout();
+			RedrawWindow();
+			EndWaitCursor();
+		}
+		else {
+			BeginWaitCursor();
+		}
 	}
 
 protected:
@@ -247,7 +337,7 @@ private:
 
 
 
-BEGIN_MESSAGE_MAP(ModelTree, CBCGPGridCtrl)
+BEGIN_MESSAGE_MAP(ModelTree, CBCGPTreeCtrlEx)
 	ON_WM_CONTEXTMENU()
 END_MESSAGE_MAP()
 
@@ -258,8 +348,8 @@ using namespace Component;
 BEGIN_MESSAGE_MAP(ModelPanel, Panel)
 	ON_REGISTERED_MESSAGE(BCGM_GRID_ROW_CHECKBOX_CLICK, OnTreeCheckClick)
 
-	ON_NOTIFY(NM_CLICK, PRESET::Tree, OnTreeClick)
-	ON_NOTIFY(NM_DBLCLK, PRESET::Tree, OnTreeDblClick)
+	//ON_NOTIFY(NM_CLICK, PRESET::Tree, OnTreeClick)
+	//ON_NOTIFY(NM_DBLCLK, PRESET::Tree, OnTreeDblClick)
 	//ON_NOTIFY(NM_RCLICK, PRESET::Tree, OnTreeRClick)
 	//ON_NOTIFY(NM_RDBLCLK, PRESET::Tree, OnTreeRDbClick)
 	//ON_NOTIFY(NM_SETFOCUS, PRESET::Tree, OnTreeSetFocus)
@@ -307,13 +397,14 @@ void Component::ModelPanel::ReceiveSignal(Json::Object* pData)
 	case Signal::ModelPanel::Action::ExpandItem:	ExpandItem(pData);		break;
 	case Signal::ModelPanel::Action::ExpandParent:	ExpandParent(pData);	break;
 	case Signal::ModelPanel::Action::SelectItem:	SelectItem(pData);		break;
+	case Signal::ModelPanel::Action::SelectItems:	SelectItems(pData);		break;
 
 	case Signal::ModelPanel::Action::InverseCheckedStatus:
 		Control().InverseCheckedStatus();
 		break;
 
 	case Signal::ModelPanel::Action::RedrawTree:
-		RedrawTree(pData->GetBoolean(SKW_FLAG));
+		Control().Redraw(pData->GetBoolean(SKW_FLAG));
 		break;
 
 	default:
@@ -570,13 +661,7 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 	if (pNMTreeView->action == TVE_EXPAND) {
 		HTREEITEM hItem = pNMTreeView->itemNew.hItem;
 
-		// get first child item
-		HTREEITEM hChild = Control().GetChildItem(hItem);
-		if (Control().GetItemText(hChild) == PRESET::DummyName) {
-			DisableNotification(
-				Control().DeleteItem(hChild);
-			);
-
+		if (Control().RemoveDummyItem(hItem)) {
 			DWORD_PTR key = Control().GetItemData(hItem);
 			ASSERT(key != 0);
 
@@ -595,6 +680,7 @@ void Component::ModelPanel::OnTreeItemExpanded(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeItemExpanding(NMHDR* pNMHDR, LRESULT* pResult)
 {
+	DEBUG_STOP;
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
 	*pResult = S_OK;
@@ -604,19 +690,8 @@ void Component::ModelPanel::OnTreeItemExpanding(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeRClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	UNREFERENCED_PARAMETER(pNMHDR);
-
-	CPoint point;
-	GetCursorPos(&point);
-	Control().ScreenToClient(&point);
-
-	CMenu menu;
-	menu.CreatePopupMenu();
-
-	menu.AppendMenu(MF_STRING, 111, L"Clear");
-	menu.AppendMenu(MF_STRING, 222, L"Save...");
-
-	menu.TrackPopupMenu(TPM_LEFTALIGN, point.x, point.y, this);
+	DEBUG_STOP;
+	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
 	*pResult = S_OK;
 }
@@ -626,7 +701,7 @@ void Component::ModelPanel::OnTreeRClick(NMHDR* pNMHDR, LRESULT* pResult)
 void Component::ModelPanel::OnTreeRDbClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	DEBUG_STOP;
-	UNREFERENCED_PARAMETER(pNMHDR);
+	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
 	*pResult = S_OK;
 }
@@ -677,6 +752,7 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeSelChanging(NMHDR* pNMHDR, LRESULT* pResult)
 {
+	DEBUG_STOP;
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
 	*pResult = S_OK;
@@ -686,6 +762,7 @@ void Component::ModelPanel::OnTreeSelChanging(NMHDR* pNMHDR, LRESULT* pResult)
 
 void Component::ModelPanel::OnTreeSetFocus(NMHDR* pNMHDR, LRESULT* pResult)
 {
+	DEBUG_STOP;
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
 
 	*pResult = S_OK;
@@ -693,44 +770,12 @@ void Component::ModelPanel::OnTreeSetFocus(NMHDR* pNMHDR, LRESULT* pResult)
 
 //--------------------------------------------------------------------------------------------------
 
-void Component::ModelPanel::AddDummyItem(HTREEITEM parent, bool checked)
-{
-	HTREEITEM hDummy = Control().InsertItem(PRESET::DummyName, parent);
-	Control().SetCheck(hDummy, checked);
-	Control().Expand(parent, TVE_COLLAPSE);
-}
-
-
-
-HTREEITEM Component::ModelPanel::AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool checked, bool hasChildren, int type)
-{
-	HTREEITEM hItem = Control().InsertItem(title, parent);
-	DEBUG_VALID(hItem);
-	DEBUG_LOG(WStr::Format(L"\t- %s", title));
-
-	m_keyMap[key] = hItem;
-
-#ifdef _TEST
-	Control().SetItemImage(hItem, 0, 0);
-#endif
-	Control().SetItemData(hItem, key);
-	Control().SetCheck(hItem, checked);
-
-	if (hasChildren) {
-		AddDummyItem(hItem, checked);
-	}
-
-	return hItem;
-}
-
-
-
 HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 {
 	DWORD_PTR key = pData->GetDwordPtr(SKW_KEY);
 	bool checked = pData->GetBoolean(SKW_CHECKED);
 
-	HTREEITEM hItem = Control().InsertItem(pData->GetString(SKW_TITLE), GetItem(pData->GetDwordPtr(SKW_PARENT)));
+	HTREEITEM hItem = Control().InsertItem(pData->GetString(SKW_TITLE), FindTreeItem(SKW_PARENT));
 	DEBUG_VALID(hItem);
 	DEBUG_LOG(WStr::Format(L"AddItem: %s", Control().GetItemText(hItem)));
 
@@ -740,7 +785,7 @@ HTREEITEM Component::ModelPanel::AddItem(Json::Object* pData)
 	Control().SetCheck(hItem, checked);
 
 	if (pData->GetBoolean(SKW_HASCHILDREN)) {
-		AddDummyItem(hItem, checked);
+		Control().AddDummyItem(hItem, checked);
 	}
 
 	return hItem;
@@ -752,10 +797,10 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 {
 	Json::Array& items = pData->GetArray(SKW_CHILDREN);
 
-	HTREEITEM hParent = GetItem(pData->GetDwordPtr(SKW_PARENT));
+	HTREEITEM hParent = FindTreeItem(SKW_PARENT);
 	DEBUG_LOG(WStr::Format(L"AddChildren: %s", Control().GetItemText(hParent)));
 
-	//bool checked = Control().GetCheck(hParent);
+	Control().RemoveDummyItem(hParent);
 
 	int childCount = 0;
 	int checkedCount = 0;
@@ -764,18 +809,21 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 	for (auto item : items.GetBuffer()) {
 		Json::Object& child = item->AsObject();
 
+		DWORD_PTR key = child.GetDwordPtr(SKW_KEY);
 		bool checked = child.GetBoolean(SKW_CHECKED);
 		childCount++;
 		checkedCount += checked ? 1 : 0;
 
-		hChild = AddItem(
+		hChild = Control().AddItem(
 			hParent,
-			child.GetDwordPtr(SKW_KEY),
+			key,
 			(LPWSTR)(LPCTSTR)child.GetString(SKW_TITLE),
 			checked,
 			child.GetBoolean(SKW_HASCHILDREN),
 			child.GetInteger(SKW_TYPE)
 		);
+
+		m_keyMap[key] = hChild;
 	}
 
 	// Use last item
@@ -793,7 +841,7 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 void Component::ModelPanel::CheckItem(Json::Object* pData)
 {
 	DisableNotification(
-		Control().SetCheck(GetItem(pData->GetDwordPtr(SKW_KEY)), pData->GetBoolean(SKW_CHECKED))
+		Control().SetCheck(FindTreeItem(SKW_KEY), pData->GetBoolean(SKW_CHECKED))
 	);
 }
 
@@ -801,42 +849,42 @@ void Component::ModelPanel::CheckItem(Json::Object* pData)
 
 void Component::ModelPanel::CheckItems(Json::Object* pData)
 {
-	RedrawTree(false);
+	Control().Redraw(false);
 
 	if (pData->FindValue(SKW_CHECKED) == nullptr) {
 		// Multi-purpose
 		Json::Array& items = pData->GetArray(SKW_ITEMS);
 
-		HTREEITEM treeItem = nullptr;
+		HTREEITEM hItem = nullptr;
 		for (auto item : items.GetBuffer()) {
 			Json::Object& node = item->AsObject();
 
 			bool check = node.GetBoolean(SKW_FLAG);
-			treeItem = GetItem(node.GetDwordPtr(SKW_KEY));
-			DEBUG_VALID(treeItem);
+			hItem = FindItem(node.GetDwordPtr(SKW_KEY));
+			DEBUG_VALID(hItem);
 
-			Control().SetCheck(treeItem, check);
-			Control().TreeItem(treeItem)->UpdateParentCheckbox();
+			Control().SetCheck(hItem, check);
+			Control().TreeItem(hItem)->UpdateParentCheckbox();
 		}
 	}
 	else {
 		// Single status
 		bool check = pData->GetBoolean(SKW_CHECKED);
 
-		std::vector<DWORD_PTR> keys;
+		Signal::KeyItems keys;
 		pData->GetArray(SKW_ITEMS).ToArray(keys);
 
-		HTREEITEM item = nullptr;
+		HTREEITEM hItem = nullptr;
 		for (auto key : keys) {
-			item = GetItem(key);
-			DEBUG_VALID(item);
+			hItem = FindItem(key);
+			DEBUG_VALID(hItem);
 
-			Control().SetCheck(item, check);
-			Control().TreeItem(item)->UpdateParentCheckbox();
+			Control().SetCheck(hItem, check);
+			Control().TreeItem(hItem)->UpdateParentCheckbox();
 		}
 	}
 
-	RedrawTree(true);
+	Control().Redraw(true);
 }
 
 
@@ -844,7 +892,7 @@ void Component::ModelPanel::CheckItems(Json::Object* pData)
 void Component::ModelPanel::DeleteItem(Json::Object* pData)
 {
 	DisableNotification(
-		Control().DeleteItem(GetItem(pData->GetDwordPtr(SKW_KEY)))
+		Control().DeleteItem(FindTreeItem(SKW_KEY))
 	);
 }
 
@@ -853,10 +901,7 @@ void Component::ModelPanel::DeleteItem(Json::Object* pData)
 void Component::ModelPanel::ExpandItem(Json::Object* pData)
 {
 	DisableNotification(
-		Control().Expand(GetItem(
-			pData->GetDwordPtr(SKW_KEY)),
-			pData->GetBoolean(SKW_EXPAND) ? TVE_EXPAND : TVE_COLLAPSE
-		)
+		Control().Expand(FindTreeItem(SKW_KEY), pData->GetBoolean(SKW_EXPAND) ? TVE_EXPAND : TVE_COLLAPSE)
 	);
 }
 
@@ -864,7 +909,7 @@ void Component::ModelPanel::ExpandItem(Json::Object* pData)
 
 void Component::ModelPanel::ExpandParent(Json::Object* pData)
 {
-	HTREEITEM hItem = GetItem(pData->GetDwordPtr(SKW_KEY));
+	HTREEITEM hItem = FindTreeItem(SKW_KEY);
 	DEBUG_VALID(hItem);
 
 	Control().EnsureVisible(hItem);
@@ -877,27 +922,49 @@ void Component::ModelPanel::ExpandParent(Json::Object* pData)
 
 void Component::ModelPanel::SelectItem(Json::Object* pData)
 {
-	HTREEITEM hItem = GetItem(pData->GetDwordPtr(SKW_KEY));
+	HTREEITEM hItem = FindTreeItem(SKW_KEY);
 	DEBUG_VALID(hItem);
 
-	CBCGPGridRow* pRow = Control().TreeItem(hItem);
-	pRow->Select(pData->GetDwordPtr(SKW_FLAG));
+	//:TODO - uncheck
+	bool selected = pData->GetBoolean(SKW_FLAG);
+	ASSERT(selected);
+
+	DisableNotification(
+		Control().SelectItem(hItem)
+	);
+
+	Control().RedrawWindow();
+}
+
+
+
+void Component::ModelPanel::SelectItems(Json::Object* pData)
+{
+	Control().ClearSelection();
+
+	//:TODO - uncheck
+	bool checked = pData->GetBoolean(SKW_FLAG);
+	ASSERT(checked);
+
+	Signal::KeyItems keys;
+	pData->GetArray(SKW_ITEMS).ToArray(keys);
+
+	Control().Redraw(false);
+
+	HTREEITEM hItem = nullptr;
+	for (auto key : keys) {
+		hItem = FindItem(key);
+		DEBUG_VALID(hItem);
+
+		Control().SelectItem(hItem);
+	}
+
+	Control().Redraw(true);
 }
 
 //--------------------------------------------------------------------------------------------------
 
-void Component::ModelPanel::GetAncestorData(HTREEITEM pItem, std::list<DWORD_PTR>& ancestor)
-{
-	HTREEITEM hParent = pItem;
-	while (hParent != nullptr) {
-		ancestor.push_front(Control().GetItemData(hParent));
-		hParent = Control().GetParentItem(hParent);
-	}
-}
-
-
-
-HTREEITEM Component::ModelPanel::GetItem(DWORD_PTR key)
+HTREEITEM Component::ModelPanel::FindItem(DWORD_PTR key)
 {
 	if (auto result = m_keyMap.find(key); result != m_keyMap.end()) {
 		return result->second;
@@ -906,32 +973,6 @@ HTREEITEM Component::ModelPanel::GetItem(DWORD_PTR key)
 		return nullptr;
 	}
 }
-
-
-
-void Component::ModelPanel::RedrawTree(bool value)
-{
-	Control().SetRedraw(value);
-	Control().EnableTreeCtrlNotifications(value);
-
-	if (value) {
-		Control().AdjustLayout();
-		Control().RedrawWindow();
-		EndWaitCursor();
-	}
-	else {
-		BeginWaitCursor();
-	}
-}
-
-#ifdef _DEBUG
-
-void Component::ModelPanel::TestFunction()
-{
-	Control().InverseCheckedStatus();
-}
-
-#endif
 
 #undef PRESET
 #undef DEBUG_LOG
