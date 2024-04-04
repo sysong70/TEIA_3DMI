@@ -8,8 +8,6 @@
 
 #include "../../UiMain/Command.Resource.h"
 
-#define FILE_OPEN_TIMER_ID		100001
-
 SESSION::Session::Session()
 {
 	m_pcDocView = new KERNEL::DocView();
@@ -37,15 +35,23 @@ void SESSION::Session::SessionId(int nSessionId)
 
 //== View 관련 함수 ==================================================================================
 
+// 1. View 초기화, 이 부분에서 ThreadFileOpen 호출.
 void SESSION::Session::ViewInitialize(Json::Object & cInObject, Signal::Delivery & cInstance)
 {
 	m_pcDocView->SetDelivery(cInstance);
 	m_pcDocView->Initialize(cInObject);
 
 	AfxBeginThread(ThreadFileOpen, this);
+}
 
-// 	HWND hWnd = (HWND)cInObject.GetDwordPtr(SKW_HWND);
-// 	SetTimer(hWnd, FILE_OPEN_TIMER_ID, 100, OnTimerCallback);
+// 1-1. Thread File Open
+UINT SESSION::Session::ThreadFileOpen(LPVOID pcParam)
+{
+	Session * pcSession = (Session *)pcParam;
+	KERNEL::DocView * pcDocView = pcSession->GetDocView();
+	pcDocView->ThreadFileOpen();
+
+	return 0;
 }
 
 void SESSION::Session::ViewPaint(Json::Object & cInObject)
@@ -61,31 +67,6 @@ void SESSION::Session::ViewResize(Json::Object & cInObject)
 KERNEL::DocView * SESSION::Session::GetDocView()
 {
 	return m_pcDocView;
-}
-
-void CALLBACK SESSION::Session::OnTimerCallback(HWND hWnd, UINT nMsg, UINT_PTR nTimerId, DWORD dwTime)
-{
-	Session * pcSession = theSessionManager.GetSession(hWnd);
-	if (nullptr == pcSession) {
-		DEBUG_STOP;
-		return;
-	}
-
-	if (FILE_OPEN_TIMER_ID == nTimerId) {
-		KERNEL::DocView * pcDocView = pcSession->GetDocView();
-		pcDocView->FileOpenTimer();
-	}
-
-	KillTimer(hWnd, nTimerId);
-}
-
-UINT SESSION::Session::ThreadFileOpen(LPVOID pcParam)
-{
-	Session * pcSession = (Session *)pcParam;
-	KERNEL::DocView * pcDocView = pcSession->GetDocView();
-	pcDocView->FileOpenTimer();
-
-	return 0;
 }
 
 //== Mouse 관련 함수 =================================================================================
