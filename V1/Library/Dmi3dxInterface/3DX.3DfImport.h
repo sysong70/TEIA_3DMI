@@ -93,7 +93,7 @@ protected:
 	bool ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, H3DF::SegmentKey & cModelSegment);
 
 	// == Product Occurrences 관련 함수 =========================================================
-	A3DStatus ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurrence, A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, 
+	A3DStatus ParseProductOccurrence(A3DAsmProductOccurrence * pcPocc, A3DMiscCascadedAttributes * pcParentAttr, double dModelScale,
 		H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComponent);
 
 	A3DStatus ProductOccurrenceGetLocation(const A3DAsmProductOccurrenceData * pcPoData, H3DF::MatrixKit & cTransMatrix);

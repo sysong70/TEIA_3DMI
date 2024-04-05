@@ -397,17 +397,17 @@ bool TdfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, H3DF::Seg
 // == 2. Product Occurrences 관련 함수 ===============================================================
 
 // 2-1. Product Occurrence 처리
-A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurrence, A3DMiscCascadedAttributes * pcParentAttr, double dModelScale,
+A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcPocc, A3DMiscCascadedAttributes * pcParentAttr, double dModelScale,
 	H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComponent)
 {
-	if (nullptr == pcOccurrence) {
+	if (nullptr == pcPocc) {
 		return A3D_ERROR;
 	}
 
 	LogIncreaseTabIndex(2);
 
 	CString strPoName;
-	GetName(pcOccurrence, strPoName);
+	GetName(pcPocc, strPoName);
 
 	Log(2, L"ParseProductOccurrence: pocc%d, Name: %s", m_nIncrementalId, strPoName);
 
@@ -432,15 +432,15 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 	// Parent에서 받은(계단식으로) Attribute를 이용해서, Attribute를 생성
 	A3DMiscCascadedAttributes * pcAttrs;
 	A3DMiscCascadedAttributesData cAttrsData;
-	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcOccurrence, pcParentAttr, &pcAttrs, &cAttrsData));
+	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcPocc, pcParentAttr, &pcAttrs, &cAttrsData));
 
-	if (cAttrsData.m_bShow && !cAttrsData.m_bRemoved && A3D_SUCCESS == IsShow(pcOccurrence))
+	if (cAttrsData.m_bShow && !cAttrsData.m_bRemoved && A3D_SUCCESS == IsShow(pcPocc))
 	{
-		A3DAsmProductOccurrenceData cData;
-		A3D_INITIALIZE_DATA(A3DAsmProductOccurrenceData, cData);
-		CHECK_A3D_RETURN(A3DAsmProductOccurrenceGet(pcOccurrence, &cData));
+		A3DAsmProductOccurrenceData cPoccData;
+		A3D_INITIALIZE_DATA(A3DAsmProductOccurrenceData, cPoccData);
+		CHECK_A3D_RETURN(A3DAsmProductOccurrenceGet(pcPocc, &cPoccData));
 
-		if (cData.m_ucBehaviour != 1)
+		if (cPoccData.m_ucBehaviour != 1)
 		{
 /*
 			A3DRootBaseData cRootBaseData;
@@ -460,21 +460,21 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 */
 
 			H3DF::MatrixKit cMatrix;
-			if (A3D_SUCCESS == ProductOccurrenceGetLocation(&cData, cMatrix)) {
+			if (A3D_SUCCESS == ProductOccurrenceGetLocation(&cPoccData, cMatrix)) {
 				if (false == cMatrix.IsIdentity()) {
 					cSegment.SetModellingMatrix(cMatrix);
 				}
 			}
 
 			A3DAsmPartDefinition * pcPart = nullptr;
-			CHECK_A3D_RETURN(ProductOccurrenceGetPart(&cData, &pcPart));
+			CHECK_A3D_RETURN(ProductOccurrenceGetPart(&cPoccData, &pcPart));
 			if (nullptr != pcPart) {
 				CHECK_A3D_RETURN(ParsePart(pcPart, pcAttrs, dModelScale, cSegment, *pcComponent));
 			}
 
 			A3DPointerArray apcChildArray;
 			PointerArrayInitialize(&apcChildArray);
-			CHECK_A3D_RETURN(ProductOccurrenceGetChild(&cData, &apcChildArray));
+			CHECK_A3D_RETURN(ProductOccurrenceGetChild(&cPoccData, &apcChildArray));
 
 			A3DUns32 nSize = apcChildArray.m_uiSize;
 
@@ -497,14 +497,14 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 				// Product Occurrence Markup 정보 수집
 				// ProductOccurrenceGetMarkups(&cData, &cMarkups);
 				// Product Occurrence View 정보 수집
-				ProductOccurrenceGetViews(&cData, &cViews);
+				ProductOccurrenceGetViews(&cPoccData, &cViews);
 
 				nSize = cViews.m_uiSize;
 				for (A3DUns32 nIndex = 0; nIndex < nSize; nIndex++) {
-					//CHECK_A3D_RETURN(DrawMarkupView(cViews.m_ppPointers[nIndex], cSegment, pcAttrs));
+					CHECK_A3D_RETURN(DrawMarkupView(cViews.m_ppPointers[nIndex], pcAttrs, cSegment, *pcComponent));
 				}
 
-				ParseAnnotations(cData.m_ppAnnotations, cData.m_uiAnnotationsSize, cSegment, *pcComponent);
+				ParseAnnotations(cPoccData.m_ppAnnotations, cPoccData.m_uiAnnotationsSize, cSegment, *pcComponent);
 
 // 				nSize = cMarkups.m_uiSize;
 // 				for(UINT nIndex = 0; nIndex < nSize; nIndex++) {
@@ -519,7 +519,7 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcOccurren
 			//CHECK_A3D_RETURN(A3DRootBaseGet(nullptr, &cRootBaseData));
 		}
 
-		CHECK_A3D_RETURN(A3DAsmProductOccurrenceGet(nullptr, &cData));
+		CHECK_A3D_RETURN(A3DAsmProductOccurrenceGet(nullptr, &cPoccData));
 	}
 
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttrs));
@@ -768,22 +768,22 @@ A3DStatus TdfImport::ProductOccurrenceGetMarkups(const A3DAsmProductOccurrenceDa
 }
 
 // 2-1-3. Product Occurrence의 View를 가져옴
-A3DStatus TdfImport::ProductOccurrenceGetViews(const A3DAsmProductOccurrenceData * pcPOccData, A3DPointerArray * pcArray)
+A3DStatus TdfImport::ProductOccurrenceGetViews(const A3DAsmProductOccurrenceData * pcPoccData, A3DPointerArray * pcArray)
 {
-	if (pcPOccData == nullptr || pcArray == nullptr)
+	if (pcPoccData == nullptr || pcArray == nullptr)
 		return A3D_ERROR;
 
-	if (pcPOccData->m_uiViewsSize == 0 && pcPOccData->m_pPrototype != nullptr) {
+	if (pcPoccData->m_uiViewsSize == 0 && pcPoccData->m_pPrototype != nullptr) {
 		A3DAsmProductOccurrenceData sPrototypeData;
 		A3D_INITIALIZE_DATA(A3DAsmProductOccurrenceData, sPrototypeData);
-		CHECK_A3D_RETURN(A3DAsmProductOccurrenceGet(pcPOccData->m_pPrototype, &sPrototypeData));
+		CHECK_A3D_RETURN(A3DAsmProductOccurrenceGet(pcPoccData->m_pPrototype, &sPrototypeData));
 
 		CHECK_A3D_RETURN(ProductOccurrenceGetViews(&sPrototypeData, pcArray));
 
 		CHECK_A3D_RETURN(A3DAsmProductOccurrenceGet(nullptr, &sPrototypeData));
 	}
 	else {
-		PointerArrayAddArray(pcArray, pcPOccData->m_ppViews, pcPOccData->m_uiViewsSize);
+		PointerArrayAddArray(pcArray, pcPoccData->m_ppViews, pcPoccData->m_uiViewsSize);
 	}
 
 	return A3D_SUCCESS;
@@ -1066,22 +1066,24 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 		pcComponent->AddStatus(H3DF::Component::Status::NoShow);
 	}
 
-	A3DAsmPartDefinitionData sData;
-	A3D_INITIALIZE_DATA(A3DAsmPartDefinitionData, sData);
-	CHECK_A3D_RETURN(A3DAsmPartDefinitionGet(pcPart, &sData));
+	A3DAsmPartDefinitionData sPartDefData;
+	A3D_INITIALIZE_DATA(A3DAsmPartDefinitionData, sPartDefData);
+	CHECK_A3D_RETURN(A3DAsmPartDefinitionGet(pcPart, &sPartDefData));
 
-	if (0 < sData.m_uiRepItemsSize)
+	if (0 < sPartDefData.m_uiRepItemsSize)
 	{
-		for (A3DUns32 nIndex = 0; nIndex < sData.m_uiRepItemsSize; nIndex++) {
-			CHECK_A3D_RETURN(ParseRiRepresentationItem(sData.m_ppRepItems[nIndex], cSegment, pcAttr, *pcComponent));
+		for (A3DUns32 nIndex = 0; nIndex < sPartDefData.m_uiRepItemsSize; nIndex++) {
+			CHECK_A3D_RETURN(ParseRiRepresentationItem(sPartDefData.m_ppRepItems[nIndex], cSegment, pcAttr, *pcComponent));
 		}
 	}
 
-	if (0 < sData.m_uiAnnotationsSize) {
-		ParseAnnotations(sData.m_ppAnnotations, sData.m_uiAnnotationsSize, cSegment, cParentComponent);
+	A3DUns32 nSize = sPartDefData.m_uiViewsSize;
+
+	if (0 < sPartDefData.m_uiAnnotationsSize) {
+		ParseAnnotations(sPartDefData.m_ppAnnotations, sPartDefData.m_uiAnnotationsSize, cSegment, cParentComponent);
 	}
 
-	CHECK_A3D_RETURN(A3DAsmPartDefinitionGet(nullptr, &sData));
+	CHECK_A3D_RETURN(A3DAsmPartDefinitionGet(nullptr, &sPartDefData));
 
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttr));
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrData));
@@ -1857,9 +1859,11 @@ A3DStatus TdfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascad
 				case kA3DMarkupSubTypeDimensionAngle:
 					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::AngleSubType);
 					break;
+
 				case kA3DMarkupSubTypeDimensionChamfer:
 					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::ChamferSubType);
 					break;
+
 				case kA3DMarkupSubTypeDimensionDiameter:
 				case kA3DMarkupSubTypeDimensionDiameterCone:
 				case kA3DMarkupSubTypeDimensionDiameterCylinder:
@@ -1867,27 +1871,33 @@ A3DStatus TdfImport::TraverseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascad
 				case kA3DMarkupSubTypeDimensionDiameterTangent:
 					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::DiameterSubType);
 					break;
+
 				case kA3DMarkupSubTypeDimensionDistance:
 				case kA3DMarkupSubTypeDimensionDistanceCumulate:
 				case kA3DMarkupSubTypeDimensionDistanceOffset:
 					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::DistanceSubType);
 					break;
+
 				case kA3DMarkupSubTypeDimensionLength:
 				case kA3DMarkupSubTypeDimensionLengthCircular:
 				case kA3DMarkupSubTypeDimensionLengthCurvilinear:
 					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::LengthSubType);
 					break;
+
 				case kA3DMarkupSubTypeDimensionRadius:
 				case kA3DMarkupSubTypeDimensionRadiusCylinder:
 				case kA3DMarkupSubTypeDimensionRadiusEdge:
 				case kA3DMarkupSubTypeDimensionRadiusTangent:
 					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::RadiusSubType);
 					break;
+
 				case kA3DMarkupSubTypeDimensionSlope:
 					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::SlopeSubType);
 					break;
+
 				default:
 					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::UnknownSubType);
+					break;
 			}
 		}
 		break;
@@ -2121,7 +2131,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 	H3DF::MatrixKit cMatrix;
 	H3DF::MatrixKit cTransformMatrix;
 	//FloatArray pline;
-	CString strLinePattern;
+	CStringA strLinePattern;
 	// 	H_UTF8 line_pattern;
 
 	// 	float cmatrix[16];
@@ -2210,7 +2220,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 				}
 				break;
 
-				case 7:  //framedraw  
+				case 7:  // frame draw  
 				{
 					if (*(pnStartCodes + 1) > 0)
 					{
@@ -2278,10 +2288,10 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 
 				case 12:  //line stipple
 				{
-					// 					if (0 < nCount)
-					// 						strLinePattern = GetLinePattern(*(pnStartCodes + 2));
-					// 					else
-					// 						strLinePattern = L"";
+// 					if (0 < nCount) {
+// 						strLinePattern = GetLinePattern(*(pnStartCodes + 2));
+// 						H3DF::SegmentKey cStyleSegment = m_cIncludeStyles.Subsegment("line_mat_%d", cAttrData.m_sStyle.m_uiRgbColorIndex);
+// 					}
 
 					DEFAULT_OFFSET;
 				}
@@ -2402,7 +2412,8 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 
 				if (bFrameDrawMode || bFaceViewMode) {
 					cTextAttributes.SetWidthScale(char_width / char_height);
-					cTextMove.Set(static_cast<float>(pdCoordData[12] / m_dCadModelUnit),
+					cTextMove.Set(
+						static_cast<float>(pdCoordData[12] / m_dCadModelUnit),
 						static_cast<float>(pdCoordData[13] / m_dCadModelUnit),
 						static_cast<float>(pdCoordData[14] / m_dCadModelUnit));
 				}
@@ -2445,17 +2456,16 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 				cTransformMatrix = cMatrix * cTransformMatrix;
 				cMatrix.Reset();
 
-				// 				MatrixCal::InverseMatrix(cMatrix.data(), cMatrix.data());
-				// 				MatrixCal::ComputeMatrixProduct(cMatrix.data(), cTransformMatrix.data(), cTransformMatrix.data());
-				// 				cMatrix.SetIdentity();
+// 				MatrixCal::InverseMatrix(cMatrix.data(), cMatrix.data());
+// 				MatrixCal::ComputeMatrixProduct(cMatrix.data(), cTransformMatrix.data(), cTransformMatrix.data());
+// 				cMatrix.SetIdentity();
 				char_height = 1.;
 				MAKE_OFFSET(0, 0);
 			}
 		}
 		else
 		{
-			if (true == bFrameDrawMode || true == bFaceViewMode)
-			{
+			if (true == bFrameDrawMode || true == bFaceViewMode) {
 				DEFAULT_OFFSET;
 				continue;
 			}
@@ -2484,8 +2494,8 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 			cPmiPolyline.SetPoints(nPointCount, pcPoints);
 			cPmiPolyline.SetRGBColor(cColor);
 
-			// 			if (line_pattern.encodedText())
-			// 				cPmiPolyline.SetLinePattern(reinterpret_cast<char const *>(line_pattern.encodedText()));
+// 			if (line_pattern.encodedText())
+// 				cPmiPolyline.SetLinePattern(reinterpret_cast<char const *>(line_pattern.encodedText()));
 
 			aOutPolylines.push_back(cPmiPolyline);
 
