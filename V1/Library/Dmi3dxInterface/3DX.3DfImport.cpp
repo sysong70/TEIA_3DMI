@@ -1020,6 +1020,7 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 		pcCdModelImpl->m_pmComponentMap->Lookup(nSegmentKey, pcFindComponent);
 
 		// 2. 찾은 Component를 복사해서 새로운 Component를 생성한다. 이렇게 해야 tree에서 별도의 Component로 인식해서 UI와 연동해서 작업할 수 있음.
+		//    하부의 Component들도 복사된다.
 		H3DF::Component * pcComponent = new H3DF::Component(*pcFindComponent);
 
 		// 새롭게 생성된 Component에서 Include Key를 변경한다.

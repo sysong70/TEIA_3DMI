@@ -102,13 +102,16 @@ Component * H3DF::CADModel::GetComponent(H3DF::SelectionItem & cInItem) const
 		pcFindSubComponent = nullptr;
 
 		for (auto pcSubComponent : cSubcomponentArray) {
+			HC_KEY nSegmentKey = pcSubComponent->GetSegmentKey();
+			HC_KEY nIncludeKey = pcSubComponent->GetIncludeKey();
+
 #ifdef _DEBUG
 			CString strName = pcSubComponent->GetName();
 			H3DF::Component::Type eType = pcSubComponent->GetType();
-#endif // _DEBUG
 
-			HC_KEY nSegmentKey = pcSubComponent->GetSegmentKey();
-			HC_KEY nIncludeKey = pcSubComponent->GetIncludeKey();
+			H3DF::SegmentKey cSegmentKey(nSegmentKey);
+			CStringA strSegmentName = cSegmentKey.Name(false);
+#endif // _DEBUG
 
 			if (INVALID_KEY != nIncludeKey && cKey.KeyValue() == nIncludeKey) {
 				pcFindSubComponent = pcSubComponent;

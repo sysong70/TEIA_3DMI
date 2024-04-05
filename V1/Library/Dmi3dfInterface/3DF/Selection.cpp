@@ -729,9 +729,14 @@ void H3DF::SelectionItem::ShowPathString(CString & strOutPath)
 		if (false == UserData::ShowSegmentName(cSegmentKey, strName)) {
 			strName = cSegmentKey.Name(false);
 		}
+
+		strText.Format(L"Select Key: %d [%s], [%s, %s]", nKey, Utility::ToString(chType), strName, CString(cSegmentKey.Name(false)));
+	}
+	else {
+		strText.Format(L"Select Key: %d [%s], [%s]", nKey, Utility::ToString(chType), strName);
 	}
 
-	strText.Format(L"Select Key: %d [%s], %s", nKey, Utility::ToString(chType), strName);
+	
 	strOutPath += strText;
 
 	if (nKey != cPath.At(0).KeyValue()) {
@@ -767,11 +772,12 @@ void H3DF::SelectionItem::ShowPathString(CString & strOutPath)
 		}
 
 		if (H3DF::Type::IncludeKey == eType) {
-			strText.Format(L"\nInclude: %d, Segment: %d [%s]", nKey, cSegment.KeyValue(), strName);
+			strText.Format(L"\nInclude: %d, Segment: %d [%s, %s]", nKey, cSegment.KeyValue(), strName, CString(cSegment.Name(false)));
 		}
 		else {
-			strText.Format(L"\nSegment: %d [%s], %s", nKey, L"segment", strName);
+			strText.Format(L"\nSegment: %d, [%s, %s]", nKey, strName, CString(cSegment.Name(false)));
 		}
+
 		strOutPath += strText;
 	}
 

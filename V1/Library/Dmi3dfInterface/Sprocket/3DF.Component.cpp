@@ -36,9 +36,20 @@ void H3DF::Component::Set(Component const & cInThat)
 {
 	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
+
 	ComponentImpl * pcInThatImpl = (ComponentImpl *)cInThat.m_pcImpl;
 	DEBUG_VALID(pcInThatImpl);
+
 	pcImpl->Copy(pcInThatImpl);
+
+	// Component의 소유자를 설정한다.
+	if (nullptr != pcImpl->m_pvSubComponents) {
+		for (auto * pcComponent : *pcImpl->m_pvSubComponents) {
+			ComponentImpl * pcSubImpl = (ComponentImpl *)pcComponent->GetImpl();
+			DEBUG_VALID(pcImpl);
+			pcSubImpl->m_pcOwner = this;
+		}
+	}
 }
 
 Component & H3DF::Component::operator = (Component const & cInThat)

@@ -322,9 +322,15 @@ void KERNEL::Operator::ModelPanelImpl::TreeReverseExpand(H3DF::Component & cInCo
 	
 	pcOwner = &cInComponent.GetOwner();
 	while (nullptr != pcOwner) {
+#ifdef _DEBUG
 		CString strName = pcOwner->GetName();
+
+		SegmentKey cSegmentKey(pcOwner->GetSegmentKey());
+		CStringA strSegmentName = cSegmentKey.Name(false);
+#endif
 		aOwnerComponents.push_back(pcOwner);
 
+		// UI에 Component는 Update되어 있어도 하부 SubComponent는 Update되어 있지 않기 때문에 Update된 Owner까지 찾아서 Expand를 한다.
 		if (H3DF::Component::Status::UiUpdate & pcOwner->GetStatus()) {
 			break;
 		}
