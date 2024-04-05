@@ -390,6 +390,9 @@
     <ClInclude Include="Geometry.UserDataFiler.h">
       <Filter>Graphic</Filter>
     </ClInclude>
+    <ClInclude Include="..\Library\Common\Template.h">
+      <Filter>Main\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="TODO.xml">

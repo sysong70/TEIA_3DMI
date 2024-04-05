@@ -68,10 +68,6 @@ namespace Component
 
 	private: // Signal responser
 
-		void AddDummyItem(HTREEITEM parent, bool checked);
-		// use in AddChildren()
-		HTREEITEM AddItem(HTREEITEM parent, DWORD_PTR key, LPWSTR title, bool checked, bool hasChildren, int type);
-
 		HTREEITEM AddItem(Json::Object* pData);
 
 		void AddChildren(Json::Object* pData);
@@ -88,17 +84,11 @@ namespace Component
 
 		void SelectItem(Json::Object* pData);
 
+		void SelectItems(Json::Object* pData);
+
 	private:
 
-		void GetAncestorData(HTREEITEM pItem, std::list<DWORD_PTR>& list);
-
-		HTREEITEM GetItem(DWORD_PTR key);
-
-		void RedrawTree(bool value);
-
-	#ifdef _DEBUG
-		void TestFunction();
-	#endif
+		HTREEITEM FindItem(DWORD_PTR key);
 
 	private:
 

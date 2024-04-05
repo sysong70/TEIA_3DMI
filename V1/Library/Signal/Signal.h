@@ -528,6 +528,7 @@ namespace Signal
 			ExpandParent,
 			InverseCheckedStatus,
 			SelectItem,
+			SelectItems,
 		};
 
 		DEFINE_WRAPPER;
@@ -574,6 +575,8 @@ namespace Signal
 		void InverseCheckedStatus();
 
 		void SelectItem(DWORD_PTR key, bool select = true);
+
+		void SelectItems(const KeyItems& items, bool select = true);
 	};
 
 

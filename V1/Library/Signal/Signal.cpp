@@ -808,10 +808,6 @@ void Signal::ModelPanel::CheckItems(const TreeItemStatuses& items)
 		node.SetBoolean(SKW_FLAG, item.Flag);
 	}
 
-	Json::Object copydata = data;
-	CString strText;
-	copydata.Stringify(strText);
-
 	Wrapper().SendData(data);
 }
 
@@ -856,6 +852,23 @@ void Signal::ModelPanel::SelectItem(DWORD_PTR key, bool select)
 
 	data.SetDwordPtr(SKW_KEY, key);
 	data.SetBoolean(SKW_FLAG, select);
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::ModelPanel::SelectItems(const KeyItems& items, bool select)
+{
+	Json::Object data;
+	ConstructData(data, Action::SelectItems);
+
+	data.SetBoolean(SKW_FLAG, select);
+
+	Json::Array& nodes = data.CreateArray(SKW_ITEMS);
+	for (auto item : items) {
+		nodes.AddDwordPtr(item);
+	}
 
 	Wrapper().SendData(data);
 }

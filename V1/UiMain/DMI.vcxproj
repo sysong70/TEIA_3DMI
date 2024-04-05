@@ -174,6 +174,7 @@
     <ClInclude Include="..\Library\Common\Fio.h" />
     <ClInclude Include="..\Library\Common\Json.h" />
     <ClInclude Include="..\Library\Common\Path.h" />
+    <ClInclude Include="..\Library\Common\Template.h" />
     <ClInclude Include="..\Library\Common\WStr.h" />
     <ClInclude Include="..\Library\Signal\Signal.h" />
     <ClInclude Include="..\Library\Signal\WorkerThread.h" />

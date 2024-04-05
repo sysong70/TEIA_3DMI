@@ -515,6 +515,8 @@ void KERNEL::Operator::ModelPanel::SelectTreeItem(H3DF::SelectionItem & cSelItem
 	pcImpl->Delivery().modelPanel.ExpandParent((DWORD_PTR)pcComponent);
 
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
+	//:Ken - 20240403
+	pcImpl->Delivery().modelPanel.SelectItem((DWORD_PTR)pcComponent);
 
 	return;
 }
@@ -616,6 +618,8 @@ void KERNEL::Operator::ModelPanel::OnItemExpandedSignal(Json::Object & cInObject
 
 	// Tree를 Update를 하도록 설정
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
+	//:Ken - 20240403
+	pcImpl->Delivery().modelPanel.SelectItem((DWORD_PTR)pcComponent);
 
 	// bool bExpanded = cInObject.GetBoolean(SKW_EXPANDED);
 }
