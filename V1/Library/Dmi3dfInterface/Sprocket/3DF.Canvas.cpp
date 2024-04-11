@@ -212,6 +212,9 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 
 	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Open File: " + strFilePathName);
 
+	// Update Callback 설정
+	pcImpl->SetFinishPictureCallback();
+
 	ViewImpl * pcViewImpl = (ViewImpl *)GetFrontView().GetImpl();
 	if (nullptr == pcViewImpl) { DEBUG_RETURN; }
 
@@ -329,29 +332,10 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 
 	HC_Relinquish_Memory();
 
-	//HC_Control_Update_By_Key(pcViewImpl->GetBaseView()->GetViewKey(), "refresh");
-
-	// ExhaustiveUpdate() 내부에서 FoceUpdate를 여러번 호출하기 때문에, Supress 시키도록 한다.
-	// pcViewImpl->GetBaseView()->ExhaustiveUpdate();
-
-	//pcViewImpl->GetBaseView()->SetSuppressUpdateTick(false);
-
-	/*
-		HC_Open_Segment_By_Key(pcHoopsView->GetSceneKey()); {
-			HC_Set_Visibility("lines = on");
-		}HC_Close_Segment();
-
-		pcHoopsView->SetGeometryChanged();
-	*/
-
 	pcViewImpl->GetBaseView()->SetSuppressUpdate(false);
 
-	pcViewImpl->GetBaseView()->ForceUpdate();
-
-	//pcHoopsView->SetSmoothTransition(true);
-	//pcHoopsView->ZoomToExtents();
-	// Temp
-	//pcHoopsView->ForceUpdate();
+	// pcImpl->Delivery().view.SetValidation()을 통해서 Update가 되므로 별도로 ForceUpdate할 필요가 없음.
+	//pcViewImpl->GetBaseView()->ForceUpdate();
 
 /*
 	char chBuffer[MVO_BUFFER_SIZE];
@@ -384,9 +368,11 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 	strMessage.Format(L"Total Load Time : [%s]", Utility::GetTimeSpanString(cMilliSec2));
 	pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
 
-	pcImpl->Delivery().mainFrame.HideProgress();
+//   	pcImpl->Delivery().mainFrame.HideProgress();
+// 
+//   	pcImpl->Delivery().view.SetValidation();
 
-	pcImpl->Delivery().view.SetValidation();
+	pcViewImpl->GetBaseView()->ForceUpdate();
 
 	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Update Complete");
 }

@@ -41,5 +41,11 @@ namespace H3DF
 
 		int m_nViewId = -1;
 		const Signal::Delivery * m_pcDelivery = nullptr;
+
+		bool m_bInitUpdate = false;
+
+		//== Callback 관련 함수 ======================================================================
+		void SetFinishPictureCallback();
+		static void FinishPictureCallback(HIC_Rendition const * pcRendition, bool bSwapBuffers);
 	};
 }

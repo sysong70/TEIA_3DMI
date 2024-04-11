@@ -39,6 +39,12 @@ protected:
 	static A3DInt32 CallbackReportWarning(A3DUTF8Char * pcCode, A3DUTF8Char * chMessage);
 	static A3DInt32 CallbackReportError(A3DUTF8Char * pcCode, A3DUTF8Char * chMessage);
 
+	static A3DVoid CallbackProgressStart(A3DInt32 nInValue);
+	static A3DVoid CallbackProgressEnd();
+	static A3DVoid CallbackProgressSize(A3DInt32 nInMax);
+	static A3DVoid CallbackProgressIncrement(A3DInt32 nInValue);
+	static A3DVoid CallbackProgressTitle(A3DUTF8Char * pchInTitle);
+
 	//== Error 관련 함수 =============================================================================
 public:
 	CString GetLastErrorMessage() { return m_strLastErrorMessage; }
@@ -51,6 +57,8 @@ private:
 	CString m_strLastErrorMessage;
 	A3DStatus m_e3dxLastErrorCode;
 	std::vector<CString> m_vestrMessageLog;
+
+	A3DInt32 m_nStop;
 
 	//== Text 관련 함수 ==============================================================================
 protected:

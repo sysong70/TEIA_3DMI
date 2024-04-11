@@ -43,6 +43,9 @@ namespace KERNEL
 
 			void Unhighlight(H3DF::SelectionResults const & cInItems);
 			void UnhighlightEverything();
+
+			void SetMouseDownTickCount(ULONGLONG nInCount);
+			void SetMouseUpTickCount(ULONGLONG nInCount);
 		};
 	}
 }

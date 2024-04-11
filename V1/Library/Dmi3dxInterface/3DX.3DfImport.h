@@ -115,22 +115,24 @@ protected:
 	A3DStatus ProductOccurrenceGetPart(const A3DAsmProductOccurrenceData * pcPOccData, A3DAsmPartDefinition ** ppcPart);
 
 	//== Draw 관련 함수 =========================================================================
-	A3DStatus ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, 
+	A3DStatus ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, const A3DMiscEntityReference * pcEntityRef,
 		H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComponent);
 
-	A3DStatus ParseRiRepresentationItem(const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cParentSegment,
-		const A3DMiscCascadedAttributes * pcParentAttr, H3DF::Component & cParentComponent);
 
-	A3DStatus ParseRiSet(const A3DRiSet * pSet, H3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr, H3DF::Component & cParentComponent);
+	A3DStatus ParseRiRepresentationItem(const A3DRiRepresentationItem * pcRepItem, const A3DMiscCascadedAttributes * pcParentAttr, const A3DMiscEntityReference * pcEntityRef,
+		H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComponent);
 
-	A3DStatus ParseRiBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData,
-		H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData);
+	A3DStatus ParseRiSet(const A3DRiSet * pSet, const A3DMiscEntityReference * pcEntityRef, const A3DMiscCascadedAttributes * pcParentAttr, 
+		H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComponent);
 
-	A3DStatus DrawRiPolyBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData,
-		H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData);
+	A3DStatus ParseRiBrepModel(const A3DRiRepresentationItem * pcInRepItem, const A3DRiRepresentationItemData & cInRepItemData, const A3DMiscEntityReference * pcInEntityRef,
+		const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData, H3DF::SegmentKey & cInSegment);
 
-	A3DStatus DrawRiPolyWire(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData,
-		H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData);
+	A3DStatus DrawRiPolyBrepModel(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, const A3DMiscEntityReference * pcInEntityRef,
+		const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData, H3DF::SegmentKey & cSegment);
+
+	A3DStatus DrawRiPolyWire(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, const A3DMiscEntityReference * pcInEntityRef,
+		const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData, H3DF::SegmentKey & cSegment);
 
 	A3DStatus DrawRiPointSet(const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr);
 
@@ -151,10 +153,12 @@ protected:
 	A3DStatus GetLeaderLinesAndSymbols(const A3DMkpLeader * pMarkup, H3DF::PolylineArray & out_leader_lines, H3DF::PolygonArray & out_leader_symbols);
 	H3DF::Component * GetPmiGroupComponent(H3DF::Component & cParentComponent);
 
-	A3DStatus DrawTessBase(A3DTessBase * pcTessBase, const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+	A3DStatus DrawTessBase(A3DTessBase * pcInTessBase, const A3DRiRepresentationItem * pcInRepItem, const A3DMiscEntityReference * pcInEntityRef,
+		const A3DMiscCascadedAttributes * pcInParentAttr, H3DF::SegmentKey & cInSegment);
 
 	A3DStatus DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem, const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment);
-	A3DStatus DrawTess3DFaceRegion(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem, const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cSegment);
+	A3DStatus DrawTess3DFaceRegion(const A3DTess3D * pcInTess3D, const A3DTessBaseData * pcInTessBaseData, const A3DRiRepresentationItem * pcInRepItem,
+		const A3DMiscEntityReference * pcInEntityRef, const A3DMiscCascadedAttributes * pcInParentAttr, H3DF::SegmentKey & cInSegment);
 
 	UINT ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo);
 	UINT ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo, H3DF::ShellKit & cInShellKit);
@@ -301,6 +305,8 @@ private:
 	CAtlMap<CStringA, H3DF::SegmentKey> m_mMaterialMappingStyleMap;
 	std::unordered_map<A3DUns32, H3DF::SegmentKey> m_mLineMaterialMappingStyleMap;
 	std::unordered_map<A3DUns32, H3DF::SegmentKey> m_mMarkerMaterialMappingStyleMap;
+	std::unordered_map<A3DEntity *, A3DMiscEntityReference *> m_mEntityReferenceMap;
+	
 
 	//----- Tessellation 관련 -----
 	H3DF::Point * m_pcPoints = nullptr;
@@ -363,6 +369,7 @@ private:
 	void LogIncreaseTabIndex(int nId);
 	void LogDecreaseTabIndex(int nId);
 	CString LogHexStr(DWORD_PTR nValue);
+	CStringA LogHexStrA(DWORD_PTR nValue);
 	CString LogBoolStr(bool bValue);
 };
 

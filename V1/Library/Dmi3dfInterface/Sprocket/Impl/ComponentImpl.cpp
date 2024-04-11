@@ -30,6 +30,7 @@ H3DF::ComponentImpl::~ComponentImpl()
 		}
 
 		delete m_pvSubComponents;
+		m_pvSubComponents = nullptr;
 	}
 
 	if (nullptr != m_pstrName) {

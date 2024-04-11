@@ -117,9 +117,13 @@ bool ImportBase::SetCallbacksReport()
 	g_vestrError.clear();
 
 	A3DStatus nStatus = A3DDllSetCallbacksReport(CallbackReportMessage, CallbackReportWarning, CallbackReportError);
-	if(A3D_SUCCESS == nStatus) {
+	if (A3D_SUCCESS == nStatus) {
 		return true;
 	}
+
+	m_nStop = 0;
+
+	A3DDllSetCallbacksProgress(CallbackProgressStart, CallbackProgressSize,	CallbackProgressIncrement, CallbackProgressEnd, CallbackProgressTitle, &m_nStop);
 
 	return false;
 }
@@ -164,6 +168,32 @@ A3DInt32 ImportBase::CallbackReportError(A3DUTF8Char * pcCode, A3DUTF8Char * chM
 
 	return 0;
 }
+
+A3DVoid ImportBase::CallbackProgressStart(A3DInt32 nInValue)
+{
+	int i = 0;
+}
+
+A3DVoid ImportBase::CallbackProgressEnd()
+{
+	int i = 0;
+}
+
+A3DVoid ImportBase::CallbackProgressSize(A3DInt32 nInMax)
+{
+	int i = 0;
+}
+
+A3DVoid ImportBase::CallbackProgressIncrement(A3DInt32 nInValue)
+{
+	int i = 0;
+}
+
+A3DVoid ImportBase::CallbackProgressTitle(A3DUTF8Char * pchInTitle)
+{
+	int i = 0;
+}
+
 
 // == Error 처리 관련 함수 ===========================================================================
 

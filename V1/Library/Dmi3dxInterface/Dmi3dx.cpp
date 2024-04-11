@@ -260,16 +260,104 @@ CString Dmi3dx::GetA3dEntityTypeString(A3DEEntityType eType)
 			strText = L"SurfExtrusion";
 			break;
 
-		case kA3DTypeRiPolyWire:
-			strText = L"RiPolyWire";
+		case kA3DTypeAsmProductOccurrence:
+			strText = L"AsmProductOccurrence";
+			break;
+
+		case kA3DTypeAsmPartDefinition:
+			strText = L"AsmPartDefinition";
+			break;
+
+		case kA3DTypeAsmPublication:
+			strText = L"AsmPublication";
+			break;
+
+		case kA3DTypeAsmPublicationSet:
+			strText = L"AsmPublicationSet";
+			break;
+
+		case kA3DTypeAsmPublicationLinkedItem:
+			strText = L"AsmPublicationLinkedItem";
+			break;
+
+		case kA3DTypeAsmFilter:
+			strText = L"AsmFilter";
+			break;
+
+		case kA3DTypeAsmConstraint:
+			strText = L"AsmConstraint";
+			break;
+
+		case kA3DTypeMkpView:
+			strText = L"MkpView";
+			break;
+
+		case kA3DTypeMkpMarkup:
+			strText = L"MkpMarkup";
+			break;
+
+		case kA3DTypeMkpLeader:
+			strText = L"MkpLeader";
+			break;
+
+		case kA3DTypeMkpAnnotationItem:
+			strText = L"MkpAnnotationItem";
+			break;
+
+		case kA3DTypeMkpAnnotationSet:
+			strText = L"MkpAnnotationSet";
+			break;
+
+		case kA3DTypeMkpAnnotationReference:
+			strText = L"MkpAnnotationReference";
+			break;
+
+		case kA3DTypeRiRepresentationItem:
+			strText = L"RiRepresentationItem";
+			break;
+
+		case kA3DTypeRiBrepModel:
+			strText = L"RiBrepModel";
 			break;
 
 		case kA3DTypeRiCurve:
 			strText = L"RiCurve";
 			break;
 
+		case kA3DTypeRiDirection:
+			strText = L"RiDirection";
+			break;
+
+		case kA3DTypeRiPlane:
+			strText = L"RiPlane";
+			break;
+
+		case kA3DTypeRiPointSet:
+			strText = L"RiPointSet";
+			break;
+
+		case kA3DTypeRiPolyBrepModel:
+			strText = L"RiPolyBrepModel";
+			break;
+
+		case kA3DTypeRiPolyWire:
+			strText = L"RiPolyWire";
+			break;
+
+		case kA3DTypeRiSet:
+			strText = L"RiSet";
+			break;
+
+		case kA3DTypeRiCoordinateSystem:
+			strText = L"RiCoordinateSystem";
+			break;
+
+		case kA3DTypeRiCoordinateSystemItem:
+			strText = L"RiCoordinateSystemItem";
+			break;
+
 		default:
-			strText.Format(L"A3dEntityType: {}", (int)eType);
+			strText.Format(L"A3dEntityType: {%d}", (int)eType);
 			break;
 	}
 

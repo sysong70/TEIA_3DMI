@@ -282,6 +282,7 @@ void KERNEL::DocView::LButtonDown(int nFlag, int x, int y)
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cLButtonDownPosition.Set(x, y);
+	pcImpl->Select().SetMouseDownTickCount(GetTickCount64());
 
 	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
 	cEvent.SetPoint(HE_LButtonDown, x, y, pcImpl->MouseMapFlags(nFlag));
@@ -297,6 +298,7 @@ void KERNEL::DocView::LButtonUp(int nFlag, int x, int y)
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	H3DF::Point2D cLButtonUpPosition(x, y);
+	pcImpl->Select().SetMouseUpTickCount(GetTickCount64());
 
 	pcImpl->GetCanvas().GetFrontView().GetWindowKey().GetBaseView();
 

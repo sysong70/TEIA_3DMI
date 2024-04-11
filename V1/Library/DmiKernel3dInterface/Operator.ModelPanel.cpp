@@ -63,7 +63,7 @@ namespace KERNEL
 			KERNEL::Operator::Select & Select();
 			KERNEL::Operator::Attribute & Attribute();
 
-			void ComponentExpanded(Component & cInComponent, bool bRecursiveExpand = false);
+			void ComponentExpanded(Component & cInComponent, int nLevel = 0);
 			
 			void ComponentChecked(Component & cInComponent, bool bChecked, bool bRecursiveExpand = false);
 
@@ -100,7 +100,7 @@ KERNEL::Operator::Attribute & KERNEL::Operator::ModelPanelImpl::Attribute()
 
 // 1. Component 전개 처리
 // bRecursiveExpand 계속해서 하부 전개를 하고, bTreeExpand는 Tree에 나타낼때 펼쳐진 상태인지 아닌지를 설정한다.
-void KERNEL::Operator::ModelPanelImpl::ComponentExpanded(H3DF::Component & cInComponent, bool bRecursiveExpand)
+void KERNEL::Operator::ModelPanelImpl::ComponentExpanded(H3DF::Component & cInComponent, int nLevel)
 {
 	ComponentArray & cSubComponents = cInComponent.GetSubComponents();
 
@@ -165,7 +165,7 @@ void KERNEL::Operator::ModelPanelImpl::ComponentExpanded(H3DF::Component & cInCo
 
 	for (auto pcComponent : cSubComponents) {
 		if (false == IsVisible(*pcComponent)) {
-			ComponentExpanded(*pcComponent);
+			ComponentExpanded(*pcComponent, nLevel);
 			continue;
 		}
 
@@ -219,11 +219,13 @@ void KERNEL::Operator::ModelPanelImpl::ComponentExpanded(H3DF::Component & cInCo
 
 	if (false == cTreeItems.empty()) {
 		Delivery().modelPanel.AddChildren((DWORD_PTR)pcParentItem, cTreeItems);
+		Delivery().modelPanel.ExpandParent((DWORD_PTR)pcParentItem);
 	}
 
-	if (true == bRecursiveExpand) {
+	if (0 < nLevel)
+	{
 		for (auto pcSubComponent : cSubComponents) {
-			ComponentExpanded(*pcSubComponent, bRecursiveExpand);
+			ComponentExpanded(*pcSubComponent, nLevel - 1);
 		}
 	}
 }
@@ -379,7 +381,7 @@ void KERNEL::Operator::ModelPanel::Initialize(H3DF::CADModel & cInCadModel)
 	// Root Item을 추가
 	pcImpl->Delivery().modelPanel.AddItem(cItem);
 
-	pcImpl->ComponentExpanded(cInCadModel, false);
+	pcImpl->ComponentExpanded(cInCadModel, 3);
 
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
 }

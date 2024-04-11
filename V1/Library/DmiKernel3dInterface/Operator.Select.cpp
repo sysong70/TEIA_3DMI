@@ -48,8 +48,9 @@ namespace KERNEL
 				OperatorImpl::Copy(pcInThat);
 			}
 
-			DWORD m_nSelectPickCount = 200;
+			ULONGLONG m_nSelectPickCount = 200;
 			ULONGLONG m_nMouseDownTickCount = 0;
+			ULONGLONG m_nMouseUpTickCount = 0;
 			H3DF::Point2D m_cLButtonDownPosition;
 
 			// HighlightObjectSnap Operator
@@ -169,7 +170,6 @@ int KERNEL::Operator::Select::LButtonDown(HEventInfo & cInEvent)
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cLButtonDownPosition.Set(cInEvent.GetMousePixelPos().x, cInEvent.GetMousePixelPos().y);
-	pcImpl->m_nMouseDownTickCount = GetTickCount64();
 
 	return 0;
 }
@@ -180,8 +180,7 @@ int KERNEL::Operator::Select::LButtonUp(HEventInfo & cInEvent)
 	DEBUG_VALID(pcImpl);
 
 	H3DF::Point2D cMousePosition(cInEvent.GetMousePixelPos().x, cInEvent.GetMousePixelPos().y);
-	DWORD nMouseUpTickCount = GetTickCount64();
-	ULONGLONG nTickCount = nMouseUpTickCount - pcImpl->m_nMouseDownTickCount;
+	ULONGLONG nTickCount = pcImpl->m_nMouseUpTickCount - pcImpl->m_nMouseDownTickCount;
 
 	// 1. 2 Pixel이하 200 Tick이하에서만 선택하는 것으로 판정한다.
 	if (pcImpl->m_nSelectPickCount > nTickCount) {
@@ -423,4 +422,20 @@ void KERNEL::Operator::Select::UnhighlightEverything()
 	pcImpl->View().SuppressUpdate(false);
 
 	pcImpl->View().Update();
+}
+
+void KERNEL::Operator::Select::SetMouseDownTickCount(ULONGLONG nInCount)
+{
+	auto * pcImpl = (SelectImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_nMouseDownTickCount = nInCount;
+}
+
+void KERNEL::Operator::Select::SetMouseUpTickCount(ULONGLONG nInCount)
+{
+	auto * pcImpl = (SelectImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_nMouseUpTickCount = nInCount;
 }
