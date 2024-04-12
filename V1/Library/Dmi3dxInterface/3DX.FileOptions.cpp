@@ -348,7 +348,7 @@ bool H3DX::ImportOptions::GetSearch(Json::Object& source, A3DRWParamsLoadData& t
 	]},
 	{"type":"color", "name":"PMIColor", "title":"Color|__#__", "desc":"__#__|__#__", "value":"0x000000"},
 	{"type":"check", "name":"SubstituteFont", "title":"Always Substitute Font|__#__", "desc":"__#__|__#__"},
-	{"type":"font", "name":"PMIFont", "title":"Substitution Font|__#__", "desc":"__#__|__#__", "value":"Myraid Pro"}
+	{"type":"font", "name":"PMIFont", "title":"Substitution Font|__#__", "desc":"__#__|__#__", "value":"Myraid CAD"}
 ]}
 */
 

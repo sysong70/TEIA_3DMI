@@ -1,4 +1,4 @@
-{
+﻿{
     "version":"240126.1",
     "Import":{
         "3MF":{
@@ -316,7 +316,7 @@
                 "PMIUnits":0,
                 "PMIColor":"0x000000",
                 "SubstituteFont":true,
-                "PMIFont":"Myraid Pro"
+                "PMIFont":"Myraid CAD"
             }
         },
         "CATIA5":{
@@ -371,7 +371,7 @@
                 "PMIUnits":0,
                 "PMIColor":"0x000000",
                 "SubstituteFont":true,
-                "PMIFont":"Myraid Pro"
+                "PMIFont":"Myraid CAD"
             },
             "Special":{
                 "DiskCache":{
@@ -415,7 +415,7 @@
                 "PMIUnits":0,
                 "PMIColor":"0x000000",
                 "SubstituteFont":true,
-                "PMIFont":"Myraid Pro"
+                "PMIFont":"Myraid CAD"
             }
         },
         "COLLADA":{
@@ -499,7 +499,7 @@
                 "PMIUnits":0,
                 "PMIColor":"0x000000",
                 "SubstituteFont":true,
-                "PMIFont":"Myraid Pro"
+                "PMIFont":"Myraid CAD"
             },
             "Special":{
                 "Display":{
@@ -581,7 +581,7 @@
                 "PMIUnits":0,
                 "PMIColor":"0x000000",
                 "SubstituteFont":true,
-                "PMIFont":"Myraid Pro"
+                "PMIFont":"Myraid CAD"
             }
         },
         "Ideas":{
@@ -636,7 +636,7 @@
                 "PMIUnits":0,
                 "PMIColor":"0x000000",
                 "SubstituteFont":true,
-                "PMIFont":"Myraid Pro"
+                "PMIFont":"Myraid CAD"
             }
         },
         "IFC":{
@@ -785,7 +785,7 @@
                 "PMIUnits":0,
                 "PMIColor":"0x000000",
                 "SubstituteFont":true,
-                "PMIFont":"Myraid Pro"
+                "PMIFont":"Myraid CAD"
             },
             "Special":{
                 "LevelOfDetail":2
@@ -843,7 +843,7 @@
                 "PMIUnits":0,
                 "PMIColor":"0x000000",
                 "SubstituteFont":true,
-                "PMIFont":"Myraid Pro"
+                "PMIFont":"Myraid CAD"
             },
             "Special":{
                 "RecomputeCameras":false
@@ -948,7 +948,7 @@
                 "PMIUnits":0,
                 "PMIColor":"0x000000",
                 "SubstituteFont":true,
-                "PMIFont":"Myraid Pro"
+                "PMIFont":"Myraid CAD"
             }
         },
         "PRC":{
@@ -1003,7 +1003,7 @@
                 "PMIUnits":0,
                 "PMIColor":"0x000000",
                 "SubstituteFont":true,
-                "PMIFont":"Myraid Pro"
+                "PMIFont":"Myraid CAD"
             }
         },
         "Revit":{
@@ -1181,7 +1181,7 @@
                 "PMIUnits":0,
                 "PMIColor":"0x000000",
                 "SubstituteFont":true,
-                "PMIFont":"Myraid Pro"
+                "PMIFont":"Myraid CAD"
             },
             "Special":{
                 "VisibleDatum":false
@@ -1239,7 +1239,7 @@
                 "PMIUnits":0,
                 "PMIColor":"0x000000",
                 "SubstituteFont":true,
-                "PMIFont":"Myraid Pro"
+                "PMIFont":"Myraid CAD"
             }
         },
         "STL":{
@@ -1276,7 +1276,7 @@
                 "PMIUnits":0,
                 "PMIColor":"0x000000",
                 "SubstituteFont":true,
-                "PMIFont":"Myraid Pro"
+                "PMIFont":"Myraid CAD"
             }
         },
         "U3D":{
@@ -1313,7 +1313,7 @@
                 "PMIUnits":0,
                 "PMIColor":"0x000000",
                 "SubstituteFont":true,
-                "PMIFont":"Myraid Pro"
+                "PMIFont":"Myraid CAD"
             }
         },
         "VDA":{
@@ -1397,7 +1397,7 @@
                 "PMIUnits":0,
                 "PMIColor":"0x000000",
                 "SubstituteFont":true,
-                "PMIFont":"Myraid Pro"
+                "PMIFont":"Myraid CAD"
             }
         },
         "OBJ":{
@@ -1434,7 +1434,7 @@
                 "PMIUnits":0,
                 "PMIColor":"0x000000",
                 "SubstituteFont":true,
-                "PMIFont":"Myraid Pro"
+                "PMIFont":"Myraid CAD"
             }
         }
     },
