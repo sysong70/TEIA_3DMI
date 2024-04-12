@@ -213,7 +213,7 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Open File: " + strFilePathName);
 
 	// Update Callback 설정
-	pcImpl->SetFinishPictureCallback();
+	//pcImpl->SetFinishPictureCallback();
 
 	ViewImpl * pcViewImpl = (ViewImpl *)GetFrontView().GetImpl();
 	if (nullptr == pcViewImpl) { DEBUG_RETURN; }
@@ -229,15 +229,16 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 	CString ext = Path::GetExtension(strFilePathName);
 	ext.MakeUpper();
 
-	bool bPointColudData = false;
+	pcImpl->m_bPointColudData = false;
+
 	for (auto & pre : EXTENSIONS) {
 		if (pre == ext) {
-			bPointColudData = true;
+			pcImpl->m_bPointColudData = true;
 		}
 	}
 
 	bool bHsfFile = false;
-	if (false == bPointColudData) {
+	if (false == pcImpl->m_bPointColudData) {
 		if (L"HSF" == ext) {
 			bHsfFile = true;
 		}
@@ -245,10 +246,10 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 
 	// Progress dialog 나타내기
 	pcImpl->Delivery().mainFrame.ShowProgress();
-	system_clock::time_point cTime1 = system_clock::now();
+	pcImpl->m_cTimes[0] = system_clock::now();
 	pcImpl->Delivery().progress.SetMessage(strFilePathName);
 
-	if (true == bPointColudData) {
+	if (true == pcImpl->m_bPointColudData) {
 		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/2 : Loading point cloud data");
 	}
 	else if (true == bHsfFile) {
@@ -264,7 +265,7 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 	SegmentKey cModelSegmentKey = GetModel().GetSegmentKey();
 
 	//----- File을 실제로 읽어 드리는 부분 -----
-	if (true == bPointColudData) {
+	if (true == pcImpl->m_bPointColudData) {
 		LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Load Point Cloud File Start");
 
 		GetFrontView().LoadPointCloudFile(strFilePathName);
@@ -286,9 +287,9 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 		cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, cInCADModel, pcImpl->Delivery(), strErrorMessage);
 	}
 
-	system_clock::time_point cTime2 = system_clock::now();
+	pcImpl->m_cTimes[1] = system_clock::now();
 
-	if (false == bPointColudData) {
+	if (false == pcImpl->m_bPointColudData) {
 		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 3/3 : Performing Initial Update");
 	}
 	else {
@@ -351,28 +352,15 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 		HC_Show_Net_Driver_Options(chBuffer);
 	HC_Close_Segment();
 */
-	system_clock::time_point cTime3 = system_clock::now();
-	auto cMilliSec1 = duration_cast<milliseconds>(cTime3 - cTime2);
-	CString strMessage;
 
-	if (false == bPointColudData) {
-		strMessage.Format(L"Stage 3/3 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec1));
-		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
-	}
-	else {
-		strMessage.Format(L"Stage 2/2 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec1));
-		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
-	}
+//    	
+//  
+   	pcImpl->Delivery().view.SetValidation();
 
-	auto cMilliSec2 = duration_cast<milliseconds>(cTime3 - cTime1);
-	strMessage.Format(L"Total Load Time : [%s]", Utility::GetTimeSpanString(cMilliSec2));
-	pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+	// Update에서 처리
+	//pcImpl->Delivery().mainFrame.HideProgress();
 
-//   	pcImpl->Delivery().mainFrame.HideProgress();
-// 
-//   	pcImpl->Delivery().view.SetValidation();
-
-	pcViewImpl->GetBaseView()->ForceUpdate();
+	//pcViewImpl->GetBaseView()->ForceUpdate();
 
 	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Update Complete");
 }
@@ -415,6 +403,30 @@ void H3DF::Canvas::Update() const
 	for (const auto pcView : pcImpl->m_vpcViewArray) {
 		pcView->Update();
 	}
+
+	if (false == pcImpl->m_bInitUpdate) {
+
+		pcImpl->m_cTimes[2] = system_clock::now();
+		auto cMilliSec1 = duration_cast<milliseconds>(pcImpl->m_cTimes[2] - pcImpl->m_cTimes[1]);
+		CString strMessage;
+
+		if (false == pcImpl->m_bPointColudData) {
+			strMessage.Format(L"Stage 3/3 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec1));
+			pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+		}
+		else {
+			strMessage.Format(L"Stage 2/2 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec1));
+			pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+		}
+
+		auto cMilliSec2 = duration_cast<milliseconds>(pcImpl->m_cTimes[2] - pcImpl->m_cTimes[0]);
+		strMessage.Format(L"Total Load Time : [%s]", Utility::GetTimeSpanString(cMilliSec2));
+		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+
+
+		pcImpl->Delivery().mainFrame.HideProgress();
+		pcImpl->m_bInitUpdate = true;
+	}
 }
 
 void H3DF::Canvas::Update(Json::Object & cInObject) const
@@ -424,6 +436,11 @@ void H3DF::Canvas::Update(Json::Object & cInObject) const
 
 	for (const auto pcView : pcImpl->m_vpcViewArray) {
 		pcView->Update(cInObject);
+	}
+
+	if (false == pcImpl->m_bInitUpdate) {
+		pcImpl->Delivery().mainFrame.HideProgress();
+		pcImpl->m_bInitUpdate = true;
 	}
 }
 

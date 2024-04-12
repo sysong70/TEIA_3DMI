@@ -13,6 +13,8 @@
 
 #include "../3DF.View.h"
 
+#include <chrono>
+
 namespace H3DF
 {
 	class MultiSelectManager;
@@ -42,7 +44,10 @@ namespace H3DF
 		int m_nViewId = -1;
 		const Signal::Delivery * m_pcDelivery = nullptr;
 
+		bool m_bPointColudData = false;
 		bool m_bInitUpdate = false;
+
+		std::chrono::system_clock::time_point m_cTimes[3];
 
 		//== Callback 관련 함수 ======================================================================
 		void SetFinishPictureCallback();

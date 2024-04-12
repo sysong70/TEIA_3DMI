@@ -139,5 +139,7 @@ void H3DF::CanvasImpl::FinishPictureCallback(HIC_Rendition const * pcRendition, 
 
 	pcImpl->Delivery().mainFrame.HideProgress();
 
-	pcImpl->Delivery().view.SetValidation();
+	HIC_Finish_Picture(pcRendition, bSwapBuffers);
+
+	//pcImpl->Delivery().view.SetValidation();
 }
