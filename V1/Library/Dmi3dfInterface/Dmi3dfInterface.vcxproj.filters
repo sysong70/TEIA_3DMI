@@ -354,6 +354,12 @@
     <ClInclude Include="3DF\CuttingSection.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
+    <ClInclude Include="Sprocket\Impl\ComponentMarkupViewImpl.h">
+      <Filter>Sprocket\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\3DF.ComponentMarkupView.h">
+      <Filter>Sprocket</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -637,6 +643,12 @@
     </ClCompile>
     <ClCompile Include="3DF\CuttingSection.cpp">
       <Filter>3DF\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\Impl\ComponentMarkupViewImpl.cpp">
+      <Filter>Sprocket\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\3DF.ComponentMarkupView.cpp">
+      <Filter>Sprocket</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

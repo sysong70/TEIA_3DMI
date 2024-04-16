@@ -76,6 +76,7 @@ void KERNEL::Operator::HighlightObjectSnap::UnhighlightEverything()
 
 	pcImpl->m_cDynHighlightControl.UnhighlightEverything();
 	pcImpl->m_cDynLineHighlightCtrl.UnhighlightEverything();
+	pcImpl->m_cDynPmiHighlightCtrl.UnhighlightEverything();
 }
 
 void KERNEL::Operator::HighlightObjectSnap::Reset(bool bUpdate)

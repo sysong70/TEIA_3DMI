@@ -25,6 +25,7 @@ H3DF::CADModel::CADModel()
 	m_pcImpl = new CADModelImpl();
 	DEBUG_VALID(m_pcImpl);
 }
+
 /*
 H3DF::CADModel::CADModel(Component const & cInThat)
 {

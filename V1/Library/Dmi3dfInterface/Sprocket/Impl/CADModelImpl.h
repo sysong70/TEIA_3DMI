@@ -1,6 +1,10 @@
 ﻿#pragma once
 
+#include "../../3DF/3DF.h"
+
 #include "ComponentImpl.h"
+
+#include <A3DSDKIncludes.h>
 
 #include <atlcoll.h>
 
@@ -30,6 +34,7 @@ namespace H3DF
 		DWORD m_nPointIndex = 1;
 
 		void MapSetAt(HC_KEY nInKey, Component * pcInComponent);
-		CAtlMap<HC_KEY, Component *> * m_pmComponentMap = nullptr;
+		CAtlMap<HC_KEY, Component *> * m_pmComponentMap;
+		CAtlMap<DWORD_PTR, A3DEntity *> * m_pmEntityMap;
 	};
 }

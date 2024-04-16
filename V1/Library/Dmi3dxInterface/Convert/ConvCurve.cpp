@@ -95,8 +95,8 @@ bool ConvCurve::ConvertPlaneCurve(const MbSurface * pcBaseSurface, double dParen
 
 	if(false == bStatus) {
 		ASSERT(false);
-		CString strType = Dmi3dx::GetA3dEntityTypeString(eCurveType);
-		LogManager::Log(2, L"ConvertPlaneCurve Error: %s", strType);
+		CStringA strType = Dmi3dx::GetA3dEntityTypeString(eCurveType);
+		LogManager::Log(2, "ConvertPlaneCurve Error: %s", strType);
 		return false;
 	}
 
@@ -166,8 +166,8 @@ bool ConvCurveBase::GetCurveData(const A3DCrvBase * pcCrvBase, double dContextSc
 
 	if(A3D_SUCCESS != nStatus) {
 		ASSERT(false);
-		CString strType = Dmi3dx::GetA3dEntityTypeString(eCurveType);
-		LogManager::Log(2, L"GetCurveData Error: %s", strType);
+		CStringA strType = Dmi3dx::GetA3dEntityTypeString(eCurveType);
+		LogManager::Log(2, "GetCurveData Error: %s", strType);
 		return false;
 	}
 
@@ -246,8 +246,8 @@ bool ConvCurveBase::ConvertPlaneCurve(const A3DCrvBase * pcCrvBase, const MbSurf
 	}
 
 	if(false == bStatus) {
-		CString strType = Dmi3dx::GetA3dEntityTypeString(eEntityType);
-		LogManager::Log(2, L"ConvertPlaneCurve Error: Type %s", strType);
+		CStringA strType = Dmi3dx::GetA3dEntityTypeString(eEntityType);
+		LogManager::Log(2, "ConvertPlaneCurve Error: Type %s", strType);
 	}
 
 	return bStatus;
@@ -274,8 +274,8 @@ bool ConvCurveBase::ConvertPlaneCurveData(DWORD_PTR * pcCurveData, A3DEEntityTyp
 	}
 
 	if(false == bStatus) {
-		CString strType = Dmi3dx::GetA3dEntityTypeString(eEntityType);
-		LogManager::Log(2, L"ConvertPlaneCurve Error: Type %s", strType);
+		CStringA strType = Dmi3dx::GetA3dEntityTypeString(eEntityType);
+		LogManager::Log(2, "ConvertPlaneCurve Error: Type %s", strType);
 	}
 
 	return bStatus;
@@ -561,13 +561,13 @@ bool ConvCurveBase::ConvertSpaceCurve(const A3DCrvBase * pcCrvBase, double dPare
 			break;
 	}
 
-	CString strType = Dmi3dx::GetA3dEntityTypeString(eEntityType);
+	CStringA strType = Dmi3dx::GetA3dEntityTypeString(eEntityType);
 
 	if(false == bStatus) {
-		LogManager::Log(2, L"ConvertSpaceCurve Error: Type %s", strType);
+		LogManager::Log(2, "ConvertSpaceCurve Error: Type %s", strType);
 	}
 	else {
-		LogManager::Log(2, L"ConvertSpaceCurve: Type %s", strType);
+		LogManager::Log(2, "ConvertSpaceCurve: Type %s", strType);
 	}
 
 	return bStatus;

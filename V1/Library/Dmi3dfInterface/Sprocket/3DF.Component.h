@@ -24,7 +24,7 @@ namespace H3DF
             ExchangePartDefinition = 0x00001003, // Represents an A3DAsmPartDefinition in Exchange.  This will be represented by
                                                  // an Exchange::Component.
 
-            ExchangeView = 0x00001004, // Represents an A3DMkpView in Exchange.  This will be represented by an
+            ExchangeMkpView = 0x00001004, // Represents an A3DMkpView in Exchange.  This will be represented by an
                                        // Exchange::Capture component.
             ExchangeFilter = 0x00001005, // Represents an A3DMkpFilter in Exchange.  This will be represented by an
                                          // Exchange::Filter component.
