@@ -265,6 +265,7 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 	SegmentKey cModelSegmentKey = GetModel().GetSegmentKey();
 
 	//----- File을 실제로 읽어 드리는 부분 -----
+	bool bFileLoadingStatus = true;
 	if (true == pcImpl->m_bPointColudData) {
 		LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Load Point Cloud File Start");
 
@@ -284,7 +285,13 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 		} SegmentKeyImpl::LocalClose(cViewKey);
 
 		DLL::H3DF::Interface cInterfaace;
-		cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, cInCADModel, pcImpl->Delivery(), strErrorMessage);
+		bFileLoadingStatus = cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, cInCADModel, pcImpl->Delivery(), strErrorMessage);
+	}
+
+	if (false == bFileLoadingStatus) {
+		//pcImpl->Delivery().mainFrame.HideProgress();
+		pcImpl->m_bInitUpdate = true;
+		return;
 	}
 
 	pcImpl->m_cTimes[1] = system_clock::now();
@@ -302,7 +309,7 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 
 	// #3DF_Debug: Z://Test.hsf
 #ifdef _DEBUG
-	 // GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
+	 GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
 #endif
 	 // GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
 

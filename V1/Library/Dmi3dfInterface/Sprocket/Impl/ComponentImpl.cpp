@@ -95,6 +95,10 @@ CString H3DF::ComponentImpl::TypeName()
 			strTypeName = L"Point Set";
 			break;
 
+		case H3DF::Component::Type::PMIGroupComponent:
+			strTypeName = L"PMI Group";
+			break;
+
 		default:
 			strTypeName.Format(L"Type: 0x%x", (int)m_eType);
 			break;

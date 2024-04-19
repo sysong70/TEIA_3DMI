@@ -1309,6 +1309,7 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 	}
 
 	HC_KEY  nKey = INVALID_KEY;
+	HC_KEY * pnSelectKeys = nullptr;
 	HC_KEY * pnIncludeKeys = nullptr;
 	int	eSelectedType = SelectionControlImpl::SelType::None;
 	char chKeyType[MVO_BUFFER_SIZE];
@@ -1353,7 +1354,11 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 			for (int nIndex = nKeyCount - 1; nIndex >= 0; nIndex--)
 			{
 				HC_Show_Key_Type(pnKeys[nIndex], chKeyType);
-				if (strstr(chKeyType, "include"))
+				if (streq(chKeyType, "segment")) {
+					// nKey = pnKeys[nIndex];
+					//nKey = HC_Show_Reference_Geometry(pnKeys[nIndex]);
+				}
+				else if (strstr(chKeyType, "include"))
 				{
 					pnIncludeKeys[nIncludeCount] = pnKeys[nIndex];
 					nIncludeCount++;

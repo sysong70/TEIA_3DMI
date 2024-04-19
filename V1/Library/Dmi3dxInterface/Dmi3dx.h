@@ -46,6 +46,7 @@ namespace Dmi3dx
 	bool GetPlacement3d(const A3DMiscCartesianTransformationData & cTransformationData, double dParentScale, MbPlacement3D & cPlacement);
 
 	// == A3D 관련 함수 ==============================================================================
-	CString GetA3dEntityTypeString(A3DEEntityType eType);
+	CStringA GetA3dEntityTypeString(A3DEEntityType eType);
+	CStringA GetA3dEntityTypeString(const A3DEntity * pcInEntity);
 };
 

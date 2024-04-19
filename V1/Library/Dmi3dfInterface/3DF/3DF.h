@@ -298,6 +298,8 @@ namespace H3DF
 		SprocketPath = 0x80000007,
 
 		Component = 0x80000200,
+		ComponentMarkupView= 0x80000201,
+
 		Filter = 0x80000600,
 		Capture = 0x80000a00,
 		CADModel = 0x80000300,

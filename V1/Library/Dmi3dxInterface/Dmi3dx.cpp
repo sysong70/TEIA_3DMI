@@ -206,160 +206,226 @@ bool Dmi3dx::GetPlacement3d(const A3DMiscCartesianTransformationData & cTransfor
 // == A3D 관련 함수 ==================================================================================
 
 // 1. A3D Entity의 이름을 돌려준다.
-CString Dmi3dx::GetA3dEntityTypeString(A3DEEntityType eType)
+CStringA Dmi3dx::GetA3dEntityTypeString(A3DEEntityType eType)
 {
-	CString strText;
+	CStringA strText;
 
 	switch(eType)
 	{
 		case kA3DTypeUnknown:
-			strText = L"Unknown";
+			strText = "Unknown";
 			break;
 
 		case kA3DTypeCrvNurbs:
-			strText = L"CrvNurbs";
+			strText = "CrvNurbs";
 			break;
 
 		case kA3DTypeCrvCircle:
-			strText = L"CrvCircle";
+			strText = "CrvCircle";
 			break;
 
 		case kA3DTypeCrvComposite:
-			strText = L"CrvComposite";
+			strText = "CrvComposite";
 			break;
 
 		case kA3DTypeCrvOnSurf:
-			strText = L"CrvOnSurf";
+			strText = "CrvOnSurf";
 			break;
 
 		case kA3DTypeCrvLine:
-			strText = L"CrvLine";
+			strText = "CrvLine";
 			break;
 
 		case kA3DTypeCrvOffset:
-			strText = L"CrvOffset";
+			strText = "CrvOffset";
 			break;
 
 		case kA3DTypeSurfBlend03:
-			strText = L"SurfBlend03";
+			strText = "SurfBlend03";
 			break;
 
 		case kA3DTypeSurfOffset:
-			strText = L"SurfOffset";
+			strText = "SurfOffset";
 			break;
 
 		case kA3DTypeSurfRuled:
-			strText = L"SurfRuled";
+			strText = "SurfRuled";
 			break;
 
 		case kA3DTypeSurfRevolution:
-			strText = L"SurfRevolution";
+			strText = "SurfRevolution";
 			break;
 
 		case kA3DTypeSurfExtrusion:
-			strText = L"SurfExtrusion";
+			strText = "SurfExtrusion";
 			break;
 
 		case kA3DTypeAsmProductOccurrence:
-			strText = L"AsmProductOccurrence";
+			strText = "AsmProductOccurrence";
 			break;
 
 		case kA3DTypeAsmPartDefinition:
-			strText = L"AsmPartDefinition";
+			strText = "AsmPartDefinition";
 			break;
 
 		case kA3DTypeAsmPublication:
-			strText = L"AsmPublication";
+			strText = "AsmPublication";
 			break;
 
 		case kA3DTypeAsmPublicationSet:
-			strText = L"AsmPublicationSet";
+			strText = "AsmPublicationSet";
 			break;
 
 		case kA3DTypeAsmPublicationLinkedItem:
-			strText = L"AsmPublicationLinkedItem";
+			strText = "AsmPublicationLinkedItem";
 			break;
 
 		case kA3DTypeAsmFilter:
-			strText = L"AsmFilter";
+			strText = "AsmFilter";
 			break;
 
 		case kA3DTypeAsmConstraint:
-			strText = L"AsmConstraint";
+			strText = "AsmConstraint";
 			break;
 
 		case kA3DTypeMkpView:
-			strText = L"MkpView";
+			strText = "MkpView";
 			break;
 
 		case kA3DTypeMkpMarkup:
-			strText = L"MkpMarkup";
+			strText = "MkpMarkup";
 			break;
 
 		case kA3DTypeMkpLeader:
-			strText = L"MkpLeader";
+			strText = "MkpLeader";
 			break;
 
 		case kA3DTypeMkpAnnotationItem:
-			strText = L"MkpAnnotationItem";
+			strText = "MkpAnnotationItem";
 			break;
 
 		case kA3DTypeMkpAnnotationSet:
-			strText = L"MkpAnnotationSet";
+			strText = "MkpAnnotationSet";
 			break;
 
 		case kA3DTypeMkpAnnotationReference:
-			strText = L"MkpAnnotationReference";
+			strText = "MkpAnnotationReference";
 			break;
 
 		case kA3DTypeRiRepresentationItem:
-			strText = L"RiRepresentationItem";
+			strText = "RiRepresentationItem";
 			break;
 
 		case kA3DTypeRiBrepModel:
-			strText = L"RiBrepModel";
+			strText = "RiBrepModel";
 			break;
 
 		case kA3DTypeRiCurve:
-			strText = L"RiCurve";
+			strText = "RiCurve";
 			break;
 
 		case kA3DTypeRiDirection:
-			strText = L"RiDirection";
+			strText = "RiDirection";
 			break;
 
 		case kA3DTypeRiPlane:
-			strText = L"RiPlane";
+			strText = "RiPlane";
 			break;
 
 		case kA3DTypeRiPointSet:
-			strText = L"RiPointSet";
+			strText = "RiPointSet";
 			break;
 
 		case kA3DTypeRiPolyBrepModel:
-			strText = L"RiPolyBrepModel";
+			strText = "RiPolyBrepModel";
 			break;
 
 		case kA3DTypeRiPolyWire:
-			strText = L"RiPolyWire";
+			strText = "RiPolyWire";
 			break;
 
 		case kA3DTypeRiSet:
-			strText = L"RiSet";
+			strText = "RiSet";
 			break;
 
 		case kA3DTypeRiCoordinateSystem:
-			strText = L"RiCoordinateSystem";
+			strText = "RiCoordinateSystem";
 			break;
 
 		case kA3DTypeRiCoordinateSystemItem:
-			strText = L"RiCoordinateSystemItem";
+			strText = "RiCoordinateSystemItem";
+			break;
+
+		case kA3DTypeMarkupText: // 10111
+			strText = "MarkupText";
+			break;
+
+		case kA3DTypeMarkupRichText: // 10112
+			strText = "MarkupRichText";
+			break;
+
+		case kA3DTypeMarkupCoordinate: // 10113
+			strText = "MarkupCoordinate";
+			break;
+
+		case kA3DTypeMarkupBalloon: // 10114
+			strText = "MarkupBalloon";
+			break;
+
+		case kA3DTypeMarkupDatum: // 10115
+			strText = "MarkupDatum";
+			break;
+
+		case kA3DTypeMarkupGDT: // 10116
+			strText = "MarkupGDT";
+			break;
+
+		case kA3DTypeMarkupRoughness: // 10117
+			strText = "MarkupRoughness";
+			break;
+
+		case kA3DTypeMarkupDimension: // 10118
+			strText = "MarkupDimension";
+			break;
+
+		case kA3DTypeMarkupLocator: // 10119
+			strText = "MarkupLocator";
+			break;
+
+		case kA3DTypeMarkupMeasurementPoint: // 10120
+			strText = "MarkupMeasurementPoint";
+			break;
+
+		case kA3DTypeMarkupFastener: // 10121
+			strText = "MarkupFastener";
+			break;
+
+		case kA3DTypeMarkupSpotWelding: // 10122
+			strText = "MarkupSpotWelding";
+			break;
+
+		case kA3DTypeMarkupLineWelding: // 10123
+			strText = "MarkupLineWelding";
 			break;
 
 		default:
-			strText.Format(L"A3dEntityType: {%d}", (int)eType);
+			strText.Format("A3dEntityType: {%d}", (int)eType);
 			break;
 	}
 
 	return strText;
 }
+
+// 1-1. A3D Entity의 이름을 돌려준다.
+CStringA Dmi3dx::GetA3dEntityTypeString(const A3DEntity * pcInEntity)
+{
+	if (nullptr == pcInEntity) {
+		return "NULL";
+	}
+
+	A3DEEntityType eType;
+	A3DEntityGetType(pcInEntity, &eType);
+
+	return GetA3dEntityTypeString(eType);
+}
+

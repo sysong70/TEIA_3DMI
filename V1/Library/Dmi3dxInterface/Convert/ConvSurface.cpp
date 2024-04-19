@@ -254,9 +254,9 @@ bool ConvSurfaceBase::GetSurfBaseData(const A3DSurfBase * pcSurfBase, double dCo
 	}
 
 	if(A3D_SUCCESS != nStatus) {
-		CString strType = Dmi3dx::GetA3dEntityTypeString(eSurfaceType);
-		CString strType1 = Dmi3dx::GetA3dEntityTypeString((A3DEEntityType) cEntityInfo.peEntityType[nIndex]);
-		LogManager::Log(2, L"GetSurfBaseData Error: %s, [%s]", strType, strType1);
+		CStringA strType = Dmi3dx::GetA3dEntityTypeString(eSurfaceType);
+		CStringA strType1 = Dmi3dx::GetA3dEntityTypeString((A3DEEntityType) cEntityInfo.peEntityType[nIndex]);
+		LogManager::Log(2, "GetSurfBaseData Error: %s, [%s]", strType, strType1);
 		return false;
 	}
 
@@ -420,8 +420,8 @@ bool ConvSurfaceBase::ConvertSurfBase(const A3DSurfBase * pcSurfBase, double dPa
 		}
 	}
 	else {
-		CString strType = Dmi3dx::GetA3dEntityTypeString(eType);
-		LogManager::Log(2, L"ConvertSurfBase Error: Type %s", strType);
+		CStringA strType = Dmi3dx::GetA3dEntityTypeString(eType);
+		LogManager::Log(2, "ConvertSurfBase Error: Type %s", strType);
 	}
 
 	return bStatus;

@@ -125,44 +125,61 @@ void KERNEL::Operator::ModelPanelImpl::ComponentExpanded(H3DF::Component & cInCo
 	H3DF::CADModelImpl * pcImpl = dynamic_cast<H3DF::CADModelImpl *>(m_pcCadModel->GetImpl());
 
 	// View Group 및 PMI Group을 우선적으로 표시한다.
-	if (H3DF::Component::Type::ExchangeProductOccurrence == cInComponent.GetType()) {
-		// View Group Item 생성.
-		for (auto pcComponent : cSubComponents) {
-			if (H3DF::Component::Status::UiUpdate & pcComponent->GetStatus()) {
-				continue;
-			}
-
-			if (H3DF::Component::Type::ViewGroupComponent == pcComponent->GetType()) {
-				if (0 < pcComponent->GetSubComponents().size()) {
-					cItem.Key = (DWORD_PTR)pcComponent;
-					cItem.Title = pcComponent->GetName();
-					cItem.HasChildren = true;
-					pcComponent->AddStatus(H3DF::Component::Status::UiUpdate);
-					cTreeItems.push_back(cItem);
-				}
-				break;
-			}
+	// View Group Item 생성.
+	for (auto pcComponent : cSubComponents) {
+		if (H3DF::Component::Status::UiUpdate & pcComponent->GetStatus()) {
+			continue;
 		}
 
-		// PMI Group Item 생성.
-		for (auto pcComponent : cSubComponents) {
-			if (H3DF::Component::Status::UiUpdate & pcComponent->GetStatus()) {
-				continue;
+		if (H3DF::Component::Type::ViewGroupComponent == pcComponent->GetType()) {
+			if (0 < pcComponent->GetSubComponents().size()) {
+				cItem.Key = (DWORD_PTR)pcComponent;
+				cItem.Title = pcComponent->GetName();
+				cItem.HasChildren = true;
+				pcComponent->AddStatus(H3DF::Component::Status::UiUpdate);
+				cTreeItems.push_back(cItem);
 			}
-
-			if (H3DF::Component::Type::PMIGroupComponent == pcComponent->GetType()) {
-				if (0 < pcComponent->GetSubComponents().size()) {
-					cItem.Key = (DWORD_PTR)pcComponent;
-					cItem.Title = pcComponent->GetName();
-					cItem.HasChildren = true;
-					pcComponent->AddStatus(H3DF::Component::Status::UiUpdate);
-					cTreeItems.push_back(cItem);
-				}
-				break;
-			}
+			break;
 		}
 	}
 
+	// PMI Group Item 생성.
+	for (auto pcComponent : cSubComponents) {
+		if (H3DF::Component::Status::UiUpdate & pcComponent->GetStatus()) {
+			continue;
+		}
+
+		if (H3DF::Component::Type::PMIGroupComponent == pcComponent->GetType()) {
+			if (0 < pcComponent->GetSubComponents().size()) {
+				cItem.Key = (DWORD_PTR)pcComponent;
+
+#ifdef _DEBUG
+				CString strText;
+
+				SegmentKey cSegment(pcComponent->GetSegmentKey());
+				CString strName;
+				strName = cSegment.Name(false);
+				strText.Format(L"%s : %s, Seg [%d]:", pcComponent->GetName(), strName, pcComponent->GetSegmentKey());
+
+				cItem.Title = strText;
+#else
+				cItem.Title = pcComponent->GetName();				
+#endif
+				cItem.HasChildren = true;
+				pcComponent->AddStatus(H3DF::Component::Status::UiUpdate);
+				cTreeItems.push_back(cItem);
+			}
+			break;
+		}
+	}
+
+	// View나 PMI Group이 있는 경우 먼저 Update하도록 한다. View나 PMI Group이 먼저 표시되도록 하기 위해서임.
+	if (false == cTreeItems.empty()) {
+		Delivery().modelPanel.AddChildren((DWORD_PTR)pcParentItem, cTreeItems);
+		cTreeItems.clear();
+	}
+
+	// 나머지 Component를 표시한다.
 	for (auto pcComponent : cSubComponents) {
 		if (false == IsVisible(*pcComponent)) {
 			ComponentExpanded(*pcComponent, nLevel);

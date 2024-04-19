@@ -23,6 +23,8 @@
 #include <3DF/LineAttribute.h>
 #include <3DF/AttributeLock.h>
 
+#include <3DF/3DF.Utility.h>
+
 #include <Json.h>
 
 #include <HEventListener.h>
@@ -59,6 +61,7 @@ namespace KERNEL
 			float m_fLineWeight = 3;
 			H3DF::HighlightControl m_cHighlightCtrl;
 			H3DF::HighlightControl m_cLineHighlightCtrl;
+			H3DF::HighlightControl m_cPmiHighlightCtrl;
 
 			// 현재 선택된 요소들이 저장되는 변수
 			H3DF::SelectionResults m_cSelectionResult;
@@ -69,6 +72,8 @@ namespace KERNEL
 
 			H3DF::HighlightControl & DynHighlightControl() { return *m_pcDynHighlightControl; }
 			H3DF::HighlightControl & DynLineHighlightControl() { return *m_pcDynLineHighlightControl; }
+			H3DF::HighlightControl & DynPmiHighlightControl() { return *m_pcDynPmiHighlightControl; }
+			
 
 			KERNEL::Operator::ModelPanel & ModelPanel();
 
@@ -81,6 +86,7 @@ namespace KERNEL
 
 			H3DF::HighlightControl * m_pcDynHighlightControl = nullptr;
 			H3DF::HighlightControl * m_pcDynLineHighlightControl = nullptr;
+			H3DF::HighlightControl * m_pcDynPmiHighlightControl = nullptr;
 		};
 	}
 }
@@ -89,7 +95,8 @@ KERNEL::Operator::SelectImpl::SelectImpl(const DocView * pcInDocView) :
 	OperatorImpl(pcInDocView),
 	m_cHighlightOSnapOperator(pcInDocView),
 	m_cHighlightCtrl(Window()),
-	m_cLineHighlightCtrl(Window())
+	m_cLineHighlightCtrl(Window()),
+	m_cPmiHighlightCtrl(Window())
 {
 	m_nOSnapMode += (DWORD)OSnap::Type::EndPoint;
 	m_nOSnapMode += (DWORD)OSnap::Type::MidPoint;
@@ -125,6 +132,8 @@ KERNEL::Operator::SelectImpl::SelectImpl(const DocView * pcInDocView) :
 	m_cLineHighlightCtrl.SetMaterialMapping(cHighlightMatMapping);
 	m_cLineHighlightCtrl.GetLineAttributeControl().SetWeight(m_fLineWeight);
 
+	m_cPmiHighlightCtrl.SetMaterialMapping(cHighlightMatMapping);
+
 	Operator::HighlightObjectSnapImpl * pcOSnapImpl = dynamic_cast<Operator::HighlightObjectSnapImpl *>(m_cHighlightOSnapOperator.GetImpl());
 	DEBUG_VALID(pcOSnapImpl);
 
@@ -132,6 +141,9 @@ KERNEL::Operator::SelectImpl::SelectImpl(const DocView * pcInDocView) :
 	DEBUG_VALID(m_pcDynHighlightControl);
 
 	m_pcDynLineHighlightControl = &pcOSnapImpl->m_cDynLineHighlightCtrl;
+	DEBUG_VALID(m_pcDynLineHighlightControl);
+
+	m_pcDynPmiHighlightControl = &pcOSnapImpl->m_cDynPmiHighlightCtrl;
 	DEBUG_VALID(m_pcDynLineHighlightControl);
 }
 
@@ -210,12 +222,32 @@ int KERNEL::Operator::Select::LButtonUp(HEventInfo & cInEvent)
 
 	H3DF::HighlightOptionsKit cOptions;
 
+	bool bPmiItem = false;
+	if (H3DF::Type::LineKey != cSelItem.Type()) {
+		H3DF::Key cKey;
+		if (true == cSelItem.ShowSelectedItem(cKey)) {
+			H3DF::Type eType = H3DF::Utility::GetType(cKey);
+			if (H3DF::Type::SegmentKey == eType) {
+				H3DF::SegmentKey cSegment(cKey.KeyValue());
+				CStringA strName = cSegment.Name(false);
+				if ("pmi" == strName.Left(3)) {
+					bPmiItem = true;
+				}
+			}
+		}
+	}
+
 	if (false == pcImpl->m_cSelectionResult.IsExist(cSelItem)) {
 		if (H3DF::Type::LineKey == cSelItem.Type()) {
 			pcImpl->m_cLineHighlightCtrl.Highlight(cSelItem, cOptions, false);
 		}
 		else {
-			pcImpl->m_cHighlightCtrl.Highlight(cSelItem, cOptions, false);
+			if (false == bPmiItem) {
+				pcImpl->m_cHighlightCtrl.Highlight(cSelItem, cOptions, false);
+			}
+			else {
+				pcImpl->m_cPmiHighlightCtrl.Highlight(cSelItem, cOptions, false);
+			}
 		}
 
 		// 선택된 객체를 SelectionResult에 추가
@@ -226,7 +258,12 @@ int KERNEL::Operator::Select::LButtonUp(HEventInfo & cInEvent)
 			pcImpl->m_cLineHighlightCtrl.Unhighlight(cSelItem, cOptions);
 		}
 		else {
-			pcImpl->m_cHighlightCtrl.Unhighlight(cSelItem, cOptions);
+			if (false == bPmiItem) {
+				pcImpl->m_cHighlightCtrl.Unhighlight(cSelItem, cOptions);
+			}
+			else {
+				pcImpl->m_cPmiHighlightCtrl.Unhighlight(cSelItem, cOptions);
+			}
 		}
 
 		pcImpl->m_cSelectionResult.Erase(cSelItem);
@@ -305,6 +342,7 @@ bool KERNEL::Operator::Select::SelectByResult(H3DF::SelectionResults & cInResult
 
 	pcImpl->DynHighlightControl().UnhighlightEverything();
 	pcImpl->DynLineHighlightControl().UnhighlightEverything();
+	pcImpl->DynPmiHighlightControl().UnhighlightEverything();
 
 	pcImpl->View().Update();
 
@@ -322,6 +360,8 @@ bool KERNEL::Operator::Select::DynamicSelectByResult(H3DF::SelectionResults & cI
 
 	pcImpl->DynHighlightControl().UnhighlightEverything();
 	pcImpl->DynLineHighlightControl().UnhighlightEverything();
+	pcImpl->DynPmiHighlightControl().UnhighlightEverything();
+
 	pcImpl->m_cDynSelectionResult.Reset();
 
 	while (true == cIter.IsValid()) {
@@ -393,6 +433,7 @@ void KERNEL::Operator::Select::Unhighlight(H3DF::SelectionResults const & cInIte
 	// 선택한 후에 Unhighlight 제거
 	pcImpl->DynHighlightControl().UnhighlightEverything();
 	pcImpl->DynLineHighlightControl().UnhighlightEverything();
+	pcImpl->DynPmiHighlightControl().UnhighlightEverything();
 
 	pcImpl->m_cSelectionResult.Erase(cInItems);
 
@@ -412,9 +453,11 @@ void KERNEL::Operator::Select::UnhighlightEverything()
 	
 	pcImpl->m_cHighlightCtrl.UnhighlightEverything();
 	pcImpl->m_cLineHighlightCtrl.UnhighlightEverything();
+	pcImpl->m_cPmiHighlightCtrl.UnhighlightEverything();
 
 	pcImpl->DynHighlightControl().UnhighlightEverything();
 	pcImpl->DynLineHighlightControl().UnhighlightEverything();
+	pcImpl->DynPmiHighlightControl().UnhighlightEverything();
 
 	pcImpl->m_cSelectionResult.Reset();
 	pcImpl->m_cDynSelectionResult.Reset();

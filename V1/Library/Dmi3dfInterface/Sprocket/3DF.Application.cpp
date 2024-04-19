@@ -29,7 +29,7 @@
 #	define WRITE_3DF_ERROR_LOG
 #endif
 
-#define WRITE_3DF_ERROR_LOG
+// #define WRITE_3DF_ERROR_LOG
 
 using namespace H3DF;
 
@@ -159,7 +159,59 @@ CStringA H3DF::ApplicationImpl::ErrorCategoryString(int nId)
 			strMessage = "Rendering";
 			break;
 
-		case HEC_INVALID_KEY:
+		case HEC_IMAGE: // 30,
+			strMessage = "Image";
+			break;
+
+		case HEC_LOCAL_LIGHT: // 31
+			strMessage = "Local Light";
+			break;
+
+		case HEC_NORMAL: // 32
+			strMessage = "Normal";
+			break;
+
+		case HEC_POLYGON: // 33
+			strMessage = "Polygon";
+			break;
+
+		case HEC_POLYLINE: // 34
+			strMessage = "Polyline";
+			break;
+
+		case HEC_TRISTRIP: // 35
+			strMessage = "Tristrip";
+			break;
+
+		case HEC_VERTEX: // 36
+			strMessage = "Vertex";
+			break;
+
+		case HEC_INK: // 37
+			strMessage = "Ink";
+			break;
+
+		case HEC_MARKER: // 38
+			strMessage = "Marker";
+			break;
+
+		case HEC_RENUMBER_KEY: // 39
+			strMessage = "Renumber Key";
+			break;
+
+		case HEC_SPOT_LIGHT: // 40
+			strMessage = "Spot Light";
+			break;
+
+		case HEC_COMPUTE: // 41
+			strMessage = "Compute";
+			break;
+
+		case HEC_FILE_IO: // 42
+			strMessage = "File IO";
+			break;
+
+		case HEC_INVALID_KEY: // 47
 			strMessage = "Invalid key";
 			break;
 
@@ -406,6 +458,14 @@ CStringA H3DF::ApplicationImpl::ErrorSpecificString(int nId)
 
 		case HES_SIZE: // 331
 			strMessage = "Size";
+			break;
+
+		case HES_ZERO_LENGTH: // 386
+			strMessage = "Zero Length";
+			break;
+
+		case HES_Z_BUFFERED_IMAGE: // 387
+			strMessage = "Z Buffered Image";
 			break;
 
 		default:

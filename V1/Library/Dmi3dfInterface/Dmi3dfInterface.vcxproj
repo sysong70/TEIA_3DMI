@@ -207,6 +207,7 @@
     <ClInclude Include="Import\DLL.Helper.h" />
     <ClInclude Include="Sprocket\3DF.Application.h" />
     <ClInclude Include="Sprocket\3DF.Canvas.h" />
+    <ClInclude Include="Sprocket\3DF.ComponentMarkupView.h" />
     <ClInclude Include="Sprocket\3DF.Factory.h" />
     <ClInclude Include="Sprocket\3DF.Model.h" />
     <ClInclude Include="Sprocket\3DF.View.h" />
@@ -215,6 +216,7 @@
     <ClInclude Include="Sprocket\Impl\CADModelImpl.h" />
     <ClInclude Include="Sprocket\Impl\CanvasImpl.h" />
     <ClInclude Include="Sprocket\Impl\ComponentImpl.h" />
+    <ClInclude Include="Sprocket\Impl\ComponentMarkupViewImpl.h" />
     <ClInclude Include="Sprocket\Impl\ModelImpl.h" />
     <ClInclude Include="Sprocket\Impl\ViewImpl.h" />
     <ClInclude Include="Sprocket\Sprocket.h" />
@@ -303,6 +305,7 @@
     <ClCompile Include="Import\DLL.Interface.cpp" />
     <ClCompile Include="Sprocket\3DF.Application.cpp" />
     <ClCompile Include="Sprocket\3DF.Canvas.cpp" />
+    <ClCompile Include="Sprocket\3DF.ComponentMarkupView.cpp" />
     <ClCompile Include="Sprocket\3DF.Factory.cpp" />
     <ClCompile Include="Sprocket\3DF.Model.cpp" />
     <ClCompile Include="Sprocket\3DF.View.cpp" />
@@ -311,6 +314,7 @@
     <ClCompile Include="Sprocket\Impl\CADModelImpl.cpp" />
     <ClCompile Include="Sprocket\Impl\CanvasImpl.cpp" />
     <ClCompile Include="Sprocket\Impl\ComponentImpl.cpp" />
+    <ClCompile Include="Sprocket\Impl\ComponentMarkupViewImpl.cpp" />
     <ClCompile Include="Sprocket\Impl\ModelImpl.cpp" />
     <ClCompile Include="Sprocket\Impl\ViewImpl.cpp" />
     <ClCompile Include="Sprocket\Sprocket.cpp" />

@@ -377,7 +377,7 @@ bool H3DX::ImportOptions::GetPMI(Json::Object& source, A3DRWParamsLoadData& targ
 
 		//param.m_usStructSize;
 		param.m_bAlwaysSubstituteFont = data.GetBoolean("SubstituteFont");
-		param.m_pcSubstitutionFont = ToHoopsString(data.GetString("PMIFont"));
+		param.m_pcSubstitutionFont = ToHoopsString("Myriad CAD"); //ToHoopsString(data.GetString("PMIFont"));
 		//param.m_iNumberOfDigitsAfterDot;
 		param.m_eDefaultUnit = unit == 0 ? kA3DUnitUnknown : (A3DEUnits)(unit - 1);
 		//param.m_uiProprietaryFontDirectoriesSize;

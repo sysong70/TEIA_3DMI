@@ -126,7 +126,8 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::SnapItem::operator == (const Sna
 KERNEL::Operator::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const DocView * pcInDocView) :
 	OperatorImpl(pcInDocView),
 	m_cDynHighlightControl(Window()),
-	m_cDynLineHighlightCtrl(Window())
+	m_cDynLineHighlightCtrl(Window()),
+	m_cDynPmiHighlightCtrl(Window())
 {
 	SegmentKey cConstruction(Window().GetBaseView()->GetConstructionKey());
 
@@ -162,8 +163,10 @@ KERNEL::Operator::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const DocView
 	MaterialMappingKit cDynHighlightMaterialMapping;
 
 	// Light Green 계열
-	cDynHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(120, 245, 120)));
-	cDynHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(120, 245, 120)));
+	RGBAColor cDynHighlightColor(RGB(120, 245, 120));
+	cDynHighlightMaterialMapping.SetLineColor(cDynHighlightColor);
+	cDynHighlightMaterialMapping.SetFaceColor(cDynHighlightColor);
+	cDynHighlightMaterialMapping.SetTextColor(cDynHighlightColor);
 
 	// Dark Green 계열
 // 	cDynHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(10, 130, 10)));
@@ -181,6 +184,8 @@ KERNEL::Operator::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const DocView
 
 	m_cDynLineHighlightCtrl.SetMaterialMapping(cDynHighlightMaterialMapping);
 	m_cDynLineHighlightCtrl.GetLineAttributeControl().SetWeight(m_fLineWeight);
+
+	m_cDynPmiHighlightCtrl.SetMaterialMapping(cDynHighlightMaterialMapping);
 
 // 	m_cDynamicHighlightControl.
 // 	m_pcSelectionSet->SetReferenceSelectionType(RefSelOff);
@@ -405,8 +410,9 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoin
 
 	nResult = cFilteredSelResult.GetCount();
 
-	m_cDynLineHighlightCtrl.UnhighlightEverything();
 	m_cDynHighlightControl.UnhighlightEverything();
+	m_cDynLineHighlightCtrl.UnhighlightEverything();
+	m_cDynPmiHighlightCtrl.UnhighlightEverything();
 
 	// 선택된 요소가 없는 경우 Deselect All을 하고 Update를 한다.
 	if(0 == nResult) {
@@ -429,9 +435,10 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoin
 	// 2개 이상의 요소가 선택된 경우 처리한다.
 	if (1 < cFilteredSelResult.GetCount()) {
 		// ----- 선택된 요소에서 Line이나 Edge를 우선적으로 찾도록 한다. -----
+		H3DF::Type eType = cFrontItem.Type();
 
 		// 1. 첫번째 요소가 Shell인 경우 다음 요소에서 Line을 찾는다. 
-		if (H3DF::Type::ShellKey == cFrontItem.Type()) {
+		if (H3DF::Type::ShellKey == eType) {
 			WorldPoint cFaceWordlPoint;
 			WindowPoint cFaceWindowPoint;
 			cFrontItem.ShowSelectionPosition(cFaceWordlPoint);
@@ -466,18 +473,82 @@ bool KERNEL::Operator::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoin
 		}
 	}
 
+	// PMI Item이 선택된 경우 처리. PMI Item은 Group으로 선택되도록 처리한다.
+	bool bFindPmiItem = false;
+	if (0 < cFilteredSelResult.GetCount()) {
+		H3DF::Type eType = cFrontItem.Type();
+		
+		if (H3DF::Type::SegmentKey == eType) {
+			SegmentKey cSegment;
+			if (true == cFrontItem.ShowSelectedItem(cSegment)) {
+				CStringA strName;
+				SegmentKey cOwner = cSegment.Owner();
+
+				// 상위 Owner 5단계까지 찾아서 PMI인지 확인한다.
+				for (int nIndex = 0; nIndex < 5; nIndex++) {
+					if (INVALID_KEY == cOwner.KeyValue()) {
+						break;
+					}
+
+					strName = cOwner.Name(false);
+
+					if ("pmi" == strName.Left(3)) {
+						SelectionItemImpl * pcImpl = (SelectionItemImpl *)cFrontItem.GetImpl();
+						pcImpl->m_cKey = cOwner.KeyValue();
+						bFindPmiItem = true;
+						break;
+					}
+
+					cOwner = cOwner.Owner();
+				}
+			}
+		}
+		else if(H3DF::Type::LineKey == eType) {
+			LineKey cLine;
+			if (true == cFrontItem.ShowSelectedItem(cLine)) {
+				CStringA strName;
+				SegmentKey cOwner = cLine.Owner();
+
+				// 상위 Owner 4단계까지 찾아서 PMI인지 확인한다.
+				for (int nIndex = 0; nIndex < 4; nIndex++) {
+					if (INVALID_KEY == cOwner.KeyValue()) {
+						break;
+					}
+
+					strName = cOwner.Name(false);
+
+					if ("pmi" == strName.Left(3)) {
+						SelectionItemImpl * pcImpl = (SelectionItemImpl *)cFrontItem.GetImpl();
+						pcImpl->m_cKey = cOwner.KeyValue();
+						bFindPmiItem = true;
+						break;
+					}
+
+					cOwner = cOwner.Owner();
+				}
+			}
+		}
+	}
+
 	H3DF::HighlightOptionsKit cOption;
 	if(0 < cFilteredSelResult.GetCount()) {
 		cOutSelection = cFrontItem;
 
-		if(H3DF::Type::LineKey == cFrontItem.Type()) {
-			m_cDynLineHighlightCtrl.Highlight(cFrontItem, cOption);
+		H3DF::Type eType = cFrontItem.Type();
+
+		if (true == bFindPmiItem) {
+			m_cDynPmiHighlightCtrl.Highlight(cFrontItem, cOption);
 		}
 		else {
-// 			float fLineWeight = 0.0;
-// 			m_cDynamicHighlightControl.GetLineAttributeControl().SetWeight(fLineWeight);
-			// 선택된 요소를 Highlight한다.
-			m_cDynHighlightControl.Highlight(cFrontItem, cOption);
+			if (H3DF::Type::LineKey == eType) {
+				m_cDynLineHighlightCtrl.Highlight(cFrontItem, cOption);
+			}
+			else {
+				// float fLineWeight = 0.0;
+				// m_cDynamicHighlightControl.GetLineAttributeControl().SetWeight(fLineWeight);
+				// 선택된 요소를 Highlight한다.
+				m_cDynHighlightControl.Highlight(cFrontItem, cOption);
+			}
 		}
 	}
 
