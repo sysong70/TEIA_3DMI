@@ -34,6 +34,8 @@ namespace Component
 
 		afx_msg void OnCommandSort();
 
+		afx_msg LRESULT OnTreeCheckClick(WPARAM wp, LPARAM lp);
+
 		afx_msg void OnTreeBeginDrag(NMHDR* pNMHDR, LRESULT* pResult);
 
 		afx_msg void OnTreeBeginLabelEdit(NMHDR* pNMHDR, LRESULT* pResult);
@@ -86,7 +88,11 @@ namespace Component
 
 	private:
 
+		HTREEITEM FindItem(DWORD_PTR key);
+
+	private:
+
+		std::unordered_map<DWORD_PTR, HTREEITEM> m_keyMap;
 		ModelTree* m_pControl = nullptr;
-		bool m_disableNofify = false;
 	};
 }

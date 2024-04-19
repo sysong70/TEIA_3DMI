@@ -529,6 +529,7 @@ namespace Signal
 			InverseCheckedStatus,
 			SelectItem,
 			SelectItems,
+			ViewItem,
 		};
 
 		DEFINE_WRAPPER;
@@ -577,6 +578,8 @@ namespace Signal
 		void SelectItem(DWORD_PTR key, bool select = true);
 
 		void SelectItems(const KeyItems& items, bool select = true);
+		// ensure visiable
+		void ViewItem(DWORD_PTR key);
 	};
 
 

@@ -219,7 +219,7 @@ void KERNEL::Operator::ModelPanelImpl::ComponentExpanded(H3DF::Component & cInCo
 
 	if (false == cTreeItems.empty()) {
 		Delivery().modelPanel.AddChildren((DWORD_PTR)pcParentItem, cTreeItems);
-		Delivery().modelPanel.ExpandParent((DWORD_PTR)pcParentItem);
+		//Delivery().modelPanel.ExpandParent((DWORD_PTR)pcParentItem);
 	}
 
 	if (0 < nLevel)
@@ -384,6 +384,8 @@ void KERNEL::Operator::ModelPanel::Initialize(H3DF::CADModel & cInCadModel)
 	pcImpl->ComponentExpanded(cInCadModel, 3);
 
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
+	//:Ken - 20240419
+	pcImpl->Delivery().modelPanel.ViewItem((DWORD_PTR)&cInCadModel);
 }
 
 // 1. 초기화 함수
@@ -472,6 +474,8 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 
 	//:Ken - 20240219, unlock and update tree
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
+	//:Ken - 20240419
+	pcImpl->Delivery().modelPanel.ViewItem((DWORD_PTR)pcRootItem);
 }
 
 //== Signal 처리 관련 함수 ============================================================================
@@ -626,8 +630,6 @@ void KERNEL::Operator::ModelPanel::OnItemExpandedSignal(Json::Object & cInObject
 
 	// Tree를 Update를 하도록 설정
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
-	//:Ken - 20240403
-	pcImpl->Delivery().modelPanel.SelectItem((DWORD_PTR)pcComponent);
 
 	// bool bExpanded = cInObject.GetBoolean(SKW_EXPANDED);
 }
