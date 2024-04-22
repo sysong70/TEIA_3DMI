@@ -263,7 +263,7 @@ void KERNEL::Operator::ModelPanelImpl::ComponentExpanded(H3DF::Component & cInCo
 
 	if (false == cTreeItems.empty()) {
 		Delivery().modelPanel.AddChildren((DWORD_PTR)pcParentItem, cTreeItems);
-		Delivery().modelPanel.ExpandParent((DWORD_PTR)pcParentItem);
+		//Delivery().modelPanel.ExpandParent((DWORD_PTR)pcParentItem);
 	}
 
 	if (0 < nLevel)
@@ -435,6 +435,8 @@ void KERNEL::Operator::ModelPanel::Initialize(H3DF::CADModel & cInCadModel)
 	pcImpl->ComponentExpanded(cInCadModel, 3);
 
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
+	//:Ken - 20240419
+	pcImpl->Delivery().modelPanel.ViewItem((DWORD_PTR)&cInCadModel);
 }
 
 // 1. 초기화 함수
@@ -445,6 +447,86 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 
 	CString strFileTitle = Path::GetFileTitle(strFilePathName);
 	CString strFileName = Path::GetFileName(strFilePathName);
+
+	Signal::TreeItems cTreeItems;
+
+	SegmentKey cModelSegment = pcImpl->View().GetModelOverrideSegmentKey();
+
+	HC_KEY nModelKey = cModelSegment.KeyValue();
+
+	ModelTreeItem * pcRootItem = pcImpl->m_cModelTree.AddItem(nModelKey, nullptr, true); // 내부 Tree 생성
+	pcRootItem->AddStatus(ModelTreeItemStatus::UiUpdate);
+
+	Signal::TreeItem cItem;
+	cItem.ParentKey = 0;
+	cItem.Key = (DWORD_PTR)pcRootItem;
+	cItem.Title = strFileTitle;
+	//cItem.HasChildren = false;
+
+	//:Ken - 20240219, lock tree
+	pcImpl->Delivery().modelPanel.RedrawTree(false);
+	//:Ken - 20240205, Add root item
+	pcImpl->Delivery().modelPanel.AddItem(cItem);
+
+	SegmentKeyArray cChildren;
+	cModelSegment.ShowSubsegments(cChildren);
+
+	SegmentKey cSegment;
+
+	// Model Group Item 생성, 이하에 CAD Model data를 저장한다.
+	if (true == Utility::ShowSubSegment(cModelSegment, "models", cSegment)) {
+		cItem.Title = L"Models";
+		//cItem.HasChildren = (0 < cSegment.ShowIncluders()) ? true : false;
+		bool hasChildren = (0 < cSegment.ShowIncluders()) ? true : false;
+
+		//ModelTreeItem * pcItem = pcImpl->m_cModelTree.AddItem(cSegment.KeyValue(), pcRootItem, cItem.HasChildren); // 내부 Tree 생성
+		ModelTreeItem * pcItem = pcImpl->m_cModelTree.AddItem(cSegment.KeyValue(), pcRootItem, hasChildren);
+		pcItem->AddStatus(ModelTreeItemStatus::UiUpdate);
+		cItem.Key = (DWORD_PTR)pcItem;
+
+		pcImpl->ModelTree().SetModelsGroupItem(pcItem);
+		cTreeItems.push_back(cItem);
+	}
+
+	// Measure Group Item 생성.
+	if (true == Utility::ShowSubSegment(cModelSegment, "measurements", cSegment)) {
+		cItem.Title = L"Measurements";
+		//cItem.HasChildren = false;
+		
+		ModelTreeItem * pcItem = pcImpl->m_cModelTree.AddItem(cSegment.KeyValue(), pcRootItem, false); // 내부 Tree 생성
+		pcItem->AddStatus(ModelTreeItemStatus::UiUpdate);
+		cItem.Key = (DWORD_PTR) pcItem;
+
+		pcImpl->ModelTree().SetMeasurementsGroupItem(pcItem);
+		cTreeItems.push_back(cItem);
+	}
+
+	// Markup Group Item 생성.
+	if (true == Utility::ShowSubSegment(cModelSegment, "markups", cSegment)) {
+		cItem.Title = L"Markups";
+		//cItem.HasChildren = false;
+
+		ModelTreeItem * pcItem = pcImpl->m_cModelTree.AddItem(cSegment.KeyValue(), pcRootItem, false); // 내부 Tree 생성
+		pcItem->AddStatus(ModelTreeItemStatus::UiUpdate);
+		cItem.Key = (DWORD_PTR)pcItem;
+
+		pcImpl->ModelTree().SetMarkupsGroupItem(pcItem);
+		cTreeItems.push_back(cItem);
+	}
+
+	//:Ken - 20240205, Add predefined items on root item
+	pcImpl->Delivery().modelPanel.AddChildren((DWORD_PTR)pcRootItem, cTreeItems);
+
+	// Model Tree를 전개한다.
+	ModelTreeItem * pcModelsGroupItem = pcImpl->ModelTree().ModelsGroupItem();
+	DEBUG_VALID(pcModelsGroupItem);
+
+	//pcImpl->UserInterfaceItemExpanded(pcModelsGroupItem, true);
+
+	//:Ken - 20240219, unlock and update tree
+	pcImpl->Delivery().modelPanel.RedrawTree(true);
+	//:Ken - 20240419
+	pcImpl->Delivery().modelPanel.ViewItem((DWORD_PTR)pcRootItem);
 }
 
 //== Signal 처리 관련 함수 ============================================================================
@@ -603,8 +685,6 @@ void KERNEL::Operator::ModelPanel::OnItemExpandedSignal(Json::Object & cInObject
 
 	// Tree를 Update를 하도록 설정
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
-	//:Ken - 20240403
-	pcImpl->Delivery().modelPanel.SelectItem((DWORD_PTR)pcComponent);
 
 	// bool bExpanded = cInObject.GetBoolean(SKW_EXPANDED);
 }

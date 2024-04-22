@@ -873,6 +873,18 @@ void Signal::ModelPanel::SelectItems(const KeyItems& items, bool select)
 	Wrapper().SendData(data);
 }
 
+
+
+void Signal::ModelPanel::ViewItem(DWORD_PTR key)
+{
+	Json::Object data;
+	ConstructData(data, Action::ViewItem);
+
+	data.SetDwordPtr(SKW_KEY, key);
+
+	Wrapper().SendData(data);
+}
+
 #undef SendKeyData
 
 #pragma endregion //:REGION
