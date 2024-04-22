@@ -2,6 +2,7 @@
 
 #include "ComponentImpl.h"
 
+#include "../3DF.MetaData.h"
 
 #include "../../3DF/Segment.h"
 #include "../../3DF/Reference.h"
@@ -18,8 +19,6 @@ using namespace H3DF;
 
 H3DF::ComponentImpl::ComponentImpl()
 {
-	m_pvSubComponents = new ComponentArray();
-	m_pstrName = new CString();
 }
 
 H3DF::ComponentImpl::~ComponentImpl()
@@ -36,6 +35,15 @@ H3DF::ComponentImpl::~ComponentImpl()
 	if (nullptr != m_pstrName) {
 		delete m_pstrName;
 	}
+
+	if (nullptr != m_pvMetaDatas) {
+		for (auto * pcMetaData : *m_pvMetaDatas) {
+			delete pcMetaData;
+		}
+
+		delete m_pvMetaDatas;
+		m_pvMetaDatas = nullptr;
+	}
 }
 
 void H3DF::ComponentImpl::Copy(ComponentImpl * pcInThat)
@@ -45,16 +53,30 @@ void H3DF::ComponentImpl::Copy(ComponentImpl * pcInThat)
 	m_eType = pcInThat->m_eType;
 	m_nStatus = pcInThat->m_nStatus;
 	m_pcOwner = pcInThat->m_pcOwner;
-	*m_pstrName = *pcInThat->m_pstrName;
 
-	for (auto * pcSubComponent : *pcInThat->m_pvSubComponents) {
-		Component * pcComponent = new Component(*pcSubComponent);
-		m_pvSubComponents->push_back(pcComponent);
+	if (nullptr != pcInThat->m_pstrName) {
+		m_pstrName = new CString();
+		*m_pstrName = *pcInThat->m_pstrName;
+	}
+
+	if (nullptr != pcInThat->m_pvSubComponents) {
+		m_pvSubComponents = new ComponentArray();
+
+		for (auto * pcSubComponent : *pcInThat->m_pvSubComponents) {
+			Component * pcComponent = new Component(*pcSubComponent);
+			m_pvSubComponents->push_back(pcComponent);
+		}
 	}
 }
 
 void H3DF::ComponentImpl::SetName(CString strInName)
 {
+	if (nullptr == m_pstrName) {
+		m_pstrName = new CString();
+	}
+	
+	DEBUG_VALID(m_pstrName);
+
 	*m_pstrName = strInName;
 }
 
@@ -99,6 +121,18 @@ CString H3DF::ComponentImpl::TypeName()
 			strTypeName = L"PMI Group";
 			break;
 
+		case H3DF::Component::Type::ViewGroupComponent:
+			strTypeName = L"View Group";
+			break;
+
+		case H3DF::Component::Type::ExchangeMkpView:
+			strTypeName = L"Markup View";
+			break;
+
+		case H3DF::Component::Type::ExchangePMI:
+			strTypeName = L"PMI";
+			break;
+
 		default:
 			strTypeName.Format(L"Type: 0x%x", (int)m_eType);
 			break;
@@ -109,6 +143,11 @@ CString H3DF::ComponentImpl::TypeName()
 
 void H3DF::ComponentImpl::AddSubComponent(Component & cInSubComponent)
 {
+	if (nullptr == m_pvSubComponents) {
+		m_pvSubComponents = new ComponentArray();
+	}
+	
+	DEBUG_VALID(m_pvSubComponents);
 	m_pvSubComponents->push_back(&cInSubComponent);
 }
 
@@ -185,7 +224,7 @@ bool H3DF::ComponentImpl::FindParentPartDefinition(Component & cInComponent, Com
 		return true;
 	}
 
-	return FindParentPartDefinition(cInComponent.GetOwner(), pcOutComponent);
+	return FindParentPartDefinition(*cInComponent.GetOwner(), pcOutComponent);
 }
 
 // Part Definition을 복제한다.
@@ -196,7 +235,7 @@ bool H3DF::ComponentImpl::ClonedParentPartDefinition(Component & cInComponent)
 		return false;
 	}
 
-	ClonedComponent(cInComponent, cInComponent.GetOwner(), true);
+	ClonedComponent(cInComponent, *cInComponent.GetOwner(), true);
 
 	return true;
 }
@@ -217,8 +256,9 @@ bool H3DF::ComponentImpl::ClonedComponent(Component & cInComponent, Component & 
 		cParentSegment.Flush(Search::Type::Include, Search::Space::SegmentOnly);
 
 		// 3-1. 입력받은 Component가 아닌 다른 Component는 Include 관계를 재설정한다.
-		ComponentArray & aOwnerSubComponents = cInOwnerComponent.GetSubComponents();
-		for (auto * pcSubComponent : aOwnerSubComponents) {
+		ComponentArray * pcOwnerSubComponents = cInOwnerComponent.GetSubComponents();
+		if(nullptr != pcOwnerSubComponents)
+		for (auto * pcSubComponent : *pcOwnerSubComponents) {
 			// 입력 받은 Component가 아닌 SubComponent를 찾는다.
 			if (pcSubComponent != &cInComponent) {
 				SegmentKey cSubSegment(pcSubComponent->GetSegmentKey());
@@ -279,9 +319,11 @@ bool H3DF::ComponentImpl::ClonedComponent(Component & cInComponent, Component & 
 	}
 
 	// 7. 하부 Include 정보 복사
-	ComponentArray & aSubComponents = cInComponent.GetSubComponents();
-	for (auto * pcSubComponent : aSubComponents) {
-		ClonedComponent(*pcSubComponent, cInComponent, false);
+	ComponentArray * pcSubComponents = cInComponent.GetSubComponents();
+	if (nullptr != pcSubComponents) {
+		for (auto * pcSubComponent : *pcSubComponents) {
+			ClonedComponent(*pcSubComponent, cInComponent, false);
+		}
 	}
 
 	return true;

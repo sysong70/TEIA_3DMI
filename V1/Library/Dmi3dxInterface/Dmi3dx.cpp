@@ -8,6 +8,8 @@
 
 #include <format>
 
+#include <Json.h>
+
 // == Text 관련 함수 =================================================================================
 
 // Char text를 Unicode CString으로 변환하여 돌려줌,
@@ -429,3 +431,54 @@ CStringA Dmi3dx::GetA3dEntityTypeString(const A3DEntity * pcInEntity)
 	return GetA3dEntityTypeString(eType);
 }
 
+//== Json 관련 함수 ==================================================================================
+
+CString Dmi3dx::GetJsonString(A3DSurfPlane * pcInSurfPlane)
+{
+	A3DSurfPlaneData cData;
+	A3D_INITIALIZE_DATA(A3DSurfPlaneData, cData);
+
+	if (A3D_SUCCESS != A3DSurfPlaneGet(pcInSurfPlane, &cData)) {
+		return L"";
+	}
+
+	Json::Object cRoot;
+
+	// Origin 정보 저장
+	Json::Array & cOrigin = cRoot.CreateArray("o");
+	cOrigin.AddRealRaw(cData.m_sTrsf.m_sOrigin.m_dX);
+	cOrigin.AddRealRaw(cData.m_sTrsf.m_sOrigin.m_dY);
+	cOrigin.AddRealRaw(cData.m_sTrsf.m_sOrigin.m_dZ);
+
+	Json::Array & cXAxis = cRoot.CreateArray("x");
+	cXAxis.AddRealRaw(cData.m_sTrsf.m_sXVector.m_dX);
+	cXAxis.AddRealRaw(cData.m_sTrsf.m_sXVector.m_dY);
+	cXAxis.AddRealRaw(cData.m_sTrsf.m_sXVector.m_dZ);
+
+	Json::Array & cYAxis = cRoot.CreateArray("y");
+	cYAxis.AddRealRaw(cData.m_sTrsf.m_sYVector.m_dX);
+	cYAxis.AddRealRaw(cData.m_sTrsf.m_sYVector.m_dY);
+	cYAxis.AddRealRaw(cData.m_sTrsf.m_sYVector.m_dZ);
+
+/*
+	Json::Array & cOriginTest = cRoot.GetArray("o");
+	double dOx = cOriginTest.GetRealRaw(0);
+	double dOy = cOriginTest.GetRealRaw(1);
+	double dOz = cOriginTest.GetRealRaw(2);
+
+	Json::Array & cXAxisTest = cRoot.GetArray("x");
+	double dXx = cXAxisTest.GetRealRaw(0);
+	double dXy = cXAxisTest.GetRealRaw(1);
+	double dXz = cXAxisTest.GetRealRaw(2);
+
+	Json::Array & cYAxisTest = cRoot.GetArray("y");
+	double dYx = cYAxisTest.GetRealRaw(0);
+	double dYy = cYAxisTest.GetRealRaw(1);
+	double dYz = cYAxisTest.GetRealRaw(2);
+*/
+
+	CString strText;
+	cRoot.Stringify(strText);
+
+	return strText;
+}

@@ -88,6 +88,8 @@ namespace H3DF
 		void SetSimpleReflection(bool bInState, float fInPercentOffset = 5.0f);
 		bool GetSimpleReflection();
 
+		void SmoothTransition(H3DF::CameraKit const & cInCamera);
+
 	public:
 		void SaveHsfFile(CString strFilePathName, H3DF::Canvas * pcHoopsView);
 		void LoadPointCloudFile(CString strFilePathName);

@@ -71,6 +71,15 @@ H3DF::SegmentKey::SegmentKey(SegmentKey const & cInThat) : Key(INVALID_KEY)
 
 H3DF::SegmentKey::~SegmentKey()
 {
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+/*
+	if (nullptr != pcImpl->m_pcBoundingKit) {
+		delete pcImpl->m_pcBoundingKit;
+		pcImpl->m_pcBoundingKit = nullptr;
+	}
+*/
 }
 
 void H3DF::SegmentKey::Set(SegmentKey const & cInThat)
@@ -681,7 +690,8 @@ SegmentKey & H3DF::SegmentKey::SetMaterialMapping(H3DF::MaterialMappingKit const
 			texture_options.Append(", parameterization source = uv");
 		}
 
-		HC_Define_Local_Texture(H_FORMAT_TEXT("texture_%u", adata.m_uiTextureDefinitionIndex), texture_options);*/
+		HC_Define_Local_Texture(H_FORMAT_TEXT("texture_%u", adata.m_uiTextureDefinitionIndex), texture_options);
+*/
 	}
 
 	if (true == cInKit.ShowFaceChannel(Material::Channel::Mirror, eType, cRgbaColor, strTextureName, strTextureOptions)) {
@@ -898,7 +908,89 @@ void H3DF::SegmentKey::SetMarkerSymbol(CString strSymbol)
 }
 
 //== Camera 관련 함수 ================================================================================
-// 	SegmentKey & SetCamera(CameraKit const & cInKit);
+SegmentKey & H3DF::SegmentKey::SetCamera(CameraKit const & cInKit)
+{
+	CameraKit cCameraInfo;
+	ShowCamera(cCameraInfo);
+
+	MatrixKit cMatrix;
+	cCameraInfo.ShowMatrix(cMatrix);
+
+	MatrixKit cMatrix1;
+	cInKit.ShowMatrix(cMatrix1);
+
+	CameraControl cCamerCtrl = GetCameraControl();
+
+	Vector cUpVector;
+	if (true == cInKit.ShowUpVector(cUpVector)) {
+		cCamerCtrl.SetUpVector(cUpVector);
+	}
+
+	Point cPosition;
+	if (true == cInKit.ShowPosition(cPosition)) {
+		cCamerCtrl.SetPosition(cPosition);
+	}
+
+	Point cTarget;
+	if (true == cInKit.ShowTarget(cTarget)) {
+		cCamerCtrl.SetTarget(cTarget);
+	}
+
+	Camera::Projection eType;
+	float fOblique_Y_Skew = 0, fOblique_X_Skew = 0;
+	if (true == cInKit.ShowProjection(eType, fOblique_X_Skew, fOblique_Y_Skew)) {
+		cCamerCtrl.SetProjection(eType, fOblique_X_Skew, fOblique_Y_Skew);
+	}
+
+	float fWidth, fHeight;
+	if (true == cInKit.ShowField(fWidth, fHeight)) {
+		cCamerCtrl.SetField(fWidth, fHeight);
+	}
+
+	float fNearLimit;
+	if (true == cInKit.ShowNearLimit(fNearLimit)) {
+		cCamerCtrl.SetNearLimit(fNearLimit);
+	}
+
+	CameraKit cCameraInfo1;
+	ShowCamera(cCameraInfo1);
+
+	return *this;
+}
+
+SegmentKey & H3DF::SegmentKey::SetCamera(MatrixKit & cInMatrix)
+{
+	CameraKit cCameraInfo;
+	ShowCamera(cCameraInfo);
+
+	Point cTarget;
+	cCameraInfo.ShowTarget(cTarget);
+
+	Point cPosition;
+	cCameraInfo.ShowPosition(cPosition);
+
+	Vector cVector = cPosition - cTarget;
+	double dLength = cVector.Length();
+
+	// 카메라의 위치를 설정한다
+	// 카메라 위치 설정
+	Point cCameraPosition = cPosition;
+	// 카메라가 바라보는 방향 설정. Matrix Z축의 반대 방향으로 설정한다.
+	Point cCameraTarget = cPosition - cInMatrix.ZAxis() * dLength;
+
+	CameraControl cCamerCtrl = GetCameraControl();
+
+	cCamerCtrl.SetTarget(cCameraTarget);
+	cCamerCtrl.SetPosition(cCameraPosition);
+	// 화면상에서 위쪽을 가리키는 방향.
+	cCamerCtrl.SetUpVector(cInMatrix.YAxis());
+
+	CameraKit cCameraInfo1;
+	ShowCamera(cCameraInfo1);
+
+	return *this;
+}
+
 // 	SegmentKey & UnsetCamera();
 
 bool H3DF::SegmentKey::ShowCamera(CameraKit & cOutKit) const
@@ -909,24 +1001,26 @@ bool H3DF::SegmentKey::ShowCamera(CameraKit & cOutKit) const
 	Point cTarget;
 	Vector cUpVector;
 	float fWidth, fHeight;
-	char chProjecionType[MVO_BUFFER_SIZE];
+	CStringA strProjecionType;
 
-	HC_Show_Net_Camera(&cPosition, &cTarget, &cUpVector, &fWidth, &fHeight, chProjecionType);
+	HC_Show_Net_Camera(&cPosition, &cTarget, &cUpVector, &fWidth, &fHeight, strProjecionType.GetBuffer(MVO_BUFFER_SIZE));
+	strProjecionType.ReleaseBuffer();
 
 	cOutKit.SetUpVector(cUpVector);
 	cOutKit.SetPosition(cPosition);
 	cOutKit.SetTarget(cTarget);
 
 	Camera::Projection eType = Camera::Projection::Default;
-	if (0 == strieq(chProjecionType, "Perspective")) {
+	if ("perspective" == strProjecionType) {
 		eType = Camera::Projection::Perspective;
 	}
-	else if (0 == strieq(chProjecionType, "Orthographic")) {
+	else if ("orthographic" == strProjecionType) {
 		eType = Camera::Projection::Orthographic;
 	}
-	else if (0 == strieq(chProjecionType, "Stretched")) {
+	else if ("stretched" == strProjecionType) {
 		eType = Camera::Projection::Stretched;
 	}
+
 	cOutKit.SetProjection(eType);
 
 	cOutKit.SetField(fWidth, fHeight);
@@ -934,6 +1028,18 @@ bool H3DF::SegmentKey::ShowCamera(CameraKit & cOutKit) const
 	SegmentKeyImpl::LocalClose(*this);
 
 	return true;
+}
+
+CameraControl H3DF::SegmentKey::GetCameraControl()
+{
+	CameraControl cCameraControl(*this);
+	return cCameraControl;
+}
+
+CameraControl const H3DF::SegmentKey::GetCameraControl() const
+{
+	CameraControl cCameraControl(*(SegmentKey *)this);
+	return cCameraControl;
 }
 
 //== Model Segment 관련 함수 =====================================================================
@@ -967,17 +1073,69 @@ bool H3DF::SegmentKey::ShowModellingMatrix(MatrixKit & cOutKit) const
 //== Bounding 관련 함수 ==============================================================================
 SegmentKey & H3DF::SegmentKey::SetBounding(BoundingKit const & cInKit)
 {
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	// 정의된 BoundingKit이 없으면 새로 생성한다
+	if (nullptr == pcImpl->m_pcBoundingKit) {
+		pcImpl->m_pcBoundingKit = new BoundingKit();
+	}
+
+	*pcImpl->m_pcBoundingKit = cInKit;
+
 	bool bExclusion = false;
-
-	cInKit.ShowExclusion(bExclusion);
-
-	if(true == bExclusion) {
-		SegmentKeyImpl::LocalOpen(*this);
-		HC_Set_Heuristics("exclude bounding");
-		SegmentKeyImpl::LocalClose(*this);
+	if (true == cInKit.ShowExclusion(bExclusion)) {
+		if (true == bExclusion) {
+			SegmentKeyImpl::LocalOpen(*this); 
+			HC_Set_Heuristics("exclude bounding");
+			SegmentKeyImpl::LocalClose(*this);
+		}
 	}
 
 	return *this;
+}
+
+SegmentKey & H3DF::SegmentKey::UnsetBounding()
+{
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr != pcImpl->m_pcBoundingKit) {
+		delete pcImpl->m_pcBoundingKit;
+		pcImpl->m_pcBoundingKit = nullptr;
+	}
+
+	return *this;
+}
+
+bool H3DF::SegmentKey::ShowBounding(BoundingKit & cOutkit) const
+{
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	// 정의된 BoundingKit이 없으면 새로 생성한다
+	if (nullptr == pcImpl->m_pcBoundingKit) {
+		pcImpl->m_pcBoundingKit = new BoundingKit();
+	}
+	
+	SimpleSphere cSphere;
+	SimpleCuboid cCuboid;
+
+	if (false == pcImpl->m_pcBoundingKit->ShowVolume(cSphere, cCuboid)) {
+		SegmentKeyImpl::LocalOpen(*this); {
+			HC_Compute_Circumsphere(".", (HPoint *)&cSphere.center, &cSphere.radius);
+			HC_Compute_Circumcuboid(".", (HPoint *)&cCuboid.cMin, (HPoint *)&cCuboid.cMax);
+		} SegmentKeyImpl::LocalClose(*this);
+
+		pcImpl->m_pcBoundingKit->SetVolume(cSphere);
+		pcImpl->m_pcBoundingKit->SetVolume(cCuboid);
+	}
+	
+	cOutkit = *pcImpl->m_pcBoundingKit;
+
+	return true;
+
+
 }
 
 //== Attribute Lock 관련 함수 ================================================================

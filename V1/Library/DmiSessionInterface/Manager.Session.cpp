@@ -121,6 +121,7 @@ void SESSION::Manager::Session::ExecuteApplicationSignal(Json::Object & cInObjec
 			break;
 
 		case Signal::Application::Action::OnDpiAware:
+			//m_cApplication.OnDpiAware(cInObject.GetAt(SKW_VALUE));
 			break;
 
 		case Signal::Application::Action::OnUpdatePreference:

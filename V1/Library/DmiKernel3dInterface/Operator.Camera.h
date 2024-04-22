@@ -26,7 +26,6 @@ namespace KERNEL
 			int RButtonUp(HEventInfo & cInEvent);
 
 			int MouseWheel(HEventInfo & cInEvent);
-
 			
 			//== View Control 관련 함수 ==============================================================
 			H3DF::Camera::Mode CameraMode();
@@ -36,6 +35,9 @@ namespace KERNEL
 			void SetZoomArea();
 			void FitWorld();
 			void FitWorldOnly();
+
+			void SetCamera(H3DF::CameraKit & cInCamera);
+			void SetCameraFitSelection(H3DF::MatrixKit & cInMatrix, H3DF::SegmentKey & cInSegment);
 		};
 	}
 }

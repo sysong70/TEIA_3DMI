@@ -120,8 +120,9 @@ KERNEL::Operator::SelectImpl::SelectImpl(const DocView * pcInDocView) :
 
 	H3DF::MaterialMappingKit cHighlightMatMapping;
 
-	cHighlightMatMapping.SetLineColor(H3DF::RGBAColor(RGB(200, 20, 10)));
+	cHighlightMatMapping.SetLineColor(H3DF::RGBAColor(RGB(250, 105, 95)));
 	cHighlightMatMapping.SetFaceColor(H3DF::RGBAColor(RGB(250, 105, 95)));
+	cHighlightMatMapping.SetTextColor(H3DF::RGBAColor(RGB(250, 105, 95)));
 
 	m_cHighlightCtrl.SetMaterialMapping(cHighlightMatMapping);
 	// Shell 선택시에 Line Visibility를 설정한대로 적용하기 위해서 Lock을 걸도록 한다.

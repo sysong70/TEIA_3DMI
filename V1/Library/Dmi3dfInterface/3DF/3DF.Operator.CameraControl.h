@@ -24,6 +24,9 @@ namespace H3DF
 
 			void FitWorld();
 
+			void SetCamera(H3DF::CameraKit & cInCameraKit);
+			void SetCameraFitSelection(H3DF::MatrixKit & cInMatrix, SegmentKey & cInSegment);
+
 			//== Mouse Event 처리 ===================================================================
 			int LButtonDown(HEventInfo & cInEvent);
 			int LButtonUp(HEventInfo & cInEvent);

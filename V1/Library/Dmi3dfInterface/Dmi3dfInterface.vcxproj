@@ -152,7 +152,6 @@
     <ClInclude Include="3DF\Reference.h" />
     <ClInclude Include="3DF\Selectability.h" />
     <ClInclude Include="3DF\SelectionSet.h" />
-    <ClInclude Include="Entity.ModelTree.h" />
     <ClInclude Include="Signal.Connector.h" />
     <ClInclude Include="3DF\Camera.h" />
     <ClInclude Include="3DF\Circle.h" />
@@ -207,8 +206,8 @@
     <ClInclude Include="Import\DLL.Helper.h" />
     <ClInclude Include="Sprocket\3DF.Application.h" />
     <ClInclude Include="Sprocket\3DF.Canvas.h" />
-    <ClInclude Include="Sprocket\3DF.ComponentMarkupView.h" />
     <ClInclude Include="Sprocket\3DF.Factory.h" />
+    <ClInclude Include="Sprocket\3DF.MetaData.h" />
     <ClInclude Include="Sprocket\3DF.Model.h" />
     <ClInclude Include="Sprocket\3DF.View.h" />
     <ClInclude Include="Sprocket\3DF.CADModel.h" />
@@ -216,7 +215,7 @@
     <ClInclude Include="Sprocket\Impl\CADModelImpl.h" />
     <ClInclude Include="Sprocket\Impl\CanvasImpl.h" />
     <ClInclude Include="Sprocket\Impl\ComponentImpl.h" />
-    <ClInclude Include="Sprocket\Impl\ComponentMarkupViewImpl.h" />
+    <ClInclude Include="Sprocket\Impl\MetaDataImpl.h" />
     <ClInclude Include="Sprocket\Impl\ModelImpl.h" />
     <ClInclude Include="Sprocket\Impl\ViewImpl.h" />
     <ClInclude Include="Sprocket\Sprocket.h" />
@@ -252,7 +251,6 @@
     <ClCompile Include="3DF\Reference.cpp" />
     <ClCompile Include="3DF\Selectability.cpp" />
     <ClCompile Include="3DF\SelectionSet.cpp" />
-    <ClCompile Include="Entity.ModelTree.cpp" />
     <ClCompile Include="Signal.Connector.cpp" />
     <ClCompile Include="3DF\Bounding.cpp" />
     <ClCompile Include="3DF\Camera.cpp" />
@@ -305,8 +303,8 @@
     <ClCompile Include="Import\DLL.Interface.cpp" />
     <ClCompile Include="Sprocket\3DF.Application.cpp" />
     <ClCompile Include="Sprocket\3DF.Canvas.cpp" />
-    <ClCompile Include="Sprocket\3DF.ComponentMarkupView.cpp" />
     <ClCompile Include="Sprocket\3DF.Factory.cpp" />
+    <ClCompile Include="Sprocket\3DF.MetaData.cpp" />
     <ClCompile Include="Sprocket\3DF.Model.cpp" />
     <ClCompile Include="Sprocket\3DF.View.cpp" />
     <ClCompile Include="Sprocket\3DF.CADModel.cpp" />
@@ -314,7 +312,7 @@
     <ClCompile Include="Sprocket\Impl\CADModelImpl.cpp" />
     <ClCompile Include="Sprocket\Impl\CanvasImpl.cpp" />
     <ClCompile Include="Sprocket\Impl\ComponentImpl.cpp" />
-    <ClCompile Include="Sprocket\Impl\ComponentMarkupViewImpl.cpp" />
+    <ClCompile Include="Sprocket\Impl\MetaDataImpl.cpp" />
     <ClCompile Include="Sprocket\Impl\ModelImpl.cpp" />
     <ClCompile Include="Sprocket\Impl\ViewImpl.cpp" />
     <ClCompile Include="Sprocket\Sprocket.cpp" />

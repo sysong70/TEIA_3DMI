@@ -102,16 +102,16 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 	HPoint target, camera, view;
 	float fLength;
 
-	HPoint cPosition, cTarget, cUpVector;
-	float widtho, heighto;
-	char projection[MVO_BUFFER_SIZE];
+	HPoint cOldPosition, cOldTarget, cOldUpVector;
+	float fOldWidth, fOldHeight;
+	char chOldProjection[MVO_BUFFER_SIZE];
 
-	HPoint cn, tn, un;
-	float widthn, heightn;
-	char lprojection[MVO_BUFFER_SIZE];
+	HPoint cNewPosition, cNewTarget, cNewUpVector;
+	float fNewWidth, fNewHeight;
+	char chNewProjection[MVO_BUFFER_SIZE];
 
 	HC_Open_Segment_By_Key(GetSceneKey()); {
-		HC_PShow_Net_Camera(0, 0, &cPosition, &cTarget, &cUpVector, &widtho, &heighto, projection);
+		HC_PShow_Net_Camera(0, 0, &cOldPosition, &cOldTarget, &cOldUpVector, &fOldWidth, &fOldHeight, chOldProjection);
 	}HC_Close_Segment();
 
 	PrepareForCameraChange();
@@ -132,6 +132,7 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 		float fNewLen = fLength * 0.5774f;
 
 		HPoint rightaxis;
+		// m_FrontAxis, m_TopAxis 값은 HBaseView의 요소임
 		HC_Compute_Cross_Product(&m_FrontAxis, &m_TopAxis, &rightaxis);
 
 		if (GetHandedness() == HandednessRight) {
@@ -142,7 +143,7 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 		float py = target.y + fNewLen * m_FrontAxis.y - fNewLen * rightaxis.y + fNewLen * m_TopAxis.y;
 		float pz = target.z + fNewLen * m_FrontAxis.z - fNewLen * rightaxis.z + fNewLen * m_TopAxis.z;
 
-		float fCos45 = cos(M_PI / 4);
+		float fCos45 = cos(PI / 4);
 		float fLenCos = fLength * fCos45;
 
 		HVector cLenFrontAxis = m_FrontAxis * fLength;
@@ -162,7 +163,7 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0, 0, 1);
 				}
 				else {
-					cSetUpVector.Set(0, -cUpVector.z, cUpVector.y);
+					cSetUpVector.Set(0, -cOldUpVector.z, cOldUpVector.y);
 				}
 			} break;
 
@@ -172,7 +173,7 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0, 0, 1);
 				}
 				else {
-					cSetUpVector.Set(0, cUpVector.z, -cUpVector.y);
+					cSetUpVector.Set(0, cOldUpVector.z, -cOldUpVector.y);
 				}
 			} break;
 
@@ -182,7 +183,7 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0, 0, 1);
 				}
 				else {
-					cSetUpVector.Set(-cUpVector.z, 0, cUpVector.x);
+					cSetUpVector.Set(-cOldUpVector.z, 0, cOldUpVector.x);
 				}
 			} break;
 
@@ -192,7 +193,7 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0, 0, 1);
 				}
 				else {
-					cSetUpVector.Set(cUpVector.z, 0, -cUpVector.x);
+					cSetUpVector.Set(cOldUpVector.z, 0, -cOldUpVector.x);
 				}
 			} break;
 
@@ -202,7 +203,7 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0, 1, 0);
 				}
 				else {
-					cSetUpVector.Set(-cUpVector.y, cUpVector.x, 0);
+					cSetUpVector.Set(-cOldUpVector.y, cOldUpVector.x, 0);
 				}
 			} break;
 
@@ -212,7 +213,7 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0, 1, 0);
 				}
 				else {
-					cSetUpVector.Set(cUpVector.y, -cUpVector.x, 0);
+					cSetUpVector.Set(cOldUpVector.y, -cOldUpVector.x, 0);
 				}
 			} break;
 
@@ -222,16 +223,16 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0, fCos45, fCos45);
 				}
 				else {
-					if (1e-6 > fabs(cUpVector.y - fCos45)) {
+					if (1e-6 > fabs(cOldUpVector.y - fCos45)) {
 						cSetUpVector.Set(1, 0, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.x - 1)) {
+					else if (1e-6 > fabs(cOldUpVector.x - 1)) {
 						cSetUpVector.Set(0, -fCos45, -fCos45);
 					}
-					else if (1e-6 > fabs(cUpVector.y + fCos45)) {
+					else if (1e-6 > fabs(cOldUpVector.y + fCos45)) {
 						cSetUpVector.Set(-1, 0, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.x + 1)) {
+					else if (1e-6 > fabs(cOldUpVector.x + 1)) {
 						cSetUpVector.Set(0, fCos45, fCos45);
 					}
 				}
@@ -243,16 +244,16 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0, -fCos45, fCos45);
 				}
 				else {
-					if (1e-6 > fabs(cUpVector.y + fCos45)) {
+					if (1e-6 > fabs(cOldUpVector.y + fCos45)) {
 						cSetUpVector.Set(1, 0, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.x - 1)) {
+					else if (1e-6 > fabs(cOldUpVector.x - 1)) {
 						cSetUpVector.Set(0, fCos45, -fCos45);
 					}
-					else if (1e-6 > fabs(cUpVector.y - fCos45)) {
+					else if (1e-6 > fabs(cOldUpVector.y - fCos45)) {
 						cSetUpVector.Set(-1, 0, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.x + 1)) {
+					else if (1e-6 > fabs(cOldUpVector.x + 1)) {
 						cSetUpVector.Set(0, -fCos45, fCos45);
 					}
 				}
@@ -264,16 +265,16 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0, fCos45, fCos45);
 				}
 				else {
-					if (1e-6 > fabs(cUpVector.y - fCos45)) {
+					if (1e-6 > fabs(cOldUpVector.y - fCos45)) {
 						cSetUpVector.Set(-1, 0, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.x + 1)) {
+					else if (1e-6 > fabs(cOldUpVector.x + 1)) {
 						cSetUpVector.Set(0, -fCos45, -fCos45);
 					}
-					else if (1e-6 > fabs(cUpVector.y + fCos45)) {
+					else if (1e-6 > fabs(cOldUpVector.y + fCos45)) {
 						cSetUpVector.Set(1, 0, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.x - 1)) {
+					else if (1e-6 > fabs(cOldUpVector.x - 1)) {
 						cSetUpVector.Set(0, fCos45, fCos45);
 					}
 				}
@@ -285,16 +286,16 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0, -fCos45, fCos45);
 				}
 				else {
-					if (1e-6 > fabs(cUpVector.y + fCos45)) {
+					if (1e-6 > fabs(cOldUpVector.y + fCos45)) {
 						cSetUpVector.Set(-1, 0, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.x + 1)) {
+					else if (1e-6 > fabs(cOldUpVector.x + 1)) {
 						cSetUpVector.Set(0, fCos45, -fCos45);
 					}
-					else if (1e-6 > fabs(cUpVector.y - fCos45)) {
+					else if (1e-6 > fabs(cOldUpVector.y - fCos45)) {
 						cSetUpVector.Set(1, 0, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.x - 1)) {
+					else if (1e-6 > fabs(cOldUpVector.x - 1)) {
 						cSetUpVector.Set(0, -fCos45, fCos45);
 					}
 				}
@@ -306,16 +307,16 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(-fCos45, 0, fCos45);
 				}
 				else {
-					if (1e-6 > fabs(cUpVector.x + fCos45)) {
+					if (1e-6 > fabs(cOldUpVector.x + fCos45)) {
 						cSetUpVector.Set(0, 1, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.y - 1)) {
+					else if (1e-6 > fabs(cOldUpVector.y - 1)) {
 						cSetUpVector.Set(fCos45, 0, -fCos45);
 					}
-					else if (1e-6 > fabs(cUpVector.x - fCos45)) {
+					else if (1e-6 > fabs(cOldUpVector.x - fCos45)) {
 						cSetUpVector.Set(0, -1, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.y + 1)) {
+					else if (1e-6 > fabs(cOldUpVector.y + 1)) {
 						cSetUpVector.Set(-fCos45, 0, fCos45);
 					}
 				}
@@ -327,16 +328,16 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(fCos45, 0, fCos45);
 				}
 				else {
-					if (1e-6 > fabs(cUpVector.x - fCos45)) {
+					if (1e-6 > fabs(cOldUpVector.x - fCos45)) {
 						cSetUpVector.Set(0, 1, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.y - 1)) {
+					else if (1e-6 > fabs(cOldUpVector.y - 1)) {
 						cSetUpVector.Set(-fCos45, 0, -fCos45);
 					}
-					else if (1e-6 > fabs(cUpVector.x + fCos45)) {
+					else if (1e-6 > fabs(cOldUpVector.x + fCos45)) {
 						cSetUpVector.Set(0, -1, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.y + 1)) {
+					else if (1e-6 > fabs(cOldUpVector.y + 1)) {
 						cSetUpVector.Set(fCos45, 0, fCos45);
 					}
 				}
@@ -348,16 +349,16 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(-fCos45, 0, fCos45);
 				}
 				else {
-					if (1e-6 > fabs(cUpVector.x + fCos45)) {
+					if (1e-6 > fabs(cOldUpVector.x + fCos45)) {
 						cSetUpVector.Set(0, -1, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.y + 1)) {
+					else if (1e-6 > fabs(cOldUpVector.y + 1)) {
 						cSetUpVector.Set(fCos45, 0, -fCos45);
 					}
-					else if (1e-6 > fabs(cUpVector.x - fCos45)) {
+					else if (1e-6 > fabs(cOldUpVector.x - fCos45)) {
 						cSetUpVector.Set(0, 1, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.y - 1)) {
+					else if (1e-6 > fabs(cOldUpVector.y - 1)) {
 						cSetUpVector.Set(-fCos45, 0, fCos45);
 					}
 				}
@@ -369,16 +370,16 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(fCos45, 0, fCos45);
 				}
 				else {
-					if (1e-6 > fabs(cUpVector.x - fCos45)) {
+					if (1e-6 > fabs(cOldUpVector.x - fCos45)) {
 						cSetUpVector.Set(0, -1, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.y + 1)) {
+					else if (1e-6 > fabs(cOldUpVector.y + 1)) {
 						cSetUpVector.Set(-fCos45, 0, -fCos45);
 					}
-					else if (1e-6 > fabs(cUpVector.x + fCos45)) {
+					else if (1e-6 > fabs(cOldUpVector.x + fCos45)) {
 						cSetUpVector.Set(0, 1, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.y - 1)) {
+					else if (1e-6 > fabs(cOldUpVector.y - 1)) {
 						cSetUpVector.Set(fCos45, 0, fCos45);
 					}
 				}
@@ -390,16 +391,16 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0, 0, 1);
 				}
 				else {
-					if (1e-6 > fabs(cUpVector.z - 1)) {
+					if (1e-6 > fabs(cOldUpVector.z - 1)) {
 						cSetUpVector.Set(fCos45, fCos45, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.x - fCos45)) {
+					else if (1e-6 > fabs(cOldUpVector.x - fCos45)) {
 						cSetUpVector.Set(0, 0, -1);
 					}
-					else if (1e-6 > fabs(cUpVector.z + 1)) {
+					else if (1e-6 > fabs(cOldUpVector.z + 1)) {
 						cSetUpVector.Set(-fCos45, -fCos45, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.x + fCos45)) {
+					else if (1e-6 > fabs(cOldUpVector.x + fCos45)) {
 						cSetUpVector.Set(0, 0, 1);
 					}
 				}
@@ -411,16 +412,16 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0, 0, 1);
 				}
 				else {
-					if (1e-6 > fabs(cUpVector.z - 1)) {
+					if (1e-6 > fabs(cOldUpVector.z - 1)) {
 						cSetUpVector.Set(fCos45, -fCos45, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.x - fCos45)) {
+					else if (1e-6 > fabs(cOldUpVector.x - fCos45)) {
 						cSetUpVector.Set(0, 0, -1);
 					}
-					else if (1e-6 > fabs(cUpVector.z + 1)) {
+					else if (1e-6 > fabs(cOldUpVector.z + 1)) {
 						cSetUpVector.Set(-fCos45, fCos45, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.x + fCos45)) {
+					else if (1e-6 > fabs(cOldUpVector.x + fCos45)) {
 						cSetUpVector.Set(0, 0, 1);
 					}
 				}
@@ -432,16 +433,16 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0, 0, 1);
 				}
 				else {
-					if (1e-6 > fabs(cUpVector.z - 1)) {
+					if (1e-6 > fabs(cOldUpVector.z - 1)) {
 						cSetUpVector.Set(-fCos45, -fCos45, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.x + fCos45)) {
+					else if (1e-6 > fabs(cOldUpVector.x + fCos45)) {
 						cSetUpVector.Set(0, 0, -1);
 					}
-					else if (1e-6 > fabs(cUpVector.z + 1)) {
+					else if (1e-6 > fabs(cOldUpVector.z + 1)) {
 						cSetUpVector.Set(fCos45, fCos45, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.x - fCos45)) {
+					else if (1e-6 > fabs(cOldUpVector.x - fCos45)) {
 						cSetUpVector.Set(0, 0, 1);
 					}
 				}
@@ -453,16 +454,16 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0, 0, 1);
 				}
 				else {
-					if (1e-6 > fabs(cUpVector.z - 1)) {
+					if (1e-6 > fabs(cOldUpVector.z - 1)) {
 						cSetUpVector.Set(-fCos45, fCos45, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.x + fCos45)) {
+					else if (1e-6 > fabs(cOldUpVector.x + fCos45)) {
 						cSetUpVector.Set(0, 0, -1);
 					}
-					else if (1e-6 > fabs(cUpVector.z + 1)) {
+					else if (1e-6 > fabs(cOldUpVector.z + 1)) {
 						cSetUpVector.Set(fCos45, -fCos45, 0);
 					}
-					else if (1e-6 > fabs(cUpVector.y - 1)) {
+					else if (1e-6 > fabs(cOldUpVector.y - 1)) {
 						cSetUpVector.Set(0, 0, 1);
 					}
 				}
@@ -474,7 +475,7 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(-0.408248f, 0.408248f, 0.816497f);
 				}
 				else {
-					cSetUpVector.Set(cUpVector.z, -cUpVector.x, -cUpVector.y);
+					cSetUpVector.Set(cOldUpVector.z, -cOldUpVector.x, -cOldUpVector.y);
 				}
 			} break;
 
@@ -484,7 +485,7 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0.408248f, -0.408248f, 0.816497f);
 				}
 				else {
-					cSetUpVector.Set(-cUpVector.y, cUpVector.z, -cUpVector.x);
+					cSetUpVector.Set(-cOldUpVector.y, cOldUpVector.z, -cOldUpVector.x);
 				}
 			} break;
 
@@ -494,7 +495,7 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0.408248f, 0.408248f, 0.816497f);
 				}
 				else {
-					cSetUpVector.Set(-cUpVector.z, cUpVector.x, -cUpVector.y);
+					cSetUpVector.Set(-cOldUpVector.z, cOldUpVector.x, -cOldUpVector.y);
 				}
 			} break;
 
@@ -504,7 +505,7 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(-0.408248f, -0.408248f, 0.816497f);
 				}
 				else {
-					cSetUpVector.Set(cUpVector.y, cUpVector.z, cUpVector.x);
+					cSetUpVector.Set(cOldUpVector.y, cOldUpVector.z, cOldUpVector.x);
 				}
 			} break;
 
@@ -514,7 +515,7 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(-0.408248f, -0.408248f, 0.816497f);
 				}
 				else {
-					cSetUpVector.Set(cUpVector.z, cUpVector.x, cUpVector.y);
+					cSetUpVector.Set(cOldUpVector.z, cOldUpVector.x, cOldUpVector.y);
 				}
 			} break;
 
@@ -524,7 +525,7 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0.408248f, 0.408248f, 0.816497f);
 				}
 				else {
-					cSetUpVector.Set(cUpVector.y, -cUpVector.z, -cUpVector.x);
+					cSetUpVector.Set(cOldUpVector.y, -cOldUpVector.z, -cOldUpVector.x);
 				}
 
 			} break;
@@ -535,7 +536,7 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(0.408248f, -0.408248f, 0.816497f);
 				}
 				else {
-					cSetUpVector.Set(-cUpVector.z, -cUpVector.x, cUpVector.y);
+					cSetUpVector.Set(-cOldUpVector.z, -cOldUpVector.x, cOldUpVector.y);
 				}
 
 			} break;
@@ -546,7 +547,7 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 					cSetUpVector.Set(-0.408248f, 0.408248f, 0.816497f);
 				}
 				else {
-					cSetUpVector.Set(-cUpVector.y, -cUpVector.z, cUpVector.x);
+					cSetUpVector.Set(-cOldUpVector.y, -cOldUpVector.z, cOldUpVector.x);
 				}
 
 			} break;
@@ -559,13 +560,13 @@ void H3DF::BaseView::SetViewDirection(H3DF::ViewDirection::Mode eViewMode, bool 
 		HC_Set_Camera_Position(cSetPosition.x, cSetPosition.y, cSetPosition.z);
 		HC_Set_Camera_Up_Vector(cSetUpVector.x, cSetUpVector.y, cSetUpVector.z);
 
-		HC_Show_Net_Camera(&cn, &tn, &un, &widthn, &heightn, lprojection);
+		HC_Show_Net_Camera(&cNewPosition, &cNewTarget, &cNewUpVector, &fNewWidth, &fNewHeight, chNewProjection);
 
 	} HC_Close_Segment();
 
 
 	if (GetSmoothTransition()) {
-		HUtility::SmoothTransition(cPosition, cTarget, cUpVector, widtho, heighto, cn, tn, un, widthn, heightn, this);
+		HUtility::SmoothTransition(cOldPosition, cOldTarget, cOldUpVector, fOldWidth, fOldHeight, cNewPosition, cNewTarget, cNewUpVector, fNewWidth, fNewHeight, this);
 	}
 	else {
 		if (GetModel()->GetContainsDouble()) {

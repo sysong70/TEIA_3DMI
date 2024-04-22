@@ -5,6 +5,8 @@
 #include "SegmentImpl.h"
 #include "../Segment.h"
 
+#include "../Bounding.h"
+
 using namespace H3DF;
 
 void H3DF::SegmentKeyImpl::Copy(SegmentKeyImpl * pcInThat)
@@ -14,6 +16,10 @@ void H3DF::SegmentKeyImpl::Copy(SegmentKeyImpl * pcInThat)
 	m_bOpen = pcInThat->m_bOpen;
 	m_bForcedOpen = pcInThat->m_bForcedOpen;
 	m_pcBaseView = pcInThat->m_pcBaseView;
+
+	if (nullptr != pcInThat->m_pcBoundingKit) {
+		m_pcBoundingKit = new BoundingKit(*pcInThat->m_pcBoundingKit);
+	}
 }
 
 //== Segment 관련 함수 ===============================================================================

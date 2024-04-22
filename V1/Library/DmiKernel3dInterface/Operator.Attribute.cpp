@@ -151,7 +151,10 @@ void KERNEL::Operator::AttributeImpl::SetShowComponent(H3DF::Component & cInComp
 		}
 	}
 
-	if (true == cInComponent.GetSubComponents().empty()) {
+	ComponentArray * paSubComponents = cInComponent.GetSubComponents();
+
+	// 하부 아이템이 없는 경우 처리
+	if (nullptr == paSubComponents) {
 		SegmentKey cSegment(cInComponent.GetSegmentKey());
 
 		CStringA strName = cSegment.Name();
@@ -186,13 +189,14 @@ void KERNEL::Operator::AttributeImpl::SetShowComponent(H3DF::Component & cInComp
 				cInComponent.AddStatus(H3DF::Component::NoShow);
 			}
 		}
+
+		return;
 	}
 
-	for (H3DF::Component * pcSubComponent : cInComponent.GetSubComponents()) {
+	for (H3DF::Component * pcComponent : *paSubComponents) {
 		// Sub Component가 없으면 NoShow로 변경
-	
 		if (true == bRecursive) {
-			SetShowComponent(*pcSubComponent, bShowFlag, bRecursive);
+			SetShowComponent(*pcComponent, bShowFlag, bRecursive);
 		}
 	}
 }
@@ -210,8 +214,12 @@ void KERNEL::Operator::AttributeImpl::ResetShowComponent(H3DF::Component & cInCo
 	SetShowComponent(cInComponent, bShowFlag, false);
 
 	if (true == bRecursive) {
-		for (H3DF::Component * pcSubComponent : cInComponent.GetSubComponents()) {
-			ResetShowComponent(*pcSubComponent, bRecursive);
+		ComponentArray * pcSubComponents = cInComponent.GetSubComponents();
+
+		if (nullptr != pcSubComponents) {
+			for (H3DF::Component * pcSubComponent : *pcSubComponents) {
+				ResetShowComponent(*pcSubComponent, bRecursive);
+			}
 		}
 	}
 }

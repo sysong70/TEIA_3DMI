@@ -5,7 +5,11 @@
 #include "Math.h"
 #include "Point.h"
 
+#include "Segment.h"
+#include "./Impl/SegmentImpl.h"
+
 #include "Impl/KeyImpl.h"
+#include "Impl/ControlImpl.h"
 
 #include <HTools.h>
 
@@ -26,15 +30,15 @@ namespace H3DF
 			bTargetFlag = pcInThat->bTargetFlag;
 		}
 
-		Vector cUpVector; bool bUpVectorFlag = false;
 		Point cPosition; bool bPositionFlag = false;
 		Point cTarget; bool bTargetFlag = false;
-		Camera::Projection eType = Camera::Projection::Default;  bool bTypeFlag = false;
-		float fOblique_Y_Skew = 0.0f; bool bOblique_Y_SkewFlag = false;
-		float fOblique_X_Skew = 0.0f; bool bOutOblique_X_SkewFlag = false;
+		Vector cUpVector; bool bUpVectorFlag = false;
 		float fWidth = 0.0f; bool bWidthFlag = false;
 		float fHeight = 0.0f; bool bHeightFlag = false;
 		float fNearLimit = 0.0f; bool bNearLimitFlag = false;
+		Camera::Projection eType = Camera::Projection::Default;  bool bTypeFlag = false;
+		float fOblique_Y_Skew = 0.0f;
+		float fOblique_X_Skew = 0.0f;
 	};
 }
 
@@ -96,10 +100,7 @@ CameraKit & H3DF::CameraKit::SetProjection(Camera::Projection eInType, float fIn
 	pcImpl->bTypeFlag = true;
 
 	pcImpl->fOblique_Y_Skew = fInOblique_Y_Skew;
-	pcImpl->bOblique_Y_SkewFlag = true;
-
 	pcImpl->fOblique_X_Skew = fInOblique_X_Skew;
-	pcImpl->bOutOblique_X_SkewFlag = true;
 
 	return *this;
 }
@@ -204,14 +205,6 @@ bool H3DF::CameraKit::ShowProjection(Camera::Projection & eOutType, float & fOut
 		return false;
 	}
 
-	if (false == pcImpl->bOblique_Y_SkewFlag) {
-		return false;
-	}
-
-	if (false == pcImpl->bOutOblique_X_SkewFlag) {
-		return false;
-	}
-
 	eOutType = pcImpl->eType;
 	fOutOblique_Y_Skew = pcImpl->fOblique_Y_Skew;
 	fOutOblique_X_Skew = pcImpl->fOblique_X_Skew;
@@ -282,7 +275,7 @@ bool H3DF::CameraKit::ShowMatrix(MatrixKit & cMatrix) const
 	if (false == pcImpl->bUpVectorFlag) {
 		return false;
 	}
-	
+
 	if (false == pcImpl->bPositionFlag) {
 		return false;
 	}
@@ -313,9 +306,144 @@ bool H3DF::CameraKit::ShowMatrix(MatrixKit & cMatrix) const
 	cMatrix[2][1] = cViewNormal.y;
 	cMatrix[2][2] = cViewNormal.z;
 
- 	cMatrix[3][0] = cTarget.x;
- 	cMatrix[3][1] = cTarget.y;
- 	cMatrix[3][2] = cTarget.z;
+	cMatrix[3][0] = cTarget.x;
+	cMatrix[3][1] = cTarget.y;
+	cMatrix[3][2] = cTarget.z;
 
 	return true;
+}
+
+//
+namespace H3DF
+{
+	class CameraControlImpl : public ControlImpl
+	{
+	public:
+		CameraControlImpl() { m_eType = H3DF::Type::CameraControl; }
+
+		void Copy(CameraControlImpl * pcInThat) {
+			ControlImpl::Copy(pcInThat);
+		}
+	};
+}
+
+//== CameraControl Class ============================================================================
+H3DF::CameraControl::CameraControl(SegmentKey & cInSegmentKey)
+{
+	CameraControlImpl * pcImpl = new CameraControlImpl();
+	pcImpl->m_cOverrideKey = cInSegmentKey;
+
+	m_pcImpl = pcImpl;
+}
+
+H3DF::CameraControl::CameraControl(CameraControl const & cInThat)
+{
+	m_pcImpl = new CameraControlImpl();
+	Set(cInThat);
+}
+
+void H3DF::CameraControl::Set(CameraControl const & cInThat)
+{
+	CameraControlImpl * pcImpl = (CameraControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	CameraControlImpl * pcInThatImpl = (CameraControlImpl *)cInThat.m_pcImpl;
+	DEBUG_VALID(pcInThatImpl);
+
+	pcImpl->Copy(pcInThatImpl);
+}
+
+CameraControl & H3DF::CameraControl::operator = (CameraControl const & cInThat)
+{
+	Set(cInThat);
+	return *this;
+}
+
+CameraControl & H3DF::CameraControl::SetUpVector(Vector const & cInUp)
+{
+	CameraControlImpl * pcImpl = (CameraControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		HC_Set_Camera_Up_Vector(cInUp.x, cInUp.y, cInUp.z);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+
+CameraControl & H3DF::CameraControl::SetPosition(Point const & cInPosition)
+{
+	CameraControlImpl * pcImpl = (CameraControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		HC_Set_Camera_Position(cInPosition.x, cInPosition.y, cInPosition.z);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+CameraControl & H3DF::CameraControl::SetTarget(Point const & cInTarget)
+{
+	CameraControlImpl * pcImpl = (CameraControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		HC_Set_Camera_Target(cInTarget.x, cInTarget.y, cInTarget.z);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+CameraControl & H3DF::CameraControl::SetProjection(Camera::Projection eInType, float fInObliqueXSkew, float fInObliqueYSkew)
+{
+	CameraControlImpl * pcImpl = (CameraControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		CStringA strProjectionType;
+		if (Camera::Projection::Orthographic == eInType) {
+			strProjectionType = "orthographic";
+		}
+		else if (Camera::Projection::Perspective == eInType) {
+			strProjectionType = "perspective";
+		}
+		else if (Camera::Projection::Stretched == eInType) {
+			strProjectionType = "stretched";
+		}
+
+		if (0.0f != fInObliqueXSkew || 0.0f != fInObliqueYSkew) {
+			strProjectionType.Format("oblique %s = (%f, %f)", strProjectionType, fInObliqueXSkew, fInObliqueYSkew);
+		}
+
+		HC_Set_Camera_Projection(strProjectionType);
+
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+CameraControl & H3DF::CameraControl::SetField(float fInWidth, float fInHeight)
+{
+	CameraControlImpl * pcImpl = (CameraControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		HC_Set_Camera_Field(fInWidth, fInHeight);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+CameraControl & H3DF::CameraControl::SetNearLimit(float fInLimit)
+{
+	CameraControlImpl * pcImpl = (CameraControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		HC_Set_Camera_Near_Limit(fInLimit);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
 }

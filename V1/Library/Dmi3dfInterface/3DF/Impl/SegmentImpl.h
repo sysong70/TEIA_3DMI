@@ -52,9 +52,11 @@ namespace H3DF
 		BaseView * GetBaseView() const;
 		void SetBaseView(BaseView * pcInBaseView);
 
+		BoundingKit * m_pcBoundingKit = nullptr;
+
 	private:
 		BaseView * m_pcBaseView = nullptr;
-
+	
 		mutable bool m_bOpen = false;
 		mutable bool m_bForcedOpen = false; // 개발자가 직접 Open해서 Close를 제어한다. 일반적인 Open과 Close는 적용되지 않는다.
 	};

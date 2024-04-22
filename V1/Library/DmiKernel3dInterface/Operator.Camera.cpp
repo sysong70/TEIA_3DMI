@@ -12,12 +12,15 @@
 
 #include <Sprocket/3DF.View.h>
 #include <3DF/Window.h>
+#include <3DF/Bounding.h>
+#include <3DF/Camera.h>
 #include <3DF/VisualEffects.h>
 #include <3DF/Facility.AppOptions.h>
 #include <3DF/3DF.Operator.CameraControl.h>
 
 #include <Json.h>
 
+using namespace H3DF;
 using namespace KERNEL;
 
 namespace KERNEL
@@ -210,3 +213,64 @@ void KERNEL::Operator::Camera::FitWorldOnly()
 	pcImpl->CameraControl().FitWorld();
 }
 
+void KERNEL::Operator::Camera::SetCamera(H3DF::CameraKit & cInCamera)
+{
+	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->CameraControl().SetCamera(cInCamera);
+}
+
+void KERNEL::Operator::Camera::SetCameraFitSelection(H3DF::MatrixKit & cInMatrix, H3DF::SegmentKey & cInSegment)
+{
+	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	// pcImpl->CameraControl().SetCameraFitSelection(cInMatrix, cInSegment);
+
+	H3DF::BoundingKit cBounding;
+	if (false == cInSegment.ShowBounding(cBounding)) {
+		DEBUG_STOP;
+		return;
+	}
+
+	H3DF::SimpleSphere cSphere;
+	H3DF::SimpleCuboid cCuboid;
+	if (false == cBounding.ShowVolume(cSphere, cCuboid)) {
+		DEBUG_STOP;
+		return;
+	}
+
+	H3DF::Point cCenter = (cCuboid.cMax + cCuboid.cMin) / 2.0;
+	H3DF::Vector cVector = cCuboid.cMax - cCuboid.cMin;
+	double dLength = cVector.Length();
+
+	// 카메라의 위치를 설정한다
+
+	// 카메라가 놓이는 위치 설정
+	//Point cCameraPosition = cCenter;
+	H3DF::Point cCameraPosition = cCenter + cInMatrix.ZAxis() * (dLength * 2.5);
+	// 카메라가 바라보는 방향 설정. Matrix Z축의 반대 방향으로 설정한다.
+	//Point cCameraTarget = cCenter - cInMatrix.ZAxis() * dLength;
+	H3DF::Point cCameraTarget = cCenter;
+
+	H3DF::CameraKit cCamera;
+	cCamera.SetTarget(cCameraTarget);
+	cCamera.SetPosition(cCameraPosition);
+	cCamera.SetUpVector(cInMatrix.YAxis());
+	cCamera.SetField(dLength, dLength);
+
+	pcImpl->View().SmoothTransition(cCamera);
+
+/*
+	H3DF::SegmentKey cScene(pcImpl->GetBaseView()->GetSceneKey());
+
+	H3DF::CameraControl cCamerCtrl = cScene.GetCameraControl();
+
+	cCamerCtrl.SetTarget(cCameraTarget);
+	cCamerCtrl.SetPosition(cCameraPosition);
+	// 화면상에서 위쪽을 가리키는 방향.
+	cCamerCtrl.SetUpVector(cInMatrix.YAxis());
+	cCamerCtrl.SetField(dLength, dLength);
+*/
+}

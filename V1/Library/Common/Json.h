@@ -75,6 +75,8 @@ namespace Json
 		Object& GetObject(int i);
 
 		double GetReal(int i);
+		// sysong: 2024-04-18 추가
+		double GetRealRaw(int i);
 
 		CString& GetString(int i);
 
@@ -85,6 +87,9 @@ namespace Json
 		void AddInteger(int value);
 
 		void AddReal(double value);
+		// sysong: 2024-04-18 추가
+		void AddRealRaw(double value);
+
 		// add string value and return reference
 		CString& AddString();
 

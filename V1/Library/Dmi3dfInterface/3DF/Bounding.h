@@ -1,19 +1,50 @@
 ﻿#pragma once
 
-#include "3DF.h"
+#include "Kit.h"
+#include "Control.h"
 
-OPEN_3DF_NAMESPACE
+#include "Math.h"
 
-class API_3DF BoundingKit
+namespace H3DF
 {
-public:
-	BoundingKit() {}
+	class API_3DF BoundingKit : public H3DF::Kit
+	{
+	public:
+		BoundingKit();
+		BoundingKit(BoundingKit const & cInThat);
 
-	BoundingKit & SetExclusion(bool bInExclude);
-	bool ShowExclusion(bool & bOutEexclusion) const; 
+		void Set(BoundingKit const & cInThat);
+		BoundingKit & operator = (BoundingKit const & cInThat);
 
-private:
-	bool m_bExclude = false;
-};
+		H3DF::Type ObjectType() const { return H3DF::Type::BoundingKit; };
 
-CLOSE_3DF_NAMESPACE
+		bool Empty() const;
+
+		bool Equals(BoundingKit const & cInKit) const;
+		bool operator == (BoundingKit const & cInKit) const;
+		bool operator != (BoundingKit const & cInKit) const;
+
+		BoundingKit & SetVolume(SimpleSphere const & cInSphere);
+		BoundingKit & SetVolume(SimpleCuboid const & cInCuboid);
+		BoundingKit & SetExclusion(bool bInExclude);
+
+		BoundingKit & UnsetVolume();
+		BoundingKit & UnsetExclusion();
+		BoundingKit & UnsetEverything();
+
+		bool ShowVolume(SimpleSphere & cOutSphere, SimpleCuboid & cOutCuboid) const;
+
+		bool ShowExclusion(bool & bOutEexclusion) const;
+	};
+
+	class API_3DF BoundingControl : public Control {
+	public:
+		explicit BoundingControl(SegmentKey & cInSegmentKey);
+		BoundingControl(BoundingControl const & cInThat);
+
+		void Set(BoundingControl const & cInThat);
+		BoundingControl & operator = (BoundingControl const & cInThat);
+
+		H3DF::Type ObjectType() const {	return H3DF::Type::BoundingControl; }
+	};
+}

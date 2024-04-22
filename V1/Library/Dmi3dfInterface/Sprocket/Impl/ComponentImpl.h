@@ -19,7 +19,7 @@ namespace H3DF
 
 		CString TypeName();
 
-		void AddSubComponent(Component & cInSubComponent);
+		void AddSubComponent(Component & cInSubCompnent);
 
 		HC_KEY m_nSegmentKey = INVALID_KEY;
 		HC_KEY m_nIncludeKey = INVALID_KEY;
@@ -27,11 +27,12 @@ namespace H3DF
 		Component::Type m_eType = Component::Type::None;
 		
 		DWORD m_nStatus = Component::Status::None;
-
+		
 		Component * m_pcOwner = nullptr;
-		ComponentArray * m_pvSubComponents = nullptr;
 
 		CString * m_pstrName = nullptr;
+		ComponentArray * m_pvSubComponents = nullptr;
+		MetadataArray * m_pvMetaDatas = nullptr;
 
 		//== Utility Functions =====================================================================
 		static bool SetData(Component & cInComponent, CString strInName, HC_KEY nKey, HC_KEY nIncludeKey, Component::Type eInType = Component::Type::None);
@@ -42,5 +43,6 @@ namespace H3DF
 
 		static bool ClonedParentPartDefinition(Component & cInComponent);
 		static bool ClonedComponent(Component & cInComponent, Component & cInOwnerComponent, bool bDeleteInclude);
+
 	};
 }

@@ -19,6 +19,7 @@
 #include <3DF/LineAttribute.h>
 #include <3DF/Polygon.h>
 #include <3DF/Bounding.h>
+#include <3DF/Camera.h>
 
 #include <3DF/Math.Matrix.h>
 
@@ -29,6 +30,7 @@
 #include <3DF/3DF.Utility.h>
 
 #include <Sprocket/Impl/CADModelImpl.h>
+#include <Sprocket/3DF.MetaData.h>
 
 #include <WStr.h>
 
@@ -51,10 +53,21 @@
 
 // #define A3D_DRAW_WITH_INDICES
 
+#define DEFAULT_OFFSET {\
+	pdData += *(pnStart + 1); \
+	pnStart += (nCount + 1);\
+}
+
+#define MAKE_OFFSET(CountInt, CountFloats) {\
+	pdData += CountFloats;\
+	pnStart += (CountInt + 1);\
+}
+
 #define NOSHOW_CONDITION		"noshow"
 
 using namespace std::chrono;
 
+/*
 #define CHECK_A3D_RETURN(FunctionCall)\
 {\
 	const A3DStatus iRet__ = FunctionCall;\
@@ -68,6 +81,7 @@ using namespace std::chrono;
 		return iRet__;\
 	}\
 }
+*/
 
 #define PI 3.1415926535897932384626433832795028841971693993751
 
@@ -88,6 +102,7 @@ TdfImport::~TdfImport()
 bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSegment, H3DF::CADModel & cInCADModel, Signal::Delivery & cInDelivery, CString & strErrorMessage)
 {
 	if (false == InitializeA3DLibrary(strErrorMessage)) {
+		cInDelivery.progress.AddLog(Signal::Progress::Status::Fail, strErrorMessage);
 		return false;
 	}
 
@@ -1637,15 +1652,116 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 		A3D_INITIALIZE_DATA(A3DMkpViewData, cViewData);
 		CHECK_A3D_RETURN(A3DMkpViewGet(pcView, &cViewData));
 
+		CString strViewName;
+		GetName(pcView, strViewName);
+
+		
+		H3DF::Component * pcViewGroupComponent = nullptr;
+
+		if (false == cViewData.m_bIsAnnotationView) {
+			pcViewGroupComponent = GetViewGroupComponent(cParentComp);
+			if (nullptr == pcViewGroupComponent) {
+				DEBUG_STOP;
+				return A3D_ERROR;
+			}
+		}
+		else {
+			pcViewGroupComponent = GetAnnotationViewGroupComponent(cParentComp);
+			if (nullptr == pcViewGroupComponent) {
+				DEBUG_STOP;
+				return A3D_ERROR;
+			}
+		}
+
+		SegmentKey cViewGroupSegment(pcViewGroupComponent->GetSegmentKey());
+
+		H3DF::SegmentKey cSegment = m_cPmiIncludeSegment.Subsegment("view%d", m_nMarkupId++);
+		IncludeKey cInclude = cViewGroupSegment.IncludeSegment(cSegment);
+
+		cSegment.GetVisibilityControl().SetEverything(false);
+
+		// #CADModel: PMI 추가
+		H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, strViewName, H3DF::Component::Type::ExchangeMkpView, *pcViewGroupComponent);
+
+		if (nullptr != cViewData.m_pPlane) {
+			A3DSurfPlaneData cData;
+			A3D_INITIALIZE_DATA(A3DSurfPlaneData, cData);
+			if (A3D_SUCCESS == A3DSurfPlaneGet(cViewData.m_pPlane, &cData)) {
+				H3DF::MatrixKit * pcMatrix = new H3DF::MatrixKit();
+
+				Point cOrigin;
+				cOrigin.x = cData.m_sTrsf.m_sOrigin.m_dX;
+				cOrigin.y = cData.m_sTrsf.m_sOrigin.m_dY;
+				cOrigin.z = cData.m_sTrsf.m_sOrigin.m_dY;
+
+				Vector cXAxis;
+				cXAxis.x = cData.m_sTrsf.m_sXVector.m_dX;
+				cXAxis.y = cData.m_sTrsf.m_sXVector.m_dY;
+				cXAxis.z = cData.m_sTrsf.m_sXVector.m_dZ;
+
+				Vector cYAxis;
+				cYAxis.x = cData.m_sTrsf.m_sYVector.m_dX;
+				cYAxis.y = cData.m_sTrsf.m_sYVector.m_dY;
+				cYAxis.z = cData.m_sTrsf.m_sYVector.m_dZ;
+
+				Vector cZAxis = cXAxis.Cross(cYAxis);
+
+				pcMatrix->SetOrigin(cOrigin);
+				pcMatrix->SetXAxis(cXAxis);
+				pcMatrix->SetYAxis(cYAxis);
+				pcMatrix->SetZAxis(cZAxis);
+
+				H3DF::DwordPtrMetaData * pcMetaData = new H3DF::DwordPtrMetaData(H3DF::MetaDataIndex::Camera, (DWORD_PTR)pcMatrix);
+				pcComponent->AddMetaData(pcMetaData);
+			}
+
+			//CString strJsonText = Dmi3dx::GetJsonString(cViewData.m_pPlane);
+// 			H3DF::StringMetaData * pcMetaData = new H3DF::StringMetaData(H3DF::MetaDataIndex::PlaneString, strJsonText);
+// 			pcComponent->AddMetadata(pcMetaData, true);
+
+			H3DF::CameraKit * pcCamera = new H3DF::CameraKit();
+			
+/*
+			pcCamera->SetTarget()
+
+			Point cPosition = pcImpl->cPosition;
+			Point cTarget = pcImpl->cTarget;
+			Vector cViewNormal = cPosition - cTarget;
+			cViewNormal.Normalize();
+
+			Vector cYAxis = pcImpl->cUpVector;
+			cYAxis.Normalize();
+
+			Vector cXAxis = cYAxis.Cross(cViewNormal);
+
+			cMatrix[0][0] = cXAxis.x;
+			cMatrix[0][1] = cXAxis.y;
+			cMatrix[0][2] = cXAxis.z;
+
+			cMatrix[1][0] = cYAxis.x;
+			cMatrix[1][1] = cYAxis.y;
+			cMatrix[1][2] = cYAxis.z;
+
+			cMatrix[2][0] = cViewNormal.x;
+			cMatrix[2][1] = cViewNormal.y;
+			cMatrix[2][2] = cViewNormal.z;
+
+			cMatrix[3][0] = cTarget.x;
+			cMatrix[3][1] = cTarget.y;
+			cMatrix[3][2] = cTarget.z;
+*/
+
+		}
+
 #ifdef USED_LOG_MANAGER
 		LogMkpViewData((A3DMkpView *)pcView, cViewData);
 		LogIncreaseTabIndex(2);
 		Log(2, "Annotations Size: %d", cViewData.m_uiAnnotationsSize);
 #endif
 
-// 		for (A3DUns32 nIndex = 0; nIndex < cViewData.m_uiAnnotationsSize; nIndex++) {
-// 			CHECK_A3D_RETURN(ParseAnnotation(cViewData.m_ppAnnotations[nIndex], pcAttr, cParentSegment, cParentComp));
-// 		}
+		for (A3DUns32 nIndex = 0; nIndex < cViewData.m_uiAnnotationsSize; nIndex++) {
+			CHECK_A3D_RETURN(ParseAnnotation(cViewData.m_ppAnnotations[nIndex], pcAttr, cSegment, *pcComponent, true));
+		}
 
 #ifdef USED_LOG_MANAGER
 		LogDecreaseTabIndex(2);
@@ -1660,6 +1776,61 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 	return iRet;
 }
 
+// 5-1. View를 Group으로 처리하기 위해서, Parent Component에서 View Group을 검색하고, 없으면 생성한다.
+// Segment도 "grpview"로 생성한다.
+H3DF::Component * TdfImport::GetViewGroupComponent(H3DF::Component & cInParentComp)
+{
+	H3DF::ComponentArray * paSubComponentArray = cInParentComp.GetSubComponents();
+
+	if (nullptr != paSubComponentArray) {
+		for (auto * pcComponent : *paSubComponentArray) {
+			if (H3DF::Component::Type::ViewGroupComponent == pcComponent->GetType()) {
+				return pcComponent;
+			}
+		}
+	}
+
+	// Parent Component에 PMI Group을 생성.
+	SegmentKey cParentSegment(cInParentComp.GetSegmentKey());
+
+	SegmentKey cSegment = m_cPmiIncludeSegment.Subsegment("grpview%d", m_nMarkupId++);
+	IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
+
+	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, "View", H3DF::Component::Type::ViewGroupComponent, cInParentComp);
+	return pcComponent;
+}
+
+// 5-2. View중에서 Annotation View를 Group으로 처리하기 위해서, Parent Component에서 Annotation View Group을 검색하고, 없으면 생성한다.
+// Segment도 "anogrpview"로 생성한다.
+H3DF::Component * TdfImport::GetAnnotationViewGroupComponent(H3DF::Component & cInParentComp)
+{
+	H3DF::Component * pcViewGroupComp = GetViewGroupComponent(cInParentComp);
+	if (nullptr == pcViewGroupComp) {
+		DEBUG_STOP;
+		return nullptr;
+	}
+
+	H3DF::ComponentArray * paSubComponentArray = pcViewGroupComp->GetSubComponents();
+
+	if (nullptr != paSubComponentArray) {
+		for (auto * pcComponent : *paSubComponentArray) {
+			if (H3DF::Component::Type::AnnotationViewGroupComponent == pcComponent->GetType()) {
+				return pcComponent;
+			}
+		}
+	}
+
+	// Parent Component에 PMI Group을 생성.
+	SegmentKey cParentSegment(pcViewGroupComp->GetSegmentKey());
+
+	SegmentKey cSegment = m_cPmiIncludeSegment.Subsegment("anogrpview%d", m_nMarkupId++);
+	IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
+
+	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, "Annotation View", H3DF::Component::Type::AnnotationViewGroupComponent, *pcViewGroupComp);
+	return pcComponent;
+}
+
+
 // 6. 복수의 Annotation을 그리는 함수
 A3DStatus TdfImport::ParseAnnotations(A3DMkpAnnotationEntity ** pcAnnotation, A3DUns32 nAnnotationsSize, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp)
 {
@@ -1673,7 +1844,7 @@ A3DStatus TdfImport::ParseAnnotations(A3DMkpAnnotationEntity ** pcAnnotation, A3
 	A3DMiscCascadedAttributesCreate(&pcAttr);
 
 	for (unsigned int i = 0; i < nAnnotationsSize; i++) {
-		ParseAnnotation(pcAnnotation[i], pcAttr, cParentSegment, cParentComp);
+		ParseAnnotation(pcAnnotation[i], pcAttr, cParentSegment, cParentComp, false);
 	}
 
 	LogDecreaseTabIndex(2);
@@ -1682,7 +1853,7 @@ A3DStatus TdfImport::ParseAnnotations(A3DMkpAnnotationEntity ** pcAnnotation, A3
 }
 
 // 6-1. Annotation을 그리는 함수
-A3DStatus TdfImport::ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation, A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp)
+A3DStatus TdfImport::ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation, A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp, bool bAddChildToParentComp)
 {
 	A3DEEntityType eType;
 	A3DEntityGetType(pcAnnotation, &eType);
@@ -1709,7 +1880,7 @@ A3DStatus TdfImport::ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation
 			A3DMiscCascadedAttributesData sMarkupAttribData;
 			CreateAndPushCascadedAttributes(sData.m_pMarkup, pcAttrs, &pcMarkupAttr, &sMarkupAttribData);
 
-			ParseMarkup(sData.m_pMarkup, &sMarkupAttribData, cParentSegment, cParentComp);
+			ParseMarkup(sData.m_pMarkup, &sMarkupAttribData, cParentSegment, cParentComp, bAddChildToParentComp);
 
 /*
 			HC_KEY tester = 0;
@@ -1740,7 +1911,7 @@ A3DStatus TdfImport::ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation
 			CHECK_A3D_RETURN(A3DMkpAnnotationSetGet(pcAnnotation, &sData));
 
 			for (A3DUns32 i = 0; i < sData.m_uiAnnotationsSize; ++i) {
-				ParseAnnotation(sData.m_ppAnnotations[i], pcAttrs, cParentSegment, cParentComp);
+				ParseAnnotation(sData.m_ppAnnotations[i], pcAttrs, cParentSegment, cParentComp, bAddChildToParentComp);
 			}
 
 			A3DMkpAnnotationSetGet(nullptr, &sData);
@@ -1862,10 +2033,13 @@ A3DStatus TdfImport::ParseMarkupLinkedItem(A3DMiscMarkupLinkedItem * pcInLinkedI
 }
 
 // 7. Markup Data를 전체적으로 가져오는 부분
-A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedAttributesData * psAttribData, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp)
+A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedAttributesData * psAttribData, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp, bool bAddChildToParentComp)
 {
 	A3DMkpMarkupData sData;
 	A3D_INITIALIZE_DATA(A3DMkpMarkupData, sData);
+
+	CString strPmiName;
+	GetName(pcMarkup, strPmiName);
 
 	H3DF::Component * pcPmiGroupComponent = GetPmiGroupComponent(cParentComp);
 	if (nullptr == pcPmiGroupComponent) {
@@ -1873,26 +2047,43 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 		return A3D_ERROR;
 	}
 
-	CString strPmiName;
-	GetName(pcMarkup, strPmiName);
+	// 이미 추가되어 있는 경우에는 Parent Component에 추가한다. Markup View에 추가하는 경우가 대부분이다.
+	HC_KEY nSegmentKey = INVALID_KEY;
+	if (true == m_mMarkupsMap.Lookup((DWORD_PTR)pcMarkup, nSegmentKey))
+	{
+		Log(2, L"LookUp ParseMarkup: %s, '%s'", LogHexStr((DWORD_PTR)pcMarkup), strPmiName);
+
+		H3DF::SegmentKey cSegment(nSegmentKey);
+		H3DF::IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
+
+		// Markup View등에서 생성된 경우를 대응하기 위해서 Parent Component에 추가한다.
+		if (true == bAddChildToParentComp) {
+			H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, strPmiName, H3DF::Component::Type::ExchangePMI, cParentComp);
+		}
+
+		return A3D_SUCCESS;
+	}
 
 	Log(2, L"ParseMarkup: %s, '%s', Markup%d", LogHexStr((DWORD_PTR)pcMarkup),  strPmiName, m_nMarkupId);
 
 	LogManager::IncreaseTabIndex(2);
 
+	// PMI는 PMI Group에 추가하도록 한다.
 	SegmentKey cPmiGroupSegment(pcPmiGroupComponent->GetSegmentKey());
-
-	H3DF::SegmentKey cPmiSegment = m_cPmiIncludeSegment.Subsegment("pmi%d", m_nMarkupId++);
-	IncludeKey cInclude = cPmiGroupSegment.IncludeSegment(cPmiSegment);
+	H3DF::SegmentKey cSegment = m_cPmiIncludeSegment.Subsegment("pmi%d", m_nMarkupId++);
+	IncludeKey cInclude = cPmiGroupSegment.IncludeSegment(cSegment);
+	m_mMarkupsMap.SetAt((DWORD_PTR)pcMarkup, cSegment.KeyValue());
 
 	// #CADModel: PMI 추가
-	H3DF::Component * pcComponent = AddComponent(cPmiSegment, cInclude, strPmiName, H3DF::Component::Type::ExchangeProductOccurrence, *pcPmiGroupComponent);
+	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, strPmiName, H3DF::Component::Type::ExchangePMI, *pcPmiGroupComponent);
 
-	// Markup View에서 PMI를 Link할 때 사용하기 위해서 Map에 저장한다.
-	m_mCompMap.SetAt((DWORD_PTR)pcMarkup, pcComponent);
+	// Markup View등에서 생성된 경우를 대응하기 위해서 Parent Component에 추가한다.
+	if (true == bAddChildToParentComp) {
+		AddComponent(cSegment, cInclude, strPmiName, H3DF::Component::Type::ExchangePMI, cParentComp);
+	}
 
 	if (A3D_FALSE == psAttribData->m_bShow || A3D_TRUE == psAttribData->m_bRemoved) {
-		cPmiSegment.GetStyleControl().PushSegment(m_cNoShowStyle);
+		cSegment.GetStyleControl().PushSegment(m_cNoShowStyle);
 
 		pcComponent->AddStatus(H3DF::Component::Status::Hide);
 		pcComponent->AddStatus(H3DF::Component::Status::NoShow);
@@ -1906,7 +2097,7 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 	{
 		case kA3DMarkupTypeDatum:
 		{
-			pcEntity = new H3DF::PMI::DatumEntity(cPmiSegment);
+			pcEntity = new H3DF::PMI::DatumEntity(cSegment);
 			H3DF::PMI::DatumEntity * pcDatum = (PMI::DatumEntity *)pcEntity;
 
 			switch (sData.m_eSubType)
@@ -1927,7 +2118,7 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 
 		case kA3DMarkupTypeDimension:
 		{
-			pcEntity = new H3DF::PMI::DimensionEntity(cPmiSegment);
+			pcEntity = new H3DF::PMI::DimensionEntity(cSegment);
 			PMI::DimensionEntity * pcDimension = (PMI::DimensionEntity *)pcEntity;
 
 			pcDimension->SetDimensionType(PMI::Dimension::Type::UnknownType);
@@ -1984,13 +2175,13 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 		{
 			// current data coming out of 3DX for FCFs makes it quite difficult to accurately determine components
 			// of a FCF, so we just insert a generic entity (just text strings and polylines, no extra information)
-			pcEntity = new PMI::GenericEntity(cPmiSegment);
+			pcEntity = new PMI::GenericEntity(cSegment);
 		}
 		break;
 
 		case kA3DMarkupTypeRoughness:
 		{
-			pcEntity = new PMI::RoughnessEntity(cPmiSegment);
+			pcEntity = new PMI::RoughnessEntity(cSegment);
 
 			PMI::RoughnessEntity * pcRoughness = (PMI::RoughnessEntity *)pcEntity;
 
@@ -2002,13 +2193,13 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 
 		case kA3DMarkupTypeText:
 		{
-			pcEntity = new PMI::NoteEntity(cPmiSegment);
+			pcEntity = new PMI::NoteEntity(cSegment);
 		}
 		break;
 
 		default:
 		{
-			pcEntity = new PMI::GenericEntity(cPmiSegment);
+			pcEntity = new PMI::GenericEntity(cSegment);
 		}
 	}
 
@@ -2063,6 +2254,7 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 	PMI::Options cOptions;
 	PolygonArray aPolygons;
 
+	// Tesselation관련 정보를 수집. Segment에 정보를 추가하거나 하지 않는다.
 	GetMarkupTesselation(&sBaseData, &sMarkupData, aPolyline, aPolygons, aStrings, aTextAttributes, &cOptions);
 
 	A3DTessMarkupGet(nullptr, &sMarkupData);
@@ -2073,6 +2265,7 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 		PMI::Frame cFrame;
 		cFrame.SetPolylines((unsigned int)aPolyline.size(), aPolyline.data());
 		if (nullptr != pcEntity) {
+			// Frame Data를 Segement에 추가
 			pcEntity->SetFrame(cFrame);
 		}
 	}
@@ -2081,6 +2274,7 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 	{
 		PMI::Drawing cDrawing;
 		cDrawing.SetPolygons((unsigned int)aPolygons.size(), aPolygons.data());
+		// Polygon Data를 Segement에 추가
 		pcEntity->SetDrawing(cDrawing);
 	}
 
@@ -2163,29 +2357,23 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 	PolylineArray & aOutPolylines, PolygonArray & aOutPolygones, StringArray & aOutStrings, PMI::TextAttributesArray & cOutTextAttributes,
 	PMI::Options * pcOutPmiOptions)
 {
+	Log(2, "ParseMarkupTesselation: %s, %s", LogHexStr((DWORD_PTR)psTessBaseData), LogHexStr((DWORD_PTR)psTessMarkupData));
+
 	if (psTessMarkupData->m_uiCodesSize == 0) {
 		return A3D_ERROR;
 	}
 
-#define DEFAULT_OFFSET {\
-	pdCoordData += *(pnStartCodes + 1); \
-	pnStartCodes += (nCount + 1);\
-}
-
-#define MAKE_OFFSET(CountInt, CountFloats) {\
-	pdCoordData += CountFloats;\
-	pnStartCodes += (CountInt + 1);\
-}
-
 	unsigned int nCount = 0;
 
-	const A3DDouble * pdCoordData = psTessBaseData->m_pdCoords;
-	const A3DUns32 * pnStartCodes = &psTessMarkupData->m_puiCodes[0];
+	const A3DDouble * pdData = psTessBaseData->m_pdCoords;
+	const A3DUns32 * pnStart = &psTessMarkupData->m_puiCodes[0];
 	const A3DUns32 * pnEndCodes = &psTessMarkupData->m_puiCodes[psTessMarkupData->m_uiCodesSize - 1];
 
-	if (nullptr == pdCoordData || nullptr == pnStartCodes || nullptr == pnEndCodes) {
+	if (nullptr == pdData || nullptr == pnStart || nullptr == pnEndCodes) {
 		return A3D_ERROR;
 	}
+
+	LogIncreaseTabIndex(2);
 
 	A3DFontKeyData sFontKeyData;
 	A3D_INITIALIZE_DATA(A3DFontKeyData, sFontKeyData);
@@ -2210,41 +2398,35 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 	H3DF::MatrixKit cTransformMatrix;
 	//FloatArray pline;
 	CStringA strLinePattern;
-	// 	H_UTF8 line_pattern;
 
-	// 	float cmatrix[16];
-	// 	float transform_matrix[16];
-	// 	TestMatrix cm;
-	// 	cm.ComputeIdentityMatrix(cmatrix);
-	// 	cm.ComputeIdentityMatrix(transform_matrix);
 
-	for (; pnStartCodes < pnEndCodes; ++pnStartCodes)
+	for (; pnStart < pnEndCodes; ++pnStart)
 	{
-		nCount = *pnStartCodes & kA3DMarkupIntegerMask;
+		nCount = *pnStart & kA3DMarkupIntegerMask;
 
-		if (*pnStartCodes & kA3DMarkupIsExtraData)
+		if (*pnStart & kA3DMarkupIsExtraData)
 		{
-			switch (A3D_DECODE_EXTRA_DATA(*pnStartCodes))
+			switch (A3D_DECODE_EXTRA_DATA(*pnStart))
 			{
-				case 0:  //pattern
+				case A3D_DECODE_EXTRA_DATA(kA3DMarkupPatternMask): //0:  //pattern
 					DEFAULT_OFFSET;
 					break;
 
-				case 1:  //picture
+				case A3D_DECODE_EXTRA_DATA(kA3DMarkupPictureMask): // 1:  //picture
 					DEFAULT_OFFSET;
 					break;
 
-				case 2:  //triangles
+				case A3D_DECODE_EXTRA_DATA(kA3DMarkupTrianglesMask): // 2:  //triangles
 				{
-					unsigned int triangleCount = *(pnStartCodes + 1) / 9;
+					unsigned int triangleCount = *(pnStart + 1) / 9;
 					for (unsigned int i = 0; i < triangleCount; ++i)
 					{
 						H3DF::Point cPoints[3];
 						for (UINT j = 0; j < 3; ++j)
 						{
-							cPoints[j].x = static_cast<float>(pdCoordData[9 * i + 3 * j + 0]);
-							cPoints[j].y = static_cast<float>(pdCoordData[9 * i + 3 * j + 1]);
-							cPoints[j].z = static_cast<float>(pdCoordData[9 * i + 3 * j + 2]);
+							cPoints[j].x = static_cast<float>(pdData[9 * i + 3 * j + 0]);
+							cPoints[j].y = static_cast<float>(pdData[9 * i + 3 * j + 1]);
+							cPoints[j].z = static_cast<float>(pdData[9 * i + 3 * j + 2]);
 						}
 
 						if (false == cTransformMatrix.IsIdentity()) {
@@ -2263,14 +2445,13 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 				}
 				break;
 
-				case 3:  //picture
+				case A3D_DECODE_EXTRA_DATA(kA3DMarkupQuadsMask):
 					DEFAULT_OFFSET;
 					break;
 
-				case 6:  //faceview  
+				case A3D_DECODE_EXTRA_DATA(kA3DMarkupFaceViewMask): // 6 :  // Camera Dependant -  Faceview
 				{
-					if (*(pnStartCodes + 1) > 0)
-					{
+					if (*(pnStart + 1) > 0) {
 						bFaceViewMode = true;
 
 						if (nullptr != pcOutPmiOptions) {
@@ -2278,9 +2459,9 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 						}
 
 						H3DF::MatrixKit cMatrix;
-						cMatrix[3][0] = static_cast<float>(pdCoordData[0]);
-						cMatrix[3][1] = static_cast<float>(pdCoordData[1]);
-						cMatrix[3][2] = static_cast<float>(pdCoordData[2]);
+						cMatrix[3][0] = static_cast<float>(pdData[0]);
+						cMatrix[3][1] = static_cast<float>(pdData[1]);
+						cMatrix[3][2] = static_cast<float>(pdData[2]);
 
 						PMI::Orientation cOrientation;
 						cOrientation.SetMatrix(cMatrix);
@@ -2289,8 +2470,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 
 						MAKE_OFFSET(0, 3);
 					}
-					else
-					{
+					else {
 						bFaceViewMode = false;
 
 						MAKE_OFFSET(0, 0);
@@ -2298,9 +2478,9 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 				}
 				break;
 
-				case 7:  // frame draw  
+				case A3D_DECODE_EXTRA_DATA(kA3DMarkupFrameDrawMask): // 7 :  // CameraDependant  -  Frame draw
 				{
-					if (*(pnStartCodes + 1) > 0)
+					if (*(pnStart + 1) > 0)
 					{
 						bFrameDrawMode = true;
 
@@ -2309,9 +2489,9 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 						}
 
 						H3DF::MatrixKit cMatrix;
-						cMatrix[3][0] = static_cast<float>(pdCoordData[0]);
-						cMatrix[3][1] = static_cast<float>(pdCoordData[1]);
-						cMatrix[3][2] = static_cast<float>(pdCoordData[2]);
+						cMatrix[3][0] = static_cast<float>(pdData[0]);
+						cMatrix[3][1] = static_cast<float>(pdData[1]);
+						cMatrix[3][2] = static_cast<float>(pdData[2]);
 
 						PMI::Orientation cOrientation;
 						cOrientation.SetMatrix(cMatrix);
@@ -2326,14 +2506,29 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 				}
 				break;
 
-				case 8:  //fixed size  
+				case A3D_DECODE_EXTRA_DATA(kA3DMarkupFixedSizeMask): // 8 :  // CameraDependant  -  Fixedsize
+				{
+					if (*(pnStart + 1) > 0)
+					{
+						bool m_bFixedSize = true;
+						double dViewDependantParameter[3];
+						dViewDependantParameter[0] = *pdData;
+						dViewDependantParameter[1] = *(pdData + 1);
+						dViewDependantParameter[2] = /*bIsText ? 0 : */*(pdData + 2);
+						UINT nFixedSizePatternIndex = *(pnStart + 2);
+						MAKE_OFFSET(0, 3);
+					}
+					else {
+						MAKE_OFFSET(0, 0);
+					}
 					// this defines the size of an object which has a view independent size
 					DEFAULT_OFFSET;
-					break;
+				} 
+				break;
 
-				case 9:  //symbol  
+				case A3D_DECODE_EXTRA_DATA(kA3DMarkupSymbolMask): // 9 :  // Camera Dependant -  Symbol
 				{
-					A3DGlobalGetGraphVPicturePatternData(*(pnStartCodes + 2), &sPicturePatternData);
+					A3DGlobalGetGraphVPicturePatternData(*(pnStart + 2), &sPicturePatternData);
 					A3DTessBaseData sBaseData;
 					A3D_INITIALIZE_DATA(A3DTessBaseData, sBaseData);
 					A3DTessBaseGet(sPicturePatternData.m_pMarkupTess, &sBaseData);
@@ -2350,13 +2545,13 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 				}
 				break;
 
-				case 10:  //cylinder  
+				case A3D_DECODE_EXTRA_DATA(kA3DMarkupCylinderMask): // 10 : cylinder
 					DEFAULT_OFFSET;
 					break;
 
-				case 11:  //color
+				case A3D_DECODE_EXTRA_DATA(kA3DMarkupColorMask): // 11 : color
 				{
-					A3DGlobalGetGraphRgbColorData(*(pnStartCodes + 2), &sRgbColorData);
+					A3DGlobalGetGraphRgbColorData(*(pnStart + 2), &sRgbColorData);
 					cColor.Set(static_cast<float>(sRgbColorData.m_dRed),
 						static_cast<float>(sRgbColorData.m_dGreen),
 						static_cast<float>(sRgbColorData.m_dBlue));
@@ -2364,7 +2559,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 				}
 				break;
 
-				case 12:  //line stipple
+				case A3D_DECODE_EXTRA_DATA(kA3DMarkupLineStippleMask): // 12 : line stipple
 				{
 // 					if (0 < nCount) {
 // 						strLinePattern = GetLinePattern(*(pnStartCodes + 2));
@@ -2375,12 +2570,12 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 				}
 				break;
 
-				case 13:  //font
+				case A3D_DECODE_EXTRA_DATA(kA3DMarkupFontMask): // 13 : font
 				{
-					sFontKeyData.m_iFontFamilyIndex = *(pnStartCodes + 2);
-					sFontKeyData.m_iFontStyleIndex = (*(pnStartCodes + 3) & kA3DFontKeyStyle) >> 24;
-					sFontKeyData.m_iFontSizeIndex = (*(pnStartCodes + 3) & kA3DFontKeySize) >> 12;
-					sFontKeyData.m_cAttributes = (A3DInt8)(*(pnStartCodes + 3) & kA3DFontKeyAttrib);
+					sFontKeyData.m_iFontFamilyIndex = *(pnStart + 2);
+					sFontKeyData.m_iFontStyleIndex = (*(pnStart + 3) & kA3DFontKeyStyle) >> 24;
+					sFontKeyData.m_iFontSizeIndex = (*(pnStart + 3) & kA3DFontKeySize) >> 12;
+					sFontKeyData.m_cAttributes = (A3DInt8)(*(pnStart + 3) & kA3DFontKeyAttrib);
 
 					A3DFontData fontdata;
 					A3D_INITIALIZE_DATA(A3DFontData, fontdata);
@@ -2400,11 +2595,11 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 				}
 				break;
 
-				case 14:  //text
+				case A3D_DECODE_EXTRA_DATA(kA3DMarkupTextMask): // 14:  text
 				{
-					double dTextboxHeight = pdCoordData[1];
+					double dTextboxHeight = pdData[1];
 
-					A3DUns32 nTextIndex = pnStartCodes[2];
+					A3DUns32 nTextIndex = pnStart[2];
 					A3DUTF8Char * pcBuffer = nullptr;
 
 					if (nTextIndex < psTessMarkupData->m_uiTextsSize) {
@@ -2434,22 +2629,22 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 				}
 				break;
 
-				case 15:  //points
+				case A3D_DECODE_EXTRA_DATA(kA3DMarkupPointsMask): // 15 : points
 					DEFAULT_OFFSET;
 					break;
 
-				case 16:  //polygon
+				case A3D_DECODE_EXTRA_DATA(kA3DMarkupPolygonMask): // 16 : polylines
 				{
-					int kSize = *(pnStartCodes + 1);
+					int kSize = *(pnStart + 1);
 
 					Point * pcPoints = new Point[kSize];
 					int pt_count = 0;
 					int i = 0;
 					while (i < kSize)
 					{
-						pcPoints[pt_count].x = static_cast<float>(pdCoordData[i++]);
-						pcPoints[pt_count].y = static_cast<float>(pdCoordData[i++]);
-						pcPoints[pt_count++].z = static_cast<float>(pdCoordData[i++]);
+						pcPoints[pt_count].x = static_cast<float>(pdData[i++]);
+						pcPoints[pt_count].y = static_cast<float>(pdData[i++]);
+						pcPoints[pt_count++].z = static_cast<float>(pdData[i++]);
 					}
 
 					if (false == cTransformMatrix.IsIdentity()) {
@@ -2470,7 +2665,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 				DEFAULT_OFFSET;
 				break;
 
-				case 17:  //line width
+				case A3D_DECODE_EXTRA_DATA(kA3DMarkupLineWidthMask): // 17 : line width
 					DEFAULT_OFFSET;
 					break;
 
@@ -2478,43 +2673,43 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 					DEFAULT_OFFSET;
 			}
 		}
-		else if (*pnStartCodes & kA3DMarkupIsMatrix)
+		else if (*pnStart & kA3DMarkupIsMatrix)
 		{
-			if (*(pnStartCodes + 1) > 0)
+			if (*(pnStart + 1) > 0)
 			{
-				Vector x(static_cast<float>(pdCoordData[0]), static_cast<float>(pdCoordData[1]), static_cast<float>(pdCoordData[2]));
-				char_width = (float)x.Length();
+				Vector cXAxis(static_cast<float>(pdData[0]), static_cast<float>(pdData[1]), static_cast<float>(pdData[2]));
+				char_width = (float)cXAxis.Length();
 
-				Vector y(static_cast<float>(pdCoordData[4]), static_cast<float>(pdCoordData[5]), static_cast<float>(pdCoordData[6]));
-				char_height = (float)y.Length();
+				Vector cYAxis(static_cast<float>(pdData[4]), static_cast<float>(pdData[5]), static_cast<float>(pdData[6]));
+				char_height = (float)cYAxis.Length();
 
 				if (bFrameDrawMode || bFaceViewMode) {
 					cTextAttributes.SetWidthScale(char_width / char_height);
 					cTextMove.Set(
-						static_cast<float>(pdCoordData[12] / m_dCadModelUnit),
-						static_cast<float>(pdCoordData[13] / m_dCadModelUnit),
-						static_cast<float>(pdCoordData[14] / m_dCadModelUnit));
+						static_cast<float>(pdData[12] / m_dCadModelUnit),
+						static_cast<float>(pdData[13] / m_dCadModelUnit),
+						static_cast<float>(pdData[14] / m_dCadModelUnit));
 				}
 				else {
-					x.Normalize();
-					y.Normalize();
-					Vector z = x.Cross(y);
+					cXAxis.Normalize();
+					cYAxis.Normalize();
+					Vector z = cXAxis.Cross(cYAxis);
 
-					cMatrix[0][0] = x.x;
-					cMatrix[0][1] = x.y;
-					cMatrix[0][2] = x.z;
+					cMatrix[0][0] = cXAxis.x;
+					cMatrix[0][1] = cXAxis.y;
+					cMatrix[0][2] = cXAxis.z;
 
-					cMatrix[1][0] = y.x;
-					cMatrix[1][1] = y.y;
-					cMatrix[1][2] = y.z;
+					cMatrix[1][0] = cYAxis.x;
+					cMatrix[1][1] = cYAxis.y;
+					cMatrix[1][2] = cYAxis.z;
 
 					cMatrix[2][0] = z.x;
 					cMatrix[2][1] = z.y;
 					cMatrix[2][2] = z.z;
 
-					cMatrix[3][0] = static_cast<float>(pdCoordData[12]);
-					cMatrix[3][1] = static_cast<float>(pdCoordData[13]);
-					cMatrix[3][2] = static_cast<float>(pdCoordData[14]);
+					cMatrix[3][0] = static_cast<float>(pdData[12]);
+					cMatrix[3][1] = static_cast<float>(pdData[13]);
+					cMatrix[3][2] = static_cast<float>(pdData[14]);
 
 
 					cTransformMatrix = cMatrix * cTransformMatrix;
@@ -2541,14 +2736,14 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 				MAKE_OFFSET(0, 0);
 			}
 		}
-		else
+		else // Polyling Data
 		{
 			if (true == bFrameDrawMode || true == bFaceViewMode) {
 				DEFAULT_OFFSET;
 				continue;
 			}
 
-			int kSize = *(pnStartCodes + 1);
+			int kSize = *(pnStart + 1);
 			//pline.SetCount(kSize);
 
 			int i = 0, nPointCount = kSize / 3;
@@ -2557,9 +2752,9 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 
 			while (i < kSize)
 			{
-				pcPoints[nPointCount].x = static_cast<float>(pdCoordData[i++]);
-				pcPoints[nPointCount].y = static_cast<float>(pdCoordData[i++]);
-				pcPoints[nPointCount++].z = static_cast<float>(pdCoordData[i++]);
+				pcPoints[nPointCount].x = static_cast<float>(pdData[i++]);
+				pcPoints[nPointCount].y = static_cast<float>(pdData[i++]);
+				pcPoints[nPointCount++].z = static_cast<float>(pdData[i++]);
 			}
 
 			if (false == cTransformMatrix.IsIdentity()) {
@@ -2581,8 +2776,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 		}
 	}
 
-#undef DEFAULT_OFFSET
-#undef MAKE_OFFSET
+	LogDecreaseTabIndex(2);
 
 	return A3D_SUCCESS;
 }
@@ -2620,16 +2814,31 @@ A3DStatus TdfImport::GetLeaderLinesAndSymbols(const A3DMkpLeader * pMarkup, Poly
 }
 
 // 7-3. PMI를 Group으로 처리하기 위해서, Parent Component에서 PMI Group을 검색하고, 없으면 생성한다.
-// Segment도 "PMI_Group"로 생성한다.
+// Segment도 "grppmi"로 생성한다.
 H3DF::Component * TdfImport::GetPmiGroupComponent(H3DF::Component & cParentComp)
 {
-	H3DF::ComponentArray aSubComponentArray = cParentComp.GetSubComponents();
-
-	for (auto * pcComponent : aSubComponentArray) {
-		if (H3DF::Component::Type::PMIGroupComponent == pcComponent->GetType()) {
-			return pcComponent;
+	if (nullptr != cParentComp.GetSubComponents()) {
+		for (auto * pcComponent : *cParentComp.GetSubComponents()) {
+			if (H3DF::Component::Type::PMIGroupComponent == pcComponent->GetType()) {
+				return pcComponent;
+			}
 		}
 	}
+
+	H3DF::Component * pcOwner = cParentComp.GetOwner();
+
+	while (nullptr != pcOwner) {
+		if (nullptr != pcOwner->GetSubComponents()) {
+			for (auto * pcComponent : *pcOwner->GetSubComponents()) {
+				if (H3DF::Component::Type::PMIGroupComponent == pcComponent->GetType()) {
+					return pcComponent;
+				}
+			}
+		}
+
+		pcOwner = pcOwner->GetOwner();
+	}
+
 	
 	// Parent Component에 PMI Group을 생성.
 	SegmentKey cParentSegment(cParentComp.GetSegmentKey());

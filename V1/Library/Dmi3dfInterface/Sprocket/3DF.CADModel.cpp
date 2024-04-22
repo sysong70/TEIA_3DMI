@@ -94,15 +94,15 @@ Component * H3DF::CADModel::GetComponent(H3DF::SelectionItem & cInItem) const
 
 	// 가져온 키값을 이용해서 Component를 찾는다.
 	for (auto & cKey : cKeys) {
-		ComponentArray & cSubcomponentArray = pcComponent->GetSubComponents();
+		ComponentArray * pcSubcomponentArray = pcComponent->GetSubComponents();
 
-		if (true == cSubcomponentArray.empty()) {
+		if (nullptr == pcSubcomponentArray) {
 			continue;
 		}
 
 		pcFindSubComponent = nullptr;
 
-		for (auto pcSubComponent : cSubcomponentArray) {
+		for (auto pcSubComponent : *pcSubcomponentArray) {
 			HC_KEY nSegmentKey = pcSubComponent->GetSegmentKey();
 			HC_KEY nIncludeKey = pcSubComponent->GetIncludeKey();
 
@@ -155,7 +155,7 @@ bool H3DF::CADModel::ShowSelectionResult(Component * pcInComponent, H3DF::Select
 			if (pcInComponent == pcImpl->m_pcModels) {
 				break;
 			}
-			pcInComponent = &pcInComponent->GetOwner();
+			pcInComponent = pcInComponent->GetOwner();
 		}
 
 		// 적어도 2개 이상의 Key가 있어야 한다.
@@ -203,8 +203,10 @@ bool H3DF::CADModel::ShowSelectionResult(Component * pcInComponent, H3DF::Select
 		return true;
 	}
 
-	for (auto pcSubcomponents : pcInComponent->GetSubComponents()) {
-		ShowSelectionResult(pcSubcomponents, cOutResults);
+	if (nullptr != pcInComponent->GetSubComponents()) {
+		for (auto pcSubcomponents : *pcInComponent->GetSubComponents()) {
+			ShowSelectionResult(pcSubcomponents, cOutResults);
+		}
 	}
 
 	return true;

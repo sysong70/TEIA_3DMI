@@ -68,6 +68,10 @@ namespace H3DF
 	class BoundingKit;
 	class SelectabilityKit;
 
+
+	class CameraKit;
+	class CameraControl;
+
 	class LineAttributeKit;
 	class LineAttributeControl;
 
@@ -118,8 +122,10 @@ namespace H3DF
 
 	class PortfolioKey;
 
-	class Component;
 	class CADModel;
+	class Component;
+	class MetaData;
+	class StringMetaData;
 
 	class KeyImpl;
 
@@ -307,6 +313,15 @@ namespace H3DF
 
 		SprocketKit = 0x81000000,
 
+		MetaData = 0x80001000,
+		IntegerMetaData = 0x80001001,
+		UnsignedIntegerMetaData = 0x80001002,
+		DoubleMetaData = 0x80001003,
+		StringMetaData = 0x80001004,
+		TimeMetaData = 0x80001005,
+		BooleanMetaData = 0x80001006,
+		DwordPtrMetaData = 0x80001007,
+
 		SprocketControl = 0xD0000000,
 		OperatorControl = 0xD0000008,
 		NavigationCubeControl = 0xD0000009,
@@ -324,11 +339,14 @@ namespace H3DF
 		LTCondition = 0x09000008,
 		GTEQCondition = 0x09000009,
 		LTEQCondition = 0x0900000A,
-
 	};
 
+	// MetaDataIndex는 UserDataIndex와 다른 값을 사용해야 함.
+	// 저장할 때 Index를 구별자로 사용하기 때문
 	enum class UserDataIndex : uint32_t
 	{
+		None									= 0x00000000,
+
 		Type									= 0x01000001,
 		Name									= 0x01000002,
 
@@ -337,6 +355,16 @@ namespace H3DF
 		ComponentStatus							= 0x02000002,
 		IncludedCount							= 0x02000003,
 		ReferenceCount							= 0x02000004,
+	};
+
+	// MetaDataIndex는 UserDataIndex와 다른 값을 사용해야 함.
+	// 저장할 때 Index를 구별자로 사용하기 때문
+	enum class MetaDataIndex : uint32_t
+	{
+		None									= 0x00000000,
+
+		Camera									= 0x03000001,
+		PlaneString								= 0x03000002,
 	};
 
 	class API_3DF ViewDirection
@@ -757,6 +785,9 @@ namespace H3DF
 	using StyleKeyArray = std::vector<StyleKey, Allocator<StyleKey>>;
 
 	using ConditionalExpressionArray = std::vector<ConditionalExpression, Allocator<ConditionalExpression>>;
+
+	using ComponentArray = std::vector<Component *, Allocator<Component *>>;
+	using MetadataArray = std::vector<MetaData *, Allocator<MetaData *>>;
 
 	namespace PMI {
 		class TextAttributes;

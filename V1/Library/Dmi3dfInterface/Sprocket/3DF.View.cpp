@@ -13,6 +13,7 @@
 
 #include "../3DF/Segment.h"
 #include "../3DF/Impl/SegmentImpl.h"
+#include "../3DF/Camera.h"
 #include "../3DF/Visibility.h"
 #include "../3DF/VisualEffects.h"
 
@@ -507,7 +508,7 @@ void H3DF::View::SetSimpleReflection(bool bInState, float fInPercentOffset)
 	cViewSegment.GetVisualEffectsControl().SetSimpleReflection(bInState, fOpacity, nBlurring, bFading);
 }
 
-/*! Returns the status of the simple reflection */
+// Returns the status of the simple reflection
 bool H3DF::View::GetSimpleReflection()
 {
 	ViewImpl * pcViewImpl = (ViewImpl *)m_pcImpl;
@@ -516,6 +517,61 @@ bool H3DF::View::GetSimpleReflection()
 	return pcViewImpl->GetSimpleReflection();
 }
 
+// Smoothly moves the camera from the current position to the one specified by the user.
+void H3DF::View::SmoothTransition(H3DF::CameraKit const & cInCamera)
+{
+	ViewImpl * pcImpl = (ViewImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->GetBaseView()->InvalidateSceneBounding();
+
+	H3DF::SegmentKey cScene(pcImpl->GetBaseView()->GetSceneKey());
+
+	H3DF::CameraKit cOldCamera;
+	if (false == cScene.ShowCamera(cOldCamera)) {
+		DEBUG_STOP;
+		return;
+	}
+
+	Point cOldPosition;
+	cOldCamera.ShowPosition(cOldPosition);
+
+	Point cOldTarget;
+	cOldCamera.ShowTarget(cOldTarget);
+
+	Vector cOldUpVector;
+	cOldCamera.ShowUpVector(cOldUpVector);
+
+	float fOldWidth, fOldHeight;
+	cOldCamera.ShowField(fOldWidth, fOldHeight);
+
+	Point cNewPosition;
+	cInCamera.ShowPosition(cNewPosition);
+
+	Point cNewTarget;
+	cInCamera.ShowTarget(cNewTarget);
+
+	Vector cNewUpVector;
+	cInCamera.ShowUpVector(cNewUpVector);
+
+	float fNewWidth, fNewHeight;
+	cInCamera.ShowField(fNewWidth, fNewHeight);
+
+	HUtility::SmoothTransition(
+		(HPoint *)&cOldPosition,
+		(HPoint *)&cOldTarget,
+		(HPoint *)&cOldUpVector,
+		fOldWidth, fOldHeight,
+		(HPoint *)&cNewPosition,
+		(HPoint *)&cNewTarget,
+		(HPoint *)&cNewUpVector,
+		fNewWidth, fNewHeight,
+		pcImpl->GetBaseView());
+
+	//pcImpl->GetBaseView()->ZoomToExtents();
+
+	pcImpl->GetBaseView()->SetZoomLimit();
+}
 
 void H3DF::View::LoadPointCloudFile(CString strFilePathName)
 {

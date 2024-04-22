@@ -61,6 +61,9 @@
     <Filter Include="Sprocket\Impl">
       <UniqueIdentifier>{f5dd20ec-ccfb-4d2b-b1d6-16b0a8271b8e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CADModel\Impl">
+      <UniqueIdentifier>{927b8a1d-7769-4070-b164-d49038c68630}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -160,9 +163,6 @@
       <Filter>3DF\Object</Filter>
     </ClInclude>
     <ClInclude Include="3DF\Color.h">
-      <Filter>3DF\Object</Filter>
-    </ClInclude>
-    <ClInclude Include="3DF\Bounding.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
     <ClInclude Include="3DF\Database.h">
@@ -306,9 +306,6 @@
     <ClInclude Include="3DF\PMI.Entity.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Entity.ModelTree.h">
-      <Filter>CADModel</Filter>
-    </ClInclude>
     <ClInclude Include="Sprocket\3DF.Application.h">
       <Filter>Sprocket</Filter>
     </ClInclude>
@@ -330,9 +327,6 @@
     <ClInclude Include="Sprocket\Impl\CanvasImpl.h">
       <Filter>Sprocket\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="Sprocket\Impl\ComponentImpl.h">
-      <Filter>Sprocket\Impl</Filter>
-    </ClInclude>
     <ClInclude Include="Sprocket\Impl\ModelImpl.h">
       <Filter>Sprocket\Impl</Filter>
     </ClInclude>
@@ -340,9 +334,6 @@
       <Filter>Sprocket\Impl</Filter>
     </ClInclude>
     <ClInclude Include="Sprocket\3DF.CADModel.h">
-      <Filter>Sprocket</Filter>
-    </ClInclude>
-    <ClInclude Include="Sprocket\3DF.Component.h">
       <Filter>Sprocket</Filter>
     </ClInclude>
     <ClInclude Include="Sprocket\Impl\CADModelImpl.h">
@@ -354,11 +345,20 @@
     <ClInclude Include="3DF\CuttingSection.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
-    <ClInclude Include="Sprocket\Impl\ComponentMarkupViewImpl.h">
-      <Filter>Sprocket\Impl</Filter>
+    <ClInclude Include="Sprocket\3DF.Component.h">
+      <Filter>CADModel</Filter>
     </ClInclude>
-    <ClInclude Include="Sprocket\3DF.ComponentMarkupView.h">
-      <Filter>Sprocket</Filter>
+    <ClInclude Include="Sprocket\3DF.MetaData.h">
+      <Filter>CADModel</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\Impl\ComponentImpl.h">
+      <Filter>CADModel\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\Impl\MetaDataImpl.h">
+      <Filter>CADModel\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Bounding.h">
+      <Filter>3DF\Control</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -447,9 +447,6 @@
       <Filter>3DF\Object</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Style.cpp">
-      <Filter>3DF\Object</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\Bounding.cpp">
       <Filter>3DF\Object</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Color.cpp">
@@ -596,9 +593,6 @@
     <ClCompile Include="3DF\PMI.Entity.cpp">
       <Filter>3DF\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Entity.ModelTree.cpp">
-      <Filter>CADModel</Filter>
-    </ClCompile>
     <ClCompile Include="Sprocket\3DF.Application.cpp">
       <Filter>Sprocket</Filter>
     </ClCompile>
@@ -620,9 +614,6 @@
     <ClCompile Include="Sprocket\Impl\CanvasImpl.cpp">
       <Filter>Sprocket\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="Sprocket\Impl\ComponentImpl.cpp">
-      <Filter>Sprocket\Impl</Filter>
-    </ClCompile>
     <ClCompile Include="Sprocket\Impl\ModelImpl.cpp">
       <Filter>Sprocket\Impl</Filter>
     </ClCompile>
@@ -630,9 +621,6 @@
       <Filter>Sprocket\Impl</Filter>
     </ClCompile>
     <ClCompile Include="Sprocket\3DF.CADModel.cpp">
-      <Filter>Sprocket</Filter>
-    </ClCompile>
-    <ClCompile Include="Sprocket\3DF.Component.cpp">
       <Filter>Sprocket</Filter>
     </ClCompile>
     <ClCompile Include="Sprocket\Impl\CADModelImpl.cpp">
@@ -644,11 +632,20 @@
     <ClCompile Include="3DF\CuttingSection.cpp">
       <Filter>3DF\Object</Filter>
     </ClCompile>
-    <ClCompile Include="Sprocket\Impl\ComponentMarkupViewImpl.cpp">
-      <Filter>Sprocket\Impl</Filter>
+    <ClCompile Include="Sprocket\3DF.Component.cpp">
+      <Filter>CADModel</Filter>
     </ClCompile>
-    <ClCompile Include="Sprocket\3DF.ComponentMarkupView.cpp">
-      <Filter>Sprocket</Filter>
+    <ClCompile Include="Sprocket\3DF.MetaData.cpp">
+      <Filter>CADModel</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\Impl\ComponentImpl.cpp">
+      <Filter>CADModel\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\Impl\MetaDataImpl.cpp">
+      <Filter>CADModel\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Bounding.cpp">
+      <Filter>3DF\Control</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

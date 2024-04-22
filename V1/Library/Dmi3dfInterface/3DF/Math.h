@@ -16,8 +16,8 @@
 
 #include <limits>
 
-#ifndef M_PI
-#	define M_PI 3.1415926535897932384626433832795028841971693993751
+#ifndef PI
+#	define PI 3.1415926535897932384626433832795028841971693993751
 #endif
 
 OPEN_3DF_NAMESPACE
@@ -774,7 +774,7 @@ public:
 		F dot = Dot(v);
 		F len = Length() * v.Length();
 		F cos_angle = dot / len;
-		return acos(cos_angle) * (F) 180 / M_PI;
+		return acos(cos_angle) * (F) 180 / PI;
 	}
 
 	H3DF_INLINE F CCWAngleWith(Vector_3D const & v1, Vector_3D const & v2) const {
@@ -785,7 +785,7 @@ public:
 		//Vector_3D<F> cross = v1.Cross(*this);
 		Vector_3D<F> cross = this->Cross(v1);
 		F dot2 = cross.Dot(v2);
-		F angle = acos(cos_angle) * (F) 180 / M_PI;
+		F angle = acos(cos_angle) * (F) 180 / PI;
 
 		if (dot2 < 0) {
 			angle = 360.0 - angle;
@@ -951,7 +951,7 @@ public:
 		F dot = Dot(v);
 		F len = Length() * v.Length();
 		F cos_angle = dot / len;
-		return acos(cos_angle) * (F)180 / M_PI;
+		return acos(cos_angle) * (F)180 / PI;
 	}
 
 	H3DF_INLINE F CCWAngleWith(Vector_2D const & v) const {
@@ -962,7 +962,7 @@ public:
 		//Vector_3D<F> cross = v1.Cross(*this);
 		Vector_3D<F> cross = Vector_3D<F>::ZAxis().Cross(Vector_3D<F>(*this));
 		F dot2 = cross.Dot(Vector_3D<F>(v));
-		F angle = acos(cos_angle) * (F)180 / M_PI;
+		F angle = acos(cos_angle) * (F)180 / PI;
 
 		if (dot2 < 0) {
 			angle = 360.0 - angle;
@@ -1160,6 +1160,9 @@ Vector_3D<F>::Vector_3D(Plane_3D<F> const & p) : x(p.a), y(p.b), z(p.c) {}
 
 //== Cuboid_3D Class ===============================================================================
 
+template<typename F>
+struct Sphere_3D;
+
 template <typename F>
 struct Cuboid_3D {
 	Point_3D<F>		cMin;
@@ -1174,7 +1177,7 @@ struct Cuboid_3D {
 	explicit Cuboid_3D(Cuboid_3D<D> const & that) : cMin(Point_3D<F>(that.cMin)), cMax(Point_3D<F>(that.cMax)) {}
 
 	// Creates a cuboid that will fit tightly around a sphere.
-	// Cuboid_3D(Sphere_3D<F> const & that);
+	Cuboid_3D(Sphere_3D<F> const & that);
 
 	// Creates a cuboid based on two points, which become opposite corners of the cuboid.
 	Cuboid_3D(Point_3D<F> const & in_min, Point_3D<F> const & in_max) : cMin(in_min), cMax(in_max) {}
@@ -1503,6 +1506,162 @@ H3DF_INLINE Cuboid_3D<F> Contract(Cuboid_3D<F> const & a, F border) {
 	Cuboid_3D<F> temp = a;
 	return temp.Contract(border);
 }
+
+template<typename F>
+struct Sphere_3D {
+	Point_3D<F> center;
+	F radius;
+
+	Sphere_3D() : center(Point_3D<F>(0, 0, 0)), radius(-1) {}
+
+	template<typename D>
+	explicit Sphere_3D(Sphere_3D<D> const & that) : center(Point_3D<F>(that.center)), radius(F(that.radius))
+	{
+	}
+
+	Sphere_3D(Cuboid_3D<F> const & cuboid)
+	{
+		if (cuboid.cMax.x < cuboid.cMin.x || cuboid.cMax.y < cuboid.cMin.y || cuboid.cMax.z < cuboid.cMin.z)
+			*this = Invalid();
+		else {
+			center = Midpoint(cuboid.cMin, cuboid.cMax);
+			radius = F(0.5 * cuboid.Diagonal().Length());
+		}
+	}
+
+	Sphere_3D(Point_3D<F> const & starting_center, F in_radius = 0) : center(starting_center), radius(in_radius) {}
+
+	Sphere_3D(size_t count, Point_3D<F> const * points) : radius(0.0f)
+	{
+		Cuboid_3D<F> cuboid(count, points);
+		center = Midpoint(cuboid.cMin, cuboid.cMax);
+		Engulf(count, points);
+	}
+
+	template<typename T>
+	Sphere_3D(size_t count, T const * indices, Point_3D<F> const * points) : radius(0.0f)
+	{
+		Cuboid_3D<F> cuboid(count, indices, points);
+		center = Midpoint(cuboid.cMin, cuboid.cMax);
+		Engulf(count, indices, points);
+	}
+
+	Sphere_3D(size_t count, Point_3D<F> const * points, Point_3D<F> const & starting_center) : center(starting_center), radius(0)
+	{
+		Engulf(count, points);
+	}
+
+	template<typename T>
+	Sphere_3D(size_t count, T const * indices, Point_3D<F> const * points, Point_3D<F> const & starting_center) :
+		center(starting_center), radius(0)
+	{
+		Engulf(count, indices, points);
+	}
+
+	H3DF_INLINE bool IsValid() const { return radius >= 0; }
+
+	static H3DF_INLINE Sphere_3D Invalid() { return Sphere_3D(Point_3D<F>(0, 0, 0), -1); };
+
+	void Invalidate() { radius = -1; }
+
+	H3DF_INLINE bool operator==(Sphere_3D const & sphere) const { return (center == sphere.center && radius == sphere.radius); }
+
+	H3DF_INLINE bool operator!=(Sphere_3D const & sphere) const { return !(*this == sphere); }
+
+	H3DF_INLINE F Volume() const { return F((4.0 / 3.0 * PI) * radius * radius * radius); }
+
+	H3DF_INLINE void Merge(Point_3D<F> const & point)
+	{
+		Vector_3D<F> dir = point - center;
+		F distance = (F)dir.Length();
+
+		if (distance > radius) {
+			F t = F(0.5) * (distance - radius);
+			center += t * dir.Normalize();
+			radius += t;
+		}
+	}
+
+	H3DF_INLINE void Merge(size_t count, Point_3D<F> const * points)
+	{
+		F radius_squared = radius * radius;
+		for (size_t i = 0; i < count; ++i) {
+			Vector_3D<F> dir = *points - center;
+			F distance_squared = (F)dir.LengthSquared();
+
+			if (distance_squared > radius_squared) {
+				F distance = sqrt(distance_squared);
+				F t = F(0.5) * (distance - radius);
+				center += t * (distance > Float_Traits<F>::Epsilon() ? dir / distance : Vector_3D<F>::Zero());
+				radius += t;
+				radius_squared = radius * radius;
+			}
+
+			++points;
+		}
+	}
+
+	H3DF_INLINE void Merge(Sphere_3D const & sphere)
+	{
+		Vector_3D<F> dir = sphere.center - center;
+		F distance = (F)dir.Length();
+
+		if (distance + sphere.radius > radius) {
+			if (distance + radius > sphere.radius) {
+				F t = F(0.5 * (sphere.radius + distance - radius));
+				center += t * dir.Normalize();
+				radius += t;
+			}
+			else {
+				center = sphere.center;
+				radius = sphere.radius;
+			}
+		}
+	}
+
+	H3DF_INLINE void Merge(Cuboid_3D<F> const & cuboid) { Merge(Sphere_3D(cuboid)); }
+
+private:
+	// Engulf expands the sphere to include the points, but does not change the center as Merge does
+	H3DF_INLINE void Engulf(size_t count, Point_3D<F> const * points)
+	{
+		double rsq = radius * radius;
+		for (size_t i = 0; i < count; ++i) {
+			double dsq = (*points++ - center).LengthSquared();
+			if (dsq > rsq)
+				rsq = dsq;
+		}
+		radius = (F)sqrt(rsq);
+	}
+
+	template<typename T>
+	H3DF_INLINE void Engulf(size_t count, T const * indices, Point_3D<F> const * points)
+	{
+		double rsq = radius * radius;
+		for (size_t i = 0; i < count; ++i) {
+			double dsq = (points[*indices++] - center).LengthSquared();
+			if (dsq > rsq)
+				rsq = dsq;
+		}
+		radius = (F)sqrt(rsq);
+	}
+};
+
+using SimpleSphere = Sphere_3D<float>;
+using DSimpleSphere = Sphere_3D<double>;
+
+template<typename F>
+H3DF_INLINE Cuboid_3D<F>::Cuboid_3D(Sphere_3D<F> const & sphere)
+{
+	if (sphere.radius < 0) {
+		*this = Invalid();
+	}
+	else {
+		cMin = Point_3D<F>(sphere.center.x - sphere.radius, sphere.center.y - sphere.radius, sphere.center.z - sphere.radius);
+		cMax = Point_3D<F>(sphere.center.x + sphere.radius, sphere.center.y + sphere.radius, sphere.center.z + sphere.radius);
+	}
+}
+
 
 using IntArray = std::vector<int, Allocator<int>>;
 using FloatArray = std::vector<float, Allocator<float>>;

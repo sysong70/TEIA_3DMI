@@ -9,6 +9,20 @@
 #include <mb_cart_point3d.h>
 #include <mb_cart_point.h>
 
+#define CHECK_A3D_RETURN(FunctionCall)\
+{\
+	const A3DStatus iRet__ = FunctionCall;\
+	if (iRet__ != A3D_SUCCESS)\
+	{\
+		assert(false);\
+		if (A3DMiscGetErrorMsg)\
+			fprintf(stderr, #FunctionCall " returned error %d = %s\n", iRet__ , A3DMiscGetErrorMsg(iRet__) ); \
+		else\
+			fprintf(stderr, #FunctionCall " returned error %d\n", iRet__ ); \
+		return iRet__;\
+	}\
+}
+
 namespace Dmi3dx
 {
 	// == Text 관련 함수 =============================================================================
@@ -48,5 +62,8 @@ namespace Dmi3dx
 	// == A3D 관련 함수 ==============================================================================
 	CStringA GetA3dEntityTypeString(A3DEEntityType eType);
 	CStringA GetA3dEntityTypeString(const A3DEntity * pcInEntity);
+
+	//== Json 관련 함수 ==============================================================================
+	CString GetJsonString(A3DSurfPlane * pcInSurfPlane);
 };
 

@@ -257,7 +257,21 @@ double Json::Array::GetReal(int i)
 	return pValue->AsReal();
 }
 
+// sysong: 2024-04-18 추가
+double Json::Array::GetRealRaw(int i)
+{
+	CString strValue = GetString(i);
+	if (true == strValue.IsEmpty()) {
+		DEBUG_STOP;
+		return 0;
+	}
 
+	double dValue = 0;
+
+	::swscanf_s(strValue, L"%llx", (unsigned long long *) & dValue);
+
+	return dValue;
+}
 
 CString& Json::Array::GetString(int i)
 {
@@ -339,7 +353,11 @@ void Json::Array::AddDwordPtr(DWORD_PTR value)
 	AddString().Format(L"%llx", value);
 }
 
-
+// sysong: 2024-04-18 추가
+void Json::Array::AddRealRaw(double value)
+{
+	AddString().Format(L"%llx", *(unsigned long long *) & value);
+}
 
 DWORD_PTR Json::Array::GetDwordPtr(int i)
 {

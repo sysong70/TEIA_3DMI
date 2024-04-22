@@ -3,13 +3,15 @@
 #include "3DF.Component.h"
 #include "Impl/ComponentImpl.h"
 
-#include "Common_Define.h"
+#include "3DF.MetaData.h"
 
 #include "../3DF/Segment.h"
 #include "../3DF/3DF.Utility.h"
 #include "../3DF/KeyPath.h"
 #include "../3DF/Selection.h"
 #include "../3DF/Impl/SelectionImpl.h"
+
+#include "Common_Define.h"
 
 #include <ranges>
 
@@ -74,8 +76,6 @@ bool H3DF::Component::Equals(Component const & cInThat) const
 		return false;
 	}
 
-
-
 	return (pcImpl->m_nSegmentKey == pcInThatImpl->m_nSegmentKey);
 }
 
@@ -103,20 +103,24 @@ HC_KEY H3DF::Component::GetIncludeKey() const
 	return pcImpl->m_nIncludeKey;
 }
 
-Component & H3DF::Component::GetOwner() const
+Component * H3DF::Component::GetOwner() const
 {
 	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	return *pcImpl->m_pcOwner;
+	return pcImpl->m_pcOwner;
 }
 
-ComponentArray & H3DF::Component::GetSubComponents() const
+ComponentArray * H3DF::Component::GetSubComponents() const
 {
 	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	return *pcImpl->m_pvSubComponents;
+	if (nullptr != pcImpl->m_pvSubComponents) {
+		return pcImpl->m_pvSubComponents;
+	}
+	
+	return nullptr;
 }
 
 size_t H3DF::Component::GetAllSubComponentCount() const
@@ -124,13 +128,17 @@ size_t H3DF::Component::GetAllSubComponentCount() const
 	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	size_t nCount = GetSubComponents().size();
+	if (nullptr != pcImpl->m_pvSubComponents) {
+		size_t nCount = pcImpl->m_pvSubComponents->size();
 
-	for (auto * pcComponent : GetSubComponents()) {
-		nCount += pcComponent->GetAllSubComponentCount();
+		for (auto * pcComponent : *pcImpl->m_pvSubComponents) {
+			nCount += pcComponent->GetAllSubComponentCount();
+		}
+
+		return nCount;
 	}
 
-	return nCount;
+	return 0;
 }
 
 CString H3DF::Component::GetName() const
@@ -139,6 +147,85 @@ CString H3DF::Component::GetName() const
 	DEBUG_VALID(pcImpl);
 
 	return *pcImpl->m_pstrName;
+}
+
+MetadataArray * H3DF::Component::GetAllMetadata() const
+{
+	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr != pcImpl->m_pvMetaDatas) {
+		return pcImpl->m_pvMetaDatas;
+	}
+
+	return nullptr;
+}
+
+MetaData * H3DF::Component::GetMetaData(H3DF::MetaDataIndex eInIndex) const
+{
+	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr != pcImpl->m_pvMetaDatas) {
+		for (auto * pcMetaData : *pcImpl->m_pvMetaDatas) {
+			if (pcMetaData->GetIndex() == eInIndex) {
+				return pcMetaData;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+bool H3DF::Component::AddMetaData(H3DF::MetaData * pcInMetaData, bool bReplace)
+{
+	if (nullptr == pcInMetaData) {
+		DEBUG_STOP;
+		return false;
+	}
+
+	MetaDataIndex eIndex = pcInMetaData->GetIndex();
+
+	MetaData * pcMetaData = GetMetaData(eIndex);
+	if (nullptr != pcMetaData) {
+		if (true == bReplace) {
+			RemoveMetaData(eIndex);
+		}
+		else {
+			return false;
+		}
+	}
+
+	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr == pcImpl->m_pvMetaDatas) {
+		pcImpl->m_pvMetaDatas = new MetadataArray();
+	}
+	DEBUG_VALID(pcImpl->m_pvMetaDatas);
+
+	pcImpl->m_pvMetaDatas->push_back(pcInMetaData);
+
+	return true;
+}
+
+bool H3DF::Component::RemoveMetaData(H3DF::MetaDataIndex eInIndex)
+{
+	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr == pcImpl->m_pvMetaDatas) {
+		return false;
+	}
+
+	for (auto * pcMetaData : *pcImpl->m_pvMetaDatas) {
+		if (pcMetaData->GetIndex() == eInIndex) {
+			pcImpl->m_pvMetaDatas->erase(std::remove(pcImpl->m_pvMetaDatas->begin(), pcImpl->m_pvMetaDatas->end(), pcMetaData), pcImpl->m_pvMetaDatas->end());
+			return true;
+		}
+	}
+
+	return false;
 }
 
 DWORD H3DF::Component::GetStatus()
@@ -195,7 +282,7 @@ KeyPath H3DF::Component::GetKeyPath(Component const & cInComponent)
 	Component const * pcComponent = &cInComponent;
 	while (nullptr != pcComponent) {
 		cKeyArray.push_back(pcComponent->GetSegmentKey());
-		pcComponent = &pcComponent->GetOwner();
+		pcComponent = pcComponent->GetOwner();
 	}
 
 	KeyPath cKeyPath(cKeyArray);

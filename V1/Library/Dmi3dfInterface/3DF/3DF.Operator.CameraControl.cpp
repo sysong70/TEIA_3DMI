@@ -9,6 +9,7 @@
 #include "Line.h"
 
 #include "Camera.h"
+#include "Bounding.h"
 
 #include "../Sprocket/Impl/ViewImpl.h"
 
@@ -376,6 +377,60 @@ void H3DF::Operator::CameraControl::FitWorld()
 	pcImpl->GetBaseView()->ZoomToExtents();
 
 	pcImpl->GetBaseView()->SetZoomLimit();
+}
+
+void H3DF::Operator::CameraControl::SetCamera(H3DF::CameraKit & cInCameraKit)
+{
+	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	SegmentKey cScene(pcImpl->GetBaseView()->GetSceneKey());
+	cScene.SetCamera(cInCameraKit);
+}
+
+void H3DF::Operator::CameraControl::SetCameraFitSelection(H3DF::MatrixKit & cInMatrix, SegmentKey & cInSegment)
+{
+	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	BoundingKit cBounding;
+	if (false == cInSegment.ShowBounding(cBounding)) {
+		DEBUG_STOP;
+		return;
+	}
+
+	SimpleSphere cSphere;
+	SimpleCuboid cCuboid;
+	if (false == cBounding.ShowVolume(cSphere, cCuboid)) {
+		DEBUG_STOP;
+		return;
+	}
+
+	Point cCenter = (cCuboid.cMax + cCuboid.cMin) / 2.0;
+	Vector cVector = cCuboid.cMax - cCuboid.cMin;
+	double dLength = cVector.Length();
+
+	// 카메라의 위치를 설정한다
+	// 카메라 위치 설정
+	//Point cCameraPosition = cCenter;
+	Point cCameraPosition = cCenter + cInMatrix.ZAxis() * (dLength);
+	// 카메라가 바라보는 방향 설정. Matrix Z축의 반대 방향으로 설정한다.
+	//Point cCameraTarget = cCenter - cInMatrix.ZAxis() * dLength;
+	Point cCameraTarget = cCenter;
+
+	SegmentKey cScene(pcImpl->GetBaseView()->GetSceneKey());
+
+	H3DF::CameraControl cCamerCtrl = cScene.GetCameraControl();
+
+	cCamerCtrl.SetTarget(cCameraTarget);
+	cCamerCtrl.SetPosition(cCameraPosition);
+	// 화면상에서 위쪽을 가리키는 방향.
+	cCamerCtrl.SetUpVector(cInMatrix.YAxis());
+	cCamerCtrl.SetField(dLength, dLength);
+		
+// 	CameraKit cCameraInfo1;
+// 	ShowCamera(cCameraInfo1);
+
 }
 
 //== Mouse cInEvent 처리 ===============================================================================

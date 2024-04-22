@@ -33,6 +33,8 @@ namespace KERNEL
 
 			void OnItemSelectedSignal(Json::Object& cInObject);
 			void OnItemCheckedSignal(Json::Object & cInObject);
+
+			void OnItemDblClickedSignal(Json::Object & cInObject);
 		};
 	}
 }	
