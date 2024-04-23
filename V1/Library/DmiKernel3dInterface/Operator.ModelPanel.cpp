@@ -249,7 +249,7 @@ void KERNEL::Operator::ModelPanelImpl::ComponentExpanded(H3DF::Component & cInCo
 			// #CADModel: Markup View의 하부 Component는 표시 제어
 			// Markup View의 하부 Component는 표시하지 않는다.
 			// Markyp View의	 하부 Component는 Visibility가 Off되어 있고, Include로 연결만 되어 있는 상태로 저장되어 있음.
-			cItem.HasChildren = true;
+			cItem.HasChildren = false;
 		}
 
 		if (true == cItem.Title.IsEmpty()) {
@@ -369,6 +369,11 @@ void KERNEL::Operator::ModelPanelImpl::TreeReverseExpand(H3DF::Component & cInCo
 		return;
 	}
 
+	// 전개하지 않는 요소는 더이상 전개하지 않도록 한다.
+	if (H3DF::Component::Type::ExchangeMkpView == cInComponent.GetType()) {
+		return;
+	}
+
 	Component * pcOwner = nullptr;
 
 	std::vector<H3DF::Component *> aOwnerComponents;
@@ -432,7 +437,7 @@ void KERNEL::Operator::ModelPanel::Initialize(H3DF::CADModel & cInCadModel)
 	// Root Item을 추가
 	pcImpl->Delivery().modelPanel.AddItem(cItem);
 
-	pcImpl->ComponentExpanded(cInCadModel, 3);
+	pcImpl->ComponentExpanded(cInCadModel, 2);
 
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
 	//:Ken - 20240419
@@ -442,6 +447,7 @@ void KERNEL::Operator::ModelPanel::Initialize(H3DF::CADModel & cInCadModel)
 // 1. 초기화 함수
 void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 {
+/*
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
@@ -526,7 +532,7 @@ void KERNEL::Operator::ModelPanel::Initialize(CString strFilePathName)
 	//:Ken - 20240219, unlock and update tree
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
 	//:Ken - 20240419
-	pcImpl->Delivery().modelPanel.ViewItem((DWORD_PTR)pcRootItem);
+	pcImpl->Delivery().modelPanel.ViewItem((DWORD_PTR)pcRootItem);*/
 }
 
 //== Signal 처리 관련 함수 ============================================================================
@@ -572,6 +578,8 @@ void KERNEL::Operator::ModelPanel::SelectTreeItem(H3DF::SelectionItem & cSelItem
 	DEBUG_VALID(pcImpl);
 
 	H3DF::Component * pcComponent = pcImpl->CADModel().GetComponent(cSelItem);
+
+	H3DF::Component::Type eType = pcComponent->GetType();
 
 	pcImpl->Delivery().modelPanel.RedrawTree(false);
 

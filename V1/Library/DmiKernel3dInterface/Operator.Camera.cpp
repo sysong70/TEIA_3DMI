@@ -245,13 +245,11 @@ void KERNEL::Operator::Camera::SetCameraFitSelection(H3DF::MatrixKit & cInMatrix
 	H3DF::Vector cVector = cCuboid.cMax - cCuboid.cMin;
 	double dLength = cVector.Length();
 
-	// 카메라의 위치를 설정한다
-
+	//===== 카메라 위치 설정 =====
 	// 카메라가 놓이는 위치 설정
-	//Point cCameraPosition = cCenter;
 	H3DF::Point cCameraPosition = cCenter + cInMatrix.ZAxis() * (dLength * 2.5);
+
 	// 카메라가 바라보는 방향 설정. Matrix Z축의 반대 방향으로 설정한다.
-	//Point cCameraTarget = cCenter - cInMatrix.ZAxis() * dLength;
 	H3DF::Point cCameraTarget = cCenter;
 
 	H3DF::CameraKit cCamera;
@@ -261,16 +259,4 @@ void KERNEL::Operator::Camera::SetCameraFitSelection(H3DF::MatrixKit & cInMatrix
 	cCamera.SetField(dLength, dLength);
 
 	pcImpl->View().SmoothTransition(cCamera);
-
-/*
-	H3DF::SegmentKey cScene(pcImpl->GetBaseView()->GetSceneKey());
-
-	H3DF::CameraControl cCamerCtrl = cScene.GetCameraControl();
-
-	cCamerCtrl.SetTarget(cCameraTarget);
-	cCamerCtrl.SetPosition(cCameraPosition);
-	// 화면상에서 위쪽을 가리키는 방향.
-	cCamerCtrl.SetUpVector(cInMatrix.YAxis());
-	cCamerCtrl.SetField(dLength, dLength);
-*/
 }
