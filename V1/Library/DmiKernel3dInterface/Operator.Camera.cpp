@@ -218,7 +218,9 @@ void KERNEL::Operator::Camera::SetCamera(H3DF::CameraKit & cInCamera)
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->CameraControl().SetCamera(cInCamera);
+	pcImpl->View().SmoothTransition(cInCamera);
+
+	//pcImpl->CameraControl().SetCamera(cInCamera);
 }
 
 void KERNEL::Operator::Camera::SetCameraFitSelection(H3DF::MatrixKit & cInMatrix, H3DF::SegmentKey & cInSegment)

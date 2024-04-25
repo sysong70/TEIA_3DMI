@@ -145,9 +145,15 @@ namespace H3DF
         HC_KEY GetIncludeKey() const;
 
         Component * GetOwner() const;
+        Component * FindOwner(Component::Type eInType);
 
         ComponentArray * GetSubComponents() const;
+        ComponentArray * GetSubComponents(Component::Type eInType) const;
+
         size_t GetAllSubComponentCount() const;
+        ComponentArray * GetAllSubcomponents(Component::Type eInType) const;
+
+        Component * FindUpComponent(Component::Type eInType);
 
         CString GetName() const;
 

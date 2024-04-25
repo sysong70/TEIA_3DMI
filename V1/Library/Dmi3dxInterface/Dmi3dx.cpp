@@ -129,6 +129,26 @@ bool Dmi3dx::CreateFolder(CString strPath)
 	return true;
 }
 
+H3DF::Point Dmi3dx::GetPoint(A3DVector3dData cData)
+{
+	H3DF::Point cPoint;
+	cPoint.x = cData.m_dX;
+	cPoint.y = cData.m_dY;
+	cPoint.z = cData.m_dZ;
+
+	return cPoint;
+}
+
+H3DF::Vector Dmi3dx::GetVector(A3DVector3dData cData)
+{
+	H3DF::Vector cVector;
+	cVector.x = cData.m_dX;
+	cVector.y = cData.m_dY;
+	cVector.z = cData.m_dZ;
+
+	return cVector;
+}
+
 MbCartPoint Dmi3dx::GetMbCartPoint(A3DVector3dData cVector, double dScale)
 {
 	MbCartPoint cCartPoint;

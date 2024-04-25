@@ -9,6 +9,8 @@
 #include <mb_cart_point3d.h>
 #include <mb_cart_point.h>
 
+#include <3DF/Math.h>
+
 #define CHECK_A3D_RETURN(FunctionCall)\
 {\
 	const A3DStatus iRet__ = FunctionCall;\
@@ -46,6 +48,9 @@ namespace Dmi3dx
 	CString GetExecuteDirectory();
 	// 다중 디렉토리도 생성함.
 	bool CreateFolder(CString strPath);
+
+	H3DF::Point GetPoint(A3DVector3dData cData);
+	H3DF::Vector GetVector(A3DVector3dData cData);
 
 	// == C3D 변환 관련 함수 ==========================================================================
 	MbCartPoint GetMbCartPoint(A3DVector3dData cVector, double dScale);

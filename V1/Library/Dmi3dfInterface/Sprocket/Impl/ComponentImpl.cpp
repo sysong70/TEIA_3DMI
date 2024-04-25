@@ -151,6 +151,69 @@ void H3DF::ComponentImpl::AddSubComponent(Component & cInSubComponent)
 	m_pvSubComponents->push_back(&cInSubComponent);
 }
 
+ComponentArray * H3DF::ComponentImpl::GetAllSubcomponents(Component::Type eInType) const
+{
+	ComponentArray * pcSubComponents = new ComponentArray();
+
+	GetSubcomponents(eInType, pcSubComponents, true);
+
+	return pcSubComponents;
+}
+
+void H3DF::ComponentImpl::GetSubcomponents(Component::Type eInType, ComponentArray * pcOutSubComponents, bool bRecursive) const
+{
+	if (nullptr == pcOutSubComponents) {
+		DEBUG_STOP;
+		return;
+	}
+
+	if (nullptr != m_pvSubComponents) {
+		for (auto * pcSubComponent : *m_pvSubComponents) {
+			if (eInType == pcSubComponent->GetType()) {
+				pcOutSubComponents->push_back(pcSubComponent);
+			}
+		}
+
+		if (true == bRecursive) {
+			for (auto * pcSubComponent : *m_pvSubComponents) {
+				ComponentImpl * pcSubImpl = dynamic_cast<ComponentImpl *>(pcSubComponent->GetImpl());
+				DEBUG_VALID(pcSubImpl);
+
+				pcSubImpl->GetSubcomponents(eInType, pcOutSubComponents, bRecursive);
+			}
+		}
+	}
+}
+
+Component * H3DF::ComponentImpl::FindSubComponentBySegmentKey(HC_KEY nInSegmentKey, bool bRecursive)
+{
+	if (INVALID_KEY == nInSegmentKey) {
+		DEBUG_STOP;
+		return nullptr;
+	}
+
+	if (nullptr != m_pvSubComponents) {
+		for (auto * pcSubComponent : *m_pvSubComponents) {
+			if (nInSegmentKey == pcSubComponent->GetSegmentKey()) {
+				return pcSubComponent;
+			}
+		}
+
+		if (true == bRecursive) {
+			for (auto * pcSubComponent : *m_pvSubComponents) {
+				ComponentImpl * pcSubImpl = dynamic_cast<ComponentImpl *>(pcSubComponent->GetImpl());
+				DEBUG_VALID(pcSubImpl);
+				Component * pcComponent = pcSubImpl->FindSubComponentBySegmentKey(nInSegmentKey, bRecursive);
+				if (nullptr != pcComponent) {
+					return pcComponent;
+				}
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 //== Utility Functions =============================================================================
 
 bool H3DF::ComponentImpl::SetData(Component & cInComponent, CString strInName, HC_KEY nKey, HC_KEY nIncludeKey, Component::Type eInType)

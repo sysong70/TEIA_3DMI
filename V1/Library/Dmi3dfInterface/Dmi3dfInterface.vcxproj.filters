@@ -342,9 +342,6 @@
     <ClInclude Include="3DF\Reference.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\CuttingSection.h">
-      <Filter>3DF\Object</Filter>
-    </ClInclude>
     <ClInclude Include="Sprocket\3DF.Component.h">
       <Filter>CADModel</Filter>
     </ClInclude>
@@ -359,6 +356,9 @@
     </ClInclude>
     <ClInclude Include="3DF\Bounding.h">
       <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\CuttingSection.h">
+      <Filter>3DF\Object</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -629,9 +629,6 @@
     <ClCompile Include="3DF\Reference.cpp">
       <Filter>3DF\Object</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\CuttingSection.cpp">
-      <Filter>3DF\Object</Filter>
-    </ClCompile>
     <ClCompile Include="Sprocket\3DF.Component.cpp">
       <Filter>CADModel</Filter>
     </ClCompile>
@@ -646,6 +643,9 @@
     </ClCompile>
     <ClCompile Include="3DF\Bounding.cpp">
       <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\CuttingSection.cpp">
+      <Filter>3DF\Object</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

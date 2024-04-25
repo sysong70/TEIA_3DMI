@@ -355,7 +355,9 @@ namespace H3DF
 	public:
 		SelectabilityControlImpl() = default;
 
-		void Copy(SelectabilityControlImpl * pcInThat) {};
+		void Copy(SelectabilityControlImpl * pcInThat) {
+			ControlImpl::Copy(pcInThat);
+		};
 
 		void SetSelectability(CString strInType, bool bInValue);
 		void UnsetSelectability(CString strInType);
@@ -364,22 +366,18 @@ namespace H3DF
 
 void H3DF::SelectabilityControlImpl::SetSelectability(CString strInType, bool bInValue)
 {
-	SegmentKeyImpl::LocalOpen(m_cOverrideKey);
-
-	CString strList;
-	strList.Format(L"%s = %s", strInType, (true == bInValue ? L"on" : L"off"));
-	HC_Set_Selectability(Utility::ToChar(strList));
-
-	SegmentKeyImpl::LocalClose(m_cOverrideKey);
+	SegmentKeyImpl::LocalOpen(m_cOverrideKey); {
+		CString strList;
+		strList.Format(L"%s = %s", strInType, (true == bInValue ? L"on" : L"off"));
+		HC_Set_Selectability(Utility::ToChar(strList));
+	} SegmentKeyImpl::LocalClose(m_cOverrideKey);
 }
 
 void H3DF::SelectabilityControlImpl::UnsetSelectability(CString strInType)
 {
-	SegmentKeyImpl::LocalOpen(m_cOverrideKey);
-
-	HC_UnSet_One_Selectability(Utility::ToChar(strInType));
-
-	SegmentKeyImpl::LocalClose(m_cOverrideKey);
+	SegmentKeyImpl::LocalOpen(m_cOverrideKey); {
+		HC_UnSet_One_Selectability(Utility::ToChar(strInType));
+	} SegmentKeyImpl::LocalClose(m_cOverrideKey);
 }
 
 //== SelectabilityControl ==========================================================================
@@ -415,70 +413,70 @@ SelectabilityControl & H3DF::SelectabilityControl::operator = (SelectabilityCont
 
 SelectabilityControl & H3DF::SelectabilityControl::SetWindows(bool bInValue)
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->SetSelectability("windows", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetEdges(bool bInValue)
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->SetSelectability("edges", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetFaces(bool bInValue)
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->SetSelectability("faces", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetLights(bool bInValue) 
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->SetSelectability("lights", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetLines(bool bInValue) 
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->SetSelectability("lines", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetMarkers(bool bInValue)
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->SetSelectability("markers", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetVertices(bool bInValue)
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->SetSelectability("vertices", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetText(bool bInValue)
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->SetSelectability("text", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetGeometry(bool bInValue)
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->SetSelectability("geometry", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetEverything(bool bInValue)
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->SetSelectability("everything", bInValue);
 	return *this;
 }
@@ -487,70 +485,70 @@ SelectabilityControl & H3DF::SelectabilityControl::SetEverything(bool bInValue)
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetWindows()
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->UnsetSelectability("windows");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetEdges()
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->UnsetSelectability("edges");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetFaces()
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->UnsetSelectability("faces");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetLights()
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->UnsetSelectability("lights");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetLines()
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->UnsetSelectability("lines");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetMarkers() 
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->UnsetSelectability("markers");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetVertices()
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->UnsetSelectability("vertices");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetText()
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->UnsetSelectability("text");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetGeometry() 
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 	pcImpl->UnsetSelectability("geometry");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetEverything()
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
+	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
 

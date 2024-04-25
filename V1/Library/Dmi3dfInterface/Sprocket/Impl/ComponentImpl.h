@@ -21,6 +21,12 @@ namespace H3DF
 
 		void AddSubComponent(Component & cInSubCompnent);
 
+		ComponentArray * GetAllSubcomponents(Component::Type eInType) const;
+		void GetSubcomponents(Component::Type eInType, ComponentArray * pcOutSubComponents, bool bRecursive) const;
+		
+		Component * FindUpComponent(Component::Type eInType);
+		Component * FindSubComponentBySegmentKey(HC_KEY nInSegmentKey, bool bRecursive);
+
 		HC_KEY m_nSegmentKey = INVALID_KEY;
 		HC_KEY m_nIncludeKey = INVALID_KEY;
 

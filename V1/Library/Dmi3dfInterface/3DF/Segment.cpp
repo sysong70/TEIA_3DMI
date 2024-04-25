@@ -9,6 +9,7 @@
 #include "Line.h"
 #include "Circle.h"
 
+#include "Selectability.h"
 #include "Visibility.h"
 #include "VisualEffects.h"
 #include "Material.h"
@@ -769,6 +770,19 @@ PerformanceControl const H3DF::SegmentKey::GetPerformanceControl() const
 	return cPerformanceControl;
 }
 
+//== Selectability Control 관련 함수 =========================================================
+SelectabilityControl H3DF::SegmentKey::GetSelectabilityControl()
+{
+	SelectabilityControl cSelectabilityControl(*this);
+	return cSelectabilityControl;
+}
+
+SelectabilityControl const H3DF::SegmentKey::GetSelectabilityControl() const
+{
+	SelectabilityControl cSelectabilityControl(*(SegmentKey *)this);
+	return cSelectabilityControl;
+}
+
 //== Visibility Control 관련 함수 ====================================================================
 VisibilityControl H3DF::SegmentKey::GetVisibilityControl()
 {
@@ -921,11 +935,6 @@ SegmentKey & H3DF::SegmentKey::SetCamera(CameraKit const & cInKit)
 
 	CameraControl cCamerCtrl = GetCameraControl();
 
-	Vector cUpVector;
-	if (true == cInKit.ShowUpVector(cUpVector)) {
-		cCamerCtrl.SetUpVector(cUpVector);
-	}
-
 	Point cPosition;
 	if (true == cInKit.ShowPosition(cPosition)) {
 		cCamerCtrl.SetPosition(cPosition);
@@ -934,6 +943,11 @@ SegmentKey & H3DF::SegmentKey::SetCamera(CameraKit const & cInKit)
 	Point cTarget;
 	if (true == cInKit.ShowTarget(cTarget)) {
 		cCamerCtrl.SetTarget(cTarget);
+	}
+
+	Vector cUpVector;
+	if (true == cInKit.ShowUpVector(cUpVector)) {
+		cCamerCtrl.SetUpVector(cUpVector);
 	}
 
 	Camera::Projection eType;

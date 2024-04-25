@@ -66,6 +66,12 @@ namespace H3DF
 		//size_t ShowReferrers(SegmentKeyArray & aOutSegments) const;
 		size_t ShowReferrers(ReferenceKeyArray & aOutReferences) const;
 
+		//== Cutting Section 관련 함수 ===============================================================
+// 		CuttingSectionKey InsertCuttingSection(Plane const & cInPlane);
+// 		CuttingSectionKey InsertCuttingSection(CuttingSectionKit const & cInKit);
+// 		CuttingSectionKey InsertCuttingSection(PlaneArray const & cInPlanes);
+// 		CuttingSectionKey InsertCuttingSection(size_t nInPlanesCount, Plane const pcInPlanes[]);
+
 		//== Shell 관련 함수 =========================================================================
 		ShellKey InsertShell(ShellKit const & cInKit);
 		// 	ShellKey InsertShell(PointArray const & in_points, IntArray const & in_facelist);
@@ -101,6 +107,10 @@ namespace H3DF
 		bool ShowPerformance(PerformanceKit & cOutKit) const;
 		PerformanceControl GetPerformanceControl();
 		PerformanceControl const GetPerformanceControl() const;
+
+		//== Selectability Control 관련 함수 =========================================================
+		SelectabilityControl GetSelectabilityControl();
+		SelectabilityControl const GetSelectabilityControl() const;
 
 		//== Visibility Control 관련 함수 ============================================================
 		VisibilityControl GetVisibilityControl();

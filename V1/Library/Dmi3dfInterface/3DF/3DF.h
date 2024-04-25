@@ -66,8 +66,9 @@ namespace H3DF
 	class PolygonKit;
 	class PolygonKey;
 	class BoundingKit;
-	class SelectabilityKit;
 
+	class SelectabilityKit;
+	class SelectabilityControl;
 
 	class CameraKit;
 	class CameraControl;
@@ -363,8 +364,9 @@ namespace H3DF
 	{
 		None									= 0x00000000,
 
-		Camera									= 0x03000001,
-		PlaneString								= 0x03000002,
+		ViewMatrix								= 0x03000001,
+		Camera									= 0x03000002,
+		PlaneString								= 0x03000003,
 	};
 
 	class API_3DF ViewDirection

@@ -138,7 +138,12 @@ protected:
 
 	A3DStatus ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp);
 	H3DF::Component * GetViewGroupComponent(H3DF::Component & cInParentComp);
+	H3DF::Component * CreateViewGroupComponent(H3DF::Component & cInParentComp);
 	H3DF::Component * GetAnnotationViewGroupComponent(H3DF::Component & cInParentComp);
+	H3DF::Component * CreateAnnotationViewGroupComponent(H3DF::Component & cInParentComp);
+
+	H3DF::Component * CreatePmiGroupComponent(H3DF::Component & cParentComp);
+	H3DF::Component * GetPmiGroupComponent(H3DF::Component & cParentComp);
 
 	A3DStatus ParseAnnotations(A3DMkpAnnotationEntity ** pcAnnotation, A3DUns32 nAnnotationsSize, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp);
 	A3DStatus ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation, A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp, bool bAddChildToParentComp);
@@ -152,7 +157,7 @@ protected:
 	A3DStatus GetMarkupTesselation(const A3DTessBaseData * psTessBaseData, const A3DTessMarkupData * psTessMarkupData, H3DF::PolylineArray & out_polylines, H3DF::PolygonArray & out_polygones,
 		H3DF::StringArray & aOutStrings, H3DF::PMI::TextAttributesArray & cOutTextAttributes, H3DF::PMI::Options * pcOutPmiOptions = nullptr);
 	A3DStatus GetLeaderLinesAndSymbols(const A3DMkpLeader * pMarkup, H3DF::PolylineArray & out_leader_lines, H3DF::PolygonArray & out_leader_symbols);
-	H3DF::Component * GetPmiGroupComponent(H3DF::Component & cParentComp);
+	
 
 	A3DStatus DrawTessBase(A3DTessBase * pcInTessBase, const A3DRiRepresentationItem * pcInRepItem, const A3DMiscEntityReference * pcInEntityRef,
 		const A3DMiscCascadedAttributes * pcInParentAttr, H3DF::SegmentKey & cInSegment);

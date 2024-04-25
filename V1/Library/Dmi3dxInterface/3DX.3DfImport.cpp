@@ -23,6 +23,7 @@
 
 #include <3DF/Math.Matrix.h>
 
+#include <3DF/Selectability.h>
 #include <3DF/Visibility.h>
 #include <3DF/MarkerAttribute.h>
 #include <3DF/Condition.h>
@@ -1141,8 +1142,14 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 #ifdef USED_LOG_MANAGER
 	Log(2, L"ParsePart AnnotationsSize: %d", sPartDefData.m_uiAnnotationsSize);
 #endif
+
+	H3DF::Component * pcPmiGroupComponent = nullptr;
 	if (0 < sPartDefData.m_uiAnnotationsSize) {
-		ParseAnnotations(sPartDefData.m_ppAnnotations, sPartDefData.m_uiAnnotationsSize, cSegment, cParentComp);
+		pcPmiGroupComponent = CreatePmiGroupComponent(cParentComp);
+		DEBUG_VALID(pcPmiGroupComponent);
+
+		SegmentKey cPmiGroupSegment(pcPmiGroupComponent->GetSegmentKey());
+		ParseAnnotations(sPartDefData.m_ppAnnotations, sPartDefData.m_uiAnnotationsSize, cPmiGroupSegment, *pcPmiGroupComponent);
 	}
 
 	// 포함되어 있는 Markup View 정보를 가져온다.
@@ -1374,19 +1381,23 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 }
 
 // 2-2. Draw Set
-A3DStatus TdfImport::ParseRiSet(const A3DRiSet * pSet, const A3DMiscEntityReference * pcEntityRef, const A3DMiscCascadedAttributes * pcParentAttr,
+A3DStatus TdfImport::ParseRiSet(const A3DRiSet * pcInSet, const A3DMiscEntityReference * pcEntityRef, const A3DMiscCascadedAttributes * pcParentAttr,
 	H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp)
 {
+	LogIncreaseTabIndex(2);
+
+	Log(2, L"ParseRiSet: %s", LogHexStr((DWORD_PTR)pcInSet));
+
 	A3DMiscCascadedAttributes * pcAttr;
 	A3DMiscCascadedAttributesData cAttrData;
-	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pSet, pcParentAttr, &pcAttr, &cAttrData));
+	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcInSet, pcParentAttr, &pcAttr, &cAttrData));
 	
 	// #3DX : Show / Noshw 처리
 	// if (cAttrData.m_bShow && !cAttrData.m_bRemoved && A3D_SUCCESS == IsShow(pSet))
 	{
 		A3DRiSetData sData;
 		A3D_INITIALIZE_DATA(A3DRiSetData, sData);
-		CHECK_A3D_RETURN(A3DRiSetGet(pSet, &sData));
+		CHECK_A3D_RETURN(A3DRiSetGet(pcInSet, &sData));
 
 		A3DUns32 ui;
 		for (ui = 0; ui < sData.m_uiRepItemsSize; ui++) {
@@ -1398,6 +1409,8 @@ A3DStatus TdfImport::ParseRiSet(const A3DRiSet * pSet, const A3DMiscEntityRefere
 
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttr));
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrData));
+
+	LogDecreaseTabIndex(2);
 
 	return A3D_SUCCESS;
 }
@@ -1679,10 +1692,12 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 		IncludeKey cInclude = cViewGroupSegment.IncludeSegment(cSegment);
 
 		cSegment.GetVisibilityControl().SetEverything(false);
+		cSegment.GetSelectabilityControl().SetEverything(false);
 
 		// #CADModel: PMI 추가
 		H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, strViewName, H3DF::Component::Type::ExchangeMkpView, *pcViewGroupComponent);
 
+		// Plane 정보 처리, Plane 정보를 Matrix로 저장한다.
 		if (nullptr != cViewData.m_pPlane) {
 			A3DSurfPlaneData cData;
 			A3D_INITIALIZE_DATA(A3DSurfPlaneData, cData);
@@ -1711,46 +1726,42 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 				pcMatrix->SetYAxis(cYAxis);
 				pcMatrix->SetZAxis(cZAxis);
 
-				H3DF::DwordPtrMetaData * pcMetaData = new H3DF::DwordPtrMetaData(H3DF::MetaDataIndex::Camera, (DWORD_PTR)pcMatrix);
+				H3DF::DwordPtrMetaData * pcMetaData = new H3DF::DwordPtrMetaData(H3DF::MetaDataIndex::ViewMatrix, (DWORD_PTR)pcMatrix);
 				pcComponent->AddMetaData(pcMetaData);
 			}
+		}
 
-			//CString strJsonText = Dmi3dx::GetJsonString(cViewData.m_pPlane);
-// 			H3DF::StringMetaData * pcMetaData = new H3DF::StringMetaData(H3DF::MetaDataIndex::PlaneString, strJsonText);
-// 			pcComponent->AddMetadata(pcMetaData, true);
+		if (nullptr != cViewData.m_pSceneDisplayParameters) {
+			A3DGraphSceneDisplayParametersData sData;
+			A3D_INITIALIZE_DATA(A3DGraphSceneDisplayParametersData, sData);
+			if (A3D_SUCCESS == A3DGraphSceneDisplayParametersGet(cViewData.m_pSceneDisplayParameters, &sData)) {
+				if (nullptr != sData.m_pCamera) {
+					A3DGraphCameraData sCameraData;
+					A3D_INITIALIZE_DATA(A3DGraphCameraData, sCameraData);
+					if (A3D_SUCCESS == A3DGraphCameraGet(sData.m_pCamera, &sCameraData)) {
+						H3DF::CameraKit * pcCamera = new H3DF::CameraKit();
 
-			H3DF::CameraKit * pcCamera = new H3DF::CameraKit();
-			
-/*
-			pcCamera->SetTarget()
+						pcCamera->SetTarget(Dmi3dx::GetPoint(sCameraData.m_sLookAt));
+						pcCamera->SetPosition(Dmi3dx::GetPoint(sCameraData.m_sLocation));
+						pcCamera->SetUpVector(Dmi3dx::GetVector(sCameraData.m_sUp));
+						pcCamera->SetField(sCameraData.m_dXFovy, sCameraData.m_dYFovy);
+						pcCamera->SetNearLimit(sCameraData.m_dZNear);
+						if (true == sCameraData.m_bOrthographic) {
+							pcCamera->SetProjection(H3DF::Camera::Projection::Orthographic);
+						}
+						else {
+							pcCamera->SetProjection(H3DF::Camera::Projection::Perspective);
+						}
 
-			Point cPosition = pcImpl->cPosition;
-			Point cTarget = pcImpl->cTarget;
-			Vector cViewNormal = cPosition - cTarget;
-			cViewNormal.Normalize();
+						H3DF::DwordPtrMetaData * pcMetaData = new H3DF::DwordPtrMetaData(H3DF::MetaDataIndex::Camera, (DWORD_PTR)pcCamera);
+						pcComponent->AddMetaData(pcMetaData);
 
-			Vector cYAxis = pcImpl->cUpVector;
-			cYAxis.Normalize();
+					}
+					A3DGraphCameraGet(nullptr, &sCameraData);
+				}
+			}
 
-			Vector cXAxis = cYAxis.Cross(cViewNormal);
-
-			cMatrix[0][0] = cXAxis.x;
-			cMatrix[0][1] = cXAxis.y;
-			cMatrix[0][2] = cXAxis.z;
-
-			cMatrix[1][0] = cYAxis.x;
-			cMatrix[1][1] = cYAxis.y;
-			cMatrix[1][2] = cYAxis.z;
-
-			cMatrix[2][0] = cViewNormal.x;
-			cMatrix[2][1] = cViewNormal.y;
-			cMatrix[2][2] = cViewNormal.z;
-
-			cMatrix[3][0] = cTarget.x;
-			cMatrix[3][1] = cTarget.y;
-			cMatrix[3][2] = cTarget.z;
-*/
-
+			A3DGraphSceneDisplayParametersGet(nullptr, &sData);
 		}
 
 #ifdef USED_LOG_MANAGER
@@ -1776,20 +1787,32 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 	return iRet;
 }
 
-// 5-1. View를 Group으로 처리하기 위해서, Parent Component에서 View Group을 검색하고, 없으면 생성한다.
-// Segment도 "grpview"로 생성한다.
+// 5-1. 입력된 Component를 기준으로 View Group을 찾아서 반환한다.
+// 없는 경우 View Group을 생성한다.
 H3DF::Component * TdfImport::GetViewGroupComponent(H3DF::Component & cInParentComp)
 {
-	H3DF::ComponentArray * paSubComponentArray = cInParentComp.GetSubComponents();
+	H3DF::Component * pcViewGroupComponent = cInParentComp.FindUpComponent(H3DF::Component::Type::ViewGroupComponent);
+	if (nullptr != pcViewGroupComponent) {
+		return pcViewGroupComponent;
+	}
 
-	if (nullptr != paSubComponentArray) {
-		for (auto * pcComponent : *paSubComponentArray) {
-			if (H3DF::Component::Type::ViewGroupComponent == pcComponent->GetType()) {
-				return pcComponent;
+	if (nullptr == pcViewGroupComponent) {
+		ComponentArray * pcSubComponents = cInParentComp.GetSubComponents(H3DF::Component::Type::ViewGroupComponent);
+		if (nullptr != pcSubComponents) {
+			if (false == pcSubComponents->empty()) {
+				pcViewGroupComponent = pcSubComponents->front();
+				return pcViewGroupComponent;
 			}
 		}
 	}
 
+	return CreateViewGroupComponent(cInParentComp);
+}
+
+// 5-2. View를 Group으로 처리하기 위해서, Parent Component에서 View Group을 검색하고, 없으면 생성한다.
+// Segment도 "grpview"로 생성한다.
+H3DF::Component * TdfImport::CreateViewGroupComponent(H3DF::Component & cInParentComp)
+{
 	// Parent Component에 PMI Group을 생성.
 	SegmentKey cParentSegment(cInParentComp.GetSegmentKey());
 
@@ -1800,36 +1823,45 @@ H3DF::Component * TdfImport::GetViewGroupComponent(H3DF::Component & cInParentCo
 	return pcComponent;
 }
 
-// 5-2. View중에서 Annotation View를 Group으로 처리하기 위해서, Parent Component에서 Annotation View Group을 검색하고, 없으면 생성한다.
-// Segment도 "anogrpview"로 생성한다.
+// 5-3. View중에서 Annotation View를 Group으로 처리하기 위해서, Parent Component에서 Annotation View Group을 검색.
 H3DF::Component * TdfImport::GetAnnotationViewGroupComponent(H3DF::Component & cInParentComp)
 {
+	H3DF::Component * pcAnnotationViewGroupComponent = cInParentComp.FindUpComponent(H3DF::Component::Type::AnnotationViewGroupComponent);
+	if (nullptr != pcAnnotationViewGroupComponent) {
+		return pcAnnotationViewGroupComponent;
+	}
+
+	if (nullptr == pcAnnotationViewGroupComponent) {
+		ComponentArray * pcSubComponents = cInParentComp.GetAllSubcomponents(H3DF::Component::Type::AnnotationViewGroupComponent);
+		if (nullptr != pcSubComponents) {
+			if (false == pcSubComponents->empty()) {
+				pcAnnotationViewGroupComponent = pcSubComponents->front();
+				return pcAnnotationViewGroupComponent;
+			}
+		}
+	}
+
 	H3DF::Component * pcViewGroupComp = GetViewGroupComponent(cInParentComp);
 	if (nullptr == pcViewGroupComp) {
 		DEBUG_STOP;
 		return nullptr;
 	}
 
-	H3DF::ComponentArray * paSubComponentArray = pcViewGroupComp->GetSubComponents();
+	return CreateAnnotationViewGroupComponent(*pcViewGroupComp);
+}
 
-	if (nullptr != paSubComponentArray) {
-		for (auto * pcComponent : *paSubComponentArray) {
-			if (H3DF::Component::Type::AnnotationViewGroupComponent == pcComponent->GetType()) {
-				return pcComponent;
-			}
-		}
-	}
-
+// 5-4. View중에서 Annotation View를 Group으로 처리하기 위해서, Parent Component에서 Annotation View Group을 검색.
+H3DF::Component * TdfImport::CreateAnnotationViewGroupComponent(H3DF::Component & cInParentComp)
+{
 	// Parent Component에 PMI Group을 생성.
-	SegmentKey cParentSegment(pcViewGroupComp->GetSegmentKey());
+	SegmentKey cParentSegment(cInParentComp.GetSegmentKey());
 
 	SegmentKey cSegment = m_cPmiIncludeSegment.Subsegment("anogrpview%d", m_nMarkupId++);
 	IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
 
-	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, "Annotation View", H3DF::Component::Type::AnnotationViewGroupComponent, *pcViewGroupComp);
+	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, "Annotation View", H3DF::Component::Type::AnnotationViewGroupComponent, cInParentComp);
 	return pcComponent;
 }
-
 
 // 6. 복수의 Annotation을 그리는 함수
 A3DStatus TdfImport::ParseAnnotations(A3DMkpAnnotationEntity ** pcAnnotation, A3DUns32 nAnnotationsSize, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp)
@@ -2041,7 +2073,14 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 	CString strPmiName;
 	GetName(pcMarkup, strPmiName);
 
-	H3DF::Component * pcPmiGroupComponent = GetPmiGroupComponent(cParentComp);
+	H3DF::Component * pcPmiGroupComponent = nullptr;
+	if (H3DF::Component::Type::PMIGroupComponent == cParentComp.GetType()) {
+		pcPmiGroupComponent = &cParentComp;
+	}
+	else {
+		pcPmiGroupComponent = GetPmiGroupComponent(cParentComp);
+	}
+	
 	if (nullptr == pcPmiGroupComponent) {
 		DEBUG_STOP;
 		return A3D_ERROR;
@@ -2729,9 +2768,9 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 				cTransformMatrix = cMatrix * cTransformMatrix;
 				cMatrix.Reset();
 
-// 				MatrixCal::InverseMatrix(cMatrix.data(), cMatrix.data());
-// 				MatrixCal::ComputeMatrixProduct(cMatrix.data(), cTransformMatrix.data(), cTransformMatrix.data());
-// 				cMatrix.SetIdentity();
+				// 				MatrixCal::InverseMatrix(cMatrix.data(), cMatrix.data());
+				// 				MatrixCal::ComputeMatrixProduct(cMatrix.data(), cTransformMatrix.data(), cTransformMatrix.data());
+				// 				cMatrix.SetIdentity();
 				char_height = 1.;
 				MAKE_OFFSET(0, 0);
 			}
@@ -2767,8 +2806,8 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 			cPmiPolyline.SetPoints(nPointCount, pcPoints);
 			cPmiPolyline.SetRGBColor(cColor);
 
-// 			if (line_pattern.encodedText())
-// 				cPmiPolyline.SetLinePattern(reinterpret_cast<char const *>(line_pattern.encodedText()));
+			// 			if (line_pattern.encodedText())
+			// 				cPmiPolyline.SetLinePattern(reinterpret_cast<char const *>(line_pattern.encodedText()));
 
 			aOutPolylines.push_back(cPmiPolyline);
 
@@ -2813,41 +2852,49 @@ A3DStatus TdfImport::GetLeaderLinesAndSymbols(const A3DMkpLeader * pMarkup, Poly
 	return A3D_SUCCESS;
 }
 
-// 7-3. PMI를 Group으로 처리하기 위해서, Parent Component에서 PMI Group을 검색하고, 없으면 생성한다.
-// Segment도 "grppmi"로 생성한다.
-H3DF::Component * TdfImport::GetPmiGroupComponent(H3DF::Component & cParentComp)
+// 7-4. Pmi Group Component 생성
+H3DF::Component * TdfImport::CreatePmiGroupComponent(H3DF::Component & cInParentComp)
 {
-	if (nullptr != cParentComp.GetSubComponents()) {
-		for (auto * pcComponent : *cParentComp.GetSubComponents()) {
-			if (H3DF::Component::Type::PMIGroupComponent == pcComponent->GetType()) {
-				return pcComponent;
-			}
-		}
-	}
-
-	H3DF::Component * pcOwner = cParentComp.GetOwner();
-
-	while (nullptr != pcOwner) {
-		if (nullptr != pcOwner->GetSubComponents()) {
-			for (auto * pcComponent : *pcOwner->GetSubComponents()) {
-				if (H3DF::Component::Type::PMIGroupComponent == pcComponent->GetType()) {
-					return pcComponent;
-				}
-			}
-		}
-
-		pcOwner = pcOwner->GetOwner();
-	}
-
-	
 	// Parent Component에 PMI Group을 생성.
-	SegmentKey cParentSegment(cParentComp.GetSegmentKey());
+	SegmentKey cParentSegment(cInParentComp.GetSegmentKey());
 
 	SegmentKey cSegment = m_cPmiIncludeSegment.Subsegment("grppmi%d", m_nMarkupId++);
 	IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
 
-	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, "PMI", H3DF::Component::Type::PMIGroupComponent, cParentComp);
+	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, "PMI", H3DF::Component::Type::PMIGroupComponent, cInParentComp);
 	return pcComponent;
+}
+
+// 7-4. PMI를 Group으로 처리하기 위해서, Parent Component에서 PMI Group을 검색해서 찾아온다.
+H3DF::Component * TdfImport::GetPmiGroupComponent(H3DF::Component & cInParentComp)
+{
+	if(H3DF::Component::Type::PMIGroupComponent == cInParentComp.GetType()) {
+		return &cInParentComp;
+	}
+
+	H3DF::ComponentArray * pcPmiGroupComponentArray = cInParentComp.GetSubComponents(H3DF::Component::Type::PMIGroupComponent);
+
+	H3DF::Component * pcViewGroupComp = nullptr;
+
+	if (nullptr != pcPmiGroupComponentArray) {
+		if (false == pcPmiGroupComponentArray->empty()) {
+			pcViewGroupComp = pcPmiGroupComponentArray->front();
+		}
+	}
+
+	// Sub Component에 PMI Group이 없는 경우 상위 Component에서 찾아본다.
+	if (nullptr == pcViewGroupComp) {
+		pcViewGroupComp = cInParentComp.FindUpComponent(H3DF::Component::Type::PMIGroupComponent);
+	}
+
+	// 찾지 못한 경우 생성.
+	if(nullptr == pcViewGroupComp) {
+		pcViewGroupComp = CreatePmiGroupComponent(cInParentComp);
+	}
+
+	DEBUG_VALID(pcViewGroupComp);
+
+	return pcViewGroupComp;
 }
 
 // 8. Draw Tessellation Base
@@ -6893,3 +6940,4 @@ H3DF::Component * TdfImport::AddComponent(SegmentKey & cInSegment, CString strIn
 
 	return pcComponent;
 }
+

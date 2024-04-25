@@ -111,6 +111,19 @@ Component * H3DF::Component::GetOwner() const
 	return pcImpl->m_pcOwner;
 }
 
+Component * H3DF::Component::FindOwner(Component::Type eInType)
+{
+	Component * pcOwner = GetOwner();
+	while (nullptr != pcOwner) {
+		if (pcOwner->GetType() == eInType) {
+			return pcOwner;
+		}
+		pcOwner = pcOwner->GetOwner();
+	}
+
+	return nullptr;
+}
+
 ComponentArray * H3DF::Component::GetSubComponents() const
 {
 	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
@@ -120,6 +133,27 @@ ComponentArray * H3DF::Component::GetSubComponents() const
 		return pcImpl->m_pvSubComponents;
 	}
 	
+	return nullptr;
+}
+
+ComponentArray * H3DF::Component::GetSubComponents(Component::Type eInType) const
+{
+	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr != pcImpl->m_pvSubComponents) {
+
+		ComponentArray * pcSubComponents = new ComponentArray();
+
+		for (auto * pcComponent : *pcImpl->m_pvSubComponents) {
+			if (pcComponent->GetType() == eInType) {
+				pcSubComponents->push_back(pcComponent);
+			}
+		}
+
+		return pcSubComponents;
+	}
+
 	return nullptr;
 }
 
@@ -140,6 +174,49 @@ size_t H3DF::Component::GetAllSubComponentCount() const
 
 	return 0;
 }
+
+ComponentArray * H3DF::Component::GetAllSubcomponents(Component::Type eInType) const
+{
+	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetAllSubcomponents(eInType);
+}
+
+Component * H3DF::Component::FindUpComponent(Component::Type eInType)
+{
+	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	if (eInType == pcImpl->m_eType) {
+		return this;
+	}
+
+	Component * pcOwner = GetOwner();
+	if (nullptr == pcOwner) {
+		return nullptr;
+	}
+
+	if (eInType == pcOwner->GetType()) {
+		return pcOwner;
+	}
+
+	if (nullptr != pcOwner->GetSubComponents()) {
+		for (auto * pcSubComponent : *pcOwner->GetSubComponents()) {
+			if (eInType == pcSubComponent->GetType()) {
+				return pcSubComponent;
+			}
+		}
+	}
+
+	Component * pcFindComponent = pcOwner->FindUpComponent(eInType);
+	if (nullptr != pcFindComponent) {
+		return pcFindComponent;
+	}
+
+	return nullptr;
+}
+
 
 CString H3DF::Component::GetName() const
 {

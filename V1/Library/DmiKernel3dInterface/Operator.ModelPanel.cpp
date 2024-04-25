@@ -69,6 +69,10 @@ namespace KERNEL
 			bool IsVisible(Component & cInComponent);
 
 			void TreeReverseExpand(H3DF::Component & cInComponent);
+
+			Component * GetPmiGroupComponent();
+
+			Component * m_pcPmiGroupComponent = nullptr;
 		};
 	}
 }
@@ -408,6 +412,40 @@ void KERNEL::Operator::ModelPanelImpl::TreeReverseExpand(H3DF::Component & cInCo
 	}
 }
 
+// 5. 주어진 Type의 Component를 찾아서 반환한다.
+
+Component * KERNEL::Operator::ModelPanelImpl::GetPmiGroupComponent()
+{
+	if (nullptr != m_pcPmiGroupComponent) {
+		return m_pcPmiGroupComponent;
+	}
+
+	if (nullptr == m_pcCadModel) {
+		DEBUG_STOP;
+		return nullptr;
+	}
+
+	ComponentArray * pcSubcomponents = m_pcCadModel->GetAllSubcomponents(H3DF::Component::Type::PMIGroupComponent);
+	if (nullptr == pcSubcomponents) {
+		DEBUG_STOP
+		return nullptr;
+	}
+
+	if (true == pcSubcomponents->empty()) {
+		return nullptr;
+	}
+
+	if (1 < pcSubcomponents->size()) {
+		DEBUG_STOP;
+	}
+
+	m_pcPmiGroupComponent = pcSubcomponents->front();
+	
+	delete pcSubcomponents;
+
+	return m_pcPmiGroupComponent;
+}
+
 //== ModelPanel 관련 함수 ============================================================================
 
 KERNEL::Operator::ModelPanel::ModelPanel(const DocView * pcInDocView)
@@ -703,40 +741,54 @@ void KERNEL::Operator::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	Component * pcComponent = dynamic_cast<Component *>((Component *)cInObject.GetDwordPtr(SKW_KEY));
+	H3DF::Component * pcComponent = dynamic_cast<Component *>((Component *)cInObject.GetDwordPtr(SKW_KEY));
 	if (nullptr == pcComponent) {
 		DEBUG_STOP;
 		return;
 	}
 
+	// 선택된 요소가 Markup View인 경우 처리.
+	// 1. 저장되어 있는 Camera 정보를 이용해서 View Position을 설정
+	// 2. View 하부에 있는 Include로 Link 되어 있는 PMI를 Show 처리 한다.
+	// 3. PMI Group 하부에 있는 PMI들은 Noshow 처리
 	if (H3DF::Component::Type::ExchangeMkpView == pcComponent->GetType()) {
+		DwordPtrMetaData * pcCameraData = (DwordPtrMetaData *)pcComponent->GetMetaData(H3DF::MetaDataIndex::Camera);
 
-		DwordPtrMetaData * pcData = (DwordPtrMetaData *)pcComponent->GetMetaData(H3DF::MetaDataIndex::Camera);
-		if (nullptr == pcData) {
+		DwordPtrMetaData * pcMatrixData = (DwordPtrMetaData *)pcComponent->GetMetaData(H3DF::MetaDataIndex::ViewMatrix);
+
+		// Pmi Group 하부에 있는 PMI들은 Noshow 처리
+		H3DF::Component * pcPmiGroupComp = pcImpl->GetPmiGroupComponent();
+		if (nullptr == pcPmiGroupComp) {
+			DEBUG_STOP;
 			return;
 		}
 
-		H3DF::Component * pcOwner = pcComponent->GetOwner();
-		if (nullptr != pcOwner) {
-			if (H3DF::Component::Type::AnnotationViewGroupComponent == pcOwner->GetType()) {
-				pcOwner = pcOwner->GetOwner();
-			}
+		pcImpl->Attribute().NoShow(pcPmiGroupComp);
 
-			if (H3DF::Component::Type::ViewGroupComponent == pcOwner->GetType()) {
-				pcImpl->Attribute().NoShow(pcOwner);
+		H3DF::ComponentImpl * pcPmiGroupCompImpl = dynamic_cast<H3DF::ComponentImpl *>(pcPmiGroupComp->GetImpl());
+		DEBUG_VALID(pcPmiGroupCompImpl);
+
+		if (nullptr != pcComponent->GetSubComponents()) {
+			for (auto * pcSubComponent : *pcComponent->GetSubComponents()) {
+				H3DF::Component * pcFindComp = pcPmiGroupCompImpl->FindSubComponentBySegmentKey(pcSubComponent->GetSegmentKey(), true);
+
+				if (nullptr != pcFindComp) {
+					pcImpl->Attribute().Show(pcFindComp);
+				}
 			}
 		}
-
-		pcImpl->Attribute().Show(pcComponent);
-
+		// View를 Update해야 Fitting이 정확하게 됨.
 		pcImpl->GetDocView().Canvas().GetFrontView().Update();
 
-		H3DF::MatrixKit * pcMatrix = (H3DF::MatrixKit *)pcData->GetValue();
-		SegmentKey cSegment(pcComponent->GetSegmentKey());
-
-		pcImpl->Camera().SetCameraFitSelection(*pcMatrix, cSegment);
-
-		// pcImpl->GetDocView().Canvas().GetFrontView().Update();
+		if (nullptr != pcCameraData && nullptr == pcComponent->GetSubComponents()) {
+			H3DF::CameraKit * pcCamera = (H3DF::CameraKit *)pcCameraData->GetValue();
+			pcImpl->Camera().SetCamera(*pcCamera);
+		}
+		else if (nullptr != pcMatrixData) {
+			SegmentKey cSegment(pcComponent->GetSegmentKey());
+			H3DF::MatrixKit * pcMatrix = (H3DF::MatrixKit *)pcMatrixData->GetValue();
+			pcImpl->Camera().SetCameraFitSelection(*pcMatrix, cSegment);
+		}
 
 		int i = 0;
 	}
