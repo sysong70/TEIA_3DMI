@@ -67,7 +67,7 @@ namespace H3DF
 		size_t ShowReferrers(ReferenceKeyArray & aOutReferences) const;
 
 		//== Cutting Section 관련 함수 ===============================================================
-// 		CuttingSectionKey InsertCuttingSection(Plane const & cInPlane);
+ 		CuttingSectionKey InsertCuttingSection(Plane const & cInPlane);
 // 		CuttingSectionKey InsertCuttingSection(CuttingSectionKit const & cInKit);
 // 		CuttingSectionKey InsertCuttingSection(PlaneArray const & cInPlanes);
 // 		CuttingSectionKey InsertCuttingSection(size_t nInPlanesCount, Plane const pcInPlanes[]);

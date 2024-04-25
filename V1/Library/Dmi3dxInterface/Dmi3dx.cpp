@@ -4,6 +4,7 @@
 
 #include <Common_Define.h>
 
+#include <3DF/Math.Matrix.h>
 #include <mb_placement3d.h>
 
 #include <format>
@@ -129,7 +130,8 @@ bool Dmi3dx::CreateFolder(CString strPath)
 	return true;
 }
 
-H3DF::Point Dmi3dx::GetPoint(A3DVector3dData cData)
+//== H3DF 관련 함수 ==================================================================================
+H3DF::Point Dmi3dx::GetPoint(A3DVector3dData & cData)
 {
 	H3DF::Point cPoint;
 	cPoint.x = cData.m_dX;
@@ -139,7 +141,7 @@ H3DF::Point Dmi3dx::GetPoint(A3DVector3dData cData)
 	return cPoint;
 }
 
-H3DF::Vector Dmi3dx::GetVector(A3DVector3dData cData)
+H3DF::Vector Dmi3dx::GetVector(A3DVector3dData & cData)
 {
 	H3DF::Vector cVector;
 	cVector.x = cData.m_dX;
@@ -148,6 +150,61 @@ H3DF::Vector Dmi3dx::GetVector(A3DVector3dData cData)
 
 	return cVector;
 }
+
+H3DF::MatrixKit Dmi3dx::GetMatrix(A3DSurfPlaneData & cData)
+{
+	H3DF::MatrixKit cMatrix;
+
+	H3DF::Point cOrigin;
+	cOrigin.x = cData.m_sTrsf.m_sOrigin.m_dX;
+	cOrigin.y = cData.m_sTrsf.m_sOrigin.m_dY;
+	cOrigin.z = cData.m_sTrsf.m_sOrigin.m_dZ;
+
+	H3DF::Vector cXAxis;
+	cXAxis.x = cData.m_sTrsf.m_sXVector.m_dX;
+	cXAxis.y = cData.m_sTrsf.m_sXVector.m_dY;
+	cXAxis.z = cData.m_sTrsf.m_sXVector.m_dZ;
+
+	H3DF::Vector cYAxis;
+	cYAxis.x = cData.m_sTrsf.m_sYVector.m_dX;
+	cYAxis.y = cData.m_sTrsf.m_sYVector.m_dY;
+	cYAxis.z = cData.m_sTrsf.m_sYVector.m_dZ;
+
+	H3DF::Vector cZAxis = cXAxis.Cross(cYAxis);
+
+	cMatrix.SetOrigin(cOrigin);
+	cMatrix.SetXAxis(cXAxis);
+	cMatrix.SetYAxis(cYAxis);
+	cMatrix.SetZAxis(cZAxis);
+
+	return cMatrix;
+}
+
+H3DF::Plane Dmi3dx::GetPlane(A3DSurfPlaneData & cData)
+{
+	H3DF::Point cOrigin;
+	cOrigin.x = cData.m_sTrsf.m_sOrigin.m_dX;
+	cOrigin.y = cData.m_sTrsf.m_sOrigin.m_dY;
+	cOrigin.z = cData.m_sTrsf.m_sOrigin.m_dZ;
+
+	H3DF::Vector cXAxis;
+	cXAxis.x = cData.m_sTrsf.m_sXVector.m_dX;
+	cXAxis.y = cData.m_sTrsf.m_sXVector.m_dY;
+	cXAxis.z = cData.m_sTrsf.m_sXVector.m_dZ;
+
+	H3DF::Vector cYAxis;
+	cYAxis.x = cData.m_sTrsf.m_sYVector.m_dX;
+	cYAxis.y = cData.m_sTrsf.m_sYVector.m_dY;
+	cYAxis.z = cData.m_sTrsf.m_sYVector.m_dZ;
+
+	H3DF::Vector cZAxis = cXAxis.Cross(cYAxis);
+
+	H3DF::Plane cPlane(cOrigin, cZAxis);
+
+	return cPlane;
+}
+
+// == C3D 변환 관련 함수 =============================================================================
 
 MbCartPoint Dmi3dx::GetMbCartPoint(A3DVector3dData cVector, double dScale)
 {

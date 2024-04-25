@@ -86,11 +86,19 @@ namespace H3DF
 
         // Sets a single cutting plane for this CuttingSectionKit.
         CuttingSectionKit & SetPlanes(H3DF::Plane const & cInPlane);
-
-        // Sets multiple cutting planes for this CuttingSectionKit.
         CuttingSectionKit & SetPlanes(H3DF::PlaneArray const & cInPlanes);
 
-        CuttingSectionKit & SetVisualization(CuttingSection::Mode eInMode, RGBAColor const & cInColor, float fInScale = 1.0f);
+        //CuttingSectionKit & SetVisualization(CuttingSection::Mode eInMode, RGBAColor const & cInColor, float fInScale = 1.0f);
+        CuttingSectionKit & SetVisualization(RGBAColor const & cInColor);
+
+/*
+        CuttingSectionKit & UnsetPlanes();
+        CuttingSectionKit & UnsetVisualization();
+        CuttingSectionKit & UnsetEverything();
+
+        size_t GetPlaneCount() const;
+        bool ShowPlanes(H3DF::PlaneArray & out_planes) const;
+*/
     };
 
 
@@ -105,5 +113,21 @@ namespace H3DF
         CuttingSectionKey & operator = (CuttingSectionKey const & cInThat);
 
         H3DF::Type ObjectType() const { return H3DF::Type::CuttingSectionKey; };
+
+/*
+        void Set(CuttingSectionKit const & cInKit);
+        void Show(CuttingSectionKit & cOutKit) const;
+
+        CuttingSectionKey & SetPlanes(H3DF::Plane const & cInPlane);
+        CuttingSectionKey & SetPlanes(H3DF::PlaneArray const & cInPlanes);
+        CuttingSectionKey & SetPlanes(size_t nInCount, Plane const pcInPlanes[]);
+
+        CuttingSectionKey & SetVisualization(CuttingSection::Mode eInMode, RGBAColor const & cInColor, float fInScale = 1.0f);
+
+        size_t GetPlaneCount() const;
+
+        bool ShowPlanes(H3DF::PlaneArray & cOutPlanes) const;
+        bool ShowVisualization(CuttingSection::Mode & cOutMode, RGBAColor & cOutColor, float & fOutScale) const;
+*/
     };
 }

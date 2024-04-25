@@ -366,7 +366,8 @@ namespace H3DF
 
 		ViewMatrix								= 0x03000001,
 		Camera									= 0x03000002,
-		PlaneString								= 0x03000003,
+		CuttingPlanes							= 0x03000003,
+		PlaneString								= 0x03000004,
 	};
 
 	class API_3DF ViewDirection

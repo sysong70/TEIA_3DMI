@@ -49,8 +49,11 @@ namespace Dmi3dx
 	// 다중 디렉토리도 생성함.
 	bool CreateFolder(CString strPath);
 
-	H3DF::Point GetPoint(A3DVector3dData cData);
-	H3DF::Vector GetVector(A3DVector3dData cData);
+	//== H3DF 관련 함수 ==============================================================================
+	H3DF::Point GetPoint(A3DVector3dData & cData);
+	H3DF::Vector GetVector(A3DVector3dData & cData);
+	H3DF::MatrixKit GetMatrix(A3DSurfPlaneData & cData);
+	H3DF::Plane GetPlane(A3DSurfPlaneData & cData);
 
 	// == C3D 변환 관련 함수 ==========================================================================
 	MbCartPoint GetMbCartPoint(A3DVector3dData cVector, double dScale);

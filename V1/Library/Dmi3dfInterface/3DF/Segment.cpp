@@ -8,6 +8,7 @@
 #include "Reference.h"
 #include "Line.h"
 #include "Circle.h"
+#include "CuttingSection.h"
 
 #include "Selectability.h"
 #include "Visibility.h"
@@ -513,6 +514,18 @@ size_t H3DF::SegmentKey::ShowReferrers(ReferenceKeyArray & aOutReferences) const
 	return nIncludeCount;
 }
 
+//== Cutting Section 관련 함수 ===============================================================
+CuttingSectionKey H3DF::SegmentKey::InsertCuttingSection(Plane const & cInPlane)
+{
+	HC_KEY nKey = INVALID_KEY;
+
+	SegmentKeyImpl::LocalOpen(*this); {
+		nKey = HC_Insert_Cutting_Plane(cInPlane.a, cInPlane.b, cInPlane.c, cInPlane.d);
+	} SegmentKeyImpl::LocalClose(*this);
+
+	CuttingSectionKey cCuttingSection(nKey);
+	return cCuttingSection;
+}
 
 //== Shell 관련 함수 =================================================================================
 ShellKey H3DF::SegmentKey::InsertShell(ShellKit const & cInKit)

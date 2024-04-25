@@ -1659,6 +1659,14 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 	A3DMiscCascadedAttributesData cAttrData;
 	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcView, pcParentAttr, &pcAttr, &cAttrData));
 
+	CString strName;
+	GetName(pcView, strName);
+
+	if ("SIDE FIXING SECTION" == strName) {
+		int i = 0;
+	}
+
+
 	if (/*cAttrData.m_bShow && */!cAttrData.m_bRemoved) // TODO m_bShow
 	{
 		A3DMkpViewData cViewData;
@@ -1702,29 +1710,7 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 			A3DSurfPlaneData cData;
 			A3D_INITIALIZE_DATA(A3DSurfPlaneData, cData);
 			if (A3D_SUCCESS == A3DSurfPlaneGet(cViewData.m_pPlane, &cData)) {
-				H3DF::MatrixKit * pcMatrix = new H3DF::MatrixKit();
-
-				Point cOrigin;
-				cOrigin.x = cData.m_sTrsf.m_sOrigin.m_dX;
-				cOrigin.y = cData.m_sTrsf.m_sOrigin.m_dY;
-				cOrigin.z = cData.m_sTrsf.m_sOrigin.m_dY;
-
-				Vector cXAxis;
-				cXAxis.x = cData.m_sTrsf.m_sXVector.m_dX;
-				cXAxis.y = cData.m_sTrsf.m_sXVector.m_dY;
-				cXAxis.z = cData.m_sTrsf.m_sXVector.m_dZ;
-
-				Vector cYAxis;
-				cYAxis.x = cData.m_sTrsf.m_sYVector.m_dX;
-				cYAxis.y = cData.m_sTrsf.m_sYVector.m_dY;
-				cYAxis.z = cData.m_sTrsf.m_sYVector.m_dZ;
-
-				Vector cZAxis = cXAxis.Cross(cYAxis);
-
-				pcMatrix->SetOrigin(cOrigin);
-				pcMatrix->SetXAxis(cXAxis);
-				pcMatrix->SetYAxis(cYAxis);
-				pcMatrix->SetZAxis(cZAxis);
+				H3DF::MatrixKit * pcMatrix = new H3DF::MatrixKit(Dmi3dx::GetMatrix(cData));
 
 				H3DF::DwordPtrMetaData * pcMetaData = new H3DF::DwordPtrMetaData(H3DF::MetaDataIndex::ViewMatrix, (DWORD_PTR)pcMatrix);
 				pcComponent->AddMetaData(pcMetaData);
@@ -1735,6 +1721,7 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 			A3DGraphSceneDisplayParametersData sData;
 			A3D_INITIALIZE_DATA(A3DGraphSceneDisplayParametersData, sData);
 			if (A3D_SUCCESS == A3DGraphSceneDisplayParametersGet(cViewData.m_pSceneDisplayParameters, &sData)) {
+				// Camera 정보 처리
 				if (nullptr != sData.m_pCamera) {
 					A3DGraphCameraData sCameraData;
 					A3D_INITIALIZE_DATA(A3DGraphCameraData, sCameraData);
@@ -1758,6 +1745,24 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 
 					}
 					A3DGraphCameraGet(nullptr, &sCameraData);
+				}
+
+				// Clipping Plane 정보 처리 (Cutting Plane 정보)
+				if(0 < sData.m_uiPlaneSize && nullptr != sData.m_ppClippingPlanes)
+				{
+					H3DF::PlaneArray * pcPlanes = new H3DF::PlaneArray();
+					for (A3DUns32 nIndex = 0; nIndex < sData.m_uiPlaneSize; nIndex++) {
+						A3DSurfPlaneData sPlaneData;
+						A3D_INITIALIZE_DATA(A3DSurfPlaneData, sPlaneData);
+						if (A3D_SUCCESS == A3DSurfPlaneGet(sData.m_ppClippingPlanes[nIndex], &sPlaneData)) {
+							H3DF::Plane cPlane = Dmi3dx::GetPlane(sPlaneData);
+							pcPlanes->push_back(cPlane);
+						}
+						A3DSurfPlaneGet(nullptr, &sPlaneData);
+					}
+
+					H3DF::DwordPtrMetaData * pcMetaData = new H3DF::DwordPtrMetaData(H3DF::MetaDataIndex::CuttingPlanes, (DWORD_PTR)pcPlanes);
+					pcComponent->AddMetaData(pcMetaData);
 				}
 			}
 

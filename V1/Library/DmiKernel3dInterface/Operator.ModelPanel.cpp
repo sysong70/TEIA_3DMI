@@ -12,6 +12,7 @@
 
 #include "Signal.Connector.h"
 
+#include <3DF/CuttingSection.h>
 #include <3DF/KeyPath.h>
 #include <3DF/Selection.h>
 #include <3DF/Impl/SelectionImpl.h>
@@ -73,6 +74,8 @@ namespace KERNEL
 			Component * GetPmiGroupComponent();
 
 			Component * m_pcPmiGroupComponent = nullptr;
+
+			std::vector<CuttingSectionKey> m_aCuttingSections;
 		};
 	}
 }
@@ -756,6 +759,8 @@ void KERNEL::Operator::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject
 
 		DwordPtrMetaData * pcMatrixData = (DwordPtrMetaData *)pcComponent->GetMetaData(H3DF::MetaDataIndex::ViewMatrix);
 
+		DwordPtrMetaData * pcCuttingPlanesData = (DwordPtrMetaData *)pcComponent->GetMetaData(H3DF::MetaDataIndex::CuttingPlanes);
+
 		// Pmi Group 하부에 있는 PMI들은 Noshow 처리
 		H3DF::Component * pcPmiGroupComp = pcImpl->GetPmiGroupComponent();
 		if (nullptr == pcPmiGroupComp) {
@@ -777,9 +782,25 @@ void KERNEL::Operator::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject
 				}
 			}
 		}
+
+		SegmentKey cSegment = pcImpl->GetDocView().Canvas().GetModel().GetSegmentKey().Subsegment("cutting_section");
+		cSegment.Flush(H3DF::Search::Type::Geometry, H3DF::Search::Space::SubsegmentsAndIncludes);
+
+		// Cutting Section 설정, 정보가 있다면 Cutting Section을 설정한다.
+		if (nullptr != pcCuttingPlanesData) {
+			H3DF::PlaneArray * pcCuttingPlanes = (H3DF::PlaneArray *)pcCuttingPlanesData->GetValue();
+			SegmentKey cSegment = pcImpl->GetDocView().Canvas().GetModel().GetSegmentKey().Subsegment("cutting_section");
+
+			for (auto cPlane : *pcCuttingPlanes) {
+				cSegment.InsertCuttingSection(cPlane);
+			}
+		}
+
 		// View를 Update해야 Fitting이 정확하게 됨.
 		pcImpl->GetDocView().Canvas().GetFrontView().Update();
 
+		// Makrup View에 Sub component가 없는 경우 Camera 정보를 이용해서 설정한다.
+		// Sub component가 없다는 것은, 하부에 PMI가 없는 경우임.
 		if (nullptr != pcCameraData && nullptr == pcComponent->GetSubComponents()) {
 			H3DF::CameraKit * pcCamera = (H3DF::CameraKit *)pcCameraData->GetValue();
 			pcImpl->Camera().SetCamera(*pcCamera);
@@ -787,10 +808,9 @@ void KERNEL::Operator::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject
 		else if (nullptr != pcMatrixData) {
 			SegmentKey cSegment(pcComponent->GetSegmentKey());
 			H3DF::MatrixKit * pcMatrix = (H3DF::MatrixKit *)pcMatrixData->GetValue();
+
 			pcImpl->Camera().SetCameraFitSelection(*pcMatrix, cSegment);
 		}
-
-		int i = 0;
 	}
 }
 

@@ -243,6 +243,9 @@ Type H3DF::Utility::GetType(HC_KEY nInKey)
 	else if ("named style" == strType) {
 		return H3DF::Type::NamedStyle;
 	}
+	else if ("cutting" == strType) {
+		return H3DF::Type::CuttingSectionKey;
+	}
 	else {
 		assert(false);
 	}

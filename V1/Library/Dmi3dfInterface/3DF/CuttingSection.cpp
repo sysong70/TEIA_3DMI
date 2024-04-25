@@ -15,12 +15,21 @@ namespace H3DF
 	class CuttingSectionKitImpl : public Impl
 	{
 	public:
-		void Copy(CuttingSectionKitImpl * that)
-		{
+		void Copy(CuttingSectionKitImpl * that) {
 			m_arPlanes = that->m_arPlanes;
+			m_eMode = that->m_eMode;
+			m_bModeSet = that->m_bModeSet;
+			m_cColor = that->m_cColor;
+			m_bColorSet = that->m_bColorSet;
+			m_fScale = that->m_fScale;
+			m_bScaleSet = that->m_bScaleSet;
 		}
 
 		PlaneArray m_arPlanes;
+
+		CuttingSection::Mode m_eMode = CuttingSection::Mode::None; bool m_bModeSet = false;
+		RGBAColor m_cColor; bool m_bColorSet = false;
+		float m_fScale = 1.0f; bool m_bScaleSet = false;
 	};
 }
 
@@ -101,6 +110,7 @@ bool H3DF::CuttingSectionKit::operator!=(CuttingSectionKit const & cInKit) const
 CuttingSectionKit & H3DF::CuttingSectionKit::SetPlanes(H3DF::Plane const & cInPlane)
 {
 	CuttingSectionKitImpl * pcImpl = (CuttingSectionKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
 
 	// Clear the existing planes and add the new one.
 	pcImpl->m_arPlanes.clear();
@@ -113,6 +123,7 @@ CuttingSectionKit & H3DF::CuttingSectionKit::SetPlanes(H3DF::Plane const & cInPl
 CuttingSectionKit & H3DF::CuttingSectionKit::SetPlanes(H3DF::PlaneArray const & cInPlanes)
 {
 	CuttingSectionKitImpl * pcImpl = (CuttingSectionKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_arPlanes.clear();
 	pcImpl->m_arPlanes = cInPlanes;
@@ -120,8 +131,33 @@ CuttingSectionKit & H3DF::CuttingSectionKit::SetPlanes(H3DF::PlaneArray const & 
 	return *this;
 }
 
+/*
 CuttingSectionKit & H3DF::CuttingSectionKit::SetVisualization(CuttingSection::Mode eInMode, RGBAColor const & cInColor, float fInScale)
 {
+	CuttingSectionKitImpl * pcImpl = (CuttingSectionKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_eMode = eInMode;
+	pcImpl->m_bModeSet = true;
+
+	pcImpl->m_cColor = cInColor;
+	pcImpl->m_bColorSet = true;
+
+	pcImpl->m_fScale = fInScale;
+	pcImpl->m_bScaleSet = true;
+
+	return *this;
+}
+*/
+
+CuttingSectionKit & H3DF::CuttingSectionKit::SetVisualization(RGBAColor const & cInColor)
+{
+	CuttingSectionKitImpl * pcImpl = (CuttingSectionKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_cColor = cInColor;
+	pcImpl->m_bColorSet = true;
+
 	return *this;
 }
 
@@ -132,8 +168,7 @@ namespace H3DF
 	class CuttingSectionKeyImpl : public KeyImpl
 	{
 	public:
-		void Copy(CuttingSectionKeyImpl * that)
-		{
+		void Copy(CuttingSectionKeyImpl * that) {
 			m_arPlanes = that->m_arPlanes;
 		}
 
