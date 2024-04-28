@@ -50,5 +50,8 @@ namespace H3DF
 		static bool ClonedParentPartDefinition(Component & cInComponent);
 		static bool ClonedComponent(Component & cInComponent, Component & cInOwnerComponent, bool bDeleteInclude);
 
+		static Component * GetViewGroupComponent(Component & cInParentComp);
+		static Component * GetAnnotationViewGroupComponent(Component & cInParentComp);
+		static Component * GetPmiGroupComponent(Component & cInParentComp);
 	};
 }

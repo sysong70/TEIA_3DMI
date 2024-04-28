@@ -205,6 +205,8 @@ void KERNEL::Operator::ModelPanelImpl::ComponentExpanded(H3DF::Component & cInCo
 		cTreeItems.clear();
 	}
 
+	Signal::KeyItems cNoShowTreeItems;
+
 	// 나머지 Component를 표시한다.
 	for (auto pcComponent : *pcSubComponents) {
 		if (false == IsVisible(*pcComponent)) {
@@ -257,6 +259,7 @@ void KERNEL::Operator::ModelPanelImpl::ComponentExpanded(H3DF::Component & cInCo
 			// Markup View의 하부 Component는 표시하지 않는다.
 			// Markyp View의	 하부 Component는 Visibility가 Off되어 있고, Include로 연결만 되어 있는 상태로 저장되어 있음.
 			cItem.HasChildren = false;
+			cNoShowTreeItems.push_back((DWORD_PTR)pcComponent);
 		}
 
 		if (true == cItem.Title.IsEmpty()) {
@@ -271,6 +274,10 @@ void KERNEL::Operator::ModelPanelImpl::ComponentExpanded(H3DF::Component & cInCo
 	if (false == cTreeItems.empty()) {
 		Delivery().modelPanel.AddChildren((DWORD_PTR)pcParentItem, cTreeItems);
 		//Delivery().modelPanel.ExpandParent((DWORD_PTR)pcParentItem);
+	}
+
+	if (false == cNoShowTreeItems.empty()) {
+		Delivery().modelPanel.CheckItems(cNoShowTreeItems, false);
 	}
 
 	if (0 < nLevel)
@@ -744,9 +751,13 @@ void KERNEL::Operator::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	H3DF::Component * pcComponent = dynamic_cast<Component *>((Component *)cInObject.GetDwordPtr(SKW_KEY));
-	if (nullptr == pcComponent) {
+	H3DF::Component * pcInComponent = dynamic_cast<Component *>((Component *)cInObject.GetDwordPtr(SKW_KEY));
+	if (nullptr == pcInComponent) {
 		DEBUG_STOP;
+		return;
+	}
+
+	if (H3DF::Component::Type::ExchangeMkpView != pcInComponent->GetType()) {
 		return;
 	}
 
@@ -754,63 +765,123 @@ void KERNEL::Operator::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject
 	// 1. 저장되어 있는 Camera 정보를 이용해서 View Position을 설정
 	// 2. View 하부에 있는 Include로 Link 되어 있는 PMI를 Show 처리 한다.
 	// 3. PMI Group 하부에 있는 PMI들은 Noshow 처리
-	if (H3DF::Component::Type::ExchangeMkpView == pcComponent->GetType()) {
-		DwordPtrMetaData * pcCameraData = (DwordPtrMetaData *)pcComponent->GetMetaData(H3DF::MetaDataIndex::Camera);
 
-		DwordPtrMetaData * pcMatrixData = (DwordPtrMetaData *)pcComponent->GetMetaData(H3DF::MetaDataIndex::ViewMatrix);
+	H3DF::Component * pcMkpViewComponent = pcInComponent;
 
-		DwordPtrMetaData * pcCuttingPlanesData = (DwordPtrMetaData *)pcComponent->GetMetaData(H3DF::MetaDataIndex::CuttingPlanes);
+	DwordPtrMetaData * pcCameraData = (DwordPtrMetaData *)pcMkpViewComponent->GetMetaData(H3DF::MetaDataIndex::Camera);
 
-		// Pmi Group 하부에 있는 PMI들은 Noshow 처리
-		H3DF::Component * pcPmiGroupComp = pcImpl->GetPmiGroupComponent();
-		if (nullptr == pcPmiGroupComp) {
+	DwordPtrMetaData * pcMatrixData = (DwordPtrMetaData *)pcMkpViewComponent->GetMetaData(H3DF::MetaDataIndex::ViewMatrix);
+
+	DwordPtrMetaData * pcCuttingPlanesData = (DwordPtrMetaData *)pcMkpViewComponent->GetMetaData(H3DF::MetaDataIndex::CuttingPlanes);
+
+	// Pmi Group 하부에 있는 PMI들은 Noshow 처리
+	H3DF::Component * pcPmiGroupComp = H3DF::ComponentImpl::GetPmiGroupComponent(*pcInComponent);
+	if (nullptr == pcPmiGroupComp) {
+		DEBUG_STOP;
+		return;
+	}
+
+	H3DF::Component * pcViewGroupComp = H3DF::ComponentImpl::GetViewGroupComponent(*pcInComponent);
+	if (nullptr == pcViewGroupComp) {
+		DEBUG_STOP;
+		return;
+	}
+
+	pcImpl->Attribute().NoShow(pcPmiGroupComp);
+
+	pcImpl->Delivery().modelPanel.RedrawTree(false);
+	
+	pcImpl->Delivery().modelPanel.CheckItem((DWORD_PTR)pcViewGroupComp, false);
+	
+	pcImpl->Delivery().modelPanel.CheckItem((DWORD_PTR)pcInComponent, true);
+
+	H3DF::ComponentImpl * pcPmiGroupCompImpl = dynamic_cast<H3DF::ComponentImpl *>(pcPmiGroupComp->GetImpl());
+	DEBUG_VALID(pcPmiGroupCompImpl);
+
+	// Markup View 하부에 PMI들이 있는 경우 Show 처리
+	if (nullptr != pcMkpViewComponent->GetSubComponents()) {
+		if (true == pcMkpViewComponent->GetSubComponents()->empty()) {
 			DEBUG_STOP;
 			return;
 		}
 
-		pcImpl->Attribute().NoShow(pcPmiGroupComp);
-
-		H3DF::ComponentImpl * pcPmiGroupCompImpl = dynamic_cast<H3DF::ComponentImpl *>(pcPmiGroupComp->GetImpl());
-		DEBUG_VALID(pcPmiGroupCompImpl);
-
-		if (nullptr != pcComponent->GetSubComponents()) {
-			for (auto * pcSubComponent : *pcComponent->GetSubComponents()) {
-				H3DF::Component * pcFindComp = pcPmiGroupCompImpl->FindSubComponentBySegmentKey(pcSubComponent->GetSegmentKey(), true);
-
-				if (nullptr != pcFindComp) {
-					pcImpl->Attribute().Show(pcFindComp);
+		// View Component를 NoShow 처리
+		ComponentArray * pcAllSubComponents = pcViewGroupComp->GetAllSubcomponents(H3DF::Component::Type::ExchangeMkpView);
+		Signal::KeyItems cNoShowItems;
+		if (nullptr != pcAllSubComponents) {
+			for (auto * pcComponent : *pcAllSubComponents) {
+				if (H3DF::Component::Status::UiUpdate & pcComponent->GetStatus()) {
+					cNoShowItems.push_back((DWORD_PTR)pcComponent);
 				}
 			}
 		}
 
-		SegmentKey cSegment = pcImpl->GetDocView().Canvas().GetModel().GetSegmentKey().Subsegment("cutting_section");
-		cSegment.Flush(H3DF::Search::Type::Geometry, H3DF::Search::Space::SubsegmentsAndIncludes);
-
-		// Cutting Section 설정, 정보가 있다면 Cutting Section을 설정한다.
-		if (nullptr != pcCuttingPlanesData) {
-			H3DF::PlaneArray * pcCuttingPlanes = (H3DF::PlaneArray *)pcCuttingPlanesData->GetValue();
-			SegmentKey cSegment = pcImpl->GetDocView().Canvas().GetModel().GetSegmentKey().Subsegment("cutting_section");
-
-			for (auto cPlane : *pcCuttingPlanes) {
-				cSegment.InsertCuttingSection(cPlane);
+		// PMI Component를 NoShow 처리
+		pcAllSubComponents = pcPmiGroupComp->GetSubComponents();
+		if (nullptr != pcAllSubComponents) {
+			for (auto * pcComponent : *pcAllSubComponents) {
+				if (H3DF::Component::Status::UiUpdate & pcComponent->GetStatus()) {
+					cNoShowItems.push_back((DWORD_PTR)pcComponent);
+				}
 			}
 		}
 
-		// View를 Update해야 Fitting이 정확하게 됨.
-		pcImpl->GetDocView().Canvas().GetFrontView().Update();
+		Signal::KeyItems cShowItems;
 
-		// Makrup View에 Sub component가 없는 경우 Camera 정보를 이용해서 설정한다.
-		// Sub component가 없다는 것은, 하부에 PMI가 없는 경우임.
-		if (nullptr != pcCameraData && nullptr == pcComponent->GetSubComponents()) {
-			H3DF::CameraKit * pcCamera = (H3DF::CameraKit *)pcCameraData->GetValue();
-			pcImpl->Camera().SetCamera(*pcCamera);
-		}
-		else if (nullptr != pcMatrixData) {
-			SegmentKey cSegment(pcComponent->GetSegmentKey());
-			H3DF::MatrixKit * pcMatrix = (H3DF::MatrixKit *)pcMatrixData->GetValue();
+		cShowItems.push_back((DWORD_PTR)pcMkpViewComponent);
 
-			pcImpl->Camera().SetCameraFitSelection(*pcMatrix, cSegment);
+		for (auto * pcPmiComponent : *pcMkpViewComponent->GetSubComponents()) {
+			H3DF::Component * pcFindComp = pcPmiGroupCompImpl->FindSubComponentBySegmentKey(pcPmiComponent->GetSegmentKey(), true);
+
+			if (nullptr != pcFindComp) {
+				pcImpl->Attribute().Show(pcFindComp);
+				if (H3DF::Component::Status::UiUpdate & pcFindComp->GetStatus()) {
+					cShowItems.push_back((DWORD_PTR)pcFindComp);
+				}
+			}
 		}
+
+		for (auto nShowItem : cShowItems) {
+			auto cIterator = std::find(cNoShowItems.begin(), cNoShowItems.end(), nShowItem);
+			if (cIterator != cNoShowItems.end()) {
+				cNoShowItems.erase(cIterator);
+			}
+		}
+
+		pcImpl->Delivery().modelPanel.CheckItems(cNoShowItems, false);
+		pcImpl->Delivery().modelPanel.CheckItems(cShowItems, true);
+	}
+
+	pcImpl->Delivery().modelPanel.RedrawTree(true);
+
+
+	SegmentKey cSegment = pcImpl->GetDocView().Canvas().GetModel().GetSegmentKey().Subsegment("cutting_section");
+	cSegment.Flush(H3DF::Search::Type::Geometry, H3DF::Search::Space::SubsegmentsAndIncludes);
+
+	// Cutting Section 설정, 정보가 있다면 Cutting Section을 설정한다.
+	if (nullptr != pcCuttingPlanesData) {
+		H3DF::PlaneArray * pcCuttingPlanes = (H3DF::PlaneArray *)pcCuttingPlanesData->GetValue();
+		SegmentKey cSegment = pcImpl->GetDocView().Canvas().GetModel().GetSegmentKey().Subsegment("cutting_section");
+
+		for (auto cPlane : *pcCuttingPlanes) {
+			cSegment.InsertCuttingSection(cPlane);
+		}
+	}
+
+	// View를 Update해야 Fitting이 정확하게 됨.
+	pcImpl->GetDocView().Canvas().GetFrontView().Update();
+
+	// Makrup View에 Sub component가 없는 경우 Camera 정보를 이용해서 설정한다.
+	// Sub component가 없다는 것은, 하부에 PMI가 없는 경우임.
+	if (nullptr != pcCameraData && nullptr == pcInComponent->GetSubComponents()) {
+		H3DF::CameraKit * pcCamera = (H3DF::CameraKit *)pcCameraData->GetValue();
+		pcImpl->Camera().SetCamera(*pcCamera);
+	}
+	else if (nullptr != pcMatrixData) {
+		SegmentKey cSegment(pcInComponent->GetSegmentKey());
+		H3DF::MatrixKit * pcMatrix = (H3DF::MatrixKit *)pcMatrixData->GetValue();
+
+		pcImpl->Camera().SetCameraFitSelection(*pcMatrix, cSegment);
 	}
 }
 
@@ -827,6 +898,11 @@ void KERNEL::Operator::ModelPanel::OnItemCheckedSignal(Json::Object & cInObject)
 	Component * pcComponent = dynamic_cast<Component *>((Component *)nInComponent);
 	if (nullptr == pcComponent) {
 		DEBUG_STOP;
+		return;
+	}
+
+	if (H3DF::Component::Type::ExchangeMkpView == pcComponent->GetType() || H3DF::Component::Type::ViewGroupComponent == pcComponent->GetType()) {
+		pcImpl->Delivery().modelPanel.CheckItem((DWORD_PTR)pcComponent, false);
 		return;
 	}
 

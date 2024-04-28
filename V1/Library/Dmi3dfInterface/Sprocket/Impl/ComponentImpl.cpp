@@ -391,3 +391,76 @@ bool H3DF::ComponentImpl::ClonedComponent(Component & cInComponent, Component & 
 
 	return true;
 }
+
+Component * H3DF::ComponentImpl::GetViewGroupComponent(Component & cInParentComp)
+{
+	if (H3DF::Component::Type::ViewGroupComponent == cInParentComp.GetType()) {
+		return &cInParentComp;
+	}
+
+	H3DF::Component * pcViewGroupComponent = cInParentComp.FindUpComponent(H3DF::Component::Type::ViewGroupComponent);
+	if (nullptr != pcViewGroupComponent) {
+		return pcViewGroupComponent;
+	}
+
+	if (nullptr == pcViewGroupComponent) {
+		ComponentArray * pcSubComponents = cInParentComp.GetSubComponents(H3DF::Component::Type::ViewGroupComponent);
+		if (nullptr != pcSubComponents) {
+			if (false == pcSubComponents->empty()) {
+				pcViewGroupComponent = pcSubComponents->front();
+				return pcViewGroupComponent;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+Component * H3DF::ComponentImpl::GetAnnotationViewGroupComponent(Component & cInParentComp)
+{
+	if (H3DF::Component::Type::AnnotationViewGroupComponent == cInParentComp.GetType()) {
+		return &cInParentComp;
+	}
+
+	H3DF::Component * pcAnnotationViewGroupComponent = cInParentComp.FindUpComponent(H3DF::Component::Type::AnnotationViewGroupComponent);
+	if (nullptr != pcAnnotationViewGroupComponent) {
+		return pcAnnotationViewGroupComponent;
+	}
+
+	if (nullptr == pcAnnotationViewGroupComponent) {
+		ComponentArray * pcSubComponents = cInParentComp.GetAllSubcomponents(H3DF::Component::Type::AnnotationViewGroupComponent);
+		if (nullptr != pcSubComponents) {
+			if (false == pcSubComponents->empty()) {
+				pcAnnotationViewGroupComponent = pcSubComponents->front();
+				return pcAnnotationViewGroupComponent;
+			}
+		}
+	}
+
+	return nullptr;	
+}
+
+// PMI를 Group으로 처리하기 위해서, Parent Component에서 PMI Group을 검색해서 찾아온다.
+Component * H3DF::ComponentImpl::GetPmiGroupComponent(Component & cInParentComp)
+{
+	if (H3DF::Component::Type::PMIGroupComponent == cInParentComp.GetType()) {
+		return &cInParentComp;
+	}
+
+	H3DF::Component * pcPMIGroupComponent = cInParentComp.FindUpComponent(H3DF::Component::Type::PMIGroupComponent);
+	if (nullptr != pcPMIGroupComponent) {
+		return pcPMIGroupComponent;
+	}
+
+	if (nullptr == pcPMIGroupComponent) {
+		ComponentArray * pcSubComponents = cInParentComp.GetAllSubcomponents(H3DF::Component::Type::PMIGroupComponent);
+		if (nullptr != pcSubComponents) {
+			if (false == pcSubComponents->empty()) {
+				pcPMIGroupComponent = pcSubComponents->front();
+				return pcPMIGroupComponent;
+			}
+		}
+	}
+
+	return nullptr;
+}

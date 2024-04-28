@@ -1662,11 +1662,6 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 	CString strName;
 	GetName(pcView, strName);
 
-	if ("SIDE FIXING SECTION" == strName) {
-		int i = 0;
-	}
-
-
 	if (/*cAttrData.m_bShow && */!cAttrData.m_bRemoved) // TODO m_bShow
 	{
 		A3DMkpViewData cViewData;
@@ -1676,7 +1671,6 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 		CString strViewName;
 		GetName(pcView, strViewName);
 
-		
 		H3DF::Component * pcViewGroupComponent = nullptr;
 
 		if (false == cViewData.m_bIsAnnotationView) {
@@ -1796,19 +1790,9 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 // 없는 경우 View Group을 생성한다.
 H3DF::Component * TdfImport::GetViewGroupComponent(H3DF::Component & cInParentComp)
 {
-	H3DF::Component * pcViewGroupComponent = cInParentComp.FindUpComponent(H3DF::Component::Type::ViewGroupComponent);
+	H3DF::Component * pcViewGroupComponent = ComponentImpl::GetViewGroupComponent(cInParentComp);
 	if (nullptr != pcViewGroupComponent) {
 		return pcViewGroupComponent;
-	}
-
-	if (nullptr == pcViewGroupComponent) {
-		ComponentArray * pcSubComponents = cInParentComp.GetSubComponents(H3DF::Component::Type::ViewGroupComponent);
-		if (nullptr != pcSubComponents) {
-			if (false == pcSubComponents->empty()) {
-				pcViewGroupComponent = pcSubComponents->front();
-				return pcViewGroupComponent;
-			}
-		}
 	}
 
 	return CreateViewGroupComponent(cInParentComp);
@@ -1831,19 +1815,9 @@ H3DF::Component * TdfImport::CreateViewGroupComponent(H3DF::Component & cInParen
 // 5-3. View중에서 Annotation View를 Group으로 처리하기 위해서, Parent Component에서 Annotation View Group을 검색.
 H3DF::Component * TdfImport::GetAnnotationViewGroupComponent(H3DF::Component & cInParentComp)
 {
-	H3DF::Component * pcAnnotationViewGroupComponent = cInParentComp.FindUpComponent(H3DF::Component::Type::AnnotationViewGroupComponent);
+	H3DF::Component * pcAnnotationViewGroupComponent = ComponentImpl::GetAnnotationViewGroupComponent(cInParentComp);
 	if (nullptr != pcAnnotationViewGroupComponent) {
 		return pcAnnotationViewGroupComponent;
-	}
-
-	if (nullptr == pcAnnotationViewGroupComponent) {
-		ComponentArray * pcSubComponents = cInParentComp.GetAllSubcomponents(H3DF::Component::Type::AnnotationViewGroupComponent);
-		if (nullptr != pcSubComponents) {
-			if (false == pcSubComponents->empty()) {
-				pcAnnotationViewGroupComponent = pcSubComponents->front();
-				return pcAnnotationViewGroupComponent;
-			}
-		}
 	}
 
 	H3DF::Component * pcViewGroupComp = GetViewGroupComponent(cInParentComp);
@@ -2401,7 +2375,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 	PolylineArray & aOutPolylines, PolygonArray & aOutPolygones, StringArray & aOutStrings, PMI::TextAttributesArray & cOutTextAttributes,
 	PMI::Options * pcOutPmiOptions)
 {
-	Log(2, "ParseMarkupTesselation: %s, %s", LogHexStr((DWORD_PTR)psTessBaseData), LogHexStr((DWORD_PTR)psTessMarkupData));
+	Log(2, "ParseMarkupTesselation: %s, %s", LogHexStrA((DWORD_PTR)psTessBaseData), LogHexStrA((DWORD_PTR)psTessMarkupData));
 
 	if (psTessMarkupData->m_uiCodesSize == 0) {
 		return A3D_ERROR;
@@ -2873,33 +2847,19 @@ H3DF::Component * TdfImport::CreatePmiGroupComponent(H3DF::Component & cInParent
 // 7-4. PMI를 Group으로 처리하기 위해서, Parent Component에서 PMI Group을 검색해서 찾아온다.
 H3DF::Component * TdfImport::GetPmiGroupComponent(H3DF::Component & cInParentComp)
 {
-	if(H3DF::Component::Type::PMIGroupComponent == cInParentComp.GetType()) {
-		return &cInParentComp;
-	}
-
-	H3DF::ComponentArray * pcPmiGroupComponentArray = cInParentComp.GetSubComponents(H3DF::Component::Type::PMIGroupComponent);
-
-	H3DF::Component * pcViewGroupComp = nullptr;
-
-	if (nullptr != pcPmiGroupComponentArray) {
-		if (false == pcPmiGroupComponentArray->empty()) {
-			pcViewGroupComp = pcPmiGroupComponentArray->front();
-		}
-	}
-
-	// Sub Component에 PMI Group이 없는 경우 상위 Component에서 찾아본다.
-	if (nullptr == pcViewGroupComp) {
-		pcViewGroupComp = cInParentComp.FindUpComponent(H3DF::Component::Type::PMIGroupComponent);
+	H3DF::Component * pcPmiGroupComponent = H3DF::ComponentImpl::GetPmiGroupComponent(cInParentComp);
+	if (nullptr != pcPmiGroupComponent) {
+		return pcPmiGroupComponent;
 	}
 
 	// 찾지 못한 경우 생성.
-	if(nullptr == pcViewGroupComp) {
-		pcViewGroupComp = CreatePmiGroupComponent(cInParentComp);
+	if(nullptr == pcPmiGroupComponent) {
+		pcPmiGroupComponent = CreatePmiGroupComponent(cInParentComp);
 	}
 
-	DEBUG_VALID(pcViewGroupComp);
+	DEBUG_VALID(pcPmiGroupComponent);
 
-	return pcViewGroupComp;
+	return pcPmiGroupComponent;
 }
 
 // 8. Draw Tessellation Base
