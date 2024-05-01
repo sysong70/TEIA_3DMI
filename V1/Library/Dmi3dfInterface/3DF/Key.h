@@ -15,8 +15,6 @@ namespace H3DF
 		void Set(Key const & cInThat);
 		Key const & operator = (Key const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::Key; };
-
 		bool operator == (Key const & cInThat) const;
 
 		HC_KEY KeyValue() const;

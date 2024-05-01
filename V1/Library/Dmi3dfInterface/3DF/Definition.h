@@ -15,8 +15,6 @@ namespace H3DF
 		void Set(Definition const & cInThat);
 		Definition const & operator = (Definition const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::Definition; };
-
 		PortfolioKey Owner() const;
 		CStringA Name() const;
 

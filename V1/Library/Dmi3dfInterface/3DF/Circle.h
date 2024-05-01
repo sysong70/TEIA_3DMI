@@ -20,8 +20,6 @@ namespace H3DF
 		void Set(CircleKit const & cInThat);
 		CircleKit const & operator=(CircleKit const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::CircleKit; };
-
 		CircleKit & SetCenter(Point const & cInCenter);
 		CircleKit & SetRadius(double dInRadius);
 		CircleKit & SetXAxis(Vector const & cInAxis);
@@ -46,8 +44,6 @@ namespace H3DF
 
 		void Set(CircleKey const & cInThat);
 		CircleKey & operator=(CircleKey const & cInThat);
-
-		H3DF::Type ObjectType() const { return H3DF::Type::CircleKey; };
 
 		CircleKey & SetCenter(Point const & cInCenter);
 		CircleKey & SetRadius(double dInRadius);

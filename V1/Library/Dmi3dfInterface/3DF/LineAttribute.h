@@ -135,8 +135,6 @@ namespace H3DF
 		void Set(LineAttributeKit const & cInThat);
 		LineAttributeKit const & operator = (LineAttributeKit const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::LineAttributeKit; };
-
 		void Show(LineAttributeKit & cOutKit) const;
 
 		bool Empty() const;
@@ -164,8 +162,6 @@ namespace H3DF
 
 		void Set(LineAttributeControl const & cInThat);
 		LineAttributeControl & operator = (LineAttributeControl const & cInThat);
-
-		H3DF::Type ObjectType() const { return H3DF::Type::LineAttributeControl; };
 
 		LineAttributeControl & SetPattern(CStringA strInPatternName);
 		LineAttributeControl & SetWeight(float fInWeight, Line::SizeUnits eInUnits = Line::SizeUnits::ScaleFactor);

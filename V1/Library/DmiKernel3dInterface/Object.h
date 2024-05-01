@@ -12,7 +12,6 @@ namespace KERNEL
 
 		KERNEL::Type Type() const;
 
-		KERNEL::Type ObjectType() const { return KERNEL::Type::None; };
 		Impl * GetImpl() { return m_pcImpl; }
 		const Impl * GetImpl() const { return m_pcImpl; }
 

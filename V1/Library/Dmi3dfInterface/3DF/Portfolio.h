@@ -30,8 +30,6 @@ namespace H3DF
 		void Set(PortfolioControl const & cInThat);
 		PortfolioControl & operator = (PortfolioControl const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::PortfolioControl; };
-
 		size_t GetCount() const;
 
 		PortfolioControl & Push(PortfolioKey const & cInPortfolio);

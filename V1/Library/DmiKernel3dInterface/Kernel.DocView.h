@@ -15,7 +15,6 @@ namespace KERNEL
 	{
 	public:
 		DocView();
-		KERNEL::Type ObjectType() const { return KERNEL::Type::View; };
 
 		void SetDelivery(Signal::Delivery & cDelivery);
 

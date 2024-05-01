@@ -18,8 +18,6 @@ namespace H3DF
 		void Set(VisualEffectsControl const & cInThat);
 		VisualEffectsControl & operator = (VisualEffectsControl const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::VisualEffectsControl; };
-
 		VisualEffectsControl & SetAmbientOcclusionEnabled(bool bInState, float fStrength = 5.0f, bool bFast = true);
 		VisualEffectsControl & SetSilhouetteEdgesEnabled(bool bInState, float fTolerance = 1.0f, bool bHeavyExterior = true);
 		VisualEffectsControl & SetBloomEnabled(bool bInState, float fStrength = 1.f, int Blurring = 5, int nShape = 0);

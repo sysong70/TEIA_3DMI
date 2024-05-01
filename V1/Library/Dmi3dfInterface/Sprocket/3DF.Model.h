@@ -19,8 +19,6 @@ namespace H3DF
 	public:
 		Model();
 
-		H3DF::Type ObjectType() const { return H3DF::Type::Model; };
-
 		SegmentKey GetSegmentKey();
 		SegmentKey const GetSegmentKey() const;
 

@@ -135,8 +135,6 @@ namespace H3DF
 		void Set(Component const & cInThat);
 		Component & operator = (Component const & cInThat);
 
-        H3DF::Type ObjectType() const { return H3DF::Type::Component; };
-
         bool Equals(Component const & cInThat) const;
 
         H3DF::Component::Type GetType() const;

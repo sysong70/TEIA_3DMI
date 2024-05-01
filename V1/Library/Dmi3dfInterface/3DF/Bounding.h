@@ -16,8 +16,6 @@ namespace H3DF
 		void Set(BoundingKit const & cInThat);
 		BoundingKit & operator = (BoundingKit const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::BoundingKit; };
-
 		bool Empty() const;
 
 		bool Equals(BoundingKit const & cInKit) const;
@@ -44,7 +42,5 @@ namespace H3DF
 
 		void Set(BoundingControl const & cInThat);
 		BoundingControl & operator = (BoundingControl const & cInThat);
-
-		H3DF::Type ObjectType() const {	return H3DF::Type::BoundingControl; }
 	};
 }

@@ -2,8 +2,14 @@
 
 #include "PMI.Entity.h"
 
+#include <HC.h>
+#include <HTools.h>
+
 #include "Line.h"
 #include "Polygon.h"
+
+#include "Camera.h"
+#include "Impl/CameraImpl.h"
 
 #include "Math.Matrix.h"
 
@@ -14,43 +20,118 @@
 
 #include "./Impl/SegmentImpl.h"
 
-using namespace H3DF::PMI;
+using namespace H3DF;
 
-H3DF::PMI::Entity::Entity(HC_KEY nInKey)
+H3DF::PMI::PMI(HC_KEY nInKey) : SegmentKey(nInKey)
 {
-	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
-	pcImpl->SetKeyValue(nInKey);
-	m_pcImpl = pcImpl;
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::PMI);
 }
 
-H3DF::PMI::Entity::Entity(Key const & cInThat)
+H3DF::PMI::PMI(SegmentKey const & cInThat) : SegmentKey(cInThat)
 {
-	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
-	m_pcImpl = pcImpl;
-
-	Key::Set(cInThat);
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::PMI);
 }
 
-H3DF::PMI::Entity::Entity(Entity const & cInThat)
+H3DF::PMI::PMI(PMI const & cInThat)
 {
+	if (nullptr != m_pcImpl) {
+		REMOVE_POINTER(m_pcImpl);
+	}
+
 	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
+	pcImpl->SetType(H3DF::Type::PMI);
 	m_pcImpl = pcImpl;
 
 	Set(cInThat);
 }
 
-void H3DF::PMI::Entity::Set(Entity const & cInThat)
+void H3DF::PMI::Set(PMI const & cInThat)
 {
 	Key::Set(cInThat);
 }
 
-Entity const & H3DF::PMI::Entity::operator=(Entity const & cInThat)
+PMI const & H3DF::PMI::operator=(PMI const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-void H3DF::PMI::Entity::SetFrame(Frame const & cInFrame)
+void H3DF::PMI::GetFrame(Frame & cOutFrame)
+{
+	char chType[64];
+	HC_KEY nKey;
+	int nIndex = 0;
+	PolylineArray aFramePolylines;
+
+	SegmentKeyImpl::LocalOpen(*this); {
+		HC_Open_Segment("frame");
+		{
+			HC_Begin_Contents_Search("...", "polylines, lines");
+			{
+				while (HC_Find_Contents(chType, &nKey)) {
+					Polyline cPolyline;
+
+					int nCount;
+					if (streq(chType, "line")) {
+						nCount = 2;
+					}
+					else {
+						HC_Show_Polyline_Count(nKey, &nCount);
+					}
+
+					Point * pcPoints = new Point[nCount];
+					if (streq(chType, "line")) {
+						HC_Show_Line(nKey, &pcPoints[0].x, &pcPoints[0].y, &pcPoints[0].z, &pcPoints[1].x, &pcPoints[1].y, &pcPoints[1].z);
+					}
+					else {
+						HC_Show_Polyline(nKey, &nCount, pcPoints);
+					}
+
+					cPolyline.SetPoints(nCount, pcPoints);
+
+					delete[] pcPoints;
+
+					HC_Open_Segment_By_Key(HC_Show_Owner_Original_Key(nKey));
+					{
+						if (HC_Show_Existence("color = lines")) {
+							H3DF::RGBColor cColor;
+							char color_space[4] = { "" };
+							HC_Show_One_Color_By_Value("lines", color_space, &cColor.red, &cColor.green, &cColor.blue);
+							cPolyline.SetRGBColor(cColor);
+						}
+
+						if (HC_Show_Existence("line pattern")) {
+							char pattern[1024] = { "" };
+							HC_Show_Line_Pattern(pattern);
+							cPolyline.SetLinePattern(pattern);
+						}
+					}
+					HC_Close_Segment();
+
+					aFramePolylines.push_back(cPolyline);
+
+					nIndex++;
+				}
+			}
+			HC_End_Contents_Search();
+		}
+		HC_Close_Segment();
+	}  SegmentKeyImpl::LocalClose(*this);
+
+	unsigned int cCount = (unsigned int)aFramePolylines.size();
+	Polyline * pcPolylines = new Polyline[cCount];
+	for (unsigned int ii = 0; ii < cCount; ii++) {
+		pcPolylines[ii] = aFramePolylines[ii];
+	}
+
+	cOutFrame.SetPolylines(cCount, pcPolylines);
+
+	delete[] pcPolylines;
+}
+
+void H3DF::PMI::SetFrame(Frame const & cInFrame)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -104,7 +185,7 @@ void H3DF::PMI::Entity::SetFrame(Frame const & cInFrame)
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-void H3DF::PMI::Entity::GetDrawing(Drawing & cOutDrawing) const
+void H3DF::PMI::GetDrawing(Drawing & cOutDrawing) const
 {
 /*
 	cOutDrawing = Drawing();
@@ -122,7 +203,7 @@ void H3DF::PMI::Entity::GetDrawing(Drawing & cOutDrawing) const
 */
 }
 
-void H3DF::PMI::Entity::SetDrawing(Drawing const & cInDrawing)
+void H3DF::PMI::SetDrawing(Drawing const & cInDrawing)
 {
 	unsigned int nCount = cInDrawing.GetPolygonCount();
 	
@@ -134,7 +215,7 @@ void H3DF::PMI::Entity::SetDrawing(Drawing const & cInDrawing)
 	SetPolygons("drawing", nCount, aPolygons.data());
 }
 
-unsigned int H3DF::PMI::Entity::GetLeaderLineCount() const
+unsigned int H3DF::PMI::GetLeaderLineCount() const
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -151,7 +232,7 @@ unsigned int H3DF::PMI::Entity::GetLeaderLineCount() const
 	return static_cast<unsigned int>(count);
 }
 
-void H3DF::PMI::Entity::SetLeaderLines(unsigned int in_count, Polyline const * in_leader_lines)
+void H3DF::PMI::SetLeaderLines(unsigned int in_count, Polyline const * in_leader_lines)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -191,12 +272,12 @@ void H3DF::PMI::Entity::SetLeaderLines(unsigned int in_count, Polyline const * i
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-void H3DF::PMI::Entity::SetLeaderSymbols(unsigned int nInCount, H3DF::Polygon const * pcInLeaderSymbols)
+void H3DF::PMI::SetLeaderSymbols(unsigned int nInCount, H3DF::Polygon const * pcInLeaderSymbols)
 {
 	SetPolygons("leader/symbol", nInCount, pcInLeaderSymbols);
 }
 
-void H3DF::PMI::Entity::SetPolygons(char const * pchInSegmentName, unsigned int nInCount, H3DF::Polygon const * pcInPolygons)
+void H3DF::PMI::SetPolygons(char const * pchInSegmentName, unsigned int nInCount, H3DF::Polygon const * pcInPolygons)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -241,7 +322,7 @@ void H3DF::PMI::Entity::SetPolygons(char const * pchInSegmentName, unsigned int 
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-void H3DF::PMI::Entity::SetColor(const H3DF::Polyline & cPolyline)
+void H3DF::PMI::SetColor(const H3DF::Polyline & cPolyline)
 {
 	H3DF::RGBColor cColor;
 	cPolyline.GetRGBColor(cColor);
@@ -258,7 +339,7 @@ void H3DF::PMI::Entity::SetColor(const H3DF::Polyline & cPolyline)
 	}
 }
 
-void H3DF::PMI::Entity::SetColor(const H3DF::Polygon & cPolygon)
+void H3DF::PMI::SetColor(const H3DF::Polygon & cPolygon)
 {
 	H3DF::RGBColor cColor;
 	cPolygon.GetRGBColor(cColor);
@@ -268,7 +349,7 @@ void H3DF::PMI::Entity::SetColor(const H3DF::Polygon & cPolygon)
 	}
 }
 
-void H3DF::PMI::Entity::SetDisplayParallelToScreen(bool const bInParallel)
+void H3DF::PMI::SetDisplayParallelToScreen(bool const bInParallel)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -287,7 +368,7 @@ void H3DF::PMI::Entity::SetDisplayParallelToScreen(bool const bInParallel)
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-bool H3DF::PMI::Entity::IsDisplayParallelToScreen() const
+bool H3DF::PMI::IsDisplayParallelToScreen() const
 {
 	bool is_parallel_to_screen = false;
 
@@ -318,7 +399,7 @@ bool H3DF::PMI::Entity::IsDisplayParallelToScreen() const
 	return is_parallel_to_screen;
 }
 
-unsigned int H3DF::PMI::Entity::GetStringsAndTextAttributesCount(CString strInSegmentName) const
+unsigned int H3DF::PMI::GetStringsAndTextAttributesCount(CString strInSegmentName) const
 {
 	int nCount = 0;
 
@@ -340,7 +421,7 @@ unsigned int H3DF::PMI::Entity::GetStringsAndTextAttributesCount(CString strInSe
 	return static_cast<unsigned int>(nCount);
 }
 
-void H3DF::PMI::Entity::GetStringsAndTextAttributes(CString strInSegmentName, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
+void H3DF::PMI::GetStringsAndTextAttributes(CString strInSegmentName, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
 {
 	char type[64];
 	HC_KEY key;
@@ -452,7 +533,7 @@ void H3DF::PMI::Entity::GetStringsAndTextAttributes(CString strInSegmentName, CS
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-void H3DF::PMI::Entity::SetStringsAndTextAttributes(CString strInSegmentName, unsigned int nInCount,
+void H3DF::PMI::SetStringsAndTextAttributes(CString strInSegmentName, unsigned int nInCount,
 	CString const * pstrInStrings, TextAttributes const * pcInTextAttributes, bool is_parallel_to_screen)
 {
 	SegmentKeyImpl::LocalOpen(*this);
@@ -548,7 +629,7 @@ void H3DF::PMI::Entity::SetStringsAndTextAttributes(CString strInSegmentName, un
 						HC_Set_Color_By_Value("text", "RGB", cColor.red, cColor.green, cColor.blue);
 					}
 
-					PMI::Orientation cOrientation;
+					Orientation cOrientation;
 					pcInTextAttributes[nIndex].GetOrientation(cOrientation);
 
 					float matrix[16];
@@ -568,98 +649,76 @@ void H3DF::PMI::Entity::SetStringsAndTextAttributes(CString strInSegmentName, un
 
 
 //== Datum =========================================================================================
-H3DF::PMI::DatumEntity::DatumEntity(HC_KEY nInKey) :
-	Entity(nInKey)
+H3DF::DatumEntity::DatumEntity(HC_KEY nInKey) : PMI(nInKey)
 {
-	if (INVALID_KEY != nInKey) {
-		SegmentKeyImpl::LocalOpen(*this);
-		HC_Set_User_Options("pmi_type = datum");
-		SegmentKeyImpl::LocalClose(*this);
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Datum);
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
 
-H3DF::PMI::DatumEntity::DatumEntity(Key const & cInThat) :
-	Entity(cInThat)
+H3DF::DatumEntity::DatumEntity(SegmentKey const & cInThat) :
+	PMI(cInThat)
 {
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Datum);
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
+	}
 }
 
-H3DF::PMI::DatumEntity::DatumEntity(DatumEntity const & cInThat) :
-	Entity(cInThat)
+H3DF::DatumEntity::DatumEntity(DatumEntity const & cInThat) :
+	PMI(cInThat)
 {
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Datum);
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
+	}
 }
 
-void H3DF::PMI::DatumEntity::Set(DatumEntity const & cInThat)
+void H3DF::DatumEntity::Set(DatumEntity const & cInThat)
 {
 	Key::Set(cInThat);
 }
 
-DatumEntity const & H3DF::PMI::DatumEntity::operator=(DatumEntity const & cInThat)
+DatumEntity const & H3DF::DatumEntity::operator=(DatumEntity const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-Datum::Type H3DF::PMI::DatumEntity::GetDatumType() const
+Datum::Type H3DF::DatumEntity::GetDatumType() const
 {
-	SegmentKeyImpl::LocalOpen(*this);
-
-	Datum::Type eDatumType = Datum::Type::Unknown;
-
-	if (HC_Show_Existence("user options = datum_type"))
-	{
-		char type[1024];
-
-		HC_Show_One_User_Option("datum_type", type);
-
-		if (streq(type, "identifier")) {
-			eDatumType = PMI::Datum::Type::Identifier;
-		}
-			
-		else if (streq(type, "target")) {
-			eDatumType = PMI::Datum::Type::Target;
-
-		}
-		else {
-			assert(0);
-
-		}
+	ByteArray aUserData;
+	if (true == ShowUserData((intptr_t)UserDataIndex::DatumType, aUserData)) {
+		DWORD nOutType;
+		CopyMemory(&nOutType, aUserData.data(), sizeof(DWORD));
+		return (Datum::Type)nOutType;
 	}
 
-	SegmentKeyImpl::LocalClose(*this);
-
-	return eDatumType;
+	return Datum::Type::Unknown;
 }
 
-void H3DF::PMI::DatumEntity::SetDatumType(Datum::Type const eInType)
+void H3DF::DatumEntity::SetDatumType(Datum::Type const eInType)
 {
-	SegmentKeyImpl::LocalOpen(*this);
-
-	switch (eInType)
-	{
-		case Datum::Type::Identifier:
-			HC_Set_User_Options("datum_type = identifier");
-			break;
-		case Datum::Type::Target:
-			HC_Set_User_Options("datum_type = target");
-			break;
-		case Datum::Type::Unknown:
-			HC_UnSet_One_User_Option("datum_type");
-			break;
-
-		default:
-			assert(0);
-			break;
-	}
-
-	SegmentKeyImpl::LocalClose(*this);
+	DWORD nType = (DWORD)eInType;
+	SetUserData((intptr_t)UserDataIndex::DatumType, sizeof(DWORD), (BYTE *)&nType);
 }
 
-unsigned int H3DF::PMI::DatumEntity::GetLabelCount() const
+unsigned int H3DF::DatumEntity::GetLabelCount() const
 {
 	return GetStringsAndTextAttributesCount(L"labels");
 }
 
-void H3DF::PMI::DatumEntity::GetLabels(unsigned int & nOutCount, CString * pstrOutLabels, TextAttributes * pcOutTextAttributes) const
+void H3DF::DatumEntity::GetLabels(unsigned int & nOutCount, CString * pstrOutLabels, TextAttributes * pcOutTextAttributes) const
 {
 	nOutCount = GetLabelCount();
 
@@ -670,200 +729,102 @@ void H3DF::PMI::DatumEntity::GetLabels(unsigned int & nOutCount, CString * pstrO
 	GetStringsAndTextAttributes(L"labels", pstrOutLabels, pcOutTextAttributes);
 }
 
-void H3DF::PMI::DatumEntity::SetLabels(unsigned int nInCount, CString const * pstrInlabels, TextAttributes const * pcInTextAttributes)
+void H3DF::DatumEntity::SetLabels(unsigned int nInCount, CString const * pstrInlabels, TextAttributes const * pcInTextAttributes)
 {
 	SetStringsAndTextAttributes(L"labels", nInCount, pstrInlabels, pcInTextAttributes, this->IsDisplayParallelToScreen());
 }
 
 
 //== DimensionEntity ===============================================================================
-H3DF::PMI::DimensionEntity::DimensionEntity(HC_KEY nInKey) :
-	Entity(nInKey)
+H3DF::DimensionEntity::DimensionEntity(HC_KEY nInKey) : PMI(nInKey)
 {
-	if (INVALID_KEY != nInKey) {
-		SegmentKeyImpl::LocalOpen(*this);
-		HC_Set_User_Options("pmi_type = dimension");
-		SegmentKeyImpl::LocalClose(*this);
-	}
-}
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Dimension);
 
-H3DF::PMI::DimensionEntity::DimensionEntity(Key const & cInThat) :
-	Entity(cInThat)
-{
 	if (INVALID_KEY != KeyValue()) {
-		SegmentKeyImpl::LocalOpen(*this);
-		HC_Set_User_Options("pmi_type = dimension");
-		SegmentKeyImpl::LocalClose(*this);
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
 
-H3DF::PMI::DimensionEntity::DimensionEntity(DimensionEntity const & cInThat) :
-	Entity(cInThat)
+H3DF::DimensionEntity::DimensionEntity(SegmentKey const & cInThat) :
+	PMI(cInThat)
 {
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Dimension);
+
 	if (INVALID_KEY != KeyValue()) {
-		SegmentKeyImpl::LocalOpen(*this);
-		HC_Set_User_Options("pmi_type = dimension");
-		SegmentKeyImpl::LocalClose(*this);
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
 
-void H3DF::PMI::DimensionEntity::Set(DimensionEntity const & cInThat)
+H3DF::DimensionEntity::DimensionEntity(DimensionEntity const & cInThat) :
+	PMI(cInThat)
 {
-	H3DF::PMI::Entity::Set(cInThat);
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Dimension);
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
+	}
 }
 
-DimensionEntity const & H3DF::PMI::DimensionEntity::operator=(DimensionEntity const & cInThat)
+void H3DF::DimensionEntity::Set(DimensionEntity const & cInThat)
+{
+	H3DF::PMI::Set(cInThat);
+}
+
+DimensionEntity const & H3DF::DimensionEntity::operator=(DimensionEntity const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-Dimension::Type H3DF::PMI::DimensionEntity::GetDimensionType() const
+Dimension::Type H3DF::DimensionEntity::GetDimensionType() const
 {
-	PMI::Dimension::Type eDimensionType = PMI::Dimension::Type::UnknownType;
-
-	if (INVALID_KEY == KeyValue()) {
-		return eDimensionType;
+	ByteArray aUserData;
+	if (true == ShowUserData((intptr_t)UserDataIndex::DimensionType, aUserData)) {
+		DWORD nOutType;
+		CopyMemory(&nOutType, aUserData.data(), sizeof(DWORD));
+		return (Dimension::Type)nOutType;
 	}
 
-	SegmentKeyImpl::LocalOpen(*this);
-
-	if (HC_Show_Existence("user options = dimension_type"))
-	{
-		char type[1024];
-
-		HC_Show_One_User_Option("dimension_type", type);
-
-		if (streq(type, "basic"))
-			eDimensionType = PMI::Dimension::Type::BasicType;
-		else if (streq(type, "reference"))
-			eDimensionType = PMI::Dimension::Type::ReferenceType;
-		else if (streq(type, "tolerance"))
-			eDimensionType = PMI::Dimension::Type::ToleranceType;
-		else
-			assert(0);
-	}
-
-	SegmentKeyImpl::LocalClose(*this);
-
-	return eDimensionType;
+	return Dimension::Type::UnknownType;
 }
 
-void H3DF::PMI::DimensionEntity::SetDimensionType(Dimension::Type const cInType)
+void H3DF::DimensionEntity::SetDimensionType(Dimension::Type const eInType)
 {
-	if (INVALID_KEY == KeyValue()) {
-		return;
-	}
-
-	SegmentKeyImpl::LocalOpen(*this);
-
-	switch (cInType)
-	{
-		case PMI::Dimension::Type::BasicType:
-			HC_Set_User_Options("dimension_type = basic");
-			break;
-		case PMI::Dimension::Type::ReferenceType:
-			HC_Set_User_Options("dimension_type = reference");
-			break;
-		case PMI::Dimension::Type::ToleranceType:
-			HC_Set_User_Options("dimension_type = tolerance");
-			break;
-		case PMI::Dimension::Type::UnknownType:
-			HC_UnSet_One_User_Option("dimension_type");
-			break;
-		default:
-			assert(0);
-	}
-
-	SegmentKeyImpl::LocalClose(*this);
+	DWORD nType = (DWORD)eInType;
+	SetUserData((intptr_t)UserDataIndex::DatumType, sizeof(DWORD), (BYTE *)&nType);
 }
 
-Dimension::SubType H3DF::PMI::DimensionEntity::GetDimensionSubType() const
+Dimension::SubType H3DF::DimensionEntity::GetDimensionSubType() const
 {
-	PMI::Dimension::SubType eDimensionSubtype = PMI::Dimension::SubType::UnknownSubType;
-
-	if (INVALID_KEY == KeyValue()) {
-		return eDimensionSubtype;
+	ByteArray aUserData;
+	if (true == ShowUserData((intptr_t)UserDataIndex::DimensionSubType, aUserData)) {
+		DWORD nOutType;
+		CopyMemory(&nOutType, aUserData.data(), sizeof(DWORD));
+		return (Dimension::SubType)nOutType;
 	}
 
-	SegmentKeyImpl::LocalOpen(*this);
-
-	if (HC_Show_Existence("user options = dimension_subtype"))
-	{
-		char subtype[1024];
-
-		HC_Show_One_User_Option("dimension_subtype", subtype);
-
-		if (streq(subtype, "angle"))
-			eDimensionSubtype = PMI::Dimension::SubType::AngleSubType;
-		else if (streq(subtype, "chamfer"))
-			eDimensionSubtype = PMI::Dimension::SubType::ChamferSubType;
-		else if (streq(subtype, "diameter"))
-			eDimensionSubtype = PMI::Dimension::SubType::DiameterSubType;
-		else if (streq(subtype, "distance"))
-			eDimensionSubtype = PMI::Dimension::SubType::DistanceSubType;
-		else if (streq(subtype, "length"))
-			eDimensionSubtype = PMI::Dimension::SubType::LengthSubType;
-		else if (streq(subtype, "radius"))
-			eDimensionSubtype = PMI::Dimension::SubType::RadiusSubType;
-		else if (streq(subtype, "slope"))
-			eDimensionSubtype = PMI::Dimension::SubType::SlopeSubType;
-		else
-			assert(0);
-	}
-
-	SegmentKeyImpl::LocalClose(*this);
-
-	return eDimensionSubtype;
+	return Dimension::SubType::UnknownSubType;
 }
 
-void H3DF::PMI::DimensionEntity::SetDimensionSubType(PMI::Dimension::SubType const eInSubType)
+
+void H3DF::DimensionEntity::SetDimensionSubType(Dimension::SubType const eInSubType)
 {
-	if (INVALID_KEY == KeyValue()) {
-		return;
-	}
-
-	SegmentKeyImpl::LocalOpen(*this);
-
-	switch (eInSubType)
-	{
-		case PMI::Dimension::SubType::AngleSubType:
-			HC_Set_User_Options("dimension_subtype = angle");
-			break;
-		case PMI::Dimension::SubType::ChamferSubType:
-			HC_Set_User_Options("dimension_subtype = chamfer");
-			break;
-		case PMI::Dimension::SubType::DiameterSubType:
-			HC_Set_User_Options("dimension_subtype = diameter");
-			break;
-		case PMI::Dimension::SubType::DistanceSubType:
-			HC_Set_User_Options("dimension_subtype = distance");
-			break;
-		case PMI::Dimension::SubType::LengthSubType:
-			HC_Set_User_Options("dimension_subtype = length");
-			break;
-		case PMI::Dimension::SubType::RadiusSubType:
-			HC_Set_User_Options("dimension_subtype = radius");
-			break;
-		case PMI::Dimension::SubType::SlopeSubType:
-			HC_Set_User_Options("dimension_subtype = slope");
-			break;
-		case PMI::Dimension::SubType::UnknownSubType:
-			HC_UnSet_One_User_Option("dimension_subtype");
-			break;
-		default:
-			assert(0);
-	}
-
-	SegmentKeyImpl::LocalClose(*this);
+	DWORD nType = (DWORD)eInSubType;
+	SetUserData((intptr_t)UserDataIndex::DimensionSubType, sizeof(DWORD), (BYTE *)&nType);
 }
 
-unsigned int H3DF::PMI::DimensionEntity::GetStringCount() const
+unsigned int H3DF::DimensionEntity::GetStringCount() const
 {
 	return GetStringsAndTextAttributesCount(L"strings");
 }
 
-void H3DF::PMI::DimensionEntity::GetStrings(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
+void H3DF::DimensionEntity::GetStrings(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
 {
 	nOutCount = GetStringCount();
 
@@ -874,60 +835,109 @@ void H3DF::PMI::DimensionEntity::GetStrings(unsigned int & nOutCount, CString * 
 	GetStringsAndTextAttributes(L"strings", pstrOutStrings, pcOutTextAttributes);
 }
 
-void H3DF::PMI::DimensionEntity::SetStrings(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes)
+void H3DF::DimensionEntity::SetStrings(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes)
 {
 	SetStringsAndTextAttributes(L"strings", nInCount, pstrInStrings, pcInTextAttributes, IsDisplayParallelToScreen());
 }
 
-//== GenericEntity =================================================================================
-
-H3DF::PMI::GenericEntity::GenericEntity(HC_KEY nInKey) :
-	Entity(nInKey)
+//== FeatureControlFrameEntity Class ===============================================================
+H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(HC_KEY nInKey) : PMI(nInKey)
 {
-	if (INVALID_KEY != nInKey) {
-		SegmentKeyImpl::LocalOpen(*this);
-		HC_Set_User_Options("pmi_type = generic");
-		SegmentKeyImpl::LocalClose(*this);
-	}
-}
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::FeatureControlFrame);
 
-H3DF::PMI::GenericEntity::GenericEntity(Key const & cInThat) :
-	Entity(cInThat)
-{
 	if (INVALID_KEY != KeyValue()) {
-		SegmentKeyImpl::LocalOpen(*this);
-		HC_Set_User_Options("pmi_type = generic");
-		SegmentKeyImpl::LocalClose(*this);
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
 
-H3DF::PMI::GenericEntity::GenericEntity(GenericEntity const & cInThat) :
-	Entity(cInThat)
+H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(SegmentKey const & cInThat) : PMI(cInThat)
 {
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::FeatureControlFrame);
+
 	if (INVALID_KEY != KeyValue()) {
-		SegmentKeyImpl::LocalOpen(*this);
-		HC_Set_User_Options("pmi_type = generic");
-		SegmentKeyImpl::LocalClose(*this);
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
 
-void H3DF::PMI::GenericEntity::Set(GenericEntity const & cInThat)
+H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(FeatureControlFrameEntity const & cInThat) : PMI(cInThat)
 {
-	H3DF::PMI::Entity::Set(cInThat);
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::FeatureControlFrame);
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
+	}
 }
 
-GenericEntity const & H3DF::PMI::GenericEntity::operator=(GenericEntity const & cInThat)
+void H3DF::FeatureControlFrameEntity::Set(FeatureControlFrameEntity const & cInThat)
+{
+	H3DF::PMI::Set(cInThat);
+}
+
+FeatureControlFrameEntity const & H3DF::FeatureControlFrameEntity::operator=(FeatureControlFrameEntity const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-unsigned int H3DF::PMI::GenericEntity::GetStringCount() const
+
+//== GenericEntity Class ===========================================================================
+
+H3DF::GenericEntity::GenericEntity(HC_KEY nInKey) :	PMI(nInKey)
+{
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Generic);
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
+	}
+}
+
+H3DF::GenericEntity::GenericEntity(SegmentKey const & cInThat) : PMI(cInThat)
+{
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Generic);
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
+	}
+}
+
+H3DF::GenericEntity::GenericEntity(GenericEntity const & cInThat) : PMI(cInThat)
+{
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Generic);
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
+	}
+}
+
+void H3DF::GenericEntity::Set(GenericEntity const & cInThat)
+{
+	H3DF::PMI::Set(cInThat);
+}
+
+GenericEntity const & H3DF::GenericEntity::operator=(GenericEntity const & cInThat)
+{
+	Set(cInThat);
+	return *this;
+}
+
+unsigned int H3DF::GenericEntity::GetStringCount() const
 {
 	return GetStringsAndTextAttributesCount("strings");
 }
 
-void H3DF::PMI::GenericEntity::GetStrings(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
+void H3DF::GenericEntity::GetStrings(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
 {
 	nOutCount = GetStringCount();
 
@@ -938,60 +948,72 @@ void H3DF::PMI::GenericEntity::GetStrings(unsigned int & nOutCount, CString * ps
 	GetStringsAndTextAttributes(L"strings", pstrOutStrings, pcOutTextAttributes);
 }
 
-void H3DF::PMI::GenericEntity::SetStrings(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes)
+void H3DF::GenericEntity::SetStrings(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes)
 {
 	SetStringsAndTextAttributes(L"strings", nInCount, pstrInStrings, pcInTextAttributes);
 }
 
-void H3DF::PMI::GenericEntity::SetDisplayParallelToScreen(bool const in_parallel)
+void H3DF::GenericEntity::SetDisplayParallelToScreen(bool const in_parallel)
 {
-	H3DF::PMI::Entity::SetDisplayParallelToScreen(in_parallel);
+	H3DF::PMI::SetDisplayParallelToScreen(in_parallel);
 }
 
-bool H3DF::PMI::GenericEntity::IsDisplayParallelToScreen() const
+bool H3DF::GenericEntity::IsDisplayParallelToScreen() const
 {
-	return H3DF::PMI::Entity::IsDisplayParallelToScreen();
+	return H3DF::PMI::IsDisplayParallelToScreen();
 }
 
 //== NoteEntity ====================================================================================
-H3DF::PMI::NoteEntity::NoteEntity(HC_KEY nInKey):
-	Entity(nInKey)
+H3DF::NoteEntity::NoteEntity(HC_KEY nInKey) : PMI(nInKey)
 {
-	if (INVALID_KEY != nInKey) {
-		SegmentKeyImpl::LocalOpen(*this);
-		HC_Set_User_Options("pmi_type = note");
-		SegmentKeyImpl::LocalClose(*this);
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Note);
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
 
-H3DF::PMI::NoteEntity::NoteEntity(Key const & cInThat) :
-	Entity(cInThat)
+H3DF::NoteEntity::NoteEntity(SegmentKey const & cInThat) : PMI(cInThat)
 {
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Note);
 
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
+	}
 }
 
-H3DF::PMI::NoteEntity::NoteEntity(NoteEntity const & cInThat) :
-	Entity(cInThat)
+H3DF::NoteEntity::NoteEntity(NoteEntity const & cInThat) : PMI(cInThat)
 {
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Note);
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
+	}
 }
 
-void H3DF::PMI::NoteEntity::Set(NoteEntity const & cInThat)
+void H3DF::NoteEntity::Set(NoteEntity const & cInThat)
 {
-	H3DF::PMI::Entity::Set(cInThat);
+	H3DF::PMI::Set(cInThat);
 }
 
-NoteEntity const & H3DF::PMI::NoteEntity::operator=(NoteEntity const & cInThat)
+NoteEntity const & H3DF::NoteEntity::operator=(NoteEntity const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-unsigned int H3DF::PMI::NoteEntity::GetStringCount() const
+unsigned int H3DF::NoteEntity::GetStringCount() const
 {
 	return GetStringsAndTextAttributesCount(L"strings");
 }
 
-void H3DF::PMI::NoteEntity::GetStrings(unsigned int & nOutCount, CString pstrOutStrings[], TextAttributes pcOutTextAttributes[]) const
+void H3DF::NoteEntity::GetStrings(unsigned int & nOutCount, CString pstrOutStrings[], TextAttributes pcOutTextAttributes[]) const
 {
 	nOutCount = GetStringCount();
 
@@ -1001,237 +1023,117 @@ void H3DF::PMI::NoteEntity::GetStrings(unsigned int & nOutCount, CString pstrOut
 	GetStringsAndTextAttributes(L"strings", pstrOutStrings, pcOutTextAttributes);
 }
 
-void H3DF::PMI::NoteEntity::SetStrings(unsigned int nInCount, CString const pstrInStrings[], TextAttributes const pcInTextAttributes[])
+void H3DF::NoteEntity::SetStrings(unsigned int nInCount, CString const pstrInStrings[], TextAttributes const pcInTextAttributes[])
 {
 	SetStringsAndTextAttributes(L"strings", nInCount, pstrInStrings, pcInTextAttributes, this->IsDisplayParallelToScreen());
 }
 
 //== RoughnessEntity ===============================================================================
 
-H3DF::PMI::RoughnessEntity::RoughnessEntity(HC_KEY nInKey) : 
-	Entity(nInKey)
+H3DF::RoughnessEntity::RoughnessEntity(HC_KEY nInKey) :  PMI(nInKey)
 {
-	if (nInKey != INVALID_KEY)
-	{
-		SegmentKeyImpl::LocalOpen(*this);
-			HC_Set_User_Options("pmi_type = roughness");
-		SegmentKeyImpl::LocalClose(*this);
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Roughness);
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
 
-H3DF::PMI::RoughnessEntity::RoughnessEntity(Key const & cInThat) :
-	Entity(cInThat)
+H3DF::RoughnessEntity::RoughnessEntity(SegmentKey const & cInThat) : PMI(cInThat)
 {
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Roughness);
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
+	}
 }
 
-H3DF::PMI::RoughnessEntity::RoughnessEntity(RoughnessEntity const & cInThat):
-	Entity(cInThat)
+H3DF::RoughnessEntity::RoughnessEntity(RoughnessEntity const & cInThat): PMI(cInThat)
 {
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Roughness);
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
+	}
 }
 
-void H3DF::PMI::RoughnessEntity::Set(RoughnessEntity const & cInThat)
+void H3DF::RoughnessEntity::Set(RoughnessEntity const & cInThat)
 {
-	H3DF::PMI::Entity::Set(cInThat);
+	H3DF::PMI::Set(cInThat);
 }
 
-RoughnessEntity const & H3DF::PMI::RoughnessEntity::operator=(RoughnessEntity const & that)
+RoughnessEntity const & H3DF::RoughnessEntity::operator=(RoughnessEntity const & that)
 {
 	Set(that);
 	return *this;
 }
 
-Roughness::Obtention::Type H3DF::PMI::RoughnessEntity::GetObtentionType() const
+Roughness::Obtention::Type H3DF::RoughnessEntity::GetObtentionType() const
 {
-	SegmentKeyImpl::LocalOpen(*this);
-
-	Roughness::Obtention::Type eObtentionType = Roughness::Obtention::Type::Unknown;
-
-	if (HC_Show_Existence("user options = obtention_type"))
-	{
-		char type[64];
-
-		HC_Show_One_User_Option("obtention_type", type);
-
-		if (streq(type, "not_defined"))
-			eObtentionType = Roughness::Obtention::Type::NotDefined;
-		else if (streq(type, "machining_mandatory"))
-			eObtentionType = Roughness::Obtention::Type::MachiningMandatory;
-		else if (streq(type, "machining_forbidden"))
-			eObtentionType = Roughness::Obtention::Type::MachiningForbidden;
-		else
-			assert(0);
+	ByteArray aUserData;
+	if (true == ShowUserData((intptr_t)UserDataIndex::RoughnessObtentionType, aUserData)) {
+		DWORD nOutType;
+		CopyMemory(&nOutType, aUserData.data(), sizeof(DWORD));
+		return (Roughness::Obtention::Type)nOutType;
 	}
 
-	SegmentKeyImpl::LocalClose(*this);
-
-	return eObtentionType;
+	return Roughness::Obtention::Type::Unknown;
 }
 
-void H3DF::PMI::RoughnessEntity::SetObtentionType(Roughness::Obtention::Type const eInObtentionType)
+void H3DF::RoughnessEntity::SetObtentionType(Roughness::Obtention::Type const eInObtentionType)
 {
-	SegmentKeyImpl::LocalOpen(*this);
+	DWORD nType = (DWORD)eInObtentionType;
+	SetUserData((intptr_t)UserDataIndex::RoughnessObtentionType, sizeof(DWORD), (BYTE *)&nType);
+}
 
-	switch (eInObtentionType)
-	{
-		case Roughness::Obtention::Type::NotDefined:
-			HC_Set_User_Options("obtention_type = not_defined");
-			break;
-		case Roughness::Obtention::Type::MachiningMandatory:
-			HC_Set_User_Options("obtention_type = machining_mandatory");
-			break;
-		case Roughness::Obtention::Type::MachiningForbidden:
-			HC_Set_User_Options("obtention_type = machining_forbidden");
-			break;
-		case Roughness::Obtention::Type::Unknown:
-			HC_UnSet_One_User_Option("obtention_type");
-			break;
-		default:
-			assert(0);
+Roughness::Applicability::Type H3DF::RoughnessEntity::GetApplicabilityType() const
+{
+	ByteArray aUserData;
+	if (true == ShowUserData((intptr_t)UserDataIndex::RoughnessObtentionType, aUserData)) {
+		DWORD nOutType;
+		CopyMemory(&nOutType, aUserData.data(), sizeof(DWORD));
+		return (Roughness::Applicability::Type)nOutType;
 	}
 
-	SegmentKeyImpl::LocalClose(*this);
+	return Roughness::Applicability::Type::Unknown;
 }
 
-Roughness::Applicability::Type H3DF::PMI::RoughnessEntity::GetApplicabilityType() const
+void H3DF::RoughnessEntity::SetApplicabilityType(Roughness::Applicability::Type const eInApplicabilityType)
 {
-	Roughness::Applicability::Type eApplicabilityType = Roughness::Applicability::Type::Unknown;
+	DWORD nType = (DWORD)eInApplicabilityType;
+	SetUserData((intptr_t)UserDataIndex::RoughnessApplicabilityType, sizeof(DWORD), (BYTE *)&nType);
+}
 
-	SegmentKeyImpl::LocalOpen(*this);
-
-	if (HC_Show_Existence("user options = applicability_type"))
-	{
-		char type[64];
-
-		HC_Show_One_User_Option("applicability_type", type);
-
-		if (streq(type, "specified_surface"))
-			eApplicabilityType = Roughness::Applicability::Type::SpecifiedSurface;
-		else if (streq(type, "surrounding_surfaces"))
-			eApplicabilityType = Roughness::Applicability::Type::SurroundingSurfaces;
-		else if (streq(type, "basic_surface"))
-			eApplicabilityType = Roughness::Applicability::Type::BasicSurface;
-		else if (streq(type, "all_surfaces"))
-			eApplicabilityType = Roughness::Applicability::Type::AllSurfaces;
-		else
-			assert(0);
+Roughness::Mode::Type H3DF::RoughnessEntity::GetModeType() const
+{
+	ByteArray aUserData;
+	if (true == ShowUserData((intptr_t)UserDataIndex::RoughnessModeType, aUserData)) {
+		DWORD nOutType;
+		CopyMemory(&nOutType, aUserData.data(), sizeof(DWORD));
+		return (Roughness::Mode::Type)nOutType;
 	}
 
-	SegmentKeyImpl::LocalClose(*this);
-
-	return eApplicabilityType;
+	return Roughness::Mode::Type::Unknown;
 }
 
-void H3DF::PMI::RoughnessEntity::SetApplicabilityType(Roughness::Applicability::Type const in_applicability_type)
+void H3DF::RoughnessEntity::SetModeType(Roughness::Mode::Type const eInModeType)
 {
-	SegmentKeyImpl::LocalOpen(*this);
-
-	switch (in_applicability_type)
-	{
-		case Roughness::Applicability::Type::SpecifiedSurface:
-			HC_Set_User_Options("applicability_type = specified_surface");
-			break;
-		case Roughness::Applicability::Type::SurroundingSurfaces:
-			HC_Set_User_Options("applicability_type = surrounding_surfaces");
-			break;
-		case Roughness::Applicability::Type::BasicSurface:
-			HC_Set_User_Options("applicability_type = basic_surface");
-			break;
-		case Roughness::Applicability::Type::AllSurfaces:
-			HC_Set_User_Options("applicability_type = all_surfaces");
-			break;
-		case Roughness::Applicability::Type::Unknown:
-			HC_UnSet_One_User_Option("applicability_type");
-			break;
-		default:
-			assert(0);
-	}
-
-	SegmentKeyImpl::LocalClose(*this);
+	DWORD nType = (DWORD)eInModeType;
+	SetUserData((intptr_t)UserDataIndex::RoughnessModeType, sizeof(DWORD), (BYTE *)&nType);
 }
 
-Roughness::Mode::Type H3DF::PMI::RoughnessEntity::GetModeType() const
-{
-	Roughness::Mode::Type mode_type = Roughness::Mode::Type::Unknown;
-
-	SegmentKeyImpl::LocalOpen(*this);
-
-	if (HC_Show_Existence("user options = mode_type"))
-	{
-		char type[64];
-
-		HC_Show_One_User_Option("mode_type", type);
-
-		if (streq(type, "none"))
-			mode_type = Roughness::Mode::Type::None;
-		else if (streq(type, "multidirectional"))
-			mode_type = Roughness::Mode::Type::MultiDirectional;
-		else if (streq(type, "circular"))
-			mode_type = Roughness::Mode::Type::Circular;
-		else if (streq(type, "radial"))
-			mode_type = Roughness::Mode::Type::Radial;
-		else if (streq(type, "particular"))
-			mode_type = Roughness::Mode::Type::Particular;
-		else if (streq(type, "with_angles"))
-			mode_type = Roughness::Mode::Type::WithAngles;
-		else if (streq(type, "parallel"))
-			mode_type = Roughness::Mode::Type::Parallel;
-		else if (streq(type, "perpendicular"))
-			mode_type = Roughness::Mode::Type::Perpendicular;
-		else
-			assert(0);
-	}
-
-	SegmentKeyImpl::LocalClose(*this);
-
-	return mode_type;
-}
-
-void H3DF::PMI::RoughnessEntity::SetModeType(Roughness::Mode::Type const eInModeType)
-{
-	SegmentKeyImpl::LocalOpen(*this);
-
-	switch (eInModeType)
-	{
-		case Roughness::Mode::Type::None:
-			HC_Set_User_Options("mode_type = none");
-			break;
-		case Roughness::Mode::Type::MultiDirectional:
-			HC_Set_User_Options("mode_type = multidirectional");
-			break;
-		case Roughness::Mode::Type::Circular:
-			HC_Set_User_Options("mode_type = circular");
-			break;
-		case Roughness::Mode::Type::Radial:
-			HC_Set_User_Options("mode_type = radial");
-			break;
-		case Roughness::Mode::Type::Particular:
-			HC_Set_User_Options("mode_type = particular");
-			break;
-		case Roughness::Mode::Type::WithAngles:
-			HC_Set_User_Options("mode_type = with_angles");
-			break;
-		case Roughness::Mode::Type::Parallel:
-			HC_Set_User_Options("mode_type = parallel");
-			break;
-		case Roughness::Mode::Type::Perpendicular:
-			HC_Set_User_Options("mode_type = perpendicular");
-			break;
-		case Roughness::Mode::Type::Unknown:
-			HC_UnSet_One_User_Option("mode_type");
-			break;
-		default:
-			assert(0);
-	}
-
-	SegmentKeyImpl::LocalClose(*this);
-}
-
-unsigned int H3DF::PMI::RoughnessEntity::GetFieldCount() const
+unsigned int H3DF::RoughnessEntity::GetFieldCount() const
 {
 	return GetStringsAndTextAttributesCount(L"fields");
 }
 
-void H3DF::PMI::RoughnessEntity::GetFields(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
+void H3DF::RoughnessEntity::GetFields(unsigned int & nOutCount, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
 {
 	nOutCount = GetFieldCount();
 
@@ -1242,7 +1144,7 @@ void H3DF::PMI::RoughnessEntity::GetFields(unsigned int & nOutCount, CString * p
 	GetStringsAndTextAttributes(L"fields", pstrOutStrings, pcOutTextAttributes);
 }
 
-void H3DF::PMI::RoughnessEntity::SetFields(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes)
+void H3DF::RoughnessEntity::SetFields(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes)
 {
 	SetStringsAndTextAttributes(L"fields", nInCount, pstrInStrings, pcInTextAttributes);
 }
@@ -1252,7 +1154,7 @@ void H3DF::PMI::RoughnessEntity::SetFields(unsigned int nInCount, CString const 
 class OrientationPrivate : public H3DF::Impl
 {
 public:
-	OrientationPrivate() {}
+	OrientationPrivate() { m_eType = H3DF::Type::Orintation; }
 
 	void Copy(OrientationPrivate * pcInThat)
 	{
@@ -1262,31 +1164,37 @@ public:
 	H3DF::MatrixKit m_cMatrix;
 };
 
-H3DF::PMI::Orientation::Orientation()
+H3DF::Orientation::Orientation()
 {
 	m_pcImpl = new OrientationPrivate();
+
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Orintation);
 }
 
-H3DF::PMI::Orientation::Orientation(Orientation const & cInThat)
+H3DF::Orientation::Orientation(Orientation const & cInThat)
 {
 	m_pcImpl = new OrientationPrivate();
 	Set(cInThat);
+
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::Roughness);
 }
 
-void H3DF::PMI::Orientation::Set(Orientation const & cInThat)
+void H3DF::Orientation::Set(Orientation const & cInThat)
 {
 	OrientationPrivate * pcImpl = (OrientationPrivate *)m_pcImpl;
 	OrientationPrivate * pcInThatImpl = (OrientationPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-H3DF::PMI::Orientation const & H3DF::PMI::Orientation::operator=(Orientation const & cInThat)
+H3DF::Orientation const & H3DF::Orientation::operator=(Orientation const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-void H3DF::PMI::Orientation::GetMatrix(float out_matrix[16]) const
+void H3DF::Orientation::GetMatrix(float out_matrix[16]) const
 {
 	OrientationPrivate * pcImpl = (OrientationPrivate *)m_pcImpl;
 
@@ -1297,7 +1205,7 @@ void H3DF::PMI::Orientation::GetMatrix(float out_matrix[16]) const
 	// memcpy(out_matrix, pcImpl->m_cMatrix.GetData(), 16 * sizeof(float));
 }
 
-void H3DF::PMI::Orientation::SetMatrix(MatrixKit const & cInMatrix)
+void H3DF::Orientation::SetMatrix(MatrixKit const & cInMatrix)
 {
 	OrientationPrivate * pcImpl = (OrientationPrivate *)m_pcImpl;
 	pcImpl->m_cMatrix = cInMatrix;
@@ -1310,6 +1218,7 @@ class TextAttributesImpl : public H3DF::Impl
 public:
 	TextAttributesImpl()
 	{
+		m_eType = H3DF::Type::TextAttributes;
 		m_insertion_point.Set(0, 0, 0);
 		m_font_size = 0.0f;
 		m_font_size_units = Font::Size::Units::UnknownUnits;
@@ -1357,67 +1266,67 @@ public:
 	float m_width_scale;
 };
 
-H3DF::PMI::TextAttributes::TextAttributes()
+H3DF::TextAttributes::TextAttributes()
 {
 	m_pcImpl = new TextAttributesImpl();
 }
 
-H3DF::PMI::TextAttributes::TextAttributes(TextAttributes const & cInThat)
+H3DF::TextAttributes::TextAttributes(TextAttributes const & cInThat)
 {
 	m_pcImpl = new TextAttributesImpl();
 	Set(cInThat);
 }
 
-void H3DF::PMI::TextAttributes::Set(TextAttributes const & cInThat)
+void H3DF::TextAttributes::Set(TextAttributes const & cInThat)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	TextAttributesImpl * pcInThatImpl = (TextAttributesImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-TextAttributes const & H3DF::PMI::TextAttributes::operator=(TextAttributes const & cInThat)
+TextAttributes const & H3DF::TextAttributes::operator=(TextAttributes const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-void H3DF::PMI::TextAttributes::GetInsertionPoint(H3DF::Point & cOutPoint) const
+void H3DF::TextAttributes::GetInsertionPoint(H3DF::Point & cOutPoint) const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	cOutPoint = pcImpl->m_insertion_point;
 }
 
-void H3DF::PMI::TextAttributes::SetInsertionPoint(H3DF::Point const & cInPoint)
+void H3DF::TextAttributes::SetInsertionPoint(H3DF::Point const & cInPoint)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_insertion_point = cInPoint;
 }
 
-void H3DF::PMI::TextAttributes::GetFontSize(float & fOutSize) const
+void H3DF::TextAttributes::GetFontSize(float & fOutSize) const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	fOutSize = pcImpl->m_font_size;
 }
 
-void H3DF::PMI::TextAttributes::SetFontSize(float const nInSize)
+void H3DF::TextAttributes::SetFontSize(float const nInSize)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_font_size = nInSize;
 }
 
-void H3DF::PMI::TextAttributes::GetFontSizeUnits(Font::Size::Units & eOutUnits) const
+void H3DF::TextAttributes::GetFontSizeUnits(Font::Size::Units & eOutUnits) const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	eOutUnits = pcImpl->m_font_size_units;
 }
 
-void H3DF::PMI::TextAttributes::SetFontSizeUnits(Font::Size::Units const eInUnits)
+void H3DF::TextAttributes::SetFontSizeUnits(Font::Size::Units const eInUnits)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_font_size_units = eInUnits;
 }
 
-void H3DF::PMI::TextAttributes::GetFontName(char * pchOutFontName) const
+void H3DF::TextAttributes::GetFontName(char * pchOutFontName) const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
@@ -1428,7 +1337,7 @@ void H3DF::PMI::TextAttributes::GetFontName(char * pchOutFontName) const
 	}
 }
 
-void H3DF::PMI::TextAttributes::SetFontName(char const * pchInFontName)
+void H3DF::TextAttributes::SetFontName(char const * pchInFontName)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
@@ -1440,93 +1349,93 @@ void H3DF::PMI::TextAttributes::SetFontName(char const * pchInFontName)
 	strcpy(pcImpl->m_font_name, pchInFontName);
 }
 
-void H3DF::PMI::TextAttributes::GetOrientation(PMI::Orientation & cOutOrientation) const
+void H3DF::TextAttributes::GetOrientation(Orientation & cOutOrientation) const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	cOutOrientation = pcImpl->m_orientation;
 }
 
-void H3DF::PMI::TextAttributes::SetOrientation(Orientation const & cInOrientation)
+void H3DF::TextAttributes::SetOrientation(Orientation const & cInOrientation)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_orientation = cInOrientation;
 }
 
-void H3DF::PMI::TextAttributes::GetRGBColor(H3DF::RGBColor & cOutColor) const
+void H3DF::TextAttributes::GetRGBColor(H3DF::RGBColor & cOutColor) const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	cOutColor = pcImpl->m_color;
 }
 
-void H3DF::PMI::TextAttributes::SetRGBColor(H3DF::RGBColor const & cInColor)
+void H3DF::TextAttributes::SetRGBColor(H3DF::RGBColor const & cInColor)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_color = cInColor;
 }
 
-bool H3DF::PMI::TextAttributes::IsBold() const
+bool H3DF::TextAttributes::IsBold() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x02) == 0x02;
 }
 
-bool H3DF::PMI::TextAttributes::IsItalic() const
+bool H3DF::TextAttributes::IsItalic() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x04) == 0x04;
 }
-bool H3DF::PMI::TextAttributes::IsUnderlined() const
+bool H3DF::TextAttributes::IsUnderlined() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x08) == 0x08;
 }
-bool H3DF::PMI::TextAttributes::IsStrikedThrough() const
+bool H3DF::TextAttributes::IsStrikedThrough() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x10) == 0x10;
 }
-bool H3DF::PMI::TextAttributes::IsOverlined() const
+bool H3DF::TextAttributes::IsOverlined() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x20) == 0x20;
 }
-bool H3DF::PMI::TextAttributes::IsStreched() const
+bool H3DF::TextAttributes::IsStreched() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x40) == 0x40;
 }
-bool H3DF::PMI::TextAttributes::IsWired() const
+bool H3DF::TextAttributes::IsWired() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x80) == 0x80;
 }
-bool H3DF::PMI::TextAttributes::IsFixedWidth() const
+bool H3DF::TextAttributes::IsFixedWidth() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 
 	return (pcImpl->m_format & 0x100) == 0x100;
 }
 
-void H3DF::PMI::TextAttributes::SetFormat(char const & chInFormat)
+void H3DF::TextAttributes::SetFormat(char const & chInFormat)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_format = chInFormat;
 }
 
-double H3DF::PMI::TextAttributes::WidthScale() const
+double H3DF::TextAttributes::WidthScale() const
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	return pcImpl->m_width_scale;
 }
 
-void H3DF::PMI::TextAttributes::SetWidthScale(const double dWidthScale)
+void H3DF::TextAttributes::SetWidthScale(const double dWidthScale)
 {
 	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
 	pcImpl->m_width_scale = static_cast<float>(dWidthScale);
@@ -1536,12 +1445,10 @@ void H3DF::PMI::TextAttributes::SetWidthScale(const double dWidthScale)
 class OptionsPrivate : public H3DF::Impl
 {
 public:
-	OptionsPrivate()
+	OptionsPrivate() 
 	{
+		m_eType = H3DF::Type::Options;
 		m_bDisplayParallelToScreen = false;
-	}
-	~OptionsPrivate()
-	{
 	}
 
 	void Copy(OptionsPrivate * that)
@@ -1552,38 +1459,38 @@ public:
 	bool m_bDisplayParallelToScreen;
 };
 
-H3DF::PMI::Options::Options()
+H3DF::Options::Options()
 {
 	m_pcImpl = new OptionsPrivate();
 }
 
-H3DF::PMI::Options::Options(Options const & cInThat)
+H3DF::Options::Options(Options const & cInThat)
 {
 	m_pcImpl = new OptionsPrivate();
 	Set(cInThat);
 }
 
-void H3DF::PMI::Options::Set(Options const & cInThat)
+void H3DF::Options::Set(Options const & cInThat)
 {
 	OptionsPrivate * pcImpl = (OptionsPrivate *)m_pcImpl;
 	OptionsPrivate * pcInThatImpl = (OptionsPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-Options const & H3DF::PMI::Options::operator=(Options const & cInThat)
+Options const & H3DF::Options::operator=(Options const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
 
-bool H3DF::PMI::Options::IsDisplayParallelToScreen() const
+bool H3DF::Options::IsDisplayParallelToScreen() const
 {
 	OptionsPrivate * pcImpl = (OptionsPrivate *)m_pcImpl;
 	return pcImpl->m_bDisplayParallelToScreen;
 }
 
-void H3DF::PMI::Options::SetDisplayParallelToScreen(const bool in_parallel)
+void H3DF::Options::SetDisplayParallelToScreen(const bool in_parallel)
 {
 	OptionsPrivate * pcImpl = (OptionsPrivate *)m_pcImpl;
 	pcImpl->m_bDisplayParallelToScreen = in_parallel;
@@ -1594,6 +1501,8 @@ void H3DF::PMI::Options::SetDisplayParallelToScreen(const bool in_parallel)
 class FramePrivate : public H3DF::Impl
 {
 public:
+	FramePrivate() { m_eType = H3DF::Type::Frame; }
+
 	void Copy(FramePrivate * that)
 	{
 		m_aPolylines = that->m_aPolylines;
@@ -1602,37 +1511,37 @@ public:
 	H3DF::PolylineArray	m_aPolylines;
 };
 
-H3DF::PMI::Frame::Frame()
+H3DF::Frame::Frame()
 {
 	m_pcImpl = new FramePrivate();
 }
 
-H3DF::PMI::Frame::Frame(Frame const & cInThat)
+H3DF::Frame::Frame(Frame const & cInThat)
 {
 	m_pcImpl = new FramePrivate();
 	Set(cInThat);
 }
 
-void H3DF::PMI::Frame::Set(Frame const & cInThat)
+void H3DF::Frame::Set(Frame const & cInThat)
 {
 	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
 	FramePrivate * pcInThatImpl = (FramePrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-Frame const & H3DF::PMI::Frame::operator=(Frame const & cInThat)
+Frame const & H3DF::Frame::operator=(Frame const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-unsigned int H3DF::PMI::Frame::GetPolylineCount() const
+unsigned int H3DF::Frame::GetPolylineCount() const
 {
 	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
 	return static_cast<unsigned int>(pcImpl->m_aPolylines.size());
 }
 
-void H3DF::PMI::Frame::GetPolylines(unsigned int & nOutCount, H3DF::Polyline * pcOutPolylines) const
+void H3DF::Frame::GetPolylines(unsigned int & nOutCount, H3DF::Polyline * pcOutPolylines) const
 {
 	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
 
@@ -1647,7 +1556,7 @@ void H3DF::PMI::Frame::GetPolylines(unsigned int & nOutCount, H3DF::Polyline * p
 	}
 }
 
-void H3DF::PMI::Frame::SetPolylines(unsigned int nInCount, H3DF::Polyline const * pcInPolylines)
+void H3DF::Frame::SetPolylines(unsigned int nInCount, H3DF::Polyline const * pcInPolylines)
 {
 	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
 	pcImpl->m_aPolylines.resize(nInCount);
@@ -1662,6 +1571,8 @@ void H3DF::PMI::Frame::SetPolylines(unsigned int nInCount, H3DF::Polyline const 
 class DrawingPrivate : public H3DF::Impl
 {
 public:
+	DrawingPrivate() { m_eType = H3DF::Type::Drawing; }
+
 	void Copy(DrawingPrivate * that)
 	{
 		m_polygons = that->m_polygons;
@@ -1670,37 +1581,37 @@ public:
 	H3DF::PolygonArray m_polygons;
 };
 
-H3DF::PMI::Drawing::Drawing()
+H3DF::Drawing::Drawing()
 {
 	m_pcImpl = new DrawingPrivate();
 }
 
-H3DF::PMI::Drawing::Drawing(Drawing const & cInThat)
+H3DF::Drawing::Drawing(Drawing const & cInThat)
 {
 	m_pcImpl = new DrawingPrivate();
 	Set(cInThat);
 }
 
-void H3DF::PMI::Drawing::Set(Drawing const & cInThat)
+void H3DF::Drawing::Set(Drawing const & cInThat)
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
 	DrawingPrivate * pcInThatImpl = (DrawingPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-Drawing const & H3DF::PMI::Drawing::operator=(Drawing const & cInThat)
+Drawing const & H3DF::Drawing::operator=(Drawing const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-unsigned int H3DF::PMI::Drawing::GetPolygonCount() const
+unsigned int H3DF::Drawing::GetPolygonCount() const
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
 	return static_cast<unsigned int>(pcImpl->m_polygons.size());
 }
 
-void H3DF::PMI::Drawing::GetPolygons(unsigned int & nOutCount, H3DF::Polygon * pcOutPolygons) const
+void H3DF::Drawing::GetPolygons(unsigned int & nOutCount, H3DF::Polygon * pcOutPolygons) const
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
 	nOutCount = (unsigned int)pcImpl->m_polygons.size();
@@ -1714,7 +1625,7 @@ void H3DF::PMI::Drawing::GetPolygons(unsigned int & nOutCount, H3DF::Polygon * p
 	}
 }
 
-void H3DF::PMI::Drawing::SetPolygons(unsigned int nInCount, H3DF::Polygon const * pcInPolygons)
+void H3DF::Drawing::SetPolygons(unsigned int nInCount, H3DF::Polygon const * pcInPolygons)
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
 	pcImpl->m_polygons.resize(nInCount);
@@ -1722,4 +1633,137 @@ void H3DF::PMI::Drawing::SetPolygons(unsigned int nInCount, H3DF::Polygon const 
 	for (unsigned int i = 0; i < nInCount; i++) {
 		pcImpl->m_polygons[i] = pcInPolygons[i];
 	}
+}
+
+//== ViewEntity Class ==============================================================================
+H3DF::ViewEntity::ViewEntity(HC_KEY nInSegmentKey) : PMI(nInSegmentKey)
+{
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::PmiView);
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
+	}
+}
+
+H3DF::ViewEntity::ViewEntity(SegmentKey & nInSegmentKey) : PMI(nInSegmentKey)
+{
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::PmiView);
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
+	}
+}
+
+H3DF::ViewEntity::ViewEntity(ViewEntity const & cInThat) : PMI(cInThat)
+{
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	pcImpl->SetType(H3DF::Type::PmiView);
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD)pcImpl->Type();
+		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
+	}
+}
+
+void H3DF::ViewEntity::Set(ViewEntity const & cInThat)
+{
+	Key::Set(cInThat);
+}
+
+ViewEntity const & H3DF::ViewEntity::operator = (ViewEntity const & cInThat)
+{
+	Set(cInThat);
+	return *this;
+}
+
+void H3DF::ViewEntity::GetCamera(CameraKit & cOutCamera) const
+{
+	ByteArray aUserData;
+	ShowUserData((intptr_t)UserDataIndex::CameraKit, aUserData);
+
+	if (true == aUserData.empty()) {
+		DEBUG_STOP;
+		return;
+	}
+
+	CameraKitImpl * pcImpl = (CameraKitImpl *)cOutCamera.GetImpl();
+	DEBUG_VALID(pcImpl);
+
+	CopyMemory(&pcImpl->m_cData, aUserData.data(), sizeof(CameraKitImpl::Data));
+}
+
+void H3DF::ViewEntity::SetCamera(CameraKit const & cInCamera)
+{
+	CameraKitImpl * pcImpl = (CameraKitImpl *)cInCamera.GetImpl();
+	DEBUG_VALID(pcImpl);
+
+	SetUserData((intptr_t)UserDataIndex::CameraKit, sizeof(CameraKitImpl::Data), (BYTE *)&pcImpl->m_cData);
+}
+
+size_t H3DF::ViewEntity::GetAssociatedEntityCount() const
+{
+	return ShowIncluders();
+}
+
+void H3DF::ViewEntity::GetAssociatedEntities(size_t & nOutCount, PMI *& pcOutEntities) const
+{
+	nOutCount = 0;
+
+	char type[64] = { "" };
+	HC_KEY key = INVALID_KEY;
+
+	SegmentKeyImpl::LocalOpen(*this); {
+		HC_Begin_Contents_Search(".", "includes");  {
+			while (HC_Find_Contents(type, &key)) {
+				HC_Open_Segment_By_Key(HC_KShow_Include_Segment(key)); {
+					HC_KEY nThisSegment = HC_KCreate_Segment(".");
+					char pmi_type[64] = { "" };
+
+					ByteArray aUserData;
+					ShowUserData((intptr_t)UserDataIndex::PmiType, aUserData);
+
+					DWORD nType;
+					CopyMemory(&nType, aUserData.data(), sizeof(DWORD));
+
+					switch ((H3DF::Type)nType)
+					{
+						case H3DF::Type::Datum:
+							pcOutEntities[nOutCount] = DatumEntity(nThisSegment);
+							break;
+
+						case H3DF::Type::Dimension:
+							pcOutEntities[nOutCount] = DimensionEntity(nThisSegment);
+							break;
+
+						case H3DF::Type::FeatureControlFrame:
+							pcOutEntities[nOutCount] = FeatureControlFrameEntity(nThisSegment);
+							break;
+
+						case H3DF::Type::Generic:
+							pcOutEntities[nOutCount] = GenericEntity(nThisSegment);
+							break;
+
+						case H3DF::Type::Note:
+							pcOutEntities[nOutCount] = NoteEntity(nThisSegment);
+							break;
+
+						case H3DF::Type::Roughness:
+							pcOutEntities[nOutCount] = RoughnessEntity(nThisSegment);
+							break;
+
+						default:
+							DEBUG_STOP;
+							break;
+					}
+
+				} HC_Close_Segment();
+
+				nOutCount++;
+			}
+		} HC_End_Contents_Search();
+	} SegmentKeyImpl::LocalClose(*this);
 }

@@ -15,8 +15,6 @@ namespace H3DF
 		void Set(MetaData const & cInThat);
 		MetaData & operator = (MetaData const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::MetaData; };
-
 		bool Equals(MetaData const & cInThat) const;
 		bool operator != (MetaData const & cInThat) const;
 		bool operator == (MetaData const & cInThat) const;
@@ -35,8 +33,6 @@ namespace H3DF
 		void Set(StringMetaData const & cInThat);
 		StringMetaData & operator = (StringMetaData const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::StringMetaData; };
-
 		bool Equals(StringMetaData const & cInThat) const;
 		bool operator != (StringMetaData const & cInThat) const;
 		bool operator == (StringMetaData const & cInThat) const;
@@ -54,8 +50,6 @@ namespace H3DF
 
 		void Set(DwordPtrMetaData const & cInThat);
 		DwordPtrMetaData & operator = (DwordPtrMetaData const & cInThat);
-
-		H3DF::Type ObjectType() const { return H3DF::Type::DwordPtrMetaData; };
 
 		bool Equals(DwordPtrMetaData const & cInThat) const;
 		bool operator != (DwordPtrMetaData const & cInThat) const;

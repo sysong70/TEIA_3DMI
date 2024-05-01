@@ -31,8 +31,6 @@ namespace H3DF
 		void Set(VisibilityKit const & cInThat);
 		VisibilityKit const & operator = (VisibilityKit const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::VisibilityKit; };
-
 		//== Set Visibility Kit ========================================================================
 		VisibilityKit & SetWindows(bool bInValue);
 		VisibilityKit & SetEdges(bool bInValue);
@@ -66,8 +64,6 @@ namespace H3DF
 
 		void Set(VisibilityControl const & cInThat);
 		VisibilityControl & operator = (VisibilityControl const & cInThat);
-
-		H3DF::Type ObjectType() const { return H3DF::Type::VisibilityControl; };
 
 		//== Set Selectability Control =================================================================
 		VisibilityControl & SetCuttingSections(bool bInValue);

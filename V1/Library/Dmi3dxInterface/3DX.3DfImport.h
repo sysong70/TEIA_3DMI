@@ -155,7 +155,7 @@ protected:
 
 	A3DStatus ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedAttributesData * psAttribData, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp, bool bAddChildToParentComp);
 	A3DStatus GetMarkupTesselation(const A3DTessBaseData * psTessBaseData, const A3DTessMarkupData * psTessMarkupData, H3DF::PolylineArray & out_polylines, H3DF::PolygonArray & out_polygones,
-		H3DF::StringArray & aOutStrings, H3DF::PMI::TextAttributesArray & cOutTextAttributes, H3DF::PMI::Options * pcOutPmiOptions = nullptr);
+		H3DF::StringArray & aOutStrings, H3DF::TextAttributesArray & cOutTextAttributes, H3DF::Options * pcOutPmiOptions = nullptr);
 	A3DStatus GetLeaderLinesAndSymbols(const A3DMkpLeader * pMarkup, H3DF::PolylineArray & out_leader_lines, H3DF::PolygonArray & out_leader_symbols);
 	
 

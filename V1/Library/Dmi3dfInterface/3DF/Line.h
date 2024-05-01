@@ -20,8 +20,6 @@ namespace H3DF
 		void Set(LineKit const & cInThat);
 		LineKit & operator = (LineKit const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::LineKit; };
-
 		unsigned int GetPointCount() const;
 
 		void GetPoints(unsigned int & nOutCount, H3DF::Point pcOutPoints[]) const;
@@ -30,7 +28,8 @@ namespace H3DF
 		void GetRGBColor(H3DF::RGBColor & cOutColor) const;
 		void SetRGBColor(H3DF::RGBColor const & cInColor);
 
-		void GetLinePattern(char out_pattern[PATTERN_BUFFER_SIZE]) const;
+		void GetLinePattern(char pcOutPattern[PATTERN_BUFFER_SIZE]) const;
+		void SetLinePattern(char pcInPattern[PATTERN_BUFFER_SIZE]) const;
 	};
 
 	class API_3DF LineKey : public H3DF::GeometryKey
@@ -45,8 +44,6 @@ namespace H3DF
 
 		void Set(LineKey const & cInThat);
 		LineKey & operator = (LineKey const & cInThat);
-
-		H3DF::Type ObjectType() const { return H3DF::Type::LineKey; };
 
 		int GetPointCount() const;
 

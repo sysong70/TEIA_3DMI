@@ -360,6 +360,9 @@
     <ClInclude Include="3DF\CuttingSection.h">
       <Filter>3DF\Object</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\Impl\CameraImpl.h">
+      <Filter>3DF\Control\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -646,6 +649,9 @@
     </ClCompile>
     <ClCompile Include="3DF\CuttingSection.cpp">
       <Filter>3DF\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\CameraImpl.cpp">
+      <Filter>3DF\Control\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

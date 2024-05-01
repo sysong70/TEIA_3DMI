@@ -17,8 +17,6 @@ namespace H3DF
 		void Set(ApplicationWindowOptionsKit const & cInThat);
 		ApplicationWindowOptionsKit const & operator = (ApplicationWindowOptionsKit const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::ApplicationWindowOptionsKit; };
-
 		void Show(ApplicationWindowOptionsKit & cOutKit) const;
 
 		ApplicationWindowOptionsKit & SetDriver(Window::Driver eInDriver);

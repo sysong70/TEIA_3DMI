@@ -1727,7 +1727,7 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 						pcCamera->SetUpVector(Dmi3dx::GetVector(sCameraData.m_sUp));
 						pcCamera->SetField(sCameraData.m_dXFovy, sCameraData.m_dYFovy);
 						pcCamera->SetNearLimit(sCameraData.m_dZNear);
-						if (true == sCameraData.m_bOrthographic) {
+						if (A3D_TRUE == sCameraData.m_bOrthographic) {
 							pcCamera->SetProjection(H3DF::Camera::Projection::Orthographic);
 						}
 						else {
@@ -2109,46 +2109,46 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 
 	A3DMkpMarkupGet(pcMarkup, &sData);
 
-	H3DF::PMI::Entity * pcEntity = nullptr;
+	H3DF::PMI * pcPmi = nullptr;
 
 	switch (sData.m_eType)
 	{
 		case kA3DMarkupTypeDatum:
 		{
-			pcEntity = new H3DF::PMI::DatumEntity(cSegment);
-			H3DF::PMI::DatumEntity * pcDatum = (PMI::DatumEntity *)pcEntity;
+			pcPmi = new H3DF::DatumEntity(cSegment);
+			H3DF::DatumEntity * pcDatum = (H3DF::DatumEntity *)pcPmi;
 
 			switch (sData.m_eSubType)
 			{
 				case kA3DMarkupSubTypeDatumIdent:
-					pcDatum->SetDatumType(PMI::Datum::Type::Identifier);
+					pcDatum->SetDatumType(H3DF::Datum::Type::Identifier);
 					break;
 
 				case kA3DMarkupSubTypeDatumTarget:
-					pcDatum->SetDatumType(PMI::Datum::Type::Target);
+					pcDatum->SetDatumType(H3DF::Datum::Type::Target);
 					break;
 
 				default:
-					pcDatum->SetDatumType(PMI::Datum::Type::Unknown);
+					pcDatum->SetDatumType(H3DF::Datum::Type::Unknown);
 			}
 		}
 		break;
 
 		case kA3DMarkupTypeDimension:
 		{
-			pcEntity = new H3DF::PMI::DimensionEntity(cSegment);
-			PMI::DimensionEntity * pcDimension = (PMI::DimensionEntity *)pcEntity;
+			pcPmi = new H3DF::DimensionEntity(cSegment);
+			H3DF::DimensionEntity * pcDimension = (H3DF::DimensionEntity *)pcPmi;
 
-			pcDimension->SetDimensionType(PMI::Dimension::Type::UnknownType);
+			pcDimension->SetDimensionType(H3DF::Dimension::Type::UnknownType);
 
 			switch (sData.m_eSubType)
 			{
 				case kA3DMarkupSubTypeDimensionAngle:
-					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::AngleSubType);
+					pcDimension->SetDimensionSubType(H3DF::Dimension::SubType::AngleSubType);
 					break;
 
 				case kA3DMarkupSubTypeDimensionChamfer:
-					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::ChamferSubType);
+					pcDimension->SetDimensionSubType(H3DF::Dimension::SubType::ChamferSubType);
 					break;
 
 				case kA3DMarkupSubTypeDimensionDiameter:
@@ -2156,34 +2156,34 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 				case kA3DMarkupSubTypeDimensionDiameterCylinder:
 				case kA3DMarkupSubTypeDimensionDiameterEdge:
 				case kA3DMarkupSubTypeDimensionDiameterTangent:
-					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::DiameterSubType);
+					pcDimension->SetDimensionSubType(H3DF::Dimension::SubType::DiameterSubType);
 					break;
 
 				case kA3DMarkupSubTypeDimensionDistance:
 				case kA3DMarkupSubTypeDimensionDistanceCumulate:
 				case kA3DMarkupSubTypeDimensionDistanceOffset:
-					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::DistanceSubType);
+					pcDimension->SetDimensionSubType(H3DF::Dimension::SubType::DistanceSubType);
 					break;
 
 				case kA3DMarkupSubTypeDimensionLength:
 				case kA3DMarkupSubTypeDimensionLengthCircular:
 				case kA3DMarkupSubTypeDimensionLengthCurvilinear:
-					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::LengthSubType);
+					pcDimension->SetDimensionSubType(H3DF::Dimension::SubType::LengthSubType);
 					break;
 
 				case kA3DMarkupSubTypeDimensionRadius:
 				case kA3DMarkupSubTypeDimensionRadiusCylinder:
 				case kA3DMarkupSubTypeDimensionRadiusEdge:
 				case kA3DMarkupSubTypeDimensionRadiusTangent:
-					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::RadiusSubType);
+					pcDimension->SetDimensionSubType(H3DF::Dimension::SubType::RadiusSubType);
 					break;
 
 				case kA3DMarkupSubTypeDimensionSlope:
-					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::SlopeSubType);
+					pcDimension->SetDimensionSubType(H3DF::Dimension::SubType::SlopeSubType);
 					break;
 
 				default:
-					pcDimension->SetDimensionSubType(PMI::Dimension::SubType::UnknownSubType);
+					pcDimension->SetDimensionSubType(H3DF::Dimension::SubType::UnknownSubType);
 					break;
 			}
 		}
@@ -2193,31 +2193,31 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 		{
 			// current data coming out of 3DX for FCFs makes it quite difficult to accurately determine components
 			// of a FCF, so we just insert a generic entity (just text strings and polylines, no extra information)
-			pcEntity = new PMI::GenericEntity(cSegment);
+			pcPmi = new H3DF::GenericEntity(cSegment);
 		}
 		break;
 
 		case kA3DMarkupTypeRoughness:
 		{
-			pcEntity = new PMI::RoughnessEntity(cSegment);
+			pcPmi = new H3DF::RoughnessEntity(cSegment);
 
-			PMI::RoughnessEntity * pcRoughness = (PMI::RoughnessEntity *)pcEntity;
+			H3DF::RoughnessEntity * pcRoughness = (H3DF::RoughnessEntity *)pcPmi;
 
-			pcRoughness->SetObtentionType(PMI::Roughness::Obtention::Type::Unknown);
-			pcRoughness->SetApplicabilityType(PMI::Roughness::Applicability::Type::Unknown);
-			pcRoughness->SetModeType(PMI::Roughness::Mode::Type::Unknown);
+			pcRoughness->SetObtentionType(H3DF::Roughness::Obtention::Type::Unknown);
+			pcRoughness->SetApplicabilityType(H3DF::Roughness::Applicability::Type::Unknown);
+			pcRoughness->SetModeType(H3DF::Roughness::Mode::Type::Unknown);
 		}
 		break;
 
 		case kA3DMarkupTypeText:
 		{
-			pcEntity = new PMI::NoteEntity(cSegment);
+			pcPmi = new H3DF::NoteEntity(cSegment);
 		}
 		break;
 
 		default:
 		{
-			pcEntity = new PMI::GenericEntity(cSegment);
+			pcPmi = new H3DF::GenericEntity(cSegment);
 		}
 	}
 
@@ -2229,11 +2229,11 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 	}
 
 	if (0 < cLeaderLines.size()) {
-		pcEntity->SetLeaderLines((unsigned int)cLeaderLines.size(), cLeaderLines.data());
+		pcPmi->SetLeaderLines((unsigned int)cLeaderLines.size(), cLeaderLines.data());
 	}
 
 	if (0 < cLeaderSymbols.size()) {
-		pcEntity->SetLeaderSymbols((unsigned int)cLeaderSymbols.size(), cLeaderSymbols.data());
+		pcPmi->SetLeaderSymbols((unsigned int)cLeaderSymbols.size(), cLeaderSymbols.data());
 	}
 
 /*
@@ -2268,8 +2268,8 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 
 	PolylineArray aPolyline;
 	StringArray aStrings;
-	PMI::TextAttributesArray aTextAttributes;
-	PMI::Options cOptions;
+	H3DF::TextAttributesArray aTextAttributes;
+	H3DF::Options cOptions;
 	PolygonArray aPolygons;
 
 	// Tesselation관련 정보를 수집. Segment에 정보를 추가하거나 하지 않는다.
@@ -2280,31 +2280,31 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 
 	if (false == aPolyline.empty())
 	{
-		PMI::Frame cFrame;
+		H3DF::Frame cFrame;
 		cFrame.SetPolylines((unsigned int)aPolyline.size(), aPolyline.data());
-		if (nullptr != pcEntity) {
+		if (nullptr != pcPmi) {
 			// Frame Data를 Segement에 추가
-			pcEntity->SetFrame(cFrame);
+			pcPmi->SetFrame(cFrame);
 		}
 	}
 
 	if (false == aPolygons.empty())
 	{
-		PMI::Drawing cDrawing;
+		H3DF::Drawing cDrawing;
 		cDrawing.SetPolygons((unsigned int)aPolygons.size(), aPolygons.data());
 		// Polygon Data를 Segement에 추가
-		pcEntity->SetDrawing(cDrawing);
+		pcPmi->SetDrawing(cDrawing);
 	}
 
 	assert(aStrings.size() == aTextAttributes.size());
 	unsigned int nCount = (unsigned int)aStrings.size();
 
 
-	switch (pcEntity->GetType())
+	switch (pcPmi->Type())
 	{
-		case PMI::Type::DatumType:
+		case H3DF::Type::Datum:
 		{
-			PMI::DatumEntity * pcDatum = (PMI::DatumEntity *)pcEntity;
+			H3DF::DatumEntity * pcDatum = (H3DF::DatumEntity *)pcPmi;
 			pcDatum->SetDisplayParallelToScreen(cOptions.IsDisplayParallelToScreen());
 			if (0 < nCount) {
 				pcDatum->SetLabels(nCount, aStrings.data(), aTextAttributes.data());
@@ -2312,9 +2312,9 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 		}
 		break;
 
-		case PMI::Type::DimensionType:
+		case H3DF::Type::Dimension:
 		{
-			PMI::DimensionEntity * pcDimension = (PMI::DimensionEntity *)pcEntity;
+			H3DF::DimensionEntity * pcDimension = (H3DF::DimensionEntity *)pcPmi;
 
 			pcDimension->SetDisplayParallelToScreen(cOptions.IsDisplayParallelToScreen());
 			if (0 < nCount) {
@@ -2323,9 +2323,9 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 		}
 		break;
 
-		case PMI::Type::GenericType:
+		case H3DF::Type::Generic:
 		{
-			PMI::GenericEntity * pcGeneric = (PMI::GenericEntity *)pcEntity;
+			H3DF::GenericEntity * pcGeneric = (H3DF::GenericEntity *)pcPmi;
 
 			if (0 < nCount) {
 				pcGeneric->SetStrings(nCount, aStrings.data(), aTextAttributes.data());
@@ -2333,9 +2333,9 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 		}
 		break;
 
-		case PMI::Type::NoteType:
+		case H3DF::Type::Note:
 		{
-			PMI::NoteEntity * pcNote = (PMI::NoteEntity *)pcEntity;
+			H3DF::NoteEntity * pcNote = (H3DF::NoteEntity *)pcPmi;
 
 			pcNote->SetDisplayParallelToScreen(cOptions.IsDisplayParallelToScreen());
 			if (0 < nCount) {
@@ -2344,9 +2344,9 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 		}
 		break;
 
-		case PMI::Type::RoughnessType:
+		case H3DF::Type::Roughness:
 		{
-			PMI::RoughnessEntity * pcRoughness = (PMI::RoughnessEntity *)pcEntity;
+			H3DF::RoughnessEntity * pcRoughness = (H3DF::RoughnessEntity *)pcPmi;
 
 			if (0 < nCount) {
 				pcRoughness->SetFields(nCount, aStrings.data(), aTextAttributes.data());
@@ -2355,14 +2355,15 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 		} break;
 
 		default:
+			DEBUG_STOP;
 			break;
 	}
 
 	//	m_pmi_entities.push_back(*pcEntity);
 
 
-	if (nullptr != pcEntity) {
-		delete pcEntity;
+	if (nullptr != pcPmi) {
+		delete pcPmi;
 	}
 
 	LogManager::DecreaseTabIndex(2);
@@ -2372,8 +2373,8 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 
 // 7-1. Mark up Tesselation 처리
 A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData, const A3DTessMarkupData * psTessMarkupData,
-	PolylineArray & aOutPolylines, PolygonArray & aOutPolygones, StringArray & aOutStrings, PMI::TextAttributesArray & cOutTextAttributes,
-	PMI::Options * pcOutPmiOptions)
+	PolylineArray & aOutPolylines, PolygonArray & aOutPolygones, StringArray & aOutStrings, H3DF::TextAttributesArray & cOutTextAttributes,
+	H3DF::Options * pcOutPmiOptions)
 {
 	Log(2, "ParseMarkupTesselation: %s, %s", LogHexStrA((DWORD_PTR)psTessBaseData), LogHexStrA((DWORD_PTR)psTessMarkupData));
 
@@ -2403,8 +2404,8 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 	A3D_INITIALIZE_DATA(A3DGraphVPicturePatternData, sPicturePatternData);
 
 	RGBColor cColor(1, 1, 1);
-	PMI::TextAttributes cTextAttributes;
-	// 	PMI::Options options;
+	H3DF::TextAttributes cTextAttributes;
+	// 	H3DF::Options options;
 
 	bool bFrameDrawMode = false;
 	bool bFaceViewMode = false;
@@ -2481,7 +2482,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 						cMatrix[3][1] = static_cast<float>(pdData[1]);
 						cMatrix[3][2] = static_cast<float>(pdData[2]);
 
-						PMI::Orientation cOrientation;
+						H3DF::Orientation cOrientation;
 						cOrientation.SetMatrix(cMatrix);
 
 						cTextAttributes.SetOrientation(cOrientation);
@@ -2511,7 +2512,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 						cMatrix[3][1] = static_cast<float>(pdData[1]);
 						cMatrix[3][2] = static_cast<float>(pdData[2]);
 
-						PMI::Orientation cOrientation;
+						H3DF::Orientation cOrientation;
 						cOrientation.SetMatrix(cMatrix);
 						cTextAttributes.SetOrientation(cOrientation);
 						MAKE_OFFSET(0, 3);
@@ -2630,15 +2631,15 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 					cTextAttributes.SetRGBColor(cColor);
 					cTextAttributes.SetFontSize(static_cast<float>(dTextboxHeight * char_height));
 					if (true == bFrameDrawMode) {
-						cTextAttributes.SetFontSizeUnits(PMI::Font::Size::Units::PixelUnits);
+						cTextAttributes.SetFontSizeUnits(H3DF::Font::Size::Units::PixelUnits);
 						cTextAttributes.SetInsertionPoint(cTextMove);
 					}
 					else if (true == bFaceViewMode) {
-						cTextAttributes.SetFontSizeUnits(PMI::Font::Size::Units::WorldSpaceUnits);
+						cTextAttributes.SetFontSizeUnits(H3DF::Font::Size::Units::WorldSpaceUnits);
 						cTextAttributes.SetInsertionPoint(cTextMove);
 					}
 					else {
-						cTextAttributes.SetFontSizeUnits(PMI::Font::Size::Units::WorldSpaceUnits);
+						cTextAttributes.SetFontSizeUnits(H3DF::Font::Size::Units::WorldSpaceUnits);
 					}
 
 					cOutTextAttributes.push_back(cTextAttributes);
@@ -2734,7 +2735,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 					//H3DF::TestMatrix cm;
 					//MatrixCal::ComputeMatrixProduct(cMatrix.data(), cTransformMatrix.data(), cTransformMatrix.data());
 
-					PMI::Orientation orientation;
+					H3DF::Orientation orientation;
 					orientation.SetMatrix(cTransformMatrix);
 					cTextAttributes.SetOrientation(orientation);
 				}
@@ -2819,7 +2820,7 @@ A3DStatus TdfImport::GetLeaderLinesAndSymbols(const A3DMkpLeader * pMarkup, Poly
 	if (!iErr && sData.m_pTessellation)
 	{
 		StringArray strings;
-		PMI::TextAttributesArray text_attributes;
+		H3DF::TextAttributesArray text_attributes;
 
 		GetMarkupTesselation(&sBaseData, &sMarkupData, cOutLeaderLines, cOutLeaderSymbols, strings, text_attributes);
 	}
@@ -4858,8 +4859,8 @@ A3DStatus TdfImport::BuildMarkup(A3DTess3D * pcTess3d, A3DTessBaseData * pcTessB
 
 	PolylineArray aPolyline;
 	StringArray aStrings;
-	PMI::TextAttributesArray aTextAttributes;
-	PMI::Options cOptions;
+	H3DF::TextAttributesArray aTextAttributes;
+	H3DF::Options cOptions;
 	PolygonArray aPolygons;
 
 	GetMarkupTesselation(pcTessBaseData, &sData, aPolyline, aPolygons, aStrings, aTextAttributes, &cOptions);

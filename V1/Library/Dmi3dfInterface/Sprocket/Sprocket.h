@@ -9,7 +9,5 @@ namespace H3DF
 	{
 	public:
 		Sprocket();
-
-		H3DF::Type ObjectType() const { return H3DF::Type::Sprocket; };
 	};
 }

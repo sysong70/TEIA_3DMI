@@ -31,8 +31,6 @@ namespace H3DF
 		void Set(View const & cInThat);
 		View const & operator = (View const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::View; };
-
 		void Update() const;
 		void Update(Json::Object & cInObject) const;
 		void Update(Json::Object & cInObject, Window::UpdateType eInType, H3DF::Time dInTimeLimit = -1.0) const;

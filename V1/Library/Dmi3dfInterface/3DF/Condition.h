@@ -38,8 +38,6 @@ namespace H3DF
 		void Set(ConditionalExpression const & cInThat);
 		ConditionalExpression & operator = (ConditionalExpression const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::ConditionalExpression; };
-
 		bool ShowCondition(CStringA & strOutCondition) const;
 		bool ShowNumber(float & fOutNumber) const;
 		bool ShowIntrinsic(Condition::Intrinsic & eOutSpecial) const;
@@ -63,8 +61,6 @@ namespace H3DF
 
 		void Set(ConditionControl const & cInThat);
 		ConditionControl & operator = (ConditionControl const & cInThat);
-
-		H3DF::Type ObjectType() const { return H3DF::Type::ConditionControl; };
 
 		size_t GetCount() const;
 

@@ -19,8 +19,6 @@ namespace H3DF
 		void Set(ReferenceKey const & cInThat);
 		ReferenceKey & operator = (ReferenceKey const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::ReferenceKey; };
-
 		Key GetTarget() const;
 	};
 }

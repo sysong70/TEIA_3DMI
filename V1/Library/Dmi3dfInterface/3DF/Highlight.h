@@ -43,8 +43,6 @@ namespace H3DF
 		void Set(HighlightControl const & cInThat);
 		HighlightControl & operator=(HighlightControl const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::HighlightControl; };
-
 		//== Highlight 관련 함수 =====================================================================
 		HighlightControl & Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting = true);
 		HighlightControl & Highlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting = true);

@@ -19,8 +19,6 @@ namespace H3DF
 		void Set(CameraKit const & cInThat);
 		CameraKit const & operator=(CameraKit const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::CameraKit; };
-
 		CameraKit & SetUpVector(Vector const & cInUpVector);
 		CameraKit & SetPosition(Point const & cInPosition);
 		CameraKit & SetTarget(Point const & cInTarget);
@@ -51,8 +49,6 @@ namespace H3DF
 
 		void Set(CameraControl const & cInThat);
 		CameraControl & operator = (CameraControl const & cInThat);
-
-		H3DF::Type ObjectType() const { return H3DF::Type::CameraControl; };
 
 		CameraControl & SetUpVector(Vector const & cInUp);
 		CameraControl & SetPosition(Point const & cInPosition);

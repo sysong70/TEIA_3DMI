@@ -52,8 +52,6 @@ namespace H3DF
 		void Set(Canvas const & cInThat);
 		Canvas const & operator = (Canvas const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::Canvas; };
-
 		void AttachViewAsLayout(View const * pcInView);
 		HWND GetHwnd();
 

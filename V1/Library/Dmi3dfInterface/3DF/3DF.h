@@ -329,6 +329,20 @@ namespace H3DF
 		AxisTriadControl = 0xD000000A,
 		AnimationControl = 0xD000000B,
 
+		PMI						= 0xE0000000,
+		Datum					= 0xE0000001,
+		Dimension				= 0xE0000002,
+		FeatureControlFrame		= 0xE0000003,
+		Generic					= 0xE0000004,
+		Note					= 0xE0000005,
+		Roughness				= 0xE0000006,
+		TextAttributes			= 0xE0000007,
+		Options					= 0xE0000008,
+		PmiView					= 0xE0000009,
+		Frame					= 0xE000000A,
+		Drawing					= 0xE000000B,
+		Orintation				= 0xE000000C,
+
 		ConditionalExpression = 0x09000000,
 		NOTCondition = 0x09000001,
 		ANDCondition = 0x09000002,
@@ -356,6 +370,17 @@ namespace H3DF
 		ComponentStatus							= 0x02000002,
 		IncludedCount							= 0x02000003,
 		ReferenceCount							= 0x02000004,
+
+		// PMI 관련 Data Index
+		PMI										= 0x03000000,
+		CameraKit								= 0x03000001,
+		PmiType									= 0x03000002,
+		RoughnessObtentionType					= 0x03000003,
+		RoughnessApplicabilityType				= 0x03000004,
+		RoughnessModeType						= 0x03000005,
+		DatumType								= 0x03000006,
+		DimensionType							= 0x03000007,
+		DimensionSubType						= 0x03000008,
 	};
 
 	// MetaDataIndex는 UserDataIndex와 다른 값을 사용해야 함.
@@ -792,10 +817,8 @@ namespace H3DF
 	using ComponentArray = std::vector<Component *, Allocator<Component *>>;
 	using MetadataArray = std::vector<MetaData *, Allocator<MetaData *>>;
 
-	namespace PMI {
-		class TextAttributes;
-		using TextAttributesArray = std::vector<TextAttributes, Allocator<TextAttributes>>;
-	};
+	class TextAttributes;
+	using TextAttributesArray = std::vector<TextAttributes, Allocator<TextAttributes>>;
 
 	enum class ModelHandedness
 	{

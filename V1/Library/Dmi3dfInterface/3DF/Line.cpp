@@ -98,10 +98,20 @@ void H3DF::LineKit::SetRGBColor(RGBColor const & cInColor)
 	pcImpl->m_cColor = cInColor;
 }
 
-void H3DF::LineKit::GetLinePattern(char out_pattern[PATTERN_BUFFER_SIZE]) const
+void H3DF::LineKit::GetLinePattern(char pcOutPattern[PATTERN_BUFFER_SIZE]) const
 {
 	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
-	strncpy(out_pattern, pcImpl->m_chPattern, PATTERN_BUFFER_SIZE);
+	DEBUG_VALID(pcImpl);
+
+	strncpy(pcOutPattern, pcImpl->m_chPattern, PATTERN_BUFFER_SIZE);
+}
+
+void H3DF::LineKit::SetLinePattern(char pcInPattern[PATTERN_BUFFER_SIZE]) const
+{
+	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	strncpy(pcImpl->m_chPattern, pcInPattern, PATTERN_BUFFER_SIZE);
 }
 
 //== LineKey =======================================================================================

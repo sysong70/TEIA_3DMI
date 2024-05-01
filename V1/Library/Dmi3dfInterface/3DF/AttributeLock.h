@@ -17,8 +17,6 @@ namespace H3DF
 		void Set(AttributeLockKit const & cInThat);
 		AttributeLockKit const & operator = (AttributeLockKit const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::AttributeLockKit; };
-
 		void Set(AttributeLockKit const & cInKit);
 
 		void Show(AttributeLockKit & cOutKit) const;
@@ -52,8 +50,6 @@ namespace H3DF
 
 		void Set(AttributeLockControl const & cInThat);
 		AttributeLockControl & operator = (AttributeLockControl const & cInThat);
-
-		H3DF::Type ObjectType() const { return H3DF::Type::VisualEffectsControl; };
 
 		AttributeLockControl & SetLock(AttributeLock::Type eInType, bool bInState = true);
 		AttributeLockControl & SetLock(AttributeLockTypeArray const & eInTypes, BoolArray const & bInStates);

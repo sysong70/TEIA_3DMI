@@ -13,8 +13,6 @@ namespace H3DF
 		void Set(CADModel const & cInThat);
 		CADModel & operator = (CADModel const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::CADModel; };
-
 		Component * GetComponent(HC_KEY cInKey) const;
 		Component * GetComponent(H3DF::SelectionItem & cInItem) const;
 

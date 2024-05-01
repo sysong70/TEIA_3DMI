@@ -15,8 +15,6 @@ public:
 	void Set(IncludeKey const & cInThat);
 	IncludeKey & operator = (IncludeKey const & cInThat);
 
-	H3DF::Type ObjectType() const { return H3DF::Type::IncludeKey; };
-
 	SegmentKey GetTarget() const;
 
 	IncludeKey & SetConditionalExpression(ConditionalExpression const & cInConditional);

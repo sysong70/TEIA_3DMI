@@ -28,8 +28,6 @@ namespace H3DF
 		void Set(SegmentKey const & cInThat);
 		SegmentKey & operator = (SegmentKey const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::SegmentKey; };
-
 		//== Segment 관련 함수 =======================================================================
 		SegmentKey & Open();
 		SegmentKey & Close();

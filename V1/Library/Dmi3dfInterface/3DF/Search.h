@@ -349,8 +349,6 @@ namespace H3DF
 		SearchResultsIterator();
 		SearchResultsIterator(SearchResultsIterator const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::SearchResultsIterator; };
-
 		void Set(SearchResultsIterator const & cInThat);
 		SearchResultsIterator & operator=(SearchResultsIterator const & cInThat);
 
@@ -376,8 +374,6 @@ namespace H3DF
 		SearchResults();
 		SearchResults(SearchResults const & cInThat);
 		~SearchResults();
-
-		H3DF::Type ObjectType() const { return H3DF::Type::SearchResults; };
 
 		void Set(SearchResults const & cInThat);
 		SearchResults & operator=(SearchResults const & cInThat);

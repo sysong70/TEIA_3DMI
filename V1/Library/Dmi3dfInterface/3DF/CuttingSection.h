@@ -75,8 +75,6 @@ namespace H3DF
         void Set(CuttingSectionKit const & cInThat);
         CuttingSectionKit & operator = (CuttingSectionKit const & cInThat);
 
-        H3DF::Type ObjectType() const { return H3DF::Type::CuttingSectionKit; };
-
         void Show(CuttingSectionKit & cOutKit) const;
         bool Empty() const;
 
@@ -111,8 +109,6 @@ namespace H3DF
 
         void Set(CuttingSectionKey const & cInThat);
         CuttingSectionKey & operator = (CuttingSectionKey const & cInThat);
-
-        H3DF::Type ObjectType() const { return H3DF::Type::CuttingSectionKey; };
 
 /*
         void Set(CuttingSectionKit const & cInKit);

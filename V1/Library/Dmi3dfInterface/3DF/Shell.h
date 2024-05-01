@@ -72,7 +72,5 @@ namespace H3DF
 
 		void Set(ShellKey const & cInThat);
 		ShellKey & operator = (ShellKey const & cInThat);
-
-		H3DF::Type ObjectType() const { return H3DF::Type::ShellKey; };
 	};
 }

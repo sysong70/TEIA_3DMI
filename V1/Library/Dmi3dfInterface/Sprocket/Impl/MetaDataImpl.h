@@ -10,6 +10,7 @@ namespace H3DF
 	class MetaDataImpl : public Impl
 	{
 	public:
+		MetaDataImpl();
 		void Copy(MetaDataImpl * pcInThat);
 
 		MetaDataIndex m_eIndex = MetaDataIndex::None;
@@ -18,6 +19,7 @@ namespace H3DF
 	class StringMetaDataImpl : public MetaDataImpl
 	{
 	public:
+		StringMetaDataImpl();
 		void Copy(StringMetaDataImpl * pcInThat);
 
 		CString m_strValue;
@@ -26,6 +28,7 @@ namespace H3DF
 	class DwordPtrMetaDataImpl : public MetaDataImpl
 	{
 	public:
+		DwordPtrMetaDataImpl();
 		void Copy(DwordPtrMetaDataImpl * pcInThat);
 
 		DWORD_PTR m_nValue = 0;

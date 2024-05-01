@@ -29,6 +29,8 @@ using namespace H3DF;
 
 KERNEL::DocViewImpl::DocViewImpl()
 {
+	m_eType = KERNEL::Type::View;
+
 	for (auto & pcOperator : m_apcOperator) {
 		pcOperator = nullptr;
 	}

@@ -214,8 +214,6 @@ namespace H3DF
 		// 선택된 Item의 Type을 반환합니다.
 		H3DF::Type Type() const override;
 
-		H3DF::Type ObjectType() const { return H3DF::Type::SelectionItem; };
-
 		void Set(SelectionItem const & cInThat);
 		SelectionItem & operator = (SelectionItem const & cInThat);
 
@@ -244,8 +242,6 @@ namespace H3DF
 		SelectionResultsIterator();
 		SelectionResultsIterator(SelectionResultsIterator const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::SelectionResultsIterator; };
-
 		void Set(SelectionResultsIterator const & in_that);
 		SelectionResultsIterator & operator=(SelectionResultsIterator const & cInThat);
 
@@ -273,8 +269,6 @@ namespace H3DF
 		SelectionResults();
 		SelectionResults(SelectionResults const & cInThat);
 		~SelectionResults();
-
-		H3DF::Type ObjectType() const { return H3DF::Type::SelectionResults; };
 
 		void Set(SelectionResults const & cInThat);
 		SelectionResults & operator=(SelectionResults const & cInThat);
@@ -318,8 +312,6 @@ namespace H3DF
 
 		void Set(SelectionControl const & cInThat);
 		SelectionControl & operator=(SelectionControl const & cInThat);
-
-		H3DF::Type ObjectType() const { return H3DF::Type::SelectionControl; };
 
 		// Point in window space at which to perform the selection.
 		size_t SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const;

@@ -16,8 +16,6 @@ namespace H3DF
 		void Set(PerformanceKit const & cInThat);
 		PerformanceKit const & operator = (PerformanceKit const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::PerformanceKit; };
-
 		PerformanceKit & SetDisplayLists(Performance::DisplayLists eInDisplayList = Performance::DisplayLists::Segment);
 		PerformanceKit & SetStaticModel(Performance::StaticModel eInModelType);
 
@@ -37,8 +35,6 @@ namespace H3DF
 
 		void Set(PerformanceControl const & cInThat);
 		PerformanceControl & operator = (PerformanceControl const & cInThat);
-
-		H3DF::Type ObjectType() const { return H3DF::Type::PerformanceControl; };
 
 		PerformanceControl & SetDisplayLists(Performance::DisplayLists eInDisplayList = Performance::DisplayLists::Segment);
 		PerformanceControl & SetStaticModel(Performance::StaticModel eInModelType);
