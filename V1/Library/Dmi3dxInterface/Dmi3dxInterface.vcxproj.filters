@@ -186,6 +186,9 @@
     <ClInclude Include="..\Signal\WorkerThread.h">
       <Filter>_Signal</Filter>
     </ClInclude>
+    <ClInclude Include="3DX.Log.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -316,6 +319,9 @@
     </ClCompile>
     <ClCompile Include="..\Signal\WorkerThread.cpp">
       <Filter>_Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="3DX.Log.cpp">
+      <Filter>Utility</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

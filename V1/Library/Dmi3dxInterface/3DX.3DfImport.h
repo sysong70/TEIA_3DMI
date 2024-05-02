@@ -369,24 +369,6 @@ private:
 	int PointerArrayFind(A3DPointerArray * pcArray, void * pcPointer);
 	UINT PointerArrayAddUnique(A3DPointerArray * pcArray, void * pcPointer);
 	UINT PointerArrayAddArray(A3DPointerArray * pcArray, void ** const ppcPointers, UINT uiSize);
-
-	//== Log 관련 함수 ==========================================================================
-	void CreateLog(int nId, const WCHAR * pchFilePathName);
-	void Log(int nId, LPCWSTR chMessage, ...);
-	void Log(int nId, LPCSTR chMessage, ...);
-	void LogIncreaseTabIndex(int nId);
-	void LogDecreaseTabIndex(int nId);
-	CString LogHexStr(DWORD_PTR nValue);
-	CStringA LogHexStrA(DWORD_PTR nValue);
-	CString LogBoolStr(bool bValue);
-	CStringA LogBoolStrA(bool bValue);
-	void LogVector3dData(A3DVector3dData & cData, CStringA strPrompt = "");
-
-	void LogMkpViewData(A3DMkpView * pcView, A3DMkpViewData & cViewData);
-	void LogSurfPlane(A3DSurfPlane * pcInSurfPlane);
-	void LogGraphCamera(A3DGraphCamera * pcInCamera);
-	void LogMarkupLinkedItem(A3DMiscMarkupLinkedItemData & cData, A3DMiscEntityReferenceData & cRefData, DWORD_PTR nInAddreass);
-
 };
 
 CLOSE_3DX_NAMESPACE

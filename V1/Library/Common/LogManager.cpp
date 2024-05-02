@@ -314,6 +314,11 @@ int LogManager::Open(int nId)
 
 	int nFileHandle = 0;
 	//_O_RDWR | _O_CREAT, _SH_DENYNO, _S_IREAD | _S_IWRITE
+	
+	//setlocale(LC_ALL, "");
+// 	setlocale(LC_ALL, "ko-KR");
+ 	//setlocale(LC_ALL, ".utf8");
+
 	errno_t nErrorNo = _wsopen_s(&nFileHandle, strFilePathName, _O_CREAT | _O_RDWR, _SH_DENYRD, _S_IREAD | _S_IWRITE); // | _O_U8TEXT
 	if(0 != nErrorNo) {
 		return 0;
@@ -461,13 +466,13 @@ bool LogManager::CStringToChar(CString strText, char *& pchText, int & nTextSize
 		return false;
 	}
 
-	int nSize = WideCharToMultiByte(CP_ACP, 0, strText, -1, NULL, 0, NULL, NULL);
+	int nSize = WideCharToMultiByte(CP_UTF8, 0, strText, -1, NULL, 0, NULL, NULL);
 	pchText = new char[nSize];
 	if(nullptr == pchText) {
 		return false;
 	}
 
-	nTextSize = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR) strText, -1, pchText, nSize, NULL, NULL);
+	nTextSize = WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR) strText, -1, pchText, nSize, NULL, NULL);
 
 	if(0 == nTextSize) {
 		delete[] pchText;
