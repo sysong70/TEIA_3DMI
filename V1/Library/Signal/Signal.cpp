@@ -787,9 +787,9 @@ void Signal::ModelPanel::CheckItems(const KeyItems& items, bool checked)
 
 	data.SetBoolean(SKW_CHECKED, checked);
 	
-	Json::Array& children = data.CreateArray(SKW_ITEMS);
+	Json::Array& nodes = data.CreateArray(SKW_ITEMS);
 	for (auto item : items) {
-		children.AddDwordPtr(item);
+		nodes.AddDwordPtr(item);
 	}
 
 	Wrapper().SendData(data);

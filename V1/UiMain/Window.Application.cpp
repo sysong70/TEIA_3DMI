@@ -193,7 +193,14 @@ END_MESSAGE_MAP()
 Window::Application::Application()
 {
 #ifdef _DEBUG
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	//Dumping objects ->
+	//{1359} normal block at 0x0139D7D8, 332 bytes long.
+	//Data: < > 00 00 00 00 CD CD CD CD 00 00 00 00 00 00 00 00
+
+	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	//_CrtSetBreakAlloc(962454); // {1359}
+	//_CrtDumpMemoryLeaks();
+	//_CrtMemDumpAllObjectsSince(0);
 #endif
 
 	// Support Restart Manager
@@ -263,15 +270,6 @@ int Window::Application::ExitInstance()
 
 BOOL Window::Application::InitInstance()
 {
-	//Dumping objects ->
-	//{1359} normal block at 0x0139D7D8, 332 bytes long.
-	//Data: < > 00 00 00 00 CD CD CD CD 00 00 00 00 00 00 00 00
-
-	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	//_CrtSetBreakAlloc(962454); // {1359}
-	//_CrtDumpMemoryLeaks();
-	//_CrtMemDumpAllObjectsSince(0);
-
 #pragma region Initialize Settings
 
 	Facility::SetLanguage(Facility::ELanguage::English);

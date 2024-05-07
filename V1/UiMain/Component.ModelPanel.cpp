@@ -134,8 +134,6 @@ public:
 
 	HTREEITEM AddItem(HTREEITEM hParent, DWORD_PTR key, int index, LPWSTR title, bool checked, bool hasChildren, int type)
 	{
-		DEBUG_VALID(hParent);
-
 		ItemData* pData = new ItemData{ key, index };
 		m_itemData.push_back(pData);
 
