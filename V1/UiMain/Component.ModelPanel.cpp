@@ -134,6 +134,8 @@ public:
 
 	HTREEITEM AddItem(HTREEITEM hParent, DWORD_PTR key, int index, LPWSTR title, bool checked, bool hasChildren, int type)
 	{
+		DEBUG_VALID(hParent);
+
 		ItemData* pData = new ItemData{ key, index };
 		m_itemData.push_back(pData);
 
@@ -957,6 +959,10 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 	Json::Array& items = pData->GetArray(SKW_CHILDREN);
 
 	HTREEITEM hParent = FindTreeItem(SKW_PARENT);
+	if (hParent == nullptr) {
+		DEBUG_RETURN;
+	}
+
 	DEBUG_LOG(WStr::Format(L"AddChildren: %s", Control().GetItemText(hParent)));
 
 	int dummyIndex = 0;
@@ -985,7 +991,23 @@ void Component::ModelPanel::AddChildren(Json::Object* pData)
 void Component::ModelPanel::CheckItem(Json::Object* pData)
 {
 	DisableNotification();
-	Control().SetCheck(FindTreeItem(SKW_KEY), pData->GetBoolean(SKW_CHECKED));
+
+	Control().Redraw(false);
+
+	HTREEITEM hItem = FindTreeItem(SKW_KEY);
+	if (hItem == nullptr) {
+		DEBUG_RETURN;
+	}
+
+	BOOL checked = (BOOL)pData->GetBoolean(SKW_CHECKED);
+	Control().SetCheck(hItem, checked);
+	Control().UpdateChildrenCheckState(hItem, checked);
+
+	HTREEITEM hRoot = Control().GetRootItem();
+	int state = Control().UpdateCheckState(hRoot);
+	Control().SetCheck(hRoot, state > 0 ? TRUE : FALSE);
+
+	Control().Redraw(true);
 }
 
 
@@ -1004,16 +1026,20 @@ void Component::ModelPanel::CheckItems(Json::Object* pData)
 		for (auto item : items.GetBuffer()) {
 			Json::Object& node = item->AsObject();
 
-			bool check = node.GetBoolean(SKW_FLAG);
+			BOOL checked = (BOOL)node.GetBoolean(SKW_FLAG);
 			hItem = Control().FindItem(node.GetDwordPtr(SKW_KEY));
-			DEBUG_VALID(hItem);
-
-			Control().SetCheck(hItem, check);
+			if (hItem != nullptr) {
+				Control().SetCheck(hItem, checked);
+				Control().UpdateChildrenCheckState(hItem, checked);
+			}
+			else {
+				DEBUG_STOP;
+			}
 		}
 	}
 	else {
 		// Single status
-		bool check = pData->GetBoolean(SKW_CHECKED);
+		BOOL checked = (BOOL)pData->GetBoolean(SKW_CHECKED);
 
 		Signal::KeyItems keys;
 		pData->GetArray(SKW_ITEMS).ToArray(keys);
@@ -1021,11 +1047,19 @@ void Component::ModelPanel::CheckItems(Json::Object* pData)
 		HTREEITEM hItem = nullptr;
 		for (auto key : keys) {
 			hItem = Control().FindItem(key);
-			DEBUG_VALID(hItem);
-
-			Control().SetCheck(hItem, check);
+			if (hItem != nullptr) {
+				Control().SetCheck(hItem, checked);
+				Control().UpdateChildrenCheckState(hItem, checked);
+			}
+			else {
+				DEBUG_STOP;
+			}
 		}
 	}
+
+	HTREEITEM hRoot = Control().GetRootItem();
+	int state = Control().UpdateCheckState(hRoot);
+	Control().SetCheck(hRoot, state > 0 ? TRUE : FALSE);
 
 	Control().Redraw(true);
 }
@@ -1035,7 +1069,9 @@ void Component::ModelPanel::CheckItems(Json::Object* pData)
 void Component::ModelPanel::DeleteItem(Json::Object* pData)
 {
 	DisableNotification();
-	Control().DeleteItem(FindTreeItem(SKW_KEY));
+
+	BOOL success = Control().DeleteItem(FindTreeItem(SKW_KEY));
+	ASSERT(success);
 }
 
 
@@ -1043,7 +1079,9 @@ void Component::ModelPanel::DeleteItem(Json::Object* pData)
 void Component::ModelPanel::ExpandItem(Json::Object* pData)
 {
 	DisableNotification();
-	Control().Expand(FindTreeItem(SKW_KEY), pData->GetBoolean(SKW_EXPAND) ? TVE_EXPAND : TVE_COLLAPSE);
+
+	BOOL success = Control().Expand(FindTreeItem(SKW_KEY), pData->GetBoolean(SKW_EXPAND) ? TVE_EXPAND : TVE_COLLAPSE);
+	ASSERT(success);
 }
 
 
@@ -1051,7 +1089,9 @@ void Component::ModelPanel::ExpandItem(Json::Object* pData)
 void Component::ModelPanel::ExpandParent(Json::Object* pData)
 {
 	DisableNotification();
-	Control().Expand(FindTreeItem(SKW_KEY), TVE_EXPAND);
+
+	BOOL success = Control().Expand(FindTreeItem(SKW_KEY), TVE_EXPAND);
+	ASSERT(success);
 }
 
 
@@ -1061,14 +1101,17 @@ void Component::ModelPanel::SelectItem(Json::Object* pData)
 	DisableNotification();
 
 	HTREEITEM hItem = FindTreeItem(SKW_KEY);
-	DEBUG_VALID(hItem);
+	if (hItem != nullptr) {
+		//:TODO - uncheck
+		bool selected = pData->GetBoolean(SKW_FLAG);
+		ASSERT(selected);
 
-	//:TODO - uncheck
-	bool selected = pData->GetBoolean(SKW_FLAG);
-	ASSERT(selected);
-
-	Control().EnsureVisible(hItem);
-	Control().SelectItem(hItem);
+		Control().EnsureVisible(hItem);
+		Control().SelectItem(hItem);
+	}
+	else {
+		DEBUG_STOP;
+	}
 }
 
 
@@ -1090,9 +1133,12 @@ void Component::ModelPanel::SelectItems(Json::Object* pData)
 	HTREEITEM hItem = nullptr;
 	for (auto key : keys) {
 		hItem = Control().FindItem(key);
-		DEBUG_VALID(hItem);
-
-		Control().SelectItem(hItem);
+		if (hItem != nullptr) {
+			Control().SelectItem(hItem);
+		}
+		else {
+			DEBUG_STOP;
+		}
 	}
 
 	Control().Redraw(true);
