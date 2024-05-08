@@ -986,9 +986,11 @@ void Signal::Delivery::SetSender(void (*func)(const wchar_t*))
 
 void Signal::Delivery::SendData(Json::Object& data)
 {
-	DEBUG_VALID(SendSignal);
 	if (SendSignal != nullptr) {
 		SendSignal(data.ToString().GetBuffer());
+	}
+	else {
+		DEBUG_STOP;
 	}
 }
 
