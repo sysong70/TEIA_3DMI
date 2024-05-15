@@ -126,23 +126,30 @@
     <ClInclude Include="..\Common\WStr.h" />
     <ClInclude Include="..\Signal\Signal.h" />
     <ClInclude Include="..\Signal\WorkerThread.h" />
+    <ClInclude Include="Command.InputManager.h" />
+    <ClInclude Include="Command.Manager.h" />
+    <ClInclude Include="Command.MeasureManager.h" />
+    <ClInclude Include="Command.PmiManager.h" />
+    <ClInclude Include="Impl\Command.InputManagerImpl.h" />
+    <ClInclude Include="Impl\Command.ManagerImpl.h" />
+    <ClInclude Include="Impl\Kernel.ApplicationImpl.h" />
     <ClInclude Include="Impl\Kernel.DocViewImpl.h" />
-    <ClInclude Include="Impl\Operator.HighlightObjectSnapImpl.h" />
-    <ClInclude Include="Impl\OperatorImpl.h" />
+    <ClInclude Include="Impl\Command.HighlightObjectSnapImpl.h" />
+    <ClInclude Include="Impl\CommandImpl.h" />
     <ClInclude Include="Kernel.Application.h" />
     <ClInclude Include="Kernel.h" />
     <ClInclude Include="Kernel.DocView.h" />
     <ClInclude Include="Object.h" />
-    <ClInclude Include="Operator.Camera.h" />
-    <ClInclude Include="Operator.h" />
-    <ClInclude Include="Operator.HighlightObjectSnap.h">
+    <ClInclude Include="Command.Camera.h" />
+    <ClInclude Include="Command.h" />
+    <ClInclude Include="Command.HighlightObjectSnap.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="Operator.ModelPanel.h" />
-    <ClInclude Include="Operator.Select.h" />
-    <ClInclude Include="Operator.Attribute.h" />
-    <ClInclude Include="Operator.VisualEffects.h" />
+    <ClInclude Include="Command.ModelPanel.h" />
+    <ClInclude Include="Command.Select.h" />
+    <ClInclude Include="Command.Attribute.h" />
+    <ClInclude Include="Command.VisualEffects.h" />
     <ClInclude Include="Signal.Connector.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClInclude>
@@ -158,24 +165,31 @@
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\Signal\Signal.cpp" />
     <ClCompile Include="..\Signal\WorkerThread.cpp" />
+    <ClCompile Include="Command.InputManager.cpp" />
+    <ClCompile Include="Command.Manager.cpp" />
+    <ClCompile Include="Command.MeasureManager.cpp" />
+    <ClCompile Include="Command.PmiManager.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Impl\Command.InputManagerImpl.cpp" />
+    <ClCompile Include="Impl\Command.ManagerImpl.cpp" />
+    <ClCompile Include="Impl\Kernel.ApplicationImpl.cpp" />
     <ClCompile Include="Impl\Kernel.DocViewImpl.cpp" />
-    <ClCompile Include="Impl\Operator.HighlightObjectSnapImpl.cpp" />
-    <ClCompile Include="Impl\OperatorImpl.cpp" />
+    <ClCompile Include="Impl\Command.HighlightObjectSnapImpl.cpp" />
+    <ClCompile Include="Impl\CommandImpl.cpp" />
     <ClCompile Include="Kernel.Application.cpp" />
     <ClCompile Include="Kernel.cpp" />
     <ClCompile Include="Kernel.DocView.cpp" />
     <ClCompile Include="Object.cpp" />
-    <ClCompile Include="Operator.Camera.cpp" />
-    <ClCompile Include="Operator.cpp" />
-    <ClCompile Include="Operator.HighlightObjectSnap.cpp">
+    <ClCompile Include="Command.Camera.cpp" />
+    <ClCompile Include="Command.cpp" />
+    <ClCompile Include="Command.HighlightObjectSnap.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Operator.ModelPanel.cpp" />
-    <ClCompile Include="Operator.Select.cpp" />
-    <ClCompile Include="Operator.Attribute.cpp" />
-    <ClCompile Include="Operator.VisualEffects.cpp" />
+    <ClCompile Include="Command.ModelPanel.cpp" />
+    <ClCompile Include="Command.Select.cpp" />
+    <ClCompile Include="Command.Attribute.cpp" />
+    <ClCompile Include="Command.VisualEffects.cpp" />
     <ClCompile Include="Signal.Connector.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
     </ClCompile>

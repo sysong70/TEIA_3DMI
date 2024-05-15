@@ -217,13 +217,12 @@ Component * H3DF::Component::FindUpComponent(Component::Type eInType)
 	return nullptr;
 }
 
-
 CString H3DF::Component::GetName() const
 {
 	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	return *pcImpl->m_pstrName;
+	return pcImpl->m_strName;
 }
 
 MetadataArray * H3DF::Component::GetAllMetadata() const

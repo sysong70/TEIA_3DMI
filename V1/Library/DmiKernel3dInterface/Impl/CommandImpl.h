@@ -12,12 +12,12 @@
 
 namespace KERNEL
 {
-	namespace Operator
+	namespace Command
 	{
-		class OperatorImpl : public Impl
+		class CommandImpl : public Impl
 		{
 		public:
-			OperatorImpl(const DocView * pcInDocView);
+			CommandImpl(const DocView * pcInDocView);
 
 			H3DF::WindowKey & Window();
 			const H3DF::WindowKey & Window() const;
@@ -25,7 +25,7 @@ namespace KERNEL
 			H3DF::View & View();
 			const H3DF::View & View() const;
 
-			void Copy(OperatorImpl * pcInThat);
+			void Copy(CommandImpl * pcInThat);
 
 			Signal::Delivery & Delivery();
 			const Signal::Delivery & Delivery() const;

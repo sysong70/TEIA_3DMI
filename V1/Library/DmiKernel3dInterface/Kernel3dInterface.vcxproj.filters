@@ -25,16 +25,16 @@
     <Filter Include="Kernel">
       <UniqueIdentifier>{d751b3d7-f946-4ee5-bbca-8c5ac048200c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Operator">
-      <UniqueIdentifier>{adbb77d6-04fa-49d2-b992-09d8f8b58488}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Facility">
       <UniqueIdentifier>{097f4284-c4aa-4f00-b724-7ae27c9375ab}</UniqueIdentifier>
     </Filter>
     <Filter Include="Kernel\Impl">
       <UniqueIdentifier>{a0a74036-15da-41a7-92b9-e49bf87a5172}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Operator\Impl">
+    <Filter Include="Command">
+      <UniqueIdentifier>{adbb77d6-04fa-49d2-b992-09d8f8b58488}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Command\Impl">
       <UniqueIdentifier>{6a1a0a9c-47cf-471f-9e3f-dd4567b680f2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -60,8 +60,8 @@
     <ClInclude Include="..\Signal\Signal.h">
       <Filter>_Signal</Filter>
     </ClInclude>
-    <ClInclude Include="Operator.HighlightObjectSnap.h">
-      <Filter>Operator</Filter>
+    <ClInclude Include="Command.HighlightObjectSnap.h">
+      <Filter>Command</Filter>
     </ClInclude>
     <ClInclude Include="Kernel.Application.h">
       <Filter>Kernel</Filter>
@@ -75,29 +75,29 @@
     <ClInclude Include="Object.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Operator.VisualEffects.h">
-      <Filter>Operator</Filter>
+    <ClInclude Include="Command.VisualEffects.h">
+      <Filter>Command</Filter>
     </ClInclude>
-    <ClInclude Include="Operator.h">
-      <Filter>Operator</Filter>
+    <ClInclude Include="Command.h">
+      <Filter>Command</Filter>
     </ClInclude>
     <ClInclude Include="Impl\Kernel.DocViewImpl.h">
       <Filter>Kernel\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="Impl\Operator.HighlightObjectSnapImpl.h">
-      <Filter>Operator\Impl</Filter>
+    <ClInclude Include="Impl\Command.HighlightObjectSnapImpl.h">
+      <Filter>Command\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="Impl\OperatorImpl.h">
-      <Filter>Operator\Impl</Filter>
+    <ClInclude Include="Impl\CommandImpl.h">
+      <Filter>Command\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="Operator.Attribute.h">
-      <Filter>Operator</Filter>
+    <ClInclude Include="Command.Attribute.h">
+      <Filter>Command</Filter>
     </ClInclude>
-    <ClInclude Include="Operator.Camera.h">
-      <Filter>Operator</Filter>
+    <ClInclude Include="Command.Camera.h">
+      <Filter>Command</Filter>
     </ClInclude>
-    <ClInclude Include="Operator.Select.h">
-      <Filter>Operator</Filter>
+    <ClInclude Include="Command.Select.h">
+      <Filter>Command</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\File.h">
       <Filter>_Common</Filter>
@@ -108,11 +108,32 @@
     <ClInclude Include="..\Common\Dir.h">
       <Filter>_Common</Filter>
     </ClInclude>
-    <ClInclude Include="Operator.ModelPanel.h">
-      <Filter>Operator</Filter>
+    <ClInclude Include="Command.ModelPanel.h">
+      <Filter>Command</Filter>
     </ClInclude>
     <ClInclude Include="..\Signal\WorkerThread.h">
       <Filter>_Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.InputManager.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.Manager.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.PmiManager.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.MeasureManager.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Impl\Command.InputManagerImpl.h">
+      <Filter>Command\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="Impl\Kernel.ApplicationImpl.h">
+      <Filter>Kernel\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="Impl\Command.ManagerImpl.h">
+      <Filter>Command\Impl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -140,8 +161,8 @@
     <ClCompile Include="..\Signal\Signal.cpp">
       <Filter>_Signal</Filter>
     </ClCompile>
-    <ClCompile Include="Operator.HighlightObjectSnap.cpp">
-      <Filter>Operator</Filter>
+    <ClCompile Include="Command.HighlightObjectSnap.cpp">
+      <Filter>Command</Filter>
     </ClCompile>
     <ClCompile Include="Kernel.Application.cpp">
       <Filter>Kernel</Filter>
@@ -155,29 +176,29 @@
     <ClCompile Include="Object.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="Operator.VisualEffects.cpp">
-      <Filter>Operator</Filter>
+    <ClCompile Include="Command.VisualEffects.cpp">
+      <Filter>Command</Filter>
     </ClCompile>
-    <ClCompile Include="Operator.cpp">
-      <Filter>Operator</Filter>
+    <ClCompile Include="Command.cpp">
+      <Filter>Command</Filter>
     </ClCompile>
     <ClCompile Include="Impl\Kernel.DocViewImpl.cpp">
       <Filter>Kernel\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="Impl\Operator.HighlightObjectSnapImpl.cpp">
-      <Filter>Operator\Impl</Filter>
+    <ClCompile Include="Impl\Command.HighlightObjectSnapImpl.cpp">
+      <Filter>Command\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="Impl\OperatorImpl.cpp">
-      <Filter>Operator\Impl</Filter>
+    <ClCompile Include="Impl\CommandImpl.cpp">
+      <Filter>Command\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="Operator.Attribute.cpp">
-      <Filter>Operator</Filter>
+    <ClCompile Include="Command.Attribute.cpp">
+      <Filter>Command</Filter>
     </ClCompile>
-    <ClCompile Include="Operator.Camera.cpp">
-      <Filter>Operator</Filter>
+    <ClCompile Include="Command.Camera.cpp">
+      <Filter>Command</Filter>
     </ClCompile>
-    <ClCompile Include="Operator.Select.cpp">
-      <Filter>Operator</Filter>
+    <ClCompile Include="Command.Select.cpp">
+      <Filter>Command</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\File.cpp">
       <Filter>_Common</Filter>
@@ -188,11 +209,32 @@
     <ClCompile Include="..\Common\Dir.cpp">
       <Filter>_Common</Filter>
     </ClCompile>
-    <ClCompile Include="Operator.ModelPanel.cpp">
-      <Filter>Operator</Filter>
+    <ClCompile Include="Command.ModelPanel.cpp">
+      <Filter>Command</Filter>
     </ClCompile>
     <ClCompile Include="..\Signal\WorkerThread.cpp">
       <Filter>_Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.InputManager.cpp">
+      <Filter>Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.Manager.cpp">
+      <Filter>Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.PmiManager.cpp">
+      <Filter>Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.MeasureManager.cpp">
+      <Filter>Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Impl\Command.InputManagerImpl.cpp">
+      <Filter>Command\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Impl\Kernel.ApplicationImpl.cpp">
+      <Filter>Kernel\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Impl\Command.ManagerImpl.cpp">
+      <Filter>Command\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

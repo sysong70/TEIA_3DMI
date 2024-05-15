@@ -7,7 +7,7 @@
 
 namespace H3DF
 {
-	class API_3DF ComponentImpl : public Impl
+	class ComponentImpl : public Impl
 	{
 	public:
 		ComponentImpl();
@@ -36,22 +36,26 @@ namespace H3DF
 		
 		Component * m_pcOwner = nullptr;
 
-		CString * m_pstrName = nullptr;
+		CString m_strName;
 		ComponentArray * m_pvSubComponents = nullptr;
 		MetadataArray * m_pvMetaDatas = nullptr;
-
-		//== Utility Functions =====================================================================
-		static bool SetData(Component & cInComponent, CString strInName, HC_KEY nKey, HC_KEY nIncludeKey, Component::Type eInType = Component::Type::None);
-		static bool SetName(Component & cInComponent, CString strInName);
-		static bool AddSubComponent(Component & cInParentComponent, Component & pcInComponent);
-		static CString TypeName(Component & cInComponent);
-		static bool FindParentPartDefinition(Component & cInComponent, Component *& pcOutComponent);
-
-		static bool ClonedParentPartDefinition(Component & cInComponent);
-		static bool ClonedComponent(Component & cInComponent, Component & cInOwnerComponent, bool bDeleteInclude);
-
-		static Component * GetViewGroupComponent(Component & cInParentComp);
-		static Component * GetAnnotationViewGroupComponent(Component & cInParentComp);
-		static Component * GetPmiGroupComponent(Component & cInParentComp);
 	};
+
+	namespace ComponentUtility
+	{
+		//== Utility Functions =====================================================================
+		API_3DF bool SetData(Component & cInComponent, CString strInName, HC_KEY nKey, HC_KEY nIncludeKey, Component::Type eInType = Component::Type::None);
+		API_3DF bool SetName(Component & cInComponent, CString strInName);
+		API_3DF bool AddSubComponent(Component & cInParentComponent, Component & pcInComponent);
+		API_3DF CString TypeName(Component & cInComponent);
+		API_3DF bool FindParentPartDefinition(Component & cInComponent, Component *& pcOutComponent);
+		API_3DF Component * FindSubComponentBySegmentKey(Component & cInComponent, HC_KEY nInSegmentKey, bool bRecursive);
+
+		API_3DF bool ClonedParentPartDefinition(Component & cInComponent);
+		API_3DF bool ClonedComponent(Component & cInComponent, Component & cInOwnerComponent, bool bDeleteInclude);
+
+		API_3DF Component * GetViewGroupComponent(Component & cInParentComp);
+		API_3DF Component * GetAnnotationViewGroupComponent(Component & cInParentComp);
+		API_3DF Component * GetPmiGroupComponent(Component & cInParentComp);
+	}
 }

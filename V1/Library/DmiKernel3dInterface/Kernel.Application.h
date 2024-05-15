@@ -3,15 +3,13 @@
 #include <Json.h>
 
 #include "Kernel.h"
-
-#include "../Dmi3dfInterface/Sprocket/3DF.Application.h"
+#include "Object.h"
 
 namespace KERNEL
 {
-	class API_KERNEL Application
+	class API_KERNEL Application : public Object
 	{
 	public:
-
 		Application();
 
 		void InitInstance();
@@ -22,8 +20,9 @@ namespace KERNEL
 		//:Ken - 20240131
 		void OnFileOptionReference(Json::Object& data);
 
-	protected:
+		DocView * GetDocView(int nId);
+		void RemoveDocView(int nId);
 
-		H3DF::Application m_cApplication;
+	protected:
 	};
 };

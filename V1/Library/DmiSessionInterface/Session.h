@@ -4,10 +4,7 @@
 
 #include "../Signal/Signal.h"
 
-namespace KERNEL 
-{
-	class DocView;
-}
+#include "../DmiKernel3dInterface/Command.Manager.h"
 
 namespace SESSION
 {
@@ -15,36 +12,32 @@ namespace SESSION
 	class Session
 	{
 	public:
-		Session();
+		Session(KERNEL::Command::Manager * pcCommandManager, int nId);
+		//Session(KERNEL::Application & cApplication, int nId);
 		~Session();
 
-		int SessionId() const;
-		void SessionId(int nSessionId);
+		int Id() const;
+
+		void ExecuteViewSignal(Json::Object & cInObject);
 
 		//== View 관련 함수 ==========================================================================
-		void ViewInitialize(Json::Object & cInObject, Signal::Delivery & cInstance);
+		void ViewInitialize(Json::Object & cInObject, int nViewId);
 		static UINT ThreadFileOpen(LPVOID pcParam);
 
-		void ViewPaint(Json::Object & cInObject);
-		void ViewResize(Json::Object & cInObject);
-		KERNEL::DocView * GetDocView();
-
-		void ViewMouseSignal(Json::Object & cInObject);
-		void ViewKeyboardSignal(Json::Object & cInObject);
-
+/*
 		void ViewExecuteCommand(Json::Object & cInObject);
 		void ViewCancelCommands();
-
+*/
 		//== Command 관련 함수 =======================================================================
-		void CommandRequest(Json::Object & cInObject);
-		void CommandChange(Json::Object & cInObject);
+		void CommandRequest(Json::Object & cInObject, int nViewId);
+		void CommandChange(Json::Object & cInObject, int nViewId);
 
 		//== Panel 관련 함수 ========================================================================
-		void ModelPanelSignal(Json::Object & cInObject);
+		void ModelPanelSignal(Json::Object & cInObject, int nViewId);
 
 	private:
 		int m_nSessionId = -1;
-
+		KERNEL::Command::Manager * m_pcCommandManager = nullptr;
 		KERNEL::DocView * m_pcDocView = nullptr;
 	};
 }

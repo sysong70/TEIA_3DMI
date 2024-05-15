@@ -1,8 +1,8 @@
 ﻿#include "StdAfx.h"
 
-#include "OPERATOR.Select.h"
+#include "Command.Select.h"
 
-#include "Impl/OperatorImpl.h"
+#include "Impl/CommandImpl.h"
 
 #include "Kernel.DocView.h"
 #include "Impl/Kernel.DocViewImpl.h"
@@ -29,9 +29,9 @@
 
 #include <HEventListener.h>
 
-#include "Operator.HighlightObjectSnap.h"
-#include "Impl/Operator.HighlightObjectSnapImpl.h"
-#include "Operator.ModelPanel.h"
+#include "Command.HighlightObjectSnap.h"
+#include "Impl/Command.HighlightObjectSnapImpl.h"
+#include "Command.ModelPanel.h"
 
 using namespace KERNEL;
 
@@ -39,15 +39,15 @@ using namespace KERNEL;
 
 namespace KERNEL
 {
-	namespace Operator
+	namespace Command
 	{
-		class SelectImpl : public OperatorImpl
+		class SelectImpl : public CommandImpl
 		{
 		public:
 			SelectImpl(const DocView * pcInDocView);
 
 			void Copy(SelectImpl * pcInThat) {
-				OperatorImpl::Copy(pcInThat);
+				CommandImpl::Copy(pcInThat);
 			}
 
 			ULONGLONG m_nSelectPickCount = 200;
@@ -56,7 +56,7 @@ namespace KERNEL
 			H3DF::Point2D m_cLButtonDownPosition;
 
 			// HighlightObjectSnap Operator
-			Operator::HighlightObjectSnap m_cHighlightOSnapOperator;
+			Command::HighlightObjectSnap m_cHighlightOSnapOperator;
 
 			float m_fLineWeight = 3;
 			H3DF::HighlightControl m_cHighlightCtrl;
@@ -75,7 +75,7 @@ namespace KERNEL
 			H3DF::HighlightControl & DynPmiHighlightControl() { return *m_pcDynPmiHighlightControl; }
 			
 
-			KERNEL::Operator::ModelPanel & ModelPanel();
+			KERNEL::Command::ModelPanel & ModelPanel();
 
 		protected:
 			H3DF::SelectionResults m_cNewHighlightSelection;
@@ -91,8 +91,8 @@ namespace KERNEL
 	}
 }
 
-KERNEL::Operator::SelectImpl::SelectImpl(const DocView * pcInDocView) :
-	OperatorImpl(pcInDocView),
+KERNEL::Command::SelectImpl::SelectImpl(const DocView * pcInDocView) :
+	CommandImpl(pcInDocView),
 	m_cHighlightOSnapOperator(pcInDocView),
 	m_cHighlightCtrl(Window()),
 	m_cLineHighlightCtrl(Window()),
@@ -135,7 +135,7 @@ KERNEL::Operator::SelectImpl::SelectImpl(const DocView * pcInDocView) :
 
 	m_cPmiHighlightCtrl.SetMaterialMapping(cHighlightMatMapping);
 
-	Operator::HighlightObjectSnapImpl * pcOSnapImpl = dynamic_cast<Operator::HighlightObjectSnapImpl *>(m_cHighlightOSnapOperator.GetImpl());
+	Command::HighlightObjectSnapImpl * pcOSnapImpl = dynamic_cast<Command::HighlightObjectSnapImpl *>(m_cHighlightOSnapOperator.GetImpl());
 	DEBUG_VALID(pcOSnapImpl);
 
 	m_pcDynHighlightControl = &pcOSnapImpl->m_cDynHighlightControl;
@@ -148,7 +148,7 @@ KERNEL::Operator::SelectImpl::SelectImpl(const DocView * pcInDocView) :
 	DEBUG_VALID(m_pcDynLineHighlightControl);
 }
 
-KERNEL::Operator::ModelPanel & KERNEL::Operator::SelectImpl::ModelPanel()
+KERNEL::Command::ModelPanel & KERNEL::Command::SelectImpl::ModelPanel()
 {
 	DocViewImpl * pcImpl = (DocViewImpl *)GetDocView().GetImpl();
 	DEBUG_VALID(pcImpl);
@@ -158,7 +158,7 @@ KERNEL::Operator::ModelPanel & KERNEL::Operator::SelectImpl::ModelPanel()
 
 //== Select 관련 함수 ================================================================================
 
-KERNEL::Operator::Select::Select(const DocView * pcInDocView)
+KERNEL::Command::Select::Select(const DocView * pcInDocView)
 {
 	SelectImpl * pcImpl = new SelectImpl(pcInDocView);
 	DEBUG_VALID(pcImpl);
@@ -167,7 +167,7 @@ KERNEL::Operator::Select::Select(const DocView * pcInDocView)
 }
 
 //== Mouse Event 관련 함수 ===========================================================================
-int KERNEL::Operator::Select::MouseMove(HEventInfo & cInEvent)
+int KERNEL::Command::Select::MouseMove(HEventInfo & cInEvent)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -177,7 +177,7 @@ int KERNEL::Operator::Select::MouseMove(HEventInfo & cInEvent)
 	return HLISTENER_PASS_EVENT;
 }
 
-int KERNEL::Operator::Select::LButtonDown(HEventInfo & cInEvent)
+int KERNEL::Command::Select::LButtonDown(HEventInfo & cInEvent)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -187,7 +187,7 @@ int KERNEL::Operator::Select::LButtonDown(HEventInfo & cInEvent)
 	return 0;
 }
 
-int KERNEL::Operator::Select::LButtonUp(HEventInfo & cInEvent)
+int KERNEL::Command::Select::LButtonUp(HEventInfo & cInEvent)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -280,7 +280,7 @@ int KERNEL::Operator::Select::LButtonUp(HEventInfo & cInEvent)
 
 //== Object Snap 관련 함수 ===========================================================================
 
-void KERNEL::Operator::Select::DrawSnapItems()
+void KERNEL::Command::Select::DrawSnapItems()
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -288,7 +288,7 @@ void KERNEL::Operator::Select::DrawSnapItems()
 	pcImpl->m_cHighlightOSnapOperator.DrawSnapItems();
 }
 
-void KERNEL::Operator::Select::SetObjectSnapMode(OSnap::Type eInType)
+void KERNEL::Command::Select::SetObjectSnapMode(OSnap::Type eInType)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -304,7 +304,7 @@ void KERNEL::Operator::Select::SetObjectSnapMode(OSnap::Type eInType)
 	pcImpl->m_cHighlightOSnapOperator.SetObjectSnapMode(pcImpl->m_nOSnapMode);
 }
 
-void KERNEL::Operator::Select::ResetSnapItems(bool bUpdate)
+void KERNEL::Command::Select::ResetSnapItems(bool bUpdate)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -314,9 +314,9 @@ void KERNEL::Operator::Select::ResetSnapItems(bool bUpdate)
 
 //== Select 관련 함수 ================================================================================
 
-bool KERNEL::Operator::Select::SelectByResult(H3DF::SelectionResults & cInResults)
+bool KERNEL::Command::Select::SelectByResult(H3DF::SelectionResults & cInResults)
 {
-	auto * pcImpl = (Operator::SelectImpl *)m_pcImpl;
+	auto * pcImpl = (Command::SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	H3DF::HighlightOptionsKit cOptions;
@@ -350,9 +350,9 @@ bool KERNEL::Operator::Select::SelectByResult(H3DF::SelectionResults & cInResult
 	return true;
 }
 
-bool KERNEL::Operator::Select::DynamicSelectByResult(H3DF::SelectionResults & cInResults)
+bool KERNEL::Command::Select::DynamicSelectByResult(H3DF::SelectionResults & cInResults)
 {
-	auto * pcImpl = (Operator::SelectImpl *)m_pcImpl;
+	auto * pcImpl = (Command::SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	H3DF::HighlightOptionsKit cOptions;
@@ -388,9 +388,9 @@ bool KERNEL::Operator::Select::DynamicSelectByResult(H3DF::SelectionResults & cI
 	return true;
 }
 
-void KERNEL::Operator::Select::SetSelectionFilter(SelectionFilter::Type eInType)
+void KERNEL::Command::Select::SetSelectionFilter(SelectionFilter::Type eInType)
 {
-	auto * pcImpl = (Operator::SelectImpl *)m_pcImpl;
+	auto * pcImpl = (Command::SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	// Selection filter type이 없는 경우 추가
@@ -404,24 +404,24 @@ void KERNEL::Operator::Select::SetSelectionFilter(SelectionFilter::Type eInType)
 	pcImpl->m_cHighlightOSnapOperator.SetSelectionFilter(pcImpl->m_nSelFilter);
 }
 
-H3DF::SelectionResults & KERNEL::Operator::Select::Results()
+H3DF::SelectionResults & KERNEL::Command::Select::Results()
 {
-	auto * pcImpl = (Operator::SelectImpl *)m_pcImpl;
+	auto * pcImpl = (Command::SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cSelectionResult;
 }
 
 //== Highlight 관련 함수 =============================================================================
-H3DF::HighlightControl & KERNEL::Operator::Select::DynHighlightControl()
+H3DF::HighlightControl & KERNEL::Command::Select::DynHighlightControl()
 {
-	auto * pcImpl = (Operator::SelectImpl *)m_pcImpl;
+	auto * pcImpl = (Command::SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->DynHighlightControl();
 }
 
-void KERNEL::Operator::Select::Unhighlight(H3DF::SelectionResults const & cInItems)
+void KERNEL::Command::Select::Unhighlight(H3DF::SelectionResults const & cInItems)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -443,7 +443,7 @@ void KERNEL::Operator::Select::Unhighlight(H3DF::SelectionResults const & cInIte
 	pcImpl->View().Update();
 }
 
-void KERNEL::Operator::Select::UnhighlightEverything()
+void KERNEL::Command::Select::UnhighlightEverything()
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -468,7 +468,7 @@ void KERNEL::Operator::Select::UnhighlightEverything()
 	pcImpl->View().Update();
 }
 
-void KERNEL::Operator::Select::SetMouseDownTickCount(ULONGLONG nInCount)
+void KERNEL::Command::Select::SetMouseDownTickCount(ULONGLONG nInCount)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -476,7 +476,7 @@ void KERNEL::Operator::Select::SetMouseDownTickCount(ULONGLONG nInCount)
 	pcImpl->m_nMouseDownTickCount = nInCount;
 }
 
-void KERNEL::Operator::Select::SetMouseUpTickCount(ULONGLONG nInCount)
+void KERNEL::Command::Select::SetMouseUpTickCount(ULONGLONG nInCount)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);

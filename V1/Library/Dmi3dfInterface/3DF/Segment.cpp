@@ -1154,6 +1154,10 @@ bool H3DF::SegmentKey::ShowBounding(BoundingKit & cOutkit) const
 			HC_Compute_Circumcuboid(".", (HPoint *)&cCuboid.cMin, (HPoint *)&cCuboid.cMax);
 		} SegmentKeyImpl::LocalClose(*this);
 
+		if (false == cSphere.IsValid() || false == cCuboid.IsValid()) {
+			return false;
+		}
+
 		pcImpl->m_pcBoundingKit->SetVolume(cSphere);
 		pcImpl->m_pcBoundingKit->SetVolume(cCuboid);
 	}
@@ -1161,8 +1165,6 @@ bool H3DF::SegmentKey::ShowBounding(BoundingKit & cOutkit) const
 	cOutkit = *pcImpl->m_pcBoundingKit;
 
 	return true;
-
-
 }
 
 //== Attribute Lock 관련 함수 ================================================================

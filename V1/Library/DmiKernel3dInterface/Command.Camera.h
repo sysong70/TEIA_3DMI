@@ -4,15 +4,15 @@
 #include <3DF/Math.h>
 #include <3DF/3DF.Operator.CameraControl.h>
 
-#include "Operator.h"
+#include "Command.h"
 
 #include "../Signal/Signal.h"
 
 namespace KERNEL
 {
-	namespace Operator
+	namespace Command
 	{
-		class Camera : public OperatorBase
+		class Camera : public CommandBase
 		{
 		public:
 			Camera(const DocView * pcInDocView);

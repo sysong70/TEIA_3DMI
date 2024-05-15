@@ -176,7 +176,7 @@ bool KERNEL::DocView::Save(WCHAR * pstrInFilePathName)
 }
 
 //== Operator 관련 함수 ======================================================================
-Operator::Attribute & KERNEL::DocView::Attribute()
+Command::Attribute & KERNEL::DocView::Attribute()
 {
 	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -184,7 +184,7 @@ Operator::Attribute & KERNEL::DocView::Attribute()
 	return pcImpl->Attribute();
 }
 
-Operator::Camera & KERNEL::DocView::Camera()
+Command::Camera & KERNEL::DocView::Camera()
 {
 	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -192,7 +192,7 @@ Operator::Camera & KERNEL::DocView::Camera()
 	return pcImpl->Camera();
 }
 
-Operator::Select & KERNEL::DocView::Select()
+Command::Select & KERNEL::DocView::Select()
 {
 	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -200,7 +200,7 @@ Operator::Select & KERNEL::DocView::Select()
 	return pcImpl->Select();
 }
 
-Operator::ModelPanel & KERNEL::DocView::ModelPanel()
+Command::ModelPanel & KERNEL::DocView::ModelPanel()
 {
 	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);

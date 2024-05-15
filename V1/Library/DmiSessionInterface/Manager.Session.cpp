@@ -108,6 +108,8 @@ void SESSION::Manager::Session::SetSendSignalFunc(SendSignalFunc lpfnSignalCallb
 // Application은 최초에 설정되는 값이기 때문에 저장하고 있다가 처리하도록 한다.
 void SESSION::Manager::Session::ExecuteApplicationSignal(Json::Object & cInObject)
 {
+	m_cCommandManager.ExecuteApplicationSignal(cInObject);
+/*
 	int nAction = cInObject.GetInteger(SKW_ACTION);
 
 	switch ((Signal::Application::Action)nAction)
@@ -141,6 +143,7 @@ void SESSION::Manager::Session::ExecuteApplicationSignal(Json::Object & cInObjec
 		default:
 			break;
 	}
+*/
 }
 
 //== View 명령어 처리 부분 ============================================================================
@@ -156,6 +159,15 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 
 	//TRACE(L"View Signal: ViewId %d, Action: %d", nViewId, nAction);
 	
+	if (Signal::View::Action::OnDestruct == (Signal::View::Action)nAction) {
+		RemoveSession(nViewId);
+	} 
+	else {
+		pcSession->ExecuteViewSignal(cInObject);
+	}
+
+/*
+
 	switch ((Signal::View::Action)nAction)
 	{
 		case Signal::View::Action::OnInitialize:
@@ -219,6 +231,7 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 			DEBUG_STOP;
 			break;
 	}
+*/
 }
 
 // 1-1. Session을 가져옴 (없으면 생성)
@@ -231,8 +244,7 @@ SESSION::Session * SESSION::Manager::Session::GetSession(int nViewId)
 	SESSION::Session * pcSession = m_mpcSessions[nViewId];
 
 	if (nullptr == pcSession) {
-		pcSession = new SESSION::Session();
-		pcSession->SessionId(nViewId);
+		pcSession = new SESSION::Session(&m_cCommandManager, nViewId);
 		if (nullptr == pcSession) {
 			DEBUG_STOP;
 			return nullptr;
@@ -248,24 +260,10 @@ SESSION::Session * SESSION::Manager::Session::GetSession(int nViewId)
 	return pcSession;
 }
 
-// 1-2. 생성된 Session을 HWND를 이용해서 찾아옴.
-SESSION::Session * SESSION::Manager::Session::GetSession(HWND hWnd)
-{
-	for (auto & cIterator : m_mpcSessions) {
-		SESSION::Session * pcSession = cIterator.second;
-		if (nullptr == pcSession) { continue; }
-
-		if (hWnd == pcSession->GetDocView()->GetHwnd()) {
-			return pcSession;
-		}
-}
-
-	return nullptr;
-}
-
 void SESSION::Manager::Session::RemoveSession(int nViewId)
 {
 	SESSION::Session * pcSession = m_mpcSessions[nViewId];
+	m_cCommandManager.RemoveDocView(nViewId);
 
 	if (nullptr != pcSession) {
 		delete pcSession;
@@ -279,7 +277,7 @@ void SESSION::Manager::Session::ModelPanelSignal(Json::Object & cInObject)
 	int nViewId = cInObject.GetInteger(SKW_VIEWID);
 
 	SESSION::Session * pcSession = GetSession(nViewId);
-	pcSession->ModelPanelSignal(cInObject);
+	pcSession->ModelPanelSignal(cInObject, nViewId);
 }
 
 //== Command 명령어 처리 부분 =========================================================================
@@ -294,11 +292,11 @@ void SESSION::Manager::Session::ExecuteCommand(Json::Object & cInObject)
 	switch ((Signal::TaskBar::Action) nAction)
 	{
 		case Signal::TaskBar::Action::OnRequestValue:
-			pcSession->CommandRequest(cInObject);
+			pcSession->CommandRequest(cInObject, nViewId);
 			break;
 
 		case Signal::TaskBar::Action::OnChangedValue:
-			pcSession->CommandChange(cInObject);
+			pcSession->CommandChange(cInObject, nViewId);
 			break;
 
 		default:

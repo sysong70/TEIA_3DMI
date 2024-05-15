@@ -5,12 +5,12 @@
 #include "../Kernel.h"
 #include "../Object.h"
 
-#include "../Operator.h"
-#include "../Operator.HighlightObjectSnap.h"
-#include "../Operator.Camera.h"
-#include "../Operator.Select.h"
-#include "../Operator.ModelPanel.h"
-#include "../Operator.Attribute.h"
+#include "../Command.h"
+#include "../Command.HighlightObjectSnap.h"
+#include "../Command.Camera.h"
+#include "../Command.Select.h"
+#include "../Command.ModelPanel.h"
+#include "../Command.Attribute.h"
 
 #include <Sprocket/3DF.Factory.h>
 #include <Sprocket/3DF.Canvas.h>
@@ -55,12 +55,12 @@ namespace KERNEL
 
 		//== Operator 관련 함수 ======================================================================
 		void AllocationOperator(const DocView * pcInDocView);
-		Operator::OperatorBase * GetOperator(Operator::Type eInType);
+		Command::CommandBase * GetOperator(Command::Type eInType);
 
-		Operator::Attribute & Attribute();
-		Operator::Camera & Camera();
-		Operator::Select & Select();
-		Operator::ModelPanel & ModelPanel();
+		Command::Attribute & Attribute();
+		Command::Camera & Camera();
+		Command::Select & Select();
+		Command::ModelPanel & ModelPanel();
 
 		DWORD MouseMapFlags(DWORD nState);
 
@@ -76,7 +76,7 @@ namespace KERNEL
 		void ChangeVisualEffects(Json::Object & cInObject);
 
 	private:
-		Operator::OperatorBase * m_apcOperator[(int)Operator::Type::Count];
+		Command::CommandBase * m_apcOperator[(int)Command::Type::Count];
 		const Signal::Delivery * m_pcDelivery = nullptr;
 
 		H3DF::CADModel m_cCADModel;

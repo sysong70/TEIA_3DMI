@@ -74,6 +74,9 @@ void H3DF::ModelImpl::Init()
 	m_cShowStyle = m_cIncludeStyles.Subsegment("show_style");
 	m_cShowStyle.GetVisibilityControl().SetFaces(true).SetLines(true).SetText(true);
 
+	m_cShowWireFrameStyle = m_cIncludeStyles.Subsegment("show_wireframe_style");
+	m_cShowWireFrameStyle.GetVisibilityControl().SetLines(true);
+
 	m_cShowVertexStyle = m_cIncludeStyles.Subsegment("show_vertex_style");
 	m_cShowVertexStyle.GetVisibilityControl().SetVertices(true);
 
@@ -81,12 +84,15 @@ void H3DF::ModelImpl::Init()
 	m_cNoShowStyle = m_cIncludeStyles.Subsegment("noshow_style");
 	m_cNoShowStyle.GetVisibilityControl().SetFaces(false).SetLines(false).SetVertices(false).SetText(false);
 
+	m_cNoShowWireFrameStyle = m_cIncludeStyles.Subsegment("noshow_wireframe_style");
+	m_cNoShowWireFrameStyle.GetVisibilityControl().SetLines(true);
+
 	m_cNoShowVertexStyle = m_cIncludeStyles.Subsegment("noshow_vertex_style");
 	m_cNoShowVertexStyle.GetVisibilityControl().SetVertices(false);
 
 	m_cModels.GetStyleControl().PushSegment(m_cShowStyle);
 
-// 	// 입력된 Matrial을 Face에 적용한다.
+// 	입력된 Matrial을 Face에 적용한다.
 // 	MaterialMappingKit cMaterialMapping;
 // 	cMaterialMapping.SetFaceMaterial(cInKit);
 // 

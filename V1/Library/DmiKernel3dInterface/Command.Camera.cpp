@@ -1,8 +1,10 @@
 ﻿#include "StdAfx.h"
 
-#include "OPERATOR.Camera.h"
+#include "Command.Camera.h"
 
-#include "Impl/OperatorImpl.h"
+#include "Impl/CommandImpl.h"
+
+#include "Kernel.DocView.h"
 
 #include "Signal.Connector.h"
 #include "../Signal/Signal.h"
@@ -11,6 +13,9 @@
 #include "../../UiMain/Command.Resource.h"
 
 #include <Sprocket/3DF.View.h>
+#include <Sprocket/3DF.Canvas.h>
+#include <Sprocket/3DF.Model.h>
+
 #include <3DF/Window.h>
 #include <3DF/Bounding.h>
 #include <3DF/Camera.h>
@@ -25,16 +30,16 @@ using namespace KERNEL;
 
 namespace KERNEL
 {
-	namespace Operator
+	namespace Command
 	{
-		class CameraImpl : public OperatorImpl
+		class CameraImpl : public CommandImpl
 		{
 		public:
 			CameraImpl(const DocView * pcInDocView);
 			~CameraImpl();
 
 			void Copy(CameraImpl * pcInThat) {
-				OperatorImpl::Copy(pcInThat);
+				CommandImpl::Copy(pcInThat);
 			}
 
 			H3DF::Operator::CameraControl & CameraControl() { return *m_pcCameraControl; }
@@ -46,13 +51,13 @@ namespace KERNEL
 	}
 }
 
-KERNEL::Operator::CameraImpl::CameraImpl(const DocView * pcInDocView)
-	: OperatorImpl(pcInDocView)
+KERNEL::Command::CameraImpl::CameraImpl(const DocView * pcInDocView)
+	: CommandImpl(pcInDocView)
 {
 	m_pcCameraControl = new H3DF::Operator::CameraControl(Window(), View().GetNavigationCube());
 }
 
-KERNEL::Operator::CameraImpl::~CameraImpl()
+KERNEL::Command::CameraImpl::~CameraImpl()
 {
 	if (nullptr != m_pcCameraControl) {
 		delete m_pcCameraControl;
@@ -62,14 +67,14 @@ KERNEL::Operator::CameraImpl::~CameraImpl()
 
 //== View Control 관련 함수 ==========================================================================
 
-H3DF::Camera::Mode KERNEL::Operator::CameraImpl::CameraMode()
+H3DF::Camera::Mode KERNEL::Command::CameraImpl::CameraMode()
 {
 	return CameraControl().CameraMode();
 }
 
 //== Camera class ==================================================================================
 
-KERNEL::Operator::Camera::Camera(const DocView * pcInDocView)
+KERNEL::Command::Camera::Camera(const DocView * pcInDocView)
 {
 	CameraImpl * pcImpl = new CameraImpl(pcInDocView);
 	DEBUG_VALID(pcImpl);
@@ -79,7 +84,7 @@ KERNEL::Operator::Camera::Camera(const DocView * pcInDocView)
 	pcImpl->CameraControl();
 }
 
-int KERNEL::Operator::Camera::MouseMove(HEventInfo & cInEvent)
+int KERNEL::Command::Camera::MouseMove(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -94,7 +99,7 @@ int KERNEL::Operator::Camera::MouseMove(HEventInfo & cInEvent)
 	return 0;
 }
 
-int KERNEL::Operator::Camera::LButtonDown(HEventInfo & cInEvent)
+int KERNEL::Command::Camera::LButtonDown(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -102,7 +107,7 @@ int KERNEL::Operator::Camera::LButtonDown(HEventInfo & cInEvent)
 	return pcImpl->CameraControl().LButtonDown(cInEvent);
 }
 
-int KERNEL::Operator::Camera::LButtonUp(HEventInfo & cInEvent)
+int KERNEL::Command::Camera::LButtonUp(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -110,7 +115,7 @@ int KERNEL::Operator::Camera::LButtonUp(HEventInfo & cInEvent)
 	return pcImpl->CameraControl().LButtonUp(cInEvent);
 }
 
-int KERNEL::Operator::Camera::RButtonDown(HEventInfo & cInEvent)
+int KERNEL::Command::Camera::RButtonDown(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -118,7 +123,7 @@ int KERNEL::Operator::Camera::RButtonDown(HEventInfo & cInEvent)
 	return pcImpl->CameraControl().RButtonDown(cInEvent);
 }
 
-int KERNEL::Operator::Camera::RButtonUp(HEventInfo & cInEvent)
+int KERNEL::Command::Camera::RButtonUp(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -126,7 +131,7 @@ int KERNEL::Operator::Camera::RButtonUp(HEventInfo & cInEvent)
 	return pcImpl->CameraControl().RButtonUp(cInEvent);
 }
 
-int KERNEL::Operator::Camera::MouseWheel(HEventInfo & cInEvent)
+int KERNEL::Command::Camera::MouseWheel(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -136,7 +141,7 @@ int KERNEL::Operator::Camera::MouseWheel(HEventInfo & cInEvent)
 
 //== View Control 관련 함수 ==========================================================================
 
-H3DF::Camera::Mode KERNEL::Operator::Camera::CameraMode()
+H3DF::Camera::Mode KERNEL::Command::Camera::CameraMode()
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -144,7 +149,7 @@ H3DF::Camera::Mode KERNEL::Operator::Camera::CameraMode()
 	return pcImpl->CameraMode();
 }
 
-void KERNEL::Operator::Camera::SetPanViewControl()
+void KERNEL::Command::Camera::SetPanViewControl()
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -157,7 +162,7 @@ void KERNEL::Operator::Camera::SetPanViewControl()
 	}
 }
 
-void KERNEL::Operator::Camera::SetOrbitViewControl()
+void KERNEL::Command::Camera::SetOrbitViewControl()
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -170,7 +175,7 @@ void KERNEL::Operator::Camera::SetOrbitViewControl()
 	}
 }
 
-void KERNEL::Operator::Camera::SetOrbitTurntableViewControl()
+void KERNEL::Command::Camera::SetOrbitTurntableViewControl()
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -183,7 +188,7 @@ void KERNEL::Operator::Camera::SetOrbitTurntableViewControl()
 	}
 }
 
-void KERNEL::Operator::Camera::SetZoomArea()
+void KERNEL::Command::Camera::SetZoomArea()
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -196,7 +201,7 @@ void KERNEL::Operator::Camera::SetZoomArea()
 	}
 }
 
-void KERNEL::Operator::Camera::FitWorld()
+void KERNEL::Command::Camera::FitWorld()
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -205,7 +210,7 @@ void KERNEL::Operator::Camera::FitWorld()
 	pcImpl->CameraControl().FitWorld();
 }
 
-void KERNEL::Operator::Camera::FitWorldOnly()
+void KERNEL::Command::Camera::FitWorldOnly()
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -213,26 +218,24 @@ void KERNEL::Operator::Camera::FitWorldOnly()
 	pcImpl->CameraControl().FitWorld();
 }
 
-void KERNEL::Operator::Camera::SetCamera(H3DF::CameraKit & cInCamera)
+void KERNEL::Command::Camera::SetCamera(H3DF::CameraKit & cInCamera)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->View().SmoothTransition(cInCamera);
-
-	//pcImpl->CameraControl().SetCamera(cInCamera);
 }
 
-void KERNEL::Operator::Camera::SetCameraFitSelection(H3DF::MatrixKit & cInMatrix, H3DF::SegmentKey & cInSegment)
+void KERNEL::Command::Camera::SetCameraFitSelection(H3DF::MatrixKit & cInMatrix, H3DF::SegmentKey & cInSegment)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	// pcImpl->CameraControl().SetCameraFitSelection(cInMatrix, cInSegment);
-
 	H3DF::BoundingKit cBounding;
 	if (false == cInSegment.ShowBounding(cBounding)) {
-		DEBUG_STOP;
+		// 입력된 Segment를 이용해서, Bounding을 구하지 못한 경우 Model의 Bounding을 구한다.
+		SegmentKey cModelSegment = pcImpl->GetDocView().Canvas().GetModel().GetSegmentKey();
+		SetCameraFitSelection(cInMatrix, cModelSegment);
 		return;
 	}
 

@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "OperatorImpl.h"
+#include "CommandImpl.h"
 
 #include "../Kernel.DocView.h"
 #include "Kernel.DocViewImpl.h"
@@ -12,7 +12,7 @@ using namespace KERNEL;
 
 //== Visual Effects class ==========================================================================
 
-KERNEL::Operator::OperatorImpl::OperatorImpl(const KERNEL::DocView * pcInDocView)
+KERNEL::Command::CommandImpl::CommandImpl(const KERNEL::DocView * pcInDocView)
 {
 	DEBUG_VALID(pcInDocView);
 
@@ -20,7 +20,7 @@ KERNEL::Operator::OperatorImpl::OperatorImpl(const KERNEL::DocView * pcInDocView
 	m_pcDocView = pcInDocView;
 }
 
-H3DF::WindowKey & KERNEL::Operator::OperatorImpl::Window()
+H3DF::WindowKey & KERNEL::Command::CommandImpl::Window()
 {
 	DEBUG_VALID(m_pcDocView);
 
@@ -30,7 +30,7 @@ H3DF::WindowKey & KERNEL::Operator::OperatorImpl::Window()
 	return pcImpl->GetCanvas().GetFrontView().GetWindowKey();
 }
 
-const H3DF::WindowKey & KERNEL::Operator::OperatorImpl::Window() const
+const H3DF::WindowKey & KERNEL::Command::CommandImpl::Window() const
 {
 	DEBUG_VALID(m_pcDocView);
 
@@ -40,7 +40,7 @@ const H3DF::WindowKey & KERNEL::Operator::OperatorImpl::Window() const
 	return pcImpl->GetCanvas().GetFrontView().GetWindowKey();
 }
 
-H3DF::View & KERNEL::Operator::OperatorImpl::View()
+H3DF::View & KERNEL::Command::CommandImpl::View()
 {
 	DEBUG_VALID(m_pcDocView);
 
@@ -50,7 +50,7 @@ H3DF::View & KERNEL::Operator::OperatorImpl::View()
 	return pcImpl->GetCanvas().GetFrontView();
 }
 
-const H3DF::View & KERNEL::Operator::OperatorImpl::View() const
+const H3DF::View & KERNEL::Command::CommandImpl::View() const
 {
 	DEBUG_VALID(m_pcDocView);
 
@@ -60,7 +60,7 @@ const H3DF::View & KERNEL::Operator::OperatorImpl::View() const
 	return pcImpl->GetCanvas().GetFrontView();
 }
 
-void KERNEL::Operator::OperatorImpl::Copy(OperatorImpl * pcInThat)
+void KERNEL::Command::CommandImpl::Copy(CommandImpl * pcInThat)
 {
 	DEBUG_VALID(pcInThat);
 
@@ -68,7 +68,7 @@ void KERNEL::Operator::OperatorImpl::Copy(OperatorImpl * pcInThat)
 	m_pcDocView = pcInThat->m_pcDocView;
 }
 
-Signal::Delivery & KERNEL::Operator::OperatorImpl::Delivery()
+Signal::Delivery & KERNEL::Command::CommandImpl::Delivery()
 {
 	DEBUG_VALID(m_pcDocView);
 
@@ -78,7 +78,7 @@ Signal::Delivery & KERNEL::Operator::OperatorImpl::Delivery()
 	return pcImpl->Delivery();
 }
 
-const Signal::Delivery & KERNEL::Operator::OperatorImpl::Delivery() const
+const Signal::Delivery & KERNEL::Command::CommandImpl::Delivery() const
 {
 	DEBUG_VALID(m_pcDocView);
 
@@ -88,19 +88,19 @@ const Signal::Delivery & KERNEL::Operator::OperatorImpl::Delivery() const
 	return pcImpl->Delivery();
 }
 
-DocView & KERNEL::Operator::OperatorImpl::GetDocView()
+DocView & KERNEL::Command::CommandImpl::GetDocView()
 {
 	DEBUG_VALID(m_pcDocView);
 	return *((KERNEL::DocView *)m_pcDocView);
 }
 
-const DocView & KERNEL::Operator::OperatorImpl::GetDocView() const
+const DocView & KERNEL::Command::CommandImpl::GetDocView() const
 {
 	DEBUG_VALID(m_pcDocView);
 	return *m_pcDocView;
 }
 
-H3DF::ModelImpl & KERNEL::Operator::OperatorImpl::GetModelImpl()
+H3DF::ModelImpl & KERNEL::Command::CommandImpl::GetModelImpl()
 {
 	DEBUG_VALID(m_pcDocView);
 
@@ -113,7 +113,7 @@ H3DF::ModelImpl & KERNEL::Operator::OperatorImpl::GetModelImpl()
 	return *pcModelImpl;
 }
 
-const H3DF::ModelImpl & KERNEL::Operator::OperatorImpl::GetModelImpl() const
+const H3DF::ModelImpl & KERNEL::Command::CommandImpl::GetModelImpl() const
 {
 	DEBUG_VALID(m_pcDocView);
 
@@ -127,7 +127,7 @@ const H3DF::ModelImpl & KERNEL::Operator::OperatorImpl::GetModelImpl() const
 }
 
 // Update하기전에 Hightlight된 것들을 모두 Unhighlight하고, SnapItem을 모두 Reset한다.
-void KERNEL::Operator::OperatorImpl::PrepareUpdate()
+void KERNEL::Command::CommandImpl::PrepareUpdate()
 {
 	GetDocView().Canvas().GetFrontView().SuppressUpdate(true);
 
@@ -137,7 +137,7 @@ void KERNEL::Operator::OperatorImpl::PrepareUpdate()
 }
 
 // Update가 완료되면, View를 Update한다.
-void KERNEL::Operator::OperatorImpl::Updated()
+void KERNEL::Command::CommandImpl::Updated()
 {
 	GetDocView().Canvas().GetFrontView().SuppressUpdate(false);
 	GetDocView().Canvas().GetFrontView().Update();

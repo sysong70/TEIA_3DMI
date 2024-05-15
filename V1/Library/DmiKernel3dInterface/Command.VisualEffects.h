@@ -3,15 +3,15 @@
 #include <3DF/3DF.h>
 #include <3DF/Math.h>
 
-#include "Operator.h"
+#include "Command.h"
 
 #include "../Signal/Signal.h"
 
 namespace KERNEL
 {
-	namespace Operator
+	namespace Command
 	{
-		class VisualEffects : public OperatorBase
+		class VisualEffects : public CommandBase
 		{
 		public:
 			VisualEffects(const DocView * pcInDocView);

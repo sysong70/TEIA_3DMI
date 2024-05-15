@@ -10,14 +10,12 @@
 
 namespace H3DF
 {
-	class API_3DF CADModelImpl : public ComponentImpl
+	class CADModelImpl : public ComponentImpl
 	{
 	public:
 		CADModelImpl();
 		~CADModelImpl();
 		void Copy(CADModelImpl * pcInThat);
-
-		CString TypeName(const Component & cInComponent);
 
 		Component & ModelComponent();
 
@@ -37,4 +35,12 @@ namespace H3DF
 		CAtlMap<HC_KEY, Component *> * m_pmComponentMap;
 		CAtlMap<DWORD_PTR, A3DEntity *> * m_pmEntityMap;
 	};
+
+	class CADModel;
+
+	namespace CADModelUtility
+	{
+		API_3DF void MapSetAt(CADModel * pcInCadModel, HC_KEY nInKey, Component * pcInComponent);
+		API_3DF CString TypeName(CADModel * pcInCadModel, const Component & cInComponent);
+	}
 }

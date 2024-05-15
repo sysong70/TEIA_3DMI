@@ -51,6 +51,10 @@
 
 #ifdef _DEBUG
 #	define USED_LOG_MANAGER
+
+#	ifdef USED_LOG_MANAGER
+#		define USED_DIMENSION_LOG_MANAGER
+#	endif
 #endif
 
 //#	define USED_LOG_MANAGER
@@ -210,8 +214,11 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 		m_cIncludeStyles = m_cModelIncludeKey.Subsegment("styles");
 
 		m_cShowStyle = m_cIncludeStyles.Subsegment("show_style");
+		m_cShowWireFrameStyle = m_cIncludeStyles.Subsegment("show_wireframe_style");
 		m_cShowVertexStyle = m_cIncludeStyles.Subsegment("show_vertex_style");
+
 		m_cNoShowStyle = m_cIncludeStyles.Subsegment("noshow_style");
+		m_cNoShowWireFrameStyle = m_cIncludeStyles.Subsegment("noshow_wireframe_style");
 		m_cNoShowVertexStyle = m_cIncludeStyles.Subsegment("noshow_vertex_style");
 
 		m_cPoccsIncludeSegment = m_cModelIncludeKey.Subsegment("poccs");
@@ -229,7 +236,7 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 		DEBUG_VALID(pcCdModelImpl);
 
 		// CAD Model 기본이름 설정
-		H3DF::ComponentImpl::SetData(cInCADModel, strFileTitle, cModelSegment.KeyValue(), INVALID_KEY);
+		H3DF::ComponentUtility::SetData(cInCADModel, strFileTitle, cModelSegment.KeyValue(), INVALID_KEY);
 
 		// Models Component 생성
 		H3DF::Component * pcModelsComponent = AddComponent(cModels, L"Models", H3DF::Component::Type::ModelsComponent, cInCADModel);
@@ -1101,7 +1108,7 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 		pcComponentImpl->m_nIncludeKey = cInclude.KeyValue();
 
 		if (nullptr != pcFindComponent) {
-			H3DF::ComponentImpl::AddSubComponent(cParentComp, *pcComponent);
+			H3DF::ComponentUtility::AddSubComponent(cParentComp, *pcComponent);
 		}
 
 		Log::Write(2, L"ParsePart Map: %s", CString(cSegment.Name()));
@@ -1793,7 +1800,7 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 // 없는 경우 View Group을 생성한다.
 H3DF::Component * TdfImport::GetViewGroupComponent(H3DF::Component & cInParentComp)
 {
-	H3DF::Component * pcViewGroupComponent = ComponentImpl::GetViewGroupComponent(cInParentComp);
+	H3DF::Component * pcViewGroupComponent = ComponentUtility::GetViewGroupComponent(cInParentComp);
 	if (nullptr != pcViewGroupComponent) {
 		return pcViewGroupComponent;
 	}
@@ -1818,7 +1825,7 @@ H3DF::Component * TdfImport::CreateViewGroupComponent(H3DF::Component & cInParen
 // 5-3. View중에서 Annotation View를 Group으로 처리하기 위해서, Parent Component에서 Annotation View Group을 검색.
 H3DF::Component * TdfImport::GetAnnotationViewGroupComponent(H3DF::Component & cInParentComp)
 {
-	H3DF::Component * pcAnnotationViewGroupComponent = ComponentImpl::GetAnnotationViewGroupComponent(cInParentComp);
+	H3DF::Component * pcAnnotationViewGroupComponent = ComponentUtility::GetAnnotationViewGroupComponent(cInParentComp);
 	if (nullptr != pcAnnotationViewGroupComponent) {
 		return pcAnnotationViewGroupComponent;
 	}
@@ -2063,11 +2070,11 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 		return A3D_SUCCESS;
 	}
 
-#ifdef USED_LOG_MANAGER
+#ifdef USED_DIMENSION_LOG_MANAGER
 	Log::DimensionData(pcMarkup);
 	Log::LeaderData(pcMarkup);
 	Log::TessMarkup(pcMarkup);
-#endif // USED_LOG_MANAGER
+#endif
 
 	Log::Write(2, L"ParseMarkup: %s, '%s', Markup%d", Log::HexStr((DWORD_PTR)pcMarkup),  strPmiName, m_nMarkupId);
 
@@ -2837,7 +2844,7 @@ H3DF::Component * TdfImport::CreatePmiGroupComponent(H3DF::Component & cInParent
 // 7-4. PMI를 Group으로 처리하기 위해서, Parent Component에서 PMI Group을 검색해서 찾아온다.
 H3DF::Component * TdfImport::GetPmiGroupComponent(H3DF::Component & cInParentComp)
 {
-	H3DF::Component * pcPmiGroupComponent = H3DF::ComponentImpl::GetPmiGroupComponent(cInParentComp);
+	H3DF::Component * pcPmiGroupComponent = H3DF::ComponentUtility::GetPmiGroupComponent(cInParentComp);
 	if (nullptr != pcPmiGroupComponent) {
 		return pcPmiGroupComponent;
 	}
@@ -4538,6 +4545,9 @@ A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3D
 	A3DEEntityType eType;
 	CHECK_A3D_RETURN(A3DEntityGetType(pcRepItem, &eType));
 
+	// Wireframe에 show wireframe style 적용
+	cInSegment.GetStyleControl().PushSegment(m_cShowWireFrameStyle);
+
 	Log::IncreaseTabIndex(2);
 
 	Log::Write(2, "DrawTess3DWire: %s, %s", Log::HexStr((DWORD_PTR)pTess3DWire), Dmi3dx::GetA3dEntityTypeString(eType));
@@ -4549,12 +4559,12 @@ A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3D
 			return DrawPolyWires(pTess3DWire, pcTessBaseData, pcRepItem, pcParentAttr, cInSegment);
 			break;
 
-			/*
-					case kA3DTypeRiCurve:
-						assert(false);
-						return A3D_ERROR;
-					break;
-			*/
+/*
+		case kA3DTypeRiCurve:
+			assert(false);
+			return A3D_ERROR;
+		break;
+*/
 	}
 
 	A3DRiCurve * pcRiCurve = (A3DRiCurve *)pcRepItem;
@@ -4610,15 +4620,13 @@ A3DStatus TdfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBase
 {
 	Log::IncreaseTabIndex(2);
 
-	Log::Write(2, L"DrawPolyWires: %s", Log::HexStr((DWORD_PTR)pcTess3D));
+	Log::Write(2, "DrawPolyWires: %s", Log::HexStrA((DWORD_PTR)pcTess3D));
 
 	Log::DecreaseTabIndex(2);
 
 	A3DTess3DWireData sWireData;
 	A3D_INITIALIZE_DATA(A3DTess3DWireData, sWireData);
 	CHECK_A3D_RETURN(A3DTess3DWireGet(pcTess3D, &sWireData));
-
-	cInSegment.GetVisibilityControl().SetLines(true);
 
 	if (nullptr == sWireData.m_puiSizesWires) {
 		A3DUns32 nPointCount = pcTessBaseData->m_uiCoordSize / 3;
@@ -6565,16 +6573,13 @@ H3DF::Component * TdfImport::AddComponent(SegmentKey & cInSegment, IncludeKey & 
 {
 	DEBUG_VALID(m_pcCADModel);
 
-	H3DF::CADModelImpl * pcCdModelImpl = dynamic_cast<H3DF::CADModelImpl *>(m_pcCADModel->GetImpl());
-	DEBUG_VALID(pcCdModelImpl);
-
 	H3DF::Component * pcComponent = new H3DF::Component();
 	DEBUG_VALID(pcComponent);
 
-	H3DF::ComponentImpl::SetData(*pcComponent, strInName, cInSegment.KeyValue(), cInInclude.KeyValue(), eInType);
-	H3DF::ComponentImpl::AddSubComponent(cInParentComponent, *pcComponent);
+	H3DF::ComponentUtility::SetData(*pcComponent, strInName, cInSegment.KeyValue(), cInInclude.KeyValue(), eInType);
+	H3DF::ComponentUtility::AddSubComponent(cInParentComponent, *pcComponent);
 
-	pcCdModelImpl->MapSetAt(cInSegment.KeyValue(), pcComponent);
+	H3DF::CADModelUtility::MapSetAt(m_pcCADModel, cInSegment.KeyValue(), pcComponent);
 
 	return pcComponent;
 }
@@ -6589,10 +6594,10 @@ H3DF::Component * TdfImport::AddComponent(SegmentKey & cInSegment, CString strIn
 	H3DF::Component * pcComponent = new H3DF::Component();
 	DEBUG_VALID(pcComponent);
 
-	H3DF::ComponentImpl::SetData(*pcComponent, strInName, cInSegment.KeyValue(), INVALID_KEY, eInType);
-	H3DF::ComponentImpl::AddSubComponent(cInParentComponent, *pcComponent);
+	H3DF::ComponentUtility::SetData(*pcComponent, strInName, cInSegment.KeyValue(), INVALID_KEY, eInType);
+	H3DF::ComponentUtility::AddSubComponent(cInParentComponent, *pcComponent);
 
-	pcCdModelImpl->MapSetAt(cInSegment.KeyValue(), pcComponent);
+	H3DF::CADModelUtility::MapSetAt(m_pcCADModel, cInSegment.KeyValue(), pcComponent);
 
 	return pcComponent;
 }

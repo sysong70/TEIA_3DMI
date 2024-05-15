@@ -45,18 +45,22 @@ namespace H3DF
 		SegmentKey m_cIncludeStyles;
 
 		SegmentKey & ShowStyleSegment() { return m_cShowStyle; }
+		SegmentKey & ShowWireFrameStyleSegment() { return m_cShowWireFrameStyle; }
 		SegmentKey & ShowVertexStyleSegment() { return m_cShowVertexStyle; }
 
 		SegmentKey & NoShowStyleSegment() { return m_cNoShowStyle; }
+		SegmentKey & NoShowWireFrameStyleSegment() { return m_cNoShowWireFrameStyle; }
 		SegmentKey & NoShowVertexStyleSegment() { return m_cNoShowVertexStyle; }
 
 	private:
 		SegmentKey m_cSegmentKey;
 
 		SegmentKey m_cShowStyle;
+		SegmentKey m_cShowWireFrameStyle;
 		SegmentKey m_cShowVertexStyle;
 
 		SegmentKey m_cNoShowStyle;
+		SegmentKey m_cNoShowWireFrameStyle;
 		SegmentKey m_cNoShowVertexStyle;
 
 		ModelHandedness m_eModelHandedness;

@@ -3,9 +3,9 @@
 #include "Kernel.DocViewImpl.h"
 #include "../Kernel.DocView.h"
 
-#include "../Operator.Camera.h"
-#include "../Operator.VisualEffects.h"
-#include "../Operator.Attribute.h"
+#include "../Command.Camera.h"
+#include "../Command.VisualEffects.h"
+#include "../Command.Attribute.h"
 
 #include "../Signal.Connector.h"
 #include "../../Signal/Signal.h"
@@ -95,44 +95,44 @@ void KERNEL::DocViewImpl::CancelCommands()
 
 void KERNEL::DocViewImpl::AllocationOperator(const DocView * pcInDocView)
 {
-	m_apcOperator[(int)KERNEL::Operator::Type::VisualEffects] = new KERNEL::Operator::VisualEffects(pcInDocView);
+	m_apcOperator[(int)KERNEL::Command::Type::VisualEffects] = new KERNEL::Command::VisualEffects(pcInDocView);
 
-	m_apcOperator[(int)KERNEL::Operator::Type::Attribute] = new KERNEL::Operator::Attribute(pcInDocView);
+	m_apcOperator[(int)KERNEL::Command::Type::Attribute] = new KERNEL::Command::Attribute(pcInDocView);
 
-	m_apcOperator[(int)KERNEL::Operator::Type::Camera] = new KERNEL::Operator::Camera(pcInDocView);
+	m_apcOperator[(int)KERNEL::Command::Type::Camera] = new KERNEL::Command::Camera(pcInDocView);
 
-	m_apcOperator[(int)KERNEL::Operator::Type::Select] = new KERNEL::Operator::Select(pcInDocView);
+	m_apcOperator[(int)KERNEL::Command::Type::Select] = new KERNEL::Command::Select(pcInDocView);
 	
-	m_apcOperator[(int)KERNEL::Operator::Type::ModelPanel] = new KERNEL::Operator::ModelPanel(pcInDocView);
+	m_apcOperator[(int)KERNEL::Command::Type::ModelPanel] = new KERNEL::Command::ModelPanel(pcInDocView);
 
 	// Navigation Cube에서 사용하는 DynHighlightControl을 설정한다. Cube에서 선택된 부분을 Unhighlight하기 위함.
-	KERNEL::Operator::Select * pcSelect = (KERNEL::Operator::Select *)m_apcOperator[(int)KERNEL::Operator::Type::Select];
+	KERNEL::Command::Select * pcSelect = (KERNEL::Command::Select *)m_apcOperator[(int)KERNEL::Command::Type::Select];
 	GetCanvas().GetFrontView().GetNavigationCube().SetHighlightControl(pcSelect->DynHighlightControl());
 }
 
-KERNEL::Operator::OperatorBase * KERNEL::DocViewImpl::GetOperator(Operator::Type eInType)
+KERNEL::Command::CommandBase * KERNEL::DocViewImpl::GetOperator(Command::Type eInType)
 { 
 	return m_apcOperator[(int)eInType]; 
 }
 
-KERNEL::Operator::Attribute & KERNEL::DocViewImpl::Attribute()
+KERNEL::Command::Attribute & KERNEL::DocViewImpl::Attribute()
 {
-	return *(Operator::Attribute *)m_apcOperator[(int)Operator::Type::Attribute];
+	return *(Command::Attribute *)m_apcOperator[(int)Command::Type::Attribute];
 }
 
-KERNEL::Operator::Camera & KERNEL::DocViewImpl::Camera()
+KERNEL::Command::Camera & KERNEL::DocViewImpl::Camera()
 {
-	return *(Operator::Camera *)m_apcOperator[(int)Operator::Type::Camera];
+	return *(Command::Camera *)m_apcOperator[(int)Command::Type::Camera];
 }
 
-KERNEL::Operator::Select & KERNEL::DocViewImpl::Select()
+KERNEL::Command::Select & KERNEL::DocViewImpl::Select()
 {
-	return *(Operator::Select *)m_apcOperator[(int)Operator::Type::Select];
+	return *(Command::Select *)m_apcOperator[(int)Command::Type::Select];
 }
 
-KERNEL::Operator::ModelPanel & KERNEL::DocViewImpl::ModelPanel()
+KERNEL::Command::ModelPanel & KERNEL::DocViewImpl::ModelPanel()
 {
-	return *(Operator::ModelPanel *)m_apcOperator[(int)Operator::Type::ModelPanel];
+	return *(Command::ModelPanel *)m_apcOperator[(int)Command::Type::ModelPanel];
 }
 
 DWORD KERNEL::DocViewImpl::MouseMapFlags(DWORD nState)
@@ -154,7 +154,7 @@ DWORD KERNEL::DocViewImpl::MouseMapFlags(DWORD nState)
 // 1. 전달받은 Attribute 명령어를 분기 처리하는 함수.
 void KERNEL::DocViewImpl::SetVisibility(int nId)
 {
-	Operator::Attribute * pcOperator = (Operator::Attribute *)m_apcOperator[(int)KERNEL::Operator::Type::Attribute];
+	Command::Attribute * pcOperator = (Command::Attribute *)m_apcOperator[(int)KERNEL::Command::Type::Attribute];
 	DEBUG_VALID(pcOperator);
 
 	switch (nId)
@@ -207,7 +207,7 @@ void KERNEL::DocViewImpl::CommandRequest(Json::Object & cInObject)
 // 1-1. Visual Effects Request 요청 함수 처리
 void KERNEL::DocViewImpl::RequestVisualEffects(Json::Object & cInObject)
 {
-	Operator::VisualEffects * pcOperator = (Operator::VisualEffects *) m_apcOperator[(int)KERNEL::Operator::Type::VisualEffects];
+	Command::VisualEffects * pcOperator = (Command::VisualEffects *) m_apcOperator[(int)KERNEL::Command::Type::VisualEffects];
 	DEBUG_VALID(pcOperator);
 	pcOperator->Request(cInObject);
 }
@@ -232,7 +232,7 @@ void KERNEL::DocViewImpl::CommandChange(Json::Object & cInObject)
 // 2-1. Visual Effects Change 요청 함수 처리
 void KERNEL::DocViewImpl::ChangeVisualEffects(Json::Object & cInObject)
 {
-	Operator::VisualEffects * pcOperator = (Operator::VisualEffects *)m_apcOperator[(int)KERNEL::Operator::Type::VisualEffects];
+	Command::VisualEffects * pcOperator = (Command::VisualEffects *)m_apcOperator[(int)KERNEL::Command::Type::VisualEffects];
 	DEBUG_VALID(pcOperator);
 	pcOperator->Change(cInObject);
 }

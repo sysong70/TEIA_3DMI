@@ -11,6 +11,9 @@
 #include "3DF.Canvas.h"
 #include "Impl/CanvasImpl.h"
 
+#include "3DF.Model.h"
+#include "Impl/ModelImpl.h"
+
 #include "../3DF/Segment.h"
 #include "../3DF/Impl/SegmentImpl.h"
 #include "../3DF/Camera.h"
@@ -327,24 +330,29 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 	SegmentKey cViewKey = pcViewImpl->GetSegmentKey();
 	SegmentKey cSceneKey(pcView->GetSceneKey());
 
+
 	if (H3DF::Rendering::Mode::HiddenLine == eInMode) {
 		pcViewImpl->SetWindowBackGroundColor(RGB(255, 255, 255), RGB(255, 255, 255));
 	}
 	else {
 		pcViewImpl->SetWindowBackGroundColor(TheKenel.Appearance.BackgroundColor.Top, TheKenel.Appearance.BackgroundColor.Bottom);
 	}
+
+	Model & cModel = GetAttachedModel();
+	ModelImpl * pcModelImpl = static_cast<ModelImpl *>(cModel.GetImpl());
+	DEBUG_VALID(pcModelImpl);
 	
 	switch (eInMode)
 	{
 		case H3DF::Rendering::Mode::Gouraud:
 			pcView->RenderGouraud();
-			GetModelOverrideSegmentKey().GetVisibilityControl().SetLines(false);
+			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(false);
 			cSceneKey.GetVisibilityControl().SetEdges(false);
 			break;
 
 		case H3DF::Rendering::Mode::GouraudWithLines:
 			pcView->RenderGouraud();
-			GetModelOverrideSegmentKey().GetVisibilityControl().SetLines(true);
+			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
 			cSceneKey.GetVisibilityControl().SetEdges(false);
 			break;
 
@@ -356,13 +364,13 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 
 		case H3DF::Rendering::Mode::Phong: {
 			pcView->RenderPhong();
-			GetModelOverrideSegmentKey().GetVisibilityControl().SetLines(false);
+			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(false);
 			cSceneKey.GetVisibilityControl().SetEdges(false);
 		} break;
 
 		case H3DF::Rendering::Mode::PhongWithLines:
 			pcView->RenderPhong();
-			GetModelOverrideSegmentKey().GetVisibilityControl().SetLines(true);
+			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
 			cSceneKey.GetVisibilityControl().SetEdges(false);
 			break;
 
@@ -371,9 +379,9 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 			pcFramerate->Stop();
 			pcFramerate->Shutdown();
 
-			GetModelOverrideSegmentKey().GetVisibilityControl().SetLines(true);
-
 			pcView->SetRenderMode(HRenderBRepHiddenLine, true);
+
+			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
 			cSceneKey.GetMaterialMappingControl().SetEdgeColor(RGBAColor(0, 0, 0));
 		} break;
 
@@ -383,17 +391,20 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 			pcFramerate->Shutdown();
 
 			pcView->SetRenderMode(HRenderHiddenLineFast, true);
+
+			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
 			cSceneKey.GetVisibilityControl().SetEdges(false);
 		} break;
 
 		case H3DF::Rendering::Mode::Wireframe: {
 			pcView->RenderBRepWireframe();
-			GetModelOverrideSegmentKey().GetVisibilityControl().SetLines(true);
+			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(false).SetLines(true);
 			cSceneKey.GetVisibilityControl().SetEdges(false);
 		} break;
 
 		case H3DF::Rendering::Mode::Tessellated:
 			pcView->RenderPhong();
+			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
 			cSceneKey.GetVisibilityControl().SetEdges(true);
 			break;
 

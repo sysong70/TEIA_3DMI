@@ -9,6 +9,13 @@
 
 #include <A3DSDKIncludes.h>
 
+#ifdef _DEBUG
+#	define USED_LOG_MANAGER
+#endif
+
+
+#ifdef USED_LOG_MANAGER
+
 void Log::CreateLog(int nId, const WCHAR * pchFilePathName)
 {
 	LogManager::SetCurrentId(nId);
@@ -1558,3 +1565,64 @@ CStringA Log::GetLeaderSymbolTypeString(A3DMDLeaderSymbolType cInType)
 
 	return "Unknown";
 }
+
+#else
+void Log::CreateLog(int nId, const WCHAR * pchFilePathName) {}
+void Log::Write(int nId, LPCWSTR chMessage, ...) {}
+void Log::Write(int nId, LPCSTR chMessage, ...) {}
+void Log::IncreaseTabIndex(int nId) {}
+void Log::DecreaseTabIndex(int nId) {}
+
+void Log::CreateLog(const WCHAR * pchFilePathName) {}
+void Log::Write(LPCWSTR chMessage, ...) {}
+void Log::Write(LPCSTR chMessage, ...) {}
+void Log::IncreaseTabIndex() {}
+void Log::DecreaseTabIndex() {}
+
+void Log::Position(A3DMDPosition * pcPosition);
+void Log::Vector3dData(A3DVector3dData & cData, CStringA strPrompt) {}
+bool Log::GetName(const A3DRootBaseWithGraphics * pcRootBase, CString & strName) { return false; }
+void Log::View(A3DMkpView * pcView, A3DMkpViewData & cViewData) {}
+void Log::SurfPlane(A3DSurfPlane * pcInSurfPlane) {}
+void Log::GraphCamera(A3DGraphCamera * pcInCamera) {}
+void Log::LinkedItem(A3DMiscMarkupLinkedItemData & cData, A3DMiscEntityReferenceData & cRefData, DWORD_PTR nInAddreass) {}
+
+void Log::DimensionData(const A3DMkpMarkup * pcInData) {}
+void Log::DimensionValue(A3DMDDimensionValue * pcInData, CStringA strPrefix) {}
+void Log::DimensionValueFormat(A3DMDDimensionValueFormat * pcInData) {}
+void Log::DimensionExtentionLine(A3DMDDimensionExtentionLine * pcInData) {}
+void Log::DimensionFunnel(A3DMDDimensionFunnel * pcInData) {}
+void Log::DimensionExtremityData(A3DMDDimensionExtremityData & cInData) {}
+void Log::DimensionLine(A3DMDDimensionLine * pcInData) {}
+void Log::DimensionLineSymbol(A3DMDDimensionLineSymbol * pcInData, CStringA strPrefix) {}
+void Log::TextProperties(A3DMDTextProperties * pcInData) {}
+
+void Log::LeaderData(const A3DMkpMarkup * pcInData) {}
+void Log::LeaderDefinitionData(A3DMDLeaderDefinition * pcInData) {}
+void Log::LeaderSymbol(A3DMDLeaderSymbol * pcInData) {}
+void Log::LeaderStub(A3DMDMarkupLeaderStub * pcInData) {}
+
+void Log::TessMarkup(const A3DMkpMarkup * pcInData);
+
+CString Log::HexStr(DWORD_PTR nValue) { return L""; }
+CStringA Log::HexStrA(DWORD_PTR nValue) { return ""; }
+CString Log::BoolStr(bool bValue) { return L""; }
+CStringA Log::BoolStrA(bool bValue) { return ""; }
+CString Log::GetVector2dDataString(A3DVector2dData & cData) { return L""; }
+CStringA Log::GetVector2dDataStringA(A3DVector2dData & cData) { return ""; }
+CString Log::GetVector3dDataString(A3DVector3dData & cData) { return L""; }
+CStringA Log::GetVector3dDataStringA(A3DVector3dData & cData) { return ""; }
+
+CStringA Log::GetDimensionTypeString(EA3DMDDimensionType cInType) { return ""; }
+CStringA Log::GetDimensionSymbolTypeString(EA3DMDDimensionSymbolType cInType) { return ""; }
+CStringA Log::GetDimensionOrientationString(EA3DMDDimensionOrientation cInType) { return ""; }
+CStringA Log::GetDimensionDualDisplayString(EA3DMDDimensionDualDisplay cInType) { return ""; }
+CStringA Log::GetDimensionSymbolShapeString(EA3DMDDimensionSymbolShape eInType) { return ""; }
+CStringA Log::GetDimensionScoreString(EA3DMDDimensionScore eInType) { return ""; }
+CStringA Log::GetDimensionFrameString(EA3DMDDimensionFrame eInType) { return ""; }
+CStringA Log::GetTextPropertiesScoreString(EA3DMDTextPropertiesScore cInType) { return ""; }
+CStringA Log::GetTextPropertiesFormatString(EA3DMDTextPropertiesFormat cInType) { return ""; }
+CStringA Log::GetTextPropertiesJustificationString(EA3DMDTextPropertiesJustification cInType) { return ""; }
+CStringA Log::GetAnchorPointTypeString(EA3DMDAnchorPointType cInType) { return ""; }
+CStringA Log::GetLeaderSymbolTypeString(A3DMDLeaderSymbolType cInType) { return ""; }
+#endif

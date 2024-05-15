@@ -32,10 +32,6 @@ H3DF::ComponentImpl::~ComponentImpl()
 		m_pvSubComponents = nullptr;
 	}
 
-	if (nullptr != m_pstrName) {
-		delete m_pstrName;
-	}
-
 	if (nullptr != m_pvMetaDatas) {
 		for (auto * pcMetaData : *m_pvMetaDatas) {
 			delete pcMetaData;
@@ -53,11 +49,7 @@ void H3DF::ComponentImpl::Copy(ComponentImpl * pcInThat)
 	m_eType = pcInThat->m_eType;
 	m_nStatus = pcInThat->m_nStatus;
 	m_pcOwner = pcInThat->m_pcOwner;
-
-	if (nullptr != pcInThat->m_pstrName) {
-		m_pstrName = new CString();
-		*m_pstrName = *pcInThat->m_pstrName;
-	}
+	m_strName = pcInThat->m_strName;
 
 	if (nullptr != pcInThat->m_pvSubComponents) {
 		m_pvSubComponents = new ComponentArray();
@@ -71,13 +63,7 @@ void H3DF::ComponentImpl::Copy(ComponentImpl * pcInThat)
 
 void H3DF::ComponentImpl::SetName(CString strInName)
 {
-	if (nullptr == m_pstrName) {
-		m_pstrName = new CString();
-	}
-	
-	DEBUG_VALID(m_pstrName);
-
-	*m_pstrName = strInName;
+	m_strName = strInName;
 }
 
 CString H3DF::ComponentImpl::TypeName()
@@ -216,7 +202,7 @@ Component * H3DF::ComponentImpl::FindSubComponentBySegmentKey(HC_KEY nInSegmentK
 
 //== Utility Functions =============================================================================
 
-bool H3DF::ComponentImpl::SetData(Component & cInComponent, CString strInName, HC_KEY nKey, HC_KEY nIncludeKey, Component::Type eInType)
+bool H3DF::ComponentUtility::SetData(Component & cInComponent, CString strInName, HC_KEY nKey, HC_KEY nIncludeKey, Component::Type eInType)
 {
 	ComponentImpl * pcImpl = dynamic_cast<ComponentImpl *>(cInComponent.GetImpl());
 	if (nullptr == pcImpl) {
@@ -232,7 +218,7 @@ bool H3DF::ComponentImpl::SetData(Component & cInComponent, CString strInName, H
 	return true;
 }
 
-bool H3DF::ComponentImpl::SetName(Component & cInComponent, CString strInName)
+bool H3DF::ComponentUtility::SetName(Component & cInComponent, CString strInName)
 {
 	ComponentImpl * pcImpl = dynamic_cast<ComponentImpl *>(cInComponent.GetImpl());
 	if (nullptr == pcImpl) {
@@ -245,7 +231,7 @@ bool H3DF::ComponentImpl::SetName(Component & cInComponent, CString strInName)
 	return true;
 }
 
-bool H3DF::ComponentImpl::AddSubComponent(Component & cInParentComponent, Component & cInComponent)
+bool H3DF::ComponentUtility::AddSubComponent(Component & cInParentComponent, Component & cInComponent)
 {
 	ComponentImpl * pcParentImpl = dynamic_cast<ComponentImpl *>(cInParentComponent.GetImpl());
 	if (nullptr == pcParentImpl) {
@@ -263,7 +249,7 @@ bool H3DF::ComponentImpl::AddSubComponent(Component & cInParentComponent, Compon
 	return true;
 }
 
-CString H3DF::ComponentImpl::TypeName(Component & cInComponent)
+CString H3DF::ComponentUtility::TypeName(Component & cInComponent)
 {
 	ComponentImpl * pcImpl = dynamic_cast<ComponentImpl *>(cInComponent.GetImpl());
 	if (nullptr == pcImpl) {
@@ -275,7 +261,7 @@ CString H3DF::ComponentImpl::TypeName(Component & cInComponent)
 }
 
 // 주어진 Component를 기준으로 상위에 있는 PartDefinition를 찾는다.
-bool H3DF::ComponentImpl::FindParentPartDefinition(Component & cInComponent, Component *& pcOutComponent)
+bool H3DF::ComponentUtility::FindParentPartDefinition(Component & cInComponent, Component *& pcOutComponent)
 {
 	// In Component가 NULL이면 Parent에 PartDefinition이 없는 것으로 한다.
 	if (nullptr == &cInComponent) {
@@ -290,8 +276,17 @@ bool H3DF::ComponentImpl::FindParentPartDefinition(Component & cInComponent, Com
 	return FindParentPartDefinition(*cInComponent.GetOwner(), pcOutComponent);
 }
 
+// 주어진 Component를 기준으로 하위에 있는 Segment를 찾는다.
+Component * H3DF::ComponentUtility::FindSubComponentBySegmentKey(Component & cInComponent, HC_KEY nInSegmentKey, bool bRecursive)
+{
+	ComponentImpl * pcImpl = dynamic_cast<ComponentImpl *>(cInComponent.GetImpl());
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->FindSubComponentBySegmentKey(nInSegmentKey, bRecursive);
+}
+
 // Part Definition을 복제한다.
-bool H3DF::ComponentImpl::ClonedParentPartDefinition(Component & cInComponent)
+bool H3DF::ComponentUtility::ClonedParentPartDefinition(Component & cInComponent)
 {
 	if (H3DF::Component::Type::ExchangePartDefinition != cInComponent.GetType()) {
 		DEBUG_STOP;
@@ -304,7 +299,7 @@ bool H3DF::ComponentImpl::ClonedParentPartDefinition(Component & cInComponent)
 }
 
 // 주어진 Component를 복제
-bool H3DF::ComponentImpl::ClonedComponent(Component & cInComponent, Component & cInOwnerComponent, bool bDeleteInclude)
+bool H3DF::ComponentUtility::ClonedComponent(Component & cInComponent, Component & cInOwnerComponent, bool bDeleteInclude)
 {
 	// 1. Parent Segment 설정
 	SegmentKey cParentSegment(cInOwnerComponent.GetSegmentKey());
@@ -392,7 +387,7 @@ bool H3DF::ComponentImpl::ClonedComponent(Component & cInComponent, Component & 
 	return true;
 }
 
-Component * H3DF::ComponentImpl::GetViewGroupComponent(Component & cInParentComp)
+Component * H3DF::ComponentUtility::GetViewGroupComponent(Component & cInParentComp)
 {
 	if (H3DF::Component::Type::ViewGroupComponent == cInParentComp.GetType()) {
 		return &cInParentComp;
@@ -416,7 +411,7 @@ Component * H3DF::ComponentImpl::GetViewGroupComponent(Component & cInParentComp
 	return nullptr;
 }
 
-Component * H3DF::ComponentImpl::GetAnnotationViewGroupComponent(Component & cInParentComp)
+Component * H3DF::ComponentUtility::GetAnnotationViewGroupComponent(Component & cInParentComp)
 {
 	if (H3DF::Component::Type::AnnotationViewGroupComponent == cInParentComp.GetType()) {
 		return &cInParentComp;
@@ -441,7 +436,7 @@ Component * H3DF::ComponentImpl::GetAnnotationViewGroupComponent(Component & cIn
 }
 
 // PMI를 Group으로 처리하기 위해서, Parent Component에서 PMI Group을 검색해서 찾아온다.
-Component * H3DF::ComponentImpl::GetPmiGroupComponent(Component & cInParentComp)
+Component * H3DF::ComponentUtility::GetPmiGroupComponent(Component & cInParentComp)
 {
 	if (H3DF::Component::Type::PMIGroupComponent == cInParentComp.GetType()) {
 		return &cInParentComp;

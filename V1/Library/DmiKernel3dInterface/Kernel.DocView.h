@@ -11,7 +11,7 @@ namespace KERNEL
 {
 	// Kernel View는 CDocument의 CView의 신호를 처리하는 역활을 한다.
 	// CDoucment 대응하는 함수는 없기 때문에, Kernel View에서 처리하도록 한다.
-	class API_KERNEL DocView : public Object
+	class DocView : public Object
 	{
 	public:
 		DocView();
@@ -36,10 +36,10 @@ namespace KERNEL
 		bool Save(WCHAR * pstrInFilePathName);
 
 		//== Operator 관련 함수 ======================================================================
-		Operator::Attribute & Attribute();
-		Operator::Camera & Camera();
-		Operator::Select & Select();
-		Operator::ModelPanel & ModelPanel();
+		Command::Attribute & Attribute();
+		Command::Camera & Camera();
+		Command::Select & Select();
+		Command::ModelPanel & ModelPanel();
 
 		//== Mouse 관련 함수 =========================================================================
 		void MouseSignal(Json::Object & cInObject);

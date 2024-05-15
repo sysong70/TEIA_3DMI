@@ -74,7 +74,7 @@ namespace KERNEL
 	class Object;
 	class DocView;
 
-	namespace Operator
+	namespace Command
 	{
 		class Attribute;
 		class Camera;

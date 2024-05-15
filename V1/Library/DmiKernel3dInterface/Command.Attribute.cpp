@@ -1,8 +1,8 @@
 ﻿#include "StdAfx.h"
 
-#include "Operator.Attribute.h"
+#include "Command.Attribute.h"
 
-#include "Impl/OperatorImpl.h"
+#include "Impl/CommandImpl.h"
 
 #include "Kernel.DocView.h"
 #include "Impl/Kernel.DocViewImpl.h"
@@ -37,15 +37,15 @@ using namespace H3DF;
 
 namespace KERNEL
 {
-	namespace Operator
+	namespace Command
 	{
-		class AttributeImpl : public OperatorImpl
+		class AttributeImpl : public CommandImpl
 		{
 		public:
 			AttributeImpl(const DocView * pcInDocView);
 
 			void Copy(AttributeImpl * pcInThat) {
-				OperatorImpl::Copy(pcInThat);
+				CommandImpl::Copy(pcInThat);
 
 				m_bToogled = pcInThat->m_bToogled;
 			}
@@ -62,12 +62,12 @@ namespace KERNEL
 	}
 }
 
-KERNEL::Operator::AttributeImpl::AttributeImpl(const DocView * pcInDocView)
-	: OperatorImpl(pcInDocView)
+KERNEL::Command::AttributeImpl::AttributeImpl(const DocView * pcInDocView)
+	: CommandImpl(pcInDocView)
 {
 }
 
-void KERNEL::Operator::AttributeImpl::ShowStyleToNoShowStyle()
+void KERNEL::Command::AttributeImpl::ShowStyleToNoShowStyle()
 {
 	DocViewImpl * pcDocImpl = (DocViewImpl *)GetDocView().GetImpl();
 	DEBUG_VALID(pcDocImpl);
@@ -86,7 +86,7 @@ void KERNEL::Operator::AttributeImpl::ShowStyleToNoShowStyle()
 	pcModelImpl->NoShowVertexStyleSegment().GetVisibilityControl().SetVertices(true);
 }
 
-void KERNEL::Operator::AttributeImpl::NoShowStyleToShowStyle()
+void KERNEL::Command::AttributeImpl::NoShowStyleToShowStyle()
 {
 	DocViewImpl * pcDocImpl = (DocViewImpl *)GetDocView().GetImpl();
 	DEBUG_VALID(pcDocImpl);
@@ -104,7 +104,7 @@ void KERNEL::Operator::AttributeImpl::NoShowStyleToShowStyle()
 }
 
 // 입력된 Component및 하위 Component들을 검색해서, RepresentationItem이 나올때까지 하부 검색을 해서 NoShow로 변경
-void KERNEL::Operator::AttributeImpl::SetShowComponent(H3DF::Component & cInComponent, bool bShowFlag, bool bRecursive)
+void KERNEL::Command::AttributeImpl::SetShowComponent(H3DF::Component & cInComponent, bool bShowFlag, bool bRecursive)
 {
 	// 1. Show/Noshow는 실질적으로 RI Component에만 적용된다.
 	// 2. 이를 위해서는 RI Component를 찾아서 적용해야 한다. 그런데 RI Component는 하위에 다른 Component를 가질 수 없기 때문에,
@@ -124,7 +124,7 @@ void KERNEL::Operator::AttributeImpl::SetShowComponent(H3DF::Component & cInComp
 	// 이렇게 해서, 다중으로 영향을 미치는 것을 최소하 하도록 하다.
 
 	Component * pcPartDefComponent = nullptr;
-	if (H3DF::ComponentImpl::FindParentPartDefinition(cInComponent, pcPartDefComponent)) {
+	if (H3DF::ComponentUtility::FindParentPartDefinition(cInComponent, pcPartDefComponent)) {
 		SegmentKey cPartSegment(pcPartDefComponent->GetSegmentKey());
 #ifdef _DEBUG
 		CStringA strName = cPartSegment.Name();
@@ -146,7 +146,7 @@ void KERNEL::Operator::AttributeImpl::SetShowComponent(H3DF::Component & cInComp
 				}
 
 				// 찾은 Part Definition Component를 Clone한다.
-				H3DF::ComponentImpl::ClonedParentPartDefinition(*pcPartDefComponent);
+				H3DF::ComponentUtility::ClonedParentPartDefinition(*pcPartDefComponent);
 			}
 		}
 	}
@@ -201,7 +201,7 @@ void KERNEL::Operator::AttributeImpl::SetShowComponent(H3DF::Component & cInComp
 	}
 }
 
-void KERNEL::Operator::AttributeImpl::ResetShowComponent(H3DF::Component & cInComponent, bool bRecursive)
+void KERNEL::Command::AttributeImpl::ResetShowComponent(H3DF::Component & cInComponent, bool bRecursive)
 {
 	ModelImpl & cModelImpl = GetModelImpl();
 
@@ -226,7 +226,7 @@ void KERNEL::Operator::AttributeImpl::ResetShowComponent(H3DF::Component & cInCo
 
 //== Attribute class ==============================================================================
 
-KERNEL::Operator::Attribute::Attribute(const DocView * pcInDocView)
+KERNEL::Command::Attribute::Attribute(const DocView * pcInDocView)
 {
 	AttributeImpl * pcImpl = new AttributeImpl(pcInDocView);
 	DEBUG_VALID(pcImpl);
@@ -234,7 +234,7 @@ KERNEL::Operator::Attribute::Attribute(const DocView * pcInDocView)
 	m_pcImpl = pcImpl;
 }
 
-bool KERNEL::Operator::Attribute::ShowAll()
+bool KERNEL::Command::Attribute::ShowAll()
 {
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -259,7 +259,7 @@ bool KERNEL::Operator::Attribute::ShowAll()
 	return true;
 }
 
-bool KERNEL::Operator::Attribute::Show(H3DF::Component * pcInComponent)
+bool KERNEL::Command::Attribute::Show(H3DF::Component * pcInComponent)
 {
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -269,7 +269,7 @@ bool KERNEL::Operator::Attribute::Show(H3DF::Component * pcInComponent)
 	return true;
 }
 
-bool KERNEL::Operator::Attribute::Show(H3DF::SelectionItem & cSelItem)
+bool KERNEL::Command::Attribute::Show(H3DF::SelectionItem & cSelItem)
 {
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -277,7 +277,7 @@ bool KERNEL::Operator::Attribute::Show(H3DF::SelectionItem & cSelItem)
 	return true;
 }
 
-bool KERNEL::Operator::Attribute::NoShow(H3DF::Component * pcInComponent)
+bool KERNEL::Command::Attribute::NoShow(H3DF::Component * pcInComponent)
 {
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 
@@ -286,7 +286,7 @@ bool KERNEL::Operator::Attribute::NoShow(H3DF::Component * pcInComponent)
 	return true;
 }
 
-bool KERNEL::Operator::Attribute::NoShow(H3DF::SelectionItem & cSelItem)
+bool KERNEL::Command::Attribute::NoShow(H3DF::SelectionItem & cSelItem)
 {
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -297,7 +297,7 @@ bool KERNEL::Operator::Attribute::NoShow(H3DF::SelectionItem & cSelItem)
 	return true;
 }
 
-bool KERNEL::Operator::Attribute::HideOnly()
+bool KERNEL::Command::Attribute::HideOnly()
 {
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -337,7 +337,7 @@ bool KERNEL::Operator::Attribute::HideOnly()
 }
 
 // KERNEL::DocViewImpl::SetVisibility에서 호출함.
-bool KERNEL::Operator::Attribute::ShowOnly()
+bool KERNEL::Command::Attribute::ShowOnly()
 {
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -386,7 +386,7 @@ bool KERNEL::Operator::Attribute::ShowOnly()
 	return true;
 }
 
-bool KERNEL::Operator::Attribute::ShowToggle()
+bool KERNEL::Command::Attribute::ShowToggle()
 {
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -415,7 +415,7 @@ bool KERNEL::Operator::Attribute::ShowToggle()
 	return true;
 }
 
-bool KERNEL::Operator::Attribute::ShowReset()
+bool KERNEL::Command::Attribute::ShowReset()
 {
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);

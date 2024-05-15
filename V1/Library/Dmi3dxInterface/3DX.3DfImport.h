@@ -289,9 +289,13 @@ private:
 	H3DF::SegmentKey m_cModelIncludeKey;
 
 	H3DF::SegmentKey m_cIncludeStyles;
+
 	H3DF::SegmentKey m_cShowStyle;
+	H3DF::SegmentKey m_cShowWireFrameStyle;
 	H3DF::SegmentKey m_cShowVertexStyle;
+
 	H3DF::SegmentKey m_cNoShowStyle;
+	H3DF::SegmentKey m_cNoShowWireFrameStyle;
 	H3DF::SegmentKey m_cNoShowVertexStyle;
 
 	H3DF::SegmentKey m_cPartsIncludeSegment;
