@@ -341,37 +341,44 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 	Model & cModel = GetAttachedModel();
 	ModelImpl * pcModelImpl = static_cast<ModelImpl *>(cModel.GetImpl());
 	DEBUG_VALID(pcModelImpl);
+
+	// VisibilityControl SetFaces을 설정
+	if (H3DF::Rendering::Mode::Wireframe == eInMode) {
+		pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(false);
+	}
+	else {
+		pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true);
+	}
 	
+	// VisibilityControl SetLines을 설정
 	switch (eInMode)
 	{
 		case H3DF::Rendering::Mode::Gouraud:
-			pcView->RenderGouraud();
-			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(false);
-			cSceneKey.GetVisibilityControl().SetEdges(false);
+		case H3DF::Rendering::Mode::Phong:
+			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetLines(false);
 			break;
 
 		case H3DF::Rendering::Mode::GouraudWithLines:
+		case H3DF::Rendering::Mode::PhongWithLines:
+		case H3DF::Rendering::Mode::HiddenLine:
+		case H3DF::Rendering::Mode::FastHiddenLine:
+		case H3DF::Rendering::Mode::Wireframe:
+		case H3DF::Rendering::Mode::Tessellated:
+			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetLines(true);
+			break;
+	}
+
+	// Rendering Mode 설정.
+	switch (eInMode)
+	{
+		case H3DF::Rendering::Mode::Gouraud:
+		case H3DF::Rendering::Mode::GouraudWithLines:
 			pcView->RenderGouraud();
-			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
-			cSceneKey.GetVisibilityControl().SetEdges(false);
 			break;
 
-		case H3DF::Rendering::Mode::Flat:
-			break;
-
-		case H3DF::Rendering::Mode::FlatWithLines:
-			break;
-
-		case H3DF::Rendering::Mode::Phong: {
-			pcView->RenderPhong();
-			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(false);
-			cSceneKey.GetVisibilityControl().SetEdges(false);
-		} break;
-
+		case H3DF::Rendering::Mode::Phong:
 		case H3DF::Rendering::Mode::PhongWithLines:
 			pcView->RenderPhong();
-			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
-			cSceneKey.GetVisibilityControl().SetEdges(false);
 			break;
 
 		case H3DF::Rendering::Mode::HiddenLine: {
@@ -380,8 +387,6 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 			pcFramerate->Shutdown();
 
 			pcView->SetRenderMode(HRenderBRepHiddenLine, true);
-
-			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
 			cSceneKey.GetMaterialMappingControl().SetEdgeColor(RGBAColor(0, 0, 0));
 		} break;
 
@@ -391,26 +396,23 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 			pcFramerate->Shutdown();
 
 			pcView->SetRenderMode(HRenderHiddenLineFast, true);
-
-			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
-			cSceneKey.GetVisibilityControl().SetEdges(false);
 		} break;
 
-		case H3DF::Rendering::Mode::Wireframe: {
+		case H3DF::Rendering::Mode::Wireframe:
 			pcView->RenderBRepWireframe();
-			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(false).SetLines(true);
-			cSceneKey.GetVisibilityControl().SetEdges(false);
-		} break;
+			break;
 
 		case H3DF::Rendering::Mode::Tessellated:
-			pcView->RenderPhong();
-			pcModelImpl->ShowStyleSegment().GetVisibilityControl().SetFaces(true).SetLines(true);
-			cSceneKey.GetVisibilityControl().SetEdges(true);
+			pcView->RenderGouraud();
 			break;
+	}
 
-		default:
-			assert(false);
-			break;
+	// 이 위치에서 실행되어야 정상적으로 표현됨.
+	if (H3DF::Rendering::Mode::Tessellated == eInMode) {
+		cSceneKey.GetVisibilityControl().SetEdges(true);
+	}
+	else {
+		cSceneKey.GetVisibilityControl().SetEdges(false);
 	}
 
 	pcView->Update();
