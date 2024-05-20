@@ -1341,6 +1341,8 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 		int nKeyCount = 0;
 		HC_Show_Selection_Keys_Count(&nKeyCount);
 
+		//TRACE(L"\nSelection_Keys_Count: %d", nKeyCount);
+
 		if (0 < nKeyCount) {
 			WindowKeyImpl * pcImpl = (WindowKeyImpl *)pcSelCtrlImpl->m_pcWindow->GetImpl();
 			HC_KEY * pnKeys = pcImpl->GetSelectBufferKey(nKeyCount);
@@ -1354,6 +1356,8 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 			for (int nIndex = nKeyCount - 1; nIndex >= 0; nIndex--)
 			{
 				HC_Show_Key_Type(pnKeys[nIndex], chKeyType);
+				//TRACE(L"%d.Selection Keys Type: %s", nIndex, CString(chKeyType));
+
 				if (streq(chKeyType, "segment")) {
 					// nKey = pnKeys[nIndex];
 					//nKey = HC_Show_Reference_Geometry(pnKeys[nIndex]);

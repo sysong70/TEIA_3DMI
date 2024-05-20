@@ -4,12 +4,13 @@
 #include <3DF/Math.h>
 
 #include "Command.h"
+#include "Command.Set.h"
 
 namespace KERNEL
 {
 	namespace Command
 	{
-		class MeasureManager : public CommandBase
+		class MeasureManager : public Set
 		{
 		public:
 			MeasureManager() = default;

@@ -2,7 +2,7 @@
 
 #include "Command.ManagerImpl.h"
 
-#include "../Kernel.DocView.h"
+#include "../Kernel.Session.h"
 #include "Kernel.DocViewImpl.h"
 
 #include <3DF/Window.h>
@@ -13,7 +13,7 @@
 using namespace KERNEL;
 
 
-KERNEL::DocView * KERNEL::Command::ManagerImpl::GetDocView(int nId)
+KERNEL::Session * KERNEL::Command::ManagerImpl::GetDocView(int nId)
 {
 	return m_cApplication.GetDocView(nId);
 }
@@ -21,7 +21,7 @@ KERNEL::DocView * KERNEL::Command::ManagerImpl::GetDocView(int nId)
 //== View 관련 함수 ==================================================================================
 void KERNEL::Command::ManagerImpl::ViewMouseSignal(Json::Object & cInObject, int nViewId)
 {
-	DocView * pcDocView = GetDocView(nViewId);
+	Session * pcDocView = GetDocView(nViewId);
 	DEBUG_VALID(pcDocView);
 
 	pcDocView->MouseSignal(cInObject);
@@ -29,7 +29,7 @@ void KERNEL::Command::ManagerImpl::ViewMouseSignal(Json::Object & cInObject, int
 
 void KERNEL::Command::ManagerImpl::ViewKeyboardSignal(Json::Object & cInObject, int nViewId)
 {
-	DocView * pcDocView = GetDocView(nViewId);
+	Session * pcDocView = GetDocView(nViewId);
 	DEBUG_VALID(pcDocView);
 
 	pcDocView->KeyboardSignal(cInObject);
@@ -37,7 +37,7 @@ void KERNEL::Command::ManagerImpl::ViewKeyboardSignal(Json::Object & cInObject, 
 
 void KERNEL::Command::ManagerImpl::ViewExecuteCommand(Json::Object & cInObject, int nViewId)
 {
-	DocView * pcDocView = GetDocView(nViewId);
+	Session * pcDocView = GetDocView(nViewId);
 	DEBUG_VALID(pcDocView);
 
 	int nId = cInObject.GetInteger(SKW_ID);

@@ -4,6 +4,7 @@
 #include <3DF/Math.h>
 
 #include "Command.h"
+#include "Command.Set.h"
 
 namespace KERNEL
 {
@@ -30,7 +31,7 @@ namespace KERNEL
 			CString String(size_t nIndex);
 		};
 
-		class InputManager : public CommandBase
+		class InputManager : public Set
 		{
 		public:
 			InputManager() = default;

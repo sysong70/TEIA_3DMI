@@ -29,7 +29,7 @@ namespace KERNEL
 		class VisualEffectsImpl : public CommandImpl
 		{
 		public:
-			VisualEffectsImpl(const DocView * pcInDocView);
+			VisualEffectsImpl(const Session * pcInSession);
 
 			void Copy(VisualEffectsImpl * pcInThat) {
 				CommandImpl::Copy(pcInThat);
@@ -59,8 +59,8 @@ namespace KERNEL
 	}
 }
 
-KERNEL::Command::VisualEffectsImpl::VisualEffectsImpl(const DocView * pcInDocView)
-	: CommandImpl(pcInDocView)
+KERNEL::Command::VisualEffectsImpl::VisualEffectsImpl(const Session * pcInSession)
+	: CommandImpl(pcInSession)
 {
 	// 변경된 전역 Visual Effect 값을 가져온다.
 	m_cOption.Set(TheKenel.VisualEffects.Get());
@@ -168,9 +168,9 @@ void KERNEL::Command::VisualEffectsImpl::SetBloom(TheVisualEffects::BLOOM & cInO
 
 //== Visual Effects class ==========================================================================
 
-KERNEL::Command::VisualEffects::VisualEffects(const DocView * pcInDocView)
+KERNEL::Command::VisualEffects::VisualEffects(const Session * pcInSession)
 {
-	VisualEffectsImpl * pcImpl = new VisualEffectsImpl(pcInDocView);
+	VisualEffectsImpl * pcImpl = new VisualEffectsImpl(pcInSession);
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;

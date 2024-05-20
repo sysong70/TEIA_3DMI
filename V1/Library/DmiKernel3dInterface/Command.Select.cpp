@@ -4,7 +4,7 @@
 
 #include "Impl/CommandImpl.h"
 
-#include "Kernel.DocView.h"
+#include "Kernel.Session.h"
 #include "Impl/Kernel.DocViewImpl.h"
 
 #include "Signal.Connector.h"
@@ -44,7 +44,7 @@ namespace KERNEL
 		class SelectImpl : public CommandImpl
 		{
 		public:
-			SelectImpl(const DocView * pcInDocView);
+			SelectImpl(const Session * pcInSession);
 
 			void Copy(SelectImpl * pcInThat) {
 				CommandImpl::Copy(pcInThat);
@@ -91,9 +91,9 @@ namespace KERNEL
 	}
 }
 
-KERNEL::Command::SelectImpl::SelectImpl(const DocView * pcInDocView) :
-	CommandImpl(pcInDocView),
-	m_cHighlightOSnapOperator(pcInDocView),
+KERNEL::Command::SelectImpl::SelectImpl(const Session * pcInSession) :
+	CommandImpl(pcInSession),
+	m_cHighlightOSnapOperator(pcInSession),
 	m_cHighlightCtrl(Window()),
 	m_cLineHighlightCtrl(Window()),
 	m_cPmiHighlightCtrl(Window())
@@ -158,9 +158,9 @@ KERNEL::Command::ModelPanel & KERNEL::Command::SelectImpl::ModelPanel()
 
 //== Select 관련 함수 ================================================================================
 
-KERNEL::Command::Select::Select(const DocView * pcInDocView)
+KERNEL::Command::Select::Select(const Session * pcInSession)
 {
-	SelectImpl * pcImpl = new SelectImpl(pcInDocView);
+	SelectImpl * pcImpl = new SelectImpl(pcInSession);
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;

@@ -5,6 +5,7 @@
 #include <3DF/3DF.Operator.CameraControl.h>
 
 #include "Command.h"
+#include "Command.Set.h"
 
 #include "../Signal/Signal.h"
 
@@ -12,10 +13,10 @@ namespace KERNEL
 {
 	namespace Command
 	{
-		class Camera : public CommandBase
+		class Camera : public Set
 		{
 		public:
-			Camera(const DocView * pcInDocView);
+			Camera(const Session * pcInSession);
 
 			int MouseMove(HEventInfo & cInEvent);
 

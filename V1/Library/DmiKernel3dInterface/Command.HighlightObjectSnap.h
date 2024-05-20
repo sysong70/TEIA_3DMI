@@ -6,6 +6,7 @@
 #include <3DF/Selection.h>
 
 #include "Command.h"
+#include "Command.Set.h"
 
 #include "../Signal/Signal.h"
 
@@ -15,10 +16,10 @@ namespace KERNEL
 {
 	namespace Command
 	{
-		class HighlightObjectSnap : public CommandBase
+		class HighlightObjectSnap : public Set
 		{
 		public:
-			HighlightObjectSnap(const DocView * pcInDocView);
+			HighlightObjectSnap(const Session * pcInSession);
 
 			int MouseMove(HEventInfo & cInEvent);
 

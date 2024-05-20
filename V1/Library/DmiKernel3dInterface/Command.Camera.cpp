@@ -4,7 +4,7 @@
 
 #include "Impl/CommandImpl.h"
 
-#include "Kernel.DocView.h"
+#include "Kernel.Session.h"
 
 #include "Signal.Connector.h"
 #include "../Signal/Signal.h"
@@ -35,7 +35,7 @@ namespace KERNEL
 		class CameraImpl : public CommandImpl
 		{
 		public:
-			CameraImpl(const DocView * pcInDocView);
+			CameraImpl(const Session * pcInSession);
 			~CameraImpl();
 
 			void Copy(CameraImpl * pcInThat) {
@@ -51,8 +51,8 @@ namespace KERNEL
 	}
 }
 
-KERNEL::Command::CameraImpl::CameraImpl(const DocView * pcInDocView)
-	: CommandImpl(pcInDocView)
+KERNEL::Command::CameraImpl::CameraImpl(const Session * pcInSession)
+	: CommandImpl(pcInSession)
 {
 	m_pcCameraControl = new H3DF::Operator::CameraControl(Window(), View().GetNavigationCube());
 }
@@ -74,9 +74,9 @@ H3DF::Camera::Mode KERNEL::Command::CameraImpl::CameraMode()
 
 //== Camera class ==================================================================================
 
-KERNEL::Command::Camera::Camera(const DocView * pcInDocView)
+KERNEL::Command::Camera::Camera(const Session * pcInSession)
 {
-	CameraImpl * pcImpl = new CameraImpl(pcInDocView);
+	CameraImpl * pcImpl = new CameraImpl(pcInSession);
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;

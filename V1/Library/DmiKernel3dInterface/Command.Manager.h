@@ -7,7 +7,7 @@ namespace KERNEL
 {
 	namespace Command
 	{
-		class API_KERNEL Manager : public CommandBase
+		class API_KERNEL Manager : public KERNEL::Object
 		{
 		public:
 			Manager();

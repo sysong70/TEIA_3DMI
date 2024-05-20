@@ -123,8 +123,8 @@ bool KERNEL::Command::HighlightObjectSnapImpl::SnapItem::operator == (const Snap
 
 
 //== ObjectSnap class ==============================================================================
-KERNEL::Command::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const DocView * pcInDocView) :
-	CommandImpl(pcInDocView),
+KERNEL::Command::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const Session * pcInSession) :
+	CommandImpl(pcInSession),
 	m_cDynHighlightControl(Window()),
 	m_cDynLineHighlightCtrl(Window()),
 	m_cDynPmiHighlightCtrl(Window())
@@ -438,11 +438,11 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 		H3DF::Type eType = cFrontItem.Type();
 
 		// 1. 첫번째 요소가 Shell인 경우 다음 요소에서 Line을 찾는다. 
-		if (H3DF::Type::ShellKey == eType) {
-			WorldPoint cFaceWordlPoint;
-			WindowPoint cFaceWindowPoint;
-			cFrontItem.ShowSelectionPosition(cFaceWordlPoint);
-			cFrontItem.ShowSelectionPosition(cFaceWindowPoint);
+		if (H3DF::Type::ShellKey == eType || H3DF::Type::SegmentKey == eType) {
+			WorldPoint cFirstWordlPoint;
+			WindowPoint cFirstWindowPoint;
+			cFrontItem.ShowSelectionPosition(cFirstWordlPoint);
+			cFrontItem.ShowSelectionPosition(cFirstWindowPoint);
 
 			SelectionResultsIterator cIter = cFilteredSelResult.GetIterator();
 			// 첫번째 요소 다음을 선택한다.
@@ -458,11 +458,11 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 					cNextItem.ShowSelectionPosition(cLineWordlPoint);
 					cNextItem.ShowSelectionPosition(cLineWindowPoint);
 
-					// TRACE(L"Face Line Distance: %f, %f\n", fabs(cFaceWindowPoint.z - cLineWindowPoint.z), cLineWordlPoint.DistanceWith(cFaceWordlPoint));
+					TRACE(L"Face Line Distance: %f, %f\n", fabs(cFirstWindowPoint.z - cLineWindowPoint.z), cLineWordlPoint.DistanceWith(cFirstWordlPoint));
 
 					// 첫번째에 Shell이 선택되고 다른 Item에서 Line이 공차내로 들어오면 Shell 대신 Line을 선택하고 끝낸다.
-					if(0.001 > fabs(cFaceWindowPoint.z - cLineWindowPoint.z)) {
-						if(2.0 > cLineWordlPoint.DistanceWith(cFaceWordlPoint)) {
+					if(0.001 > fabs(cFirstWindowPoint.z - cLineWindowPoint.z)) {
+						if(2.0 > cLineWordlPoint.DistanceWith(cFirstWordlPoint)) {
 							cFrontItem = cNextItem;
 							break;
 						}
@@ -573,8 +573,8 @@ void KERNEL::Command::HighlightObjectSnapImpl::ApplySelectionFilter(H3DF::Select
 
 	while (true == cIter.IsValid()) {
 		SelectionItem cNextItem = cIter.GetItem();
-
-		if (H3DF::Type::LineKey == cNextItem.Type()) {
+		H3DF::Type eType = cNextItem.Type();
+		if (H3DF::Type::LineKey == eType) {
 
 			cOutSelections.PushBack(cNextItem);
 
@@ -602,7 +602,7 @@ void KERNEL::Command::HighlightObjectSnapImpl::ApplySelectionFilter(H3DF::Select
 //			}
 */
 		}
-		else if (H3DF::Type::ShellKey == cNextItem.Type()) {
+		else if (H3DF::Type::ShellKey == eType) {
 			if (m_nSelFilter & (DWORD)SelectionFilter::Type::Solid) {
 
 				Key cItemKey;

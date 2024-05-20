@@ -7,7 +7,7 @@
 #include "Command.Attribute.h"
 #include "Command.Select.h"
 
-#include "Kernel.DocView.h"
+#include "Kernel.Session.h"
 #include "Impl/Kernel.DocViewImpl.h"
 
 #include "Signal.Connector.h"
@@ -48,7 +48,7 @@ namespace KERNEL
 		class ModelPanelImpl : public CommandImpl
 		{
 		public:
-			ModelPanelImpl(const DocView * pcInDocView);
+			ModelPanelImpl(const Session * pcInSession);
 
 			void Copy(ModelPanelImpl * pcInThat) {
 				CommandImpl::Copy(pcInThat);
@@ -80,8 +80,8 @@ namespace KERNEL
 	}
 }
 
-KERNEL::Command::ModelPanelImpl::ModelPanelImpl(const DocView * pcInDocView) :
-	CommandImpl(pcInDocView)
+KERNEL::Command::ModelPanelImpl::ModelPanelImpl(const Session * pcInSession) :
+	CommandImpl(pcInSession)
 {
 
 }
@@ -451,9 +451,9 @@ Component * KERNEL::Command::ModelPanelImpl::GetPmiGroupComponent()
 
 //== ModelPanel 관련 함수 ============================================================================
 
-KERNEL::Command::ModelPanel::ModelPanel(const DocView * pcInDocView)
+KERNEL::Command::ModelPanel::ModelPanel(const Session * pcInSession)
 {
-	auto pcImpl = new ModelPanelImpl(pcInDocView);
+	auto pcImpl = new ModelPanelImpl(pcInSession);
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;

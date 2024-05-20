@@ -42,15 +42,15 @@ void KERNEL::Application::OnFileOptionReference(Json::Object& data)
 	TheFileOptions.SetReference(data);
 }
 
-DocView * KERNEL::Application::GetDocView(int nId)
+Session * KERNEL::Application::GetDocView(int nId)
 {
 	ApplicationImpl * pcImpl = (ApplicationImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	DocView * pcDocView = pcImpl->m_mapDocView[nId];
+	Session * pcDocView = pcImpl->m_mapDocView[nId];
 
 	if (nullptr == pcDocView) {
-		pcDocView = new DocView();
+		pcDocView = new Session();
 		if (nullptr == pcDocView) {
 			DEBUG_STOP;
 			return nullptr;
@@ -69,7 +69,7 @@ void KERNEL::Application::RemoveDocView(int nId)
 	ApplicationImpl * pcImpl = (ApplicationImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	DocView * pcDocView = pcImpl->m_mapDocView[nId];
+	Session * pcDocView = pcImpl->m_mapDocView[nId];
 
 	if (nullptr != pcDocView) {
 		delete pcDocView;

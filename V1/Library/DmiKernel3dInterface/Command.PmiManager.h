@@ -4,12 +4,13 @@
 #include <3DF/Math.h>
 
 #include "Command.h"
+#include "Command.Set.h"
 
 namespace KERNEL
 {
 	namespace Command
 	{
-		class PmiManager : public CommandBase
+		class PmiManager : public Set
 		{
 		public:
 			PmiManager() = default;

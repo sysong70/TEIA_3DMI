@@ -1,7 +1,7 @@
 ﻿#include <StdAfx.h>
 
 #include "Kernel.DocViewImpl.h"
-#include "../Kernel.DocView.h"
+#include "../Kernel.Session.h"
 
 #include "../Command.Camera.h"
 #include "../Command.VisualEffects.h"
@@ -93,24 +93,24 @@ void KERNEL::DocViewImpl::CancelCommands()
 
 //== Operator 관련 함수 ==============================================================================
 
-void KERNEL::DocViewImpl::AllocationOperator(const DocView * pcInDocView)
+void KERNEL::DocViewImpl::AllocationOperator(const Session * pcInSession)
 {
-	m_apcOperator[(int)KERNEL::Command::Type::VisualEffects] = new KERNEL::Command::VisualEffects(pcInDocView);
+	m_apcOperator[(int)KERNEL::Command::Type::VisualEffects] = new KERNEL::Command::VisualEffects(pcInSession);
 
-	m_apcOperator[(int)KERNEL::Command::Type::Attribute] = new KERNEL::Command::Attribute(pcInDocView);
+	m_apcOperator[(int)KERNEL::Command::Type::Attribute] = new KERNEL::Command::Attribute(pcInSession);
 
-	m_apcOperator[(int)KERNEL::Command::Type::Camera] = new KERNEL::Command::Camera(pcInDocView);
+	m_apcOperator[(int)KERNEL::Command::Type::Camera] = new KERNEL::Command::Camera(pcInSession);
 
-	m_apcOperator[(int)KERNEL::Command::Type::Select] = new KERNEL::Command::Select(pcInDocView);
+	m_apcOperator[(int)KERNEL::Command::Type::Select] = new KERNEL::Command::Select(pcInSession);
 	
-	m_apcOperator[(int)KERNEL::Command::Type::ModelPanel] = new KERNEL::Command::ModelPanel(pcInDocView);
+	m_apcOperator[(int)KERNEL::Command::Type::ModelPanel] = new KERNEL::Command::ModelPanel(pcInSession);
 
 	// Navigation Cube에서 사용하는 DynHighlightControl을 설정한다. Cube에서 선택된 부분을 Unhighlight하기 위함.
 	KERNEL::Command::Select * pcSelect = (KERNEL::Command::Select *)m_apcOperator[(int)KERNEL::Command::Type::Select];
 	GetCanvas().GetFrontView().GetNavigationCube().SetHighlightControl(pcSelect->DynHighlightControl());
 }
 
-KERNEL::Command::CommandBase * KERNEL::DocViewImpl::GetOperator(Command::Type eInType)
+KERNEL::Command::Set * KERNEL::DocViewImpl::GetOperator(Command::Type eInType)
 { 
 	return m_apcOperator[(int)eInType]; 
 }

@@ -7,7 +7,7 @@
 
 namespace KERNEL
 {
-	class API_KERNEL Application : public Object
+	class Application : public Object
 	{
 	public:
 		Application();
@@ -20,7 +20,7 @@ namespace KERNEL
 		//:Ken - 20240131
 		void OnFileOptionReference(Json::Object& data);
 
-		DocView * GetDocView(int nId);
+		Session * GetDocView(int nId);
 		void RemoveDocView(int nId);
 
 	protected:

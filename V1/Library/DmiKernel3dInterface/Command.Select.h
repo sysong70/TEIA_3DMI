@@ -4,6 +4,7 @@
 #include <3DF/Math.h>
 
 #include "Command.h"
+#include "Command.Set.h"
 
 #include "../Signal/Signal.h"
 
@@ -15,10 +16,10 @@ namespace KERNEL
 	{
 		class ModelPanel;
 
-		class Select : public CommandBase
+		class Select : public Set
 		{
 		public:
-			Select(const DocView * pcInDocView);
+			Select(const Session * pcInSession);
 
 			int MouseMove(HEventInfo & cInEvent);
 

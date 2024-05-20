@@ -37,6 +37,9 @@
     <Filter Include="Command\Impl">
       <UniqueIdentifier>{6a1a0a9c-47cf-471f-9e3f-dd4567b680f2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Command\Base">
+      <UniqueIdentifier>{8c47f93e-7a00-48eb-bfa5-3a8bb9fca232}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -69,16 +72,13 @@
     <ClInclude Include="Kernel.h">
       <Filter>Kernel</Filter>
     </ClInclude>
-    <ClInclude Include="Kernel.DocView.h">
+    <ClInclude Include="Kernel.Session.h">
       <Filter>Kernel</Filter>
     </ClInclude>
     <ClInclude Include="Object.h">
       <Filter>Kernel</Filter>
     </ClInclude>
     <ClInclude Include="Command.VisualEffects.h">
-      <Filter>Command</Filter>
-    </ClInclude>
-    <ClInclude Include="Command.h">
       <Filter>Command</Filter>
     </ClInclude>
     <ClInclude Include="Impl\Kernel.DocViewImpl.h">
@@ -135,6 +135,15 @@
     <ClInclude Include="Impl\Command.ManagerImpl.h">
       <Filter>Command\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="Command.h">
+      <Filter>Command\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.Step.h">
+      <Filter>Command\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.Set.h">
+      <Filter>Command\Base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -170,16 +179,13 @@
     <ClCompile Include="Kernel.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
-    <ClCompile Include="Kernel.DocView.cpp">
+    <ClCompile Include="Kernel.Session.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
     <ClCompile Include="Object.cpp">
       <Filter>Kernel</Filter>
     </ClCompile>
     <ClCompile Include="Command.VisualEffects.cpp">
-      <Filter>Command</Filter>
-    </ClCompile>
-    <ClCompile Include="Command.cpp">
       <Filter>Command</Filter>
     </ClCompile>
     <ClCompile Include="Impl\Kernel.DocViewImpl.cpp">
@@ -235,6 +241,15 @@
     </ClCompile>
     <ClCompile Include="Impl\Command.ManagerImpl.cpp">
       <Filter>Command\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.cpp">
+      <Filter>Command\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.Step.cpp">
+      <Filter>Command\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.Set.cpp">
+      <Filter>Command\Base</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

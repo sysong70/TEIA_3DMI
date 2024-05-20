@@ -4,8 +4,6 @@
 
 namespace KERNEL
 {
-	class DocViewImpl;
-
 	namespace Command
 	{
 		enum class Type
@@ -16,12 +14,6 @@ namespace KERNEL
 			Select,
 			ModelPanel,
 			Count
-		};
-
-		class API_KERNEL CommandBase : public Object
-		{
-		public:
-			CommandBase() = default;
 		};
 	}
 }

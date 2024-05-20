@@ -9,7 +9,7 @@
 
 #include "Session.h"
 
-#include "../DmiKernel3dInterface/Kernel.DocView.h"
+#include "../DmiKernel3dInterface/Kernel.Session.h"
 
 #include "../Signal/Signal.h"
 #include "../Common/Common_Define.h"

@@ -72,7 +72,7 @@ namespace KERNEL
 	};
 
 	class Object;
-	class DocView;
+	class Session;
 
 	namespace Command
 	{

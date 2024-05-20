@@ -3,7 +3,7 @@
 #include "../Kernel.h"
 
 #include "../Kernel.Application.h"
-#include "../Kernel.DocView.h"
+#include "../Kernel.Session.h"
 
 // #include <3DF/3DF.h>
 // #include <3DF/Math.h>
@@ -29,7 +29,7 @@ namespace KERNEL
 			KERNEL::Application m_cApplication;
 			int m_nThreadFileOpenViewId = -1;
 
-			KERNEL::DocView * GetDocView(int nId);
+			KERNEL::Session * GetDocView(int nId);
 
 			void ViewMouseSignal(Json::Object & cInObject, int nViewId);
 			void ViewKeyboardSignal(Json::Object & cInObject, int nViewId);

@@ -4,6 +4,7 @@
 #include <3DF/Math.h>
 
 #include "Command.h"
+#include "Command.Set.h"
 
 #include "../Signal/Signal.h"
 
@@ -11,10 +12,10 @@ namespace KERNEL
 {
 	namespace Command
 	{
-		class Attribute : public CommandBase
+		class Attribute : public Set
 		{
 		public:
-			Attribute(const DocView * pcInDocView);
+			Attribute(const Session * pcInSession);
 
 			bool ShowAll();
 			bool Show(H3DF::Component * pcInComponent);

@@ -13,7 +13,7 @@ using namespace KERNEL;
 
 KERNEL::Command::Manager::Manager()
 {
-	m_pcImpl = new Command::ManagerImpl();
+	m_pcImpl = new KERNEL::Command::ManagerImpl();
 }
 
 void KERNEL::Command::Manager::ExecuteApplicationSignal(Json::Object & cInObject)
@@ -136,7 +136,7 @@ void KERNEL::Command::Manager::ViewInitialize(Json::Object & cInObject, Signal::
 
 	int nViewId = cInObject.GetInteger(SKW_VIEWID);
 
-	DocView * pcDocView = pcImpl->GetDocView(nViewId);
+	Session * pcDocView = pcImpl->GetDocView(nViewId);
 	DEBUG_VALID(pcDocView);
 
 	pcDocView->SetDelivery(cInstance);
@@ -154,7 +154,7 @@ void KERNEL::Command::Manager::ThreadFileOpen()
 		return;
 	}
 
-	DocView * pcDocView = pcImpl->GetDocView(nViewId);
+	Session * pcDocView = pcImpl->GetDocView(nViewId);
 	DEBUG_VALID(pcDocView);
 
 	pcDocView->ThreadFileOpen();
@@ -183,7 +183,7 @@ void KERNEL::Command::Manager::CommandRequest(Json::Object & cInObject, int nVie
 	ManagerImpl * pcImpl = (ManagerImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	DocView * pcDocView = pcImpl->GetDocView(nViewId);
+	Session * pcDocView = pcImpl->GetDocView(nViewId);
 	DEBUG_VALID(pcDocView);
 
 	pcDocView->CommandRequest(cInObject);
@@ -194,7 +194,9 @@ void KERNEL::Command::Manager::CommandChange(Json::Object & cInObject, int nView
 	ManagerImpl * pcImpl = (ManagerImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	DocView * pcDocView = pcImpl->GetDocView(nViewId);
+	int nId = cInObject.GetInteger(SKW_ID);
+
+	Session * pcDocView = pcImpl->GetDocView(nViewId);
 	DEBUG_VALID(pcDocView);
 
 	pcDocView->CommandChange(cInObject);
@@ -205,7 +207,7 @@ void KERNEL::Command::Manager::ModelPanelSignal(Json::Object & cInObject, int nV
 	ManagerImpl * pcImpl = (ManagerImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	DocView * pcDocView = pcImpl->GetDocView(nViewId);
+	Session * pcDocView = pcImpl->GetDocView(nViewId);
 	DEBUG_VALID(pcDocView);
 
 	pcDocView->ModelPanelSignal(cInObject);
@@ -216,7 +218,7 @@ void KERNEL::Command::Manager::ViewPaint(Json::Object & cInObject, int nViewId)
 	ManagerImpl * pcImpl = (ManagerImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	DocView * pcDocView = pcImpl->GetDocView(nViewId);
+	Session * pcDocView = pcImpl->GetDocView(nViewId);
 	DEBUG_VALID(pcDocView);
 
 	pcDocView->Paint(cInObject);
@@ -227,7 +229,7 @@ void KERNEL::Command::Manager::ViewResize(Json::Object & cInObject, int nViewId)
 	ManagerImpl * pcImpl = (ManagerImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	DocView * pcDocView = pcImpl->GetDocView(nViewId);
+	Session * pcDocView = pcImpl->GetDocView(nViewId);
 	DEBUG_VALID(pcDocView);
 
 	pcDocView->Resize(cInObject);

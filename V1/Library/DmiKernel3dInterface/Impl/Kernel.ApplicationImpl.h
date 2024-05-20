@@ -6,7 +6,7 @@
 
 #include "../../Dmi3dfInterface/Sprocket/3DF.Application.h"
 
-#include "../Kernel.DocView.h"
+#include "../Kernel.Session.h"
 
 #include <map>
 
@@ -15,7 +15,7 @@ namespace KERNEL
 	class ApplicationImpl : public Impl
 	{
 	public:
-		std::map<int, DocView *> m_mapDocView;
+		std::map<int, Session *> m_mapDocView;
 		H3DF::Application m_cApplication;
 	};
 };

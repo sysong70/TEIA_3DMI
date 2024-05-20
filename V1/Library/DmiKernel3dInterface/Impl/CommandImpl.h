@@ -17,7 +17,7 @@ namespace KERNEL
 		class CommandImpl : public Impl
 		{
 		public:
-			CommandImpl(const DocView * pcInDocView);
+			CommandImpl(const Session * pcInSession);
 
 			H3DF::WindowKey & Window();
 			const H3DF::WindowKey & Window() const;
@@ -30,8 +30,8 @@ namespace KERNEL
 			Signal::Delivery & Delivery();
 			const Signal::Delivery & Delivery() const;
 
-			DocView & GetDocView();
-			const DocView & GetDocView() const;
+			Session & GetDocView();
+			const Session & GetDocView() const;
 
 			H3DF::ModelImpl & GetModelImpl();
 			const H3DF::ModelImpl & GetModelImpl() const;
@@ -42,7 +42,7 @@ namespace KERNEL
 			void Updated();
 
 		private:
-			const DocView * m_pcDocView = nullptr;
+			const Session * m_pcSession = nullptr;
 		};
 	}
 }

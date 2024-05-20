@@ -13,7 +13,6 @@ namespace SESSION
 	{
 	public:
 		Session(KERNEL::Command::Manager * pcCommandManager, int nId);
-		//Session(KERNEL::Application & cApplication, int nId);
 		~Session();
 
 		int Id() const;
@@ -38,6 +37,6 @@ namespace SESSION
 	private:
 		int m_nSessionId = -1;
 		KERNEL::Command::Manager * m_pcCommandManager = nullptr;
-		KERNEL::DocView * m_pcDocView = nullptr;
+		// KERNEL::DocView * m_pcDocView = nullptr;
 	};
 }

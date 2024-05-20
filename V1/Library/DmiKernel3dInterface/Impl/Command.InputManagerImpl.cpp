@@ -2,7 +2,7 @@
 
 #include "CommandImpl.h"
 
-#include "../Kernel.DocView.h"
+#include "../Kernel.Session.h"
 #include "Kernel.DocViewImpl.h"
 
 #include <3DF/Window.h>

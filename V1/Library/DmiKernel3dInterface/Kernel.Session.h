@@ -11,10 +11,10 @@ namespace KERNEL
 {
 	// Kernel View는 CDocument의 CView의 신호를 처리하는 역활을 한다.
 	// CDoucment 대응하는 함수는 없기 때문에, Kernel View에서 처리하도록 한다.
-	class DocView : public Object
+	class Session : public Object
 	{
 	public:
-		DocView();
+		Session();
 
 		void SetDelivery(Signal::Delivery & cDelivery);
 

@@ -3,6 +3,7 @@
 #include <3DF/3DF.h>
 
 #include "Command.h"
+#include "Command.Set.h"
 
 #include "../Signal/Signal.h"
 
@@ -12,10 +13,10 @@ namespace KERNEL
 	{
 		class Select;
 
-		class ModelPanel : public CommandBase
+		class ModelPanel : public Set
 		{
 		public:
-			ModelPanel(const DocView * pcInDocView);
+			ModelPanel(const Session * pcInSession);
 
 			void Initialize(H3DF::CADModel & cInCadModel);
 			void Initialize(CString strFilePathName);
@@ -27,7 +28,6 @@ namespace KERNEL
 			void Checked(H3DF::SelectionResults & cInResults, bool bInChecked);
 			void CheckedAll(bool bChecked);
 			void CheckedUpdate(H3DF::Component & cInComponent);
-
 
 		protected:
 			void OnItemExpandedSignal(Json::Object & cInObject);

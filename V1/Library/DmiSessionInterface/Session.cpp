@@ -14,13 +14,6 @@ SESSION::Session::Session(KERNEL::Command::Manager * pcCommandManager, int nId)
 	m_nSessionId = nId;
 	m_pcCommandManager = pcCommandManager;
 }
-/*
-SESSION::Session::Session(KERNEL::Application & cApplication, int nId)
-{
-	m_nSessionId = nId;
-	m_pcDocView = cApplication.GetDocView(nId);
-}
-*/
 
 SESSION::Session::~Session()
 {

@@ -4,7 +4,7 @@
 
 #include "Impl/CommandImpl.h"
 
-#include "Kernel.DocView.h"
+#include "Kernel.Session.h"
 #include "Impl/Kernel.DocViewImpl.h"
 
 #include "Signal.Connector.h"
@@ -42,7 +42,7 @@ namespace KERNEL
 		class AttributeImpl : public CommandImpl
 		{
 		public:
-			AttributeImpl(const DocView * pcInDocView);
+			AttributeImpl(const Session * pcInSession);
 
 			void Copy(AttributeImpl * pcInThat) {
 				CommandImpl::Copy(pcInThat);
@@ -62,8 +62,8 @@ namespace KERNEL
 	}
 }
 
-KERNEL::Command::AttributeImpl::AttributeImpl(const DocView * pcInDocView)
-	: CommandImpl(pcInDocView)
+KERNEL::Command::AttributeImpl::AttributeImpl(const Session * pcInSession)
+	: CommandImpl(pcInSession)
 {
 }
 
@@ -226,9 +226,9 @@ void KERNEL::Command::AttributeImpl::ResetShowComponent(H3DF::Component & cInCom
 
 //== Attribute class ==============================================================================
 
-KERNEL::Command::Attribute::Attribute(const DocView * pcInDocView)
+KERNEL::Command::Attribute::Attribute(const Session * pcInSession)
 {
-	AttributeImpl * pcImpl = new AttributeImpl(pcInDocView);
+	AttributeImpl * pcImpl = new AttributeImpl(pcInSession);
 	DEBUG_VALID(pcImpl);
 
 	m_pcImpl = pcImpl;

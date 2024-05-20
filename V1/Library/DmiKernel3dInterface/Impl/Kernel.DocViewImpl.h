@@ -54,8 +54,8 @@ namespace KERNEL
 		void CancelCommands();
 
 		//== Operator 관련 함수 ======================================================================
-		void AllocationOperator(const DocView * pcInDocView);
-		Command::CommandBase * GetOperator(Command::Type eInType);
+		void AllocationOperator(const Session * pcInSession);
+		Command::Set * GetOperator(Command::Type eInType);
 
 		Command::Attribute & Attribute();
 		Command::Camera & Camera();
@@ -76,7 +76,7 @@ namespace KERNEL
 		void ChangeVisualEffects(Json::Object & cInObject);
 
 	private:
-		Command::CommandBase * m_apcOperator[(int)Command::Type::Count];
+		Command::Set * m_apcOperator[(int)Command::Type::Count];
 		const Signal::Delivery * m_pcDelivery = nullptr;
 
 		H3DF::CADModel m_cCADModel;

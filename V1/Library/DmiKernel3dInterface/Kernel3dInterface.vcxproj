@@ -130,6 +130,8 @@
     <ClInclude Include="Command.Manager.h" />
     <ClInclude Include="Command.MeasureManager.h" />
     <ClInclude Include="Command.PmiManager.h" />
+    <ClInclude Include="Command.Set.h" />
+    <ClInclude Include="Command.Step.h" />
     <ClInclude Include="Impl\Command.InputManagerImpl.h" />
     <ClInclude Include="Impl\Command.ManagerImpl.h" />
     <ClInclude Include="Impl\Kernel.ApplicationImpl.h" />
@@ -138,7 +140,7 @@
     <ClInclude Include="Impl\CommandImpl.h" />
     <ClInclude Include="Kernel.Application.h" />
     <ClInclude Include="Kernel.h" />
-    <ClInclude Include="Kernel.DocView.h" />
+    <ClInclude Include="Kernel.Session.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Command.Camera.h" />
     <ClInclude Include="Command.h" />
@@ -169,6 +171,8 @@
     <ClCompile Include="Command.Manager.cpp" />
     <ClCompile Include="Command.MeasureManager.cpp" />
     <ClCompile Include="Command.PmiManager.cpp" />
+    <ClCompile Include="Command.Set.cpp" />
+    <ClCompile Include="Command.Step.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Impl\Command.InputManagerImpl.cpp" />
     <ClCompile Include="Impl\Command.ManagerImpl.cpp" />
@@ -178,7 +182,7 @@
     <ClCompile Include="Impl\CommandImpl.cpp" />
     <ClCompile Include="Kernel.Application.cpp" />
     <ClCompile Include="Kernel.cpp" />
-    <ClCompile Include="Kernel.DocView.cpp" />
+    <ClCompile Include="Kernel.Session.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Command.Camera.cpp" />
     <ClCompile Include="Command.cpp" />
