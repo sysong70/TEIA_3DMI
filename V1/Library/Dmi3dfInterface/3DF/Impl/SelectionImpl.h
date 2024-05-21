@@ -135,6 +135,7 @@ namespace H3DF
 
 		WorldPoint m_cWorldPoint;
 		WindowPoint m_cWindowPoint;
+		PixelPoint m_cPixelPoint;
 
 		WindowKey * GetWindow() { return (WindowKey *) m_pcWindow; }
 		const WindowKey * m_pcWindow = nullptr;

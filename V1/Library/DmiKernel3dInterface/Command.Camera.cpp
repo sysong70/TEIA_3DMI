@@ -234,7 +234,7 @@ void KERNEL::Command::Camera::SetCameraFitSelection(H3DF::MatrixKit & cInMatrix,
 	H3DF::BoundingKit cBounding;
 	if (false == cInSegment.ShowBounding(cBounding)) {
 		// 입력된 Segment를 이용해서, Bounding을 구하지 못한 경우 Model의 Bounding을 구한다.
-		SegmentKey cModelSegment = pcImpl->GetDocView().Canvas().GetModel().GetSegmentKey();
+		SegmentKey cModelSegment = pcImpl->GetSession().Canvas().GetModel().GetSegmentKey();
 		SetCameraFitSelection(cInMatrix, cModelSegment);
 		return;
 	}

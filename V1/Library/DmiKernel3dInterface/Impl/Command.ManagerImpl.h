@@ -29,7 +29,7 @@ namespace KERNEL
 			KERNEL::Application m_cApplication;
 			int m_nThreadFileOpenViewId = -1;
 
-			KERNEL::Session * GetDocView(int nId);
+			KERNEL::Session * GetSession(int nId);
 
 			void ViewMouseSignal(Json::Object & cInObject, int nViewId);
 			void ViewKeyboardSignal(Json::Object & cInObject, int nViewId);

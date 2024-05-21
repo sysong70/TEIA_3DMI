@@ -3,7 +3,7 @@
 #include "CommandImpl.h"
 
 #include "../Kernel.Session.h"
-#include "Kernel.DocViewImpl.h"
+#include "Kernel.SessionImpl.h"
 
 #include <3DF/Window.h>
 #include <Sprocket/3DF.View.h>
@@ -24,7 +24,7 @@ H3DF::WindowKey & KERNEL::Command::CommandImpl::Window()
 {
 	DEBUG_VALID(m_pcSession);
 
-	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>((DocViewImpl *)m_pcSession->GetImpl());
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *)m_pcSession->GetImpl());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetCanvas().GetFrontView().GetWindowKey();
@@ -34,7 +34,7 @@ const H3DF::WindowKey & KERNEL::Command::CommandImpl::Window() const
 {
 	DEBUG_VALID(m_pcSession);
 
-	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>((DocViewImpl *)m_pcSession->GetImpl());
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *)m_pcSession->GetImpl());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetCanvas().GetFrontView().GetWindowKey();
@@ -44,7 +44,7 @@ H3DF::View & KERNEL::Command::CommandImpl::View()
 {
 	DEBUG_VALID(m_pcSession);
 
-	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>((DocViewImpl *)m_pcSession->GetImpl());
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *)m_pcSession->GetImpl());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetCanvas().GetFrontView();
@@ -54,7 +54,7 @@ const H3DF::View & KERNEL::Command::CommandImpl::View() const
 {
 	DEBUG_VALID(m_pcSession);
 
-	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>((DocViewImpl *)m_pcSession->GetImpl());
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *)m_pcSession->GetImpl());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetCanvas().GetFrontView();
@@ -72,7 +72,7 @@ Signal::Delivery & KERNEL::Command::CommandImpl::Delivery()
 {
 	DEBUG_VALID(m_pcSession);
 
-	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>((DocViewImpl *)m_pcSession->GetImpl());
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *)m_pcSession->GetImpl());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->Delivery();
@@ -82,19 +82,19 @@ const Signal::Delivery & KERNEL::Command::CommandImpl::Delivery() const
 {
 	DEBUG_VALID(m_pcSession);
 
-	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>((DocViewImpl *)m_pcSession->GetImpl());
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *)m_pcSession->GetImpl());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->Delivery();
 }
 
-Session & KERNEL::Command::CommandImpl::GetDocView()
+Session & KERNEL::Command::CommandImpl::GetSession()
 {
 	DEBUG_VALID(m_pcSession);
 	return *((KERNEL::Session *)m_pcSession);
 }
 
-const Session & KERNEL::Command::CommandImpl::GetDocView() const
+const Session & KERNEL::Command::CommandImpl::GetSession() const
 {
 	DEBUG_VALID(m_pcSession);
 	return *m_pcSession;
@@ -104,7 +104,7 @@ H3DF::ModelImpl & KERNEL::Command::CommandImpl::GetModelImpl()
 {
 	DEBUG_VALID(m_pcSession);
 
-	DocViewImpl * pcDocImpl = (DocViewImpl *)GetDocView().GetImpl();
+	SessionImpl * pcDocImpl = (SessionImpl *)GetSession().GetImpl();
 	DEBUG_VALID(pcDocImpl);
 
 	H3DF::ModelImpl * pcModelImpl = (H3DF::ModelImpl *)pcDocImpl->GetModel().GetImpl();
@@ -117,7 +117,7 @@ const H3DF::ModelImpl & KERNEL::Command::CommandImpl::GetModelImpl() const
 {
 	DEBUG_VALID(m_pcSession);
 
-	DocViewImpl * pcDocImpl = (DocViewImpl *)GetDocView().GetImpl();
+	SessionImpl * pcDocImpl = (SessionImpl *)GetSession().GetImpl();
 	DEBUG_VALID(pcDocImpl);
 
 	H3DF::ModelImpl * pcModelImpl = (H3DF::ModelImpl *)pcDocImpl->GetModel().GetImpl();
@@ -129,9 +129,9 @@ const H3DF::ModelImpl & KERNEL::Command::CommandImpl::GetModelImpl() const
 // Update하기전에 Hightlight된 것들을 모두 Unhighlight하고, SnapItem을 모두 Reset한다.
 void KERNEL::Command::CommandImpl::PrepareUpdate()
 {
-	GetDocView().Canvas().GetFrontView().SuppressUpdate(true);
+	GetSession().Canvas().GetFrontView().SuppressUpdate(true);
 
-	DocViewImpl * pcDocViewImpl = dynamic_cast<DocViewImpl *>(GetDocView().GetImpl());
+	SessionImpl * pcDocViewImpl = dynamic_cast<SessionImpl *>(GetSession().GetImpl());
 	pcDocViewImpl->Select().UnhighlightEverything();
 	pcDocViewImpl->Select().ResetSnapItems(false);
 }
@@ -139,8 +139,8 @@ void KERNEL::Command::CommandImpl::PrepareUpdate()
 // Update가 완료되면, View를 Update한다.
 void KERNEL::Command::CommandImpl::Updated()
 {
-	GetDocView().Canvas().GetFrontView().SuppressUpdate(false);
-	GetDocView().Canvas().GetFrontView().Update();
+	GetSession().Canvas().GetFrontView().SuppressUpdate(false);
+	GetSession().Canvas().GetFrontView().Update();
 }
 
 

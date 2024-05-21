@@ -5,7 +5,7 @@
 #include "Impl/CommandImpl.h"
 
 #include "Kernel.Session.h"
-#include "Impl/Kernel.DocViewImpl.h"
+#include "Impl/Kernel.SessionImpl.h"
 
 #include "Signal.Connector.h"
 #include "../Signal/Signal.h"
@@ -150,7 +150,7 @@ KERNEL::Command::SelectImpl::SelectImpl(const Session * pcInSession) :
 
 KERNEL::Command::ModelPanel & KERNEL::Command::SelectImpl::ModelPanel()
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)GetDocView().GetImpl();
+	SessionImpl * pcImpl = (SessionImpl *)GetSession().GetImpl();
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->ModelPanel();

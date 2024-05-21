@@ -135,7 +135,7 @@
     <ClInclude Include="Impl\Command.InputManagerImpl.h" />
     <ClInclude Include="Impl\Command.ManagerImpl.h" />
     <ClInclude Include="Impl\Kernel.ApplicationImpl.h" />
-    <ClInclude Include="Impl\Kernel.DocViewImpl.h" />
+    <ClInclude Include="Impl\Kernel.SessionImpl.h" />
     <ClInclude Include="Impl\Command.HighlightObjectSnapImpl.h" />
     <ClInclude Include="Impl\CommandImpl.h" />
     <ClInclude Include="Kernel.Application.h" />
@@ -177,7 +177,7 @@
     <ClCompile Include="Impl\Command.InputManagerImpl.cpp" />
     <ClCompile Include="Impl\Command.ManagerImpl.cpp" />
     <ClCompile Include="Impl\Kernel.ApplicationImpl.cpp" />
-    <ClCompile Include="Impl\Kernel.DocViewImpl.cpp" />
+    <ClCompile Include="Impl\Kernel.SessionImpl.cpp" />
     <ClCompile Include="Impl\Command.HighlightObjectSnapImpl.cpp" />
     <ClCompile Include="Impl\CommandImpl.cpp" />
     <ClCompile Include="Kernel.Application.cpp" />

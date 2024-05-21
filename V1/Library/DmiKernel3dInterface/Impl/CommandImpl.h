@@ -30,8 +30,8 @@ namespace KERNEL
 			Signal::Delivery & Delivery();
 			const Signal::Delivery & Delivery() const;
 
-			Session & GetDocView();
-			const Session & GetDocView() const;
+			Session & GetSession();
+			const Session & GetSession() const;
 
 			H3DF::ModelImpl & GetModelImpl();
 			const H3DF::ModelImpl & GetModelImpl() const;

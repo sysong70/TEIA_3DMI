@@ -375,7 +375,7 @@ int KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(HEventInfo & c
 }
 
 // 2.1 Dynamic Highlight 처리
-bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint cMousePoint, SelectionItem & cOutSelection)
+bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint cInWindowPoint, SelectionItem & cOutSelection)
 {
 	BaseView * pcView = Window().GetBaseView();
 	DEBUG_VALID(pcView);
@@ -400,10 +400,10 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 	cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(15).SetInternalLimit(0).SetProximity(0.2f); // .SetBias(Selection::Bias::Lines);
 
 	SelectionResults cSelections;
-	size_t nResult = Window().GetSelectionControl().SelectByPoint(cMousePoint, cSelectOption, cSelections);
+	size_t nResult = Window().GetSelectionControl().SelectByPoint(cInWindowPoint, cSelectOption, cSelections);
 	
 // 	cSelectOption.SetLevel(Selection::Level::Segment);
-// 	nResult = Window().GetSelectionControl().SelectByPoint(cMousePoint, cSelectOption, cSelections);
+// 	nResult = Window().GetelectionControl().SelectByPoint(cMousePoint, cSelectOption, cSelections);
 
 	SelectionResults cFilteredSelResult;
 	ApplySelectionFilter(cSelections, cFilteredSelResult);
@@ -425,6 +425,24 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 
 	// 선택결과를 Z값으로 Sort한다.
 	cFilteredSelResult.Sort();
+#ifdef _DEBUG
+	TRACE(L"Selection Count: %d", nResult);
+	// 선택된 요소를 출력한다.
+	SelectionResultsIterator cIter = cFilteredSelResult.GetIterator();
+	while (true == cIter.IsValid()) {
+		SelectionItem cItem = cIter.GetItem();
+		H3DF::Type eType = cItem.Type();
+
+		WorldPoint cWordlPoint;
+		WindowPoint cWindowPoint;
+		cItem.ShowSelectionPosition(cWordlPoint);
+		cItem.ShowSelectionPosition(cWindowPoint);
+
+		TRACE(L"Item Type: %s / %f, %f, %f", Utility::GetTypeString(eType), cWindowPoint.x, cWindowPoint.y, cWindowPoint.z);
+		cIter.Next();
+	}
+
+#endif
 
 	// 첫번째 요소를 저장한다.
 	SelectionItem cFrontItem;
@@ -438,34 +456,35 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 		H3DF::Type eType = cFrontItem.Type();
 
 		// 1. 첫번째 요소가 Shell인 경우 다음 요소에서 Line을 찾는다. 
-		if (H3DF::Type::ShellKey == eType || H3DF::Type::SegmentKey == eType) {
-			WorldPoint cFirstWordlPoint;
+		if (H3DF::Type::ShellKey == eType || H3DF::Type::SegmentKey == eType)
+		{
 			WindowPoint cFirstWindowPoint;
-			cFrontItem.ShowSelectionPosition(cFirstWordlPoint);
 			cFrontItem.ShowSelectionPosition(cFirstWindowPoint);
 
 			SelectionResultsIterator cIter = cFilteredSelResult.GetIterator();
 			// 첫번째 요소 다음을 선택한다.
 			cIter.Next();
 
+			double dTolerance = cInWindowPoint.DistanceWith(cFirstWindowPoint) / 10.0;
+
 			while (true == cIter.IsValid()) {
 				SelectionItem cNextItem = cIter.GetItem();
 				// Line을 선택한다. Line을 우선적으로 선택하기 위한 것임.
 				// Line과 첫번째 Shell과 선택점과의 Z값을 비교한다. 값의 공차가 Proximity보다 작은 경우 Line을 선택한다.
 				if (H3DF::Type::LineKey == cNextItem.Type()) {
-					WorldPoint cLineWordlPoint;
 					WindowPoint cLineWindowPoint;
-					cNextItem.ShowSelectionPosition(cLineWordlPoint);
 					cNextItem.ShowSelectionPosition(cLineWindowPoint);
 
-					TRACE(L"Face Line Distance: %f, %f\n", fabs(cFirstWindowPoint.z - cLineWindowPoint.z), cLineWordlPoint.DistanceWith(cFirstWordlPoint));
+					TRACE(L"Face Line Distance: %f, %f, %f", cLineWindowPoint.z - cFirstWindowPoint.z, cLineWindowPoint.DistanceWith(cFirstWindowPoint), dTolerance);
 
 					// 첫번째에 Shell이 선택되고 다른 Item에서 Line이 공차내로 들어오면 Shell 대신 Line을 선택하고 끝낸다.
-					if(0.001 > fabs(cFirstWindowPoint.z - cLineWindowPoint.z)) {
-						if(2.0 > cLineWordlPoint.DistanceWith(cFirstWordlPoint)) {
+					// Z값 기준으로 하부에 있는 Line들이 선택되는 경우를 대비해서, z값을 비교한다.
+					if(dTolerance > cLineWindowPoint.z- cFirstWindowPoint.z) {
+					//if (0.05 > cInWindowPoint.DistanceWith(cLineWindowPoint)) 
+						//if(2.0 > cLineWordlPoint.DistanceWith(cFirstWordlPoint)) {
 							cFrontItem = cNextItem;
 							break;
-						}
+						//}
 					}
 				}
 				cIter.Next();

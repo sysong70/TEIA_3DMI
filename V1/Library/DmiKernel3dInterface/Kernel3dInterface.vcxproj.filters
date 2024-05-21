@@ -81,7 +81,7 @@
     <ClInclude Include="Command.VisualEffects.h">
       <Filter>Command</Filter>
     </ClInclude>
-    <ClInclude Include="Impl\Kernel.DocViewImpl.h">
+    <ClInclude Include="Impl\Kernel.SessionImpl.h">
       <Filter>Kernel\Impl</Filter>
     </ClInclude>
     <ClInclude Include="Impl\Command.HighlightObjectSnapImpl.h">
@@ -188,7 +188,7 @@
     <ClCompile Include="Command.VisualEffects.cpp">
       <Filter>Command</Filter>
     </ClCompile>
-    <ClCompile Include="Impl\Kernel.DocViewImpl.cpp">
+    <ClCompile Include="Impl\Kernel.SessionImpl.cpp">
       <Filter>Kernel\Impl</Filter>
     </ClCompile>
     <ClCompile Include="Impl\Command.HighlightObjectSnapImpl.cpp">

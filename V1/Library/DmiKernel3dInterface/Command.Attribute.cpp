@@ -5,7 +5,7 @@
 #include "Impl/CommandImpl.h"
 
 #include "Kernel.Session.h"
-#include "Impl/Kernel.DocViewImpl.h"
+#include "Impl/Kernel.SessionImpl.h"
 
 #include "Signal.Connector.h"
 #include "../Signal/Signal.h"
@@ -69,7 +69,7 @@ KERNEL::Command::AttributeImpl::AttributeImpl(const Session * pcInSession)
 
 void KERNEL::Command::AttributeImpl::ShowStyleToNoShowStyle()
 {
-	DocViewImpl * pcDocImpl = (DocViewImpl *)GetDocView().GetImpl();
+	SessionImpl * pcDocImpl = (SessionImpl *)GetSession().GetImpl();
 	DEBUG_VALID(pcDocImpl);
 
 	pcDocImpl->GetBaseView()->InvalidateSceneBounding();
@@ -88,7 +88,7 @@ void KERNEL::Command::AttributeImpl::ShowStyleToNoShowStyle()
 
 void KERNEL::Command::AttributeImpl::NoShowStyleToShowStyle()
 {
-	DocViewImpl * pcDocImpl = (DocViewImpl *)GetDocView().GetImpl();
+	SessionImpl * pcDocImpl = (SessionImpl *)GetSession().GetImpl();
 	DEBUG_VALID(pcDocImpl);
 
 	pcDocImpl->Select().ResetSnapItems(false);
@@ -239,14 +239,14 @@ bool KERNEL::Command::Attribute::ShowAll()
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	DocViewImpl * pcDocViewImpl = dynamic_cast<DocViewImpl *>(pcImpl->GetDocView().GetImpl());
+	SessionImpl * pcDocViewImpl = dynamic_cast<SessionImpl *>(pcImpl->GetSession().GetImpl());
 	DEBUG_VALID(pcDocViewImpl);
 
 	pcImpl->PrepareUpdate();
 
-	pcImpl->SetShowComponent(pcImpl->GetDocView().CADModel(), true);
+	pcImpl->SetShowComponent(pcImpl->GetSession().CADModel(), true);
 
-	pcDocViewImpl->ModelPanel().CheckedUpdate(pcImpl->GetDocView().CADModel());
+	pcDocViewImpl->ModelPanel().CheckedUpdate(pcImpl->GetSession().CADModel());
 
 	pcImpl->Updated();
 
@@ -302,7 +302,7 @@ bool KERNEL::Command::Attribute::HideOnly()
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	DocViewImpl * pcDocViewImpl = dynamic_cast<DocViewImpl *>(pcImpl->GetDocView().GetImpl());
+	SessionImpl * pcDocViewImpl = dynamic_cast<SessionImpl *>(pcImpl->GetSession().GetImpl());
 	DEBUG_VALID(pcDocViewImpl);
 
 	H3DF::SelectionResults cResults = pcDocViewImpl->Select().Results();
@@ -317,7 +317,7 @@ bool KERNEL::Command::Attribute::HideOnly()
 	while (true == cIter.IsValid()) {
 		SelectionItem cItem = cIter.GetItem();
 
-		Component * pcComponent = pcImpl->GetDocView().CADModel().GetComponent(cItem);
+		Component * pcComponent = pcImpl->GetSession().CADModel().GetComponent(cItem);
 		if (nullptr != pcComponent) {
 			pcImpl->SetShowComponent(*pcComponent, false, true);
 			pcDocViewImpl->ModelPanel().CheckedUpdate(*pcComponent);
@@ -342,10 +342,10 @@ bool KERNEL::Command::Attribute::ShowOnly()
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	DocViewImpl * pcDocViewImpl = dynamic_cast<DocViewImpl *>(pcImpl->GetDocView().GetImpl());
+	SessionImpl * pcDocViewImpl = dynamic_cast<SessionImpl *>(pcImpl->GetSession().GetImpl());
 	DEBUG_VALID(pcDocViewImpl);
 
-	H3DF::SelectionResults cResults = pcImpl->GetDocView().Select().Results();
+	H3DF::SelectionResults cResults = pcImpl->GetSession().Select().Results();
 	if (0 == cResults.GetCount()) {
 		return false;
 	}
@@ -353,14 +353,14 @@ bool KERNEL::Command::Attribute::ShowOnly()
 	pcImpl->PrepareUpdate();
 
 	// 입력된 CADModel 및 하위 Component들을 NoShow로 변경
-	pcImpl->SetShowComponent(pcImpl->GetDocView().CADModel(), false);
+	pcImpl->SetShowComponent(pcImpl->GetSession().CADModel(), false);
 
 	SelectionResultsIterator cIter = cResults.GetIterator();
 
 	while (true == cIter.IsValid()) {
 		SelectionItem cItem = cIter.GetItem();
 
-		Component * pcComponent = pcImpl->GetDocView().CADModel().GetComponent(cItem);
+		Component * pcComponent = pcImpl->GetSession().CADModel().GetComponent(cItem);
 		if (nullptr != pcComponent) {
 			pcImpl->SetShowComponent(*pcComponent, true, true);
 		}
@@ -374,14 +374,14 @@ bool KERNEL::Command::Attribute::ShowOnly()
 	// UI ModelPanel에 Redraw를 하지 않기 위해서 false로 설정
 	pcImpl->Delivery().modelPanel.RedrawTree(false);
 
-	pcImpl->GetDocView().ModelPanel().CheckedUpdate(pcImpl->GetDocView().CADModel());
+	pcImpl->GetSession().ModelPanel().CheckedUpdate(pcImpl->GetSession().CADModel());
 
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
 
 	// Update후에 Fit을 해야 Smooth Transition이 효과가 나타난다.
 	pcImpl->Updated();
 
-	pcImpl->GetDocView().Camera().FitWorldOnly();
+	pcImpl->GetSession().Camera().FitWorldOnly();
 
 	return true;
 }
@@ -405,7 +405,7 @@ bool KERNEL::Command::Attribute::ShowToggle()
 	pcImpl->Delivery().modelPanel.InverseCheckedStatus();
 
 	// Zoom Fit 명령어 호출
-	DocViewImpl * pcDocViewImpl = dynamic_cast<DocViewImpl *>(pcImpl->GetDocView().GetImpl());
+	SessionImpl * pcDocViewImpl = dynamic_cast<SessionImpl *>(pcImpl->GetSession().GetImpl());
 	DEBUG_VALID(pcDocViewImpl);
 
 	pcDocViewImpl->Camera().FitWorldOnly();
@@ -420,14 +420,14 @@ bool KERNEL::Command::Attribute::ShowReset()
 	AttributeImpl * pcImpl = (AttributeImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	DocViewImpl * pcDocViewImpl = dynamic_cast<DocViewImpl *>(pcImpl->GetDocView().GetImpl());
+	SessionImpl * pcDocViewImpl = dynamic_cast<SessionImpl *>(pcImpl->GetSession().GetImpl());
 	DEBUG_VALID(pcDocViewImpl);
 
 	pcImpl->PrepareUpdate();
 
-	pcImpl->ResetShowComponent(pcImpl->GetDocView().CADModel(), true);
+	pcImpl->ResetShowComponent(pcImpl->GetSession().CADModel(), true);
 
-	pcDocViewImpl->ModelPanel().CheckedUpdate(pcImpl->GetDocView().CADModel());
+	pcDocViewImpl->ModelPanel().CheckedUpdate(pcImpl->GetSession().CADModel());
 
 	pcImpl->Updated();
 

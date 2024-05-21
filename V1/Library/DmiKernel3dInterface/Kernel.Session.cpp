@@ -1,7 +1,7 @@
 ﻿#include <StdAfx.h>
 
 #include "Kernel.Session.h"
-#include "./Impl/Kernel.DocViewImpl.h"
+#include "./Impl/Kernel.SessionImpl.h"
 
 #include <Sprocket/3DF.Canvas.h>
 #include <Sprocket/3DF.Factory.h>
@@ -22,12 +22,12 @@ using namespace KERNEL;
 
 KERNEL::Session::Session()
 {
-	m_pcImpl = new DocViewImpl();
+	m_pcImpl = new SessionImpl();
 }
 
 void KERNEL::Session::SetDelivery(Signal::Delivery & cDelivery)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	pcImpl->SetDelivery(&cDelivery);
@@ -38,7 +38,7 @@ void KERNEL::Session::SetDelivery(Signal::Delivery & cDelivery)
 // 1. H3DF View Initialize 함수
 void KERNEL::Session::Initialize(Json::Object & cInObject)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	H3DF::WindowHandle nWindowHandle = (H3DF::WindowHandle)cInObject.GetDwordPtr(SKW_HWND);
@@ -74,7 +74,7 @@ void KERNEL::Session::Initialize(Json::Object & cInObject)
 
 void KERNEL::Session::ThreadFileOpen()
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_pcCanvas->FileOpen(pcImpl->m_strFilePathName, pcImpl->CADModel());
@@ -86,7 +86,7 @@ void KERNEL::Session::ThreadFileOpen()
 // 3. H3DF View Paint 함수
 void KERNEL::Session::Paint(Json::Object & cInObject)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
@@ -97,7 +97,7 @@ void KERNEL::Session::Paint(Json::Object & cInObject)
 // 4. H3DF View Resize 함수
 void KERNEL::Session::Resize(Json::Object & cInObject)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
@@ -111,7 +111,7 @@ void KERNEL::Session::Resize(Json::Object & cInObject)
 // 5. 명령어 취소
 void KERNEL::Session::CancelCommands()
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
@@ -124,21 +124,21 @@ void KERNEL::Session::CancelCommands()
 
 void KERNEL::Session::ViewId(int nViewId)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *) m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 	pcImpl->m_nViewId = nViewId;
 }
 
 int KERNEL::Session::ViewId()
 {
-	DocViewImpl * pcImpl = (DocViewImpl *) m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 	return pcImpl->m_nViewId;
 }
 
 HWND KERNEL::Session::GetHwnd()
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetCanvas().GetHwnd();
@@ -146,7 +146,7 @@ HWND KERNEL::Session::GetHwnd()
 
 H3DF::Canvas & KERNEL::Session::Canvas() const
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetCanvas();
@@ -154,7 +154,7 @@ H3DF::Canvas & KERNEL::Session::Canvas() const
 
 H3DF::CADModel & KERNEL::Session::CADModel() const
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->CADModel();
@@ -162,7 +162,7 @@ H3DF::CADModel & KERNEL::Session::CADModel() const
 
 bool KERNEL::Session::Save(WCHAR * pstrInFilePathName)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 
 	CString strFilePathName = pstrInFilePathName;
 
@@ -178,7 +178,7 @@ bool KERNEL::Session::Save(WCHAR * pstrInFilePathName)
 //== Operator 관련 함수 ======================================================================
 Command::Attribute & KERNEL::Session::Attribute()
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->Attribute();
@@ -186,7 +186,7 @@ Command::Attribute & KERNEL::Session::Attribute()
 
 Command::Camera & KERNEL::Session::Camera()
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->Camera();
@@ -194,7 +194,7 @@ Command::Camera & KERNEL::Session::Camera()
 
 Command::Select & KERNEL::Session::Select()
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->Select();
@@ -202,7 +202,7 @@ Command::Select & KERNEL::Session::Select()
 
 Command::ModelPanel & KERNEL::Session::ModelPanel()
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->ModelPanel();
@@ -212,7 +212,7 @@ Command::ModelPanel & KERNEL::Session::ModelPanel()
 
 void KERNEL::Session::MouseSignal(Json::Object & cInObject)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
@@ -260,7 +260,7 @@ void KERNEL::Session::MouseSignal(Json::Object & cInObject)
 
 void KERNEL::Session::MouseMove(int nFlag, int x, int y)
 {
-	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	if (200 > GetTickCount() - pcImpl->m_nMouseWhellStartTick) {
@@ -278,7 +278,7 @@ void KERNEL::Session::MouseMove(int nFlag, int x, int y)
 
 void KERNEL::Session::LButtonDown(int nFlag, int x, int y)
 {
-	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cLButtonDownPosition.Set(x, y);
@@ -294,7 +294,7 @@ void KERNEL::Session::LButtonDown(int nFlag, int x, int y)
 
 void KERNEL::Session::LButtonUp(int nFlag, int x, int y)
 {
-	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	H3DF::Point2D cLButtonUpPosition(x, y);
@@ -329,7 +329,7 @@ void KERNEL::Session::LButtonUp(int nFlag, int x, int y)
 
 void KERNEL::Session::RButtonDown(int nFlag, int x, int y)
 {
-	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
@@ -340,7 +340,7 @@ void KERNEL::Session::RButtonDown(int nFlag, int x, int y)
 
 void KERNEL::Session::RButtonUp(int nFlag, int x, int y)
 {
-	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
@@ -351,7 +351,7 @@ void KERNEL::Session::RButtonUp(int nFlag, int x, int y)
 
 void KERNEL::Session::MouseWheel(int nFlag, int x, int y, Json::Object & cInObject)
 {
-	DocViewImpl * pcImpl = dynamic_cast<DocViewImpl *>(m_pcImpl);
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	pcImpl->m_nMouseWhellStartTick = GetTickCount();
@@ -383,7 +383,7 @@ void KERNEL::Session::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 
 void KERNEL::Session::KeyboardSignal(Json::Object & cInObject)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	pcImpl->GetCanvas().KeyboardInput(cInObject);
@@ -392,7 +392,7 @@ void KERNEL::Session::KeyboardSignal(Json::Object & cInObject)
 //== View 관련 함수 ==================================================================================
 void KERNEL::Session::SetViewControl(int nId)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	switch (nId)
@@ -432,7 +432,7 @@ void KERNEL::Session::SetViewControl(int nId)
 //== Object Snap 관련 함수 ===========================================================================
 void KERNEL::Session::SetObjectSnap(int nId)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	if(nullptr == pcImpl) { DEBUG_RETURN; }
 
 	switch (nId)
@@ -487,7 +487,7 @@ void KERNEL::Session::SetObjectSnap(int nId)
 //== Selection Fiter 관련 함수 =======================================================================
 void KERNEL::Session::SetSelectionFilter(int nId)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	switch (nId)
@@ -526,7 +526,7 @@ void KERNEL::Session::SetSelectionFilter(int nId)
 //== Measure 관련 함수 ===============================================================================
 void KERNEL::Session::SetMeasure(int nId)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 
@@ -536,7 +536,7 @@ void KERNEL::Session::SetMeasure(int nId)
 
 void KERNEL::Session::SetViewStyle(int nStyleId)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	switch (nStyleId)
@@ -570,7 +570,7 @@ void KERNEL::Session::SetViewStyle(int nStyleId)
 //== Visibility 관련 함수 ============================================================================
 void KERNEL::Session::SetVisibility(int nId)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	pcImpl->SetVisibility(nId);
@@ -580,7 +580,7 @@ void KERNEL::Session::SetVisibility(int nId)
 
 void KERNEL::Session::SetViewDirection(int nDirectionId)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	switch (nDirectionId)
@@ -629,7 +629,7 @@ void KERNEL::Session::SetViewDirection(int nDirectionId)
 // 1. Request Value 처리
 void KERNEL::Session::CommandRequest(Json::Object & cInObject)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *) m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->CommandRequest(cInObject);
@@ -638,7 +638,7 @@ void KERNEL::Session::CommandRequest(Json::Object & cInObject)
 // 1. Change Value 처리
 void KERNEL::Session::CommandChange(Json::Object & cInObject)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->CommandChange(cInObject);
@@ -647,7 +647,7 @@ void KERNEL::Session::CommandChange(Json::Object & cInObject)
 //== Panel 관련 함수 =================================================================================
 void KERNEL::Session::ModelPanelSignal(Json::Object & cInObject)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	// Delivery는 ModelPanel 선언할 때 이미 할당함.
@@ -657,7 +657,7 @@ void KERNEL::Session::ModelPanelSignal(Json::Object & cInObject)
 //== 임시 Test용 함수 ================================================================================
 void KERNEL::Session::TestCommand(int nId)
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)m_pcImpl;
+	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	switch (nId)

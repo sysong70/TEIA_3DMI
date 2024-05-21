@@ -8,7 +8,7 @@
 #include "Command.Select.h"
 
 #include "Kernel.Session.h"
-#include "Impl/Kernel.DocViewImpl.h"
+#include "Impl/Kernel.SessionImpl.h"
 
 #include "Signal.Connector.h"
 
@@ -88,7 +88,7 @@ KERNEL::Command::ModelPanelImpl::ModelPanelImpl(const Session * pcInSession) :
 
 KERNEL::Command::Select & KERNEL::Command::ModelPanelImpl::Select()
 { 
-	DocViewImpl * pcImpl = (DocViewImpl *)GetDocView().GetImpl();
+	SessionImpl * pcImpl = (SessionImpl *)GetSession().GetImpl();
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->Select();
@@ -96,7 +96,7 @@ KERNEL::Command::Select & KERNEL::Command::ModelPanelImpl::Select()
 
 KERNEL::Command::Attribute & KERNEL::Command::ModelPanelImpl::Attribute()
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)GetDocView().GetImpl();
+	SessionImpl * pcImpl = (SessionImpl *)GetSession().GetImpl();
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->Attribute();
@@ -104,7 +104,7 @@ KERNEL::Command::Attribute & KERNEL::Command::ModelPanelImpl::Attribute()
 
 KERNEL::Command::Camera & KERNEL::Command::ModelPanelImpl::Camera()
 {
-	DocViewImpl * pcImpl = (DocViewImpl *)GetDocView().GetImpl();
+	SessionImpl * pcImpl = (SessionImpl *)GetSession().GetImpl();
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->Camera();
@@ -654,7 +654,7 @@ void KERNEL::Command::ModelPanel::Checked(H3DF::SelectionResults & cInResults, b
 	while (true == cIter.IsValid()) {
 		SelectionItem cItem = cIter.GetItem();
 
-		Component * pcComponent = pcImpl->GetDocView().CADModel().GetComponent(cItem);
+		Component * pcComponent = pcImpl->GetSession().CADModel().GetComponent(cItem);
 		if (nullptr == pcComponent) {
 			DEBUG_STOP;
 			cIter.Next();
@@ -817,13 +817,13 @@ void KERNEL::Command::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject)
 
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
 
-	SegmentKey cSegment = pcImpl->GetDocView().Canvas().GetModel().GetSegmentKey().Subsegment("cutting_section");
+	SegmentKey cSegment = pcImpl->GetSession().Canvas().GetModel().GetSegmentKey().Subsegment("cutting_section");
 	cSegment.Flush(H3DF::Search::Type::Geometry, H3DF::Search::Space::SubsegmentsAndIncludes);
 
 	// Cutting Section 설정, 정보가 있다면 Cutting Section을 설정한다.
 	if (nullptr != pcCuttingPlanesData) {
 		H3DF::PlaneArray * pcCuttingPlanes = (H3DF::PlaneArray *)pcCuttingPlanesData->GetValue();
-		SegmentKey cSegment = pcImpl->GetDocView().Canvas().GetModel().GetSegmentKey().Subsegment("cutting_section");
+		SegmentKey cSegment = pcImpl->GetSession().Canvas().GetModel().GetSegmentKey().Subsegment("cutting_section");
 
 		for (auto cPlane : *pcCuttingPlanes) {
 			cSegment.InsertCuttingSection(cPlane);
@@ -831,7 +831,7 @@ void KERNEL::Command::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject)
 	}
 
 	// View를 Update해야 Fitting이 정확하게 됨.
-	pcImpl->GetDocView().Canvas().GetFrontView().Update();
+	pcImpl->GetSession().Canvas().GetFrontView().Update();
 
 	// Makrup View에 Sub component가 없는 경우 Camera 정보를 이용해서 설정한다.
 	// Sub component가 없다는 것은, 하부에 PMI가 없는 경우임.
