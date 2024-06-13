@@ -124,6 +124,7 @@ public:
 
 		m_bVisualManagerStyle = TRUE;
 		m_bThemedInplaceTooltip = TRUE;
+		//:WARNING - special case for CBCGPTreeCtrl(CTreeCtrl)
 		globalData.SetWindowTheme(this, L"DarkMode_Explorer", NULL);
 
 		SetBkColor(CBCGPVisualManager::GetInstance()->GetTreeControlFillColor(this));
