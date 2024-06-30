@@ -21,7 +21,9 @@ namespace KERNEL
 		Application								= 0x00000003,
 		View									= 0x00000004,
 		
-		Operator								= 0x50000000,
+		Command									= 0x50000000,
+		CommandSet								= 0x50000001,
+		CommandStep								= 0x50000002,
 	};
 
 	class OSnap

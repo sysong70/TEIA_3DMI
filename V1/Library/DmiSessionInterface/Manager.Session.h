@@ -41,9 +41,6 @@ namespace SESSION
 			bool m_bIsValid = false;
 
 			KERNEL::Command::Manager m_cCommandManager;
-
-			//KERNEL::Application m_cApplication;
-
 			std::map<int, SESSION::Session *> m_mpcSessions;
 
 			SendSignalFunc m_pcSendSignal = nullptr;

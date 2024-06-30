@@ -21,6 +21,8 @@
 
 #include <Sprocket/3DF.CADModel.h>
 
+#include <unordered_map>
+
 namespace KERNEL
 {
 	class SessionImpl : public Impl
@@ -62,6 +64,16 @@ namespace KERNEL
 		Command::Select & Select();
 		Command::ModelPanel & ModelPanel();
 
+		//== Mouse 관련 함수 =========================================================================
+		bool SelectViewControlMouseMove(int nFlag, int x, int y);
+		bool MouseMove(int nFlag, int x, int y);
+
+		bool SelectViewControlLButtonDown(int nFlag, int x, int y);
+		bool LButtonDown(int nFlag, int x, int y);
+		
+		bool SelectViewControlLButtonUp(int nFlag, int x, int y);
+		bool LButtonUp(int nFlag, int x, int y);
+
 		DWORD MouseMapFlags(DWORD nState);
 
 		//== Visibility 관련 함수 ====================================================================
@@ -71,17 +83,23 @@ namespace KERNEL
 		void CommandRequest(Json::Object & cInObject);
 		void CommandChange(Json::Object & cInObject);
 
+		void SetCommand(int nId);
+
 	protected:
 		void RequestVisualEffects(Json::Object & cInObject);
 		void ChangeVisualEffects(Json::Object & cInObject);
 
 	private:
-		Command::Set * m_apcOperator[(int)Command::Type::Count];
+		// 화변 제어, Camera, Select, ModelPanel, Attribute등의 처리를 담당. 1회성 이벤트 처리
+		std::unordered_map<Command::Type, Command::Set *> m_mpcCommandMap; 
 		const Signal::Delivery * m_pcDelivery = nullptr;
 
 		H3DF::CADModel m_cCADModel;
-
+		
 	public:
+		//KERNEL::Command::InputManager m_cInputManager;
+		std::vector<Command::Set *> m_vpcCommandSets;
+
 		// 현재 선택된 요소들이 저장되는 변수
 		H3DF::SelectionResults m_cSelectionResult;
 

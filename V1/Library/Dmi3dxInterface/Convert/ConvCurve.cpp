@@ -41,9 +41,6 @@ namespace ConvCurveBase
 	double dTolerance = 1.0e-6;
 };
 
-#define CHECK_BOOL_RETURN(FunctionCall) { bool nResult = FunctionCall; if (nResult == false) { return false; } }
-#define CHECK_A3D_RETURN(FunctionCall) { A3DStatus eResult = FunctionCall; if (eResult != A3D_SUCCESS) { return false; } }
-
 using namespace c3d;
 
 ConvCurve::ConvCurve(A3DCrvBase * pcUVCurve, double dContextScale)

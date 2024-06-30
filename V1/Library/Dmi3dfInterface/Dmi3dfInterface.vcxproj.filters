@@ -363,6 +363,9 @@
     <ClInclude Include="3DF\Impl\CameraImpl.h">
       <Filter>3DF\Control\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\DrawingAttribute.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -652,6 +655,9 @@
     </ClCompile>
     <ClCompile Include="3DF\Impl\CameraImpl.cpp">
       <Filter>3DF\Control\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\DrawingAttribute.cpp">
+      <Filter>3DF\Control</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

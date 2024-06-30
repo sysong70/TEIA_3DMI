@@ -32,8 +32,8 @@ namespace KERNEL
 			KERNEL::Session * GetSession(int nId);
 
 			void ViewMouseSignal(Json::Object & cInObject, int nViewId);
-			void ViewKeyboardSignal(Json::Object & cInObject, int nViewId);
-			void ViewExecuteCommand(Json::Object & cInObject, int nViewId);
+			void SessionKeyboardSignal(Json::Object & cInObject, int nViewId);
+			void SessionExecuteCommand(Json::Object & cInObject, int nSessionId);
 		};
 	}
 }

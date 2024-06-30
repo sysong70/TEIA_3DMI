@@ -121,7 +121,6 @@ void KERNEL::Session::CancelCommands()
 	//m_cView.CancelCommands();
 }
 
-
 void KERNEL::Session::ViewId(int nViewId)
 {
 	SessionImpl * pcImpl = (SessionImpl *) m_pcImpl;
@@ -261,19 +260,10 @@ void KERNEL::Session::MouseSignal(Json::Object & cInObject)
 void KERNEL::Session::MouseMove(int nFlag, int x, int y)
 {
 	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { DEBUG_RETURN; }
+	DEBUG_VALID(pcImpl);
 
-	if (200 > GetTickCount() - pcImpl->m_nMouseWhellStartTick) {
-		return;
-	}
-
-	DWORD nNewFlags = pcImpl->MouseMapFlags(nFlag);
-	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
-	cEvent.SetPoint(HE_MouseMove, x, y, nNewFlags);
-
-	pcImpl->Camera().MouseMove(cEvent);
-
-	pcImpl->Select().MouseMove(cEvent);
+	// Select(Object Snap) 및 View Control Mouse Event 처리 함수
+	pcImpl->SelectViewControlMouseMove(nFlag, x, y);
 }
 
 void KERNEL::Session::LButtonDown(int nFlag, int x, int y)
@@ -281,50 +271,23 @@ void KERNEL::Session::LButtonDown(int nFlag, int x, int y)
 	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->m_cLButtonDownPosition.Set(x, y);
-	pcImpl->Select().SetMouseDownTickCount(GetTickCount64());
-
-	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
-	cEvent.SetPoint(HE_LButtonDown, x, y, pcImpl->MouseMapFlags(nFlag));
-
-	pcImpl->Camera().LButtonDown(cEvent);
-
-	pcImpl->Select().LButtonDown(cEvent);
+	// Select(Object Snap) 및 View Control Mouse Event 처리 함수
+	pcImpl->SelectViewControlLButtonDown(nFlag, x, y);
 }
 
 void KERNEL::Session::LButtonUp(int nFlag, int x, int y)
 {
 	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { DEBUG_RETURN; }
+	DEBUG_VALID(pcImpl);
 
-	H3DF::Point2D cLButtonUpPosition(x, y);
-	pcImpl->Select().SetMouseUpTickCount(GetTickCount64());
+	// Select(Object Snap) 및 View Control Mouse Event 처리 함수
+	pcImpl->SelectViewControlLButtonUp(nFlag, x, y);
 
-	pcImpl->GetCanvas().GetFrontView().GetWindowKey().GetBaseView();
+	// Drag 상태를 확인하도록 한다. 명령어는 Mouse Drag 상태에서는 사용하지 않도록 한다.
+	// Current command에 Input 상태를 확인해야 함.
 
-	// Camera 관련 처리
-	H3DF::Camera::Mode eMode = pcImpl->Camera().CameraMode();
-
-	if (H3DF::Camera::Mode::ZoomBox == eMode) {
-		pcImpl->GetCanvas().GetFrontView().SetSuppressUpdate(true);
-	}
-
-	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
-	cEvent.SetPoint(HE_LButtonUp, x, y, pcImpl->MouseMapFlags(nFlag));
-
-	// NavigationCube가 선택된 경우를 처리한다. NavigationCube가 선택되어 View를 변경한 경우에는 
-	// HLISTENER_CONSUME_EVENT값을 리턴한다.
-	if (HLISTENER_CONSUME_EVENT == pcImpl->Camera().LButtonUp(cEvent)) {
-		return;
-	}
-
-	if (H3DF::Camera::Mode::ZoomBox == eMode) {
-		pcImpl->Select().DrawSnapItems();
-		pcImpl->GetCanvas().GetFrontView().SetSuppressUpdate(false);
-		pcImpl->GetCanvas().GetFrontView().Update();
-	}
-
-	pcImpl->Select().LButtonUp(cEvent);
+	// Current command가 Setting되어 있는 경우에, Request Value에 Coordinate가 있는 경우 Command에 Input Coordinate를 전달한다.
+	// pcImpl->CommandRequestCoordinate(cEvent);
 }
 
 void KERNEL::Session::RButtonDown(int nFlag, int x, int y)
@@ -523,13 +486,15 @@ void KERNEL::Session::SetSelectionFilter(int nId)
 
 }
 
-//== Measure 관련 함수 ===============================================================================
-void KERNEL::Session::SetMeasure(int nId)
+//== Command 관련 함수 ===============================================================================
+
+// 1. 처리할 Command를 설정한다. 여기서 Command를 설정하고, 기존 Command가 있으면 마무리 하도록 한다.
+void KERNEL::Session::SetCommand(int nId)
 {
 	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-
+	pcImpl->SetCommand(nId);
 }
 
 //== View Style 관련 함수 ============================================================================

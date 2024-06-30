@@ -64,7 +64,6 @@ namespace H3DF
 		void SetTransparency();
 		void SetupFrameRateMode();
 		void SetViewAxis();
-		void SetSelectOption();
 
 	public:
 		void ViewReady();

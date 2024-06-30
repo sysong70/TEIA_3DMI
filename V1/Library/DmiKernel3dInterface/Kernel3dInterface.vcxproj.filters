@@ -40,6 +40,12 @@
     <Filter Include="Command\Base">
       <UniqueIdentifier>{8c47f93e-7a00-48eb-bfa5-3a8bb9fca232}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Command\Base\Impl">
+      <UniqueIdentifier>{1fa7bb20-21a2-4ac1-af41-fe131c2102be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Command\PMI">
+      <UniqueIdentifier>{8016c271-80a1-48b4-9488-98128d5ba817}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -87,9 +93,6 @@
     <ClInclude Include="Impl\Command.HighlightObjectSnapImpl.h">
       <Filter>Command\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="Impl\CommandImpl.h">
-      <Filter>Command\Impl</Filter>
-    </ClInclude>
     <ClInclude Include="Command.Attribute.h">
       <Filter>Command</Filter>
     </ClInclude>
@@ -114,20 +117,11 @@
     <ClInclude Include="..\Signal\WorkerThread.h">
       <Filter>_Signal</Filter>
     </ClInclude>
-    <ClInclude Include="Command.InputManager.h">
-      <Filter>Command</Filter>
-    </ClInclude>
     <ClInclude Include="Command.Manager.h">
-      <Filter>Command</Filter>
-    </ClInclude>
-    <ClInclude Include="Command.PmiManager.h">
       <Filter>Command</Filter>
     </ClInclude>
     <ClInclude Include="Command.MeasureManager.h">
       <Filter>Command</Filter>
-    </ClInclude>
-    <ClInclude Include="Impl\Command.InputManagerImpl.h">
-      <Filter>Command\Impl</Filter>
     </ClInclude>
     <ClInclude Include="Impl\Kernel.ApplicationImpl.h">
       <Filter>Kernel\Impl</Filter>
@@ -143,6 +137,18 @@
     </ClInclude>
     <ClInclude Include="Command.Set.h">
       <Filter>Command\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.PMI.Smart.h">
+      <Filter>Command\PMI</Filter>
+    </ClInclude>
+    <ClInclude Include="Impl\Command.StepImpl.h">
+      <Filter>Command\Base\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="Impl\Command.SetImpl.h">
+      <Filter>Command\Base\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.PMI.Distance.h">
+      <Filter>Command\PMI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -194,9 +200,6 @@
     <ClCompile Include="Impl\Command.HighlightObjectSnapImpl.cpp">
       <Filter>Command\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="Impl\CommandImpl.cpp">
-      <Filter>Command\Impl</Filter>
-    </ClCompile>
     <ClCompile Include="Command.Attribute.cpp">
       <Filter>Command</Filter>
     </ClCompile>
@@ -221,20 +224,11 @@
     <ClCompile Include="..\Signal\WorkerThread.cpp">
       <Filter>_Signal</Filter>
     </ClCompile>
-    <ClCompile Include="Command.InputManager.cpp">
-      <Filter>Command</Filter>
-    </ClCompile>
     <ClCompile Include="Command.Manager.cpp">
-      <Filter>Command</Filter>
-    </ClCompile>
-    <ClCompile Include="Command.PmiManager.cpp">
       <Filter>Command</Filter>
     </ClCompile>
     <ClCompile Include="Command.MeasureManager.cpp">
       <Filter>Command</Filter>
-    </ClCompile>
-    <ClCompile Include="Impl\Command.InputManagerImpl.cpp">
-      <Filter>Command\Impl</Filter>
     </ClCompile>
     <ClCompile Include="Impl\Kernel.ApplicationImpl.cpp">
       <Filter>Kernel\Impl</Filter>
@@ -250,6 +244,18 @@
     </ClCompile>
     <ClCompile Include="Command.Set.cpp">
       <Filter>Command\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.PMI.Smart.cpp">
+      <Filter>Command\PMI</Filter>
+    </ClCompile>
+    <ClCompile Include="Impl\Command.StepImpl.cpp">
+      <Filter>Command\Base\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Impl\Command.SetImpl.cpp">
+      <Filter>Command\Base\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.PMI.Distance.cpp">
+      <Filter>Command\PMI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

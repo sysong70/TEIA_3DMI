@@ -2,13 +2,12 @@
 
 #include "Command.ModelPanel.h"
 
-#include "Impl/CommandImpl.h"
-
 #include "Command.Attribute.h"
 #include "Command.Select.h"
 
 #include "Kernel.Session.h"
 #include "Impl/Kernel.SessionImpl.h"
+#include "Impl/Command.SetImpl.h"
 
 #include "Signal.Connector.h"
 
@@ -45,13 +44,13 @@ namespace KERNEL
 {
 	namespace Command
 	{
-		class ModelPanelImpl : public CommandImpl
+		class ModelPanelImpl : public SetImpl
 		{
 		public:
 			ModelPanelImpl(const Session * pcInSession);
 
 			void Copy(ModelPanelImpl * pcInThat) {
-				CommandImpl::Copy(pcInThat);
+				SetImpl::Copy(pcInThat);
 			}
 
 			H3DF::CADModel & CADModel() { return *m_pcCadModel; }
@@ -81,7 +80,7 @@ namespace KERNEL
 }
 
 KERNEL::Command::ModelPanelImpl::ModelPanelImpl(const Session * pcInSession) :
-	CommandImpl(pcInSession)
+	SetImpl(pcInSession)
 {
 
 }
@@ -451,7 +450,8 @@ Component * KERNEL::Command::ModelPanelImpl::GetPmiGroupComponent()
 
 //== ModelPanel 관련 함수 ============================================================================
 
-KERNEL::Command::ModelPanel::ModelPanel(const Session * pcInSession)
+KERNEL::Command::ModelPanel::ModelPanel(const Session * pcInSession) :
+	Set(pcInSession)
 {
 	auto pcImpl = new ModelPanelImpl(pcInSession);
 	DEBUG_VALID(pcImpl);

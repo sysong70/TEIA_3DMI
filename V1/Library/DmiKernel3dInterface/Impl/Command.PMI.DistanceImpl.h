@@ -10,10 +10,13 @@ namespace KERNEL
 {
 	namespace Command
 	{
-		class PmiManager : public Set
+		namespace PMI
 		{
-		public:
-			PmiManager() = default;
-		};
+			class Distance : public Set
+			{
+			public:
+				Distance() = default;
+			};
+		}
 	}
 }

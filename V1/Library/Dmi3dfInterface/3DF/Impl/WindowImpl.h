@@ -34,14 +34,6 @@ namespace H3DF
 		SelectionOptionsControl * m_pcSelectionOptions = nullptr;
 		SelectionOptionsKit m_cSelectionOptionsKit;
 
-		/*
-			HSelectionSet * GetSelection() { return m_pcSelection; }
-			HSelectionSet * m_pcSelection = nullptr;
-
-			HSelectionSet * GetHighlight() { return m_pcHighlight; }
-			HSelectionSet * m_pcHighlight = nullptr;
-		*/
-
 		int m_nViewId = -1;
 
 		HC_KEY * GetSelectBufferKey(int nCount);

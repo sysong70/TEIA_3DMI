@@ -29,7 +29,7 @@ namespace H3DF
 
 			//== Mouse Event 처리 ===================================================================
 			int LButtonDown(HEventInfo & cInEvent);
-			int LButtonUp(HEventInfo & cInEvent);
+			int LButtonUp(HEventInfo & cInEvent, SelectionItem & cInItem);
 			int LButtonDownAndMove(HEventInfo & cInEvent);
 			
 			int RButtonDown(HEventInfo & cInEvent);

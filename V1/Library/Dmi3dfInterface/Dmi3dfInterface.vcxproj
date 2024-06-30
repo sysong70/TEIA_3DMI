@@ -16,10 +16,14 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Dmi3dfInterface</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <SccProjectName>SAK</SccProjectName>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccProvider>SAK</SccProvider>
+    <SccProjectName>
+    </SccProjectName>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccProvider>
+    </SccProvider>
     <ProjectName>3dfInterface</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -137,6 +141,7 @@
     <ClInclude Include="3DF\Condition.h" />
     <ClInclude Include="3DF\CuttingSection.h" />
     <ClInclude Include="3DF\Definition.h" />
+    <ClInclude Include="3DF\DrawingAttribute.h" />
     <ClInclude Include="3DF\Impl\CameraImpl.h" />
     <ClInclude Include="3DF\Impl\ControlImpl.h" />
     <ClInclude Include="3DF\Impl\DefinitionImpl.h" />
@@ -238,6 +243,7 @@
     <ClCompile Include="3DF\Condition.cpp" />
     <ClCompile Include="3DF\CuttingSection.cpp" />
     <ClCompile Include="3DF\Definition.cpp" />
+    <ClCompile Include="3DF\DrawingAttribute.cpp" />
     <ClCompile Include="3DF\Impl\CameraImpl.cpp" />
     <ClCompile Include="3DF\Impl\ControlImpl.cpp" />
     <ClCompile Include="3DF\Impl\DefinitionImpl.cpp" />

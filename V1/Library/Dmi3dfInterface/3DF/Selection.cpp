@@ -660,6 +660,10 @@ bool H3DF::SelectionItem::ShowSelectedItem(Key & cOutSelection)
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
 	cOutSelection = pcImpl->m_cKey;
 
+	if (INVALID_KEY == cOutSelection.KeyValue()) {
+		return false;
+	}
+
 	return true;
 }
 
@@ -672,6 +676,10 @@ const bool H3DF::SelectionItem::ShowSelectedItem(Key & cOutSelection) const
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
 	cOutSelection = pcImpl->m_cKey;
 
+	if (INVALID_KEY == cOutSelection.KeyValue()) {
+		return false;
+	}
+
 	return true;
 }
 
@@ -680,10 +688,13 @@ bool H3DF::SelectionItem::ShowPath(KeyPath & cOutPath) const
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
+	HC_KEY nSegmentKey = pcImpl->m_cKey.KeyValue();
+	if(INVALID_KEY == nSegmentKey) {
+		return false;
+	}
+
 	size_t nPathCount = pcImpl->m_nIncludeCount + 1;
 	HC_KEY * pnPath = new HC_KEY[nPathCount];
-
-	HC_KEY nSegmentKey = pcImpl->m_cKey.KeyValue();
 
 	char chType[MVO_BUFFER_SIZE];
 	HC_Show_Key_Type(nSegmentKey, chType);

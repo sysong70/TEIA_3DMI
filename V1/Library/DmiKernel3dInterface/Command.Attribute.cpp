@@ -2,7 +2,7 @@
 
 #include "Command.Attribute.h"
 
-#include "Impl/CommandImpl.h"
+#include "Impl/Command.SetImpl.h"
 
 #include "Kernel.Session.h"
 #include "Impl/Kernel.SessionImpl.h"
@@ -39,13 +39,13 @@ namespace KERNEL
 {
 	namespace Command
 	{
-		class AttributeImpl : public CommandImpl
+		class AttributeImpl : public SetImpl
 		{
 		public:
 			AttributeImpl(const Session * pcInSession);
 
 			void Copy(AttributeImpl * pcInThat) {
-				CommandImpl::Copy(pcInThat);
+				SetImpl::Copy(pcInThat);
 
 				m_bToogled = pcInThat->m_bToogled;
 			}
@@ -63,7 +63,7 @@ namespace KERNEL
 }
 
 KERNEL::Command::AttributeImpl::AttributeImpl(const Session * pcInSession)
-	: CommandImpl(pcInSession)
+	: SetImpl(pcInSession)
 {
 }
 
@@ -115,7 +115,7 @@ void KERNEL::Command::AttributeImpl::SetShowComponent(H3DF::Component & cInCompo
 	// 4. 이 때 중요한것은 Segment가 몇번이나, Include되어 있고, Visibility 속성이 Input된 속성과 다를때만, Cloning을 해야 한다는 것이다.
 	//    의미없는 PartDefinition을 계속해서 늘리면 않된다.
 
-	ModelImpl & cModelImpl = GetModelImpl();
+	ModelImpl & cModelImpl = *(ModelImpl *)GetModel().GetImpl();
 
 	H3DF::Component::Type eType = cInComponent.GetType();
 
@@ -203,7 +203,7 @@ void KERNEL::Command::AttributeImpl::SetShowComponent(H3DF::Component & cInCompo
 
 void KERNEL::Command::AttributeImpl::ResetShowComponent(H3DF::Component & cInComponent, bool bRecursive)
 {
-	ModelImpl & cModelImpl = GetModelImpl();
+	ModelImpl & cModelImpl = *(ModelImpl *)GetModel().GetImpl();
 
 	bool bShowFlag = true;
 
@@ -226,7 +226,8 @@ void KERNEL::Command::AttributeImpl::ResetShowComponent(H3DF::Component & cInCom
 
 //== Attribute class ==============================================================================
 
-KERNEL::Command::Attribute::Attribute(const Session * pcInSession)
+KERNEL::Command::Attribute::Attribute(const Session * pcInSession) :
+	Set(pcInSession)
 {
 	AttributeImpl * pcImpl = new AttributeImpl(pcInSession);
 	DEBUG_VALID(pcImpl);

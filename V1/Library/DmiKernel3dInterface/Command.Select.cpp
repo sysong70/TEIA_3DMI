@@ -2,7 +2,7 @@
 
 #include "Command.Select.h"
 
-#include "Impl/CommandImpl.h"
+#include "Impl/Command.SetImpl.h"
 
 #include "Kernel.Session.h"
 #include "Impl/Kernel.SessionImpl.h"
@@ -41,19 +41,19 @@ namespace KERNEL
 {
 	namespace Command
 	{
-		class SelectImpl : public CommandImpl
+		class SelectImpl : public SetImpl
 		{
 		public:
 			SelectImpl(const Session * pcInSession);
 
 			void Copy(SelectImpl * pcInThat) {
-				CommandImpl::Copy(pcInThat);
+				SetImpl::Copy(pcInThat);
 			}
 
 			ULONGLONG m_nSelectPickCount = 200;
 			ULONGLONG m_nMouseDownTickCount = 0;
 			ULONGLONG m_nMouseUpTickCount = 0;
-			H3DF::Point2D m_cLButtonDownPosition;
+			H3DF::Point2D m_cLButtonDownPixelPosition;
 
 			// HighlightObjectSnap Operator
 			Command::HighlightObjectSnap m_cHighlightOSnapOperator;
@@ -92,7 +92,7 @@ namespace KERNEL
 }
 
 KERNEL::Command::SelectImpl::SelectImpl(const Session * pcInSession) :
-	CommandImpl(pcInSession),
+	SetImpl(pcInSession),
 	m_cHighlightOSnapOperator(pcInSession),
 	m_cHighlightCtrl(Window()),
 	m_cLineHighlightCtrl(Window()),
@@ -158,7 +158,8 @@ KERNEL::Command::ModelPanel & KERNEL::Command::SelectImpl::ModelPanel()
 
 //== Select 관련 함수 ================================================================================
 
-KERNEL::Command::Select::Select(const Session * pcInSession)
+KERNEL::Command::Select::Select(const Session * pcInSession) :
+	Set(pcInSession)
 {
 	SelectImpl * pcImpl = new SelectImpl(pcInSession);
 	DEBUG_VALID(pcImpl);
@@ -182,7 +183,7 @@ int KERNEL::Command::Select::LButtonDown(HEventInfo & cInEvent)
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->m_cLButtonDownPosition.Set(cInEvent.GetMousePixelPos().x, cInEvent.GetMousePixelPos().y);
+	pcImpl->m_cLButtonDownPixelPosition.Set(cInEvent.GetMousePixelPos().x, cInEvent.GetMousePixelPos().y);
 
 	return 0;
 }
@@ -192,12 +193,12 @@ int KERNEL::Command::Select::LButtonUp(HEventInfo & cInEvent)
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	H3DF::Point2D cMousePosition(cInEvent.GetMousePixelPos().x, cInEvent.GetMousePixelPos().y);
+	H3DF::Point2D cMousePixelPosition(cInEvent.GetMousePixelPos().x, cInEvent.GetMousePixelPos().y);
 	ULONGLONG nTickCount = pcImpl->m_nMouseUpTickCount - pcImpl->m_nMouseDownTickCount;
 
 	// 1. 2 Pixel이하 200 Tick이하에서만 선택하는 것으로 판정한다.
 	if (pcImpl->m_nSelectPickCount > nTickCount) {
-		double dLength = pcImpl->m_cLButtonDownPosition.DistanceWith(cMousePosition);
+		double dLength = pcImpl->m_cLButtonDownPixelPosition.DistanceWith(cMousePixelPosition);
 
 		if (2.0 < dLength) {
 			return HLISTENER_PASS_EVENT;
@@ -419,6 +420,14 @@ H3DF::HighlightControl & KERNEL::Command::Select::DynHighlightControl()
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->DynHighlightControl();
+}
+
+H3DF::SelectionItem & KERNEL::Command::Select::DynamicHighlightSelectionItem()
+{
+	auto * pcImpl = (Command::SelectImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->m_cHighlightOSnapOperator.DynamicHighlightSelectionItem();
 }
 
 void KERNEL::Command::Select::Unhighlight(H3DF::SelectionResults const & cInItems)

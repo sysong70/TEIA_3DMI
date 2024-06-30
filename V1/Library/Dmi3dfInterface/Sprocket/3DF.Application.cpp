@@ -42,6 +42,8 @@ namespace H3DF
 		static void ErrorCallback(HErrorNode * pcNode, void * pcUserData);
 		static CStringA ErrorCategoryString(int nId);
 		static CStringA ErrorSpecificString(int nId);
+
+		double m_dInDpiScale = 1.0;
 	};
 }
 
@@ -545,6 +547,7 @@ void H3DF::Application::InitInstance()
 void H3DF::Application::ExitInstance()
 {
 	ApplicationImpl * pcImpl = static_cast<ApplicationImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 
 	if (nullptr != pcImpl->m_pcHoopsDB) {
 		delete pcImpl->m_pcHoopsDB;

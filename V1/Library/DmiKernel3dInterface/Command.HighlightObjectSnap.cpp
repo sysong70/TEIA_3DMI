@@ -9,6 +9,7 @@ using namespace KERNEL;
 
 //== ObjectSnap class ==============================================================================
 KERNEL::Command::HighlightObjectSnap::HighlightObjectSnap(const Session * pcInSession)
+	: Set(pcInSession)
 {
 	auto * pcImpl = new HighlightObjectSnapImpl(pcInSession);
 	DEBUG_VALID(pcImpl);

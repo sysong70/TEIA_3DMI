@@ -15,7 +15,8 @@ namespace KERNEL
 	class ApplicationImpl : public Impl
 	{
 	public:
-		std::map<int, Session *> m_mapDocView;
+		std::map<int, Session *> m_mpSessionMap;
 		H3DF::Application m_cApplication;
+		double m_dDpiScale = 1.0;
 	};
 };

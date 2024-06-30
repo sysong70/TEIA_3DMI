@@ -8,6 +8,7 @@
 #include "../../3DF/AttributeLock.h"
 #include "../../3DF/Visibility.h"
 #include "../../3DF/Condition.h"
+#include "../../3DF/LineAttribute.h"
 
 #include "../../3DF/3DF.Utility.h"
 
@@ -62,6 +63,11 @@ void H3DF::ModelImpl::Init()
 	m_cMeasurements = m_cSegmentKey.Subsegment("measurements");
 	m_cMarkups = m_cSegmentKey.Subsegment("markups");
 
+	// 화면에 표시되는 통상적인 Line Weigth를 설정한다.	
+	float fLineWeight = 0.001f;
+	Line::SizeUnits eUnits = Line::SizeUnits::WindowRelative;
+	m_cModels.GetLineAttributeControl().SetWeight(fLineWeight, eUnits);
+
 	BoundingKit cBounding;
 	cBounding.SetExclusion(true);
 	m_cInclude.SetBounding(cBounding);
@@ -85,7 +91,7 @@ void H3DF::ModelImpl::Init()
 	m_cNoShowStyle.GetVisibilityControl().SetFaces(false).SetLines(false).SetVertices(false).SetText(false);
 
 	m_cNoShowWireFrameStyle = m_cIncludeStyles.Subsegment("noshow_wireframe_style");
-	m_cNoShowWireFrameStyle.GetVisibilityControl().SetLines(true);
+	m_cNoShowWireFrameStyle.GetVisibilityControl().SetLines(false);
 
 	m_cNoShowVertexStyle = m_cIncludeStyles.Subsegment("noshow_vertex_style");
 	m_cNoShowVertexStyle.GetVisibilityControl().SetVertices(false);

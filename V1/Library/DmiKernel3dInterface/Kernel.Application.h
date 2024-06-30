@@ -15,12 +15,15 @@ namespace KERNEL
 		void InitInstance();
 
 		void ExitInstance();
+
+		double ShowDpiScale();
+
 		//:Ken - 20240131
 		void OnUpdateFileOption(Json::Object& data);
 		//:Ken - 20240131
 		void OnFileOptionReference(Json::Object& data);
 
-		Session * GetDocView(int nId);
+		Session * GetSession(int nId);
 		void RemoveDocView(int nId);
 
 	protected:

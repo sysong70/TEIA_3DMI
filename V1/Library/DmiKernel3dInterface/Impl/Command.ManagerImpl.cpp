@@ -15,30 +15,30 @@ using namespace KERNEL;
 
 KERNEL::Session * KERNEL::Command::ManagerImpl::GetSession(int nId)
 {
-	return m_cApplication.GetDocView(nId);
+	return m_cApplication.GetSession(nId);
 }
 
 //== View 관련 함수 ==================================================================================
 void KERNEL::Command::ManagerImpl::ViewMouseSignal(Json::Object & cInObject, int nViewId)
 {
-	Session * pcDocView = GetSession(nViewId);
-	DEBUG_VALID(pcDocView);
+	Session * pcSession = GetSession(nViewId);
+	DEBUG_VALID(pcSession);
 
-	pcDocView->MouseSignal(cInObject);
+	pcSession->MouseSignal(cInObject);
 }
 
-void KERNEL::Command::ManagerImpl::ViewKeyboardSignal(Json::Object & cInObject, int nViewId)
+void KERNEL::Command::ManagerImpl::SessionKeyboardSignal(Json::Object & cInObject, int nSessionId)
 {
-	Session * pcDocView = GetSession(nViewId);
-	DEBUG_VALID(pcDocView);
+	Session * pcSession = GetSession(nSessionId);
+	DEBUG_VALID(pcSession);
 
-	pcDocView->KeyboardSignal(cInObject);
+	pcSession->KeyboardSignal(cInObject);
 }
 
-void KERNEL::Command::ManagerImpl::ViewExecuteCommand(Json::Object & cInObject, int nViewId)
+void KERNEL::Command::ManagerImpl::SessionExecuteCommand(Json::Object & cInObject, int nSessionId)
 {
-	Session * pcDocView = GetSession(nViewId);
-	DEBUG_VALID(pcDocView);
+	Session * pcSession = GetSession(nSessionId);
+	DEBUG_VALID(pcSession);
 
 	int nId = cInObject.GetInteger(SKW_ID);
 
@@ -47,7 +47,7 @@ void KERNEL::Command::ManagerImpl::ViewExecuteCommand(Json::Object & cInObject, 
 		case FILE_3D_CMD_Save:
 		case FILE_3D_CMD_SaveAs: {
 			CString strFilePath = cInObject.GetString(SKW_FILEPATH);
-			pcDocView->Save(strFilePath.GetBuffer());
+			pcSession->Save(strFilePath.GetBuffer());
 			strFilePath.ReleaseBuffer();
 			return;
 		} break;
@@ -60,7 +60,7 @@ void KERNEL::Command::ManagerImpl::ViewExecuteCommand(Json::Object & cInObject, 
 		case HOME_3D_CMD_ViewStyle_Wireframe:
 		case HOME_3D_CMD_ViewStyle_HiddenLineRemove:
 		case HOME_3D_CMD_ViewStyle_Tessellated:
-			pcDocView->SetViewStyle(nId);
+			pcSession->SetViewStyle(nId);
 			return;
 			break;
 	}
@@ -76,7 +76,7 @@ void KERNEL::Command::ManagerImpl::ViewExecuteCommand(Json::Object & cInObject, 
 		case HOME_3D_CMD_ViewDirection_Iso:
 		case HOME_3D_CMD_ViewDirection_SeIso:
 		case HOME_3D_CMD_ViewDirection_Perspective:
-			pcDocView->SetViewDirection(nId);
+			pcSession->SetViewDirection(nId);
 			return;
 			break;
 	}
@@ -91,7 +91,7 @@ void KERNEL::Command::ManagerImpl::ViewExecuteCommand(Json::Object & cInObject, 
 		case HOME_3D_CMD_Rotate_RotateCenter:
 		case HOME_3D_CMD_Rotate_Turntable:
 		case HOME_3D_CMD_Rotate_Orbit:
-			pcDocView->SetViewControl(nId);
+			pcSession->SetViewControl(nId);
 			return;
 			break;
 	}
@@ -112,7 +112,7 @@ void KERNEL::Command::ManagerImpl::ViewExecuteCommand(Json::Object & cInObject, 
 		case HOME_3D_CMD_ObjectSnap_Absolute:
 		case HOME_3D_CMD_ObjectSnap_Relative:
 		case HOME_3D_CMD_ObjectSnap_ExpandLine:
-			pcDocView->SetObjectSnap(nId);
+			pcSession->SetObjectSnap(nId);
 			return;
 			break;
 	}
@@ -127,7 +127,7 @@ void KERNEL::Command::ManagerImpl::ViewExecuteCommand(Json::Object & cInObject, 
 		case HOME_3D_CMD_SelectionFiter_Solid:
 		case HOME_3D_CMD_SelectionFiter_Axis:
 		case HOME_3D_CMD_SelectionFiter_PMI:
-			pcDocView->SetSelectionFilter(nId);
+			pcSession->SetSelectionFilter(nId);
 			return;
 			break;
 	}
@@ -138,7 +138,7 @@ void KERNEL::Command::ManagerImpl::ViewExecuteCommand(Json::Object & cInObject, 
 		case HOME_3D_CMD_Visualize_Hide:
 		case HOME_3D_CMD_Visualize_ShowOnly:
 		case HOME_3D_CMD_Visualize_Toggle:
-			pcDocView->SetVisibility(nId);
+			pcSession->SetVisibility(nId);
 			return;
 			break;
 	}
@@ -150,14 +150,15 @@ void KERNEL::Command::ManagerImpl::ViewExecuteCommand(Json::Object & cInObject, 
 			//case MEASURE_3D_CMD_Basic_Length:
 			//case MEASURE_3D_CMD_Basic_Radius:
 			//case MEASURE_3D_CMD_Basic_Angle:
-			pcDocView->SetMeasure(nId);
+			pcSession->SetCommand(nId);
 			return;
 			break;
 	}
+
 	switch (nId)
 	{
 		case CUSTOM_3D_CMD_SYSONG_Test1:
-			pcDocView->TestCommand(nId);
+			pcSession->TestCommand(nId);
 			return;
 			break;
 

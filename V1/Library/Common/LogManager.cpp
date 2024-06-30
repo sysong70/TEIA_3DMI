@@ -15,8 +15,6 @@
 bool LogManager::m_bInstanceFlag;
 LogManager * LogManager::m_pcLogManger;
 
-CString LogManager::m_strProductName;
-CString LogManager::m_strProductVersion;
 CString LogManager::m_strFilePathName[LOGMANAGER_MAX_COUNT];
 CString LogManager::m_strLogManagerComment[LOGMANAGER_MAX_COUNT];
 CString LogManager::m_strLogFileNamePrefix[LOGMANAGER_MAX_COUNT];
@@ -34,9 +32,6 @@ LogManager::Init::Init()
 {
 	m_bInstanceFlag = false;
 	m_pcLogManger = nullptr;
-
-	m_strProductName = L"";
-	m_strProductVersion = L"";
 
 	m_nCurrentId = 0;
 
@@ -197,6 +192,10 @@ void LogManager::WriteLog(CString strMessage)
 
 void LogManager::WriteLog(int nId, CString strMessage)
 {
+	if(false == m_bWriteLogFlag[nId]) {
+		return;
+	}
+
 	CString strBuffer, strBuffer2;
 
 	if(true == m_bFileCloseFlag[nId]) {
@@ -270,36 +269,20 @@ int LogManager::Open()
 
 int LogManager::Open(int nId)
 {
+	if (true == m_strFilePathName[nId].IsEmpty()) {
+		DEBUG_STOP;
+		return 0;
+	}
+
 	CString strFilePath;
 	CString strFilePathName;
 	CString strFileName;
 	WCHAR chReturn[255];
 	ZeroMemory(chReturn, sizeof(chReturn));
 
-	// 지정된 FilePathName이 없는 경우에는 AppData 폴더에 생성한다.
-	if (true == m_strFilePathName[nId].IsEmpty()) {
-		CString strAppDataDirectory = GetAppDataFolderPath();
-		strFilePath.Format(L"%sSystemLog\\", strAppDataDirectory);
-
-		struct tm cCurTime;
-		time_t cLocalCurrentTime = time(nullptr);
-		_localtime64_s(&cCurTime, &cLocalCurrentTime);
-
-		CString strTimeText;
-		strTimeText.Format(L"%04d%02d%02d", cCurTime.tm_year + 1900, cCurTime.tm_mon + 1, cCurTime.tm_mday);
-
-		if (true == m_strLogFileNamePrefix[nId].IsEmpty()) {
-			strFileName.Format(L"%s.log", strTimeText);
-		}
-		else {
-			strFileName.Format(L"%s_%s.log", m_strLogFileNamePrefix[nId], strTimeText);
-		}
-	}
-	else {
-		strFilePathName = m_strFilePathName[nId];
-		strFilePath = Path::GetDirectory(strFilePathName);
-		strFileName = Path::GetFileName(strFilePathName);
-	}
+	strFilePathName = m_strFilePathName[nId];
+	strFilePath = Path::GetDirectory(strFilePathName);
+	strFileName = Path::GetFileName(strFilePathName);
 
 	::CreateDirectory(strFilePath, nullptr);
 
@@ -378,30 +361,6 @@ CString LogManager::GetExecuteDirectory()
 	strFilePath.Format(L"%s%s", Drive, Path);
 
 	return strFilePath;
-}
-
-CString LogManager::GetAppDataFolderPath()
-{
-	CString strLicenseFilePathName;
-	WCHAR chAppDataPath[MAX_PATH] = {0,};
-
-	// Get path for each computer, non-user specific and non-roaming data.
-	// Vista 이상 : C:/ProgramData/MDS 2015
-	// XP : C:/Documents and Settings/All Users/Application Data/MDS 2015
-	if(S_OK == SHGetFolderPath(nullptr, CSIDL_COMMON_APPDATA, NULL, 0, chAppDataPath)) {
-		strLicenseFilePathName = chAppDataPath;
-		strLicenseFilePathName += L"\\" + m_strProductName + L"\\" + m_strProductName + L" " + m_strProductVersion + L"\\";
-
-		if(0 != _wchdir(strLicenseFilePathName))
-		{
-			if(false == CreateFolder(strLicenseFilePathName))
-			{
-				return L"";
-			}
-		}
-	}
-
-	return strLicenseFilePathName;
 }
 
 void LogManager::ResetTabIndex()

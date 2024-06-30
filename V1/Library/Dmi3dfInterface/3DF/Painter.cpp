@@ -204,16 +204,14 @@ void H3DF::Painter::Arc::GetPoints(H3DF::Point center, double radius, double sta
 
     for (int i = (int)startAngle; i <= (int)endAngle; i++) {
         double angle = i * 3.141592 / 180;
-        H3DF::Point p(cos(angle), sin(angle));
+        H3DF::Point p(cos(angle), sin(angle), 0);
         points.push_back(center + (p * radius));
     }
 }
 
-
-
 void H3DF::Painter::Arc::GetPoints(float x, float y, double radius, double startAngle, double endAngle, Points& points)
 {
-    GetPoints(H3DF::Point(x, y), radius, startAngle, endAngle, points);
+    GetPoints(H3DF::Point(x, y, 0), radius, startAngle, endAngle, points);
 }
 
 #pragma endregion //:REGION
@@ -229,7 +227,7 @@ HC_KEY H3DF::Painter::Circle::Create(H3DF::Point center, double radius, bool pol
 
         for (int i = 0; i <= 360; i += 6) {
             double angle = i * 3.141592 / 180;
-            H3DF::Point p(cos(angle), sin(angle));
+            H3DF::Point p(cos(angle), sin(angle), 0);
             points.push_back(center + (p * radius));
         }
 
@@ -283,7 +281,7 @@ void H3DF::Painter::Circle::GetPoints(H3DF::Point center, double radius, bool re
 
 double H3DF::Painter::Compute::Distance(H3DF::Point p1, H3DF::Point p2)
 {
-    H3DF::Point d = p2 - p1;
+    H3DF::Vector d = p2 - p1;
     return sqrt(d.x * d.x + d.y * d.y + d.z * d.z);
 }
 

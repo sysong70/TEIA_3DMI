@@ -79,6 +79,10 @@ using namespace std::chrono;
 #define ColorValue(x) GetRValue(x) / 255.0f, GetGValue(x) / 255.0f, GetBValue(x) / 255.0f
 #define ColorRGBA(x, alpha) GetRValue(x), GetGValue(x), GetBValue(x), (unsigned char)alpha
 
+#ifdef _DEBUG
+//#define		USED_LOG_MANAGER
+#endif
+
 //:Ken - 20240229
 //#define SAVE_HSF_FILE
 
@@ -179,13 +183,18 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 	CanvasImpl * pcImpl = (CanvasImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	//:Ken - 20240215
-	//LogManager::CreateLog(LOGMANAGER_3DF_LOG_ID, L"Z://3DF_Log.txt");
-	//LogManager::SetWriteTimeLog(LOGMANAGER_3DF_LOG_ID, true);
+#ifdef USED_LOG_MANAGER
+	CString strExecuteDirectory = LogManager::GetExecuteDirectory();
+	LogManager::CreateFolder(strExecuteDirectory + L"\\Log");
 
-// 	LogManager::CreateLog(3, L"Z://3DF_Log.txt");
-// 	LogManager::SetWriteTimeLog(true);
+	CString strLogFilePathName = strExecuteDirectory + L"\\Log\\3DF.log";
+ 	LogManager::CreateLog(LOGMANAGER_3DF_LOG_ID, strLogFilePathName);
+ 	LogManager::SetWriteTimeLog(LOGMANAGER_3DF_LOG_ID, true);
+	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Open File: " + strFilePathName);
 
+	//m_cA3dTracer.CreateLog(L"D:\\Temp\\A3dXInfo.log");
+	//CreateLog(1, L"d:\\Temp\\AssyStruct.log");
+#endif
 // 	CString strErrorMessage1;
 // 	DLL::H3DF::Interface cInterfaace;
 // 	cInterfaace.TDFInitializeA3DLibrary(strErrorMessage1);
@@ -209,8 +218,6 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 // 	if (true == strFilePathName.IsEmpty()) {
 // 		return;
 // 	}
-
-	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Open File: " + strFilePathName);
 
 	// Update Callback 설정
 	//pcImpl->SetFinishPictureCallback();

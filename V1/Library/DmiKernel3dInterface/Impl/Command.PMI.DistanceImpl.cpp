@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "Command.h"
+#include "Command.PMI.Smart.h"
 
 #include <3DF/Window.h>
 

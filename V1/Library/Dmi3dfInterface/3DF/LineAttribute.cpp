@@ -143,18 +143,15 @@ namespace H3DF
 		LineAttributeControlImpl() { m_eType = H3DF::Type::LineAttributeControl; }
 
 		void Copy(LineAttributeControlImpl * pcInThat) {
-			m_cParentSegmentKey = pcInThat->m_cParentSegmentKey;
+			ControlImpl::Copy(pcInThat);
 		}
-
-		// Parent Segment Key
-		SegmentKey m_cParentSegmentKey;
 	};
 }
 
 H3DF::LineAttributeControl::LineAttributeControl(SegmentKey & cInSegmentKey)
 {
 	LineAttributeControlImpl * pcImpl = new LineAttributeControlImpl();
-	pcImpl->m_cParentSegmentKey = cInSegmentKey;
+	pcImpl->m_cOverrideKey = cInSegmentKey;
 
 	m_pcImpl = pcImpl;
 }
@@ -182,9 +179,9 @@ LineAttributeControl & H3DF::LineAttributeControl::SetPattern(CStringA strInPatt
 {
 	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_Set_Line_Pattern(strInPatternName);
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }
@@ -193,7 +190,7 @@ LineAttributeControl & H3DF::LineAttributeControl::SetWeight(float fInWeight, Li
 {
 	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		
 		if (Line::SizeUnits::ScaleFactor == eInUnits) {
 			HC_Set_Line_Weight(fInWeight);
@@ -231,7 +228,7 @@ LineAttributeControl & H3DF::LineAttributeControl::SetWeight(float fInWeight, Li
 			HC_Set_Variable_Line_Weight(Utility::ToChar(strWeight));
 		}
 
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }
@@ -240,9 +237,9 @@ LineAttributeControl & H3DF::LineAttributeControl::UnsetPattern()
 {
 	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_UnSet_Line_Pattern();
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }
@@ -251,9 +248,9 @@ LineAttributeControl & H3DF::LineAttributeControl::UnsetWeight()
 {
 	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_UnSet_Line_Weight();
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }
@@ -261,11 +258,12 @@ LineAttributeControl & H3DF::LineAttributeControl::UnsetWeight()
 LineAttributeControl & H3DF::LineAttributeControl::UnsetEverything()
 {
 	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_UnSet_Line_Pattern();
 		HC_UnSet_Line_Weight();
 		HC_UnSet_One_Rendering_Option("geometry options");
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
 	return *this;
 }
 
@@ -273,11 +271,11 @@ bool H3DF::LineAttributeControl::ShowPattern(CStringA & strOutPatternName) const
 {
 	LineAttributeControlImpl * pcImpl = (LineAttributeControlImpl *)m_pcImpl;
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cParentSegmentKey); {
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		char chBuffer[MVO_BUFFER_SIZE] = "\n";
 		HC_Show_Line_Pattern(chBuffer);
 		strOutPatternName = chBuffer;
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cParentSegmentKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return !strOutPatternName.IsEmpty();
 }
@@ -286,6 +284,7 @@ bool H3DF::LineAttributeControl::ShowWeight(float & fOutWeight, Line::SizeUnits 
 {
 	char chBuffer[MVO_BUFFER_SIZE] = "\n";
 	HC_Show_Variable_Line_Weight(chBuffer);
+
 	if (0 < strlen(chBuffer)) {
 		float fValue = 0;
 		char chUnits[32] = "\n";

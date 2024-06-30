@@ -25,7 +25,7 @@ namespace H3DF
 		void Set(NavigationCube const & cInThat);
 		NavigationCube const & operator = (NavigationCube const & cInThat);
 
-		int LButtonUp(HEventInfo & cInEvent);
+		int LButtonUp(HEventInfo & cInEvent, SelectionItem & cInItem);
 
 		int LButtonDownAndMove(HEventInfo & cInEvent);
 

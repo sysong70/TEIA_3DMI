@@ -2,7 +2,7 @@
 
 #include "../Kernel.h"
 
-#include "CommandImpl.h"
+#include "Command.SetImpl.h"
 
 #include <3DF/3DF.h>
 #include <3DF/Math.h>
@@ -20,7 +20,7 @@ namespace KERNEL
 	{
 		class SnapItem;
 
-		class HighlightObjectSnapImpl : public CommandImpl
+		class HighlightObjectSnapImpl : public SetImpl
 		{
 		public:
 			enum class Status
@@ -107,7 +107,7 @@ namespace KERNEL
 			H3DF::SegmentKey m_cSnapPointSegment;
 
 			float m_fSnapRadius = 8;
-			float m_fLineWeight = 3;
+			float m_fLineWeight = 10;
 
 			H3DF::Point m_cPrevMousePixelPoint;
 

@@ -70,7 +70,7 @@ namespace KERNEL
 		void SetVisibility(int nId);
 
 		//== Measure 관련 함수 =======================================================================
-		void SetMeasure(int nId);
+		void SetCommand(int nId);
 		
 		//== Style 관련 함수 =========================================================================
 		void SetViewStyle(int nStyleId);

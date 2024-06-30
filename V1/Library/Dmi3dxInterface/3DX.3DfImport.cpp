@@ -1307,10 +1307,16 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 		if(kA3DTypeRiPointSet == eType) {
 			cSegment.GetStyleControl().PushSegment(m_cShowVertexStyle);
 		}
+		else if (kA3DTypeRiCurve == eType || kA3DTypeRiPolyWire == eType) {
+			cSegment.GetStyleControl().PushSegment(m_cShowWireFrameStyle);
+		}
 	}
 	else {
 		if (kA3DTypeRiPointSet == eType) {
 			cSegment.GetStyleControl().PushSegment(m_cNoShowVertexStyle);
+		}
+		else if (kA3DTypeRiCurve == eType || kA3DTypeRiPolyWire == eType) {
+			cSegment.GetStyleControl().PushSegment(m_cNoShowWireFrameStyle);
 		}
 		else {
 			cSegment.GetStyleControl().PushSegment(m_cNoShowStyle);
@@ -4546,7 +4552,7 @@ A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3D
 	CHECK_A3D_RETURN(A3DEntityGetType(pcRepItem, &eType));
 
 	// Wireframe에 show wireframe style 적용
-	cInSegment.GetStyleControl().PushSegment(m_cShowWireFrameStyle);
+	// cInSegment.GetStyleControl().PushSegment(m_cShowWireFrameStyle);
 
 	Log::IncreaseTabIndex(2);
 

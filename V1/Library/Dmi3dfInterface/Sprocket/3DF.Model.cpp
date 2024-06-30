@@ -3,13 +3,13 @@
 #include "3DF.Model.h"
 #include "Impl/ModelImpl.h"
 
-#include "../3DF/Facility.AppOptions.h"
+//#include "../3DF/Facility.AppOptions.h"
 
-#include <Common_Define.h>
-#include <Path.h>
-#include <WStr.h>
+// #include <Common_Define.h>
+// #include <Path.h>
+// #include <WStr.h>
 
-#include "../Signal/Signal.h"
+//#include "../Signal/Signal.h"
 
 using namespace H3DF;
 

@@ -9,6 +9,8 @@
 #include <3DF/Math.h>
 #include <3DF/Window.h>
 
+#include "../../../UiMain/Command.Resource.h"
+
 using namespace KERNEL;
 
 KERNEL::Command::Manager::Manager()
@@ -33,9 +35,10 @@ void KERNEL::Command::Manager::ExecuteApplicationSignal(Json::Object & cInObject
 			pcImpl->m_cApplication.ExitInstance();
 			break;
 
-		case Signal::Application::Action::OnDpiAware:
-			//pcImpl->m_cApplication.OnDpiAware(cInObject.GetAt(SKW_VALUE));
-			break;
+		case Signal::Application::Action::OnDpiAware: {
+// 			double dDpiScale = cInObject.GetReal(SKW_DPISCALE);
+// 			pcImpl->m_cApplication.OnDpiAware(dDpiScale);
+		} break;
 
 		case Signal::Application::Action::OnUpdatePreference:
 			//:TODO
@@ -66,6 +69,8 @@ void KERNEL::Command::Manager::ExecuteViewSignal(Json::Object & cInObject)
 
 	int nAction = cInObject.GetInteger(SKW_ACTION);
 	int nViewId = cInObject.GetInteger(SKW_VIEWID);
+
+	TRACE(L"ExecuteViewSignal Action: %d, ViewId: %d", nAction, nViewId);
 
 	switch ((Signal::View::Action)nAction)
 	{
@@ -111,7 +116,7 @@ void KERNEL::Command::Manager::ExecuteViewSignal(Json::Object & cInObject)
 		case Signal::View::Action::OnChar:
 		case Signal::View::Action::OnKeyDown:
 		case Signal::View::Action::OnKeyUp:
-			pcImpl->ViewKeyboardSignal(cInObject, nViewId);
+			pcImpl->SessionKeyboardSignal(cInObject, nViewId);
 			break;
 
 		case Signal::View::Action::OnCancel:
@@ -119,7 +124,7 @@ void KERNEL::Command::Manager::ExecuteViewSignal(Json::Object & cInObject)
 			break;
 
 		case Signal::View::Action::OnCommand:
-			pcImpl->ViewExecuteCommand(cInObject, nViewId);
+			pcImpl->SessionExecuteCommand(cInObject, nViewId);
 			break;
 
 		default:

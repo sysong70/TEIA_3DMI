@@ -1055,8 +1055,6 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	// Object Snap용 Glyph 생성
 	//Operator::ObjectSnap::CreateGlyph();
 
-	SetSelectOption();
-
 	// Portfolio Key 생성
 // 	SegmentKey cPortfoliosKey = m_cKey.Subsegment(L"Portfolios");
 // 	m_cPortfolioKey.SetKeyValue(cPortfoliosKey.KeyValue());
@@ -1305,28 +1303,6 @@ void H3DF::ViewImpl::SetViewAxis()
 	HVector front(1, 0, 0), top(0, 1, 0);
 	m_pcBaseView->SetViewAxis(&front, &top);
 }
-
-// Select option 처리
-void H3DF::ViewImpl::SetSelectOption()
-{
-	MaterialMappingKit cMaterial;
-	cMaterial.SetFaceColor(RGBColor(1.0f, 0.5f, 0.0f));
-	cMaterial.SetEdgeColor(RGBColor(1.0f, 0.5f, 0.0f));
-	cMaterial.SetLineColor(RGBColor(1.0f, 0.5f, 0.0f));
-
-	// #Selection: Selection Option 설정 
-	m_pcWindow->GetSelectionOptionsControl().SetLevel(Selection::Level::Entity);
-	//m_pcWindow->GetSelectionOptionsControl().SetRelatedLimit(10);
-	//m_pcWindow->GetSelectionOptionsControl().SetProximity(0.05f);
-	//m_pcWindow->GetSelectionOptionsControl().SetBias(Selection::Bias::Lines);
-	//m_pcWindow->GetSelectionOptionsControl().SetSorting(Selection::Sorting::Proximity); // Sorting 해도 Z방향 Sort가 정확하게 되지는 않됨.
-
-	m_pcWindow->GetHighlightControl().SetMaterialMapping(cMaterial);
-	m_pcWindow->GetHighlightControl().GetLineAttributeControl().SetWeight(5.0);
-
-	return;
-}
-
 
 void H3DF::ViewImpl::SetWindowBackGroundColor(COLORREF nNewTopColor, COLORREF nNewBottomColor, bool bEmitMessage)
 {

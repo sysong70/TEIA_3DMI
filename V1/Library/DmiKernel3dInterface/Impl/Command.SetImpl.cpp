@@ -1,74 +1,90 @@
 ﻿#include "StdAfx.h"
 
-#include "CommandImpl.h"
+#include "Command.SetImpl.h"
+
+#include "../Command.Step.h"
 
 #include "../Kernel.Session.h"
 #include "Kernel.SessionImpl.h"
 
-#include <3DF/Window.h>
-#include <Sprocket/3DF.View.h>
-
 using namespace KERNEL;
+using namespace KERNEL::Command;
 
-//== Visual Effects class ==========================================================================
-
-KERNEL::Command::CommandImpl::CommandImpl(const KERNEL::Session * pcInSession)
+KERNEL::Command::SetImpl::SetImpl(const KERNEL::Session * pcInSession)
 {
 	DEBUG_VALID(pcInSession);
 
-	m_eType = KERNEL::Type::Operator;
+	m_eType = KERNEL::Type::CommandSet;
 	m_pcSession = pcInSession;
 }
 
-H3DF::WindowKey & KERNEL::Command::CommandImpl::Window()
+void KERNEL::Command::SetImpl::Copy(SetImpl * pcInThat)
 {
-	DEBUG_VALID(m_pcSession);
-
-	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *)m_pcSession->GetImpl());
-	DEBUG_VALID(pcImpl);
-
-	return pcImpl->GetCanvas().GetFrontView().GetWindowKey();
-}
-
-const H3DF::WindowKey & KERNEL::Command::CommandImpl::Window() const
-{
-	DEBUG_VALID(m_pcSession);
-
-	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *)m_pcSession->GetImpl());
-	DEBUG_VALID(pcImpl);
-
-	return pcImpl->GetCanvas().GetFrontView().GetWindowKey();
-}
-
-H3DF::View & KERNEL::Command::CommandImpl::View()
-{
-	DEBUG_VALID(m_pcSession);
-
-	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *)m_pcSession->GetImpl());
-	DEBUG_VALID(pcImpl);
-
-	return pcImpl->GetCanvas().GetFrontView();
-}
-
-const H3DF::View & KERNEL::Command::CommandImpl::View() const
-{
-	DEBUG_VALID(m_pcSession);
-
-	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *)m_pcSession->GetImpl());
-	DEBUG_VALID(pcImpl);
-
-	return pcImpl->GetCanvas().GetFrontView();
-}
-
-void KERNEL::Command::CommandImpl::Copy(CommandImpl * pcInThat)
-{
-	DEBUG_VALID(pcInThat);
-
 	m_eType = pcInThat->m_eType;
 	m_pcSession = pcInThat->m_pcSession;
+
+	m_deStep.clear();
+	for (auto cItem : pcInThat->m_deStep) {
+		m_deStep.push_back(cItem);
+	}
+
+	m_vstrTexts.clear();
+	for (auto & cItem : pcInThat->m_vstrTexts) {
+		m_vstrTexts.push_back(cItem);
+	}
+
+	m_vcPoints.clear();
+	for (auto & cItem : pcInThat->m_vcPoints) {
+		m_vcPoints.push_back(cItem);
+	}
+
+	m_vfValues.clear();
+	for (auto & cItem : pcInThat->m_vfValues) {
+		m_vfValues.push_back(cItem);
+	}
 }
 
-Signal::Delivery & KERNEL::Command::CommandImpl::Delivery()
+H3DF::WindowKey & KERNEL::Command::SetImpl::Window()
+{
+	DEBUG_VALID(m_pcSession);
+
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *)m_pcSession->GetImpl());
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetCanvas().GetFrontView().GetWindowKey();
+}
+
+const H3DF::WindowKey & KERNEL::Command::SetImpl::Window() const
+{
+	DEBUG_VALID(m_pcSession);
+
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *)m_pcSession->GetImpl());
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetCanvas().GetFrontView().GetWindowKey();
+}
+
+H3DF::View & KERNEL::Command::SetImpl::View()
+{
+	DEBUG_VALID(m_pcSession);
+
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *)m_pcSession->GetImpl());
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetCanvas().GetFrontView();
+}
+
+const H3DF::View & KERNEL::Command::SetImpl::View() const
+{
+	DEBUG_VALID(m_pcSession);
+
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *)m_pcSession->GetImpl());
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetCanvas().GetFrontView();
+}
+
+Signal::Delivery & KERNEL::Command::SetImpl::Delivery()
 {
 	DEBUG_VALID(m_pcSession);
 
@@ -78,7 +94,7 @@ Signal::Delivery & KERNEL::Command::CommandImpl::Delivery()
 	return pcImpl->Delivery();
 }
 
-const Signal::Delivery & KERNEL::Command::CommandImpl::Delivery() const
+const Signal::Delivery & KERNEL::Command::SetImpl::Delivery() const
 {
 	DEBUG_VALID(m_pcSession);
 
@@ -88,46 +104,40 @@ const Signal::Delivery & KERNEL::Command::CommandImpl::Delivery() const
 	return pcImpl->Delivery();
 }
 
-Session & KERNEL::Command::CommandImpl::GetSession()
+Session & KERNEL::Command::SetImpl::GetSession()
 {
 	DEBUG_VALID(m_pcSession);
 	return *((KERNEL::Session *)m_pcSession);
 }
 
-const Session & KERNEL::Command::CommandImpl::GetSession() const
+const Session & KERNEL::Command::SetImpl::GetSession() const
 {
 	DEBUG_VALID(m_pcSession);
 	return *m_pcSession;
 }
 
-H3DF::ModelImpl & KERNEL::Command::CommandImpl::GetModelImpl()
+H3DF::Model & KERNEL::Command::SetImpl::GetModel()
 {
 	DEBUG_VALID(m_pcSession);
 
 	SessionImpl * pcDocImpl = (SessionImpl *)GetSession().GetImpl();
 	DEBUG_VALID(pcDocImpl);
 
-	H3DF::ModelImpl * pcModelImpl = (H3DF::ModelImpl *)pcDocImpl->GetModel().GetImpl();
-	DEBUG_VALID(pcModelImpl);
-
-	return *pcModelImpl;
+	return pcDocImpl->GetModel();
 }
 
-const H3DF::ModelImpl & KERNEL::Command::CommandImpl::GetModelImpl() const
+const H3DF::Model & KERNEL::Command::SetImpl::GetModel() const
 {
 	DEBUG_VALID(m_pcSession);
 
 	SessionImpl * pcDocImpl = (SessionImpl *)GetSession().GetImpl();
 	DEBUG_VALID(pcDocImpl);
 
-	H3DF::ModelImpl * pcModelImpl = (H3DF::ModelImpl *)pcDocImpl->GetModel().GetImpl();
-	DEBUG_VALID(pcModelImpl);
-
-	return *pcModelImpl;
+	return pcDocImpl->GetModel();
 }
 
 // Update하기전에 Hightlight된 것들을 모두 Unhighlight하고, SnapItem을 모두 Reset한다.
-void KERNEL::Command::CommandImpl::PrepareUpdate()
+void KERNEL::Command::SetImpl::PrepareUpdate()
 {
 	GetSession().Canvas().GetFrontView().SuppressUpdate(true);
 
@@ -137,7 +147,7 @@ void KERNEL::Command::CommandImpl::PrepareUpdate()
 }
 
 // Update가 완료되면, View를 Update한다.
-void KERNEL::Command::CommandImpl::Updated()
+void KERNEL::Command::SetImpl::Updated()
 {
 	GetSession().Canvas().GetFrontView().SuppressUpdate(false);
 	GetSession().Canvas().GetFrontView().Update();

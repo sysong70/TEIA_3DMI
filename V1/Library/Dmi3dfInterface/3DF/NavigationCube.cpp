@@ -169,11 +169,11 @@ NavigationCube const & H3DF::NavigationCube::operator = (NavigationCube const & 
 
 
 
-int H3DF::NavigationCube::LButtonUp(HEventInfo & cInEvent)
+int H3DF::NavigationCube::LButtonUp(HEventInfo & cInEvent, SelectionItem & cInItem)
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {  assert(false); }
-
+/*
 	WindowPoint cPoint(cInEvent.GetMouseWindowPos().x, cInEvent.GetMouseWindowPos().y, cInEvent.GetMouseWindowPos().z);
 
 	SelectionOptionsKit cSelectOption;
@@ -192,6 +192,15 @@ int H3DF::NavigationCube::LButtonUp(HEventInfo & cInEvent)
 	}
 
 	CStringA strName = cSelectKey.Name();
+	// TRACE(L"%s\n", strName);
+*/
+
+	SegmentKey cSelectKey;
+	if (false == cInItem.ShowSelectedItem(cSelectKey)) {
+		return HLISTENER_PASS_EVENT;
+	}
+
+	// CStringA strName = cSelectKey.Name();
 	// TRACE(L"%s\n", strName);
 
 	for (int nIndex = 0; nIndex < (int)H3DF::ViewDirection::Mode::Count; nIndex++) {
@@ -214,6 +223,7 @@ int H3DF::NavigationCube::LButtonUp(HEventInfo & cInEvent)
 
 int H3DF::NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)
 {
+/*
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
@@ -221,6 +231,7 @@ int H3DF::NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)
 		pcImpl->m_pcWindow->GetHighlightControl().Unhighlight(pcImpl->m_cOldHighlightSelection);
 		pcImpl->m_cOldHighlightSelection.Reset();
 	}
+*/
 
 	return HLISTENER_PASS_EVENT;
 }

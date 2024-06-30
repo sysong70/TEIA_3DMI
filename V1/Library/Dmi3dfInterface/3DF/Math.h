@@ -20,6 +20,11 @@
 #	define PI 3.1415926535897932384626433832795028841971693993751
 #endif
 
+#define TEMPLATE_API_H3DF __declspec(dllexport)
+
+#pragma warning(push)
+#pragma warning(disable : 4251) // Not an issue as long as debug and release libraries aren't mixed
+
 OPEN_3DF_NAMESPACE
 
 template <typename T>	H3DF_INLINE	T		Abs(T const & a) { return  a < 0 ? -a : a; }
@@ -365,13 +370,13 @@ private:
 	Coordinate() {}
 };
 
-template <typename F> class Vector_3D;
-template <typename F> class Plane_3D;
-template <typename F> class Vector_2D;
-template <typename F> class Point_2D;
+template <typename F> class TEMPLATE_API_H3DF Vector_3D;
+template <typename F> class TEMPLATE_API_H3DF Plane_3D;
+template <typename F> class TEMPLATE_API_H3DF Vector_2D;
+template <typename F> class TEMPLATE_API_H3DF Point_2D;
 
 template <typename F>
-class Point_3D
+class TEMPLATE_API_H3DF Point_3D
 {
 public:
 	F x;
@@ -385,24 +390,21 @@ public:
 	Point_3D(Point_3D<D> const & that) : x((F) that.x), y((F) that.y), z((F) that.z) {}
 
 	Point_3D(Vector_3D<F> const & v) : x(v.x), y(v.y), z(v.z) {}
-	explicit Point_3D(Vector_2D<F> const & v) : x(v.x), y(v.y), z((F)0.0) {}
-	explicit Point_3D(Point_2D<F> const & that) : x(that.x), y(that.y), z((F)0.0) {}
+	Point_3D(Vector_2D<F> const & v) : x(v.x), y(v.y), z((F)0.0) {}
+	Point_3D(Point_2D<F> const & that) : x(that.x), y(that.y), z((F)0.0) {}
 
 	void Set(F X, F Y, F Z) { x = X; y = Y; z = Z; };
 
 	Point_3D const	operator- () const	{ return Point_3D (-x, -y, -z); }
 
-	bool operator== (Point_3D const & p) const { return  x == p.x && y == p.y && z == p.z; }
-	bool operator!= (Point_3D const & p) const { return  !(*this == p); }
+	bool operator == (Point_3D const & p) const { return  x == p.x && y == p.y && z == p.z; }
+	bool operator != (Point_3D const & p) const { return  !(*this == p); }
 
 	bool Equals(Point_3D const & p, int in_tolerance = 32) const {
-		return	Float::Equals(x, p.x, in_tolerance) &&
-			Float::Equals(y, p.y, in_tolerance) &&
-			Float::Equals(z, p.z, in_tolerance);
+		return	Float::Equals(x, p.x, in_tolerance) && Float::Equals(y, p.y, in_tolerance) && Float::Equals(z, p.z, in_tolerance);
 	}
 
-	Point_3D const operator+(const Point_3D & p) const { return Point_3D(x + p.x, y + p.y, z + p.z); }
-	//Point_3D const operator-(const Point_3D & p) const { return Point_3D(x - p.x, y - p.y, z - p.z); }
+	Point_3D const operator + (const Point_3D & p) const { return Point_3D(x + p.x, y + p.y, z + p.z); }
 	Vector_3D<F> const operator - (Point_3D const & p) const;
 
 	template <typename D>
@@ -411,30 +413,31 @@ public:
 	template <typename D>
 	H3DF_INLINE Point_3D const operator - (Vector_3D<D> const & v) const {return Point_3D(x - v.x, y - v.y, z - v.z); }
 
-	Point_3D & operator*= (F s) { x *= s; y *= s; z *= s;  return *this; }
-	Point_3D & operator/= (F s) { return operator*= ((F)1 / s); }
-	Point_3D const operator* (F s) const { return Point_3D(x * s, y * s, z * s); }
-	Point_3D const operator/ (F s) const { return operator* ((F)1 / s); }
+	Point_3D & operator *= (F s) { x *= s; y *= s; z *= s;  return *this; }
+	Point_3D & operator /= (F s) { return operator*= ((F)1 / s); }
+	Point_3D const operator * (F s) const { return Point_3D(x * s, y * s, z * s); }
+	Point_3D const operator / (F s) const { return operator* ((F)1 / s); }
 
-	F & operator[] (size_t i) { return (&x)[i]; }
-	F const & operator[] (size_t i) const { return (&x)[i]; }
+	F & operator [] (size_t i) { return (&x)[i]; }
+	F const & operator [] (size_t i) const { return (&x)[i]; }
 
-	Point_3D & operator+= (Vector_3D<F> const & v);
-	Point_3D & operator-= (Vector_3D<F> const & v);
-	Point_3D & operator*= (Vector_3D<F> const & v);
-	Point_3D & operator/= (Vector_3D<F> const & v);
-	Point_3D const operator* (Vector_3D<F> const & v) const;
-	Point_3D const operator/ (Vector_3D<F> const & v) const;
+	// Vector_3D 관련 연산자
+	Point_3D & operator += (Vector_3D<F> const & v);
+	Point_3D & operator -= (Vector_3D<F> const & v);
+	Point_3D & operator *= (Vector_3D<F> const & v);
+	Point_3D & operator /= (Vector_3D<F> const & v);
+	Point_3D const operator + (Vector_2D<F> const & v) const;
+	Point_3D const operator - (Vector_2D<F> const & v) const;
+	Point_3D const operator * (Vector_3D<F> const & v) const;
+	Point_3D const operator / (Vector_3D<F> const & v) const;
 
-	Point_3D & operator+= (Vector_2D<F> const & v);
-	Point_3D & operator-= (Vector_2D<F> const & v);
-	Point_3D & operator*= (Vector_2D<F> const & v);
-	Point_3D & operator/= (Vector_2D<F> const & v);
-	Point_3D const operator* (Vector_2D<F> const & v) const;
-	Point_3D const operator/ (Vector_2D<F> const & v) const;
-
-	Point_3D const operator+ (Vector_2D<F> const & v) const;
-	Point_3D const operator- (Vector_2D<F> const & v) const;
+	// Vector_2D 관련 연산자
+	Point_3D & operator += (Vector_2D<F> const & v);
+	Point_3D & operator -= (Vector_2D<F> const & v);
+	Point_3D & operator *= (Vector_2D<F> const & v);
+	Point_3D & operator /= (Vector_2D<F> const & v);
+	Point_3D const operator * (Vector_2D<F> const & v) const;
+	Point_3D const operator / (Vector_2D<F> const & v) const;
 
 	static H3DF_INLINE Point_3D	Origin() {return Point_3D (0, 0, 0);};
 	static H3DF_INLINE Point_3D	Zero() {return Point_3D (0, 0, 0);}; //-V524
@@ -448,11 +451,8 @@ public:
 	Point_3D ProjectionPoint(Point_3D cOrigin, Vector_3D<F> cNormal);
 };
 
-using Point = Point_3D<float>;
-using DPoint = Point_3D<double>;
-
 template <typename F, typename S>
-H3DF_INLINE Point_3D<F>	operator* (S s, Point_3D<F> const & a) { return Point_3D<F>(F(s * a.x), F(s * a.y), F(s * a.z)); }
+H3DF_INLINE Point_3D<F>	operator * (S s, Point_3D<F> const & a) { return Point_3D<F>(F(s * a.x), F(s * a.y), F(s * a.z)); }
 
 template <typename F>
 H3DF_INLINE Point_3D<F> Midpoint(Point_3D<F> const & a, Point_3D<F> const & b) {
@@ -473,24 +473,25 @@ H3DF_INLINE bool Is_Abnormal(Point_3D<F> const & p) {
 // H3DF_INLINE	Point_3D<F>::Point_3D(Vector_3D<F> const & v) : x(v.x), y(v.y), z(v.z) {}
 
 template <typename F>
-H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator+= (Vector_3D<F> const & v) { x += v.x; y += v.y; z += v.z;  return *this; }
-template <typename F>
-H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator-= (Vector_3D<F> const & v) { x -= v.x; y -= v.y; z -= v.z;  return *this; }
+H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator += (Vector_3D<F> const & v) { x += v.x; y += v.y; z += v.z;  return *this; }
 
 template <typename F>
-H3DF_INLINE	Vector_3D<F> const	Point_3D<F>::operator- (Point_3D<F> const & p) const { return Vector_3D<F>(x - p.x, y - p.y, z - p.z); }
-
-// template <typename F>
-// TDF_INLINE	Point_3D<F> const	Point_3D<F>::operator- (Vector_3D<F> const & v) const { return Point_3D<F>(x - v.x, y - v.y, z - v.z); }
+H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator -= (Vector_3D<F> const & v) { x -= v.x; y -= v.y; z -= v.z;  return *this; }
 
 template <typename F>
-H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator*= (Vector_3D<F> const & v) { x *= v.x; y *= v.y; z *= v.z;  return *this; }
+H3DF_INLINE	Vector_3D<F> const	Point_3D<F>::operator - (Point_3D<F> const & p) const { return Vector_3D<F>(x - p.x, y - p.y, z - p.z); }
+
 template <typename F>
-H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator/= (Vector_3D<F> const & v) { x /= v.x; y /= v.y; z /= v.z;  return *this; }
+H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator *= (Vector_3D<F> const & v) { x *= v.x; y *= v.y; z *= v.z;  return *this; }
+
 template <typename F>
-H3DF_INLINE	Point_3D<F> const	Point_3D<F>::operator* (Vector_3D<F> const & v) const { return Point_3D<F>(x * v.x, y * v.y, z * v.z); }
+H3DF_INLINE	Point_3D<F> & Point_3D<F>::operator /= (Vector_3D<F> const & v) { x /= v.x; y /= v.y; z /= v.z;  return *this; }
+
 template <typename F>
-H3DF_INLINE	Point_3D<F> const	Point_3D<F>::operator/ (Vector_3D<F> const & v) const { return Point_3D<F>(x / v.x, y / v.y, z / v.z); }
+H3DF_INLINE	Point_3D<F> const Point_3D<F>::operator * (Vector_3D<F> const & v) const { return Point_3D<F>(x * v.x, y * v.y, z * v.z); }
+
+template <typename F>
+H3DF_INLINE	Point_3D<F> const Point_3D<F>::operator / (Vector_3D<F> const & v) const { return Point_3D<F>(x / v.x, y / v.y, z / v.z); }
 
 template <typename F>
 double Point_3D<F>::DistanceWith(Point_3D const & p) const {
@@ -513,11 +514,12 @@ template <typename F>
 // Origin Point와 Normal Vector를 이용해서 Projection Point를 구함.
 Point_3D<F> Point_3D<F>::ProjectionPoint(Point_3D<F> cOrigin, Vector_3D<F> cNormal)
 {
-// Origin Point를 ZAxis 방향으로 투영한 내적값, 물론 ZAxis는 단위 벡터라야함.
-	double dOriginPointProjectionDistance = cNormal.Dot(cOrigin);
+	Vector_3D<F> cOriginVector = cOrigin;
+	// Origin Point를 ZAxis 방향으로 투영한 내적값, 물론 ZAxis는 단위 벡터라야함.
+	double dOriginPointProjectionDistance = cNormal.Dot(cOriginVector);
 
 	// Target Point를 ZAxis 방향으로 투영한 내적값.
-	double dInputPointProjectionDistance = cNormal .Dot(*this);
+	double dInputPointProjectionDistance = cNormal.Dot(*this);
 
 	// 두 내적값의 차이
 	double dParameter = dOriginPointProjectionDistance - dInputPointProjectionDistance;
@@ -557,7 +559,7 @@ H3DF_INLINE Point_3D<F> Circumcenter(Point_3D<F> const & a, Point_3D<F> const & 
 }
 
 template <typename F>
-class Point_2D {
+class TEMPLATE_API_H3DF Point_2D {
 public:
 	F	x;
 	F	y;
@@ -573,8 +575,8 @@ public:
 
 	void Set(F X, F Y) { x = X; y = Y; };
 
-	Point_2D const operator+ (const Point_2D & p) const { return Point_2D(x + p.x, y + p.y); }
-	Point_2D const	operator- () const { return Point_2D(-x, -y); }
+	Point_2D const operator + (const Point_2D & p) const { return Point_2D(x + p.x, y + p.y); }
+	Point_2D const	operator - () const { return Point_2D(-x, -y); }
 
 	bool operator== (Point_2D const & p) const { return  x == p.x && y == p.y; }
 	bool operator!= (Point_2D const & p) const { return  !(*this == p); }
@@ -583,26 +585,25 @@ public:
 		return Float::Equals(x, p.x, in_tolerance) && Float::Equals(y, p.y, in_tolerance);
 	}
 
-
-	Point_2D & operator*= (F s) { x *= s; y *= s; return *this; }
-	Point_2D & operator/= (F s) { return operator*= ((F)1 / s); }
-	Point_2D const		operator* (F s) const { return Point_2D(x * s, y * s); }
-	Point_2D const		operator/ (F s) const { return operator* ((F)1 / s); }
+	Point_2D & operator *= (F s) { x *= s; y *= s; return *this; }
+	Point_2D & operator /= (F s) { return operator*= ((F)1 / s); }
+	Point_2D const operator * (F s) const { return Point_2D(x * s, y * s); }
+	Point_2D const operator / (F s) const { return operator* ((F)1 / s); }
 
 	F & operator[] (size_t i) { return (&x)[i]; }
 	F const & operator[] (size_t i) const { return (&x)[i]; }
 
-	Point_2D & operator+= (Vector_2D<F> const & v);
-	Point_2D & operator-= (Vector_2D<F> const & v);
-	Point_2D & operator*= (Vector_2D<F> const & v);
-	Point_2D & operator/= (Vector_2D<F> const & v);
-	Point_2D const		operator* (Vector_2D<F> const & v) const;
-	Point_2D const		operator/ (Vector_2D<F> const & v) const;
+	Point_2D & operator += (Vector_2D<F> const & v);
+	Point_2D & operator -= (Vector_2D<F> const & v);
+	Point_2D & operator *= (Vector_2D<F> const & v);
+	Point_2D & operator /= (Vector_2D<F> const & v);
+	Point_2D const operator * (Vector_2D<F> const & v) const;
+	Point_2D const operator / (Vector_2D<F> const & v) const;
 
-	Vector_2D<F> const	operator- (Point_2D const & p) const;
+	Vector_2D<F> const operator - (Point_2D const & p) const;
 
-	Point_2D const		operator+ (Vector_2D<F> const & v) const;
-	Point_2D const		operator- (Vector_2D<F> const & v) const;
+	Point_2D const operator + (Vector_2D<F> const & v) const;
+	Point_2D const operator - (Vector_2D<F> const & v) const;
 
 	static H3DF_INLINE Point_2D	Origin() { return Point_2D(0, 0); };
 	static H3DF_INLINE Point_2D	Zero() { return Point_2D(0, 0); }; //-V524
@@ -613,9 +614,6 @@ public:
 
 	void Rotate(double dAngle, Point_2D cPivot) const;
 };
-
-using Point2D = Point_2D<float>		;
-using DPoint2D = Point_2D<double>	;
 
 // template <typename F>
 // H3DF_INLINE Point_3D<F>::Point_3D(Point_2D<F> const & that) : x(that.x), y(that.y), z(0) {}
@@ -665,7 +663,7 @@ void Point_2D<F>::Rotate(double dAngle, Point_2D<F> cPivot) const {
 }
 
 template <typename F>
-class Vector_3D
+class TEMPLATE_API_H3DF Vector_3D
 {
 public:
 	F x;
@@ -680,9 +678,8 @@ public:
 
 	template <typename D>
 	Vector_3D (Point_3D<D> const & p) : x(p.x), y(p.y), z(p.z) {}
-	// explicit Vector_3D(Point_3D<F> const & p) : x(p.x), y(p.y), z(p.z) {}
-	explicit Vector_3D(Plane_3D<F> const & p);
-	explicit Vector_3D (Vector_2D<F> const & that);
+	Vector_3D(Plane_3D<F> const & p);
+	Vector_3D (Vector_2D<F> const & that);
 
 	void Set(F X, F Y, F Z) { x = X; y = Y; z = Z; };
 
@@ -882,11 +879,8 @@ void Vector_3D<F>::Rotate(Point_3D<F> cOrigin, Vector_3D<F> cXAxis, Vector_3D<F>
 	*this = cPoint.LiftPoint(cOrigin, cXAxis, cYAxis);
 }
 
-using Vector = Vector_3D<float>;
-using DVector = Vector_3D<double>;
-
 template <typename F>
-class Vector_2D {
+class TEMPLATE_API_H3DF Vector_2D {
 public:
 	F	x;
 	F	y;
@@ -983,9 +977,6 @@ public:
 	static H3DF_INLINE Vector_2D	Unit() { return Vector_2D(1, 1); };
 };
 
-using Vector2D = Vector_2D<float>;
-using DVector2D = Vector_2D<double>;
-
 template <typename F, typename S>
 H3DF_INLINE	Vector_2D<F>	operator* (S s, Vector_2D<F> const & v) { return Vector_2D<F>(F(s * v.x), F(s * v.y)); }
 
@@ -995,7 +986,7 @@ H3DF_INLINE bool Is_Abnormal(Vector_2D<F> const & v) {
 }
 
 template <typename F>
-class Plane_3D {
+class TEMPLATE_API_H3DF Plane_3D {
 public:
 	F	a;
 	F	b;
@@ -1129,11 +1120,6 @@ private:
 		return Float::Equals(a, b);
 	}
 };
-
-using Plane = Plane_3D<float>;
-using DPlane = Plane_3D<double>;
-
-using PlaneArray = std::vector<Plane, Allocator<Plane>>; //!< Array of type HPS::Plane
 
 template <typename F>
 H3DF_INLINE bool Is_Abnormal(Plane_3D<F> const & p) {
@@ -1480,9 +1466,6 @@ private:
 	};
 };
 
-using SimpleCuboid = Cuboid_3D<float>;
-using DSimpleCuboid = Cuboid_3D<double>;
-
 template <typename F>
 H3DF_INLINE Cuboid_3D<F> Intersect(Cuboid_3D<F> const & a, Cuboid_3D<F> const & b) {
 	Cuboid_3D<F> temp = a;
@@ -1647,9 +1630,6 @@ private:
 	}
 };
 
-using SimpleSphere = Sphere_3D<float>;
-using DSimpleSphere = Sphere_3D<double>;
-
 template<typename F>
 H3DF_INLINE Cuboid_3D<F>::Cuboid_3D(Sphere_3D<F> const & sphere)
 {
@@ -1662,6 +1642,26 @@ H3DF_INLINE Cuboid_3D<F>::Cuboid_3D(Sphere_3D<F> const & sphere)
 	}
 }
 
+using Point = Point_3D<float>;
+using DPoint = Point_3D<double>;
+
+using Point2D = Point_2D<float>;
+using DPoint2D = Point_2D<double>;
+
+using Vector = Vector_3D<float>;
+using DVector = Vector_3D<double>;
+
+using Vector2D = Vector_2D<float>;
+using DVector2D = Vector_2D<double>;
+
+using SimpleSphere = Sphere_3D<float>;
+using DSimpleSphere = Sphere_3D<double>;
+
+using Plane = Plane_3D<float>;
+using DPlane = Plane_3D<double>;
+
+using SimpleCuboid = Cuboid_3D<float>;
+using DSimpleCuboid = Cuboid_3D<double>;
 
 using IntArray = std::vector<int, Allocator<int>>;
 using FloatArray = std::vector<float, Allocator<float>>;
@@ -1670,6 +1670,7 @@ using Point2DArray = std::vector<H3DF::Point2D, Allocator<H3DF::Point2D>>;
 using DPoint2DArray = std::vector<H3DF::DPoint2D, Allocator<H3DF::DPoint2D>>;
 using VectorArray = std::vector<H3DF::Vector, Allocator<H3DF::Vector>>;
 using Vector2DArray = std::vector<H3DF::Vector2D, Allocator<H3DF::Vector2D>>;
+using PlaneArray = std::vector<Plane, Allocator<Plane>>;
 
 namespace Math
 {
@@ -1689,3 +1690,5 @@ namespace Math
 };
 
 CLOSE_3DF_NAMESPACE
+
+#pragma warning(pop)

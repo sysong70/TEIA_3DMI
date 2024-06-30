@@ -38,10 +38,6 @@ public:
 	static void SetCreateFile(bool bFlag) { m_bCreateFileFlag[m_nCurrentId] = bFlag; }
 	static void SetCreateFile(int nId, bool bFlag) { m_bCreateFileFlag[nId] = bFlag; }
 
-	static void SetProductInformation(CString strProductName, CString strProductVersion) { 
-		m_strProductName = strProductName, m_strProductVersion = strProductVersion; 
-	}
-
 	static void ResetTabIndex();
 	static void ResetTabIndex(int nId);
 	static void IncreaseTabIndex();
@@ -77,8 +73,6 @@ public:
 	static bool CreateFolder(CString strPath);
 protected:
 	
-	CString GetAppDataFolderPath();
-
 	bool CStringToChar(CString strText, char *& pchText);
 	bool CStringToChar(CString strText, char *& pchText, int & nTextSize);
 
@@ -99,8 +93,6 @@ private:
 	static int m_nFileHandle[LOGMANAGER_MAX_COUNT];
 	static bool m_bFileCloseFlag[LOGMANAGER_MAX_COUNT];
 
-	static CString m_strProductName;
-	static CString m_strProductVersion;
 	static CString m_strFilePathName[LOGMANAGER_MAX_COUNT];
 	static CString m_strLogManagerComment[LOGMANAGER_MAX_COUNT];
 	static CString m_strLogFileNamePrefix[LOGMANAGER_MAX_COUNT];

@@ -2,9 +2,11 @@
 
 #include "Command.Camera.h"
 
-#include "Impl/CommandImpl.h"
+#include "Impl/Command.SetImpl.h"
 
 #include "Kernel.Session.h"
+
+#include "Command.Select.h"
 
 #include "Signal.Connector.h"
 #include "../Signal/Signal.h"
@@ -32,14 +34,14 @@ namespace KERNEL
 {
 	namespace Command
 	{
-		class CameraImpl : public CommandImpl
+		class CameraImpl : public SetImpl
 		{
 		public:
 			CameraImpl(const Session * pcInSession);
 			~CameraImpl();
 
 			void Copy(CameraImpl * pcInThat) {
-				CommandImpl::Copy(pcInThat);
+				SetImpl::Copy(pcInThat);
 			}
 
 			H3DF::Operator::CameraControl & CameraControl() { return *m_pcCameraControl; }
@@ -52,7 +54,7 @@ namespace KERNEL
 }
 
 KERNEL::Command::CameraImpl::CameraImpl(const Session * pcInSession)
-	: CommandImpl(pcInSession)
+	: SetImpl(pcInSession)
 {
 	m_pcCameraControl = new H3DF::Operator::CameraControl(Window(), View().GetNavigationCube());
 }
@@ -74,7 +76,8 @@ H3DF::Camera::Mode KERNEL::Command::CameraImpl::CameraMode()
 
 //== Camera class ==================================================================================
 
-KERNEL::Command::Camera::Camera(const Session * pcInSession)
+KERNEL::Command::Camera::Camera(const Session * pcInSession) :
+	Set(pcInSession)
 {
 	CameraImpl * pcImpl = new CameraImpl(pcInSession);
 	DEBUG_VALID(pcImpl);
@@ -112,7 +115,9 @@ int KERNEL::Command::Camera::LButtonUp(HEventInfo & cInEvent)
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->CameraControl().LButtonUp(cInEvent);
+	H3DF::SelectionItem & cItem = pcImpl->GetSession().Select().DynamicHighlightSelectionItem();
+
+	return pcImpl->CameraControl().LButtonUp(cInEvent, cItem);
 }
 
 int KERNEL::Command::Camera::RButtonDown(HEventInfo & cInEvent)

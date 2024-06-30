@@ -534,6 +534,7 @@ HighlightControl & H3DF::HighlightControl::SetLineAttribute(LineAttributeKit con
 VisibilityControl H3DF::HighlightControl::GetVisibilityControl()
 {
 	auto * pcImpl = (HighlightControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
 
 	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
 
@@ -570,6 +571,7 @@ AttributeLockControl H3DF::HighlightControl::GetAttributeLockControl()
 AttributeLockControl const H3DF::HighlightControl::GetAttributeLockControl() const
 {
 	auto * pcImpl = (HighlightControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
 
 	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
 
@@ -582,7 +584,9 @@ AttributeLockControl const H3DF::HighlightControl::GetAttributeLockControl() con
 LineAttributeControl H3DF::HighlightControl::GetLineAttributeControl()
 {
 	auto * pcImpl = (HighlightControlImpl *)m_pcImpl;
-	HC_KEY nKey = pcImpl->SelectionSet()->GetSelectionSegment();
+	DEBUG_VALID(pcImpl);
+
+	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
 
 	SegmentKey cSegmentKey(nKey);
 	LineAttributeControl cControl(cSegmentKey);
@@ -593,7 +597,9 @@ LineAttributeControl H3DF::HighlightControl::GetLineAttributeControl()
 LineAttributeControl const H3DF::HighlightControl::GetLineAttributeControl() const
 {
 	auto * pcImpl = (HighlightControlImpl *)m_pcImpl;
-	HC_KEY nKey = pcImpl->SelectionSet()->GetSelectionSegment();
+	DEBUG_VALID(pcImpl);
+
+	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
 
 	SegmentKey cSegmentKey(nKey);
 	LineAttributeControl cControl(cSegmentKey);

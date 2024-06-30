@@ -1,4 +1,4 @@
-﻿#include <StdAfx.h>
+﻿#include "StdAfx.h"
 
 #include "Manager.Session.h"
 
@@ -109,41 +109,6 @@ void SESSION::Manager::Session::SetSendSignalFunc(SendSignalFunc lpfnSignalCallb
 void SESSION::Manager::Session::ExecuteApplicationSignal(Json::Object & cInObject)
 {
 	m_cCommandManager.ExecuteApplicationSignal(cInObject);
-/*
-	int nAction = cInObject.GetInteger(SKW_ACTION);
-
-	switch ((Signal::Application::Action)nAction)
-	{
-		case Signal::Application::Action::OnInitInstance:
-			m_cApplication.InitInstance();
-			break;
-
-		case Signal::Application::Action::OnExitInstance:
-			m_cApplication.ExitInstance();
-			break;
-
-		case Signal::Application::Action::OnDpiAware:
-			//m_cApplication.OnDpiAware(cInObject.GetAt(SKW_VALUE));
-			break;
-
-		case Signal::Application::Action::OnUpdatePreference:
-			//:TODO
-			break;
-
-		//:Ken - 20240131
-		case Signal::Application::Action::OnUpdateFileOption:
-			m_cApplication.OnUpdateFileOption(cInObject.GetAt(SKW_VALUE));
-			break;
-
-		//:Ken - 20240131
-		case Signal::Application::Action::OnFileOptionReference:
-			m_cApplication.OnFileOptionReference(cInObject.GetAt(SKW_VALUE));
-			break;
-
-		default:
-			break;
-	}
-*/
 }
 
 //== View 명령어 처리 부분 ============================================================================
@@ -165,73 +130,6 @@ void SESSION::Manager::Session::ExecuteViewSignal(Json::Object & cInObject)
 	else {
 		pcSession->ExecuteViewSignal(cInObject);
 	}
-
-/*
-
-	switch ((Signal::View::Action)nAction)
-	{
-		case Signal::View::Action::OnInitialize:
-			// nViewId를 넣는 이유는 Instnace에서 Signal을 보낼때 식별자로서 ViewId를 보내기 위해서 값을 넣어주는 것임.
-			// 실제로는 하나의 Instance를 사용하는 것임.
-			pcSession->ViewInitialize(cInObject, Connector::GetInstance(nViewId));
-
-			//:Ken - TEST
-			//Connector::GetInstance(-1).application.AddTraceLogV(L"View initialized %d", nViewId);
-			//Connector::GetInstance(-1).application.AddTraceLog(L"next message");
-			//Connector::GetInstance(-1).application.SaveTraceLog(nullptr);
-			//Connector::GetInstance(-1).application.SaveTraceLog(L"c:\\temp\\test.log", false);
-			break;
-
-		case Signal::View::Action::OnConstruct:
-			break;
-
-		case Signal::View::Action::OnDestruct:
-			RemoveSession(nViewId);
-			break;
-
-		case Signal::View::Action::OnPaint:
-			pcSession->ViewPaint(cInObject);
-			//:Ken - TEST
-			//Connector::GetInstance(nViewId).view.PaintOverlap();
-			break;
-
-		case Signal::View::Action::OnResize:
-			// Resize를 하면 속도 저하가 발생함. 그리고 할 필요가 없음.
-			//pcSession->ViewResize(cInObject);
-			break;
-
-		case Signal::View::Action::OnMouseMove:
-		case Signal::View::Action::OnLButtonDown:
-		case Signal::View::Action::OnLButtonUp:
-		case Signal::View::Action::OnMButtonDown:
-		case Signal::View::Action::OnMButtonUp:
-		case Signal::View::Action::OnRButtonDown:
-		case Signal::View::Action::OnRButtonUp:
-		case Signal::View::Action::OnMouseWheel:
-			pcSession->ViewMouseSignal(cInObject);
-			break;
-
-			//:Ken - 20230607
-		case Signal::View::Action::OnInput:
-		case Signal::View::Action::OnChar:
-		case Signal::View::Action::OnKeyDown:
-		case Signal::View::Action::OnKeyUp:
-			pcSession->ViewKeyboardSignal(cInObject);
-			break;
-
-		case Signal::View::Action::OnCancel:
-			pcSession->ViewCancelCommands();
-			break;
-
-		case Signal::View::Action::OnCommand:
-			pcSession->ViewExecuteCommand(cInObject);
-			break;
-
-		default:
-			DEBUG_STOP;
-			break;
-	}
-*/
 }
 
 // 1-1. Session을 가져옴 (없으면 생성)

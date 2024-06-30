@@ -32,6 +32,14 @@ void KERNEL::Application::ExitInstance()
 	pcImpl->m_cApplication.ExitInstance();
 }
 
+double KERNEL::Application::ShowDpiScale()
+{
+	ApplicationImpl * pcImpl = (ApplicationImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->m_dDpiScale;
+}
+
 void KERNEL::Application::OnUpdateFileOption(Json::Object& data)
 {
 	TheFileOptions.Import.Set(data);
@@ -42,12 +50,12 @@ void KERNEL::Application::OnFileOptionReference(Json::Object& data)
 	TheFileOptions.SetReference(data);
 }
 
-Session * KERNEL::Application::GetDocView(int nId)
+Session * KERNEL::Application::GetSession(int nId)
 {
 	ApplicationImpl * pcImpl = (ApplicationImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	Session * pcDocView = pcImpl->m_mapDocView[nId];
+	Session * pcDocView = pcImpl->m_mpSessionMap[nId];
 
 	if (nullptr == pcDocView) {
 		pcDocView = new Session();
@@ -57,7 +65,7 @@ Session * KERNEL::Application::GetDocView(int nId)
 		}
 		else {
 			pcDocView->ViewId(nId);
-			pcImpl->m_mapDocView[nId] = pcDocView;
+			pcImpl->m_mpSessionMap[nId] = pcDocView;
 		}
 	}
 
@@ -69,10 +77,10 @@ void KERNEL::Application::RemoveDocView(int nId)
 	ApplicationImpl * pcImpl = (ApplicationImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	Session * pcDocView = pcImpl->m_mapDocView[nId];
+	Session * pcDocView = pcImpl->m_mpSessionMap[nId];
 
 	if (nullptr != pcDocView) {
 		delete pcDocView;
-		pcImpl->m_mapDocView.erase(nId);
+		pcImpl->m_mpSessionMap.erase(nId);
 	}
 }

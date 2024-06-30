@@ -65,6 +65,8 @@ using namespace H3DF;
 #define TheEnvironment TheAppOptions.Preference.Environment
 #define TheSession TheAppOptions.Preference.Session
 
+
+
 //== SnapPoint class ===============================================================================
 
 KERNEL::Command::HighlightObjectSnapImpl::SnapPoint::SnapPoint(KERNEL::Command::HighlightObjectSnapImpl::SnapPoint const & cInThat)
@@ -124,7 +126,7 @@ bool KERNEL::Command::HighlightObjectSnapImpl::SnapItem::operator == (const Snap
 
 //== ObjectSnap class ==============================================================================
 KERNEL::Command::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const Session * pcInSession) :
-	CommandImpl(pcInSession),
+	SetImpl(pcInSession),
 	m_cDynHighlightControl(Window()),
 	m_cDynLineHighlightCtrl(Window()),
 	m_cDynPmiHighlightCtrl(Window())
@@ -164,6 +166,7 @@ KERNEL::Command::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const Session 
 
 	// Light Green 계열
 	RGBAColor cDynHighlightColor(RGB(120, 245, 120));
+	//RGBAColor cDynHighlightColor(RGB(120, 0, 0));
 	cDynHighlightMaterialMapping.SetLineColor(cDynHighlightColor);
 	cDynHighlightMaterialMapping.SetFaceColor(cDynHighlightColor);
 	cDynHighlightMaterialMapping.SetTextColor(cDynHighlightColor);
@@ -182,8 +185,14 @@ KERNEL::Command::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const Session 
 	m_cDynHighlightControl.GetVisibilityControl().SetLines(false);
 	m_cDynHighlightControl.GetVisibilityControl().SetEdges(false);
 
+	//m_cDynHighlightControl.GetLineAttributeControl().SetWeight(1);
+
 	m_cDynLineHighlightCtrl.SetMaterialMapping(cDynHighlightMaterialMapping);
-	m_cDynLineHighlightCtrl.GetLineAttributeControl().SetWeight(m_fLineWeight);
+
+  	float fLineWeight = 0.003;
+  	Line::SizeUnits eUnits = Line::SizeUnits::WindowRelative;
+	m_cDynLineHighlightCtrl.GetLineAttributeControl().SetWeight(fLineWeight, eUnits);
+	//m_cDynLineHighlightCtrl.GetLineAttributeControl().SetWeight(1);
 
 	m_cDynPmiHighlightCtrl.SetMaterialMapping(cDynHighlightMaterialMapping);
 
@@ -286,7 +295,9 @@ int KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(HEventInfo & c
 				HighlightOptionsKit cHighlightOptions;
 				cHighlightOptions.SetNotification(false);
 
-				m_cDynHighlightControl.GetLineAttributeControl().SetWeight(m_fLineWeight);
+// 				float fLineWeight = 0.05;
+// 				Line::SizeUnits eUnits = Line::SizeUnits::WindowRelative;
+// 				m_cDynLineHighlightCtrl.GetLineAttributeControl().SetWeight(fLineWeight, eUnits);
 
 				// 맨 처음에는 기존 Hightlight를 삭제한다.
 				if (0 < m_cOSnapRelationSelItem.GetCount()) {
@@ -384,7 +395,7 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 	pcView->GetHighlightSelection()->SetAllowRegionSelection(false);
 	pcView->SetDynamicHighlighting(true);
 
-	pcView->DoDynamicHighlighting(HPoint(cMousePoint.x, cMousePoint.y, 0.0f));
+	pcView->DoDynamicHighlighting(HPoint(cInWindowPoint.x, cInWindowPoint.y, 0.0f));
 
 	return HLISTENER_PASS_EVENT;
 #endif
@@ -560,11 +571,12 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 		}
 		else {
 			if (H3DF::Type::LineKey == eType) {
+				//m_cDynLineHighlightCtrl.GetLineAttributeControl().SetWeight(1);
 				m_cDynLineHighlightCtrl.Highlight(cFrontItem, cOption);
 			}
 			else {
 				// float fLineWeight = 0.0;
-				// m_cDynamicHighlightControl.GetLineAttributeControl().SetWeight(fLineWeight);
+				//m_cDynHighlightControl.GetLineAttributeControl().SetWeight(10);
 				// 선택된 요소를 Highlight한다.
 				m_cDynHighlightControl.Highlight(cFrontItem, cOption);
 			}
@@ -931,6 +943,7 @@ void KERNEL::Command::HighlightObjectSnapImpl::DrawSnapItems()
 // 1-1. Snap Point를 Draw
 void KERNEL::Command::HighlightObjectSnapImpl::DrawSnapPoint(Command::HighlightObjectSnapImpl::SnapPoint & cSnapPoint, CamerInformation & cInCameraInfo, bool bOperateSemgment)
 {
+
 	if (true == bOperateSemgment) {
 		m_cSnapPointSegment.Open(); {
 			m_cSnapPointSegment.SetModellingMatrix(cInCameraInfo.cMatrix);
@@ -946,7 +959,7 @@ void KERNEL::Command::HighlightObjectSnapImpl::DrawSnapPoint(Command::HighlightO
 }
 
 // 1-1-1. Point에 Snap Point와 글자를 Draw
-void KERNEL::Command::HighlightObjectSnapImpl::DrawSnapPoint(Point2D center, Status eInStatus, OSnap::Type eInType, double dUnit)
+void KERNEL::Command::HighlightObjectSnapImpl::DrawSnapPoint(H3DF::Point2D center, Status eInStatus, OSnap::Type eInType, double dUnit)
 {
 	using namespace Painter;
 
@@ -961,7 +974,7 @@ void KERNEL::Command::HighlightObjectSnapImpl::DrawSnapPoint(Point2D center, Sta
 	const COLORREF TooltipBackColor = RGB(0x43, 0x43, 0x43);
 	const COLORREF TooltipEdgeColor = RGB(0x64, 0x64, 0x64);
 
-	Point position(center);
+	H3DF::Point position(center);
 
 	HC_Open_Segment("inner");
 	{
@@ -1037,9 +1050,9 @@ void KERNEL::Command::HighlightObjectSnapImpl::DrawSnapPoint(Point2D center, Sta
 			Segment::SetColor("edges", TooltipEdgeColor);
 
 			double padding = dUnit * 3;
-			Point size(width, height + padding);
-			H3DF::Point p1(position.x - size.x / 2, position.y + size.y / 2);
-			H3DF::Point p2(position.x + size.x / 2, position.y - size.y / 2);
+			H3DF::Point size(width, height + padding, 0);
+			H3DF::Point p1(position.x - size.x / 2, position.y + size.y / 2, 0);
+			H3DF::Point p2(position.x + size.x / 2, position.y - size.y / 2, 0);
 
 			Figure::CreateObround(p1, p2);
 		}

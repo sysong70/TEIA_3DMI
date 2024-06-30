@@ -2,7 +2,7 @@
 
 #include "Command.VisualEffects.h"
 
-#include "Impl/CommandImpl.h"
+#include "Impl/Command.SetImpl.h"
 
 #include "Signal.Connector.h"
 #include "../Signal/Signal.h"
@@ -26,13 +26,13 @@ namespace KERNEL
 {
 	namespace Command
 	{
-		class VisualEffectsImpl : public CommandImpl
+		class VisualEffectsImpl : public SetImpl
 		{
 		public:
 			VisualEffectsImpl(const Session * pcInSession);
 
 			void Copy(VisualEffectsImpl * pcInThat) {
-				CommandImpl::Copy(pcInThat);
+				SetImpl::Copy(pcInThat);
 			}
 
 			void Request(Json::Object & cInObject);
@@ -60,7 +60,7 @@ namespace KERNEL
 }
 
 KERNEL::Command::VisualEffectsImpl::VisualEffectsImpl(const Session * pcInSession)
-	: CommandImpl(pcInSession)
+	: SetImpl(pcInSession)
 {
 	// 변경된 전역 Visual Effect 값을 가져온다.
 	m_cOption.Set(TheKenel.VisualEffects.Get());
@@ -168,7 +168,8 @@ void KERNEL::Command::VisualEffectsImpl::SetBloom(TheVisualEffects::BLOOM & cInO
 
 //== Visual Effects class ==========================================================================
 
-KERNEL::Command::VisualEffects::VisualEffects(const Session * pcInSession)
+KERNEL::Command::VisualEffects::VisualEffects(const Session * pcInSession) :
+	Set(pcInSession)
 {
 	VisualEffectsImpl * pcImpl = new VisualEffectsImpl(pcInSession);
 	DEBUG_VALID(pcImpl);

@@ -468,14 +468,14 @@ int H3DF::Operator::CameraControl::LButtonDown(HEventInfo & cInEvent)
 
 // 2. Left Button Up 처리
 // L Button Up을 핱때 Objet를 선택함.
-int H3DF::Operator::CameraControl::LButtonUp(HEventInfo & cInEvent)
+int H3DF::Operator::CameraControl::LButtonUp(HEventInfo & cInEvent, SelectionItem & cInItem)
 {
 	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	// Nvigation Cube가 있으면 Navigation Cube의 이벤트를 처리함.
 	if (nullptr != pcImpl->m_pcNaviCube) {
-		if (HLISTENER_CONSUME_EVENT == pcImpl->m_pcNaviCube->LButtonUp(cInEvent)) {
+		if (HLISTENER_CONSUME_EVENT == pcImpl->m_pcNaviCube->LButtonUp(cInEvent, cInItem)) {
 			return HLISTENER_CONSUME_EVENT;
 		}
 	}
@@ -584,16 +584,19 @@ int H3DF::Operator::CameraControl::MouseWheel(HEventInfo & cInEvent)
 
 	if (cInEvent.Shift()) {
 		if (zDelta >= 0) {
-			cAdjustedCamera.field_width *= 1.2f;
-			cAdjustedCamera.field_height *= 1.2f;
+			cAdjustedCamera.field_width *= 1.5f;
+			cAdjustedCamera.field_height *= 1.5f;
 		}
 		else {
-			cAdjustedCamera.field_width *= 0.8f;
-			cAdjustedCamera.field_height *= 0.8f;
+			cAdjustedCamera.field_width *= 0.75f;
+			cAdjustedCamera.field_height *= 0.75f;
 		}
 	}
 	else {
-		pcImpl->ComputeReasonableTarget(cAdjustedCamera.target, cInEvent.GetMouseWindowPos(), cOriginCamera.target);
+		// 선택한 오브젝트가 있는 경우 선택점을 이용해서 위치 보정을 함.
+		// 속도에 영향을 줘서 사용하지 않도록 처리함, 사용상에 큰 문제는 없어 보임.
+		// pcImpl->ComputeReasonableTarget(cAdjustedCamera.target, cInEvent.GetMouseWindowPos(), cOriginCamera.target);
+		
 		if (streq(cOriginCamera.projection, "perspective")) {
 			pcView->ComputeNewField(cAdjustedCamera.field_width, cAdjustedCamera.field_height, cAdjustedCamera.target, cOriginCamera);
 		}
@@ -612,18 +615,23 @@ int H3DF::Operator::CameraControl::MouseWheel(HEventInfo & cInEvent)
 			if (zDelta < 0) {
 				goto BAILOUT;
 			}
+
 			cAdjustedCamera.field_width = cOriginCamera.field_width * fabs(1 + zDelta);
 			cAdjustedCamera.field_height = cOriginCamera.field_height * fabs(1 + zDelta);
 			dDiagonalLength = sqrt(pow(cAdjustedCamera.field_width, 2) + pow(cAdjustedCamera.field_height, 2));
 			cAdjustedCamera.target = cOriginCamera.target;
 		}
-		/* If the camera is about to be too big... */
-		if (dDiagonalLength > fabs(MVO_SQRT_MAX_FLOAT))
+
+		// If the camera is about to be too big...
+		if (dDiagonalLength > fabs(MVO_SQRT_MAX_FLOAT)) {
 			goto BAILOUT;
+		}
 
 		/* Shift the target slightly toward the mouse pointer. */
 		HVector cMouseWorldPos = cInEvent.GetMouseWorldPos();
+
 		HUtility::AdjustPositionToPlane(pcView, cMouseWorldPos, cAdjustedCamera.target);
+
 		cAdjustedCamera.target += (cAdjustedCamera.target - cMouseWorldPos) * zDelta;
 
 		HVector cDirectionToPosition = cOriginCamera.position - cOriginCamera.target;

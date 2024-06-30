@@ -42,6 +42,8 @@ namespace KERNEL
 			//== Highlight 관련 함수 =================================================================
 			H3DF::HighlightControl & DynHighlightControl();
 
+			H3DF::SelectionItem & DynamicHighlightSelectionItem();
+
 			void Unhighlight(H3DF::SelectionResults const & cInItems);
 			void UnhighlightEverything();
 

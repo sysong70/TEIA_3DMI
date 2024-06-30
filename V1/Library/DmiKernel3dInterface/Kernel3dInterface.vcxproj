@@ -16,10 +16,14 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>3DmiCommandAnalyzer</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <SccProjectName>SAK</SccProjectName>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccLocalPath>SAK</SccLocalPath>
-    <SccProvider>SAK</SccProvider>
+    <SccProjectName>
+    </SccProjectName>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccProvider>
+    </SccProvider>
     <ProjectName>Kernel3dInterface</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -74,6 +78,7 @@
       <AdditionalIncludeDirectories>$(Dmi3dfInclude);../Common;../Dmi3dfInterface;../3DX/include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <BrowseInformation>true</BrowseInformation>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -102,6 +107,7 @@
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(Dmi3dfInclude);../Common;../Dmi3dfInterface;../3DX/include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -126,18 +132,18 @@
     <ClInclude Include="..\Common\WStr.h" />
     <ClInclude Include="..\Signal\Signal.h" />
     <ClInclude Include="..\Signal\WorkerThread.h" />
-    <ClInclude Include="Command.InputManager.h" />
     <ClInclude Include="Command.Manager.h" />
     <ClInclude Include="Command.MeasureManager.h" />
-    <ClInclude Include="Command.PmiManager.h" />
+    <ClInclude Include="Command.PMI.Distance.h" />
+    <ClInclude Include="Command.PMI.Smart.h" />
     <ClInclude Include="Command.Set.h" />
     <ClInclude Include="Command.Step.h" />
-    <ClInclude Include="Impl\Command.InputManagerImpl.h" />
     <ClInclude Include="Impl\Command.ManagerImpl.h" />
+    <ClInclude Include="Impl\Command.SetImpl.h" />
+    <ClInclude Include="Impl\Command.StepImpl.h" />
     <ClInclude Include="Impl\Kernel.ApplicationImpl.h" />
     <ClInclude Include="Impl\Kernel.SessionImpl.h" />
     <ClInclude Include="Impl\Command.HighlightObjectSnapImpl.h" />
-    <ClInclude Include="Impl\CommandImpl.h" />
     <ClInclude Include="Kernel.Application.h" />
     <ClInclude Include="Kernel.h" />
     <ClInclude Include="Kernel.Session.h" />
@@ -167,19 +173,19 @@
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\Signal\Signal.cpp" />
     <ClCompile Include="..\Signal\WorkerThread.cpp" />
-    <ClCompile Include="Command.InputManager.cpp" />
     <ClCompile Include="Command.Manager.cpp" />
     <ClCompile Include="Command.MeasureManager.cpp" />
-    <ClCompile Include="Command.PmiManager.cpp" />
+    <ClCompile Include="Command.PMI.Distance.cpp" />
+    <ClCompile Include="Command.PMI.Smart.cpp" />
     <ClCompile Include="Command.Set.cpp" />
     <ClCompile Include="Command.Step.cpp" />
     <ClCompile Include="dllmain.cpp" />
-    <ClCompile Include="Impl\Command.InputManagerImpl.cpp" />
     <ClCompile Include="Impl\Command.ManagerImpl.cpp" />
+    <ClCompile Include="Impl\Command.SetImpl.cpp" />
+    <ClCompile Include="Impl\Command.StepImpl.cpp" />
     <ClCompile Include="Impl\Kernel.ApplicationImpl.cpp" />
     <ClCompile Include="Impl\Kernel.SessionImpl.cpp" />
     <ClCompile Include="Impl\Command.HighlightObjectSnapImpl.cpp" />
-    <ClCompile Include="Impl\CommandImpl.cpp" />
     <ClCompile Include="Kernel.Application.cpp" />
     <ClCompile Include="Kernel.cpp" />
     <ClCompile Include="Kernel.Session.cpp" />
