@@ -23,6 +23,7 @@
 #include <HBhvBehaviorManager.h>
 
 #include <HOpCameraOrbit.h>
+#include <HOpCameraRelativeOrbit.h>
 #include <HOpCameraOrbitTurntable.h>
 #include <HOpCameraPan.h>
 #include <HOpCameraZoomBox.h>
@@ -256,6 +257,7 @@ namespace H3DF
 			double  m_dFirstPoint[3];
 
 			HOpCameraOrbit m_cCameraOrbit;
+			HOpCameraRelativeOrbit m_cCameraRelativeOrbit;
 			CameraOrbitTurntable m_cCameraOrbitTurntable;
 			HOpCameraPan m_cCameraPan;
 			CameraZoomBox m_cCameraZoomBox;
@@ -266,6 +268,7 @@ namespace H3DF
 H3DF::Operator::CameraControlImpl::CameraControlImpl(WindowKey const & cInWindow, NavigationCube const & cNaviCube)
 	: OperatorImpl(cInWindow),
 	m_cCameraOrbit((HBaseView *)cInWindow.GetBaseView()),
+	m_cCameraRelativeOrbit((HBaseView *)cInWindow.GetBaseView()),
 	m_cCameraOrbitTurntable((HBaseView *)cInWindow.GetBaseView()),
 	m_cCameraPan((HBaseView *)cInWindow.GetBaseView()),
 	m_cCameraZoomBox((HBaseView *)cInWindow.GetBaseView())
@@ -462,8 +465,9 @@ int H3DF::Operator::CameraControl::LButtonDown(HEventInfo & cInEvent)
 			return pcImpl->m_cCameraZoomBox.OnLButtonDown(cInEvent);
 			break;
 	}
-
-	return pcImpl->m_cCameraOrbit.OnLButtonDown(cInEvent);
+	
+	return pcImpl->m_cCameraRelativeOrbit.OnLButtonDown(cInEvent);
+	//return pcImpl->m_cCameraOrbit.OnLButtonDown(cInEvent);
 }
 
 // 2. Left Button Up 처리
@@ -495,7 +499,8 @@ int H3DF::Operator::CameraControl::LButtonUp(HEventInfo & cInEvent, SelectionIte
 			break;
 	}
 
-	return pcImpl->m_cCameraOrbit.OnLButtonUp(cInEvent);
+	return pcImpl->m_cCameraRelativeOrbit.OnLButtonUp(cInEvent);
+	//return pcImpl->m_cCameraOrbit.OnLButtonUp(cInEvent);
 }
 
 int H3DF::Operator::CameraControl::LButtonDownAndMove(HEventInfo & cInEvent)
@@ -527,7 +532,8 @@ int H3DF::Operator::CameraControl::LButtonDownAndMove(HEventInfo & cInEvent)
 			break;
 
 		default:
-			nResult = pcImpl->m_cCameraOrbit.OnLButtonDownAndMove(cInEvent);
+			nResult = pcImpl->m_cCameraRelativeOrbit.OnLButtonDownAndMove(cInEvent);
+			//nResult = pcImpl->m_cCameraOrbit.OnLButtonDownAndMove(cInEvent);
 			break;
 	}
 

@@ -561,18 +561,18 @@ namespace H3DF
 		Selectability() = default;
 	};
 
-	class SelectionHighlightMode
+	class HighlightMode
 	{
 	public:
 		enum class Type : uint32_t
 		{
-			HighlightDefault,			// use default conditional highlighting
-			HighlightQuickmoves,		// use quick move reference highlighting
+			DefaultConditional,			// use default conditional highlighting
+			Quickmoves,					// use quick move reference highlighting
 			InverseTransparency,		// do nothing to the selected item, but make the rest of the model transparent.
 			ColoredInverseTransparency	// color the selected item and make the rest of the model transparent.
 		};
 	private:
-		SelectionHighlightMode() = default;
+		HighlightMode() = default;
 	};
 
 	class API_3DF AttributeLock
@@ -709,6 +709,14 @@ namespace H3DF
 			MaterialCutFaceGloss,
 
 			Camera = 0x04000000,
+
+			LineAttribute = 0x05000000,
+			LineAttributePattern,
+			LineAttributeWeight,
+
+			EdgeAttribute = 0x05100000,
+			EdgeAttributePattern,
+			EdgeAttributeWeight,
 		};
 
 	private:

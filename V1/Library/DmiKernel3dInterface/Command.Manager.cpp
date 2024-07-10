@@ -70,7 +70,7 @@ void KERNEL::Command::Manager::ExecuteViewSignal(Json::Object & cInObject)
 	int nAction = cInObject.GetInteger(SKW_ACTION);
 	int nViewId = cInObject.GetInteger(SKW_VIEWID);
 
-	TRACE(L"ExecuteViewSignal Action: %d, ViewId: %d", nAction, nViewId);
+	// TRACE(L"ExecuteViewSignal Action: %d, ViewId: %d", nAction, nViewId);
 
 	switch ((Signal::View::Action)nAction)
 	{

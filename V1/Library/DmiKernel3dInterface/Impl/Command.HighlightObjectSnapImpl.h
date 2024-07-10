@@ -65,6 +65,7 @@ namespace KERNEL
 			int LButtonDownAndMove(HEventInfo & cInEvent);
 			int NoButtonDownAndMove(HEventInfo & cInEvent);
 			bool DoDynamicHighlighting(H3DF::WindowPoint cMousePoint, H3DF::SelectionItem & cOutSelection);
+			bool DoDynamicHighlighting_V1(H3DF::WindowPoint cMousePoint, H3DF::SelectionItem & cOutSelection);
 
 			void SetObjectSnapMode(DWORD nInSnapMode);
 			void SetSelectionFilter(DWORD nInSelFilter);
@@ -82,8 +83,8 @@ namespace KERNEL
 		public:
 			void DrawSnapItems();
 
-			void DrawSnapPoint(SnapPoint & cSnapPoint, CamerInformation & cInCameraInfo, bool bOperateSemgment = true);
-			void DrawSnapPoint(H3DF::Point2D center, Status eInStatus, OSnap::Type eInType, double dUnit);
+			void DrawSnapPointTypeText(SnapPoint & cSnapPoint, CamerInformation & cInCameraInfo, bool bSemgmentOpen = true);
+			void DrawSnapPointTypeText(H3DF::Point2D center, Status eInStatus, OSnap::Type eInType, double dUnit);
 
 			double PixelToWorld(double unit);
 			bool ShowCameraInformation(float fInRadius, CamerInformation & cOutInfo);

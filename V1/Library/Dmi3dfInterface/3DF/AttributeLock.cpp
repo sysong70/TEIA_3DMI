@@ -402,6 +402,29 @@ CStringA H3DF::AttributeLockControlImpl::GetTypeString(AttributeLock::Type eInTy
 		case H3DF::AttributeLock::Type::Camera:
 			break;
 */
+		case H3DF::AttributeLock::Type::LineAttribute:
+			strTypeString = "line";
+			break;
+
+		case H3DF::AttributeLock::Type::LineAttributePattern:
+			strTypeString = "line pattern";
+			break;
+
+		case H3DF::AttributeLock::Type::LineAttributeWeight:
+			strTypeString = "line weight";
+			break;
+
+		case H3DF::AttributeLock::Type::EdgeAttribute:
+			strTypeString = "edge";
+			break;
+
+		case H3DF::AttributeLock::Type::EdgeAttributePattern:
+			strTypeString = "edge pattern";
+			break;
+
+		case H3DF::AttributeLock::Type::EdgeAttributeWeight:
+			strTypeString = "edge weight";
+			break;
 
 		default:
 			ASSERT(false);

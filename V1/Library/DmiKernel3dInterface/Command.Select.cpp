@@ -188,7 +188,7 @@ int KERNEL::Command::Select::LButtonDown(HEventInfo & cInEvent)
 	return 0;
 }
 
-int KERNEL::Command::Select::LButtonUp(HEventInfo & cInEvent)
+bool KERNEL::Command::Select::LButtonUp(HEventInfo & cInEvent)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -201,17 +201,17 @@ int KERNEL::Command::Select::LButtonUp(HEventInfo & cInEvent)
 		double dLength = pcImpl->m_cLButtonDownPixelPosition.DistanceWith(cMousePixelPosition);
 
 		if (2.0 < dLength) {
-			return HLISTENER_PASS_EVENT;
+			return false;
 		}
 	}
 	else {
-		return HLISTENER_PASS_EVENT;
+		return false;
 	}
 
 	// 2. Dynamic Highlight된 Item을 가져옴. 
 	H3DF::SelectionItem & cSelItem = pcImpl->m_cHighlightOSnapOperator.DynamicHighlightSelectionItem();
 	if (false == cSelItem.IsValid()) {
-		return HLISTENER_PASS_EVENT;
+		return false;
 	}
 
 #ifdef _DEBUG
@@ -276,7 +276,7 @@ int KERNEL::Command::Select::LButtonUp(HEventInfo & cInEvent)
 
 	pcImpl->View().Update();
 
-	return HLISTENER_PASS_EVENT;
+	return true;
 }
 
 //== Object Snap 관련 함수 ===========================================================================

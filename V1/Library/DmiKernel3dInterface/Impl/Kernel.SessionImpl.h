@@ -6,6 +6,7 @@
 #include "../Object.h"
 
 #include "../Command.h"
+#include "../Command.Step.h"
 #include "../Command.HighlightObjectSnap.h"
 #include "../Command.Camera.h"
 #include "../Command.Select.h"
@@ -71,7 +72,7 @@ namespace KERNEL
 		bool SelectViewControlLButtonDown(int nFlag, int x, int y);
 		bool LButtonDown(int nFlag, int x, int y);
 		
-		bool SelectViewControlLButtonUp(int nFlag, int x, int y);
+		Command::Step::InputType SelectViewControlLButtonUp(int nFlag, int x, int y);
 		bool LButtonUp(int nFlag, int x, int y);
 
 		DWORD MouseMapFlags(DWORD nState);

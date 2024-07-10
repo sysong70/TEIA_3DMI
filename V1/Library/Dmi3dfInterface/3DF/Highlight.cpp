@@ -121,6 +121,31 @@ bool H3DF::HighlightOptionsKit::ShowNotification(bool & bOutState) const
 	return true;
 }
 
+//== SelectionSet Class =============================================================================
+namespace H3DF
+{
+	class HighlightSelectionSet : public HSelectionSet
+	{
+	public:
+		HighlightSelectionSet(HBaseView * pcInView, bool bInReferenceSelection = false);
+
+		void UpdateHighlightStyle() override;
+	};
+}
+
+H3DF::HighlightSelectionSet::HighlightSelectionSet(HBaseView * pcInView, bool bInReferenceSelection)
+	: HSelectionSet(pcInView, bInReferenceSelection)
+{
+}
+
+void H3DF::HighlightSelectionSet::UpdateHighlightStyle()
+{
+	HSelectionSet::UpdateHighlightStyle();
+
+	SegmentKey cHighlightStyleSegment = GetHighlightStyle();
+	cHighlightStyleSegment.GetAttributeLockControl().SetLock(AttributeLock::Type::LineAttributeWeight).SetLock(AttributeLock::Type::EdgeAttributeWeight);
+}
+
 //== HighlightControlImpl Class ====================================================================
 namespace H3DF
 {
@@ -170,13 +195,11 @@ H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
 	// HSelectionSet은 각각 선언될때, Style을 생성하게 된다.
 	//================================================================================================
 
-	m_pcSelectionSet = new HSelectionSet((HBaseView *)cInWindow.GetBaseView());
-	m_pcSelectionSet->Init();
+	m_pcSelectionSet = new H3DF::HighlightSelectionSet((HBaseView *)cInWindow.GetBaseView());
 
 	m_pcSelectionSet->SetHighlightMode(HighlightQuickmoves);
-	m_pcSelectionSet->SetReferenceSelectionType(RefSelOff);
 
-	m_pcSelectionSet->UpdateHighlightStyle();
+	m_pcSelectionSet->SetReferenceSelectionType(RefSelOff);
 
 	m_pcSelectionSet->SetSelectionLevel(HSelectEntity);
 
@@ -198,8 +221,6 @@ H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
 	m_pcSelectionSet->SetSelectionFaceColor(cHighlightSelectColor);
 	m_pcSelectionSet->SetSelectionEdgeColor(cHighlightSelectColor);
 	m_pcSelectionSet->SetSelectionMarkerColor(cHighlightSelectColor);
-
-	m_pcSelectionSet->SetHighlightMode(HighlightQuickmoves);
 
 	// 선택될때 Face의 Edge를 표시여부 처리
 	m_pcSelectionSet->HighlightRegionEdgesAutoVisibility(false);
@@ -255,6 +276,59 @@ HighlightControl & H3DF::HighlightControl::operator=(HighlightControl const & cI
 {
 	Set(cInThat);
 	return *this;
+}
+
+void H3DF::HighlightControl::SetMode(HighlightMode::Type eInMode)
+{
+	HighlightControlImpl * pcHighlightImpl = (HighlightControlImpl *)m_pcImpl;
+
+	HSelectionHighlightMode eMode = HighlightDefault;
+
+	switch (eInMode) {
+		case HighlightMode::Type::DefaultConditional:
+			eMode = HighlightDefault;
+		break;
+
+		case HighlightMode::Type::Quickmoves:
+			eMode = HighlightQuickmoves;
+		break;
+
+		case HighlightMode::Type::InverseTransparency:
+			eMode = InverseTransparency;
+			break;
+
+		case HighlightMode::Type::ColoredInverseTransparency:
+			eMode = ColoredInverseTransparency;
+			break;
+	}
+
+	pcHighlightImpl->SelectionSet()->SetHighlightMode(eMode);
+}
+
+void H3DF::HighlightControl::SetMode(HighlightMode::Type eInMode) const
+{
+	HighlightControlImpl * pcHighlightImpl = (HighlightControlImpl *)m_pcImpl;
+	HSelectionHighlightMode eMode = HighlightDefault;
+
+	switch (eInMode) {
+	case HighlightMode::Type::DefaultConditional:
+		eMode = HighlightDefault;
+		break;
+
+	case HighlightMode::Type::Quickmoves:
+		eMode = HighlightQuickmoves;
+		break;
+
+	case HighlightMode::Type::InverseTransparency:
+		eMode = InverseTransparency;
+		break;
+
+	case HighlightMode::Type::ColoredInverseTransparency:
+		eMode = ColoredInverseTransparency;
+		break;
+	}
+
+	pcHighlightImpl->SelectionSet()->SetHighlightMode(eMode);
 }
 
 //== Highlight 관련 함수 =============================================================================

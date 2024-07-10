@@ -24,7 +24,7 @@ namespace KERNEL
 			int MouseMove(HEventInfo & cInEvent);
 
 			int LButtonDown(HEventInfo & cInEvent);
-			int LButtonUp(HEventInfo & cInEvent);
+			bool LButtonUp(HEventInfo & cInEvent);
 
 			//== Object Snap 관련 함수 ===============================================================
 			void DrawSnapItems();

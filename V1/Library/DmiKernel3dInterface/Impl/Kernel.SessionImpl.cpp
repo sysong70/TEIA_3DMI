@@ -160,10 +160,6 @@ bool KERNEL::SessionImpl::SelectViewControlMouseMove(int nFlag, int x, int y)
 
 bool KERNEL::SessionImpl::MouseMove(int nFlag, int x, int y)
 {
-	if (true == m_vpcCommandSets.empty()) {
-		return false;
-	}
-
 	return true;
 }
 
@@ -173,7 +169,7 @@ bool KERNEL::SessionImpl::SelectViewControlLButtonDown(int nFlag, int x, int y)
 	// Camera 및 Select 처리
 	m_cLButtonDownPosition.Set(x, y);
 	Select().SetMouseDownTickCount(GetTickCount64());
-
+	 
 	HEventInfo cEvent((HBaseView *) GetBaseView());
 	cEvent.SetPoint(HE_LButtonDown, x, y, MouseMapFlags(nFlag));
 
@@ -188,22 +184,16 @@ bool KERNEL::SessionImpl::SelectViewControlLButtonDown(int nFlag, int x, int y)
 
 bool KERNEL::SessionImpl::LButtonDown(int nFlag, int x, int y)
 {
-	if (true == m_vpcCommandSets.empty()) {
-		return false;
-	}
-
 	return true;
 }
 
 // 3. Left Button Up 함수 처리
 
-// 3-1. Select 및 View Control Mouse Event 처리 함수
-bool KERNEL::SessionImpl::SelectViewControlLButtonUp(int nFlag, int x, int y)
+// 3-1. Select 및 View Control Mouse Event 처리 함수 
+Command::Step::InputType KERNEL::SessionImpl::SelectViewControlLButtonUp(int nFlag, int x, int y)
 {
 	H3DF::Point2D cLButtonUpPosition(x, y);
 	Select().SetMouseUpTickCount(GetTickCount64());
-
-	GetCanvas().GetFrontView().GetWindowKey().GetBaseView();
 
 	// Camera 관련 처리
 	H3DF::Camera::Mode eMode = Camera().CameraMode();
@@ -218,7 +208,7 @@ bool KERNEL::SessionImpl::SelectViewControlLButtonUp(int nFlag, int x, int y)
 	// NavigationCube가 선택된 경우를 처리한다. NavigationCube가 선택되어 View를 변경한 경우에는 
 	// HLISTENER_CONSUME_EVENT값을 리턴한다.
 	if (HLISTENER_CONSUME_EVENT == Camera().LButtonUp(cEvent)) {
-		return false;
+		return Command::Step::InputType::None;
 	}
 
 	if (H3DF::Camera::Mode::ZoomBox == eMode) {
@@ -231,19 +221,17 @@ bool KERNEL::SessionImpl::SelectViewControlLButtonUp(int nFlag, int x, int y)
 	// 앞단에서, NavigationCube가 선택되어 View가 변경된 경우에는 Select 처리를 하지 않는다.
 	Select().LButtonUp(cEvent);
 
-	return true;
+	// 선택된 값을 판단해서 InputType을 리턴한다.
+
+	return Command::Step::InputType::None;
 }
 
 bool KERNEL::SessionImpl::LButtonUp(int nFlag, int x, int y)
 {
-	if (true == m_vpcCommandSets.empty()) {
-		return false;
-	}
-
 	return true;
 }
 
-DWORD KERNEL::SessionImpl::MouseMapFlags(DWORD nState)
+DWORD KERNEL::SessionImpl::MouseMapFlags(DWORD nState) 
 {
 	DWORD nFlag = 0;
 
