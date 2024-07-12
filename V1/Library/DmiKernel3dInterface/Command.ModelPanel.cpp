@@ -6,8 +6,8 @@
 #include "Command.Select.h"
 
 #include "Kernel.Session.h"
-#include "Impl/Kernel.SessionImpl.h"
-#include "Impl/Command.SetImpl.h"
+#include "Impl/Kernel.Session.Impl.h"
+#include "Impl/Command.Set.Impl.h"
 
 #include "Signal.Connector.h"
 

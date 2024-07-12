@@ -2,7 +2,7 @@
 
 #include "../Kernel.h"
 
-#include "Command.SetImpl.h"
+#include "Command.Set.Impl.h"
 
 #include <3DF/3DF.h>
 #include <3DF/Math.h>

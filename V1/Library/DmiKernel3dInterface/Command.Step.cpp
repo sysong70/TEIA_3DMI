@@ -57,5 +57,11 @@ void KERNEL::Command::Step::Draw()
 {
 	StepImpl * pcImpl = (StepImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_pfDrawFunction(this);
 }
 
+void KERNEL::Command::Step::SetEventInfo(const EventInfo & cInEventInfo)
+{
+
+}

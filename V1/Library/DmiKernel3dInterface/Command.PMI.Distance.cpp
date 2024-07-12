@@ -31,11 +31,13 @@ namespace KERNEL
 // Step에서 받아온 Data를 이용해서 Draw를 수행한다.
 void KERNEL::Command::PMI::DistanceStep::Draw1(Step * pcInStep)
 {
+	int i = 0;
 	//Window::Draw::Text(pcInStep->GetMessage(), pcInStep->GetPoint());
 }
 
 void KERNEL::Command::PMI::DistanceStep::Draw2(Step * pcInStep)
 {
+	int j = 0;
 	//Window::Draw::Text(pcInStep->GetMessage(), pcInStep->GetPoint());
 }
 
@@ -50,12 +52,12 @@ KERNEL::Command::PMI::Distance::Distance(const Session * pcInSession) :
 	pcStep1->SetInformation(L"Enter the first coordinate for the distance dimension./거리 치수를 위한 첫번째 좌표를 입력하세요.");
 	pcStep1->SetDrawFunction(DistanceStep::Draw1);
 	PushBack(pcStep1);
-
+ 
 	Step * pcStep2 = new Step();
 	pcStep2->SetInputType(Step::InputType::Coordinate);
 	pcStep2->SetMessage(L"Input second coordiate/두번째 좌표 입력");
 	pcStep2->SetInformation(L"Complete the distance dimension by entering a second coordinate./두번째 좌표를 입력해서 거리 치수를 완성하세요.");
-	pcStep1->SetDrawFunction(DistanceStep::Draw2);
+	pcStep2->SetDrawFunction(DistanceStep::Draw2);
 	PushBack(pcStep2);
 }
 

@@ -103,6 +103,8 @@ namespace H3DF
 
 		//WindowPoint & operator = (HPoint const & cInPoint) { x = cInPoint.x, y = cInPoint.y, z = cInPoint.z; return *this; }
 
+		void ClampPoint();
+
 	private:
 		WindowPoint(ObjectPoint const & cInPoint); // Prevents implicit conversion to other points
 		WindowPoint(WorldPoint const & cInPoint); // Prevents implicit conversion to other points

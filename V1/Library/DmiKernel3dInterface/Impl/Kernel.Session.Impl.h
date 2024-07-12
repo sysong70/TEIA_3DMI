@@ -1,4 +1,4 @@
-﻿//////////////#pragma once
+﻿#pragma once
 
 #include <Json.h>
 
@@ -45,6 +45,9 @@ namespace KERNEL
 		H3DF::Canvas & GetCanvas() { return *m_pcCanvas; }
 		H3DF::Canvas * m_pcCanvas = nullptr;
 
+		H3DF::WindowKey & Window();
+		const H3DF::WindowKey & Window() const;
+
 		H3DF::Model & GetModel();
 		H3DF::CADModel & CADModel();
 	
@@ -66,13 +69,8 @@ namespace KERNEL
 		Command::ModelPanel & ModelPanel();
 
 		//== Mouse 관련 함수 =========================================================================
-		bool SelectViewControlMouseMove(int nFlag, int x, int y);
 		bool MouseMove(int nFlag, int x, int y);
-
-		bool SelectViewControlLButtonDown(int nFlag, int x, int y);
 		bool LButtonDown(int nFlag, int x, int y);
-		
-		Command::Step::InputType SelectViewControlLButtonUp(int nFlag, int x, int y);
 		bool LButtonUp(int nFlag, int x, int y);
 
 		DWORD MouseMapFlags(DWORD nState);
@@ -84,14 +82,23 @@ namespace KERNEL
 		void CommandRequest(Json::Object & cInObject);
 		void CommandChange(Json::Object & cInObject);
 
-		void SetCommand(int nId);
+		void SetCommand(int nInCommandId);
 
 	protected:
+		bool IsCommandActive();
+		bool CommandLButtonUp(int nFlag, int x, int y);
+
+	protected:
+		//== View Control 관련 함수 ==================================================================
+		bool SelectViewControlMouseMove(int nFlag, int x, int y);
+		bool SelectViewControlLButtonDown(int nFlag, int x, int y);
+		Command::Step::InputType SelectViewControlLButtonUp(int nFlag, int x, int y);
+
 		void RequestVisualEffects(Json::Object & cInObject);
 		void ChangeVisualEffects(Json::Object & cInObject);
 
 	private:
-		// 화변 제어, Camera, Select, ModelPanel, Attribute등의 처리를 담당. 1회성 이벤트 처리
+		// 화면 제어, Camera, Select, ModelPanel, Attribute등의 처리를 담당. 1회성 이벤트 처리
 		std::unordered_map<Command::Type, Command::Set *> m_mpcCommandMap; 
 		const Signal::Delivery * m_pcDelivery = nullptr;
 

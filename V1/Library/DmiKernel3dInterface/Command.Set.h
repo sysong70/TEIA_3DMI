@@ -2,6 +2,8 @@
 
 #include "Command.h"
 
+#include "Command.EventInfo.h"
+
 namespace KERNEL
 {
 	namespace Command
@@ -43,6 +45,9 @@ namespace KERNEL
 			void Reset();
 			void Reset() const;
 
+			void Clear();
+			void Clear() const;
+
 			size_t GetCount() const;
 			SetIterator GetIterator() const;
 
@@ -51,6 +56,9 @@ namespace KERNEL
 
 			void PushFront(Step * pcInStep);
 			void PushBack(Step * pcInStep);
+
+			//== 입력된 사용자 명령어 처리 ==============================================================
+			bool EventExecution(Command::EventInfo & cInEvent);
 
 			virtual KERNEL::Command::Type GetType() const;
 		};

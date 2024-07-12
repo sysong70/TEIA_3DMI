@@ -3,7 +3,7 @@
 #include "Command.ManagerImpl.h"
 
 #include "../Kernel.Session.h"
-#include "Kernel.SessionImpl.h"
+#include "Kernel.Session.Impl.h"
 
 #include <3DF/Window.h>
 #include <Sprocket/3DF.View.h>

@@ -1,12 +1,13 @@
 ﻿#include <StdAfx.h>
 
-#include "Kernel.SessionImpl.h"
+#include "Kernel.Session.Impl.h"
 #include "../Kernel.Session.h"
 
 #include "../Command.Camera.h"
 #include "../Command.VisualEffects.h"
 #include "../Command.Attribute.h"
 #include "../Command.PMI.Distance.h"
+#include "../Command.EventInfo.h"
 
 #include "../Signal.Connector.h"
 #include "../../Signal/Signal.h"
@@ -47,6 +48,18 @@ KERNEL::SessionImpl::~SessionImpl()
 	if (nullptr != m_pcCanvas) {
 		delete m_pcCanvas;
 	}
+}
+
+H3DF::WindowKey & KERNEL::SessionImpl::Window()
+{
+	DEBUG_VALID(m_pcCanvas);
+	return m_pcCanvas->GetFrontView().GetWindowKey();
+}
+
+const H3DF::WindowKey & KERNEL::SessionImpl::Window() const
+{
+	DEBUG_VALID(m_pcCanvas);
+	return m_pcCanvas->GetFrontView().GetWindowKey();
 }
 
 H3DF::Model & KERNEL::SessionImpl::GetModel()
@@ -138,13 +151,62 @@ KERNEL::Command::ModelPanel & KERNEL::SessionImpl::ModelPanel()
 }
 
 //== Mouse 관련 함수 =================================================================================
+bool KERNEL::SessionImpl::MouseMove(int nFlag, int x, int y)
+{
+	// Select(Object Snap) 및 View Control Mouse Event 처리 함수
+	SelectViewControlMouseMove(nFlag, x, y);
 
-// 1. Mouse Move 함수 처리
+	return true;
+}
 
+bool KERNEL::SessionImpl::LButtonDown(int nFlag, int x, int y)
+{
+	// Select(Object Snap) 및 View Control Mouse Event 처리 함수
+	SelectViewControlLButtonDown(nFlag, x, y);
+
+	return true;
+}
+
+bool KERNEL::SessionImpl::LButtonUp(int nFlag, int x, int y)
+{
+	// Select(Object Snap) 및 View Control Mouse Event 처리 함수
+	SelectViewControlLButtonUp(nFlag, x, y);
+
+	// Command가 설정되었다면, Command에 명령어를 처리할 수 있도록 좌표를 전달한다.
+	if(false == IsCommandActive()) {
+		return true;
+	}
+
+	// 현재 활성화되어 있는 Command에 Left button up 이벤트 전달.
+	CommandLButtonUp(nFlag, x, y);
+
+	// Drag 상태를 확인하도록 한다. 명령어는 Mouse Drag 상태에서는 사용하지 않도록 한다.
+	// Current command에 Input 상태를 확인해야 함.
+
+	// Current command가 Setting되어 있는 경우에, Request Value에 Coordinate가 있는 경우 Command에 Input Coordinate를 전달한다.
+	// pcImpl->CommandRequestCoordinate(cEvent);
+
+	return true;
+}
+
+DWORD KERNEL::SessionImpl::MouseMapFlags(DWORD nState) 
+{
+	DWORD nFlag = 0;
+
+	// map the mfc events state to MVO
+	if (nState & MK_LBUTTON) nFlag |= (DWORD) Command::EventInfo::Flag::LeftButton;
+	if (nState & MK_RBUTTON) nFlag |= (DWORD) Command::EventInfo::Flag::RightButton;
+	if (nState & MK_MBUTTON) nFlag |= (DWORD) Command::EventInfo::Flag::MiddleButton;
+	if (nState & MK_SHIFT) nFlag |= (DWORD) Command::EventInfo::Flag::Shift;
+	if (nState & MK_CONTROL) nFlag |= (DWORD) Command::EventInfo::Flag::Control;
+
+	return nFlag;
+}
+//== View Control 관련 함수 ==========================================================================
 bool KERNEL::SessionImpl::SelectViewControlMouseMove(int nFlag, int x, int y)
 {
 	if (200 > GetTickCount() - m_nMouseWhellStartTick) {
-		return false; 
+		return false;
 	}
 
 	DWORD nNewFlags = MouseMapFlags(nFlag);
@@ -158,12 +220,7 @@ bool KERNEL::SessionImpl::SelectViewControlMouseMove(int nFlag, int x, int y)
 	return true;
 }
 
-bool KERNEL::SessionImpl::MouseMove(int nFlag, int x, int y)
-{
-	return true;
-}
 
-// 2. Left Button Down 함수 처리
 bool KERNEL::SessionImpl::SelectViewControlLButtonDown(int nFlag, int x, int y)
 {
 	// Camera 및 Select 처리
@@ -182,14 +239,7 @@ bool KERNEL::SessionImpl::SelectViewControlLButtonDown(int nFlag, int x, int y)
 	return true;
 }
 
-bool KERNEL::SessionImpl::LButtonDown(int nFlag, int x, int y)
-{
-	return true;
-}
-
-// 3. Left Button Up 함수 처리
-
-// 3-1. Select 및 View Control Mouse Event 처리 함수 
+// 3. Select 및 View Control Mouse Event 처리 함수 
 Command::Step::InputType KERNEL::SessionImpl::SelectViewControlLButtonUp(int nFlag, int x, int y)
 {
 	H3DF::Point2D cLButtonUpPosition(x, y);
@@ -226,26 +276,7 @@ Command::Step::InputType KERNEL::SessionImpl::SelectViewControlLButtonUp(int nFl
 	return Command::Step::InputType::None;
 }
 
-bool KERNEL::SessionImpl::LButtonUp(int nFlag, int x, int y)
-{
-	return true;
-}
-
-DWORD KERNEL::SessionImpl::MouseMapFlags(DWORD nState) 
-{
-	DWORD nFlag = 0;
-
-	// map the mfc events state to MVO
-	if (nState & MK_LBUTTON) nFlag |= MVO_LBUTTON;
-	if (nState & MK_RBUTTON) nFlag |= MVO_RBUTTON;
-	if (nState & MK_MBUTTON) nFlag |= MVO_MBUTTON;
-	if (nState & MK_SHIFT) nFlag |= MVO_SHIFT;
-	if (nState & MK_CONTROL) nFlag |= MVO_CONTROL;
-
-	return nFlag;
-}
-
-//== Attribute 관련 함수 ============================================================================
+//== Attribute 관련 함수 =============================================================================
 
 // 1. 전달받은 Attribute 명령어를 분기 처리하는 함수.
 void KERNEL::SessionImpl::SetVisibility(int nId)
@@ -334,12 +365,12 @@ void KERNEL::SessionImpl::ChangeVisualEffects(Json::Object & cInObject)
 }
 
 // 3. 사용할 Command를 설정하는 함수 #Command
-void KERNEL::SessionImpl::SetCommand(int nId)
+void KERNEL::SessionImpl::SetCommand(int nInCommandId)
 {
 	// Command를 설정하기 전에 기존 Command를 초기화한다.
 	m_vpcCommandSets.clear();
 
-	switch (nId)
+	switch (nInCommandId)
 	{
 		case MEASURE_3D_CMD_Basic_Distance: {
 			Command::PMI::Distance * pcCommand = (Command::PMI::Distance *)m_mpcCommandMap[KERNEL::Command::Type::PMI_Distance];
@@ -353,4 +384,29 @@ void KERNEL::SessionImpl::SetCommand(int nId)
 		default:
 			break;
 	}
+}
+
+//== Command 관련 함수 ===============================================================================
+bool KERNEL::SessionImpl::IsCommandActive()
+{
+	return !m_vpcCommandSets.empty();
+}
+
+bool KERNEL::SessionImpl::CommandLButtonUp(int nFlag, int x, int y)
+{
+	if(false == IsCommandActive()) {
+		return false;
+	}
+
+	Command::EventInfo cEvent(Window());
+	cEvent.SetPoint(Command::EventInfo::Type::LButtonUp, x, y, MouseMapFlags(nFlag));
+
+	m_vpcCommandSets.front()->EventExecution(cEvent);
+/*
+	for (auto & pcCommand : m_vpcCommandSets) {
+		pcCommand->LButtonUp(cEvent);
+	}
+*/
+
+	return true;
 }

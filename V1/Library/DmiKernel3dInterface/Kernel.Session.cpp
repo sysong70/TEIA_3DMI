@@ -1,7 +1,7 @@
 ﻿#include <StdAfx.h>
 
 #include "Kernel.Session.h"
-#include "./Impl/Kernel.SessionImpl.h"
+#include "./Impl/Kernel.Session.Impl.h"
 
 #include <Sprocket/3DF.Canvas.h>
 #include <Sprocket/3DF.Factory.h>
@@ -262,8 +262,7 @@ void KERNEL::Session::MouseMove(int nFlag, int x, int y)
 	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	// Select(Object Snap) 및 View Control Mouse Event 처리 함수
-	pcImpl->SelectViewControlMouseMove(nFlag, x, y);
+	pcImpl->MouseMove(nFlag, x, y);
 }
 
 void KERNEL::Session::LButtonDown(int nFlag, int x, int y)
@@ -271,8 +270,7 @@ void KERNEL::Session::LButtonDown(int nFlag, int x, int y)
 	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	// Select(Object Snap) 및 View Control Mouse Event 처리 함수
-	pcImpl->SelectViewControlLButtonDown(nFlag, x, y);
+	pcImpl->LButtonDown(nFlag, x, y);
 }
 
 void KERNEL::Session::LButtonUp(int nFlag, int x, int y)
@@ -280,14 +278,7 @@ void KERNEL::Session::LButtonUp(int nFlag, int x, int y)
 	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	// Select(Object Snap) 및 View Control Mouse Event 처리 함수
-	pcImpl->SelectViewControlLButtonUp(nFlag, x, y);
-
-	// Drag 상태를 확인하도록 한다. 명령어는 Mouse Drag 상태에서는 사용하지 않도록 한다.
-	// Current command에 Input 상태를 확인해야 함.
-
-	// Current command가 Setting되어 있는 경우에, Request Value에 Coordinate가 있는 경우 Command에 Input Coordinate를 전달한다.
-	// pcImpl->CommandRequestCoordinate(cEvent);
+	pcImpl->LButtonUp(nFlag, x, y);
 }
 
 void KERNEL::Session::RButtonDown(int nFlag, int x, int y)

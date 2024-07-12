@@ -87,9 +87,6 @@
     <ClInclude Include="Command.VisualEffects.h">
       <Filter>Command</Filter>
     </ClInclude>
-    <ClInclude Include="Impl\Kernel.SessionImpl.h">
-      <Filter>Kernel\Impl</Filter>
-    </ClInclude>
     <ClInclude Include="Impl\Command.HighlightObjectSnapImpl.h">
       <Filter>Command\Impl</Filter>
     </ClInclude>
@@ -144,11 +141,17 @@
     <ClInclude Include="Impl\Command.StepImpl.h">
       <Filter>Command\Base\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="Impl\Command.SetImpl.h">
+    <ClInclude Include="Impl\Command.Set.Impl.h">
       <Filter>Command\Base\Impl</Filter>
     </ClInclude>
     <ClInclude Include="Command.PMI.Distance.h">
       <Filter>Command\PMI</Filter>
+    </ClInclude>
+    <ClInclude Include="Impl\Kernel.Session.Impl.h">
+      <Filter>Kernel\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.EventInfo.h">
+      <Filter>Command</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -193,9 +196,6 @@
     </ClCompile>
     <ClCompile Include="Command.VisualEffects.cpp">
       <Filter>Command</Filter>
-    </ClCompile>
-    <ClCompile Include="Impl\Kernel.SessionImpl.cpp">
-      <Filter>Kernel\Impl</Filter>
     </ClCompile>
     <ClCompile Include="Impl\Command.HighlightObjectSnapImpl.cpp">
       <Filter>Command\Impl</Filter>
@@ -251,11 +251,17 @@
     <ClCompile Include="Impl\Command.StepImpl.cpp">
       <Filter>Command\Base\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="Impl\Command.SetImpl.cpp">
+    <ClCompile Include="Impl\Command.Set.Impl.cpp">
       <Filter>Command\Base\Impl</Filter>
     </ClCompile>
     <ClCompile Include="Command.PMI.Distance.cpp">
       <Filter>Command\PMI</Filter>
+    </ClCompile>
+    <ClCompile Include="Impl\Kernel.Session.Impl.cpp">
+      <Filter>Kernel\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.EventInfo.cpp">
+      <Filter>Command</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

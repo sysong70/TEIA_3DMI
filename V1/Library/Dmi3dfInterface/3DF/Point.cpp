@@ -206,6 +206,31 @@ H3DF::WindowPoint::WindowPoint(WorldPoint const & cInPoint) {}
 H3DF::WindowPoint::WindowPoint(InnerWindowPoint const & cInPoint) {}
 H3DF::WindowPoint::WindowPoint(PixelPoint const & cInPoint) {}
 
+void H3DF::WindowPoint::ClampPoint()
+{
+	if (x < -1.0) {
+		x = -1.0f;
+	}
+	else if (x > 1.0) {
+		x = 1.0f;
+	}
+
+	if (y < -1.0) {
+		y = -1.0f;
+	}
+	else if (y > 1.0) {
+		y = 1.0f;
+	}
+
+	if (z < -1.0) {
+		z = -1.0f;
+	}
+	else if (z > 1.0) {
+		z = 1.0f;
+	}
+}
+
+
 //== PixelPoint class ==============================================================================
 H3DF::PixelPoint::PixelPoint(HPoint const & cInPoint)
 {

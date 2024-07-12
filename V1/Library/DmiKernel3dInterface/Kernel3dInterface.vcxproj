@@ -132,6 +132,7 @@
     <ClInclude Include="..\Common\WStr.h" />
     <ClInclude Include="..\Signal\Signal.h" />
     <ClInclude Include="..\Signal\WorkerThread.h" />
+    <ClInclude Include="Command.EventInfo.h" />
     <ClInclude Include="Command.Manager.h" />
     <ClInclude Include="Command.MeasureManager.h" />
     <ClInclude Include="Command.PMI.Distance.h" />
@@ -139,10 +140,10 @@
     <ClInclude Include="Command.Set.h" />
     <ClInclude Include="Command.Step.h" />
     <ClInclude Include="Impl\Command.ManagerImpl.h" />
-    <ClInclude Include="Impl\Command.SetImpl.h" />
+    <ClInclude Include="Impl\Command.Set.Impl.h" />
     <ClInclude Include="Impl\Command.StepImpl.h" />
     <ClInclude Include="Impl\Kernel.ApplicationImpl.h" />
-    <ClInclude Include="Impl\Kernel.SessionImpl.h" />
+    <ClInclude Include="Impl\Kernel.Session.Impl.h" />
     <ClInclude Include="Impl\Command.HighlightObjectSnapImpl.h" />
     <ClInclude Include="Kernel.Application.h" />
     <ClInclude Include="Kernel.h" />
@@ -173,6 +174,7 @@
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\Signal\Signal.cpp" />
     <ClCompile Include="..\Signal\WorkerThread.cpp" />
+    <ClCompile Include="Command.EventInfo.cpp" />
     <ClCompile Include="Command.Manager.cpp" />
     <ClCompile Include="Command.MeasureManager.cpp" />
     <ClCompile Include="Command.PMI.Distance.cpp" />
@@ -181,10 +183,10 @@
     <ClCompile Include="Command.Step.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Impl\Command.ManagerImpl.cpp" />
-    <ClCompile Include="Impl\Command.SetImpl.cpp" />
+    <ClCompile Include="Impl\Command.Set.Impl.cpp" />
     <ClCompile Include="Impl\Command.StepImpl.cpp" />
     <ClCompile Include="Impl\Kernel.ApplicationImpl.cpp" />
-    <ClCompile Include="Impl\Kernel.SessionImpl.cpp" />
+    <ClCompile Include="Impl\Kernel.Session.Impl.cpp" />
     <ClCompile Include="Impl\Command.HighlightObjectSnapImpl.cpp" />
     <ClCompile Include="Kernel.Application.cpp" />
     <ClCompile Include="Kernel.cpp" />

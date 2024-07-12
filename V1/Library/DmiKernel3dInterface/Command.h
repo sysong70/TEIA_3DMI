@@ -2,6 +2,11 @@
 
 #include "Object.h"
 
+namespace H3DF
+{
+	class WindowKey;
+}
+
 namespace KERNEL
 {
 	namespace Command

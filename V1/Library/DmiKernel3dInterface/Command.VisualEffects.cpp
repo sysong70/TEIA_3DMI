@@ -2,7 +2,7 @@
 
 #include "Command.VisualEffects.h"
 
-#include "Impl/Command.SetImpl.h"
+#include "Impl/Command.Set.Impl.h"
 
 #include "Signal.Connector.h"
 #include "../Signal/Signal.h"

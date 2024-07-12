@@ -2,6 +2,8 @@
 
 #include "Object.h"
 
+#include "Command.EventInfo.h"
+
 namespace KERNEL
 {
 	namespace Command
@@ -22,6 +24,8 @@ namespace KERNEL
 
 			InputType GetInputType() const;
 			void SetInputType(InputType eInInputType);
+
+			void SetEventInfo(const EventInfo & cInEventInfo);
 
 			void SetMessage(CString strInMessage);
 			void SetInformation(CString strInInformation);

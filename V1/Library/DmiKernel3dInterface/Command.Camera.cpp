@@ -2,7 +2,7 @@
 
 #include "Command.Camera.h"
 
-#include "Impl/Command.SetImpl.h"
+#include "Impl/Command.Set.Impl.h"
 
 #include "Kernel.Session.h"
 

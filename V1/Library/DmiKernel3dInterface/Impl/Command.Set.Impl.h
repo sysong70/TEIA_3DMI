@@ -2,6 +2,9 @@
 
 #include "../Kernel.h"
 
+#include "../Command.Set.h"
+#include "../Command.EventInfo.h"
+
 #include <vector>
 #include <deque>
 
@@ -40,8 +43,17 @@ namespace KERNEL
 
 			// Update하기전에 Hightlight된 것들을 모두 Unhighlight하고, SnapItem을 모두 Reset한다.
 			void PrepareUpdate();
+
 			// Update가 완료되면, View를 Update한다.
 			void Updated();
+
+			//== Event 관련 함수 =====================================================================
+			bool EventExecution(Command::EventInfo & cInEvent);
+
+			bool StepExecution(Command::Step * pcInStep, Command::EventInfo & cInEvent);
+			bool CheckEvent(Command::Step * pcInStep, Command::EventInfo & cInEvent);
+
+			bool IsValidEventInfo(Command::EventInfo & cInEvent);
 
 		private:
 			const Session * m_pcSession = nullptr;
@@ -50,11 +62,16 @@ namespace KERNEL
 			// 명령어 단계를 저장하는 queue
 			std::deque<Step *> m_deStep;
 
+			std::vector<EventInfo> m_vcEventInfos;
+			EventInfo m_cHoverEventInfo;
+
 			std::vector<CString> m_vstrTexts;
 			std::vector<H3DF::Point> m_vcPoints;
 			std::vector<float> m_vfValues;
 
 			H3DF::Point2D m_cPoint;
+
+			SetIterator m_cIterator;
 		};
 
 		class SetIteratorImpl : public Impl

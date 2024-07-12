@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #include "Command.Set.h"
-#include "Impl/Command.SetImpl.h"
+#include "Impl/Command.Set.Impl.h"
 
 #include "Command.Step.h"
 
@@ -112,10 +112,10 @@ KERNEL::Command::Set::Set(const Session * pcInSession)
 
 KERNEL::Command::Set::~Set()
 {
-	Reset();
+	Clear();
 }
 
-// 결과값을 삭제한다.
+// Set에 포함되어 있는 값 Iterator, EventInfo 등을 초기화.
 void KERNEL::Command::Set::Reset()
 {
 	if (nullptr == m_pcImpl) {
@@ -123,14 +123,12 @@ void KERNEL::Command::Set::Reset()
 		return;
 	}
 
-	SetImpl * pcImpl = (SetImpl *)m_pcImpl;
+	SetImpl * pcImpl = (SetImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	for (auto cItem : pcImpl->m_deStep) {
-		delete cItem;
-	}
+	pcImpl->m_cIterator = GetIterator();
 
-	pcImpl->m_deStep.clear();
+	pcImpl->m_vcEventInfos.clear();
 }
 
 void KERNEL::Command::Set::Reset() const
@@ -140,7 +138,40 @@ void KERNEL::Command::Set::Reset() const
 		return;
 	}
 
-	SetImpl * pcImpl = (SetImpl *)m_pcImpl;
+	SetImpl * pcImpl = (SetImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_cIterator = GetIterator();
+
+	pcImpl->m_vcEventInfos.clear();
+}
+
+// Step을 모두 삭제한다.
+void KERNEL::Command::Set::Clear()
+{
+	if (nullptr == m_pcImpl) {
+		DEBUG_STOP;
+		return;
+	}
+
+	SetImpl * pcImpl = (SetImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	for (auto cItem : pcImpl->m_deStep) {
+		delete cItem;
+	}
+
+	pcImpl->m_deStep.clear();
+}
+
+void KERNEL::Command::Set::Clear() const
+{
+	if (nullptr == m_pcImpl) {
+		DEBUG_STOP;
+		return;
+	}
+
+	SetImpl * pcImpl = (SetImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	for (auto cItem : pcImpl->m_deStep) {
@@ -165,18 +196,20 @@ size_t KERNEL::Command::Set::GetCount() const
 
 KERNEL::Command::SetIterator KERNEL::Command::Set::GetIterator() const
 {
-	SetIterator cIterator;
-	SetIteratorImpl * pcIteratorImpl = (SetIteratorImpl *)cIterator.GetImpl();
-	DEBUG_VALID(pcIteratorImpl);
-
 	SetImpl * pcImpl = (SetImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcIteratorImpl->pcBeginIterator = pcImpl->m_deStep.begin();
-	pcIteratorImpl->pcEndIterator = pcImpl->m_deStep.end();
-	pcIteratorImpl->pcIterator = pcIteratorImpl->pcBeginIterator;
+	if (false == pcImpl->m_cIterator.IsValid()) {
 
-	return cIterator;
+		SetIteratorImpl * pcIteratorImpl = (SetIteratorImpl *) pcImpl->m_cIterator.GetImpl();
+		DEBUG_VALID(pcIteratorImpl);
+
+		pcIteratorImpl->pcBeginIterator = pcImpl->m_deStep.begin();
+		pcIteratorImpl->pcEndIterator = pcImpl->m_deStep.end();
+		pcIteratorImpl->pcIterator = pcIteratorImpl->pcBeginIterator;
+	}
+
+	return pcImpl->m_cIterator;
 }
 
 KERNEL::Command::Step * KERNEL::Command::Set::Front()
@@ -219,6 +252,24 @@ void KERNEL::Command::Set::PushBack(Step * pcInStep)
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_deStep.push_back(pcInStep);
+}
+
+//== 입력된 사용자 명령어 처리 =========================================================================
+bool KERNEL::Command::Set::EventExecution(Command::EventInfo & cInEvent)
+{
+	if (nullptr == m_pcImpl) {
+		DEBUG_STOP;
+		return false;
+	}
+	// Command Step이 없으면 처리하지 않는다.
+	if (0 == GetCount()) {
+		return false;
+	}
+
+	Command::SetImpl * pcImpl = (Command::SetImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->EventExecution(cInEvent);
 }
 
 KERNEL::Command::Type KERNEL::Command::Set::GetType() const
