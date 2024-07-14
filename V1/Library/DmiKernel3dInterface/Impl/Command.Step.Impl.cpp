@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "Command.StepImpl.h"
+#include "Command.Step.Impl.h"
 
 using namespace KERNEL;
 using namespace KERNEL::Command;

@@ -139,9 +139,10 @@
     <ClInclude Include="Command.PMI.Smart.h" />
     <ClInclude Include="Command.Set.h" />
     <ClInclude Include="Command.Step.h" />
+    <ClInclude Include="Draw\Command.Step.Draw.h" />
     <ClInclude Include="Impl\Command.ManagerImpl.h" />
     <ClInclude Include="Impl\Command.Set.Impl.h" />
-    <ClInclude Include="Impl\Command.StepImpl.h" />
+    <ClInclude Include="Impl\Command.Step.Impl.h" />
     <ClInclude Include="Impl\Kernel.ApplicationImpl.h" />
     <ClInclude Include="Impl\Kernel.Session.Impl.h" />
     <ClInclude Include="Impl\Command.HighlightObjectSnapImpl.h" />
@@ -182,9 +183,10 @@
     <ClCompile Include="Command.Set.cpp" />
     <ClCompile Include="Command.Step.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Draw\Command.Step.Draw.cpp" />
     <ClCompile Include="Impl\Command.ManagerImpl.cpp" />
     <ClCompile Include="Impl\Command.Set.Impl.cpp" />
-    <ClCompile Include="Impl\Command.StepImpl.cpp" />
+    <ClCompile Include="Impl\Command.Step.Impl.cpp" />
     <ClCompile Include="Impl\Kernel.ApplicationImpl.cpp" />
     <ClCompile Include="Impl\Kernel.Session.Impl.cpp" />
     <ClCompile Include="Impl\Command.HighlightObjectSnapImpl.cpp" />

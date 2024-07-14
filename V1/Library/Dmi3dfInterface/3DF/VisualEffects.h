@@ -18,6 +18,8 @@ namespace H3DF
 		void Set(VisualEffectsControl const & cInThat);
 		VisualEffectsControl & operator = (VisualEffectsControl const & cInThat);
 
+		VisualEffectsControl & SetPostProcessEffectsEnabled(bool bInState);
+
 		VisualEffectsControl & SetAmbientOcclusionEnabled(bool bInState, float fStrength = 5.0f, bool bFast = true);
 		VisualEffectsControl & SetSilhouetteEdgesEnabled(bool bInState, float fTolerance = 1.0f, bool bHeavyExterior = true);
 		VisualEffectsControl & SetBloomEnabled(bool bInState, float fStrength = 1.f, int Blurring = 5, int nShape = 0);
@@ -49,6 +51,7 @@ namespace H3DF
 		VisualEffectsControl & SetSimpleReflection(bool bInState, float fInOpacity = 0.5f, unsigned int nInBlurring = 1, bool bInFading = false, float fInAttenuationNearDistance = -1.0f, float fInAttenuationFarDistance = -1.0f);
 
 		//== Unset Functions =======================================================================
+		VisualEffectsControl & UnsetPostProcessEffectsEnabled();
 		VisualEffectsControl & UnsetAmbientOcclusionEnabled();
 		VisualEffectsControl & UnsetSilhouetteEdgesEnabled();
 		VisualEffectsControl & UnsetBloomEnabled();
@@ -58,6 +61,7 @@ namespace H3DF
 		VisualEffectsControl & UnsetSimpleShadow();
 
 		//== Show Functions ========================================================================
+		bool ShowPostProcessEffectsEnabled(bool & bOutState) const;
 		bool ShowAmbientOcclusionEnabled(bool & bOutState) const;
 		bool ShowSilhouetteEdgesEnabled(bool & bOutState) const;
 		bool ShowBloomEnabled(bool & bOutState) const;

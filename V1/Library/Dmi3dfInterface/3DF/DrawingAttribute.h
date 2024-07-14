@@ -35,4 +35,17 @@ namespace H3DF
 		DrawingAttributeKit & UnsetDepthRange();
 		DrawingAttributeKit & UnsetFaceDisplacement();
 	};
+
+	class API_3DF DrawingAttributeControl : public Control
+	{
+	public:
+		DrawingAttributeControl(SegmentKey & cInSegmentKey);
+		DrawingAttributeControl(DrawingAttributeControl const & cInThat);
+
+		void Set(DrawingAttributeControl const & cInThat);
+		DrawingAttributeControl & operator = (DrawingAttributeControl const & cInThat);
+
+		DrawingAttributeControl & SetDepthRange(float fInNear, float fInFar);
+		DrawingAttributeControl & SetOverlay(Drawing::Overlay eInOverlay);
+	};
 }

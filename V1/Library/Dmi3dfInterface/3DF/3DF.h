@@ -723,6 +723,56 @@ namespace H3DF
 		AttributeLock() {}
 	};
 
+	class API_3DF Drawing {
+	public:
+		// Handedness is used to define the front face of a polygon as well as the orientation of the z-axis relative to the x-y plane.
+		enum class Handedness : uint32_t {
+			None,
+			Left,
+			Right
+		};
+
+		enum class Overlay : uint32_t {
+			// No overlay will be used.  If geometry is moved, edited or highlighted, a full screen redraw will be triggered on the subsequent update.
+			None,
+
+			// Any geometry in a segment with this mode set will be redrawn on each update and it will appear on top of the scene
+			// regardless of whether it should appear behind other geometry. This is the most efficient overlay mode.
+			// 이 모드가 설정된 세그먼트의 모든 형상은 업데이트할 때마다 다시 그려지며 다른 형상 뒤에 표시되어야 하는지 여부에 관계없이 장면 위에 표시됩니다.이는 가장 효율적인 오버레이 모드입니다.
+			Default,
+
+			// Any geometry in a segment with this mode set will be drawn on each update and it will be positioned correctly with
+			// respect to other geometry within the scene. This is the most accurate overlay mode, but is not as efficient as NormalOverlay.
+			// 이 모드가 설정된 세그먼트의 모든 형상은 업데이트할 때마다 그려지며 장면 내의 다른 형상과 관련하여 올바르게 배치됩니다.이는 가장 정확한 오버레이 모드이지만 NormalOverlay만큼 효율적이지는 않습니다.
+			// 3DF의 spriting 옵션과 같은 옵션임.
+			WithZValues,
+
+			// This setting is useful when you are applying a transparent highlight style to overlay geometry.
+			// This setting suppresses the drawing of the geometry, instead drawing the highlight itself in its place.
+			// If you are not using a transparent highlight style, this setting has no visible effect. This setting is
+			// slightly more computationally expensive than the other overlay settings.
+			// 이 설정은 오버레이 형상에 투명한 강조 스타일을 적용할 때 유용합니다. 이 설정은 형상 그리기를 억제하고 그 자리에 하이라이트 자체를 그립니다.
+			// 투명한 강조 스타일을 사용하지 않는 경우 이 설정은 눈에 보이는 효과가 없습니다.이 설정은 다른 오버레이 설정보다 계산 비용이 약간 더 높습니다.
+			InPlace,
+		};
+
+		// Enumerates the clip region operation types.
+		enum class ClipOperation : uint32_t {
+			Keep, // The geometry inside the clip region is drawn. Everything outside of it is clipped.
+			Remove, // The geometry outside the clip region is drawn. Everything inside of it is clipped.
+		};
+
+		// Enumerates the coordinate spaces types for clip regions.
+		enum class ClipSpace : uint32_t {
+			Window, // The clip region is specified in window coordinates.
+			World, // The clip region is specified in world coordinated.
+			Object, // The clip region is specified in object coordinated.
+		};
+
+	private:
+		Drawing() {}
+	};
+
 	using WindowHandle = DWORD_PTR;
 	using Time = double;
 

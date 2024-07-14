@@ -65,6 +65,21 @@ VisualEffectsControl & H3DF::VisualEffectsControl::operator = (VisualEffectsCont
 
 //== Set Functions =================================================================================
 
+VisualEffectsControl & H3DF::VisualEffectsControl::SetPostProcessEffectsEnabled(bool bInState)
+{
+	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		CStringA strOption;
+		strOption.Format("frame buffer effects = %s", (bInState ? "on" : "off"));
+		HC_Set_Rendering_Options(strOption);
+
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
 // Allows ambient occlusion to be enabled or disabled on a per segment basis.
 // param: in_state Whether ambient occlusion should be used.
 VisualEffectsControl & H3DF::VisualEffectsControl::SetAmbientOcclusionEnabled(bool bInState, float fStrength, bool bFast)
@@ -305,6 +320,19 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleReflection(bool bInS
 
 //== Unset Functions ===============================================================================
 
+VisualEffectsControl & H3DF::VisualEffectsControl::UnsetPostProcessEffectsEnabled()
+{
+	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		HC_UnSet_One_Rendering_Option("frame buffer effects");
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+
 VisualEffectsControl & H3DF::VisualEffectsControl::UnsetAmbientOcclusionEnabled()
 {
 	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
@@ -386,6 +414,38 @@ VisualEffectsControl & H3DF::VisualEffectsControl::UnsetSimpleShadow()
 }
 
 //== Show Functions ================================================================================
+bool H3DF::VisualEffectsControl::ShowPostProcessEffectsEnabled(bool & bOutState) const
+{
+	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	bool bResult = false;
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		char chValue[MVO_BUFFER_SIZE];
+		HC_Show_One_Rendering_Option("frame buffer effects", chValue);
+
+		if (0 == strlen(chValue)) {
+			bResult = false;
+		}
+		else if (nullptr != strstr(chValue, "on")) {
+			bOutState = true;
+			bResult = true;
+		}
+		else if (nullptr != strstr(chValue, "off")) {
+			bOutState = false;
+			bResult = true;
+		}
+		else {
+			bOutState = false;
+			bResult = true;
+			DEBUG_STOP;
+		}
+
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return bResult;
+}
 
 bool H3DF::VisualEffectsControl::ShowAmbientOcclusionEnabled(bool & bOutState) const
 {
@@ -499,6 +559,7 @@ bool H3DF::VisualEffectsControl::ShowAntiAliasing(bool & bOutState) const
 		else {
 			bOutState = false;
 			bResult = true;
+			DEBUG_STOP;
 		}
 
 	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
@@ -535,6 +596,7 @@ bool H3DF::VisualEffectsControl::ShowTextAntiAliasing(bool & bOutState) const
 		else {
 			bOutState = false;
 			bResult = true;
+			DEBUG_STOP;
 		}
 	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
@@ -570,6 +632,7 @@ bool H3DF::VisualEffectsControl::ShowLineAntiAliasing(bool & bOutState) const
 		else {
 			bOutState = false;
 			bResult = true;
+			DEBUG_STOP;
 		}
 	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 

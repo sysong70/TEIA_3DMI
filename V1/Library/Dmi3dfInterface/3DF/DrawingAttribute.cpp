@@ -6,6 +6,9 @@
 #include "./Impl/SegmentImpl.h"
 #include "./Impl/ControlImpl.h"
 
+#include <hc.h>
+#include <HTools.h>
+
 using namespace H3DF;
 
 //== DrawingAttributeKit class =====================================================================
@@ -139,6 +142,95 @@ DrawingAttributeKit & H3DF::DrawingAttributeKit::UnsetFaceDisplacement()
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bFaceDisplacement = false;
+
+	return *this;
+}
+
+//== DrawingAttributeControl class =================================================================
+
+namespace H3DF
+{
+	class DrawingAttributeControlImpl : public ControlImpl
+	{
+	public:
+		DrawingAttributeControlImpl() { m_eType = H3DF::Type::DrawingAttributeControl; }
+
+		void Copy(DrawingAttributeControlImpl * pcInThat) {
+			ControlImpl::Copy(pcInThat);
+		}
+	};
+}
+H3DF::DrawingAttributeControl::DrawingAttributeControl(SegmentKey & cInSegmentKey)
+{
+	DrawingAttributeControlImpl * pcImpl = new DrawingAttributeControlImpl();
+	pcImpl->m_cOverrideKey = cInSegmentKey;
+
+	m_pcImpl = pcImpl;
+}
+
+H3DF::DrawingAttributeControl::DrawingAttributeControl(DrawingAttributeControl const & cInThat)
+{
+	m_pcImpl = new DrawingAttributeControlImpl();
+	Set(cInThat);
+}
+
+void H3DF::DrawingAttributeControl::Set(DrawingAttributeControl const & cInThat)
+{
+	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	DrawingAttributeControlImpl * pcInThatImpl = (DrawingAttributeControlImpl *) cInThat.m_pcImpl;
+	pcImpl->Copy(pcInThatImpl);
+}
+
+DrawingAttributeControl & H3DF::DrawingAttributeControl::operator = (DrawingAttributeControl const & cInThat)
+{
+	Set(cInThat);
+	return *this;
+}
+
+DrawingAttributeControl & H3DF::DrawingAttributeControl::SetDepthRange(float fInNear, float fInFar)
+{
+	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		CStringA strOption;
+		strOption.Format("depth range = (%f, %f)", fInNear, fInFar);
+		HC_Set_Rendering_Options(strOption);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+DrawingAttributeControl & H3DF::DrawingAttributeControl::SetOverlay(Drawing::Overlay eInOverlay)
+{
+	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+
+		switch (eInOverlay)
+		{
+		case Drawing::Overlay::None:
+			HC_Set_Heuristics("quick moves = off");
+			break;
+
+		case Drawing::Overlay::Default:
+			HC_Set_Heuristics("quick moves = on");
+			break;
+
+		case Drawing::Overlay::WithZValues:
+			HC_Set_Heuristics("quick moves = spriting");
+			break;
+
+		case Drawing::Overlay::InPlace:
+			HC_Set_Heuristics("quick moves = inplace");
+			break;
+
+		default:
+			DEBUG_STOP;
+			break;
+		}
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }
