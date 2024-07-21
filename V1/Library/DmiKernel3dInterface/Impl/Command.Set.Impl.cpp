@@ -162,7 +162,7 @@ bool KERNEL::Command::SetImpl::EventExecution(Command::EventInfo & cInEvent)
 		return false;
 	}
 
-	// Iterator가 유효하지 않으면 처리하지 않는다.
+	// Iterator가 유효하지 않은 경우 Iterator를 초기화한다.
 	if (false == m_cIterator.IsValid()) {
 		SetIteratorImpl * pcIteratorImpl = (SetIteratorImpl *) m_cIterator.GetImpl();
 		DEBUG_VALID(pcIteratorImpl);
@@ -199,8 +199,15 @@ bool KERNEL::Command::SetImpl::StepExecution(Command::Step * pcInStep, Command::
 	//pcStep->SetEventInfo(m_vcEventInfos);
 
 	// Step에서 요구하는 Event인지 확인 필요
-	if (false == CheckEvent(pcInStep, cInEvent)) {
-		return false;
+	Step::EventType eEventType = CheckEvent(pcInStep, cInEvent);
+
+	// Event가 완료되기 전 단계임.
+	if (Step::EventType::PreProcessing == eEventType) {
+		return true;
+	}
+	// Event가 완료된 후 단계임.
+	else if (Step::EventType::Complete == eEventType) {
+		return true;
 	}
 
 	// Step에서 필요한 화면을 그리도록 한다.
@@ -212,9 +219,9 @@ bool KERNEL::Command::SetImpl::StepExecution(Command::Step * pcInStep, Command::
 }
 
 // 2-1. Step에서 요청한 Event인지 확인한다.
-bool KERNEL::Command::SetImpl::CheckEvent(Command::Step * pcInStep, Command::EventInfo & cInEvent)
+Step::EventType KERNEL::Command::SetImpl::CheckEvent(Command::Step * pcInStep, Command::EventInfo & cInEvent)
 {
-	return true;
+	return Step::EventType::None;
 }
 
 // 3. EventInfo의 정보가 유효한지를 검사한다.

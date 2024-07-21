@@ -29,11 +29,13 @@ namespace H3DF
 
 		// 렌더링된 face를 카메라에서 밀어내는 하는 Z-buffer 단위수를 지정. 
 		// face 위에 edge가 동일하게 있는 경우 edge를 face위에 놓이도록 해 스티칭을 줄이는데 사용할 수 있음. 음수인 경우 카메라로 다가오게 됨.
-		DrawingAttributeKit & SetFaceDisplacement(bool bInState, int bInBuckets = 8);
-		DrawingAttributeKit & SetFaceDisplacement(int bInBuckets);
+		DrawingAttributeKit & SetFaceDisplacement(int nInBuckets);
 
 		DrawingAttributeKit & UnsetDepthRange();
 		DrawingAttributeKit & UnsetFaceDisplacement();
+
+		bool ShowDepthRange(float & fOutNear, float & fOutFar) const;
+		bool ShowFaceDisplacement(int & nOutBuckets) const;
 	};
 
 	class API_3DF DrawingAttributeControl : public Control
@@ -46,6 +48,19 @@ namespace H3DF
 		DrawingAttributeControl & operator = (DrawingAttributeControl const & cInThat);
 
 		DrawingAttributeControl & SetDepthRange(float fInNear, float fInFar);
+		DrawingAttributeControl & SetFaceDisplacement(int nInBuckets);
 		DrawingAttributeControl & SetOverlay(Drawing::Overlay eInOverlay);
+
+		DrawingAttributeControl & UnsetDepthRange();
+		DrawingAttributeControl & UnsetFaceDisplacement();
+		DrawingAttributeControl & UnsetOverlay();
+
+		bool ShowDepthRange(float & fOutX, float & fOutY) const;
+		bool ShowFaceDisplacement(int & nOutBuckets) const;
+		bool ShowOverlay(Drawing::Overlay & eOutOverlay) const;
+
+	private:
+		// Private default constructor to prevent instantiation without a segment.
+		DrawingAttributeControl();
 	};
 }

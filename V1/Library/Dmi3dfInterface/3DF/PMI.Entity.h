@@ -100,7 +100,7 @@ namespace H3DF {
 	};
 
 	class Frame;
-	class Drawing;
+	class Draw;
 	class ViewEntity;
 
 	class API_3DF PMI : public SegmentKey
@@ -116,8 +116,8 @@ namespace H3DF {
 		void GetFrame(Frame & cOutFrame);
 		void SetFrame(Frame const & cInFrame);
 
-		void GetDrawing(Drawing & cOutDrawing) const;
-		void SetDrawing(Drawing const & cInDrawing);
+		void GetDrawing(Draw & cOutDrawing) const;
+		void SetDrawing(Draw const & cInDrawing);
 
 		unsigned int GetLeaderLineCount() const;
 		void SetLeaderLines(unsigned int in_count, Polyline const * in_leader_lines);
@@ -329,14 +329,14 @@ namespace H3DF {
 		void SetPolylines(unsigned int nInCount, H3DF::Polyline const * pcInPolylines);
 	};
 
-	class API_3DF Drawing : public PMI
+	class API_3DF Draw : public PMI
 	{
 	public:
-		Drawing();
-		Drawing(Drawing const & cInThat);
+		Draw();
+		Draw(Draw const & cInThat);
 
-		void Set(Drawing const & cInThat);
-		Drawing const & operator=(Drawing const & cInThat);
+		void Set(Draw const & cInThat);
+		Draw const & operator=(Draw const & cInThat);
 
 		unsigned int GetPolygonCount() const;
 

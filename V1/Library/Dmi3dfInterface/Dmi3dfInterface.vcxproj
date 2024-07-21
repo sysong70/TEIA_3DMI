@@ -138,6 +138,7 @@
     <ClInclude Include="..\Signal\WorkerThread.h" />
     <ClInclude Include="3DF\ApplicationWindowOption.h" />
     <ClInclude Include="3DF\AttributeLock.h" />
+    <ClInclude Include="3DF\ColorInterpolation.h" />
     <ClInclude Include="3DF\Condition.h" />
     <ClInclude Include="3DF\CuttingSection.h" />
     <ClInclude Include="3DF\Definition.h" />
@@ -240,6 +241,7 @@
     <ClCompile Include="..\Signal\WorkerThread.cpp" />
     <ClCompile Include="3DF\ApplicationWindowOption.cpp" />
     <ClCompile Include="3DF\AttributeLock.cpp" />
+    <ClCompile Include="3DF\ColorInterpolation.cpp" />
     <ClCompile Include="3DF\Condition.cpp" />
     <ClCompile Include="3DF\CuttingSection.cpp" />
     <ClCompile Include="3DF\Definition.cpp" />

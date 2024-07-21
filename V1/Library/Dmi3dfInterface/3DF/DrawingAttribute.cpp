@@ -23,24 +23,30 @@ namespace H3DF
 		void Copy(DrawingAttributeKitImpl * pcInThat) 
 		{
 			m_bDepthRange = pcInThat->m_bDepthRange;
-			m_fInNear = pcInThat->m_fInNear;
-			m_fInFar = pcInThat->m_fInFar;
+			m_fDepthRangeNear = pcInThat->m_fDepthRangeNear;
+			m_fDepthRangeFar = pcInThat->m_fDepthRangeFar;
+
+			m_bFaceDisplacement = pcInThat->m_bFaceDisplacement;
+			m_nFaceDisplacementBuckets = pcInThat->m_nFaceDisplacementBuckets;
 		}
 
 		bool Equals(DrawingAttributeKitImpl * pcInThat)
 		{
 			if (m_bDepthRange != pcInThat->m_bDepthRange) return false;
-			if (m_fInNear != pcInThat->m_fInNear) return false;
-			if (m_fInFar != pcInThat->m_fInFar) return false;
+			if (m_fDepthRangeNear != pcInThat->m_fDepthRangeNear) return false;
+			if (m_fDepthRangeFar != pcInThat->m_fDepthRangeFar) return false;
+
+			if (m_bFaceDisplacement != pcInThat->m_bFaceDisplacement) return false;
+			if (m_nFaceDisplacementBuckets != pcInThat->m_nFaceDisplacementBuckets) return false;
 
 			return true;
 		}
 
 		bool m_bDepthRange = false;
-		float m_fInNear = 0.0f, m_fInFar = 1.0f;
+		float m_fDepthRangeNear = 0.0f, m_fDepthRangeFar = 1.0f;
 
 		bool m_bFaceDisplacement = false;
-		int m_nBuckets = 8;
+		float m_nFaceDisplacementBuckets = 8;
 	};
 }
 
@@ -103,28 +109,22 @@ DrawingAttributeKit & H3DF::DrawingAttributeKit::SetDepthRange(float fInNear, fl
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bDepthRange = true;
-	pcImpl->m_fInNear = fInNear;
-	pcImpl->m_fInFar = fInFar;
+	pcImpl->m_fDepthRangeNear = fInNear;
+	pcImpl->m_fDepthRangeFar = fInFar;
 
 	return *this;
 }
 
-DrawingAttributeKit & H3DF::DrawingAttributeKit::SetFaceDisplacement(bool bInState, int bInBuckets)
+DrawingAttributeKit & H3DF::DrawingAttributeKit::SetFaceDisplacement(int nInBuckets)
 {
 	DrawingAttributeKitImpl * pcImpl = (DrawingAttributeKitImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->m_bFaceDisplacement = bInState;
-	pcImpl->m_nBuckets = bInBuckets;
+	pcImpl->m_bFaceDisplacement = true;
+	pcImpl->m_nFaceDisplacementBuckets = nInBuckets;
 
 	return *this;
 }
-
-DrawingAttributeKit & H3DF::DrawingAttributeKit::SetFaceDisplacement(int bInBuckets)
-{
-	return SetFaceDisplacement(true, bInBuckets);
-}
-
 
 DrawingAttributeKit & H3DF::DrawingAttributeKit::UnsetDepthRange()
 {
@@ -146,6 +146,28 @@ DrawingAttributeKit & H3DF::DrawingAttributeKit::UnsetFaceDisplacement()
 	return *this;
 }
 
+bool H3DF::DrawingAttributeKit::ShowDepthRange(float & fOutNear, float & fOutFar) const
+{
+	DrawingAttributeKitImpl * pcImpl = (DrawingAttributeKitImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	fOutNear = pcImpl->m_fDepthRangeNear;
+	fOutFar = pcImpl->m_fDepthRangeFar;
+
+	return pcImpl->m_bDepthRange;
+}
+
+bool H3DF::DrawingAttributeKit::ShowFaceDisplacement(int & nOutBuckets) const
+{
+	DrawingAttributeKitImpl * pcImpl = (DrawingAttributeKitImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	nOutBuckets = pcImpl->m_nFaceDisplacementBuckets;
+
+	return pcImpl->m_bFaceDisplacement;
+}
+
+
 //== DrawingAttributeControl class =================================================================
 
 namespace H3DF
@@ -160,6 +182,9 @@ namespace H3DF
 		}
 	};
 }
+
+H3DF::DrawingAttributeControl::DrawingAttributeControl() {}
+
 H3DF::DrawingAttributeControl::DrawingAttributeControl(SegmentKey & cInSegmentKey)
 {
 	DrawingAttributeControlImpl * pcImpl = new DrawingAttributeControlImpl();
@@ -201,17 +226,30 @@ DrawingAttributeControl & H3DF::DrawingAttributeControl::SetDepthRange(float fIn
 	return *this;
 }
 
+DrawingAttributeControl & H3DF::DrawingAttributeControl::SetFaceDisplacement(int nInBuckets)
+{
+	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		CStringA strOption;
+		strOption.Format("face displacement = %d", nInBuckets);
+		HC_Set_Rendering_Options(strOption);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
 DrawingAttributeControl & H3DF::DrawingAttributeControl::SetOverlay(Drawing::Overlay eInOverlay)
 {
 	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-
 		switch (eInOverlay)
 		{
 		case Drawing::Overlay::None:
-			HC_Set_Heuristics("quick moves = off");
+			HC_Set_Heuristics("no quick moves");
 			break;
 
 		case Drawing::Overlay::Default:
@@ -233,4 +271,127 @@ DrawingAttributeControl & H3DF::DrawingAttributeControl::SetOverlay(Drawing::Ove
 	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
+}
+
+DrawingAttributeControl & H3DF::DrawingAttributeControl::UnsetDepthRange()
+{
+	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		if (0 < HC_Show_Existence("rendering options = depth range")) {
+			HC_UnSet_One_Rendering_Option("depth range");
+		}
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+DrawingAttributeControl & H3DF::DrawingAttributeControl::UnsetFaceDisplacement()
+{
+	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		if (0 < HC_Show_Existence("rendering options = face displacement")) {
+			HC_UnSet_One_Rendering_Option("face displacement");
+		}
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+DrawingAttributeControl & H3DF::DrawingAttributeControl::UnsetOverlay()
+{
+	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		if (0 < HC_Show_Existence("heuristic = quick moves")) {
+			HC_UnSet_One_Heuristic("quick moves");
+		}
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+bool H3DF::DrawingAttributeControl::ShowDepthRange(float & fOutX, float & fOutY) const
+{
+	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	bool bResult = false;
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		if (0 < HC_Show_Existence("rendering options = depth range")) {
+			bResult = true;
+			CStringA strValue;
+			HC_Show_One_Rendering_Option("depth range", strValue.GetBuffer(MVO_BUFFER_SIZE));
+			strValue.ReleaseBuffer();
+
+			sscanf(strValue, "%f,%f", &fOutX, &fOutY);
+		}
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return bResult;
+}
+
+bool H3DF::DrawingAttributeControl::ShowFaceDisplacement(int & nOutBuckets) const
+{
+	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	bool bResult = false;
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		if (0 < HC_Show_Existence("rendering options = face displacement")) {
+			bResult = true;
+			CStringA strValue;
+			HC_Show_One_Rendering_Option("face displacement", strValue.GetBuffer(MVO_BUFFER_SIZE));
+			strValue.ReleaseBuffer();
+
+			sscanf(strValue, "%d", &nOutBuckets);
+		}
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return bResult;
+}
+
+bool H3DF::DrawingAttributeControl::ShowOverlay(Drawing::Overlay & eOutOverlay) const
+{
+	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	bool bResult = false;
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		if (0 < HC_Show_Existence("heuristics = quick moves")) {
+			CStringA strValue;
+			HC_Show_One_Heuristic("quick moves", strValue.GetBuffer(MVO_BUFFER_SIZE));
+			strValue.ReleaseBuffer();
+
+			if (false == strValue.IsEmpty()) {
+				bResult = true;
+
+				if ("on" == strValue) {
+					eOutOverlay = Drawing::Overlay::Default;
+				}
+				else if ("spriting" == strValue) {
+					eOutOverlay = Drawing::Overlay::WithZValues;
+				}
+				else if ("inplace" == strValue) {
+					eOutOverlay = Drawing::Overlay::InPlace;
+				}
+				else {
+					eOutOverlay = Drawing::Overlay::None;
+					DEBUG_STOP;
+				}
+			}
+			else {
+				bResult = false;
+			}
+		}
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return bResult;
 }

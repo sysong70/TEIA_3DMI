@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "Command.ManagerImpl.h"
+#include "Command.Manager.Impl.h"
 
 #include "../Kernel.Session.h"
 #include "Kernel.Session.Impl.h"

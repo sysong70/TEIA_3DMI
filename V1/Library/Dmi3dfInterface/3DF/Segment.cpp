@@ -19,6 +19,8 @@
 #include "Performance.h"
 #include "AttributeLock.h"
 #include "Condition.h"
+#include "DrawingAttribute.h"
+#include "ColorInterpolation.h"
 
 #include "Camera.h"
 
@@ -1180,6 +1182,47 @@ AttributeLockControl H3DF::SegmentKey::GetAttributeLockControl()
 AttributeLockControl const H3DF::SegmentKey::GetAttributeLockControl() const
 {
 	AttributeLockControl cControl(*(SegmentKey *)this);
+	return cControl;
+}
+
+//== Drawing Attribute 관련 함수 =====================================================================
+SegmentKey & H3DF::SegmentKey::SetDrawingAttribute(DrawingAttributeKit const & cInKit)
+{
+	DrawingAttributeControl cControl(*this);
+
+	float fNear = 0, fFar = 0;
+	if (true == cInKit.ShowDepthRange(fNear, fFar)) {
+		cControl.SetDepthRange(fNear, fFar);
+	}
+
+	int nBuckets = 0;
+	if (true == cInKit.ShowFaceDisplacement(nBuckets)) {
+	}
+
+	return *this;
+}
+
+DrawingAttributeControl H3DF::SegmentKey::GetDrawingAttributeControl()
+{
+	DrawingAttributeControl cControl(*this);
+	return cControl;
+}
+
+DrawingAttributeControl const H3DF::SegmentKey::GetDrawingAttributeControl() const
+{
+	DrawingAttributeControl cControl(*(SegmentKey *) this);
+	return cControl;
+}
+
+ColorInterpolationControl H3DF::SegmentKey::GetColorInterpolationControl()
+{
+	ColorInterpolationControl cControl(*this);
+	return cControl;
+}
+
+ColorInterpolationControl const H3DF::SegmentKey::GetColorInterpolationControl() const
+{
+	ColorInterpolationControl cControl(*(SegmentKey *) this);
 	return cControl;
 }
 

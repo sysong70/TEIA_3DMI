@@ -3,6 +3,7 @@
 #include "../Kernel.h"
 
 #include "../Command.Set.h"
+#include "../Command.Step.h"
 #include "../Command.EventInfo.h"
 
 #include <vector>
@@ -51,8 +52,7 @@ namespace KERNEL
 			bool EventExecution(Command::EventInfo & cInEvent);
 
 			bool StepExecution(Command::Step * pcInStep, Command::EventInfo & cInEvent);
-			bool CheckEvent(Command::Step * pcInStep, Command::EventInfo & cInEvent);
-
+			Step::EventType CheckEvent(Command::Step * pcInStep, Command::EventInfo & cInEvent);
 			bool IsValidEventInfo(Command::EventInfo & cInEvent);
 
 		private:

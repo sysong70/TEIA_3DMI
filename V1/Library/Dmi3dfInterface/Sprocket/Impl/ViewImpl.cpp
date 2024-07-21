@@ -42,6 +42,7 @@
 #include "../../3DF/Visibility.h"
 #include "../../3DF/Material.h"
 #include "../../3DF/LineAttribute.h"
+#include "../../3DF/DrawingAttribute.h"
 #include "../../3DF/Impl/SegmentImpl.h"
 
 #include "../../3DF/Database.h"
@@ -678,15 +679,14 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 
 	// set up some scene defaults
 	HC_Open_Segment_By_Key(m_pcBaseView->GetSceneKey()); {
-		// #Selection: Line이 더 잘보이게 하고 선택이 잘되도록 하기 위해서 Face를 뒤로 보냄
-		//HC_Set_Rendering_Options("face displacement = 16"); // 양수값이 Camera에서 멀어지는 방향임.
-		HC_Set_Rendering_Options("face displacement = 2"); // 양수값이 Camera에서 멀어지는 방향임.
 		HC_Set_Rendering_Options("no color interpolation, color index interpolation");
-		HC_Set_Visibility("lights = (faces = on, edges = off), markers = off, faces=on, edges=off, lines=on, text = on");
+		HC_Set_Visibility("lights = (faces = on, edges = off), markers = off, faces = on, edges = off, lines = on, text = on");
 	} HC_Close_Segment();
 
-	SegmentKey cSceneKey(m_pcBaseView->GetSceneKey());
-	cSceneKey.GetMaterialMappingControl().SetEdgeColor(RGBAColor(0, 0, 0));
+	SegmentKey cSceneSegment(m_pcBaseView->GetSceneKey());
+	cSceneSegment.GetMaterialMappingControl().SetEdgeColor(RGBAColor(0, 0, 0));
+	// #Selection: Line이 더 잘보이게 하고 선택이 잘되도록 하기 위해서 Face를 뒤로 보냄
+	cSceneSegment.GetDrawingAttributeControl().SetFaceDisplacement(2); // 양수값이 Camera에서 멀어지는 방향임.
 
 	// windowspace (overlay) defaults
 	HC_Open_Segment_By_Key(m_pcBaseView->GetWindowspaceKey()); {

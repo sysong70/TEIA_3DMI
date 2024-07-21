@@ -123,6 +123,12 @@ namespace H3DF
 
 	class PortfolioKey;
 
+	class DrawingAttributeKit;
+	class DrawingAttributeControl;
+
+	class ColorInterpolationKit;
+	class ColorInterpolationControl;
+
 	class CADModel;
 	class Component;
 	class MetaData;
@@ -203,6 +209,29 @@ namespace H3DF
 		DebuggingKit = 0x0100004a,
 		ContourLineKit = 0x0100004b,
 		AttributeLockKit = 0x01000056,
+		TransformMaskKit = 0x01000057,
+		ColorInterpolationKit = 0x01000058,
+		UpdateOptionsKit = 0x01000059,
+		ImageExportOptionsKit = 0x0100005a,
+		OBJImportOptionsKit = 0x0100005b,
+		OBJImportResultsKit = 0x0100005c,
+		STLImportOptionsKit = 0x0100005d,
+		STLImportResultsKit = 0x0100005e,
+		ShellOptimizationOptionsKit = 0x0100005f,
+		ShellRelationOptionsKit = 0x01000060,
+		ShellRelationResultsKit = 0x01000061,
+		GridKit = 0x01000062,
+		CutGeometryGatheringOptionsKit = 0x01000063,
+		SegmentOptimizationOptionsKit = 0x01000064,
+		PointCloudImportOptionsKit = 0x01000065,
+		PointCloudImportResultsKit = 0x01000066,
+		ShapeKit = 0x01000067,
+		HighlightSearchOptionsKit = 0x01000068,
+		PBRMaterialKit = 0x01000069,
+		PixelShaderKit = 0x0100006a,
+		VertexShaderKit = 0x0100006b,
+		ShaderTextureKit = 0x0100006c,
+		ShaderSamplerKit = 0x0100006d,
 
 		Key = 0x10000000,
 		IncludeKey = 0x10000001,
@@ -340,7 +369,7 @@ namespace H3DF
 		Options					= 0xE0000008,
 		PmiView					= 0xE0000009,
 		Frame					= 0xE000000A,
-		Drawing					= 0xE000000B,
+		Draw					= 0xE000000B,
 		Orintation				= 0xE000000C,
 
 		ConditionalExpression = 0x09000000,

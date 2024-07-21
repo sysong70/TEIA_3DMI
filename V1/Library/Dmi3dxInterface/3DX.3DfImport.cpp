@@ -2292,10 +2292,10 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 
 	if (false == aPolygons.empty())
 	{
-		H3DF::Drawing cDrawing;
-		cDrawing.SetPolygons((unsigned int)aPolygons.size(), aPolygons.data());
+		H3DF::Draw cDraw;
+		cDraw.SetPolygons((unsigned int)aPolygons.size(), aPolygons.data());
 		// Polygon Data를 Segement에 추가
-		pcPmi->SetDrawing(cDrawing);
+		pcPmi->SetDrawing(cDraw);
 	}
 
 	assert(aStrings.size() == aTextAttributes.size());

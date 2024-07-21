@@ -28,7 +28,8 @@ namespace H3DF
 		VisualEffectsControl & SetTextAntiAliasing(bool bInState);
 		VisualEffectsControl & SetLineAntiAliasing(bool bInState);
 
-		VisualEffectsControl & SetSimpleShadow(bool bInState, H3DF::VisualEffects::ShadowMode eMode = H3DF::VisualEffects::ShadowMode::Soft, UINT nInResolution = 256, UINT nInBlurring = 1, bool bInIgnoreTransparency = false);
+		VisualEffectsControl & SetSimpleShadow(bool bInState, H3DF::VisualEffects::ShadowMode eMode = H3DF::VisualEffects::ShadowMode::Soft, 
+			UINT nInResolution = 256, UINT nInBlurring = 1, bool bInIgnoreTransparency = false);
 
 	/*
 		// Manipulates the state of simple shadows, projected onto a plane.  The state is implicitly on.
@@ -48,7 +49,8 @@ namespace H3DF
 
 		VisualEffectsControl & SetSimpleShadowColor(RGBAColor const & cInColor = RGBAColor(0.0f, 0.0f, 0.0f, 1.0f));
 
-		VisualEffectsControl & SetSimpleReflection(bool bInState, float fInOpacity = 0.5f, unsigned int nInBlurring = 1, bool bInFading = false, float fInAttenuationNearDistance = -1.0f, float fInAttenuationFarDistance = -1.0f);
+		VisualEffectsControl & SetSimpleReflection(bool bInState, float fInOpacity = 0.5f, unsigned int nInBlurring = 1, bool bInFading = false, 
+			float fInAttenuationNearDistance = -1.0f, float fInAttenuationFarDistance = -1.0f);
 
 		//== Unset Functions =======================================================================
 		VisualEffectsControl & UnsetPostProcessEffectsEnabled();

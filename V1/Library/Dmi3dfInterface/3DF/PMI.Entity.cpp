@@ -185,10 +185,10 @@ void H3DF::PMI::SetFrame(Frame const & cInFrame)
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-void H3DF::PMI::GetDrawing(Drawing & cOutDrawing) const
+void H3DF::PMI::GetDrawing(Draw & cOutDrawing) const
 {
 /*
-	cOutDrawing = Drawing();
+	cOutDrawing = Draw();
 
 	BasePrivate * my_impl = (BasePrivate *)m_pcImpl;
 
@@ -203,7 +203,7 @@ void H3DF::PMI::GetDrawing(Drawing & cOutDrawing) const
 */
 }
 
-void H3DF::PMI::SetDrawing(Drawing const & cInDrawing)
+void H3DF::PMI::SetDrawing(Draw const & cInDrawing)
 {
 	unsigned int nCount = cInDrawing.GetPolygonCount();
 	
@@ -1566,12 +1566,12 @@ void H3DF::Frame::SetPolylines(unsigned int nInCount, H3DF::Polyline const * pcI
 	}
 }
 
-//== Drawing =======================================================================================
+//== Draw =======================================================================================
 
 class DrawingPrivate : public H3DF::Impl
 {
 public:
-	DrawingPrivate() { m_eType = H3DF::Type::Drawing; }
+	DrawingPrivate() { m_eType = H3DF::Type::Draw; }
 
 	void Copy(DrawingPrivate * that)
 	{
@@ -1581,37 +1581,37 @@ public:
 	H3DF::PolygonArray m_polygons;
 };
 
-H3DF::Drawing::Drawing()
+H3DF::Draw::Draw()
 {
 	m_pcImpl = new DrawingPrivate();
 }
 
-H3DF::Drawing::Drawing(Drawing const & cInThat)
+H3DF::Draw::Draw(Draw const & cInThat)
 {
 	m_pcImpl = new DrawingPrivate();
 	Set(cInThat);
 }
 
-void H3DF::Drawing::Set(Drawing const & cInThat)
+void H3DF::Draw::Set(Draw const & cInThat)
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
 	DrawingPrivate * pcInThatImpl = (DrawingPrivate *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-Drawing const & H3DF::Drawing::operator=(Drawing const & cInThat)
+Draw const & H3DF::Draw::operator=(Draw const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-unsigned int H3DF::Drawing::GetPolygonCount() const
+unsigned int H3DF::Draw::GetPolygonCount() const
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
 	return static_cast<unsigned int>(pcImpl->m_polygons.size());
 }
 
-void H3DF::Drawing::GetPolygons(unsigned int & nOutCount, H3DF::Polygon * pcOutPolygons) const
+void H3DF::Draw::GetPolygons(unsigned int & nOutCount, H3DF::Polygon * pcOutPolygons) const
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
 	nOutCount = (unsigned int)pcImpl->m_polygons.size();
@@ -1625,7 +1625,7 @@ void H3DF::Drawing::GetPolygons(unsigned int & nOutCount, H3DF::Polygon * pcOutP
 	}
 }
 
-void H3DF::Drawing::SetPolygons(unsigned int nInCount, H3DF::Polygon const * pcInPolygons)
+void H3DF::Draw::SetPolygons(unsigned int nInCount, H3DF::Polygon const * pcInPolygons)
 {
 	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
 	pcImpl->m_polygons.resize(nInCount);

@@ -270,6 +270,8 @@ bool KERNEL::Command::Set::EventExecution(Command::EventInfo & cInEvent)
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->EventExecution(cInEvent);
+
+	return true;
 }
 
 KERNEL::Command::Type KERNEL::Command::Set::GetType() const

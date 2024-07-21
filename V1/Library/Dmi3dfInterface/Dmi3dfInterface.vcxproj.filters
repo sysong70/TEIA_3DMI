@@ -366,6 +366,9 @@
     <ClInclude Include="3DF\DrawingAttribute.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\ColorInterpolation.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -657,6 +660,9 @@
       <Filter>3DF\Control\Impl</Filter>
     </ClCompile>
     <ClCompile Include="3DF\DrawingAttribute.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\ColorInterpolation.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
   </ItemGroup>

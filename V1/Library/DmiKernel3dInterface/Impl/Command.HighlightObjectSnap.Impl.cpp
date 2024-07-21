@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "Command.HighlightObjectSnapImpl.h"
+#include "Command.HighlightObjectSnap.Impl.h"
 
 #include "../Signal/Signal.h"
 #include "../Common/Common_Define.h"

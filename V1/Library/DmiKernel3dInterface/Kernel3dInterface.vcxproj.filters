@@ -90,7 +90,7 @@
     <ClInclude Include="Command.VisualEffects.h">
       <Filter>Command</Filter>
     </ClInclude>
-    <ClInclude Include="Impl\Command.HighlightObjectSnapImpl.h">
+    <ClInclude Include="Impl\Command.HighlightObjectSnap.Impl.h">
       <Filter>Command\Impl</Filter>
     </ClInclude>
     <ClInclude Include="Command.Attribute.h">
@@ -126,7 +126,7 @@
     <ClInclude Include="Impl\Kernel.ApplicationImpl.h">
       <Filter>Kernel\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="Impl\Command.ManagerImpl.h">
+    <ClInclude Include="Impl\Command.Manager.Impl.h">
       <Filter>Command\Impl</Filter>
     </ClInclude>
     <ClInclude Include="Command.h">
@@ -203,7 +203,7 @@
     <ClCompile Include="Command.VisualEffects.cpp">
       <Filter>Command</Filter>
     </ClCompile>
-    <ClCompile Include="Impl\Command.HighlightObjectSnapImpl.cpp">
+    <ClCompile Include="Impl\Command.HighlightObjectSnap.Impl.cpp">
       <Filter>Command\Impl</Filter>
     </ClCompile>
     <ClCompile Include="Command.Attribute.cpp">
@@ -239,7 +239,7 @@
     <ClCompile Include="Impl\Kernel.ApplicationImpl.cpp">
       <Filter>Kernel\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="Impl\Command.ManagerImpl.cpp">
+    <ClCompile Include="Impl\Command.Manager.Impl.cpp">
       <Filter>Command\Impl</Filter>
     </ClCompile>
     <ClCompile Include="Command.cpp">

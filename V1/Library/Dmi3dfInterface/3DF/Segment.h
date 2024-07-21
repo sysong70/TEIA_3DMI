@@ -171,6 +171,17 @@ namespace H3DF
 		AttributeLockControl GetAttributeLockControl();
 		AttributeLockControl const GetAttributeLockControl() const;
 
+		//== Drawing Attribute 관련 함수 =============================================================
+ 		SegmentKey & SetDrawingAttribute(DrawingAttributeKit const & cInKit);
+// 		SegmentKey & UnsetDrawingAttribute();
+// 		bool ShowDrawingAttribute(DrawingAttributeKit & out_kit) const;
+		DrawingAttributeControl GetDrawingAttributeControl();
+		DrawingAttributeControl const GetDrawingAttributeControl() const;
+
+		//== Color Interpolation 관련 함수 ==========================================================
+		ColorInterpolationControl GetColorInterpolationControl();
+		ColorInterpolationControl const GetColorInterpolationControl() const;
+
 		//== User Data 관련 함수 =====================================================================
 		SegmentKey & SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData);
 		SegmentKey & SetUserData(intptr_t nInIndex, size_t nInBytes, BYTE const pnInData[]);

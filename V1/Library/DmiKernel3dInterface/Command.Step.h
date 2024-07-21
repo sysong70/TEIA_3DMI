@@ -17,7 +17,15 @@ namespace KERNEL
 				Coordinate,
 				IntegerValue,
 				FloatValue,
-				Text
+				Text,
+				Count
+			};
+
+			enum class EventType
+			{
+				None,
+				PreProcessing,
+				Complete,
 			};
 
 			Step();

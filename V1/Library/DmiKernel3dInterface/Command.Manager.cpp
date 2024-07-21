@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #include "Command.Manager.h"
-#include "Impl/Command.ManagerImpl.h"
+#include "Impl/Command.Manager.Impl.h"
 
 #include "Kernel.Application.h"
 

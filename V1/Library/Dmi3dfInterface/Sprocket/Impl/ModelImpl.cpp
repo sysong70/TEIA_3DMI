@@ -9,6 +9,8 @@
 #include "../../3DF/Visibility.h"
 #include "../../3DF/Condition.h"
 #include "../../3DF/LineAttribute.h"
+#include "../../3DF/DrawingAttribute.h"
+#include "../../3DF/ColorInterpolation.h"
 
 #include "../../3DF/3DF.Utility.h"
 

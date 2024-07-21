@@ -30,7 +30,7 @@
 #include <HEventListener.h>
 
 #include "Command.HighlightObjectSnap.h"
-#include "Impl/Command.HighlightObjectSnapImpl.h"
+#include "Impl/Command.HighlightObjectSnap.Impl.h"
 #include "Command.ModelPanel.h"
 
 using namespace KERNEL;
