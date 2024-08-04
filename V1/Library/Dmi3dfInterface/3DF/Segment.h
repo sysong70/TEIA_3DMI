@@ -159,10 +159,10 @@ namespace H3DF
 		//== Bounding 관련 함수 ======================================================================
 		SegmentKey & SetBounding(BoundingKit const & cInKit);
 		SegmentKey & UnsetBounding();
- 		bool ShowBounding(BoundingKit & cOutkit) const;
-// 
-// 		BoundingControl GetBoundingControl();
-// 		BoundingControl const GetBoundingControl() const;
+		bool ShowBounding(BoundingKit & cOutkit) const;
+
+ 		BoundingControl GetBoundingControl();
+ 		BoundingControl const GetBoundingControl() const;
 
 		//== Attribute Lock 관련 함수 ================================================================
 // 		SegmentKey & SetAttributeLock(AttributeLockKit const & in_kit);

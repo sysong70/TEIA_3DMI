@@ -42,5 +42,11 @@ namespace H3DF
 
 		void Set(BoundingControl const & cInThat);
 		BoundingControl & operator = (BoundingControl const & cInThat);
+
+		BoundingControl & SetExclusion(bool bInExclusion);
+
+		BoundingControl & UnsetExclusion();
+
+		bool ShowExclusion(bool & bOutExclusion) const;
 	};
 }

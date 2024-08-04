@@ -114,6 +114,9 @@ namespace H3DF
 	class MarkerAttributeControl;
 	class MaterialMappingControl;
 
+	class BoundingKit;
+	class BoundingControl;
+
 	class AttributeLockControl;
 
 	class ApplicationWindowOptionsKit;
@@ -137,6 +140,16 @@ namespace H3DF
 	class KeyImpl;
 
 	//==============================================================================================
+
+	namespace Operator {
+		enum class Result : UINT
+		{
+			None			= 0,
+			Pass			= 1 << 1,
+			Consume			= 1 << 2,
+			Complete		= 1 << 3,
+		};
+	}
 
 	// The Type class is a concept class that contains type information for all classes.
 	enum class Type : uint32_t

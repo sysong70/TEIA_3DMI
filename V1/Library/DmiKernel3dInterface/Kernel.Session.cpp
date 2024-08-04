@@ -62,14 +62,6 @@ void KERNEL::Session::Initialize(Json::Object & cInObject)
 	if (true != strFilePathName.IsEmpty()) {
 		pcImpl->m_strFilePathName = strFilePathName;
 	}
-
-/*
-	pcImpl->m_pcCanvas->FileOpen(cInObject, pcImpl->CADModel());
-
-	// #ModelPanel: File Open한 후에, CADModel을 이용해서 ModelPanel을 초기화한다.
-	pcImpl->ModelPanel().Initialize(pcImpl->CADModel());
-*/
-	//pcImpl->ModelPanel().Initialize(strFilePathName);
 }
 
 void KERNEL::Session::ThreadFileOpen()

@@ -6,7 +6,7 @@
 #include "Window.h"
 #include "Impl/WindowImpl.h"
 
-#include "../Sprocket/Impl/ViewImpl.h"
+#include "../Sprocket/Impl/3DF.View.Impl.h"
 
 #include "Line.h"
 

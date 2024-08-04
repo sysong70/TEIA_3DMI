@@ -15,7 +15,6 @@ namespace H3DF
 	namespace Operator
 	{
 		class CameraControl;
-		class CameraPan;
 		class SelectArea;
 	}
 

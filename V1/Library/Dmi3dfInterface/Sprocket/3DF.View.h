@@ -53,6 +53,9 @@ namespace H3DF
 		PortfolioKey const GetPortfolioKey() const;
 		PortfolioKey GetPortfolioKey();
 
+		SegmentKey GetConstructionKey();
+		SegmentKey const GetConstructionKey() const;
+
 		NavigationCube & GetNavigationCube() const;
 
 		void SetSuppressUpdate(bool bInState);

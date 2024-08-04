@@ -79,11 +79,12 @@ namespace KERNEL
 
 			EventInfo();
 			EventInfo(H3DF::WindowKey & cInWindowKey);
+			EventInfo(EventInfo const & cInThat);
 
 			void Set(EventInfo const & cInThat);
 			EventInfo & operator = (EventInfo const & cInThat);
 
-			void SetPoint(Command::EventInfo::Type cInType, int x, int y, UINT nInFlags);
+			void SetPoint(EventInfo::Type cInType, int x, int y, UINT nInFlags);
 
 			bool Control() const;
 			bool Shift() const;
@@ -96,6 +97,11 @@ namespace KERNEL
 			H3DF::PixelPoint const & GetMousePixelPoint() const;
 			H3DF::WindowPoint const & GetMouseWindowPoint() const;
 			H3DF::WorldPoint const & GetMouseWorldPoint() const;
+
+			void SetEventType(EventInfo::Type cInType);
+			EventInfo::Type GetEventType() const;
 		};
+
+		using EventInfoArray = std::vector<EventInfo>;
 	}
 }

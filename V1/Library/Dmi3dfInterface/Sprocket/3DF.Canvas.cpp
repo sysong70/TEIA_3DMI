@@ -21,7 +21,7 @@
 #include "Impl/CanvasImpl.h"
 
 #include "3DF.View.h"
-#include "Impl/ViewImpl.h"
+#include "Impl/3DF.View.Impl.h"
 
 #include "3DF.Model.h"
 
@@ -36,7 +36,7 @@
 #include "../3DF/NavigationCube.h"
 #include "../3DF/3DF.Utility.h"
 
-#include "../3DF/3DF.Operator.CameraControl.h"
+#include "../3DF/Operator.CameraControl.h"
 #include "../3DF/Operator.SelectArea.h"
 
 #include "../3DF/Facility.AppOptions.h"

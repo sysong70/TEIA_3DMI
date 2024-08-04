@@ -25,7 +25,7 @@
 #include <Sprocket/3DF.View.h>
 #include <Sprocket/Impl/CADModelImpl.h>
 #include <Sprocket/Impl/ModelImpl.h>
-#include <Sprocket/Impl/ViewImpl.h>
+#include <Sprocket/Impl/3DF.View.Impl.h>
 
 #include <Json.h>
 

@@ -6,7 +6,7 @@
 #include "../Common/Common_Define.h"
 
 
-#include <Sprocket/Impl/ViewImpl.h>
+#include <Sprocket/Impl/3DF.View.Impl.h>
 
 #include <Sprocket/3DF.View.h>
 
@@ -226,11 +226,11 @@ KERNEL::Command::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const Session 
 //== Mouse Event ===================================================================================
 
 // 1. Left 버튼 눌림 있는 Mouse Move 처리
-int KERNEL::Command::HighlightObjectSnapImpl::LButtonDownAndMove(HEventInfo & cInEvent)
+KERNEL::Command::Result::Type KERNEL::Command::HighlightObjectSnapImpl::LButtonDownAndMove(HEventInfo & cInEvent)
 {
 	DrawSnapItems();
 
-	return HLISTENER_PASS_EVENT;
+	return KERNEL::Command::Result::Type::Pass;
 }
 
 // 2. 버튼 눌림 없는 Mouse Move 처리
@@ -280,7 +280,10 @@ int KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(HEventInfo & c
 		}
 	}
 
+	m_cSelectSnapPoint.eStatus = Status::Normal;
+
 	// 저장되어 있는 Snap Point를 선택해서 처리하는 부분
+	// SnapItem에는 SelectionResult와 SnapPoint가 저장되어 있다.
 	for (auto & pcSnapItem : m_vSnapItems) {
 		for (auto & cSnapPoint : pcSnapItem->vcSnapPoints) {
 			if (OSnap::Type::NearPoint == cSnapPoint.eType) {
@@ -292,10 +295,15 @@ int KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(HEventInfo & c
 			double dDist = cPixelPoint.DistanceWith(cMousePixelPoint);
 
 			// 2. Object Snap Point가 선택된 경우 관련된 Entity 선택.
+			// 선택된 SnapItem들 중에서 Mouse Point와 가장 가까운 Snap Point를 선택한다.
+			// 선택된 SnapItem를 이용해서 Object Snap Text를 화면에 표시함.
 			if (10 > dDist) {
 				m_cDynHighlightControl.UnhighlightEverything();
 
 				cSnapPoint.eStatus = HighlightObjectSnapImpl::Status::Selected;
+				
+				// 선택된	 Snap Point를 저장한다.
+				m_cSelectSnapPoint = cSnapPoint;
 
 				// 기존에 선택된 Snap Point가 있으면 삭제한다.
 				// m_cSnapPointSegment.Flush(Search::Type::Segment);
@@ -306,9 +314,9 @@ int KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(HEventInfo & c
 				HighlightOptionsKit cHighlightOptions;
 				cHighlightOptions.SetNotification(false);
 
-//  				float fLineWeight = 0.05;
-//  				Line::SizeUnits eUnits = Line::SizeUnits::WindowRelative;
-//  				m_cDynLineHighlightCtrl.GetLineAttributeControl().SetWeight(fLineWeight, eUnits);
+// 				float fLineWeight = 0.05;
+// 				Line::SizeUnits eUnits = Line::SizeUnits::WindowRelative;
+// 				m_cDynLineHighlightCtrl.GetLineAttributeControl().SetWeight(fLineWeight, eUnits);
 
 				// 맨 처음에는 기존 Hightlight를 삭제한다.
 				if (0 < m_cOSnapRelationSelItem.GetCount()) {
@@ -358,7 +366,6 @@ int KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(HEventInfo & c
 	// Dynamic Highlight Item이 있는 경우 Item에 관련된 Snap Point를 계산한다.
 	if (true == m_cDynamicHighlightSelItem.IsValid()) {
 		// Object Snap Point를 계산한다.
-		//CalculationObjectSnapPoint(cSelection);
 		CalculationObjectSnapPoint(m_cSelectionResult);
 
 		// Snap Item 그림.

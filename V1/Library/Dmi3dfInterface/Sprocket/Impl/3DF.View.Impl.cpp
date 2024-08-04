@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "ViewImpl.h"
+#include "3DF.View.Impl.h"
 
 #include "CanvasImpl.h"
 
@@ -35,7 +35,7 @@
 #include "../../3DF/3DF.Utility.h"
 #include "../../3DF/Facility.AppOptions.h"
 
-#include "../../3DF/3DF.Operator.CameraControl.h"
+#include "../../3DF/Operator.CameraControl.h"
 #include "../../3DF/Operator.SelectArea.h"
 
 #include "../../3DF/Window.h"

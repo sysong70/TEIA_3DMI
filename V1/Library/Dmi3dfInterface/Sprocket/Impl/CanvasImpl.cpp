@@ -7,7 +7,7 @@
 #include "../3DF.Model.h"
 #include "ModelImpl.h"
 
-#include "ViewImpl.h"
+#include "3DF.View.Impl.h"
 
 #include "../../3DF/3DF.Utility.h"
 

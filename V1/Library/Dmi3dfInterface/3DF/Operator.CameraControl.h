@@ -28,15 +28,15 @@ namespace H3DF
 			void SetCameraFitSelection(H3DF::MatrixKit & cInMatrix, SegmentKey & cInSegment);
 
 			//== Mouse Event 처리 ===================================================================
-			int LButtonDown(HEventInfo & cInEvent);
-			int LButtonUp(HEventInfo & cInEvent, SelectionItem & cInItem);
-			int LButtonDownAndMove(HEventInfo & cInEvent);
+			Operator::Result LButtonDown(HEventInfo & cInEvent);
+			Operator::Result LButtonUp(HEventInfo & cInEvent, SelectionItem & cInItem);
+			Operator::Result LButtonDownAndMove(HEventInfo & cInEvent);
 			
-			int RButtonDown(HEventInfo & cInEvent);
-			int RButtonUp(HEventInfo & cInEvent);
-			int RButtonDownAndMove(HEventInfo & cInEvent);
+			Operator::Result RButtonDown(HEventInfo & cInEvent);
+			Operator::Result RButtonUp(HEventInfo & cInEvent);
+			Operator::Result RButtonDownAndMove(HEventInfo & cInEvent);
 		
-			int MouseWheel(HEventInfo & cInEvent);
+			Operator::Result MouseWheel(HEventInfo & cInEvent);
 		};
 	}
 }

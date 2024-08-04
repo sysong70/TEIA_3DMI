@@ -194,7 +194,7 @@
     <ClInclude Include="3DF\Material.h" />
     <ClInclude Include="3DF\Math.h" />
     <ClInclude Include="3DF\Object.h" />
-    <ClInclude Include="3DF\3DF.Operator.CameraControl.h" />
+    <ClInclude Include="3DF\Operator.CameraControl.h" />
     <ClInclude Include="3DF\Operator.SelectArea.h" />
     <ClInclude Include="3DF\PMI.Entity.h" />
     <ClInclude Include="3DF\Point.h" />
@@ -224,7 +224,7 @@
     <ClInclude Include="Sprocket\Impl\ComponentImpl.h" />
     <ClInclude Include="Sprocket\Impl\MetaDataImpl.h" />
     <ClInclude Include="Sprocket\Impl\ModelImpl.h" />
-    <ClInclude Include="Sprocket\Impl\ViewImpl.h" />
+    <ClInclude Include="Sprocket\Impl\3DF.View.Impl.h" />
     <ClInclude Include="Sprocket\Sprocket.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
@@ -289,7 +289,7 @@
     <ClCompile Include="3DF\Math.Matrix.cpp" />
     <ClCompile Include="3DF\NavigationCube.cpp" />
     <ClCompile Include="3DF\Object.cpp" />
-    <ClCompile Include="3DF\3DF.Operator.CameraControl.cpp" />
+    <ClCompile Include="3DF\Operator.CameraControl.cpp" />
     <ClCompile Include="3DF\Operator.KeyboardTest.cpp" />
     <ClCompile Include="3DF\Operator.KinematicTest.cpp" />
     <ClCompile Include="3DF\Operator.SelectArea.cpp" />
@@ -324,7 +324,7 @@
     <ClCompile Include="Sprocket\Impl\ComponentImpl.cpp" />
     <ClCompile Include="Sprocket\Impl\MetaDataImpl.cpp" />
     <ClCompile Include="Sprocket\Impl\ModelImpl.cpp" />
-    <ClCompile Include="Sprocket\Impl\ViewImpl.cpp" />
+    <ClCompile Include="Sprocket\Impl\3DF.View.Impl.cpp" />
     <ClCompile Include="Sprocket\Sprocket.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

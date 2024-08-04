@@ -50,15 +50,24 @@ namespace H3DF
 		ColorInterpolationControl & SetFaceColor(bool bInState);
 		ColorInterpolationControl & SetEdgeColor(bool bInState);
 		ColorInterpolationControl & SetVertexColor(bool bInState);
+		ColorInterpolationControl & SetFaceIndex(bool bInState);
+		ColorInterpolationControl & SetEdgeIndex(bool bInState);
+		ColorInterpolationControl & SetVertexIndex(bool bInState);
 
 		ColorInterpolationControl & UnsetFaceColor();
 		ColorInterpolationControl & UnsetEdgeColor();
 		ColorInterpolationControl & UnsetVertexColor();
+		ColorInterpolationControl & UnsetFaceIndex();
+		ColorInterpolationControl & UnsetEdgeIndex();
+		ColorInterpolationControl & UnsetVertexIndex();
 		ColorInterpolationControl & UnsetEverything();
 
 		bool ShowFaceColor(bool & bOutState) const;
 		bool ShowEdgeColor(bool & bOutState) const;
 		bool ShowVertexColor(bool & bOutState) const;
+		bool ShowFaceIndex(bool & bOutState) const;
+		bool ShowEdgeIndex(bool & bOutState) const;
+		bool ShowVertexIndex(bool & bOutState) const;
 
 	private:
 		// Private default constructor to prevent instantiation without a segment.

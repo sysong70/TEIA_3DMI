@@ -71,7 +71,7 @@ namespace KERNEL
 
 			H3DF::Point2D m_cPoint;
 
-			SetIterator m_cIterator;
+			SetIterator m_cStepIterator;
 		};
 
 		class SetIteratorImpl : public Impl

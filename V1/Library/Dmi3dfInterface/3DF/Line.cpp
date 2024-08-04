@@ -164,11 +164,6 @@ H3DF::LineKey::LineKey(LineKey const & cInThat)
 	Set(cInThat);
 }
 
-H3DF::LineKey::~LineKey()
-{
-	int i = 0;
-}
-
 void H3DF::LineKey::Set(LineKey const & cInThat)
 {
 	if (nullptr == m_pcImpl || nullptr == cInThat.m_pcImpl) {

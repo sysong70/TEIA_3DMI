@@ -18,8 +18,6 @@ namespace KERNEL
 {
 	namespace Command
 	{
-		class SnapItem;
-
 		class HighlightObjectSnapImpl : public SetImpl
 		{
 		public:
@@ -62,7 +60,7 @@ namespace KERNEL
 
 			HighlightObjectSnapImpl(const Session * pcInSession);
 
-			int LButtonDownAndMove(HEventInfo & cInEvent);
+			Command::Result::Type LButtonDownAndMove(HEventInfo & cInEvent);
 			int NoButtonDownAndMove(HEventInfo & cInEvent);
 			bool DoDynamicHighlighting(H3DF::WindowPoint cMousePoint, H3DF::SelectionItem & cOutSelection);
 			bool DoDynamicHighlighting_V1(H3DF::WindowPoint cMousePoint, H3DF::SelectionItem & cOutSelection);
@@ -121,6 +119,8 @@ namespace KERNEL
 			std::vector<SnapItem *> m_vSnapItems;
 			SnapItem m_cNearSnapItem;
 			
+			SnapPoint m_cSelectSnapPoint;
+
 			int m_nTotalSnapItemCount = 5;
 		};
 	}

@@ -40,8 +40,6 @@ namespace H3DF
 		explicit LineKey(Key const & cInKey);
 		LineKey(LineKey const & cInThat);
 
-		~LineKey();
-
 		void Set(LineKey const & cInThat);
 		LineKey & operator = (LineKey const & cInThat);
 

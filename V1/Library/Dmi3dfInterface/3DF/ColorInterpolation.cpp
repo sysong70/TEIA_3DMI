@@ -181,50 +181,71 @@ namespace H3DF
 			ControlImpl::Copy(pcInThat);
 		}
 
-		void SetGeometryColor(CStringA strName, bool bInState);
-		void UnsetGeometryColor(CStringA strName);
-		bool ShowGeometryColor(CStringA strName, bool & bOutState) const;
+		void SetGeometry(CStringA strName, bool bInState, bool bColor);
+		void UnsetGeometry(CStringA strName, bool bColor);
+		bool ShowGeometry(CStringA strName, bool & bOutState, bool bColor) const;
 	};
 }
 
-void H3DF::ColorInterpolationControlImpl::SetGeometryColor(CStringA strName, bool bInState)
+void H3DF::ColorInterpolationControlImpl::SetGeometry(CStringA strName, bool bInState, bool bColor)
 {
 	CStringA strOption;
+	if(true == bColor) {
+		strOption = "color interpolation = ";
+	}
+	else {
+		strOption = "color index interpolation = ";
+	}
+
 	SegmentKeyImpl::LocalOpen(m_cOverrideKey); {
-		if (true == bInState) {
-			strOption.Format("color interpolation = %s", strName);
-			HC_Set_Rendering_Options(strOption);
+		if (false == bInState) {
+			strOption += "no ";
 		}
-		else {
-			strOption.Format("color interpolation = no %s", strName);
-			HC_Set_Rendering_Options(strOption);
-		}
+		
+		strOption += strName;
+		HC_Set_Rendering_Options(strOption);
 	} SegmentKeyImpl::LocalClose(m_cOverrideKey);
 }
 
-void H3DF::ColorInterpolationControlImpl::UnsetGeometryColor(CStringA strName)
+void H3DF::ColorInterpolationControlImpl::UnsetGeometry(CStringA strName, bool bColor)
 {
 	CStringA strOption;
-	strOption.Format("color interpolation = %s", strName);
+	if (true == bColor) {
+		strOption = "color interpolation = ";
+	}
+	else {
+		strOption = "color index interpolation = ";
+	}
+
+	strOption += strName;
 
 	SegmentKeyImpl::LocalOpen(m_cOverrideKey); {
 		HC_UnSet_One_Rendering_Option(strOption);
 	} SegmentKeyImpl::LocalClose(m_cOverrideKey);
 }
 
-bool H3DF::ColorInterpolationControlImpl::ShowGeometryColor(CStringA strName, bool & bOutState) const
+bool H3DF::ColorInterpolationControlImpl::ShowGeometry(CStringA strName, bool & bOutState, bool bColor) const
 {
 	bool bResult = false;
 
+	CStringA strColorOption;
+	if (true == bColor) {
+		strColorOption = "color interpolation = ";
+	}
+	else {
+		strColorOption = "color index interpolation = ";
+	}
+
+	strColorOption += strName;
+
 	SegmentKeyImpl::LocalOpen(m_cOverrideKey); {
 		CStringA strOption;
-		strOption.Format("rendering options = (color interpolation = %s)", strName);
+		strOption.Format("rendering options = (%s)", strColorOption);
 
 		if (0 < HC_Show_Existence(strOption)) {
 			bResult = true;
-			strOption.Format("color interpolation = %s", strName);
 			CStringA strValue;
-			HC_Show_One_Rendering_Option(strOption, strValue.GetBuffer(MVO_BUFFER_SIZE));
+			HC_Show_One_Rendering_Option(strColorOption, strValue.GetBuffer(MVO_BUFFER_SIZE));
 			strValue.ReleaseBuffer();
 
 			if (0 == strValue.CompareNoCase("on")) {
@@ -272,7 +293,7 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::SetFaceColor(bool b
 {
 	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->SetGeometryColor("faces", bInState);
+	pcImpl->SetGeometry("faces", bInState, true);
 
 	return *this;
 }
@@ -281,7 +302,7 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::SetEdgeColor(bool b
 {
 	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->SetGeometryColor("edges", bInState);
+	pcImpl->SetGeometry("edges", bInState, true);
 
 	return *this;
 }
@@ -290,7 +311,34 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::SetVertexColor(bool
 {
 	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->SetGeometryColor("markers", bInState);
+	pcImpl->SetGeometry("markers", bInState, true);
+
+	return *this;
+}
+
+ColorInterpolationControl & H3DF::ColorInterpolationControl::SetFaceIndex(bool bInState)
+{
+	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	pcImpl->SetGeometry("faces", bInState, false);
+
+	return *this;
+}
+
+ColorInterpolationControl & H3DF::ColorInterpolationControl::SetEdgeIndex(bool bInState)
+{
+	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	pcImpl->SetGeometry("edges", bInState, false);
+
+	return *this;
+}
+
+ColorInterpolationControl & H3DF::ColorInterpolationControl::SetVertexIndex(bool bInState)
+{
+	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	pcImpl->SetGeometry("markers", bInState, false);
 
 	return *this;
 }
@@ -299,7 +347,7 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetFaceColor()
 {
 	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->UnsetGeometryColor("faces");
+	pcImpl->UnsetGeometry("faces", true);
 
 	return *this;
 }
@@ -308,7 +356,7 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetEdgeColor()
 {
 	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->UnsetGeometryColor("edges");
+	pcImpl->UnsetGeometry("edges", true);
 
 	return *this;
 }
@@ -317,7 +365,34 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetVertexColor()
 {
 	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->UnsetGeometryColor("markers");
+	pcImpl->UnsetGeometry("markers", true);
+
+	return *this;
+}
+
+ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetFaceIndex()
+{
+	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	pcImpl->UnsetGeometry("faces", false);
+
+	return *this;
+}
+
+ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetEdgeIndex()
+{
+	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	pcImpl->UnsetGeometry("edges", false);
+
+	return *this;
+}
+
+ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetVertexIndex()
+{
+	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	pcImpl->UnsetGeometry("markers", false);
 
 	return *this;
 }
@@ -339,19 +414,40 @@ bool H3DF::ColorInterpolationControl::ShowFaceColor(bool & bOutState) const
 {
 	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	return pcImpl->ShowGeometryColor("faces", bOutState);
+	return pcImpl->ShowGeometry("faces", bOutState, true);
 }
 
 bool H3DF::ColorInterpolationControl::ShowEdgeColor(bool & bOutState) const
 {
 	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	return pcImpl->ShowGeometryColor("edges", bOutState);
+	return pcImpl->ShowGeometry("edges", bOutState, true);
 }
 
 bool H3DF::ColorInterpolationControl::ShowVertexColor(bool & bOutState) const
 {
 	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	return pcImpl->ShowGeometryColor("markers", bOutState);
+	return pcImpl->ShowGeometry("markers", bOutState, true);
+}
+
+bool H3DF::ColorInterpolationControl::ShowFaceIndex(bool & bOutState) const
+{
+	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	return pcImpl->ShowGeometry("faces", bOutState, false);
+}
+
+bool H3DF::ColorInterpolationControl::ShowEdgeIndex(bool & bOutState) const
+{
+	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	return pcImpl->ShowGeometry("edges", bOutState, false);
+}
+
+bool H3DF::ColorInterpolationControl::ShowVertexIndex(bool & bOutState) const
+{
+	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	return pcImpl->ShowGeometry("markers", bOutState, false);
 }

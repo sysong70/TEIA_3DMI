@@ -6,7 +6,7 @@
 #include "Segment.h"
 #include "./Impl/SegmentImpl.h"
 
-#include "../Sprocket/Impl/ViewImpl.h"
+#include "../Sprocket/Impl/3DF.View.Impl.h"
 
 #include <Common_Define.h>
 

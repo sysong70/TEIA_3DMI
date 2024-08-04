@@ -126,7 +126,7 @@ void KERNEL::Command::Set::Reset()
 	SetImpl * pcImpl = (SetImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->m_cIterator = GetIterator();
+	pcImpl->m_cStepIterator = GetIterator();
 
 	pcImpl->m_vcEventInfos.clear();
 }
@@ -141,7 +141,7 @@ void KERNEL::Command::Set::Reset() const
 	SetImpl * pcImpl = (SetImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->m_cIterator = GetIterator();
+	pcImpl->m_cStepIterator = GetIterator();
 
 	pcImpl->m_vcEventInfos.clear();
 }
@@ -199,9 +199,9 @@ KERNEL::Command::SetIterator KERNEL::Command::Set::GetIterator() const
 	SetImpl * pcImpl = (SetImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	if (false == pcImpl->m_cIterator.IsValid()) {
+	if (false == pcImpl->m_cStepIterator.IsValid()) {
 
-		SetIteratorImpl * pcIteratorImpl = (SetIteratorImpl *) pcImpl->m_cIterator.GetImpl();
+		SetIteratorImpl * pcIteratorImpl = (SetIteratorImpl *) pcImpl->m_cStepIterator.GetImpl();
 		DEBUG_VALID(pcIteratorImpl);
 
 		pcIteratorImpl->pcBeginIterator = pcImpl->m_deStep.begin();
@@ -209,7 +209,7 @@ KERNEL::Command::SetIterator KERNEL::Command::Set::GetIterator() const
 		pcIteratorImpl->pcIterator = pcIteratorImpl->pcBeginIterator;
 	}
 
-	return pcImpl->m_cIterator;
+	return pcImpl->m_cStepIterator;
 }
 
 KERNEL::Command::Step * KERNEL::Command::Set::Front()

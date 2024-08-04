@@ -54,10 +54,18 @@ KERNEL::Command::EventInfo::EventInfo(H3DF::WindowKey & cInWindowKey)
 	m_pcImpl = pcImpl;
 }
 
+KERNEL::Command::EventInfo::EventInfo(EventInfo const & cInThat)
+{
+	m_pcImpl = new EventInfoImpl();
+	DEBUG_VALID(m_pcImpl);
+	Set(cInThat);
+}
+
 void KERNEL::Command::EventInfo::Set(EventInfo const & cInThat)
 {
 	EventInfoImpl * pcImpl = (EventInfoImpl *) m_pcImpl;
 	EventInfoImpl * pcInThatImpl = (EventInfoImpl *) cInThat.m_pcImpl;
+
 	pcImpl->Copy(pcInThatImpl);
 }
 
@@ -66,7 +74,6 @@ KERNEL::Command::EventInfo & KERNEL::Command::EventInfo::operator = (EventInfo c
 	Set(cInThat);
 	return *this;
 }
-
 
 void KERNEL::Command::EventInfo::SetPoint(Command::EventInfo::Type eInType, int x, int y, UINT nInFlags)
 {
@@ -156,4 +163,20 @@ WorldPoint const & KERNEL::Command::EventInfo::GetMouseWorldPoint() const
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cWorldPoint; 
+}
+
+void KERNEL::Command::EventInfo::SetEventType(EventInfo::Type cInType)
+{
+	EventInfoImpl * pcImpl = (EventInfoImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_eEventType = cInType;
+}
+
+KERNEL::Command::EventInfo::Type KERNEL::Command::EventInfo::GetEventType() const
+{
+	EventInfoImpl * pcImpl = (EventInfoImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->m_eEventType;
 }

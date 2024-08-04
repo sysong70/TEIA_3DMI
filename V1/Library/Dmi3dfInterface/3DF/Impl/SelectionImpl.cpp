@@ -3,7 +3,7 @@
 #include "SelectionImpl.h"
 
 #include "../Window.h"
-#include "../../Sprocket/Impl/ViewImpl.h"
+#include "../../Sprocket/Impl/3DF.View.Impl.h"
 
 #include "../Line.h"
 #include "../Shell.h"

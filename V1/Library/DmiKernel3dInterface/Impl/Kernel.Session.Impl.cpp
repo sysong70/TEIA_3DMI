@@ -22,8 +22,9 @@
 #include <3DF/AttributeLock.h>
 #include <3DF/NavigationCube.h>
 
-using namespace KERNEL;
 using namespace H3DF;
+using namespace KERNEL;
+
 
 #define TheKenel TheAppOptions.Kernel
 
@@ -156,6 +157,14 @@ bool KERNEL::SessionImpl::MouseMove(int nFlag, int x, int y)
 	// Select(Object Snap) 및 View Control Mouse Event 처리 함수
 	SelectViewControlMouseMove(nFlag, x, y);
 
+	// Command가 설정되었다면, Command에 명령어를 처리할 수 있도록 좌표를 전달한다.
+	if (false == IsCommandActive()) {
+		return true;
+	}
+
+	// 현재 활성화되어 있는 Command에 Left button up 이벤트 전달.
+	CommandMouseMove(nFlag, x, y);
+
 	return true;
 }
 
@@ -203,10 +212,10 @@ DWORD KERNEL::SessionImpl::MouseMapFlags(DWORD nState)
 	return nFlag;
 }
 //== View Control 관련 함수 ==========================================================================
-bool KERNEL::SessionImpl::SelectViewControlMouseMove(int nFlag, int x, int y)
+Command::Result::Type KERNEL::SessionImpl::SelectViewControlMouseMove(int nFlag, int x, int y)
 {
 	if (200 > GetTickCount() - m_nMouseWhellStartTick) {
-		return false;
+		return Command::Result::Type::Pass;
 	}
 
 	DWORD nNewFlags = MouseMapFlags(nFlag);
@@ -217,9 +226,8 @@ bool KERNEL::SessionImpl::SelectViewControlMouseMove(int nFlag, int x, int y)
 
 	Select().MouseMove(cEvent);
 
-	return true;
+	return Command::Result::Type::Pass;
 }
-
 
 bool KERNEL::SessionImpl::SelectViewControlLButtonDown(int nFlag, int x, int y)
 {
@@ -240,7 +248,7 @@ bool KERNEL::SessionImpl::SelectViewControlLButtonDown(int nFlag, int x, int y)
 }
 
 // 3. Select 및 View Control Mouse Event 처리 함수 
-Command::Step::InputType KERNEL::SessionImpl::SelectViewControlLButtonUp(int nFlag, int x, int y)
+Command::Result::Type KERNEL::SessionImpl::SelectViewControlLButtonUp(int nFlag, int x, int y)
 {
 	H3DF::Point2D cLButtonUpPosition(x, y);
 	Select().SetMouseUpTickCount(GetTickCount64());
@@ -257,14 +265,16 @@ Command::Step::InputType KERNEL::SessionImpl::SelectViewControlLButtonUp(int nFl
 
 	// NavigationCube가 선택된 경우를 처리한다. NavigationCube가 선택되어 View를 변경한 경우에는 
 	// HLISTENER_CONSUME_EVENT값을 리턴한다.
-	if (HLISTENER_CONSUME_EVENT == Camera().LButtonUp(cEvent)) {
-		return Command::Step::InputType::None;
+	if (Command::Result::Type::Consume == Camera().LButtonUp(cEvent)) {
+		return Command::Result::Type::Consume;
 	}
 
 	if (H3DF::Camera::Mode::ZoomBox == eMode) {
 		Select().DrawSnapItems();
 		GetCanvas().GetFrontView().SetSuppressUpdate(false);
 		GetCanvas().GetFrontView().Update();
+
+		return Command::Result::Type::Consume;
 	}
 
 	// 카메라 처리가 끝나면 Select 처리를 한다.
@@ -273,7 +283,7 @@ Command::Step::InputType KERNEL::SessionImpl::SelectViewControlLButtonUp(int nFl
 
 	// 선택된 값을 판단해서 InputType을 리턴한다.
 
-	return Command::Step::InputType::None;
+	return Command::Result::Type::Pass;
 }
 
 //== Attribute 관련 함수 =============================================================================
@@ -394,10 +404,6 @@ bool KERNEL::SessionImpl::IsCommandActive()
 
 bool KERNEL::SessionImpl::CommandLButtonUp(int nFlag, int x, int y)
 {
-	if(false == IsCommandActive()) {
-		return false;
-	}
-
 	Command::EventInfo cEvent(Window());
 	cEvent.SetPoint(Command::EventInfo::Type::LButtonUp, x, y, MouseMapFlags(nFlag));
 
@@ -407,6 +413,16 @@ bool KERNEL::SessionImpl::CommandLButtonUp(int nFlag, int x, int y)
 		pcCommand->LButtonUp(cEvent);
 	}
 */
+
+	return true;
+}
+
+bool KERNEL::SessionImpl::CommandMouseMove(int nFlag, int x, int y)
+{
+	Command::EventInfo cEvent(Window());
+	cEvent.SetPoint(Command::EventInfo::Type::MouseMove, x, y, MouseMapFlags(nFlag));
+
+	m_vpcCommandSets.front()->EventExecution(cEvent);
 
 	return true;
 }

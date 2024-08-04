@@ -111,7 +111,7 @@
     <ClInclude Include="3DF\Image.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\3DF.Operator.CameraControl.h">
+    <ClInclude Include="3DF\Operator.CameraControl.h">
       <Filter>Operator</Filter>
     </ClInclude>
     <ClInclude Include="..\Signal\Signal.h">
@@ -330,7 +330,7 @@
     <ClInclude Include="Sprocket\Impl\ModelImpl.h">
       <Filter>Sprocket\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="Sprocket\Impl\ViewImpl.h">
+    <ClInclude Include="Sprocket\Impl\3DF.View.Impl.h">
       <Filter>Sprocket\Impl</Filter>
     </ClInclude>
     <ClInclude Include="Sprocket\3DF.CADModel.h">
@@ -413,7 +413,7 @@
     <ClCompile Include="3DF\Image.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\3DF.Operator.CameraControl.cpp">
+    <ClCompile Include="3DF\Operator.CameraControl.cpp">
       <Filter>Operator</Filter>
     </ClCompile>
     <ClCompile Include="..\Signal\Signal.cpp">
@@ -626,7 +626,7 @@
     <ClCompile Include="Sprocket\Impl\ModelImpl.cpp">
       <Filter>Sprocket\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="Sprocket\Impl\ViewImpl.cpp">
+    <ClCompile Include="Sprocket\Impl\3DF.View.Impl.cpp">
       <Filter>Sprocket\Impl</Filter>
     </ClCompile>
     <ClCompile Include="Sprocket\3DF.CADModel.cpp">

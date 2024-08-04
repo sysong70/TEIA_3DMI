@@ -5,6 +5,11 @@
 namespace H3DF
 {
 	class WindowKey;
+
+	namespace Operator
+	{
+		enum class Result : UINT;
+	}
 }
 
 namespace KERNEL
@@ -25,6 +30,20 @@ namespace KERNEL
 			PMI_Distance		= 0x02000001,
 
 			Count
+		};
+
+		class Result
+		{
+		public:
+			enum class Type : UINT
+			{
+				None = 0,
+				Pass = 1 << 1,
+				Consume = 1 << 2,
+				Complete = 1 << 3,
+			};
+
+			static Type Convert(H3DF::Operator::Result eInType);
 		};
 	}
 }

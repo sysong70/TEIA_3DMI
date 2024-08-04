@@ -58,6 +58,12 @@ bool H3DF::Key::operator == (Key const & cInThat) const
 	return (pcImpl->KeyValue() == pcInThatImpl->KeyValue());
 }
 
+bool H3DF::Key::IsValidate()
+{
+	KeyImpl * pcImpl = (KeyImpl *)m_pcImpl;
+	return (INVALID_KEY != pcImpl->KeyValue());
+}
+
 HC_KEY H3DF::Key::KeyValue() const 
 { 
 	KeyImpl * pcImpl = (KeyImpl *)m_pcImpl;

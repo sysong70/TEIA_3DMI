@@ -17,6 +17,8 @@ namespace H3DF
 
 		bool operator == (Key const & cInThat) const;
 
+		bool IsValidate();
+
 		HC_KEY KeyValue() const;
 		void SetKeyValue(HC_KEY nInKey);
 		void SetKeyValue(HC_KEY nInKey) const;

@@ -6,6 +6,8 @@
 #include "Segment.h"
 #include "./Impl/SegmentImpl.h"
 
+#include <HTools.h>
+
 using namespace H3DF;
 
 //== BoundingKit class =============================================================================
@@ -143,6 +145,7 @@ BoundingKit & H3DF::BoundingKit::UnsetExclusion()
 	BoundingKitImpl * pcImpl = (BoundingKitImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
+	pcImpl->m_bExclude = false;
 	pcImpl->m_bExcludeValid = false;
 
 	return *this;
@@ -246,4 +249,70 @@ BoundingControl & H3DF::BoundingControl::operator = (BoundingControl const & cIn
 {
 	Set(cInThat);
 	return *this;
+}
+
+BoundingControl & H3DF::BoundingControl::SetExclusion(bool bInExclusion)
+{
+	BoundingControlImpl * pcImpl = (BoundingControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		CStringA strList;
+		if(true == bInExclusion) {
+			strList.Format("exclude bounding = on");
+		} else {
+			strList.Format("exclude bounding = off");
+		}
+
+		HC_Set_Heuristics(strList);
+
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+BoundingControl & H3DF::BoundingControl::UnsetExclusion()
+{
+	BoundingControlImpl * pcImpl = (BoundingControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		if (0 < HC_Show_Existence("heuristics = exclude bounding")) {
+			HC_UnSet_One_Heuristic("exclude bounding");
+		}
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+bool H3DF::BoundingControl::ShowExclusion(bool & bOutExclusion) const
+{
+	BoundingControlImpl * pcImpl = (BoundingControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	bool bResult = false;
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		if (0 < HC_Show_Existence("heuristics = exclude bounding")) {
+			CStringA strValue;
+			HC_Show_One_Heuristic("exclude bounding", strValue.GetBuffer(MVO_BUFFER_SIZE));
+			strValue.ReleaseBuffer();
+
+			if (false == strValue.IsEmpty()) {
+				bResult = true;
+
+				if ("on" == strValue) {
+					bOutExclusion = true;
+				}
+				else {
+					bOutExclusion = false;
+				}
+			}
+			else {
+				bResult = false;
+			}
+		}
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return bResult;
 }

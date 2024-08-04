@@ -11,7 +11,7 @@
 #include "Facility.AppOptions.h"
 #include "./Impl/SelectionImpl.h"
 
-#include "../Sprocket/Impl/ViewImpl.h"
+#include "../Sprocket/Impl/3DF.View.Impl.h"
 
 USING_3DF_NAMESPACE
 

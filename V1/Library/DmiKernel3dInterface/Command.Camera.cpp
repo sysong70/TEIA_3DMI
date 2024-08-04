@@ -23,7 +23,7 @@
 #include <3DF/Camera.h>
 #include <3DF/VisualEffects.h>
 #include <3DF/Facility.AppOptions.h>
-#include <3DF/3DF.Operator.CameraControl.h>
+#include <3DF/Operator.CameraControl.h>
 
 #include <Json.h>
 
@@ -87,61 +87,61 @@ KERNEL::Command::Camera::Camera(const Session * pcInSession) :
 	pcImpl->CameraControl();
 }
 
-int KERNEL::Command::Camera::MouseMove(HEventInfo & cInEvent)
+Command::Result::Type KERNEL::Command::Camera::MouseMove(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	if (MVO_LBUTTON & cInEvent.GetFlags()) {
-		return pcImpl->CameraControl().LButtonDownAndMove(cInEvent);
+	if (MVO_LBUTTON & cInEvent.GetFlags()) {  
+		return Command::Result::Convert(pcImpl->CameraControl().LButtonDownAndMove(cInEvent));
 	}
 	else if (MVO_RBUTTON & cInEvent.GetFlags()) {
-		return pcImpl->CameraControl().RButtonDownAndMove(cInEvent);
+		return Command::Result::Convert(pcImpl->CameraControl().RButtonDownAndMove(cInEvent));
 	}
 
-	return 0;
+	return Command::Result::Type::Pass;
 }
 
-int KERNEL::Command::Camera::LButtonDown(HEventInfo & cInEvent)
+Command::Result::Type KERNEL::Command::Camera::LButtonDown(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->CameraControl().LButtonDown(cInEvent);
+	return Command::Result::Convert(pcImpl->CameraControl().LButtonDown(cInEvent));
 }
 
-int KERNEL::Command::Camera::LButtonUp(HEventInfo & cInEvent)
+Command::Result::Type KERNEL::Command::Camera::LButtonUp(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	H3DF::SelectionItem & cItem = pcImpl->GetSession().Select().DynamicHighlightSelectionItem();
 
-	return pcImpl->CameraControl().LButtonUp(cInEvent, cItem);
+	return Command::Result::Convert(pcImpl->CameraControl().LButtonUp(cInEvent, cItem));
 }
 
-int KERNEL::Command::Camera::RButtonDown(HEventInfo & cInEvent)
+Command::Result::Type KERNEL::Command::Camera::RButtonDown(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->CameraControl().RButtonDown(cInEvent);
+	return Command::Result::Convert(pcImpl->CameraControl().RButtonDown(cInEvent));
 }
 
-int KERNEL::Command::Camera::RButtonUp(HEventInfo & cInEvent)
+Command::Result::Type KERNEL::Command::Camera::RButtonUp(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->CameraControl().RButtonUp(cInEvent);
+	return Command::Result::Convert(pcImpl->CameraControl().RButtonUp(cInEvent));
 }
 
-int KERNEL::Command::Camera::MouseWheel(HEventInfo & cInEvent)
+Command::Result::Type KERNEL::Command::Camera::MouseWheel(HEventInfo & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->CameraControl().MouseWheel(cInEvent);
+	return Command::Result::Convert(pcImpl->CameraControl().MouseWheel(cInEvent));
 }
 
 //== View Control 관련 함수 ==========================================================================

@@ -1169,6 +1169,18 @@ bool H3DF::SegmentKey::ShowBounding(BoundingKit & cOutkit) const
 	return true;
 }
 
+BoundingControl H3DF::SegmentKey::GetBoundingControl()
+{
+	BoundingControl cControl(*this);
+	return cControl;
+}
+
+BoundingControl const H3DF::SegmentKey::GetBoundingControl() const
+{
+	BoundingControl cControl(*(SegmentKey *) this);
+	return cControl;
+}
+
 //== Attribute Lock 관련 함수 ================================================================
 // 		SegmentKey & SetAttributeLock(AttributeLockKit const & in_kit);
 // 		SegmentKey & UnsetAttributeLock();

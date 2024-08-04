@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 
 #include "3DF.View.h"
-#include "Impl/ViewImpl.h"
+#include "Impl/3DF.View.Impl.h"
 
 #include "../Signal.Connector.h"
 
@@ -234,6 +234,30 @@ PortfolioKey H3DF::View::GetPortfolioKey()
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cPortfolioKey;
+}
+
+SegmentKey H3DF::View::GetConstructionKey()
+{
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr == pcImpl->GetBaseView()) {
+		DEBUG_STOP;
+	}
+
+	return pcImpl->GetBaseView()->GetConstructionKey();
+}
+
+SegmentKey const H3DF::View::GetConstructionKey() const
+{
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr == pcImpl->GetBaseView()) {
+		DEBUG_STOP;
+	}
+
+	return pcImpl->GetBaseView()->GetConstructionKey();
 }
 
 NavigationCube & H3DF::View::GetNavigationCube() const

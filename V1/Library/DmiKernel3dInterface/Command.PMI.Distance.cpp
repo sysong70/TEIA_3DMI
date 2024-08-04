@@ -5,6 +5,7 @@
 #include "Command.Step.h"
 
 #include <3DF/Window.h>
+#include <3DF/Line.h>
 
 // 1. Plane을 갖는 Distance Dimension
 // 2. ID: MEASURE_3D_CMD_Basic_Distance
@@ -21,24 +22,40 @@ namespace KERNEL
 			class DistanceStep
 			{
 			public:
-				static void Draw1(Step * pcInStep);
-				static void Draw2(Step * pcInStep);
+				static void Draw1(Step * pcInStep, H3DF::SegmentKey cInSegment);
+				static void Draw2(Step * pcInStep, H3DF::SegmentKey cInSegment);
 			};
 		}
 	}
 }
 
 // Step에서 받아온 Data를 이용해서 Draw를 수행한다.
-void KERNEL::Command::PMI::DistanceStep::Draw1(Step * pcInStep)
+void KERNEL::Command::PMI::DistanceStep::Draw1(Step * pcInStep, H3DF::SegmentKey cInSegment)
 {
 	int i = 0;
 	//Window::Draw::Text(pcInStep->GetMessage(), pcInStep->GetPoint());
 }
 
-void KERNEL::Command::PMI::DistanceStep::Draw2(Step * pcInStep)
+void KERNEL::Command::PMI::DistanceStep::Draw2(Step * pcInStep, H3DF::SegmentKey cInSegment)
 {
-	int j = 0;
-	//Window::Draw::Text(pcInStep->GetMessage(), pcInStep->GetPoint());
+	if (nullptr == pcInStep || false == cInSegment.IsValidate()) {
+		DEBUG_STOP;
+		return;
+	}
+
+	if (1 != pcInStep->GetSavedEvents().size()) {
+		DEBUG_STOP;
+		return;
+	}
+
+	H3DF::PointArray acPoints;
+	acPoints.resize(2);
+
+	acPoints[0] = pcInStep->GetSavedEvents()[0].GetMouseWorldPoint();
+	acPoints[1] = pcInStep->GetEvent().GetMouseWorldPoint();
+
+	H3DF::LineKey cLine = cInSegment.InsertLine(acPoints.size(), acPoints.data());
+	int i = 0;
 }
 
 // == Distance Class ===============================================================================

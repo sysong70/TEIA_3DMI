@@ -87,12 +87,13 @@ namespace KERNEL
 	protected:
 		bool IsCommandActive();
 		bool CommandLButtonUp(int nFlag, int x, int y);
-
+		bool CommandMouseMove(int nFlag, int x, int y);
+	
 	protected:
 		//== View Control 관련 함수 ==================================================================
-		bool SelectViewControlMouseMove(int nFlag, int x, int y);
+		Command::Result::Type SelectViewControlMouseMove(int nFlag, int x, int y);
 		bool SelectViewControlLButtonDown(int nFlag, int x, int y);
-		Command::Step::InputType SelectViewControlLButtonUp(int nFlag, int x, int y);
+		Command::Result::Type SelectViewControlLButtonUp(int nFlag, int x, int y);
 
 		void RequestVisualEffects(Json::Object & cInObject);
 		void ChangeVisualEffects(Json::Object & cInObject);

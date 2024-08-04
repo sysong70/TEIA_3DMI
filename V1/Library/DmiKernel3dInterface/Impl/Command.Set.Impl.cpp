@@ -7,6 +7,8 @@
 #include "../Kernel.Session.h"
 #include "Kernel.Session.Impl.h"
 
+#include <3DF/Visibility.h>
+
 using namespace KERNEL;
 using namespace KERNEL::Command;
 
@@ -163,8 +165,8 @@ bool KERNEL::Command::SetImpl::EventExecution(Command::EventInfo & cInEvent)
 	}
 
 	// Iterator가 유효하지 않은 경우 Iterator를 초기화한다.
-	if (false == m_cIterator.IsValid()) {
-		SetIteratorImpl * pcIteratorImpl = (SetIteratorImpl *) m_cIterator.GetImpl();
+	if (false == m_cStepIterator.IsValid()) {
+		SetIteratorImpl * pcIteratorImpl = (SetIteratorImpl *) m_cStepIterator.GetImpl();
 		DEBUG_VALID(pcIteratorImpl);
 
 		pcIteratorImpl->pcBeginIterator = m_deStep.begin();
@@ -173,12 +175,10 @@ bool KERNEL::Command::SetImpl::EventExecution(Command::EventInfo & cInEvent)
 	}
 
 	// Step을 하나씩 실행한다. 지금 단계의 Step을 가져와 실행하도록 한다.
-	Command::Step * pcStep = m_cIterator.GetStep();
+	Command::Step * pcStep = m_cStepIterator.GetStep();
 	DEBUG_VALID(pcStep);
 
 	StepExecution(pcStep, cInEvent);
-
-	m_cIterator.Next();
 
 	return true;
 }
@@ -186,34 +186,38 @@ bool KERNEL::Command::SetImpl::EventExecution(Command::EventInfo & cInEvent)
 // 2. Step 실행
 bool KERNEL::Command::SetImpl::StepExecution(Command::Step * pcInStep, Command::EventInfo & cInEvent)
 {
+	// 저장되어 있는 Step이 유효한지 확인
 	if (true == m_deStep.empty()) {
 		return false;
 	}
 
+	DEBUG_VALID(m_pcSession);
+
 	// EventInfo의 정보가 유효한지를 검사한다.
 	IsValidEventInfo(cInEvent);
 
-	// 전달받은 Event를 저장한다.
-	m_vcEventInfos.push_back(cInEvent);
-
-	//pcStep->SetEventInfo(m_vcEventInfos);
+	// 현제 저장되어 있는 Event와 현재 Event를 전달한다.
+	pcInStep->SetEventInfo(m_vcEventInfos, cInEvent);
 
 	// Step에서 요구하는 Event인지 확인 필요
 	Step::EventType eEventType = CheckEvent(pcInStep, cInEvent);
 
-	// Event가 완료되기 전 단계임.
+	// 주어진 Event가 현재 Step을 완료하지 않고 준비 단계를 나타냄. Moouse Move등의 Event를 나타냄.
 	if (Step::EventType::PreProcessing == eEventType) {
+
+		H3DF::SegmentKey cConstructionSegment = m_pcSession->Canvas().GetFrontView().GetConstructionKey();
+		cConstructionSegment.Flush(H3DF::Search::Type::Geometry);
+		pcInStep->Draw(cConstructionSegment);
+
 		return true;
 	}
 	// Event가 완료된 후 단계임.
 	else if (Step::EventType::Complete == eEventType) {
-		return true;
+		// 전달받은 Event를 저장한다.
+		m_vcEventInfos.push_back(cInEvent);
 	}
 
-	// Step에서 필요한 화면을 그리도록 한다.
-	pcInStep->Draw();
-
-	m_cIterator.Next();
+	m_cStepIterator.Next();
 
 	return true;
 }
@@ -221,7 +225,23 @@ bool KERNEL::Command::SetImpl::StepExecution(Command::Step * pcInStep, Command::
 // 2-1. Step에서 요청한 Event인지 확인한다.
 Step::EventType KERNEL::Command::SetImpl::CheckEvent(Command::Step * pcInStep, Command::EventInfo & cInEvent)
 {
-	return Step::EventType::None;
+	Step::EventType eStepEventType = Step::EventType::None;
+
+	// 입력된 Step Command에서 InputType을 확인해서 각 Type별로 처리한다.
+	Step::InputType eInputType = pcInStep->GetInputType();
+	if (Step::InputType::Coordinate == eInputType) {
+		// LButtonUp이면 그 좌표를 이용해서 다음 처리를 한다. 현재 Step은 완료한 것으로 본다.
+		if (EventInfo::Type::LButtonUp == cInEvent.GetEventType()) {
+			eStepEventType = Step::EventType::Complete;
+		}
+		// MouseMove이면 그 좌표를 이용해서 현재 Step의 처리를 한다. 현재 Step은 완료하지 않은 것으로 본다.
+		// 완료되기전 Process를 진행하도록 한다.
+		else if (EventInfo::Type::MouseMove == cInEvent.GetEventType()) {
+			eStepEventType = Step::EventType::PreProcessing;
+		}
+	}
+
+	return eStepEventType;
 }
 
 // 3. EventInfo의 정보가 유효한지를 검사한다.

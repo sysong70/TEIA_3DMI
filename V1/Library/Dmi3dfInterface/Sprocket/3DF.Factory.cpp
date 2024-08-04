@@ -8,7 +8,7 @@
 #include "Impl/CanvasImpl.h"
 
 #include "3DF.View.h"
-#include "Impl/ViewImpl.h"
+#include "Impl/3DF.View.Impl.h"
 
 #include "../3DF/3DF.Utility.h"
 

@@ -33,14 +33,17 @@ namespace KERNEL
 			InputType GetInputType() const;
 			void SetInputType(InputType eInInputType);
 
-			void SetEventInfo(const EventInfo & cInEventInfo);
+			void SetEventInfo(std::vector<Command::EventInfo> & vcEventInfos, Command::EventInfo & cInEvent);
+
+			Command::EventInfoArray & GetSavedEvents();
+			Command::EventInfo & GetEvent();
 
 			void SetMessage(CString strInMessage);
 			void SetInformation(CString strInInformation);
 
-			void SetDrawFunction(void (*pfInDrawFunction)(Step * pcInStep));
+			void SetDrawFunction(void (*pfInDrawFunction)(Step * pcInStep, H3DF::SegmentKey cInSegment));
 
-			void Draw();
+			void Draw(H3DF::SegmentKey cInSegment);
 		};
 	}
 }
