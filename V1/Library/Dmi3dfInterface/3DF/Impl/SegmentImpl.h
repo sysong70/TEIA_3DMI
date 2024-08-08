@@ -13,9 +13,6 @@ namespace H3DF
 	class API_3DF SegmentKeyImpl : public KeyImpl
 	{
 	public:
-		SegmentKeyImpl() { m_eType = Type::SegmentKey; }
-		~SegmentKeyImpl() {}
-
 		void Copy(SegmentKeyImpl * pcInThat);
 
 		//== Segment 관련 함수 ===========================================================================

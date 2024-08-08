@@ -17,8 +17,6 @@ namespace H3DF
 	class AttributeLockControlImpl : public ControlImpl
 	{
 	public:
-		AttributeLockControlImpl() { m_eType = H3DF::Type::AttributeLockControl; }
-
 		void Copy(AttributeLockControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}

@@ -8,15 +8,12 @@ namespace H3DF
 	class API_3DF DefinitionImpl : public H3DF::Impl
 	{
 	public:
-		DefinitionImpl() { m_eType = Type::Definition; }
-
 		HC_KEY const KeyValue() const;
 		void SetKeyValue(HC_KEY nInKey);
 
 		void Copy(DefinitionImpl * pcInThat)
 		{
 			m_nKey = pcInThat->KeyValue();
-			m_eType = pcInThat->Type();
 		}
 
 	private:

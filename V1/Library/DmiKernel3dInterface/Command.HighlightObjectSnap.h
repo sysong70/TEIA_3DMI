@@ -10,7 +10,7 @@
 
 #include "../Signal/Signal.h"
 
-#include <HEventInfo.h>
+#include "Command.Event.h"
 
 namespace KERNEL
 {
@@ -21,7 +21,7 @@ namespace KERNEL
 		public:
 			HighlightObjectSnap(const Session * pcInSession);
 
-			int MouseMove(HEventInfo & cInEvent);
+			Command::Result::Type MouseMove(Event & cInEvent);
 
 			void DrawSnapItems();
 

@@ -16,6 +16,9 @@ namespace H3DF
 
 		~ReferenceKey();
 
+		static const H3DF::Type staticType = H3DF::Type::ReferenceKey;
+		H3DF::Type ObjectType() const override { return staticType; };
+
 		void Set(ReferenceKey const & cInThat);
 		ReferenceKey & operator = (ReferenceKey const & cInThat);
 

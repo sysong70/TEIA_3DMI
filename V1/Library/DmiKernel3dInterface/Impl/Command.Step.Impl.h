@@ -26,8 +26,8 @@ namespace KERNEL
 			CString m_strMessage; // Message
 			CString m_strInformation; // 명령어 정보
 
-			std::vector<Command::EventInfo> * m_pvcSavedEvents;
-			Command::EventInfo * m_pcEvent;
+			std::vector<Command::Event> * m_pvcSavedEvents;
+			Command::Event * m_pcEvent;
 
 			void (*m_pfDrawFunction)(Step * pcInStep, H3DF::SegmentKey cInSegment) = nullptr;
 		};

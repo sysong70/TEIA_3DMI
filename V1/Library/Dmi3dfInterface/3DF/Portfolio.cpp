@@ -81,7 +81,6 @@ namespace H3DF
 H3DF::PortfolioControlImpl::PortfolioControlImpl()
 {
 	m_pdpcPortfolioDeque = new PortfolioDeque();
-	m_eType = H3DF::Type::PortfolioControl;
 }
 
 H3DF::PortfolioControlImpl::~PortfolioControlImpl()

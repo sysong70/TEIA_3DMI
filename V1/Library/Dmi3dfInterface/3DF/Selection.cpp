@@ -546,7 +546,7 @@ H3DF::SelectionItem::SelectionItem(SelectionItem const & cInThat)
 H3DF::Type H3DF::SelectionItem::Type() const
 {
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
-	return pcImpl->m_cKey.Type();
+	return pcImpl->m_cKey.ObjectType();
 }
 
 void H3DF::SelectionItem::Set(SelectionItem const & cInThat)
@@ -1183,7 +1183,7 @@ void H3DF::SelectionResults::LeaveType(DWORD nType)
 	for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
 		Key cItemKey;
 		if (true == pcItemIter->ShowSelectedItem(cItemKey)) {
-			DWORD nItemType = (DWORD)cItemKey.Type();
+			DWORD nItemType = (DWORD)cItemKey.ObjectType();
 			// 원하는 Type이면 삭제하지 않는다.
 			if (nType == nItemType) {
 				++pcItemIter; // 다음 요소로 이동
@@ -1205,7 +1205,7 @@ void H3DF::SelectionResults::RemoveType(DWORD nType)
 	for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
 		Key cItemKey;
 		if (true == pcItemIter->ShowSelectedItem(cItemKey)) {
-			DWORD nItemType = (DWORD)cItemKey.Type();
+			DWORD nItemType = (DWORD)cItemKey.ObjectType();
 			// 원하는 Type이면 삭제한다.
 			if (nItemType == (nType & nItemType)) {
 				pcItemIter = pcImpl->Erase(pcItemIter);

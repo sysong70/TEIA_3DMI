@@ -4,6 +4,11 @@
 
 #include "KeyImpl.h"
 
+#include "../Segment.h"
+#include "../Include.h"
+#include "../Line.h"
+#include "../Reference.h"
+
 using namespace H3DF;
 
 CString SearchImpl::GetSearchTypeString(Search::Type eType)
@@ -535,26 +540,32 @@ CString SearchImpl::GetSearchSpaceString(Search::Space eInSpace)
 
 Key H3DF::SearchResultsImpl::GetKey(CStringA strType, HC_KEY nInKey)
 {
-	Key cKey(nInKey);
-	KeyImpl * pcKeyImpl = (KeyImpl *)cKey.GetImpl();
+	Key cKey;
+	//KeyImpl * pcKeyImpl = (KeyImpl *)cKey.GetImpl();
 
 	if (strType == _T("include")) {
-		pcKeyImpl->SetType(H3DF::Type::IncludeKey);
+		IncludeKey cInclude(nInKey);
+		cKey = cInclude;
 	}
 	else if (strType == _T("segment")) {
-		pcKeyImpl->SetType(H3DF::Type::SegmentKey);
+		SegmentKey cSegment(nInKey);
+		cKey = cSegment;
 	}
 	else if (strType == _T("geometry")) {
-		pcKeyImpl->SetType(H3DF::Type::GeometryKey);
+		GeometryKey cGeometry(nInKey);
+		cKey = cGeometry;
 	}
 	else if (strType == _T("shell")) {
-		pcKeyImpl->SetType(H3DF::Type::ShellKey);
+		ShellKey cShell(nInKey);
+		cKey = cShell;
 	}
 	else if (strType == _T("lines") || strType == _T("polylines") || strType == _T("polyline")) {
-		pcKeyImpl->SetType(H3DF::Type::LineKey);
+		LineKey cLine(nInKey);
+		cKey = cLine;
 	}
 	else if (strType == _T("reference")) {
-		pcKeyImpl->SetType(H3DF::Type::ReferenceKey);
+		ReferenceKey cReference(nInKey);
+		cKey = cReference;
 	}
 	else {
 		DEBUG_STOP;

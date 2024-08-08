@@ -34,5 +34,8 @@ namespace H3DF
 	public:
 		MarkerKey() {};
 		MarkerKey(HC_KEY nInKey);
+
+		static const H3DF::Type staticType = H3DF::Type::MarkerKey;
+		H3DF::Type ObjectType() const override { return staticType; };
 	};
 }

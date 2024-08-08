@@ -37,8 +37,6 @@ namespace H3DF
 
 VisibilityKitImpl::VisibilityKitImpl()
 {
-	m_eType = H3DF::Type::VisibilityKit;
-
 	for (auto & nFlag : m_bVisibilityFlag) {
 		nFlag = 0;
 	}
@@ -80,104 +78,104 @@ VisibilityKit const & H3DF::VisibilityKit::operator = (VisibilityKit const & cIn
 
 //== Set Visibility Kit ============================================================================
 
-VisibilityKit & H3DF::VisibilityKit::SetWindows(bool bInValue)
+VisibilityKit & H3DF::VisibilityKit::SetWindows(bool bInState)
 {
 	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->SetVisibility(VisibilityType::Windows, bInValue);
+	pcImpl->SetVisibility(VisibilityType::Windows, bInState);
 
 	return *this;
 }
 
-VisibilityKit & H3DF::VisibilityKit::SetEdges(bool bInValue)
+VisibilityKit & H3DF::VisibilityKit::SetEdges(bool bInState)
 {
 	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->SetVisibility(VisibilityType::Edges, bInValue);
+	pcImpl->SetVisibility(VisibilityType::Edges, bInState);
 
 	return *this;
 }
 
-VisibilityKit & H3DF::VisibilityKit::SetFaces(bool bInValue)
+VisibilityKit & H3DF::VisibilityKit::SetFaces(bool bInState)
 {
 	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->SetVisibility(VisibilityType::Faces, bInValue);
+	pcImpl->SetVisibility(VisibilityType::Faces, bInState);
 
 	return *this;
 }
 
-VisibilityKit & H3DF::VisibilityKit::SetLights(bool bInValue)
+VisibilityKit & H3DF::VisibilityKit::SetLights(bool bInState)
 {
 	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->SetVisibility(VisibilityType::Lights, bInValue);
+	pcImpl->SetVisibility(VisibilityType::Lights, bInState);
 
 	return *this;
 }
 
-VisibilityKit & H3DF::VisibilityKit::SetLines(bool bInValue)
+VisibilityKit & H3DF::VisibilityKit::SetLines(bool bInState)
 {
 	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->SetVisibility(VisibilityType::Lines, bInValue);
+	pcImpl->SetVisibility(VisibilityType::Lines, bInState);
 
 	return *this;
 }
 
-VisibilityKit & H3DF::VisibilityKit::SetMarkers(bool bInValue)
+VisibilityKit & H3DF::VisibilityKit::SetMarkers(bool bInState)
 {
 	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->SetVisibility(VisibilityType::Markers, bInValue);
-
-	return *this;
-
-}
-
-VisibilityKit & H3DF::VisibilityKit::SetVertices(bool bInValue)
-{
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
-	pcImpl->SetVisibility(VisibilityType::Vertices, bInValue);
+	pcImpl->SetVisibility(VisibilityType::Markers, bInState);
 
 	return *this;
 
 }
 
-VisibilityKit & H3DF::VisibilityKit::SetText(bool bInValue)
+VisibilityKit & H3DF::VisibilityKit::SetVertices(bool bInState)
 {
 	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->SetVisibility(VisibilityType::Text, bInValue);
+	pcImpl->SetVisibility(VisibilityType::Vertices, bInState);
+
+	return *this;
+
+}
+
+VisibilityKit & H3DF::VisibilityKit::SetText(bool bInState)
+{
+	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->SetVisibility(VisibilityType::Text, bInState);
 
 	return *this;
 }
 
-VisibilityKit & H3DF::VisibilityKit::SetGeometry(bool bInValue)
+VisibilityKit & H3DF::VisibilityKit::SetGeometry(bool bInState)
 {
 	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->SetVisibility(VisibilityType::Geometry, bInValue);
+	pcImpl->SetVisibility(VisibilityType::Geometry, bInState);
 
 	return *this;
 }
 
-VisibilityKit & H3DF::VisibilityKit::SetEverything(bool bInValue)
+VisibilityKit & H3DF::VisibilityKit::SetEverything(bool bInState)
 {
 	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->SetVisibility(VisibilityType::Everything, bInValue);
+	pcImpl->SetVisibility(VisibilityType::Everything, bInState);
 
 	return *this;
 }
@@ -292,23 +290,21 @@ namespace H3DF
 	class VisibilityControlImpl : public ControlImpl
 	{
 	public:
-		VisibilityControlImpl() { m_eType = H3DF::Type::VisibilityControl; }
-
 		void Copy(VisibilityControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
 
-		void SetVisibility(CStringA strInType, bool bInValue);
+		void SetVisibility(CStringA strInType, bool bInState);
 		void UnSetVisibility(CStringA strInType);
 	};
 }
 
-void H3DF::VisibilityControlImpl::SetVisibility(CStringA strInType, bool bInValue)
+void H3DF::VisibilityControlImpl::SetVisibility(CStringA strInType, bool bInState)
 {
 	SegmentKeyImpl::LocalOpen(m_cOverrideKey);
 
 	CStringA strList;
-	strList.Format("%s = %s", strInType, (true == bInValue ? "on" : "off"));
+	strList.Format("%s = %s", strInType, (true == bInState ? "on" : "off"));
 	
 	HC_Set_Visibility(strList);
 
@@ -324,7 +320,7 @@ void H3DF::VisibilityControlImpl::UnSetVisibility(CStringA strInType)
 	SegmentKeyImpl::LocalClose(m_cOverrideKey);
 }
 
-VisibilityControl::VisibilityControl(SegmentKey & cInSegmentKey)
+H3DF::VisibilityControl::VisibilityControl(SegmentKey & cInSegmentKey)
 {
 	VisibilityControlImpl * pcImpl = new VisibilityControlImpl();
 	pcImpl->m_cOverrideKey = cInSegmentKey;
@@ -332,20 +328,20 @@ VisibilityControl::VisibilityControl(SegmentKey & cInSegmentKey)
 	m_pcImpl = pcImpl;
 }
 
-VisibilityControl::VisibilityControl(VisibilityControl const & cInThat)
+H3DF::VisibilityControl::VisibilityControl(VisibilityControl const & cInThat)
 {
 	m_pcImpl = new VisibilityControlImpl();
 	Set(cInThat);
 }
 
-void VisibilityControl::Set(VisibilityControl const & cInThat)
+void H3DF::VisibilityControl::Set(VisibilityControl const & cInThat)
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	VisibilityControlImpl * pcInThatImpl = (VisibilityControlImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
 }
 
-VisibilityControl & VisibilityControl::operator = (VisibilityControl const & cInThat)
+VisibilityControl & H3DF::VisibilityControl::operator = (VisibilityControl const & cInThat)
 {
 	Set(cInThat);
 	return *this;
@@ -353,107 +349,116 @@ VisibilityControl & VisibilityControl::operator = (VisibilityControl const & cIn
 
 //== Set Visibility Control ========================================================================
 
-VisibilityControl & VisibilityControl::SetCuttingSections(bool bInValue)
+VisibilityControl & H3DF::VisibilityControl::SetCuttingSections(bool bInState)
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->SetVisibility("cutting planes", bInValue);
+	pcImpl->SetVisibility("cutting planes", bInState);
 
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::SetWindows(bool bInValue)
+VisibilityControl & H3DF::VisibilityControl::SetWindows(bool bInState)
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->SetVisibility("windows", bInValue);
+	pcImpl->SetVisibility("windows", bInState);
 
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::SetEdges(bool bInValue)
+VisibilityControl & H3DF::VisibilityControl::SetEdges(bool bInState)
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->SetVisibility("edges", bInValue);
+	pcImpl->SetVisibility("edges", bInState);
 
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::SetFaces(bool bInValue)
+VisibilityControl & H3DF::VisibilityControl::SetFaces(bool bInState)
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->SetVisibility("faces", bInValue);
+	pcImpl->SetVisibility("faces", bInState);
 
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::SetLights(bool bInValue) 
+VisibilityControl & H3DF::VisibilityControl::SetLights(bool bInState) 
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->SetVisibility("lights", bInValue);
+	pcImpl->SetVisibility("lights", bInState);
 
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::SetLines(bool bInValue) 
+VisibilityControl & H3DF::VisibilityControl::SetLines(bool bInState) 
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->SetVisibility("lines", bInValue);
+	pcImpl->SetVisibility("lines", bInState);
 
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::SetMarkers(bool bInValue)
+VisibilityControl & H3DF::VisibilityControl::SetMarkers(bool bInState)
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->SetVisibility("markers", bInValue);
+	pcImpl->SetVisibility("markers", bInState);
 
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::SetVertices(bool bInValue)
+VisibilityControl & H3DF::VisibilityControl::SetVertices(bool bInState)
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->SetVisibility("vertices", bInValue);
+	pcImpl->SetVisibility("vertices", bInState);
 
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::SetText(bool bInValue)
+VisibilityControl & H3DF::VisibilityControl::SetText(bool bInState)
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->SetVisibility("text", bInValue);
+	pcImpl->SetVisibility("text", bInState);
 
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::SetGeometry(bool bInValue)
+VisibilityControl & H3DF::VisibilityControl::SetShadows(bool bInState)
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->SetVisibility("geometry", bInValue);
+	pcImpl->SetVisibility("shadows", bInState);
 
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::SetEverything(bool bInValue)
+VisibilityControl & H3DF::VisibilityControl::SetGeometry(bool bInState)
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
-	pcImpl->SetVisibility("everything", bInValue);
+	pcImpl->SetVisibility("geometry", bInState);
+
+	return *this;
+}
+
+VisibilityControl & H3DF::VisibilityControl::SetEverything(bool bInState)
+{
+	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	pcImpl->SetVisibility("everything", bInState);
 
 	return *this;
 }
 
 //== Unset Selectability Control ===================================================================
-VisibilityControl & VisibilityControl::UnsetCuttingSections()
+VisibilityControl & H3DF::VisibilityControl::UnsetCuttingSections()
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -462,7 +467,7 @@ VisibilityControl & VisibilityControl::UnsetCuttingSections()
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::UnsetWindows()
+VisibilityControl & H3DF::VisibilityControl::UnsetWindows()
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -471,7 +476,7 @@ VisibilityControl & VisibilityControl::UnsetWindows()
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::UnsetEdges()
+VisibilityControl & H3DF::VisibilityControl::UnsetEdges()
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -480,7 +485,7 @@ VisibilityControl & VisibilityControl::UnsetEdges()
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::UnsetFaces()
+VisibilityControl & H3DF::VisibilityControl::UnsetFaces()
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -489,7 +494,7 @@ VisibilityControl & VisibilityControl::UnsetFaces()
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::UnsetLights()
+VisibilityControl & H3DF::VisibilityControl::UnsetLights()
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -498,7 +503,7 @@ VisibilityControl & VisibilityControl::UnsetLights()
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::UnsetLines()
+VisibilityControl & H3DF::VisibilityControl::UnsetLines()
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -507,7 +512,7 @@ VisibilityControl & VisibilityControl::UnsetLines()
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::UnsetMarkers() 
+VisibilityControl & H3DF::VisibilityControl::UnsetMarkers() 
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -516,7 +521,7 @@ VisibilityControl & VisibilityControl::UnsetMarkers()
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::UnsetVertices()
+VisibilityControl & H3DF::VisibilityControl::UnsetVertices()
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -525,7 +530,7 @@ VisibilityControl & VisibilityControl::UnsetVertices()
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::UnsetText()
+VisibilityControl & H3DF::VisibilityControl::UnsetText()
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -534,7 +539,16 @@ VisibilityControl & VisibilityControl::UnsetText()
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::UnsetGeometry() 
+VisibilityControl & H3DF::VisibilityControl::UnsetShadows()
+{
+	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+	pcImpl->UnSetVisibility("shadows");
+
+	return *this;
+}
+
+VisibilityControl & H3DF::VisibilityControl::UnsetGeometry() 
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -543,21 +557,19 @@ VisibilityControl & VisibilityControl::UnsetGeometry()
 	return *this;
 }
 
-VisibilityControl & VisibilityControl::UnsetEverything()
+VisibilityControl & H3DF::VisibilityControl::UnsetEverything()
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
-
-	HC_UnSet_Visibility();
-
-	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		HC_UnSet_Visibility();
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
 }
 
-bool VisibilityControl::ShowFaces(bool & bOutState) const
+bool H3DF::VisibilityControl::ShowFaces(bool & bOutState) const
 {
 	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -579,7 +591,7 @@ bool VisibilityControl::ShowFaces(bool & bOutState) const
 			bOutState = false;
 		}
 
-	}SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return true;
 }

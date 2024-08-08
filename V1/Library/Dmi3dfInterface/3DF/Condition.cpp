@@ -20,8 +20,6 @@ namespace H3DF
 	class ConditionalExpressionImpl : public Impl
 	{
 	public:
-		ConditionalExpressionImpl() { m_eType = H3DF::Type::ConditionalExpression; }
-
 		void Copy(ConditionalExpressionImpl * pcInThat) {
 			m_strCondition = pcInThat->m_strCondition;
 			m_fNumber = pcInThat->m_fNumber;
@@ -200,8 +198,6 @@ namespace H3DF
 	class ConditionControlImpl : public ControlImpl
 	{
 	public:
-		ConditionControlImpl() { m_eType = H3DF::Type::ConditionControl; }
-
 		void Copy(ConditionControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}

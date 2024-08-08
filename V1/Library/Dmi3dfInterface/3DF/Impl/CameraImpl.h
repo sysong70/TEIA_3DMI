@@ -41,8 +41,6 @@ namespace H3DF
 	class CameraControlImpl : public ControlImpl
 	{
 	public:
-		CameraControlImpl() { m_eType = H3DF::Type::CameraControl; }
-
 		void Copy(CameraControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}

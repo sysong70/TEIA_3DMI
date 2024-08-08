@@ -178,8 +178,6 @@ namespace H3DF
 
 H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
 {
-	m_eType = H3DF::Type::HighlightControl;
-
 	m_pcWindow = (WindowKey *)&cInWindow;
 
 	// m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetHighlightSelection();

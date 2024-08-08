@@ -4,6 +4,10 @@
 
 #include <chrono>
 
+#include "Math.h"
+
+class HPoint;
+
 namespace H3DF
 {
 	namespace Utility
@@ -51,6 +55,9 @@ namespace H3DF
 		short RawStringToShort(CStringA strText);
 
 		short RawByteToShort(BYTE * pbData);
+
+		//== Point 관련 함수 =========================================================================
+		HPoint ToHPoint(H3DF::Point cInPoint);
 
 		//== File 관련 함수 ==========================================================================
 		CString GetExecuteDirectory();

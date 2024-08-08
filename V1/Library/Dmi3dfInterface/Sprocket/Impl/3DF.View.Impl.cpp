@@ -72,6 +72,10 @@ using namespace H3DF;
 #define ColorValue(x) GetRValue(x) / 255.0f, GetGValue(x) / 255.0f, GetBValue(x) / 255.0f
 #define ColorRGBA(x, alpha) GetRValue(x), GetGValue(x), GetBValue(x), (unsigned char)alpha
 
+#ifndef PI
+#	define PI 3.1415926535897932384626433832795028841971693993751
+#endif
+
 //== BaseView Class ================================================================================
 
 H3DF::BaseView::BaseView(HBaseModel * model, const char * alias, const char * driver_type, const char * instance_name,

@@ -22,11 +22,7 @@ Object::~Object()
 	}
 }
 
-H3DF::Type Object::Type() const
+bool Object::HasType(H3DF::Type eInMask) const
 {
-	if (nullptr == m_pcImpl) {
-		return H3DF::Type::None;
-	}
-
-	return m_pcImpl->Type();
+	return ((DWORD) staticType & (DWORD) eInMask) == (DWORD) eInMask;
 }

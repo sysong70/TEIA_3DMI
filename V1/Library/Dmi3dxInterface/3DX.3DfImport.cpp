@@ -91,7 +91,9 @@ using namespace std::chrono;
 }
 */
 
-#define PI 3.1415926535897932384626433832795028841971693993751
+#ifndef PI
+#	define PI 3.1415926535897932384626433832795028841971693993751
+#endif
 
 USING_3DF_NAMESPACE
 USING_3DX_NAMESPACE
@@ -2302,9 +2304,9 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 	unsigned int nCount = (unsigned int)aStrings.size();
 
 
-	switch (pcPmi->Type())
+	switch (pcPmi->ObjectType())
 	{
-		case H3DF::Type::Datum:
+		case H3DF::Type::DatumEntity:
 		{
 			H3DF::DatumEntity * pcDatum = (H3DF::DatumEntity *)pcPmi;
 			pcDatum->SetDisplayParallelToScreen(cOptions.IsDisplayParallelToScreen());
@@ -2314,7 +2316,7 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 		}
 		break;
 
-		case H3DF::Type::Dimension:
+		case H3DF::Type::DimensionEntity:
 		{
 			H3DF::DimensionEntity * pcDimension = (H3DF::DimensionEntity *)pcPmi;
 
@@ -2325,7 +2327,7 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 		}
 		break;
 
-		case H3DF::Type::Generic:
+		case H3DF::Type::GenericEntity:
 		{
 			H3DF::GenericEntity * pcGeneric = (H3DF::GenericEntity *)pcPmi;
 
@@ -2335,7 +2337,7 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 		}
 		break;
 
-		case H3DF::Type::Note:
+		case H3DF::Type::NoteEntity:
 		{
 			H3DF::NoteEntity * pcNote = (H3DF::NoteEntity *)pcPmi;
 
@@ -2346,7 +2348,7 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 		}
 		break;
 
-		case H3DF::Type::Roughness:
+		case H3DF::Type::RoughnessEntity:
 		{
 			H3DF::RoughnessEntity * pcRoughness = (H3DF::RoughnessEntity *)pcPmi;
 

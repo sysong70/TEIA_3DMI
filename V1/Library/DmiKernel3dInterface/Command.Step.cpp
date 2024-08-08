@@ -61,7 +61,7 @@ void KERNEL::Command::Step::Draw(H3DF::SegmentKey cInSegment)
 	pcImpl->m_pfDrawFunction(this, cInSegment);
 }
 
-void KERNEL::Command::Step::SetEventInfo(std::vector<Command::EventInfo> & vcInEvents, Command::EventInfo & cInEvent)
+void KERNEL::Command::Step::SetEventInfo(std::vector<Command::Event> & vcInEvents, Command::Event & cInEvent)
 {
 	StepImpl * pcImpl = (StepImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -70,7 +70,7 @@ void KERNEL::Command::Step::SetEventInfo(std::vector<Command::EventInfo> & vcInE
 	pcImpl->m_pcEvent = &cInEvent;
 }
 
-Command::EventInfoArray & KERNEL::Command::Step::GetSavedEvents()
+Command::EventArray & KERNEL::Command::Step::GetSavedEvents()
 {
 	StepImpl * pcImpl = (StepImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -78,7 +78,7 @@ Command::EventInfoArray & KERNEL::Command::Step::GetSavedEvents()
 	return *pcImpl->m_pvcSavedEvents;
 }
 
-Command::EventInfo & KERNEL::Command::Step::GetEvent()
+Command::Event & KERNEL::Command::Step::GetEvent()
 {
 	StepImpl * pcImpl = (StepImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);

@@ -132,6 +132,8 @@ namespace H3DF
 	class ColorInterpolationKit;
 	class ColorInterpolationControl;
 
+	class CullingControl;
+
 	class CADModel;
 	class Component;
 	class MetaData;
@@ -149,6 +151,8 @@ namespace H3DF
 			Consume			= 1 << 2,
 			Complete		= 1 << 3,
 		};
+
+		class Event;
 	}
 
 	// The Type class is a concept class that contains type information for all classes.
@@ -197,8 +201,21 @@ namespace H3DF
 		EllipticalArcKit = 0x0100001e,
 		InfiniteLineKit = 0x0100001f,
 		LineKit = 0x01000020,
+		NURBSCurveKit = 0x01000021,
+		MeshKit = 0x01000022,
+		NURBSSurfaceKit = 0x01000023,
+		PolygonKit = 0x01000024,
+		SphereKit = 0x01000025,
+		SpotlightKit = 0x01000026,
 		ShellKit = 0x01000027,
+		TextKit = 0x01000028,
 		MaterialKit = 0x01000029,
+		TrimKit = 0x0100002a,
+		TextureOptionsKit = 0x0100002c,
+		LinePatternKit = 0x0100002d,
+		GlyphKit = 0x0100002e,
+		ImageKit = 0x0100002f,
+		LinePatternOptionsKit = 0x01000030,
 		CameraKit = 0x01000031,
 		BoundingKit = 0x01000032,
 		CullingKit = 0x01000033,
@@ -209,8 +226,13 @@ namespace H3DF
 		LineAttributeKit = 0x01000038,
 		MarkerAttributeKit = 0x01000039,
 		MaterialMappingKit = 0x0100003a,
+		// MatrixKit								= 0x0100003b,
+		NURBSSurfaceAttributeKit = 0x0100003c,
+		PostProcessEffectsKit = 0x0100003d,
 		SelectabilityKit = 0x0100003e,
 		SelectionOptionsKit = 0x0100003f,
+		StandAloneWindowOptionsKit = 0x01000040,
+		OffScreenWindowOptionsKit = 0x01000041,
 		ApplicationWindowOptionsKit = 0x01000042,
 		HighlightOptionsKit = 0x01000043,
 		LinePatternParallelKit = 0x01000044,
@@ -221,6 +243,16 @@ namespace H3DF
 		LegacyShaderKit = 0x01000049,
 		DebuggingKit = 0x0100004a,
 		ContourLineKit = 0x0100004b,
+		StreamImportOptionsKit = 0x0100004c,
+		StreamImportResultsKit = 0x0100004d,
+		StreamExportOptionsKit = 0x0100004e,
+		StreamExportResultsKit = 0x0100004f,
+		WindowInfoKit = 0x01000050,
+		ImageImportOptionsKit = 0x01000051,
+		SearchOptionsKit = 0x01000052,
+		LegacyShaderImportOptionsKit = 0x01000053,
+		HardcopyExportOptionsKit = 0x01000055, // These two use the same Impl, so
+		HardcopyGDIExportOptionsKit = 0x01001055, // we make sure their bits are compatible here
 		AttributeLockKit = 0x01000056,
 		TransformMaskKit = 0x01000057,
 		ColorInterpolationKit = 0x01000058,
@@ -245,6 +277,8 @@ namespace H3DF
 		VertexShaderKit = 0x0100006b,
 		ShaderTextureKit = 0x0100006c,
 		ShaderSamplerKit = 0x0100006d,
+
+		KeyPath = 0x01000F01,
 
 		Key = 0x10000000,
 		IncludeKey = 0x10000001,
@@ -371,19 +405,20 @@ namespace H3DF
 		AxisTriadControl = 0xD000000A,
 		AnimationControl = 0xD000000B,
 
-		PMI						= 0xE0000000,
-		Datum					= 0xE0000001,
-		Dimension				= 0xE0000002,
-		FeatureControlFrame		= 0xE0000003,
-		Generic					= 0xE0000004,
-		Note					= 0xE0000005,
-		Roughness				= 0xE0000006,
-		TextAttributes			= 0xE0000007,
-		Options					= 0xE0000008,
-		PmiView					= 0xE0000009,
-		Frame					= 0xE000000A,
-		Draw					= 0xE000000B,
-		Orintation				= 0xE000000C,
+		PMI = 0xE0000000,
+		DatumEntity = 0xE0000001,
+		DimensionEntity = 0xE0000002,
+		FeatureControlFrameEntity = 0xE0000003,
+		GenericEntity = 0xE0000004,
+		NoteEntity = 0xE0000005,
+		RoughnessEntity = 0xE0000006,
+		Orientation = 0xE0000007,
+		TextAttributes = 0xE0000008,
+		Options = 0xE0000009,
+		PmiView = 0xE000000A,
+		Frame = 0xE000000B,
+		Draw = 0xE000000C,
+		ViewEntity = 0xE000000D,
 
 		ConditionalExpression = 0x09000000,
 		NOTCondition = 0x09000001,
@@ -934,12 +969,6 @@ namespace H3DF
 		Impl() = default;
 		virtual ~Impl() = default;
 
-		H3DF::Type Type() const;
-		void SetType(H3DF::Type eType);
-
 		void SetImpl(Object * pcObject, Impl * pcImpl);
-
-	protected:
-		H3DF::Type m_eType = H3DF::Type::None;
 	};
 }

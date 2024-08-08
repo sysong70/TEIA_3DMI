@@ -21,6 +21,7 @@
 #include "Condition.h"
 #include "DrawingAttribute.h"
 #include "ColorInterpolation.h"
+#include "Culling.h"
 
 #include "Camera.h"
 
@@ -98,8 +99,6 @@ void H3DF::SegmentKey::Set(SegmentKey const & cInThat)
 
 SegmentKey & H3DF::SegmentKey::operator = (SegmentKey const & cInThat)
 {
-//	Key::Set(cInThat);
-
 	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
 	SegmentKeyImpl * pcInThatImpl = (SegmentKeyImpl *)cInThat.m_pcImpl;
 
@@ -1024,37 +1023,36 @@ SegmentKey & H3DF::SegmentKey::SetCamera(MatrixKit & cInMatrix)
 
 bool H3DF::SegmentKey::ShowCamera(CameraKit & cOutKit) const
 {
-	SegmentKeyImpl::LocalOpen(*this);
+	SegmentKeyImpl::LocalOpen(*this); {
 
-	Point cPosition;
-	Point cTarget;
-	Vector cUpVector;
-	float fWidth, fHeight;
-	CStringA strProjecionType;
+		Point cPosition;
+		Point cTarget;
+		Vector cUpVector;
+		float fWidth, fHeight;
+		CStringA strProjecionType;
 
-	HC_Show_Net_Camera(&cPosition, &cTarget, &cUpVector, &fWidth, &fHeight, strProjecionType.GetBuffer(MVO_BUFFER_SIZE));
-	strProjecionType.ReleaseBuffer();
+		HC_Show_Net_Camera(&cPosition, &cTarget, &cUpVector, &fWidth, &fHeight, strProjecionType.GetBuffer(MVO_BUFFER_SIZE));
+		strProjecionType.ReleaseBuffer();
 
-	cOutKit.SetUpVector(cUpVector);
-	cOutKit.SetPosition(cPosition);
-	cOutKit.SetTarget(cTarget);
+		cOutKit.SetUpVector(cUpVector);
+		cOutKit.SetPosition(cPosition);
+		cOutKit.SetTarget(cTarget);
 
-	Camera::Projection eType = Camera::Projection::Default;
-	if ("perspective" == strProjecionType) {
-		eType = Camera::Projection::Perspective;
-	}
-	else if ("orthographic" == strProjecionType) {
-		eType = Camera::Projection::Orthographic;
-	}
-	else if ("stretched" == strProjecionType) {
-		eType = Camera::Projection::Stretched;
-	}
+		Camera::Projection eType = Camera::Projection::Default;
+		if ("perspective" == strProjecionType) {
+			eType = Camera::Projection::Perspective;
+		}
+		else if ("orthographic" == strProjecionType) {
+			eType = Camera::Projection::Orthographic;
+		}
+		else if ("stretched" == strProjecionType) {
+			eType = Camera::Projection::Stretched;
+		}
 
-	cOutKit.SetProjection(eType);
+		cOutKit.SetProjection(eType);
+		cOutKit.SetField(fWidth, fHeight);
 
-	cOutKit.SetField(fWidth, fHeight);
-
-	SegmentKeyImpl::LocalClose(*this);
+	} SegmentKeyImpl::LocalClose(*this);
 
 	return true;
 }
@@ -1237,6 +1235,19 @@ ColorInterpolationControl const H3DF::SegmentKey::GetColorInterpolationControl()
 	ColorInterpolationControl cControl(*(SegmentKey *) this);
 	return cControl;
 }
+
+CullingControl H3DF::SegmentKey::GetCullingControl()
+{
+	CullingControl cControl(*this);
+	return cControl;
+}
+
+CullingControl const H3DF::SegmentKey::GetCullingControl() const
+{
+	CullingControl cControl(*(SegmentKey *) this);
+	return cControl;
+}
+
 
 //== User Data 관련 함수 =============================================================================
 SegmentKey & H3DF::SegmentKey::SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData)

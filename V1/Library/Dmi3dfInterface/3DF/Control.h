@@ -11,5 +11,8 @@ namespace H3DF
 		Control() = default;
 		Control(Control && cInThat);
 		Control & operator=(Control && cInThat);
+
+		static const H3DF::Type staticType = H3DF::Type::Control;
+		H3DF::Type ObjectType() const override { return staticType; }
 	};
 }

@@ -21,10 +21,10 @@ namespace KERNEL
 		public:
 			Select(const Session * pcInSession);
 
-			int MouseMove(HEventInfo & cInEvent);
+			int MouseMove(Event & cInEvent);
 
-			int LButtonDown(HEventInfo & cInEvent);
-			bool LButtonUp(HEventInfo & cInEvent);
+			int LButtonDown(Event & cInEvent);
+			bool LButtonUp(Event & cInEvent);
 
 			//== Object Snap 관련 함수 ===============================================================
 			void DrawSnapItems();

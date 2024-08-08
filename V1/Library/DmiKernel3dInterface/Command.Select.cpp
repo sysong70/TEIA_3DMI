@@ -82,8 +82,6 @@ namespace KERNEL
 			H3DF::SelectionResults m_cOldHighlightSelection;
 			H3DF::SelectionResults m_cHighlightSelection;
 
-			HPoint m_cClickPoint;
-
 			H3DF::HighlightControl * m_pcDynHighlightControl = nullptr;
 			H3DF::HighlightControl * m_pcDynLineHighlightControl = nullptr;
 			H3DF::HighlightControl * m_pcDynPmiHighlightControl = nullptr;
@@ -168,7 +166,7 @@ KERNEL::Command::Select::Select(const Session * pcInSession) :
 }
 
 //== Mouse Event 관련 함수 ===========================================================================
-int KERNEL::Command::Select::MouseMove(HEventInfo & cInEvent)
+int KERNEL::Command::Select::MouseMove(Event & cInEvent)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -178,22 +176,22 @@ int KERNEL::Command::Select::MouseMove(HEventInfo & cInEvent)
 	return HLISTENER_PASS_EVENT;
 }
 
-int KERNEL::Command::Select::LButtonDown(HEventInfo & cInEvent)
+int KERNEL::Command::Select::LButtonDown(Event & cInEvent)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->m_cLButtonDownPixelPosition.Set(cInEvent.GetMousePixelPos().x, cInEvent.GetMousePixelPos().y);
+	pcImpl->m_cLButtonDownPixelPosition.Set(cInEvent.GetMousePixelPoint().x, cInEvent.GetMousePixelPoint().y);
 
 	return 0;
 }
 
-bool KERNEL::Command::Select::LButtonUp(HEventInfo & cInEvent)
+bool KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	H3DF::Point2D cMousePixelPosition(cInEvent.GetMousePixelPos().x, cInEvent.GetMousePixelPos().y);
+	H3DF::Point2D cMousePixelPosition(cInEvent.GetMousePixelPoint().x, cInEvent.GetMousePixelPoint().y);
 	ULONGLONG nTickCount = pcImpl->m_nMouseUpTickCount - pcImpl->m_nMouseDownTickCount;
 
 	// 1. 2 Pixel이하 200 Tick이하에서만 선택하는 것으로 판정한다.

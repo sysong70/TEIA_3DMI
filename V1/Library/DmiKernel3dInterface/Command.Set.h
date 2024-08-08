@@ -2,7 +2,7 @@
 
 #include "Command.h"
 
-#include "Command.EventInfo.h"
+#include "Command.Event.h"
 
 namespace KERNEL
 {
@@ -58,7 +58,7 @@ namespace KERNEL
 			void PushBack(Step * pcInStep);
 
 			//== 입력된 사용자 명령어 처리 ==============================================================
-			bool EventExecution(Command::EventInfo & cInEvent);
+			bool EventExecution(Command::Event & cInEvent);
 
 			virtual KERNEL::Command::Type GetType() const;
 		};

@@ -72,7 +72,7 @@ void KERNEL::Command::AttributeImpl::ShowStyleToNoShowStyle()
 	SessionImpl * pcDocImpl = (SessionImpl *)GetSession().GetImpl();
 	DEBUG_VALID(pcDocImpl);
 
-	pcDocImpl->GetBaseView()->InvalidateSceneBounding();
+	pcDocImpl->GetCanvas().GetFrontView().InvalidateSceneBounding();
 
 	pcDocImpl->Select().ResetSnapItems(false);
 

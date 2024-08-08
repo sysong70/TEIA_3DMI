@@ -19,19 +19,11 @@ namespace H3DF {
 	class ReferenceKeyImpl : public GeometryKeyImpl
 	{
 	public:
-		ReferenceKeyImpl() { m_eType = H3DF::Type::ReferenceKey; }
-		~ReferenceKeyImpl();
-
 		void Copy(ReferenceKeyImpl * pcInThat) {
 			KeyImpl::Copy(pcInThat);
 		}
 	};
 };
-
-H3DF::ReferenceKeyImpl::~ReferenceKeyImpl()
-{
-	int i = 0;
-}
 
 H3DF::ReferenceKey::ReferenceKey() : GeometryKey(INVALID_KEY)
 {
@@ -51,10 +43,12 @@ H3DF::ReferenceKey::ReferenceKey(Key const & cInKey)
 	ReferenceKeyImpl * pcImpl = new ReferenceKeyImpl();
 	m_pcImpl = pcImpl;
 
-	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInKey.GetImpl()));
+	if (H3DF::Type::ReferenceKey != cInKey.ObjectType()) {
+		DEBUG_STOP;
+		return;
+	}
 
-	// 외부에서 들어오는 Key는 ReferenceKey가 아닐 수 있으므로, ReferenceKey로 변경한다.
-	pcImpl->SetType(H3DF::Type::ReferenceKey);
+	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInKey.GetImpl()));
 }
 
 H3DF::ReferenceKey::ReferenceKey(ReferenceKey const & cInThat)

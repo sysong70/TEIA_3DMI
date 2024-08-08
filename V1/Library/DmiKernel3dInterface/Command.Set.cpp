@@ -115,7 +115,7 @@ KERNEL::Command::Set::~Set()
 	Clear();
 }
 
-// Set에 포함되어 있는 값 Iterator, EventInfo 등을 초기화.
+// Set에 포함되어 있는 값 Iterator, Event 등을 초기화.
 void KERNEL::Command::Set::Reset()
 {
 	if (nullptr == m_pcImpl) {
@@ -255,7 +255,7 @@ void KERNEL::Command::Set::PushBack(Step * pcInStep)
 }
 
 //== 입력된 사용자 명령어 처리 =========================================================================
-bool KERNEL::Command::Set::EventExecution(Command::EventInfo & cInEvent)
+bool KERNEL::Command::Set::EventExecution(Command::Event & cInEvent)
 {
 	if (nullptr == m_pcImpl) {
 		DEBUG_STOP;

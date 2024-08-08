@@ -18,21 +18,19 @@ KERNEL::Command::HighlightObjectSnap::HighlightObjectSnap(const Session * pcInSe
 
 }
 
-int KERNEL::Command::HighlightObjectSnap::MouseMove(HEventInfo & cInEvent)
+Command::Result::Type KERNEL::Command::HighlightObjectSnap::MouseMove(Event & cInEvent)
 {
 	auto * pcImpl = static_cast<HighlightObjectSnapImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	UINT nFlags = cInEvent.GetFlags();
-
-	if (!(MVO_LBUTTON & nFlags) && !(MVO_MBUTTON & nFlags) && !(MVO_RBUTTON & nFlags)) {
+	if (false == cInEvent.LButton() && false == cInEvent.MButton() && false == cInEvent.RButton()) {
 		pcImpl->NoButtonDownAndMove(cInEvent);
 	}
-	else if (MVO_LBUTTON & nFlags) {
+	else if (true == cInEvent.LButton()) {
 		pcImpl->LButtonDownAndMove(cInEvent);
 	}
 
-	return HLISTENER_PASS_EVENT;
+	return Command::Result::Type::Pass;
 }
 
 //== Object Snap Point를 그리는 함수 ==================================================================

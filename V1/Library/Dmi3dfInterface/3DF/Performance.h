@@ -13,6 +13,9 @@ namespace H3DF
 		PerformanceKit();
 		PerformanceKit(PerformanceKit const & cInThat);
 
+		static const H3DF::Type staticType = H3DF::Type::PerformanceKit;
+		H3DF::Type ObjectType() const override { return staticType; };
+
 		void Set(PerformanceKit const & cInThat);
 		PerformanceKit const & operator = (PerformanceKit const & cInThat);
 
@@ -32,6 +35,9 @@ namespace H3DF
 	public:
 		explicit PerformanceControl(SegmentKey & cInSegmentKey);
 		PerformanceControl(PerformanceControl const & cInThat);
+
+		static const H3DF::Type staticType = H3DF::Type::PerformanceControl;
+		H3DF::Type ObjectType() const override { return staticType; };
 
 		void Set(PerformanceControl const & cInThat);
 		PerformanceControl & operator = (PerformanceControl const & cInThat);

@@ -35,6 +35,9 @@ namespace H3DF
 		ConditionalExpression(Condition::Intrinsic eInSpecial);
 		ConditionalExpression(ConditionalExpression const & cInThat);
 
+		static const H3DF::Type staticType = H3DF::Type::ConditionalExpression;
+		H3DF::Type ObjectType() const override { return staticType; };
+
 		void Set(ConditionalExpression const & cInThat);
 		ConditionalExpression & operator = (ConditionalExpression const & cInThat);
 
@@ -58,6 +61,9 @@ namespace H3DF
 	public:
 		ConditionControl(SegmentKey & cInSegmentKey);
 		ConditionControl(ConditionControl const & cInThat);
+
+		static const H3DF::Type staticType = H3DF::Type::ConditionControl;
+		H3DF::Type ObjectType() const override { return staticType; };
 
 		void Set(ConditionControl const & cInThat);
 		ConditionControl & operator = (ConditionControl const & cInThat);

@@ -132,6 +132,9 @@ namespace H3DF
 		LineAttributeKit();
 		LineAttributeKit(LineAttributeKit const & cInThat);
 
+		static const H3DF::Type staticType = H3DF::Type::LineAttributeKit;
+		H3DF::Type ObjectType() const override { return staticType; };
+
 		void Set(LineAttributeKit const & cInThat);
 		LineAttributeKit const & operator = (LineAttributeKit const & cInThat);
 
@@ -159,6 +162,9 @@ namespace H3DF
 	public:
 		explicit LineAttributeControl(SegmentKey & cInSegmentKey);
 		LineAttributeControl(LineAttributeControl const & cInThat);
+
+		static const H3DF::Type staticType = H3DF::Type::LineAttributeControl;
+		H3DF::Type ObjectType() const override { return staticType; };
 
 		void Set(LineAttributeControl const & cInThat);
 		LineAttributeControl & operator = (LineAttributeControl const & cInThat);

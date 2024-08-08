@@ -7,8 +7,6 @@ namespace H3DF
 	class ApplicationWindowOptionsKitImpl : public Impl
 	{
 	public:
-		ApplicationWindowOptionsKitImpl() { m_eType = H3DF::Type::ApplicationWindowOptionsKit; }
-
 		void Copy(ApplicationWindowOptionsKitImpl * pcInThat) {
 			m_eDriver = pcInThat->m_eDriver;
 		}

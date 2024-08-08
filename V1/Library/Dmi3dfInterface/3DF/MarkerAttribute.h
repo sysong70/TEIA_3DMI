@@ -11,6 +11,10 @@ namespace H3DF
 	{
 	public:
 		MarkerAttributeControl(SegmentKey nInKey);
+
+		static const H3DF::Type staticType = H3DF::Type::MarkerAttributeControl;
+		H3DF::Type ObjectType() const override { return staticType; };
+
 		MarkerAttributeControl & SetSize(float fInSize, Marker::SizeUnits nInUnits = Marker::SizeUnits::ScaleFactor);
 	};
 }

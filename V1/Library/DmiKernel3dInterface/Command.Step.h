@@ -2,7 +2,7 @@
 
 #include "Object.h"
 
-#include "Command.EventInfo.h"
+#include "Command.Event.h"
 
 namespace KERNEL
 {
@@ -33,10 +33,10 @@ namespace KERNEL
 			InputType GetInputType() const;
 			void SetInputType(InputType eInInputType);
 
-			void SetEventInfo(std::vector<Command::EventInfo> & vcEventInfos, Command::EventInfo & cInEvent);
+			void SetEventInfo(std::vector<Command::Event> & vcEventInfos, Command::Event & cInEvent);
 
-			Command::EventInfoArray & GetSavedEvents();
-			Command::EventInfo & GetEvent();
+			Command::EventArray & GetSavedEvents();
+			Command::Event & GetEvent();
 
 			void SetMessage(CString strInMessage);
 			void SetInformation(CString strInInformation);

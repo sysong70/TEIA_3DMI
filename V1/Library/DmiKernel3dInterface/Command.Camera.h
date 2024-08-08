@@ -18,15 +18,15 @@ namespace KERNEL
 		public:
 			Camera(const Session * pcInSession);
 
-			Command::Result::Type MouseMove(HEventInfo & cInEvent);
+			Command::Result::Type MouseMove(Event & cInEvent);
 
-			Command::Result::Type LButtonDown(HEventInfo & cInEvent);
-			Command::Result::Type LButtonUp(HEventInfo & cInEvent);
+			Command::Result::Type LButtonDown(Event & cInEvent);
+			Command::Result::Type LButtonUp(Event & cInEvent);
 
-			Command::Result::Type RButtonDown(HEventInfo & cInEvent);
-			Command::Result::Type RButtonUp(HEventInfo & cInEvent);
+			Command::Result::Type RButtonDown(Event & cInEvent);
+			Command::Result::Type RButtonUp(Event & cInEvent);
 
-			Command::Result::Type MouseWheel(HEventInfo & cInEvent);
+			Command::Result::Type MouseWheel(Event & cInEvent);
 			
 			//== View Control 관련 함수 ==============================================================
 			H3DF::Camera::Mode CameraMode();

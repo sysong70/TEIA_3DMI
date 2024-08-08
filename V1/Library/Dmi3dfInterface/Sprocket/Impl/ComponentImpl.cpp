@@ -369,7 +369,7 @@ bool H3DF::ComponentUtility::ClonedComponent(Component & cInComponent, Component
 
 	while (true == cIterator.IsValid()) {
 		Key cKey = cIterator.GetItem();
-		H3DF::Type eType = cKey.Type();
+		H3DF::Type eType = cKey.ObjectType();
 
 		cSegment.ReferenceGeometry(cKey);
 

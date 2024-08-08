@@ -37,6 +37,10 @@ namespace H3DF
 
 		void SuppressUpdate(bool bSuppress);
 
+		bool GetSuppressUpdate();
+		bool GetSuppressUpdateTick();
+
+
 		void Destruct() const;
 		void Resize(int x, int y);
 
@@ -56,9 +60,12 @@ namespace H3DF
 		SegmentKey GetConstructionKey();
 		SegmentKey const GetConstructionKey() const;
 
+		SegmentKey GetSceneKey();
+		SegmentKey const GetSceneKey() const;
+
 		NavigationCube & GetNavigationCube() const;
 
-		void SetSuppressUpdate(bool bInState);
+		void InvalidateSceneBounding();
 
 		//== Command 관련 함수 =======================================================================
 		void CancelCommands();

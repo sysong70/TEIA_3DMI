@@ -9,5 +9,8 @@ namespace H3DF
 	{
 	public:
 		Kit();
+
+		static const H3DF::Type staticType = H3DF::Type::Kit;
+		H3DF::Type ObjectType() const override { return staticType; };
 	};
 }

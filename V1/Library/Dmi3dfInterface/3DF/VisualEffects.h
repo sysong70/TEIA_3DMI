@@ -15,6 +15,9 @@ namespace H3DF
 		VisualEffectsControl(SegmentKey & cInSegmentKey);
 		VisualEffectsControl(VisualEffectsControl const & cInThat);
 
+		static const H3DF::Type staticType = H3DF::Type::VisualEffectsControl;
+		H3DF::Type ObjectType() const { return staticType; };
+
 		void Set(VisualEffectsControl const & cInThat);
 		VisualEffectsControl & operator = (VisualEffectsControl const & cInThat);
 

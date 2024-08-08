@@ -158,7 +158,7 @@ void KERNEL::Command::SetImpl::Updated()
 //== Event 관련 함수 =================================================================================
 
 // 1.입력 Event 처리
-bool KERNEL::Command::SetImpl::EventExecution(Command::EventInfo & cInEvent)
+bool KERNEL::Command::SetImpl::EventExecution(Command::Event & cInEvent)
 {
 	if (true == m_deStep.empty()) {
 		return false;
@@ -184,7 +184,7 @@ bool KERNEL::Command::SetImpl::EventExecution(Command::EventInfo & cInEvent)
 }
 
 // 2. Step 실행
-bool KERNEL::Command::SetImpl::StepExecution(Command::Step * pcInStep, Command::EventInfo & cInEvent)
+bool KERNEL::Command::SetImpl::StepExecution(Command::Step * pcInStep, Command::Event & cInEvent)
 {
 	// 저장되어 있는 Step이 유효한지 확인
 	if (true == m_deStep.empty()) {
@@ -193,7 +193,7 @@ bool KERNEL::Command::SetImpl::StepExecution(Command::Step * pcInStep, Command::
 
 	DEBUG_VALID(m_pcSession);
 
-	// EventInfo의 정보가 유효한지를 검사한다.
+	// Event의 정보가 유효한지를 검사한다.
 	IsValidEventInfo(cInEvent);
 
 	// 현제 저장되어 있는 Event와 현재 Event를 전달한다.
@@ -223,7 +223,7 @@ bool KERNEL::Command::SetImpl::StepExecution(Command::Step * pcInStep, Command::
 }
 
 // 2-1. Step에서 요청한 Event인지 확인한다.
-Step::EventType KERNEL::Command::SetImpl::CheckEvent(Command::Step * pcInStep, Command::EventInfo & cInEvent)
+Step::EventType KERNEL::Command::SetImpl::CheckEvent(Command::Step * pcInStep, Command::Event & cInEvent)
 {
 	Step::EventType eStepEventType = Step::EventType::None;
 
@@ -231,12 +231,12 @@ Step::EventType KERNEL::Command::SetImpl::CheckEvent(Command::Step * pcInStep, C
 	Step::InputType eInputType = pcInStep->GetInputType();
 	if (Step::InputType::Coordinate == eInputType) {
 		// LButtonUp이면 그 좌표를 이용해서 다음 처리를 한다. 현재 Step은 완료한 것으로 본다.
-		if (EventInfo::Type::LButtonUp == cInEvent.GetEventType()) {
+		if (H3DF::Operator::Event::Type::LButtonUp == cInEvent.GetEventType()) {
 			eStepEventType = Step::EventType::Complete;
 		}
 		// MouseMove이면 그 좌표를 이용해서 현재 Step의 처리를 한다. 현재 Step은 완료하지 않은 것으로 본다.
 		// 완료되기전 Process를 진행하도록 한다.
-		else if (EventInfo::Type::MouseMove == cInEvent.GetEventType()) {
+		else if (H3DF::Operator::Event::Type::MouseMove == cInEvent.GetEventType()) {
 			eStepEventType = Step::EventType::PreProcessing;
 		}
 	}
@@ -244,8 +244,8 @@ Step::EventType KERNEL::Command::SetImpl::CheckEvent(Command::Step * pcInStep, C
 	return eStepEventType;
 }
 
-// 3. EventInfo의 정보가 유효한지를 검사한다.
-bool KERNEL::Command::SetImpl::IsValidEventInfo(Command::EventInfo & cInEvent)
+// 3. Event의 정보가 유효한지를 검사한다.
+bool KERNEL::Command::SetImpl::IsValidEventInfo(Command::Event & cInEvent)
 {
 	return true;
 }

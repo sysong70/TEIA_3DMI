@@ -18,8 +18,6 @@ namespace H3DF
 	class ColorInterpolationKitImpl : public Impl
 	{
 	public:
-		ColorInterpolationKitImpl() { m_eType = H3DF::Type::ColorInterpolationKit; }
-
 		void Copy(ColorInterpolationKitImpl * pcInThat) 
 		{
 			m_bDepthRange = pcInThat->m_bDepthRange;
@@ -175,8 +173,6 @@ namespace H3DF
 	class ColorInterpolationControlImpl : public ControlImpl
 	{
 	public:
-		ColorInterpolationControlImpl() { m_eType = H3DF::Type::ColorInterpolationControl; }
-
 		void Copy(ColorInterpolationControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}

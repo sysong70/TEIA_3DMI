@@ -23,8 +23,6 @@ using namespace H3DF;
 class MaterialKitImpl : public Impl
 {
 public:
-	MaterialKitImpl() { m_eType = H3DF::Type::MaterialKit; }
-
 	void Copy(MaterialKitImpl * pcInThat) {
 		for (int nColorIndex = 0; nColorIndex < (int)Material::Channel::Count; nColorIndex++) {
 			m_pcColors[nColorIndex] = pcInThat->m_pcColors[nColorIndex];
@@ -625,8 +623,6 @@ namespace H3DF
 
 H3DF::MaterialMappingKitImpl::MaterialMappingKitImpl()
 {
-	m_eType = H3DF::Type::MaterialMappingKit;
-
 	for(bool & bMaterialFlag : m_bMaterialFlag) {
 		bMaterialFlag = false;
 	}

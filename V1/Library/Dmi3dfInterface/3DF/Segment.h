@@ -25,6 +25,9 @@ namespace H3DF
 
 		virtual ~SegmentKey();
 
+		static const H3DF::Type staticType = H3DF::Type::SegmentKey;
+		H3DF::Type ObjectType() const { return staticType; };
+
 		void Set(SegmentKey const & cInThat);
 		SegmentKey & operator = (SegmentKey const & cInThat);
 
@@ -181,6 +184,10 @@ namespace H3DF
 		//== Color Interpolation 관련 함수 ==========================================================
 		ColorInterpolationControl GetColorInterpolationControl();
 		ColorInterpolationControl const GetColorInterpolationControl() const;
+
+		//== Culling 관련 함수 =======================================================================
+		CullingControl GetCullingControl();
+		CullingControl const GetCullingControl() const;
 
 		//== User Data 관련 함수 =====================================================================
 		SegmentKey & SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData);

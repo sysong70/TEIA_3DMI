@@ -7,7 +7,7 @@
 #include "../Command.VisualEffects.h"
 #include "../Command.Attribute.h"
 #include "../Command.PMI.Distance.h"
-#include "../Command.EventInfo.h"
+#include "../Command.Event.h"
 
 #include "../Signal.Connector.h"
 #include "../../Signal/Signal.h"
@@ -73,11 +73,6 @@ H3DF::Model & KERNEL::SessionImpl::GetModel()
 H3DF::CADModel & KERNEL::SessionImpl::CADModel()
 {
 	return m_cCADModel;
-}
-
-H3DF::BaseView * KERNEL::SessionImpl::GetBaseView()
-{
-	return GetCanvas().GetFrontView().GetWindowKey().GetBaseView();
 }
 
 Signal::Delivery & KERNEL::SessionImpl::Delivery() 
@@ -203,11 +198,11 @@ DWORD KERNEL::SessionImpl::MouseMapFlags(DWORD nState)
 	DWORD nFlag = 0;
 
 	// map the mfc events state to MVO
-	if (nState & MK_LBUTTON) nFlag |= (DWORD) Command::EventInfo::Flag::LeftButton;
-	if (nState & MK_RBUTTON) nFlag |= (DWORD) Command::EventInfo::Flag::RightButton;
-	if (nState & MK_MBUTTON) nFlag |= (DWORD) Command::EventInfo::Flag::MiddleButton;
-	if (nState & MK_SHIFT) nFlag |= (DWORD) Command::EventInfo::Flag::Shift;
-	if (nState & MK_CONTROL) nFlag |= (DWORD) Command::EventInfo::Flag::Control;
+	if (nState & MK_LBUTTON) nFlag |= (DWORD) H3DF::Operator::Event::Flag::LeftButton;
+	if (nState & MK_RBUTTON) nFlag |= (DWORD) H3DF::Operator::Event::Flag::RightButton;
+	if (nState & MK_MBUTTON) nFlag |= (DWORD) H3DF::Operator::Event::Flag::MiddleButton;
+	if (nState & MK_SHIFT) nFlag |= (DWORD) H3DF::Operator::Event::Flag::Shift;
+	if (nState & MK_CONTROL) nFlag |= (DWORD) H3DF::Operator::Event::Flag::Control;
 
 	return nFlag;
 }
@@ -218,9 +213,8 @@ Command::Result::Type KERNEL::SessionImpl::SelectViewControlMouseMove(int nFlag,
 		return Command::Result::Type::Pass;
 	}
 
-	DWORD nNewFlags = MouseMapFlags(nFlag);
-	HEventInfo cEvent((HBaseView *) GetBaseView());
-	cEvent.SetPoint(HE_MouseMove, x, y, nNewFlags);
+	Command::Event cEvent(Window());
+	cEvent.SetPoint(H3DF::Operator::Event::Type::MouseMove, x, y, MouseMapFlags(nFlag));
 
 	Camera().MouseMove(cEvent);
 
@@ -234,9 +228,12 @@ bool KERNEL::SessionImpl::SelectViewControlLButtonDown(int nFlag, int x, int y)
 	// Camera 및 Select 처리
 	m_cLButtonDownPosition.Set(x, y);
 	Select().SetMouseDownTickCount(GetTickCount64());
-	 
-	HEventInfo cEvent((HBaseView *) GetBaseView());
-	cEvent.SetPoint(HE_LButtonDown, x, y, MouseMapFlags(nFlag));
+
+	Command::Event cEvent(Window());
+	cEvent.SetPoint(H3DF::Operator::Event::Type::LButtonDown, x, y, MouseMapFlags(nFlag));
+
+// 	HEventInfo cEvent((HBaseView *) GetBaseView());
+// 	cEvent.SetPoint(HE_LButtonDown, x, y, MouseMapFlags(nFlag));
 
 	// 카메라에서 LButtonDown 처리는 First Point등을 설정하는 것임.
 	Camera().LButtonDown(cEvent);
@@ -257,11 +254,11 @@ Command::Result::Type KERNEL::SessionImpl::SelectViewControlLButtonUp(int nFlag,
 	H3DF::Camera::Mode eMode = Camera().CameraMode();
 
 	if (H3DF::Camera::Mode::ZoomBox == eMode) {
-		GetCanvas().GetFrontView().SetSuppressUpdate(true);
+		GetCanvas().GetFrontView().SuppressUpdate(true);
 	}
 
-	HEventInfo cEvent((HBaseView *) GetBaseView());
-	cEvent.SetPoint(HE_LButtonUp, x, y, MouseMapFlags(nFlag));
+	Command::Event cEvent(Window());
+	cEvent.SetPoint(H3DF::Operator::Event::Type::LButtonUp, x, y, MouseMapFlags(nFlag));
 
 	// NavigationCube가 선택된 경우를 처리한다. NavigationCube가 선택되어 View를 변경한 경우에는 
 	// HLISTENER_CONSUME_EVENT값을 리턴한다.
@@ -271,7 +268,7 @@ Command::Result::Type KERNEL::SessionImpl::SelectViewControlLButtonUp(int nFlag,
 
 	if (H3DF::Camera::Mode::ZoomBox == eMode) {
 		Select().DrawSnapItems();
-		GetCanvas().GetFrontView().SetSuppressUpdate(false);
+		GetCanvas().GetFrontView().SuppressUpdate(false);
 		GetCanvas().GetFrontView().Update();
 
 		return Command::Result::Type::Consume;
@@ -404,8 +401,8 @@ bool KERNEL::SessionImpl::IsCommandActive()
 
 bool KERNEL::SessionImpl::CommandLButtonUp(int nFlag, int x, int y)
 {
-	Command::EventInfo cEvent(Window());
-	cEvent.SetPoint(Command::EventInfo::Type::LButtonUp, x, y, MouseMapFlags(nFlag));
+	Command::Event cEvent(Window());
+	cEvent.SetPoint(H3DF::Operator::Event::Type::LButtonUp, x, y, MouseMapFlags(nFlag));
 
 	m_vpcCommandSets.front()->EventExecution(cEvent);
 /*
@@ -419,8 +416,8 @@ bool KERNEL::SessionImpl::CommandLButtonUp(int nFlag, int x, int y)
 
 bool KERNEL::SessionImpl::CommandMouseMove(int nFlag, int x, int y)
 {
-	Command::EventInfo cEvent(Window());
-	cEvent.SetPoint(Command::EventInfo::Type::MouseMove, x, y, MouseMapFlags(nFlag));
+	Command::Event cEvent(Window());
+	cEvent.SetPoint(H3DF::Operator::Event::Type::MouseMove, x, y, MouseMapFlags(nFlag));
 
 	m_vpcCommandSets.front()->EventExecution(cEvent);
 

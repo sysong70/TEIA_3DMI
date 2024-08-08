@@ -1,15 +1,16 @@
 ﻿#pragma once
 
+#include "3DF.h"
 #include "Object.h"
+#include "Math.h"
 
-#include <3DF/Point.h>
-#include <3DF/Window.h>
+class HEventInfo;
 
-namespace KERNEL
+namespace H3DF
 {
-	namespace Command
+	namespace Operator
 	{
-		class EventInfo : public Object
+		class API_3DF Event : public Object
 		{
 		public:
 			enum class Type {
@@ -77,14 +78,19 @@ namespace KERNEL
 				JoystickButton8 = 1 << 24
 			};
 
-			EventInfo();
-			EventInfo(H3DF::WindowKey & cInWindowKey);
-			EventInfo(EventInfo const & cInThat);
+			Event();
+			Event(H3DF::WindowKey & cInWindowKey);
+			Event(Event const & cInThat);
 
-			void Set(EventInfo const & cInThat);
-			EventInfo & operator = (EventInfo const & cInThat);
+			void Set(Event const & cInThat);
+			Event & operator = (Event const & cInThat);
 
-			void SetPoint(EventInfo::Type cInType, int x, int y, UINT nInFlags);
+			void SetWindow(H3DF::WindowKey & cInWindowKey);
+
+			void SetPoint(Event::Type cInType, int x, int y, UINT nInFlags);
+			
+			int GetMouseWheelDelta();
+			void SetMouseWheelDelta(int nInDelta);
 
 			bool Control() const;
 			bool Shift() const;
@@ -98,10 +104,10 @@ namespace KERNEL
 			H3DF::WindowPoint const & GetMouseWindowPoint() const;
 			H3DF::WorldPoint const & GetMouseWorldPoint() const;
 
-			void SetEventType(EventInfo::Type cInType);
-			EventInfo::Type GetEventType() const;
-		};
+			void SetEventType(Event::Type cInType);
+			Event::Type GetEventType() const;
 
-		using EventInfoArray = std::vector<EventInfo>;
+			bool GetHEventInfo(HEventInfo & cOutEvent);
+		};
 	}
 }

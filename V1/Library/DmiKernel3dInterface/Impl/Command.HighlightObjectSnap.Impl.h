@@ -60,10 +60,9 @@ namespace KERNEL
 
 			HighlightObjectSnapImpl(const Session * pcInSession);
 
-			Command::Result::Type LButtonDownAndMove(HEventInfo & cInEvent);
-			int NoButtonDownAndMove(HEventInfo & cInEvent);
+			Command::Result::Type LButtonDownAndMove(Event & cInEvent);
+			int NoButtonDownAndMove(Event & cInEvent);
 			bool DoDynamicHighlighting(H3DF::WindowPoint cMousePoint, H3DF::SelectionItem & cOutSelection);
-			bool DoDynamicHighlighting_V1(H3DF::WindowPoint cMousePoint, H3DF::SelectionItem & cOutSelection);
 
 			void SetObjectSnapMode(DWORD nInSnapMode);
 			void SetSelectionFilter(DWORD nInSelFilter);

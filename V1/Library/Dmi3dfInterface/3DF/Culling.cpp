@@ -1,6 +1,6 @@
 ﻿#include "StdAfx.h"
 
-#include "Bounding.h"
+#include "Culling.h"
 #include "./Impl/ControlImpl.h"
 
 #include "Segment.h"
@@ -11,6 +11,7 @@
 using namespace H3DF;
 
 //== BoundingKit class =============================================================================
+/*
 
 namespace H3DF
 {
@@ -194,15 +195,16 @@ bool H3DF::BoundingKit::ShowExclusion(bool & bOutEexclusion) const
 	bOutEexclusion = pcImpl->m_bExclude;
 	return true;
 }
+*/
 
-//== BoundingControl class =========================================================================
+//== CullingControl class =========================================================================
 
 namespace H3DF
 {
-	class BoundingControlImpl : public ControlImpl
+	class CullingControlImpl : public ControlImpl
 	{
 	public:
-		void Copy(BoundingControlImpl * pcInThat) {
+		void Copy(CullingControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
 
@@ -210,7 +212,7 @@ namespace H3DF
 	};
 }
 
-BaseView * BoundingControlImpl::GetBaseView()
+BaseView * CullingControlImpl::GetBaseView()
 {
 	SegmentKeyImpl * pcKeyImpl = static_cast<SegmentKeyImpl *>(m_cOverrideKey.GetImpl());
 	DEBUG_VALID(pcKeyImpl);
@@ -218,40 +220,92 @@ BaseView * BoundingControlImpl::GetBaseView()
 	return pcKeyImpl->GetBaseView();
 }
 
-H3DF::BoundingControl::BoundingControl(SegmentKey & cInSegmentKey)
+H3DF::CullingControl::CullingControl(SegmentKey & cInSegmentKey)
 {
-	BoundingControlImpl * pcImpl = new BoundingControlImpl();
+	CullingControlImpl * pcImpl = new CullingControlImpl();
 	pcImpl->m_cOverrideKey = cInSegmentKey;
 
 	m_pcImpl = pcImpl;
 }
 
-H3DF::BoundingControl::BoundingControl(BoundingControl const & cInThat)
+H3DF::CullingControl::CullingControl(CullingControl const & cInThat)
 {
-	m_pcImpl = new BoundingControlImpl();
+	m_pcImpl = new CullingControlImpl();
 	Set(cInThat);
 }
 
-void H3DF::BoundingControl::Set(BoundingControl const & cInThat)
+void H3DF::CullingControl::Set(CullingControl const & cInThat)
 {
-	BoundingControlImpl * pcImpl = (BoundingControlImpl *)m_pcImpl;
+	CullingControlImpl * pcImpl = (CullingControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	BoundingControlImpl * pcInThatImpl = (BoundingControlImpl *)cInThat.m_pcImpl;
+	CullingControlImpl * pcInThatImpl = (CullingControlImpl *)cInThat.m_pcImpl;
 	DEBUG_VALID(pcInThatImpl);
 
 	pcImpl->Copy(pcInThatImpl);
 }
 
-BoundingControl & H3DF::BoundingControl::operator = (BoundingControl const & cInThat)
+CullingControl & H3DF::CullingControl::operator = (CullingControl const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
 
-BoundingControl & H3DF::BoundingControl::SetExclusion(bool bInExclusion)
+CullingControl & H3DF::CullingControl::SetBackFace(bool bInState)
 {
-	BoundingControlImpl * pcImpl = (BoundingControlImpl *) m_pcImpl;
+	CullingControlImpl * pcImpl = (CullingControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		CStringA strList;
+		if (true == bInState) {
+			strList.Format("backplane cull = on");
+		}
+		else {
+			strList.Format("backplane cull = off");
+		}
+
+		HC_Set_Heuristics(strList);
+
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+CullingControl & H3DF::CullingControl::SetFace(Culling::Face eInState)
+{
+	CullingControlImpl * pcImpl = (CullingControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		CStringA strList;
+
+		switch (eInState) 
+		{
+		case Culling::Face::Off:
+			strList.Format("no face culling");
+			break;
+
+		case Culling::Face::Front:
+			strList.Format("face culling front");
+			break;
+
+		case Culling::Face::Back:
+			strList.Format("face culling back");
+			break;
+		}
+
+		HC_Set_Heuristics(strList);
+
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+/*
+CullingControl & H3DF::CullingControl::SetExclusion(bool bInExclusion)
+{
+	CullingControlImpl * pcImpl = (CullingControlImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -269,9 +323,9 @@ BoundingControl & H3DF::BoundingControl::SetExclusion(bool bInExclusion)
 	return *this;
 }
 
-BoundingControl & H3DF::BoundingControl::UnsetExclusion()
+CullingControl & H3DF::CullingControl::UnsetExclusion()
 {
-	BoundingControlImpl * pcImpl = (BoundingControlImpl *) m_pcImpl;
+	CullingControlImpl * pcImpl = (CullingControlImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -283,9 +337,9 @@ BoundingControl & H3DF::BoundingControl::UnsetExclusion()
 	return *this;
 }
 
-bool H3DF::BoundingControl::ShowExclusion(bool & bOutExclusion) const
+bool H3DF::CullingControl::ShowExclusion(bool & bOutExclusion) const
 {
-	BoundingControlImpl * pcImpl = (BoundingControlImpl *) m_pcImpl;
+	CullingControlImpl * pcImpl = (CullingControlImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	bool bResult = false;
@@ -313,4 +367,4 @@ bool H3DF::BoundingControl::ShowExclusion(bool & bOutExclusion) const
 	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return bResult;
-}
+}*/

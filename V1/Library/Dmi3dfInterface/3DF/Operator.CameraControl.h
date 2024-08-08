@@ -13,6 +13,8 @@ namespace H3DF
 
 	namespace Operator
 	{
+		class Event;
+
 		class API_3DF CameraControl : public Object
 		{
 		public:
@@ -28,15 +30,15 @@ namespace H3DF
 			void SetCameraFitSelection(H3DF::MatrixKit & cInMatrix, SegmentKey & cInSegment);
 
 			//== Mouse Event 처리 ===================================================================
-			Operator::Result LButtonDown(HEventInfo & cInEvent);
-			Operator::Result LButtonUp(HEventInfo & cInEvent, SelectionItem & cInItem);
-			Operator::Result LButtonDownAndMove(HEventInfo & cInEvent);
+			Operator::Result LButtonDown(Operator::Event & cInEvent);
+			Operator::Result LButtonUp(Operator::Event & cInEvent, SelectionItem & cInItem);
+			Operator::Result LButtonDownAndMove(Operator::Event & cInEvent);
 			
-			Operator::Result RButtonDown(HEventInfo & cInEvent);
-			Operator::Result RButtonUp(HEventInfo & cInEvent);
-			Operator::Result RButtonDownAndMove(HEventInfo & cInEvent);
+			Operator::Result RButtonDown(Operator::Event & cInEvent);
+			Operator::Result RButtonUp(Operator::Event & cInEvent);
+			Operator::Result RButtonDownAndMove(Operator::Event & cInEvent);
 		
-			Operator::Result MouseWheel(HEventInfo & cInEvent);
+			Operator::Result MouseWheel(Operator::Event & cInEvent);
 		};
 	}
 }

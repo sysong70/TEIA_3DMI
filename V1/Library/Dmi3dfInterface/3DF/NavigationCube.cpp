@@ -169,7 +169,7 @@ NavigationCube const & H3DF::NavigationCube::operator = (NavigationCube const & 
 
 
 
-int H3DF::NavigationCube::LButtonUp(HEventInfo & cInEvent, SelectionItem & cInItem)
+int H3DF::NavigationCube::LButtonUp(Operator::Event & cInEvent, SelectionItem & cInItem)
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) {  assert(false); }
@@ -221,7 +221,7 @@ int H3DF::NavigationCube::LButtonUp(HEventInfo & cInEvent, SelectionItem & cInIt
 
 
 
-int H3DF::NavigationCube::LButtonDownAndMove(HEventInfo & cInEvent)
+int H3DF::NavigationCube::LButtonDownAndMove(Operator::Event & cInEvent)
 {
 /*
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);

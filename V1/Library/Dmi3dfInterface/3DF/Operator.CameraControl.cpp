@@ -11,6 +11,10 @@
 #include "Camera.h"
 #include "Bounding.h"
 
+#include "Operator.Event.h"
+
+#include "3DF.Utility.h"
+
 #include "../Sprocket/Impl/3DF.View.Impl.h"
 
 #include <Common_Define.h>
@@ -58,9 +62,9 @@ namespace H3DF
 	public:
 		CameraPan(HBaseView * view, int DoRepeat = 0, int DoCapture = 1);
 
-		Operator::Result LButtonDown(HEventInfo & cInEvent);
-		Operator::Result LButtonUp(HEventInfo & cInEvent);
-		Operator::Result LButtonDownAndMove(HEventInfo & cInEvent);
+		Operator::Result LButtonDown(Operator::Event & cInEvent);
+		Operator::Result LButtonUp(Operator::Event & cInEvent);
+		Operator::Result LButtonDownAndMove(Operator::Event & cInEvent);
 	};
 
 	class CameraZoomBox : public HOpCameraZoomBox
@@ -68,9 +72,9 @@ namespace H3DF
 	public:
 		CameraZoomBox(HBaseView * view, int DoRepeat = 0, int DoCapture = 1);
 
-		Operator::Result LButtonDown(HEventInfo & cInEvent);
-		Operator::Result LButtonUp(HEventInfo & cInEvent);
-		Operator::Result LButtonDownAndMove(HEventInfo & cInEvent);
+		Operator::Result LButtonDown(Operator::Event & cInEvent);
+		Operator::Result LButtonUp(Operator::Event & cInEvent);
+		Operator::Result LButtonDownAndMove(Operator::Event & cInEvent);
 	};
 
 	class CameraRelativeOrbit : public HOpCameraRelativeOrbit
@@ -78,9 +82,9 @@ namespace H3DF
 	public:
 		CameraRelativeOrbit(HBaseView * view, int DoRepeat = 0, int DoCapture = 1);
 
-		Operator::Result LButtonDown(HEventInfo & cInEvent);
-		Operator::Result LButtonUp(HEventInfo & cInEvent);
-		Operator::Result LButtonDownAndMove(HEventInfo & cInEvent);
+		Operator::Result LButtonDown(Operator::Event & cInEvent);
+		Operator::Result LButtonUp(Operator::Event & cInEvent);
+		Operator::Result LButtonDownAndMove(Operator::Event & cInEvent);
 	};
 
 	class CameraOrbitTurntable : public HOpCameraOrbitTurntable
@@ -88,9 +92,9 @@ namespace H3DF
 	public:
 		CameraOrbitTurntable(HBaseView * view, int DoRepeat = 0, int DoCapture = 1);
 
-		Operator::Result LButtonDown(HEventInfo & cInEvent);
-		Operator::Result LButtonUp(HEventInfo & cInEvent);
-		Operator::Result LButtonDownAndMove(HEventInfo & hevent);
+		Operator::Result LButtonDown(Operator::Event & cInEvent);
+		Operator::Result LButtonUp(Operator::Event & cInEvent);
+		Operator::Result LButtonDownAndMove(Operator::Event & hevent);
 	};
 }
 
@@ -101,27 +105,36 @@ H3DF::CameraPan::CameraPan(HBaseView * view, int DoRepeat, int DoCapture) :
 
 }
 
-Operator::Result H3DF::CameraPan::LButtonDown(HEventInfo & cInEvent)
+Operator::Result H3DF::CameraPan::LButtonDown(Operator::Event & cInEvent)
 {
-	if(HOP_OK == OnLButtonDown(cInEvent)) {
+	HEventInfo cEventInfo(nullptr);
+	cInEvent.GetHEventInfo(cEventInfo);
+
+	if(HOP_OK == OnLButtonDown(cEventInfo)) {
 		return Operator::Result::Consume;
 	}
 
 	return Operator::Result::Pass;
 }
 
-Operator::Result H3DF::CameraPan::LButtonUp(HEventInfo & cInEvent)
+Operator::Result H3DF::CameraPan::LButtonUp(Operator::Event & cInEvent)
 {
-	if (HOP_READY == OnLButtonUp(cInEvent)) {
+	HEventInfo cEventInfo(nullptr);
+	cInEvent.GetHEventInfo(cEventInfo);
+
+	if (HOP_READY == OnLButtonUp(cEventInfo)) {
 		return Operator::Result::Complete;
 	}
 
 	return Operator::Result::Pass;
 }
 
-Operator::Result H3DF::CameraPan::LButtonDownAndMove(HEventInfo & cInEvent)
+Operator::Result H3DF::CameraPan::LButtonDownAndMove(Operator::Event & cInEvent)
 {
-	if (HOP_OK == OnLButtonDownAndMove(cInEvent)) {
+	HEventInfo cEventInfo(nullptr);
+	cInEvent.GetHEventInfo(cEventInfo);
+
+	if (HOP_OK == OnLButtonDownAndMove(cEventInfo)) {
 		return Operator::Result::Consume;
 	}
 
@@ -135,9 +148,12 @@ H3DF::CameraZoomBox::CameraZoomBox(HBaseView * view, int DoRepeat, int DoCapture
 
 }
 
-Operator::Result H3DF::CameraZoomBox::LButtonDown(HEventInfo & cInEvent)
+Operator::Result H3DF::CameraZoomBox::LButtonDown(Operator::Event & cInEvent)
 {
-	if (HOP_OK == OnLButtonDown(cInEvent)) {
+	HEventInfo cEventInfo(nullptr);
+	cInEvent.GetHEventInfo(cEventInfo);
+
+	if (HOP_OK == OnLButtonDown(cEventInfo)) {
 		return Operator::Result::Consume;
 	}
 
@@ -147,9 +163,12 @@ Operator::Result H3DF::CameraZoomBox::LButtonDown(HEventInfo & cInEvent)
 #define MINIMUM_FIELD_SIZE (1e-9f)
 
 // diagonal_len 계산 오류로 인해서 상속해서 사용함.
-Operator::Result H3DF::CameraZoomBox::LButtonUp(HEventInfo & cInEvent)
+Operator::Result H3DF::CameraZoomBox::LButtonUp(Operator::Event & cInEvent)
 {
-	HOpConstructRectangle::OnLButtonUp(cInEvent);
+	HEventInfo cEventInfo(nullptr);
+	cInEvent.GetHEventInfo(cEventInfo);
+
+	HOpConstructRectangle::OnLButtonUp(cEventInfo);
 
 	if (GetView()->GetModel()->GetBhvBehaviorManager()->IsPlaying() &&
 		GetView()->GetModel()->GetBhvBehaviorManager()->GetCameraUpdated()) {
@@ -267,9 +286,12 @@ Operator::Result H3DF::CameraZoomBox::LButtonUp(HEventInfo & cInEvent)
 	return Operator::Result::Complete;
 }
 
-Operator::Result H3DF::CameraZoomBox::LButtonDownAndMove(HEventInfo & cInEvent)
+Operator::Result H3DF::CameraZoomBox::LButtonDownAndMove(Operator::Event & cInEvent)
 {
-	if (HOP_OK == OnLButtonDownAndMove(cInEvent)) {
+	HEventInfo cEventInfo(nullptr);
+	cInEvent.GetHEventInfo(cEventInfo);
+
+	if (HOP_OK == OnLButtonDownAndMove(cEventInfo)) {
 		return Operator::Result::Consume;
 	}
 
@@ -282,27 +304,36 @@ H3DF::CameraRelativeOrbit::CameraRelativeOrbit(HBaseView * view, int DoRepeat, i
 
 }
 
-Operator::Result H3DF::CameraRelativeOrbit::LButtonDown(HEventInfo & cInEvent)
+Operator::Result H3DF::CameraRelativeOrbit::LButtonDown(Operator::Event & cInEvent)
 {
-	if (HOP_OK == OnLButtonDown(cInEvent)) {
+	HEventInfo cEventInfo(nullptr);
+	cInEvent.GetHEventInfo(cEventInfo);
+
+	if (HOP_OK == OnLButtonDown(cEventInfo)) {
 		return Operator::Result::Consume;
 	}
 
 	return Operator::Result::Pass;
 }
 
-Operator::Result H3DF::CameraRelativeOrbit::LButtonUp(HEventInfo & cInEvent)
+Operator::Result H3DF::CameraRelativeOrbit::LButtonUp(Operator::Event & cInEvent)
 {
-	if (HOP_READY == OnLButtonUp(cInEvent)) {
+	HEventInfo cEventInfo(nullptr);
+	cInEvent.GetHEventInfo(cEventInfo);
+
+	if (HOP_READY == OnLButtonUp(cEventInfo)) {
 		return Operator::Result::Complete;
 	}
 
 	return Operator::Result::Pass;
 }
 
-Operator::Result H3DF::CameraRelativeOrbit::LButtonDownAndMove(HEventInfo & cInEvent)
+Operator::Result H3DF::CameraRelativeOrbit::LButtonDownAndMove(Operator::Event & cInEvent)
 {
-	if (HOP_OK == OnLButtonDownAndMove(cInEvent)) {
+	HEventInfo cEventInfo(nullptr);
+	cInEvent.GetHEventInfo(cEventInfo);
+
+	if (HOP_OK == OnLButtonDownAndMove(cEventInfo)) {
 		return Operator::Result::Consume;
 	}
 
@@ -316,30 +347,36 @@ H3DF::CameraOrbitTurntable::CameraOrbitTurntable(HBaseView * view, int DoRepeat,
 
 }
 
-Operator::Result H3DF::CameraOrbitTurntable::LButtonDown(HEventInfo & cInEvent)
+Operator::Result H3DF::CameraOrbitTurntable::LButtonDown(Operator::Event & cInEvent)
 {
-	if (HOP_OK == OnLButtonDown(cInEvent)) {
+	HEventInfo cEventInfo(nullptr);
+	cInEvent.GetHEventInfo(cEventInfo);
+
+	if (HOP_OK == OnLButtonDown(cEventInfo)) {
 		return Operator::Result::Consume;
 	}
 
 	return Operator::Result::Pass;
 }
 
-Operator::Result H3DF::CameraOrbitTurntable::LButtonUp(HEventInfo & cInEvent)
+Operator::Result H3DF::CameraOrbitTurntable::LButtonUp(Operator::Event & cInEvent)
 {
-	if (HOP_READY == OnLButtonUp(cInEvent)) {
+	HEventInfo cEventInfo(nullptr);
+	cInEvent.GetHEventInfo(cEventInfo);
+
+	if (HOP_READY == OnLButtonUp(cEventInfo)) {
 		return Operator::Result::Complete;
 	}
 	 
 	return Operator::Result::Pass;
 }
 
-Operator::Result H3DF::CameraOrbitTurntable::LButtonDownAndMove(HEventInfo & cInEvent)
+Operator::Result H3DF::CameraOrbitTurntable::LButtonDownAndMove(Operator::Event & cInEvent)
 {
 // 	if (!OperatorStarted())
 // 		return HBaseOperator::OnLButtonDownAndMove(cInEvent);
 
-	SetNewPoint(cInEvent.GetMouseWindowPos());
+	SetNewPoint(H3DF::Utility::ToHPoint(cInEvent.GetMouseWindowPoint()));
 
 	HPoint delta2(GetNewPoint() - GetFirstPoint());
 
@@ -388,7 +425,7 @@ namespace H3DF
 			DWORD m_nSelectPickCount;
 			DWORD m_nMouseDownTickCount;
 			
-			HPoint m_cMouseDownPoint;
+			Point m_cMouseDownPoint;
 			HPoint m_cClickPoint;
 
 			double  m_dFirstPoint[3];
@@ -576,16 +613,16 @@ void H3DF::Operator::CameraControl::SetCameraFitSelection(H3DF::MatrixKit & cInM
 //== Mouse cInEvent 처리 ===============================================================================
 
 // 1. Left Button Down 처리
-Operator::Result H3DF::Operator::CameraControl::LButtonDown(HEventInfo & cInEvent)
+Operator::Result H3DF::Operator::CameraControl::LButtonDown(Operator::Event & cInEvent)
 {
 	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->m_cMouseDownPoint = cInEvent.GetMousePixelPos();
+	pcImpl->m_cMouseDownPoint = cInEvent.GetMousePixelPoint();
 	pcImpl->m_nMouseDownTickCount = GetTickCount();
 
 	// Shift & L Button 이벤트는 Area Select
-	if (MVO_SHIFT & cInEvent.GetFlags()) {
+	if (true == cInEvent.Shift()) {
 	}
 
 	switch (pcImpl->m_eCameraMode)
@@ -609,7 +646,7 @@ Operator::Result H3DF::Operator::CameraControl::LButtonDown(HEventInfo & cInEven
 
 // 2. Left Button Up 처리
 // L Button Up을 핱때 Objet를 선택함.
-Operator::Result H3DF::Operator::CameraControl::LButtonUp(HEventInfo & cInEvent, SelectionItem & cInItem)
+Operator::Result H3DF::Operator::CameraControl::LButtonUp(Operator::Event & cInEvent, SelectionItem & cInItem)
 {
 	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -640,7 +677,7 @@ Operator::Result H3DF::Operator::CameraControl::LButtonUp(HEventInfo & cInEvent,
 	//return pcImpl->m_cCameraOrbit.OnLButtonUp(cInEvent);
 }
 
-Operator::Result H3DF::Operator::CameraControl::LButtonDownAndMove(HEventInfo & cInEvent)
+Operator::Result H3DF::Operator::CameraControl::LButtonDownAndMove(Operator::Event & cInEvent)
 {
 	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -682,7 +719,7 @@ Operator::Result H3DF::Operator::CameraControl::LButtonDownAndMove(HEventInfo & 
 	return eResult;
 }
 
-Operator::Result H3DF::Operator::CameraControl::RButtonDown(HEventInfo & cInEvent)
+Operator::Result H3DF::Operator::CameraControl::RButtonDown(Operator::Event & cInEvent)
 {
 	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -690,7 +727,7 @@ Operator::Result H3DF::Operator::CameraControl::RButtonDown(HEventInfo & cInEven
 	return pcImpl->m_cCameraPan.LButtonDown(cInEvent);
 }
 
-Operator::Result H3DF::Operator::CameraControl::RButtonUp(HEventInfo & cInEvent)
+Operator::Result H3DF::Operator::CameraControl::RButtonUp(Operator::Event & cInEvent)
 {
 	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -698,7 +735,7 @@ Operator::Result H3DF::Operator::CameraControl::RButtonUp(HEventInfo & cInEvent)
 	return pcImpl->m_cCameraPan.LButtonUp(cInEvent);
 }
 
-Operator::Result H3DF::Operator::CameraControl::RButtonDownAndMove(HEventInfo & cInEvent)
+Operator::Result H3DF::Operator::CameraControl::RButtonDownAndMove(Operator::Event & cInEvent)
 {
 	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -706,7 +743,7 @@ Operator::Result H3DF::Operator::CameraControl::RButtonDownAndMove(HEventInfo & 
 	return pcImpl->m_cCameraPan.LButtonDownAndMove(cInEvent);
 }
 
-Operator::Result H3DF::Operator::CameraControl::MouseWheel(HEventInfo & cInEvent)
+Operator::Result H3DF::Operator::CameraControl::MouseWheel(Operator::Event & cInEvent)
 {
 	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -772,7 +809,7 @@ Operator::Result H3DF::Operator::CameraControl::MouseWheel(HEventInfo & cInEvent
 		}
 
 		/* Shift the target slightly toward the mouse pointer. */
-		HVector cMouseWorldPos = cInEvent.GetMouseWorldPos();
+		HVector cMouseWorldPos = Utility::ToHPoint(cInEvent.GetMouseWorldPoint());
 
 		HUtility::AdjustPositionToPlane(pcView, cMouseWorldPos, cAdjustedCamera.target);
 

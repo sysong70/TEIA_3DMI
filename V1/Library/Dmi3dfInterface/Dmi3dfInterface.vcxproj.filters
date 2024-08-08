@@ -345,13 +345,7 @@
     <ClInclude Include="Sprocket\3DF.Component.h">
       <Filter>CADModel</Filter>
     </ClInclude>
-    <ClInclude Include="Sprocket\3DF.MetaData.h">
-      <Filter>CADModel</Filter>
-    </ClInclude>
     <ClInclude Include="Sprocket\Impl\ComponentImpl.h">
-      <Filter>CADModel\Impl</Filter>
-    </ClInclude>
-    <ClInclude Include="Sprocket\Impl\MetaDataImpl.h">
       <Filter>CADModel\Impl</Filter>
     </ClInclude>
     <ClInclude Include="3DF\Bounding.h">
@@ -368,6 +362,18 @@
     </ClInclude>
     <ClInclude Include="3DF\ColorInterpolation.h">
       <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Operator.Event.h">
+      <Filter>Operator</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Culling.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\3DF.MetaData.h">
+      <Filter>Sprocket</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\Impl\MetaDataImpl.h">
+      <Filter>Sprocket\Impl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -641,13 +647,7 @@
     <ClCompile Include="Sprocket\3DF.Component.cpp">
       <Filter>CADModel</Filter>
     </ClCompile>
-    <ClCompile Include="Sprocket\3DF.MetaData.cpp">
-      <Filter>CADModel</Filter>
-    </ClCompile>
     <ClCompile Include="Sprocket\Impl\ComponentImpl.cpp">
-      <Filter>CADModel\Impl</Filter>
-    </ClCompile>
-    <ClCompile Include="Sprocket\Impl\MetaDataImpl.cpp">
       <Filter>CADModel\Impl</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Bounding.cpp">
@@ -664,6 +664,18 @@
     </ClCompile>
     <ClCompile Include="3DF\ColorInterpolation.cpp">
       <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Operator.Event.cpp">
+      <Filter>Operator</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Culling.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\3DF.MetaData.cpp">
+      <Filter>Sprocket</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\Impl\MetaDataImpl.cpp">
+      <Filter>Sprocket\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

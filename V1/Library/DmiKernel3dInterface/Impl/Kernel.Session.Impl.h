@@ -51,8 +51,6 @@ namespace KERNEL
 		H3DF::Model & GetModel();
 		H3DF::CADModel & CADModel();
 	
-		H3DF::BaseView * GetBaseView();
-
 		Signal::Delivery & Delivery();
 		const Signal::Delivery & Delivery() const;
 		void SetDelivery(const Signal::Delivery * pcInDelivery);
@@ -91,9 +89,9 @@ namespace KERNEL
 	
 	protected:
 		//== View Control 관련 함수 ==================================================================
-		Command::Result::Type SelectViewControlMouseMove(int nFlag, int x, int y);
-		bool SelectViewControlLButtonDown(int nFlag, int x, int y);
-		Command::Result::Type SelectViewControlLButtonUp(int nFlag, int x, int y);
+		Command::Result::Type SelectViewControlMouseMove(int nInFlag, int x, int y);
+		bool SelectViewControlLButtonDown(int nInFlag, int x, int y);
+		Command::Result::Type SelectViewControlLButtonUp(int nInFlag, int x, int y);
 
 		void RequestVisualEffects(Json::Object & cInObject);
 		void ChangeVisualEffects(Json::Object & cInObject);

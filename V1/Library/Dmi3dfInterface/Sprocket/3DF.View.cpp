@@ -144,6 +144,22 @@ void H3DF::View::SuppressUpdate(bool bSuppress)
 	pcImpl->GetBaseView()->SetSuppressUpdate(bSuppress);
 }
 
+bool H3DF::View::GetSuppressUpdate()
+{
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetBaseView()->GetSuppressUpdate();
+}
+
+bool H3DF::View::GetSuppressUpdateTick()
+{
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetBaseView()->GetSuppressUpdateTick();
+}
+
 void H3DF::View::Destruct() const
 {
 	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
@@ -260,6 +276,30 @@ SegmentKey const H3DF::View::GetConstructionKey() const
 	return pcImpl->GetBaseView()->GetConstructionKey();
 }
 
+SegmentKey H3DF::View::GetSceneKey()
+{
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr == pcImpl->GetBaseView()) {
+		DEBUG_STOP;
+	}
+
+	return pcImpl->GetBaseView()->GetSceneKey();
+}
+
+SegmentKey const H3DF::View::GetSceneKey() const
+{
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr == pcImpl->GetBaseView()) {
+		DEBUG_STOP;
+	}
+
+	return pcImpl->GetBaseView()->GetSceneKey();
+}
+
 NavigationCube & H3DF::View::GetNavigationCube() const
 {
 	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
@@ -268,12 +308,12 @@ NavigationCube & H3DF::View::GetNavigationCube() const
 	return pcImpl->GetNavigationCube();
 }
 
-void H3DF::View::SetSuppressUpdate(bool bInState)
+void H3DF::View::InvalidateSceneBounding()
 {
 	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->GetBaseView()->SetSuppressUpdate(bInState);
+	pcImpl->GetBaseView()->InvalidateSceneBounding();
 }
 
 //== Command 관련 함수 ===========================================================================

@@ -13,6 +13,9 @@ namespace H3DF
 		DrawingAttributeKit();
 		DrawingAttributeKit(DrawingAttributeKit const & cInKit);
 
+		static const H3DF::Type staticType = H3DF::Type::DrawingAttributeKit;
+		H3DF::Type ObjectType() const override { return staticType; };
+
 		void Set(DrawingAttributeKit const & cInKit);
 		DrawingAttributeKit const & operator = (DrawingAttributeKit const & cInKit);
 
@@ -43,6 +46,9 @@ namespace H3DF
 	public:
 		DrawingAttributeControl(SegmentKey & cInSegmentKey);
 		DrawingAttributeControl(DrawingAttributeControl const & cInThat);
+
+		static const H3DF::Type staticType = H3DF::Type::DrawingAttributeControl;
+		H3DF::Type ObjectType() const override { return staticType; };
 
 		void Set(DrawingAttributeControl const & cInThat);
 		DrawingAttributeControl & operator = (DrawingAttributeControl const & cInThat);

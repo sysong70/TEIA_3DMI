@@ -146,8 +146,6 @@ namespace H3DF {
 	class CircleKeyImpl : public GeometryKeyImpl
 	{
 	public:
-		CircleKeyImpl() { m_eType = H3DF::Type::CircleKey; }
-
 		void Copy(CircleKeyImpl * pcInThat) {
 			KeyImpl::Copy(pcInThat);
 			m_cCircleKit = pcInThat->m_cCircleKit;
@@ -175,10 +173,12 @@ H3DF::CircleKey::CircleKey(Key const & cInKey) : GeometryKey(INVALID_KEY)
 	CircleKeyImpl * pcImpl = new CircleKeyImpl();
 	m_pcImpl = pcImpl;
 
-	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInKey.GetImpl()));
+	if(H3DF::Type::CircleKey != cInKey.ObjectType()) {
+		DEBUG_STOP;
+		return;
+	}
 
-	// 외부에서 들어오는 Key는 CircleKey가 아닐 수 있으므로, CircleKey로 변경한다.
-	pcImpl->SetType(H3DF::Type::CircleKey);
+	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInKey.GetImpl()));
 }
 
 H3DF::CircleKey::CircleKey(CircleKey const & cInThat) : GeometryKey(INVALID_KEY)

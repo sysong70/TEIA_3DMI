@@ -4,7 +4,7 @@
 
 #include "../Command.Set.h"
 #include "../Command.Step.h"
-#include "../Command.EventInfo.h"
+#include "../Command.Event.h"
 
 #include <vector>
 #include <deque>
@@ -49,11 +49,11 @@ namespace KERNEL
 			void Updated();
 
 			//== Event 관련 함수 =====================================================================
-			bool EventExecution(Command::EventInfo & cInEvent);
+			bool EventExecution(Command::Event & cInEvent);
 
-			bool StepExecution(Command::Step * pcInStep, Command::EventInfo & cInEvent);
-			Step::EventType CheckEvent(Command::Step * pcInStep, Command::EventInfo & cInEvent);
-			bool IsValidEventInfo(Command::EventInfo & cInEvent);
+			bool StepExecution(Command::Step * pcInStep, Command::Event & cInEvent);
+			Step::EventType CheckEvent(Command::Step * pcInStep, Command::Event & cInEvent);
+			bool IsValidEventInfo(Command::Event & cInEvent);
 
 		private:
 			const Session * m_pcSession = nullptr;
@@ -62,8 +62,8 @@ namespace KERNEL
 			// 명령어 단계를 저장하는 queue
 			std::deque<Step *> m_deStep;
 
-			std::vector<EventInfo> m_vcEventInfos;
-			EventInfo m_cHoverEventInfo;
+			std::vector<Event> m_vcEventInfos;
+			Event m_cHoverEventInfo;
 
 			std::vector<CString> m_vstrTexts;
 			std::vector<H3DF::Point> m_vcPoints;

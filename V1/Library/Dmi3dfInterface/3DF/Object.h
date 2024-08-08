@@ -13,8 +13,10 @@ namespace H3DF
 		Object(Object const & cInThat);
 		virtual ~Object();
 
-		virtual H3DF::Type Type() const;
-		//H3DF::Type Type(HC_KEY nKey) const;
+		static const H3DF::Type staticType = H3DF::Type::None;
+		virtual H3DF::Type ObjectType() const { return staticType; }
+
+		bool HasType(H3DF::Type eInMask) const;
 
 		Impl * GetImpl() { return m_pcImpl; }
 		const Impl * GetImpl() const { return m_pcImpl; }

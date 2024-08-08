@@ -89,6 +89,9 @@ namespace H3DF
 		SelectionOptionsKit();
 		SelectionOptionsKit(SelectionOptionsKit const & cInThat);
 
+		static const H3DF::Type staticType = H3DF::Type::SelectionOptionsKit;
+		H3DF::Type ObjectType() const override { return staticType; } ;
+
 		void Set(SelectionOptionsKit const & cInThat);
 		SelectionOptionsKit & operator =(SelectionOptionsKit const & cInThat);
 
@@ -170,6 +173,9 @@ namespace H3DF
 		SelectionOptionsControl(SelectionOptionsControl const & cInThat);
 		virtual ~SelectionOptionsControl();
 
+		static const H3DF::Type staticType = H3DF::Type::SelectionOptionsControl;
+		H3DF::Type ObjectType() const override { return staticType; };
+
 		void Set(SelectionOptionsControl const & cInThat);
 		SelectionOptionsControl & operator=(SelectionOptionsControl const & cInThat);
 
@@ -212,8 +218,11 @@ namespace H3DF
 		SelectionItem();
 		SelectionItem(SelectionItem const & cInThat);
 
+		static const H3DF::Type staticType = H3DF::Type::SelectionItem;
+		H3DF::Type ObjectType() const override { return staticType; };
+		
 		// 선택된 Item의 Type을 반환합니다.
-		H3DF::Type Type() const override;
+		H3DF::Type Type() const;
 
 		void Set(SelectionItem const & cInThat);
 		SelectionItem & operator = (SelectionItem const & cInThat);
@@ -242,6 +251,9 @@ namespace H3DF
 	public:
 		SelectionResultsIterator();
 		SelectionResultsIterator(SelectionResultsIterator const & cInThat);
+
+		static const H3DF::Type staticType = H3DF::Type::SelectionResultsIterator;
+		H3DF::Type ObjectType() const override { return staticType; };
 
 		void Set(SelectionResultsIterator const & in_that);
 		SelectionResultsIterator & operator=(SelectionResultsIterator const & cInThat);

@@ -19,8 +19,6 @@ namespace H3DF
 	class PerformanceKitImpl : public Impl
 	{
 	public:
-		PerformanceKitImpl() { m_eType = H3DF::Type::PerformanceKit; }
-
 		void Copy(PerformanceKitImpl * pcInThat) {
 			m_eInDisplayList = pcInThat->m_eInDisplayList;
 		}
@@ -117,8 +115,6 @@ bool H3DF::PerformanceKit::ShowStaticModel(Performance::StaticModel & eOutModelT
 class PerformanceControlImpl : public ControlImpl
 {
 public:
-	PerformanceControlImpl() { m_eType = H3DF::Type::PerformanceControl; }
-
 	void Copy(PerformanceControlImpl * pcInThat) {
 		ControlImpl::Copy(pcInThat);
 	}
@@ -277,36 +273,6 @@ bool H3DF::PerformanceControl::ShowStaticModel(Performance::StaticModel & eOutMo
 			eOutModelType = Performance::StaticModel::None;
 		}
 	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
-
-	return true;
-/*
-
-	BaseView * pcView = pcImpl->GetBaseView();
-	if (nullptr == pcView) {
-		assert(false);
-		return false;
-	}
-
-	HC_Open_Segment_By_Key(pcView->GetModelKey());
-	if (HC_Show_Existence("heuristics = static model")) {
-		char chValue[256] = { 0 };
-		HC_Show_One_Heuristic("static model", chValue);
-
-		if (strstr(chValue, "view independent")) {
-			eOutModelType = Performance::StaticModel::AttributeSpatial;
-		}
-		else if (strstr(chValue, "on")) {
-			eOutModelType = Performance::StaticModel::Attribute;
-		}
-		else {
-			eOutModelType = Performance::StaticModel::None;
-		}
-	}
-	else {
-		eOutModelType = Performance::StaticModel::None;
-	}
-	HC_Close_Segment();
-*/
 
 	return true;
 }

@@ -189,10 +189,12 @@ H3DF::CuttingSectionKey::CuttingSectionKey(Key const & cInThat) : GeometryKey(IN
 	DEBUG_VALID(pcImpl);
 	m_pcImpl = pcImpl;
 
-	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInThat.GetImpl()));
+	if (H3DF::Type::CuttingSectionKey != cInThat.ObjectType()) {
+		DEBUG_STOP;
+		return;
+	}
 
-	// 외부에서 들어오는 Key는 CuttingSectionKey가 아닐 수 있으므로, ShellKey로 변경한다.
-	pcImpl->SetType(H3DF::Type::CuttingSectionKey);
+	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInThat.GetImpl()));
 }
 
 H3DF::CuttingSectionKey::CuttingSectionKey(CuttingSectionKey const & cInThat) : GeometryKey(INVALID_KEY)

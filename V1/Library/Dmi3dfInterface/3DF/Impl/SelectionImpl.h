@@ -85,7 +85,6 @@ namespace H3DF
 	class SelectionItemImpl : public Impl
 	{
 	public:
-		SelectionItemImpl() { m_eType = H3DF::Type::SelectionItem; }
 		virtual ~SelectionItemImpl()
 		{
 			if (nullptr != m_pnIncludeKeys) {
@@ -146,8 +145,6 @@ namespace H3DF
 	class SelectionResultsIteratorImpl : public Impl
 	{
 	public:
-		SelectionResultsIteratorImpl() { m_eType = H3DF::Type::SelectionResultsIterator; }
-
 		void Copy(SelectionResultsIteratorImpl * pcInThat) {
 			pcIterator = pcInThat->pcIterator;
 			pcBeginIterator = pcInThat->pcBeginIterator;
@@ -162,8 +159,6 @@ namespace H3DF
 	class SelectionResultsImpl : public Impl
 	{
 	public:
-		SelectionResultsImpl() { m_eType = H3DF::Type::SelectionResults; }
-
 		void Copy(SelectionResultsImpl * pcInThat) {
 			m_deItems.clear();
 			for (auto cItem : pcInThat->m_deItems) {
@@ -199,8 +194,6 @@ namespace H3DF
 	class SelectionControlImpl : public ControlImpl
 	{
 	public:
-		SelectionControlImpl() { m_eType = H3DF::Type::SelectionControl; }
-
 		// & 연산을 해야하므로 enum class를 사용하지 않는다.
 		enum SelType
 		{

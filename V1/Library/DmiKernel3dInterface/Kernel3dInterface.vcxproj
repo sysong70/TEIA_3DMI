@@ -84,7 +84,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>$(TargetProd)3dfInterface.lib;$(TargetProd)C3dInterface.lib;$(TargetProd)3dxInterface.lib;$(Dmi3dfLibaray);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(TargetProd)3dfInterface.lib;$(TargetProd)C3dInterface.lib;$(TargetProd)3dxInterface.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(Dmi3dfLibarayPath);$(DmiOutDir)</AdditionalLibraryDirectories>
       <ImportLibrary>$(DmiOutDir)\$(TargetName).lib</ImportLibrary>
       <ProgramDatabaseFile>$(DmiSymbolsDir)\$(TargetName).pdb</ProgramDatabaseFile>
@@ -132,7 +132,7 @@
     <ClInclude Include="..\Common\WStr.h" />
     <ClInclude Include="..\Signal\Signal.h" />
     <ClInclude Include="..\Signal\WorkerThread.h" />
-    <ClInclude Include="Command.EventInfo.h" />
+    <ClInclude Include="Command.Event.h" />
     <ClInclude Include="Command.Manager.h" />
     <ClInclude Include="Command.MeasureManager.h" />
     <ClInclude Include="Command.PMI.Distance.h" />
@@ -175,7 +175,7 @@
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\Signal\Signal.cpp" />
     <ClCompile Include="..\Signal\WorkerThread.cpp" />
-    <ClCompile Include="Command.EventInfo.cpp" />
+    <ClCompile Include="Command.Event.cpp" />
     <ClCompile Include="Command.Manager.cpp" />
     <ClCompile Include="Command.MeasureManager.cpp" />
     <ClCompile Include="Command.PMI.Distance.cpp" />

@@ -120,19 +120,11 @@ namespace H3DF {
 	class LineKeyImpl : public GeometryKeyImpl
 	{
 	public:
-		LineKeyImpl() { m_eType = H3DF::Type::LineKey; }
-		~LineKeyImpl();
-
 		void Copy(LineKeyImpl * pcInThat) {
 			KeyImpl::Copy(pcInThat);
 		}
 	};
 };
-
-H3DF::LineKeyImpl::~LineKeyImpl()
-{
-	int i = 0;
-}
 
 H3DF::LineKey::LineKey() : GeometryKey(INVALID_KEY)
 {
@@ -152,10 +144,12 @@ H3DF::LineKey::LineKey(Key const & cInKey)
 	LineKeyImpl * pcImpl = new LineKeyImpl();
 	m_pcImpl = pcImpl;
 
-	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInKey.GetImpl()));
+	if(H3DF::Type::LineKey != cInKey.ObjectType()) {
+		DEBUG_STOP;
+		return;
+	}
 
-	// 외부에서 들어오는 Key는 LineKey가 아닐 수 있으므로, LineKey로 변경한다.
-	pcImpl->SetType(H3DF::Type::LineKey);
+	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInKey.GetImpl()));
 }
 
 H3DF::LineKey::LineKey(LineKey const & cInThat)

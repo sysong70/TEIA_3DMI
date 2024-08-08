@@ -140,6 +140,7 @@
     <ClInclude Include="3DF\AttributeLock.h" />
     <ClInclude Include="3DF\ColorInterpolation.h" />
     <ClInclude Include="3DF\Condition.h" />
+    <ClInclude Include="3DF\Culling.h" />
     <ClInclude Include="3DF\CuttingSection.h" />
     <ClInclude Include="3DF\Definition.h" />
     <ClInclude Include="3DF\DrawingAttribute.h" />
@@ -154,6 +155,7 @@
     <ClInclude Include="3DF\Impl\SelectionImpl.h" />
     <ClInclude Include="3DF\Impl\WindowImpl.h" />
     <ClInclude Include="3DF\KeyPath.h" />
+    <ClInclude Include="3DF\Operator.Event.h" />
     <ClInclude Include="3DF\Performance.h" />
     <ClInclude Include="3DF\PointCloud.h" />
     <ClInclude Include="3DF\Reference.h" />
@@ -243,6 +245,7 @@
     <ClCompile Include="3DF\AttributeLock.cpp" />
     <ClCompile Include="3DF\ColorInterpolation.cpp" />
     <ClCompile Include="3DF\Condition.cpp" />
+    <ClCompile Include="3DF\Culling.cpp" />
     <ClCompile Include="3DF\CuttingSection.cpp" />
     <ClCompile Include="3DF\Definition.cpp" />
     <ClCompile Include="3DF\DrawingAttribute.cpp" />
@@ -256,6 +259,7 @@
     <ClCompile Include="3DF\Impl\SegmentImpl.cpp" />
     <ClCompile Include="3DF\Impl\SelectionImpl.cpp" />
     <ClCompile Include="3DF\Impl\WindowImpl.cpp" />
+    <ClCompile Include="3DF\Operator.Event.cpp" />
     <ClCompile Include="3DF\Performance.cpp" />
     <ClCompile Include="3DF\PointCloud.cpp" />
     <ClCompile Include="3DF\Reference.cpp" />

@@ -13,6 +13,9 @@ namespace H3DF
 		ColorInterpolationKit();
 		ColorInterpolationKit(ColorInterpolationKit const & cInKit);
 
+		static const H3DF::Type staticType = H3DF::Type::ColorInterpolationKit;
+		H3DF::Type ObjectType() const override { return staticType; };
+
 		void Set(ColorInterpolationKit const & cInKit);
 		ColorInterpolationKit const & operator = (ColorInterpolationKit const & cInKit);
 
@@ -43,6 +46,9 @@ namespace H3DF
 	public:
 		ColorInterpolationControl(SegmentKey & cInSegmentKey);
 		ColorInterpolationControl(ColorInterpolationControl const & cInThat);
+
+		static const H3DF::Type staticType = H3DF::Type::ColorInterpolationControl;
+		H3DF::Type ObjectType() const override { return staticType; };
 
 		void Set(ColorInterpolationControl const & cInThat);
 		ColorInterpolationControl & operator = (ColorInterpolationControl const & cInThat);

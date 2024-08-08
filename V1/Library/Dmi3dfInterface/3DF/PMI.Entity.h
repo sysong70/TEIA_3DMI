@@ -110,6 +110,9 @@ namespace H3DF {
 		PMI(SegmentKey const & cInThat);
 		PMI(PMI const & cInThat);
 
+		static const H3DF::Type staticType = H3DF::Type::PMI;
+		H3DF::Type ObjectType() const override { return staticType; };
+
 		void Set(PMI const & cInThat);
 		PMI const & operator=(PMI const & cInThat);
 
@@ -146,6 +149,9 @@ namespace H3DF {
 		DatumEntity(SegmentKey const & cInThat);
 		DatumEntity(DatumEntity const & cInThat);
 
+		static const H3DF::Type staticType = H3DF::Type::DatumEntity;
+		H3DF::Type ObjectType() const override { return staticType; };
+
 		void Set(DatumEntity const & cInThat);
 		DatumEntity const & operator=(DatumEntity const & cInThat);
 
@@ -163,6 +169,9 @@ namespace H3DF {
 		DimensionEntity(HC_KEY nInKey = INVALID_KEY);
 		DimensionEntity(SegmentKey const & cInThat);
 		DimensionEntity(DimensionEntity const & cInThat);
+
+		static const H3DF::Type staticType = H3DF::Type::DimensionEntity;
+		H3DF::Type ObjectType() const override { return staticType; };
 
 		void Set(DimensionEntity const & cInThat);
 		DimensionEntity const & operator=(DimensionEntity const & cInThat);
@@ -184,6 +193,9 @@ namespace H3DF {
 		FeatureControlFrameEntity(SegmentKey const & cInThat);
 		FeatureControlFrameEntity(FeatureControlFrameEntity const & cInThat);
 
+		static const H3DF::Type staticType = H3DF::Type::FeatureControlFrameEntity;
+		H3DF::Type ObjectType() const override { return staticType; };
+
 		void Set(FeatureControlFrameEntity const & cInThat);
 		FeatureControlFrameEntity const & operator=(FeatureControlFrameEntity const & cInThat);
 	};
@@ -194,6 +206,9 @@ namespace H3DF {
 		GenericEntity(HC_KEY nInKey = INVALID_KEY);
 		GenericEntity(SegmentKey const & cInThat);
 		GenericEntity(GenericEntity const & cInThat);
+
+		static const H3DF::Type staticType = H3DF::Type::GenericEntity;
+		H3DF::Type ObjectType() const override { return staticType; };
 
 		void Set(GenericEntity const & cInThat);
 		GenericEntity const & operator=(GenericEntity const & cInThat);
@@ -213,6 +228,9 @@ namespace H3DF {
 		NoteEntity(SegmentKey const & cInThat);
 		NoteEntity(NoteEntity const & cInThat);
 
+		static const H3DF::Type staticType = H3DF::Type::NoteEntity;
+		H3DF::Type ObjectType() const override { return staticType; };
+
 		void Set(NoteEntity const & cInThat);
 		NoteEntity const & operator=(NoteEntity const & cInThat);
 
@@ -227,6 +245,9 @@ namespace H3DF {
 		RoughnessEntity(HC_KEY nInKey = INVALID_KEY);
 		RoughnessEntity(SegmentKey const & cInThat);
 		RoughnessEntity(RoughnessEntity const & cInThat);
+
+		static const H3DF::Type staticType = H3DF::Type::RoughnessEntity;
+		H3DF::Type ObjectType() const override { return staticType; };
 
 		void Set(RoughnessEntity const & cInThat);
 		RoughnessEntity const & operator=(RoughnessEntity const & cInThat);
@@ -251,6 +272,9 @@ namespace H3DF {
 		Orientation();
 		Orientation(Orientation const & cInThat);
 
+		static const H3DF::Type staticType = H3DF::Type::Orientation;
+		H3DF::Type ObjectType() const override { return staticType; };
+
 		void Set(Orientation const & cInThat);
 		Orientation const & operator=(Orientation const & cInThat);
 
@@ -263,6 +287,9 @@ namespace H3DF {
 	public:
 		TextAttributes();
 		TextAttributes(TextAttributes const & cInThat);
+
+		static const H3DF::Type staticType = H3DF::Type::TextAttributes;
+		H3DF::Type ObjectType() const override { return staticType; };
 
 		void Set(TextAttributes const & cInThat);
 		TextAttributes const & operator=(TextAttributes const & cInThat);
@@ -306,6 +333,9 @@ namespace H3DF {
 		Options();
 		Options(Options const & cInThat);
 
+		static const H3DF::Type staticType = H3DF::Type::Options;
+		H3DF::Type ObjectType() const override { return staticType; };
+
 		void Set(Options const & cInThat);
 		Options const & operator=(Options const & cInThat);
 
@@ -321,6 +351,9 @@ namespace H3DF {
 		Frame();
 		Frame(Frame const & cInThat);
 
+		static const H3DF::Type staticType = H3DF::Type::Frame;
+		H3DF::Type ObjectType() const override { return staticType; };
+
 		void Set(Frame const & cInThat);
 		Frame const & operator=(Frame const & cInThat);
 
@@ -334,6 +367,9 @@ namespace H3DF {
 	public:
 		Draw();
 		Draw(Draw const & cInThat);
+
+		static const H3DF::Type staticType = H3DF::Type::Draw;
+		H3DF::Type ObjectType() const override { return staticType; };
 
 		void Set(Draw const & cInThat);
 		Draw const & operator=(Draw const & cInThat);
@@ -351,6 +387,9 @@ namespace H3DF {
 		ViewEntity(SegmentKey & nInSegmentKey);
 		ViewEntity(ViewEntity const & cInThat);
 
+		static const H3DF::Type staticType = H3DF::Type::ViewEntity;
+		H3DF::Type ObjectType() const override { return staticType; };
+
 		void Set(ViewEntity const & cInThat);
 		ViewEntity const & operator = (ViewEntity const & cInThat);
 
@@ -360,43 +399,43 @@ namespace H3DF {
 		size_t GetAssociatedEntityCount() const;
 		void GetAssociatedEntities(size_t & nOutCount, PMI *& pcOutEntities) const;
 		// 			void SetAssociatedEntities(unsigned int in_count, PMI const in_entities[]);
-		/*
-					void GetCamera(Point & out_position,
-						Point & out_target,
-						Point & out_up_vector,
-						float & out_field_width,
-						float & out_field_height,
-						char out_projection[128]);
+/*
+		void GetCamera(Point & out_position,
+			Point & out_target,
+			Point & out_up_vector,
+			float & out_field_width,
+			float & out_field_height,
+			char out_projection[128]);
 
-					void GetCamera(float out_position[3],
-						float out_target[3],
-						float out_up_vector[3],
-						float & out_field_width,
-						float & out_field_height,
-						char out_projection[128]);
+		void GetCamera(float out_position[3],
+			float out_target[3],
+			float out_up_vector[3],
+			float & out_field_width,
+			float & out_field_height,
+			char out_projection[128]);
 
-					void SetCamera(Point const & in_position,
-						Point const & in_target,
-						Point const & in_up_vector,
-						float in_field_width,
-						float in_field_height,
-						char const in_projection[128]);
+		void SetCamera(Point const & in_position,
+			Point const & in_target,
+			Point const & in_up_vector,
+			float in_field_width,
+			float in_field_height,
+			char const in_projection[128]);
 
-					void SetCamera(float const in_position[3],
-						float const in_target[3],
-						float const in_up_vector[3],
-						float in_field_width,
-						float in_field_height,
-						char const in_projection[128]);
+		void SetCamera(float const in_position[3],
+			float const in_target[3],
+			float const in_up_vector[3],
+			float in_field_width,
+			float in_field_height,
+			char const in_projection[128]);
 
 
-					void GetFrame(Frame & out_frame) const;
+		void GetFrame(Frame & out_frame) const;
 
-					void SetFrame(Frame const & in_frame);
+		void SetFrame(Frame const & in_frame);
 
-					unsigned int GetAssociatedEntityCount() const;
-					void GetAssociatedEntities(unsigned int & out_count, PMI out_entities[]) const;
-					void SetAssociatedEntities(unsigned int in_count, PMI const in_entities[]);
-		*/
+		unsigned int GetAssociatedEntityCount() const;
+		void GetAssociatedEntities(unsigned int & out_count, PMI out_entities[]) const;
+		void SetAssociatedEntities(unsigned int in_count, PMI const in_entities[]);
+*/
 	};
 }

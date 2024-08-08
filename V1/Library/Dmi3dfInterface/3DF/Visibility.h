@@ -32,16 +32,16 @@ namespace H3DF
 		VisibilityKit const & operator = (VisibilityKit const & cInThat);
 
 		//== Set Visibility Kit ========================================================================
-		VisibilityKit & SetWindows(bool bInValue);
-		VisibilityKit & SetEdges(bool bInValue);
-		VisibilityKit & SetFaces(bool bInValue);
-		VisibilityKit & SetLights(bool bInValue);
-		VisibilityKit & SetLines(bool bInValue);
-		VisibilityKit & SetMarkers(bool bInValue);
-		VisibilityKit & SetVertices(bool bInValue);
-		VisibilityKit & SetText(bool bInValue);
-		VisibilityKit & SetGeometry(bool bInValue);
-		VisibilityKit & SetEverything(bool bInValue);
+		VisibilityKit & SetWindows(bool bInState);
+		VisibilityKit & SetEdges(bool bInState);
+		VisibilityKit & SetFaces(bool bInState);
+		VisibilityKit & SetLights(bool bInState);
+		VisibilityKit & SetLines(bool bInState);
+		VisibilityKit & SetMarkers(bool bInState);
+		VisibilityKit & SetVertices(bool bInState);
+		VisibilityKit & SetText(bool bInState);
+		VisibilityKit & SetGeometry(bool bInState);
+		VisibilityKit & SetEverything(bool bInState);
 
 		//== Unset Visibility Kit ======================================================================
 		VisibilityKit & UnsetWindows();
@@ -66,17 +66,18 @@ namespace H3DF
 		VisibilityControl & operator = (VisibilityControl const & cInThat);
 
 		//== Set Selectability Control =================================================================
-		VisibilityControl & SetCuttingSections(bool bInValue);
-		VisibilityControl & SetWindows(bool bInValue);
-		VisibilityControl & SetEdges(bool bInValue);
-		VisibilityControl & SetFaces(bool bInValue);
-		VisibilityControl & SetLights(bool bInValue);
-		VisibilityControl & SetLines(bool bInValue);
-		VisibilityControl & SetMarkers(bool bInValue);
-		VisibilityControl & SetVertices(bool bInValue);
-		VisibilityControl & SetText(bool bInValue);
-		VisibilityControl & SetGeometry(bool bInValue);
-		VisibilityControl & SetEverything(bool bInValue);
+		VisibilityControl & SetCuttingSections(bool bInState);
+		VisibilityControl & SetWindows(bool bInState);
+		VisibilityControl & SetEdges(bool bInState);
+		VisibilityControl & SetFaces(bool bInState);
+		VisibilityControl & SetLights(bool bInState);
+		VisibilityControl & SetLines(bool bInState);
+		VisibilityControl & SetMarkers(bool bInState);
+		VisibilityControl & SetVertices(bool bInState);
+		VisibilityControl & SetText(bool bInState);
+		VisibilityControl & SetShadows(bool bInState);
+		VisibilityControl & SetGeometry(bool bInState);
+		VisibilityControl & SetEverything(bool bInState);
 
 		//== Unset Selectability Control ===============================================================
 		VisibilityControl & UnsetCuttingSections();
@@ -88,6 +89,7 @@ namespace H3DF
 		VisibilityControl & UnsetMarkers();
 		VisibilityControl & UnsetVertices();
 		VisibilityControl & UnsetText();
+		VisibilityControl & UnsetShadows();
 		VisibilityControl & UnsetGeometry();
 		VisibilityControl & UnsetEverything();
 

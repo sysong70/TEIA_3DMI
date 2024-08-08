@@ -6,15 +6,8 @@
 
 using namespace H3DF;
 
-H3DF::Operator::OperatorImpl::OperatorImpl()
-{
-	m_eType = H3DF::Type::HighlightControl;
-}
-
 H3DF::Operator::OperatorImpl::OperatorImpl(WindowKey const & cInWindow)
 {
-	m_eType = H3DF::Type::HighlightControl;
-
 	m_pcWindow = (WindowKey *)&cInWindow;
 }
 

@@ -153,7 +153,7 @@
     <ClInclude Include="Impl\Kernel.Session.Impl.h">
       <Filter>Kernel\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="Command.EventInfo.h">
+    <ClInclude Include="Command.Event.h">
       <Filter>Command</Filter>
     </ClInclude>
     <ClInclude Include="Draw\Command.Step.Draw.h">
@@ -266,7 +266,7 @@
     <ClCompile Include="Impl\Kernel.Session.Impl.cpp">
       <Filter>Kernel\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="Command.EventInfo.cpp">
+    <ClCompile Include="Command.Event.cpp">
       <Filter>Command</Filter>
     </ClCompile>
     <ClCompile Include="Draw\Command.Step.Draw.cpp">

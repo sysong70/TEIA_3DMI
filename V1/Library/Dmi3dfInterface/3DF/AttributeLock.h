@@ -48,6 +48,9 @@ namespace H3DF
 		explicit AttributeLockControl(SegmentKey & cInSegmentKey);
 		AttributeLockControl(AttributeLockControl const & cInThat);
 
+		static const H3DF::Type staticType = H3DF::Type::AttributeLockControl;
+		H3DF::Type ObjectType() const { return staticType; };
+
 		void Set(AttributeLockControl const & cInThat);
 		AttributeLockControl & operator = (AttributeLockControl const & cInThat);
 

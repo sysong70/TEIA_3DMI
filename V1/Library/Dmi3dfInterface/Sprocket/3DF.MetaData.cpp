@@ -124,7 +124,7 @@ H3DF::StringMetaData::StringMetaData(MetaData const & cInThat)
 
 	m_pcImpl = pcImpl;
 
-	if (H3DF::Type::StringMetaData == cInThat.Type()) {
+	if (H3DF::Type::StringMetaData == cInThat.ObjectType()) {
 		Set(cInThat);
 	}
 	else {
@@ -245,7 +245,7 @@ H3DF::DwordPtrMetaData::DwordPtrMetaData(MetaData const & cInThat)
 
 	m_pcImpl = pcImpl;
 
-	if (H3DF::Type::DwordPtrMetaData == cInThat.Type()) {
+	if (H3DF::Type::DwordPtrMetaData == cInThat.ObjectType()) {
 		Set(cInThat);
 	}
 	else {

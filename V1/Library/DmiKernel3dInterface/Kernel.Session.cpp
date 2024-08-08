@@ -278,8 +278,8 @@ void KERNEL::Session::RButtonDown(int nFlag, int x, int y)
 	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
-	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
-	cEvent.SetPoint(HE_RButtonDown, x, y, pcImpl->MouseMapFlags(nFlag));
+	Command::Event cEvent(pcImpl->Window());
+	cEvent.SetPoint(H3DF::Operator::Event::Type::RButtonDown, x, y, pcImpl->MouseMapFlags(nFlag));
 
 	pcImpl->Camera().RButtonDown(cEvent);
 }
@@ -289,8 +289,8 @@ void KERNEL::Session::RButtonUp(int nFlag, int x, int y)
 	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
-	HEventInfo cEvent((HBaseView *)pcImpl->GetBaseView());
-	cEvent.SetPoint(HE_RButtonUp, x, y, pcImpl->MouseMapFlags(nFlag));
+	Command::Event cEvent(pcImpl->Window());
+	cEvent.SetPoint(H3DF::Operator::Event::Type::RButtonUp, x, y, pcImpl->MouseMapFlags(nFlag));
 
 	pcImpl->Camera().RButtonUp(cEvent);
 }
@@ -307,20 +307,20 @@ void KERNEL::Session::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 	int nLeft = cArray[0]->ToInteger();
 	int nTop = cArray[1]->ToInteger();
 
-	pcImpl->GetCanvas().GetFrontView().SetSuppressUpdate(true);
+	pcImpl->GetCanvas().GetFrontView().SuppressUpdate(true);
 
 	// Control Flag을 추가해서 ComputeReasonableTarget이란 함수를 사용해서 Whell Zomm할때 Entity를 선택하는 과정을 생략함.
 	// nFlag |= MK_CONTROL;
 
-	HEventInfo	cEvent((HBaseView *)pcImpl->GetBaseView());
-	cEvent.SetPoint(HE_MouseWheel, x - nLeft, y - nTop, pcImpl->MouseMapFlags(nFlag));
+	Command::Event cEvent(pcImpl->Window());
+	cEvent.SetPoint(H3DF::Operator::Event::Type::MouseWheel, x - nLeft, y - nTop, pcImpl->MouseMapFlags(nFlag));
 	cEvent.SetMouseWheelDelta(zDelta);
 
 	pcImpl->Camera().MouseWheel(cEvent);
 
 	pcImpl->Select().DrawSnapItems();
 
-	pcImpl->GetCanvas().GetFrontView().SetSuppressUpdate(false);
+	pcImpl->GetCanvas().GetFrontView().SuppressUpdate(false);
 
 	pcImpl->GetCanvas().GetFrontView().Update();
 }

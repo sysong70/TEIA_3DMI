@@ -7,14 +7,24 @@
 
 namespace H3DF
 {
+	class API_3DF Culling {
+	public:
+		enum class Face {
+			Off, // No faces will be culled.
+			Back, // Culls faces with normals that face away from the camera.
+			Front, // Culls faces with normals that face towards the camera.
+		};
+
+	private:
+		Culling() {}
+	};
+
+/*
 	class API_3DF BoundingKit : public H3DF::Kit
 	{
 	public:
 		BoundingKit();
 		BoundingKit(BoundingKit const & cInThat);
-
-		static const H3DF::Type staticType = H3DF::Type::BoundingKit;
-		H3DF::Type ObjectType() const override { return staticType; };
 
 		void Set(BoundingKit const & cInThat);
 		BoundingKit & operator = (BoundingKit const & cInThat);
@@ -38,21 +48,20 @@ namespace H3DF
 		bool ShowExclusion(bool & bOutEexclusion) const;
 	};
 
-	class API_3DF BoundingControl : public Control {
+*/
+	class API_3DF CullingControl : public Control {
 	public:
-		explicit BoundingControl(SegmentKey & cInSegmentKey);
-		BoundingControl(BoundingControl const & cInThat);
+		explicit CullingControl(SegmentKey & cInSegmentKey);
+		CullingControl(CullingControl const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::BoundingControl;
+		static const H3DF::Type staticType = H3DF::Type::CullingControl;
 		H3DF::Type ObjectType() const override { return staticType; };
 
-		void Set(BoundingControl const & cInThat);
-		BoundingControl & operator = (BoundingControl const & cInThat);
+		void Set(CullingControl const & cInThat);
+		CullingControl & operator = (CullingControl const & cInThat);
 
-		BoundingControl & SetExclusion(bool bInExclusion);
+		CullingControl & SetBackFace(bool bInState);
+		CullingControl & SetFace(Culling::Face eInState);
 
-		BoundingControl & UnsetExclusion();
-
-		bool ShowExclusion(bool & bOutExclusion) const;
 	};
 }

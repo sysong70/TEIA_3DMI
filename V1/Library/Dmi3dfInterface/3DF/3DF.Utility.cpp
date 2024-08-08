@@ -4,6 +4,7 @@
 
 #include "Segment.h"
 
+#include "hc.h"
 #include <HUtility.h>
 #include <HTools.h>
 
@@ -517,6 +518,16 @@ short H3DF::Utility::RawByteToShort(BYTE * pbData)
 	return nValue;
 }
 
+//== Point 관련 함수 =================================================================================
+HPoint H3DF::Utility::ToHPoint(H3DF::Point cInPoint)
+{
+	HPoint cOutPoint;
+	cOutPoint.x = cInPoint.x;
+	cOutPoint.y = cInPoint.y;
+	cOutPoint.z = cInPoint.z;
+
+	return cOutPoint;
+}
 
 //== File 관련 함수 ==================================================================================
 CString H3DF::Utility::GetExecuteDirectory()

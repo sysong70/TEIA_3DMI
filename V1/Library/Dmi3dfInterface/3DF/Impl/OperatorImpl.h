@@ -16,7 +16,7 @@ namespace H3DF
 		class API_3DF OperatorImpl : public H3DF::Impl
 		{
 		public:
-			OperatorImpl();
+			OperatorImpl() = default;
 			OperatorImpl(WindowKey const & cInWindow);
 
 			void Copy(OperatorImpl * pcInThat) {

@@ -25,9 +25,9 @@ namespace H3DF
 		void Set(NavigationCube const & cInThat);
 		NavigationCube const & operator = (NavigationCube const & cInThat);
 
-		int LButtonUp(HEventInfo & cInEvent, SelectionItem & cInItem);
+		int LButtonUp(Operator::Event & cInEvent, SelectionItem & cInItem);
 
-		int LButtonDownAndMove(HEventInfo & cInEvent);
+		int LButtonDownAndMove(Operator::Event & cInEvent);
 
 		void SetView(H3DF::BaseView * view, WindowKey * pcInWindow);
 

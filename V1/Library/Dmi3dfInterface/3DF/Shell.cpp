@@ -445,8 +445,6 @@ namespace H3DF {
 	class ShellKeyImpl : public KeyImpl
 	{
 	public:
-		ShellKeyImpl() {m_eType = H3DF::Type::ShellKey; }
-
 		void Copy(ShellKeyImpl * pcInThat) {
 			KeyImpl::Copy(pcInThat);
 		}
@@ -471,10 +469,12 @@ H3DF::ShellKey::ShellKey(Key const & cInKey) : GeometryKey(INVALID_KEY)
 	ShellKeyImpl * pcImpl = new ShellKeyImpl();
 	m_pcImpl = pcImpl;
 
-	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInKey.GetImpl()));
+	if (H3DF::Type::ShellKey != cInKey.ObjectType()) {
+		DEBUG_STOP;
+		return;
+	}
 
-	// 외부에서 들어오는 Key는 ShellKey가 아닐 수 있으므로, ShellKey로 변경한다.
-	pcImpl->SetType(H3DF::Type::ShellKey);
+	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInKey.GetImpl()));
 }
 
 H3DF::ShellKey::ShellKey(ShellKey const & cInThat)
@@ -486,16 +486,18 @@ H3DF::ShellKey::ShellKey(ShellKey const & cInThat)
 void H3DF::ShellKey::Set(ShellKey const & cInThat)
 {
 	if (nullptr == m_pcImpl || nullptr == cInThat.m_pcImpl) {
+		DEBUG_STOP;
 		return;
 	}
 
 	ShellKeyImpl * pcImpl = (ShellKeyImpl *)m_pcImpl;
 	ShellKeyImpl * pcInThatImpl = (ShellKeyImpl *)cInThat.m_pcImpl;
+
 	pcImpl->Copy(pcInThatImpl);
 }
 
 ShellKey & H3DF::ShellKey::operator = (ShellKey const & cInThat)
 {
-	Key::Set(cInThat);
+	Set(cInThat);
 	return *this;
 }
