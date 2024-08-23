@@ -18,6 +18,8 @@ namespace H3DF
 	class ColorInterpolationKitImpl : public Impl
 	{
 	public:
+		ColorInterpolationKitImpl() { m_eType = H3DF::Type::ColorInterpolationKit; }
+
 		void Copy(ColorInterpolationKitImpl * pcInThat) 
 		{
 			m_bDepthRange = pcInThat->m_bDepthRange;
@@ -173,6 +175,8 @@ namespace H3DF
 	class ColorInterpolationControlImpl : public ControlImpl
 	{
 	public:
+		ColorInterpolationControlImpl() { m_eType = H3DF::Type::ColorInterpolationControl; }
+
 		void Copy(ColorInterpolationControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
@@ -186,18 +190,19 @@ namespace H3DF
 void H3DF::ColorInterpolationControlImpl::SetGeometry(CStringA strName, bool bInState, bool bColor)
 {
 	CStringA strOption;
+
+	if (false == bInState) {
+		strOption = "no ";
+	}
+
 	if(true == bColor) {
-		strOption = "color interpolation = ";
+		strOption += "color interpolation = ";
 	}
 	else {
-		strOption = "color index interpolation = ";
+		strOption += "color index interpolation = ";
 	}
 
 	SegmentKeyImpl::LocalOpen(m_cOverrideKey); {
-		if (false == bInState) {
-			strOption += "no ";
-		}
-		
 		strOption += strName;
 		HC_Set_Rendering_Options(strOption);
 	} SegmentKeyImpl::LocalClose(m_cOverrideKey);
@@ -223,6 +228,7 @@ void H3DF::ColorInterpolationControlImpl::UnsetGeometry(CStringA strName, bool b
 bool H3DF::ColorInterpolationControlImpl::ShowGeometry(CStringA strName, bool & bOutState, bool bColor) const
 {
 	bool bResult = false;
+	bOutState = false;
 
 	CStringA strColorOption;
 	if (true == bColor) {

@@ -17,6 +17,8 @@ namespace H3DF
 	class CircleKitImpl : public Impl
 	{
 	public:
+		CircleKitImpl() { m_eType = H3DF::Type::CircleKit; }
+
 		void Copy(CircleKitImpl * pcInThat)
 		{
 			m_cCenter = pcInThat->m_cCenter;
@@ -146,6 +148,8 @@ namespace H3DF {
 	class CircleKeyImpl : public GeometryKeyImpl
 	{
 	public:
+		CircleKeyImpl() { m_eType = H3DF::Type::CircleKey; }
+
 		void Copy(CircleKeyImpl * pcInThat) {
 			KeyImpl::Copy(pcInThat);
 			m_cCircleKit = pcInThat->m_cCircleKit;

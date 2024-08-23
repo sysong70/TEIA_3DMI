@@ -28,6 +28,8 @@ namespace H3DF
 		VisibilityKit();
 		VisibilityKit(VisibilityKit const & cInThat);
 
+		H3DF::Type ObjectType() const override { return H3DF::Type::VisibilityKit; }
+
 		void Set(VisibilityKit const & cInThat);
 		VisibilityKit const & operator = (VisibilityKit const & cInThat);
 
@@ -61,6 +63,8 @@ namespace H3DF
 	public:
 		explicit VisibilityControl(SegmentKey & cInSegmentKey);
 		VisibilityControl(VisibilityControl const & cInThat);
+
+		H3DF::Type ObjectType() const override { return H3DF::Type::VisibilityControl; }
 
 		void Set(VisibilityControl const & cInThat);
 		VisibilityControl & operator = (VisibilityControl const & cInThat);

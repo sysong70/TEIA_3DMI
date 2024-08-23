@@ -16,6 +16,8 @@ USING_3DF_NAMESPACE
 class EdgeAttributeKitImpl : public Impl
 {
 public:
+	EdgeAttributeKitImpl() { m_eType = H3DF::Type::EdgeAttributeKit; }
+
 	void Copy(EdgeAttributeKitImpl * pcInThat) {
 		m_strPatternName = pcInThat->m_strPatternName;
 		m_fWeight = pcInThat->m_fWeight;
@@ -156,6 +158,8 @@ bool EdgeAttributeKit::ShowHardAngle(float & fOutAngle) const
 class EdgeAttributeControlImpl : public ControlImpl
 {
 public:
+	EdgeAttributeControlImpl() { m_eType = H3DF::Type::EdgeAttributeControl; }
+
 	void Copy(EdgeAttributeControlImpl * pcInThat) {
 		ControlImpl::Copy(pcInThat);
 	}

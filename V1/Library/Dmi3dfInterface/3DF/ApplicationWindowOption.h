@@ -14,8 +14,7 @@ namespace H3DF
 		ApplicationWindowOptionsKit();
 		ApplicationWindowOptionsKit(ApplicationWindowOptionsKit const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::ApplicationWindowOptionsKit;
-		H3DF::Type ObjectType() const { return staticType; };
+		H3DF::Type ObjectType() const { return H3DF::Type::ApplicationWindowOptionsKit; };
 
 		void Set(ApplicationWindowOptionsKit const & cInThat);
 		ApplicationWindowOptionsKit const & operator = (ApplicationWindowOptionsKit const & cInThat);

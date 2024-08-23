@@ -182,8 +182,7 @@ namespace H3DF
 		MaterialKit();
 		MaterialKit(MaterialKit const & cInKit);
 
-		static const H3DF::Type staticType = H3DF::Type::MaterialKit;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::MaterialKit; };
 
 		void Set(MaterialKit const & cInThat);
 		MaterialKit & operator = (MaterialKit const & cInThat);
@@ -265,8 +264,7 @@ namespace H3DF
 		MaterialMappingKit();
 		MaterialMappingKit(MaterialMappingKit const & cInKit);
 
-		static const H3DF::Type staticType = H3DF::Type::MaterialMappingKit;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::MaterialMappingKit; };
 
 		void Set(MaterialMappingKit const & cInThat);
 		MaterialMappingKit & operator = (MaterialMappingKit const & cInThat);
@@ -355,8 +353,7 @@ namespace H3DF
 		MaterialMappingControl(SegmentKey const & cInThat);
 		MaterialMappingControl(MaterialMappingControl const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::MaterialMappingControl;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::MaterialMappingControl; };
 
 		void Set(MaterialMappingControl const & cInThat);
 		MaterialMappingControl & operator = (MaterialMappingControl const & cInThat);

@@ -54,8 +54,8 @@ namespace H3DF
 		explicit CullingControl(SegmentKey & cInSegmentKey);
 		CullingControl(CullingControl const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::CullingControl;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type Type() const override { return ObjectType(); }
+		H3DF::Type ObjectType() const override { return H3DF::Type::CullingControl; }
 
 		void Set(CullingControl const & cInThat);
 		CullingControl & operator = (CullingControl const & cInThat);
@@ -63,5 +63,7 @@ namespace H3DF
 		CullingControl & SetBackFace(bool bInState);
 		CullingControl & SetFace(Culling::Face eInState);
 
+	private:
+		CullingControl();
 	};
 }

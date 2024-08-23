@@ -76,3 +76,13 @@ void Impl::SetImpl(Object * pcObject, Impl * pcImpl)
 
 	pcObject->m_pcImpl = pcImpl;
 }
+
+H3DF::Type Impl::Type() const
+{
+	return m_eType;
+}
+
+void Impl::SetType(H3DF::Type eType)
+{
+	m_eType = eType;
+}

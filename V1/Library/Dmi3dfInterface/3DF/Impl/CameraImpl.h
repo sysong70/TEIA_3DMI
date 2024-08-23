@@ -9,6 +9,8 @@ namespace H3DF
 	class CameraKitImpl : public Impl
 	{
 	public:
+		CameraKitImpl() { m_eType = H3DF::Type::CameraKit; }
+
 		void Copy(CameraKitImpl * pcInThat)
 		{
 			m_cData.cUpVector = pcInThat->m_cData.cUpVector;
@@ -41,6 +43,8 @@ namespace H3DF
 	class CameraControlImpl : public ControlImpl
 	{
 	public:
+		CameraControlImpl() { m_eType = H3DF::Type::CameraControl; }
+
 		void Copy(CameraControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}

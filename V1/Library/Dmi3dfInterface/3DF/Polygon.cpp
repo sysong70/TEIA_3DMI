@@ -15,6 +15,7 @@ namespace H3DF
 	public:
 		PolygonKitImpl()
 		{
+			m_eType = H3DF::Type::PolygonKit;
 			m_cColor.Set(-1, -1, -1);
 		}
 

@@ -13,8 +13,7 @@ namespace H3DF
 		BoundingKit();
 		BoundingKit(BoundingKit const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::BoundingKit;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::BoundingKit; };
 
 		void Set(BoundingKit const & cInThat);
 		BoundingKit & operator = (BoundingKit const & cInThat);
@@ -43,8 +42,7 @@ namespace H3DF
 		explicit BoundingControl(SegmentKey & cInSegmentKey);
 		BoundingControl(BoundingControl const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::BoundingControl;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::BoundingControl; };
 
 		void Set(BoundingControl const & cInThat);
 		BoundingControl & operator = (BoundingControl const & cInThat);

@@ -18,6 +18,8 @@ namespace H3DF
 	class LineKitImpl : public Impl
 	{
 	public:
+		LineKitImpl() { m_eType = H3DF::Type::LineKit; }
+
 		void Copy(LineKitImpl * that)
 		{
 			m_aPoints = that->m_aPoints;
@@ -120,6 +122,8 @@ namespace H3DF {
 	class LineKeyImpl : public GeometryKeyImpl
 	{
 	public:
+		LineKeyImpl() { m_eType = H3DF::Type::LineKey; }
+
 		void Copy(LineKeyImpl * pcInThat) {
 			KeyImpl::Copy(pcInThat);
 		}

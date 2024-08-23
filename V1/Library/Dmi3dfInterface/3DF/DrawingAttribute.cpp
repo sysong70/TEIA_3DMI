@@ -18,6 +18,8 @@ namespace H3DF
 	class DrawingAttributeKitImpl : public Impl
 	{
 	public:
+		DrawingAttributeKitImpl() { m_eType = H3DF::Type::DrawingAttributeKit; }
+
 		void Copy(DrawingAttributeKitImpl * pcInThat) 
 		{
 			m_bDepthRange = pcInThat->m_bDepthRange;
@@ -173,6 +175,8 @@ namespace H3DF
 	class DrawingAttributeControlImpl : public ControlImpl
 	{
 	public:
+		DrawingAttributeControlImpl() { m_eType = H3DF::Type::DrawingAttributeControl; }
+
 		void Copy(DrawingAttributeControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}

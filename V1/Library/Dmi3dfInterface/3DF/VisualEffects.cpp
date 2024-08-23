@@ -18,6 +18,8 @@ using namespace H3DF;
 class VisualEffectsControlImpl : public ControlImpl
 {
 public:
+	VisualEffectsControlImpl() { m_eType = H3DF::Type::VisualEffectsControl; }
+
 	void Copy(VisualEffectsControlImpl * pcInThat) {
 		ControlImpl::Copy(pcInThat);
 	}

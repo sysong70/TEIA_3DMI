@@ -89,8 +89,7 @@ namespace H3DF
 		SelectionOptionsKit();
 		SelectionOptionsKit(SelectionOptionsKit const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::SelectionOptionsKit;
-		H3DF::Type ObjectType() const override { return staticType; } ;
+		H3DF::Type ObjectType() const override { return H3DF::Type::SelectionOptionsKit; } ;
 
 		void Set(SelectionOptionsKit const & cInThat);
 		SelectionOptionsKit & operator =(SelectionOptionsKit const & cInThat);
@@ -173,8 +172,7 @@ namespace H3DF
 		SelectionOptionsControl(SelectionOptionsControl const & cInThat);
 		virtual ~SelectionOptionsControl();
 
-		static const H3DF::Type staticType = H3DF::Type::SelectionOptionsControl;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::SelectionOptionsControl; };
 
 		void Set(SelectionOptionsControl const & cInThat);
 		SelectionOptionsControl & operator=(SelectionOptionsControl const & cInThat);
@@ -218,8 +216,7 @@ namespace H3DF
 		SelectionItem();
 		SelectionItem(SelectionItem const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::SelectionItem;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::SelectionItem; };
 		
 		// 선택된 Item의 Type을 반환합니다.
 		H3DF::Type Type() const;
@@ -252,8 +249,7 @@ namespace H3DF
 		SelectionResultsIterator();
 		SelectionResultsIterator(SelectionResultsIterator const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::SelectionResultsIterator;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::SelectionResultsIterator; };
 
 		void Set(SelectionResultsIterator const & in_that);
 		SelectionResultsIterator & operator=(SelectionResultsIterator const & cInThat);
@@ -322,6 +318,8 @@ namespace H3DF
 		explicit SelectionControl(WindowKey const & cInWindow);
 		SelectionControl(SelectionControl const & cInThat);
 		~SelectionControl();
+
+		H3DF::Type ObjectType() const override { return H3DF::Type::SelectionControl; };
 
 		void Set(SelectionControl const & cInThat);
 		SelectionControl & operator=(SelectionControl const & cInThat);

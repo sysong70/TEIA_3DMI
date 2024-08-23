@@ -20,8 +20,7 @@ public:
 	PolygonKit();
 	PolygonKit(PolygonKit const & cInThat);
 
-	static const H3DF::Type staticType = H3DF::Type::PolygonKit;
-	H3DF::Type ObjectType() const override { return staticType; };
+	H3DF::Type ObjectType() const override { return H3DF::Type::PolygonKit; };
 
 	void Set(PolygonKit const & cInThat);
 	PolygonKit const & operator = (PolygonKit const & cInThat);
@@ -41,8 +40,7 @@ public:
 	PolygonKey();
 	PolygonKey(HC_KEY nInKey);
 
-	static const H3DF::Type staticType = H3DF::Type::PolygonKey;
-	H3DF::Type ObjectType() const override { return staticType; };
+	H3DF::Type ObjectType() const override { return H3DF::Type::PolygonKey; };
 };
 
 CLOSE_3DF_NAMESPACE

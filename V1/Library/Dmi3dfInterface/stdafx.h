@@ -27,3 +27,4 @@
 #define CHECK_DWORD_PTR(nValue) if(0 == nValue) { assert(FALSE);  return false; } 
 
 #define LOGMANAGER_3DF_LOG_ID			1
+

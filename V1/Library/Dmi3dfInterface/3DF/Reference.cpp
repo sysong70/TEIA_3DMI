@@ -19,6 +19,8 @@ namespace H3DF {
 	class ReferenceKeyImpl : public GeometryKeyImpl
 	{
 	public:
+		ReferenceKeyImpl() { m_eType = H3DF::Type::ReferenceKey; }
+
 		void Copy(ReferenceKeyImpl * pcInThat) {
 			KeyImpl::Copy(pcInThat);
 		}

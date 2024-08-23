@@ -487,10 +487,9 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 		cItem.ShowSelectionPosition(cWordlPoint);
 		cItem.ShowSelectionPosition(cWindowPoint);
 
-		TRACE(L"Item Type: %s / %f, %f, %f", Utility::GetTypeString(eType), cWindowPoint.x, cWindowPoint.y, cWindowPoint.z);
+		TRACE(L"Item Type: %s / %f, %f, %f", Utility::GetTypeString(eType), cWordlPoint.x, cWordlPoint.y, cWordlPoint.z);
 		cIter.Next();
 	}
-
 #endif
 
 	// 5.첫번째 요소를 저장한다.
@@ -501,7 +500,6 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 	WindowPoint cSelectItemWindowPoint;
 	cSelectItem.ShowSelectionPosition(cSelectItemWorldPoint);
 	cSelectItem.ShowSelectionPosition(cSelectItemWindowPoint);
-
 
 	// 6.2개 이상의 요소가 선택된 경우 Line을 우선 처리한다. 앞에서 선택된 요소가 line이 아닌 경우에만 처리를 한다.
 	if (1 < cFilteredSelResult.GetCount() && H3DF::Type::LineKey != eType) 

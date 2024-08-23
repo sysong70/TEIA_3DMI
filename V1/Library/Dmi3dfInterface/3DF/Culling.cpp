@@ -204,6 +204,8 @@ namespace H3DF
 	class CullingControlImpl : public ControlImpl
 	{
 	public:
+		CullingControlImpl() { m_eType = H3DF::Type::CullingControl; }
+
 		void Copy(CullingControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
@@ -301,6 +303,8 @@ CullingControl & H3DF::CullingControl::SetFace(Culling::Face eInState)
 
 	return *this;
 }
+
+H3DF::CullingControl::CullingControl() {}
 
 /*
 CullingControl & H3DF::CullingControl::SetExclusion(bool bInExclusion)

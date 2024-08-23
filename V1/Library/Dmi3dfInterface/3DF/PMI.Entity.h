@@ -110,8 +110,7 @@ namespace H3DF {
 		PMI(SegmentKey const & cInThat);
 		PMI(PMI const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::PMI;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::PMI; };
 
 		void Set(PMI const & cInThat);
 		PMI const & operator=(PMI const & cInThat);
@@ -149,8 +148,7 @@ namespace H3DF {
 		DatumEntity(SegmentKey const & cInThat);
 		DatumEntity(DatumEntity const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::DatumEntity;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::DatumEntity; };
 
 		void Set(DatumEntity const & cInThat);
 		DatumEntity const & operator=(DatumEntity const & cInThat);
@@ -170,8 +168,7 @@ namespace H3DF {
 		DimensionEntity(SegmentKey const & cInThat);
 		DimensionEntity(DimensionEntity const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::DimensionEntity;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::DimensionEntity; };
 
 		void Set(DimensionEntity const & cInThat);
 		DimensionEntity const & operator=(DimensionEntity const & cInThat);
@@ -193,8 +190,7 @@ namespace H3DF {
 		FeatureControlFrameEntity(SegmentKey const & cInThat);
 		FeatureControlFrameEntity(FeatureControlFrameEntity const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::FeatureControlFrameEntity;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::FeatureControlFrameEntity; };
 
 		void Set(FeatureControlFrameEntity const & cInThat);
 		FeatureControlFrameEntity const & operator=(FeatureControlFrameEntity const & cInThat);
@@ -207,8 +203,7 @@ namespace H3DF {
 		GenericEntity(SegmentKey const & cInThat);
 		GenericEntity(GenericEntity const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::GenericEntity;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::GenericEntity; };
 
 		void Set(GenericEntity const & cInThat);
 		GenericEntity const & operator=(GenericEntity const & cInThat);
@@ -228,8 +223,7 @@ namespace H3DF {
 		NoteEntity(SegmentKey const & cInThat);
 		NoteEntity(NoteEntity const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::NoteEntity;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::NoteEntity; };
 
 		void Set(NoteEntity const & cInThat);
 		NoteEntity const & operator=(NoteEntity const & cInThat);
@@ -246,8 +240,7 @@ namespace H3DF {
 		RoughnessEntity(SegmentKey const & cInThat);
 		RoughnessEntity(RoughnessEntity const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::RoughnessEntity;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::RoughnessEntity; };
 
 		void Set(RoughnessEntity const & cInThat);
 		RoughnessEntity const & operator=(RoughnessEntity const & cInThat);
@@ -272,8 +265,7 @@ namespace H3DF {
 		Orientation();
 		Orientation(Orientation const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::Orientation;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::Orientation; };
 
 		void Set(Orientation const & cInThat);
 		Orientation const & operator=(Orientation const & cInThat);
@@ -288,8 +280,7 @@ namespace H3DF {
 		TextAttributes();
 		TextAttributes(TextAttributes const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::TextAttributes;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::TextAttributes; };
 
 		void Set(TextAttributes const & cInThat);
 		TextAttributes const & operator=(TextAttributes const & cInThat);
@@ -333,8 +324,7 @@ namespace H3DF {
 		Options();
 		Options(Options const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::Options;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::Options; };
 
 		void Set(Options const & cInThat);
 		Options const & operator=(Options const & cInThat);
@@ -351,8 +341,7 @@ namespace H3DF {
 		Frame();
 		Frame(Frame const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::Frame;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::Frame; };
 
 		void Set(Frame const & cInThat);
 		Frame const & operator=(Frame const & cInThat);
@@ -368,8 +357,7 @@ namespace H3DF {
 		Draw();
 		Draw(Draw const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::Draw;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::Draw; };
 
 		void Set(Draw const & cInThat);
 		Draw const & operator=(Draw const & cInThat);
@@ -387,8 +375,7 @@ namespace H3DF {
 		ViewEntity(SegmentKey & nInSegmentKey);
 		ViewEntity(ViewEntity const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::ViewEntity;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::ViewEntity; };
 
 		void Set(ViewEntity const & cInThat);
 		ViewEntity const & operator = (ViewEntity const & cInThat);

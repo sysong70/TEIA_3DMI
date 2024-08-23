@@ -37,6 +37,8 @@ namespace H3DF
 
 VisibilityKitImpl::VisibilityKitImpl()
 {
+	m_eType = H3DF::Type::VisibilityKit;
+
 	for (auto & nFlag : m_bVisibilityFlag) {
 		nFlag = 0;
 	}
@@ -290,6 +292,8 @@ namespace H3DF
 	class VisibilityControlImpl : public ControlImpl
 	{
 	public:
+		VisibilityControlImpl() { m_eType = H3DF::Type::VisibilityControl; }
+
 		void Copy(VisibilityControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}

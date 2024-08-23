@@ -22,6 +22,8 @@ namespace H3DF
 	class SelectionOptionsKitImpl : public Impl
 	{
 	public:
+		SelectionOptionsKitImpl() { m_eType = H3DF::Type::SelectionOptionsKit; }
+
 		void Copy(SelectionOptionsKitImpl * pcInThat) {
 			fProximity = pcInThat->fProximity;
 			bProximity = pcInThat->bProximity;
@@ -70,6 +72,8 @@ namespace H3DF
 	class SelectionOptionsControlImpl : public ControlImpl
 	{
 	public:
+		SelectionOptionsControlImpl() { m_eType = H3DF::Type::SelectionOptionsControl; }
+
 		void Copy(SelectionOptionsControlImpl * pcInThat) {
 			m_pcWindow = pcInThat->m_pcWindow;
 			m_pcSelectionSet = pcInThat->m_pcSelectionSet;
@@ -85,6 +89,8 @@ namespace H3DF
 	class SelectionItemImpl : public Impl
 	{
 	public:
+		SelectionItemImpl() { m_eType = H3DF::Type::SelectionItem; }
+
 		virtual ~SelectionItemImpl()
 		{
 			if (nullptr != m_pnIncludeKeys) {
@@ -145,6 +151,8 @@ namespace H3DF
 	class SelectionResultsIteratorImpl : public Impl
 	{
 	public:
+		SelectionResultsIteratorImpl() { m_eType = H3DF::Type::SelectionResultsIterator; }
+
 		void Copy(SelectionResultsIteratorImpl * pcInThat) {
 			pcIterator = pcInThat->pcIterator;
 			pcBeginIterator = pcInThat->pcBeginIterator;
@@ -159,6 +167,8 @@ namespace H3DF
 	class SelectionResultsImpl : public Impl
 	{
 	public:
+		SelectionResultsImpl() { m_eType = H3DF::Type::SelectionResults; }
+
 		void Copy(SelectionResultsImpl * pcInThat) {
 			m_deItems.clear();
 			for (auto cItem : pcInThat->m_deItems) {
@@ -203,6 +213,8 @@ namespace H3DF
 			Marker,
 			Line
 		};
+
+		SelectionControlImpl() { m_eType = H3DF::Type::SelectionControl; }
 
 		void Copy(SelectionControlImpl * pcInThat) {
 			m_pcWindow = pcInThat->m_pcWindow;

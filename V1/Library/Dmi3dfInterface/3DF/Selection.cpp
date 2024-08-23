@@ -539,14 +539,13 @@ H3DF::SelectionItem::SelectionItem()
 H3DF::SelectionItem::SelectionItem(SelectionItem const & cInThat)
 {
 	m_pcImpl = new SelectionItemImpl();
-
 	Set(cInThat);
 }
 
 H3DF::Type H3DF::SelectionItem::Type() const
 {
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
-	return pcImpl->m_cKey.ObjectType();
+	return pcImpl->m_cKey.Type();
 }
 
 void H3DF::SelectionItem::Set(SelectionItem const & cInThat)
@@ -1389,12 +1388,9 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 
 		HC_Show_Key_Type(nKey, chKeyType);
 
-		HC_KEY nTestKey3 = INVALID_KEY;
-		HC_KEY nTestKey4 = INVALID_KEY;
-
 		if (streq(chKeyType, "line") || streq(chKeyType, "polyline") || streq(chKeyType, "circular arc") || streq(chKeyType, "elliptical arc")) {
 			eSelectedType = SelectionControlImpl::SelType::Line;
-			pcItemImpl->m_cKey = LineKey(Key(nKey));
+			pcItemImpl->m_cKey = LineKey(nKey);
 		}
 		else if (streq(chKeyType, "marker")) {
 			eSelectedType = SelectionControlImpl::SelType::Marker;
@@ -1406,7 +1402,7 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 		else {
 			// This may be shell, mesh, cyliner, etc...
 			eSelectedType = SelectionControlImpl::SelType::Shell;
-			pcItemImpl->m_cKey = ShellKey(Key(nKey));
+			pcItemImpl->m_cKey = ShellKey(nKey);
 
 			// But if it really is a shell, check for regions.
 			if (streq(chKeyType, "shell") && pcItemImpl->m_nOffset3 != -1) {

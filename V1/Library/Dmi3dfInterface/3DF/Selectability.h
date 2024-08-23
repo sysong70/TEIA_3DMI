@@ -27,8 +27,7 @@ namespace H3DF
 		SelectabilityKit();
 		SelectabilityKit(SelectabilityKit const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::SelectabilityKit;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::SelectabilityKit; };
 
 		static SelectabilityKit GetDefault();
 
@@ -83,8 +82,7 @@ namespace H3DF
 		explicit SelectabilityControl(SegmentKey & cInSegmentKey);
 		SelectabilityControl(SelectabilityControl const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::SelectabilityControl;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::SelectabilityControl; };
 
 		void Set(SelectabilityControl const & cInThat);
 		SelectabilityControl & operator = (SelectabilityControl const & cInThat);

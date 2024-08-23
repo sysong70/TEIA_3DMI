@@ -14,8 +14,8 @@ H3DF::Control::Control(Control && cInThat) :
 {
 }
 
-Control & H3DF::Control::operator=(Control && cInThat)
+Control & H3DF::Control::operator = (Control && cInThat)
 {
-	this->Object::operator=(std::move(cInThat));
+	this->Object::operator = (std::move(cInThat));
 	return *this;
 }

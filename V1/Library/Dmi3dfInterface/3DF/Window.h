@@ -108,8 +108,7 @@ namespace H3DF
 		WindowKey(WindowKey const & cInThat);
 		~WindowKey();
 
-		static const H3DF::Type staticType = H3DF::Type::WindowKey;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::WindowKey; };
 
 		const H3DF::BaseView * GetBaseView() const;
 		H3DF::BaseView * GetBaseView();

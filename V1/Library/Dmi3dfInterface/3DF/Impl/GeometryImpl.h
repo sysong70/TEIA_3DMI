@@ -11,6 +11,8 @@ namespace H3DF
 	class API_3DF GeometryKeyImpl : public KeyImpl
 	{
 	public:
+		GeometryKeyImpl() { m_eType = H3DF::Type::GeometryKey; }
+
 		void Copy(GeometryKeyImpl * pcInThat);
 
 		// 부분 함수(Local Function)에서 사용하는 함수

@@ -19,6 +19,8 @@ namespace H3DF
 	class PerformanceKitImpl : public Impl
 	{
 	public:
+		PerformanceKitImpl() { m_eType = Type::PerformanceKit; }
+
 		void Copy(PerformanceKitImpl * pcInThat) {
 			m_eInDisplayList = pcInThat->m_eInDisplayList;
 		}
@@ -115,6 +117,8 @@ bool H3DF::PerformanceKit::ShowStaticModel(Performance::StaticModel & eOutModelT
 class PerformanceControlImpl : public ControlImpl
 {
 public:
+	PerformanceControlImpl() { m_eType = H3DF::Type::PerformanceControl; }
+
 	void Copy(PerformanceControlImpl * pcInThat) {
 		ControlImpl::Copy(pcInThat);
 	}

@@ -12,8 +12,8 @@ namespace H3DF
 		Key(HC_KEY nInKey);
 		Key(Key const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::Key;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type Type() const override;
+		H3DF::Type ObjectType() const override { return H3DF::Type::Key; };
 
 		void Set(Key const & cInThat);
 		Key const & operator = (Key const & cInThat);

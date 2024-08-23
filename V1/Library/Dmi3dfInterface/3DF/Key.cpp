@@ -38,10 +38,19 @@ H3DF::Key::Key(Key const & cInThat)
 	Set(cInThat);
 }
 
+H3DF::Type H3DF::Key::Type() const
+{
+	KeyImpl * pcImpl = (KeyImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->Type();
+}
+
 void H3DF::Key::Set(Key const & cInThat)
 {
 	KeyImpl * pcImpl = (KeyImpl *)m_pcImpl;
 	KeyImpl * pcInThatImpl = (KeyImpl *)cInThat.m_pcImpl;
+
 	pcImpl->Copy(pcInThatImpl);
 }
 

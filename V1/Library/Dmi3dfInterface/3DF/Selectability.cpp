@@ -32,6 +32,7 @@ namespace H3DF
 
 H3DF::SelectabilityKitImpl::SelectabilityKitImpl()
 {
+	m_eType = H3DF::Type::SelectabilityKit;
 	Empty();
 }
 
@@ -353,7 +354,7 @@ namespace H3DF
 	class SelectabilityControlImpl : public ControlImpl
 	{
 	public:
-		SelectabilityControlImpl() = default;
+		SelectabilityControlImpl() { m_eType = H3DF::Type::SelectabilityControl; }
 
 		void Copy(SelectabilityControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);

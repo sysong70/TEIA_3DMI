@@ -15,8 +15,7 @@ namespace H3DF
 		explicit PortfolioKey(Key const & cInThat);
 		PortfolioKey(PortfolioKey const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::PortfolioKey;
-		H3DF::Type ObjectType() const { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::PortfolioKey; };
 
 		void Set(PortfolioKey const & cInThat);
 		PortfolioKey & operator = (PortfolioKey const & cInThat);
@@ -30,8 +29,7 @@ namespace H3DF
 		explicit PortfolioControl(SegmentKey & cInSegmentKey);
 		PortfolioControl(PortfolioControl const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::PortfolioControl;
-		H3DF::Type ObjectType() const { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::PortfolioControl; };
 
 		void Set(PortfolioControl const & cInThat);
 		PortfolioControl & operator = (PortfolioControl const & cInThat);

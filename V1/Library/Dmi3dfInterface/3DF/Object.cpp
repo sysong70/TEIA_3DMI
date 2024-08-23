@@ -22,7 +22,37 @@ Object::~Object()
 	}
 }
 
+void Object::Set(Object const & cInThat)
+{
+
+}
+
+Object const & Object::operator = (Object const & cInThat)
+{
+	Set(cInThat);
+	return *this;
+}
+
+Object::Object(Object && cInThat) noexcept 
+{
+	m_pcImpl = cInThat.m_pcImpl;
+	cInThat.m_pcImpl = nullptr;
+}
+
+Object & Object::operator = (Object && cInThat) noexcept 
+{
+	m_pcImpl = cInThat.m_pcImpl;
+	cInThat.m_pcImpl = nullptr;
+
+	return *this;
+}
+
+H3DF::Type Object::Type() const
+{
+	return m_pcImpl->Type();
+}
+
 bool Object::HasType(H3DF::Type eInMask) const
 {
-	return ((DWORD) staticType & (DWORD) eInMask) == (DWORD) eInMask;
+	return ((DWORD) ObjectType() & (DWORD) eInMask) == (DWORD) eInMask;
 }

@@ -25,8 +25,7 @@ namespace H3DF
 
 		virtual ~SegmentKey();
 
-		static const H3DF::Type staticType = H3DF::Type::SegmentKey;
-		H3DF::Type ObjectType() const { return staticType; };
+		H3DF::Type ObjectType() const { return H3DF::Type::SegmentKey; };
 
 		void Set(SegmentKey const & cInThat);
 		SegmentKey & operator = (SegmentKey const & cInThat);

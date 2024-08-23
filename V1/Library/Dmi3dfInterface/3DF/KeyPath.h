@@ -16,8 +16,7 @@ public:
 	KeyPath(KeyPath const & cInThat);
 	KeyPath(char chKeyPath[]);
 
-	static const H3DF::Type staticType = H3DF::Type::KeyPath;
-	H3DF::Type ObjectType() const override { return staticType; };
+	H3DF::Type ObjectType() const override { return H3DF::Type::KeyPath; };
 
 	void Set(KeyPath const & cInThat);
 

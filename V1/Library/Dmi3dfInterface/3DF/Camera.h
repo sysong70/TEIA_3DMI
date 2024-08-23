@@ -16,8 +16,7 @@ namespace H3DF
 		CameraKit();
 		CameraKit(CameraKit const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::CameraKit;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::CameraKit; };
 
 		void Set(CameraKit const & cInThat);
 		CameraKit const & operator=(CameraKit const & cInThat);
@@ -50,8 +49,7 @@ namespace H3DF
 		explicit CameraControl(SegmentKey & cInSegment);
 		CameraControl(CameraControl const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::CameraControl;
-		H3DF::Type ObjectType() const override { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::CameraControl; };
 
 		void Set(CameraControl const & cInThat);
 		CameraControl & operator = (CameraControl const & cInThat);

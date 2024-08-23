@@ -17,6 +17,8 @@ namespace H3DF
 	class KeyPathImpl : public H3DF::Impl
 	{
 	public:
+		KeyPathImpl() { m_eType = H3DF::Type::KeyPath; }
+
 		void Copy(KeyPathImpl * that)
 		{
 			m_aPaths = that->m_aPaths;

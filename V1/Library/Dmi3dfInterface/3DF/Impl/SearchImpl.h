@@ -32,6 +32,8 @@ namespace H3DF
 	class SearchResultsIteratorImpl : public Impl
 	{
 	public:
+		SearchResultsIteratorImpl() { m_eType = H3DF::Type::SearchResultsIterator; }
+
 		void Copy(SearchResultsIteratorImpl * pcInThat) {
 			pcIterator = pcInThat->pcIterator;
 			pcBeginIterator = pcInThat->pcBeginIterator;
@@ -47,6 +49,8 @@ namespace H3DF
 	class SearchResultsImpl : public Impl
 	{
 	public:
+		SearchResultsImpl() { m_eType = H3DF::Type::SearchResults; }
+
 		void Copy(SearchResultsImpl * pcInThat) {
 			m_deKeys.clear();
 			for (auto cKey : pcInThat->m_deKeys) {

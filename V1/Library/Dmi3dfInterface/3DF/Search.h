@@ -340,11 +340,10 @@ namespace H3DF
 		SearchOptionsKit();
 		SearchOptionsKit(SearchOptionsKit const & cInKit);
 
-		static const H3DF::Type staticType = H3DF::Type::SearchOptionsKit;
-		H3DF::Type ObjectType() const { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::SearchOptionsKit; };
 
 		void Set(SearchOptionsKit const & cInThat);
-		SearchOptionsKit & operator=(SearchOptionsKit && cInThat);
+		SearchOptionsKit & operator = (SearchOptionsKit && cInThat);
 	};
 
 	class API_3DF SearchResultsIterator : public Object {
@@ -352,8 +351,7 @@ namespace H3DF
 		SearchResultsIterator();
 		SearchResultsIterator(SearchResultsIterator const & cInThat);
 
-		static const H3DF::Type staticType = H3DF::Type::SearchResultsIterator;
-		H3DF::Type ObjectType() const { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::SearchResultsIterator; };
 
 		void Set(SearchResultsIterator const & cInThat);
 		SearchResultsIterator & operator=(SearchResultsIterator const & cInThat);
@@ -381,11 +379,10 @@ namespace H3DF
 		SearchResults(SearchResults const & cInThat);
 		~SearchResults();
 
-		static const H3DF::Type staticType = H3DF::Type::SearchResults;
-		H3DF::Type ObjectType() const { return staticType; };
+		H3DF::Type ObjectType() const override { return H3DF::Type::SearchResults; };
 
 		void Set(SearchResults const & cInThat);
-		SearchResults & operator=(SearchResults const & cInThat);
+		SearchResults & operator = (SearchResults const & cInThat);
 
 		virtual void Reset();
 

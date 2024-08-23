@@ -23,6 +23,8 @@ using namespace H3DF;
 class MaterialKitImpl : public Impl
 {
 public:
+	MaterialKitImpl() {  m_eType = H3DF::Type::MaterialKit;  }
+
 	void Copy(MaterialKitImpl * pcInThat) {
 		for (int nColorIndex = 0; nColorIndex < (int)Material::Channel::Count; nColorIndex++) {
 			m_pcColors[nColorIndex] = pcInThat->m_pcColors[nColorIndex];
@@ -1069,6 +1071,8 @@ bool H3DF::MaterialMappingKit::ShowVertexMaterial(MaterialKit & cOutKit) const
 class MaterialMappingControlImpl : public ControlImpl
 {
 public:
+	MaterialMappingControlImpl() { m_eType = H3DF::Type::MaterialMappingControl; }
+
 	void Copy(ControlImpl * pcInThat)
 	{
 		ControlImpl::Copy(pcInThat);

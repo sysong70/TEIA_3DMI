@@ -258,6 +258,9 @@ void LogManager::WriteLog(int nId, CString strMessage)
 		_close(m_nFileHandle[nId]);
 		m_nFileHandle[nId] = NULL;
 	}
+	else {
+		_commit(m_nFileHandle[nId]);
+	}
 
 	delete[] pchText;
 }
@@ -302,7 +305,7 @@ int LogManager::Open(int nId)
 // 	setlocale(LC_ALL, "ko-KR");
  	//setlocale(LC_ALL, ".utf8");
 
-	errno_t nErrorNo = _wsopen_s(&nFileHandle, strFilePathName, _O_CREAT | _O_RDWR, _SH_DENYRD, _S_IREAD | _S_IWRITE); // | _O_U8TEXT
+	errno_t nErrorNo = _wsopen_s(&nFileHandle, strFilePathName, _O_CREAT | _O_RDWR, _SH_DENYNO, _S_IREAD | _S_IWRITE); // | _O_U8TEXT
 	if(0 != nErrorNo) {
 		return 0;
 	}

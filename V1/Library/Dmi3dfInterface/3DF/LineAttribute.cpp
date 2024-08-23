@@ -16,6 +16,8 @@ namespace H3DF
 	class LineAttributeKitImpl : public Impl
 	{
 	public:
+		LineAttributeKitImpl() { m_eType = H3DF::Type::LineAttributeKit; }
+
 		void Copy(LineAttributeKitImpl * pcInThat) {
 			m_strPatternName = pcInThat->m_strPatternName;
 			m_fWeight = pcInThat->m_fWeight;
@@ -138,6 +140,8 @@ namespace H3DF
 	class LineAttributeControlImpl : public ControlImpl
 	{
 	public:
+		LineAttributeControlImpl() { m_eType = H3DF::Type::LineAttributeControl; }
+
 		void Copy(LineAttributeControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}

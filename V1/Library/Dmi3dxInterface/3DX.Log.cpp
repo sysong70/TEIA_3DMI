@@ -13,6 +13,7 @@
 #	define USED_LOG_MANAGER
 #endif
 
+#	define USED_LOG_MANAGER
 
 #ifdef USED_LOG_MANAGER
 
@@ -20,14 +21,10 @@ void Log::CreateLog(int nId, const WCHAR * pchFilePathName)
 {
 	LogManager::SetCurrentId(nId);
 
-	LogManager::SetFilePathName(nId, pchFilePathName);
-	LogManager::SetCreateFile(nId, true);
+	LogManager::CreateLog(nId, pchFilePathName);
+	LogManager::SetFileCloseFlag(true);
 	LogManager::SetWriteLog(nId, true);
 	LogManager::ResetTabIndex(nId);
-
-	LogManager::SetWriteTimeLog(nId, true);
-	Write(nId, L"Create Log");
-	LogManager::SetWriteTimeLog(nId, false);
 }
 
 void Log::Write(int nId, LPCWSTR chMessage, ...)

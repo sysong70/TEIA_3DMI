@@ -649,7 +649,7 @@ H3DF::DatumEntity::DatumEntity(HC_KEY nInKey) : PMI(nInKey)
 	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
 
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *) &nType);
 	}
 }
@@ -657,7 +657,7 @@ H3DF::DatumEntity::DatumEntity(HC_KEY nInKey) : PMI(nInKey)
 H3DF::DatumEntity::DatumEntity(SegmentKey const & cInThat) : PMI(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -665,7 +665,7 @@ H3DF::DatumEntity::DatumEntity(SegmentKey const & cInThat) : PMI(cInThat)
 H3DF::DatumEntity::DatumEntity(DatumEntity const & cInThat) : PMI(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -725,7 +725,7 @@ void H3DF::DatumEntity::SetLabels(unsigned int nInCount, CString const * pstrInl
 H3DF::DimensionEntity::DimensionEntity(HC_KEY nInKey) : PMI(nInKey)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -733,7 +733,7 @@ H3DF::DimensionEntity::DimensionEntity(HC_KEY nInKey) : PMI(nInKey)
 H3DF::DimensionEntity::DimensionEntity(SegmentKey const & cInThat) : PMI(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -741,7 +741,7 @@ H3DF::DimensionEntity::DimensionEntity(SegmentKey const & cInThat) : PMI(cInThat
 H3DF::DimensionEntity::DimensionEntity(DimensionEntity const & cInThat) : PMI(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -819,7 +819,7 @@ void H3DF::DimensionEntity::SetStrings(unsigned int nInCount, CString const * ps
 H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(HC_KEY nInKey) : PMI(nInKey)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -827,7 +827,7 @@ H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(HC_KEY nInKey) : PMI(
 H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(SegmentKey const & cInThat) : PMI(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -835,7 +835,7 @@ H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(SegmentKey const & cI
 H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(FeatureControlFrameEntity const & cInThat) : PMI(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -859,7 +859,7 @@ H3DF::GenericEntity::GenericEntity(HC_KEY nInKey) :	PMI(nInKey)
 	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
 
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -869,7 +869,7 @@ H3DF::GenericEntity::GenericEntity(SegmentKey const & cInThat) : PMI(cInThat)
 	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
 
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -879,7 +879,7 @@ H3DF::GenericEntity::GenericEntity(GenericEntity const & cInThat) : PMI(cInThat)
 	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
 
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -930,7 +930,7 @@ bool H3DF::GenericEntity::IsDisplayParallelToScreen() const
 H3DF::NoteEntity::NoteEntity(HC_KEY nInKey) : PMI(nInKey)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -938,7 +938,7 @@ H3DF::NoteEntity::NoteEntity(HC_KEY nInKey) : PMI(nInKey)
 H3DF::NoteEntity::NoteEntity(SegmentKey const & cInThat) : PMI(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -946,7 +946,7 @@ H3DF::NoteEntity::NoteEntity(SegmentKey const & cInThat) : PMI(cInThat)
 H3DF::NoteEntity::NoteEntity(NoteEntity const & cInThat) : PMI(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -987,7 +987,7 @@ void H3DF::NoteEntity::SetStrings(unsigned int nInCount, CString const pstrInStr
 H3DF::RoughnessEntity::RoughnessEntity(HC_KEY nInKey) :  PMI(nInKey)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -995,7 +995,7 @@ H3DF::RoughnessEntity::RoughnessEntity(HC_KEY nInKey) :  PMI(nInKey)
 H3DF::RoughnessEntity::RoughnessEntity(SegmentKey const & cInThat) : PMI(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -1003,7 +1003,7 @@ H3DF::RoughnessEntity::RoughnessEntity(SegmentKey const & cInThat) : PMI(cInThat
 H3DF::RoughnessEntity::RoughnessEntity(RoughnessEntity const & cInThat): PMI(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -1570,7 +1570,7 @@ void H3DF::Draw::SetPolygons(unsigned int nInCount, H3DF::Polygon const * pcInPo
 H3DF::ViewEntity::ViewEntity(HC_KEY nInSegmentKey) : PMI(nInSegmentKey)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -1578,7 +1578,7 @@ H3DF::ViewEntity::ViewEntity(HC_KEY nInSegmentKey) : PMI(nInSegmentKey)
 H3DF::ViewEntity::ViewEntity(SegmentKey & nInSegmentKey) : PMI(nInSegmentKey)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }
@@ -1586,7 +1586,7 @@ H3DF::ViewEntity::ViewEntity(SegmentKey & nInSegmentKey) : PMI(nInSegmentKey)
 H3DF::ViewEntity::ViewEntity(ViewEntity const & cInThat) : PMI(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) staticType;
+		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
 }

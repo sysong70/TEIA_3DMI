@@ -969,6 +969,12 @@ namespace H3DF
 		Impl() = default;
 		virtual ~Impl() = default;
 
+		H3DF::Type Type() const;
+		void SetType(H3DF::Type eType);
+
 		void SetImpl(Object * pcObject, Impl * pcImpl);
+
+	protected:
+		H3DF::Type m_eType = H3DF::Type::None;
 	};
 }

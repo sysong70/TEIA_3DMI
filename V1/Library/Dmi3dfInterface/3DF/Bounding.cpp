@@ -17,6 +17,8 @@ namespace H3DF
 	class BoundingKitImpl : public Impl
 	{
 	public:
+		BoundingKitImpl() { m_eType = H3DF::Type::BoundingKit; }
+
 		void Copy(BoundingKitImpl * pcInThat)
 		{
 			m_cCuboid = pcInThat->m_cCuboid;
@@ -202,6 +204,8 @@ namespace H3DF
 	class BoundingControlImpl : public ControlImpl
 	{
 	public:
+		BoundingControlImpl() { m_eType = H3DF::Type::BoundingControl; }
+
 		void Copy(BoundingControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}

@@ -17,6 +17,8 @@ namespace H3DF
 	class ShellKitImpl : public Impl
 	{
 	public:
+		ShellKitImpl() { m_eType = H3DF::Type::ShellKit; }
+
 		void Copy(ShellKitImpl * pcInThat)
 		{
 			m_pacPointArray = pcInThat->m_pacPointArray;
@@ -445,6 +447,8 @@ namespace H3DF {
 	class ShellKeyImpl : public KeyImpl
 	{
 	public:
+		ShellKeyImpl() { m_eType = H3DF::Type::ShellKey; }
+
 		void Copy(ShellKeyImpl * pcInThat) {
 			KeyImpl::Copy(pcInThat);
 		}

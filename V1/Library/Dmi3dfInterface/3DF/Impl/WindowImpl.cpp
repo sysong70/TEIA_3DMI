@@ -8,6 +8,7 @@ using namespace H3DF;
 
 H3DF::WindowKeyImpl::WindowKeyImpl()
 {
+	m_eType = H3DF::Type::WindowKey;
 	m_pnSelectBufferKey = new HC_KEY[m_nSelectBufferKeyCount];
 }
 

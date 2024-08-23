@@ -49,6 +49,8 @@
 
 #include "3DX.Log.h"
 
+#	define USED_LOG_MANAGER
+
 #ifdef _DEBUG
 #	define USED_LOG_MANAGER
 
@@ -129,6 +131,20 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 
 	m_strCadFileName = strFilePathName.Right(strFilePathName.GetLength() - strFilePathName.ReverseFind('\\') - 1);
 
+	// #Import_Log : ExcuteFunction.log
+#ifdef USED_LOG_MANAGER
+	//LogManager::SetWriteTimeLog(2, true);
+
+	CString strExecuteDirectory = LogManager::GetExecuteDirectory();
+	LogManager::CreateFolder(strExecuteDirectory + L"\\Log");
+
+	CString strLogFilePathName = strExecuteDirectory + L"\\Log\\3DX_ExcuteFunction.log";
+	Log::CreateLog(2, strLogFilePathName);
+
+	//m_cA3dTracer.CreateLog(L"D:\\Temp\\A3dXInfo.log");
+	//CreateLog(1, L"d:\\Temp\\AssyStruct.log");
+#endif
+
 	//:Ken - 20240131, sample test. remove later
 #define KEN
 
@@ -148,6 +164,13 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 	A3DRWParamsLoadData cParamsLoadData;
 	TheFileOptions.Import.Get(strFilePathName, cParamsLoadData);
 #endif
+
+	Log::Write(2, "Import Option");
+	
+	Log::IncreaseTabIndex(2);
+	Log::Write(2, "ReadHiddenObjects: %s", Log::BoolStrA(cParamsLoadData.m_sGeneral.m_bReadHiddenObjects));
+	Log::DecreaseTabIndex(2);
+
 
 	// 이 부분을 True로 만들어야, 파일 내부에 있는 Assy File 정보와 일치하지 않는 경우도 같은 하부 Directory를 찾아서 로드한다.
 	cParamsLoadData.m_sAssembly.m_bUseRootDirectory = true;
@@ -354,20 +377,6 @@ bool TdfImport::SetDefaultParamsLoadData(A3DRWParamsLoadData & cParamsLoadData)
 //== 1. 3DF 변환 관련 함수 ============================================================================
 bool TdfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, H3DF::SegmentKey & cModelSegment)
 {
-	// #Import_Log : ExcuteFunction.log
-#ifdef USED_LOG_MANAGER
-	//LogManager::SetWriteTimeLog(2, true);
-
-	CString strExecuteDirectory = LogManager::GetExecuteDirectory();
-	LogManager::CreateFolder(strExecuteDirectory + L"\\Log");
-
-	CString strLogFilePathName = strExecuteDirectory + L"\\Log\\3DX_ExcuteFunction.log";
-	Log::CreateLog(2, strLogFilePathName);
-
-	//m_cA3dTracer.CreateLog(L"D:\\Temp\\A3dXInfo.log");
-	//CreateLog(1, L"d:\\Temp\\AssyStruct.log");
-#endif
-
 	Log::Write(2, L"ConvertAsmModelFile: %s, '%s'", Log::HexStr((DWORD_PTR)pcAsmModelFile), m_strCadFileName);
 
 	Log::IncreaseTabIndex(2);

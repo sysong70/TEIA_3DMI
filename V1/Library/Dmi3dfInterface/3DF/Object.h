@@ -13,8 +13,14 @@ namespace H3DF
 		Object(Object const & cInThat);
 		virtual ~Object();
 
-		static const H3DF::Type staticType = H3DF::Type::None;
-		virtual H3DF::Type ObjectType() const { return staticType; }
+		virtual H3DF::Type Type() const;
+		virtual H3DF::Type ObjectType() const { return H3DF::Type::None; }
+
+		void Set(Object const & cInThat);
+		Object const & operator = (Object const & cInThat);
+
+		Object(Object && cInThat) noexcept ;
+		Object & operator=(Object && cInThat) noexcept;
 
 		bool HasType(H3DF::Type eInMask) const;
 

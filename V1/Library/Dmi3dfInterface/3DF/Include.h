@@ -12,8 +12,7 @@ public:
 	IncludeKey(HC_KEY nInKey);
 	IncludeKey(IncludeKey const & cInThat);
 
-	static const H3DF::Type staticType = H3DF::Type::IncludeKey;
-	H3DF::Type ObjectType() const override { return staticType; };
+	H3DF::Type ObjectType() const override { return H3DF::Type::IncludeKey; };
 
 	void Set(IncludeKey const & cInThat);
 	IncludeKey & operator = (IncludeKey const & cInThat);

@@ -163,13 +163,18 @@ bool H3DF::StyleKey::ShowSource(Style::Type & cOutType, SegmentKey & cOutSegment
 
 //== StyleControl Function =========================================================================
 
-class StyleControlImpl : public ControlImpl
+namespace H3DF
 {
-public:
-	void Copy(StyleControlImpl * pcInThat) {
-		ControlImpl::Copy(pcInThat);
-	}
-};
+	class StyleControlImpl : public ControlImpl
+	{
+	public:
+		StyleControlImpl() { m_eType = H3DF::Type::StyleControl; }
+
+		void Copy(StyleControlImpl * pcInThat) {
+			ControlImpl::Copy(pcInThat);
+		}
+	};
+}
 
 H3DF::StyleControl::StyleControl(SegmentKey & cInSegment) 
 {

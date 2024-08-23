@@ -2,11 +2,15 @@
 
 #include "ApplicationWindowOption.h"
 
+using namespace H3DF;
+
 namespace H3DF
 {
 	class ApplicationWindowOptionsKitImpl : public Impl
 	{
 	public:
+		ApplicationWindowOptionsKitImpl() { m_eType = H3DF::Type::ApplicationWindowOptionsKit; }
+
 		void Copy(ApplicationWindowOptionsKitImpl * pcInThat) {
 			m_eDriver = pcInThat->m_eDriver;
 		}
@@ -14,8 +18,6 @@ namespace H3DF
 		Window::Driver m_eDriver = Window::Driver::Default3D;
 	};
 }
-
-using namespace H3DF;
 
 //== ApplicationWindowOptionsKit ===================================================================
 

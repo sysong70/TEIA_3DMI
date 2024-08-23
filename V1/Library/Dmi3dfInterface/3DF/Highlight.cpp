@@ -38,6 +38,8 @@ namespace H3DF
 	class HighlightOptionsKitImpl : public Impl
 	{
 	public:
+		HighlightOptionsKitImpl() { m_eType = H3DF::Type::HighlightOptionsKit; }
+
 		void Copy(HighlightOptionsKitImpl * pcInThat) {
 			m_strInStyleName = pcInThat->m_strInStyleName;
 			m_strInSecondaryStyleName = pcInThat->m_strInSecondaryStyleName;
@@ -178,6 +180,7 @@ namespace H3DF
 
 H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
 {
+	m_eType = H3DF::Type::HighlightControl;
 	m_pcWindow = (WindowKey *)&cInWindow;
 
 	// m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetHighlightSelection();

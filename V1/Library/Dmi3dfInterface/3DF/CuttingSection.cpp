@@ -15,6 +15,8 @@ namespace H3DF
 	class CuttingSectionKitImpl : public Impl
 	{
 	public:
+		CuttingSectionKitImpl() { m_eType = Type::CuttingSectionKit; }
+
 		void Copy(CuttingSectionKitImpl * that) {
 			m_arPlanes = that->m_arPlanes;
 			m_eMode = that->m_eMode;
@@ -168,6 +170,8 @@ namespace H3DF
 	class CuttingSectionKeyImpl : public KeyImpl
 	{
 	public:
+		CuttingSectionKeyImpl() { m_eType = Type::CuttingSectionKey; }
+
 		void Copy(CuttingSectionKeyImpl * that) {
 			m_arPlanes = that->m_arPlanes;
 		}
