@@ -214,7 +214,7 @@ size_t H3DF::SegmentKey::ShowSubsegments(SegmentKeyArray & cOutChildren) const
 // 			}
 
 			SegmentKey cChildSegment(nChildSegkey);
-			cOutChildren.push_back(nChildSegkey);
+			cOutChildren.emplace_back(nChildSegkey);
 		}
 	}
 	HC_End_Contents_Search();
@@ -941,12 +941,6 @@ SegmentKey & H3DF::SegmentKey::SetCamera(CameraKit const & cInKit)
 	CameraKit cCameraInfo;
 	ShowCamera(cCameraInfo);
 
-	MatrixKit cMatrix;
-	cCameraInfo.ShowMatrix(cMatrix);
-
-	MatrixKit cMatrix1;
-	cInKit.ShowMatrix(cMatrix1);
-
 	CameraControl cCamerCtrl = GetCameraControl();
 
 	Point cPosition;
@@ -980,9 +974,6 @@ SegmentKey & H3DF::SegmentKey::SetCamera(CameraKit const & cInKit)
 		cCamerCtrl.SetNearLimit(fNearLimit);
 	}
 
-	CameraKit cCameraInfo1;
-	ShowCamera(cCameraInfo1);
-
 	return *this;
 }
 
@@ -1012,9 +1003,6 @@ SegmentKey & H3DF::SegmentKey::SetCamera(MatrixKit & cInMatrix)
 	cCamerCtrl.SetPosition(cCameraPosition);
 	// 화면상에서 위쪽을 가리키는 방향.
 	cCamerCtrl.SetUpVector(cInMatrix.YAxis());
-
-	CameraKit cCameraInfo1;
-	ShowCamera(cCameraInfo1);
 
 	return *this;
 }
@@ -1090,9 +1078,13 @@ SegmentKey & H3DF::SegmentKey::UnsetModellingMatrix()
 
 bool H3DF::SegmentKey::ShowModellingMatrix(MatrixKit & cOutKit) const
 {
-	SegmentKeyImpl::LocalOpen(*this);
-	HC_Show_Modelling_Matrix(cOutKit.m_fData);
-	SegmentKeyImpl::LocalClose(*this);
+	bool bStatus = false;
+	SegmentKeyImpl::LocalOpen(*this); {
+		if (0 < HC_Show_Existence("modelling matrix")) {
+			HC_Show_Modelling_Matrix(cOutKit.m_fData);
+			bStatus = true;
+		}
+	} SegmentKeyImpl::LocalClose(*this);
 
 	return true;
 }
@@ -1348,27 +1340,30 @@ bool H3DF::SegmentKey::ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray &
 	SegmentKeyImpl::LocalOpen(*this);
 
 	long nSize = HC_Show_User_Data_Indices(nullptr, 0);
-	nSize = abs(nSize);
-	aOutIndices.resize(nSize);
 
-	nSize = HC_Show_User_Data_Indices(aOutIndices.data(), nSize);
-	if (0 == nSize) {
-		return false;
-	}
+	if (0 != nSize) {
 
-	aOutData.resize(nSize);
+		nSize = abs(nSize);
+		aOutIndices.resize(nSize);
 
-	for (size_t nIndex = 0; nIndex < aOutIndices.size(); ++nIndex) {
-		long nBytes = HC_Show_One_User_Data(aOutIndices[nIndex], nullptr, 0);
-		nBytes = abs(nBytes);
-		aOutData[nIndex].resize(nBytes);
+		nSize = HC_Show_User_Data_Indices(aOutIndices.data(), nSize);
+		if (0 != nSize) {
 
-		HC_Show_One_User_Data(aOutIndices[nIndex], aOutData[nIndex].data(), nBytes);
+			aOutData.resize(nSize);
+
+			for (size_t nIndex = 0; nIndex < aOutIndices.size(); ++nIndex) {
+				long nBytes = HC_Show_One_User_Data(aOutIndices[nIndex], nullptr, 0);
+				nBytes = abs(nBytes);
+				aOutData[nIndex].resize(nBytes);
+
+				HC_Show_One_User_Data(aOutIndices[nIndex], aOutData[nIndex].data(), nBytes);
+			}
+		}
 	}
 
 	SegmentKeyImpl::LocalClose(*this);
 
-	return true;
+	return (0 < nSize) ? true : false;
 }
 
 bool H3DF::SegmentKey::ShowUserDataIndices(IntPtrTArray & aOutIndices) const
@@ -1376,17 +1371,16 @@ bool H3DF::SegmentKey::ShowUserDataIndices(IntPtrTArray & aOutIndices) const
 	SegmentKeyImpl::LocalOpen(*this);
 
 	long nSize = HC_Show_User_Data_Indices(nullptr, 0);
-	nSize = abs(nSize);
-	aOutIndices.resize(nSize);
+	if (0 != nSize) {
+		nSize = abs(nSize);
+		aOutIndices.resize(nSize);
 
-	nSize = HC_Show_User_Data_Indices(aOutIndices.data(), nSize);
-	if (0 == nSize) {
-		return false;
+		nSize = HC_Show_User_Data_Indices(aOutIndices.data(), nSize);
 	}
 
 	SegmentKeyImpl::LocalClose(*this);
 
-	return true;
+	return (0 < nSize) ? true : false;
 }
 
 bool H3DF::SegmentKey::ShowUserData(intptr_t nInIndex, ByteArray & aOutData) const
@@ -1394,16 +1388,16 @@ bool H3DF::SegmentKey::ShowUserData(intptr_t nInIndex, ByteArray & aOutData) con
 	SegmentKeyImpl::LocalOpen(*this);
 
 	long nSize = HC_Show_One_User_Data(nInIndex, nullptr, 0);
-	nSize = abs(nSize);
+	if (0 != nSize) {
 
-	aOutData.resize(nSize);
+		nSize = abs(nSize);
 
-	nSize = HC_Show_One_User_Data(nInIndex, aOutData.data(), nSize);
-	if (0 == nSize) {
-		return false;
+		aOutData.resize(nSize);
+
+		nSize = HC_Show_One_User_Data(nInIndex, aOutData.data(), nSize);
 	}
 
 	SegmentKeyImpl::LocalClose(*this);
 
-	return true;
+	return (0 < nSize) ? true : false;
 }

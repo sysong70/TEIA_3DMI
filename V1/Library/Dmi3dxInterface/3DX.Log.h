@@ -4,20 +4,23 @@
 
 namespace Log
 {
-	void CreateLog(int nId, const WCHAR * pchFilePathName);
-	void Write(int nId, LPCWSTR chMessage, ...);
-	void Write(int nId, LPCSTR chMessage, ...);
-	void IncreaseTabIndex(int nId);
-	void DecreaseTabIndex(int nId);
-
 	void CreateLog(const WCHAR * pchFilePathName);
+
 	void Write(LPCWSTR chMessage, ...);
 	void Write(LPCSTR chMessage, ...);
+
+	void Write(int nLogLevel, LPCWSTR chMessage, ...);
+	void Write(int nLogLevel, LPCSTR chMessage, ...);
+
 	void IncreaseTabIndex();
 	void DecreaseTabIndex();
 
+	void SetLogLevel(int nLogLevel);
+	int GetLogLevel();
+
 	void Position(A3DMDPosition * pcPosition);
 	void Vector3dData(A3DVector3dData & cData, CStringA strPrompt = "");
+	void Vector3dData(int nLogLevel, A3DVector3dData & cData, CStringA strPrompt = "");
 	bool GetName(const A3DRootBaseWithGraphics * pcRootBase, CString & strName);
 	void View(A3DMkpView * pcView, A3DMkpViewData & cViewData);
 	void SurfPlane(A3DSurfPlane * pcInSurfPlane);

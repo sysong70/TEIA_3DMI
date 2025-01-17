@@ -100,8 +100,9 @@ protected:
 		A3DAsmProductOccurrence ** ppcExternalData);
 	A3DStatus ProductOccurrenceGetMarkups(const A3DAsmProductOccurrenceData * pcPOccData, A3DPointerArray * pcArray);
 	A3DStatus ProductOccurrenceGetViews(const A3DAsmProductOccurrenceData * pcPOccData, A3DPointerArray * pcArray);
+	H3DF::Component * FindFirstProductOccurrenceComponentOfTheModelComponent(H3DF::Component & cInComp);
 
-	A3DStatus ProductOccurrenceGetChild(const A3DAsmProductOccurrenceData * pcPOccData, A3DPointerArray * pcArray);
+	A3DStatus ProductOccurrenceGetChildren(const A3DAsmProductOccurrenceData * pcPOccData, A3DPointerArray * pcArray);
 	A3DStatus ProductOccurrenceGetOccurrences(const A3DAsmProductOccurrenceData * pcPOccData, A3DPointerArray * pcArray);
 
 	A3DStatus AnnotationGetMarkups(const A3DMkpAnnotationEntity * pcAnnotation, A3DPointerArray * pcArray);
@@ -132,11 +133,13 @@ protected:
 	A3DStatus DrawRiPolyWire(const A3DRiRepresentationItem * pcRepItem, const A3DRiRepresentationItemData & cRepItemData, const A3DMiscEntityReference * pcInEntityRef,
 		const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData, H3DF::SegmentKey & cSegment);
 
-	A3DStatus DrawRiPointSet(const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcAttr);
+	A3DStatus DrawRiPointSet(const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
+	
+	A3DStatus DrawRiPlane(const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr);
 
 	A3DStatus DrawRiCurve(A3DRiCurve * pcInputRiCurve, H3DF::SegmentKey & cParentSegment, A3DMiscCascadedAttributes * pcParentAttr);
 
-	A3DStatus ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp);
+	A3DStatus ParseMarkupView(const A3DMkpView * pcInView, const A3DMiscCascadedAttributes * pcInParentAttr, H3DF::SegmentKey & cInParentSegment, H3DF::Component & cInParentComp);
 	H3DF::Component * GetViewGroupComponent(H3DF::Component & cInParentComp);
 	H3DF::Component * CreateViewGroupComponent(H3DF::Component & cInParentComp);
 	H3DF::Component * GetAnnotationViewGroupComponent(H3DF::Component & cInParentComp);
@@ -146,14 +149,14 @@ protected:
 	H3DF::Component * GetPmiGroupComponent(H3DF::Component & cParentComp);
 
 	A3DStatus ParseAnnotations(A3DMkpAnnotationEntity ** pcAnnotation, A3DUns32 nAnnotationsSize, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp);
-	A3DStatus ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation, A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp, bool bAddChildToParentComp);
+	A3DStatus ParseAnnotationEntity(const A3DMkpAnnotationEntity * pcInAnnotation, A3DMiscCascadedAttributes * pcInParentAttr, H3DF::SegmentKey & cInParentSegment, H3DF::Component & cInParentComp, bool bAddChildToParentComp);
 
 	A3DStatus DrawAnnotationSet(const A3DMkpAnnotationSet * pcAnnotationSet, H3DF::SegmentKey & cParentSegment, const A3DMiscCascadedAttributes * pcParentAttr);
 	A3DStatus DrawAnnotationReference(const A3DMkpAnnotationItem * /*pcAnnotationItem*/, const A3DMiscCascadedAttributes * /*pcParentAttr*/);
 	A3DStatus ParseAnnotationItem(const A3DMkpAnnotationItem * pcAnnotationItem, const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment);
 	A3DStatus ParseMarkupLinkedItem(A3DMiscMarkupLinkedItem * pcInLinkedItems, A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp);
 
-	A3DStatus ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedAttributesData * psAttribData, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp, bool bAddChildToParentComp);
+	A3DStatus ParseMarkup(const A3DMkpMarkup * pcInMarkup, A3DMiscCascadedAttributesData * psInAttribData, H3DF::SegmentKey & cInParentSegment, H3DF::Component & cInParentComp, bool bAddChildToParentComp);
 	A3DStatus GetMarkupTesselation(const A3DTessBaseData * psTessBaseData, const A3DTessMarkupData * psTessMarkupData, H3DF::PolylineArray & out_polylines, H3DF::PolygonArray & out_polygones,
 		H3DF::StringArray & aOutStrings, H3DF::TextAttributesArray & cOutTextAttributes, H3DF::Options * pcOutPmiOptions = nullptr);
 	A3DStatus GetLeaderLinesAndSymbols(const A3DMkpLeader * pMarkup, H3DF::PolylineArray & out_leader_lines, H3DF::PolygonArray & out_leader_symbols);

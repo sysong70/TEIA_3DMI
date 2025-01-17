@@ -166,27 +166,28 @@ KERNEL::Command::Select::Select(const Session * pcInSession) :
 }
 
 //== Mouse Event 관련 함수 ===========================================================================
-int KERNEL::Command::Select::MouseMove(Event & cInEvent)
+Command::Result::Type KERNEL::Command::Select::MouseMove(Event & cInEvent)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cHighlightOSnapOperator.MouseMove(cInEvent);
 
-	return HLISTENER_PASS_EVENT;
+	return Command::Result::Type::Pass;
 }
 
-int KERNEL::Command::Select::LButtonDown(Event & cInEvent)
+Command::Result::Type KERNEL::Command::Select::LButtonDown(Event & cInEvent)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cLButtonDownPixelPosition.Set(cInEvent.GetMousePixelPoint().x, cInEvent.GetMousePixelPoint().y);
 
-	return 0;
+	return Command::Result::Type::Pass;
 }
 
-bool KERNEL::Command::Select::LButtonUp(Event & cInEvent)
+// #Coding: 1.Select::LButtonUp
+Command::Result::Type KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
@@ -199,17 +200,17 @@ bool KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 		double dLength = pcImpl->m_cLButtonDownPixelPosition.DistanceWith(cMousePixelPosition);
 
 		if (2.0 < dLength) {
-			return false;
+			return Command::Result::Type::Pass;
 		}
 	}
 	else {
-		return false;
+		return Command::Result::Type::Pass;
 	}
 
 	// 2. Dynamic Highlight된 Item을 가져옴. 
 	H3DF::SelectionItem & cSelItem = pcImpl->m_cHighlightOSnapOperator.DynamicHighlightSelectionItem();
 	if (false == cSelItem.IsValid()) {
-		return false;
+		return Command::Result::Type::Pass;
 	}
 
 #ifdef _DEBUG
@@ -274,7 +275,7 @@ bool KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 
 	pcImpl->View().Update();
 
-	return true;
+	return Command::Result::Type::Consume;
 }
 
 //== Object Snap 관련 함수 ===========================================================================

@@ -16,7 +16,7 @@ public:
 	static void Log(int nId, int nLogLevle, LPCWSTR mesg, ...);
 	static void Log(int nId, int nLogLevle, LPCSTR mesg, ...);
 
-	static void CreateLog(int nId, const WCHAR * pchFilePathName);
+	static void CreateLog(int nId, const WCHAR * pchFilePathName, bool bExistsFileDelete = true);
 
 	static LogManager * GetInstance();
 
@@ -45,16 +45,12 @@ public:
 	static void DecreaseTabIndex();
 	static void DecreaseTabIndex(int nId);
 
-	void WriteLog(CString strMessage);
-	void WriteLog(int nId, CString strMessage);
-
-	static void SetFileCloseFlag(bool bFlag);
-	static void SetFileCloseFlag(int nId, bool bFlag);
-
 	static int GetCurrentId() { return m_nCurrentId; }
 	static void SetCurrentId(int nId) { m_nCurrentId = nId; }
 	static void SetLogLevel(int nLogLevel) { m_nLogLevel[m_nCurrentId] = nLogLevel; }
 	static void SetLogLevel(int nId, int nLogLevel) { m_nLogLevel[nId] = nLogLevel; }
+	static int GetLogLevel() { return m_nLogLevel[m_nCurrentId]; }
+	static int GetLogLevel(int nId) { return m_nLogLevel[nId]; }
 
 	static CString HexStr(DWORD_PTR nValue);
 	static CString BoolStr(bool bValue);
@@ -71,6 +67,7 @@ public:
 
 	static CString GetExecuteDirectory();
 	static bool CreateFolder(CString strPath);
+
 protected:
 	
 	bool CStringToChar(CString strText, char *& pchText);
@@ -79,10 +76,8 @@ protected:
 	int Open();
 	int Open(int nId);
 
-/*
-	void Close();
-	void Close(int nId);
-*/
+	void WriteLog(CString strMessage);
+	void WriteLog(int nId, CString strMessage);
 
 private:
 	static Init StaticInitializer;
@@ -91,7 +86,6 @@ private:
 	static LogManager * m_pcLogManger;
 
 	static int m_nFileHandle[LOGMANAGER_MAX_COUNT];
-	static bool m_bFileCloseFlag[LOGMANAGER_MAX_COUNT];
 
 	static CString m_strFilePathName[LOGMANAGER_MAX_COUNT];
 	static CString m_strLogManagerComment[LOGMANAGER_MAX_COUNT];

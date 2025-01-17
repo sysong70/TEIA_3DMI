@@ -57,5 +57,5 @@ namespace H3DF
 		API_3DF Component * GetViewGroupComponent(Component & cInParentComp);
 		API_3DF Component * GetAnnotationViewGroupComponent(Component & cInParentComp);
 		API_3DF Component * GetPmiGroupComponent(Component & cInParentComp);
-	}
+	};
 }

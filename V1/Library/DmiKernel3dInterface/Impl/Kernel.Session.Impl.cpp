@@ -149,8 +149,17 @@ KERNEL::Command::ModelPanel & KERNEL::SessionImpl::ModelPanel()
 //== Mouse 관련 함수 =================================================================================
 bool KERNEL::SessionImpl::MouseMove(int nFlag, int x, int y)
 {
-	// Select(Object Snap) 및 View Control Mouse Event 처리 함수
-	SelectViewControlMouseMove(nFlag, x, y);
+	Command::Event cEvent(Window());
+	cEvent.SetPoint(H3DF::Operator::Event::Type::MouseMove, x, y, MouseMapFlags(nFlag));
+
+	// View Control Mouse Event 처리 함수, Mouse L, R Button Down 상태로 마우스를 이동하면, View Control을 사용하고 있는 것으로
+	// 간주하여 Cosume Type을 리턴한다.
+	if (Command::Result::Type::Consume == CameraControlMouseMove(cEvent)) {
+		return true;
+	}
+
+	// Select(Object Snap) 
+	SelectControlMouseMove(cEvent);
 
 	// Command가 설정되었다면, Command에 명령어를 처리할 수 있도록 좌표를 전달한다.
 	if (false == IsCommandActive()) {
@@ -158,23 +167,38 @@ bool KERNEL::SessionImpl::MouseMove(int nFlag, int x, int y)
 	}
 
 	// 현재 활성화되어 있는 Command에 Left button up 이벤트 전달.
-	CommandMouseMove(nFlag, x, y);
+	CommandMouseMove(cEvent);
 
 	return true;
 }
 
 bool KERNEL::SessionImpl::LButtonDown(int nFlag, int x, int y)
 {
-	// Select(Object Snap) 및 View Control Mouse Event 처리 함수
-	SelectViewControlLButtonDown(nFlag, x, y);
+	Command::Event cEvent(Window());
+	cEvent.SetPoint(H3DF::Operator::Event::Type::LButtonDown, x, y, MouseMapFlags(nFlag));
+
+	// Camera 및 Select Control에서는 L Button Click 위치를 저장해 놓는 단순한 역활만 수행함.
+	// View Control Mouse Event 처리 함수
+	CameraControlLButtonDown(cEvent);
+
+	// Select(Object Snap) 처리 함수
+	SelectControlLButtonDown(cEvent);
 
 	return true;
 }
 
 bool KERNEL::SessionImpl::LButtonUp(int nFlag, int x, int y)
 {
+	Command::Event cEvent(Window());
+	cEvent.SetPoint(H3DF::Operator::Event::Type::LButtonUp, x, y, MouseMapFlags(nFlag));
+
+	// View Control Mouse Event 처리 함수
+	if (Command::Result::Type::Consume == CameraControlLButtonUp(cEvent)) {
+		return true;
+	}
+
 	// Select(Object Snap) 및 View Control Mouse Event 처리 함수
-	SelectViewControlLButtonUp(nFlag, x, y);
+	SelectControlLButtonUp(cEvent);
 
 	// Command가 설정되었다면, Command에 명령어를 처리할 수 있도록 좌표를 전달한다.
 	if(false == IsCommandActive()) {
@@ -182,7 +206,7 @@ bool KERNEL::SessionImpl::LButtonUp(int nFlag, int x, int y)
 	}
 
 	// 현재 활성화되어 있는 Command에 Left button up 이벤트 전달.
-	CommandLButtonUp(nFlag, x, y);
+	CommandLButtonUp(cEvent);
 
 	// Drag 상태를 확인하도록 한다. 명령어는 Mouse Drag 상태에서는 사용하지 않도록 한다.
 	// Current command에 Input 상태를 확인해야 함.
@@ -207,48 +231,37 @@ DWORD KERNEL::SessionImpl::MouseMapFlags(DWORD nState)
 	return nFlag;
 }
 //== View Control 관련 함수 ==========================================================================
-Command::Result::Type KERNEL::SessionImpl::SelectViewControlMouseMove(int nFlag, int x, int y)
+Command::Result::Type KERNEL::SessionImpl::SelectControlMouseMove(Command::Event & cInEvent)
 {
 	if (200 > GetTickCount() - m_nMouseWhellStartTick) {
 		return Command::Result::Type::Pass;
 	}
 
-	Command::Event cEvent(Window());
-	cEvent.SetPoint(H3DF::Operator::Event::Type::MouseMove, x, y, MouseMapFlags(nFlag));
-
-	Camera().MouseMove(cEvent);
-
-	Select().MouseMove(cEvent);
+	Select().MouseMove(cInEvent);
 
 	return Command::Result::Type::Pass;
 }
 
-bool KERNEL::SessionImpl::SelectViewControlLButtonDown(int nFlag, int x, int y)
+bool KERNEL::SessionImpl::SelectControlLButtonDown(Command::Event & cInEvent)
 {
 	// Camera 및 Select 처리
-	m_cLButtonDownPosition.Set(x, y);
+	m_cLButtonDownPixelPoint = cInEvent.GetMousePixelPoint();
 	Select().SetMouseDownTickCount(GetTickCount64());
 
-	Command::Event cEvent(Window());
-	cEvent.SetPoint(H3DF::Operator::Event::Type::LButtonDown, x, y, MouseMapFlags(nFlag));
-
-// 	HEventInfo cEvent((HBaseView *) GetBaseView());
-// 	cEvent.SetPoint(HE_LButtonDown, x, y, MouseMapFlags(nFlag));
-
 	// 카메라에서 LButtonDown 처리는 First Point등을 설정하는 것임.
-	Camera().LButtonDown(cEvent);
+	// Camera().LButtonDown(cInEvent);
 
 	// Select에서 LButtonDown 처리는 버튼 위치를 저장하는 것임.
-	Select().LButtonDown(cEvent);
+	Select().LButtonDown(cInEvent);
 
 	return true;
 }
 
 // 3. Select 및 View Control Mouse Event 처리 함수 
-Command::Result::Type KERNEL::SessionImpl::SelectViewControlLButtonUp(int nFlag, int x, int y)
+Command::Result::Type KERNEL::SessionImpl::SelectControlLButtonUp(Command::Event & cInEvent)
 {
-	H3DF::Point2D cLButtonUpPosition(x, y);
 	Select().SetMouseUpTickCount(GetTickCount64());
+/*
 
 	// Camera 관련 처리
 	H3DF::Camera::Mode eMode = Camera().CameraMode();
@@ -257,12 +270,66 @@ Command::Result::Type KERNEL::SessionImpl::SelectViewControlLButtonUp(int nFlag,
 		GetCanvas().GetFrontView().SuppressUpdate(true);
 	}
 
-	Command::Event cEvent(Window());
-	cEvent.SetPoint(H3DF::Operator::Event::Type::LButtonUp, x, y, MouseMapFlags(nFlag));
+	// NavigationCube가 선택된 경우를 처리한다. NavigationCube가 선택되어 View를 변경한 경우에는 
+	// HLISTENER_CONSUME_EVENT값을 리턴한다.
+	if (Command::Result::Type::Consume == Camera().LButtonUp(cInEvent)) {
+		return Command::Result::Type::Consume;
+	}
+
+	if (H3DF::Camera::Mode::ZoomBox == eMode) {
+		Select().DrawSnapItems();
+		GetCanvas().GetFrontView().SuppressUpdate(false);
+		GetCanvas().GetFrontView().Update();
+
+		return Command::Result::Type::Consume;
+	}
+*/
+
+	// 카메라 처리가 끝나면 Select 처리를 한다.
+	// 앞단에서, NavigationCube가 선택되어 View가 변경된 경우에는 Select 처리를 하지 않는다.
+	Select().LButtonUp(cInEvent);
+
+	// 선택된 값을 판단해서 InputType을 리턴한다.
+
+	return Command::Result::Type::Pass;
+}
+
+//== Camera Control 관련 함수 ========================================================================
+Command::Result::Type KERNEL::SessionImpl::CameraControlMouseMove(Command::Event & cInEvent)
+{
+	if (200 > GetTickCount() - m_nMouseWhellStartTick) {
+		return Command::Result::Type::Pass;
+	}
+
+	return Camera().MouseMove(cInEvent);
+}
+
+Command::Result::Type KERNEL::SessionImpl::CameraControlLButtonDown(Command::Event & cInEvent)
+{
+	// Camera 및 Select 처리
+	m_cLButtonDownPixelPoint = cInEvent.GetMousePixelPoint();
+	Select().SetMouseDownTickCount(GetTickCount64());
+
+	// 카메라에서 LButtonDown 처리는 First Point등을 설정하는 것임.
+	return Camera().LButtonDown(cInEvent);
+
+	// Select에서 LButtonDown 처리는 버튼 위치를 저장하는 것임.
+	// Select().LButtonDown(cInEvent);
+}
+
+// 3. Select 및 View Control Mouse Event 처리 함수 
+Command::Result::Type KERNEL::SessionImpl::CameraControlLButtonUp(Command::Event & cInEvent)
+{
+	// Camera 관련 처리
+	H3DF::Camera::Mode eMode = Camera().CameraMode();
+
+	if (H3DF::Camera::Mode::ZoomBox == eMode) {
+		GetCanvas().GetFrontView().SuppressUpdate(true);
+	}
 
 	// NavigationCube가 선택된 경우를 처리한다. NavigationCube가 선택되어 View를 변경한 경우에는 
 	// HLISTENER_CONSUME_EVENT값을 리턴한다.
-	if (Command::Result::Type::Consume == Camera().LButtonUp(cEvent)) {
+	if (Command::Result::Type::Consume == Camera().LButtonUp(cInEvent)) {
 		return Command::Result::Type::Consume;
 	}
 
@@ -276,7 +343,7 @@ Command::Result::Type KERNEL::SessionImpl::SelectViewControlLButtonUp(int nFlag,
 
 	// 카메라 처리가 끝나면 Select 처리를 한다.
 	// 앞단에서, NavigationCube가 선택되어 View가 변경된 경우에는 Select 처리를 하지 않는다.
-	Select().LButtonUp(cEvent);
+	// Select().LButtonUp(cInEvent);
 
 	// 선택된 값을 판단해서 InputType을 리턴한다.
 
@@ -399,12 +466,9 @@ bool KERNEL::SessionImpl::IsCommandActive()
 	return !m_vpcCommandSets.empty();
 }
 
-bool KERNEL::SessionImpl::CommandLButtonUp(int nFlag, int x, int y)
+bool KERNEL::SessionImpl::CommandLButtonUp(Command::Event & cInEvent)
 {
-	Command::Event cEvent(Window());
-	cEvent.SetPoint(H3DF::Operator::Event::Type::LButtonUp, x, y, MouseMapFlags(nFlag));
-
-	m_vpcCommandSets.front()->EventExecution(cEvent);
+	m_vpcCommandSets.front()->EventExecution(cInEvent);
 /*
 	for (auto & pcCommand : m_vpcCommandSets) {
 		pcCommand->LButtonUp(cEvent);
@@ -414,12 +478,10 @@ bool KERNEL::SessionImpl::CommandLButtonUp(int nFlag, int x, int y)
 	return true;
 }
 
-bool KERNEL::SessionImpl::CommandMouseMove(int nFlag, int x, int y)
+bool KERNEL::SessionImpl::CommandMouseMove(Command::Event & cInEvent)
 {
-	Command::Event cEvent(Window());
-	cEvent.SetPoint(H3DF::Operator::Event::Type::MouseMove, x, y, MouseMapFlags(nFlag));
-
-	m_vpcCommandSets.front()->EventExecution(cEvent);
+	// 첫번째 Command에 MouseMove 이벤트를 전달한다.
+	m_vpcCommandSets.front()->EventExecution(cInEvent);
 
 	return true;
 }

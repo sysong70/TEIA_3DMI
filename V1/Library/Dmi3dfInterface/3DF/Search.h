@@ -332,7 +332,7 @@ namespace H3DF
 		Search() {}
 	};
 
-	using SearchTypeArray = std::vector<Search::Type, Allocator<Search::Type> >;
+	using SearchTypeArray = std::vector<Search::Type>;
 
 	class SearchOptionsKit : public Kit
 	{

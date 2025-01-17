@@ -49,8 +49,6 @@
 
 #include "3DX.Log.h"
 
-#	define USED_LOG_MANAGER
-
 #ifdef _DEBUG
 #	define USED_LOG_MANAGER
 
@@ -138,8 +136,9 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 	CString strExecuteDirectory = LogManager::GetExecuteDirectory();
 	LogManager::CreateFolder(strExecuteDirectory + L"\\Log");
 
-	CString strLogFilePathName = strExecuteDirectory + L"\\Log\\3DX_ExcuteFunction.log";
-	Log::CreateLog(2, strLogFilePathName);
+	CString strLogFilePathName = strExecuteDirectory + L"Log\\3DX_ExcuteFunction.log";
+	Log::CreateLog(strLogFilePathName);
+	Log::SetLogLevel(0);
 
 	//m_cA3dTracer.CreateLog(L"D:\\Temp\\A3dXInfo.log");
 	//CreateLog(1, L"d:\\Temp\\AssyStruct.log");
@@ -160,17 +159,15 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 	//cParamsLoadData.m_sGeneral.m_eReadGeomTessMode = kA3DReadGeomAndTess;
 	cParamsLoadData.m_sGeneral.m_eReadGeomTessMode = kA3DReadTessOnly;
 #else
+	Log::Write("Import Option");
+	Log::IncreaseTabIndex();
 	//:WARNING - do not initialize
 	A3DRWParamsLoadData cParamsLoadData;
 	TheFileOptions.Import.Get(strFilePathName, cParamsLoadData);
+
+	Log::Write("ReadHiddenObjects: %s", Log::BoolStrA(cParamsLoadData.m_sGeneral.m_bReadHiddenObjects));
+	Log::DecreaseTabIndex();
 #endif
-
-	Log::Write(2, "Import Option");
-	
-	Log::IncreaseTabIndex(2);
-	Log::Write(2, "ReadHiddenObjects: %s", Log::BoolStrA(cParamsLoadData.m_sGeneral.m_bReadHiddenObjects));
-	Log::DecreaseTabIndex(2);
-
 
 	// 이 부분을 True로 만들어야, 파일 내부에 있는 Assy File 정보와 일치하지 않는 경우도 같은 하부 Directory를 찾아서 로드한다.
 	cParamsLoadData.m_sAssembly.m_bUseRootDirectory = true;
@@ -264,7 +261,7 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 		H3DF::ComponentUtility::SetData(cInCADModel, strFileTitle, cModelSegment.KeyValue(), INVALID_KEY);
 
 		// Models Component 생성
-		H3DF::Component * pcModelsComponent = AddComponent(cModels, L"Models", H3DF::Component::Type::ModelsComponent, cInCADModel);
+		H3DF::Component * pcModelsComponent = AddComponent(cModels, L"Models", H3DF::Component::Type::ExchangeModelFile, cInCADModel);
 		m_pcModelsComponent = pcModelsComponent;
 		pcCdModelImpl->m_pcModels = pcModelsComponent;
 
@@ -374,12 +371,19 @@ bool TdfImport::SetDefaultParamsLoadData(A3DRWParamsLoadData & cParamsLoadData)
 
 	return true;
 }
+
+class A
+{
+public:
+
+};
+
 //== 1. 3DF 변환 관련 함수 ============================================================================
 bool TdfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, H3DF::SegmentKey & cModelSegment)
 {
-	Log::Write(2, L"ConvertAsmModelFile: %s, '%s'", Log::HexStr((DWORD_PTR)pcAsmModelFile), m_strCadFileName);
+	Log::Write(L"ConvertAsmModelFile: %s, '%s'", Log::HexStr((DWORD_PTR)pcAsmModelFile), m_strCadFileName);
 
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
 	// 	UINT nProcessCount = std::thread::hardware_concurrency();
 	// 	m_pcThreadPoolpool = new ThreadPool(nProcessCount);
@@ -443,9 +447,9 @@ bool TdfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, H3DF::Seg
 
 	A3DGlobalGet(nullptr, &m_cGlobalData);
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
-	Log::Write(2, L"ConvertAsmModelFile End");
+	Log::Write(L"ConvertAsmModelFile End");
 
 	return true;
 }
@@ -463,9 +467,9 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcPocc, A3
 	CString strPoName;
 	GetName(pcPocc, strPoName);
 
-	Log::Write(2, L"ParseProductOccurrence: %s, pocc%d, '%s'", Log::HexStr((DWORD_PTR)pcPocc), m_nIncrementalId, strPoName);
+	Log::Write(L"ParseProductOccurrence: %s, pocc%d, '%s'", Log::HexStr((DWORD_PTR)pcPocc), m_nIncrementalId, strPoName);
 
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
 	// Segment를 생성하고 생성된 Segment를 Parent Segment에 Include한다.
 	CStringA strSegmentName;
@@ -477,8 +481,8 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcPocc, A3
 	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, strPoName, H3DF::Component::Type::ExchangeProductOccurrence, cParentComp);
 
 	//cSegment.Open(); // Segment를 Open하면 문제가 생김. 검토가 필요함.
-
 	H3DF::UserData::SetSegmentName(cSegment, strPoName);
+	H3DF::UserData::SetComponentType(cSegment, (DWORD) H3DF::Component::Type::ExchangeProductOccurrence);
 
 	// Attribute 생성
 	// Parent에서 받은(계단식으로) Attribute를 이용해서, Attribute를 생성
@@ -486,165 +490,196 @@ A3DStatus TdfImport::ParseProductOccurrence(A3DAsmProductOccurrence * pcPocc, A3
 	A3DMiscCascadedAttributesData cAttrsData;
 	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcPocc, pcParentAttr, &pcAttrs, &cAttrsData));
 
-	if (cAttrsData.m_bShow && !cAttrsData.m_bRemoved && A3D_SUCCESS == IsShow(pcPocc))
+	if (!(cAttrsData.m_bShow && !cAttrsData.m_bRemoved && A3D_SUCCESS == IsShow(pcPocc)))
 	{
-		A3DAsmProductOccurrenceData cPoccData;
-		A3D_INITIALIZE_DATA(A3DAsmProductOccurrenceData, cPoccData);
-		CHECK_A3D_RETURN(A3DAsmProductOccurrenceGet(pcPocc, &cPoccData));
+		Log::Write(L"Product Occurrence is not shown");
+		Log::DecreaseTabIndex();
+		return A3D_SUCCESS;
+	}
 
-		A3DAsmProductOccurrenceData cPoccPrototypeData;
-		A3D_INITIALIZE_DATA(A3DAsmProductOccurrenceData, cPoccPrototypeData);
+	A3DAsmProductOccurrenceData cPoccData;
+	A3D_INITIALIZE_DATA(A3DAsmProductOccurrenceData, cPoccData);
+	CHECK_A3D_RETURN(A3DAsmProductOccurrenceGet(pcPocc, &cPoccData));
 
-		if (nullptr != cPoccData.m_pPrototype) {
-			A3DAsmProductOccurrenceGet(cPoccData.m_pPrototype, &cPoccPrototypeData);
+	A3DAsmProductOccurrenceData cPoccPrototypeData;
+	A3D_INITIALIZE_DATA(A3DAsmProductOccurrenceData, cPoccPrototypeData);
+
+	if (nullptr != cPoccData.m_pPrototype) {
+		A3DAsmProductOccurrenceGet(cPoccData.m_pPrototype, &cPoccPrototypeData);
+	}
+
+	if (0 < cPoccData.m_uiEntityReferenceSize || 0 < cPoccPrototypeData.m_uiEntityReferenceSize) {
+		Log::IncreaseTabIndex();
+		Log::Write(L"Pocc Reference Count: %d", cPoccData.m_uiEntityReferenceSize);
+
+		Log::IncreaseTabIndex();
+		for (A3DUns32 nIndex = 0; nIndex < cPoccData.m_uiEntityReferenceSize; nIndex++) {
+			A3DMiscEntityReference * pcEntityRef = cPoccData.m_ppEntityReferences[nIndex];
+
+			A3DMiscEntityReferenceData cEntityRefData;
+			A3D_INITIALIZE_DATA(A3DMiscEntityReferenceData, cEntityRefData);
+			A3DMiscEntityReferenceGet(pcEntityRef, &cEntityRefData);
+
+			A3DEEntityType eType;
+			A3DEntityGetType(cEntityRefData.m_pEntity, &eType);
+
+			m_mEntityReferenceMap.insert(std::make_pair(cEntityRefData.m_pEntity, pcEntityRef));
+
+			Log::Write(L"%d. Ref Data Entity: %s, %s", nIndex, Log::HexStr((DWORD_PTR)cEntityRefData.m_pEntity), Dmi3dx::GetA3dEntityTypeString(eType));
+
+			A3DMiscEntityReferenceGet(NULL, &cEntityRefData);
 		}
 
-		if (0 < cPoccData.m_uiEntityReferenceSize || 0 < cPoccPrototypeData.m_uiEntityReferenceSize) {
-			Log::IncreaseTabIndex(2);
-			Log::Write(2, L"Pocc Reference Count: %d", cPoccData.m_uiEntityReferenceSize);
+		for (A3DUns32 nIndex = 0; nIndex < cPoccPrototypeData.m_uiEntityReferenceSize; nIndex++) {
+			A3DMiscEntityReference * pcEntityRef = cPoccPrototypeData.m_ppEntityReferences[nIndex];
 
-			Log::IncreaseTabIndex(2);
-			for (A3DUns32 nIndex = 0; nIndex < cPoccData.m_uiEntityReferenceSize; nIndex++) {
-				A3DMiscEntityReference * pcEntityRef = cPoccData.m_ppEntityReferences[nIndex];
+			A3DMiscEntityReferenceData cEntityRefData;
+			A3D_INITIALIZE_DATA(A3DMiscEntityReferenceData, cEntityRefData);
+			A3DMiscEntityReferenceGet(pcEntityRef, &cEntityRefData);
 
-				A3DMiscEntityReferenceData cEntityRefData;
-				A3D_INITIALIZE_DATA(A3DMiscEntityReferenceData, cEntityRefData);
-				A3DMiscEntityReferenceGet(pcEntityRef, &cEntityRefData);
+			A3DEEntityType eType;
+			A3DEntityGetType(cEntityRefData.m_pEntity, &eType);
 
-				A3DEEntityType eType;
-				A3DEntityGetType(cEntityRefData.m_pEntity, &eType);
+			m_mEntityReferenceMap.insert(std::make_pair(cEntityRefData.m_pEntity, pcEntityRef));
 
-				m_mEntityReferenceMap.insert(std::make_pair(cEntityRefData.m_pEntity, pcEntityRef));
+			Log::Write(L"%d. Prototype Ref Data Entity: %s, %s", nIndex, Log::HexStr((DWORD_PTR)cEntityRefData.m_pEntity), Dmi3dx::GetA3dEntityTypeString(eType));
 
-				Log::Write(2, L"%d. Ref Data Entity: %s, %s", nIndex, Log::HexStr((DWORD_PTR)cEntityRefData.m_pEntity), Dmi3dx::GetA3dEntityTypeString(eType));
-
-				A3DMiscEntityReferenceGet(NULL, &cEntityRefData);
-			}
-
-			for (A3DUns32 nIndex = 0; nIndex < cPoccPrototypeData.m_uiEntityReferenceSize; nIndex++) {
-				A3DMiscEntityReference * pcEntityRef = cPoccPrototypeData.m_ppEntityReferences[nIndex];
-
-				A3DMiscEntityReferenceData cEntityRefData;
-				A3D_INITIALIZE_DATA(A3DMiscEntityReferenceData, cEntityRefData);
-				A3DMiscEntityReferenceGet(pcEntityRef, &cEntityRefData);
-
-				A3DEEntityType eType;
-				A3DEntityGetType(cEntityRefData.m_pEntity, &eType);
-
-				m_mEntityReferenceMap.insert(std::make_pair(cEntityRefData.m_pEntity, pcEntityRef));
-
-				Log::Write(2, L"%d. Prototype Ref Data Entity: %s, %s", nIndex, Log::HexStr((DWORD_PTR)cEntityRefData.m_pEntity), Dmi3dx::GetA3dEntityTypeString(eType));
-
-				A3DMiscEntityReferenceGet(NULL, &cEntityRefData);
-			}
-
-			Log::DecreaseTabIndex(2);
-
-			Log::DecreaseTabIndex(2);
+			A3DMiscEntityReferenceGet(NULL, &cEntityRefData);
 		}
 
-		if (cPoccData.m_ucBehaviour != 1)
-		{
+		Log::DecreaseTabIndex();
+
+		Log::DecreaseTabIndex();
+	}
+
+	if (cPoccData.m_ucBehaviour != 1)
+	{
 /*
-			A3DRootBaseData cRootBaseData;
-			A3D_INITIALIZE_DATA(A3DRootBaseData, cRootBaseData);
-			CHECK_A3D_RETURN(A3DRootBaseGet(pcOccurrence, &cRootBaseData));
+		A3DRootBaseData cRootBaseData;
+		A3D_INITIALIZE_DATA(A3DRootBaseData, cRootBaseData);
+		CHECK_A3D_RETURN(A3DRootBaseGet(pcOccurrence, &cRootBaseData));
 
-			if(cRootBaseData.m_uiSize > 0)
+		if(cRootBaseData.m_uiSize > 0)
+		{
+			for(A3DUns32 ui = 0; ui < cRootBaseData.m_uiSize; ui++)
 			{
-				for(A3DUns32 ui = 0; ui < cRootBaseData.m_uiSize; ui++)
-				{
-					A3DMiscAttributeData sMiscAttrData;
-					A3D_INITIALIZE_DATA(A3DMiscAttributeData, sMiscAttrData);
-					CHECK_A3D_RETURN(A3DMiscAttributeGet(cRootBaseData.m_ppAttributes[ui], &sMiscAttrData));
-					CHECK_A3D_RETURN(A3DMiscAttributeGet(nullptr, &sMiscAttrData));
-				}
+				A3DMiscAttributeData sMiscAttrData;
+				A3D_INITIALIZE_DATA(A3DMiscAttributeData, sMiscAttrData);
+				CHECK_A3D_RETURN(A3DMiscAttributeGet(cRootBaseData.m_ppAttributes[ui], &sMiscAttrData));
+				CHECK_A3D_RETURN(A3DMiscAttributeGet(nullptr, &sMiscAttrData));
 			}
+		}
 */
 
-			H3DF::MatrixKit cMatrix;
-			if (A3D_SUCCESS == ProductOccurrenceGetLocation(&cPoccData, cMatrix)) {
-				if (false == cMatrix.IsIdentity()) {
-					cSegment.SetModellingMatrix(cMatrix);
-				}
+		H3DF::MatrixKit cMatrix;
+		if (A3D_SUCCESS == ProductOccurrenceGetLocation(&cPoccData, cMatrix)) {
+			if (false == cMatrix.IsIdentity()) {
+				cSegment.SetModellingMatrix(cMatrix);
 			}
-
-			A3DAsmPartDefinition * pcPart = nullptr;
-			CHECK_A3D_RETURN(ProductOccurrenceGetPart(&cPoccData, &pcPart));
-			if (nullptr != pcPart) {
-
-				A3DMiscEntityReference * pcEntityRef = nullptr;
-				auto pcIterator = m_mEntityReferenceMap.find(pcPocc);
-				if (pcIterator != m_mEntityReferenceMap.end()) {
-					pcEntityRef = pcIterator->second;
-				}
-
-				CHECK_A3D_RETURN(ParsePart(pcPart, pcAttrs, dModelScale, pcEntityRef, cSegment, *pcComponent));
-			}
-
-			A3DPointerArray apcChildArray;
-			PointerArrayInitialize(&apcChildArray);
-			CHECK_A3D_RETURN(ProductOccurrenceGetChild(&cPoccData, &apcChildArray));
-
-			A3DUns32 nSize = apcChildArray.m_uiSize;
-
-			Log::Write(2, L"ParseProductOccurrence Child Count: %d", nSize);
-
-			for (A3DUns32 nIndex = 0; nIndex < nSize; nIndex++) {
-				CHECK_A3D_RETURN(ParseProductOccurrence(apcChildArray.m_ppPointers[nIndex], pcAttrs, dModelScale, cSegment, *pcComponent));
-			}
-
-			PointerArrayTerminate(&apcChildArray);
-
-			//m_bDrawMarkups = false;
-
-			if (true == m_bDrawMarkups)
-			{
-				A3DPointerArray cMarkups, cViews;
-				PointerArrayInitialize(&cMarkups);
-				PointerArrayInitialize(&cViews);
-
-				// Product Occurrence Markup 정보 수집
-				// ProductOccurrenceGetMarkups(&cData, &cMarkups);
-				// Product Occurrence View 정보 수집
-				ProductOccurrenceGetViews(&cPoccData, &cViews);
-
-				Log::Write(2, L"ParseProductOccurrence View Size: %d", cViews.m_uiSize);
-
-				nSize = cViews.m_uiSize;
-
-				for (A3DUns32 nIndex = 0; nIndex < nSize; nIndex++) {
-					CHECK_A3D_RETURN(ParseMarkupView(cViews.m_ppPointers[nIndex], pcAttrs, cSegment, *pcComponent));
-				}
-
-				Log::Write(2, L"ParseProductOccurrence Annotations Size: %d", cPoccData.m_uiAnnotationsSize);
-				ParseAnnotations(cPoccData.m_ppAnnotations, cPoccData.m_uiAnnotationsSize, cSegment, *pcComponent);
-
-// 				nSize = cMarkups.m_uiSize;
-// 				for(UINT nIndex = 0; nIndex < nSize; nIndex++) {
-// 					ParseAnnotation(cMarkups.m_ppPointers[nIndex], pcAttrs, cSegment);
-// 					//CHECK_A3D_RETURN(BuildMarkup(cMarkups.m_ppPointers[nIndex], pcAttrs, cSegment));
-// 				}
-
-				// PointerArrayTerminate(&cMarkups);
-				PointerArrayTerminate(&cViews);
-			}
-
-			//CHECK_A3D_RETURN(A3DRootBaseGet(nullptr, &cRootBaseData));
 		}
 
-		CHECK_A3D_RETURN(A3DAsmProductOccurrenceGet(nullptr, &cPoccData));
+		A3DAsmPartDefinition * pcPart = nullptr;
+		CHECK_A3D_RETURN(ProductOccurrenceGetPart(&cPoccData, &pcPart));
+		if (nullptr != pcPart) {
+
+			A3DMiscEntityReference * pcEntityRef = nullptr;
+			auto pcIterator = m_mEntityReferenceMap.find(pcPocc);
+			if (pcIterator != m_mEntityReferenceMap.end()) {
+				pcEntityRef = pcIterator->second;
+			}
+
+			CHECK_A3D_RETURN(ParsePart(pcPart, pcAttrs, dModelScale, pcEntityRef, cSegment, *pcComponent));
+		}
+
+		A3DPointerArray apcChildArray;
+		PointerArrayInitialize(&apcChildArray);
+		CHECK_A3D_RETURN(ProductOccurrenceGetChildren(&cPoccData, &apcChildArray));
+
+		A3DUns32 nSize = apcChildArray.m_uiSize;
+
+		Log::Write(L"ParseProductOccurrence Child Count: %d", nSize);
+
+		for (A3DUns32 nIndex = 0; nIndex < nSize; nIndex++) {
+			CHECK_A3D_RETURN(ParseProductOccurrence(apcChildArray.m_ppPointers[nIndex], pcAttrs, dModelScale, cSegment, *pcComponent));
+		}
+
+		PointerArrayTerminate(&apcChildArray);
+
+		//m_bDrawMarkups = false;
+
+		if (true == m_bDrawMarkups)
+		{
+			A3DPointerArray cViews;
+			PointerArrayInitialize(&cViews);
+
+			// Product Occurrence Markup 정보 수집
+			// ProductOccurrenceGetMarkups(&cData, &cMarkups);
+
+			// Product Occurrence View 정보 수집
+			ProductOccurrenceGetViews(&cPoccData, &cViews);
+
+			Log::Write(L"ParseProductOccurrence View Size: %d", cViews.m_uiSize);
+
+			nSize = cViews.m_uiSize;
+
+			Log::IncreaseTabIndex();
+
+			for (A3DUns32 nIndex = 0; nIndex < nSize; nIndex++) {
+				CHECK_A3D_RETURN(ParseMarkupView(cViews.m_ppPointers[nIndex], pcAttrs, cSegment, *pcComponent));
+			}
+
+			Log::DecreaseTabIndex();
+
+			Log::Write(L"ParseProductOccurrence Annotations Size: %d", cPoccData.m_uiAnnotationsSize);
+
+			H3DF::Component * pcPmiGroupComponent = GetPmiGroupComponent(*pcComponent);
+			DEBUG_VALID(pcPmiGroupComponent);
+
+			SegmentKey cPmiGroupSegment(pcPmiGroupComponent->GetSegmentKey());
+			ParseAnnotations(cPoccData.m_ppAnnotations, cPoccData.m_uiAnnotationsSize, cPmiGroupSegment, *pcPmiGroupComponent);
+
+			if (nullptr != cPoccData.m_pPrototype)
+			{
+				A3DPointerArray cPrototypeViews;
+				PointerArrayInitialize(&cPrototypeViews);
+
+				// Product Occurrence View 정보 수집
+				ProductOccurrenceGetViews(&cPoccPrototypeData, &cPrototypeViews);
+
+				Log::Write(L"ParseProductOccurrence Prototype View Size: %d", cPrototypeViews.m_uiSize);
+
+				nSize = cPrototypeViews.m_uiSize;
+
+				Log::IncreaseTabIndex();
+
+				for (A3DUns32 nIndex = 0; nIndex < nSize; nIndex++) {
+					CHECK_A3D_RETURN(ParseMarkupView(cPrototypeViews.m_ppPointers[nIndex], pcAttrs, cSegment, *pcComponent));
+				}
+
+				Log::DecreaseTabIndex();
+
+				Log::Write(L"ParseProductOccurrence Prototype Annotations Size: %d", cPoccPrototypeData.m_uiAnnotationsSize);
+
+				SegmentKey cPmiGroupSegment(pcPmiGroupComponent->GetSegmentKey());
+				ParseAnnotations(cPoccPrototypeData.m_ppAnnotations, cPoccPrototypeData.m_uiAnnotationsSize, cPmiGroupSegment, *pcPmiGroupComponent);
+
+				PointerArrayTerminate(&cPrototypeViews);
+			}
+
+			PointerArrayTerminate(&cViews);
+		}
+
+		//CHECK_A3D_RETURN(A3DRootBaseGet(nullptr, &cRootBaseData));
 	}
-	else {
-		Log::Write(2, L"Product Occurrence is not shown");
-	}
+
+	CHECK_A3D_RETURN(A3DAsmProductOccurrenceGet(nullptr, &cPoccData));
 
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttrs));
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrsData));
 
 	//cSegment.Close();
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	return A3D_SUCCESS;
 }
@@ -698,7 +733,7 @@ A3DStatus TdfImport::ProductOccurrenceGetLocation(A3DAsmProductOccurrenceData co
 		}
 	}
 
-	Log::Write(2, L"GetProductOccurrenceTransformMatrix");
+	Log::Write(L"GetProductOccurrenceTransformMatrix");
 
 	return A3D_ERROR;
 }
@@ -819,7 +854,7 @@ A3DStatus TdfImport::ProductOccurrenceGetViews(const A3DAsmProductOccurrenceData
 	if (pcPoccData == nullptr || pcArray == nullptr)
 		return A3D_ERROR;
 
-	if (pcPoccData->m_uiViewsSize == 0 && pcPoccData->m_pPrototype != nullptr) {
+	if (0 == pcPoccData->m_uiViewsSize == 0 && nullptr != pcPoccData->m_pPrototype) {
 		A3DAsmProductOccurrenceData sPrototypeData;
 		A3D_INITIALIZE_DATA(A3DAsmProductOccurrenceData, sPrototypeData);
 		CHECK_A3D_RETURN(A3DAsmProductOccurrenceGet(pcPoccData->m_pPrototype, &sPrototypeData));
@@ -835,8 +870,37 @@ A3DStatus TdfImport::ProductOccurrenceGetViews(const A3DAsmProductOccurrenceData
 	return A3D_SUCCESS;
 }
 
+// 2-1-4. 주어진 Component에서 상위 Product Occurrence를 검색해서, Model 아래의 첫번째 Product Occurrence를 가져옴
+H3DF::Component * TdfImport::FindFirstProductOccurrenceComponentOfTheModelComponent(H3DF::Component & cInComp)
+{
+	Component * pcComp = &cInComp;
+	Component * pcOwner = nullptr;
+
+	while (nullptr != pcComp) {
+		pcOwner = pcComp->GetOwner();
+		if (nullptr == pcOwner) {
+			return nullptr;
+		}
+
+		Component::Type cCompType = pcComp->GetType();
+		Component::Type cOwnerCompType = pcOwner->GetType();
+
+		// 현재 Component의 Type을 확인
+		if (Component::Type::ExchangeProductOccurrence == pcComp->GetType()) {
+			// Owner가 Model이면, Product Occurrence를 찾은 것임
+			if (Component::Type::ExchangeModelFile == pcOwner->GetType()) {
+				return pcComp;
+			}
+		}
+
+		pcComp = pcOwner;
+	}
+
+	return nullptr;
+}
+
 // 2-2. Product Occurrence의 Child를 가져오는 함수
-A3DStatus TdfImport::ProductOccurrenceGetChild(const A3DAsmProductOccurrenceData * pcPOccData, A3DPointerArray * pcArray)
+A3DStatus TdfImport::ProductOccurrenceGetChildren(const A3DAsmProductOccurrenceData * pcPOccData, A3DPointerArray * pcArray)
 {
 	if (pcPOccData == nullptr || pcArray == nullptr)
 		return A3D_ERROR;
@@ -855,7 +919,7 @@ A3DStatus TdfImport::ProductOccurrenceGetChild(const A3DAsmProductOccurrenceData
 
 		if (pcArray->m_uiSize == 0)
 		{
-			CHECK_A3D_RETURN(ProductOccurrenceGetChild(&sExternalDataData, pcArray));
+			CHECK_A3D_RETURN(ProductOccurrenceGetChildren(&sExternalDataData, pcArray));
 		}
 		else {
 			PointerArrayAdd(pcArray, pExternal);
@@ -895,25 +959,25 @@ A3DStatus TdfImport::ProductOccurrenceGetOccurrences(const A3DAsmProductOccurren
 
 }
 // 2-3. Annotation Markups을 가져옴
-A3DStatus TdfImport::AnnotationGetMarkups(const A3DMkpAnnotationEntity * pcAnnotation, A3DPointerArray * pcArray)
+A3DStatus TdfImport::AnnotationGetMarkups(const A3DMkpAnnotationEntity * pcInAnnotation, A3DPointerArray * pcArray)
 {
 	A3DStatus iRet = A3D_SUCCESS;
 	A3DEEntityType eType = kA3DTypeUnknown;
 
-	CHECK_A3D_RETURN(A3DEntityGetType(pcAnnotation, &eType));
+	CHECK_A3D_RETURN(A3DEntityGetType(pcInAnnotation, &eType));
 
 	switch (eType)
 	{
 		case kA3DTypeMkpAnnotationSet:
-			CHECK_A3D_RETURN(AnnotationSetGetMarkups(pcAnnotation, pcArray));
+			CHECK_A3D_RETURN(AnnotationSetGetMarkups(pcInAnnotation, pcArray));
 			break;
 
 		case kA3DTypeMkpAnnotationReference:
-			CHECK_A3D_RETURN(AnnotationReferenceGetMarkups(pcAnnotation, pcArray));
+			CHECK_A3D_RETURN(AnnotationReferenceGetMarkups(pcInAnnotation, pcArray));
 			break;
 
 		case kA3DTypeMkpAnnotationItem:
-			CHECK_A3D_RETURN(AnnotationItemGetMarkups(pcAnnotation, pcArray));
+			CHECK_A3D_RETURN(AnnotationItemGetMarkups(pcInAnnotation, pcArray));
 			break;
 
 		default:
@@ -925,13 +989,13 @@ A3DStatus TdfImport::AnnotationGetMarkups(const A3DMkpAnnotationEntity * pcAnnot
 }
 
 // 2-3-1. Annotation Set Markups을 가져옴
-A3DStatus TdfImport::AnnotationSetGetMarkups(const A3DMkpAnnotationSet * pcAnnotationSet, A3DPointerArray * pcArray)
+A3DStatus TdfImport::AnnotationSetGetMarkups(const A3DMkpAnnotationSet * pcInAnnotationSet, A3DPointerArray * pcArray)
 {
 	A3DStatus iRet = A3D_SUCCESS;
 
 	A3DMkpAnnotationSetData sAnnotationSetData;
 	A3D_INITIALIZE_DATA(A3DMkpAnnotationSetData, sAnnotationSetData);
-	CHECK_A3D_RETURN(A3DMkpAnnotationSetGet(pcAnnotationSet, &sAnnotationSetData));
+	CHECK_A3D_RETURN(A3DMkpAnnotationSetGet(pcInAnnotationSet, &sAnnotationSetData));
 
 	for (A3DUns32 ui = 0; ui < sAnnotationSetData.m_uiAnnotationsSize; ui++)
 	{
@@ -944,9 +1008,9 @@ A3DStatus TdfImport::AnnotationSetGetMarkups(const A3DMkpAnnotationSet * pcAnnot
 }
 
 // 2-3-2. Annotation Reference Markups을 가져옴
-A3DStatus TdfImport::AnnotationReferenceGetMarkups(const A3DMkpAnnotationItem * pcAnnotationItem, A3DPointerArray * pcArray)
+A3DStatus TdfImport::AnnotationReferenceGetMarkups(const A3DMkpAnnotationItem * pcInAnnotationItem, A3DPointerArray * pcArray)
 {
-	if (pcAnnotationItem == nullptr || pcArray == nullptr) {
+	if (pcInAnnotationItem == nullptr || pcArray == nullptr) {
 		return A3D_ERROR;
 	}
 
@@ -954,7 +1018,7 @@ A3DStatus TdfImport::AnnotationReferenceGetMarkups(const A3DMkpAnnotationItem * 
 
 	A3DMkpAnnotationReferenceData sData;
 	A3D_INITIALIZE_DATA(A3DMkpAnnotationReferenceData, sData);
-	CHECK_A3D_RETURN(A3DMkpAnnotationReferenceGet(pcAnnotationItem, &sData));
+	CHECK_A3D_RETURN(A3DMkpAnnotationReferenceGet(pcInAnnotationItem, &sData));
 
 	PointerArrayAddUnique(pcArray, sData.m_ppLinkedItems);
 
@@ -962,15 +1026,15 @@ A3DStatus TdfImport::AnnotationReferenceGetMarkups(const A3DMkpAnnotationItem * 
 
 	return nRet;
 /*
-	Log::Write(2, "AnnotationReferenceGetMarkups: %s", Log::HexStr((DWORD_PTR)pcAnnotationItem));
+	Log::Write("AnnotationReferenceGetMarkups: %s", Log::HexStr((DWORD_PTR)pcInAnnotationItem));
 
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
 	A3DMkpAnnotationReferenceData sData;
 	A3D_INITIALIZE_DATA(A3DMkpAnnotationReferenceData, sData);
-	CHECK_A3D_RETURN(A3DMkpAnnotationReferenceGet(pcAnnotationItem, &sData));
+	CHECK_A3D_RETURN(A3DMkpAnnotationReferenceGet(pcInAnnotationItem, &sData));
 
-	Log::Write(2, "LinkedItemsSize: %d", sData.m_uiLinkedItemsSize);
+	Log::Write("LinkedItemsSize: %d", sData.m_uiLinkedItemsSize);
 
 	for (A3DUns32 nIndex = 0; nIndex < sData.m_uiLinkedItemsSize; nIndex++)
 	{
@@ -985,16 +1049,16 @@ A3DStatus TdfImport::AnnotationReferenceGetMarkups(const A3DMkpAnnotationItem * 
 
 	A3DMkpAnnotationReferenceGet(nullptr, &sData);
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	return A3D_SUCCESS;
 */
 }
 
 // 2-3-3. Annotation Item Markups을 가져옴
-A3DStatus TdfImport::AnnotationItemGetMarkups(const A3DMkpAnnotationItem * pcAnnotationItem, A3DPointerArray * pcArray)
+A3DStatus TdfImport::AnnotationItemGetMarkups(const A3DMkpAnnotationItem * pcInAnnotationItem, A3DPointerArray * pcArray)
 {
-	if (pcAnnotationItem == nullptr || pcArray == nullptr) {
+	if (pcInAnnotationItem == nullptr || pcArray == nullptr) {
 		return A3D_ERROR;
 	}
 
@@ -1002,7 +1066,7 @@ A3DStatus TdfImport::AnnotationItemGetMarkups(const A3DMkpAnnotationItem * pcAnn
 
 	A3DMkpAnnotationItemData sAnnotationItemData;
 	A3D_INITIALIZE_DATA(A3DMkpAnnotationItemData, sAnnotationItemData);
-	CHECK_A3D_RETURN(A3DMkpAnnotationItemGet(pcAnnotationItem, &sAnnotationItemData));
+	CHECK_A3D_RETURN(A3DMkpAnnotationItemGet(pcInAnnotationItem, &sAnnotationItemData));
 
 	PointerArrayAddUnique(pcArray, sAnnotationItemData.m_pMarkup);
 
@@ -1071,15 +1135,18 @@ A3DStatus TdfImport::ProductOccurrenceGetPart(const A3DAsmProductOccurrenceData 
 	return A3D_SUCCESS;
 }
 
-//== Parse 관련 함수 =================================================================================
+//== 4. Parse 관련 함수 ==============================================================================
 
 // 1. Parse Part Definition
 A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMiscCascadedAttributes * pcParentAttr, double dModelScale, const A3DMiscEntityReference * pcEntityRef,
 	H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp)
 {
-	Log::Write(2, L"ParsePart: part%d", m_nIncrementalId);
-
-	Log::IncreaseTabIndex(2);
+#ifdef USED_LOG_MANAGER
+	CString strName;
+	GetName(pcPart, strName);
+	Log::Write(L"ParsePart: 'part%d', '%s'", m_nIncrementalId, strName);
+	Log::IncreaseTabIndex();
+#endif
 
 	// 기존에 생성된 Part를 찾은 경우 Include로 Parent에 추가 시킨다.
 	HC_KEY nSegmentKey = INVALID_KEY;
@@ -1122,9 +1189,9 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 			H3DF::ComponentUtility::AddSubComponent(cParentComp, *pcComponent);
 		}
 
-		Log::Write(2, L"ParsePart Map: %s", CString(cSegment.Name()));
+		Log::Write(L"ParsePart Map: %s", CString(cSegment.Name()));
 
-		Log::DecreaseTabIndex(2);
+		Log::DecreaseTabIndex();
 
 		return A3D_SUCCESS;
 	}
@@ -1161,7 +1228,7 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 
 	// 포함되어 있는 Annotation 정보를 가져온다.
 #ifdef USED_LOG_MANAGER
-	Log::Write(2, L"ParsePart AnnotationsSize: %d", sPartDefData.m_uiAnnotationsSize);
+	Log::Write(L"ParsePart AnnotationsSize: %d", sPartDefData.m_uiAnnotationsSize);
 #endif
 
 	H3DF::Component * pcPmiGroupComponent = nullptr;
@@ -1175,7 +1242,7 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 
 	// 포함되어 있는 Markup View 정보를 가져온다.
 #ifdef USED_LOG_MANAGER
-	Log::Write(2, L"ParsePart MarkupView Size: %d", sPartDefData.m_uiViewsSize);
+	Log::Write(L"ParsePart MarkupView Size: %d", sPartDefData.m_uiViewsSize);
 #endif
 	for (A3DUns32 nIndex = 0; nIndex < sPartDefData.m_uiViewsSize; nIndex++) {
 		CHECK_A3D_RETURN(ParseMarkupView(sPartDefData.m_ppViews[nIndex], pcAttr, cSegment, cParentComp));
@@ -1183,11 +1250,15 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 
 
 #ifdef USED_LOG_MANAGER
-	Log::Write(2, L"ParsePart RepItems Size: %d", sPartDefData.m_uiRepItemsSize);
+	Log::Write(L"ParsePart RepItems Size: %d", sPartDefData.m_uiRepItemsSize);
+	Log::IncreaseTabIndex();
 #endif
+
 	for (A3DUns32 nIndex = 0; nIndex < sPartDefData.m_uiRepItemsSize; nIndex++) {
 		CHECK_A3D_RETURN(ParseRiRepresentationItem(sPartDefData.m_ppRepItems[nIndex], pcAttr, pcEntityRef, cSegment, *pcComponent));
 	}
+
+	Log::DecreaseTabIndex();
 
 	CHECK_A3D_RETURN(A3DAsmPartDefinitionGet(nullptr, &sPartDefData));
 
@@ -1196,7 +1267,7 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 
 	cSegment.Close();
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	return A3D_SUCCESS;
 }
@@ -1266,6 +1337,10 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 			eComponentType = H3DF::Component::Type::ExchangeRIPointSet;
 			break;
 
+		case kA3DTypeRiPlane:
+			eComponentType = H3DF::Component::Type::ExchangeRIPlane;
+			break;
+
 		default:
 			assert(false);
 			break;
@@ -1276,12 +1351,12 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, strRiName, eComponentType, cParentComp);
 
 	if (true == strRiName.IsEmpty()) {
-		Log::Write(2, "ParseRiRepresentationItem: %s, %s, Include: %d, Segment: %d", Log::HexStrA((DWORD_PTR)pcInRepItem), strSegmentName, cInclude.KeyValue(), cSegment.KeyValue());
+		Log::Write("ParseRiRepresentationItem: %s, %s, Include: %d, Segment: %d", Log::HexStrA((DWORD_PTR)pcInRepItem), strSegmentName, cInclude.KeyValue(), cSegment.KeyValue());
 	}
 	else {
 		CStringA strText;
 		strText = strRiName;
-		Log::Write(2, "ParseRiRepresentationItem: %s, %s, Include: %d, Segment: %d, '%s'", Log::HexStrA((DWORD_PTR)pcInRepItem), strSegmentName, cInclude.KeyValue(), cSegment.KeyValue(), strText);
+		Log::Write("ParseRiRepresentationItem: %s, %s, Include: %d, Segment: %d, '%s'", Log::HexStrA((DWORD_PTR)pcInRepItem), strSegmentName, cInclude.KeyValue(), cSegment.KeyValue(), strText);
 	}
 
 	// Ri Rep에 설정된 이름을 확인해서 저장한다.
@@ -1360,7 +1435,7 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 		GetMatrix(sCSysData.m_pTransformation, cMatrix);
 		cSegment.SetModellingMatrix(cMatrix);
 
-		Log::Write(2, "SetModellingMatrix");
+		Log::Write("SetModellingMatrix");
 
 		CHECK_A3D_RETURN(A3DRiCoordinateSystemGet(nullptr, &sCSysData));
 	}
@@ -1388,6 +1463,10 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 			eStatus = DrawRiPointSet(pcInRepItem, cSegment, pcAttr);
 		break;
 
+		case kA3DTypeRiPlane:
+			eStatus = DrawRiPlane(pcInRepItem, cSegment, pcAttr);
+			break;
+
 		default:
 			assert(false);
 			break;
@@ -1411,9 +1490,9 @@ A3DStatus TdfImport::ParseRiRepresentationItem(const A3DRiRepresentationItem * p
 A3DStatus TdfImport::ParseRiSet(const A3DRiSet * pcInSet, const A3DMiscEntityReference * pcEntityRef, const A3DMiscCascadedAttributes * pcParentAttr,
 	H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp)
 {
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
-	Log::Write(2, L"ParseRiSet: %s", Log::HexStr((DWORD_PTR)pcInSet));
+	Log::Write(L"ParseRiSet: %s", Log::HexStr((DWORD_PTR)pcInSet));
 
 	A3DMiscCascadedAttributes * pcAttr;
 	A3DMiscCascadedAttributesData cAttrData;
@@ -1437,7 +1516,7 @@ A3DStatus TdfImport::ParseRiSet(const A3DRiSet * pcInSet, const A3DMiscEntityRef
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesDelete(pcAttr));
 	CHECK_A3D_RETURN(A3DMiscCascadedAttributesGet(nullptr, &cAttrData));
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	return A3D_SUCCESS;
 }
@@ -1446,9 +1525,9 @@ A3DStatus TdfImport::ParseRiSet(const A3DRiSet * pcInSet, const A3DMiscEntityRef
 A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcInRepItem, const A3DRiRepresentationItemData & cInRepItemData, const A3DMiscEntityReference * pcInEntityRef,
 	const A3DMiscCascadedAttributes * pcInAttr, const A3DMiscCascadedAttributesData & cInAttrData,  H3DF::SegmentKey & cInSegment)
 {
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
-	Log::Write(2, L"ParseRiBrepModel: %s", Log::HexStr((DWORD_PTR)pcInRepItem));
+	Log::Write(L"ParseRiBrepModel: %s", Log::HexStr((DWORD_PTR)pcInRepItem));
 
 	A3DRootBaseData cRootBaseData;
 	A3D_INITIALIZE_DATA(A3DRootBaseData, cRootBaseData);
@@ -1499,7 +1578,7 @@ A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcInRepIte
 
 	//	CHECK_A3D_RETURN(A3DRiBrepModelGet(nullptr, &cBrepModelData));
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	return A3D_SUCCESS;
 }
@@ -1508,9 +1587,9 @@ A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcInRepIte
 A3DStatus TdfImport::DrawRiPolyBrepModel(const A3DRiRepresentationItem * pcInRepItem, const A3DRiRepresentationItemData & cRepItemData, const A3DMiscEntityReference * pcInEntityRef,
 	const A3DMiscCascadedAttributes * pcAttr, const A3DMiscCascadedAttributesData & cAttrData, H3DF::SegmentKey & cSegment)
 {
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
-	Log::Write(2, L"DrawRiPolyBrepModel: %s", Log::HexStr((DWORD_PTR)pcInRepItem));
+	Log::Write(L"DrawRiPolyBrepModel: %s", Log::HexStr((DWORD_PTR)pcInRepItem));
 
 	// 외부에서 Entity References가 들어와도 Map에서 다시 검색해서 일치하는게 있는지 여부를 확인해서 적용한다.
 	auto pcIterator = m_mEntityReferenceMap.find((A3DEntity *)pcInRepItem);
@@ -1523,7 +1602,7 @@ A3DStatus TdfImport::DrawRiPolyBrepModel(const A3DRiRepresentationItem * pcInRep
 		nStatus = DrawTessBase(cRepItemData.m_pTessBase, pcInRepItem, pcInEntityRef, pcAttr, cSegment);
 	}
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	return nStatus;
 }
@@ -1569,6 +1648,10 @@ A3DStatus TdfImport::DrawRiPointSet(const A3DRiRepresentationItem * pcRepItem, H
 	return nStatus;
 }
 
+A3DStatus TdfImport::DrawRiPlane(const A3DRiRepresentationItem * pcRepItem, H3DF::SegmentKey & cSegment, const A3DMiscCascadedAttributes * pcParentAttr)
+{
+	return A3D_SUCCESS;
+}
 
 // 4. Draw Ri Curve
 A3DStatus TdfImport::DrawRiCurve(A3DRiCurve * pcInputRiCurve, H3DF::SegmentKey & cParentSegment, A3DMiscCascadedAttributes * pcParentAttr)
@@ -1576,7 +1659,7 @@ A3DStatus TdfImport::DrawRiCurve(A3DRiCurve * pcInputRiCurve, H3DF::SegmentKey &
 	CString strName;
 	GetName(pcInputRiCurve, strName);
 
-	Log::Write(2, L"DrawRiCurve: %s", strName);
+	Log::Write(L"DrawRiCurve: %s", strName);
 
 	A3DMiscCascadedAttributes * pcAttrs;
 	A3DMiscCascadedAttributesData cAttrsData;
@@ -1638,7 +1721,7 @@ A3DStatus TdfImport::DrawRiCurve(A3DRiCurve * pcInputRiCurve, H3DF::SegmentKey &
 		A3DMiscCascadedAttributesGet(nullptr, &cAttrsData);
 	}
 
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
 	/*
 		SpaceCurveSPtr pcSpaceCurve;
@@ -1666,7 +1749,7 @@ A3DStatus TdfImport::DrawRiCurve(A3DRiCurve * pcInputRiCurve, H3DF::SegmentKey &
 		}
 	*/
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	A3DRiCurveGet(nullptr, &cRiCurveData);
 	A3DTopoSingleWireBodyGet(nullptr, &cSingleWireBodyData);
@@ -1677,38 +1760,40 @@ A3DStatus TdfImport::DrawRiCurve(A3DRiCurve * pcInputRiCurve, H3DF::SegmentKey &
 	return A3D_SUCCESS;
 }
 
+//== 5. Markup View 관련 함수 ========================================================================
+
 // 5. Markup View
-A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp)
+A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcInView, const A3DMiscCascadedAttributes * pcInParentAttr, H3DF::SegmentKey & cInParentSegment, H3DF::Component & cInParentComp)
 {
 	A3DStatus iRet = A3D_SUCCESS;
 
 	A3DMiscCascadedAttributes * pcAttr;
 	A3DMiscCascadedAttributesData cAttrData;
-	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcView, pcParentAttr, &pcAttr, &cAttrData));
+	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcInView, pcInParentAttr, &pcAttr, &cAttrData));
 
 	CString strName;
-	GetName(pcView, strName);
+	GetName(pcInView, strName);
 
 	if (/*cAttrData.m_bShow && */!cAttrData.m_bRemoved) // TODO m_bShow
 	{
 		A3DMkpViewData cViewData;
 		A3D_INITIALIZE_DATA(A3DMkpViewData, cViewData);
-		CHECK_A3D_RETURN(A3DMkpViewGet(pcView, &cViewData));
+		CHECK_A3D_RETURN(A3DMkpViewGet(pcInView, &cViewData));
 
 		CString strViewName;
-		GetName(pcView, strViewName);
+		GetName(pcInView, strViewName);
 
 		H3DF::Component * pcViewGroupComponent = nullptr;
 
 		if (false == cViewData.m_bIsAnnotationView) {
-			pcViewGroupComponent = GetViewGroupComponent(cParentComp);
+			pcViewGroupComponent = GetViewGroupComponent(cInParentComp);
 			if (nullptr == pcViewGroupComponent) {
 				DEBUG_STOP;
 				return A3D_ERROR;
 			}
 		}
 		else {
-			pcViewGroupComponent = GetAnnotationViewGroupComponent(cParentComp);
+			pcViewGroupComponent = GetAnnotationViewGroupComponent(cInParentComp);
 			if (nullptr == pcViewGroupComponent) {
 				DEBUG_STOP;
 				return A3D_ERROR;
@@ -1717,7 +1802,7 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 
 		SegmentKey cViewGroupSegment(pcViewGroupComponent->GetSegmentKey());
 
-		H3DF::SegmentKey cSegment = m_cPmiIncludeSegment.Subsegment("view%d", m_nMarkupId++);
+		H3DF::SegmentKey cSegment = m_cPmiIncludeSegment.Subsegment("view%d", m_nViewId++);
 		IncludeKey cInclude = cViewGroupSegment.IncludeSegment(cSegment);
 
 		cSegment.GetVisibilityControl().SetEverything(false);
@@ -1752,7 +1837,7 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 						pcCamera->SetTarget(Dmi3dx::GetPoint(sCameraData.m_sLookAt));
 						pcCamera->SetPosition(Dmi3dx::GetPoint(sCameraData.m_sLocation));
 						pcCamera->SetUpVector(Dmi3dx::GetVector(sCameraData.m_sUp));
-						pcCamera->SetField(sCameraData.m_dXFovy, sCameraData.m_dYFovy);
+						pcCamera->SetField(sCameraData.m_dXFovy * 2, sCameraData.m_dYFovy * 2);
 						pcCamera->SetNearLimit(sCameraData.m_dZNear);
 						if (A3D_TRUE == sCameraData.m_bOrthographic) {
 							pcCamera->SetProjection(H3DF::Camera::Projection::Orthographic);
@@ -1791,17 +1876,17 @@ A3DStatus TdfImport::ParseMarkupView(const A3DMkpView * pcView, const A3DMiscCas
 		}
 
 #ifdef USED_LOG_MANAGER
-		Log::View((A3DMkpView *)pcView, cViewData);
-		Log::IncreaseTabIndex(2);
-		Log::Write(2, "Annotations Size: %d", cViewData.m_uiAnnotationsSize);
+		Log::View((A3DMkpView *)pcInView, cViewData);
+		Log::IncreaseTabIndex();
+		Log::Write("Annotations Size: %d", cViewData.m_uiAnnotationsSize);
 #endif
 
 		for (A3DUns32 nIndex = 0; nIndex < cViewData.m_uiAnnotationsSize; nIndex++) {
-			CHECK_A3D_RETURN(ParseAnnotation(cViewData.m_ppAnnotations[nIndex], pcAttr, cSegment, *pcComponent, true));
+			CHECK_A3D_RETURN(ParseAnnotationEntity(cViewData.m_ppAnnotations[nIndex], pcAttr, cSegment, *pcComponent, true));
 		}
 
 #ifdef USED_LOG_MANAGER
-		Log::DecreaseTabIndex(2);
+		Log::DecreaseTabIndex();
 #endif
 
 		CHECK_A3D_RETURN(A3DMkpViewGet(nullptr, &cViewData));
@@ -1829,11 +1914,17 @@ H3DF::Component * TdfImport::GetViewGroupComponent(H3DF::Component & cInParentCo
 // Segment도 "grpview"로 생성한다.
 H3DF::Component * TdfImport::CreateViewGroupComponent(H3DF::Component & cInParentComp)
 {
+	Component * pcProductOccurrence = cInParentComp.FindUpComponent(H3DF::Component::Type::ExchangeProductOccurrence);
+	if (nullptr == pcProductOccurrence) {
+		DEBUG_STOP;
+		return nullptr;
+	}
+
 	// Parent Component에 PMI Group을 생성.
-	SegmentKey cParentSegment(cInParentComp.GetSegmentKey());
+	SegmentKey cProductOccurrenceSegment(cInParentComp.GetSegmentKey());
 
 	SegmentKey cSegment = m_cPmiIncludeSegment.Subsegment("grpview%d", m_nMarkupId++);
-	IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
+	IncludeKey cInclude = cProductOccurrenceSegment.IncludeSegment(cSegment);
 
 	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, "View", H3DF::Component::Type::ViewGroupComponent, cInParentComp);
 	return pcComponent;
@@ -1842,9 +1933,9 @@ H3DF::Component * TdfImport::CreateViewGroupComponent(H3DF::Component & cInParen
 // 5-3. View중에서 Annotation View를 Group으로 처리하기 위해서, Parent Component에서 Annotation View Group을 검색.
 H3DF::Component * TdfImport::GetAnnotationViewGroupComponent(H3DF::Component & cInParentComp)
 {
-	H3DF::Component * pcAnnotationViewGroupComponent = ComponentUtility::GetAnnotationViewGroupComponent(cInParentComp);
-	if (nullptr != pcAnnotationViewGroupComponent) {
-		return pcAnnotationViewGroupComponent;
+	H3DF::Component * pcInAnnotationViewGroupComponent = ComponentUtility::GetAnnotationViewGroupComponent(cInParentComp);
+	if (nullptr != pcInAnnotationViewGroupComponent) {
+		return pcInAnnotationViewGroupComponent;
 	}
 
 	H3DF::Component * pcViewGroupComp = GetViewGroupComponent(cInParentComp);
@@ -1870,41 +1961,42 @@ H3DF::Component * TdfImport::CreateAnnotationViewGroupComponent(H3DF::Component 
 }
 
 // 6. 복수의 Annotation을 그리는 함수
-A3DStatus TdfImport::ParseAnnotations(A3DMkpAnnotationEntity ** pcAnnotation, A3DUns32 nAnnotationsSize, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp)
+A3DStatus TdfImport::ParseAnnotations(A3DMkpAnnotationEntity ** pcInAnnotation, A3DUns32 nAnnotationsSize, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp)
 {
 	if (0 == nAnnotationsSize) {
 		return A3D_SUCCESS;
 	}
 
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
 	A3DMiscCascadedAttributes * pcAttr = nullptr;
 	A3DMiscCascadedAttributesCreate(&pcAttr);
 
 	for (unsigned int i = 0; i < nAnnotationsSize; i++) {
-		ParseAnnotation(pcAnnotation[i], pcAttr, cParentSegment, cParentComp, false);
+		ParseAnnotationEntity(pcInAnnotation[i], pcAttr, cParentSegment, cParentComp, false);
 	}
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	return A3D_SUCCESS;
 }
 
 // 6-1. Annotation을 그리는 함수
-A3DStatus TdfImport::ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation, A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp, bool bAddChildToParentComp)
+A3DStatus TdfImport::ParseAnnotationEntity(const A3DMkpAnnotationEntity * pcInAnnotation, A3DMiscCascadedAttributes * pcInParentAttr, H3DF::SegmentKey & cInParentSegment, H3DF::Component & cInParentComp, bool bAddChildToParentComp)
 {
 	A3DEEntityType eType;
-	A3DEntityGetType(pcAnnotation, &eType);
+	A3DEntityGetType(pcInAnnotation, &eType);
 
 	A3DMiscCascadedAttributes * pcAttrs;
 	A3DMiscCascadedAttributesData cAttrData;
-	CreateAndPushCascadedAttributes(pcAnnotation, pcParentAttr, &pcAttrs, &cAttrData);
+	CreateAndPushCascadedAttributes(pcInAnnotation, pcInParentAttr, &pcAttrs, &cAttrData);
 
 #ifdef USED_LOG_MANAGER
-	Log::Write(2, "ParseAnnotation: %s, %s", Log::HexStrA((DWORD_PTR)pcAnnotation), Dmi3dx::GetA3dEntityTypeString(eType));
+	Log::Write("ParseAnnotation: %s, %s, Show: %s, Removed: %s", Log::HexStrA((DWORD_PTR)pcInAnnotation), Dmi3dx::GetA3dEntityTypeString(eType), 
+		Log::BoolStrA(cAttrData.m_bShow), Log::BoolStrA(cAttrData.m_bRemoved));
 #endif
 
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
 	switch (eType)
 	{
@@ -1912,13 +2004,13 @@ A3DStatus TdfImport::ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation
 		{
 			A3DMkpAnnotationItemData sData;
 			A3D_INITIALIZE_DATA(A3DMkpAnnotationItemData, sData);
-			A3DMkpAnnotationItemGet(pcAnnotation, &sData);
+			A3DMkpAnnotationItemGet(pcInAnnotation, &sData);
 
 			A3DMiscCascadedAttributes * pcMarkupAttr;
 			A3DMiscCascadedAttributesData sMarkupAttribData;
 			CreateAndPushCascadedAttributes(sData.m_pMarkup, pcAttrs, &pcMarkupAttr, &sMarkupAttribData);
 
-			ParseMarkup(sData.m_pMarkup, &sMarkupAttribData, cParentSegment, cParentComp, bAddChildToParentComp);
+			ParseMarkup(sData.m_pMarkup, &sMarkupAttribData, cInParentSegment, cInParentComp, bAddChildToParentComp);
 
 			A3DMiscCascadedAttributesDelete(pcMarkupAttr);
 		}
@@ -1927,10 +2019,10 @@ A3DStatus TdfImport::ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation
 		case kA3DTypeMkpAnnotationSet: {
 			A3DMkpAnnotationSetData sData;
 			A3D_INITIALIZE_DATA(A3DMkpAnnotationSetData, sData);
-			CHECK_A3D_RETURN(A3DMkpAnnotationSetGet(pcAnnotation, &sData));
+			CHECK_A3D_RETURN(A3DMkpAnnotationSetGet(pcInAnnotation, &sData));
 
 			for (A3DUns32 i = 0; i < sData.m_uiAnnotationsSize; ++i) {
-				ParseAnnotation(sData.m_ppAnnotations[i], pcAttrs, cParentSegment, cParentComp, bAddChildToParentComp);
+				ParseAnnotationEntity(sData.m_ppAnnotations[i], pcAttrs, cInParentSegment, cInParentComp, bAddChildToParentComp);
 			}
 
 			A3DMkpAnnotationSetGet(nullptr, &sData);
@@ -1940,12 +2032,12 @@ A3DStatus TdfImport::ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation
 		case kA3DTypeMkpAnnotationReference: {
 			A3DMkpAnnotationReferenceData cData;
 			A3D_INITIALIZE_DATA(A3DMkpAnnotationReferenceData, cData);
-			CHECK_A3D_RETURN(A3DMkpAnnotationReferenceGet(pcAnnotation, &cData));
+			CHECK_A3D_RETURN(A3DMkpAnnotationReferenceGet(pcInAnnotation, &cData));
 
-			Log::Write(2, "Linked Items Size: %d", cData.m_uiLinkedItemsSize);
+			Log::Write("Linked Items Size: %d", cData.m_uiLinkedItemsSize);
 
 			for (A3DUns32 nIndex = 0; nIndex < cData.m_uiLinkedItemsSize; nIndex++) {
-				ParseMarkupLinkedItem(cData.m_ppLinkedItems[nIndex], pcAttrs, cParentSegment, cParentComp);
+				ParseMarkupLinkedItem(cData.m_ppLinkedItems[nIndex], pcAttrs, cInParentSegment, cInParentComp);
 			}
 
 			CHECK_A3D_RETURN(A3DMkpAnnotationReferenceGet(nullptr, &cData));
@@ -1957,14 +2049,14 @@ A3DStatus TdfImport::ParseAnnotation(const A3DMkpAnnotationEntity * pcAnnotation
 
 	A3DMiscCascadedAttributesDelete(pcAttrs);
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	return A3D_SUCCESS;
 }
 
 
 // 6-1. Draw Annotation Set
-A3DStatus TdfImport::DrawAnnotationSet(const A3DMkpAnnotationSet * pcAnnotationSet, H3DF::SegmentKey & cParentSegment,
+A3DStatus TdfImport::DrawAnnotationSet(const A3DMkpAnnotationSet * pcInAnnotationSet, H3DF::SegmentKey & cParentSegment,
 	const A3DMiscCascadedAttributes * pcParentAttr)
 {
 	/*
@@ -1972,13 +2064,13 @@ A3DStatus TdfImport::DrawAnnotationSet(const A3DMkpAnnotationSet * pcAnnotationS
 
 		A3DMiscCascadedAttributes * pcAttr;
 		A3DMiscCascadedAttributesData cAttrData;
-		CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcAnnotationSet, pcParentAttr, &pcAttr, &cAttrData));
+		CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcInAnnotationSet, pcParentAttr, &pcAttr, &cAttrData));
 
 		if(cAttrData.m_bShow && !cAttrData.m_bRemoved)
 		{
 			A3DMkpAnnotationSetData sAnnotationSetData;
 			A3D_INITIALIZE_DATA(A3DMkpAnnotationSetData, sAnnotationSetData);
-			CHECK_A3D_RETURN(A3DMkpAnnotationSetGet(pcAnnotationSet, &sAnnotationSetData));
+			CHECK_A3D_RETURN(A3DMkpAnnotationSetGet(pcInAnnotationSet, &sAnnotationSetData));
 
 			A3DUns32 ui;
 			for(ui = 0; ui < sAnnotationSetData.m_uiAnnotationsSize; ui++)
@@ -1997,20 +2089,20 @@ A3DStatus TdfImport::DrawAnnotationSet(const A3DMkpAnnotationSet * pcAnnotationS
 }
 
 // 6-2. (미완성) Draw Annotation Reference
-A3DStatus TdfImport::DrawAnnotationReference(const A3DMkpAnnotationItem * /*pcAnnotationItem*/, const A3DMiscCascadedAttributes * /*pcParentAttr*/)
+A3DStatus TdfImport::DrawAnnotationReference(const A3DMkpAnnotationItem * /*pcInAnnotationItem*/, const A3DMiscCascadedAttributes * /*pcParentAttr*/)
 {
 	assert(false);
 	return A3D_SUCCESS;
 }
 
 // 6-3. Draw Annotation Item
-A3DStatus TdfImport::ParseAnnotationItem(const A3DMkpAnnotationItem * pcAnnotationItem, const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment)
+A3DStatus TdfImport::ParseAnnotationItem(const A3DMkpAnnotationItem * pcInAnnotationItem, const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment)
 {
 	//A3DStatus iRet = A3D_SUCCESS;
 
 	A3DMiscCascadedAttributes * pcAttr;
 	A3DMiscCascadedAttributesData cAttrData;
-	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcAnnotationItem, pcParentAttr, &pcAttr, &cAttrData));
+	CHECK_A3D_RETURN(CreateAndPushCascadedAttributes(pcInAnnotationItem, pcParentAttr, &pcAttr, &cAttrData));
 
 	MaterialKit cMaterial;
 	GetMaterial(cAttrData.m_sStyle, cMaterial);
@@ -2019,7 +2111,7 @@ A3DStatus TdfImport::ParseAnnotationItem(const A3DMkpAnnotationItem * pcAnnotati
 	{
 		A3DMkpAnnotationItemData sAnnotationItemData;
 		A3D_INITIALIZE_DATA(A3DMkpAnnotationItemData, sAnnotationItemData);
-		CHECK_A3D_RETURN(A3DMkpAnnotationItemGet(pcAnnotationItem, &sAnnotationItemData));
+		CHECK_A3D_RETURN(A3DMkpAnnotationItemGet(pcInAnnotationItem, &sAnnotationItemData));
 
 		//CHECK_A3D_RETURN(DrawMarkup(sAnnotationItemData.m_pMarkup, cParentSegment, pcAttr));
 
@@ -2052,17 +2144,17 @@ A3DStatus TdfImport::ParseMarkupLinkedItem(A3DMiscMarkupLinkedItem * pcInLinkedI
 }
 
 // 7. Markup Data를 전체적으로 가져오는 부분
-A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedAttributesData * psAttribData, H3DF::SegmentKey & cParentSegment, H3DF::Component & cParentComp, bool bAddChildToParentComp)
+A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcInMarkup, A3DMiscCascadedAttributesData * psInAttribData, H3DF::SegmentKey & cInParentSegment, H3DF::Component & cInParentComp, bool bAddChildToParentComp)
 {
 	CString strPmiName;
-	GetName(pcMarkup, strPmiName);
+	GetName(pcInMarkup, strPmiName);
 
 	H3DF::Component * pcPmiGroupComponent = nullptr;
-	if (H3DF::Component::Type::PMIGroupComponent == cParentComp.GetType()) {
-		pcPmiGroupComponent = &cParentComp;
+	if (H3DF::Component::Type::PMIGroupComponent == cInParentComp.GetType()) {
+		pcPmiGroupComponent = &cInParentComp;
 	}
 	else {
-		pcPmiGroupComponent = GetPmiGroupComponent(cParentComp);
+		pcPmiGroupComponent = GetPmiGroupComponent(cInParentComp);
 	}
 	
 	if (nullptr == pcPmiGroupComponent) {
@@ -2072,28 +2164,28 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 
 	// 이미 추가되어 있는 경우에는 Parent Component에 추가한다. Markup View에 추가하는 경우가 대부분이다.
 	HC_KEY nSegmentKey = INVALID_KEY;
-	if (true == m_mMarkupsMap.Lookup((DWORD_PTR)pcMarkup, nSegmentKey))
+	if (true == m_mMarkupsMap.Lookup((DWORD_PTR)pcInMarkup, nSegmentKey))
 	{
-		Log::Write(2, L"LookUp ParseMarkup: %s, '%s'", Log::HexStr((DWORD_PTR)pcMarkup), strPmiName);
+		Log::Write(L"LookUp ParseMarkup: %s, '%s'", Log::HexStr((DWORD_PTR)pcInMarkup), strPmiName);
 
 		H3DF::SegmentKey cSegment(nSegmentKey);
-		H3DF::IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
+		H3DF::IncludeKey cInclude = cInParentSegment.IncludeSegment(cSegment);
 
 		// Markup View등에서 생성된 경우를 대응하기 위해서 Parent Component에 추가한다.
 		if (true == bAddChildToParentComp) {
-			H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, strPmiName, H3DF::Component::Type::ExchangePMI, cParentComp);
+			H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, strPmiName, H3DF::Component::Type::ExchangePMI, cInParentComp);
 		}
 
 		return A3D_SUCCESS;
 	}
 
 #ifdef USED_DIMENSION_LOG_MANAGER
-	Log::DimensionData(pcMarkup);
-	Log::LeaderData(pcMarkup);
-	Log::TessMarkup(pcMarkup);
+	Log::DimensionData(pcInMarkup);
+	Log::LeaderData(pcInMarkup);
+	Log::TessMarkup(pcInMarkup);
 #endif
 
-	Log::Write(2, L"ParseMarkup: %s, '%s', Markup%d", Log::HexStr((DWORD_PTR)pcMarkup),  strPmiName, m_nMarkupId);
+	Log::Write(L"ParseMarkup: %s, '%s', Markup%d", Log::HexStr((DWORD_PTR)pcInMarkup),  strPmiName, m_nMarkupId);
 
 	LogManager::IncreaseTabIndex(2);
 
@@ -2101,17 +2193,19 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 	SegmentKey cPmiGroupSegment(pcPmiGroupComponent->GetSegmentKey());
 	H3DF::SegmentKey cSegment = m_cPmiIncludeSegment.Subsegment("pmi%d", m_nMarkupId++);
 	IncludeKey cInclude = cPmiGroupSegment.IncludeSegment(cSegment);
-	m_mMarkupsMap.SetAt((DWORD_PTR)pcMarkup, cSegment.KeyValue());
+	//IncludeKey cInclude1 = cInParentSegment.IncludeSegment(cSegment);
+	m_mMarkupsMap.SetAt((DWORD_PTR)pcInMarkup, cSegment.KeyValue());
 
 	// #CADModel: PMI 추가
 	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, strPmiName, H3DF::Component::Type::ExchangePMI, *pcPmiGroupComponent);
 
 	// Markup View등에서 생성된 경우를 대응하기 위해서 Parent Component에 추가한다.
 	if (true == bAddChildToParentComp) {
-		AddComponent(cSegment, cInclude, strPmiName, H3DF::Component::Type::ExchangePMI, cParentComp);
+		AddComponent(cSegment, cInclude, strPmiName, H3DF::Component::Type::ExchangePMI, cInParentComp);
 	}
 
-	if (A3D_FALSE == psAttribData->m_bShow || A3D_TRUE == psAttribData->m_bRemoved) {
+	// Show / No Show Style 처리
+	if (A3D_FALSE == psInAttribData->m_bShow || A3D_TRUE == psInAttribData->m_bRemoved) {
 		cSegment.GetStyleControl().PushSegment(m_cNoShowStyle);
 
 		pcComponent->AddStatus(H3DF::Component::Status::Hide);
@@ -2120,7 +2214,9 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 
 	A3DMkpMarkupData sData;
 	A3D_INITIALIZE_DATA(A3DMkpMarkupData, sData);
-	A3DMkpMarkupGet(pcMarkup, &sData);
+	A3DMkpMarkupGet(pcInMarkup, &sData);
+
+	Log::Write(L"Linked Items Size: %d", sData.m_uiLinkedItemsSize);
 
 	H3DF::PMI * pcPmi = nullptr;
 
@@ -2249,24 +2345,6 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 		pcPmi->SetLeaderSymbols((unsigned int)cLeaderSymbols.size(), cLeaderSymbols.data());
 	}
 
-/*
-	if (GetDLLVersion() >= 202)
-	{
-		for (unsigned int j = 0; j < sData.m_uiLinkedItemsSize; j++)
-		{
-			A3DMiscMarkupLinkedItemData sData2;
-			A3D_INITIALIZE_DATA(A3DMiscMarkupLinkedItemData, sData2);
-
-			A3DMiscMarkupLinkedItemGet(sData.m_ppLinkedItems[j], &sData2);
-
-			if (sData2.m_pReference)
-				treatReference(sData2.m_pReference, pMarkup);
-
-			A3DMiscMarkupLinkedItemGet(NULL, &sData2);
-		}
-	}
-*/
-
 	A3DTessBaseData sBaseData;
 	A3D_INITIALIZE_DATA(A3DTessBaseData, sBaseData);
 
@@ -2311,7 +2389,6 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcMarkup, A3DMiscCascadedA
 
 	assert(aStrings.size() == aTextAttributes.size());
 	unsigned int nCount = (unsigned int)aStrings.size();
-
 
 	switch (pcPmi->ObjectType())
 	{
@@ -2389,7 +2466,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 	PolylineArray & aOutPolylines, PolygonArray & aOutPolygones, StringArray & aOutStrings, H3DF::TextAttributesArray & cOutTextAttributes,
 	H3DF::Options * pcOutPmiOptions)
 {
-	Log::Write(2, "ParseMarkupTesselation: %s, %s", Log::HexStr((DWORD_PTR)psTessBaseData), Log::HexStr((DWORD_PTR)psTessMarkupData));
+	Log::Write("ParseMarkupTesselation: %s, %s", Log::HexStr((DWORD_PTR)psTessBaseData), Log::HexStr((DWORD_PTR)psTessMarkupData));
 
 	if (psTessMarkupData->m_uiCodesSize == 0) {
 		return A3D_ERROR;
@@ -2405,7 +2482,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 		return A3D_ERROR;
 	}
 
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
 	A3DFontKeyData sFontKeyData;
 	A3D_INITIALIZE_DATA(A3DFontKeyData, sFontKeyData);
@@ -2424,8 +2501,8 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 	bool bFaceViewMode = false;
 	// 	H_UTF8 pmi_utf8;
 	Point cTextMove;
-	float char_width = 0.;
-	float char_height = 1.;
+	float fCharWidth = 0.;
+	float fCharHeight = 1.;
 	H3DF::MatrixKit cMatrix;
 	H3DF::MatrixKit cTransformMatrix;
 	//FloatArray pline;
@@ -2642,7 +2719,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 					aOutStrings.push_back(strText);
 
 					cTextAttributes.SetRGBColor(cColor);
-					cTextAttributes.SetFontSize(static_cast<float>(dTextboxHeight * char_height));
+					cTextAttributes.SetFontSize(static_cast<float>(dTextboxHeight * fCharHeight));
 					if (true == bFrameDrawMode) {
 						cTextAttributes.SetFontSizeUnits(H3DF::Font::Size::Units::PixelUnits);
 						cTextAttributes.SetInsertionPoint(cTextMove);
@@ -2710,13 +2787,13 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 			if (*(pnStart + 1) > 0)
 			{
 				Vector cXAxis(static_cast<float>(pdData[0]), static_cast<float>(pdData[1]), static_cast<float>(pdData[2]));
-				char_width = (float)cXAxis.Length();
+				fCharWidth = (float)cXAxis.Length();
 
 				Vector cYAxis(static_cast<float>(pdData[4]), static_cast<float>(pdData[5]), static_cast<float>(pdData[6]));
-				char_height = (float)cYAxis.Length();
+				fCharHeight = (float)cYAxis.Length();
 
 				if (bFrameDrawMode || bFaceViewMode) {
-					cTextAttributes.SetWidthScale(char_width / char_height);
+					cTextAttributes.SetWidthScale(fCharWidth / fCharHeight);
 					cTextMove.Set(
 						static_cast<float>(pdData[12] / m_dCadModelUnit),
 						static_cast<float>(pdData[13] / m_dCadModelUnit),
@@ -2748,9 +2825,9 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 					//H3DF::TestMatrix cm;
 					//MatrixCal::ComputeMatrixProduct(cMatrix.data(), cTransformMatrix.data(), cTransformMatrix.data());
 
-					H3DF::Orientation orientation;
-					orientation.SetMatrix(cTransformMatrix);
-					cTextAttributes.SetOrientation(orientation);
+					H3DF::Orientation cOrientation;
+					cOrientation.SetMatrix(cTransformMatrix);
+					cTextAttributes.SetOrientation(cOrientation);
 				}
 
 				MAKE_OFFSET(0, 16);
@@ -2764,7 +2841,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 				// 				MatrixCal::InverseMatrix(cMatrix.data(), cMatrix.data());
 				// 				MatrixCal::ComputeMatrixProduct(cMatrix.data(), cTransformMatrix.data(), cTransformMatrix.data());
 				// 				cMatrix.SetIdentity();
-				char_height = 1.;
+				fCharHeight = 1.;
 				MAKE_OFFSET(0, 0);
 			}
 		}
@@ -2808,7 +2885,7 @@ A3DStatus TdfImport::GetMarkupTesselation(const A3DTessBaseData * psTessBaseData
 		}
 	}
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	return A3D_SUCCESS;
 }
@@ -2848,17 +2925,38 @@ A3DStatus TdfImport::GetLeaderLinesAndSymbols(const A3DMkpLeader * pMarkup, Poly
 // 7-4. Pmi Group Component 생성
 H3DF::Component * TdfImport::CreatePmiGroupComponent(H3DF::Component & cInParentComp)
 {
+/*
+	Component * pcFirstPoccComp = FindFirstProductOccurrenceComponentOfTheModelComponent(cInParentComp);
+	if (nullptr == pcFirstPoccComp) {
+		DEBUG_STOP;
+		return nullptr;
+	}
+
+	// First POcc Component에 PMI Group을 생성.
+	SegmentKey cFirstPoccSegment(pcFirstPoccComp->GetSegmentKey());
+	SegmentKey cSegment = m_cPmiIncludeSegment.Subsegment("grppmi%d", m_nMarkupId++);
+	IncludeKey cInclude = cFirstPoccSegment.IncludeSegment(cSegment);
+
+	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, "PMI", H3DF::Component::Type::PMIGroupComponent, *pcFirstPoccComp);
+	return pcComponent;
+*/
+	Component * pcProductOccurrence = cInParentComp.FindUpComponent(H3DF::Component::Type::ExchangeProductOccurrence);
+	if (nullptr == pcProductOccurrence) {
+		DEBUG_STOP;
+		return nullptr;
+	}
+
 	// Parent Component에 PMI Group을 생성.
-	SegmentKey cParentSegment(cInParentComp.GetSegmentKey());
+	SegmentKey cProductOccurrenceSegment(pcProductOccurrence->GetSegmentKey());
 
 	SegmentKey cSegment = m_cPmiIncludeSegment.Subsegment("grppmi%d", m_nMarkupId++);
-	IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
+	IncludeKey cInclude = cProductOccurrenceSegment.IncludeSegment(cSegment);
 
 	H3DF::Component * pcComponent = AddComponent(cSegment, cInclude, "PMI", H3DF::Component::Type::PMIGroupComponent, cInParentComp);
 	return pcComponent;
 }
 
-// 7-4. PMI를 Group으로 처리하기 위해서, Parent Component에서 PMI Group을 검색해서 찾아온다.
+// 7-5. PMI를 Group으로 처리하기 위해서, Parent Component에서 PMI Group을 검색해서 찾아온다.
 H3DF::Component * TdfImport::GetPmiGroupComponent(H3DF::Component & cInParentComp)
 {
 	H3DF::Component * pcPmiGroupComponent = H3DF::ComponentUtility::GetPmiGroupComponent(cInParentComp);
@@ -2867,7 +2965,7 @@ H3DF::Component * TdfImport::GetPmiGroupComponent(H3DF::Component & cInParentCom
 	}
 
 	// 찾지 못한 경우 생성.
-	if(nullptr == pcPmiGroupComponent) {
+	if(nullptr == pcPmiGroupComponent) {	
 		pcPmiGroupComponent = CreatePmiGroupComponent(cInParentComp);
 	}
 
@@ -2924,7 +3022,7 @@ A3DStatus TdfImport::DrawTessBase(A3DTessBase * pcInTessBase, const A3DRiReprese
 A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
 	const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cParentSegment)
 {
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
 	double dUnitScale = 1.0;	// Tessellation은 1:1 비율로 들어온다 
 
@@ -2948,7 +3046,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 	A3DMiscCascadedAttributesData sFistAttrData;
 	CreateAndPushCascadedAttributesTessFace(pcRepItem, pcTess3D, &cTessFaceData, 0, pcParentAttr, &pcAttribute, &sFistAttrData);
 
-	//Log::Write(2, L"pcAttribute: %s, sFistAttrData: %s,, m_uiRgbColorIndex: %d", Log::LogHexStr((DWORD_PTR) pcAttribute), Log::LogHexStr((DWORD_PTR) &sFistAttrData), sFistAttrData.m_sStyle.m_uiRgbColorIndex);
+	//Log::Write(L"pcAttribute: %s, sFistAttrData: %s,, m_uiRgbColorIndex: %d", Log::LogHexStr((DWORD_PTR) pcAttribute), Log::LogHexStr((DWORD_PTR) &sFistAttrData), sFistAttrData.m_sStyle.m_uiRgbColorIndex);
 
 	SetFaceStyle(cParentSegment, sFistAttrData);
 
@@ -3083,7 +3181,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 	//SetTextureMapping(cParentSegment, psAttrData[nMaxFaceIndex]);
 
 	mFaceSegmentStyleMap.SetAt(nMaxRgbColorIndex, cParentSegment.KeyValue());
-	Log::Write(2, L"max_style_face_%d, count: %d", nMaxRgbColorIndex, nMaxCount);
+	Log::Write(L"max_style_face_%d, count: %d", nMaxRgbColorIndex, nMaxCount);
 
 	// Max Color Index를 제외한 나머지 Color Index들은 각각의 Style Face Segment를 생성해서 집어 넣도록 한다.
 	// 각각 Face의 Color Index가 Max Index가 아닌 경우는 Color Index를 적용하기 위해서 별도의 Face Segment를 생성하고 Style을 적용시킨다.
@@ -3102,7 +3200,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 
 	mStyleDefineMap.RemoveAll();
 
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
 	for (A3DUns32 nFaceIndex = 0; nFaceIndex < nFacesCount; nFaceIndex++)
 	{
@@ -3124,7 +3222,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 				//----- Texture Mapping 설정 -----
 				//SetTextureMapping(cCurrnetSegment, psAttrData[nFaceIndex]);
 
-				// Log::Write(2, L"style_face_%d", nRgbColorIndex);
+				// Log::Write(L"style_face_%d", nRgbColorIndex);
 			}
 		}
 
@@ -3240,13 +3338,13 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 
 	REMOVE_ARRAY(psAttrData);
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
-	Log::Write(2, L"DrawTess3D [InsertShell]: %s, %d, Style Count: %d", Log::HexStr((DWORD_PTR)pcTess3D), nTriangleFaceCount, m_mMaterialMappingStyleMap.GetCount());
+	Log::Write(L"DrawTess3D [InsertShell]: %s, %d, Style Count: %d", Log::HexStr((DWORD_PTR)pcTess3D), nTriangleFaceCount, m_mMaterialMappingStyleMap.GetCount());
 
 	CHECK_A3D_RETURN(A3DTess3DGet(nullptr, &cTess3dData));
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	return A3D_SUCCESS;
 }
@@ -3254,7 +3352,7 @@ A3DStatus TdfImport::DrawTess3D(const A3DTess3D * pcTess3D, const A3DTessBaseDat
 A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcInTess3D, const A3DTessBaseData * pcInTessBaseData, const A3DRiRepresentationItem * pcInRepItem, 
 	const A3DMiscEntityReference * pcInEntityRef, const A3DMiscCascadedAttributes * pcInParentAttr, H3DF::SegmentKey & cInSegment)
 {
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
 	double dUnitScale = 1.0;	// Tessellation은 1:1 비율로 들어온다 
 
@@ -3438,7 +3536,7 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcInTess3D, const A3
 	// 또한 내부에서 Style Segment를 생성하고 Map 저장한다.
 	SetFaceStyle(cInSegment, psMaxAttrData);
 
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
 	H3DF::ShellKit cShellKit;
 	cShellKit.CreateShellWrapper();
@@ -3613,13 +3711,13 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcInTess3D, const A3
 	REMOVE_ARRAY(pnFaceStartIndexes);
 	REMOVE_ARRAY(pnFaceRgbColorIndex);
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
-	Log::Write(2, L"DrawTess3DFaceRegion: %s, %d, Style Count: %d", Log::HexStr((DWORD_PTR)pcInTess3D), nTriangleFaceCount, m_mMaterialMappingStyleMap.GetCount());
+	Log::Write(L"DrawTess3DFaceRegion: %s, %d, Style Count: %d", Log::HexStr((DWORD_PTR)pcInTess3D), nTriangleFaceCount, m_mMaterialMappingStyleMap.GetCount());
 
 	CHECK_A3D_RETURN(A3DTess3DGet(nullptr, &cTess3dData));
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	return A3D_SUCCESS;
 }
@@ -3635,7 +3733,7 @@ UINT TdfImport::ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo)
 
 	A3DUns32 nTriangleCount = cInFaceInfo.pnIndices->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
 
-	// Log::Write(2, L"ConvertTessFaceDataTriangle: %d", nTriangleCount);
+	// Log::Write(L"ConvertTessFaceDataTriangle: %d", nTriangleCount);
 
 	for (A3DUns32 nTriIndex = 0; nTriIndex < nTriangleCount; nTriIndex++)
 	{
@@ -3672,7 +3770,7 @@ UINT TdfImport::ConvertTessFaceDataTriangle(ConvertFaceInfo & cInFaceInfo, H3DF:
 
 	A3DUns32 nTriangleCount = cInFaceInfo.pnIndices->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
 
-	// Log::Write(2, L"ConvertTessFaceDataTriangle: %d", nTriangleCount);
+	// Log::Write(L"ConvertTessFaceDataTriangle: %d", nTriangleCount);
 
 	for (A3DUns32 nTriIndex = 0; nTriIndex < nTriangleCount; nTriIndex++)
 	{
@@ -3709,7 +3807,7 @@ UINT TdfImport::ConvertTessFaceDataTriangleFan(ConvertFaceInfo & cInFaceInfo)
 
 	A3DUns32 nTriFanCount = cInFaceInfo.pnIndices->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
 
-	// Log::Write(2, L"ConvertTessFaceDataTriangleFan: %d", nTriFanCount);
+	// Log::Write(L"ConvertTessFaceDataTriangleFan: %d", nTriFanCount);
 
 	for (A3DUns32 nFanIndex = 0; nFanIndex < nTriFanCount; nFanIndex++)
 	{
@@ -3832,7 +3930,7 @@ UINT TdfImport::ConvertTessFaceDataTriangleStripe(ConvertFaceInfo & cInFaceInfo)
 	A3DUns32 nStripesCount = cInFaceInfo.pnIndices->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
 	A3DUns32 nTriFaceCount = 0;
 
-	// Log::Write(2, L"ConvertTessFaceDataTriangleStripe: %d", nStripesCount);
+	// Log::Write(L"ConvertTessFaceDataTriangleStripe: %d", nStripesCount);
 
 	bool hasVertexColor = false; // INT2bool(cTessFaceData.m_uiRGBAVerticesSize);
 	if (0 < cInFaceInfo.pnIndices->m_uiRGBAVerticesSize) {
@@ -3976,7 +4074,7 @@ UINT TdfImport::ConvertTessFaceDataTriangleOneNormal(ConvertFaceInfo & cInFaceIn
 
 	A3DUns32 nTriangleCount = cInFaceInfo.pnIndices->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
 
-	// Log::Write(2, L"ConvertTessFaceDataTriangleOneNormal: %d", nTriangleCount);
+	// Log::Write(L"ConvertTessFaceDataTriangleOneNormal: %d", nTriangleCount);
 
 	for (A3DUns32 nTriIndex = 0; nTriIndex < nTriangleCount; nTriIndex++)
 	{
@@ -4010,7 +4108,7 @@ UINT TdfImport::ConvertTessFaceDataTriangleOneNormal(ConvertFaceInfo & cInFaceIn
 
 	A3DUns32 nTriangleCount = cInFaceInfo.pnIndices->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
 
-	// Log::Write(2, L"ConvertTessFaceDataTriangleOneNormal: %d", nTriangleCount);
+	// Log::Write(L"ConvertTessFaceDataTriangleOneNormal: %d", nTriangleCount);
 
 	for (A3DUns32 nTriIndex = 0; nTriIndex < nTriangleCount; nTriIndex++)
 	{
@@ -4045,7 +4143,7 @@ UINT TdfImport::ConvertTessFaceDataTriangleFanOneNormal(ConvertFaceInfo & cInFac
 
 	A3DUns32 nTriFanCount = cInFaceInfo.pnIndices->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
 
-	// Log::Write(2, L"ConvertTessFaceDataTriangleFanOneNormal: %d", nTriFanCount);
+	// Log::Write(L"ConvertTessFaceDataTriangleFanOneNormal: %d", nTriFanCount);
 
 	for (A3DUns32 fan = 0; fan < nTriFanCount; fan++)
 	{
@@ -4117,7 +4215,7 @@ UINT TdfImport::ConvertTessFaceDataTriangleFanOneNormal(ConvertFaceInfo & cInFac
 
 	A3DUns32 nTriFanCount = cInFaceInfo.pnIndices->m_puiSizesTriangulated[nTriSizeIndex++];
 
-	// Log::Write(2, L"ConvertTessFaceDataTriangleFanOneNormal: %d", nTriFanCount);
+	// Log::Write(L"ConvertTessFaceDataTriangleFanOneNormal: %d", nTriFanCount);
 
 	bool bSingleNormal = false;
 	A3DUns32 nFaceCount = 0;
@@ -4223,7 +4321,7 @@ UINT TdfImport::ConvertTessFaceDataTriangleStripeOneNormal(ConvertFaceInfo & cIn
 
 	A3DUns32 nStripesCount = cInFaceInfo.pnIndices->m_puiSizesTriangulated[cInFaceInfo.nOutTriSizeIndex++];
 
-	// Log::Write(2, L"ConvertTessFaceDataTriangleStripeOneNormal: %d", nStripesCount);
+	// Log::Write(L"ConvertTessFaceDataTriangleStripeOneNormal: %d", nStripesCount);
 
 	for (A3DUns32 nStripIndex = 0; nStripIndex < nStripesCount; nStripIndex++)
 	{
@@ -4565,9 +4663,9 @@ A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3D
 	// Wireframe에 show wireframe style 적용
 	// cInSegment.GetStyleControl().PushSegment(m_cShowWireFrameStyle);
 
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
-	Log::Write(2, "DrawTess3DWire: %s, %s", Log::HexStr((DWORD_PTR)pTess3DWire), Dmi3dx::GetA3dEntityTypeString(eType));
+	Log::Write("DrawTess3DWire: %s, %s", Log::HexStr((DWORD_PTR)pTess3DWire), Dmi3dx::GetA3dEntityTypeString(eType));
 
 	switch (eType)
 	{
@@ -4606,7 +4704,7 @@ A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3D
 		A3DEEntityType eEntityType = kA3DTypeUnknown;
 		CHECK_A3D_RETURN(A3DEntityGetType(cWireEdgeData.m_p3dCurve, &eEntityType));
 
-		Log::Write(2, "3dCurve type: %s, %s", Log::HexStr((DWORD_PTR)cWireEdgeData.m_p3dCurve), Dmi3dx::GetA3dEntityTypeString(eEntityType));
+		Log::Write("3dCurve type: %s, %s", Log::HexStr((DWORD_PTR)cWireEdgeData.m_p3dCurve), Dmi3dx::GetA3dEntityTypeString(eEntityType));
 	}
 
 	SetLineStyle(pTess3DWire, cInSegment, pcParentAttr);
@@ -4627,7 +4725,7 @@ A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3D
 
 	cInSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	return nStatus;
 }
@@ -4635,11 +4733,11 @@ A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3D
 A3DStatus TdfImport::DrawPolyWires(const A3DTess3D * pcTess3D, const A3DTessBaseData * pcTessBaseData, const A3DRiRepresentationItem * pcRepItem,
 	const A3DMiscCascadedAttributes * pcParentAttr, H3DF::SegmentKey & cInSegment)
 {
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
-	Log::Write(2, "DrawPolyWires: %s", Log::HexStrA((DWORD_PTR)pcTess3D));
+	Log::Write("DrawPolyWires: %s", Log::HexStrA((DWORD_PTR)pcTess3D));
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	A3DTess3DWireData sWireData;
 	A3D_INITIALIZE_DATA(A3DTess3DWireData, sWireData);
@@ -5206,7 +5304,7 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 		return A3D_ERROR;
 	}
 
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
 	A3DStatus nRetStatus = A3D_SUCCESS;
 
@@ -5300,7 +5398,7 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 
 			cMaterialKit.SetDiffuseColor(cDiffuseColor);
 
-			//Log::Write(2, L"DrawStyle: DiffuseColor R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
+			//Log::Write(L"DrawStyle: DiffuseColor R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
 /*
 			nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiAmbient, &sRgbColorData));
@@ -5337,13 +5435,13 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 			H3DF::RGBAColor cDiffuseColor(sRgbColorData.m_dRed, sRgbColorData.m_dGreen, sRgbColorData.m_dBlue);
 			cMaterialKit.SetDiffuseColor(cDiffuseColor);
 
-			//Log::Write(2, L"DrawStyle: R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
+			//Log::Write(L"DrawStyle: R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
 
 			//nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 		}
 	}
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	return A3D_SUCCESS;
 }
@@ -5351,7 +5449,7 @@ A3DStatus TdfImport::GetMaterial(const A3DMiscCascadedAttributesData & cAttrsDat
 // 8-1. 일반 DrawStyle 정의 
 A3DStatus TdfImport::GetMaterial(const A3DGraphStyleData & cInStyleData, H3DF::MaterialKit & cOutMaterial)
 {
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
 	bool bTransparencyDefined = (1 == cInStyleData.m_bIsTransparencyDefined) ? true : false;
 	float fTransparency = cInStyleData.m_ucTransparency / 255.0f;
@@ -5436,7 +5534,7 @@ A3DStatus TdfImport::GetMaterial(const A3DGraphStyleData & cInStyleData, H3DF::M
 			}
 			cOutMaterial.SetDiffuseColor(cDiffuseColor);
 
-			//Log::Write(2, L"DrawStyle: DiffuseColor R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
+			//Log::Write(L"DrawStyle: DiffuseColor R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
 /*
 			nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiAmbient, &sRgbColorData));
@@ -5474,13 +5572,13 @@ A3DStatus TdfImport::GetMaterial(const A3DGraphStyleData & cInStyleData, H3DF::M
 			if (true == bTransparencyDefined) { cDiffuseColor.alpha = fTransparency; }
 			cOutMaterial.SetDiffuseColor(cDiffuseColor);
 
-			//Log::Write(2, L"DrawStyle: R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
+			//Log::Write(L"DrawStyle: R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
 
 			A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 		}
 	}
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	return A3D_SUCCESS;
 }
@@ -5785,7 +5883,7 @@ A3DStatus TdfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cAt
 		return A3D_ERROR;
 	}
 
-	Log::IncreaseTabIndex(2);
+	Log::IncreaseTabIndex();
 
 	bool bTransparencyDefined = (1 == cAttrsData.m_sStyle.m_bIsTransparencyDefined) ? true : false;
 	float fTransparency = cAttrsData.m_sStyle.m_ucTransparency / 255.0f;
@@ -5864,7 +5962,7 @@ A3DStatus TdfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cAt
 			if (true == bTransparencyDefined) { cDiffuseColor.alpha = fTransparency; }
 			cMaterialKit.SetDiffuseColor(cDiffuseColor);
 
-			//Log::Write(2, L"DrawStyle: DiffuseColor R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
+			//Log::Write(L"DrawStyle: DiffuseColor R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
 /*
 			nRetStatus = A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 			CHECK_A3D_RETURN(A3DGlobalGetGraphRgbColorData(sMaterialData.m_uiAmbient, &sRgbColorData));
@@ -5902,13 +6000,13 @@ A3DStatus TdfImport::GetTextureMapping(const A3DMiscCascadedAttributesData & cAt
 			if (true == bTransparencyDefined) { cDiffuseColor.alpha = fTransparency; }
 			cMaterialKit.SetDiffuseColor(cDiffuseColor);
 
-			//Log::Write(2, L"DrawStyle: R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
+			//Log::Write(L"DrawStyle: R:%f, G:%f, B:%f, A:%f", cDiffuseColor.red, cDiffuseColor.green, cDiffuseColor.blue, cDiffuseColor.alpha);
 
 			//A3DGlobalGetGraphRgbColorData(A3D_DEFAULT_COLOR_INDEX, &sRgbColorData);
 		}
 	}
 
-	Log::DecreaseTabIndex(2);
+	Log::DecreaseTabIndex();
 
 	return A3D_SUCCESS;
 }

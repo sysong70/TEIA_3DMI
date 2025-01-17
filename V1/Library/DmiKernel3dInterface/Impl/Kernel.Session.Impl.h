@@ -84,14 +84,19 @@ namespace KERNEL
 
 	protected:
 		bool IsCommandActive();
-		bool CommandLButtonUp(int nFlag, int x, int y);
-		bool CommandMouseMove(int nFlag, int x, int y);
+		bool CommandLButtonUp(Command::Event & cInEvent);
+		bool CommandMouseMove(Command::Event & cInEvent);
 	
 	protected:
-		//== View Control 관련 함수 ==================================================================
-		Command::Result::Type SelectViewControlMouseMove(int nInFlag, int x, int y);
-		bool SelectViewControlLButtonDown(int nInFlag, int x, int y);
-		Command::Result::Type SelectViewControlLButtonUp(int nInFlag, int x, int y);
+		//== Select Control 관련 함수 ================================================================
+		Command::Result::Type SelectControlMouseMove(Command::Event & cInEvent);
+		bool SelectControlLButtonDown(Command::Event & cInEvent);
+		Command::Result::Type SelectControlLButtonUp(Command::Event & cInEvent);
+
+		//== Camera Control 관련 함수 ================================================================
+		Command::Result::Type CameraControlMouseMove(Command::Event & cInEvent);
+		Command::Result::Type CameraControlLButtonDown(Command::Event & cInEvent);
+		Command::Result::Type CameraControlLButtonUp(Command::Event & cInEvent);
 
 		void RequestVisualEffects(Json::Object & cInObject);
 		void ChangeVisualEffects(Json::Object & cInObject);
@@ -110,7 +115,7 @@ namespace KERNEL
 		// 현재 선택된 요소들이 저장되는 변수
 		H3DF::SelectionResults m_cSelectionResult;
 
-		H3DF::Point2D m_cLButtonDownPosition;
+		H3DF::PixelPoint m_cLButtonDownPixelPoint;
 
 		DWORD m_nMouseWhellStartTick;
 

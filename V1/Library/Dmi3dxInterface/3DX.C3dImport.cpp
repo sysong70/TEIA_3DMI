@@ -4869,7 +4869,7 @@ void C3dImport::Log(int nId, LPCWSTR chMessage, ...)
 
 	va_end(cArgList);
 
-	LogManager::GetInstance()->WriteLog(nId, strBuffer);
+	LogManager::Log(nId, strBuffer);
 #endif
 }
 

@@ -859,101 +859,41 @@ namespace H3DF
 #	define TDF_UNREFERENCED(param) ((void)(param))
 #endif
 
-	class API_3DF Memory
-	{
-	public:
-		static void * Allocate(size_t nInBytes, bool bInClearMemory = false);
-		static void	Free(void * pInPointer);
-
-	private:
-		//! Private default constructor to prevent instantiation.
-		Memory();
-	};
-
-	template <typename T>
-	class Allocator
-	{
-	public:
-		typedef T					value_type;
-		typedef value_type * pointer;
-		typedef value_type const * const_pointer;
-		typedef value_type & reference;
-		typedef value_type const & const_reference;
-		typedef size_t				size_type;
-		typedef ptrdiff_t			difference_type;
-
-		Allocator() {}
-		Allocator(Allocator<T> const & in_that) { TDF_UNREFERENCED(in_that); }
-		~Allocator() {}
-
-		template <typename U> Allocator(Allocator<U> const &) {}
-
-		template <typename U>
-		struct rebind {
-			typedef Allocator<U> other;
-		};
-
-		pointer address(reference x) const { return &x; }
-		const_pointer address(const_reference x) const { return &x; }
-
-		pointer allocate(size_type n, void * v = 0) { TDF_UNREFERENCED(v); return static_cast<pointer>(Memory::Allocate(n * sizeof(T))); }
-		void deallocate(pointer p, size_type n) { TDF_UNREFERENCED(n); Memory::Free(p); }
-
-#if defined(_MSC_VER) || defined (__APPLE__)
-		void construct(pointer p, const_reference x) { new(p) T(x); }
-		void construct(pointer p, value_type && x) { new(p) T(std::move(x)); }
-#else
-		template<typename U, typename... Args>
-		void construct(U * p, Args&&... args) { new(p) U(std::forward<Args>(args)...); }
-#endif
-
-		void destroy(pointer p) { TDF_UNREFERENCED(p); p->~T(); }
-
-		size_type max_size() const { return static_cast<size_type>(-1) / sizeof(T); }
-	};
-
-	template <typename T, typename U>
-	bool operator == (const Allocator<T> &, const Allocator<U> &) { return true; }
-
-	template <typename T, typename U>
-	bool operator != (const Allocator<T> &, const Allocator<U> &) { return false; }
-
-
 	//== Type Definitions ==========================================================================
-	using SegmentKeyArray = std::vector<SegmentKey, Allocator<SegmentKey>>;
-	using IncludeKeyArray = std::vector<IncludeKey, Allocator<IncludeKey>>;
+	using SegmentKeyArray = std::vector<SegmentKey>;
+	using IncludeKeyArray = std::vector<IncludeKey>;
 	
-	using ReferenceKeyArray = std::vector<ReferenceKey, Allocator<ReferenceKey>>;
-	using LineArray = std::vector<LineKit, Allocator<LineKit>>;
+	using ReferenceKeyArray = std::vector<ReferenceKey>;
+	using LineArray = std::vector<LineKit>;
 	using PolylineArray = LineArray;
 	using Polyline = LineKit;
 
-	using WindowPointArray = std::vector<WindowPoint, Allocator<WindowPoint>>;
-	using WorldPointArray = std::vector<WorldPoint, Allocator<WorldPoint>>;
-	using PixelPointArray = std::vector<PixelPoint, Allocator<PixelPoint>>;
+	using WindowPointArray = std::vector<WindowPoint>;
+	using WorldPointArray = std::vector<WorldPoint>;
+	using PixelPointArray = std::vector<PixelPoint>;
 
 	using Polygon = PolygonKit;
-	using PolygonArray = std::vector<PolygonKit, Allocator<PolygonKit>>;
+	using PolygonArray = std::vector<PolygonKit>;
 
-	using StringArray = std::vector<CString, Allocator<CString>>;
+	using StringArray = std::vector<CString>;
 	
-	using IntPtrTArray = std::vector<intptr_t, Allocator<intptr_t>>;
-	using ByteArray = std::vector<BYTE, Allocator<BYTE>>;
-	using ByteArrayArray = std::vector<ByteArray, Allocator<ByteArray>>;
+	using IntPtrTArray = std::vector<intptr_t>;
+	using ByteArray = std::vector<BYTE>;
+	using ByteArrayArray = std::vector<ByteArray>;
 
-	using BoolArray = std::vector<bool, Allocator<bool>>;
+	using BoolArray = std::vector<bool>;
 	
-	using AttributeLockTypeArray = std::vector<AttributeLock::Type, Allocator<AttributeLock::Type>>;
+	using AttributeLockTypeArray = std::vector<AttributeLock::Type>;
 
-	using StyleKeyArray = std::vector<StyleKey, Allocator<StyleKey>>;
+	using StyleKeyArray = std::vector<StyleKey>;
 
-	using ConditionalExpressionArray = std::vector<ConditionalExpression, Allocator<ConditionalExpression>>;
+	using ConditionalExpressionArray = std::vector<ConditionalExpression>;
 
-	using ComponentArray = std::vector<Component *, Allocator<Component *>>;
-	using MetadataArray = std::vector<MetaData *, Allocator<MetaData *>>;
+	using ComponentArray = std::vector<Component *>;
+	using MetadataArray = std::vector<MetaData *>;
 
 	class TextAttributes;
-	using TextAttributesArray = std::vector<TextAttributes, Allocator<TextAttributes>>;
+	using TextAttributesArray = std::vector<TextAttributes>;
 
 	enum class ModelHandedness
 	{
