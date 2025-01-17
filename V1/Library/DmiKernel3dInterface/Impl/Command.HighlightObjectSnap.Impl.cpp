@@ -251,7 +251,7 @@ KERNEL::Command::Result::Type KERNEL::Command::HighlightObjectSnapImpl::LButtonD
 }
 
 // 2. 버튼 눌림 없는 Mouse Move 처리
-int KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(Event & cInEvent)
+KERNEL::Command::Result::Type KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(Event & cInEvent)
 {
 	PixelPoint cMousePixelPoint(cInEvent.GetMousePixelPoint());
 	WindowPoint cWindowPoint(cInEvent.GetMouseWindowPoint());
@@ -269,7 +269,7 @@ int KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(Event & cInEve
 
 	// 같은 Mouse Point가 계속 들어오는 경우는 처리하지 않는다.
 	if (0 == fDist) {
-		return HLISTENER_PASS_EVENT;
+		return KERNEL::Command::Result::Type::Pass;
 	}
 
 	// 화면상에 나타나는 Dynamic Highlight 처리
@@ -282,6 +282,7 @@ int KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(Event & cInEve
 	// 기존에 선택된 Snap Point가 있으면 삭제한다. Segment Flush.
 	m_cSnapPointSegment.Flush(Search::Type::Segment);
 
+	// 마무리 될때까지 화면을 업데이트 하지 않음.
 	View().SuppressUpdate(true);
 
 	// Prev Mouse Move에서 저장되어 있는 Snap Point를 그림.
@@ -355,7 +356,7 @@ int KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(Event & cInEve
 
 				View().Update();
 
-				return HLISTENER_PASS_EVENT;
+				return KERNEL::Command::Result::Type::Pass;
 			}
 		}
 	}
@@ -418,17 +419,17 @@ int KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(Event & cInEve
 		// TRACE(L"Update, Tick: %d\n", nTickCount);
 	}
 
-	return HLISTENER_PASS_EVENT;
+	return KERNEL::Command::Result::Type::Pass;
 }
 
 // 2.1 Dynamic Highlight 처리
 bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint cInWindowPoint, SelectionItem & cOutSelection)
 {
 #if 0
-	pcView->GetHighlightSelection()->SetAllowRegionSelection(false);
-	pcView->SetDynamicHighlighting(true);
+	Window().GetBaseView()->GetHighlightSelection()->SetAllowRegionSelection(false);
+	Window().GetBaseView()->SetDynamicHighlighting(true);
 
-	pcView->DoDynamicHighlighting(HPoint(cInWindowPoint.x, cInWindowPoint.y, 0.0f));
+	Window().GetBaseView()->DoDynamicHighlighting(HPoint(cInWindowPoint.x, cInWindowPoint.y, 0.0f));
 
 	return HLISTENER_PASS_EVENT;
 #endif
@@ -487,7 +488,10 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 		cItem.ShowSelectionPosition(cWordlPoint);
 		cItem.ShowSelectionPosition(cWindowPoint);
 
-		TRACE(L"Item Type: %s / %f, %f, %f", Utility::GetTypeString(eType), cWordlPoint.x, cWordlPoint.y, cWordlPoint.z);
+		Key cSelectItemKey;
+		cItem.ShowSelectedItem(cSelectItemKey);
+
+		TRACE(L"Item Key: %d, Type: %s / %f, %f, %f", cSelectItemKey.KeyValue(), Utility::GetTypeString(eType), cWordlPoint.x, cWordlPoint.y, cWordlPoint.z);
 		cIter.Next();
 	}
 #endif
@@ -501,7 +505,7 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 	cSelectItem.ShowSelectionPosition(cSelectItemWorldPoint);
 	cSelectItem.ShowSelectionPosition(cSelectItemWindowPoint);
 
-	// 6.2개 이상의 요소가 선택된 경우 Line을 우선 처리한다. 앞에서 선택된 요소가 line이 아닌 경우에만 처리를 한다.
+	// 6. 2개 이상의 요소가 선택된 경우 Line을 우선 처리한다. 앞에서 선택된 요소가 line이 아닌 경우에만 처리를 한다.
 	if (1 < cFilteredSelResult.GetCount() && H3DF::Type::LineKey != eType) 
 	{
 		SelectionResultsIterator cIter = cFilteredSelResult.GetIterator();
@@ -536,7 +540,7 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 		}
 	}
 
-	// PMI Item이 선택된 경우 처리. PMI Item은 Group으로 선택되도록 처리한다.
+	// 7. PMI Item이 선택된 경우 처리. PMI Item은 Group으로 선택되도록 처리한다.
 	bool bFindPmiItem = false;
 	if (0 < cFilteredSelResult.GetCount()) {
 		H3DF::Type eType = cSelectItem.Type();
