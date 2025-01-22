@@ -427,6 +427,9 @@ HighlightControl & H3DF::HighlightControl::Highlight(SelectionResults const & cI
 
 		if (true == bShowNotification) {
 			H3DF::BaseView * pcView = pcHighlightImpl->GetBaseView();
+			
+			// HC_KEY nKey = pcView->GetViewKey();
+
 			pcView->ForceUpdate();
 		}
 	}

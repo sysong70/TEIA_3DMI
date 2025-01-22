@@ -603,6 +603,10 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 
 		H3DF::Type eType = cSelectItem.Type();
 
+#if 0
+		HC_KEY nKey = Window().GetBaseView()->GetViewKey();
+#endif
+
 		if (true == bFindPmiItem) {
 			m_cDynPmiHighlightCtrl.Highlight(cSelectItem, cOption);
 		}
