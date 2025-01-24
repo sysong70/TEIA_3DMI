@@ -300,6 +300,32 @@ SegmentKey const H3DF::View::GetSceneKey() const
 	return pcImpl->GetBaseView()->GetSceneKey();
 }
 
+SegmentKey H3DF::View::GetOverwriteKey()
+{
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr == pcImpl->GetBaseView()) {
+		DEBUG_STOP;
+	}
+
+	return pcImpl->GetBaseView()->GetOverwriteKey();
+}
+
+SegmentKey const H3DF::View::GetOverwriteKey() const
+{
+	return GetOverwriteKey();
+
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr == pcImpl->GetBaseView()) {
+		DEBUG_STOP;
+	}
+
+	return pcImpl->GetBaseView()->GetOverwriteKey();
+}
+
 NavigationCube & H3DF::View::GetNavigationCube() const
 {
 	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);

@@ -1401,3 +1401,81 @@ bool H3DF::SegmentKey::ShowUserData(intptr_t nInIndex, ByteArray & aOutData) con
 
 	return (0 < nSize) ? true : false;
 }
+
+bool H3DF::SegmentKey::ShowRenderingOptions(CStringA & strList) const
+{
+	bool bFlag = false;
+	SegmentKeyImpl::LocalOpen(*this);
+
+	if (0 < HC_Show_Existence("rendering options")) {
+		HC_Show_Rendering_Options(strList.GetBuffer(MVO_BUFFER_SIZE));
+		bFlag = true;
+	}
+
+	SegmentKeyImpl::LocalClose(*this);
+
+	return bFlag;
+}
+
+bool H3DF::SegmentKey::ShowVisibility(CStringA & strList) const
+{
+	bool bFlag = false;
+	SegmentKeyImpl::LocalOpen(*this);
+	
+	if (0 < HC_Show_Existence("visibility")) {
+		HC_Show_Visibility(strList.GetBuffer(MVO_BUFFER_SIZE));
+		bFlag = true;
+	}
+
+	SegmentKeyImpl::LocalClose(*this);
+
+	return bFlag;
+}
+
+bool H3DF::SegmentKey::ShowSelectability(CStringA & strList) const
+{
+	bool bFlag = false;
+	SegmentKeyImpl::LocalOpen(*this);
+
+	if (0 < HC_Show_Existence("selectability")) {
+		HC_Show_Selectability(strList.GetBuffer(MVO_BUFFER_SIZE));
+		bFlag = true;
+	}
+
+	SegmentKeyImpl::LocalClose(*this);
+
+	return bFlag;
+}
+
+bool H3DF::SegmentKey::ShowHeuristics(CStringA & strList) const
+{
+	bool bFlag = false;
+
+	SegmentKeyImpl::LocalOpen(*this);
+
+	if (0 < HC_Show_Existence("heuristics")) {
+		HC_Show_Heuristics(strList.GetBuffer(MVO_BUFFER_SIZE));
+		bFlag = true;
+	}
+
+	SegmentKeyImpl::LocalClose(*this);
+
+	return bFlag;
+}
+
+bool H3DF::SegmentKey::ShowDriverOptions(CStringA & strList) const
+{
+	bool bFlag = false;
+
+	SegmentKeyImpl::LocalOpen(*this);
+
+	if (0 < HC_Show_Existence("driver options")) {
+
+		HC_Show_Driver_Options(strList.GetBuffer(MVO_BUFFER_SIZE));
+		bFlag = true;
+	}
+
+	SegmentKeyImpl::LocalClose(*this);
+
+	return bFlag;
+}

@@ -603,8 +603,30 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 
 		H3DF::Type eType = cSelectItem.Type();
 
-#if 0
-		HC_KEY nKey = Window().GetBaseView()->GetViewKey();
+#if 1
+		CStringA strRenderingOptions, strVisibility, strSelectability, strHeuristics, strDriverOptions;
+
+		View().GetSegmentKey().ShowRenderingOptions(strRenderingOptions);
+		View().GetSegmentKey().ShowVisibility(strVisibility);
+		View().GetSegmentKey().ShowSelectability(strSelectability);
+		View().GetSegmentKey().ShowHeuristics(strHeuristics);
+		View().GetSegmentKey().ShowDriverOptions(strDriverOptions);
+
+		View().GetSceneKey().ShowRenderingOptions(strRenderingOptions);
+		View().GetSceneKey().ShowVisibility(strVisibility);
+		View().GetSceneKey().ShowSelectability(strSelectability);
+		View().GetSceneKey().ShowHeuristics(strHeuristics);
+		View().GetSceneKey().ShowDriverOptions(strDriverOptions);
+
+		View().GetOverwriteKey().ShowRenderingOptions(strRenderingOptions);
+		View().GetOverwriteKey().ShowVisibility(strVisibility);
+		View().GetOverwriteKey().ShowSelectability(strSelectability);
+		View().GetOverwriteKey().ShowHeuristics(strHeuristics);
+		View().GetOverwriteKey().ShowDriverOptions(strDriverOptions);
+
+// 		SegmentKey cSegmentKey(nKey);
+// 		CStringA strRenderingOptions;
+// 		cSegmentKey.ShowRenderingOptions(strRenderingOptions);
 #endif
 
 		if (true == bFindPmiItem) {

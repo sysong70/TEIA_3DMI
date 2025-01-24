@@ -63,6 +63,9 @@ namespace H3DF
 		SegmentKey GetSceneKey();
 		SegmentKey const GetSceneKey() const;
 
+		SegmentKey GetOverwriteKey();
+		SegmentKey const GetOverwriteKey() const;
+
 		NavigationCube & GetNavigationCube() const;
 
 		void InvalidateSceneBounding();

@@ -219,11 +219,13 @@ H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
 
 	//================================================================================================
 
+/*
 	m_pcSelectionSet->SetAllowRegionSelection(true);
 
 	m_pcSelectionSet->SetGrayScale(false);
 	m_pcSelectionSet->SetUseDefinedHighlight(false);
 	m_pcSelectionSet->SetAllowDisplacement(false);
+*/
 
 	HPixelRGBA cHighlightSelectColor;
 	cHighlightSelectColor.Set(255, 0, 0);
@@ -236,6 +238,12 @@ H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
 	m_pcSelectionSet->HighlightRegionEdgesAutoVisibility(false);
 
 	m_pcSelectionSet->UpdateHighlightStyle();
+
+	HC_Open_Segment_By_Key(m_pcSelectionSet->GetHighlightStyle()); {
+		char chRenderOptions[MVO_BUFFER_SIZE];
+		HC_Show_Rendering_Options(chRenderOptions);
+		int i = 0;
+	} HC_Close_Segment();
 }
 
 BaseView * H3DF::HighlightControlImpl::GetBaseView()
