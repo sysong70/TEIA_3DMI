@@ -41,21 +41,16 @@ END_MESSAGE_MAP()
 Window::View::View()
 {
 	m_nViewId = PRESET::ViewIndex++;
-
-	GetMainFrame().ViewChanged(WM_CREATE, this);
 }
 
 
 
 Window::View::~View()
 {
-	m_toolBar.DestroyWindow();
-	m_historyBar.DestroyWindow();
-	m_tabs.DestroyWindow();
-
 	GetDelivery().view.OnDestruct();
-	//:WARNING - change after OnDestruct()
+	// WARNING - change after OnDestruct()
 	m_nViewId = -1;
+	m_tabs.DestroyWindow();
 	GetMainFrame().ViewChanged(WM_DESTROY, this);
 }
 
@@ -95,17 +90,25 @@ int Window::View::GetId()
 
 
 
+EViewType Window::View::GetViewType()
+{
+	return m_eType;
+}
+
+
+
 void Window::View::OnActivateView(BOOL bActivate, CView* pActivateView, CView* pDeactiveView)
 {
-	Activate(bActivate);
-
 	__super::OnActivateView(bActivate, pActivateView, pDeactiveView);
+
+	Activate(bActivate);
 }
 
 
 
 void Window::View::OnDraw(CDC* pDC)
 {
+	__super::OnDraw(pDC);
 }
 
 
@@ -114,6 +117,7 @@ void Window::View::OnInitialUpdate()
 {
 	__super::OnInitialUpdate();
 
+	CreateCommandPrompt();
 	CreateHistoryBar();
 	CreateToolBar();
 	CreatePanelTabs();
@@ -157,15 +161,6 @@ LRESULT Window::View::OnSignal(WPARAM wp, LPARAM lp)
 
 
 
-void Window::View::OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized)
-{
-	__super::OnActivate(nState, pWndOther, bMinimized);
-
-	Activate(nState == WA_ACTIVE);
-}
-
-
-
 void Window::View::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	__super::OnChar(nChar, nRepCnt, nFlags);
@@ -186,7 +181,7 @@ void Window::View::OnContextMenu(CWnd*, CPoint point)
 
 BOOL Window::View::OnEraseBkgnd(CDC* pDC)
 {
-	//:WARING - do not remove background
+	// WARNING - do not remove background
 	//return __super::OnEraseBkgnd(pDC);
 	return TRUE;
 }
@@ -195,14 +190,20 @@ BOOL Window::View::OnEraseBkgnd(CDC* pDC)
 
 void Window::View::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	switch (nChar) {
-	case VK_ESCAPE:
-		CancelCommand();
-		return;
-
-	default:
-		break;
+	if (IsValid()) {
+		GetDelivery().view.OnKeyDown(nChar, nRepCnt, nFlags);
 	}
+
+	// CHECK
+
+	//switch (nChar) {
+	//case VK_ESCAPE:
+	//	CancelCommand();
+	//	return;
+
+	//default:
+	//	break;
+	//}
 
 	__super::OnKeyDown(nChar, nRepCnt, nFlags);
 }
@@ -211,7 +212,7 @@ void Window::View::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void Window::View::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	//:TODO
+	// TODO
 
 	__super::OnKeyUp(nChar, nRepCnt, nFlags);
 }
@@ -220,11 +221,11 @@ void Window::View::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void Window::View::OnPaint()
 {
-	//:WARNING - do not remove! call CPaintDC or CWindow::View::OnPaint() 
+	// WARNING - do not remove! call CPaintDC or CWindow::View::OnPaint() 
 	CPaintDC dc(this);
 	CRect rect = GetClientArea();
 
-	if (m_bRenderer) {
+	if (IsValid()) {
 		GetDelivery().view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
 	}
 	else {
@@ -237,6 +238,7 @@ void Window::View::OnPaint()
 void Window::View::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	if (IsValid()) {
+		SetFocus();
 		SetCapture();
 
 		//if (TheAppOptions.GetBoolean("Environment/Mouse/SwapPanAndRotate")) {
@@ -277,9 +279,10 @@ void Window::View::OnLButtonUp(UINT nFlags, CPoint point)
 void Window::View::OnMButtonDown(UINT nFlags, CPoint point)
 {
 	if (IsValid()) {
+		SetFocus();
 		SetCapture();
 
-		GetDelivery().view.OnLButtonDown(nFlags, point.x, point.y);
+		GetDelivery().view.OnMButtonDown(nFlags, point.x, point.y);
 	}
 
 	__super::OnMButtonDown(nFlags, point);
@@ -331,6 +334,7 @@ void Window::View::OnMouseMove(UINT nFlags, CPoint point)
 void Window::View::OnRButtonDown(UINT nFlags, CPoint point)
 {
 	if (IsValid()) {
+		SetFocus();
 		SetCapture();
 
 		//if (TheAppOptions.GetBoolean("Environment/Mouse/SwapPanAndRotate")) {
@@ -372,13 +376,15 @@ void Window::View::OnSize(UINT nType, int cx, int cy)
 {
 	__super::OnSize(nType, cx, cy);
 
+	// REF - nType: SIZE_MAXIMIZED, ...
+
 	if (cx > 0 && cy > 0) {
 		m_toolBar.AdjustLayout();
 		m_historyBar.AdjustLayout();
 		TheApplication.GetMainFrame().m_taskBar.AdjustLayout();
 	}
 
-	if (m_bRenderer) {
+	if (IsValid()) {
 		GetDelivery().view.OnResize(cx, cy);
 	}
 }
@@ -387,19 +393,19 @@ void Window::View::OnSize(UINT nType, int cx, int cy)
 
 void Window::View::Activate(bool value)
 {
-	if (m_bRenderer) {
-		m_bActivate = value;
+#define ShowOrHide(x) if (x.GetSafeHwnd() != nullptr) x.ShowWindow(cmd);
 
-		if (value) {
-			GetMainFrame().ViewChanged(WM_ACTIVATE, this);
-			m_toolBar.ShowWindow(SW_SHOW);
-			m_historyBar.ShowWindow(SW_SHOW);
-		}
-		else {
-			m_toolBar.ShowWindow(SW_HIDE);
-			m_historyBar.ShowWindow(SW_HIDE);
-		}
-	}
+	//if (IsValid()) {
+		m_bActivate = value;
+		int cmd = value ? SW_SHOW : SW_HIDE;
+
+		ShowOrHide(m_toolBar);
+		ShowOrHide(m_historyBar);
+
+		GetMainFrame().ViewChanged(WM_ACTIVATE, this);
+	//}
+
+#undef ShowOrHide
 }
 
 
@@ -430,14 +436,16 @@ Window::MainFrame& Window::View::GetMainFrame()
 
 bool Window::View::IsValid()
 {
-	return m_bRenderer && m_bActivate;
+	// KEN - 20250124, OnPaint error
+	//return m_bRenderer && m_bActivate;
+	return m_bRenderer;
 }
 
 
 
-void Window::View::CreateHistoryBar()
+void Window::View::CreateHistoryBar(Control::EPivot pivot)
 {
-	m_historyBar.SetPivot(Control::EPivot::BottomCenter, false);
+	m_historyBar.SetPivot(pivot, false);
 	m_historyBar.Initialize(this);
 }
 

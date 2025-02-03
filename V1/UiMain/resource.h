@@ -44,22 +44,25 @@
 #define IDC_DMI_CONTROL_08		10208
 #define IDC_DMI_CONTROL_09		10209
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Local Resource
 
 #define IDF_JSON_UI					19101
-#define IDF_JSON_DATA_PREFERENCES	19102
-#define IDF_JSON_DATA_FILEOPTIONS	19103
-#define IDF_PNG_BACKGROUND			19104
+#define IDF_JSON_DIALOGS			19102
+#define IDF_JSON_DICTIONARY			19103
+#define IDF_JSON_TASKS				19104
+#define IDF_JSON_DATA_FILEOPTIONS	19105
+#define IDF_JSON_DATA_PREFERENCES	19106
+#define IDF_PNG_BACKGROUND			19107
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region TaskBar ID
 
 #include "Command.Resource.h"
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 // Next default values for new objects
 // 

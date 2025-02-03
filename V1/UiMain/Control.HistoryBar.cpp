@@ -40,12 +40,12 @@ void Control::HistoryBar::PushButton(UINT id)
 
 void Control::HistoryBar::RemoveButton(UINT id)
 {
-	std::vector<CBCGPButton*>::iterator iter;
-	for (iter = m_buttons.begin(); iter != m_buttons.end(); iter++) {
-		auto button = *iter;
+	std::vector<CBCGPButton*>::iterator it;
+	for (it = m_buttons.begin(); it != m_buttons.end(); it++) {
+		auto button = *it;
 		if (button != nullptr && button->GetDlgCtrlID() == id) {
 			REMOVE_POINTER(button);
-			m_buttons.erase(iter);
+			m_buttons.erase(it);
 			break;
 		}
 	}

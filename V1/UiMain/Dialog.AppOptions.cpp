@@ -67,6 +67,8 @@ BOOL Dialog::AppOptions::OnInitDialog()
 {
 	__super::OnInitDialog();
 
+	BeginWaitCursor();
+
 	CSize frame = GetFrameThickness();
 	CSize size = GetWinSize();
 	CRect body = { 0, frame.cy, size.cx, size.cy };
@@ -78,7 +80,7 @@ BOOL Dialog::AppOptions::OnInitDialog()
 	m_windowSize = AdjustWindowSize(size);
 	SetSizeLimit(true, true);
 
-	//:WARNING
+	// WARNING
 	m_fileOptionsUi.OnPropertyChangedHandler(this);
 
 	// data initialize
@@ -104,7 +106,6 @@ BOOL Dialog::AppOptions::OnInitDialog()
 	m_preferencesUi.InitializeDesign(m_preferences.Design);
 	m_fileOptionsUi.InitializeDesign(m_fileOptions.Design);
 
-	//:CHECK - from Window::MainFrame::OnAppOptions()
 	EndWaitCursor();
 
 	return TRUE;
@@ -125,7 +126,7 @@ LRESULT Dialog::AppOptions::OnChangeActiveTab(WPARAM wp, LPARAM lp)
 {
 	int index = (int)wp;
 
-	//:TODO
+	// TODO
 
 	return S_OK;
 }
@@ -178,7 +179,7 @@ void Dialog::AppOptions::OnApply()
 
 void Dialog::AppOptions::ConstructBody(const CRect& boundary)
 {
-	//:WARNING - setting before Create()
+	// WARNING - setting before Create()
 	m_tabs.SetTabHeight(Control::TabHeight());
 
 	if (m_tabs.Create(CBCGPTabWnd::STYLE_3D, boundary, this, PRESET::Id) == FALSE) {

@@ -19,9 +19,9 @@ namespace Control
 
 		bool Initialize(CWnd* pParentWnd, UINT id = WM_USER, const RECT& rect = {});
 
-		void InitializeDesign(Json::Object& design);
+		bool InitializeDesign(Json::Object& design, CString dictionary = L"");
 
-		void InitializeData(Json::Object& data);
+		bool InitializeData(Json::Object& data);
 
 	public:
 
@@ -46,7 +46,7 @@ namespace Control
 		void SetPropEnable(CBCGPProp* pProp, Json::Object& design);
 
 		void SetPropId(CBCGPProp* pProp, Json::Object& design);
-		//:WARNING - do not use Name, use XMLTagName
+		// WARNING - do not use Name, use XMLTagName
 		void SetPropName(CBCGPProp* pProp, Json::Object& design);
 
 		void SetPropValue(CBCGPProp* pProp, Json::Value* pValue);
@@ -60,7 +60,7 @@ namespace Control
 		BOOL PreTranslateMessage(MSG* pMsg) override;
 
 		void OnPropertyChanged(CBCGPProp* pProp) const override;
-		//:WARNING - for Property::CommandButton highlight
+		// WARNING - for Property::CommandButton highlight
 		afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 
 		DECLARE_MESSAGE_MAP()
@@ -93,12 +93,18 @@ namespace Control
 
 		CBCGPProp* CreateFontProp(Json::Object& design);
 
+		CBCGPProp* CreateLengthProp(Json::Object& design);
+
 		CBCGPProp* CreateSliderProp(Json::Object& design);
 
 	protected:
 
+		CString m_dictionary;
+		// block signalling during design
 		bool m_bInitialized = false;
+		// desing structure
 		Json::Object* m_pDesign = nullptr;
+		// data(value)
 		Json::Object* m_pData = nullptr;
 	};
 }

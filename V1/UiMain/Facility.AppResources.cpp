@@ -26,26 +26,26 @@ Facility::AppResources::~AppResources()
 
 bool Facility::AppResources::Load()
 {
+#define LoadSub(x) if (Init##x() == false) { return false; }
+
+	LoadSub(Dialogs);
+	LoadSub(Dictionary);
+	LoadSub(Tasks);
+	LoadSub(Images);
+
+	LoadSub(FileOptions);
+	LoadSub(Preferences);
+
 	if (Initialize() == false) {
 		return false;
 	}
 
-	if (InitPreferences() == false) {
-		return false;
-	}
-
-	if (InitFileOptions() == false) {
-		return false;
-	}
-
-	if (InitImages() == false) {
-		return false;
-	}
-
 	return true;
+
+#undef LoadSub
 }
 
-
+//--------------------------------------------------------------------------------------------------
 
 HBITMAP Facility::AppResources::GetBackground()
 {
@@ -54,23 +54,16 @@ HBITMAP Facility::AppResources::GetBackground()
 
 
 
-Json::Object& Facility::AppResources::GetDescription()
-{
-	return m_ui.GetAt("Description");
-}
-
-
-
 Json::Object& Facility::AppResources::GetDialog(CStringA name)
 {
-	return m_ui.GetAt("Dialogs").GetAt(name);
+	return m_dialogs.GetAt(name);
 }
 
 
 
-Json::Object& Facility::AppResources::GetPreferences()
+Json::Object& Facility::AppResources::GetDictionary()
 {
-	return m_preferences;
+	return m_dictionary;
 }
 
 
@@ -82,6 +75,13 @@ Json::Object& Facility::AppResources::GetFileOptions()
 
 
 
+Json::Object& Facility::AppResources::GetPreferences()
+{
+	return m_preferences;
+}
+
+
+
 Json::Object& Facility::AppResources::GetStyles()
 {
 	return m_ui.GetAt("Styles");
@@ -89,9 +89,55 @@ Json::Object& Facility::AppResources::GetStyles()
 
 
 
+CString Facility::AppResources::GetStringFrom(Json::Value* pValue, CString dictionary)
+{
+	CString value;
+
+	if (pValue->IsInteger()) {
+		CStringA code = (CStringA)WStr::Format(
+			WStr::Format(L"%%0%dd", Facility::CodeLength),
+			pValue->AsInteger()
+		);
+
+		if (dictionary.IsEmpty() == false) {
+			code = (CStringA)dictionary + "." + code;
+		}
+		else {
+			code = (CStringA)pValue->ToString();
+		}
+
+		value = m_dictionary.GetString(code);
+	}
+	else {
+		value = pValue->AsString();
+
+		// Special case - pass dictionary prefix
+		if (value.GetAt(1) == L'.') {
+			switch (value.GetAt(0)) {
+				case L'C': // Common
+				case L'E': // Error
+				case L'K': // Keyword
+				case L'M': // Message
+					value = m_dictionary.GetString((CStringA)value);
+					break;
+
+				default:
+					DEBUG_STOP;
+					break;
+			}
+		}
+	}
+
+	value.Replace(L"<br>", L"\n");
+
+	return Local(value);
+}
+
+
+
 Json::Object& Facility::AppResources::GetTask(CStringA name)
 {
-	return m_ui.GetAt("Tasks").GetAt(name);
+	return m_tasks.GetAt(name);
 }
 
 
@@ -105,7 +151,7 @@ bool Facility::AppResources::Initialize()
 	}
 
 	// Dialogs/FileOptions
-	Json::Object& fileOptions = m_ui.GetAt("Dialogs").GetAt("FileOptions");
+	Json::Object& fileOptions = m_dialogs.GetAt("FileOptions");
 	if (fileOptions.FindValue("properties") != nullptr) {
 		return true;
 	}
@@ -192,7 +238,7 @@ bool Facility::AppResources::Initialize()
 		}
 	}
 
-	//:TODO
+	// TODO
 	//Json::Array& exportTree = Json::Helper::FindValueByPath(fileOptions, "tree/1/items")->AsArray();
 
 	return true;
@@ -200,11 +246,38 @@ bool Facility::AppResources::Initialize()
 
 
 
-bool Facility::AppResources::InitPreferences()
+bool Facility::AppResources::InitDialogs()
 {
 	CString stream;
-	if (LoadTextResource(IDF_JSON_DATA_PREFERENCES, stream) == false ||
-		Json::Helper::Load(stream, m_preferences) == false) {
+	if (LoadTextResource(IDF_JSON_DIALOGS, stream) == false ||
+		Json::Helper::Load(stream, m_dialogs) == false) {
+		RETURN_FALSE;
+	}
+
+	return true;
+}
+
+
+
+
+bool Facility::AppResources::InitDictionary()
+{
+	CString stream;
+	if (LoadTextResource(IDF_JSON_DICTIONARY, stream) == false ||
+		Json::Helper::Load(stream, m_dictionary) == false) {
+		RETURN_FALSE;
+	}
+
+	return true;
+}
+
+
+
+bool Facility::AppResources::InitTasks()
+{
+	CString stream;
+	if (LoadTextResource(IDF_JSON_TASKS, stream) == false ||
+		Json::Helper::Load(stream, m_tasks) == false) {
 		RETURN_FALSE;
 	}
 
@@ -235,6 +308,19 @@ bool Facility::AppResources::InitFileOptions()
 	CString stream;
 	if (LoadTextResource(IDF_JSON_DATA_FILEOPTIONS, stream) == false ||
 		Json::Helper::Load(stream, m_fileOptions) == false) {
+		RETURN_FALSE;
+	}
+
+	return true;
+}
+
+
+
+bool Facility::AppResources::InitPreferences()
+{
+	CString stream;
+	if (LoadTextResource(IDF_JSON_DATA_PREFERENCES, stream) == false ||
+		Json::Helper::Load(stream, m_preferences) == false) {
 		RETURN_FALSE;
 	}
 

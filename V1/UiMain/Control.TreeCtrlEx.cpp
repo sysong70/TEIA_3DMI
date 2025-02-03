@@ -29,7 +29,7 @@ Control::TreeCtrlEx::~TreeCtrlEx()
 {
 }
 
-//:REF - https://learn.microsoft.com/ko-kr/windows/win32/controls/tree-view-control-window-styles
+// REF - https://learn.microsoft.com/ko-kr/windows/win32/controls/tree-view-control-window-styles
 // Component::ModelPanel::ConstructBody()
 
 bool Control::TreeCtrlEx::Initialize(CWnd* pParentWnd, UINT id, const RECT& rect)
@@ -60,7 +60,7 @@ bool Control::TreeCtrlEx::Initialize(CWnd* pParentWnd, UINT id, const RECT& rect
 
 
 
-void Control::TreeCtrlEx::InitializeDesign(Json::Array& design)
+bool Control::TreeCtrlEx::InitializeDesign(Json::Array& design)
 {
 	SetRedraw(FALSE);
 	m_bInitialized = false;
@@ -71,6 +71,8 @@ void Control::TreeCtrlEx::InitializeDesign(Json::Array& design)
 	SetRedraw(TRUE);
 
 	AdjustLayout();
+
+	return true;
 }
 
 

@@ -19,7 +19,7 @@ namespace Control
 
 		bool Initialize(CWnd* pParentWnd, UINT id = WM_USER, const RECT& rect = {});
 
-		void InitializeDesign(Json::Array& design);
+		bool InitializeDesign(Json::Array& design);
 
 		void GetAncestor(HTREEITEM pItem, std::vector<HTREEITEM>& parent);
 		// from GetItemData(pItem)

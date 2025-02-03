@@ -9,11 +9,38 @@
 #include "Facility.AppResources.h"
 #include "Facility.AppOptions.h"
 
+#include <gdiplus.h>
+#pragma comment (lib, "gdiplus.lib")
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+//**************************************************************************************************
+
+class GdiPlusManager
+{
+public:
+
+	GdiPlusManager()
+	{
+		Gdiplus::GdiplusStartup(&m_token, &m_startupInput, nullptr);
+	}
+
+
+
+	~GdiPlusManager()
+	{
+		Gdiplus::GdiplusShutdown(m_token);
+	}
+
+private:
+
+	Gdiplus::GdiplusStartupInput m_startupInput;
+	ULONG_PTR m_token;
+};
 
 //**************************************************************************************************
 
@@ -28,11 +55,12 @@ public:
 	VisualManagerCustom()
 		: CBCGPVisualManager2019()
 	{
-		//:WARNING - change context menu height
-		//CBCGPToolBar::SetSizes(
-		//	globalUtils.ScaleByDPI(CSize(38, 38)),
-		//	globalUtils.ScaleByDPI(CSize(32, 32))
-		//);
+		// KEN - 20250123, change context meuu height
+		// CHECK - different with CBCGPToolBar::SetSizes()
+		CBCGPToolBar::SetMenuSizes(
+			globalUtils.ScaleByDPI(CSize(24, 24)),	// button size (menu height)
+			globalUtils.ScaleByDPI(CSize(16, 16))	// inner image size of button
+		);
 	}
 
 public:
@@ -40,7 +68,7 @@ public:
 	BOOL DrawCheckBox(CDC* pDC, CRect rect, BOOL bHighlighted, int nState, BOOL bEnabled, BOOL bPressed) override
 	{
 		const COLORREF BorderColor = RGB(0xC0, 0xC0, 0xC0);
-		//:WANING - replace check box(border) color
+		// WANING - replace check box(border) color
 		CLocalState<COLORREF> color(globalData.clrBarDkShadow, BorderColor);
 		return CBCGPVisualManagerVS2012::DrawCheckBox(pDC, rect, bHighlighted, nState, bEnabled, bPressed);
 	}
@@ -67,11 +95,15 @@ namespace PresetApplication
 
 		return appPath.Left(nPos);
 	}
+
+
+
+	GdiPlusManager gdiMananger;
 }
 
 //**************************************************************************************************
 
-//:REF - C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\atlmfc\src\mfc\doctempl.cpp
+// REF - C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\atlmfc\src\mfc\doctempl.cpp
 
 class DocTemplate3d : public CMultiDocTemplate
 {
@@ -175,7 +207,7 @@ protected:
 BEGIN_MESSAGE_MAP(CAboutDlg, CBCGPDialog)
 END_MESSAGE_MAP()
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -193,12 +225,18 @@ END_MESSAGE_MAP()
 Window::Application::Application()
 {
 #ifdef _DEBUG
-	//Dumping objects ->
-	//{1359} normal block at 0x0139D7D8, 332 bytes long.
-	//Data: < > 00 00 00 00 CD CD CD CD 00 00 00 00 00 00 00 00
+/*
+	Dumping objects ->
+	{1359} normal block at 0x0139D7D8, 332 bytes long.
+	Data: < > 00 00 00 00 CD CD CD CD 00 00 00 00 00 00 00 00
 
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+	_CrtSetBreakAlloc(962454); // {1359}
+	_CrtDumpMemoryLeaks();
+	_CrtMemDumpAllObjectsSince(0);
+*/
 	//_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	//_CrtSetBreakAlloc(962454); // {1359}
+	//_CrtSetBreakAlloc(154829);
 	//_CrtDumpMemoryLeaks();
 	//_CrtMemDumpAllObjectsSince(0);
 #endif
@@ -206,8 +244,46 @@ Window::Application::Application()
 	// Support Restart Manager
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_ALL_ASPECTS;
 
-	//:WARNING - use SetCustomVisualManger()
+	// WARNING - use SetCustomVisualManger()
 	//SetVisualTheme(BCGP_VISUAL_THEME_OFFICE_2019_BLACK);
+}
+
+
+
+CDocument* Window::Application::OpenDocumentFile(LPCTSTR lpszFileName)
+{
+	CString fileName(lpszFileName);
+	fileName.MakeUpper();
+
+	POSITION pos = GetFirstDocTemplatePosition();
+	while (pos != nullptr) {
+		CDocTemplate* pDocTemplate = GetNextDocTemplate(pos);
+		if (pDocTemplate == nullptr) {
+			continue;
+		}
+
+		POSITION docPos = pDocTemplate->GetFirstDocPosition();
+		while (docPos != nullptr) {
+			Document* pDocument = DYNAMIC_DOWNCAST(Document, pDocTemplate->GetNextDoc(docPos));
+			if (pDocument != nullptr) {
+				CString path = pDocument->GetPathName();
+				path.MakeUpper();
+				// WARNING - has same document?
+				if (path == fileName) {
+					return nullptr;
+				}
+			}
+		}
+	}
+
+	return __super::OpenDocumentFile(lpszFileName);
+}
+
+
+
+CDocument* Window::Application::OpenDocumentFile(LPCTSTR lpszFileName, BOOL bAddToMRU)
+{
+	RETURN_NULL;
 }
 
 
@@ -261,7 +337,7 @@ CString Window::Application::GetAppPath(bool bLastBackslash)
 int Window::Application::ExitInstance()
 {
 	Connector3d::GetInstance().application.OnExitInstance();
-	//Connector2d::GetInstance().application.OnExitInstance();
+	Connector2d::GetInstance().application.OnExitInstance();
 
 	return __super::ExitInstance();
 }
@@ -272,16 +348,21 @@ BOOL Window::Application::InitInstance()
 {
 #pragma region Initialize Settings
 
-	Facility::SetLanguage(Facility::ELanguage::English);
-
 	TheAppResources.Load();
 	TheAppOptions.SetFolderPath(GetAppPath() + L"Settings\\");
 	TheAppOptions.Load();
+
+	// CHECK - using registry or TheAppOptions
+	Facility::ELanguage language = Facility::ELanguage::English;
+	Facility::SetLanguage(language);
+
+	double dpi = globalUtils.GetDpiForWindow(nullptr) / 96.0;
 
 	if (Connector3d::Initialize()) {
 		Signal::Application& app = Connector3d::GetInstance().application;
 
 		app.OnInitInstance();
+		app.OnDpiAware(dpi);
 		app.OnUpdatePreference(TheAppOptions.GetPreferences());
 
 		Json::Array& tree = TheAppResources.GetDialog("FileOptions").GetArray("tree");
@@ -296,22 +377,23 @@ BOOL Window::Application::InitInstance()
 		RETURN_FALSE;
 	}
 
-/*
 	if (Connector2d::Initialize()) {
+		//:Ken -20250128
+		Connector2d::SetLanguage((int)language);
+
 		Signal::Application& app = Connector2d::GetInstance().application;
+
 		app.OnInitInstance();
+		app.OnDpiAware(dpi);
 		app.OnUpdatePreference(TheAppOptions.GetPreferences());
+		// CHECK
 		app.OnUpdateFileOption(TheAppOptions.GetFileOptions());
 	}
 	else {
 		RETURN_FALSE;
 	}
-*/
 
-	double dpi = globalUtils.GetDpiForWindow(nullptr) / 96.0;
-	Connector3d::GetInstance().application.OnDpiAware(dpi);
-
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 	INITCOMMONCONTROLSEX InitCtrls;
 	InitCtrls.dwSize = sizeof(InitCtrls);
@@ -330,7 +412,7 @@ BOOL Window::Application::InitInstance()
 	AfxEnableControlContainer();
 
 	SetRegistryKey(_T("Dataface"));
-	//:WARNING - recend file counts
+	// WARNING - recend file counts
 	LoadStdProfileSettings(10);
 	SetRegistryBase(_T("Settings"));
 
@@ -356,7 +438,7 @@ BOOL Window::Application::InitInstance()
 	CCommandLineInfo cmdInfo;
 	ParseCommandLine(cmdInfo);
 
-	//:CHECK - disable new and last document
+	// CHECK - disable new and last document
 	cmdInfo.m_nShellCommand = CCommandLineInfo::FileNothing;
 
 	if (cmdInfo.m_nShellCommand == CCommandLineInfo::FileNew) {
@@ -426,9 +508,10 @@ void Window::Application::OnAppAbout()
 void Window::Application::SetCustomVisualManager()
 {
 #pragma region Create visual manager - based BCGP_VISUAL_THEME_OFFICE_2019_BLACK;
+
 	m_ActiveTheme = BCGP_VISUAL_THEME_CUSTOM;
 
-	//:WARNING - copy from CBCGPWinApp::SetVisualTheme(), BCGP_VISUAL_THEME_OFFICE_2019_BLACK
+	// WARNING - copy from CBCGPWinApp::SetVisualTheme(), BCGP_VISUAL_THEME_OFFICE_2019_BLACK
 	CBCGPVisualManager2019::SetStyle(CBCGPVisualManager2019::Office2016_Black);
 	CBCGPVisualManager::SetDefaultManager(RUNTIME_CLASS(VisualManagerCustom));
 
@@ -444,9 +527,11 @@ void Window::Application::SetCustomVisualManager()
 	CBCGPDockManager::SetDockMode(BCGP_DT_SMART);
 	CBCGPThemeSelectorComboBox::SelectActiveThemeInAllControls(this);
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
-	/// Colors
+#pragma region // Visual manager-based tooltip
+
+	/// REF - Colors
 
 	//globalData.clrActiveBorder;
 	//globalData.clrActiveCaption;
@@ -480,8 +565,6 @@ void Window::Application::SetCustomVisualManager()
 	//globalData.clrWindowFrame;
 	//globalData.clrWindowText;
 
-#pragma region // Visual manager-based tooltip
-
 	globalData.m_bIsDlgWsCaptionStyle = TRUE;
 	globalData.m_bUseDlgFontInControls = TRUE;
 	globalData.m_bUseVisualManagerInBuiltInDialogs = TRUE;
@@ -496,7 +579,7 @@ void Window::Application::SetCustomVisualManager()
 
 	GetTooltipManager()->SetTooltipParams(BCGP_TOOLTIP_TYPE_ALL, RUNTIME_CLASS(CBCGPToolTipCtrl), &params);
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region // Replace all fonts
 
@@ -563,7 +646,7 @@ void Window::Application::SetCustomVisualManager()
 		type.Font.CreateFontIndirect(&lf);
 	}
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 }
 
 #undef PRESET

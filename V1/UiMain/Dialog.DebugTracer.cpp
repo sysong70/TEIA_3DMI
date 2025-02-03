@@ -58,7 +58,6 @@ Dialog::DebugTracer::DebugTracer(CWnd* pParent /*=nullptr*/)
 
 Dialog::DebugTracer::~DebugTracer()
 {
-	DestroyWindow();
 }
 
 
@@ -116,9 +115,8 @@ void Dialog::DebugTracer::OnContextMenu(CWnd* pWnd, CPoint point)
 	menu.CreatePopupMenu();
 	menu.AppendMenu(MF_STRING, PRESET::Clear, L"Clear");
 	menu.AppendMenu(MF_STRING, PRESET::Save, L"Save...");
-	//menu.TrackPopupMenu(TPM_LEFTALIGN, pos.x, pos.y, this);
 
-	//:CHECK - visual theme
+	// CHECK - visual theme
 	UINT id = TheApplication.GetContextMenuManager()->TrackPopupMenu(menu.Detach(), point.x, point.y, this);
 	OnContextCommand(id);
 }
@@ -147,7 +145,7 @@ void Dialog::DebugTracer::ConstructBody(const CRect& boundary)
 
 	CBCGPStaticLayout* pLayout = (CBCGPStaticLayout*)GetLayout();
 	DEBUG_VALID(pLayout);
-	//:WARNING - create before using (why?)
+	// WARNING - create before using (why?)
 	pLayout->Create(this);
 	pLayout->AddAnchor(IDC_DMI_CONTROL_01, CBCGPStaticLayout::e_MoveTypeNone, CBCGPStaticLayout::e_SizeTypeBoth);
 }

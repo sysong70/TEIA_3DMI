@@ -15,6 +15,24 @@ static char THIS_FILE[] = __FILE__;
 
 //**************************************************************************************************
 
+namespace
+{
+	void RemoveMenuItems(CMenu* pMenu)
+	{
+		while (pMenu->GetMenuItemCount() > 0) {
+			UINT id = pMenu->GetMenuItemID(0);
+			if (id == (UINT)-1) {
+				CMenu* pSubMenu = pMenu->GetSubMenu(0);
+				RemoveMenuItems(pSubMenu);
+				pMenu->DeleteMenu(0, MF_BYPOSITION);
+			}
+			else {
+				pMenu->RemoveMenu(0, MF_BYPOSITION);
+			}
+		}
+	}
+}
+
 using namespace Window;
 
 IMPLEMENT_DYNAMIC(MainFrame, CBCGPMDIFrameWnd)
@@ -23,6 +41,7 @@ BEGIN_MESSAGE_MAP(MainFrame, CBCGPMDIFrameWnd)
 	ON_WM_CREATE()
 	ON_WM_CLOSE()
 	ON_WM_DROPFILES()
+	ON_WM_SIZE()
 
 	ON_COMMAND(FILE_3D_CMD_Open, OnFileOpen)
 	ON_COMMAND(FILE_3D_CMD_Options, OnAppOptions)
@@ -34,6 +53,7 @@ END_MESSAGE_MAP()
 
 Window::MainFrame::MainFrame()
 {
+	m_contextMenu.CreatePopupMenu();
 }
 
 
@@ -65,6 +85,17 @@ Window::View* Window::MainFrame::GetActiveView()
 {
 	DEBUG_VALID(m_pActiveView);
 	return m_pActiveView;
+}
+
+
+
+CMenu& Window::MainFrame::GetContextMenu(bool clearFirst)
+{
+	if (clearFirst) {
+		RemoveMenuItems(&m_contextMenu);
+	}
+
+	return m_contextMenu;
 }
 
 
@@ -162,7 +193,7 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 			pDialog->ReceiveSignal(pData);
 		}
 		else {
-			DEBUG_STOP;
+			//DEBUG_STOP;
 			REMOVE_POINTER(pData);
 		}
 	} break;
@@ -171,7 +202,7 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 	{
 		int id = data.GetInteger(SKW_VIEWID, -1);
 		if (id == -1) {
-			//:TODO - active command
+			// TODO - active command
 		}
 		else {
 			View* pView = TheApplication.FindView(id);
@@ -242,6 +273,11 @@ void Window::MainFrame::ViewChanged(UINT message, View* pView)
 {
 	if (message == WM_ACTIVATE) {
 		m_panelBar.ViewChanged(&pView->m_tabs);
+		if (m_pActiveView == nullptr ||
+			m_pActiveView->GetViewType() != pView->GetViewType()) {
+			m_ribbonBar.ChangeByDocType(pView->GetDocument()->GetDocType());
+		}
+
 		if (m_pActiveView != nullptr &&
 			m_pActiveView->GetId() != -1 &&
 			m_pActiveView->GetId() != pView->GetId()) {
@@ -262,6 +298,27 @@ void Window::MainFrame::ViewChanged(UINT message, View* pView)
 	}
 
 	m_pActiveView = pView;
+}
+
+
+
+bool Window::MainFrame::HasCommandHandeler(UINT id)
+{
+	switch (id) {
+		case FILE_3D_CMD_New:
+		case FILE_3D_CMD_Open:
+		case FILE_3D_CMD_Options:
+		case HOME_3D_CMD_Window_Cascade:
+		case HOME_2D_CMD_Window_Cascade:
+		case HOME_3D_CMD_Window_TileHorizontal:
+		case HOME_2D_CMD_Window_TileHorizontal:
+		case HOME_3D_CMD_Window_TileVertical:
+		case HOME_2D_CMD_Window_TileVertical:
+			return true;
+
+		default:
+			return false;
+	}
 }
 
 
@@ -294,6 +351,51 @@ HMENU Window::MainFrame::GetWindowMenuPopup(HMENU hMenuBar)
 	return nullptr;
 }
 
+
+/*
+BOOL Window::MainFrame::OnDrawMenuImage(CDC* pDC, const CBCGPToolbarMenuButton* pMenuButton, const CRect& rectImage)
+{
+// TODO - 2D menu is not registered at this time. Will fix it later.
+#define OnMenuId(x) case CONTEXT_2D_CMD_ObjectSnap_##x: id = HOME_3D_CMD_ObjectSnap_##x; break
+
+	UINT id = 0;
+
+	switch (pMenuButton->m_nID) {
+		OnMenuId(Point);
+		OnMenuId(End);
+		OnMenuId(Mid);
+		OnMenuId(Intersection);
+		OnMenuId(Perpendicular);
+		OnMenuId(Center);
+		OnMenuId(Quadrant);
+		OnMenuId(Near);
+
+		case CONTEXT_2D_POP_ObjectSnap_Overrides:
+			id = HOME_3D_POP_ObjectSnap;
+			break;
+
+		default:
+			return __super::OnDrawMenuImage(pDC, pMenuButton, rectImage);
+	}
+
+	CSize size = globalUtils.ScaleByDPI(CSize(16, 16));
+	int offsetX = (rectImage.Width() - size.cx) / 2;
+	int offsetY = (rectImage.Height() - size.cy) / 2;
+
+	CRect rect = rectImage;
+	rect.DeflateRect(offsetX, offsetY);
+
+	CBCGPBaseRibbonElement* pElem = m_ribbonBar.FindByID(id, FALSE, TRUE);
+	if (pElem != nullptr) {
+		pElem->OnDrawMenuImage(pDC, rect);
+	}
+	else {
+		DEBUG_STOP;
+	}
+
+#undef OnMenuId
+}
+*/
 
 
 BOOL Window::MainFrame::OnEraseMDIClientBackground(CDC* pDC)
@@ -364,7 +466,7 @@ LRESULT Window::MainFrame::OnSignal(WPARAM wp, LPARAM lp)
 LRESULT Window::MainFrame::OnNextFileOpen(WPARAM wp, LPARAM lp)
 {
 	if (m_fileNames.size() > 0) {
-		//:WARNING - do not use CDocTemplate, or check CMultiDocTemplate
+		// WARNING - do not use CDocTemplate, or check CMultiDocTemplate
 		CString fileName = m_fileNames.front();
 		m_fileNames.erase(m_fileNames.begin());
 		CDocument* pDoc = AfxGetApp()->OpenDocumentFile(fileName);
@@ -386,12 +488,32 @@ void Window::MainFrame::OnClose()
 void Window::MainFrame::OnCommand(UINT id)
 {
 	switch (id) {
-	case FILE_3D_CMD_New:					TheApplication.OnFileNew();								return;
-	case FILE_3D_CMD_Open:					OnFileOpen();											return;
-	case FILE_3D_CMD_Options:				OnAppOptions();											return;
-	case HOME_3D_CMD_Window_Cascade:		SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_CASCADE);		return;
-	case HOME_3D_CMD_Window_TileHorizontal:	SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_TILE_HORZ);	return;
-	case HOME_3D_CMD_Window_TileVertical:	SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_TILE_VERT);	return;
+	case FILE_3D_CMD_New:
+		TheApplication.OnFileNew();
+		return;
+
+	case FILE_3D_CMD_Open:
+		OnFileOpen();
+		return;
+
+	case FILE_3D_CMD_Options:
+		OnAppOptions();
+		return;
+
+	case HOME_3D_CMD_Window_Cascade:
+	case HOME_2D_CMD_Window_Cascade:
+		SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_CASCADE);
+		return;
+
+	case HOME_3D_CMD_Window_TileHorizontal:
+	case HOME_2D_CMD_Window_TileHorizontal:
+		SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_TILE_HORZ);
+		return;
+
+	case HOME_3D_CMD_Window_TileVertical:
+	case HOME_2D_CMD_Window_TileVertical:
+		SendMessage(WM_COMMAND, (WPARAM)ID_WINDOW_TILE_VERT);
+		return;
 
 	default:
 		DEBUG_STOP;
@@ -409,13 +531,15 @@ int Window::MainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	}
 
 	EnableMDITabs(TRUE, FALSE, CBCGPTabWnd::LOCATION_TOP, TRUE, CBCGPTabWnd::STYLE_UNDERLINE);
-	GetMDITabs().EnableTabDocumentsMenu(TRUE, CBCGPTabWnd::TAB_DOCUMENTS_MENU_HAMBURGER);
-	GetMDITabs().SetActiveTabBoldFont(FALSE);
-	GetMDITabs().SetCaptionFont(TRUE);
-	GetMDITabs().SetFlatFrame(TRUE);
-	GetMDITabs().SetScrollButtonFullSize(TRUE);
-	GetMDITabs().SetTabBorderSize(0);
-	GetMDITabs().SetTabCloseButtonMode(CBCGPTabWnd::TAB_CLOSE_BUTTON_ACTIVE);
+
+	CBCGPTabWnd& mdi = GetMDITabs();
+	mdi.EnableTabDocumentsMenu(TRUE, CBCGPTabWnd::TAB_DOCUMENTS_MENU_HAMBURGER);
+	mdi.SetActiveTabBoldFont(FALSE);
+	mdi.SetCaptionFont(TRUE);
+	mdi.SetFlatFrame(TRUE);
+	mdi.SetScrollButtonFullSize(TRUE);
+	mdi.SetTabBorderSize(0);
+	mdi.SetTabCloseButtonMode(CBCGPTabWnd::TAB_CLOSE_BUTTON_ACTIVE);
 
 	m_ribbonBar.Initialize(this);
 	m_panelBar.Initialize(this);
@@ -423,6 +547,11 @@ int Window::MainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	m_taskBar.Initialize(this);
 
 	DockControlBar(&m_panelBar);
+
+	// TEST - command prompt
+	m_commandPrompt.Initialize(this);
+	m_commandPrompt.Wait();
+	//m_commandPrompt.Activate(L"LINE", L"Specify first point:", L"Undo(U)|취소(U) Close(C)|닫기(C)");
 
 	return 0;
 }
@@ -496,7 +625,7 @@ void Window::MainFrame::OnFileOpen()
 	const DWORD SHOW_OPTION = WM_USER;
 
 	CFileDialog dlg(TRUE, NULL, NULL, OFN_HIDEREADONLY, filter, this);
-	//:WARNING
+	// WARNING
 	dlg.AddCheckButton(SHOW_OPTION, Facility::Local(L"Show import option|파일 옵션 보기"), TRUE);
 	dlg.MakeProminent(SHOW_OPTION); // align to buttons
 
@@ -506,10 +635,10 @@ void Window::MainFrame::OnFileOpen()
 		BOOL bShow = FALSE;
 		dlg.GetCheckButtonState(WM_USER, bShow);
 		if (bShow) {
-			//:TODO - show option dialog
+			// TODO - show option dialog
 		}
 		else {
-			//:WARNING
+			// WARNING
 			m_importOption.Clean();
 		}
 
@@ -543,11 +672,19 @@ void Window::MainFrame::OnFileOpen()
 
 void Window::MainFrame::OnAppOptions()
 {
-	//:CHECK - to Dialog::AppOptions::OnInitDialog() 
-	BeginWaitCursor();
-
 	Dialog::AppOptions dlg;
 	dlg.DoModal();
+}
+
+
+
+void Window::MainFrame::OnSize(UINT nType, int cx, int cy)
+{
+	__super::OnSize(nType, cx, cy);
+
+	if (cx > 0 && cy > 0) {
+		m_commandPrompt.AdjustLayout();
+	}
 }
 
 

@@ -83,7 +83,7 @@ namespace H3DF
 		void CancelCommands();
 
 	public:
-		//:Ken - 20230607
+		// KEN - 20230607
 		bool KeyboardInput(Json::Object & input);
 
 		//== 환경 변수 관련 함수 ==========================================================================

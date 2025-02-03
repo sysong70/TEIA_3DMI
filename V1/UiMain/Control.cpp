@@ -10,13 +10,13 @@ static char THIS_FILE[] = __FILE__;
 
 //**************************************************************************************************
 
-CSize Control::Setup(CBCGPButton& control, Json::Object& data, CWnd* pParent)
+CSize Control::Setup(CBCGPButton& control, const CString& title, UINT id, CWnd* pParent)
 {
 	const CSize defaultSize = CSize(64, 0);
 	const DWORD dwStyle = WS_CHILD | WS_VISIBLE;
 
 	if (control.GetSafeHwnd() == nullptr) {
-		if (control.Create(Facility::GetTitle(data), dwStyle, {}, pParent, Facility::GetId(data)) == FALSE) {
+		if (control.Create(title, dwStyle, {}, pParent, id) == FALSE) {
 			RETURN({});
 		}
 	}
@@ -27,29 +27,38 @@ CSize Control::Setup(CBCGPButton& control, Json::Object& data, CWnd* pParent)
 	return AdjustSize(&control, globalUtils.ScaleByDPI(defaultSize));
 }
 
-
-
-CRect Control::Setup(CBCGPEdit& control, Json::Object& data, EPivot ePivot, CRect rect, CWnd* pParent)
+CSize Control::Setup(CBCGPButton& control, Json::Object& data, CWnd* pParent)
 {
-	//:TODO - check style
-	DEBUG_STOP;
-
-	const DWORD dwStyle = WS_CHILD | WS_VISIBLE;
-
-	if (control.GetSafeHwnd() == nullptr) {
-		if (control.Create(dwStyle, {}, pParent, Facility::GetId(data)) == FALSE) {
-			RETURN({});
-		}
-	}
-
-	control.m_bVisualManagerStyle = TRUE;
-
-	return AdjustLayout(&control, rect, CSize(rect.Width(), 0), ePivot);
+	return Setup(control, Facility::GetTitle(data), Facility::GetId(data), pParent);
 }
 
 
 
-CRect Control::Setup(CBCGPStatic& control, Json::Object& data, EPivot ePivot, CRect rect, CWnd* pParent)
+CRect Control::Setup(CBCGPEdit& control, UINT id, EPivot ePivot, CRect rect, CWnd* pParent)
+{
+	const DWORD dwStyle = WS_CHILD | WS_VISIBLE;
+
+	if (control.GetSafeHwnd() == nullptr) {
+		if (control.Create(dwStyle, {}, pParent, id) == FALSE) {
+			RETURN({});
+		}
+	}
+
+	// CHECK
+	control.m_bVisualManagerStyle = TRUE;
+	control.SetVerticalAlignment(TA_CENTER);
+
+	return AdjustLayout(&control, rect, CSize(rect.Width(), 0), ePivot);
+}
+
+CRect Control::Setup(CBCGPEdit& control, Json::Object& data, EPivot ePivot, CRect rect, CWnd* pParent)
+{
+	return Setup(control, Facility::GetId(data), ePivot, rect, pParent);
+}
+
+
+
+CRect Control::Setup(CBCGPStatic& control, const CString& title, EPivot ePivot, CRect rect, CWnd* pParent)
 {
 	const DWORD dwStyle = WS_CHILD | WS_VISIBLE;
 
@@ -60,10 +69,15 @@ CRect Control::Setup(CBCGPStatic& control, Json::Object& data, EPivot ePivot, CR
 	}
 
 	control.m_bVisualManagerStyle = TRUE;
-	control.SetWindowText(Facility::GetTitle(data));
+	control.SetWindowText(title);
 	control.SizeToContent();
 
 	return AdjustLayout(&control, rect, CSize(rect.Width(), 0), ePivot);
+}
+
+CRect Control::Setup(CBCGPStatic& control, Json::Object& data, EPivot ePivot, CRect rect, CWnd* pParent)
+{
+	return Setup(control, Facility::GetTitle(data), ePivot, rect, pParent);
 }
 
 
@@ -128,7 +142,7 @@ CRect Control::AdjustLayout(CWnd* pControl, CRect frame, CSize baseSize, EPivot 
 	}
 
 	// move and resize
-	pControl->SetWindowPos(NULL, pivot.x, pivot.y, size.cx, size.cy, 0);
+	pControl->SetWindowPos(NULL, pivot.x, pivot.y, size.cx, size.cy, SWP_NONE);
 
 	return { pivot, size };
 }
@@ -328,8 +342,6 @@ CRect Control::Destribute(Controls controls, CPoint basePoint, int gap, EDirecti
 
 CRect Control::GetRect(CWnd* pControl)
 {
-	DEBUG_VALID(pControl);
-
 	CRect rect;
 	if (pControl != nullptr && pControl->GetSafeHwnd() != nullptr && pControl->GetParent() != nullptr) {
 		pControl->GetWindowRect(&rect);
@@ -346,8 +358,6 @@ CRect Control::GetRect(CWnd* pControl)
 
 CSize Control::GetSize(CWnd* pControl)
 {
-	DEBUG_VALID(pControl);
-
 	CRect rect;
 	if (pControl != nullptr && pControl->GetSafeHwnd() != nullptr) {
 		pControl->GetClientRect(&rect);
@@ -389,14 +399,7 @@ int Control::TabHeight()
 
 
 
-int Control::TreeRowHeight()
+bool Control::IsKeyPressed(int vk)
 {
-	return globalUtils.ScaleByDPI(24);
-}
-
-
-
-int Control::PropListRowPadding()
-{
-	return globalUtils.ScaleByDPI(1);
+	return ::GetAsyncKeyState(vk) & 0x8000;
 }

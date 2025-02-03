@@ -48,6 +48,9 @@ namespace WindowPreset
 			Extensions3d.push_back(L"PTS");
 			Extensions3d.push_back(L"PTX");
 			Extensions3d.push_back(L"XYZ");
+			// KEN - move to 2d
+			//Extensions3d.erase(std::remove(Extensions3d.begin(), Extensions3d.end(), L"DWG"));
+			//Extensions3d.erase(std::remove(Extensions3d.begin(), Extensions3d.end(), L"DXF"));
 		}
 
 		return Extensions3d;
@@ -57,7 +60,7 @@ namespace WindowPreset
 
 	Extensions& Get2dExtensions()
 	{
-		//:TODO
+		// TODO
 		if (Extensions2d.size() == 0) {
 			Extensions2d.push_back(L"DWG");
 			Extensions2d.push_back(L"DXF");
@@ -74,14 +77,19 @@ bool Window::IsAllowedFile(const wchar_t* pFilePath)
 	return IsAllowed3d(pFilePath) || IsAllowed2d(pFilePath);
 }
 
-//:REF - https://docs.techsoft3d.com/exchange/latest/start/supported-formats.html
+// REF - https://docs.techsoft3d.com/exchange/latest/start/supported-formats.html
 
 bool Window::IsAllowed3d(const wchar_t* pFilePath)
 {
 	CString extension = Path::GetExtension(pFilePath);
 	extension.MakeUpper();
 
-	//:WARNING - Creo/ProE (case *.1)
+	// CHECK - how to 2d/3d?
+	if (extension == L"DWG" || extension == L"DXF") {
+		return false;
+	}
+
+	// WARNING - Creo/ProE (case *.1)
 	if (WStr::IsDigit(extension)) {
 		return true;
 	}

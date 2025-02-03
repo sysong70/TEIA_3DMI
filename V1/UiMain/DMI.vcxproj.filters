@@ -8,22 +8,22 @@
       <Filter>Dialog</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Json.cpp">
-      <Filter>Main\Common</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\WStr.cpp">
-      <Filter>Main\Common</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Path.cpp">
-      <Filter>Main\Common</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Common_Define.cpp">
-      <Filter>Main\Common</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Fio.cpp">
-      <Filter>Main\Common</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="Connector.cpp">
       <Filter>Signal\Connector</Filter>
@@ -56,10 +56,10 @@
       <Filter>Facility</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Dir.cpp">
-      <Filter>Main\Common</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\File.cpp">
-      <Filter>Main\Common</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="Dialog.cpp">
       <Filter>Dialog</Filter>
@@ -102,12 +102,6 @@
     </ClCompile>
     <ClCompile Include="Control.TaskPanel.cpp">
       <Filter>Control\Panel</Filter>
-    </ClCompile>
-    <ClCompile Include="Control.FloatValueEdit.cpp">
-      <Filter>Working</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.CoordEdit.cpp">
-      <Filter>Working</Filter>
     </ClCompile>
     <ClCompile Include="Command.Test.cpp">
       <Filter>Working</Filter>
@@ -187,6 +181,21 @@
     <ClCompile Include="Geometry.UserDataFiler.cpp">
       <Filter>Graphic</Filter>
     </ClCompile>
+    <ClCompile Include="Control.CoordEdit.cpp">
+      <Filter>Control\Property</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.Circle2d.cpp">
+      <Filter>Command\2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Control.ContextMenu.cpp">
+      <Filter>Control\Other</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.Line2d.cpp">
+      <Filter>Command\2D</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.CommandPrompt.cpp">
+      <Filter>Component\MainFrame</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Command.Common.h">
@@ -208,19 +217,19 @@
       <Filter>Dialog</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Json.h">
-      <Filter>Main\Common</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
       <Filter>Main\Resource</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\WStr.h">
-      <Filter>Main\Common</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Main\Resource</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Path.h">
-      <Filter>Main\Common</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="Window.h">
       <Filter>Window</Filter>
@@ -229,10 +238,10 @@
       <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Common_Define.h">
-      <Filter>Main\Common</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Fio.h">
-      <Filter>Main\Common</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="Connector.h">
       <Filter>Signal\Connector</Filter>
@@ -259,10 +268,10 @@
       <Filter>Facility\Command</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Dir.h">
-      <Filter>Main\Common</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\File.h">
-      <Filter>Main\Common</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="Control.h">
       <Filter>Control</Filter>
@@ -305,12 +314,6 @@
     </ClInclude>
     <ClInclude Include="Control.TaskPanel.h">
       <Filter>Control\Panel</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.FloatValueEdit.h">
-      <Filter>Working</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.CoordEdit.h">
-      <Filter>Working</Filter>
     </ClInclude>
     <ClInclude Include="Command.Test.h">
       <Filter>Working</Filter>
@@ -391,7 +394,22 @@
       <Filter>Graphic</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Template.h">
-      <Filter>Main\Common</Filter>
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.CoordEdit.h">
+      <Filter>Control\Property</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.Circle2d.h">
+      <Filter>Command\2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Control.ContextMenu.h">
+      <Filter>Control\Other</Filter>
+    </ClInclude>
+    <ClInclude Include="Command.Line2d.h">
+      <Filter>Command\2D</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.CommandPrompt.h">
+      <Filter>Component\MainFrame</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -426,6 +444,12 @@
     <None Include="RES\Data.FileOptions.json">
       <Filter>Main\Resource</Filter>
     </None>
+    <None Include="RES\Dictionary.json">
+      <Filter>Main\Resource</Filter>
+    </None>
+    <None Include="RES\Dialogs.json">
+      <Filter>Main\Resource</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Component">
@@ -457,9 +481,6 @@
     </Filter>
     <Filter Include="Main">
       <UniqueIdentifier>{5626235d-04b2-48ff-aa6a-b189a3f69c04}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Main\Common">
-      <UniqueIdentifier>{fb2d04f0-eb3c-414a-af01-e993443a5070}</UniqueIdentifier>
     </Filter>
     <Filter Include="Main\Resource">
       <UniqueIdentifier>{c42b87a4-4dc7-4b9a-9df2-192721ac7010}</UniqueIdentifier>
@@ -508,6 +529,12 @@
     </Filter>
     <Filter Include="Graphic">
       <UniqueIdentifier>{1e4d06cf-b066-4830-9114-d05eecd2f387}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{fb2d04f0-eb3c-414a-af01-e993443a5070}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Command\2D">
+      <UniqueIdentifier>{f7d397b1-6473-45e2-9854-54cd76f95ceb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

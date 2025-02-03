@@ -1,15 +1,79 @@
 ﻿#pragma once
 
 #include <vector>
+#include <unordered_map>
+
+//--------------------------------------------------------------------------------------------------
+
+template<typename Key, typename Value>
+class CDualMap
+{
+    std::unordered_map<Key, Value> m_keyFirst;
+    std::unordered_map<Value, Key> m_valueFirst;
+
+    const Key theDummyKey;
+    const Value theDummyValue;
+
+public:
+
+    static void SetDummy(const Key& key, const Value& value)
+    {
+        m_keyDummy = key;
+        m_valueDummy = value;
+    }
+
+    std::unordered_map<Key, Value>& GetKeyMap()
+    {
+        return m_keyFirst;
+    }
+
+    std::unordered_map<Value, Key>& GetValueMap()
+    {
+        return m_valueFirst;
+    }
+
+    void Insert(const Key& key, const Value& value)
+    {
+        m_keyFirst[key] = value;
+        m_valueFirst[value] = key;
+    }
+
+    Key& FindValue(const Key& key) const
+    {
+        auto it = m_keyFirst.find(key);
+        if (it != m_keyFirst.end()) {
+            return it->second;
+        }
+        else {
+            ASSERT(FALSE);
+            return theDummyKey;
+        }
+    }
+
+    Value& FindKey(const Value& value) const
+	{
+        auto it = m_valueFirst.find(value);
+        if (it != m_valueFirst.end()) {
+            return it->second;
+        }
+        else {
+            ASSERT(FALSE);
+            return theDummyValue;
+        }
+    }
+};
+
+//--------------------------------------------------------------------------------------------------
 
 template<typename VT> VT Max(VT a, VT b)
 {
 	return (a > b ? a : b);
 }
 
+//--------------------------------------------------------------------------------------------------
 
-
-template <class valueType> class CLimit
+template<class valueType>
+class CLimit
 {
 public:
 
@@ -64,11 +128,10 @@ public:
 private:
 
 	valueType m_min;
-
 	valueType m_max;
 };
 
-
+//--------------------------------------------------------------------------------------------------
 
 template <class valueType>
 class CLocalPtr
@@ -172,11 +235,10 @@ public:
 private:
 
 	valueType* m_pObject;
-
 	bool m_bArray;
 };
 
-
+//--------------------------------------------------------------------------------------------------
 
 template <class valueType>
 class CLocalState
@@ -212,7 +274,7 @@ private:
 	valueType m_oldValue;
 };
 
-
+//--------------------------------------------------------------------------------------------------
 
 template<class LEFT, class RIGHT>
 class CSimplePairs

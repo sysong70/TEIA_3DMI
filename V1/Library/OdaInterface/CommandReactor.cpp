@@ -1,8 +1,9 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "CommandReactor.h"
+
 #include "DbCommandContext.h"
 
-//--------------------------------------------------------------------------------------------------
+//**************************************************************************************************
 
 CommandReactor::CommandReactor(OdDbCommandContext* pCmdCtx)
 	: m_pCommandContext(pCmdCtx)

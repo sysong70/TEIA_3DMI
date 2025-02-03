@@ -117,11 +117,11 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;ODAINTERFACE_EXPORTS;_WINDOWS;_USRDLL;_CRT_NOFORCE_MANIFEST;_CRT_SECURE_NO_DEPRECATE;_CRTDBG_MAP_ALLOC;_STL_NOFORCE_MANIFEST;_TOOLKIT_IN_DLL_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ConformanceMode>Default</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>..\Teigha\Drawing\Include;..\Teigha\Drawing\Extensions\ExServices;..\Teigha\KernelBase\Include;..\Teigha\Kernel\Include;..\Teigha\Kernel\Extensions\ExServices;..\Common;..\Signal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
       <PreprocessToFile>false</PreprocessToFile>
       <BrowseInformation>true</BrowseInformation>
@@ -132,6 +132,7 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>..\Teigha\lib\vc17_amd64dlldbg;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>TD_Db.lib;TD_Gs.lib;TD_Gi.lib;TD_Ge.lib;TD_DbRoot.lib;TD_Root.lib;TD_Alloc.lib;TD_Key.lib;RText.lib;TD_DbEntities.lib;TD_DbIO.lib;TD_DbCore.lib;ATEXT.lib;ISM.lib;WipeOut.lib;AcMPolygonObj15.lib;ACCAMERA.lib;SCENEOE.lib;UTF.lib;advapi32.lib;comdlg32.lib;gdi32.lib;kernel32.lib;odbc32.lib;odbccp32.lib;ole32.lib;oleaut32.lib;Secur32.lib;shell32.lib;user32.lib;uuid.lib;winspool.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -147,10 +148,10 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;ODAINTERFACE_EXPORTS;_WINDOWS;_USRDLL;_CRT_NOFORCE_MANIFEST;_CRT_SECURE_NO_DEPRECATE;_CRTDBG_MAP_ALLOC;_STL_NOFORCE_MANIFEST;_TOOLKIT_IN_DLL_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>Default</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>..\Teigha\Drawing\Include;..\Teigha\Drawing\Extensions\ExServices;..\Teigha\KernelBase\Include;..\Teigha\Kernel\Include;..\Teigha\Kernel\Extensions\ExServices;..\Common;..\Signal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4819</DisableSpecificWarnings>
     </ClCompile>
@@ -162,6 +163,8 @@
       <EnableUAC>false</EnableUAC>
       <AdditionalLibraryDirectories>..\Teigha\lib\vc17_amd64dll;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>TD_Db.lib;TD_Gs.lib;TD_Gi.lib;TD_Ge.lib;TD_DbRoot.lib;TD_Root.lib;TD_Alloc.lib;TD_Key.lib;RText.lib;TD_DbEntities.lib;TD_DbIO.lib;TD_DbCore.lib;ATEXT.lib;ISM.lib;WipeOut.lib;AcMPolygonObj15.lib;ACCAMERA.lib;SCENEOE.lib;UTF.lib;advapi32.lib;comdlg32.lib;gdi32.lib;kernel32.lib;odbc32.lib;odbccp32.lib;ole32.lib;oleaut32.lib;Secur32.lib;shell32.lib;user32.lib;uuid.lib;winspool.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ProgramDatabaseFile>$(IntDir)$(TargetName).pdb</ProgramDatabaseFile>
+      <ImportLibrary>..\..\Build\3DMI.$(Configuration)$(PlatformArchitecture)\$(ProjectName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -173,7 +176,6 @@
     <ClInclude Include="..\Common\Path.h" />
     <ClInclude Include="..\Common\WStr.h" />
     <ClInclude Include="..\OdaInterface\Application.h" />
-    <ClInclude Include="Command.h" />
     <ClInclude Include="..\OdaInterface\CommandReactor.h" />
     <ClInclude Include="..\OdaInterface\Connector.h" />
     <ClInclude Include="..\OdaInterface\framework.h" />
@@ -181,12 +183,20 @@
     <ClInclude Include="..\OdaInterface\Renderer.h" />
     <ClInclude Include="..\Signal\Signal.h" />
     <ClInclude Include="..\Signal\WorkerThread.h" />
-    <ClInclude Include="Command.Line.h" />
+    <ClInclude Include="Commands.h" />
+    <ClInclude Include="CommandStack.h" />
+    <ClInclude Include="OSnapManager.h" />
+    <ClInclude Include="Prompt.Def.h" />
+    <ClInclude Include="Prompt.h" />
+    <ClInclude Include="Prompt.Resource.h" />
     <ClInclude Include="SignalArgs.h" />
     <ClInclude Include="EventDelegator.h" />
-    <ClInclude Include="ThreadPool.h" />
+    <ClInclude Include="Tracker.h" />
+    <ClInclude Include="Trackers.h" />
+    <ClInclude Include="UserIO.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\Develop\Library\Teigha\25.9\Kernel\Extensions\ExServices\ExUndoController.cpp" />
     <ClCompile Include="..\Common\Common_Define.cpp" />
     <ClCompile Include="..\Common\Dir.cpp" />
     <ClCompile Include="..\Common\File.cpp" />
@@ -195,21 +205,28 @@
     <ClCompile Include="..\Common\Path.cpp" />
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\OdaInterface\Application.cpp" />
-    <ClCompile Include="Command.cpp" />
+    <ClCompile Include="Command.Circle.cpp" />
     <ClCompile Include="..\OdaInterface\CommandReactor.cpp" />
     <ClCompile Include="..\OdaInterface\Connector.cpp" />
     <ClCompile Include="..\OdaInterface\dllmain.cpp" />
-    <ClCompile Include="..\OdaInterface\stdafx.cpp" />
+    <ClCompile Include="..\OdaInterface\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\OdaInterface\Renderer.cpp" />
     <ClCompile Include="..\Signal\Signal.cpp" />
     <ClCompile Include="..\Signal\WorkerThread.cpp" />
     <ClCompile Include="..\Teigha\Drawing\Extensions\ExServices\ExHostAppServices.cpp" />
     <ClCompile Include="..\Teigha\Kernel\Extensions\ExServices\OdFileBuf.cpp" />
     <ClCompile Include="..\Teigha\Kernel\Extensions\ExServices\RxSystemServicesImpl.cpp" />
+    <ClCompile Include="Commands.cpp" />
+    <ClCompile Include="CommandStack.cpp" />
     <ClCompile Include="Command.Line.cpp" />
+    <ClCompile Include="OSnapManager.cpp" />
     <ClCompile Include="SignalArgs.cpp" />
     <ClCompile Include="EventDelegator.cpp" />
-    <ClCompile Include="ThreadPool.cpp" />
+    <ClCompile Include="Tracker.cpp" />
+    <ClCompile Include="Trackers.cpp" />
+    <ClCompile Include="UserIO.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

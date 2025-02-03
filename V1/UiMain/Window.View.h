@@ -24,13 +24,6 @@ namespace Window
 
 	public:
 
-		enum EType
-		{
-			Unknown = -1,
-			View3d,
-			View2d,
-		};
-
 		friend class MainFrame;
 
 		~View() override;
@@ -39,6 +32,10 @@ namespace Window
 
 		virtual void ReceiveSignal(Json::Object* pData) {}
 
+		virtual bool SetContextMenu(Json::Object* pData) { return false; }
+
+		virtual void ShowContextMenu(Json::Object* pData) {}
+
 	public:
 
 		void CancelCommand();
@@ -46,6 +43,16 @@ namespace Window
 		Document* GetDocument() const;
 
 		int GetId();
+
+		EViewType GetViewType();
+
+		Control::ToolBar& GetToolBar() {
+			return m_toolBar;
+		}
+
+		Control::HistoryBar& GetHistoryBar() {
+			return m_historyBar;
+		}
 
 	protected:
 
@@ -64,8 +71,6 @@ namespace Window
 	#endif
 
 		afx_msg LRESULT OnSignal(WPARAM wp, LPARAM lp);
-
-		afx_msg void OnActivate(UINT nState, CWnd* pWndOther, BOOL bMinimized);
 
 		afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 
@@ -101,7 +106,7 @@ namespace Window
 
 	protected:
 
-		EType m_eType = EType::Unknown;
+		EViewType m_eType = EViewType::Unknown;
 		int m_nViewId = -1;
 		bool m_bRenderer = false;
 		bool m_bActivate = false;
@@ -120,12 +125,14 @@ namespace Window
 
 		Command::Base* m_pActiveCommand = nullptr;
 
+		virtual void CreateCommandPrompt() {}
+
 	protected: // ToolBar
 
 		Control::ToolBar m_toolBar;
 		Control::HistoryBar m_historyBar;
 
-		virtual void CreateHistoryBar();
+		virtual void CreateHistoryBar(Control::EPivot pivot = Control::EPivot::BottomCenter);
 
 		virtual void CreateToolBar();
 

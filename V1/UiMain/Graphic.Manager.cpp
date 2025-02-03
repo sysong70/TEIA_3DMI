@@ -9,7 +9,7 @@ static char THIS_FILE[] = __FILE__;
 
 //**************************************************************************************************
 
-//:TEST
+// TEST
 /*
 CBCGPGraphicsManager* m_pGraphics = nullptr;
 
@@ -26,12 +26,12 @@ void DrawCircleOnView(const CPoint center, const CSize radiusSize, COLORREF colo
 		DEBUG_RETURN;
 	}
 
-	//:CHECK
+	// CHECK
 	//CBCGPPoint from(center.x + radiusSize.cx, center.y + radiusSize.cy);
 	//m_pGraphics->DrawArc(from, from, radiusSize, TRUE, TRUE, CBCGPBrush(color));
 	//m_pGraphics->DrawRectangle({ center.x - 20.0, center.y - 20.0, center.x + 20.0, center.y + 20.0 }, CBCGPBrush(color));
 
-	//:TEST- random
+	// TEST- random
 	for (int i = 0; i < 100; i++) {
 		double x = rand() % 4000;
 		double y = rand() % 1500;

@@ -11,7 +11,7 @@ static char THIS_FILE[] = __FILE__;
 
 void Command::Test8::Run(Window::View* pView)
 {
-	//: load files
+	// TODO - load files
 
 	// send Preference
 
@@ -33,17 +33,6 @@ public:
 
 	~TestPanel() override {}
 
-
-
-	void SetData(Json::Object& data) override
-	{
-		__super::SetData(data);
-
-		m_bInitialized = false;
-		m_propList.InitializeData(m_data);
-		m_bInitialized = true;
-	}
-
 protected:
 
 	void ConstructBody() override
@@ -53,32 +42,6 @@ protected:
 		}
 
 		m_propList.InitializeDesign(GetUiData().GetAt("properties"));
-	}
-
-protected:
-
-	afx_msg void OnSize(UINT nType, int cx, int cy)
-	{
-		if (cx == 0 || cy == 0) {
-			return;
-		}
-
-		int margin = Control::Gap().cy;
-		CPoint propTop;
-		CSize propSize;
-
-		if (m_toolBar.GetSafeHwnd() != nullptr) {
-			m_toolBar.AdjustLayout();
-			CSize toolBarSize = Control::GetSize(&m_toolBar);
-
-			propTop = { 0, toolBarSize.cy + margin };
-			propSize = { cx, cy - toolBarSize.cy - margin };
-		}
-		else {
-			propSize = { cx, cy };
-		}
-
-		m_propList.SetWindowPos(NULL, propTop.x, propTop.y, propSize.cx, propSize.cy, SWP_NOACTIVATE);
 	}
 
 
@@ -94,7 +57,7 @@ BEGIN_MESSAGE_MAP(TestPanel, CWnd)
 	ON_REGISTERED_MESSAGE(BCGM_PROPERTY_CHANGED, OnPropertyChanged)
 END_MESSAGE_MAP()
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -121,18 +84,9 @@ void Command::Test9::Run(Window::View* pView)
 	Component::TaskBar& taskBar = TheApplication.GetMainFrame().GetTaskBar();
 	Json::Object& uiData = TheAppResources.GetTask("Test");
 
-	TestPanel* pPanel = new TestPanel(&uiData);
-	pPanel->Initialize(&taskBar);
+	m_pPanel = new TestPanel(&uiData);
+	m_pPanel->Initialize(&taskBar);
 
-	taskBar.SetPanel(pPanel);
+	taskBar.SetPanel(m_pPanel);
 	taskBar.Show(m_pView);
-}
-
-
-
-void Command::Test9::Cancel()
-{
-	__super::Cancel();
-
-	TheApplication.GetMainFrame().GetTaskBar().Show(nullptr);
 }

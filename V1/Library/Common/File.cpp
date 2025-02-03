@@ -84,7 +84,7 @@ void File::Finder::Close()
 	m_hFind = INVALID_HANDLE_VALUE;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 

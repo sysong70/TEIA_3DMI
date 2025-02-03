@@ -10,10 +10,14 @@
 #define SKW_CHILDREN		"Children"
 #define SKW_CLEAR			"Clear"
 #define SKW_COLUMN			"Column"
+#define SKW_COMMAND			"Command"
 #define SKW_DEFAULTVALUE	"Default"
 #define SKW_DELTA			"Delta"
 #define SKW_DESCRIPTION		"Description"
 #define SKW_DPISCALE		"DpiScale"
+#define SKW_ECHO			"Echo"
+#define SKW_ERROR			"Error"
+#define SKW_ERRORMESSAGE	"ErrorMessage"
 #define SKW_EXPAND			"Expand"
 #define SKW_FILEPATH		"FilePath"
 #define SKW_FLAG			"Flag"
@@ -24,6 +28,7 @@
 #define SKW_ID				"Id"
 #define SKW_ITEMS			"Items"
 #define SKW_KEY				"Key"
+#define SKW_KEYWORD			"Keyword"
 #define SKW_MAX				"Max"
 #define SKW_MESSAGE			"Message"
 #define SKW_MIN				"Min"
@@ -32,9 +37,11 @@
 #define SKW_OSNAPID			"OsnapId"
 #define SKW_PARENT			"Parent"
 #define SKW_POSITION		"Position"
+#define SKW_PROMPT			"Prompt"
 #define SKW_RECT			"Rect"
 #define SKW_REPCNT			"RepCnt"
 #define SKW_ROW				"Row"
+#define SKW_SHOW			"Show"
 #define SKW_STATUS			"Status"
 #define SKW_TARGET			"Target"
 #define SKW_TITLE			"Title"
@@ -53,13 +60,19 @@ namespace Signal
 {
 	enum class EInputMode
 	{
-		Unknown = -1, // stop
+		Unknown = -1,
 
-		Real,
+		Angle, // No negative
+		Color,
 		Integer,
-		String,
+		Length,
 		Point2d,
 		Point3d,
+		Real,
+		String,
+
+		PlusInteger,
+		PlusReal,
 	};
 
 	enum EInputControl
@@ -119,6 +132,42 @@ namespace Signal
 	using TreeItems = std::vector<TreeItem>;
 	using TreeItemStatuses = std::vector<TreeItemStatus>;
 	using KeyItems = std::vector<DWORD_PTR>;
+
+	enum class EMenuType
+	{
+		Unknown = -1,
+
+		Normal,
+		Seperator,
+		OSnap,
+		SelFilter,
+	};
+
+	struct MenuItem
+	{
+		EMenuType Type = EMenuType::Normal;
+		int Id = -1;
+		CString Title;
+	};
+
+	using MenuItems = std::vector<MenuItem>;
+
+	using ContextItems = std::vector<int>;
+
+	struct PropItem
+	{
+		CString Key;
+		CString Value;
+		CString Desc;
+
+		bool UseOSnap = false;
+		bool UseSelFilter = false;
+
+		bool Enable = true;
+		bool Show = true;
+	};
+
+	using PropItems = std::vector<PropItem>;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -155,10 +204,11 @@ namespace Signal
 
 		Progress,
 		Command,
-		DebugTracer, //:TEMP
+		UserIO,
+		DebugTracer, // TEMP
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class Application
 	{
@@ -212,7 +262,7 @@ namespace Signal
 		void SaveTraceLog(const wchar_t* pPath, bool saveAndClear = true);
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class MainFrame
 	{
@@ -235,7 +285,7 @@ namespace Signal
 
 	public:
 
-		//:TODO
+		// TODO
 		void ShowNotice();
 
 		void ShowProgress();
@@ -243,7 +293,8 @@ namespace Signal
 		void HideProgress();
 	};
 
-	//:TODO
+// TODO
+//--------------------------------------------------------------------------------------------------
 
 	class StatusBar
 	{
@@ -272,6 +323,7 @@ namespace Signal
 		void ShowCoordinate(double x, double y, double z);
 	};
 
+//--------------------------------------------------------------------------------------------------
 	/*
 		Delivery delivery;
 		delivery.mainFrame.ShowProgress();
@@ -342,7 +394,7 @@ namespace Signal
 		void ClearLog();
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class Command
 	{
@@ -378,7 +430,7 @@ namespace Signal
 		void ResponseFileOption(Json::Object& value, Json::Object& defaultValue);
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class View
 	{
@@ -395,6 +447,7 @@ namespace Signal
 			OnInitialize, // CreateModelHandler, InitialUpdateHpsView
 
 			OnCommand,
+			OnContextCommand,
 			OnCancel, // cancel command
 
 			OnMouseMove,
@@ -413,9 +466,15 @@ namespace Signal
 			OnKeyDown,
 			OnKeyUp,
 
+			CancelCommand,
+			CompleteCommand,
+
 			SetValidation, // complete opening file
 			PaintOverlap, // complete OnPaint
 			SetInputMode,
+			SetContextMenu,
+			ShowContextMenu,
+			ShowInputBox,
 		};
 
 		DEFINE_WRAPPER;
@@ -440,6 +499,8 @@ namespace Signal
 
 		// id: enum Command
 		void OnCommand(UINT id);
+
+		void OnContextCommand(UINT id);
 
 		void OnCancel();
 
@@ -481,14 +542,24 @@ namespace Signal
 
 	public:
 
+		void CancelCommand(UINT id);
+
+		void CompleteCommand(UINT id);
+
 		void SetValidation(bool success = true);
-		//:TODO
+		// TEMP:
 		void PaintOverlap();
 
 		void SetInputMode(EInputMode mode);
+
+		void SetContextMenu(MenuItems& menus, bool show = false);
+
+		void ShowContextMenu(ContextItems& ids);
+
+		void ShowInputBox(EInputMode mode, CString prompt, CString errorMessage);
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class ModelPanel
 	{
@@ -582,7 +653,7 @@ namespace Signal
 		void ViewItem(DWORD_PTR key);
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class TaskBar
 	{
@@ -594,10 +665,19 @@ namespace Signal
 		{
 			Unknown = -1,
 
-			OnRequestValue,
-			OnChangedValue,
+			OnCancel,
+			OnComplete,
 
+			OnChangedValue,
+			OnClickedValue,
+			OnRequestValue,
+
+			CompleteCommand,
+
+			EnableValue,
 			ResponseValue,
+			SetValueState,
+			ShowValue,
 			UpdateValue,
 		};
 
@@ -607,18 +687,79 @@ namespace Signal
 
 	public:
 
-		void OnRequestValue(UINT commandId);
+		void OnCancel(UINT commandId);
 
-		void OnChangedValue(UINT coomandId, Json::Object& value);
+		void OnComplete(UINT commandId, CString key);
 
 	public:
 
+		// all data of property grid
+		void OnChangedValue(UINT coomandId, Json::Object& value);
+		// single data of property item
+		void OnChangedValue(UINT commandId, CString key, Json::Value& value);
+
+		void OnClickedValue(UINT commandId, CString key);
+
+		void OnRequestValue(UINT commandId);
+
+	public:
+
+		void EnableValue(UINT commandId, const std::vector<CString>& items, bool enable = true);
+
 		void ResponseValue(UINT commandId, Json::Object& value, Json::Object& defaultValue);
-		//:TODO
-		void UpdateValue(UINT commandId, Json::Array& values);
+
+		void SetValue(UINT commandId, Json::Object& value);
+
+		void SetValueState(UINT commandId, const PropItems& items);
+
+		void ShowValue(UINT commandId, const std::vector<CString>& items, bool show = true);
+
+		void UpdateValue(UINT commandId, Json::Object& value);
+
+		void UpdateValue(UINT commandId, CString key, Json::Value& value);
 	};
 
+//--------------------------------------------------------------------------------------------------
 
+	class UserIO
+	{
+	public:
+
+		CHILD_CONSTRUCTOR(UserIO);
+
+		enum class Action
+		{
+			Unknown = -1,
+
+			OnInput,
+			OnContextMenu,
+
+			PutCommand,
+			PutPrompt, // and keyword
+			InputError,
+			InputEcho,
+		};
+
+		DEFINE_WRAPPER;
+
+		void ConstructData(Json::Object& data, Action action);
+
+	public:
+
+		void OnInput(const CString& value);
+
+	public:
+
+		void PutCommand(CString command, CString prompt, CString keyword = L"");
+
+		void PutPrompt(CString prompt, CString keyword = L"");
+
+		void InputError(const CString& value);
+
+		void InputEcho(const CString& value);
+	};
+
+//--------------------------------------------------------------------------------------------------
 
 	class Delivery
 	{
@@ -650,6 +791,7 @@ namespace Signal
 		ModelPanel modelPanel;
 		TaskBar taskBar;
 		Command command;
+		UserIO userIO;
 
 		void (*SendSignal)(const wchar_t*) = nullptr;
 

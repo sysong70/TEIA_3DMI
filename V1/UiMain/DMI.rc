@@ -109,11 +109,11 @@ BEGIN
     LISTBOX         IDC_DMI_CONTROL_01, 0, 4, 300, 196, LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_VSCROLL
 END
 
-#pragma endregion //:REGION - Dialog
+#pragma endregion // REGION - Dialog
 
 #endif // !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_KOR)
 
-#pragma endregion //:REGION - 한국어(대한민국) Resources
+#pragma endregion // REGION - 한국어(대한민국) Resources
 
 #pragma region 영어(미국) Resources
 
@@ -127,7 +127,7 @@ IDR_MAINFRAME                ICON   "RES\\DMI.ico"
 IDR_DMITYPE_3D               ICON   "RES\\DMIDoc.ico"
 IDR_DMITYPE_2D               ICON   "RES\\DMIDoc.ico"
 
-#pragma endregion //:REGION - Icon
+#pragma endregion // REGION - Icon
 
 #pragma region Menu
 
@@ -204,7 +204,7 @@ BEGIN
     MENUITEM "", ID_VIEW_APPLOOK
 END
 
-#pragma endregion //:REGION - Menu
+#pragma endregion // REGION - Menu
 
 #pragma region Accelerator
 
@@ -212,7 +212,7 @@ IDR_MAINFRAME ACCELERATORS
 BEGIN
 END
 
-#pragma endregion //:REGION - Accelerator
+#pragma endregion // REGION - Accelerator
 
 #pragma region Version
 
@@ -249,7 +249,7 @@ BEGIN
     END
 END
 
-#pragma endregion //:REGION - Version
+#pragma endregion // REGION - Version
 
 #pragma region String Table
 
@@ -274,11 +274,11 @@ BEGIN
     AFX_IDS_IDLEMESSAGE     "Ready"
 END
 
-#pragma endregion //:REGION - String Table
+#pragma endregion // REGION - String Table
 
 #endif // !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 
-#pragma endregion //:REGION - 영어(미국) Resources
+#pragma endregion // REGION - 영어(미국) Resources
 
 #ifndef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -315,6 +315,9 @@ LANGUAGE LANG_KOREAN, SUBLANG_DEFAULT
 1 24 DISCARDABLE "DpiAwareness.xml"
 
 IDF_JSON_UI                 TEXT    "res/UI.json"
-IDF_JSON_DATA_PREFERENCES   TEXT    "res/Data.Preferences.json"
+IDF_JSON_DIALOGS            TEXT    "res/Dialogs.json"
+IDF_JSON_DICTIONARY         TEXT    "res/Dictionary.json"
+IDF_JSON_TASKS              TEXT    "res/Tasks.json"
 IDF_JSON_DATA_FILEOPTIONS   TEXT    "res/Data.FileOptions.json"
+IDF_JSON_DATA_PREFERENCES   TEXT    "res/Data.Preferences.json"
 IDF_PNG_BACKGROUND          PNG     "res/Background.png"

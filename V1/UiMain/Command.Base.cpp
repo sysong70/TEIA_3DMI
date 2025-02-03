@@ -23,7 +23,6 @@ Command::Base::~Base()
 
 bool Command::Base::ReceiveSignal(Json::Object* pData)
 {
-	REMOVE_POINTER(pData);
 	RETURN_FALSE;
 }
 
@@ -39,4 +38,13 @@ void Command::Base::Run(Window::View* pView)
 void Command::Base::Cancel()
 {
 	m_pView = nullptr;
+	TheApplication.GetMainFrame().GetTaskBar().Show(nullptr);
+}
+
+
+
+void Command::Base::Complete()
+{
+	m_pView = nullptr;
+	TheApplication.GetMainFrame().GetTaskBar().Show(nullptr);
 }

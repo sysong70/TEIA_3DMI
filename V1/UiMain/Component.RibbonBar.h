@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Component.h"
-#include "Facility.CommandIndexer.h"
+#include "Window.h"
 
 //--------------------------------------------------------------------------------------------------
 
@@ -18,18 +18,37 @@ namespace Component
 
 		~RibbonBar();
 
+	protected:
+
+		CBCGPRibbonCategory* AddCategory(LPCTSTR lpszName);
+
 	public:
 
-		bool Initialize(CWnd* pMainFrame);
+		bool Initialize(CWnd* pMainFrame, Window::EDocType eType = Window::EDocType::Model);
+		// doc & view changed
+		void ChangeByDocType(Window::EDocType eType);
+		// for changing language, ...
+		void Reload();
+
+	protected:
 
 		bool CreateMainCategory();
 
-		bool CreateCategories();
+		bool Create3dCategories();
 
-		void Reload();
+		bool Create2dCategories();
+
+		void SetPadding(const CSize& value);
 
 	private:
 
+		using Categories = std::list<CBCGPRibbonCategory*>;
+
+		Window::EDocType m_eDocType;
 		CBCGPRibbonMainButton m_wndMainButton;
+		Categories m_categoies3d;
+		Categories m_categoies2d;
+		// For Context Menu
+		CBCGPRibbonCategory* m_pDummy = nullptr;
 	};
 }

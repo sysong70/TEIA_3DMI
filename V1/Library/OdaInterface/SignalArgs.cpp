@@ -5,22 +5,28 @@
 #define DUMP_BASE
 //#define DUMP_COMMAND
 #define DUMP_INITIALIZE
+#define DUMP_KEYBOARD
 #define DUMP_MOUSE
 #define DUMP_RESIZE
 #define DUMP_PAINT
 //#define DUMP_TEXT
 
-
+//**************************************************************************************************
 
 #pragma region Base Class
 
-SignalArgs::Base* SignalArgs::Base::CreateInstance(Json::Object& content)
+SignalArgs::Base* SignalArgs::Base::CreateInstance(Json::Object& content, int& signalTarget, int& signalAction)
 {
+#define OnAction(x) Signal::View::Action::On##x: instance = new x(content); break
+
 	Base* instance = nullptr;
-	Signal::Target target = (Signal::Target)content.GetInteger(SKW_TARGET, -1);
+	signalTarget = content.GetInteger(SKW_TARGET, -1);
+	signalAction = content.GetInteger(SKW_ACTION, -1);
+
+	Signal::Target target = (Signal::Target)signalTarget;
 
 	if (target == Signal::Target::View) {
-		Signal::View::Action action = (Signal::View::Action)content.GetInteger(SKW_ACTION, -1);
+		Signal::View::Action action = (Signal::View::Action)signalAction;
 
 		switch (action) {
 		case Signal::View::Action::OnLButtonDown:
@@ -34,20 +40,24 @@ SignalArgs::Base* SignalArgs::Base::CreateInstance(Json::Object& content)
 			instance = new Mouse(content);
 			break;
 
-		case Signal::View::Action::OnPaint:
-			instance = new Paint(content);
-			break;
+		case OnAction(Paint);
+		case OnAction(Resize);
+		case OnAction(Initialize);
+		case OnAction(Command);
+		case OnAction(ContextCommand);
 
-		case Signal::View::Action::OnResize:
-			instance = new Resize(content);
+		case Signal::View::Action::OnKeyDown:
+			instance = new Keyboard(content);
 			break;
 
 		case Signal::View::Action::OnConstruct:
-		case Signal::View::Action::OnDestruct:
+			TRACE(L"TODO - Signal::View::Action::OnConstruct");
 			break;
-
-		case Signal::View::Action::OnInitialize:
-			instance = new Initialize(content);
+		case Signal::View::Action::OnDestruct:
+			TRACE(L"TODO - Signal::View::Action::OnDestruct");
+			break;
+		case Signal::View::Action::OnCancel:
+			TRACE(L"TODO - Signal::View::Action::OnCancel");
 			break;
 
 		case Signal::View::Action::Unknown:
@@ -57,30 +67,42 @@ SignalArgs::Base* SignalArgs::Base::CreateInstance(Json::Object& content)
 		}
 	}
 	else if (target == Signal::Target::Application) {
-		Signal::Application::Action action = (Signal::Application::Action)content.GetInteger(SKW_ACTION, -1);
+		Signal::Application::Action action = (Signal::Application::Action)signalAction;
 
 		switch (action) {
-		case Signal::Application::Action::OnInitInstance:
-			break;
+		case Signal::Application::Action::OnInitInstance: break;
+		case Signal::Application::Action::OnUpdatePreference: break;
+		case Signal::Application::Action::OnUpdateFileOption: break; 
+		case Signal::Application::Action::OnExitInstance: break;
+		case Signal::Application::Action::OnDpiAware: break;
 
-		case Signal::Application::Action::OnUpdatePreference:
+		default:
+			DEBUG_STOP;
 			break;
+		};
+	}
+	else if (target == Signal::Target::TaskBar) {
+	}
+	else if (target == Signal::Target::UserIO) {
+		Signal::UserIO::Action action = (Signal::UserIO::Action)signalAction;
 
-		case Signal::Application::Action::OnUpdateFileOption:
-			break;
-
-		case Signal::Application::Action::OnExitInstance:
+		switch (action) {
+		case Signal::UserIO::Action::OnInput:
+			instance = new Text(content);
 			break;
 
 		default:
 			DEBUG_STOP;
-		};
+			break;
+		}
 	}
 	else {
 		DEBUG_STOP;
 	}
 
 	return instance;
+
+#undef OnAction
 }
 
 
@@ -118,18 +140,16 @@ CString SignalArgs::Base::Dump()
 #endif
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Command Class
 
 SignalArgs::Command::Command(Json::Object& content)
 	: Base(content)
 {
-	GroupName = content.GetString(SKW_GROUPNAME);
-	GlobalName = content.GetString(SKW_GLOBALNAME);
-	Options = content.GetAt(SKW_OPTIONS);
+	Id = content.GetInteger(SKW_ID, -1);
 
-	Valid &= (GlobalName.IsEmpty() == false);
+	Valid &= (Id > 0);
 	ASSERT(Valid);
 }
 
@@ -138,9 +158,7 @@ SignalArgs::Command::Command(Json::Object& content)
 CString SignalArgs::Command::Dump()
 {
 	CString serializer(L"\n[Command] ");
-	serializer += WStr::Format(L"GroupName:%s, ", GroupName);
-	serializer += WStr::Format(L"GlobalName:%s, ", GlobalName);
-	serializer += WStr::Format(L"Options:%s, ", Options.ToString());
+	serializer += WStr::Format(L"Id:%d, ", Id);
 	serializer += __super::Dump();
 
 #ifdef DUMP_COMMAND
@@ -150,7 +168,16 @@ CString SignalArgs::Command::Dump()
 #endif
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
+
+#pragma region ContextCommand Class
+
+SignalArgs::ContextCommand::ContextCommand(Json::Object& content)
+	: Command(content)
+{
+}
+
+#pragma endregion // REGION
 
 #pragma region Initialize Class
 
@@ -179,6 +206,53 @@ CString SignalArgs::Initialize::Dump()
 #endif
 }
 
+#pragma endregion // REGION
+
+#pragma region Keyboard Class
+
+SignalArgs::Keyboard::Keyboard(Json::Object& content)
+	: Base(content)
+{
+	Flags = content.GetInteger(SKW_FLAG);
+	Repeat = content.GetInteger(SKW_REPCNT);
+	Char = content.GetInteger(SKW_CHAR);
+	Down = static_cast<Signal::View::Action>(Action) == Signal::View::Action::OnKeyDown;
+}
+
+
+
+bool SignalArgs::Keyboard::IsEnter()
+{
+	return Char == VK_RETURN;
+}
+
+
+
+bool SignalArgs::Keyboard::IsEscape()
+{
+	return Char == VK_ESCAPE;
+}
+
+
+
+CString SignalArgs::Keyboard::Dump()
+{
+	CString serializer(L"\n[Mouse] ");
+	serializer += WStr::Format(L"Flags:%d, ", Flags);
+	serializer += WStr::Format(L"Repeat:%d, ", Repeat);
+	serializer += WStr::Format(L"Char:%d, ", Char);
+	serializer += WStr::Format(L"Down:%d, ", Down);
+	serializer += __super::Dump();
+
+#ifdef DUMP_KEYBOARD
+	return serializer;
+#else
+	return CString();
+#endif
+}
+
+#pragma endregion // REGION
+
 #pragma region Mouse Class
 
 SignalArgs::Mouse::Mouse(Json::Object& content)
@@ -191,6 +265,13 @@ SignalArgs::Mouse::Mouse(Json::Object& content)
 
 	Valid &= (X > INT_MIN && Y > INT_MIN);
 	ASSERT(Valid);
+}
+
+
+
+CPoint SignalArgs::Mouse::GetPoint()
+{
+	return CPoint(X, Y);
 }
 
 
@@ -243,7 +324,7 @@ bool SignalArgs::Mouse::RightButton()
 	return Flags & MK_RBUTTON;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Paint Class
 
@@ -261,6 +342,12 @@ SignalArgs::Paint::Paint(int viewId)
 SignalArgs::Paint::Paint(Json::Object& content)
 	: Base(content)
 {
+	Json::Array& rect = content.GetArray(SKW_RECT);
+
+	Left = rect.GetInteger(0);
+	Top = rect.GetInteger(1);
+	Right = rect.GetInteger(2);
+	Bottom = rect.GetInteger(3);
 }
 
 
@@ -268,6 +355,10 @@ SignalArgs::Paint::Paint(Json::Object& content)
 CString SignalArgs::Paint::Dump()
 {
 	CString serializer(L"\n[Paint] ");
+	serializer += WStr::Format(L"Left:%d, ", Left);
+	serializer += WStr::Format(L"Top:%d, ", Top);
+	serializer += WStr::Format(L"Right:%d, ", Right);
+	serializer += WStr::Format(L"Bottom:%d, ", Bottom);
 	serializer += __super::Dump();
 
 #ifdef DUMP_PAINT
@@ -277,7 +368,7 @@ CString SignalArgs::Paint::Dump()
 #endif
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Resize Class
 
@@ -307,14 +398,14 @@ CString SignalArgs::Resize::Dump()
 #endif
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Text Class
 
 SignalArgs::Text::Text(Json::Object& content)
 	: Base(content)
 {
-	DEBUG_STOP;
+	Buffer = content.GetString(SKW_VALUE);
 }
 
 

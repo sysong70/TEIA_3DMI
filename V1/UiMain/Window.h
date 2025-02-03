@@ -24,7 +24,21 @@ namespace Window
 		Pro,
 	};
 
+	enum class EDocType
+	{
+		Unknown = -1,
+		Model,
+		Drawing,
+		Image,
+		PDF,
+	};
 
+	enum class EViewType
+	{
+		Unknown = -1,
+		View3d,
+		View2d,
+	};
 
 	enum class EStatusArea
 	{
@@ -32,8 +46,6 @@ namespace Window
 		Progress,
 		Coordinate,
 	};
-
-
 
 	enum class EUserMessage
 	{

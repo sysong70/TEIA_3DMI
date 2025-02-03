@@ -1004,7 +1004,7 @@ void KERNEL::Command::HighlightObjectSnapImpl::DrawSnapPointTypeText(H3DF::Point
 
 	// pixel to world
 	double fontSize = PixelToWorld(TheEnvironment.General.FontSize * TheSession.DpiScale);
-	//:WARNING - replace dUnit
+	// WARNING - replace dUnit
 	dUnit = fontSize * 0.5;
 
 	const COLORREF PointBackColor = RGB(0xFD, 0xF4, 0xDC);
@@ -1094,13 +1094,13 @@ void KERNEL::Command::HighlightObjectSnapImpl::DrawSnapPointTypeText(H3DF::Point
 		Font::SetRenderer("truetype");
 		Font::SetAlignment(Font::EPivot::MiddleCenter);
 
-		//:TODO - text position in window
+		// TODO - text position in window
 		double textOffset = dUnit * 5;
 		position.y += textOffset;
 		CString text = TheEnvironment.General.Local(pText);
 		Text::Create(position, text);
 
-		//:WARNING - for calculating text extent
+		// WARNING - for calculating text extent
 		Font::SetTransform();
 			float width, height;
 			Text::GetExtent(text, width, height);

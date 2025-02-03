@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 #include "Facility.CommandIndexer.h"
 #include "Command.VisualEffects3d.h"
-//:TEST
-#include "Command.Test.h"
+#include "Command.Circle2d.h"
+#include "Command.Line2d.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -14,12 +14,9 @@ static char THIS_FILE[] = __FILE__;
 // Global single instance
 
 Facility::CommandIndexer TheCommandIndexer;
-Facility::CommandIndexer::CommandInfo theDummy;
 Facility::ActiveCommand TheActiveCommand;
 
-Command::VisualEffects3d theVisualEffects3d;
-//:TEST
-Command::Test9 theTestCommand9;
+Facility::CommandIndexer::CommandInfo theDummy;
 
 //**************************************************************************************************
 
@@ -32,6 +29,12 @@ Facility::CommandIndexer::CommandIndexer()
 
 Facility::CommandIndexer::~CommandIndexer()
 {
+	CommandMap& map = GetInstance();
+	CommandMap::iterator it;
+
+	for (it = map.begin(); it != map.end(); it++) {
+		REMOVE_POINTER(it->second.Function);
+	}
 }
 
 
@@ -45,7 +48,7 @@ Facility::CommandIndexer::CommandInfo& Facility::CommandIndexer::Get(int id)
 		return it->second;
 	}
 	else {
-		ASSERT(FALSE);
+		DEBUG_STOP;
 		return theDummy;
 	}
 }
@@ -59,7 +62,7 @@ Facility::CommandIndexer::CommandInfo& Facility::CommandIndexer::GetDummyData()
 
 
 
-void Facility::CommandIndexer::Initialize()
+bool Facility::CommandIndexer::Initialize()
 {
 #define ITEM_DEF(type,id,stringId) { id, { type, id, -1, stringId } },
 
@@ -69,9 +72,18 @@ void Facility::CommandIndexer::Initialize()
 
 #undef ITEM_DEF
 
-	Get(HOME_3D_LST_VisualEffects).Function = &theVisualEffects3d;
-	//:TEST
-	Get(CUSTOM_3D_CMD_KEN_Test9).Function = &theTestCommand9;
+	Get(HOME_3D_LST_VisualEffects).Function = new Command::VisualEffects3d();
+
+	//Get(DRAW_2D_CMD_Line).Function = new Command::Line2d::TwoPoints();
+	Get(DRAW_2D_CMD_Polyline).Function = new Command::Line2d::Polyline();
+	Get(DRAW_2D_CMD_Rectangle).Function = new Command::Line2d::Rectangle();
+	Get(DRAW_2D_CMD_Polygon).Function = new Command::Line2d::Polygon();
+	Get(DRAW_2D_CMD_Circle_2Points).Function = new Command::Circle2d::TwoPoints();
+	Get(DRAW_2D_CMD_Circle_3Points).Function = new Command::Circle2d::ThreePoints();
+	Get(DRAW_2D_CMD_Circle_CenterRadius).Function = new Command::Circle2d::CenterRadius();
+	Get(DRAW_2D_CMD_Circle_2TangentsRadius).Function = new Command::Circle2d::TwoTangentsRadius();
+
+	return true;
 }
 
 

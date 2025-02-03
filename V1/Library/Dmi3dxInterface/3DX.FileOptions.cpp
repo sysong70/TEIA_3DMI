@@ -29,7 +29,7 @@ bool H3DX::JsonWrapper::Set(Json::Object& value)
 	return m_root.IsEmpty() == false;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //--------------------------------------------------------------------------------------------------
 
@@ -75,7 +75,7 @@ bool H3DX::ImportOptions::SetReference(Json::Object& value)
 
 bool H3DX::ImportOptions::Get(CString& filePath, A3DRWParamsLoadData& param)
 {
-	//:CHECK
+	// CHECK
 	A3D_INITIALIZE_DATA(A3DRWParamsLoadData, param);
 
 	CStringA fileType = (CStringA)GetFileTypeName(filePath);
@@ -158,7 +158,7 @@ bool H3DX::ImportOptions::GetGeneral(Json::Object& source, A3DRWParamsLoadData& 
 {
 	const CStringA category = "General";
 
-	//:WARNING - essential
+	// WARNING - essential
 	if (source.FindValue(category) == nullptr) {
 		RETURN_FALSE;
 	}
@@ -173,14 +173,14 @@ bool H3DX::ImportOptions::GetGeneral(Json::Object& source, A3DRWParamsLoadData& 
 	param.m_bReadSolids = data.GetBoolean("Solids");
 	param.m_bReadSurfaces = data.GetBoolean("Surfaces");
 	param.m_bReadWireframes = data.GetBoolean("Wireframes");
-	//:WARNING - process in GetPMI()
+	// WARNING - process in GetPMI()
 	//param.m_bReadPmis;
 	param.m_bReadAttributes = data.GetBoolean("Attributes");
 	param.m_bReadHiddenObjects = data.GetBoolean("HiddenObjects");
 	param.m_bReadConstructionAndReferences = data.GetBoolean("ConstructionAndReferences");
 	param.m_bReadActiveFilter = data.GetBoolean("ActiveFilter");
-	param.m_eReadingMode2D3D = kA3DRead_3D; //:CHECK
-	param.m_eReadGeomTessMode = (A3DEReadGeomTessMode)(readingMode + 1) ; //:CHECK - non Feature
+	param.m_eReadingMode2D3D = kA3DRead_3D; // CHECK
+	param.m_eReadGeomTessMode = (A3DEReadGeomTessMode)(readingMode + 1) ; // CHECK - non Feature
 	param.m_eDefaultUnit = unit == 0 ? kA3DUnitUnknown : (A3DEUnits)(unit - 1);
 	//param.m_bReadFeature;
 	//param.m_bReadConstraints;
@@ -246,8 +246,8 @@ bool H3DX::ImportOptions::GetTessellation(Json::Object& source, A3DRWParamsLoadD
 
 		//param.m_usStructSize;
 		param.m_eTessellationLevelOfDetail = (A3DETessellationLevelOfDetail)data.GetInteger("TessLevel");
-		param.m_dChordHeightRatio = (double)custom.GetInteger("ChordLimit"); //:CHECK
-		param.m_dAngleToleranceDeg = (double)custom.GetInteger("AngleTolerance"); //:CHECK
+		param.m_dChordHeightRatio = (double)custom.GetInteger("ChordLimit"); // CHECK
+		param.m_dAngleToleranceDeg = (double)custom.GetInteger("AngleTolerance"); // CHECK
 		//param.m_dMinimalTriangleAngleDeg;
 		//param.m_dMaxChordHeight;
 		param.m_bAccurateTessellation = accurate.GetBoolean("checked");
@@ -256,11 +256,11 @@ bool H3DX::ImportOptions::GetTessellation(Json::Object& source, A3DRWParamsLoadD
 		param.m_bAccurateSurfaceCurvatures = gridAlignedTess.GetReal("SurfaceCurvatures");
 		//param.m_bDoNotComputeNormalsInAccurateTessellation;
 		param.m_bKeepUVPoints = data.GetBoolean("PreserveUV");
-		param.m_bUseHeightInsteadOfRatio = custom.GetInteger("ChordLimitType") == 1; //:CHECK
-		param.m_dMaximalTriangleEdgeLength = (double)data.GetInteger("TessMaxEdgeLength"); //:CHECK
+		param.m_bUseHeightInsteadOfRatio = custom.GetInteger("ChordLimitType") == 1; // CHECK
+		param.m_dMaximalTriangleEdgeLength = (double)data.GetInteger("TessMaxEdgeLength"); //CHECK
 	}
 	else {
-		//:TODO - default?
+		// TODO - default?
 	}
 
 	return true;
@@ -282,7 +282,7 @@ bool H3DX::ImportOptions::GetSearch(Json::Object& source, A3DRWParamsLoadData& t
 {
 	const CStringA category = "Search";
 
-	//:WARNING - essential
+	// WARNING - essential
 	if (source.FindValue(category) == nullptr) {
 		RETURN_FALSE;
 	}
@@ -293,7 +293,7 @@ bool H3DX::ImportOptions::GetSearch(Json::Object& source, A3DRWParamsLoadData& t
 	bool recursive = data.GetBoolean("RecursiveSearch");
 
 	//param.m_usStructSize;
-	param.m_bUseRootDirectory = recursive; //:CHECK
+	param.m_bUseRootDirectory = recursive; // CHECK
 	param.m_bRootDirRecursive = recursive;
 
 	WStringArray strings;
@@ -320,7 +320,7 @@ bool H3DX::ImportOptions::GetSearch(Json::Object& source, A3DRWParamsLoadData& t
 			//pDir->m_usStructSize;
 			pDir->m_pcPhysicalPath = ToHoopsString(dir);
 			//pDir->m_pcLogicalName
-			pDir->m_bRecursive = recursive; //:CHECK
+			pDir->m_bRecursive = recursive; // CHECK
 		}
 	}
 
@@ -368,7 +368,7 @@ bool H3DX::ImportOptions::GetPMI(Json::Object& source, A3DRWParamsLoadData& targ
 			return true;
 		}
 
-		//:CHECK
+		// CHECK
 		target.m_sGeneral.m_bReadPmis = true;
 
 		A3DRWParamsPmiData& param = target.m_sPmi;
@@ -386,7 +386,7 @@ bool H3DX::ImportOptions::GetPMI(Json::Object& source, A3DRWParamsLoadData& targ
 		//param.m_bAlwaysUseDefaultColor;
 	}
 	else {
-		//:TODO - default?
+		// TODO - default?
 	}
 
 	return true;
@@ -421,13 +421,13 @@ bool H3DX::ImportOptions::GetSpecial(CStringA fileType, Json::Object& source, A3
 	Json::Object& data = source.GetAt(category);
 	A3DRWParamsSpecificLoadData& special = target.m_sSpecifics;
 
-	//:TODO
+	// TODO
 
 	if (fileType == "") {
 		return true;
 	}
 	else if (fileType == "ACAD") {
-		//:TODO
+		// TODO
 		// - "AsDrawing"
 	}
 	else if (fileType == "Inventor") {
@@ -476,7 +476,7 @@ bool H3DX::ImportOptions::GetSpecial(CStringA fileType, Json::Object& source, A3
 		switch (sessionColor) {
 		case 0: param.m_eSessionColorType = kA3DHExchangeSessionColor; break;
 		case 1: param.m_eSessionColorType = kA3DLastCreoVersionSessionColor; break;
-		case 2: param.m_eSessionColorType = kA3DFileVersionSessionColor; break; //:CHECK
+		case 2: param.m_eSessionColorType = kA3DFileVersionSessionColor; break; // CHECK
 
 		default:
 			DEBUG_STOP;
@@ -486,11 +486,11 @@ bool H3DX::ImportOptions::GetSpecial(CStringA fileType, Json::Object& source, A3
 		param.m_eFamilyTables = (A3DProEFamilyTables)data.GetInteger("FamilyTable");
 		param.m_bBoolOpUseGenericIfNoTess = display.GetBoolean("MissingBoolean");
 		param.m_bFlexCompUseGenericIfNoTess = display.GetBoolean("MissingFlexible");
-		param.m_bHideSkeletons = !import.GetBoolean("Skeletons"); //:WARNING - reverse value
+		param.m_bHideSkeletons = !import.GetBoolean("Skeletons"); // WARNING - reverse value
 		//param.m_bReadExplodeStateAsView;
 		param.m_bDisplayVisibleDatum = import.GetBoolean("Datum");
 		param.m_eReadConstructEntities = import.GetBoolean("Construction")
-			? A3DProEReadConstructEntities_Yes : A3DProEReadConstructEntities_No; //:CHECK
+			? A3DProEReadConstructEntities_Yes : A3DProEReadConstructEntities_No; // CHECK
 		//param.m_bComputeHomeView;
 		//param.m_bHandlePMIScreenLocation;
 		//param.m_bIsometricDefaultView;
@@ -648,7 +648,7 @@ A3DUTF8Char** H3DX::ImportOptions::ToHoopsStrings(CString value)
 	return pBuffer;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //--------------------------------------------------------------------------------------------------
 
@@ -689,7 +689,7 @@ bool H3DX::ExportOptions::SetReference(Json::Object& value)
 	RETURN_TRUE;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //--------------------------------------------------------------------------------------------------
 
@@ -709,12 +709,12 @@ H3DX::FileOptions::~FileOptions()
 
 bool H3DX::FileOptions::Set(Json::Object& value)
 {
-	//:TODO - version check
+	// TODO - version check
 	ASSERT(value.GetString("version") == L"240126.1");
 
 	bool success = true;
 	success &= Import.Set(value.GetAt("Import"));
-	//:TODO
+	// TODO
 	//success &= Export.Set(value.GetAt("Export"));
 
 	return success;
@@ -726,10 +726,10 @@ bool H3DX::FileOptions::SetReference(Json::Object& value)
 {
 	bool success = true;
 	success &= Import.SetReference(value.GetAt("Import"));
-	//:TODO
+	// TODO
 	//success &= Export.SetReference(value.GetAt("Export"));
 	
 	return success;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION

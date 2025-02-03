@@ -94,7 +94,7 @@ namespace H3DF
     }
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Root
 
@@ -176,7 +176,7 @@ H3DF::Point H3DF::Painter::TransColor(COLORREF color)
     return rgb;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Arc
 
@@ -214,7 +214,7 @@ void H3DF::Painter::Arc::GetPoints(float x, float y, double radius, double start
     GetPoints(H3DF::Point(x, y, 0), radius, startAngle, endAngle, points);
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Circle
 
@@ -275,7 +275,7 @@ void H3DF::Painter::Circle::GetPoints(H3DF::Point center, double radius, bool re
     }
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Compute
 
@@ -323,7 +323,7 @@ H3DF::Vector H3DF::Painter::Compute::Normal()
 
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Font
 
@@ -423,7 +423,7 @@ void H3DF::Painter::Font::SetTransform(const char* value)
     HC_Set_Text_Font(Format("transforms = %s", value));
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Figure
 
@@ -492,7 +492,7 @@ HC_KEY API_3DF H3DF::Painter::Figure::CreateSquare(H3DF::Point center, double si
    );
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Line
 
@@ -504,7 +504,7 @@ HC_KEY H3DF::Painter::Line::Create(H3DF::Point first, H3DF::Point second, bool f
     return key;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Polyline
 
@@ -516,7 +516,7 @@ HC_KEY H3DF::Painter::Polyline::Create(Points& points)
     return key;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Polygon
 
@@ -528,7 +528,7 @@ HC_KEY H3DF::Painter::Polygon::Create(Points& points)
     return key;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Segment
 
@@ -626,7 +626,7 @@ void H3DF::Painter::Segment::SetLinePattern(const char* value, const char* prefi
     // "]", A "bevel" line join.
     // ")", A "round" line join.
 
-    //:CHECK
+    // CHECK
     HC_Set_Line_Pattern(value);
 }
 
@@ -719,7 +719,7 @@ void H3DF::Painter::Segment::SetVisibility(const char* option, const char* sub, 
     }
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Text
 
@@ -755,11 +755,11 @@ void H3DF::Painter::Text::GetExtent(const wchar_t* value, float& width, float& h
 
 void H3DF::Painter::Text::Update(HC_KEY key, const wchar_t* value)
 {
-    //:TODO
+    // TODO
     ASSERT(FALSE);
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Cursor
 
@@ -785,4 +785,4 @@ void H3DF::Painter::Cursor::Move(HC_KEY key, int row, int column)
     HC_Move_String_Cursor(key, row, column);
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION

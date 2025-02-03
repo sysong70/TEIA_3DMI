@@ -83,7 +83,7 @@ using namespace std::chrono;
 //#define		USED_LOG_MANAGER
 #endif
 
-//:Ken - 20240229
+// KEN - 20240229
 //#define SAVE_HSF_FILE
 
 //== Camera 관련 Class ==============================================================================

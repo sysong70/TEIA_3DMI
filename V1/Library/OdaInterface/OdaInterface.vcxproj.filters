@@ -4,20 +4,29 @@
     <Filter Include="Main">
       <UniqueIdentifier>{ba326929-c445-485c-a91a-b78b3e94bdf6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Command">
-      <UniqueIdentifier>{f0344dd1-7a0c-43c3-b301-852405a888f4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="_Signal">
-      <UniqueIdentifier>{f47705c0-f88c-40c2-b57d-04740eb06d79}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="_Teigha">
-      <UniqueIdentifier>{ad643cde-9944-421a-944f-40a9ee8b0abc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="_Common">
+    <Filter Include="Common">
       <UniqueIdentifier>{472337a1-7e18-468e-9d28-ff1621fc6d25}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Tracker">
+    <Filter Include="Teigha">
+      <UniqueIdentifier>{ad643cde-9944-421a-944f-40a9ee8b0abc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\Signal">
+      <UniqueIdentifier>{f47705c0-f88c-40c2-b57d-04740eb06d79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Wait">
+      <UniqueIdentifier>{6f9ec2b7-b2d1-4f6d-9a32-55b032dc9099}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IO">
+      <UniqueIdentifier>{f0344dd1-7a0c-43c3-b301-852405a888f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IO\Command">
+      <UniqueIdentifier>{a9408fe5-c710-4412-946f-45e8b3dca501}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="IO\UserIO">
       <UniqueIdentifier>{5e1e3227-07b7-4fd6-99d9-f23847556782}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main\Application">
+      <UniqueIdentifier>{be21e798-8dbe-4293-a1af-385e8170cc9b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -25,49 +34,79 @@
       <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Json.h">
-      <Filter>_Common</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Common_Define.h">
-      <Filter>_Common</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\WStr.h">
-      <Filter>_Common</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Fio.h">
-      <Filter>_Common</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="..\OdaInterface\framework.h">
       <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="..\Signal\WorkerThread.h">
-      <Filter>_Signal</Filter>
+      <Filter>Main\Signal</Filter>
     </ClInclude>
     <ClInclude Include="..\Signal\Signal.h">
-      <Filter>_Signal</Filter>
+      <Filter>Main\Signal</Filter>
     </ClInclude>
-    <ClInclude Include="Command.h">
-      <Filter>Command</Filter>
-    </ClInclude>
-    <ClInclude Include="..\OdaInterface\CommandReactor.h">
-      <Filter>Command</Filter>
-    </ClInclude>
-    <ClInclude Include="..\OdaInterface\Application.h" />
-    <ClInclude Include="..\OdaInterface\Connector.h" />
-    <ClInclude Include="EventDelegator.h" />
-    <ClInclude Include="..\OdaInterface\Renderer.h" />
-    <ClInclude Include="SignalArgs.h" />
-    <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="..\Common\File.h">
-      <Filter>_Common</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Dir.h">
-      <Filter>_Common</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Path.h">
-      <Filter>_Common</Filter>
+      <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="Command.Line.h">
-      <Filter>Command</Filter>
+    <ClInclude Include="SignalArgs.h">
+      <Filter>Main\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="EventDelegator.h">
+      <Filter>Main\Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="UserIO.h">
+      <Filter>IO\UserIO</Filter>
+    </ClInclude>
+    <ClInclude Include="OSnapManager.h">
+      <Filter>Wait</Filter>
+    </ClInclude>
+    <ClInclude Include="Prompt.Def.h">
+      <Filter>Wait</Filter>
+    </ClInclude>
+    <ClInclude Include="Prompt.Resource.h">
+      <Filter>Wait</Filter>
+    </ClInclude>
+    <ClInclude Include="Tracker.h">
+      <Filter>Wait</Filter>
+    </ClInclude>
+    <ClInclude Include="Trackers.h">
+      <Filter>IO\UserIO</Filter>
+    </ClInclude>
+    <ClInclude Include="Commands.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandStack.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OdaInterface\CommandReactor.h">
+      <Filter>Wait</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OdaInterface\Application.h">
+      <Filter>Main\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OdaInterface\Connector.h">
+      <Filter>Main\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="..\OdaInterface\Renderer.h">
+      <Filter>Main\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="Prompt.h">
+      <Filter>IO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -75,58 +114,88 @@
       <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Json.cpp">
-      <Filter>_Common</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Common_Define.cpp">
-      <Filter>_Common</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\WStr.cpp">
-      <Filter>_Common</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Fio.cpp">
-      <Filter>_Common</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="..\OdaInterface\dllmain.cpp">
       <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="..\Teigha\Drawing\Extensions\ExServices\ExHostAppServices.cpp">
-      <Filter>_Teigha</Filter>
+      <Filter>Teigha</Filter>
     </ClCompile>
     <ClCompile Include="..\Teigha\Kernel\Extensions\ExServices\RxSystemServicesImpl.cpp">
-      <Filter>_Teigha</Filter>
+      <Filter>Teigha</Filter>
     </ClCompile>
     <ClCompile Include="..\Teigha\Kernel\Extensions\ExServices\OdFileBuf.cpp">
-      <Filter>_Teigha</Filter>
+      <Filter>Teigha</Filter>
     </ClCompile>
     <ClCompile Include="..\Signal\WorkerThread.cpp">
-      <Filter>_Signal</Filter>
+      <Filter>Main\Signal</Filter>
     </ClCompile>
     <ClCompile Include="..\Signal\Signal.cpp">
-      <Filter>_Signal</Filter>
+      <Filter>Main\Signal</Filter>
     </ClCompile>
-    <ClCompile Include="Command.cpp">
-      <Filter>Command</Filter>
-    </ClCompile>
-    <ClCompile Include="..\OdaInterface\CommandReactor.cpp">
-      <Filter>Command</Filter>
-    </ClCompile>
-    <ClCompile Include="..\OdaInterface\Application.cpp" />
-    <ClCompile Include="..\OdaInterface\Connector.cpp" />
-    <ClCompile Include="EventDelegator.cpp" />
-    <ClCompile Include="..\OdaInterface\Renderer.cpp" />
-    <ClCompile Include="SignalArgs.cpp" />
-    <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="..\Common\File.cpp">
-      <Filter>_Common</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Dir.cpp">
-      <Filter>_Common</Filter>
+      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Path.cpp">
-      <Filter>_Common</Filter>
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="SignalArgs.cpp">
+      <Filter>Main\Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="EventDelegator.cpp">
+      <Filter>Main\Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="UserIO.cpp">
+      <Filter>IO\UserIO</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\Develop\Library\Teigha\25.9\Kernel\Extensions\ExServices\ExUndoController.cpp">
+      <Filter>Teigha</Filter>
+    </ClCompile>
+    <ClCompile Include="OSnapManager.cpp">
+      <Filter>Wait</Filter>
+    </ClCompile>
+    <ClCompile Include="Tracker.cpp">
+      <Filter>Wait</Filter>
+    </ClCompile>
+    <ClCompile Include="Trackers.cpp">
+      <Filter>IO\UserIO</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandStack.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Command.Circle.cpp">
+      <Filter>IO\Command</Filter>
     </ClCompile>
     <ClCompile Include="Command.Line.cpp">
-      <Filter>Command</Filter>
+      <Filter>IO\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OdaInterface\CommandReactor.cpp">
+      <Filter>Wait</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OdaInterface\Application.cpp">
+      <Filter>Main\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OdaInterface\Connector.cpp">
+      <Filter>Main\Application</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OdaInterface\Renderer.cpp">
+      <Filter>Main\Application</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

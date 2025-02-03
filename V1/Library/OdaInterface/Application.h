@@ -1,28 +1,37 @@
 ﻿#pragma once
 
 #include "Connector.h"
+#include "Signal.h"
 
 #include "OdToolKit.h"
 #include "ExHostAppServices.h"
 #include "ExSystemServices.h"
-
-#include <string>
-#include <map>
+#include "ExUndoController.h"
 
 class Renderer;
 
-
+//--------------------------------------------------------------------------------------------------
 
 class Application
 	: public ExHostAppServices
 	, public ExSystemServices
 {
+	Signal::Delivery TheDelivery;
+
 public:
 
-	//:WARNING - defined for future enhancements, from DllMain
+	// WARNING - defined for future enhancements, from DllMain
 	static HMODULE Instance;
 
 	std::map<int, Renderer*> Renderers;
+
+	Signal::Delivery& GetDelivery(int viewId);
+
+public: // Tools
+
+	void SetLanguage(int value);
+
+	CString Local(const CString& value);
 
 protected:
 
@@ -33,6 +42,10 @@ protected:
 	void addRef() override {}
 
 	void release() override {}
+
+public: // OdDbHostAppServices
+
+	OdDbUndoControllerPtr newUndoController() override;
 
 public:
 
@@ -46,7 +59,7 @@ public:
 
 public:
 
-	void AddNew(int id, Renderer* thread);
+	void AddNew(int id, Renderer* pRenderer);
 
 	void Clear();
 
@@ -56,17 +69,11 @@ public:
 
 public:
 
-	bool ReceiveSignalFromUi(const wchar_t* content);
-
-	SendSignalFunc SendSignalToUi;
+	bool ReceiveSignalFromUi(const wchar_t* pContent);
 
 public:
 
 	void OnFileClose(int id);
-
-private:
-
-	clock_t on_paint = 0;
 };
 
 

@@ -10,7 +10,7 @@
 #include <functional>
 
 //--------------------------------------------------------------------------------------------------
-//:REF - https://www.codeproject.com/Articles/1169105/Cplusplus-std-thread-Event-Loop-with-Message-Queue
+// REF - https://www.codeproject.com/Articles/1169105/Cplusplus-std-thread-Event-Loop-with-Message-Queue
 
 struct EventWrapper
 {
@@ -45,7 +45,7 @@ public:
     // Get the ID of the currently executing thread
     static std::thread::id GetCurrentThreadId();
 
-protected: //:WARNING - disabed
+protected: // WARNING - disabed
 
     WorkerThread(const WorkerThread&) = delete;
     WorkerThread& operator =(const WorkerThread&) = delete;
@@ -53,9 +53,9 @@ protected: //:WARNING - disabed
 public:
 
     // Called once to create the worker thread
-    bool CreateThread();
-    // Called once a program exit to exit the worker thread
-    void TerminateThread();
+    bool Create();
+    // Called once to exit the worker thread
+    void Terminate();
     // Get the ID of this thread instance
     std::thread::id GetThreadId();
 

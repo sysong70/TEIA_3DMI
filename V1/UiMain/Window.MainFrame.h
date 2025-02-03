@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Window.h"
+#include "Component.CommandPrompt.h"
 #include "Component.PanelBar.h"
 #include "Component.RibbonBar.h"
 #include "Component.StatusBar.h"
@@ -34,6 +35,8 @@ namespace Window
 
 		Window::View* GetActiveView();
 
+		CMenu& GetContextMenu(bool clearFirst);
+
 		CRect GetMDIRect();
 
 		Component::PanelBar& GetPanelBar();
@@ -52,11 +55,15 @@ namespace Window
 
 		void ViewChanged(UINT message, View* pView);
 
+		bool HasCommandHandeler(UINT id);
+
 	protected:
 
 		CBCGPMDIChildWnd* CreateDocumentWindow(LPCTSTR lpcszDocName, CObject* /*pObj*/) override;
-		//:WARNING - for remove debug message (AppMsg - Warning: GetWindowMenuPopup failed!)
+		// WARNING - for remove debug message (AppMsg - Warning: GetWindowMenuPopup failed!)
 		HMENU GetWindowMenuPopup(HMENU hMenuBar) override;
+
+		//BOOL OnDrawMenuImage(CDC* pDC, const CBCGPToolbarMenuButton* pMenuButton, const CRect& rectImage) override;
 
 		BOOL OnEraseMDIClientBackground(CDC* pDC) override;
 
@@ -86,6 +93,8 @@ namespace Window
 
 		afx_msg void OnAppOptions();
 
+		afx_msg void OnSize(UINT nType, int cx, int cy);
+
 		DECLARE_MESSAGE_MAP()
 
 	private: // Components
@@ -94,6 +103,11 @@ namespace Window
 		Component::StatusBar m_statusBar;
 		Component::PanelBar m_panelBar;
 		Component::TaskBar m_taskBar;
+
+	private: // Command prompt and Menu
+
+		CMenu m_contextMenu;
+		Component::CommandPrompt m_commandPrompt;
 
 	private: // Windows
 

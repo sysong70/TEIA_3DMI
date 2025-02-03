@@ -1096,7 +1096,7 @@ OdSelectionSetPtr ExDbCommandContext::select(const OdString& sPrompt, int option
 				}
 
 				if (ptsPointer != NULL) {
-					//:TODO - more complicated for nKword != -1 
+					// TODO: more complicated for nKword != -1 
 					ptsPointer->append(pts[0]);
 				}
 
@@ -1405,7 +1405,7 @@ double ExDbCommandContext::getReal(const OdString& sPrompt, int options, double 
 			pPtTracker = PointToDistTracker::create(basePt, options, pTracker, m_pDb);
 		}
 		else {
-			//:TODO
+			// TODO:
 			//pPtTracker = DbPointToOrientTracker::create(basePt, pTracker);
 		}
 	}

@@ -5,6 +5,8 @@
 #include "Control.ToolBar.h"
 #include "Component.TaskBar.h"
 
+//#define GetName GetXMLTagName
+
 //--------------------------------------------------------------------------------------------------
 
 namespace Control
@@ -33,6 +35,8 @@ namespace Control
 
 	public:
 
+		virtual void ReceiveSignal(Json::Object* pData);
+
 		virtual void SetData(Json::Object& data);
 
 		virtual void SetDefaultData(Json::Object& data);
@@ -55,10 +59,13 @@ namespace Control
 
 		afx_msg LRESULT OnPropertyChanged(WPARAM wp, LPARAM lp);
 
+		afx_msg void OnSize(UINT nType, int cx, int cy);
+
 		DECLARE_MESSAGE_MAP()
 
 	protected:
 
+		CString m_dictionary;
 		Control::ToolBar m_toolBar;
 		Control::PropList m_propList;
 
@@ -67,6 +74,7 @@ namespace Control
 
 		UINT m_commandId = 0;
 		Json::Object* m_pUiData = nullptr;
+		bool m_bSendAllData = true;
 
 		Json::Object m_data;
 		Json::Object m_defaultData;

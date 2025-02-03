@@ -33,7 +33,7 @@ void Facility::SetLanguage(ELanguage value)
 {
 	PRESET::Language = value;
 
-	//:WARNING - change UI(resource) language
+	// WARNING - change UI(resource) language
 	BOOL success = FALSE;
 	switch (value) {
 	case ELanguage::Korean:
@@ -55,7 +55,7 @@ CString Facility::Local(LPCTSTR value)
 {
 	CString found;
 	if (AfxExtractSubString(found, value, (int)PRESET::Language, '|')) {
-		//:TODO
+		// TODO
 		//ASSERT(found != L"__#__");
 		return found;
 	}
@@ -70,7 +70,7 @@ CString Facility::Local(CString& value)
 {
 	CString found;
 	if (AfxExtractSubString(found, value, (int)PRESET::Language, '|')) {
-		//:TODO
+		// TODO
 		//ASSERT(found != L"__#__");
 		return found;
 	}
@@ -79,7 +79,7 @@ CString Facility::Local(CString& value)
 	RETURN(L"");
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -127,6 +127,20 @@ CString Facility::GetTitle(UINT id)
 	AfxExtractSubString(result, resource, 1, '\n');
 
 	return result;
+}
+
+
+
+void Facility::GetToolBarImages(CBCGPToolBarImages& target, CSize imageSize, const std::vector<UINT>& ids)
+{
+	target.SetImageSize(imageSize);
+
+	for (auto id : ids) {
+		CBCGPSVGImage* pImage = new CBCGPSVGImage();
+		BOOL success = pImage->Load(id);
+		ASSERT(success);
+		target.AddSVG(pImage);
+	}
 }
 
 
@@ -195,7 +209,7 @@ EXIT:
 	return (result.IsEmpty() == false);
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -203,26 +217,14 @@ EXIT:
 
 #include "Facility.AppResources.h"
 
-CString Facility::GetDescription(Json::Object& source)
+CString Facility::GetDescription(Json::Object& source, CString dictionary)
 {
-	//return Local(source.GetString("desc"));
-
-	//:TEST - dictionary test
 	Json::Value* pValue = source.FindValue("desc");
 	if (pValue == nullptr) {
 		return L"";
 	}
 
-	if (pValue->IsInteger()) {
-		CStringA code = (CStringA)pValue->ToString();
-		CString desc = TheAppResources.GetDescription().GetString(code);
-		desc.Replace(L"<br>", L"\n");
-
-		return Local(desc);
-	}
-	else {
-		return Local(pValue->AsString());
-	}
+	return TheAppResources.GetStringFrom(pValue, dictionary);
 }
 
 
@@ -349,7 +351,7 @@ void Facility::SetValue(Json::Value& target, CBCGPProp& source)
 		target.AsObject().SetBoolean("checked", (bool)source.IsGroupChecked());
 	}
 	else if (dynamic_cast<CBCGPColorProp*>(&source) != nullptr) {
-		//:WARNING - not GetValue()
+		// WARNING - not GetValue()
 		COLORREF color = ((CBCGPColorProp*)&source)->GetColor();
 		target.SetString(Json::Helper::ToString(color));
 	}
@@ -385,7 +387,7 @@ void Facility::SetValue(CBCGPProp& target, Json::Value& source)
 	}
 	else if (dynamic_cast<CBCGPColorProp*>(&target) != nullptr) {
 		COLORREF color = Json::Helper::ToColor(source.ToString());
-		//:WARNING - not SetValue()
+		// WARNING - not SetValue()
 		((CBCGPColorProp*)&target)->SetColor(color);
 	}
 	else if (dynamic_cast<CBCGPFileProp*>(&target) != nullptr ||
@@ -421,6 +423,6 @@ void Facility::SetValueByPath(Json::Object& object, CString& path, CBCGPProp& va
 	}
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #undef PRESET

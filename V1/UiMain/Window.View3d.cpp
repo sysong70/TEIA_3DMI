@@ -5,8 +5,8 @@
 #include "Window.MainFrame.h"
 #include "Command.Base.h"
 #include "Connector.h"
-#include "Facility.h"
 #include "Facility.AppOptions.h"
+#include "Facility.CommandIndexer.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -40,7 +40,6 @@ using namespace Window;
 IMPLEMENT_DYNCREATE(View3d, View)
 
 BEGIN_MESSAGE_MAP(View3d, View)
-	ON_WM_ACTIVATE()
 	ON_WM_CHAR()
 	ON_WM_ERASEBKGND()
 	ON_WM_KEYDOWN()
@@ -68,7 +67,7 @@ END_MESSAGE_MAP()
 Window::View3d::View3d()
 	: View()
 {
-	m_eType = EType::View3d;
+	m_eType = EViewType::View3d;
 
 	GetDelivery().view.OnConstruct();
 }
@@ -117,7 +116,7 @@ void Window::View3d::ReceiveSignal(Json::Object* pData)
 			break;
 
 		case Signal::View::Action::PaintOverlap: {
-			//:TODO
+			// TODO
 		} break;
 
 		default:
@@ -149,16 +148,12 @@ void Window::View3d::OnCommand(UINT id)
 {
 	// global post process
 
-	switch (id) {
-	case FILE_3D_CMD_New:
-	case FILE_3D_CMD_Open:
-	case FILE_3D_CMD_Options:
-	case HOME_3D_CMD_Window_Cascade:
-	case HOME_3D_CMD_Window_TileHorizontal:
-	case HOME_3D_CMD_Window_TileVertical:
+	if (GetMainFrame().HasCommandHandeler(id)) {
 		GetMainFrame().OnCommand(id);
 		return;
+	}
 
+	switch (id) {
 	case HOME_3D_CMD_Panels_Model:
 	case HOME_3D_CMD_Panels_View:
 	case HOME_3D_CMD_Panels_Layer:
@@ -173,13 +168,19 @@ void Window::View3d::OnCommand(UINT id)
 		}
 	}
 
-	Facility::CommandIndexer::CommandInfo& cmd = TheCommandIndexer.Get(id);
-	id = (cmd.ChildId >= 0 ? cmd.ChildId : id);
+	Facility::CommandIndexer::CommandInfo cmd = TheCommandIndexer.Get(id);
+	//id = (cmd.ChildId >= 0 ? cmd.ChildId : id);
+	if (cmd.ChildId >= 0) {
+		id = cmd.ChildId;
+		// WARNING - replace info
+		cmd = TheCommandIndexer.Get(id);
+	}
 
 	m_historyBar.PushButton(id);
+	CancelCommand();
 
 	if (cmd.Function != nullptr) {
-		Command::Base* pCommand = (Command::Base*)cmd.Function;
+		Command::Base* pCommand = cmd.Function;
 		if (pCommand->IsRunOnlyOnce() == false) {
 			m_pActiveCommand = pCommand;
 		}
@@ -196,7 +197,7 @@ void Window::View3d::OnCommand(UINT id)
 			break;
 
 		case Facility::CommandIndexer::ListItem:
-		case Facility::CommandIndexer::Check: //:TEMP
+		case Facility::CommandIndexer::Check: // TEMP
 		default:
 			GetDelivery().view.OnCommand(id);
 			break;

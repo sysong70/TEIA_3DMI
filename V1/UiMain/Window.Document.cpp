@@ -31,23 +31,23 @@ Window::Document::~Document()
 
 
 
-Window::Document::EType Window::Document::GetCateogry()
+Window::EDocType Window::Document::GetDocType()
 {
 	CString filePath = GetPathName();
 
-	//:WARNING - new document
+	// WARNING - new document
 	if (filePath.IsEmpty()) {
-		return EType::Doc3d;
+		return EDocType::Model;
 	}
 
 	CString ext = Path::GetExtension(filePath);
 	ext.MakeLower();
 
 	if (ext == "dwg" || ext == "dxf") {
-		return EType::Doc2d;
+		return EDocType::Drawing;
 	}
 	else {
-		return EType::Doc3d;
+		return EDocType::Model;
 	}
 }
 

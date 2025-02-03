@@ -69,6 +69,8 @@ public:
 	{
 	}
 
+
+
 	virtual ~ModelTree()
 	{
 		for (auto item : m_itemData) {
@@ -79,9 +81,9 @@ public:
 
 public:
 
-	void Initialize(CWnd* pParent, CRect rect)
+	bool Initialize(CWnd* pParentWnd, CRect rect)
 	{
-		//:REF - https://learn.microsoft.com/ko-kr/windows/win32/controls/tree-view-control-window-styles
+		// REF - https://learn.microsoft.com/ko-kr/windows/win32/controls/tree-view-control-window-styles
 		DWORD dwStyle = WS_CHILD | WS_VISIBLE
 			/// Enables check boxes for items in a tree - view control.
 			| TVS_CHECKBOXES
@@ -118,17 +120,19 @@ public:
 			| TVS_TRACKSELECT
 		;
 
-		if (Create(dwStyle, rect, pParent, PRESET::Tree) == FALSE) {
-			DEBUG_RETURN;
+		if (Create(dwStyle, rect, pParentWnd, PRESET::Tree) == FALSE) {
+			RETURN_FALSE;
 		}
 
 		m_bVisualManagerStyle = TRUE;
 		m_bThemedInplaceTooltip = TRUE;
-		//:WARNING - special case for CBCGPTreeCtrl(CTreeCtrl)
+		// WARNING - special case for CBCGPTreeCtrl(CTreeCtrl)
 		globalData.SetWindowTheme(this, L"DarkMode_Explorer", NULL);
 
 		SetBkColor(CBCGPVisualManager::GetInstance()->GetTreeControlFillColor(this));
 		SetItemHeight(globalUtils.ScaleByDPI(22));
+
+		return true;
 	}
 
 
@@ -163,7 +167,8 @@ public:
 
 	HTREEITEM FindItem(DWORD_PTR key)
 	{
-		if (auto result = m_keyMap.find(key); result != m_keyMap.end()) {
+		auto result = m_keyMap.find(key);
+		if (result != m_keyMap.end()) {
 			return result->second;
 		}
 		else {
@@ -200,7 +205,7 @@ public:
 
 	void InverseCheckedStatus()
 	{
-		//:TODO
+		// TODO
 		DEBUG_STOP;
 	}
 
@@ -442,8 +447,8 @@ private:
 
 private:
 
-	//:WARNING - lParam1(and lParm2) is ItemData(not HTREEITEM)
-	//:REF - https://learn.microsoft.com/ko-kr/windows/win32/api/shlwapi/nf-shlwapi-strcmplogicalw
+	// WARNING - lParam1(and lParm2) is ItemData(not HTREEITEM)
+	// REF - https://learn.microsoft.com/ko-kr/windows/win32/api/shlwapi/nf-shlwapi-strcmplogicalw
 
 	static int CALLBACK OriginalSort(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 	{
@@ -518,7 +523,7 @@ private:
 
 	CSize GetScaledImageSize()
 	{
-		//:WARNING - 20, maximum height
+		// WARNING - 20, maximum height
 		return globalUtils.ScaleByDPI(CSize(20, 20));
 	}
 };
@@ -537,15 +542,15 @@ using namespace Component;
 BEGIN_MESSAGE_MAP(ModelPanel, Panel)
 	//ON_NOTIFY(TVN_BEGINDRAG, PRESET::Tree,		OnTreeBeginDrag)
 	//ON_NOTIFY(TVN_BEGINLABELEDIT, PRESET::Tree,	OnTreeBeginLabelEdit)
-	ON_NOTIFY(NM_CLICK, PRESET::Tree,				OnTreeClick)
+	ON_NOTIFY(NM_CLICK, PRESET::Tree, OnTreeClick)
 	//ON_NOTIFY(NM_DBLCLK, PRESET::Tree,			OnTreeDblClick)
 	//ON_NOTIFY(TVN_DELETEITEM, PRESET::Tree,		OnTreeDeleteItem)
 	//ON_NOTIFY(TVN_ENDLABELEDIT, PRESET::Tree,		OnTreeEndLabelEdit)
 	//ON_NOTIFY(TVN_ITEMEXPANDED, PRESET::Tree,		OnTreeItemExpanded)
-	ON_NOTIFY(TVN_ITEMEXPANDING, PRESET::Tree,		OnTreeItemExpanding)
+	ON_NOTIFY(TVN_ITEMEXPANDING, PRESET::Tree, OnTreeItemExpanding)
 	//ON_NOTIFY(NM_RCLICK, PRESET::Tree,			OnTreeRClick)
 	//ON_NOTIFY(NM_RDBLCLK, PRESET::Tree,			OnTreeRDbClick)
-	ON_NOTIFY(TVN_SELCHANGED, PRESET::Tree,			OnTreeSelChanged)
+	ON_NOTIFY(TVN_SELCHANGED, PRESET::Tree, OnTreeSelChanged)
 	//ON_NOTIFY(TVN_SELCHANGING, PRESET::Tree,		OnTreeSelChanging)
 	//ON_NOTIFY(NM_SETFOCUS, PRESET::Tree, OnTreeSetFocus)
 
@@ -738,7 +743,7 @@ void Component::ModelPanel::OnTreeClick(NMHDR* pNMHDR, LRESULT* pResult)
 		DWORD_PTR key = Control().GetItemKey(hItem);
 		ASSERT(key != 0);
 
-		//:WARNING - the state is not changed yet
+		// WARNING - the state is not changed yet
 		BOOL checked = !Control().GetCheck(hItem);
 
 		Control().SetCheck(hItem, checked);
@@ -785,7 +790,7 @@ void Component::ModelPanel::OnTreeDblClick(NMHDR* pNMHDR, LRESULT* pResult)
 	DEBUG_LOG(L"* OnItemDblClicked activated");
 	View().GetDelivery().modelPanel.OnItemDblClicked(key);
 
-	//:CHECK - if S_OK, tree expand the item
+	// CHECK - if S_OK, tree expand the item
 	*pResult = S_FALSE;
 }
 
@@ -882,14 +887,14 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 		return;
 	}
 
-	//:WARNING - range selection, skip signal
+	// WARNING - range selection, skip signal
 	if (::GetAsyncKeyState(VK_SHIFT) & 0x8000) {
 		*pResult = S_OK;
 		return;
 	}
-	//:WARNING - multi selection
+	// WARNING - multi selection
 	if (::GetAsyncKeyState(VK_CONTROL) & 0x8080) {
-		//:TODO - how
+		// TODO - how
 	}
 
 	NM_TREEVIEW* pNMTreeView = (NM_TREEVIEW*)pNMHDR;
@@ -908,7 +913,7 @@ void Component::ModelPanel::OnTreeSelChanged(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = S_OK;
 }
 
-//:WARNING - not use
+// WARNING - not use
 
 void Component::ModelPanel::OnTreeSelChanging(NMHDR* pNMHDR, LRESULT* pResult)
 {
@@ -1101,7 +1106,7 @@ void Component::ModelPanel::SelectItem(Json::Object* pData)
 
 	HTREEITEM hItem = FindTreeItem(SKW_KEY);
 	if (hItem != nullptr) {
-		//:TODO - uncheck
+		// TODO - uncheck
 		bool selected = pData->GetBoolean(SKW_FLAG);
 		ASSERT(selected);
 
@@ -1122,7 +1127,7 @@ void Component::ModelPanel::SelectItems(Json::Object* pData)
 
 	Control().Redraw(false);
 
-	//:TODO - uncheck
+	// TODO - uncheck
 	bool checked = pData->GetBoolean(SKW_FLAG);
 	ASSERT(checked);
 

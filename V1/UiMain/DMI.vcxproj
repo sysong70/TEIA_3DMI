@@ -183,11 +183,15 @@
     <ClInclude Include="..\Library\Signal\Signal.h" />
     <ClInclude Include="..\Library\Signal\WorkerThread.h" />
     <ClInclude Include="Command.Base.h" />
+    <ClInclude Include="Command.Circle2d.h" />
     <ClInclude Include="Command.Common.h" />
     <ClInclude Include="Command.h" />
+    <ClInclude Include="Command.Line2d.h" />
     <ClInclude Include="Command.Test.h" />
     <ClInclude Include="Command.VisualEffects3d.h" />
-    <ClInclude Include="Control.FloatValueEdit.h" />
+    <ClInclude Include="Component.CommandPrompt.h" />
+    <ClInclude Include="Control.ContextMenu.h" />
+    <ClInclude Include="Control.CoordEdit.h" />
     <ClInclude Include="Control.PopupMenu.h" />
     <ClInclude Include="Control.TaskPanel.h" />
     <ClInclude Include="Control.CheckListBox.h" />
@@ -224,7 +228,6 @@
     <ClInclude Include="Dialog.h" />
     <ClInclude Include="Dialog.ProgressLog.h" />
     <ClInclude Include="Dialog.Standard.h" />
-    <ClInclude Include="Component.CoordEdit.h" />
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="Geometry.UserDataFiler.h" />
     <ClInclude Include="Graphic.h" />
@@ -252,9 +255,12 @@
     <ClCompile Include="..\Library\Signal\Signal.cpp" />
     <ClCompile Include="..\Library\Signal\WorkerThread.cpp" />
     <ClCompile Include="Command.Base.cpp" />
+    <ClCompile Include="Command.Circle2d.cpp" />
+    <ClCompile Include="Command.Line2d.cpp" />
     <ClCompile Include="Command.Test.cpp" />
     <ClCompile Include="Command.VisualEffects3d.cpp" />
-    <ClCompile Include="Control.FloatValueEdit.cpp" />
+    <ClCompile Include="Component.CommandPrompt.cpp" />
+    <ClCompile Include="Control.ContextMenu.cpp" />
     <ClCompile Include="Control.PopupMenu.cpp" />
     <ClCompile Include="Control.TaskPanel.cpp" />
     <ClCompile Include="Control.CheckListBox.cpp" />
@@ -290,7 +296,7 @@
     <ClCompile Include="Dialog.Base.cpp" />
     <ClCompile Include="Dialog.ProgressLog.cpp" />
     <ClCompile Include="Dialog.Standard.cpp" />
-    <ClCompile Include="Component.CoordEdit.cpp" />
+    <ClCompile Include="Control.CoordEdit.cpp" />
     <ClCompile Include="Geometry.cpp" />
     <ClCompile Include="Geometry.UserDataFiler.cpp" />
     <ClCompile Include="Graphic.cpp" />
@@ -320,6 +326,8 @@
   <ItemGroup>
     <None Include="RES\Data.FileOptions.json" />
     <None Include="RES\Data.Preferences.json" />
+    <None Include="RES\Dialogs.json" />
+    <None Include="RES\Dictionary.json" />
     <None Include="RES\DMI.rc2" />
     <None Include="RES\DMI_ENU.rc2" />
     <None Include="RES\DMI_KOR.rc2" />

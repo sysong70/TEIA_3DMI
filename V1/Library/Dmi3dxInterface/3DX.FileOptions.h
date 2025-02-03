@@ -40,7 +40,7 @@ namespace H3DX
 	public:
 
 		bool Set(Json::Object& value) override;
-		//:WARNING - setting from UI
+		// WARNING - setting from UI
 		bool SetReference(Json::Object& value);
 		// Assign A3DRWParamsLoadData(3DX parameter) by extension of filePath(import file)
 		bool Get(CString& filePath, A3DRWParamsLoadData& param);
@@ -70,7 +70,7 @@ namespace H3DX
 		A3DUTF8Char** ToHoopsStrings(CString value);
 	};
 
-	//:TODO
+	// TODO
 
 	class API_3DX ExportOptions : public JsonWrapper
 	{
@@ -83,7 +83,7 @@ namespace H3DX
 	public:
 
 		bool Set(Json::Object& value) override;
-		//:WARNING - setting from UI
+		// WARNING - setting from UI
 		bool SetReference(Json::Object& value);
 		// A3DRWParamsExportPrcData??
 		bool Get(CString& filePath, A3DRWParamsExportPrcData& param) {
@@ -106,7 +106,7 @@ namespace H3DX
 		~FileOptions();
 
 		bool Set(Json::Object& value);
-		//:WARNING - setting from UI
+		// WARNING - setting from UI
 		bool SetReference(Json::Object& value);
 
 		ImportOptions Import;

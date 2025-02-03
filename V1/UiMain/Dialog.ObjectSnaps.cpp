@@ -78,7 +78,7 @@ BOOL Dialog::ObjectSnaps::OnInitDialog()
 
 void Dialog::ObjectSnaps::OnOK()
 {
-	//:TODO - sand data to connector
+	// TODO - sand data to connector
 
 	__super::OnOK();
 }

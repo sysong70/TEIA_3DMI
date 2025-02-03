@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
 #include "Signal.h"
 
+#include <thread>
+
 #define SendActionDataOnly(action) \
 Json::Object data; \
 ConstructData(data, action); \
@@ -138,7 +140,7 @@ void Signal::Application::SaveTraceLog(const wchar_t* pPath, bool saveAndClear)
 	Wrapper().SendData(data);
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -171,7 +173,7 @@ void Signal::MainFrame::HideProgress()
 	SendActionDataOnly(Action::HideProgress);
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -205,7 +207,7 @@ void Signal::StatusBar::ShowCoordinate(double x, double y)
 	data.SetReal(SKW_X, x);
 	data.SetReal(SKW_Y, y);
 
-	Wrapper().SendData(data);
+	Wrapper().PostData(data);
 }
 
 
@@ -222,7 +224,7 @@ void Signal::StatusBar::ShowCoordinate(double x, double y, double z)
 	Wrapper().SendData(data);
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -266,7 +268,7 @@ void Signal::Progress::SetMessage(CString message)
 	Json::Object data;
 	ConstructData(data, Action::SetMessage);
 
-	//:WARNING - check file path
+	// WARNING - check file path
 	message.Replace(L"\\", L"/");
 	data.SetString(SKW_MESSAGE, message);
 
@@ -307,7 +309,7 @@ void Signal::Progress::ClearLog()
 	SendActionDataOnly(Action::ClearLog);
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -340,7 +342,7 @@ void Signal::Command::ResponsePreference(Json::Object& value, Json::Object& defa
 	Json::Object data;
 	ConstructData(data, Action::ResponsePreference);
 
-	//:WARNING - Window.MainFrame
+	// WARNING - Window.MainFrame
 	data.SetInteger(SKW_VIEWID, -1);
 	data.SetObject(SKW_VALUE, new Json::Object(value));
 	data.SetObject(SKW_DEFAULTVALUE, new Json::Object(defaultValue));
@@ -355,7 +357,7 @@ void Signal::Command::ResponseFileOption(Json::Object& value, Json::Object& defa
 	Json::Object data;
 	ConstructData(data, Action::ResponseFileOption);
 
-	//:WARNING - Window.MainFrame
+	// WARNING - Window.MainFrame
 	data.SetInteger(SKW_VIEWID, -1);
 	data.SetObject(SKW_VALUE, new Json::Object(value));
 	data.SetObject(SKW_DEFAULTVALUE, new Json::Object(defaultValue));
@@ -363,7 +365,7 @@ void Signal::Command::ResponseFileOption(Json::Object& value, Json::Object& defa
 	Wrapper().SendData(data);
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -440,6 +442,18 @@ void Signal::View::OnCommand(UINT id)
 {
 	Json::Object data;
 	ConstructData(data, Action::OnCommand);
+
+	data.SetInteger(SKW_ID, id);
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::View::OnContextCommand(UINT id)
+{
+	Json::Object data;
+	ConstructData(data, Action::OnContextCommand);
 
 	data.SetInteger(SKW_ID, id);
 
@@ -612,6 +626,30 @@ void Signal::View::OnKeyUp(UINT chr, UINT repeat, UINT flags)
 
 #undef SendKeyData
 
+void Signal::View::CancelCommand(UINT id)
+{
+	Json::Object data;
+	ConstructData(data, Action::CancelCommand);
+
+	data.SetInteger(SKW_ID, id);
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::View::CompleteCommand(UINT id)
+{
+	Json::Object data;
+	ConstructData(data, Action::CompleteCommand);
+
+	data.SetInteger(SKW_ID, id);
+
+	Wrapper().SendData(data);
+}
+
+
+
 void Signal::View::SetValidation(bool success)
 {
 	Json::Object data;
@@ -641,7 +679,57 @@ void Signal::View::SetInputMode(EInputMode mode)
 	Wrapper().SendData(data);
 }
 
-#pragma endregion //:REGION
+
+
+void Signal::View::SetContextMenu(MenuItems& menus, bool show)
+{
+	Json::Object data;
+	ConstructData(data, Action::SetContextMenu);
+
+	data.SetBoolean(SKW_SHOW, show);
+
+	Json::Array& items = data.CreateArray(SKW_ITEMS);
+	for (auto menu : menus) {
+		Json::Object& item = items.AddObject();
+
+		item.SetInteger(SKW_TYPE, (int)menu.Type);
+		item.SetInteger(SKW_ID, (int)menu.Id);
+		item.SetString(SKW_TITLE, menu.Title);
+	}
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::View::ShowContextMenu(ContextItems& ids)
+{
+	Json::Object data;
+	ConstructData(data, Action::ShowContextMenu);
+
+	Json::Array& items = data.CreateArray(SKW_ITEMS);
+	for (auto id : ids) {
+		items.AddInteger(id);
+	}
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::View::ShowInputBox(EInputMode mode, CString prompt, CString errorMessage)
+{
+	Json::Object data;
+	ConstructData(data, Action::ShowInputBox);
+
+	data.SetInteger(SKW_MODE, (int)mode);
+	data.SetString(SKW_PROMPT, prompt);
+	data.SetString(SKW_ERRORMESSAGE, errorMessage);
+
+	Wrapper().SendData(data);
+}
+
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -887,7 +975,7 @@ void Signal::ModelPanel::ViewItem(DWORD_PTR key)
 
 #undef SendKeyData
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -902,18 +990,6 @@ void Signal::TaskBar::ConstructData(Json::Object& data, Action action)
 
 
 
-void Signal::TaskBar::OnRequestValue(UINT commandId)
-{
-	Json::Object data;
-	ConstructData(data, Action::OnRequestValue);
-
-	data.SetInteger(SKW_ID, commandId);
-
-	Wrapper().SendData(data);
-}
-
-
-
 void Signal::TaskBar::OnChangedValue(UINT commandId, Json::Object& value)
 {
 	Json::Object data;
@@ -921,6 +997,43 @@ void Signal::TaskBar::OnChangedValue(UINT commandId, Json::Object& value)
 
 	data.SetInteger(SKW_ID, commandId);
 	data.SetObject(SKW_VALUE, new Json::Object(value));
+
+	Wrapper().SendData(data);
+}
+
+void Signal::TaskBar::OnChangedValue(UINT commandId, CString key, Json::Value& value)
+{
+	Json::Object data;
+	ConstructData(data, Action::OnChangedValue);
+
+	data.SetInteger(SKW_ID, commandId);
+	data.SetString(SKW_KEY, key);
+	data.SetValue(SKW_VALUE, new Json::Value(value));
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::TaskBar::OnClickedValue(UINT commandId, CString key)
+{
+	Json::Object data;
+	ConstructData(data, Action::OnChangedValue);
+
+	data.SetInteger(SKW_ID, commandId);
+	data.SetString(SKW_KEY, key);
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::TaskBar::OnRequestValue(UINT commandId)
+{
+	Json::Object data;
+	ConstructData(data, Action::OnRequestValue);
+
+	data.SetInteger(SKW_ID, commandId);
 
 	Wrapper().SendData(data);
 }
@@ -939,7 +1052,108 @@ void Signal::TaskBar::ResponseValue(UINT commandId, Json::Object& value, Json::O
 	Wrapper().SendData(data);
 }
 
-#pragma endregion //:REGION
+
+
+void Signal::TaskBar::UpdateValue(UINT commandId, Json::Object& value)
+{
+	Json::Object data;
+	ConstructData(data, Action::UpdateValue);
+
+	data.SetInteger(SKW_ID, commandId);
+	data.SetObject(SKW_VALUE, new Json::Object(value));
+
+	Wrapper().SendData(data);
+}
+
+void Signal::TaskBar::UpdateValue(UINT commandId, CString key, Json::Value& value)
+{
+	Json::Object data;
+	ConstructData(data, Action::UpdateValue);
+
+	data.SetInteger(SKW_ID, commandId);
+	data.SetString(SKW_KEY, key);
+	data.SetValue(SKW_VALUE, new Json::Value(value));
+
+	Wrapper().SendData(data);
+}
+
+#pragma endregion // REGION
+
+//**************************************************************************************************
+
+#pragma region UserIO Class
+
+void Signal::UserIO::ConstructData(Json::Object& data, Action action)
+{
+	data.SetInteger(SKW_TARGET, (int)Target::UserIO);
+	data.SetInteger(SKW_ACTION, (int)action);
+	data.SetInteger(SKW_VIEWID, Wrapper().ViewId);
+}
+
+
+
+void Signal::UserIO::OnInput(const CString& value)
+{
+	Json::Object data;
+	ConstructData(data, Action::OnInput);
+
+	data.SetString(SKW_VALUE, value);
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::UserIO::PutCommand(CString command, CString prompt, CString keyword)
+{
+	Json::Object data;
+	ConstructData(data, Action::PutCommand);
+
+	data.SetString(SKW_COMMAND, command);
+	data.SetString(SKW_PROMPT, prompt);
+	data.SetString(SKW_KEYWORD, keyword);
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::UserIO::PutPrompt(CString prompt, CString keyword)
+{
+	Json::Object data;
+	ConstructData(data, Action::PutPrompt);
+
+	data.SetString(SKW_PROMPT, prompt);
+	data.SetString(SKW_KEYWORD, keyword);
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::UserIO::InputError(const CString& value)
+{
+	Json::Object data;
+	ConstructData(data, Action::InputError);
+
+	data.SetString(SKW_VALUE, value);
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::UserIO::InputEcho(const CString& value)
+{
+	Json::Object data;
+	ConstructData(data, Action::InputEcho);
+
+	data.SetString(SKW_VALUE, value);
+
+	Wrapper().SendData(data);
+}
+
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -957,6 +1171,7 @@ Signal::Delivery::Delivery()
 	SetWrapper(modelPanel);
 	SetWrapper(taskBar);
 	SetWrapper(command);
+	SetWrapper(userIO);
 
 #undef SetWrapper
 }
@@ -994,7 +1209,6 @@ void Signal::Delivery::SendData(Json::Object& data)
 	}
 }
 
-#include <thread>
 #pragma warning(disable : 4996)
 
 void Signal::Delivery::PostData(Json::Object& data)
@@ -1016,6 +1230,6 @@ void Signal::Delivery::PostData(Json::Object& data)
 	}).detach();
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #undef SendActionDataOnly

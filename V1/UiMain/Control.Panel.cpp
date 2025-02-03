@@ -39,7 +39,6 @@ Control::Panel::Panel()
 
 Control::Panel::~Panel()
 {
-	DestroyWindow();
 }
 
 
@@ -125,7 +124,7 @@ LRESULT Control::Panel::OnDPIChangedAfterParent(WPARAM, LPARAM)
 {
 	LRESULT result = Default();
 
-	//:TODO
+	// TODO
 
 	return result;
 }

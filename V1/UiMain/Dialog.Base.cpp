@@ -33,13 +33,13 @@ Dialog::Base::~Base()
 
 void Dialog::Base::DoModaless()
 {
-	//:CHECK
+	// CHECK
 	EnableParent(false);
 
 	AdjustControlsLayout();
 	Create(m_nTemplateId);
 	ShowWindow(SW_SHOW);
-	//:WARNING - do not remove (pump message)
+	// WARNING - do not remove (pump message)
 	RedrawWindow();
 }
 
@@ -195,7 +195,7 @@ CRect Dialog::Base::GetClientArea()
 
 CFont* Dialog::Base::GetDefaultFont()
 {
-	//:WAIT
+	// WAIT
 	return GetFont();
 }
 

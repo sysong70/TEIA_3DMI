@@ -13,6 +13,7 @@ namespace Control
 	class TaskPanel;		// CWnd
 	// Property
 	// namespace Property	// Control.Property.h
+	class CoordEdit;		// CBCGPEdit
 	class PropList;			// CBCGPPropList
 	// ToolBar
 	class HistoryBar;		// Control::ToolBar
@@ -76,6 +77,7 @@ namespace Control
 		BlueBolt = RGB(0x00, 0xAA, 0xFF),
 		Charcoal = RGB(0x3B, 0x44, 0x53),
 		DeepSkyBlue = RGB(0x00, 0xA8, 0xFF),
+		GhostWhite = RGB(0xF8, 0xF8, 0xFF),
 		HonoluluBlue = RGB(0x00, 0x67, 0xAD),
 		NavyBlue = RGB(0x00, 0x78, 0xD7),
 		OldSilver = RGB(0x86, 0x86, 0x86),
@@ -85,16 +87,26 @@ namespace Control
 		Green = RGB(0x00, 0xFF, 0x00),
 		Blue = RGB(0x00, 0x00, 0xFF),
 		Yellow = RGB(0xFF, 0xFF, 0x00),
+
+		DimGray = RGB(0x69, 0x69, 0x69),
 		Gray = RGB(0x80, 0x80, 0x80),
-		LightGray = RGB(0xB0, 0xB0, 0xB0),
+		DarkGray = RGB(0xA9, 0xA9, 0xA9),
+		Silver = RGB(0xC0, 0xC0, 0xC0),
+		LightGray = RGB(0xD3, 0xD3, 0xD3),
 		Black = RGB(0, 0, 0),
 	};
 
 
 
+	CSize Setup(CBCGPButton& control, const CString& title, UINT id, CWnd* pParent = nullptr);
+
 	CSize Setup(CBCGPButton& control, Json::Object& data, CWnd* pParent = nullptr);
 
+	CRect Setup(CBCGPEdit& control, UINT id, EPivot ePivot, CRect rect, CWnd* pParent = nullptr);
+
 	CRect Setup(CBCGPEdit& control, Json::Object& data, EPivot ePivot, CRect rect, CWnd* pParent = nullptr);
+
+	CRect Setup(CBCGPStatic& control, const CString& title, EPivot ePivot, CRect rect, CWnd* pParent = nullptr);
 
 	CRect Setup(CBCGPStatic& control, Json::Object& data, EPivot ePivot, CRect rect, CWnd* pParent = nullptr);
 
@@ -110,7 +122,7 @@ namespace Control
 	CRect Align(Controls controls, CPoint basePoint, EAlign eAlign, CWnd* pParent);
 	// destribute controls from base point with gap
 	CRect Destribute(Controls controls, CPoint basePoint, int gap, EDirection eDir, CWnd* pParent);
-	// boundary on client area
+	// boundary on parent area
 	CRect GetRect(CWnd* pControl);
 
 	CSize GetSize(CWnd* pControl);
@@ -124,8 +136,8 @@ namespace Control
 	CSize ImageSize();
 	// CBCGPTabWnd tab height
 	int TabHeight();
-	// CBCGPTreeCtrlEx row height
-	int TreeRowHeight();
-	// CBCGPPropList row padding
-	int PropListRowPadding();
+
+
+
+	bool IsKeyPressed(int vk);
 }

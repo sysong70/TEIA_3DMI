@@ -14,7 +14,7 @@ static char THIS_FILE[] = __FILE__;
 
 namespace TaskPanelPreset
 {
-	//:CHECK
+	// CHECK
 	const int ResetButtonIdMax = 10;
 }
 
@@ -24,7 +24,9 @@ using namespace Control;
 
 BEGIN_MESSAGE_MAP(TaskPanel, CWnd)
 	ON_WM_ERASEBKGND()
+	ON_WM_SIZE()
 	ON_MESSAGE(WM_DPICHANGED_AFTERPARENT, OnDPIChangedAfterParent)
+	ON_REGISTERED_MESSAGE(BCGM_PROPERTY_CHANGED, OnPropertyChanged)
 END_MESSAGE_MAP()
 
 
@@ -33,6 +35,8 @@ Control::TaskPanel::TaskPanel(UINT commandId, Json::Object* pUiData)
 	: m_commandId(commandId)
 	, m_pUiData(pUiData)
 {
+	DEBUG_VALID(pUiData);
+	m_dictionary = m_pUiData->GetString("dictionary");
 }
 
 
@@ -63,6 +67,11 @@ bool Control::TaskPanel::Initialize(CWnd* pParentWnd)
 
 void Control::TaskPanel::ConstructBody()
 {
+	if (m_propList.Initialize(this, WM_USER) == false) {
+		DEBUG_RETURN;
+	}
+
+	m_propList.InitializeDesign(GetUiData().GetAt("properties"), m_dictionary);
 }
 
 
@@ -92,7 +101,7 @@ void Control::TaskPanel::OnReset(CBCGPProp* pProp)
 	// grouped(checked) value
 	bool checked = target.GetBoolean("checked");
 
-	//:WARNING - copy data, do not use reference
+	// WARNING - copy data, do not use reference
 	target = m_defaultData.GetAt(name);
 	target.SetBoolean("checked", checked);
 
@@ -104,9 +113,20 @@ void Control::TaskPanel::OnReset(CBCGPProp* pProp)
 
 
 
+void Control::TaskPanel::ReceiveSignal(Json::Object* pData)
+{
+	DEBUG_STOP;
+}
+
+
+
 void Control::TaskPanel::SetData(Json::Object& data)
 {
 	m_data = data;
+
+	m_bInitialized = false;
+	m_propList.InitializeData(m_data);
+	m_bInitialized = true;
 }
 
 
@@ -195,14 +215,45 @@ LRESULT Control::TaskPanel::OnPropertyChanged(WPARAM wp, LPARAM lp)
 			}
 		}
 		else {
-			DEBUG_STOP;
+			GetTaskBar().GetDelivery().taskBar.OnClickedValue(m_commandId, pProp->GetXMLTagName());
 		}
 	}
 
 	ASSERT(m_commandId > 0);
-	GetTaskBar().GetDelivery().taskBar.OnChangedValue(m_commandId, m_data);
+	if (m_bSendAllData) {
+		GetTaskBar().GetDelivery().taskBar.OnChangedValue(m_commandId, m_data);
+	}
+	else {
+		GetTaskBar().GetDelivery().taskBar.OnChangedValue(m_commandId, pProp->GetXMLTagName(), *pValue);
+	}
 
 	return S_OK;
+}
+
+
+
+void Control::TaskPanel::OnSize(UINT nType, int cx, int cy)
+{
+	if (cx == 0 || cy == 0) {
+		return;
+	}
+
+	int margin = Control::Gap().cy;
+	CPoint propTop;
+	CSize propSize;
+
+	if (m_toolBar.GetSafeHwnd() != nullptr) {
+		m_toolBar.AdjustLayout();
+		CSize toolBarSize = Control::GetSize(&m_toolBar);
+
+		propTop = { 0, toolBarSize.cy + margin };
+		propSize = { cx, cy - toolBarSize.cy - margin };
+	}
+	else {
+		propSize = { cx, cy };
+	}
+
+	m_propList.SetWindowPos(NULL, propTop.x, propTop.y, propSize.cx, propSize.cy, SWP_NOACTIVATE);
 }
 
 #undef PRESET

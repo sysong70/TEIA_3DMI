@@ -1,0 +1,26 @@
+﻿{
+	"C.0001":"Type a command|__#__",
+	"C.0002":"COMMON_MAX|__#__",
+	"E.0001":"Invalid point|__#__",
+	"E.0002":"ERROR_MAX|__#__",
+	"M.0001":"Specify next point|__#__",
+	"M.0002":"Specify next point or |__#__",
+	"M.0003":"MESSAGE_MAX|__#__",
+	"FileOptions.501":"* BRep & Tessellation<br>Mixed mode. In this mode, the B-rep and faceted elements are read from the native file. Tessellation is then generated from B-rep elements.<br>* Tessellation only<br>In this mode, all faceted elements from the native file are read. If present, the native tessellation of the B-rep is read exclusively. Native tessellation is the display list integrated in the CAD file (only available for CATIA V5, Solidworks, 3DXML, and Inventor).|__#__",
+	"L2.2P.501":"Specify first end point|__#__",
+	"L2.2P.502":"Specify second end point|__#__",
+	"L2.2P.503":"Specify angle of line segments|__#__",
+	"L2.2P.504":"Specify length of line segments|__#__",
+	"L2.2P.505":"Close line segments|__#__",
+	"C2.2P.501":"Specify first end point of circle's diameter|__#__",
+	"C2.2P.502":"Specify second end point of circle's diameter|__#__",
+	"C2.3P.501":"Specify first point on circle|__#__",
+	"C2.3P.502":"Specify second point on circle|__#__",
+	"C2.3P.503":"Specify third point on circle|__#__",
+	"C2.CR.501":"Specify center point for circle|__#__",
+	"C2.CR.502":"Specify radius of circle|__#__",
+	"C2.2TR.501":"Specify point on object for first tangent of circle|__#__",
+	"C2.2TR.502":"Specify point on object for second tangent of circle|__#__",
+	"C2.2TR.503":"Specify radius of circle|__#__"
+}
+

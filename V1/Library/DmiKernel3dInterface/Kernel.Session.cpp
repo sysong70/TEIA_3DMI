@@ -42,7 +42,7 @@ void KERNEL::Session::Initialize(Json::Object & cInObject)
 	if (nullptr == pcImpl) { DEBUG_RETURN; }
 
 	H3DF::WindowHandle nWindowHandle = (H3DF::WindowHandle)cInObject.GetDwordPtr(SKW_HWND);
-	//:Ken - 20240229
+	// KEN - 20240229
 	ASSERT(::IsWindow((HWND)nWindowHandle) == TRUE);
 	
 	H3DF::ApplicationWindowOptionsKit cOptions;

@@ -41,7 +41,7 @@ void SESSION::Session::ExecuteViewSignal(Json::Object & cInObject)
 			// 실제로는 하나의 Instance를 사용하는 것임.
 			ViewInitialize(cInObject, nViewId);
 
-			//:Ken - TEST
+			// KEN - TEST
 			//Connector::GetInstance(-1).application.AddTraceLogV(L"View initialized %d", nViewId);
 			//Connector::GetInstance(-1).application.AddTraceLog(L"next message");
 			//Connector::GetInstance(-1).application.SaveTraceLog(nullptr);

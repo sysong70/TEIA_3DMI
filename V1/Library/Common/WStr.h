@@ -54,6 +54,8 @@ namespace WStr
 
 	bool IsDigit(wchar_t value);
 
+	bool IsNumeric(CString& value);
+
 	bool IsNumeric(wchar_t value);
 
 	/*
@@ -82,7 +84,7 @@ namespace WStr
 	*/
 	bool Split(const wchar_t* source, wchar_t token, WStringArray& atomArray);
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Startdard Functions
 
@@ -117,7 +119,7 @@ namespace WStr
 
 	CString Get(CString& source, int start, wchar_t fromCh, wchar_t toCh, bool includeCh, bool erase);
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Extended Functions
 
@@ -163,7 +165,7 @@ namespace WStr
 	*/
 	void RemoveTo(CString& source, wchar_t ch);
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Cast Functions
 
@@ -220,7 +222,7 @@ namespace WStr
 
 	CString ToUtf16(const char* value);
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Helper Functions
 
@@ -271,5 +273,5 @@ namespace WStr
 
 	void Wrap(CString& source, EWrapper e, int count = 1);
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 }

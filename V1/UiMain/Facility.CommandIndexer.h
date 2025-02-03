@@ -1,7 +1,13 @@
 ﻿#pragma once
 
 #include "Facility.h"
+#include "Window.h"
 #include "Command.Resource.h"
+
+namespace Command
+{
+	class Base;
+}
 
 //--------------------------------------------------------------------------------------------------
 
@@ -11,7 +17,7 @@ namespace Facility
 	{
 	public:
 
-		//:WARNING - do not use enum class
+		// WARNING - do not use enum class
 		enum EItemType
 		{
 			Unknown,
@@ -30,10 +36,10 @@ namespace Facility
 		{
 			EItemType Type = Unknown;
 
-			int Id = -1;				// HOME_3D_LST_Zoom
-			int ChildId = -1;			// HOME_3D_CMD_Zoom_Fit
-			CString StringId;			// L"HOME_3D_LST_Zoom"
-			void* Function = nullptr;	// Target function
+			int Id = -1;						// HOME_3D_LST_Zoom
+			int ChildId = -1;					// HOME_3D_CMD_Zoom_Fit
+			CString StringId;					// L"HOME_3D_LST_Zoom"
+			Command::Base* Function = nullptr;	// Target function
 		};
 
 		CommandIndexer();
@@ -46,7 +52,7 @@ namespace Facility
 
 	private:
 
-		void Initialize();
+		bool Initialize();
 
 		using CommandMap = std::unordered_map<int, CommandInfo>;
 
@@ -55,7 +61,7 @@ namespace Facility
 		CommandMap m_commandMap;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class ActiveCommand
 	{
@@ -67,7 +73,6 @@ namespace Facility
 		}
 		Home;
 
-		//:TODO
 		struct
 		{
 			UINT Angle3d = 0;
@@ -77,6 +82,17 @@ namespace Facility
 			UINT Radius = 0;
 		}
 		Measure;
+
+		struct
+		{
+			UINT Point2d = DRAW_2D_CMD_Point;
+			UINT Line2d = DRAW_2D_CMD_Line;
+			UINT Circle2d = DRAW_2D_CMD_Circle_CenterRadius;
+			UINT Arc2d = DRAW_2D_CMD_Arc_3Points;
+			UINT Ellipse2d = DRAW_2D_CMD_Ellipse_2Axes;
+			UINT EllipticalArc2d = DRAW_2D_CMD_EllipticalArc_2Axes;
+		}
+		Draw;
 	};
 }
 

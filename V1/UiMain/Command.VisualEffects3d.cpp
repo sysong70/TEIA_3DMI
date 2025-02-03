@@ -34,21 +34,6 @@ public:
 	VisualEffects3dPanel(Json::Object* pUiData)
 		: TaskPanel(PRESET::CommandId, pUiData) {}
 
-
-
-	~VisualEffects3dPanel() override {}
-
-
-
-	void SetData(Json::Object& data) override
-	{
-		__super::SetData(data);
-
-		m_bInitialized = false;
-		m_propList.InitializeData(m_data);
-		m_bInitialized = true;
-	}
-
 protected:
 
 	void ConstructBody() override
@@ -115,32 +100,6 @@ protected:
 
 
 
-	afx_msg void OnSize(UINT nType, int cx, int cy)
-	{
-		if (cx == 0 || cy == 0) {
-			return;
-		}
-
-		int margin = Control::Gap().cy;
-		CPoint propTop;
-		CSize propSize;
-
-		if (m_toolBar.GetSafeHwnd() != nullptr) {
-			m_toolBar.AdjustLayout();
-			CSize toolBarSize = Control::GetSize(&m_toolBar);
-
-			propTop = { 0, toolBarSize.cy + margin };
-			propSize = { cx, cy - toolBarSize.cy - margin };
-		}
-		else {
-			propSize = { cx, cy };
-		}
-
-		m_propList.SetWindowPos(NULL, propTop.x, propTop.y, propSize.cx, propSize.cy, SWP_NOACTIVATE);
-	}
-
-
-
 	DECLARE_MESSAGE_MAP();
 };
 
@@ -152,15 +111,9 @@ BEGIN_MESSAGE_MAP(VisualEffects3dPanel, CWnd)
 	ON_REGISTERED_MESSAGE(BCGM_PROPERTY_CHANGED, OnPropertyChanged)
 END_MESSAGE_MAP()
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
-
-Command::VisualEffects3d::VisualEffects3d()
-{
-}
-
-
 
 bool Command::VisualEffects3d::ReceiveSignal(Json::Object* pData)
 {
@@ -172,18 +125,23 @@ bool Command::VisualEffects3d::ReceiveSignal(Json::Object* pData)
 		RETURN_FALSE;
 	}
 
-	Component::TaskBar& taskBar = TheApplication.GetMainFrame().GetTaskBar();
-	Json::Object& uiData = TheAppResources.GetTask(PRESET::TaskName);
+	if (m_pPanel != nullptr) {
+		m_pPanel->ReceiveSignal(pData);
+	}
+	else {
+		Component::TaskBar& taskBar = TheApplication.GetMainFrame().GetTaskBar();
+		Json::Object& uiData = TheAppResources.GetTask(PRESET::TaskName);
 
-	VisualEffects3dPanel* pPanel = new VisualEffects3dPanel(&uiData);
-	pPanel->Initialize(&taskBar);
-	pPanel->SetDefaultData(data.GetAt(SKW_DEFAULTVALUE));
-	pPanel->SetData(data.GetAt(SKW_VALUE));
+		m_pPanel = new VisualEffects3dPanel(&uiData);
+		m_pPanel->Initialize(&taskBar);
+		m_pPanel->SetDefaultData(data.GetAt(SKW_DEFAULTVALUE));
+		m_pPanel->SetData(data.GetAt(SKW_VALUE));
 
-	taskBar.SetPanel(pPanel);
-	taskBar.Show(m_pView);
+		taskBar.SetPanel(m_pPanel);
+		taskBar.Show(m_pView);
 
-	REMOVE_POINTER(pData);
+		REMOVE_POINTER(pData);
+	}
 
 	return true;
 }
@@ -197,15 +155,6 @@ void Command::VisualEffects3d::Run(Window::View* pView)
 	Component::TaskBar& taskBar = TheApplication.GetMainFrame().GetTaskBar();
 	taskBar.SetParent((CWnd*)pView);
 	taskBar.GetDelivery().taskBar.OnRequestValue(PRESET::CommandId);
-}
-
-
-
-void Command::VisualEffects3d::Cancel()
-{
-	__super::Cancel();
-
-	TheApplication.GetMainFrame().GetTaskBar().Show(nullptr);
 }
 
 #undef PRESET

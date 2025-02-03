@@ -44,7 +44,7 @@ void Property::DurationCtrl::OnKillFocus(CWnd* pNewWnd)
 	}
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -122,7 +122,7 @@ void Property::IconComboBoxCtrl::OnMeasureItem(int /*nIDCtl*/, LPMEASUREITEMSTRU
 	lpMeasureItemStruct->itemHeight = max(nTextHeight, m_icons.GetImageSize().cy + 2 * ICON_PADDING(this));
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -170,7 +170,7 @@ void Property::SliderCtrl::HScroll(UINT /*nSBCode*/, UINT /*nPos*/)
 	m_pProp->Redraw();
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -200,17 +200,69 @@ void Property::Color::OnCloseCombo()
 	__super::OnCloseCombo();
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
 #pragma region Coordinate
 
-#include "Component.CoordEdit.h"
+#include "Command.Resource.h"
+#include "Control.CoordEdit.h"
+#include "Facility.h"
 
 Property::Coordinate::Coordinate(const CString& name, const CString& value, LPCTSTR lpDescr, DWORD_PTR data)
 	: CBCGPProp(name, 0, (LPCTSTR)value, lpDescr)
 {
+	LoadImages();
+
+	// TODO - 3d options
+
+	//std::vector<UINT> ids = {
+	//	HOME_2D_CMD_ObjectSnap_Point,
+	//	HOME_2D_CMD_ObjectSnap_End,
+	//	HOME_2D_CMD_ObjectSnap_Mid,
+	//	HOME_2D_CMD_ObjectSnap_Intersection,
+	//	HOME_2D_CMD_ObjectSnap_Perpendicular,
+	//	HOME_2D_CMD_ObjectSnap_Center,
+	//	HOME_2D_CMD_ObjectSnap_Quadrant,
+	//	HOME_2D_CMD_ObjectSnap_Near,
+	//};
+
+	//Facility::GetToolBarImages(m_icons, Control::ImageSize(), ids);
+
+	//for (auto id : ids) {
+	//	m_iconNames.AddTail(Facility::GetTitle(id));
+	//	AddOption(Facility::GetTitle(id));
+	//}
+}
+
+
+
+void Property::Coordinate::AdjustButtonRect()
+{
+	__super::AdjustButtonRect();
+
+	m_rectButton.left -= m_rectButton.Width();
+}
+
+
+
+CComboBox* Property::Coordinate::CreateCombo(CWnd* pWndParent, CRect rect)
+{
+	const int HEIGHT = 400;
+
+	rect.bottom = rect.top + HEIGHT;
+
+	IconComboBoxCtrl* pControl = new IconComboBoxCtrl(m_icons, m_iconNames);
+	DEBUG_VALID(pControl);
+
+	DWORD dwStyle = WS_CHILD | WS_VSCROLL | CBS_NOINTEGRALHEIGHT | CBS_DROPDOWNLIST | CBS_OWNERDRAWFIXED | CBS_HASSTRINGS;
+	if (pControl->Create(dwStyle, rect, pWndParent, BCGPROPLIST_ID_INPLACE_COMBO) == FALSE) {
+		REMOVE_POINTER(pControl);
+		RETURN_NULL;
+	}
+
+	return pControl;
 }
 
 
@@ -220,24 +272,24 @@ CWnd* Property::Coordinate::CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultForm
 	DEBUG_VALID(this);
 	DEBUG_VALID(m_pWndList);
 
-	Component::CoordEdit* pControl = new Component::CoordEdit;
+	Control::CoordEdit* pControl = new Control::CoordEdit();
 	DEBUG_VALID(pControl);
 
-	//:CHECK
-	rectEdit.top -= globalUtils.ScaleByDPI(4);
-	rectEdit.left -= globalUtils.ScaleByDPI(4);
-
 	const DWORD dwStyle = WS_CHILD | WS_VISIBLE;
-	if (pControl->Create(NULL, L"", dwStyle, rectEdit, m_pWndList, BCGPROPLIST_ID_INPLACE) == FALSE) {
+	if (pControl->Create(dwStyle, rectEdit, m_pWndList, BCGPROPLIST_ID_INPLACE) == FALSE) {
 		REMOVE_POINTER(pControl);
-		RETURN_FALSE;
+		RETURN_NULL;
 	}
 
-	//pControl->SetFont(GetFont());
-	pControl->SetValue((CString)m_varValue);
 	pControl->EnableWindow(m_bEnabled);
+	pControl->SetOriginalValue((CString)m_varValue);
 
 	bDefaultFormat = FALSE;
+
+	//CWnd* pControl = CBCGPProp::CreateInPlaceEdit(rectEdit, bDefaultFormat);
+	//if (pControl != nullptr) {
+	//	pControl->ShowWindow(SW_HIDE);
+	//}
 
 	return pControl;
 }
@@ -246,16 +298,95 @@ CWnd* Property::Coordinate::CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultForm
 
 BOOL Property::Coordinate::HasButton() const
 {
-	return FALSE;
+	return TRUE;
 }
 
 
 
 void Property::Coordinate::OnClickButton(CPoint point)
 {
+	bool isLeft = point.x < m_rectButton.CenterPoint().x;
+
+	m_nClickedButton = (isLeft ? 0 : 1);
+	RedrawButton();
+
+	BCGPMessageBox(isLeft ? L"Object snap button" : L"Point picking button");
+
+	m_nClickedButton = -1;
+	RedrawButton();
 }
 
-#pragma endregion //:REGION
+
+
+void Property::Coordinate::OnDPIChanged(UINT nDPIOld, UINT nDPINew)
+{
+	__super::OnDPIChanged(nDPIOld, nDPINew);
+
+	LoadImages();
+}
+
+
+
+void Property::Coordinate::OnDrawButton(CDC* pDC, CRect rectButton)
+{
+	CSize imageSize = m_buttonImages.GetImageSize();
+
+	for (int i = 0; i < 2; i++) {
+		CBCGPToolbarButton button;
+		CRect rect = rectButton;
+
+		if (i == 0) {
+			rect.right = rect.left + rect.Width() / 2;
+		}
+		else {
+			rect.left = rect.right - rect.Width() / 2;
+		}
+
+		CBCGPVisualManager::BCGBUTTON_STATE state =
+			(m_nClickedButton == i ? CBCGPVisualManager::ButtonsIsHighlighted : CBCGPVisualManager::ButtonsIsRegular);
+
+		CBCGPVisualManager::GetInstance()->OnFillButtonInterior(pDC, &button, rect, state);
+		m_buttonImages.DrawEx(pDC, rect, i, CBCGPToolBarImages::ImageAlignHorzCenter, CBCGPToolBarImages::ImageAlignVertCenter);
+		CBCGPVisualManager::GetInstance()->OnDrawButtonBorder(pDC, &button, rect, state);
+	}
+}
+
+
+
+BOOL Property::Coordinate::OnUpdateValue()
+{
+	ASSERT_VALID(this);
+	ASSERT_VALID(m_pWndInPlace);
+	ASSERT_VALID(m_pWndList);
+	ASSERT(::IsWindow(m_pWndInPlace->GetSafeHwnd()));
+
+	Control::CoordEdit* pControl = (Control::CoordEdit*)m_pWndInPlace;
+	ASSERT_VALID(pControl);
+
+	CString oldValue = m_varValue;
+	CString newValue = pControl->UpdateValue();
+	m_varValue = (LPCTSTR)newValue;
+
+	if (oldValue != newValue) {
+		m_pWndList->OnPropertyChanged(this);
+	}
+
+	return TRUE;
+}
+
+
+
+void Property::Coordinate::LoadImages()
+{
+	m_buttonImages.Clear();
+	m_buttonImages.SetTransparentColor(RGB(255, 0, 255));
+
+	Facility::GetToolBarImages(m_buttonImages, globalUtils.ScaleByDPI(CSize(16, 16)), {
+		HOME_2D_POP_ObjectSnap, HOME_2D_CMD_Select_Point
+	});
+}
+
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -302,7 +433,7 @@ void Property::ComboButton::OnClickButton(CPoint point)
 	}
 	else {
 		DEBUG_STOP;
-		//:TODO - Display your dialog here...
+		// TODO - Display your dialog here...
 		SetValue(_T("New value"));
 	}
 }
@@ -343,7 +474,7 @@ void Property::ComboButton::OnDrawButton(CDC* pDC, CRect rectButton)
 	}
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -416,7 +547,7 @@ BOOL Property::CommandButton::OnSetCursor() const
 	return FALSE;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -426,7 +557,7 @@ Property::CustomColor::CustomColor(const CString& name, const COLORREF& color, L
 	: CBCGPColorProp(name, color, NULL, lpDescr)
 {
 	DEBUG_STOP;
-	//:WARNING - localization
+	// WARNING - localization
 	EnableOtherButton(_T("Other..."));
 	EnableAutomaticButton(_T("Default"), ::GetSysColor(COLOR_3DFACE));
 }
@@ -448,7 +579,7 @@ BOOL Property::CustomColor::OnDrawPaletteColorBox(CDC* pDC, const CRect rectColo
 	return TRUE;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -485,7 +616,7 @@ void Property::CustomDescription::OnDrawDescription(CDC* pDC, CRect rect)
 	pDC->DrawText(m_strDescr, rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -508,7 +639,7 @@ Property::CustomDialog::CustomDialog(const CString& name, const _variant_t& valu
 void Property::CustomDialog::OnClickButton(CPoint point)
 {
 	DEBUG_STOP;
-	//:TODO - Display your dialog here...
+	// TODO - Display your dialog here...
 	SetValue(_T("New value"));
 }
 
@@ -519,7 +650,7 @@ BOOL Property::CustomDialog::HasButton() const
 	return TRUE;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -588,7 +719,7 @@ void Property::CustomState::OnDrawStateIndicator(CDC* pDC, CRect rect)
 	}
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -787,7 +918,7 @@ BOOL Property::Duration::OnUpdateValue()
 		pPopup->SetStemLocation(CBCGPPopupWindow::BCGPPopupWindowStemLocation_TopLeft);
 
 		DEBUG_STOP;
-		//:TODO - localization
+		// TODO - localization
 		CBCGPPopupWndParams params;
 		params.m_strText = _T("The duration should not exceed 2 days. Please correct the entered duration value.");
 
@@ -845,7 +976,7 @@ void Property::Duration::SetValue(const _variant_t& varValue)
 	}
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -878,7 +1009,7 @@ void Property::FoldersDialog::OnClickButton(CPoint point)
 	}
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -908,7 +1039,7 @@ CComboBox* Property::FontCombo::CreateCombo(CWnd* pWndParent, CRect rect)
 		RETURN_NULL;
 	}
 
-	//:WARNING - static var, vary slow
+	// WARNING - static var, vary slow
 	//CBCGPFontComboBox::m_bDrawUsingFont = TRUE;
 	pControl->SelectFont((CString)m_varValue);
 
@@ -930,7 +1061,7 @@ CWnd* Property::FontCombo::CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultForma
 	return pWnd;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -964,6 +1095,7 @@ CString Property::HexValue::FormatProperty()
 
 BOOL Property::HexValue::ParseValue(const CString& str)
 {
+	// CHECK - local or super?
 	return __super::TextToVar(str);
 }
 
@@ -992,7 +1124,7 @@ BOOL Property::HexValue::TextToVar(const CString& str)
 	return TRUE;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -1084,7 +1216,7 @@ BOOL Property::IconCombo::OnEdit(LPPOINT lpClick)
 	return TRUE;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -1187,7 +1319,7 @@ void Property::IconList::OnDrawValue(CDC* pDC, CRect rect)
 	m_bValueIsTrancated = FALSE;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -1262,7 +1394,7 @@ BOOL Property::Password::IsCopyAvailable() const
 	return FALSE;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -1317,7 +1449,7 @@ BOOL Property::RangeValidation::OnUpdateValue()
 
 	long value = ::_ttol(strText);
 	if (value < m_minValue || value > m_maxValue) {
-		//:TODO - localization
+		// TODO - localization
 		SetState(L"Incorrect value: the correct value should be between ??? and ???");
 		return FALSE;
 	}
@@ -1327,7 +1459,7 @@ BOOL Property::RangeValidation::OnUpdateValue()
 	return __super::OnUpdateValue();
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -1359,7 +1491,7 @@ CWnd* Property::Slider::CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultFormat)
 
 	CBCGPClientDC dc(m_pWndList);
 
-	CString strLabel(L"000000"); //:CHECK
+	CString strLabel(L"000000"); // CHECK
 	rectEdit.left += dc.GetTextExtent(strLabel).cx;
 
 	SliderCtrl* pControl = new SliderCtrl(this, m_pWndList->GetBkColor());
@@ -1425,11 +1557,11 @@ BOOL Property::Slider::OnUpdateValue()
 	return TRUE;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
-#pragma region TwoButton Class
+#pragma region TwoButtons Class
 
 Property::TwoButtons::TwoButtons(const CString& name, const _variant_t& value) :
 	CBCGPProp(name, value)
@@ -1472,7 +1604,7 @@ void Property::TwoButtons::OnClickButton(CPoint point)
 	m_nClickedButton = (isLeft ? 0 : 1);
 	RedrawButton();
 
-	//:TODO
+	// TODO
 
 	m_nClickedButton = -1;
 	RedrawButton();
@@ -1527,7 +1659,7 @@ void Property::TwoButtons::LoadImages()
 	globalUtils.ScaleByDPI(m_images, (m_pWndList->GetSafeHwnd() == nullptr ? AfxGetMainWnd() : m_pWndList));
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #undef PROP_HAS_LIST
 #undef ICON_PADDING

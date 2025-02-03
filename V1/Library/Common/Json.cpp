@@ -467,7 +467,7 @@ void Json::Array::Stringify(CString& buffer)
 	buffer += L"]";
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -1146,7 +1146,7 @@ void Json::Value::Stringify(CString& buffer)
 	}
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -1180,7 +1180,7 @@ Json::Pair::~Pair()
 	REMOVE_POINTER(pValue);
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -1658,7 +1658,7 @@ bool Json::Object::Look(const char* pName, Value*& pValue) const
 	return false;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -1813,7 +1813,7 @@ bool Json::Reader::ReadString(wchar_t*& pStream, CString& value)
 	::wcsncpy(value.GetBufferSetLength(nCount), pStream + 1, nCount);
 	value.ReleaseBuffer();
 
-	//:CHECK
+	// CHECK
 	value.Replace(L"\\\"", L"\"");
 	value.Replace(L"\\\\", L"\\");
 
@@ -1922,7 +1922,7 @@ bool Json::Reader::SkipNull(wchar_t*& pStream)
 	return false;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -2225,7 +2225,7 @@ CString Json::Helper::ToString(COLORREF value)
 	return buffer;
 }
 
-//:WARNING - Signal.h, Delivery Keywords
+// WARNING - Signal.h, Delivery Keywords
 #ifndef SKW_X
 #define SKW_X "x"
 #define SKW_Y "y"
@@ -2234,7 +2234,10 @@ CString Json::Helper::ToString(COLORREF value)
 
 bool Json::Helper::GetCoordinate(Value* pSource, float* pTarget)
 {
-	if (pSource == nullptr || pTarget == nullptr) {
+	if (pSource == nullptr) {
+		return false;
+	}
+	if (pTarget == nullptr) {
 		RETURN_FALSE;
 	}
 
@@ -2311,7 +2314,7 @@ Json::Value* Json::Helper::GetCoordinate(float* pSource, bool useArray, bool is3
 	return &target;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -2409,4 +2412,4 @@ CString Json::Builder::Encode(const char* pName, void* pArray, int count, EValue
 	return sArray;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION

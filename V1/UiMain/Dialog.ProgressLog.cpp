@@ -100,8 +100,8 @@ void Dialog::ProgressLog::ReceiveSignal(Json::Object* pData)
 
 	Signal::Progress::Action action = (Signal::Progress::Action)data.GetInteger(SKW_ACTION);
 	switch (action) {
-	//case Signal::Progress::Action::SetRange:     SetRange(data);      break;
-	//case Signal::Progress::Action::SetPosition:  SetPosition(data);   break;
+	case Signal::Progress::Action::SetRange:     SetRange(data);      break;
+	case Signal::Progress::Action::SetPosition:  SetPosition(data);   break;
 	case Signal::Progress::Action::SetMessage:   SetMessage(data);    break;
 	case Signal::Progress::Action::AddLog:       AddLog(data);        break;
 	case Signal::Progress::Action::SetLogStatus: SetLogStatus(data);  break;
@@ -113,6 +113,15 @@ void Dialog::ProgressLog::ReceiveSignal(Json::Object* pData)
 	}
 
 	REMOVE_POINTER(pData);
+}
+
+
+
+BOOL Dialog::ProgressLog::DestroyWindow()
+{
+	EnableParent();
+
+	return CBCGPDialog::DestroyWindow();
 }
 
 
@@ -184,15 +193,6 @@ void Dialog::ProgressLog::ConstructBody(const CRect& boundary)
 	m_wndLog.SetItemExtraHeight(PRESET::ExtraHeight());
 
 	Control::AdjustLayout(&m_wndLog, area, area.Size(), Control::EPivot::TopLeft);
-}
-
-
-
-BOOL Dialog::ProgressLog::DestroyWindow()
-{
-	EnableParent();
-
-	return CBCGPDialog::DestroyWindow();
 }
 
 

@@ -69,7 +69,7 @@ void Dialog::Instances::Remove(int id)
 	}
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 

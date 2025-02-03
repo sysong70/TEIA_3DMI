@@ -43,7 +43,7 @@ void Dialog::Folders::EditListBox::OnBrowse()
 
 void Dialog::Folders::EditListBox::OnClickButton(int iButton)
 {
-	//:TODO
+	// TODO
 	UINT id = GetButtonID(iButton);
 
 	CBCGPEditListBox::OnClickButton(iButton);
@@ -55,10 +55,10 @@ void Dialog::Folders::EditListBox::OnSelectionChanged()
 {
 	CBCGPEditListBox::OnSelectionChanged();
 
-	//:TODO
+	// TODO
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 

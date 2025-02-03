@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "resource.h"
 #include "Component.RibbonBar.h"
+#include "Facility.CommandIndexer.h"
 #include "Window.Application.h"
 
 #ifdef _DEBUG
@@ -8,6 +9,18 @@
 #undef THIS_FILE
 static char THIS_FILE[] = __FILE__;
 #endif
+
+//**************************************************************************************************
+// WARNING - for using protected members
+
+class RibbonCategory : public CBCGPRibbonCategory
+{
+	friend class Component::RibbonBar;
+
+public:
+
+	RibbonCategory() : CBCGPRibbonCategory() {}
+};
 
 //**************************************************************************************************
 
@@ -20,10 +33,12 @@ public:
 		CommonInit();
 	}
 
+
+
 	RibbonSplitButton(int id, LPCTSTR lpszText)
 		: CBCGPRibbonButton(id, lpszText)
 	{
-		//:WARNING - split button mode
+		// WARNING - split button mode
 		SetDefaultCommand(TRUE);
 	}
 
@@ -34,15 +49,17 @@ public:
 		SelectChild((CBCGPRibbonButton*)m_arSubItems[index]);
 	}
 
+
+
 	void SelectChild(CBCGPRibbonButton* pChild)
 	{
 		auto& cmd = TheCommandIndexer.Get(GetID());
 		ASSERT(cmd.Id != -1); // Not dummy
 		cmd.ChildId = pChild->GetID();
 
-		//:WARNING - bAlphaBlendIcon == TRUE
+		// WARNING - bAlphaBlendIcon == TRUE
 		SetIcon(pChild->GetIcon(), TRUE, FALSE, TRUE);
-		//:CHECK - can not change size...
+		// CHECK - can not change size...
 		//SetText(pChild->GetText());
 		//SetToolTipText(pChild->GetToolTipText());
 	}
@@ -61,6 +78,8 @@ public:
 		CommonInit();
 	}
 
+
+
 	RibbonChildItem(int id, LPCTSTR lpszText)
 		: CBCGPRibbonButton(id, lpszText)
 	{}
@@ -77,10 +96,11 @@ public: // CBCGPRibbonButton
 	void OnClick(CPoint point) override
 	{
 		if (m_pParentElem == nullptr) {
-			//:WARNING - this is a new dynamically created entity! why??
+			// WARNING - this is a new dynamically created entity! why??
 			RibbonChildItem* inRibbon = (RibbonChildItem*)TheApplication.GetMainFrame().GetRibbonBar().FindByID(GetID());
-			DEBUG_VALID(inRibbon);
-			inRibbon->m_pParentElem->SelectChild(inRibbon);
+			if (inRibbon != nullptr) {
+				inRibbon->m_pParentElem->SelectChild(inRibbon);
+			}
 		}
 		else {
 			m_pParentElem->SelectChild(this);
@@ -108,6 +128,8 @@ public:
 	{
 		CommonInit();
 	}
+
+
 
 	RibbonButton(int id, LPCTSTR lpszText)
 		: CBCGPRibbonButton(id, lpszText)
@@ -147,18 +169,17 @@ namespace PresetRibbonBar
 
 	// Single button
 
-	CBCGPRibbonButton* CreateButton(int id, CString otherTitle = L"")
+	CBCGPRibbonButton* CreateButton(int id, CString otherTitle = L"", bool largeButton = true)
 	{
 		CString title, tooltip;
 		Facility::GetResource(id, title, tooltip);
-		//:CHECK
+		// CHECK
 		if (otherTitle.IsEmpty() == false) {
 			title = otherTitle;
 		}
 
-		//CBCGPRibbonButton* pButton = new CBCGPRibbonButton(id, title);
 		CBCGPRibbonButton* pButton = new RibbonButton(id, title);
-		pButton->SetIcon(Facility::CreateIcon(id, PRESET::IconSize()), TRUE, FALSE, TRUE);
+		pButton->SetIcon(Facility::CreateIcon(id, PRESET::IconSize()), largeButton, FALSE, TRUE);
 		pButton->SetToolTipText(tooltip);
 		pButton->SetAlwaysLargeImage();
 
@@ -203,62 +224,11 @@ namespace PresetRibbonBar
 			pParent->AddSubItem(pItem);
 		}
 
-		//:WARNING - select first item
+		// WARNING - select first item
 		pParent->SelectChild(0);
 
 		return pParent;
 	}
-
-
-	/*
-	CBCGPRibbonPaletteButton* CreatePalette(int baseId, int startId, int endId, bool splitMode = true)
-	{
-		// make image list
-		CBCGPToolBarImages images;
-		images.SetImageSize(PRESET::IconSize());
-
-		for (int id = startId; id <= endId; id++) {
-			//:WARNING - do not use local variable
-			CBCGPSVGImage* pImage = new CBCGPSVGImage();
-			pImage->Load(id);
-			images.AddSVG(pImage);
-		}
-
-		CBCGPRibbonPaletteButton* pButton = new CBCGPRibbonPaletteButton(
-			startId, // palette base id
-			Facility::GetTitle(baseId), // default title
-			0, 0, // image index on panel
-			images // sub item images
-		);
-
-		pButton->SetIcon(Facility::CreateIcon(baseId, PRESET::IconSize()), TRUE, FALSE, TRUE);
-		pButton->SetButtonMode();
-		pButton->SetAlwaysLargeImage();
-		pButton->SetDefaultCommand(splitMode);
-		pButton->SetComboMode(); // text label on the right of icon
-
-		// set sub items tooltip and user data
-		int index = 0;
-		CString title, tooltip;
-
-		for (int id = startId; id <= endId; id++) {
-			Facility::CommandIndexer::CommandInfo& item = TheCommandIndexer.Get(id);
-			Facility::GetResource(id, title, tooltip);
-
-			pButton->SetItemToolTip(index, title + L"\n" + tooltip);
-			pButton->SetItemUserData(index, (DWORD_PTR)&item);
-			index++;
-		}
-
-		if (splitMode) {
-			// replace icon and text
-			pButton->ShowSelectedImage(TRUE, TRUE);
-		}
-		pButton->SelectItem(0); // select first
-
-		return pButton;
-	}
-	*/
 }
 
 //**************************************************************************************************
@@ -275,8 +245,17 @@ Component::RibbonBar::~RibbonBar()
 
 
 
-bool Component::RibbonBar::Initialize(CWnd* pMainFrame)
+CBCGPRibbonCategory* Component::RibbonBar::AddCategory(LPCTSTR lpszName)
 {
+	return CBCGPRibbonBar::AddCategory(lpszName, 0, 0, 0, CSize(16, 16), CSize(32, 32), CSize(20, 20), -1, RUNTIME_CLASS(RibbonCategory));
+}
+
+
+
+bool Component::RibbonBar::Initialize(CWnd* pMainFrame, Window::EDocType eType)
+{
+	m_eDocType = eType;
+
 	if (Create(pMainFrame) == FALSE) {
 		RETURN_FALSE;
 	}
@@ -290,26 +269,68 @@ bool Component::RibbonBar::Initialize(CWnd* pMainFrame)
 	SetMinimizeButtonLocation(BCGPRibbonMinimizeButtonLocation_RightOfCategory);
 	//SetGrayDisabledImages();
 	//SetImagesLuminosity(1.1); // 0.1, 1.1
+	//SetSimplifiedMode(TRUE);
 	//ShowCategory();
 	//ShowContextCategories();
-	ToggleMinimizeState();
+	//ToggleMinimizeState();
 
-	bool success = CreateMainCategory() && CreateCategories();
-	RedrawWindow();
+	bool success = CreateMainCategory() && Create3dCategories() && Create2dCategories();
+	ASSERT(success);
+	ChangeByDocType(m_eDocType);
+
+	// WARNING - Unuseable due to unnecessary blanks at the bottom of the buttons
+	//SetPadding(globalUtils.ScaleByDPI(CSize(5, 5)));
 
 	return success;
 }
 
 
 
-bool Component::RibbonBar::CreateMainCategory()
+void Component::RibbonBar::ChangeByDocType(Window::EDocType eType)
 {
+	m_eDocType = eType;
+
+	Categories& hide = m_eDocType == Window::EDocType::Model ? m_categoies2d : m_categoies3d;
+	Categories& show = m_eDocType == Window::EDocType::Model ? m_categoies3d : m_categoies2d;
+
+	for (auto category : hide) {
+		int index = GetCategoryIndex(category);
+		TRACE(L"hide - %d\n", index);
+		ShowCategory(index, FALSE);
+	}
+
+	for (auto category : show) {
+		int index = GetCategoryIndex(category);
+		TRACE(L"show - %d\n", index);
+		ShowCategory(index, TRUE);
+	}
+
+	SetActiveCategory(show.front());
+
+	// WARNING
+	RecalcLayout();
+	RedrawWindow();
+}
+
+
+
+void Component::RibbonBar::Reload()
+{
+	RemoveAllCategories();
+
+	bool success = CreateMainCategory() && Create3dCategories() && Create2dCategories();
+	ASSERT(success);
+	ChangeByDocType(m_eDocType);
+}
+
 #define _USE_DEFAULT_MAIN_
 
+bool Component::RibbonBar::CreateMainCategory()
+{
 #ifdef _USE_DEFAULT_MAIN_
 
-#pragma region Main button and Search
-	//m_wndMainButton.SetImage(IDB_RIBBON_MAIN, TRUE);
+	// Main button and Search
+
 	CString title = Facility::GetTitle(FILE_3D_CAT);
 	m_wndMainButton.SetText(title);
 	m_wndMainButton.SetScenicText(title);
@@ -319,9 +340,9 @@ bool Component::RibbonBar::CreateMainCategory()
 	CBCGPRibbonCommandSearchOptions so;
 	so.m_Location = BCGPRibbonCommandSearchLocation_OnCaption;
 	SetCommandSearchOptions(so);
-#pragma endregion //:REGION
 
-#pragma region Main Category
+	// Main Category 3d
+
 	CBCGPRibbonMainPanel* pMain = AddMainCategory(title, 0, 0);
 
 	pMain->Add(PRESET::CreateButton(FILE_3D_CMD_New));
@@ -337,33 +358,32 @@ bool Component::RibbonBar::CreateMainCategory()
 	pMain->AddSeparator();
 	pMain->Add(PRESET::CreateButton(FILE_3D_CMD_Options));
 
-	pMain->AddRecentFilesList(Facility::Local(L"Recent Documents|최근 파일"), 300, TRUE); //:WARNING
-#pragma endregion //:REGION
+	pMain->AddRecentFilesList(Facility::Local(L"Recent Documents|최근 파일"), 300, TRUE); // WARNING
 
-#pragma region Right Side Menu
 /*
+	// Right Side Menu
+
 	CMenu styleMenu;
 	styleMenu.CreateMenu();
 
-	//:WARNING - check Id
+	// WARNING - check Id
 	styleMenu.AppendMenuW(MF_STRING, CMD_THEME_LIGHT, Facility::Local(L"Light Theme|밝은 테마"));
 	styleMenu.AppendMenuW(MF_STRING, CMD_THEME_DARK, Facility::Local(L"Dark Theme|어두운 테마"));
 
 	CBCGPRibbonButton* pStyle = new CBCGPRibbonButton(
-		-1, Facility::Local(L"Color Theme|색 테마"), -1, -1); //:WARNING
+		-1, Facility::Local(L"Color Theme|색 테마"), -1, -1); // WARNING
 	pStyle->SetMenu(styleMenu.GetSafeHmenu());
 	AddToTabs(pStyle);
 */
-#pragma endregion //:REGION - Will be replaced by another menu
 
 #else
 
-#pragma region Main and Search
-	EnableCommandSearch(
-		TRUE, Facility::Local(L"Enter menu name to search...|검색할 메뉴명을 입력하세요...")); //:WARNING
-#pragma endregion //:REGION
+	// Main and Search
 
-#pragma region Main Category
+	EnableCommandSearch(TRUE, Facility::Local(L"Enter menu name to search...|검색할 메뉴명을 입력하세요...")); // WARNING
+
+	// Main Category 3d
+
 	CBCGPRibbonCategory* pCategory = AddCategory(GetTitle(FILE_3D_CAT), 0, 0);
 	CBCGPRibbonPanel* pPanel = nullptr;
 
@@ -381,24 +401,24 @@ bool Component::RibbonBar::CreateMainCategory()
 	pPanel = CreatePanel(pCategory, FILE_3D_PNL_Settings);
 	pPanel->Add(CreateButton(FILE_3D_CMD_Preference));
 
-	//:WARING - add recent files...
-#pragma endregion //:REGION
+	// WARNING - add recent files...
 
 #endif
+
 	return true;
 }
 
 
 
-bool Component::RibbonBar::CreateCategories()
+bool Component::RibbonBar::Create3dCategories()
 {
 	CBCGPRibbonCategory* pCategory = nullptr;
 	CBCGPRibbonPanel* pPanel = nullptr;
 
-	using namespace PRESET;
+	// Home Category
 
-#pragma region Home Category
-	pCategory = AddCategory(Facility::GetTitle(HOME_3D_CAT), 0, 0);
+	pCategory = AddCategory(Facility::GetTitle(HOME_3D_CAT));
+	m_categoies3d.push_back(pCategory);
 
 	pPanel = PRESET::CreatePanel(pCategory, HOME_3D_PNL_Panels);
 	pPanel->Add(PRESET::CreateButton(HOME_3D_CMD_Panels_Model));
@@ -426,10 +446,11 @@ bool Component::RibbonBar::CreateCategories()
 	pPanel->Add(PRESET::CreateButton(HOME_3D_CMD_Window_Cascade));
 	pPanel->Add(PRESET::CreateButton(HOME_3D_CMD_Window_TileHorizontal));
 	pPanel->Add(PRESET::CreateButton(HOME_3D_CMD_Window_TileVertical));
-#pragma endregion //:REGION
 
-#pragma region Measure Category
-	pCategory = AddCategory(Facility::GetTitle(MEASURE_3D_CAT), 0, 0);
+	// Measure Category
+
+	pCategory = AddCategory(Facility::GetTitle(MEASURE_3D_CAT));
+	m_categoies3d.push_back(pCategory);
 
 	pPanel = PRESET::CreatePanel(pCategory, MEASURE_3D_PNL_Basic);
 	pPanel->Add(PRESET::CreateButton(MEASURE_3D_CMD_Basic_Coordinate));
@@ -450,10 +471,11 @@ bool Component::RibbonBar::CreateCategories()
 
 	pPanel = PRESET::CreatePanel(pCategory, MEASURE_3D_PNL_Settings);
 	pPanel->Add(PRESET::CreateButton(MEASURE_3D_CMD_Settings));
-#pragma endregion //:REGION
 
-#pragma region Custom Category - remove ids in Command.Resource.h later
-	pCategory = AddCategory(Facility::GetTitle(CUSTOM_3D_CAT), 0, 0);
+	// Custom Category - remove ids in Command.Resource.h later
+
+	pCategory = AddCategory(Facility::GetTitle(CUSTOM_3D_CAT));
+	m_categoies3d.push_back(pCategory);
 
 	pPanel = PRESET::CreatePanel(pCategory, CUSTOM_3D_PNL_SYSONG);
 	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_SYSONG_Test1));
@@ -476,19 +498,88 @@ bool Component::RibbonBar::CreateCategories()
 	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test7));
 	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test8));
 	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test9, L"Coordinate"));
-#pragma endregion //:REGION
 
 	return true;
 }
 
 
 
-void Component::RibbonBar::Reload()
+bool Component::RibbonBar::Create2dCategories()
 {
-	RemoveAllCategories();
+	CBCGPRibbonCategory* pCategory = nullptr;
+	CBCGPRibbonPanel* pPanel = nullptr;
 
-	CreateCategories();
-	CreateMainCategory();
+	// Home Category
+
+	pCategory = AddCategory(Facility::GetTitle(HOME_3D_CAT));
+	m_categoies2d.push_back(pCategory);
+
+	pPanel = PRESET::CreatePanel(pCategory, HOME_2D_PNL_Panels);
+	pPanel->Add(PRESET::CreateButton(HOME_2D_CMD_Panels_Model));
+	pPanel->Add(PRESET::CreateButton(HOME_2D_CMD_Panels_View));
+	pPanel->Add(PRESET::CreateButton(HOME_2D_CMD_Panels_Layer));
+
+	pPanel = PRESET::CreatePanel(pCategory, HOME_2D_PNL_Focus);
+	pPanel->Add(PRESET::CreateButton(HOME_2D_CMD_Pan));
+	pPanel->Add(PRESET::CreateSplitButton(HOME_2D_LST_Zoom, HOME_2D_CMD_Zoom_Fit, HOME_2D_CMD_Zoom_Area));
+
+	pPanel = PRESET::CreatePanel(pCategory, HOME_2D_PNL_Window);
+	pPanel->Add(PRESET::CreateButton(HOME_2D_CMD_Window_Cascade));
+	pPanel->Add(PRESET::CreateButton(HOME_2D_CMD_Window_TileHorizontal));
+	pPanel->Add(PRESET::CreateButton(HOME_2D_CMD_Window_TileVertical));
+
+	// Draw Category
+
+	pCategory = AddCategory(Facility::GetTitle(DRAW_2D_CAT));
+	m_categoies2d.push_back(pCategory);
+
+	pPanel = PRESET::CreatePanel(pCategory, DRAW_2D_PNL_Basic);
+	pPanel->Add(PRESET::CreateSplitButton(DRAW_2D_LST_Point, DRAW_2D_CMD_Point, DRAW_2D_CMD_Divide));
+	pPanel->Add(PRESET::CreateSplitButton(DRAW_2D_LST_Line, DRAW_2D_CMD_Line, DRAW_2D_CMD_Polygon));
+	pPanel->Add(PRESET::CreateSplitButton(DRAW_2D_LST_Circle, DRAW_2D_CMD_Circle_2Points, DRAW_2D_CMD_Circle_2TangentsRadius));
+	pPanel->Add(PRESET::CreateSplitButton(DRAW_2D_LST_Arc, DRAW_2D_CMD_Arc_3Points, DRAW_2D_CMD_Arc_2TangentsRadius));
+	pPanel->Add(PRESET::CreateSplitButton(DRAW_2D_LST_Ellipse, DRAW_2D_CMD_Ellipse_2Axes, DRAW_2D_CMD_Ellipse_Center2Axes));
+	pPanel->Add(PRESET::CreateSplitButton(DRAW_2D_LST_EllipticalArc, DRAW_2D_CMD_EllipticalArc_2Axes, DRAW_2D_CMD_EllipticalArc_Center2Axes));
+	pPanel->Add(PRESET::CreateButton(DRAW_2D_CMD_Spline));
+
+	pPanel = PRESET::CreatePanel(pCategory, DRAW_2D_PNL_Annotate);
+	pPanel->Add(PRESET::CreateButton(DRAW_2D_CMD_Text));
+
+	// Custom Category - remove ids in Command.Resource.h later
+
+	pCategory = AddCategory(Facility::GetTitle(CUSTOM_3D_CAT));
+	m_categoies2d.push_back(pCategory);
+
+	pPanel = PRESET::CreatePanel(pCategory, CUSTOM_3D_PNL_KEN);
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test1));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test2));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test3));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test4));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test5));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test6));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test7));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test8));
+	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test9, L"Coordinate"));
+
+	// CHECK - Context Menu, hide
+
+	m_pDummy = AddCategory(L"Dummy");
+	pPanel = pCategory->AddPanel(Facility::GetTitle(CONTEXT_2D_POP_ObjectSnap_Overrides));
+	for (int id = CONTEXT_2D_CMD_ObjectSnap_Point; id <= CONTEXT_2D_CMD_ObjectSnap_Near; id++) {
+		pPanel->Add(PRESET::CreateButton(id, L"", false));
+	}
+
+	return true;
+}
+
+
+
+void Component::RibbonBar::SetPadding(const CSize& value)
+{
+	m_sizePadding = value;
+	OnChangePadding();
+
+	ForceRecalcLayout(TRUE, FALSE);
 }
 
 #undef PRESET

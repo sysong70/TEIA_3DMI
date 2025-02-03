@@ -42,7 +42,7 @@ namespace H3DF
 	public:
 
 		void Create(float width, float height, HC_KEY parent);
-		//:WARNING - on changing preference
+		// WARNING - on changing preference
 		void Recreate();
 
 		HC_KEY HitTest(float x, float y, float z);

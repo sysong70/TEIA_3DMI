@@ -1,16 +1,16 @@
-#pragma once
+﻿#pragma once
 
 #include "StaticRxObject.h"
-#include "Ed/EdCommandStack.h"
 #include "DbDatabaseReactor.h"
+#include "Ed/EdCommandStack.h"
 
 class OdDbCommandContext;
 
 //--------------------------------------------------------------------------------------------------
 
 class CommandReactor
-	: public OdStaticRxObject<OdEdCommandStackReactor>
-	, public OdStaticRxObject<OdDbDatabaseReactor>
+	: public OdStaticRxObject<OdDbDatabaseReactor>
+	, public OdStaticRxObject<OdEdCommandStackReactor>
 {
 	ODRX_NO_HEAP_OPERATORS();
 

@@ -3,6 +3,6 @@
 #define WIN32_LEAN_AND_MEAN
 
 #include <windows.h>
-#include <atlstr.h>
 #include <atltypes.h>
+#include <atlstr.h>
 #include <atlacc.h>

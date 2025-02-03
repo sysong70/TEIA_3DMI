@@ -72,8 +72,6 @@ bool WStr::IsDigit(CString& value)
 	return true;
 }
 
-
-
 bool WStr::IsDigit(wchar_t value)
 {
 	switch (value) {
@@ -95,6 +93,20 @@ bool WStr::IsDigit(wchar_t value)
 }
 
 
+
+bool WStr::IsNumeric(CString& value)
+{
+	wchar_t* stream = (wchar_t*)value.GetBuffer();
+
+	for (int i = 0; i < value.GetLength(); i++) {
+		if (IsNumeric(*stream) == false) {
+			return false;
+		}
+		stream++;
+	}
+
+	return true;
+}
 
 bool WStr::IsNumeric(wchar_t value)
 {
@@ -195,7 +207,7 @@ bool WStr::Split(const wchar_t* pSource, wchar_t token, WStringArray& atomArray)
 	return (atomArray.size() > 0);
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //--------------------------------------------------------------------------------------------------
 
@@ -326,7 +338,7 @@ CString WStr::Get(CString& source, int start, wchar_t fromCh, wchar_t toCh, bool
 	return result;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //--------------------------------------------------------------------------------------------------
 
@@ -430,7 +442,7 @@ void WStr::RemoveTo(CString& source, wchar_t ch)
 	source.Delete(0, pos + 1);
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //--------------------------------------------------------------------------------------------------
 
@@ -507,12 +519,12 @@ CString WStr::ToString(DWORD_PTR value)
 	return sValue;
 }
 
-//:WARNING - wstring_convert deprecated (C++20)
+// WARNING - wstring_convert deprecated (C++20)
 //#include <codecvt>
 
 CStringA WStr::ToUtf8(const wchar_t* value)
 {
-	//:WARNING - wstring_convert deprecated (C++20)
+	// WARNING - wstring_convert deprecated (C++20)
 	//CString_convert<std::codecvt_utf8<wchar_t>> conv;
 	//return conv.to_bytes(value);
 
@@ -532,7 +544,7 @@ CStringA WStr::ToUtf8(const wchar_t* value)
 
 CString WStr::ToUtf16(const char* value)
 {
-	//:WARNING - wstring_convert deprecated (C++20)
+	// WARNING - wstring_convert deprecated (C++20)
 	//CString_convert<std::codecvt_utf8<wchar_t>> conv;
 	//return conv.from_bytes(value);
 
@@ -548,7 +560,7 @@ CString WStr::ToUtf16(const char* value)
 	return result;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //--------------------------------------------------------------------------------------------------
 
@@ -696,4 +708,4 @@ void WStr::Wrap(CString& source, EWrapper e, int count /*= 1*/)
 	}
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION

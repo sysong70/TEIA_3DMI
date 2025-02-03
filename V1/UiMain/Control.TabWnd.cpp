@@ -50,7 +50,7 @@ void Control::TabWnd::SetImageList(const ResourceIds& ids, CSize imageSize)
 
 void Control::TabWnd::SetTabHeight(int height)
 {
-	//:CHECK
+	// CHECK
 	m_sizeImage.cx = height;
 	m_sizeImage.cy = height;
 }

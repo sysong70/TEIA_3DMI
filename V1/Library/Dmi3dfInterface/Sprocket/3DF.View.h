@@ -73,10 +73,10 @@ namespace H3DF
 
 		//== Keyboard 관련 함수 ======================================================================
 		bool Char(UINT nChar, UINT nRepCnt, UINT nFlags);
-		//:Ken - 20230607
+		// KEN - 20230607
 		bool KeyboardInput(Json::Object & input);
 
-		//:Ken - 20230607
+		// KEN - 20230607
 		bool ExecuteKeyboardSignal(int nAction, Json::Object & cInObject);
 
 		//== Select 관련 함수 ========================================================================

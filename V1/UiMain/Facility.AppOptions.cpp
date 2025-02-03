@@ -73,7 +73,7 @@ bool Facility::AppOptions::Load()
 		}
 		else {
 			if (m_preferences.GetString("version") != TheAppResources.GetPreferences().GetString("version")) {
-				//:TODO - remove file
+				// TODO - remove file
 				m_preferences = TheAppResources.GetPreferences();
 			}
 		}
@@ -91,7 +91,7 @@ bool Facility::AppOptions::Load()
 		}
 		else {
 			if (m_fileOptions.GetString("version") != TheAppResources.GetFileOptions().GetString("version")) {
-				//:TODO - remove file
+				// TODO - remove file
 				m_fileOptions = TheAppResources.GetFileOptions();
 			}
 		}

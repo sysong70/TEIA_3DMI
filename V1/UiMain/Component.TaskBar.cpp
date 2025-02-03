@@ -56,7 +56,6 @@ Component::TaskBar::TaskBar()
 
 Component::TaskBar::~TaskBar()
 {
-	DestroyWindow();
 }
 
 
@@ -227,7 +226,7 @@ LRESULT Component::TaskBar::OnDPIChangedAfterParent(WPARAM, LPARAM)
 {
 	LRESULT result = Default();
 
-	//:TODO
+	// TODO
 
 	return result;
 }
@@ -236,12 +235,13 @@ LRESULT Component::TaskBar::OnDPIChangedAfterParent(WPARAM, LPARAM)
 
 BOOL Component::TaskBar::OnEraseBkgnd(CDC* pDC)
 {
+	const CBrush border((COLORREF)Control::EColor::Gray);
 	const CBrush backgound((COLORREF)Control::EColor::DialogBack);
 
 	CRect rect;
 	GetClientRect(rect);
 
-	pDC->FillRect(rect, (CBrush*)&CBrush((COLORREF)Control::EColor::Gray));
+	pDC->FillRect(rect, (CBrush*)&border);
 	rect.DeflateRect(CRect(1, 1, 1, 1));
 	pDC->FillRect(rect, (CBrush*)&backgound);
 

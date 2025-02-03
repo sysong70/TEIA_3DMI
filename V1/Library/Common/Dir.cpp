@@ -3,7 +3,7 @@
 #include "File.h"
 #include "Path.h"
 
-#include <shlobj_core.h>
+#include <shlobj.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

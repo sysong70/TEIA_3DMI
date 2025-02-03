@@ -6,6 +6,6 @@ class Application
 {
 public:
 
-	//:WARNING - defined for future enhancements, from DllMain
+	// WARNING - defined for future enhancements, from DllMain
 	static HMODULE Instance;
 };

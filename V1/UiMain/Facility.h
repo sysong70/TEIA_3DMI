@@ -15,6 +15,10 @@ namespace Facility
 
 
 
+	const int CodeLength = 3;
+
+
+
 	enum class ELanguage
 	{
 		English = 0,
@@ -31,7 +35,7 @@ namespace Facility
 
 	CString Local(CString& strings);
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Resource
 
@@ -43,15 +47,17 @@ namespace Facility
 
 	CString GetTitle(UINT id);
 
+	void GetToolBarImages(CBCGPToolBarImages& target, CSize imageSize, const std::vector<UINT>& ids);
+
 	CString GetTooltip(UINT id);
 
 	bool LoadTextResource(UINT id, CString& result);
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Json
 
-	CString GetDescription(Json::Object& source);
+	CString GetDescription(Json::Object& source, CString dictionary = L"");
 
 	UINT GetId(Json::Object& source);
 
@@ -79,5 +85,5 @@ namespace Facility
 
 	void SetValueByPath(Json::Object& object, CString& path, CBCGPProp& value);
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 }

@@ -51,7 +51,7 @@ LogManager::Init::Init()
 	}
 }
 
-//:Ken
+// KEN
 LogManager::Init::~Init()
 {
 	if (m_bInstanceFlag && m_pcLogManger != nullptr) {

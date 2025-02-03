@@ -70,18 +70,23 @@ bool Control::TreePropList::Initialize(CWnd* pParentWnd, UINT id, const RECT& re
 
 
 
-void Control::TreePropList::InitializeDesign(Json::Object& design)
+bool Control::TreePropList::InitializeDesign(Json::Object& design)
 {
+	m_dictionary = design.GetString("dictionary");
 	m_pDesign = &design;
 	m_tree.InitializeDesign(m_pDesign->GetArray("tree"));
 	ChangePropList(m_tree.GetSelectedItem());
+
+	return true;
 }
 
 
 
-void Control::TreePropList::InitializeData(Json::Object& data)
+bool Control::TreePropList::InitializeData(Json::Object& data)
 {
 	m_pData = &data;
+
+	return true;
 }
 
 
@@ -168,7 +173,7 @@ void Control::TreePropList::ChangePropList(HTREEITEM pItem)
 	Json::Object* pData = Json::Helper::FindObjectByPath(*m_pData, path);
 
 	if (pDesign != nullptr) {
-		m_propList.InitializeDesign(*pDesign);
+		m_propList.InitializeDesign(*pDesign, m_dictionary);
 
 		if (pData != nullptr) {
 			m_propList.InitializeData(*pData);
@@ -179,7 +184,7 @@ void Control::TreePropList::ChangePropList(HTREEITEM pItem)
 	}
 	else {
 		m_propList.RemoveAll();
-		//:WARNING - UpdateWindow or RedrawWindow not working 
+		// WARNING - UpdateWindow or RedrawWindow not working 
 		m_propList.AdjustLayout();
 		DEBUG_STOP;
 	}

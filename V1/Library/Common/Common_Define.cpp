@@ -23,11 +23,11 @@ void Trace(const wchar_t* pFormat, ...)
 	va_list args;
 	va_start(args, pFormat);
 	int size = ::vswprintf(nullptr, 0, pFormat, args) + 1;
-	//:CHECK
+	// CHECK
 	::vswprintf(buffer, size, pFormat, args);
 	va_end(args);
 
-	//:KEN - 20240206
+	// KEN - 20240206
 	buffer[size - 1] = L'\r';
 	buffer[size] = L'\n';
 	buffer[size + 1] = L'\0';

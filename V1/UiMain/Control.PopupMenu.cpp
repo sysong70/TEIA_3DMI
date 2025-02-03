@@ -71,5 +71,5 @@ void Control::PopupMenu::SetCheckItems(const ResourceIds& ids)
 
 void Control::PopupMenu::OnClickItem(int index)
 {
-	//:TODO - user color bar
+	// TODO - user color bar
 }

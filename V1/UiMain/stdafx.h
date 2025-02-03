@@ -25,8 +25,10 @@
 #include <BCGCBProInc.h>			// BCGPro Control Bar
 
 #include <list>
-#include <vector>
+#include <queue>
+#include <stack>
 #include <unordered_map>
+#include <vector>
 
 #include <Common_Define.h>
 #include <Dir.h>

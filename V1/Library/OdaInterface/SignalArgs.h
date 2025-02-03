@@ -3,7 +3,7 @@
 #include "Signal.h"
 #include "Json.h"
 
-
+//--------------------------------------------------------------------------------------------------
 
 namespace SignalArgs
 {
@@ -18,8 +18,8 @@ namespace SignalArgs
 
 	public:
 
-		//:WARING - delete pointer after use
-		static Base* CreateInstance(Json::Object& content);
+		// WARING - delete pointer after use
+		static Base* CreateInstance(Json::Object& content, int& signalTarget, int& signalAction);
 
 		Base() {}
 
@@ -28,16 +28,22 @@ namespace SignalArgs
 		~Base();
 
 		virtual CString Dump();
+
+#ifdef _DEBUG
+		void DebugTrace()
+		{
+			TRACE(Dump());
+		}
+#endif
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class Command : public Base
 	{
 	public:
 
-		CString GroupName;
-		CString GlobalName;
+		int Id = -1;
 		Json::Object Options;
 
 	public:
@@ -47,7 +53,16 @@ namespace SignalArgs
 		CString Dump() override;
 	};
 
+//--------------------------------------------------------------------------------------------------
 
+	class ContextCommand : public Command
+	{
+	public:
+
+		ContextCommand(Json::Object& content);
+	};
+
+//--------------------------------------------------------------------------------------------------
 
 	class Initialize : public Base
 	{
@@ -63,7 +78,29 @@ namespace SignalArgs
 		CString Dump() override;
 	};
 
+//--------------------------------------------------------------------------------------------------
 
+	class Keyboard : public Base
+	{
+	public:
+
+		UINT Flags = 0;
+		UINT Repeat = 0;
+		UINT Char = 0;
+		bool Down = false;
+
+	public:
+
+		Keyboard(Json::Object& content);
+
+		bool IsEnter();
+
+		bool IsEscape();
+
+		CString Dump() override;
+	};
+
+//--------------------------------------------------------------------------------------------------
 
 	class Mouse : public Base
 	{
@@ -78,6 +115,8 @@ namespace SignalArgs
 
 		Mouse(Json::Object& content);
 
+		CPoint GetPoint();
+
 		CString Dump() override;
 
 	public:
@@ -91,10 +130,17 @@ namespace SignalArgs
 		bool RightButton();
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class Paint : public Base
 	{
+	public:
+
+		int Left = 0;
+		int Top = 0;
+		int Right = 0;
+		int Bottom = 0;
+
 	public:
 
 		// Renderer::PostPaintSignal()
@@ -107,7 +153,7 @@ namespace SignalArgs
 		CString Dump() override;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class Resize : public Base
 	{
@@ -123,7 +169,7 @@ namespace SignalArgs
 		CString Dump() override;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class Text : public Base
 	{
@@ -140,6 +186,8 @@ namespace SignalArgs
 		CString Dump() override;
 
 	public:
+
+		double ToAngle();
 
 		COLORREF ToColor();
 

@@ -41,15 +41,15 @@ void KERNEL::Command::Manager::ExecuteApplicationSignal(Json::Object & cInObject
 		} break;
 
 		case Signal::Application::Action::OnUpdatePreference:
-			//:TODO
+			// TODO
 			break;
 
-			//:Ken - 20240131
+			// KEN - 20240131
 		case Signal::Application::Action::OnUpdateFileOption:
 			pcImpl->m_cApplication.OnUpdateFileOption(cInObject.GetAt(SKW_VALUE));
 			break;
 
-			//:Ken - 20240131
+			// KEN - 20240131
 		case Signal::Application::Action::OnFileOptionReference:
 			pcImpl->m_cApplication.OnFileOptionReference(cInObject.GetAt(SKW_VALUE));
 			break;
@@ -79,7 +79,7 @@ void KERNEL::Command::Manager::ExecuteViewSignal(Json::Object & cInObject)
 			// 실제로는 하나의 Instance를 사용하는 것임.
 			ViewInitialize(cInObject, Connector::GetInstance(nViewId));
 
-			//:Ken - TEST
+			// KEN - TEST
 			//Connector::GetInstance(-1).application.AddTraceLogV(L"View initialized %d", nViewId);
 			//Connector::GetInstance(-1).application.AddTraceLog(L"next message");
 			//Connector::GetInstance(-1).application.SaveTraceLog(nullptr);
@@ -91,7 +91,7 @@ void KERNEL::Command::Manager::ExecuteViewSignal(Json::Object & cInObject)
 
 		case Signal::View::Action::OnPaint:
 			ViewPaint(cInObject, nViewId);
-			//:Ken - TEST
+			// KEN - TEST
 			//Connector::GetInstance(nViewId).view.PaintOverlap();
 			break;
 
@@ -111,7 +111,7 @@ void KERNEL::Command::Manager::ExecuteViewSignal(Json::Object & cInObject)
 			pcImpl->ViewMouseSignal(cInObject, nViewId);
 			break;
 
-			//:Ken - 20230607
+			// KEN - 20230607
 		case Signal::View::Action::OnInput:
 		case Signal::View::Action::OnChar:
 		case Signal::View::Action::OnKeyDown:

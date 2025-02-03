@@ -34,12 +34,14 @@ namespace Window
 
 	protected:
 
+		void CreateToolBar() override;
+
+	protected:
+
 		Component::ModelPanel m_modelPanel;
 		Component::ViewPanel m_viewPanel;
 		Component::LayerPanel m_layerPanel;
 		Component::ScenePanel m_scenePanel;
-
-		void CreateToolBar() override;
 
 		void CreatePanelTabs() override;
 	};

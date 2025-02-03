@@ -1414,7 +1414,7 @@ void H3DF::ViewImpl::ViewReady()
 }
 
 #include "../../3DF/Operator.KeyboardTest.h"
-//:TEMP
+// TEMP
 Operator::KeyboardTest * g_pOperator = nullptr;
 
 bool H3DF::ViewImpl::KeyboardInput(Json::Object & cInObject)

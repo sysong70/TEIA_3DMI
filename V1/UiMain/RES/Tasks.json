@@ -1,0 +1,117 @@
+﻿{
+	"VisualEffects3d":{
+		"dictionary":"VisualEffects3d",
+		"header":{"title":"Visual Effects|__#__", "size":{"cx":350, "cy":570}},
+		"toolbar":{"itemSize":2},
+		"properties":{"type":"root", "items":[
+			{"type":"group", "name":"Shadow", "title":"Shadow|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+				{"type":"drop", "name":"Mode", "title":"Mode|__#__", "desc":"__#__|__#__", "value":1, "items":[
+					"None|__#__",
+					"Soft|__#__",
+					"Hard|__#__"
+				]},
+				{"type":"slider", "name":"Resolution", "title":"Resolution|__#__", "desc":"__#__|__#__", "min":1, "max":10, "value":3},
+				{"type":"slider", "name":"Blurring", "title":"Blurring|__#__", "desc":"__#__|__#__", "min":1, "max":10, "value":1},
+				{"type":"check", "name":"IgnoreTransparency", "title":"Ignore transparency|__#__", "desc":"__#__|__#__", "value":false},
+				{"type":"color", "name":"Color", "title":"Color|__#__", "desc":"__#__|__#__", "value":"0x404040"},
+				{"type":"slider", "name":"Opacity", "title":"Opacity|__#__", "desc":"__#__|__#__", "min":1, "max":10, "value":10},
+				{"type":"button", "name":"ResetShadow", "title":"Reset to default|__#__", "desc":"__#__|__#__", "command":"Reset|__#__", "id":1}
+			]},
+			{"type":"group", "name":"PlaneReflection", "title":"Plane reflection|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+				{"type":"slider", "name":"Opacity", "title":"Opacity|__#__", "desc":"__#__|__#__", "min":1, "max":10, "value":5},
+				{"type":"slider", "name":"Blurring", "title":"Blurring|__#__", "desc":"__#__|__#__", "min":1, "max":10, "value":1},
+				{"type":"check", "name":"Fading", "title":"Fading|__#__", "desc":"__#__|__#__", "value":false},
+				{"type":"button", "name":"ResetPlaneReflection", "title":"Reset to default|__#__", "desc":"__#__|__#__", "command":"Reset|__#__", "id":2}
+			]},
+			{"type":"group", "name":"AmbientOcclusion", "title":"Ambient occlusion|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+				{"type":"slider", "name":"Strength", "title":"Strength|__#__", "desc":"__#__|__#__", "min":1, "max":20, "value":1},
+				{"type":"drop", "name":"Quality", "title":"Quality|__#__", "desc":"__#__|__#__", "value":0, "items":[
+					"Fast|__#__",
+					"Nicest|__#__"
+				]},
+				{"type":"button", "name":"ResetAmbientOcclusion", "title":"Reset to default|__#__", "desc":"__#__|__#__", "command":"Reset|__#__", "id":3}
+			]},
+			{"type":"group", "name":"SilhouetteEdges", "title":"Silhouette edges|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+				{"type":"slider", "name":"Tolerance", "title":"Tolerance|__#__", "desc":"__#__|__#__", "min":1, "max":20, "value":1},
+				{"type":"check", "name":"HeavyExterior", "title":"Heavy exterior|__#__", "desc":"__#__|__#__", "value":true},
+				{"type":"button", "name":"ResetSilhouetteEdges", "title":"Reset to default|__#__", "desc":"__#__|__#__", "command":"Reset|__#__", "id":4}
+			]},
+			{"type":"group", "name":"Bloom", "title":"Bloom|__#__", "desc":"__#__|__#__", "hasCheck":true, "items":[
+				{"type":"slider", "name":"Strength", "title":"Strength|__#__", "desc":"__#__|__#__", "min":1, "max":10, "value":1},
+				{"type":"slider", "name":"Blurring", "title":"Blurring|__#__", "desc":"__#__|__#__", "min":1, "max":10, "value":5},
+				{"type":"drop", "name":"Shape", "title":"Shape|__#__", "desc":"__#__|__#__", "value":0, "items":[
+					"Radial",
+					"Star"
+				]},
+				{"type":"button", "name":"ResetBloom", "title":"Reset to default|__#__", "desc":"__#__|__#__", "command":"Reset|__#__", "id":5}
+			]}
+		]},
+		"default":{
+			"Shadow":{"checked":true, "Mode":1, "Resolution":3, "Blurring":1, "IgnoreTransparency":false, "Color":"0x404040", "Opacity":10},
+			"PlaneReflection":{"checked":true, "Opacity":5, "Blurring":1, "Fading":false},
+			"AmbientOcclusion":{"checked":true, "Strength":1, "Quality":0},
+			"SilhouetteEdges":{"checked":true, "Tolerance":1, "HeavyExterior":true},
+			"Bloom":{"checked":true, "Strength":1, "Blurring":5, "Shape":0}
+		}
+	},
+
+	"Test":{
+		"header":{"title":"Test Coordinate Input|__#__", "size":{"cx":350, "cy":400}},
+		"properties":{"type":"root", "items":[
+			{"type":"coord", "name":"1stPoint", "title":"Dimension Line 1 Point|__#__", "desc":"__#__|__#__", "format":3, "digit":4, "value":["1.0", "2.0", "3.0"]},
+			{"type":"coord", "name":"2ndPoint", "title":"Dimension Line 2 Point|__#__", "desc":"__#__|__#__", "format":3, "digit":4, "value":["4.0", "5.0", "6.0"]},
+			{"type":"coord", "name":"3rdPoint", "title":"Text Point|__#__", "desc":"__#__|__#__", "format":3, "digit":4, "value":["7.0", "8.0", "9.0"]},
+			{"type":"length", "name":"Value", "title":"Radius|__#__", "desc":"Specify radius of circle|__#__", "digit":4, "value":10.0}
+		]}
+	},
+
+	"Line2d.2Points":{
+		"dictionary":"L2.2P",
+		"header":{"title":"Draw a Line with 2 Points|__#__", "size":{"cx":350, "cy":400}},
+		"properties":{"type":"root", "items":[
+			{"type":"coord", "name":"FirstPoint", "title":"First point|__#__", "desc":201, "format":2},
+			{"type":"coord", "name":"SecondPoint", "title":"Second point|__#__", "desc":202, "format":2},
+			{"type":"angle", "name":"Angle", "title":"Angle|__#__", "desc":3},
+			{"type":"length", "name":"Length", "title":"Length|__#__", "desc":4},
+			{"type":"button", "name":"Close", "title":"Close|__#__", "desc":5, "command":"Run|__#__", "id":11, "complete":true}
+		]}
+	},
+
+    "Circle2d.2Points":{
+		"dictionary":"C2.2P",
+		"header":{"title":"Draw a Circle with 2 Points|__#__", "size":{"cx":350, "cy":400}},
+		"properties":{"type":"root", "items":[
+			{"type":"coord", "name":"FirstPoint", "title":"First point|__#__", "desc":201, "format":2},
+			{"type":"coord", "name":"SecondPoint", "title":"Second point|__#__", "desc":202, "format":2}
+		]}
+	},
+
+	"Circle2d.3Points":{
+		"dictionary":"C2.3P",
+		"header":{"title":"Draw a Circle with 3 Points|__#__", "size":{"cx":350, "cy":400}},
+		"properties":{"type":"root", "items":[
+			{"type":"coord", "name":"FirstPoint", "title":"First point|__#__", "desc":201, "format":2},
+			{"type":"coord", "name":"SecondPoint", "title":"Second point|__#__", "desc":202, "format":2},
+			{"type":"coord", "name":"ThirdPoint", "title":"Third point|__#__", "desc":203, "format":2}
+		]}
+	},
+
+	"Circle2d.CenterRadius":{
+		"dictionary":"C2.CR",
+		"header":{"title":"Draw a Circle with Center and Radius|__#__", "size":{"cx":350, "cy":400}},
+		"properties":{"type":"root", "items":[
+			{"type":"coord", "name":"CenterPoint", "title":"Center point|__#__", "desc":201, "format":2},
+			{"type":"length", "name":"Radius", "title":"Radius|__#__", "desc":202, "value":10.0}
+		]}
+	},
+
+	"Circle2d.2TangentsRadius":{
+		"dictionary":"C2.2TR",
+		"header":{"title":"Draw a Circle with 2 Tangents and Radius|__#__", "size":{"cx":350, "cy":400}},
+		"properties":{"type":"root", "items":[
+			{"type":"coord", "name":"FirstTangent", "title":"First tangent|__#__", "desc":201, "format":2},
+			{"type":"coord", "name":"SecondTangent", "title":"Second tangent|__#__", "desc":202, "format":2},
+			{"type":"length", "name":"Radius", "title":"Radius|__#__", "desc":203, "value":10.0}
+		]}
+	}
+}

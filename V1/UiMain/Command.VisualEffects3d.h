@@ -10,18 +10,12 @@ namespace Command
 	{
 	public:
 
-		VisualEffects3d();
+		VisualEffects3d() {}
 
 	public:
 
 		bool ReceiveSignal(Json::Object* pData) override;
 
 		void Run(Window::View* pView) override;
-
-		void Cancel() override;
-
-	private:
-
-		Json::Object m_data;
 	};
 }

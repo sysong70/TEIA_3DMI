@@ -21,7 +21,7 @@ namespace Command
 		}
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class Test9 : public Base
 	{
@@ -34,8 +34,6 @@ namespace Command
 		bool ReceiveSignal(Json::Object* pData) override;
 
 		void Run(Window::View* pView) override;
-
-		void Cancel() override;
 
 	private:
 

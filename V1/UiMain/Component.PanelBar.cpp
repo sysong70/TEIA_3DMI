@@ -58,10 +58,10 @@ bool Component::PanelBar::Initialize(CWnd* pMainFrame)
 	EnableDocking(CBRS_ALIGN_LEFT);
 	SetBCGStyle(GetBCGStyle() & ~(CBRS_BCGP_AUTOHIDE | CBRS_BCGP_FLOAT));
 	SetMinSize(PRESET::MinBarSize());
-	//:WARNING - clear all and close button only
+	// WARNING - clear all and close button only
 	RemoveCaptionButtons();
 	m_arrButtons.Add(new CBCGPCaptionButton(HTCLOSE_BCG, FALSE, this));
-	//:WARNING - set child style
+	// WARNING - set child style
 	//SendMessageToDescendants(BCGM_ONSETCONTROLVMMODE, TRUE, 0, TRUE, FALSE);
 
 	return true;

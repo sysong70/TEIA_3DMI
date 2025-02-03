@@ -65,7 +65,7 @@ public:
 	public:
 
 		Init();
-		//:Ken
+		// KEN
 		~Init();
 	};
 

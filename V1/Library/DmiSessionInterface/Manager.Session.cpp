@@ -59,7 +59,7 @@ void SESSION::Manager::Session::ExecuteSignal(const wchar_t * pchBuffer)
 	// ReadObject에 buffer에 내용을 전달하고 나오면 buffer는 empty됨.
 	bool success = Json::Reader::ReadObject((wchar_t *&)pchBuffer, cInObject);
 #ifdef _DEBUG
-	//:Ken - 20240223, echo data
+	// KEN - 20240223, echo data
 	if (success == false) {
 		Json::Object msg;
 		msg.SetString("Echo", CString(pchBuffer));

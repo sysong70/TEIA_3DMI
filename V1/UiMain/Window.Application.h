@@ -20,6 +20,14 @@ namespace Window
 
 		Application();
 
+	protected: // CWinApp
+
+		CDocument* OpenDocumentFile(LPCTSTR lpszFileName) override;
+
+		CDocument* OpenDocumentFile(LPCTSTR lpszFileName, BOOL bAddToMRU) override;
+
+	public:
+
 		MainFrame& GetMainFrame();
 
 		View* FindView(int id);

@@ -170,7 +170,7 @@ void Command::MeasureCoordinate3d::Run(Window::View* pView)
 {
 	__super::Run(pView);
 
-	//:TEMP
+	// TEMP
 
 	//Component::TaskBar& taskBar = TheApplication.GetMainFrame().GetTaskBar();
 	//Json::Object& data = TheAppResources.GetTask(PRESET::TaskName);

@@ -46,10 +46,10 @@ namespace Json
 	public:
 
 		Array& operator =(const Array& other);
-		//:WARNING - hard compare by string
+		// WARNING - hard compare by string
 		bool operator ==(Array& other);
 		bool operator !=(Array& other);
-		//:WARNING - contents compare (ignore order)
+		// WARNING - contents compare (ignore order)
 		bool Compare(Array& other);
 
 	public:
@@ -64,7 +64,7 @@ namespace Json
 
 		Value* operator [](int i);
 
-	public: //:WARNING - no type check
+	public: // WARNING - no type check
 
 		Array& GetArray(int i);
 
@@ -103,7 +103,7 @@ namespace Json
 
 	public:
 
-		//:WARNING - special
+		// WARNING - special
 		void AddDwordPtr(DWORD_PTR value);
 
 		DWORD_PTR GetDwordPtr(int i);
@@ -159,16 +159,16 @@ namespace Json
 
 	public:
 
-		//:CHECK
+		// CHECK
 		Value& operator =(const Value& other);
 		Value& operator =(bool value);
 		Value& operator =(int value);
 		Value& operator =(double value);
 		Value& operator =(CString value);
-		//:WARNING - hard compare by string
+		// WARNING - hard compare by string
 		bool operator ==(Value& other);
 		bool operator !=(Value& other);
-		//:WARNING - contents compare (ignore order)
+		// WARNING - contents compare (ignore order)
 		bool Compare(Value& other);
 
 	public: // get value
@@ -191,7 +191,7 @@ namespace Json
 
 		bool IsString();
 
-	public: //:WARNING - check type and return forced conversion value
+	public: // WARNING - check type and return forced conversion value
 
 		Array* ToArray();
 
@@ -205,7 +205,7 @@ namespace Json
 
 		CString ToString();
 
-	public: //:WARNING - no type check
+	public: // WARNING - no type check
 
 		Array& AsArray();
 
@@ -311,10 +311,10 @@ namespace Json
 	public:
 
 		Object& operator =(const Object& other);
-		//:WARNING - hard compare by string
+		// WARNING - hard compare by string
 		bool operator ==(Object& other);
 		bool operator !=(Object& other);
-		//:WARNING - contents compare (ignore order)
+		// WARNING - contents compare (ignore order)
 		bool Compare(Object& other);
 
 		Value& operator [](const char* name);
@@ -440,7 +440,7 @@ namespace Json
 
 		// object/value, do not check last object
 		Value* FindValueByPath(Json::Object& object, CStringA path);
-		//:SAMPLE - FindObjectByPath("Dialog/FileOptions/Import/ACIS")
+		// SAMPLE - FindObjectByPath("Dialog/FileOptions/Import/ACIS")
 		Object* FindObjectByPath(Json::Object& object, CStringA path);
 
 		CStringA GetIdString(UINT id);
@@ -491,7 +491,7 @@ namespace Json
 			float coord[3] = {};
 
 			if (GetCoordinate(source.FindValue("POINT1), coord) == true) {
-				//:TODO
+				// TODO
 			}
 		*/
 		bool GetCoordinate(Value* pSource, float* pTarget);

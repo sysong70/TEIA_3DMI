@@ -206,7 +206,7 @@ bool Facility::KernelOption::GENERAL::ETC::Set(Json::Object* pData)
 	return true;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Performance
 
@@ -298,7 +298,7 @@ bool Facility::KernelOption::PERFORMANCE::FRAMERATE_OPTIMIZATION::Set(Json::Obje
 	return true;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Interaction
 
@@ -372,7 +372,7 @@ bool Facility::KernelOption::INTERACTION::ANIMATION::Set(Json::Object* pData)
 	return true;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Appearance
 
@@ -450,7 +450,7 @@ bool Facility::KernelOption::APPEARANCE::BACKGROUND_COLOR::Set(Json::Object* pDa
 	return true;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Selection
 
@@ -530,7 +530,7 @@ bool Facility::KernelOption::SELECTIION::HIGHLIGHT::Set(Json::Object* pData)
 	return true;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region Lighting
 
@@ -610,7 +610,7 @@ bool Facility::KernelOption::LIGHTING::LIGHT::Set(Json::Object* pData)
 	return true;
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 #pragma region VisualEffects
 
@@ -928,6 +928,6 @@ void Facility::KernelOption::VISUALEFFECTS::SetChecked(bool bChecked)
 	Bloom.checked = bChecked;
 }
 
-#pragma endregion //:REGION (VisualEffects)
+#pragma endregion // REGION (VisualEffects)
 
 

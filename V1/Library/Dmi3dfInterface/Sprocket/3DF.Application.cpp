@@ -22,7 +22,7 @@
 #include <HErrorManager.h>
 #include <hpserror.h>
 
-//:Ken
+// KEN
 #include "../3DF/Facility.AppOptions.h"
 
 #ifdef _DEBUG

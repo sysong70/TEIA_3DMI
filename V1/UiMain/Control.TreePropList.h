@@ -32,9 +32,9 @@ namespace Control
 
 		bool Initialize(CWnd* pParentWnd, UINT id = WM_USER, const RECT& rect = {});
 
-		void InitializeDesign(Json::Object& design);
+		bool InitializeDesign(Json::Object& design);
 
-		void InitializeData(Json::Object& data);
+		bool InitializeData(Json::Object& data);
 
 		void RefreshData();
 
@@ -56,6 +56,7 @@ namespace Control
 
 	protected:
 
+		CString m_dictionary;
 		TreeCtrlEx m_tree;
 		PropList m_propList;
 

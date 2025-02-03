@@ -25,7 +25,7 @@ namespace H3DF
 			}
 
 			KernelOption Kernel;
-			KernelPreset Preset; //:TODO - remove later
+			KernelPreset Preset; // TODO - remove later
 			Preference Preference;
 			//ImportOption Import;
 		};

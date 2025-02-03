@@ -54,7 +54,7 @@ public:
 		SendSignal = (SendSignalFunc)GetProcAddress(hInstance, "ExecuteCommand");
 		SetReceiver = (AssignSendSignalFunc)GetProcAddress(hInstance, "AssignSendSignalFunc");
 
-		if (IsValid = SetReceiver) {
+		if (IsValid = (SendSignal && SetReceiver)) {
 			SetReceiver(Connector3d::ReceiveSignal);
 			TheDelivery.SetSender(SendSignal);
 
@@ -98,7 +98,7 @@ Signal::Delivery& Connector3d::GetInstance(int viewId)
 
 void Connector3d::ReceiveSignal(const wchar_t* content)
 {
-	//:WARNING - delete this pointer after use
+	// WARNING - delete this pointer after use
 	Json::Object* pData = new Json::Object();
 	Json::Object& data = *pData;
 	if (Json::Helper::Load(content, data) == false) {
@@ -128,7 +128,7 @@ void Connector3d::ReceiveSignal(const wchar_t* content)
 	}
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -142,10 +142,10 @@ public:
 	HINSTANCE hInstance = nullptr;
 	DWORD ErrorCode = -1;
 
-	InitializeFunc Initialize = nullptr;
-	TerminateFunc Terminate = nullptr;
 	SendSignalFunc SendSignal = nullptr;
 	AssignSendSignalFunc SetReceiver = nullptr;
+	GetCoordinateFunc GetCoordinate = nullptr;
+	SetIntegerFunc SetLanguage = nullptr;
 
 	Signal::Delivery TheDelivery;
 
@@ -157,9 +157,6 @@ public:
 
 	~Broker2d()
 	{
-		if (IsValid) {
-			Terminate();
-		}
 		if (hInstance != nullptr) {
 			::FreeLibrary(hInstance);
 		}
@@ -173,13 +170,14 @@ public:
 			return false;
 		}
 
-		Initialize = (InitializeFunc)GetProcAddress(hInstance, "Initialize");
-		Terminate = (TerminateFunc)GetProcAddress(hInstance, "Terminate");
 		SendSignal = (SendSignalFunc)GetProcAddress(hInstance, "ReceiveSignal");
 		SetReceiver = (AssignSendSignalFunc)GetProcAddress(hInstance, "AssignSendSignalFunc");
+		GetCoordinate = (GetCoordinateFunc)GetProcAddress(hInstance, "GetCoordinate");
+		SetLanguage = (SetIntegerFunc)GetProcAddress(hInstance, "SetLanguage");
 
-		if (IsValid = (Initialize && Terminate && SetReceiver)) {
-			Initialize();
+		if (IsValid = (SendSignal && SetReceiver)) {
+			DEBUG_VALID(GetCoordinate);
+			DEBUG_VALID(SetLanguage);
 
 			SetReceiver(Connector2d::ReceiveSignal);
 			TheDelivery.SetSender(SendSignal);
@@ -225,9 +223,7 @@ Signal::Delivery& Connector2d::GetInstance(int viewId)
 
 void Connector2d::ReceiveSignal(const wchar_t* content)
 {
-	//:CHECK - 2d case
-
-	//:WARNING - delete this pointer after use
+	// WARNING - delete this pointer after use
 	Json::Object* pData = new Json::Object();
 	Json::Object& data = *pData;
 	Json::Helper::Load(content, data);
@@ -238,7 +234,8 @@ void Connector2d::ReceiveSignal(const wchar_t* content)
 	case Signal::Target::MainFrame:
 	case Signal::Target::Progress:
 	case Signal::Target::View:
-		//:CHECK - why not PostMessage
+	case Signal::Target::StatusBar:
+		// CHECK - why not PostMessage
 		TheApplication.GetMainFrame().SendMessage((UINT)Window::EUserMessage::OnSignal, (WPARAM)pData);
 		break;
 
@@ -249,4 +246,16 @@ void Connector2d::ReceiveSignal(const wchar_t* content)
 	}
 }
 
-#pragma endregion //:REGION
+double* Connector2d::GetCoordinate(int viewId, int x, int y)
+{
+	return theBroker2d.GetCoordinate(viewId, x, y);
+}
+
+
+
+void Connector2d::SetLanguage(int value)
+{
+	theBroker2d.SetLanguage(value);
+}
+
+#pragma endregion // REGION

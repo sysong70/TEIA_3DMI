@@ -197,7 +197,7 @@ bool Fio::BinFile::Open(const wchar_t* path, EMode mode)
 {
 	Close();
 
-	//:WARNING - share mode
+	// WARNING - share mode
 	if ((m_pFile = ::_wfsopen(path, GetMode(mode).GetBuffer(), _SH_DENYNO)) == nullptr) {
 		RETURN_FALSE;
 	}
@@ -243,7 +243,7 @@ CString Fio::BinFile::GetMode(EMode e)
 	}
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
@@ -401,4 +401,4 @@ CString Fio::TextFile::GetEncodeing(EEncoding e)
 	}
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION

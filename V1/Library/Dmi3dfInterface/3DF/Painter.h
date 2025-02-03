@@ -71,7 +71,7 @@ namespace H3DF
 			HC_KEY API_3DF CreateSquare(H3DF::Point center, double size);
 		};
 
-		//:REF - https://docs.techsoft3d.com/3df/latest/api_ref/3dgs/HC_Set_Text_Font.html
+		// REF - https://docs.techsoft3d.com/3df/latest/api_ref/3dgs/HC_Set_Text_Font.html
 
 		namespace Font
 		{

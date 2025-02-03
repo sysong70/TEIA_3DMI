@@ -22,7 +22,7 @@ DmiC3dInterface::DmiC3dInterface()
 
 DmiC3dInterface::~DmiC3dInterface()
 {
-	//:Ken
+	// KEN
 	delete m_pcC3dModeler;
 }
 

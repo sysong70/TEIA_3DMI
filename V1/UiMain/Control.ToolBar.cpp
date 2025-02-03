@@ -11,13 +11,12 @@ static char THIS_FILE[] = __FILE__;
 
 //**************************************************************************************************
 
-static const COLORREF clrDefault = (COLORREF)-1;
-
-
-
 class Button : public CBCGPButton
 {
 protected:
+
+	static const COLORREF clrDefault = (COLORREF)-1;
+
 	/*
 	void DoDrawItem(CDC* pDCPaint, CRect rectClient, UINT itemState) override
 	{
@@ -259,7 +258,7 @@ CSize Control::ToolBar::AdjustLayout()
 {
 	const int ArrowWidth = 18;
 
-	if (m_buttons.size() == 0 || GetParent() == nullptr || GetParent()->GetSafeHwnd() == nullptr) {
+	if (m_buttons.size() == 0 || GetSafeHwnd() == nullptr || GetParent() == nullptr || GetParent()->GetSafeHwnd() == nullptr) {
 		return {};
 	}
 
@@ -325,7 +324,7 @@ CPoint Control::ToolBar::AdjustLocation(CSize size)
 	CRect parentArea;
 	GetParent()->GetClientRect(&parentArea);
 
-	CSize margin; //:WARNING
+	CSize margin; // WARNING
 	CPoint pivot;
 
 	switch (m_ePivot) {
@@ -405,8 +404,6 @@ void Control::ToolBar::SetSize(CSize buttonSize, CSize buttonMargin, CSize image
 
 void Control::ToolBar::SetSize(EItemSize size)
 {
-	DEBUG_STOP;
-
 	switch (size) {
 	case EItemSize::Small:
 		m_imageSize = CSize(16, 16);
@@ -428,6 +425,7 @@ void Control::ToolBar::SetSize(EItemSize size)
 void Control::ToolBar::OnCommand(UINT id)
 {
 	GetParent()->SendMessage(WM_COMMAND, (WPARAM)id);
+	GetParent()->SetFocus();
 }
 
 
@@ -436,7 +434,7 @@ LRESULT Control::ToolBar::OnDPIChangedAfterParent(WPARAM, LPARAM)
 {
 	LRESULT result = Default();
 
-	//:TODO
+	// TODO
 
 	return result;
 }

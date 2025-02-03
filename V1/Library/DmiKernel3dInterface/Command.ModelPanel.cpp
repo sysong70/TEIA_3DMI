@@ -481,7 +481,7 @@ void KERNEL::Command::ModelPanel::Initialize(H3DF::CADModel & cInCadModel)
 	pcImpl->ComponentExpanded(cInCadModel, 2);
 
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
-	//:Ken - 20240419
+	// KEN - 20240419
 	pcImpl->Delivery().modelPanel.ViewItem((DWORD_PTR)&cInCadModel);
 }
 
@@ -510,9 +510,9 @@ void KERNEL::Command::ModelPanel::Initialize(CString strFilePathName)
 	cItem.Title = strFileTitle;
 	//cItem.HasChildren = false;
 
-	//:Ken - 20240219, lock tree
+	// KEN - 20240219, lock tree
 	pcImpl->Delivery().modelPanel.RedrawTree(false);
-	//:Ken - 20240205, Add root item
+	// KEN - 20240205, Add root item
 	pcImpl->Delivery().modelPanel.AddItem(cItem);
 
 	SegmentKeyArray cChildren;
@@ -561,7 +561,7 @@ void KERNEL::Command::ModelPanel::Initialize(CString strFilePathName)
 		cTreeItems.push_back(cItem);
 	}
 
-	//:Ken - 20240205, Add predefined items on root item
+	// KEN - 20240205, Add predefined items on root item
 	pcImpl->Delivery().modelPanel.AddChildren((DWORD_PTR)pcRootItem, cTreeItems);
 
 	// Model Tree를 전개한다.
@@ -570,9 +570,9 @@ void KERNEL::Command::ModelPanel::Initialize(CString strFilePathName)
 
 	//pcImpl->UserInterfaceItemExpanded(pcModelsGroupItem, true);
 
-	//:Ken - 20240219, unlock and update tree
+	// KEN - 20240219, unlock and update tree
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
-	//:Ken - 20240419
+	// KEN - 20240419
 	pcImpl->Delivery().modelPanel.ViewItem((DWORD_PTR)pcRootItem);*/
 }
 
@@ -631,7 +631,7 @@ void KERNEL::Command::ModelPanel::SelectTreeItem(H3DF::SelectionItem & cSelItem)
 	pcImpl->Delivery().modelPanel.ExpandParent((DWORD_PTR)pcComponent);
 
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
-	//:Ken - 20240403
+	// KEN - 20240403
 	pcImpl->Delivery().modelPanel.SelectItem((DWORD_PTR)pcComponent);
 
 	return;
@@ -859,7 +859,7 @@ void KERNEL::Command::ModelPanel::OnItemCheckedSignal(Json::Object & cInObject)
 	DEBUG_VALID(pcImpl);
 
 	DWORD_PTR nInComponent = cInObject.GetDwordPtr(SKW_KEY);
-	//:Ken - checked or unchecked...
+	// KEN - checked or unchecked...
 	bool bChecked = cInObject.GetBoolean(SKW_CHECKED);
 
 	Component * pcComponent = dynamic_cast<Component *>((Component *)nInComponent);

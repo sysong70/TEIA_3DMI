@@ -22,6 +22,8 @@ namespace Dialog
 
 	protected:
 
+		BOOL DestroyWindow() override;
+
 		void DoDataExchange(CDataExchange* pDX) override;
 
 		BOOL OnInitDialog() override;
@@ -31,8 +33,6 @@ namespace Dialog
 	protected:
 
 		void ConstructBody(const CRect& boundary) override;
-
-		BOOL DestroyWindow() override;
 
 	private:
 

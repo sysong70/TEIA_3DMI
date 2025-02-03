@@ -18,9 +18,9 @@ namespace KERNEL
 
 		double ShowDpiScale();
 
-		//:Ken - 20240131
+		// KEN - 20240131
 		void OnUpdateFileOption(Json::Object& data);
-		//:Ken - 20240131
+		// KEN - 20240131
 		void OnFileOptionReference(Json::Object& data);
 
 		Session * GetSession(int nId);

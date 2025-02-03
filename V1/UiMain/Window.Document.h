@@ -16,16 +16,9 @@ namespace Window
 
 	public:
 
-		enum EType
-		{
-			Unknown = -1,
-			Doc3d,
-			Doc2d,
-		};
-
 		~Document() override;
 
-		EType GetCateogry();
+		EDocType GetDocType();
 
 		View* GetView();
 

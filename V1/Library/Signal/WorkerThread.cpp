@@ -34,19 +34,20 @@ EventWrapper::~EventWrapper()
 	}
 }
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
 
 //**************************************************************************************************
 
 WorkerThread::WorkerThread()
 {
+	Create();
 }
 
 
 
 WorkerThread::~WorkerThread()
 {
-	TerminateThread();
+	//Terminate();
 }
 
 
@@ -58,10 +59,11 @@ std::thread::id WorkerThread::GetCurrentThreadId()
 
 
 
-bool WorkerThread::CreateThread()
+bool WorkerThread::Create()
 {
 	if (!m_thread) {
 		m_thread = std::make_unique<std::thread>(&WorkerThread::Process, this);
+		//m_thread->detach();
 		return true;
 	}
 	else {
@@ -71,20 +73,22 @@ bool WorkerThread::CreateThread()
 
 
 
-void WorkerThread::TerminateThread()
+void WorkerThread::Terminate()
 {
 	if (m_thread == nullptr) {
-		return;
+		DEBUG_RETURN;
 	}
 
-	auto wrapper = std::make_shared<EventWrapper>((int)Event::Close);
-	std::unique_lock<std::mutex> lock(m_mutex);
 	// Put close event into the queue
-	m_queue.push(wrapper);
+	auto event = std::make_shared<EventWrapper>((int)Event::Close);
+	// WARNING - do not lock
+	//std::unique_lock<std::mutex> lock(m_mutex);
+	m_queue.push(event);
 	m_condition.notify_one();
-	//:ERROR - End thread, dead lock!
-	m_thread->join();
-	m_thread = nullptr;
+
+	if (m_thread->joinable()) {
+		m_thread->join();
+	}
 }
 
 
@@ -118,7 +122,7 @@ void WorkerThread::PostEvent(const wchar_t* pEventData, bool copyData)
 
 	wchar_t* pData = (wchar_t*)pEventData;
 	if (copyData) {
-		int length = ::wcslen(pEventData);
+		size_t length = ::wcslen(pEventData);
 		pData = new wchar_t[length + 1];
 		::wcsncpy(pData, pEventData, length);
 		pData[length] = 0;
@@ -156,10 +160,10 @@ void WorkerThread::SetUserFunc(std::function<void(const wchar_t*)> func)
 
 void WorkerThread::StartTimer(UINT milliseconds)
 {
-	if (milliseconds > 0 && m_timer == nullptr) {
-		m_timerInterver = milliseconds;
-		m_timer = std::make_unique<std::thread>(&WorkerThread::TimerThread, this);
-	}
+	//if (milliseconds > 0 && m_timer == nullptr) {
+	//	m_timerInterver = milliseconds;
+	//	m_timer = std::make_unique<std::thread>(&WorkerThread::TimerThread, this);
+	//}
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -188,9 +192,19 @@ void WorkerThread::Process()
 			}
 			return;
 
-		case Event::Timer:	OnTimer(); break;
-		case Event::Signal:	OnSignal(wrapper); break;
-		case Event::User:	OnUser(wrapper); break;
+		case Event::Timer:
+			OnTimer();
+			break;
+
+		case Event::Signal:
+			if (OnSignal(wrapper) == false) {
+				return;
+			}
+			break;
+
+		case Event::User:
+			OnUser(wrapper);
+			break;
 
 		default:
 			DEBUG_STOP;

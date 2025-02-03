@@ -38,7 +38,7 @@ namespace Property
 		DECLARE_MESSAGE_MAP()
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class IconComboBoxCtrl : public CBCGPComboBox
 	{
@@ -62,7 +62,7 @@ namespace Property
 		CStringList& m_iconNames;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class SliderCtrl : public CBCGPSliderCtrl
 	{
@@ -87,7 +87,9 @@ namespace Property
 		CBrush m_brBackground;
 	};
 
-#pragma endregion //:REGION
+#pragma endregion // REGION
+
+#pragma region Propertis
 
 	class Color : public CBCGPColorProp
 	{
@@ -102,24 +104,45 @@ namespace Property
 		void OnCloseCombo() override;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class Coordinate : public CBCGPProp
 	{
+		// Combo
+		CBCGPToolBarImages m_icons;
+		CStringList m_iconNames;
+		// Buttons
+		CBCGPToolBarImages m_buttonImages;
+		int m_nClickedButton = -1;
+
 	public:
 
 		Coordinate(const CString& name, const CString& value, LPCTSTR lpDescr = NULL, DWORD_PTR data = NULL);
 
 	protected:
 
+		void AdjustButtonRect() override;
+
+		CComboBox* CreateCombo(CWnd* pWndParent, CRect rect) override;
+
 		CWnd* CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultFormat) override;
 
 		BOOL HasButton() const override;
 
 		void OnClickButton(CPoint point) override;
+
+		void OnDPIChanged(UINT nDPIOld, UINT nDPINew) override;
+
+		void OnDrawButton(CDC* pDC, CRect rectButton) override;
+
+		BOOL OnUpdateValue() override;
+
+	private:
+
+		void LoadImages();
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class ComboButton : public CBCGPProp
 	{
@@ -140,7 +163,7 @@ namespace Property
 		void OnDrawButton(CDC* pDC, CRect rectButton) override;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class CommandButton : public CBCGPProp
 	{
@@ -168,7 +191,7 @@ namespace Property
 		bool m_bHighlighted = false;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class CustomColor : public CBCGPColorProp
 	{
@@ -183,7 +206,7 @@ namespace Property
 		BOOL OnDrawPaletteColorBox(CDC* pDC, const CRect rectColor, COLORREF color, BOOL bIsAutomatic, BOOL bIsSelected, BOOL bOnPopupMenu) override;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class CustomDescription : public CBCGPProp
 	{
@@ -198,7 +221,7 @@ namespace Property
 		virtual void OnDrawDescription(CDC* pDC, CRect rect);
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class CustomDialog : public CBCGPProp
 	{
@@ -215,7 +238,7 @@ namespace Property
 		void OnClickButton(CPoint point) override;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class CustomState : public CBCGPProp
 	{
@@ -242,7 +265,7 @@ namespace Property
 		CBCGPToolBarImages m_images;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class Duration : public CBCGPProp
 	{
@@ -285,7 +308,7 @@ namespace Property
 		DurationCtrl m_wndDuration;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class FoldersDialog : public CBCGPProp
 	{
@@ -300,7 +323,7 @@ namespace Property
 		void OnClickButton(CPoint point) override;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class FontCombo : public CBCGPProp
 	{
@@ -315,7 +338,7 @@ namespace Property
 		CWnd* CreateInPlaceEdit(CRect rectEdit, BOOL& bDefaultFormat) override;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class HexValue : public CBCGPProp
 	{
@@ -336,7 +359,7 @@ namespace Property
 		BOOL TextToVar(const CString& strText) override;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class IconCombo : public CBCGPProp
 	{
@@ -361,7 +384,7 @@ namespace Property
 		std::vector<int> m_indents;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class IconList : public CBCGPProp
 	{
@@ -385,7 +408,7 @@ namespace Property
 		CStringList m_iconNames;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class Password : public CBCGPProp
 	{
@@ -402,13 +425,13 @@ namespace Property
 		CString FormatProperty() override;
 
 		//LPCTSTR GetXMLTagName() const override;
-		//:WARNING - Don't save password in XML!
+		// WARNING - Don't save password in XML!
 		CString GetXMLValue() const override;
-		//:WARNING - Don't copy password to the clipboard!
+		// WARNING - Don't copy password to the clipboard!
 		BOOL IsCopyAvailable() const override;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class RangeValidation : public CBCGPProp
 	{
@@ -432,7 +455,7 @@ namespace Property
 		long m_maxValue = LONG_MAX;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class Slider : public CBCGPProp
 	{
@@ -463,7 +486,7 @@ namespace Property
 		int m_step = 1;
 	};
 
-
+//--------------------------------------------------------------------------------------------------
 
 	class TwoButtons : public CBCGPProp
 	{
@@ -492,4 +515,6 @@ namespace Property
 
 		void LoadImages();
 	};
+
+#pragma endregion // REGION
 }

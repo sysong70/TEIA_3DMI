@@ -69,12 +69,12 @@ public:
 		return globalUtils.ScaleByDPI(CSize(28, 29));
 	}
 
-	//:WARNING - remove menu arrow
+	// WARNING - remove menu arrow
 	virtual void OnDrawMenuArrow(CDC* pDC, const CRect& rectMenuArrow) override
 	{
 	}
 
-	//:CHECK
+	// CHECK
 	//virtual COLORREF OnFillBackground(CDC* pDC) override
 	//{
 	//	ASSERT_VALID(this);
@@ -147,10 +147,12 @@ bool Component::StatusBar::Initialize(CWnd* pMainFrame)
 	os->EnablePopupDialog(RUNTIME_CLASS(Dialog::ObjectSnaps), IDD_DMI_DROPDOWN, FALSE, FALSE, TRUE);
 	AddExtendedElement(os, L"");
 
-#ifdef _DEBUG
-	//GetElement(0)->SetText(L"Message Pane");
-	//GetExElement(0)->SetText(L"Coordinate Pane");
-#endif
+	// CHECK
+	GetElement(0)->SetText(Facility::Local(L"Select a command|명령을 선택하세요"));
+	// CHECK - how to Initialize width?
+	CBCGPRibbonStatusBarPane* pCoord = (CBCGPRibbonStatusBarPane*)GetExElement(0);
+	pCoord->SetText(L"0000000000.0000, 0000000000.0000");
+	pCoord->Redraw();
 
 	return true;
 }
@@ -191,11 +193,6 @@ void Component::StatusBar::ShowMessage(Json::Object& data)
 
 void Component::StatusBar::ShowCoordinate(Json::Object& data)
 {
-	CBCGPRibbonStatusBarPane* pPane = (CBCGPRibbonStatusBarPane*)GetExElement(0);
-	if (pPane == nullptr) {
-		DEBUG_RETURN;
-	}
-
 	CString coord;
 	if (data.FindValue(SKW_Z) == nullptr) {
 		coord.Format(L"%.4f, %.4f", data.GetReal(SKW_X), data.GetReal(SKW_Y));
@@ -204,8 +201,28 @@ void Component::StatusBar::ShowCoordinate(Json::Object& data)
 		coord.Format(L"%.4f, %.4f, %.4f", data.GetReal(SKW_X), data.GetReal(SKW_Y), data.GetReal(SKW_Z));
 	}
 
-	pPane->SetText(coord);
+	ShowCoordinate(coord);
+}
+
+void Component::StatusBar::ShowCoordinate(const CString& value)
+{
+	CBCGPRibbonStatusBarPane* pPane = (CBCGPRibbonStatusBarPane*)GetExElement(0);
+	if (pPane == nullptr) {
+		DEBUG_RETURN;
+	}
+
+	pPane->SetText(value);
 	pPane->Redraw();
+}
+
+void Component::StatusBar::ShowCoordinate(double x, double y)
+{
+	ShowCoordinate(WStr::Format(L"%.4f, %.4f", x, y));
+}
+
+void Component::StatusBar::ShowCoordinate(double x, double y, double z)
+{
+	ShowCoordinate(WStr::Format(L"%.4f, %.4f, %.4f", x, y, z));
 }
 
 #undef PRESET
