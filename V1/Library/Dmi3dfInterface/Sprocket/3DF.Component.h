@@ -15,15 +15,14 @@ namespace H3DF
             GenericMask = 0xfffff000,
 
             ExchangeComponentMask = 0x00001000, // Mask for any Exchange components.
-            ExchangeModelFile =
-                0x00001001, // Represents an A3DAsmModelFile in Exchange.  This will be represented by an Exchange::CADModel.
+            ExchangeModelFile = 0x00001001, // Represents an A3DAsmModelFile in Exchange.  This will be represented by an Exchange::CADModel.
             ExchangeProductOccurrence = 0x00001002, // Represents an A3DAsmProductOccurrence in Exchange.  This will be
                                                     // represented by an Exchange::Component.
             ExchangePartDefinition = 0x00001003, // Represents an A3DAsmPartDefinition in Exchange.  This will be represented by
                                                  // an Exchange::Component.
 
             ExchangeMkpView = 0x00001004, // Represents an A3DMkpView in Exchange.  This will be represented by an
-                                       // Exchange::Capture component.
+                                          // Exchange::Capture component.
             ExchangeFilter = 0x00001005, // Represents an A3DMkpFilter in Exchange.  This will be represented by an
                                          // Exchange::Filter component.
 
@@ -110,14 +109,14 @@ namespace H3DF
             DWGLayerTable = 0x00100006, // Represents an AcDbLayerTable in RealDWG.
             DWGLayer = 0x00100007, // Represents an AcDbLayer in RealDWG.
 
-            UserComponent = 0x01000000, // Represents a user created component
+			UserComponentMask = 0x01000000, // Mask for any user component.
+            UserComponent = UserComponentMask, // Represents a user created component
 
-            ModelsComponent = 0x01000001, // Represents a model component
-            MeasurementsComponent = 0x01000002, // Represents a model component
-            MarkupsComponent = 0x01000003, // Represents a model component
-            ViewGroupComponent = 0x01000004, // UI에서 View를 Group으로 나타내기 위한 Type;
-            AnnotationViewGroupComponent = 0x01000005, // UI에서 Annotation View를 Group으로 나타내기 위한 Type;
-            PMIGroupComponent = 0x01000006, // UI에서 Pmi를 Group으로 나타내기 위한 Type;
+            MeasurementsComponent = 0x01000001, // Represents a model component
+            MarkupsComponent = 0x01000002, // Represents a model component
+            ViewGroupComponent = 0x01000003, // UI에서 View를 Group으로 나타내기 위한 Type;
+            AnnotationViewGroupComponent = 0x01000004, // UI에서 Annotation View를 Group으로 나타내기 위한 Type;
+            PMIGroupComponent = 0x01000005, // UI에서 Pmi를 Group으로 나타내기 위한 Type;
         };
 
 		enum Status

@@ -27,7 +27,7 @@ namespace H3DF
 		Style() {}
 	};
 
-	using StyleTypeArray = std::vector<Style::Type, Allocator<Style::Type>>;
+	using StyleTypeArray = std::vector<Style::Type>;
 
 	class API_3DF NamedStyleDefinition : public Definition
 	{

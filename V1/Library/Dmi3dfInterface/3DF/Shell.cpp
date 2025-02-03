@@ -89,6 +89,7 @@ size_t H3DF::ShellKit::GetPointCount() const
 
 	return pcImpl->m_pacPointArray->size();
 }
+
 size_t H3DF::ShellKit::GetFacelistCount() const
 {
 	ShellKitImpl * pcImpl = (ShellKitImpl *)m_pcImpl;
@@ -504,4 +505,303 @@ ShellKey & H3DF::ShellKey::operator = (ShellKey const & cInThat)
 {
 	Set(cInThat);
 	return *this;
+}
+
+
+size_t H3DF::ShellKey::GetPointCount() const
+{
+	if (INVALID_KEY == KeyValue()) {
+		return 0;
+	}
+
+	int nPointCount = 0;
+	int nFacelistCount = 0;
+	HC_Show_Shell_Size(KeyValue(), &nPointCount, &nFacelistCount);
+	return nPointCount;
+}
+
+size_t H3DF::ShellKey::GetFacelistCount() const
+{
+	if (INVALID_KEY == KeyValue()) {
+		return 0;
+	}
+
+	int nPointCount = 0;
+	int nFacelistCount = 0;
+	HC_Show_Shell_Size(KeyValue(), &nPointCount, &nFacelistCount);
+	return nFacelistCount;
+}
+
+size_t H3DF::ShellKey::GetTristripsCount() const
+{
+	if (INVALID_KEY == KeyValue()) {
+		return 0;
+	}
+
+	int nTristripCount = 0;
+	HC_Show_Shell_Tristrip_Count(KeyValue(), &nTristripCount);
+
+	return nTristripCount;
+}
+
+ShellKey & H3DF::ShellKey::UnsetPoints()
+{
+	if (INVALID_KEY == KeyValue()) {
+		return *this;
+	}
+
+	int nPointCount = 0;
+	int nFacelistCount = 0;
+	HC_Show_Shell_Size(KeyValue(), &nPointCount, &nFacelistCount);
+	if (0 == nPointCount) {
+		return *this;
+	}
+
+	HC_Edit_Shell_Points(KeyValue(), 0, nPointCount, 0, nullptr);
+
+	HC_Show_Shell_Size(KeyValue(), &nPointCount, &nFacelistCount);
+
+	return *this;
+}
+
+ShellKey & H3DF::ShellKey::UnsetFacelist()
+{
+	if (INVALID_KEY == KeyValue()) {
+		return *this;
+	}
+
+	int nPointCount = 0;
+	int nFacelistCount = 0;
+	HC_Show_Shell_Size(KeyValue(), &nPointCount, &nFacelistCount);
+	if (0 == nPointCount) {
+		return *this;
+	}
+
+	HC_Edit_Shell_Points(KeyValue(), 0, nPointCount, 0, nullptr);
+
+	HC_Show_Shell_Size(KeyValue(), &nPointCount, &nFacelistCount);
+
+	return *this;
+}
+
+ShellKey & H3DF::ShellKey::UnsetVertexNormals()
+{
+	if (INVALID_KEY == KeyValue()) {
+		return *this;
+	}
+
+	int nPointCount = 0;
+	int nFacelistCount = 0;
+	HC_Show_Shell_Size(KeyValue(), &nPointCount, &nFacelistCount);
+	if (0 == nPointCount) {
+		return *this;
+	}
+
+	HC_MUnSet_Vertex_Normals(KeyValue(), 0, nPointCount);
+
+	return *this;
+}
+
+bool H3DF::ShellKey::ShowPoints(PointArray & arOutPoints) const
+{
+	if (INVALID_KEY == KeyValue()) {
+		return false;
+	}
+	int nPointCount = 0;
+	int nFacelistCount = 0;
+	HC_Show_Shell_Size(KeyValue(), &nPointCount, &nFacelistCount);
+	if (0 == nPointCount) {
+		return false;
+	}
+
+	arOutPoints.resize(nPointCount);
+
+	HC_Show_Shell(KeyValue(), &nPointCount, arOutPoints.data(), &nFacelistCount, nullptr);
+
+	return true;
+}
+
+bool H3DF::ShellKey::ShowFacelist(IntArray & arOutFacelist) const
+{
+	if (INVALID_KEY == KeyValue()) {
+		return false;
+	}
+
+	int nPointCount = 0;
+	int nFacelistCount = 0;
+	HC_Show_Shell_Size(KeyValue(), &nPointCount, &nFacelistCount);
+	if (0 == nPointCount) {
+		return false;
+	}
+
+	arOutFacelist.resize(nFacelistCount);
+
+	HC_Show_Shell(KeyValue(), &nPointCount, nullptr, &nFacelistCount, arOutFacelist.data());
+
+	return true;
+}
+
+bool H3DF::ShellKey::ShowTristrips(IntArray & arOutTristrips) const
+{
+	if (INVALID_KEY == KeyValue()) {
+		return false;
+	}
+
+	int nPointCount = 0;
+	int nTristripsLength = 0;
+	int nFaceIndicesLength = 0;
+	HC_Show_Shell_By_Tristrips_Size(KeyValue(), &nPointCount, &nTristripsLength, &nFaceIndicesLength);
+	if (0 == nPointCount) {
+		return false;
+	}
+
+	HC_Show_Shell_By_Tristrips(KeyValue(), &nPointCount, nullptr, &nTristripsLength, arOutTristrips.data(), &nFaceIndicesLength, nullptr);
+
+	return true;
+}
+
+bool H3DF::ShellKey::ShowTristrips(IntArray & arOutTristrips, IntArray & arOutFaceIndices) const
+{
+	if (INVALID_KEY == KeyValue()) {
+		return false;
+	}
+
+	int nPointCount = 0;
+	int nTristripsLength = 0;
+	int nFaceIndicesLength = 0;
+	HC_Show_Shell_By_Tristrips_Size(KeyValue(), &nPointCount, &nTristripsLength, &nFaceIndicesLength);
+	if (0 == nPointCount) {
+		return false;
+	}
+
+	arOutTristrips.resize(nTristripsLength);
+	arOutFaceIndices.resize(nFaceIndicesLength);
+
+	HC_Show_Shell_By_Tristrips(KeyValue(), &nPointCount, nullptr, &nTristripsLength, arOutTristrips.data(), &nFaceIndicesLength, arOutFaceIndices.data());
+
+	return true;
+}
+
+/**
+ * @brief Shell 키의 Vertex Normal 데이터를 가져옵니다.
+ *
+ * 이 메서드는 Shell 키에 저장된 Vertex Normal 데이터를 추출하고, 각 Vertex의 유효성 정보도 함께 제공합니다.
+ *
+ * @param[out] arOutValidities 각 Vertex의 Normal 데이터 유효성을 나타내는 배열.
+ * @param[out] arOutNormals 각 Vertex의 Normal 데이터를 저장할 배열.
+ *
+ * @return Vertex Normal 데이터를 성공적으로 가져왔으면 true, 그렇지 않으면 false.
+ *
+ * @details
+ * - Shell 키가 유효한지 확인한 후 데이터를 처리합니다.
+ * - 각 Vertex의 Normal 데이터를 `arOutNormals`에 저장합니다.
+ * - 각 Vertex가 유효한지 여부를 `arOutValidities`에 저장합니다.
+ */
+
+bool H3DF::ShellKey::ShowVertexNormals(BoolArray & arOutValidities, VectorArray & arOutNormals) const
+{
+	if (INVALID_KEY == KeyValue()) {
+		return false;
+	}
+
+	// Shell 정보 수집
+	int nPointCount = 0;
+	int nFacelistCount = 0;
+	HC_Show_Shell_Size(KeyValue(), &nPointCount, &nFacelistCount);
+	if (0 == nPointCount) {
+		return false;
+	}
+
+	arOutNormals.resize(nPointCount);
+	arOutValidities.resize(nPointCount);
+
+	std::vector<char> vExistenceBuffer(nPointCount);
+
+	HC_MShow_Vertex_Normals_With_Existence(KeyValue(), 0, nPointCount, vExistenceBuffer.data(), arOutNormals.data());
+
+	for (int i = 0; i < nPointCount; i++) {
+		arOutValidities[i] = (vExistenceBuffer[i] != 0);
+	}
+
+	return true;
+}
+
+/**
+ * @brief Shell 키의 Net Vertex Normal 데이터를 가져옵니다.
+ *
+ * 이 메서드는 Shell 키에서 Net Vertex Normal 데이터를 추출하여 출력 벡터에 저장합니다.
+ *
+ * @param[out] arOutNormals Net Vertex Normal 데이터를 저장할 벡터.
+ *
+ * @return Net Vertex Normal 데이터를 성공적으로 가져왔으면 true, 그렇지 않으면 false.
+ *
+ * @details
+ * - 먼저 Shell 키가 유효한지 확인합니다.
+ * - Shell에서 포인트 개수와 Facelist 정보를 가져옵니다.
+ * - Net Vertex Normal 데이터를 출력 벡터에 저장합니다.
+ */
+bool H3DF::ShellKey::ShowNetVertexNormals(VectorArray & arOutNormals) const
+{
+	if (INVALID_KEY == KeyValue()) {
+		return false;
+	}
+
+	// Shell 정보 수집
+	int nPointCount = 0;
+	int nFacelistCount = 0;
+	HC_Show_Shell_Size(KeyValue(), &nPointCount, &nFacelistCount);
+	if (0 == nPointCount) {
+		return false;
+	}
+
+	// Normal Vector 추출
+	arOutNormals.resize(nPointCount);
+	HC_MShow_Net_Vertex_Normals(KeyValue(), 0, nPointCount, arOutNormals.data());
+
+	return true;
+}
+
+/**
+ * @brief Shell 키 내 모든 Region의 Facelist 데이터를 가져옵니다.
+ *
+ * 이 메서드는 Shell 키에 정의된 Region을 탐색하고 각 Region의 Facelist 데이터를 추출합니다.
+ * 추출된 데이터는 2D 배열로 저장되며, 각 내부 배열은 특정 Region의 Facelist를 나타냅니다.
+ *
+ * @param[out] arOutFacelist 모든 Region의 Facelist 데이터를 저장할 2D 배열.
+ *
+ * @return Region Facelist 데이터를 성공적으로 가져왔으면 true, 그렇지 않으면 false.
+ *
+ * @details
+ * - 먼저 Shell 키가 유효한지와 Region 범위가 존재하는지 확인합니다.
+ * - 범위 내 각 Region에 대해 Face 개수와 해당 Facelist를 가져옵니다.
+ * - Face 데이터가 없는 Region은 건너뜁니다.
+ * - 각 Region의 Facelist를 출력 배열로 이동하여 불필요한 복사를 최소화합니다.
+ */
+bool H3DF::ShellKey::ShowRegionFacelist(Int2DArray & arOutFacelist) const
+{
+	if (INVALID_KEY == KeyValue()) {
+		return false;
+	}
+
+	int nLowNo = 0, nHighNo = 0;
+	HC_Show_Region_Range(KeyValue(), &nLowNo, &nHighNo);
+	if (0 == nLowNo || 0 == nHighNo) {
+		return false;
+	}
+
+	for (int nRegionNo = nLowNo; nRegionNo <= nHighNo; nRegionNo++)
+	{
+		int nRegionFaceCount = 0;
+		HC_MShow_Region_Faces_Count(KeyValue(), nRegionNo, &nRegionFaceCount);
+
+		if (0 == nRegionFaceCount) {
+			continue;
+		}
+
+		std::vector<int> arFacelist(nRegionFaceCount);
+		HC_MShow_Region_Faces(KeyValue(), nRegionNo, &nRegionFaceCount, arFacelist.data());
+		arOutFacelist.push_back(std::move(arFacelist));
+	}
+
+	return true;
 }

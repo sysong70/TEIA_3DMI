@@ -44,7 +44,7 @@ namespace H3DF
 		bool ShowTristrips(IntArray const *& acOutTristrips) const;
 		bool ShowParameters(FloatArray const *& aOutParameters) const;
 		bool ShowColors(RGBAColorArray const *& aOutColors) const;
-
+				
 		ShellKit & SetMaterialMapping(MaterialMappingKit const & cInkit);
 
 		//== Shell 생성용 함수 =======================================================================
@@ -76,5 +76,22 @@ namespace H3DF
 
 		void Set(ShellKey const & cInThat);
 		ShellKey & operator = (ShellKey const & cInThat);
+
+		size_t GetPointCount() const;
+		size_t GetFacelistCount() const;
+		size_t GetTristripsCount() const;
+
+		ShellKey & UnsetPoints();
+		ShellKey & UnsetFacelist();
+		ShellKey & UnsetVertexNormals();
+
+		bool ShowPoints(PointArray & arOutPoints) const;
+		bool ShowFacelist(IntArray & arOutFacelist) const;
+		bool ShowTristrips(IntArray & arOutTristrips) const;
+		bool ShowTristrips(IntArray & arOutTristrips, IntArray & arOutFaceIndices) const;
+		bool ShowVertexNormals(BoolArray & arOutValidities, VectorArray & arOutNormals) const;
+		bool ShowNetVertexNormals(VectorArray & arOutNormals) const;
+
+		bool ShowRegionFacelist(Int2DArray & arOutFacelist) const;
 	};
 }

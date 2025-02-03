@@ -13,60 +13,18 @@
 #	define USED_LOG_MANAGER
 #endif
 
-#	define USED_LOG_MANAGER
-
 #ifdef USED_LOG_MANAGER
 
-void Log::CreateLog(int nId, const WCHAR * pchFilePathName)
-{
-	LogManager::SetCurrentId(nId);
-
-	LogManager::CreateLog(nId, pchFilePathName);
-	LogManager::SetFileCloseFlag(true);
-	LogManager::SetWriteLog(nId, true);
-	LogManager::ResetTabIndex(nId);
-}
-
-void Log::Write(int nId, LPCWSTR chMessage, ...)
-{
-	va_list cArgList;
-	va_start(cArgList, chMessage);
-
-	CString strBuffer;
-	strBuffer.FormatV(chMessage, cArgList);
-
-	va_end(cArgList);
-
-	LogManager::GetInstance()->WriteLog(nId, strBuffer);
-}
-
-void Log::Write(int nId, LPCSTR chMessage, ...)
-{
-	va_list cArgList;
-	va_start(cArgList, chMessage);
-
-	CStringA strBuffer;
-	strBuffer.FormatV(chMessage, cArgList);
-
-	va_end(cArgList);
-
-	CString strText(strBuffer);
-	LogManager::GetInstance()->WriteLog(nId, strText);
-}
-
-void Log::IncreaseTabIndex(int nId)
-{
-	LogManager::IncreaseTabIndex(nId);
-}
-
-void Log::DecreaseTabIndex(int nId)
-{
-	LogManager::DecreaseTabIndex(nId);
-}
+#define LOG_3DX_ID		2
 
 void Log::CreateLog(const WCHAR * pchFilePathName)
 {
-	CreateLog(2, pchFilePathName);
+	LogManager::SetCurrentId(LOG_3DX_ID);
+	LogManager::SetWriteLog(LOG_3DX_ID, true);
+
+	LogManager::CreateLog(LOG_3DX_ID, pchFilePathName);
+	
+	LogManager::ResetTabIndex(LOG_3DX_ID);
 }
 
 void Log::Write(LPCWSTR chMessage, ...)
@@ -79,7 +37,7 @@ void Log::Write(LPCWSTR chMessage, ...)
 
 	va_end(cArgList);
 
-	LogManager::GetInstance()->WriteLog(2, strBuffer);
+	LogManager::Log(LOG_3DX_ID, strBuffer);
 }
 
 void Log::Write(LPCSTR chMessage, ...)
@@ -93,19 +51,55 @@ void Log::Write(LPCSTR chMessage, ...)
 	va_end(cArgList);
 
 	CString strText(strBuffer);
-	LogManager::GetInstance()->WriteLog(2, strText);
+	LogManager::Log(LOG_3DX_ID, strText);
 }
 
+void Log::Write(int nLogLevel, LPCWSTR chMessage, ...)
+{
+	va_list cArgList;
+	va_start(cArgList, chMessage);
+
+	CString strBuffer;
+	strBuffer.FormatV(chMessage, cArgList);
+
+	va_end(cArgList);
+
+	LogManager::Log(LOG_3DX_ID, nLogLevel, strBuffer);
+}
+
+void Log::Write(int nLogLevel, LPCSTR chMessage, ...)
+{
+	va_list cArgList;
+	va_start(cArgList, chMessage);
+
+	CStringA strBuffer;
+	strBuffer.FormatV(chMessage, cArgList);
+
+	va_end(cArgList);
+
+	CString strText(strBuffer);
+	LogManager::Log(LOG_3DX_ID, nLogLevel, strText);
+}
 void Log::IncreaseTabIndex()
 {
-	IncreaseTabIndex(2);
+	LogManager::IncreaseTabIndex(LOG_3DX_ID);
 }
 
 void Log::DecreaseTabIndex()
 {
-	DecreaseTabIndex(2);
+	LogManager::DecreaseTabIndex(LOG_3DX_ID);
 }
-\
+
+void Log::SetLogLevel(int nLogLevel)
+{
+	LogManager::SetLogLevel(LOG_3DX_ID, nLogLevel);
+}
+
+int Log::GetLogLevel()
+{
+	return LogManager::GetLogLevel(LOG_3DX_ID);
+}
+
 void Log::Position(A3DMDPosition * pcInData)
 {
 	if (nullptr == pcInData) {
@@ -167,11 +161,16 @@ void Log::Position(A3DMDPosition * pcInData)
 
 void Log::Vector3dData(A3DVector3dData & cData, CStringA strPrompt)
 {
+	Vector3dData(0, cData, strPrompt);
+}
+
+void Log::Vector3dData(int nLogLevel, A3DVector3dData & cData, CStringA strPrompt)
+{
 	if (true == strPrompt.IsEmpty()) {
-		Write(2, "VectorData: %f, %f, %f", cData.m_dX, cData.m_dY, cData.m_dZ);
+		Write(nLogLevel, "VectorData: %f, %f, %f", cData.m_dX, cData.m_dY, cData.m_dZ);
 	}
 	else {
-		Write(2, "%s: %f, %f, %f", strPrompt, cData.m_dX, cData.m_dY, cData.m_dZ);
+		Write(nLogLevel, "%s: %f, %f, %f", strPrompt, cData.m_dX, cData.m_dY, cData.m_dZ);
 	}
 }
 
@@ -200,69 +199,78 @@ void Log::View(A3DMkpView * pcView, A3DMkpViewData & cViewData)
 	CString strName;
 	GetName(pcView, strName);
 
-	Write(2, L"MkpView: %s, '%s'", HexStr((DWORD_PTR)pcView), strName);
+	Write(L"MkpView: %s, '%s'", HexStr((DWORD_PTR)pcView), strName);
 
-	IncreaseTabIndex(2); {
+	IncreaseTabIndex(); {
 		SurfPlane(cViewData.m_pPlane);
 
 		// SceneDisplayParameters 정보 수집
 		if (nullptr != cViewData.m_pSceneDisplayParameters) {
-			Write(2, "Scene Display Parameters Information");
+			Write("Scene Display Parameters Information");
 
-			IncreaseTabIndex(2); {
+			IncreaseTabIndex(); {
 				A3DGraphSceneDisplayParametersData sData;
 				A3D_INITIALIZE_DATA(A3DGraphSceneDisplayParametersData, sData);
 				if (A3D_SUCCESS == A3DGraphSceneDisplayParametersGet(cViewData.m_pSceneDisplayParameters, &sData)) {
-					Write(2, "IsActive: %s", BoolStrA(sData.m_bIsActive));
+					Write("IsActive: %s", BoolStrA(sData.m_bIsActive));
 					GraphCamera(sData.m_pCamera);
-					Write(2, "LightSize: %d", sData.m_uiLightSize);
-					Write(2, "PlaneSize: %d", sData.m_uiPlaneSize);
+					Write("LightSize: %d", sData.m_uiLightSize);
+					Write("PlaneSize: %d", sData.m_uiPlaneSize);
 					for (A3DUns32 nIndex = 0; nIndex < sData.m_uiPlaneSize; nIndex++) {
 						SurfPlane(sData.m_ppClippingPlanes[nIndex]);
 					}
-					Write(2, "HasRotationCenter: %s", BoolStrA(sData.m_bHasRotationCenter));
+					Write("HasRotationCenter: %s", BoolStrA(sData.m_bHasRotationCenter));
 					Vector3dData(sData.m_sRotationCenter, "RotationCenter");
-					Write(2, "BackgroundStyleIndex: %d", sData.m_uiBackgroundStyleIndex);
-					Write(2, "DefaultStyleIndex: %d", sData.m_uiDefaultStyleIndex);
-					Write(2, "DefaultPerTypeIndexSize: %d", sData.m_uiDefaultPerTypeIndexSize);
+					Write("BackgroundStyleIndex: %d", sData.m_uiBackgroundStyleIndex);
+					Write("DefaultStyleIndex: %d", sData.m_uiDefaultStyleIndex);
+					Write("DefaultPerTypeIndexSize: %d", sData.m_uiDefaultPerTypeIndexSize);
 				}
 
 				A3DGraphSceneDisplayParametersGet(nullptr, &sData);
-			} DecreaseTabIndex(2);
+			} DecreaseTabIndex();
+		}
+		else {
+			Write("No Scene Display Parameters Information");
 		}
 
 		if (A3D_TRUE == cViewData.m_bIsAnnotationView) {
-			Write(2, "Annotation View Type");
+			Write("Annotation View Type");
+		}
+		else {
+			Write("No Annotation View Type");
 		}
 
 		if (A3D_TRUE == cViewData.m_bIsDefaultView) {
-			Write(2, "Default View Type");
+			Write("Default View Type");
+		}
+		else {
+			Write("No Default View Type");
 		}
 
-		Write(2, "Linked Items Size: %d", cViewData.m_uiLinkedItemsSize);
+		Write("Linked Items Size: %d", cViewData.m_uiLinkedItemsSize);
 
-		Write(2, "Display Filter Size: %d", cViewData.m_uiDisplayFilterSize);
+		Write("Display Filter Size: %d", cViewData.m_uiDisplayFilterSize);
 
-	} DecreaseTabIndex(2);
+	} DecreaseTabIndex();
 }
 
 void Log::SurfPlane(A3DSurfPlane * pcInData)
 {
 	if (nullptr == pcInData) {
-		Write(2, "SurfPlane: NULL");
+		Write("SurfPlane: NULL");
 		return;
 	}
 
-	Write(2, "SurfPlane: %s", HexStrA((DWORD_PTR)pcInData));
+	Write("SurfPlane: %s", HexStrA((DWORD_PTR)pcInData));
 
 	A3DSurfPlaneData cData;
 	A3D_INITIALIZE_DATA(A3DSurfPlaneData, cData);
 
 	if (A3D_SUCCESS == A3DSurfPlaneGet(pcInData, &cData)) {
-		IncreaseTabIndex(2); {
-			Write(2, "Origin: %f, %f, %f", cData.m_sTrsf.m_sOrigin.m_dX, cData.m_sTrsf.m_sOrigin.m_dY, cData.m_sTrsf.m_sOrigin.m_dZ);
-			Write(2, "X Axis: %f, %f, %f", cData.m_sTrsf.m_sXVector.m_dX, cData.m_sTrsf.m_sXVector.m_dY, cData.m_sTrsf.m_sXVector.m_dZ);
-			Write(2, "Y Axis: %f, %f, %f", cData.m_sTrsf.m_sYVector.m_dX, cData.m_sTrsf.m_sYVector.m_dY, cData.m_sTrsf.m_sYVector.m_dZ);
+		IncreaseTabIndex(); {
+			Write("Origin: %f, %f, %f", cData.m_sTrsf.m_sOrigin.m_dX, cData.m_sTrsf.m_sOrigin.m_dY, cData.m_sTrsf.m_sOrigin.m_dZ);
+			Write("X Axis: %f, %f, %f", cData.m_sTrsf.m_sXVector.m_dX, cData.m_sTrsf.m_sXVector.m_dY, cData.m_sTrsf.m_sXVector.m_dZ);
+			Write("Y Axis: %f, %f, %f", cData.m_sTrsf.m_sYVector.m_dX, cData.m_sTrsf.m_sYVector.m_dY, cData.m_sTrsf.m_sYVector.m_dZ);
 
 			CStringA strBehaviourInfo;
 			if (kA3DTransformationIdentity & cData.m_sTrsf.m_ucBehaviour) {
@@ -284,16 +292,16 @@ void Log::SurfPlane(A3DSurfPlane * pcInData)
 				strBehaviourInfo += "NonUniformScale ";
 			}
 
-			Write(2, "Scale: %f, Behaviour: %s", cData.m_sTrsf.m_sScale, strBehaviourInfo);
+			Write("Scale: %f, Behaviour: %s", cData.m_sTrsf.m_sScale, strBehaviourInfo);
 
-			// Write(2, "Min Domain: %f, %f", sSurfPlaneData.m_sParam.m_sUVDomain.m_sMin.m_dX, sSurfPlaneData.m_sParam.m_sUVDomain.m_sMin.m_dY);
-			// Write(2, "Max Domain: %f, %f", sSurfPlaneData.m_sParam.m_sUVDomain.m_sMax.m_dX, sSurfPlaneData.m_sParam.m_sUVDomain.m_sMax.m_dY);
+			// Write("Min Domain: %f, %f", sSurfPlaneData.m_sParam.m_sUVDomain.m_sMin.m_dX, sSurfPlaneData.m_sParam.m_sUVDomain.m_sMin.m_dY);
+			// Write("Max Domain: %f, %f", sSurfPlaneData.m_sParam.m_sUVDomain.m_sMax.m_dX, sSurfPlaneData.m_sParam.m_sUVDomain.m_sMax.m_dY);
 
-			Write(2, L"SwapUV: %s", BoolStr(cData.m_sParam.m_bSwapUV));
+			Write(L"SwapUV: %s", BoolStr(cData.m_sParam.m_bSwapUV));
 
-			// Write(2, "CoeffA: %f, %f", sSurfPlaneData.m_sParam.m_dUCoeffA, sSurfPlaneData.m_sParam.m_dVCoeffA);
-			// Write(2, "CoeffB: %f, %f", sSurfPlaneData.m_sParam.m_dUCoeffB, sSurfPlaneData.m_sParam.m_dVCoeffB);
-		} DecreaseTabIndex(2);
+			// Write("CoeffA: %f, %f", sSurfPlaneData.m_sParam.m_dUCoeffA, sSurfPlaneData.m_sParam.m_dVCoeffA);
+			// Write("CoeffB: %f, %f", sSurfPlaneData.m_sParam.m_dUCoeffB, sSurfPlaneData.m_sParam.m_dVCoeffB);
+		} DecreaseTabIndex();
 
 		A3DSurfPlaneGet(nullptr, &cData);
 	}
@@ -306,61 +314,63 @@ void Log::GraphCamera(A3DGraphCamera * pcInCamera)
 		return;
 	}
 
-	Write(2, "Graph Camera Information: %s", HexStrA((DWORD_PTR)pcInCamera));
+	Write("Graph Camera Information: %s", HexStrA((DWORD_PTR)pcInCamera));
 
-	IncreaseTabIndex(2);
+	IncreaseTabIndex();
 	A3DGraphCameraData sCameraData;
 	A3D_INITIALIZE_DATA(A3DGraphCameraData, sCameraData);
 
 	if (A3D_SUCCESS == A3DGraphCameraGet(pcInCamera, &sCameraData)) {
-		IncreaseTabIndex(2); {
-			Write(2, "Orthographic: %s", BoolStrA(sCameraData.m_bOrthographic));
-			Vector3dData(sCameraData.m_sLocation, "Location");
-			Vector3dData(sCameraData.m_sLookAt, "LookAt");
-			Vector3dData(sCameraData.m_sUp, "Up");
-			Write(2, "Fovy: %f, %f", sCameraData.m_dXFovy, sCameraData.m_dYFovy);
-			Write(2, "AspectRatio: %f", sCameraData.m_dAspectRatio);
-			Write(2, "ZNear: %f, ZFar: %f, ZoomFactor: %f", sCameraData.m_dZNear, sCameraData.m_dZFar, sCameraData.m_dZoomFactor);
-		} DecreaseTabIndex(2);
+		Write("Orthographic: %s", BoolStrA(sCameraData.m_bOrthographic));
+		Vector3dData(sCameraData.m_sLocation, "Location");
+		Vector3dData(sCameraData.m_sLookAt, "LookAt");
+		Vector3dData(sCameraData.m_sUp, "Up");
+		Write("Fovy: %f, %f", sCameraData.m_dXFovy, sCameraData.m_dYFovy);
+		Write("AspectRatio: %f", sCameraData.m_dAspectRatio);
+		Write("ZNear: %f, ZFar: %f, ZoomFactor: %f", sCameraData.m_dZNear, sCameraData.m_dZFar, sCameraData.m_dZoomFactor);
 
 		A3DGraphCameraGet(nullptr, &sCameraData);
 	}
 
-	DecreaseTabIndex(2);
+	DecreaseTabIndex();
 }
 
 void Log::LinkedItem(A3DMiscMarkupLinkedItemData & cInData, A3DMiscEntityReferenceData & cRefData, DWORD_PTR nInAddreass)
 {
-	Write(2, "MarkupLinkedItem Information: %s", HexStrA(nInAddreass));
+	Write("MarkupLinkedItem Information: %s", HexStrA(nInAddreass));
 
-	IncreaseTabIndex(2); {
-		Write(2, "MarkupShowControl: %s", BoolStrA(cInData.m_bMarkupShowControl));
-		Write(2, "MarkupDeleteControl: %s", BoolStrA(cInData.m_bMarkupDeleteControl));
-		Write(2, "LeaderShowControl: %s", BoolStrA(cInData.m_bLeaderShowControl));
-		Write(2, "LeaderDeleteControl: %s", BoolStrA(cInData.m_bLeaderDeleteControl));
-		Write(2, "TargetProductOccurrence: %s", HexStrA((DWORD_PTR)cInData.m_pTargetProductOccurrence));
+	IncreaseTabIndex(); {
+		Write("MarkupShowControl: %s", BoolStrA(cInData.m_bMarkupShowControl));
+		Write("MarkupDeleteControl: %s", BoolStrA(cInData.m_bMarkupDeleteControl));
+		Write("LeaderShowControl: %s", BoolStrA(cInData.m_bLeaderShowControl));
+		Write("LeaderDeleteControl: %s", BoolStrA(cInData.m_bLeaderDeleteControl));
+		Write("TargetProductOccurrence: %s", HexStrA((DWORD_PTR)cInData.m_pTargetProductOccurrence));
 
 		CString strName;
 		GetName(cInData.m_pReference, strName);
 
-		Write(2, "Reference: %s, Type: %s, '%s'", HexStrA((DWORD_PTR)cInData.m_pReference), Dmi3dx::GetA3dEntityTypeString(cInData.m_pReference), CStringA(strName));
+		Write("Reference: %s, Type: %s, '%s'", HexStrA((DWORD_PTR)cInData.m_pReference), Dmi3dx::GetA3dEntityTypeString(cInData.m_pReference), CStringA(strName));
 
-		Write(2, "RefData Referenced entity: %s, Type: %s", HexStrA((DWORD_PTR)cRefData.m_pEntity), Dmi3dx::GetA3dEntityTypeString(cRefData.m_pEntity));
-		Write(2, "RefData CoordinateSystem: %s", HexStrA((DWORD_PTR)cRefData.m_pCoordinateSystem), Dmi3dx::GetA3dEntityTypeString(cInData.m_pReference));
-	} DecreaseTabIndex(2);
+		Write("RefData Referenced entity: %s, Type: %s", HexStrA((DWORD_PTR)cRefData.m_pEntity), Dmi3dx::GetA3dEntityTypeString(cRefData.m_pEntity));
+		Write("RefData CoordinateSystem: %s", HexStrA((DWORD_PTR)cRefData.m_pCoordinateSystem), Dmi3dx::GetA3dEntityTypeString(cInData.m_pReference));
+	} DecreaseTabIndex();
 }
 
 //== Dimension Data 관련 함수 ========================================================================
 void Log::DimensionData(const A3DMkpMarkup * pcInData)
 {
+	Write("Dimension Data: %s", HexStrA((DWORD_PTR) pcInData));
+
+	if (1 > GetLogLevel()) {
+		return;
+	}
+
 	A3DMarkupDimensionData cInData;
 	A3D_INITIALIZE_DATA(A3DMarkupDimensionData, cInData);
 	A3DMarkupDimensionGet(pcInData, &cInData);
 
-	Write(2, "Dimension Data: %s", HexStrA((DWORD_PTR)pcInData));
-
-	IncreaseTabIndex(2); {
-		Write(2, "Type: %s, Value: %f, Symbol: %s, AdditionnalSymbol: %s", GetDimensionTypeString(cInData.m_eType), cInData.m_dValue,
+	IncreaseTabIndex(); {
+		Write("Type: %s, Value: %f, Symbol: %s, AdditionnalSymbol: %s", GetDimensionTypeString(cInData.m_eType), cInData.m_dValue,
 			GetDimensionSymbolTypeString(cInData.m_eSymbol), GetDimensionSymbolTypeString(cInData.m_eAdditionnalSymbol));
 
 		CStringA strPosition;
@@ -370,12 +380,12 @@ void Log::DimensionData(const A3DMkpMarkup * pcInData)
 			case 2:	strPosition = "Outside"; break;
 		}
 
-		Write(2, "Suffixe: '%s', Prefixe: '%s', Orientation: %s, Position: %s", cInData.m_pcSuffixe, cInData.m_pcPrefixe,
+		Write("Suffixe: '%s', Prefixe: '%s', Orientation: %s, Position: %s", cInData.m_pcSuffixe, cInData.m_pcPrefixe,
 			GetDimensionOrientationString(cInData.m_eOrientation), strPosition);
 
 		DimensionValue(cInData.m_pMainValue, "Main");
 
-		Write(2, "DualDisplay: %s", GetDimensionDualDisplayString(cInData.m_eDualDisplay));
+		Write("DualDisplay: %s", GetDimensionDualDisplayString(cInData.m_eDualDisplay));
 
 		DimensionValue(cInData.m_pDualValue, "Dual");
 
@@ -425,7 +435,7 @@ void Log::DimensionData(const A3DMkpMarkup * pcInData)
 
 		Write(L"Chamfer dimension markup second value: %f", cInData.m_dChamferDimSecondValue);
 
-	} DecreaseTabIndex(2);
+	} DecreaseTabIndex();
 
 	A3DMarkupDimensionGet(nullptr, &cInData);
 }
@@ -433,7 +443,7 @@ void Log::DimensionData(const A3DMkpMarkup * pcInData)
 void Log::DimensionValue(A3DMDDimensionValue * pcInData, CStringA strPrefix)
 {
 	if (nullptr == pcInData) {
-		Write(2, "%s DimensionValueData: NULL", strPrefix);
+		Write("%s DimensionValueData: NULL", strPrefix);
 		return;
 	}
 
@@ -441,9 +451,9 @@ void Log::DimensionValue(A3DMDDimensionValue * pcInData, CStringA strPrefix)
 	A3D_INITIALIZE_DATA(A3DMDDimensionValueData, cData);
 	A3DMDDimensionValueGet(pcInData, &cData);
 
-	Write(2, "%s DimensionValueData Information: %s", strPrefix, HexStrA((DWORD_PTR)pcInData));
+	Write("%s DimensionValueData Information: %s", strPrefix, HexStrA((DWORD_PTR)pcInData));
 
-	IncreaseTabIndex(2); {
+	IncreaseTabIndex(); {
 		CStringA strType;
 		switch (cData.m_iType) {
 			case 0:
@@ -465,24 +475,24 @@ void Log::DimensionValue(A3DMDDimensionValue * pcInData, CStringA strPrefix)
 			strFormat = "Fractional";
 		}
 
-		Write(2, "Value type: %s, Format: %s, Accuracy: %f, Tolerance accuracy: %f", strType, strFormat, cData.m_dAccuracy, cData.m_dToleranceAccuracy);
-		Write(2, "FakeValue: '%s', Superior numerical tolerance: %f, Inferior numerical tolerance: %f", cData.m_pcFakeValue, cData.m_dTolNumSup, cData.m_dTolNumInf);
-		Write(2, "Superior alpha numerical tolerance: '%s', Inferior alpha numerical tolerance: '%s'", cData.m_pcTolTxtSup, cData.m_pcTolTxtInf);
-		Write(2, "Text diplayed Before value: '%s', After value: '%s', Above value: '%s', Below value: '%s'", cData.m_pcBeforeText, cData.m_pcAfterText, cData.m_pcAboveText, cData.m_pcBelowText);
-		Write(2, "Last separator to use: %d, Option of semantic data: %d, Value of delta if the option MIN/MAX is activated: %f", cData.m_usLastSeparDefinedNum, cData.m_iOption, cData.m_dDeltaForMinMax);
+		Write("Value type: %s, Format: %s, Accuracy: %f, Tolerance accuracy: %f", strType, strFormat, cData.m_dAccuracy, cData.m_dToleranceAccuracy);
+		Write("FakeValue: '%s', Superior numerical tolerance: %f, Inferior numerical tolerance: %f", cData.m_pcFakeValue, cData.m_dTolNumSup, cData.m_dTolNumInf);
+		Write("Superior alpha numerical tolerance: '%s', Inferior alpha numerical tolerance: '%s'", cData.m_pcTolTxtSup, cData.m_pcTolTxtInf);
+		Write("Text diplayed Before value: '%s', After value: '%s', Above value: '%s', Below value: '%s'", cData.m_pcBeforeText, cData.m_pcAfterText, cData.m_pcAboveText, cData.m_pcBelowText);
+		Write("Last separator to use: %d, Option of semantic data: %d, Value of delta if the option MIN/MAX is activated: %f", cData.m_usLastSeparDefinedNum, cData.m_iOption, cData.m_dDeltaForMinMax);
 
 		DimensionValueFormat(cData.m_pDimValueFormat);
 
 		if (nullptr != cData.m_pToleranceFormat) {
-			Write(2, "ToleranceFormat: %s", HexStrA((DWORD_PTR)cData.m_pToleranceFormat));
+			Write("ToleranceFormat: %s", HexStrA((DWORD_PTR)cData.m_pToleranceFormat));
 		}
 		else {
-			Write(2, "ToleranceFormat: NULL");
+			Write("ToleranceFormat: NULL");
 		}
 
 		DimensionValue(cData.m_pChamferDimSecondValue, "ChamferDim Second Value");
 
-	} DecreaseTabIndex(2);
+	} DecreaseTabIndex();
 
 	A3DMDDimensionValueGet(nullptr, &cData);
 }
@@ -718,6 +728,11 @@ void Log::LeaderData(const A3DMkpMarkup * pcInData)
 
 	Write("Leader Data: %s, Count: %d", HexStrA((DWORD_PTR)pcInData), sMarkupData.m_uiLeadersSize);
 
+	if (1 > GetLogLevel()) {
+		A3DMkpMarkupGet(nullptr, &sMarkupData);
+		return;
+	}
+
 	IncreaseTabIndex(); {
 		for (A3DUns32 nIndex = 0; nIndex < sMarkupData.m_uiLeadersSize; nIndex++) {
 			A3DMkpLeader * psLeader = sMarkupData.m_ppLeaders[nIndex];
@@ -861,14 +876,14 @@ void Log::TessMarkup(const A3DMkpMarkup * pcInData)
 		Write("Coord Count: %d, IsCalculated: %s", sTessBaseData.m_uiCoordSize / 3, BoolStrA(sTessBaseData.m_bIsCalculated));
 		IncreaseTabIndex(); {
 			for (A3DUns32 nIndex = 0; nIndex < sTessBaseData.m_uiCoordSize / 3; nIndex++) {
-				Write("%d. %f, %f, %f", nIndex, sTessBaseData.m_pdCoords[nIndex * 3], sTessBaseData.m_pdCoords[nIndex * 3 + 1], sTessBaseData.m_pdCoords[nIndex * 3 + 2]);
+				Write(2, "%d. %f, %f, %f", nIndex, sTessBaseData.m_pdCoords[nIndex * 3], sTessBaseData.m_pdCoords[nIndex * 3 + 1], sTessBaseData.m_pdCoords[nIndex * 3 + 2]);
 			}
 		} DecreaseTabIndex();
 
 		Write("Text Count: %d", sTessMarkupData.m_uiTextsSize);
 		IncreaseTabIndex(); {
 			for (A3DUns32 nIndex = 0; nIndex < sTessMarkupData.m_uiTextsSize; nIndex++) {
-				Write(L"%d. %s", nIndex, WStr::ToUtf16(sTessMarkupData.m_ppcTexts[nIndex]));
+				Write(2, L"%d. %s", nIndex, WStr::ToUtf16(sTessMarkupData.m_ppcTexts[nIndex]));
 			}
 		} DecreaseTabIndex();
 
@@ -1564,20 +1579,18 @@ CStringA Log::GetLeaderSymbolTypeString(A3DMDLeaderSymbolType cInType)
 }
 
 #else
-void Log::CreateLog(int nId, const WCHAR * pchFilePathName) {}
-void Log::Write(int nId, LPCWSTR chMessage, ...) {}
-void Log::Write(int nId, LPCSTR chMessage, ...) {}
-void Log::IncreaseTabIndex(int nId) {}
-void Log::DecreaseTabIndex(int nId) {}
-
 void Log::CreateLog(const WCHAR * pchFilePathName) {}
-void Log::Write(LPCWSTR chMessage, ...) {}
-void Log::Write(LPCSTR chMessage, ...) {}
+void Log::Write(LPCWSTR chMessage, ...) {};
+void Log::Write(LPCSTR chMessage, ...) {};
 void Log::IncreaseTabIndex() {}
 void Log::DecreaseTabIndex() {}
 
+void Log::SetLogLevel(int nLogLevel) {}
+int Log::GetLogLevel() {}
+
 void Log::Position(A3DMDPosition * pcPosition);
 void Log::Vector3dData(A3DVector3dData & cData, CStringA strPrompt) {}
+void Log::Vector3dData(int nLogLevel, A3DVector3dData & cData, CStringA strPrompt) {}
 bool Log::GetName(const A3DRootBaseWithGraphics * pcRootBase, CString & strName) { return false; }
 void Log::View(A3DMkpView * pcView, A3DMkpViewData & cViewData) {}
 void Log::SurfPlane(A3DSurfPlane * pcInSurfPlane) {}

@@ -42,26 +42,6 @@ boost::pool<> CBoostPool<T>::m_bpool(sizeof(T));
 
 using namespace H3DF;
 
-//== 메모리 관리 =====================================================================================
-
-void * Memory::Allocate(size_t nInBytes, bool bInClearMemory)
-{
-	void * pByte = new BYTE[nInBytes];// s_pool.Allocate(nInBytes);
-	if (true == bInClearMemory) {
-		memset(pByte, 0, nInBytes);
-	}
-
-	return pByte;
-}
-
-void Memory::Free(void * pInPointer)
-{
- 	delete[] pInPointer;
-	pInPointer = nullptr;
-}
-
-Memory::Memory() {}
-
 
 //== 객체 관리 ======================================================================================
 void Impl::SetImpl(Object * pcObject, Impl * pcImpl)

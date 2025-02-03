@@ -836,10 +836,11 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	m_pcBaseView->SetColorInterpolation(ThePreset.CiByValue);
 	m_pcBaseView->SetColorIndexInterpolation(ThePreset.CiByColormapIndex, ThePreset.CiIsolines);
 
-	m_pcBaseView->GetSelection()->SetGrayScale(ThePreset.GrayScaleSelection);
-	m_pcBaseView->GetSelection()->SetUseDefinedHighlight(ThePreset.UseDefinedHighlighting);
-	m_pcBaseView->GetSelection()->SetAllowDisplacement(ThePreset.DisplaceSelection);
-	m_pcBaseView->GetSelection()->SetHighlightMode(HighlightQuickmoves);
+// 	m_pcBaseView->GetSelection()->SetGrayScale(ThePreset.GrayScaleSelection);
+// 	m_pcBaseView->GetSelection()->SetUseDefinedHighlight(ThePreset.UseDefinedHighlighting);
+// 	m_pcBaseView->GetSelection()->SetAllowDisplacement(ThePreset.DisplaceSelection);
+
+	/*m_pcBaseView->GetSelection()->SetHighlightMode(HighlightQuickmoves);
 	m_pcBaseView->GetHighlightSelection()->SetHighlightMode(HighlightQuickmoves);
 
 	m_pcBaseView->GetSelection()->SetHighlightTransparency(ThePreset.TransparencyLevel);
@@ -852,10 +853,10 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	}
 	else {
 		m_pcBaseView->GetSelection()->SetReferenceSelectionType(RefSelDefault);
-	}
+	}*/
 
-	m_pcBaseView->GetHighlightSelection()->UpdateHighlightStyle();
-	m_pcBaseView->GetSelection()->UpdateHighlightStyle();
+// 	m_pcBaseView->GetHighlightSelection()->UpdateHighlightStyle();
+// 	m_pcBaseView->GetSelection()->UpdateHighlightStyle();
 
 	// set the rendermode
 	m_pcBaseView->SetRenderMode((HRenderMode)ThePreset.RenderMode, true);

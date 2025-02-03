@@ -689,7 +689,6 @@ Operator::Result H3DF::Operator::CameraControl::LButtonDownAndMove(Operator::Eve
 		pcImpl->m_pcNaviCube->Transform();
 	}
 
-
 	Operator::Result eResult = Operator::Result::None;
 
 	switch (pcImpl->m_eCameraMode)

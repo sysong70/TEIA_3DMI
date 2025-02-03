@@ -26,7 +26,6 @@ int LogManager::m_nTabIndex[LOGMANAGER_MAX_COUNT];
 int LogManager::m_nLogLevel[LOGMANAGER_MAX_COUNT];
 
 int LogManager::m_nFileHandle[LOGMANAGER_MAX_COUNT];
-bool LogManager::m_bFileCloseFlag[LOGMANAGER_MAX_COUNT];
 
 LogManager::Init::Init()
 {
@@ -47,7 +46,6 @@ LogManager::Init::Init()
 		m_nTabIndex[nIndex] = 0;
 		m_nLogLevel[nIndex] = -1;
 		m_nFileHandle[nIndex] = NULL;
-		m_bFileCloseFlag[nIndex] = true;
 	}
 }
 
@@ -171,8 +169,29 @@ void LogManager::Log(int nId, int nLogLevle, LPCSTR chMessage, ...)
 	LogManager::GetInstance()->WriteLog(nId, CString(strBuffer));
 }
 
-void LogManager::CreateLog(int nId, const WCHAR * pchFilePathName)
+void LogManager::CreateLog(int nId, const WCHAR * pchFilePathName, bool bExistsFileDelete)
 {
+	SetFilePathName(nId, pchFilePathName);
+	SetCreateFile(nId, true);
+
+	if (true == bExistsFileDelete) {
+		if (NULL != m_nFileHandle[nId]) {
+			_close(m_nFileHandle[nId]);
+			m_nFileHandle[nId] = NULL;
+		}
+
+		_wremove(pchFilePathName);
+	}
+
+	if (NULL == m_nFileHandle[nId]) {
+		m_nFileHandle[nId] = LogManager::GetInstance()->Open(nId);
+	}
+
+	SetWriteTimeLog(nId, true);
+	Log(nId, L"Create Log");
+	SetWriteTimeLog(nId, false);
+
+/*
 	SetCurrentId(nId);
 
 	SetFilePathName(nId, pchFilePathName);
@@ -182,7 +201,7 @@ void LogManager::CreateLog(int nId, const WCHAR * pchFilePathName)
 
 	SetWriteTimeLog(nId, true);
 	Log(nId, L"Create Log");
-	SetWriteTimeLog(nId, false);
+	SetWriteTimeLog(nId, false);*/
 }
 
 void LogManager::WriteLog(CString strMessage)
@@ -198,13 +217,8 @@ void LogManager::WriteLog(int nId, CString strMessage)
 
 	CString strBuffer, strBuffer2;
 
-	if(true == m_bFileCloseFlag[nId]) {
+	if (NULL == m_nFileHandle[nId]) {
 		m_nFileHandle[nId] = LogManager::Open(nId);
-	}
-	else {
-		if(NULL == m_nFileHandle[nId]) {
-			m_nFileHandle[nId] = LogManager::Open(nId);
-		}
 	}
 
 	// Log 파일을 생성하지 못한경우 저장하지 않는다.
@@ -254,13 +268,7 @@ void LogManager::WriteLog(int nId, CString strMessage)
 		int nBytesWritten = _write(m_nFileHandle[nId], pchText, (UINT)nSize);
 	}
 
-	if(true == m_bFileCloseFlag[nId]) {
-		_close(m_nFileHandle[nId]);
-		m_nFileHandle[nId] = NULL;
-	}
-	else {
-		_commit(m_nFileHandle[nId]);
-	}
+	_commit(m_nFileHandle[nId]);
 
 	delete[] pchText;
 }
@@ -314,12 +322,6 @@ int LogManager::Open(int nId)
 
 	return nFileHandle;
 }
-
-/*
-void LogManager::Close()
-{
-}
-*/
 
 // 다중 디렉토리도 생성함.
 bool LogManager::CreateFolder(CString strPath)
@@ -396,23 +398,6 @@ void LogManager::DecreaseTabIndex(int nId)
 	m_nTabIndex[nId]--;
 	if(0 > m_nTabIndex[nId]) {
 		m_nTabIndex[nId] = 0;
-	}
-}
-
-void LogManager::SetFileCloseFlag(bool bFlag)
-{
-	SetFileCloseFlag(m_nCurrentId, bFlag);
-}
-
-void LogManager::SetFileCloseFlag(int nId, bool bFlag) 
-{ 
-	m_bFileCloseFlag[nId] = bFlag; 
-
-	if(true == bFlag) {
-		if(NULL != m_nFileHandle[nId]) {
-			_close(m_nFileHandle[nId]);
-			m_nFileHandle[nId] = NULL;
-		}
 	}
 }
 

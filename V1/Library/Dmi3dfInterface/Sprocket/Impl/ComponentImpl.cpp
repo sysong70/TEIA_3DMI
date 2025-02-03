@@ -73,12 +73,11 @@ CString H3DF::ComponentImpl::TypeName()
 	switch (m_eType)
 	{
 		case H3DF::Component::Type::ExchangeProductOccurrence:
-			//strTypeName = L"ProductOccurrence";
 			strTypeName = L"Product";
 			break;
 
 		case H3DF::Component::Type::ExchangePartDefinition:
-			strTypeName = L"PartDefinition";
+			strTypeName = L"Part";
 			break;
 
 		case H3DF::Component::Type::ExchangeRIBRepModelSolid:
@@ -389,15 +388,18 @@ bool H3DF::ComponentUtility::ClonedComponent(Component & cInComponent, Component
 
 Component * H3DF::ComponentUtility::GetViewGroupComponent(Component & cInParentComp)
 {
+	// 입력된 값이 ViewGroupComponent이면 그냥 리턴한다.
 	if (H3DF::Component::Type::ViewGroupComponent == cInParentComp.GetType()) {
 		return &cInParentComp;
 	}
 
+	// 상위 Component에서 재귀하게 View Group Component를 찾는다.
 	H3DF::Component * pcViewGroupComponent = cInParentComp.FindUpComponent(H3DF::Component::Type::ViewGroupComponent);
 	if (nullptr != pcViewGroupComponent) {
 		return pcViewGroupComponent;
 	}
 
+	// 하부 Component에서 View Group Component를 찾는다.
 	if (nullptr == pcViewGroupComponent) {
 		ComponentArray * pcSubComponents = cInParentComp.GetSubComponents(H3DF::Component::Type::ViewGroupComponent);
 		if (nullptr != pcSubComponents) {
@@ -449,6 +451,7 @@ Component * H3DF::ComponentUtility::GetPmiGroupComponent(Component & cInParentCo
 
 	if (nullptr == pcPMIGroupComponent) {
 		ComponentArray * pcSubComponents = cInParentComp.GetAllSubcomponents(H3DF::Component::Type::PMIGroupComponent);
+		//ComponentArray * pcSubComponents = cInParentComp.GetSubComponents(H3DF::Component::Type::PMIGroupComponent);
 		if (nullptr != pcSubComponents) {
 			if (false == pcSubComponents->empty()) {
 				pcPMIGroupComponent = pcSubComponents->front();

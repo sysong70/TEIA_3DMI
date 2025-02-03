@@ -3,6 +3,8 @@
 #include <Path.h>
 #include <WStr.h>
 
+#include "LogManager.h"
+
 //--------------------------------------------------------------------------------------------------
 
 H3DX::FileOptions TheFileOptions;
@@ -78,10 +80,15 @@ bool H3DX::ImportOptions::Get(CString& filePath, A3DRWParamsLoadData& param)
 	// CHECK
 	A3D_INITIALIZE_DATA(A3DRWParamsLoadData, param);
 
+	A3DEModellerType eModellerType;
+	A3DStatus nResult = A3DGetFileFormat(ToHoopsString(filePath), &eModellerType);
+
 	CStringA fileType = (CStringA)GetFileTypeName(filePath);
 	if (fileType.IsEmpty()) {
 		return false;
 	}
+
+	LogManager::Log(2, "File Type: %s", fileType);
 
 	Json::Object& data = m_root.GetAt(fileType);
 	bool success = true;

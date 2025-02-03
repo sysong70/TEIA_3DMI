@@ -35,5 +35,5 @@ namespace H3DF
 		void Delete();
 	};
 
-	using KeyArray = std::vector<Key, Allocator<Key>>;
+	using KeyArray = std::vector<Key>;
 }

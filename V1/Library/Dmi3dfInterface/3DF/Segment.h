@@ -18,7 +18,7 @@ namespace H3DF
 	class API_3DF SegmentKey : public Key
 	{
 	public:
-		SegmentKey();
+		SegmentKey();	
 		SegmentKey(CStringA strInName);
 		SegmentKey(HC_KEY nInKey);
 		SegmentKey(SegmentKey const & cInThat);

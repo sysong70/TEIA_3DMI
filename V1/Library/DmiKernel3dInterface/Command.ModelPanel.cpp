@@ -835,7 +835,7 @@ void KERNEL::Command::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject)
 
 	// Makrup View에 Sub component가 없는 경우 Camera 정보를 이용해서 설정한다.
 	// Sub component가 없다는 것은, 하부에 PMI가 없는 경우임.
-	if (nullptr != pcCameraData && nullptr == pcInComponent->GetSubComponents()) {
+	if (nullptr != pcCameraData) { // && nullptr == pcInComponent->GetSubComponents()) {
 		H3DF::CameraKit * pcCamera = (H3DF::CameraKit *)pcCameraData->GetValue();
 		pcImpl->Camera().SetCamera(*pcCamera);
 	}

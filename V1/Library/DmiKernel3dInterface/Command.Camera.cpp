@@ -110,6 +110,7 @@ Command::Result::Type KERNEL::Command::Camera::LButtonDown(Event & cInEvent)
 	return Command::Result::Convert(pcImpl->CameraControl().LButtonDown(cInEvent.OperatorEvent()));
 }
 
+// #Coding: 2.Command::Camera::LButtonUp
 Command::Result::Type KERNEL::Command::Camera::LButtonUp(Event & cInEvent)
 {
 	auto * pcImpl = dynamic_cast<CameraImpl *>(m_pcImpl);
@@ -253,11 +254,16 @@ void KERNEL::Command::Camera::SetCameraFitSelection(H3DF::MatrixKit & cInMatrix,
 
 	H3DF::Point cCenter = (cCuboid.cMax + cCuboid.cMin) / 2.0;
 	H3DF::Vector cVector = cCuboid.cMax - cCuboid.cMin;
-	double dLength = cVector.Length();
+	//double dLength = cVector.Length() * 1.3; // 30% 더 큰 길이로 설정. Demo View에서 나온값을 이용해서 설정함. 
+	double dLength = cVector.Length() * 1.1;
 
 	//===== 카메라 위치 설정 =====
 	// 카메라가 놓이는 위치 설정
 	H3DF::Point cCameraPosition = cCenter + cInMatrix.ZAxis() * (dLength * 2.5);
+	H3DF::Point cCameraPosition1 = cCenter + cInMatrix.ZAxis() * (dLength * 3.25);
+
+	H3DF::Vector cTemp = cInMatrix.ZAxis() * (dLength * 2.5);
+	H3DF::Vector cZAxis = cInMatrix.ZAxis();
 
 	// 카메라가 바라보는 방향 설정. Matrix Z축의 반대 방향으로 설정한다.
 	H3DF::Point cCameraTarget = cCenter;

@@ -1663,14 +1663,15 @@ using DPlane = Plane_3D<double>;
 using SimpleCuboid = Cuboid_3D<float>;
 using DSimpleCuboid = Cuboid_3D<double>;
 
-using IntArray = std::vector<int, Allocator<int>>;
-using FloatArray = std::vector<float, Allocator<float>>;
-using PointArray = std::vector<H3DF::Point, Allocator<H3DF::Point>>;
-using Point2DArray = std::vector<H3DF::Point2D, Allocator<H3DF::Point2D>>;
-using DPoint2DArray = std::vector<H3DF::DPoint2D, Allocator<H3DF::DPoint2D>>;
-using VectorArray = std::vector<H3DF::Vector, Allocator<H3DF::Vector>>;
-using Vector2DArray = std::vector<H3DF::Vector2D, Allocator<H3DF::Vector2D>>;
-using PlaneArray = std::vector<Plane, Allocator<Plane>>;
+using IntArray = std::vector<int>;
+using Int2DArray = std::vector<std::vector<int>>;
+using FloatArray = std::vector<float>;
+using PointArray = std::vector<H3DF::Point>;
+using Point2DArray = std::vector<H3DF::Point2D>;
+using DPoint2DArray = std::vector<H3DF::DPoint2D>;
+using VectorArray = std::vector<H3DF::Vector>;
+using Vector2DArray = std::vector<H3DF::Vector2D>;
+using PlaneArray = std::vector<Plane>;
 
 namespace Math
 {

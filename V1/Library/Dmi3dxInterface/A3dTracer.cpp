@@ -19,8 +19,6 @@ using namespace std;
 
 void A3dTracer::A3DTopoShellLog(const A3DTopoShell * pcTopoShell)
 {
-	//LogManager::SetFileCloseFlag(false);
-
 	A3DTopoShellData cTopoShellData;
 	A3D_INITIALIZE_DATA(A3DTopoShellData, cTopoShellData);
 	A3DStatus nResult = A3DTopoShellGet(pcTopoShell, &cTopoShellData);
@@ -35,8 +33,6 @@ void A3dTracer::A3DTopoShellLog(const A3DTopoShell * pcTopoShell)
 
 		A3DTopoShellGet(nullptr, &cTopoShellData);
 	}
-
-	//LogManager::SetFileCloseFlag(true);
 
 	//LogManager::SetCurrentId(m_nOldCurrentId);
 }
@@ -803,7 +799,7 @@ void A3dTracer::Log(LPCWSTR chMessage, ...)
 
 	va_end(cArgList);
 
-	LogManager::GetInstance()->WriteLog(strBuffer);
+	LogManager::Log(strBuffer);
 }
 
 void A3dTracer::IncreaseLogTab()

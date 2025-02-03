@@ -131,7 +131,7 @@ namespace H3DF
 	public:
 		HighlightSelectionSet(HBaseView * pcInView, bool bInReferenceSelection = false);
 
-		void UpdateHighlightStyle() override;
+		void UpdateHighlightStyle1();
 	};
 }
 
@@ -140,9 +140,9 @@ H3DF::HighlightSelectionSet::HighlightSelectionSet(HBaseView * pcInView, bool bI
 {
 }
 
-void H3DF::HighlightSelectionSet::UpdateHighlightStyle()
+void H3DF::HighlightSelectionSet::UpdateHighlightStyle1()
 {
-	HSelectionSet::UpdateHighlightStyle();
+	UpdateHighlightStyle();
 
 	SegmentKey cHighlightStyleSegment = GetHighlightStyle();
 	cHighlightStyleSegment.GetAttributeLockControl().SetLock(AttributeLock::Type::LineAttributeWeight).SetLock(AttributeLock::Type::EdgeAttributeWeight);
@@ -181,9 +181,16 @@ namespace H3DF
 H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
 {
 	m_eType = H3DF::Type::HighlightControl;
-	m_pcWindow = (WindowKey *)&cInWindow;
+	m_pcWindow = (WindowKey *)&m_pcWindow;
 
-	// m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetHighlightSelection();
+	m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetHighlightSelection();
+	m_pcSelectionSet->SetHighlightMode(HighlightQuickmoves);
+	m_pcSelectionSet->SetReferenceSelectionType(RefSelSpriting);
+
+	m_pcSelectionSet->UpdateHighlightStyle();
+
+// 
+ 	return;
 
 // 	if (false == bDynFlag) {
 // 		m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetSelection();
@@ -198,33 +205,30 @@ H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
 
 	m_pcSelectionSet = new H3DF::HighlightSelectionSet((HBaseView *)cInWindow.GetBaseView());
 
-	m_pcSelectionSet->SetHighlightMode(HighlightQuickmoves);
-
-	m_pcSelectionSet->SetReferenceSelectionType(RefSelOff);
-
-	m_pcSelectionSet->SetSelectionLevel(HSelectEntity);
-
-	m_pcSelectionSet->SetReferenceSelectionType(RefSelSpriting);
-
-	m_pcSelectionSet->SetSelectionEdgeWeight(1.0);
+// 	m_pcSelectionSet->SetHighlightMode(HighlightQuickmoves);
+// 	m_pcSelectionSet->SetReferenceSelectionType(RefSelOff);
+// 
+// 	m_pcSelectionSet->SetSelectionLevel(HSelectEntity);
+	//m_pcSelectionSet->SetSelectionEdgeWeight(1.0);
 
 	//================================================================================================
 
-	m_pcSelectionSet->SetAllowRegionSelection(true);
+	/*m_pcSelectionSet->SetAllowRegionSelection(true);
 
 	m_pcSelectionSet->SetGrayScale(false);
+	// Transparecy Segment를 선택했을 때, 투명하게 보이도록 설정하는 부분
 	m_pcSelectionSet->SetUseDefinedHighlight(false);
-	m_pcSelectionSet->SetAllowDisplacement(false);
+	m_pcSelectionSet->SetAllowDisplacement(false);*/
 
-	HPixelRGBA cHighlightSelectColor;
-	cHighlightSelectColor.Set(255, 0, 0);
-
-	m_pcSelectionSet->SetSelectionFaceColor(cHighlightSelectColor);
-	m_pcSelectionSet->SetSelectionEdgeColor(cHighlightSelectColor);
-	m_pcSelectionSet->SetSelectionMarkerColor(cHighlightSelectColor);
+// 	HPixelRGBA cHighlightSelectColor;
+// 	cHighlightSelectColor.Set(255, 0, 0);
+// 
+// 	m_pcSelectionSet->SetSelectionFaceColor(cHighlightSelectColor);
+// 	m_pcSelectionSet->SetSelectionEdgeColor(cHighlightSelectColor);
+// 	m_pcSelectionSet->SetSelectionMarkerColor(cHighlightSelectColor);
 
 	// 선택될때 Face의 Edge를 표시여부 처리
-	m_pcSelectionSet->HighlightRegionEdgesAutoVisibility(false);
+	//m_pcSelectionSet->HighlightRegionEdgesAutoVisibility(false);
 
 	m_pcSelectionSet->UpdateHighlightStyle();
 }

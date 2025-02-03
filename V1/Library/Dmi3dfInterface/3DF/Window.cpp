@@ -28,7 +28,7 @@ H3DF::WindowKey::WindowKey(H3DF::BaseView * pcBaseView)
 	//SetKeyValue(pcBaseView->GetViewKey());
 
 	// SelectionSet 초기화, 3DF에서는 Hightliht, Selection을 구분하지 않고 사용한다.
-
+	// 이 부분의 Selection Set을 이용해서 전체적인 Selection을 처리한다.
 	pcImpl->m_pcSelectionSet = GetBaseView()->GetSelection();
 
 	pcImpl->m_pcSelection = new SelectionControl(*this);
