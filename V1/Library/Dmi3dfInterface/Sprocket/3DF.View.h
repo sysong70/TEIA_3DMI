@@ -104,5 +104,7 @@ namespace H3DF
 	public:
 		void SaveHsfFile(CString strFilePathName, H3DF::Canvas * pcHoopsView);
 		void LoadPointCloudFile(CString strFilePathName);
+
+		bool DoDynamicHighlighting(H3DF::HighlightControl & cHighlightControl,WindowPoint cInWindowPoint);
 	};
 };

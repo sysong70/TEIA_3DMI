@@ -57,10 +57,9 @@ void H3DF::HighlightSelectionSet::UpdateHighlightStyle1()
 
 H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
 {
-/*
 	m_eType = H3DF::Type::HighlightControl;
-	m_pcWindow = (WindowKey *)&m_pcWindow;
-
+	m_pcWindow = (WindowKey *)&cInWindow;
+/*
 	m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetHighlightSelection();
 	m_pcSelectionSet->SetHighlightMode(HighlightQuickmoves);
 	m_pcSelectionSet->SetReferenceSelectionType(RefSelSpriting);
@@ -82,7 +81,9 @@ H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
 	// HSelectionSet은 각각 선언될때, Style을 생성하게 된다.
 	//================================================================================================
 
-	m_pcSelectionSet = new H3DF::HighlightSelectionSet((HBaseView *) cInWindow.GetBaseView());
+	m_pcSelectionSet = ((HBaseView *) cInWindow.GetBaseView())->GetHighlightSelection();
+
+	//m_pcSelectionSet = new H3DF::HighlightSelectionSet((HBaseView *) cInWindow.GetBaseView());
 
 	m_pcSelectionSet->SetHighlightMode(HighlightQuickmoves);
 
@@ -116,11 +117,13 @@ H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
 
 	m_pcSelectionSet->UpdateHighlightStyle();
 
+#if 0
 	HC_Open_Segment_By_Key(m_pcSelectionSet->GetHighlightStyle()); {
 		char chRenderOptions[MVO_BUFFER_SIZE];
 		HC_Show_Rendering_Options(chRenderOptions);
 		int i = 0;
 	} HC_Close_Segment();
+#endif
 }
 
 BaseView * H3DF::HighlightControlImpl::GetBaseView()

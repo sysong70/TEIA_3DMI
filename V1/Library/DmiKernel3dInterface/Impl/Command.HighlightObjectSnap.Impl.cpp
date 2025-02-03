@@ -422,16 +422,13 @@ KERNEL::Command::Result::Type KERNEL::Command::HighlightObjectSnapImpl::NoButton
 	return KERNEL::Command::Result::Type::Pass;
 }
 
-// 2.1 Dynamic Highlight 처리
+// 2.1 Dynamic Highlight 처리 #Selection
 bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint cInWindowPoint, SelectionItem & cOutSelection)
 {
-#if 0
-	Window().GetBaseView()->GetHighlightSelection()->SetAllowRegionSelection(false);
-	Window().GetBaseView()->SetDynamicHighlighting(true);
+#if 1
+	View().DoDynamicHighlighting(m_cDynHighlightControl, cInWindowPoint);
 
-	Window().GetBaseView()->DoDynamicHighlighting(HPoint(cInWindowPoint.x, cInWindowPoint.y, 0.0f));
-
-	return HLISTENER_PASS_EVENT;
+	return true;
 #endif
 
 	//if (View().GetSuppressUpdateTick() || View().GetSuppressUpdate() || !pcView->GetModel()->GetFileLoadComplete()) {
