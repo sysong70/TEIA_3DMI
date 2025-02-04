@@ -738,8 +738,12 @@ bool H3DF::View::DoDynamicHighlighting(H3DF::HighlightControl & cHighlightContro
 
 	H3DF::HighlightControlImpl * pcHighlightControlImpl = (H3DF::HighlightControlImpl *) cHighlightControl.GetImpl();
 	
+	ViewImpl * pcImpl = dynamic_cast<ViewImpl *> (m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
 	HC_KEY nViewKey = pcHighlightControlImpl->GetBaseView()->GetViewKey();
 	HSelectionSet * pcHighlight = pcHighlightControlImpl->SelectionSet();
+	//HSelectionSet * pcHighlight = pcImpl->GetBaseView()->GetHighlightSelection();// pcHighlightControlImpl->SelectionSet();
 
 	HC_Open_Segment_By_Key(nViewKey);
 	res = HC_Compute_Selection(".", "./scene/overwrite", "v, selection level = entity", cMousePos.x, cMousePos.y);

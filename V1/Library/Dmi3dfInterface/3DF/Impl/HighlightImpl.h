@@ -34,7 +34,7 @@ namespace H3DF
 
 		CStringA m_strInStyleName;
 		CStringA m_strInSecondaryStyleName;
-		int m_nNotification = -1;
+		int m_nNotification = -1; // -1: No Setting, 0: false, 1: true
 	};
 
 	class HighlightControlImpl : public ControlImpl
