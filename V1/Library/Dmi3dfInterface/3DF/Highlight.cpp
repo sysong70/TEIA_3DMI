@@ -1,6 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #include "Highlight.h"
+#include "Impl/HighlightImpl.h"
 
 #include "Impl/SelectionImpl.h"
 #include "Impl/ControlImpl.h"
@@ -33,25 +34,6 @@
 using namespace H3DF;
 
 //== HighlightOptionsKit Class =====================================================================
-namespace H3DF
-{
-	class HighlightOptionsKitImpl : public Impl
-	{
-	public:
-		HighlightOptionsKitImpl() { m_eType = H3DF::Type::HighlightOptionsKit; }
-
-		void Copy(HighlightOptionsKitImpl * pcInThat) {
-			m_strInStyleName = pcInThat->m_strInStyleName;
-			m_strInSecondaryStyleName = pcInThat->m_strInSecondaryStyleName;
-			m_nNotification = pcInThat->m_nNotification;
-		}
-
-		CStringA m_strInStyleName;
-		CStringA m_strInSecondaryStyleName;
-		int m_nNotification = -1;
-	};
-}
-
 H3DF::HighlightOptionsKit::HighlightOptionsKit()
 {
 	m_pcImpl = new HighlightOptionsKitImpl();
@@ -121,140 +103,6 @@ bool H3DF::HighlightOptionsKit::ShowNotification(bool & bOutState) const
 
 	bOutState = (0 != pcImpl->m_nNotification);
 	return true;
-}
-
-//== SelectionSet Class =============================================================================
-namespace H3DF
-{
-	class HighlightSelectionSet : public HSelectionSet
-	{
-	public:
-		HighlightSelectionSet(HBaseView * pcInView, bool bInReferenceSelection = false);
-
-		void UpdateHighlightStyle1();
-	};
-}
-
-H3DF::HighlightSelectionSet::HighlightSelectionSet(HBaseView * pcInView, bool bInReferenceSelection)
-	: HSelectionSet(pcInView, bInReferenceSelection)
-{
-}
-
-void H3DF::HighlightSelectionSet::UpdateHighlightStyle1()
-{
-	UpdateHighlightStyle();
-
-	SegmentKey cHighlightStyleSegment = GetHighlightStyle();
-	cHighlightStyleSegment.GetAttributeLockControl().SetLock(AttributeLock::Type::LineAttributeWeight).SetLock(AttributeLock::Type::EdgeAttributeWeight);
-}
-
-//== HighlightControlImpl Class ====================================================================
-namespace H3DF
-{
-	class HighlightControlImpl : public ControlImpl
-	{
-	public:
-		HighlightControlImpl(WindowKey const & cInWindow);
-
-		void Copy(HighlightControlImpl * pcInThat) {
-			m_pcWindow = pcInThat->m_pcWindow;
-		}
-
-		// 	int SelectButtonDown(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults);
-		// 	void HandleSelection(UINT const nFlags, SelectionResults & cOutResults);
-
-		const WindowKey & Window() { return *m_pcWindow; }
-
-		BaseView * GetBaseView();
-		BaseView * GetBaseView() const;
-
-		HSelectionSet * SelectionSet();
-
-		H3DF::SelectionResults m_cOldHighlightSelection;
-
-	private:
-		const WindowKey * m_pcWindow = nullptr;
-		HSelectionSet * m_pcSelectionSet = nullptr;
-	};
-}
-
-H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
-{
-/*
-	m_eType = H3DF::Type::HighlightControl;
-	m_pcWindow = (WindowKey *)&m_pcWindow;
-
-	m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetHighlightSelection();
-	m_pcSelectionSet->SetHighlightMode(HighlightQuickmoves);
-	m_pcSelectionSet->SetReferenceSelectionType(RefSelSpriting);
-
-	m_pcSelectionSet->UpdateHighlightStyle();
-
-// 
- 	return;
-*/
-
-// 	if (false == bDynFlag) {
-// 		m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetSelection();
-// 	}
-// 	else
-// 	{
-// 		m_pcSelectionSet = ((HBaseView *)cInWindow.GetBaseView())->GetHighlightSelection();
-// 	}
-
-	// HSelectionSet은 각각 선언될때, Style을 생성하게 된다.
-	//================================================================================================
-
-	m_pcSelectionSet = new H3DF::HighlightSelectionSet((HBaseView *) cInWindow.GetBaseView());
-
-	m_pcSelectionSet->SetHighlightMode(HighlightQuickmoves);
-
-	m_pcSelectionSet->SetReferenceSelectionType(RefSelOff);
-
-	m_pcSelectionSet->SetSelectionLevel(HSelectEntity);
-
-	m_pcSelectionSet->SetReferenceSelectionType(RefSelSpriting);
-
-	m_pcSelectionSet->SetSelectionEdgeWeight(1.0);
-
-	//================================================================================================
-
-	m_pcSelectionSet->SetAllowRegionSelection(true);
-
-	m_pcSelectionSet->SetGrayScale(false);
-	m_pcSelectionSet->SetUseDefinedHighlight(false);
-	m_pcSelectionSet->SetAllowDisplacement(false);
-
-	HPixelRGBA cHighlightSelectColor;
-	cHighlightSelectColor.Set(255, 0, 0);
-
-	m_pcSelectionSet->SetSelectionFaceColor(cHighlightSelectColor);
-	m_pcSelectionSet->SetSelectionEdgeColor(cHighlightSelectColor);
-	m_pcSelectionSet->SetSelectionMarkerColor(cHighlightSelectColor);
-
-	// 선택될때 Face의 Edge를 표시여부 처리
-	m_pcSelectionSet->HighlightRegionEdgesAutoVisibility(false);
-
-	m_pcSelectionSet->UpdateHighlightStyle();
-}
-
-BaseView * H3DF::HighlightControlImpl::GetBaseView()
-{
-	return (BaseView *)m_pcWindow->GetBaseView();
-}
-
-BaseView * H3DF::HighlightControlImpl::GetBaseView() const
-{
-	DEBUG_VALID(m_pcWindow);
-	return (BaseView *)m_pcWindow->GetBaseView();
-}
-
-HSelectionSet * H3DF::HighlightControlImpl::SelectionSet()
-{
-	//return ((HBaseView *)m_pcWindow->GetBaseView())->GetHighlightSelection();
-
-	DEBUG_VALID(m_pcSelectionSet);
-	return m_pcSelectionSet;
 }
 
 //== HighlightControl Class ========================================================================

@@ -633,7 +633,7 @@ void H3DF::ViewImpl::Copy(const ViewImpl * pcInThat)
 	m_bSimpleReflection = pcInThat->m_bSimpleReflection;
 }
 
-// 1. BaseView를 초기화 하는 부분
+// #View: 1. BaseView를 초기화 하는 부분
 bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType, CStringA strInInstanceName, H3DF::WindowHandle nInWindowHandle)
 {
 	ModelImpl * pcModelImpl = static_cast<ModelImpl *>(pcInModel->GetImpl());
@@ -735,7 +735,9 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	m_pcBaseView->SetDetailSelection(TheKenel.Selection.Behavior.DetailSelection); // "Honor Line/Edge Weight/Pattern"
 	m_pcBaseView->SetRelatedSelectionLimit(TheKenel.Selection.Behavior.RelatedSelectionLimit);
 	m_pcBaseView->SetTransparentSelectionBoxMode(TheKenel.Selection.Behavior.UseSelectBox); // show a transparent box when selecting areas
-	m_pcBaseView->SetRespectSelectionCulling(TheKenel.Selection.Behavior.RespectCulling); // Respect Culling during selection.
+	
+	// #Temp Remark
+	//m_pcBaseView->SetRespectSelectionCulling(TheKenel.Selection.Behavior.RespectCulling); // Respect Culling during selection.
 	m_pcBaseView->SetFastFitWorld(true);
 	m_pcBaseView->SetForceFastHiddenLine(TheKenel.Performance.Optimization.HiddenLineMode == FastHiddenLine);
 	m_pcBaseView->SetSpritingMode(TheKenel.Interaction.GeometryManipulation.Spriting);
@@ -743,6 +745,8 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	m_pcBaseView->SetAllowInteractiveShadows(TheKenel.Interaction.GeometryManipulation.UpdateShadows);
 	m_pcBaseView->SetBackplaneCulling(TheKenel.General.Etc.BackplaneCulling);
 	m_pcBaseView->SetDisplayListType(DisplayListSegment);// DisplayListOff);
+
+	m_pcBaseView->SetOcclusionCullingMode(ThePreset.OcclusionCulling, true);
 
 	SetupFrameRateMode();
 
@@ -778,18 +782,21 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	// Rajesh B (11-Apr-2003)
 	m_pcBaseView->SetPolygonHandednessMode(HandednessLeft);
 
+/*
 	HPixelRGBA cHighlightSelectColor;
 	cHighlightSelectColor.Set(255, 0, 0);
 
 	m_pcBaseView->GetHighlightSelection()->SetSelectionFaceColor(cHighlightSelectColor);
 	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeColor(cHighlightSelectColor);
-	m_pcBaseView->GetHighlightSelection()->SetSelectionMarkerColor(cHighlightSelectColor);
+	m_pcBaseView->GetHighlightSelection()->SetSelectionMarkerColor(cHighlightSelectColor);*/
 
 	// #Selection: Highlighting Line, Edge 두께 설정
 
 	// 아래 부분을 삭제하면 다음에 설정된 fLineWeight를 적용할 때 Segment 오류가 발생함.
-	m_pcBaseView->GetSelection()->SetSelectionEdgeWeight(1.0);
-	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeWeight(1.0);
+
+/*
+ 	m_pcBaseView->GetSelection()->SetSelectionEdgeWeight(1.0);
+ 	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeWeight(1.0);
 
 	float fLineWeight = 2.0;
 	HC_KEY nHighlightSelectionKey = m_pcBaseView->GetHighlightSelection()->GetSelectionSegment();
@@ -803,6 +810,7 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 		HC_Set_Line_Weight(fLineWeight);
 		HC_Set_Edge_Weight(fLineWeight);
 	} HC_Close_Segment();
+*/
 
 	m_pcBaseView->GetHighlightSelection()->SetGrayScale(false);// ThePreset.GrayScaleSelection);
 	m_pcBaseView->GetHighlightSelection()->SetUseDefinedHighlight(false);// ThePreset.UseDefinedHighlighting);
@@ -816,12 +824,14 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	int sel_alpha = (int)(ThePreset.SelectionColorTransparency * 2.56f);		// settings is a %, scale it to 256
 	cSelectColor.Set(ColorRGBA(ThePreset.PolygonSelectionColor, sel_alpha));
 	sel_set->SetSelectionFaceColor(cSelectColor);
+	m_pcBaseView->GetHighlightSelection()->SetSelectionFaceColor(cSelectColor);
 
 	cSelectColor.Set(ColorRGBA(ThePreset.LineSelectionColor, sel_alpha));
 	sel_set->SetSelectionEdgeColor(cSelectColor);
 
 	cSelectColor.Set(ColorRGBA(ThePreset.MarkerSelectionColor, sel_alpha));
 	sel_set->SetSelectionMarkerColor(cSelectColor);
+
 
 	// set markup color and weight
 	SetMarkupColor(ThePreset.MarkupColor);
@@ -1042,7 +1052,10 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	*/
 
 	m_pcBaseView->SetLightCount(ThePreset.LightCount);
-	m_pcBaseView->SetViewSelectionLevel(HSelectionLevelSegment);
+
+	// #Temp Change
+	//m_pcBaseView->SetViewSelectionLevel(HSelectionLevelSegment);
+	m_pcBaseView->SetViewSelectionLevel(HSelectionLevelEntity);
 
 	// 메모리 소모가 많고 속도에는 큰 도움이 되지 않으므로 사용하지 않는다.
 	m_pcBaseView->GetModel()->SetStaticModel(false);
@@ -1408,7 +1421,7 @@ void H3DF::ViewImpl::ViewReady()
 // 	GetBaseView()->SetShadowIgnoresTransparency(TheKenel.VisualEffects.Shadow.IgnoreTransparency);
 // 	GetBaseView()->SetShadowMode((HShadowMode) TheKenel.VisualEffects.Shadow.Mode);
 
-	// GetBaseView()->SetOcclusionCullingMode(ThePreset.OcclusionCulling);
+	GetBaseView()->SetOcclusionCullingMode(ThePreset.OcclusionCulling, true);
 
 	//Turn on static model and display lists last, and in that order
  	//pcModel->SetStaticModel(TheKenel.Performance.Optimization.StaticModel);

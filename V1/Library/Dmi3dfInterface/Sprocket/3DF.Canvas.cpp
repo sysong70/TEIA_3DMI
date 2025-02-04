@@ -310,7 +310,7 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 2/2 : Performing Initial Update");
 	}
 
-	//pcViewImpl->ViewReady();
+	// pcViewImpl->ViewReady();
 
 	//cModelSegmentKey.ForcedClose();
 

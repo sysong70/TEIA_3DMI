@@ -20,6 +20,9 @@
 #include "../3DF/Visibility.h"
 #include "../3DF/VisualEffects.h"
 
+#include "../3DF/Highlight.h"
+#include "../3DF/Impl/HighlightImpl.h"
+
 #include "../3DF/Facility.AppOptions.h"
 
 #include "../3DF/3DF.Utility.h"
@@ -298,6 +301,30 @@ SegmentKey const H3DF::View::GetSceneKey() const
 	}
 
 	return pcImpl->GetBaseView()->GetSceneKey();
+}
+
+SegmentKey H3DF::View::GetOverwriteKey()
+{
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr == pcImpl->GetBaseView()) {
+		DEBUG_STOP;
+	}
+
+	return pcImpl->GetBaseView()->GetOverwriteKey();
+}
+
+SegmentKey const H3DF::View::GetOverwriteKey() const
+{
+	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	if (nullptr == pcImpl->GetBaseView()) {
+		DEBUG_STOP;
+	}
+
+	return pcImpl->GetBaseView()->GetOverwriteKey();
 }
 
 NavigationCube & H3DF::View::GetNavigationCube() const
@@ -695,3 +722,145 @@ void H3DF::View::LoadPointCloudFile(CString strFilePathName)
 	Utility::ChangeSubSegmentColor(cPointCloudSegment, cMaterialMapping, true);
 }
 
+bool H3DF::View::DoDynamicHighlighting(H3DF::HighlightControl & cHighlightControl, WindowPoint cInWindowPoint)
+{
+	int res, offset1, offset2, offset3;
+	char pathname[MVO_SEGMENT_PATHNAME_BUFFER], type[MVO_BUFFER_SIZE];
+	HC_KEY primitive;
+
+	HPoint cMousePos;
+	cMousePos.x = cInWindowPoint.x;
+	cMousePos.y = cInWindowPoint.y;
+	cMousePos.z = 0;
+
+// 	if (!m_bDynamicHighlighting || GetSuppressUpdateTick() || GetSuppressUpdate() || !GetModel()->GetFileLoadComplete())
+// 		return;
+
+	H3DF::HighlightControlImpl * pcHighlightControlImpl = (H3DF::HighlightControlImpl *) cHighlightControl.GetImpl();
+	
+	ViewImpl * pcImpl = dynamic_cast<ViewImpl *> (m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	HC_KEY nViewKey = pcHighlightControlImpl->GetBaseView()->GetViewKey();
+	HSelectionSet * pcHighlight = pcHighlightControlImpl->SelectionSet();
+	//HSelectionSet * pcHighlight = pcImpl->GetBaseView()->GetHighlightSelection();// pcHighlightControlImpl->SelectionSet();
+
+	HC_Open_Segment_By_Key(nViewKey);
+	res = HC_Compute_Selection(".", "./scene/overwrite", "v, selection level = entity", cMousePos.x, cMousePos.y);
+	HC_Close_Segment();
+
+	// compute the selection using the HOOPS window coordinate of the pick location
+	bool need_deselect = true;
+	bool need_update = true;
+
+	if (res) {
+		HC_Show_Selection_Element(&primitive, &offset1, &offset2, &offset3);
+		HC_Show_Selection_Pathname(pathname);
+
+		int incl_count;
+		int skey_count;
+		char skey_type[MVO_BUFFER_SIZE];
+
+		HC_Show_Selection_Keys_Count(&skey_count);
+
+		HC_KEY * keys = new HC_KEY[skey_count];
+		HC_KEY * incl_keys = new HC_KEY[skey_count];
+		HC_Show_Selection_Keys(&skey_count, keys);
+
+		incl_count = 0;
+		for (int i = skey_count - 1; i >= 0; i--) {
+			HC_Show_Key_Type(keys[i], skey_type);
+			if (strstr(skey_type, "include")) {
+				incl_keys[incl_count] = keys[i];
+				incl_count++;
+			}
+			else if (streq(skey_type, "reference")) {
+				primitive = keys[i];
+				break;
+			}
+		}
+
+		// Get the type of the selected
+		HC_Show_Key_Type(primitive, type);
+
+		// if we have a shell with visible faces, we may need to select regions
+		if (streq(type, "shell") && offset3 != -1) {
+			int region;
+			int lowest = 0;
+			int highest = 0;
+
+			if (pcHighlight->GetAllowRegionSelection())
+				HC_Show_Region_Range(primitive, &lowest, &highest);
+
+			if (lowest != highest || lowest > 0) {
+				HC_Open_Geometry(primitive);
+				{
+					HC_Open_Face(offset3);
+					{
+						HC_Show_Region(&region);
+					}
+					HC_Close_Face();
+				}
+				HC_Close_Geometry();
+
+				need_deselect = false;
+
+				if (!pcHighlight->IsRegionSelected(primitive, incl_count, incl_keys, region)) {
+					pcHighlight->DeSelectAll();
+					pcHighlight->SelectRegion(primitive, incl_count, incl_keys, region, false);
+				}
+				else
+					need_update = false;
+
+				goto DONE;
+			}
+
+			// NON-REGION SELECT FALLS THROUGH
+		}
+
+		need_deselect = false;
+
+		if (!pcHighlight->IsSelected(primitive, incl_count, incl_keys)) {
+			if (pcHighlight->GetSelectionLevel() !=
+				HSelectSegment) // never should fail for dynamic highlighting, but let's be nice and check
+			{
+				// the key is to a geometric entity.  If we are in segment selection mode,
+				// then we need to get the key to its parent segment.
+
+				HC_Show_Key_Type(primitive, type);
+
+				if (!streq("segment", type)) {
+					char segname[MVO_BUFFER_SIZE];
+					HC_KEY segkey;
+
+					segkey = HC_KShow_Owner_Original_Key(primitive);
+					HC_Show_Owner_By_Key(primitive, segname);
+
+					// climb up one more level if this is the temporary highlight key
+					if (pcHighlight->IsHighlightSegment(segkey)) {
+						segkey = HC_KShow_Owner_Original_Key(segkey);
+						HC_Show_Owner_By_Key(segkey, segname);
+					}
+				}
+			}
+			pcHighlight->DeSelectAll();
+			pcHighlight->Select(primitive, incl_count, incl_keys, false);
+		}
+		else
+			need_update = false;
+
+	DONE:
+		delete[] keys;
+		delete[] incl_keys;
+	}
+
+	if (need_deselect) {
+		pcHighlight->DeSelectAll();
+	}
+
+	if (need_update) {
+		pcHighlightControlImpl->GetBaseView()->ForceUpdate();
+	}
+
+	return true;
+}
