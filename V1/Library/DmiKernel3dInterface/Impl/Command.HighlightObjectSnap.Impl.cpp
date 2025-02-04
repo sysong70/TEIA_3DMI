@@ -422,16 +422,13 @@ KERNEL::Command::Result::Type KERNEL::Command::HighlightObjectSnapImpl::NoButton
 	return KERNEL::Command::Result::Type::Pass;
 }
 
-// 2.1 Dynamic Highlight 처리
+// 2.1 Dynamic Highlight 처리 #Selection
 bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint cInWindowPoint, SelectionItem & cOutSelection)
 {
-#if 0
-	Window().GetBaseView()->GetHighlightSelection()->SetAllowRegionSelection(false);
-	Window().GetBaseView()->SetDynamicHighlighting(true);
+#if 1
+	View().DoDynamicHighlighting(m_cDynHighlightControl, cInWindowPoint);
 
-	Window().GetBaseView()->DoDynamicHighlighting(HPoint(cInWindowPoint.x, cInWindowPoint.y, 0.0f));
-
-	return HLISTENER_PASS_EVENT;
+	return true;
 #endif
 
 	//if (View().GetSuppressUpdateTick() || View().GetSuppressUpdate() || !pcView->GetModel()->GetFileLoadComplete()) {
@@ -602,6 +599,32 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 		cOutSelection = cSelectItem;
 
 		H3DF::Type eType = cSelectItem.Type();
+
+#if 1
+		CStringA strRenderingOptions, strVisibility, strSelectability, strHeuristics, strDriverOptions;
+
+		View().GetSegmentKey().ShowRenderingOptions(strRenderingOptions);
+		View().GetSegmentKey().ShowVisibility(strVisibility);
+		View().GetSegmentKey().ShowSelectability(strSelectability);
+		View().GetSegmentKey().ShowHeuristics(strHeuristics);
+		View().GetSegmentKey().ShowDriverOptions(strDriverOptions);
+
+		View().GetSceneKey().ShowRenderingOptions(strRenderingOptions);
+		View().GetSceneKey().ShowVisibility(strVisibility);
+		View().GetSceneKey().ShowSelectability(strSelectability);
+		View().GetSceneKey().ShowHeuristics(strHeuristics);
+		View().GetSceneKey().ShowDriverOptions(strDriverOptions);
+
+		View().GetOverwriteKey().ShowRenderingOptions(strRenderingOptions);
+		View().GetOverwriteKey().ShowVisibility(strVisibility);
+		View().GetOverwriteKey().ShowSelectability(strSelectability);
+		View().GetOverwriteKey().ShowHeuristics(strHeuristics);
+		View().GetOverwriteKey().ShowDriverOptions(strDriverOptions);
+
+// 		SegmentKey cSegmentKey(nKey);
+// 		CStringA strRenderingOptions;
+// 		cSegmentKey.ShowRenderingOptions(strRenderingOptions);
+#endif
 
 		if (true == bFindPmiItem) {
 			m_cDynPmiHighlightCtrl.Highlight(cSelectItem, cOption);

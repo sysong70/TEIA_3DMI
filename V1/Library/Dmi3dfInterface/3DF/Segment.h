@@ -202,5 +202,12 @@ namespace H3DF
 		bool ShowUserData(IntPtrTArray & aOutIndices, ByteArrayArray & aOutData) const;
 		bool ShowUserDataIndices(IntPtrTArray & aOutIndices) const;
 		bool ShowUserData(intptr_t nInIndex, ByteArray & aOutData) const;
+
+		//== Information 관련 함수 ===================================================================
+		bool ShowRenderingOptions(CStringA & strList) const;
+		bool ShowVisibility(CStringA & strList) const;
+		bool ShowSelectability(CStringA & strList) const;
+		bool ShowHeuristics(CStringA & strList) const;
+		bool ShowDriverOptions(CStringA & strList) const;
 	};
 }
