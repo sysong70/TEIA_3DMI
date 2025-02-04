@@ -782,16 +782,18 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	// Rajesh B (11-Apr-2003)
 	m_pcBaseView->SetPolygonHandednessMode(HandednessLeft);
 
+/*
 	HPixelRGBA cHighlightSelectColor;
 	cHighlightSelectColor.Set(255, 0, 0);
 
 	m_pcBaseView->GetHighlightSelection()->SetSelectionFaceColor(cHighlightSelectColor);
 	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeColor(cHighlightSelectColor);
-	m_pcBaseView->GetHighlightSelection()->SetSelectionMarkerColor(cHighlightSelectColor);
+	m_pcBaseView->GetHighlightSelection()->SetSelectionMarkerColor(cHighlightSelectColor);*/
 
 	// #Selection: Highlighting Line, Edge 두께 설정
 
 	// 아래 부분을 삭제하면 다음에 설정된 fLineWeight를 적용할 때 Segment 오류가 발생함.
+
 /*
  	m_pcBaseView->GetSelection()->SetSelectionEdgeWeight(1.0);
  	m_pcBaseView->GetHighlightSelection()->SetSelectionEdgeWeight(1.0);
@@ -808,6 +810,7 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 		HC_Set_Line_Weight(fLineWeight);
 		HC_Set_Edge_Weight(fLineWeight);
 	} HC_Close_Segment();
+*/
 
 	m_pcBaseView->GetHighlightSelection()->SetGrayScale(false);// ThePreset.GrayScaleSelection);
 	m_pcBaseView->GetHighlightSelection()->SetUseDefinedHighlight(false);// ThePreset.UseDefinedHighlighting);
@@ -821,13 +824,14 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	int sel_alpha = (int)(ThePreset.SelectionColorTransparency * 2.56f);		// settings is a %, scale it to 256
 	cSelectColor.Set(ColorRGBA(ThePreset.PolygonSelectionColor, sel_alpha));
 	sel_set->SetSelectionFaceColor(cSelectColor);
+	m_pcBaseView->GetHighlightSelection()->SetSelectionFaceColor(cSelectColor);
 
 	cSelectColor.Set(ColorRGBA(ThePreset.LineSelectionColor, sel_alpha));
 	sel_set->SetSelectionEdgeColor(cSelectColor);
 
 	cSelectColor.Set(ColorRGBA(ThePreset.MarkerSelectionColor, sel_alpha));
 	sel_set->SetSelectionMarkerColor(cSelectColor);
-*/
+
 
 	// set markup color and weight
 	SetMarkupColor(ThePreset.MarkupColor);
