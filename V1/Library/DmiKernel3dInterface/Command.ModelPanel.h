@@ -33,6 +33,8 @@ namespace KERNEL
 			void OnItemExpandedSignal(Json::Object & cInObject);
 
 			void OnItemSelectedSignal(Json::Object& cInObject);
+			void ExchangeMkpViewSelectedSignal(H3DF::Component * pcInComponent);
+
 			void OnItemCheckedSignal(Json::Object & cInObject);
 
 			void OnItemDblClickedSignal(Json::Object & cInObject);

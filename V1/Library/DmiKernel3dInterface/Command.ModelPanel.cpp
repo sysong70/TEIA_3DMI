@@ -744,15 +744,35 @@ void KERNEL::Command::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject)
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	H3DF::Component * pcInComponent = dynamic_cast<Component *>((Component *)cInObject.GetDwordPtr(SKW_KEY));
+	H3DF::Component * pcInComponent = dynamic_cast<Component *>((Component *) cInObject.GetDwordPtr(SKW_KEY));
+	if (nullptr == pcInComponent) {
+		DEBUG_STOP;
+		return;
+	}
+
+	H3DF::Component::Type eType = pcInComponent->GetType();
+
+	if (H3DF::Component::Type::ExchangeMkpView == eType) {
+		ExchangeMkpViewSelectedSignal(pcInComponent);
+		return;
+	}
+}
+
+// 1.1 ExchangeMkpView Select Changed Signal 처리
+void KERNEL::Command::ModelPanel::ExchangeMkpViewSelectedSignal(H3DF::Component * pcInComponent)
+{
 	if (nullptr == pcInComponent) {
 		DEBUG_STOP;
 		return;
 	}
 
 	if (H3DF::Component::Type::ExchangeMkpView != pcInComponent->GetType()) {
+		DEBUG_STOP;
 		return;
 	}
+
+	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 
 	// 선택된 요소가 Markup View인 경우 처리.
 	// 1. 저장되어 있는 Camera 정보를 이용해서 View Position을 설정
@@ -900,7 +920,4 @@ void KERNEL::Command::ModelPanel::OnItemDblClickedSignal(Json::Object & cInObjec
 		DEBUG_STOP;
 		return;
 	}
-
-
-
 }
