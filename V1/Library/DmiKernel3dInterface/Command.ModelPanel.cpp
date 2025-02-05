@@ -756,6 +756,8 @@ void KERNEL::Command::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject)
 		ExchangeMkpViewSelectedSignal(pcInComponent);
 		return;
 	}
+
+	// Product Occurrence인 경우 처리
 }
 
 // 1.1 ExchangeMkpView Select Changed Signal 처리
