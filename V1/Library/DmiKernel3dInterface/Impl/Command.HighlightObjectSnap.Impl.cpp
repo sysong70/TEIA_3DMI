@@ -193,10 +193,9 @@ KERNEL::Command::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const Session 
 	cDynHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(10, 130, 10)));
 
 	// Blue 계열
- 	cDynHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(80, 80, 230)));
-	cDynHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(125, 125, 230)));
+//  cDynHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(80, 80, 230)));
+// 	cDynHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(125, 125, 230)));
 	
-/*
 
 	//cDynHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(120, 245, 120)));
 	cDynHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(117, 245, 158)));
@@ -212,11 +211,13 @@ KERNEL::Command::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const Session 
 	cDynHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(141+5, 79+5, 168+5)));
 
 	cDynHighlightMaterialMapping.SetTextColor(RGBAColor(RGB(115 + 10, 43 + 10, 245 + 10)));
-*/
 
 	m_cDynHighlightControl.SetMaterialMapping(cDynHighlightMaterialMapping);
 	// Shell 선택시에 Line Visibility를 설정한대로 적용하기 위해서 Lock을 걸도록 한다.
-	//m_cDynHighlightControl.GetAttributeLockControl().SetLock(AttributeLock::Type::Visibility);
+
+	m_cDynHighlightControl.GetAttributeLockControl().SetLock(AttributeLock::Type::MaterialLineColor);
+//	m_cDynHighlightControl.GetAttributeLockControl().SetLock(AttributeLock::Type::VisibilityLines);
+//	m_cDynHighlightControl.GetAttributeLockControl().SetLock(AttributeLock::Type::VisibilityEdges);
 	m_cDynHighlightControl.GetVisibilityControl().SetLines(false);
 	m_cDynHighlightControl.GetVisibilityControl().SetEdges(false);
 
@@ -226,11 +227,10 @@ KERNEL::Command::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const Session 
 	//m_cDynLineHighlightCtrl.SetMode(HighlightMode::Type::DefaultConditional);
 	m_cDynLineHighlightCtrl.SetMaterialMapping(cDynHighlightMaterialMapping);
 
-  	float fLineWeight = 0.003f;
-	fLineWeight = 0.1f;
+  	float fLineWeight = 0.004f;
   	Line::SizeUnits eUnits = Line::SizeUnits::WindowRelative;
 	m_cDynLineHighlightCtrl.GetLineAttributeControl().SetWeight(fLineWeight, eUnits);
-	//m_cDynLineHighlightCtrl.GetAttributeLockControl().SetLock(AttributeLock::Type::Visibility);
+	m_cDynLineHighlightCtrl.GetAttributeLockControl().SetLock(AttributeLock::Type::LineAttributeWeight);
 
 	//----- PMI Highlight Control 설정 -----
 	m_cDynPmiHighlightCtrl.SetMaterialMapping(cDynHighlightMaterialMapping);

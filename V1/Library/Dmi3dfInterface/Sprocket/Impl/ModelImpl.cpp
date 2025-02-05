@@ -66,7 +66,7 @@ void H3DF::ModelImpl::Init()
 	m_cMarkups = m_cSegmentKey.Subsegment("markups");
 
 	// 화면에 표시되는 통상적인 Line Weigth를 설정한다.	
-	float fLineWeight = 0.001f;
+	float fLineWeight = 0.0005f;
 	Line::SizeUnits eUnits = Line::SizeUnits::WindowRelative;
 	m_cModels.GetLineAttributeControl().SetWeight(fLineWeight, eUnits);
 

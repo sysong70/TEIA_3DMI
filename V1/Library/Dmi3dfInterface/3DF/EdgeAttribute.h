@@ -15,8 +15,8 @@ namespace H3DF
 		enum class SizeUnits : uint32_t
 		{
 			ScaleFactor,			// A unitless linear scaling factor.  A value of 2.0 will cause edges to be rendered twice as thick.  
-			// A value of 1.0 will result in a visually pleasing device-dependent edge weight.  
-			// A value of 0 will result in the minimal weight edge supported by the device.
+									// A value of 1.0 will result in a visually pleasing device-dependent edge weight.  
+									// A value of 0 will result in the minimal weight edge supported by the device.
 			ObjectSpace,			// Object space units ignoring any scaling components in modelling matrices. (oru)
 			SubscreenRelative,		// Fraction of the height of the outermost window. (sru)
 			WindowRelative,			// Fraction of the height of the local window. (wru)
