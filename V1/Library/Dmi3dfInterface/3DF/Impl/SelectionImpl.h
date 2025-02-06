@@ -91,24 +91,19 @@ namespace H3DF
 	public:
 		SelectionItemImpl() { m_eType = H3DF::Type::SelectionItem; }
 
-		virtual ~SelectionItemImpl()
-		{
-			if (nullptr != m_pnIncludeKeys) {
-				delete m_pnIncludeKeys;
-			}
-		}
-
 		void Copy(SelectionItemImpl * pcInThat) {
 			m_cKey = pcInThat->m_cKey;
 
-			m_nIncludeCount = pcInThat->m_nIncludeCount;
-			// pnIncludeKeys값 복사
-			if (0 < m_nIncludeCount) {
-				m_pnIncludeKeys = new HC_KEY[m_nIncludeCount];
-				for (int i = 0; i < m_nIncludeCount; i++) {
-					m_pnIncludeKeys[i] = pcInThat->m_pnIncludeKeys[i];
-				}
-			}
+			m_vcIncludeKeys = pcInThat->m_vcIncludeKeys;
+
+// 			m_nIncludeCount = pcInThat->m_nIncludeCount;
+// 			// pnIncludeKeys값 복사
+// 			if (0 < m_nIncludeCount) {
+// 				m_pnIncludeKeys = new HC_KEY[m_nIncludeCount];
+// 				for (int i = 0; i < m_nIncludeCount; i++) {
+// 					m_pnIncludeKeys[i] = pcInThat->m_pnIncludeKeys[i];
+// 				}
+// 			}
 
 			m_nOffset1 = pcInThat->m_nOffset1;
 			m_nOffset2 = pcInThat->m_nOffset2;
@@ -127,8 +122,10 @@ namespace H3DF
 		// LineKey 등이 저장되는 변수
 		Key m_cKey;
 
-		int m_nIncludeCount = 0;
-		HC_KEY * m_pnIncludeKeys = nullptr;
+		std::vector<HC_KEY> m_vcIncludeKeys;
+
+// 		int m_nIncludeCount = 0;
+// 		HC_KEY * m_pnIncludeKeys = nullptr;
 
 		int m_nOffset1 = 0;
 		int m_nOffset2 = 0;

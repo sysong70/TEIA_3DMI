@@ -238,6 +238,7 @@ namespace H3DF
 
 		bool ShowPath(KeyPath & cOutPath) const;
 		void ShowPathString(CString & strOutPath);
+		void ShowSimplePathString(CString & strOutPath);
 
 		bool ShowSelectionPosition(WindowPoint & cOutLocation) const;
 		bool ShowSelectionPosition(WorldPoint & cOutLocation) const;

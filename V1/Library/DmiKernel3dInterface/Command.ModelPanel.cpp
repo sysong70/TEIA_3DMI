@@ -756,11 +756,16 @@ void KERNEL::Command::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject)
 		ExchangeMkpViewSelectedSignal(pcInComponent);
 		return;
 	}
-
-	// Product Occurrence인 경우 처리
+	// Product Occurrence인 경우 처리, 일단 Product Occurrence를 대상으로 작업한다.
+	// 다만 다른 아이탬과 차이가 있는지는 알 수 없음.
+	else if (H3DF::Component::Type::ExchangeProductOccurrence == eType) {
+		ProductOccurrenceSelectedSignal(pcInComponent);
+		return;
+	}
 }
+	
 
-// 1.1 ExchangeMkpView Select Changed Signal 처리
+// 1.1 ExchangeMkpView Select Changed Signal 처리 #Tree-Select
 void KERNEL::Command::ModelPanel::ExchangeMkpViewSelectedSignal(H3DF::Component * pcInComponent)
 {
 	if (nullptr == pcInComponent) {
@@ -872,6 +877,16 @@ void KERNEL::Command::ModelPanel::ExchangeMkpViewSelectedSignal(H3DF::Component 
 	else { 
 		pcImpl->Camera().FitWorldOnly();
 	}
+}
+
+// 1.2 Product Occurrence Select Changed Signal 처리 #Tree-Select
+void KERNEL::Command::ModelPanel::ProductOccurrenceSelectedSignal(H3DF::Component * pcInComponent)
+{
+	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->Select().SelectByComponent(pcInComponent);
+
 }
 
 // 2. Item Checked Signal 처리

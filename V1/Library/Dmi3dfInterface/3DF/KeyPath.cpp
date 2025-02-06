@@ -139,16 +139,6 @@ H3DF::KeyPath::KeyPath(size_t nInPathCount, Key const pInPath[])
 	pcImpl->Set(nInPathCount, pInPath);
 }
 
-H3DF::KeyPath::KeyPath(size_t nInPathCount, HC_KEY const pInPath[])
-{
-	KeyPathImpl * pcImpl = new KeyPathImpl();
-	DEBUG_VALID(pcImpl);
-
-	pcImpl->Set(nInPathCount, pInPath);
-
-	m_pcImpl = pcImpl;
-}
-
 H3DF::KeyPath::KeyPath(KeyPath const & cInThat)
 {
 	KeyPathImpl * pcImpl = new KeyPathImpl();
@@ -191,13 +181,6 @@ KeyPath & H3DF::KeyPath::SetKeys(KeyArray const & cInKeys)
 {
 	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
 	pcImpl->Set(cInKeys);
-	return *this;
-}
-
-KeyPath & H3DF::KeyPath::SetKeys(size_t nInKeyCount, HC_KEY const pInKeys[])
-{
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
-	pcImpl->Set(nInKeyCount, pInKeys);
 	return *this;
 }
 
@@ -326,14 +309,9 @@ Key const & H3DF::KeyPath::At(size_t nInIndex) const
 
 void H3DF::KeyPath::Insert(size_t nInIndex, Key const & cInItem)
 {
-	Insert(nInIndex, cInItem.KeyValue());
-}
-
-void H3DF::KeyPath::Insert(size_t nInIndex, HC_KEY nInKey)
-{
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	KeyPathImpl * pcImpl = (KeyPathImpl *) m_pcImpl;
 	auto cIterator = pcImpl->m_aPaths.begin();
-	pcImpl->m_aPaths.insert(cIterator + nInIndex, nInKey);
+	pcImpl->m_aPaths.insert(cIterator + nInIndex, cInItem);
 }
 
 void H3DF::KeyPath::Remove(Key const & cInItem)

@@ -18,6 +18,7 @@
 #include <Sprocket/3DF.View.h>
 #include <3DF/Window.h>
 #include <3DF/Selection.h>
+#include <3DF/Impl/SelectionImpl.h>
 #include <3DF/Highlight.h>
 #include <3DF/Visibility.h>
 #include <3DF/LineAttribute.h>
@@ -166,6 +167,8 @@ KERNEL::Command::Select::Select(const Session * pcInSession) :
 }
 
 //== Mouse Event 관련 함수 ===========================================================================
+
+// 1.Select::MouseMove
 Command::Result::Type KERNEL::Command::Select::MouseMove(Event & cInEvent)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
@@ -176,17 +179,19 @@ Command::Result::Type KERNEL::Command::Select::MouseMove(Event & cInEvent)
 	return Command::Result::Type::Pass;
 }
 
+// 2.Select::LButtonDown
 Command::Result::Type KERNEL::Command::Select::LButtonDown(Event & cInEvent)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
+	// 위치 저장
 	pcImpl->m_cLButtonDownPixelPosition.Set(cInEvent.GetMousePixelPoint().x, cInEvent.GetMousePixelPoint().y);
 
 	return Command::Result::Type::Pass;
 }
 
-// #Coding: 1.Select::LButtonUp
+// 3.Select::LButtonUp 실제로 Mouse Click으로 선택하는 부분 #Selection
 Command::Result::Type KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
@@ -216,6 +221,9 @@ Command::Result::Type KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 #ifdef _DEBUG
 	CString strPath;
 	cSelItem.ShowPathString(strPath);
+	
+	CString strSimplePath;
+	cSelItem.ShowSimplePathString(strSimplePath);
 #endif
 
 	// 3. 기존에 선택되어 있는 Dynamic highlight를 모두 지움.
@@ -238,6 +246,7 @@ Command::Result::Type KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 		}
 	}
 
+	// 이미 선택된 객체인지 확인
 	if (false == pcImpl->m_cSelectionResult.IsExist(cSelItem)) {
 		if (H3DF::Type::LineKey == cSelItem.Type()) {
 			pcImpl->m_cLineHighlightCtrl.Highlight(cSelItem, cOptions, false);
@@ -314,6 +323,7 @@ void KERNEL::Command::Select::ResetSnapItems(bool bUpdate)
 
 //== Select 관련 함수 ================================================================================
 
+// 1. SelectionResults를 이용해서 Select 실행 #Selection
 bool KERNEL::Command::Select::SelectByResult(H3DF::SelectionResults & cInResults)
 {
 	auto * pcImpl = (Command::SelectImpl *)m_pcImpl;
@@ -410,6 +420,51 @@ H3DF::SelectionResults & KERNEL::Command::Select::Results()
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cSelectionResult;
+}
+
+bool KERNEL::Command::Select::SelectByComponent(H3DF::Component * pcInComponent)
+{
+	if (nullptr == pcInComponent) {
+		DEBUG_STOP;
+		return false;
+	}
+
+	auto * pcImpl = dynamic_cast<Command::SelectImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	H3DF::SelectionItem cSelItem;
+	H3DF::SelectionItemImpl * pcSelItemImpl = dynamic_cast<H3DF::SelectionItemImpl *>(cSelItem.GetImpl());
+	DEBUG_VALID(pcSelItemImpl);
+
+	// 입력된 Component의 Segment Key를 설정
+	pcSelItemImpl->m_cKey = pcInComponent->GetSegmentKey();
+
+	// 다음은 Owner의 Include Key를 저장한다.
+	std::vector<HC_KEY> vcIncludeKeys;
+
+	H3DF::Component * pcTargetComponent = pcInComponent->GetOwner();
+
+	while (nullptr != pcTargetComponent) {
+		HC_KEY nIncludeKey = pcTargetComponent->GetIncludeKey();
+		if (INVALID_KEY != nIncludeKey) {
+			pcSelItemImpl->m_vcIncludeKeys.emplace_back(nIncludeKey);
+		}
+
+		pcTargetComponent = pcTargetComponent->GetOwner();
+	}
+
+#ifdef _DEBUG
+	CString strPath;
+	cSelItem.ShowPathString(strPath);
+
+	CString strSimplePath;
+	cSelItem.ShowSimplePathString(strSimplePath);
+#endif
+
+	H3DF::SelectionResults cResults;
+	cResults.PushFront(cSelItem);
+
+	return SelectByResult(cResults);
 }
 
 //== Highlight 관련 함수 =============================================================================

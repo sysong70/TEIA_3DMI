@@ -26,6 +26,8 @@
 #include <HMarkupManager.h>
 #include <HConstantFrameRate.h>
 
+#include <ranges>
+
 #define		SEGMENT_TYPE		1
 #define		ENTITY_TYPE			2
 #define		SUBENTITY_TYPE		3
@@ -574,14 +576,8 @@ bool H3DF::SelectionItem::operator==(SelectionItem const & cInThat) const
 		return false;
 	}
 
-	if (pcImpl->m_nIncludeCount != pcInThatImpl->m_nIncludeCount) {
+	if (pcImpl->m_vcIncludeKeys != pcInThatImpl->m_vcIncludeKeys) {
 		return false;
-	}
-
-	for (int nIndex = 0; nIndex < pcImpl->m_nIncludeCount; nIndex++) {
-		if (pcImpl->m_pnIncludeKeys[nIndex] != pcInThatImpl->m_pnIncludeKeys[nIndex]) {
-			return false;
-		}
 	}
 
 	// Arc나 Polygon, Polyline 등에서 특성값이나, 몇번째 요소들이 선택되었는지 여부를 나타내는 값들이다.
@@ -687,37 +683,56 @@ bool H3DF::SelectionItem::ShowPath(KeyPath & cOutPath) const
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	HC_KEY nSegmentKey = pcImpl->m_cKey.KeyValue();
-	if(INVALID_KEY == nSegmentKey) {
+	HC_KEY nKey = pcImpl->m_cKey.KeyValue();
+	if(INVALID_KEY == nKey) {
 		return false;
 	}
 
-	size_t nPathCount = pcImpl->m_nIncludeCount + 1;
-	HC_KEY * pnPath = new HC_KEY[nPathCount];
+	KeyArray cKeys;
 
 	char chType[MVO_BUFFER_SIZE];
-	HC_Show_Key_Type(nSegmentKey, chType);
+	HC_Show_Key_Type(nKey, chType);
 
 	if (!streq(chType, "segment")) {
-		nSegmentKey = HC_KShow_Owner_Original_Key(nSegmentKey);
+		nKey = HC_KShow_Owner_Original_Key(nKey);
 	}
 
-	pnPath[0] = nSegmentKey;
+	cKeys.emplace_back(nKey);
 
+	for (auto & vcIncludeKey : std::ranges::reverse_view(pcImpl->m_vcIncludeKeys)) {
+		cKeys.emplace_back(vcIncludeKey);
+	}
+
+/*
+	HC_KEY nBackKey = cKeys.back().KeyValue();
+	HC_Show_Key_Type(nBackKey, chType);
+
+	SegmentKey cSegment(nBackKey);
+	CStringA strName = cSegment.Name();
+
+	CString strName1;
+	UserData::ShowSegmentName(cSegment, strName1);
+*/
+
+	HC_KEY nBackKey = cKeys[cKeys.size() - 2].KeyValue();
+	cKeys.back() = HC_KShow_Owner_Original_Key(nBackKey);
+
+/*
 	for (int nIndex = 1; nIndex < pcImpl->m_nIncludeCount; ++nIndex) {
 		pnPath[nIndex] = pcImpl->m_pnIncludeKeys[pcImpl->m_nIncludeCount - nIndex];
 	}
 
 	pnPath[nPathCount - 1] = HC_KShow_Owner_Original_Key(pnPath[nPathCount - 2]);
+*/
 
-	cOutPath = KeyPath(nPathCount, pnPath);
+	cOutPath = KeyPath(cKeys);
 
 	return true;
 }
 
 void H3DF::SelectionItem::ShowPathString(CString & strOutPath)
 {
-	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
+	SelectionItemImpl * pcImpl = (SelectionItemImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	KeyPath cPath;
@@ -735,34 +750,34 @@ void H3DF::SelectionItem::ShowPathString(CString & strOutPath)
 	CString strName;
 
 	if (streq("segment", chType)) {
-		SegmentKey cSegmentKey(nKey);
-		if (false == UserData::ShowSegmentName(cSegmentKey, strName)) {
-			strName = cSegmentKey.Name(false);
+		SegmentKey cSegment(nKey);
+		if (false == UserData::ShowSegmentName(cSegment, strName)) {
+			strName = cSegment.Name(false);
 		}
 
-		strText.Format(L"Select Key: %d [%s], [%s, %s]", nKey, Utility::ToString(chType), strName, CString(cSegmentKey.Name(false)));
+		strText.Format(L"Select Key: %d [%s], [%s, %s]", nKey, Utility::ToString(chType), strName, CString(cSegment.Name(false)));
 	}
 	else {
-		strText.Format(L"Select Key: %d [%s], [%s]", nKey, Utility::ToString(chType), strName);
+		strText.Format(L"Select Key: %d [%s]", nKey, Utility::ToString(chType));
 	}
 
-	
+
 	strOutPath += strText;
 
 	if (nKey != cPath.At(0).KeyValue()) {
 		nKey = cPath.At(0).KeyValue();
 		HC_Show_Key_Type(nKey, chType);
 
-		SegmentKey cSegmentKey(nKey);
-		if (false == UserData::ShowSegmentName(cSegmentKey, strName)) {
-			strName = cSegmentKey.Name(false);
+		SegmentKey cSegment(nKey);
+		if (false == UserData::ShowSegmentName(cSegment, strName)) {
+			strName = cSegment.Name(false);
 		}
 
 		strText.Format(L"\nOwner of select key: %d [%s], %s", nKey, Utility::ToString(chType), strName);
 		strOutPath += strText;
 	}
 
-	for (int nIndex = 1; nIndex < pcImpl->m_nIncludeCount; ++nIndex) {
+	for (int nIndex = 1; nIndex < pcImpl->m_vcIncludeKeys.size(); ++nIndex) {
 		nKey = cPath.At(nIndex).KeyValue();
 
 		H3DF::Type eType = H3DF::Utility::GetType(nKey);
@@ -795,6 +810,8 @@ void H3DF::SelectionItem::ShowPathString(CString & strOutPath)
 	H3DF::Type eType = H3DF::Utility::GetType(nKey);
 
 	SegmentKey cSegmentKey1(nKey);
+	strName = cSegmentKey1.Name();
+
 	if (false == UserData::ShowSegmentName(cSegmentKey1, strName)) {
 		strName = cSegmentKey1.Name(false);
 	}
@@ -807,6 +824,34 @@ void H3DF::SelectionItem::ShowPathString(CString & strOutPath)
 	}
 
 	strOutPath += strText;
+}
+
+void H3DF::SelectionItem::ShowSimplePathString(CString & strOutPath)
+{
+	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	KeyPath cPath;
+	if (false == ShowPath(cPath)) {
+		DEBUG_STOP;
+		return;
+	}
+
+	CString strText;
+	char chType[MVO_BUFFER_SIZE];
+
+	HC_KEY nKey = pcImpl->m_cKey.KeyValue();
+	HC_Show_Key_Type(nKey, chType);
+
+	strText.Format(L"Select Key: %d [%s]", nKey, Utility::ToString(chType));
+	
+	strOutPath += strText;
+
+	for (auto nIncludeKey : pcImpl->m_vcIncludeKeys) {
+		HC_Show_Key_Type(nIncludeKey, chType);
+		strText.Format(L"\nPath Key: %d [%s]", nIncludeKey, Utility::ToString(chType));
+		strOutPath += strText;
+	}
 }
 
 bool H3DF::SelectionItem::ShowSelectionPosition(WindowPoint & cOutLocation) const
@@ -1323,7 +1368,6 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 	HC_KEY * pnIncludeKeys = nullptr;
 	int	eSelectedType = SelectionControlImpl::SelType::None;
 	char chKeyType[MVO_BUFFER_SIZE];
-	int	nIncludeCount = 0;
 
 	// 선택된 요소를 SelectionResults에 저장하기 위해서 새롭게 생성
 	SelectionResultsImpl * pcResultsImpl = static_cast<SelectionResultsImpl *>(cOutResults.GetImpl());
@@ -1354,15 +1398,18 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 		//TRACE(L"\nSelection_Keys_Count: %d", nKeyCount);
 
 		if (0 < nKeyCount) {
-			WindowKeyImpl * pcImpl = (WindowKeyImpl *)pcSelCtrlImpl->m_pcWindow->GetImpl();
+			WindowKeyImpl * pcImpl = (WindowKeyImpl *) pcSelCtrlImpl->m_pcWindow->GetImpl();
 			HC_KEY * pnKeys = pcImpl->GetSelectBufferKey(nKeyCount);
 
 			pnIncludeKeys = new HC_KEY[nKeyCount];
 			HC_Show_Selection_Original_Keys(&nKeyCount, pnKeys);
 
-			pcItemImpl->m_pnIncludeKeys = pnIncludeKeys;
+			for (int nIndex = 0 ; nIndex < nKeyCount ; nIndex++)
+			{
+				HC_Show_Key_Type(pnKeys[nIndex], chKeyType);
+				int i = 0;
+			}
 
-			nIncludeCount = 0;
 			for (int nIndex = nKeyCount - 1; nIndex >= 0; nIndex--)
 			{
 				HC_Show_Key_Type(pnKeys[nIndex], chKeyType);
@@ -1372,18 +1419,14 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 					// nKey = pnKeys[nIndex];
 					//nKey = HC_Show_Reference_Geometry(pnKeys[nIndex]);
 				}
-				else if (strstr(chKeyType, "include"))
-				{
-					pnIncludeKeys[nIncludeCount] = pnKeys[nIndex];
-					nIncludeCount++;
+				else if (strstr(chKeyType, "include")) {
+					pcItemImpl->m_vcIncludeKeys.emplace_back(pnKeys[nIndex]);
 				}
 				else if (streq(chKeyType, "reference")) {
 					// nKey = pnKeys[nIndex];
 					//nKey = HC_Show_Reference_Geometry(pnKeys[nIndex]);
 				}
 			}
-
-			pcItemImpl->m_nIncludeCount = nIncludeCount;
 		}
 
 		HC_Show_Key_Type(nKey, chKeyType);

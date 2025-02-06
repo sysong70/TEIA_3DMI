@@ -216,13 +216,13 @@ HighlightControl & H3DF::HighlightControl::Highlight(SelectionResults const & cI
 		if (H3DF::Type::ShellKey == cItem.Type() && (pcItemImpl->m_nLowest != pcItemImpl->m_nHighest || pcItemImpl->m_nLowest > 0)) {
 			bNeedDeselect = false;
 
-			if (!pcSelSet->IsRegionSelected(nKey, pcItemImpl->m_nIncludeCount, pcItemImpl->m_pnIncludeKeys, pcItemImpl->m_nRegion))
+			if (!pcSelSet->IsRegionSelected(nKey, (int)pcItemImpl->m_vcIncludeKeys.size(), pcItemImpl->m_vcIncludeKeys.data(), pcItemImpl->m_nRegion))
 			{
 				if (true == bInRemoveExisting) {
 					pcSelSet->DeSelectAll();
 				}
 
-				pcSelSet->SelectRegion(nKey, pcItemImpl->m_nIncludeCount, pcItemImpl->m_pnIncludeKeys, pcItemImpl->m_nRegion, false);
+				pcSelSet->SelectRegion(nKey, (int)pcItemImpl->m_vcIncludeKeys.size(), pcItemImpl->m_vcIncludeKeys.data(), pcItemImpl->m_nRegion, false);
 			}
 			else {
 				bNeedUpdate = false;
@@ -231,7 +231,7 @@ HighlightControl & H3DF::HighlightControl::Highlight(SelectionResults const & cI
 		else {
 			bNeedDeselect = false;
 
-			if (!pcSelSet->IsSelected(nKey, pcItemImpl->m_nIncludeCount, pcItemImpl->m_pnIncludeKeys)) {
+			if (!pcSelSet->IsSelected(nKey, (int) pcItemImpl->m_vcIncludeKeys.size(), pcItemImpl->m_vcIncludeKeys.data())) {
 				HSelectLevel eSelectLevel = pcSelSet->GetSelectionLevel();
 
 				if (pcSelSet->GetSelectionLevel() != HSelectSegment) // never should fail for dynamic highlighting, but let's be nice and check
@@ -257,7 +257,7 @@ HighlightControl & H3DF::HighlightControl::Highlight(SelectionResults const & cI
 					}
 				}
 
-				pcSelSet->Select(nKey, pcItemImpl->m_nIncludeCount, pcItemImpl->m_pnIncludeKeys, false);
+				pcSelSet->Select(nKey, (int) pcItemImpl->m_vcIncludeKeys.size(), pcItemImpl->m_vcIncludeKeys.data(), false);
 			}
 			else {
 				bNeedUpdate = false;
@@ -304,15 +304,15 @@ HighlightControl & H3DF::HighlightControl::Highlight(SelectionItem const & cInIt
 
 	// Region 선택 관련 처리 부분
 	if (H3DF::Type::ShellKey == cInItem.Type() && (pcItemImpl->m_nLowest != pcItemImpl->m_nHighest || pcItemImpl->m_nLowest > 0)) {
-		if (!pcSelSet->IsRegionSelected(nKey, pcItemImpl->m_nIncludeCount, pcItemImpl->m_pnIncludeKeys, pcItemImpl->m_nRegion)) {
-			pcSelSet->SelectRegion(nKey, pcItemImpl->m_nIncludeCount, pcItemImpl->m_pnIncludeKeys, pcItemImpl->m_nRegion, false);
+		if (!pcSelSet->IsRegionSelected(nKey, (int) pcItemImpl->m_vcIncludeKeys.size(), pcItemImpl->m_vcIncludeKeys.data(), pcItemImpl->m_nRegion)) {
+			pcSelSet->SelectRegion(nKey, (int) pcItemImpl->m_vcIncludeKeys.size(), pcItemImpl->m_vcIncludeKeys.data(), pcItemImpl->m_nRegion, false);
 		}
 		else {
 			bNeedUpdate = false;
 		}
 	}
 	else {
-		if (!pcSelSet->IsSelected(nKey, pcItemImpl->m_nIncludeCount, pcItemImpl->m_pnIncludeKeys)) {
+		if (!pcSelSet->IsSelected(nKey, (int) pcItemImpl->m_vcIncludeKeys.size(), pcItemImpl->m_vcIncludeKeys.data())) {
 			HSelectLevel eSelectLevel = pcSelSet->GetSelectionLevel();
 
 			if (pcSelSet->GetSelectionLevel() != HSelectSegment) // never should fail for dynamic highlighting, but let's be nice and check
@@ -339,7 +339,7 @@ HighlightControl & H3DF::HighlightControl::Highlight(SelectionItem const & cInIt
 				}
 			}
 
-			pcSelSet->Select(nKey, pcItemImpl->m_nIncludeCount, pcItemImpl->m_pnIncludeKeys, false);
+			pcSelSet->Select(nKey, (int) pcItemImpl->m_vcIncludeKeys.size(), pcItemImpl->m_vcIncludeKeys.data(), false);
 		}
 		else {
 			bNeedUpdate = false;
@@ -375,7 +375,7 @@ HighlightControl & H3DF::HighlightControl::Unhighlight(SelectionResults const & 
 	for (auto & pcItem : pcImpl->GetItems()) {
 		SelectionItemImpl * pcItemImpl = (SelectionItemImpl *)pcItem.GetImpl();
 		HC_KEY nKey = pcItemImpl->m_cKey.KeyValue();
-		pcSelection->DeSelect(nKey, pcItemImpl->m_nIncludeCount, pcItemImpl->m_pnIncludeKeys, false);
+		pcSelection->DeSelect(nKey, (int) pcItemImpl->m_vcIncludeKeys.size(), pcItemImpl->m_vcIncludeKeys.data(), false);
 	}
 
 	bool bShowNotification = false;
@@ -396,7 +396,7 @@ HighlightControl & H3DF::HighlightControl::Unhighlight(SelectionItem const & cIn
 	DEBUG_VALID(pcItemImpl);
 
 	HC_KEY nKey = pcItemImpl->m_cKey.KeyValue();
-	pcHighlightImpl->SelectionSet()->DeSelect(nKey, pcItemImpl->m_nIncludeCount, pcItemImpl->m_pnIncludeKeys, false);
+	pcHighlightImpl->SelectionSet()->DeSelect(nKey, (int) pcItemImpl->m_vcIncludeKeys.size(), pcItemImpl->m_vcIncludeKeys.data(), false);
 
 	bool bShowNotification = false;
 	cInOptions.ShowNotification(bShowNotification);
@@ -421,8 +421,8 @@ HighlightControl & H3DF::HighlightControl::SetMaterialMapping(MaterialMappingKit
 	HighlightControlImpl * pcHighlightControlImpl = (HighlightControlImpl *)m_pcImpl;
 	HC_KEY nKey = pcHighlightControlImpl->SelectionSet()->GetHighlightStyle();
 	
-	SegmentKey cSegmentKey(nKey);
-	cSegmentKey.SetMaterialMapping(cInKit);
+	SegmentKey cSegment(nKey);
+	cSegment.SetMaterialMapping(cInKit);
 
 	return *this;
 }
@@ -432,8 +432,8 @@ MaterialMappingControl H3DF::HighlightControl::GetMaterialMappingControl()
 	HighlightControlImpl * pcHighlightControlImpl = (HighlightControlImpl *)m_pcImpl;
 	HC_KEY nKey = pcHighlightControlImpl->SelectionSet()->GetHighlightStyle();
 
-	SegmentKey cSegmentKey(nKey);
-	MaterialMappingControl cMaterialMappingControl(cSegmentKey);
+	SegmentKey cSegment(nKey);
+	MaterialMappingControl cMaterialMappingControl(cSegment);
 
 	return cMaterialMappingControl;
 }
@@ -443,8 +443,8 @@ MaterialMappingControl const H3DF::HighlightControl::GetMaterialMappingControl()
 	HighlightControlImpl * pcHighlightControlImpl = (HighlightControlImpl *)m_pcImpl;
 	HC_KEY nKey = pcHighlightControlImpl->SelectionSet()->GetHighlightStyle();
 
-	SegmentKey cSegmentKey(nKey);
-	MaterialMappingControl cMaterialMappingControl(cSegmentKey);
+	SegmentKey cSegment(nKey);
+	MaterialMappingControl cMaterialMappingControl(cSegment);
 
 	return cMaterialMappingControl;
 }
@@ -470,8 +470,8 @@ VisibilityControl H3DF::HighlightControl::GetVisibilityControl()
 
 	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
 
-	SegmentKey cSegmentKey(nKey);
-	VisibilityControl cControl(cSegmentKey);
+	SegmentKey cSegment(nKey);
+	VisibilityControl cControl(cSegment);
 
 	return cControl;
 }
@@ -482,8 +482,8 @@ VisibilityControl const H3DF::HighlightControl::GetVisibilityControl() const
 
 	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
 
-	SegmentKey cSegmentKey(nKey);
-	VisibilityControl cControl(cSegmentKey);
+	SegmentKey cSegment(nKey);
+	VisibilityControl cControl(cSegment);
 
 	return cControl;
 }
@@ -494,8 +494,8 @@ AttributeLockControl H3DF::HighlightControl::GetAttributeLockControl()
 
 	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
 
-	SegmentKey cSegmentKey(nKey);
-	AttributeLockControl cControl(cSegmentKey);
+	SegmentKey cSegment(nKey);
+	AttributeLockControl cControl(cSegment);
 
 	return cControl;
 }
@@ -507,8 +507,8 @@ AttributeLockControl const H3DF::HighlightControl::GetAttributeLockControl() con
 
 	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
 
-	SegmentKey cSegmentKey(nKey);
-	AttributeLockControl cControl(cSegmentKey);
+	SegmentKey cSegment(nKey);
+	AttributeLockControl cControl(cSegment);
 
 	return cControl;
 }
@@ -520,8 +520,8 @@ LineAttributeControl H3DF::HighlightControl::GetLineAttributeControl()
 
 	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
 
-	SegmentKey cSegmentKey(nKey);
-	LineAttributeControl cControl(cSegmentKey);
+	SegmentKey cSegment(nKey);
+	LineAttributeControl cControl(cSegment);
 
 	return cControl;
 }
@@ -533,8 +533,8 @@ LineAttributeControl const H3DF::HighlightControl::GetLineAttributeControl() con
 
 	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
 
-	SegmentKey cSegmentKey(nKey);
-	LineAttributeControl cControl(cSegmentKey);
+	SegmentKey cSegment(nKey);
+	LineAttributeControl cControl(cSegment);
 
 	return cControl;
 }
@@ -560,13 +560,13 @@ HighlightControl & H3DF::HighlightControl::Highlight_ORG(SelectionResults const 
 		if (H3DF::Type::ShellKey == cItem.Type() && (pcImpl->m_nLowest != pcImpl->m_nHighest || pcImpl->m_nLowest > 0)) {
 			bNeedDeselect = false;
 
-			if (!pcView->GetHighlightSelection()->IsRegionSelected(nKey, pcImpl->m_nIncludeCount, pcImpl->m_pnIncludeKeys, pcImpl->m_nRegion))
+			if (!pcView->GetHighlightSelection()->IsRegionSelected(nKey, (int) pcImpl->m_vcIncludeKeys.size(), pcImpl->m_vcIncludeKeys.data(), pcImpl->m_nRegion))
 			{
 				if (true == bInRemoveExisting) {
 					pcView->GetHighlightSelection()->DeSelectAll();
 				}
 
-				pcView->GetHighlightSelection()->SelectRegion(nKey, pcImpl->m_nIncludeCount, pcImpl->m_pnIncludeKeys, pcImpl->m_nRegion, false);
+				pcView->GetHighlightSelection()->SelectRegion(nKey, (int) pcImpl->m_vcIncludeKeys.size(), pcImpl->m_vcIncludeKeys.data(), pcImpl->m_nRegion, false);
 			}
 			else {
 				bNeedUpdate = false;
@@ -575,7 +575,7 @@ HighlightControl & H3DF::HighlightControl::Highlight_ORG(SelectionResults const 
 		else {
 			bNeedDeselect = false;
 
-			if (!pcView->GetHighlightSelection()->IsSelected(nKey, pcImpl->m_nIncludeCount, pcImpl->m_pnIncludeKeys)) {
+			if (!pcView->GetHighlightSelection()->IsSelected(nKey, (int) pcImpl->m_vcIncludeKeys.size(), pcImpl->m_vcIncludeKeys.data())) {
 				if (pcView->GetHighlightSelection()->GetSelectionLevel() != HSelectSegment) // never should fail for dynamic highlighting, but let's be nice and check
 				{
 					// the key is to a geometric entity.  If we are in segment selection mode,
@@ -603,7 +603,7 @@ HighlightControl & H3DF::HighlightControl::Highlight_ORG(SelectionResults const 
 					pcView->GetHighlightSelection()->DeSelectAll();
 				}
 				
-				pcView->GetHighlightSelection()->Select(nKey, pcImpl->m_nIncludeCount, pcImpl->m_pnIncludeKeys, false);
+				pcView->GetHighlightSelection()->Select(nKey, (int) pcImpl->m_vcIncludeKeys.size(), pcImpl->m_vcIncludeKeys.data(), false);
 			}
 			else {
 				bNeedUpdate = false;

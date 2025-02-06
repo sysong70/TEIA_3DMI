@@ -37,13 +37,6 @@ void H3DF::SelectionItemImpl::Reset()
 {
 	m_cKey.SetKeyValue(INVALID_KEY);
 
-	if (nullptr != m_pnIncludeKeys) {
-		delete m_pnIncludeKeys;
-		m_pnIncludeKeys = nullptr;
-	}
-
-	m_nIncludeCount = 0;
-
 	m_nOffset1 = 0;
 	m_nOffset2 = 0;
 	m_nOffset3 = 0;

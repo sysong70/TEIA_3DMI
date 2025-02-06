@@ -32,6 +32,7 @@ namespace KERNEL
 
 			//== Select 관련 함수 ====================================================================
 			bool SelectByResult(H3DF::SelectionResults & cInResults);
+			bool SelectByComponent(H3DF::Component * pcInComponent);
 			bool DynamicSelectByResult(H3DF::SelectionResults & cInResults);
 
 			void SetSelectionFilter(SelectionFilter::Type eInType);
