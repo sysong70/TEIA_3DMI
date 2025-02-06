@@ -359,7 +359,7 @@ namespace SESSION
 			bool InvisibleSelection = false;
 			bool DisplaceSelection = false;	// no gray scale selection
 			int SelectionColorTransparency = 0;
-			COLORREF PolygonSelectionColor = RGB(255, 128, 0);
+			COLORREF PolygonSelectionColor = RGB(0, 128, 0);
 			COLORREF LineSelectionColor = RGB(255, 128, 0);
 			COLORREF MarkerSelectionColor = RGB(255, 128, 0);
 			COLORREF MarkupColor = RGB(255, 0, 0);

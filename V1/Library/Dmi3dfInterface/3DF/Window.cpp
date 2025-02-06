@@ -77,12 +77,14 @@ H3DF::WindowKey::~WindowKey()
 const H3DF::BaseView * H3DF::WindowKey::GetBaseView() const
 {
 	WindowKeyImpl * pcImpl = dynamic_cast<WindowKeyImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 	return pcImpl->m_pcBaseView;
 }
 
 H3DF::BaseView * H3DF::WindowKey::GetBaseView()
 {
 	WindowKeyImpl * pcImpl = dynamic_cast<WindowKeyImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 	return pcImpl->GetBaseView();
 }
 

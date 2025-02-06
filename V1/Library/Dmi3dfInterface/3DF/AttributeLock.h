@@ -56,6 +56,9 @@ namespace H3DF
 		AttributeLockControl & SetLock(AttributeLock::Type eInType, bool bInState = true);
 		AttributeLockControl & SetLock(AttributeLockTypeArray const & eInTypes, BoolArray const & bInStates);
 
+		AttributeLockControl & UnsetLock(AttributeLock::Type eInType = AttributeLock::Type::Everything);
+		AttributeLockControl & UnsetLock(AttributeLockTypeArray const & eInType);
+
 		bool ShowLock(AttributeLock::Type eInType, bool & bOutState) const;
 	};
 }

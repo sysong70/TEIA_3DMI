@@ -63,6 +63,9 @@ namespace H3DF
 		SegmentKey GetSceneKey();
 		SegmentKey const GetSceneKey() const;
 
+		SegmentKey GetOverwriteKey();
+		SegmentKey const GetOverwriteKey() const;
+
 		NavigationCube & GetNavigationCube() const;
 
 		void InvalidateSceneBounding();
@@ -101,5 +104,7 @@ namespace H3DF
 	public:
 		void SaveHsfFile(CString strFilePathName, H3DF::Canvas * pcHoopsView);
 		void LoadPointCloudFile(CString strFilePathName);
+
+		bool DoDynamicHighlighting(H3DF::HighlightControl & cHighlightControl,WindowPoint cInWindowPoint);
 	};
 };

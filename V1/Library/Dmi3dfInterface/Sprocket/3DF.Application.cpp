@@ -501,6 +501,7 @@ void H3DF::Application::InitInstance()
 	//HC_Define_System_Options("fatal errors, errors, warnings, info, no message limit");
 	HErrorManager::AllowAllErrors();
 	HErrorManager::SetErrorCallback(H3DF::ApplicationImpl::ErrorCallback, this);
+	LogManager::SetWriteLog(LOGMANAGER_3DF_ERROR_LOG_ID, true);
 	LogManager::SetCreateFile(LOGMANAGER_3DF_ERROR_LOG_ID, true);
 	LogManager::SetFilePathName(LOGMANAGER_3DF_ERROR_LOG_ID, LogManager::GetExecuteDirectory() + L"Log\\3DF_Error.txt");
 	LogManager::Log(LOGMANAGER_3DF_ERROR_LOG_ID, L"Log Create");

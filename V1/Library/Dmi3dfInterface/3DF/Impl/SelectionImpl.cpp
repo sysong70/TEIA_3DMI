@@ -293,22 +293,27 @@ void H3DF::SelectionControlImpl::GetSelectOption(SelectionOptionsKit const & cIn
 	// Related Limit 관련 설정
 	size_t nLimit = 0;
 	if (true == cInOptions.ShowRelatedLimit(nLimit)) {
-		sprintf(chOption, "related selection limit = %d", (int)nLimit);
+		if (0 == nLimit) {
+			sprintf(chOption, "no related selection limit");
+		}
+		else {
+			sprintf(chOption, "related selection limit = %d", (int) nLimit);
+		}
+
+		Utility::Set3DfOptionString(pchOutOption, chOption);
 	}
-	else {
-		sprintf(chOption, "no related selection limit");
-	}
-	Utility::Set3DfOptionString(pchOutOption, chOption);
 
 	// Internal Limit 관련 설정
 	if (true == cInOptions.ShowInternalLimit(nLimit)) {
-		sprintf(chOption, "internal selection limit = %d", (int)nLimit);
-	}
-	else {
-		sprintf(chOption, "no internal selection limit");
-	}
-	Utility::Set3DfOptionString(pchOutOption, chOption);
+		if (0 == nLimit) {
+			sprintf(chOption, "no internal selection limit");
+		}
+		else {
+			sprintf(chOption, "internal selection limit = %d", (int) nLimit);
+		}
 
+		Utility::Set3DfOptionString(pchOutOption, chOption);
+	}
 	// Sorting 관련 설정
 	Selection::Sorting eSorting;
 	if (true == cInOptions.ShowSorting(eSorting)) {

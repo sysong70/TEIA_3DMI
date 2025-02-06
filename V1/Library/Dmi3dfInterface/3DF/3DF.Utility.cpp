@@ -247,6 +247,9 @@ Type H3DF::Utility::GetType(HC_KEY nInKey)
 	else if ("cutting" == strType) {
 		return H3DF::Type::CuttingSectionKey;
 	}
+	else if ("shell" == strType) {
+		return H3DF::Type::ShellKey;
+	}
 	else {
 		assert(false);
 	}

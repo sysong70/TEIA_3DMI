@@ -500,6 +500,22 @@ AttributeLockControl & H3DF::AttributeLockControl::SetLock(AttributeLockTypeArra
 	return *this;
 }
 
+AttributeLockControl & H3DF::AttributeLockControl::UnsetLock(AttributeLock::Type eInType)
+{
+	SetLock(eInType, false);
+
+	return *this;
+}
+
+AttributeLockControl & H3DF::AttributeLockControl::UnsetLock(AttributeLockTypeArray const & eInTypes)
+{
+	for (size_t nIndex = 0; nIndex < eInTypes.size(); nIndex++) {
+		SetLock(eInTypes[nIndex], false);
+	}
+
+	return *this;
+}
+
 bool H3DF::AttributeLockControl::ShowLock(AttributeLock::Type eInType, bool & bOutState) const
 {
 	AttributeLockControlImpl * pcImpl = dynamic_cast<AttributeLockControlImpl *>(m_pcImpl);

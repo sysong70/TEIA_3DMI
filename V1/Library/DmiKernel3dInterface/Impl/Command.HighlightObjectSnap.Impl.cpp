@@ -189,12 +189,12 @@ KERNEL::Command::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const Session 
 	cDynHighlightMaterialMapping.SetTextColor(cDynHighlightColor);
 
 	// Dark Green 계열
-// 	cDynHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(10, 130, 10)));
-// 	cDynHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(10, 130, 10)));
+	cDynHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(10, 130, 10)));
+	cDynHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(10, 130, 10)));
 
 	// Blue 계열
-	//cDynHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(80, 80, 230)));
- 	//cDynHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(125, 125, 230)));
+//  cDynHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(80, 80, 230)));
+// 	cDynHighlightMaterialMapping.SetFaceColor(RGBAColor(RGB(125, 125, 230)));
 	
 
 	//cDynHighlightMaterialMapping.SetLineColor(RGBAColor(RGB(120, 245, 120)));
@@ -214,20 +214,23 @@ KERNEL::Command::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const Session 
 
 	m_cDynHighlightControl.SetMaterialMapping(cDynHighlightMaterialMapping);
 	// Shell 선택시에 Line Visibility를 설정한대로 적용하기 위해서 Lock을 걸도록 한다.
-	m_cDynHighlightControl.GetAttributeLockControl().SetLock(AttributeLock::Type::Visibility);
+
+	m_cDynHighlightControl.GetAttributeLockControl().SetLock(AttributeLock::Type::MaterialLineColor);
+//	m_cDynHighlightControl.GetAttributeLockControl().SetLock(AttributeLock::Type::VisibilityLines);
+//	m_cDynHighlightControl.GetAttributeLockControl().SetLock(AttributeLock::Type::VisibilityEdges);
 	m_cDynHighlightControl.GetVisibilityControl().SetLines(false);
 	m_cDynHighlightControl.GetVisibilityControl().SetEdges(false);
 
-	//m_cDynHighlightControl.GetLineAttributeControl().SetWeight(1);
+	m_cDynHighlightControl.GetLineAttributeControl().SetWeight(1);
 
 	//----- Dynamic Line Highlight Control 설정 -----
 	//m_cDynLineHighlightCtrl.SetMode(HighlightMode::Type::DefaultConditional);
 	m_cDynLineHighlightCtrl.SetMaterialMapping(cDynHighlightMaterialMapping);
 
-  	float fLineWeight = 0.003f;
+  	float fLineWeight = 0.004f;
   	Line::SizeUnits eUnits = Line::SizeUnits::WindowRelative;
 	m_cDynLineHighlightCtrl.GetLineAttributeControl().SetWeight(fLineWeight, eUnits);
-	//m_cDynLineHighlightCtrl.GetAttributeLockControl().SetLock(AttributeLock::Type::Visibility);
+	m_cDynLineHighlightCtrl.GetAttributeLockControl().SetLock(AttributeLock::Type::LineAttributeWeight);
 
 	//----- PMI Highlight Control 설정 -----
 	m_cDynPmiHighlightCtrl.SetMaterialMapping(cDynHighlightMaterialMapping);
@@ -251,7 +254,7 @@ KERNEL::Command::Result::Type KERNEL::Command::HighlightObjectSnapImpl::LButtonD
 }
 
 // 2. 버튼 눌림 없는 Mouse Move 처리
-int KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(Event & cInEvent)
+KERNEL::Command::Result::Type KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(Event & cInEvent)
 {
 	PixelPoint cMousePixelPoint(cInEvent.GetMousePixelPoint());
 	WindowPoint cWindowPoint(cInEvent.GetMouseWindowPoint());
@@ -269,7 +272,7 @@ int KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(Event & cInEve
 
 	// 같은 Mouse Point가 계속 들어오는 경우는 처리하지 않는다.
 	if (0 == fDist) {
-		return HLISTENER_PASS_EVENT;
+		return KERNEL::Command::Result::Type::Pass;
 	}
 
 	// 화면상에 나타나는 Dynamic Highlight 처리
@@ -282,6 +285,7 @@ int KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(Event & cInEve
 	// 기존에 선택된 Snap Point가 있으면 삭제한다. Segment Flush.
 	m_cSnapPointSegment.Flush(Search::Type::Segment);
 
+	// 마무리 될때까지 화면을 업데이트 하지 않음.
 	View().SuppressUpdate(true);
 
 	// Prev Mouse Move에서 저장되어 있는 Snap Point를 그림.
@@ -355,7 +359,7 @@ int KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(Event & cInEve
 
 				View().Update();
 
-				return HLISTENER_PASS_EVENT;
+				return KERNEL::Command::Result::Type::Pass;
 			}
 		}
 	}
@@ -418,19 +422,15 @@ int KERNEL::Command::HighlightObjectSnapImpl::NoButtonDownAndMove(Event & cInEve
 		// TRACE(L"Update, Tick: %d\n", nTickCount);
 	}
 
-	return HLISTENER_PASS_EVENT;
+	return KERNEL::Command::Result::Type::Pass;
 }
 
-// 2.1 Dynamic Highlight 처리
+// 2.1 Dynamic Highlight 처리 #Selection
 bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint cInWindowPoint, SelectionItem & cOutSelection)
 {
 #if 0
-	pcView->GetHighlightSelection()->SetAllowRegionSelection(false);
-	pcView->SetDynamicHighlighting(true);
-
-	pcView->DoDynamicHighlighting(HPoint(cInWindowPoint.x, cInWindowPoint.y, 0.0f));
-
-	return HLISTENER_PASS_EVENT;
+	View().DoDynamicHighlighting(m_cDynHighlightControl, cInWindowPoint);
+	return true;
 #endif
 
 	//if (View().GetSuppressUpdateTick() || View().GetSuppressUpdate() || !pcView->GetModel()->GetFileLoadComplete()) {
@@ -443,7 +443,7 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 	// 전달되는 값에는 Line이 빠지지 않고 전달된다. Line은 Polyline을 함께 포함하고 있음.
 	// 0.2f의 단위는 ORU 단위임.
 	SelectionOptionsKit cSelectOption;
-	cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(15).SetInternalLimit(0).SetProximity(0.2f); // .SetBias(Selection::Bias::Lines);
+	cSelectOption.SetLevel(Selection::Level::Entity).SetRelatedLimit(15).SetInternalLimit(0).SetProximity(0.2f); // .SetBias(Selection::Bias::Lines); //Origin
 
 	// 2.Point를 이용한 Selection
 	SelectionResults cSelections;
@@ -453,6 +453,7 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 	// 	nResult = Window().GetelectionControl().SelectByPoint(cMousePoint, cSelectOption, cSelections);
 
 	// 3.Selection Filter를 적용해서 Filtering된 결과값을 얻음.
+	// ApplySelectionFilter 부분에서 ShellKey를 선택한 경우 Solid Filter를 적용해서 상단 Segment를 선택하는 경우 Dynamic Highlight에서 투명도가 적용되지 않는 문제가 있음.
 	SelectionResults cFilteredSelResult;
 	ApplySelectionFilter(cSelections, cFilteredSelResult);
 
@@ -487,7 +488,10 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 		cItem.ShowSelectionPosition(cWordlPoint);
 		cItem.ShowSelectionPosition(cWindowPoint);
 
-		TRACE(L"Item Type: %s / %f, %f, %f", Utility::GetTypeString(eType), cWordlPoint.x, cWordlPoint.y, cWordlPoint.z);
+		Key cSelectItemKey;
+		cItem.ShowSelectedItem(cSelectItemKey);
+
+		TRACE(L"Item Key: %d, Type: %s / %f, %f, %f", cSelectItemKey.KeyValue(), Utility::GetTypeString(eType), cWordlPoint.x, cWordlPoint.y, cWordlPoint.z);
 		cIter.Next();
 	}
 #endif
@@ -501,7 +505,7 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 	cSelectItem.ShowSelectionPosition(cSelectItemWorldPoint);
 	cSelectItem.ShowSelectionPosition(cSelectItemWindowPoint);
 
-	// 6.2개 이상의 요소가 선택된 경우 Line을 우선 처리한다. 앞에서 선택된 요소가 line이 아닌 경우에만 처리를 한다.
+	// 6. 2개 이상의 요소가 선택된 경우 Line을 우선 처리한다. 앞에서 선택된 요소가 line이 아닌 경우에만 처리를 한다.
 	if (1 < cFilteredSelResult.GetCount() && H3DF::Type::LineKey != eType) 
 	{
 		SelectionResultsIterator cIter = cFilteredSelResult.GetIterator();
@@ -536,7 +540,7 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 		}
 	}
 
-	// PMI Item이 선택된 경우 처리. PMI Item은 Group으로 선택되도록 처리한다.
+	// 7. PMI Item이 선택된 경우 처리. PMI Item은 Group으로 선택되도록 처리한다.
 	bool bFindPmiItem = false;
 	if (0 < cFilteredSelResult.GetCount()) {
 		H3DF::Type eType = cSelectItem.Type();
@@ -594,10 +598,37 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 	}
 
 	H3DF::HighlightOptionsKit cOption;
+
 	if (0 < cFilteredSelResult.GetCount()) {
 		cOutSelection = cSelectItem;
 
 		H3DF::Type eType = cSelectItem.Type();
+
+#if 0
+		CStringA strRenderingOptions, strVisibility, strSelectability, strHeuristics, strDriverOptions;
+
+		View().GetSegmentKey().ShowRenderingOptions(strRenderingOptions);
+		View().GetSegmentKey().ShowVisibility(strVisibility);
+		View().GetSegmentKey().ShowSelectability(strSelectability);
+		View().GetSegmentKey().ShowHeuristics(strHeuristics);
+		View().GetSegmentKey().ShowDriverOptions(strDriverOptions);
+
+		View().GetSceneKey().ShowRenderingOptions(strRenderingOptions);
+		View().GetSceneKey().ShowVisibility(strVisibility);
+		View().GetSceneKey().ShowSelectability(strSelectability);
+		View().GetSceneKey().ShowHeuristics(strHeuristics);
+		View().GetSceneKey().ShowDriverOptions(strDriverOptions);
+
+		View().GetOverwriteKey().ShowRenderingOptions(strRenderingOptions);
+		View().GetOverwriteKey().ShowVisibility(strVisibility);
+		View().GetOverwriteKey().ShowSelectability(strSelectability);
+		View().GetOverwriteKey().ShowHeuristics(strHeuristics);
+		View().GetOverwriteKey().ShowDriverOptions(strDriverOptions);
+
+// 		SegmentKey cSegmentKey(nKey);
+// 		CStringA strRenderingOptions;
+// 		cSegmentKey.ShowRenderingOptions(strRenderingOptions);
+#endif
 
 		if (true == bFindPmiItem) {
 			m_cDynPmiHighlightCtrl.Highlight(cSelectItem, cOption);
@@ -669,6 +700,14 @@ void KERNEL::Command::HighlightObjectSnapImpl::ApplySelectionFilter(H3DF::Select
 		else if (H3DF::Type::ShellKey == eType) {
 			if (m_nSelFilter & (DWORD)SelectionFilter::Type::Solid) {
 
+				SelectionItemImpl * pcItemImpl = dynamic_cast<SelectionItemImpl *>(cNextItem.GetImpl());
+
+				pcItemImpl->m_nOffset1 = 0;
+				pcItemImpl->m_nOffset2 = 0;
+				pcItemImpl->m_nOffset3 = 0;
+
+				cOutSelections.PushBack(cNextItem);
+#if 0
 				Key cItemKey;
 				cNextItem.ShowSelectedItem(cItemKey);
 
@@ -685,6 +724,7 @@ void KERNEL::Command::HighlightObjectSnapImpl::ApplySelectionFilter(H3DF::Select
 				pcItemPrivate->m_cKey = cOwner;
 
 				cOutSelections.PushBack(cOwnerItem);
+#endif
 			}
 			else if (m_nSelFilter & (DWORD)SelectionFilter::Type::Face) {
 				cOutSelections.PushBack(cNextItem);
