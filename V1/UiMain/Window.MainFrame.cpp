@@ -112,6 +112,20 @@ CRect Window::MainFrame::GetMDIRect()
 
 
 
+Component::CommandBar& Window::MainFrame::GetCommandBar()
+{
+	return m_commandBar;
+}
+
+
+
+CBCGPEdit& Window::MainFrame::GetCommandBarInput()
+{
+	return m_commandBar.m_wndInput;
+}
+
+
+
 Component::PanelBar& Window::MainFrame::GetPanelBar()
 {
 	return m_panelBar;
@@ -138,46 +152,11 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 	Json::Object& data = *pData;
 	Signal::Target target = (Signal::Target)data.GetInteger(SKW_TARGET);
 
-	switch (target) {
-	case Signal::Target::DebugTracer:
-	{
-		Dialog::Base& dlg = GetDebugTracer();
-		dlg.ShowWindow(SW_SHOW);
-		dlg.ReceiveSignal(pData);
-
-		REMOVE_POINTER(pData);
-	} break;
-
-	case Signal::Target::MainFrame:
-	{
-		Signal::MainFrame::Action action = (Signal::MainFrame::Action)data.GetInteger(SKW_ACTION, -1);
-		switch (action) {
-		case Signal::MainFrame::Action::ShowProgress:
-			ShowProgress(true);
-			break;
-
-		case Signal::MainFrame::Action::HideProgress:
-			ShowProgress(false);
-			break;
-
-		default:
-			DEBUG_STOP;
-			break;
-		}
-
-		REMOVE_POINTER(pData);
-	} break;
-
-	case Signal::Target::StatusBar:
-		m_statusBar.ReceiveSignal(pData);
-		break;
-
-	case Signal::Target::View:
-	case Signal::Target::ModelPanel:
-	case Signal::Target::TaskBar:
-	{
+	
+	if (target == Signal::Target::View || target == Signal::Target::ModelPanel || target == Signal::Target::TaskBar) {
 		int id = data.GetInteger(SKW_VIEWID, -1);
 		View* pView = TheApplication.FindView(id);
+
 		if (pView != nullptr) {
 			pView->PostMessage((int)EUserMessage::OnSignal, (WPARAM)pData);
 		}
@@ -185,24 +164,26 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 			DEBUG_STOP;
 			REMOVE_POINTER(pData);
 		}
-	} break;
 
-	case Signal::Target::Progress:
-	{
-		if (auto pDialog = m_dialogs.Get((int)target)) {
-			pDialog->ReceiveSignal(pData);
-		}
-		else {
-			//DEBUG_STOP;
-			REMOVE_POINTER(pData);
-		}
-	} break;
+		return;
+	}
 
-	case Signal::Target::Command: 
-	{
+	if (target == Signal::Target::StatusBar) {
+		m_statusBar.ReceiveSignal(pData);
+		return;
+	}
+
+	if (target == Signal::Target::UserIO) {
+		m_commandBar.ReceiveSignal(pData);
+		return;
+	}
+
+	if (target == Signal::Target::Command) {
 		int id = data.GetInteger(SKW_VIEWID, -1);
+
 		if (id == -1) {
 			// TODO - active command
+			REMOVE_POINTER(pData);
 		}
 		else {
 			View* pView = TheApplication.FindView(id);
@@ -214,12 +195,55 @@ void Window::MainFrame::ReceiveSignal(Json::Object* pData)
 				REMOVE_POINTER(pData);
 			}
 		}
-	} break;
 
-	default:
-		DEBUG_STOP;
-		REMOVE_POINTER(pData);
+		return;
 	}
+
+	if (target == Signal::Target::MainFrame) {
+		Signal::MainFrame::Action action = (Signal::MainFrame::Action)data.GetInteger(SKW_ACTION, -1);
+
+		switch (action) {
+			case Signal::MainFrame::Action::ShowProgress:
+				ShowProgress(true);
+				break;
+
+			case Signal::MainFrame::Action::HideProgress:
+				ShowProgress(false);
+				break;
+
+			default:
+				DEBUG_STOP;
+				break;
+		}
+
+		REMOVE_POINTER(pData);
+		return;
+	}
+
+	if (target == Signal::Target::Progress) {
+		if (auto pDialog = m_dialogs.Get((int)target)) {
+			pDialog->ReceiveSignal(pData);
+		}
+		else {
+			//DEBUG_STOP;
+			REMOVE_POINTER(pData);
+		}
+
+		return;
+	}
+
+#ifdef _DEBUG
+	if (target == Signal::Target::DebugTracer) {
+		Dialog::Base& dlg = GetDebugTracer();
+		dlg.ShowWindow(SW_SHOW);
+		dlg.ReceiveSignal(pData);
+
+		REMOVE_POINTER(pData);
+		return;
+	}
+#endif
+
+	DEBUG_STOP;
 }
 
 
@@ -273,6 +297,8 @@ void Window::MainFrame::ViewChanged(UINT message, View* pView)
 {
 	if (message == WM_ACTIVATE) {
 		m_panelBar.ViewChanged(&pView->m_tabs);
+		m_commandBar.ViewChanged(pView);
+
 		if (m_pActiveView == nullptr ||
 			m_pActiveView->GetViewType() != pView->GetViewType()) {
 			m_ribbonBar.ChangeByDocType(pView->GetDocument()->GetDocType());
@@ -548,10 +574,7 @@ int Window::MainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	DockControlBar(&m_panelBar);
 
-	// TEST - command prompt
-	m_commandPrompt.Initialize(this);
-	m_commandPrompt.Wait();
-	//m_commandPrompt.Activate(L"LINE", L"Specify first point:", L"Undo(U)|취소(U) Close(C)|닫기(C)");
+	m_commandBar.Initialize(this);
 
 	return 0;
 }
@@ -683,7 +706,7 @@ void Window::MainFrame::OnSize(UINT nType, int cx, int cy)
 	__super::OnSize(nType, cx, cy);
 
 	if (cx > 0 && cy > 0) {
-		m_commandPrompt.AdjustLayout();
+		m_commandBar.AdjustLayout();
 	}
 }
 

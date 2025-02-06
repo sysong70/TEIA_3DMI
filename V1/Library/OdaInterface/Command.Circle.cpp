@@ -10,16 +10,20 @@ struct CircleTracker : public TrackerBase
 {
     OdDbCircle* pCircle = nullptr;
 
-    void SetGsView(OdGsView* pView) override
+    void Initialize(OdGsView* pView) override
     {
-        pView->add(pCircle, 0);
+        if (Protect == false) {
+            pView->add(pCircle, 0);
+            Protect = true;
+        }
     };
 
-    void UnsetGsView(OdGsView* pView) override
+    void Terminate(OdGsView* pView) override
     {
-        pView->erase(pCircle);
-
-        pCircle = nullptr;
+        if (Protect == false) {
+            pView->erase(pCircle);
+            pCircle = nullptr;
+        }
     }
 };
 
@@ -41,38 +45,46 @@ static void TrackRadius(UserIO& io, OdGePoint3d centerPoint, CircleTracker* pTra
             pTracker->pCircle->setRadius(radius);
         }
 
-        void SetGsView(OdGsView* pView) override
+        void SetValue(const OdGePoint3d& point) override
         {
-            pTracker->SetGsView(pView);
+            OdGePoint3d center = pTracker->pCircle->center();
+            double radius = (center - point).length();
+            SetValue(radius);
         }
 
-        void UnsetGsView(OdGsView* pView) override
+        void Initialize(OdGsView* pView) override
         {
-            pTracker->UnsetGsView(pView);
+            pTracker->Initialize(pView);
+        }
+
+        void Terminate(OdGsView* pView) override
+        {
+            pTracker->Terminate(pView);
         }
     }
     tracker;
     tracker.pTracker = pTracker;
 
     pTracker->pCircle->setCenter(centerPoint);
-    double radius = 1.0;
 
-    CString prompt = Io::CircleCrRadius;
-    CString key = Io::CircleCrK2;
-
-Repeat:
+    // Read radius point
     try {
-        radius = io.GetDistance(prompt, key, &tracker);
-        tracker.SetValue(radius);
+        OdGePoint3d point = io.GetPoint(Io::CircleCrRadius, Io::eRubberBand, Io::CircleCrK2, &tracker);
+        tracker.SetValue(point);
+        return;
     }
     catch (const OdEdKeyword& keyword) {
         ASSERT(keyword.keywordIndex() == 0);
- 
-        tracker.Diameter = true;
-        prompt = Io::CircleCrDiameter;
-        key.Empty();
+    }
 
-        goto Repeat;
+    // Read diameter value or radius point
+    try {
+        OdGePoint3d point = io.GetPoint(Io::CircleCrDiameter, Io::eAllowReal, nullptr, &tracker);
+        tracker.SetValue(point);
+    }
+    catch (const IoResult& result) {
+        ASSERT(result.Real > 0.0);
+        tracker.SetValue(result.Real);
     }
 }
 
@@ -95,7 +107,7 @@ static void Track3Points(UserIO& io, CircleTracker* pTracker)
             OdGeVector3d v2 = point3 - Point2;
             OdGeVector3d vNewNormal = v1.crossProduct(v2);
             if (vNewNormal == OdGeVector3d::kIdentity) {
-                DEBUG_RETURN;
+                return;
             }
 
             if (vNewNormal.isCodirectionalTo(pTracker->pCircle->normal())) {
@@ -109,22 +121,22 @@ static void Track3Points(UserIO& io, CircleTracker* pTracker)
             pTracker->pCircle->setFromOdGeCurve(geArc);
         }
 
-        void SetGsView(OdGsView* pView) override
+        void Initialize(OdGsView* pView) override
         {
-            return pTracker->SetGsView(pView);
+            return pTracker->Initialize(pView);
         }
 
-        void UnsetGsView(OdGsView* pView) override
+        void Terminate(OdGsView* pView) override
         {
-            pTracker->UnsetGsView(pView);
+            pTracker->Terminate(pView);
         }
     }
     tracker;
     tracker.pTracker = pTracker;
 
-    tracker.Point1 = io.GetPoint(Io::Circle3pFirst);
-    tracker.Point2 = io.GetPoint(Io::Circle3pSecond);
-    OdGePoint3d point = io.GetPoint(Io::Circle3pThird, L"", &tracker);
+    tracker.Point1 = io.GetPoint(Io::Circle3pFirst, 0);
+    tracker.Point2 = io.GetPoint(Io::Circle3pSecond, Io::eRubberBand);
+    OdGePoint3d point = io.GetPoint(Io::Circle3pThird, Io::eRubberBand, nullptr, &tracker);
     tracker.SetValue(point);
 }
 
@@ -137,7 +149,7 @@ static void Track2Points(UserIO& io, CircleTracker* pTracker)
         OdGePoint3d Point1 = OdGePoint3d::kOrigin;
         CircleTracker* pTracker = nullptr;
 
-        void SetPoint(const OdGePoint3d& point2)
+        void SetValue(const OdGePoint3d& point2) override
         {
             OdGeVector3d centerVector = (point2 - Point1) / 2.0;
             double dRadius = centerVector.length();
@@ -147,21 +159,29 @@ static void Track2Points(UserIO& io, CircleTracker* pTracker)
             }
         }
 
-        void SetGsView(OdGsView* pView)
+        void Initialize(OdGsView* pView)
         {
-            pTracker->SetGsView(pView);
+            pTracker->Initialize(pView);
         }
 
-        void UnsetGsView(OdGsView* pView)
+        void Terminate(OdGsView* pView)
         {
-            pTracker->UnsetGsView(pView);
+            pTracker->Terminate(pView);
         }
     }
     tracker;
+    tracker.pTracker = pTracker;
 
-    tracker.Point1 = io.GetPoint(Io::Circle2pFirst);
-    OdGePoint3d point = io.GetPoint(Io::Circle2PSecond, L"", &tracker);
+    tracker.Point1 = io.GetPoint(Io::Circle2pFirst, 0);
+    OdGePoint3d point = io.GetPoint(Io::Circle2PSecond, Io::eRubberBand, nullptr, &tracker);
     tracker.SetValue(point);
+}
+
+
+
+static void TrackTTR(UserIO& io, CircleTracker* pTracker)
+{
+    DEBUG_STOP;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -180,30 +200,41 @@ void CircleCommand::Run(Renderer* pRenderer)
     CircleTracker tracker;
     tracker.pCircle = pNewCircle;
 
+    // WARNING - lock process
+    tracker.Initialize(params.pGsView);
+
     try {
-        centerPoint = params.pio->GetPoint(Io::CircleCrCenter, Io::CircleCrK1);
+        centerPoint = params.pIo->GetPoint(Io::CircleCrCenter, 0, Io::CircleCrK1);
     }
     catch (const OdEdKeyword& keyword) {
         nKeyword = keyword.keywordIndex();
         ASSERT(nKeyword > -1);
     }
     catch (const OdEdCancel&) {
-        params.Cancel();
+        goto Exit;
     }
 
     try {
         switch (nKeyword) {
-            case -1: TrackRadius(*params.pio, centerPoint, &tracker); break;
-            case 0:  Track3Points(*params.pio, &tracker); break;
-            case 1:  Track2Points(*params.pio, &tracker); break;
+            case -1: TrackRadius(*params.pIo, centerPoint, &tracker); break;
+            case 0:  Track3Points(*params.pIo, &tracker); break;
+            case 1:  Track2Points(*params.pIo, &tracker); break;
+            case 2:  TrackTTR(*params.pIo, &tracker); break;
 
             default:
                 DEBUG_STOP;
         }
     }
     catch (const OdEdCancel&) {
-        params.Cancel();
+        goto Exit;
     }
 
     params.pSpace->appendOdDbEntity(pNewCircle);
+    params.Completed = true;
+
+Exit:
+
+    // WARNING - disable Protect first
+    tracker.Protect = false;
+    tracker.Terminate(params.pGsView);
 }

@@ -5,21 +5,43 @@ class CommandBase;
 
 //--------------------------------------------------------------------------------------------------
 
+struct CommandInfo
+{
+	CommandBase* pCommand = nullptr;
+	UINT Id = 0;
+	CString Name;
+	CString Step;
+};
+
+
+
 class CommandStack
 {
-	std::map<CString, CommandBase*> m_commands;
-	std::stack<CommandBase*> m_stack;
+	std::vector<CommandInfo> m_commands;
+	Renderer* m_pRenderer = nullptr;
 	bool m_bActivated = false;
 
 public:
 
 	CommandStack();
 
-	CommandBase* Find(const CString& name);
+public: // From IO
+
+	CommandInfo* Find(UINT id);
+
+	CommandInfo* Find(const CString& name);
+
+	bool Execute(UINT id, Renderer* pRenderer);
 
 	bool Execute(const CString& name, Renderer* pRenderer);
 
 	bool Execute(CommandBase* pCommand, Renderer* pRenderer);
+
+public: // From Command
+
+	void Completed();
+
+	void Canceled();
 };
 
 extern CommandStack TheCommandStack;

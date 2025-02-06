@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#define COLOR(R,G,B) RGB(0x##R, 0x##G, 0x##B)
+
 //--------------------------------------------------------------------------------------------------
 
 namespace Control
@@ -65,35 +67,38 @@ namespace Control
 		BottomRight,
 	};
 
+
+
 	enum class EColor : COLORREF
 	{
-		Transparent = 0xFFFFFFFF,
-		LightBack = RGB(0x60, 0x60, 0x60),
-		MidiumBack = RGB(0x48, 0x48, 0x48),
-		DarkBack = RGB(0x30, 0x30, 0x30),
-		DialogBack = RGB(0x25, 0x25, 0x25),
+		Transparent		= 0xFFFFFFFF,
+		LightBack		= COLOR(60, 60, 60),
+		MidiumBack		= COLOR(48, 48, 48),
+		DarkBack		= COLOR(30, 30, 30),
+		DialogBack		= COLOR(25, 25, 25),
 
-		Arsenic = RGB(0x43, 0x43, 0x43),
-		BlueBolt = RGB(0x00, 0xAA, 0xFF),
-		Charcoal = RGB(0x3B, 0x44, 0x53),
-		DeepSkyBlue = RGB(0x00, 0xA8, 0xFF),
-		GhostWhite = RGB(0xF8, 0xF8, 0xFF),
-		HonoluluBlue = RGB(0x00, 0x67, 0xAD),
-		NavyBlue = RGB(0x00, 0x78, 0xD7),
-		OldSilver = RGB(0x86, 0x86, 0x86),
+		Arsenic			= COLOR(43, 43, 43),
+		BlueBolt		= COLOR(00, AA, FF),
+		Charcoal		= COLOR(3B, 44, 53),
+		DeepSkyBlue		= COLOR(00, A8, FF),
+		GhostWhite		= COLOR(F8, F8, FF),
+		HonoluluBlue	= COLOR(00, 67, AD),
+		IndianRed		= COLOR(CD, 5C, 5C),
+		NavyBlue		= COLOR(00, 78, D7),
+		OldSilver		= COLOR(86, 86, 86),
 
-		White = RGB(0xFF, 0xFF, 0xFF),
-		Red = RGB(0xFF, 0x00, 0x00),
-		Green = RGB(0x00, 0xFF, 0x00),
-		Blue = RGB(0x00, 0x00, 0xFF),
-		Yellow = RGB(0xFF, 0xFF, 0x00),
+		White			= COLOR(FF, FF, FF),
+		Red				= COLOR(FF, 00, 00),
+		Green			= COLOR(00, FF, 00),
+		Blue			= COLOR(00, 00, FF),
+		Yellow			= COLOR(FF, FF, 00),
 
-		DimGray = RGB(0x69, 0x69, 0x69),
-		Gray = RGB(0x80, 0x80, 0x80),
-		DarkGray = RGB(0xA9, 0xA9, 0xA9),
-		Silver = RGB(0xC0, 0xC0, 0xC0),
-		LightGray = RGB(0xD3, 0xD3, 0xD3),
-		Black = RGB(0, 0, 0),
+		DimGray			= COLOR(69, 69, 69),
+		Gray			= COLOR(80, 80, 80),
+		DarkGray		= COLOR(A9, A9, A9),
+		Silver			= COLOR(C0, C0, C0),
+		LightGray		= COLOR(D3, D3, D3),
+		Black			= 0x0,
 	};
 
 
@@ -141,3 +146,5 @@ namespace Control
 
 	bool IsKeyPressed(int vk);
 }
+
+#undef COLOR

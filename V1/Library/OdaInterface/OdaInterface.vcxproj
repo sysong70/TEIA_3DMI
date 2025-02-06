@@ -185,13 +185,11 @@
     <ClInclude Include="..\Signal\WorkerThread.h" />
     <ClInclude Include="Commands.h" />
     <ClInclude Include="CommandStack.h" />
+    <ClInclude Include="Exceptions.h" />
     <ClInclude Include="OSnapManager.h" />
-    <ClInclude Include="Prompt.Def.h" />
     <ClInclude Include="Prompt.h" />
-    <ClInclude Include="Prompt.Resource.h" />
     <ClInclude Include="SignalArgs.h" />
     <ClInclude Include="EventDelegator.h" />
-    <ClInclude Include="Tracker.h" />
     <ClInclude Include="Trackers.h" />
     <ClInclude Include="UserIO.h" />
   </ItemGroup>
@@ -221,12 +219,13 @@
     <ClCompile Include="Commands.cpp" />
     <ClCompile Include="CommandStack.cpp" />
     <ClCompile Include="Command.Line.cpp" />
+    <ClCompile Include="Exceptions.cpp" />
     <ClCompile Include="OSnapManager.cpp" />
     <ClCompile Include="SignalArgs.cpp" />
     <ClCompile Include="EventDelegator.cpp" />
-    <ClCompile Include="Tracker.cpp" />
     <ClCompile Include="Trackers.cpp" />
     <ClCompile Include="UserIO.cpp" />
+    <ClCompile Include="Command.Single.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

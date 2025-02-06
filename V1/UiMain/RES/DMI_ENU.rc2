@@ -176,6 +176,8 @@ BEGIN
     HOME_2D_CMD_Window_Cascade                        "__#__\nCascade"
     HOME_2D_CMD_Window_TileHorizontal                 "__#__\nHorizontal"
     HOME_2D_CMD_Window_TileVertical                   "__#__\nVertical"
+    EDIT_2D_CMD_Undo                                  "__#__\nUndo"
+    EDIT_2D_CMD_Redo                                  "__#__\nRedo"
     DRAW_2D_CAT                                       "__#__\nDraw"
     DRAW_2D_PNL_Basic                                 "__#__\nBasic"
     DRAW_2D_LST_Point                                 "Create a point\nPoint"

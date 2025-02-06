@@ -189,7 +189,7 @@
     <ClInclude Include="Command.Line2d.h" />
     <ClInclude Include="Command.Test.h" />
     <ClInclude Include="Command.VisualEffects3d.h" />
-    <ClInclude Include="Component.CommandPrompt.h" />
+    <ClInclude Include="Component.CommandBar.h" />
     <ClInclude Include="Control.ContextMenu.h" />
     <ClInclude Include="Control.CoordEdit.h" />
     <ClInclude Include="Control.PopupMenu.h" />
@@ -259,7 +259,7 @@
     <ClCompile Include="Command.Line2d.cpp" />
     <ClCompile Include="Command.Test.cpp" />
     <ClCompile Include="Command.VisualEffects3d.cpp" />
-    <ClCompile Include="Component.CommandPrompt.cpp" />
+    <ClCompile Include="Component.CommandBar.cpp" />
     <ClCompile Include="Control.ContextMenu.cpp" />
     <ClCompile Include="Control.PopupMenu.cpp" />
     <ClCompile Include="Control.TaskPanel.cpp" />

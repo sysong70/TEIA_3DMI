@@ -144,6 +144,7 @@ public:
 
 	SendSignalFunc SendSignal = nullptr;
 	AssignSendSignalFunc SetReceiver = nullptr;
+	// TEST - StatusBar::ShowCoordinate()
 	GetCoordinateFunc GetCoordinate = nullptr;
 	SetIntegerFunc SetLanguage = nullptr;
 
@@ -154,7 +155,7 @@ public:
 	Broker2d()
 	{
 	}
-
+	// TEST
 	~Broker2d()
 	{
 		if (hInstance != nullptr) {
@@ -235,6 +236,7 @@ void Connector2d::ReceiveSignal(const wchar_t* content)
 	case Signal::Target::Progress:
 	case Signal::Target::View:
 	case Signal::Target::StatusBar:
+	case Signal::Target::UserIO:
 		// CHECK - why not PostMessage
 		TheApplication.GetMainFrame().SendMessage((UINT)Window::EUserMessage::OnSignal, (WPARAM)pData);
 		break;

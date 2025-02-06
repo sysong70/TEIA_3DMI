@@ -73,10 +73,10 @@ void CommandReactor::commandWillStart(OdEdCommand* pCmd, OdEdCommandContext*)
 {
 	m_sLastInput.makeUpper();
 
-	if (GETBIT(pCmd->flags(), OdEdCommand::kNoHistory) == false) {
+	if (GetBit(pCmd->flags(), OdEdCommand::kNoHistory) == false) {
 		//theApp.setRecentCmd(m_sLastInput);
 	}
-	if (GETBIT(pCmd->flags(), OdEdCommand::kNoUndoMarker) == false) {
+	if (GetBit(pCmd->flags(), OdEdCommand::kNoUndoMarker) == false) {
 		m_pCommandContext->database()->startUndoRecord();
 	}
 }
@@ -120,11 +120,12 @@ void CommandReactor::undoCommand()
 {
 	OdDbDatabase* pDb = m_pCommandContext->database();
 
-	try {
-		pDb->disableUndoRecording(true);
-		pDb->undo();
-		pDb->disableUndoRecording(false);
-	} catch (const OdError& err) {
-		//theApp.reportError(_T("Can't repair database"), err);
-	}
+	//try {
+	//	pDb->disableUndoRecording(true);
+	//	pDb->undo();
+	//	pDb->disableUndoRecording(false);
+	//}
+	//catch (const OdError& err) {
+	//	theApp.reportError(_T("Can't repair database"), err);
+	//}
 }

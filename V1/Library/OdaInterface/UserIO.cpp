@@ -9,41 +9,41 @@
 
 //**************************************************************************************************
 
-void UserIO::KeywordIndexer::Initialize(CString value)
+void IoKeywords::Initialize(CString value)
 {
 	Clear();
 
-	value.MakeLower();
+	if (value.IsEmpty()) {
+		return;
+	}
+
+	value.MakeUpper();
+	int index = 0;
 
 	WStringArray byLanguage;
 	WStr::Split(value, L'|', byLanguage);
 
-	WStringArray byData;
-	WStr::Split(byLanguage[0], L'/', byData);
+	WStringArray byKeyword;
+	WStr::Split(byLanguage[0], L'/', byKeyword);
 
-	for (auto data : byData) {
-		CString code = WStr::Get(data, 0, L'(', false, true);
+	for (auto item : byKeyword) {
+		CString code = WStr::Front(item, L'(', false, false);
+		CString shortcut = WStr::Back(item, L'(', L')', false, false);
+		ASSERT(code.IsEmpty() == false && shortcut.IsEmpty() == false);
 
-		wchar_t key = 0;
-		swscanf_s(data, L"(%c)", &key, 1);
-		ASSERT(key != 0);
-
-		Indexer.push_back({ code, key });
+		push_back({ index++, code, shortcut });
 	}
 }
 
 
 
-int UserIO::KeywordIndexer::Find(const CString& value, Data& found)
+int IoKeywords::Find(const CString& value, IoKeyword& found)
 {
-	int index = 0;
-	for (auto data : Indexer) {
-		if (value == data.Code || (value.GetLength() == 1 && value[0] == data.Key)) {
-			found = data;
-			return index;
+	for (auto it = cbegin(); it != cend(); ++it) {
+		if (it->Code.CompareNoCase(value) == 0 || it->Shortcut.CompareNoCase(value) == 0) {
+			found = *it;
+			return it->Index;
 		}
-
-		index++;
 	}
 
 	return -1;
@@ -51,57 +51,185 @@ int UserIO::KeywordIndexer::Find(const CString& value, Data& found)
 
 
 
-void UserIO::KeywordIndexer::Check(CString value)
+void IoKeywords::Check(CString value)
 {
-	value.MakeLower();
+	value.MakeUpper();
 
-	Data found;
+	IoKeyword found;
 	int index = Find(value, found);
 	if (index > -1) {
-		throw OdEdKeyword(index, OdString(found.Code));
+		DEBUG_STOP;
+		//throw OdEdKeyword(index, OdString(found.Code));
 	}
 }
 
 
 
-void UserIO::KeywordIndexer::Clear()
+void IoKeywords::Clear()
 {
-	Indexer.clear();
+	clear();
 }
 
 //**************************************************************************************************
 
-void UserIO::Data::Clear()
+void IoSteps::Initialize(CString value)
 {
-	Prompt.Empty();
-	Keywords.Clear();
+	Clear();
 
-	Mode = EMode::None;
-	OSnap = EOverride::None;
-	Return = EReturn::None;
+	WStringArray steps;
+	WStr::Split(value, L' ', steps);
+	for (auto item : steps) {
+		push(item);
+	}
+}
 
+
+
+void IoSteps::Clear()
+{
+	// WARNING - Clear(fast initialize)
+	IoSteps dummy;
+	std::swap(*this, dummy);
+}
+
+
+
+void IoSteps::Next(Io::EOSnap& osnap, IoKeywords& keywords)
+{
+#define FrontAndPop() front(); pop()
+
+	if (size() == 0) {
+		return;
+	}
+
+	CString value = FrontAndPop();
+	if (value.IsEmpty()) {
+		return;
+	}
+
+	HasOsnap(value, osnap);
+	HasKeyword(value, keywords);
+
+#undef FrontAndPop
+}
+
+
+
+bool IoSteps::HasOsnap(CString value, Io::EOSnap& osnap)
+{
+	if (value[0] != PRE_OSNAP) {
+		return false;
+	}
+
+	CString snap = CString(value[1]).MakeUpper() + value.Mid(2);
+
+#define SetOSnap(x) else if (snap == L#x) { \
+	osnap = Io::EOSnap::x; \
+	return true; \
+}
+
+	if (value.IsEmpty()) {
+		osnap = Io::EOSnap::None;
+		return false;
+	}
+	SetOSnap(X)
+	SetOSnap(Y)
+	SetOSnap(Point)
+	SetOSnap(End)
+	SetOSnap(Mid)
+	SetOSnap(Intersection)
+	SetOSnap(Perpendicular)
+	SetOSnap(Center)
+	SetOSnap(Quadrant)
+	SetOSnap(Near)
+
+	return false;
+
+#undef SetOSnap
+}
+
+
+
+bool IoSteps::HasKeyword(CString value, IoKeywords& keywords)
+{
+	if (value[0] != PRE_KEYWORD) {
+		return false;
+	}
+
+	IoKeyword found;
+	int index = keywords.Find(value.Mid(1), found);
+
+	if (index > -1) {
+		throw OdEdKeyword(found.Index, found.Code.GetBuffer());
+	}
+	else {
+		RETURN_FALSE;
+	}
+}
+
+//**************************************************************************************************
+
+void IoResult::Initialize()
+{
 	Real = 0.0;
 	Integer = 0;
 	Point = OdGePoint3d::kOrigin;
 	String.Empty();
 
-	Keyword.Empty();
-	KeywordIndex = -1;
-
-	MousePoint = CPoint(0, 0);
+	Keyword.Index = -1;
+	Keyword.Code.Empty();
+	Keyword.Shortcut.Empty();
 }
 
 //**************************************************************************************************
 
-#define theRenderer		(*m_data.pRenderer)
-#define theGsView		m_data.pRenderer->GetGsView()
-#define theDelivery		m_data.pRenderer->GetDelivery()
-#define theCoord		m_data.pRenderer->GetCoordConvertor()
-#define theKeywords		m_data.Keywords
-#define theTrackers		m_data.trackers
+void UserIO::IoState::Initialize()
+{
+	Mode = Io::EMode::None;
+	OSnap = Io::EOSnap::None;
 
-#define ThrowKeyword	throw OdEdKeyword(m_data.KeywordIndex, m_data.Keyword.GetBuffer());
-#define ThrowCancel		throw OdEdCancel()
+	MousePoint = CPoint(0, 0);
+}
+
+
+
+void UserIO::IoState::Clear()
+{
+	Command.Empty();
+	Prompt.Empty();
+	Keyword.Empty();
+	Keywords.Clear();
+	Steps.Clear();
+	Options = 0;
+}
+
+
+
+void UserIO::IoState::Set(const CString& prompt, int options, const wchar_t* keyword, TrackerBase* pTracker)
+{
+	Prompt = prompt;
+
+	if (keyword != nullptr) {
+		Keyword = keyword;
+		Keywords.Initialize(Keyword);
+	}
+	else {
+		Keyword.Empty();
+	}
+
+	Options = options;
+
+	Trackers.Push(pTracker);
+}
+
+//**************************************************************************************************
+
+#define theRenderer		(*m_state.pRenderer)
+#define theGsView		m_state.pRenderer->GetGsView()
+#define theDelivery		m_state.pRenderer->GetDelivery().userIO
+#define theCoord		m_state.pRenderer->GetCoordConvertor()
+#define theKeywords		m_state.Keywords
+#define theTrackers		m_state.Trackers
 
 //--------------------------------------------------------------------------------------------------
 
@@ -167,38 +295,22 @@ bool UserIO::OnSignal(std::shared_ptr<EventWrapper> wrapper)
 bool UserIO::OnCommand(SignalArgs::Base* pSignal)
 {
 	SignalArgs::Command& signal = *(SignalArgs::Command*)pSignal;
+	CommandInfo* pInfo = TheCommandStack.Find((UINT)signal.Id);
 
-	// TEST
-	if (DRAW_2D_CMD_Line) {
-		return ParseCommand(L"line");
-	}
-	else {
+	if (pInfo == nullptr) {
 		return false;
 	}
 
-	return true;
-}
+	CString name = pInfo->pCommand->Name().MakeUpper();
+	SendCommand(name);
 
-
-
-bool UserIO::OnContextCommand(SignalArgs::Base* pSignal)
-{
-	return false;
-}
-
-
-
-bool UserIO::OnKeyDown(SignalArgs::Base* pSignal)
-{
-	SignalArgs::Keyboard& signal = *(SignalArgs::Keyboard*)pSignal;
-
-	switch (signal.Char) {
-	case VK_ESCAPE: return Cancel();
-	case VK_RETURN:
-		break;
-
-	default:
-		break;
+	if (TheCommandStack.Execute(pInfo->pCommand, &theRenderer)) {
+		m_state.Command = name;
+		m_state.Steps.Initialize(pInfo->Step);
+		return true;
+	}
+	else {
+		SendError(Io::ErrorInvalidCommand);
 	}
 
 	return false;
@@ -228,7 +340,7 @@ bool UserIO::OnLButtonUp(SignalArgs::Base* pSignal)
 bool UserIO::OnMButtonDown(SignalArgs::Base* pSignal)
 {
 	SignalArgs::Mouse& signal = *(SignalArgs::Mouse*)pSignal;
-	m_data.MousePoint = CPoint(signal.X, signal.Y);
+	m_state.MousePoint = CPoint(signal.X, signal.Y);
 
 	return true;
 }
@@ -244,6 +356,7 @@ bool UserIO::OnMButtonUp(SignalArgs::Base* pSignal)
 
 bool UserIO::OnRButtonDown(SignalArgs::Base* pSignal)
 {
+	// TODO - Context menu
 	return false;
 }
 
@@ -262,16 +375,15 @@ bool UserIO::OnMouseMove(SignalArgs::Base* pSignal)
 	CPoint point = { signal.X, signal.Y };
 
 	if (signal.Flags & MK_MBUTTON) {
-		theRenderer.Dolly(point.x - m_data.MousePoint.x, point.y - m_data.MousePoint.y);
-		m_data.MousePoint = point;
+		theRenderer.Dolly(point.x - m_state.MousePoint.x, point.y - m_state.MousePoint.y);
+		m_state.MousePoint = point;
 	}
 	else {
 		OdGePoint3d gePoint = theCoord.ToEyeToWorld(point);
 		theTrackers.SetValue(gePoint);
 	}
 
-	// WARNING - thread operation failed
-	//theRenderer.RedrawWindow();
+	// WARNING - thread operation failed, do not call RedrawWindow()
 	theRenderer.PostPaintSignal();
 
 	return true;
@@ -281,33 +393,44 @@ bool UserIO::OnMouseMove(SignalArgs::Base* pSignal)
 
 bool UserIO::OnInput(SignalArgs::Base* pSignal)
 {
+	static wchar_t* TRIMER = L" \t\r\n";
+
 	SignalArgs::Text& signal = *(SignalArgs::Text*)pSignal;
 	CString value = signal.Buffer;
 
-	value.Trim(L" \t\r\n");
-	value.MakeLower();
+	value.Trim(TRIMER);
+	value.MakeUpper();
 
-	if (value == L"^c") {
-		return Cancel();
-	}
-	else if (value[0] == L'_') {
-		return ParseKeyword(value);
-	}
-	else if (value[0] == L'.') {
-		return ParseOverride(value);
+	if (value.IsEmpty() || value == KEY_CANCEL) {
+		return CancelCommand();
 	}
 
-	switch (m_data.Mode) {
-		case EMode::Integer:	return ParseInteger(value);
-		case EMode::Distance:	return ParseReal(value);
-		case EMode::Point:		return ParsePoint(value);
-		case EMode::String:		return ParseString(value);
+	// Activated command
+	if (m_state.Command.IsEmpty() == false) {
+		// Has keyword?
+		if (value[0] == PRE_KEYWORD && m_state.Keyword.IsEmpty() == false) {
+			return ParseKeyword(value);
+		}
+		else if (value[1] == PRE_OSNAP) {
+			return ParseOSnap(value);
+		}
+
+		// Wait input
+		bool success = false;
+
+		switch (m_state.Mode) {
+		case Io::EMode::Integer:	success = ParseInteger(value); break;
+		case Io::EMode::Point:		success = ParsePoint(value); break;
+		case Io::EMode::Real:		success = ParseReal(value); break;
+		case Io::EMode::String:		success = ParseString(value); break;
 
 		default:
-			return ParseCommand(value);
+			DEBUG_STOP;
+			break;
+		}
 	}
 
-	RETURN_FALSE;
+	return ParseCommand(value);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -328,14 +451,7 @@ UserIO::~UserIO()
 
 bool UserIO::IsActivated()
 {
-	return m_data.Mode != EMode::None;
-}
-
-
-
-void UserIO::SetRenderer(Renderer* pRenderer)
-{
-	m_data.pRenderer = pRenderer;
+	return m_state.Mode != Io::EMode::None;
 }
 
 
@@ -343,42 +459,79 @@ void UserIO::SetRenderer(Renderer* pRenderer)
 void UserIO::LockProcess(bool value)
 {
 	if (value) {
-		// CHECK
-		theTrackers.SetGsView(theGsView);
-
+		theTrackers.Initialize(theGsView);
 		std::unique_lock<std::mutex> lock(m_waitMutex);
 		m_waitCondition.wait(lock);
 	}
 	else {
-		// CHECK
 		theTrackers.Clear(theGsView);
-
 		m_waitCondition.notify_one();
 	}
 }
 
+
+
+void UserIO::SetRenderer(Renderer* pRenderer)
+{
+	m_state.pRenderer = pRenderer;
+	StandbyCommand();
+}
+
+
+
+bool UserIO::CancelCommand()
+{
+	if (m_state.Command.IsEmpty() == false) {
+		m_state.Command.Empty();
+		m_result.Return = Io::EReturn::Cancel;
+
+		LockProcess(false);
+	}
+
+	return true;
+}
+
+
+
+void UserIO::StandbyCommand()
+{
+	m_state.Clear();
+	theDelivery.StandbyCommand(Io::PromptTypeACommand);
+}
+
 //--------------------------------------------------------------------------------------------------
 
-double UserIO::GetDistance(const CString& prompt, const CString& keyword, TrackerBase* pTracker)
+OdGePoint3d UserIO::GetPoint(const CString& prompt, int options, const wchar_t* keyword, TrackerBase* pTracker)
 {
-	m_data.Clear();
+	m_state.Initialize();
+	m_state.Set(prompt, options, keyword, pTracker);
+	m_state.Mode = Io::EMode::Point;
+	m_state.Steps.Next(m_state.OSnap, m_state.Keywords);
 
-	m_data.Mode = EMode::Distance;
-	m_data.Return = EReturn::None;
-	m_data.Prompt = prompt;
-	m_data.Keyword = keyword;
-	theTrackers.Push(pTracker);
+	RubberBand rubberBand;
+	if (GetBit(options, Io::eRubberBand)) {
+		rubberBand.SetBasePoint(m_state.LastPoint);
+		theTrackers.Push(&rubberBand);
+	}
 
+	// CHECK
+	RubberRect rubberRect;
+	if (GetBit(options, Io::eRubberRect)) {
+		rubberBand.SetBasePoint(m_state.LastPoint);
+		theTrackers.Push(&rubberRect);
+	}
+
+	SendPrompt(prompt, keyword);
 	LockProcess();
 
-	if (m_data.Return == EReturn::Real) {
-		return m_data.Real;
-	}
-	else if (m_data.Return == EReturn::Keyword) {
-		ThrowKeyword;
-	}
-	else if (m_data.Return == EReturn::Cancel) {
-		ThrowCancel;
+	switch (m_result.Return) {
+	case Io::EReturn::Point:	return m_result.Point;
+	case Io::EReturn::Keyword:	throw OdEdKeyword(m_result.Keyword.Index, m_result.Keyword.Code.GetBuffer());
+	case Io::EReturn::Cancel:	throw OdEdCancel();
+
+	default:
+		ASSERT(m_result.Return != Io::EReturn::None);
+		throw m_result;
 	}
 
 	DEBUG_STOP;
@@ -387,38 +540,10 @@ double UserIO::GetDistance(const CString& prompt, const CString& keyword, Tracke
 
 
 
-OdGePoint3d UserIO::GetPoint(const CString& prompt, const CString& keyword, TrackerBase* pTracker)
+bool UserIO::SetInteger(int value)
 {
-	m_data.Clear();
-
-	m_data.Mode = EMode::Point;
-	m_data.Return = EReturn::None;
-	m_data.Prompt = prompt;
-	m_data.Keyword = keyword;
-	theTrackers.Push(pTracker);
-
-	LockProcess();
-
-	if (m_data.Return == EReturn::Point) {
-		return m_data.Point;
-	}
-	else if (m_data.Return == EReturn::Keyword) {
-		ThrowKeyword;
-	}
-	else if (m_data.Return == EReturn::Cancel) {
-		ThrowCancel;
-	}
-
-	DEBUG_STOP;
-	return {};
-}
-
-
-
-bool UserIO::SetDistance(double value)
-{
-	m_data.Return = EReturn::Real;
-	m_data.Real = value;
+	m_result.Return = Io::EReturn::Integer;
+	m_result.Integer = value;
 	theTrackers.SetValue(value);
 
 	LockProcess(false);
@@ -429,9 +554,33 @@ bool UserIO::SetDistance(double value)
 
 bool UserIO::SetPoint(const OdGePoint3d& value)
 {
-	m_data.Return = EReturn::Point;
-	m_data.LastPoint = value;
-	m_data.Point = value;
+	m_state.LastPoint = value;
+	m_result.Return = Io::EReturn::Point;
+	m_result.Point = value;
+	theTrackers.SetValue(value);
+
+	LockProcess(false);
+	return true;
+}
+
+
+
+bool UserIO::SetReal(double value)
+{
+	m_result.Return = Io::EReturn::Real;
+	m_result.Real = value;
+	theTrackers.SetValue(value);
+
+	LockProcess(false);
+	return true;
+}
+
+
+
+bool UserIO::SetString(const CString& value)
+{
+	m_result.Return = Io::EReturn::Real;
+	m_result.String = value;
 	theTrackers.SetValue(value);
 
 	LockProcess(false);
@@ -440,31 +589,54 @@ bool UserIO::SetPoint(const OdGePoint3d& value)
 
 //--------------------------------------------------------------------------------------------------
 
-bool UserIO::Cancel()
+bool UserIO::SendCommand(const CString& value)
 {
-	if (m_data.Command.IsEmpty() == false) {
-		m_data.Command.Empty();
-		m_data.Return = EReturn::Cancel;
-
-		LockProcess(false);
-	}
-
+	theDelivery.PutCommand(value);
 	return true;
 }
 
 
 
-bool UserIO::ParseCommand(const CString& value)
+bool UserIO::SendPrompt(const CString& prompt, const CString& keyword)
 {
-	CommandBase* pCommand = TheCommandStack.Find(value);
-	if (pCommand != nullptr) {
-		if (TheCommandStack.Execute(pCommand, &theRenderer)) {
-			m_data.Command = value;
-			return true;
-		}
-		else {
-			InputError(Io::ErrorInvalidCommand);
-		}
+	theDelivery.PutPrompt(prompt, keyword);
+	return true;
+}
+
+
+
+bool UserIO::SendEcho(const CString& value)
+{
+	theDelivery.PutEcho(value);
+	return true;
+}
+
+
+
+bool UserIO::SendError(const CString& value)
+{
+	theDelivery.PutError(value);
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+
+bool UserIO::ParseCommand(CString& value)
+{
+	CommandInfo* pInfo = TheCommandStack.Find(value);
+
+	if (pInfo == nullptr) {
+		return false;
+	}
+
+	CString name = pInfo->Name.MakeUpper();
+
+	if (TheCommandStack.Execute(pInfo->pCommand, &theRenderer)) {
+		m_state.Command = name;
+		return SendCommand(name);
+	}
+	else {
+		SendError(Io::ErrorInvalidCommand);
 	}
 
 	return false;
@@ -472,27 +644,27 @@ bool UserIO::ParseCommand(const CString& value)
 
 
 
-bool UserIO::ParseInteger(const CString& value)
+bool UserIO::ParseInteger(CString& value)
 {
 	RETURN_FALSE;
 }
 
 
 
-bool UserIO::ParseKeyword(const CString& value)
+bool UserIO::ParseKeyword(CString& value)
 {
-	KeywordIndexer::Data found;
-	int index = m_data.Keywords.Find(value, found);
+	IoKeyword found;
+	// Shift PRE_KEYWORD
+	int index = m_state.Keywords.Find(value.Mid(1), found);
 
 	if (index > -1) {
-		m_data.Return = EReturn::Keyword;
-		m_data.KeywordIndex = index;
-		m_data.Keyword = found.Code;
+		m_result.Return = Io::EReturn::Keyword;
+		m_result.Keyword = found;
 
 		LockProcess(false);
 	}
 	else {
-		InputError(Io::ErrorInvalidKeyword);
+		SendError(Io::ErrorInvalidKeyword);
 	}
 
 	return true;
@@ -500,48 +672,69 @@ bool UserIO::ParseKeyword(const CString& value)
 
 
 
-bool UserIO::ParseOverride(const CString& value)
+bool UserIO::ParseOSnap(CString& value)
 {
-#define SetOSnap(x) else if (snap == L#x) m_data.OSnap = EOverride::x
-	
-	CString snap = CString(value[1]).MakeLower() + value.Mid(2);
+	// Shift PRE_OSNAP
+	CString snap = CString(value[1]).MakeUpper() + value.Mid(2);
 
-	if (value == L"") m_data.OSnap = EOverride::None;
-	SetOSnap(X);
-	SetOSnap(Y);
-	SetOSnap(Point);
-	SetOSnap(End);
-	SetOSnap(Mid);
-	SetOSnap(Intersection);
-	SetOSnap(Perpendicular);
-	SetOSnap(Center);
-	SetOSnap(Quadrant);
-	SetOSnap(Near);
+#define SetOSnap(x) else if (snap == L#x) { \
+	m_state.OSnap = Io::EOSnap::x; \
+	return true; \
+}
 
-	return true;
+	if (value.IsEmpty()) {
+		m_state.OSnap = Io::EOSnap::None;
+	}
+	SetOSnap(X)
+	SetOSnap(Y)
+	SetOSnap(Point)
+	SetOSnap(End)
+	SetOSnap(Mid)
+	SetOSnap(Intersection)
+	SetOSnap(Perpendicular)
+	SetOSnap(Center)
+	SetOSnap(Quadrant)
+	SetOSnap(Near)
 
 #undef SetOSnap
+
+	return false;
 }
 
 
 
-bool UserIO::ParsePoint(const CString& value)
+bool UserIO::ParseOtherInput(CString& value)
 {
-	const wchar_t CARTESIAN[] = L"%lf,%lf";
-	const wchar_t POLAR[] = L"%lf<%lf";
+	if (GetBit(m_state.Options, Io::eAllowInteger)) return ParseInteger(value);
+	if (GetBit(m_state.Options, Io::eAllowReal)) return ParseReal(value);
+
+	return false;
+}
+
+
+
+bool UserIO::ParsePoint(CString& value)
+{
+	static wchar_t* CARTESIAN = L"%lf,%lf";
+	static wchar_t* POLAR = L"%lf<%lf";
 
 	wchar_t* pValue = (wchar_t*)value.GetString();
 	double v1, v2;
 	bool relative = false;
 
-	if (pValue[0] == L'@') {
-		pValue++;
+	if (value[0] == PRE_OSNAP) {
+		value.TrimLeft(PRE_OSNAP);
+		return ParseOSnap(value);
+	}
+
+	if (pValue[0] == PRE_RELATIVE) {
 		relative = true;
+		pValue++;
 	}
 
 	if (swscanf_s(pValue, CARTESIAN, &v1, &v2) == 2) {
 		if (relative) {
-			return SetPoint(m_data.LastPoint + OdGeVector3d(v1, v2, 0));
+			return SetPoint(m_state.LastPoint + OdGeVector3d(v1, v2, 0));
 		}
 		else {
 			return SetPoint({ v1, v2, 0 });
@@ -549,15 +742,15 @@ bool UserIO::ParsePoint(const CString& value)
 	}
 	else if (swscanf_s(pValue, POLAR, &v1, &v2) == 2) {
 		OdGePoint3d point(v1, 0, 0);
-		point.rotateBy(v2, OdGeVector3d::kZAxis, relative ? m_data.LastPoint : OdGePoint3d::kOrigin);
+		point.rotateBy(v2, OdGeVector3d::kZAxis, relative ? m_state.LastPoint : OdGePoint3d::kOrigin);
 
 		return SetPoint(point);
 	}
-	else if (ParseKeyword(value)) {
-		return true;
+	else if (m_state.Options > 0) {
+		return ParseOtherInput(value);
 	}
 	else {
-		return InputError(Io::ErrorInvalidPoint);
+		return SendError(Io::ErrorInvalidPoint);
 	}
 
 	return false;
@@ -565,44 +758,29 @@ bool UserIO::ParsePoint(const CString& value)
 
 
 
-bool UserIO::ParseReal(const CString& value)
+bool UserIO::ParseReal(CString& value)
 {
-	double result;
+	double result = 0.0;
 
 	if (swscanf_s(value, L"%lf", &result) != 1) {
-		return InputError(Io::ErrorInvalidDistance);
+		return SendError(Io::ErrorInvalidValue);
 	}
 
-	if (m_data.Mode == EMode::Distance && result < 0.0) {
-		return InputError(Io::ErrorNotPositive);
+	if (GetBit(m_state.Options, Io::eNoZero) && OdZero(result)) {
+		return SendError(Io::ErrorZeroValue);
+	}
+	if (GetBit(m_state.Options, Io::eNoNegative) && result < 0) {
+		return SendError(Io::ErrorNegativeValue);
 	}
 
-	return SetDistance(result);
+	return SetReal(result);
 }
 
 
 
-bool UserIO::ParseString(const CString& value)
+bool UserIO::ParseString(CString& value)
 {
 	RETURN_FALSE;
-}
-
-//--------------------------------------------------------------------------------------------------
-
-bool UserIO::InputError(const CString& value)
-{
-	// TODO
-	//theDelivery.userIO.InputError(value);
-	return true;
-}
-
-
-
-bool UserIO::InputEcho(const CString& value)
-{
-	// TODO
-	//theDelivery.userIO.InputEcho(value);
-	return true;
 }
 
 #undef theRenderer
@@ -612,5 +790,4 @@ bool UserIO::InputEcho(const CString& value)
 #undef theKeywords
 #undef theTrackers
 
-#undef ThrowKeyword
 #undef ThrowCancel

@@ -30,6 +30,10 @@ namespace Window
 
 	protected:
 
+		void OnDraw(CDC* pDC) override;
+
+		afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
+
 		afx_msg void OnCommand(UINT id);
 
 		afx_msg void OnContextCommand(UINT id);

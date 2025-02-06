@@ -172,7 +172,7 @@ bool Renderer::PostSignal(SignalArgs::Base* pSignal)
 		case Signal::View::Action::OnMouseWheel:
 		case Signal::View::Action::OnPaint:
 		case Signal::View::Action::OnResize:
-			return EventDelegator::PostSignal(pSignal);
+			return __super::PostSignal(pSignal);
 
 		default:
 			break;
@@ -200,15 +200,15 @@ void Renderer::PostPaintSignal(bool lock)
 bool Renderer::OnCommand(SignalArgs::Base* pSignal)
 {
 	SignalArgs::Command& signal = *(SignalArgs::Command*)pSignal;
-	// TODO - UNDO, REDO, make id
-	if (signal.Id == CUSTOM_3D_CMD_KEN_Test1) {
+
+	if (signal.Id == EDIT_2D_CMD_Undo) {
 		if (m_pDatabase->hasUndoMark()) {
 			m_pDatabase->undoBack();
 
 			RedrawWindow();
 		}
 	}
-	else if (signal.Id == CUSTOM_3D_CMD_KEN_Test2) {
+	else if (signal.Id == EDIT_2D_CMD_Redo) {
 		if (m_pDatabase->hasRedo()) {
 			m_pDatabase->redo();
 
@@ -399,6 +399,13 @@ Signal::Delivery& Renderer::GetDelivery()
 OdGsViewPtr Renderer::GetGsView()
 {
 	return m_pDevice->viewAt(0);
+}
+
+
+
+UserIO& Renderer::GetUserIO()
+{
+	return m_io;
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -10,12 +10,12 @@ struct LineTracker : public TrackerBase
     OdDbLine* pLine = nullptr;
     double Length = 0.0;
 
-    void SetGsView(OdGsView* pView) override
+    void Initialize(OdGsView* pView) override
     {
         pView->add(pLine, NULL);
     }
 
-    void UnsetGsView(OdGsView* pView) override
+    void Terminate(OdGsView* pView) override
     {
         pView->erase(pLine);
 
@@ -51,7 +51,12 @@ void LineCommand::Run(Renderer* pRenderer)
     OdGePoint3d firstPoint, startPoint, endPoint;
 
     while (finished == false) {
-        firstPoint = startPoint = endPoint = params.pio->GetPoint(Io::LineFirst);
+        try {
+            firstPoint = startPoint = endPoint = params.pIo->GetPoint(Io::LineFirst, 0);
+        }
+        catch (const OdEdCancel&) {
+            return;
+        }
 
         while (true) {
             OdDbLinePtr pNewLine = OdDbLine::createObject();
@@ -64,7 +69,7 @@ void LineCommand::Run(Renderer* pRenderer)
             tracker.pLine = pNewLine;
 
             try {
-                endPoint = params.pio->GetPoint(Io::LineNext, lines > 1 ? Io::LineK2 : Io::LineK1, &tracker);
+                endPoint = params.pIo->GetPoint(Io::LineNext, 0, lines > 1 ? Io::LineK2 : Io::LineK1, &tracker);
             }
             catch (const OdEdKeyword& keyword) {
                 if (keyword.keywordIndex() == 0) {
@@ -79,7 +84,9 @@ void LineCommand::Run(Renderer* pRenderer)
                     if (pLine.isNull() == false) {
                         startPoint = pLine->startPoint();
                         pLine->erase();
-                        --lines;
+                        lines--;
+
+                        params.pRenderer->PostPaintSignal();
                     }
                     else {
                         DEBUG_STOP;
@@ -97,6 +104,8 @@ void LineCommand::Run(Renderer* pRenderer)
                 }
             }
             catch (const OdEdCancel&) {
+                // WARNING - keep the lines created
+                params.Completed = true;
                 return;
             }
 
@@ -106,6 +115,7 @@ void LineCommand::Run(Renderer* pRenderer)
             ++lines;
 
             if (finished) {
+                params.Completed = true;
                 return;
             }
         }

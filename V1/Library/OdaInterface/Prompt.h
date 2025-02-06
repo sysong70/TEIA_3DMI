@@ -3,11 +3,12 @@
 namespace Io
 {
 	const wchar_t PromptTypeACommand[] =        L"Type a command|__#__";
-	const wchar_t ErrorNotPositive[] =          L"Negative numbers now allowed|__#__";
 	const wchar_t ErrorInvalidCommand[] =       L"Invalid command|__#__";
-	const wchar_t ErrorInvalidDistance[] =      L"Invalid command|__#__";
 	const wchar_t ErrorInvalidKeyword[] =       L"Invalid Keyword|__#__";
 	const wchar_t ErrorInvalidPoint[] =         L"Invalid point|__#__";
+	const wchar_t ErrorInvalidValue[] =         L"Invalid value|__#__";
+	const wchar_t ErrorNegativeValue[] =        L"Negative value not allowed|__#__";
+	const wchar_t ErrorZeroValue[] =            L"Zero value not allowed|__#__";
 	const wchar_t LineFirst[] =                 L"Specify first point|__#__";
 	const wchar_t LineNext[] =                  L"Specify next point or|__#__";
 	const wchar_t LineK1[] =                    L"Undo(U)|__#__";
@@ -23,6 +24,7 @@ namespace Io
 	const wchar_t CircleCrK1[] =                L"3 Points(3P)/2 Points(2P)|__#__";
 	const wchar_t CircleCrK2[] =                L"Diameter(D)|__#__";
 	const wchar_t CircleTtrFirst[] =            L"Specify point on object for first tangent of circle|__#__";
-	const wchar_t CircleTrrSecond[] =           L"Specify point on object for second tangent of circle|__#__";
+	const wchar_t CircleTtrSecond[] =           L"Specify point on object for second tangent of circle|__#__";
+	const wchar_t CircleTtrInvalid[] =          L"Circle does not exist|__#__";
 }
 

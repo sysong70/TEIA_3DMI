@@ -1104,14 +1104,24 @@ void Signal::UserIO::OnInput(const CString& value)
 
 
 
-void Signal::UserIO::PutCommand(CString command, CString prompt, CString keyword)
+void Signal::UserIO::StandbyCommand(CString prompt)
+{
+	Json::Object data;
+	ConstructData(data, Action::StandbyCommand);
+
+	data.SetString(SKW_PROMPT, prompt);
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::UserIO::PutCommand(CString value)
 {
 	Json::Object data;
 	ConstructData(data, Action::PutCommand);
 
-	data.SetString(SKW_COMMAND, command);
-	data.SetString(SKW_PROMPT, prompt);
-	data.SetString(SKW_KEYWORD, keyword);
+	data.SetString(SKW_COMMAND, value);
 
 	Wrapper().SendData(data);
 }
@@ -1131,10 +1141,10 @@ void Signal::UserIO::PutPrompt(CString prompt, CString keyword)
 
 
 
-void Signal::UserIO::InputError(const CString& value)
+void Signal::UserIO::PutError(const CString& value)
 {
 	Json::Object data;
-	ConstructData(data, Action::InputError);
+	ConstructData(data, Action::PutError);
 
 	data.SetString(SKW_VALUE, value);
 
@@ -1143,10 +1153,10 @@ void Signal::UserIO::InputError(const CString& value)
 
 
 
-void Signal::UserIO::InputEcho(const CString& value)
+void Signal::UserIO::PutEcho(const CString& value)
 {
 	Json::Object data;
-	ConstructData(data, Action::InputEcho);
+	ConstructData(data, Action::PutEcho);
 
 	data.SetString(SKW_VALUE, value);
 

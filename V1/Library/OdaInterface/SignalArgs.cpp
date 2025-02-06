@@ -47,7 +47,7 @@ SignalArgs::Base* SignalArgs::Base::CreateInstance(Json::Object& content, int& s
 		case OnAction(ContextCommand);
 
 		case Signal::View::Action::OnKeyDown:
-			instance = new Keyboard(content);
+			//instance = new Keyboard(content);
 			break;
 
 		case Signal::View::Action::OnConstruct:

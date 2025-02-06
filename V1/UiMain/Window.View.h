@@ -46,18 +46,14 @@ namespace Window
 
 		EViewType GetViewType();
 
-		Control::ToolBar& GetToolBar() {
-			return m_toolBar;
-		}
+		Control::ToolBar& GetToolBar();
 
-		Control::HistoryBar& GetHistoryBar() {
-			return m_historyBar;
-		}
+		Control::HistoryBar& GetHistoryBar();
 
 	protected:
 
 		void OnActivateView(BOOL bActivate, CView* pActivateView, CView* pDeactiveView) override;
-
+		// WARNING - abstract
 		void OnDraw(CDC* pDC) override;
 
 		void OnInitialUpdate() override;

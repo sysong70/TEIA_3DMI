@@ -561,10 +561,12 @@ bool Component::RibbonBar::Create2dCategories()
 	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test8));
 	pPanel->Add(PRESET::CreateButton(CUSTOM_3D_CMD_KEN_Test9, L"Coordinate"));
 
-	// CHECK - Context Menu, hide
+	// CHECK - Context Menu
 
 	m_pDummy = AddCategory(L"Dummy");
+	// TODO - hide panel
 	pPanel = pCategory->AddPanel(Facility::GetTitle(CONTEXT_2D_POP_ObjectSnap_Overrides));
+
 	for (int id = CONTEXT_2D_CMD_ObjectSnap_Point; id <= CONTEXT_2D_CMD_ObjectSnap_Near; id++) {
 		pPanel->Add(PRESET::CreateButton(id, L"", false));
 	}

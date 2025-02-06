@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Commands.h"
+#include "CommandStack.h"
 
 #include "DbViewport.h"
 
@@ -12,16 +13,24 @@ CommandParams::CommandParams(Renderer* pRenderer)
     pGsView = pRenderer->GetGsView();
     pDb = pRenderer->GetDatabase();
     pSpace = CommandBase::OpenActiveSpace(pDb);
-    pio = &pRenderer->GetUserIO();
-
+    pIo = &pRenderer->GetUserIO();
+    Completed = false;
+    //:WARNING - not pDb->disableUndoRecording
     pDb->setUndoMark();
 }
 
 
 
-void CommandParams::Cancel()
+CommandParams::~CommandParams()
 {
-    pDb->undoBack();
+    if (Completed) {
+        TheCommandStack.Completed();
+    }
+    else {
+        //:WARNING - not pDb->undo()
+        pDb->undoBack();
+        TheCommandStack.Canceled();
+    }
 }
 
 //**************************************************************************************************

@@ -193,7 +193,7 @@
     <ClCompile Include="Command.Line2d.cpp">
       <Filter>Command\2D</Filter>
     </ClCompile>
-    <ClCompile Include="Component.CommandPrompt.cpp">
+    <ClCompile Include="Component.CommandBar.cpp">
       <Filter>Component\MainFrame</Filter>
     </ClCompile>
   </ItemGroup>
@@ -408,7 +408,7 @@
     <ClInclude Include="Command.Line2d.h">
       <Filter>Command\2D</Filter>
     </ClInclude>
-    <ClInclude Include="Component.CommandPrompt.h">
+    <ClInclude Include="Component.CommandBar.h">
       <Filter>Component\MainFrame</Filter>
     </ClInclude>
   </ItemGroup>

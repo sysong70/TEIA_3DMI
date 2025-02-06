@@ -143,7 +143,6 @@ void Window::View2d::ReceiveSignal(Json::Object* pData)
 
 
 
-
 bool Window::View2d::SetContextMenu(Json::Object* pData)
 {
 	DEBUG_VALID(pData);
@@ -196,6 +195,21 @@ void Window::View2d::ShowContextMenu(Json::Object* pData)
 
 
 
+void Window::View2d::OnDraw(CDC* pDC)
+{
+	OutputDebugString(L"View2d::OnDraw\n");
+}
+
+
+
+void Window::View2d::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	// WARNING - not SendMessage
+	GetMainFrame().GetCommandBar().PostMessage(WM_CHAR, (WPARAM)nChar, (LPARAM)nRepCnt);
+}
+
+
+
 void Window::View2d::OnCommand(UINT id)
 {
 	// global post process
@@ -232,7 +246,7 @@ void Window::View2d::OnCommand(UINT id)
 		DEBUG_VALID(pInfo);
 	}
 
-	// TEST
+	// TEST - move to CommandBar
 	//m_historyBar.PushButton(id);
 	CancelCommand();
 
@@ -274,11 +288,12 @@ void Window::View2d::OnContextCommand(UINT id)
 void Window::View2d::OnMouseMove(UINT nFlags, CPoint point)
 {
 	if (IsValid()) {
-		// TSET
+		// TEST - StatusBar::ShowCoordinate()
+		/*
 		double* pValue = Connector2d::GetCoordinate(m_nViewId, point.x, point.y);
 		GetMainFrame().m_statusBar.ShowCoordinate(pValue[0], pValue[1]);
 		REMOVE_ARRAY(pValue);
-
+		*/
 		GetDelivery().view.OnMouseMove(nFlags, point.x, point.y);
 	}
 

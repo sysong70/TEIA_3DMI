@@ -46,6 +46,8 @@ class Renderer
 	: public EventDelegator
 	, public OdGiContextForDbDatabase
 {
+	friend class CommandParams;
+
 	OdDbDatabasePtr m_pDatabase;
 	// Vectorizer device
 	OdGsDevicePtr m_pDevice;
@@ -113,7 +115,7 @@ public:
 
 	OdGsViewPtr GetGsView();
 
-	UserIO& GetUserIO() { return m_io; }
+	UserIO& GetUserIO();
 
 public:
 

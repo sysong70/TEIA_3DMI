@@ -75,23 +75,8 @@
     <ClInclude Include="OSnapManager.h">
       <Filter>Wait</Filter>
     </ClInclude>
-    <ClInclude Include="Prompt.Def.h">
-      <Filter>Wait</Filter>
-    </ClInclude>
-    <ClInclude Include="Prompt.Resource.h">
-      <Filter>Wait</Filter>
-    </ClInclude>
-    <ClInclude Include="Tracker.h">
-      <Filter>Wait</Filter>
-    </ClInclude>
     <ClInclude Include="Trackers.h">
       <Filter>IO\UserIO</Filter>
-    </ClInclude>
-    <ClInclude Include="Commands.h">
-      <Filter>IO</Filter>
-    </ClInclude>
-    <ClInclude Include="CommandStack.h">
-      <Filter>IO</Filter>
     </ClInclude>
     <ClInclude Include="..\OdaInterface\CommandReactor.h">
       <Filter>Wait</Filter>
@@ -107,6 +92,15 @@
     </ClInclude>
     <ClInclude Include="Prompt.h">
       <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Exceptions.h">
+      <Filter>IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Commands.h">
+      <Filter>IO\Command</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandStack.h">
+      <Filter>IO\Command</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -167,17 +161,8 @@
     <ClCompile Include="OSnapManager.cpp">
       <Filter>Wait</Filter>
     </ClCompile>
-    <ClCompile Include="Tracker.cpp">
-      <Filter>Wait</Filter>
-    </ClCompile>
     <ClCompile Include="Trackers.cpp">
       <Filter>IO\UserIO</Filter>
-    </ClCompile>
-    <ClCompile Include="Commands.cpp">
-      <Filter>IO</Filter>
-    </ClCompile>
-    <ClCompile Include="CommandStack.cpp">
-      <Filter>IO</Filter>
     </ClCompile>
     <ClCompile Include="Command.Circle.cpp">
       <Filter>IO\Command</Filter>
@@ -197,5 +182,19 @@
     <ClCompile Include="..\OdaInterface\Renderer.cpp">
       <Filter>Main\Application</Filter>
     </ClCompile>
+    <ClCompile Include="Exceptions.cpp">
+      <Filter>IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Commands.cpp">
+      <Filter>IO\Command</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandStack.cpp">
+      <Filter>IO\Command</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Command.Single.cpp">
+      <Filter>IO\Command</Filter>
+    </None>
   </ItemGroup>
 </Project>

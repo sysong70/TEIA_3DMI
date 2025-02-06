@@ -12,17 +12,20 @@
 
 //--------------------------------------------------------------------------------------------------
 
-struct CommandParams
+class CommandParams
 {
+public:
+
 	Renderer* pRenderer = nullptr;
 	OdGsView* pGsView = nullptr;
 	OdDbDatabase* pDb = nullptr;
 	OdDbBlockTableRecordPtr pSpace;
-	UserIO* pio = nullptr;
+	UserIO* pIo = nullptr;
+	bool Completed = false;
 
 	CommandParams(Renderer* pRenderer);
 
-	void Cancel();
+	~CommandParams();
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -39,14 +42,14 @@ public:
 
 	CommandBase() {}
 
-	virtual CString Name() { return "Base"; }
+	virtual CString Name() { return L"Base"; }
 
 	virtual void Run(Renderer* pRenderer) { DEBUG_STOP; }
 };
 
 //--------------------------------------------------------------------------------------------------
 
-#define DECLARE_CLASS(x) class x##Command : public CommandBase \
+#define DECLARE_COMMAND_CLASS(x) class x##Command : public CommandBase \
 { \
 public: \
 	x##Command() {}; \
@@ -54,7 +57,9 @@ public: \
 	void Run(Renderer* pRenderer) override; \
 }
 
-DECLARE_CLASS(Line);
-DECLARE_CLASS(Circle);
+DECLARE_COMMAND_CLASS(Undo);
+DECLARE_COMMAND_CLASS(Redo);
+DECLARE_COMMAND_CLASS(Line);
+DECLARE_COMMAND_CLASS(Circle);
 
-#undef DECLARE_CLASS
+#undef DECLARE_COMMAND_CLASS

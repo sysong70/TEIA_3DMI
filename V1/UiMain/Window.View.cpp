@@ -97,6 +97,20 @@ EViewType Window::View::GetViewType()
 
 
 
+Control::ToolBar& Window::View::GetToolBar()
+{
+	return m_toolBar;
+}
+
+
+
+Control::HistoryBar& Window::View::GetHistoryBar()
+{
+	return m_historyBar;
+}
+
+
+
 void Window::View::OnActivateView(BOOL bActivate, CView* pActivateView, CView* pDeactiveView)
 {
 	__super::OnActivateView(bActivate, pActivateView, pDeactiveView);
@@ -108,7 +122,6 @@ void Window::View::OnActivateView(BOOL bActivate, CView* pActivateView, CView* p
 
 void Window::View::OnDraw(CDC* pDC)
 {
-	__super::OnDraw(pDC);
 }
 
 
@@ -227,6 +240,8 @@ void Window::View::OnPaint()
 
 	if (IsValid()) {
 		GetDelivery().view.OnPaint(rect.left, rect.top, rect.right, rect.bottom);
+		// CHECK
+		OnDraw(&dc);
 	}
 	else {
 		dc.FillSolidRect(rect, (COLORREF)Control::EColor::DarkBack);

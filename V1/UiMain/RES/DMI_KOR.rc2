@@ -176,6 +176,8 @@ BEGIN
     HOME_2D_CMD_Window_Cascade                        "__#__\n계단식 정렬"
     HOME_2D_CMD_Window_TileHorizontal                 "__#__\n가로 정렬"
     HOME_2D_CMD_Window_TileVertical                   "__#__\n세로 정렬"
+    EDIT_2D_CMD_Undo                                  "__#__\n__#__"
+    EDIT_2D_CMD_Redo                                  "__#__\n__#__"
     DRAW_2D_CAT                                       "__#__\n__#__"
     DRAW_2D_PNL_Basic                                 "__#__\n기본"
     DRAW_2D_LST_Point                                 "점 생성\n점"

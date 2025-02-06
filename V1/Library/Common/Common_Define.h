@@ -50,6 +50,11 @@ void Trace(const wchar_t* pFormat, ...);
 #define REMOVE_POINTER(x)			{ delete x; x = nullptr; }
 #define REMOVE_ARRAY(x)				{ delete [] x; x = nullptr; }
 
+#define GetBit(flags, bit) (((flags) & (bit)) ? true : false)
+#define SetBit(flags, bit, value) ((value) ? (flags |= (bit)) : (flags &= ~(bit)))
+#define BitOff(flags, bit) (flags &= ~(bit))
+#define BitOn(flags, bit) (flags |= (bit))
+
 //--------------------------------------------------------------------------------------------------
 
 #include <vector>

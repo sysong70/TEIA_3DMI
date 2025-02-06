@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "EventDelegator.h"
+#include "Exceptions.h"
 #include "Prompt.h"
 #include "Trackers.h"
 
@@ -10,22 +11,22 @@ class Renderer;
 
 //--------------------------------------------------------------------------------------------------
 
-class UserIO : public EventDelegator
+namespace Io
 {
-	friend class Renderer;
-
-	enum class EMode
+	//  do not use enum class
+	enum EInputOptions
 	{
-		None,
-		Integer,
-		Real,
-
-		Point,
-		Distance,
-		String,
+		eDefault = 0,
+		eAllowInteger = 1,
+		eAllowReal = eAllowInteger * 2,
+		eNoZero = eAllowReal * 2,
+		eNoNegative = eNoZero * 2,
+		eRubberBand = eNoNegative * 2,
+		eRubberRect = eRubberBand * 2,
+		eUseLastPoint = eRubberRect * 2,
 	};
-	// Object snap override
-	enum class EOverride
+
+	enum class EOSnap
 	{
 		None,
 		// point filters
@@ -46,68 +47,122 @@ class UserIO : public EventDelegator
 		Near,
 	};
 
+	enum class EMode
+	{
+		None,
+		Integer,
+		Point,
+		Real,
+		String,
+	};
+
 	enum class EReturn
 	{
 		None,
 		Integer,
-		Real,
 		Point,
+		Real,
 		String,
 
 		Cancel,
-		CommaCommand,
 		Keyword,
 	};
+}
+
+//--------------------------------------------------------------------------------------------------
+
+struct IoKeyword
+{
+	int Index = -1;
+	CString Code;
+	CString Shortcut;
+};
+
+class IoKeywords : public std::vector<IoKeyword>
+{
+public:
+
+	void Initialize(CString value);
+
+	int Find(const CString& value, IoKeyword& found);
+	// throw exception
+	void Check(CString value);
+
+	void Clear();
+};
+
+//--------------------------------------------------------------------------------------------------
+
+class IoSteps : public std::queue<CString>
+{
+	friend class UserIO;
+
+public:
+
+	void Initialize(CString value);
+
+	void Clear();
+
+	void Next(Io::EOSnap& osnap, IoKeywords& keywords);
+
+private:
+
+	bool HasOsnap(CString value, Io::EOSnap& osnap);
+
+	bool HasKeyword(CString valaue, IoKeywords& keywords);
+};
+
+//--------------------------------------------------------------------------------------------------
+
+struct IoResult
+{
+	Io::EReturn Return = Io::EReturn::None;
+
+	double Real = 0.0;
+	int Integer = 0;
+	OdGePoint3d Point;
+	CString String;
+	IoKeyword Keyword;
+
+	void Initialize();
+};
+
+//--------------------------------------------------------------------------------------------------
+
+class UserIO : public EventDelegator
+{
+	friend class Renderer;
 
 protected:
 
-	struct KeywordIndexer
+	struct IoState
 	{
-		struct Data
-		{
-			CString Code;
-			wchar_t Key;
-		};
-
-		std::vector<Data> Indexer;
-
-		void Initialize(CString value);
-
-		int Find(const CString& value, Data& found);
-		// throw exception
-		void Check(CString value);
-
-		void Clear();
-	};
-
-	struct Data
-	{
+		// References
 		Renderer* pRenderer = nullptr;
-		TrackerStack trackers;
-
+		TrackerStack Trackers;
+		// Input values
 		CString Command;
 		CString Prompt;
-		KeywordIndexer Keywords;
-
-		EMode Mode = EMode::None;
-		EOverride OSnap = EOverride::None;
-		EReturn Return = EReturn::None;
-
-		// Result values
-		double Real = 0.0;
-		int Integer = 0;
-		OdGePoint3d Point;
-		CString String;
-
 		CString Keyword;
-		int KeywordIndex = -1;
-
+		IoKeywords Keywords;
+		IoSteps Steps;
+		int Options = 0;
+		// State values
+		Io::EMode Mode = Io::EMode::None;
+		Io::EOSnap OSnap = Io::EOSnap::None;
+		// Interactive UI values
 		CPoint MousePoint;
 		OdGePoint3d LastPoint;
 
+		void Initialize();
+
 		void Clear();
-	}
-	m_data;
+
+		void Set(const CString& prompt, int options, const wchar_t* keyword, TrackerBase* pTracker);
+	};
+
+	IoState m_state;
+	IoResult m_result;
 
 	// Wait process (different with WorkerThread)
 	std::mutex m_waitMutex;
@@ -121,18 +176,14 @@ protected: // EventDelegator
 
 	bool OnCommand(SignalArgs::Base* pSignal) override;
 
-	bool OnContextCommand(SignalArgs::Base* pSignal) override;
-
-	bool OnKeyDown(SignalArgs::Base* pSignal) override;
-
 	bool OnLButtonDown(SignalArgs::Base* pSignal) override;
 
 	bool OnLButtonUp(SignalArgs::Base* pSignal) override;
-
+	// Fast Pan
 	bool OnMButtonDown(SignalArgs::Base* pSignal) override;
 
 	bool OnMButtonUp(SignalArgs::Base* pSignal) override;
-
+	// Context Menu
 	bool OnRButtonDown(SignalArgs::Base* pSignal) override;
 
 	bool OnRButtonUp(SignalArgs::Base* pSignal) override;
@@ -148,42 +199,52 @@ public:
 	virtual ~UserIO();
 
 	bool IsActivated();
-
-	void SetRenderer(Renderer* pRenderer);
 	// lock or unlock(false)
 	void LockProcess(bool value = true);
 
+	void SetRenderer(Renderer* pRenderer);
+
+	bool CancelCommand();
+
+	void StandbyCommand();
+
 public:
 
-	double GetDistance(const CString& prompt, const CString& keyword = L"", TrackerBase* pTracker = nullptr);
+	OdGePoint3d GetPoint(const CString& prompt, int options, const wchar_t* keyword = nullptr, TrackerBase* pTracker = nullptr);
 
-	OdGePoint3d GetPoint(const CString& prompt, const CString& keyword = L"", TrackerBase* pTracker = nullptr);
-
-	bool SetDistance(double value);
+	bool SetInteger(int value);
 
 	bool SetPoint(const OdGePoint3d& value);
 
-public:
+	bool SetReal(double value);
 
-	bool Cancel();
-
-	bool ParseCommand(const CString& value);
-
-	bool ParseInteger(const CString& value);
-
-	bool ParseKeyword(const CString& value);
-
-	bool ParseOverride(const CString& value);
-
-	bool ParsePoint(const CString& value);
-
-	bool ParseReal(const CString& value);
-
-	bool ParseString(const CString& value);
+	bool SetString(const CString& value);
 
 public:
 
-	bool InputError(const CString& value);
+	bool SendCommand(const CString& value);
 
-	bool InputEcho(const CString& value);
+	bool SendPrompt(const CString& prompt, const CString& keyword);
+
+	bool SendEcho(const CString& value);
+
+	bool SendError(const CString& value);
+
+private:
+
+	bool ParseCommand(CString& value);
+
+	bool ParseInteger(CString& value);
+
+	bool ParseKeyword(CString& value);
+
+	bool ParseOSnap(CString& value);
+
+	bool ParseOtherInput(CString& value);
+
+	bool ParsePoint(CString& value);
+
+	bool ParseReal(CString& value);
+
+	bool ParseString(CString& value);
 };

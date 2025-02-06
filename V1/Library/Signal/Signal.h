@@ -55,6 +55,14 @@
 #define SKW_Z				"z"  // lower case
 
 //--------------------------------------------------------------------------------------------------
+// UserIO - use upper case
+
+#define KEY_CANCEL		L"^C"
+#define PRE_KEYWORD		L'.'
+#define PRE_OSNAP		L'_'
+#define PRE_RELATIVE	L'@'
+
+//--------------------------------------------------------------------------------------------------
 
 namespace Signal
 {
@@ -734,10 +742,11 @@ namespace Signal
 			OnInput,
 			OnContextMenu,
 
+			StandbyCommand,
 			PutCommand,
 			PutPrompt, // and keyword
-			InputError,
-			InputEcho,
+			PutEcho,
+			PutError,
 		};
 
 		DEFINE_WRAPPER;
@@ -750,13 +759,15 @@ namespace Signal
 
 	public:
 
-		void PutCommand(CString command, CString prompt, CString keyword = L"");
+		void StandbyCommand(CString prompt);
 
-		void PutPrompt(CString prompt, CString keyword = L"");
+		void PutCommand(CString value);
 
-		void InputError(const CString& value);
+		void PutPrompt(CString prompt, CString keyword);
 
-		void InputEcho(const CString& value);
+		void PutError(const CString& value);
+
+		void PutEcho(const CString& value);
 	};
 
 //--------------------------------------------------------------------------------------------------

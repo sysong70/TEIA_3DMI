@@ -75,13 +75,13 @@ bool Facility::CommandIndexer::Initialize()
 	Get(HOME_3D_LST_VisualEffects).Function = new Command::VisualEffects3d();
 
 	//Get(DRAW_2D_CMD_Line).Function = new Command::Line2d::TwoPoints();
-	Get(DRAW_2D_CMD_Polyline).Function = new Command::Line2d::Polyline();
-	Get(DRAW_2D_CMD_Rectangle).Function = new Command::Line2d::Rectangle();
-	Get(DRAW_2D_CMD_Polygon).Function = new Command::Line2d::Polygon();
-	Get(DRAW_2D_CMD_Circle_2Points).Function = new Command::Circle2d::TwoPoints();
-	Get(DRAW_2D_CMD_Circle_3Points).Function = new Command::Circle2d::ThreePoints();
-	Get(DRAW_2D_CMD_Circle_CenterRadius).Function = new Command::Circle2d::CenterRadius();
-	Get(DRAW_2D_CMD_Circle_2TangentsRadius).Function = new Command::Circle2d::TwoTangentsRadius();
+	//Get(DRAW_2D_CMD_Polyline).Function = new Command::Line2d::Polyline();
+	//Get(DRAW_2D_CMD_Rectangle).Function = new Command::Line2d::Rectangle();
+	//Get(DRAW_2D_CMD_Polygon).Function = new Command::Line2d::Polygon();
+	//Get(DRAW_2D_CMD_Circle_2Points).Function = new Command::Circle2d::TwoPoints();
+	//Get(DRAW_2D_CMD_Circle_3Points).Function = new Command::Circle2d::ThreePoints();
+	//Get(DRAW_2D_CMD_Circle_CenterRadius).Function = new Command::Circle2d::CenterRadius();
+	//Get(DRAW_2D_CMD_Circle_2TangentsRadius).Function = new Command::Circle2d::TwoTangentsRadius();
 
 	return true;
 }

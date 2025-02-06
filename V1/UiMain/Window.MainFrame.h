@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Window.h"
-#include "Component.CommandPrompt.h"
+#include "Component.CommandBar.h"
 #include "Component.PanelBar.h"
 #include "Component.RibbonBar.h"
 #include "Component.StatusBar.h"
@@ -38,6 +38,10 @@ namespace Window
 		CMenu& GetContextMenu(bool clearFirst);
 
 		CRect GetMDIRect();
+
+		Component::CommandBar& GetCommandBar();
+
+		CBCGPEdit& GetCommandBarInput();
 
 		Component::PanelBar& GetPanelBar();
 
@@ -107,7 +111,7 @@ namespace Window
 	private: // Command prompt and Menu
 
 		CMenu m_contextMenu;
-		Component::CommandPrompt m_commandPrompt;
+		Component::CommandBar m_commandBar;
 
 	private: // Windows
 
