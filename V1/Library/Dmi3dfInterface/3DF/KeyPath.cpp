@@ -6,6 +6,8 @@
 
 #include "Line.h"
 
+#include "3DF.Utility.h"
+
 #include <HTools.h>
 
 using namespace H3DF;
@@ -397,4 +399,58 @@ KeyPath & H3DF::KeyPath::PushBack(Key const & cInKey)
 	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
 	pcImpl->m_aPaths.push_back(cInKey);
 	return *this;
+}
+
+void H3DF::KeyPath::ShowString(CString & strOutPath)
+{
+	KeyPathImpl * pcImpl = (KeyPathImpl *) m_pcImpl;
+
+	CString strText;
+
+	size_t nIndex = 0;
+
+	for (auto & cKey : pcImpl->m_aPaths) {
+		H3DF::Type eType = Utility::GetType(cKey);
+		HC_KEY nKey = cKey.KeyValue();
+
+		if (H3DF::Type::SegmentKey == eType) {
+			SegmentKey cSegment(nKey);
+
+			CString strUserName = L"_None_";
+			UserData::ShowSegmentName(cSegment, strUserName);
+
+			strText.Format(L"\n%d. Segment: %d [%s, %s]", nIndex, nKey, strUserName, CString(cSegment.Name(false)));
+		}
+		else {
+
+			strText.Format(L"\n%d. %s: %d", nIndex, H3DF::Utility::GetTypeString(eType), nKey);
+		}
+
+		strOutPath += strText;
+		nIndex++;
+	}
+/*
+	for (int nIndex = 0; nIndex < pcImpl->m_vcKeys.size(); ++nIndex) {
+		nKey = pcImpl->m_vcKeys[nIndex];
+
+		H3DF::Type eType = H3DF::Utility::GetType(nKey);
+
+		if (H3DF::Type::SegmentKey == eType) {
+			SegmentKey cSegment(nKey);
+
+			CString strUserName = L"_None_";
+			UserData::ShowSegmentName(cSegment, strUserName);
+
+			strText.Format(L"\nSegment: %d [%s, %s]", nKey, strUserName, CString(cSegment.Name(false)));
+		}
+		else {
+
+			strText.Format(L"\n%s: %d", H3DF::Utility::GetTypeString(eType), nKey);
+		}
+
+		strOutPath += strText;
+	}
+
+	strOutPath += strText;
+	}*/
 }

@@ -14,7 +14,7 @@
 #include <3DF/CuttingSection.h>
 #include <3DF/KeyPath.h>
 #include <3DF/Selection.h>
-#include <3DF/Impl/SelectionImpl.h>
+#include <3DF/Impl/Selection.Impl.h>
 #include <3DF/Bounding.h>
 #include <3DF/Facility.AppOptions.h>
 #include <3DF/3DF.Utility.h>
@@ -885,7 +885,28 @@ void KERNEL::Command::ModelPanel::ProductOccurrenceSelectedSignal(H3DF::Componen
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->Select().SelectByComponent(pcInComponent);
+	H3DF::SelectionResults cSelectResults;
+	pcImpl->CADModel().ShowSelectionResult(pcInComponent, cSelectResults);
+
+#if 1
+	SelectionResultsIterator cIter = cSelectResults.GetIterator();
+
+	while (true == cIter.IsValid()) {
+		SelectionItem cItem = cIter.GetItem();
+
+		KeyPath cPath;
+		cItem.ShowPath(cPath);
+
+		CString strText;
+		cPath.ShowString(strText);
+
+		cIter.Next();
+	}
+#endif
+
+	pcImpl->Select().SelectByResult(cSelectResults);
+
+//	pcImpl->Select().SelectByComponent(pcInComponent);
 
 }
 

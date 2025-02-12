@@ -1090,7 +1090,9 @@ void Component::ModelPanel::ExpandParent(Json::Object* pData)
 	DisableNotification();
 
 	BOOL success = Control().Expand(FindTreeItem(SKW_KEY), TVE_EXPAND);
-	ASSERT(success);
+
+	// #sysong: 2025.2.11 remark, Parent가 끝일 경우 false가 나옴.
+	// ASSERT(success);
 }
 
 

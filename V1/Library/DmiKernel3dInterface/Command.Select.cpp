@@ -18,7 +18,7 @@
 #include <Sprocket/3DF.View.h>
 #include <3DF/Window.h>
 #include <3DF/Selection.h>
-#include <3DF/Impl/SelectionImpl.h>
+#include <3DF/Impl/Selection.Impl.h>
 #include <3DF/Highlight.h>
 #include <3DF/Visibility.h>
 #include <3DF/LineAttribute.h>
@@ -218,14 +218,6 @@ Command::Result::Type KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 		return Command::Result::Type::Pass;
 	}
 
-#ifdef _DEBUG
-	CString strPath;
-	cSelItem.ShowPathString(strPath);
-	
-	CString strSimplePath;
-	cSelItem.ShowSimplePathString(strSimplePath);
-#endif
-
 	// 3. 기존에 선택되어 있는 Dynamic highlight를 모두 지움.
 	pcImpl->m_cHighlightOSnapOperator.UnhighlightEverything();
 
@@ -420,51 +412,6 @@ H3DF::SelectionResults & KERNEL::Command::Select::Results()
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cSelectionResult;
-}
-
-bool KERNEL::Command::Select::SelectByComponent(H3DF::Component * pcInComponent)
-{
-	if (nullptr == pcInComponent) {
-		DEBUG_STOP;
-		return false;
-	}
-
-	auto * pcImpl = dynamic_cast<Command::SelectImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	H3DF::SelectionItem cSelItem;
-	H3DF::SelectionItemImpl * pcSelItemImpl = dynamic_cast<H3DF::SelectionItemImpl *>(cSelItem.GetImpl());
-	DEBUG_VALID(pcSelItemImpl);
-
-	// 입력된 Component의 Segment Key를 설정
-	pcSelItemImpl->m_cKey = pcInComponent->GetSegmentKey();
-
-	// 다음은 Owner의 Include Key를 저장한다.
-	std::vector<HC_KEY> vcIncludeKeys;
-
-	H3DF::Component * pcTargetComponent = pcInComponent->GetOwner();
-
-	while (nullptr != pcTargetComponent) {
-		HC_KEY nIncludeKey = pcTargetComponent->GetIncludeKey();
-		if (INVALID_KEY != nIncludeKey) {
-			pcSelItemImpl->m_vcIncludeKeys.emplace_back(nIncludeKey);
-		}
-
-		pcTargetComponent = pcTargetComponent->GetOwner();
-	}
-
-#ifdef _DEBUG
-	CString strPath;
-	cSelItem.ShowPathString(strPath);
-
-	CString strSimplePath;
-	cSelItem.ShowSimplePathString(strSimplePath);
-#endif
-
-	H3DF::SelectionResults cResults;
-	cResults.PushFront(cSelItem);
-
-	return SelectByResult(cResults);
 }
 
 //== Highlight 관련 함수 =============================================================================

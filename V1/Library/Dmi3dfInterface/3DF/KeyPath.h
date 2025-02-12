@@ -60,6 +60,8 @@ public:
 
 	KeyPath & PushFront(Key const & cInKey);
 	KeyPath & PushBack(Key const & cInKey);
+
+	void ShowString(CString & strOutPath);
 };
 
 CLOSE_3DF_NAMESPACE

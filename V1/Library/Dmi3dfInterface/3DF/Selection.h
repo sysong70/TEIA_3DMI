@@ -237,11 +237,15 @@ namespace H3DF
 		const bool ShowSelectedItem(Key & cOutSelection) const;
 
 		bool ShowPath(KeyPath & cOutPath) const;
-		void ShowPathString(CString & strOutPath);
-		void ShowSimplePathString(CString & strOutPath);
 
 		bool ShowSelectionPosition(WindowPoint & cOutLocation) const;
 		bool ShowSelectionPosition(WorldPoint & cOutLocation) const;
+
+		bool KeyFront(Key & cInKey, H3DF::Type eInType = H3DF::Type::None);
+		bool KeyFront(HC_KEY nInKey, H3DF::Type eInType = H3DF::Type::None);
+
+		bool KeyPushBack(Key & cInKey, H3DF::Type eInType = H3DF::Type::None);
+		bool KeyPushBack(HC_KEY nInKey, H3DF::Type eInType = H3DF::Type::None);
 	};
 
 	class API_3DF SelectionResultsIterator : public Object

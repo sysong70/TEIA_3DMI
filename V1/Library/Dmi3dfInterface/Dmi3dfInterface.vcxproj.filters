@@ -273,7 +273,7 @@
     <ClInclude Include="3DF\Impl\WindowImpl.h">
       <Filter>3DF\Object\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Impl\SelectionImpl.h">
+    <ClInclude Include="3DF\Impl\Selection.Impl.h">
       <Filter>3DF\Control\Impl</Filter>
     </ClInclude>
     <ClInclude Include="3DF\Search.h">
@@ -575,7 +575,7 @@
     <ClCompile Include="3DF\Impl\WindowImpl.cpp">
       <Filter>3DF\Object\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Impl\SelectionImpl.cpp">
+    <ClCompile Include="3DF\Impl\Selection.Impl.cpp">
       <Filter>3DF\Control\Impl</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Search.cpp">
