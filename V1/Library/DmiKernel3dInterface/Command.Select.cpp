@@ -326,8 +326,6 @@ bool KERNEL::Command::Select::SelectByResult(H3DF::SelectionResults & cInResults
 
 	H3DF::HighlightOptionsKit cOptions;
 
-	H3DF::SelectionResultsIterator cIter = cInResults.GetIterator();
-
 	pcImpl->m_cHighlightCtrl.UnhighlightEverything();
 	pcImpl->m_cLineHighlightCtrl.UnhighlightEverything();
 	pcImpl->m_cPmiHighlightCtrl.UnhighlightEverything();
@@ -337,6 +335,8 @@ bool KERNEL::Command::Select::SelectByResult(H3DF::SelectionResults & cInResults
 	pcImpl->DynPmiHighlightControl().UnhighlightEverything();
 
 	pcImpl->m_cSelectionResult.Reset();
+
+	H3DF::SelectionResultsIterator cIter = cInResults.GetIterator();
 
 	while (true == cIter.IsValid()) {
 		H3DF::SelectionItem cItem = cIter.GetItem();

@@ -585,6 +585,10 @@ bool H3DF::SelectionItem::operator==(SelectionItem const & cInThat) const
 		return false;
 	}
 
+	if (pcImpl->Keys() != pcInThatImpl->Keys()) {
+		return false;
+	}
+
 	// Arc나 Polygon, Polyline 등에서 특성값이나, 몇번째 요소들이 선택되었는지 여부를 나타내는 값들이다.
 	// 값이 같지 않아도 같은 요소들이 선택된것일 수 있으므로 비교처리하지 않는다.
 /*  

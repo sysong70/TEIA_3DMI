@@ -744,7 +744,7 @@ void KERNEL::Command::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject)
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-#if 1
+#if 0
 	// 다른 Keyboard Event는 들어오지 않음.
 	Json::Object cTestObject(cInObject);
 	CString strText;
