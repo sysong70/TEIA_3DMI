@@ -9,7 +9,7 @@
 #include "../../3DF/3DF.Utility.h"
 #include "../../3DF/KeyPath.h"
 #include "../../3DF/Selection.h"
-#include "../../3DF/Impl/SelectionImpl.h"
+#include "../../3DF/Impl/Selection.Impl.h"
 
 #include <Common_Define.h>
 

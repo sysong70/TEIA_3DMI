@@ -4674,6 +4674,15 @@ A3DStatus TdfImport::DrawTess3DWire(const A3DTess3DWire * pTess3DWire, const A3D
 			return DrawPolyWires(pTess3DWire, pcTessBaseData, pcRepItem, pcParentAttr, cInSegment);
 			break;
 
+		case kA3DTypeRiCurve:
+			break;
+
+
+		default:
+			assert(false);
+			//return A3D_ERROR;
+			break;
+
 /*
 		case kA3DTypeRiCurve:
 			assert(false);

@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #include "Operator.CameraControl.h"
-#include "Impl/SelectionImpl.h"
+#include "Impl/Selection.Impl.h"
 
 #include "Impl/OperatorImpl.h"
 

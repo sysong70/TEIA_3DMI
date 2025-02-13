@@ -6,6 +6,8 @@
 
 #include "Line.h"
 
+#include "3DF.Utility.h"
+
 #include <HTools.h>
 
 using namespace H3DF;
@@ -139,16 +141,6 @@ H3DF::KeyPath::KeyPath(size_t nInPathCount, Key const pInPath[])
 	pcImpl->Set(nInPathCount, pInPath);
 }
 
-H3DF::KeyPath::KeyPath(size_t nInPathCount, HC_KEY const pInPath[])
-{
-	KeyPathImpl * pcImpl = new KeyPathImpl();
-	DEBUG_VALID(pcImpl);
-
-	pcImpl->Set(nInPathCount, pInPath);
-
-	m_pcImpl = pcImpl;
-}
-
 H3DF::KeyPath::KeyPath(KeyPath const & cInThat)
 {
 	KeyPathImpl * pcImpl = new KeyPathImpl();
@@ -191,13 +183,6 @@ KeyPath & H3DF::KeyPath::SetKeys(KeyArray const & cInKeys)
 {
 	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
 	pcImpl->Set(cInKeys);
-	return *this;
-}
-
-KeyPath & H3DF::KeyPath::SetKeys(size_t nInKeyCount, HC_KEY const pInKeys[])
-{
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
-	pcImpl->Set(nInKeyCount, pInKeys);
 	return *this;
 }
 
@@ -326,14 +311,9 @@ Key const & H3DF::KeyPath::At(size_t nInIndex) const
 
 void H3DF::KeyPath::Insert(size_t nInIndex, Key const & cInItem)
 {
-	Insert(nInIndex, cInItem.KeyValue());
-}
-
-void H3DF::KeyPath::Insert(size_t nInIndex, HC_KEY nInKey)
-{
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	KeyPathImpl * pcImpl = (KeyPathImpl *) m_pcImpl;
 	auto cIterator = pcImpl->m_aPaths.begin();
-	pcImpl->m_aPaths.insert(cIterator + nInIndex, nInKey);
+	pcImpl->m_aPaths.insert(cIterator + nInIndex, cInItem);
 }
 
 void H3DF::KeyPath::Remove(Key const & cInItem)
@@ -419,4 +399,34 @@ KeyPath & H3DF::KeyPath::PushBack(Key const & cInKey)
 	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
 	pcImpl->m_aPaths.push_back(cInKey);
 	return *this;
+}
+
+void H3DF::KeyPath::ShowString(CString & strOutPath)
+{
+	KeyPathImpl * pcImpl = (KeyPathImpl *) m_pcImpl;
+
+	CString strText;
+
+	size_t nIndex = 0;
+
+	for (auto & cKey : pcImpl->m_aPaths) {
+		H3DF::Type eType = Utility::GetType(cKey);
+		HC_KEY nKey = cKey.KeyValue();
+
+		if (H3DF::Type::SegmentKey == eType) {
+			SegmentKey cSegment(nKey);
+
+			CString strUserName = L"_None_";
+			UserData::ShowSegmentName(cSegment, strUserName);
+
+			strText.Format(L"\n%d. Segment: %d [%s, %s]", nIndex, nKey, strUserName, CString(cSegment.Name(false)));
+		}
+		else {
+
+			strText.Format(L"\n%d. %s: %d", nIndex, H3DF::Utility::GetTypeString(eType), nKey);
+		}
+
+		strOutPath += strText;
+		nIndex++;
+	}
 }

@@ -23,7 +23,7 @@ namespace KERNEL
 
 			void Signal(Json::Object & cInObject);
 
-			void SelectTreeItem(H3DF::SelectionItem & cSelItem);
+			void SelectTreeItem(H3DF::SelectionItem & cSelItem, bool bSelectFlag);
 
 			void Checked(H3DF::SelectionResults & cInResults, bool bInChecked);
 			void CheckedAll(bool bChecked);
@@ -33,6 +33,9 @@ namespace KERNEL
 			void OnItemExpandedSignal(Json::Object & cInObject);
 
 			void OnItemSelectedSignal(Json::Object& cInObject);
+			void ExchangeMkpViewSelectedSignal(H3DF::Component * pcInComponent);
+			void ProductOccurrenceSelectedSignal(H3DF::Component * pcInComponent);
+
 			void OnItemCheckedSignal(Json::Object & cInObject);
 
 			void OnItemDblClickedSignal(Json::Object & cInObject);

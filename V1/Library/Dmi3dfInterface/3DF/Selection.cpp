@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #include "Selection.h"
-#include "Impl/SelectionImpl.h"
+#include "Impl/Selection.Impl.h"
 
 #include "Window.h"
 #include "Impl/WindowImpl.h"
@@ -25,6 +25,8 @@
 #include <HBaseOperator.h>
 #include <HMarkupManager.h>
 #include <HConstantFrameRate.h>
+
+#include <ranges>
 
 #define		SEGMENT_TYPE		1
 #define		ENTITY_TYPE			2
@@ -545,7 +547,12 @@ H3DF::SelectionItem::SelectionItem(SelectionItem const & cInThat)
 H3DF::Type H3DF::SelectionItem::Type() const
 {
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
-	return pcImpl->m_cKey.Type();
+
+	if (true == pcImpl->Types().empty()) {
+		return H3DF::Type::None;
+	}
+
+	return pcImpl->Types().front();
 }
 
 void H3DF::SelectionItem::Set(SelectionItem const & cInThat)
@@ -567,21 +574,15 @@ bool H3DF::SelectionItem::operator==(SelectionItem const & cInThat) const
 		return false;
 	}
 
-	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
-	SelectionItemImpl * pcInThatImpl = (SelectionItemImpl *)cInThat.m_pcImpl;
+	SelectionItemImpl * pcImpl = (SelectionItemImpl *) m_pcImpl;
+	SelectionItemImpl * pcInThatImpl = (SelectionItemImpl *) cInThat.m_pcImpl;
 
-	if (pcImpl->m_cKey.KeyValue() != pcInThatImpl->m_cKey.KeyValue()) {
+	if (true == pcImpl->Keys().empty() || true == pcInThatImpl->Keys().empty()) {
 		return false;
 	}
 
-	if (pcImpl->m_nIncludeCount != pcInThatImpl->m_nIncludeCount) {
+	if (pcImpl->Keys().front() != pcInThatImpl->Keys().front()) {
 		return false;
-	}
-
-	for (int nIndex = 0; nIndex < pcImpl->m_nIncludeCount; nIndex++) {
-		if (pcImpl->m_pnIncludeKeys[nIndex] != pcInThatImpl->m_pnIncludeKeys[nIndex]) {
-			return false;
-		}
 	}
 
 	// Arc나 Polygon, Polyline 등에서 특성값이나, 몇번째 요소들이 선택되었는지 여부를 나타내는 값들이다.
@@ -640,14 +641,24 @@ bool H3DF::SelectionItem::IsValid()
 {
 	auto * pcImpl = dynamic_cast<SelectionItemImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
-	return (INVALID_KEY != pcImpl->m_cKey.KeyValue()) ? true : false;
+
+	if (true == pcImpl->Keys().empty()) {
+		return false;
+	}
+
+	return (INVALID_KEY != pcImpl->Keys().front()) ? true : false;
 }
 
 bool H3DF::SelectionItem::IsValid() const
 {
 	auto * pcImpl = dynamic_cast<SelectionItemImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
-	return (INVALID_KEY != pcImpl->m_cKey.KeyValue()) ? true : false;
+
+	if (true == pcImpl->Keys().empty()) {
+		return false;
+	}
+
+	return (INVALID_KEY != pcImpl->Keys().front()) ? true : false;
 }
 
 bool H3DF::SelectionItem::ShowSelectedItem(Key & cOutSelection)
@@ -657,10 +668,29 @@ bool H3DF::SelectionItem::ShowSelectedItem(Key & cOutSelection)
 	}
 
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
-	cOutSelection = pcImpl->m_cKey;
 
-	if (INVALID_KEY == cOutSelection.KeyValue()) {
+	if (true == pcImpl->Keys().empty() || true == pcImpl->Types().empty()) {
 		return false;
+	}
+
+	HC_KEY nKey = pcImpl->Keys().front();
+	if (INVALID_KEY == nKey) {
+		return false;
+	}
+
+	H3DF::Type eType = pcImpl->Types().front();
+
+	if (H3DF::Type::LineKey == eType) {
+		cOutSelection = LineKey(nKey);
+	}
+	else if (H3DF::Type::ShellKey == eType) {
+		cOutSelection = ShellKey(nKey);
+	}
+	else if (H3DF::Type::SegmentKey == eType) {
+		cOutSelection = SegmentKey(nKey);
+	}
+	else {
+		cOutSelection = H3DF::Key(nKey);
 	}
 
 	return true;
@@ -673,7 +703,12 @@ const bool H3DF::SelectionItem::ShowSelectedItem(Key & cOutSelection) const
 	}
 
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
-	cOutSelection = pcImpl->m_cKey;
+
+	if (true == pcImpl->Keys().empty()) {
+		return false;
+	}
+
+	cOutSelection = pcImpl->Keys().front();
 
 	if (INVALID_KEY == cOutSelection.KeyValue()) {
 		return false;
@@ -687,126 +722,24 @@ bool H3DF::SelectionItem::ShowPath(KeyPath & cOutPath) const
 	SelectionItemImpl * pcImpl = (SelectionItemImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	HC_KEY nSegmentKey = pcImpl->m_cKey.KeyValue();
-	if(INVALID_KEY == nSegmentKey) {
+	if (true == pcImpl->Keys().empty()) {
 		return false;
 	}
 
-	size_t nPathCount = pcImpl->m_nIncludeCount + 1;
-	HC_KEY * pnPath = new HC_KEY[nPathCount];
-
-	char chType[MVO_BUFFER_SIZE];
-	HC_Show_Key_Type(nSegmentKey, chType);
-
-	if (!streq(chType, "segment")) {
-		nSegmentKey = HC_KShow_Owner_Original_Key(nSegmentKey);
+	HC_KEY nKey = pcImpl->Keys().front();
+	if(INVALID_KEY == nKey) {
+		return false;
 	}
 
-	pnPath[0] = nSegmentKey;
+	KeyArray cKeys;
 
-	for (int nIndex = 1; nIndex < pcImpl->m_nIncludeCount; ++nIndex) {
-		pnPath[nIndex] = pcImpl->m_pnIncludeKeys[pcImpl->m_nIncludeCount - nIndex];
+	for (auto nKey : pcImpl->Keys()) {
+		cKeys.emplace_back(nKey);
 	}
 
-	pnPath[nPathCount - 1] = HC_KShow_Owner_Original_Key(pnPath[nPathCount - 2]);
-
-	cOutPath = KeyPath(nPathCount, pnPath);
+	cOutPath = KeyPath(cKeys);
 
 	return true;
-}
-
-void H3DF::SelectionItem::ShowPathString(CString & strOutPath)
-{
-	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
-	KeyPath cPath;
-	if (false == ShowPath(cPath)) {
-		DEBUG_STOP;
-		return;
-	}
-
-	CString strText;
-	char chType[MVO_BUFFER_SIZE];
-
-	HC_KEY nKey = pcImpl->m_cKey.KeyValue();
-	HC_Show_Key_Type(nKey, chType);
-
-	CString strName;
-
-	if (streq("segment", chType)) {
-		SegmentKey cSegmentKey(nKey);
-		if (false == UserData::ShowSegmentName(cSegmentKey, strName)) {
-			strName = cSegmentKey.Name(false);
-		}
-
-		strText.Format(L"Select Key: %d [%s], [%s, %s]", nKey, Utility::ToString(chType), strName, CString(cSegmentKey.Name(false)));
-	}
-	else {
-		strText.Format(L"Select Key: %d [%s], [%s]", nKey, Utility::ToString(chType), strName);
-	}
-
-	
-	strOutPath += strText;
-
-	if (nKey != cPath.At(0).KeyValue()) {
-		nKey = cPath.At(0).KeyValue();
-		HC_Show_Key_Type(nKey, chType);
-
-		SegmentKey cSegmentKey(nKey);
-		if (false == UserData::ShowSegmentName(cSegmentKey, strName)) {
-			strName = cSegmentKey.Name(false);
-		}
-
-		strText.Format(L"\nOwner of select key: %d [%s], %s", nKey, Utility::ToString(chType), strName);
-		strOutPath += strText;
-	}
-
-	for (int nIndex = 1; nIndex < pcImpl->m_nIncludeCount; ++nIndex) {
-		nKey = cPath.At(nIndex).KeyValue();
-
-		H3DF::Type eType = H3DF::Utility::GetType(nKey);
-
-		SegmentKey cSegment;
-
-		if (H3DF::Type::IncludeKey == eType) {
-			IncludeKey cInclude(nKey);
-			cSegment = cInclude.GetTarget();
-		}
-		else {
-			cSegment = SegmentKey(nKey);
-		}
-
-		if (false == UserData::ShowSegmentName(cSegment, strName)) {
-			strName = cSegment.Name(false);
-		}
-
-		if (H3DF::Type::IncludeKey == eType) {
-			strText.Format(L"\nInclude: %d, Segment: %d [%s, %s]", nKey, cSegment.KeyValue(), strName, CString(cSegment.Name(false)));
-		}
-		else {
-			strText.Format(L"\nSegment: %d, [%s, %s]", nKey, strName, CString(cSegment.Name(false)));
-		}
-
-		strOutPath += strText;
-	}
-
-	nKey = cPath.Back().KeyValue();
-	H3DF::Type eType = H3DF::Utility::GetType(nKey);
-
-	SegmentKey cSegmentKey1(nKey);
-	if (false == UserData::ShowSegmentName(cSegmentKey1, strName)) {
-		strName = cSegmentKey1.Name(false);
-	}
-
-	if (H3DF::Type::IncludeKey == eType) {
-		strText.Format(L"\nInclude: %d, Segment: %d [%s]", nKey, nKey, strName);
-	}
-	else {
-		strText.Format(L"\nSegment: %d [%s]", nKey, strName);
-	}
-
-	strOutPath += strText;
 }
 
 bool H3DF::SelectionItem::ShowSelectionPosition(WindowPoint & cOutLocation) const
@@ -832,6 +765,55 @@ bool H3DF::SelectionItem::ShowSelectionPosition(WorldPoint & cOutLocation) const
 
 	return true;
 }
+
+bool H3DF::SelectionItem::KeyFront(Key & cInKey, H3DF::Type eInType)
+{
+	return KeyFront(cInKey.KeyValue(), eInType);
+}
+
+bool H3DF::SelectionItem::KeyFront(HC_KEY nInKey, H3DF::Type eInType)
+{
+	SelectionItemImpl * pcImpl = dynamic_cast<SelectionItemImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->Keys().front() = nInKey;
+
+	if (H3DF::Type::None == eInType) {
+		char chType[MVO_BUFFER_SIZE];
+		HC_Show_Key_Type(nInKey, chType);
+
+		eInType = H3DF::Utility::GetType(chType);
+	}
+
+	pcImpl->Types().front() = eInType;
+
+	return true;
+}
+
+bool H3DF::SelectionItem::KeyPushBack(Key & cInKey, H3DF::Type eInType)
+{
+	return KeyPushBack(cInKey.KeyValue(), eInType);
+}
+
+bool H3DF::SelectionItem::KeyPushBack(HC_KEY nInKey, H3DF::Type eInType)
+{
+	SelectionItemImpl * pcImpl = dynamic_cast<SelectionItemImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->Keys().push_back(nInKey);
+
+	if (H3DF::Type::None == eInType) {
+		char chType[MVO_BUFFER_SIZE];
+		HC_Show_Key_Type(nInKey, chType);
+
+		eInType = H3DF::Utility::GetType(chType);
+	}
+
+	pcImpl->Types().push_back(eInType);
+
+	return true;
+}
+
 //== SelectionResultsIterator Class ================================================================
 SelectionResultsIterator::SelectionResultsIterator()
 {
@@ -1313,17 +1295,25 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 		} HC_Close_Segment();
 	}
 
+
+	if (nResult > 0) {
+		pcSelCtrlImpl->SelectionResult(pcSelCtrlImpl, cOutResults);
+		return cOutResults.GetCount();
+	}
+
+	return 0;
+
+/*
 	// 선택된 요소가 없음
 	if (0 == nResult) {
 		return 0;
 	}
 
-	HC_KEY  nKey = INVALID_KEY;
+	HC_KEY  nSelectKey = INVALID_KEY;
 	HC_KEY * pnSelectKeys = nullptr;
 	HC_KEY * pnIncludeKeys = nullptr;
 	int	eSelectedType = SelectionControlImpl::SelType::None;
 	char chKeyType[MVO_BUFFER_SIZE];
-	int	nIncludeCount = 0;
 
 	// 선택된 요소를 SelectionResults에 저장하기 위해서 새롭게 생성
 	SelectionResultsImpl * pcResultsImpl = static_cast<SelectionResultsImpl *>(cOutResults.GetImpl());
@@ -1337,8 +1327,56 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 
 		pcItemImpl->m_pcWindow = pcSelCtrlImpl->m_pcWindow;
 
-		HC_Show_Selection_Element(&nKey, &pcItemImpl->m_nOffset1, &pcItemImpl->m_nOffset2, &pcItemImpl->m_nOffset3);
-		HC_Show_Selection_Original_Key(&nKey);
+		HC_Show_Selection_Element(&nSelectKey, &pcItemImpl->m_nOffset1, &pcItemImpl->m_nOffset2, &pcItemImpl->m_nOffset3);
+		HC_Show_Selection_Original_Key(&nSelectKey);
+
+		if (INVALID_KEY == nSelectKey) {
+			DEBUG_STOP;
+			continue;
+		}
+
+		HC_Show_Key_Type(nSelectKey, chKeyType);
+
+		if (streq(chKeyType, "line") || streq(chKeyType, "polyline") || streq(chKeyType, "circular arc") || streq(chKeyType, "elliptical arc")) {
+			eSelectedType = SelectionControlImpl::SelType::Line;
+			pcItemImpl->m_cKey = LineKey(nSelectKey);
+		}
+		else if (streq(chKeyType, "marker")) {
+			eSelectedType = SelectionControlImpl::SelType::Marker;
+		}
+		else if (streq(chKeyType, "text leader")) {
+			eSelectedType = SelectionControlImpl::SelType::Shell;	//?
+			nSelectKey = HC_Show_Owner_Original_Key(nSelectKey);		// move up to text;
+		}
+		else {
+			// This may be shell, mesh, cyliner, etc...
+			eSelectedType = SelectionControlImpl::SelType::Shell;
+			pcItemImpl->m_cKey = ShellKey(nSelectKey);
+
+			// But if it really is a shell, check for regions.
+			if (streq(chKeyType, "shell") && pcItemImpl->m_nOffset3 != -1) {
+
+				int nRegion = 0;
+				int nLowest = 0;
+				int nHighest = 0;
+
+				HC_Show_Region_Range(nSelectKey, &nLowest, &nHighest);
+
+				if ((nLowest != nHighest || nLowest > 0)) {
+					// eSelectedType |= SelectionControlImpl::SelType::Region;
+
+					HC_Open_Geometry(nSelectKey); {
+						HC_Open_Face(pcItemImpl->m_nOffset3); {
+							HC_Show_Region(&nRegion);
+						}HC_Close_Face();
+					}HC_Close_Geometry();
+
+					pcItemImpl->m_nRegion = nRegion;
+					pcItemImpl->m_nLowest = nLowest;
+					pcItemImpl->m_nHighest = nHighest;
+				}
+			}
+		}
 
 		WindowPoint cWindowPoint;
 		WorldPoint cWorldPoint;
@@ -1354,105 +1392,25 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 		//TRACE(L"\nSelection_Keys_Count: %d", nKeyCount);
 
 		if (0 < nKeyCount) {
-			WindowKeyImpl * pcImpl = (WindowKeyImpl *)pcSelCtrlImpl->m_pcWindow->GetImpl();
+			WindowKeyImpl * pcImpl = (WindowKeyImpl *) pcSelCtrlImpl->m_pcWindow->GetImpl();
 			HC_KEY * pnKeys = pcImpl->GetSelectBufferKey(nKeyCount);
 
 			pnIncludeKeys = new HC_KEY[nKeyCount];
 			HC_Show_Selection_Original_Keys(&nKeyCount, pnKeys);
 
-			pcItemImpl->m_pnIncludeKeys = pnIncludeKeys;
-
-			nIncludeCount = 0;
+			// Include Key값을 찾아서 저장한다. 저장할 때는 역순으로 저장한다.
 			for (int nIndex = nKeyCount - 1; nIndex >= 0; nIndex--)
 			{
 				HC_Show_Key_Type(pnKeys[nIndex], chKeyType);
-				//TRACE(L"%d.Selection Keys Type: %s", nIndex, CString(chKeyType));
 
-				if (streq(chKeyType, "segment")) {
-					// nKey = pnKeys[nIndex];
-					//nKey = HC_Show_Reference_Geometry(pnKeys[nIndex]);
+				pcItemImpl->Keys().emplace_back(pnKeys[nIndex]);
+
+				H3DF::Type eType = Utility::GetType(chKeyType);
+				pcItemImpl->Types().emplace_back(eType);
+
+				if (H3DF::Type::ReferenceKey == eType) {
+					nSelectKey = pnKeys[nIndex];
 				}
-				else if (strstr(chKeyType, "include"))
-				{
-					pnIncludeKeys[nIncludeCount] = pnKeys[nIndex];
-					nIncludeCount++;
-				}
-				else if (streq(chKeyType, "reference")) {
-					// nKey = pnKeys[nIndex];
-					//nKey = HC_Show_Reference_Geometry(pnKeys[nIndex]);
-				}
-			}
-
-			pcItemImpl->m_nIncludeCount = nIncludeCount;
-		}
-
-		HC_Show_Key_Type(nKey, chKeyType);
-
-		if (streq(chKeyType, "line") || streq(chKeyType, "polyline") || streq(chKeyType, "circular arc") || streq(chKeyType, "elliptical arc")) {
-			eSelectedType = SelectionControlImpl::SelType::Line;
-			pcItemImpl->m_cKey = LineKey(nKey);
-		}
-		else if (streq(chKeyType, "marker")) {
-			eSelectedType = SelectionControlImpl::SelType::Marker;
-		}
-		else if (streq(chKeyType, "text leader")) {
-			eSelectedType = SelectionControlImpl::SelType::Shell;	//?
-			nKey = HC_Show_Owner_Original_Key(nKey);		// move up to text;
-		}
-		else {
-			// This may be shell, mesh, cyliner, etc...
-			eSelectedType = SelectionControlImpl::SelType::Shell;
-			pcItemImpl->m_cKey = ShellKey(nKey);
-
-			// But if it really is a shell, check for regions.
-			if (streq(chKeyType, "shell") && pcItemImpl->m_nOffset3 != -1) {
-
-				int nRegion = 0;
-				int nLowest = 0;
-				int nHighest = 0;
-
-				HC_Show_Region_Range(nKey, &nLowest, &nHighest);
-
-				if ((nLowest != nHighest || nLowest > 0)) {
-					// eSelectedType |= SelectionControlImpl::SelType::Region;
-
-					HC_Open_Geometry(nKey); {
-						HC_Open_Face(pcItemImpl->m_nOffset3); {
-							HC_Show_Region(&nRegion);
-						}HC_Close_Face();
-					}HC_Close_Geometry();
-
-					pcItemImpl->m_nRegion = nRegion;
-					pcItemImpl->m_nLowest = nLowest;
-					pcItemImpl->m_nHighest = nHighest;
-				}
-/*
-				//Selection::Level cLevel;
-
-			if(true == cInOptions.ShowLevel(cLevel)) {
-				if (Selection::Level::Subentity == cLevel) {
-					//if (true ==  pcSelection->GetAllowRegionSelection()) {
-					int nRegion = 0;
-					int nLowest = 0;
-					int nHighest = 0;
-
-					HC_Show_Region_Range(nKey, &nLowest, &nHighest);
-
-					if ((nLowest != nHighest || nLowest > 0)) {
-						eSelectedType |= SelType::Region;
-						HC_Open_Geometry(nKey); {
-							HC_Open_Face(nOffset3); {
-								HC_Show_Region(&nRegion);
-							}HC_Close_Face();
-						}HC_Close_Geometry();
-
-						pcItemImpl->nRegion = nRegion;
-						pcItemImpl->nLowest = nLowest;
-						pcItemImpl->nHighest = nHighest;
-					}
-				}
-			}
-*/
 			}
 		}
 
@@ -1461,6 +1419,7 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 	} while (HC_Find_Related_Selection());
 
 	return cOutResults.GetCount();
+*/
 }
 
 size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, SelectionResults & cOutResults) const
@@ -1491,7 +1450,7 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, UINT con
 
 	HPoint  new_pos;
 	int		nResult = 0;
-	bool	need_update = false;
+	bool	bNeedUpdate = false;
 
 	//HSelectionSet * pcSelection = GetBaseView()->GetSelection();
 
@@ -1519,13 +1478,13 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, UINT con
 	if (nResult > 0) {
 		pcSelCtrlImpl->HandleSelection(nFlags, cOutResults);
 		size_t nCount = cOutResults.GetCount();
-		need_update = true;
+		bNeedUpdate = true;
 	}
 
 	pcSelCtrlImpl->GetBaseView()->GetConstantFrameRateObject()->SetDisableIncreaseTemp(true);
 
 	//GetBaseView()->SetGeometryChanged();
-	if (need_update) {
+	if (bNeedUpdate) {
 		pcSelCtrlImpl->GetBaseView()->Update();	// update the scene to reflect the new highlight attributes
 	}
 
@@ -1537,8 +1496,4 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, UINT con
 
 	// of the selected items
 	return HOP_READY;
-
-	//pcImpl->SelectByPoint(cInLocation, nFlags, cInOptions, cOutResults);
-
-	return 0;
 }

@@ -14,7 +14,7 @@
 #include <3DF/CuttingSection.h>
 #include <3DF/KeyPath.h>
 #include <3DF/Selection.h>
-#include <3DF/Impl/SelectionImpl.h>
+#include <3DF/Impl/Selection.Impl.h>
 #include <3DF/Bounding.h>
 #include <3DF/Facility.AppOptions.h>
 #include <3DF/3DF.Utility.h>
@@ -613,7 +613,7 @@ void KERNEL::Command::ModelPanel::Signal(Json::Object & cInObject)
 //== Select 관련 함수 ===============================================================================
 
 // 1. 외부에서 전달된 Selection Item을 이용해서 Model Tree를 설정한다.
-void KERNEL::Command::ModelPanel::SelectTreeItem(H3DF::SelectionItem & cSelItem)
+void KERNEL::Command::ModelPanel::SelectTreeItem(H3DF::SelectionItem & cSelItem, bool bSelectFlag)
 {
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -632,7 +632,7 @@ void KERNEL::Command::ModelPanel::SelectTreeItem(H3DF::SelectionItem & cSelItem)
 
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
 	//:Ken - 20240403
-	pcImpl->Delivery().modelPanel.SelectItem((DWORD_PTR)pcComponent);
+	pcImpl->Delivery().modelPanel.SelectItem((DWORD_PTR)pcComponent, bSelectFlag);
 
 	return;
 }
@@ -744,15 +744,50 @@ void KERNEL::Command::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject)
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	H3DF::Component * pcInComponent = dynamic_cast<Component *>((Component *)cInObject.GetDwordPtr(SKW_KEY));
+#if 1
+	// 다른 Keyboard Event는 들어오지 않음.
+	Json::Object cTestObject(cInObject);
+	CString strText;
+	cTestObject.Stringify(strText);
+#endif
+
+	H3DF::Component * pcInComponent = dynamic_cast<Component *>((Component *) cInObject.GetDwordPtr(SKW_KEY));
+	if (nullptr == pcInComponent) {
+		DEBUG_STOP;
+		return;
+	}
+
+	H3DF::Component::Type eType = pcInComponent->GetType();
+
+	if (H3DF::Component::Type::ExchangeMkpView == eType) {
+		ExchangeMkpViewSelectedSignal(pcInComponent);
+	}
+	// Product Occurrence인 경우 처리, 일단 Product Occurrence를 대상으로 작업한다.
+	// 다만 다른 아이탬과 차이가 있는지는 알 수 없음.
+	else if (H3DF::Component::Type::ExchangeProductOccurrence == eType) {
+		ProductOccurrenceSelectedSignal(pcInComponent);
+	}
+	else {
+		DEBUG_STOP;
+	}
+}
+	
+
+// 1.1 ExchangeMkpView Select Changed Signal 처리 #Tree-Select
+void KERNEL::Command::ModelPanel::ExchangeMkpViewSelectedSignal(H3DF::Component * pcInComponent)
+{
 	if (nullptr == pcInComponent) {
 		DEBUG_STOP;
 		return;
 	}
 
 	if (H3DF::Component::Type::ExchangeMkpView != pcInComponent->GetType()) {
+		DEBUG_STOP;
 		return;
 	}
+
+	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 
 	// 선택된 요소가 Markup View인 경우 처리.
 	// 1. 저장되어 있는 Camera 정보를 이용해서 View Position을 설정
@@ -852,6 +887,37 @@ void KERNEL::Command::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject)
 	}
 }
 
+// 1.2 Product Occurrence Select Changed Signal 처리 #Tree-Select
+void KERNEL::Command::ModelPanel::ProductOccurrenceSelectedSignal(H3DF::Component * pcInComponent)
+{
+	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	H3DF::SelectionResults cSelectResults;
+	pcImpl->CADModel().ShowSelectionResult(pcInComponent, cSelectResults);
+
+#if 1
+	SelectionResultsIterator cIter = cSelectResults.GetIterator();
+
+	while (true == cIter.IsValid()) {
+		SelectionItem cItem = cIter.GetItem();
+
+		KeyPath cPath;
+		cItem.ShowPath(cPath);
+
+		CString strText;
+		cPath.ShowString(strText);
+
+		cIter.Next();
+	}
+#endif
+
+	pcImpl->Select().SelectByResult(cSelectResults);
+
+//	pcImpl->Select().SelectByComponent(pcInComponent);
+
+}
+
 // 2. Item Checked Signal 처리
 void KERNEL::Command::ModelPanel::OnItemCheckedSignal(Json::Object & cInObject)
 {
@@ -900,7 +966,4 @@ void KERNEL::Command::ModelPanel::OnItemDblClickedSignal(Json::Object & cInObjec
 		DEBUG_STOP;
 		return;
 	}
-
-
-
 }

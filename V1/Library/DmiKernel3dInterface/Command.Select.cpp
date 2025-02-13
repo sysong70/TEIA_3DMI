@@ -18,6 +18,7 @@
 #include <Sprocket/3DF.View.h>
 #include <3DF/Window.h>
 #include <3DF/Selection.h>
+#include <3DF/Impl/Selection.Impl.h>
 #include <3DF/Highlight.h>
 #include <3DF/Visibility.h>
 #include <3DF/LineAttribute.h>
@@ -166,6 +167,8 @@ KERNEL::Command::Select::Select(const Session * pcInSession) :
 }
 
 //== Mouse Event 관련 함수 ===========================================================================
+
+// 1.Select::MouseMove
 Command::Result::Type KERNEL::Command::Select::MouseMove(Event & cInEvent)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
@@ -176,17 +179,19 @@ Command::Result::Type KERNEL::Command::Select::MouseMove(Event & cInEvent)
 	return Command::Result::Type::Pass;
 }
 
+// 2.Select::LButtonDown
 Command::Result::Type KERNEL::Command::Select::LButtonDown(Event & cInEvent)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
+	// 위치 저장
 	pcImpl->m_cLButtonDownPixelPosition.Set(cInEvent.GetMousePixelPoint().x, cInEvent.GetMousePixelPoint().y);
 
 	return Command::Result::Type::Pass;
 }
 
-// #Coding: 1.Select::LButtonUp
+// 3.Select::LButtonUp 실제로 Mouse Click으로 선택하는 부분 #Selection
 Command::Result::Type KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 {
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
@@ -213,11 +218,6 @@ Command::Result::Type KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 		return Command::Result::Type::Pass;
 	}
 
-#ifdef _DEBUG
-	CString strPath;
-	cSelItem.ShowPathString(strPath);
-#endif
-
 	// 3. 기존에 선택되어 있는 Dynamic highlight를 모두 지움.
 	pcImpl->m_cHighlightOSnapOperator.UnhighlightEverything();
 
@@ -238,6 +238,8 @@ Command::Result::Type KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 		}
 	}
 
+	// 이미 선택된 객체인지 확인
+	bool bSelectFlag = false;
 	if (false == pcImpl->m_cSelectionResult.IsExist(cSelItem)) {
 		if (H3DF::Type::LineKey == cSelItem.Type()) {
 			pcImpl->m_cLineHighlightCtrl.Highlight(cSelItem, cOptions, false);
@@ -251,6 +253,7 @@ Command::Result::Type KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 			}
 		}
 
+		bSelectFlag = true;
 		// 선택된 객체를 SelectionResult에 추가
 		pcImpl->m_cSelectionResult.PushFront(cSelItem);
 	}
@@ -267,11 +270,12 @@ Command::Result::Type KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 			}
 		}
 
+		bSelectFlag = false;
 		pcImpl->m_cSelectionResult.Erase(cSelItem);
 	}
 
 	// 4. ModelPanel에 선택된 객체를 전달
-	pcImpl->ModelPanel().SelectTreeItem(cSelItem);
+	pcImpl->ModelPanel().SelectTreeItem(cSelItem, bSelectFlag);
 
 	pcImpl->View().Update();
 
@@ -314,6 +318,7 @@ void KERNEL::Command::Select::ResetSnapItems(bool bUpdate)
 
 //== Select 관련 함수 ================================================================================
 
+// 1. SelectionResults를 이용해서 Select 실행 #Selection
 bool KERNEL::Command::Select::SelectByResult(H3DF::SelectionResults & cInResults)
 {
 	auto * pcImpl = (Command::SelectImpl *)m_pcImpl;
@@ -322,6 +327,16 @@ bool KERNEL::Command::Select::SelectByResult(H3DF::SelectionResults & cInResults
 	H3DF::HighlightOptionsKit cOptions;
 
 	H3DF::SelectionResultsIterator cIter = cInResults.GetIterator();
+
+	pcImpl->m_cHighlightCtrl.UnhighlightEverything();
+	pcImpl->m_cLineHighlightCtrl.UnhighlightEverything();
+	pcImpl->m_cPmiHighlightCtrl.UnhighlightEverything();
+
+	pcImpl->DynHighlightControl().UnhighlightEverything();
+	pcImpl->DynLineHighlightControl().UnhighlightEverything();
+	pcImpl->DynPmiHighlightControl().UnhighlightEverything();
+
+	pcImpl->m_cSelectionResult.Reset();
 
 	while (true == cIter.IsValid()) {
 		H3DF::SelectionItem cItem = cIter.GetItem();
@@ -340,10 +355,6 @@ bool KERNEL::Command::Select::SelectByResult(H3DF::SelectionResults & cInResults
 
 		cIter.Next();
 	}
-
-	pcImpl->DynHighlightControl().UnhighlightEverything();
-	pcImpl->DynLineHighlightControl().UnhighlightEverything();
-	pcImpl->DynPmiHighlightControl().UnhighlightEverything();
 
 	pcImpl->View().Update();
 

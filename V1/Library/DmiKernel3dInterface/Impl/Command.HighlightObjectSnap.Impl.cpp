@@ -25,7 +25,6 @@
 #include <3DF/Material.h>
 
 #include <3DF/Selection.h>
-#include <3DF/Impl/SelectionImpl.h>
 
 #include <3DF/Highlight.h>
 #include <3DF/Visibility.h>
@@ -560,8 +559,7 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 					strName = cOwner.Name(false);
 
 					if ("pmi" == strName.Left(3)) {
-						SelectionItemImpl * pcImpl = (SelectionItemImpl *) cSelectItem.GetImpl();
-						pcImpl->m_cKey = cOwner.KeyValue();
+						cSelectItem.KeyPushBack(cOwner, H3DF::Type::SegmentKey);
 						bFindPmiItem = true;
 						break;
 					}
@@ -585,8 +583,7 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 					strName = cOwner.Name(false);
 
 					if ("pmi" == strName.Left(3)) {
-						SelectionItemImpl * pcImpl = (SelectionItemImpl *) cSelectItem.GetImpl();
-						pcImpl->m_cKey = cOwner.KeyValue();
+						cSelectItem.KeyPushBack(cOwner, H3DF::Type::SegmentKey);
 						bFindPmiItem = true;
 						break;
 					}
@@ -700,11 +697,13 @@ void KERNEL::Command::HighlightObjectSnapImpl::ApplySelectionFilter(H3DF::Select
 		else if (H3DF::Type::ShellKey == eType) {
 			if (m_nSelFilter & (DWORD)SelectionFilter::Type::Solid) {
 
+/*
 				SelectionItemImpl * pcItemImpl = dynamic_cast<SelectionItemImpl *>(cNextItem.GetImpl());
 
 				pcItemImpl->m_nOffset1 = 0;
 				pcItemImpl->m_nOffset2 = 0;
 				pcItemImpl->m_nOffset3 = 0;
+*/
 
 				cOutSelections.PushBack(cNextItem);
 #if 0

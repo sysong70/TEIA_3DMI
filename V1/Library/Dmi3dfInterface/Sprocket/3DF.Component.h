@@ -159,6 +159,8 @@ namespace H3DF
         bool AddMetaData(H3DF::MetaData * pcInMetaData, bool bReplace = true);
         bool RemoveMetaData(H3DF::MetaDataIndex eInIndex);
 
+        bool IsShow();
+
         DWORD GetStatus();
 		DWORD AddStatus(Component::Status eStatus);
 		DWORD RemoveStatus(Component::Status eStatus);

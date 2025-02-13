@@ -232,6 +232,11 @@ Type H3DF::Utility::GetType(HC_KEY nInKey)
 	HC_Show_Key_Type(nInKey, strType.GetBuffer());
 	strType.ReleaseBuffer();
 
+	return GetType(strType);
+}
+
+Type H3DF::Utility::GetType(CStringA strType)
+{
 	if ("segment" == strType) {
 		return H3DF::Type::SegmentKey;
 	}
@@ -249,6 +254,12 @@ Type H3DF::Utility::GetType(HC_KEY nInKey)
 	}
 	else if ("shell" == strType) {
 		return H3DF::Type::ShellKey;
+	}
+	else if ("reference" == strType) {
+		return H3DF::Type::ReferenceKey;
+	}
+	else if ("polylin" == strType || "polyline" == strType) {
+		return H3DF::Type::LineKey;
 	}
 	else {
 		assert(false);

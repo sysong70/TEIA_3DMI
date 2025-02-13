@@ -257,7 +257,7 @@ bool KERNEL::SessionImpl::SelectControlLButtonDown(Command::Event & cInEvent)
 	return true;
 }
 
-// 3. Select 및 View Control Mouse Event 처리 함수 
+// 3. Select 및 View Control Mouse Event 처리 함수 #Selection
 Command::Result::Type KERNEL::SessionImpl::SelectControlLButtonUp(Command::Event & cInEvent)
 {
 	Select().SetMouseUpTickCount(GetTickCount64());

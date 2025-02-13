@@ -255,7 +255,7 @@ namespace H3DF
 		bool ShowBump(CStringA & strOutTextureName, CStringA & strOutTextureOptions) const;
 		bool ShowGloss(float & fOutGloss) const;
 
-		void SetMaterial(CStringA strInGeometryName);
+		void SetMaterial(CStringA strInGeometryName, bool bFaseFlag = true);
 	};
 
 	class API_3DF MaterialMappingKit : public Kit

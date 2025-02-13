@@ -4,7 +4,7 @@
 #include "Impl/WindowImpl.h"
 
 #include "Selection.h"
-#include "Impl/SelectionImpl.h"
+#include "Impl/Selection.Impl.h"
 
 #include "Highlight.h"
 

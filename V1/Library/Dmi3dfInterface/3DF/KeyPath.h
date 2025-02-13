@@ -12,7 +12,6 @@ public:
 	KeyPath();
 	KeyPath(KeyArray const & cInPath);
 	KeyPath(size_t nInPathCount, Key const pInPath[]);
-	KeyPath(size_t nInPathCount, HC_KEY const pInPath[]);
 	KeyPath(KeyPath const & cInThat);
 	KeyPath(char chKeyPath[]);
 
@@ -24,7 +23,6 @@ public:
 	KeyPath & operator=(KeyArray const & cInPath);
 
 	KeyPath & SetKeys(KeyArray const & cInKeys);
-	KeyPath & SetKeys(size_t nInKeyCount, HC_KEY const pInKeys[]);
 
 	KeyPath & UnsetKeys();
 
@@ -44,7 +42,6 @@ public:
 	Key const & At(size_t nInIndex) const;
 
 	void Insert(size_t nInIndex, Key const & cInItem);
-	void Insert(size_t nInIndex, HC_KEY nInKey);
 
 	void Remove(Key const & cInItem);
 	void Remove(size_t nInIndex);
@@ -63,6 +60,8 @@ public:
 
 	KeyPath & PushFront(Key const & cInKey);
 	KeyPath & PushBack(Key const & cInKey);
+
+	void ShowString(CString & strOutPath);
 };
 
 CLOSE_3DF_NAMESPACE
