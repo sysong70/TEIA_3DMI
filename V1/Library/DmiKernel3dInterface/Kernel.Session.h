@@ -56,6 +56,7 @@ namespace KERNEL
 
 		//== Keyboard 관련 함수 ======================================================================
 		void KeyboardSignal(Json::Object & cInObject);
+		void CancelSignal();
 
 		//== View 관련 함수 ==========================================================================
 		void SetViewControl(int nId);

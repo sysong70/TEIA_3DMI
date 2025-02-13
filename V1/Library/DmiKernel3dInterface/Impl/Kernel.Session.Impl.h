@@ -103,7 +103,8 @@ namespace KERNEL
 
 	private:
 		// 화면 제어, Camera, Select, ModelPanel, Attribute등의 처리를 담당. 1회성 이벤트 처리
-		std::unordered_map<Command::Type, Command::Set *> m_mpcCommandMap; 
+		// 공통적으로 사용되는 Command를 저장하는 Map
+		std::unordered_map<Command::Type, Command::Set *> m_mpcCommonCommandMap; 
 		const Signal::Delivery * m_pcDelivery = nullptr;
 
 		H3DF::CADModel m_cCADModel;

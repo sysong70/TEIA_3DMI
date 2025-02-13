@@ -27,6 +27,14 @@ void KERNEL::Command::ManagerImpl::ViewMouseSignal(Json::Object & cInObject, int
 	pcSession->MouseSignal(cInObject);
 }
 
+void KERNEL::Command::ManagerImpl::ViewCancelSignal(int nViewId)
+{
+	Session * pcSession = GetSession(nViewId);
+	DEBUG_VALID(pcSession);
+
+	pcSession->CancelSignal();
+}
+
 void KERNEL::Command::ManagerImpl::SessionKeyboardSignal(Json::Object & cInObject, int nSessionId)
 {
 	Session * pcSession = GetSession(nSessionId);

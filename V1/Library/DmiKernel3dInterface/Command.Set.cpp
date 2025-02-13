@@ -266,7 +266,7 @@ bool KERNEL::Command::Set::EventExecution(Command::Event & cInEvent)
 		return false;
 	}
 
-	Command::SetImpl * pcImpl = (Command::SetImpl *) m_pcImpl;
+	Command::SetImpl * pcImpl = dynamic_cast<Command::SetImpl *> (m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->EventExecution(cInEvent);

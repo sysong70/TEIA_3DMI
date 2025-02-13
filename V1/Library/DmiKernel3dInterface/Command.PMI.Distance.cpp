@@ -43,6 +43,7 @@ void KERNEL::Command::PMI::DistanceStep::Draw2(Step * pcInStep, H3DF::SegmentKey
 		return;
 	}
 
+	// 저장되어 있는 Event가 1개가 아니면 오류
 	if (1 != pcInStep->GetSavedEvents().size()) {
 		DEBUG_STOP;
 		return;
