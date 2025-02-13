@@ -23,7 +23,7 @@ namespace KERNEL
 
 			void Signal(Json::Object & cInObject);
 
-			void SelectTreeItem(H3DF::SelectionItem & cSelItem);
+			void SelectTreeItem(H3DF::SelectionItem & cSelItem, bool bSelectFlag);
 
 			void Checked(H3DF::SelectionResults & cInResults, bool bInChecked);
 			void CheckedAll(bool bChecked);

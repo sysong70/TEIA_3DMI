@@ -51,6 +51,9 @@ bool H3DF::SelectionItemImpl::GetIncludeKeys(std::vector<HC_KEY> & vcOutIncludeK
 
 void H3DF::SelectionItemImpl::Reset()
 {
+	m_vcKeys.clear();
+	m_vcTypes.clear();
+
 	m_nOffset1 = 0;
 	m_nOffset2 = 0;
 	m_nOffset3 = 0;
@@ -388,7 +391,8 @@ size_t H3DF::SelectionControlImpl::SelectionResult(SelectionControlImpl * pcInSe
 			pnIncludeKeys = new HC_KEY[nKeyCount];
 			HC_Show_Selection_Original_Keys(&nKeyCount, pnKeys);
 
-			for (int nIndex = 0 ; nIndex < nKeyCount - 1; nIndex++)
+			// Index 0은 선택된 Key이므로 제외하고 다음 Key만 저장
+			for (int nIndex = 1 ; nIndex < nKeyCount; nIndex++)
 			{
 				HC_Show_Key_Type(pnKeys[nIndex], chKeyType);
 				H3DF::Type eType = Utility::GetType(chKeyType);

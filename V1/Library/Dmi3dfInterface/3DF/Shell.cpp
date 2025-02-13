@@ -400,7 +400,7 @@ void H3DF::ShellKit::SetRegionMaterial(int nInRegionIndex, H3DF::MaterialKit & c
 
 	HC_Open_Geometry(pcImpl->m_pcCreatedShell->m_Key); {
 		HC_Open_Region(nInRegionIndex); {
-			cInMaterial.SetMaterial("faces");
+			cInMaterial.SetMaterial("faces", false);
 		} HC_Close_Region();
 	} HC_Close_Geometry();
 }

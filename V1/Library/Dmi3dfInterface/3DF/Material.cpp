@@ -561,7 +561,7 @@ bool H3DF::MaterialKit::ShowGloss(float & fOutGloss) const
 
 // Region등에서 사용하기 위해서 추가된 함수
 // 내부에서 단순히 SetColor만 호출한다.
-void H3DF::MaterialKit::SetMaterial(CStringA strInGeometryName)
+void H3DF::MaterialKit::SetMaterial(CStringA strInGeometryName, bool bFaseFlag)
 {
 	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
 	pcImpl->m_strTextureNames[(int)Material::Channel::DiffuseTexture] = strInGeometryName;
@@ -570,14 +570,16 @@ void H3DF::MaterialKit::SetMaterial(CStringA strInGeometryName)
 	RGBAColor cColor;
 
 	if (true == ShowDiffuseColor(cColor)) {
-		if (1.0f == cColor.alpha) {
-			strColorText.Format("%s = (diffuse = (r=%f g=%f b=%f))", strInGeometryName, cColor.red, cColor.green, cColor.blue);
-		}
-		else {
+
+		if (true == bFaseFlag && 1.0f > cColor.alpha) {
 			float fAlpha = 1.0f - cColor.alpha;
 			strColorText.Format("%s = (diffuse = (r=%f g=%f b=%f), transmission = (r=%f g=%f b=%f))", strInGeometryName, cColor.red, cColor.green, cColor.blue, fAlpha, fAlpha, fAlpha);
-		}
 
+		}
+		else {
+			strColorText.Format("%s = (diffuse = (r=%f g=%f b=%f))", strInGeometryName, cColor.red, cColor.green, cColor.blue);
+		}
+ 
 		HC_Set_Color(strColorText);
 	}
 }

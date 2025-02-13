@@ -613,7 +613,7 @@ void KERNEL::Command::ModelPanel::Signal(Json::Object & cInObject)
 //== Select 관련 함수 ===============================================================================
 
 // 1. 외부에서 전달된 Selection Item을 이용해서 Model Tree를 설정한다.
-void KERNEL::Command::ModelPanel::SelectTreeItem(H3DF::SelectionItem & cSelItem)
+void KERNEL::Command::ModelPanel::SelectTreeItem(H3DF::SelectionItem & cSelItem, bool bSelectFlag)
 {
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
@@ -632,7 +632,7 @@ void KERNEL::Command::ModelPanel::SelectTreeItem(H3DF::SelectionItem & cSelItem)
 
 	pcImpl->Delivery().modelPanel.RedrawTree(true);
 	//:Ken - 20240403
-	pcImpl->Delivery().modelPanel.SelectItem((DWORD_PTR)pcComponent);
+	pcImpl->Delivery().modelPanel.SelectItem((DWORD_PTR)pcComponent, bSelectFlag);
 
 	return;
 }
@@ -744,6 +744,13 @@ void KERNEL::Command::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject)
 	auto pcImpl = dynamic_cast<ModelPanelImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
+#if 1
+	// 다른 Keyboard Event는 들어오지 않음.
+	Json::Object cTestObject(cInObject);
+	CString strText;
+	cTestObject.Stringify(strText);
+#endif
+
 	H3DF::Component * pcInComponent = dynamic_cast<Component *>((Component *) cInObject.GetDwordPtr(SKW_KEY));
 	if (nullptr == pcInComponent) {
 		DEBUG_STOP;
@@ -754,13 +761,14 @@ void KERNEL::Command::ModelPanel::OnItemSelectedSignal(Json::Object & cInObject)
 
 	if (H3DF::Component::Type::ExchangeMkpView == eType) {
 		ExchangeMkpViewSelectedSignal(pcInComponent);
-		return;
 	}
 	// Product Occurrence인 경우 처리, 일단 Product Occurrence를 대상으로 작업한다.
 	// 다만 다른 아이탬과 차이가 있는지는 알 수 없음.
 	else if (H3DF::Component::Type::ExchangeProductOccurrence == eType) {
 		ProductOccurrenceSelectedSignal(pcInComponent);
-		return;
+	}
+	else {
+		DEBUG_STOP;
 	}
 }
 	

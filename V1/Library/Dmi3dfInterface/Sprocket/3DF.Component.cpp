@@ -304,6 +304,15 @@ bool H3DF::Component::RemoveMetaData(H3DF::MetaDataIndex eInIndex)
 	return false;
 }
 
+bool H3DF::Component::IsShow()
+{
+	if (GetStatus() & Component::Status::NoShow) {
+		return false;
+	}
+
+	return true;
+}
+
 DWORD H3DF::Component::GetStatus()
 {
 	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;

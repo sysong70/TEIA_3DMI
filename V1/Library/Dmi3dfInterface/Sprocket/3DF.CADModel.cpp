@@ -142,6 +142,11 @@ bool H3DF::CADModel::ShowSelectionResult(Component * pcInComponent, H3DF::Select
 		return false;
 	}
 
+	// Show/No Show 검사
+	if (false == pcInComponent->IsShow()) {
+		return true;
+	}
+
 	CADModelImpl * pcImpl = (CADModelImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 

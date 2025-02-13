@@ -429,28 +429,4 @@ void H3DF::KeyPath::ShowString(CString & strOutPath)
 		strOutPath += strText;
 		nIndex++;
 	}
-/*
-	for (int nIndex = 0; nIndex < pcImpl->m_vcKeys.size(); ++nIndex) {
-		nKey = pcImpl->m_vcKeys[nIndex];
-
-		H3DF::Type eType = H3DF::Utility::GetType(nKey);
-
-		if (H3DF::Type::SegmentKey == eType) {
-			SegmentKey cSegment(nKey);
-
-			CString strUserName = L"_None_";
-			UserData::ShowSegmentName(cSegment, strUserName);
-
-			strText.Format(L"\nSegment: %d [%s, %s]", nKey, strUserName, CString(cSegment.Name(false)));
-		}
-		else {
-
-			strText.Format(L"\n%s: %d", H3DF::Utility::GetTypeString(eType), nKey);
-		}
-
-		strOutPath += strText;
-	}
-
-	strOutPath += strText;
-	}*/
 }

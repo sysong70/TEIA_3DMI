@@ -1105,7 +1105,7 @@ void Component::ModelPanel::SelectItem(Json::Object* pData)
 	if (hItem != nullptr) {
 		//:TODO - uncheck
 		bool selected = pData->GetBoolean(SKW_FLAG);
-		ASSERT(selected);
+		//ASSERT(selected);
 
 		Control().EnsureVisible(hItem);
 		Control().SelectItem(hItem);

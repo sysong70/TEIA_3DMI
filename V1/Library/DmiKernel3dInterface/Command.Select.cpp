@@ -239,6 +239,7 @@ Command::Result::Type KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 	}
 
 	// 이미 선택된 객체인지 확인
+	bool bSelectFlag = false;
 	if (false == pcImpl->m_cSelectionResult.IsExist(cSelItem)) {
 		if (H3DF::Type::LineKey == cSelItem.Type()) {
 			pcImpl->m_cLineHighlightCtrl.Highlight(cSelItem, cOptions, false);
@@ -252,6 +253,7 @@ Command::Result::Type KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 			}
 		}
 
+		bSelectFlag = true;
 		// 선택된 객체를 SelectionResult에 추가
 		pcImpl->m_cSelectionResult.PushFront(cSelItem);
 	}
@@ -268,11 +270,12 @@ Command::Result::Type KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 			}
 		}
 
+		bSelectFlag = false;
 		pcImpl->m_cSelectionResult.Erase(cSelItem);
 	}
 
 	// 4. ModelPanel에 선택된 객체를 전달
-	pcImpl->ModelPanel().SelectTreeItem(cSelItem);
+	pcImpl->ModelPanel().SelectTreeItem(cSelItem, bSelectFlag);
 
 	pcImpl->View().Update();
 
@@ -325,6 +328,16 @@ bool KERNEL::Command::Select::SelectByResult(H3DF::SelectionResults & cInResults
 
 	H3DF::SelectionResultsIterator cIter = cInResults.GetIterator();
 
+	pcImpl->m_cHighlightCtrl.UnhighlightEverything();
+	pcImpl->m_cLineHighlightCtrl.UnhighlightEverything();
+	pcImpl->m_cPmiHighlightCtrl.UnhighlightEverything();
+
+	pcImpl->DynHighlightControl().UnhighlightEverything();
+	pcImpl->DynLineHighlightControl().UnhighlightEverything();
+	pcImpl->DynPmiHighlightControl().UnhighlightEverything();
+
+	pcImpl->m_cSelectionResult.Reset();
+
 	while (true == cIter.IsValid()) {
 		H3DF::SelectionItem cItem = cIter.GetItem();
 
@@ -342,10 +355,6 @@ bool KERNEL::Command::Select::SelectByResult(H3DF::SelectionResults & cInResults
 
 		cIter.Next();
 	}
-
-	pcImpl->DynHighlightControl().UnhighlightEverything();
-	pcImpl->DynLineHighlightControl().UnhighlightEverything();
-	pcImpl->DynPmiHighlightControl().UnhighlightEverything();
 
 	pcImpl->View().Update();
 
