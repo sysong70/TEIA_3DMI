@@ -273,6 +273,13 @@ namespace H3DF
 		MaterialMappingKit & SetAmbientLightUpColor(RGBAColor const & cInRgbaColor);
 		MaterialMappingKit & SetAmbientLightDownColor(RGBAColor const & cInRgbaColor);
 
+		MaterialMappingKit & SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
+		MaterialMappingKit & SetFaceAlpha(float fInAlpha);
+		MaterialMappingKit & SetFaceTexture(CStringA strTextureName);
+		MaterialMappingKit & SetFaceTextureOption(CStringA strTextureOption);
+		MaterialMappingKit & SetFaceGloss(float fInValue);
+		MaterialMappingKit & SetFaceMaterial(MaterialKit const & cInMaterial);
+
 		MaterialMappingKit & SetBackFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
 		MaterialMappingKit & SetBackFaceAlpha(float fInAlpha);
 		MaterialMappingKit & SetBackFaceTexture(CStringA strTextureName);
@@ -292,13 +299,6 @@ namespace H3DF
 		MaterialMappingKit & SetEdgeTexture(char const * strTextureName);
 		MaterialMappingKit & SetEdgeGloss(float fInValue);
 		MaterialMappingKit & SetEdgeMaterial(MaterialKit const & cInMaterial);
-
-		MaterialMappingKit & SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
-		MaterialMappingKit & SetFaceAlpha(float fInAlpha);
-		MaterialMappingKit & SetFaceTexture(CStringA strTextureName);
-		MaterialMappingKit & SetFaceTextureOption(CStringA strTextureOption);
-		MaterialMappingKit & SetFaceGloss(float fInValue);
-		MaterialMappingKit & SetFaceMaterial(MaterialKit const & cInMaterial);
 
 		MaterialMappingKit & SetLineAlpha(float fInAlpha);
 		MaterialMappingKit & SetLineColor(RGBAColor const & cInRgbaColor);
@@ -359,8 +359,14 @@ namespace H3DF
 		MaterialMappingControl & operator = (MaterialMappingControl const & cInThat);
 
 		//== Color 설정 =============================================================================
-		MaterialMappingControl & SetFaceAlpha(float fInAlpha);
 		MaterialMappingControl & SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel = Material::Color::Channel::DiffuseColor);
+		MaterialMappingControl & SetFaceAlpha(float fInAlpha);
+
+		MaterialMappingControl & SetBackFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
+		MaterialMappingControl & SetBackFaceAlpha(float fInAlpha);
+
+		MaterialMappingControl & SetFrontFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
+		MaterialMappingControl & SetFrontFaceAlpha(float fInAlpha);
 
 		MaterialMappingControl & SetEdgeColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel = Material::Color::Channel::DiffuseColor);
 

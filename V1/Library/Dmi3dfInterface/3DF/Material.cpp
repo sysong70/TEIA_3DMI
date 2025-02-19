@@ -1081,15 +1081,15 @@ public:
 	}
 
 	void SetAlpha(CStringA strGeometry, float fInAlpha);
-	void SetColor(CStringA strGeometry, RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel);
+	void SetColor(CStringA strGeometry, RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel);
 
 protected:
-	CStringA GetColorChannelString(Material::Color::Channel cInChannel);
+	CStringA GetColorChannelString(Material::Color::Channel eInChannel);
 };
 
-CStringA MaterialMappingControlImpl::GetColorChannelString(Material::Color::Channel cInChannel)
+CStringA MaterialMappingControlImpl::GetColorChannelString(Material::Color::Channel eInChannel)
 {
-	switch (cInChannel)
+	switch (eInChannel)
 	{
 		case H3DF::Material::Color::Channel::DiffuseColor:
 			return L"diffuse";
@@ -1117,10 +1117,10 @@ void MaterialMappingControlImpl::SetAlpha(CStringA strGeometry, float fInAlpha)
 	} SegmentKeyImpl::LocalClose(m_cOverrideKey);
 }
 
-void MaterialMappingControlImpl::SetColor(CStringA strGeometry, RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel)
+void MaterialMappingControlImpl::SetColor(CStringA strGeometry, RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
 	CStringA strColorText;
-	CStringA strColorChannel = GetColorChannelString(cInChannel);
+	CStringA strColorChannel = GetColorChannelString(eInChannel);
 
 	if (1.0f > cInRgbaColor.alpha) {
 		strColorText.Format("%s = (%s = (r=%f g=%f b=%f), (transmission = r=%f g=%f b=%f))", strGeometry, strColorChannel, 
@@ -1152,10 +1152,10 @@ H3DF::MaterialMappingControl::MaterialMappingControl(MaterialMappingControl cons
 
 void H3DF::MaterialMappingControl::Set(MaterialMappingControl const & cInThat)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	MaterialMappingControlImpl * pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	MaterialMappingControlImpl * pcInThatImpl = static_cast<MaterialMappingControlImpl *>(cInThat.m_pcImpl);
+	MaterialMappingControlImpl * pcInThatImpl = dynamic_cast<MaterialMappingControlImpl *>(cInThat.m_pcImpl);
 	DEBUG_VALID(pcInThatImpl);
 
 	pcImpl->Copy(pcInThatImpl);
@@ -1167,49 +1167,89 @@ MaterialMappingControl & H3DF::MaterialMappingControl::operator = (MaterialMappi
 	return *this;
 }
 
+MaterialMappingControl & H3DF::MaterialMappingControl::SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
+{
+	MaterialMappingControlImpl * pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->SetColor("faces", cInRgbaColor, eInChannel);
+
+	return *this;
+}
+
 MaterialMappingControl & H3DF::MaterialMappingControl::SetFaceAlpha(float fInAlpha)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
+	MaterialMappingControlImpl * pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetAlpha("faces", fInAlpha);
 
 	return *this;
 }
 
-MaterialMappingControl & H3DF::MaterialMappingControl::SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel)
+MaterialMappingControl & H3DF::MaterialMappingControl::SetBackFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
+	MaterialMappingControlImpl * pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 
-	pcImpl->SetColor("faces", cInRgbaColor, cInChannel);
+	pcImpl->SetColor("back", cInRgbaColor, eInChannel);
 
 	return *this;
 }
 
-MaterialMappingControl & H3DF::MaterialMappingControl::SetEdgeColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel)
+MaterialMappingControl & H3DF::MaterialMappingControl::SetBackFaceAlpha(float fInAlpha)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { assert(false); }
+	MaterialMappingControlImpl * pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
 
-	pcImpl->SetColor("edges", cInRgbaColor, cInChannel);
+	pcImpl->SetAlpha("back", fInAlpha);
 
 	return *this;
 }
 
-MaterialMappingControl & H3DF::MaterialMappingControl::SetMarkerColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel)
+MaterialMappingControl & H3DF::MaterialMappingControl::SetFrontFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	MaterialMappingControlImpl * pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->SetColor("front", cInRgbaColor, eInChannel);
+
+	return *this;
+}
+
+MaterialMappingControl & H3DF::MaterialMappingControl::SetFrontFaceAlpha(float fInAlpha)
+{ 
+	MaterialMappingControlImpl * pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->SetAlpha("front", fInAlpha);
+
+	return *this;
+}
+
+MaterialMappingControl & H3DF::MaterialMappingControl::SetEdgeColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
+{
+	MaterialMappingControlImpl * pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
-	pcImpl->SetColor("markers", cInRgbaColor, cInChannel);
+	pcImpl->SetColor("edges", cInRgbaColor, eInChannel);
+
+	return *this;
+}
+
+MaterialMappingControl & H3DF::MaterialMappingControl::SetMarkerColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
+{
+	MaterialMappingControlImpl * pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	if (nullptr == pcImpl) { assert(false); }
+
+	pcImpl->SetColor("markers", cInRgbaColor, eInChannel);
 
 	return *this;
 }
 
 MaterialMappingControl & H3DF::MaterialMappingControl::UnSetColor(CStringA strInType)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	MaterialMappingControlImpl * pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -1221,7 +1261,7 @@ MaterialMappingControl & H3DF::MaterialMappingControl::UnSetColor(CStringA strIn
 
 void H3DF::MaterialMappingControl::InitPopulateTextures()
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	MaterialMappingControlImpl * pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	InitializeMagick(".");
@@ -1233,7 +1273,7 @@ void H3DF::MaterialMappingControl::InitPopulateTextures()
 
 void H3DF::MaterialMappingControl::InsertPicture(UINT nIndex, UINT nPixelWidth, UINT nPixelHeight, UCHAR * pucBinaryData)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	MaterialMappingControlImpl * pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -1261,7 +1301,7 @@ void H3DF::MaterialMappingControl::InsertDifaultPicture(UINT nIndex, UINT nSize,
 		DestroyImageInfo(image_info);
 		DestroyExceptionInfo(&exception);
 
-		MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+		MaterialMappingControlImpl * pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl);
 		if (nullptr == pcImpl) { assert(false); }
 
 		SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -1275,7 +1315,7 @@ void H3DF::MaterialMappingControl::InsertDifaultPicture(UINT nIndex, UINT nSize,
 
 void H3DF::MaterialMappingControl::SetTextureMatrix(float * pfTextureMatrix, char * pchTextureTransformSegment)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	MaterialMappingControlImpl * pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -1299,7 +1339,7 @@ void H3DF::MaterialMappingControl::SetTextureMatrix(float * pfTextureMatrix, cha
 
 void H3DF::MaterialMappingControl::SetDefineLocalTexture(UINT nIndex, CStringA strTextureOptions)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	MaterialMappingControlImpl * pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl);
 	if (nullptr == pcImpl) { assert(false); }
 
 	CStringA strText;
