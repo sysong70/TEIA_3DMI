@@ -672,7 +672,7 @@ SegmentKey & H3DF::SegmentKey::SetMaterialMapping(H3DF::MaterialMappingKit const
 
 	if (true == cInKit.ShowFaceChannel(Material::Channel::DiffuseColor, eType, cRgbaColor, strTextureName, strTextureOptions)) {
 		if (Material::Type::RGBAColor == eType) {
-			pcImpl->SetColor(L"faces", cRgbaColor);
+			pcImpl->SetColor(L"faces ", cRgbaColor);
 		}
 	}
 

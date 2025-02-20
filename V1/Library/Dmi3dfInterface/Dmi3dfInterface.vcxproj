@@ -149,6 +149,7 @@
     <ClInclude Include="3DF\Impl\DefinitionImpl.h" />
     <ClInclude Include="3DF\Impl\GeometryImpl.h" />
     <ClInclude Include="3DF\Impl\HighlightImpl.h" />
+    <ClInclude Include="3DF\Impl\ImageImpl.h" />
     <ClInclude Include="3DF\Impl\KeyImpl.h" />
     <ClInclude Include="3DF\Impl\OperatorImpl.h" />
     <ClInclude Include="3DF\Impl\SearchImpl.h" />
@@ -255,6 +256,7 @@
     <ClCompile Include="3DF\Impl\DefinitionImpl.cpp" />
     <ClCompile Include="3DF\Impl\GeometryImpl.cpp" />
     <ClCompile Include="3DF\Impl\HighlightImpl.cpp" />
+    <ClCompile Include="3DF\Impl\ImageImpl.cpp" />
     <ClCompile Include="3DF\Impl\KeyImpl.cpp" />
     <ClCompile Include="3DF\Impl\OperatorImpl.cpp" />
     <ClCompile Include="3DF\Impl\SearchImpl.cpp" />

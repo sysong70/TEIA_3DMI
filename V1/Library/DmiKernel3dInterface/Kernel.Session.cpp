@@ -9,7 +9,7 @@
 #include <3DF/Visibility.h>
 #include <3DF/LineAttribute.h>
 #include <3DF/AttributeLock.h>
-
+#include <3DF/Image.h>
 
 #include "Signal.Connector.h"
 
@@ -613,6 +613,12 @@ void KERNEL::Session::TestCommand(int nId)
 		case CUSTOM_3D_CMD_SYSONG_Test1:
 			pcImpl->SetVisibility(nId);
 			break;
+
+		case CUSTOM_3D_CMD_SYSONG_Test2: {
+			H3DF::Image::ImportOptionsKit cOptions;
+			cOptions.SetFormat(H3DF::Image::Format::Jpeg);
+			H3DF::Image::ImageKit cImage = H3DF::Image::File::Import(L"Z:\\jebra.jpeg", cOptions);
+		} break;
 
 		default:
 			break;

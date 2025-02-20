@@ -378,6 +378,9 @@
     <ClInclude Include="3DF\Impl\HighlightImpl.h">
       <Filter>3DF\Control\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\Impl\ImageImpl.h">
+      <Filter>3DF\Control\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -681,6 +684,9 @@
       <Filter>Sprocket\Impl</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Impl\HighlightImpl.cpp">
+      <Filter>3DF\Control\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\ImageImpl.cpp">
       <Filter>3DF\Control\Impl</Filter>
     </ClCompile>
   </ItemGroup>
