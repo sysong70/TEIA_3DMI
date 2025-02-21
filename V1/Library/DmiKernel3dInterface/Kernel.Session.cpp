@@ -10,6 +10,7 @@
 #include <3DF/LineAttribute.h>
 #include <3DF/AttributeLock.h>
 #include <3DF/Image.h>
+#include <3DF/Portfolio.h>
 
 #include "Signal.Connector.h"
 
@@ -615,9 +616,17 @@ void KERNEL::Session::TestCommand(int nId)
 			break;
 
 		case CUSTOM_3D_CMD_SYSONG_Test2: {
+			CString strFilePathName = L"Z://Test.hsf";
 			H3DF::Image::ImportOptionsKit cOptions;
 			cOptions.SetFormat(H3DF::Image::Format::Jpeg);
-			H3DF::Image::ImageKit cImage = H3DF::Image::File::Import(L"Z:\\jebra.jpeg", cOptions);
+			H3DF::Image::ImageKit cImage = H3DF::Image::File::Import(strFilePathName, cOptions);
+
+			H3DF::PortfolioKeyArray arPortfolios;
+			H3DF::PortfolioKey cPortfolio;
+
+			H3DF::SegmentKey cModel = pcImpl->GetCanvas().GetFrontView().GetAttachedModel().GetSegmentKey();
+			cModel.GetPortfolioControl().Show(arPortfolios);
+
 		} break;
 
 		default:

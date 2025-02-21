@@ -5,7 +5,6 @@
 #include "Include.h"
 #include "Shell.h"
 #include "EdgeAttribute.h"
-//#include "Portfolio.h"
 #include "Style.h"
 #include "Search.h"
 
@@ -125,8 +124,8 @@ namespace H3DF
 		SegmentKey & SetHeuristics(CString strInHeuristics);
 
 		//== Portfolio Control 관련 함수 =============================================================
-		//PortfolioControl GetPortfolioControl();
-		//PortfolioControl const GetPortfolioControl() const;
+		PortfolioControl GetPortfolioControl();
+		PortfolioControl const GetPortfolioControl() const;
 
 		//== Style Control 관련 함수 =================================================================
 		StyleControl GetStyleControl();

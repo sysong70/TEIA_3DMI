@@ -23,6 +23,8 @@ namespace H3DF
 		NamedStyleDefinition DefineNamedStyle(CStringA strInName, SegmentKey const & cInStyleSource);
 	};
 
+	using PortfolioKeyArray = std::vector<PortfolioKey>;
+
 	class API_3DF PortfolioControl : public Control
 	{
 	public:
@@ -40,6 +42,7 @@ namespace H3DF
 		bool Pop();
 
 		bool ShowTop(PortfolioKey & cOutPortfolio) const;
+		bool Show(PortfolioKeyArray & cOutPortfolios) const;
 
 	private:
 		

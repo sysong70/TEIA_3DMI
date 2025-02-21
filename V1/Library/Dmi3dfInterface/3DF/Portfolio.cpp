@@ -137,9 +137,10 @@ PortfolioControl & H3DF::PortfolioControl::Push(PortfolioKey const & cInPortfoli
 	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	PortfolioKey * pcPortfolioKey = new PortfolioKey();
-	*pcPortfolioKey = cInPortfolio;
-	pcImpl->m_pdpcPortfolioDeque->push_front(pcPortfolioKey);
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		HC_KEY nTestKey = HC_Style_Segment_By_Key(cInPortfolio.KeyValue());
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
 	return *this;
 }
 
@@ -170,5 +171,18 @@ bool H3DF::PortfolioControl::ShowTop(PortfolioKey & cOutPortfolio) const
 	}
 
 	cOutPortfolio = *pcImpl->m_pdpcPortfolioDeque->front();
+	return true;
+}
+
+bool H3DF::PortfolioControl::Show(PortfolioKeyArray & cOutPortfolios) const
+{
+	PortfolioControlImpl * pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	SegmentKey cSegment(pcImpl->m_cOverrideKey.KeyValue());
+
+	SearchResults cResults;
+	cSegment.Find(Search::Type::Portfolio, Search::Space::SegmentOnly, cResults);
+
 	return true;
 }

@@ -186,13 +186,7 @@ H3DF::Image::ImageKit::ImageKit(ImageKit && cInThat) noexcept :
 
 Image::ImageKit & H3DF::Image::ImageKit::operator = (ImageKit && cInThat) noexcept
 {
-	ImageKitImpl * pcImpl = static_cast<ImageKitImpl *> (m_pcImpl);
-	DEBUG_VALID(pcImpl);
-	ImageKitImpl * pcInThatImpl = static_cast<ImageKitImpl *>(cInThat.m_pcImpl);
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl = std::move(pcInThatImpl);
-
+	this->Kit::operator = (std::move(cInThat));
 	return *this;
 }
 
@@ -326,24 +320,9 @@ H3DF::Image::File::File()
 Image::ImageKit H3DF::Image::File::Import(CString strFilePathName, ImportOptionsKit const & cInOptions)
 {
 	ImageKit cOutKit;
+
+	// FileToImage 함수를 호출하여 ImageKit에 정보를 저장한다.
 	((ImageKitImpl *)cOutKit.GetImpl())->FileToImage(strFilePathName, cInOptions);
-
-/*
-	// HDB::GetHIOManager()는 선언된적이 없으면 다시 선언됨.
-	HInputHandler * pcReader = HDB::GetHIOManager()->GetInputHandler(strExt);
-
-	HInputHandlerOptions input_options;
-	input_options.m_bLocal = true;
-	input_options.m_pImageName = "imagename";
-	HFileInputResult result = InputFail;
-
-	HC_KEY image_key = INVALID_KEY;
-	HC_KEY temp_seg = INVALID_KEY;
-
-	if (nullptr != pcReader) {
-		result = pcReader->FileInputToImageKey(strFilePathName, &image_key, temp_seg, &input_options);
-	}
-*/
 
 	return std::move(cOutKit);
 }
