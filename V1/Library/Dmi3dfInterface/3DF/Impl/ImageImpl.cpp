@@ -171,7 +171,7 @@ bool H3DF::ImageKitImpl::OutsourceToImageMagick(size_t nInCount, CStringA strFor
 	m_nWidth = pcImage->magick_columns;
 	m_nHeight = pcImage->magick_rows;
 
-	if (nPixelSize) {
+	if (0 < nPixelSize) {
 		m_nLength = m_nWidth * m_nHeight * nPixelSize;
 		m_arImageData.resize(m_nLength);
 

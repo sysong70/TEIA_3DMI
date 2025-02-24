@@ -50,6 +50,7 @@ void H3DF::Definition::Set(Definition const & cInThat)
 	DEBUG_VALID(pcImpl);
 	DefinitionImpl * pcInThatImpl = dynamic_cast<DefinitionImpl *>(cInThat.m_pcImpl);
 	DEBUG_VALID(pcInThatImpl);
+
 	pcImpl->Copy(pcInThatImpl);
 }
 

@@ -3,6 +3,8 @@
 #include "../Kit.h"
 #include "../Math.h"
 
+#include "DefinitionImpl.h"
+
 namespace H3DF
 {
 	class ImageImportOptionsKitImpl : public Impl
@@ -20,21 +22,6 @@ namespace H3DF
 		UINT m_nHeight = 0;
 
 		Image::Format m_eFormat = Image::Format::None;
-	};
-
-	class HImageInfo {
-	public:
-		char * m_data;
-		int m_len, m_width, m_height;
-		char m_format[35];
-
-		HImageInfo() : m_data(0), m_width(-1), m_height(-1) { strcpy(m_format, ""); }
-
-		~HImageInfo()
-		{
-			if (m_data)
-				free(m_data);
-		}
 	};
 
 	class ImageKitImpl : public Impl
@@ -63,6 +50,17 @@ namespace H3DF
 
 		bool FileToImage(CString strFilePathName, Image::ImportOptionsKit const & cInOptions);
 		bool OutsourceToImageMagick(size_t nInCount, CStringA strInImplicitFormat);
+	};
+
+	class ImageDefinitionImpl : public DefinitionImpl
+	{
+	public:
+		ImageDefinitionImpl() { m_eType = H3DF::Type::ImageDefinition; }
+
+		void Copy(ImageDefinitionImpl * pcInThat) {
+		}
+
+		ImageKit m_cImageKit;
 	};
 }
 

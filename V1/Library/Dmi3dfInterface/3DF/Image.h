@@ -2,10 +2,13 @@
 
 #include "3DF.h"
 #include "Kit.h"
+#include "Definition.h"
 #include "Math.h"
 
 namespace H3DF
 {
+	class ImageKit;
+
 	class API_3DF Image
 	{
 	public:
@@ -57,37 +60,6 @@ namespace H3DF
 			bool ShowFormat(Image::Format & eOutFormat) const;
 		};
 
-
-		class API_3DF ImageKit : public Kit
-		{
-		public:
-			ImageKit();
-			ImageKit(ImageKit const & cInKit);
-			ImageKit(ImageKit const & cInKit, H3DF::Image::Format eInFormat);
-			
-			ImageKit(ImageKit && cInThat) noexcept;
-			ImageKit & operator = (ImageKit && cInThat) noexcept;
-
-			void Set(ImageKit const & cInKit);
-			ImageKit const & operator = (ImageKit const & cInKit);
-
-			void Show(ImageKit & cOutKit) const;
-
-			bool Empty() const;
-
-			bool operator == (ImageKit const & cInKit) const;
-			bool operator != (ImageKit const & cInKit) const;
-
-			ImageKit & SetSize(UINT nInWidth, UINT nInHeight);
-			ImageKit & SetData(ByteArray const & arInImageData);
-			ImageKit & SetData(size_t nByteCount, byte const pInImageData[]);
-
-			ImageKit & UnsetEverything();
-
-			bool ShowSize(UINT & nOutWidth, UINT & nOutheight) const;
-			bool ShowData(ByteArray & arOutImageData) const;
-		};
-
 		class API_3DF File
 		{
 		public:
@@ -98,6 +70,60 @@ namespace H3DF
 		};
 
 	private:
-		Image() {}
+		Image() = default;
+	};
+
+	class API_3DF ImageKit : public Kit
+	{
+	public:
+		ImageKit();
+		ImageKit(ImageKit const & cInKit);
+		ImageKit(ImageKit const & cInKit, H3DF::Image::Format eInFormat);
+
+		H3DF::Type ObjectType() const override { return H3DF::Type::ImageKit; };
+
+		ImageKit(ImageKit && cInThat) noexcept;
+		ImageKit & operator = (ImageKit && cInThat) noexcept;
+
+		void Set(ImageKit const & cInKit);
+		ImageKit const & operator = (ImageKit const & cInKit);
+
+		void Show(ImageKit & cOutKit) const;
+
+		bool Empty() const;
+
+		bool operator == (ImageKit const & cInKit) const;
+		bool operator != (ImageKit const & cInKit) const;
+
+		ImageKit & SetSize(UINT nInWidth, UINT nInHeight);
+		ImageKit & SetData(ByteArray const & arInImageData);
+		ImageKit & SetData(size_t nByteCount, byte const pInImageData[]);
+
+		ImageKit & UnsetFormat();
+		ImageKit & UnsetEverything();
+
+		bool ShowSize(UINT & nOutWidth, UINT & nOutheight) const;
+		bool ShowData(ByteArray & arOutImageData) const;
+		bool ShowFormat(Image::Format & cOutFormat) const;
+	};
+
+	class API_3DF ImageDefinition : public Definition {
+	public:
+		ImageDefinition();
+		ImageDefinition(Definition const & cInThat);
+		ImageDefinition(ImageDefinition const & cInThat);
+
+		H3DF::Type ObjectType() const override { return H3DF::Type::ImageDefinition; };
+
+		ImageDefinition(ImageDefinition && cInThat) noexcept;
+		ImageDefinition & operator = (ImageDefinition && cInThat) noexcept;
+
+		void Set(ImageDefinition const & cInKit);
+		ImageDefinition const & operator = (ImageDefinition const & cInKit);
+
+		~ImageDefinition();
+
+		void Set(ImageKit const & cInKit);
+		void Show(ImageKit & cOutKit) const;
 	};
 }

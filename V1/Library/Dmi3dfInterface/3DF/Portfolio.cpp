@@ -6,6 +6,8 @@
 #include "./Impl/SegmentImpl.h"
 
 #include "./Impl/ControlImpl.h"
+#include "./Impl/ImageImpl.h"
+#include "./Impl/DefinitionImpl.h"
 
 #include "Style.h"
 
@@ -13,7 +15,64 @@
 
 using namespace H3DF;
 
-using PortfolioDeque = std::deque<PortfolioKey *>;
+namespace H3DF
+{
+	class PortfolioKeyImpl : public Impl
+	{
+	public:
+		static CStringA FormatString(Image::Format cInFormat);
+	};
+}
+
+CStringA H3DF::PortfolioKeyImpl::FormatString(Image::Format cInFormat)
+{
+	CStringA strFormatText;
+
+	switch (cInFormat)
+	{
+		case H3DF::Image::Format::RGB:
+			strFormatText = "rgb";
+			break;
+		case H3DF::Image::Format::RGBA:
+			strFormatText = "rgba";
+			break;
+		case H3DF::Image::Format::ARGB:
+			strFormatText = "argb";
+			break;
+		case H3DF::Image::Format::Mapped8:
+			strFormatText = "mapped8";
+			break;
+		case H3DF::Image::Format::Grayscale:
+			strFormatText = "grayscale";
+			break;
+		case H3DF::Image::Format::Bmp:
+			strFormatText = "bmp";
+			break;
+		case H3DF::Image::Format::Jpeg:
+			strFormatText = "jpeg";
+			break;
+		case H3DF::Image::Format::Png:
+			strFormatText = "png";
+			break;
+		case H3DF::Image::Format::Targa:
+			strFormatText = "targa";
+			break;
+		case H3DF::Image::Format::DXT1:
+			strFormatText = "dxt1";
+			break;
+		case H3DF::Image::Format::DXT3:
+			strFormatText = "dxt3";
+			break;
+		case H3DF::Image::Format::DXT5:
+			strFormatText = "dxt5";
+			break;
+		default:
+			DEBUG_STOP;
+			break;
+	}
+
+	return strFormatText;
+}
 
 H3DF::PortfolioKey::PortfolioKey()
 {
@@ -40,6 +99,57 @@ PortfolioKey & H3DF::PortfolioKey::operator = (PortfolioKey const & cInThat)
 {
 	Key::Set(cInThat);
 	return *this;
+}
+
+ImageDefinition H3DF::PortfolioKey::DefineImage(CStringA strInName, ImageKit const & cInSource)
+{
+	if (INVALID_KEY == KeyValue()) {
+		DEBUG_STOP;
+	}
+
+	SegmentKey cPortfolio(KeyValue());
+	HC_KEY nImageKey = INVALID_KEY;
+
+	Image::Format eFormat;
+	if (false == cInSource.ShowFormat(eFormat)) {
+		DEBUG_STOP;
+	}
+
+	CStringA strFormat = H3DF::PortfolioKeyImpl::FormatString(eFormat);
+
+	double x = 0, y = 0, z = 0;
+	
+	UINT nHeight, nWidth;
+	if (false == cInSource.ShowSize(nHeight, nWidth)) {
+		DEBUG_STOP;
+	}
+
+	ByteArray arData;
+	if (false == cInSource.ShowData(arData)) {
+		DEBUG_STOP;
+	}
+
+	cPortfolio.Open(); {
+		Image::Format eFormat;
+		if (true == cInSource.ShowFormat(eFormat)) {
+
+			if (Image::Format::RGB <= eFormat && eFormat <= Image::Format::Bmp) {
+				nImageKey = HC_Insert_Image(x, y, z, strFormat, (int) nWidth, (int) nHeight, arData.data());
+			}
+			else {
+				nImageKey = HC_Insert_Compressed_Image(x, y, z, strFormat, (int) nWidth, (int) nHeight, (int) arData.size(), arData.data());
+			}
+		}
+	} cPortfolio.Close();
+
+	ImageDefinition cDefinition;
+	ImageDefinitionImpl * pcDefinitionImpl = static_cast<ImageDefinitionImpl *>(cDefinition.GetImpl());
+	DEBUG_VALID(pcDefinitionImpl);
+
+	pcDefinitionImpl->SetKeyValue(nImageKey);
+	cDefinition.Set(cInSource);
+
+	return cDefinition;
 }
 
 NamedStyleDefinition H3DF::PortfolioKey::DefineNamedStyle(CStringA strInName, SegmentKey const & cInStyleSource)
@@ -73,26 +183,16 @@ namespace H3DF
 		void Copy(PortfolioControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
-
-		PortfolioDeque * m_pdpcPortfolioDeque = nullptr;
 	};
 }
 
 H3DF::PortfolioControlImpl::PortfolioControlImpl()
 {
 	m_eType = H3DF::Type::PortfolioControl;
-	m_pdpcPortfolioDeque = new PortfolioDeque();
 }
 
 H3DF::PortfolioControlImpl::~PortfolioControlImpl()
 {
-	if (nullptr != m_pdpcPortfolioDeque) {
-		for (auto & pcPortfolioDeque : *m_pdpcPortfolioDeque) {
-			delete pcPortfolioDeque;
-		}
-
-		m_pdpcPortfolioDeque->clear();
-	}
 }
 
 //== PortfolioControl 관련 함수 ======================================================================
@@ -129,7 +229,10 @@ size_t H3DF::PortfolioControl::GetCount() const
 	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->m_pdpcPortfolioDeque->size();
+	PortfolioKeyArray arPortfolios;
+	Show(arPortfolios);
+
+	return arPortfolios.size();
 }
 
 PortfolioControl & H3DF::PortfolioControl::Push(PortfolioKey const & cInPortfolio)
@@ -138,7 +241,7 @@ PortfolioControl & H3DF::PortfolioControl::Push(PortfolioKey const & cInPortfoli
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_KEY nTestKey = HC_Style_Segment_By_Key(cInPortfolio.KeyValue());
+		HC_KEY nKey = HC_Style_Segment_By_Key(cInPortfolio.KeyValue());
 	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return *this;
@@ -149,28 +252,107 @@ bool H3DF::PortfolioControl::Pop()
 	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	if(true == pcImpl->m_pdpcPortfolioDeque->empty()) {
+	PortfolioKeyArray arPortfolios;
+	Show(arPortfolios);
+
+	if (true == arPortfolios.empty()) {
 		return false;
 	}
 
-	PortfolioKey * pcPortfolioKey = pcImpl->m_pdpcPortfolioDeque->back();
-	delete pcPortfolioKey;
+	HC_KEY nKey = arPortfolios.front().KeyValue();
 
-	pcImpl->m_pdpcPortfolioDeque->pop_back();
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		HC_Delete_By_Key(nKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	
+	return true;
+}
+bool H3DF::PortfolioControl::Pop(PortfolioKey & cOutPortfolio)
+{
+	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	PortfolioKeyArray arPortfolios;
+	Show(arPortfolios);
+
+	if (true == arPortfolios.empty()) {
+		return false;
+	}
+
+	cOutPortfolio = arPortfolios.front();
+	HC_KEY nKey = arPortfolios.front().KeyValue();
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		HC_Delete_By_Key(nKey);
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return true;
 }
 
-bool H3DF::PortfolioControl::ShowTop(PortfolioKey & cOutPortfolio) const
+PortfolioControl & H3DF::PortfolioControl::Set(PortfolioKey const & cInPortfolio)
 {
-	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
+	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	if(true == pcImpl->m_pdpcPortfolioDeque->empty()) {
+	UnsetEverything();
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		HC_KEY nKey = HC_Style_Segment_By_Key(cInPortfolio.KeyValue());
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+PortfolioControl & H3DF::PortfolioControl::Set(PortfolioKeyArray const & cInPortfolios)
+{
+	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *) m_pcImpl;
+	DEBUG_VALID(pcImpl);
+
+	UnsetEverything();
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		for (auto & cPortfolio : cInPortfolios) {
+			HC_KEY nKey = HC_Style_Segment_By_Key(cPortfolio.KeyValue());
+		}
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+PortfolioControl & H3DF::PortfolioControl::UnsetTop()
+{
+	Pop();
+	return *this;
+}
+
+PortfolioControl & H3DF::PortfolioControl::UnsetEverything()
+{
+	PortfolioControlImpl * pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	PortfolioKeyArray arPortfolios;
+	Show(arPortfolios);
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+		for (auto & cPortfolio : arPortfolios) {
+			HC_Delete_By_Key(cPortfolio.KeyValue());
+		}
+	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+
+	return *this;
+}
+
+bool H3DF::PortfolioControl::ShowTop(PortfolioKey & cOutPortfolio) const
+{
+	PortfolioKeyArray arPortfolios;
+	Show(arPortfolios);
+
+	if (true == arPortfolios.empty()) {
 		return false;
 	}
 
-	cOutPortfolio = *pcImpl->m_pdpcPortfolioDeque->front();
+	cOutPortfolio = arPortfolios.front();
+
 	return true;
 }
 
@@ -183,6 +365,14 @@ bool H3DF::PortfolioControl::Show(PortfolioKeyArray & cOutPortfolios) const
 
 	SearchResults cResults;
 	cSegment.Find(Search::Type::Portfolio, Search::Space::SegmentOnly, cResults);
+
+	SearchResultsIterator cIter = cResults.GetIterator();
+
+	while (true == cIter.IsValid()) {
+		Key cKey = cIter.GetItem();
+		cOutPortfolios.emplace_back(cKey.KeyValue());
+		cIter.Next();
+	}
 
 	return true;
 }

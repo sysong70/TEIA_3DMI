@@ -616,16 +616,22 @@ void KERNEL::Session::TestCommand(int nId)
 			break;
 
 		case CUSTOM_3D_CMD_SYSONG_Test2: {
-			CString strFilePathName = L"Z://Test.hsf";
+			CString strFilePathName = L"C://zebra.jpeg";
 			H3DF::Image::ImportOptionsKit cOptions;
 			cOptions.SetFormat(H3DF::Image::Format::Jpeg);
-			H3DF::Image::ImageKit cImage = H3DF::Image::File::Import(strFilePathName, cOptions);
+			H3DF::ImageKit cImage = H3DF::Image::File::Import(strFilePathName, cOptions);
 
 			H3DF::PortfolioKeyArray arPortfolios;
 			H3DF::PortfolioKey cPortfolio;
+ 			H3DF::ImageDefinition cImageDefinition;
+// 			H3DF::TextureOptionsKit cTextureOptionsKit;
 
 			H3DF::SegmentKey cModel = pcImpl->GetCanvas().GetFrontView().GetAttachedModel().GetSegmentKey();
 			cModel.GetPortfolioControl().Show(arPortfolios);
+			cPortfolio = arPortfolios[0];
+			cImageDefinition = cPortfolio.DefineImage("zebra_texture", cImage);
+
+			int i = 0;
 
 		} break;
 
