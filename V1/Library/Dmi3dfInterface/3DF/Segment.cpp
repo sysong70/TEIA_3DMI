@@ -296,35 +296,13 @@ size_t H3DF::SegmentKey::Find(Search::Type eInRequest, Search::Space eInSearchSp
 
 		HC_KEY nKey;
 		char chType[MVO_BUFFER_SIZE];
-		char chPathName[MVO_BUFFER_SIZE];
 
 		for (int nIndex = 0; nIndex < nCount; nIndex++) {
 			HC_Find_Contents(chType, &nKey);
 
-			//----- 특별한 처리가 필요한 경우 -----
-
-			// Portfolio는 Style로 저장되어 있고, root의 /portfolios에서 파생되어야 Portfolio로 인식한다.
-			if (Search::Type::Portfolio == eInRequest) {
-				HC_Show_Style_Segment(nKey, chPathName);
-
-				const char * pchPattern = "/portfolios";
-				size_t nPatternLength = std::strlen(pchPattern);
-
-				if (std::strlen(chPathName) < nPatternLength) {
-					continue;
-				}
-
-				if (0 != std::strncmp(chPathName, pchPattern, nPatternLength)) {
-					continue;
-				}
-
-				Key cKey = PortfolioKey(nKey);
-				pcResultsImpl->PushBack(cKey);
-			}
-			else {
-				Key cKey = H3DF::SearchResultsImpl::GetKey(chType, nKey);
-				pcResultsImpl->PushBack(cKey);
-			}
+			// String을 바탕으로 Key값을 생성
+			Key cKey = H3DF::SearchResultsImpl::GetKey(chType, nKey);
+			pcResultsImpl->PushBack(cKey);
 		}
 	}
 	HC_End_Contents_Search();
@@ -1265,6 +1243,23 @@ CullingControl const H3DF::SegmentKey::GetCullingControl() const
 	return cControl;
 }
 
+//== Priority 관련 함수 ==============================================================================
+SegmentKey & H3DF::SegmentKey::SetPriority(int nInPriority)
+{
+	HC_Set_Priority(KeyValue(), nInPriority);
+	return *this;
+}
+
+SegmentKey & H3DF::SegmentKey::UnsetPriority()
+{
+	HC_UnSet_Priority(KeyValue());
+	return *this;
+}
+
+bool H3DF::SegmentKey::ShowPriority(int & nOutPriority) const\
+{
+	return (bool)HC_Show_Priority(KeyValue(), &nOutPriority);
+}
 
 //== User Data 관련 함수 =============================================================================
 SegmentKey & H3DF::SegmentKey::SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData)

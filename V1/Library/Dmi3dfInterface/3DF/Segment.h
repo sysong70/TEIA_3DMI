@@ -187,6 +187,11 @@ namespace H3DF
 		CullingControl GetCullingControl();
 		CullingControl const GetCullingControl() const;
 
+		//== Priority 관련 함수 ======================================================================
+		SegmentKey & SetPriority(int nInPriority);
+		SegmentKey & UnsetPriority();
+		bool ShowPriority(int & nOutPriority) const;
+
 		//== User Data 관련 함수 =====================================================================
 		SegmentKey & SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData);
 		SegmentKey & SetUserData(intptr_t nInIndex, size_t nInBytes, BYTE const pnInData[]);

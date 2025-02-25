@@ -227,9 +227,9 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 		//----- Model 관련 Include 선언 -----
 		SegmentKey cModelInclude = cModelSegment.Subsegment("model_include");
 
-		SegmentKey cModels = cModelSegment.Subsegment("models");
-		SegmentKey cMeasurements = cModelSegment.Subsegment("measurements");
-		SegmentKey cMarkups = cModelSegment.Subsegment("markups");
+		SegmentKey cModelsRoot = cModelSegment.Subsegment("models_root");
+		SegmentKey cMeasurementsRoot = cModelSegment.Subsegment("measurements_root");
+		SegmentKey cMarkupsRoot = cModelSegment.Subsegment("markups_root");
 
 		SegmentKey cIncludeSegment = cModelInclude.Subsegment("include");
 		m_cModelIncludeKey = cIncludeSegment.Subsegment("model");
@@ -261,17 +261,17 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 		H3DF::ComponentUtility::SetData(cInCADModel, strFileTitle, cModelSegment.KeyValue(), INVALID_KEY);
 
 		// Models Component 생성
-		H3DF::Component * pcModelsComponent = AddComponent(cModels, L"Models", H3DF::Component::Type::ExchangeModelFile, cInCADModel);
+		H3DF::Component * pcModelsComponent = AddComponent(cModelsRoot, L"Models", H3DF::Component::Type::ExchangeModelFile, cInCADModel);
 		m_pcModelsComponent = pcModelsComponent;
 		pcCdModelImpl->m_pcModels = pcModelsComponent;
 
 		// Measurements Component 생성
-		H3DF::Component * pcMeasurementsComponent = AddComponent(cMeasurements, L"Measurements", H3DF::Component::Type::MeasurementsComponent, cInCADModel);
+		H3DF::Component * pcMeasurementsComponent = AddComponent(cMeasurementsRoot, L"Measurements", H3DF::Component::Type::MeasurementsComponent, cInCADModel);
 		m_pcMeasurementsComponent = pcMeasurementsComponent;
 		pcCdModelImpl->m_pcMeasurements = pcMeasurementsComponent;
 
 		// Measurements Component 생성
-		H3DF::Component * pcMarkupsComponent = AddComponent(cMarkups, L"Markups", H3DF::Component::Type::MarkupsComponent, cInCADModel);
+		H3DF::Component * pcMarkupsComponent = AddComponent(cMarkupsRoot, L"Markups", H3DF::Component::Type::MarkupsComponent, cInCADModel);
 		m_pcMarkups = pcMarkupsComponent;
 		pcCdModelImpl->m_pcMarkups = pcMarkupsComponent;
 
@@ -279,18 +279,18 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 		ImportOption sImportOption;
 
 		// 처음부터 
-		sImportOption.cParentSegment = cModels;
+		sImportOption.cParentSegment = cModelsRoot;
 
 		LoadMatrixIdentity();
 
 		MaterialMappingKit cMaterialMapping;
 		cMaterialMapping.SetLineColor(RGBAColor(0, 0, 0));
 		cMaterialMapping.SetEdgeColor(RGBAColor(0, 0, 0));
-		cModels.SetMaterialMapping(cMaterialMapping);
+		cModelsRoot.SetMaterialMapping(cMaterialMapping);
 
-		cModels.GetMarkerAttributeControl().SetSize(0.2f);
+		cModelsRoot.GetMarkerAttributeControl().SetSize(0.2f);
 
-		bool bStatus = ParseModelFile(pcAsmModelFile, cModels);
+		bool bStatus = ParseModelFile(pcAsmModelFile, cModelsRoot);
 
 		A3DAsmModelFileDelete(pcAsmModelFile);
 

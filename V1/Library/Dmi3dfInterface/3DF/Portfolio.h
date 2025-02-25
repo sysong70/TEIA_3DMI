@@ -3,6 +3,7 @@
 #include "Segment.h"
 #include "Control.h"
 #include "Image.h"
+#include "Texture.h"
 #include <deque>
 
 namespace H3DF
@@ -19,6 +20,9 @@ namespace H3DF
 
 		void Set(PortfolioKey const & cInThat);
 		PortfolioKey & operator = (PortfolioKey const & cInThat);
+
+		TextureDefinition DefineTexture(CStringA strName, ImageDefinition const & cInSource);
+		TextureDefinition DefineTexture(CStringA strName, ImageDefinition const & cInSource, TextureOptionsKit const & cInOptions);
 		
 		ImageDefinition DefineImage(CStringA strInName, ImageKit const & cInSource);
 		NamedStyleDefinition DefineNamedStyle(CStringA strInName, SegmentKey const & cInStyleSource);

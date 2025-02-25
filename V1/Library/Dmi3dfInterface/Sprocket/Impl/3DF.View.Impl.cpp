@@ -618,8 +618,6 @@ void H3DF::ViewImpl::Copy(const ViewImpl * pcInThat)
 	m_pcModel = pcInThat->m_pcModel;
 	m_cModelKey = pcInThat->m_cModelKey;
 
-	m_cPortfolioKey = pcInThat->m_cPortfolioKey;
-
 	m_bShowCollisions = pcInThat->m_bShowCollisions;
 
 	m_pcCameraSelect = pcInThat->m_pcCameraSelect;
@@ -1076,8 +1074,6 @@ bool H3DF::ViewImpl::Init(H3DF::Model * pcInModel, const char * pchInDriverType,
 	// Portfolio Key 생성
 // 	SegmentKey cPortfoliosKey = m_cKey.Subsegment(L"Portfolios");
 // 	m_cPortfolioKey.SetKeyValue(cPortfoliosKey.KeyValue());
-
-	m_cPortfolioKey = Database::CreatePortfolio();
 
 	// do all the setup with no updates
 	m_pcBaseView->SetSuppressUpdate(false);

@@ -7,6 +7,7 @@
 
 #include "./Impl/ControlImpl.h"
 #include "./Impl/ImageImpl.h"
+#include "./Impl/TextureImpl.h"
 #include "./Impl/DefinitionImpl.h"
 
 #include "Style.h"
@@ -101,14 +102,71 @@ PortfolioKey & H3DF::PortfolioKey::operator = (PortfolioKey const & cInThat)
 	return *this;
 }
 
+TextureDefinition H3DF::PortfolioKey::DefineTexture(CStringA strName, ImageDefinition const & cInSource)
+{
+	TextureOptionsKit cTextureOptions;
+	return DefineTexture(strName, cInSource, cTextureOptions);
+}
+
+TextureDefinition H3DF::PortfolioKey::DefineTexture(CStringA strName, ImageDefinition const & cInSource, TextureOptionsKit const & cInOptions)
+{
+	StyleKey cStyle(KeyValue());
+	HC_KEY nImageKey = INVALID_KEY;
+
+	// PortfolioKey는 StyleKey가 저장되어 있는 것임.
+	SegmentKey cPortfolio;
+	cStyle.ShowSource(cPortfolio);
+
+	SegmentKey cPortfolioTextures = cPortfolio.Subsegment("textures");
+	cPortfolio.GetStyleControl().PushSegment(cPortfolioTextures);
+
+	const ImageDefinitionImpl * pcImageDefinitionImpl = static_cast<const ImageDefinitionImpl *> (cInSource.GetImpl());
+	DEBUG_VALID(pcImageDefinitionImpl);
+
+	CStringA strDefinition, strText;
+
+	// Source 정의
+	strText.Format("source = %s", pcImageDefinitionImpl->m_strSource);
+	strDefinition += strText;
+
+	// Texture Options 정의
+	const TextureOptionsKitImpl * pcTextureOptionsKitImpl = static_cast<const TextureOptionsKitImpl *> (cInOptions.GetImpl());
+	DEBUG_VALID(pcTextureOptionsKitImpl);
+
+	CStringA strTextureOptionsDefinition;
+	pcTextureOptionsKitImpl->GetDefinitionString(strTextureOptionsDefinition);
+	
+	strDefinition += strDefinition.IsEmpty() ? "" : ", ";
+	strDefinition += strTextureOptionsDefinition;
+
+	cPortfolioTextures.Open(); {
+		HC_Define_Local_Texture(strName, strDefinition);
+	} cPortfolioTextures.Close();
+
+	// TextureDefinition 생성 
+	TextureDefinition cDefinition;
+	TextureDefinitionImpl * pcDefinitionImpl = static_cast<TextureDefinitionImpl *> (cDefinition.GetImpl());
+	DEBUG_VALID(pcDefinitionImpl);
+
+	pcDefinitionImpl->m_strName = strName;
+
+	return cDefinition;
+}
+
 ImageDefinition H3DF::PortfolioKey::DefineImage(CStringA strInName, ImageKit const & cInSource)
 {
 	if (INVALID_KEY == KeyValue()) {
 		DEBUG_STOP;
 	}
 
-	SegmentKey cPortfolio(KeyValue());
+	StyleKey cStyle(KeyValue());
 	HC_KEY nImageKey = INVALID_KEY;
+
+	// PortfolioKey는 StyleKey가 저장되어 있는 것임.
+	SegmentKey cPortfolio;
+	cStyle.ShowSource(cPortfolio);
+
+	SegmentKey cPortfolioImages = cPortfolio.Subsegment("images");
 
 	Image::Format eFormat;
 	if (false == cInSource.ShowFormat(eFormat)) {
@@ -129,25 +187,32 @@ ImageDefinition H3DF::PortfolioKey::DefineImage(CStringA strInName, ImageKit con
 		DEBUG_STOP;
 	}
 
-	cPortfolio.Open(); {
-		Image::Format eFormat;
-		if (true == cInSource.ShowFormat(eFormat)) {
+	CStringA strImageSpace;
+	strImageSpace = strFormat;
 
-			if (Image::Format::RGB <= eFormat && eFormat <= Image::Format::Bmp) {
-				nImageKey = HC_Insert_Image(x, y, z, strFormat, (int) nWidth, (int) nHeight, arData.data());
-			}
-			else {
-				nImageKey = HC_Insert_Compressed_Image(x, y, z, strFormat, (int) nWidth, (int) nHeight, (int) arData.size(), arData.data());
-			}
+	if (false == strInName.IsEmpty()) {
+		strImageSpace += ", name = " + strInName;
+	}
+
+	//strImageSpace += ", local";
+
+	cPortfolioImages.Open(); {
+		if (Image::Format::RGB <= eFormat && eFormat <= Image::Format::Bmp) {
+			nImageKey = HC_Insert_Image(x, y, z, strImageSpace, (int) nWidth, (int) nHeight, arData.data());
 		}
-	} cPortfolio.Close();
+		else {
+			nImageKey = HC_Insert_Compressed_Image(x, y, z, strImageSpace, (int) nWidth, (int) nHeight, (int) arData.size(), arData.data());
+		}
+	} cPortfolioImages.Close();
 
 	ImageDefinition cDefinition;
+	cDefinition.Set(cInSource);
+
 	ImageDefinitionImpl * pcDefinitionImpl = static_cast<ImageDefinitionImpl *>(cDefinition.GetImpl());
 	DEBUG_VALID(pcDefinitionImpl);
 
 	pcDefinitionImpl->SetKeyValue(nImageKey);
-	cDefinition.Set(cInSource);
+	pcDefinitionImpl->m_strSource = strInName;
 
 	return cDefinition;
 }
@@ -361,16 +426,40 @@ bool H3DF::PortfolioControl::Show(PortfolioKeyArray & cOutPortfolios) const
 	PortfolioControlImpl * pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	SegmentKey cSegment(pcImpl->m_cOverrideKey.KeyValue());
+	SegmentKey cModelSegment;
+
+	if (H3DF::Type::Model == pcImpl->m_cOverrideKey.Type()) {
+		cModelSegment = pcImpl->m_cOverrideKey;
+	}
+	else {
+		SegmentKeyImpl::FindUp(pcImpl->m_cOverrideKey, H3DF::Type::Model, cModelSegment);
+	}
+
+	if (false == cModelSegment.IsValidate()) {
+		return false;
+	}
 
 	SearchResults cResults;
-	cSegment.Find(Search::Type::Portfolio, Search::Space::SegmentOnly, cResults);
+	cModelSegment.Find(Search::Type::SegmentStyle, Search::Space::SegmentOnly, cResults);
 
+	CStringA strPortfoliosText = "/portfolios";
 	SearchResultsIterator cIter = cResults.GetIterator();
-
 	while (true == cIter.IsValid()) {
-		Key cKey = cIter.GetItem();
-		cOutPortfolios.emplace_back(cKey.KeyValue());
+		if (H3DF::Type::SegmentStyle != cIter.GetItem().Type()) {
+			DEBUG_STOP;
+		}
+
+		H3DF::Style::Type eSoruceType;
+		H3DF::SegmentKey cSource;
+		CStringA strSourceName;
+
+		StyleKey cStyle(cIter.GetItem());
+		cStyle.ShowSource(eSoruceType, cSource, strSourceName);
+
+		if (0 == strSourceName.Left(strPortfoliosText.GetLength()).Compare(strPortfoliosText)) {
+			cOutPortfolios.emplace_back(cStyle.KeyValue());
+		}
+
 		cIter.Next();
 	}
 

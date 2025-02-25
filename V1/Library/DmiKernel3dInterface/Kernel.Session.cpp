@@ -10,6 +10,7 @@
 #include <3DF/LineAttribute.h>
 #include <3DF/AttributeLock.h>
 #include <3DF/Image.h>
+#include <3DF/Texture.h>
 #include <3DF/Portfolio.h>
 
 #include "Signal.Connector.h"
@@ -624,14 +625,18 @@ void KERNEL::Session::TestCommand(int nId)
 			H3DF::PortfolioKeyArray arPortfolios;
 			H3DF::PortfolioKey cPortfolio;
  			H3DF::ImageDefinition cImageDefinition;
-// 			H3DF::TextureOptionsKit cTextureOptionsKit;
+ 			H3DF::TextureOptionsKit cTextureOptionsKit;
 
 			H3DF::SegmentKey cModel = pcImpl->GetCanvas().GetFrontView().GetAttachedModel().GetSegmentKey();
 			cModel.GetPortfolioControl().Show(arPortfolios);
 			cPortfolio = arPortfolios[0];
+			
 			cImageDefinition = cPortfolio.DefineImage("zebra_texture", cImage);
 
-			int i = 0;
+ 			cTextureOptionsKit.SetParameterizationSource(H3DF::Material::Texture::Parameterization::ReflectionVector);
+ 			cPortfolio.DefineTexture("zebra", cImageDefinition, cTextureOptionsKit);
+
+			cModel.GetMaterialMappingControl().SetFaceTexture("zebra", H3DF::Material::Texture::Channel::EnvironmentTexture);
 
 		} break;
 

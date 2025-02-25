@@ -58,8 +58,11 @@ namespace H3DF
 		ImageDefinitionImpl() { m_eType = H3DF::Type::ImageDefinition; }
 
 		void Copy(ImageDefinitionImpl * pcInThat) {
+			m_strSource = pcInThat->m_strSource;
+			m_cImageKit = pcInThat->m_cImageKit; // Copy
 		}
 
+		CStringA m_strSource;
 		ImageKit m_cImageKit;
 	};
 }

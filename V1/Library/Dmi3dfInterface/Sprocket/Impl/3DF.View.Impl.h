@@ -124,8 +124,6 @@ namespace H3DF
 		H3DF::Model * m_pcModel = nullptr;
 		SegmentKey m_cModelKey;
 
-		PortfolioKey m_cPortfolioKey;
-
 		bool m_bShowCollisions = false;
 
 		Operator::CameraControl * m_pcCameraSelect = nullptr;

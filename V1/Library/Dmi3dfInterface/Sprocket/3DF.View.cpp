@@ -244,7 +244,7 @@ PortfolioKey const H3DF::View::GetPortfolioKey() const
 	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->m_cPortfolioKey;
+	return pcImpl->GetAttachedModel().GetPortfolioKey();
 }
 
 PortfolioKey H3DF::View::GetPortfolioKey()
@@ -252,7 +252,7 @@ PortfolioKey H3DF::View::GetPortfolioKey()
 	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->m_cPortfolioKey;
+	return pcImpl->GetAttachedModel().GetPortfolioKey();
 }
 
 SegmentKey H3DF::View::GetConstructionKey()

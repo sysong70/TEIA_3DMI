@@ -111,7 +111,9 @@ namespace H3DF
 				UV,
 
 				// Use the (x, y, z) coordinates for the object after transforms have been applied for the texture parameters.
-				World
+				World,
+
+				None
 			};
 
 			// Enumeration of the tiling modes for textures.
@@ -359,8 +361,9 @@ namespace H3DF
 		MaterialMappingControl & operator = (MaterialMappingControl const & cInThat);
 
 		//== Color 설정 =============================================================================
-		MaterialMappingControl & SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel = Material::Color::Channel::DiffuseColor);
+		MaterialMappingControl & SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
 		MaterialMappingControl & SetFaceAlpha(float fInAlpha);
+		MaterialMappingControl & SetFaceTexture(CStringA strInTextureName, Material::Texture::Channel eInChannel = Material::Texture::Channel::DiffuseTexture, size_t nInLayer = 0);
 
 		MaterialMappingControl & SetBackFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
 		MaterialMappingControl & SetBackFaceAlpha(float fInAlpha);
@@ -368,9 +371,9 @@ namespace H3DF
 		MaterialMappingControl & SetFrontFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
 		MaterialMappingControl & SetFrontFaceAlpha(float fInAlpha);
 
-		MaterialMappingControl & SetEdgeColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel = Material::Color::Channel::DiffuseColor);
+		MaterialMappingControl & SetEdgeColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
 
-		MaterialMappingControl & SetMarkerColor(RGBAColor const & cInRgbaColor, Material::Color::Channel cInChannel = Material::Color::Channel::DiffuseColor);
+		MaterialMappingControl & SetMarkerColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
 	
 		//== Texture 설정 ===========================================================================
 		void InitPopulateTextures();

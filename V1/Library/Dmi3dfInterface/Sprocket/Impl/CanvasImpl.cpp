@@ -28,10 +28,6 @@ H3DF::CanvasImpl::CanvasImpl()
 	if (nullptr == m_pcModel) {
 		assert(false);
 	}
-
-	// Model에 PortfolioKey를 추가한다.
-	PortfolioKey cPortfolio = H3DF::Database::CreatePortfolio();
-	m_pcModel->GetSegmentKey().GetPortfolioControl().Push(cPortfolio);
 }
 
 H3DF::CanvasImpl::~CanvasImpl()

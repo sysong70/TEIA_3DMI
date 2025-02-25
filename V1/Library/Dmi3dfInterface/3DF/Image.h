@@ -121,8 +121,6 @@ namespace H3DF
 		void Set(ImageDefinition const & cInKit);
 		ImageDefinition const & operator = (ImageDefinition const & cInKit);
 
-		~ImageDefinition();
-
 		void Set(ImageKit const & cInKit);
 		void Show(ImageKit & cOutKit) const;
 	};

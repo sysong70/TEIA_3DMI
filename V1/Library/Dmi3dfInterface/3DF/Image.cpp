@@ -29,10 +29,10 @@ void H3DF::Image::ImportOptionsKit::Set(ImportOptionsKit const & cInKit)
 {
 	ImageImportOptionsKitImpl * pcImpl = static_cast<ImageImportOptionsKitImpl *> (m_pcImpl);
 	DEBUG_VALID(pcImpl);
-	ImageImportOptionsKitImpl * pccInKitImpl = static_cast<ImageImportOptionsKitImpl *>(cInKit.m_pcImpl);
-	DEBUG_VALID(pccInKitImpl);
+	ImageImportOptionsKitImpl * ccInKitImpl = static_cast<ImageImportOptionsKitImpl *>(cInKit.m_pcImpl);
+	DEBUG_VALID(ccInKitImpl);
 
-	pcImpl->Copy(pccInKitImpl);
+	pcImpl->Copy(ccInKitImpl);
 }
 
 Image::ImportOptionsKit const & H3DF::Image::ImportOptionsKit::operator = (ImportOptionsKit const & cInKit)
@@ -377,36 +377,31 @@ H3DF::ImageDefinition::ImageDefinition(ImageDefinition const & cInThat)
 }
 
 H3DF::ImageDefinition::ImageDefinition(ImageDefinition && cInThat) noexcept :
-	Definition(std::move(cInThat))
+	Definition(cInThat)
 {
 }
 
 ImageDefinition & H3DF::ImageDefinition::operator = (ImageDefinition && cInThat) noexcept
 {
-	this->Definition::operator = (std::move(cInThat));
+	this->ImageDefinition::operator = (cInThat);
 	return *this;
 }
 
 void H3DF::ImageDefinition::Set(ImageDefinition const & cInKit)
 {
-	ImageKitImpl * pcImpl = static_cast<ImageKitImpl *> (m_pcImpl);
+	ImageDefinitionImpl * pcImpl = static_cast<ImageDefinitionImpl *> (m_pcImpl);
 	DEBUG_VALID(pcImpl);
-	ImageKitImpl * pcInKitImpl = static_cast<ImageKitImpl *>(cInKit.m_pcImpl);
+
+	ImageDefinitionImpl * pcInKitImpl = static_cast<ImageDefinitionImpl *>(cInKit.m_pcImpl);
 	DEBUG_VALID(pcInKitImpl);
 
 	pcImpl->Copy(pcInKitImpl);
-
 }
 
 ImageDefinition const & H3DF::ImageDefinition::operator = (ImageDefinition const & cInKit)
 {
 	Set(cInKit);
 	return *this;
-}
-
-H3DF::ImageDefinition::~ImageDefinition()
-{
-
 }
 
 void H3DF::ImageDefinition::Set(ImageKit const & cInKit)
