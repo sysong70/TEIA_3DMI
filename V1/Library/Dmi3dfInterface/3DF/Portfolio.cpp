@@ -11,6 +11,7 @@
 #include "./Impl/DefinitionImpl.h"
 
 #include "Style.h"
+#include "Visibility.h"
 
 #include <HTools.h>
 
@@ -167,6 +168,7 @@ ImageDefinition H3DF::PortfolioKey::DefineImage(CStringA strInName, ImageKit con
 	cStyle.ShowSource(cPortfolio);
 
 	SegmentKey cPortfolioImages = cPortfolio.Subsegment("images");
+	cPortfolioImages.GetVisibilityControl().SetGeometry(false);
 
 	Image::Format eFormat;
 	if (false == cInSource.ShowFormat(eFormat)) {
@@ -442,7 +444,13 @@ bool H3DF::PortfolioControl::Show(PortfolioKeyArray & cOutPortfolios) const
 	SearchResults cResults;
 	cModelSegment.Find(Search::Type::SegmentStyle, Search::Space::SegmentOnly, cResults);
 
-	CStringA strPortfoliosText = "/portfolios";
+	if (0 == cResults.GetCount()) {
+		return false;
+	}
+
+	CStringA strModelSegmentName = cModelSegment.Name();
+
+	CStringA strPortfoliosText = strModelSegmentName + "/portfolios";
 	SearchResultsIterator cIter = cResults.GetIterator();
 	while (true == cIter.IsValid()) {
 		if (H3DF::Type::SegmentStyle != cIter.GetItem().Type()) {

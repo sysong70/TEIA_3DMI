@@ -12,6 +12,7 @@
 #include <3DF/Image.h>
 #include <3DF/Texture.h>
 #include <3DF/Portfolio.h>
+#include <3DF/3DF.Utility.h>
 
 #include "Signal.Connector.h"
 
@@ -617,7 +618,8 @@ void KERNEL::Session::TestCommand(int nId)
 			break;
 
 		case CUSTOM_3D_CMD_SYSONG_Test2: {
-			CString strFilePathName = L"C://zebra.jpeg";
+
+			CString strFilePathName = H3DF::Utility::GetExecuteDirectory() + L"Image\\Texture\\zebra.jpeg";
 			H3DF::Image::ImportOptionsKit cOptions;
 			cOptions.SetFormat(H3DF::Image::Format::Jpeg);
 			H3DF::ImageKit cImage = H3DF::Image::File::Import(strFilePathName, cOptions);

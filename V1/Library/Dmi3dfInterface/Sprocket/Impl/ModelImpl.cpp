@@ -109,15 +109,14 @@ void H3DF::ModelImpl::Init()
 
 	// #Model: Portfolio 생성
 	// 신규 Portfolio를 생성함. Portfolios는 Root Segment에 생성한다.
-	SegmentKey cPortfolios("/portfolios");
+//	SegmentKey cPortfolios("/portfolios");
+// 
+	// Root에 만드는 경우 Portfolio가 계속적으로 메모리에 남아있게 됨.
+ 	SegmentKey cPortfolios = m_cSegmentKey.Subsegment("portfolios");
 
 	// 신규 Segment를 생성해서 Portfolio Style의 Base로 사용한다.
 	SegmentKey cRootPortfolio = cPortfolios.Subsegment();
-
-	// Root에 만드는 경우 Portfolio가 계속적으로 메모리에 남아있게 됨.
-// 	SegmentKey cPortfolios = m_cSegmentKey.Subsegment("portfolios");
-// 	cPortfolios.SetPriority(0);
-
+	cRootPortfolio.SetPriority(0);
 
 	// Model에 Portfolio와 연결된 Style을 생성.
 	StyleKey cStyle = m_cSegmentKey.GetStyleControl().PushSegment(cRootPortfolio);
