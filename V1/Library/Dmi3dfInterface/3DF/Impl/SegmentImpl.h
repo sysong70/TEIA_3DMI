@@ -51,6 +51,8 @@ namespace H3DF
 		BaseView * GetBaseView() const;
 		void SetBaseView(BaseView * pcInBaseView);
 
+		static bool FindUp(SegmentKey & cInSegment, H3DF::Type eInType, SegmentKey & cOutFindSegment);
+
 		BoundingKit * m_pcBoundingKit = nullptr;
 
 	private:

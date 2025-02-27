@@ -11,8 +11,11 @@
 #include "../../3DF/LineAttribute.h"
 #include "../../3DF/DrawingAttribute.h"
 #include "../../3DF/ColorInterpolation.h"
+#include "../../3DF/Portfolio.h"
 
 #include "../../3DF/3DF.Utility.h"
+
+#include "../../3DF/Impl/SegmentImpl.h"
 
 using namespace H3DF;
 
@@ -22,6 +25,9 @@ H3DF::ModelImpl::ModelImpl()
 	: HBaseModel()
 {
 	m_cSegmentKey.Set(GetModelKey());
+
+	SegmentKeyImpl * pcImpl = static_cast<SegmentKeyImpl *>(m_cSegmentKey.GetImpl());
+	pcImpl->SetType(H3DF::Type::Model);
 
 	SetBRepGeometry(false);
 
@@ -61,14 +67,14 @@ void H3DF::ModelImpl::Init()
 	m_cInclude.GetAttributeLockControl().SetLock(AttributeLock::Type::Visibility);
 	m_cInclude.SetVisibility(L"off");
 
-	m_cModels = m_cSegmentKey.Subsegment("models");
-	m_cMeasurements = m_cSegmentKey.Subsegment("measurements");
-	m_cMarkups = m_cSegmentKey.Subsegment("markups");
+	m_cModelsRoot = m_cSegmentKey.Subsegment("models_root");
+	m_cMeasurementsRoot = m_cSegmentKey.Subsegment("measurements_root");
+	m_cMarkupsRoot = m_cSegmentKey.Subsegment("markups_root");
 
 	// 화면에 표시되는 통상적인 Line Weigth를 설정한다.	
 	float fLineWeight = 0.0005f;
 	Line::SizeUnits eUnits = Line::SizeUnits::WindowRelative;
-	m_cModels.GetLineAttributeControl().SetWeight(fLineWeight, eUnits);
+	m_cModelsRoot.GetLineAttributeControl().SetWeight(fLineWeight, eUnits);
 
 	BoundingKit cBounding;
 	cBounding.SetExclusion(true);
@@ -98,7 +104,26 @@ void H3DF::ModelImpl::Init()
 	m_cNoShowVertexStyle = m_cIncludeStyles.Subsegment("noshow_vertex_style");
 	m_cNoShowVertexStyle.GetVisibilityControl().SetVertices(false);
 
-	m_cModels.GetStyleControl().PushSegment(m_cShowStyle);
+	m_cModelsRoot.GetStyleControl().PushSegment(m_cShowStyle);
+
+
+	// #Model: Portfolio 생성
+	// 신규 Portfolio를 생성함. Portfolios는 Root Segment에 생성한다.
+//	SegmentKey cPortfolios("/portfolios");
+// 
+	// Root에 만드는 경우 Portfolio가 계속적으로 메모리에 남아있게 됨.
+ 	SegmentKey cPortfolios = m_cSegmentKey.Subsegment("portfolios");
+
+	// 신규 Segment를 생성해서 Portfolio Style의 Base로 사용한다.
+	SegmentKey cRootPortfolio = cPortfolios.Subsegment();
+	cRootPortfolio.SetPriority(0);
+
+	// Model에 Portfolio와 연결된 Style을 생성.
+	StyleKey cStyle = m_cSegmentKey.GetStyleControl().PushSegment(cRootPortfolio);
+
+	// PortfolioKey는 style 키를 이용한다.
+	PortfolioKey cPortfolio(cStyle);
+	m_cPortfolio = cPortfolio;
 
 // 	입력된 Matrial을 Face에 적용한다.
 // 	MaterialMappingKit cMaterialMapping;
@@ -118,6 +143,16 @@ SegmentKey H3DF::ModelImpl::GetSegmentKey()
 SegmentKey const H3DF::ModelImpl::GetSegmentKey() const
 {
 	return m_cSegmentKey;
+}
+
+PortfolioKey H3DF::ModelImpl::GetPortfolioKey()
+{
+	return m_cPortfolio;
+}
+
+PortfolioKey const H3DF::ModelImpl::GetPortfolioKey() const
+{
+	return m_cPortfolio;
 }
 
 void H3DF::ModelImpl::SetBRepGeometry(bool bBrepFlag)

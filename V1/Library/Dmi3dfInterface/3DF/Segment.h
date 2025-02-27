@@ -5,7 +5,6 @@
 #include "Include.h"
 #include "Shell.h"
 #include "EdgeAttribute.h"
-//#include "Portfolio.h"
 #include "Style.h"
 #include "Search.h"
 
@@ -125,8 +124,8 @@ namespace H3DF
 		SegmentKey & SetHeuristics(CString strInHeuristics);
 
 		//== Portfolio Control 관련 함수 =============================================================
-		//PortfolioControl GetPortfolioControl();
-		//PortfolioControl const GetPortfolioControl() const;
+		PortfolioControl GetPortfolioControl();
+		PortfolioControl const GetPortfolioControl() const;
 
 		//== Style Control 관련 함수 =================================================================
 		StyleControl GetStyleControl();
@@ -187,6 +186,11 @@ namespace H3DF
 		//== Culling 관련 함수 =======================================================================
 		CullingControl GetCullingControl();
 		CullingControl const GetCullingControl() const;
+
+		//== Priority 관련 함수 ======================================================================
+		SegmentKey & SetPriority(int nInPriority);
+		SegmentKey & UnsetPriority();
+		bool ShowPriority(int & nOutPriority) const;
 
 		//== User Data 관련 함수 =====================================================================
 		SegmentKey & SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData);

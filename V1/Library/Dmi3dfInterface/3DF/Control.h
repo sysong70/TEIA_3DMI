@@ -15,7 +15,7 @@ namespace H3DF
 
 	protected:
 		Control() = default;
-		Control(Control && cInThat);
-		Control & operator = (Control && cInThat);
+		Control(Control && cInThat) noexcept;
+		Control & operator = (Control && cInThat) noexcept;
 	};
 }

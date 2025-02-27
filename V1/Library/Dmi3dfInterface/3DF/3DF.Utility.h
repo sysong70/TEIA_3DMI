@@ -62,7 +62,7 @@ namespace H3DF
 		HPoint ToHPoint(H3DF::Point cInPoint);
 
 		//== File 관련 함수 ==========================================================================
-		CString GetExecuteDirectory();
+		API_3DF CString GetExecuteDirectory();
 
 		//== Segment 관련 함수 =======================================================================
 		API_3DF bool ShowSubSegment(SegmentKey & cInTargetSegment, CStringA strInSegmentName, SegmentKey & cOutSegment);

@@ -262,3 +262,23 @@ void H3DF::SegmentKeyImpl::SetBaseView(BaseView * pcInBaseView)
 {
 	m_pcBaseView = pcInBaseView;
 }
+
+// 찾는 요소가 찾아지면 바로 멈춤. 제한적으로 사용해야 함.
+bool H3DF::SegmentKeyImpl::FindUp(SegmentKey & cInSegment, H3DF::Type eInType, SegmentKey & cOutFindSegment)
+{
+	SegmentKey cOwner = cInSegment.Owner();
+
+	bool bResult = false;
+	SegmentKey cFindSegment;
+	while (true == cOwner.IsValidate()) {
+		if (eInType == cOwner.Type()) {
+			cFindSegment = cOwner;
+			bResult = true;
+			break;
+		}
+
+		cOwner = cOwner.Owner();
+	}
+
+	return bResult;
+}

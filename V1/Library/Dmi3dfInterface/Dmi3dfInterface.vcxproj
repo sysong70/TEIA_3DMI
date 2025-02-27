@@ -149,11 +149,13 @@
     <ClInclude Include="3DF\Impl\DefinitionImpl.h" />
     <ClInclude Include="3DF\Impl\GeometryImpl.h" />
     <ClInclude Include="3DF\Impl\HighlightImpl.h" />
+    <ClInclude Include="3DF\Impl\ImageImpl.h" />
     <ClInclude Include="3DF\Impl\KeyImpl.h" />
     <ClInclude Include="3DF\Impl\OperatorImpl.h" />
     <ClInclude Include="3DF\Impl\SearchImpl.h" />
     <ClInclude Include="3DF\Impl\SegmentImpl.h" />
     <ClInclude Include="3DF\Impl\Selection.Impl.h" />
+    <ClInclude Include="3DF\Impl\TextureImpl.h" />
     <ClInclude Include="3DF\Impl\WindowImpl.h" />
     <ClInclude Include="3DF\KeyPath.h" />
     <ClInclude Include="3DF\Operator.Event.h" />
@@ -162,6 +164,7 @@
     <ClInclude Include="3DF\Reference.h" />
     <ClInclude Include="3DF\Selectability.h" />
     <ClInclude Include="3DF\SelectionSet.h" />
+    <ClInclude Include="3DF\Texture.h" />
     <ClInclude Include="Signal.Connector.h" />
     <ClInclude Include="3DF\Camera.h" />
     <ClInclude Include="3DF\Circle.h" />
@@ -255,11 +258,13 @@
     <ClCompile Include="3DF\Impl\DefinitionImpl.cpp" />
     <ClCompile Include="3DF\Impl\GeometryImpl.cpp" />
     <ClCompile Include="3DF\Impl\HighlightImpl.cpp" />
+    <ClCompile Include="3DF\Impl\ImageImpl.cpp" />
     <ClCompile Include="3DF\Impl\KeyImpl.cpp" />
     <ClCompile Include="3DF\Impl\OperatorImpl.cpp" />
     <ClCompile Include="3DF\Impl\SearchImpl.cpp" />
     <ClCompile Include="3DF\Impl\SegmentImpl.cpp" />
     <ClCompile Include="3DF\Impl\Selection.Impl.cpp" />
+    <ClCompile Include="3DF\Impl\TextureImpl.cpp" />
     <ClCompile Include="3DF\Impl\WindowImpl.cpp" />
     <ClCompile Include="3DF\Operator.Event.cpp" />
     <ClCompile Include="3DF\Performance.cpp" />
@@ -267,6 +272,7 @@
     <ClCompile Include="3DF\Reference.cpp" />
     <ClCompile Include="3DF\Selectability.cpp" />
     <ClCompile Include="3DF\SelectionSet.cpp" />
+    <ClCompile Include="3DF\Texture.cpp" />
     <ClCompile Include="Signal.Connector.cpp" />
     <ClCompile Include="3DF\Bounding.cpp" />
     <ClCompile Include="3DF\Camera.cpp" />

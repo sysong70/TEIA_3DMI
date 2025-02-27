@@ -130,6 +130,8 @@ bool KERNEL::Command::HighlightObjectSnapImpl::SnapItem::operator == (const Snap
 
 
 //== ObjectSnap class ==============================================================================
+
+// Highlight Option 설정 #Selection
 KERNEL::Command::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const Session * pcInSession) :
 	SetImpl(pcInSession),
 	m_cDynHighlightControl(Window()),
@@ -213,6 +215,9 @@ KERNEL::Command::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const Session 
 
 	m_cDynHighlightControl.SetMaterialMapping(cDynHighlightMaterialMapping);
 	// Shell 선택시에 Line Visibility를 설정한대로 적용하기 위해서 Lock을 걸도록 한다.
+
+	// 사용하면 속도가 저하됨. 투명도 상태에서 선택된 결과값은 깨끗하게 나옴.
+	//m_cDynHighlightControl.SetMode(HighlightMode::Type::DefaultConditional);
 
 	m_cDynHighlightControl.GetAttributeLockControl().SetLock(AttributeLock::Type::MaterialLineColor);
 //	m_cDynHighlightControl.GetAttributeLockControl().SetLock(AttributeLock::Type::VisibilityLines);

@@ -84,14 +84,26 @@ PortfolioKey H3DF::NamedStyleDefinition::Owner() const
 
 H3DF::StyleKey::StyleKey() : Key()
 {
+	KeyImpl * pcImpl = static_cast<KeyImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->SetType(H3DF::Type::SegmentStyle);
 }
 
-H3DF::StyleKey::StyleKey(HC_KEY nInKey) : Key(nInKey)
+H3DF::StyleKey::StyleKey(Key const & cInThat) : Key(cInThat)
 {
+	KeyImpl * pcImpl = static_cast<KeyImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->SetType(H3DF::Type::SegmentStyle);
 }
 
 H3DF::StyleKey::StyleKey(StyleKey const & cInThat) : Key(cInThat)
 {
+	KeyImpl * pcImpl = static_cast<KeyImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->SetType(H3DF::Type::SegmentStyle);
 }
 
 void H3DF::StyleKey::Set(StyleKey const & cInThat)

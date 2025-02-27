@@ -11,8 +11,6 @@ namespace H3DF
 
 		static SegmentKey CreateRootSegment();
 
-		static PortfolioKey CreatePortfolio();
-
 		static void RelinquishMemory();
 	};
 }

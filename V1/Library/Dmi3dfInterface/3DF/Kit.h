@@ -10,6 +10,11 @@ namespace H3DF
 	public:
 		Kit();
 
+		H3DF::Type Type() const override { return ObjectType(); }
 		H3DF::Type ObjectType() const override { return H3DF::Type::Kit; };
+
+	protected:
+		Kit(Kit && cInThat) noexcept;
+		Kit & operator = (Kit && cInThat) noexcept;
 	};
 }

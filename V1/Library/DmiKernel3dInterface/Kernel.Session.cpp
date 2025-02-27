@@ -9,7 +9,10 @@
 #include <3DF/Visibility.h>
 #include <3DF/LineAttribute.h>
 #include <3DF/AttributeLock.h>
-
+#include <3DF/Image.h>
+#include <3DF/Texture.h>
+#include <3DF/Portfolio.h>
+#include <3DF/3DF.Utility.h>
 
 #include "Signal.Connector.h"
 
@@ -613,6 +616,31 @@ void KERNEL::Session::TestCommand(int nId)
 		case CUSTOM_3D_CMD_SYSONG_Test1:
 			pcImpl->SetVisibility(nId);
 			break;
+
+		case CUSTOM_3D_CMD_SYSONG_Test2: {
+
+			CString strFilePathName = H3DF::Utility::GetExecuteDirectory() + L"Image\\Texture\\zebra.jpeg";
+			H3DF::Image::ImportOptionsKit cOptions;
+			cOptions.SetFormat(H3DF::Image::Format::Jpeg);
+			H3DF::ImageKit cImage = H3DF::Image::File::Import(strFilePathName, cOptions);
+
+			H3DF::PortfolioKeyArray arPortfolios;
+			H3DF::PortfolioKey cPortfolio;
+ 			H3DF::ImageDefinition cImageDefinition;
+ 			H3DF::TextureOptionsKit cTextureOptionsKit;
+
+			H3DF::SegmentKey cModel = pcImpl->GetCanvas().GetFrontView().GetAttachedModel().GetSegmentKey();
+			cModel.GetPortfolioControl().Show(arPortfolios);
+			cPortfolio = arPortfolios[0];
+			
+			cImageDefinition = cPortfolio.DefineImage("zebra_texture", cImage);
+
+ 			cTextureOptionsKit.SetParameterizationSource(H3DF::Material::Texture::Parameterization::ReflectionVector);
+ 			cPortfolio.DefineTexture("zebra", cImageDefinition, cTextureOptionsKit);
+
+			cModel.GetMaterialMappingControl().SetFaceTexture("zebra", H3DF::Material::Texture::Channel::EnvironmentTexture);
+
+		} break;
 
 		default:
 			break;

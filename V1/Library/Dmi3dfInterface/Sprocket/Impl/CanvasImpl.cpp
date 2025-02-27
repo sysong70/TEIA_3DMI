@@ -7,6 +7,8 @@
 #include "../3DF.Model.h"
 #include "ModelImpl.h"
 
+#include "../../3DF/Database.h"
+
 #include "3DF.View.Impl.h"
 
 #include "../../3DF/3DF.Utility.h"
@@ -26,7 +28,6 @@ H3DF::CanvasImpl::CanvasImpl()
 	if (nullptr == m_pcModel) {
 		assert(false);
 	}
-
 }
 
 H3DF::CanvasImpl::~CanvasImpl()
