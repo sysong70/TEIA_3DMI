@@ -332,10 +332,26 @@ void KERNEL::Session::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 
 void KERNEL::Session::KeyboardSignal(Json::Object & cInObject)
 {
-	SessionImpl * pcImpl = (SessionImpl *)m_pcImpl;
-	if (nullptr == pcImpl) { DEBUG_RETURN; }
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+#ifdef _DEBUG
+	Json::Object cTestObject(cInObject);
+	CString strText;
+	cTestObject.Stringify(strText);
+#endif
+
+	//pcImpl->Select()
 
 	pcImpl->GetCanvas().KeyboardInput(cInObject);
+}
+
+void KERNEL::Session::CancelSignal()
+{
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->Select().UnhighlightEverything();
 }
 
 //== View 관련 함수 ==================================================================================
