@@ -25,13 +25,23 @@ namespace H3DF
 
 		bool Empty() const;
 
+        bool Equals(TextureOptionsKit const & cInKit) const;
 		bool operator == (TextureOptionsKit const & cInKit) const;
 		bool operator != (TextureOptionsKit const & cInKit) const;
 
-
+        TextureOptionsKit & SetDecal(bool bInState);
+        TextureOptionsKit & SetDownSampling(bool bInState);
+        TextureOptionsKit & SetModulation(bool bInState);
+        TextureOptionsKit & SetParameterOffset(size_t nInSffset);
         TextureOptionsKit & SetParameterizationSource(Material::Texture::Parameterization cInSource);
+        TextureOptionsKit & SetTiling(Material::Texture::Tiling eInTiling);
+        TextureOptionsKit & SetInterpolationFilter(Material::Texture::Interpolation eInFilter);
+        TextureOptionsKit & SetDecimationFilter(Material::Texture::Decimation eInFilter);
+        TextureOptionsKit & SetTransformMatrix(MatrixKit const & cInTransform);
+        TextureOptionsKit & SetValueScale(float fInMin, float fInMax);
 
         bool ShowParameterizationSource(Material::Texture::Parameterization & cOutSource) const;
+        bool ShowTransformMatrix(MatrixKit & cOutTransform) const;
     };
 
     class API_3DF TextureDefinition : public Definition {

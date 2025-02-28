@@ -385,7 +385,7 @@ namespace H3DF {
 
 		size_t GetAssociatedEntityCount() const;
 		void GetAssociatedEntities(size_t & nOutCount, PMI *& pcOutEntities) const;
-		// 			void SetAssociatedEntities(unsigned int in_count, PMI const in_entities[]);
+// 		void SetAssociatedEntities(unsigned int in_count, PMI const in_entities[]);
 /*
 		void GetCamera(Point & out_position,
 			Point & out_target,

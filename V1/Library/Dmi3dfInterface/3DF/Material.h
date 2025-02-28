@@ -112,8 +112,6 @@ namespace H3DF
 
 				// Use the (x, y, z) coordinates for the object after transforms have been applied for the texture parameters.
 				World,
-
-				None
 			};
 
 			// Enumeration of the tiling modes for textures.
@@ -131,7 +129,7 @@ namespace H3DF
 
 				// The texture will get mapped normally for parameters in the range [0,1], but parameters outside that range will act as if the
 				// texture at that location is transparent.
-				Trim
+				Trim, 
 			};
 
 			//Enumeration of the various interpolation filters for textures.  These are used when the texture needs to be magnified.

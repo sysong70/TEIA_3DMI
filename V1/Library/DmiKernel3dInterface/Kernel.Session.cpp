@@ -634,7 +634,6 @@ void KERNEL::Session::TestCommand(int nId)
 			break;
 
 		case CUSTOM_3D_CMD_SYSONG_Test2: {
-
 			CString strFilePathName = H3DF::Utility::GetExecuteDirectory() + L"Image\\Texture\\zebra.jpeg";
 			H3DF::Image::ImportOptionsKit cOptions;
 			cOptions.SetFormat(H3DF::Image::Format::Jpeg);
@@ -652,6 +651,8 @@ void KERNEL::Session::TestCommand(int nId)
 			cImageDefinition = cPortfolio.DefineImage("zebra_texture", cImage);
 
  			cTextureOptionsKit.SetParameterizationSource(H3DF::Material::Texture::Parameterization::ReflectionVector);
+			cTextureOptionsKit.SetDownSampling(false);
+
  			cPortfolio.DefineTexture("zebra", cImageDefinition, cTextureOptionsKit);
 
 			cModel.GetMaterialMappingControl().SetFaceTexture("zebra", H3DF::Material::Texture::Channel::EnvironmentTexture);
