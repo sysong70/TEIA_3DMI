@@ -7,17 +7,7 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-
-
-#define PRESET PresetClass_
-
-namespace PresetClass_
-{
-}
-
-
-
-using namespace namespace_;
+//**************************************************************************************************
 
 BEGIN_MESSAGE_MAP(class_, CWnd)
 END_MESSAGE_MAP()

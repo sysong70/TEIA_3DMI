@@ -1,7 +1,9 @@
 ﻿#include "stdafx.h"
+
 #include "Application.h"
+#include "AppSetting.h"
 #include "Renderer.h"
-#include "SignalArgs.h"
+#include "SignalParams.h"
 #include "UserIO.h"
 
 //**************************************************************************************************
@@ -16,14 +18,6 @@ HMODULE Application::Instance = nullptr;
 Application TheApp;
 
 //--------------------------------------------------------------------------------------------------
-
-Signal::Delivery& Application::GetDelivery(int viewId)
-{
-	TheDelivery.ViewId = viewId;
-	return TheDelivery;
-}
-
-
 
 void Application::SetLanguage(int value)
 {
@@ -152,23 +146,23 @@ bool Application::ReceiveSignalFromUi(const wchar_t* pContent)
 
 	int signalTarget = -1;
 	int signalAction = -1;
-	SignalArgs::Base* signal = SignalArgs::Base::CreateInstance(root, signalTarget, signalAction);
+	SignalParams* signal = SignalParams::CreateInstance(root, signalTarget, signalAction);
 
 	if (signal == nullptr) {
-		if ((Signal::Target)signalTarget == Signal::Target::Application) {
-			Signal::Application::Action action = (Signal::Application::Action)signalAction;
+		if ((Sgn::ETarget)signalTarget == Sgn::ETarget::Application) {
+			SgnApplication::Action action = (SgnApplication::Action)signalAction;
 
 			switch (action) {
-				case Signal::Application::Action::OnInitInstance:
-					Initialize();
-					return true;
+			case SgnApplication::Action::OnInitInstance:
+				Initialize();
+				return true;
 
-				case Signal::Application::Action::OnExitInstance:
-					Terminate();
-					return true;
+			case SgnApplication::Action::OnExitInstance:
+				Terminate();
+				return true;
 
-				default:
-					return false;
+			default:
+				return false;
 			}
 		}
 		else {
@@ -180,11 +174,16 @@ bool Application::ReceiveSignalFromUi(const wchar_t* pContent)
 	if ((pRenderer = Find(signal->ViewId)) != nullptr) {
 	}
 	else {
-		pRenderer = new Renderer();
+		pRenderer = new Renderer(signal->ViewId, SendSignalFp, AstBoolean(UseThreadIo));
 		AddNew(signal->ViewId, pRenderer);
 	}
 
-	pRenderer->PostSignal(signal);
+	if (AstBoolean(UseThreadIo)) {
+		pRenderer->PostSignal(signal);
+	}
+	else {
+		pRenderer->SendSignal(signal);
+	}
 
 	return true;
 }

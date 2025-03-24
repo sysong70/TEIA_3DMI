@@ -1,4 +1,5 @@
 ﻿#include "stdafx.h"
+
 #include "Common_Define.h"
 
 #include <locale>

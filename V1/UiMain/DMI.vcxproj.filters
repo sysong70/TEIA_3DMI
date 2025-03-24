@@ -1,545 +1,572 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Dialog.Base.cpp">
+    <ClCompile Include="Dlg.Base.cpp">
       <Filter>Dialog</Filter>
     </ClCompile>
-    <ClCompile Include="Dialog.Standard.cpp">
+    <ClCompile Include="Dlg.Standard.cpp">
       <Filter>Dialog</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Json.cpp">
-      <Filter>Common</Filter>
+      <Filter>.Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\WStr.cpp">
-      <Filter>Common</Filter>
+      <Filter>.Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Path.cpp">
-      <Filter>Common</Filter>
+      <Filter>.Common</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
-      <Filter>Main</Filter>
+      <Filter>.Main</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Common_Define.cpp">
-      <Filter>Common</Filter>
+      <Filter>.Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Fio.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="Connector.cpp">
-      <Filter>Signal\Connector</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.cpp">
-      <Filter>Window</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Library\Signal\Signal.cpp">
-      <Filter>Signal</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.LayerPanel.cpp">
-      <Filter>Component\Panel</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.ModelPanel.cpp">
-      <Filter>Component\Panel</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.ViewPanel.cpp">
-      <Filter>Component\Panel</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.ScenePanel.cpp">
-      <Filter>Component\Panel</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>Component</Filter>
-    </ClCompile>
-    <ClCompile Include="Facility.CommandIndexer.cpp">
-      <Filter>Facility\Command</Filter>
-    </ClCompile>
-    <ClCompile Include="Facility.cpp">
-      <Filter>Facility</Filter>
+      <Filter>.Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\Dir.cpp">
-      <Filter>Common</Filter>
+      <Filter>.Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Library\Common\File.cpp">
-      <Filter>Common</Filter>
+      <Filter>.Common</Filter>
     </ClCompile>
-    <ClCompile Include="Dialog.cpp">
-      <Filter>Dialog</Filter>
+    <ClCompile Include="Ast.Base.cpp">
+      <Filter>Asset</Filter>
     </ClCompile>
-    <ClCompile Include="Control.cpp">
-      <Filter>Control</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.RibbonBar.cpp">
-      <Filter>Component\MainFrame</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.StatusBar.cpp">
-      <Filter>Component\MainFrame</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.TaskBar.cpp">
-      <Filter>Component\MainFrame</Filter>
-    </ClCompile>
-    <ClCompile Include="Control.TreeCtrlEx.cpp">
-      <Filter>Control\Tree</Filter>
-    </ClCompile>
-    <ClCompile Include="Control.TreePropList.cpp">
-      <Filter>Control\Tree</Filter>
-    </ClCompile>
-    <ClCompile Include="Control.ToolBar.cpp">
-      <Filter>Control\ToolBar</Filter>
-    </ClCompile>
-    <ClCompile Include="Control.HistoryBar.cpp">
-      <Filter>Control\ToolBar</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.PanelBar.cpp">
-      <Filter>Component\MainFrame</Filter>
-    </ClCompile>
-    <ClCompile Include="Facility.Base.cpp">
-      <Filter>Facility</Filter>
-    </ClCompile>
-    <ClCompile Include="Command.Base.cpp">
+    <ClCompile Include="Cmd.Base.cpp">
       <Filter>Command</Filter>
     </ClCompile>
-    <ClCompile Include="Control.Panel.cpp">
-      <Filter>Control\Panel</Filter>
-    </ClCompile>
-    <ClCompile Include="Control.TaskPanel.cpp">
-      <Filter>Control\Panel</Filter>
-    </ClCompile>
-    <ClCompile Include="Command.Test.cpp">
-      <Filter>Working</Filter>
-    </ClCompile>
-    <ClCompile Include="Dialog.AppOptions.cpp">
-      <Filter>Dialog\Modal</Filter>
-    </ClCompile>
-    <ClCompile Include="Dialog.ObjectSnaps.cpp">
-      <Filter>Dialog\Modaless</Filter>
-    </ClCompile>
-    <ClCompile Include="Dialog.ProgressLog.cpp">
-      <Filter>Dialog\Modaless</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.Application.cpp">
-      <Filter>Window\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.ChildFrame.cpp">
-      <Filter>Window\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.MainFrame.cpp">
-      <Filter>Window\Main</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.Document.cpp">
-      <Filter>Window\View</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.View.cpp">
-      <Filter>Window\View</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.View2d.cpp">
-      <Filter>Window\View</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.View3d.cpp">
-      <Filter>Window\View</Filter>
-    </ClCompile>
-    <ClCompile Include="Facility.AppOptions.cpp">
-      <Filter>Facility\Data</Filter>
-    </ClCompile>
-    <ClCompile Include="Facility.AppResources.cpp">
-      <Filter>Facility\Data</Filter>
-    </ClCompile>
-    <ClCompile Include="Control.Property.cpp">
-      <Filter>Control\Property</Filter>
-    </ClCompile>
-    <ClCompile Include="Control.PropList.cpp">
-      <Filter>Control\Property</Filter>
-    </ClCompile>
-    <ClCompile Include="Command.VisualEffects3d.cpp">
-      <Filter>Command\3D</Filter>
-    </ClCompile>
-    <ClCompile Include="Control.CheckListBox.cpp">
-      <Filter>Control\Other</Filter>
-    </ClCompile>
-    <ClCompile Include="Control.TabWnd.cpp">
-      <Filter>Control\Other</Filter>
-    </ClCompile>
-    <ClCompile Include="Dialog.DebugTracer.cpp">
-      <Filter>Dialog\Modaless</Filter>
-    </ClCompile>
-    <ClCompile Include="Dialog.Folders.cpp">
-      <Filter>Dialog\Modal</Filter>
-    </ClCompile>
     <ClCompile Include="..\Library\Signal\WorkerThread.cpp">
-      <Filter>Signal</Filter>
+      <Filter>.Signal</Filter>
     </ClCompile>
-    <ClCompile Include="Control.PopupMenu.cpp">
-      <Filter>Control\Other</Filter>
+    <ClCompile Include="..\Library\Signal\Signal2d.cpp">
+      <Filter>.Signal</Filter>
     </ClCompile>
-    <ClCompile Include="Graphic.cpp">
-      <Filter>Graphic</Filter>
+    <ClCompile Include="..\Library\Signal\Signal3d.cpp">
+      <Filter>.Signal</Filter>
     </ClCompile>
-    <ClCompile Include="Graphic.Manager.cpp">
-      <Filter>Graphic</Filter>
+    <ClCompile Include="Cmd.Circle2d.cpp">
+      <Filter>Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Cmd.Line2d.cpp">
+      <Filter>Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Cmd.VisualEffects3d.cpp">
+      <Filter>Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.TreePropList.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.TreeCtrlEx.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.cpp">
+      <Filter>Control\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.CheckListBox.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.ContextMenu.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.PopupMenu.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.Properties.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.PropList.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.ToolBar.cpp">
+      <Filter>Control</Filter>
     </ClCompile>
     <ClCompile Include="Geometry.cpp">
-      <Filter>Graphic</Filter>
+      <Filter>Working</Filter>
     </ClCompile>
     <ClCompile Include="Geometry.UserDataFiler.cpp">
-      <Filter>Graphic</Filter>
+      <Filter>Working</Filter>
     </ClCompile>
-    <ClCompile Include="Control.CoordEdit.cpp">
-      <Filter>Control\Property</Filter>
+    <ClCompile Include="Graphic.cpp">
+      <Filter>Working</Filter>
     </ClCompile>
-    <ClCompile Include="Command.Circle2d.cpp">
-      <Filter>Command\2D</Filter>
+    <ClCompile Include="Graphic.Manager.cpp">
+      <Filter>Working</Filter>
     </ClCompile>
-    <ClCompile Include="Control.ContextMenu.cpp">
-      <Filter>Control\Other</Filter>
+    <ClCompile Include="Cmd.Test.cpp">
+      <Filter>Command</Filter>
     </ClCompile>
-    <ClCompile Include="Command.Line2d.cpp">
-      <Filter>Command\2D</Filter>
+    <ClCompile Include="Dlg.cpp">
+      <Filter>Dialog\Base</Filter>
     </ClCompile>
-    <ClCompile Include="Component.CommandBar.cpp">
-      <Filter>Component\MainFrame</Filter>
+    <ClCompile Include="Dlg.ProgressBar.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Dlg.ObjectSnaps.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Dlg.DebugTracer.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Dlg.Folders.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Dlg.AppOptions.cpp">
+      <Filter>Dialog</Filter>
+    </ClCompile>
+    <ClCompile Include="Wnd.cpp">
+      <Filter>Window\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Wnd.Application.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Wnd.ChildFrame.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Wnd.MainFrame.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Wnd.Document.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Wnd.View.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Wnd.View2d.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Wnd.View3d.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Cmd.Indexer.cpp">
+      <Filter>Command</Filter>
+    </ClCompile>
+    <ClCompile Include="Ast.cpp">
+      <Filter>Asset\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Ast.AppOptions.cpp">
+      <Filter>Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="Ast.AppResources.cpp">
+      <Filter>Asset</Filter>
+    </ClCompile>
+    <ClCompile Include="Cmd.cpp">
+      <Filter>Command\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.Panel2dLayer.cpp">
+      <Filter>SidePanel</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.Panel3dModel.cpp">
+      <Filter>SidePanel</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.Panel3dLayer.cpp">
+      <Filter>SidePanel</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.Panels.cpp">
+      <Filter>SidePanel</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.Panel3dScene.cpp">
+      <Filter>SidePanel</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.Panel3dView.cpp">
+      <Filter>SidePanel</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.PanelBar.cpp">
+      <Filter>SidePanel</Filter>
+    </ClCompile>
+    <ClCompile Include="Cls.UserIoManager.cpp">
+      <Filter>UserIO</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.StatusBar.cpp">
+      <Filter>Window\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.RibbonBar.cpp">
+      <Filter>Window\Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.TaskPanel.cpp">
+      <Filter>TaskPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.TaskBar.cpp">
+      <Filter>TaskPanel</Filter>
+    </ClCompile>
+    <ClCompile Include="Uio.cpp">
+      <Filter>UserIO\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.TabWnd.cpp">
+      <Filter>SidePanel</Filter>
+    </ClCompile>
+    <ClCompile Include="Cls.PanelManager.cpp">
+      <Filter>SidePanel</Filter>
+    </ClCompile>
+    <ClCompile Include="Cls.DioContainer.cpp">
+      <Filter>UserIO</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.CoordEdit.cpp">
+      <Filter>Control</Filter>
+    </ClCompile>
+    <ClCompile Include="Cnt.cpp">
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.DynamicInput.cpp">
+      <Filter>UserIO</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.CommandBar.cpp">
+      <Filter>UserIO</Filter>
+    </ClCompile>
+    <ClCompile Include="Wnd.Frame.cpp">
+      <Filter>Window\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Ctl.TaskIoBar.cpp">
+      <Filter>TaskPanel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Command.Common.h">
-      <Filter>Facility\Command</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Facility.h">
-      <Filter>Facility</Filter>
-    </ClInclude>
-    <ClInclude Include="Dialog.Base.h">
+    <ClInclude Include="Dlg.Base.h">
       <Filter>Dialog</Filter>
     </ClInclude>
-    <ClInclude Include="Dialog.h">
-      <Filter>Dialog</Filter>
-    </ClInclude>
-    <ClInclude Include="Dialog.Standard.h">
+    <ClInclude Include="Dlg.Standard.h">
       <Filter>Dialog</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Json.h">
-      <Filter>Common</Filter>
+      <Filter>.Common</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>Main\Resource</Filter>
+      <Filter>.Main\Resource</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\WStr.h">
-      <Filter>Common</Filter>
+      <Filter>.Common</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>Main\Resource</Filter>
+      <Filter>.Main\Resource</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Path.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.h">
-      <Filter>Window</Filter>
+      <Filter>.Common</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
-      <Filter>Main</Filter>
+      <Filter>.Main</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Common_Define.h">
-      <Filter>Common</Filter>
+      <Filter>.Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Fio.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="Connector.h">
-      <Filter>Signal\Connector</Filter>
-    </ClInclude>
-    <ClInclude Include="Command.Resource.h">
-      <Filter>Facility\Command</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Library\Signal\Signal.h">
-      <Filter>Signal</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.LayerPanel.h">
-      <Filter>Component\Panel</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.ModelPanel.h">
-      <Filter>Component\Panel</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.ViewPanel.h">
-      <Filter>Component\Panel</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.ScenePanel.h">
-      <Filter>Component\Panel</Filter>
-    </ClInclude>
-    <ClInclude Include="Facility.CommandIndexer.h">
-      <Filter>Facility\Command</Filter>
+      <Filter>.Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Dir.h">
-      <Filter>Common</Filter>
+      <Filter>.Common</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\File.h">
-      <Filter>Common</Filter>
+      <Filter>.Common</Filter>
     </ClInclude>
-    <ClInclude Include="Control.h">
-      <Filter>Control</Filter>
+    <ClInclude Include="Ast.Base.h">
+      <Filter>Asset</Filter>
     </ClInclude>
-    <ClInclude Include="Component.RibbonBar.h">
-      <Filter>Component\MainFrame</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.StatusBar.h">
-      <Filter>Component\MainFrame</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.TaskBar.h">
-      <Filter>Component\MainFrame</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.TreeCtrlEx.h">
-      <Filter>Control\Tree</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.TreePropList.h">
-      <Filter>Control\Tree</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.ToolBar.h">
-      <Filter>Control\ToolBar</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.HistoryBar.h">
-      <Filter>Control\ToolBar</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.PanelBar.h">
-      <Filter>Component\MainFrame</Filter>
-    </ClInclude>
-    <ClInclude Include="Facility.Base.h">
-      <Filter>Facility</Filter>
-    </ClInclude>
-    <ClInclude Include="Command.h">
+    <ClInclude Include="Cmd.Base.h">
       <Filter>Command</Filter>
-    </ClInclude>
-    <ClInclude Include="Command.Base.h">
-      <Filter>Command</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.Panel.h">
-      <Filter>Control\Panel</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.TaskPanel.h">
-      <Filter>Control\Panel</Filter>
-    </ClInclude>
-    <ClInclude Include="Command.Test.h">
-      <Filter>Working</Filter>
-    </ClInclude>
-    <ClInclude Include="Dialog.AppOptions.h">
-      <Filter>Dialog\Modal</Filter>
-    </ClInclude>
-    <ClInclude Include="Dialog.ObjectSnaps.h">
-      <Filter>Dialog\Modaless</Filter>
-    </ClInclude>
-    <ClInclude Include="Dialog.ProgressLog.h">
-      <Filter>Dialog\Modaless</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.Application.h">
-      <Filter>Window\Main</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.ChildFrame.h">
-      <Filter>Window\Main</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.MainFrame.h">
-      <Filter>Window\Main</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.Document.h">
-      <Filter>Window\View</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.View.h">
-      <Filter>Window\View</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.View2d.h">
-      <Filter>Window\View</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.View3d.h">
-      <Filter>Window\View</Filter>
-    </ClInclude>
-    <ClInclude Include="Facility.AppOptions.h">
-      <Filter>Facility\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Facility.AppResources.h">
-      <Filter>Facility\Data</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.Property.h">
-      <Filter>Control\Property</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.PropList.h">
-      <Filter>Control\Property</Filter>
-    </ClInclude>
-    <ClInclude Include="Command.VisualEffects3d.h">
-      <Filter>Command\3D</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.CheckListBox.h">
-      <Filter>Control\Other</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.TabWnd.h">
-      <Filter>Control\Other</Filter>
-    </ClInclude>
-    <ClInclude Include="Dialog.DebugTracer.h">
-      <Filter>Dialog\Modaless</Filter>
-    </ClInclude>
-    <ClInclude Include="Dialog.Folders.h">
-      <Filter>Dialog\Modal</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Signal\WorkerThread.h">
-      <Filter>Signal</Filter>
-    </ClInclude>
-    <ClInclude Include="Control.PopupMenu.h">
-      <Filter>Control\Other</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphic.h">
-      <Filter>Graphic</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphic.Manager.h">
-      <Filter>Graphic</Filter>
-    </ClInclude>
-    <ClInclude Include="Geometry.h">
-      <Filter>Graphic</Filter>
-    </ClInclude>
-    <ClInclude Include="Geometry.UserDataFiler.h">
-      <Filter>Graphic</Filter>
+      <Filter>.Signal</Filter>
     </ClInclude>
     <ClInclude Include="..\Library\Common\Template.h">
-      <Filter>Common</Filter>
+      <Filter>.Common</Filter>
     </ClInclude>
-    <ClInclude Include="Control.CoordEdit.h">
-      <Filter>Control\Property</Filter>
+    <ClInclude Include="..\Library\Signal\Signal2d.h">
+      <Filter>.Signal</Filter>
     </ClInclude>
-    <ClInclude Include="Command.Circle2d.h">
-      <Filter>Command\2D</Filter>
+    <ClInclude Include="..\Library\Signal\Signal3d.h">
+      <Filter>.Signal</Filter>
     </ClInclude>
-    <ClInclude Include="Control.ContextMenu.h">
-      <Filter>Control\Other</Filter>
+    <ClInclude Include="Cmd.Circle2d.h">
+      <Filter>Command</Filter>
     </ClInclude>
-    <ClInclude Include="Command.Line2d.h">
-      <Filter>Command\2D</Filter>
+    <ClInclude Include="Cmd.Line2d.h">
+      <Filter>Command</Filter>
     </ClInclude>
-    <ClInclude Include="Component.CommandBar.h">
-      <Filter>Component\MainFrame</Filter>
+    <ClInclude Include="Cmd.VisualEffects3d.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.TreePropList.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.TreeCtrlEx.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.h">
+      <Filter>Control\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.CheckListBox.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.ContextMenu.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.PopupMenu.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.Properties.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.PropList.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.ToolBar.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Cmd.h">
+      <Filter>Command\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry.h">
+      <Filter>Working</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry.UserDataFiler.h">
+      <Filter>Working</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphic.h">
+      <Filter>Working</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphic.Manager.h">
+      <Filter>Working</Filter>
+    </ClInclude>
+    <ClInclude Include="Cmd.Test.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Dlg.h">
+      <Filter>Dialog\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Dlg.ProgressBar.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Dlg.ObjectSnaps.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Dlg.DebugTracer.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Dlg.Folders.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Dlg.AppOptions.h">
+      <Filter>Dialog</Filter>
+    </ClInclude>
+    <ClInclude Include="Wnd.h">
+      <Filter>Window\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Wnd.Application.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Wnd.ChildFrame.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Wnd.MainFrame.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Wnd.Document.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Wnd.View.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Wnd.View2d.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Wnd.View3d.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Cmd.Common.h">
+      <Filter>Command\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Cmd.Resource.h">
+      <Filter>Command\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Cmd.Indexer.h">
+      <Filter>Command</Filter>
+    </ClInclude>
+    <ClInclude Include="Ast.h">
+      <Filter>Asset\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Ast.AppOptions.h">
+      <Filter>Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Ast.AppResources.h">
+      <Filter>Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.Panel2dLayer.h">
+      <Filter>SidePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.Panel3dModel.h">
+      <Filter>SidePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.Panel3dLayer.h">
+      <Filter>SidePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.Panels.h">
+      <Filter>SidePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.Panel3dScene.h">
+      <Filter>SidePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.Panel3dView.h">
+      <Filter>SidePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.PanelBar.h">
+      <Filter>SidePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="Cls.UserIoManager.h">
+      <Filter>UserIO</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.StatusBar.h">
+      <Filter>Window\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.RibbonBar.h">
+      <Filter>Window\Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.TaskPanel.h">
+      <Filter>TaskPanel</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.TaskBar.h">
+      <Filter>TaskPanel</Filter>
+    </ClInclude>
+    <ClInclude Include="Dio.h">
+      <Filter>UserIO</Filter>
+    </ClInclude>
+    <ClInclude Include="Uio.h">
+      <Filter>UserIO\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.TabWnd.h">
+      <Filter>SidePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="Cls.PanelManager.h">
+      <Filter>SidePanel</Filter>
+    </ClInclude>
+    <ClInclude Include="Cls.DioContainer.h">
+      <Filter>UserIO</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.CoordEdit.h">
+      <Filter>Control</Filter>
+    </ClInclude>
+    <ClInclude Include="Cnt.h">
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.DynamicInput.h">
+      <Filter>UserIO</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.CommandBar.h">
+      <Filter>UserIO</Filter>
+    </ClInclude>
+    <ClInclude Include="Wnd.Frame.h">
+      <Filter>Window\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Ctl.TaskIoBar.h">
+      <Filter>TaskPanel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="TODO.xml">
-      <Filter>Main\Resource</Filter>
+      <Filter>.Main\Resource</Filter>
     </Xml>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\DMI.ico">
-      <Filter>Main\Resource</Filter>
+      <Filter>.Main\Resource</Filter>
     </Image>
     <Image Include="res\DMIDoc.ico">
-      <Filter>Main\Resource</Filter>
+      <Filter>.Main\Resource</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
     <None Include="RES\UI.json">
-      <Filter>Main\Resource</Filter>
+      <Filter>.Main\Resource</Filter>
     </None>
     <None Include="RES\DMI_ENU.rc2">
-      <Filter>Main\Resource</Filter>
+      <Filter>.Main\Resource</Filter>
     </None>
     <None Include="RES\DMI_KOR.rc2">
-      <Filter>Main\Resource</Filter>
+      <Filter>.Main\Resource</Filter>
     </None>
     <None Include="RES\DMI.rc2">
-      <Filter>Main\Resource</Filter>
+      <Filter>.Main\Resource</Filter>
     </None>
     <None Include="RES\Data.Preferences.json">
-      <Filter>Main\Resource</Filter>
+      <Filter>.Main\Resource</Filter>
     </None>
     <None Include="RES\Data.FileOptions.json">
-      <Filter>Main\Resource</Filter>
+      <Filter>.Main\Resource</Filter>
     </None>
     <None Include="RES\Dictionary.json">
-      <Filter>Main\Resource</Filter>
+      <Filter>.Main\Resource</Filter>
     </None>
     <None Include="RES\Dialogs.json">
-      <Filter>Main\Resource</Filter>
+      <Filter>.Main\Resource</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Component">
-      <UniqueIdentifier>{ba176a78-43a4-410d-a9fa-e45c827bf1c7}</UniqueIdentifier>
+    <Filter Include="Working">
+      <UniqueIdentifier>{4d7c4082-24b8-4594-a68a-7b5f780f85b0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Dialog">
-      <UniqueIdentifier>{926466f9-0eab-4599-90a4-dfdeb1480304}</UniqueIdentifier>
+    <Filter Include=".Common">
+      <UniqueIdentifier>{fb2d04f0-eb3c-414a-af01-e993443a5070}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Window">
-      <UniqueIdentifier>{de91bf0f-f3ed-49a6-8ff6-11682b4caf5f}</UniqueIdentifier>
+    <Filter Include=".Signal">
+      <UniqueIdentifier>{3fa6ca85-306e-4855-8675-3bbd31f1539e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Facility">
+    <Filter Include=".Main">
+      <UniqueIdentifier>{5626235d-04b2-48ff-aa6a-b189a3f69c04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include=".Main\Resource">
+      <UniqueIdentifier>{c42b87a4-4dc7-4b9a-9df2-192721ac7010}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Asset">
       <UniqueIdentifier>{c01d14a0-5142-4118-a49b-dd83bfce121e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Facility\Command">
-      <UniqueIdentifier>{107652ad-09a5-4c94-9c81-79e4c50396f8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Control">
-      <UniqueIdentifier>{54e5b7f9-b1c6-4146-9960-ef402a5e0520}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\Panel">
-      <UniqueIdentifier>{17e426a6-77e8-4a55-a4e4-86e17ed068a0}</UniqueIdentifier>
+    <Filter Include="Asset\Base">
+      <UniqueIdentifier>{38aede9a-7346-4dcd-8dd3-ec0fb85b2074}</UniqueIdentifier>
     </Filter>
     <Filter Include="Command">
       <UniqueIdentifier>{64d47e27-6764-45be-a7d0-d9f90367c89d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Control\Panel">
-      <UniqueIdentifier>{e7a6640c-e4cd-4f57-92f9-29435cfaf150}</UniqueIdentifier>
+    <Filter Include="Command\Base">
+      <UniqueIdentifier>{9d4018ff-d1c5-4b31-91a0-bd0f88257013}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Main">
-      <UniqueIdentifier>{5626235d-04b2-48ff-aa6a-b189a3f69c04}</UniqueIdentifier>
+    <Filter Include="Control">
+      <UniqueIdentifier>{54e5b7f9-b1c6-4146-9960-ef402a5e0520}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Main\Resource">
-      <UniqueIdentifier>{c42b87a4-4dc7-4b9a-9df2-192721ac7010}</UniqueIdentifier>
+    <Filter Include="Control\Base">
+      <UniqueIdentifier>{3b389266-d57c-4c57-a6f7-094b3a6715f8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Signal">
-      <UniqueIdentifier>{3fa6ca85-306e-4855-8675-3bbd31f1539e}</UniqueIdentifier>
+    <Filter Include="Dialog">
+      <UniqueIdentifier>{926466f9-0eab-4599-90a4-dfdeb1480304}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Signal\Connector">
-      <UniqueIdentifier>{548c7e7f-a4c4-46f5-87a3-25aed4147b06}</UniqueIdentifier>
+    <Filter Include="Dialog\Base">
+      <UniqueIdentifier>{9527ef4b-ce4c-4249-a0df-b78342468bbc}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Dialog\Modal">
-      <UniqueIdentifier>{2483c7ef-ee9e-4014-8f82-5d92b3adf1aa}</UniqueIdentifier>
+    <Filter Include="Window">
+      <UniqueIdentifier>{de91bf0f-f3ed-49a6-8ff6-11682b4caf5f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Dialog\Modaless">
-      <UniqueIdentifier>{bb1b9bb5-fe6d-47d6-b000-4797969f627f}</UniqueIdentifier>
+    <Filter Include="Window\Base">
+      <UniqueIdentifier>{8d34fff9-d072-49be-ae4a-8cb6190d8541}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Window\Main">
-      <UniqueIdentifier>{cd438507-f617-4e11-ab29-920a1019947b}</UniqueIdentifier>
+    <Filter Include="UserIO">
+      <UniqueIdentifier>{2af7bc8b-8808-4877-bcad-aaa400539b6a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Window\View">
-      <UniqueIdentifier>{4de0644d-3076-4abf-9df7-de3ab8d4112d}</UniqueIdentifier>
+    <Filter Include="Window\Controls">
+      <UniqueIdentifier>{a62cd94a-3f54-4a13-8b59-dd05cf4766d9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Facility\Data">
-      <UniqueIdentifier>{38aede9a-7346-4dcd-8dd3-ec0fb85b2074}</UniqueIdentifier>
+    <Filter Include="UserIO\Base">
+      <UniqueIdentifier>{06e07ae4-512d-4159-ad55-8396df9a23fb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Control\Tree">
-      <UniqueIdentifier>{3d17d7b6-2a80-4d06-a5c9-0cdaf14dc8bd}</UniqueIdentifier>
+    <Filter Include="TaskPanel">
+      <UniqueIdentifier>{7e481373-07a6-4252-b555-3082d5aee76b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Control\Property">
-      <UniqueIdentifier>{d5f01667-5334-4a2b-aedb-ddd6355ad409}</UniqueIdentifier>
+    <Filter Include="SidePanel">
+      <UniqueIdentifier>{ea858541-91e6-4605-bde9-be262877e562}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Control\ToolBar">
-      <UniqueIdentifier>{cbf0972b-db82-4dd9-a406-974efbc9634b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Component\MainFrame">
-      <UniqueIdentifier>{8cff23ec-11e5-4f51-a933-7b8a2f2d9fac}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Command\3D">
-      <UniqueIdentifier>{3dbe6d30-500a-4462-addc-2a0d0d2957ad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Control\Other">
-      <UniqueIdentifier>{1cbd6f4d-9366-4e60-89b9-bbab87803bde}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Working">
-      <UniqueIdentifier>{4d7c4082-24b8-4594-a68a-7b5f780f85b0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Graphic">
-      <UniqueIdentifier>{1e4d06cf-b066-4830-9114-d05eecd2f387}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Common">
-      <UniqueIdentifier>{fb2d04f0-eb3c-414a-af01-e993443a5070}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Command\2D">
-      <UniqueIdentifier>{f7d397b1-6473-45e2-9854-54cd76f95ceb}</UniqueIdentifier>
+    <Filter Include="UserIO\Windows">
+      <UniqueIdentifier>{4b055dd0-0455-41b4-9c23-846f14c04b3c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DMI.rc">
-      <Filter>Main\Resource</Filter>
+      <Filter>.Main\Resource</Filter>
     </ResourceCompile>
   </ItemGroup>
 </Project>

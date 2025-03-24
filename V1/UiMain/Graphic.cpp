@@ -1,4 +1,5 @@
 ﻿#include "stdafx.h"
+
 #include "Graphic.h"
 
 #ifdef _DEBUG

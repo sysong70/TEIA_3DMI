@@ -1,73 +1,25 @@
 ﻿#include "stdafx.h"
+
 #include "EventDelegator.h"
+
+#include <mutex>
 
 //**************************************************************************************************
 
-EventDelegator::EventDelegator()
-	: WorkerThread()
-{
-}
-
-
-
-EventDelegator::~EventDelegator()
-{
-}
-
-
-
-bool EventDelegator::PostSignal(int type, int id, SignalArgs::Base* pSignal)
-{
-	DEBUG_VALID(pSignal);
-	DEBUG_VALID(m_thread);
-
-	auto wrapper = std::make_shared<EventWrapper>(type, id, pSignal);
-	// Add signal to queue and notify worker thread
-	std::unique_lock<std::mutex> lock(m_mutex);
-	m_queue.push(wrapper);
-	m_condition.notify_one();
-
-	return true;
-}
-
-bool EventDelegator::PostSignal(SignalArgs::Base* pSignal)
-{
-	return PostSignal((int)WorkerThread::Event::Signal, pSignal->ViewId, pSignal);
-}
-
-
-
-void EventDelegator::PushSignal(SignalArgs::Base* pSignal)
-{
-	auto wrapper = std::make_shared<EventWrapper>((int)WorkerThread::Event::Signal, pSignal->ViewId, pSignal);
-	m_queue.push(wrapper);
-}
-
-
-
-void EventDelegator::SendSignal(SignalArgs::Base* pSignal)
-{
-	// WARNING - check validation
-	auto wrapper = std::make_shared<EventWrapper>((int)WorkerThread::Event::Signal, pSignal->ViewId, pSignal);
-	OnSignal(wrapper);
-}
-
-
-
 bool EventDelegator::OnSignal(std::shared_ptr<EventWrapper> wrapper)
 {
-#define OnAction(x) Signal::View::Action::On##x: On##x(pSignal); break
+#define OnAction(x) SgnView::Action::On##x: On##x(pSignal); break
 
 	WorkerThread::Event e = (WorkerThread::Event)wrapper->Type;
 
 	if (e == WorkerThread::Event::Signal) {
-		SignalArgs::Base* pSignal = (SignalArgs::Base*)wrapper->EventData;
+		SignalParams* pSignal = (SignalParams*)wrapper->EventData;
 		if (pSignal == nullptr) {
 			RETURN_FALSE;
 		}
 
-		if (pSignal->Target == Signal::Target::View) {
-			switch ((Signal::View::Action)pSignal->Action) {
+		if (pSignal->Target == Sgn::ETarget::View) {
+			switch ((SgnView::Action)pSignal->Action) {
 			case OnAction(Command);
 			case OnAction(ContextCommand);
 			case OnAction(KeyDown);
@@ -102,4 +54,57 @@ bool EventDelegator::OnSignal(std::shared_ptr<EventWrapper> wrapper)
 	return true;
 
 #undef OnAction
+}
+
+//--------------------------------------------------------------------------------------------------
+
+EventDelegator::EventDelegator()
+	: WorkerThread()
+{
+}
+
+
+
+EventDelegator::~EventDelegator()
+{
+}
+
+
+
+bool EventDelegator::PostSignal(int type, int id, SignalParams* pSignal)
+{
+	DEBUG_VALID(pSignal);
+	DEBUG_VALID(ThreadPtr);
+
+	auto wrapper = std::make_shared<EventWrapper>(type, id, pSignal);
+	// Add signal to queue and notify worker thread
+	std::unique_lock<std::mutex> lock(ThreadMutex);
+	SignalQueue.push(wrapper);
+	ThreadCondition.notify_one();
+
+	return true;
+}
+
+bool EventDelegator::PostSignal(SignalParams* pSignal)
+{
+	return PostSignal((int)WorkerThread::Event::Signal, pSignal->ViewId, pSignal);
+}
+
+
+
+bool EventDelegator::PushSignal(SignalParams* pSignal)
+{
+	auto wrapper = std::make_shared<EventWrapper>((int)WorkerThread::Event::Signal, pSignal->ViewId, pSignal);
+	SignalQueue.push(wrapper);
+
+	return true;
+}
+
+
+
+bool EventDelegator::SendSignal(SignalParams* pSignal)
+{
+	// WARNING - check validation
+	auto wrapper = std::make_shared<EventWrapper>((int)WorkerThread::Event::Signal, pSignal->ViewId, pSignal);
+	return OnSignal(wrapper);
 }

@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
-#include "Renderer.h"
+
 #include "Application.h"
+#include "Renderer.h"
 
 #include "AbstractViewPE.h"
 #include "ColorMapping.h"
@@ -9,7 +10,8 @@
 #include "Ge/GePlane.h"
 #include "RxVariantValue.h"
 
-const double ZOOM_FACTOR = 0.8;
+#include "File.h"
+#include <atltypes.h>
 
 //**************************************************************************************************
 
@@ -21,14 +23,14 @@ CoordConvertor::CoordConvertor()
 
 CoordConvertor::~CoordConvertor(void)
 {
-	m_pDevice = NULL;
+	DevicePtr = NULL;
 }
 
 
 
 void CoordConvertor::Initialize(OdGsLayoutHelperPtr pDevice)
 {
-	m_pDevice = pDevice;
+	DevicePtr = pDevice;
 }
 
 
@@ -47,7 +49,6 @@ OdGePoint3d CoordConvertor::ToEyeToWorld(int x, int y)
 	}
 
 	wcsPoint.transformBy((pView->screenMatrix() * pView->projectionMatrix()).inverse());
-
 	wcsPoint.z = 0.0;
 	wcsPoint.transformBy(OdAbstractViewPEPtr(pView)->eyeToWorld(pView));
 
@@ -57,6 +58,21 @@ OdGePoint3d CoordConvertor::ToEyeToWorld(int x, int y)
 OdGePoint3d CoordConvertor::ToEyeToWorld(CPoint point)
 {
 	return ToEyeToWorld(point.x, point.y);
+}
+
+
+
+CPoint CoordConvertor::ToWorldToEye(const OdGePoint3d& wcsPoint)
+{
+	OdGsViewPtr pView = ActiveView();
+	if (pView.isNull()) {
+		return {};
+	}
+
+	OdGePoint3d eyePoint = wcsPoint;
+	eyePoint.transformBy(pView->worldToDeviceMatrix());
+
+	return CPoint(eyePoint.x, eyePoint.y);
 }
 
 
@@ -111,10 +127,10 @@ OdGePoint3d CoordConvertor::ToScreenCoord(const OdGePoint3d& wcsPoint)
 	}
 
 	OdGePoint3d screenPoint(wcsPoint);
-	OdGsClientViewInfo viewInfo;
-	pView->clientViewInfo(viewInfo);
+	OdGsClientViewInfo cvi;
+	pView->clientViewInfo(cvi);
 
-	OdRxObjectPtr pObj = OdDbObjectId(viewInfo.viewportObjectId).openObject();
+	OdRxObjectPtr pObj = OdDbObjectId(cvi.viewportObjectId).openObject();
 	OdAbstractViewPEPtr pVp(pObj);
 
 	OdGeVector3d vecY = pVp->upVector(pObj);
@@ -139,39 +155,22 @@ OdGePoint3d CoordConvertor::ToScreenCoord(CPoint point)
 
 OdGsViewPtr CoordConvertor::ActiveView()
 {
-	return m_pDevice->activeView();
+	return DevicePtr->activeView();
 }
 
 //**************************************************************************************************
 
-Renderer::Renderer()
-{
-	// TEST
-	//m_clrBackground = RGB(0x3b, 0x44, 0x53);
-	m_clrBackground = RGB(0x21, 0x28, 0x30);
-}
-
-
-
-Renderer::~Renderer()
-{
-	m_io.Terminate();
-}
-
-
-
-bool Renderer::PostSignal(SignalArgs::Base* pSignal)
+bool Renderer::PostSignal(SignalParams* pSignal)
 {
 	DEBUG_VALID(pSignal);
 
 	// TODO - filter signal
-	if (pSignal->Target == Signal::Target::View) {
-		switch ((Signal::View::Action)pSignal->Action) {
-		case Signal::View::Action::OnCommand:
-		case Signal::View::Action::OnInitialize:
-		case Signal::View::Action::OnMouseWheel:
-		case Signal::View::Action::OnPaint:
-		case Signal::View::Action::OnResize:
+	if (pSignal->Target == Sgn::ETarget::View) {
+		switch ((SgnView::Action)pSignal->Action) {
+		case SgnView::Action::OnInitialize:
+		case SgnView::Action::OnMouseWheel:
+		case SgnView::Action::OnPaint:
+		case SgnView::Action::OnResize:
 			return __super::PostSignal(pSignal);
 
 		default:
@@ -179,68 +178,92 @@ bool Renderer::PostSignal(SignalArgs::Base* pSignal)
 		}
 	}
 
-	return m_io.PostSignal(pSignal);
+	return UserIo.PostSignal(pSignal);
 }
 
 
 
-void Renderer::PostPaintSignal(bool lock)
+bool Renderer::SendSignal(SignalParams* pSignal)
 {
-	auto signal = new SignalArgs::Paint(m_nViewId);
-	if (lock) {
-		SendSignal(signal);
-	}
-	else {
-		PostSignal(signal);
-	}
-}
+	DEBUG_VALID(pSignal);
+	bool process = false;
 
+	if (pSignal->Target == Sgn::ETarget::View) {
+		switch ((SgnView::Action)pSignal->Action) {
+		case SgnView::Action::OnInitialize:
+			return __super::PostSignal(pSignal);
 
+		case SgnView::Action::OnMouseWheel:
+			OnMouseWheel(pSignal);
+			process = true;
+			break;
 
-bool Renderer::OnCommand(SignalArgs::Base* pSignal)
-{
-	SignalArgs::Command& signal = *(SignalArgs::Command*)pSignal;
+		case SgnView::Action::OnPaint:
+			OnPaint(pSignal);
+			process = true;
+			break;
 
-	if (signal.Id == EDIT_2D_CMD_Undo) {
-		if (m_pDatabase->hasUndoMark()) {
-			m_pDatabase->undoBack();
+		case SgnView::Action::OnResize:
+			OnResize(pSignal);
+			process = true;
+			break;
 
-			RedrawWindow();
+		default:
+			break;
+		}
+
+		if (process == false) {
+			return UserIo.SendSignal(pSignal);
 		}
 	}
-	else if (signal.Id == EDIT_2D_CMD_Redo) {
-		if (m_pDatabase->hasRedo()) {
-			m_pDatabase->redo();
-
-			RedrawWindow();
-		}
+	else if (pSignal->Target == Sgn::ETarget::UserIO) {
+		return UserIo.SendSignal(pSignal);
 	}
 	else {
-		return m_io.OnCommand(pSignal);
+		DEBUG_STOP;
 	}
 
+	REMOVE_POINTER(pSignal);
 	return true;
 }
 
 
 
-bool Renderer::OnInitialize(SignalArgs::Base* pSignal)
+bool Renderer::SendPaintSignal(bool useThread, SignalParams* pSignal)
 {
-	SignalArgs::Initialize* signal = (SignalArgs::Initialize*)pSignal;
-	DEBUG_VALID(signal);
-	DEBUG_VALID(signal->hWnd);
+	if (pSignal == nullptr) {
+		pSignal = new PaintSignal(ViewId);
+	}
 
-	m_nViewId = signal->ViewId;
-	m_hWnd = signal->hWnd;
+	if (useThread) {
+		return PostSignal(pSignal);
+	}
+	else {
+		return SendSignal(pSignal);
+	}
+}
+
+//--------------------------------------------------------------------------------------------------
+
+bool Renderer::OnInitialize(SignalParams* pSignal)
+{
+	InitializeSignal* signal = (InitializeSignal*)pSignal;
+	DEBUG_VALID(signal);
+	DEBUG_VALID(signal->WindowHandle);
+
+	ViewId = signal->ViewId;
+	WindowHandle = signal->WindowHandle;
 
 	return OpenFile(signal->FilePath);
 }
 
 
 
-bool Renderer::OnMouseWheel(SignalArgs::Base* pSignal)
+bool Renderer::OnMouseWheel(SignalParams* pSignal)
 {
-	SignalArgs::Mouse* signal = (SignalArgs::Mouse*)pSignal;
+	static const double zoomFactor = 0.8;
+
+	MouseSignal* signal = (MouseSignal*)pSignal;
 
 	OdGsViewPtr pView = GetGsView();
 	OdGePoint3d position(pView->position());
@@ -253,9 +276,11 @@ bool Renderer::OnMouseWheel(SignalArgs::Base* pSignal)
 	y = signal->Y - y;
 
 	Dolly(-x, -y);
-	pView->zoom(signal->Delta > 0 ? ZOOM_FACTOR : 1.0 / ZOOM_FACTOR);
+	pView->zoom(signal->Delta > 0 ? zoomFactor : 1.0 / zoomFactor);
 	Dolly(x, y);
 
+	//:CHECK
+	TrackerBase::SetPixelDensity(GetGsView());
 	RedrawWindow();
 
 	return true;
@@ -263,37 +288,34 @@ bool Renderer::OnMouseWheel(SignalArgs::Base* pSignal)
 
 
 
-bool Renderer::OnPaint(SignalArgs::Base* pSignal)
+bool Renderer::OnPaint(SignalParams* pSignal)
 {
-	SignalArgs::Paint* signal = (SignalArgs::Paint*)pSignal;
+	PaintSignal& signal = *(PaintSignal*)pSignal;
 
-	if (m_pDevice.isNull() == false) {
-		try {
-			if (m_pDevice->isValid() == false) {
-				OdGsDCRect rect(signal->Left, signal->Right, signal->Top, signal->Bottom);
-				m_pDevice->update(&rect);
-			}
-			return true;
-		}
-		catch (...) {
-			RETURN_FALSE;
-		}
-	}
-	else {
+	if (GsDevicePtr.isNull()) {
 		return false;
 	}
+
+	CRect rect = signal.GetRect();
+	RedrawWindow(rect.IsRectNull() ? nullptr : &rect);
+
+	if (signal.Options.IsEmpty() == false) {
+		Delivery.UserIO.SetDynamicInput(signal.Options);
+	}
+
+	return true;
 }
 
 
 
-bool Renderer::OnResize(SignalArgs::Base* pSignal)
+bool Renderer::OnResize(SignalParams* pSignal)
 {
-	SignalArgs::Resize* signal = (SignalArgs::Resize*)pSignal;
+	ResizeSignal* signal = (ResizeSignal*)pSignal;
 
-	if (m_pDevice.isNull() == false && signal->Valid) {
+	if (GsDevicePtr.isNull() == false && signal->Valid) {
 		// Update the client rectangle
 		OdGsDCRect rect(OdGsDCPoint(0, signal->Height), OdGsDCPoint(signal->Width, 0));
-		m_pDevice->onSize(rect);
+		GsDevicePtr->onSize(rect);
 
 		return true;
 	}
@@ -311,35 +333,35 @@ bool Renderer::OpenFile(Json::Object& options)
 
 bool Renderer::OpenFile(CString filePath)
 {
-	m_filePath = filePath;
-	if (m_filePath.IsEmpty()) {
+	FilePath = filePath;
+	if (FilePath.IsEmpty()) {
 		return true;
 	}
 
 	try {
 		// CHECK
-		if (File::GetFileSize(m_filePath) > 1000000) {
-			GetDelivery().mainFrame.ShowProgress();
-			GetDelivery().progress.SetMessage(filePath);
+		if (File::GetFileSize(FilePath) > 1000000) {
+			Delivery.MainFrame.ShowProgressBar();
+			Delivery.MainFrame.SetProgressMessage(filePath);
 		}
 
-		GetDelivery().progress.AddLog(Signal::Progress::Status::Succeed, L"Start reading file");
-		m_pDatabase = TheApp.readFile(m_filePath.GetBuffer(), true, false);
+		Delivery.MainFrame.AddProgressLog(Sgn::EStatus::Succeed, L"Start reading file");
+		DatabasePtr = TheApp.readFile(FilePath.GetBuffer(), true, false);
 
-		OdGiContextForDbDatabase::setDatabase(m_pDatabase);
+		OdGiContextForDbDatabase::setDatabase(DatabasePtr);
 		enableGsModel(true);
 
-		GetDelivery().progress.AddLog(Signal::Progress::Status::Succeed, L"Create rendering device");
+		Delivery.MainFrame.AddProgressLog(Sgn::EStatus::Succeed, L"Create rendering device");
 		if (CreateDevice(true, true)) {
 			// WARNING - do not set this in constructor (device, gsview)
-			m_io.SetRenderer(this);
+			UserIo.SetRenderer(this);
 
-			GetDelivery().mainFrame.HideProgress();
-			GetDelivery().view.SetValidation();
+			Delivery.MainFrame.HideProgressBar();
+			Delivery.View.SetValidation();
 		}
 	}
 	catch (const OdError& err) {
-		GetDelivery().progress.AddLog(Signal::Progress::Status::Fail, (LPCTSTR)err.description().c_str());
+		Delivery.MainFrame.AddProgressLog(Sgn::EStatus::Fail, (LPCTSTR)err.description().c_str());
 		RETURN_FALSE;
 	}
 
@@ -350,62 +372,64 @@ bool Renderer::OpenFile(CString filePath)
 
 void Renderer::RedrawWindow(LPRECT lpRect)
 {
-	if (m_pDevice.isNull()) {
+	if (GsDevicePtr.isNull()) {
 		DEBUG_STOP;
 	}
 
-	if (m_pDevice->isValid() == false) {
+	//if (GsDevicePtr->isValid()) {
+	//	return;
+	//}
+
+	//:WARNING - OpenGL error
+	try {
 		if (lpRect != nullptr) {
-			OdGsDCRect rect(lpRect->left, lpRect->right, lpRect->bottom, lpRect->top);
-			m_pDevice->update(&rect);
+			OdGsDCRect rect(lpRect->left, lpRect->right, lpRect->top, lpRect->bottom);
+			GsDevicePtr->update(&rect);
 		}
 		else {
-			m_pDevice->update();
+			GsDevicePtr->update();
 		}
 	}
-}
+	catch (...) {
+		return;
+	}
 
-
-
-void Renderer::UpdateWindow()
-{
-	::InvalidateRect(m_hWnd, nullptr, TRUE);
-	::RedrawWindow(m_hWnd, nullptr, nullptr, 0);
+	Delivery.View.PaintOverlap();
 }
 
 //--------------------------------------------------------------------------------------------------
 
+Renderer::Renderer(int viewId, SendSignalFunc fp, bool useThreadIo)
+	: ViewId(viewId)
+	, UserIo(useThreadIo)
+{
+	Delivery.ViewId = viewId;
+	Delivery.SetSender(fp);
+	//BackgroundColor = RGB(0x3b, 0x44, 0x53);
+	BackgroundColor = RGB(0x21, 0x28, 0x30);
+
+	Create();
+}
+
+
+
+Renderer::~Renderer()
+{
+	UserIo.Terminate();
+}
+
+
+
 OdDbDatabase* Renderer::GetDatabase()
 {
-	return m_pDatabase.get();
-}
-
-
-
-CoordConvertor& Renderer::GetCoordConvertor()
-{
-	return m_coordinate;
-}
-
-
-
-Signal::Delivery& Renderer::GetDelivery()
-{
-	return TheApp.GetDelivery(m_nViewId);
+	return DatabasePtr.get();
 }
 
 
 
 OdGsViewPtr Renderer::GetGsView()
 {
-	return m_pDevice->viewAt(0);
-}
-
-
-
-UserIO& Renderer::GetUserIO()
-{
-	return m_io;
+	return GsDevicePtr->viewAt(0);
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -413,7 +437,7 @@ UserIO& Renderer::GetUserIO()
 bool Renderer::CreateDevice(bool recreate, bool zoomExtents)
 {
 	CRect rc;
-	::GetClientRect(m_hWnd, &rc);
+	::GetClientRect(WindowHandle, &rc);
 
 	// Load the vectorization module
 	OdGsModulePtr pGs = ::odrxDynamicLinker()->loadModule(OdWinOpenGLModuleName);
@@ -422,17 +446,17 @@ bool Renderer::CreateDevice(bool recreate, bool zoomExtents)
 	}
 
 	// Create a new OdGsDevice object, and associate with the vectorization GsDevice
-	m_pDevice = pGs->createDevice();
-	if (m_pDevice.isNull()) {
+	GsDevicePtr = pGs->createDevice();
+	if (GsDevicePtr.isNull()) {
 		RETURN_FALSE;
 	}
 
 	// Return a pointer to the dictionary entity containing the device properties
-	OdRxDictionaryPtr pProperties = m_pDevice->properties();
+	OdRxDictionaryPtr pProperties = GsDevicePtr->properties();
 
 	// Set the window handle for this GsDevice
 	if (pProperties->has(OD_T("WindowHWND"))) {
-		pProperties->putAt("WindowHWND", OdRxVariantValue((OdIntPtr)m_hWnd));
+		pProperties->putAt("WindowHWND", OdRxVariantValue((OdIntPtr)WindowHandle));
 	}
 	if (pProperties->has(OD_T("DoubleBufferEnabled"))) {
 		pProperties->putAt(OD_T("DoubleBufferEnabled"), OdRxVariantValue(true));
@@ -445,21 +469,21 @@ bool Renderer::CreateDevice(bool recreate, bool zoomExtents)
 	}
 
 	// Set the device background color and palette
-	m_pDevice->setBackgroundColor(m_clrBackground);
-	m_pDevice->setLogicalPalette(CurrentPalette(), 256);
+	GsDevicePtr->setBackgroundColor(BackgroundColor);
+	GsDevicePtr->setLogicalPalette(CurrentPalette(), 256);
 
 	if (database() == nullptr) {
 		RETURN_FALSE;
 	}
 
 	// Set up the views for the active layout
-	m_pDevice = OdDbGsManager::setupActiveLayoutViews(m_pDevice, this);
+	GsDevicePtr = OdDbGsManager::setupActiveLayoutViews(GsDevicePtr, this);
 
 	// Return true if and only the current layout is a paper space layout
-	BOOL bModelSpace = (m_pDatabase->getTILEMODE() == 0);
+	BOOL bModelSpace = (DatabasePtr->getTILEMODE() == 0);
 
 	// Set the viewport border properties
-	//SetViewportBorderProperties(m_pDevice, !bModelSpace);
+	//SetViewportBorderProperties(GsDevicePtr, !bModelSpace);
 
 	//if (zoomExtents) {
 	//	ViewZoomExtents();
@@ -467,10 +491,11 @@ bool Renderer::CreateDevice(bool recreate, bool zoomExtents)
 
 	// Update the client rectangle
 	OdGsDCRect rect(OdGsDCPoint(rc.left, rc.bottom), OdGsDCPoint(rc.right, rc.top));
-	m_pDevice->onSize(rect);
-	m_pDevice->update();
+	GsDevicePtr->onSize(rect);
+	GsDevicePtr->update();
 
-	m_coordinate.Initialize(m_pDevice);
+	Coordinate.Initialize(GsDevicePtr);
+	TrackerBase::SetPixelDensity(GetGsView());
 
 	return true;
 }
@@ -479,7 +504,7 @@ bool Renderer::CreateDevice(bool recreate, bool zoomExtents)
 
 const ODCOLORREF* Renderer::CurrentPalette()
 {
-	return ::odcmAcadPalette(m_clrBackground);
+	return ::odcmAcadPalette(BackgroundColor);
 }
 
 
@@ -487,10 +512,10 @@ const ODCOLORREF* Renderer::CurrentPalette()
 void Renderer::Dolly(int x, int y)
 {
 	// Get the view
-	OdGsViewPtr pView = GetGsView();
+	OdGsViewPtr pGsView = GetGsView();
 	// Set up the dolly vector
-	OdGeVector3d Vector(-x, -y, 0.0);
-	Vector.transformBy((pView->screenMatrix() * pView->projectionMatrix()).inverse());
+	OdGeVector3d vector(-x, -y, 0.0);
+	vector.transformBy((pGsView->screenMatrix() * pGsView->projectionMatrix()).inverse());
 	// Perform the dolly
-	pView->dolly(Vector);
+	pGsView->dolly(vector);
 }

@@ -113,5 +113,31 @@
 			{"type":"coord", "name":"SecondTangent", "title":"Second tangent|__#__", "desc":202, "format":2},
 			{"type":"length", "name":"Radius", "title":"Radius|__#__", "desc":203, "value":10.0}
 		]}
+	},
+
+	"IoPoint":{
+		"header":{"title":"Specify a point", "size":{"cx":350, "cy":250}},
+		"properties":{"type":"root", "items":[
+			{"type":"double", "name":"Point", "title":"Pick a point|__#__", "desc":"Absolute coordinate: #x,y<br>Relative coordinate: x,y|__#__"},
+			{"type":"length", "name":"LimitLength", "title":"Limit on length|__#__", "desc":"Limit the length and determine the coordinate|__#__"},
+			{"type":"angle", "name":"LimitAngle", "title":"Limit on angle|__#__", "desc":"Limit the angle and determine the coordinate|__#__"},
+			{"type":"double", "name":"FilterX", "title":"Filter of X coordinate|__#__", "desc":"Fix the X value and determine the coordinate|__#__"},
+			{"type":"double", "name":"FilterY", "title":"Filter of Y coordinate|__#__", "desc":"Fix the Y value and determine the coordinate|__#__"},
+			{"type":"drop", "name":"OSnapOverrides", "title":"OSnap overrides|__#__", "desc":"Replace OSnap only once and determine the coordinate|__#__", "value":-1, "items":[
+				"None|__#__",
+				"Point|__#__",
+				"End|__#__",
+				"Mid|__#__",
+				"Intersection|__#__",
+				"Perpendicular|__#__",
+				"Center|__#__",
+				"Quadrant|__#__",
+				"Near|__#__"
+			]}
+		]}
+	},
+
+	"IoSelect":{
+		"header":{"size":{"cx":350, "cy":400}}
 	}
 }

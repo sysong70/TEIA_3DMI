@@ -1,8 +1,10 @@
 ﻿#pragma once
 
+#include "stdafx.h"
+
 using SendSignalFunc = void (*)(const wchar_t* content);
 
-
+//--------------------------------------------------------------------------------------------------
 
 extern "C"
 {

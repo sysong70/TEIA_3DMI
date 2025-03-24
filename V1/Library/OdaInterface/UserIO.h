@@ -2,89 +2,36 @@
 
 #include "EventDelegator.h"
 #include "Exceptions.h"
-#include "Prompt.h"
 #include "Trackers.h"
+#include "Uio.h"
+#include "Uio.Prompt.h"
 
 #include "Ge/GePoint3d.h"
+
+#include <condition_variable>
+#include <memory>
+#include <mutex>
+#include <queue>
+#include <vector>
 
 class Renderer;
 
 //--------------------------------------------------------------------------------------------------
 
-namespace Io
-{
-	//  do not use enum class
-	enum EInputOptions
-	{
-		eDefault = 0,
-		eAllowInteger = 1,
-		eAllowReal = eAllowInteger * 2,
-		eNoZero = eAllowReal * 2,
-		eNoNegative = eNoZero * 2,
-		eRubberBand = eNoNegative * 2,
-		eRubberRect = eRubberBand * 2,
-		eUseLastPoint = eRubberRect * 2,
-	};
-
-	enum class EOSnap
-	{
-		None,
-		// point filters
-		X,
-		Y,
-		Z,
-		XY,
-		XZ,
-		YZ,
-		// snap
-		Point,
-		End,
-		Mid,
-		Intersection,
-		Perpendicular,
-		Center,
-		Quadrant,
-		Near,
-	};
-
-	enum class EMode
-	{
-		None,
-		Integer,
-		Point,
-		Real,
-		String,
-	};
-
-	enum class EReturn
-	{
-		None,
-		Integer,
-		Point,
-		Real,
-		String,
-
-		Cancel,
-		Keyword,
-	};
-}
-
-//--------------------------------------------------------------------------------------------------
-
-struct IoKeyword
+struct UioKeyword
 {
 	int Index = -1;
 	CString Code;
 	CString Shortcut;
 };
 
-class IoKeywords : public std::vector<IoKeyword>
+class IoKeywords : public std::vector<UioKeyword>
 {
 public:
 
 	void Initialize(CString value);
 
-	int Find(const CString& value, IoKeyword& found);
+	int Find(const CString& value, UioKeyword& found);
 	// throw exception
 	void Check(CString value);
 
@@ -93,7 +40,7 @@ public:
 
 //--------------------------------------------------------------------------------------------------
 
-class IoSteps : public std::queue<CString>
+class UioSteps : public std::queue<CString>
 {
 	friend class UserIO;
 
@@ -103,98 +50,108 @@ public:
 
 	void Clear();
 
-	void Next(Io::EOSnap& osnap, IoKeywords& keywords);
+	void Next(Uio::EOSnap& osnap, IoKeywords& keywords);
 
 private:
 
-	bool HasOsnap(CString value, Io::EOSnap& osnap);
+	bool HasOsnap(CString value, Uio::EOSnap& osnap);
 
 	bool HasKeyword(CString valaue, IoKeywords& keywords);
 };
 
 //--------------------------------------------------------------------------------------------------
 
-struct IoResult
+struct UioResult
 {
-	Io::EReturn Return = Io::EReturn::None;
+	Uio::EReturn Return = Uio::EReturn::None;
 
 	double Real = 0.0;
 	int Integer = 0;
 	OdGePoint3d Point;
 	CString String;
-	IoKeyword Keyword;
+	UioKeyword Keyword;
 
 	void Initialize();
 };
 
 //--------------------------------------------------------------------------------------------------
 
+struct UioState
+{
+	Renderer* RendererPtr = nullptr;
+	TrackerStack Trackers;
+
+	CString Command;
+	CString Prompt;
+	CString Keyword;
+	IoKeywords Keywords;
+	UioSteps Steps;
+	int Options = 0;
+
+	Uio::EWait Wait = Uio::EWait::None;
+	Uio::EOSnap OSnap = Uio::EOSnap::None;
+	struct {
+		int Flag = Uio::EFilter::None;
+		double Angle = 0.0;
+		double Length = 0.0;
+		double X = 0.0;
+		double Y = 0.0;
+	} Filter;
+
+	CPoint MousePoint;
+	OdGePoint3d LastPoint;
+
+	void Initialize();
+
+	void Clear();
+
+	void Set(const CString& prompt, int options, const wchar_t* keyword, TrackerBase* pTracker);
+};
+
+//--------------------------------------------------------------------------------------------------
+
 class UserIO : public EventDelegator
 {
-	friend class Renderer;
-
-protected:
-
-	struct IoState
-	{
-		// References
-		Renderer* pRenderer = nullptr;
-		TrackerStack Trackers;
-		// Input values
-		CString Command;
-		CString Prompt;
-		CString Keyword;
-		IoKeywords Keywords;
-		IoSteps Steps;
-		int Options = 0;
-		// State values
-		Io::EMode Mode = Io::EMode::None;
-		Io::EOSnap OSnap = Io::EOSnap::None;
-		// Interactive UI values
-		CPoint MousePoint;
-		OdGePoint3d LastPoint;
-
-		void Initialize();
-
-		void Clear();
-
-		void Set(const CString& prompt, int options, const wchar_t* keyword, TrackerBase* pTracker);
-	};
-
-	IoState m_state;
-	IoResult m_result;
-
-	// Wait process (different with WorkerThread)
-	std::mutex m_waitMutex;
-	std::condition_variable m_waitCondition;
-
 protected: // WorkerThread
 
 	bool OnSignal(std::shared_ptr<EventWrapper> wrapper) override;
 
-protected: // EventDelegator
+public: // EventDelegator
 
-	bool OnCommand(SignalArgs::Base* pSignal) override;
+	bool SendSignal(SignalParams* pSignal) override;
 
-	bool OnLButtonDown(SignalArgs::Base* pSignal) override;
+protected:
 
-	bool OnLButtonUp(SignalArgs::Base* pSignal) override;
+	bool OnCommand(SignalParams* pSignal) override;
+
+	bool OnInput(SignalParams* pSignal) override;
+
+	bool OnLButtonDown(SignalParams* pSignal) override;
+
+	bool OnLButtonUp(SignalParams* pSignal) override { return false; }
 	// Fast Pan
-	bool OnMButtonDown(SignalArgs::Base* pSignal) override;
+	bool OnMButtonDown(SignalParams* pSignal) override;
 
-	bool OnMButtonUp(SignalArgs::Base* pSignal) override;
+	bool OnMButtonUp(SignalParams* pSignal) override { return false; }
 	// Context Menu
-	bool OnRButtonDown(SignalArgs::Base* pSignal) override;
+	bool OnRButtonDown(SignalParams* pSignal) override { return false;  }
 
-	bool OnRButtonUp(SignalArgs::Base* pSignal) override;
+	bool OnRButtonUp(SignalParams* pSignal) override { return false; }
 
-	bool OnMouseMove(SignalArgs::Base* pSignal) override;
-
-	bool OnInput(SignalArgs::Base* pSignal) override;
+	bool OnMouseMove(SignalParams* pSignal) override;
 
 public:
 
-	UserIO();
+	bool UseThread = false;
+	UioState State;
+	UioResult Result;
+	// For CancelCommand
+	bool HasPostProcess = false;
+	// Wait process (different with WorkerThread)
+	std::mutex WaitMutex;
+	std::condition_variable WaitCondition;
+
+	UserIO(bool useThread);
 
 	virtual ~UserIO();
 
@@ -204,9 +161,11 @@ public:
 
 	void SetRenderer(Renderer* pRenderer);
 
-	bool CancelCommand();
+	bool CancelCommand(bool hasPostProcess);
 
 	void StandbyCommand();
+
+	void CommandCompleted();
 
 public:
 
@@ -214,7 +173,7 @@ public:
 
 	bool SetInteger(int value);
 
-	bool SetPoint(const OdGePoint3d& value);
+	bool SetPoint(OdGePoint3d value, bool unlock);
 
 	bool SetReal(double value);
 
@@ -224,7 +183,7 @@ public:
 
 	bool SendCommand(const CString& value);
 
-	bool SendPrompt(const CString& prompt, const CString& keyword);
+	bool SendPrompt(const CString& prompt, const CString& keyword, int options);
 
 	bool SendEcho(const CString& value);
 
@@ -232,19 +191,21 @@ public:
 
 private:
 
-	bool ParseCommand(CString& value);
+	bool ParseCommand(CString value);
 
-	bool ParseInteger(CString& value);
+	bool ParseFilter(CString value);
 
-	bool ParseKeyword(CString& value);
+	bool ParseInteger(CString value) { RETURN_FALSE; }
 
-	bool ParseOSnap(CString& value);
+	bool ParseKeyword(CString value);
 
-	bool ParseOtherInput(CString& value);
+	bool ParseOSnap(CString value);
 
-	bool ParsePoint(CString& value);
+	bool ParseOtherInput(CString value);
 
-	bool ParseReal(CString& value);
+	bool ParsePoint(CString value);
 
-	bool ParseString(CString& value);
+	bool ParseReal(CString value);
+
+	bool ParseString(CString value) { RETURN_FALSE; }
 };

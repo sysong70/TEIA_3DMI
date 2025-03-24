@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Connector.h"
 #include "EventDelegator.h"
 #include "UserIO.h"
 
@@ -11,7 +12,7 @@
 
 class CoordConvertor
 {
-	OdGsLayoutHelperPtr m_pDevice;
+	OdGsLayoutHelperPtr DevicePtr;
 
 public:
 
@@ -26,6 +27,8 @@ public:
 	OdGePoint3d ToEyeToWorld(int x, int y);
 
 	OdGePoint3d ToEyeToWorld(CPoint point);
+
+	CPoint ToWorldToEye(const OdGePoint3d& wcsPoint);
 
 	bool ToUcsToWorld(OdGePoint3d& wcsPoint);
 
@@ -43,25 +46,10 @@ private:
 //--------------------------------------------------------------------------------------------------
 
 class Renderer
-	: public EventDelegator
-	, public OdGiContextForDbDatabase
+	: public OdGiContextForDbDatabase
+	, public EventDelegator
 {
-	friend class CommandParams;
-
-	OdDbDatabasePtr m_pDatabase;
-	// Vectorizer device
-	OdGsDevicePtr m_pDevice;
-	// Drawing background color
-	ODCOLORREF m_clrBackground;
-
-	int m_nViewId = -1;
-	HWND m_hWnd = nullptr;
-	CString m_filePath;
-
-	CoordConvertor m_coordinate;
-	UserIO m_io;
-
-public:
+public: // OdGiContextForDbDatabase
 
 	using OdRxObject::operator new;
 
@@ -71,29 +59,25 @@ public:
 
 	void release() override {}
 
-public:
+public: // EventDelegator
 
-	Renderer();
+	bool PostSignal(SignalParams* pSignal) override;
 
-	virtual ~Renderer();
+	bool SendSignal(SignalParams* pSignal) override;
 
-	bool PostSignal(SignalArgs::Base* pSignal) override;
+	bool SendPaintSignal(bool useThread = false, SignalParams* pSignal = nullptr);
 
-	void PostPaintSignal(bool lock = false);
-
-protected: // EventDelegator
+protected:
 
 	bool OnClose() override { RETURN_FALSE; }
-	// WARNING - not UserIO, instance command
-	bool OnCommand(SignalArgs::Base* pSignal) override;
 
-	bool OnInitialize(SignalArgs::Base* pSignal) override;
+	bool OnInitialize(SignalParams* pSignal) override;
 
-	bool OnMouseWheel(SignalArgs::Base* pSignal) override;
+	bool OnMouseWheel(SignalParams* pSignal) override;
 
-	bool OnPaint(SignalArgs::Base* pSignal) override;
+	bool OnPaint(SignalParams* pSignal) override;
 
-	bool OnResize(SignalArgs::Base* pSignal) override;
+	bool OnResize(SignalParams* pSignal) override;
 
 public: // Special Command
 
@@ -102,20 +86,32 @@ public: // Special Command
 	bool OpenFile(CString filePath);
 
 	void RedrawWindow(LPRECT lpRect = nullptr);
-	// WARNING - first single call
-	void UpdateWindow();
 
 public:
 
+	OdDbDatabasePtr DatabasePtr;
+	// Vectorizer device
+	OdGsDevicePtr GsDevicePtr;
+	// Drawing background color
+	ODCOLORREF BackgroundColor;
+
+	int ViewId = -1;
+	SgnDelivery2d Delivery;
+	HWND WindowHandle = nullptr;
+	CString FilePath;
+
+	CoordConvertor Coordinate;
+	UserIO UserIo;
+
+public:
+
+	Renderer(int viewId, SendSignalFunc fp, bool useThreadIo);
+
+	virtual ~Renderer();
+
 	OdDbDatabase* GetDatabase();
 
-	CoordConvertor& GetCoordConvertor();
-
-	Signal::Delivery& GetDelivery();
-
 	OdGsViewPtr GetGsView();
-
-	UserIO& GetUserIO();
 
 public:
 

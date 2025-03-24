@@ -5,6 +5,7 @@
 /// Delivery Keywords
 
 #define SKW_ACTION			"Action"
+#define SKW_ANGLE			"Angle"
 #define SKW_CHAR			"Char"
 #define SKW_CHECKED			"checked" // lower case
 #define SKW_CHILDREN		"Children"
@@ -29,6 +30,7 @@
 #define SKW_ITEMS			"Items"
 #define SKW_KEY				"Key"
 #define SKW_KEYWORD			"Keyword"
+#define SKW_LENGTH			"Length"
 #define SKW_MAX				"Max"
 #define SKW_MESSAGE			"Message"
 #define SKW_MIN				"Min"
@@ -477,8 +479,9 @@ namespace Signal
 			CancelCommand,
 			CompleteCommand,
 
-			SetValidation, // complete opening file
-			PaintOverlap, // complete OnPaint
+			SetValidation,	// complete opening file
+			PaintOverlap,	// complete OnPaint
+			PaintDynamicInput,
 			SetInputMode,
 			SetContextMenu,
 			ShowContextMenu,
@@ -555,8 +558,10 @@ namespace Signal
 		void CompleteCommand(UINT id);
 
 		void SetValidation(bool success = true);
-		// TEMP:
+
 		void PaintOverlap();
+
+		void PaintDynamicInput(const Json::Object& value);
 
 		void SetInputMode(EInputMode mode);
 
@@ -747,6 +752,8 @@ namespace Signal
 			PutPrompt, // and keyword
 			PutEcho,
 			PutError,
+
+			PaintOverlap
 		};
 
 		DEFINE_WRAPPER;
@@ -768,6 +775,10 @@ namespace Signal
 		void PutError(const CString& value);
 
 		void PutEcho(const CString& value);
+
+	public:
+
+		void PaintOverlap(const Json::Object& value);
 	};
 
 //--------------------------------------------------------------------------------------------------

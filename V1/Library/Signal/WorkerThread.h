@@ -1,13 +1,14 @@
 ﻿#pragma once
 
 #include "Common_Define.h"
+
 #include <atomic>
 #include <condition_variable>
+#include <functional>
 #include <map>
 #include <mutex>
 #include <queue>
 #include <thread>
-#include <functional>
 
 //--------------------------------------------------------------------------------------------------
 // REF - https://www.codeproject.com/Articles/1169105/Cplusplus-std-thread-Event-Loop-with-Message-Queue
@@ -17,7 +18,7 @@ struct EventWrapper
     int Type;                   // WorkerThread::Event
     int Id = -1;                // Any id
     void* EventData = nullptr;  // Data buffer
-    bool IsArray = false;         // Is EventData array?
+    bool IsArray = false;       // Is EventData array?
 
     EventWrapper(int type, int id = -1, void* pEventData = nullptr, void* pArrayData = nullptr);
 
@@ -74,7 +75,7 @@ public:
 protected:
 
     // Entry point for the worker thread
-    void Process();
+    void MainProcess();
 
 protected: // Process switch
 
@@ -88,28 +89,28 @@ protected: // Process switch
 protected:
 
     // main thread
-    std::unique_ptr<std::thread> m_thread = nullptr;
+    std::unique_ptr<std::thread> ThreadPtr = nullptr;
     // main signal queue
-    std::queue<std::shared_ptr<EventWrapper> > m_queue;
+    std::queue<std::shared_ptr<EventWrapper> > SignalQueue;
     // class for mutual exclusion
-    std::mutex m_mutex;
+    std::mutex ThreadMutex;
     // class for waiting for conditions
-    std::condition_variable m_condition;
+    std::condition_variable ThreadCondition;
     // signal process function
-    std::function<void(const wchar_t*)> m_pSignalFunc = nullptr;
+    std::function<void(const wchar_t*)> SignalFunc = nullptr;
     // user process function
-    std::function<void(const wchar_t*)> m_pUserFunc = nullptr;
+    std::function<void(const wchar_t*)> UserFunc = nullptr;
 
 protected: // Single Timer
 
     // thread safe variable
-    std::atomic<int> m_timerInterver;
+    std::atomic<int> TimerInterver;
     // thread safe variable
-    std::atomic<bool> m_timerExit;
+    std::atomic<bool> TimerExit;
     // time thread
-    std::unique_ptr<std::thread> m_timer;
+    std::unique_ptr<std::thread> TimerPtr;
     // timer process function
-    std::function<void()> m_pTimerFunc = nullptr;
+    std::function<void()> TimerFunc = nullptr;
 
-    void TimerThread();
+    void TimerProcess();
 };

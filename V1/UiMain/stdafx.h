@@ -39,14 +39,13 @@
 #include <Template.h>
 #include <WStr.h>
 
-#include <Signal.h>
+#include "resource.h"
 
-namespace Command {}
-namespace Component {}
-namespace Control {}
-namespace Dialog {}
-namespace Facility {}
-namespace Window {}
+namespace Ast {}
+namespace Cmd {}
+namespace Ctl {}
+namespace Dlg {}
+namespace Wnd {}
 
 #ifdef _UNICODE
 #if defined _M_IX86

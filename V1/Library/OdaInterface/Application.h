@@ -1,12 +1,13 @@
 ﻿#pragma once
 
 #include "Connector.h"
-#include "Signal.h"
 
 #include "OdToolKit.h"
 #include "ExHostAppServices.h"
 #include "ExSystemServices.h"
 #include "ExUndoController.h"
+
+#include <map>
 
 class Renderer;
 
@@ -16,16 +17,13 @@ class Application
 	: public ExHostAppServices
 	, public ExSystemServices
 {
-	Signal::Delivery TheDelivery;
-
 public:
 
 	// WARNING - defined for future enhancements, from DllMain
 	static HMODULE Instance;
 
 	std::map<int, Renderer*> Renderers;
-
-	Signal::Delivery& GetDelivery(int viewId);
+	SendSignalFunc SendSignalFp = nullptr;
 
 public: // Tools
 

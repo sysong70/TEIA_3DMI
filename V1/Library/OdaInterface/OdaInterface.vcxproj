@@ -181,16 +181,18 @@
     <ClInclude Include="..\OdaInterface\framework.h" />
     <ClInclude Include="..\OdaInterface\stdafx.h" />
     <ClInclude Include="..\OdaInterface\Renderer.h" />
-    <ClInclude Include="..\Signal\Signal.h" />
+    <ClInclude Include="..\Signal\Signal2d.h" />
     <ClInclude Include="..\Signal\WorkerThread.h" />
+    <ClInclude Include="AppSetting.h" />
     <ClInclude Include="Commands.h" />
-    <ClInclude Include="CommandStack.h" />
     <ClInclude Include="Exceptions.h" />
     <ClInclude Include="OSnapManager.h" />
-    <ClInclude Include="Prompt.h" />
-    <ClInclude Include="SignalArgs.h" />
+    <ClInclude Include="Uio.Prompt.h" />
+    <ClInclude Include="SignalParams.h" />
     <ClInclude Include="EventDelegator.h" />
+    <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="Trackers.h" />
+    <ClInclude Include="Uio.h" />
     <ClInclude Include="UserIO.h" />
   </ItemGroup>
   <ItemGroup>
@@ -203,7 +205,9 @@
     <ClCompile Include="..\Common\Path.cpp" />
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\OdaInterface\Application.cpp" />
-    <ClCompile Include="Command.Circle.cpp" />
+    <ClCompile Include="..\Signal\Signal2d.cpp" />
+    <ClCompile Include="AppSetting.cpp" />
+    <ClCompile Include="Cmd.Circle.cpp" />
     <ClCompile Include="..\OdaInterface\CommandReactor.cpp" />
     <ClCompile Include="..\OdaInterface\Connector.cpp" />
     <ClCompile Include="..\OdaInterface\dllmain.cpp" />
@@ -211,21 +215,21 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\OdaInterface\Renderer.cpp" />
-    <ClCompile Include="..\Signal\Signal.cpp" />
     <ClCompile Include="..\Signal\WorkerThread.cpp" />
     <ClCompile Include="..\Teigha\Drawing\Extensions\ExServices\ExHostAppServices.cpp" />
     <ClCompile Include="..\Teigha\Kernel\Extensions\ExServices\OdFileBuf.cpp" />
     <ClCompile Include="..\Teigha\Kernel\Extensions\ExServices\RxSystemServicesImpl.cpp" />
     <ClCompile Include="Commands.cpp" />
-    <ClCompile Include="CommandStack.cpp" />
-    <ClCompile Include="Command.Line.cpp" />
+    <ClCompile Include="CmdLine.cpp" />
     <ClCompile Include="Exceptions.cpp" />
     <ClCompile Include="OSnapManager.cpp" />
-    <ClCompile Include="SignalArgs.cpp" />
+    <ClCompile Include="SignalParams.cpp" />
     <ClCompile Include="EventDelegator.cpp" />
+    <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="Trackers.cpp" />
+    <ClCompile Include="Uio.cpp" />
     <ClCompile Include="UserIO.cpp" />
-    <ClCompile Include="Command.Single.cpp" />
+    <ClCompile Include="Cmd.Single.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

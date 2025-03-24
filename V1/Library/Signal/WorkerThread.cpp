@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
+
 #include "WorkerThread.h"
-#include "Json.h"
 
 #pragma warning(disable : 4996)
 
@@ -40,7 +40,7 @@ EventWrapper::~EventWrapper()
 
 WorkerThread::WorkerThread()
 {
-	Create();
+	//Create();
 }
 
 
@@ -61,9 +61,9 @@ std::thread::id WorkerThread::GetCurrentThreadId()
 
 bool WorkerThread::Create()
 {
-	if (!m_thread) {
-		m_thread = std::make_unique<std::thread>(&WorkerThread::Process, this);
-		//m_thread->detach();
+	if (!ThreadPtr) {
+		ThreadPtr = std::make_unique<std::thread>(&WorkerThread::MainProcess, this);
+		//ThreadPtr->detach();
 		return true;
 	}
 	else {
@@ -75,19 +75,19 @@ bool WorkerThread::Create()
 
 void WorkerThread::Terminate()
 {
-	if (m_thread == nullptr) {
+	if (ThreadPtr == nullptr) {
 		DEBUG_RETURN;
 	}
 
 	// Put close event into the queue
 	auto event = std::make_shared<EventWrapper>((int)Event::Close);
 	// WARNING - do not lock
-	//std::unique_lock<std::mutex> lock(m_mutex);
-	m_queue.push(event);
-	m_condition.notify_one();
+	//std::unique_lock<std::mutex> lock(ThreadMutex);
+	SignalQueue.push(event);
+	ThreadCondition.notify_one();
 
-	if (m_thread->joinable()) {
-		m_thread->join();
+	if (ThreadPtr->joinable()) {
+		ThreadPtr->join();
 	}
 }
 
@@ -95,28 +95,28 @@ void WorkerThread::Terminate()
 
 std::thread::id WorkerThread::GetThreadId()
 {
-	DEBUG_VALID(m_thread);
-	return m_thread->get_id();
+	DEBUG_VALID(ThreadPtr);
+	return ThreadPtr->get_id();
 }
 
 
 
 void WorkerThread::PostEvent(Event type, int id, void* pEventData)
 {
-	if (m_thread == nullptr) {
+	if (ThreadPtr == nullptr) {
 		DEBUG_RETURN;
 	}
 
 	// Add evnet to queue and notify worker thread
 	auto event = std::make_shared<EventWrapper>((int)type, id, pEventData);
-	std::unique_lock<std::mutex> lock(m_mutex);
-	m_queue.push(event);
-	m_condition.notify_one();
+	std::unique_lock<std::mutex> lock(ThreadMutex);
+	SignalQueue.push(event);
+	ThreadCondition.notify_one();
 }
 
 void WorkerThread::PostEvent(const wchar_t* pEventData, bool copyData)
 {
-	if (m_thread == nullptr) {
+	if (ThreadPtr == nullptr) {
 		DEBUG_RETURN;
 	}
 
@@ -130,65 +130,65 @@ void WorkerThread::PostEvent(const wchar_t* pEventData, bool copyData)
 
 	// Add evnet to queue and notify worker thread
 	auto event = std::make_shared<EventWrapper>((int)Event::Signal, 0, nullptr, (void*)pData);
-	std::unique_lock<std::mutex> lock(m_mutex);
-	m_queue.push(event);
-	m_condition.notify_one();
+	std::unique_lock<std::mutex> lock(ThreadMutex);
+	SignalQueue.push(event);
+	ThreadCondition.notify_one();
 }
 
 
 
 void WorkerThread::SetSignalFunc(std::function<void(const wchar_t*)> func)
 {
-	m_pSignalFunc = func;
+	SignalFunc = func;
 }
 
 
 
 void WorkerThread::SetTimerFunc(std::function<void()> func)
 {
-	m_pTimerFunc = func;
+	TimerFunc = func;
 }
 
 
 
 void WorkerThread::SetUserFunc(std::function<void(const wchar_t*)> func)
 {
-	m_pUserFunc = func;
+	UserFunc = func;
 }
 
 
 
 void WorkerThread::StartTimer(UINT milliseconds)
 {
-	//if (milliseconds > 0 && m_timer == nullptr) {
-	//	m_timerInterver = milliseconds;
-	//	m_timer = std::make_unique<std::thread>(&WorkerThread::TimerThread, this);
+	//if (milliseconds > 0 && TimerPtr == nullptr) {
+	//	TimerInterver = milliseconds;
+	//	TimerPtr = std::make_unique<std::thread>(&WorkerThread::TimerProcess, this);
 	//}
 }
 
 //--------------------------------------------------------------------------------------------------
 
-void WorkerThread::Process()
+void WorkerThread::MainProcess()
 {
 	while (true) {
 		// Wait for a message to be added to the queue
-		std::unique_lock<std::mutex> lock(m_mutex);
-		while (m_queue.empty()) {
-			m_condition.wait(lock);
+		std::unique_lock<std::mutex> lock(ThreadMutex);
+		while (SignalQueue.empty()) {
+			ThreadCondition.wait(lock);
 		}
 
-		if (m_queue.empty()) {
+		if (SignalQueue.empty()) {
 			continue;
 		}
 
-		auto wrapper = m_queue.front();
-		m_queue.pop();
+		auto wrapper = SignalQueue.front();
+		SignalQueue.pop();
 
 		switch ((Event)wrapper->Type) {
 		case Event::Close:
-			if (m_timer) {
-				m_timerExit = true;
-				m_timer->join();
+			if (TimerPtr) {
+				TimerExit = true;
+				TimerPtr->join();
 			}
 			return;
 
@@ -217,8 +217,8 @@ void WorkerThread::Process()
 
 bool WorkerThread::OnTimer()
 {
-	if (m_pTimerFunc != nullptr) {
-		m_pTimerFunc();
+	if (TimerFunc != nullptr) {
+		TimerFunc();
 		return true;
 	}
 
@@ -229,8 +229,8 @@ bool WorkerThread::OnTimer()
 
 bool WorkerThread::OnSignal(std::shared_ptr<EventWrapper> wrapper)
 {
-	if (m_pSignalFunc != nullptr) {
-		m_pSignalFunc((const wchar_t*)wrapper->EventData);
+	if (SignalFunc != nullptr) {
+		SignalFunc((const wchar_t*)wrapper->EventData);
 		return true;
 	}
 
@@ -242,8 +242,8 @@ bool WorkerThread::OnSignal(std::shared_ptr<EventWrapper> wrapper)
 
 bool WorkerThread::OnUser(std::shared_ptr<EventWrapper> wrapper)
 {
-	if (m_pUserFunc != nullptr) {
-		m_pUserFunc((const wchar_t*)wrapper->EventData);
+	if (UserFunc != nullptr) {
+		UserFunc((const wchar_t*)wrapper->EventData);
 		return true;
 	}
 
@@ -253,10 +253,10 @@ bool WorkerThread::OnUser(std::shared_ptr<EventWrapper> wrapper)
 
 //--------------------------------------------------------------------------------------------------
 
-void WorkerThread::TimerThread()
+void WorkerThread::TimerProcess()
 {
-	while (m_timerExit == false) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(m_timerInterver));
+	while (TimerExit == false) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(TimerInterver));
 		PostEvent(Event::Timer);
 	}
 }

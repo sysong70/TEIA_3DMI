@@ -1,5 +1,7 @@
 ﻿#include "stdafx.h"
+
 #include "Geometry.UserDataFiler.h"
+
 #include <WStr.h>
 
 #ifdef _DEBUG

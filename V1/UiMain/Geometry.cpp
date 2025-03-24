@@ -1,4 +1,5 @@
 ﻿#include "stdafx.h"
+
 #include "Geometry.h"
 
 #ifdef _DEBUG

@@ -206,7 +206,7 @@ void Signal::StatusBar::ShowCoordinate(double x, double y)
 
 	data.SetReal(SKW_X, x);
 	data.SetReal(SKW_Y, y);
-
+	//:WARNING - post
 	Wrapper().PostData(data);
 }
 
@@ -433,7 +433,6 @@ void Signal::View::OnInitialize(DWORD_PTR hWnd, CString path)
 	data.SetString(SKW_FILEPATH, path);
 
 	Wrapper().SendData(data);
-	//Wrapper().PostData(data);
 }
 
 
@@ -664,7 +663,20 @@ void Signal::View::SetValidation(bool success)
 
 void Signal::View::PaintOverlap()
 {
-	SendActionDataOnly(Action::PaintOverlap);
+	//:WARNING - post
+	PostActionDataOnly(Action::PaintOverlap);
+}
+
+
+
+void Signal::View::PaintDynamicInput(const Json::Object& value)
+{
+	Json::Object data;
+	ConstructData(data, Action::PaintDynamicInput);
+
+	data.SetObject(SKW_OPTIONS, new Json::Object(value));
+	//:WARNING - post
+	Wrapper().PostData(data);
 }
 
 
@@ -1106,6 +1118,8 @@ void Signal::UserIO::OnInput(const CString& value)
 
 void Signal::UserIO::StandbyCommand(CString prompt)
 {
+	ASSERT(prompt.IsEmpty() == false);
+
 	Json::Object data;
 	ConstructData(data, Action::StandbyCommand);
 
@@ -1118,6 +1132,8 @@ void Signal::UserIO::StandbyCommand(CString prompt)
 
 void Signal::UserIO::PutCommand(CString value)
 {
+	ASSERT(value.IsEmpty() == false);
+
 	Json::Object data;
 	ConstructData(data, Action::PutCommand);
 
@@ -1130,6 +1146,8 @@ void Signal::UserIO::PutCommand(CString value)
 
 void Signal::UserIO::PutPrompt(CString prompt, CString keyword)
 {
+	ASSERT(prompt.IsEmpty() == false);
+
 	Json::Object data;
 	ConstructData(data, Action::PutPrompt);
 
@@ -1143,6 +1161,8 @@ void Signal::UserIO::PutPrompt(CString prompt, CString keyword)
 
 void Signal::UserIO::PutError(const CString& value)
 {
+	ASSERT(value.IsEmpty() == false);
+
 	Json::Object data;
 	ConstructData(data, Action::PutError);
 
@@ -1155,10 +1175,24 @@ void Signal::UserIO::PutError(const CString& value)
 
 void Signal::UserIO::PutEcho(const CString& value)
 {
+	ASSERT(value.IsEmpty() == false);
+
 	Json::Object data;
 	ConstructData(data, Action::PutEcho);
 
 	data.SetString(SKW_VALUE, value);
+
+	Wrapper().SendData(data);
+}
+
+
+
+void Signal::UserIO::PaintOverlap(const Json::Object& value)
+{
+	Json::Object data;
+	ConstructData(data, Action::PutEcho);
+
+	data.SetObject(SKW_OPTIONS, new Json::Object(value));
 
 	Wrapper().SendData(data);
 }
@@ -1219,6 +1253,8 @@ void Signal::Delivery::SendData(Json::Object& data)
 	}
 }
 
+//**************************************************************************************************
+
 #pragma warning(disable : 4996)
 
 void Signal::Delivery::PostData(Json::Object& data)
@@ -1238,6 +1274,15 @@ void Signal::Delivery::PostData(Json::Object& data)
 
 		delete [] pData;
 	}).detach();
+
+	//:WAIT
+	//theThreadPool.Enqueue([this, pData] {
+	//	if (SendSignal != nullptr) {
+	//		SendSignal(pData);
+	//	}
+
+	//	delete[] pData;
+	//});
 }
 
 #pragma endregion // REGION

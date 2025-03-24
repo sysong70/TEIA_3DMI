@@ -46,10 +46,10 @@ namespace Json
 	public:
 
 		Array& operator =(const Array& other);
-		// WARNING - hard compare by string
+		//:WARNING - hard compare by string
 		bool operator ==(Array& other);
 		bool operator !=(Array& other);
-		// WARNING - contents compare (ignore order)
+		//:WARNING - contents compare (ignore order)
 		bool Compare(Array& other);
 
 	public:
@@ -64,7 +64,7 @@ namespace Json
 
 		Value* operator [](int i);
 
-	public: // WARNING - no type check
+	public: //:WARNING - no type check
 
 		Array& GetArray(int i);
 
@@ -75,8 +75,6 @@ namespace Json
 		Object& GetObject(int i);
 
 		double GetReal(int i);
-		// sysong: 2024-04-18 추가
-		double GetRealRaw(int i);
 
 		CString& GetString(int i);
 
@@ -87,9 +85,6 @@ namespace Json
 		void AddInteger(int value);
 
 		void AddReal(double value);
-		// sysong: 2024-04-18 추가
-		void AddRealRaw(double value);
-
 		// add string value and return reference
 		CString& AddString();
 
@@ -101,12 +96,15 @@ namespace Json
 		// standard type
 		void AddValue(Value* pValue);
 
-	public:
+	public: //:WARNING - special
 
-		// WARNING - special
 		void AddDwordPtr(DWORD_PTR value);
 
+		void AddRealRaw(double value);
+
 		DWORD_PTR GetDwordPtr(int i);
+
+		double GetRealRaw(int i);
 
 	public: // casting
 
@@ -165,10 +163,10 @@ namespace Json
 		Value& operator =(int value);
 		Value& operator =(double value);
 		Value& operator =(CString value);
-		// WARNING - hard compare by string
+		//:WARNING - hard compare by string
 		bool operator ==(Value& other);
 		bool operator !=(Value& other);
-		// WARNING - contents compare (ignore order)
+		//:WARNING - contents compare (ignore order)
 		bool Compare(Value& other);
 
 	public: // get value
@@ -191,7 +189,7 @@ namespace Json
 
 		bool IsString();
 
-	public: // WARNING - check type and return forced conversion value
+	public: //:WARNING - check type and return forced conversion value
 
 		Array* ToArray();
 
@@ -205,7 +203,7 @@ namespace Json
 
 		CString ToString();
 
-	public: // WARNING - no type check
+	public: //:WARNING - no type check
 
 		Array& AsArray();
 
@@ -259,7 +257,7 @@ namespace Json
 
 	protected:
 
-		EValueType m_eType;
+		EValueType ViewType;
 
 		union ValueHolder
 		{
@@ -311,10 +309,10 @@ namespace Json
 	public:
 
 		Object& operator =(const Object& other);
-		// WARNING - hard compare by string
+		//:WARNING - hard compare by string
 		bool operator ==(Object& other);
 		bool operator !=(Object& other);
-		// WARNING - contents compare (ignore order)
+		//:WARNING - contents compare (ignore order)
 		bool Compare(Object& other);
 
 		Value& operator [](const char* name);
@@ -367,11 +365,15 @@ namespace Json
 		// standard type
 		void SetValue(CStringA name, Value* pValue, bool deepCopy = false);
 
-	public:
+	public: //:WARNING - special
 
 		DWORD_PTR GetDwordPtr(CStringA name, DWORD_PTR defaultValue = 0);
 
+		double GetRealRaw(CStringA name, double defaultValue = 0.0);
+
 		void SetDwordPtr(CStringA name, DWORD_PTR value);
+
+		void SetRealRaw(CStringA name, double value);
 
 	public:
 
@@ -453,7 +455,7 @@ namespace Json
 
 		double GetReal(Object& object, UINT id, double defaultValue = 0.0);
 
-		double GetRealRawString(Object& object, UINT id, double defaultValue = 0.0);
+		double GetRealRaw(Object& object, UINT id, double defaultValue = 0.0);
 
 		CString GetString(Object& object, UINT id, CString defaultValue = L"");
 
@@ -471,7 +473,7 @@ namespace Json
 
 		void SetReal(Object& object, UINT id, double value);
 
-		void SetRealRawString(Object& object, UINT id, double value, bool allDigit = false);
+		void SetRealRaw(Object& object, UINT id, double value, bool allDigit = false);
 
 		void SetString(Object& object, UINT id, CString value);
 

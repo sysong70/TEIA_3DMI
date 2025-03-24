@@ -1,63 +1,63 @@
 ﻿#pragma once
 
+#include "SignalParams.h"
 #include "WorkerThread.h"
-#include "SignalArgs.h"
+
+#include <memory>
 
 //--------------------------------------------------------------------------------------------------
 
 class EventDelegator : public WorkerThread
 {
+protected: // WorkerThread
+
+    bool OnSignal(std::shared_ptr<EventWrapper> wrapper) override;
+
 public:
 
     EventDelegator();
 
     virtual ~EventDelegator();
 
-public:
+    virtual bool PostSignal(int type, int id, SignalParams* pSignal);
 
-    virtual bool PostSignal(int type, int id, SignalArgs::Base* pSignal);
-
-    virtual bool PostSignal(SignalArgs::Base* pSignal);
+    virtual bool PostSignal(SignalParams* pSignal);
     // WARING - do not lock thread, push only (singal in signal)
-    void PushSignal(SignalArgs::Base* pSignal);
+    virtual bool PushSignal(SignalParams* pSignal);
 
-    void SendSignal(SignalArgs::Base* pSignal);
-
-protected: // WorkerThread
-
-    bool OnSignal(std::shared_ptr<EventWrapper> wrapper) override;
+    virtual bool SendSignal(SignalParams* pSignal);
 
 protected:
 
     virtual bool OnClose() { return false; }
 
-    virtual bool OnCommand(SignalArgs::Base* pSignal) { return false; }
+    virtual bool OnCommand(SignalParams* pSignal) { return false; }
 
-    virtual bool OnContextCommand(SignalArgs::Base* pSignal) { return false; }
+    virtual bool OnContextCommand(SignalParams* pSignal) { return false; }
 
-    virtual bool OnKeyDown(SignalArgs::Base* pSignal) { return false; }
+    virtual bool OnKeyDown(SignalParams* pSignal) { return false; }
 
-    virtual bool OnInitialize(SignalArgs::Base* pSignal) { return false; }
+    virtual bool OnInitialize(SignalParams* pSignal) { return false; }
 
-    virtual bool OnLButtonDown(SignalArgs::Base* pSignal) { return false; }
+    virtual bool OnInput(SignalParams* pSignal) { return false; }
 
-    virtual bool OnLButtonUp(SignalArgs::Base* pSignal) { return false; }
+    virtual bool OnLButtonDown(SignalParams* pSignal) { return false; }
 
-    virtual bool OnMButtonDown(SignalArgs::Base* pSignal) { return false; }
+    virtual bool OnLButtonUp(SignalParams* pSignal) { return false; }
 
-    virtual bool OnMButtonUp(SignalArgs::Base* pSignal) { return false; }
+    virtual bool OnMButtonDown(SignalParams* pSignal) { return false; }
 
-    virtual bool OnRButtonDown(SignalArgs::Base* pSignal) { return false; }
+    virtual bool OnMButtonUp(SignalParams* pSignal) { return false; }
 
-    virtual bool OnRButtonUp(SignalArgs::Base* pSignal) { return false; }
+    virtual bool OnRButtonDown(SignalParams* pSignal) { return false; }
 
-    virtual bool OnMouseMove(SignalArgs::Base* pSignal) { return false; }
+    virtual bool OnRButtonUp(SignalParams* pSignal) { return false; }
 
-    virtual bool OnMouseWheel(SignalArgs::Base* pSignal) { return false; }
+    virtual bool OnMouseMove(SignalParams* pSignal) { return false; }
 
-    virtual bool OnPaint(SignalArgs::Base* pSignal) { return false; }
+    virtual bool OnMouseWheel(SignalParams* pSignal) { return false; }
 
-    virtual bool OnResize(SignalArgs::Base* pSignal) { return false; }
+    virtual bool OnPaint(SignalParams* pSignal) { return false; }
 
-    virtual bool OnInput(SignalArgs::Base* pSignal) { return false; }
+    virtual bool OnResize(SignalParams* pSignal) { return false; }
 };

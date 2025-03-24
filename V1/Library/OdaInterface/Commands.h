@@ -10,20 +10,23 @@
 #include "Ge/GePoint3d.h"
 #include "Gs/Gs.h"
 
+#include <vector>
+
 //--------------------------------------------------------------------------------------------------
 
 class CommandParams
 {
 public:
 
-	Renderer* pRenderer = nullptr;
-	OdGsView* pGsView = nullptr;
-	OdDbDatabase* pDb = nullptr;
-	OdDbBlockTableRecordPtr pSpace;
-	UserIO* pIo = nullptr;
+	CString Name;
+	Renderer* RendererPtr = nullptr;
+	OdGsView* GsViewPtr = nullptr;
+	OdDbDatabase* DbPtr = nullptr;
+	OdDbBlockTableRecordPtr SpacePtr;
+	UserIO* IoPtr = nullptr;
 	bool Completed = false;
 
-	CommandParams(Renderer* pRenderer);
+	CommandParams(const CString& name, Renderer* pRenderer);
 
 	~CommandParams();
 };
@@ -49,10 +52,10 @@ public:
 
 //--------------------------------------------------------------------------------------------------
 
-#define DECLARE_COMMAND_CLASS(x) class x##Command : public CommandBase \
+#define DECLARE_COMMAND_CLASS(x) class Cmd##x : public CommandBase \
 { \
 public: \
-	x##Command() {}; \
+	Cmd##x() {}; \
 	CString Name() override { return L#x; } \
 	void Run(Renderer* pRenderer) override; \
 }
@@ -63,3 +66,50 @@ DECLARE_COMMAND_CLASS(Line);
 DECLARE_COMMAND_CLASS(Circle);
 
 #undef DECLARE_COMMAND_CLASS
+
+//--------------------------------------------------------------------------------------------------
+
+struct CommandInfo
+{
+	CommandBase* CommandPtr = nullptr;
+	UINT Id = 0;
+	CString Name;
+	CString Step;
+
+	CString GetName();
+};
+
+//--------------------------------------------------------------------------------------------------
+
+class CommandStack
+{
+	std::vector<CommandInfo> Commands;
+	WStringArray ActiveCommands;
+	Renderer* RendererPtr = nullptr;
+
+public:
+
+	CommandStack();
+
+public: // From IO
+
+	bool IsActivated();
+
+	CommandInfo* Find(UINT id);
+
+	CommandInfo* Find(const CString& name);
+
+	bool Execute(UINT id, Renderer* pRenderer);
+
+	bool Execute(const CString& name, Renderer* pRenderer);
+
+	bool Execute(CommandInfo* pInfo, Renderer* pRenderer);
+
+public: // From Command
+
+	void Completed(const CString& name, bool complete);
+};
+
+
+
+extern CommandStack TheCommandStack;

@@ -60,7 +60,7 @@
 
 #pragma region TaskBar ID
 
-#include "Command.Resource.h"
+#include "Cmd.Resource.h"
 
 #pragma endregion // REGION
 

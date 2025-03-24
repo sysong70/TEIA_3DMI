@@ -1,11 +1,14 @@
 ﻿#include "stdafx.h"
-#include "UserIO.h"
+
 #include "Application.h"
 #include "Commands.h"
-#include "CommandStack.h"
 #include "Renderer.h"
+#include "UserIO.h"
 
 #include "Ed/EdUserIO.h"
+
+#include "WStr.h"
+#include <atltypes.h>
 
 //**************************************************************************************************
 
@@ -37,7 +40,7 @@ void IoKeywords::Initialize(CString value)
 
 
 
-int IoKeywords::Find(const CString& value, IoKeyword& found)
+int IoKeywords::Find(const CString& value, UioKeyword& found)
 {
 	for (auto it = cbegin(); it != cend(); ++it) {
 		if (it->Code.CompareNoCase(value) == 0 || it->Shortcut.CompareNoCase(value) == 0) {
@@ -55,7 +58,7 @@ void IoKeywords::Check(CString value)
 {
 	value.MakeUpper();
 
-	IoKeyword found;
+	UioKeyword found;
 	int index = Find(value, found);
 	if (index > -1) {
 		DEBUG_STOP;
@@ -72,7 +75,7 @@ void IoKeywords::Clear()
 
 //**************************************************************************************************
 
-void IoSteps::Initialize(CString value)
+void UioSteps::Initialize(CString value)
 {
 	Clear();
 
@@ -85,16 +88,16 @@ void IoSteps::Initialize(CString value)
 
 
 
-void IoSteps::Clear()
+void UioSteps::Clear()
 {
 	// WARNING - Clear(fast initialize)
-	IoSteps dummy;
+	UioSteps dummy;
 	std::swap(*this, dummy);
 }
 
 
 
-void IoSteps::Next(Io::EOSnap& osnap, IoKeywords& keywords)
+void UioSteps::Next(Uio::EOSnap& osnap, IoKeywords& keywords)
 {
 #define FrontAndPop() front(); pop()
 
@@ -115,7 +118,7 @@ void IoSteps::Next(Io::EOSnap& osnap, IoKeywords& keywords)
 
 
 
-bool IoSteps::HasOsnap(CString value, Io::EOSnap& osnap)
+bool UioSteps::HasOsnap(CString value, Uio::EOSnap& osnap)
 {
 	if (value[0] != PRE_OSNAP) {
 		return false;
@@ -124,16 +127,14 @@ bool IoSteps::HasOsnap(CString value, Io::EOSnap& osnap)
 	CString snap = CString(value[1]).MakeUpper() + value.Mid(2);
 
 #define SetOSnap(x) else if (snap == L#x) { \
-	osnap = Io::EOSnap::x; \
+	osnap = Uio::EOSnap::x; \
 	return true; \
 }
 
 	if (value.IsEmpty()) {
-		osnap = Io::EOSnap::None;
+		osnap = Uio::EOSnap::None;
 		return false;
 	}
-	SetOSnap(X)
-	SetOSnap(Y)
 	SetOSnap(Point)
 	SetOSnap(End)
 	SetOSnap(Mid)
@@ -150,13 +151,13 @@ bool IoSteps::HasOsnap(CString value, Io::EOSnap& osnap)
 
 
 
-bool IoSteps::HasKeyword(CString value, IoKeywords& keywords)
+bool UioSteps::HasKeyword(CString value, IoKeywords& keywords)
 {
 	if (value[0] != PRE_KEYWORD) {
 		return false;
 	}
 
-	IoKeyword found;
+	UioKeyword found;
 	int index = keywords.Find(value.Mid(1), found);
 
 	if (index > -1) {
@@ -169,7 +170,7 @@ bool IoSteps::HasKeyword(CString value, IoKeywords& keywords)
 
 //**************************************************************************************************
 
-void IoResult::Initialize()
+void UioResult::Initialize()
 {
 	Real = 0.0;
 	Integer = 0;
@@ -183,17 +184,21 @@ void IoResult::Initialize()
 
 //**************************************************************************************************
 
-void UserIO::IoState::Initialize()
+void UioState::Initialize()
 {
-	Mode = Io::EMode::None;
-	OSnap = Io::EOSnap::None;
+	Wait = Uio::EWait::None;
+	OSnap = Uio::EOSnap::None;
 
-	MousePoint = CPoint(0, 0);
+	Filter.Flag = Uio::EFilter::None;
+	Filter.Angle = 0.0;
+	Filter.Length = 0.0;
+	Filter.X = 0.0;
+	Filter.Y = 0.0;
 }
 
 
 
-void UserIO::IoState::Clear()
+void UioState::Clear()
 {
 	Command.Empty();
 	Prompt.Empty();
@@ -205,7 +210,7 @@ void UserIO::IoState::Clear()
 
 
 
-void UserIO::IoState::Set(const CString& prompt, int options, const wchar_t* keyword, TrackerBase* pTracker)
+void UioState::Set(const CString& prompt, int options, const wchar_t* keyword, TrackerBase* pTracker)
 {
 	Prompt = prompt;
 
@@ -224,12 +229,12 @@ void UserIO::IoState::Set(const CString& prompt, int options, const wchar_t* key
 
 //**************************************************************************************************
 
-#define theRenderer		(*m_state.pRenderer)
-#define theGsView		m_state.pRenderer->GetGsView()
-#define theDelivery		m_state.pRenderer->GetDelivery().userIO
-#define theCoord		m_state.pRenderer->GetCoordConvertor()
-#define theKeywords		m_state.Keywords
-#define theTrackers		m_state.Trackers
+#define theRenderer		(*State.RendererPtr)
+#define theGsViewPtr	State.RendererPtr->GetGsView()
+#define theDelivery		State.RendererPtr->Delivery.UserIO
+#define theCoord		State.RendererPtr->Coordinate
+#define theKeywords		State.Keywords
+#define theTrackers		State.Trackers
 
 //--------------------------------------------------------------------------------------------------
 
@@ -238,16 +243,17 @@ bool UserIO::OnSignal(std::shared_ptr<EventWrapper> wrapper)
 	WorkerThread::Event e = (WorkerThread::Event)wrapper->Type;
 
 	if (e == WorkerThread::Event::Signal) {
-		SignalArgs::Base* pSignal = (SignalArgs::Base*)wrapper->EventData;
+		SignalParams* pSignal = (SignalParams*)wrapper->EventData;
 		if (pSignal == nullptr) {
 			RETURN_FALSE;
 		}
 
-		if (pSignal->Target == Signal::Target::View) {
-#define OnAction(x) Signal::View::Action::On##x: On##x(pSignal); break
+		if (pSignal->Target == Sgn::ETarget::View) {
+#define OnAction(x) SgnView::Action::On##x: On##x(pSignal); break
 
-			switch ((Signal::View::Action)pSignal->Action) {
+			switch ((SgnView::Action)pSignal->Action) {
 			case OnAction(ContextCommand);
+			case OnAction(Command);
 			case OnAction(KeyDown);
 			case OnAction(LButtonDown);
 			case OnAction(LButtonUp);
@@ -256,7 +262,6 @@ bool UserIO::OnSignal(std::shared_ptr<EventWrapper> wrapper)
 			case OnAction(RButtonDown);
 			case OnAction(RButtonUp);
 			case OnAction(MouseMove);
-			case OnAction(Input);
 
 			default:
 				RETURN_FALSE;
@@ -264,10 +269,10 @@ bool UserIO::OnSignal(std::shared_ptr<EventWrapper> wrapper)
 
 #undef OnAction
 		}
-		else if (pSignal->Target == Signal::Target::UserIO) {
-#define OnAction(x) Signal::UserIO::Action::On##x: On##x(pSignal); break
+		else if (pSignal->Target == Sgn::ETarget::UserIO) {
+#define OnAction(x) SgnUserIO::Action::On##x: On##x(pSignal); break
 
-			switch ((Signal::UserIO::Action)pSignal->Action) {
+			switch ((SgnUserIO::Action)pSignal->Action) {
 			case OnAction(Input);
 
 			default:
@@ -292,152 +297,257 @@ bool UserIO::OnSignal(std::shared_ptr<EventWrapper> wrapper)
 
 //--------------------------------------------------------------------------------------------------
 
-bool UserIO::OnCommand(SignalArgs::Base* pSignal)
+bool UserIO::SendSignal(SignalParams* pSignal)
 {
-	SignalArgs::Command& signal = *(SignalArgs::Command*)pSignal;
-	CommandInfo* pInfo = TheCommandStack.Find((UINT)signal.Id);
+	if (pSignal->Target == Sgn::ETarget::View) {
+#define OnAction(x) SgnView::Action::On##x: On##x(pSignal); break
 
-	if (pInfo == nullptr) {
-		return false;
-	}
+		switch ((SgnView::Action)pSignal->Action) {
+		case OnAction(ContextCommand);
+		case OnAction(Command);
+		case OnAction(KeyDown);
+		case OnAction(LButtonDown);
+		case OnAction(LButtonUp);
+		case OnAction(MButtonDown);
+		case OnAction(MButtonUp);
+		case OnAction(RButtonDown);
+		case OnAction(RButtonUp);
+		case OnAction(MouseMove);
 
-	CString name = pInfo->pCommand->Name().MakeUpper();
-	SendCommand(name);
-
-	if (TheCommandStack.Execute(pInfo->pCommand, &theRenderer)) {
-		m_state.Command = name;
-		m_state.Steps.Initialize(pInfo->Step);
-		return true;
-	}
-	else {
-		SendError(Io::ErrorInvalidCommand);
-	}
-
-	return false;
-}
-
-
-
-bool UserIO::OnLButtonDown(SignalArgs::Base* pSignal)
-{
-	SignalArgs::Mouse& signal = *(SignalArgs::Mouse*)pSignal;
-	CPoint point = { signal.X, signal.Y };
-
-	SetPoint(theCoord.ToEyeToWorld(point));
-
-	return true;
-}
-
-
-
-bool UserIO::OnLButtonUp(SignalArgs::Base* pSignal)
-{
-	return false;
-}
-
-
-
-bool UserIO::OnMButtonDown(SignalArgs::Base* pSignal)
-{
-	SignalArgs::Mouse& signal = *(SignalArgs::Mouse*)pSignal;
-	m_state.MousePoint = CPoint(signal.X, signal.Y);
-
-	return true;
-}
-
-
-
-bool UserIO::OnMButtonUp(SignalArgs::Base* pSignal)
-{
-	return false;
-}
-
-
-
-bool UserIO::OnRButtonDown(SignalArgs::Base* pSignal)
-{
-	// TODO - Context menu
-	return false;
-}
-
-
-
-bool UserIO::OnRButtonUp(SignalArgs::Base* pSignal)
-{
-	return false;
-}
-
-
-
-bool UserIO::OnMouseMove(SignalArgs::Base* pSignal)
-{
-	SignalArgs::Mouse& signal = *(SignalArgs::Mouse*)pSignal;
-	CPoint point = { signal.X, signal.Y };
-
-	if (signal.Flags & MK_MBUTTON) {
-		theRenderer.Dolly(point.x - m_state.MousePoint.x, point.y - m_state.MousePoint.y);
-		m_state.MousePoint = point;
-	}
-	else {
-		OdGePoint3d gePoint = theCoord.ToEyeToWorld(point);
-		theTrackers.SetValue(gePoint);
-	}
-
-	// WARNING - thread operation failed, do not call RedrawWindow()
-	theRenderer.PostPaintSignal();
-
-	return true;
-}
-
-
-
-bool UserIO::OnInput(SignalArgs::Base* pSignal)
-{
-	static wchar_t* TRIMER = L" \t\r\n";
-
-	SignalArgs::Text& signal = *(SignalArgs::Text*)pSignal;
-	CString value = signal.Buffer;
-
-	value.Trim(TRIMER);
-	value.MakeUpper();
-
-	if (value.IsEmpty() || value == KEY_CANCEL) {
-		return CancelCommand();
-	}
-
-	// Activated command
-	if (m_state.Command.IsEmpty() == false) {
-		// Has keyword?
-		if (value[0] == PRE_KEYWORD && m_state.Keyword.IsEmpty() == false) {
-			return ParseKeyword(value);
-		}
-		else if (value[1] == PRE_OSNAP) {
-			return ParseOSnap(value);
+		default:
+			REMOVE_POINTER(pSignal);
+			RETURN_FALSE;
 		}
 
-		// Wait input
-		bool success = false;
-
-		switch (m_state.Mode) {
-		case Io::EMode::Integer:	success = ParseInteger(value); break;
-		case Io::EMode::Point:		success = ParsePoint(value); break;
-		case Io::EMode::Real:		success = ParseReal(value); break;
-		case Io::EMode::String:		success = ParseString(value); break;
+#undef OnAction
+	}
+	else if (pSignal->Target == Sgn::ETarget::UserIO) {
+		switch ((SgnUserIO::Action)pSignal->Action) {
+		case SgnUserIO::Action::OnInput:
+			OnInput(pSignal);
+			break;
 
 		default:
 			DEBUG_STOP;
 			break;
 		}
 	}
+	else {
+		DEBUG_STOP;
+	}
 
-	return ParseCommand(value);
+	REMOVE_POINTER(pSignal);
+	return true;
 }
 
 //--------------------------------------------------------------------------------------------------
 
-UserIO::UserIO()
-	: EventDelegator()
+bool UserIO::OnCommand(SignalParams* pSignal)
 {
+	CommandSignal& signal = *(CommandSignal*)pSignal;
+	CommandInfo* pInfo = TheCommandStack.Find((UINT)signal.Id);
+
+	if (pInfo == nullptr) {
+		return SendError(Uio::ErrorInvalidCommand);
+	}
+
+	CancelCommand(true);
+
+	State.Command = pInfo->GetName();
+	State.Steps.Initialize(pInfo->Step);
+	SendCommand(State.Command);
+
+	if (TheCommandStack.Execute(pInfo, &theRenderer) == false) {
+		DEBUG_STOP;
+	}
+
+	return true;
+}
+
+
+
+bool UserIO::OnInput(SignalParams* pSignal)
+{
+	TextSignal& signal = *(TextSignal*)pSignal;
+	CString value = signal.Buffer;
+
+	if (value.IsEmpty()) {
+		return false;
+	}
+	else if (State.Wait == Uio::EWait::String) {
+		//:WARING - Spectial case, pass all string
+		return ParseString(value);
+	}
+
+	// Remove white space
+	value.Trim(L" \t\r\n");
+
+	if (value.CompareNoCase(KEY_CANCEL) == 0) {
+		return CancelCommand(false);
+	}
+	else if (State.Wait == Uio::EWait::None) {
+		return ParseCommand(value);
+	}
+
+	// Compare by lower
+	value.MakeLower();
+	WCHAR first = value[0];
+
+	if (first == PRE_KEYWORD) {
+		return ParseKeyword(value);
+	}
+	else if (first == PRE_OSNAP) {
+		return ParseOSnap(value);
+	}
+	else if (first == PRE_FILTERANGLE) {
+		return ParseFilter(value);
+	}
+	else if (first == PRE_FILTERLENGTH) {
+		// Case of "@100<45"
+		if (value.Find(PRE_FILTERANGLE) > 0) {
+			return ParsePoint(value);
+		}
+		// Case of "@100"
+		ParseFilter(value);
+	}
+	else if (value.Find(PRE_FILTERX) == 0 || value.Find(PRE_FILTERY) == 0) {
+		return ParseFilter(value);
+	}
+
+	switch (State.Wait) {
+	case Uio::EWait::Integer:	return ParseInteger(value); break;
+	case Uio::EWait::Real:		return ParseReal(value); break;
+	case Uio::EWait::String:	return ParseString(value); break;
+
+	case Uio::EWait::Point:
+	case Uio::EWait::PointOrAngle:
+	case Uio::EWait::PointOrLength:
+		return ParsePoint(value);
+		break;
+
+	default:
+		DEBUG_STOP;
+		break;
+	}
+
+	return false;
+}
+
+
+
+bool UserIO::OnLButtonDown(SignalParams* pSignal)
+{
+	MouseSignal& signal = *(MouseSignal*)pSignal;
+	State.MousePoint = { signal.X, signal.Y };
+
+	OdGePoint3d point = theCoord.ToEyeToWorld(State.MousePoint);
+	bool unlock = true;
+
+	if (GetBit(State.Filter.Flag, Uio::EFilter::WaitX)) {
+		State.Filter.X = point.x;
+		BitOn(State.Filter.Flag, Uio::EFilter::X);
+		BitOff(State.Filter.Flag, Uio::EFilter::WaitX);
+		unlock = false;
+	}
+	else if (GetBit(State.Filter.Flag, Uio::EFilter::WaitY)) {
+		State.Filter.Y = point.y;
+		BitOn(State.Filter.Flag, Uio::EFilter::Y);
+		BitOff(State.Filter.Flag, Uio::EFilter::WaitY);
+		unlock = false;
+	}
+
+	SetPoint(point, unlock);
+
+	return true;
+}
+
+
+
+bool UserIO::OnMButtonDown(SignalParams* pSignal)
+{
+	MouseSignal& signal = *(MouseSignal*)pSignal;
+	State.MousePoint = CPoint(signal.X, signal.Y);
+
+	return true;
+}
+
+
+
+bool UserIO::OnMouseMove(SignalParams* pSignal)
+{
+	MouseSignal& signal = *(MouseSignal*)pSignal;
+	CPoint point = { signal.X, signal.Y };
+	SignalParams* pPaintSignal = nullptr;
+
+	if (signal.MiddleButton()) {
+		theRenderer.Dolly(point.x - State.MousePoint.x, point.y - State.MousePoint.y);
+		State.MousePoint = point;
+		// WARNING - thread operation failed, do not call RedrawWindow()
+		theRenderer.SendPaintSignal(UseThread);
+	}
+	else if (IsActivated()) {
+		State.MousePoint = point;
+		SetPoint(theCoord.ToEyeToWorld(point), false);
+/*
+		OdGePoint3d gePoint = theCoord.ToEyeToWorld(point);
+		theTrackers.SetValue(gePoint);
+		theTrackers.Invalidate();
+
+		if (State.Trackers.UseDynamicInput) {
+			RubberBandTracker* pTracker = theTrackers.GetRubberBand();
+			if (pTracker != nullptr) {
+				const int lineCount = 5;
+				const int arcCount = 4;
+
+				RubberBandTracker& tracker = *pTracker;
+				pPaintSignal = new PaintSignal(theRenderer.ViewId);
+				Json::Object& options = ((PaintSignal*)pPaintSignal)->Options;
+
+				if (tracker.LengthGuide) {
+					Json::Array& items = options.CreateArray(SKW_LENGTH);
+					//:WARNING - unlock input control
+					items.AddBoolean(GetBit(tracker.Params.GetFixed(), TrackerParams::eLength));
+					items.AddReal(tracker.Result.Length);
+					items.AddInteger(lineCount);
+
+					for (int i = 0; i < lineCount; i++) {
+						CPoint dcPoint = theCoord.ToWorldToEye(tracker.Result.LinePoints[i]);
+						items.AddInteger(dcPoint.x);
+						items.AddInteger(dcPoint.y);
+					}
+				}
+
+				if (tracker.AngleGuide) {
+					Json::Array& items = options.CreateArray(SKW_ANGLE);
+					items.AddBoolean(GetBit(tracker.Params.GetFixed(), TrackerParams::eAngle));
+					items.AddReal(OdaToDegree(tracker.Result.Angle));
+					items.AddInteger(arcCount);
+
+					for (int i = 0; i < arcCount; i++) {
+						CPoint dcPoint = theCoord.ToWorldToEye(tracker.Result.ArcPoints[i]);
+						items.AddInteger(dcPoint.x);
+						items.AddInteger(dcPoint.y);
+					}
+				}
+			}
+		}
+*/
+	}
+	else {
+	}
+
+	return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+
+UserIO::UserIO(bool useThread)
+	: EventDelegator()
+	, UseThread(useThread)
+{
+	if (UseThread) {
+		Create();
+	}
 }
 
 
@@ -451,7 +561,7 @@ UserIO::~UserIO()
 
 bool UserIO::IsActivated()
 {
-	return m_state.Mode != Io::EMode::None;
+	return State.Wait != Uio::EWait::None;
 }
 
 
@@ -459,13 +569,11 @@ bool UserIO::IsActivated()
 void UserIO::LockProcess(bool value)
 {
 	if (value) {
-		theTrackers.Initialize(theGsView);
-		std::unique_lock<std::mutex> lock(m_waitMutex);
-		m_waitCondition.wait(lock);
+		std::unique_lock<std::mutex> lock(WaitMutex);
+		WaitCondition.wait(lock);
 	}
 	else {
-		theTrackers.Clear(theGsView);
-		m_waitCondition.notify_one();
+		WaitCondition.notify_one();
 	}
 }
 
@@ -473,65 +581,102 @@ void UserIO::LockProcess(bool value)
 
 void UserIO::SetRenderer(Renderer* pRenderer)
 {
-	m_state.pRenderer = pRenderer;
+	State.RendererPtr = pRenderer;
 	StandbyCommand();
 }
 
 
 
-bool UserIO::CancelCommand()
+bool UserIO::CancelCommand(bool hasPostProcess)
 {
-	if (m_state.Command.IsEmpty() == false) {
-		m_state.Command.Empty();
-		m_result.Return = Io::EReturn::Cancel;
-
+	if (State.Command.IsEmpty() == false) {
+		State.Initialize();
+		Result.Return = Uio::EReturn::Cancel;
+		//:WARNING - release Command
 		LockProcess(false);
 	}
 
-	return true;
+	if (hasPostProcess == false) {
+		HasPostProcess = false;
+	}
+
+	if (TheCommandStack.IsActivated()) {
+		//:WARNING - wait CommandCompleted
+		LockProcess();
+		return true;
+	}
+
+	return false;
 }
 
 
 
 void UserIO::StandbyCommand()
 {
-	m_state.Clear();
-	theDelivery.StandbyCommand(Io::PromptTypeACommand);
+	State.Clear();
+	theDelivery.StandbyCommand(Uio::PromptTypeACommand);
+}
+
+
+
+void UserIO::CommandCompleted()
+{
+	if (HasPostProcess == false) {
+		State.Initialize();
+		StandbyCommand();
+	}
+
+	theRenderer.SendPaintSignal(UseThread);
+	//:WARNING - release CancelCommand
+	LockProcess(HasPostProcess = false);
 }
 
 //--------------------------------------------------------------------------------------------------
 
 OdGePoint3d UserIO::GetPoint(const CString& prompt, int options, const wchar_t* keyword, TrackerBase* pTracker)
 {
-	m_state.Initialize();
-	m_state.Set(prompt, options, keyword, pTracker);
-	m_state.Mode = Io::EMode::Point;
-	m_state.Steps.Next(m_state.OSnap, m_state.Keywords);
+	State.Initialize();
+	State.Set(prompt, options, keyword, pTracker);
+	State.Wait = Uio::EWait::Point;
+	State.Steps.Next(State.OSnap, State.Keywords);
 
-	RubberBand rubberBand;
-	if (GetBit(options, Io::eRubberBand)) {
-		rubberBand.SetBasePoint(m_state.LastPoint);
+	RubberBandTracker rubberBand;
+	if (GetBit(options, Uio::eRubberBand)) {
+		rubberBand.Params.Set(this);
+
+		rubberBand.BandLine = GetBit(options, Uio::eBandLine);
+		rubberBand.LengthGuide = GetBit(options, Uio::eLengthGuide);
+		rubberBand.AngleGuide = GetBit(options, Uio::eAngleGuide);
+		rubberBand.SetBasePoint(State.LastPoint);
+
 		theTrackers.Push(&rubberBand);
 	}
 
-	// CHECK
-	RubberRect rubberRect;
-	if (GetBit(options, Io::eRubberRect)) {
-		rubberBand.SetBasePoint(m_state.LastPoint);
+	//:CHECK
+	RubberRectTracker rubberRect;
+	if (GetBit(options, Uio::eRubberRect)) {
+		rubberBand.SetBasePoint(State.LastPoint);
 		theTrackers.Push(&rubberRect);
 	}
 
-	SendPrompt(prompt, keyword);
+	theTrackers.Initialize(theGsViewPtr);
+	//:WARING - for keyboard signal
+	theTrackers.SetValue(theCoord.ToEyeToWorld(State.MousePoint));
+	theTrackers.Invalidate(State.RendererPtr);
+
+	SendPrompt(prompt, keyword, options);
 	LockProcess();
 
-	switch (m_result.Return) {
-	case Io::EReturn::Point:	return m_result.Point;
-	case Io::EReturn::Keyword:	throw OdEdKeyword(m_result.Keyword.Index, m_result.Keyword.Code.GetBuffer());
-	case Io::EReturn::Cancel:	throw OdEdCancel();
+	theTrackers.Terminate(theGsViewPtr);
+
+	switch (Result.Return) {
+	case Uio::EReturn::Point:	return Result.Point;
+	case Uio::EReturn::Keyword:	throw OdEdKeyword(Result.Keyword.Index, Result.Keyword.Code.GetBuffer());
+	case Uio::EReturn::Cancel:	throw OdEdCancel();
 
 	default:
-		ASSERT(m_result.Return != Io::EReturn::None);
-		throw m_result;
+		ASSERT(Result.Return != Uio::EReturn::None);
+		throw Result;
 	}
 
 	DEBUG_STOP;
@@ -542,8 +687,8 @@ OdGePoint3d UserIO::GetPoint(const CString& prompt, int options, const wchar_t* 
 
 bool UserIO::SetInteger(int value)
 {
-	m_result.Return = Io::EReturn::Integer;
-	m_result.Integer = value;
+	Result.Return = Uio::EReturn::Integer;
+	Result.Integer = value;
 	theTrackers.SetValue(value);
 
 	LockProcess(false);
@@ -552,14 +697,58 @@ bool UserIO::SetInteger(int value)
 
 
 
-bool UserIO::SetPoint(const OdGePoint3d& value)
+bool UserIO::SetPoint(OdGePoint3d value, bool unlock)
 {
-	m_state.LastPoint = value;
-	m_result.Return = Io::EReturn::Point;
-	m_result.Point = value;
-	theTrackers.SetValue(value);
+	if (State.Wait == Uio::EWait::None) {
+		return false;
+	}
 
-	LockProcess(false);
+	OdGePoint3d start = State.LastPoint;
+	if (OdNonZero((start - value).normalizeGetLength())) {
+		if (GetBit(State.Filter.Flag, Uio::EFilter::Angle) && GetBit(State.Filter.Flag, Uio::EFilter::Length)) {
+			ASSERT(State.Filter.Length > 0);
+
+			value = start + (OdGeVector3d::kXAxis * State.Filter.Length);
+			value.rotateBy(State.Filter.Angle, OdGeVector3d::kZAxis, start);
+			//:WARNING
+			unlock = true;
+		}
+		else if (GetBit(State.Filter.Flag, Uio::EFilter::Angle)) {
+			ASSERT(OdNonZero(State.Filter.Angle));
+
+			double length = (value - start).normalizeGetLength();
+			value = start + (OdGeVector3d::kXAxis * length);
+			value.rotateBy(State.Filter.Angle, OdGeVector3d::kZAxis, start);
+		}
+		else if (GetBit(State.Filter.Flag, Uio::EFilter::Length)) {
+			value = start + (value - start).normalize() * State.Filter.Length;
+		}
+
+		if (GetBit(State.Filter.Flag, Uio::EFilter::X) && GetBit(State.Filter.Flag, Uio::EFilter::Y)) {
+			value.x = State.Filter.X;
+			value.y = State.Filter.Y;
+			//:WARNING
+			unlock = true;
+		}
+		else if (GetBit(State.Filter.Flag, Uio::EFilter::X)) {
+			value.x = State.Filter.X;
+		}
+		else if (GetBit(State.Filter.Flag, Uio::EFilter::Y)) {
+			value.y = State.Filter.Y;
+		}
+	}
+
+	theTrackers.SetValue(value);
+	theTrackers.Invalidate(State.RendererPtr);
+
+	if (unlock) {
+		State.LastPoint = value;
+		Result.Return = Uio::EReturn::Point;
+		Result.Point = value;
+
+		LockProcess(false);
+	}
+
 	return true;
 }
 
@@ -567,8 +756,8 @@ bool UserIO::SetPoint(const OdGePoint3d& value)
 
 bool UserIO::SetReal(double value)
 {
-	m_result.Return = Io::EReturn::Real;
-	m_result.Real = value;
+	Result.Return = Uio::EReturn::Real;
+	Result.Real = value;
 	theTrackers.SetValue(value);
 
 	LockProcess(false);
@@ -579,8 +768,8 @@ bool UserIO::SetReal(double value)
 
 bool UserIO::SetString(const CString& value)
 {
-	m_result.Return = Io::EReturn::Real;
-	m_result.String = value;
+	Result.Return = Uio::EReturn::Real;
+	Result.String = value;
 	theTrackers.SetValue(value);
 
 	LockProcess(false);
@@ -597,9 +786,9 @@ bool UserIO::SendCommand(const CString& value)
 
 
 
-bool UserIO::SendPrompt(const CString& prompt, const CString& keyword)
+bool UserIO::SendPrompt(const CString& prompt, const CString& keyword, int options)
 {
-	theDelivery.PutPrompt(prompt, keyword);
+	theDelivery.PutPrompt(prompt, keyword, options);
 	return true;
 }
 
@@ -616,55 +805,104 @@ bool UserIO::SendEcho(const CString& value)
 bool UserIO::SendError(const CString& value)
 {
 	theDelivery.PutError(value);
-	return true;
+	return false;
 }
 
 //--------------------------------------------------------------------------------------------------
 
-bool UserIO::ParseCommand(CString& value)
+bool UserIO::ParseCommand(CString value)
 {
-	CommandInfo* pInfo = TheCommandStack.Find(value);
-
+	CommandInfo* pInfo = TheCommandStack.Find(value.MakeUpper());
 	if (pInfo == nullptr) {
-		return false;
+		return SendError(Uio::ErrorInvalidCommand);
 	}
 
-	CString name = pInfo->Name.MakeUpper();
+	CancelCommand(true);
 
-	if (TheCommandStack.Execute(pInfo->pCommand, &theRenderer)) {
-		m_state.Command = name;
-		return SendCommand(name);
-	}
-	else {
-		SendError(Io::ErrorInvalidCommand);
+	State.Command = pInfo->GetName();
+	State.Steps.Initialize(pInfo->Step);
+	SendCommand(State.Command);
+
+	if (TheCommandStack.Execute(pInfo, &theRenderer) == false) {
+		DEBUG_STOP;
 	}
 
+	return true;
+}
+
+
+
+bool UserIO::ParseFilter(CString value)
+{
+	static wchar_t* ANGLE = L"<%lf";
+	static wchar_t* LENGTH = L"@%lf<%lf";
+	static wchar_t* COORDX = L".x%lf";
+	static wchar_t* COORDY = L".y%lf";
+
+	value.MakeLower();
+
+	WCHAR first = value[0];
+	double result = 0.0;
+	bool parsed = false;
+
+	if (value == L".x") {
+		BitOn(State.Filter.Flag, Uio::EFilter::WaitX);
+		//:TODO
+		return SendEcho(L".x of");
+	}
+	else if (value == L".y") {
+		BitOn(State.Filter.Flag, Uio::EFilter::WaitY);
+		//:TODO
+		return SendEcho(L".y of");
+	}
+	else if (swscanf_s(value, ANGLE, &result) == 1) {
+		BitOn(State.Filter.Flag, Uio::EFilter::Angle);
+		State.Filter.Angle = Uio::ToRadian(result);
+		parsed = true;
+	}
+	else if (swscanf_s(value, LENGTH, &result) == 1) {
+		if (OdNonZero(result)) {
+			BitOn(State.Filter.Flag, Uio::EFilter::Length);
+			State.Filter.Length = result;
+			parsed = true;
+		}
+	}
+	else if (swscanf_s(value, COORDX, &result) == 1) {
+		BitOn(State.Filter.Flag, Uio::EFilter::X);
+		State.Filter.X = result;
+		parsed = true;
+	}
+	else if (swscanf_s(value, COORDY, &result) == 1) {
+		BitOn(State.Filter.Flag, Uio::EFilter::Y);
+		State.Filter.Y = result;
+		parsed = true;
+	}
+
+	if (parsed) {
+		SetPoint(theCoord.ToEyeToWorld(State.MousePoint), false);
+		return true;
+	}
+
+	SendError(Uio::ErrorInvalidValue);
 	return false;
 }
 
 
 
-bool UserIO::ParseInteger(CString& value)
+bool UserIO::ParseKeyword(CString value)
 {
-	RETURN_FALSE;
-}
-
-
-
-bool UserIO::ParseKeyword(CString& value)
-{
-	IoKeyword found;
+	UioKeyword found;
 	// Shift PRE_KEYWORD
-	int index = m_state.Keywords.Find(value.Mid(1), found);
+	int index = State.Keywords.Find(value.Mid(1), found);
 
 	if (index > -1) {
-		m_result.Return = Io::EReturn::Keyword;
-		m_result.Keyword = found;
+		Result.Return = Uio::EReturn::Keyword;
+		Result.Keyword = found;
 
 		LockProcess(false);
 	}
 	else {
-		SendError(Io::ErrorInvalidKeyword);
+		SendError(Uio::ErrorInvalidKeyword);
 	}
 
 	return true;
@@ -672,21 +910,19 @@ bool UserIO::ParseKeyword(CString& value)
 
 
 
-bool UserIO::ParseOSnap(CString& value)
+bool UserIO::ParseOSnap(CString value)
 {
 	// Shift PRE_OSNAP
 	CString snap = CString(value[1]).MakeUpper() + value.Mid(2);
 
 #define SetOSnap(x) else if (snap == L#x) { \
-	m_state.OSnap = Io::EOSnap::x; \
+	State.OSnap = Uio::EOSnap::x; \
 	return true; \
 }
 
 	if (value.IsEmpty()) {
-		m_state.OSnap = Io::EOSnap::None;
+		State.OSnap = Uio::EOSnap::None;
 	}
-	SetOSnap(X)
-	SetOSnap(Y)
 	SetOSnap(Point)
 	SetOSnap(End)
 	SetOSnap(Mid)
@@ -703,17 +939,17 @@ bool UserIO::ParseOSnap(CString& value)
 
 
 
-bool UserIO::ParseOtherInput(CString& value)
+bool UserIO::ParseOtherInput(CString value)
 {
-	if (GetBit(m_state.Options, Io::eAllowInteger)) return ParseInteger(value);
-	if (GetBit(m_state.Options, Io::eAllowReal)) return ParseReal(value);
+	if (GetBit(State.Options, Uio::eAllowInteger)) return ParseInteger(value);
+	if (GetBit(State.Options, Uio::eAllowReal)) return ParseReal(value);
 
 	return false;
 }
 
 
 
-bool UserIO::ParsePoint(CString& value)
+bool UserIO::ParsePoint(CString value)
 {
 	static wchar_t* CARTESIAN = L"%lf,%lf";
 	static wchar_t* POLAR = L"%lf<%lf";
@@ -722,35 +958,37 @@ bool UserIO::ParsePoint(CString& value)
 	double v1, v2;
 	bool relative = false;
 
-	if (value[0] == PRE_OSNAP) {
-		value.TrimLeft(PRE_OSNAP);
-		return ParseOSnap(value);
-	}
-
 	if (pValue[0] == PRE_RELATIVE) {
 		relative = true;
 		pValue++;
 	}
 
 	if (swscanf_s(pValue, CARTESIAN, &v1, &v2) == 2) {
+		double x = v1;
+		double y = v2;
+
 		if (relative) {
-			return SetPoint(m_state.LastPoint + OdGeVector3d(v1, v2, 0));
+			return SetPoint(State.LastPoint + OdGeVector3d(x, y, 0), true);
 		}
 		else {
-			return SetPoint({ v1, v2, 0 });
+			return SetPoint(OdGePoint3d(x, y, 0), true);
 		}
 	}
 	else if (swscanf_s(pValue, POLAR, &v1, &v2) == 2) {
-		OdGePoint3d point(v1, 0, 0);
-		point.rotateBy(v2, OdGeVector3d::kZAxis, relative ? m_state.LastPoint : OdGePoint3d::kOrigin);
+		double length = v1;
+		double angle = Uio::ToRadian(v2);
 
-		return SetPoint(point);
+		OdGePoint3d point(length, 0, 0);
+		point += State.LastPoint.asVector();
+		point.rotateBy(angle, OdGeVector3d::kZAxis, relative ? State.LastPoint : OdGePoint3d::kOrigin);
+
+		return SetPoint(point, true);
 	}
-	else if (m_state.Options > 0) {
+	else if (State.Options > 0) {
 		return ParseOtherInput(value);
 	}
 	else {
-		return SendError(Io::ErrorInvalidPoint);
+		return SendError(Uio::ErrorInvalidPoint);
 	}
 
 	return false;
@@ -758,29 +996,22 @@ bool UserIO::ParsePoint(CString& value)
 
 
 
-bool UserIO::ParseReal(CString& value)
+bool UserIO::ParseReal(CString value)
 {
 	double result = 0.0;
 
 	if (swscanf_s(value, L"%lf", &result) != 1) {
-		return SendError(Io::ErrorInvalidValue);
+		return SendError(Uio::ErrorInvalidValue);
 	}
 
-	if (GetBit(m_state.Options, Io::eNoZero) && OdZero(result)) {
-		return SendError(Io::ErrorZeroValue);
+	if (GetBit(State.Options, Uio::eNoZero) && OdZero(result)) {
+		return SendError(Uio::ErrorZeroValue);
 	}
-	if (GetBit(m_state.Options, Io::eNoNegative) && result < 0) {
-		return SendError(Io::ErrorNegativeValue);
+	if (GetBit(State.Options, Uio::eNoNegative) && result < 0) {
+		return SendError(Uio::ErrorNegativeValue);
 	}
 
 	return SetReal(result);
-}
-
-
-
-bool UserIO::ParseString(CString& value)
-{
-	RETURN_FALSE;
 }
 
 #undef theRenderer
