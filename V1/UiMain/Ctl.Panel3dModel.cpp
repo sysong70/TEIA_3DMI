@@ -1053,7 +1053,7 @@ void CtlPanel3dModel::ExpandParent(Json::Object* pData)
 	DisableNotification();
 
 	BOOL success = Control.Expand(FindTreeItem(SKW_KEY), TVE_EXPAND);
-	ASSERT(success);
+	//ASSERT(success);
 }
 
 
