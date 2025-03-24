@@ -25,7 +25,6 @@
 #include <3DF/Material.h>
 
 #include <3DF/Selection.h>
-#include <3DF/Impl/SelectionImpl.h>
 
 #include <3DF/Highlight.h>
 #include <3DF/Visibility.h>
@@ -131,6 +130,8 @@ bool KERNEL::Command::HighlightObjectSnapImpl::SnapItem::operator == (const Snap
 
 
 //== ObjectSnap class ==============================================================================
+
+// Highlight Option 설정 #Selection
 KERNEL::Command::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const Session * pcInSession) :
 	SetImpl(pcInSession),
 	m_cDynHighlightControl(Window()),
@@ -214,6 +215,9 @@ KERNEL::Command::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const Session 
 
 	m_cDynHighlightControl.SetMaterialMapping(cDynHighlightMaterialMapping);
 	// Shell 선택시에 Line Visibility를 설정한대로 적용하기 위해서 Lock을 걸도록 한다.
+
+	// 사용하면 속도가 저하됨. 투명도 상태에서 선택된 결과값은 깨끗하게 나옴.
+	//m_cDynHighlightControl.SetMode(HighlightMode::Type::DefaultConditional);
 
 	m_cDynHighlightControl.GetAttributeLockControl().SetLock(AttributeLock::Type::MaterialLineColor);
 //	m_cDynHighlightControl.GetAttributeLockControl().SetLock(AttributeLock::Type::VisibilityLines);
@@ -560,8 +564,7 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 					strName = cOwner.Name(false);
 
 					if ("pmi" == strName.Left(3)) {
-						SelectionItemImpl * pcImpl = (SelectionItemImpl *) cSelectItem.GetImpl();
-						pcImpl->m_cKey = cOwner.KeyValue();
+						cSelectItem.KeyPushBack(cOwner, H3DF::Type::SegmentKey);
 						bFindPmiItem = true;
 						break;
 					}
@@ -585,8 +588,7 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 					strName = cOwner.Name(false);
 
 					if ("pmi" == strName.Left(3)) {
-						SelectionItemImpl * pcImpl = (SelectionItemImpl *) cSelectItem.GetImpl();
-						pcImpl->m_cKey = cOwner.KeyValue();
+						cSelectItem.KeyPushBack(cOwner, H3DF::Type::SegmentKey);
 						bFindPmiItem = true;
 						break;
 					}
@@ -700,11 +702,13 @@ void KERNEL::Command::HighlightObjectSnapImpl::ApplySelectionFilter(H3DF::Select
 		else if (H3DF::Type::ShellKey == eType) {
 			if (m_nSelFilter & (DWORD)SelectionFilter::Type::Solid) {
 
+/*
 				SelectionItemImpl * pcItemImpl = dynamic_cast<SelectionItemImpl *>(cNextItem.GetImpl());
 
 				pcItemImpl->m_nOffset1 = 0;
 				pcItemImpl->m_nOffset2 = 0;
 				pcItemImpl->m_nOffset3 = 0;
+*/
 
 				cOutSelections.PushBack(cNextItem);
 #if 0

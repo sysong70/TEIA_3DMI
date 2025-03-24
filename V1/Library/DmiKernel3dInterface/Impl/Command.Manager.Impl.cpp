@@ -27,6 +27,14 @@ void KERNEL::Command::ManagerImpl::ViewMouseSignal(Json::Object & cInObject, int
 	pcSession->MouseSignal(cInObject);
 }
 
+void KERNEL::Command::ManagerImpl::ViewCancelSignal(int nViewId)
+{
+	Session * pcSession = GetSession(nViewId);
+	DEBUG_VALID(pcSession);
+
+	pcSession->CancelSignal();
+}
+
 void KERNEL::Command::ManagerImpl::SessionKeyboardSignal(Json::Object & cInObject, int nSessionId)
 {
 	Session * pcSession = GetSession(nSessionId);
@@ -158,6 +166,14 @@ void KERNEL::Command::ManagerImpl::SessionExecuteCommand(Json::Object & cInObjec
 	switch (nId)
 	{
 		case CUSTOM_3D_CMD_SYSONG_Test1:
+		case CUSTOM_3D_CMD_SYSONG_Test2:
+		case CUSTOM_3D_CMD_SYSONG_Test3:
+		case CUSTOM_3D_CMD_SYSONG_Test4:
+		case CUSTOM_3D_CMD_SYSONG_Test5:
+		case CUSTOM_3D_CMD_SYSONG_Test6:
+		case CUSTOM_3D_CMD_SYSONG_Test7:
+		case CUSTOM_3D_CMD_SYSONG_Test8:
+		case CUSTOM_3D_CMD_SYSONG_Test9:
 			pcSession->TestCommand(nId);
 			return;
 			break;

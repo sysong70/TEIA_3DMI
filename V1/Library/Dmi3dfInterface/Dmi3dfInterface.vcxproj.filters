@@ -108,9 +108,6 @@
     <ClInclude Include="3DF\MarkerAttribute.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Image.h">
-      <Filter>3DF\Control</Filter>
-    </ClInclude>
     <ClInclude Include="3DF\Operator.CameraControl.h">
       <Filter>Operator</Filter>
     </ClInclude>
@@ -273,7 +270,7 @@
     <ClInclude Include="3DF\Impl\WindowImpl.h">
       <Filter>3DF\Object\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="3DF\Impl\SelectionImpl.h">
+    <ClInclude Include="3DF\Impl\Selection.Impl.h">
       <Filter>3DF\Control\Impl</Filter>
     </ClInclude>
     <ClInclude Include="3DF\Search.h">
@@ -378,6 +375,18 @@
     <ClInclude Include="3DF\Impl\HighlightImpl.h">
       <Filter>3DF\Control\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\Texture.h">
+      <Filter>3DF\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Image.h">
+      <Filter>3DF\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Impl\ImageImpl.h">
+      <Filter>3DF\Object\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Impl\TextureImpl.h">
+      <Filter>3DF\Object\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -417,9 +426,6 @@
       <Filter>3DF\Control</Filter>
     </ClCompile>
     <ClCompile Include="3DF\MarkerAttribute.cpp">
-      <Filter>3DF\Control</Filter>
-    </ClCompile>
-    <ClCompile Include="3DF\Image.cpp">
       <Filter>3DF\Control</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Operator.CameraControl.cpp">
@@ -575,7 +581,7 @@
     <ClCompile Include="3DF\Impl\WindowImpl.cpp">
       <Filter>3DF\Object\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="3DF\Impl\SelectionImpl.cpp">
+    <ClCompile Include="3DF\Impl\Selection.Impl.cpp">
       <Filter>3DF\Control\Impl</Filter>
     </ClCompile>
     <ClCompile Include="3DF\Search.cpp">
@@ -682,6 +688,18 @@
     </ClCompile>
     <ClCompile Include="3DF\Impl\HighlightImpl.cpp">
       <Filter>3DF\Control\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Texture.cpp">
+      <Filter>3DF\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Image.cpp">
+      <Filter>3DF\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\ImageImpl.cpp">
+      <Filter>3DF\Object\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\TextureImpl.cpp">
+      <Filter>3DF\Object\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

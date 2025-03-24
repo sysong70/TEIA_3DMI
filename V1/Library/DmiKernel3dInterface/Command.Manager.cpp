@@ -120,7 +120,7 @@ void KERNEL::Command::Manager::ExecuteViewSignal(Json::Object & cInObject)
 			break;
 
 		case Signal::View::Action::OnCancel:
-			//ViewCancelCommands();
+			pcImpl->ViewCancelSignal(nViewId);
 			break;
 
 		case Signal::View::Action::OnCommand:

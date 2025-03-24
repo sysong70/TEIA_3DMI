@@ -2,7 +2,8 @@
 
 #include "Segment.h"
 #include "Control.h"
-
+#include "Image.h"
+#include "Texture.h"
 #include <deque>
 
 namespace H3DF
@@ -20,8 +21,14 @@ namespace H3DF
 		void Set(PortfolioKey const & cInThat);
 		PortfolioKey & operator = (PortfolioKey const & cInThat);
 
+		TextureDefinition DefineTexture(CStringA strName, ImageDefinition const & cInSource);
+		TextureDefinition DefineTexture(CStringA strName, ImageDefinition const & cInSource, TextureOptionsKit const & cInOptions);
+		
+		ImageDefinition DefineImage(CStringA strInName, ImageKit const & cInSource);
 		NamedStyleDefinition DefineNamedStyle(CStringA strInName, SegmentKey const & cInStyleSource);
 	};
+
+	using PortfolioKeyArray = std::vector<PortfolioKey>;
 
 	class API_3DF PortfolioControl : public Control
 	{
@@ -37,11 +44,20 @@ namespace H3DF
 		size_t GetCount() const;
 
 		PortfolioControl & Push(PortfolioKey const & cInPortfolio);
+		
 		bool Pop();
+		bool Pop(PortfolioKey & cOutPortfolio);
+
+		PortfolioControl & Set(PortfolioKey const & cInPortfolio);
+		PortfolioControl & Set(PortfolioKeyArray const & cInPortfolios);
+
+		PortfolioControl & UnsetTop();
+		PortfolioControl & UnsetEverything();
 
 		bool ShowTop(PortfolioKey & cOutPortfolio) const;
+		bool Show(PortfolioKeyArray & cOutPortfolios) const;
 
 	private:
-		
+		PortfolioControl();
 	};
 }

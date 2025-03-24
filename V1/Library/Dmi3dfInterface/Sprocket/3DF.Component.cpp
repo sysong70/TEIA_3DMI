@@ -9,7 +9,7 @@
 #include "../3DF/3DF.Utility.h"
 #include "../3DF/KeyPath.h"
 #include "../3DF/Selection.h"
-#include "../3DF/Impl/SelectionImpl.h"
+#include "../3DF/Impl/Selection.Impl.h"
 
 #include "Common_Define.h"
 
@@ -302,6 +302,15 @@ bool H3DF::Component::RemoveMetaData(H3DF::MetaDataIndex eInIndex)
 	}
 
 	return false;
+}
+
+bool H3DF::Component::IsShow()
+{
+	if (GetStatus() & Component::Status::NoShow) {
+		return false;
+	}
+
+	return true;
 }
 
 DWORD H3DF::Component::GetStatus()

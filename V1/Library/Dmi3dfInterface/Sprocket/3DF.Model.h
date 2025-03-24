@@ -22,14 +22,17 @@ namespace H3DF
 		SegmentKey GetSegmentKey();
 		SegmentKey const GetSegmentKey() const;
 
+		PortfolioKey GetPortfolioKey();
+		PortfolioKey const GetPortfolioKey() const;
+
 		void SetBRepGeometry(bool brep);
 
 		H3DF::ModelHandedness GetModelHandedness();
 		void UpdateModelHandedness();
 
-		SegmentKey & Models() const;
-		SegmentKey & Measurements() const;
-		SegmentKey & Markups() const;
+		SegmentKey & ModelsRoot() const;
+		SegmentKey & MeasurementsRoot() const;
+		SegmentKey & MarkupsRoot() const;
 
 		SegmentKey & IncludeModel() const;
 		SegmentKey & IncludeStyles() const;

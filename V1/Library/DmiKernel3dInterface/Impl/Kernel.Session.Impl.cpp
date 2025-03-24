@@ -37,14 +37,14 @@ KERNEL::SessionImpl::SessionImpl()
 
 KERNEL::SessionImpl::~SessionImpl()
 {
-	for (auto & cIterator : m_mpcCommandMap) {
+	for (auto & cIterator : m_mpcCommonCommandMap) {
 		Command::Set * pcOperator = cIterator.second;
 		if (nullptr != pcOperator) {
 			delete pcOperator;
 		}
 	}
 
-	m_mpcCommandMap.clear();
+	m_mpcCommonCommandMap.clear();
 
 	if (nullptr != m_pcCanvas) {
 		delete m_pcCanvas;
@@ -103,47 +103,47 @@ void KERNEL::SessionImpl::CancelCommands()
 
 void KERNEL::SessionImpl::AllocationOperator(const Session * pcInSession)
 {
-	m_mpcCommandMap.insert(std::make_pair(KERNEL::Command::Type::VisualEffects, new KERNEL::Command::VisualEffects(pcInSession)));
+	m_mpcCommonCommandMap.insert(std::make_pair(KERNEL::Command::Type::VisualEffects, new KERNEL::Command::VisualEffects(pcInSession)));
 	// )[(int)KERNEL::Command::Type::VisualEffects] = new KERNEL::Command::VisualEffects(pcInSession);
 
-	m_mpcCommandMap.insert(std::make_pair(KERNEL::Command::Type::Attribute, new KERNEL::Command::Attribute(pcInSession)));
+	m_mpcCommonCommandMap.insert(std::make_pair(KERNEL::Command::Type::Attribute, new KERNEL::Command::Attribute(pcInSession)));
 
-	m_mpcCommandMap.insert(std::make_pair(KERNEL::Command::Type::Camera, new KERNEL::Command::Camera(pcInSession)));
+	m_mpcCommonCommandMap.insert(std::make_pair(KERNEL::Command::Type::Camera, new KERNEL::Command::Camera(pcInSession)));
 
-	m_mpcCommandMap.insert(std::make_pair(KERNEL::Command::Type::Select, new KERNEL::Command::Select(pcInSession)));
+	m_mpcCommonCommandMap.insert(std::make_pair(KERNEL::Command::Type::Select, new KERNEL::Command::Select(pcInSession)));
 
-	m_mpcCommandMap.insert(std::make_pair(KERNEL::Command::Type::ModelPanel, new KERNEL::Command::ModelPanel(pcInSession)));
+	m_mpcCommonCommandMap.insert(std::make_pair(KERNEL::Command::Type::ModelPanel, new KERNEL::Command::ModelPanel(pcInSession)));
 
-	m_mpcCommandMap.insert(std::make_pair(KERNEL::Command::Type::PMI_Distance, new KERNEL::Command::PMI::Distance(pcInSession)));
+	m_mpcCommonCommandMap.insert(std::make_pair(KERNEL::Command::Type::PMI_Distance, new KERNEL::Command::PMI::Distance(pcInSession)));
 
 	// Navigation Cube에서 사용하는 DynHighlightControl을 설정한다. Cube에서 선택된 부분을 Unhighlight하기 위함.
-	KERNEL::Command::Select * pcSelect = (KERNEL::Command::Select *)m_mpcCommandMap[KERNEL::Command::Type::Select];
+	KERNEL::Command::Select * pcSelect = (KERNEL::Command::Select *)m_mpcCommonCommandMap[KERNEL::Command::Type::Select];
 	GetCanvas().GetFrontView().GetNavigationCube().SetHighlightControl(pcSelect->DynHighlightControl());
 }
 
 KERNEL::Command::Set * KERNEL::SessionImpl::GetOperator(Command::Type eInType)
 { 
-	return m_mpcCommandMap[eInType]; 
+	return m_mpcCommonCommandMap[eInType]; 
 }
 
 KERNEL::Command::Attribute & KERNEL::SessionImpl::Attribute()
 {
-	return *(Command::Attribute *)m_mpcCommandMap[Command::Type::Attribute];
+	return *(Command::Attribute *)m_mpcCommonCommandMap[Command::Type::Attribute];
 }
 
 KERNEL::Command::Camera & KERNEL::SessionImpl::Camera()
 {
-	return *(Command::Camera *)m_mpcCommandMap[Command::Type::Camera];
+	return *(Command::Camera *)m_mpcCommonCommandMap[Command::Type::Camera];
 }
 
 KERNEL::Command::Select & KERNEL::SessionImpl::Select()
 {
-	return *(Command::Select *)m_mpcCommandMap[Command::Type::Select];
+	return *(Command::Select *)m_mpcCommonCommandMap[Command::Type::Select];
 }
 
 KERNEL::Command::ModelPanel & KERNEL::SessionImpl::ModelPanel()
 {
-	return *(Command::ModelPanel *)m_mpcCommandMap[Command::Type::ModelPanel];
+	return *(Command::ModelPanel *)m_mpcCommonCommandMap[Command::Type::ModelPanel];
 }
 
 //== Mouse 관련 함수 =================================================================================
@@ -257,7 +257,7 @@ bool KERNEL::SessionImpl::SelectControlLButtonDown(Command::Event & cInEvent)
 	return true;
 }
 
-// 3. Select 및 View Control Mouse Event 처리 함수 
+// 3. Select 및 View Control Mouse Event 처리 함수 #Selection
 Command::Result::Type KERNEL::SessionImpl::SelectControlLButtonUp(Command::Event & cInEvent)
 {
 	Select().SetMouseUpTickCount(GetTickCount64());
@@ -355,7 +355,7 @@ Command::Result::Type KERNEL::SessionImpl::CameraControlLButtonUp(Command::Event
 // 1. 전달받은 Attribute 명령어를 분기 처리하는 함수.
 void KERNEL::SessionImpl::SetVisibility(int nId)
 {
-	Command::Attribute * pcOperator = (Command::Attribute *)m_mpcCommandMap[KERNEL::Command::Type::Attribute];
+	Command::Attribute * pcOperator = (Command::Attribute *)m_mpcCommonCommandMap[KERNEL::Command::Type::Attribute];
 	DEBUG_VALID(pcOperator);
 
 	switch (nId)
@@ -408,7 +408,7 @@ void KERNEL::SessionImpl::CommandRequest(Json::Object & cInObject)
 // 1-1. Visual Effects Request 요청 함수 처리
 void KERNEL::SessionImpl::RequestVisualEffects(Json::Object & cInObject)
 {
-	Command::VisualEffects * pcOperator = (Command::VisualEffects *) m_mpcCommandMap[KERNEL::Command::Type::VisualEffects];
+	Command::VisualEffects * pcOperator = (Command::VisualEffects *) m_mpcCommonCommandMap[KERNEL::Command::Type::VisualEffects];
 	DEBUG_VALID(pcOperator);
 	pcOperator->Request(cInObject);
 }
@@ -433,7 +433,7 @@ void KERNEL::SessionImpl::CommandChange(Json::Object & cInObject)
 // 2-1. Visual Effects Change 요청 함수 처리
 void KERNEL::SessionImpl::ChangeVisualEffects(Json::Object & cInObject)
 {
-	Command::VisualEffects * pcOperator = (Command::VisualEffects *)m_mpcCommandMap[KERNEL::Command::Type::VisualEffects];
+	Command::VisualEffects * pcOperator = (Command::VisualEffects *)m_mpcCommonCommandMap[KERNEL::Command::Type::VisualEffects];
 	DEBUG_VALID(pcOperator);
 	pcOperator->Change(cInObject);
 }
@@ -447,7 +447,7 @@ void KERNEL::SessionImpl::SetCommand(int nInCommandId)
 	switch (nInCommandId)
 	{
 		case MEASURE_3D_CMD_Basic_Distance: {
-			Command::PMI::Distance * pcCommand = (Command::PMI::Distance *)m_mpcCommandMap[KERNEL::Command::Type::PMI_Distance];
+			Command::PMI::Distance * pcCommand = (Command::PMI::Distance *)m_mpcCommonCommandMap[KERNEL::Command::Type::PMI_Distance];
 			DEBUG_VALID(pcCommand);
 
 			// Command를 설정

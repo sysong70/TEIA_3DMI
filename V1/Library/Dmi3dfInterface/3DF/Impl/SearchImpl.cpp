@@ -44,6 +44,11 @@ CString SearchImpl::GetSearchTypeString(Search::Type eType)
 			strType = _T("lines, polylines");
 			break;
 
+		case H3DF::Search::Type::Portfolio:
+		case H3DF::Search::Type::SegmentStyle: {
+			strType = _T("style");
+		} break;
+
 /*
 		case H3DF::Search::Type::CuttingSection:
 			break;
@@ -507,7 +512,7 @@ CString SearchImpl::GetSearchTypeString(Search::Type eType)
 */
 
 		default:
-
+			DEBUG_STOP;
 			break;
 	}
 
@@ -566,6 +571,10 @@ Key H3DF::SearchResultsImpl::GetKey(CStringA strType, HC_KEY nInKey)
 	else if (strType == _T("reference")) {
 		ReferenceKey cReference(nInKey);
 		cKey = cReference;
+	}
+	else if (strType == _T("style")) {
+		StyleKey cStyle(nInKey);
+		cKey = cStyle;
 	}
 	else {
 		DEBUG_STOP;

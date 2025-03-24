@@ -22,6 +22,8 @@ namespace H3DF
 		API_3DF CString GetTypeString(Type eType);
 		API_3DF Type GetType(Key & cKey);
 		API_3DF Type GetType(HC_KEY nInKey);
+		API_3DF Type GetType(CStringA strType);
+
 		API_3DF CStringA GetName(HC_KEY nInKey);
 		API_3DF CStringA GetName(Key & cInKey);
 
@@ -60,7 +62,7 @@ namespace H3DF
 		HPoint ToHPoint(H3DF::Point cInPoint);
 
 		//== File 관련 함수 ==========================================================================
-		CString GetExecuteDirectory();
+		API_3DF CString GetExecuteDirectory();
 
 		//== Segment 관련 함수 =======================================================================
 		API_3DF bool ShowSubSegment(SegmentKey & cInTargetSegment, CStringA strInSegmentName, SegmentKey & cOutSegment);

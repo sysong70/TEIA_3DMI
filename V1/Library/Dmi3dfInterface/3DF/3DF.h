@@ -57,7 +57,6 @@ namespace H3DF
 	class SegmentKey;
 	class IncludeKey;
 	class MaterialMappingKit;
-	class PortfolioKey;
 	class ShellKey;
 	class CircleKit;
 	class CircleKey;
@@ -125,6 +124,7 @@ namespace H3DF
 	class ReferenceKey;
 
 	class PortfolioKey;
+	class PortfolioControl;
 
 	class DrawingAttributeKit;
 	class DrawingAttributeControl;
@@ -884,7 +884,7 @@ namespace H3DF
 	using BoolArray = std::vector<bool>;
 	
 	using AttributeLockTypeArray = std::vector<AttributeLock::Type>;
-
+	
 	using StyleKeyArray = std::vector<StyleKey>;
 
 	using ConditionalExpressionArray = std::vector<ConditionalExpression>;

@@ -50,7 +50,7 @@ namespace H3DF
 	{
 	public:
 		StyleKey();
-		StyleKey(HC_KEY cInKey);
+		explicit StyleKey(Key const & cInThat);
 		StyleKey(StyleKey const & cInThat);
 
 		H3DF::Type ObjectType() const { return H3DF::Type::StyleKey; };

@@ -9,7 +9,7 @@
 #include "Highlight.h"
 
 #include "Facility.AppOptions.h"
-#include "./Impl/SelectionImpl.h"
+#include "./Impl/Selection.Impl.h"
 
 #include "../Sprocket/Impl/3DF.View.Impl.h"
 

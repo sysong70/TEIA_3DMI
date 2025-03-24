@@ -10,7 +10,7 @@
 
 #include "../3DF/Object.h"
 #include "../3DF/Selection.h"
-#include "../3DF/Impl/SelectionImpl.h"
+#include "../3DF/Impl/Selection.Impl.h"
 #include "../3DF/3DF.Utility.h"
 
 using namespace H3DF;
@@ -80,7 +80,7 @@ Component * H3DF::CADModel::GetComponent(H3DF::SelectionItem & cInItem) const
 
 #ifdef _DEBUG
 	CString strText;
-	cInItem.ShowPathString(strText);
+	cPath.ShowString(strText);
 #endif
 
 	// 키값 배열을 가져온다.
@@ -124,8 +124,8 @@ Component * H3DF::CADModel::GetComponent(H3DF::SelectionItem & cInItem) const
 			}
 		}
 
+		// 찾는 Component가 없으면 다음 Key를 이용해서 탐색을 계속한다.
 		if (nullptr == pcFindSubComponent) {
-			DEBUG_STOP;
 			continue;
 		}
 
@@ -142,48 +142,59 @@ bool H3DF::CADModel::ShowSelectionResult(Component * pcInComponent, H3DF::Select
 		return false;
 	}
 
+	// Show/No Show 검사
+	if (false == pcInComponent->IsShow()) {
+		return true;
+	}
+
 	CADModelImpl * pcImpl = (CADModelImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
 	// RepresentationItem이면 마지막 하부까지 탐색한걸로 간주한다.
+	// RepresentationItem이 아니면 하부까지 탐색한다.
+	// RepresentationItem이면 Component를 중심으로 상위로 탐색을 시작하면서 Key 값을 저장한다.
+	// Shell값등의 Geometry를 최상단으로 넣어야 하는지는 결정되지 않았음.
+	// Component class에서 ShowSelectionResult를 처리하는 것이 더 자	연스러울 수 있음. (아님.. 아래에서 위로 선택하니까. 
 	if (true == pcInComponent->IsRepresentationItem()) {
 
-		// 선택된 Item을 상위 탐색을 통해서, Models Group Item까지 값을 저장한다.
-		std::vector<HC_KEY> vnKeys;
+		SelectionItem cInItem;
+		SelectionItemImpl * pcInItemImpl = (SelectionItemImpl *) cInItem.GetImpl();
+		DEBUG_VALID(pcInItemImpl);
+
+		// Shell을 찾아서 넣는다. 그렇게 해야 Selection에서 화면에 보이는 것이 제대로 나옴.
+		SearchResults cResults;
+		SegmentKey cSegment(pcInComponent->GetSegmentKey());
+		cSegment.Find(Search::Type::Geometry, Search::Space::SegmentOnly, cResults);
+		
+		SearchResultsIterator cIter = cResults.GetIterator();
+		while (true == cIter.IsValid()) {
+			Key cKey = cIter.GetItem();
+			H3DF::Type cType = cKey.Type();
+
+			if (H3DF::Type::ShellKey == cType) {
+				cInItem.KeyPushBack(cKey, H3DF::Type::ShellKey);
+			}
+
+			cIter.Next();
+		}
+
 		while (nullptr != pcInComponent) {
-			vnKeys.push_back(pcInComponent->GetIncludeKey());
+			if (INVALID_KEY != pcInComponent->GetSegmentKey()) {
+				cInItem.KeyPushBack(pcInComponent->GetSegmentKey(), H3DF::Type::SegmentKey);
+			}
+
+			if (INVALID_KEY != pcInComponent->GetIncludeKey()) {
+				cInItem.KeyPushBack(pcInComponent->GetIncludeKey(), H3DF::Type::IncludeKey);
+			}
+
 			if (pcInComponent == pcImpl->m_pcModels) {
 				break;
 			}
+
 			pcInComponent = pcInComponent->GetOwner();
 		}
 
-		// 적어도 2개 이상의 Key가 있어야 한다.
-		if (2 > vnKeys.size()) {
-			return false;
-		}
-
-		SelectionItem cInItem;
-		SelectionItemImpl * pcImpl = dynamic_cast<SelectionItemImpl *>(cInItem.GetImpl());
-		DEBUG_VALID(pcImpl);
-
-		H3DF::Type eType = H3DF::Utility::GetType(vnKeys[0]);
-
-		int nIncludeCount = 0;
-		int nStartIndex = 0;
-
-		if (H3DF::Type::IncludeKey == eType) {
-			IncludeKey cInclude(vnKeys[0]);
-			pcImpl->m_cKey = cInclude.GetTarget();
-			nIncludeCount = (int)vnKeys.size();
-			nStartIndex = 0;
-		}
-		else {
-			pcImpl->m_cKey = SegmentKey(vnKeys[0]);
-			nIncludeCount = (int)vnKeys.size() - 1;
-			nStartIndex = 1;
-		}
-
+/*
 		pcImpl->m_nIncludeCount = nIncludeCount;
 		pcImpl->m_pnIncludeKeys = new HC_KEY[nIncludeCount];
 
@@ -192,6 +203,7 @@ bool H3DF::CADModel::ShowSelectionResult(Component * pcInComponent, H3DF::Select
 		for (int nIndex = nStartIndex; nIndex < nIncludeCount; nIndex++) {
 			pcImpl->m_pnIncludeKeys[nIncludeIndex++] = vnKeys[nIncludeCount - nIndex - 1];
 		}
+*/
 
 #ifdef _DEBUG
 // 		CString strPath;

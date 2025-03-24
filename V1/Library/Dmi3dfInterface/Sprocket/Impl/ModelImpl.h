@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "../../3DF/3DF.h"
-
+#include "../../3DF/Portfolio.h"
 #include "../../3DF/ApplicationWindowOption.h"
 
 #include <HDB.h>
@@ -12,6 +12,7 @@
 #include <HIOManager.h>
 
 #include "../3DF.View.h"
+
 
 namespace H3DF
 {
@@ -28,6 +29,9 @@ namespace H3DF
 		SegmentKey GetSegmentKey();
 		SegmentKey const GetSegmentKey() const;
 
+		PortfolioKey GetPortfolioKey();
+		PortfolioKey const GetPortfolioKey() const;
+
 		void SetBRepGeometry(bool brep) override;
 
 		H3DF::ModelHandedness GetModelHandedness() { return m_eModelHandedness; }
@@ -36,9 +40,9 @@ namespace H3DF
 
 		SegmentKey m_cInclude;
 
-		SegmentKey m_cModels;
-		SegmentKey m_cMeasurements;
-		SegmentKey m_cMarkups;
+		SegmentKey m_cModelsRoot;
+		SegmentKey m_cMeasurementsRoot;
+		SegmentKey m_cMarkupsRoot;
 
 		SegmentKey m_cIncludeSegment;
 		SegmentKey m_cIncludeModel;
@@ -54,6 +58,8 @@ namespace H3DF
 
 	private:
 		SegmentKey m_cSegmentKey;
+
+		PortfolioKey m_cPortfolio;
 
 		SegmentKey m_cShowStyle;
 		SegmentKey m_cShowWireFrameStyle;

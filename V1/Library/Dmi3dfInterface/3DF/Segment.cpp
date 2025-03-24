@@ -22,6 +22,7 @@
 #include "DrawingAttribute.h"
 #include "ColorInterpolation.h"
 #include "Culling.h"
+#include "Portfolio.h"
 
 #include "Camera.h"
 
@@ -298,6 +299,8 @@ size_t H3DF::SegmentKey::Find(Search::Type eInRequest, Search::Space eInSearchSp
 
 		for (int nIndex = 0; nIndex < nCount; nIndex++) {
 			HC_Find_Contents(chType, &nKey);
+
+			// String을 바탕으로 Key값을 생성
 			Key cKey = H3DF::SearchResultsImpl::GetKey(chType, nKey);
 			pcResultsImpl->PushBack(cKey);
 		}
@@ -672,7 +675,7 @@ SegmentKey & H3DF::SegmentKey::SetMaterialMapping(H3DF::MaterialMappingKit const
 
 	if (true == cInKit.ShowFaceChannel(Material::Channel::DiffuseColor, eType, cRgbaColor, strTextureName, strTextureOptions)) {
 		if (Material::Type::RGBAColor == eType) {
-			pcImpl->SetColor(L"faces", cRgbaColor);
+			pcImpl->SetColor(L"faces ", cRgbaColor);
 		}
 	}
 
@@ -841,17 +844,17 @@ SegmentKey & H3DF::SegmentKey::SetHeuristics(CString strInHeuristics)
 }
 
 //== Portfolio Control 관련 함수 =====================================================================
-/*
 PortfolioControl H3DF::SegmentKey::GetPortfolioControl()
 {
-	return m_cPortfolioControl;
+	PortfolioControl cPortfolioControl(*this);
+	return cPortfolioControl;
 }
 
-SelectabilityControl const H3DF::SegmentKey::GetPortfolioControl() const
+PortfolioControl const H3DF::SegmentKey::GetPortfolioControl() const
 {
-	return m_cPortfolioControl;
+	PortfolioControl cPortfolioControl(*(SegmentKey *) this);
+	return cPortfolioControl;
 }
-*/
 
 //== StyleControl Control 관련 함수 ==================================================================
 StyleControl H3DF::SegmentKey::GetStyleControl()
@@ -1240,6 +1243,23 @@ CullingControl const H3DF::SegmentKey::GetCullingControl() const
 	return cControl;
 }
 
+//== Priority 관련 함수 ==============================================================================
+SegmentKey & H3DF::SegmentKey::SetPriority(int nInPriority)
+{
+	HC_Set_Priority(KeyValue(), nInPriority);
+	return *this;
+}
+
+SegmentKey & H3DF::SegmentKey::UnsetPriority()
+{
+	HC_UnSet_Priority(KeyValue());
+	return *this;
+}
+
+bool H3DF::SegmentKey::ShowPriority(int & nOutPriority) const\
+{
+	return (bool)HC_Show_Priority(KeyValue(), &nOutPriority);
+}
 
 //== User Data 관련 함수 =============================================================================
 SegmentKey & H3DF::SegmentKey::SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData)
