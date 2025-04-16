@@ -59,7 +59,71 @@ bool H3DF::TextureOptionsKit::Empty() const
 	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	if (pcImpl->m_eParameterization != Material::Texture::Parameterization::None) {
+	pcImpl->m_bDecalFlag = false;
+	pcImpl->m_bDownSamplingFlag = false;
+	pcImpl->m_bModulationFlag = false;
+	pcImpl->m_bParameterOffsetFlag = false;
+	pcImpl->m_bParameterizationFlag = false;
+	pcImpl->m_bTilingFlag = false;
+	pcImpl->m_bInterpolationFlag = false;
+
+	return true;
+}
+
+bool H3DF::TextureOptionsKit::Equals(TextureOptionsKit const & cInKit) const
+{
+	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	TextureOptionsKitImpl * pcInKitImpl = static_cast<TextureOptionsKitImpl *>(cInKit.m_pcImpl);
+	DEBUG_VALID(pcInKitImpl);
+
+	if (pcImpl->m_bDecalFlag != pcInKitImpl->m_bDecalFlag) {
+		return false;
+	}
+	if (pcImpl->m_bDecal != pcInKitImpl->m_bDecal) {
+		return false;
+	}
+
+	if (pcImpl->m_bDownSamplingFlag != pcInKitImpl->m_bDownSamplingFlag) {
+		return false;
+	}
+	if (pcImpl->m_bDownSampling != pcInKitImpl->m_bDownSampling) {
+		return false;
+	}
+
+	if (pcImpl->m_bModulationFlag != pcInKitImpl->m_bModulationFlag) {
+		return false;
+	}
+	if (pcImpl->m_bModulation != pcInKitImpl->m_bModulation) {
+		return false;
+	}
+
+	if (pcImpl->m_bParameterOffsetFlag != pcInKitImpl->m_bParameterOffsetFlag) {
+		return false;
+	}
+	if (pcImpl->m_nParameterOffset != pcInKitImpl->m_nParameterOffset) {
+		return false;
+	}
+
+	if (pcImpl->m_bParameterizationFlag != pcInKitImpl->m_bParameterizationFlag) {
+		return false;
+	}
+	if (pcImpl->m_eParameterization != pcInKitImpl->m_eParameterization) {
+		return false;
+	}
+
+	if (pcImpl->m_bTilingFlag != pcInKitImpl->m_bTilingFlag) {
+		return false;
+	}
+	if (pcImpl->m_eTiling != pcInKitImpl->m_eTiling) {
+		return false;
+	}
+
+	if (pcImpl->m_bInterpolationFlag != pcInKitImpl->m_bInterpolationFlag) {
+		return false;
+	}
+	if (pcImpl->m_eInterpolation != pcInKitImpl->m_eInterpolation) {
 		return false;
 	}
 
@@ -68,22 +132,58 @@ bool H3DF::TextureOptionsKit::Empty() const
 
 bool H3DF::TextureOptionsKit::operator == (TextureOptionsKit const & cInKit) const
 {
-	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	TextureOptionsKitImpl * pcInKitImpl = static_cast<TextureOptionsKitImpl *>(cInKit.m_pcImpl);
-	DEBUG_VALID(pcInKitImpl);
-
-	if (pcImpl->m_eParameterization != pcInKitImpl->m_eParameterization) {
-		return false;
-	}
-
-	return true;
+	return Equals(cInKit);
 }
 
 bool H3DF::TextureOptionsKit::operator != (TextureOptionsKit const & cInKit) const
 {
-	return !(*this == cInKit);
+	return !Equals(cInKit);
+}
+
+TextureOptionsKit & H3DF::TextureOptionsKit::SetDecal(bool bInState)
+{
+	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_bDecal = bInState;
+	pcImpl->m_bDecalFlag = true;
+
+	return *this;
+}
+
+TextureOptionsKit & H3DF::TextureOptionsKit::SetDownSampling(bool bInState)
+{
+	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_bDownSampling = bInState;
+	pcImpl->m_bDownSamplingFlag = true;
+
+	return *this;
+
+}
+
+TextureOptionsKit & H3DF::TextureOptionsKit::SetModulation(bool bInState)
+{
+	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	DEBUG_VALID(pcImpl);
+	
+	pcImpl->m_bModulation = bInState;
+	pcImpl->m_bModulationFlag = true;
+
+	return *this;
+
+}
+
+TextureOptionsKit & H3DF::TextureOptionsKit::SetParameterOffset(size_t nInSffset)
+{
+	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	DEBUG_VALID(pcImpl);
+	
+	pcImpl->m_nParameterOffset = nInSffset;
+	pcImpl->m_bParameterOffsetFlag = true;
+
+	return *this;
 }
 
 TextureOptionsKit & H3DF::TextureOptionsKit::SetParameterizationSource(Material::Texture::Parameterization cInSource)
@@ -92,22 +192,91 @@ TextureOptionsKit & H3DF::TextureOptionsKit::SetParameterizationSource(Material:
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_eParameterization = cInSource;
+	pcImpl->m_bParameterizationFlag = true;
 
 	return *this;
 }
 
+TextureOptionsKit & H3DF::TextureOptionsKit::SetTiling(Material::Texture::Tiling eInTiling)
+{
+	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_eTiling = eInTiling;
+	pcImpl->m_bTilingFlag = true;
+
+	return *this;
+}
+
+TextureOptionsKit & H3DF::TextureOptionsKit::SetInterpolationFilter(Material::Texture::Interpolation eInFilter)
+{
+	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_eInterpolation = eInFilter;
+	pcImpl->m_bInterpolationFlag = true;
+
+	return *this;
+}
+
+TextureOptionsKit & H3DF::TextureOptionsKit::SetDecimationFilter(Material::Texture::Decimation eInFilter)
+{
+	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_eDecimation = eInFilter;
+	pcImpl->m_bDecimationFlag = true;
+
+	return *this;
+}
+
+TextureOptionsKit & H3DF::TextureOptionsKit::SetTransformMatrix(MatrixKit const & cInTransform)
+{
+	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_cTransform = cInTransform;
+	pcImpl->m_bTransformFlag = true;
+
+	return *this;
+}
+
+TextureOptionsKit & H3DF::TextureOptionsKit::SetValueScale(float fInMin, float fInMax)
+{
+	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_fValueScaleMin = fInMin;
+	pcImpl->m_fValueScaleMax = fInMax;
+	pcImpl->m_bValueScaleFlag = true;
+
+	return *this;
+}
 
 bool H3DF::TextureOptionsKit::ShowParameterizationSource(Material::Texture::Parameterization & cOutSource) const
 {
 	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	if (Material::Texture::Parameterization::None == pcImpl->m_eParameterization) {
+	if (false == pcImpl->m_bParameterizationFlag) {
 		return false;
 	}
 
 	cOutSource = pcImpl->m_eParameterization;
 
+	return true;
+}
+
+bool H3DF::TextureOptionsKit::ShowTransformMatrix(MatrixKit & cOutTransform) const
+{
+	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	if (false == pcImpl->m_bTransformFlag) {
+		return false;
+	}
+
+	cOutTransform = pcImpl->m_cTransform;
 	return true;
 }
 

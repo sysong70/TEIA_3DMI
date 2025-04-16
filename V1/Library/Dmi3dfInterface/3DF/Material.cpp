@@ -1115,7 +1115,7 @@ CStringA MaterialMappingControlImpl::GetTextureChannelString(Material::Texture::
 	switch (eInChannel)
 	{
 		case H3DF::Material::Texture::Channel::DiffuseTexture:
-			return "diffuse texture";
+			return "diffuse";
 
 		case H3DF::Material::Texture::Channel::Specular:
 			return "specular";
@@ -1149,12 +1149,13 @@ void MaterialMappingControlImpl::SetFaceTexture(CStringA strInTextureName, Mater
 	CStringA strColorChannel = GetTextureChannelString(eInChannel);
 
 	if (H3DF::Material::Texture::Channel::EnvironmentTexture == eInChannel) {
-		strColorText.Format("faces = (environment = %s)", strInTextureName);
+		strColorText.Format("faces = (%s = %s)", strColorChannel, strInTextureName);
 	}
 	else {
 		DEBUG_STOP;
 		return;
 	}
+
 	SegmentKeyImpl::LocalOpen(m_cOverrideKey); {
 		HC_Set_Color(strColorText);
 	} SegmentKeyImpl::LocalClose(m_cOverrideKey);

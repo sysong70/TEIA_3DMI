@@ -136,11 +136,18 @@ TextureDefinition H3DF::PortfolioKey::DefineTexture(CStringA strName, ImageDefin
 
 	CStringA strTextureOptionsDefinition;
 	pcTextureOptionsKitImpl->GetDefinitionString(strTextureOptionsDefinition);
+
+	MatrixKit cTransform;
+	bool bTransformFlag = cInOptions.ShowTransformMatrix(cTransform);
 	
 	strDefinition += strDefinition.IsEmpty() ? "" : ", ";
 	strDefinition += strTextureOptionsDefinition;
 
 	cPortfolioTextures.Open(); {
+		if (true == bTransformFlag) {
+			HC_Set_Texture_Matrix(cTransform.m_fData);
+		}
+
 		HC_Define_Local_Texture(strName, strDefinition);
 	} cPortfolioTextures.Close();
 

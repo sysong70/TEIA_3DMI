@@ -551,18 +551,17 @@ void H3DF::PMI::SetStringsAndTextAttributes(CString strInSegmentName, unsigned i
 					Font::Size::Units font_size_units;
 					pcInTextAttributes[nIndex].GetFontSizeUnits(font_size_units);
 
-					bool const frame_draw_mode = is_parallel_to_screen && (font_size_units == Font::Size::Units::PixelUnits || 
+					bool const bFrameDrawMode = is_parallel_to_screen && (font_size_units == Font::Size::Units::PixelUnits || 
 						font_size_units == Font::Size::Units::UnknownUnits);
 
-					bool const face_view_mode = is_parallel_to_screen && font_size_units == Font::Size::Units::WorldSpaceUnits;
-
+					bool const bFaceViewMode = is_parallel_to_screen && font_size_units == Font::Size::Units::WorldSpaceUnits;
 
 					H3DF::Point cInsertionPoint;
 					pcInTextAttributes[nIndex].GetInsertionPoint(cInsertionPoint);
 
 					H_UTF8 utf8(pstrInStrings[nIndex]);
 
-					if (frame_draw_mode)
+					if (bFrameDrawMode)
 					{
 						HC_KEY text = HC_Insert_Text_With_Encoding(0., 0., 0., "utf8", WStr::ToUtf8(pstrInStrings[nIndex]));
 
@@ -573,7 +572,7 @@ void H3DF::PMI::SetStringsAndTextAttributes(CString strInSegmentName, unsigned i
 						sprintf(character_attributes, "vertical offset= %d.points", (int)cInsertionPoint.y);
 						HC_MSet_Character_Attributes(text, 0, pstrInStrings[nIndex].GetLength(), character_attributes);
 					}
-					else if (face_view_mode)
+					else if (bFaceViewMode)
 					{
 						HC_KEY text = HC_Insert_Text_With_Encoding(0., 0., 0., "utf8", WStr::ToUtf8(pstrInStrings[nIndex]));
 
@@ -595,7 +594,7 @@ void H3DF::PMI::SetStringsAndTextAttributes(CString strInSegmentName, unsigned i
 
 					if (font_name[0] != '\0')
 					{
-						if (frame_draw_mode)
+						if (bFrameDrawMode)
 							HC_Set_Text_Font(H_FORMAT_TEXT("name = %s, size = %f pixels", font_name, font_size));
 						else
 							HC_Set_Text_Font(H_FORMAT_TEXT("name = %s, size = %f world", font_name, font_size));
