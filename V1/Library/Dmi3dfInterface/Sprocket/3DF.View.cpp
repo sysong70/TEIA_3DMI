@@ -11,6 +11,7 @@
 #include "3DF.Canvas.h"
 #include "Impl/CanvasImpl.h"
 
+
 #include "3DF.Model.h"
 #include "Impl/ModelImpl.h"
 
@@ -19,6 +20,9 @@
 #include "../3DF/Camera.h"
 #include "../3DF/Visibility.h"
 #include "../3DF/VisualEffects.h"
+
+#include "../3DF/Window.h"
+#include "../3DF/Impl/WindowImpl.h"
 
 #include "../3DF/Highlight.h"
 #include "../3DF/Impl/HighlightImpl.h"
@@ -82,129 +86,12 @@ View const & H3DF::View::operator = (View const & cInThat)
 	return *this;
 }
 
-void H3DF::View::Update() const
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	if (pcImpl->GetBaseView()->GetViewActive() && !pcImpl->GetBaseView()->GetSuppressUpdate())
-	{
-		HC_Control_Update_By_Key(pcImpl->GetBaseView()->GetViewKey(), "redraw everything");
-		pcImpl->GetBaseView()->GetConstantFrameRateObject()->SetActivityType(GeneralActivity);
-
-		if (false == pcImpl->GetBaseView()->GetFirstUpdate()) {
-			pcImpl->GetBaseView()->ForceUpdate();
-		}
-		else {
-			pcImpl->GetBaseView()->Update();
-		}
-	}
-}
-
-void H3DF::View::Update(Json::Object & cInObject) const
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	if (false == pcImpl->IsInitNavigationCube()) {
-		Json::Array & cArray = cInObject.GetArray(SKW_RECT);
-		int nLeft = cArray[0]->ToInteger();
-		int nTop = cArray[1]->ToInteger();
-		int nRight = cArray[2]->ToInteger();
-		int nBottom = cArray[3]->ToInteger();
-
-		pcImpl->InitNavigationCube(nRight, nBottom);
-	}
-
-	if (pcImpl->GetBaseView()->GetViewActive() && !pcImpl->GetBaseView()->GetSuppressUpdate())
-	{
-		HC_Control_Update_By_Key(pcImpl->GetBaseView()->GetViewKey(), "redraw everything");
-		pcImpl->GetBaseView()->GetConstantFrameRateObject()->SetActivityType(GeneralActivity);
-
-//		pcCanvas->GetIntRectangle(&rectangle);
-// 		m_pHView->Notify(HSignalPaint, &rectangle);
-// 		m_pHView->ResetIdleTime();
-
-		if (false == pcImpl->GetBaseView()->GetFirstUpdate()) {
-			pcImpl->GetBaseView()->ForceUpdate();
-		}
-		else {
-			pcImpl->GetBaseView()->Update();
-		}
-	}
-}
-
-void H3DF::View::Update(Json::Object & cInObject, Window::UpdateType eInType, H3DF::Time dInTimeLimit) const
-{
-	Update(cInObject);
-}
-
-void H3DF::View::SuppressUpdate(bool bSuppress)
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	pcImpl->GetBaseView()->SetSuppressUpdate(bSuppress);
-}
-
-bool H3DF::View::GetSuppressUpdate()
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	return pcImpl->GetBaseView()->GetSuppressUpdate();
-}
-
-bool H3DF::View::GetSuppressUpdateTick()
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	return pcImpl->GetBaseView()->GetSuppressUpdateTick();
-}
-
-void H3DF::View::Destruct() const
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) {
-		DEBUG_RETURN;
-	}
-
-	if (nullptr != pcImpl->m_pcBaseView) {
-		pcImpl->m_pcBaseView->SetSuppressUpdate(true);
-		pcImpl->m_pcBaseView->SetModel(nullptr);
-		delete pcImpl->m_pcBaseView;
-	}
-
-	if (nullptr != pcImpl->m_pcWindow) {
-		delete pcImpl->m_pcWindow;
-	}
-}
-
-void H3DF::View::Resize(int x, int y)
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) { DEBUG_RETURN; }
-
-	pcImpl->Resize(x, y);
-}
-
 Model & H3DF::View::GetAttachedModel() const
 {
 	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetAttachedModel();
-}
-
-WindowKey & H3DF::View::GetWindowKey() const
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	DEBUG_VALID(pcImpl->m_pcWindow);
-
-	return *pcImpl->m_pcWindow;
 }
 
 SegmentKey H3DF::View::GetSegmentKey()
@@ -255,117 +142,6 @@ PortfolioKey H3DF::View::GetPortfolioKey()
 	return pcImpl->GetAttachedModel().GetPortfolioKey();
 }
 
-SegmentKey H3DF::View::GetConstructionKey()
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	if (nullptr == pcImpl->GetBaseView()) {
-		DEBUG_STOP;
-	}
-
-	return pcImpl->GetBaseView()->GetConstructionKey();
-}
-
-SegmentKey const H3DF::View::GetConstructionKey() const
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	if (nullptr == pcImpl->GetBaseView()) {
-		DEBUG_STOP;
-	}
-
-	return pcImpl->GetBaseView()->GetConstructionKey();
-}
-
-SegmentKey H3DF::View::GetSceneKey()
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	if (nullptr == pcImpl->GetBaseView()) {
-		DEBUG_STOP;
-	}
-
-	return pcImpl->GetBaseView()->GetSceneKey();
-}
-
-SegmentKey const H3DF::View::GetSceneKey() const
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	if (nullptr == pcImpl->GetBaseView()) {
-		DEBUG_STOP;
-	}
-
-	return pcImpl->GetBaseView()->GetSceneKey();
-}
-
-SegmentKey H3DF::View::GetOverwriteKey()
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	if (nullptr == pcImpl->GetBaseView()) {
-		DEBUG_STOP;
-	}
-
-	return pcImpl->GetBaseView()->GetOverwriteKey();
-}
-
-SegmentKey const H3DF::View::GetOverwriteKey() const
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	if (nullptr == pcImpl->GetBaseView()) {
-		DEBUG_STOP;
-	}
-
-	return pcImpl->GetBaseView()->GetOverwriteKey();
-}
-
-NavigationCube & H3DF::View::GetNavigationCube() const
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	return pcImpl->GetNavigationCube();
-}
-
-void H3DF::View::InvalidateSceneBounding()
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	pcImpl->GetBaseView()->InvalidateSceneBounding();
-}
-
-//== Command 관련 함수 ===========================================================================
-
-// 명령어 취소 함수, Select된 Object도 취소됨.
-void H3DF::View::CancelCommands()
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) {
-		DEBUG_RETURN;
-	}
-
-	//pcImpl->DeSelectAll();
-}
-
-void H3DF::View::CancelCommands() const
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) {
-		DEBUG_RETURN;
-	}
-
-	//pcImpl->DeSelectAll();
-}
-
 // == Action Function ==============================================================================
 
 bool H3DF::View::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -414,19 +190,24 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 	ViewImpl * pcViewImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcViewImpl);
 
+	if (H3DF::Type::None == pcViewImpl->GetWindowKey().Type()) {
+		DEBUG_RETURN;
+	}
+
 	pcViewImpl->m_eRenderingMode = eInMode;
 
-	BaseView * pcView = pcViewImpl->GetBaseView();
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) pcViewImpl->GetWindowKey().GetImpl();
+
+	BaseView * pcBaseView = pcWindowImpl->GetBaseView();
 	
 	SegmentKey cViewKey = pcViewImpl->GetSegmentKey();
-	SegmentKey cSceneKey(pcView->GetSceneKey());
-
+	SegmentKey cSceneKey(pcBaseView->GetSceneKey());
 
 	if (H3DF::Rendering::Mode::HiddenLine == eInMode) {
-		pcViewImpl->SetWindowBackGroundColor(RGB(255, 255, 255), RGB(255, 255, 255));
+		pcWindowImpl->SetWindowBackGroundColor(RGB(255, 255, 255), RGB(255, 255, 255));
 	}
 	else {
-		pcViewImpl->SetWindowBackGroundColor(TheKenel.Appearance.BackgroundColor.Top, TheKenel.Appearance.BackgroundColor.Bottom);
+		pcWindowImpl->SetWindowBackGroundColor(TheKenel.Appearance.BackgroundColor.Top, TheKenel.Appearance.BackgroundColor.Bottom);
 	}
 
 	Model & cModel = GetAttachedModel();
@@ -464,37 +245,37 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 	{
 		case H3DF::Rendering::Mode::Gouraud:
 		case H3DF::Rendering::Mode::GouraudWithLines:
-			pcView->RenderGouraud();
+			pcBaseView->RenderGouraud();
 			break;
 
 		case H3DF::Rendering::Mode::Phong:
 		case H3DF::Rendering::Mode::PhongWithLines:
-			pcView->RenderPhong();
+			pcBaseView->RenderPhong();
 			break;
 
 		case H3DF::Rendering::Mode::HiddenLine: {
-			HConstantFrameRate * pcFramerate = pcView->GetConstantFrameRateObject();
+			HConstantFrameRate * pcFramerate = pcBaseView->GetConstantFrameRateObject();
 			pcFramerate->Stop();
 			pcFramerate->Shutdown();
 
-			pcView->SetRenderMode(HRenderBRepHiddenLine, true);
+			pcBaseView->SetRenderMode(HRenderBRepHiddenLine, true);
 			cSceneKey.GetMaterialMappingControl().SetEdgeColor(RGBAColor(0, 0, 0));
 		} break;
 
 		case H3DF::Rendering::Mode::FastHiddenLine: {
-			HConstantFrameRate * pcFramerate = pcView->GetConstantFrameRateObject();
+			HConstantFrameRate * pcFramerate = pcBaseView->GetConstantFrameRateObject();
 			pcFramerate->Stop();
 			pcFramerate->Shutdown();
 
-			pcView->SetRenderMode(HRenderHiddenLineFast, true);
+			pcBaseView->SetRenderMode(HRenderHiddenLineFast, true);
 		} break;
 
 		case H3DF::Rendering::Mode::Wireframe:
-			pcView->RenderBRepWireframe();
+			pcBaseView->RenderBRepWireframe();
 			break;
 
 		case H3DF::Rendering::Mode::Tessellated:
-			pcView->RenderGouraud();
+			pcBaseView->RenderGouraud();
 			break;
 	}
 
@@ -506,7 +287,7 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 		cSceneKey.GetVisibilityControl().SetEdges(false);
 	}
 
-	pcView->Update();
+	pcBaseView->Update();
 }
 
 Rendering::Mode H3DF::View::GetRenderingMode() const
@@ -522,7 +303,17 @@ void H3DF::View::SetViewDirection(ViewDirection::Mode eInMode)
 	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->GetBaseView()->SetViewDirection(eInMode);
+	if (H3DF::Type::None == pcImpl->GetWindowKey().Type()) {
+		DEBUG_RETURN;
+	}
+
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) pcImpl->GetWindowKey().GetImpl();
+	DEBUG_VALID(pcWindowImpl);
+
+	BaseView * pcBaseView = pcWindowImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	pcBaseView->SetViewDirection(eInMode);
 }
 
 void H3DF::View::SaveHsfFile(CString strFilePathName, Canvas * pcHoopsView)
@@ -532,7 +323,10 @@ void H3DF::View::SaveHsfFile(CString strFilePathName, Canvas * pcHoopsView)
 
 	HIOUtilityHsf cUtilityHsf;
 
-	HC_KEY nModelKey = pcImpl->m_pcBaseView->GetModelKey();
+	BaseView * pcBaseView = pcImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	HC_KEY nModelKey = pcBaseView->GetModelKey();
 
 	HC_Open_Segment_By_Key(nModelKey);
 

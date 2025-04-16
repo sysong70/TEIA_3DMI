@@ -9,9 +9,6 @@
 
 #include "Sprocket.h"
 
-#include "../3DF/Window.h"
-
-
 #include "../3DF.Signal.h"
 #include "../../Signal/Signal.h"
 
@@ -31,21 +28,6 @@ namespace H3DF
 		void Set(View const & cInThat);
 		View const & operator = (View const & cInThat);
 
-		void Update() const;
-		void Update(Json::Object & cInObject) const;
-		void Update(Json::Object & cInObject, Window::UpdateType eInType, H3DF::Time dInTimeLimit = -1.0) const;
-
-		void SuppressUpdate(bool bSuppress);
-
-		bool GetSuppressUpdate();
-		bool GetSuppressUpdateTick();
-
-
-		void Destruct() const;
-		void Resize(int x, int y);
-
-		WindowKey & GetWindowKey() const;
-
 		Model & GetAttachedModel() const;
 
 		SegmentKey GetSegmentKey();
@@ -56,23 +38,6 @@ namespace H3DF
 
 		PortfolioKey const GetPortfolioKey() const;
 		PortfolioKey GetPortfolioKey();
-
-		SegmentKey GetConstructionKey();
-		SegmentKey const GetConstructionKey() const;
-
-		SegmentKey GetSceneKey();
-		SegmentKey const GetSceneKey() const;
-
-		SegmentKey GetOverwriteKey();
-		SegmentKey const GetOverwriteKey() const;
-
-		NavigationCube & GetNavigationCube() const;
-
-		void InvalidateSceneBounding();
-
-		//== Command 관련 함수 =======================================================================
-		void CancelCommands();
-		void CancelCommands() const;
 
 		//== Keyboard 관련 함수 ======================================================================
 		bool Char(UINT nChar, UINT nRepCnt, UINT nFlags);

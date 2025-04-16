@@ -158,6 +158,7 @@
     <ClInclude Include="3DF\Impl\TextureImpl.h" />
     <ClInclude Include="3DF\Impl\WindowImpl.h" />
     <ClInclude Include="3DF\KeyPath.h" />
+    <ClInclude Include="3DF\OffScreenWindow.h" />
     <ClInclude Include="3DF\Operator.Event.h" />
     <ClInclude Include="3DF\Performance.h" />
     <ClInclude Include="3DF\PointCloud.h" />
@@ -266,6 +267,7 @@
     <ClCompile Include="3DF\Impl\Selection.Impl.cpp" />
     <ClCompile Include="3DF\Impl\TextureImpl.cpp" />
     <ClCompile Include="3DF\Impl\WindowImpl.cpp" />
+    <ClCompile Include="3DF\OffScreenWindow.cpp" />
     <ClCompile Include="3DF\Operator.Event.cpp" />
     <ClCompile Include="3DF\Performance.cpp" />
     <ClCompile Include="3DF\PointCloud.cpp" />

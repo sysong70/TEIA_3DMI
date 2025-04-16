@@ -2,6 +2,7 @@
 
 #include "../../3DF/3DF.h"
 
+#include "../../3DF/Window.h"
 #include "../../3DF/ApplicationWindowOption.h"
 
 #include <HDB.h>
@@ -36,8 +37,9 @@ namespace H3DF
 		char * m_pchName = NULL;
 		H3DF::ApplicationWindowOptionsKit m_cApplicationWindowOptionsKit;
 
-		std::vector<const H3DF::View *> m_vpcViewArray;
-		const H3DF::View * m_pcFrontView = nullptr;
+		std::vector<H3DF::View> m_vcViewArray;
+
+		WindowKey m_cWindowKey;
 
 		H3DF::Model * m_pcModel = nullptr;
 

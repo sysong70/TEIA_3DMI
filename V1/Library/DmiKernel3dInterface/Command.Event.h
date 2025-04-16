@@ -14,7 +14,7 @@ namespace KERNEL
 		{
 		public:
 			Event();
-			Event(H3DF::WindowKey & cInWindowKey);
+			Event(H3DF::WindowKey cInWindowKey);
 			Event(Event const & cInThat);
 
 			void Set(Event const & cInThat);

@@ -45,8 +45,8 @@ namespace KERNEL
 		H3DF::Canvas & GetCanvas() { return *m_pcCanvas; }
 		H3DF::Canvas * m_pcCanvas = nullptr;
 
-		H3DF::WindowKey & Window();
-		const H3DF::WindowKey & Window() const;
+		H3DF::WindowKey Window();
+		const H3DF::WindowKey Window() const;
 
 		H3DF::Model & GetModel();
 		H3DF::CADModel & CADModel();

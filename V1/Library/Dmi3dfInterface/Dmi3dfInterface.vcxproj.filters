@@ -387,6 +387,9 @@
     <ClInclude Include="3DF\Impl\TextureImpl.h">
       <Filter>3DF\Object\Impl</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\OffScreenWindow.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -700,6 +703,9 @@
     </ClCompile>
     <ClCompile Include="3DF\Impl\TextureImpl.cpp">
       <Filter>3DF\Object\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\OffScreenWindow.cpp">
+      <Filter>3DF\Control</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

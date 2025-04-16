@@ -27,6 +27,9 @@ namespace KERNEL
 
 			void Copy(SetImpl * pcInThat);
 
+			H3DF::Canvas & Canvas();
+			const H3DF::Canvas & Canvas() const;
+
 			H3DF::WindowKey & Window();
 			const H3DF::WindowKey & Window() const;
 

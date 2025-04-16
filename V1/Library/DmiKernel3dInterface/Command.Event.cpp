@@ -16,12 +16,12 @@ namespace KERNEL
 		public:
 			void Copy(EventImpl * pcInThat)
 			{
-				m_pcWindowKey = pcInThat->m_pcWindowKey;
+				m_cWindowKey = pcInThat->m_cWindowKey;
 				m_cOperatorEvent = pcInThat->m_cOperatorEvent;
 			}
 
 			H3DF::Operator::Event m_cOperatorEvent;
-			H3DF::WindowKey * m_pcWindowKey = nullptr;
+			H3DF::WindowKey m_cWindowKey;
 		};
 	}
 }
@@ -32,12 +32,12 @@ KERNEL::Command::Event::Event()
 	DEBUG_VALID(m_pcImpl);
 }
 
-KERNEL::Command::Event::Event(H3DF::WindowKey & cInWindowKey)
+KERNEL::Command::Event::Event(H3DF::WindowKey cInWindowKey)
 {
 	EventImpl * pcImpl = new EventImpl();
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->m_pcWindowKey = &cInWindowKey;
+	pcImpl->m_cWindowKey = cInWindowKey;
 	pcImpl->m_cOperatorEvent.SetWindow(cInWindowKey);
 
 	m_pcImpl = pcImpl;

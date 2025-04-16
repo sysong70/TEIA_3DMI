@@ -29,7 +29,7 @@ namespace H3DF
 
 		int LButtonDownAndMove(Operator::Event & cInEvent);
 
-		void SetView(H3DF::BaseView * view, WindowKey * pcInWindow);
+		void SetView(H3DF::BaseView * pcInView);
 
 		void SetVisible(bool axis, bool cube);
 

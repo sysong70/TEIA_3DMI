@@ -9,6 +9,8 @@
 
 #include "../../3DF/Database.h"
 
+#include "../../3DF/Impl/WindowImpl.h"
+
 #include "3DF.View.Impl.h"
 
 #include "../../3DF/3DF.Utility.h"
@@ -42,11 +44,6 @@ H3DF::CanvasImpl::~CanvasImpl()
 // 		m_pcModel = nullptr;
 // 	}
 
-	for (auto pcView : m_vpcViewArray) {
-		delete pcView;
-	}
-
-	HC_Relinquish_Memory();
 }
 
 void H3DF::CanvasImpl::Copy(const CanvasImpl * pcInThat)
@@ -54,6 +51,8 @@ void H3DF::CanvasImpl::Copy(const CanvasImpl * pcInThat)
 	if (nullptr != pcInThat->m_pchName) {
 		Utility::CopyString(pcInThat->m_pchName, m_pchName);
 	}
+
+	m_cWindowKey = pcInThat->m_cWindowKey;
 
 	m_pcModel = pcInThat->m_pcModel;
 
@@ -63,9 +62,7 @@ void H3DF::CanvasImpl::Copy(const CanvasImpl * pcInThat)
 	m_nInWindowHandle = pcInThat->m_nInWindowHandle;
 	m_cApplicationWindowOptionsKit = pcInThat->m_cApplicationWindowOptionsKit;
 
-	for (auto pcView : pcInThat->m_vpcViewArray) {
-		m_vpcViewArray.push_back(pcView);
-	}
+	m_vcViewArray = pcInThat->m_vcViewArray;
 }
 
 Signal::Delivery & H3DF::CanvasImpl::Delivery()
@@ -89,15 +86,22 @@ void H3DF::CanvasImpl::SetDelivery(const Signal::Delivery * pcInDelivery, int nV
 //== Callback 관련 함수 ==============================================================================
 void H3DF::CanvasImpl::SetFinishPictureCallback()
 {
-	View * pcView = (View *)(m_pcFrontView);
-	DEBUG_VALID(pcView);
+	if (H3DF::Type::None == m_cWindowKey.Type()) {
+		DEBUG_RETURN;
+	}
 
-	ViewImpl * pcViewImpl = (ViewImpl *)pcView->GetImpl();
-	DEBUG_VALID(pcViewImpl);
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) m_cWindowKey.GetImpl();
+	DEBUG_VALID(pcWindowImpl);
 
-	HC_KEY nViewKey = pcViewImpl->GetBaseView()->GetViewKey();
+	BaseView * pcBaseView = pcWindowImpl->GetBaseView();
 
-	HC_Open_Segment_By_Key(pcViewImpl->GetBaseView()->GetViewKey()); {
+	HC_KEY nViewKey = pcBaseView->GetViewKey();
+	if (INVALID_KEY == nViewKey) {
+		DEBUG_STOP;
+		return;
+	}
+
+	HC_Open_Segment_By_Key(nViewKey); {
 		HC_Define_Callback_Name("FinishPictureCallback", (CallbackFunc)CanvasImpl::FinishPictureCallback);
 		HC_Set_Callback_With_Data("finish picture = FinishPictureCallback", this);
 	} HC_Close_Segment();

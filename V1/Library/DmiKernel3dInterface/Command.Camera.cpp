@@ -19,6 +19,7 @@
 #include <Sprocket/3DF.Model.h>
 
 #include <3DF/Window.h>
+#include <3DF/Impl/WindowImpl.h>
 #include <3DF/Bounding.h>
 #include <3DF/Camera.h>
 #include <3DF/VisualEffects.h>
@@ -56,7 +57,11 @@ namespace KERNEL
 KERNEL::Command::CameraImpl::CameraImpl(const Session * pcInSession)
 	: SetImpl(pcInSession)
 {
-	m_pcCameraControl = new H3DF::Operator::CameraControl(Window(), View().GetNavigationCube());
+	WindowKey cWindow = Canvas().GetWindowKey();
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) cWindow.GetImpl();
+	DEBUG_VALID(pcWindowImpl);
+
+	m_pcCameraControl = new H3DF::Operator::CameraControl(Window(), pcWindowImpl->GetNavigationCube());
 }
 
 KERNEL::Command::CameraImpl::~CameraImpl()

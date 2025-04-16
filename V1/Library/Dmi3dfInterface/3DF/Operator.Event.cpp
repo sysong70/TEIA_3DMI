@@ -5,6 +5,8 @@
 
 #include "3DF.Utility.h"
 
+#include "Window.h"
+
 #include <HEventInfo.h>
 
 using namespace H3DF;
@@ -21,7 +23,7 @@ namespace H3DF
 		public:
 			void Copy(EventImpl * pcInThat)
 			{
-				m_pcWindowKey = pcInThat->m_pcWindowKey;
+				m_cWindowKey = pcInThat->m_cWindowKey;
 				m_eEventType = pcInThat->m_eEventType;
 				m_nFlags = pcInThat->m_nFlags;
 				m_nWheelDelta = pcInThat->m_nWheelDelta;
@@ -33,7 +35,7 @@ namespace H3DF
 
 			void SetType(Event::Type eInType) { m_eEventType = eInType; }
 
-			H3DF::WindowKey * m_pcWindowKey = nullptr;
+			H3DF::WindowKey m_cWindowKey;
 			Event::Type m_eEventType = Event::Type::NoEvent;
 			UINT m_nFlags = 0;
 			int m_nWheelDelta = 0;
@@ -56,7 +58,7 @@ H3DF::Operator::Event::Event(H3DF::WindowKey & cInWindowKey)
 	EventImpl * pcImpl = new EventImpl();
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->m_pcWindowKey = &cInWindowKey;
+	pcImpl->m_cWindowKey = cInWindowKey;
 
 	m_pcImpl = pcImpl;
 }
@@ -87,7 +89,7 @@ void H3DF::Operator::Event::SetWindow(H3DF::WindowKey & cInWindowKey)
 	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->m_pcWindowKey = &cInWindowKey;
+	pcImpl->m_cWindowKey = cInWindowKey;
 }
 
 void H3DF::Operator::Event::SetPoint(Operator::Event::Type eInType, int x, int y, UINT nInFlags)
@@ -102,9 +104,9 @@ void H3DF::Operator::Event::SetPoint(Operator::Event::Type eInType, int x, int y
 	pcImpl->m_cPixelPoint.y = (float) y;
 	pcImpl->m_cPixelPoint.z = 0.0f;
 
-	pcImpl->m_cWorldPoint = WorldPoint(*pcImpl->m_pcWindowKey, pcImpl->m_cPixelPoint);
+	pcImpl->m_cWorldPoint = WorldPoint(pcImpl->m_cWindowKey, pcImpl->m_cPixelPoint);
 
-	pcImpl->m_cWindowPoint = WindowPoint(*pcImpl->m_pcWindowKey, pcImpl->m_cPixelPoint);
+	pcImpl->m_cWindowPoint = WindowPoint(pcImpl->m_cWindowKey, pcImpl->m_cPixelPoint);
 	pcImpl->m_cWindowPoint.z = 0.0f;
 	pcImpl->m_cWindowPoint.ClampPoint();
 }

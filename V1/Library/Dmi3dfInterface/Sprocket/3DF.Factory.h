@@ -16,7 +16,7 @@ namespace H3DF
 	public:
 		static Canvas * CreateCanvas(H3DF::WindowHandle nInWindowHandle, char const * chInName = nullptr, H3DF::ApplicationWindowOptionsKit const & cInOptions = H3DF::ApplicationWindowOptionsKit());
 
-		static View * CreateView(CStringA strInName);
+		static View CreateView(CStringA strInName);
 
 	private:
 		Factory() {}

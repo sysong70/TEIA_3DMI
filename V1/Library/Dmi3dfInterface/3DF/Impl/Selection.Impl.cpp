@@ -296,7 +296,7 @@ size_t H3DF::SelectionControlImpl::SelectionResult(SelectionControlImpl * pcInSe
 		SelectionItemImpl * pcItemImpl = static_cast<SelectionItemImpl *>(cItem.GetImpl());
 		DEBUG_VALID(pcItemImpl);
 
-		pcItemImpl->m_pcWindow = pcInSelCtrlImpl->m_pcWindow;
+		pcItemImpl->m_cWindow = pcInSelCtrlImpl->m_cWindow;
 
 		HC_Show_Selection_Element(&nSelectKey, &pcItemImpl->m_nOffset1, &pcItemImpl->m_nOffset2, &pcItemImpl->m_nOffset3);
 		HC_Show_Selection_Original_Key(&nSelectKey);
@@ -385,7 +385,7 @@ size_t H3DF::SelectionControlImpl::SelectionResult(SelectionControlImpl * pcInSe
 		HC_Show_Selection_Keys_Count(&nKeyCount);
 
 		if (0 < nKeyCount) {
-			WindowKeyImpl * pcImpl = (WindowKeyImpl *) pcInSelCtrlImpl->m_pcWindow->GetImpl();
+			WindowKeyImpl * pcImpl = (WindowKeyImpl *) pcInSelCtrlImpl->m_cWindow.GetImpl();
 			HC_KEY * pnKeys = pcImpl->GetSelectBufferKey(nKeyCount);
 
 			pnIncludeKeys = new HC_KEY[nKeyCount];
@@ -535,5 +535,10 @@ void H3DF::SelectionControlImpl::GetScope(SelectionOptionsKit const & cInOptions
 
 HBaseView * H3DF::SelectionControlImpl::GetBaseView()
 { 
-	return (HBaseView *)m_pcWindow->GetBaseView(); 
+	if (H3DF::Type::None == m_cWindow.Type()) {
+		DEBUG_STOP;
+		return nullptr;
+	}
+
+	return (HBaseView *)m_cWindow.GetBaseView(); 
 }

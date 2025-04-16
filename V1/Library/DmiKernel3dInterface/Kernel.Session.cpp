@@ -52,9 +52,9 @@ void KERNEL::Session::Initialize(Json::Object & cInObject)
 
 	pcImpl->m_pcCanvas = H3DF::Factory::CreateCanvas(nWindowHandle, "3DMI_Canvas", cOptions);
 
-	H3DF::View * pcView = H3DF::Factory::CreateView("3DMI_View");
+	H3DF::View cView = H3DF::Factory::CreateView("3DMI_View");
 
-	pcImpl->m_pcCanvas->AttachViewAsLayout(pcView);
+	pcImpl->m_pcCanvas->AttachViewAsLayout(cView);
 
 	pcImpl->AllocationOperator(this);
 
@@ -310,7 +310,7 @@ void KERNEL::Session::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 	int nLeft = cArray[0]->ToInteger();
 	int nTop = cArray[1]->ToInteger();
 
-	pcImpl->GetCanvas().GetFrontView().SuppressUpdate(true);
+	pcImpl->GetCanvas().SuppressUpdate(true);
 
 	// Control Flag을 추가해서 ComputeReasonableTarget이란 함수를 사용해서 Whell Zomm할때 Entity를 선택하는 과정을 생략함.
 	// nFlag |= MK_CONTROL;
@@ -323,9 +323,9 @@ void KERNEL::Session::MouseWheel(int nFlag, int x, int y, Json::Object & cInObje
 
 	pcImpl->Select().DrawSnapItems();
 
-	pcImpl->GetCanvas().GetFrontView().SuppressUpdate(false);
+	pcImpl->GetCanvas().SuppressUpdate(false);
 
-	pcImpl->GetCanvas().GetFrontView().Update();
+	pcImpl->GetCanvas().Update();
 }
 
 //== Keyboard 관련 함수 ==============================================================================

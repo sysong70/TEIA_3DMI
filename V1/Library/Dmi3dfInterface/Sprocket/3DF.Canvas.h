@@ -26,7 +26,7 @@ namespace H3DF
 		class KinematicTest;
 	}
 
-	//== Camera 관련 Class ==============================================================================
+	//== Camera 관련 Class ==========================================================================
 
 	class CameraPos
 	{
@@ -38,9 +38,6 @@ namespace H3DF
 		bool bActive;
 	};
 
-	class BaseView;
-	class NavigationCube;
-
 	class API_3DF Canvas : public Sprocket
 	{
 	public:
@@ -51,14 +48,19 @@ namespace H3DF
 		void Set(Canvas const & cInThat);
 		Canvas const & operator = (Canvas const & cInThat);
 
-		void AttachViewAsLayout(View const * pcInView);
+		void AttachViewAsLayout(View const & cInView);
 		HWND GetHwnd();
 
 		void SetDelivery(Signal::Delivery & cDelivery, int nViewId);
 		void FileOpen(CString strFilePathName, CADModel & cInCADModel);
 		static void ThreadFileOpen(Canvas * pcCanvas, CString strFilePathName, CADModel & cInCADModel);
 
+		//== View 관련 함수 ==========================================================================
 		H3DF::View & GetFrontView() const;
+		H3DF::View & GetFrontView();
+
+		H3DF::WindowKey & GetWindowKey() const;
+		H3DF::WindowKey & GetWindowKey();
 
 		Model & GetModel() const;
 
@@ -67,26 +69,32 @@ namespace H3DF
 		void Update(Json::Object & cInObject) const;
 		void Update(Json::Object & cInObject, Window::UpdateType eInType, H3DF::Time dInTimeLimit = -1.0) const;
 
+		SegmentKey GetConstructionKey();
+		SegmentKey const GetConstructionKey() const;
+
+		SegmentKey GetSceneKey();
+		SegmentKey const GetSceneKey() const;
+
+		SegmentKey GetOverwriteKey();
+		SegmentKey const GetOverwriteKey() const;
+
+		void InvalidateSceneBounding();
+
+		void SuppressUpdate(bool bSuppress);
+
+		bool GetSuppressUpdate();
+		bool GetSuppressUpdateTick();
+
 		void Resize(int cx, int cy);
 
 		//== Keyboard 관련 함수 ======================================================================
 		bool Char(UINT nChar, UINT nRepCnt, UINT nFlags);
 
-
-		//==========================================================================================
-
-	protected:
-		void SetSceneFont(CString csFontName, CString csFontSize, CString csFontUnits);
-
-		//== Command 관련 함수 ===========================================================================
-	public:
-		void CancelCommands();
-
 	public:
 		// KEN - 20230607
 		bool KeyboardInput(Json::Object & input);
 
-		//== 환경 변수 관련 함수 ==========================================================================
+		//== 환경 변수 관련 함수 =======================================================================
 	protected:
 		Facility::KernelOption m_cPreference;
 
