@@ -5,7 +5,7 @@
 #include "ConvVertex.h"
 
 #define CHECK_BOOL_RETURN(FunctionCall) { bool nResult = FunctionCall; if (nResult == false) { return false; } }
-#define CHECK_A3D_RETURN(FunctionCall) { A3DStatus eResult = FunctionCall; if (eResult != A3D_SUCCESS) { return false; } }
+#define CHECK_A3D_RESULT(FunctionCall) { A3DStatus eResult = FunctionCall; if (eResult != A3D_SUCCESS) { return false; } }
 
 ConvEdge::ConvEdge(A3DTopoEdge * pcTopoEdge)
 {

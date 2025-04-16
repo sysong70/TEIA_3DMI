@@ -48,15 +48,15 @@ namespace H3DF
 
 		void SetColor(CStringA strInGeometryName, RGBAColor cInColor);
 
-		BaseView * GetBaseView() const;
-		void SetBaseView(BaseView * pcInBaseView);
+		WindowKey * GetWindow() const;
+		void SetWindow(WindowKey * pcInWindow);
 
 		static bool FindUp(SegmentKey & cInSegment, H3DF::Type eInType, SegmentKey & cOutFindSegment);
 
 		BoundingKit * m_pcBoundingKit = nullptr;
 
 	private:
-		BaseView * m_pcBaseView = nullptr;
+		WindowKey * m_pcWindowKey = nullptr;
 	
 		mutable bool m_bOpen = false;
 		mutable bool m_bForcedOpen = false; // 개발자가 직접 Open해서 Close를 제어한다. 일반적인 Open과 Close는 적용되지 않는다.

@@ -15,7 +15,7 @@ void H3DF::SegmentKeyImpl::Copy(SegmentKeyImpl * pcInThat)
 
 	m_bOpen = pcInThat->m_bOpen;
 	m_bForcedOpen = pcInThat->m_bForcedOpen;
-	m_pcBaseView = pcInThat->m_pcBaseView;
+	m_pcWindowKey = pcInThat->m_pcWindowKey;
 
 	if (nullptr != pcInThat->m_pcBoundingKit) {
 		m_pcBoundingKit = new BoundingKit(*pcInThat->m_pcBoundingKit);
@@ -253,14 +253,15 @@ void H3DF::SegmentKeyImpl::SetColor(CStringA strInGeometryName, RGBAColor cInCol
 	HC_Set_Color(strColorText);
 }
 
-BaseView * H3DF::SegmentKeyImpl::GetBaseView() const
+WindowKey * H3DF::SegmentKeyImpl::GetWindow() const
 {
-	return m_pcBaseView;
+	DEBUG_VALID(m_pcWindowKey);
+	return m_pcWindowKey;
 }
 
-void H3DF::SegmentKeyImpl::SetBaseView(BaseView * pcInBaseView)
+void H3DF::SegmentKeyImpl::SetWindow(WindowKey * pcInWindow)
 {
-	m_pcBaseView = pcInBaseView;
+	m_pcWindowKey = pcInWindow;
 }
 
 // 찾는 요소가 찾아지면 바로 멈춤. 제한적으로 사용해야 함.

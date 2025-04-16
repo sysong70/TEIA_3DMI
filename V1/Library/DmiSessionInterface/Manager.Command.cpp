@@ -33,7 +33,7 @@ void SESSION::Manager::Command::AddCommand(SESSION::Command::Root * pcCommand)
 }
 
 // 2. Command Vector 크기를 가져온다.
-int SESSION::Manager::Command::GetCommandSize()
+size_t SESSION::Manager::Command::GetCommandSize()
 {
 	return m_vCommand.size();
 }

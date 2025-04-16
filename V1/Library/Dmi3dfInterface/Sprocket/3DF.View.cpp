@@ -197,8 +197,10 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 	pcViewImpl->m_eRenderingMode = eInMode;
 
 	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) pcViewImpl->GetWindowKey().GetImpl();
+	DEBUG_VALID(pcWindowImpl);
 
 	BaseView * pcBaseView = pcWindowImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
 	
 	SegmentKey cViewKey = pcViewImpl->GetSegmentKey();
 	SegmentKey cSceneKey(pcBaseView->GetSceneKey());

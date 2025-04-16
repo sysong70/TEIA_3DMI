@@ -588,6 +588,7 @@ void H3DF::WindowKeyImpl::Copy(WindowKeyImpl * pcInThat)
 	Impl::Copy(pcInThat);
 
 	m_pcBaseView = pcInThat->m_pcBaseView;
+
 	m_pcSelectionSet = pcInThat->m_pcSelectionSet;
 	m_nViewId = pcInThat->m_nViewId;
 

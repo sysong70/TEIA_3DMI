@@ -108,7 +108,7 @@ bool ConvCurve::ConvertPlaneCurve(const MbSurface * pcBaseSurface, double dParen
 bool ConvCurveBase::GetCurveData(const A3DCrvBase * pcCrvBase, double dContextScale, ConvEntityInfo & cEntityInfo)
 {
 	A3DEEntityType eCurveType = kA3DTypeUnknown;
-	CHECK_A3D_RETURN(A3DEntityGetType(pcCrvBase, &eCurveType));
+	CHECK_A3D_RESULT(A3DEntityGetType(pcCrvBase, &eCurveType));
 
 	double dTolerance = ConvCurveBase::dTolerance / dContextScale;
 
@@ -222,7 +222,7 @@ bool ConvCurveBase::ClearCurveData(A3DEEntityType & eCurveType, DWORD_PTR *& pcC
 bool ConvCurveBase::ConvertPlaneCurve(const A3DCrvBase * pcCrvBase, const MbSurface * pcBaseSurface, double dParentScale, c3d::PlaneCurveSPtr & pcPlaneCurve)
 {
 	A3DEEntityType eEntityType = kA3DTypeUnknown;
-	CHECK_A3D_RETURN(A3DEntityGetType(pcCrvBase, &eEntityType));
+	CHECK_A3D_RESULT(A3DEntityGetType(pcCrvBase, &eEntityType));
 
 	bool bStatus = false;
 	switch(eEntityType)
@@ -285,7 +285,7 @@ bool ConvCurveBase::ConvertPlaneLine(const A3DCrvBase * pcCrvBase, const MbSurfa
 
 	A3DCrvLineData cCrvLineData;
 	A3D_INITIALIZE_DATA(A3DCrvLineData, cCrvLineData);
-	CHECK_A3D_RETURN(A3DCrvLineGet(pcCrvBase, &cCrvLineData));
+	CHECK_A3D_RESULT(A3DCrvLineGet(pcCrvBase, &cCrvLineData));
 
 	MbCartPoint cOirgin = Dmi3dx::GetMbCartPoint(cCrvLineData.m_sTrsf.m_sOrigin, dParentScale);
 	MbVector cXAxis = Dmi3dx::GetMbVector(cCrvLineData.m_sTrsf.m_sXVector);
@@ -314,7 +314,7 @@ bool ConvCurveBase::ConvertPlaneCircle(const A3DCrvBase * pcCrvBase, const MbSur
 	A3DCrvCircleData cCrvCircleData;
 	A3D_INITIALIZE_DATA(A3DCrvCircleData, cCrvCircleData);
 
-	CHECK_A3D_RETURN(A3DCrvCircleGet(pcCrvBase, &cCrvCircleData));
+	CHECK_A3D_RESULT(A3DCrvCircleGet(pcCrvBase, &cCrvCircleData));
 
 	return true;
 }
@@ -324,7 +324,7 @@ bool ConvCurveBase::ConvertPlaneNurbs(const A3DCrvBase * pcCrvBase, const MbSurf
 {
 	A3DCrvNurbsData cCrvNurbsData;
 	A3D_INITIALIZE_DATA(A3DCrvNurbsData, cCrvNurbsData);
-	CHECK_A3D_RETURN(A3DCrvNurbsGet(pcCrvBase, &cCrvNurbsData));
+	CHECK_A3D_RESULT(A3DCrvNurbsGet(pcCrvBase, &cCrvNurbsData));
 
 	return ConvertPlaneNurbsData((DWORD_PTR *) &cCrvNurbsData, pcBaseSurface, dParentScale, pcPlaneCurve);
 }
@@ -513,7 +513,7 @@ bool ConvCurveBase::ConvertProjectionPlaneCurveData(DWORD_PTR * pcCurveData, A3D
 bool ConvCurveBase::ConvertSpaceCurve(const A3DCrvBase * pcCrvBase, double dParentScale, double dContextScale, SpaceCurveSPtr & pcSpaceCurve)
 {
 	A3DEEntityType eEntityType = kA3DTypeUnknown;
-	CHECK_A3D_RETURN(A3DEntityGetType(pcCrvBase, &eEntityType));
+	CHECK_A3D_RESULT(A3DEntityGetType(pcCrvBase, &eEntityType));
 
 	bool bStatus = false;
 
@@ -633,7 +633,7 @@ bool ConvCurveBase::ConvertSpaceLine(const A3DCrvBase * pc3dCurve, double dParen
 {
 	A3DCrvLineData cCrvLineData;
 	A3D_INITIALIZE_DATA(A3DCrvLineData, cCrvLineData);
-	CHECK_A3D_RETURN(A3DCrvLineGet(pc3dCurve, &cCrvLineData));
+	CHECK_A3D_RESULT(A3DCrvLineGet(pc3dCurve, &cCrvLineData));
 
 	MbPlacement3D cPlacement;
 	Dmi3dx::GetPlacement3d(cCrvLineData.m_sTrsf, dParentScale, cPlacement);
@@ -662,7 +662,7 @@ bool ConvCurveBase::ConvertSpacePolyLine(const A3DCrvBase * pc3dCurve, double dP
 {
 	A3DCrvPolyLineData cCrvPolyLineData;
 	A3D_INITIALIZE_DATA(A3DCrvPolyLineData, cCrvPolyLineData);
-	CHECK_A3D_RETURN(A3DCrvPolyLineGet(pc3dCurve, &cCrvPolyLineData));
+	CHECK_A3D_RESULT(A3DCrvPolyLineGet(pc3dCurve, &cCrvPolyLineData));
 
 	MbPlacement3D cPlacement;
 	Dmi3dx::GetPlacement3d(cCrvPolyLineData.m_sTrsf, dParentScale, cPlacement);
@@ -689,7 +689,7 @@ bool ConvCurveBase::ConvertSpaceCircle(const A3DCrvBase * pc3dCurve, double dPar
 {
 	A3DCrvCircleData cCrvCircleData;
 	A3D_INITIALIZE_DATA(A3DCrvCircleData, cCrvCircleData);
-	CHECK_A3D_RETURN(A3DCrvCircleGet(pc3dCurve, &cCrvCircleData));
+	CHECK_A3D_RESULT(A3DCrvCircleGet(pc3dCurve, &cCrvCircleData));
 
 	MbPlacement3D cPlacement;
 	Dmi3dx::GetPlacement3d(cCrvCircleData.m_sTrsf, dParentScale, cPlacement);
@@ -721,7 +721,7 @@ bool ConvCurveBase::ConvertSpaceEllipse(const A3DCrvBase * pc3dCurve, double dPa
 {
 	A3DCrvEllipseData cCrvEllipseData;
 	A3D_INITIALIZE_DATA(A3DCrvEllipseData, cCrvEllipseData);
-	CHECK_A3D_RETURN(A3DCrvEllipseGet(pc3dCurve, &cCrvEllipseData));
+	CHECK_A3D_RESULT(A3DCrvEllipseGet(pc3dCurve, &cCrvEllipseData));
 
 	ConvEntityInfo cEntityInfo(1);
 	cEntityInfo.pcEntityData[0] = (DWORD_PTR *) &cCrvEllipseData;
@@ -757,7 +757,7 @@ bool ConvCurveBase::ConvertSpaceNurbs(const A3DCrvBase * pc3dCurve, double dPare
 {
 	A3DCrvNurbsData cCrvNurbsData;
 	A3D_INITIALIZE_DATA(A3DCrvNurbsData, cCrvNurbsData);
-	CHECK_A3D_RETURN(A3DCrvNurbsGet(pc3dCurve, &cCrvNurbsData));
+	CHECK_A3D_RESULT(A3DCrvNurbsGet(pc3dCurve, &cCrvNurbsData));
 
 	bool bStatus = ConvCurveBase::ConvertSpaceNurbsData(cCrvNurbsData, dParentScale, dContextScale, pcSpaceCurve);
 
@@ -836,7 +836,7 @@ bool ConvCurveBase::ConvertSpaceCompositeCurve(const A3DCrvBase * pc3dCurve, dou
 
 	A3DCrvCompositeData cCrvCompositeData;
 	A3D_INITIALIZE_DATA(A3DCrvCompositeData, cCrvCompositeData);
-	CHECK_A3D_RETURN(A3DCrvCompositeGet(pc3dCurve, &cCrvCompositeData));
+	CHECK_A3D_RESULT(A3DCrvCompositeGet(pc3dCurve, &cCrvCompositeData));
 
 	SpaceCurvesSPtrVector cCurveVector;
 
@@ -892,7 +892,7 @@ bool ConvCurveBase::ConvertSpaceGetAsNurbsCurve(const A3DCrvBase * pc3dCurve, do
 
 	A3DCrvNurbsData cCrvNurbsData;
 	A3D_INITIALIZE_DATA(A3DCrvNurbsData, cCrvNurbsData);
-	CHECK_A3D_RETURN(A3DCrvBaseGetAsNurbs(pc3dCurve, dTolerance, true, &cCrvNurbsData));
+	CHECK_A3D_RESULT(A3DCrvBaseGetAsNurbs(pc3dCurve, dTolerance, true, &cCrvNurbsData));
 
 	return ConvertSpaceNurbsData(cCrvNurbsData, dParentScale, dContextScale, pcSpaceCurve);
 }

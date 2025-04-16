@@ -101,9 +101,6 @@
     <ClCompile Include="..\Common\Path.cpp">
       <Filter>.Common</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\Develop\Library\Teigha\25.9\Kernel\Extensions\ExServices\ExUndoController.cpp">
-      <Filter>.Teigha</Filter>
-    </ClCompile>
     <ClCompile Include="OSnapManager.cpp">
       <Filter>Wait</Filter>
     </ClCompile>
@@ -127,5 +124,8 @@
     <ClCompile Include="..\Signal\Signal2d.cpp" />
     <ClCompile Include="Uio.cpp" />
     <ClCompile Include="AppSetting.cpp" />
+    <ClCompile Include="..\Teigha\Kernel\Extensions\ExServices\ExUndoController.cpp">
+      <Filter>.Teigha</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -23,7 +23,7 @@ namespace SESSION
 
 			//== Command 관리 함수 ===================================================================
 			void AddCommand(SESSION::Command::Root * pCommand);
-			int GetCommandSize();
+			size_t GetCommandSize();
 			void ClearCommand();
 
 		private:

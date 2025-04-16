@@ -160,9 +160,15 @@ void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
 
 	// setlocale(LC_ALL, "ko_KR.utf8");
 
-	// pcViewImpl에 포함되어 있는 HBaseView를 생성하고 초기화 한다.
-	//pcViewImpl->Init(pcModel, Utility::ToChar(TheKenel.General.Display.Driver), strName, nWindowHandle);
+	// View에 필요한 정보를 저장한다. #3DF_View
 	pcViewImpl->m_cWindow = pcCanvasImpl->m_cWindowKey;
+	pcViewImpl->m_pcModel = pcModel;
+
+	// View의 SegmentKey값에 window정보를 저장한다. 현제 Key값은 Invalid Key 상태임.
+	SegmentKeyImpl * pcKeyImpl = (SegmentKeyImpl *)pcViewImpl->m_cKey.GetImpl();
+	DEBUG_VALID(pcViewImpl);
+
+	pcKeyImpl->SetWindow(&pcCanvasImpl->m_cWindowKey);
 
 	pcCanvasImpl->m_vcViewArray.push_back(cInView);
 }
@@ -328,7 +334,7 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 
 	// #3DF_Debug: Z://Test.hsf
 #ifdef _DEBUG
-	 GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
+	 // GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
 #endif
 	 // GetFrontView().SaveHsfFile(L"Z://Test.hsf", this);
 

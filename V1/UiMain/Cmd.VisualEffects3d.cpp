@@ -24,7 +24,7 @@ static char THIS_FILE[] = __FILE__;
 
 namespace
 {
-	const UINT CommandId = HOME_3D_LST_VisualEffects;
+	const UINT VisualEffect_CommandId = HOME_3D_LST_VisualEffects;
 	const CStringA TaskName = "VisualEffects3d";
 
 	enum class Id
@@ -43,7 +43,7 @@ class VisualEffects3dPanel : public CtlTaskPanel
 public:
 
 	VisualEffects3dPanel(Json::Object* pUiData)
-		: CtlTaskPanel(CommandId, pUiData) {}
+		: CtlTaskPanel(VisualEffect_CommandId, pUiData) {}
 
 public:
 
@@ -124,7 +124,7 @@ bool CmdVisualEffects3d::ReceiveSignal(Json::Object* pData)
 	DEBUG_VALID(ViewWnd);
 
 	Json::Object& data = *pData;
-	if (data.GetInteger(SKW_ID) != CommandId) {
+	if (data.GetInteger(SKW_ID) != VisualEffect_CommandId) {
 		REMOVE_POINTER(pData);
 		RETURN_FALSE;
 	}
@@ -158,7 +158,7 @@ void CmdVisualEffects3d::Run(WndView* pView)
 
 	CtlTaskBar& taskBar = TheApp.GetMainFrame().TaskBarCtl;
 	taskBar.SetParent((CWnd*)pView);
-	theDelivery.taskBar.OnRequestValue(CommandId);
+	theDelivery.taskBar.OnRequestValue(VisualEffect_CommandId);
 }
 
 #undef theDelivery

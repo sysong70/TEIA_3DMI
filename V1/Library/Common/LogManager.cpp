@@ -111,6 +111,10 @@ void LogManager::Log(LPCSTR chMessage, ...)
 
 void LogManager::Log(int nId, LPCWSTR chMessage, ...)
 {
+	if (false == m_bWriteLogFlag[nId]) {
+		return;
+	}
+
 	va_list cArgList;
 	va_start(cArgList, chMessage);
 
@@ -124,6 +128,10 @@ void LogManager::Log(int nId, LPCWSTR chMessage, ...)
 
 void LogManager::Log(int nId, LPCSTR chMessage, ...)
 {
+	if (false == m_bWriteLogFlag[nId]) {
+		return;
+	}
+
 	va_list cArgList;
 	va_start(cArgList, chMessage);
 
@@ -137,6 +145,10 @@ void LogManager::Log(int nId, LPCSTR chMessage, ...)
 
 void LogManager::Log(int nId, int nLogLevle, LPCWSTR chMessage, ...)
 {
+	if (false == m_bWriteLogFlag[nId]) {
+		return;
+	}
+
 	if(0 > m_nLogLevel[nId] || m_nLogLevel[nId] < nLogLevle) {
 		return;
 	}
@@ -154,6 +166,10 @@ void LogManager::Log(int nId, int nLogLevle, LPCWSTR chMessage, ...)
 
 void LogManager::Log(int nId, int nLogLevle, LPCSTR chMessage, ...)
 {
+	if (false == m_bWriteLogFlag[nId]) {
+		return;
+	}
+
 	if (0 > m_nLogLevel[nId] || m_nLogLevel[nId] < nLogLevle) {
 		return;
 	}

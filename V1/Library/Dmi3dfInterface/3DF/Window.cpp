@@ -28,32 +28,6 @@ H3DF::WindowKey::WindowKey() {
 	m_pcImpl->SetType(H3DF::Type::None);
 }
 
-/*
-H3DF::WindowKey::WindowKey(H3DF::BaseView * pcBaseView)
-{
-	WindowKeyImpl * pcImpl = new WindowKeyImpl();
-	m_pcImpl = pcImpl;
-
-	pcImpl->m_pcBaseView = pcBaseView;
-
-	//SetKeyValue(pcBaseView->GetViewKey());
-
-	// SelectionSet 초기화, 3DF에서는 Hightliht, Selection을 구분하지 않고 사용한다.
-	// 이 부분의 Selection Set을 이용해서 전체적인 Selection을 처리한다.
-	pcImpl->m_pcSelectionSet = GetBaseView()->GetSelection();
-
-	pcImpl->m_pcSelection = new SelectionControl(*this);
-	SelectionControlImpl * pcSelectionImpl = dynamic_cast<SelectionControlImpl *>(pcImpl->m_pcSelection->GetImpl());
-	pcSelectionImpl->m_pcSelectionSet = GetBaseView()->GetSelection();
-
-	pcImpl->m_pcHighlight = new HighlightControl(*this);
-	
-	pcImpl->m_pcSelectionOptions = new SelectionOptionsControl(*this);
-	SelectionOptionsControlImpl * pcSelectionOptionsImpl = dynamic_cast<SelectionOptionsControlImpl *>(pcImpl->m_pcSelectionOptions->GetImpl());
-	pcSelectionOptionsImpl->m_pcSelectionSet = GetBaseView()->GetSelection();
-}
-*/
-
 H3DF::WindowKey::WindowKey(WindowKey const & cInThat)
 {
 	WindowKeyImpl * pcImpl = new WindowKeyImpl();
@@ -103,7 +77,7 @@ const H3DF::BaseView * H3DF::WindowKey::GetBaseView() const
 {
 	WindowKeyImpl * pcImpl = dynamic_cast<WindowKeyImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
-	return pcImpl->m_pcBaseView;
+	return pcImpl->GetBaseView();
 }
 
 H3DF::BaseView * H3DF::WindowKey::GetBaseView()
