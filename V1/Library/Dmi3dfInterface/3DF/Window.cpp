@@ -18,6 +18,17 @@ USING_3DF_NAMESPACE
 
 // public HBaseView, public HAnimationListener
 
+H3DF::WindowKey::WindowKey() {
+	WindowKeyImpl * pcImpl = new WindowKeyImpl();
+	DEBUG_VALID(pcImpl);
+
+	m_pcImpl = pcImpl;
+
+	// 단순 선언은 Type을 None으로 설정한다.
+	m_pcImpl->SetType(H3DF::Type::None);
+}
+
+/*
 H3DF::WindowKey::WindowKey(H3DF::BaseView * pcBaseView)
 {
 	WindowKeyImpl * pcImpl = new WindowKeyImpl();
@@ -40,19 +51,20 @@ H3DF::WindowKey::WindowKey(H3DF::BaseView * pcBaseView)
 	pcImpl->m_pcSelectionOptions = new SelectionOptionsControl(*this);
 	SelectionOptionsControlImpl * pcSelectionOptionsImpl = dynamic_cast<SelectionOptionsControlImpl *>(pcImpl->m_pcSelectionOptions->GetImpl());
 	pcSelectionOptionsImpl->m_pcSelectionSet = GetBaseView()->GetSelection();
-
-	Initialize();
 }
+*/
 
 H3DF::WindowKey::WindowKey(WindowKey const & cInThat)
 {
 	WindowKeyImpl * pcImpl = new WindowKeyImpl();
-	pcImpl->m_pcBaseView = ((WindowKeyImpl *)cInThat.m_pcImpl)->m_pcBaseView;
 	m_pcImpl = pcImpl;
+
+	Set(cInThat);
 }
 
 H3DF::WindowKey::~WindowKey()
 {
+/*
 	WindowKeyImpl * pcImpl = dynamic_cast<WindowKeyImpl *>(m_pcImpl);
 
 	if (nullptr != pcImpl->m_pcSelection)
@@ -71,7 +83,20 @@ H3DF::WindowKey::~WindowKey()
 	{
 		delete pcImpl->m_pcSelectionOptions;
 		pcImpl->m_pcSelectionOptions = nullptr;
-	}
+	}*/
+}
+
+void H3DF::WindowKey::Set(WindowKey const & cInThat)
+{
+	WindowKeyImpl * pcImpl = (WindowKeyImpl *) m_pcImpl;
+	WindowKeyImpl * pcInThatImpl = (WindowKeyImpl *) cInThat.m_pcImpl;
+	pcImpl->Copy(pcInThatImpl);
+}
+
+WindowKey const & H3DF::WindowKey::operator = (WindowKey const & cInThat)
+{
+	Set(cInThat);
+	return *this;
 }
 
 const H3DF::BaseView * H3DF::WindowKey::GetBaseView() const
@@ -93,6 +118,11 @@ void H3DF::WindowKey::Update()
 	GetBaseView()->Update();
 }
 
+void H3DF::WindowKey::ForceUpdate()
+{
+	GetBaseView()->ForceUpdate();
+}
+
 int H3DF::WindowKey::ViewId()
 {
 	WindowKeyImpl * pcImpl = dynamic_cast<WindowKeyImpl *>(m_pcImpl);
@@ -109,13 +139,6 @@ void H3DF::WindowKey::SetViewId(int nViewId)
 { 
 	WindowKeyImpl * pcImpl = dynamic_cast<WindowKeyImpl *>(m_pcImpl);
 	pcImpl->m_nViewId = nViewId;
-}
-
-void H3DF::WindowKey::Initialize()
-{
-	WindowKeyImpl * pcImpl = dynamic_cast<WindowKeyImpl *>(m_pcImpl);
-
-//	HBaseView * pcBaseView = pcImpl->m_pcBaseView;
 }
 
 WindowKey & H3DF::WindowKey::SetSelectionOptions(SelectionOptionsKit const & cInKit)

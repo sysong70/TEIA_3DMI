@@ -286,7 +286,14 @@ namespace H3DF
 		StyleKey = 0x10000003,
 
 		SegmentKey = 0x10200000,
+		ConstructionKey = 0x10200001,
+		SceneKey = 0x10200002,
+		OverwriteKey = 0x10200003,
+
 		WindowKey = 0x10600000,
+		StandAloneWindowKey = 0x10600001,
+		OffScreenWindowKey = 0x10600002,
+		ApplicationWindowKey = 0x10600003,
 
 		GeometryKey = 0x10100000,
 		ReferenceKey = 0x10100001,
@@ -913,6 +920,8 @@ namespace H3DF
 		void SetType(H3DF::Type eType);
 
 		void SetImpl(Object * pcObject, Impl * pcImpl);
+
+		void Copy(Impl * pcInThat);
 
 	protected:
 		H3DF::Type m_eType = H3DF::Type::None;

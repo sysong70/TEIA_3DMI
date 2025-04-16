@@ -7,10 +7,23 @@
 #include "3DF.Canvas.h"
 #include "Impl/CanvasImpl.h"
 
+#include "../3DF/Selection.h"
+#include "../3DF/Impl/Selection.Impl.h"
+#include "../3DF/Highlight.h"
+#include "../3DF/Impl/HighlightImpl.h"
+
+#include "../3DF/Impl/WindowImpl.h"
+
 #include "3DF.View.h"
 #include "Impl/3DF.View.Impl.h"
 
+#include "3DF.Model.h"
+#include "Impl/ModelImpl.h"
+
 #include "../3DF/3DF.Utility.h"
+
+#define TheKenel TheAppOptions.Kernel
+#define ThePreset TheAppOptions.Preset
 
 using namespace H3DF;
 
@@ -18,32 +31,58 @@ Canvas * H3DF::Factory::CreateCanvas(H3DF::WindowHandle nInWindowHandle, char co
 {
 	Canvas * pcCanvas = new Canvas();
 
-	CanvasImpl * pcImpl = (CanvasImpl *)pcCanvas->GetImpl();;
-	if (nullptr == pcImpl) {
+	CanvasImpl * pcCanvasImpl = (CanvasImpl *)pcCanvas->GetImpl();;
+	if (nullptr == pcCanvasImpl) {
 		assert(false);
 	}
 
-	pcImpl->m_nInWindowHandle = nInWindowHandle;
+	pcCanvasImpl->m_nInWindowHandle = nInWindowHandle;
 
 	if (nullptr != chInName) {
-		Utility::CopyString(chInName, pcImpl->m_pchName);
+		Utility::CopyString(chInName, pcCanvasImpl->m_pchName);
 	}
 
-	pcImpl->m_cApplicationWindowOptionsKit = cInOptions;
+	pcCanvasImpl->m_cApplicationWindowOptionsKit = cInOptions;
+
+	// HBaseView를 생성하고 초기화 한다. 그 값은 WindowsKey에 저장한다.
+	WindowKeyImpl * pcWindowImpl = dynamic_cast<WindowKeyImpl *>(pcCanvasImpl->m_cWindowKey.GetImpl());
+	if (nullptr == pcWindowImpl) {
+		DEBUG_STOP;
+		return nullptr;
+	}
+
+	ModelImpl * pcModelImpl = static_cast<ModelImpl *>(pcCanvasImpl->m_pcModel->GetImpl());
+	DEBUG_VALID(pcModelImpl);
+
+	// 내부에서 BaseView를 생성한다. (HBaseView 기반 Class)
+	if (false == pcWindowImpl->Init(pcCanvasImpl->m_pcModel, Utility::ToChar(TheKenel.General.Display.Driver), chInName, nInWindowHandle)) {
+		DEBUG_STOP;
+		return nullptr;
+	}
+
+	// Navigation Cube 설정
+	pcWindowImpl->m_pcNaviCube = new NavigationCube(pcWindowImpl->m_pcBaseView, &pcCanvasImpl->m_cWindowKey);
+
+	WindowKeyImpl::SetSelectionControl(pcCanvasImpl->m_cWindowKey);
+	WindowKeyImpl::SetHighlightControl(pcCanvasImpl->m_cWindowKey);
+
+	pcWindowImpl->SetType(H3DF::Type::WindowKey);
+
+	pcCanvasImpl->SetType(H3DF::Type::Canvas);
 
 	return pcCanvas;
 }
 
-View * H3DF::Factory::CreateView(CStringA strInName)
+View H3DF::Factory::CreateView(CStringA strInName)
 {
-	View * pcView = new View();
+	View cView;
 
-	ViewImpl * pcImpl = (ViewImpl *)pcView->GetImpl();
+	ViewImpl * pcImpl = (ViewImpl *) cView.GetImpl();
 	if (nullptr == pcImpl) {
 		assert(false);
 	}
 
 	pcImpl->m_strName = strInName;
 
-	return pcView;
+	return cView;
 }

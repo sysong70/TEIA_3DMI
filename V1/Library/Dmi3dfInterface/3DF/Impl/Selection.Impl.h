@@ -10,6 +10,7 @@
 #include "../Control.h"
 #include "../Impl/ControlImpl.h"
 
+#include "../Window.h"
 #include "../Segment.h"
 #include "../Selection.h"
 #include "../Math.h"
@@ -106,10 +107,10 @@ namespace H3DF
 			m_cWorldPoint = pcInThat->m_cWorldPoint;
 			m_cWindowPoint = pcInThat->m_cWindowPoint;
 
-			m_pcWindow = pcInThat->m_pcWindow;
+			m_cWindow = pcInThat->m_cWindow;
 		}
-		WindowKey * GetWindow() { return (WindowKey *) m_pcWindow; }
-		const WindowKey * m_pcWindow = nullptr;
+		WindowKey & GetWindow() { return m_cWindow; }
+		WindowKey m_cWindow;
 
 		std::vector<HC_KEY> & Keys() { return m_vcKeys; }
 		std::vector<H3DF::Type> & Types() { return m_vcTypes; }
@@ -204,7 +205,7 @@ namespace H3DF
 		SelectionControlImpl() { m_eType = H3DF::Type::SelectionControl; }
 
 		void Copy(SelectionControlImpl * pcInThat) {
-			m_pcWindow = pcInThat->m_pcWindow;
+			m_cWindow = pcInThat->m_cWindow;
 			m_pcSelectionSet = pcInThat->m_pcSelectionSet;
 		}
 
@@ -216,8 +217,8 @@ namespace H3DF
 		static void GetSelectOption(SelectionOptionsKit const & cInOptions, char * pchOutOption);
 		static void GetScope(SelectionOptionsKit const & cInOptions, char * pchOutScope);
 
-		WindowKey * GetWindow() { return (WindowKey *) m_pcWindow; }
-		const WindowKey * m_pcWindow = nullptr;
+		WindowKey & GetWindow() { return m_cWindow; }
+		WindowKey m_cWindow;
 
 		HBaseView * GetBaseView();
 

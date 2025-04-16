@@ -2,7 +2,7 @@
 
 #include "../3DF.h"
 #include "../Object.h"
-#include "../../Sprocket/Impl/3DF.View.Impl.h"
+#include "../Impl/WindowImpl.h"
 
 #include <HBaseView.h>
 #include <HUtility.h>

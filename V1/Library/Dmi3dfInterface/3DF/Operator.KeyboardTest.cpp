@@ -22,7 +22,7 @@ void Operator::KeyboardTest::OnKeyboard(Json::Object& input)
 	m_row = input.GetInteger(SKW_ROW);
 	m_column = input.GetInteger(SKW_COLUMN);
 
-	HC_Open_Segment_By_Key(m_pWindow->GetBaseView()->GetConstructionKey());
+	/*HC_Open_Segment_By_Key(m_pWindow->GetBaseView()->GetConstructionKey());
 	{
 		Segment::SetVisibility("string cursors", true);
 		HC_Delete_By_Key(m_textKey);
@@ -33,5 +33,5 @@ void Operator::KeyboardTest::OnKeyboard(Json::Object& input)
 	}
 	HC_Close_Segment();
 
-	m_pWindow->GetBaseView()->Update();
+	m_pWindow->GetBaseView()->Update();*/
 }

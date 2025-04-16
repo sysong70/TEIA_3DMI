@@ -10,6 +10,7 @@
 
 #include "../../UiMain/Command.Resource.h"
 
+#include <Sprocket/3DF.Canvas.h>
 #include <Sprocket/3DF.View.h>
 #include <3DF/Window.h>
 #include <3DF/VisualEffects.h>
@@ -111,7 +112,7 @@ void KERNEL::Command::VisualEffectsImpl::Change(Json::Object & cInObject)
 
 	m_cOption.Set(&cInSetting);
 
-	View().Update();
+	Canvas().Update();
 }
 
 bool KERNEL::Command::VisualEffectsImpl::SetSetting(Json::Object & cInObject)

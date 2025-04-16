@@ -6,9 +6,9 @@
 #include "../Common/Common_Define.h"
 
 
-#include <Sprocket/Impl/3DF.View.Impl.h>
-
+#include <Sprocket/3DF.Canvas.h>
 #include <Sprocket/3DF.View.h>
+#include <Sprocket/Impl/3DF.View.Impl.h>
 
 #include <3DF/Window.h>
 //#include <3DF/Impl/WindowImpl.h>
@@ -138,7 +138,7 @@ KERNEL::Command::HighlightObjectSnapImpl::HighlightObjectSnapImpl(const Session 
 	m_cDynLineHighlightCtrl(Window()),
 	m_cDynPmiHighlightCtrl(Window())
 {
-	SegmentKey cConstruction = View().GetConstructionKey();
+	SegmentKey cConstruction = Canvas().GetConstructionKey();
 
 	m_cSnapPointSegment = cConstruction.Subsegment("SnapPoint");
 
@@ -290,7 +290,7 @@ KERNEL::Command::Result::Type KERNEL::Command::HighlightObjectSnapImpl::NoButton
 	m_cSnapPointSegment.Flush(Search::Type::Segment);
 
 	// 마무리 될때까지 화면을 업데이트 하지 않음.
-	View().SuppressUpdate(true);
+	Canvas().SuppressUpdate(true);
 
 	// Prev Mouse Move에서 저장되어 있는 Snap Point를 그림.
 	for (auto & pcSnapItem : m_vSnapItems) {
@@ -359,9 +359,9 @@ KERNEL::Command::Result::Type KERNEL::Command::HighlightObjectSnapImpl::NoButton
 					bInRemoveExisting = false;
 				}
 
-				View().SuppressUpdate(false);
+				Canvas().SuppressUpdate(false);
 
-				View().Update();
+				Canvas().Update();
 
 				return KERNEL::Command::Result::Type::Pass;
 			}
@@ -401,7 +401,7 @@ KERNEL::Command::Result::Type KERNEL::Command::HighlightObjectSnapImpl::NoButton
 		}
 	}
 
-	View().SuppressUpdate(false);
+	Canvas().SuppressUpdate(false);
 
 	nMouseMoveTickCount = GetTickCount();
 	nTickCount = nMouseMoveTickCount - m_nPrevMouseMoveTickCount;
@@ -410,7 +410,7 @@ KERNEL::Command::Result::Type KERNEL::Command::HighlightObjectSnapImpl::NoButton
 
 	if (true == bForceUpdate) {
 		//Window().Update();
-		Window().GetBaseView()->ForceUpdate();
+		Window().ForceUpdate();
 
 		nMouseMoveTickCount = GetTickCount();
 		nTickCount = nMouseMoveTickCount - m_nPrevMouseMoveTickCount;
@@ -438,7 +438,7 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 #endif
 
 	//if (View().GetSuppressUpdateTick() || View().GetSuppressUpdate() || !pcView->GetModel()->GetFileLoadComplete()) {
-	if (View().GetSuppressUpdateTick() || View().GetSuppressUpdate()) {
+	if (Canvas().GetSuppressUpdateTick() || Canvas().GetSuppressUpdate()) {
 		return false;
 	}
 
@@ -471,7 +471,7 @@ bool KERNEL::Command::HighlightObjectSnapImpl::DoDynamicHighlighting(WindowPoint
 	if (0 == nResult) {
 		if (0 < m_cOSnapRelationSelItem.GetCount()) {
 			m_cOSnapRelationSelItem.Reset();
-			Window().GetBaseView()->ForceUpdate();
+			Window().ForceUpdate();
 		}
 		return false;
 	}
@@ -1020,7 +1020,7 @@ void KERNEL::Command::HighlightObjectSnapImpl::DrawSnapItems()
 		} SegmentKeyImpl::ForcedClose(m_cSnapPointSegment);
 		
 
-		Window().GetBaseView()->ForceUpdate();
+		Window().ForceUpdate();
 	}
 }
 
@@ -1173,7 +1173,7 @@ bool KERNEL::Command::HighlightObjectSnapImpl::ShowCameraInformation(float fInRa
 // 	const WindowKeyImpl * pcWindowKeyPrivate = static_cast<const WindowKeyImpl *>(Window().GetImpl());
 // 	SegmentKey cSecne(pcWindowKeyPrivate->GetSceneKey());
 
-	SegmentKey cScene = View().GetSceneKey();
+	SegmentKey cScene = Canvas().GetSceneKey();
 
 	CameraKit cCamera;
 	cScene.ShowCamera(cCamera);
@@ -1253,7 +1253,7 @@ void KERNEL::Command::HighlightObjectSnapImpl::ClearSnapItems(bool bUpdate)
 // 	m_cSnapPointSegment.Close();
 
 	if (true == bUpdate) {
-		View().Update();
+		Canvas().Update();
 		//Window().GetBaseView()->Update();
 	}
 }

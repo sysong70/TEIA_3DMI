@@ -26,6 +26,7 @@
 #include "3DF.Model.h"
 
 #include "../3DF/Window.h"
+#include "../3DF/Impl/WindowImpl.h"
 #include "../3DF/Segment.h"
 #include "../3DF/Impl/SegmentImpl.h"
 #include "../3DF/Selection.h"
@@ -112,6 +113,11 @@ H3DF::Canvas::Canvas(Canvas const & cInThat)
 	Set(cInThat);
 }
 
+H3DF::Canvas::~Canvas()
+{
+	// HC_Relinquish_Memory();
+}
+
 void H3DF::Canvas::Set(Canvas const & cInThat)
 {
 	CanvasImpl * pcImpl = (CanvasImpl *)m_pcImpl;
@@ -128,7 +134,7 @@ Canvas const & H3DF::Canvas::operator = (Canvas const & cInThat)
 // Attaches a View to this HPS::Canvas using an implicit Layout that covers the whole window.
 // 전체 창을 덮는 암시적 레이아웃을 사용하여 이 HPS:Canvas에 View 연결.
 // 여기서 BaseView를 생성한다.
-void H3DF::Canvas::AttachViewAsLayout(View const * pcInView)
+void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
 {
 	CanvasImpl * pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl);
 	if(nullptr == pcCanvasImpl) {
@@ -145,9 +151,9 @@ void H3DF::Canvas::AttachViewAsLayout(View const * pcInView)
 		DEBUG_RETURN;
 	}
 
-	ViewImpl * pcViewImpl = (ViewImpl *)pcInView->GetImpl();
-	if (nullptr == pcViewImpl) {
-		DEBUG_RETURN;
+	ViewImpl * pcViewImpl = (ViewImpl *) cInView.GetImpl();
+	if (pcViewImpl == nullptr) {
+		DEBUG_RETURN; // 변환 실패 처리
 	}
 
 	CStringA strName = pcViewImpl->m_strName;
@@ -155,10 +161,10 @@ void H3DF::Canvas::AttachViewAsLayout(View const * pcInView)
 	// setlocale(LC_ALL, "ko_KR.utf8");
 
 	// pcViewImpl에 포함되어 있는 HBaseView를 생성하고 초기화 한다.
-	pcViewImpl->Init(pcModel, Utility::ToChar(TheKenel.General.Display.Driver), strName, nWindowHandle);
+	//pcViewImpl->Init(pcModel, Utility::ToChar(TheKenel.General.Display.Driver), strName, nWindowHandle);
+	pcViewImpl->m_cWindow = pcCanvasImpl->m_cWindowKey;
 
-	pcCanvasImpl->m_vpcViewArray.push_back(pcInView);
-	pcCanvasImpl->m_pcFrontView = pcCanvasImpl->m_vpcViewArray.front();
+	pcCanvasImpl->m_vcViewArray.push_back(cInView);
 }
 
 HWND H3DF::Canvas::GetHwnd()
@@ -180,8 +186,8 @@ void H3DF::Canvas::SetDelivery(Signal::Delivery & cDelivery, int nViewId)
 // #Import: File Open
 void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADModel)
 {
-	CanvasImpl * pcImpl = (CanvasImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
+	CanvasImpl * pcCanvasImpl = (CanvasImpl *)m_pcImpl;
+	DEBUG_VALID(pcCanvasImpl);
 
 #ifdef USED_LOG_MANAGER
 	CString strExecuteDirectory = LogManager::GetExecuteDirectory();
@@ -222,12 +228,8 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 	// Update Callback 설정
 	//pcImpl->SetFinishPictureCallback();
 
-	ViewImpl * pcViewImpl = (ViewImpl *)GetFrontView().GetImpl();
-	if (nullptr == pcViewImpl) { DEBUG_RETURN; }
-
 	// 업데이트 강제 중지
-	pcViewImpl->GetBaseView()->SetSuppressUpdate(true);
-	//pcViewImpl->GetBaseView()->SetSuppressUpdateTick(true);
+	SuppressUpdate(true);
 
 	const CString EXTENSIONS[] = {
 		L"PTS", L"PTX", L"XYZ", // Point Cloud
@@ -236,34 +238,34 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 	CString ext = Path::GetExtension(strFilePathName);
 	ext.MakeUpper();
 
-	pcImpl->m_bPointColudData = false;
+	pcCanvasImpl->m_bPointColudData = false;
 
 	for (auto & pre : EXTENSIONS) {
 		if (pre == ext) {
-			pcImpl->m_bPointColudData = true;
+			pcCanvasImpl->m_bPointColudData = true;
 		}
 	}
 
 	bool bHsfFile = false;
-	if (false == pcImpl->m_bPointColudData) {
+	if (false == pcCanvasImpl->m_bPointColudData) {
 		if (L"HSF" == ext) {
 			bHsfFile = true;
 		}
 	}
 
 	// Progress dialog 나타내기
-	pcImpl->Delivery().mainFrame.ShowProgress();
-	pcImpl->m_cTimes[0] = system_clock::now();
-	pcImpl->Delivery().progress.SetMessage(strFilePathName);
+	pcCanvasImpl->Delivery().mainFrame.ShowProgress();
+	pcCanvasImpl->m_cTimes[0] = system_clock::now();
+	pcCanvasImpl->Delivery().progress.SetMessage(strFilePathName);
 
-	if (true == pcImpl->m_bPointColudData) {
-		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/2 : Loading point cloud data");
+	if (true == pcCanvasImpl->m_bPointColudData) {
+		pcCanvasImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/2 : Loading point cloud data");
 	}
 	else if (true == bHsfFile) {
-		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/2 : Loading stream file");
+		pcCanvasImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/2 : Loading stream file");
 	}
 	else {
-		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/3 : Import and Tessellation");
+		pcCanvasImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, "Stage 1/3 : Import and Tessellation");
 	}
 	// HC_Define_System_Options("update control=thread=off");
 
@@ -271,9 +273,19 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 
 	SegmentKey cModelSegmentKey = GetModel().GetSegmentKey();
 
+	if (H3DF::Type::None == GetWindowKey().Type()) {
+		DEBUG_STOP;
+	}
+
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) GetWindowKey().GetImpl();
+	DEBUG_VALID(pcWindowImpl);
+
+	BaseView * pcBaseView = pcWindowImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
 	//----- File을 실제로 읽어 드리는 부분 -----
 	bool bFileLoadingStatus = true;
-	if (true == pcImpl->m_bPointColudData) {
+	if (true == pcCanvasImpl->m_bPointColudData) {
 		LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Load Point Cloud File Start");
 
 		GetFrontView().LoadPointCloudFile(strFilePathName);
@@ -281,33 +293,33 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 		LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Load Point Cloud File End");
 	}
 	else if (true == bHsfFile) {
-		HC_Open_Segment_By_Key(pcViewImpl->GetBaseView()->GetModel()->GetModelKey()); {
-			TK_Status read_status = HTK_Read_Stream_File(strFilePathName, pcViewImpl->GetBaseView()->GetModel()->GetStreamFileTK());
+		HC_Open_Segment_By_Key(pcBaseView->GetModel()->GetModelKey()); {
+			TK_Status read_status = HTK_Read_Stream_File(strFilePathName, pcBaseView->GetModel()->GetStreamFileTK());
 		} HC_Close_Segment();
 	}
 	else {
-		SegmentKey cViewKey(pcViewImpl->GetBaseView()->GetViewKey());
+		SegmentKey cViewKey(pcBaseView->GetViewKey());
 		SegmentKeyImpl::LocalOpen(cViewKey); {
 			HC_Set_Driver_Options("eye dome lighting = off");
 		} SegmentKeyImpl::LocalClose(cViewKey);
 
 		DLL::H3DF::Interface cInterfaace;
-		bFileLoadingStatus = cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, cInCADModel, pcImpl->Delivery(), strErrorMessage);
+		bFileLoadingStatus = cInterfaace.TDFImportFile(strFilePathName, cModelSegmentKey, cInCADModel, pcCanvasImpl->Delivery(), strErrorMessage);
 	}
 
 	if (false == bFileLoadingStatus) {
 		//pcImpl->Delivery().mainFrame.HideProgress();
-		pcImpl->m_bInitUpdate = true;
+		pcCanvasImpl->m_bInitUpdate = true;
 		return;
 	}
 
-	pcImpl->m_cTimes[1] = system_clock::now();
+	pcCanvasImpl->m_cTimes[1] = system_clock::now();
 
-	if (false == pcImpl->m_bPointColudData) {
-		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 3/3 : Performing Initial Update");
+	if (false == pcCanvasImpl->m_bPointColudData) {
+		pcCanvasImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 3/3 : Performing Initial Update");
 	}
 	else {
-		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 2/2 : Performing Initial Update");
+		pcCanvasImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, L"Stage 2/2 : Performing Initial Update");
 	}
 
 	// pcViewImpl->ViewReady();
@@ -322,35 +334,36 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 
 	// HC_Define_System_Options("update control=thread");
 
-// 	pcViewImpl->GetBaseView()->SetSuppressUpdateTick(false);
-// 	pcViewImpl->GetBaseView()->SetSuppressUpdate(false);
+// 	pcBaseView->SetSuppressUpdateTick(false);
+// 	pcBaseView->SetSuppressUpdate(false);
 
-	bool bHasInitialView = pcViewImpl->GetBaseView()->HasInitialView();
+	bool bHasInitialView = pcBaseView->HasInitialView();
 
-	pcViewImpl->GetBaseView()->GetModel()->SetFileLoadComplete(true);
-	pcViewImpl->GetBaseView()->GetModel()->SetFirstFitComplete(true);
+	pcBaseView->GetModel()->SetFileLoadComplete(true);
+	pcBaseView->GetModel()->SetFirstFitComplete(true);
 
-	// pcViewImpl->GetBaseView()->SetGeometryChanged();
+	// pcBaseView->SetGeometryChanged();
 
 	if (false == bHasInitialView) {
-		pcViewImpl->GetBaseView()->FitWorld();		// fit the camera to the scene extents
-		pcViewImpl->GetBaseView()->CameraPositionChanged(true);
+		pcBaseView->FitWorld();		// fit the camera to the scene extents
+		pcBaseView->CameraPositionChanged(true);
 	}
 
-	pcViewImpl->GetBaseView()->SetZoomLimit();
+	pcBaseView->SetZoomLimit();
 
 	//pcCanvasImpl->m_pcModel->UpdateModelHandedness();
 
-	pcViewImpl->GetBaseView()->SetRenderMode(pcViewImpl->GetBaseView()->GetRenderMode(), true);
+	pcBaseView->SetRenderMode(pcBaseView->GetRenderMode(), true);
 
-	pcViewImpl->GetBaseView()->SetViewDirection(H3DF::ViewDirection::Mode::px_py_pz);
-
+	pcBaseView->SetViewDirection(H3DF::ViewDirection::Mode::px_py_pz);
+	
+	// HOOPS 메모리 정리
 	HC_Relinquish_Memory();
 
-	pcViewImpl->GetBaseView()->SetSuppressUpdate(false);
+	pcBaseView->SetSuppressUpdate(false);
 
 	// pcImpl->Delivery().view.SetValidation()을 통해서 Update가 되므로 별도로 ForceUpdate할 필요가 없음.
-	//pcViewImpl->GetBaseView()->ForceUpdate();
+	//pcBaseView->ForceUpdate();
 
 /*
 	char chBuffer[MVO_BUFFER_SIZE];
@@ -369,12 +382,12 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 
 //    	
 //  
-   	pcImpl->Delivery().view.SetValidation();
+   	pcCanvasImpl->Delivery().view.SetValidation();
 
 	// Update에서 처리
 	//pcImpl->Delivery().mainFrame.HideProgress();
 
-	//pcViewImpl->GetBaseView()->ForceUpdate();
+	//pcBaseView->ForceUpdate();
 
 	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Update Complete");
 }
@@ -390,15 +403,39 @@ H3DF::View & H3DF::Canvas::GetFrontView() const
 	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	DEBUG_VALID(pcImpl->m_pcFrontView);
-	return *((View *)pcImpl->m_pcFrontView);
-/*
-
-	if (pcImpl->m_vpcViewArray.empty()) {
-		assert(false);
+	if (pcImpl->m_vcViewArray.empty()) {
+		DEBUG_STOP;
 	}
 
-	return *pcImpl->m_vpcViewArray.front();*/
+	return pcImpl->m_vcViewArray.front();
+}
+
+H3DF::View & H3DF::Canvas::GetFrontView()
+{
+	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	if (pcImpl->m_vcViewArray.empty()) {
+		DEBUG_STOP;
+	}
+
+	return pcImpl->m_vcViewArray.front();
+}
+
+WindowKey & H3DF::Canvas::GetWindowKey() const
+{
+	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->m_cWindowKey;
+}
+
+WindowKey & H3DF::Canvas::GetWindowKey()
+{
+	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->m_cWindowKey;
 }
 
 Model & H3DF::Canvas::GetModel() const
@@ -411,50 +448,102 @@ Model & H3DF::Canvas::GetModel() const
 
 void H3DF::Canvas::Update() const
 {
-	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	for (const auto pcView : pcImpl->m_vpcViewArray) {
-		pcView->Update();
+	if (H3DF::Type::None == GetWindowKey().Type()) {
+		DEBUG_RETURN;
 	}
 
-	if (false == pcImpl->m_bInitUpdate) {
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *)GetWindowKey().GetImpl();
+	DEBUG_VALID(pcWindowImpl);
 
-		pcImpl->m_cTimes[2] = system_clock::now();
-		auto cMilliSec1 = duration_cast<milliseconds>(pcImpl->m_cTimes[2] - pcImpl->m_cTimes[1]);
+	BaseView * pcBaseView = pcWindowImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	if (pcBaseView->GetViewActive() && false == pcBaseView->GetSuppressUpdate())
+	{
+		HC_Control_Update_By_Key(pcBaseView->GetViewKey(), "redraw everything");
+		pcBaseView->GetConstantFrameRateObject()->SetActivityType(GeneralActivity);
+
+		if (false == pcBaseView->GetFirstUpdate()) {
+			pcBaseView->ForceUpdate();
+		}
+		else {
+			pcBaseView->Update();
+		}
+	}
+
+	CanvasImpl * pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl);
+	DEBUG_VALID(pcCanvasImpl);
+
+	if (false == pcCanvasImpl->m_bInitUpdate) {
+
+		pcCanvasImpl->m_cTimes[2] = system_clock::now();
+		auto cMilliSec1 = duration_cast<milliseconds>(pcCanvasImpl->m_cTimes[2] - pcCanvasImpl->m_cTimes[1]);
 		CString strMessage;
 
-		if (false == pcImpl->m_bPointColudData) {
+		if (false == pcCanvasImpl->m_bPointColudData) {
 			strMessage.Format(L"Stage 3/3 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec1));
-			pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+			pcCanvasImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
 		}
 		else {
 			strMessage.Format(L"Stage 2/2 : Complete [%s]", Utility::GetTimeSpanString(cMilliSec1));
-			pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+			pcCanvasImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
 		}
 
-		auto cMilliSec2 = duration_cast<milliseconds>(pcImpl->m_cTimes[2] - pcImpl->m_cTimes[0]);
+		auto cMilliSec2 = duration_cast<milliseconds>(pcCanvasImpl->m_cTimes[2] - pcCanvasImpl->m_cTimes[0]);
 		strMessage.Format(L"Total Load Time : [%s]", Utility::GetTimeSpanString(cMilliSec2));
-		pcImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
+		pcCanvasImpl->Delivery().progress.AddLog(Signal::Progress::Status::Succeed, strMessage);
 
 
-		pcImpl->Delivery().mainFrame.HideProgress();
-		pcImpl->m_bInitUpdate = true;
+		pcCanvasImpl->Delivery().mainFrame.HideProgress();
+		pcCanvasImpl->m_bInitUpdate = true;
 	}
 }
 
 void H3DF::Canvas::Update(Json::Object & cInObject) const
 {
-	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	for (const auto pcView : pcImpl->m_vpcViewArray) {
-		pcView->Update(cInObject);
+	if (H3DF::Type::None == GetWindowKey().Type()) {
+		DEBUG_RETURN;
 	}
 
-	if (false == pcImpl->m_bInitUpdate) {
-		pcImpl->Delivery().mainFrame.HideProgress();
-		pcImpl->m_bInitUpdate = true;
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) GetWindowKey().GetImpl();
+	DEBUG_VALID(pcWindowImpl);
+
+	if (false == pcWindowImpl->IsInitNavigationCube()) {
+		Json::Array & cArray = cInObject.GetArray(SKW_RECT);
+		int nLeft = cArray[0]->ToInteger();
+		int nTop = cArray[1]->ToInteger();
+		int nRight = cArray[2]->ToInteger();
+		int nBottom = cArray[3]->ToInteger();
+
+		pcWindowImpl->InitNavigationCube(nRight, nBottom);
+	}
+
+	BaseView * pcBaseView = pcWindowImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	if (pcBaseView->GetViewActive() && !pcBaseView->GetSuppressUpdate())
+	{
+		HC_Control_Update_By_Key(pcBaseView->GetViewKey(), "redraw everything");
+		pcBaseView->GetConstantFrameRateObject()->SetActivityType(GeneralActivity);
+
+		//		pcCanvas->GetIntRectangle(&rectangle);
+		// 		m_pHView->Notify(HSignalPaint, &rectangle);
+		// 		m_pHView->ResetIdleTime();
+
+		if (false == pcBaseView->GetFirstUpdate()) {
+			pcBaseView->ForceUpdate();
+		}
+		else {
+			pcBaseView->Update();
+		}
+	}
+
+	CanvasImpl * pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl);
+	DEBUG_VALID(pcCanvasImpl);
+
+	if (false == pcCanvasImpl->m_bInitUpdate) {
+		pcCanvasImpl->Delivery().mainFrame.HideProgress();
+		pcCanvasImpl->m_bInitUpdate = true;
 	}
 }
 
@@ -463,35 +552,188 @@ void H3DF::Canvas::Update(Json::Object & cInObject, Window::UpdateType eInType, 
 	Update(cInObject);
 }
 
+SegmentKey H3DF::Canvas::GetConstructionKey()
+{
+	if (H3DF::Type::None == GetWindowKey().Type()) {
+		DEBUG_STOP;
+		return {};
+	}
+
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) GetWindowKey().GetImpl();
+	DEBUG_VALID(pcWindowImpl);
+
+	BaseView * pcBaseView = pcWindowImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	HC_KEY nKey = pcBaseView->GetConstructionKey();
+
+	SegmentKey cConstructionKey = pcBaseView->GetConstructionKey();
+	cConstructionKey.GetImpl()->SetType(H3DF::Type::ConstructionKey);
+
+	return cConstructionKey;
+}
+
+SegmentKey const H3DF::Canvas::GetConstructionKey() const
+{
+	if (H3DF::Type::None == GetWindowKey().Type()) {
+		DEBUG_STOP;
+		return {};
+	}
+
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) GetWindowKey().GetImpl();
+	DEBUG_VALID(pcWindowImpl);
+
+	BaseView * pcBaseView = pcWindowImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	SegmentKey cConstructionKey = pcBaseView->GetConstructionKey();
+	cConstructionKey.GetImpl()->SetType(H3DF::Type::ConstructionKey);
+
+	return cConstructionKey;
+}
+
+SegmentKey H3DF::Canvas::GetSceneKey()
+{
+	if (H3DF::Type::None == GetWindowKey().Type()) {
+		DEBUG_STOP;
+		return {};
+	}
+
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) GetWindowKey().GetImpl();
+	DEBUG_VALID(pcWindowImpl);
+
+	BaseView * pcBaseView = pcWindowImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	SegmentKey cGetSceneKey = pcBaseView->GetSceneKey();
+	cGetSceneKey.GetImpl()->SetType(H3DF::Type::SceneKey);
+
+	return cGetSceneKey;
+}
+
+SegmentKey const H3DF::Canvas::GetSceneKey() const
+{
+	if (H3DF::Type::None == GetWindowKey().Type()) {
+		DEBUG_STOP;
+		return {};
+	}
+
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) GetWindowKey().GetImpl();
+	DEBUG_VALID(pcWindowImpl);
+
+	BaseView * pcBaseView = pcWindowImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	SegmentKey cGetSceneKey = pcBaseView->GetSceneKey();
+	cGetSceneKey.GetImpl()->SetType(H3DF::Type::SceneKey);
+
+	return cGetSceneKey;
+}
+
+SegmentKey H3DF::Canvas::GetOverwriteKey()
+{
+	if (H3DF::Type::None == GetWindowKey().Type()) {
+		DEBUG_STOP;
+		return {};
+	}
+
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) GetWindowKey().GetImpl();
+	DEBUG_VALID(pcWindowImpl);
+
+	BaseView * pcBaseView = pcWindowImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	SegmentKey cOverwriteKey = pcBaseView->GetOverwriteKey();
+	cOverwriteKey.GetImpl()->SetType(H3DF::Type::OverwriteKey);
+
+	return cOverwriteKey;
+}
+
+SegmentKey const H3DF::Canvas::GetOverwriteKey() const
+{
+	if (H3DF::Type::None == GetWindowKey().Type()) {
+		DEBUG_STOP;
+		return {};
+	}
+
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) GetWindowKey().GetImpl();
+	DEBUG_VALID(pcWindowImpl);
+
+	BaseView * pcBaseView = pcWindowImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	SegmentKey cOverwriteKey = pcBaseView->GetOverwriteKey();
+	cOverwriteKey.GetImpl()->SetType(H3DF::Type::OverwriteKey);
+
+	return cOverwriteKey;
+}
+
+void H3DF::Canvas::InvalidateSceneBounding()
+{
+	if (H3DF::Type::None == GetWindowKey().Type()) {
+		DEBUG_STOP;
+		return;
+	}
+
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) GetWindowKey().GetImpl();
+	DEBUG_VALID(pcWindowImpl);
+
+	BaseView * pcBaseView = pcWindowImpl->GetBaseView();
+	DEBUG_VALID(pcBaseView);
+
+	pcBaseView->InvalidateSceneBounding();
+}
+
+void H3DF::Canvas::SuppressUpdate(bool bSuppress)
+{
+	if (H3DF::Type::None == GetWindowKey().Type()) {
+		DEBUG_RETURN;
+	}
+
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) GetWindowKey().GetImpl();
+	DEBUG_VALID(pcWindowImpl);
+
+	pcWindowImpl->GetBaseView()->SetSuppressUpdate(bSuppress);
+}
+
+bool H3DF::Canvas::GetSuppressUpdate()
+{
+	if (H3DF::Type::None == GetWindowKey().Type()) {
+		DEBUG_STOP;
+		return false;
+	}
+
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) GetWindowKey().GetImpl();
+	DEBUG_VALID(pcWindowImpl);
+
+	return pcWindowImpl->GetBaseView()->GetSuppressUpdate();
+}
+
+bool H3DF::Canvas::GetSuppressUpdateTick()
+{
+	if (H3DF::Type::None == GetWindowKey().Type()) {
+		DEBUG_STOP;
+		return false;
+	}
+
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) GetWindowKey().GetImpl();
+	DEBUG_VALID(pcWindowImpl);
+
+	return pcWindowImpl->GetBaseView()->GetSuppressUpdateTick();
+}
+
 void H3DF::Canvas::Resize(int cx, int cy)
 {
-	View & cView = GetFrontView();
-	cView.Resize(cx, cy);
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) GetWindowKey().GetImpl();
+	DEBUG_VALID(pcWindowImpl);
+
+	pcWindowImpl->Resize(cx, cy);
 }
 
 //== Keyboard 관련 함수 ==============================================================================
 bool H3DF::Canvas::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	return GetFrontView().Char(nChar, nRepCnt, nFlags);
-}
-
-//== Command 관련 함수 ===========================================================================
-
-void H3DF::Canvas::CancelCommands()
-{
-	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
-	if (nullptr == pcImpl) {
-		DEBUG_RETURN;
-	}
-
-	for (const auto pcView : pcImpl->m_vpcViewArray) {
-		pcView->CancelCommands();
-	}
-}
-
-H3DF::Canvas::~Canvas()
-{
-	HC_Relinquish_Memory();
 }
 
 bool H3DF::Canvas::KeyboardInput(Json::Object& input)

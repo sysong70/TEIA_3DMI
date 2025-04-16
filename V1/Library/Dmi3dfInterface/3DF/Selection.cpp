@@ -1231,7 +1231,7 @@ bool H3DF::SelectionResults::IsExist(SelectionItem & cInItem)
 H3DF::SelectionControl::SelectionControl(WindowKey const & cInWindow)
 {
 	SelectionControlImpl * pcImpl = new SelectionControlImpl();
-	pcImpl->m_pcWindow = &cInWindow;
+	pcImpl->m_cWindow = cInWindow;
 	m_pcImpl = pcImpl;
 }
 
@@ -1431,7 +1431,7 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 	SelectionControlImpl * pcImpl = (SelectionControlImpl *) m_pcImpl;
 
 	SelectionOptionsKit cOptions;
-	if(false == pcImpl->GetWindow()->ShowSelectionOptions(cOptions)) {
+	if(false == pcImpl->GetWindow().ShowSelectionOptions(cOptions)) {
 		return 0;
 	}
 

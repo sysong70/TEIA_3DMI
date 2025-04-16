@@ -277,7 +277,7 @@ Command::Result::Type KERNEL::Command::Select::LButtonUp(Event & cInEvent)
 	// 4. ModelPanel에 선택된 객체를 전달
 	pcImpl->ModelPanel().SelectTreeItem(cSelItem, bSelectFlag);
 
-	pcImpl->View().Update();
+	pcImpl->Canvas().Update();
 
 	return Command::Result::Type::Consume;
 }
@@ -356,7 +356,7 @@ bool KERNEL::Command::Select::SelectByResult(H3DF::SelectionResults & cInResults
 		cIter.Next();
 	}
 
-	pcImpl->View().Update();
+	pcImpl->Canvas().Update();
 
 	return true;
 }
@@ -394,7 +394,7 @@ bool KERNEL::Command::Select::DynamicSelectByResult(H3DF::SelectionResults & cIn
 		cIter.Next();
 	}
 
-	pcImpl->View().Update();
+	pcImpl->Canvas().Update();
 
 	return true;
 }
@@ -445,7 +445,7 @@ void KERNEL::Command::Select::Unhighlight(H3DF::SelectionResults const & cInItem
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->View().SuppressUpdate(true);
+	pcImpl->Canvas().SuppressUpdate(true);
 
 	pcImpl->m_cHighlightCtrl.Unhighlight(cInItems);
 	pcImpl->m_cLineHighlightCtrl.Unhighlight(cInItems);
@@ -457,9 +457,9 @@ void KERNEL::Command::Select::Unhighlight(H3DF::SelectionResults const & cInItem
 
 	pcImpl->m_cSelectionResult.Erase(cInItems);
 
-	pcImpl->View().SuppressUpdate(false);
+	pcImpl->Canvas().SuppressUpdate(false);
 
-	pcImpl->View().Update();
+	pcImpl->Canvas().Update();
 }
 
 void KERNEL::Command::Select::UnhighlightEverything()
@@ -467,7 +467,7 @@ void KERNEL::Command::Select::UnhighlightEverything()
 	auto * pcImpl = (SelectImpl *)m_pcImpl;
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->View().SuppressUpdate(true);
+	pcImpl->Canvas().SuppressUpdate(true);
 
 	pcImpl->m_cHighlightOSnapOperator.UnhighlightEverything();
 	
@@ -482,9 +482,9 @@ void KERNEL::Command::Select::UnhighlightEverything()
 	pcImpl->m_cSelectionResult.Reset();
 	pcImpl->m_cDynSelectionResult.Reset();
 
-	pcImpl->View().SuppressUpdate(false);
+	pcImpl->Canvas().SuppressUpdate(false);
 
-	pcImpl->View().Update();
+	pcImpl->Canvas().Update();
 }
 
 void KERNEL::Command::Select::SetMouseDownTickCount(ULONGLONG nInCount)

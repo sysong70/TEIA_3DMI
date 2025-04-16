@@ -44,7 +44,7 @@ using namespace H3DF;
 
 
 //== 객체 관리 ======================================================================================
-void Impl::SetImpl(Object * pcObject, Impl * pcImpl)
+void H3DF::Impl::SetImpl(Object * pcObject, Impl * pcImpl)
 {
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
@@ -57,12 +57,17 @@ void Impl::SetImpl(Object * pcObject, Impl * pcImpl)
 	pcObject->m_pcImpl = pcImpl;
 }
 
-H3DF::Type Impl::Type() const
+H3DF::Type H3DF::Impl::Type() const
 {
 	return m_eType;
 }
 
-void Impl::SetType(H3DF::Type eType)
+void H3DF::Impl::SetType(H3DF::Type eType)
 {
 	m_eType = eType;
+}
+
+void H3DF::Impl::Copy(Impl * pcInThat)
+{
+	m_eType = pcInThat->m_eType;
 }

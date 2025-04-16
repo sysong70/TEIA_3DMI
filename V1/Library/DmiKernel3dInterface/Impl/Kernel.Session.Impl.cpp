@@ -22,6 +22,9 @@
 #include <3DF/AttributeLock.h>
 #include <3DF/NavigationCube.h>
 
+#include <3DF/Window.h>
+#include <3DF/Impl/WindowImpl.h>
+
 using namespace H3DF;
 using namespace KERNEL;
 
@@ -51,16 +54,16 @@ KERNEL::SessionImpl::~SessionImpl()
 	}
 }
 
-H3DF::WindowKey & KERNEL::SessionImpl::Window()
+H3DF::WindowKey KERNEL::SessionImpl::Window()
 {
 	DEBUG_VALID(m_pcCanvas);
-	return m_pcCanvas->GetFrontView().GetWindowKey();
+	return m_pcCanvas->GetWindowKey();
 }
 
-const H3DF::WindowKey & KERNEL::SessionImpl::Window() const
+const H3DF::WindowKey KERNEL::SessionImpl::Window() const
 {
 	DEBUG_VALID(m_pcCanvas);
-	return m_pcCanvas->GetFrontView().GetWindowKey();
+	return m_pcCanvas->GetWindowKey();
 }
 
 H3DF::Model & KERNEL::SessionImpl::GetModel()
@@ -96,7 +99,7 @@ void KERNEL::SessionImpl::CancelCommands()
 {
 	m_cSelectionResult.Reset();
 	Select().UnhighlightEverything();
-	GetCanvas().GetFrontView().GetWindowKey().Update();
+	GetCanvas().Update();
 }
 
 //== Operator 관련 함수 ==============================================================================
@@ -118,7 +121,9 @@ void KERNEL::SessionImpl::AllocationOperator(const Session * pcInSession)
 
 	// Navigation Cube에서 사용하는 DynHighlightControl을 설정한다. Cube에서 선택된 부분을 Unhighlight하기 위함.
 	KERNEL::Command::Select * pcSelect = (KERNEL::Command::Select *)m_mpcCommonCommandMap[KERNEL::Command::Type::Select];
-	GetCanvas().GetFrontView().GetNavigationCube().SetHighlightControl(pcSelect->DynHighlightControl());
+
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *)GetCanvas().GetWindowKey().GetImpl();
+	pcWindowImpl->GetNavigationCube().SetHighlightControl(pcSelect->DynHighlightControl());
 }
 
 KERNEL::Command::Set * KERNEL::SessionImpl::GetOperator(Command::Type eInType)
@@ -324,7 +329,7 @@ Command::Result::Type KERNEL::SessionImpl::CameraControlLButtonUp(Command::Event
 	H3DF::Camera::Mode eMode = Camera().CameraMode();
 
 	if (H3DF::Camera::Mode::ZoomBox == eMode) {
-		GetCanvas().GetFrontView().SuppressUpdate(true);
+		GetCanvas().SuppressUpdate(true);
 	}
 
 	// NavigationCube가 선택된 경우를 처리한다. NavigationCube가 선택되어 View를 변경한 경우에는 
@@ -335,8 +340,8 @@ Command::Result::Type KERNEL::SessionImpl::CameraControlLButtonUp(Command::Event
 
 	if (H3DF::Camera::Mode::ZoomBox == eMode) {
 		Select().DrawSnapItems();
-		GetCanvas().GetFrontView().SuppressUpdate(false);
-		GetCanvas().GetFrontView().Update();
+		GetCanvas().SuppressUpdate(false);
+		GetCanvas().Update();
 
 		return Command::Result::Type::Consume;
 	}

@@ -866,7 +866,7 @@ void KERNEL::Command::ModelPanel::ExchangeMkpViewSelectedSignal(H3DF::Component 
 	}
 
 	// View를 Update해야 Fitting이 정확하게 됨.
-	pcImpl->GetSession().Canvas().GetFrontView().Update();
+	pcImpl->GetSession().Canvas().Update();
 
 	// Makrup View에 Sub component가 없는 경우 Camera 정보를 이용해서 설정한다.
 	// Sub component가 없다는 것은, 하부에 PMI가 없는 경우임.

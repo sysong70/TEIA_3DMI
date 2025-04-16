@@ -104,9 +104,12 @@ namespace H3DF
 	class API_3DF WindowKey : public SegmentKey
 	{
 	public:
-		WindowKey(H3DF::BaseView * pcBaseView);
+		WindowKey();
 		WindowKey(WindowKey const & cInThat);
 		~WindowKey();
+
+		void Set(WindowKey const & cInThat);
+		WindowKey const & operator = (WindowKey const & cInThat);
 
 		H3DF::Type ObjectType() const override { return H3DF::Type::WindowKey; };
 
@@ -114,6 +117,7 @@ namespace H3DF
 		H3DF::BaseView * GetBaseView();
 
 		void Update();
+		void ForceUpdate();
 
 		int ViewId();
 		const int ViewId() const;
@@ -133,7 +137,5 @@ namespace H3DF
 		// Returns a control that allows the user to highlight segments or geometry in this window.
 		HighlightControl & GetHighlightControl();
 		HighlightControl const & GetHighlightControl() const;
-
-		void Initialize();
 	};
 }

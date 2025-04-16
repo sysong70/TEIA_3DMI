@@ -46,6 +46,26 @@ void KERNEL::Command::SetImpl::Copy(SetImpl * pcInThat)
 	}
 }
 
+H3DF::Canvas & KERNEL::Command::SetImpl::Canvas()
+{
+	DEBUG_VALID(m_pcSession);
+
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *) m_pcSession->GetImpl());
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetCanvas();
+}
+
+const H3DF::Canvas & KERNEL::Command::SetImpl::Canvas() const
+{
+	DEBUG_VALID(m_pcSession);
+
+	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *) m_pcSession->GetImpl());
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetCanvas();
+}
+
 H3DF::WindowKey & KERNEL::Command::SetImpl::Window()
 {
 	DEBUG_VALID(m_pcSession);
@@ -53,7 +73,7 @@ H3DF::WindowKey & KERNEL::Command::SetImpl::Window()
 	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *)m_pcSession->GetImpl());
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->GetCanvas().GetFrontView().GetWindowKey();
+	return pcImpl->GetCanvas().GetWindowKey();
 }
 
 const H3DF::WindowKey & KERNEL::Command::SetImpl::Window() const
@@ -63,7 +83,7 @@ const H3DF::WindowKey & KERNEL::Command::SetImpl::Window() const
 	SessionImpl * pcImpl = dynamic_cast<SessionImpl *>((SessionImpl *)m_pcSession->GetImpl());
 	DEBUG_VALID(pcImpl);
 
-	return pcImpl->GetCanvas().GetFrontView().GetWindowKey();
+	return pcImpl->GetCanvas().GetWindowKey();
 }
 
 H3DF::View & KERNEL::Command::SetImpl::View()
@@ -141,7 +161,7 @@ const H3DF::Model & KERNEL::Command::SetImpl::GetModel() const
 // Update하기전에 Hightlight된 것들을 모두 Unhighlight하고, SnapItem을 모두 Reset한다.
 void KERNEL::Command::SetImpl::PrepareUpdate()
 {
-	GetSession().Canvas().GetFrontView().SuppressUpdate(true);
+	GetSession().Canvas().SuppressUpdate(true);
 
 	SessionImpl * pcDocViewImpl = dynamic_cast<SessionImpl *>(GetSession().GetImpl());
 	pcDocViewImpl->Select().UnhighlightEverything();
@@ -151,8 +171,8 @@ void KERNEL::Command::SetImpl::PrepareUpdate()
 // Update가 완료되면, View를 Update한다.
 void KERNEL::Command::SetImpl::Updated()
 {
-	GetSession().Canvas().GetFrontView().SuppressUpdate(false);
-	GetSession().Canvas().GetFrontView().Update();
+	GetSession().Canvas().SuppressUpdate(false);
+	GetSession().Canvas().Update();
 }
 
 //== Event 관련 함수 =================================================================================
@@ -205,7 +225,7 @@ bool KERNEL::Command::SetImpl::StepExecution(Command::Step * pcInStep, Command::
 	// 주어진 Event가 현재 Step을 완료하지 않고 준비 단계를 나타냄. Moouse Move등의 Event를 나타냄.
 	if (Step::EventType::PreProcessing == eEventType) {
 
-		H3DF::SegmentKey cConstructionSegment = m_pcSession->Canvas().GetFrontView().GetConstructionKey();
+		H3DF::SegmentKey cConstructionSegment = m_pcSession->Canvas().GetConstructionKey();
 		cConstructionSegment.Flush(H3DF::Search::Type::Geometry);
 		pcInStep->Draw(cConstructionSegment);
 

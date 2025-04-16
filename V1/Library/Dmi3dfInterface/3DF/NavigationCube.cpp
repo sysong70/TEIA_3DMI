@@ -11,7 +11,7 @@
 #include "Facility.AppOptions.h"
 #include "./Impl/Selection.Impl.h"
 
-#include "../Sprocket/Impl/3DF.View.Impl.h"
+#include "./Impl/WindowImpl.h"
 
 USING_3DF_NAMESPACE
 
@@ -96,8 +96,7 @@ public:
 	void Copy(const NavigationCubeImpl * pcInThat) {
 		m_bInitialized = pcInThat->m_bInitialized;
 
-		m_pcWindow = pcInThat->m_pcWindow;
-		m_pView = pcInThat->m_pView;
+		m_pcBaseView = pcInThat->m_pcBaseView;
 
 		m_windowSize = pcInThat->m_windowSize;
 
@@ -112,11 +111,11 @@ public:
 
 		m_cOldHighlightSelection = pcInThat->m_cOldHighlightSelection;
 	}
-
+		
 	bool m_bInitialized = false;
 
-	WindowKey * m_pcWindow = nullptr;
-	H3DF::BaseView * m_pView = nullptr;
+	BaseView * m_pcBaseView = nullptr;
+
 	H3DF::Point2D m_windowSize;
 
 	HC_KEY m_parentSegment = HC_ERROR_KEY;
@@ -138,36 +137,25 @@ H3DF::NavigationCube::NavigationCube(H3DF::BaseView * view, WindowKey * pcInWind
 
 	m_pcImpl = pcImpl;
 
-	pcImpl->m_pView = view;
-	pcImpl->m_pcWindow = pcInWindow;
+	pcImpl->m_pcBaseView = view;
 }
 
 H3DF::NavigationCube::~NavigationCube()
 {
 }
 
-
-
 void H3DF::NavigationCube::Set(NavigationCube const & cInThat)
 {
 	NavigationCubeImpl * pcImpl = (NavigationCubeImpl *)m_pcImpl;
 	NavigationCubeImpl * pcInThatImpl = (NavigationCubeImpl *)cInThat.m_pcImpl;
 	pcImpl->Copy(pcInThatImpl);
-
-	if (nullptr != pcImpl->m_pView) {
-		pcImpl->m_pView->SetNavigationCube(this);
-	}
 }
-
-
 
 NavigationCube const & H3DF::NavigationCube::operator = (NavigationCube const & cInThat)
 {
 	Set(cInThat);
 	return *this;
 }
-
-
 
 int H3DF::NavigationCube::LButtonUp(Operator::Event & cInEvent, SelectionItem & cInItem)
 {
@@ -210,7 +198,7 @@ int H3DF::NavigationCube::LButtonUp(Operator::Event & cInEvent, SelectionItem & 
 				pcImpl->m_pcHighlightCtrl->UnhighlightEverything();
 			}
 
-			pcImpl->m_pView->SetViewDirection((H3DF::ViewDirection::Mode)nIndex);
+			pcImpl->m_pcBaseView->SetViewDirection((H3DF::ViewDirection::Mode)nIndex);
 
 			return HLISTENER_CONSUME_EVENT;
 		}
@@ -238,13 +226,12 @@ int H3DF::NavigationCube::LButtonDownAndMove(Operator::Event & cInEvent)
 
 
 
-void H3DF::NavigationCube::SetView(H3DF::BaseView * view, WindowKey * pcInWindow) 
+void H3DF::NavigationCube::SetView(H3DF::BaseView * pcInView) 
 {
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->m_pView = view;
-	pcImpl->m_pcWindow = pcInWindow;
+	pcImpl->m_pcBaseView = pcInView;
 }
 
 
@@ -377,13 +364,12 @@ HC_KEY H3DF::NavigationCube::HitTest(float x, float y, float z)
 
 void H3DF::NavigationCube::Transform()
 {
-
 	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
 	HPoint position, target, up_vector;
 
-	HC_Open_Segment_By_Key(pcImpl->m_pView->GetSceneKey()); {
+	HC_Open_Segment_By_Key(pcImpl->m_pcBaseView->GetSceneKey()); {
 		HC_Show_Net_Camera_Target(&target.x, &target.y, &target.z);
 		HC_Show_Net_Camera_Up_Vector(&up_vector.x, &up_vector.y, &up_vector.z);
 		HC_Show_Net_Camera_Position(&position.x, &position.y, &position.z);
