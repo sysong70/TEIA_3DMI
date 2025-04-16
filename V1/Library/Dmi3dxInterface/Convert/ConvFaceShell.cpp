@@ -18,7 +18,7 @@ using namespace c3d;
 using namespace concurrency;
 
 #define CHECK_BOOL_RETURN(FunctionCall) { bool nResult = FunctionCall; if (nResult == false) { return false; } }
-#define CHECK_A3D_RETURN(FunctionCall) { A3DStatus eResult = FunctionCall; if (eResult != A3D_SUCCESS) { return false; } }
+#define CHECK_A3D_RESULT(FunctionCall) { A3DStatus eResult = FunctionCall; if (eResult != A3D_SUCCESS) { return false; } }
 
 ConvFaceShell::ConvFaceShell(A3DTopoShell * pcTopoShell, double dContextScale)
 {

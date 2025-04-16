@@ -8,7 +8,7 @@
 #include <cur_surface_intersection.h>
 
 #define CHECK_BOOL_RETURN(FunctionCall) { bool nResult = FunctionCall; if (nResult == false) { return false; } }
-#define CHECK_A3D_RETURN(FunctionCall) { A3DStatus eResult = FunctionCall; if (eResult != A3D_SUCCESS) { return false; } }
+#define CHECK_A3D_RESULT(FunctionCall) { A3DStatus eResult = FunctionCall; if (eResult != A3D_SUCCESS) { return false; } }
 
 ConvLoop::ConvLoop(A3DTopoLoop * pcTopoLoop, A3DSurfBase * pcSurfBase, double dContextScale)
 {
@@ -440,3 +440,6 @@ bool ConvLoop::IsOrientedEdgeAllPlaneLine(std::list<const MbOrientedEdge *> & lp
 
 	return true;
 }
+
+#undef CHECK_BOOL_RETURN
+#undef CHECK_A3D_RETURN

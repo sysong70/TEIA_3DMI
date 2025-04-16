@@ -11,12 +11,14 @@
 
 #include <3DF/Math.h>
 
-#define CHECK_A3D_RETURN(FunctionCall)\
+#include <assert.h>
+
+#define CHECK_A3D_RESULT(FunctionCall)\
 {\
 	const A3DStatus iRet__ = FunctionCall;\
 	if (iRet__ != A3D_SUCCESS)\
 	{\
-		assert(false);\
+		assert(FALSE);\
 		if (A3DMiscGetErrorMsg)\
 			fprintf(stderr, #FunctionCall " returned error %d = %s\n", iRet__ , A3DMiscGetErrorMsg(iRet__) ); \
 		else\

@@ -23,18 +23,7 @@ public:
 	void Copy(VisualEffectsControlImpl * pcInThat) {
 		ControlImpl::Copy(pcInThat);
 	}
-
-	BaseView * GetBaseView();
 };
-
-BaseView * VisualEffectsControlImpl::GetBaseView()
-{
-	SegmentKeyImpl * pcKeyImpl = static_cast<SegmentKeyImpl *>(m_cOverrideKey.GetImpl());
-	DEBUG_VALID(pcKeyImpl);
-
-	return pcKeyImpl->GetBaseView();
-}
-
 
 H3DF::VisualEffectsControl::VisualEffectsControl(SegmentKey & cInSegmentKey)
 {

@@ -93,7 +93,12 @@ void H3DF::ViewImpl::Copy(const ViewImpl * pcInThat)
 	m_bSimpleReflection = pcInThat->m_bSimpleReflection;
 }
 
-H3DF::WindowKey H3DF::ViewImpl::GetWindowKey()
+SegmentKey H3DF::ViewImpl::GetSegmentKey()
+{ 
+	return m_cKey; 
+}
+
+H3DF::WindowKey & H3DF::ViewImpl::GetWindowKey()
 {
 	return m_cWindow;
 }

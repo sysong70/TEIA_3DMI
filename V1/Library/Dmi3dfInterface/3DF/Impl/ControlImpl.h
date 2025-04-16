@@ -2,19 +2,35 @@
 
 #include "../3DF.h"
 #include "../Object.h"
+#include "../Window.h"
 #include "../Segment.h"
+#include "../Impl/SegmentImpl.h"
 
-OPEN_3DF_NAMESPACE
-
-class ControlImpl : public H3DF::Impl
+namespace H3DF 
 {
-public:
-	SegmentKey m_cOverrideKey;
+	class BaseView;
 
-	void Copy(ControlImpl * pcInThat)
+	class ControlImpl : public H3DF::Impl
 	{
-		m_cOverrideKey = pcInThat->m_cOverrideKey;
-	}
-};
+	public:
+		SegmentKey m_cOverrideKey;
 
-CLOSE_3DF_NAMESPACE
+		H3DF::BaseView * GetBaseView() const
+		{
+			SegmentKeyImpl * pcSegmentImpl = (SegmentKeyImpl *)m_cOverrideKey.GetImpl();
+			DEBUG_VALID(pcSegmentImpl);
+
+			if (nullptr == pcSegmentImpl->GetWindow()) {
+				DEBUG_STOP;
+				return nullptr;
+			}
+
+			return pcSegmentImpl->GetWindow()->GetBaseView();
+		}
+
+		void Copy(ControlImpl * pcInThat)
+		{
+			m_cOverrideKey = pcInThat->m_cOverrideKey;
+		}
+	};
+}

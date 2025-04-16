@@ -6,6 +6,8 @@
 #include "Segment.h"
 #include "./Impl/SegmentImpl.h"
 
+#include "Window.h"
+
 #include <HTools.h>
 
 using namespace H3DF;
@@ -219,7 +221,12 @@ BaseView * CullingControlImpl::GetBaseView()
 	SegmentKeyImpl * pcKeyImpl = static_cast<SegmentKeyImpl *>(m_cOverrideKey.GetImpl());
 	DEBUG_VALID(pcKeyImpl);
 
-	return pcKeyImpl->GetBaseView();
+	if (nullptr == pcKeyImpl->GetWindow()) {
+		DEBUG_STOP;
+		return nullptr;
+	}
+
+	return pcKeyImpl->GetWindow()->GetBaseView();
 }
 
 H3DF::CullingControl::CullingControl(SegmentKey & cInSegmentKey)

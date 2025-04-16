@@ -18,12 +18,12 @@ namespace H3DF
 		void Copy(const ViewImpl * pcInThat);
 
 	public:
-		SegmentKey GetSegmentKey() { return m_cKey; }
+		SegmentKey GetSegmentKey();
 		SegmentKey GetModelKey() { return m_cModelKey; }
 
 		Model & GetAttachedModel() {return *m_pcModel;}
 		
-		H3DF::WindowKey GetWindowKey();
+		H3DF::WindowKey & GetWindowKey();
 
 		H3DF::BaseView * GetBaseView();
 

@@ -196,7 +196,7 @@
     <ClInclude Include="UserIO.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Develop\Library\Teigha\25.9\Kernel\Extensions\ExServices\ExUndoController.cpp" />
+    <ClCompile Include="..\Teigha\Kernel\Extensions\ExServices\ExUndoController.cpp" />
     <ClCompile Include="..\Common\Common_Define.cpp" />
     <ClCompile Include="..\Common\Dir.cpp" />
     <ClCompile Include="..\Common\File.cpp" />
