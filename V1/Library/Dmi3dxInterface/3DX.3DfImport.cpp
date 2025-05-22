@@ -1523,11 +1523,11 @@ A3DStatus TdfImport::ParseRiSet(const A3DRiSet * pcInSet, const A3DMiscEntityRef
 
 // 2-1. Draw Ri Brep Model (B-Rep Model 및 Tessellation Model도 함께 처리된다.)
 A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcInRepItem, const A3DRiRepresentationItemData & cInRepItemData, const A3DMiscEntityReference * pcInEntityRef,
-	const A3DMiscCascadedAttributes * pcInAttr, const A3DMiscCascadedAttributesData & cInAttrData,  H3DF::SegmentKey & cInSegment)
+	const A3DMiscCascadedAttributes * pcInAttr, const A3DMiscCascadedAttributesData & cInAttrData, H3DF::SegmentKey & cInSegment)
 {
 	Log::IncreaseTabIndex();
 
-	Log::Write(L"ParseRiBrepModel: %s", Log::HexStr((DWORD_PTR)pcInRepItem));
+	Log::Write(L"ParseRiBrepModel: %s", Log::HexStr((DWORD_PTR) pcInRepItem));
 
 	A3DRootBaseData cRootBaseData;
 	A3D_INITIALIZE_DATA(A3DRootBaseData, cRootBaseData);
@@ -1535,18 +1535,22 @@ A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcInRepIte
 	m_pchRepresentationItemName = cRootBaseData.m_pcName;
 
 	// 외부에서 Entity References가 들어와도 Map에서 다시 검색해서 일치하는게 있는지 여부를 확인해서 적용한다.
-	auto pcIterator = m_mEntityReferenceMap.find((A3DEntity *)pcInRepItem);
+	auto pcIterator = m_mEntityReferenceMap.find((A3DEntity *) pcInRepItem);
 	if (pcIterator != m_mEntityReferenceMap.end()) {
 		pcInEntityRef = pcIterator->second;
 	}
 
-/*
+	// #B-Rep: Brep Model Data를 가져옴.
 	A3DRiBrepModelData cBrepModelData;
 	A3D_INITIALIZE_DATA(A3DRiBrepModelData, cBrepModelData);
-	A3DStatus nResult = A3DRiBrepModelGet(pcRepItem, &cBrepModelData);
+	A3DStatus nResult = A3DRiBrepModelGet(pcInRepItem, &cBrepModelData);
 
+	if (A3D_SUCCESS == nResult) {
+		Log::A3DTopoBrepDataLog(cBrepModelData.m_pBrepData);
+	}
+
+	// cBrepModelData 초기화
 	A3DRiBrepModelGet(nullptr, &cBrepModelData);
-*/
 
 /*
 	// Scale을 구하기 위해서 Context Data에서 값을 가져온다.

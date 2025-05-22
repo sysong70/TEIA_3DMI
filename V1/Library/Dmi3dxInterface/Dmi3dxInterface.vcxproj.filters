@@ -49,6 +49,9 @@
     <Filter Include="_Signal">
       <UniqueIdentifier>{c69e44d6-cd5c-41ac-b158-f84e0e681edc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Function">
+      <UniqueIdentifier>{c4b7990a-a8e3-4b25-9695-f06194146047}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -189,6 +192,9 @@
     <ClInclude Include="3DX.Log.h">
       <Filter>Utility</Filter>
     </ClInclude>
+    <ClInclude Include="3DX.Simplifier.h">
+      <Filter>Function</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -322,6 +328,9 @@
     </ClCompile>
     <ClCompile Include="3DX.Log.cpp">
       <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="3DX.Simplifier.cpp">
+      <Filter>Function</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

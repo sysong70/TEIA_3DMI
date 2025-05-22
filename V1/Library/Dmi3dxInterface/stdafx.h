@@ -23,3 +23,7 @@
 
 #define BUILD_PRODUCTNAME	L"3DMI"
 #define BUILD_VER_BRAND		L"1.0"
+
+#define LOG LogManager::Log
+#define LogIncTab LogManager::IncreaseTabIndex
+#define LogDecTab LogManager::DecreaseTabIndex

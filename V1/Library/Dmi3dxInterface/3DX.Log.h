@@ -48,6 +48,8 @@ namespace Log
 	CStringA HexStrA(DWORD_PTR nValue);
 	CString BoolStr(bool bValue);
 	CStringA BoolStrA(bool bValue);
+	CString DblStr(double dValue);
+	CStringA DblStrA(double dValue);
 	CString GetVector2dDataString(A3DVector2dData & cData);
 	CStringA GetVector2dDataStringA(A3DVector2dData & cData);
 	CString GetVector3dDataString(A3DVector3dData & cData);
@@ -65,4 +67,14 @@ namespace Log
 	CStringA GetTextPropertiesJustificationString(EA3DMDTextPropertiesJustification cInType);
 	CStringA GetAnchorPointTypeString(EA3DMDAnchorPointType cInType);
 	CStringA GetLeaderSymbolTypeString(A3DMDLeaderSymbolType cInType);
+
+	//== Topology Log Functions ===================================================================
+	void A3DTopoBrepDataLog(const A3DTopoBrepData * pcInBrepData);
+	void A3DTopoConnexLog(A3DTopoConnex * pcInTopoConnex, A3DUns32 nInIndex);
+	void A3DTopoShellLog(const A3DTopoShell * pcInTopoShell, A3DUns32 nInIndex);
+	void A3DTopoFaceLog(const A3DTopoFace * pcTopoFace, A3DUns32 nInIndex, A3DUns8 nOrientationWithShell);
+	void A3DTopoLoopLog(const A3DTopoLoop * pcTopoLoop, A3DUns32 nLoopIndex, A3DUns32 nFaceIndex);
+	void A3DTopoCoEdgeLog(const A3DTopoCoEdge * pcTopoCoEdge, A3DUns32 nEdgeIndex);
+	void A3DTopoEdgeLog(const A3DTopoEdge * pcTopoEdge);
+	void A3DTopoVertexLog(const A3DTopoVertex * pcTopoVertex);
 }

@@ -138,6 +138,7 @@
     <ClInclude Include="3DX.h" />
     <ClInclude Include="3DX.ImportBase.h" />
     <ClInclude Include="3DX.Log.h" />
+    <ClInclude Include="3DX.Simplifier.h" />
     <ClInclude Include="3DXSignal.h" />
     <ClInclude Include="3DXSignal.Interface.h" />
     <ClInclude Include="A3dTracer.h" />
@@ -184,6 +185,7 @@
     <ClCompile Include="3DX.FileOptions.cpp" />
     <ClCompile Include="3DX.ImportBase.cpp" />
     <ClCompile Include="3DX.Log.cpp" />
+    <ClCompile Include="3DX.Simplifier.cpp" />
     <ClCompile Include="3DXSignal.Interface.cpp" />
     <ClCompile Include="A3dTracer.cpp" />
     <ClCompile Include="C3dTracer.cpp" />

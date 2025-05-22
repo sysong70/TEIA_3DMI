@@ -37,7 +37,7 @@ void Log::Write(LPCWSTR chMessage, ...)
 
 	va_end(cArgList);
 
-	LogManager::Log(LOG_3DX_ID, strBuffer);
+	LOG(LOG_3DX_ID, strBuffer);
 }
 
 void Log::Write(LPCSTR chMessage, ...)
@@ -51,7 +51,7 @@ void Log::Write(LPCSTR chMessage, ...)
 	va_end(cArgList);
 
 	CString strText(strBuffer);
-	LogManager::Log(LOG_3DX_ID, strText);
+	LOG(LOG_3DX_ID, strText);
 }
 
 void Log::Write(int nLogLevel, LPCWSTR chMessage, ...)
@@ -64,7 +64,7 @@ void Log::Write(int nLogLevel, LPCWSTR chMessage, ...)
 
 	va_end(cArgList);
 
-	LogManager::Log(LOG_3DX_ID, nLogLevel, strBuffer);
+	LOG(LOG_3DX_ID, nLogLevel, strBuffer);
 }
 
 void Log::Write(int nLogLevel, LPCSTR chMessage, ...)
@@ -78,7 +78,7 @@ void Log::Write(int nLogLevel, LPCSTR chMessage, ...)
 	va_end(cArgList);
 
 	CString strText(strBuffer);
-	LogManager::Log(LOG_3DX_ID, nLogLevel, strText);
+	LOG(LOG_3DX_ID, nLogLevel, strText);
 }
 void Log::IncreaseTabIndex()
 {
@@ -933,6 +933,20 @@ CStringA Log::BoolStrA(bool bValue)
 	return strValue;
 }
 
+CString Log::DblStr(double dValue)
+{
+	CString strText;
+	strText.Format(L"%.8f", dValue);
+	return strText;
+}
+
+CStringA Log::DblStrA(double dValue)
+{
+	CStringA strText;
+	strText.Format("%.8f", dValue);
+	return strText;
+}
+
 CString Log::GetVector2dDataString(A3DVector2dData & cData)
 {
 	CString strData;
@@ -977,8 +991,8 @@ CStringA Log::GetDimensionSymbolShapeString(EA3DMDDimensionSymbolShape eInType)
 			return "Closed arrow";
 		case KEA3DDimensionSymbolFilledArrow: // 3, Filled arrow.
 			return "Filled arrow";
-		case KEA3DDimensionSymbolSymArrow: // 4, Symetric arrow.
-			return "Symetric arrow";
+		case KEA3DDimensionSymbolSymArrow: // 4, Symmetric arrow.
+			return "Symmetric arrow";
 		case KEA3DDimensionSymbolSlash: // 5, Slash.
 			return "Slash";
 		case KEA3DDimensionSymbolCircle: // 6, Circle.
@@ -1578,6 +1592,236 @@ CStringA Log::GetLeaderSymbolTypeString(A3DMDLeaderSymbolType cInType)
 	return "Unknown";
 }
 
+//== Topology Log Functions ===================================================================
+void Log::A3DTopoBrepDataLog(const A3DTopoBrepData * pcInBrepData)
+{
+	Write(L"TopoBrepData: %s", HexStr((DWORD_PTR) pcInBrepData));
+
+	IncreaseTabIndex();
+
+	A3DTopoBrepDataData cTopoBrepDataData;
+	A3D_INITIALIZE_DATA(A3DTopoBrepDataData, cTopoBrepDataData);
+	A3DStatus nResult = A3DTopoBrepDataGet(pcInBrepData, &cTopoBrepDataData);
+
+	if (A3D_SUCCESS == nResult) {
+		
+		Write(L"Connex Count: %d", cTopoBrepDataData.m_uiConnexSize);
+
+		for(A3DUns32 nIndex = 0; nIndex < cTopoBrepDataData.m_uiConnexSize; nIndex++) {
+			A3DTopoConnexLog(cTopoBrepDataData.m_ppConnexes[nIndex], nIndex);
+			// Write(L"Connex %d: %s", nIndex, HexStr((DWORD_PTR) cTopoBrepDataData.m_ppConnexes[nIndex]));
+			
+		}
+		
+		A3DTopoBrepDataGet(nullptr, &cTopoBrepDataData);
+	}
+
+	DecreaseTabIndex();
+}
+
+void Log::A3DTopoConnexLog(A3DTopoConnex * pcInTopoConnex, A3DUns32 nInIndex)
+{
+	A3DTopoConnexData cTopoConnexData;
+	A3D_INITIALIZE_DATA(A3DTopoConnexData, cTopoConnexData);
+	A3DStatus nResult = A3DTopoConnexGet(pcInTopoConnex, &cTopoConnexData);
+
+	if (A3D_SUCCESS == nResult) {
+		Write(L"%d.Connex: %s. Shell Count: %d", nInIndex, HexStr((DWORD_PTR) pcInTopoConnex), cTopoConnexData.m_uiShellSize);
+
+		IncreaseTabIndex(); {
+
+			for (A3DUns32 nIndex = 0; nIndex < cTopoConnexData.m_uiShellSize; nIndex++) {
+				A3DTopoShellLog(cTopoConnexData.m_ppShells[nIndex], nIndex);
+			}
+			A3DTopoConnexGet(nullptr, &cTopoConnexData);
+
+		}DecreaseTabIndex();
+	}
+	else {
+		Write(L"A3DTopoConnexGet failed: %d", nResult);
+	}
+}
+
+void Log::A3DTopoShellLog(const A3DTopoShell * pcTopoShell, A3DUns32 nInIndex)
+{
+	A3DTopoShellData cTopoShellData;
+	A3D_INITIALIZE_DATA(A3DTopoShellData, cTopoShellData);
+	A3DStatus nResult = A3DTopoShellGet(pcTopoShell, &cTopoShellData);
+
+	if (A3D_SUCCESS == nResult) {
+		Write(L"%d.Shell: %s, Face Count: %d, Closed: %s", nInIndex, HexStr((DWORD_PTR) pcTopoShell), cTopoShellData.m_uiFaceSize, BoolStr((bool) cTopoShellData.m_bClosed));
+
+		IncreaseTabIndex(); {
+
+			for (A3DUns32 nIndex = 0; nIndex < cTopoShellData.m_uiFaceSize; nIndex++) {
+				A3DTopoFaceLog(cTopoShellData.m_ppFaces[nIndex], nIndex, cTopoShellData.m_pucOrientationWithShell[nIndex]);
+			}
+
+		} DecreaseTabIndex();
+
+		A3DTopoShellGet(nullptr, &cTopoShellData);
+	}
+	else {
+		Write(L"A3DTopoShellGet failed: %d", nResult);
+	}
+}
+
+void Log::A3DTopoFaceLog(const A3DTopoFace * pcTopoFace, A3DUns32 nInIndex, A3DUns8 nOrientationWithShell)
+{
+	A3DTopoFaceData cTopoFaceData;
+	A3D_INITIALIZE_DATA(A3DTopoFaceData, cTopoFaceData);
+	A3DStatus eResult = A3DTopoFaceGet(pcTopoFace, &cTopoFaceData);
+
+	if (A3D_SUCCESS == eResult) {
+		Write(L"%d.Face: %s, Sense: %s, LoopSize: %d, HasTrimDomain: %s, OuterLoopIndex: %d", nInIndex, HexStr((DWORD_PTR) pcTopoFace), BoolStr((bool) nOrientationWithShell), cTopoFaceData.m_uiLoopSize, BoolStr((bool) cTopoFaceData.m_bHasTrimDomain), cTopoFaceData.m_uiOuterLoopIndex);
+
+		IncreaseTabIndex(); {
+
+			// A3DSurfBaseLog(cTopoFaceData.m_pSurface);
+
+			if (TRUE == cTopoFaceData.m_bHasTrimDomain) {
+				// A3DDomainDataLog(cTopoFaceData.m_sSurfaceDomain);
+			}
+
+			// Loop Data
+			for (A3DUns32 nLoopIndex = 0; nLoopIndex < cTopoFaceData.m_uiLoopSize; nLoopIndex++) {
+				A3DTopoLoopLog(cTopoFaceData.m_ppLoops[nLoopIndex], nLoopIndex, nInIndex);
+			}
+
+		} DecreaseTabIndex();
+
+		A3DTopoFaceGet(nullptr, &cTopoFaceData);
+	}
+	else {
+		Write(L"A3DTopoFaceGet failed: %d", eResult);
+	}
+}
+
+void Log::A3DTopoLoopLog(const A3DTopoLoop * pcTopoLoop, A3DUns32 nLoopIndex, A3DUns32 nFaceIndex)
+{
+	A3DTopoLoopData cTopoLoopData;
+	A3D_INITIALIZE_DATA(A3DTopoLoopData, cTopoLoopData);
+	A3DStatus eResult = A3DTopoLoopGet(pcTopoLoop, &cTopoLoopData);
+	if (A3D_SUCCESS == eResult) {
+		Write(L"%d.Loop: %s, EdgeSize: %d, OrientationWithSurface: %s", nLoopIndex, HexStr((DWORD_PTR) pcTopoLoop), cTopoLoopData.m_uiCoEdgeSize, BoolStr((bool) cTopoLoopData.m_ucOrientationWithSurface));
+
+		IncreaseTabIndex();
+
+		for (A3DUns32 nIndex = 0; nIndex < cTopoLoopData.m_uiCoEdgeSize; nIndex++) {
+			A3DTopoCoEdgeLog(cTopoLoopData.m_ppCoEdges[nIndex], nIndex);
+		}
+
+		DecreaseTabIndex();
+
+		A3DTopoLoopGet(nullptr, &cTopoLoopData);
+	}
+	else {
+		Write(L"A3DTopoLoopGet failed: %d", eResult);
+	}
+}
+
+void Log::A3DTopoCoEdgeLog(const A3DTopoCoEdge * pcTopoCoEdge, A3DUns32 nEdgeIndex)
+{
+	A3DTopoCoEdgeData cTopoCoEdgeData;
+	A3D_INITIALIZE_DATA(A3DTopoCoEdgeData, cTopoCoEdgeData);
+	A3DStatus eResult = A3DTopoCoEdgeGet(pcTopoCoEdge, &cTopoCoEdgeData);
+
+	if (A3D_SUCCESS == eResult) {
+		Write(L"%d.CoEdge: %s, OrientationWithLoop: %s, OrientationUVWithLoop: %s, CoEdge Neighbor: %s, UV Curve: %s", nEdgeIndex, HexStr((DWORD_PTR) pcTopoCoEdge), BoolStr((bool) cTopoCoEdgeData.m_ucOrientationWithLoop),
+			BoolStr((bool) cTopoCoEdgeData.m_ucOrientationUVWithLoop), HexStr((DWORD_PTR) cTopoCoEdgeData.m_pNeighbor), HexStr((DWORD_PTR) cTopoCoEdgeData.m_pUVCurve));
+
+		IncreaseTabIndex(); {
+
+			A3DTopoEdgeLog(cTopoCoEdgeData.m_pEdge);
+
+			IncreaseTabIndex(); {
+				// A3DCrvBaseLog(cTopoCoEdgeData.m_pUVCurve);
+			} DecreaseTabIndex();
+
+		} DecreaseTabIndex();
+
+		A3DTopoCoEdgeGet(nullptr, &cTopoCoEdgeData);
+	}
+	else {
+		Write(L"A3DTopoCoEdgeGet failed: %d", eResult);
+	}
+}
+
+void Log::A3DTopoEdgeLog(const A3DTopoEdge * pcTopoEdge)
+{
+	A3DTopoEdgeData cTopoEdgeData;
+	A3D_INITIALIZE_DATA(A3DTopoEdgeData, cTopoEdgeData);
+	A3DStatus eResult = A3DTopoEdgeGet(pcTopoEdge, &cTopoEdgeData);
+
+	if (A3D_SUCCESS == eResult) {
+		Write(L"Edge: %s, 3D space curve: %s", HexStr((DWORD_PTR) pcTopoEdge), HexStr((DWORD_PTR) cTopoEdgeData.m_p3dCurve));
+
+		IncreaseTabIndex(); {
+	// 		Log(L"HasTrimDomain: %s, Tolerance: %s", BoolStr((bool) cTopoEdgeData.m_bHasTrimDomain), DblStr(cTopoEdgeData.m_dTolerance));
+	// 		Log(L"Interval: %s,%s", DblStr(cTopoEdgeData.m_sInterval.m_dMin), DblStr(cTopoEdgeData.m_sInterval.m_dMax));
+
+			A3DTopoVertexLog(cTopoEdgeData.m_pStartVertex);
+			A3DTopoVertexLog(cTopoEdgeData.m_pEndVertex);
+		} DecreaseTabIndex();
+
+		A3DTopoEdgeGet(nullptr, &cTopoEdgeData);
+	}
+	else {
+		Write(L"A3DTopoEdgeGet failed: %d", eResult);
+	}
+}
+
+void Log::A3DTopoVertexLog(const A3DTopoVertex * pcTopoVertex)
+{
+	A3DEEntityType eType = kA3DTypeUnknown;
+	A3DEntityGetType(pcTopoVertex, &eType);
+
+	double x = 0.0, y = 0.0, z = 0.0;
+
+	CString strVertexType = L"Vertex Error";
+
+	double m_dTopoContextScale = 1.0;
+
+	switch (eType)
+	{
+		case kA3DTypeTopoUniqueVertex:
+		{
+			A3DTopoUniqueVertexData cTopoUniqueVertexData;
+			A3D_INITIALIZE_DATA(A3DTopoUniqueVertexData, cTopoUniqueVertexData);
+			if (A3D_SUCCESS == A3DTopoUniqueVertexGet(pcTopoVertex, &cTopoUniqueVertexData)) {
+				x = cTopoUniqueVertexData.m_sPoint.m_dX * m_dTopoContextScale;
+				y = cTopoUniqueVertexData.m_sPoint.m_dY * m_dTopoContextScale;
+				z = cTopoUniqueVertexData.m_sPoint.m_dZ * m_dTopoContextScale;
+
+				A3DTopoUniqueVertexGet(nullptr, &cTopoUniqueVertexData);
+
+				strVertexType = L"UniqueVertex";
+			}
+		}
+		break;
+
+		case kA3DTypeTopoMultipleVertex:
+		{
+			A3DTopoMultipleVertexData cMultipleVertexData;
+			A3D_INITIALIZE_DATA(A3DTopoMultipleVertexData, cMultipleVertexData);
+			if (A3D_SUCCESS == A3DTopoMultipleVertexGet(pcTopoVertex, &cMultipleVertexData)) {
+				if (0 != cMultipleVertexData.m_uiSize) {
+					x = cMultipleVertexData.m_pPts[0].m_dX * m_dTopoContextScale;
+					y = cMultipleVertexData.m_pPts[0].m_dY * m_dTopoContextScale;
+					z = cMultipleVertexData.m_pPts[0].m_dZ * m_dTopoContextScale;
+				}
+
+				A3DTopoMultipleVertexGet(nullptr, &cMultipleVertexData);
+
+				strVertexType.Format(L"MultipleVertex [%d]", cMultipleVertexData.m_uiSize);
+			}
+		}
+		break;
+	}
+
+	Write(L"%s: %s, %s,%s,%s", strVertexType, HexStr((DWORD_PTR) pcTopoVertex), DblStr(x), DblStr(y), DblStr(z));
+}
+
 #else
 void Log::CreateLog(const WCHAR * pchFilePathName) {}
 void Log::Write(LPCWSTR chMessage, ...) {};
@@ -1635,4 +1879,13 @@ CStringA Log::GetTextPropertiesFormatString(EA3DMDTextPropertiesFormat cInType) 
 CStringA Log::GetTextPropertiesJustificationString(EA3DMDTextPropertiesJustification cInType) { return ""; }
 CStringA Log::GetAnchorPointTypeString(EA3DMDAnchorPointType cInType) { return ""; }
 CStringA Log::GetLeaderSymbolTypeString(A3DMDLeaderSymbolType cInType) { return ""; }
+
+void Log::A3DTopoBrepDataLog(const A3DTopoBrepData * pcInBrepData) {}
+void Log::A3DTopoConnexLog(A3DTopoConnex * pcInTopoConnex, A3DUns32 nInIndex) {}
+void Log::A3DTopoShellLog(const A3DTopoShell * pcTopoShell, A3DUns32 nInIndex) {}
+void Log::A3DTopoFaceLog(const A3DTopoFace * pcTopoFace, A3DUns32 nInIndex, A3DUns8 nOrientationWithShell) {}
+void Log::A3DTopoLoopLog(const A3DTopoLoop * pcTopoLoop, A3DUns32 nLoopIndex, A3DUns32 nFaceIndex) {}
+void Log::A3DTopoCoEdgeLog(const A3DTopoCoEdge * pcTopoCoEdge, A3DUns32 nEdgeIndex) {}
+void Log::A3DTopoEdgeLog(const A3DTopoEdge * pcTopoEdge) {}
+void Log::A3DTopoVertexLog(const A3DTopoVertex * pcTopoVertex) {}
 #endif
