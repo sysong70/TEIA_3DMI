@@ -34,7 +34,10 @@ CmdIndexer::~CmdIndexer()
 	CommandMap::iterator it;
 
 	for (it = map.begin(); it != map.end(); it++) {
-		REMOVE_POINTER(it->second.Function);
+		// ASSERT(it->second.Function);
+		if(nullptr != it->second.Function) {
+			REMOVE_POINTER(it->second.Function);
+		}
 	}
 }
 

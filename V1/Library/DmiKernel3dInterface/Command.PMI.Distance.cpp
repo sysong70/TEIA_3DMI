@@ -102,11 +102,11 @@ KERNEL::Command::PMI::Distance::Distance(const Session * pcInSession) :
 	PushBack(pcStep2);
 
 	Step * pcStep3 = new Step();
-	pcStep2->SetInputType(Step::InputType::Coordinate);
-	pcStep2->SetMessage(L"Input third coordiate/세번째 좌표 입력");
-	pcStep2->SetInformation(L"Complete the distance dimension by entering a third coordinate./세번째 좌표를 입력해서 거리 치수를 완성하세요.");
-	pcStep2->SetDrawFunction(DistanceStep::Draw3);
-	PushBack(pcStep2);
+	pcStep3->SetInputType(Step::InputType::Coordinate);
+	pcStep3->SetMessage(L"Input third coordiate/세번째 좌표 입력");
+	pcStep3->SetInformation(L"Complete the distance dimension by entering a third coordinate./세번째 좌표를 입력해서 거리 치수를 완성하세요.");
+	pcStep3->SetDrawFunction(DistanceStep::Draw3);
+	PushBack(pcStep3);
 }
 
 KERNEL::Command::Type KERNEL::Command::PMI::Distance::GetType() const

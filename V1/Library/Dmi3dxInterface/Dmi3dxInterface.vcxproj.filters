@@ -52,6 +52,9 @@
     <Filter Include="Function">
       <UniqueIdentifier>{c4b7990a-a8e3-4b25-9695-f06194146047}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Function\Impl">
+      <UniqueIdentifier>{9a221a62-4baf-491b-ac09-0c4d2e7127a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -195,6 +198,9 @@
     <ClInclude Include="3DX.Simplifier.h">
       <Filter>Function</Filter>
     </ClInclude>
+    <ClInclude Include="Impl\3DX.Simplifier.Impl.h">
+      <Filter>Function\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -331,6 +337,9 @@
     </ClCompile>
     <ClCompile Include="3DX.Simplifier.cpp">
       <Filter>Function</Filter>
+    </ClCompile>
+    <ClCompile Include="Impl\3DX.Simplifier.Impl.cpp">
+      <Filter>Function\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

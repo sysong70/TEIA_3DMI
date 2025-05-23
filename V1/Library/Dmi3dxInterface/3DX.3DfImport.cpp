@@ -47,13 +47,15 @@
 #include <Signal.h>
 #include <Path.h>
 
+#include "3DX.Simplifier.h"
 #include "3DX.Log.h"
 
 #ifdef _DEBUG
 #	define USED_LOG_MANAGER
 
 #	ifdef USED_LOG_MANAGER
-#		define USED_DIMENSION_LOG_MANAGER
+//#		define USED_DIMENSION_LOG_MANAGER
+//#		define BREP_DATA_LOG
 #	endif
 #endif
 
@@ -146,6 +148,7 @@ bool TdfImport::FileImport(CString strFilePathName, H3DF::SegmentKey & cModelSeg
 	Log::Write("Import Option");
 	Log::IncreaseTabIndex();
 	//:WARNING - do not initialize
+	// #3DX: Import Option 설정 부분
 	A3DRWParamsLoadData cParamsLoadData;
 	TheFileOptions.Import.Get(strFilePathName, cParamsLoadData);
 
@@ -1539,23 +1542,73 @@ A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcInRepIte
 	A3D_INITIALIZE_DATA(A3DRiBrepModelData, cBrepModelData);
 	A3DStatus nResult = A3DRiBrepModelGet(pcInRepItem, &cBrepModelData);
 
+
+	// #Simplifier: B-Rep Data Simplify 하는 부분
+	H3DX::Simplifier cSimplifier;
+
 	if (A3D_SUCCESS == nResult) {
+#ifdef BREP_DATA_LOG
 		Log::A3DTopoBrepDataLog(cBrepModelData.m_pBrepData);
+#endif
+		
+		cSimplifier.Initialize(cBrepModelData.m_pBrepData);
+
+		if (true == cSimplifier.Simplify()) {
+#ifdef BREP_DATA_LOG
+			Log::A3DTopoBrepDataLog(cSimplifier.GetSimplifiedData());
+#endif
+		}
 	}
 
 	// cBrepModelData 초기화
-	A3DRiBrepModelGet(nullptr, &cBrepModelData);
+	//A3DRiBrepModelGet(nullptr, &cBrepModelData);
 
-/*
 	// Scale을 구하기 위해서 Context Data에서 값을 가져온다.
-	double m_dContextScale = 1.0;
-	ParseTopoContextScale(cBrepModelData.m_pBrepData, m_dContextScale);
-*/
+	m_dContextScale = 1.0;
+
+	if (nullptr != cSimplifier.GetSimplifiedData()) {
+		ParseTopoContextScale(cBrepModelData.m_pBrepData, m_dContextScale);
+
+		A3DRiBrepModelData cLocalBrepModelData;
+		A3D_INITIALIZE_DATA(A3DRiBrepModelData, cLocalBrepModelData);
+
+		//cLocalBrepModelData.m_pBrepData = cBrepModelData.m_pBrepData;
+		cLocalBrepModelData.m_pBrepData = (A3DTopoBrepData *) cSimplifier.GetSimplifiedData();
+		cLocalBrepModelData.m_bSolid = cBrepModelData.m_bSolid;
+
+		A3DRiBrepModel * pcBrepModel = nullptr;
+		A3DRiBrepModelCreate(&cLocalBrepModelData, &pcBrepModel);
+
+		A3DRiRepresentationItemData cSimplifierItemData;
+		A3D_INITIALIZE_DATA(A3DRiRepresentationItemData, cSimplifierItemData);
+		//A3DRiRepresentationItemGet(pcInRepItem, &cInRepItemData);
+
+		// Tessellation이 없는 경우는 Tesselltion을 생성한다.
+
+		A3DRWParamsTessellationData sTesselationData;
+		A3D_INITIALIZE_DATA(A3DRWParamsTessellationData, sTesselationData);
+		sTesselationData.m_eTessellationLevelOfDetail = kA3DTessLODMedium;
+		CHECK_A3D_RESULT(A3DRiRepresentationItemComputeTessellation((A3DRiRepresentationItem *) pcBrepModel, &sTesselationData));
+		A3DRiRepresentationItemGet((A3DRiRepresentationItem *) pcBrepModel, (A3DRiRepresentationItemData *) &cSimplifierItemData);
+
+		if (cSimplifierItemData.m_pTessBase != nullptr) {
+			MatrixKit cMatrix;
+			cMatrix.SetOrigin(0, 0, 10000);
+			CStringA strName = cInSegment.Name();
+			SegmentKey cSegment = cInSegment.Subsegment("Simplified_Model");
+			cSegment.SetModellingMatrix(cMatrix);
+			CHECK_A3D_RESULT(DrawTessBase(cSimplifierItemData.m_pTessBase, pcBrepModel, pcInEntityRef, pcInAttr, cSegment));
+		}
+	}
 
 	if (cInRepItemData.m_pTessBase != nullptr) {
+		m_dContextScale = 1.0;
 		CHECK_A3D_RESULT(DrawTessBase(cInRepItemData.m_pTessBase, pcInRepItem, pcInEntityRef, pcInAttr, cInSegment));
 	}
 	else {
+		// B-Rep Data를 이용하는 경우는 m_dContextScale을 구한다.
+		ParseTopoContextScale(cBrepModelData.m_pBrepData, m_dContextScale);
+
 		// Tessellation이 없는 경우는 Tesselltion을 생성한다.
 		A3DRiRepresentationItemData sData;
 		A3D_INITIALIZE_DATA(A3DRiRepresentationItemData, sData);
@@ -1570,6 +1623,8 @@ A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcInRepIte
 			CHECK_A3D_RESULT(DrawTessBase(cInRepItemData.m_pTessBase, pcInRepItem, pcInEntityRef, pcInAttr, cInSegment));
 		}
 	}
+
+	A3DRiBrepModelGet(nullptr, &cBrepModelData);
 
 	m_pchRepresentationItemName = nullptr;
 	CHECK_A3D_RESULT(A3DRootBaseGet(nullptr, &cRootBaseData));
@@ -3370,7 +3425,7 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcInTess3D, const A3
 	const double cBigValue = 1.0e+12;
 	bool bStrange = false;
 
-	double dScale = 1.0;// cImportInfo.dModelScale * cImportInfo.dTessellationScale;
+	double dScale = m_dContextScale;// cImportInfo.dModelScale * cImportInfo.dTessellationScale;
 
 	A3DUns32 * pnTriIndices = cTess3dData.m_puiTriangulatedIndexes;
 
@@ -3394,9 +3449,9 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcInTess3D, const A3
 
 	for (A3DUns32 nIndex = 0; nIndex < nPointCount; nIndex++) {
 		m_pcPoints[nIndex].Set(
-			pcInTessBaseData->m_pdCoords[nIndex * 3],
-			pcInTessBaseData->m_pdCoords[nIndex * 3 + 1],
-			pcInTessBaseData->m_pdCoords[nIndex * 3 + 2]);
+			pcInTessBaseData->m_pdCoords[nIndex * 3] * dScale,
+			pcInTessBaseData->m_pdCoords[nIndex * 3 + 1] * dScale,
+			pcInTessBaseData->m_pdCoords[nIndex * 3 + 2] * dScale);
 	}
 
 	// ----- Normal Vector 활당 -----
@@ -3536,6 +3591,8 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcInTess3D, const A3
 
 	Log::IncreaseTabIndex();
 
+	cInSegment.Open();
+
 	H3DF::ShellKit cShellKit;
 	cShellKit.CreateShellWrapper();
 	cShellKit.BeginAddFaces(nPointCount);
@@ -3568,7 +3625,7 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcInTess3D, const A3
 				acWirePoints[k] = m_pcPoints[cTess3dData.m_puiWireIndexes[nStartWireIndex + index++] / 3];
 			}
 
-			H3DF::LineKey cLineKey = cInSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
+			//H3DF::LineKey cLineKey = cInSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
 
 			// 대용량 파일에서 메모리 소모가 심하므로 사용하지 않은다. 심한 경우 20%이상 메모리를 소모한다.
 // 			if (true == bSolidSegmentFlag) {
@@ -3655,6 +3712,7 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcInTess3D, const A3
 
 	cShellKit.EndAddFaces();
 
+	cInSegment.Close();
 
 	if (0 < cShellKit.GetPointCount()) {
 		// Region 설정

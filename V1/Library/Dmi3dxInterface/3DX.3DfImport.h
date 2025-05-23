@@ -286,6 +286,7 @@ private:
 	float m_fNormalAngleCosine = 0.0f;
 
 	double m_dCadModelUnit = 1.0;
+	double m_dContextScale = 1.0;
 
 	//----- Segment Header -----
 	H3DF::SegmentKey * m_pcModelSegment = nullptr;
