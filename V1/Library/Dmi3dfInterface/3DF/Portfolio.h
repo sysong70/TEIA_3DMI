@@ -4,6 +4,7 @@
 #include "Control.h"
 #include "Image.h"
 #include "Texture.h"
+#include "Shape.h"
 #include <deque>
 
 namespace H3DF
@@ -26,6 +27,9 @@ namespace H3DF
 		
 		ImageDefinition DefineImage(CStringA strInName, ImageKit const & cInSource);
 		NamedStyleDefinition DefineNamedStyle(CStringA strInName, SegmentKey const & cInStyleSource);
+
+		ShapeDefinition DefineShape(CStringA strInName, ShapeKit const & cInSource);
+		PortfolioKey & UndefineShape(CStringA strInName);
 	};
 
 	using PortfolioKeyArray = std::vector<PortfolioKey>;

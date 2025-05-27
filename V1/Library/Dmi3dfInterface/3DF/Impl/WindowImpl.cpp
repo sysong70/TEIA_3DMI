@@ -585,7 +585,7 @@ H3DF::WindowKeyImpl::~WindowKeyImpl()
 
 void H3DF::WindowKeyImpl::Copy(WindowKeyImpl * pcInThat)
 {
-	Impl::Copy(pcInThat);
+	Impl::Set(pcInThat);
 
 	m_pcBaseView = pcInThat->m_pcBaseView;
 

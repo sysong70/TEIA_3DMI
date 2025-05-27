@@ -51,7 +51,16 @@ void H3DF::Definition::Set(Definition const & cInThat)
 	DefinitionImpl * pcInThatImpl = dynamic_cast<DefinitionImpl *>(cInThat.m_pcImpl);
 	DEBUG_VALID(pcInThatImpl);
 
-	pcImpl->Copy(pcInThatImpl);
+	pcImpl->Set(pcInThatImpl);
+}
+
+H3DF::Definition::Definition(Definition && cInThat) noexcept :
+	Object(std::move(cInThat)) {}
+
+Definition & H3DF::Definition::operator=(Definition && cInThat) noexcept
+{
+	this->Object::operator = (std::move(cInThat));
+	return *this;
 }
 
 Definition const & H3DF::Definition::operator = (Definition const & cInThat)
@@ -65,9 +74,11 @@ PortfolioKey H3DF::Definition::Owner() const
 	DefinitionImpl * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	SegmentKey cKey(pcImpl->KeyValue());
-	PortfolioKey cOwner(cKey.Owner());
-	return cOwner;
+	return pcImpl->m_cOwnerPortfolio;
+
+// 	SegmentKey cKey(pcImpl->KeyValue());
+// 	PortfolioKey cOwner(cKey.Owner());
+// 	return cOwner;
 }
 
 CStringA H3DF::Definition::Name() const
@@ -75,8 +86,10 @@ CStringA H3DF::Definition::Name() const
 	DefinitionImpl * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
 	DEBUG_VALID(pcImpl);
 
-	SegmentKey cKey(pcImpl->KeyValue());
-	return cKey.Name();
+	return pcImpl->m_strName;
+
+// 	SegmentKey cKey(pcImpl->KeyValue());
+// 	return cKey.Name();
 }
 
 
@@ -87,7 +100,19 @@ bool H3DF::Definition::operator == (Definition const & cInThat) const
 	DefinitionImpl * pcInThatImpl = dynamic_cast<DefinitionImpl *>(cInThat.m_pcImpl);
 	DEBUG_VALID(pcInThatImpl);
 
-	return (pcImpl->KeyValue() == pcInThatImpl->KeyValue());
+	if (pcImpl->KeyValue() != pcInThatImpl->KeyValue()) {
+		return false;
+	}
+
+	if (pcImpl->m_cOwnerPortfolio != pcInThatImpl->m_cOwnerPortfolio) {
+		return false;
+	}
+
+	if (pcImpl->m_strName != pcInThatImpl->m_strName) {
+		return false;
+	}
+
+	return true;
 }
 
 bool H3DF::Definition::operator != (Definition const & cInThat) const

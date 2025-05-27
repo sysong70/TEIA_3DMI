@@ -57,7 +57,7 @@ namespace H3DF
 	public:
 		ImageDefinitionImpl() { m_eType = H3DF::Type::ImageDefinition; }
 
-		void Copy(ImageDefinitionImpl * pcInThat) {
+		void Set(ImageDefinitionImpl * pcInThat) {
 			m_strSource = pcInThat->m_strSource;
 			m_cImageKit = pcInThat->m_cImageKit; // Copy
 		}

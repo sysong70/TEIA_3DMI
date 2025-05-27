@@ -2,6 +2,8 @@
 
 #include "Portfolio.h"
 
+#include "Impl/Portfolio.Impl.h"
+
 #include "Segment.h"
 #include "./Impl/SegmentImpl.h"
 
@@ -9,6 +11,7 @@
 #include "./Impl/ImageImpl.h"
 #include "./Impl/TextureImpl.h"
 #include "./Impl/DefinitionImpl.h"
+#include "./Impl/Shape.Impl.h"
 
 #include "Style.h"
 #include "Visibility.h"
@@ -16,65 +19,6 @@
 #include <HTools.h>
 
 using namespace H3DF;
-
-namespace H3DF
-{
-	class PortfolioKeyImpl : public Impl
-	{
-	public:
-		static CStringA FormatString(Image::Format cInFormat);
-	};
-}
-
-CStringA H3DF::PortfolioKeyImpl::FormatString(Image::Format cInFormat)
-{
-	CStringA strFormatText;
-
-	switch (cInFormat)
-	{
-		case H3DF::Image::Format::RGB:
-			strFormatText = "rgb";
-			break;
-		case H3DF::Image::Format::RGBA:
-			strFormatText = "rgba";
-			break;
-		case H3DF::Image::Format::ARGB:
-			strFormatText = "argb";
-			break;
-		case H3DF::Image::Format::Mapped8:
-			strFormatText = "mapped8";
-			break;
-		case H3DF::Image::Format::Grayscale:
-			strFormatText = "grayscale";
-			break;
-		case H3DF::Image::Format::Bmp:
-			strFormatText = "bmp";
-			break;
-		case H3DF::Image::Format::Jpeg:
-			strFormatText = "jpeg";
-			break;
-		case H3DF::Image::Format::Png:
-			strFormatText = "png";
-			break;
-		case H3DF::Image::Format::Targa:
-			strFormatText = "targa";
-			break;
-		case H3DF::Image::Format::DXT1:
-			strFormatText = "dxt1";
-			break;
-		case H3DF::Image::Format::DXT3:
-			strFormatText = "dxt3";
-			break;
-		case H3DF::Image::Format::DXT5:
-			strFormatText = "dxt5";
-			break;
-		default:
-			DEBUG_STOP;
-			break;
-	}
-
-	return strFormatText;
-}
 
 H3DF::PortfolioKey::PortfolioKey()
 {
@@ -243,6 +187,70 @@ NamedStyleDefinition H3DF::PortfolioKey::DefineNamedStyle(CStringA strInName, Se
 	NamedStyleDefinition cStyle(nStyleKey);
 	return cStyle;
 }
+
+ShapeDefinition H3DF::PortfolioKey::DefineShape(CStringA strInName, ShapeKit const & cInSource)
+{
+	if (INVALID_KEY == KeyValue()) {
+		DEBUG_STOP;
+	}
+
+	SegmentKey cPortfolio(KeyValue());
+
+	CStringA strName = cPortfolio.Name();
+
+	// Portpolio
+	SegmentKey cShapesSegment = cPortfolio.Subsegment("shapes");
+
+	SegmentKey cStyleSegment = cShapesSegment.Subsegment(strInName);
+
+	ShapeElementArray arShapeElements;
+	if (false == cInSource.ShowElements(arShapeElements)) {
+		DEBUG_STOP;
+	}
+
+	std::vector<float> vfData;
+
+	PortfolioKeyImpl::CreateShapeData(arShapeElements, vfData);
+
+	cStyleSegment.Open(); {
+		HC_Define_Shape(strInName, (int)vfData.size(), vfData.data());
+	} cStyleSegment.Close();
+
+	ShapeDefinition cDefinition;
+	ShapeDefinitionImpl * pcShapeImpl = static_cast<ShapeDefinitionImpl *>(cDefinition.GetImpl());
+	DEBUG_VALID(pcShapeImpl);
+
+	pcShapeImpl->m_nKey = cStyleSegment.KeyValue();
+	pcShapeImpl->m_cOwnerPortfolio = *this;
+	pcShapeImpl->m_strName = strInName;
+
+/*
+	float const clipped[] = {
+		3,  
+		8, 1,  0, 1,  0, 1,  0, 1, 0, 0,  0,  1, 1, -1, 0, 0,  0,  1, 1, -1, 0, -1, 0, 1, 0,
+							 -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, -1, -1, 1, 0, 0,  0, -1, -1, 1, 0, 1,  0, -1, 0, 0 };
+	HC_Define_Shape("clipped", countof(clipped), clipped);
+
+	HC_Open_Segment("clipped");
+	HC_Set_Text_Font("background=shape=clipped");
+	HC_Insert_Text(-0.8, 0.8, 0, "corner trimmed box");
+	HC_Close_Segment();
+
+	HC_Define_Shape(strInName, )*/
+  
+
+	return cDefinition;
+}
+
+PortfolioKey & H3DF::PortfolioKey::UndefineShape(CStringA strInName)
+{
+	if (INVALID_KEY == KeyValue()) {
+		DEBUG_STOP;
+	}
+
+	return *this;
+}
+
 
 //== PortfolioControlImpl 관련 함수 ==================================================================
 
@@ -437,6 +445,7 @@ bool H3DF::PortfolioControl::Show(PortfolioKeyArray & cOutPortfolios) const
 
 	SegmentKey cModelSegment;
 
+	// Model을 찾는다.
 	if (H3DF::Type::Model == pcImpl->m_cOverrideKey.Type()) {
 		cModelSegment = pcImpl->m_cOverrideKey;
 	}
@@ -458,7 +467,9 @@ bool H3DF::PortfolioControl::Show(PortfolioKeyArray & cOutPortfolios) const
 	CStringA strModelSegmentName = cModelSegment.Name();
 
 	CStringA strPortfoliosText = strModelSegmentName + "/portfolios";
+
 	SearchResultsIterator cIter = cResults.GetIterator();
+
 	while (true == cIter.IsValid()) {
 		if (H3DF::Type::SegmentStyle != cIter.GetItem().Type()) {
 			DEBUG_STOP;
@@ -472,7 +483,7 @@ bool H3DF::PortfolioControl::Show(PortfolioKeyArray & cOutPortfolios) const
 		cStyle.ShowSource(eSoruceType, cSource, strSourceName);
 
 		if (0 == strSourceName.Left(strPortfoliosText.GetLength()).Compare(strPortfoliosText)) {
-			cOutPortfolios.emplace_back(cStyle.KeyValue());
+			cOutPortfolios.emplace_back(cSource.KeyValue());
 		}
 
 		cIter.Next();

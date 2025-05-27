@@ -395,7 +395,7 @@ void H3DF::ImageDefinition::Set(ImageDefinition const & cInKit)
 	ImageDefinitionImpl * pcInKitImpl = static_cast<ImageDefinitionImpl *>(cInKit.m_pcImpl);
 	DEBUG_VALID(pcInKitImpl);
 
-	pcImpl->Copy(pcInKitImpl);
+	pcImpl->Set(pcInKitImpl);
 }
 
 ImageDefinition const & H3DF::ImageDefinition::operator = (ImageDefinition const & cInKit)

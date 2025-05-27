@@ -324,7 +324,7 @@ void H3DF::TextureDefinition::Set(TextureDefinition const & cInKit)
 	TextureDefinitionImpl * pcInKitImpl = static_cast<TextureDefinitionImpl *>(cInKit.m_pcImpl);
 	DEBUG_VALID(pcInKitImpl);
 
-	pcImpl->Copy(pcInKitImpl);
+	pcImpl->Set(pcInKitImpl);
 }
 
 TextureDefinition const & H3DF::TextureDefinition::operator = (TextureDefinition const & cInKit)

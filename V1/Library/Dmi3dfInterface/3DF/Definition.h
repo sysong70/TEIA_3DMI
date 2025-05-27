@@ -14,6 +14,9 @@ namespace H3DF
 
 		H3DF::Type ObjectType() const override { return H3DF::Type::Definition; };
 
+		Definition(Definition && cInThat) noexcept;
+		Definition & operator = (Definition && cInThat) noexcept;
+
 		void Set(Definition const & cInThat);
 		Definition const & operator = (Definition const & cInThat);
 

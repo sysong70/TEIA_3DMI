@@ -58,7 +58,7 @@ namespace H3DF
 	public:
 		TextureDefinitionImpl() { m_eType = H3DF::Type::TextureDefinition; }
 
-		void Copy(TextureDefinitionImpl * pcInThat) {
+		void Set(TextureDefinitionImpl * pcInThat) {
 			m_strName = pcInThat->m_strName;
 		}
 

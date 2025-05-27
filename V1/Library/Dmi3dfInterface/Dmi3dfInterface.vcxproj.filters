@@ -390,6 +390,15 @@
     <ClInclude Include="3DF\OffScreenWindow.h">
       <Filter>3DF\Control</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\Shape.h">
+      <Filter>3DF\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Impl\Shape.Impl.h">
+      <Filter>3DF\Object\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Impl\Portfolio.Impl.h">
+      <Filter>3DF\Control\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -706,6 +715,15 @@
     </ClCompile>
     <ClCompile Include="3DF\OffScreenWindow.cpp">
       <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Shape.cpp">
+      <Filter>3DF\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\Shape.Impl.cpp">
+      <Filter>3DF\Object\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\Portfolio.Impl.cpp">
+      <Filter>3DF\Control\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

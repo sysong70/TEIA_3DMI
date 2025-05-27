@@ -67,7 +67,7 @@ void H3DF::Impl::SetType(H3DF::Type eType)
 	m_eType = eType;
 }
 
-void H3DF::Impl::Copy(Impl * pcInThat)
+void H3DF::Impl::Set(Impl * pcInThat)
 {
 	m_eType = pcInThat->m_eType;
 }

@@ -106,11 +106,10 @@ void H3DF::ModelImpl::Init()
 
 	m_cModelsRoot.GetStyleControl().PushSegment(m_cShowStyle);
 
-
-	// #Model: Portfolio 생성
+	// #Model #Portfolio: Portfolio 생성 
 	// 신규 Portfolio를 생성함. Portfolios는 Root Segment에 생성한다.
 //	SegmentKey cPortfolios("/portfolios");
-// 
+
 	// Root에 만드는 경우 Portfolio가 계속적으로 메모리에 남아있게 됨.
  	SegmentKey cPortfolios = m_cSegmentKey.Subsegment("portfolios");
 
@@ -124,6 +123,9 @@ void H3DF::ModelImpl::Init()
 	// PortfolioKey는 style 키를 이용한다.
 	PortfolioKey cPortfolio(cStyle);
 	m_cPortfolio = cPortfolio;
+
+	// #Portfolio: Model Segement에 기본 Portfolio 추가.
+	m_cSegmentKey.GetPortfolioControl().Push(cPortfolio);
 
 // 	입력된 Matrial을 Face에 적용한다.
 // 	MaterialMappingKit cMaterialMapping;

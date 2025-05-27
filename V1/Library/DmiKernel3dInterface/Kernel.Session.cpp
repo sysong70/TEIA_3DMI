@@ -659,6 +659,53 @@ void KERNEL::Session::TestCommand(int nId)
 
 		} break;
 
+		case CUSTOM_3D_CMD_SYSONG_Test3: {
+			H3DF::SegmentKey rectangleSegmentKey = pcImpl->GetCanvas().GetFrontView().GetAttachedModel().GetSegmentKey();
+
+			CStringA strName = rectangleSegmentKey.Name();
+
+			// define the vertices of the textbox rectangle
+			H3DF::ShapePoint leftBottom(-1, -1);
+			H3DF::ShapePoint leftTop(-1, 1);
+			H3DF::ShapePoint rightBottom(1, -1);
+			H3DF::ShapePoint rightTop(1, 1);
+
+			H3DF::ShapePoint textBoxRectanglePoints[4] = { leftBottom, rightBottom, rightTop, leftTop };
+
+			// use a PolygonShapeElement to contain our textbox rectangle
+			H3DF::PolygonShapeElement rectangleBackgroundShape(4, textBoxRectanglePoints);
+
+			// 5.4 Define Leader Line Anchor and Intermediate Points=====
+			// set the anchor at the top right vertex of our textbox rectangle
+			H3DF::AnchorShapeElement lineAnchor(rightTop);
+
+			// define the intermediate point where the leader line will bend
+			H3DF::ShapeCoordinate intermediatePoint_1(1.5f, 2.5f);
+			H3DF::ShapePointArray intermediatePoints;
+			intermediatePoints.emplace_back(intermediatePoint_1.x, intermediatePoint_1.y);
+
+			// and set the intermediate point
+			lineAnchor.SetIntermediatePoints(intermediatePoints);
+
+			// 5.5 Define a ShapeKit and Add Text
+
+			// add our textbox background and line anchors to a ShapeKit
+			H3DF::ShapeKit rectangle_shape;
+			H3DF::ShapeElement rectangle_elements[] = { rectangleBackgroundShape, lineAnchor };
+
+			rectangle_shape.SetElements(2, rectangle_elements);
+
+
+			H3DF::PortfolioKey portfolio;
+			rectangleSegmentKey.GetPortfolioControl().ShowTop(portfolio);
+
+			H3DF::SegmentKey cTest(portfolio.KeyValue());
+			strName = cTest.Name();
+
+			// define the rectangle_shape in our portfolio and add to the rectangle segment
+			portfolio.DefineShape("anchored_leader_line_rectangle", rectangle_shape);
+		} break;
+
 		default:
 			break;
 	}
