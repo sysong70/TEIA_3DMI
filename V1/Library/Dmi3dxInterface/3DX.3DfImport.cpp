@@ -380,7 +380,7 @@ bool TdfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, H3DF::Seg
 	A3D_INITIALIZE_DATA(A3DAsmModelFileData, cModelFileData);
 	A3DStatus nStatus = A3DAsmModelFileGet(pcAsmModelFile, &cModelFileData);
 	if (A3D_SUCCESS != nStatus) {
-		SetLastErrorMessage(L"Asm Model File Get Error", nStatus);
+		SetLastErrorMessage(L"AsmModelFileGet Error", nStatus);
 		return false;
 	}
 
@@ -424,8 +424,57 @@ bool TdfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, H3DF::Seg
 	CHECK_A3D_RESULT(A3DMiscCascadedAttributesCreate(&pcAttrs));
 
 	A3DUns32 nSize = cModelFileData.m_uiPOccurrencesSize;
-	for (A3DUns32 nIndex = 0; nIndex < nSize; ++nIndex) {
-		ParseProductOccurrence(cModelFileData.m_ppPOccurrences[nIndex], pcAttrs, dModelScale, cModelSegment, *m_pcModelsComponent);
+
+	m_bSimplifyBrepData = true;
+
+	if (false == m_bSimplifyBrepData) {
+		for (A3DUns32 nIndex = 0; nIndex < nSize; ++nIndex) {
+			ParseProductOccurrence(cModelFileData.m_ppPOccurrences[nIndex], pcAttrs, dModelScale, cModelSegment, *m_pcModelsComponent);
+		}
+	}
+	else {
+		SegmentKey cOriginModelSegment = cModelSegment.Subsegment("Origin_Data");
+		H3DF::Component * pcOriginModelComponent = AddComponent(cModelSegment, "Origin Data", H3DF::Component::Type::ExchangeProductOccurrence, *m_pcModelsComponent);
+
+		m_bSimplifyBrepData = false;
+		for (A3DUns32 nIndex = 0; nIndex < nSize; ++nIndex) {
+			ParseProductOccurrence(cModelFileData.m_ppPOccurrences[nIndex], pcAttrs, dModelScale, cOriginModelSegment, *pcOriginModelComponent);
+		}
+
+		BoundingKit cOriginModelBounding;
+		cOriginModelSegment.ShowBounding(cOriginModelBounding);
+
+		SimpleSphere cSphere;
+		SimpleCuboid cCuboid;
+		cOriginModelBounding.ShowVolume(cSphere, cCuboid);
+
+		m_bSimplifyBrepData = true;
+
+		SegmentKey cSimplifyModelSegment = cModelSegment.Subsegment("Simplify_Data");
+		H3DF::Component * pcSimplifyModelComponent = AddComponent(cModelSegment, "Simplify Data", H3DF::Component::Type::ExchangeProductOccurrence, *m_pcModelsComponent);
+
+		MatrixKit cMatrix;
+
+		float fDX = (cCuboid.cMax.x - cCuboid.cMin.x);
+		float fDY = (cCuboid.cMax.y - cCuboid.cMin.y);
+		float fDZ = (cCuboid.cMax.z - cCuboid.cMin.z);
+
+		if (fDX < fDY && fDX < fDZ) {
+			cMatrix.SetOrigin(fDX * 1.5, 0, 0);
+		}
+		else if (fDY < fDZ && fDY < fDX) {
+			cMatrix.SetOrigin(0, fDY * 1.5, 0);
+		}
+		else {
+			cMatrix.SetOrigin(0, 0, fDZ * 1.5);
+		}
+		
+		cSimplifyModelSegment.SetModellingMatrix(cMatrix);
+
+		for (A3DUns32 nIndex = 0; nIndex < nSize; ++nIndex) {
+			ParseProductOccurrence(cModelFileData.m_ppPOccurrences[nIndex], pcAttrs, dModelScale, cSimplifyModelSegment, *pcSimplifyModelComponent);
+		}
+
 	}
 
 	A3DAsmModelFileGet(nullptr, &cModelFileData);
@@ -1143,50 +1192,53 @@ A3DStatus TdfImport::ParsePart(const A3DAsmPartDefinition * pcPart, const A3DMis
 
 	// 기존에 생성된 Part를 찾은 경우 Include로 Parent에 추가 시킨다.
 	HC_KEY nSegmentKey = INVALID_KEY;
-	if (true == m_mPartsMap.Lookup((DWORD_PTR)pcPart, nSegmentKey))
-	{
-		H3DF::SegmentKey cSegment(nSegmentKey);
-		H3DF::IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
 
-		DWORD nIncludeCount = 0;
+	if (false == m_bSimplifyBrepData) {
+		if (true == m_mPartsMap.Lookup((DWORD_PTR) pcPart, nSegmentKey))
+		{
+			H3DF::SegmentKey cSegment(nSegmentKey);
+			H3DF::IncludeKey cInclude = cParentSegment.IncludeSegment(cSegment);
 
-		if (true == H3DF::UserData::ShowIncludedCount(cSegment, nIncludeCount)) {
-			nIncludeCount++;
+			DWORD nIncludeCount = 0;
+
+			if (true == H3DF::UserData::ShowIncludedCount(cSegment, nIncludeCount)) {
+				nIncludeCount++;
+			}
+			else {
+				// 저장된 Include Count가 없는 경우는 2로 설정한다. 처음 1번, 이제 다시 Include되었으므로 2번이 된다.
+				nIncludeCount = 2;
+			}
+
+			H3DF::UserData::SetIncludedCount(cSegment, nIncludeCount);
+
+			// #CADModel: ParsePart 추가. 값은 새롭게 생성해서 넣도록 한다.
+
+			// 1. CADModel에 들어있는 Component맵에서 Key값을 이용해서 Component를 찾도록 한다.
+			H3DF::CADModelImpl * pcCdModelImpl = dynamic_cast<H3DF::CADModelImpl *>(m_pcCADModel->GetImpl());
+			DEBUG_VALID(pcCdModelImpl);
+
+			H3DF::Component * pcFindComponent = nullptr;
+			pcCdModelImpl->m_pmComponentMap->Lookup(nSegmentKey, pcFindComponent);
+
+			// 2. 찾은 Component를 복사해서 새로운 Component를 생성한다. 이렇게 해야 tree에서 별도의 Component로 인식해서 UI와 연동해서 작업할 수 있음.
+			//    하부의 Component들도 복사된다.
+			H3DF::Component * pcComponent = new H3DF::Component(*pcFindComponent);
+
+			// 새롭게 생성된 Component에서 Include Key를 변경한다.
+			H3DF::ComponentImpl * pcComponentImpl = dynamic_cast<H3DF::ComponentImpl *>(pcComponent->GetImpl());
+			pcComponentImpl->m_pcOwner = &cParentComp;
+			pcComponentImpl->m_nIncludeKey = cInclude.KeyValue();
+
+			if (nullptr != pcFindComponent) {
+				H3DF::ComponentUtility::AddSubComponent(cParentComp, *pcComponent);
+			}
+
+			Log::Write(L"ParsePart Map: %s", CString(cSegment.Name()));
+
+			Log::DecreaseTabIndex();
+
+			return A3D_SUCCESS;
 		}
-		else {
-			// 저장된 Include Count가 없는 경우는 2로 설정한다. 처음 1번, 이제 다시 Include되었으므로 2번이 된다.
-			nIncludeCount = 2;
-		}
-
-		H3DF::UserData::SetIncludedCount(cSegment, nIncludeCount);
-
-		// #CADModel: ParsePart 추가. 값은 새롭게 생성해서 넣도록 한다.
-
-		// 1. CADModel에 들어있는 Component맵에서 Key값을 이용해서 Component를 찾도록 한다.
-		H3DF::CADModelImpl * pcCdModelImpl = dynamic_cast<H3DF::CADModelImpl *>(m_pcCADModel->GetImpl());
-		DEBUG_VALID(pcCdModelImpl);
-
-		H3DF::Component * pcFindComponent = nullptr;
-		pcCdModelImpl->m_pmComponentMap->Lookup(nSegmentKey, pcFindComponent);
-
-		// 2. 찾은 Component를 복사해서 새로운 Component를 생성한다. 이렇게 해야 tree에서 별도의 Component로 인식해서 UI와 연동해서 작업할 수 있음.
-		//    하부의 Component들도 복사된다.
-		H3DF::Component * pcComponent = new H3DF::Component(*pcFindComponent);
-
-		// 새롭게 생성된 Component에서 Include Key를 변경한다.
-		H3DF::ComponentImpl * pcComponentImpl = dynamic_cast<H3DF::ComponentImpl *>(pcComponent->GetImpl());
-		pcComponentImpl->m_pcOwner = &cParentComp;
-		pcComponentImpl->m_nIncludeKey = cInclude.KeyValue();
-
-		if (nullptr != pcFindComponent) {
-			H3DF::ComponentUtility::AddSubComponent(cParentComp, *pcComponent);
-		}
-
-		Log::Write(L"ParsePart Map: %s", CString(cSegment.Name()));
-
-		Log::DecreaseTabIndex();
-
-		return A3D_SUCCESS;
 	}
 
 	// Segment를 생성하고 생성된 Segment를 Parent Segment에 Include한다.
@@ -1550,8 +1602,9 @@ A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcInRepIte
 #ifdef BREP_DATA_LOG
 		Log::A3DTopoBrepDataLog(cBrepModelData.m_pBrepData);
 #endif
-		
-		cSimplifier.Initialize(cBrepModelData.m_pBrepData);
+		if (true == m_bSimplifyBrepData) {
+			cSimplifier.Initialize(cBrepModelData.m_pBrepData);
+		}
 
 		if (true == cSimplifier.Simplify()) {
 #ifdef BREP_DATA_LOG
@@ -1592,16 +1645,17 @@ A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcInRepIte
 		A3DRiRepresentationItemGet((A3DRiRepresentationItem *) pcBrepModel, (A3DRiRepresentationItemData *) &cSimplifierItemData);
 
 		if (cSimplifierItemData.m_pTessBase != nullptr) {
+/*
 			MatrixKit cMatrix;
 			cMatrix.SetOrigin(0, 0, 10000);
 			CStringA strName = cInSegment.Name();
 			SegmentKey cSegment = cInSegment.Subsegment("Simplified_Model");
 			cSegment.SetModellingMatrix(cMatrix);
-			CHECK_A3D_RESULT(DrawTessBase(cSimplifierItemData.m_pTessBase, pcBrepModel, pcInEntityRef, pcInAttr, cSegment));
+*/
+			CHECK_A3D_RESULT(DrawTessBase(cSimplifierItemData.m_pTessBase, pcBrepModel, pcInEntityRef, pcInAttr, cInSegment));
 		}
 	}
-
-	if (cInRepItemData.m_pTessBase != nullptr) {
+	else if (cInRepItemData.m_pTessBase != nullptr) {
 		m_dContextScale = 1.0;
 		CHECK_A3D_RESULT(DrawTessBase(cInRepItemData.m_pTessBase, pcInRepItem, pcInEntityRef, pcInAttr, cInSegment));
 	}
@@ -3625,7 +3679,7 @@ A3DStatus TdfImport::DrawTess3DFaceRegion(const A3DTess3D * pcInTess3D, const A3
 				acWirePoints[k] = m_pcPoints[cTess3dData.m_puiWireIndexes[nStartWireIndex + index++] / 3];
 			}
 
-			//H3DF::LineKey cLineKey = cInSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
+			H3DF::LineKey cLineKey = cInSegment.InsertLine(acWirePoints.size(), acWirePoints.data());
 
 			// 대용량 파일에서 메모리 소모가 심하므로 사용하지 않은다. 심한 경우 20%이상 메모리를 소모한다.
 // 			if (true == bSolidSegmentFlag) {

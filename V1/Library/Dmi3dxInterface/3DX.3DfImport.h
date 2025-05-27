@@ -346,6 +346,8 @@ private:
 
 	Signal::Delivery * m_pcInDelivery = nullptr;
 
+	bool m_bSimplifyBrepData = false; // Brep Data를 단순화할지 여부. true면 Brep Data를 단순화함.
+
 	//== 계산 관련 함수 ==========================================================================
 private:
 	double m_dMatrixStack[32][16];

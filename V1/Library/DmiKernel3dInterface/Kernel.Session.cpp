@@ -161,7 +161,7 @@ bool KERNEL::Session::Save(WCHAR * pstrInFilePathName)
 	CString strFilePathName = pstrInFilePathName;
 
 	if (true == strFilePathName.IsEmpty()) {
-		strFilePathName = L"Z://Test.hsf";
+		strFilePathName = L"D://Test.hsf";
 	}
 	
 	pcImpl->GetCanvas().GetFrontView().SaveHsfFile(strFilePathName, &pcImpl->GetCanvas());
