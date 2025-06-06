@@ -18,9 +18,13 @@ namespace H3DF
 	class DrawingAttributeKitImpl : public Impl
 	{
 	public:
-		DrawingAttributeKitImpl() { m_eType = H3DF::Type::DrawingAttributeKit; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<DrawingAttributeKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(DrawingAttributeKitImpl * pcInThat) 
+		void Copy(const DrawingAttributeKitImpl * pcInThat) 
 		{
 			m_bDepthRange = pcInThat->m_bDepthRange;
 			m_fDepthRangeNear = pcInThat->m_fDepthRangeNear;
@@ -52,32 +56,40 @@ namespace H3DF
 
 H3DF::DrawingAttributeKit::DrawingAttributeKit() 
 {
-	m_pcImpl = new DrawingAttributeKitImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<DrawingAttributeKitImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::DrawingAttributeKit::DrawingAttributeKit(DrawingAttributeKit const & cInKit)
 {
-	m_pcImpl = new DrawingAttributeKitImpl();
-	Set(cInKit);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void H3DF::DrawingAttributeKit::Set(DrawingAttributeKit const & cInKit)
-{
-	DrawingAttributeKitImpl * pcImpl = (DrawingAttributeKitImpl *)m_pcImpl;
-	DrawingAttributeKitImpl * pcInThatImpl = (DrawingAttributeKitImpl *)cInKit.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
 }
 
 DrawingAttributeKit const & H3DF::DrawingAttributeKit::operator = (DrawingAttributeKit const & cInKit)
 {
-	Set(cInKit);
+	if (nullptr != cInKit.m_pcImpl) {
+		m_pcImpl = cInKit.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 void H3DF::DrawingAttributeKit::Show(DrawingAttributeKit & cOutKit) const
 {
-	DrawingAttributeKitImpl * pcImpl = (DrawingAttributeKitImpl *)m_pcImpl;
-	DrawingAttributeKitImpl * pcOutKitImpl = (DrawingAttributeKitImpl *)cOutKit.m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeKitImpl *>(m_pcImpl.get());
+	auto pcOutKitImpl = static_cast<DrawingAttributeKitImpl *>(cOutKit.m_pcImpl.get());
+
 	pcOutKitImpl->Copy(pcImpl);
 }
 
@@ -88,8 +100,9 @@ bool H3DF::DrawingAttributeKit::Empty() const
 
 bool H3DF::DrawingAttributeKit::Equals(DrawingAttributeKit const & cInKit) const
 {
-	DrawingAttributeKitImpl * pcImpl = (DrawingAttributeKitImpl *)m_pcImpl;
-	DrawingAttributeKitImpl * pcInThatImpl = (DrawingAttributeKitImpl *)cInKit.m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeKitImpl *>(m_pcImpl.get());
+	auto pcInThatImpl = static_cast<DrawingAttributeKitImpl *>(cInKit.m_pcImpl.get());
+
 	return pcImpl->Equals(pcInThatImpl);
 }
 
@@ -105,7 +118,7 @@ bool H3DF::DrawingAttributeKit::operator != (DrawingAttributeKit const & cInKit)
 
 DrawingAttributeKit & H3DF::DrawingAttributeKit::SetDepthRange(float fInNear, float fInFar)
 {
-	DrawingAttributeKitImpl * pcImpl = (DrawingAttributeKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bDepthRange = true;
@@ -117,7 +130,7 @@ DrawingAttributeKit & H3DF::DrawingAttributeKit::SetDepthRange(float fInNear, fl
 
 DrawingAttributeKit & H3DF::DrawingAttributeKit::SetFaceDisplacement(int nInBuckets)
 {
-	DrawingAttributeKitImpl * pcImpl = (DrawingAttributeKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bFaceDisplacement = true;
@@ -128,7 +141,7 @@ DrawingAttributeKit & H3DF::DrawingAttributeKit::SetFaceDisplacement(int nInBuck
 
 DrawingAttributeKit & H3DF::DrawingAttributeKit::UnsetDepthRange()
 {
-	DrawingAttributeKitImpl * pcImpl = (DrawingAttributeKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bDepthRange = false;
@@ -138,7 +151,7 @@ DrawingAttributeKit & H3DF::DrawingAttributeKit::UnsetDepthRange()
 
 DrawingAttributeKit & H3DF::DrawingAttributeKit::UnsetFaceDisplacement()
 {
-	DrawingAttributeKitImpl * pcImpl = (DrawingAttributeKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bFaceDisplacement = false;
@@ -148,7 +161,7 @@ DrawingAttributeKit & H3DF::DrawingAttributeKit::UnsetFaceDisplacement()
 
 bool H3DF::DrawingAttributeKit::ShowDepthRange(float & fOutNear, float & fOutFar) const
 {
-	DrawingAttributeKitImpl * pcImpl = (DrawingAttributeKitImpl *) m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	fOutNear = pcImpl->m_fDepthRangeNear;
@@ -159,7 +172,7 @@ bool H3DF::DrawingAttributeKit::ShowDepthRange(float & fOutNear, float & fOutFar
 
 bool H3DF::DrawingAttributeKit::ShowFaceDisplacement(int & nOutBuckets) const
 {
-	DrawingAttributeKitImpl * pcImpl = (DrawingAttributeKitImpl *) m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	nOutBuckets = pcImpl->m_nFaceDisplacementBuckets;
@@ -175,9 +188,13 @@ namespace H3DF
 	class DrawingAttributeControlImpl : public ControlImpl
 	{
 	public:
-		DrawingAttributeControlImpl() { m_eType = H3DF::Type::DrawingAttributeControl; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<DrawingAttributeControlImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(DrawingAttributeControlImpl * pcInThat) {
+		void Copy(const DrawingAttributeControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
 	};
@@ -187,34 +204,40 @@ H3DF::DrawingAttributeControl::DrawingAttributeControl() {}
 
 H3DF::DrawingAttributeControl::DrawingAttributeControl(SegmentKey & cInSegmentKey)
 {
-	DrawingAttributeControlImpl * pcImpl = new DrawingAttributeControlImpl();
-	pcImpl->m_cOverrideKey = cInSegmentKey;
+	if (staticType != Type()) {
+		return;
+	}
 
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<DrawingAttributeControlImpl>();
+	auto pcImpl = dynamic_cast<DrawingAttributeControlImpl *>(m_pcImpl.get());
+
+	pcImpl->m_cOverrideKey = cInSegmentKey;
 }
 
 H3DF::DrawingAttributeControl::DrawingAttributeControl(DrawingAttributeControl const & cInThat)
 {
-	m_pcImpl = new DrawingAttributeControlImpl();
-	Set(cInThat);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void H3DF::DrawingAttributeControl::Set(DrawingAttributeControl const & cInThat)
-{
-	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
-	DrawingAttributeControlImpl * pcInThatImpl = (DrawingAttributeControlImpl *) cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 DrawingAttributeControl & H3DF::DrawingAttributeControl::operator = (DrawingAttributeControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 DrawingAttributeControl & H3DF::DrawingAttributeControl::SetDepthRange(float fInNear, float fInFar)
 {
-	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -228,7 +251,7 @@ DrawingAttributeControl & H3DF::DrawingAttributeControl::SetDepthRange(float fIn
 
 DrawingAttributeControl & H3DF::DrawingAttributeControl::SetFaceDisplacement(int nInBuckets)
 {
-	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -242,7 +265,7 @@ DrawingAttributeControl & H3DF::DrawingAttributeControl::SetFaceDisplacement(int
 
 DrawingAttributeControl & H3DF::DrawingAttributeControl::SetOverlay(Drawing::Overlay eInOverlay)
 {
-	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -275,7 +298,7 @@ DrawingAttributeControl & H3DF::DrawingAttributeControl::SetOverlay(Drawing::Ove
 
 DrawingAttributeControl & H3DF::DrawingAttributeControl::UnsetDepthRange()
 {
-	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -289,7 +312,7 @@ DrawingAttributeControl & H3DF::DrawingAttributeControl::UnsetDepthRange()
 
 DrawingAttributeControl & H3DF::DrawingAttributeControl::UnsetFaceDisplacement()
 {
-	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -303,7 +326,7 @@ DrawingAttributeControl & H3DF::DrawingAttributeControl::UnsetFaceDisplacement()
 
 DrawingAttributeControl & H3DF::DrawingAttributeControl::UnsetOverlay()
 {
-	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -317,7 +340,7 @@ DrawingAttributeControl & H3DF::DrawingAttributeControl::UnsetOverlay()
 
 bool H3DF::DrawingAttributeControl::ShowDepthRange(float & fOutX, float & fOutY) const
 {
-	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	bool bResult = false;
@@ -338,7 +361,7 @@ bool H3DF::DrawingAttributeControl::ShowDepthRange(float & fOutX, float & fOutY)
 
 bool H3DF::DrawingAttributeControl::ShowFaceDisplacement(int & nOutBuckets) const
 {
-	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	bool bResult = false;
@@ -359,7 +382,7 @@ bool H3DF::DrawingAttributeControl::ShowFaceDisplacement(int & nOutBuckets) cons
 
 bool H3DF::DrawingAttributeControl::ShowOverlay(Drawing::Overlay & eOutOverlay) const
 {
-	DrawingAttributeControlImpl * pcImpl = (DrawingAttributeControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<DrawingAttributeControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	bool bResult = false;

@@ -4,64 +4,64 @@
 #include "Key.h"
 #include "Math.h"
 
-OPEN_3DF_NAMESPACE
-
-class API_3DF KeyPath : public Object
+namespace H3DF 
 {
-public:
-	KeyPath();
-	KeyPath(KeyArray const & cInPath);
-	KeyPath(size_t nInPathCount, Key const pInPath[]);
-	KeyPath(KeyPath const & cInThat);
-	KeyPath(char chKeyPath[]);
+	class KeyPath : public Object
+	{
+	public:
+		KeyPath();
+		KeyPath(KeyArray const & cInPath);
+		KeyPath(size_t nInPathCount, Key const pInPath[]);
+		KeyPath(KeyPath const & cInThat);
+		KeyPath(char chKeyPath[]);
 
-	H3DF::Type ObjectType() const override { return H3DF::Type::KeyPath; };
+		static const H3DF::Type staticType = H3DF::Type::KeyPath;
+		H3DF::Type ObjectType() const { return staticType; };
 
-	void Set(KeyPath const & cInThat);
+		void Set(KeyPath const & cInThat);
 
-	KeyPath & operator=(KeyPath const & cInThat);
-	KeyPath & operator=(KeyArray const & cInPath);
+		KeyPath & operator=(KeyPath const & cInThat);
+		KeyPath & operator=(KeyArray const & cInPath);
 
-	KeyPath & SetKeys(KeyArray const & cInKeys);
+		KeyPath & SetKeys(KeyArray const & cInKeys);
 
-	KeyPath & UnsetKeys();
+		KeyPath & UnsetKeys();
 
-	bool ShowKeys(KeyArray & cOutKeys) const;
+		bool ShowKeys(KeyArray & cOutKeys) const;
 
-	bool ConvertCoordinate(Coordinate::Space eInSpace, Point const & cInpoint, Coordinate::Space eInOutputSpace, Point & cOutPoint) const;
-	bool ConvertCoordinate(Coordinate::Space eInSpace, PointArray const & aInPoints, Coordinate::Space eInOutputSpace, PointArray & aOutPoints) const;
+		bool ConvertCoordinate(Coordinate::Space eInSpace, Point const & cInpoint, Coordinate::Space eInOutputSpace, Point & cOutPoint) const;
+		bool ConvertCoordinate(Coordinate::Space eInSpace, PointArray const & aInPoints, Coordinate::Space eInOutputSpace, PointArray & aOutPoints) const;
 
-	// Shows the net modelling matrix attribute settings along this key path.
-	bool ShowNetModellingMatrix(MatrixKit & cOutKit) const;
+		// Shows the net modelling matrix attribute settings along this key path.
+		bool ShowNetModellingMatrix(MatrixKit & cOutKit) const;
 
-	size_t Size() const;
+		size_t Size() const;
 
-	virtual bool Empty() const;
+		virtual bool Empty() const;
 
-	Key & At(size_t nInIndex);
-	Key const & At(size_t nInIndex) const;
+		Key & At(size_t nInIndex);
+		Key const & At(size_t nInIndex) const;
 
-	void Insert(size_t nInIndex, Key const & cInItem);
+		void Insert(size_t nInIndex, Key const & cInItem);
 
-	void Remove(Key const & cInItem);
-	void Remove(size_t nInIndex);
+		void Remove(Key const & cInItem);
+		void Remove(size_t nInIndex);
 
-	// Creates and returns a new KeyPath object, with the keys organized in the reverse order.
-	KeyPath Reverse() const;
+		// Creates and returns a new KeyPath object, with the keys organized in the reverse order.
+		KeyPath Reverse() const;
 
-	Key & Front();
-	Key const & Front() const;
+		Key & Front();
+		Key const & Front() const;
 
-	Key & Back();
-	Key const & Back() const;
+		Key & Back();
+		Key const & Back() const;
 
-	Key PopFront();
-	Key PopBack();
+		Key PopFront();
+		Key PopBack();
 
-	KeyPath & PushFront(Key const & cInKey);
-	KeyPath & PushBack(Key const & cInKey);
+		KeyPath & PushFront(Key const & cInKey);
+		KeyPath & PushBack(Key const & cInKey);
 
-	void ShowString(CString & strOutPath);
-};
-
-CLOSE_3DF_NAMESPACE
+		void ShowString(CString & strOutPath);
+	};
+}

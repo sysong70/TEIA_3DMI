@@ -38,31 +38,38 @@ using namespace H3DF;
 //== SelectionOptionsKit Class =====================================================================
 H3DF::SelectionOptionsKit::SelectionOptionsKit()
 {
-	m_pcImpl = new SelectionOptionsKitImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<SelectionOptionsKitImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::SelectionOptionsKit::SelectionOptionsKit(SelectionOptionsKit const & cInThat)
 {
-	m_pcImpl = new SelectionOptionsKitImpl();
-	Set(cInThat);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void H3DF::SelectionOptionsKit::Set(SelectionOptionsKit const & cInThat)
-{
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
-	SelectionOptionsKitImpl * pcInThatImpl = (SelectionOptionsKitImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 SelectionOptionsKit & H3DF::SelectionOptionsKit::operator =(SelectionOptionsKit const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 SelectionOptionsKit & H3DF::SelectionOptionsKit::SetProximity(float fInProximity)
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	pcImpl->fProximity = fInProximity;
 	pcImpl->bProximity = true;
 	return *this;
@@ -70,7 +77,7 @@ SelectionOptionsKit & H3DF::SelectionOptionsKit::SetProximity(float fInProximity
 
 SelectionOptionsKit & H3DF::SelectionOptionsKit::SetLevel(Selection::Level eInLevel)
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	pcImpl->eLevel = eInLevel;
 	pcImpl->bLevel = true;
 	return *this;
@@ -78,7 +85,7 @@ SelectionOptionsKit & H3DF::SelectionOptionsKit::SetLevel(Selection::Level eInLe
 
 SelectionOptionsKit & H3DF::SelectionOptionsKit::SetInternalLimit(size_t nInLimit)
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	pcImpl->nInternalLimit = nInLimit;
 	pcImpl->bInternalLimit = true;
 	return *this;
@@ -86,7 +93,7 @@ SelectionOptionsKit & H3DF::SelectionOptionsKit::SetInternalLimit(size_t nInLimi
 
 SelectionOptionsKit & H3DF::SelectionOptionsKit::SetRelatedLimit(size_t nInLimit)
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	pcImpl->nRelatedLimit = nInLimit;
 	pcImpl->bRelatedLimit = true;
 	return *this;
@@ -94,7 +101,7 @@ SelectionOptionsKit & H3DF::SelectionOptionsKit::SetRelatedLimit(size_t nInLimit
 
 SelectionOptionsKit & H3DF::SelectionOptionsKit::SetSorting(Selection::Sorting eInSorting)
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	pcImpl->eSorting = eInSorting;
 	pcImpl->bSorting = true;
 	return *this;
@@ -102,7 +109,7 @@ SelectionOptionsKit & H3DF::SelectionOptionsKit::SetSorting(Selection::Sorting e
 
 SelectionOptionsKit & H3DF::SelectionOptionsKit::SetAlgorithm(Selection::Algorithm eInAlgorithm)
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	pcImpl->eAlgorithm = eInAlgorithm;
 	pcImpl->bAlgorithm = true;
 	return *this;
@@ -110,7 +117,7 @@ SelectionOptionsKit & H3DF::SelectionOptionsKit::SetAlgorithm(Selection::Algorit
 
 SelectionOptionsKit & H3DF::SelectionOptionsKit::SetGranularity(Selection::Granularity eInGranularity)
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	pcImpl->eGranularity = eInGranularity;
 	pcImpl->bGranularity = true;
 	return *this;
@@ -118,7 +125,7 @@ SelectionOptionsKit & H3DF::SelectionOptionsKit::SetGranularity(Selection::Granu
 
 SelectionOptionsKit & H3DF::SelectionOptionsKit::SetBias(Selection::Bias eInBias)
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	pcImpl->eBias = eInBias;
 	pcImpl->bBias = true;
 	return *this;
@@ -126,7 +133,7 @@ SelectionOptionsKit & H3DF::SelectionOptionsKit::SetBias(Selection::Bias eInBias
 
 SelectionOptionsKit & H3DF::SelectionOptionsKit::SetScope(SegmentKey const & cInStartSegment, bool bInScopeOnly)
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	pcImpl->cStartSegment = cInStartSegment;
 	pcImpl->bScopeOnly = bInScopeOnly;
 	return *this;
@@ -134,7 +141,7 @@ SelectionOptionsKit & H3DF::SelectionOptionsKit::SetScope(SegmentKey const & cIn
 
 SelectionOptionsKit & H3DF::SelectionOptionsKit::SetScope(KeyPath const & cInStartPath, bool bInScopeOnly)
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	pcImpl->cStartPath = cInStartPath;
 	pcImpl->bScopeOnly = bInScopeOnly;
 	return *this;
@@ -142,7 +149,7 @@ SelectionOptionsKit & H3DF::SelectionOptionsKit::SetScope(KeyPath const & cInSta
 
 bool H3DF::SelectionOptionsKit::ShowProximity(float & fOutProximity) const
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->bProximity) {
 		return false;
 	}
@@ -153,7 +160,7 @@ bool H3DF::SelectionOptionsKit::ShowProximity(float & fOutProximity) const
 
 bool H3DF::SelectionOptionsKit::ShowLevel(Selection::Level & eOutLevel) const
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->bLevel) {
 		return false;
 	}
@@ -164,7 +171,7 @@ bool H3DF::SelectionOptionsKit::ShowLevel(Selection::Level & eOutLevel) const
 
 bool H3DF::SelectionOptionsKit::ShowInternalLimit(size_t & nOutLimit) const
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->bInternalLimit) {
 		return false;
 	}
@@ -175,7 +182,7 @@ bool H3DF::SelectionOptionsKit::ShowInternalLimit(size_t & nOutLimit) const
 
 bool H3DF::SelectionOptionsKit::ShowRelatedLimit(size_t & nOutLimit) const
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->bRelatedLimit) {
 		return false;
 	}
@@ -187,7 +194,7 @@ bool H3DF::SelectionOptionsKit::ShowRelatedLimit(size_t & nOutLimit) const
 
 bool H3DF::SelectionOptionsKit::ShowSorting(Selection::Sorting & eOutSorting) const
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->bSorting) {
 		return false;
 	}
@@ -198,7 +205,7 @@ bool H3DF::SelectionOptionsKit::ShowSorting(Selection::Sorting & eOutSorting) co
 
 bool H3DF::SelectionOptionsKit::ShowAlgorithm(Selection::Algorithm & eOutAlgorithm) const
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->bAlgorithm) {
 		return false;
 	}
@@ -209,7 +216,7 @@ bool H3DF::SelectionOptionsKit::ShowAlgorithm(Selection::Algorithm & eOutAlgorit
 
 bool H3DF::SelectionOptionsKit::ShowGranularity(Selection::Granularity & eOutGranularity) const
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->bGranularity) {
 		return false;
 	}
@@ -220,7 +227,7 @@ bool H3DF::SelectionOptionsKit::ShowGranularity(Selection::Granularity & eOutGra
 
 bool H3DF::SelectionOptionsKit::ShowBias(Selection::Bias & eOutBias) const
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->bBias) {
 		return false;
 	}
@@ -231,7 +238,7 @@ bool H3DF::SelectionOptionsKit::ShowBias(Selection::Bias & eOutBias) const
 
 bool H3DF::SelectionOptionsKit::ShowScope(SegmentKey & cOutStartSegment, bool & bOutScopeOnly) const
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	if (INVALID_KEY == pcImpl->cStartSegment.KeyValue()) {
 		return false;
 	}
@@ -244,7 +251,7 @@ bool H3DF::SelectionOptionsKit::ShowScope(SegmentKey & cOutStartSegment, bool & 
 
 bool H3DF::SelectionOptionsKit::ShowScope(KeyPath & cOutStartPath, bool & bOutScopeOnly) const
 {
-	SelectionOptionsKitImpl * pcImpl = (SelectionOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
 	if (true == pcImpl->cStartPath.Empty()) {
 		return false;
 	}
@@ -258,16 +265,26 @@ bool H3DF::SelectionOptionsKit::ShowScope(KeyPath & cOutStartPath, bool & bOutSc
 //== SelectionOptionsControl Class =================================================================
 SelectionOptionsControl::SelectionOptionsControl(H3DF::WindowKey const & cInWindow)
 {
-	SelectionOptionsControlImpl * pcImpl = new SelectionOptionsControlImpl();
-	pcImpl->m_pcWindow = &cInWindow;
+	if (staticType != Type()) {
+		return;
+	}
 
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<SelectionOptionsControlImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcImpl = static_cast<SelectionOptionsControlImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_pcWindow = &cInWindow;
 }
 
 SelectionOptionsControl::SelectionOptionsControl(SelectionOptionsControl const & cInThat)
 {
-	m_pcImpl = new SelectionOptionsControlImpl();
-	Set(cInThat);
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 SelectionOptionsControl::~SelectionOptionsControl()
@@ -275,22 +292,21 @@ SelectionOptionsControl::~SelectionOptionsControl()
 
 }
 
-void SelectionOptionsControl::Set(SelectionOptionsControl const & cInThat)
-{
-	SelectionOptionsControlImpl * pcImpl = (SelectionOptionsControlImpl *)m_pcImpl;
-	SelectionOptionsControlImpl * pcInThatImpl = (SelectionOptionsControlImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
-}
-
 SelectionOptionsControl & SelectionOptionsControl::operator =(SelectionOptionsControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 SelectionOptionsControl & SelectionOptionsControl::SetProximity(float fInProximity)
 {
-	SelectionOptionsControlImpl * pcImpl = (SelectionOptionsControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsControlImpl *>(m_pcImpl.get());
 	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
@@ -304,7 +320,7 @@ SelectionOptionsControl & SelectionOptionsControl::SetProximity(float fInProximi
 
 SelectionOptionsControl & SelectionOptionsControl::SetLevel(Selection::Level eInLevel)
 {
-	SelectionOptionsControlImpl * pcImpl = (SelectionOptionsControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsControlImpl *>(m_pcImpl.get());
 
 	switch (eInLevel)
 	{
@@ -330,7 +346,7 @@ SelectionOptionsControl & SelectionOptionsControl::SetLevel(Selection::Level eIn
 
 SelectionOptionsControl & SelectionOptionsControl::SetInternalLimit(size_t nInLimit)
 {
-	SelectionOptionsControlImpl * pcImpl = (SelectionOptionsControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsControlImpl *>(m_pcImpl.get());
 	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
@@ -344,7 +360,7 @@ SelectionOptionsControl & SelectionOptionsControl::SetInternalLimit(size_t nInLi
 
 SelectionOptionsControl & SelectionOptionsControl::SetRelatedLimit(size_t nInLimit)
 {
-	SelectionOptionsControlImpl * pcImpl = (SelectionOptionsControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsControlImpl *>(m_pcImpl.get());
 	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
@@ -358,7 +374,7 @@ SelectionOptionsControl & SelectionOptionsControl::SetRelatedLimit(size_t nInLim
 
 SelectionOptionsControl & SelectionOptionsControl::SetSorting(Selection::Sorting eInSorting)
 {
-	SelectionOptionsControlImpl * pcImpl = (SelectionOptionsControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsControlImpl *>(m_pcImpl.get());
 	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
@@ -388,7 +404,7 @@ SelectionOptionsControl & SelectionOptionsControl::SetSorting(Selection::Sorting
 
 SelectionOptionsControl & SelectionOptionsControl::SetAlgorithm(Selection::Algorithm eInAlgorithm)
 {
-	SelectionOptionsControlImpl * pcImpl = (SelectionOptionsControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsControlImpl *>(m_pcImpl.get());
 	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
@@ -405,7 +421,7 @@ SelectionOptionsControl & SelectionOptionsControl::SetAlgorithm(Selection::Algor
 
 SelectionOptionsControl & SelectionOptionsControl::SetGranularity(Selection::Granularity eInGranularity)
 {
-	SelectionOptionsControlImpl * pcImpl = (SelectionOptionsControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsControlImpl *>(m_pcImpl.get());
 	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
@@ -422,7 +438,7 @@ SelectionOptionsControl & SelectionOptionsControl::SetGranularity(Selection::Gra
 
 SelectionOptionsControl & SelectionOptionsControl::SetBias(Selection::Bias eInBias)
 {
-	SelectionOptionsControlImpl * pcImpl = (SelectionOptionsControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsControlImpl *>(m_pcImpl.get());
 	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
@@ -451,7 +467,7 @@ SelectionOptionsControl & SelectionOptionsControl::SetBias(Selection::Bias eInBi
 
 SelectionOptionsControl & SelectionOptionsControl::UnsetProximity()
 {
-	SelectionOptionsControlImpl * pcImpl = (SelectionOptionsControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsControlImpl *>(m_pcImpl.get());
 	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
@@ -469,7 +485,7 @@ SelectionOptionsControl & SelectionOptionsControl::UnsetLevel()
 
 SelectionOptionsControl & SelectionOptionsControl::UnsetInternalLimit()
 {
-	SelectionOptionsControlImpl * pcImpl = (SelectionOptionsControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsControlImpl *>(m_pcImpl.get());
 	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
@@ -481,7 +497,7 @@ SelectionOptionsControl & SelectionOptionsControl::UnsetInternalLimit()
 
 SelectionOptionsControl & SelectionOptionsControl::UnsetRelatedLimit()
 {
-	SelectionOptionsControlImpl * pcImpl = (SelectionOptionsControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsControlImpl *>(m_pcImpl.get());
 	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
@@ -498,7 +514,7 @@ SelectionOptionsControl & SelectionOptionsControl::UnsetSorting()
 }
 SelectionOptionsControl & SelectionOptionsControl::UnsetAlgorithm()
 {
-	SelectionOptionsControlImpl * pcImpl = (SelectionOptionsControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsControlImpl *>(m_pcImpl.get());
 	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
@@ -510,7 +526,7 @@ SelectionOptionsControl & SelectionOptionsControl::UnsetAlgorithm()
 
 SelectionOptionsControl & SelectionOptionsControl::UnsetGranularity()
 {
-	SelectionOptionsControlImpl * pcImpl = (SelectionOptionsControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsControlImpl *>(m_pcImpl.get());
 	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
@@ -522,7 +538,7 @@ SelectionOptionsControl & SelectionOptionsControl::UnsetGranularity()
 
 SelectionOptionsControl & SelectionOptionsControl::UnsetBias()
 {
-	SelectionOptionsControlImpl * pcImpl = (SelectionOptionsControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionOptionsControlImpl *>(m_pcImpl.get());
 	HC_KEY nViewKey = pcImpl->GetWindow()->GetBaseView()->GetViewKey();
 
 	HC_Open_Segment_By_Key(nViewKey); {
@@ -535,18 +551,26 @@ SelectionOptionsControl & SelectionOptionsControl::UnsetBias()
 //== SelectionItem Class ===========================================================================
 H3DF::SelectionItem::SelectionItem()
 {
-	m_pcImpl = new SelectionItemImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<SelectionItemImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::SelectionItem::SelectionItem(SelectionItem const & cInThat)
 {
-	m_pcImpl = new SelectionItemImpl();
-	Set(cInThat);
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
-H3DF::Type H3DF::SelectionItem::Type() const
+H3DF::Type H3DF::SelectionItem::ItemType() const
 {
-	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionItemImpl *>(m_pcImpl.get());
 
 	if (true == pcImpl->Types().empty()) {
 		return H3DF::Type::None;
@@ -555,16 +579,15 @@ H3DF::Type H3DF::SelectionItem::Type() const
 	return pcImpl->Types().front();
 }
 
-void H3DF::SelectionItem::Set(SelectionItem const & cInThat)
-{
-	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
-	SelectionItemImpl * pcInThatImpl = (SelectionItemImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
-}
-
 SelectionItem & H3DF::SelectionItem::operator=(SelectionItem const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -574,8 +597,8 @@ bool H3DF::SelectionItem::operator==(SelectionItem const & cInThat) const
 		return false;
 	}
 
-	SelectionItemImpl * pcImpl = (SelectionItemImpl *) m_pcImpl;
-	SelectionItemImpl * pcInThatImpl = (SelectionItemImpl *) cInThat.m_pcImpl;
+	auto pcImpl = static_cast<SelectionItemImpl *> (m_pcImpl.get());
+	auto pcInThatImpl = static_cast<SelectionItemImpl *> (cInThat.m_pcImpl.get());
 
 	if (true == pcImpl->Keys().empty() || true == pcInThatImpl->Keys().empty()) {
 		return false;
@@ -627,7 +650,7 @@ bool H3DF::SelectionItem::operator!=(SelectionItem const & cInThat) const
 
 void H3DF::SelectionItem::Reset()
 {
-	auto * pcImpl = dynamic_cast<SelectionItemImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectionItemImpl *> (m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->Reset();
@@ -635,7 +658,7 @@ void H3DF::SelectionItem::Reset()
 
 void H3DF::SelectionItem::Reset() const
 {
-	auto * pcImpl = dynamic_cast<SelectionItemImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectionItemImpl *> (m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->Reset();
@@ -643,7 +666,7 @@ void H3DF::SelectionItem::Reset() const
 
 bool H3DF::SelectionItem::IsValid()
 {
-	auto * pcImpl = dynamic_cast<SelectionItemImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectionItemImpl *> (m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (true == pcImpl->Keys().empty()) {
@@ -655,7 +678,7 @@ bool H3DF::SelectionItem::IsValid()
 
 bool H3DF::SelectionItem::IsValid() const
 {
-	auto * pcImpl = dynamic_cast<SelectionItemImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectionItemImpl *> (m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (true == pcImpl->Keys().empty()) {
@@ -671,7 +694,7 @@ bool H3DF::SelectionItem::ShowSelectedItem(Key & cOutSelection)
 		return false;
 	}
 
-	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionItemImpl *> (m_pcImpl.get());
 
 	if (true == pcImpl->Keys().empty() || true == pcImpl->Types().empty()) {
 		return false;
@@ -706,7 +729,7 @@ const bool H3DF::SelectionItem::ShowSelectedItem(Key & cOutSelection) const
 		return false;
 	}
 
-	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionItemImpl *> (m_pcImpl.get());
 
 	if (true == pcImpl->Keys().empty()) {
 		return false;
@@ -723,7 +746,7 @@ const bool H3DF::SelectionItem::ShowSelectedItem(Key & cOutSelection) const
 
 bool H3DF::SelectionItem::ShowPath(KeyPath & cOutPath) const
 {
-	SelectionItemImpl * pcImpl = (SelectionItemImpl *) m_pcImpl;
+	auto pcImpl = static_cast<SelectionItemImpl *> (m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (true == pcImpl->Keys().empty()) {
@@ -752,7 +775,7 @@ bool H3DF::SelectionItem::ShowSelectionPosition(WindowPoint & cOutLocation) cons
 		return false;
 	}
 
-	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionItemImpl *> (m_pcImpl.get());
 	cOutLocation = pcImpl->m_cWindowPoint;
 
 	return true;
@@ -764,7 +787,7 @@ bool H3DF::SelectionItem::ShowSelectionPosition(WorldPoint & cOutLocation) const
 		return false;
 	}
 
-	SelectionItemImpl * pcImpl = (SelectionItemImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionItemImpl *> (m_pcImpl.get());
 	cOutLocation = pcImpl->m_cWorldPoint;
 
 	return true;
@@ -777,7 +800,7 @@ bool H3DF::SelectionItem::KeyFront(Key & cInKey, H3DF::Type eInType)
 
 bool H3DF::SelectionItem::KeyFront(HC_KEY nInKey, H3DF::Type eInType)
 {
-	SelectionItemImpl * pcImpl = dynamic_cast<SelectionItemImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectionItemImpl *> (m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->Keys().front() = nInKey;
@@ -801,7 +824,7 @@ bool H3DF::SelectionItem::KeyPushBack(Key & cInKey, H3DF::Type eInType)
 
 bool H3DF::SelectionItem::KeyPushBack(HC_KEY nInKey, H3DF::Type eInType)
 {
-	SelectionItemImpl * pcImpl = dynamic_cast<SelectionItemImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectionItemImpl *> (m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->Keys().push_back(nInKey);
@@ -821,32 +844,38 @@ bool H3DF::SelectionItem::KeyPushBack(HC_KEY nInKey, H3DF::Type eInType)
 //== SelectionResultsIterator Class ================================================================
 SelectionResultsIterator::SelectionResultsIterator()
 {
-	m_pcImpl = new SelectionResultsIteratorImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<SelectionResultsIteratorImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 SelectionResultsIterator::SelectionResultsIterator(SelectionResultsIterator const & cInThat)
 {
-	m_pcImpl = new SelectionResultsIteratorImpl();
-	Set(cInThat);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void SelectionResultsIterator::Set(SelectionResultsIterator const & cInThat)
-{
-	SelectionResultsIteratorImpl * pcImpl = (SelectionResultsIteratorImpl *)m_pcImpl;
-	SelectionResultsIteratorImpl * pcInThatImpl = (SelectionResultsIteratorImpl *)cInThat.m_pcImpl;
-
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 SelectionResultsIterator & SelectionResultsIterator::operator=(SelectionResultsIterator const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 void SelectionResultsIterator::Next()
 {
-	SelectionResultsIteratorImpl * pcImpl = (SelectionResultsIteratorImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsIteratorImpl *>(m_pcImpl.get());
 	++pcImpl->pcIterator;
 }
 
@@ -858,15 +887,16 @@ SelectionResultsIterator & SelectionResultsIterator::operator++()
 
 SelectionResultsIterator & SelectionResultsIterator::operator++(int nInVal)
 {
-	SelectionResultsIteratorImpl * pcImpl = (SelectionResultsIteratorImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsIteratorImpl *>(m_pcImpl.get());
 	std::advance(pcImpl->pcIterator, nInVal);
 	return *this;
 }
 
 bool SelectionResultsIterator::operator == (SelectionResultsIterator const & cInSearchResultsIterator)
 {
-	SelectionResultsIteratorImpl * pcImpl = (SelectionResultsIteratorImpl *)m_pcImpl;
-	SelectionResultsIteratorImpl * pcInThatImpl = (SelectionResultsIteratorImpl *)cInSearchResultsIterator.m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsIteratorImpl *>(m_pcImpl.get());
+	auto pcInThatImpl = static_cast<SelectionResultsIteratorImpl *>(cInSearchResultsIterator.m_pcImpl.get());
+
 	if(pcImpl->pcIterator != pcInThatImpl->pcIterator) {
 		return false;
 	}
@@ -889,19 +919,19 @@ bool SelectionResultsIterator::operator != (SelectionResultsIterator const & cIn
 
 bool SelectionResultsIterator::IsValid() const
 {
-	SelectionResultsIteratorImpl * pcImpl = (SelectionResultsIteratorImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsIteratorImpl *>(m_pcImpl.get());
 	return pcImpl->pcIterator != pcImpl->pcEndIterator;
 }
 
 void SelectionResultsIterator::Reset()
 {
-	SelectionResultsIteratorImpl * pcImpl = (SelectionResultsIteratorImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsIteratorImpl *>(m_pcImpl.get());
 	pcImpl->pcIterator = pcImpl->pcBeginIterator;
 }
 
 SelectionItem & SelectionResultsIterator::GetItem() const
 {
-	SelectionResultsIteratorImpl * pcImpl = (SelectionResultsIteratorImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsIteratorImpl *>(m_pcImpl.get());
 	return *pcImpl->pcIterator;
 }
 
@@ -913,13 +943,21 @@ SelectionItem & SelectionResultsIterator::operator * () const
 //== SelectionResults Class ========================================================================
 H3DF::SelectionResults::SelectionResults()
 {
-	m_pcImpl = new SelectionResultsImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<SelectionResultsImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::SelectionResults::SelectionResults(SelectionResults const & cInThat)
 {
-	m_pcImpl = new SelectionResultsImpl();
-	Set(cInThat);
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 H3DF::SelectionResults::~SelectionResults()
@@ -927,27 +965,22 @@ H3DF::SelectionResults::~SelectionResults()
 	Reset();
 }
 
-void H3DF::SelectionResults::Set(SelectionResults const & cInThat)
-{
-	// 복사하기 전에 기존의 결과값을 삭제한다.
-	Reset();
-
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
-	SelectionResultsImpl * pcInThatImpl = (SelectionResultsImpl *)cInThat.m_pcImpl;
-
-	pcImpl->Copy(pcInThatImpl);
-}
-
 SelectionResults & H3DF::SelectionResults::operator=(SelectionResults const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 bool H3DF::SelectionResults::operator==(SelectionResults const & cInThat) const
 {
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
-	SelectionResultsImpl * pcInThatImpl = (SelectionResultsImpl *)cInThat.m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
+	auto pcInThatImpl = static_cast<SelectionResultsImpl *>(cInThat.m_pcImpl.get());
 
 	if (pcImpl->GetItems().size() != pcInThatImpl->GetItems().size()) {
 		return false;
@@ -985,7 +1018,7 @@ void H3DF::SelectionResults::Reset()
 		return;
 	}
 
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
 	pcImpl->Clear();
 }
 
@@ -995,7 +1028,7 @@ void H3DF::SelectionResults::Reset() const
 		return;
 	}
 
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *) m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
 	pcImpl->Clear();
 }
 
@@ -1005,16 +1038,16 @@ size_t H3DF::SelectionResults::GetCount() const
 		return 0;
 	}
 
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
 	return  pcImpl->Size();
 }
 
 SelectionResultsIterator H3DF::SelectionResults::GetIterator() const
 {
 	SelectionResultsIterator cIterator;
-	SelectionResultsIteratorImpl * pcIteratorImpl = (SelectionResultsIteratorImpl *)cIterator.GetImpl();
+	auto pcIteratorImpl = static_cast<SelectionResultsIteratorImpl *>(cIterator.GetImpl());
 
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
 	pcIteratorImpl->pcBeginIterator = pcImpl->Begin();
 	pcIteratorImpl->pcEndIterator = pcImpl->End();
 	pcIteratorImpl->pcIterator = pcIteratorImpl->pcBeginIterator;
@@ -1024,31 +1057,31 @@ SelectionResultsIterator H3DF::SelectionResults::GetIterator() const
 
 SelectionItem & H3DF::SelectionResults::Front()
 {
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
 	return pcImpl->Front();
 }
 
 SelectionItem & H3DF::SelectionResults::Front() const
 {
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
 	return pcImpl->Front();
 }
 
 void H3DF::SelectionResults::PushFront(SelectionItem & cInItem)
 {
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
 	pcImpl->PushFront(cInItem);
 }
 
 void H3DF::SelectionResults::PushBack(SelectionItem & cInItem)
 {
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
 	pcImpl->PushBack(cInItem);
 }
 
 bool H3DF::SelectionResults::Erase(SelectionItem & cInItem)
 {
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
 	for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
 		if (*pcItemIter == cInItem) {
 			pcItemIter = pcImpl->Erase(pcItemIter);
@@ -1064,8 +1097,8 @@ bool H3DF::SelectionResults::Erase(SelectionItem & cInItem)
 
 bool H3DF::SelectionResults::Erase(SelectionResults const & cInResults)
 {
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
-	SelectionResultsImpl * pcInThatImpl = (SelectionResultsImpl *)cInResults.m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
+	auto pcInThatImpl = static_cast<SelectionResultsImpl *>(cInResults.m_pcImpl.get());
 
 	if (nullptr == pcImpl || nullptr == pcInThatImpl) {
 		return false;
@@ -1092,7 +1125,7 @@ void H3DF::SelectionResults::SetSize(size_t nInSize)
 		return;
 	}
 
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
 	
 	pcImpl->Resize(nInSize);
 
@@ -1125,8 +1158,8 @@ void H3DF::SelectionResults::SetSize(size_t nInSize)
 // 들어오는 SelectionResults 값을 추가시킨다. 
 bool H3DF::SelectionResults::Union(SelectionResults const & cInThat)
 {
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
-	SelectionResultsImpl * pcInThatImpl = (SelectionResultsImpl *)cInThat.m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
+	auto pcInThatImpl = static_cast<SelectionResultsImpl *>(cInThat.m_pcImpl.get());
 
 	if (nullptr == pcImpl || nullptr == pcInThatImpl) {
 		return false;
@@ -1164,7 +1197,7 @@ bool H3DF::SelectionResults::Union(SelectionResults const & cInThat)
 
 void H3DF::SelectionResults::LeaveType(DWORD nType)
 {
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
 	for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
 		Key cItemKey;
 		if (true == pcItemIter->ShowSelectedItem(cItemKey)) {
@@ -1186,7 +1219,7 @@ void H3DF::SelectionResults::LeaveType(DWORD nType)
 
 void H3DF::SelectionResults::RemoveType(DWORD nType)
 {
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
 	for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
 		Key cItemKey;
 		if (true == pcItemIter->ShowSelectedItem(cItemKey)) {
@@ -1208,13 +1241,13 @@ void H3DF::SelectionResults::RemoveType(DWORD nType)
 // Selection Item point의 Z값을 이용해서 정렬한다.
 bool H3DF::SelectionResults::Sort()
 {
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
 	return pcImpl->Sort();
 }
 
 bool H3DF::SelectionResults::IsExist(SelectionItem & cInItem)
 {
-	SelectionResultsImpl * pcImpl = (SelectionResultsImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
 	for (auto pcItemIter = pcImpl->Begin(); pcItemIter != pcImpl->End();) {
 
 		if (*pcItemIter == cInItem) {
@@ -1230,15 +1263,26 @@ bool H3DF::SelectionResults::IsExist(SelectionItem & cInItem)
 //== SelectionControl Class ========================================================================
 H3DF::SelectionControl::SelectionControl(WindowKey const & cInWindow)
 {
-	SelectionControlImpl * pcImpl = new SelectionControlImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<SelectionControlImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcImpl = static_cast<SelectionControlImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
 	pcImpl->m_cWindow = cInWindow;
-	m_pcImpl = pcImpl;
 }
 
 H3DF::SelectionControl::SelectionControl(SelectionControl const & cInThat)
 {
-	m_pcImpl = new SelectionControlImpl();
-	Set(cInThat);
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 H3DF::SelectionControl::SelectionControl() {}
@@ -1247,23 +1291,22 @@ H3DF::SelectionControl::~SelectionControl()
 {
 }
 
-void H3DF::SelectionControl::Set(SelectionControl const & cInThat)
-{
-	SelectionControlImpl * pcImpl = (SelectionControlImpl *)m_pcImpl;
-	SelectionControlImpl * pcInThatImpl = (SelectionControlImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
-}
-
 SelectionControl & H3DF::SelectionControl::operator =(SelectionControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 // 1. 주어진 Point와 Selection Option을 이용해서 선택 작업을 수행하고, 선택된 요소를 SelectionResults에 저장한다.
 size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, SelectionOptionsKit const & cInOptions, SelectionResults & cOutResults) const
 {
-	SelectionControlImpl * pcSelCtrlImpl = (SelectionControlImpl *)m_pcImpl;
+	auto pcSelCtrlImpl = static_cast<SelectionControlImpl *>(m_pcImpl.get());
 
 	int	 nResult = 0;
 
@@ -1428,7 +1471,7 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, Selectio
 
 size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, SelectionResults & cOutResults) const
 {
-	SelectionControlImpl * pcImpl = (SelectionControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<SelectionControlImpl *>(m_pcImpl.get());
 
 	SelectionOptionsKit cOptions;
 	if(false == pcImpl->GetWindow().ShowSelectionOptions(cOptions)) {
@@ -1445,7 +1488,8 @@ size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, UINT con
 
 size_t H3DF::SelectionControl::SelectByPoint(Point const & cInLocation, UINT const nFlags, SelectionResults & cOutResults) const
 {
-	SelectionControlImpl * pcSelCtrlImpl = (SelectionControlImpl *)m_pcImpl;
+	auto pcSelCtrlImpl = static_cast<SelectionControlImpl *>(m_pcImpl.get());
+
 	SelectionOptionsKit cInOptions;
 
 	if (nullptr == pcSelCtrlImpl->m_pcSelectionSet) {

@@ -17,7 +17,8 @@ namespace H3DF
 		LineKit();
 		LineKit(LineKit const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::LineKit; };
+		static const H3DF::Type staticType = H3DF::Type::LineKit;
+		H3DF::Type ObjectType() const { return staticType; };
 
 		void Set(LineKit const & cInThat);
 		LineKit & operator = (LineKit const & cInThat);
@@ -42,7 +43,8 @@ namespace H3DF
 		explicit LineKey(Key const & cInKey);
 		LineKey(LineKey const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::LineKey; };
+		static const H3DF::Type staticType = H3DF::Type::LineKey;
+		H3DF::Type ObjectType() const { return staticType; };
 
 		void Set(LineKey const & cInThat);
 		LineKey & operator = (LineKey const & cInThat);

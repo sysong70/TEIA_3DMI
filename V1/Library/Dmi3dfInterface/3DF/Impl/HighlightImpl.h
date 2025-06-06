@@ -24,9 +24,13 @@ namespace H3DF
 	class HighlightOptionsKitImpl : public Impl
 	{
 	public:
-		HighlightOptionsKitImpl() { m_eType = H3DF::Type::HighlightOptionsKit; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<HighlightOptionsKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(HighlightOptionsKitImpl * pcInThat) {
+		void Copy(const HighlightOptionsKitImpl * pcInThat) {
 			m_strInStyleName = pcInThat->m_strInStyleName;
 			m_strInSecondaryStyleName = pcInThat->m_strInSecondaryStyleName;
 			m_nNotification = pcInThat->m_nNotification;
@@ -40,9 +44,15 @@ namespace H3DF
 	class HighlightControlImpl : public ControlImpl
 	{
 	public:
-		HighlightControlImpl(WindowKey const & cInWindow);
+		HighlightControlImpl(const WindowKey & cInWindow);
 
-		void Copy(HighlightControlImpl * pcInThat) {
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<HighlightControlImpl>(*m_pcWindow);
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy(const HighlightControlImpl * pcInThat) {
 			m_pcWindow = pcInThat->m_pcWindow;
 		}
 

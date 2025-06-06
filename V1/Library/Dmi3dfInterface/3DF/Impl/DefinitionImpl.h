@@ -9,12 +9,16 @@ namespace H3DF
 	class DefinitionImpl : public H3DF::Impl
 	{
 	public:
-		DefinitionImpl() { m_eType = H3DF::Type::Definition; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<DefinitionImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
 		HC_KEY const KeyValue() const;
 		void SetKeyValue(HC_KEY nInKey);
 
-		void Set(DefinitionImpl * pcInThat)
+		void Copy(const DefinitionImpl * pcInThat)
 		{
 			m_nKey = pcInThat->KeyValue();
 			m_cOwnerPortfolio = pcInThat->m_cOwnerPortfolio;

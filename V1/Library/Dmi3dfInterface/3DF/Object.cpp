@@ -5,51 +5,35 @@
 USING_3DF_NAMESPACE
 
 Object::Object()
+	: m_pcImpl(nullptr)
 {
 }
 
 Object::Object(Object const & cInThat)
 {
-	m_pcImpl = cInThat.m_pcImpl;
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
-Object::~Object()
-{
-	if (nullptr != m_pcImpl) {
-		
-		delete m_pcImpl;  
-		m_pcImpl = nullptr;
-	}
-}
-
-void Object::Set(Object const & cInThat)
-{
-
-}
+Object::~Object() = default;
 
 Object const & Object::operator = (Object const & cInThat)
 {
-	Set(cInThat);
-	return *this;
-}
-
-Object::Object(Object && cInThat) noexcept 
-{
-	m_pcImpl = cInThat.m_pcImpl;
-	cInThat.m_pcImpl = nullptr;
-}
-
-Object & Object::operator = (Object && cInThat) noexcept 
-{
-	m_pcImpl = cInThat.m_pcImpl;
-	cInThat.m_pcImpl = nullptr;
+	if (this != &cInThat) {
+		m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	}
 
 	return *this;
 }
 
+Object::Object(Object && cInThat) noexcept = default;
+
+Object & Object::operator=(Object && cInThat) noexcept = default;
+
+
+// this는 선언된 class를 가르치므로 SegmentKey라면 Type을 staticType이 아닌 Type::SegmentKey를 반환함.
 H3DF::Type Object::Type() const
 {
-	return m_pcImpl->Type();
+	return this->ObjectType();
 }
 
 bool Object::HasType(H3DF::Type eInMask) const

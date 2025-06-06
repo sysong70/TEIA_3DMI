@@ -12,6 +12,7 @@
 #include <3DF/Image.h>
 #include <3DF/Texture.h>
 #include <3DF/Portfolio.h>
+#include <3DF/TextAttribute.h>
 #include <3DF/3DF.Utility.h>
 
 #include "Signal.Connector.h"
@@ -704,6 +705,11 @@ void KERNEL::Session::TestCommand(int nId)
 
 			// define the rectangle_shape in our portfolio and add to the rectangle segment
 			portfolio.DefineShape("anchored_leader_line_rectangle", rectangle_shape);
+
+			rectangleSegmentKey.GetTextAttributeControl().SetBackground("anchored_leader_line_rectangle");
+
+			//H3DF::TextKey rectangle_text = rectangleSegmentKey.InsertText(H3DF::Point(2, -2, 0), "Vertex is 0.5, 0.5, -0.5\nin world space.");
+
 		} break;
 
 		default:

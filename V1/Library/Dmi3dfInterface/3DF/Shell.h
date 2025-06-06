@@ -15,7 +15,8 @@ namespace H3DF
 		ShellKit();
 		virtual ~ShellKit();
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::ShellKit; };
+		static const H3DF::Type staticType = H3DF::Type::ShellKit;
+		H3DF::Type ObjectType() const { return staticType; };
 
 		size_t GetPointCount() const;
 		size_t GetFacelistCount() const;
@@ -72,7 +73,8 @@ namespace H3DF
 		explicit ShellKey(Key const & cInKey);
 		ShellKey(ShellKey const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::ShellKey; };
+		static const H3DF::Type staticType = H3DF::Type::ShellKey;
+		H3DF::Type ObjectType() const { return staticType; };
 
 		void Set(ShellKey const & cInThat);
 		ShellKey & operator = (ShellKey const & cInThat);

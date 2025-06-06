@@ -131,7 +131,6 @@ namespace H3DF
 		Component();
 		Component(Component const & cInThat);
 
-		void Set(Component const & cInThat);
 		Component & operator = (Component const & cInThat);
 
         bool Equals(Component const & cInThat) const;

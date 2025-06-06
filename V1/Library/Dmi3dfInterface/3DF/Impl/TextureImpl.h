@@ -12,9 +12,13 @@ namespace H3DF
 	class TextureOptionsKitImpl : public Impl
 	{
 	public:
-		TextureOptionsKitImpl() { m_eType = H3DF::Type::TextureOptionsKit; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<TextureOptionsKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(TextureOptionsKitImpl * pcInThat) {
+		void Copy(const TextureOptionsKitImpl * pcInThat) {
 			m_eParameterization = pcInThat->m_eParameterization;
 		}
 
@@ -56,9 +60,13 @@ namespace H3DF
 	class TextureDefinitionImpl : public DefinitionImpl
 	{
 	public:
-		TextureDefinitionImpl() { m_eType = H3DF::Type::TextureDefinition; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<TextureDefinitionImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Set(TextureDefinitionImpl * pcInThat) {
+		void Copy(const TextureDefinitionImpl * pcInThat) {
 			m_strName = pcInThat->m_strName;
 		}
 

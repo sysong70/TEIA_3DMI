@@ -19,9 +19,13 @@ namespace H3DF
 	class BoundingKitImpl : public Impl
 	{
 	public:
-		BoundingKitImpl() { m_eType = H3DF::Type::BoundingKit; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<BoundingKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(BoundingKitImpl * pcInThat)
+		void Copy(const BoundingKitImpl * pcInThat)
 		{
 			m_cCuboid = pcInThat->m_cCuboid;
 
@@ -39,38 +43,38 @@ namespace H3DF
 
 H3DF::BoundingKit::BoundingKit()
 {
-	m_pcImpl = new BoundingKitImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<BoundingKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::BoundingKit::BoundingKit(BoundingKit const & cInThat)
 {
-	m_pcImpl = new BoundingKitImpl();
-	DEBUG_VALID(m_pcImpl);
+	if (staticType != Type()) {
+		return;
+	}
 
-	Set(cInThat);
-}
-
-void H3DF::BoundingKit::Set(BoundingKit const & cInThat)
-{
-	BoundingKitImpl * pcImpl = (BoundingKitImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
-	BoundingKitImpl * pcInThatImpl = (BoundingKitImpl *)cInThat.m_pcImpl;
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 BoundingKit & H3DF::BoundingKit::operator = (BoundingKit const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 bool H3DF::BoundingKit::Empty() const
 {
-	BoundingKitImpl * pcImpl = (BoundingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<BoundingKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (false == pcImpl->m_cCuboid.IsValid() && false == pcImpl->m_cSphere.IsValid()) {
@@ -83,10 +87,10 @@ bool H3DF::BoundingKit::Empty() const
 
 bool H3DF::BoundingKit::Equals(BoundingKit const & cInKit) const
 {
-	BoundingKitImpl * pcImpl = (BoundingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<BoundingKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
-	BoundingKitImpl * pcInThatImpl = (BoundingKitImpl *)cInKit.m_pcImpl;
+	auto pcInThatImpl = static_cast<const BoundingKitImpl *>(cInKit.GetImpl());
 	DEBUG_VALID(pcInThatImpl);
 
 	return pcImpl->m_cCuboid == pcInThatImpl->m_cCuboid;
@@ -104,7 +108,7 @@ bool H3DF::BoundingKit::operator != (BoundingKit const & cInKit) const
 
 BoundingKit & H3DF::BoundingKit::SetVolume(SimpleSphere const & cInSphere)
 {
-	BoundingKitImpl * pcImpl = (BoundingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<BoundingKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cSphere = cInSphere;
@@ -114,7 +118,7 @@ BoundingKit & H3DF::BoundingKit::SetVolume(SimpleSphere const & cInSphere)
 
 BoundingKit & H3DF::BoundingKit::SetVolume(SimpleCuboid const & cInCuboid)
 {
-	BoundingKitImpl * pcImpl = (BoundingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<BoundingKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cCuboid = cInCuboid;
@@ -124,7 +128,7 @@ BoundingKit & H3DF::BoundingKit::SetVolume(SimpleCuboid const & cInCuboid)
 
 BoundingKit & H3DF::BoundingKit::SetExclusion(bool bInExclude)
 { 
-	BoundingKitImpl * pcImpl = (BoundingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<BoundingKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bExclude = bInExclude;
@@ -135,7 +139,7 @@ BoundingKit & H3DF::BoundingKit::SetExclusion(bool bInExclude)
 
 BoundingKit & H3DF::BoundingKit::UnsetVolume()
 {
-	BoundingKitImpl * pcImpl = (BoundingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<BoundingKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cCuboid.Invalidate();
@@ -146,7 +150,7 @@ BoundingKit & H3DF::BoundingKit::UnsetVolume()
 
 BoundingKit & H3DF::BoundingKit::UnsetExclusion()
 {
-	BoundingKitImpl * pcImpl = (BoundingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<BoundingKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bExclude = false;
@@ -157,7 +161,7 @@ BoundingKit & H3DF::BoundingKit::UnsetExclusion()
 
 BoundingKit & H3DF::BoundingKit::UnsetEverything()
 {
-	BoundingKitImpl * pcImpl = (BoundingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<BoundingKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cCuboid.Invalidate();
@@ -169,7 +173,7 @@ BoundingKit & H3DF::BoundingKit::UnsetEverything()
 
 bool H3DF::BoundingKit::ShowVolume(SimpleSphere & cOutSphere, SimpleCuboid & cOutCuboid) const
 {
-	BoundingKitImpl * pcImpl = (BoundingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<BoundingKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (true == Empty()) {
@@ -188,7 +192,7 @@ bool H3DF::BoundingKit::ShowVolume(SimpleSphere & cOutSphere, SimpleCuboid & cOu
 
 bool H3DF::BoundingKit::ShowExclusion(bool & bOutEexclusion) const
 {
-	BoundingKitImpl * pcImpl = (BoundingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<BoundingKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (false == pcImpl->m_bExcludeValid) {
@@ -206,9 +210,13 @@ namespace H3DF
 	class BoundingControlImpl : public ControlImpl
 	{
 	public:
-		BoundingControlImpl() { m_eType = H3DF::Type::BoundingControl; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<BoundingControlImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(BoundingControlImpl * pcInThat) {
+		void Copy(const BoundingControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
 
@@ -231,38 +239,42 @@ BaseView * BoundingControlImpl::GetBaseView()
 
 H3DF::BoundingControl::BoundingControl(SegmentKey & cInSegmentKey)
 {
-	BoundingControlImpl * pcImpl = new BoundingControlImpl();
-	pcImpl->m_cOverrideKey = cInSegmentKey;
+	if (staticType != Type()) {
+		return;
+	}
 
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<BoundingControlImpl>();
+	DEBUG_VALID(m_pcImpl);
+	auto pcImpl = dynamic_cast<BoundingControlImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_cOverrideKey = cInSegmentKey;
 }
 
 H3DF::BoundingControl::BoundingControl(BoundingControl const & cInThat)
 {
-	m_pcImpl = new BoundingControlImpl();
-	Set(cInThat);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void H3DF::BoundingControl::Set(BoundingControl const & cInThat)
-{
-	BoundingControlImpl * pcImpl = (BoundingControlImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
-	BoundingControlImpl * pcInThatImpl = (BoundingControlImpl *)cInThat.m_pcImpl;
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 BoundingControl & H3DF::BoundingControl::operator = (BoundingControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 BoundingControl & H3DF::BoundingControl::SetExclusion(bool bInExclusion)
 {
-	BoundingControlImpl * pcImpl = (BoundingControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<BoundingControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -282,7 +294,7 @@ BoundingControl & H3DF::BoundingControl::SetExclusion(bool bInExclusion)
 
 BoundingControl & H3DF::BoundingControl::UnsetExclusion()
 {
-	BoundingControlImpl * pcImpl = (BoundingControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<BoundingControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -296,7 +308,7 @@ BoundingControl & H3DF::BoundingControl::UnsetExclusion()
 
 bool H3DF::BoundingControl::ShowExclusion(bool & bOutExclusion) const
 {
-	BoundingControlImpl * pcImpl = (BoundingControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<BoundingControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	bool bResult = false;

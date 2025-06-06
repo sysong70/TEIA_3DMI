@@ -64,7 +64,6 @@ namespace H3DF
 	class LineKey;
 	class PolygonKit;
 	class PolygonKey;
-	class BoundingKit;
 
 	class SelectabilityKit;
 	class SelectabilityControl;
@@ -141,6 +140,8 @@ namespace H3DF
 	class ColorInterpolationControl;
 
 	class CullingControl;
+
+	class TextAttributeControl;
 
 	class CADModel;
 	class Component;
@@ -928,20 +929,13 @@ namespace H3DF
 		NotSet
 	};
 
-	class API_3DF Impl
+	class Impl
 	{
 	public:
 		Impl() = default;
 		virtual ~Impl() = default;
-
-		H3DF::Type Type() const;
-		void SetType(H3DF::Type eType);
-
-		void SetImpl(Object * pcObject, Impl * pcImpl);
-
-		void Set(Impl * pcInThat);
-
-	protected:
-		H3DF::Type m_eType = H3DF::Type::None;
+		
+		// 순수 가상 함수(pure virtual function)임. 그래서 추상 class로 취급함.
+		virtual std::unique_ptr<Impl> Clone() const  = 0;
 	};
 }

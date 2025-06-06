@@ -42,7 +42,7 @@ H3DF::ComponentImpl::~ComponentImpl()
 	}
 }
 
-void H3DF::ComponentImpl::Copy(ComponentImpl * pcInThat)
+void H3DF::ComponentImpl::Copy(const ComponentImpl * pcInThat)
 {
 	m_nSegmentKey = pcInThat->m_nSegmentKey;
 	m_nIncludeKey = pcInThat->m_nIncludeKey;

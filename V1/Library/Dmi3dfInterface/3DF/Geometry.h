@@ -12,7 +12,8 @@ namespace H3DF
 		GeometryKey();
 		GeometryKey(HC_KEY nInKey);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::GeometryKey; };
+		static const H3DF::Type staticType = H3DF::Type::GeometryKey;
+		H3DF::Type ObjectType() const { return staticType; };
 
 		virtual bool NearPoint(WindowKey const & cInWindow, const MatrixKit & cModelingMatrix, const WindowPoint & cInPoint, WorldPoint & cOutPoint) const;
 		virtual bool DistanceToPoint(const WorldPoint & cInPoint, double & nOutDistance) const;

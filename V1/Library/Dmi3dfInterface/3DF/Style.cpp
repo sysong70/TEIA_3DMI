@@ -20,44 +20,50 @@ using namespace H3DF;
 
 H3DF::NamedStyleDefinition::NamedStyleDefinition()
 {
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<DefinitionImpl>();
 }
 
-H3DF::NamedStyleDefinition::NamedStyleDefinition(HC_KEY nInKey) : Definition(nInKey)
+H3DF::NamedStyleDefinition::NamedStyleDefinition(HC_KEY nInKey)
 {
+	if (staticType != Type()) {
+		return;
+	}
+
+	// PolygonShapeElementImpl 생성
+	m_pcImpl = std::make_unique<DefinitionImpl>();
+	auto pcImpl = static_cast<DefinitionImpl *>(m_pcImpl.get());
+
+	pcImpl->SetKeyValue(nInKey);
 }
 
 H3DF::NamedStyleDefinition::NamedStyleDefinition(NamedStyleDefinition const & cInThat)
 {
-	Set(cInThat);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void H3DF::NamedStyleDefinition::Set(NamedStyleDefinition const & cInThat)
-{
-	auto * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	auto * pcInThatImpl = dynamic_cast<DefinitionImpl *>(cInThat.m_pcImpl);
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->SetKeyValue(pcInThatImpl->KeyValue());
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 NamedStyleDefinition & H3DF::NamedStyleDefinition::operator = (NamedStyleDefinition const & cInThat)
 {
-	auto * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	auto * pcInThatImpl = dynamic_cast<DefinitionImpl *>(cInThat.m_pcImpl);
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->SetKeyValue(pcInThatImpl->KeyValue());
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
 
 	return *this;
 }
 
 SegmentKey H3DF::NamedStyleDefinition::GetSource() const
 {
-	auto * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<DefinitionImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	HC_KEY nKey = pcImpl->KeyValue();
@@ -68,7 +74,7 @@ SegmentKey H3DF::NamedStyleDefinition::GetSource() const
 
 PortfolioKey H3DF::NamedStyleDefinition::Owner() const
 {
-	auto * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<DefinitionImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKey cSegment(pcImpl->KeyValue());

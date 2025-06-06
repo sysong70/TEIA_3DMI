@@ -9,7 +9,7 @@
 
 using namespace H3DF;
 
-void H3DF::SegmentKeyImpl::Copy(SegmentKeyImpl * pcInThat)
+void H3DF::SegmentKeyImpl::Copy(const SegmentKeyImpl * pcInThat)
 {
 	KeyImpl::Copy(pcInThat);
 
@@ -18,7 +18,7 @@ void H3DF::SegmentKeyImpl::Copy(SegmentKeyImpl * pcInThat)
 	m_pcWindowKey = pcInThat->m_pcWindowKey;
 
 	if (nullptr != pcInThat->m_pcBoundingKit) {
-		m_pcBoundingKit = new BoundingKit(*pcInThat->m_pcBoundingKit);
+		m_pcBoundingKit = std::make_unique<BoundingKit>(*pcInThat->m_pcBoundingKit);
 	}
 }
 

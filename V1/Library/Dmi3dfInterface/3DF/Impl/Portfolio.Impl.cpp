@@ -103,7 +103,7 @@ bool H3DF::PortfolioKeyImpl::CreateShapeData(ShapeElementArray & arInShapeElemen
 			}
 
 			// Format Code Check, 각 ShapePoint의 Margin의 최대 갯수를 파악해서 Format Code를 설정한다.
-			int nMaxMarginCount = 0;
+			size_t nMaxMarginCount = 0;
 			for (auto & cShapePoint : arShapePoints) {
 				FloatArray afMargins;
 				if (true == cShapePoint.x.ShowMargins(afMargins)) {

@@ -13,7 +13,7 @@ namespace H3DF
 {
 	namespace Operator
 	{
-		class API_3DF OperatorImpl : public H3DF::Impl
+		class OperatorImpl : public H3DF::Impl
 		{
 		public:
 			OperatorImpl() = default;

@@ -23,6 +23,7 @@
 #include "ColorInterpolation.h"
 #include "Culling.h"
 #include "Portfolio.h"
+#include "TextAttribute.h"
 
 #include "Camera.h"
 
@@ -33,13 +34,21 @@
 
 using namespace H3DF;
 
-H3DF::SegmentKey::SegmentKey() : Key(INVALID_KEY)
+H3DF::SegmentKey::SegmentKey()
 {
-	m_pcImpl = new SegmentKeyImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<SegmentKeyImpl>();
 }
 
-H3DF::SegmentKey::SegmentKey(CStringA strInName) : Key(INVALID_KEY)
+H3DF::SegmentKey::SegmentKey(CStringA strInName)
 {
+	if (staticType != Type()) {
+		return;
+	}
+
 	HC_KEY nKey = INVALID_KEY;
 
 	if(false == strInName.IsEmpty()) {
@@ -52,34 +61,36 @@ H3DF::SegmentKey::SegmentKey(CStringA strInName) : Key(INVALID_KEY)
 	if (INVALID_KEY == nKey) {
 		DEBUG_STOP;
 	}
-
-	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
-	pcImpl->SetKeyValue(nKey);
 	
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<SegmentKeyImpl>();
+	static_cast<SegmentKeyImpl *>(m_pcImpl.get())->SetKeyValue(nKey);
 }
 
-H3DF::SegmentKey::SegmentKey(HC_KEY nInKey) : Key(INVALID_KEY)
+H3DF::SegmentKey::SegmentKey(HC_KEY nInKey)
 {
-	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
-	pcImpl->SetKeyValue(nInKey);
+	if (staticType != Type()) {
+		return;
+	}
 
-	m_pcImpl = pcImpl;
+	if (INVALID_KEY == nInKey) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<SegmentKeyImpl>();
+	static_cast<SegmentKeyImpl *>(m_pcImpl.get())->SetKeyValue(nInKey);
 }
 
-H3DF::SegmentKey::SegmentKey(SegmentKey const & cInThat) : Key(INVALID_KEY)
+H3DF::SegmentKey::SegmentKey(SegmentKey const & cInThat)
 {
-	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
-	m_pcImpl = pcImpl;
+	if (staticType != Type()) {
+		return;
+	}
 
-	Set(cInThat);
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::SegmentKey::~SegmentKey()
 {
-	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
 /*
 	if (nullptr != pcImpl->m_pcBoundingKit) {
 		delete pcImpl->m_pcBoundingKit;
@@ -88,22 +99,14 @@ H3DF::SegmentKey::~SegmentKey()
 */
 }
 
-void H3DF::SegmentKey::Set(SegmentKey const & cInThat)
-{
-//	Key::Set(cInThat);
-
-	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
-	SegmentKeyImpl * pcInThatImpl = (SegmentKeyImpl *)cInThat.m_pcImpl;
-
-	pcImpl->Copy(pcInThatImpl);
-}
-
 SegmentKey & H3DF::SegmentKey::operator = (SegmentKey const & cInThat)
 {
-	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
-	SegmentKeyImpl * pcInThatImpl = (SegmentKeyImpl *)cInThat.m_pcImpl;
-
-	pcImpl->Copy(pcInThatImpl);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
 
 	return *this;
 }
@@ -112,16 +115,26 @@ SegmentKey & H3DF::SegmentKey::operator = (SegmentKey const & cInThat)
 
 SegmentKey & H3DF::SegmentKey::Open()
 {
-	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
-	pcImpl->Open();
+	auto pcImpl = dynamic_cast<SegmentKeyImpl *>(m_pcImpl.get());
+	if (nullptr != pcImpl) {
+		pcImpl->Open();
+	}
+	else {
+		DEBUG_STOP;
+	}
 
 	return *this;
 }
 
 SegmentKey & H3DF::SegmentKey::Close()
 {
-	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
-	pcImpl->Close();
+	auto pcImpl = dynamic_cast<SegmentKeyImpl *>(m_pcImpl.get());
+	if (nullptr != pcImpl) {
+		pcImpl->Close();
+	}
+	else {
+		DEBUG_STOP;
+	}
 
 	return *this;
 }
@@ -1095,12 +1108,12 @@ bool H3DF::SegmentKey::ShowModellingMatrix(MatrixKit & cOutKit) const
 //== Bounding 관련 함수 ==============================================================================
 SegmentKey & H3DF::SegmentKey::SetBounding(BoundingKit const & cInKit)
 {
-	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	auto pcImpl = dynamic_cast<SegmentKeyImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	// 정의된 BoundingKit이 없으면 새로 생성한다
 	if (nullptr == pcImpl->m_pcBoundingKit) {
-		pcImpl->m_pcBoundingKit = new BoundingKit();
+		pcImpl->m_pcBoundingKit = std::make_unique<BoundingKit>();
 	}
 
 	*pcImpl->m_pcBoundingKit = cInKit;
@@ -1119,12 +1132,11 @@ SegmentKey & H3DF::SegmentKey::SetBounding(BoundingKit const & cInKit)
 
 SegmentKey & H3DF::SegmentKey::UnsetBounding()
 {
-	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	auto pcImpl = dynamic_cast<SegmentKeyImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (nullptr != pcImpl->m_pcBoundingKit) {
-		delete pcImpl->m_pcBoundingKit;
-		pcImpl->m_pcBoundingKit = nullptr;
+		pcImpl->m_pcBoundingKit.reset();
 	}
 
 	return *this;
@@ -1132,12 +1144,12 @@ SegmentKey & H3DF::SegmentKey::UnsetBounding()
 
 bool H3DF::SegmentKey::ShowBounding(BoundingKit & cOutkit) const
 {
-	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	auto pcImpl = dynamic_cast<SegmentKeyImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	// 정의된 BoundingKit이 없으면 새로 생성한다
 	if (nullptr == pcImpl->m_pcBoundingKit) {
-		pcImpl->m_pcBoundingKit = new BoundingKit();
+		pcImpl->m_pcBoundingKit = std::make_unique<BoundingKit>();
 	}
 	
 	SimpleSphere cSphere;
@@ -1259,6 +1271,25 @@ SegmentKey & H3DF::SegmentKey::UnsetPriority()
 bool H3DF::SegmentKey::ShowPriority(int & nOutPriority) const\
 {
 	return (bool)HC_Show_Priority(KeyValue(), &nOutPriority);
+}
+
+//== Text 관련 함수 ===================================================================================
+// TextKey H3DF::SegmentKey::InsertText(Point const & cInPosition, CStringA strInText)
+// {
+// 
+// }
+
+//== TextAttribute 관련 함수 ========================================================================
+TextAttributeControl H3DF::SegmentKey::GetTextAttributeControl()
+{
+	TextAttributeControl cControl(*this);
+	return cControl;
+}
+
+TextAttributeControl const H3DF::SegmentKey::GetTextAttributeControl() const
+{
+	TextAttributeControl cControl(*(SegmentKey *) this);
+	return cControl;
 }
 
 //== User Data 관련 함수 =============================================================================

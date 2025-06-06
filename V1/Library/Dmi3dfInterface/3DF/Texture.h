@@ -13,12 +13,12 @@ namespace H3DF
         TextureOptionsKit();
         TextureOptionsKit(TextureOptionsKit const & cInKit);
 
-        H3DF::Type ObjectType() const override { return H3DF::Type::TextureOptionsKit; };
+		static const H3DF::Type staticType = H3DF::Type::TextureOptionsKit;
+		H3DF::Type ObjectType() const { return staticType; };
 
         TextureOptionsKit(TextureOptionsKit && cInThat) noexcept;
         TextureOptionsKit & operator = (TextureOptionsKit && cInThat) noexcept;
 
-		void Set(TextureOptionsKit const & cInKit);
 		TextureOptionsKit const & operator = (TextureOptionsKit const & cInKit);
 
 		void Show(TextureOptionsKit & cOutKit) const;
@@ -50,12 +50,12 @@ namespace H3DF
         TextureDefinition(Definition const & cInThat);
         TextureDefinition(TextureDefinition const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::TextureDefinition; };
+		static const H3DF::Type staticType = H3DF::Type::TextureDefinition;
+		H3DF::Type ObjectType() const { return staticType; };
 
 		TextureDefinition(TextureDefinition && cInThat) noexcept;
 		TextureDefinition & operator = (TextureDefinition && cInThat) noexcept;
 
-		void Set(TextureDefinition const & cInKit);
 		TextureDefinition const & operator = (TextureDefinition const & cInKit);
     };
 }

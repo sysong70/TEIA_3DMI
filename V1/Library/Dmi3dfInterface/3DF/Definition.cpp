@@ -11,47 +11,34 @@ using namespace H3DF;
 
 H3DF::Definition::Definition()
 {
-	auto * pcImpl = new DefinitionImpl();
-	DEBUG_VALID(pcImpl);
+	if (staticType != Type()) {
+		return;
+	}
 
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<DefinitionImpl>();
 }
 
 H3DF::Definition::Definition(HC_KEY nInKey)
 {
+	if (staticType != Type()) {
+		return;
+	}
+
 	if (INVALID_KEY == nInKey) {
 		return;
 	}
 
-	auto * pcImpl = new DefinitionImpl();
-	DEBUG_VALID(pcImpl);
-
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<DefinitionImpl>();
+	static_cast<DefinitionImpl *>(m_pcImpl.get())->SetKeyValue(nInKey);
 }
 
 H3DF::Definition::Definition(Definition const & cInThat)
 {
-	DefinitionImpl * pcInThatImpl = dynamic_cast<DefinitionImpl *>(cInThat.m_pcImpl);
-	DEBUG_VALID(pcInThatImpl);
-	if (INVALID_KEY == pcInThatImpl->KeyValue()) {
+	if (staticType != Type()) {
 		return;
 	}
 
-	auto * pcImpl = new DefinitionImpl();
-	DEBUG_VALID(pcImpl);
-	m_pcImpl = pcImpl;
-
-	Set(cInThat);
-}
-
-void H3DF::Definition::Set(Definition const & cInThat)
-{
-	DefinitionImpl * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-	DefinitionImpl * pcInThatImpl = dynamic_cast<DefinitionImpl *>(cInThat.m_pcImpl);
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->Set(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::Definition::Definition(Definition && cInThat) noexcept :
@@ -65,13 +52,19 @@ Definition & H3DF::Definition::operator=(Definition && cInThat) noexcept
 
 Definition const & H3DF::Definition::operator = (Definition const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 PortfolioKey H3DF::Definition::Owner() const
 {
-	DefinitionImpl * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
+	auto pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cOwnerPortfolio;
@@ -83,7 +76,7 @@ PortfolioKey H3DF::Definition::Owner() const
 
 CStringA H3DF::Definition::Name() const
 {
-	DefinitionImpl * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
+	auto pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_strName;
@@ -95,9 +88,10 @@ CStringA H3DF::Definition::Name() const
 
 bool H3DF::Definition::operator == (Definition const & cInThat) const
 {
-	DefinitionImpl * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
+	auto pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
-	DefinitionImpl * pcInThatImpl = dynamic_cast<DefinitionImpl *>(cInThat.m_pcImpl);
+
+	auto pcInThatImpl = dynamic_cast<const DefinitionImpl *>(cInThat.GetImpl());
 	DEBUG_VALID(pcInThatImpl);
 
 	if (pcImpl->KeyValue() != pcInThatImpl->KeyValue()) {

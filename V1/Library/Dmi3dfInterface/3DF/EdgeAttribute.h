@@ -35,7 +35,8 @@ namespace H3DF
 		EdgeAttributeKit();
 		EdgeAttributeKit(EdgeAttributeKit const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::EdgeAttributeKit; };
+		static const H3DF::Type staticType = H3DF::Type::EdgeAttributeKit;
+		H3DF::Type ObjectType() const { return staticType; };
 
 		void Set(EdgeAttributeKit const & cInThat);
 		EdgeAttributeKit const & operator = (EdgeAttributeKit const & cInThat);
@@ -68,7 +69,8 @@ namespace H3DF
 		EdgeAttributeControl(SegmentKey & cInSegmentKey);
 		EdgeAttributeControl(EdgeAttributeControl const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::EdgeAttributeControl; };
+		static const H3DF::Type staticType = H3DF::Type::EdgeAttributeControl;
+		H3DF::Type ObjectType() const { return staticType; };
 
 		void Set(EdgeAttributeControl const & cInThat);
 		EdgeAttributeControl & operator = (EdgeAttributeControl const & cInThat);

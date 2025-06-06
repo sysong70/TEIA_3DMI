@@ -15,9 +15,13 @@ namespace H3DF
 	class CuttingSectionKitImpl : public Impl
 	{
 	public:
-		CuttingSectionKitImpl() { m_eType = Type::CuttingSectionKit; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<CuttingSectionKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(CuttingSectionKitImpl * that) {
+		void Copy(const CuttingSectionKitImpl * that) {
 			m_arPlanes = that->m_arPlanes;
 			m_eMode = that->m_eMode;
 			m_bModeSet = that->m_bModeSet;
@@ -37,30 +41,32 @@ namespace H3DF
 
 H3DF::CuttingSectionKit::CuttingSectionKit()
 {
-	m_pcImpl = new CuttingSectionKitImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<CuttingSectionKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::CuttingSectionKit::CuttingSectionKit(CuttingSectionKit const & cInKit)
 {
-	m_pcImpl = new CuttingSectionKitImpl();
-	DEBUG_VALID(m_pcImpl);
-	Set(cInKit);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void H3DF::CuttingSectionKit::Set(CuttingSectionKit const & cInThat)
-{
-	CuttingSectionKitImpl * pcImpl = (CuttingSectionKitImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-	CuttingSectionKitImpl * pcInThatImpl = (CuttingSectionKitImpl *)cInThat.m_pcImpl;
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
 }
 
 CuttingSectionKit & H3DF::CuttingSectionKit::operator = (CuttingSectionKit const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -71,7 +77,7 @@ void H3DF::CuttingSectionKit::Show(CuttingSectionKit & cOutKit) const
 
 bool H3DF::CuttingSectionKit::Empty() const
 {
-	CuttingSectionKitImpl * pcImpl = (CuttingSectionKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CuttingSectionKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_arPlanes.clear();
@@ -81,9 +87,9 @@ bool H3DF::CuttingSectionKit::Empty() const
 
 bool H3DF::CuttingSectionKit::Equals(CuttingSectionKit const & cInKit) const
 {
-	CuttingSectionKitImpl * pcImpl = (CuttingSectionKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CuttingSectionKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
-	CuttingSectionKitImpl * pcInKitImpl = (CuttingSectionKitImpl *)cInKit.m_pcImpl;
+	auto pcInKitImpl = static_cast<CuttingSectionKitImpl *>(cInKit.m_pcImpl.get());
 	DEBUG_VALID(pcInKitImpl);
 
 	if (pcImpl->m_arPlanes.size() != pcInKitImpl->m_arPlanes.size()) {
@@ -111,7 +117,7 @@ bool H3DF::CuttingSectionKit::operator!=(CuttingSectionKit const & cInKit) const
 
 CuttingSectionKit & H3DF::CuttingSectionKit::SetPlanes(H3DF::Plane const & cInPlane)
 {
-	CuttingSectionKitImpl * pcImpl = (CuttingSectionKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CuttingSectionKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	// Clear the existing planes and add the new one.
@@ -124,7 +130,7 @@ CuttingSectionKit & H3DF::CuttingSectionKit::SetPlanes(H3DF::Plane const & cInPl
 // Sets multiple cutting planes for this CuttingSectionKit.
 CuttingSectionKit & H3DF::CuttingSectionKit::SetPlanes(H3DF::PlaneArray const & cInPlanes)
 {
-	CuttingSectionKitImpl * pcImpl = (CuttingSectionKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CuttingSectionKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_arPlanes.clear();
@@ -136,7 +142,7 @@ CuttingSectionKit & H3DF::CuttingSectionKit::SetPlanes(H3DF::PlaneArray const & 
 /*
 CuttingSectionKit & H3DF::CuttingSectionKit::SetVisualization(CuttingSection::Mode eInMode, RGBAColor const & cInColor, float fInScale)
 {
-	CuttingSectionKitImpl * pcImpl = (CuttingSectionKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CuttingSectionKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_eMode = eInMode;
@@ -154,7 +160,7 @@ CuttingSectionKit & H3DF::CuttingSectionKit::SetVisualization(CuttingSection::Mo
 
 CuttingSectionKit & H3DF::CuttingSectionKit::SetVisualization(RGBAColor const & cInColor)
 {
-	CuttingSectionKitImpl * pcImpl = (CuttingSectionKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CuttingSectionKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cColor = cInColor;
@@ -170,9 +176,13 @@ namespace H3DF
 	class CuttingSectionKeyImpl : public KeyImpl
 	{
 	public:
-		CuttingSectionKeyImpl() { m_eType = Type::CuttingSectionKey; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<CuttingSectionKeyImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(CuttingSectionKeyImpl * that) {
+		void Copy(const CuttingSectionKeyImpl * that) {
 			m_arPlanes = that->m_arPlanes;
 		}
 
@@ -181,45 +191,54 @@ namespace H3DF
 }
 
 
-H3DF::CuttingSectionKey::CuttingSectionKey() : GeometryKey(INVALID_KEY)
+H3DF::CuttingSectionKey::CuttingSectionKey()
 {
-	m_pcImpl = new CuttingSectionKeyImpl();
-	DEBUG_VALID(m_pcImpl);
-}
-
-H3DF::CuttingSectionKey::CuttingSectionKey(Key const & cInThat) : GeometryKey(INVALID_KEY)
-{
-	CuttingSectionKeyImpl * pcImpl = new CuttingSectionKeyImpl();
-	DEBUG_VALID(pcImpl);
-	m_pcImpl = pcImpl;
-
-	if (H3DF::Type::CuttingSectionKey != cInThat.ObjectType()) {
-		DEBUG_STOP;
+	if (staticType != Type()) {
 		return;
 	}
 
-	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInThat.GetImpl()));
+	m_pcImpl = std::make_unique<CuttingSectionKeyImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
-H3DF::CuttingSectionKey::CuttingSectionKey(CuttingSectionKey const & cInThat) : GeometryKey(INVALID_KEY)
+H3DF::CuttingSectionKey::CuttingSectionKey(Key const & cInThat)
 {
-	m_pcImpl = new CuttingSectionKeyImpl();
-	Set(cInThat);
+	// cInThat이 올바른 Impl(CuttingSectionKeyImpl)을 가지고 있으면 복제
+	if (cInThat.GetImpl()) {
+		// 만약 CuttingSectionKeyImpl이 KeyImpl에서 파생된 구조라면 dynamic_cast에 의해서 nullptr이 아닌 정상적인 값이 넘어옴
+		auto pcSrcImpl = dynamic_cast<const CuttingSectionKeyImpl *>(cInThat.GetImpl());
+		if (nullptr != pcSrcImpl) {
+			m_pcImpl = pcSrcImpl->Clone();
+		}
+		else {
+			// 타입이 다를 경우 예외 처리 또는 방어적 초기화
+			m_pcImpl = std::make_unique<CuttingSectionKeyImpl>();
+			static_cast<CuttingSectionKeyImpl *>(m_pcImpl.get())->Copy((CuttingSectionKeyImpl *) (cInThat.GetImpl()));
+		}
+	}
+	else {
+		m_pcImpl = std::make_unique<CuttingSectionKeyImpl>();
+		static_cast<CuttingSectionKeyImpl *>(m_pcImpl.get())->Copy((CuttingSectionKeyImpl *) (cInThat.GetImpl()));
+	}
 }
 
-void H3DF::CuttingSectionKey::Set(CuttingSectionKey const & cInThat)
+H3DF::CuttingSectionKey::CuttingSectionKey(CuttingSectionKey const & cInThat)
 {
-	CuttingSectionKeyImpl * pcImpl = (CuttingSectionKeyImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-	CuttingSectionKeyImpl * pcInThatImpl = (CuttingSectionKeyImpl *)cInThat.m_pcImpl;
-	DEBUG_VALID(pcInThatImpl);
+	if (staticType != Type()) {
+		return;
+	}
 
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 CuttingSectionKey & H3DF::CuttingSectionKey::operator = (CuttingSectionKey const & cInThat)
 {
-	Key::Set(cInThat);
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }

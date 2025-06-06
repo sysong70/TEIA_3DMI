@@ -10,17 +10,16 @@ namespace H3DF
 	public:
 		Key();
 		Key(HC_KEY nInKey);
-		Key(Key const & cInThat);
+		Key(const Key & cInThat);
 
-		H3DF::Type Type() const override;
-		H3DF::Type ObjectType() const override { return H3DF::Type::Key; };
+		static const H3DF::Type staticType = H3DF::Type::Key;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(Key const & cInThat);
 		Key const & operator = (Key const & cInThat);
 
 		bool operator == (Key const & cInThat) const;
 
-		bool IsValidate();
+		bool IsValidate() const;
 
 		HC_KEY KeyValue() const;
 		void SetKeyValue(HC_KEY nInKey);

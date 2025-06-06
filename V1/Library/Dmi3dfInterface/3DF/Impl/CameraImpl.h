@@ -9,9 +9,13 @@ namespace H3DF
 	class CameraKitImpl : public Impl
 	{
 	public:
-		CameraKitImpl() { m_eType = H3DF::Type::CameraKit; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<CameraKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(CameraKitImpl * pcInThat)
+		void Copy(const CameraKitImpl * pcInThat)
 		{
 			m_cData.cUpVector = pcInThat->m_cData.cUpVector;
 			m_cData.bUpVectorFlag = pcInThat->m_cData.bUpVectorFlag;
@@ -43,9 +47,13 @@ namespace H3DF
 	class CameraControlImpl : public ControlImpl
 	{
 	public:
-		CameraControlImpl() { m_eType = H3DF::Type::CameraControl; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<CameraControlImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(CameraControlImpl * pcInThat) {
+		void Copy(const CameraControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
 	};

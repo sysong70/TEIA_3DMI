@@ -12,21 +12,27 @@ using namespace H3DF;
 
 //== GeometryKey 관련 함수 ===========================================================================
 
-H3DF::GeometryKey::GeometryKey() : Key(INVALID_KEY)
+H3DF::GeometryKey::GeometryKey()
 {
-	m_pcImpl = new GeometryKeyImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<GeometryKeyImpl>();
 }
 
-H3DF::GeometryKey::GeometryKey(HC_KEY nInKey) : Key(INVALID_KEY)
+H3DF::GeometryKey::GeometryKey(HC_KEY nInKey)
 {
+	if (staticType != Type()) {
+		return;
+	}
+
 	if (INVALID_KEY == nInKey) {
 		return;
 	}
 
-	GeometryKeyImpl * pcImpl = new GeometryKeyImpl();
-	pcImpl->SetKeyValue(nInKey);
-
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<GeometryKeyImpl>();
+	static_cast<GeometryKeyImpl *>(m_pcImpl.get())->SetKeyValue(nInKey);
 }
 
 bool H3DF::GeometryKey::NearPoint(WindowKey const & cInWindow, const MatrixKit & cModelingMatrix, const WindowPoint & cInPoint, WorldPoint & cOutPoint) const

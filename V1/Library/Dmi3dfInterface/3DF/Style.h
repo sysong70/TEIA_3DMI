@@ -38,7 +38,6 @@ namespace H3DF
 
 		H3DF::Type ObjectType() const { return H3DF::Type::NamedStyleDefinition; };
 
-		void Set(NamedStyleDefinition const & cInThat);
 		NamedStyleDefinition & operator = (NamedStyleDefinition const & cInThat);
 
 		SegmentKey GetSource() const;

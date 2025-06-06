@@ -13,10 +13,9 @@ namespace H3DF
 		DrawingAttributeKit();
 		DrawingAttributeKit(DrawingAttributeKit const & cInKit);
 
-		H3DF::Type Type() const override { return ObjectType(); }
-		H3DF::Type ObjectType() const override { return H3DF::Type::DrawingAttributeKit; };
+		static const H3DF::Type staticType = H3DF::Type::DrawingAttributeKit;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(DrawingAttributeKit const & cInKit);
 		DrawingAttributeKit const & operator = (DrawingAttributeKit const & cInKit);
 
 		void Show(DrawingAttributeKit & cOutKit) const;
@@ -47,10 +46,9 @@ namespace H3DF
 		DrawingAttributeControl(SegmentKey & cInSegmentKey);
 		DrawingAttributeControl(DrawingAttributeControl const & cInThat);
 
-		H3DF::Type Type() const override { return ObjectType(); }
-		H3DF::Type ObjectType() const override { return H3DF::Type::DrawingAttributeControl; };
+		static const H3DF::Type staticType = H3DF::Type::DrawingAttributeControl;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(DrawingAttributeControl const & cInThat);
 		DrawingAttributeControl & operator = (DrawingAttributeControl const & cInThat);
 
 		DrawingAttributeControl & SetDepthRange(float fInNear, float fInFar);

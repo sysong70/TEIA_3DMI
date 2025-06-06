@@ -18,37 +18,50 @@ using namespace H3DF;
 class VisualEffectsControlImpl : public ControlImpl
 {
 public:
-	VisualEffectsControlImpl() { m_eType = H3DF::Type::VisualEffectsControl; }
+	std::unique_ptr<Impl> Clone() const override {
+		auto pcClone = std::make_unique<VisualEffectsControlImpl>();
+		pcClone->Copy(this);
+		return pcClone;
+	}
 
-	void Copy(VisualEffectsControlImpl * pcInThat) {
+	void Copy(const VisualEffectsControlImpl * pcInThat) {
 		ControlImpl::Copy(pcInThat);
 	}
 };
 
-H3DF::VisualEffectsControl::VisualEffectsControl(SegmentKey & cInSegmentKey)
+H3DF::VisualEffectsControl::VisualEffectsControl(SegmentKey & cInSegment)
 {
-	VisualEffectsControlImpl * pcImpl = new VisualEffectsControlImpl();
-	pcImpl->m_cOverrideKey = cInSegmentKey;
+	if (staticType != Type()) {
+		return;
+	}
 
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<VisualEffectsControlImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_cOverrideKey = cInSegment;
 }
 
 H3DF::VisualEffectsControl::VisualEffectsControl(VisualEffectsControl const & cInThat)
 {
-	m_pcImpl = new VisualEffectsControlImpl();
-	Set(cInThat);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void H3DF::VisualEffectsControl::Set(VisualEffectsControl const & cInThat)
-{
-	VisualEffectsControlImpl * pcImpl = (VisualEffectsControlImpl *) m_pcImpl;
-	VisualEffectsControlImpl * pcInThatImpl = (VisualEffectsControlImpl *) cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 VisualEffectsControl & H3DF::VisualEffectsControl::operator = (VisualEffectsControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -56,7 +69,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::operator = (VisualEffectsCont
 
 VisualEffectsControl & H3DF::VisualEffectsControl::SetPostProcessEffectsEnabled(bool bInState)
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -73,7 +86,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetPostProcessEffectsEnabled(
 // param: in_state Whether ambient occlusion should be used.
 VisualEffectsControl & H3DF::VisualEffectsControl::SetAmbientOcclusionEnabled(bool bInState, float fStrength, bool bFast)
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	BaseView * pcBaseView = pcImpl->GetBaseView();
@@ -93,7 +106,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetAmbientOcclusionEnabled(bo
 
 VisualEffectsControl & H3DF::VisualEffectsControl::SetSilhouetteEdgesEnabled(bool bInState, float fTolerance, bool bHeavyExterior)
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	BaseView * pcBaseView = pcImpl->GetBaseView();
@@ -117,7 +130,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSilhouetteEdgesEnabled(boo
 
 VisualEffectsControl & H3DF::VisualEffectsControl::SetBloomEnabled(bool bInState, float fStrength, int nBlurring, int nShape)
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	BaseView * pcBaseView = pcImpl->GetBaseView();
@@ -141,7 +154,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetBloomEnabled(bool bInState
 // Manipulates the state of anti - aliasing(text and screen).
 VisualEffectsControl & H3DF::VisualEffectsControl::SetAntiAliasing(bool bInState)
 {
-	VisualEffectsControlImpl * pcImpl = (VisualEffectsControlImpl *) m_pcImpl;
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		CStringA strOption;
@@ -162,7 +175,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetAntiAliasing(bool bInState
 
 VisualEffectsControl & H3DF::VisualEffectsControl::SetTextAntiAliasing(bool bInState)
 {
-	VisualEffectsControlImpl * pcImpl = (VisualEffectsControlImpl *) m_pcImpl;
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		CString strOption;
@@ -183,7 +196,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetTextAntiAliasing(bool bInS
 
 VisualEffectsControl & H3DF::VisualEffectsControl::SetLineAntiAliasing(bool bInState)
 {
-	VisualEffectsControlImpl * pcImpl = (VisualEffectsControlImpl *) m_pcImpl;
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		CString strOption;
@@ -209,7 +222,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetLineAntiAliasing(bool bInS
 //	param: in_ignore_transparency Whether any segment-level transparency setting should be ignored when rendering the simple shadow.
 VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleShadow(bool bInState, H3DF::VisualEffects::ShadowMode eMode, UINT nInResolution, UINT nInBlurring, bool bInIgnoreTransparency)
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	BaseView * pcBaseView = pcImpl->GetBaseView();
@@ -252,7 +265,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleShadow(bool bInState
 // param: in_color The color of simple shadows.
 VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleShadowColor(RGBAColor const & cInColor)
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	BaseView * pcBaseView = pcImpl->GetBaseView();
@@ -283,7 +296,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleShadowColor(RGBAColo
 
 VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleReflection(bool bInState, float fInOpacity, unsigned int nInBlurring, bool bInFading, float fInAttenuationNearDistance, float fInAttenuationFarDistance)
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	BaseView * pcBaseView = pcImpl->GetBaseView();
@@ -311,7 +324,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleReflection(bool bInS
 
 VisualEffectsControl & H3DF::VisualEffectsControl::UnsetPostProcessEffectsEnabled()
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -324,7 +337,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::UnsetPostProcessEffectsEnable
 
 VisualEffectsControl & H3DF::VisualEffectsControl::UnsetAmbientOcclusionEnabled()
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	BaseView * pcBaseView = pcImpl->GetBaseView();
@@ -341,7 +354,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::UnsetAmbientOcclusionEnabled(
 
 VisualEffectsControl & H3DF::VisualEffectsControl::UnsetSilhouetteEdgesEnabled()
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	BaseView * pcBaseView = pcImpl->GetBaseView();
@@ -358,7 +371,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::UnsetSilhouetteEdgesEnabled()
 
 VisualEffectsControl & H3DF::VisualEffectsControl::UnsetBloomEnabled()
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	BaseView * pcBaseView = pcImpl->GetBaseView();
@@ -375,7 +388,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::UnsetBloomEnabled()
 
 VisualEffectsControl & H3DF::VisualEffectsControl::UnsetAntiAliasing()
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -387,7 +400,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::UnsetAntiAliasing()
 
 VisualEffectsControl & H3DF::VisualEffectsControl::UnsetSimpleShadow()
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	BaseView * pcBaseView = pcImpl->GetBaseView();
@@ -405,7 +418,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::UnsetSimpleShadow()
 //== Show Functions ================================================================================
 bool H3DF::VisualEffectsControl::ShowPostProcessEffectsEnabled(bool & bOutState) const
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	bool bResult = false;
@@ -438,7 +451,7 @@ bool H3DF::VisualEffectsControl::ShowPostProcessEffectsEnabled(bool & bOutState)
 
 bool H3DF::VisualEffectsControl::ShowAmbientOcclusionEnabled(bool & bOutState) const
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	BaseView * pcBaseView = pcImpl->GetBaseView();
@@ -465,7 +478,7 @@ bool H3DF::VisualEffectsControl::ShowAmbientOcclusionEnabled(bool & bOutState) c
 
 bool H3DF::VisualEffectsControl::ShowSilhouetteEdgesEnabled(bool & bOutState) const
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	BaseView * pcBaseView = pcImpl->GetBaseView();
@@ -496,7 +509,7 @@ bool H3DF::VisualEffectsControl::ShowSilhouetteEdgesEnabled(bool & bOutState) co
 
 bool H3DF::VisualEffectsControl::ShowBloomEnabled(bool & bOutState) const
 {
-	VisualEffectsControlImpl * pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl);
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	BaseView * pcBaseView = pcImpl->GetBaseView();
@@ -526,7 +539,7 @@ bool H3DF::VisualEffectsControl::ShowBloomEnabled(bool & bOutState) const
 }
 bool H3DF::VisualEffectsControl::ShowAntiAliasing(bool & bOutState) const
 {
-	VisualEffectsControlImpl * pcImpl = (VisualEffectsControlImpl *) m_pcImpl;
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 
 	bool bResult = false;
 
@@ -558,7 +571,7 @@ bool H3DF::VisualEffectsControl::ShowAntiAliasing(bool & bOutState) const
 
 bool H3DF::VisualEffectsControl::ShowTextAntiAliasing(bool & bOutState) const
 {
-	VisualEffectsControlImpl * pcImpl = (VisualEffectsControlImpl *) m_pcImpl;
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 
 	bool bResult = false;
 
@@ -594,7 +607,7 @@ bool H3DF::VisualEffectsControl::ShowTextAntiAliasing(bool & bOutState) const
 
 bool H3DF::VisualEffectsControl::ShowLineAntiAliasing(bool & bOutState) const
 {
-	VisualEffectsControlImpl * pcImpl = (VisualEffectsControlImpl *) m_pcImpl;
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 
 	bool bResult = false;
 
@@ -630,7 +643,7 @@ bool H3DF::VisualEffectsControl::ShowLineAntiAliasing(bool & bOutState) const
 
 bool H3DF::VisualEffectsControl::ShowSimpleShadowColor(RGBAColor & cOutColor) const
 {
-	VisualEffectsControlImpl * pcImpl = (VisualEffectsControlImpl *) m_pcImpl;
+	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	BaseView * pcBaseView = pcImpl->GetBaseView();

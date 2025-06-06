@@ -24,10 +24,7 @@ using namespace H3DF;
 H3DF::ModelImpl::ModelImpl()
 	: HBaseModel()
 {
-	m_cSegmentKey.Set(GetModelKey());
-
-	SegmentKeyImpl * pcImpl = static_cast<SegmentKeyImpl *>(m_cSegmentKey.GetImpl());
-	pcImpl->SetType(H3DF::Type::Model);
+	m_cSegmentKey.SetKeyValue(GetModelKey());
 
 	SetBRepGeometry(false);
 

@@ -64,12 +64,12 @@ namespace H3DF
         
         virtual ~ShapeElement();
 
-        H3DF::Type ObjectType() const override { return H3DF::Type::ShapeElement; }
+		static const H3DF::Type staticType = H3DF::Type::ShapeElement;
+		H3DF::Type ObjectType() const { return staticType; };
 
         ShapeElement(ShapeElement && cInThat) noexcept;
         ShapeElement & operator = (ShapeElement && cInThat) noexcept;
 
-		void Set(ShapeElement const & cInThat);
         ShapeElement const & operator = (ShapeElement const & cInThat);
 
         bool Equals(ShapeElement const & cInThat) const;
@@ -102,12 +102,12 @@ namespace H3DF
 
         ~PolygonShapeElement() noexcept override;
         
-        H3DF::Type ObjectType() const override { return H3DF::Type::PolygonShapeElement; }
+		static const H3DF::Type staticType = H3DF::Type::PolygonShapeElement;
+		H3DF::Type ObjectType() const { return staticType; };
         
         PolygonShapeElement(PolygonShapeElement && cInThat) noexcept;
         PolygonShapeElement& operator=(PolygonShapeElement&& cInThat) noexcept;
 
-		void Set(PolygonShapeElement const & cInThat);
         PolygonShapeElement const & operator = (PolygonShapeElement const & cInThat);
 
         PolygonShapeElement& SetPoints(ShapePointArray const& arInPoints);
@@ -125,12 +125,12 @@ namespace H3DF
 
         ~AnchorShapeElement();
 
-        H3DF::Type ObjectType() const override { return H3DF::Type::AnchorShapeElement; }
+		static const H3DF::Type staticType = H3DF::Type::AnchorShapeElement;
+		H3DF::Type ObjectType() const { return staticType; };
 
-        AnchorShapeElement(AnchorShapeElement && cInThat);
-        AnchorShapeElement & operator=(AnchorShapeElement && cInThat);
+        AnchorShapeElement(AnchorShapeElement && cInThat) noexcept;
+        AnchorShapeElement & operator=(AnchorShapeElement && cInThat) noexcept;
 
-		void Set(AnchorShapeElement const & cInThat);
         AnchorShapeElement const & operator = (AnchorShapeElement const & cInThat);
 
         AnchorShapeElement & SetAnchor(ShapePoint const & in_anchor);
@@ -157,12 +157,12 @@ namespace H3DF
 
 		virtual ~ShapeKit();
 
-        H3DF::Type ObjectType() const override { return H3DF::Type::ShapeKit; }
+		static const H3DF::Type staticType = H3DF::Type::ShapeKit;
+		H3DF::Type ObjectType() const { return staticType; };
 
 		ShapeKit(ShapeKit && cInThat) noexcept;
 		ShapeKit & operator=(ShapeKit && cInThat) noexcept;
 
-		void Set(ShapeKit const & cInKit);
 		ShapeKit & operator=(ShapeKit const & cInKit);
 
 		void Show(ShapeKit & cOutKit) const;
@@ -195,12 +195,12 @@ namespace H3DF
 
         ~ShapeDefinition();
 
-        H3DF::Type ObjectType() const override { return H3DF::Type::ShapeDefinition; }
+		static const H3DF::Type staticType = H3DF::Type::ShapeDefinition;
+		H3DF::Type ObjectType() const { return staticType; };
         
         ShapeDefinition(ShapeDefinition && cInThat) noexcept;
         ShapeDefinition & operator = (ShapeDefinition && cInThat) noexcept;
 
-		void Set(ShapeDefinition const & cInThat);
         ShapeDefinition & operator = (ShapeDefinition const & cInThat);
 
         void Set(ShapeKit const & cInKit);

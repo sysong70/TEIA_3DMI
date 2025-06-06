@@ -15,7 +15,14 @@ namespace H3DF
 	public:
 		CADModelImpl();
 		~CADModelImpl();
-		void Copy(CADModelImpl * pcInThat);
+
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<CADModelImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy(const CADModelImpl * pcInThat);
 
 		Component & ModelComponent();
 

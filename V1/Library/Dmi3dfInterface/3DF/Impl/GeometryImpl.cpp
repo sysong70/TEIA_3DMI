@@ -14,13 +14,17 @@ using namespace H3DF;
 
 //== GeometryKeyImpl 관련 함수 =======================================================================
 
-
-void H3DF::GeometryKeyImpl::Copy(GeometryKeyImpl * pcInThat)
+std::unique_ptr<Impl> GeometryKeyImpl::Clone() const
 {
-	KeyImpl::Copy(pcInThat);
+	// 새 객체 생성
+	auto pcClone = std::make_unique<GeometryKeyImpl>();
 
-	m_bOpen = pcInThat->m_bOpen;
-	m_bForcedOpen = pcInThat->m_bForcedOpen;
+	pcClone->SetKeyValue(KeyValue());
+
+	pcClone->m_bOpen = m_bOpen;
+	pcClone->m_bForcedOpen = m_bForcedOpen;
+
+	return pcClone;
 }
 
 // Local Open/Close Function 함수

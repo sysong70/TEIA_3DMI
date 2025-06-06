@@ -330,9 +330,6 @@
     <ClInclude Include="Sprocket\Impl\3DF.View.Impl.h">
       <Filter>Sprocket\Impl</Filter>
     </ClInclude>
-    <ClInclude Include="Sprocket\3DF.CADModel.h">
-      <Filter>Sprocket</Filter>
-    </ClInclude>
     <ClInclude Include="Sprocket\Impl\CADModelImpl.h">
       <Filter>Sprocket\Impl</Filter>
     </ClInclude>
@@ -398,6 +395,18 @@
     </ClInclude>
     <ClInclude Include="3DF\Impl\Portfolio.Impl.h">
       <Filter>3DF\Control\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\TextAttribute.h">
+      <Filter>3DF\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Impl\TextAttribute.Impl.h">
+      <Filter>3DF\Control\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Text.h">
+      <Filter>3DF\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprocket\3DF.CADModel.h">
+      <Filter>CADModel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -656,9 +665,6 @@
     <ClCompile Include="Sprocket\Impl\3DF.View.Impl.cpp">
       <Filter>Sprocket\Impl</Filter>
     </ClCompile>
-    <ClCompile Include="Sprocket\3DF.CADModel.cpp">
-      <Filter>Sprocket</Filter>
-    </ClCompile>
     <ClCompile Include="Sprocket\Impl\CADModelImpl.cpp">
       <Filter>Sprocket\Impl</Filter>
     </ClCompile>
@@ -724,6 +730,18 @@
     </ClCompile>
     <ClCompile Include="3DF\Impl\Portfolio.Impl.cpp">
       <Filter>3DF\Control\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\TextAttribute.cpp">
+      <Filter>3DF\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\TextAttribute.Impl.cpp">
+      <Filter>3DF\Control\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Text.cpp">
+      <Filter>3DF\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprocket\3DF.CADModel.cpp">
+      <Filter>CADModel</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

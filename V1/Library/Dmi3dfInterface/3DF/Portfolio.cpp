@@ -22,28 +22,73 @@ using namespace H3DF;
 
 H3DF::PortfolioKey::PortfolioKey()
 {
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<PortfolioKeyImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
-H3DF::PortfolioKey::PortfolioKey(HC_KEY nInKey) : Key(nInKey)
+H3DF::PortfolioKey::PortfolioKey(HC_KEY nInKey)
 {
+	if (staticType != Type()) {
+		return;
+	}
+
+	if (INVALID_KEY == nInKey) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<PortfolioKeyImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	static_cast<PortfolioKeyImpl *>(m_pcImpl.get())->SetKeyValue(nInKey);
 }
 
-H3DF::PortfolioKey::PortfolioKey(Key const & cInThat) : Key(cInThat) 
+H3DF::PortfolioKey::PortfolioKey(Key const & cInThat)
 {
+	if (staticType != Type()) {
+		return;
+	}
+
+	// cInThat이 올바른 Impl(PortfolioKeyImpl)을 가지고 있으면 복제
+	if (cInThat.GetImpl()) {
+		// 만약 PortfolioKeyImpl이 KeyImpl에서 파생된 구조라면 dynamic_cast에 의해서 nullptr이 아닌 정상적인 값이 넘어옴
+		auto pcSrcImpl = dynamic_cast<const PortfolioKeyImpl *>(cInThat.GetImpl());
+		if (nullptr != pcSrcImpl) {
+			m_pcImpl = pcSrcImpl->Clone();
+		}
+		else {
+			// 타입이 다를 경우 예외 처리 또는 방어적 초기화
+			m_pcImpl = std::make_unique<PortfolioKeyImpl>();
+			static_cast<PortfolioKeyImpl *>(m_pcImpl.get())->Copy((PortfolioKeyImpl *) (cInThat.GetImpl()));
+		}
+	}
+	else {
+		m_pcImpl = std::make_unique<PortfolioKeyImpl>();
+		static_cast<PortfolioKeyImpl *>(m_pcImpl.get())->Copy((PortfolioKeyImpl *) (cInThat.GetImpl()));
+	}
 }
 
-H3DF::PortfolioKey::PortfolioKey(PortfolioKey const & cInThat) : Key(cInThat)
+H3DF::PortfolioKey::PortfolioKey(PortfolioKey const & cInThat)
 {
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void H3DF::PortfolioKey::Set(PortfolioKey const & cInThat)
-{
-	Key::Set(cInThat);
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 PortfolioKey & H3DF::PortfolioKey::operator = (PortfolioKey const & cInThat)
 {
-	Key::Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -259,56 +304,59 @@ namespace H3DF
 	class PortfolioControlImpl : public ControlImpl
 	{
 	public:
-		PortfolioControlImpl();
-		virtual ~PortfolioControlImpl();
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<PortfolioControlImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(PortfolioControlImpl * pcInThat) {
+		void Copy(const PortfolioControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
 	};
 }
 
-H3DF::PortfolioControlImpl::PortfolioControlImpl()
-{
-	m_eType = H3DF::Type::PortfolioControl;
-}
-
-H3DF::PortfolioControlImpl::~PortfolioControlImpl()
-{
-}
-
 //== PortfolioControl 관련 함수 ======================================================================
 
-H3DF::PortfolioControl::PortfolioControl(SegmentKey & cInSegmentKey)
+H3DF::PortfolioControl::PortfolioControl(SegmentKey & cInSegment)
 {
-	PortfolioControlImpl * pcImpl = new PortfolioControlImpl();
-	pcImpl->m_cOverrideKey = cInSegmentKey;
+	if (staticType != Type()) {
+		return;
+	}
 
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<PortfolioControlImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+	
+	pcImpl->m_cOverrideKey = cInSegment;
 }
 
 H3DF::PortfolioControl::PortfolioControl(PortfolioControl const & cInThat)
 {
-	m_pcImpl = new PortfolioControlImpl();
-	Set(cInThat);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void H3DF::PortfolioControl::Set(PortfolioControl const & cInThat)
-{
-	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
-	PortfolioControlImpl * pcInThatImpl = (PortfolioControlImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 PortfolioControl & H3DF::PortfolioControl::operator = (PortfolioControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 size_t H3DF::PortfolioControl::GetCount() const
 {
-	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	PortfolioKeyArray arPortfolios;
@@ -319,7 +367,7 @@ size_t H3DF::PortfolioControl::GetCount() const
 
 PortfolioControl & H3DF::PortfolioControl::Push(PortfolioKey const & cInPortfolio)
 {
-	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -331,7 +379,7 @@ PortfolioControl & H3DF::PortfolioControl::Push(PortfolioKey const & cInPortfoli
 
 bool H3DF::PortfolioControl::Pop()
 {
-	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	PortfolioKeyArray arPortfolios;
@@ -351,7 +399,7 @@ bool H3DF::PortfolioControl::Pop()
 }
 bool H3DF::PortfolioControl::Pop(PortfolioKey & cOutPortfolio)
 {
-	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	PortfolioKeyArray arPortfolios;
@@ -373,7 +421,7 @@ bool H3DF::PortfolioControl::Pop(PortfolioKey & cOutPortfolio)
 
 PortfolioControl & H3DF::PortfolioControl::Set(PortfolioKey const & cInPortfolio)
 {
-	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	UnsetEverything();
@@ -387,7 +435,7 @@ PortfolioControl & H3DF::PortfolioControl::Set(PortfolioKey const & cInPortfolio
 
 PortfolioControl & H3DF::PortfolioControl::Set(PortfolioKeyArray const & cInPortfolios)
 {
-	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	UnsetEverything();
@@ -409,7 +457,7 @@ PortfolioControl & H3DF::PortfolioControl::UnsetTop()
 
 PortfolioControl & H3DF::PortfolioControl::UnsetEverything()
 {
-	PortfolioControlImpl * pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	PortfolioKeyArray arPortfolios;
@@ -440,7 +488,7 @@ bool H3DF::PortfolioControl::ShowTop(PortfolioKey & cOutPortfolio) const
 
 bool H3DF::PortfolioControl::Show(PortfolioKeyArray & cOutPortfolios) const
 {
-	PortfolioControlImpl * pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKey cModelSegment;

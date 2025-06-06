@@ -10,12 +10,16 @@ namespace H3DF
 {
 	class BaseView;
 
-	class API_3DF SegmentKeyImpl : public KeyImpl
+	class SegmentKeyImpl : public KeyImpl
 	{
 	public:
-		SegmentKeyImpl() { m_eType = H3DF::Type::SegmentKey; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<SegmentKeyImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(SegmentKeyImpl * pcInThat);
+		void Copy(const SegmentKeyImpl * pcInThat);
 
 		//== Segment 관련 함수 ===========================================================================
 
@@ -53,7 +57,7 @@ namespace H3DF
 
 		static bool FindUp(SegmentKey & cInSegment, H3DF::Type eInType, SegmentKey & cOutFindSegment);
 
-		BoundingKit * m_pcBoundingKit = nullptr;
+		std::unique_ptr<BoundingKit> m_pcBoundingKit;
 
 	private:
 		WindowKey * m_pcWindowKey = nullptr;

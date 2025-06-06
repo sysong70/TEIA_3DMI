@@ -19,39 +19,48 @@ namespace H3DF
 	class MarkerAttributeControlImpl : public ControlImpl
 	{
 	public:
-		MarkerAttributeControlImpl() { m_eType = H3DF::Type::MarkerAttributeControl; }
 
-		void Copy(MarkerAttributeControlImpl * pcInThat) {
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<MarkerAttributeControlImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy(const MarkerAttributeControlImpl * pcInThat) {
 		}
 	};
 }
 
-H3DF::MarkerAttributeControl::MarkerAttributeControl(SegmentKey cInSegmentKey)
+H3DF::MarkerAttributeControl::MarkerAttributeControl(SegmentKey cInSegment)
 {
-	MarkerAttributeControlImpl * pcImpl = new MarkerAttributeControlImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<MarkerAttributeControlImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcImpl = static_cast<MarkerAttributeControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
-	pcImpl->m_cOverrideKey = cInSegmentKey;
-
-	m_pcImpl = pcImpl;
-}
-
-void H3DF::MarkerAttributeControl::Set(MarkerAttributeControl const & cInThat)
-{
-	MarkerAttributeControlImpl * pcImpl = static_cast<MarkerAttributeControlImpl *>(m_pcImpl);
-	MarkerAttributeControlImpl * pcInThatImpl = static_cast<MarkerAttributeControlImpl *>(cInThat.m_pcImpl);
-	pcImpl->Copy(pcInThatImpl);
+	pcImpl->m_cOverrideKey = cInSegment;
 }
 
 MarkerAttributeControl const & H3DF::MarkerAttributeControl::operator = (MarkerAttributeControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 MarkerAttributeControl & H3DF::MarkerAttributeControl::SetSize(float fInSize, Marker::SizeUnits nInUnits)
 {
-	MarkerAttributeControlImpl * pcImpl = static_cast<MarkerAttributeControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<MarkerAttributeControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {

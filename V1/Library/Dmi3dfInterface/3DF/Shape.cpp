@@ -158,16 +158,21 @@ H3DF::ShapePoint::ShapePoint(float fInX, float fInY)
 
 H3DF::ShapeElement::ShapeElement()
 {
-	m_pcImpl = new ShapeElementImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<ShapeElementImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::ShapeElement::ShapeElement(ShapeElement const & cInThat)
 {
-	m_pcImpl = new ShapeElementImpl();
-	DEBUG_VALID(m_pcImpl);
+	if (staticType != Type()) {
+		return;
+	}
 
-	Set(cInThat);
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::ShapeElement::ShapeElement(ShapeElement && cInThat) noexcept :
@@ -187,29 +192,24 @@ H3DF::ShapeElement::~ShapeElement()
 
 }
 
-void H3DF::ShapeElement::Set(ShapeElement const & cInThat)
-{
-	ShapeElementImpl * pcImpl = static_cast<ShapeElementImpl *> (m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	ShapeElementImpl * pccInImpl = static_cast<ShapeElementImpl *>(cInThat.m_pcImpl);
-	DEBUG_VALID(pccInImpl);
-
-	pcImpl->Set(pccInImpl);
-}
-
 ShapeElement const & H3DF::ShapeElement::operator = (ShapeElement const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 bool H3DF::ShapeElement::Equals(ShapeElement const & cInThat) const
 {
-	ShapeElementImpl const * pcImpl = static_cast<ShapeElementImpl const *>(m_pcImpl);
+	auto pcImpl = static_cast<ShapeElementImpl const *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
-	ShapeElementImpl const * pccInImpl = static_cast<ShapeElementImpl const *>(cInThat.m_pcImpl);
+	auto pccInImpl = static_cast<ShapeElementImpl const *>(cInThat.GetImpl());
 	DEBUG_VALID(pccInImpl);
 
 	pcImpl->Equals(pccInImpl);
@@ -229,7 +229,7 @@ bool H3DF::ShapeElement::operator!=(ShapeElement const & cInThat) const
 
 ShapeElement & H3DF::ShapeElement::SetDisjointed(bool bInState)
 {
-	ShapeElementImpl * pcImpl = static_cast<ShapeElementImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ShapeElementImpl *> (m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bDisjointedFlag = bInState;
@@ -239,7 +239,7 @@ ShapeElement & H3DF::ShapeElement::SetDisjointed(bool bInState)
 
 bool H3DF::ShapeElement::ShowDisjointed(bool & bOutState) const
 {
-	ShapeElementImpl * pcImpl = static_cast<ShapeElementImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ShapeElementImpl *> (m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	bOutState = pcImpl->m_bDisjointedFlag;
@@ -249,7 +249,7 @@ bool H3DF::ShapeElement::ShowDisjointed(bool & bOutState) const
 
 ShapeElement & H3DF::ShapeElement::SetFill(bool bInState)
 {
-	ShapeElementImpl * pcImpl = static_cast<ShapeElementImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ShapeElementImpl *> (m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bFillFlag = bInState;
@@ -259,7 +259,7 @@ ShapeElement & H3DF::ShapeElement::SetFill(bool bInState)
 
 bool H3DF::ShapeElement::ShowFill(bool & bOutState) const
 {
-	ShapeElementImpl * pcImpl = static_cast<ShapeElementImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ShapeElementImpl *> (m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	bOutState = pcImpl->m_bFillFlag;
@@ -271,39 +271,61 @@ bool H3DF::ShapeElement::ShowFill(bool & bOutState) const
 
 H3DF::PolygonShapeElement::PolygonShapeElement()
 {
-	m_pcImpl = new PolygonShapeElementImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<PolygonShapeElementImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::PolygonShapeElement::PolygonShapeElement(ShapeElement const & cInThat)
 {
-	m_pcImpl = new PolygonShapeElementImpl();
-	DEBUG_VALID(m_pcImpl);
+	if (staticType != Type()) {
+		return;
+	}
 
-	ShapeElement::Set(cInThat);
+	// PolygonShapeElementImpl 생성
+	m_pcImpl = std::make_unique<PolygonShapeElementImpl>();
+	auto pcImpl = static_cast<PolygonShapeElementImpl *>(m_pcImpl.get());
+
+	auto pcInThatImpl = static_cast<const ShapeElementImpl *>(cInThat.GetImpl());
+
+	if (nullptr != pcImpl && nullptr != pcInThatImpl) {
+		pcImpl->ShapeElementImpl::Copy(pcInThatImpl);
+	}
+	else {
+		DEBUG_STOP;
+	}
 }
 
 H3DF::PolygonShapeElement::PolygonShapeElement(PolygonShapeElement const & cInThat)
 {
-	m_pcImpl = new PolygonShapeElementImpl();
-	DEBUG_VALID(m_pcImpl);
-	Set(cInThat);
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::PolygonShapeElement::PolygonShapeElement(ShapePointArray const & arInPoints)
 {
-	PolygonShapeElementImpl * pcImpl = new PolygonShapeElementImpl();
+	m_pcImpl = std::make_unique<PolygonShapeElementImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcImpl = static_cast<PolygonShapeElementImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
-	m_pcImpl = pcImpl;
 
 	pcImpl->m_arPoints = arInPoints;
 }
 
 H3DF::PolygonShapeElement::PolygonShapeElement(size_t nInCount, ShapePoint const arInPoints[])
 {
-	PolygonShapeElementImpl * pcImpl = new PolygonShapeElementImpl();
+	m_pcImpl = std::make_unique<PolygonShapeElementImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcImpl = static_cast<PolygonShapeElementImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
-	m_pcImpl = pcImpl;
 
 	pcImpl->m_arPoints.resize(nInCount);
 
@@ -321,26 +343,27 @@ H3DF::PolygonShapeElement::PolygonShapeElement(PolygonShapeElement && cInThat) n
 {
 }
 
-void H3DF::PolygonShapeElement::Set(PolygonShapeElement const & cInThat)
-{
-	PolygonShapeElementImpl * pcImpl = static_cast<PolygonShapeElementImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	PolygonShapeElementImpl * pcInImpl = static_cast<PolygonShapeElementImpl *>(cInThat.m_pcImpl);
-	DEBUG_VALID(pcInImpl);
-
-	pcImpl->Set(pcInImpl);
-}
-
-H3DF::PolygonShapeElement & H3DF::PolygonShapeElement::operator=(PolygonShapeElement && cInThat) noexcept
+H3DF::PolygonShapeElement & H3DF::PolygonShapeElement::operator = (PolygonShapeElement && cInThat) noexcept
 {
 	this->ShapeElement::operator = (std::move(cInThat));
 	return *this;
 }
 
+PolygonShapeElement const & H3DF::PolygonShapeElement::operator = (PolygonShapeElement const & cInThat)
+{
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
+	return *this;
+}
+
 PolygonShapeElement & H3DF::PolygonShapeElement::SetPoints(ShapePointArray const & arInPoints)
 {
-	PolygonShapeElementImpl * pcImpl = static_cast<PolygonShapeElementImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PolygonShapeElementImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_arPoints = arInPoints;
@@ -350,7 +373,7 @@ PolygonShapeElement & H3DF::PolygonShapeElement::SetPoints(ShapePointArray const
 
 PolygonShapeElement & H3DF::PolygonShapeElement::SetPoints(size_t nInCount, ShapePoint const arInPoints[])
 {
-	PolygonShapeElementImpl * pcImpl = static_cast<PolygonShapeElementImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PolygonShapeElementImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_arPoints.resize(nInCount);
@@ -363,7 +386,7 @@ PolygonShapeElement & H3DF::PolygonShapeElement::SetPoints(size_t nInCount, Shap
 
 bool H3DF::PolygonShapeElement::ShowPoints(ShapePointArray & arOutPoints) const
 {
-	PolygonShapeElementImpl * pcImpl = static_cast<PolygonShapeElementImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PolygonShapeElementImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	arOutPoints = pcImpl->m_arPoints;
@@ -375,44 +398,63 @@ bool H3DF::PolygonShapeElement::ShowPoints(ShapePointArray & arOutPoints) const
 
 H3DF::AnchorShapeElement::AnchorShapeElement()
 {
-	m_pcImpl = new AnchorShapeElementImpl();
+	m_pcImpl = std::make_unique<AnchorShapeElementImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::AnchorShapeElement::AnchorShapeElement(ShapeElement const & cInThat)
 {
-	m_pcImpl = new AnchorShapeElementImpl();
-	DEBUG_VALID(m_pcImpl);
+	if (staticType != Type()) {
+		return;
+	}
 
-	ShapeElement::Set(cInThat);
+	// PolygonShapeElementImpl 생성
+	m_pcImpl = std::make_unique<AnchorShapeElementImpl>();
+	auto pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl.get());
+
+	auto pcInThatImpl = static_cast<const ShapeElementImpl *>(cInThat.GetImpl());
+
+	if (nullptr != pcImpl && nullptr != pcInThatImpl) {
+		pcImpl->ShapeElementImpl::Copy(pcInThatImpl);
+	}
+	else {
+		DEBUG_STOP;
+	}
 }
 
 H3DF::AnchorShapeElement::AnchorShapeElement(AnchorShapeElement const & cInThat)
 {
-	m_pcImpl = new AnchorShapeElementImpl();
-	DEBUG_VALID(m_pcImpl);
+	if (staticType != Type()) {
+		return;
+	}
 
-	Set(cInThat);
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 
 H3DF::AnchorShapeElement::AnchorShapeElement(ShapePoint const & cInAnchorPoint)
 {
-	AnchorShapeElementImpl * pcImpl = new AnchorShapeElementImpl();
-	DEBUG_VALID(pcImpl);
-	m_pcImpl = pcImpl;
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<AnchorShapeElementImpl>();
+	auto pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl.get());
 
 	pcImpl->m_cAnchorPoint = cInAnchorPoint;
 	pcImpl->m_bSetAnchorPointFlag = true;
 }
 
-H3DF::AnchorShapeElement::AnchorShapeElement(ShapePoint const & cInAnchorPoint,
-	ShapePointArray const & arInIntermediatePoints,
-	bool bInConnection)
+H3DF::AnchorShapeElement::AnchorShapeElement(ShapePoint const & cInAnchorPoint,	ShapePointArray const & arInIntermediatePoints, bool bInConnection)
 {
-	AnchorShapeElementImpl * pcImpl = new AnchorShapeElementImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<AnchorShapeElementImpl>();
+	DEBUG_VALID(m_pcImpl);
+	auto pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
-	m_pcImpl = pcImpl;
 
 	pcImpl->m_cAnchorPoint = cInAnchorPoint;
 	pcImpl->m_bSetAnchorPointFlag = true;
@@ -429,38 +471,33 @@ H3DF::AnchorShapeElement::~AnchorShapeElement()
 
 }
 
-H3DF::AnchorShapeElement::AnchorShapeElement(AnchorShapeElement && cInThat) : 
+H3DF::AnchorShapeElement::AnchorShapeElement(AnchorShapeElement && cInThat) noexcept :
 	ShapeElement(std::move(cInThat))
 {
 
 }
 
-AnchorShapeElement & H3DF::AnchorShapeElement::operator=(AnchorShapeElement && cInThat)
+AnchorShapeElement & H3DF::AnchorShapeElement::operator=(AnchorShapeElement && cInThat) noexcept
 {
 	this->ShapeElement::operator = (std::move(cInThat));
 	return *this;
 }
 
-void H3DF::AnchorShapeElement::Set(AnchorShapeElement const & cInThat)
-{
-	AnchorShapeElementImpl * pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	AnchorShapeElementImpl * pcInImpl = static_cast<AnchorShapeElementImpl *>(cInThat.m_pcImpl);
-	DEBUG_VALID(pcInImpl);
-
-	pcImpl->Set(pcInImpl);
-}
-
 AnchorShapeElement const & H3DF::AnchorShapeElement::operator = (AnchorShapeElement const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 AnchorShapeElement & H3DF::AnchorShapeElement::SetAnchor(ShapePoint const & in_anchor)
 {
-	AnchorShapeElementImpl * pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cAnchorPoint = in_anchor;
@@ -471,7 +508,7 @@ AnchorShapeElement & H3DF::AnchorShapeElement::SetAnchor(ShapePoint const & in_a
 
 bool H3DF::AnchorShapeElement::ShowAnchor(ShapePoint & cOutAnchor) const
 {
-	AnchorShapeElementImpl * pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (false == pcImpl->m_bSetAnchorPointFlag) {
@@ -485,7 +522,7 @@ bool H3DF::AnchorShapeElement::ShowAnchor(ShapePoint & cOutAnchor) const
 
 AnchorShapeElement & H3DF::AnchorShapeElement::SetIntermediatePoints(ShapePointArray const & arInIntermediatePoints)
 {
-	AnchorShapeElementImpl * pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_arIntermediatePoints = arInIntermediatePoints;
@@ -496,7 +533,7 @@ AnchorShapeElement & H3DF::AnchorShapeElement::SetIntermediatePoints(ShapePointA
 
 bool H3DF::AnchorShapeElement::ShowIntermediatePoints(ShapePointArray & arOutIntermediatePoints) const
 {
-	AnchorShapeElementImpl * pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (false == pcImpl->m_bSetIntermediatePointsFlag) {
@@ -510,7 +547,7 @@ bool H3DF::AnchorShapeElement::ShowIntermediatePoints(ShapePointArray & arOutInt
 
 AnchorShapeElement & H3DF::AnchorShapeElement::UnsetIntermediatePoints()
 {
-	AnchorShapeElementImpl * pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_arIntermediatePoints.clear();
@@ -521,7 +558,7 @@ AnchorShapeElement & H3DF::AnchorShapeElement::UnsetIntermediatePoints()
 
 AnchorShapeElement & H3DF::AnchorShapeElement::SetConnection(bool bInConnection)
 {
-	AnchorShapeElementImpl * pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bConnectionFlag = bInConnection;
@@ -532,7 +569,7 @@ AnchorShapeElement & H3DF::AnchorShapeElement::SetConnection(bool bInConnection)
 
 bool H3DF::AnchorShapeElement::ShowConnection(bool & bOutConnection) const
 {
-	AnchorShapeElementImpl * pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	
 	if (false == pcImpl->m_bSetConnectionFlag) {
@@ -546,7 +583,7 @@ bool H3DF::AnchorShapeElement::ShowConnection(bool & bOutConnection) const
 
 AnchorShapeElement & H3DF::AnchorShapeElement::UnsetConnection()
 {
-	AnchorShapeElementImpl * pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bSetConnectionFlag = false;
@@ -558,16 +595,21 @@ AnchorShapeElement & H3DF::AnchorShapeElement::UnsetConnection()
 
 H3DF::ShapeKit::ShapeKit()
 {
-	m_pcImpl = new ShapeKitImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<ShapeKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::ShapeKit::ShapeKit(ShapeKit const & cInThat)
 {
-	m_pcImpl = new ShapeKitImpl();
-	DEBUG_VALID(m_pcImpl);
+	if (staticType != Type()) {
+		return;
+	}
 
-	Set(cInThat);
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::ShapeKit::~ShapeKit()
@@ -586,20 +628,15 @@ ShapeKit & H3DF::ShapeKit::operator=(ShapeKit && cInThat) noexcept
 	return *this;
 }
 
-void H3DF::ShapeKit::Set(ShapeKit const & cInThat)
-{
-	ShapeKitImpl * pcImpl = static_cast<ShapeKitImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	ShapeKitImpl * pccInImpl = static_cast<ShapeKitImpl *>(cInThat.m_pcImpl);
-	DEBUG_VALID(pccInImpl);
-
-	pcImpl->Set(pccInImpl);
-}
-
 ShapeKit & H3DF::ShapeKit::operator = (ShapeKit const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -610,7 +647,7 @@ void H3DF::ShapeKit::Show(ShapeKit & cOutKit) const
 
 bool H3DF::ShapeKit::Empty() const
 {
-	ShapeKitImpl * pcImpl = static_cast<ShapeKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ShapeKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->Empty();
@@ -618,7 +655,7 @@ bool H3DF::ShapeKit::Empty() const
 
 bool H3DF::ShapeKit::Equals(ShapeKit const & cInKit) const
 {
-	ShapeKitImpl * pcImpl = static_cast<ShapeKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ShapeKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->Equals(cInKit);
@@ -636,7 +673,7 @@ bool H3DF::ShapeKit::operator != (ShapeKit const & cInKit) const
 
 ShapeKit & H3DF::ShapeKit::SetElements(ShapeElementArray const & cInDef)
 {
-	ShapeKitImpl * pcImpl = static_cast<ShapeKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ShapeKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_arElements = cInDef;
@@ -647,7 +684,7 @@ ShapeKit & H3DF::ShapeKit::SetElements(ShapeElementArray const & cInDef)
 
 ShapeKit & H3DF::ShapeKit::SetElements(size_t nInCount, ShapeElement const cInDef[])
 {
-	ShapeKitImpl * pcImpl = static_cast<ShapeKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ShapeKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	for (size_t nIndex = 0; nIndex < nInCount; nIndex++) {
@@ -661,7 +698,7 @@ ShapeKit & H3DF::ShapeKit::SetElements(size_t nInCount, ShapeElement const cInDe
 
 ShapeKit & H3DF::ShapeKit::SetElement(ShapeElement const & cInElement)
 {
-	ShapeKitImpl * pcImpl = static_cast<ShapeKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ShapeKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_arElements.clear();
@@ -673,7 +710,7 @@ ShapeKit & H3DF::ShapeKit::SetElement(ShapeElement const & cInElement)
 
 ShapeKit & H3DF::ShapeKit::UnsetElements()
 {
-	ShapeKitImpl * pcImpl = static_cast<ShapeKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ShapeKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_arElements.clear();
@@ -691,7 +728,7 @@ ShapeKit & H3DF::ShapeKit::UnsetEverything()
 
 bool H3DF::ShapeKit::ShowElements(ShapeElementArray & cOutDef) const
 {
-	ShapeKitImpl * pcImpl = static_cast<ShapeKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ShapeKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (false == pcImpl->m_bSetElementsFlag) {
@@ -707,24 +744,41 @@ bool H3DF::ShapeKit::ShowElements(ShapeElementArray & cOutDef) const
 
 H3DF::ShapeDefinition::ShapeDefinition()
 {
-	m_pcImpl = new ShapeDefinitionImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<ShapeDefinitionImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::ShapeDefinition::ShapeDefinition(Definition const & cInThat)
 {
-	m_pcImpl = new ShapeDefinitionImpl();
-	DEBUG_VALID(m_pcImpl);
+	if (staticType != Type()) {
+		return;
+	}
 
-	Definition::Set(cInThat);
+	// PolygonShapeElementImpl 생성
+	m_pcImpl = std::make_unique<ShapeDefinitionImpl>();
+	auto pcImpl = static_cast<ShapeDefinitionImpl *>(m_pcImpl.get());
+
+	auto pcInThatImpl = static_cast<const DefinitionImpl *>(cInThat.GetImpl());
+
+	if (nullptr != pcImpl && nullptr != pcInThatImpl) {
+		pcImpl->DefinitionImpl::Copy(pcInThatImpl);
+	}
+	else {
+		DEBUG_STOP;
+	}
 }
 
 H3DF::ShapeDefinition::ShapeDefinition(ShapeDefinition const & cInThat)
 {
-	m_pcImpl = new ShapeDefinitionImpl();
-	DEBUG_VALID(m_pcImpl);
+	if (staticType != Type()) {
+		return;
+	}
 
-	Set(cInThat);
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::ShapeDefinition::~ShapeDefinition()
@@ -742,26 +796,21 @@ ShapeDefinition & H3DF::ShapeDefinition::operator=(ShapeDefinition && cInThat) n
 	return *this;
 }
 
-void H3DF::ShapeDefinition::Set(ShapeDefinition const & cInThat)
-{
-	ShapeDefinitionImpl * pcImpl = static_cast<ShapeDefinitionImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	ShapeDefinitionImpl * pccInImpl = static_cast<ShapeDefinitionImpl *>(cInThat.m_pcImpl);
-	DEBUG_VALID(pccInImpl);
-
-	pcImpl->Set(pccInImpl);
-}
-
 ShapeDefinition & H3DF::ShapeDefinition::operator = (ShapeDefinition const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 void H3DF::ShapeDefinition::Set(ShapeKit const & cInKit)
 {
-	ShapeDefinitionImpl * pcImpl = static_cast<ShapeDefinitionImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ShapeDefinitionImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cShape = cInKit;
@@ -769,7 +818,7 @@ void H3DF::ShapeDefinition::Set(ShapeKit const & cInKit)
 
 void H3DF::ShapeDefinition::Show(ShapeKit & cOutKit) const
 {
-	ShapeDefinitionImpl * pcImpl = static_cast<ShapeDefinitionImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ShapeDefinitionImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	cOutKit = pcImpl->m_cShape;
@@ -784,8 +833,7 @@ void H3DF::ShapeDefinition::Show(ShapeKit & cOutKit) const
 
 void Test() 
 {
-	// 5.3 Define the Annotation Shape
-	H3DF::SegmentKey rectangleSegmentKey;// = GetCanvas().GetFrontView().GetAttachedModel().GetSegmentKey();
+	
 
 	// define the vertices of the textbox rectangle
 	H3DF::ShapePoint leftBottom(-1, -1);
@@ -818,14 +866,16 @@ void Test()
 
 	rectangle_shape.SetElements(2, rectangle_elements);
 
+	// 5.3 Define the Annotation Shape
+	H3DF::SegmentKey rectangleSegmentKey;// = GetCanvas().GetFrontView().GetAttachedModel().GetSegmentKey();
 
 	H3DF::PortfolioKey portfolio;
 	rectangleSegmentKey.GetPortfolioControl().ShowTop(portfolio);
 
 	// define the rectangle_shape in our portfolio and add to the rectangle segment
 	portfolio.DefineShape("anchored_leader_line_rectangle", rectangle_shape);
-	/*rectangleSegmentKey.GetTextAttributeControl().SetBackground("anchored_leader_line_rectangle");
-
+	//rectangleSegmentKey.GetTextAttributeControl().SetBackground("anchored_leader_line_rectangle");
+/*
 	// create a TextKey and insert the text into it
 	H3DF::TextKey rectangle_text =
 		rectangleSegmentKey.InsertText(H3DF::Point(2, -2, 0), "Vertex is 0.5, 0.5, -0.5\nin world space.");

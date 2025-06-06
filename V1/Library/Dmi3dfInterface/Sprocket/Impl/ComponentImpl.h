@@ -13,7 +13,13 @@ namespace H3DF
 		ComponentImpl();
 		~ComponentImpl();
 
-		void Copy(ComponentImpl * pcInThat);
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<ComponentImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy(const ComponentImpl * pcInThat);
 
 		void SetName(CString strInName);
 

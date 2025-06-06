@@ -10,9 +10,13 @@ namespace H3DF
 	class ImageImportOptionsKitImpl : public Impl
 	{
 	public:
-		ImageImportOptionsKitImpl() { m_eType = H3DF::Type::ImageImportOptionsKit; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<ImageImportOptionsKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(ImageImportOptionsKitImpl * pcInThat) {
+		void Copy(const ImageImportOptionsKitImpl * pcInThat) {
 			m_nWidth = pcInThat->m_nWidth;
 			m_nHeight = pcInThat->m_nHeight;
 			m_eFormat = pcInThat->m_eFormat;
@@ -27,9 +31,13 @@ namespace H3DF
 	class ImageKitImpl : public Impl
 	{
 	public:
-		ImageKitImpl() { m_eType = H3DF::Type::ImageKit; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<ImageKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(ImageKitImpl * pcInThat) {
+		void Copy(const ImageKitImpl * pcInThat) {
 			m_nWidth = pcInThat->m_nWidth;
 			m_nHeight = pcInThat->m_nHeight;
 			m_eFormat = pcInThat->m_eFormat;
@@ -55,9 +63,13 @@ namespace H3DF
 	class ImageDefinitionImpl : public DefinitionImpl
 	{
 	public:
-		ImageDefinitionImpl() { m_eType = H3DF::Type::ImageDefinition; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<ImageDefinitionImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Set(ImageDefinitionImpl * pcInThat) {
+		void Copy(const ImageDefinitionImpl * pcInThat) {
 			m_strSource = pcInThat->m_strSource;
 			m_cImageKit = pcInThat->m_cImageKit; // Copy
 		}

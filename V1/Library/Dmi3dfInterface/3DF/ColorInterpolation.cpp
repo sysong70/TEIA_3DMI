@@ -18,9 +18,13 @@ namespace H3DF
 	class ColorInterpolationKitImpl : public Impl
 	{
 	public:
-		ColorInterpolationKitImpl() { m_eType = H3DF::Type::ColorInterpolationKit; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<ColorInterpolationKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(ColorInterpolationKitImpl * pcInThat) 
+		void Copy(const ColorInterpolationKitImpl * pcInThat) 
 		{
 			m_bDepthRange = pcInThat->m_bDepthRange;
 			m_fDepthRangeNear = pcInThat->m_fDepthRangeNear;
@@ -52,33 +56,52 @@ namespace H3DF
 
 H3DF::ColorInterpolationKit::ColorInterpolationKit() 
 {
-	m_pcImpl = new ColorInterpolationKitImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<ColorInterpolationKitImpl>();
 }
 
 H3DF::ColorInterpolationKit::ColorInterpolationKit(ColorInterpolationKit const & cInKit)
 {
-	m_pcImpl = new ColorInterpolationKitImpl();
-	Set(cInKit);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void H3DF::ColorInterpolationKit::Set(ColorInterpolationKit const & cInKit)
-{
-	ColorInterpolationKitImpl * pcImpl = (ColorInterpolationKitImpl *)m_pcImpl;
-	ColorInterpolationKitImpl * pcInThatImpl = (ColorInterpolationKitImpl *)cInKit.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
 }
 
 ColorInterpolationKit const & H3DF::ColorInterpolationKit::operator = (ColorInterpolationKit const & cInKit)
 {
-	Set(cInKit);
+	if (nullptr != cInKit.m_pcImpl) {
+		m_pcImpl = cInKit.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 void H3DF::ColorInterpolationKit::Show(ColorInterpolationKit & cOutKit) const
 {
-	ColorInterpolationKitImpl * pcImpl = (ColorInterpolationKitImpl *)m_pcImpl;
-	ColorInterpolationKitImpl * pcOutKitImpl = (ColorInterpolationKitImpl *)cOutKit.m_pcImpl;
-	pcOutKitImpl->Copy(pcImpl);
+	auto pcImpl = static_cast<ColorInterpolationKitImpl *>(m_pcImpl.get());
+	auto pcOutImpl = static_cast<ColorInterpolationKitImpl *>(cOutKit.m_pcImpl.get());
+
+	if (nullptr == pcImpl) {
+		DEBUG_STOP;
+		return;
+	}
+
+	if (nullptr == pcOutImpl) {
+		// cOutKit이 Impl을 아직 할당받지 않았다면 새로 할당
+		cOutKit.m_pcImpl = std::make_unique<ColorInterpolationKitImpl>();
+		pcOutImpl = static_cast<ColorInterpolationKitImpl *>(cOutKit.m_pcImpl.get());
+	}
+
+	// 복사 (Copy 함수가 있다면 Copy 활용)
+	pcOutImpl->Copy(pcImpl);
 }
 
 bool H3DF::ColorInterpolationKit::Empty() const
@@ -88,8 +111,14 @@ bool H3DF::ColorInterpolationKit::Empty() const
 
 bool H3DF::ColorInterpolationKit::Equals(ColorInterpolationKit const & cInKit) const
 {
-	ColorInterpolationKitImpl * pcImpl = (ColorInterpolationKitImpl *)m_pcImpl;
-	ColorInterpolationKitImpl * pcInThatImpl = (ColorInterpolationKitImpl *)cInKit.m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationKitImpl *>(m_pcImpl.get());
+	auto pcInThatImpl = static_cast<ColorInterpolationKitImpl *>(cInKit.m_pcImpl.get());
+
+	if(nullptr == pcImpl || nullptr == pcInThatImpl) {
+		DEBUG_STOP;
+		return false; // 하나라도 Impl이 없다면 같지 않음
+	}
+
 	return pcImpl->Equals(pcInThatImpl);
 }
 
@@ -105,7 +134,7 @@ bool H3DF::ColorInterpolationKit::operator != (ColorInterpolationKit const & cIn
 
 ColorInterpolationKit & H3DF::ColorInterpolationKit::SetDepthRange(float fInNear, float fInFar)
 {
-	ColorInterpolationKitImpl * pcImpl = (ColorInterpolationKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bDepthRange = true;
@@ -117,7 +146,7 @@ ColorInterpolationKit & H3DF::ColorInterpolationKit::SetDepthRange(float fInNear
 
 ColorInterpolationKit & H3DF::ColorInterpolationKit::SetFaceDisplacement(int nInBuckets)
 {
-	ColorInterpolationKitImpl * pcImpl = (ColorInterpolationKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bFaceDisplacement = true;
@@ -128,7 +157,7 @@ ColorInterpolationKit & H3DF::ColorInterpolationKit::SetFaceDisplacement(int nIn
 
 ColorInterpolationKit & H3DF::ColorInterpolationKit::UnsetDepthRange()
 {
-	ColorInterpolationKitImpl * pcImpl = (ColorInterpolationKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bDepthRange = false;
@@ -138,7 +167,7 @@ ColorInterpolationKit & H3DF::ColorInterpolationKit::UnsetDepthRange()
 
 ColorInterpolationKit & H3DF::ColorInterpolationKit::UnsetFaceDisplacement()
 {
-	ColorInterpolationKitImpl * pcImpl = (ColorInterpolationKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bFaceDisplacement = false;
@@ -148,7 +177,7 @@ ColorInterpolationKit & H3DF::ColorInterpolationKit::UnsetFaceDisplacement()
 
 bool H3DF::ColorInterpolationKit::ShowDepthRange(float & fOutNear, float & fOutFar) const
 {
-	ColorInterpolationKitImpl * pcImpl = (ColorInterpolationKitImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	fOutNear = pcImpl->m_fDepthRangeNear;
@@ -159,7 +188,7 @@ bool H3DF::ColorInterpolationKit::ShowDepthRange(float & fOutNear, float & fOutF
 
 bool H3DF::ColorInterpolationKit::ShowFaceDisplacement(int & nOutBuckets) const
 {
-	ColorInterpolationKitImpl * pcImpl = (ColorInterpolationKitImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	nOutBuckets = pcImpl->m_nFaceDisplacementBuckets;
@@ -175,9 +204,14 @@ namespace H3DF
 	class ColorInterpolationControlImpl : public ControlImpl
 	{
 	public:
-		ColorInterpolationControlImpl() { m_eType = H3DF::Type::ColorInterpolationControl; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<ColorInterpolationControlImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(ColorInterpolationControlImpl * pcInThat) {
+
+		void Copy(const ColorInterpolationControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
 
@@ -266,34 +300,40 @@ H3DF::ColorInterpolationControl::ColorInterpolationControl() {}
 
 H3DF::ColorInterpolationControl::ColorInterpolationControl(SegmentKey & cInSegmentKey)
 {
-	ColorInterpolationControlImpl * pcImpl = new ColorInterpolationControlImpl();
-	pcImpl->m_cOverrideKey = cInSegmentKey;
+	if (staticType != Type()) {
+		return;
+	}
 
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<ColorInterpolationControlImpl>();
+	auto pcImpl = dynamic_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
+
+	pcImpl->m_cOverrideKey = cInSegmentKey;
 }
 
 H3DF::ColorInterpolationControl::ColorInterpolationControl(ColorInterpolationControl const & cInThat)
 {
-	m_pcImpl = new ColorInterpolationControlImpl();
-	Set(cInThat);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void H3DF::ColorInterpolationControl::Set(ColorInterpolationControl const & cInThat)
-{
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
-	ColorInterpolationControlImpl * pcInThatImpl = (ColorInterpolationControlImpl *) cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 ColorInterpolationControl & H3DF::ColorInterpolationControl::operator = (ColorInterpolationControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 ColorInterpolationControl & H3DF::ColorInterpolationControl::SetFaceColor(bool bInState)
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetGeometry("faces", bInState, true);
 
@@ -302,7 +342,7 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::SetFaceColor(bool b
 
 ColorInterpolationControl & H3DF::ColorInterpolationControl::SetEdgeColor(bool bInState)
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetGeometry("edges", bInState, true);
 
@@ -311,8 +351,9 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::SetEdgeColor(bool b
 
 ColorInterpolationControl & H3DF::ColorInterpolationControl::SetVertexColor(bool bInState)
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
+
 	pcImpl->SetGeometry("markers", bInState, true);
 
 	return *this;
@@ -320,7 +361,7 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::SetVertexColor(bool
 
 ColorInterpolationControl & H3DF::ColorInterpolationControl::SetFaceIndex(bool bInState)
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetGeometry("faces", bInState, false);
 
@@ -329,7 +370,7 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::SetFaceIndex(bool b
 
 ColorInterpolationControl & H3DF::ColorInterpolationControl::SetEdgeIndex(bool bInState)
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetGeometry("edges", bInState, false);
 
@@ -338,7 +379,7 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::SetEdgeIndex(bool b
 
 ColorInterpolationControl & H3DF::ColorInterpolationControl::SetVertexIndex(bool bInState)
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetGeometry("markers", bInState, false);
 
@@ -347,7 +388,7 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::SetVertexIndex(bool
 
 ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetFaceColor()
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnsetGeometry("faces", true);
 
@@ -356,7 +397,7 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetFaceColor()
 
 ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetEdgeColor()
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnsetGeometry("edges", true);
 
@@ -365,7 +406,7 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetEdgeColor()
 
 ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetVertexColor()
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnsetGeometry("markers", true);
 
@@ -374,7 +415,7 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetVertexColor()
 
 ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetFaceIndex()
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnsetGeometry("faces", false);
 
@@ -383,7 +424,7 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetFaceIndex()
 
 ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetEdgeIndex()
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnsetGeometry("edges", false);
 
@@ -392,7 +433,7 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetEdgeIndex()
 
 ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetVertexIndex()
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnsetGeometry("markers", false);
 
@@ -401,7 +442,7 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetVertexIndex()
 
 ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetEverything()
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -414,42 +455,42 @@ ColorInterpolationControl & H3DF::ColorInterpolationControl::UnsetEverything()
 
 bool H3DF::ColorInterpolationControl::ShowFaceColor(bool & bOutState) const
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	return pcImpl->ShowGeometry("faces", bOutState, true);
 }
 
 bool H3DF::ColorInterpolationControl::ShowEdgeColor(bool & bOutState) const
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	return pcImpl->ShowGeometry("edges", bOutState, true);
 }
 
 bool H3DF::ColorInterpolationControl::ShowVertexColor(bool & bOutState) const
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	return pcImpl->ShowGeometry("markers", bOutState, true);
 }
 
 bool H3DF::ColorInterpolationControl::ShowFaceIndex(bool & bOutState) const
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	return pcImpl->ShowGeometry("faces", bOutState, false);
 }
 
 bool H3DF::ColorInterpolationControl::ShowEdgeIndex(bool & bOutState) const
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	return pcImpl->ShowGeometry("edges", bOutState, false);
 }
 
 bool H3DF::ColorInterpolationControl::ShowVertexIndex(bool & bOutState) const
 {
-	ColorInterpolationControlImpl * pcImpl = (ColorInterpolationControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	return pcImpl->ShowGeometry("markers", bOutState, false);
 }

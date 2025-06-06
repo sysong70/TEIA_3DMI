@@ -66,10 +66,6 @@ Canvas * H3DF::Factory::CreateCanvas(H3DF::WindowHandle nInWindowHandle, char co
 	WindowKeyImpl::SetSelectionControl(pcCanvasImpl->m_cWindowKey);
 	WindowKeyImpl::SetHighlightControl(pcCanvasImpl->m_cWindowKey);
 
-	pcWindowImpl->SetType(H3DF::Type::WindowKey);
-
-	pcCanvasImpl->SetType(H3DF::Type::Canvas);
-
 	return pcCanvas;
 }
 

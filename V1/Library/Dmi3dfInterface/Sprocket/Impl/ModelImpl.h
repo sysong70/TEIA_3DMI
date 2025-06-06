@@ -18,7 +18,7 @@ namespace H3DF
 {
 	class MultiSelectManager;
 
-	class API_3DF ModelImpl : public HBaseModel, public Impl
+	class ModelImpl : public HBaseModel, public Impl
 	{
 	public:
 		ModelImpl();

@@ -11,9 +11,13 @@ namespace H3DF
 	class ShapeElementImpl : public Impl
 	{
 	public:
-		ShapeElementImpl() { m_eType = H3DF::Type::ShapeElement; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<ShapeElementImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Set(ShapeElementImpl * pcInThat)
+		void Copy(const ShapeElementImpl * pcInThat)
 		{
 			if (pcInThat == nullptr) {
 				DEBUG_STOP;
@@ -33,16 +37,20 @@ namespace H3DF
 	class PolygonShapeElementImpl : public ShapeElementImpl
 	{
 	public:
-		PolygonShapeElementImpl() { m_eType = H3DF::Type::PolygonShapeElement; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<PolygonShapeElementImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Set(PolygonShapeElementImpl * pcInThat)
+		void Copy(const PolygonShapeElementImpl * pcInThat)
 		{
 			if (pcInThat == nullptr) {
 				DEBUG_STOP;
 				return;
 			}
 
-			ShapeElementImpl::Set(pcInThat);
+			ShapeElementImpl::Copy(pcInThat);
 
 			m_arPoints = pcInThat->m_arPoints;
 		}
@@ -53,16 +61,19 @@ namespace H3DF
 	class AnchorShapeElementImpl : public ShapeElementImpl
 	{
 	public:
-		AnchorShapeElementImpl() { m_eType = H3DF::Type::AnchorShapeElement; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<AnchorShapeElementImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Set(AnchorShapeElementImpl * pcInThat)
-		{
+		void Copy(const AnchorShapeElementImpl * pcInThat) {
 			if (pcInThat == nullptr) {
 				DEBUG_STOP;
 				return;
 			}
 
-			ShapeElementImpl::Set(pcInThat);
+			ShapeElementImpl::Copy(pcInThat);
 
 			m_cAnchorPoint = pcInThat->m_cAnchorPoint;
 			m_bSetAnchorPointFlag = pcInThat->m_bSetAnchorPointFlag;
@@ -87,10 +98,13 @@ namespace H3DF
 	class ShapeKitImpl : public Impl
 	{
 	public:
-		ShapeKitImpl() { m_eType = H3DF::Type::ShapeKit; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<ShapeKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Set(ShapeKitImpl * pcInThat)
-		{
+		void Copy(const ShapeKitImpl * pcInThat) {
 			if (pcInThat == nullptr) {
 				DEBUG_STOP;
 				return;
@@ -120,10 +134,13 @@ namespace H3DF
 	class ShapeDefinitionImpl : public DefinitionImpl
 	{
 	public:
-		ShapeDefinitionImpl() { m_eType = H3DF::Type::ShapeDefinition; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<ShapeDefinitionImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Set(ShapeDefinitionImpl * pcInThat)
-		{
+		void Copy(const ShapeDefinitionImpl * pcInThat) {
 			m_cShape = pcInThat->m_cShape;
 		}
 

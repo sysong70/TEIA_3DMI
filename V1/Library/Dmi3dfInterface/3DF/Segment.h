@@ -7,6 +7,7 @@
 #include "EdgeAttribute.h"
 #include "Style.h"
 #include "Search.h"
+#include "Bounding.h"
 
 #include "Marker.h"
 
@@ -24,9 +25,9 @@ namespace H3DF
 
 		virtual ~SegmentKey();
 
-		H3DF::Type ObjectType() const { return H3DF::Type::SegmentKey; };
+		static const H3DF::Type staticType = H3DF::Type::SegmentKey;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(SegmentKey const & cInThat);
 		SegmentKey & operator = (SegmentKey const & cInThat);
 
 		//== Segment 관련 함수 =======================================================================
@@ -191,6 +192,13 @@ namespace H3DF
 		SegmentKey & SetPriority(int nInPriority);
 		SegmentKey & UnsetPriority();
 		bool ShowPriority(int & nOutPriority) const;
+
+		//== Text 관련 함수 =================================================================================
+		//TextKey InsertText(Point const & cInPosition, CStringA strInText);
+
+		//== TextAttribute 관련 함수 ========================================================================
+		TextAttributeControl GetTextAttributeControl();
+		TextAttributeControl const GetTextAttributeControl() const;
 
 		//== User Data 관련 함수 =====================================================================
 		SegmentKey & SetUserData(IntPtrTArray const & aInIndices, ByteArrayArray const & aInData);

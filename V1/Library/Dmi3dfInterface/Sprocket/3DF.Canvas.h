@@ -45,6 +45,9 @@ namespace H3DF
 		Canvas(Canvas const & cInThat);
 		virtual ~Canvas();
 
+		static const H3DF::Type staticType = H3DF::Type::Canvas;
+		H3DF::Type ObjectType() const { return staticType; };
+
 		void Set(Canvas const & cInThat);
 		Canvas const & operator = (Canvas const & cInThat);
 

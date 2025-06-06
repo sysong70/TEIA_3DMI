@@ -157,6 +157,7 @@
     <ClInclude Include="3DF\Impl\SegmentImpl.h" />
     <ClInclude Include="3DF\Impl\Selection.Impl.h" />
     <ClInclude Include="3DF\Impl\Shape.Impl.h" />
+    <ClInclude Include="3DF\Impl\TextAttribute.Impl.h" />
     <ClInclude Include="3DF\Impl\TextureImpl.h" />
     <ClInclude Include="3DF\Impl\WindowImpl.h" />
     <ClInclude Include="3DF\KeyPath.h" />
@@ -168,6 +169,8 @@
     <ClInclude Include="3DF\Selectability.h" />
     <ClInclude Include="3DF\SelectionSet.h" />
     <ClInclude Include="3DF\Shape.h" />
+    <ClInclude Include="3DF\Text.h" />
+    <ClInclude Include="3DF\TextAttribute.h" />
     <ClInclude Include="3DF\Texture.h" />
     <ClInclude Include="Signal.Connector.h" />
     <ClInclude Include="3DF\Camera.h" />
@@ -270,6 +273,7 @@
     <ClCompile Include="3DF\Impl\SegmentImpl.cpp" />
     <ClCompile Include="3DF\Impl\Selection.Impl.cpp" />
     <ClCompile Include="3DF\Impl\Shape.Impl.cpp" />
+    <ClCompile Include="3DF\Impl\TextAttribute.Impl.cpp" />
     <ClCompile Include="3DF\Impl\TextureImpl.cpp" />
     <ClCompile Include="3DF\Impl\WindowImpl.cpp" />
     <ClCompile Include="3DF\OffScreenWindow.cpp" />
@@ -280,6 +284,8 @@
     <ClCompile Include="3DF\Selectability.cpp" />
     <ClCompile Include="3DF\SelectionSet.cpp" />
     <ClCompile Include="3DF\Shape.cpp" />
+    <ClCompile Include="3DF\Text.cpp" />
+    <ClCompile Include="3DF\TextAttribute.cpp" />
     <ClCompile Include="3DF\Texture.cpp" />
     <ClCompile Include="Signal.Connector.cpp" />
     <ClCompile Include="3DF\Bounding.cpp" />
