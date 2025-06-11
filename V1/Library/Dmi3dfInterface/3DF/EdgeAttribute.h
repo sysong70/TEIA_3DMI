@@ -38,7 +38,6 @@ namespace H3DF
 		static const H3DF::Type staticType = H3DF::Type::EdgeAttributeKit;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(EdgeAttributeKit const & cInThat);
 		EdgeAttributeKit const & operator = (EdgeAttributeKit const & cInThat);
 
 		void Show(EdgeAttributeKit & cOutKit) const;
@@ -66,13 +65,12 @@ namespace H3DF
 	class API_3DF EdgeAttributeControl : public Control
 	{
 	public:
-		EdgeAttributeControl(SegmentKey & cInSegmentKey);
+		EdgeAttributeControl(SegmentKey & cInSegment);
 		EdgeAttributeControl(EdgeAttributeControl const & cInThat);
 
 		static const H3DF::Type staticType = H3DF::Type::EdgeAttributeControl;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(EdgeAttributeControl const & cInThat);
 		EdgeAttributeControl & operator = (EdgeAttributeControl const & cInThat);
 
 		EdgeAttributeControl & SetPattern(CString strInPatternName);

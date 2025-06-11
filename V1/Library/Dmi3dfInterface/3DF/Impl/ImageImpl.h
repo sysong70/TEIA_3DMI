@@ -42,6 +42,15 @@ namespace H3DF
 			m_nHeight = pcInThat->m_nHeight;
 			m_eFormat = pcInThat->m_eFormat;
 			m_arImageData = pcInThat->m_arImageData;
+			m_strInformation = pcInThat->m_strInformation;
+		}
+
+		bool Equals(const ImageKitImpl * pcInThat) const {
+			return (m_nWidth == pcInThat->m_nWidth &&
+				m_nHeight == pcInThat->m_nHeight &&
+				m_eFormat == pcInThat->m_eFormat &&
+				m_arImageData == pcInThat->m_arImageData &&
+				m_strInformation == pcInThat->m_strInformation);
 		}
 
 		UINT m_nWidth = 0;
@@ -72,6 +81,11 @@ namespace H3DF
 		void Copy(const ImageDefinitionImpl * pcInThat) {
 			m_strSource = pcInThat->m_strSource;
 			m_cImageKit = pcInThat->m_cImageKit; // Copy
+		}
+
+		bool Equals(const ImageDefinitionImpl * pcInThat) const {
+			return (m_strSource == pcInThat->m_strSource &&
+				m_cImageKit == pcInThat->m_cImageKit);
 		}
 
 		CStringA m_strSource;

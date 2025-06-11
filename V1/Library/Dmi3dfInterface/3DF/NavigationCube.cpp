@@ -92,6 +92,11 @@ namespace NavigationCubePreset
 class NavigationCubeImpl : public Impl
 {
 public:
+	std::unique_ptr<Impl> Clone() const override {
+		auto pcClone = std::make_unique<NavigationCubeImpl>();
+		pcClone->Copy(this);
+		return pcClone;
+	}
 
 	void Copy(const NavigationCubeImpl * pcInThat) {
 		m_bInitialized = pcInThat->m_bInitialized;
@@ -132,10 +137,11 @@ public:
 
 H3DF::NavigationCube::NavigationCube(H3DF::BaseView * view, WindowKey * pcInWindow)
 {
-	NavigationCubeImpl * pcImpl = new NavigationCubeImpl();
-	DEBUG_VALID(pcImpl);
+	m_pcImpl = std::make_unique<NavigationCubeImpl>();
+	DEBUG_VALID(m_pcImpl);
 
-	m_pcImpl = pcImpl;
+	auto pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_pcBaseView = view;
 }
@@ -144,22 +150,21 @@ H3DF::NavigationCube::~NavigationCube()
 {
 }
 
-void H3DF::NavigationCube::Set(NavigationCube const & cInThat)
-{
-	NavigationCubeImpl * pcImpl = (NavigationCubeImpl *)m_pcImpl;
-	NavigationCubeImpl * pcInThatImpl = (NavigationCubeImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
-}
-
 NavigationCube const & H3DF::NavigationCube::operator = (NavigationCube const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 int H3DF::NavigationCube::LButtonUp(Operator::Event & cInEvent, SelectionItem & cInItem)
 {
-	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) {  assert(false); }
 /*
 	WindowPoint cPoint(cInEvent.GetMouseWindowPos().x, cInEvent.GetMouseWindowPos().y, cInEvent.GetMouseWindowPos().z);
@@ -212,7 +217,7 @@ int H3DF::NavigationCube::LButtonUp(Operator::Event & cInEvent, SelectionItem & 
 int H3DF::NavigationCube::LButtonDownAndMove(Operator::Event & cInEvent)
 {
 /*
-	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (0 < pcImpl->m_cOldHighlightSelection.GetCount()) {
@@ -228,7 +233,7 @@ int H3DF::NavigationCube::LButtonDownAndMove(Operator::Event & cInEvent)
 
 void H3DF::NavigationCube::SetView(H3DF::BaseView * pcInView) 
 {
-	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_pcBaseView = pcInView;
@@ -238,7 +243,7 @@ void H3DF::NavigationCube::SetView(H3DF::BaseView * pcInView)
 
 bool H3DF::NavigationCube::IsValid()
 {
-	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cubeSegment != HC_ERROR_KEY;
@@ -248,7 +253,7 @@ bool H3DF::NavigationCube::IsValid()
 
 bool H3DF::NavigationCube::IsInitialized()
 {
-	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_bInitialized;
@@ -258,7 +263,7 @@ bool H3DF::NavigationCube::IsInitialized()
 
 void H3DF::NavigationCube::SetHighlightControl(H3DF::HighlightControl & cInHighlightCtrl)
 {
-	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_pcHighlightCtrl = &cInHighlightCtrl;
@@ -268,7 +273,7 @@ void H3DF::NavigationCube::SetHighlightControl(H3DF::HighlightControl & cInHighl
 
 void H3DF::NavigationCube::Create(float width, float height, HC_KEY parent)
 {
-	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_windowSize.x = width;
@@ -342,7 +347,7 @@ void H3DF::NavigationCube::Create(float width, float height, HC_KEY parent)
 
 void H3DF::NavigationCube::Recreate()
 {
-	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	HC_Open_Segment_By_Key(pcImpl->m_parentSegment);
@@ -364,7 +369,7 @@ HC_KEY H3DF::NavigationCube::HitTest(float x, float y, float z)
 
 void H3DF::NavigationCube::Transform()
 {
-	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	HPoint position, target, up_vector;
@@ -412,7 +417,7 @@ void H3DF::NavigationCube::OnSize(float width, float height)
 
 void H3DF::NavigationCube::OpenCubeSegment()
 {
-	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (pcImpl->m_cubeSegment == HC_ERROR_KEY) {
@@ -451,7 +456,7 @@ void H3DF::NavigationCube::CreateAxis()
 
 void H3DF::NavigationCube::CreateCube()
 {
-	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	double unit = PRESET::PlaneUnit();
@@ -709,7 +714,7 @@ HC_KEY H3DF::NavigationCube::CreateAxis(const char* name, const char* text, HPoi
 
 void H3DF::NavigationCube::SetWindowSize(double width, double height, bool openSegment)
 {
-	NavigationCubeImpl * pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<NavigationCubeImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_windowSize.x = width;

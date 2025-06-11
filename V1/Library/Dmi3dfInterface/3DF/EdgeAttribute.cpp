@@ -16,9 +16,13 @@ USING_3DF_NAMESPACE
 class EdgeAttributeKitImpl : public Impl
 {
 public:
-	EdgeAttributeKitImpl() { m_eType = H3DF::Type::EdgeAttributeKit; }
+	std::unique_ptr<Impl> Clone() const override {
+		auto pcClone = std::make_unique<EdgeAttributeKitImpl>();
+		pcClone->Copy(this);
+		return pcClone;
+	}
 
-	void Copy(EdgeAttributeKitImpl * pcInThat) {
+	void Copy(const EdgeAttributeKitImpl * pcInThat) {
 		m_strPatternName = pcInThat->m_strPatternName;
 		m_fWeight = pcInThat->m_fWeight;
 	}
@@ -31,45 +35,59 @@ public:
 
 EdgeAttributeKit::EdgeAttributeKit()
 {
-	m_pcImpl = new EdgeAttributeKitImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<EdgeAttributeKitImpl>();
+	DEBUG_VALID(m_pcImpl);
+
 }
 
 EdgeAttributeKit::EdgeAttributeKit(EdgeAttributeKit const & cInThat)
 {
-	m_pcImpl = new EdgeAttributeKitImpl();
-	Set(cInThat);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void EdgeAttributeKit::Set(EdgeAttributeKit const & cInThat)
-{
-	EdgeAttributeKitImpl * pcImpl = (EdgeAttributeKitImpl *)m_pcImpl;
-	EdgeAttributeKitImpl * pcInThatImpl = (EdgeAttributeKitImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 EdgeAttributeKit const & EdgeAttributeKit::operator = (EdgeAttributeKit const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 void EdgeAttributeKit::Show(EdgeAttributeKit & cOutKit) const
 {
-	EdgeAttributeKitImpl * pcImpl = (EdgeAttributeKitImpl *)m_pcImpl;
-	EdgeAttributeKitImpl * pcOutKitImpl = (EdgeAttributeKitImpl *)cOutKit.m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeKitImpl *>(m_pcImpl.get());
+	auto pcOutKitImpl = static_cast<EdgeAttributeKitImpl *>(cOutKit.m_pcImpl.get());
+	if (nullptr == pcImpl || nullptr == pcOutKitImpl) {
+		DEBUG_STOP;
+		return;
+	}
+
 	pcOutKitImpl->Copy(pcImpl);
 }
 
 bool EdgeAttributeKit::Empty() const
 {
-	EdgeAttributeKitImpl * pcImpl = (EdgeAttributeKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeKitImpl *>(m_pcImpl.get());
 	return pcImpl->m_strPatternName.IsEmpty() && pcImpl->m_fWeight < 0 && pcImpl->m_fHardAngle < 0;
 }
 
 bool EdgeAttributeKit::operator == (EdgeAttributeKit const & cInThat) const
 {
-	EdgeAttributeKitImpl * pcImpl = (EdgeAttributeKitImpl *)m_pcImpl;
-	EdgeAttributeKitImpl * pcInThatImpl = (EdgeAttributeKitImpl *)cInThat.m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeKitImpl *>(m_pcImpl.get());
+	auto pcInThatImpl = static_cast<EdgeAttributeKitImpl *>(cInThat.m_pcImpl.get());
 	return pcImpl->m_strPatternName == pcInThatImpl->m_strPatternName && pcImpl->m_fWeight == pcInThatImpl->m_fWeight && pcImpl->m_fHardAngle == pcInThatImpl->m_fHardAngle;
 }
 
@@ -80,35 +98,35 @@ bool EdgeAttributeKit::operator != (EdgeAttributeKit const & cInThat) const
 
 EdgeAttributeKit & EdgeAttributeKit::SetPattern(CString strInPatternName)
 {
-	EdgeAttributeKitImpl * pcImpl = (EdgeAttributeKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strPatternName = strInPatternName;
 	return *this;
 }
 
 EdgeAttributeKit & EdgeAttributeKit::SetWeight(float fInWeight, Edge::SizeUnits eInUnits)
 {
-	EdgeAttributeKitImpl * pcImpl = (EdgeAttributeKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeKitImpl *>(m_pcImpl.get());
 	pcImpl->m_fWeight = fInWeight;
 	return *this;
 }
 
 EdgeAttributeKit & EdgeAttributeKit::SetHardAngle(float fInAngle)
 {
-	EdgeAttributeKitImpl * pcImpl = (EdgeAttributeKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeKitImpl *>(m_pcImpl.get());
 	pcImpl->m_fHardAngle = fInAngle;
 	return *this;
 }
 
 EdgeAttributeKit & EdgeAttributeKit::UnsetPattern()
 {
-	EdgeAttributeKitImpl * pcImpl = (EdgeAttributeKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strPatternName.Empty();
 	return *this;
 }
 
 EdgeAttributeKit & EdgeAttributeKit::UnsetWeight()
 {
-	EdgeAttributeKitImpl * pcImpl = (EdgeAttributeKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeKitImpl *>(m_pcImpl.get());
 	pcImpl->m_fWeight = -1;
 	pcImpl->m_eInUnits = Edge::SizeUnits::ScaleFactor;
 	return *this;
@@ -116,14 +134,14 @@ EdgeAttributeKit & EdgeAttributeKit::UnsetWeight()
 
 EdgeAttributeKit & EdgeAttributeKit::UnsetHardAngle()
 {
-	EdgeAttributeKitImpl * pcImpl = (EdgeAttributeKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeKitImpl *>(m_pcImpl.get());
 	pcImpl->m_fHardAngle = -1;
 	return *this;
 }
 
 EdgeAttributeKit & EdgeAttributeKit::UnsetEverything()
 {
-	EdgeAttributeKitImpl * pcImpl = (EdgeAttributeKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strPatternName.Empty();
 	pcImpl->m_fWeight = -1;
 	pcImpl->m_eInUnits = Edge::SizeUnits::ScaleFactor;
@@ -133,14 +151,14 @@ EdgeAttributeKit & EdgeAttributeKit::UnsetEverything()
 
 bool EdgeAttributeKit::ShowPattern(CString & strOutPatternName) const
 {
-	EdgeAttributeKitImpl * pcImpl = (EdgeAttributeKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeKitImpl *>(m_pcImpl.get());
 	strOutPatternName = pcImpl->m_strPatternName;
 	return !strOutPatternName.IsEmpty();
 }
 
 bool EdgeAttributeKit::ShowWeight(float & fOutWeight, Edge::SizeUnits & eOutUnits) const
 {
-	EdgeAttributeKitImpl * pcImpl = (EdgeAttributeKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeKitImpl *>(m_pcImpl.get());
 	fOutWeight = pcImpl->m_fWeight;
 	eOutUnits = pcImpl->m_eInUnits;
 	return fOutWeight >= 0;
@@ -148,7 +166,7 @@ bool EdgeAttributeKit::ShowWeight(float & fOutWeight, Edge::SizeUnits & eOutUnit
 
 bool EdgeAttributeKit::ShowHardAngle(float & fOutAngle) const
 {
-	EdgeAttributeKitImpl * pcImpl = (EdgeAttributeKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeKitImpl *>(m_pcImpl.get());
 	fOutAngle = pcImpl->m_fHardAngle;
 	return fOutAngle >= 0;
 }
@@ -158,43 +176,57 @@ bool EdgeAttributeKit::ShowHardAngle(float & fOutAngle) const
 class EdgeAttributeControlImpl : public ControlImpl
 {
 public:
-	EdgeAttributeControlImpl() { m_eType = H3DF::Type::EdgeAttributeControl; }
+	std::unique_ptr<Impl> Clone() const override {
+		auto pcClone = std::make_unique<EdgeAttributeControlImpl>();
+		pcClone->Copy(this);
+		return pcClone;
+	}
 
-	void Copy(EdgeAttributeControlImpl * pcInThat) {
+	void Copy(const EdgeAttributeControlImpl * pcInThat) {
 		ControlImpl::Copy(pcInThat);
 	}
 };
 
-EdgeAttributeControl::EdgeAttributeControl(SegmentKey & cInSegmentKey)
+EdgeAttributeControl::EdgeAttributeControl(SegmentKey & cInSegment)
 {
-	EdgeAttributeControlImpl * pcImpl = new EdgeAttributeControlImpl();
-	pcImpl->m_cOverrideKey = cInSegmentKey;
+	if (staticType != Type()) {
+		return;
+	}
 
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<EdgeAttributeControlImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_cOverrideKey = cInSegment;
 }
 
 EdgeAttributeControl::EdgeAttributeControl(EdgeAttributeControl const & cInThat)
 {
-	m_pcImpl = new EdgeAttributeControlImpl();
-	Set(cInThat);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void EdgeAttributeControl::Set(EdgeAttributeControl const & cInThat)
-{
-	EdgeAttributeControlImpl * pcImpl = (EdgeAttributeControlImpl *)m_pcImpl;
-	EdgeAttributeControlImpl * pcInThatImpl = (EdgeAttributeControlImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 EdgeAttributeControl & EdgeAttributeControl::operator = (EdgeAttributeControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 EdgeAttributeControl & EdgeAttributeControl::SetPattern(CString strInPatternName)
 {
-	EdgeAttributeControlImpl * pcImpl = (EdgeAttributeControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_Set_Edge_Pattern(Utility::ToChar(strInPatternName));
@@ -205,7 +237,7 @@ EdgeAttributeControl & EdgeAttributeControl::SetPattern(CString strInPatternName
 
 EdgeAttributeControl & EdgeAttributeControl::SetWeight(float fInWeight, Edge::SizeUnits eInUnits)
 {
-	EdgeAttributeControlImpl * pcImpl = (EdgeAttributeControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		
@@ -252,7 +284,7 @@ EdgeAttributeControl & EdgeAttributeControl::SetWeight(float fInWeight, Edge::Si
 
 EdgeAttributeControl & EdgeAttributeControl::SetHardAngle(float fInAngle)
 {
-	EdgeAttributeControlImpl * pcImpl = (EdgeAttributeControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		CString strOption;
@@ -265,7 +297,7 @@ EdgeAttributeControl & EdgeAttributeControl::SetHardAngle(float fInAngle)
 
 EdgeAttributeControl & EdgeAttributeControl::UnsetPattern()
 {
-	EdgeAttributeControlImpl * pcImpl = (EdgeAttributeControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_UnSet_Edge_Pattern();
@@ -276,7 +308,7 @@ EdgeAttributeControl & EdgeAttributeControl::UnsetPattern()
 
 EdgeAttributeControl & EdgeAttributeControl::UnsetWeight()
 {
-	EdgeAttributeControlImpl * pcImpl = (EdgeAttributeControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_UnSet_Edge_Weight();
@@ -287,7 +319,7 @@ EdgeAttributeControl & EdgeAttributeControl::UnsetWeight()
 
 EdgeAttributeControl & EdgeAttributeControl::UnsetHardAngle()
 {
-	EdgeAttributeControlImpl * pcImpl = (EdgeAttributeControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_UnSet_One_Rendering_Option("geometry options");
@@ -298,7 +330,7 @@ EdgeAttributeControl & EdgeAttributeControl::UnsetHardAngle()
 
 EdgeAttributeControl & EdgeAttributeControl::UnsetEverything()
 {
-	EdgeAttributeControlImpl * pcImpl = (EdgeAttributeControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_UnSet_Edge_Pattern();
 		HC_UnSet_Edge_Weight();
@@ -309,7 +341,7 @@ EdgeAttributeControl & EdgeAttributeControl::UnsetEverything()
 
 bool EdgeAttributeControl::ShowPattern(CString & strOutPatternName) const
 {
-	EdgeAttributeControlImpl * pcImpl = (EdgeAttributeControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		char chBuffer[MVO_BUFFER_SIZE] = "\n";
@@ -365,7 +397,7 @@ bool EdgeAttributeControl::ShowWeight(float & fOutWeight, Edge::SizeUnits & eOut
 
 bool EdgeAttributeControl::ShowHardAngle(float & fOutAngle) const
 {
-	EdgeAttributeControlImpl * pcImpl = (EdgeAttributeControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		char chBuffer[MVO_BUFFER_SIZE] = "\n";

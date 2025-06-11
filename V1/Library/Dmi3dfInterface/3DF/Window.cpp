@@ -175,4 +175,11 @@ HighlightControl const & H3DF::WindowKey::GetHighlightControl() const
 	return *pcImpl->m_pcHighlight;
 }
 
+NavigationCube & H3DF::WindowKey::GetNavigationCube()
+{
+	auto pcImpl = static_cast<WindowKeyImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	return pcImpl->GetNavigationCube();
+}
 

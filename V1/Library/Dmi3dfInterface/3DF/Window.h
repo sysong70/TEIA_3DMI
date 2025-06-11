@@ -137,5 +137,7 @@ namespace H3DF
 		// Returns a control that allows the user to highlight segments or geometry in this window.
 		HighlightControl & GetHighlightControl();
 		HighlightControl const & GetHighlightControl() const;
+
+		NavigationCube & GetNavigationCube();
 	};
 }

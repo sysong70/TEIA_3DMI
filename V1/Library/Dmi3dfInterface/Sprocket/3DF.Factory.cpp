@@ -29,6 +29,8 @@ using namespace H3DF;
 
 Canvas * H3DF::Factory::CreateCanvas(H3DF::WindowHandle nInWindowHandle, char const * chInName, H3DF::ApplicationWindowOptionsKit const & cInOptions)
 {
+	SegmentKey cTestSegment;
+
 	Canvas * pcCanvas = new Canvas();
 
 	CanvasImpl * pcCanvasImpl = (CanvasImpl *)pcCanvas->GetImpl();;

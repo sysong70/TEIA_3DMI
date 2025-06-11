@@ -32,7 +32,6 @@ namespace H3DF
 
 		static SelectabilityKit GetDefault();
 
-		void Set(SelectabilityKit const & cInKit);
 		void Show(SelectabilityKit & cOutKit) const;
 
 		SelectabilityKit & operator = (SelectabilityKit const & cInKit);
@@ -80,13 +79,12 @@ namespace H3DF
 	class API_3DF SelectabilityControl : public Control
 	{
 	public:
-		explicit SelectabilityControl(SegmentKey & cInSegmentKey);
+		explicit SelectabilityControl(SegmentKey & cInSegment);
 		SelectabilityControl(SelectabilityControl const & cInThat);
 
 		static const H3DF::Type staticType = H3DF::Type::SelectabilityControl;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(SelectabilityControl const & cInThat);
 		SelectabilityControl & operator = (SelectabilityControl const & cInThat);
 
 		//== Set Selectability Control =============================================================

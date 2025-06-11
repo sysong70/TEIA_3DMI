@@ -150,6 +150,8 @@ namespace H3DF
 
 	class KeyImpl;
 
+	class NavigationCube;
+
 	//==============================================================================================
 
 	namespace Operator {

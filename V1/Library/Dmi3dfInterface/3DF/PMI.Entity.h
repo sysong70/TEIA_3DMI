@@ -113,7 +113,6 @@ namespace H3DF {
 		static const H3DF::Type staticType = H3DF::Type::PMI;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(PmiKey const & cInThat);
 		PmiKey const & operator=(PmiKey const & cInThat);
 
 		void GetFrame(Frame & cOutFrame);
@@ -172,7 +171,6 @@ namespace H3DF {
 		static const H3DF::Type staticType = H3DF::Type::DimensionEntity;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(DimensionEntity const & cInThat);
 		DimensionEntity const & operator=(DimensionEntity const & cInThat);
 
 		Dimension::Type GetDimensionType() const;
@@ -195,7 +193,6 @@ namespace H3DF {
 		static const H3DF::Type staticType = H3DF::Type::FeatureControlFrameEntity;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(FeatureControlFrameEntity const & cInThat);
 		FeatureControlFrameEntity const & operator=(FeatureControlFrameEntity const & cInThat);
 	};
 
@@ -209,7 +206,6 @@ namespace H3DF {
 		static const H3DF::Type staticType = H3DF::Type::GenericEntity;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(GenericEntity const & cInThat);
 		GenericEntity const & operator=(GenericEntity const & cInThat);
 
 		unsigned int GetStringCount() const;
@@ -230,7 +226,6 @@ namespace H3DF {
 		static const H3DF::Type staticType = H3DF::Type::NoteEntity;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(NoteEntity const & cInThat);
 		NoteEntity const & operator=(NoteEntity const & cInThat);
 
 		unsigned int GetStringCount() const;
@@ -248,7 +243,6 @@ namespace H3DF {
 		static const H3DF::Type staticType = H3DF::Type::RoughnessEntity;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(RoughnessEntity const & cInThat);
 		RoughnessEntity const & operator=(RoughnessEntity const & cInThat);
 
 		Roughness::Obtention::Type GetObtentionType() const;

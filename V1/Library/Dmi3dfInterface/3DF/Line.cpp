@@ -18,9 +18,13 @@ namespace H3DF
 	class LineKitImpl : public Impl
 	{
 	public:
-		LineKitImpl() { m_eType = H3DF::Type::LineKit; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<LineKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(LineKitImpl * that)
+		void Copy(const LineKitImpl * that)
 		{
 			m_aPoints = that->m_aPoints;
 			m_cColor = that->m_cColor;
@@ -35,37 +39,45 @@ namespace H3DF
 
 H3DF::LineKit::LineKit()
 {
-	m_pcImpl = new LineKitImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<LineKitImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::LineKit::LineKit(LineKit const & cInThat)
 {
-	m_pcImpl = new LineKitImpl();
-	Set(cInThat);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void H3DF::LineKit::Set(LineKit const & cInThat)
-{
-	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
-	LineKitImpl * pcInThatImpl = (LineKitImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
+
 }
 
 LineKit & H3DF::LineKit::operator = (LineKit const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
 	return *this;
 }
 
 unsigned int H3DF::LineKit::GetPointCount() const
 {
-	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<LineKitImpl *>(m_pcImpl.get());
 	return static_cast<unsigned int>(pcImpl->m_aPoints.size());
 }
 
 void H3DF::LineKit::GetPoints(unsigned int & nOutCount, H3DF::Point pcOutPoints[]) const
 {
-	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<LineKitImpl *>(m_pcImpl.get());
 
 	nOutCount = GetPointCount();
 
@@ -80,7 +92,7 @@ void H3DF::LineKit::GetPoints(unsigned int & nOutCount, H3DF::Point pcOutPoints[
 
 void H3DF::LineKit::SetPoints(unsigned int nInCount, Point const pcInPoints[])
 {
-	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<LineKitImpl *>(m_pcImpl.get());
 	pcImpl->m_aPoints.resize(nInCount);
 
 	for (size_t i = 0; i < nInCount; i++) {
@@ -90,19 +102,19 @@ void H3DF::LineKit::SetPoints(unsigned int nInCount, Point const pcInPoints[])
 
 void H3DF::LineKit::GetRGBColor(H3DF::RGBColor & cOutColor) const
 {
-	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<LineKitImpl *>(m_pcImpl.get());
 	cOutColor = pcImpl->m_cColor;
 }
 
 void H3DF::LineKit::SetRGBColor(RGBColor const & cInColor)
 {
-	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<LineKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cColor = cInColor;
 }
 
 void H3DF::LineKit::GetLinePattern(char pcOutPattern[PATTERN_BUFFER_SIZE]) const
 {
-	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<LineKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	strncpy(pcOutPattern, pcImpl->m_chPattern, PATTERN_BUFFER_SIZE);
@@ -110,7 +122,7 @@ void H3DF::LineKit::GetLinePattern(char pcOutPattern[PATTERN_BUFFER_SIZE]) const
 
 void H3DF::LineKit::SetLinePattern(char pcInPattern[PATTERN_BUFFER_SIZE]) const
 {
-	LineKitImpl * pcImpl = (LineKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<LineKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	strncpy(pcImpl->m_chPattern, pcInPattern, PATTERN_BUFFER_SIZE);
@@ -122,61 +134,82 @@ namespace H3DF {
 	class LineKeyImpl : public GeometryKeyImpl
 	{
 	public:
-		LineKeyImpl() { m_eType = H3DF::Type::LineKey; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<LineKeyImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(LineKeyImpl * pcInThat) {
-			KeyImpl::Copy(pcInThat);
+		void Copy(const LineKeyImpl * pcInThat) {
+			GeometryKeyImpl::Copy(pcInThat);
 		}
 	};
 };
 
-H3DF::LineKey::LineKey() : GeometryKey(INVALID_KEY)
+H3DF::LineKey::LineKey()
 {
-	m_pcImpl = new LineKeyImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<LineKeyImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
-H3DF::LineKey::LineKey(HC_KEY nInKey) : GeometryKey(INVALID_KEY)
+H3DF::LineKey::LineKey(HC_KEY nInKey)
 {
-	LineKeyImpl * pcImpl = new LineKeyImpl();
-	pcImpl->SetKeyValue(nInKey);
+	if (staticType != Type()) {
+		return;
+	}
 
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<LineKeyImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcImpl = static_cast<LineKeyImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->SetKeyValue(nInKey);
 }
 
 H3DF::LineKey::LineKey(Key const & cInKey)
 {
-	LineKeyImpl * pcImpl = new LineKeyImpl();
-	m_pcImpl = pcImpl;
-
-	if(H3DF::Type::LineKey != cInKey.ObjectType()) {
-		DEBUG_STOP;
+	if (staticType != Type()) {
 		return;
 	}
 
-	((KeyImpl *)pcImpl)->Copy((KeyImpl *)(cInKey.GetImpl()));
+	// PolygonShapeElementImpl 생성
+	m_pcImpl = std::make_unique<LineKeyImpl>();
+	auto pcImpl = static_cast<LineKeyImpl *>(m_pcImpl.get());
+
+	auto pcInThatImpl = static_cast<const KeyImpl *>(cInKey.GetImpl());
+
+	if (nullptr != pcImpl && nullptr != pcInThatImpl) {
+		pcImpl->KeyImpl::Copy(pcInThatImpl);
+	}
+	else {
+		DEBUG_STOP;
+	}
 }
 
 H3DF::LineKey::LineKey(LineKey const & cInThat)
 {
-	m_pcImpl = new LineKeyImpl();
-	Set(cInThat);
-}
-
-void H3DF::LineKey::Set(LineKey const & cInThat)
-{
-	if (nullptr == m_pcImpl || nullptr == cInThat.m_pcImpl) {
+	if (staticType != Type()) {
 		return;
 	}
 
-	LineKeyImpl * pcImpl = (LineKeyImpl *)m_pcImpl;
-	LineKeyImpl * pcInThatImpl = (LineKeyImpl *)cInThat.m_pcImpl;
-
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 LineKey & H3DF::LineKey::operator=(LineKey const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 

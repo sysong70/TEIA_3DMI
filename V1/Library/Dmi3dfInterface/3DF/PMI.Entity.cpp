@@ -89,7 +89,13 @@ H3DF::PmiKey::PmiKey(PmiKey const & cInThat)
 
 PmiKey const & H3DF::PmiKey::operator=(PmiKey const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -837,14 +843,15 @@ H3DF::DimensionEntity::DimensionEntity(DimensionEntity const & cInThat) : PmiKey
 	}
 }
 
-void H3DF::DimensionEntity::Set(DimensionEntity const & cInThat)
-{
-	H3DF::PmiKey::Set(cInThat);
-}
-
 DimensionEntity const & H3DF::DimensionEntity::operator=(DimensionEntity const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -931,14 +938,15 @@ H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(FeatureControlFrameEn
 	}
 }
 
-void H3DF::FeatureControlFrameEntity::Set(FeatureControlFrameEntity const & cInThat)
-{
-	H3DF::PmiKey::Set(cInThat);
-}
-
 FeatureControlFrameEntity const & H3DF::FeatureControlFrameEntity::operator=(FeatureControlFrameEntity const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -983,14 +991,15 @@ H3DF::GenericEntity::GenericEntity(GenericEntity const & cInThat) : PmiKey(cInTh
 	}
 }
 
-void H3DF::GenericEntity::Set(GenericEntity const & cInThat)
-{
-	H3DF::PmiKey::Set(cInThat);
-}
-
 GenericEntity const & H3DF::GenericEntity::operator=(GenericEntity const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -1050,14 +1059,15 @@ H3DF::NoteEntity::NoteEntity(NoteEntity const & cInThat) : PmiKey(cInThat)
 	}
 }
 
-void H3DF::NoteEntity::Set(NoteEntity const & cInThat)
-{
-	H3DF::PmiKey::Set(cInThat);
-}
-
 NoteEntity const & H3DF::NoteEntity::operator=(NoteEntity const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -1107,14 +1117,15 @@ H3DF::RoughnessEntity::RoughnessEntity(RoughnessEntity const & cInThat): PmiKey(
 	}
 }
 
-void H3DF::RoughnessEntity::Set(RoughnessEntity const & cInThat)
+RoughnessEntity const & H3DF::RoughnessEntity::operator=(RoughnessEntity const & cInThat)
 {
-	H3DF::PmiKey::Set(cInThat);
-}
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
 
-RoughnessEntity const & H3DF::RoughnessEntity::operator=(RoughnessEntity const & that)
-{
-	Set(that);
 	return *this;
 }
 

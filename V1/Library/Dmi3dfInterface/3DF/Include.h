@@ -15,7 +15,6 @@ namespace H3DF
 		static const H3DF::Type staticType = H3DF::Type::IncludeKey;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(IncludeKey const & cInThat);
 		IncludeKey & operator = (IncludeKey const & cInThat);
 
 		SegmentKey GetTarget() const;

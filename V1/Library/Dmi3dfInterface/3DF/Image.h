@@ -40,7 +40,6 @@ namespace H3DF
 			static const H3DF::Type staticType = H3DF::Type::ImageImportOptionsKit;
 			H3DF::Type ObjectType() const { return staticType; };
 
-			void Set(ImportOptionsKit const & cInKit);
 			ImportOptionsKit const & operator = (ImportOptionsKit const & cInKit);
 
 			void Show(ImportOptionsKit & cOutKit) const;
@@ -87,7 +86,6 @@ namespace H3DF
 		ImageKit(ImageKit && cInThat) noexcept;
 		ImageKit & operator = (ImageKit && cInThat) noexcept;
 
-		void Set(ImageKit const & cInKit);
 		ImageKit const & operator = (ImageKit const & cInKit);
 
 		void Show(ImageKit & cOutKit) const;
@@ -121,7 +119,6 @@ namespace H3DF
 		ImageDefinition(ImageDefinition && cInThat) noexcept;
 		ImageDefinition & operator = (ImageDefinition && cInThat) noexcept;
 
-		void Set(ImageDefinition const & cInKit);
 		ImageDefinition const & operator = (ImageDefinition const & cInKit);
 
 		void Set(ImageKit const & cInKit);

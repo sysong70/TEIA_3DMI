@@ -2,6 +2,8 @@
 
 #include "Include.h"
 
+#include "./Impl/KeyImpl.h"
+
 #include "Segment.h"
 
 #include "Condition.h"
@@ -10,29 +12,67 @@
 
 using namespace H3DF;
 
-H3DF::IncludeKey::IncludeKey() : Key()
+namespace H3DF
 {
-	
+	class IncludeKeyImpl : public KeyImpl
+	{
+	public:
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<IncludeKeyImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy(const IncludeKeyImpl * pcInThat) {
+			KeyImpl::Copy(pcInThat);
+		}
+	};
 }
 
-H3DF::IncludeKey::IncludeKey(HC_KEY nInKey) : Key(nInKey)
+H3DF::IncludeKey::IncludeKey()
 {
-	
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<IncludeKeyImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
-H3DF::IncludeKey::IncludeKey(IncludeKey const & cInThat):
-	Key(cInThat.KeyValue())
+H3DF::IncludeKey::IncludeKey(HC_KEY nInKey)
 {
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<IncludeKeyImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcImpl = static_cast<IncludeKeyImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->SetKeyValue(nInKey);
 }
 
-void H3DF::IncludeKey::Set(IncludeKey const & cInThat)
+H3DF::IncludeKey::IncludeKey(IncludeKey const & cInThat)
 {
-	Key::Set(cInThat);
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 IncludeKey & H3DF::IncludeKey::operator = (IncludeKey const & cInThat)
 {
-	Key::Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 

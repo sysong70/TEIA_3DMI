@@ -6,7 +6,7 @@
 
 namespace H3DF 
 {
-	class KeyPath : public Object
+	class API_3DF KeyPath : public Object
 	{
 	public:
 		KeyPath();

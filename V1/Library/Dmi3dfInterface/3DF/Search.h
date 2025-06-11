@@ -343,8 +343,7 @@ namespace H3DF
 		static const H3DF::Type staticType = H3DF::Type::SearchOptionsKit;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(SearchOptionsKit const & cInThat);
-		SearchOptionsKit & operator = (SearchOptionsKit && cInThat);
+		SearchOptionsKit & operator = (SearchOptionsKit const & cInThat);
 	};
 
 	class API_3DF SearchResultsIterator : public Object {
@@ -355,7 +354,6 @@ namespace H3DF
 		static const H3DF::Type staticType = H3DF::Type::SearchResultsIterator;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(SearchResultsIterator const & cInThat);
 		SearchResultsIterator & operator=(SearchResultsIterator const & cInThat);
 
 		void Next();

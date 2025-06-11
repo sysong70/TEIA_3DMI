@@ -38,7 +38,6 @@ namespace H3DF
 		static const H3DF::Type staticType = H3DF::Type::ConditionalExpression;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(ConditionalExpression const & cInThat);
 		ConditionalExpression & operator = (ConditionalExpression const & cInThat);
 
 		bool ShowCondition(CStringA & strOutCondition) const;
@@ -59,13 +58,12 @@ namespace H3DF
 	class API_3DF ConditionControl : public Control
 	{
 	public:
-		ConditionControl(SegmentKey & cInSegmentKey);
+		ConditionControl(SegmentKey & cInSegment);
 		ConditionControl(ConditionControl const & cInThat);
 
 		static const H3DF::Type staticType = H3DF::Type::ConditionControl;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(ConditionControl const & cInThat);
 		ConditionControl & operator = (ConditionControl const & cInThat);
 
 		size_t GetCount() const;

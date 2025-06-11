@@ -18,31 +18,39 @@ using namespace H3DF;
 
 H3DF::CameraKit::CameraKit()
 {
-	m_pcImpl = new CameraKitImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<CameraKitImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::CameraKit::CameraKit(CameraKit const & cInThat)
 {
-	m_pcImpl = new CameraKitImpl();
-	Set(cInThat);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void H3DF::CameraKit::Set(CameraKit const & cInThat)
-{
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
-	CameraKitImpl * pcInThatImpl = (CameraKitImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 CameraKit const & H3DF::CameraKit::operator=(CameraKit const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 //== Set ===========================================================================================
 CameraKit & H3DF::CameraKit::SetUpVector(Vector const & cInUpVector)
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cData.cUpVector = cInUpVector;
 	pcImpl->m_cData.bUpVectorFlag = true;
 
@@ -51,7 +59,7 @@ CameraKit & H3DF::CameraKit::SetUpVector(Vector const & cInUpVector)
 
 CameraKit & H3DF::CameraKit::SetPosition(Point const & cInPosition)
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cData.cPosition = cInPosition;
 	pcImpl->m_cData.bPositionFlag = true;
 
@@ -60,7 +68,7 @@ CameraKit & H3DF::CameraKit::SetPosition(Point const & cInPosition)
 
 CameraKit & H3DF::CameraKit::SetTarget(Point const & cInTarget)
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cData.cTarget = cInTarget;
 	pcImpl->m_cData.bTargetFlag = true;
 
@@ -69,7 +77,7 @@ CameraKit & H3DF::CameraKit::SetTarget(Point const & cInTarget)
 
 CameraKit & H3DF::CameraKit::SetProjection(Camera::Projection eInType, float fInOblique_Y_Skew, float fInOblique_X_Skew)
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cData.eType = eInType;
 	pcImpl->m_cData.bTypeFlag = true;
 
@@ -81,7 +89,7 @@ CameraKit & H3DF::CameraKit::SetProjection(Camera::Projection eInType, float fIn
 
 CameraKit & H3DF::CameraKit::SetField(float fInWidth, float fInHeight)
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cData.fWidth = fInWidth;
 	pcImpl->m_cData.bWidthFlag = true;
 
@@ -93,7 +101,7 @@ CameraKit & H3DF::CameraKit::SetField(float fInWidth, float fInHeight)
 
 CameraKit & H3DF::CameraKit::SetNearLimit(float const fInLimit)
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cData.fNearLimit = fInLimit;
 	pcImpl->m_cData.bNearLimitFlag = true;
 
@@ -105,7 +113,7 @@ CameraKit & H3DF::CameraKit::SetNearLimit(float const fInLimit)
 //== Unset =========================================================================================
 CameraKit & H3DF::CameraKit::UnsetUpVector()
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cData.bUpVectorFlag = false;
 
 	return *this;
@@ -113,7 +121,7 @@ CameraKit & H3DF::CameraKit::UnsetUpVector()
 
 CameraKit & H3DF::CameraKit::UnsetPosition()
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cData.bPositionFlag = false;
 
 	return *this;
@@ -121,7 +129,7 @@ CameraKit & H3DF::CameraKit::UnsetPosition()
 
 CameraKit & H3DF::CameraKit::UnsetTarget()
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cData.bTargetFlag = false;
 
 	return *this;
@@ -130,7 +138,7 @@ CameraKit & H3DF::CameraKit::UnsetTarget()
 //== Show ===========================================================================================
 bool H3DF::CameraKit::ShowUpVector(Vector & cOutUpVector) const
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->m_cData.bUpVectorFlag) {
 		return false;
 	}
@@ -141,7 +149,7 @@ bool H3DF::CameraKit::ShowUpVector(Vector & cOutUpVector) const
 
 bool H3DF::CameraKit::ShowPosition(Point & cOutPosition) const
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->m_cData.bPositionFlag) {
 		return false;
 	}
@@ -152,7 +160,7 @@ bool H3DF::CameraKit::ShowPosition(Point & cOutPosition) const
 
 bool H3DF::CameraKit::ShowTarget(Point & cOutTarget) const
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->m_cData.bTargetFlag) {
 		return false;
 	}
@@ -163,7 +171,7 @@ bool H3DF::CameraKit::ShowTarget(Point & cOutTarget) const
 
 bool H3DF::CameraKit::ShowProjection(Camera::Projection & eOutType) const
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->m_cData.bTargetFlag) {
 		return false;
 	}
@@ -174,7 +182,7 @@ bool H3DF::CameraKit::ShowProjection(Camera::Projection & eOutType) const
 
 bool H3DF::CameraKit::ShowProjection(Camera::Projection & eOutType, float & fOutOblique_Y_Skew, float & fOutOblique_X_Skew) const
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->m_cData.bTypeFlag) {
 		return false;
 	}
@@ -188,7 +196,7 @@ bool H3DF::CameraKit::ShowProjection(Camera::Projection & eOutType, float & fOut
 
 bool H3DF::CameraKit::ShowWidth(float & fOutWidth) const
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->m_cData.bWidthFlag) {
 		return false;
 	}
@@ -200,7 +208,7 @@ bool H3DF::CameraKit::ShowWidth(float & fOutWidth) const
 
 bool H3DF::CameraKit::ShowHeight(float & fOutHeight) const
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->m_cData.bHeightFlag) {
 		return false;
 	}
@@ -212,7 +220,7 @@ bool H3DF::CameraKit::ShowHeight(float & fOutHeight) const
 
 bool H3DF::CameraKit::ShowField(float & fOutWidth, float & fOutHeight) const
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->m_cData.bWidthFlag) {
 		return false;
 	}
@@ -230,7 +238,7 @@ bool H3DF::CameraKit::ShowField(float & fOutWidth, float & fOutHeight) const
 // NearLimit Show
 bool H3DF::CameraKit::ShowNearLimit(float & fOutNearLimit) const
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 	if (false == pcImpl->m_cData.bNearLimitFlag) {
 		return false;
 	}
@@ -243,7 +251,7 @@ bool H3DF::CameraKit::ShowNearLimit(float & fOutNearLimit) const
 // Show Matrix 생성
 bool H3DF::CameraKit::ShowMatrix(MatrixKit & cMatrix) const
 {
-	CameraKitImpl * pcImpl = (CameraKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraKitImpl *>(m_pcImpl.get());
 
 	// Matrix를 생성하기 위해서 필요한 값들이 존재하는지 여부를 확인한다.
 	if (false == pcImpl->m_cData.bUpVectorFlag) {
@@ -288,40 +296,46 @@ bool H3DF::CameraKit::ShowMatrix(MatrixKit & cMatrix) const
 }
 
 //== CameraControl Class ============================================================================
-H3DF::CameraControl::CameraControl(SegmentKey & cInSegmentKey)
+H3DF::CameraControl::CameraControl(SegmentKey & cInSegment)
 {
-	CameraControlImpl * pcImpl = new CameraControlImpl();
-	pcImpl->m_cOverrideKey = cInSegmentKey;
+	if (staticType != Type()) {
+		return;
+	}
 
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<CameraControlImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_cOverrideKey = cInSegment;
 }
 
 H3DF::CameraControl::CameraControl(CameraControl const & cInThat)
 {
-	m_pcImpl = new CameraControlImpl();
-	Set(cInThat);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void H3DF::CameraControl::Set(CameraControl const & cInThat)
-{
-	CameraControlImpl * pcImpl = (CameraControlImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
-	CameraControlImpl * pcInThatImpl = (CameraControlImpl *)cInThat.m_pcImpl;
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 CameraControl & H3DF::CameraControl::operator = (CameraControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 CameraControl & H3DF::CameraControl::SetUpVector(Vector const & cInUp)
 {
-	CameraControlImpl * pcImpl = (CameraControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -333,7 +347,7 @@ CameraControl & H3DF::CameraControl::SetUpVector(Vector const & cInUp)
 
 CameraControl & H3DF::CameraControl::SetPosition(Point const & cInPosition)
 {
-	CameraControlImpl * pcImpl = (CameraControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -345,7 +359,7 @@ CameraControl & H3DF::CameraControl::SetPosition(Point const & cInPosition)
 
 CameraControl & H3DF::CameraControl::SetTarget(Point const & cInTarget)
 {
-	CameraControlImpl * pcImpl = (CameraControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -357,7 +371,7 @@ CameraControl & H3DF::CameraControl::SetTarget(Point const & cInTarget)
 
 CameraControl & H3DF::CameraControl::SetProjection(Camera::Projection eInType, float fInObliqueXSkew, float fInObliqueYSkew)
 {
-	CameraControlImpl * pcImpl = (CameraControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -385,7 +399,7 @@ CameraControl & H3DF::CameraControl::SetProjection(Camera::Projection eInType, f
 
 CameraControl & H3DF::CameraControl::SetField(float fInWidth, float fInHeight)
 {
-	CameraControlImpl * pcImpl = (CameraControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -397,7 +411,7 @@ CameraControl & H3DF::CameraControl::SetField(float fInWidth, float fInHeight)
 
 CameraControl & H3DF::CameraControl::SetNearLimit(float fInLimit)
 {
-	CameraControlImpl * pcImpl = (CameraControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {

@@ -26,6 +26,12 @@ namespace H3DF
 		CanvasImpl();
 		virtual ~CanvasImpl();
 
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<CanvasImpl>(*this);
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
 		void Copy(const CanvasImpl * pcInThat);
 
 		Signal::Delivery & Delivery();

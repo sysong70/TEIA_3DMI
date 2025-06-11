@@ -19,60 +19,60 @@ using namespace H3DF;
 
 H3DF::MetaData::MetaData()
 {
-	m_pcImpl = new MetaDataImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<MetaDataImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::MetaData::MetaData(MetaData const & cInThat)
 {
-	MetaDataImpl * pcImpl = new MetaDataImpl();
-	DEBUG_VALID(pcImpl);
+	if (staticType != Type()) {
+		return;
+	}
 
-	m_pcImpl = pcImpl;
-
-	Set(cInThat);
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::MetaData::MetaData(MetaDataIndex nInIndex)
 {
-	MetaDataImpl * pcImpl = new MetaDataImpl();
-	DEBUG_VALID(pcImpl);
+	if (staticType != Type()) {
+		return;
+	}
 
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<MetaDataImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcImpl = static_cast<MetaDataImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_eIndex = nInIndex;
 }
 
-void H3DF::MetaData::Set(MetaData const & cInThat)
-{
-	MetaDataImpl * pcImpl = (MetaDataImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
-	MetaDataImpl * pcInThatImpl = (MetaDataImpl *)cInThat.m_pcImpl;
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->Copy(pcInThatImpl);
-}
-
 H3DF::MetaData & H3DF::MetaData::operator = (MetaData const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 bool H3DF::MetaData::Equals(MetaData const & cInThat) const
 {
-	MetaDataImpl * pcImpl = (MetaDataImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MetaDataImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
-	MetaDataImpl * pcInThatImpl = (MetaDataImpl *)cInThat.m_pcImpl;
+	auto pcInThatImpl = static_cast<MetaDataImpl *>(cInThat.m_pcImpl.get());
 	DEBUG_VALID(pcInThatImpl);
 
-	if (pcImpl->m_eIndex != pcInThatImpl->m_eIndex) {
-		return false;
-	}
-
-	return true;
+	return pcImpl->Equals(pcInThatImpl);
 }
 
 bool H3DF::MetaData::operator != (MetaData const & cInThat) const
@@ -87,7 +87,7 @@ bool H3DF::MetaData::operator == (MetaData const & cInThat) const
 
 MetaDataIndex H3DF::MetaData::GetIndex() const
 {
-	MetaDataImpl * pcImpl = (MetaDataImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MetaDataImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_eIndex;
@@ -95,7 +95,7 @@ MetaDataIndex H3DF::MetaData::GetIndex() const
 
 void H3DF::MetaData::SetIndex(MetaDataIndex nInIndex)
 {
-	MetaDataImpl * pcImpl = (MetaDataImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MetaDataImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_eIndex = nInIndex;
@@ -105,111 +105,91 @@ void H3DF::MetaData::SetIndex(MetaDataIndex nInIndex)
 
 H3DF::StringMetaData::StringMetaData()
 {
-	if (nullptr != m_pcImpl) {
-		REMOVE_POINTER(m_pcImpl);
+	if (staticType != Type()) {
+		return;
 	}
 
-	m_pcImpl = new StringMetaDataImpl();
+	m_pcImpl = std::make_unique<StringMetaDataImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::StringMetaData::StringMetaData(MetaData const & cInThat)
 {
-	if (nullptr != m_pcImpl) {
-		REMOVE_POINTER(m_pcImpl);
+	if (staticType != Type()) {
+		return;
 	}
 
-	StringMetaDataImpl * pcImpl = new StringMetaDataImpl();
-	DEBUG_VALID(pcImpl);
+	// PolygonShapeElementImpl 생성
+	m_pcImpl = std::make_unique<StringMetaDataImpl>();
+	auto pcImpl = static_cast<StringMetaDataImpl *>(m_pcImpl.get());
 
-	m_pcImpl = pcImpl;
+	auto pcInThatImpl = static_cast<const MetaDataImpl *>(cInThat.GetImpl());
 
-	if (H3DF::Type::StringMetaData == cInThat.ObjectType()) {
-		Set(cInThat);
+	if (nullptr != pcImpl && nullptr != pcInThatImpl) {
+		pcImpl->MetaDataImpl::Copy(pcInThatImpl);
 	}
 	else {
-		MetaData::Set(cInThat);
+		DEBUG_STOP;
 	}
 }
 
 H3DF::StringMetaData::StringMetaData(StringMetaData const & cInThat)
 {
-	if (nullptr != m_pcImpl) {
-		REMOVE_POINTER(m_pcImpl);
+	if (staticType != Type()) {
+		return;
 	}
 
-	StringMetaDataImpl * pcImpl = new StringMetaDataImpl();
-	DEBUG_VALID(pcImpl);
-
-	m_pcImpl = pcImpl;
-
-	Set(cInThat);
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::StringMetaData::StringMetaData(MetaDataIndex nInIndex, CString strInValue)
 {
-	if (nullptr != m_pcImpl) {
-		REMOVE_POINTER(m_pcImpl);
+	if (staticType != Type()) {
+		return;
 	}
 
-	StringMetaDataImpl * pcImpl = new StringMetaDataImpl();
-	DEBUG_VALID(pcImpl);
+	m_pcImpl = std::make_unique<StringMetaDataImpl>();
+	DEBUG_VALID(m_pcImpl);
 
-	m_pcImpl = pcImpl;
+	auto pcImpl = static_cast<StringMetaDataImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_eIndex = nInIndex;
 	pcImpl->m_strValue = strInValue;
 }
 
-void H3DF::StringMetaData::Set(StringMetaData const & cInThat)
-{
-	StringMetaDataImpl * pcImpl = (StringMetaDataImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
-	StringMetaDataImpl * pcInThatImpl = (StringMetaDataImpl *)cInThat.m_pcImpl;
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->Copy(pcInThatImpl);
-}
-
 StringMetaData & H3DF::StringMetaData::operator = (StringMetaData const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
-}
-
-bool H3DF::StringMetaData::Equals(StringMetaData const & cInThat) const
-{
-	StringMetaDataImpl * pcImpl = (StringMetaDataImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
-	StringMetaDataImpl * pcInThatImpl = (StringMetaDataImpl *)cInThat.m_pcImpl;
-	DEBUG_VALID(pcInThatImpl);
-
-	if (pcImpl->m_eIndex != pcInThatImpl->m_eIndex) {
-		return false;
-	}
-
-	if (pcImpl->m_strValue != pcInThatImpl->m_strValue) {
-		return false;
-	}
-
-	return true;
 }
 
 bool H3DF::StringMetaData::operator != (StringMetaData const & cInThat) const
 {
-	return !Equals(cInThat);
+	return !(*this == cInThat);
 }
 
 bool H3DF::StringMetaData::operator == (StringMetaData const & cInThat) const
 {
-	return Equals(cInThat);
+	auto pcImpl = static_cast<StringMetaDataImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	auto pcInThatImpl = static_cast<StringMetaDataImpl *>(cInThat.m_pcImpl.get());
+	DEBUG_VALID(pcInThatImpl);
+
+	return pcImpl->Equals(pcInThatImpl);
 }
 
 CString H3DF::StringMetaData::GetValue() const
 {
-	StringMetaDataImpl * pcImpl = (StringMetaDataImpl *)m_pcImpl;
+	auto pcImpl = static_cast<StringMetaDataImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_strValue;
@@ -217,7 +197,7 @@ CString H3DF::StringMetaData::GetValue() const
 
 void H3DF::StringMetaData::SetValue(CString strInValue)
 {
-	StringMetaDataImpl * pcImpl = (StringMetaDataImpl *)m_pcImpl;
+	auto pcImpl = static_cast<StringMetaDataImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_strValue = strInValue;
@@ -226,111 +206,92 @@ void H3DF::StringMetaData::SetValue(CString strInValue)
 //== DwordMetaData Class ===========================================================================
 H3DF::DwordPtrMetaData::DwordPtrMetaData()
 {
-	if (nullptr != m_pcImpl) {
-		REMOVE_POINTER(m_pcImpl);
+	if (staticType != Type()) {
+		return;
 	}
 
-	m_pcImpl = new DwordPtrMetaDataImpl();
+	m_pcImpl = std::make_unique<DwordPtrMetaDataImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::DwordPtrMetaData::DwordPtrMetaData(MetaData const & cInThat)
 {
-	if (nullptr != m_pcImpl) {
-		REMOVE_POINTER(m_pcImpl);
+	if (staticType != Type()) {
+		return;
 	}
 
-	DwordPtrMetaDataImpl * pcImpl = new DwordPtrMetaDataImpl();
-	DEBUG_VALID(pcImpl);
+	// PolygonShapeElementImpl 생성
+	m_pcImpl = std::make_unique<DwordPtrMetaDataImpl>();
+	auto pcImpl = static_cast<DwordPtrMetaDataImpl *>(m_pcImpl.get());
 
-	m_pcImpl = pcImpl;
+	auto pcInThatImpl = static_cast<const MetaDataImpl *>(cInThat.GetImpl());
 
-	if (H3DF::Type::DwordPtrMetaData == cInThat.ObjectType()) {
-		Set(cInThat);
+	if (nullptr != pcImpl && nullptr != pcInThatImpl) {
+		pcImpl->MetaDataImpl::Copy(pcInThatImpl);
 	}
 	else {
-		MetaData::Set(cInThat);
+		DEBUG_STOP;
 	}
 }
 
 H3DF::DwordPtrMetaData::DwordPtrMetaData(DwordPtrMetaData const & cInThat)
 {
-	if (nullptr != m_pcImpl) {
-		REMOVE_POINTER(m_pcImpl);
+	if (staticType != Type()) {
+		return;
 	}
 
-	DwordPtrMetaDataImpl * pcImpl = new DwordPtrMetaDataImpl();
-	DEBUG_VALID(pcImpl);
-
-	m_pcImpl = pcImpl;
-
-	Set(cInThat);
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::DwordPtrMetaData::DwordPtrMetaData(MetaDataIndex nInIndex, DWORD_PTR nInValue)
 {
-	if (nullptr != m_pcImpl) {
-		REMOVE_POINTER(m_pcImpl);
+	if (staticType != Type()) {
+		return;
 	}
 
-	DwordPtrMetaDataImpl * pcImpl = new DwordPtrMetaDataImpl();
-	DEBUG_VALID(pcImpl);
+	m_pcImpl = std::make_unique<DwordPtrMetaDataImpl>();
+	DEBUG_VALID(m_pcImpl);
 
-	m_pcImpl = pcImpl;
+	auto pcImpl = static_cast<DwordPtrMetaDataImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_eIndex = nInIndex;
 	pcImpl->m_nValue = nInValue;
 }
 
-void H3DF::DwordPtrMetaData::Set(DwordPtrMetaData const & cInThat)
-{
-	DwordPtrMetaDataImpl * pcImpl = (DwordPtrMetaDataImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
-	DwordPtrMetaDataImpl * pcInThatImpl = (DwordPtrMetaDataImpl *)cInThat.m_pcImpl;
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->Copy(pcInThatImpl);
-}
-
 DwordPtrMetaData & H3DF::DwordPtrMetaData::operator = (DwordPtrMetaData const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
-}
-
-bool H3DF::DwordPtrMetaData::Equals(DwordPtrMetaData const & cInThat) const
-{
-	DwordPtrMetaDataImpl * pcImpl = (DwordPtrMetaDataImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
-	DwordPtrMetaDataImpl * pcInThatImpl = (DwordPtrMetaDataImpl *)cInThat.m_pcImpl;
-	DEBUG_VALID(pcInThatImpl);
-
-	if (pcImpl->m_eIndex != pcInThatImpl->m_eIndex) {
-		return false;
-	}
-
-	if (pcImpl->m_nValue != pcInThatImpl->m_nValue) {
-		return false;
-	}
-
-	return true;
 }
 
 bool H3DF::DwordPtrMetaData::operator != (DwordPtrMetaData const & cInThat) const
 {
-	return !Equals(cInThat);
+	return !(*this == cInThat);
 }
 
 bool H3DF::DwordPtrMetaData::operator == (DwordPtrMetaData const & cInThat) const
 {
-	return Equals(cInThat);
+	auto pcImpl = static_cast<DwordPtrMetaDataImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	auto pcInThatImpl = static_cast<DwordPtrMetaDataImpl *>(cInThat.m_pcImpl.get());
+	DEBUG_VALID(pcInThatImpl);
+
+
+	return pcImpl->Equals(pcInThatImpl);
 }
 
 DWORD_PTR H3DF::DwordPtrMetaData::GetValue() const
 {
-	DwordPtrMetaDataImpl * pcImpl = (DwordPtrMetaDataImpl *)m_pcImpl;
+	auto pcImpl = static_cast<DwordPtrMetaDataImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_nValue;
@@ -338,7 +299,7 @@ DWORD_PTR H3DF::DwordPtrMetaData::GetValue() const
 
 void H3DF::DwordPtrMetaData::SetValue(DWORD_PTR nInValue)
 {
-	DwordPtrMetaDataImpl * pcImpl = (DwordPtrMetaDataImpl *)m_pcImpl;
+	auto pcImpl = static_cast<DwordPtrMetaDataImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_nValue = nInValue;

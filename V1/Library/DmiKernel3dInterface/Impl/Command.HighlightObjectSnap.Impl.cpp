@@ -1000,7 +1000,7 @@ void KERNEL::Command::HighlightObjectSnapImpl::DrawSnapItems()
 		CamerInformation cCameraInfo;
 		ShowCameraInformation(m_fSnapRadius, cCameraInfo);
 
-		SegmentKeyImpl::ForcedOpen(m_cSnapPointSegment); {
+		H3DF::SegmentKeyUtility::ForcedOpen(m_cSnapPointSegment); {
 
 			H3DF::SearchTypeArray aSearchTypes;
 			aSearchTypes.push_back(H3DF::Search::Type::Geometry);
@@ -1017,7 +1017,7 @@ void KERNEL::Command::HighlightObjectSnapImpl::DrawSnapItems()
 					DrawSnapPointTypeText(cSnapPoint, cCameraInfo, false);
 				}
 			}
-		} SegmentKeyImpl::ForcedClose(m_cSnapPointSegment);
+		} H3DF::SegmentKeyUtility::ForcedClose(m_cSnapPointSegment);
 		
 
 		Window().ForceUpdate();

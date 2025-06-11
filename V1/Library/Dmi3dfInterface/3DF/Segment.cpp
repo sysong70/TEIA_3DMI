@@ -36,7 +36,7 @@ using namespace H3DF;
 
 H3DF::SegmentKey::SegmentKey()
 {
-	if (staticType != Type()) {
+	if (staticType != H3DF::Type::SegmentKey) {
 		return;
 	}
 

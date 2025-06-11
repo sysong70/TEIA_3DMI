@@ -406,7 +406,14 @@ namespace H3DF
 		public:
 			CameraControlImpl(WindowKey const & cInWindow, NavigationCube const & cNaviCube);
 
-			void Copy(CameraControlImpl * pcInThat) {
+			CameraControlImpl(const CameraControlImpl * pcInThat);
+
+			std::unique_ptr<Impl> Clone() const override {
+				auto pcClone = std::make_unique<CameraControlImpl>(this);
+				return pcClone;
+			}
+
+			void Copy(const CameraControlImpl * pcInThat) {
 				OperatorImpl::Copy(pcInThat);
 				m_pcNaviCube = pcInThat->m_pcNaviCube;
 			}
@@ -422,13 +429,13 @@ namespace H3DF
 
 			H3DF::Camera::Mode m_eCameraMode = H3DF::Camera::Mode::Multi;
 
-			DWORD m_nSelectPickCount;
-			DWORD m_nMouseDownTickCount;
+			DWORD m_nSelectPickCount{};
+			DWORD m_nMouseDownTickCount{};
 			
 			Point m_cMouseDownPoint;
 			HPoint m_cClickPoint;
 
-			double  m_dFirstPoint[3];
+			double  m_dFirstPoint[3]{};
 
 			HOpCameraOrbit m_cCameraOrbit;
 			CameraRelativeOrbit m_cCameraRelativeOrbit;
@@ -439,8 +446,8 @@ namespace H3DF
 	}
 }
 
-H3DF::Operator::CameraControlImpl::CameraControlImpl(WindowKey const & cInWindow, NavigationCube const & cNaviCube)
-	: OperatorImpl(cInWindow),
+H3DF::Operator::CameraControlImpl::CameraControlImpl(WindowKey const & cInWindow, NavigationCube const & cNaviCube) :
+	OperatorImpl(cInWindow),
 	m_cCameraOrbit((HBaseView *)cInWindow.GetBaseView()),
 	m_cCameraRelativeOrbit((HBaseView *)cInWindow.GetBaseView()),
 	m_cCameraOrbitTurntable((HBaseView *)cInWindow.GetBaseView()),
@@ -451,6 +458,17 @@ H3DF::Operator::CameraControlImpl::CameraControlImpl(WindowKey const & cInWindow
 
 	m_nSelectPickCount = 200;
 	m_nMouseDownTickCount = 0;
+}
+
+H3DF::Operator::CameraControlImpl::CameraControlImpl(const CameraControlImpl * pcInThat) : 
+	OperatorImpl(pcInThat),
+	m_cCameraOrbit((HBaseView *) pcInThat->m_pcWindow->GetBaseView()),
+	m_cCameraRelativeOrbit((HBaseView *) pcInThat->m_pcWindow->GetBaseView()),
+	m_cCameraOrbitTurntable((HBaseView *) pcInThat->m_pcWindow->GetBaseView()),
+	m_cCameraPan((HBaseView *) pcInThat->m_pcWindow->GetBaseView()),
+	m_cCameraZoomBox((HBaseView *) pcInThat->m_pcWindow->GetBaseView())
+{
+	Copy(pcInThat);
 }
 
 bool H3DF::Operator::CameraControlImpl::ComputeReasonableTarget(HPoint & cNewTarget, HPoint const & cWindowMousePosition, HPoint const & cOriginTarget)
@@ -513,13 +531,13 @@ DWORD H3DF::Operator::CameraControlImpl::MouseMapFlags(DWORD nState)
 
 H3DF::Operator::CameraControl::CameraControl(WindowKey const & cInWindow, NavigationCube & cNaviCube)
 {
-	CameraControlImpl * pcImpl = new CameraControlImpl(cInWindow, cNaviCube);
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<CameraControlImpl>(cInWindow, cNaviCube);
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::Operator::CameraControl::~CameraControl()
 {
-	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	HC_Open_Segment_By_Key(pcImpl->GetBaseView()->GetConstructionKey()); {
@@ -529,7 +547,7 @@ H3DF::Operator::CameraControl::~CameraControl()
 
 H3DF::Camera::Mode H3DF::Operator::CameraControl::CameraMode()
 {
-	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->CameraMode();
@@ -538,7 +556,7 @@ H3DF::Camera::Mode H3DF::Operator::CameraControl::CameraMode()
 
 void H3DF::Operator::CameraControl::SetCameraMode(H3DF::Camera::Mode eMode)
 {
-	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetCameraMode(eMode);
@@ -546,7 +564,7 @@ void H3DF::Operator::CameraControl::SetCameraMode(H3DF::Camera::Mode eMode)
 
 void H3DF::Operator::CameraControl::FitWorld()
 {
-	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->GetBaseView()->InvalidateSceneBounding();
@@ -558,7 +576,7 @@ void H3DF::Operator::CameraControl::FitWorld()
 
 void H3DF::Operator::CameraControl::SetCamera(H3DF::CameraKit & cInCameraKit)
 {
-	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKey cScene(pcImpl->GetBaseView()->GetSceneKey());
@@ -567,7 +585,7 @@ void H3DF::Operator::CameraControl::SetCamera(H3DF::CameraKit & cInCameraKit)
 
 void H3DF::Operator::CameraControl::SetCameraFitSelection(H3DF::MatrixKit & cInMatrix, SegmentKey & cInSegment)
 {
-	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	BoundingKit cBounding;
@@ -615,7 +633,7 @@ void H3DF::Operator::CameraControl::SetCameraFitSelection(H3DF::MatrixKit & cInM
 // 1. Left Button Down 처리
 Operator::Result H3DF::Operator::CameraControl::LButtonDown(Operator::Event & cInEvent)
 {
-	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cMouseDownPoint = cInEvent.GetMousePixelPoint();
@@ -648,7 +666,7 @@ Operator::Result H3DF::Operator::CameraControl::LButtonDown(Operator::Event & cI
 // L Button Up을 핱때 Objet를 선택함.
 Operator::Result H3DF::Operator::CameraControl::LButtonUp(Operator::Event & cInEvent, SelectionItem & cInItem)
 {
-	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	// Nvigation Cube가 있으면 Navigation Cube의 이벤트를 처리함.
@@ -679,7 +697,7 @@ Operator::Result H3DF::Operator::CameraControl::LButtonUp(Operator::Event & cInE
 
 Operator::Result H3DF::Operator::CameraControl::LButtonDownAndMove(Operator::Event & cInEvent)
 {
-	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->GetBaseView()->SetSuppressUpdate(true);
@@ -720,7 +738,7 @@ Operator::Result H3DF::Operator::CameraControl::LButtonDownAndMove(Operator::Eve
 
 Operator::Result H3DF::Operator::CameraControl::RButtonDown(Operator::Event & cInEvent)
 {
-	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cCameraPan.LButtonDown(cInEvent);
@@ -728,7 +746,7 @@ Operator::Result H3DF::Operator::CameraControl::RButtonDown(Operator::Event & cI
 
 Operator::Result H3DF::Operator::CameraControl::RButtonUp(Operator::Event & cInEvent)
 {
-	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cCameraPan.LButtonUp(cInEvent);
@@ -736,7 +754,7 @@ Operator::Result H3DF::Operator::CameraControl::RButtonUp(Operator::Event & cInE
 
 Operator::Result H3DF::Operator::CameraControl::RButtonDownAndMove(Operator::Event & cInEvent)
 {
-	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cCameraPan.LButtonDownAndMove(cInEvent);
@@ -744,7 +762,7 @@ Operator::Result H3DF::Operator::CameraControl::RButtonDownAndMove(Operator::Eve
 
 Operator::Result H3DF::Operator::CameraControl::MouseWheel(Operator::Event & cInEvent)
 {
-	CameraControlImpl * pcImpl = dynamic_cast<CameraControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CameraControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	// return pcImpl->GetBaseView()->OnMouseWheel(cInEvent);

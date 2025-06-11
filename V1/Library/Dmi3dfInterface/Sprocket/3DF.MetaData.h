@@ -12,7 +12,6 @@ namespace H3DF
 		MetaData(const MetaData & cInThat);
 		MetaData(MetaDataIndex nInIndex);
 
-		void Set(MetaData const & cInThat);
 		MetaData & operator = (MetaData const & cInThat);
 
 		bool Equals(MetaData const & cInThat) const;
@@ -30,10 +29,8 @@ namespace H3DF
 		StringMetaData(StringMetaData const & cInThat);
 		StringMetaData(MetaDataIndex nInIndex, CString strInValue);
 
-		void Set(StringMetaData const & cInThat);
 		StringMetaData & operator = (StringMetaData const & cInThat);
 
-		bool Equals(StringMetaData const & cInThat) const;
 		bool operator != (StringMetaData const & cInThat) const;
 		bool operator == (StringMetaData const & cInThat) const;
 
@@ -48,10 +45,8 @@ namespace H3DF
 		DwordPtrMetaData(DwordPtrMetaData const & cInThat);
 		DwordPtrMetaData(MetaDataIndex nInIndex, DWORD_PTR nInValue);
 
-		void Set(DwordPtrMetaData const & cInThat);
 		DwordPtrMetaData & operator = (DwordPtrMetaData const & cInThat);
 
-		bool Equals(DwordPtrMetaData const & cInThat) const;
 		bool operator != (DwordPtrMetaData const & cInThat) const;
 		bool operator == (DwordPtrMetaData const & cInThat) const;
 

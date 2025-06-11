@@ -19,7 +19,6 @@ namespace H3DF
 		static const H3DF::Type staticType = H3DF::Type::CameraKit;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(CameraKit const & cInThat);
 		CameraKit const & operator=(CameraKit const & cInThat);
 
 		CameraKit & SetUpVector(Vector const & cInUpVector);
@@ -53,7 +52,6 @@ namespace H3DF
 		static const H3DF::Type staticType = H3DF::Type::CameraControl;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(CameraControl const & cInThat);
 		CameraControl & operator = (CameraControl const & cInThat);
 
 		CameraControl & SetUpVector(Vector const & cInUp);

@@ -99,18 +99,14 @@ H3DF::CameraPos::CameraPos() {
 
 H3DF::Canvas::Canvas()
 {
-	CanvasImpl * pcImpl = new CanvasImpl();
-	if (nullptr == pcImpl) {
-		assert(false);
-	}
-
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<CanvasImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::Canvas::Canvas(Canvas const & cInThat)
 {
-	m_pcImpl = new CanvasImpl();
-	Set(cInThat);
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::Canvas::~Canvas()
@@ -118,16 +114,15 @@ H3DF::Canvas::~Canvas()
 	// HC_Relinquish_Memory();
 }
 
-void H3DF::Canvas::Set(Canvas const & cInThat)
-{
-	CanvasImpl * pcImpl = (CanvasImpl *)m_pcImpl;
-	CanvasImpl * pcInThatImpl = (CanvasImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
-}
-
 Canvas const & H3DF::Canvas::operator = (Canvas const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -136,7 +131,7 @@ Canvas const & H3DF::Canvas::operator = (Canvas const & cInThat)
 // 여기서 BaseView를 생성한다.
 void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
 {
-	CanvasImpl * pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl);
+	auto pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl.get());
 	if(nullptr == pcCanvasImpl) {
 		DEBUG_RETURN;
 	}
@@ -175,7 +170,7 @@ void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
 
 HWND H3DF::Canvas::GetHwnd()
 {
-	CanvasImpl * pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl);
+	auto pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcCanvasImpl);
 
 	return (HWND)pcCanvasImpl->m_nInWindowHandle;
@@ -183,7 +178,7 @@ HWND H3DF::Canvas::GetHwnd()
 
 void H3DF::Canvas::SetDelivery(Signal::Delivery & cDelivery, int nViewId)
 {
-	CanvasImpl * pcImpl = (CanvasImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CanvasImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetDelivery(&cDelivery, nViewId);
@@ -192,7 +187,7 @@ void H3DF::Canvas::SetDelivery(Signal::Delivery & cDelivery, int nViewId)
 // #Import: File Open
 void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADModel)
 {
-	CanvasImpl * pcCanvasImpl = (CanvasImpl *)m_pcImpl;
+	auto pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcCanvasImpl);
 
 #ifdef USED_LOG_MANAGER
@@ -406,7 +401,7 @@ void H3DF::Canvas::ThreadFileOpen(Canvas * pcCanvas, CString strFilePathName, H3
 
 H3DF::View & H3DF::Canvas::GetFrontView() const
 {
-	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CanvasImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (pcImpl->m_vcViewArray.empty()) {
@@ -418,7 +413,7 @@ H3DF::View & H3DF::Canvas::GetFrontView() const
 
 H3DF::View & H3DF::Canvas::GetFrontView()
 {
-	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CanvasImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (pcImpl->m_vcViewArray.empty()) {
@@ -430,7 +425,7 @@ H3DF::View & H3DF::Canvas::GetFrontView()
 
 WindowKey & H3DF::Canvas::GetWindowKey() const
 {
-	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CanvasImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cWindowKey;
@@ -438,7 +433,7 @@ WindowKey & H3DF::Canvas::GetWindowKey() const
 
 WindowKey & H3DF::Canvas::GetWindowKey()
 {
-	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CanvasImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cWindowKey;
@@ -446,7 +441,7 @@ WindowKey & H3DF::Canvas::GetWindowKey()
 
 Model & H3DF::Canvas::GetModel() const
 {
-	CanvasImpl * pcImpl = static_cast<CanvasImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<CanvasImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return *pcImpl->m_pcModel;
@@ -477,7 +472,7 @@ void H3DF::Canvas::Update() const
 		}
 	}
 
-	CanvasImpl * pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl);
+	auto pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcCanvasImpl);
 
 	if (false == pcCanvasImpl->m_bInitUpdate) {
@@ -544,7 +539,7 @@ void H3DF::Canvas::Update(Json::Object & cInObject) const
 		}
 	}
 
-	CanvasImpl * pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl);
+	auto pcCanvasImpl = static_cast<CanvasImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcCanvasImpl);
 
 	if (false == pcCanvasImpl->m_bInitUpdate) {
@@ -574,7 +569,7 @@ SegmentKey H3DF::Canvas::GetConstructionKey()
 	HC_KEY nKey = pcBaseView->GetConstructionKey();
 
 	SegmentKey cConstructionKey = pcBaseView->GetConstructionKey();
-	cConstructionKey.GetImpl()->SetType(H3DF::Type::ConstructionKey);
+	//cConstructionKey.GetImpl()->SetType(H3DF::Type::ConstructionKey);
 
 	return cConstructionKey;
 }
@@ -593,7 +588,7 @@ SegmentKey const H3DF::Canvas::GetConstructionKey() const
 	DEBUG_VALID(pcBaseView);
 
 	SegmentKey cConstructionKey = pcBaseView->GetConstructionKey();
-	cConstructionKey.GetImpl()->SetType(H3DF::Type::ConstructionKey);
+	//cConstructionKey.GetImpl()->SetType(H3DF::Type::ConstructionKey);
 
 	return cConstructionKey;
 }
@@ -612,7 +607,7 @@ SegmentKey H3DF::Canvas::GetSceneKey()
 	DEBUG_VALID(pcBaseView);
 
 	SegmentKey cGetSceneKey = pcBaseView->GetSceneKey();
-	cGetSceneKey.GetImpl()->SetType(H3DF::Type::SceneKey);
+	//cGetSceneKey.GetImpl()->SetType(H3DF::Type::SceneKey);
 
 	return cGetSceneKey;
 }
@@ -631,7 +626,7 @@ SegmentKey const H3DF::Canvas::GetSceneKey() const
 	DEBUG_VALID(pcBaseView);
 
 	SegmentKey cGetSceneKey = pcBaseView->GetSceneKey();
-	cGetSceneKey.GetImpl()->SetType(H3DF::Type::SceneKey);
+	//cGetSceneKey.GetImpl()->SetType(H3DF::Type::SceneKey);
 
 	return cGetSceneKey;
 }
@@ -650,7 +645,7 @@ SegmentKey H3DF::Canvas::GetOverwriteKey()
 	DEBUG_VALID(pcBaseView);
 
 	SegmentKey cOverwriteKey = pcBaseView->GetOverwriteKey();
-	cOverwriteKey.GetImpl()->SetType(H3DF::Type::OverwriteKey);
+	//cOverwriteKey.GetImpl()->SetType(H3DF::Type::OverwriteKey);
 
 	return cOverwriteKey;
 }
@@ -669,7 +664,7 @@ SegmentKey const H3DF::Canvas::GetOverwriteKey() const
 	DEBUG_VALID(pcBaseView);
 
 	SegmentKey cOverwriteKey = pcBaseView->GetOverwriteKey();
-	cOverwriteKey.GetImpl()->SetType(H3DF::Type::OverwriteKey);
+	//cOverwriteKey.GetImpl()->SetType(H3DF::Type::OverwriteKey);
 
 	return cOverwriteKey;
 }

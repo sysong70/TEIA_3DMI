@@ -31,7 +31,6 @@ namespace H3DF
 		static const H3DF::Type staticType = H3DF::Type::VisibilityKit;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(VisibilityKit const & cInThat);
 		VisibilityKit const & operator = (VisibilityKit const & cInThat);
 
 		//== Set Visibility Kit ========================================================================
@@ -62,13 +61,12 @@ namespace H3DF
 	class API_3DF VisibilityControl : public Control
 	{
 	public:
-		explicit VisibilityControl(SegmentKey & cInSegmentKey); // explicit를 사용하면 입력인자에 변환 방지가 걸리게 됨. 그래서 SegmentKey는 들어와도 Key는 못들어게 됨
+		explicit VisibilityControl(SegmentKey & cInSegment); // explicit를 사용하면 입력인자에 변환 방지가 걸리게 됨. 그래서 SegmentKey는 들어와도 Key는 못들어게 됨
 		VisibilityControl(VisibilityControl const & cInThat);
 
 		static const H3DF::Type staticType = H3DF::Type::VisibilityControl;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(VisibilityControl const & cInThat);
 		VisibilityControl & operator = (VisibilityControl const & cInThat);
 
 		//== Set Selectability Control =================================================================

@@ -22,7 +22,6 @@ namespace H3DF
 
 		~NavigationCube();
 
-		void Set(NavigationCube const & cInThat);
 		NavigationCube const & operator = (NavigationCube const & cInThat);
 
 		int LButtonUp(Operator::Event & cInEvent, SelectionItem & cInItem);

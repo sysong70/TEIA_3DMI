@@ -20,9 +20,13 @@ namespace H3DF
 	class ConditionalExpressionImpl : public Impl
 	{
 	public:
-		ConditionalExpressionImpl() { m_eType = H3DF::Type::ConditionalExpression; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<ConditionalExpressionImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(ConditionalExpressionImpl * pcInThat) {
+		void Copy(const ConditionalExpressionImpl * pcInThat) {
 			m_strCondition = pcInThat->m_strCondition;
 			m_fNumber = pcInThat->m_fNumber;
 			m_eInSpecial = pcInThat->m_eInSpecial;
@@ -36,63 +40,71 @@ namespace H3DF
 
 H3DF::ConditionalExpression::ConditionalExpression()
 {
-	m_pcImpl = new ConditionalExpressionImpl();
+	if (staticType != Type()) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<ConditionalExpressionImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::ConditionalExpression::ConditionalExpression(CStringA strInCondition)
 {
-	ConditionalExpressionImpl * pcImpl = new ConditionalExpressionImpl();
-	DEBUG_VALID(pcImpl);
-	pcImpl->m_strCondition = strInCondition;
+	m_pcImpl = std::make_unique<ConditionalExpressionImpl>();
+	DEBUG_VALID(m_pcImpl);
 
-	m_pcImpl = pcImpl;
+	auto pcImpl = static_cast<ConditionalExpressionImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_strCondition = strInCondition;
 }
 
 H3DF::ConditionalExpression::ConditionalExpression(float fInNumber)
 {
-	ConditionalExpressionImpl * pcImpl = new ConditionalExpressionImpl();
-	DEBUG_VALID(pcImpl);
-	pcImpl->m_fNumber = fInNumber;
+	m_pcImpl = std::make_unique<ConditionalExpressionImpl>();
+	DEBUG_VALID(m_pcImpl);
 
-	m_pcImpl = pcImpl;
+	auto pcImpl = static_cast<ConditionalExpressionImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_fNumber = fInNumber;
 }
 
 H3DF::ConditionalExpression::ConditionalExpression(Condition::Intrinsic eInSpecial)
 {
-	ConditionalExpressionImpl * pcImpl = new ConditionalExpressionImpl();
-	DEBUG_VALID(pcImpl);
-	pcImpl->m_eInSpecial = eInSpecial;
+	m_pcImpl = std::make_unique<ConditionalExpressionImpl>();
+	DEBUG_VALID(m_pcImpl);
 
-	m_pcImpl = pcImpl;
+	auto pcImpl = static_cast<ConditionalExpressionImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_eInSpecial = eInSpecial;
 }
 
 H3DF::ConditionalExpression::ConditionalExpression(ConditionalExpression const & cInThat)
 {
-	m_pcImpl = new ConditionalExpressionImpl();
-	DEBUG_VALID(m_pcImpl);
-	Set(cInThat);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void H3DF::ConditionalExpression::Set(ConditionalExpression const & cInThat)
-{
-	ConditionalExpressionImpl * pcImpl = dynamic_cast<ConditionalExpressionImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-	ConditionalExpressionImpl * pcInThatImpl = dynamic_cast<ConditionalExpressionImpl *>(cInThat.m_pcImpl);
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 ConditionalExpression & H3DF::ConditionalExpression::operator = (ConditionalExpression const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 bool H3DF::ConditionalExpression::ShowCondition(CStringA & strOutCondition) const
 {
-	ConditionalExpressionImpl * pcImpl = dynamic_cast<ConditionalExpressionImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ConditionalExpressionImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	
 	if (true == pcImpl->m_strCondition.IsEmpty()) {
@@ -106,7 +118,7 @@ bool H3DF::ConditionalExpression::ShowCondition(CStringA & strOutCondition) cons
 
 bool H3DF::ConditionalExpression::ShowNumber(float & fOutNumber) const
 {
-	ConditionalExpressionImpl * pcImpl = dynamic_cast<ConditionalExpressionImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ConditionalExpressionImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (0.0f > pcImpl->m_fNumber) {
@@ -120,7 +132,7 @@ bool H3DF::ConditionalExpression::ShowNumber(float & fOutNumber) const
 
 bool H3DF::ConditionalExpression::ShowIntrinsic(Condition::Intrinsic & eOutSpecial) const
 {
-	ConditionalExpressionImpl * pcImpl = dynamic_cast<ConditionalExpressionImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ConditionalExpressionImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (Condition::Intrinsic::None == pcImpl->m_eInSpecial) {
@@ -134,9 +146,10 @@ bool H3DF::ConditionalExpression::ShowIntrinsic(Condition::Intrinsic & eOutSpeci
 
 bool H3DF::ConditionalExpression::Equals(ConditionalExpression const & cInThat) const
 {
-	ConditionalExpressionImpl * pcImpl = dynamic_cast<ConditionalExpressionImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ConditionalExpressionImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
-	ConditionalExpressionImpl * pcInThatImpl = dynamic_cast<ConditionalExpressionImpl *>(cInThat.m_pcImpl);
+
+	auto pcInThatImpl = static_cast<ConditionalExpressionImpl *>(cInThat.m_pcImpl.get());
 	DEBUG_VALID(pcInThatImpl);
 
 	if (pcImpl->m_strCondition != pcInThatImpl->m_strCondition) {
@@ -166,10 +179,10 @@ bool H3DF::ConditionalExpression::operator != (ConditionalExpression const & cIn
 
 ConditionalExpression OR(ConditionalExpression const & cInOperand1, ConditionalExpression const & cInOperand2)
 {
-	ConditionalExpressionImpl * pcImpl1 = dynamic_cast<ConditionalExpressionImpl *>((ConditionalExpressionImpl *)cInOperand1.GetImpl());
+	auto pcImpl1 = static_cast<ConditionalExpressionImpl *>((ConditionalExpressionImpl *)cInOperand1.GetImpl());
 	DEBUG_VALID(pcImpl1);
 
-	ConditionalExpressionImpl * pcImpl2 = dynamic_cast<ConditionalExpressionImpl *>((ConditionalExpressionImpl *)cInOperand2.GetImpl());
+	auto pcImpl2 = static_cast<ConditionalExpressionImpl *>((ConditionalExpressionImpl *)cInOperand2.GetImpl());
 	DEBUG_VALID(pcImpl1);
 
 	CStringA strCondition;
@@ -181,10 +194,10 @@ ConditionalExpression OR(ConditionalExpression const & cInOperand1, ConditionalE
 
 ConditionalExpression AND(ConditionalExpression const & cInOperand1, ConditionalExpression const & cInOperand2)
 {
-	ConditionalExpressionImpl * pcImpl1 = dynamic_cast<ConditionalExpressionImpl *>((ConditionalExpressionImpl *)cInOperand1.GetImpl());
+	auto pcImpl1 = static_cast<ConditionalExpressionImpl *>((ConditionalExpressionImpl *)cInOperand1.GetImpl());
 	DEBUG_VALID(pcImpl1);
 
-	ConditionalExpressionImpl * pcImpl2 = dynamic_cast<ConditionalExpressionImpl *>((ConditionalExpressionImpl *)cInOperand2.GetImpl());
+	auto pcImpl2 = static_cast<ConditionalExpressionImpl *>((ConditionalExpressionImpl *)cInOperand2.GetImpl());
 	DEBUG_VALID(pcImpl1);
 
 	CStringA strCondition;
@@ -200,44 +213,57 @@ namespace H3DF
 	class ConditionControlImpl : public ControlImpl
 	{
 	public:
-		ConditionControlImpl() { m_eType = H3DF::Type::ConditionControl; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<ConditionControlImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(ConditionControlImpl * pcInThat) {
+		void Copy(const ConditionControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
 	};
 }
 
-H3DF::ConditionControl::ConditionControl(SegmentKey & cInSegmentKey)
+H3DF::ConditionControl::ConditionControl(SegmentKey & cInSegment)
 {
-	ConditionControlImpl * pcImpl = new ConditionControlImpl();
-	pcImpl->m_cOverrideKey = cInSegmentKey;
+	if (staticType != Type()) {
+		return;
+	}
 
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<ConditionControlImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcImpl = static_cast<ConditionControlImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_cOverrideKey = cInSegment;
 }
 
 H3DF::ConditionControl::ConditionControl(ConditionControl const & cInThat)
 {
-	m_pcImpl = new ConditionControlImpl();
-	Set(cInThat);
-}
+	if (staticType != Type()) {
+		return;
+	}
 
-void H3DF::ConditionControl::Set(ConditionControl const & cInThat)
-{
-	ConditionControlImpl * pcImpl = (ConditionControlImpl *) m_pcImpl;
-	ConditionControlImpl * pcInThatImpl = (ConditionControlImpl *) cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 ConditionControl & H3DF::ConditionControl::operator = (ConditionControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 size_t H3DF::ConditionControl::GetCount() const
 {
-	ConditionControlImpl * pcImpl = (ConditionControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ConditionControlImpl *>(m_pcImpl.get());
 
 	int nCount = 0;
 	char chList[MVO_BUFFER_SIZE];
@@ -252,7 +278,7 @@ size_t H3DF::ConditionControl::GetCount() const
 // Adds a condition to the collection of active conditions on this segment.
 ConditionControl & H3DF::ConditionControl::AddCondition(CStringA strInCondition)
 {
-	ConditionControlImpl * pcImpl = (ConditionControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ConditionControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		//HC_Add_Condition(strInCondition);
@@ -264,7 +290,7 @@ ConditionControl & H3DF::ConditionControl::AddCondition(CStringA strInCondition)
 // Sets a condition as the only active condition on this segment, replacing any existing conditions.
 ConditionControl & H3DF::ConditionControl::SetCondition(CStringA strInCondition)
 {
-	ConditionControlImpl * pcImpl = (ConditionControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ConditionControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_Set_Conditions(strInCondition);
@@ -276,7 +302,7 @@ ConditionControl & H3DF::ConditionControl::SetCondition(CStringA strInCondition)
 // Removes a specified condition from the active conditions on this segment.
 ConditionControl & H3DF::ConditionControl::UnsetCondition(CStringA strInCondition)
 {
-	ConditionControlImpl * pcImpl = (ConditionControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ConditionControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_UnSet_One_Condition(strInCondition);
@@ -288,7 +314,7 @@ ConditionControl & H3DF::ConditionControl::UnsetCondition(CStringA strInConditio
 // Unsets all conditions on this segment.
 ConditionControl & H3DF::ConditionControl::UnsetEverything()
 {
-	ConditionControlImpl * pcImpl = (ConditionControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ConditionControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_UnSet_Conditions();
@@ -300,7 +326,7 @@ ConditionControl & H3DF::ConditionControl::UnsetEverything()
 // Queries the existence of one condition on this segment.
 bool H3DF::ConditionControl::ShowCondition(CStringA & strOutCondition) const
 {
-	ConditionControlImpl * pcImpl = (ConditionControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<ConditionControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_Show_Conditions(strOutCondition.GetBuffer());

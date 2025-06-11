@@ -20,7 +20,6 @@ namespace H3DF
 		static const H3DF::Type staticType = H3DF::Type::LineKit;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(LineKit const & cInThat);
 		LineKit & operator = (LineKit const & cInThat);
 
 		unsigned int GetPointCount() const;
@@ -46,7 +45,6 @@ namespace H3DF
 		static const H3DF::Type staticType = H3DF::Type::LineKey;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(LineKey const & cInThat);
 		LineKey & operator = (LineKey const & cInThat);
 
 		int GetPointCount() const;

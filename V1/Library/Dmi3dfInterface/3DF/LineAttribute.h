@@ -135,7 +135,6 @@ namespace H3DF
 		static const H3DF::Type staticType = H3DF::Type::LineAttributeKit;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(LineAttributeKit const & cInThat);
 		LineAttributeKit const & operator = (LineAttributeKit const & cInThat);
 
 		void Show(LineAttributeKit & cOutKit) const;
@@ -160,13 +159,12 @@ namespace H3DF
 	class API_3DF LineAttributeControl : public Control
 	{
 	public:
-		explicit LineAttributeControl(SegmentKey & cInSegmentKey);
+		explicit LineAttributeControl(SegmentKey & cInSegment);
 		LineAttributeControl(LineAttributeControl const & cInThat);
 
 		static const H3DF::Type staticType = H3DF::Type::LineAttributeControl;
 		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(LineAttributeControl const & cInThat);
 		LineAttributeControl & operator = (LineAttributeControl const & cInThat);
 
 		LineAttributeControl & SetPattern(CStringA strInPatternName);

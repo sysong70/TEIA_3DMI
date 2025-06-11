@@ -131,7 +131,7 @@ bool H3DF::PortfolioKeyImpl::CreateShapeData(ShapeElementArray & arInShapeElemen
 			}
 
 			// Format code 추가
-			vfOutData.emplace_back(nFormatCode);
+			vfOutData.emplace_back((float)nFormatCode);
 
 			for (auto & cShapePoint : arShapePoints) {
 				CreateShapePointData(nFormatCode, cShapePoint, vfOutData);
