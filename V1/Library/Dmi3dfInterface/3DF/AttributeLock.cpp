@@ -440,10 +440,6 @@ CStringA H3DF::AttributeLockControlImpl::GetTypeString(AttributeLock::Type eInTy
 
 H3DF::AttributeLockControl::AttributeLockControl(SegmentKey & cInSegmentKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<AttributeLockControlImpl>();
 	auto pcImpl = dynamic_cast<AttributeLockControlImpl *>(m_pcImpl.get());
 
@@ -452,11 +448,7 @@ H3DF::AttributeLockControl::AttributeLockControl(SegmentKey & cInSegmentKey)
 
 H3DF::AttributeLockControl::AttributeLockControl(AttributeLockControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 AttributeLockControl & H3DF::AttributeLockControl::operator = (AttributeLockControl const & cInThat)

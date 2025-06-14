@@ -46,6 +46,8 @@ namespace H3DF
 			bGranularity = pcInThat->bGranularity;
 			eBias = pcInThat->eBias;
 			bBias = pcInThat->bBias;
+
+			bSetScopeFlag = pcInThat->bSetScopeFlag;
 			cStartSegment = pcInThat->cStartSegment;
 			cStartPath = pcInThat->cStartPath;
 			bScopeOnly = pcInThat->bScopeOnly;
@@ -69,6 +71,8 @@ namespace H3DF
 		Selection::Granularity eGranularity = Selection::Granularity::General;
 		Selection::Bias eBias = Selection::Bias::None;
 
+		// Scope 관련 변수
+		bool bSetScopeFlag = false;
 		SegmentKey cStartSegment;
 		KeyPath cStartPath;
 		bool bScopeOnly = false;

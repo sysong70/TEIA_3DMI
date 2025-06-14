@@ -572,6 +572,8 @@ void H3DF::BaseView::SetNavigationCube(NavigationCube * pcNaviCube)
 //== WindowKeyImpl Class ===========================================================================
 H3DF::WindowKeyImpl::WindowKeyImpl()
 {
+	SetType(H3DF::Type::None);
+
 	m_pnSelectBufferKey = new HC_KEY[m_nSelectBufferKeyCount];
 }
 
@@ -584,6 +586,8 @@ H3DF::WindowKeyImpl::~WindowKeyImpl()
 
 void H3DF::WindowKeyImpl::Copy(const WindowKeyImpl * pcInThat)
 {
+	SegmentKeyImpl::Copy(pcInThat);
+
 	m_pcBaseView = pcInThat->m_pcBaseView;
 
 	m_pcSelectionSet = pcInThat->m_pcSelectionSet;
@@ -1106,6 +1110,8 @@ bool H3DF::WindowKeyImpl::Init(H3DF::Model * pcInModel, const char * pchInDriver
 	// do all the setup with no updates
 	m_pcBaseView->SetSuppressUpdate(false);
 
+	SetType(H3DF::Type::WindowKey);
+
 	return true;
 }
 
@@ -1338,9 +1344,9 @@ void H3DF::WindowKeyImpl::event_checker(HIC_Rendition const * nr)
 
 void H3DF::WindowKeyImpl::SetSelectionControl(WindowKey const & cInWindow)
 {
-	if (H3DF::Type::None == cInWindow.Type()) {
-		DEBUG_RETURN;
-	}
+// 	if (H3DF::Type::None == cInWindow.Type()) {
+// 		DEBUG_RETURN;
+// 	}
 
 	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *)cInWindow.GetImpl();
 	DEBUG_VALID(pcWindowImpl);
@@ -1365,9 +1371,9 @@ void H3DF::WindowKeyImpl::SetSelectionControl(WindowKey const & cInWindow)
 
 void H3DF::WindowKeyImpl::SetHighlightControl(WindowKey const & cInWindow)
 {
-	if (H3DF::Type::None == cInWindow.Type()) {
-		DEBUG_RETURN;
-	}
+// 	if (H3DF::Type::None == cInWindow.Type()) {
+// 		DEBUG_RETURN;
+// 	}
 
 	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) cInWindow.GetImpl();
 	DEBUG_VALID(pcWindowImpl);

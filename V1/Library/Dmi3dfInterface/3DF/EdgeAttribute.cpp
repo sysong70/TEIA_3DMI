@@ -35,22 +35,13 @@ public:
 
 EdgeAttributeKit::EdgeAttributeKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<EdgeAttributeKitImpl>();
 	DEBUG_VALID(m_pcImpl);
-
 }
 
 EdgeAttributeKit::EdgeAttributeKit(EdgeAttributeKit const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 
@@ -189,10 +180,6 @@ public:
 
 EdgeAttributeControl::EdgeAttributeControl(SegmentKey & cInSegment)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<EdgeAttributeControlImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -204,11 +191,7 @@ EdgeAttributeControl::EdgeAttributeControl(SegmentKey & cInSegment)
 
 EdgeAttributeControl::EdgeAttributeControl(EdgeAttributeControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 

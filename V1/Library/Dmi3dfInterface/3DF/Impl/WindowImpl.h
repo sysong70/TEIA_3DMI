@@ -8,6 +8,7 @@
 #include <HUtility.h>
 
 #include "../Segment.h"
+#include "SegmentImpl.h"
 
 class HSelectionSet;
 #include "../Selection.h"
@@ -54,7 +55,7 @@ namespace H3DF
 		H3DF::ViewDirection::Mode m_eViewMode = H3DF::ViewDirection::Mode::Unknown;
 	};
 
-	class WindowKeyImpl : public Impl
+	class WindowKeyImpl : public SegmentKeyImpl
 	{
 	public:
 		WindowKeyImpl();

@@ -33,20 +33,10 @@ namespace H3DF {
 
 H3DF::ReferenceKey::ReferenceKey()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<ReferenceKeyImpl>();
-	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::ReferenceKey::ReferenceKey(HC_KEY nInKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<ReferenceKeyImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -58,10 +48,6 @@ H3DF::ReferenceKey::ReferenceKey(HC_KEY nInKey)
 
 H3DF::ReferenceKey::ReferenceKey(Key const & cInKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	// PolygonShapeElementImpl 생성
 	m_pcImpl = std::make_unique<ReferenceKeyImpl>();
 	auto pcImpl = static_cast<ReferenceKeyImpl *>(m_pcImpl.get());
@@ -78,11 +64,7 @@ H3DF::ReferenceKey::ReferenceKey(Key const & cInKey)
 
 H3DF::ReferenceKey::ReferenceKey(ReferenceKey const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 

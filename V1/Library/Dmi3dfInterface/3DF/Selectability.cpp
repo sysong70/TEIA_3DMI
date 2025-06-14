@@ -80,21 +80,13 @@ void H3DF::SelectabilityKitImpl::UnsetSelectability(H3DF::SelectabilityKit::Sele
 //== SelectabilityKit Class ========================================================================
 H3DF::SelectabilityKit::SelectabilityKit() 
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<SelectabilityKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::SelectabilityKit::SelectabilityKit(SelectabilityKit const & cInKit)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInKit.GetImpl()) ? cInKit.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInKit.GetImpl()) ? cInKit.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 
@@ -402,10 +394,6 @@ void H3DF::SelectabilityControlImpl::UnsetSelectability(CString strInType)
 
 H3DF::SelectabilityControl::SelectabilityControl(SegmentKey & cInSegment)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<SelectabilityControlImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -417,11 +405,7 @@ H3DF::SelectabilityControl::SelectabilityControl(SegmentKey & cInSegment)
 
 H3DF::SelectabilityControl::SelectabilityControl(SelectabilityControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 

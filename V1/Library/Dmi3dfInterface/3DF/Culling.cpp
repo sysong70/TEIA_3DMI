@@ -238,10 +238,6 @@ BaseView * CullingControlImpl::GetBaseView()
 
 H3DF::CullingControl::CullingControl(SegmentKey & cInSegmentKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<CullingControlImpl>();
 	auto pcImpl = dynamic_cast<CullingControlImpl *>(m_pcImpl.get());
 
@@ -250,11 +246,7 @@ H3DF::CullingControl::CullingControl(SegmentKey & cInSegmentKey)
 
 H3DF::CullingControl::CullingControl(CullingControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 CullingControl & H3DF::CullingControl::operator = (CullingControl const & cInThat)

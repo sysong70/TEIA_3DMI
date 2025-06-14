@@ -50,8 +50,8 @@ namespace H3DF
 
 		void Init() override;
 
-		SegmentKey GetSegmentKey();
-		SegmentKey const GetSegmentKey() const;
+		SegmentKey & GetSegmentKey();
+		SegmentKey const & GetSegmentKey() const;
 
 		PortfolioKey GetPortfolioKey();
 		PortfolioKey const GetPortfolioKey() const;

@@ -535,10 +535,5 @@ void H3DF::SelectionControlImpl::GetScope(SelectionOptionsKit const & cInOptions
 
 HBaseView * H3DF::SelectionControlImpl::GetBaseView()
 { 
-	if (H3DF::Type::None == m_cWindow.Type()) {
-		DEBUG_STOP;
-		return nullptr;
-	}
-
 	return (HBaseView *)m_cWindow.GetBaseView(); 
 }

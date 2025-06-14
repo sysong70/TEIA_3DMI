@@ -14,9 +14,21 @@ namespace H3DF
 			return pcClone;
 		}
 
-		void Copy(const KeyImpl * pcInThat) {
-			m_nKey = pcInThat->KeyValue();
+// 		void Copy(const KeyImpl * pcInThat) {
+// 			m_nKey = pcInThat->KeyValue();
+// 		}
+
+		void Copy(const Impl * pcInThat) override {
+			auto pcImpl = static_cast<const KeyImpl *>(pcInThat);
+			if (nullptr == pcImpl) {
+				DEBUG_RETURN;
+			}
+
+			Impl::Copy(pcInThat);
+
+			m_nKey = pcImpl->KeyValue();
 		}
+
 
 		HC_KEY const KeyValue() const;
 		void SetKeyValue(HC_KEY nInKey);

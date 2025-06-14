@@ -8,21 +8,13 @@ using namespace H3DF;
 //== TextureOptionsKit class =======================================================================
 H3DF::TextureOptionsKit::TextureOptionsKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<TextureOptionsKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::TextureOptionsKit::TextureOptionsKit(TextureOptionsKit const & cInKit)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::TextureOptionsKit::TextureOptionsKit(TextureOptionsKit && cInThat) noexcept : 
@@ -288,10 +280,6 @@ H3DF::TextureDefinition::TextureDefinition()
 
 H3DF::TextureDefinition::TextureDefinition(Definition const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	// PolygonShapeElementImpl 생성
 	m_pcImpl = std::make_unique<TextureDefinitionImpl>();
 	auto pcImpl = static_cast<TextureDefinitionImpl *>(m_pcImpl.get());
@@ -314,11 +302,7 @@ H3DF::TextureDefinition::TextureDefinition(Definition const & cInThat)
 
 H3DF::TextureDefinition::TextureDefinition(TextureDefinition const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 

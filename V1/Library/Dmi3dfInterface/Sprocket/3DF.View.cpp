@@ -52,21 +52,12 @@ using namespace std::chrono;
 
 H3DF::View::View()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<ViewImpl>();
-	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::View::View(View const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 H3DF::View::~View()

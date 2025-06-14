@@ -19,30 +19,16 @@ using namespace H3DF;
 
 H3DF::MetaData::MetaData()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<MetaDataImpl>();
-	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::MetaData::MetaData(MetaData const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::MetaData::MetaData(MetaDataIndex nInIndex)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<MetaDataImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -105,20 +91,12 @@ void H3DF::MetaData::SetIndex(MetaDataIndex nInIndex)
 
 H3DF::StringMetaData::StringMetaData()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<StringMetaDataImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::StringMetaData::StringMetaData(MetaData const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	// PolygonShapeElementImpl 생성
 	m_pcImpl = std::make_unique<StringMetaDataImpl>();
 	auto pcImpl = static_cast<StringMetaDataImpl *>(m_pcImpl.get());
@@ -135,20 +113,12 @@ H3DF::StringMetaData::StringMetaData(MetaData const & cInThat)
 
 H3DF::StringMetaData::StringMetaData(StringMetaData const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::StringMetaData::StringMetaData(MetaDataIndex nInIndex, CString strInValue)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<StringMetaDataImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -206,20 +176,12 @@ void H3DF::StringMetaData::SetValue(CString strInValue)
 //== DwordMetaData Class ===========================================================================
 H3DF::DwordPtrMetaData::DwordPtrMetaData()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<DwordPtrMetaDataImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::DwordPtrMetaData::DwordPtrMetaData(MetaData const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	// PolygonShapeElementImpl 생성
 	m_pcImpl = std::make_unique<DwordPtrMetaDataImpl>();
 	auto pcImpl = static_cast<DwordPtrMetaDataImpl *>(m_pcImpl.get());
@@ -236,20 +198,12 @@ H3DF::DwordPtrMetaData::DwordPtrMetaData(MetaData const & cInThat)
 
 H3DF::DwordPtrMetaData::DwordPtrMetaData(DwordPtrMetaData const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::DwordPtrMetaData::DwordPtrMetaData(MetaDataIndex nInIndex, DWORD_PTR nInValue)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<DwordPtrMetaDataImpl>();
 	DEBUG_VALID(m_pcImpl);
 

@@ -18,13 +18,15 @@ H3DF::Model::Model()
 	m_pcImpl = std::make_unique<ModelImpl>();
 	DEBUG_VALID(m_pcImpl);
 
+	m_pcImpl->SetType(H3DF::Type::Model);
+
 	auto pcImpl = static_cast<ModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->Init();
 }
 
-SegmentKey H3DF::Model::GetSegmentKey()
+SegmentKey & H3DF::Model::GetSegmentKey()
 {
 	auto pcImpl = static_cast<ModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
@@ -32,7 +34,7 @@ SegmentKey H3DF::Model::GetSegmentKey()
 	return pcImpl->GetSegmentKey();
 }
 
-SegmentKey const H3DF::Model::GetSegmentKey() const
+SegmentKey const & H3DF::Model::GetSegmentKey() const
 {
 	auto pcImpl = static_cast<ModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);

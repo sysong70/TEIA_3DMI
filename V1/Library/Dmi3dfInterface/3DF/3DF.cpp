@@ -42,6 +42,20 @@ boost::pool<> CBoostPool<T>::m_bpool(sizeof(T));
 
 using namespace H3DF;
 
+void H3DF::Impl::Copy(const Impl * pcInThat)
+{
+	m_eType = pcInThat->m_eType; 
+}
+
+bool H3DF::Impl::Equal(const Impl * pcInThat) const
+{ 
+	if (m_eType != pcInThat->m_eType) {
+		return false;
+	}
+
+	return true; 
+}
+
 /*
 
 //== 객체 관리 ======================================================================================

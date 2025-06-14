@@ -134,48 +134,29 @@ bool H3DF::KeyPathImpl::GetCoordinateSpaceName(Coordinate::Space eInSpace, char 
 
 H3DF::KeyPath::KeyPath()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<KeyPathImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::KeyPath::KeyPath(KeyArray const & cInPath)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<KeyPathImpl>();
 	static_cast<KeyPathImpl *>(m_pcImpl.get())->Set(cInPath);
 }
 
 H3DF::KeyPath::KeyPath(size_t nInPathCount, Key const pInPath[])
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<KeyPathImpl>();
 	static_cast<KeyPathImpl *>(m_pcImpl.get())->Set(nInPathCount, pInPath);
 }
 
 H3DF::KeyPath::KeyPath(KeyPath const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::KeyPath::KeyPath(char chKeyPath[])
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<KeyPathImpl>();
 	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 

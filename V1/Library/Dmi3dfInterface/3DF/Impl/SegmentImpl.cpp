@@ -272,6 +272,7 @@ bool H3DF::SegmentKeyImpl::FindUp(SegmentKey & cInSegment, H3DF::Type eInType, S
 	bool bResult = false;
 	SegmentKey cFindSegment;
 	while (true == cOwner.IsValidate()) {
+		H3DF::Type eObjectType = cOwner.ObjectType();
 		if (eInType == cOwner.Type()) {
 			cFindSegment = cOwner;
 			bResult = true;

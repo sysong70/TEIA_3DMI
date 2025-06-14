@@ -9,6 +9,7 @@
 
 #include "../../3DF/Database.h"
 
+#include "../../3DF/Impl/SegmentImpl.h"
 #include "../../3DF/Impl/WindowImpl.h"
 
 #include "3DF.View.Impl.h"
@@ -30,6 +31,8 @@ H3DF::CanvasImpl::CanvasImpl()
 	if (nullptr == m_pcModel) {
 		assert(false);
 	}
+
+	//m_cWindowKey.SetImpl(std::make_unique<WindowKeyImpl>());
 }
 
 H3DF::CanvasImpl::~CanvasImpl()
@@ -52,7 +55,7 @@ void H3DF::CanvasImpl::Copy(const CanvasImpl * pcInThat)
 		Utility::CopyString(pcInThat->m_pchName, m_pchName);
 	}
 
-	m_cWindowKey = pcInThat->m_cWindowKey;
+	m_cWindow = pcInThat->m_cWindow;
 
 	m_pcModel = pcInThat->m_pcModel;
 
@@ -86,11 +89,11 @@ void H3DF::CanvasImpl::SetDelivery(const Signal::Delivery * pcInDelivery, int nV
 //== Callback 관련 함수 ==============================================================================
 void H3DF::CanvasImpl::SetFinishPictureCallback()
 {
-	if (H3DF::Type::None == m_cWindowKey.Type()) {
+	if (H3DF::Type::None == m_cWindow.Type()) {
 		DEBUG_RETURN;
 	}
 
-	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) m_cWindowKey.GetImpl();
+	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) m_cWindow.GetImpl();
 	DEBUG_VALID(pcWindowImpl);
 
 	BaseView * pcBaseView = pcWindowImpl->GetBaseView();

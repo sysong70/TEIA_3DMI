@@ -31,20 +31,10 @@ namespace H3DF
 
 H3DF::IncludeKey::IncludeKey()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<IncludeKeyImpl>();
-	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::IncludeKey::IncludeKey(HC_KEY nInKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<IncludeKeyImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -56,11 +46,7 @@ H3DF::IncludeKey::IncludeKey(HC_KEY nInKey)
 
 H3DF::IncludeKey::IncludeKey(IncludeKey const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 

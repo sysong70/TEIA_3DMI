@@ -39,21 +39,13 @@ namespace H3DF
 
 H3DF::LineKit::LineKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<LineKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::LineKit::LineKit(LineKit const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 
 }
@@ -148,22 +140,16 @@ namespace H3DF {
 
 H3DF::LineKey::LineKey()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<LineKeyImpl>();
 	DEBUG_VALID(m_pcImpl);
+	m_pcImpl->SetType(H3DF::Type::LineKey);
 }
 
 H3DF::LineKey::LineKey(HC_KEY nInKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<LineKeyImpl>();
 	DEBUG_VALID(m_pcImpl);
+	m_pcImpl->SetType(H3DF::Type::LineKey);
 
 	auto pcImpl = static_cast<LineKeyImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
@@ -173,12 +159,10 @@ H3DF::LineKey::LineKey(HC_KEY nInKey)
 
 H3DF::LineKey::LineKey(Key const & cInKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	// PolygonShapeElementImpl 생성
 	m_pcImpl = std::make_unique<LineKeyImpl>();
+	DEBUG_VALID(m_pcImpl);
+
 	auto pcImpl = static_cast<LineKeyImpl *>(m_pcImpl.get());
 
 	auto pcInThatImpl = static_cast<const KeyImpl *>(cInKey.GetImpl());
@@ -189,15 +173,13 @@ H3DF::LineKey::LineKey(Key const & cInKey)
 	else {
 		DEBUG_STOP;
 	}
+
+	m_pcImpl->SetType(H3DF::Type::LineKey);
 }
 
 H3DF::LineKey::LineKey(LineKey const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 

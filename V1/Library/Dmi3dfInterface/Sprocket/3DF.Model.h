@@ -19,8 +19,8 @@ namespace H3DF
 	public:
 		Model();
 
-		SegmentKey GetSegmentKey();
-		SegmentKey const GetSegmentKey() const;
+		SegmentKey & GetSegmentKey();
+		SegmentKey const & GetSegmentKey() const;
 
 		PortfolioKey GetPortfolioKey();
 		PortfolioKey const GetPortfolioKey() const;

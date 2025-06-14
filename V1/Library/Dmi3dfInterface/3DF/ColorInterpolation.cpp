@@ -56,20 +56,13 @@ namespace H3DF
 
 H3DF::ColorInterpolationKit::ColorInterpolationKit() 
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<ColorInterpolationKitImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::ColorInterpolationKit::ColorInterpolationKit(ColorInterpolationKit const & cInKit)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
 }
 
 ColorInterpolationKit const & H3DF::ColorInterpolationKit::operator = (ColorInterpolationKit const & cInKit)
@@ -300,10 +293,6 @@ H3DF::ColorInterpolationControl::ColorInterpolationControl() {}
 
 H3DF::ColorInterpolationControl::ColorInterpolationControl(SegmentKey & cInSegmentKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<ColorInterpolationControlImpl>();
 	auto pcImpl = dynamic_cast<ColorInterpolationControlImpl *>(m_pcImpl.get());
 
@@ -312,11 +301,7 @@ H3DF::ColorInterpolationControl::ColorInterpolationControl(SegmentKey & cInSegme
 
 H3DF::ColorInterpolationControl::ColorInterpolationControl(ColorInterpolationControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 ColorInterpolationControl & H3DF::ColorInterpolationControl::operator = (ColorInterpolationControl const & cInThat)

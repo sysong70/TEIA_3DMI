@@ -72,7 +72,7 @@ H3DF::Operator::Event::Event(H3DF::WindowKey & cInWindowKey)
 
 H3DF::Operator::Event::Event(Event const & cInThat)
 {
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 

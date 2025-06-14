@@ -11,19 +11,10 @@ using namespace H3DF;
 
 H3DF::Definition::Definition()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<DefinitionImpl>();
 }
 
 H3DF::Definition::Definition(HC_KEY nInKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	if (INVALID_KEY == nInKey) {
 		return;
 	}
@@ -34,11 +25,7 @@ H3DF::Definition::Definition(HC_KEY nInKey)
 
 H3DF::Definition::Definition(Definition const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::Definition::Definition(Definition && cInThat) noexcept :

@@ -8,21 +8,13 @@ using namespace H3DF;
 
 H3DF::SearchOptionsKit::SearchOptionsKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<SearchOptionsKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::SearchOptionsKit::SearchOptionsKit(SearchOptionsKit const & cInKit)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInKit.GetImpl()) ? cInKit.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInKit.GetImpl()) ? cInKit.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 
@@ -41,21 +33,13 @@ SearchOptionsKit & H3DF::SearchOptionsKit::operator = (SearchOptionsKit const & 
 //== Search Results Iterator Class =================================================================
 H3DF::SearchResultsIterator::SearchResultsIterator()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<SearchResultsIteratorImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::SearchResultsIterator::SearchResultsIterator(SearchResultsIterator const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 
@@ -142,21 +126,13 @@ Key H3DF::SearchResultsIterator::operator * () const
 //== Search Results Class ==========================================================================
 H3DF::SearchResults::SearchResults()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<SearchOptionsKitImpl>();
+	m_pcImpl = std::make_unique<SearchResultsImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::SearchResults::SearchResults(SearchResults const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 

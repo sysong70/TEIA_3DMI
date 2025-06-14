@@ -670,9 +670,8 @@ void KERNEL::Command::HighlightObjectSnapImpl::ApplySelectionFilter(H3DF::Select
 
 	while (true == cIter.IsValid()) {
 		SelectionItem cNextItem = cIter.GetItem();
-		H3DF::Type eType = cNextItem.Type();
+		H3DF::Type eType = cNextItem.ItemType();
 		if (H3DF::Type::LineKey == eType) {
-
 			cOutSelections.PushBack(cNextItem);
 
 /*

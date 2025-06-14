@@ -33,10 +33,6 @@ namespace H3DF
 
 H3DF::MarkerAttributeControl::MarkerAttributeControl(SegmentKey cInSegment)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<MarkerAttributeControlImpl>();
 	DEBUG_VALID(m_pcImpl);
 

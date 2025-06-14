@@ -24,6 +24,7 @@
 #include "Culling.h"
 #include "Portfolio.h"
 #include "TextAttribute.h"
+#include "Text.h"
 
 #include "Camera.h"
 
@@ -36,19 +37,14 @@ using namespace H3DF;
 
 H3DF::SegmentKey::SegmentKey()
 {
-	if (staticType != H3DF::Type::SegmentKey) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<SegmentKeyImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	m_pcImpl->SetType(H3DF::Type::SegmentKey);
 }
 
 H3DF::SegmentKey::SegmentKey(CStringA strInName)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	HC_KEY nKey = INVALID_KEY;
 
 	if(false == strInName.IsEmpty()) {
@@ -64,29 +60,25 @@ H3DF::SegmentKey::SegmentKey(CStringA strInName)
 	
 	m_pcImpl = std::make_unique<SegmentKeyImpl>();
 	static_cast<SegmentKeyImpl *>(m_pcImpl.get())->SetKeyValue(nKey);
+
+	m_pcImpl->SetType(H3DF::Type::SegmentKey);
 }
 
 H3DF::SegmentKey::SegmentKey(HC_KEY nInKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	if (INVALID_KEY == nInKey) {
 		return;
 	}
 
 	m_pcImpl = std::make_unique<SegmentKeyImpl>();
 	static_cast<SegmentKeyImpl *>(m_pcImpl.get())->SetKeyValue(nInKey);
+
+	m_pcImpl->SetType(H3DF::Type::SegmentKey);
 }
 
 H3DF::SegmentKey::SegmentKey(SegmentKey const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::SegmentKey::~SegmentKey()
@@ -110,6 +102,19 @@ SegmentKey & H3DF::SegmentKey::operator = (SegmentKey const & cInThat)
 
 	return *this;
 }
+
+H3DF::SegmentKey::SegmentKey(SegmentKey && cInThat) noexcept :
+	Key(cInThat)
+{
+}
+
+SegmentKey & H3DF::SegmentKey::operator = (SegmentKey && cInThat) noexcept
+{
+	this->Object::operator = (std::move(cInThat));
+	return *this;
+}
+
+
 
 //== Segment 관련 함수 ===============================================================================
 
@@ -1274,10 +1279,18 @@ bool H3DF::SegmentKey::ShowPriority(int & nOutPriority) const\
 }
 
 //== Text 관련 함수 ===================================================================================
-// TextKey H3DF::SegmentKey::InsertText(Point const & cInPosition, CStringA strInText)
-// {
-// 
-// }
+TextKey H3DF::SegmentKey::InsertText(Point const & cInPosition, CStringA strInText)
+{
+	TextKey cTextKey;
+	HC_KEY nTextKey = INVALID_KEY;
+	SegmentKeyImpl::LocalOpen(*this); {
+		nTextKey = HC_Insert_Text(cInPosition.x, cInPosition.y, cInPosition.z, strInText);
+	} SegmentKeyImpl::LocalClose(*this);
+
+	cTextKey.SetKeyValue(nTextKey);
+
+	return cTextKey;
+}
 
 //== TextAttribute 관련 함수 ========================================================================
 TextAttributeControl H3DF::SegmentKey::GetTextAttributeControl()

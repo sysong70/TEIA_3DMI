@@ -14,19 +14,6 @@ using namespace H3DF;
 
 //== GeometryKeyImpl 관련 함수 =======================================================================
 
-std::unique_ptr<Impl> GeometryKeyImpl::Clone() const
-{
-	// 새 객체 생성
-	auto pcClone = std::make_unique<GeometryKeyImpl>();
-
-	pcClone->SetKeyValue(KeyValue());
-
-	pcClone->m_bOpen = m_bOpen;
-	pcClone->m_bForcedOpen = m_bForcedOpen;
-
-	return pcClone;
-}
-
 // Local Open/Close Function 함수
 void H3DF::GeometryKeyImpl::LocalOpen()
 {

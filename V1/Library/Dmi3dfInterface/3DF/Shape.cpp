@@ -158,21 +158,12 @@ H3DF::ShapePoint::ShapePoint(float fInX, float fInY)
 
 H3DF::ShapeElement::ShapeElement()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<ShapeElementImpl>();
-	DEBUG_VALID(m_pcImpl);
+	DEBUG_VALID(SetImpl(H3DF::Type::ShapeElement, std::make_unique<ShapeElementImpl>()));
 }
 
 H3DF::ShapeElement::ShapeElement(ShapeElement const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::ShapeElement::ShapeElement(ShapeElement && cInThat) noexcept :
@@ -271,20 +262,11 @@ bool H3DF::ShapeElement::ShowFill(bool & bOutState) const
 
 H3DF::PolygonShapeElement::PolygonShapeElement()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<PolygonShapeElementImpl>();
-	DEBUG_VALID(m_pcImpl);
+	DEBUG_VALID(SetImpl(H3DF::Type::PolygonShapeElement, std::make_unique<PolygonShapeElementImpl>()));
 }
 
 H3DF::PolygonShapeElement::PolygonShapeElement(ShapeElement const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	// PolygonShapeElementImpl 생성
 	m_pcImpl = std::make_unique<PolygonShapeElementImpl>();
 	auto pcImpl = static_cast<PolygonShapeElementImpl *>(m_pcImpl.get());
@@ -301,11 +283,7 @@ H3DF::PolygonShapeElement::PolygonShapeElement(ShapeElement const & cInThat)
 
 H3DF::PolygonShapeElement::PolygonShapeElement(PolygonShapeElement const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::PolygonShapeElement::PolygonShapeElement(ShapePointArray const & arInPoints)
@@ -398,16 +376,11 @@ bool H3DF::PolygonShapeElement::ShowPoints(ShapePointArray & arOutPoints) const
 
 H3DF::AnchorShapeElement::AnchorShapeElement()
 {
-	m_pcImpl = std::make_unique<AnchorShapeElementImpl>();
-	DEBUG_VALID(m_pcImpl);
+	DEBUG_VALID(SetImpl(H3DF::Type::AnchorShapeElement, std::make_unique<AnchorShapeElementImpl>()));
 }
 
 H3DF::AnchorShapeElement::AnchorShapeElement(ShapeElement const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	// PolygonShapeElementImpl 생성
 	m_pcImpl = std::make_unique<AnchorShapeElementImpl>();
 	auto pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl.get());
@@ -420,24 +393,18 @@ H3DF::AnchorShapeElement::AnchorShapeElement(ShapeElement const & cInThat)
 	else {
 		DEBUG_STOP;
 	}
+
+	m_pcImpl->SetType(H3DF::Type::AnchorShapeElement);
 }
 
 H3DF::AnchorShapeElement::AnchorShapeElement(AnchorShapeElement const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 
 H3DF::AnchorShapeElement::AnchorShapeElement(ShapePoint const & cInAnchorPoint)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<AnchorShapeElementImpl>();
 	auto pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl.get());
 
@@ -447,10 +414,6 @@ H3DF::AnchorShapeElement::AnchorShapeElement(ShapePoint const & cInAnchorPoint)
 
 H3DF::AnchorShapeElement::AnchorShapeElement(ShapePoint const & cInAnchorPoint,	ShapePointArray const & arInIntermediatePoints, bool bInConnection)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<AnchorShapeElementImpl>();
 	DEBUG_VALID(m_pcImpl);
 	auto pcImpl = static_cast<AnchorShapeElementImpl *>(m_pcImpl.get());
@@ -595,21 +558,12 @@ AnchorShapeElement & H3DF::AnchorShapeElement::UnsetConnection()
 
 H3DF::ShapeKit::ShapeKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<ShapeKitImpl>();
-	DEBUG_VALID(m_pcImpl);
+	DEBUG_VALID(SetImpl(H3DF::Type::ShapeKit, std::make_unique<ShapeKitImpl>()));
 }
 
 H3DF::ShapeKit::ShapeKit(ShapeKit const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::ShapeKit::~ShapeKit()
@@ -744,20 +698,11 @@ bool H3DF::ShapeKit::ShowElements(ShapeElementArray & cOutDef) const
 
 H3DF::ShapeDefinition::ShapeDefinition()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<ShapeDefinitionImpl>();
-	DEBUG_VALID(m_pcImpl);
+	DEBUG_VALID(SetImpl(H3DF::Type::ShapeDefinition, std::make_unique<ShapeDefinitionImpl>()));
 }
 
 H3DF::ShapeDefinition::ShapeDefinition(Definition const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	// PolygonShapeElementImpl 생성
 	m_pcImpl = std::make_unique<ShapeDefinitionImpl>();
 	auto pcImpl = static_cast<ShapeDefinitionImpl *>(m_pcImpl.get());
@@ -770,15 +715,13 @@ H3DF::ShapeDefinition::ShapeDefinition(Definition const & cInThat)
 	else {
 		DEBUG_STOP;
 	}
+
+	m_pcImpl->SetType(H3DF::Type::ShapeDefinition);
 }
 
 H3DF::ShapeDefinition::ShapeDefinition(ShapeDefinition const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::ShapeDefinition::~ShapeDefinition()

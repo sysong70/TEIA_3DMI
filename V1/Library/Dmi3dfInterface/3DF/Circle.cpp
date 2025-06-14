@@ -39,21 +39,13 @@ namespace H3DF
 
 H3DF::CircleKit::CircleKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<CircleKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::CircleKit::CircleKit(CircleKit const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 
 }
@@ -178,20 +170,12 @@ namespace H3DF {
 
 H3DF::CircleKey::CircleKey() : GeometryKey(INVALID_KEY)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<CircleKeyImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::CircleKey::CircleKey(HC_KEY nInKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<CircleKeyImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -203,10 +187,6 @@ H3DF::CircleKey::CircleKey(HC_KEY nInKey)
 
 H3DF::CircleKey::CircleKey(Key const & cInKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	// PolygonShapeElementImpl 생성
 	m_pcImpl = std::make_unique<CircleKeyImpl>();
 	auto pcImpl = static_cast<CircleKeyImpl *>(m_pcImpl.get());
@@ -223,11 +203,7 @@ H3DF::CircleKey::CircleKey(Key const & cInKey)
 
 H3DF::CircleKey::CircleKey(CircleKey const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 
 }

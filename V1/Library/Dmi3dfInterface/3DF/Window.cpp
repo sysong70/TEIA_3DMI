@@ -20,21 +20,14 @@ USING_3DF_NAMESPACE
 
 H3DF::WindowKey::WindowKey() 
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<WindowKeyImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::WindowKey::WindowKey(WindowKey const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::WindowKey::~WindowKey()
@@ -183,3 +176,4 @@ NavigationCube & H3DF::WindowKey::GetNavigationCube()
 	return pcImpl->GetNavigationCube();
 }
 
+ 

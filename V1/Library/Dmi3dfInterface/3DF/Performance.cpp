@@ -43,21 +43,13 @@ using namespace H3DF;
 
 H3DF::PerformanceKit::PerformanceKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<PerformanceKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::PerformanceKit::PerformanceKit(PerformanceKit const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 
@@ -142,10 +134,6 @@ public:
 
 H3DF::PerformanceControl::PerformanceControl(SegmentKey & cInSegment)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<PerformanceControlImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -157,11 +145,7 @@ H3DF::PerformanceControl::PerformanceControl(SegmentKey & cInSegment)
 
 H3DF::PerformanceControl::PerformanceControl(PerformanceControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 

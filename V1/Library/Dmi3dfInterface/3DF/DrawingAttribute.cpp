@@ -56,21 +56,13 @@ namespace H3DF
 
 H3DF::DrawingAttributeKit::DrawingAttributeKit() 
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<DrawingAttributeKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::DrawingAttributeKit::DrawingAttributeKit(DrawingAttributeKit const & cInKit)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
 }
 
 DrawingAttributeKit const & H3DF::DrawingAttributeKit::operator = (DrawingAttributeKit const & cInKit)
@@ -204,10 +196,6 @@ H3DF::DrawingAttributeControl::DrawingAttributeControl() {}
 
 H3DF::DrawingAttributeControl::DrawingAttributeControl(SegmentKey & cInSegmentKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<DrawingAttributeControlImpl>();
 	auto pcImpl = dynamic_cast<DrawingAttributeControlImpl *>(m_pcImpl.get());
 
@@ -216,11 +204,7 @@ H3DF::DrawingAttributeControl::DrawingAttributeControl(SegmentKey & cInSegmentKe
 
 H3DF::DrawingAttributeControl::DrawingAttributeControl(DrawingAttributeControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 DrawingAttributeControl & H3DF::DrawingAttributeControl::operator = (DrawingAttributeControl const & cInThat)

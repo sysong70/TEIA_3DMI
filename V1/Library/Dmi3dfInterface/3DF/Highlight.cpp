@@ -36,29 +36,18 @@ using namespace H3DF;
 //== HighlightOptionsKit Class =====================================================================
 H3DF::HighlightOptionsKit::HighlightOptionsKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<HighlightOptionsKitImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::HighlightOptionsKit::HighlightOptionsKit(CStringA strInStyleName)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<HighlightOptionsKitImpl>();
 	static_cast<HighlightOptionsKitImpl *>(m_pcImpl.get())->m_strInStyleName = strInStyleName;
 }
 
 H3DF::HighlightOptionsKit::HighlightOptionsKit(CStringA strInStyleName, CStringA strInSecondaryStyleName)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<HighlightOptionsKitImpl>();
 	auto pcImpl = static_cast<HighlightOptionsKitImpl *>(m_pcImpl.get());
 
@@ -68,11 +57,7 @@ H3DF::HighlightOptionsKit::HighlightOptionsKit(CStringA strInStyleName, CStringA
 
 H3DF::HighlightOptionsKit::HighlightOptionsKit(HighlightOptionsKit const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 HighlightOptionsKit & H3DF::HighlightOptionsKit::operator=(HighlightOptionsKit const & cInThat)

@@ -14,19 +14,10 @@ using namespace H3DF;
 
 H3DF::GeometryKey::GeometryKey()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<GeometryKeyImpl>();
 }
 
 H3DF::GeometryKey::GeometryKey(HC_KEY nInKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	if (INVALID_KEY == nInKey) {
 		return;
 	}

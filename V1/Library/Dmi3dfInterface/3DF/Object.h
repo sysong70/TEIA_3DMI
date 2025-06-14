@@ -31,6 +31,8 @@ namespace H3DF
 		Impl * GetImpl() { return m_pcImpl.get(); }
 		const Impl * GetImpl() const { return m_pcImpl.get(); }
 
+		Impl * SetImpl(H3DF::Type eInType, std::unique_ptr<Impl> pcInImpl);
+
 	protected:
 		friend class Impl;
 		friend class KeyImpl;

@@ -11,7 +11,23 @@ namespace H3DF
 	class GeometryKeyImpl : public KeyImpl
 	{
 	public:
-		std::unique_ptr<Impl> Clone() const override;
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<GeometryKeyImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy(const Impl * pcInThat) override {
+			KeyImpl::Copy(pcInThat);
+
+			auto pcImpl = static_cast<const GeometryKeyImpl *>(pcInThat);
+			if (nullptr == pcImpl) {
+				DEBUG_RETURN;
+			}
+
+			m_bOpen = pcImpl->m_bOpen;
+			m_bForcedOpen = pcImpl->m_bForcedOpen;
+		}
 
 		// 부분 함수(Local Function)에서 사용하는 함수
 		void LocalOpen();

@@ -20,19 +20,10 @@ using namespace H3DF;
 
 H3DF::NamedStyleDefinition::NamedStyleDefinition()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<DefinitionImpl>();
 }
 
 H3DF::NamedStyleDefinition::NamedStyleDefinition(HC_KEY nInKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	// PolygonShapeElementImpl 생성
 	m_pcImpl = std::make_unique<DefinitionImpl>();
 	auto pcImpl = static_cast<DefinitionImpl *>(m_pcImpl.get());
@@ -42,11 +33,7 @@ H3DF::NamedStyleDefinition::NamedStyleDefinition(HC_KEY nInKey)
 
 H3DF::NamedStyleDefinition::NamedStyleDefinition(NamedStyleDefinition const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 NamedStyleDefinition & H3DF::NamedStyleDefinition::operator = (NamedStyleDefinition const & cInThat)
@@ -107,23 +94,13 @@ namespace H3DF
 
 H3DF::StyleKey::StyleKey()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<StyleKeyImpl>();
-	DEBUG_VALID(m_pcImpl);
+	DEBUG_VALID(SetImpl(H3DF::Type::SegmentStyle, std::make_unique<StyleKeyImpl>()));
 }
 
 H3DF::StyleKey::StyleKey(Key const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	// PolygonShapeElementImpl 생성
-	m_pcImpl = std::make_unique<StyleKeyImpl>();
-	auto pcImpl = static_cast<StyleKeyImpl *>(m_pcImpl.get());
+	auto pcImpl = static_cast<StyleKeyImpl *>(SetImpl(H3DF::Type::SegmentStyle, std::make_unique<StyleKeyImpl>()));
+	DEBUG_VALID(pcImpl);
 
 	auto pcInThatImpl = static_cast<const KeyImpl *>(cInThat.GetImpl());
 
@@ -133,15 +110,13 @@ H3DF::StyleKey::StyleKey(Key const & cInThat)
 	else {
 		DEBUG_STOP;
 	}
+
+	pcImpl->SetType(H3DF::Type::SegmentStyle);
 }
 
 H3DF::StyleKey::StyleKey(StyleKey const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 
@@ -234,10 +209,6 @@ namespace H3DF
 
 H3DF::StyleControl::StyleControl(SegmentKey & cInSegment) 
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<StyleControlImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -249,11 +220,7 @@ H3DF::StyleControl::StyleControl(SegmentKey & cInSegment)
 
 H3DF::StyleControl::StyleControl(StyleControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 

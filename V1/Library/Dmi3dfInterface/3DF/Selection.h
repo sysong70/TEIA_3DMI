@@ -284,7 +284,10 @@ namespace H3DF
 		SelectionResults(SelectionResults const & cInThat);
 		~SelectionResults();
 
-		SelectionResults & operator=(SelectionResults const & cInThat);
+		SelectionResults & operator = (SelectionResults const & cInThat);
+
+		SelectionResults(SelectionResults && cInThat) noexcept;
+		SelectionResults & operator = (SelectionResults && cInThat) noexcept;
 
 		bool operator==(SelectionResults const & cInThat) const;
 		bool operator!=(SelectionResults const & cInThat) const;

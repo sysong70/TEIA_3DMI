@@ -1,17 +1,54 @@
 ﻿#include "StdAfx.h"
 
 #include "Text.h"
-/*
 
-H3DF::LineKey::LineKey() : GeometryKey()
+#include "./Impl/GeometryImpl.h"
+
+namespace H3DF
 {
-	m_pcImpl = new LineKeyImpl();
+	class TextKeyImpl : public GeometryKeyImpl
+	{
+	public:
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<TextKeyImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy (const Impl * pcInThat) override
+		{
+			if (pcInThat == nullptr) {
+				DEBUG_RETURN;
+			}
+
+			GeometryKeyImpl::Copy(pcInThat);
+
+			auto pcImpl = static_cast<const TextKeyImpl *>(pcInThat);
+		}
+	};
 }
 
-H3DF::LineKey::LineKey(HC_KEY nInKey) : GeometryKey(nInKey)
+H3DF::TextKey::TextKey()
 {
-	LineKeyImpl * pcImpl = new LineKeyImpl();
-	pcImpl->SetKeyValue(nInKey);
+	m_pcImpl = std::make_unique<TextKeyImpl>();
+	DEBUG_VALID(m_pcImpl);
+}
 
-	m_pcImpl = pcImpl;
-}*/
+H3DF::TextKey::TextKey(Key const & cInThat)
+{
+	m_pcImpl = std::make_unique<TextKeyImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcInKeyImpl = static_cast<const KeyImpl *>(cInThat.GetImpl());
+	// 명시적 캐스팅을 해야 합니다.
+	static_cast<KeyImpl *>(m_pcImpl.get())->Copy(pcInKeyImpl);
+}
+
+H3DF::TextKey::TextKey(TextKey const & cInThat)
+{
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
+}
+
+// TextKey & operator = (TextKey const & other);
+

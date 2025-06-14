@@ -31,10 +31,6 @@ public:
 
 H3DF::VisualEffectsControl::VisualEffectsControl(SegmentKey & cInSegment)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<VisualEffectsControlImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -46,11 +42,7 @@ H3DF::VisualEffectsControl::VisualEffectsControl(SegmentKey & cInSegment)
 
 H3DF::VisualEffectsControl::VisualEffectsControl(VisualEffectsControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 VisualEffectsControl & H3DF::VisualEffectsControl::operator = (VisualEffectsControl const & cInThat)

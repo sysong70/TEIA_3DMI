@@ -57,22 +57,13 @@ void VisibilityKitImpl::SetVisibility(H3DF::VisibilityKit::VisibilityType eType,
 
 H3DF::VisibilityKit::VisibilityKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<VisibilityKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::VisibilityKit::VisibilityKit(VisibilityKit const & cInThat)
 {
-
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 
@@ -342,10 +333,6 @@ void H3DF::VisibilityControlImpl::UnSetVisibility(CStringA strInType)
 
 H3DF::VisibilityControl::VisibilityControl(SegmentKey & cInSegment)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<VisibilityControlImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -357,11 +344,7 @@ H3DF::VisibilityControl::VisibilityControl(SegmentKey & cInSegment)
 
 H3DF::VisibilityControl::VisibilityControl(VisibilityControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 

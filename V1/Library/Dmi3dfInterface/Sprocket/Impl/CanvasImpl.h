@@ -45,7 +45,7 @@ namespace H3DF
 
 		std::vector<H3DF::View> m_vcViewArray;
 
-		WindowKey m_cWindowKey;
+		WindowKey m_cWindow;
 
 		H3DF::Model * m_pcModel = nullptr;
 

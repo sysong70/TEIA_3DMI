@@ -24,7 +24,10 @@ using namespace H3DF;
 H3DF::ModelImpl::ModelImpl()
 	: HBaseModel()
 {
-	m_cSegmentKey.SetKeyValue(GetModelKey());
+	m_cSegmentKey = SegmentKey(GetModelKey());
+
+	auto pcImpl = static_cast<SegmentKeyImpl *>(m_cSegmentKey.GetImpl());
+	pcImpl->SetType(H3DF::Type::Model);
 
 	SetBRepGeometry(false);
 
@@ -134,12 +137,12 @@ void H3DF::ModelImpl::Init()
 
 }
 
-SegmentKey H3DF::ModelImpl::GetSegmentKey()
+SegmentKey & H3DF::ModelImpl::GetSegmentKey()
 {
 	return m_cSegmentKey;
 }
 
-SegmentKey const H3DF::ModelImpl::GetSegmentKey() const
+SegmentKey const & H3DF::ModelImpl::GetSegmentKey() const
 {
 	return m_cSegmentKey;
 }

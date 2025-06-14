@@ -171,20 +171,13 @@ bool MaterialKitImpl::ShowChannel(Material::Channel eInChannel, Material::Type &
 
 H3DF::MaterialKit::MaterialKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<MaterialKitImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::MaterialKit::MaterialKit(MaterialKit const & cInKit)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
 }
 
 MaterialKit & H3DF::MaterialKit::operator = (MaterialKit const & cInThat)
@@ -704,20 +697,13 @@ bool H3DF::MaterialMappingKitImpl::ShowMaterial(H3DF::MaterialMappingKitImpl::Ty
 
 H3DF::MaterialMappingKit::MaterialMappingKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<MaterialMappingKitImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::MaterialMappingKit::MaterialMappingKit(MaterialMappingKit const & cInKit)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::operator = (MaterialMappingKit const & cInThat)
@@ -1231,10 +1217,6 @@ void MaterialMappingControlImpl::SetColor(CStringA strGeometry, RGBAColor const 
 
 H3DF::MaterialMappingControl::MaterialMappingControl(SegmentKey const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<MaterialMappingControlImpl>();
 	auto pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
 
@@ -1243,11 +1225,7 @@ H3DF::MaterialMappingControl::MaterialMappingControl(SegmentKey const & cInThat)
 
 H3DF::MaterialMappingControl::MaterialMappingControl(MaterialMappingControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 MaterialMappingControl & H3DF::MaterialMappingControl::operator = (MaterialMappingControl const & cInThat)

@@ -15,31 +15,23 @@ using namespace H3DF;
 
 H3DF::Key::Key() 
 {
-	if (staticType != H3DF::Type::Key) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<KeyImpl>();
 }
 
 H3DF::Key::Key(HC_KEY nInKey)
 {
-	if (staticType == Type()) {
-		m_pcImpl = (INVALID_KEY == nInKey) ? nullptr : std::make_unique<KeyImpl>();
-
-		if (nullptr != m_pcImpl) {
-			static_cast<KeyImpl *>(m_pcImpl.get())->SetKeyValue(nInKey);
-		}
+	if (INVALID_KEY == nInKey) {
+		DEBUG_RETURN;
 	}
+
+	m_pcImpl = (INVALID_KEY == nInKey) ? nullptr : std::make_unique<KeyImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	static_cast<KeyImpl *>(m_pcImpl.get())->SetKeyValue(nInKey);
 }
 
 H3DF::Key::Key(Key const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 Key const & H3DF::Key::operator = (Key const & cInThat)
@@ -143,20 +135,18 @@ SegmentKey H3DF::Key::Up() const
 // return: The segment containing this key.
 SegmentKey H3DF::Key::Owner() const
 {
-	SegmentKey cOwner;
-
 	HC_KEY nOwnerKey = HC_Show_Owner_Original_Key(KeyValue());
 	if (INVALID_KEY == nOwnerKey) {
-		return cOwner;
+		return {};
 	}
 
 	// Onwer Key가 Segmnet인지 여부 확인.
 	char chType[MVO_BUFFER_SIZE]{};
 	HC_Show_Key_Type(nOwnerKey, chType);
 	if (0 != strcmp(chType, "segment")) {
-		return cOwner;
+		return {};
 	}
 
-	cOwner.SetKeyValue(nOwnerKey);
+	SegmentKey cOwner(nOwnerKey);
 	return cOwner;
 }

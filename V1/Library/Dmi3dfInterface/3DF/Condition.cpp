@@ -40,10 +40,6 @@ namespace H3DF
 
 H3DF::ConditionalExpression::ConditionalExpression()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<ConditionalExpressionImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
@@ -83,11 +79,7 @@ H3DF::ConditionalExpression::ConditionalExpression(Condition::Intrinsic eInSpeci
 
 H3DF::ConditionalExpression::ConditionalExpression(ConditionalExpression const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 ConditionalExpression & H3DF::ConditionalExpression::operator = (ConditionalExpression const & cInThat)
@@ -227,10 +219,6 @@ namespace H3DF
 
 H3DF::ConditionControl::ConditionControl(SegmentKey & cInSegment)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<ConditionControlImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -242,11 +230,7 @@ H3DF::ConditionControl::ConditionControl(SegmentKey & cInSegment)
 
 H3DF::ConditionControl::ConditionControl(ConditionControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 ConditionControl & H3DF::ConditionControl::operator = (ConditionControl const & cInThat)

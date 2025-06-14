@@ -41,21 +41,13 @@ namespace H3DF
 
 H3DF::CuttingSectionKit::CuttingSectionKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<CuttingSectionKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::CuttingSectionKit::CuttingSectionKit(CuttingSectionKit const & cInKit)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
 }
 
 CuttingSectionKit & H3DF::CuttingSectionKit::operator = (CuttingSectionKit const & cInThat)
@@ -193,12 +185,6 @@ namespace H3DF
 
 H3DF::CuttingSectionKey::CuttingSectionKey()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<CuttingSectionKeyImpl>();
-	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::CuttingSectionKey::CuttingSectionKey(Key const & cInThat)
@@ -224,11 +210,7 @@ H3DF::CuttingSectionKey::CuttingSectionKey(Key const & cInThat)
 
 H3DF::CuttingSectionKey::CuttingSectionKey(CuttingSectionKey const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 CuttingSectionKey & H3DF::CuttingSectionKey::operator = (CuttingSectionKey const & cInThat)

@@ -30,6 +30,9 @@ namespace H3DF
 
 		SegmentKey & operator = (SegmentKey const & cInThat);
 
+		SegmentKey(SegmentKey && cInThat) noexcept;
+		SegmentKey & operator = (SegmentKey && cInThat) noexcept;
+		
 		//== Segment 관련 함수 =======================================================================
 		SegmentKey & Open();
 		SegmentKey & Close();
@@ -194,7 +197,7 @@ namespace H3DF
 		bool ShowPriority(int & nOutPriority) const;
 
 		//== Text 관련 함수 =================================================================================
-		//TextKey InsertText(Point const & cInPosition, CStringA strInText);
+		TextKey InsertText(Point const & cInPosition, CStringA strInText);
 
 		//== TextAttribute 관련 함수 ========================================================================
 		TextAttributeControl GetTextAttributeControl();

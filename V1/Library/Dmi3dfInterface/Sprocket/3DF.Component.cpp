@@ -26,7 +26,7 @@ H3DF::Component::Component()
 
 H3DF::Component::Component(Component const & cInThat)
 {
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 Component & H3DF::Component::operator = (Component const & cInThat)

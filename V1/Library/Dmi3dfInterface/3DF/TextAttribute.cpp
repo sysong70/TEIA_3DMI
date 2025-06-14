@@ -9,10 +9,6 @@ using namespace H3DF;
 
 H3DF::TextAttributeControl::TextAttributeControl(SegmentKey & cInSegment)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<TextAttributeControlImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -26,11 +22,7 @@ H3DF::TextAttributeControl::TextAttributeControl(SegmentKey & cInSegment)
 
 H3DF::TextAttributeControl::TextAttributeControl(TextAttributeControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::TextAttributeControl::TextAttributeControl(TextAttributeControl && cInThat) noexcept : Control(std::move(cInThat))

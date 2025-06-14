@@ -18,21 +18,13 @@ using namespace H3DF;
 
 H3DF::CameraKit::CameraKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<CameraKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::CameraKit::CameraKit(CameraKit const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 
@@ -298,10 +290,6 @@ bool H3DF::CameraKit::ShowMatrix(MatrixKit & cMatrix) const
 //== CameraControl Class ============================================================================
 H3DF::CameraControl::CameraControl(SegmentKey & cInSegment)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<CameraControlImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -313,11 +301,7 @@ H3DF::CameraControl::CameraControl(SegmentKey & cInSegment)
 
 H3DF::CameraControl::CameraControl(CameraControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 

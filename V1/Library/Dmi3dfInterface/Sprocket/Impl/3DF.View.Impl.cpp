@@ -73,6 +73,11 @@ using namespace H3DF;
 #endif
 
 //== ViewPrivate Class =============================================================================
+
+H3DF::ViewImpl::ViewImpl()
+{
+}
+
 H3DF::ViewImpl::~ViewImpl()
 {
 }

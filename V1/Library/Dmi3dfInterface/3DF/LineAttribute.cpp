@@ -36,21 +36,13 @@ using namespace H3DF;
 
 H3DF::LineAttributeKit::LineAttributeKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<LineAttributeKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::LineAttributeKit::LineAttributeKit(LineAttributeKit const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 
@@ -167,10 +159,6 @@ namespace H3DF
 
 H3DF::LineAttributeControl::LineAttributeControl(SegmentKey & cInSegment)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<LineAttributeControlImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -182,11 +170,7 @@ H3DF::LineAttributeControl::LineAttributeControl(SegmentKey & cInSegment)
 
 H3DF::LineAttributeControl::LineAttributeControl(LineAttributeControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 

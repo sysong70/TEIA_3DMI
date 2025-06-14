@@ -61,10 +61,6 @@ namespace H3DF
 //== ShellKit Class ================================================================================
 H3DF::ShellKit::ShellKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<ShellKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
@@ -468,22 +464,17 @@ namespace H3DF {
 
 H3DF::ShellKey::ShellKey()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<ShellKeyImpl>();
 	DEBUG_VALID(m_pcImpl);
+
+	m_pcImpl->SetType(H3DF::Type::ShellKey);
 }
 
 H3DF::ShellKey::ShellKey(HC_KEY nInKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<ShellKeyImpl>();
 	DEBUG_VALID(m_pcImpl);
+	m_pcImpl->SetType(H3DF::Type::ShellKey);
 
 	auto pcImpl = static_cast<ShellKeyImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
@@ -493,10 +484,6 @@ H3DF::ShellKey::ShellKey(HC_KEY nInKey)
 
 H3DF::ShellKey::ShellKey(Key const & cInKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	// PolygonShapeElementImpl 생성
 	m_pcImpl = std::make_unique<ShellKeyImpl>();
 	auto pcImpl = static_cast<ShellKeyImpl *>(m_pcImpl.get());
@@ -509,15 +496,13 @@ H3DF::ShellKey::ShellKey(Key const & cInKey)
 	else {
 		DEBUG_STOP;
 	}
+
+	m_pcImpl->SetType(H3DF::Type::ShellKey);
 }
 
 H3DF::ShellKey::ShellKey(ShellKey const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 

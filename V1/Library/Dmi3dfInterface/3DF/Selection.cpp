@@ -38,21 +38,13 @@ using namespace H3DF;
 //== SelectionOptionsKit Class =====================================================================
 H3DF::SelectionOptionsKit::SelectionOptionsKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<SelectionOptionsKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::SelectionOptionsKit::SelectionOptionsKit(SelectionOptionsKit const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 SelectionOptionsKit & H3DF::SelectionOptionsKit::operator =(SelectionOptionsKit const & cInThat)
@@ -239,7 +231,8 @@ bool H3DF::SelectionOptionsKit::ShowBias(Selection::Bias & eOutBias) const
 bool H3DF::SelectionOptionsKit::ShowScope(SegmentKey & cOutStartSegment, bool & bOutScopeOnly) const
 {
 	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
-	if (INVALID_KEY == pcImpl->cStartSegment.KeyValue()) {
+
+	if (false == pcImpl->bSetScopeFlag) {
 		return false;
 	}
 
@@ -252,6 +245,11 @@ bool H3DF::SelectionOptionsKit::ShowScope(SegmentKey & cOutStartSegment, bool & 
 bool H3DF::SelectionOptionsKit::ShowScope(KeyPath & cOutStartPath, bool & bOutScopeOnly) const
 {
 	auto pcImpl = static_cast<SelectionOptionsKitImpl *>(m_pcImpl.get());
+
+	if (false == pcImpl->bSetScopeFlag) {
+		return false;
+	}
+
 	if (true == pcImpl->cStartPath.Empty()) {
 		return false;
 	}
@@ -265,10 +263,6 @@ bool H3DF::SelectionOptionsKit::ShowScope(KeyPath & cOutStartPath, bool & bOutSc
 //== SelectionOptionsControl Class =================================================================
 SelectionOptionsControl::SelectionOptionsControl(H3DF::WindowKey const & cInWindow)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<SelectionOptionsControlImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -280,11 +274,7 @@ SelectionOptionsControl::SelectionOptionsControl(H3DF::WindowKey const & cInWind
 
 SelectionOptionsControl::SelectionOptionsControl(SelectionOptionsControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 SelectionOptionsControl::~SelectionOptionsControl()
@@ -551,21 +541,13 @@ SelectionOptionsControl & SelectionOptionsControl::UnsetBias()
 //== SelectionItem Class ===========================================================================
 H3DF::SelectionItem::SelectionItem()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<SelectionItemImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::SelectionItem::SelectionItem(SelectionItem const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 H3DF::Type H3DF::SelectionItem::ItemType() const
@@ -844,21 +826,13 @@ bool H3DF::SelectionItem::KeyPushBack(HC_KEY nInKey, H3DF::Type eInType)
 //== SelectionResultsIterator Class ================================================================
 SelectionResultsIterator::SelectionResultsIterator()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<SelectionResultsIteratorImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 SelectionResultsIterator::SelectionResultsIterator(SelectionResultsIterator const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 SelectionResultsIterator & SelectionResultsIterator::operator=(SelectionResultsIterator const & cInThat)
@@ -943,21 +917,13 @@ SelectionItem & SelectionResultsIterator::operator * () const
 //== SelectionResults Class ========================================================================
 H3DF::SelectionResults::SelectionResults()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<SelectionResultsImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::SelectionResults::SelectionResults(SelectionResults const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 H3DF::SelectionResults::~SelectionResults()
@@ -974,6 +940,18 @@ SelectionResults & H3DF::SelectionResults::operator=(SelectionResults const & cI
 		m_pcImpl.reset();
 	}
 
+	return *this;
+}
+
+H3DF::SelectionResults::SelectionResults(SelectionResults && cInThat) noexcept :
+	Object(cInThat)
+{
+
+}
+
+SelectionResults & H3DF::SelectionResults::operator = (SelectionResults && cInThat) noexcept
+{
+	this->Object::operator = (std::move(cInThat));
 	return *this;
 }
 
@@ -1046,8 +1024,11 @@ SelectionResultsIterator H3DF::SelectionResults::GetIterator() const
 {
 	SelectionResultsIterator cIterator;
 	auto pcIteratorImpl = static_cast<SelectionResultsIteratorImpl *>(cIterator.GetImpl());
+	DEBUG_VALID(pcIteratorImpl);
 
 	auto pcImpl = static_cast<SelectionResultsImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
 	pcIteratorImpl->pcBeginIterator = pcImpl->Begin();
 	pcIteratorImpl->pcEndIterator = pcImpl->End();
 	pcIteratorImpl->pcIterator = pcIteratorImpl->pcBeginIterator;
@@ -1263,10 +1244,6 @@ bool H3DF::SelectionResults::IsExist(SelectionItem & cInItem)
 //== SelectionControl Class ========================================================================
 H3DF::SelectionControl::SelectionControl(WindowKey const & cInWindow)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<SelectionControlImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -1278,11 +1255,7 @@ H3DF::SelectionControl::SelectionControl(WindowKey const & cInWindow)
 
 H3DF::SelectionControl::SelectionControl(SelectionControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 H3DF::SelectionControl::SelectionControl() {}

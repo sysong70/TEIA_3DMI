@@ -41,10 +41,6 @@ namespace H3DF
 
 H3DF::PmiKey::PmiKey(HC_KEY nInKey)
 {
-// 	if (staticType != Type()) {
-// 		return;
-// 	}
-
 	if (INVALID_KEY == nInKey) {
 		return;
 	}
@@ -55,10 +51,6 @@ H3DF::PmiKey::PmiKey(HC_KEY nInKey)
 
 H3DF::PmiKey::PmiKey(Key const & cInThat)
 {
-	// 	if (staticType != Type()) {
-	// 		return;
-	// 	}
-
 	// cInThat이 올바른 Impl(PmiKeyImpl)을 가지고 있으면 복제
 	if (cInThat.GetImpl()) {
 		// 만약 PmiKeyImpl이 KeyImpl에서 파생된 구조라면 dynamic_cast에 의해서 nullptr이 아닌 정상적인 값이 넘어옴
@@ -80,11 +72,7 @@ H3DF::PmiKey::PmiKey(Key const & cInThat)
 
 H3DF::PmiKey::PmiKey(PmiKey const & cInThat)
 {
-// 	if (staticType != Type()) {
-// 		return;
-// 	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 PmiKey const & H3DF::PmiKey::operator=(PmiKey const & cInThat)
@@ -709,10 +697,6 @@ namespace H3DF
 
 H3DF::DatumEntity::DatumEntity(HC_KEY nInKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	if (INVALID_KEY == nInKey) {
 		return;
 	}
@@ -754,11 +738,7 @@ H3DF::DatumEntity::DatumEntity(SegmentKey const & cInThat)
 
 H3DF::DatumEntity::DatumEntity(DatumEntity const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
@@ -955,10 +935,6 @@ FeatureControlFrameEntity const & H3DF::FeatureControlFrameEntity::operator=(Fea
 
 H3DF::GenericEntity::GenericEntity(HC_KEY nInKey) :	PmiKey(nInKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	if (INVALID_KEY == nInKey) {
 		return;
 	}
@@ -1225,21 +1201,11 @@ public:
 
 H3DF::Orientation::Orientation()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<OrientationImpl>();
-	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::Orientation::Orientation(Orientation const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 H3DF::Orientation const & H3DF::Orientation::operator=(Orientation const & cInThat)
@@ -1333,21 +1299,11 @@ public:
 
 H3DF::TextAttributes::TextAttributes()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<TextAttributesImpl>();
-	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::TextAttributes::TextAttributes(TextAttributes const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 TextAttributes const & H3DF::TextAttributes::operator=(TextAttributes const & cInThat)
@@ -1536,21 +1492,11 @@ public:
 
 H3DF::Options::Options()
 {
-	if (staticType != Type()) {
- 		return;
- 	}
-
-	m_pcImpl = std::make_unique<OptionsImpl>();
-	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::Options::Options(Options const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 Options const & H3DF::Options::operator=(Options const & cInThat)
@@ -1598,21 +1544,11 @@ public:
 
 H3DF::Frame::Frame()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<FrameImpl>();
-	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::Frame::Frame(Frame const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 Frame const & H3DF::Frame::operator=(Frame const & cInThat)
@@ -1678,25 +1614,11 @@ public:
 
 H3DF::Draw::Draw()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<DrawingImpl>();
-	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::Draw::Draw(Draw const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 Draw const & H3DF::Draw::operator=(Draw const & cInThat)

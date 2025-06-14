@@ -13,6 +13,7 @@
 #include <3DF/Texture.h>
 #include <3DF/Portfolio.h>
 #include <3DF/TextAttribute.h>
+#include <3DF/Text.h>
 #include <3DF/3DF.Utility.h>
 
 #include "Signal.Connector.h"
@@ -696,7 +697,6 @@ void KERNEL::Session::TestCommand(int nId)
 
 			rectangle_shape.SetElements(2, rectangle_elements);
 
-
 			H3DF::PortfolioKey portfolio;
 			rectangleSegmentKey.GetPortfolioControl().ShowTop(portfolio);
 
@@ -708,7 +708,7 @@ void KERNEL::Session::TestCommand(int nId)
 
 			rectangleSegmentKey.GetTextAttributeControl().SetBackground("anchored_leader_line_rectangle");
 
-			//H3DF::TextKey rectangle_text = rectangleSegmentKey.InsertText(H3DF::Point(2, -2, 0), "Vertex is 0.5, 0.5, -0.5\nin world space.");
+			H3DF::TextKey rectangle_text = rectangleSegmentKey.InsertText(H3DF::Point(2, -2, 0), "Vertex is 0.5, 0.5, -0.5\nin world space.");
 
 		} break;
 

@@ -16,21 +16,13 @@ using namespace H3DF;
 
 H3DF::Image::ImportOptionsKit::ImportOptionsKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<ImageImportOptionsKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::Image::ImportOptionsKit::ImportOptionsKit(ImportOptionsKit const & cInKit)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInKit.GetImpl()) ? cInKit.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInKit.GetImpl()) ? cInKit.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 
@@ -170,31 +162,19 @@ bool H3DF::Image::ImportOptionsKit::ShowFormat(Image::Format & eOutFormat) const
 //== Image Kit class ===============================================================================
 H3DF::ImageKit::ImageKit()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<ImageKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::ImageKit::ImageKit(ImageKit const & cInKit)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInKit.GetImpl()) ? cInKit.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInKit.GetImpl()) ? cInKit.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::ImageKit::ImageKit(ImageKit const & cInKit, H3DF::Image::Format eInFormat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInKit.GetImpl()) ? cInKit.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInKit.GetImpl()) ? cInKit.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 
 	auto pcImpl = static_cast<ImageKitImpl *>(m_pcImpl.get());
@@ -371,20 +351,10 @@ ImageKit H3DF::Image::File::Import(CString strFilePathName, ImportOptionsKit con
 //== ImageDefinition class =========================================================================
 H3DF::ImageDefinition::ImageDefinition()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = std::make_unique<ImageDefinitionImpl>();
-	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::ImageDefinition::ImageDefinition(Definition const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	// PolygonShapeElementImpl 생성
 	m_pcImpl = std::make_unique<ImageDefinitionImpl>();
 	auto pcImpl = static_cast<ImageDefinitionImpl *>(m_pcImpl.get());
@@ -401,11 +371,7 @@ H3DF::ImageDefinition::ImageDefinition(Definition const & cInThat)
 
 H3DF::ImageDefinition::ImageDefinition(ImageDefinition const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
 }
 

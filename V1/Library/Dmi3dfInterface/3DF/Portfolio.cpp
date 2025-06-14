@@ -22,20 +22,12 @@ using namespace H3DF;
 
 H3DF::PortfolioKey::PortfolioKey()
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<PortfolioKeyImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::PortfolioKey::PortfolioKey(HC_KEY nInKey)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	if (INVALID_KEY == nInKey) {
 		return;
 	}
@@ -48,10 +40,6 @@ H3DF::PortfolioKey::PortfolioKey(HC_KEY nInKey)
 
 H3DF::PortfolioKey::PortfolioKey(Key const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	// cInThat이 올바른 Impl(PortfolioKeyImpl)을 가지고 있으면 복제
 	if (cInThat.GetImpl()) {
 		// 만약 PortfolioKeyImpl이 KeyImpl에서 파생된 구조라면 dynamic_cast에 의해서 nullptr이 아닌 정상적인 값이 넘어옴
@@ -73,11 +61,7 @@ H3DF::PortfolioKey::PortfolioKey(Key const & cInThat)
 
 H3DF::PortfolioKey::PortfolioKey(PortfolioKey const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 PortfolioKey & H3DF::PortfolioKey::operator = (PortfolioKey const & cInThat)
@@ -320,10 +304,6 @@ namespace H3DF
 
 H3DF::PortfolioControl::PortfolioControl(SegmentKey & cInSegment)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
 	m_pcImpl = std::make_unique<PortfolioControlImpl>();
 	DEBUG_VALID(m_pcImpl);
 
@@ -335,11 +315,7 @@ H3DF::PortfolioControl::PortfolioControl(SegmentKey & cInSegment)
 
 H3DF::PortfolioControl::PortfolioControl(PortfolioControl const & cInThat)
 {
-	if (staticType != Type()) {
-		return;
-	}
-
-	m_pcImpl = (nullptr == cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 PortfolioControl & H3DF::PortfolioControl::operator = (PortfolioControl const & cInThat)
