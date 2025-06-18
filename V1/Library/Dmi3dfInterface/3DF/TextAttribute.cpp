@@ -58,10 +58,18 @@ TextAttributeControl & H3DF::TextAttributeControl::operator = (TextAttributeCont
 
 TextAttributeControl & H3DF::TextAttributeControl::SetBackground(bool bInState, CStringA strInName)
 {
+	auto pcImpl = static_cast<TextAttributeControlImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	CStringA strName = pcImpl->m_cOverrideKey.Name();
+
 	CStringA strList;
 	strList.Format("background=(%s,shape=%s)", (true == bInState) ? "on" : "off", strInName);
 		
 	HC_Set_Text_Font(strList);
+
+	CStringA strList2;
+	HC_Show_Text_Font(strList2.GetBuffer());
 
 	return *this;
 }

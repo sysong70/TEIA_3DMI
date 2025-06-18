@@ -90,6 +90,8 @@ bool H3DF::PortfolioKeyImpl::CreateShapeData(ShapeElementArray & arInShapeElemen
 
 	for(auto & cShapeElement : arInShapeElements) {
 
+		H3DF::Type eType = cShapeElement.Type();
+
 		if (H3DF::Type::PolygonShapeElement == cShapeElement.Type()) {
 			PolygonShapeElement cPolygonShape(cShapeElement);
 
@@ -132,6 +134,9 @@ bool H3DF::PortfolioKeyImpl::CreateShapeData(ShapeElementArray & arInShapeElemen
 
 			// Format code 추가
 			vfOutData.emplace_back((float)nFormatCode);
+
+			// Count
+			vfOutData.emplace_back((float) (arShapePoints.size()));
 
 			for (auto & cShapePoint : arShapePoints) {
 				CreateShapePointData(nFormatCode, cShapePoint, vfOutData);

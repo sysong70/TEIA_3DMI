@@ -661,13 +661,14 @@ void KERNEL::Session::TestCommand(int nId)
 
 		} break;
 
-		case CUSTOM_3D_CMD_SYSONG_Test3: {
-			H3DF::SegmentKey rectangleSegmentKey = pcImpl->GetCanvas().GetFrontView().GetAttachedModel().GetSegmentKey();
+		case CUSTOM_3D_CMD_SYSONG_Test3: 
+		{
+			H3DF::SegmentKey cTextSegment = pcImpl->GetCanvas().GetFrontView().GetAttachedModel().GetSegmentKey().Subsegment("TextShapeTest");
 
-			CStringA strName = rectangleSegmentKey.Name();
+			CStringA strName = cTextSegment.Name();
 
 			// define the vertices of the textbox rectangle
-			H3DF::ShapePoint leftBottom(-1, -1);
+			H3DF::ShapePoint leftBottom(-0.5, -0.5);
 			H3DF::ShapePoint leftTop(-1, 1);
 			H3DF::ShapePoint rightBottom(1, -1);
 			H3DF::ShapePoint rightTop(1, 1);
@@ -697,18 +698,18 @@ void KERNEL::Session::TestCommand(int nId)
 
 			rectangle_shape.SetElements(2, rectangle_elements);
 
-			H3DF::PortfolioKey portfolio;
-			rectangleSegmentKey.GetPortfolioControl().ShowTop(portfolio);
-
-			H3DF::SegmentKey cTest(portfolio.KeyValue());
-			strName = cTest.Name();
+			H3DF::PortfolioKey cPortfolio;
+			cTextSegment.GetPortfolioControl().ShowTop(cPortfolio);
 
 			// define the rectangle_shape in our portfolio and add to the rectangle segment
-			portfolio.DefineShape("anchored_leader_line_rectangle", rectangle_shape);
+			H3DF::ShapeDefinition cDefinition = cPortfolio.DefineShape("anchored_leader_line_rectangle", rectangle_shape);
 
-			rectangleSegmentKey.GetTextAttributeControl().SetBackground("anchored_leader_line_rectangle");
+//			cTextSegment.GetTextAttributeControl().SetBackground(true, "oval");
+//			cTextSegment.GetTextAttributeControl().SetBackground(true, "oval");
+ 			cTextSegment.GetTextAttributeControl().SetBackground(true, "anchored_leader_line_rectangle");
+// 
+ 			H3DF::TextKey rectangle_text = cTextSegment.InsertText(H3DF::Point(2, -2, 0), "Vertex is 0.5, 0.5, -0.5");
 
-			H3DF::TextKey rectangle_text = rectangleSegmentKey.InsertText(H3DF::Point(2, -2, 0), "Vertex is 0.5, 0.5, -0.5\nin world space.");
 
 		} break;
 

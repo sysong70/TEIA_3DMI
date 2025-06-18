@@ -267,6 +267,11 @@ H3DF::PolygonShapeElement::PolygonShapeElement()
 
 H3DF::PolygonShapeElement::PolygonShapeElement(ShapeElement const & cInThat)
 {
+	m_pcImpl = cInThat.GetImpl()->Clone();
+	m_pcImpl->SetType(H3DF::Type::PolygonShapeElement);
+
+	return;
+
 	// PolygonShapeElementImpl 생성
 	m_pcImpl = std::make_unique<PolygonShapeElementImpl>();
 	auto pcImpl = static_cast<PolygonShapeElementImpl *>(m_pcImpl.get());
@@ -279,6 +284,8 @@ H3DF::PolygonShapeElement::PolygonShapeElement(ShapeElement const & cInThat)
 	else {
 		DEBUG_STOP;
 	}
+
+	
 }
 
 H3DF::PolygonShapeElement::PolygonShapeElement(PolygonShapeElement const & cInThat)
@@ -290,6 +297,7 @@ H3DF::PolygonShapeElement::PolygonShapeElement(ShapePointArray const & arInPoint
 {
 	m_pcImpl = std::make_unique<PolygonShapeElementImpl>();
 	DEBUG_VALID(m_pcImpl);
+	m_pcImpl->SetType(H3DF::Type::PolygonShapeElement);
 
 	auto pcImpl = static_cast<PolygonShapeElementImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
@@ -301,6 +309,7 @@ H3DF::PolygonShapeElement::PolygonShapeElement(size_t nInCount, ShapePoint const
 {
 	m_pcImpl = std::make_unique<PolygonShapeElementImpl>();
 	DEBUG_VALID(m_pcImpl);
+	m_pcImpl->SetType(H3DF::Type::PolygonShapeElement);
 
 	auto pcImpl = static_cast<PolygonShapeElementImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
@@ -319,6 +328,7 @@ H3DF::PolygonShapeElement::~PolygonShapeElement()
 H3DF::PolygonShapeElement::PolygonShapeElement(PolygonShapeElement && cInThat) noexcept :
 	ShapeElement(std::move(cInThat))
 {
+	m_pcImpl->SetType(H3DF::Type::PolygonShapeElement);
 }
 
 H3DF::PolygonShapeElement & H3DF::PolygonShapeElement::operator = (PolygonShapeElement && cInThat) noexcept

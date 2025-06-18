@@ -24,6 +24,8 @@ namespace H3DF
 				return;
 			}
 
+			Impl::Copy(pcInThat);
+
 			m_bFillFlag = pcInThat->m_bFillFlag;
 			m_bDisjointedFlag = pcInThat->m_bDisjointedFlag;
 		}

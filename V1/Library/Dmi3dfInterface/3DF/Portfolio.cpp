@@ -225,8 +225,6 @@ ShapeDefinition H3DF::PortfolioKey::DefineShape(CStringA strInName, ShapeKit con
 
 	SegmentKey cPortfolio(KeyValue());
 
-	CStringA strName = cPortfolio.Name();
-
 	// Portpolio
 	SegmentKey cShapesSegment = cPortfolio.Subsegment("shapes");
 
@@ -242,7 +240,21 @@ ShapeDefinition H3DF::PortfolioKey::DefineShape(CStringA strInName, ShapeKit con
 	PortfolioKeyImpl::CreateShapeData(arShapeElements, vfData);
 
 	cStyleSegment.Open(); {
-		HC_Define_Shape(strInName, (int)vfData.size(), vfData.data());
+
+		float const clipped[] = {
+			3,
+			8, 1,  0, 1,  0, 1,  0, 1, 0, 0,  0,  1, 1, -1, 0, 0,  0,  1, 1, -1, 0, -1, 0, 1, 0,
+			-1, 0, -1, 0, -1, 0, -1, 0, 0, 0, -1, -1, 1, 0, 0,  0, -1, -1, 1, 0, 1,  0, -1, 0, 0 };
+		HC_Define_Shape(strInName, std::ranges::size(clipped), clipped);
+
+/*
+		CStringA strText;
+		strText.Format()
+// 		HC_Set_Text_Font("background=(on, shape=clipped)");
+// 		HC_Insert_Text(10, 10, 0, "corner trimmed box");
+*/
+
+	//	HC_Define_Shape(strInName, (int)vfData.size(), vfData.data());
 	} cStyleSegment.Close();
 
 	ShapeDefinition cDefinition;

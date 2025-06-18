@@ -63,11 +63,15 @@ void H3DF::ModelImpl::Init()
 {
 	HBaseModel::Init();
 
+	m_cSegmentKey.GetImpl()->SetType(H3DF::Type::Model);
+
 	m_cInclude = m_cSegmentKey.Subsegment("model_include");
 	m_cInclude.GetAttributeLockControl().SetLock(AttributeLock::Type::Visibility);
 	m_cInclude.SetVisibility(L"off");
 
 	m_cModelsRoot = m_cSegmentKey.Subsegment("models_root");
+	m_cModelsRoot.GetImpl()->SetType(H3DF::Type::Model);
+
 	m_cMeasurementsRoot = m_cSegmentKey.Subsegment("measurements_root");
 	m_cMarkupsRoot = m_cSegmentKey.Subsegment("markups_root");
 
