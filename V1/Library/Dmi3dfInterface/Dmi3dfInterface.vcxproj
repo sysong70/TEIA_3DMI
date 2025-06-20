@@ -144,6 +144,7 @@
     <ClInclude Include="3DF\CuttingSection.h" />
     <ClInclude Include="3DF\Definition.h" />
     <ClInclude Include="3DF\DrawingAttribute.h" />
+    <ClInclude Include="3DF\3DF.Tracer.h" />
     <ClInclude Include="3DF\Impl\CameraImpl.h" />
     <ClInclude Include="3DF\Impl\ControlImpl.h" />
     <ClInclude Include="3DF\Impl\DefinitionImpl.h" />
@@ -252,6 +253,7 @@
     <ClCompile Include="..\Common\WStr.cpp" />
     <ClCompile Include="..\Signal\Signal.cpp" />
     <ClCompile Include="..\Signal\WorkerThread.cpp" />
+    <ClCompile Include="3DF\3DF.Tracer.cpp" />
     <ClCompile Include="3DF\ApplicationWindowOption.cpp" />
     <ClCompile Include="3DF\AttributeLock.cpp" />
     <ClCompile Include="3DF\ColorInterpolation.cpp" />

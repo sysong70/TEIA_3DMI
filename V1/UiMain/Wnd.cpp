@@ -84,6 +84,11 @@ bool Wnd::IsAllowed3d(const wchar_t* pFilePath)
 		return false;
 	}
 
+	// HSF is 3D format: #HSF
+	if (L"HSF" == extension) {
+		return true;
+	}
+
 	// WARNING - Creo/ProE (case *.1)
 	if (WStr::IsDigit(extension)) {
 		return true;

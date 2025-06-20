@@ -44,12 +44,14 @@
 
 #include "../3DF/Operator.KinematicTest.h"
 
+#include "../3DF/3DF.Tracer.h"
+
 #include <Common_Define.h>
 #include <Path.h>
 #include <WStr.h>
 
 #include "../../Signal/Signal.h"
-
+               
 #include <chrono>
 #include <thread>
 
@@ -195,9 +197,9 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 	LogManager::CreateFolder(strExecuteDirectory + L"\\Log");
 
 	CString strLogFilePathName = strExecuteDirectory + L"\\Log\\3DF.log";
- 	LogManager::CreateLog(LOGMANAGER_3DF_LOG_ID, strLogFilePathName);
- 	LogManager::SetWriteTimeLog(LOGMANAGER_3DF_LOG_ID, true);
-	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Open File: " + strFilePathName);
+ 	LogManager::CreateLog(LOG_3DF_ID, strLogFilePathName);
+ 	LogManager::SetWriteTimeLog(LOG_3DF_ID, true);
+	LogManager::Log(LOG_3DF_ID, L"Open File: " + strFilePathName);
 
 	//m_cA3dTracer.CreateLog(L"D:\\Temp\\A3dXInfo.log");
 	//CreateLog(1, L"d:\\Temp\\AssyStruct.log");
@@ -283,16 +285,21 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 	//----- File을 실제로 읽어 드리는 부분 -----
 	bool bFileLoadingStatus = true;
 	if (true == pcCanvasImpl->m_bPointColudData) {
-		LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Load Point Cloud File Start");
+		LogManager::Log(LOG_3DF_ID, L"Load Point Cloud File Start");
 
 		GetFrontView().LoadPointCloudFile(strFilePathName);
 
-		LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Load Point Cloud File End");
+		LogManager::Log(LOG_3DF_ID, L"Load Point Cloud File End");
 	}
-	else if (true == bHsfFile) {
+	else if (true == bHsfFile) { //#HSF: HSF 파일을 읽어 드리는 부분
 		HC_Open_Segment_By_Key(pcBaseView->GetModel()->GetModelKey()); {
 			TK_Status read_status = HTK_Read_Stream_File(strFilePathName, pcBaseView->GetModel()->GetStreamFileTK());
 		} HC_Close_Segment();
+
+		Tracer::CreateLog("HSF_Trace.log");
+		HC_KEY nRootKey = HC_Create_Segment("/");
+		//Tracer::ModelLog(pcBaseView->GetModel()->GetModelKey());
+		Tracer::ContentsLog(nRootKey);
 	}
 	else {
 		SegmentKey cViewKey(pcBaseView->GetViewKey());
@@ -386,7 +393,7 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 
 	//pcBaseView->ForceUpdate();
 
-	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Update Complete");
+	LogManager::Log(LOG_3DF_ID, L"Update Complete");
 }
 
 void H3DF::Canvas::ThreadFileOpen(Canvas * pcCanvas, CString strFilePathName, H3DF::CADModel & cInCADModel)

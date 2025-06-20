@@ -28,7 +28,7 @@ public:
 	static void SetWriteTimeLog(bool bFlag) { m_bWriteTimeFlag[m_nCurrentId] = bFlag; }
 	static void SetWriteTimeLog(int nId, bool bFlag) { m_bWriteTimeFlag[nId] = bFlag; }
 
-	static bool IsWriteLog() { return m_bWriteLogFlag; }
+	static bool IsWriteLog(int nId) { return m_bWriteLogFlag[nId]; }
 
 	// FilePathName을 지정할 경우 특정 위치에 저장한다.
 	static void SetFilePathName(CString strFilePathName) { m_strFilePathName[m_nCurrentId] = strFilePathName; }

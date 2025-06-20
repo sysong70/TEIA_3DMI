@@ -158,7 +158,7 @@ void KERNEL::Command::Set::Clear()
 	DEBUG_VALID(pcImpl);
 
 	for (auto cItem : pcImpl->m_deStep) {
-		delete cItem;
+		// delete cItem;
 	}
 
 	pcImpl->m_deStep.clear();

@@ -26,5 +26,11 @@
 #define CHECK_POINTER(pcValue) if(0 == pcValue) { assert(FALSE);  return false; } 
 #define CHECK_DWORD_PTR(nValue) if(0 == nValue) { assert(FALSE);  return false; } 
 
-#define LOGMANAGER_3DF_LOG_ID			1
+#include <LogManager.h>
 
+#define LOG LogManager::Log
+#define LogIncTab LogManager::IncreaseTabIndex
+#define LogDecTab LogManager::DecreaseTabIndex
+
+#define LOG_3DF_ID					1
+#define LOG_3DF_TRACE_ID			2

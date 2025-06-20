@@ -408,6 +408,9 @@
     <ClInclude Include="Sprocket\3DF.CADModel.h">
       <Filter>CADModel</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\3DF.Tracer.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -742,6 +745,9 @@
     </ClCompile>
     <ClCompile Include="Sprocket\3DF.CADModel.cpp">
       <Filter>CADModel</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Tracer.cpp">
+      <Filter>Utility</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

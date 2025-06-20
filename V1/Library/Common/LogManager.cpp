@@ -242,16 +242,16 @@ void LogManager::WriteLog(int nId, CString strMessage)
 		return;
 	}
 
-	struct tm cCurTime;
-	time_t cLocalCurrentTime = time(nullptr);
-	_localtime64_s(&cCurTime, &cLocalCurrentTime);
-
 	CString strTabText;
 	for(int nIndex = 0; nIndex < m_nTabIndex[nId]; nIndex++) {
 		strTabText += L"   ";
 	}
 
 	if(true == m_bWriteTimeFlag[nId]) {
+		struct tm cCurTime;
+		time_t cLocalCurrentTime = time(nullptr);
+		_localtime64_s(&cCurTime, &cLocalCurrentTime);
+
 		CString strTimeText;
 		strTimeText.Format(L"%04d-%02d-%02d %02d:%02d:%02d", cCurTime.tm_year + 1900, cCurTime.tm_mon + 1, cCurTime.tm_mday,
 			cCurTime.tm_hour, cCurTime.tm_min, cCurTime.tm_sec);
@@ -278,10 +278,10 @@ void LogManager::WriteLog(int nId, CString strMessage)
 
 	int nTextSize = 0;
 	char * pchText = nullptr;
-
+	int nBytesWritten = 0;
 	if(true == CStringToChar(strBuffer, pchText, nTextSize)) {
 		size_t nSize = strlen(pchText);
-		int nBytesWritten = _write(m_nFileHandle[nId], pchText, (UINT)nSize);
+		nBytesWritten = _write(m_nFileHandle[nId], pchText, (UINT)nSize);
 	}
 
 	_commit(m_nFileHandle[nId]);
