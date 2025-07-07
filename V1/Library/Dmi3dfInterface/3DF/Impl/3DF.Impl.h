@@ -1,6 +1,21 @@
 ﻿#pragma once
 
+#include "../3DF.h"
+
+#include <map>
 #include <memory>
+
+#define IMPL(ClassName) \
+    auto impl = static_cast<ClassName##Impl *>(m_pcImpl.get()); \
+    DEBUG_VALID(impl)
+
+#define IMPL_AS(ClassName, varName) \
+    varName = static_cast<ClassName##Impl *>(m_pcImpl.get()); \
+    DEBUG_VALID(varName)
+
+#define INIT_IMPL(ClassName) \
+	m_pcImpl = std::make_unique<ClassName##Impl>(); \
+	DEBUG_VALID(m_pcImpl)
 
 namespace H3DF
 {
@@ -21,4 +36,12 @@ namespace H3DF
 	protected:
 		H3DF::Type m_eType = H3DF::Type::None;
 	};
+
+	struct HoopsOption {
+		CStringA name;
+		BOOL enabled = TRUE;
+		std::map<CStringA, CStringA> options;
+	};
+
+	std::vector<HoopsOption> ParseHoopsOptionString(const CStringA & input);
 }

@@ -13,6 +13,8 @@
 #include <HUtility.h>
 #include <HTools.h>
 
+#include <format>
+
 using namespace H3DF;
 
 class VisualEffectsControlImpl : public ControlImpl
@@ -31,18 +33,27 @@ public:
 
 H3DF::VisualEffectsControl::VisualEffectsControl(SegmentKey & cInSegment)
 {
-	m_pcImpl = std::make_unique<VisualEffectsControlImpl>();
-	DEBUG_VALID(m_pcImpl);
+	INIT_IMPL(VisualEffectsControl);
 
-	auto pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
+	IMPL(VisualEffectsControl);
 
-	pcImpl->m_cOverrideKey = cInSegment;
+	impl->m_cOverrideKey = cInSegment;
+
+	SegmentKeyImpl::LocalOpen(impl->m_cOverrideKey);
 }
 
 H3DF::VisualEffectsControl::VisualEffectsControl(VisualEffectsControl const & cInThat)
 {
 	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+
+	IMPL(VisualEffectsControl);
+	SegmentKeyImpl::LocalOpen(impl->m_cOverrideKey);
+}
+
+H3DF::VisualEffectsControl::~VisualEffectsControl()
+{
+	IMPL(VisualEffectsControl);
+	SegmentKeyImpl::LocalClose(impl->m_cOverrideKey);
 }
 
 VisualEffectsControl & H3DF::VisualEffectsControl::operator = (VisualEffectsControl const & cInThat)
@@ -61,15 +72,9 @@ VisualEffectsControl & H3DF::VisualEffectsControl::operator = (VisualEffectsCont
 
 VisualEffectsControl & H3DF::VisualEffectsControl::SetPostProcessEffectsEnabled(bool bInState)
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
-
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		CStringA strOption;
-		strOption.Format("frame buffer effects = %s", (bInState ? "on" : "off"));
-		HC_Set_Rendering_Options(strOption);
-
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	CStringA strOption;
+	strOption.Format("frame buffer effects = %s", (bInState ? "on" : "off"));
+	HC_Set_Rendering_Options(strOption);
 
 	return *this;
 }
@@ -78,10 +83,9 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetPostProcessEffectsEnabled(
 // param: in_state Whether ambient occlusion should be used.
 VisualEffectsControl & H3DF::VisualEffectsControl::SetAmbientOcclusionEnabled(bool bInState, float fStrength, bool bFast)
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
+	IMPL(VisualEffectsControl);
 
-	BaseView * pcBaseView = pcImpl->GetBaseView();
+	BaseView * pcBaseView = impl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
 	if (nullptr != pcBaseView) {
@@ -98,10 +102,9 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetAmbientOcclusionEnabled(bo
 
 VisualEffectsControl & H3DF::VisualEffectsControl::SetSilhouetteEdgesEnabled(bool bInState, float fTolerance, bool bHeavyExterior)
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
+	IMPL(VisualEffectsControl);
 
-	BaseView * pcBaseView = pcImpl->GetBaseView();
+	BaseView * pcBaseView = impl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
 	if (nullptr != pcBaseView) {
@@ -122,14 +125,13 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSilhouetteEdgesEnabled(boo
 
 VisualEffectsControl & H3DF::VisualEffectsControl::SetBloomEnabled(bool bInState, float fStrength, int nBlurring, int nShape)
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
+	IMPL(VisualEffectsControl);
 
-	BaseView * pcBaseView = pcImpl->GetBaseView();
-	DEBUG_VALID(pcBaseView);
+	BaseView * baseView = impl->GetBaseView();
+	DEBUG_VALID(baseView);
 
-	if (nullptr != pcBaseView) {
-		HC_Open_Segment_By_Key(pcBaseView->GetViewKey()); {
+	if (nullptr != baseView) {
+		HC_Open_Segment_By_Key(baseView->GetViewKey()); {
 			CStringA strOption;
 			strOption.Format("bloom = (%s, strength = %f, blur = %d, shape = %s)",
 				(bInState ? "on" : "off"),
@@ -146,63 +148,27 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetBloomEnabled(bool bInState
 // Manipulates the state of anti - aliasing(text and screen).
 VisualEffectsControl & H3DF::VisualEffectsControl::SetAntiAliasing(bool bInState)
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
+	std::string list = std::format("anti-alias=(screen={})", bInState ? "on" : "off");
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		CStringA strOption;
-
-		if (true == bInState) {
-			strOption = "anti-alias = (screen = on)";
-		}
-		else {
-			strOption = "anti-alias = (screen = off)";
-		}
-
-		HC_Set_Rendering_Options(strOption);
-
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	HC_Set_Rendering_Options(list.c_str());
 
 	return *this;
 }
 
 VisualEffectsControl & H3DF::VisualEffectsControl::SetTextAntiAliasing(bool bInState)
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
+	std::string list = std::format("anti-alias=(text={})", bInState ? "on" : "off");
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		CString strOption;
-
-		if (true == bInState) {
-			strOption = L"anti-alias = (text = on)";
-		}
-		else {
-			strOption = L"anti-alias = (text = off)";
-		}
-
-		HC_Set_Rendering_Options(Utility::ToChar(strOption));
-
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	HC_Set_Rendering_Options(list.c_str());
 
 	return *this;
 }
 
 VisualEffectsControl & H3DF::VisualEffectsControl::SetLineAntiAliasing(bool bInState)
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
+	std::string list = std::format("anti-alias=(lines={})", bInState ? "on" : "off");
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		CString strOption;
-
-		if (true == bInState) {
-			strOption = L"anti-alias = (lines = on)";
-		}
-		else {
-			strOption = L"anti-alias = (lines = off)";
-		}
-
-		HC_Set_Rendering_Options(Utility::ToChar(strOption));
-
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	HC_Set_Rendering_Options(list.c_str());
 
 	return *this;
 }
@@ -214,10 +180,9 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetLineAntiAliasing(bool bInS
 //	param: in_ignore_transparency Whether any segment-level transparency setting should be ignored when rendering the simple shadow.
 VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleShadow(bool bInState, H3DF::VisualEffects::ShadowMode eMode, UINT nInResolution, UINT nInBlurring, bool bInIgnoreTransparency)
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
+	IMPL(VisualEffectsControl);
 
-	BaseView * pcBaseView = pcImpl->GetBaseView();
+	BaseView * pcBaseView = impl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
 	if (nullptr != pcBaseView) {
@@ -257,10 +222,9 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleShadow(bool bInState
 // param: in_color The color of simple shadows.
 VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleShadowColor(RGBAColor const & cInColor)
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
+	IMPL(VisualEffectsControl);
 
-	BaseView * pcBaseView = pcImpl->GetBaseView();
+	BaseView * pcBaseView = impl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
 	if (nullptr != pcBaseView) {
@@ -288,10 +252,9 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleShadowColor(RGBAColo
 
 VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleReflection(bool bInState, float fInOpacity, unsigned int nInBlurring, bool bInFading, float fInAttenuationNearDistance, float fInAttenuationFarDistance)
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
+	IMPL(VisualEffectsControl);
 
-	BaseView * pcBaseView = pcImpl->GetBaseView();
+	BaseView * pcBaseView = impl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
 	if (nullptr != pcBaseView) {
@@ -316,12 +279,7 @@ VisualEffectsControl & H3DF::VisualEffectsControl::SetSimpleReflection(bool bInS
 
 VisualEffectsControl & H3DF::VisualEffectsControl::UnsetPostProcessEffectsEnabled()
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
-
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_UnSet_One_Rendering_Option("frame buffer effects");
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	HC_UnSet_One_Rendering_Option("frame buffer effects");
 
 	return *this;
 }
@@ -329,10 +287,9 @@ VisualEffectsControl & H3DF::VisualEffectsControl::UnsetPostProcessEffectsEnable
 
 VisualEffectsControl & H3DF::VisualEffectsControl::UnsetAmbientOcclusionEnabled()
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
+	IMPL(VisualEffectsControl);
 
-	BaseView * pcBaseView = pcImpl->GetBaseView();
+	BaseView * pcBaseView = impl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
 	if (nullptr != pcBaseView) {
@@ -346,10 +303,9 @@ VisualEffectsControl & H3DF::VisualEffectsControl::UnsetAmbientOcclusionEnabled(
 
 VisualEffectsControl & H3DF::VisualEffectsControl::UnsetSilhouetteEdgesEnabled()
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
+	IMPL(VisualEffectsControl);
 
-	BaseView * pcBaseView = pcImpl->GetBaseView();
+	BaseView * pcBaseView = impl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
 	if (nullptr != pcBaseView) {
@@ -363,10 +319,9 @@ VisualEffectsControl & H3DF::VisualEffectsControl::UnsetSilhouetteEdgesEnabled()
 
 VisualEffectsControl & H3DF::VisualEffectsControl::UnsetBloomEnabled()
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
+	IMPL(VisualEffectsControl);
 
-	BaseView * pcBaseView = pcImpl->GetBaseView();
+	BaseView * pcBaseView = impl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
 	if (nullptr != pcBaseView) {
@@ -380,22 +335,16 @@ VisualEffectsControl & H3DF::VisualEffectsControl::UnsetBloomEnabled()
 
 VisualEffectsControl & H3DF::VisualEffectsControl::UnsetAntiAliasing()
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
-
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_UnSet_One_Rendering_Option("anti-alias");
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	HC_UnSet_One_Rendering_Option("anti-alias");
 
 	return *this;
 }
 
 VisualEffectsControl & H3DF::VisualEffectsControl::UnsetSimpleShadow()
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
+	IMPL(VisualEffectsControl);
 
-	BaseView * pcBaseView = pcImpl->GetBaseView();
+	BaseView * pcBaseView = impl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
 	if (nullptr != pcBaseView) {
@@ -410,43 +359,36 @@ VisualEffectsControl & H3DF::VisualEffectsControl::UnsetSimpleShadow()
 //== Show Functions ================================================================================
 bool H3DF::VisualEffectsControl::ShowPostProcessEffectsEnabled(bool & bOutState) const
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
-
 	bool bResult = false;
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		char chValue[MVO_BUFFER_SIZE];
-		HC_Show_One_Rendering_Option("frame buffer effects", chValue);
+	char chValue[MVO_BUFFER_SIZE];
+	HC_Show_One_Rendering_Option("frame buffer effects", chValue);
 
-		if (0 == strlen(chValue)) {
-			bResult = false;
-		}
-		else if (nullptr != strstr(chValue, "on")) {
-			bOutState = true;
-			bResult = true;
-		}
-		else if (nullptr != strstr(chValue, "off")) {
-			bOutState = false;
-			bResult = true;
-		}
-		else {
-			bOutState = false;
-			bResult = true;
-			DEBUG_STOP;
-		}
-
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	if (0 == strlen(chValue)) {
+		bResult = false;
+	}
+	else if (nullptr != strstr(chValue, "on")) {
+		bOutState = true;
+		bResult = true;
+	}
+	else if (nullptr != strstr(chValue, "off")) {
+		bOutState = false;
+		bResult = true;
+	}
+	else {
+		bOutState = false;
+		bResult = true;
+		DEBUG_STOP;
+	}
 
 	return bResult;
 }
 
 bool H3DF::VisualEffectsControl::ShowAmbientOcclusionEnabled(bool & bOutState) const
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
+	IMPL(VisualEffectsControl);
 
-	BaseView * pcBaseView = pcImpl->GetBaseView();
+	BaseView * pcBaseView = impl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
 	if (nullptr != pcBaseView) {
@@ -470,10 +412,9 @@ bool H3DF::VisualEffectsControl::ShowAmbientOcclusionEnabled(bool & bOutState) c
 
 bool H3DF::VisualEffectsControl::ShowSilhouetteEdgesEnabled(bool & bOutState) const
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
+	IMPL(VisualEffectsControl);
 
-	BaseView * pcBaseView = pcImpl->GetBaseView();
+	BaseView * pcBaseView = impl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
 	bool bStatus = false;
@@ -501,10 +442,9 @@ bool H3DF::VisualEffectsControl::ShowSilhouetteEdgesEnabled(bool & bOutState) co
 
 bool H3DF::VisualEffectsControl::ShowBloomEnabled(bool & bOutState) const
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
+	IMPL(VisualEffectsControl);
 
-	BaseView * pcBaseView = pcImpl->GetBaseView();
+	BaseView * pcBaseView = impl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
 	bool bStatus = false;
@@ -531,114 +471,100 @@ bool H3DF::VisualEffectsControl::ShowBloomEnabled(bool & bOutState) const
 }
 bool H3DF::VisualEffectsControl::ShowAntiAliasing(bool & bOutState) const
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-
 	bool bResult = false;
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		char chValue[MVO_BUFFER_SIZE];
-		HC_Show_One_Rendering_Option("anti-alias", chValue);
+	char chValue[MVO_BUFFER_SIZE];
+	HC_Show_One_Rendering_Option("anti-alias", chValue);
 
-		if (0 == strlen(chValue)) {
-			bResult = false;
-		}
-		else if (NULL != strstr(chValue, "no screen")) {
-			bOutState = false;
-			bResult = true;
-		}
-		else if (NULL != strstr(chValue, "screen")) {
-			bOutState = true;
-			bResult = true;
-		}
-		else {
-			bOutState = false;
-			bResult = true;
-			DEBUG_STOP;
-		}
-
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	if (0 == strlen(chValue)) {
+		bResult = false;
+	}
+	else if (NULL != strstr(chValue, "no screen")) {
+		bOutState = false;
+		bResult = true;
+	}
+	else if (NULL != strstr(chValue, "screen")) {
+		bOutState = true;
+		bResult = true;
+	}
+	else {
+		bOutState = false;
+		bResult = true;
+		DEBUG_STOP;
+	}
 
 	return bResult;
 }
 
 bool H3DF::VisualEffectsControl::ShowTextAntiAliasing(bool & bOutState) const
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-
 	bool bResult = false;
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		char chValue[MVO_BUFFER_SIZE];
-		HC_Show_One_Rendering_Option("anti-alias = text", chValue);
+	char chValue[MVO_BUFFER_SIZE];
+	HC_Show_One_Rendering_Option("anti-alias = text", chValue);
 
-		if (0 == strlen(chValue)) {
-			bResult = false;
-		}
-		// chValue값에 no text가 포함되어 있으면 false
-		else if (NULL != strstr(chValue, "no text")) {
-			bOutState = false;
-			bResult = true;
-		}
-		else if (NULL != strstr(chValue, "text")) {
-			bOutState = true;
-			bResult = true;
-		}
-		else if (NULL != strstr(chValue, "screen")) {
-			bOutState = true;
-			bResult = true;
-		}
-		else {
-			bOutState = false;
-			bResult = true;
-			DEBUG_STOP;
-		}
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	if (0 == strlen(chValue)) {
+		bResult = false;
+	}
+	// chValue값에 no text가 포함되어 있으면 false
+	else if (NULL != strstr(chValue, "no text")) {
+		bOutState = false;
+		bResult = true;
+	}
+	else if (NULL != strstr(chValue, "text")) {
+		bOutState = true;
+		bResult = true;
+	}
+	else if (NULL != strstr(chValue, "screen")) {
+		bOutState = true;
+		bResult = true;
+	}
+	else {
+		bOutState = false;
+		bResult = true;
+		DEBUG_STOP;
+	}
 
 	return bResult;
 }
 
 bool H3DF::VisualEffectsControl::ShowLineAntiAliasing(bool & bOutState) const
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-
 	bool bResult = false;
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		char chValue[MVO_BUFFER_SIZE];
-		HC_Show_One_Rendering_Option("anti-alias", chValue);
+	char chValue[MVO_BUFFER_SIZE];
+	HC_Show_One_Rendering_Option("anti-alias", chValue);
 
-		if (0 == strlen(chValue)) {
-			bResult = false;
-		}
-		// chValue값에 no line이 포함되어 있으면 false
-		else if (NULL != strstr(chValue, "no lines")) {
-			bOutState = false;
-			bResult = true;
-		}
-		else if (NULL != strstr(chValue, "lines")) {
-			bOutState = true;
-			bResult = true;
-		}
-		else if (NULL != strstr(chValue, "screen")) {
-			bOutState = true;
-			bResult = true;
-		}
-		else {
-			bOutState = false;
-			bResult = true;
-			DEBUG_STOP;
-		}
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	if (0 == strlen(chValue)) {
+		bResult = false;
+	}
+	// chValue값에 no line이 포함되어 있으면 false
+	else if (NULL != strstr(chValue, "no lines")) {
+		bOutState = false;
+		bResult = true;
+	}
+	else if (NULL != strstr(chValue, "lines")) {
+		bOutState = true;
+		bResult = true;
+	}
+	else if (NULL != strstr(chValue, "screen")) {
+		bOutState = true;
+		bResult = true;
+	}
+	else {
+		bOutState = false;
+		bResult = true;
+		DEBUG_STOP;
+	}
 
 	return bResult;
 }
 
 bool H3DF::VisualEffectsControl::ShowSimpleShadowColor(RGBAColor & cOutColor) const
 {
-	auto  pcImpl = static_cast<VisualEffectsControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
+	IMPL(VisualEffectsControl);
 
-	BaseView * pcBaseView = pcImpl->GetBaseView();
+	BaseView * pcBaseView = impl->GetBaseView();
 	DEBUG_VALID(pcBaseView);
 
 	bool bResult = false;

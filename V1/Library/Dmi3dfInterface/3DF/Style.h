@@ -69,6 +69,7 @@ namespace H3DF
 	public:
 		StyleControl(SegmentKey & cInSegment);
 		StyleControl(StyleControl const & cInThat);
+		~StyleControl();
 
 		static const H3DF::Type staticType = H3DF::Type::StyleControl;
 		H3DF::Type ObjectType() const { return staticType; };

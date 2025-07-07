@@ -12,7 +12,7 @@ H3DF::ShapeCoordinate::ShapeCoordinate()
 {
 	x = FLT_MAX;
 	y = FLT_MAX;
-	radius = FLT_MAX;
+	radius = -FLT_MAX;
 	margins.clear();
 }
 
@@ -20,7 +20,7 @@ H3DF::ShapeCoordinate::ShapeCoordinate(float fInX, float fInY)
 {
 	x = fInX;
 	y = fInY;
-	radius = FLT_MAX;
+	radius = -FLT_MAX;
 	margins.clear();
 }
 
@@ -28,7 +28,7 @@ H3DF::ShapeCoordinate::ShapeCoordinate(float fInX, float fInY, FloatArray const 
 {
 	x = fInX;
 	y = fInY;
-	radius = FLT_MAX;
+	radius = -FLT_MAX;
 	margins = afInMargins;
 }
 
@@ -36,7 +36,7 @@ H3DF::ShapeCoordinate::ShapeCoordinate(float fInX, float fInY, size_t nInCount, 
 {
 	x = fInX;
 	y = fInY;
-	radius = FLT_MAX;
+	radius = -FLT_MAX;
 
 	margins.resize(nInCount);
 	for (size_t nIndex = 0; nIndex < nInCount; nIndex++) {
@@ -150,8 +150,8 @@ H3DF::ShapePoint::ShapePoint(ShapeCoordinate const & cInX, ShapeCoordinate const
 
 H3DF::ShapePoint::ShapePoint(float fInX, float fInY)
 {
-	x = ShapeCoordinate(fInX, fInY);
-	y = ShapeCoordinate(fInX, fInY);
+	x = ShapeCoordinate(fInX, 0);
+	y = ShapeCoordinate(0, fInY);
 }
 
 //== ShapeElement Class ===========================================================================

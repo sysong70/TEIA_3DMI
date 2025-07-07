@@ -552,6 +552,21 @@ void H3DF::Application::InitInstance()
 */
 
 	HC_Define_System_Options(strBuffer);
+
+	// #DB Init
+
+ 	
+// 	SegmentKey cRootSegment("/");
+// 	SegmentKey cPortfolios = cRootSegment.Subsegment("/portfolios");
+// 
+// 	SegmentKey cShapes = cPortfolios.Subsegment("shapes");
+// 	cPortfolios.GetStyleControl().PushSegment(cShapes);
+// 
+// 	SegmentKey cImages = cPortfolios.Subsegment("images");
+// 	cPortfolios.GetStyleControl().PushSegment(cImages);
+// 
+// 	SegmentKey cStyles = cPortfolios.Subsegment("styles");
+// 	cPortfolios.GetStyleControl().PushSegment(cStyles);
 }
 
 // 2. CWinApp::OnExitInstance() 처리

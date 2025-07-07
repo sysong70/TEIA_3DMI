@@ -7,6 +7,7 @@
 #include <Sprocket/3DF.Factory.h>
 
 #include <3DF/Visibility.h>
+#include <3DF/VisualEffects.h>
 #include <3DF/LineAttribute.h>
 #include <3DF/AttributeLock.h>
 #include <3DF/Image.h>
@@ -15,6 +16,7 @@
 #include <3DF/TextAttribute.h>
 #include <3DF/Text.h>
 #include <3DF/3DF.Utility.h>
+#include <3DF/3DF.Tracer.h>
 
 #include "Signal.Connector.h"
 
@@ -663,15 +665,18 @@ void KERNEL::Session::TestCommand(int nId)
 
 		case CUSTOM_3D_CMD_SYSONG_Test3: 
 		{
-			H3DF::SegmentKey cTextSegment = pcImpl->GetCanvas().GetFrontView().GetAttachedModel().GetSegmentKey().Subsegment("TextShapeTest");
+			H3DF::SegmentKey cModel = pcImpl->GetCanvas().GetFrontView().GetAttachedModel().GetSegmentKey();
 
-			CStringA strName = cTextSegment.Name();
+			pcImpl->GetCanvas().GetFrontView().GetSegmentKey().GetVisualEffectsControl().SetTextAntiAliasing(false);
+			//cModel.GetVisibilityControl().SetLeaderLines(true).SetEdges(true);
+
+			CStringA strName = cModel.Name();
 
 			// define the vertices of the textbox rectangle
-			H3DF::ShapePoint leftBottom(-0.5, -0.5);
-			H3DF::ShapePoint leftTop(-1, 1);
-			H3DF::ShapePoint rightBottom(1, -1);
-			H3DF::ShapePoint rightTop(1, 1);
+			H3DF::ShapePoint leftBottom(-0.5, -1.0);
+			H3DF::ShapePoint leftTop(-1.0, 1.0);
+			H3DF::ShapePoint rightBottom(1.0, -1.0);
+			H3DF::ShapePoint rightTop(1.0, 1.0f);
 
 			H3DF::ShapePoint textBoxRectanglePoints[4] = { leftBottom, rightBottom, rightTop, leftTop };
 
@@ -699,17 +704,28 @@ void KERNEL::Session::TestCommand(int nId)
 			rectangle_shape.SetElements(2, rectangle_elements);
 
 			H3DF::PortfolioKey cPortfolio;
-			cTextSegment.GetPortfolioControl().ShowTop(cPortfolio);
+			cModel.GetPortfolioControl().ShowTop(cPortfolio);
 
 			// define the rectangle_shape in our portfolio and add to the rectangle segment
 			H3DF::ShapeDefinition cDefinition = cPortfolio.DefineShape("anchored_leader_line_rectangle", rectangle_shape);
 
-//			cTextSegment.GetTextAttributeControl().SetBackground(true, "oval");
-//			cTextSegment.GetTextAttributeControl().SetBackground(true, "oval");
- 			cTextSegment.GetTextAttributeControl().SetBackground(true, "anchored_leader_line_rectangle");
-// 
- 			H3DF::TextKey rectangle_text = cTextSegment.InsertText(H3DF::Point(2, -2, 0), "Vertex is 0.5, 0.5, -0.5");
+			H3DF::SegmentKey rectangleTextSegment = cModel.Subsegment("RectangleText");
+			rectangleTextSegment.GetVisibilityControl().SetEdges(true);
+			//rectangleTextSegment.GetVisualEffectsControl().SetAntiAliasing(true).SetTextAntiAliasing(true);
+			rectangleTextSegment.GetMaterialMappingControl().SetFaceColor(H3DF::RGBColor(1, 1, 1)).SetTextColor(H3DF::RGBColor(0, 0, 0));
 
+			rectangleTextSegment.GetTextAttributeControl().SetBackground(true, "oval");
+//			cRectangleText.GetTextAttributeControl().SetBackground(true, "anchored_leader_line_rectangle");
+
+ 			H3DF::TextKey textKey = rectangleTextSegment.InsertText(H3DF::Point(2, -2, 0), L"한글 Vertex is \n0.5, 0.5, -0.5");
+			textKey.SetFont("Malgun Gothic").SetBold(true).SetSize(26, H3DF::Text::SizeUnits::Points);
+			//textKey.SetColor(RGBColor(0.1, 0.1, 0.1)).SetFont("stroked").SetBold(true).SetSize(26, HPS::Text::SizeUnits::Points);
+
+			rectangleTextSegment.GetEdgeAttributeControl().SetWeight(4, H3DF::Edge::SizeUnits::Pixels);
+			
+
+			H3DF::Tracer::CreateLog("Test.Log");
+			H3DF::Tracer::ContentsLog(INVALID_KEY, false);
 
 		} break;
 

@@ -110,11 +110,13 @@ void H3DF::ModelImpl::Init()
 
 	m_cModelsRoot.GetStyleControl().PushSegment(m_cShowStyle);
 
-	// #Model #Portfolio: Portfolio 생성 
+	// #Model: Portfolio 생성 
+	// #Portfolio: root 생성 (하부 Style 생성)
 	// 신규 Portfolio를 생성함. Portfolios는 Root Segment에 생성한다.
-//	SegmentKey cPortfolios("/portfolios");
+	//SegmentKey cPortfolios("/portfolios");
 
 	// Root에 만드는 경우 Portfolio가 계속적으로 메모리에 남아있게 됨.
+	// 그리고 HPS도 파일을 open할 때마다, root portlio에 sub portfolio를 생성하는데, File을 close해도 삭제가 되지 않음.
  	SegmentKey cPortfolios = m_cSegmentKey.Subsegment("portfolios");
 
 	// 신규 Segment를 생성해서 Portfolio Style의 Base로 사용한다.
@@ -123,6 +125,15 @@ void H3DF::ModelImpl::Init()
 
 	// Model에 Portfolio와 연결된 Style을 생성.
 	StyleKey cStyle = m_cSegmentKey.GetStyleControl().PushSegment(cRootPortfolio);
+
+// 	SegmentKey cShapes = cRootPortfolio.Subsegment("shapes");
+// 	cRootPortfolio.GetStyleControl().PushSegment(cShapes);
+// 
+// 	SegmentKey cImages = cRootPortfolio.Subsegment("images");
+// 	cRootPortfolio.GetStyleControl().PushSegment(cImages);
+// 
+// 	SegmentKey cStyles = cRootPortfolio.Subsegment("styles");
+// 	cRootPortfolio.GetStyleControl().PushSegment(cStyles);
 
 	// PortfolioKey는 style 키를 이용한다.
 	PortfolioKey cPortfolio(cStyle);

@@ -161,6 +161,8 @@ void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
 	pcViewImpl->m_cWindow = pcCanvasImpl->m_cWindow;
 	pcViewImpl->m_pcModel = pcModel;
 
+	pcViewImpl->m_cKey.SetKeyValue(pcCanvasImpl->m_cWindow.GetBaseView()->GetViewKey());
+
 	// View의 SegmentKey값에 window정보를 저장한다. 현제 Key값은 Invalid Key 상태임.
 	SegmentKeyImpl * pcKeyImpl = (SegmentKeyImpl *)pcViewImpl->m_cKey.GetImpl();
 	DEBUG_VALID(pcViewImpl);
@@ -168,6 +170,10 @@ void H3DF::Canvas::AttachViewAsLayout(View const & cInView)
 	pcKeyImpl->SetWindow(&pcCanvasImpl->m_cWindow);
 
 	pcCanvasImpl->m_vcViewArray.push_back(cInView);
+
+	SegmentKey segment = cInView.GetSegmentKey();
+
+	int i = 0;
 }
 
 HWND H3DF::Canvas::GetHwnd()
@@ -297,9 +303,10 @@ void H3DF::Canvas::FileOpen(CString strFilePathName, H3DF::CADModel & cInCADMode
 		} HC_Close_Segment();
 
 		Tracer::CreateLog("HSF_Trace.log");
-		HC_KEY nRootKey = HC_Create_Segment("/");
+		HC_KEY nRootKey = HC_Open_Segment("/");
 		//Tracer::ModelLog(pcBaseView->GetModel()->GetModelKey());
-		Tracer::ContentsLog(nRootKey);
+		Tracer::ContentsLog(nRootKey, false);
+		HC_Close_Segment();
 	}
 	else {
 		SegmentKey cViewKey(pcBaseView->GetViewKey());

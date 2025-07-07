@@ -88,6 +88,7 @@ bool H3DF::PortfolioKeyImpl::CreateShapeData(ShapeElementArray & arInShapeElemen
 		return false;
 	}
 
+
 	for(auto & cShapeElement : arInShapeElements) {
 
 		H3DF::Type eType = cShapeElement.Type();
@@ -117,7 +118,7 @@ bool H3DF::PortfolioKeyImpl::CreateShapeData(ShapeElementArray & arInShapeElemen
 
 			int nFormatCode = 0;
 			if(0 == nMaxMarginCount) {
-				nFormatCode = SHAPE_FORMAT_XY_BOUNDING_SINGLE;
+				nFormatCode = SHAPE_FORMAT_XY_BOUNDING_SINGLE_FORMAT3;
 			}
 			else if(1 == nMaxMarginCount) {
 				nFormatCode = SHAPE_FORMAT_XY_BOUNDING_ONE_MARGIN;
@@ -141,6 +142,9 @@ bool H3DF::PortfolioKeyImpl::CreateShapeData(ShapeElementArray & arInShapeElemen
 			for (auto & cShapePoint : arShapePoints) {
 				CreateShapePointData(nFormatCode, cShapePoint, vfOutData);
 			}
+
+			// End mark
+			vfOutData.emplace_back(0);
 		}
 	}
 
@@ -159,6 +163,7 @@ void H3DF::PortfolioKeyImpl::CreateShapePointData(int nFormatCode, H3DF::ShapePo
 		if (false == afMargins.empty()) {
 			switch (nFormatCode)
 			{
+				case SHAPE_FORMAT_XY_BOUNDING_SINGLE_FORMAT3:
 				case SHAPE_FORMAT_XY_BOUNDING_SINGLE: {
 				} break;
 

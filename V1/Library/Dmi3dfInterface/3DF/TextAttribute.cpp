@@ -68,9 +68,6 @@ TextAttributeControl & H3DF::TextAttributeControl::SetBackground(bool bInState, 
 		
 	HC_Set_Text_Font(strList);
 
-	CStringA strList2;
-	HC_Show_Text_Font(strList2.GetBuffer());
-
 	return *this;
 }
 

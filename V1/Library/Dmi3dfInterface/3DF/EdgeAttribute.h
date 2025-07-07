@@ -68,6 +68,8 @@ namespace H3DF
 		EdgeAttributeControl(SegmentKey & cInSegment);
 		EdgeAttributeControl(EdgeAttributeControl const & cInThat);
 
+		~EdgeAttributeControl();
+
 		static const H3DF::Type staticType = H3DF::Type::EdgeAttributeControl;
 		H3DF::Type ObjectType() const { return staticType; };
 

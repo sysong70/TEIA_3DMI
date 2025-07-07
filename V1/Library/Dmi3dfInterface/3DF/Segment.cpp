@@ -1279,12 +1279,13 @@ bool H3DF::SegmentKey::ShowPriority(int & nOutPriority) const\
 }
 
 //== Text 관련 함수 ===================================================================================
-TextKey H3DF::SegmentKey::InsertText(Point const & cInPosition, CStringA strInText)
+TextKey H3DF::SegmentKey::InsertText(Point const & cInPosition, std::wstring text)
 {
 	TextKey cTextKey;
 	HC_KEY nTextKey = INVALID_KEY;
 	SegmentKeyImpl::LocalOpen(*this); {
-		nTextKey = HC_Insert_Text(cInPosition.x, cInPosition.y, cInPosition.z, strInText);
+		std::string convText = H3DF::Utility::WStringToUtf8(std::wstring(text));
+		nTextKey = HC_Insert_Text_With_Encoding(cInPosition.x, cInPosition.y, cInPosition.z, "utf8", convText.c_str());
 	} SegmentKeyImpl::LocalClose(*this);
 
 	cTextKey.SetKeyValue(nTextKey);

@@ -631,7 +631,7 @@ namespace H3DF
 			Single
 
 			// placeholder.  Option would generate different optimized trees at the cost of memory.
-			//Multiple		//!< An optimized segment tree will be used for rendering. The tree will be sorted based on both attributes and spatial locations of objects.  This is particularly useful for very large, spatially dispersed models.
+			//Multiple		// An optimized segment tree will be used for rendering. The tree will be sorted based on both attributes and spatial locations of objects.  This is particularly useful for very large, spatially dispersed models.
 		};
 
 	private:
@@ -877,6 +877,130 @@ namespace H3DF
 
 	private:
 		Drawing() {}
+	};
+
+	class API_3DF Text {
+	public:
+		enum class Alignment : uint32_t {
+			TopLeft,		// Insertion point is the top left corner of the text string.
+			CenterLeft,		// Insertion point is the center of the left side of the text string.
+			BottomLeft,		// Insertion point is the bottom left corner of the text string.
+			TopCenter,		// Insertion point is the center of the top side of the text string.
+			Center,			// Insertion point is the vertical and horizontal center of the text string.
+			BottomCenter,	// Insertion point is the center of the bottom side of the text string.
+			TopRight,		// Insertion point is the top right corner of the text string.
+			CenterRight,	// Insertion point is the center of the right side of the text string.
+			BottomRight		// Insertion point is the bottom right corner of the text string.
+		};
+
+		enum class ReferenceFrame : uint32_t {
+			WorldAligned,	// Alignment and justification will be defined relative to a screen-facing box around the text.
+			PathAligned		// Alignment and justification will be defined relative to a text-path-aligned box around the text.
+		};
+
+		enum class Justification : uint32_t {
+			Left,			// Multiline strings will be left justified.
+			Right,			// Multiline strings will be right justified.
+			Center			// Multiline strings will be center justified.
+		};
+
+		enum class Transform : uint32_t {
+			Transformable,
+			NonTransformable,
+			CharacterPositionOnly,
+			CharacterPositionAdjusted,
+			NonScalingTransformable
+		};
+
+		enum class Renderer : uint32_t {
+			Default,	// All font-handling subsystems will be used.
+			Driver,		// Only driver fonts will be used.  If a non-driver font is requested, the stroked font will be used instead.
+			Truetype,	// Only TrueType fonts will be used.  If a non-TrueType font is requested, the stroked font will be used  instead.
+		};
+
+		enum class Preference : uint32_t {
+			Default, // Use the default font type for the current driver.
+			Vector, // Use vector fonts.
+			Raster, // Use raster or bitmap fonts.
+			Exterior // Use the font outline (characters will be unfilled).
+		};
+
+		enum class Rotation : uint32_t {
+			None, // Characters are not rotated.
+			Rotate, // Characters are rotated clockwise by a specified angle.
+			FollowPath // Characters are rotated such that they will be perpendicular to the text path.
+		};
+
+		enum class SizeUnits : uint32_t {
+			ObjectSpace, // Object space units ignoring any scaling components in modelling matrices.
+			SubscreenRelative, // Fraction of the height of the outermost window.
+			WindowRelative, // Fraction of the height of the local window.
+			WorldSpace, // Object space units including any scaling components in modelling matrices and cameras.
+			Points, // Points units typically used for text size.  1 point corresponds to 1/72 inch.
+			Pixels // Number of pixels.
+		};
+
+		enum class SizeToleranceUnits : uint32_t {
+			ObjectSpace, // Object space units ignoring any scaling components in modelling matrices.
+			SubscreenRelative, // Fraction of the height of the outermost window.
+			WindowRelative, // Fraction of the height of the local window.
+			WorldSpace, // Object space units including any scaling components in modelling matrices and cameras.
+			Points, // Points units typically used for text size.  1 point corresponds to 1/72 inch.
+			Pixels, // Number of pixels.
+			Percent // Percentage of the requested font size defining the lower limit on the smallest font size that can be
+					// substituted in the requested's place.
+		};
+
+		enum class MarginUnits : uint32_t {
+			ObjectSpace, // Object space units ignoring any scaling components in modelling matrices.
+			SubscreenRelative, // Fraction of the height of the outermost window.
+			WindowRelative, // Fraction of the height of the local window.
+			WorldSpace, // Object space units including any scaling components in modelling matrices and cameras.
+			Points, // Points units typically used for text size.  1 point corresponds to 1/72 inch.
+			Pixels, // Number of pixels.
+			Percent // Percentage of the requested font height.
+		};
+
+		enum class GreekingUnits : uint32_t {
+			ObjectSpace, // Object space units ignoring any scaling components in modelling matrices.
+			SubscreenRelative, // Fraction of the height of the outermost window.
+			WindowRelative, // Fraction of the height of the local window.
+			WorldSpace, // Object space units including any scaling components in modelling matrices and cameras.
+			Points, // Points units typically used for text size.  1 point corresponds to 1/72 inch.
+			Pixels // Number of pixels.
+		};
+
+		enum class GreekingMode : uint32_t {
+			Nothing, // Nothing will be drawn for characters below the greeking limit.
+			Lines, // A grid of lines will be drawn in place of characters below the greeking limit.
+			Box // A filled box will be drawn in place of characters below the greeking limit.
+		};
+
+		enum class RegionAlignment : uint32_t {
+			Top, // Text will be drawn below the region line.
+			Center, // Text will be drawn such that the region line passes through its center.
+			Bottom // Text will be drawn above the region line.
+		};
+
+		enum class LeaderLineSpace : uint32_t {
+			Object, // The leader line position is supplied in Object Space.
+			World, // The leader line position is supplied in World Space.
+		};
+
+		enum class RegionFitting : uint32_t {
+			Left, // Text will be left-justified on the region line.
+			Center, // Text will be centered-justified on the region line.
+			Right, // Text will be right-justified on the region line.
+			Spacing, // Text will be stretched or squeezed to fill the region line and character width will not change
+			// (characters may overlap).
+			Width, // Text will be stretched or squeezed to fill the region line and character width will change (narrowing or
+			// widening as necessary).
+			Auto, // Text will be stretched or squeezed to fill the region line.  This will behave as Width when the text needs
+			// to be squeezed, or as Spacing when the text needs to be stretched.
+		};
+
+	private:
+		Text() {}
 	};
 
 	using WindowHandle = DWORD_PTR;

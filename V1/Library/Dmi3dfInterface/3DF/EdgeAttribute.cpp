@@ -178,24 +178,35 @@ public:
 	}
 };
 
-EdgeAttributeControl::EdgeAttributeControl(SegmentKey & cInSegment)
+H3DF::EdgeAttributeControl::EdgeAttributeControl(SegmentKey & cInSegment)
 {
-	m_pcImpl = std::make_unique<EdgeAttributeControlImpl>();
-	DEBUG_VALID(m_pcImpl);
+	INIT_IMPL(EdgeAttributeControl);
 
-	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
-	DEBUG_VALID(pcImpl);
+	IMPL(EdgeAttributeControl);
 
-	pcImpl->m_cOverrideKey = cInSegment;
+	impl->m_cOverrideKey = cInSegment;
+
+	H3DF::SegmentKeyImpl::LocalOpen(impl->m_cOverrideKey);
 }
 
-EdgeAttributeControl::EdgeAttributeControl(EdgeAttributeControl const & cInThat)
+H3DF::EdgeAttributeControl::EdgeAttributeControl(EdgeAttributeControl const & cInThat)
 {
 	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
+
+	IMPL(EdgeAttributeControl);
+
+	H3DF::SegmentKeyImpl::LocalOpen(impl->m_cOverrideKey);
 }
 
-EdgeAttributeControl & EdgeAttributeControl::operator = (EdgeAttributeControl const & cInThat)
+H3DF::EdgeAttributeControl::~EdgeAttributeControl()
+{
+	IMPL(EdgeAttributeControl);
+
+	H3DF::SegmentKeyImpl::LocalClose(impl->m_cOverrideKey);
+}
+
+EdgeAttributeControl & H3DF::EdgeAttributeControl::operator = (EdgeAttributeControl const & cInThat)
 {
 	if (nullptr != cInThat.m_pcImpl) {
 		m_pcImpl = cInThat.m_pcImpl->Clone();
@@ -207,135 +218,107 @@ EdgeAttributeControl & EdgeAttributeControl::operator = (EdgeAttributeControl co
 	return *this;
 }
 
-EdgeAttributeControl & EdgeAttributeControl::SetPattern(CString strInPatternName)
+EdgeAttributeControl & H3DF::EdgeAttributeControl::SetPattern(CString strInPatternName)
 {
 	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_Set_Edge_Pattern(Utility::ToChar(strInPatternName));
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	HC_Set_Edge_Pattern(Utility::ToChar(strInPatternName));
 
 	return *this;
 }
 
-EdgeAttributeControl & EdgeAttributeControl::SetWeight(float fInWeight, Edge::SizeUnits eInUnits)
+EdgeAttributeControl & H3DF::EdgeAttributeControl::SetWeight(float fInWeight, Edge::SizeUnits eInUnits)
 {
 	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		
-		if (Edge::SizeUnits::ScaleFactor == eInUnits) {
-			HC_Set_Edge_Weight(fInWeight);
-		}
-		else {
-			CString strWeight;
+	if (Edge::SizeUnits::ScaleFactor == eInUnits) {
+		HC_Set_Edge_Weight(fInWeight);
+	}
+	else {
+		CString strWeight;
 
-			switch (eInUnits)
-			{
-				case H3DF::Edge::SizeUnits::ObjectSpace:
-					strWeight.Format(_T("%f oru"), fInWeight);
-					break;
+		switch (eInUnits)
+		{
+		case H3DF::Edge::SizeUnits::ObjectSpace:
+			strWeight.Format(_T("%f oru"), fInWeight);
+			break;
 
-				case H3DF::Edge::SizeUnits::SubscreenRelative:
-					strWeight.Format(_T("%f sru"), fInWeight);
-					break;
+		case H3DF::Edge::SizeUnits::SubscreenRelative:
+			strWeight.Format(_T("%f sru"), fInWeight);
+			break;
 
-				case H3DF::Edge::SizeUnits::WindowRelative:
-					strWeight.Format(_T("%f wru"), fInWeight);
-					break;
+		case H3DF::Edge::SizeUnits::WindowRelative:
+			strWeight.Format(_T("%f wru"), fInWeight);
+			break;
 
-				case H3DF::Edge::SizeUnits::WorldSpace:
-					strWeight.Format(_T("%f wsu"), fInWeight);
-					break;
+		case H3DF::Edge::SizeUnits::WorldSpace:
+			strWeight.Format(_T("%f wsu"), fInWeight);
+			break;
 
-				case H3DF::Edge::SizeUnits::Points:
-					strWeight.Format(_T("%f points"), fInWeight);
-					break;
+		case H3DF::Edge::SizeUnits::Points:
+			strWeight.Format(_T("%f points"), fInWeight);
+			break;
 
-				case H3DF::Edge::SizeUnits::Pixels:
-					strWeight.Format(_T("%f Pixels"), fInWeight);
-					break;
-			}
-			
-			HC_Set_Variable_Edge_Weight(Utility::ToChar(strWeight));
+		case H3DF::Edge::SizeUnits::Pixels:
+			strWeight.Format(_T("%f Pixels"), fInWeight);
+			break;
 		}
 
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+		HC_Set_Variable_Edge_Weight(Utility::ToChar(strWeight));
+	}
 
 	return *this;
 }
 
-EdgeAttributeControl & EdgeAttributeControl::SetHardAngle(float fInAngle)
+EdgeAttributeControl & H3DF::EdgeAttributeControl::SetHardAngle(float fInAngle)
 {
-	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
-
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		CString strOption;
-		strOption.Format(L"geometry options = (hard edge angle = %f, no invert polycylinders, no fea nodes)", fInAngle);
-		HC_Set_Rendering_Options(Utility::ToChar(strOption));
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	CString strOption;
+	strOption.Format(L"geometry options = (hard edge angle = %f, no invert polycylinders, no fea nodes)", fInAngle);
+	HC_Set_Rendering_Options(Utility::ToChar(strOption));
 
 	return *this;
 }
 
-EdgeAttributeControl & EdgeAttributeControl::UnsetPattern()
+EdgeAttributeControl & H3DF::EdgeAttributeControl::UnsetPattern()
 {
-	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
-
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_UnSet_Edge_Pattern();
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	HC_UnSet_Edge_Pattern();
 
 	return *this;
 }
 
-EdgeAttributeControl & EdgeAttributeControl::UnsetWeight()
+EdgeAttributeControl & H3DF::EdgeAttributeControl::UnsetWeight()
 {
-	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
-
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_UnSet_Edge_Weight();
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	HC_UnSet_Edge_Weight();
 
 	return *this;
 }
 
-EdgeAttributeControl & EdgeAttributeControl::UnsetHardAngle()
+EdgeAttributeControl & H3DF::EdgeAttributeControl::UnsetHardAngle()
 {
-	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
-
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_UnSet_One_Rendering_Option("geometry options");
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	HC_UnSet_One_Rendering_Option("geometry options");
 
 	return *this;
 }
 
-EdgeAttributeControl & EdgeAttributeControl::UnsetEverything()
+EdgeAttributeControl & H3DF::EdgeAttributeControl::UnsetEverything()
 {
-	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_UnSet_Edge_Pattern();
-		HC_UnSet_Edge_Weight();
-		HC_UnSet_One_Rendering_Option("geometry options");
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	HC_UnSet_Edge_Pattern();
+	HC_UnSet_Edge_Weight();
+	HC_UnSet_One_Rendering_Option("geometry options");
+
 	return *this;
 }
 
-bool EdgeAttributeControl::ShowPattern(CString & strOutPatternName) const
+bool H3DF::EdgeAttributeControl::ShowPattern(CString & strOutPatternName) const
 {
-	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
-
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		char chBuffer[MVO_BUFFER_SIZE] = "\n";
-		HC_Show_Edge_Pattern(chBuffer);
-		strOutPatternName = chBuffer;
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	char chBuffer[MVO_BUFFER_SIZE] = "\n";
+	HC_Show_Edge_Pattern(chBuffer);
+	strOutPatternName = chBuffer;
 
 	return !strOutPatternName.IsEmpty();
 }
 
-bool EdgeAttributeControl::ShowWeight(float & fOutWeight, Edge::SizeUnits & eOutUnits) const
+bool H3DF::EdgeAttributeControl::ShowWeight(float & fOutWeight, Edge::SizeUnits & eOutUnits) const
 {
 	char chBuffer[MVO_BUFFER_SIZE] = "\n";
 	HC_Show_Variable_Line_Weight(chBuffer);
@@ -378,18 +361,16 @@ bool EdgeAttributeControl::ShowWeight(float & fOutWeight, Edge::SizeUnits & eOut
 	return true;
 }
 
-bool EdgeAttributeControl::ShowHardAngle(float & fOutAngle) const
+bool H3DF::EdgeAttributeControl::ShowHardAngle(float & fOutAngle) const
 {
 	auto pcImpl = static_cast<EdgeAttributeControlImpl *>(m_pcImpl.get());
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		char chBuffer[MVO_BUFFER_SIZE] = "\n";
-		HC_Show_One_Rendering_Option("geometry options", chBuffer);
-		if (0 < strlen(chBuffer)) {
-			sscanf(chBuffer, "hard edge angle = %f", &fOutAngle);
-			return true;
-		}
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	char chBuffer[MVO_BUFFER_SIZE] = "\n";
+	HC_Show_One_Rendering_Option("geometry options", chBuffer);
+	if (0 < strlen(chBuffer)) {
+		sscanf(chBuffer, "hard edge angle = %f", &fOutAngle);
+		return true;
+	}
 
 	return false;
 }

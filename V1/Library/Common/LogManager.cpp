@@ -242,6 +242,8 @@ void LogManager::WriteLog(int nId, CString strMessage)
 		return;
 	}
 
+	strMessage.Replace(L"\n", L"\\n");
+
 	CString strTabText;
 	for(int nIndex = 0; nIndex < m_nTabIndex[nId]; nIndex++) {
 		strTabText += L"   ";
