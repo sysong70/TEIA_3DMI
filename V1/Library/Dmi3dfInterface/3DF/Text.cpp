@@ -4,6 +4,8 @@
 
 #include "./Impl/GeometryImpl.h"
 
+using namespace H3DF;
+
 namespace H3DF
 {
 	class TextKeyImpl : public GeometryKeyImpl
@@ -40,6 +42,7 @@ H3DF::TextKey::TextKey(Key const & cInThat)
 	DEBUG_VALID(m_pcImpl);
 
 	auto pcInKeyImpl = static_cast<const KeyImpl *>(cInThat.GetImpl());
+
 	// 명시적 캐스팅을 해야 합니다.
 	static_cast<KeyImpl *>(m_pcImpl.get())->Copy(pcInKeyImpl);
 }
@@ -50,5 +53,37 @@ H3DF::TextKey::TextKey(TextKey const & cInThat)
 	DEBUG_VALID(m_pcImpl);
 }
 
-// TextKey & operator = (TextKey const & other);
+TextKey & H3DF::TextKey::operator=(TextKey const & cInOther)
+{
+	if (nullptr != cInOther.m_pcImpl) {
+		m_pcImpl = cInOther.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
+	return *this;
+}
+
+TextKey & H3DF::TextKey::SetBackground(bool bInState, CStringA strName)
+{
+	return *this;
+}
+
+TextKey & H3DF::TextKey::SetBackground(CStringA strName)
+{
+	return *this;
+}
+
+TextKey & H3DF::TextKey::SetBackground(bool bInState)
+{
+	return *this;
+}
+
+bool H3DF::TextKey::ShowBackground(bool & bOutState, CString & cOutName) const
+{
+	//HC_Show_Text()
+
+	return false;
+}
 

@@ -77,6 +77,13 @@ void H3DF::Tracer::SegmentLog(HC_KEY nInKey)
 			else if (0 == strcmp("shape definitions", chType)) {
 				ShapeDefinitionsLog();
 			}
+			else if (0 == strcmp("text font", chType)) {
+				TextFontLog();
+			}
+
+// 			else if (0 == strcmp("text", chType)) {
+// 				TextLog(nChildKey);
+// 			}
 			else {
 				LOG(LOG_3DF_TRACE_ID, "%d: %d, %s", nIndex, nChildKey, chType);
 			}
@@ -182,4 +189,33 @@ void H3DF::Tracer::ShapeDefinitionsLog()
 	HC_End_Shape_Search();
 
 	return;
+}
+
+void H3DF::Tracer::TextFontLog()
+{
+	CStringA strOption;
+	//HC_Show_Text_Font(strOption.GetBuffer(MVO_BUFFER_SIZE));
+	HC_Show_One_Text_Font("background", strOption.GetBuffer(MVO_BUFFER_SIZE));
+	LOG(LOG_3DF_TRACE_ID, "Text Font: '%s'", strOption);
+	strOption.ReleaseBuffer();
+}
+
+void H3DF::Tracer::TextLog(HC_KEY nInKey)
+{
+/*
+	HC_Begin_Text_Search();
+	{
+		int nCount = 0;
+		HC_Show_Text_Count(&nCount);
+		LOG(LOG_3DF_TRACE_ID, "Text: Count [%d]", nCount);
+		LogIncTab(LOG_3DF_TRACE_ID);
+		if (nCount > 0) {
+			CStringA strName;
+			while (HC_Find_Text(strName.GetBuffer(MVO_BUFFER_SIZE))) {
+				LOG(LOG_3DF_TRACE_ID, "'%s'", strName);
+			}
+		}
+		LogDecTab(LOG_3DF_TRACE_ID);
+	}
+	HC_End_Text_Search();*/
 }

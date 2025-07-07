@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "../3DF.h"
+#include "3DF.Impl.h"
 #include "../Object.h"
 
 namespace H3DF

@@ -16,5 +16,8 @@ namespace H3DF
 
 		void StyleLog(HC_KEY nInKey);
 		void ShapeDefinitionsLog();
+
+		void TextLog(HC_KEY nInKey);
+		void TextFontLog();
 	}
 }

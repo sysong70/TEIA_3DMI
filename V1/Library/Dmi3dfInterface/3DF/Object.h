@@ -9,6 +9,8 @@
 
 namespace H3DF
 {
+	class Impl;
+
 	class API_3DF Object
 	{
 	public:

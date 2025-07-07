@@ -11,7 +11,7 @@
 // #include "3DF.Signal.Interface.h"
 
 #include "../3DF/3DF.Utility.h"
-
+#include "../3DF/Impl/3DF.Impl.h"
 #include "../3DF/Database.h"
 #include "../3DF/Portfolio.h"
 

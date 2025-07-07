@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "../3DF.h"
+#include "../Impl/3DF.Impl.h"
 
 #include "../Shape.h"
 

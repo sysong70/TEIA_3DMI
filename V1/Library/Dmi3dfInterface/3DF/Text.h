@@ -18,5 +18,11 @@ namespace H3DF
         TextKey(TextKey const & in_that);
 
         TextKey & operator = (TextKey const & other);
+
+        TextKey & SetBackground(bool bInState, CStringA strName);
+        TextKey & SetBackground(CStringA strName);
+        TextKey & SetBackground(bool bInState);
+
+        bool ShowBackground(bool & bOutState, CString & cOutName) const;
     };
 }

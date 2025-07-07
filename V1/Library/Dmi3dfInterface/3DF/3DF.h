@@ -931,6 +931,7 @@ namespace H3DF
 		None,
 		NotSet
 	};
+/*
 
 	class Impl
 	{
@@ -948,5 +949,5 @@ namespace H3DF
 
 	protected:
 		H3DF::Type m_eType = H3DF::Type::None;
-	};
+	};*/
 }
