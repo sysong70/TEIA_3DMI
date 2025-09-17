@@ -94,7 +94,7 @@ namespace H3DF
 
 H3DF::StyleKey::StyleKey()
 {
-	DEBUG_VALID(SetImpl(H3DF::Type::SegmentStyle, std::make_unique<StyleKeyImpl>()));
+	DEBUG_VALID(SetImpl(H3DF::Type::None, std::make_unique<StyleKeyImpl>()));
 }
 
 H3DF::StyleKey::StyleKey(Key const & cInThat)
@@ -216,12 +216,22 @@ H3DF::StyleControl::StyleControl(SegmentKey & cInSegment)
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cOverrideKey = cInSegment;
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
 }
 
 H3DF::StyleControl::StyleControl(StyleControl const & cInThat)
 {
 	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
+}
+
+H3DF::StyleControl::~StyleControl()
+{
+	auto pcImpl = static_cast<StyleControlImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 }
 
 StyleControl & H3DF::StyleControl::operator = (StyleControl const & cInThat)
@@ -242,9 +252,9 @@ StyleKey H3DF::StyleControl::PushNamed(CStringA strInStyleName)
 	auto pcImpl = static_cast<StyleControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
+	//SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
 	HC_KEY nStyleKey = HC_Named_Style_Segment(strInStyleName);
-	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	//SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	StyleKey cStyle(nStyleKey);
 	return cStyle;
@@ -260,9 +270,9 @@ StyleKey H3DF::StyleControl::PushNamed(CStringA strInStyleName, ConditionalExpre
 		DEBUG_STOP;
 	}
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
+	//SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
 	HC_KEY nStyleKey = HC_Conditional_Named_Style(strInStyleName, strCondition);
-	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	//SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	StyleKey cStyle(nStyleKey);
 	return cStyle;
@@ -273,9 +283,7 @@ StyleKey H3DF::StyleControl::PushSegment(SegmentKey const & cInStyleSource)
 	auto pcImpl = static_cast<StyleControlImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) { assert(false); }
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
 	HC_KEY nStyleKey = HC_Style_Segment_By_Key(cInStyleSource.KeyValue());
-	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	StyleKey cStyle(nStyleKey);
 	return cStyle;
@@ -291,9 +299,9 @@ StyleKey H3DF::StyleControl::PushSegment(SegmentKey const & cInStyleSource, Cond
 		DEBUG_STOP;
 	}
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
+	//SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
 	HC_KEY nStyleKey = HC_Conditional_Style_By_Key(cInStyleSource.KeyValue(), strCondition);
-	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	//SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	StyleKey cStyle(nStyleKey);
 	return cStyle;
@@ -306,7 +314,7 @@ void H3DF::StyleControl::Flush(SegmentKey const & cInStyleSource)
 
 	CStringA strName = cInStyleSource.Name();
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+	//SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 
 		std::vector<CStringA> vStyleStrings;
 		int nCount = 0;
@@ -340,7 +348,7 @@ void H3DF::StyleControl::Flush(SegmentKey const & cInStyleSource)
 			HC_Style_Segment(strStyle);
 		}
 
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	// } SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 }
 
 bool H3DF::StyleControl::Show(StyleKeyArray & acOutStyles) const
@@ -353,7 +361,7 @@ bool H3DF::StyleControl::Show(StyleKeyArray & acOutStyles) const
 	char chType[MVO_BUFFER_SIZE];
 	HC_KEY nKey;
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+	//SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_Begin_Contents_Search(".", "styles, named styles"); {
 			HC_Show_Contents_Count(&nStyleCount);
 
@@ -365,8 +373,7 @@ bool H3DF::StyleControl::Show(StyleKeyArray & acOutStyles) const
 			}
 
 		} HC_End_Contents_Search();
-	}
-	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	//} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return !acOutStyles.empty();
 }
@@ -382,7 +389,7 @@ bool H3DF::StyleControl::Show(StyleTypeArray & cOutTypes, SegmentKeyArray & cOut
 	char chType[MVO_BUFFER_SIZE];
 	HC_KEY nKey;
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
+	//SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
 		HC_Begin_Contents_Search(".", "styles, named styles"); {
 			HC_Show_Contents_Count(&nStyleCount);
 
@@ -417,8 +424,7 @@ bool H3DF::StyleControl::Show(StyleTypeArray & cOutTypes, SegmentKeyArray & cOut
 			}
 
 		} HC_End_Contents_Search();
-	}
-	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	//} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 
 	return !cOutTypes.empty();
 }

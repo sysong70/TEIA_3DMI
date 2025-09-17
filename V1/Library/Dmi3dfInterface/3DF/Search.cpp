@@ -1,7 +1,7 @@
 ﻿#include "StdAfx.h"
 
 #include "Search.h"
-
+#include "./Impl/3DF.Impl.h"
 #include "./Impl/SearchImpl.h"
 
 using namespace H3DF;

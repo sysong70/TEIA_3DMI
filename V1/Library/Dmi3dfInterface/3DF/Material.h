@@ -373,6 +373,8 @@ namespace H3DF
 		MaterialMappingControl & SetEdgeColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
 
 		MaterialMappingControl & SetMarkerColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel = Material::Color::Channel::DiffuseColor);
+
+		MaterialMappingControl & SetTextColor(RGBAColor const & rgbaColor);
 	
 		//== Texture 설정 ===========================================================================
 		void InitPopulateTextures();

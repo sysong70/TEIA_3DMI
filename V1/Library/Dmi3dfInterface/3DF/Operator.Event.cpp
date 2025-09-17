@@ -1,6 +1,9 @@
 ﻿#include "StdAfx.h"
 
 #include "Operator.Event.h"
+
+#include "Impl/3DF.Impl.h"
+
 #include "Point.h"
 
 #include "3DF.Utility.h"

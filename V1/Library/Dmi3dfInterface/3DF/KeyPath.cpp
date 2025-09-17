@@ -1,5 +1,7 @@
 ﻿#include "StdAfx.h"
 
+#include "Impl/3DF.Impl.h"
+
 #include "KeyPath.h"
 
 #include "Segment.h"

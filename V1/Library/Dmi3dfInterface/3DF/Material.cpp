@@ -1322,10 +1322,18 @@ MaterialMappingControl & H3DF::MaterialMappingControl::SetEdgeColor(RGBAColor co
 
 MaterialMappingControl & H3DF::MaterialMappingControl::SetMarkerColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
-	auto pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
-	if (nullptr == pcImpl) { assert(false); }
+	IMPL(MaterialMappingControl);
 
-	pcImpl->SetColor("markers", cInRgbaColor, eInChannel);
+	impl->SetColor("markers", cInRgbaColor, eInChannel);
+
+	return *this;
+}
+
+MaterialMappingControl & H3DF::MaterialMappingControl::SetTextColor(RGBAColor const & rgbaColor)
+{
+	IMPL(MaterialMappingControl);
+
+	impl->SetColor("text", rgbaColor, Material::Color::Channel::DiffuseColor);
 
 	return *this;
 }

@@ -9,6 +9,9 @@
 #include <HTools.h>
 
 #include <bit>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
 using namespace std::chrono;
 using namespace H3DF;
@@ -561,7 +564,7 @@ CString H3DF::Utility::GetExecuteDirectory()
 	return strFilePath;
 }
 
-//== Segment 관련 함수 =======================================================================
+//== Segment 관련 함수 ==============================================================================
 
 // 주어진 Segment의 하부 Segment 중에서 지정된 이름을 가진 Segment를 찾아서 반환한다. 여기서 이름은 User define name이 아니라 Segment의 이름이다.
 bool H3DF::Utility::ShowSubSegment(SegmentKey & cInTargetSegment, CStringA strInSegmentName, SegmentKey & cOutSegment)
@@ -581,6 +584,114 @@ bool H3DF::Utility::ShowSubSegment(SegmentKey & cInTargetSegment, CStringA strIn
 	return false;
 }
 
+
+//== string 관련 함수 ===============================================================================
+
+std::string H3DF::Utility::WStringToUtf8(const std::wstring & wstr)
+{
+	std::string result;
+
+	for (size_t i = 0; i < wstr.size(); ++i)
+	{
+		uint32_t codepoint;
+		wchar_t wc = wstr[i];
+
+		// 서러게이트 페어인지 확인
+		if (0xD800 <= wc && wc <= 0xDBFF)
+		{
+			if (i + 1 >= wstr.size())
+				throw std::runtime_error("Invalid UTF-16: unexpected end after high surrogate");
+
+			wchar_t wc2 = wstr[++i];
+			if (wc2 < 0xDC00 || wc2 > 0xDFFF)
+				throw std::runtime_error("Invalid UTF-16: expected low surrogate after high surrogate");
+
+			// Surrogate pair → 코드포인트 계산
+			codepoint = ((wc - 0xD800) << 10) + (wc2 - 0xDC00) + 0x10000;
+		}
+		else if (0xDC00 <= wc && wc <= 0xDFFF)
+		{
+			throw std::runtime_error("Invalid UTF-16: unexpected low surrogate");
+		}
+		else
+		{
+			codepoint = wc;
+		}
+
+		// UTF-8 인코딩
+		if (codepoint <= 0x7F)
+		{
+			result += static_cast<char>(codepoint);
+		}
+		else if (codepoint <= 0x7FF)
+		{
+			result += static_cast<char>(0xC0 | ((codepoint >> 6) & 0x1F));
+			result += static_cast<char>(0x80 | (codepoint & 0x3F));
+		}
+		else if (codepoint <= 0xFFFF)
+		{
+			result += static_cast<char>(0xE0 | ((codepoint >> 12) & 0x0F));
+			result += static_cast<char>(0x80 | ((codepoint >> 6) & 0x3F));
+			result += static_cast<char>(0x80 | (codepoint & 0x3F));
+		}
+		else // U+10000 ~ U+10FFFF
+		{
+			result += static_cast<char>(0xF0 | ((codepoint >> 18) & 0x07));
+			result += static_cast<char>(0x80 | ((codepoint >> 12) & 0x3F));
+			result += static_cast<char>(0x80 | ((codepoint >> 6) & 0x3F));
+			result += static_cast<char>(0x80 | (codepoint & 0x3F));
+		}
+	}
+
+	return result;
+}
+
+std::wstring H3DF::Utility::Utf8ToWString(const std::string & str)
+{
+	std::wstring result;
+
+	size_t i = 0;
+	while (i < str.size()) {
+		uint32_t codepoint = 0;
+		unsigned char c = str[i];
+
+		if (c <= 0x7F) {
+			codepoint = c;
+			i += 1;
+		}
+		else if ((c & 0xE0) == 0xC0) {
+			codepoint = ((c & 0x1F) << 6) | (str[i + 1] & 0x3F);
+			i += 2;
+		}
+		else if ((c & 0xF0) == 0xE0) {
+			codepoint = ((c & 0x0F) << 12) |
+				((str[i + 1] & 0x3F) << 6) |
+				(str[i + 2] & 0x3F);
+			i += 3;
+		}
+		else if ((c & 0xF8) == 0xF0) {
+			codepoint = ((c & 0x07) << 18) |
+				((str[i + 1] & 0x3F) << 12) |
+				((str[i + 2] & 0x3F) << 6) |
+				(str[i + 3] & 0x3F);
+			i += 4;
+		}
+
+		if (codepoint <= 0xFFFF) {
+			result += static_cast<wchar_t>(codepoint);
+		}
+		else {
+			// surrogate pair 처리 (UTF-16 한정)
+			codepoint -= 0x10000;
+			wchar_t high = static_cast<wchar_t>((codepoint >> 10) + 0xD800);
+			wchar_t low = static_cast<wchar_t>((codepoint & 0x3FF) + 0xDC00);
+			result += high;
+			result += low;
+		}
+	}
+
+	return result;
+}
 
 //== Segment User Data 관련 함수 =====================================================================
 bool H3DF::UserData::SetSegmentName(SegmentKey & cInSegment, CString strName)

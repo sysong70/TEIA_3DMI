@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "../3DF.h"
+#include "3DF.Impl.h"
 #include "../Kit.h"
 #include "../Control.h"
 #include "../Search.h"

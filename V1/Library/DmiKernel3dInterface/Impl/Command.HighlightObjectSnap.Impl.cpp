@@ -1141,12 +1141,12 @@ void KERNEL::Command::HighlightObjectSnapImpl::DrawSnapPointTypeText(H3DF::Point
 		double textOffset = dUnit * 5;
 		position.y += textOffset;
 		CString text = TheEnvironment.General.Local(pText);
-		Text::Create(position, text);
+		H3DF::Painter::Text::Create(position, text);
 
 		// WARNING - for calculating text extent
 		Font::SetTransform();
 			float width, height;
-			Text::GetExtent(text, width, height);
+			H3DF::Painter::Text::GetExtent(text, width, height);
 		Font::SetTransform(false);
 
 		SegmentKey cFrameSegment("frame");

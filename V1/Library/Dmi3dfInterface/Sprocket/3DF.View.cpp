@@ -489,7 +489,7 @@ void H3DF::View::LoadPointCloudFile(CString strFilePathName)
 
 	PointCloud cPointCloud;
 	
-	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"PointCloud Open");
+	LogManager::Log(LOG_3DF_ID, L"PointCloud Open");
 
 	// 라이브러리를 사용해야 하므로 미리 cPointCloudSegment를 Open하도록 한다.
 	SegmentKeyImpl::LocalOpen(cPointCloudSegment); {
@@ -500,7 +500,7 @@ void H3DF::View::LoadPointCloudFile(CString strFilePathName)
 
 	} SegmentKeyImpl::LocalClose(cPointCloudSegment);
 
-	LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"PointCloud Close");
+	LogManager::Log(LOG_3DF_ID, L"PointCloud Close");
 
 	// Point Clouse Segment의 하부를 검색해서 색상을 변경함.
 	// Library에서 나오는 색상은 기본적으로 Black으로 나옴.

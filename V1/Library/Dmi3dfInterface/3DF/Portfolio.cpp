@@ -225,12 +225,11 @@ ShapeDefinition H3DF::PortfolioKey::DefineShape(CStringA strInName, ShapeKit con
 
 	SegmentKey cPortfolio(KeyValue());
 
-	CStringA strName = cPortfolio.Name();
-
-	// Portpolio
+	// Portpolio Shape Segment를 생성하거나 찾아옴.
 	SegmentKey cShapesSegment = cPortfolio.Subsegment("shapes");
 
-	SegmentKey cStyleSegment = cShapesSegment.Subsegment(strInName);
+	SegmentKey cOwner = cShapesSegment.Owner();
+	cOwner.GetStyleControl().PushSegment(cShapesSegment);
 
 	ShapeElementArray arShapeElements;
 	if (false == cInSource.ShowElements(arShapeElements)) {
@@ -241,15 +240,34 @@ ShapeDefinition H3DF::PortfolioKey::DefineShape(CStringA strInName, ShapeKit con
 
 	PortfolioKeyImpl::CreateShapeData(arShapeElements, vfData);
 
-	cStyleSegment.Open(); {
+	cShapesSegment.Open(); {
+
+// 		float const clipped[] = {
+// 			3,
+// 			8, 1,  0, -0.456789,  0, 1,  0, 1, 0, 0,  0,  1, 1, -0.456789, 0, 0,  0,  1, 1, -0.456789, 0, -1, 0, 1, 0,
+// 			-1, 0, -1, 0, -1, 0, -1, 0, 0, 0, -1, -1, 1, 0, 0,  0, -1, -0.456789, 1, 0, 1,  0, -1, 0, 0 };
+// 
+// 		HC_Define_Shape(strInName, std::ranges::size(clipped), clipped);
+
+		//
+		// -7.000000, 
+		// 4.000000, 
+// -0.456789, 0.000000, 0.000000, -0.456789, 0.000000, 0.000000, 0.000000, 0.000000, -0.456789, 0.000000, 0.000000, -0.456789, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 0.000000, -1.000000, 0.000000, 0.000000, -1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, -1.000000, 0.000000, 0.000000, -1.000000, 0.000000, 0.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.000000
+/*
+		CStringA strText;
+		strText.Format()
+// 		HC_Set_Text_Font("background=(on, shape=clipped)");
+// 		HC_Insert_Text(10, 10, 0, "corner trimmed box");
+*/
+
 		HC_Define_Shape(strInName, (int)vfData.size(), vfData.data());
-	} cStyleSegment.Close();
+	} cShapesSegment.Close();
 
 	ShapeDefinition cDefinition;
 	ShapeDefinitionImpl * pcShapeImpl = static_cast<ShapeDefinitionImpl *>(cDefinition.GetImpl());
 	DEBUG_VALID(pcShapeImpl);
 
-	pcShapeImpl->m_nKey = cStyleSegment.KeyValue();
+	pcShapeImpl->m_nKey = INVALID_KEY;
 	pcShapeImpl->m_cOwnerPortfolio = *this;
 	pcShapeImpl->m_strName = strInName;
 
@@ -311,11 +329,21 @@ H3DF::PortfolioControl::PortfolioControl(SegmentKey & cInSegment)
 	DEBUG_VALID(pcImpl);
 	
 	pcImpl->m_cOverrideKey = cInSegment;
+
+	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
 }
 
 H3DF::PortfolioControl::PortfolioControl(PortfolioControl const & cInThat)
 {
 	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+}
+
+H3DF::PortfolioControl::~PortfolioControl()
+{
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
 }
 
 PortfolioControl & H3DF::PortfolioControl::operator = (PortfolioControl const & cInThat)
@@ -346,9 +374,7 @@ PortfolioControl & H3DF::PortfolioControl::Push(PortfolioKey const & cInPortfoli
 	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_KEY nKey = HC_Style_Segment_By_Key(cInPortfolio.KeyValue());
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	HC_KEY nKey = HC_Style_Segment_By_Key(cInPortfolio.KeyValue());
 
 	return *this;
 }
@@ -367,12 +393,12 @@ bool H3DF::PortfolioControl::Pop()
 
 	HC_KEY nKey = arPortfolios.front().KeyValue();
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_Delete_By_Key(nKey);
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	HC_Delete_By_Key(nKey);
 	
 	return true;
 }
+
+// 제거된 Portfolio를 반환
 bool H3DF::PortfolioControl::Pop(PortfolioKey & cOutPortfolio)
 {
 	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
@@ -388,9 +414,7 @@ bool H3DF::PortfolioControl::Pop(PortfolioKey & cOutPortfolio)
 	cOutPortfolio = arPortfolios.front();
 	HC_KEY nKey = arPortfolios.front().KeyValue();
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_Delete_By_Key(nKey);
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	HC_Delete_By_Key(nKey);
 
 	return true;
 }
@@ -402,9 +426,7 @@ PortfolioControl & H3DF::PortfolioControl::Set(PortfolioKey const & cInPortfolio
 
 	UnsetEverything();
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		HC_KEY nKey = HC_Style_Segment_By_Key(cInPortfolio.KeyValue());
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	HC_KEY nKey = HC_Style_Segment_By_Key(cInPortfolio.KeyValue());
 
 	return *this;
 }
@@ -416,11 +438,9 @@ PortfolioControl & H3DF::PortfolioControl::Set(PortfolioKeyArray const & cInPort
 
 	UnsetEverything();
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		for (auto & cPortfolio : cInPortfolios) {
-			HC_KEY nKey = HC_Style_Segment_By_Key(cPortfolio.KeyValue());
-		}
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	for (auto & cPortfolio : cInPortfolios) {
+		HC_KEY nKey = HC_Style_Segment_By_Key(cPortfolio.KeyValue());
+	}
 
 	return *this;
 }
@@ -439,11 +459,9 @@ PortfolioControl & H3DF::PortfolioControl::UnsetEverything()
 	PortfolioKeyArray arPortfolios;
 	Show(arPortfolios);
 
-	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
-		for (auto & cPortfolio : arPortfolios) {
-			HC_Delete_By_Key(cPortfolio.KeyValue());
-		}
-	} SegmentKeyImpl::LocalClose(pcImpl->m_cOverrideKey);
+	for (auto & cPortfolio : arPortfolios) {
+		HC_Delete_By_Key(cPortfolio.KeyValue());
+	}
 
 	return *this;
 }
@@ -451,9 +469,7 @@ PortfolioControl & H3DF::PortfolioControl::UnsetEverything()
 bool H3DF::PortfolioControl::ShowTop(PortfolioKey & cOutPortfolio) const
 {
 	PortfolioKeyArray arPortfolios;
-	Show(arPortfolios);
-
-	if (true == arPortfolios.empty()) {
+	if (false == Show(arPortfolios)) {
 		return false;
 	}
 
@@ -464,6 +480,45 @@ bool H3DF::PortfolioControl::ShowTop(PortfolioKey & cOutPortfolio) const
 
 bool H3DF::PortfolioControl::Show(PortfolioKeyArray & cOutPortfolios) const
 {
+	// 현재 Override Segment에 들어 있는 styles, named styles를 검색한다.
+	HC_Begin_Contents_Search(".", "styles, named styles"); {
+		int nCount = 0;
+		HC_Show_Contents_Count(&nCount);
+
+		HC_KEY nContentKey = INVALID_KEY;
+		char chType[MVO_BUFFER_SIZE];
+
+		for (int nIndex = 0; nIndex < nCount; nIndex++)
+		{
+			HC_Find_Contents(chType, &nContentKey);
+
+			if (0 != strcmp("style", chType)) {
+				DEBUG_STOP; // 예상치 못한 타입이 나옴
+				continue;
+			}
+
+			StyleKey cStyle(nContentKey);
+
+			Style::Type cType;
+			SegmentKey cSegment;
+			CStringA strName;
+
+			if (true == cStyle.ShowSource(cType, cSegment, strName)) {
+				PortfolioKey cPortfolio(cSegment);
+				if (true == cPortfolio.IsValidate()) {
+					cOutPortfolios.emplace_back(cPortfolio);
+				}
+			}
+		}
+
+	} HC_End_Contents_Search();
+
+	if (cOutPortfolios.empty()) {
+		return false;
+	}
+
+	return true;
+
 	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 

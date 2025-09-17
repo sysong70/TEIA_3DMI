@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "../3DF.h"
+#include "../Impl/3DF.Impl.h"
 
 #include "../Shape.h"
 
@@ -23,6 +23,8 @@ namespace H3DF
 				DEBUG_STOP;
 				return;
 			}
+
+			Impl::Copy(pcInThat);
 
 			m_bFillFlag = pcInThat->m_bFillFlag;
 			m_bDisjointedFlag = pcInThat->m_bDisjointedFlag;

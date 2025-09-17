@@ -41,6 +41,7 @@ boost::pool<> CBoostPool<T>::m_bpool(sizeof(T));
 // using VectorArray = std::vector<_3DF::Vector, boost::pool_allocator<Vector>>;
 
 using namespace H3DF;
+/*
 
 void H3DF::Impl::Copy(const Impl * pcInThat)
 {
@@ -55,6 +56,7 @@ bool H3DF::Impl::Equal(const Impl * pcInThat) const
 
 	return true; 
 }
+*/
 
 /*
 

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "../../3DF/3DF.h"
+#include "../../3DF/Impl/3DF.Impl.h"
 #include "../../3DF/Object.h"
 
 #include "../3DF.MetaData.h"

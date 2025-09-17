@@ -40,6 +40,8 @@ namespace H3DF
 		explicit PortfolioControl(SegmentKey & cInSegment);
 		PortfolioControl(PortfolioControl const & cInThat);
 
+		virtual ~PortfolioControl();
+
 		static const H3DF::Type staticType = H3DF::Type::PortfolioControl;
 		H3DF::Type ObjectType() const { return staticType; };
 

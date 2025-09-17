@@ -6,6 +6,8 @@
 
 #include "Math.h"
 
+#include <string>
+
 class HPoint;
 
 namespace H3DF
@@ -66,7 +68,11 @@ namespace H3DF
 
 		//== Segment 관련 함수 =======================================================================
 		API_3DF bool ShowSubSegment(SegmentKey & cInTargetSegment, CStringA strInSegmentName, SegmentKey & cOutSegment);
-	};
+
+		//== string 관련 함수 =======================================================================
+		std::string WStringToUtf8(const std::wstring & wstr);
+		std::wstring Utf8ToWString(const std::string & str);
+	}; 
 
 	class API_3DF UserData
 	{

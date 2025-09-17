@@ -1107,6 +1107,8 @@ bool H3DF::WindowKeyImpl::Init(H3DF::Model * pcInModel, const char * pchInDriver
 // 	SegmentKey cPortfoliosKey = m_cKey.Subsegment(L"Portfolios");
 // 	m_cPortfolioKey.SetKeyValue(cPortfoliosKey.KeyValue());
 
+	//m_pcBaseView->SetHardwareAntialiasing(4);
+
 	// do all the setup with no updates
 	m_pcBaseView->SetSuppressUpdate(false);
 
