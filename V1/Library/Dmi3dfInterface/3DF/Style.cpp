@@ -22,42 +22,35 @@ H3DF::NamedStyleDefinition::NamedStyleDefinition()
 {
 }
 
-H3DF::NamedStyleDefinition::NamedStyleDefinition(HC_KEY nInKey) : Definition(nInKey)
+H3DF::NamedStyleDefinition::NamedStyleDefinition(HC_KEY nInKey)
 {
+	// PolygonShapeElementImpl 생성
+	m_pcImpl = std::make_unique<DefinitionImpl>();
+	auto pcImpl = static_cast<DefinitionImpl *>(m_pcImpl.get());
+
+	pcImpl->SetKeyValue(nInKey);
 }
 
 H3DF::NamedStyleDefinition::NamedStyleDefinition(NamedStyleDefinition const & cInThat)
 {
-	Set(cInThat);
-}
-
-void H3DF::NamedStyleDefinition::Set(NamedStyleDefinition const & cInThat)
-{
-	auto * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	auto * pcInThatImpl = dynamic_cast<DefinitionImpl *>(cInThat.m_pcImpl);
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->SetKeyValue(pcInThatImpl->KeyValue());
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 NamedStyleDefinition & H3DF::NamedStyleDefinition::operator = (NamedStyleDefinition const & cInThat)
 {
-	auto * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	auto * pcInThatImpl = dynamic_cast<DefinitionImpl *>(cInThat.m_pcImpl);
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->SetKeyValue(pcInThatImpl->KeyValue());
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
 
 	return *this;
 }
 
 SegmentKey H3DF::NamedStyleDefinition::GetSource() const
 {
-	auto * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<DefinitionImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	HC_KEY nKey = pcImpl->KeyValue();
@@ -68,7 +61,7 @@ SegmentKey H3DF::NamedStyleDefinition::GetSource() const
 
 PortfolioKey H3DF::NamedStyleDefinition::Owner() const
 {
-	auto * pcImpl = dynamic_cast<DefinitionImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<DefinitionImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKey cSegment(pcImpl->KeyValue());
@@ -82,44 +75,66 @@ PortfolioKey H3DF::NamedStyleDefinition::Owner() const
 
 //== StyleKey Function =============================================================================
 
-H3DF::StyleKey::StyleKey() : Key()
+namespace H3DF
 {
-	KeyImpl * pcImpl = static_cast<KeyImpl *>(m_pcImpl);
+	class StyleKeyImpl : public KeyImpl
+	{
+	public:
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<StyleKeyImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy(const StyleKeyImpl * pcInThat) {
+			KeyImpl::Copy(pcInThat);
+		}
+	};
+}
+
+H3DF::StyleKey::StyleKey()
+{
+	DEBUG_VALID(SetImpl(H3DF::Type::SegmentStyle, std::make_unique<StyleKeyImpl>()));
+}
+
+H3DF::StyleKey::StyleKey(Key const & cInThat)
+{
+	auto pcImpl = static_cast<StyleKeyImpl *>(SetImpl(H3DF::Type::SegmentStyle, std::make_unique<StyleKeyImpl>()));
 	DEBUG_VALID(pcImpl);
+
+	auto pcInThatImpl = static_cast<const KeyImpl *>(cInThat.GetImpl());
+
+	if (nullptr != pcImpl && nullptr != pcInThatImpl) {
+		pcImpl->KeyImpl::Copy(pcInThatImpl);
+	}
+	else {
+		DEBUG_STOP;
+	}
 
 	pcImpl->SetType(H3DF::Type::SegmentStyle);
 }
 
-H3DF::StyleKey::StyleKey(Key const & cInThat) : Key(cInThat)
+H3DF::StyleKey::StyleKey(StyleKey const & cInThat)
 {
-	KeyImpl * pcImpl = static_cast<KeyImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	pcImpl->SetType(H3DF::Type::SegmentStyle);
-}
-
-H3DF::StyleKey::StyleKey(StyleKey const & cInThat) : Key(cInThat)
-{
-	KeyImpl * pcImpl = static_cast<KeyImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	pcImpl->SetType(H3DF::Type::SegmentStyle);
-}
-
-void H3DF::StyleKey::Set(StyleKey const & cInThat)
-{
-	Key::Set(cInThat);
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 StyleKey & H3DF::StyleKey::operator = (StyleKey const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 CStringA H3DF::StyleKey::Name(bool bIncludePath) const
 {
-	auto * pcImpl = dynamic_cast<KeyImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<KeyImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	char chName[MVO_BUFFER_SIZE] = "\n";
@@ -135,7 +150,7 @@ CStringA H3DF::StyleKey::Name(bool bIncludePath) const
 
 bool H3DF::StyleKey::ShowSource(SegmentKey & cOutSegment) const
 {
-	auto * pcImpl = dynamic_cast<KeyImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<KeyImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	HC_KEY nKey = HC_Show_Style_Segment(pcImpl->KeyValue(), nullptr);
@@ -148,7 +163,7 @@ bool H3DF::StyleKey::ShowSource(SegmentKey & cOutSegment) const
 
 bool H3DF::StyleKey::ShowSource(Style::Type & cOutType, SegmentKey & cOutSegment, CStringA & strOutName) const
 {
-	auto * pcImpl = dynamic_cast<KeyImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<KeyImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	HC_KEY nKey = HC_Show_Style_Segment(pcImpl->KeyValue(), strOutName.GetBuffer(MVO_BUFFER_SIZE));
@@ -180,9 +195,13 @@ namespace H3DF
 	class StyleControlImpl : public ControlImpl
 	{
 	public:
-		StyleControlImpl() { m_eType = H3DF::Type::StyleControl; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<StyleControlImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(StyleControlImpl * pcInThat) {
+		void Copy(const StyleControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
 	};
@@ -190,38 +209,37 @@ namespace H3DF
 
 H3DF::StyleControl::StyleControl(SegmentKey & cInSegment) 
 {
-	StyleControlImpl * pcImpl = new StyleControlImpl();
+	m_pcImpl = std::make_unique<StyleControlImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcImpl = static_cast<StyleControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cOverrideKey = cInSegment;
-	m_pcImpl = pcImpl;
 }
 
 H3DF::StyleControl::StyleControl(StyleControl const & cInThat)
 {
-	m_pcImpl = new StyleControlImpl();
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
-
-	Set(cInThat);
-}
-
-void H3DF::StyleControl::Set(StyleControl const & cInThat)
-{
-	StyleControlImpl * pcImpl = (StyleControlImpl *)m_pcImpl;
-	StyleControlImpl * pcInThatImpl = (StyleControlImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
 }
 
 StyleControl & H3DF::StyleControl::operator = (StyleControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 
 StyleKey H3DF::StyleControl::PushNamed(CStringA strInStyleName)
 {
-	StyleControlImpl * pcImpl = (StyleControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<StyleControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
@@ -234,7 +252,7 @@ StyleKey H3DF::StyleControl::PushNamed(CStringA strInStyleName)
 
 StyleKey H3DF::StyleControl::PushNamed(CStringA strInStyleName, ConditionalExpression const & cInConditional)
 {
-	StyleControlImpl * pcImpl = (StyleControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<StyleControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	CStringA strCondition;
@@ -252,7 +270,7 @@ StyleKey H3DF::StyleControl::PushNamed(CStringA strInStyleName, ConditionalExpre
 
 StyleKey H3DF::StyleControl::PushSegment(SegmentKey const & cInStyleSource)
 {
-	StyleControlImpl * pcImpl = (StyleControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<StyleControlImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) { assert(false); }
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
@@ -265,7 +283,7 @@ StyleKey H3DF::StyleControl::PushSegment(SegmentKey const & cInStyleSource)
 
 StyleKey H3DF::StyleControl::PushSegment(SegmentKey const & cInStyleSource, ConditionalExpression const & cInConditional)
 {
-	StyleControlImpl * pcImpl = (StyleControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<StyleControlImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) { assert(false); }
 
 	CStringA strCondition;
@@ -283,7 +301,7 @@ StyleKey H3DF::StyleControl::PushSegment(SegmentKey const & cInStyleSource, Cond
 
 void H3DF::StyleControl::Flush(SegmentKey const & cInStyleSource)
 {
-	StyleControlImpl * pcImpl = (StyleControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<StyleControlImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) { assert(false); }
 
 	CStringA strName = cInStyleSource.Name();
@@ -327,7 +345,7 @@ void H3DF::StyleControl::Flush(SegmentKey const & cInStyleSource)
 
 bool H3DF::StyleControl::Show(StyleKeyArray & acOutStyles) const
 {
-	StyleControlImpl * pcImpl = dynamic_cast<StyleControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<StyleControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	CStringA strStyle;
@@ -356,7 +374,7 @@ bool H3DF::StyleControl::Show(StyleKeyArray & acOutStyles) const
 // ConditionalExpressionArray는 구현 않됨.
 bool H3DF::StyleControl::Show(StyleTypeArray & cOutTypes, SegmentKeyArray & cOutSegmentSources, AStringArray & astrOutStyleNames, ConditionalExpressionArray & acOutConditions) const
 {
-	StyleControlImpl * pcImpl = dynamic_cast<StyleControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<StyleControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	CStringA strStyle;

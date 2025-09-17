@@ -17,9 +17,9 @@ namespace H3DF
 		CircleKit();
 		CircleKit(CircleKit const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::CircleKit; };
+		static const H3DF::Type staticType = H3DF::Type::CircleKit;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(CircleKit const & cInThat);
 		CircleKit const & operator=(CircleKit const & cInThat);
 
 		CircleKit & SetCenter(Point const & cInCenter);
@@ -44,9 +44,9 @@ namespace H3DF
 		explicit CircleKey(Key const & cInKey);
 		CircleKey(CircleKey const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::CircleKey; };
+		static const H3DF::Type staticType = H3DF::Type::CircleKey;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(CircleKey const & cInThat);
 		CircleKey & operator=(CircleKey const & cInThat);
 
 		CircleKey & SetCenter(Point const & cInCenter);

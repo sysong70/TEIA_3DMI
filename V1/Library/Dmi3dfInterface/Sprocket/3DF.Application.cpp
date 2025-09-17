@@ -38,6 +38,17 @@ namespace H3DF
 	class ApplicationImpl : public Impl
 	{
 	public:
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<ApplicationImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+		
+		void Copy(const ApplicationImpl * pcInThat) {
+			m_pcHoopsDB = pcInThat->m_pcHoopsDB;
+			m_dInDpiScale = pcInThat->m_dInDpiScale;
+		}
+
 		HDB * m_pcHoopsDB = nullptr;
 		static void ErrorCallback(HErrorNode * pcNode, void * pcUserData);
 		static CStringA ErrorCategoryString(int nId);
@@ -484,12 +495,11 @@ CStringA H3DF::ApplicationImpl::ErrorSpecificString(int nId)
 // 1. Application이 실행될때 최초 처리 CWinApp::InitInstance에서 메시지 전달 받음.
 void H3DF::Application::InitInstance()
 {
-	ApplicationImpl * pcImpl = new ApplicationImpl();
-	if (nullptr == pcImpl) {
-		assert(false);
-	}
+	m_pcImpl = std::make_unique<ApplicationImpl>();
+	DEBUG_VALID(m_pcImpl);
 
-	m_pcImpl = pcImpl;
+	auto pcImpl = static_cast<ApplicationImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
 
 	//----- Construct에서 처리 하는 부분 -----
 	// HOOPS License 처리
@@ -547,7 +557,7 @@ void H3DF::Application::InitInstance()
 // 2. CWinApp::OnExitInstance() 처리
 void H3DF::Application::ExitInstance()
 {
-	ApplicationImpl * pcImpl = static_cast<ApplicationImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ApplicationImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (nullptr != pcImpl->m_pcHoopsDB) {

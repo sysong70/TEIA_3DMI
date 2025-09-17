@@ -21,7 +21,13 @@ namespace H3DF
 		class EventImpl : public Impl
 		{
 		public:
-			void Copy(EventImpl * pcInThat)
+			std::unique_ptr<Impl> Clone() const override {
+				auto pcClone = std::make_unique<EventImpl>();
+				pcClone->Copy(this);
+				return pcClone;
+			}
+
+			void Copy(const EventImpl * pcInThat)
 			{
 				m_cWindowKey = pcInThat->m_cWindowKey;
 				m_eEventType = pcInThat->m_eEventType;
@@ -49,44 +55,42 @@ namespace H3DF
 
 H3DF::Operator::Event::Event()
 {
-	m_pcImpl = new EventImpl();
+	m_pcImpl = std::make_unique<EventImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::Operator::Event::Event(H3DF::WindowKey & cInWindowKey)
 {
-	EventImpl * pcImpl = new EventImpl();
+	m_pcImpl = std::make_unique<EventImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cWindowKey = cInWindowKey;
-
-	m_pcImpl = pcImpl;
 }
 
 H3DF::Operator::Event::Event(Event const & cInThat)
 {
-	m_pcImpl = new EventImpl();
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 	DEBUG_VALID(m_pcImpl);
-	Set(cInThat);
-}
-
-void H3DF::Operator::Event::Set(Event const & cInThat)
-{
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
-	EventImpl * pcInThatImpl = (EventImpl *) cInThat.m_pcImpl;
-
-	pcImpl->Copy(pcInThatImpl);
 }
 
 H3DF::Operator::Event & H3DF::Operator::Event::operator = (Event const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 void H3DF::Operator::Event::SetWindow(H3DF::WindowKey & cInWindowKey)
 {
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cWindowKey = cInWindowKey;
@@ -94,7 +98,7 @@ void H3DF::Operator::Event::SetWindow(H3DF::WindowKey & cInWindowKey)
 
 void H3DF::Operator::Event::SetPoint(Operator::Event::Type eInType, int x, int y, UINT nInFlags)
 {
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_eEventType = eInType;
@@ -113,7 +117,7 @@ void H3DF::Operator::Event::SetPoint(Operator::Event::Type eInType, int x, int y
 
 int H3DF::Operator::Event::GetMouseWheelDelta()
 {
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_nWheelDelta;
@@ -121,7 +125,7 @@ int H3DF::Operator::Event::GetMouseWheelDelta()
 
 void H3DF::Operator::Event::SetMouseWheelDelta(int nInDelta)
 {
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_nWheelDelta = nInDelta;
@@ -129,7 +133,7 @@ void H3DF::Operator::Event::SetMouseWheelDelta(int nInDelta)
 
 bool H3DF::Operator::Event::Control() const
 {
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return 0 != (pcImpl->m_nFlags & (UINT) Event::Flag::Control);
@@ -137,14 +141,14 @@ bool H3DF::Operator::Event::Control() const
 
 bool H3DF::Operator::Event::Shift() const
 {
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return 0 != (pcImpl->m_nFlags & (UINT) Event::Flag::Shift);
 }
 bool H3DF::Operator::Event::Alt() const
 {
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return 0 != (pcImpl->m_nFlags & (UINT) Event::Flag::Alt);
@@ -152,7 +156,7 @@ bool H3DF::Operator::Event::Alt() const
 
 bool H3DF::Operator::Event::LButton() const
 {
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return 0 != (pcImpl->m_nFlags & (UINT) Event::Flag::LeftButton);
@@ -160,7 +164,7 @@ bool H3DF::Operator::Event::LButton() const
 
 bool H3DF::Operator::Event::MButton() const
 {
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return 0 != (pcImpl->m_nFlags & (UINT) Event::Flag::MiddleButton);
@@ -168,7 +172,7 @@ bool H3DF::Operator::Event::MButton() const
 
 bool H3DF::Operator::Event::RButton() const
 {
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return 0 != (pcImpl->m_nFlags & (UINT) Event::Flag::RightButton);
@@ -176,7 +180,7 @@ bool H3DF::Operator::Event::RButton() const
 
 PixelPoint const & H3DF::Operator::Event::GetMousePixelPoint() const
 {
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cPixelPoint;
@@ -184,7 +188,7 @@ PixelPoint const & H3DF::Operator::Event::GetMousePixelPoint() const
 
 WindowPoint const & H3DF::Operator::Event::GetMouseWindowPoint() const
 {
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cWindowPoint;
@@ -192,7 +196,7 @@ WindowPoint const & H3DF::Operator::Event::GetMouseWindowPoint() const
 
 WorldPoint const & H3DF::Operator::Event::GetMouseWorldPoint() const
 {
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cWorldPoint;
@@ -200,7 +204,7 @@ WorldPoint const & H3DF::Operator::Event::GetMouseWorldPoint() const
 
 void H3DF::Operator::Event::SetEventType(Event::Type cInType)
 {
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_eEventType = cInType;
@@ -208,7 +212,7 @@ void H3DF::Operator::Event::SetEventType(Event::Type cInType)
 
 H3DF::Operator::Event::Type H3DF::Operator::Event::GetEventType() const
 {
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_eEventType;
@@ -217,7 +221,7 @@ H3DF::Operator::Event::Type H3DF::Operator::Event::GetEventType() const
 
 bool H3DF::Operator::Event::GetHEventInfo(HEventInfo & cOutEvent)
 {
-	EventImpl * pcImpl = (EventImpl *) m_pcImpl;
+	auto pcImpl = static_cast<EventImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	HEventType cEventType = HE_NoEvent;

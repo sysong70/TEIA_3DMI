@@ -13,14 +13,28 @@ namespace H3DF
 {
 	namespace Operator
 	{
-		class API_3DF OperatorImpl : public H3DF::Impl
+		class OperatorImpl : public H3DF::Impl
 		{
 		public:
 			OperatorImpl() = default;
 			OperatorImpl(WindowKey const & cInWindow);
 
-			void Copy(OperatorImpl * pcInThat) {
+			OperatorImpl(const OperatorImpl * pcInThat){
 				m_pcWindow = pcInThat->m_pcWindow;
+			}
+
+			std::unique_ptr<Impl> Clone() const override {
+				auto pcClone = std::make_unique<OperatorImpl>();
+				pcClone->Copy(this);
+				return pcClone;
+			}
+
+			void Copy(const OperatorImpl * pcInThat) {
+				m_pcWindow = pcInThat->m_pcWindow;
+			}
+
+			bool Equals(const OperatorImpl * pcInThat) const {
+				return m_pcWindow == pcInThat->m_pcWindow;
 			}
 
 			WindowKey * GetWindow() { return (WindowKey *)m_pcWindow; }

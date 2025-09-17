@@ -12,7 +12,13 @@ namespace H3DF
 	class SearchImpl : public Impl
 	{
 	public:
-		void Copy(SearchImpl * pcInThat) {
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<SearchImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy(const SearchImpl * pcInThat) {
 		}
 
 		static CString GetSearchTypeString(Search::Type eInType);
@@ -23,7 +29,13 @@ namespace H3DF
 	class SearchOptionsKitImpl : public Impl
 	{
 	public:
-		void Copy(SearchOptionsKitImpl * pcInThat) {
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<SearchOptionsKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy(const SearchOptionsKitImpl * pcInThat) {
 		}
 
 	};
@@ -32,9 +44,13 @@ namespace H3DF
 	class SearchResultsIteratorImpl : public Impl
 	{
 	public:
-		SearchResultsIteratorImpl() { m_eType = H3DF::Type::SearchResultsIterator; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<SearchResultsIteratorImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(SearchResultsIteratorImpl * pcInThat) {
+		void Copy(const SearchResultsIteratorImpl * pcInThat) {
 			pcIterator = pcInThat->pcIterator;
 			pcBeginIterator = pcInThat->pcBeginIterator;
 			pcEndIterator = pcInThat->pcEndIterator;
@@ -49,11 +65,15 @@ namespace H3DF
 	class SearchResultsImpl : public Impl
 	{
 	public:
-		SearchResultsImpl() { m_eType = H3DF::Type::SearchResults; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<SearchResultsImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(SearchResultsImpl * pcInThat) {
+		void Copy(const SearchResultsImpl * pcInThat) {
 			m_deKeys.clear();
-			for (auto cKey : pcInThat->m_deKeys) {
+			for (const auto & cKey : pcInThat->m_deKeys) {
 				m_deKeys.push_back(cKey);
 			}
 		}

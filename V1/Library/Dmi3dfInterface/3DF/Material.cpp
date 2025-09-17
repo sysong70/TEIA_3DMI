@@ -7,8 +7,6 @@
 
 #include "./Impl/ControlImpl.h"
 
-#include "3DF.Utility.h"
-
 #include <Common_Define.h>
 
 #include <hc.h>
@@ -23,9 +21,13 @@ using namespace H3DF;
 class MaterialKitImpl : public Impl
 {
 public:
-	MaterialKitImpl() {  m_eType = H3DF::Type::MaterialKit;  }
+	std::unique_ptr<Impl> Clone() const override {
+		auto pcClone = std::make_unique<MaterialKitImpl>();
+		pcClone->Copy(this);
+		return pcClone;
+	}
 
-	void Copy(MaterialKitImpl * pcInThat) {
+	void Copy(const MaterialKitImpl * pcInThat) {
 		for (int nColorIndex = 0; nColorIndex < (int)Material::Channel::Count; nColorIndex++) {
 			m_pcColors[nColorIndex] = pcInThat->m_pcColors[nColorIndex];
 
@@ -49,7 +51,7 @@ public:
 	RGBAColor m_pcColors[(int)Material::Channel::Count];
 	float m_fGloss = -1.f;
 
-	bool m_bTextureMirrors[(int)Material::Channel::Count];
+	bool m_bTextureMirrors[(int)Material::Channel::Count]{};
 	CStringA m_strTextureNames[(int)Material::Channel::Count];;
 	CStringA m_strTextureOptions[(int)Material::Channel::Count];;
 };
@@ -169,32 +171,31 @@ bool MaterialKitImpl::ShowChannel(Material::Channel eInChannel, Material::Type &
 
 H3DF::MaterialKit::MaterialKit()
 {
-	m_pcImpl = new MaterialKitImpl();
+	m_pcImpl = std::make_unique<MaterialKitImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::MaterialKit::MaterialKit(MaterialKit const & cInKit)
 {
-	m_pcImpl = new MaterialKitImpl();
-	Set(cInKit);
-}
-
-void H3DF::MaterialKit::Set(MaterialKit const & cInThat)
-{
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
-	MaterialKitImpl * pcInThatImpl = (MaterialKitImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
 }
 
 MaterialKit & H3DF::MaterialKit::operator = (MaterialKit const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 bool H3DF::MaterialKit::operator == (MaterialKit const & cInThat) const
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
-	MaterialKitImpl * pcInThatImpl = (MaterialKitImpl *)cInThat.m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
+	auto pcInThatImpl = static_cast<const MaterialKitImpl *>(cInThat.GetImpl());
 
 	return (pcImpl == pcInThatImpl);
 }
@@ -206,18 +207,33 @@ bool H3DF::MaterialKit::operator != (MaterialKit const & cInThat) const
 
 void H3DF::MaterialKit::Show(MaterialKit & cOutKit) const
 {
-	cOutKit.Set(*this);
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
+	auto pcOutImpl = static_cast<MaterialKitImpl *>(cOutKit.m_pcImpl.get());
+
+	if (nullptr == pcImpl) {
+		DEBUG_STOP;
+		return;
+	}
+
+	if (nullptr == pcOutImpl) {
+		// cOutKit이 Impl을 아직 할당받지 않았다면 새로 할당
+		cOutKit.m_pcImpl = std::make_unique<MaterialKitImpl>();
+		pcOutImpl = static_cast<MaterialKitImpl *>(cOutKit.m_pcImpl.get());
+	}
+
+	// 복사 (Copy 함수가 있다면 Copy 활용)
+	pcOutImpl->Copy(pcImpl);
 }
 
 bool H3DF::MaterialKit::Empty() const
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	return pcImpl->Empty();
 }
 
 MaterialKit & H3DF::MaterialKit::SetDiffuse(RGBColor const & cInColor)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_pcColors[(int)Material::Channel::DiffuseColor] = cInColor;
 	pcImpl->m_pcColors[(int)Material::Channel::DiffuseTexture] = cInColor;
 	return *this;
@@ -225,7 +241,7 @@ MaterialKit & H3DF::MaterialKit::SetDiffuse(RGBColor const & cInColor)
 
 MaterialKit & H3DF::MaterialKit::SetDiffuse(RGBAColor const & cInColor)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_pcColors[(int)Material::Channel::DiffuseColor] = cInColor;
 	pcImpl->m_pcColors[(int)Material::Channel::DiffuseTexture] = cInColor;
 	return *this;
@@ -233,35 +249,35 @@ MaterialKit & H3DF::MaterialKit::SetDiffuse(RGBAColor const & cInColor)
 
 MaterialKit & H3DF::MaterialKit::SetDiffuseColor(RGBColor const & cInColor)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_pcColors[(int)Material::Channel::DiffuseColor] = cInColor;
 	return *this;
 }
 
 MaterialKit & H3DF::MaterialKit::SetDiffuseColor(RGBAColor const & cInColor)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_pcColors[(int)Material::Channel::DiffuseColor] = cInColor;
 	return *this;
 }
 
 MaterialKit & H3DF::MaterialKit::SetDiffuseAlpha(float fInAlpha)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_pcColors[(int)Material::Channel::DiffuseColor].alpha = fInAlpha;
 	return *this;
 }
 
 MaterialKit & H3DF::MaterialKit::SetDiffuseTexture(CStringA strTextureName)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureNames[(int)Material::Channel::DiffuseTexture] = strTextureName;
 	return *this;
 }
 
 MaterialKit & H3DF::MaterialKit::SetDiffuseTexture(CStringA strTextureName, RGBAColor const & cInModulatingColor)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureNames[(int)Material::Channel::DiffuseTexture] = strTextureName;
 	pcImpl->m_pcColors[(int)Material::Channel::DiffuseTexture] = cInModulatingColor;
 	return *this;
@@ -269,21 +285,21 @@ MaterialKit & H3DF::MaterialKit::SetDiffuseTexture(CStringA strTextureName, RGBA
 
 MaterialKit & H3DF::MaterialKit::SetDiffuseTextureOption(CStringA strTextureOption)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureOptions[(int)Material::Channel::DiffuseTexture] = strTextureOption;
 	return *this;
 }
 
 MaterialKit & H3DF::MaterialKit::SetSpecular(RGBAColor const & cInColor)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_pcColors[(int)Material::Channel::Specular] = cInColor;
 	return *this;
 }
 
 MaterialKit & H3DF::MaterialKit::SetSpecular(CStringA strTextureName, RGBAColor const & cInModulatingColor)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureNames[(int)Material::Channel::Specular] = strTextureName;
 	pcImpl->m_pcColors[(int)Material::Channel::Specular] = cInModulatingColor;
 	return *this;
@@ -291,14 +307,14 @@ MaterialKit & H3DF::MaterialKit::SetSpecular(CStringA strTextureName, RGBAColor 
 
 MaterialKit & H3DF::MaterialKit::SetMirror(RGBAColor const & cInColor)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_pcColors[(int)Material::Channel::Mirror] = cInColor;
 	return *this;
 }
 
 MaterialKit & H3DF::MaterialKit::SetMirror(CStringA strTextureName, RGBAColor const & cInModulatingColor)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureNames[(int)Material::Channel::Mirror] = strTextureName;
 	pcImpl->m_pcColors[(int)Material::Channel::Mirror] = cInModulatingColor;
 	return *this;
@@ -306,7 +322,7 @@ MaterialKit & H3DF::MaterialKit::SetMirror(CStringA strTextureName, RGBAColor co
 
 MaterialKit & H3DF::MaterialKit::SetTransmission(CStringA strTextureName, RGBAColor const & cInModulatingColor)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureNames[(int)Material::Channel::Transmission] = strTextureName;
 	pcImpl->m_pcColors[(int)Material::Channel::Transmission] = cInModulatingColor;
 	return *this;
@@ -314,14 +330,14 @@ MaterialKit & H3DF::MaterialKit::SetTransmission(CStringA strTextureName, RGBACo
 
 MaterialKit & H3DF::MaterialKit::SetEmission(RGBAColor const & cInColor)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_pcColors[(int)Material::Channel::Emission] = cInColor;
 	return *this;
 }
 
 MaterialKit & H3DF::MaterialKit::SetEmission(CStringA strTextureName, RGBAColor const & cInModulatingColor)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureNames[(int)Material::Channel::Emission] = strTextureName;
 	pcImpl->m_pcColors[(int)Material::Channel::Emission] = cInModulatingColor;
 	return *this;
@@ -329,14 +345,14 @@ MaterialKit & H3DF::MaterialKit::SetEmission(CStringA strTextureName, RGBAColor 
 
 MaterialKit & H3DF::MaterialKit::SetEnvironmentTexture(CStringA strTextureName)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureNames[(int)Material::Channel::EnvironmentTexture] = strTextureName;
 	return *this;
 }
 
 MaterialKit & H3DF::MaterialKit::SetEnvironmentTexture(CStringA strTextureName, RGBAColor const & cInModulatingColor)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureNames[(int)Material::Channel::EnvironmentTexture] = strTextureName;
 	pcImpl->m_pcColors[(int)Material::Channel::EnvironmentTexture] = cInModulatingColor;
 	return *this;
@@ -344,14 +360,14 @@ MaterialKit & H3DF::MaterialKit::SetEnvironmentTexture(CStringA strTextureName, 
 
 MaterialKit & H3DF::MaterialKit::SetEnvironmentCubeMap(CStringA strTextureName)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureNames[(int)Material::Channel::EnvironmentCubeMap] = strTextureName;
 	return *this;
 }
 
 MaterialKit & H3DF::MaterialKit::SetEnvironmentCubeMap(CStringA strTextureName, RGBAColor const & cInModulatingColor)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureNames[(int)Material::Channel::EnvironmentCubeMap] = strTextureName;
 	pcImpl->m_pcColors[(int)Material::Channel::EnvironmentCubeMap] = cInModulatingColor;
 	return *this;
@@ -359,7 +375,7 @@ MaterialKit & H3DF::MaterialKit::SetEnvironmentCubeMap(CStringA strTextureName, 
 
 MaterialKit & H3DF::MaterialKit::SetBump(CStringA strTextureName)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureNames[(int)Material::Channel::Bump] = strTextureName;
 	return *this;
 }
@@ -367,7 +383,7 @@ MaterialKit & H3DF::MaterialKit::SetBump(CStringA strTextureName)
 // Gloss is always positive, and most surfaces have a gloss in the range of 1.0 to 30.0.
 MaterialKit & H3DF::MaterialKit::SetGloss(float fInGloss)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_fGloss = fInGloss;
 	return *this;
 }
@@ -375,7 +391,7 @@ MaterialKit & H3DF::MaterialKit::SetGloss(float fInGloss)
 // Removes all settings applied to the diffuse rgb channel.
 MaterialKit & H3DF::MaterialKit::UnsetDiffuseColorRGB()
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_pcColors[(int)Material::Channel::DiffuseColor].Invalid();
 	return *this;
 }
@@ -383,7 +399,7 @@ MaterialKit & H3DF::MaterialKit::UnsetDiffuseColorRGB()
 // Removes all settings applied to the diffuse color channel including alpha.
 MaterialKit & H3DF::MaterialKit::UnsetDiffuseColor()
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_pcColors[(int)Material::Channel::DiffuseColor].Invalid();
 	pcImpl->m_pcColors[(int)Material::Channel::DiffuseTexture].Invalid();
 	return *this;
@@ -392,21 +408,21 @@ MaterialKit & H3DF::MaterialKit::UnsetDiffuseColor()
 // Removes all settings applied to the diffuse alpha channel.
 MaterialKit & H3DF::MaterialKit::UnsetDiffuseAlpha()
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_pcColors[(int)Material::Channel::DiffuseColor].alpha = -1;
 	return *this;
 }
 
 MaterialKit & H3DF::MaterialKit::UnsetDiffuseTexture()
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureNames[(int)Material::Channel::DiffuseTexture].Empty();
 	return *this;
 }
 
 MaterialKit & H3DF::MaterialKit::UnsetSpecular()
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_pcColors[(int)Material::Channel::Specular].Invalid();
 	pcImpl->m_strTextureNames[(int)Material::Channel::Specular].Empty();
 	return *this;
@@ -414,7 +430,7 @@ MaterialKit & H3DF::MaterialKit::UnsetSpecular()
 
 MaterialKit & H3DF::MaterialKit::UnsetMirror()
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_pcColors[(int)Material::Channel::Mirror].Invalid();
 	pcImpl->m_strTextureNames[(int)Material::Channel::Mirror].Empty();
 	return *this;
@@ -422,14 +438,14 @@ MaterialKit & H3DF::MaterialKit::UnsetMirror()
 
 MaterialKit & H3DF::MaterialKit::UnsetTransmission()
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureNames[(int)Material::Channel::Transmission].Empty();
 	return *this;
 }
 
 MaterialKit & H3DF::MaterialKit::UnsetEmission()
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_pcColors[(int)Material::Channel::Emission].Invalid();
 	pcImpl->m_strTextureNames[(int)Material::Channel::Emission].Empty();
 	return *this;
@@ -437,7 +453,7 @@ MaterialKit & H3DF::MaterialKit::UnsetEmission()
 
 MaterialKit & H3DF::MaterialKit::UnsetEnvironment()
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureNames[(int)Material::Channel::EnvironmentTexture].Empty();
 	pcImpl->m_strTextureNames[(int)Material::Channel::EnvironmentCubeMap].Empty();
 	return *this;
@@ -445,21 +461,21 @@ MaterialKit & H3DF::MaterialKit::UnsetEnvironment()
 
 MaterialKit & H3DF::MaterialKit::UnsetBump()
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureNames[(int)Material::Channel::Bump].Empty();
 	return *this;
 }
 
 MaterialKit & H3DF::MaterialKit::UnsetGloss()
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_fGloss = -1;
 	return *this;
 }
 
 MaterialKit & H3DF::MaterialKit::UnsetEverything()
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	for (int nChannelIndex = 0; nChannelIndex < (int)Material::Channel::Count; nChannelIndex++) {
 		pcImpl->m_pcColors[nChannelIndex].Invalid();
 		pcImpl->m_strTextureNames[nChannelIndex].Empty();
@@ -473,7 +489,7 @@ MaterialKit & H3DF::MaterialKit::UnsetEverything()
 
 bool H3DF::MaterialKit::ShowDiffuseColor(RGBColor & cOutColor) const
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	RGBAColor cTempOutColor;
 	if (false == pcImpl->ShowColor(Material::Channel::DiffuseColor, cTempOutColor)) {
 		return false;
@@ -486,56 +502,56 @@ bool H3DF::MaterialKit::ShowDiffuseColor(RGBColor & cOutColor) const
 
 bool H3DF::MaterialKit::ShowDiffuseColor(RGBAColor & cOutColor) const
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	return pcImpl->ShowColor(Material::Channel::DiffuseColor, cOutColor);
 }
 
 bool H3DF::MaterialKit::ShowDiffuseAlpha(float & fOutAlpha) const
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowAlpah(Material::Channel::DiffuseColor, fOutAlpha);
 }
 
 bool H3DF::MaterialKit::ShowDiffuseTexture(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowTexture(Material::Channel::DiffuseTexture, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialKit::ShowSpecular(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowTexture(Material::Channel::Specular, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialKit::ShowMirror(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowTexture(Material::Channel::Mirror, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialKit::ShowTransmission(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowTexture(Material::Channel::Transmission, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialKit::ShowEmission(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowTexture(Material::Channel::Emission, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialKit::ShowEnvironment(Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowTexture(Material::Channel::EnvironmentTexture, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialKit::ShowBump(CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	if (true == pcImpl->m_strTextureNames[(int)Material::Channel::Bump].IsEmpty()) {
 		return false;
 	}
@@ -549,7 +565,7 @@ bool H3DF::MaterialKit::ShowBump(CStringA & strOutTextureName, CStringA & strOut
 
 bool H3DF::MaterialKit::ShowGloss(float & fOutGloss) const
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	if (0 > pcImpl->m_fGloss) {
 		return false;
 	}
@@ -563,7 +579,7 @@ bool H3DF::MaterialKit::ShowGloss(float & fOutGloss) const
 // 내부에서 단순히 SetColor만 호출한다.
 void H3DF::MaterialKit::SetMaterial(CStringA strInGeometryName, bool bFaseFlag)
 {
-	MaterialKitImpl * pcImpl = (MaterialKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialKitImpl *>(m_pcImpl.get());
 	pcImpl->m_strTextureNames[(int)Material::Channel::DiffuseTexture] = strInGeometryName;
 
 	CStringA strColorText;
@@ -608,7 +624,13 @@ namespace H3DF
 
 		MaterialMappingKitImpl();
 
-		void Copy(MaterialMappingKitImpl * pcInThat) {
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<MaterialMappingKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy(const MaterialMappingKitImpl * pcInThat) {
 			for (int nTypeIndex = 0; nTypeIndex < (int) Type::Count; nTypeIndex++) {
 				m_cMaterial[nTypeIndex] = pcInThat->m_cMaterial[nTypeIndex];
 				m_bMaterialFlag[nTypeIndex] = pcInThat->m_bMaterialFlag[nTypeIndex];
@@ -675,25 +697,24 @@ bool H3DF::MaterialMappingKitImpl::ShowMaterial(H3DF::MaterialMappingKitImpl::Ty
 
 H3DF::MaterialMappingKit::MaterialMappingKit()
 {
-	m_pcImpl = new MaterialMappingKitImpl();
+	m_pcImpl = std::make_unique<MaterialMappingKitImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::MaterialMappingKit::MaterialMappingKit(MaterialMappingKit const & cInKit)
 {
-	m_pcImpl = new MaterialMappingKitImpl();
-	Set(cInKit);
-}
-
-void H3DF::MaterialMappingKit::Set(MaterialMappingKit const & cInThat)
-{
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
-	MaterialMappingKitImpl * pcInThatImpl = (MaterialMappingKitImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::operator = (MaterialMappingKit const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -701,238 +722,238 @@ MaterialMappingKit & H3DF::MaterialMappingKit::operator = (MaterialMappingKit co
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetAmbientLightUpColor(RGBAColor const & cInRgbaColor)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::AmbientLightUp].SetDiffuseColor(cInRgbaColor);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetAmbientLightDownColor(RGBAColor const & cInRgbaColor)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::AmbientLightDown].SetDiffuseColor(cInRgbaColor);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->SetColor(cInRgbaColor, H3DF::MaterialMappingKitImpl::Type::BackFace, eInChannel);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceAlpha(float fInAlpha)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::BackFace].SetDiffuseAlpha(fInAlpha);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceTexture(CStringA strTextureName)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::BackFace].SetDiffuseTexture(strTextureName);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceTextureOption(CStringA strTextureOption)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::BackFace].SetDiffuseTextureOption(strTextureOption);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceGloss(float fInValue)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::BackFace].SetGloss(fInValue);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetBackFaceMaterial(MaterialKit const & cInMaterial)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::BackFace] = cInMaterial;
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->SetColor(cInRgbaColor, H3DF::MaterialMappingKitImpl::Type::FrontFace, eInChannel);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceAlpha(float fInAlpha)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::FrontFace].SetDiffuseAlpha(fInAlpha);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceTexture(CStringA strTextureName)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::FrontFace].SetDiffuseTexture(strTextureName);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceTextureOption(CStringA strTextureOption)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::FrontFace].SetDiffuseTextureOption(strTextureOption);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceGloss(float fInValue)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::FrontFace].SetGloss(fInValue);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetFrontFaceMaterial(MaterialKit const & cInMaterial)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::FrontFace] = cInMaterial;
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetEdgeAlpha(float fInAlpha)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Edge].SetDiffuseAlpha(fInAlpha);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetEdgeColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->SetColor(cInRgbaColor, H3DF::MaterialMappingKitImpl::Type::Edge, eInChannel);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetEdgeTexture(char const * strTextureName)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Edge].SetDiffuseTexture(strTextureName);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetEdgeGloss(float fInValue)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Edge].SetGloss(fInValue);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetEdgeMaterial(MaterialKit const & cInMaterial)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Edge] = cInMaterial;
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->SetColor(cInRgbaColor, H3DF::MaterialMappingKitImpl::Type::Face, eInChannel);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceAlpha(float fInAlpha)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Face].SetDiffuseAlpha(fInAlpha);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceTexture(CStringA strTextureName)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Face].SetDiffuseTexture(strTextureName);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceTextureOption(CStringA strTextureOption)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Face].SetDiffuseTextureOption(strTextureOption);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceGloss(float fInValue)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Face].SetGloss(fInValue);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetFaceMaterial(MaterialKit const & cInMaterial)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Face] = cInMaterial;
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetLineAlpha(float fInAlpha)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Line].SetDiffuseAlpha(fInAlpha);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetLineColor(RGBAColor const & cInRgbaColor)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Line].SetDiffuseColor(cInRgbaColor);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetMarkerColor(RGBAColor const & cInRgbaColor)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Marker].SetDiffuseColor(cInRgbaColor);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetTextColor(RGBAColor const & cInRgbaColor)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Text].SetDiffuseColor(cInRgbaColor);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetVertexAlpha(float fInAlpha)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Vertex].SetDiffuseAlpha(fInAlpha);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetVertexColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->SetColor(cInRgbaColor, H3DF::MaterialMappingKitImpl::Type::Vertex, eInChannel);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetVertexTexture(CStringA strTextureName)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Vertex].SetDiffuseTexture(strTextureName);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetVertexGloss(float fInValue)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Vertex].SetGloss(fInValue);
 	return *this;
 }
 
 MaterialMappingKit & H3DF::MaterialMappingKit::SetVertexMaterial(MaterialKit const & cInMaterial)
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Vertex] = cInMaterial;
 	return *this;
 }
@@ -951,8 +972,8 @@ MaterialMappingKit & H3DF::MaterialMappingKit::SetGeometryColor(RGBAColor const 
 
 bool H3DF::MaterialMappingKit::operator == (MaterialMappingKit const & cInThat) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
-	MaterialMappingKitImpl * pcInThatImpl = (MaterialMappingKitImpl *)cInThat.m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
+	auto pcInThatImpl = static_cast<const MaterialMappingKitImpl *>(cInThat.GetImpl());
 
 	for (int nTypeIndex = 0; nTypeIndex < (int)H3DF::MaterialMappingKitImpl::Type::Count; nTypeIndex++) {
 		if (pcImpl->m_cMaterial[nTypeIndex] != pcInThatImpl->m_cMaterial[nTypeIndex]) {
@@ -974,98 +995,98 @@ bool H3DF::MaterialMappingKit::operator != (MaterialMappingKit const & cInThat) 
 
 bool H3DF::MaterialMappingKit::ShowAmbientLightUpColor(Material::Type & cOutType, RGBAColor & cOutColor) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	return pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::AmbientLightUp].ShowDiffuseColor(cOutColor);
 
 }
 
 bool H3DF::MaterialMappingKit::ShowAmbientLightDownColor(Material::Type & cOutType, RGBAColor & cOutColor) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	return pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::AmbientLightDown].ShowDiffuseColor(cOutColor);
 }
 
 bool H3DF::MaterialMappingKit::ShowBackFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowChannel(H3DF::MaterialMappingKitImpl::Type::BackFace, eInChannel, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialMappingKit::ShowBackFaceMaterial(MaterialKit & cOutKit) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowMaterial(H3DF::MaterialMappingKitImpl::Type::BackFace, cOutKit);
 }
 
 bool H3DF::MaterialMappingKit::ShowFrontFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowChannel(H3DF::MaterialMappingKitImpl::Type::FrontFace, eInChannel, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialMappingKit::ShowFrontFaceMaterial(MaterialKit & cOutKit) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowMaterial(H3DF::MaterialMappingKitImpl::Type::FrontFace, cOutKit);
 }
 
 bool H3DF::MaterialMappingKit::ShowEdgeChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowChannel(H3DF::MaterialMappingKitImpl::Type::Edge, eInChannel, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialMappingKit::ShowEdgeMaterial(MaterialKit & cOutKit) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowMaterial(H3DF::MaterialMappingKitImpl::Type::Edge, cOutKit);
 }
 
 bool H3DF::MaterialMappingKit::ShowFaceChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowChannel(H3DF::MaterialMappingKitImpl::Type::Face, eInChannel, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialMappingKit::ShowFaceMaterial(MaterialKit & cOutKit) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowMaterial(H3DF::MaterialMappingKitImpl::Type::Face, cOutKit);
 }
 
 bool H3DF::MaterialMappingKit::ShowLineAlpha(float & fOutAlpha) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	return pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Line].ShowDiffuseAlpha(fOutAlpha);
 }
 
 bool H3DF::MaterialMappingKit::ShowLineColor(RGBAColor & cOutColor) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	return pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Line].ShowDiffuseColor(cOutColor);
 }
 
 bool H3DF::MaterialMappingKit::ShowMarkerColor(RGBAColor & cOutColor) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	return pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Marker].ShowDiffuseColor(cOutColor);
 }
 
 bool H3DF::MaterialMappingKit::ShowTextColor(RGBAColor & cOutColor) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	return pcImpl->m_cMaterial[(int)H3DF::MaterialMappingKitImpl::Type::Text].ShowDiffuseColor(cOutColor);
 }
 
 bool H3DF::MaterialMappingKit::ShowVertexChannel(Material::Channel eInChannel, Material::Type & cOutType, RGBAColor & cOutColor, CStringA & strOutTextureName, CStringA & strOutTextureOptions) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowChannel(H3DF::MaterialMappingKitImpl::Type::Vertex, eInChannel, cOutType, cOutColor, strOutTextureName, strOutTextureOptions);
 }
 
 bool H3DF::MaterialMappingKit::ShowVertexMaterial(MaterialKit & cOutKit) const
 {
-	MaterialMappingKitImpl * pcImpl = (MaterialMappingKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<MaterialMappingKitImpl *>(m_pcImpl.get());
 	return pcImpl->ShowMaterial(H3DF::MaterialMappingKitImpl::Type::Vertex, cOutKit);
 }
 
@@ -1073,9 +1094,13 @@ bool H3DF::MaterialMappingKit::ShowVertexMaterial(MaterialKit & cOutKit) const
 class MaterialMappingControlImpl : public ControlImpl
 {
 public:
-	MaterialMappingControlImpl() { m_eType = H3DF::Type::MaterialMappingControl; }
+	std::unique_ptr<Impl> Clone() const override {
+		auto pcClone = std::make_unique<MaterialMappingControlImpl>();
+		pcClone->Copy(this);
+		return pcClone;
+	}
 
-	void Copy(ControlImpl * pcInThat)
+	void Copy(const ControlImpl * pcInThat)
 	{
 		ControlImpl::Copy(pcInThat);
 	}
@@ -1192,38 +1217,32 @@ void MaterialMappingControlImpl::SetColor(CStringA strGeometry, RGBAColor const 
 
 H3DF::MaterialMappingControl::MaterialMappingControl(SegmentKey const & cInThat)
 {
-	MaterialMappingControlImpl * pcImpl = new MaterialMappingControlImpl();
-	m_pcImpl = pcImpl;
-	
+	m_pcImpl = std::make_unique<MaterialMappingControlImpl>();
+	auto pcImpl = dynamic_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
+
 	pcImpl->m_cOverrideKey = cInThat;
 }
 
 H3DF::MaterialMappingControl::MaterialMappingControl(MaterialMappingControl const & cInThat)
 {
-	m_pcImpl = new MaterialMappingControlImpl();
-	Set(cInThat);
-}
-
-void H3DF::MaterialMappingControl::Set(MaterialMappingControl const & cInThat)
-{
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	MaterialMappingControlImpl * pcInThatImpl = static_cast<MaterialMappingControlImpl *>(cInThat.m_pcImpl);
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 MaterialMappingControl & H3DF::MaterialMappingControl::operator = (MaterialMappingControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 MaterialMappingControl & H3DF::MaterialMappingControl::SetFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetColor("faces", cInRgbaColor, eInChannel);
@@ -1233,7 +1252,7 @@ MaterialMappingControl & H3DF::MaterialMappingControl::SetFaceColor(RGBAColor co
 
 MaterialMappingControl & H3DF::MaterialMappingControl::SetFaceAlpha(float fInAlpha)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetAlpha("faces", fInAlpha);
@@ -1243,7 +1262,7 @@ MaterialMappingControl & H3DF::MaterialMappingControl::SetFaceAlpha(float fInAlp
 
 MaterialMappingControl & H3DF::MaterialMappingControl::SetFaceTexture(CStringA strInTextureName, Material::Texture::Channel eInChannel, size_t nInLayer)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetFaceTexture(strInTextureName, eInChannel, nInLayer);
@@ -1253,7 +1272,7 @@ MaterialMappingControl & H3DF::MaterialMappingControl::SetFaceTexture(CStringA s
 
 MaterialMappingControl & H3DF::MaterialMappingControl::SetBackFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetColor("back", cInRgbaColor, eInChannel);
@@ -1263,7 +1282,7 @@ MaterialMappingControl & H3DF::MaterialMappingControl::SetBackFaceColor(RGBAColo
 
 MaterialMappingControl & H3DF::MaterialMappingControl::SetBackFaceAlpha(float fInAlpha)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetAlpha("back", fInAlpha);
@@ -1273,7 +1292,7 @@ MaterialMappingControl & H3DF::MaterialMappingControl::SetBackFaceAlpha(float fI
 
 MaterialMappingControl & H3DF::MaterialMappingControl::SetFrontFaceColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetColor("front", cInRgbaColor, eInChannel);
@@ -1283,7 +1302,7 @@ MaterialMappingControl & H3DF::MaterialMappingControl::SetFrontFaceColor(RGBACol
 
 MaterialMappingControl & H3DF::MaterialMappingControl::SetFrontFaceAlpha(float fInAlpha)
 { 
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetAlpha("front", fInAlpha);
@@ -1293,7 +1312,7 @@ MaterialMappingControl & H3DF::MaterialMappingControl::SetFrontFaceAlpha(float f
 
 MaterialMappingControl & H3DF::MaterialMappingControl::SetEdgeColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) { assert(false); }
 
 	pcImpl->SetColor("edges", cInRgbaColor, eInChannel);
@@ -1303,7 +1322,7 @@ MaterialMappingControl & H3DF::MaterialMappingControl::SetEdgeColor(RGBAColor co
 
 MaterialMappingControl & H3DF::MaterialMappingControl::SetMarkerColor(RGBAColor const & cInRgbaColor, Material::Color::Channel eInChannel)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) { assert(false); }
 
 	pcImpl->SetColor("markers", cInRgbaColor, eInChannel);
@@ -1313,7 +1332,7 @@ MaterialMappingControl & H3DF::MaterialMappingControl::SetMarkerColor(RGBAColor 
 
 MaterialMappingControl & H3DF::MaterialMappingControl::UnSetColor(CStringA strInType)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) { assert(false); }
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -1325,7 +1344,7 @@ MaterialMappingControl & H3DF::MaterialMappingControl::UnSetColor(CStringA strIn
 
 void H3DF::MaterialMappingControl::InitPopulateTextures()
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) { assert(false); }
 
 	InitializeMagick(".");
@@ -1337,7 +1356,7 @@ void H3DF::MaterialMappingControl::InitPopulateTextures()
 
 void H3DF::MaterialMappingControl::InsertPicture(UINT nIndex, UINT nPixelWidth, UINT nPixelHeight, UCHAR * pucBinaryData)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) { assert(false); }
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -1365,7 +1384,7 @@ void H3DF::MaterialMappingControl::InsertDifaultPicture(UINT nIndex, UINT nSize,
 		DestroyImageInfo(image_info);
 		DestroyExceptionInfo(&exception);
 
-		MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+		auto pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
 		if (nullptr == pcImpl) { assert(false); }
 
 		SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -1379,7 +1398,7 @@ void H3DF::MaterialMappingControl::InsertDifaultPicture(UINT nIndex, UINT nSize,
 
 void H3DF::MaterialMappingControl::SetTextureMatrix(float * pfTextureMatrix, char * pchTextureTransformSegment)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) { assert(false); }
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -1403,7 +1422,7 @@ void H3DF::MaterialMappingControl::SetTextureMatrix(float * pfTextureMatrix, cha
 
 void H3DF::MaterialMappingControl::SetDefineLocalTexture(UINT nIndex, CStringA strTextureOptions)
 {
-	MaterialMappingControlImpl * pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<MaterialMappingControlImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) { assert(false); }
 
 	CStringA strText;

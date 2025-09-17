@@ -15,23 +15,28 @@ using namespace H3DF;
 
 H3DF::Model::Model()
 {
-	ModelImpl * pcImpl = new ModelImpl();
-	pcImpl->Init();
+	m_pcImpl = std::make_unique<ModelImpl>();
+	DEBUG_VALID(m_pcImpl);
 
-	m_pcImpl = pcImpl;
+	m_pcImpl->SetType(H3DF::Type::Model);
+
+	auto pcImpl = static_cast<ModelImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->Init();
 }
 
-SegmentKey H3DF::Model::GetSegmentKey()
+SegmentKey & H3DF::Model::GetSegmentKey()
 {
-	ModelImpl* pcImpl = static_cast<ModelImpl*>(m_pcImpl);
+	auto pcImpl = static_cast<ModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetSegmentKey();
 }
 
-SegmentKey const H3DF::Model::GetSegmentKey() const
+SegmentKey const & H3DF::Model::GetSegmentKey() const
 {
-	ModelImpl * pcImpl = static_cast<ModelImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetSegmentKey();
@@ -39,7 +44,7 @@ SegmentKey const H3DF::Model::GetSegmentKey() const
 
 PortfolioKey H3DF::Model::GetPortfolioKey()
 {
-	ModelImpl * pcImpl = static_cast<ModelImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetPortfolioKey();
@@ -47,7 +52,7 @@ PortfolioKey H3DF::Model::GetPortfolioKey()
 
 PortfolioKey const H3DF::Model::GetPortfolioKey() const
 {
-	ModelImpl * pcImpl = static_cast<ModelImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetPortfolioKey();
@@ -55,7 +60,7 @@ PortfolioKey const H3DF::Model::GetPortfolioKey() const
 
 void H3DF::Model::SetBRepGeometry(bool brep)
 {
-	ModelImpl * pcImpl = static_cast<ModelImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->SetBRepGeometry(brep);
@@ -63,7 +68,7 @@ void H3DF::Model::SetBRepGeometry(bool brep)
 
 H3DF::ModelHandedness H3DF::Model::GetModelHandedness() 
 {
-	ModelImpl * pcImpl = static_cast<ModelImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetModelHandedness(); 
@@ -71,7 +76,7 @@ H3DF::ModelHandedness H3DF::Model::GetModelHandedness()
 
 void H3DF::Model::UpdateModelHandedness()
 {
-	ModelImpl * pcImpl = static_cast<ModelImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->UpdateModelHandedness();
@@ -79,7 +84,7 @@ void H3DF::Model::UpdateModelHandedness()
 
 SegmentKey & H3DF::Model::ModelsRoot() const
 {
-	ModelImpl * pcImpl = static_cast<ModelImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cModelsRoot;
@@ -87,7 +92,7 @@ SegmentKey & H3DF::Model::ModelsRoot() const
 
 SegmentKey & H3DF::Model::MeasurementsRoot() const
 {
-	ModelImpl * pcImpl = static_cast<ModelImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cMeasurementsRoot;
@@ -95,7 +100,7 @@ SegmentKey & H3DF::Model::MeasurementsRoot() const
 
 SegmentKey & H3DF::Model::MarkupsRoot() const
 {
-	ModelImpl * pcImpl = static_cast<ModelImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cMarkupsRoot;
@@ -103,7 +108,7 @@ SegmentKey & H3DF::Model::MarkupsRoot() const
 
 SegmentKey & H3DF::Model::IncludeModel() const
 {
-	ModelImpl * pcImpl = static_cast<ModelImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cIncludeModel;
@@ -111,7 +116,7 @@ SegmentKey & H3DF::Model::IncludeModel() const
 
 SegmentKey & H3DF::Model::IncludeStyles() const
 {
-	ModelImpl * pcImpl = static_cast<ModelImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_cIncludeStyles;

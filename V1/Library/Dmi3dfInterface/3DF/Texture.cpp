@@ -8,16 +8,13 @@ using namespace H3DF;
 //== TextureOptionsKit class =======================================================================
 H3DF::TextureOptionsKit::TextureOptionsKit()
 {
-	m_pcImpl = new TextureOptionsKitImpl();
+	m_pcImpl = std::make_unique<TextureOptionsKitImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::TextureOptionsKit::TextureOptionsKit(TextureOptionsKit const & cInKit)
 {
-	m_pcImpl = new TextureOptionsKitImpl();
-	DEBUG_VALID(m_pcImpl);
-
-	Set(cInKit);
+	m_pcImpl = (nullptr != cInKit.m_pcImpl) ? cInKit.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::TextureOptionsKit::TextureOptionsKit(TextureOptionsKit && cInThat) noexcept : 
@@ -31,21 +28,15 @@ TextureOptionsKit & H3DF::TextureOptionsKit::operator = (TextureOptionsKit && cI
 	return *this;
 }
 
-void H3DF::TextureOptionsKit::Set(TextureOptionsKit const & cInKit)
-{
-	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	TextureOptionsKitImpl * pccInKitImpl = static_cast<TextureOptionsKitImpl *>(cInKit.m_pcImpl);
-	DEBUG_VALID(pccInKitImpl);
-
-	pcImpl->Copy(pccInKitImpl);
-
-}
-
 TextureOptionsKit const & H3DF::TextureOptionsKit::operator = (TextureOptionsKit const & cInKit)
 {
-	Set(cInKit);
+	if (nullptr != cInKit.m_pcImpl) {
+		m_pcImpl = cInKit.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -56,7 +47,7 @@ void H3DF::TextureOptionsKit::Show(TextureOptionsKit & cOutKit) const
 
 bool H3DF::TextureOptionsKit::Empty() const
 {
-	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<TextureOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bDecalFlag = false;
@@ -72,10 +63,10 @@ bool H3DF::TextureOptionsKit::Empty() const
 
 bool H3DF::TextureOptionsKit::Equals(TextureOptionsKit const & cInKit) const
 {
-	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<TextureOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
-	TextureOptionsKitImpl * pcInKitImpl = static_cast<TextureOptionsKitImpl *>(cInKit.m_pcImpl);
+	auto pcInKitImpl = static_cast<TextureOptionsKitImpl *>(cInKit.m_pcImpl.get());
 	DEBUG_VALID(pcInKitImpl);
 
 	if (pcImpl->m_bDecalFlag != pcInKitImpl->m_bDecalFlag) {
@@ -142,7 +133,7 @@ bool H3DF::TextureOptionsKit::operator != (TextureOptionsKit const & cInKit) con
 
 TextureOptionsKit & H3DF::TextureOptionsKit::SetDecal(bool bInState)
 {
-	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<TextureOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bDecal = bInState;
@@ -153,7 +144,7 @@ TextureOptionsKit & H3DF::TextureOptionsKit::SetDecal(bool bInState)
 
 TextureOptionsKit & H3DF::TextureOptionsKit::SetDownSampling(bool bInState)
 {
-	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<TextureOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bDownSampling = bInState;
@@ -165,7 +156,7 @@ TextureOptionsKit & H3DF::TextureOptionsKit::SetDownSampling(bool bInState)
 
 TextureOptionsKit & H3DF::TextureOptionsKit::SetModulation(bool bInState)
 {
-	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<TextureOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	
 	pcImpl->m_bModulation = bInState;
@@ -177,7 +168,7 @@ TextureOptionsKit & H3DF::TextureOptionsKit::SetModulation(bool bInState)
 
 TextureOptionsKit & H3DF::TextureOptionsKit::SetParameterOffset(size_t nInSffset)
 {
-	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<TextureOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	
 	pcImpl->m_nParameterOffset = nInSffset;
@@ -188,7 +179,7 @@ TextureOptionsKit & H3DF::TextureOptionsKit::SetParameterOffset(size_t nInSffset
 
 TextureOptionsKit & H3DF::TextureOptionsKit::SetParameterizationSource(Material::Texture::Parameterization cInSource)
 {
-	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<TextureOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_eParameterization = cInSource;
@@ -199,7 +190,7 @@ TextureOptionsKit & H3DF::TextureOptionsKit::SetParameterizationSource(Material:
 
 TextureOptionsKit & H3DF::TextureOptionsKit::SetTiling(Material::Texture::Tiling eInTiling)
 {
-	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<TextureOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_eTiling = eInTiling;
@@ -210,7 +201,7 @@ TextureOptionsKit & H3DF::TextureOptionsKit::SetTiling(Material::Texture::Tiling
 
 TextureOptionsKit & H3DF::TextureOptionsKit::SetInterpolationFilter(Material::Texture::Interpolation eInFilter)
 {
-	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<TextureOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_eInterpolation = eInFilter;
@@ -221,7 +212,7 @@ TextureOptionsKit & H3DF::TextureOptionsKit::SetInterpolationFilter(Material::Te
 
 TextureOptionsKit & H3DF::TextureOptionsKit::SetDecimationFilter(Material::Texture::Decimation eInFilter)
 {
-	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<TextureOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_eDecimation = eInFilter;
@@ -232,7 +223,7 @@ TextureOptionsKit & H3DF::TextureOptionsKit::SetDecimationFilter(Material::Textu
 
 TextureOptionsKit & H3DF::TextureOptionsKit::SetTransformMatrix(MatrixKit const & cInTransform)
 {
-	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<TextureOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cTransform = cInTransform;
@@ -243,7 +234,7 @@ TextureOptionsKit & H3DF::TextureOptionsKit::SetTransformMatrix(MatrixKit const 
 
 TextureOptionsKit & H3DF::TextureOptionsKit::SetValueScale(float fInMin, float fInMax)
 {
-	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<TextureOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_fValueScaleMin = fInMin;
@@ -255,7 +246,7 @@ TextureOptionsKit & H3DF::TextureOptionsKit::SetValueScale(float fInMin, float f
 
 bool H3DF::TextureOptionsKit::ShowParameterizationSource(Material::Texture::Parameterization & cOutSource) const
 {
-	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<TextureOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (false == pcImpl->m_bParameterizationFlag) {
@@ -269,7 +260,7 @@ bool H3DF::TextureOptionsKit::ShowParameterizationSource(Material::Texture::Para
 
 bool H3DF::TextureOptionsKit::ShowTransformMatrix(MatrixKit & cOutTransform) const
 {
-	TextureOptionsKitImpl * pcImpl = static_cast<TextureOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<TextureOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (false == pcImpl->m_bTransformFlag) {
@@ -283,25 +274,36 @@ bool H3DF::TextureOptionsKit::ShowTransformMatrix(MatrixKit & cOutTransform) con
 //== TextureDefinition class =======================================================================
 H3DF::TextureDefinition::TextureDefinition()
 {
-	m_pcImpl = new TextureDefinitionImpl();
+	m_pcImpl = std::make_unique<TextureDefinitionImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::TextureDefinition::TextureDefinition(Definition const & cInThat)
 {
+	// PolygonShapeElementImpl 생성
+	m_pcImpl = std::make_unique<TextureDefinitionImpl>();
+	auto pcImpl = static_cast<TextureDefinitionImpl *>(m_pcImpl.get());
+
+	auto pcInThatImpl = static_cast<const DefinitionImpl *>(cInThat.GetImpl());
+
+	if (nullptr != pcImpl && nullptr != pcInThatImpl) {
+		pcImpl->DefinitionImpl::Copy(pcInThatImpl);
+	}
+	else {
+		DEBUG_STOP;
+	}
+
 	if (H3DF::Type::TextureDefinition != cInThat.Type())
 	{
 		DEBUG_STOP;
 		return;
 	}
-
-	m_pcImpl = new TextureDefinitionImpl();
-	Set(cInThat);
 }
 
 H3DF::TextureDefinition::TextureDefinition(TextureDefinition const & cInThat)
 {
-	m_pcImpl = new TextureDefinitionImpl();
-	Set(cInThat);
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::TextureDefinition::TextureDefinition(TextureDefinition && cInThat) noexcept :
@@ -316,19 +318,14 @@ TextureDefinition & H3DF::TextureDefinition::operator = (TextureDefinition && cI
 	return *this;
 }
 
-void H3DF::TextureDefinition::Set(TextureDefinition const & cInKit)
-{
-	TextureDefinitionImpl * pcImpl = static_cast<TextureDefinitionImpl *> (m_pcImpl);
-
-	DEBUG_VALID(pcImpl);
-	TextureDefinitionImpl * pcInKitImpl = static_cast<TextureDefinitionImpl *>(cInKit.m_pcImpl);
-	DEBUG_VALID(pcInKitImpl);
-
-	pcImpl->Copy(pcInKitImpl);
-}
-
 TextureDefinition const & H3DF::TextureDefinition::operator = (TextureDefinition const & cInKit)
 {
-	Set(cInKit);
+	if (nullptr != cInKit.m_pcImpl) {
+		m_pcImpl = cInKit.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }

@@ -23,9 +23,13 @@ namespace H3DF
 	class SelectionOptionsKitImpl : public Impl
 	{
 	public:
-		SelectionOptionsKitImpl() { m_eType = H3DF::Type::SelectionOptionsKit; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<SelectionOptionsKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(SelectionOptionsKitImpl * pcInThat) {
+		void Copy(const SelectionOptionsKitImpl * pcInThat) {
 			fProximity = pcInThat->fProximity;
 			bProximity = pcInThat->bProximity;
 			eLevel = pcInThat->eLevel;
@@ -42,6 +46,8 @@ namespace H3DF
 			bGranularity = pcInThat->bGranularity;
 			eBias = pcInThat->eBias;
 			bBias = pcInThat->bBias;
+
+			bSetScopeFlag = pcInThat->bSetScopeFlag;
 			cStartSegment = pcInThat->cStartSegment;
 			cStartPath = pcInThat->cStartPath;
 			bScopeOnly = pcInThat->bScopeOnly;
@@ -65,6 +71,8 @@ namespace H3DF
 		Selection::Granularity eGranularity = Selection::Granularity::General;
 		Selection::Bias eBias = Selection::Bias::None;
 
+		// Scope 관련 변수
+		bool bSetScopeFlag = false;
 		SegmentKey cStartSegment;
 		KeyPath cStartPath;
 		bool bScopeOnly = false;
@@ -73,12 +81,15 @@ namespace H3DF
 	class SelectionOptionsControlImpl : public ControlImpl
 	{
 	public:
-		SelectionOptionsControlImpl() { m_eType = H3DF::Type::SelectionOptionsControl; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<SelectionOptionsControlImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(SelectionOptionsControlImpl * pcInThat) {
+		void Copy(const SelectionOptionsControlImpl * pcInThat) {
 			m_pcWindow = pcInThat->m_pcWindow;
 			m_pcSelectionSet = pcInThat->m_pcSelectionSet;
-
 		}
 
 		WindowKey * GetWindow() { return (WindowKey *) m_pcWindow; }
@@ -90,9 +101,13 @@ namespace H3DF
 	class SelectionItemImpl : public Impl
 	{
 	public:
-		SelectionItemImpl() { m_eType = H3DF::Type::SelectionItem; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<SelectionItemImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(SelectionItemImpl * pcInThat) {
+		void Copy(const SelectionItemImpl * pcInThat) {
 			m_vcKeys = pcInThat->m_vcKeys;
 			m_vcTypes = pcInThat->m_vcTypes;
 
@@ -140,9 +155,13 @@ namespace H3DF
 	class SelectionResultsIteratorImpl : public Impl
 	{
 	public:
-		SelectionResultsIteratorImpl() { m_eType = H3DF::Type::SelectionResultsIterator; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<SelectionResultsIteratorImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(SelectionResultsIteratorImpl * pcInThat) {
+		void Copy(const SelectionResultsIteratorImpl * pcInThat) {
 			pcIterator = pcInThat->pcIterator;
 			pcBeginIterator = pcInThat->pcBeginIterator;
 			pcEndIterator = pcInThat->pcEndIterator;
@@ -156,9 +175,13 @@ namespace H3DF
 	class SelectionResultsImpl : public Impl
 	{
 	public:
-		SelectionResultsImpl() { m_eType = H3DF::Type::SelectionResults; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<SelectionResultsImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(SelectionResultsImpl * pcInThat) {
+		void Copy(const SelectionResultsImpl * pcInThat) {
 			m_deItems.clear();
 			for (auto cItem : pcInThat->m_deItems) {
 				m_deItems.push_back(cItem);
@@ -202,9 +225,13 @@ namespace H3DF
 			Line
 		};
 
-		SelectionControlImpl() { m_eType = H3DF::Type::SelectionControl; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<SelectionControlImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(SelectionControlImpl * pcInThat) {
+		void Copy(const SelectionControlImpl * pcInThat) {
 			m_cWindow = pcInThat->m_cWindow;
 			m_pcSelectionSet = pcInThat->m_pcSelectionSet;
 		}

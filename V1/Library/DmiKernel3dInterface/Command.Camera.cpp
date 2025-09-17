@@ -58,10 +58,7 @@ KERNEL::Command::CameraImpl::CameraImpl(const Session * pcInSession)
 	: SetImpl(pcInSession)
 {
 	WindowKey cWindow = Canvas().GetWindowKey();
-	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *) cWindow.GetImpl();
-	DEBUG_VALID(pcWindowImpl);
-
-	m_pcCameraControl = new H3DF::Operator::CameraControl(Window(), pcWindowImpl->GetNavigationCube());
+	m_pcCameraControl = new H3DF::Operator::CameraControl(Window(), cWindow.GetNavigationCube());
 }
 
 KERNEL::Command::CameraImpl::~CameraImpl()

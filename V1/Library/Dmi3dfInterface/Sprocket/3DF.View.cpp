@@ -52,20 +52,12 @@ using namespace std::chrono;
 
 H3DF::View::View()
 {
-	m_pcImpl = new ViewImpl();
-	if (nullptr == m_pcImpl) {
-		assert(false);
-	}
+	m_pcImpl = std::make_unique<ViewImpl>();
 }
 
 H3DF::View::View(View const & cInThat)
 {
-	m_pcImpl = new ViewImpl();
-	if (nullptr == m_pcImpl) {
-		assert(false);
-	}
-
-	Set(cInThat);
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 H3DF::View::~View()
@@ -73,22 +65,21 @@ H3DF::View::~View()
 	
 }
 
-void H3DF::View::Set(View const & cInThat)
-{
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
-	ViewImpl * pcInThatImpl = (ViewImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
-}
-
 View const & H3DF::View::operator = (View const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 Model & H3DF::View::GetAttachedModel() const
 {
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetAttachedModel();
@@ -96,7 +87,7 @@ Model & H3DF::View::GetAttachedModel() const
 
 SegmentKey H3DF::View::GetSegmentKey()
 {
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetSegmentKey();
@@ -104,7 +95,7 @@ SegmentKey H3DF::View::GetSegmentKey()
 
 SegmentKey const H3DF::View::GetSegmentKey() const
 {
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetSegmentKey();
@@ -112,7 +103,7 @@ SegmentKey const H3DF::View::GetSegmentKey() const
 
 SegmentKey H3DF::View::GetModelOverrideSegmentKey()
 {
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetModelKey();
@@ -120,7 +111,7 @@ SegmentKey H3DF::View::GetModelOverrideSegmentKey()
 
 SegmentKey const H3DF::View::GetModelOverrideSegmentKey() const
 {
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetModelKey();
@@ -128,7 +119,7 @@ SegmentKey const H3DF::View::GetModelOverrideSegmentKey() const
 
 PortfolioKey const H3DF::View::GetPortfolioKey() const
 {
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetAttachedModel().GetPortfolioKey();
@@ -136,7 +127,7 @@ PortfolioKey const H3DF::View::GetPortfolioKey() const
 
 PortfolioKey H3DF::View::GetPortfolioKey()
 {
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetAttachedModel().GetPortfolioKey();
@@ -146,7 +137,7 @@ PortfolioKey H3DF::View::GetPortfolioKey()
 
 bool H3DF::View::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -156,7 +147,7 @@ bool H3DF::View::Char(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 bool H3DF::View::KeyboardInput(Json::Object & input)
 {
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -166,7 +157,7 @@ bool H3DF::View::KeyboardInput(Json::Object & input)
 
 bool H3DF::View::ExecuteKeyboardSignal(int nAction, Json::Object& cInObject)
 {
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) {
 		RETURN_FALSE;
 	}
@@ -177,7 +168,7 @@ bool H3DF::View::ExecuteKeyboardSignal(int nAction, Json::Object& cInObject)
 //== Select 관련 함수 ========================================================================
 void H3DF::View::SetSubentitySelectLevel()
 {
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	//pcImpl->SetSubentitySelectLevel();
@@ -187,7 +178,7 @@ void H3DF::View::SetSubentitySelectLevel()
 //== View Style 관련 함수 ====================================================================
 void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 {
-	ViewImpl * pcViewImpl = static_cast<ViewImpl *>(m_pcImpl);
+	auto pcViewImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcViewImpl);
 
 	if (H3DF::Type::None == pcViewImpl->GetWindowKey().Type()) {
@@ -294,7 +285,7 @@ void H3DF::View::SetRenderingMode(Rendering::Mode eInMode)
 
 Rendering::Mode H3DF::View::GetRenderingMode() const
 {
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_eRenderingMode;
@@ -302,7 +293,7 @@ Rendering::Mode H3DF::View::GetRenderingMode() const
 
 void H3DF::View::SetViewDirection(ViewDirection::Mode eInMode)
 {
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (H3DF::Type::None == pcImpl->GetWindowKey().Type()) {
@@ -320,7 +311,7 @@ void H3DF::View::SetViewDirection(ViewDirection::Mode eInMode)
 
 void H3DF::View::SaveHsfFile(CString strFilePathName, Canvas * pcHoopsView)
 {
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	HIOUtilityHsf cUtilityHsf;
@@ -355,7 +346,7 @@ void H3DF::View::SaveHsfFile(CString strFilePathName, Canvas * pcHoopsView)
 // param: fInPercentOffset distance to add between the model's bounding box and the position of the shadow plane If not specified, it is set to 5%.
 void H3DF::View::SetSimpleShadow(bool bInState, float fInPercentOffset)
 {
-	ViewImpl * pcViewImpl = (ViewImpl *)m_pcImpl;
+	auto pcViewImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcViewImpl);
 
 	SegmentKey cViewSegment = pcViewImpl->GetSegmentKey();
@@ -379,7 +370,7 @@ void H3DF::View::SetSimpleShadow(bool bInState, float fInPercentOffset)
 // Returns the status of the simple shadows
 bool H3DF::View::GetSimpleShadow()
 {
-	ViewImpl * pcViewImpl = (ViewImpl *)m_pcImpl;
+	auto pcViewImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcViewImpl);
 
 	if (H3DF::VisualEffects::ShadowMode::None == (H3DF::VisualEffects::ShadowMode)pcViewImpl->GetBaseView()->GetShadowMode()) {
@@ -394,7 +385,7 @@ bool H3DF::View::GetSimpleShadow()
 // param: in_percent_offset distance to add between the model's bounding box and the position of the reflection plane If not specified, it is set to 5%.
 void H3DF::View::SetSimpleReflection(bool bInState, float fInPercentOffset)
 {
-	ViewImpl * pcViewImpl = (ViewImpl *)m_pcImpl;
+	auto pcViewImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcViewImpl);
 
 	pcViewImpl->SetSimpleReflection(bInState);
@@ -411,7 +402,7 @@ void H3DF::View::SetSimpleReflection(bool bInState, float fInPercentOffset)
 // Returns the status of the simple reflection
 bool H3DF::View::GetSimpleReflection()
 {
-	ViewImpl * pcViewImpl = (ViewImpl *)m_pcImpl;
+	auto pcViewImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcViewImpl);
 
 	return pcViewImpl->GetSimpleReflection();
@@ -420,7 +411,7 @@ bool H3DF::View::GetSimpleReflection()
 // Smoothly moves the camera from the current position to the one specified by the user.
 void H3DF::View::SmoothTransition(H3DF::CameraKit const & cInCamera)
 {
-	ViewImpl * pcImpl = (ViewImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->GetBaseView()->InvalidateSceneBounding();
@@ -475,7 +466,7 @@ void H3DF::View::SmoothTransition(H3DF::CameraKit const & cInCamera)
 
 void H3DF::View::LoadPointCloudFile(CString strFilePathName)
 {
-	ViewImpl * pcImpl = static_cast<ViewImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<ViewImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) {
 		DEBUG_RETURN;
 	}
@@ -534,7 +525,7 @@ bool H3DF::View::DoDynamicHighlighting(H3DF::HighlightControl & cHighlightContro
 
 	H3DF::HighlightControlImpl * pcHighlightControlImpl = (H3DF::HighlightControlImpl *) cHighlightControl.GetImpl();
 	
-	ViewImpl * pcImpl = dynamic_cast<ViewImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ViewImpl *> (m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	HC_KEY nViewKey = pcHighlightControlImpl->GetBaseView()->GetViewKey();

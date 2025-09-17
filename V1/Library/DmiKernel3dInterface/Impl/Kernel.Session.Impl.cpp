@@ -122,8 +122,7 @@ void KERNEL::SessionImpl::AllocationOperator(const Session * pcInSession)
 	// Navigation Cube에서 사용하는 DynHighlightControl을 설정한다. Cube에서 선택된 부분을 Unhighlight하기 위함.
 	KERNEL::Command::Select * pcSelect = (KERNEL::Command::Select *)m_mpcCommonCommandMap[KERNEL::Command::Type::Select];
 
-	WindowKeyImpl * pcWindowImpl = (WindowKeyImpl *)GetCanvas().GetWindowKey().GetImpl();
-	pcWindowImpl->GetNavigationCube().SetHighlightControl(pcSelect->DynHighlightControl());
+	GetCanvas().GetWindowKey().GetNavigationCube().SetHighlightControl(pcSelect->DynHighlightControl());
 }
 
 KERNEL::Command::Set * KERNEL::SessionImpl::GetOperator(Command::Type eInType)

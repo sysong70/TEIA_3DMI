@@ -24,9 +24,9 @@ using namespace H3DF;
 H3DF::ModelImpl::ModelImpl()
 	: HBaseModel()
 {
-	m_cSegmentKey.Set(GetModelKey());
+	m_cSegmentKey = SegmentKey(GetModelKey());
 
-	SegmentKeyImpl * pcImpl = static_cast<SegmentKeyImpl *>(m_cSegmentKey.GetImpl());
+	auto pcImpl = static_cast<SegmentKeyImpl *>(m_cSegmentKey.GetImpl());
 	pcImpl->SetType(H3DF::Type::Model);
 
 	SetBRepGeometry(false);
@@ -106,11 +106,10 @@ void H3DF::ModelImpl::Init()
 
 	m_cModelsRoot.GetStyleControl().PushSegment(m_cShowStyle);
 
-
-	// #Model: Portfolio 생성
+	// #Model #Portfolio: Portfolio 생성 
 	// 신규 Portfolio를 생성함. Portfolios는 Root Segment에 생성한다.
 //	SegmentKey cPortfolios("/portfolios");
-// 
+
 	// Root에 만드는 경우 Portfolio가 계속적으로 메모리에 남아있게 됨.
  	SegmentKey cPortfolios = m_cSegmentKey.Subsegment("portfolios");
 
@@ -125,6 +124,9 @@ void H3DF::ModelImpl::Init()
 	PortfolioKey cPortfolio(cStyle);
 	m_cPortfolio = cPortfolio;
 
+	// #Portfolio: Model Segement에 기본 Portfolio 추가.
+	m_cSegmentKey.GetPortfolioControl().Push(cPortfolio);
+
 // 	입력된 Matrial을 Face에 적용한다.
 // 	MaterialMappingKit cMaterialMapping;
 // 	cMaterialMapping.SetFaceMaterial(cInKit);
@@ -135,12 +137,12 @@ void H3DF::ModelImpl::Init()
 
 }
 
-SegmentKey H3DF::ModelImpl::GetSegmentKey()
+SegmentKey & H3DF::ModelImpl::GetSegmentKey()
 {
 	return m_cSegmentKey;
 }
 
-SegmentKey const H3DF::ModelImpl::GetSegmentKey() const
+SegmentKey const & H3DF::ModelImpl::GetSegmentKey() const
 {
 	return m_cSegmentKey;
 }

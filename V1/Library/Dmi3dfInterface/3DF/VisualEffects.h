@@ -12,12 +12,12 @@ namespace H3DF
 	class API_3DF VisualEffectsControl : public Control
 	{
 	public:
-		VisualEffectsControl(SegmentKey & cInSegmentKey);
+		VisualEffectsControl(SegmentKey & cInSegment);
 		VisualEffectsControl(VisualEffectsControl const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::VisualEffectsControl; }
+		static const H3DF::Type staticType = H3DF::Type::VisualEffectsControl;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(VisualEffectsControl const & cInThat);
 		VisualEffectsControl & operator = (VisualEffectsControl const & cInThat);
 
 		VisualEffectsControl & SetPostProcessEffectsEnabled(bool bInState);

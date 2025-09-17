@@ -10,8 +10,13 @@ namespace H3DF
 	public:
 		Kit();
 
+
+		static const H3DF::Type staticType = H3DF::Type::Kit;
+		H3DF::Type ObjectType() const { return staticType; }
 		H3DF::Type Type() const override { return ObjectType(); }
-		H3DF::Type ObjectType() const override { return H3DF::Type::Kit; };
+
+// 		H3DF::Type Type() const override { return ObjectType(); }
+// 		H3DF::Type ObjectType() const override { return H3DF::Type::Kit; };
 
 	protected:
 		Kit(Kit && cInThat) noexcept;

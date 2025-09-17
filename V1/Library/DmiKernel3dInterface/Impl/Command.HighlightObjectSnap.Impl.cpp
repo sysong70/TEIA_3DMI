@@ -670,9 +670,8 @@ void KERNEL::Command::HighlightObjectSnapImpl::ApplySelectionFilter(H3DF::Select
 
 	while (true == cIter.IsValid()) {
 		SelectionItem cNextItem = cIter.GetItem();
-		H3DF::Type eType = cNextItem.Type();
+		H3DF::Type eType = cNextItem.ItemType();
 		if (H3DF::Type::LineKey == eType) {
-
 			cOutSelections.PushBack(cNextItem);
 
 /*
@@ -1000,7 +999,7 @@ void KERNEL::Command::HighlightObjectSnapImpl::DrawSnapItems()
 		CamerInformation cCameraInfo;
 		ShowCameraInformation(m_fSnapRadius, cCameraInfo);
 
-		SegmentKeyImpl::ForcedOpen(m_cSnapPointSegment); {
+		H3DF::SegmentKeyUtility::ForcedOpen(m_cSnapPointSegment); {
 
 			H3DF::SearchTypeArray aSearchTypes;
 			aSearchTypes.push_back(H3DF::Search::Type::Geometry);
@@ -1017,7 +1016,7 @@ void KERNEL::Command::HighlightObjectSnapImpl::DrawSnapItems()
 					DrawSnapPointTypeText(cSnapPoint, cCameraInfo, false);
 				}
 			}
-		} SegmentKeyImpl::ForcedClose(m_cSnapPointSegment);
+		} H3DF::SegmentKeyUtility::ForcedClose(m_cSnapPointSegment);
 		
 
 		Window().ForceUpdate();

@@ -36,46 +36,45 @@ using namespace H3DF;
 //== HighlightOptionsKit Class =====================================================================
 H3DF::HighlightOptionsKit::HighlightOptionsKit()
 {
-	m_pcImpl = new HighlightOptionsKitImpl();
+	m_pcImpl = std::make_unique<HighlightOptionsKitImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::HighlightOptionsKit::HighlightOptionsKit(CStringA strInStyleName)
 {
-	HighlightOptionsKitImpl * pcImpl = new HighlightOptionsKitImpl();
-	pcImpl->m_strInStyleName = strInStyleName;
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<HighlightOptionsKitImpl>();
+	static_cast<HighlightOptionsKitImpl *>(m_pcImpl.get())->m_strInStyleName = strInStyleName;
 }
 
 H3DF::HighlightOptionsKit::HighlightOptionsKit(CStringA strInStyleName, CStringA strInSecondaryStyleName)
 {
-	HighlightOptionsKitImpl * pcImpl = new HighlightOptionsKitImpl();
+	m_pcImpl = std::make_unique<HighlightOptionsKitImpl>();
+	auto pcImpl = static_cast<HighlightOptionsKitImpl *>(m_pcImpl.get());
+
 	pcImpl->m_strInStyleName = strInStyleName;
 	pcImpl->m_strInSecondaryStyleName = strInSecondaryStyleName;
-	m_pcImpl = pcImpl;
 }
 
 H3DF::HighlightOptionsKit::HighlightOptionsKit(HighlightOptionsKit const & cInThat)
 {
-	m_pcImpl = new HighlightOptionsKitImpl();
-	Set(cInThat);
-}
-
-void H3DF::HighlightOptionsKit::Set(HighlightOptionsKit const & cInThat)
-{
-	HighlightOptionsKitImpl * pcImpl = (HighlightOptionsKitImpl *)m_pcImpl;
-	HighlightOptionsKitImpl * pcInThatImpl = (HighlightOptionsKitImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 HighlightOptionsKit & H3DF::HighlightOptionsKit::operator=(HighlightOptionsKit const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 HighlightOptionsKit & H3DF::HighlightOptionsKit::SetNotification(bool bInState)
 {
-	HighlightOptionsKitImpl * pcImpl = (HighlightOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<HighlightOptionsKitImpl *>(m_pcImpl.get());
 
 	if (true == bInState) {
 		pcImpl->m_nNotification = true;
@@ -89,14 +88,14 @@ HighlightOptionsKit & H3DF::HighlightOptionsKit::SetNotification(bool bInState)
 
 HighlightOptionsKit & H3DF::HighlightOptionsKit::UnsetNotification()
 {
-	HighlightOptionsKitImpl * pcImpl = (HighlightOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<HighlightOptionsKitImpl *>(m_pcImpl.get());
 	pcImpl->m_nNotification = -1;
 	return *this;
 }
 
 bool H3DF::HighlightOptionsKit::ShowNotification(bool & bOutState) const
 {
-	HighlightOptionsKitImpl * pcImpl = (HighlightOptionsKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<HighlightOptionsKitImpl *>(m_pcImpl.get());
 	if (0 > pcImpl->m_nNotification) {
 		return false;
 	}
@@ -109,8 +108,7 @@ bool H3DF::HighlightOptionsKit::ShowNotification(bool & bOutState) const
 
 H3DF::HighlightControl::HighlightControl(WindowKey const & cInWindow)
 {
-	HighlightControlImpl * pcImpl = new HighlightControlImpl(cInWindow);
-	m_pcImpl = pcImpl;
+	m_pcImpl = std::make_unique<HighlightControlImpl>(cInWindow);
 }
 
 /*
@@ -123,22 +121,22 @@ H3DF::HighlightControl::HighlightControl(HighlightControl const & cInThat)
 
 H3DF::HighlightControl::HighlightControl() {}
 
-void H3DF::HighlightControl::Set(HighlightControl const & cInThat)
-{
-	HighlightControlImpl * pcImpl = (HighlightControlImpl *)m_pcImpl;
-	HighlightControlImpl * pcInThatImpl = (HighlightControlImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
-}
 
 HighlightControl & H3DF::HighlightControl::operator=(HighlightControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 void H3DF::HighlightControl::SetMode(HighlightMode::Type eInMode)
 {
-	HighlightControlImpl * pcHighlightImpl = (HighlightControlImpl *)m_pcImpl;
+	auto pcHighlightImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
 
 	HSelectionHighlightMode eMode = HighlightDefault;
 
@@ -165,7 +163,7 @@ void H3DF::HighlightControl::SetMode(HighlightMode::Type eInMode)
 
 void H3DF::HighlightControl::SetMode(HighlightMode::Type eInMode) const
 {
-	HighlightControlImpl * pcHighlightImpl = (HighlightControlImpl *)m_pcImpl;
+	auto pcHighlightImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
 	HSelectionHighlightMode eMode = HighlightDefault;
 
 	switch (eInMode) {
@@ -192,7 +190,7 @@ void H3DF::HighlightControl::SetMode(HighlightMode::Type eInMode) const
 //== Highlight 관련 함수 =============================================================================
 HighlightControl & H3DF::HighlightControl::Highlight(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting)
 {
-	HighlightControlImpl * pcHighlightImpl = (HighlightControlImpl *)m_pcImpl;
+	auto pcHighlightImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
 
 	HSelectionSet * pcSelSet = pcHighlightImpl->SelectionSet();
 
@@ -287,7 +285,7 @@ HighlightControl & H3DF::HighlightControl::Highlight(SelectionResults const & cI
 
 HighlightControl & H3DF::HighlightControl::Highlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting)
 {
-	HighlightControlImpl * pcHighlightImpl = (HighlightControlImpl *)m_pcImpl;
+	auto pcHighlightImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcHighlightImpl);
 
 	HSelectionSet * pcSelSet = pcHighlightImpl->SelectionSet(); // HSelectionSet에서 Select 및 Highlight를 다 처리함.
@@ -370,7 +368,7 @@ HighlightControl & H3DF::HighlightControl::Unhighlight(SelectionResults const & 
 		return *this;
 	}
 
-	HighlightControlImpl * pcHighlightImpl = (HighlightControlImpl *) m_pcImpl;
+	auto pcHighlightImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
 
 	HSelectionSet * pcSelection = pcHighlightImpl->SelectionSet(); // HSelectionSet에서 Select 및 Highlight를 다 처리함.
 
@@ -397,7 +395,7 @@ HighlightControl & H3DF::HighlightControl::Unhighlight(SelectionResults const & 
 
 HighlightControl & H3DF::HighlightControl::Unhighlight(SelectionItem const & cInItem, HighlightOptionsKit const & cInOptions)
 {
-	HighlightControlImpl * pcHighlightImpl = (HighlightControlImpl *) m_pcImpl;
+	auto pcHighlightImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
 
 	// cInItem의 Impl을 가져와서 작업을 수행한다.
 	SelectionItemImpl * pcItemImpl = (SelectionItemImpl *)cInItem.GetImpl();
@@ -420,16 +418,16 @@ HighlightControl & H3DF::HighlightControl::Unhighlight(SelectionItem const & cIn
 
 HighlightControl & H3DF::HighlightControl::UnhighlightEverything()
 {
-	HighlightControlImpl * pcImpl = dynamic_cast<HighlightControlImpl *>(m_pcImpl);
-	DEBUG_VALID(pcImpl);
-	pcImpl->SelectionSet()->DeSelectAll();
+	auto pcHighlightImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcHighlightImpl);
+	pcHighlightImpl->SelectionSet()->DeSelectAll();
 	return *this;
 }
 
 //== Material Mapping 관련 함수 ======================================================================
 HighlightControl & H3DF::HighlightControl::SetMaterialMapping(MaterialMappingKit const & cInKit)
 {
-	HighlightControlImpl * pcHighlightControlImpl = (HighlightControlImpl *)m_pcImpl;
+	auto pcHighlightControlImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
 	HC_KEY nKey = pcHighlightControlImpl->SelectionSet()->GetHighlightStyle();
 	
 	SegmentKey cSegment(nKey);
@@ -440,7 +438,7 @@ HighlightControl & H3DF::HighlightControl::SetMaterialMapping(MaterialMappingKit
 
 MaterialMappingControl H3DF::HighlightControl::GetMaterialMappingControl()
 {
-	HighlightControlImpl * pcHighlightControlImpl = (HighlightControlImpl *)m_pcImpl;
+	auto pcHighlightControlImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
 	HC_KEY nKey = pcHighlightControlImpl->SelectionSet()->GetHighlightStyle();
 
 	SegmentKey cSegment(nKey);
@@ -451,7 +449,7 @@ MaterialMappingControl H3DF::HighlightControl::GetMaterialMappingControl()
 
 MaterialMappingControl const H3DF::HighlightControl::GetMaterialMappingControl() const
 {
-	HighlightControlImpl * pcHighlightControlImpl = (HighlightControlImpl *)m_pcImpl;
+	auto pcHighlightControlImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
 	HC_KEY nKey = pcHighlightControlImpl->SelectionSet()->GetHighlightStyle();
 
 	SegmentKey cSegment(nKey);
@@ -476,7 +474,7 @@ HighlightControl & H3DF::HighlightControl::SetLineAttribute(LineAttributeKit con
 
 VisibilityControl H3DF::HighlightControl::GetVisibilityControl()
 {
-	auto * pcImpl = (HighlightControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
@@ -489,7 +487,7 @@ VisibilityControl H3DF::HighlightControl::GetVisibilityControl()
 
 VisibilityControl const H3DF::HighlightControl::GetVisibilityControl() const
 {
-	auto * pcImpl = (HighlightControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
 
 	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
 
@@ -501,7 +499,7 @@ VisibilityControl const H3DF::HighlightControl::GetVisibilityControl() const
 
 AttributeLockControl H3DF::HighlightControl::GetAttributeLockControl()
 {
-	auto * pcImpl = (HighlightControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
 
 	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
 
@@ -513,7 +511,7 @@ AttributeLockControl H3DF::HighlightControl::GetAttributeLockControl()
 
 AttributeLockControl const H3DF::HighlightControl::GetAttributeLockControl() const
 {
-	auto * pcImpl = (HighlightControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
@@ -526,7 +524,7 @@ AttributeLockControl const H3DF::HighlightControl::GetAttributeLockControl() con
 
 LineAttributeControl H3DF::HighlightControl::GetLineAttributeControl()
 {
-	auto * pcImpl = (HighlightControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
@@ -539,7 +537,7 @@ LineAttributeControl H3DF::HighlightControl::GetLineAttributeControl()
 
 LineAttributeControl const H3DF::HighlightControl::GetLineAttributeControl() const
 {
-	auto * pcImpl = (HighlightControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	HC_KEY nKey = pcImpl->SelectionSet()->GetHighlightStyle();
@@ -552,7 +550,7 @@ LineAttributeControl const H3DF::HighlightControl::GetLineAttributeControl() con
 
 HighlightControl & H3DF::HighlightControl::Highlight_ORG(SelectionResults const & cInItems, HighlightOptionsKit const & cInOptions, bool bInRemoveExisting)
 {
-	HighlightControlImpl * pcHighlightControlImpl = (HighlightControlImpl *)m_pcImpl;
+	auto pcHighlightControlImpl = static_cast<HighlightControlImpl *>(m_pcImpl.get());
 	H3DF::BaseView * pcView = pcHighlightControlImpl->GetBaseView();
 
 	char chType[MVO_BUFFER_SIZE];

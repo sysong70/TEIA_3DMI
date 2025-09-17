@@ -13,9 +13,9 @@ namespace H3DF
 		PerformanceKit();
 		PerformanceKit(PerformanceKit const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::PerformanceKit; };
+		static const H3DF::Type staticType = H3DF::Type::PerformanceKit;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(PerformanceKit const & cInThat);
 		PerformanceKit const & operator = (PerformanceKit const & cInThat);
 
 		PerformanceKit & SetDisplayLists(Performance::DisplayLists eInDisplayList = Performance::DisplayLists::Segment);
@@ -35,9 +35,9 @@ namespace H3DF
 		explicit PerformanceControl(SegmentKey & cInSegmentKey);
 		PerformanceControl(PerformanceControl const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::PerformanceControl; };
+		static const H3DF::Type staticType = H3DF::Type::PerformanceControl;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(PerformanceControl const & cInThat);
 		PerformanceControl & operator = (PerformanceControl const & cInThat);
 
 		PerformanceControl & SetDisplayLists(Performance::DisplayLists eInDisplayList = Performance::DisplayLists::Segment);

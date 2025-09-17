@@ -8,6 +8,8 @@
 
 #include "Window.h"
 
+#include "Bounding.h"
+
 #include <HTools.h>
 
 using namespace H3DF;
@@ -206,9 +208,14 @@ namespace H3DF
 	class CullingControlImpl : public ControlImpl
 	{
 	public:
-		CullingControlImpl() { m_eType = H3DF::Type::CullingControl; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<CullingControlImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(CullingControlImpl * pcInThat) {
+
+		void Copy(const CullingControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
 
@@ -231,38 +238,32 @@ BaseView * CullingControlImpl::GetBaseView()
 
 H3DF::CullingControl::CullingControl(SegmentKey & cInSegmentKey)
 {
-	CullingControlImpl * pcImpl = new CullingControlImpl();
-	pcImpl->m_cOverrideKey = cInSegmentKey;
+	m_pcImpl = std::make_unique<CullingControlImpl>();
+	auto pcImpl = dynamic_cast<CullingControlImpl *>(m_pcImpl.get());
 
-	m_pcImpl = pcImpl;
+	pcImpl->m_cOverrideKey = cInSegmentKey;
 }
 
 H3DF::CullingControl::CullingControl(CullingControl const & cInThat)
 {
-	m_pcImpl = new CullingControlImpl();
-	Set(cInThat);
-}
-
-void H3DF::CullingControl::Set(CullingControl const & cInThat)
-{
-	CullingControlImpl * pcImpl = (CullingControlImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
-	CullingControlImpl * pcInThatImpl = (CullingControlImpl *)cInThat.m_pcImpl;
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 CullingControl & H3DF::CullingControl::operator = (CullingControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 CullingControl & H3DF::CullingControl::SetBackFace(bool bInState)
 {
-	CullingControlImpl * pcImpl = (CullingControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<CullingControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -283,7 +284,7 @@ CullingControl & H3DF::CullingControl::SetBackFace(bool bInState)
 
 CullingControl & H3DF::CullingControl::SetFace(Culling::Face eInState)
 {
-	CullingControlImpl * pcImpl = (CullingControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<CullingControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -316,7 +317,7 @@ H3DF::CullingControl::CullingControl() {}
 /*
 CullingControl & H3DF::CullingControl::SetExclusion(bool bInExclusion)
 {
-	CullingControlImpl * pcImpl = (CullingControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<CullingControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -336,7 +337,7 @@ CullingControl & H3DF::CullingControl::SetExclusion(bool bInExclusion)
 
 CullingControl & H3DF::CullingControl::UnsetExclusion()
 {
-	CullingControlImpl * pcImpl = (CullingControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<CullingControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -350,7 +351,7 @@ CullingControl & H3DF::CullingControl::UnsetExclusion()
 
 bool H3DF::CullingControl::ShowExclusion(bool & bOutExclusion) const
 {
-	CullingControlImpl * pcImpl = (CullingControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<CullingControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	bool bResult = false;

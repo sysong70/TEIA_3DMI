@@ -18,16 +18,40 @@ namespace H3DF
 {
 	class MultiSelectManager;
 
-	class API_3DF ModelImpl : public HBaseModel, public Impl
+	class ModelImpl : public HBaseModel, public Impl
 	{
 	public:
 		ModelImpl();
 		virtual ~ModelImpl();
 
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<ModelImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy(const ModelImpl * pcInThat) {
+			m_cSegmentKey = pcInThat->m_cSegmentKey;
+			m_cPortfolio = pcInThat->m_cPortfolio;
+			m_cShowStyle = pcInThat->m_cShowStyle;
+			m_cShowWireFrameStyle = pcInThat->m_cShowWireFrameStyle;
+			m_cShowVertexStyle = pcInThat->m_cShowVertexStyle;
+			m_cNoShowStyle = pcInThat->m_cNoShowStyle;
+			m_cNoShowWireFrameStyle = pcInThat->m_cNoShowWireFrameStyle;
+			m_cNoShowVertexStyle = pcInThat->m_cNoShowVertexStyle;
+			m_eModelHandedness = pcInThat->m_eModelHandedness;
+			m_pcMultiSelectManager = pcInThat->m_pcMultiSelectManager;
+			m_pcTopologyManager = pcInThat->m_pcTopologyManager;
+			m_pPMIConnector = pcInThat->m_pPMIConnector;
+			m_pcConnector = pcInThat->m_pcConnector;
+			m_pcPRCAsmModelFile = pcInThat->m_pcPRCAsmModelFile;
+			m_pcPRCDeleteModelCallback = pcInThat->m_pcPRCDeleteModelCallback;
+		}
+
 		void Init() override;
 
-		SegmentKey GetSegmentKey();
-		SegmentKey const GetSegmentKey() const;
+		SegmentKey & GetSegmentKey();
+		SegmentKey const & GetSegmentKey() const;
 
 		PortfolioKey GetPortfolioKey();
 		PortfolioKey const GetPortfolioKey() const;

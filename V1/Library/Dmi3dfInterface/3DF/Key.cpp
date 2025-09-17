@@ -9,92 +9,107 @@
 
 #include <HTools.h>
 
+#include <stdexcept>
+
 using namespace H3DF;
 
 H3DF::Key::Key() 
 {
-	m_pcImpl = new KeyImpl();
 }
 
 H3DF::Key::Key(HC_KEY nInKey)
 {
 	if (INVALID_KEY == nInKey) {
-		return;
+		DEBUG_RETURN;
 	}
 
-	KeyImpl * pcImpl = new KeyImpl();
-	pcImpl->SetKeyValue(nInKey);
+	m_pcImpl = (INVALID_KEY == nInKey) ? nullptr : std::make_unique<KeyImpl>();
+	DEBUG_VALID(m_pcImpl);
 
-	m_pcImpl = pcImpl;
+	static_cast<KeyImpl *>(m_pcImpl.get())->SetKeyValue(nInKey);
 }
 
 H3DF::Key::Key(Key const & cInThat)
 {
-	if (INVALID_KEY == cInThat.KeyValue()) {
-		return;
-	}
-
-	m_pcImpl = new KeyImpl();
-	Set(cInThat);
-}
-
-H3DF::Type H3DF::Key::Type() const
-{
-	KeyImpl * pcImpl = (KeyImpl *) m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
-	return pcImpl->Type();
-}
-
-void H3DF::Key::Set(Key const & cInThat)
-{
-	KeyImpl * pcImpl = (KeyImpl *)m_pcImpl;
-	KeyImpl * pcInThatImpl = (KeyImpl *)cInThat.m_pcImpl;
-
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 Key const & H3DF::Key::operator = (Key const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 bool H3DF::Key::operator == (Key const & cInThat) const
 {
-	KeyImpl * pcImpl = (KeyImpl *)m_pcImpl;
-	KeyImpl * pcInThatImpl = (KeyImpl *)cInThat.m_pcImpl;
-	return (pcImpl->KeyValue() == pcInThatImpl->KeyValue());
+	auto pcImpl = dynamic_cast<KeyImpl *>(m_pcImpl.get());
+	auto pcInThatImpl = dynamic_cast<KeyImpl *>(cInThat.m_pcImpl.get());
+
+	if (nullptr == pcImpl || nullptr == pcInThatImpl) {
+		DEBUG_STOP;
+		return false;
+	}
+
+	return pcImpl->KeyValue() == pcInThatImpl->KeyValue();
 }
 
-bool H3DF::Key::IsValidate()
+bool H3DF::Key::IsValidate() const
 {
-	KeyImpl * pcImpl = (KeyImpl *)m_pcImpl;
+	auto pcImpl = dynamic_cast<KeyImpl *>(m_pcImpl.get());
+	if (nullptr == pcImpl) {
+		DEBUG_STOP;
+		return false;
+	}
+
 	return (INVALID_KEY != pcImpl->KeyValue());
 }
 
 HC_KEY H3DF::Key::KeyValue() const 
 { 
-	KeyImpl * pcImpl = (KeyImpl *)m_pcImpl;
+	auto pcImpl = dynamic_cast<KeyImpl *>(m_pcImpl.get());
+	if (nullptr == pcImpl) {
+		DEBUG_STOP;
+		return INVALID_KEY;
+	}
+
 	return pcImpl->KeyValue();
 }
 
 void H3DF::Key::SetKeyValue(HC_KEY nInKey)
 {
-	KeyImpl * pcImpl = (KeyImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyImpl *>(m_pcImpl.get());
+	if (nullptr == pcImpl) {
+		DEBUG_STOP;
+		return;
+	}
+
 	pcImpl->SetKeyValue(nInKey);
 }
 
 void H3DF::Key::SetKeyValue(HC_KEY nInKey) const
 {
-	KeyImpl * pcImpl = (KeyImpl *)m_pcImpl;
+	auto pcImpl = dynamic_cast<KeyImpl *>(m_pcImpl.get());
+	if (nullptr == pcImpl) {
+		DEBUG_STOP;
+		return;
+	}
+
 	pcImpl->SetKeyValue(nInKey);
 }
 
 void H3DF::Key::Delete()
 {
-	KeyImpl * pcImpl = (KeyImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
+	auto pcImpl = dynamic_cast<KeyImpl *>(m_pcImpl.get());
+	if (nullptr == pcImpl) {
+		DEBUG_STOP;
+		return;
+	}
 
 	HC_Delete_By_Key(pcImpl->KeyValue());
 
@@ -120,20 +135,18 @@ SegmentKey H3DF::Key::Up() const
 // return: The segment containing this key.
 SegmentKey H3DF::Key::Owner() const
 {
-	SegmentKey cOwner;
-
 	HC_KEY nOwnerKey = HC_Show_Owner_Original_Key(KeyValue());
 	if (INVALID_KEY == nOwnerKey) {
-		return cOwner;
+		return {};
 	}
 
 	// Onwer Key가 Segmnet인지 여부 확인.
-	char chType[MVO_BUFFER_SIZE];
+	char chType[MVO_BUFFER_SIZE]{};
 	HC_Show_Key_Type(nOwnerKey, chType);
 	if (0 != strcmp(chType, "segment")) {
-		return cOwner;
+		return {};
 	}
 
-	cOwner.SetKeyValue(nOwnerKey);
+	SegmentKey cOwner(nOwnerKey);
 	return cOwner;
 }

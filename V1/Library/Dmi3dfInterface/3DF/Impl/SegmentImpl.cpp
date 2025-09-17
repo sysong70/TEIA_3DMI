@@ -9,7 +9,7 @@
 
 using namespace H3DF;
 
-void H3DF::SegmentKeyImpl::Copy(SegmentKeyImpl * pcInThat)
+void H3DF::SegmentKeyImpl::Copy(const SegmentKeyImpl * pcInThat)
 {
 	KeyImpl::Copy(pcInThat);
 
@@ -18,7 +18,7 @@ void H3DF::SegmentKeyImpl::Copy(SegmentKeyImpl * pcInThat)
 	m_pcWindowKey = pcInThat->m_pcWindowKey;
 
 	if (nullptr != pcInThat->m_pcBoundingKit) {
-		m_pcBoundingKit = new BoundingKit(*pcInThat->m_pcBoundingKit);
+		m_pcBoundingKit = std::make_unique<BoundingKit>(*pcInThat->m_pcBoundingKit);
 	}
 }
 
@@ -272,6 +272,7 @@ bool H3DF::SegmentKeyImpl::FindUp(SegmentKey & cInSegment, H3DF::Type eInType, S
 	bool bResult = false;
 	SegmentKey cFindSegment;
 	while (true == cOwner.IsValidate()) {
+		H3DF::Type eObjectType = cOwner.ObjectType();
 		if (eInType == cOwner.Type()) {
 			cFindSegment = cOwner;
 			bResult = true;
@@ -282,4 +283,53 @@ bool H3DF::SegmentKeyImpl::FindUp(SegmentKey & cInSegment, H3DF::Type eInType, S
 	}
 
 	return bResult;
+}
+
+void H3DF::SegmentKeyUtility::LocalOpen(SegmentKey & cSegmentKey)
+{
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *) cSegmentKey.GetImpl();
+	pcImpl->LocalOpen();
+}
+
+void H3DF::SegmentKeyUtility::LocalOpen(SegmentKey const & cSegmentKey)
+{
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *) cSegmentKey.GetImpl();
+	pcImpl->LocalOpen();
+}
+
+void H3DF::SegmentKeyUtility::LocalClose(SegmentKey & cSegmentKey)
+{
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *) cSegmentKey.GetImpl();
+	pcImpl->LocalClose();
+
+}
+
+void H3DF::SegmentKeyUtility::LocalClose(SegmentKey const & cSegmentKey)
+{
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *) cSegmentKey.GetImpl();
+	pcImpl->LocalClose();
+}
+
+void H3DF::SegmentKeyUtility::ForcedOpen(SegmentKey & cSegmentKey)
+{
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *) cSegmentKey.GetImpl();
+	pcImpl->ForcedOpen();
+}
+
+void H3DF::SegmentKeyUtility::ForcedOpen(SegmentKey const & cSegmentKey)
+{
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *) cSegmentKey.GetImpl();
+	pcImpl->ForcedOpen();
+}
+
+void H3DF::SegmentKeyUtility::ForcedClose(SegmentKey & cSegmentKey)
+{
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *) cSegmentKey.GetImpl();
+	pcImpl->ForcedClose();
+}
+
+void H3DF::SegmentKeyUtility::ForcedClose(SegmentKey const & cSegmentKey)
+{
+	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *) cSegmentKey.GetImpl();
+	pcImpl->ForcedClose();
 }

@@ -8,6 +8,7 @@
 #include <HUtility.h>
 
 #include "../Segment.h"
+#include "SegmentImpl.h"
 
 class HSelectionSet;
 #include "../Selection.h"
@@ -54,13 +55,19 @@ namespace H3DF
 		H3DF::ViewDirection::Mode m_eViewMode = H3DF::ViewDirection::Mode::Unknown;
 	};
 
-	class API_3DF WindowKeyImpl : public Impl
+	class WindowKeyImpl : public SegmentKeyImpl
 	{
 	public:
 		WindowKeyImpl();
 		virtual ~WindowKeyImpl();
 
-		void Copy(WindowKeyImpl * pcInThat);
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<WindowKeyImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy(const WindowKeyImpl * pcInThat);
 
 		void ViewReady();
 

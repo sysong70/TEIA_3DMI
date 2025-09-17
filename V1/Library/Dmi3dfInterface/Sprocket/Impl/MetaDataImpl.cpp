@@ -20,46 +20,12 @@ H3DF::MetaDataImpl::MetaDataImpl()
 {
 }
 
-void H3DF::MetaDataImpl::Copy(MetaDataImpl * pcInThat)
-{
-	if (nullptr == pcInThat) {
-		DEBUG_STOP;
-		return;
-	}
-
-	m_eIndex = pcInThat->m_eIndex;
-}
-
 //== StringMetaDataImp Class =======================================================================
 H3DF::StringMetaDataImpl::StringMetaDataImpl()
 {
 }
 
-void H3DF::StringMetaDataImpl::Copy(StringMetaDataImpl * pcInThat)
-{
-	if (nullptr == pcInThat) {
-		DEBUG_STOP;
-		return;
-	}
-
-	MetaDataImpl::Copy(pcInThat);
-
-	m_strValue = pcInThat->m_strValue;
-}
-
 //== DwordPtrMetaDataImpl Class ====================================================================
 H3DF::DwordPtrMetaDataImpl::DwordPtrMetaDataImpl()
 {
-}
-
-void H3DF::DwordPtrMetaDataImpl::Copy(DwordPtrMetaDataImpl * pcInThat)
-{
-	if (nullptr == pcInThat) {
-		DEBUG_STOP;
-		return;
-	}
-
-	MetaDataImpl::Copy(pcInThat);
-
-	m_nValue = pcInThat->m_nValue;
 }

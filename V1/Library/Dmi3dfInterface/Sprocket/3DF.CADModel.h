@@ -10,7 +10,6 @@ namespace H3DF
 		CADModel();
 		//CADModel(Component const & cInThat);
 
-		void Set(CADModel const & cInThat);
 		CADModel & operator = (CADModel const & cInThat);
 
 		Component * GetComponent(HC_KEY cInKey) const;

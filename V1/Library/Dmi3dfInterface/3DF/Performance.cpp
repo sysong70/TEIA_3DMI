@@ -19,9 +19,13 @@ namespace H3DF
 	class PerformanceKitImpl : public Impl
 	{
 	public:
-		PerformanceKitImpl() { m_eType = Type::PerformanceKit; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<PerformanceKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(PerformanceKitImpl * pcInThat) {
+		void Copy(const PerformanceKitImpl * pcInThat) {
 			m_eInDisplayList = pcInThat->m_eInDisplayList;
 		}
 
@@ -39,31 +43,31 @@ using namespace H3DF;
 
 H3DF::PerformanceKit::PerformanceKit()
 {
-	m_pcImpl = new PerformanceKitImpl();
+	m_pcImpl = std::make_unique<PerformanceKitImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::PerformanceKit::PerformanceKit(PerformanceKit const & cInThat)
 {
-	m_pcImpl = new PerformanceKitImpl();
-	Set(cInThat);
-}
-
-void H3DF::PerformanceKit::Set(PerformanceKit const & cInThat)
-{
-	PerformanceKitImpl * pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl);
-	PerformanceKitImpl * pcInThatImpl = static_cast<PerformanceKitImpl *>(cInThat.m_pcImpl);
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 PerformanceKit const & H3DF::PerformanceKit::operator = (PerformanceKit const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 PerformanceKit & H3DF::PerformanceKit::SetDisplayLists(Performance::DisplayLists eInDisplayList)
 {
-	PerformanceKitImpl * pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl.get());
 	pcImpl->m_eInDisplayList = eInDisplayList;
 
 	return *this;
@@ -71,7 +75,7 @@ PerformanceKit & H3DF::PerformanceKit::SetDisplayLists(Performance::DisplayLists
 
 PerformanceKit & H3DF::PerformanceKit::SetStaticModel(Performance::StaticModel eInModelType)
 {
-	PerformanceKitImpl * pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl.get());
 	pcImpl->m_eInModelType = eInModelType;
 
 	return *this;
@@ -79,7 +83,7 @@ PerformanceKit & H3DF::PerformanceKit::SetStaticModel(Performance::StaticModel e
 
 PerformanceKit & H3DF::PerformanceKit::UnsetDisplayLists()
 {
-	PerformanceKitImpl * pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl.get());
 	pcImpl->m_eInDisplayList = Performance::DisplayLists::None;
 
 	return *this;
@@ -87,7 +91,7 @@ PerformanceKit & H3DF::PerformanceKit::UnsetDisplayLists()
 
 PerformanceKit & H3DF::PerformanceKit::UnsetStaticModel()
 {
-	PerformanceKitImpl * pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl.get());
 	pcImpl->m_eInModelType = Performance::StaticModel::None;
 
 	return *this;
@@ -95,7 +99,7 @@ PerformanceKit & H3DF::PerformanceKit::UnsetStaticModel()
 
 bool H3DF::PerformanceKit::ShowDisplayLists(Performance::DisplayLists & eOutDisplayList) const
 {
-	PerformanceKitImpl * pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) { assert(false); return false; }
 
 	eOutDisplayList = pcImpl->m_eInDisplayList;
@@ -105,7 +109,7 @@ bool H3DF::PerformanceKit::ShowDisplayLists(Performance::DisplayLists & eOutDisp
 
 bool H3DF::PerformanceKit::ShowStaticModel(Performance::StaticModel & eOutModelType) const
 {
-	PerformanceKitImpl * pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PerformanceKitImpl *>(m_pcImpl.get());
 	if (nullptr == pcImpl) { assert(false); return false; }
 
 	eOutModelType = pcImpl->m_eInModelType;
@@ -117,43 +121,49 @@ bool H3DF::PerformanceKit::ShowStaticModel(Performance::StaticModel & eOutModelT
 class PerformanceControlImpl : public ControlImpl
 {
 public:
-	PerformanceControlImpl() { m_eType = H3DF::Type::PerformanceControl; }
+	std::unique_ptr<Impl> Clone() const override {
+		auto pcClone = std::make_unique<PerformanceControlImpl>();
+		pcClone->Copy(this);
+		return pcClone;
+	}
 
-	void Copy(PerformanceControlImpl * pcInThat) {
+	void Copy(const PerformanceControlImpl * pcInThat) {
 		ControlImpl::Copy(pcInThat);
 	}
 };
 
-H3DF::PerformanceControl::PerformanceControl(SegmentKey & cInSegmentKey)
+H3DF::PerformanceControl::PerformanceControl(SegmentKey & cInSegment)
 {
-	PerformanceControlImpl * pcImpl = new PerformanceControlImpl();
-	pcImpl->m_cOverrideKey = cInSegmentKey;
+	m_pcImpl = std::make_unique<PerformanceControlImpl>();
+	DEBUG_VALID(m_pcImpl);
 
-	m_pcImpl = pcImpl;
+	auto pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_cOverrideKey = cInSegment;
 }
 
 H3DF::PerformanceControl::PerformanceControl(PerformanceControl const & cInThat)
 {
-	m_pcImpl = new PerformanceControlImpl();
-	Set(cInThat);
-}
-
-void H3DF::PerformanceControl::Set(PerformanceControl const & cInThat)
-{
-	PerformanceControlImpl * pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl);
-	PerformanceControlImpl * pcInThatImpl = static_cast<PerformanceControlImpl *>(cInThat.m_pcImpl);
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 PerformanceControl & H3DF::PerformanceControl::operator = (PerformanceControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 PerformanceControl & H3DF::PerformanceControl::SetDisplayLists(Performance::DisplayLists eInDisplayList)
 {
-	PerformanceControlImpl * pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -178,7 +188,7 @@ PerformanceControl & H3DF::PerformanceControl::SetDisplayLists(Performance::Disp
 
 PerformanceControl & H3DF::PerformanceControl::SetStaticModel(Performance::StaticModel eInModelType)
 {
-	PerformanceControlImpl * pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -203,7 +213,7 @@ PerformanceControl & H3DF::PerformanceControl::SetStaticModel(Performance::Stati
 
 PerformanceControl & H3DF::PerformanceControl::UnsetDisplayLists()
 {
-	PerformanceControlImpl * pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -215,7 +225,7 @@ PerformanceControl & H3DF::PerformanceControl::UnsetDisplayLists()
 
 PerformanceControl & H3DF::PerformanceControl::UnsetStaticModel()
 {
-	PerformanceControlImpl * pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -227,7 +237,7 @@ PerformanceControl & H3DF::PerformanceControl::UnsetStaticModel()
 
 bool H3DF::PerformanceControl::ShowDisplayLists(Performance::DisplayLists & eOutDisplayList) const
 {
-	PerformanceControlImpl * pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -255,7 +265,7 @@ bool H3DF::PerformanceControl::ShowDisplayLists(Performance::DisplayLists & eOut
 
 bool H3DF::PerformanceControl::ShowStaticModel(Performance::StaticModel & eOutModelType) const
 {
-	PerformanceControlImpl * pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PerformanceControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {

@@ -20,52 +20,47 @@ using namespace H3DF;
 //== Component Class ===============================================================================
 H3DF::Component::Component()
 {
-	m_pcImpl = new ComponentImpl();
+	m_pcImpl = std::make_unique<ComponentImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::Component::Component(Component const & cInThat)
 {
-	ComponentImpl * pcImpl = new ComponentImpl();
-	DEBUG_VALID(pcImpl);
-
-	m_pcImpl = pcImpl;
-
-	Set(cInThat);
-}
-
-void H3DF::Component::Set(Component const & cInThat)
-{
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
-	ComponentImpl * pcInThatImpl = (ComponentImpl *)cInThat.m_pcImpl;
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->Copy(pcInThatImpl);
-
-	// Component의 소유자를 설정한다.
-	if (nullptr != pcImpl->m_pvSubComponents) {
-		for (auto * pcComponent : *pcImpl->m_pvSubComponents) {
-			ComponentImpl * pcSubImpl = (ComponentImpl *)pcComponent->GetImpl();
-			DEBUG_VALID(pcImpl);
-			pcSubImpl->m_pcOwner = this;
-		}
-	}
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 Component & H3DF::Component::operator = (Component const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
+	if (nullptr != m_pcImpl.get()) {
+
+		auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
+
+		// Component의 소유자를 설정한다.
+		if (nullptr != pcImpl->m_pvSubComponents) {
+			for (auto * pcComponent : *pcImpl->m_pvSubComponents) {
+				ComponentImpl * pcSubImpl = (ComponentImpl *) pcComponent->GetImpl();
+				DEBUG_VALID(pcImpl);
+				pcSubImpl->m_pcOwner = this;
+			}
+		}
+	}
+
 	return *this;
 }
 
 bool H3DF::Component::Equals(Component const & cInThat) const
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	
-	ComponentImpl * pcInThatImpl = (ComponentImpl *)cInThat.m_pcImpl;
+	auto pcInThatImpl = static_cast<ComponentImpl *>(cInThat.m_pcImpl.get());
 	DEBUG_VALID(pcInThatImpl);
 
 	if (pcImpl->m_nSegmentKey != pcInThatImpl->m_nSegmentKey) {
@@ -81,7 +76,7 @@ bool H3DF::Component::Equals(Component const & cInThat) const
 
 Component::Type H3DF::Component::GetType() const
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_eType;
@@ -89,7 +84,7 @@ Component::Type H3DF::Component::GetType() const
 
 HC_KEY H3DF::Component::GetSegmentKey() const
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_nSegmentKey;
@@ -97,7 +92,7 @@ HC_KEY H3DF::Component::GetSegmentKey() const
 
 HC_KEY H3DF::Component::GetIncludeKey() const
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_nIncludeKey;
@@ -105,7 +100,7 @@ HC_KEY H3DF::Component::GetIncludeKey() const
 
 Component * H3DF::Component::GetOwner() const
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_pcOwner;
@@ -126,7 +121,7 @@ Component * H3DF::Component::FindOwner(Component::Type eInType)
 
 ComponentArray * H3DF::Component::GetSubComponents() const
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (nullptr != pcImpl->m_pvSubComponents) {
@@ -138,7 +133,7 @@ ComponentArray * H3DF::Component::GetSubComponents() const
 
 ComponentArray * H3DF::Component::GetSubComponents(Component::Type eInType) const
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (nullptr != pcImpl->m_pvSubComponents) {
@@ -159,7 +154,7 @@ ComponentArray * H3DF::Component::GetSubComponents(Component::Type eInType) cons
 
 size_t H3DF::Component::GetAllSubComponentCount() const
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (nullptr != pcImpl->m_pvSubComponents) {
@@ -177,7 +172,7 @@ size_t H3DF::Component::GetAllSubComponentCount() const
 
 ComponentArray * H3DF::Component::GetAllSubcomponents(Component::Type eInType) const
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->GetAllSubcomponents(eInType);
@@ -185,7 +180,7 @@ ComponentArray * H3DF::Component::GetAllSubcomponents(Component::Type eInType) c
 
 Component * H3DF::Component::FindUpComponent(Component::Type eInType)
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (eInType == pcImpl->m_eType) {
@@ -219,7 +214,7 @@ Component * H3DF::Component::FindUpComponent(Component::Type eInType)
 
 CString H3DF::Component::GetName() const
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_strName;
@@ -227,7 +222,7 @@ CString H3DF::Component::GetName() const
 
 MetadataArray * H3DF::Component::GetAllMetadata() const
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (nullptr != pcImpl->m_pvMetaDatas) {
@@ -239,7 +234,7 @@ MetadataArray * H3DF::Component::GetAllMetadata() const
 
 MetaData * H3DF::Component::GetMetaData(H3DF::MetaDataIndex eInIndex) const
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (nullptr != pcImpl->m_pvMetaDatas) {
@@ -272,7 +267,7 @@ bool H3DF::Component::AddMetaData(H3DF::MetaData * pcInMetaData, bool bReplace)
 		}
 	}
 
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (nullptr == pcImpl->m_pvMetaDatas) {
@@ -287,7 +282,7 @@ bool H3DF::Component::AddMetaData(H3DF::MetaData * pcInMetaData, bool bReplace)
 
 bool H3DF::Component::RemoveMetaData(H3DF::MetaDataIndex eInIndex)
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (nullptr == pcImpl->m_pvMetaDatas) {
@@ -315,7 +310,7 @@ bool H3DF::Component::IsShow()
 
 DWORD H3DF::Component::GetStatus()
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return pcImpl->m_nStatus;
@@ -323,7 +318,7 @@ DWORD H3DF::Component::GetStatus()
 
 DWORD H3DF::Component::AddStatus(Component::Status eStatus)
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_nStatus |= eStatus;
@@ -332,7 +327,7 @@ DWORD H3DF::Component::AddStatus(Component::Status eStatus)
 
 DWORD H3DF::Component::RemoveStatus(Component::Status eStatus)
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_nStatus &= ~eStatus;
@@ -341,7 +336,7 @@ DWORD H3DF::Component::RemoveStatus(Component::Status eStatus)
 
 bool H3DF::Component::IsRepresentationItem()
 {
-	ComponentImpl * pcImpl = (ComponentImpl *)m_pcImpl;
+	auto pcImpl = static_cast<ComponentImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	switch (pcImpl->m_eType)

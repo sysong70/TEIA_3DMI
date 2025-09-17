@@ -22,6 +22,8 @@
 
 #include "../3DF/3DF.Utility.h"
 
+#include <memory>
+
 #define TheKenel TheAppOptions.Kernel
 #define ThePreset TheAppOptions.Preset
 
@@ -29,6 +31,8 @@ using namespace H3DF;
 
 Canvas * H3DF::Factory::CreateCanvas(H3DF::WindowHandle nInWindowHandle, char const * chInName, H3DF::ApplicationWindowOptionsKit const & cInOptions)
 {
+	SegmentKey cTestSegment;
+
 	Canvas * pcCanvas = new Canvas();
 
 	CanvasImpl * pcCanvasImpl = (CanvasImpl *)pcCanvas->GetImpl();;
@@ -45,7 +49,7 @@ Canvas * H3DF::Factory::CreateCanvas(H3DF::WindowHandle nInWindowHandle, char co
 	pcCanvasImpl->m_cApplicationWindowOptionsKit = cInOptions;
 
 	// HBaseView를 생성하고 초기화 한다. 그 값은 WindowsKey에 저장한다.
-	WindowKeyImpl * pcWindowImpl = dynamic_cast<WindowKeyImpl *>(pcCanvasImpl->m_cWindowKey.GetImpl());
+	WindowKeyImpl * pcWindowImpl = dynamic_cast<WindowKeyImpl *>(pcCanvasImpl->m_cWindow.GetImpl());
 	if (nullptr == pcWindowImpl) {
 		DEBUG_STOP;
 		return nullptr;
@@ -61,10 +65,10 @@ Canvas * H3DF::Factory::CreateCanvas(H3DF::WindowHandle nInWindowHandle, char co
 	}
 
 	// Navigation Cube 설정
-	pcWindowImpl->m_pcNaviCube = new NavigationCube(pcWindowImpl->m_pcBaseView, &pcCanvasImpl->m_cWindowKey);
+	pcWindowImpl->m_pcNaviCube = new NavigationCube(pcWindowImpl->m_pcBaseView, &pcCanvasImpl->m_cWindow);
 
-	WindowKeyImpl::SetSelectionControl(pcCanvasImpl->m_cWindowKey);
-	WindowKeyImpl::SetHighlightControl(pcCanvasImpl->m_cWindowKey);
+	WindowKeyImpl::SetSelectionControl(pcCanvasImpl->m_cWindow);
+	WindowKeyImpl::SetHighlightControl(pcCanvasImpl->m_cWindow);
 
 	pcWindowImpl->SetType(H3DF::Type::WindowKey);
 

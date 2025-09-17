@@ -16,44 +16,40 @@ using namespace H3DF;
 
 H3DF::Image::ImportOptionsKit::ImportOptionsKit()
 {
-	m_pcImpl = new ImageImportOptionsKitImpl();
+	m_pcImpl = std::make_unique<ImageImportOptionsKitImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::Image::ImportOptionsKit::ImportOptionsKit(ImportOptionsKit const & cInKit)
 {
-	m_pcImpl = new ImageImportOptionsKitImpl();
-	Set(cInKit);
-}
-
-void H3DF::Image::ImportOptionsKit::Set(ImportOptionsKit const & cInKit)
-{
-	ImageImportOptionsKitImpl * pcImpl = static_cast<ImageImportOptionsKitImpl *> (m_pcImpl);
-	DEBUG_VALID(pcImpl);
-	ImageImportOptionsKitImpl * ccInKitImpl = static_cast<ImageImportOptionsKitImpl *>(cInKit.m_pcImpl);
-	DEBUG_VALID(ccInKitImpl);
-
-	pcImpl->Copy(ccInKitImpl);
+	m_pcImpl = (nullptr != cInKit.GetImpl()) ? cInKit.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 Image::ImportOptionsKit const & H3DF::Image::ImportOptionsKit::operator = (ImportOptionsKit const & cInKit)
 {
-	Set(cInKit);
+	if (nullptr != cInKit.m_pcImpl) {
+		m_pcImpl = cInKit.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 void H3DF::Image::ImportOptionsKit::Show(ImportOptionsKit & cOutKit) const
 {
-	ImageImportOptionsKitImpl * pcImpl = static_cast<ImageImportOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageImportOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
-	ImageImportOptionsKitImpl * pcOutKitImpl = static_cast<ImageImportOptionsKitImpl *>(cOutKit.m_pcImpl);
-	DEBUG_VALID(pcOutKitImpl);
 
-	pcOutKitImpl->Copy(pcImpl);
+	cOutKit.m_pcImpl = pcImpl->Clone();
+	DEBUG_VALID(cOutKit.m_pcImpl);
 }
 
 bool H3DF::Image::ImportOptionsKit::Empty() const
 {
-	ImageImportOptionsKitImpl * pcImpl = static_cast<ImageImportOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageImportOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (pcImpl->m_eFormat != Image::Format::None) {
@@ -65,9 +61,9 @@ bool H3DF::Image::ImportOptionsKit::Empty() const
 
 bool H3DF::Image::ImportOptionsKit::operator == (ImportOptionsKit const & cInKit) const
 {
-	ImageImportOptionsKitImpl * pcImpl = static_cast<ImageImportOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageImportOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
-	ImageImportOptionsKitImpl * pccInKitImpl = static_cast<ImageImportOptionsKitImpl *>(cInKit.m_pcImpl);
+	ImageImportOptionsKitImpl * pccInKitImpl = static_cast<ImageImportOptionsKitImpl *>(cInKit.m_pcImpl.get());
 	DEBUG_VALID(pccInKitImpl);
 
 	if (pcImpl->m_eFormat != pccInKitImpl->m_eFormat) {
@@ -84,7 +80,7 @@ bool H3DF::Image::ImportOptionsKit::operator != (ImportOptionsKit const & cInKit
 
 Image::ImportOptionsKit & H3DF::Image::ImportOptionsKit::SetSize(UINT nInWidth, UINT nInHeight)
 {
-	ImageImportOptionsKitImpl * pcImpl = static_cast<ImageImportOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageImportOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_nWidth = nInWidth;
@@ -95,7 +91,7 @@ Image::ImportOptionsKit & H3DF::Image::ImportOptionsKit::SetSize(UINT nInWidth, 
 
 Image::ImportOptionsKit & H3DF::Image::ImportOptionsKit::SetFormat(Image::Format eInFormat)
 {
-	ImageImportOptionsKitImpl * pcImpl = static_cast<ImageImportOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageImportOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_eFormat = eInFormat;
@@ -105,7 +101,7 @@ Image::ImportOptionsKit & H3DF::Image::ImportOptionsKit::SetFormat(Image::Format
 
 Image::ImportOptionsKit & H3DF::Image::ImportOptionsKit::UnsetSize()
 {
-	ImageImportOptionsKitImpl * pcImpl = static_cast<ImageImportOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageImportOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_nWidth = 0;
@@ -116,7 +112,7 @@ Image::ImportOptionsKit & H3DF::Image::ImportOptionsKit::UnsetSize()
 
 Image::ImportOptionsKit & H3DF::Image::ImportOptionsKit::UnsetFormat()
 {
-	ImageImportOptionsKitImpl * pcImpl = static_cast<ImageImportOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageImportOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_eFormat = Image::Format::None;
@@ -126,7 +122,7 @@ Image::ImportOptionsKit & H3DF::Image::ImportOptionsKit::UnsetFormat()
 
 Image::ImportOptionsKit & H3DF::Image::ImportOptionsKit::UnsetEverything()
 {
-	ImageImportOptionsKitImpl * pcImpl = static_cast<ImageImportOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageImportOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_nWidth = 0;
@@ -138,7 +134,7 @@ Image::ImportOptionsKit & H3DF::Image::ImportOptionsKit::UnsetEverything()
 
 bool H3DF::Image::ImportOptionsKit::ShowSize(UINT & nOutWidth, UINT & nOutHeight) const
 {
-	ImageImportOptionsKitImpl * pcImpl = static_cast<ImageImportOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageImportOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	if (0 == pcImpl->m_nWidth || 0 == pcImpl->m_nHeight) {
 		return false;
@@ -152,7 +148,7 @@ bool H3DF::Image::ImportOptionsKit::ShowSize(UINT & nOutWidth, UINT & nOutHeight
 
 bool H3DF::Image::ImportOptionsKit::ShowFormat(Image::Format & eOutFormat) const
 {
-	ImageImportOptionsKitImpl * pcImpl = static_cast<ImageImportOptionsKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageImportOptionsKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	if (Image::Format::None == pcImpl->m_eFormat) {
 		return false;
@@ -166,19 +162,25 @@ bool H3DF::Image::ImportOptionsKit::ShowFormat(Image::Format & eOutFormat) const
 //== Image Kit class ===============================================================================
 H3DF::ImageKit::ImageKit()
 {
-	m_pcImpl = new ImageKitImpl();
+	m_pcImpl = std::make_unique<ImageKitImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::ImageKit::ImageKit(ImageKit const & cInKit)
 {
-	m_pcImpl = new ImageKitImpl();
-	Set(cInKit);
+	m_pcImpl = (nullptr != cInKit.GetImpl()) ? cInKit.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::ImageKit::ImageKit(ImageKit const & cInKit, H3DF::Image::Format eInFormat)
 {
-	m_pcImpl = new ImageKitImpl();
-	Set(cInKit);
+	m_pcImpl = (nullptr != cInKit.GetImpl()) ? cInKit.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
+
+	auto pcImpl = static_cast<ImageKitImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_eFormat = eInFormat;
 }
 
 H3DF::ImageKit::ImageKit(ImageKit && cInThat) noexcept :
@@ -192,37 +194,30 @@ ImageKit & H3DF::ImageKit::operator = (ImageKit && cInThat) noexcept
 	return *this;
 }
 
-
-void H3DF::ImageKit::Set(ImageKit const & cInKit)
-{
-	ImageKitImpl * pcImpl = static_cast<ImageKitImpl *> (m_pcImpl);
-	DEBUG_VALID(pcImpl);
-	ImageKitImpl * pcInKitImpl = static_cast<ImageKitImpl *>(cInKit.m_pcImpl);
-	DEBUG_VALID(pcInKitImpl);
-
-	pcImpl->Copy(pcInKitImpl);
-
-}
-
 ImageKit const & H3DF::ImageKit::operator = (ImageKit const & cInKit)
 {
-	Set(cInKit);
+	if (nullptr != cInKit.m_pcImpl) {
+		m_pcImpl = cInKit.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 void H3DF::ImageKit::Show(ImageKit & cOutKit) const
 {
-	ImageKitImpl * pcImpl = static_cast<ImageKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
-	ImageKitImpl * pcOutKitImpl = static_cast<ImageKitImpl *>(cOutKit.m_pcImpl);
-	DEBUG_VALID(pcOutKitImpl);
 
-	pcOutKitImpl->Copy(pcImpl);
+	cOutKit.m_pcImpl = pcImpl->Clone();
+	DEBUG_VALID(cOutKit.m_pcImpl);
 }
 
 bool H3DF::ImageKit::Empty() const
 {
-	ImageKitImpl * pcImpl = static_cast<ImageKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	return true;
@@ -230,12 +225,13 @@ bool H3DF::ImageKit::Empty() const
 
 bool H3DF::ImageKit::operator == (ImageKit const & cInKit) const
 {
-	ImageKitImpl * pcImpl = static_cast<ImageKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
-	ImageKitImpl * pccInKitImpl = static_cast<ImageKitImpl *>(cInKit.m_pcImpl);
-	DEBUG_VALID(pccInKitImpl);
 
-	return true;
+	auto pcInKitImpl = static_cast<ImageKitImpl *>(cInKit.m_pcImpl.get());
+	DEBUG_VALID(pcInKitImpl);
+
+	return pcImpl->Equals(pcInKitImpl);
 }
 
 bool H3DF::ImageKit::operator != (ImageKit const & cInKit) const
@@ -245,7 +241,7 @@ bool H3DF::ImageKit::operator != (ImageKit const & cInKit) const
 
 ImageKit & H3DF::ImageKit::SetSize(UINT nInWidth, UINT nInHeight)
 {
-	ImageKitImpl * pcImpl = static_cast<ImageKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_nWidth = nInWidth;
@@ -256,7 +252,7 @@ ImageKit & H3DF::ImageKit::SetSize(UINT nInWidth, UINT nInHeight)
 
 ImageKit & H3DF::ImageKit::SetData(ByteArray const & arInImageData)
 {
-	ImageKitImpl * pcImpl = static_cast<ImageKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_arImageData = arInImageData;
@@ -266,7 +262,7 @@ ImageKit & H3DF::ImageKit::SetData(ByteArray const & arInImageData)
 
 ImageKit & H3DF::ImageKit::SetData(size_t nByteCount, byte const pInImageData[])
 {
-	ImageKitImpl * pcImpl = static_cast<ImageKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_arImageData.clear();
@@ -277,7 +273,7 @@ ImageKit & H3DF::ImageKit::SetData(size_t nByteCount, byte const pInImageData[])
 
 ImageKit & H3DF::ImageKit::UnsetFormat()
 {
-	ImageKitImpl * pcImpl = static_cast<ImageKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->m_eFormat = Image::Format::None;
 
@@ -286,7 +282,7 @@ ImageKit & H3DF::ImageKit::UnsetFormat()
 
 ImageKit & H3DF::ImageKit::UnsetEverything()
 {
-	ImageKitImpl * pcImpl = static_cast<ImageKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->m_nWidth = 0;
 	pcImpl->m_nHeight = 0;
@@ -298,7 +294,7 @@ ImageKit & H3DF::ImageKit::UnsetEverything()
 
 bool H3DF::ImageKit::ShowSize(UINT & nOutWidth, UINT & nOutheight) const
 {
-	ImageKitImpl * pcImpl = static_cast<ImageKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	if (0 == pcImpl->m_nWidth || 0 == pcImpl->m_nHeight) {
 		return false;
@@ -311,7 +307,7 @@ bool H3DF::ImageKit::ShowSize(UINT & nOutWidth, UINT & nOutheight) const
 
 bool H3DF::ImageKit::ShowData(ByteArray & arOutImageData) const
 {
-	ImageKitImpl * pcImpl = static_cast<ImageKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	if (pcImpl->m_arImageData.empty()) {
 		return false;
@@ -324,7 +320,7 @@ bool H3DF::ImageKit::ShowData(ByteArray & arOutImageData) const
 
 bool H3DF::ImageKit::ShowFormat(Image::Format & cOutFormat) const
 {
-	ImageKitImpl * pcImpl = static_cast<ImageKitImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if (Image::Format::None == pcImpl->m_eFormat) {
@@ -355,25 +351,28 @@ ImageKit H3DF::Image::File::Import(CString strFilePathName, ImportOptionsKit con
 //== ImageDefinition class =========================================================================
 H3DF::ImageDefinition::ImageDefinition()
 {
-	m_pcImpl = new ImageDefinitionImpl();
 }
 
 H3DF::ImageDefinition::ImageDefinition(Definition const & cInThat)
 {
-	if (H3DF::Type::ImageDefinition != cInThat.Type())
-	{
-		DEBUG_STOP;
-		return;
-	}
+	// PolygonShapeElementImpl 생성
+	m_pcImpl = std::make_unique<ImageDefinitionImpl>();
+	auto pcImpl = static_cast<ImageDefinitionImpl *>(m_pcImpl.get());
 
-	m_pcImpl = new ImageDefinitionImpl();
-	Set(cInThat);
+	auto pcInThatImpl = static_cast<const DefinitionImpl *>(cInThat.GetImpl());
+
+	if (nullptr != pcImpl && nullptr != pcInThatImpl) {
+		pcImpl->DefinitionImpl::Copy(pcInThatImpl);
+	}
+	else {
+		DEBUG_STOP;
+	}
 }
 
 H3DF::ImageDefinition::ImageDefinition(ImageDefinition const & cInThat)
 {
-	m_pcImpl = new ImageDefinitionImpl();
-	Set(cInThat);
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::ImageDefinition::ImageDefinition(ImageDefinition && cInThat) noexcept :
@@ -387,26 +386,21 @@ ImageDefinition & H3DF::ImageDefinition::operator = (ImageDefinition && cInThat)
 	return *this;
 }
 
-void H3DF::ImageDefinition::Set(ImageDefinition const & cInKit)
-{
-	ImageDefinitionImpl * pcImpl = static_cast<ImageDefinitionImpl *> (m_pcImpl);
-	DEBUG_VALID(pcImpl);
-
-	ImageDefinitionImpl * pcInKitImpl = static_cast<ImageDefinitionImpl *>(cInKit.m_pcImpl);
-	DEBUG_VALID(pcInKitImpl);
-
-	pcImpl->Copy(pcInKitImpl);
-}
-
 ImageDefinition const & H3DF::ImageDefinition::operator = (ImageDefinition const & cInKit)
 {
-	Set(cInKit);
+	if (nullptr != cInKit.m_pcImpl) {
+		m_pcImpl = cInKit.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 void H3DF::ImageDefinition::Set(ImageKit const & cInKit)
 {
-	ImageDefinitionImpl * pcImpl = static_cast<ImageDefinitionImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageDefinitionImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_cImageKit = cInKit;
@@ -414,7 +408,7 @@ void H3DF::ImageDefinition::Set(ImageKit const & cInKit)
 
 void H3DF::ImageDefinition::Show(ImageKit & cOutKit) const
 {
-	ImageDefinitionImpl * pcImpl = static_cast<ImageDefinitionImpl *> (m_pcImpl);
+	auto pcImpl = static_cast<ImageDefinitionImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	cOutKit = pcImpl->m_cImageKit;

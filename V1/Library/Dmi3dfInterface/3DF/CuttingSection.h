@@ -72,7 +72,8 @@ namespace H3DF
         CuttingSectionKit();
         CuttingSectionKit(CuttingSectionKit const & cInKit);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::CuttingSectionKit; };
+		static const H3DF::Type staticType = H3DF::Type::CuttingSectionKit;
+		H3DF::Type ObjectType() const { return staticType; };
 
         void Set(CuttingSectionKit const & cInThat);
         CuttingSectionKit & operator = (CuttingSectionKit const & cInThat);
@@ -109,10 +110,10 @@ namespace H3DF
         explicit CuttingSectionKey(Key const & cInThat);
         CuttingSectionKey(CuttingSectionKey const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::CuttingSectionKey; };
+		static const H3DF::Type staticType = H3DF::Type::CuttingSectionKey;
+		H3DF::Type ObjectType() const { return staticType; };
 
-        void Set(CuttingSectionKey const & cInThat);
-        CuttingSectionKey & operator = (CuttingSectionKey const & cInThat);
+         CuttingSectionKey & operator = (CuttingSectionKey const & cInThat);
 
 /*
         void Set(CuttingSectionKit const & cInKit);

@@ -20,9 +20,9 @@ public:
 	PolygonKit();
 	PolygonKit(PolygonKit const & cInThat);
 
-	H3DF::Type ObjectType() const override { return H3DF::Type::PolygonKit; };
+	static const H3DF::Type staticType = H3DF::Type::PolygonKit;
+	H3DF::Type ObjectType() const { return staticType; };
 
-	void Set(PolygonKit const & cInThat);
 	PolygonKit const & operator = (PolygonKit const & cInThat);
 
 	unsigned int GetPointCount() const;
@@ -39,8 +39,9 @@ class API_3DF PolygonKey : public GeometryKey
 public:
 	PolygonKey();
 	PolygonKey(HC_KEY nInKey);
-
-	H3DF::Type ObjectType() const override { return H3DF::Type::PolygonKey; };
+	
+	static const H3DF::Type staticType = H3DF::Type::PolygonKey;
+	H3DF::Type ObjectType() const { return staticType; };
 };
 
 CLOSE_3DF_NAMESPACE

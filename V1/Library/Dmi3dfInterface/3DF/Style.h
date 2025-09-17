@@ -36,9 +36,9 @@ namespace H3DF
 		NamedStyleDefinition(HC_KEY nInKey);
 		NamedStyleDefinition(NamedStyleDefinition const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::NamedStyleDefinition; };
+		static const H3DF::Type staticType = H3DF::Type::NamedStyleDefinition;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(NamedStyleDefinition const & cInThat);
 		NamedStyleDefinition & operator = (NamedStyleDefinition const & cInThat);
 
 		SegmentKey GetSource() const;
@@ -53,9 +53,9 @@ namespace H3DF
 		explicit StyleKey(Key const & cInThat);
 		StyleKey(StyleKey const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::StyleKey; };
+		static const H3DF::Type staticType = H3DF::Type::StyleKey;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(StyleKey const & cInThat);
 		StyleKey & operator = (StyleKey const & cInThat);
 
 		CStringA Name(bool bIncludePath = true) const;
@@ -70,9 +70,9 @@ namespace H3DF
 		StyleControl(SegmentKey & cInSegment);
 		StyleControl(StyleControl const & cInThat);
 
-		H3DF::Type ObjectType() const { return H3DF::Type::StyleControl; };
+		static const H3DF::Type staticType = H3DF::Type::StyleControl;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(StyleControl const & cInThat);
 		StyleControl & operator = (StyleControl const & cInThat);
 
 		StyleKey PushNamed(CStringA strInStyleName);

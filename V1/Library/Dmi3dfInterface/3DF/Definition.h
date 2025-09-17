@@ -12,9 +12,12 @@ namespace H3DF
 		Definition(HC_KEY nInKey);
 		Definition(Definition const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::Definition; };
+		static const H3DF::Type staticType = H3DF::Type::Definition;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(Definition const & cInThat);
+		Definition(Definition && cInThat) noexcept;
+		Definition & operator = (Definition && cInThat) noexcept;
+
 		Definition const & operator = (Definition const & cInThat);
 
 		PortfolioKey Owner() const;

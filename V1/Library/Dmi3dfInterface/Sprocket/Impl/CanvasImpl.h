@@ -26,6 +26,12 @@ namespace H3DF
 		CanvasImpl();
 		virtual ~CanvasImpl();
 
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<CanvasImpl>(*this);
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
 		void Copy(const CanvasImpl * pcInThat);
 
 		Signal::Delivery & Delivery();
@@ -39,7 +45,7 @@ namespace H3DF
 
 		std::vector<H3DF::View> m_vcViewArray;
 
-		WindowKey m_cWindowKey;
+		WindowKey m_cWindow;
 
 		H3DF::Model * m_pcModel = nullptr;
 

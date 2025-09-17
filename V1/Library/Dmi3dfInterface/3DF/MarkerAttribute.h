@@ -10,11 +10,11 @@ namespace H3DF
 	class API_3DF MarkerAttributeControl : public Control
 	{
 	public:
-		MarkerAttributeControl(SegmentKey cInSegmentKey);
+		MarkerAttributeControl(SegmentKey cInSegment);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::MarkerAttributeControl; };
+		static const H3DF::Type staticType = H3DF::Type::MarkerAttributeControl;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(MarkerAttributeControl const & cInThat);
 		MarkerAttributeControl const & operator = (MarkerAttributeControl const & cInThat);
 
 		MarkerAttributeControl & SetSize(float fInSize, Marker::SizeUnits nInUnits = Marker::SizeUnits::ScaleFactor);

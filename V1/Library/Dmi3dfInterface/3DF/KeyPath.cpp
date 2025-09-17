@@ -19,7 +19,19 @@ namespace H3DF
 	class KeyPathImpl : public H3DF::Impl
 	{
 	public:
-		KeyPathImpl() { m_eType = H3DF::Type::KeyPath; }
+		std::unique_ptr<Impl> Clone() const
+		{
+			// 새 객체 생성
+			auto pcClone = std::make_unique<KeyPathImpl>();
+
+			pcClone->m_aPaths = m_aPaths;
+			pcClone->m_vKeys = m_vKeys;
+
+			strcpy_s(pcClone->m_chKeyPath, sizeof(pcClone->m_chKeyPath), m_chKeyPath);
+
+			return pcClone;
+
+		}
 
 		void Copy(KeyPathImpl * that)
 		{
@@ -122,73 +134,73 @@ bool H3DF::KeyPathImpl::GetCoordinateSpaceName(Coordinate::Space eInSpace, char 
 
 H3DF::KeyPath::KeyPath()
 {
-	m_pcImpl = new KeyPathImpl();
+	m_pcImpl = std::make_unique<KeyPathImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::KeyPath::KeyPath(KeyArray const & cInPath)
 {
-	m_pcImpl = new KeyPathImpl();
-
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
-	pcImpl->Set(cInPath);
+	m_pcImpl = std::make_unique<KeyPathImpl>();
+	static_cast<KeyPathImpl *>(m_pcImpl.get())->Set(cInPath);
 }
 
 H3DF::KeyPath::KeyPath(size_t nInPathCount, Key const pInPath[])
 {
-	m_pcImpl = new KeyPathImpl();
-
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
-	pcImpl->Set(nInPathCount, pInPath);
+	m_pcImpl = std::make_unique<KeyPathImpl>();
+	static_cast<KeyPathImpl *>(m_pcImpl.get())->Set(nInPathCount, pInPath);
 }
 
 H3DF::KeyPath::KeyPath(KeyPath const & cInThat)
 {
-	KeyPathImpl * pcImpl = new KeyPathImpl();
-	DEBUG_VALID(pcImpl);
-	m_pcImpl = pcImpl;
-
-	KeyPathImpl * pcInThatImpl = (KeyPathImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 H3DF::KeyPath::KeyPath(char chKeyPath[])
 {
-	m_pcImpl = new KeyPathImpl();
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	m_pcImpl = std::make_unique<KeyPathImpl>();
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 
-	strcpy(pcImpl->m_chKeyPath, chKeyPath);
-}
-
-void H3DF::KeyPath::Set(KeyPath const & cInThat)
-{
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
-	KeyPathImpl * pcInThatImpl = (KeyPathImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	// 안전하게 복사
+	strcpy_s(pcImpl->m_chKeyPath, sizeof(pcImpl->m_chKeyPath), chKeyPath);
 }
 
 KeyPath & H3DF::KeyPath::operator = (KeyPath const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 KeyPath & H3DF::KeyPath::operator = (KeyArray const & cInPath)
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
+	if (nullptr == pcImpl) {
+		// 방어 코드: 만약 생성자에서 m_pcImpl 할당 안 된 경우
+		m_pcImpl = std::make_unique<KeyPathImpl>();
+		pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
+	}
+
 	pcImpl->Set(cInPath);
+
 	return *this;
 }
 
 KeyPath & H3DF::KeyPath::SetKeys(KeyArray const & cInKeys)
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	pcImpl->Set(cInKeys);
+
 	return *this;
 }
 
 KeyPath & H3DF::KeyPath::UnsetKeys()
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	pcImpl->m_aPaths.clear();
 	pcImpl->m_vKeys.clear();
 	return *this;
@@ -196,7 +208,7 @@ KeyPath & H3DF::KeyPath::UnsetKeys()
 
 bool H3DF::KeyPath::ShowKeys(KeyArray & cOutKeys) const
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	if (true == pcImpl->m_aPaths.empty()) {
 		return false;
 	}
@@ -208,7 +220,7 @@ bool H3DF::KeyPath::ShowKeys(KeyArray & cOutKeys) const
 
 bool H3DF::KeyPath::ConvertCoordinate(Coordinate::Space eInSpace, Point const & cInpoint, Coordinate::Space eInOutputSpace, Point & cOutPoint) const
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 
 	char chInSpaceName[64];
 	char chInOutputSpaceName[64];
@@ -236,7 +248,7 @@ bool H3DF::KeyPath::ConvertCoordinate(Coordinate::Space eInSpace, Point const & 
 
 bool H3DF::KeyPath::ConvertCoordinate(Coordinate::Space eInSpace, PointArray const & aInPoints, Coordinate::Space eInOutputSpace, PointArray & aOutPoints) const
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 
 	aOutPoints.resize(aInPoints.size());
 
@@ -270,7 +282,8 @@ bool H3DF::KeyPath::ConvertCoordinate(Coordinate::Space eInSpace, PointArray con
 
 bool H3DF::KeyPath::ShowNetModellingMatrix(MatrixKit & cOutKit) const
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
+
 	if (true == pcImpl->m_vKeys.empty()) {
 		return false;
 	}
@@ -287,38 +300,38 @@ bool H3DF::KeyPath::ShowNetModellingMatrix(MatrixKit & cOutKit) const
 
 size_t H3DF::KeyPath::Size() const
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	return pcImpl->m_aPaths.size();
 }
 
 bool H3DF::KeyPath::Empty() const
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	return pcImpl->m_aPaths.empty();
 }
 
 Key & H3DF::KeyPath::At(size_t nInIndex)
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	return pcImpl->m_aPaths.at(nInIndex);
 }
 
 Key const & H3DF::KeyPath::At(size_t nInIndex) const
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	return pcImpl->m_aPaths.at(nInIndex);
 }
 
 void H3DF::KeyPath::Insert(size_t nInIndex, Key const & cInItem)
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *) m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	auto cIterator = pcImpl->m_aPaths.begin();
 	pcImpl->m_aPaths.insert(cIterator + nInIndex, cInItem);
 }
 
 void H3DF::KeyPath::Remove(Key const & cInItem)
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 
 	// 검색
 	auto cIterator = std::find(pcImpl->m_aPaths.begin(), pcImpl->m_aPaths.end(), cInItem);
@@ -331,14 +344,14 @@ void H3DF::KeyPath::Remove(Key const & cInItem)
 
 void H3DF::KeyPath::Remove(size_t nInIndex)
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	auto cIterator = pcImpl->m_aPaths.begin();
 	pcImpl->m_aPaths.erase(cIterator + nInIndex);
 }
 
 KeyPath H3DF::KeyPath::Reverse() const
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	KeyArray cReverseKeyArray = pcImpl->m_aPaths;
 
 	std::reverse(cReverseKeyArray.begin(), cReverseKeyArray.end());
@@ -348,31 +361,31 @@ KeyPath H3DF::KeyPath::Reverse() const
 
 Key & H3DF::KeyPath::Front()
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	return pcImpl->m_aPaths.front();
 }
 
 Key const & H3DF::KeyPath::Front() const
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	return pcImpl->m_aPaths.front();
 }
 
 Key & H3DF::KeyPath::Back()
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	return pcImpl->m_aPaths.back();
 }
 
 Key const & H3DF::KeyPath::Back() const
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	return pcImpl->m_aPaths.back();
 }
 
 Key H3DF::KeyPath::PopFront()
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	Key cKey = pcImpl->m_aPaths.front();
 	pcImpl->m_aPaths.erase(pcImpl->m_aPaths.begin());
 	return cKey;
@@ -380,7 +393,7 @@ Key H3DF::KeyPath::PopFront()
 
 Key H3DF::KeyPath::PopBack()
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	Key cKey = pcImpl->m_aPaths.back();
 	pcImpl->m_aPaths.pop_back();
 
@@ -389,21 +402,21 @@ Key H3DF::KeyPath::PopBack()
 
 KeyPath & H3DF::KeyPath::PushFront(Key const & cInKey)
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	pcImpl->m_aPaths.insert(pcImpl->m_aPaths.begin(), cInKey);
 	return *this;
 }
 
 KeyPath & H3DF::KeyPath::PushBack(Key const & cInKey)
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *)m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 	pcImpl->m_aPaths.push_back(cInKey);
 	return *this;
 }
 
 void H3DF::KeyPath::ShowString(CString & strOutPath)
 {
-	KeyPathImpl * pcImpl = (KeyPathImpl *) m_pcImpl;
+	auto pcImpl = static_cast<KeyPathImpl *>(m_pcImpl.get());
 
 	CString strText;
 

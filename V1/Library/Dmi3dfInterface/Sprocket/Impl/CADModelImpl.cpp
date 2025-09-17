@@ -28,7 +28,7 @@ H3DF::CADModelImpl::~CADModelImpl()
 	}
 }
 
-void H3DF::CADModelImpl::Copy(CADModelImpl * pcInThat)
+void H3DF::CADModelImpl::Copy(const CADModelImpl * pcInThat)
 {
 	m_pcModels = pcInThat->m_pcModels;
 	m_pcMeasurements = pcInThat->m_pcMeasurements;

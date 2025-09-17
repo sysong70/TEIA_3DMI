@@ -20,7 +20,13 @@ namespace H3DF
 		SelectabilityKitImpl();
 		void Empty();
 
-		void Copy(SelectabilityKitImpl * pcInThat);
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<SelectabilityKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy(const SelectabilityKitImpl * pcInThat);
 
 		void SetSelectability(H3DF::SelectabilityKit::SelectabilityType eType, bool bInFlag);
 		void UnsetSelectability(H3DF::SelectabilityKit::SelectabilityType eType);
@@ -32,7 +38,6 @@ namespace H3DF
 
 H3DF::SelectabilityKitImpl::SelectabilityKitImpl()
 {
-	m_eType = H3DF::Type::SelectabilityKit;
 	Empty();
 }
 
@@ -47,7 +52,7 @@ void H3DF::SelectabilityKitImpl::Empty()
 	}
 }
 
-void H3DF::SelectabilityKitImpl::Copy(SelectabilityKitImpl * pcInThat)
+void H3DF::SelectabilityKitImpl::Copy(const SelectabilityKitImpl * pcInThat)
 {
 	int nIndex = 0;
 	for(auto & bSelectability : m_bSelectabilityFlag) {
@@ -75,13 +80,14 @@ void H3DF::SelectabilityKitImpl::UnsetSelectability(H3DF::SelectabilityKit::Sele
 //== SelectabilityKit Class ========================================================================
 H3DF::SelectabilityKit::SelectabilityKit() 
 {
-	m_pcImpl = new SelectabilityKitImpl();
+	m_pcImpl = std::make_unique<SelectabilityKitImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::SelectabilityKit::SelectabilityKit(SelectabilityKit const & cInKit)
 {
-	m_pcImpl = new SelectabilityKitImpl();
-	Set(cInKit);
+	m_pcImpl = (nullptr != cInKit.GetImpl()) ? cInKit.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 SelectabilityKit H3DF::SelectabilityKit::GetDefault()
@@ -90,37 +96,36 @@ SelectabilityKit H3DF::SelectabilityKit::GetDefault()
 	return cSelectabilityKit;
 }
 
-void H3DF::SelectabilityKit::Set(SelectabilityKit const & cInKit)
-{
-	SelectabilityKitImpl * pcImpl = (SelectabilityKitImpl *) m_pcImpl;
-	SelectabilityKitImpl * pcInKitImpl = (SelectabilityKitImpl *) cInKit.m_pcImpl;
-	pcImpl->Copy(pcInKitImpl);
-}
-
 void H3DF::SelectabilityKit::Show(SelectabilityKit & cOutKit) const
 {
-	SelectabilityKitImpl * pcImpl = (SelectabilityKitImpl *) m_pcImpl;
-	SelectabilityKitImpl * pcOutKitImpl = (SelectabilityKitImpl *) cOutKit.m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
+	auto pcOutKitImpl = static_cast<SelectabilityKitImpl *>(cOutKit.m_pcImpl.get());
 	pcOutKitImpl->Copy(pcImpl);
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::operator = (SelectabilityKit const & cInKit)
 {
-	Set(cInKit);
+	if (nullptr != cInKit.m_pcImpl) {
+		m_pcImpl = cInKit.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 bool H3DF::SelectabilityKit::Empty() const
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->Empty();
 	return true;
 }
 
 bool H3DF::SelectabilityKit::Equals(SelectabilityKit const & cInKit) const
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
-	SelectabilityKitImpl * pcInKitImpl = static_cast<SelectabilityKitImpl *>(cInKit.m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
+	auto pcInKitImpl = static_cast<SelectabilityKitImpl *>(cInKit.m_pcImpl.get());
 
 	for (int nIndex = 0; nIndex < (int) SelectabilityType::Count; nIndex++) {
 		if (pcImpl->m_bSelectabilityFlag[nIndex] != pcInKitImpl->m_bSelectabilityFlag[nIndex]) {
@@ -145,70 +150,70 @@ bool H3DF::SelectabilityKit::operator != (SelectabilityKit const & cInKit) const
 
 SelectabilityKit & H3DF::SelectabilityKit::SetWindows(bool bInValue)
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability(SelectabilityType::Windows, bInValue);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::SetEdges(bool bInValue)
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability(SelectabilityType::Edges, bInValue);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::SetFaces(bool bInValue)
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability(SelectabilityType::Faces, bInValue);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::SetLights(bool bInValue)
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability(SelectabilityType::Lights, bInValue);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::SetLines(bool bInValue)
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability(SelectabilityType::Lines, bInValue);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::SetMarkers(bool bInValue)
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability(SelectabilityType::Markers, bInValue);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::SetVertices(bool bInValue)
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability(SelectabilityType::Vertices, bInValue);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::SetText(bool bInValue)
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability(SelectabilityType::Text, bInValue);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::SetGeometry(bool bInValue)
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability(SelectabilityType::Geometry, bInValue);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::SetEverything(bool bInValue)
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 
 	for(auto & bSelectability : pcImpl->m_bSelectabilityFlag) {
 		bSelectability = bInValue;
@@ -221,70 +226,70 @@ SelectabilityKit & H3DF::SelectabilityKit::SetEverything(bool bInValue)
 
 SelectabilityKit & H3DF::SelectabilityKit::UnsetWindows()
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability(SelectabilityType::Windows);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::UnsetEdges()
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability(SelectabilityType::Edges);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::UnsetFaces()
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability(SelectabilityType::Faces);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::UnsetLights()
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability(SelectabilityType::Lights);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::UnsetLines()
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability(SelectabilityType::Lines);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::UnsetMarkers()
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability(SelectabilityType::Markers);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::UnsetVertices()
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability(SelectabilityType::Vertices);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::UnsetText()
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability(SelectabilityType::Text);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::UnsetGeometry()
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability(SelectabilityType::Geometry);
 	return *this;
 }
 
 SelectabilityKit & H3DF::SelectabilityKit::UnsetEverything()
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 
 	for (auto & bUnsetSelectability : pcImpl->m_bUnsetSelectabilityFlag) {
 		bUnsetSelectability = true;
@@ -295,56 +300,56 @@ SelectabilityKit & H3DF::SelectabilityKit::UnsetEverything()
 
 bool H3DF::SelectabilityKit::ShowWindows(Selectability::Value & cOuValue) const
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	cOuValue = pcImpl->m_bSelectabilityFlag[(int) SelectabilityType::Windows] ? Selectability::Value::On : Selectability::Value::Off;
 	return true;
 }
 
 bool H3DF::SelectabilityKit::ShowEdges(Selectability::Value & cOuValue) const
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	cOuValue = pcImpl->m_bSelectabilityFlag[(int) SelectabilityType::Edges] ? Selectability::Value::On : Selectability::Value::Off;
 	return true;
 }
 
 bool H3DF::SelectabilityKit::ShowFaces(Selectability::Value & cOuValue) const
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	cOuValue = pcImpl->m_bSelectabilityFlag[(int) SelectabilityType::Faces] ? Selectability::Value::On : Selectability::Value::Off;
 	return true;
 }
 
 bool H3DF::SelectabilityKit::ShowLights(Selectability::Value & cOuValue) const
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	cOuValue = pcImpl->m_bSelectabilityFlag[(int) SelectabilityType::Lights] ? Selectability::Value::On : Selectability::Value::Off;
 	return true;
 }
 
 bool H3DF::SelectabilityKit::ShowLines(Selectability::Value & cOuValue) const
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	cOuValue = pcImpl->m_bSelectabilityFlag[(int) SelectabilityType::Lines] ? Selectability::Value::On : Selectability::Value::Off;
 	return true;
 }
 
 bool H3DF::SelectabilityKit::ShowMarkers(Selectability::Value & cOuValue) const
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	cOuValue = pcImpl->m_bSelectabilityFlag[(int) SelectabilityType::Markers] ? Selectability::Value::On : Selectability::Value::Off;
 	return true;
 }
 
 bool H3DF::SelectabilityKit::ShowVertices(Selectability::Value & cOuValue) const
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	cOuValue = pcImpl->m_bSelectabilityFlag[(int) SelectabilityType::Vertices] ? Selectability::Value::On : Selectability::Value::Off;
 	return true;
 }
 
 bool H3DF::SelectabilityKit::ShowText(Selectability::Value & cOuValue) const
 {
-	SelectabilityKitImpl * pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<SelectabilityKitImpl *>(m_pcImpl.get());
 	cOuValue = pcImpl->m_bSelectabilityFlag[(int) SelectabilityType::Text] ? Selectability::Value::On : Selectability::Value::Off;
 	return true;
 }
@@ -354,9 +359,13 @@ namespace H3DF
 	class SelectabilityControlImpl : public ControlImpl
 	{
 	public:
-		SelectabilityControlImpl() { m_eType = H3DF::Type::SelectabilityControl; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<SelectabilityControlImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(SelectabilityControlImpl * pcInThat) {
+		void Copy(const SelectabilityControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		};
 
@@ -383,30 +392,32 @@ void H3DF::SelectabilityControlImpl::UnsetSelectability(CString strInType)
 
 //== SelectabilityControl ==========================================================================
 
-H3DF::SelectabilityControl::SelectabilityControl(SegmentKey & cInSegmentKey)
+H3DF::SelectabilityControl::SelectabilityControl(SegmentKey & cInSegment)
 {
-	SelectabilityControlImpl * pcImpl = new SelectabilityControlImpl();
-	pcImpl->m_cOverrideKey = cInSegmentKey;
+	m_pcImpl = std::make_unique<SelectabilityControlImpl>();
+	DEBUG_VALID(m_pcImpl);
 
-	m_pcImpl = pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_cOverrideKey = cInSegment;
 }
 
 H3DF::SelectabilityControl::SelectabilityControl(SelectabilityControl const & cInThat)
 {
-	m_pcImpl = new SelectabilityControlImpl();
-	Set(cInThat);
-}
-
-void H3DF::SelectabilityControl::Set(SelectabilityControl const & cInThat)
-{
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *) m_pcImpl;
-	SelectabilityControlImpl * pcInThatImpl = (SelectabilityControlImpl *) cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::operator = (SelectabilityControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -414,70 +425,70 @@ SelectabilityControl & H3DF::SelectabilityControl::operator = (SelectabilityCont
 
 SelectabilityControl & H3DF::SelectabilityControl::SetWindows(bool bInValue)
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability("windows", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetEdges(bool bInValue)
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability("edges", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetFaces(bool bInValue)
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability("faces", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetLights(bool bInValue) 
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability("lights", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetLines(bool bInValue) 
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability("lines", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetMarkers(bool bInValue)
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability("markers", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetVertices(bool bInValue)
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability("vertices", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetText(bool bInValue)
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability("text", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetGeometry(bool bInValue)
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability("geometry", bInValue);
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::SetEverything(bool bInValue)
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->SetSelectability("everything", bInValue);
 	return *this;
 }
@@ -486,70 +497,70 @@ SelectabilityControl & H3DF::SelectabilityControl::SetEverything(bool bInValue)
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetWindows()
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability("windows");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetEdges()
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability("edges");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetFaces()
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability("faces");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetLights()
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability("lights");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetLines()
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability("lines");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetMarkers() 
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability("markers");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetVertices()
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability("vertices");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetText()
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability("text");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetGeometry() 
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 	pcImpl->UnsetSelectability("geometry");
 	return *this;
 }
 
 SelectabilityControl & H3DF::SelectabilityControl::UnsetEverything()
 {
-	SelectabilityControlImpl * pcImpl = (SelectabilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SelectabilityControlImpl *>(m_pcImpl.get());
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey);
 

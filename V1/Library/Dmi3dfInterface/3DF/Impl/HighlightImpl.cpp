@@ -58,7 +58,6 @@ void H3DF::HighlightSelectionSet::UpdateHighlightStyle1()
 // #Highlight 관련 설정 (Style, Color등을 설정)
 H3DF::HighlightControlImpl::HighlightControlImpl(WindowKey const & cInWindow)
 {
-	m_eType = H3DF::Type::HighlightControl;
 	m_pcWindow = (WindowKey *)&cInWindow;
 
 	// HSelectionSet은 각각 선언될때, Style을 생성하게 된다.

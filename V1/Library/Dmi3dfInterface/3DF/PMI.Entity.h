@@ -103,17 +103,17 @@ namespace H3DF {
 	class Draw;
 	class ViewEntity;
 
-	class API_3DF PMI : public SegmentKey
+	class API_3DF PmiKey : public SegmentKey
 	{
 	public:
-		PMI(HC_KEY nInKey = INVALID_KEY);
-		PMI(SegmentKey const & cInThat);
-		PMI(PMI const & cInThat);
+		PmiKey(HC_KEY nInKey = INVALID_KEY);
+		PmiKey(Key const & cInThat);
+		PmiKey(PmiKey const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::PMI; };
+		static const H3DF::Type staticType = H3DF::Type::PMI;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(PMI const & cInThat);
-		PMI const & operator=(PMI const & cInThat);
+		PmiKey const & operator=(PmiKey const & cInThat);
 
 		void GetFrame(Frame & cOutFrame);
 		void SetFrame(Frame const & cInFrame);
@@ -141,16 +141,16 @@ namespace H3DF {
 			TextAttributes const * in_text_attributes, bool is_parallel_to_screen = false);
 	};
 
-	class API_3DF DatumEntity : public PMI
+	class API_3DF DatumEntity : public PmiKey
 	{
 	public:
 		DatumEntity(HC_KEY nInKey = INVALID_KEY);
 		DatumEntity(SegmentKey const & cInThat);
 		DatumEntity(DatumEntity const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::DatumEntity; };
+		static const H3DF::Type staticType = H3DF::Type::DatumEntity;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(DatumEntity const & cInThat);
 		DatumEntity const & operator=(DatumEntity const & cInThat);
 
 		Datum::Type GetDatumType() const;
@@ -161,16 +161,16 @@ namespace H3DF {
 		void SetLabels(unsigned int in_count, CString const * pstrInlabels, TextAttributes const * in_text_attributes);
 	};
 
-	class API_3DF DimensionEntity : public PMI
+	class API_3DF DimensionEntity : public PmiKey
 	{
 	public:
 		DimensionEntity(HC_KEY nInKey = INVALID_KEY);
 		DimensionEntity(SegmentKey const & cInThat);
 		DimensionEntity(DimensionEntity const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::DimensionEntity; };
+		static const H3DF::Type staticType = H3DF::Type::DimensionEntity;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(DimensionEntity const & cInThat);
 		DimensionEntity const & operator=(DimensionEntity const & cInThat);
 
 		Dimension::Type GetDimensionType() const;
@@ -184,28 +184,28 @@ namespace H3DF {
 		void SetStrings(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes);
 	};
 
-	class API_3DF FeatureControlFrameEntity : public PMI {
+	class API_3DF FeatureControlFrameEntity : public PmiKey {
 	public:
 		FeatureControlFrameEntity(HC_KEY nInKey = INVALID_KEY);
 		FeatureControlFrameEntity(SegmentKey const & cInThat);
 		FeatureControlFrameEntity(FeatureControlFrameEntity const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::FeatureControlFrameEntity; };
+		static const H3DF::Type staticType = H3DF::Type::FeatureControlFrameEntity;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(FeatureControlFrameEntity const & cInThat);
 		FeatureControlFrameEntity const & operator=(FeatureControlFrameEntity const & cInThat);
 	};
 
-	class API_3DF GenericEntity : public PMI
+	class API_3DF GenericEntity : public PmiKey
 	{
 	public:
 		GenericEntity(HC_KEY nInKey = INVALID_KEY);
 		GenericEntity(SegmentKey const & cInThat);
 		GenericEntity(GenericEntity const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::GenericEntity; };
+		static const H3DF::Type staticType = H3DF::Type::GenericEntity;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(GenericEntity const & cInThat);
 		GenericEntity const & operator=(GenericEntity const & cInThat);
 
 		unsigned int GetStringCount() const;
@@ -216,16 +216,16 @@ namespace H3DF {
 		bool IsDisplayParallelToScreen() const;
 	};
 
-	class API_3DF NoteEntity : public PMI
+	class API_3DF NoteEntity : public PmiKey
 	{
 	public:
 		NoteEntity(HC_KEY nInKey = INVALID_KEY);
 		NoteEntity(SegmentKey const & cInThat);
 		NoteEntity(NoteEntity const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::NoteEntity; };
+		static const H3DF::Type staticType = H3DF::Type::NoteEntity;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(NoteEntity const & cInThat);
 		NoteEntity const & operator=(NoteEntity const & cInThat);
 
 		unsigned int GetStringCount() const;
@@ -233,16 +233,16 @@ namespace H3DF {
 		void SetStrings(unsigned int nInCount, CString const pstrInStrings[], TextAttributes const pcInTextAttributes[]);
 	};
 
-	class API_3DF RoughnessEntity : public PMI
+	class API_3DF RoughnessEntity : public PmiKey
 	{
 	public:
 		RoughnessEntity(HC_KEY nInKey = INVALID_KEY);
 		RoughnessEntity(SegmentKey const & cInThat);
 		RoughnessEntity(RoughnessEntity const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::RoughnessEntity; };
+		static const H3DF::Type staticType = H3DF::Type::RoughnessEntity;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(RoughnessEntity const & cInThat);
 		RoughnessEntity const & operator=(RoughnessEntity const & cInThat);
 
 		Roughness::Obtention::Type GetObtentionType() const;
@@ -259,30 +259,30 @@ namespace H3DF {
 		void SetFields(unsigned int nInCount, CString const * pstrInStrings, TextAttributes const * pcInTextAttributes);
 	};
 
-	class API_3DF Orientation : public PMI
+	class API_3DF Orientation : public PmiKey
 	{
 	public:
 		Orientation();
 		Orientation(Orientation const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::Orientation; };
+		static const H3DF::Type staticType = H3DF::Type::Orientation;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(Orientation const & cInThat);
 		Orientation const & operator=(Orientation const & cInThat);
 
 		void GetMatrix(float out_matrix[16]) const;
 		void SetMatrix(H3DF::MatrixKit const & cInMatrix);
 	};
 
-	class API_3DF TextAttributes : public PMI
+	class API_3DF TextAttributes : public PmiKey
 	{
 	public:
 		TextAttributes();
 		TextAttributes(TextAttributes const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::TextAttributes; };
+		static const H3DF::Type staticType = H3DF::Type::TextAttributes;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(TextAttributes const & cInThat);
 		TextAttributes const & operator=(TextAttributes const & cInThat);
 
 		void GetInsertionPoint(H3DF::Point & out_point) const;
@@ -318,15 +318,15 @@ namespace H3DF {
 		void SetWidthScale(const double dWidthScale);
 	};
 
-	class API_3DF Options : public PMI
+	class API_3DF Options : public PmiKey
 	{
 	public:
 		Options();
 		Options(Options const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::Options; };
+		static const H3DF::Type staticType = H3DF::Type::Options;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(Options const & cInThat);
 		Options const & operator=(Options const & cInThat);
 
 		// Set the option parallel to screen. The pmi is display parallel to screen and is not impacted by any rotation
@@ -335,15 +335,15 @@ namespace H3DF {
 		bool IsDisplayParallelToScreen() const;
 	};
 
-	class API_3DF Frame : public PMI
+	class API_3DF Frame : public PmiKey
 	{
 	public:
 		Frame();
 		Frame(Frame const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::Frame; };
+		static const H3DF::Type staticType = H3DF::Type::Frame;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(Frame const & cInThat);
 		Frame const & operator=(Frame const & cInThat);
 
 		unsigned int GetPolylineCount() const;
@@ -351,15 +351,15 @@ namespace H3DF {
 		void SetPolylines(unsigned int nInCount, H3DF::Polyline const * pcInPolylines);
 	};
 
-	class API_3DF Draw : public PMI
+	class API_3DF Draw : public PmiKey
 	{
 	public:
 		Draw();
 		Draw(Draw const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::Draw; };
+		static const H3DF::Type staticType = H3DF::Type::Draw;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(Draw const & cInThat);
 		Draw const & operator=(Draw const & cInThat);
 
 		unsigned int GetPolygonCount() const;
@@ -368,23 +368,23 @@ namespace H3DF {
 		void SetPolygons(unsigned int nInCount, H3DF::Polygon const * pcInPolygons);
 	};
 
-	class API_3DF ViewEntity : public PMI
+	class API_3DF ViewEntity : public PmiKey
 	{
 	public:
 		ViewEntity(HC_KEY nInSegmentKey = INVALID_KEY);
 		ViewEntity(SegmentKey & nInSegmentKey);
 		ViewEntity(ViewEntity const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::ViewEntity; };
+		static const H3DF::Type staticType = H3DF::Type::ViewEntity;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(ViewEntity const & cInThat);
 		ViewEntity const & operator = (ViewEntity const & cInThat);
 
 		void GetCamera(CameraKit & cOutCamera) const;
 		void SetCamera(CameraKit const & cInCamera);
 
 		size_t GetAssociatedEntityCount() const;
-		void GetAssociatedEntities(size_t & nOutCount, PMI *& pcOutEntities) const;
+		void GetAssociatedEntities(size_t & nOutCount, PmiKey *& pcOutEntities) const;
 // 		void SetAssociatedEntities(unsigned int in_count, PMI const in_entities[]);
 /*
 		void GetCamera(Point & out_position,

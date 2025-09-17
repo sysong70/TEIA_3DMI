@@ -18,11 +18,7 @@ using namespace H3DF;
 //== CADModel Class =================================================================================
 H3DF::CADModel::CADModel()
 {
-	if (nullptr != m_pcImpl) {
-		REMOVE_POINTER(m_pcImpl);
-	}
-
-	m_pcImpl = new CADModelImpl();
+	m_pcImpl = std::make_unique<CADModelImpl>();
 	DEBUG_VALID(m_pcImpl);
 }
 
@@ -40,26 +36,21 @@ H3DF::CADModel::CADModel(Component const & cInThat)
 }
 */
 
-void H3DF::CADModel::Set(CADModel const & cInThat)
-{
-	CADModelImpl * pcImpl = (CADModelImpl *)m_pcImpl;
-	DEBUG_VALID(pcImpl);
-
-	CADModelImpl * pcInThatImpl = (CADModelImpl *)cInThat.m_pcImpl;
-	DEBUG_VALID(pcInThatImpl);
-
-	pcImpl->Copy(pcInThatImpl);
-}
-
 CADModel & H3DF::CADModel::operator = (CADModel const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 Component * H3DF::CADModel::GetComponent(HC_KEY cInKey) const
 {
-	CADModelImpl * pcImpl = (CADModelImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CADModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	
 // 	Component * pcOutComponent = nullptr;
@@ -72,7 +63,7 @@ Component * H3DF::CADModel::GetComponent(HC_KEY cInKey) const
 
 Component * H3DF::CADModel::GetComponent(H3DF::SelectionItem & cInItem) const
 {
-	CADModelImpl * pcImpl = (CADModelImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CADModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	H3DF::KeyPath cPath;
@@ -147,7 +138,7 @@ bool H3DF::CADModel::ShowSelectionResult(Component * pcInComponent, H3DF::Select
 		return true;
 	}
 
-	CADModelImpl * pcImpl = (CADModelImpl *)m_pcImpl;
+	auto pcImpl = static_cast<CADModelImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	// RepresentationItem이면 마지막 하부까지 탐색한걸로 간주한다.

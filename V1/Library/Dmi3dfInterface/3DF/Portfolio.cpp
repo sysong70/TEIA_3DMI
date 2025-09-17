@@ -2,6 +2,8 @@
 
 #include "Portfolio.h"
 
+#include "Impl/Portfolio.Impl.h"
+
 #include "Segment.h"
 #include "./Impl/SegmentImpl.h"
 
@@ -9,6 +11,7 @@
 #include "./Impl/ImageImpl.h"
 #include "./Impl/TextureImpl.h"
 #include "./Impl/DefinitionImpl.h"
+#include "./Impl/Shape.Impl.h"
 
 #include "Style.h"
 #include "Visibility.h"
@@ -17,89 +20,59 @@
 
 using namespace H3DF;
 
-namespace H3DF
-{
-	class PortfolioKeyImpl : public Impl
-	{
-	public:
-		static CStringA FormatString(Image::Format cInFormat);
-	};
-}
-
-CStringA H3DF::PortfolioKeyImpl::FormatString(Image::Format cInFormat)
-{
-	CStringA strFormatText;
-
-	switch (cInFormat)
-	{
-		case H3DF::Image::Format::RGB:
-			strFormatText = "rgb";
-			break;
-		case H3DF::Image::Format::RGBA:
-			strFormatText = "rgba";
-			break;
-		case H3DF::Image::Format::ARGB:
-			strFormatText = "argb";
-			break;
-		case H3DF::Image::Format::Mapped8:
-			strFormatText = "mapped8";
-			break;
-		case H3DF::Image::Format::Grayscale:
-			strFormatText = "grayscale";
-			break;
-		case H3DF::Image::Format::Bmp:
-			strFormatText = "bmp";
-			break;
-		case H3DF::Image::Format::Jpeg:
-			strFormatText = "jpeg";
-			break;
-		case H3DF::Image::Format::Png:
-			strFormatText = "png";
-			break;
-		case H3DF::Image::Format::Targa:
-			strFormatText = "targa";
-			break;
-		case H3DF::Image::Format::DXT1:
-			strFormatText = "dxt1";
-			break;
-		case H3DF::Image::Format::DXT3:
-			strFormatText = "dxt3";
-			break;
-		case H3DF::Image::Format::DXT5:
-			strFormatText = "dxt5";
-			break;
-		default:
-			DEBUG_STOP;
-			break;
-	}
-
-	return strFormatText;
-}
-
 H3DF::PortfolioKey::PortfolioKey()
 {
+	m_pcImpl = std::make_unique<PortfolioKeyImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
-H3DF::PortfolioKey::PortfolioKey(HC_KEY nInKey) : Key(nInKey)
+H3DF::PortfolioKey::PortfolioKey(HC_KEY nInKey)
 {
+	if (INVALID_KEY == nInKey) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<PortfolioKeyImpl>();
+	DEBUG_VALID(m_pcImpl);
+
+	static_cast<PortfolioKeyImpl *>(m_pcImpl.get())->SetKeyValue(nInKey);
 }
 
-H3DF::PortfolioKey::PortfolioKey(Key const & cInThat) : Key(cInThat) 
+H3DF::PortfolioKey::PortfolioKey(Key const & cInThat)
 {
+	// cInThat이 올바른 Impl(PortfolioKeyImpl)을 가지고 있으면 복제
+	if (cInThat.GetImpl()) {
+		// 만약 PortfolioKeyImpl이 KeyImpl에서 파생된 구조라면 dynamic_cast에 의해서 nullptr이 아닌 정상적인 값이 넘어옴
+		auto pcSrcImpl = dynamic_cast<const PortfolioKeyImpl *>(cInThat.GetImpl());
+		if (nullptr != pcSrcImpl) {
+			m_pcImpl = pcSrcImpl->Clone();
+		}
+		else {
+			// 타입이 다를 경우 예외 처리 또는 방어적 초기화
+			m_pcImpl = std::make_unique<PortfolioKeyImpl>();
+			static_cast<PortfolioKeyImpl *>(m_pcImpl.get())->Copy((PortfolioKeyImpl *) (cInThat.GetImpl()));
+		}
+	}
+	else {
+		m_pcImpl = std::make_unique<PortfolioKeyImpl>();
+		static_cast<PortfolioKeyImpl *>(m_pcImpl.get())->Copy((PortfolioKeyImpl *) (cInThat.GetImpl()));
+	}
 }
 
-H3DF::PortfolioKey::PortfolioKey(PortfolioKey const & cInThat) : Key(cInThat)
+H3DF::PortfolioKey::PortfolioKey(PortfolioKey const & cInThat)
 {
-}
-
-void H3DF::PortfolioKey::Set(PortfolioKey const & cInThat)
-{
-	Key::Set(cInThat);
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 PortfolioKey & H3DF::PortfolioKey::operator = (PortfolioKey const & cInThat)
 {
-	Key::Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -244,6 +217,70 @@ NamedStyleDefinition H3DF::PortfolioKey::DefineNamedStyle(CStringA strInName, Se
 	return cStyle;
 }
 
+ShapeDefinition H3DF::PortfolioKey::DefineShape(CStringA strInName, ShapeKit const & cInSource)
+{
+	if (INVALID_KEY == KeyValue()) {
+		DEBUG_STOP;
+	}
+
+	SegmentKey cPortfolio(KeyValue());
+
+	CStringA strName = cPortfolio.Name();
+
+	// Portpolio
+	SegmentKey cShapesSegment = cPortfolio.Subsegment("shapes");
+
+	SegmentKey cStyleSegment = cShapesSegment.Subsegment(strInName);
+
+	ShapeElementArray arShapeElements;
+	if (false == cInSource.ShowElements(arShapeElements)) {
+		DEBUG_STOP;
+	}
+
+	std::vector<float> vfData;
+
+	PortfolioKeyImpl::CreateShapeData(arShapeElements, vfData);
+
+	cStyleSegment.Open(); {
+		HC_Define_Shape(strInName, (int)vfData.size(), vfData.data());
+	} cStyleSegment.Close();
+
+	ShapeDefinition cDefinition;
+	ShapeDefinitionImpl * pcShapeImpl = static_cast<ShapeDefinitionImpl *>(cDefinition.GetImpl());
+	DEBUG_VALID(pcShapeImpl);
+
+	pcShapeImpl->m_nKey = cStyleSegment.KeyValue();
+	pcShapeImpl->m_cOwnerPortfolio = *this;
+	pcShapeImpl->m_strName = strInName;
+
+/*
+	float const clipped[] = {
+		3,  
+		8, 1,  0, 1,  0, 1,  0, 1, 0, 0,  0,  1, 1, -1, 0, 0,  0,  1, 1, -1, 0, -1, 0, 1, 0,
+							 -1, 0, -1, 0, -1, 0, -1, 0, 0, 0, -1, -1, 1, 0, 0,  0, -1, -1, 1, 0, 1,  0, -1, 0, 0 };
+	HC_Define_Shape("clipped", countof(clipped), clipped);
+
+	HC_Open_Segment("clipped");
+	HC_Set_Text_Font("background=shape=clipped");
+	HC_Insert_Text(-0.8, 0.8, 0, "corner trimmed box");
+	HC_Close_Segment();
+
+	HC_Define_Shape(strInName, )*/
+  
+
+	return cDefinition;
+}
+
+PortfolioKey & H3DF::PortfolioKey::UndefineShape(CStringA strInName)
+{
+	if (INVALID_KEY == KeyValue()) {
+		DEBUG_STOP;
+	}
+
+	return *this;
+}
+
+
 //== PortfolioControlImpl 관련 함수 ==================================================================
 
 namespace H3DF
@@ -251,56 +288,51 @@ namespace H3DF
 	class PortfolioControlImpl : public ControlImpl
 	{
 	public:
-		PortfolioControlImpl();
-		virtual ~PortfolioControlImpl();
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<PortfolioControlImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(PortfolioControlImpl * pcInThat) {
+		void Copy(const PortfolioControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
 	};
 }
 
-H3DF::PortfolioControlImpl::PortfolioControlImpl()
-{
-	m_eType = H3DF::Type::PortfolioControl;
-}
-
-H3DF::PortfolioControlImpl::~PortfolioControlImpl()
-{
-}
-
 //== PortfolioControl 관련 함수 ======================================================================
 
-H3DF::PortfolioControl::PortfolioControl(SegmentKey & cInSegmentKey)
+H3DF::PortfolioControl::PortfolioControl(SegmentKey & cInSegment)
 {
-	PortfolioControlImpl * pcImpl = new PortfolioControlImpl();
-	pcImpl->m_cOverrideKey = cInSegmentKey;
+	m_pcImpl = std::make_unique<PortfolioControlImpl>();
+	DEBUG_VALID(m_pcImpl);
 
-	m_pcImpl = pcImpl;
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+	
+	pcImpl->m_cOverrideKey = cInSegment;
 }
 
 H3DF::PortfolioControl::PortfolioControl(PortfolioControl const & cInThat)
 {
-	m_pcImpl = new PortfolioControlImpl();
-	Set(cInThat);
-}
-
-void H3DF::PortfolioControl::Set(PortfolioControl const & cInThat)
-{
-	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
-	PortfolioControlImpl * pcInThatImpl = (PortfolioControlImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 PortfolioControl & H3DF::PortfolioControl::operator = (PortfolioControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 size_t H3DF::PortfolioControl::GetCount() const
 {
-	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	PortfolioKeyArray arPortfolios;
@@ -311,7 +343,7 @@ size_t H3DF::PortfolioControl::GetCount() const
 
 PortfolioControl & H3DF::PortfolioControl::Push(PortfolioKey const & cInPortfolio)
 {
-	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -323,7 +355,7 @@ PortfolioControl & H3DF::PortfolioControl::Push(PortfolioKey const & cInPortfoli
 
 bool H3DF::PortfolioControl::Pop()
 {
-	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	PortfolioKeyArray arPortfolios;
@@ -343,7 +375,7 @@ bool H3DF::PortfolioControl::Pop()
 }
 bool H3DF::PortfolioControl::Pop(PortfolioKey & cOutPortfolio)
 {
-	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	PortfolioKeyArray arPortfolios;
@@ -365,7 +397,7 @@ bool H3DF::PortfolioControl::Pop(PortfolioKey & cOutPortfolio)
 
 PortfolioControl & H3DF::PortfolioControl::Set(PortfolioKey const & cInPortfolio)
 {
-	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	UnsetEverything();
@@ -379,7 +411,7 @@ PortfolioControl & H3DF::PortfolioControl::Set(PortfolioKey const & cInPortfolio
 
 PortfolioControl & H3DF::PortfolioControl::Set(PortfolioKeyArray const & cInPortfolios)
 {
-	PortfolioControlImpl * pcImpl = (PortfolioControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	UnsetEverything();
@@ -401,7 +433,7 @@ PortfolioControl & H3DF::PortfolioControl::UnsetTop()
 
 PortfolioControl & H3DF::PortfolioControl::UnsetEverything()
 {
-	PortfolioControlImpl * pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	PortfolioKeyArray arPortfolios;
@@ -432,11 +464,12 @@ bool H3DF::PortfolioControl::ShowTop(PortfolioKey & cOutPortfolio) const
 
 bool H3DF::PortfolioControl::Show(PortfolioKeyArray & cOutPortfolios) const
 {
-	PortfolioControlImpl * pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl);
+	auto pcImpl = static_cast<PortfolioControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKey cModelSegment;
 
+	// Model을 찾는다.
 	if (H3DF::Type::Model == pcImpl->m_cOverrideKey.Type()) {
 		cModelSegment = pcImpl->m_cOverrideKey;
 	}
@@ -458,7 +491,9 @@ bool H3DF::PortfolioControl::Show(PortfolioKeyArray & cOutPortfolios) const
 	CStringA strModelSegmentName = cModelSegment.Name();
 
 	CStringA strPortfoliosText = strModelSegmentName + "/portfolios";
+
 	SearchResultsIterator cIter = cResults.GetIterator();
+
 	while (true == cIter.IsValid()) {
 		if (H3DF::Type::SegmentStyle != cIter.GetItem().Type()) {
 			DEBUG_STOP;
@@ -472,7 +507,7 @@ bool H3DF::PortfolioControl::Show(PortfolioKeyArray & cOutPortfolios) const
 		cStyle.ShowSource(eSoruceType, cSource, strSourceName);
 
 		if (0 == strSourceName.Left(strPortfoliosText.GetLength()).Compare(strPortfoliosText)) {
-			cOutPortfolios.emplace_back(cStyle.KeyValue());
+			cOutPortfolios.emplace_back(cSource.KeyValue());
 		}
 
 		cIter.Next();

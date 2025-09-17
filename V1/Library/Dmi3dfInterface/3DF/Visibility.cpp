@@ -20,9 +20,19 @@ namespace H3DF
 	class VisibilityKitImpl : public Impl
 	{
 	public:
-		VisibilityKitImpl();
+		VisibilityKitImpl() {
+			for (auto & nFlag : m_bVisibilityFlag) {
+				nFlag = 0;
+			}
+		}
+		
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<VisibilityKitImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(VisibilityKitImpl * pcInThat) {
+		void Copy(const VisibilityKitImpl * pcInThat) {
 
 			for (int nIndex = 0; nIndex < (int)H3DF::VisibilityKit::VisibilityType::Count; nIndex++) {
 				m_bVisibilityFlag[nIndex] = pcInThat->m_bVisibilityFlag[nIndex];
@@ -33,15 +43,6 @@ namespace H3DF
 
 		int m_bVisibilityFlag[(int)H3DF::VisibilityKit::VisibilityType::Count];
 	};
-}
-
-VisibilityKitImpl::VisibilityKitImpl()
-{
-	m_eType = H3DF::Type::VisibilityKit;
-
-	for (auto & nFlag : m_bVisibilityFlag) {
-		nFlag = 0;
-	}
 }
 
 void VisibilityKitImpl::SetVisibility(H3DF::VisibilityKit::VisibilityType eType, bool bInFlag)
@@ -56,25 +57,25 @@ void VisibilityKitImpl::SetVisibility(H3DF::VisibilityKit::VisibilityType eType,
 
 H3DF::VisibilityKit::VisibilityKit()
 {
-	m_pcImpl = new VisibilityKitImpl();
+	m_pcImpl = std::make_unique<VisibilityKitImpl>();
+	DEBUG_VALID(m_pcImpl);
 }
 
 H3DF::VisibilityKit::VisibilityKit(VisibilityKit const & cInThat)
 {
-	m_pcImpl = new VisibilityKitImpl();
-	Set(cInThat);
-}
-
-void H3DF::VisibilityKit::Set(VisibilityKit const & cInThat)
-{
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
-	VisibilityKitImpl * pcInThatImpl = (VisibilityKitImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 VisibilityKit const & H3DF::VisibilityKit::operator = (VisibilityKit const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -82,7 +83,7 @@ VisibilityKit const & H3DF::VisibilityKit::operator = (VisibilityKit const & cIn
 
 VisibilityKit & H3DF::VisibilityKit::SetWindows(bool bInState)
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetVisibility(VisibilityType::Windows, bInState);
@@ -92,7 +93,7 @@ VisibilityKit & H3DF::VisibilityKit::SetWindows(bool bInState)
 
 VisibilityKit & H3DF::VisibilityKit::SetEdges(bool bInState)
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetVisibility(VisibilityType::Edges, bInState);
@@ -102,7 +103,7 @@ VisibilityKit & H3DF::VisibilityKit::SetEdges(bool bInState)
 
 VisibilityKit & H3DF::VisibilityKit::SetFaces(bool bInState)
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetVisibility(VisibilityType::Faces, bInState);
@@ -112,7 +113,7 @@ VisibilityKit & H3DF::VisibilityKit::SetFaces(bool bInState)
 
 VisibilityKit & H3DF::VisibilityKit::SetLights(bool bInState)
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetVisibility(VisibilityType::Lights, bInState);
@@ -122,7 +123,7 @@ VisibilityKit & H3DF::VisibilityKit::SetLights(bool bInState)
 
 VisibilityKit & H3DF::VisibilityKit::SetLines(bool bInState)
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetVisibility(VisibilityType::Lines, bInState);
@@ -132,7 +133,7 @@ VisibilityKit & H3DF::VisibilityKit::SetLines(bool bInState)
 
 VisibilityKit & H3DF::VisibilityKit::SetMarkers(bool bInState)
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetVisibility(VisibilityType::Markers, bInState);
@@ -143,7 +144,7 @@ VisibilityKit & H3DF::VisibilityKit::SetMarkers(bool bInState)
 
 VisibilityKit & H3DF::VisibilityKit::SetVertices(bool bInState)
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetVisibility(VisibilityType::Vertices, bInState);
@@ -154,7 +155,7 @@ VisibilityKit & H3DF::VisibilityKit::SetVertices(bool bInState)
 
 VisibilityKit & H3DF::VisibilityKit::SetText(bool bInState)
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetVisibility(VisibilityType::Text, bInState);
@@ -164,7 +165,7 @@ VisibilityKit & H3DF::VisibilityKit::SetText(bool bInState)
 
 VisibilityKit & H3DF::VisibilityKit::SetGeometry(bool bInState)
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetVisibility(VisibilityType::Geometry, bInState);
@@ -174,7 +175,7 @@ VisibilityKit & H3DF::VisibilityKit::SetGeometry(bool bInState)
 
 VisibilityKit & H3DF::VisibilityKit::SetEverything(bool bInState)
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->SetVisibility(VisibilityType::Everything, bInState);
@@ -186,7 +187,7 @@ VisibilityKit & H3DF::VisibilityKit::SetEverything(bool bInState)
 
 VisibilityKit & H3DF::VisibilityKit::UnsetWindows()
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bVisibilityFlag[(int)VisibilityType::Windows] = VisibilityUnSet;
@@ -196,7 +197,7 @@ VisibilityKit & H3DF::VisibilityKit::UnsetWindows()
 
 VisibilityKit & H3DF::VisibilityKit::UnsetEdges()
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bVisibilityFlag[(int)VisibilityType::Edges] = VisibilityUnSet;
@@ -206,7 +207,7 @@ VisibilityKit & H3DF::VisibilityKit::UnsetEdges()
 
 VisibilityKit & H3DF::VisibilityKit::UnsetFaces()
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bVisibilityFlag[(int)VisibilityType::Faces] = VisibilityUnSet;
@@ -216,7 +217,7 @@ VisibilityKit & H3DF::VisibilityKit::UnsetFaces()
 
 VisibilityKit & H3DF::VisibilityKit::UnsetLights()
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bVisibilityFlag[(int)VisibilityType::Lights] = VisibilityUnSet;
@@ -226,7 +227,7 @@ VisibilityKit & H3DF::VisibilityKit::UnsetLights()
 
 VisibilityKit & H3DF::VisibilityKit::UnsetLines()
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bVisibilityFlag[(int)VisibilityType::Lines] = VisibilityUnSet;
@@ -236,7 +237,7 @@ VisibilityKit & H3DF::VisibilityKit::UnsetLines()
 
 VisibilityKit & H3DF::VisibilityKit::UnsetMarkers()
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bVisibilityFlag[(int)VisibilityType::Markers] = VisibilityUnSet;
@@ -247,7 +248,7 @@ VisibilityKit & H3DF::VisibilityKit::UnsetMarkers()
 
 VisibilityKit & H3DF::VisibilityKit::UnsetVertices()
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bVisibilityFlag[(int)VisibilityType::Vertices] = VisibilityUnSet;
@@ -257,7 +258,7 @@ VisibilityKit & H3DF::VisibilityKit::UnsetVertices()
 
 VisibilityKit & H3DF::VisibilityKit::UnsetText()
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bVisibilityFlag[(int)VisibilityType::Text] = VisibilityUnSet;
@@ -267,7 +268,7 @@ VisibilityKit & H3DF::VisibilityKit::UnsetText()
 
 VisibilityKit & H3DF::VisibilityKit::UnsetGeometry()
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bVisibilityFlag[(int)VisibilityType::Geometry] = VisibilityUnSet;
@@ -277,7 +278,7 @@ VisibilityKit & H3DF::VisibilityKit::UnsetGeometry()
 
 VisibilityKit & H3DF::VisibilityKit::UnsetEverything()
 {
-	VisibilityKitImpl * pcImpl = (VisibilityKitImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityKitImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	pcImpl->m_bVisibilityFlag[(int)VisibilityType::Everything] = VisibilityUnSet;
@@ -292,9 +293,15 @@ namespace H3DF
 	class VisibilityControlImpl : public ControlImpl
 	{
 	public:
-		VisibilityControlImpl() { m_eType = H3DF::Type::VisibilityControl; }
+		VisibilityControlImpl() {}
 
-		void Copy(VisibilityControlImpl * pcInThat) {
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<VisibilityControlImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy(const VisibilityControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
 
@@ -324,30 +331,32 @@ void H3DF::VisibilityControlImpl::UnSetVisibility(CStringA strInType)
 	SegmentKeyImpl::LocalClose(m_cOverrideKey);
 }
 
-H3DF::VisibilityControl::VisibilityControl(SegmentKey & cInSegmentKey)
+H3DF::VisibilityControl::VisibilityControl(SegmentKey & cInSegment)
 {
-	VisibilityControlImpl * pcImpl = new VisibilityControlImpl();
-	pcImpl->m_cOverrideKey = cInSegmentKey;
+	m_pcImpl = std::make_unique<VisibilityControlImpl>();
+	DEBUG_VALID(m_pcImpl);
 
-	m_pcImpl = pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
+	DEBUG_VALID(pcImpl);
+
+	pcImpl->m_cOverrideKey = cInSegment;
 }
 
 H3DF::VisibilityControl::VisibilityControl(VisibilityControl const & cInThat)
 {
-	m_pcImpl = new VisibilityControlImpl();
-	Set(cInThat);
-}
-
-void H3DF::VisibilityControl::Set(VisibilityControl const & cInThat)
-{
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
-	VisibilityControlImpl * pcInThatImpl = (VisibilityControlImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+	DEBUG_VALID(m_pcImpl);
 }
 
 VisibilityControl & H3DF::VisibilityControl::operator = (VisibilityControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -355,7 +364,7 @@ VisibilityControl & H3DF::VisibilityControl::operator = (VisibilityControl const
 
 VisibilityControl & H3DF::VisibilityControl::SetCuttingSections(bool bInState)
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetVisibility("cutting planes", bInState);
 
@@ -364,7 +373,7 @@ VisibilityControl & H3DF::VisibilityControl::SetCuttingSections(bool bInState)
 
 VisibilityControl & H3DF::VisibilityControl::SetWindows(bool bInState)
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetVisibility("windows", bInState);
 
@@ -373,7 +382,7 @@ VisibilityControl & H3DF::VisibilityControl::SetWindows(bool bInState)
 
 VisibilityControl & H3DF::VisibilityControl::SetEdges(bool bInState)
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetVisibility("edges", bInState);
 
@@ -382,7 +391,7 @@ VisibilityControl & H3DF::VisibilityControl::SetEdges(bool bInState)
 
 VisibilityControl & H3DF::VisibilityControl::SetFaces(bool bInState)
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetVisibility("faces", bInState);
 
@@ -391,7 +400,7 @@ VisibilityControl & H3DF::VisibilityControl::SetFaces(bool bInState)
 
 VisibilityControl & H3DF::VisibilityControl::SetLights(bool bInState) 
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetVisibility("lights", bInState);
 
@@ -400,7 +409,7 @@ VisibilityControl & H3DF::VisibilityControl::SetLights(bool bInState)
 
 VisibilityControl & H3DF::VisibilityControl::SetLines(bool bInState) 
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetVisibility("lines", bInState);
 
@@ -409,7 +418,7 @@ VisibilityControl & H3DF::VisibilityControl::SetLines(bool bInState)
 
 VisibilityControl & H3DF::VisibilityControl::SetMarkers(bool bInState)
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetVisibility("markers", bInState);
 
@@ -418,7 +427,7 @@ VisibilityControl & H3DF::VisibilityControl::SetMarkers(bool bInState)
 
 VisibilityControl & H3DF::VisibilityControl::SetVertices(bool bInState)
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetVisibility("vertices", bInState);
 
@@ -427,7 +436,7 @@ VisibilityControl & H3DF::VisibilityControl::SetVertices(bool bInState)
 
 VisibilityControl & H3DF::VisibilityControl::SetText(bool bInState)
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetVisibility("text", bInState);
 
@@ -436,7 +445,7 @@ VisibilityControl & H3DF::VisibilityControl::SetText(bool bInState)
 
 VisibilityControl & H3DF::VisibilityControl::SetShadows(bool bInState)
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *) m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetVisibility("shadows", bInState);
 
@@ -445,7 +454,7 @@ VisibilityControl & H3DF::VisibilityControl::SetShadows(bool bInState)
 
 VisibilityControl & H3DF::VisibilityControl::SetGeometry(bool bInState)
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetVisibility("geometry", bInState);
 
@@ -454,7 +463,7 @@ VisibilityControl & H3DF::VisibilityControl::SetGeometry(bool bInState)
 
 VisibilityControl & H3DF::VisibilityControl::SetEverything(bool bInState)
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->SetVisibility("everything", bInState);
 
@@ -464,7 +473,7 @@ VisibilityControl & H3DF::VisibilityControl::SetEverything(bool bInState)
 //== Unset Selectability Control ===================================================================
 VisibilityControl & H3DF::VisibilityControl::UnsetCuttingSections()
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnSetVisibility("cutting planes");
 
@@ -473,7 +482,7 @@ VisibilityControl & H3DF::VisibilityControl::UnsetCuttingSections()
 
 VisibilityControl & H3DF::VisibilityControl::UnsetWindows()
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnSetVisibility("windows");
 
@@ -482,7 +491,7 @@ VisibilityControl & H3DF::VisibilityControl::UnsetWindows()
 
 VisibilityControl & H3DF::VisibilityControl::UnsetEdges()
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnSetVisibility("edges");
 
@@ -491,7 +500,7 @@ VisibilityControl & H3DF::VisibilityControl::UnsetEdges()
 
 VisibilityControl & H3DF::VisibilityControl::UnsetFaces()
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnSetVisibility("faces");
 
@@ -500,7 +509,7 @@ VisibilityControl & H3DF::VisibilityControl::UnsetFaces()
 
 VisibilityControl & H3DF::VisibilityControl::UnsetLights()
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnSetVisibility("lights");
 
@@ -509,7 +518,7 @@ VisibilityControl & H3DF::VisibilityControl::UnsetLights()
 
 VisibilityControl & H3DF::VisibilityControl::UnsetLines()
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnSetVisibility("lines");
 
@@ -518,7 +527,7 @@ VisibilityControl & H3DF::VisibilityControl::UnsetLines()
 
 VisibilityControl & H3DF::VisibilityControl::UnsetMarkers() 
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnSetVisibility("markers");
 
@@ -527,7 +536,7 @@ VisibilityControl & H3DF::VisibilityControl::UnsetMarkers()
 
 VisibilityControl & H3DF::VisibilityControl::UnsetVertices()
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnSetVisibility("vertices");
 
@@ -536,7 +545,7 @@ VisibilityControl & H3DF::VisibilityControl::UnsetVertices()
 
 VisibilityControl & H3DF::VisibilityControl::UnsetText()
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnSetVisibility("text");
 
@@ -545,7 +554,7 @@ VisibilityControl & H3DF::VisibilityControl::UnsetText()
 
 VisibilityControl & H3DF::VisibilityControl::UnsetShadows()
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnSetVisibility("shadows");
 
@@ -554,7 +563,7 @@ VisibilityControl & H3DF::VisibilityControl::UnsetShadows()
 
 VisibilityControl & H3DF::VisibilityControl::UnsetGeometry() 
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 	pcImpl->UnSetVisibility("geometry");
 
@@ -563,7 +572,7 @@ VisibilityControl & H3DF::VisibilityControl::UnsetGeometry()
 
 VisibilityControl & H3DF::VisibilityControl::UnsetEverything()
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {
@@ -575,7 +584,7 @@ VisibilityControl & H3DF::VisibilityControl::UnsetEverything()
 
 bool H3DF::VisibilityControl::ShowFaces(bool & bOutState) const
 {
-	VisibilityControlImpl * pcImpl = (VisibilityControlImpl *)m_pcImpl;
+	auto pcImpl = static_cast<VisibilityControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	SegmentKeyImpl::LocalOpen(pcImpl->m_cOverrideKey); {

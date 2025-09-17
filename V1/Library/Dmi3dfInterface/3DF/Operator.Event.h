@@ -82,7 +82,6 @@ namespace H3DF
 			Event(H3DF::WindowKey & cInWindowKey);
 			Event(Event const & cInThat);
 
-			void Set(Event const & cInThat);
 			Event & operator = (Event const & cInThat);
 
 			void SetWindow(H3DF::WindowKey & cInWindowKey);

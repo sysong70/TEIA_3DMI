@@ -89,9 +89,9 @@ namespace H3DF
 		SelectionOptionsKit();
 		SelectionOptionsKit(SelectionOptionsKit const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::SelectionOptionsKit; } ;
+		static const H3DF::Type staticType = H3DF::Type::SelectionOptionsKit;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(SelectionOptionsKit const & cInThat);
 		SelectionOptionsKit & operator =(SelectionOptionsKit const & cInThat);
 
 		// Sets the selection proximity in centimeters or object-relative-units (ORU), depending
@@ -172,9 +172,9 @@ namespace H3DF
 		SelectionOptionsControl(SelectionOptionsControl const & cInThat);
 		virtual ~SelectionOptionsControl();
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::SelectionOptionsControl; };
+		static const H3DF::Type staticType = H3DF::Type::SelectionOptionsControl;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(SelectionOptionsControl const & cInThat);
 		SelectionOptionsControl & operator=(SelectionOptionsControl const & cInThat);
 
 		// https://docs.techsoft3d.com/hps/latest/api_ref/cs/class_h_p_s_1_1_selection_options_control.html?highlight=setproximity#function-HPS.SelectionOptionsControl.SetProximity
@@ -216,12 +216,12 @@ namespace H3DF
 		SelectionItem();
 		SelectionItem(SelectionItem const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::SelectionItem; };
-		
-		// 선택된 Item의 Type을 반환합니다.
-		H3DF::Type Type() const;
+		static const H3DF::Type staticType = H3DF::Type::SelectionItem;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(SelectionItem const & cInThat);
+		// 선택된 Item의 Type을 반환합니다.
+		H3DF::Type ItemType() const;
+
 		SelectionItem & operator = (SelectionItem const & cInThat);
 
 		bool operator==(SelectionItem const & cInThat) const;
@@ -254,9 +254,9 @@ namespace H3DF
 		SelectionResultsIterator();
 		SelectionResultsIterator(SelectionResultsIterator const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::SelectionResultsIterator; };
+		static const H3DF::Type staticType = H3DF::Type::SelectionResultsIterator;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(SelectionResultsIterator const & in_that);
 		SelectionResultsIterator & operator=(SelectionResultsIterator const & cInThat);
 
 		void Next();
@@ -284,8 +284,10 @@ namespace H3DF
 		SelectionResults(SelectionResults const & cInThat);
 		~SelectionResults();
 
-		void Set(SelectionResults const & cInThat);
-		SelectionResults & operator=(SelectionResults const & cInThat);
+		SelectionResults & operator = (SelectionResults const & cInThat);
+
+		SelectionResults(SelectionResults && cInThat) noexcept;
+		SelectionResults & operator = (SelectionResults && cInThat) noexcept;
 
 		bool operator==(SelectionResults const & cInThat) const;
 		bool operator!=(SelectionResults const & cInThat) const;
@@ -324,9 +326,9 @@ namespace H3DF
 		SelectionControl(SelectionControl const & cInThat);
 		~SelectionControl();
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::SelectionControl; };
+		static const H3DF::Type staticType = H3DF::Type::SelectionControl;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(SelectionControl const & cInThat);
 		SelectionControl & operator=(SelectionControl const & cInThat);
 
 		// Point in window space at which to perform the selection.

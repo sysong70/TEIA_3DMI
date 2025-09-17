@@ -17,9 +17,13 @@ namespace H3DF
 	class AttributeLockControlImpl : public ControlImpl
 	{
 	public:
-		AttributeLockControlImpl() { m_eType = H3DF::Type::AttributeLockControl; }
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<AttributeLockControlImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
 
-		void Copy(AttributeLockControlImpl * pcInThat) {
+		void Copy(const AttributeLockControlImpl * pcInThat) {
 			ControlImpl::Copy(pcInThat);
 		}
 
@@ -436,34 +440,32 @@ CStringA H3DF::AttributeLockControlImpl::GetTypeString(AttributeLock::Type eInTy
 
 H3DF::AttributeLockControl::AttributeLockControl(SegmentKey & cInSegmentKey)
 {
-	AttributeLockControlImpl * pcImpl = new AttributeLockControlImpl();
-	pcImpl->m_cOverrideKey = cInSegmentKey;
+	m_pcImpl = std::make_unique<AttributeLockControlImpl>();
+	auto pcImpl = dynamic_cast<AttributeLockControlImpl *>(m_pcImpl.get());
 
-	m_pcImpl = pcImpl;
+	pcImpl->m_cOverrideKey = cInSegmentKey;
 }
 
 H3DF::AttributeLockControl::AttributeLockControl(AttributeLockControl const & cInThat)
 {
-	m_pcImpl = new AttributeLockControlImpl();
-	Set(cInThat);
-}
-
-void H3DF::AttributeLockControl::Set(AttributeLockControl const & cInThat)
-{
-	AttributeLockControlImpl * pcImpl = (AttributeLockControlImpl *) m_pcImpl;
-	AttributeLockControlImpl * pcInThatImpl = (AttributeLockControlImpl *) cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.m_pcImpl) ? cInThat.m_pcImpl->Clone() : nullptr;
 }
 
 AttributeLockControl & H3DF::AttributeLockControl::operator = (AttributeLockControl const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 AttributeLockControl & H3DF::AttributeLockControl::SetLock(AttributeLock::Type eInType, bool bInState)
 {
-	AttributeLockControlImpl * pcImpl = dynamic_cast<AttributeLockControlImpl *>(m_pcImpl);
+	auto pcImpl = dynamic_cast<AttributeLockControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	CStringA strOption = "attribute lock = (";
@@ -485,7 +487,7 @@ AttributeLockControl & H3DF::AttributeLockControl::SetLock(AttributeLock::Type e
 
 AttributeLockControl & H3DF::AttributeLockControl::SetLock(AttributeLockTypeArray const & eInTypes, BoolArray const & bInStates)
 {
-	AttributeLockControlImpl * pcImpl = dynamic_cast<AttributeLockControlImpl *>(m_pcImpl);
+	auto pcImpl = dynamic_cast<AttributeLockControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	if(eInTypes.size() != bInStates.size()) {
@@ -518,7 +520,7 @@ AttributeLockControl & H3DF::AttributeLockControl::UnsetLock(AttributeLockTypeAr
 
 bool H3DF::AttributeLockControl::ShowLock(AttributeLock::Type eInType, bool & bOutState) const
 {
-	AttributeLockControlImpl * pcImpl = dynamic_cast<AttributeLockControlImpl *>(m_pcImpl);
+	auto pcImpl = dynamic_cast<AttributeLockControlImpl *>(m_pcImpl.get());
 	DEBUG_VALID(pcImpl);
 
 	CStringA strOption = "attribute lock = (";

@@ -25,7 +25,6 @@ namespace H3DF
 		View(View const & cInThat);
 		virtual ~View();
 
-		void Set(View const & cInThat);
 		View const & operator = (View const & cInThat);
 
 		Model & GetAttachedModel() const;

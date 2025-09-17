@@ -2325,7 +2325,7 @@ A3DStatus TdfImport::ParseMarkup(const A3DMkpMarkup * pcInMarkup, A3DMiscCascade
 
 	Log::Write(L"Linked Items Size: %d", sData.m_uiLinkedItemsSize);
 
-	H3DF::PMI * pcPmi = nullptr;
+	H3DF::PmiKey * pcPmi = nullptr;
 
 	switch (sData.m_eType)
 	{

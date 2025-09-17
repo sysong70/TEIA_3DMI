@@ -22,38 +22,72 @@
 
 using namespace H3DF;
 
-H3DF::PMI::PMI(HC_KEY nInKey) : SegmentKey(nInKey)
+namespace H3DF
 {
+	class PmiKeyImpl : public SegmentKeyImpl
+	{
+	public:
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<PmiKeyImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy(const PmiKeyImpl * pcInThat) {
+			SegmentKeyImpl::Copy(pcInThat);
+		}
+	};
 }
 
-H3DF::PMI::PMI(SegmentKey const & cInThat) : SegmentKey(cInThat)
+H3DF::PmiKey::PmiKey(HC_KEY nInKey)
 {
-}
-
-H3DF::PMI::PMI(PMI const & cInThat)
-{
-	if (nullptr != m_pcImpl) {
-		REMOVE_POINTER(m_pcImpl);
+	if (INVALID_KEY == nInKey) {
+		return;
 	}
 
-	SegmentKeyImpl * pcImpl = new SegmentKeyImpl();
-	m_pcImpl = pcImpl;
-
-	Set(cInThat);
+	m_pcImpl = std::make_unique<PmiKeyImpl>();
+	static_cast<PmiKeyImpl *>(m_pcImpl.get())->SetKeyValue(nInKey);
 }
 
-void H3DF::PMI::Set(PMI const & cInThat)
+H3DF::PmiKey::PmiKey(Key const & cInThat)
 {
-	Key::Set(cInThat);
+	// cInThat이 올바른 Impl(PmiKeyImpl)을 가지고 있으면 복제
+	if (cInThat.GetImpl()) {
+		// 만약 PmiKeyImpl이 KeyImpl에서 파생된 구조라면 dynamic_cast에 의해서 nullptr이 아닌 정상적인 값이 넘어옴
+		auto pcSrcImpl = dynamic_cast<const PmiKeyImpl *>(cInThat.GetImpl());
+		if (nullptr != pcSrcImpl) {
+			m_pcImpl = pcSrcImpl->Clone();
+		}
+		else {
+			// 타입이 다를 경우 예외 처리 또는 방어적 초기화
+			m_pcImpl = std::make_unique<PmiKeyImpl>();
+			static_cast<PmiKeyImpl *>(m_pcImpl.get())->Copy((PmiKeyImpl *) (cInThat.GetImpl()));
+		}
+	}
+	else {
+		m_pcImpl = std::make_unique<PmiKeyImpl>();
+		static_cast<PmiKeyImpl *>(m_pcImpl.get())->Copy((PmiKeyImpl *) (cInThat.GetImpl()));
+	}
 }
 
-PMI const & H3DF::PMI::operator=(PMI const & cInThat)
+H3DF::PmiKey::PmiKey(PmiKey const & cInThat)
 {
-	Set(cInThat);
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+}
+
+PmiKey const & H3DF::PmiKey::operator=(PmiKey const & cInThat)
+{
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
-void H3DF::PMI::GetFrame(Frame & cOutFrame)
+void H3DF::PmiKey::GetFrame(Frame & cOutFrame)
 {
 	char chType[64];
 	HC_KEY nKey;
@@ -126,7 +160,7 @@ void H3DF::PMI::GetFrame(Frame & cOutFrame)
 	delete[] pcPolylines;
 }
 
-void H3DF::PMI::SetFrame(Frame const & cInFrame)
+void H3DF::PmiKey::SetFrame(Frame const & cInFrame)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -180,7 +214,7 @@ void H3DF::PMI::SetFrame(Frame const & cInFrame)
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-void H3DF::PMI::GetDrawing(Draw & cOutDrawing) const
+void H3DF::PmiKey::GetDrawing(Draw & cOutDrawing) const
 {
 /*
 	cOutDrawing = Draw();
@@ -198,7 +232,7 @@ void H3DF::PMI::GetDrawing(Draw & cOutDrawing) const
 */
 }
 
-void H3DF::PMI::SetDrawing(Draw const & cInDrawing)
+void H3DF::PmiKey::SetDrawing(Draw const & cInDrawing)
 {
 	unsigned int nCount = cInDrawing.GetPolygonCount();
 	
@@ -210,7 +244,7 @@ void H3DF::PMI::SetDrawing(Draw const & cInDrawing)
 	SetPolygons("drawing", nCount, aPolygons.data());
 }
 
-unsigned int H3DF::PMI::GetLeaderLineCount() const
+unsigned int H3DF::PmiKey::GetLeaderLineCount() const
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -227,7 +261,7 @@ unsigned int H3DF::PMI::GetLeaderLineCount() const
 	return static_cast<unsigned int>(count);
 }
 
-void H3DF::PMI::SetLeaderLines(unsigned int in_count, Polyline const * in_leader_lines)
+void H3DF::PmiKey::SetLeaderLines(unsigned int in_count, Polyline const * in_leader_lines)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -267,12 +301,12 @@ void H3DF::PMI::SetLeaderLines(unsigned int in_count, Polyline const * in_leader
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-void H3DF::PMI::SetLeaderSymbols(unsigned int nInCount, H3DF::Polygon const * pcInLeaderSymbols)
+void H3DF::PmiKey::SetLeaderSymbols(unsigned int nInCount, H3DF::Polygon const * pcInLeaderSymbols)
 {
 	SetPolygons("leader/symbol", nInCount, pcInLeaderSymbols);
 }
 
-void H3DF::PMI::SetPolygons(char const * pchInSegmentName, unsigned int nInCount, H3DF::Polygon const * pcInPolygons)
+void H3DF::PmiKey::SetPolygons(char const * pchInSegmentName, unsigned int nInCount, H3DF::Polygon const * pcInPolygons)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -317,7 +351,7 @@ void H3DF::PMI::SetPolygons(char const * pchInSegmentName, unsigned int nInCount
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-void H3DF::PMI::SetColor(const H3DF::Polyline & cPolyline)
+void H3DF::PmiKey::SetColor(const H3DF::Polyline & cPolyline)
 {
 	H3DF::RGBColor cColor;
 	cPolyline.GetRGBColor(cColor);
@@ -334,7 +368,7 @@ void H3DF::PMI::SetColor(const H3DF::Polyline & cPolyline)
 	}
 }
 
-void H3DF::PMI::SetColor(const H3DF::Polygon & cPolygon)
+void H3DF::PmiKey::SetColor(const H3DF::Polygon & cPolygon)
 {
 	H3DF::RGBColor cColor;
 	cPolygon.GetRGBColor(cColor);
@@ -344,7 +378,7 @@ void H3DF::PMI::SetColor(const H3DF::Polygon & cPolygon)
 	}
 }
 
-void H3DF::PMI::SetDisplayParallelToScreen(bool const bInParallel)
+void H3DF::PmiKey::SetDisplayParallelToScreen(bool const bInParallel)
 {
 	SegmentKeyImpl::LocalOpen(*this);
 
@@ -363,7 +397,7 @@ void H3DF::PMI::SetDisplayParallelToScreen(bool const bInParallel)
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-bool H3DF::PMI::IsDisplayParallelToScreen() const
+bool H3DF::PmiKey::IsDisplayParallelToScreen() const
 {
 	bool is_parallel_to_screen = false;
 
@@ -394,7 +428,7 @@ bool H3DF::PMI::IsDisplayParallelToScreen() const
 	return is_parallel_to_screen;
 }
 
-unsigned int H3DF::PMI::GetStringsAndTextAttributesCount(CString strInSegmentName) const
+unsigned int H3DF::PmiKey::GetStringsAndTextAttributesCount(CString strInSegmentName) const
 {
 	int nCount = 0;
 
@@ -416,7 +450,7 @@ unsigned int H3DF::PMI::GetStringsAndTextAttributesCount(CString strInSegmentNam
 	return static_cast<unsigned int>(nCount);
 }
 
-void H3DF::PMI::GetStringsAndTextAttributes(CString strInSegmentName, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
+void H3DF::PmiKey::GetStringsAndTextAttributes(CString strInSegmentName, CString * pstrOutStrings, TextAttributes * pcOutTextAttributes) const
 {
 	char type[64];
 	HC_KEY key;
@@ -528,7 +562,7 @@ void H3DF::PMI::GetStringsAndTextAttributes(CString strInSegmentName, CString * 
 	SegmentKeyImpl::LocalClose(*this);
 }
 
-void H3DF::PMI::SetStringsAndTextAttributes(CString strInSegmentName, unsigned int nInCount,
+void H3DF::PmiKey::SetStringsAndTextAttributes(CString strInSegmentName, unsigned int nInCount,
 	CString const * pstrInStrings, TextAttributes const * pcInTextAttributes, bool is_parallel_to_screen)
 {
 	SegmentKeyImpl::LocalOpen(*this);
@@ -643,9 +677,32 @@ void H3DF::PMI::SetStringsAndTextAttributes(CString strInSegmentName, unsigned i
 
 
 //== Datum =========================================================================================
-H3DF::DatumEntity::DatumEntity(HC_KEY nInKey) : PMI(nInKey)
+
+namespace H3DF
 {
-	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	class DatumEntityImpl : public PmiKeyImpl
+	{
+	public:
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<DatumEntityImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
+		void Copy(const DatumEntityImpl * pcInThat) {
+			PmiKeyImpl::Copy(pcInThat);
+		}
+	};
+}
+
+H3DF::DatumEntity::DatumEntity(HC_KEY nInKey)
+{
+	if (INVALID_KEY == nInKey) {
+		return;
+	}
+
+	m_pcImpl = std::make_unique<DatumEntityImpl>();
+	static_cast<DatumEntityImpl *>(m_pcImpl.get())->SetKeyValue(nInKey);
 
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
@@ -653,30 +710,51 @@ H3DF::DatumEntity::DatumEntity(HC_KEY nInKey) : PMI(nInKey)
 	}
 }
 
-H3DF::DatumEntity::DatumEntity(SegmentKey const & cInThat) : PMI(cInThat)
+H3DF::DatumEntity::DatumEntity(SegmentKey const & cInThat)
 {
+	// cInThat이 올바른 Impl(DatumEntityImpl)을 가지고 있으면 복제
+	if (cInThat.GetImpl()) {
+		// 만약 PmiKeyImpl이 KeyImpl에서 파생된 구조라면 dynamic_cast에 의해서 nullptr이 아닌 정상적인 값이 넘어옴
+		auto pcSrcImpl = dynamic_cast<const DatumEntityImpl *>(cInThat.GetImpl());
+		if (nullptr != pcSrcImpl) {
+			m_pcImpl = pcSrcImpl->Clone();
+		}
+		else {
+			// 타입이 다를 경우 예외 처리 또는 방어적 초기화
+			m_pcImpl = std::make_unique<DatumEntityImpl>();
+			static_cast<DatumEntityImpl *>(m_pcImpl.get())->Copy((DatumEntityImpl *) (cInThat.GetImpl()));
+		}
+	}
+	else {
+		m_pcImpl = std::make_unique<DatumEntityImpl>();
+		static_cast<DatumEntityImpl *>(m_pcImpl.get())->Copy((DatumEntityImpl *) (cInThat.GetImpl()));
+	}
+
+	if (INVALID_KEY != KeyValue()) {
+		DWORD nType = (DWORD) ObjectType();
+		SetUserData((intptr_t) UserDataIndex::PmiType, sizeof(DWORD), (BYTE *) &nType);
+	}
+}
+
+H3DF::DatumEntity::DatumEntity(DatumEntity const & cInThat)
+{
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
+
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
-}
-
-H3DF::DatumEntity::DatumEntity(DatumEntity const & cInThat) : PMI(cInThat)
-{
-	if (INVALID_KEY != KeyValue()) {
-		DWORD nType = (DWORD) ObjectType();
-		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
-	}
-}
-
-void H3DF::DatumEntity::Set(DatumEntity const & cInThat)
-{
-	Key::Set(cInThat);
 }
 
 DatumEntity const & H3DF::DatumEntity::operator=(DatumEntity const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -721,7 +799,7 @@ void H3DF::DatumEntity::SetLabels(unsigned int nInCount, CString const * pstrInl
 
 
 //== DimensionEntity ===============================================================================
-H3DF::DimensionEntity::DimensionEntity(HC_KEY nInKey) : PMI(nInKey)
+H3DF::DimensionEntity::DimensionEntity(HC_KEY nInKey) : PmiKey(nInKey)
 {
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
@@ -729,7 +807,7 @@ H3DF::DimensionEntity::DimensionEntity(HC_KEY nInKey) : PMI(nInKey)
 	}
 }
 
-H3DF::DimensionEntity::DimensionEntity(SegmentKey const & cInThat) : PMI(cInThat)
+H3DF::DimensionEntity::DimensionEntity(SegmentKey const & cInThat) : PmiKey(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
@@ -737,22 +815,23 @@ H3DF::DimensionEntity::DimensionEntity(SegmentKey const & cInThat) : PMI(cInThat
 	}
 }
 
-H3DF::DimensionEntity::DimensionEntity(DimensionEntity const & cInThat) : PMI(cInThat)
+H3DF::DimensionEntity::DimensionEntity(DimensionEntity const & cInThat) : PmiKey(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
-}
-
-void H3DF::DimensionEntity::Set(DimensionEntity const & cInThat)
-{
-	H3DF::PMI::Set(cInThat);
 }
 
 DimensionEntity const & H3DF::DimensionEntity::operator=(DimensionEntity const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -815,7 +894,7 @@ void H3DF::DimensionEntity::SetStrings(unsigned int nInCount, CString const * ps
 }
 
 //== FeatureControlFrameEntity Class ===============================================================
-H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(HC_KEY nInKey) : PMI(nInKey)
+H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(HC_KEY nInKey) : PmiKey(nInKey)
 {
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
@@ -823,7 +902,7 @@ H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(HC_KEY nInKey) : PMI(
 	}
 }
 
-H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(SegmentKey const & cInThat) : PMI(cInThat)
+H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(SegmentKey const & cInThat) : PmiKey(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
@@ -831,31 +910,36 @@ H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(SegmentKey const & cI
 	}
 }
 
-H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(FeatureControlFrameEntity const & cInThat) : PMI(cInThat)
+H3DF::FeatureControlFrameEntity::FeatureControlFrameEntity(FeatureControlFrameEntity const & cInThat) : PmiKey(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
-}
-
-void H3DF::FeatureControlFrameEntity::Set(FeatureControlFrameEntity const & cInThat)
-{
-	H3DF::PMI::Set(cInThat);
 }
 
 FeatureControlFrameEntity const & H3DF::FeatureControlFrameEntity::operator=(FeatureControlFrameEntity const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 
 //== GenericEntity Class ===========================================================================
 
-H3DF::GenericEntity::GenericEntity(HC_KEY nInKey) :	PMI(nInKey)
+H3DF::GenericEntity::GenericEntity(HC_KEY nInKey) :	PmiKey(nInKey)
 {
-	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	if (INVALID_KEY == nInKey) {
+		return;
+	}
+
+	auto pcImpl = static_cast<SegmentKeyImpl *>(m_pcImpl.get());
 
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
@@ -863,9 +947,9 @@ H3DF::GenericEntity::GenericEntity(HC_KEY nInKey) :	PMI(nInKey)
 	}
 }
 
-H3DF::GenericEntity::GenericEntity(SegmentKey const & cInThat) : PMI(cInThat)
+H3DF::GenericEntity::GenericEntity(SegmentKey const & cInThat) : PmiKey(cInThat)
 {
-	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SegmentKeyImpl *>(m_pcImpl.get());
 
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
@@ -873,24 +957,25 @@ H3DF::GenericEntity::GenericEntity(SegmentKey const & cInThat) : PMI(cInThat)
 	}
 }
 
-H3DF::GenericEntity::GenericEntity(GenericEntity const & cInThat) : PMI(cInThat)
+H3DF::GenericEntity::GenericEntity(GenericEntity const & cInThat) : PmiKey(cInThat)
 {
-	SegmentKeyImpl * pcImpl = (SegmentKeyImpl *)m_pcImpl;
+	auto pcImpl = static_cast<SegmentKeyImpl *>(m_pcImpl.get());
 
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
-}
-
-void H3DF::GenericEntity::Set(GenericEntity const & cInThat)
-{
-	H3DF::PMI::Set(cInThat);
 }
 
 GenericEntity const & H3DF::GenericEntity::operator=(GenericEntity const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -917,16 +1002,16 @@ void H3DF::GenericEntity::SetStrings(unsigned int nInCount, CString const * pstr
 
 void H3DF::GenericEntity::SetDisplayParallelToScreen(bool const in_parallel)
 {
-	H3DF::PMI::SetDisplayParallelToScreen(in_parallel);
+	H3DF::PmiKey::SetDisplayParallelToScreen(in_parallel);
 }
 
 bool H3DF::GenericEntity::IsDisplayParallelToScreen() const
 {
-	return H3DF::PMI::IsDisplayParallelToScreen();
+	return H3DF::PmiKey::IsDisplayParallelToScreen();
 }
 
 //== NoteEntity ====================================================================================
-H3DF::NoteEntity::NoteEntity(HC_KEY nInKey) : PMI(nInKey)
+H3DF::NoteEntity::NoteEntity(HC_KEY nInKey) : PmiKey(nInKey)
 {
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
@@ -934,7 +1019,7 @@ H3DF::NoteEntity::NoteEntity(HC_KEY nInKey) : PMI(nInKey)
 	}
 }
 
-H3DF::NoteEntity::NoteEntity(SegmentKey const & cInThat) : PMI(cInThat)
+H3DF::NoteEntity::NoteEntity(SegmentKey const & cInThat) : PmiKey(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
@@ -942,22 +1027,23 @@ H3DF::NoteEntity::NoteEntity(SegmentKey const & cInThat) : PMI(cInThat)
 	}
 }
 
-H3DF::NoteEntity::NoteEntity(NoteEntity const & cInThat) : PMI(cInThat)
+H3DF::NoteEntity::NoteEntity(NoteEntity const & cInThat) : PmiKey(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
-}
-
-void H3DF::NoteEntity::Set(NoteEntity const & cInThat)
-{
-	H3DF::PMI::Set(cInThat);
 }
 
 NoteEntity const & H3DF::NoteEntity::operator=(NoteEntity const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -983,7 +1069,7 @@ void H3DF::NoteEntity::SetStrings(unsigned int nInCount, CString const pstrInStr
 
 //== RoughnessEntity ===============================================================================
 
-H3DF::RoughnessEntity::RoughnessEntity(HC_KEY nInKey) :  PMI(nInKey)
+H3DF::RoughnessEntity::RoughnessEntity(HC_KEY nInKey) :  PmiKey(nInKey)
 {
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
@@ -991,7 +1077,7 @@ H3DF::RoughnessEntity::RoughnessEntity(HC_KEY nInKey) :  PMI(nInKey)
 	}
 }
 
-H3DF::RoughnessEntity::RoughnessEntity(SegmentKey const & cInThat) : PMI(cInThat)
+H3DF::RoughnessEntity::RoughnessEntity(SegmentKey const & cInThat) : PmiKey(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
@@ -999,7 +1085,7 @@ H3DF::RoughnessEntity::RoughnessEntity(SegmentKey const & cInThat) : PMI(cInThat
 	}
 }
 
-H3DF::RoughnessEntity::RoughnessEntity(RoughnessEntity const & cInThat): PMI(cInThat)
+H3DF::RoughnessEntity::RoughnessEntity(RoughnessEntity const & cInThat): PmiKey(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
@@ -1007,14 +1093,15 @@ H3DF::RoughnessEntity::RoughnessEntity(RoughnessEntity const & cInThat): PMI(cIn
 	}
 }
 
-void H3DF::RoughnessEntity::Set(RoughnessEntity const & cInThat)
+RoughnessEntity const & H3DF::RoughnessEntity::operator=(RoughnessEntity const & cInThat)
 {
-	H3DF::PMI::Set(cInThat);
-}
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
 
-RoughnessEntity const & H3DF::RoughnessEntity::operator=(RoughnessEntity const & that)
-{
-	Set(that);
 	return *this;
 }
 
@@ -1095,10 +1182,16 @@ void H3DF::RoughnessEntity::SetFields(unsigned int nInCount, CString const * pst
 
 //== Orientation ===================================================================================
 
-class OrientationPrivate : public H3DF::Impl
+class OrientationImpl : public H3DF::PmiKeyImpl
 {
 public:
-	void Copy(OrientationPrivate * pcInThat)
+	std::unique_ptr<Impl> Clone() const override {
+		auto pcClone = std::make_unique<OrientationImpl>();
+		pcClone->Copy(this);
+		return pcClone;
+	}
+
+	void Copy(const OrientationImpl * pcInThat)
 	{
 		m_cMatrix = pcInThat->m_cMatrix;
 	}
@@ -1108,31 +1201,28 @@ public:
 
 H3DF::Orientation::Orientation()
 {
-	m_pcImpl = new OrientationPrivate();
 }
 
 H3DF::Orientation::Orientation(Orientation const & cInThat)
 {
-	m_pcImpl = new OrientationPrivate();
-	Set(cInThat);
-}
-
-void H3DF::Orientation::Set(Orientation const & cInThat)
-{
-	OrientationPrivate * pcImpl = (OrientationPrivate *)m_pcImpl;
-	OrientationPrivate * pcInThatImpl = (OrientationPrivate *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 H3DF::Orientation const & H3DF::Orientation::operator=(Orientation const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 void H3DF::Orientation::GetMatrix(float out_matrix[16]) const
 {
-	OrientationPrivate * pcImpl = (OrientationPrivate *)m_pcImpl;
+	auto pcImpl = static_cast<OrientationImpl *>(m_pcImpl.get());
 
 	for (int nIndex = 0; nIndex < 16; nIndex++) {
 		out_matrix[nIndex] = pcImpl->m_cMatrix.m_fData[nIndex];
@@ -1143,13 +1233,13 @@ void H3DF::Orientation::GetMatrix(float out_matrix[16]) const
 
 void H3DF::Orientation::SetMatrix(MatrixKit const & cInMatrix)
 {
-	OrientationPrivate * pcImpl = (OrientationPrivate *)m_pcImpl;
+	auto pcImpl = static_cast<OrientationImpl *>(m_pcImpl.get());
 	pcImpl->m_cMatrix = cInMatrix;
 }
 
 //== TextAttributes ================================================================================
 
-class TextAttributesImpl : public H3DF::Impl
+class TextAttributesImpl : public H3DF::PmiKeyImpl
 {
 public:
 	TextAttributesImpl()
@@ -1168,7 +1258,13 @@ public:
 		delete[] m_font_name;
 	}
 
-	void Copy(TextAttributesImpl * pcInThat)
+	std::unique_ptr<Impl> Clone() const override {
+		auto pcClone = std::make_unique<TextAttributesImpl>();
+		pcClone->Copy(this);
+		return pcClone;
+	}
+
+	void Copy(const TextAttributesImpl * pcInThat)
 	{
 		m_insertion_point = pcInThat->m_insertion_point;
 		m_font_size = pcInThat->m_font_size;
@@ -1203,67 +1299,64 @@ public:
 
 H3DF::TextAttributes::TextAttributes()
 {
-	m_pcImpl = new TextAttributesImpl();
 }
 
 H3DF::TextAttributes::TextAttributes(TextAttributes const & cInThat)
 {
-	m_pcImpl = new TextAttributesImpl();
-	Set(cInThat);
-}
-
-void H3DF::TextAttributes::Set(TextAttributes const & cInThat)
-{
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
-	TextAttributesImpl * pcInThatImpl = (TextAttributesImpl *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 TextAttributes const & H3DF::TextAttributes::operator=(TextAttributes const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 void H3DF::TextAttributes::GetInsertionPoint(H3DF::Point & cOutPoint) const
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 	cOutPoint = pcImpl->m_insertion_point;
 }
 
 void H3DF::TextAttributes::SetInsertionPoint(H3DF::Point const & cInPoint)
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 	pcImpl->m_insertion_point = cInPoint;
 }
 
 void H3DF::TextAttributes::GetFontSize(float & fOutSize) const
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 	fOutSize = pcImpl->m_font_size;
 }
 
 void H3DF::TextAttributes::SetFontSize(float const nInSize)
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 	pcImpl->m_font_size = nInSize;
 }
 
 void H3DF::TextAttributes::GetFontSizeUnits(Font::Size::Units & eOutUnits) const
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 	eOutUnits = pcImpl->m_font_size_units;
 }
 
 void H3DF::TextAttributes::SetFontSizeUnits(Font::Size::Units const eInUnits)
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 	pcImpl->m_font_size_units = eInUnits;
 }
 
 void H3DF::TextAttributes::GetFontName(char * pchOutFontName) const
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 
 	pchOutFontName[0] = '\0';
 
@@ -1274,7 +1367,7 @@ void H3DF::TextAttributes::GetFontName(char * pchOutFontName) const
 
 void H3DF::TextAttributes::SetFontName(char const * pchInFontName)
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 
 	delete[] pcImpl->m_font_name;
 
@@ -1286,107 +1379,111 @@ void H3DF::TextAttributes::SetFontName(char const * pchInFontName)
 
 void H3DF::TextAttributes::GetOrientation(Orientation & cOutOrientation) const
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 	cOutOrientation = pcImpl->m_orientation;
 }
 
 void H3DF::TextAttributes::SetOrientation(Orientation const & cInOrientation)
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 	pcImpl->m_orientation = cInOrientation;
 }
 
 void H3DF::TextAttributes::GetRGBColor(H3DF::RGBColor & cOutColor) const
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 	cOutColor = pcImpl->m_color;
 }
 
 void H3DF::TextAttributes::SetRGBColor(H3DF::RGBColor const & cInColor)
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 	pcImpl->m_color = cInColor;
 }
 
 bool H3DF::TextAttributes::IsBold() const
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 
 	return (pcImpl->m_format & 0x02) == 0x02;
 }
 
 bool H3DF::TextAttributes::IsItalic() const
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 
 	return (pcImpl->m_format & 0x04) == 0x04;
 }
 bool H3DF::TextAttributes::IsUnderlined() const
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 
 	return (pcImpl->m_format & 0x08) == 0x08;
 }
 bool H3DF::TextAttributes::IsStrikedThrough() const
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 
 	return (pcImpl->m_format & 0x10) == 0x10;
 }
 bool H3DF::TextAttributes::IsOverlined() const
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 
 	return (pcImpl->m_format & 0x20) == 0x20;
 }
 bool H3DF::TextAttributes::IsStreched() const
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 
 	return (pcImpl->m_format & 0x40) == 0x40;
 }
 bool H3DF::TextAttributes::IsWired() const
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 
 	return (pcImpl->m_format & 0x80) == 0x80;
 }
 bool H3DF::TextAttributes::IsFixedWidth() const
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 
 	return (pcImpl->m_format & 0x100) == 0x100;
 }
 
 void H3DF::TextAttributes::SetFormat(char const & chInFormat)
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 	pcImpl->m_format = chInFormat;
 }
 
 double H3DF::TextAttributes::WidthScale() const
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 	return pcImpl->m_width_scale;
 }
 
 void H3DF::TextAttributes::SetWidthScale(const double dWidthScale)
 {
-	TextAttributesImpl * pcImpl = (TextAttributesImpl *)m_pcImpl;
+	auto pcImpl = static_cast<TextAttributesImpl *>(m_pcImpl.get());
 	pcImpl->m_width_scale = static_cast<float>(dWidthScale);
 }
 
 //== Options =======================================================================================
-class OptionsPrivate : public H3DF::Impl
+class OptionsImpl : public H3DF::PmiKeyImpl
 {
 public:
-	OptionsPrivate() 
-	{
+	OptionsImpl()  {
 		m_bDisplayParallelToScreen = false;
 	}
 
-	void Copy(OptionsPrivate * that)
-	{
+	std::unique_ptr<Impl> Clone() const override {
+		auto pcClone = std::make_unique<OptionsImpl>();
+		pcClone->Copy(this);
+		return pcClone;
+	}
+
+	void Copy(const OptionsImpl * that) {
 		m_bDisplayParallelToScreen = that->m_bDisplayParallelToScreen;
 	}
 
@@ -1395,48 +1492,50 @@ public:
 
 H3DF::Options::Options()
 {
-	m_pcImpl = new OptionsPrivate();
 }
 
 H3DF::Options::Options(Options const & cInThat)
 {
-	m_pcImpl = new OptionsPrivate();
-	Set(cInThat);
-}
-
-void H3DF::Options::Set(Options const & cInThat)
-{
-	OptionsPrivate * pcImpl = (OptionsPrivate *)m_pcImpl;
-	OptionsPrivate * pcInThatImpl = (OptionsPrivate *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 Options const & H3DF::Options::operator=(Options const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 
 bool H3DF::Options::IsDisplayParallelToScreen() const
 {
-	OptionsPrivate * pcImpl = (OptionsPrivate *)m_pcImpl;
+	auto pcImpl = static_cast<OptionsImpl *>(m_pcImpl.get());
 	return pcImpl->m_bDisplayParallelToScreen;
 }
 
 void H3DF::Options::SetDisplayParallelToScreen(const bool in_parallel)
 {
-	OptionsPrivate * pcImpl = (OptionsPrivate *)m_pcImpl;
+	auto pcImpl = static_cast<OptionsImpl *>(m_pcImpl.get());
 	pcImpl->m_bDisplayParallelToScreen = in_parallel;
 }
 
 //== Frame =========================================================================================
 
-class FramePrivate : public H3DF::Impl
+class FrameImpl : public H3DF::PmiKeyImpl
 {
 public:
-	void Copy(FramePrivate * that)
-	{
+	std::unique_ptr<Impl> Clone() const override {
+		auto pcClone = std::make_unique<FrameImpl>();
+		pcClone->Copy(this);
+		return pcClone;
+	}
+
+	void Copy(const FrameImpl * that) {
 		m_aPolylines = that->m_aPolylines;
 	}
 
@@ -1445,37 +1544,34 @@ public:
 
 H3DF::Frame::Frame()
 {
-	m_pcImpl = new FramePrivate();
 }
 
 H3DF::Frame::Frame(Frame const & cInThat)
 {
-	m_pcImpl = new FramePrivate();
-	Set(cInThat);
-}
-
-void H3DF::Frame::Set(Frame const & cInThat)
-{
-	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
-	FramePrivate * pcInThatImpl = (FramePrivate *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 Frame const & H3DF::Frame::operator=(Frame const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 unsigned int H3DF::Frame::GetPolylineCount() const
 {
-	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
+	auto pcImpl = static_cast<FrameImpl *>(m_pcImpl.get());
 	return static_cast<unsigned int>(pcImpl->m_aPolylines.size());
 }
 
 void H3DF::Frame::GetPolylines(unsigned int & nOutCount, H3DF::Polyline * pcOutPolylines) const
 {
-	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
+	auto pcImpl = static_cast<FrameImpl *>(m_pcImpl.get());
 
 	nOutCount = (unsigned int)pcImpl->m_aPolylines.size();
 
@@ -1490,7 +1586,7 @@ void H3DF::Frame::GetPolylines(unsigned int & nOutCount, H3DF::Polyline * pcOutP
 
 void H3DF::Frame::SetPolylines(unsigned int nInCount, H3DF::Polyline const * pcInPolylines)
 {
-	FramePrivate * pcImpl = (FramePrivate *)m_pcImpl;
+	auto pcImpl = static_cast<FrameImpl *>(m_pcImpl.get());
 	pcImpl->m_aPolylines.resize(nInCount);
 
 	for (unsigned int nIndex = 0; nIndex < nInCount; nIndex++) {
@@ -1500,11 +1596,16 @@ void H3DF::Frame::SetPolylines(unsigned int nInCount, H3DF::Polyline const * pcI
 
 //== Draw =======================================================================================
 
-class DrawingPrivate : public H3DF::Impl
+class DrawingImpl : public H3DF::Impl
 {
 public:
-	void Copy(DrawingPrivate * that)
-	{
+	std::unique_ptr<Impl> Clone() const override {
+		auto pcClone = std::make_unique<DrawingImpl>();
+		pcClone->Copy(this);
+		return pcClone;
+	}
+
+	void Copy(const DrawingImpl * that) {
 		m_polygons = that->m_polygons;
 	}
 
@@ -1513,37 +1614,34 @@ public:
 
 H3DF::Draw::Draw()
 {
-	m_pcImpl = new DrawingPrivate();
 }
 
 H3DF::Draw::Draw(Draw const & cInThat)
 {
-	m_pcImpl = new DrawingPrivate();
-	Set(cInThat);
-}
-
-void H3DF::Draw::Set(Draw const & cInThat)
-{
-	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
-	DrawingPrivate * pcInThatImpl = (DrawingPrivate *)cInThat.m_pcImpl;
-	pcImpl->Copy(pcInThatImpl);
+	m_pcImpl = (nullptr != cInThat.GetImpl()) ? cInThat.GetImpl()->Clone() : nullptr;
 }
 
 Draw const & H3DF::Draw::operator=(Draw const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
 unsigned int H3DF::Draw::GetPolygonCount() const
 {
-	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
+	auto pcImpl = static_cast<DrawingImpl *>(m_pcImpl.get());
 	return static_cast<unsigned int>(pcImpl->m_polygons.size());
 }
 
 void H3DF::Draw::GetPolygons(unsigned int & nOutCount, H3DF::Polygon * pcOutPolygons) const
 {
-	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
+	auto pcImpl = static_cast<DrawingImpl *>(m_pcImpl.get());
 	nOutCount = (unsigned int)pcImpl->m_polygons.size();
 
 	if (nullptr == pcOutPolygons) {
@@ -1557,7 +1655,7 @@ void H3DF::Draw::GetPolygons(unsigned int & nOutCount, H3DF::Polygon * pcOutPoly
 
 void H3DF::Draw::SetPolygons(unsigned int nInCount, H3DF::Polygon const * pcInPolygons)
 {
-	DrawingPrivate * pcImpl = (DrawingPrivate *)m_pcImpl;
+	auto pcImpl = static_cast<DrawingImpl *>(m_pcImpl.get());
 	pcImpl->m_polygons.resize(nInCount);
 
 	for (unsigned int i = 0; i < nInCount; i++) {
@@ -1566,7 +1664,7 @@ void H3DF::Draw::SetPolygons(unsigned int nInCount, H3DF::Polygon const * pcInPo
 }
 
 //== ViewEntity Class ==============================================================================
-H3DF::ViewEntity::ViewEntity(HC_KEY nInSegmentKey) : PMI(nInSegmentKey)
+H3DF::ViewEntity::ViewEntity(HC_KEY nInSegmentKey) : PmiKey(nInSegmentKey)
 {
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
@@ -1574,7 +1672,7 @@ H3DF::ViewEntity::ViewEntity(HC_KEY nInSegmentKey) : PMI(nInSegmentKey)
 	}
 }
 
-H3DF::ViewEntity::ViewEntity(SegmentKey & nInSegmentKey) : PMI(nInSegmentKey)
+H3DF::ViewEntity::ViewEntity(SegmentKey & nInSegmentKey) : PmiKey(nInSegmentKey)
 {
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
@@ -1582,22 +1680,23 @@ H3DF::ViewEntity::ViewEntity(SegmentKey & nInSegmentKey) : PMI(nInSegmentKey)
 	}
 }
 
-H3DF::ViewEntity::ViewEntity(ViewEntity const & cInThat) : PMI(cInThat)
+H3DF::ViewEntity::ViewEntity(ViewEntity const & cInThat) : PmiKey(cInThat)
 {
 	if (INVALID_KEY != KeyValue()) {
 		DWORD nType = (DWORD) ObjectType();
 		SetUserData((intptr_t)UserDataIndex::PmiType, sizeof(DWORD), (BYTE *)&nType);
 	}
-}
-
-void H3DF::ViewEntity::Set(ViewEntity const & cInThat)
-{
-	Key::Set(cInThat);
 }
 
 ViewEntity const & H3DF::ViewEntity::operator = (ViewEntity const & cInThat)
 {
-	Set(cInThat);
+	if (nullptr != cInThat.m_pcImpl) {
+		m_pcImpl = cInThat.m_pcImpl->Clone();
+	}
+	else {
+		m_pcImpl.reset();
+	}
+
 	return *this;
 }
 
@@ -1630,7 +1729,7 @@ size_t H3DF::ViewEntity::GetAssociatedEntityCount() const
 	return ShowIncluders();
 }
 
-void H3DF::ViewEntity::GetAssociatedEntities(size_t & nOutCount, PMI *& pcOutEntities) const
+void H3DF::ViewEntity::GetAssociatedEntities(size_t & nOutCount, PmiKey *& pcOutEntities) const
 {
 	nOutCount = 0;
 

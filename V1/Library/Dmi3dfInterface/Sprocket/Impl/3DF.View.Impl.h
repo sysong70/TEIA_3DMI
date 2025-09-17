@@ -14,7 +14,15 @@ namespace H3DF
 	class ViewImpl : public Impl
 	{
 	public:
+		ViewImpl();
 		virtual ~ViewImpl();
+
+		std::unique_ptr<Impl> Clone() const override {
+			auto pcClone = std::make_unique<ViewImpl>();
+			pcClone->Copy(this);
+			return pcClone;
+		}
+
 		void Copy(const ViewImpl * pcInThat);
 
 	public:

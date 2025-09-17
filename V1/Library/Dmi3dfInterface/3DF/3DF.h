@@ -64,7 +64,7 @@ namespace H3DF
 	class LineKey;
 	class PolygonKit;
 	class PolygonKey;
-	class BoundingKit;
+	class TextKey;
 
 	class SelectabilityKit;
 	class SelectabilityControl;
@@ -87,6 +87,14 @@ namespace H3DF
 	class Style;
 	class StyleKey;
 	class NamedStyleDefinition;
+
+	class ShapeCoordinate;
+	class ShapePoint;
+	class ShapeElement;
+	class PolygonShapeElement;
+	class AnchorShapeElement;
+	class ShapeKit;
+	class ShapeDefinition;
 
 	class CuttingSectionKit;
 	class CuttingSectionKey;
@@ -134,12 +142,16 @@ namespace H3DF
 
 	class CullingControl;
 
+	class TextAttributeControl;
+
 	class CADModel;
 	class Component;
 	class MetaData;
 	class StringMetaData;
 
 	class KeyImpl;
+
+	class NavigationCube;
 
 	//==============================================================================================
 
@@ -277,6 +289,28 @@ namespace H3DF
 		VertexShaderKit = 0x0100006b,
 		ShaderTextureKit = 0x0100006c,
 		ShaderSamplerKit = 0x0100006d,
+
+		ConditionalExpression = 0x09000000,
+		NOTCondition = 0x09000001,
+		ANDCondition = 0x09000002,
+		ORCondition = 0x09000003,
+		XORCondition = 0x09000004,
+		EQCondition = 0x09000005,
+		NEQCondition = 0x09000006,
+		GTCondition = 0x09000007,
+		LTCondition = 0x09000008,
+		GTEQCondition = 0x09000009,
+		LTEQCondition = 0x0900000A,
+
+		ShapeElement = 0x0B000000,
+		PolygonShapeElement = 0x0B000001,
+		EllipseShapeElement = 0x0B000002,
+		CircleShapeElement = 0x0B000003,
+		EllipticalArcShapeElement = 0x0B000004,
+		AnchorShapeElement = 0x0B000005,
+		LineShapeElement = 0x0B000006,
+		CircularArcShapeElement = 0x0B000007,
+		LeaderLineClippingElement = 0x0B000008,
 
 		KeyPath = 0x01000F01,
 
@@ -426,18 +460,6 @@ namespace H3DF
 		Frame = 0xE000000B,
 		Draw = 0xE000000C,
 		ViewEntity = 0xE000000D,
-
-		ConditionalExpression = 0x09000000,
-		NOTCondition = 0x09000001,
-		ANDCondition = 0x09000002,
-		ORCondition = 0x09000003,
-		XORCondition = 0x09000004,
-		EQCondition = 0x09000005,
-		NEQCondition = 0x09000006,
-		GTCondition = 0x09000007,
-		LTCondition = 0x09000008,
-		GTEQCondition = 0x09000009,
-		LTEQCondition = 0x0900000A,
 	};
 
 	// MetaDataIndex는 UserDataIndex와 다른 값을 사용해야 함.
@@ -910,18 +932,19 @@ namespace H3DF
 		NotSet
 	};
 
-	class API_3DF Impl
+	class Impl
 	{
 	public:
 		Impl() = default;
 		virtual ~Impl() = default;
 
-		H3DF::Type Type() const;
-		void SetType(H3DF::Type eType);
+		// 순수 가상 함수(pure virtual function)임. 그래서 추상 class로 취급함.
+		virtual std::unique_ptr<Impl> Clone() const = 0;
+		virtual void Copy(const Impl * pcInThat);
+		virtual bool Equal(const Impl * pcInThat) const;
 
-		void SetImpl(Object * pcObject, Impl * pcImpl);
-
-		void Copy(Impl * pcInThat);
+		H3DF::Type Type() const { return m_eType; }
+		void SetType(H3DF::Type eType) { m_eType = eType; }
 
 	protected:
 		H3DF::Type m_eType = H3DF::Type::None;

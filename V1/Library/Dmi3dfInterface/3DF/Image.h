@@ -37,9 +37,9 @@ namespace H3DF
 			ImportOptionsKit();
 			ImportOptionsKit(ImportOptionsKit const & cInKit);
 
-			H3DF::Type ObjectType() const override { return H3DF::Type::ImageImportOptionsKit; };
+			static const H3DF::Type staticType = H3DF::Type::ImageImportOptionsKit;
+			H3DF::Type ObjectType() const { return staticType; };
 
-			void Set(ImportOptionsKit const & cInKit);
 			ImportOptionsKit const & operator = (ImportOptionsKit const & cInKit);
 
 			void Show(ImportOptionsKit & cOutKit) const;
@@ -80,12 +80,12 @@ namespace H3DF
 		ImageKit(ImageKit const & cInKit);
 		ImageKit(ImageKit const & cInKit, H3DF::Image::Format eInFormat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::ImageKit; };
+		static const H3DF::Type staticType = H3DF::Type::ImageKit;
+		H3DF::Type ObjectType() const { return staticType; };
 
 		ImageKit(ImageKit && cInThat) noexcept;
 		ImageKit & operator = (ImageKit && cInThat) noexcept;
 
-		void Set(ImageKit const & cInKit);
 		ImageKit const & operator = (ImageKit const & cInKit);
 
 		void Show(ImageKit & cOutKit) const;
@@ -113,12 +113,12 @@ namespace H3DF
 		ImageDefinition(Definition const & cInThat);
 		ImageDefinition(ImageDefinition const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::ImageDefinition; };
+		static const H3DF::Type staticType = H3DF::Type::ImageDefinition;
+		H3DF::Type ObjectType() const { return staticType; };
 
 		ImageDefinition(ImageDefinition && cInThat) noexcept;
 		ImageDefinition & operator = (ImageDefinition && cInThat) noexcept;
 
-		void Set(ImageDefinition const & cInKit);
 		ImageDefinition const & operator = (ImageDefinition const & cInKit);
 
 		void Set(ImageKit const & cInKit);

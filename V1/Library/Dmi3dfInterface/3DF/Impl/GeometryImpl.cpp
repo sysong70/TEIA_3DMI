@@ -14,15 +14,6 @@ using namespace H3DF;
 
 //== GeometryKeyImpl 관련 함수 =======================================================================
 
-
-void H3DF::GeometryKeyImpl::Copy(GeometryKeyImpl * pcInThat)
-{
-	KeyImpl::Copy(pcInThat);
-
-	m_bOpen = pcInThat->m_bOpen;
-	m_bForcedOpen = pcInThat->m_bForcedOpen;
-}
-
 // Local Open/Close Function 함수
 void H3DF::GeometryKeyImpl::LocalOpen()
 {

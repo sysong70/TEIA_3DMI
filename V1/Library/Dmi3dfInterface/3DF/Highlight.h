@@ -24,7 +24,8 @@ namespace H3DF
 		HighlightOptionsKit(CStringA strInStyleName, CStringA strInSecondaryStyleName);
 		HighlightOptionsKit(HighlightOptionsKit const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::HighlightOptionsKit; };
+		static const H3DF::Type staticType = H3DF::Type::HighlightOptionsKit;
+		H3DF::Type ObjectType() const { return staticType; };
 
 		void Set(HighlightOptionsKit const & cInThat);
 		HighlightOptionsKit & operator=(HighlightOptionsKit const & cInThat);
@@ -42,9 +43,9 @@ namespace H3DF
 		explicit HighlightControl(WindowKey const & cInWindow);
 		//HighlightControl(HighlightControl const & cInThat);
 
-		H3DF::Type ObjectType() const override { return H3DF::Type::HighlightControl; };
+		static const H3DF::Type staticType = H3DF::Type::HighlightControl;
+		H3DF::Type ObjectType() const { return staticType; };
 
-		void Set(HighlightControl const & cInThat);
 		HighlightControl & operator=(HighlightControl const & cInThat);
 
 		void SetMode(HighlightMode::Type eInMode);
