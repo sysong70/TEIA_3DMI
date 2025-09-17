@@ -1,5 +1,7 @@
 ﻿#include "StdAfx.h"
 
+#include "Impl/3DF.Impl.h"
+
 #include "ApplicationWindowOption.h"
 
 using namespace H3DF;

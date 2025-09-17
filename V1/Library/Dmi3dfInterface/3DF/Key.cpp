@@ -105,15 +105,32 @@ void H3DF::Key::SetKeyValue(HC_KEY nInKey) const
 
 void H3DF::Key::Delete()
 {
-	auto pcImpl = dynamic_cast<KeyImpl *>(m_pcImpl.get());
-	if (nullptr == pcImpl) {
+	HC_KEY nKey = KeyValue();
+	if (INVALID_KEY == nKey) {
 		DEBUG_STOP;
 		return;
 	}
 
-	HC_Delete_By_Key(pcImpl->KeyValue());
+	HC_Delete_By_Key(nKey);
 
-	pcImpl->SetKeyValue(INVALID_KEY);
+	SetKeyValue(INVALID_KEY);
+}
+
+void H3DF::Key::MoveTo(SegmentKey const & cInNewOwner)
+{
+	HC_KEY nKey = KeyValue();
+	if (INVALID_KEY == nKey) {
+		DEBUG_STOP;
+		return;
+	}
+
+	HC_KEY nNewOnwerKey = cInNewOwner.KeyValue();
+	if (INVALID_KEY == nNewOnwerKey) {
+		DEBUG_STOP;
+		return;
+	}
+
+	HC_Move_Key_By_Key(nKey, nNewOnwerKey);
 }
 
 bool H3DF::Key::HasOwner() const

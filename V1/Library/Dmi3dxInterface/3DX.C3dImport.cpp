@@ -1313,7 +1313,7 @@ bool C3dImport::ParseRiRepresentationItem(int nIndex, A3DRiRepresentationItem * 
 			break;
 
 		case kA3DTypeRiBrepModel:
-			// #Chech_point : A3DCopyAndAdaptBrepModel
+			// #Check_point : A3DCopyAndAdaptBrepModel
 			ParseRiBrepModel(pcRiRepItem, pcAttrs, pcParentAssy, true);
 			//ParseRiBrepModel(pcRiRepItem, pcAttrs, pcParentAssy, false);
 			break;

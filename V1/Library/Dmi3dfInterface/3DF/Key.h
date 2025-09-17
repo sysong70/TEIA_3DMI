@@ -32,6 +32,8 @@ namespace H3DF
 		SegmentKey Owner() const;
 
 		void Delete();
+
+		void MoveTo(SegmentKey const & cInNewOwner);
 	};
 
 	using KeyArray = std::vector<Key>;

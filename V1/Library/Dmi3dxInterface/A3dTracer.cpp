@@ -787,7 +787,7 @@ void A3dTracer::CreateLog(CString strFilePathName)
 
 void A3dTracer::Log(LPCWSTR chMessage, ...)
 {
-	if(false == LogManager::IsWriteLog()) {
+	if(false == LogManager::IsWriteLog(LogManager::GetCurrentId())) {
 		return;
 	}
 

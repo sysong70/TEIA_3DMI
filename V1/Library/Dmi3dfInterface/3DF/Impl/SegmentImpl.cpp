@@ -270,13 +270,23 @@ bool H3DF::SegmentKeyImpl::FindUp(SegmentKey & cInSegment, H3DF::Type eInType, S
 	SegmentKey cOwner = cInSegment.Owner();
 
 	bool bResult = false;
-	SegmentKey cFindSegment;
 	while (true == cOwner.IsValidate()) {
+#ifdef _DEBUG
 		H3DF::Type eObjectType = cOwner.ObjectType();
+#endif
 		if (eInType == cOwner.Type()) {
-			cFindSegment = cOwner;
+			cOutFindSegment = cOwner;
 			bResult = true;
 			break;
+		}
+		// 현재로서는 찾을 방법이 이름으로 하는 방법외에는 없음. 아니면 UserData에 넣어놔야 함.
+		else if (H3DF::Type::Model == eInType) {
+			CStringA strName = cOwner.Name(false);
+			if ("model" == strName.Left(5)) {
+				cOutFindSegment = cOwner;
+				bResult = true;
+				break;
+			}
 		}
 
 		cOwner = cOwner.Owner();

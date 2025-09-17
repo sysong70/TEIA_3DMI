@@ -64,6 +64,9 @@
     <Filter Include="CADModel\Impl">
       <UniqueIdentifier>{927b8a1d-7769-4070-b164-d49038c68630}</UniqueIdentifier>
     </Filter>
+    <Filter Include="3DF\Impl">
+      <UniqueIdentifier>{150ce2c8-ab15-4d29-9f9f-a383737b94fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -408,6 +411,12 @@
     <ClInclude Include="Sprocket\3DF.CADModel.h">
       <Filter>CADModel</Filter>
     </ClInclude>
+    <ClInclude Include="3DF\3DF.Tracer.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="3DF\Impl\3DF.Impl.h">
+      <Filter>3DF\Impl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -742,6 +751,12 @@
     </ClCompile>
     <ClCompile Include="Sprocket\3DF.CADModel.cpp">
       <Filter>CADModel</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\3DF.Tracer.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="3DF\Impl\3DF.Impl.cpp">
+      <Filter>3DF\Impl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

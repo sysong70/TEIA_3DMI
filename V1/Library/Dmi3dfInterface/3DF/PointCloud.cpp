@@ -440,7 +440,7 @@ static char const* strchrs(char const* str, char const* cs, size_t max_count)
  */
 bool PointCloud::Initialize(wchar_t const* filename)
 {
-    LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"PointCloud::Initialize Start");
+    LogManager::Log(LOG_3DF_ID, L"PointCloud::Initialize Start");
     
     m_file = NULL;
     m_bin_file = NULL;
@@ -483,7 +483,7 @@ bool PointCloud::Initialize(wchar_t const* filename)
         // nothing to be done -- no additional data
     }
 
-    LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Parsing text file...");
+    LogManager::Log(LOG_3DF_ID, L"Parsing text file...");
 
     BufferedWriter writer(m_bin_file);
     // placeholders for bounding info
@@ -510,7 +510,7 @@ bool PointCloud::Initialize(wchar_t const* filename)
 
     char const* const new_line_chars = "\n\r";
 
-    LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Start read text file...");
+    LogManager::Log(LOG_3DF_ID, L"Start read text file...");
 
     while (true) {
         size_t amount_read = fread(read_buffer, 1, sizeof(read_buffer), m_file);
@@ -579,7 +579,7 @@ bool PointCloud::Initialize(wchar_t const* filename)
             result = sscanf(read_buffer + read_pos, "%f%*c%f%*c%f%*c%f%*c%d%*c%d%*c%d", &x, &y, &z, &intensity, &r, &g, &b);
 
             if (result == EOF) {
-                LogManager::Log(LOGMANAGER_3DF_LOG_ID, H_FORMAT_TEXT("ERROR1! Failed to parse line # %lu\n%s", line_no, read_buffer));
+                LogManager::Log(LOG_3DF_ID, H_FORMAT_TEXT("ERROR1! Failed to parse line # %lu\n%s", line_no, read_buffer));
                 success = false;
                 break;
             }
@@ -696,12 +696,12 @@ bool PointCloud::Initialize(wchar_t const* filename)
 
     writer.Flush();
 
-    LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"End read text file...");
+    LogManager::Log(LOG_3DF_ID, L"End read text file...");
 
 //  LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Percent Progress: %d%%", 100);
 
     if (m_point_cloud_file_type == PTS && valid_read_point_count != m_num_points)
-        LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"WARNING! Number of points reported by file doesn't match number found in the file.");
+        LogManager::Log(LOG_3DF_ID, L"WARNING! Number of points reported by file doesn't match number found in the file.");
 
     if (success) {
         // go back to beginning, add actual bounding box and min/max intensities
@@ -715,7 +715,7 @@ bool PointCloud::Initialize(wchar_t const* filename)
         fclose(m_file);
         m_file = NULL;
 
-        LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Done.");
+        LogManager::Log(LOG_3DF_ID, L"Done.");
 
         m_file = wfopen(m_bin_file_name, L"rb");
         // reinitialize file size
@@ -736,7 +736,7 @@ bool PointCloud::Initialize(wchar_t const* filename)
         }
     }
 
-    LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"PointCloud::Initialize End");
+    LogManager::Log(LOG_3DF_ID, L"PointCloud::Initialize End");
 
     return success;
 }
@@ -765,7 +765,7 @@ float PointCloud::GetScaledIntensity(PCPoint const* cpt)
 HFileInputResult PointCloud::SpatiallySortPointCloud(HC_KEY seg_key)
 {
     if (!feof(m_file)) {
-        LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Generating spatially segregated shells...");
+        LogManager::Log(LOG_3DF_ID, L"Generating spatially segregated shells...");
         BSPData bsp_data(this, m_point_cloud_options);
         VHash<int, VBSP<PCPoint*>*>* gray_point_bsp_hash = new VHash<int, VBSP<PCPoint*>*>();
         VBSP<PCPoint*>* gray_point_bsp = 0;
@@ -934,11 +934,11 @@ HFileInputResult PointCloud::SpatiallySortPointCloud(HC_KEY seg_key)
         }
 
         ReportInputPercentProgress(1.0f);
-        LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Done.");
+        LogManager::Log(LOG_3DF_ID, L"Done.");
 
         wremove(m_bin_file_name);
 
-        LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Inserting shells...");
+        LogManager::Log(LOG_3DF_ID, L"Inserting shells...");
         ReportInputPercentProgress(0.0f);
         temp_fp = wfopen(dump_file, L"rb");
         big_fseek(temp_fp, 0, SEEK_SET);
@@ -948,7 +948,7 @@ HFileInputResult PointCloud::SpatiallySortPointCloud(HC_KEY seg_key)
             bool success = InsertShells(&bsp_data);
             fclose(temp_fp);
             if (!success) {
-                LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"ERROR1!  File is corrupt.");
+                LogManager::Log(LOG_3DF_ID, L"ERROR1!  File is corrupt.");
                 ReportInputPercentProgress(1);
                 return InputFail;
             }
@@ -959,7 +959,7 @@ HFileInputResult PointCloud::SpatiallySortPointCloud(HC_KEY seg_key)
         wremove(dump_file);
 
         ReportInputPercentProgress(1.0f);
-        LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Done.");
+        LogManager::Log(LOG_3DF_ID, L"Done.");
 
         // set up visibility of markers
         HC_Open_Segment_By_Key(seg_key);
@@ -981,7 +981,7 @@ HFileInputResult PointCloud::SpatiallySortPointCloud(HC_KEY seg_key)
     }
     else {
         ReportInputPercentProgress(1);
-        LogManager::Log(LOGMANAGER_3DF_LOG_ID, H_FORMAT_TEXT("ERROR1! Couldn't open input file..."));
+        LogManager::Log(LOG_3DF_ID, H_FORMAT_TEXT("ERROR1! Couldn't open input file..."));
         return InputBadFileName;
     }
     return InputOK;
@@ -1160,22 +1160,22 @@ void PointCloud::DeleteBSPs(VBSP<PCPoint*>* bsp, int bucket, void const* const u
 HFileInputResult PointCloud::FileInputByKey(wchar_t const* filename, HC_KEY key, HInputHandlerOptions* options)
 {
     ReportInputPercentProgress(0);
-    LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Starting file load...");
+    LogManager::Log(LOG_3DF_ID, L"Starting file load...");
     if (!filename) {
         ReportInputPercentProgress(1);
-        LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"ERROR1! No filename...");
+        LogManager::Log(LOG_3DF_ID, L"ERROR1! No filename...");
         return InputBadFileName;
     }
 
     if (key == INVALID_KEY) {
         ReportInputPercentProgress(1);
-        LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"ERROR1! No segment...");
+        LogManager::Log(LOG_3DF_ID, L"ERROR1! No segment...");
         return InputFail;
     }
 
     m_pHView = options->m_pHBaseView;
     if (m_pHView == 0) {
-        LogManager::Log(LOGMANAGER_3DF_LOG_ID, 
+        LogManager::Log(LOG_3DF_ID, 
             "WARNING! HBaseView pointer is NULL.  Marker visibility will be set in segment passed to this function.");
     }
 
@@ -1184,7 +1184,7 @@ HFileInputResult PointCloud::FileInputByKey(wchar_t const* filename, HC_KEY key,
     if (m_point_cloud_options == 0) {
         free_m_point_cloud_options = true;
         m_point_cloud_options = new HPointCloudOptions();
-        LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Using default HPointCloudOptions values.");
+        LogManager::Log(LOG_3DF_ID, L"Using default HPointCloudOptions values.");
     }
 
     wchar_t const* extension = wcsrchr(filename, L'.');
@@ -1205,13 +1205,13 @@ HFileInputResult PointCloud::FileInputByKey(wchar_t const* filename, HC_KEY key,
     if (m_point_cloud_file_type != UNKNOWN && m_point_cloud_file_type != NONE) {
         if (Initialize(filename)) {
             if (m_point_cloud_options->m_maxShellSize <= 0)
-                LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"ERROR1! Must use a positive maximum shell size.");
+                LogManager::Log(LOG_3DF_ID, L"ERROR1! Must use a positive maximum shell size.");
             else if (m_point_cloud_options->m_minShellSize < 0)
-                LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"ERROR1! Must use a non-negative minimum shell size.");
+                LogManager::Log(LOG_3DF_ID, L"ERROR1! Must use a non-negative minimum shell size.");
             else if (m_point_cloud_options->m_maxShellSize <= m_point_cloud_options->m_minShellSize)
-                LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"ERROR1! Max shell size must be strictly greater than minimum shell size.");
+                LogManager::Log(LOG_3DF_ID, L"ERROR1! Max shell size must be strictly greater than minimum shell size.");
             else if (m_point_cloud_options->m_numBuckets < 0)
-                LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"ERROR1! Must use a non-negative number of buckets.");
+                LogManager::Log(LOG_3DF_ID, L"ERROR1! Must use a non-negative number of buckets.");
             else {
                 if (m_point_cloud_options->m_highIntensityValue == m_point_cloud_options->m_lowIntensityValue) {
                     m_point_cloud_options->m_highIntensityValue = m_max_intensity;
@@ -1222,11 +1222,11 @@ HFileInputResult PointCloud::FileInputByKey(wchar_t const* filename, HC_KEY key,
             }
         }
         else
-            LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Aborting import (invalid or missing file).");
+            LogManager::Log(LOG_3DF_ID, L"Aborting import (invalid or missing file).");
     }
 
     ReportInputPercentProgress(1);
-    LogManager::Log(LOGMANAGER_3DF_LOG_ID, L"Finished file load.");
+    LogManager::Log(LOG_3DF_ID, L"Finished file load.");
     if (free_m_point_cloud_options)
         delete m_point_cloud_options;
     return retval;

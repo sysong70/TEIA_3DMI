@@ -13,6 +13,8 @@
 
 #include "Math.Matrix.h"
 
+#include <string>
+
 namespace H3DF
 {
 	class API_3DF SegmentKey : public Key
@@ -197,7 +199,7 @@ namespace H3DF
 		bool ShowPriority(int & nOutPriority) const;
 
 		//== Text 관련 함수 =================================================================================
-		TextKey InsertText(Point const & cInPosition, CStringA strInText);
+		TextKey InsertText(Point const & cInPosition, std::wstring text);
 
 		//== TextAttribute 관련 함수 ========================================================================
 		TextAttributeControl GetTextAttributeControl();
