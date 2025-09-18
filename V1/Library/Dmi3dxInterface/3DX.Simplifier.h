@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "Impl/3DX.Simplifier.Impl.h"
+
 namespace H3DX
 {
 	class SimplifierKit
@@ -15,9 +17,18 @@ namespace H3DX
 // 		const Mesh & GetMesh() const;
 	};
 
-	class Simplifier
+	class Simplifier : public SimplifierImpl
 	{
 	public:
 		Simplifier();
+
+		// Load BREP data from A3DTopoBrepData
+		bool Initialize(const A3DTopoBrepData * pcInBrepData);
+
+		// Run simplification
+		bool Simplify();
+
+		// Export simplified result
+		const A3DTopoBrepData * GetSimplifiedData() const;
 	};
 }

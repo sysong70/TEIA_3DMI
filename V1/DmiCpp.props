@@ -44,8 +44,8 @@
     <DebFlg Condition="$(Configuration.Contains('Release'))"></DebFlg >
 
     <!-- HOOPS 3DF Header Include Path -->
-		<DevTools>..\3DF\Dev_Tools</DevTools>
-		<Dmi3dfInclude>$(DevTools)\hoops_3dgs\source;</Dmi3dfInclude>
+	<DevTools>..\3DF\Dev_Tools</DevTools>
+	<Dmi3dfInclude>$(DevTools)\hoops_3dgs\source;</Dmi3dfInclude>
     <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\hoops_3dgs\source;</Dmi3dfInclude>
     <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\hoops_hio\hio_dwf\hoops_dwf\source;</Dmi3dfInclude>
     <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\hoops_hio\hio_exchange\source;</Dmi3dfInclude>
@@ -58,13 +58,14 @@
     <Dmi3dfInclude>$(Dmi3dfInclude)$(DevTools)\3rdParty\ImageMagick;</Dmi3dfInclude>
 
     <!-- HOOPS 3DF Header Library Path -->
-    <Dmi3dfLibarayPath>$(DevTools)\hoops_3dgs\lib\nt_x64_v142$(DebFlg);</Dmi3dfLibarayPath>
-    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\hoops_mvo\lib\nt_x64_v142$(DebFlg);</Dmi3dfLibarayPath>
-    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\hoops_mfc\lib\nt_x64_v142$(DebFlg);</Dmi3dfLibarayPath>
-    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\hoops_stream\lib\nt_x64_v142$(DebFlg);</Dmi3dfLibarayPath>
-    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\utility\lib\nt_x64_v142$(DebFlg);</Dmi3dfLibarayPath>
-    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\hoops_ooc\lib\nt_x64_v142$(DebFlg);</Dmi3dfLibarayPath>
-    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\3rdparty\ImageMagick\lib\nt_x64_v142$(DebFlg);</Dmi3dfLibarayPath>
+	<HoopsVsVer>v143</HoopsVsVer>
+    <Dmi3dfLibarayPath>$(DevTools)\hoops_3dgs\lib\nt_x64_$(HoopsVsVer)$(DebFlg);</Dmi3dfLibarayPath>
+    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\hoops_mvo\lib\nt_x64_$(HoopsVsVer)$(DebFlg);</Dmi3dfLibarayPath>
+    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\hoops_mfc\lib\nt_x64_$(HoopsVsVer)$(DebFlg);</Dmi3dfLibarayPath>
+    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\hoops_stream\lib\nt_x64_$(HoopsVsVer)$(DebFlg);</Dmi3dfLibarayPath>
+    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\utility\lib\nt_x64_$(HoopsVsVer)$(DebFlg);</Dmi3dfLibarayPath>
+    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\hoops_ooc\lib\nt_x64_$(HoopsVsVer)$(DebFlg);</Dmi3dfLibarayPath>
+    <Dmi3dfLibarayPath>$(Dmi3dfLibarayPath)$(DevTools)\3rdparty\ImageMagick\lib\nt_x64_$(HoopsVsVer)$(DebFlg);</Dmi3dfLibarayPath>
     
     <Dmi3dfLibaray>vfw32.lib;</Dmi3dfLibaray>
     <Dmi3dfLibaray>$(Dmi3dfLibaray)hoops_utilsstat_md.lib;</Dmi3dfLibaray>

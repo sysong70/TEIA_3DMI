@@ -17,6 +17,8 @@
 	m_pcImpl = std::make_unique<ClassName##Impl>(); \
 	DEBUG_VALID(m_pcImpl)
 
+
+
 namespace H3DF
 {
 	class Impl
@@ -45,3 +47,4 @@ namespace H3DF
 
 	std::vector<HoopsOption> ParseHoopsOptionString(const CStringA & input);
 }
+

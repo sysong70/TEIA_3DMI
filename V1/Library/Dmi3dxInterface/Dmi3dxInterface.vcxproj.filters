@@ -1,287 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="소스 파일">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="헤더 파일">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
-    <Filter Include="리소스 파일">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="3DX">
-      <UniqueIdentifier>{7f496ad0-262a-431e-b987-5f885c8f654e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Utility">
-      <UniqueIdentifier>{62f2e8ca-d201-4510-816e-c6e959fe7f75}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ConvertObject">
-      <UniqueIdentifier>{d1d3abaf-6b43-4323-b5ed-d8bf2a9867d5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Object">
-      <UniqueIdentifier>{5c8388f3-8c55-40ac-b102-bac82cf6353a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Object\Surface">
-      <UniqueIdentifier>{3005bad7-e037-42bf-890d-66d2367524a7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Object\Curve">
-      <UniqueIdentifier>{d3bd9637-644a-403f-a646-d75764ce3cc7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Object\TopoItem">
-      <UniqueIdentifier>{f556bef3-e4b9-4cf3-b255-14f35bd72ae0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Signal">
-      <UniqueIdentifier>{e3591eae-b163-4976-923e-122b00d4890c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Import">
-      <UniqueIdentifier>{cf25a673-c790-4bc6-904d-9c5aa74d2be1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DLL">
-      <UniqueIdentifier>{e7d7b1c5-abb3-4eb0-b863-19e4fb6709d1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="_Common">
-      <UniqueIdentifier>{171e8008-7852-404e-ba8a-4e7b26d21778}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="_Signal">
-      <UniqueIdentifier>{c69e44d6-cd5c-41ac-b158-f84e0e681edc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Function">
-      <UniqueIdentifier>{c4b7990a-a8e3-4b25-9695-f06194146047}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="stdafx.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="Dmi3dx.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="Surface\DmiCylinderSurface.h">
-      <Filter>Object\Surface</Filter>
-    </ClInclude>
-    <ClInclude Include="Surface\DmiConeSurface.h">
-      <Filter>Object\Surface</Filter>
-    </ClInclude>
-    <ClInclude Include="C3dTracer.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="Surface\DmiSurface.h">
-      <Filter>Object\Surface</Filter>
-    </ClInclude>
-    <ClInclude Include="A3dTracer.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="Surface\DmiSphereSurface.h">
-      <Filter>Object\Surface</Filter>
-    </ClInclude>
-    <ClInclude Include="Surface\DmiTorusSurface.h">
-      <Filter>Object\Surface</Filter>
-    </ClInclude>
-    <ClInclude Include="Convert\ConvFace.h">
-      <Filter>ConvertObject</Filter>
-    </ClInclude>
-    <ClInclude Include="Convert\ConvObject.h">
-      <Filter>ConvertObject</Filter>
-    </ClInclude>
-    <ClInclude Include="Convert\ConvLoop.h">
-      <Filter>ConvertObject</Filter>
-    </ClInclude>
-    <ClInclude Include="Convert\ConvCoEdge.h">
-      <Filter>ConvertObject</Filter>
-    </ClInclude>
-    <ClInclude Include="Convert\ConvEdge.h">
-      <Filter>ConvertObject</Filter>
-    </ClInclude>
-    <ClInclude Include="Convert\ConvVertex.h">
-      <Filter>ConvertObject</Filter>
-    </ClInclude>
-    <ClInclude Include="Convert\ConvSurface.h">
-      <Filter>ConvertObject</Filter>
-    </ClInclude>
-    <ClInclude Include="Convert\ConvCurve.h">
-      <Filter>ConvertObject</Filter>
-    </ClInclude>
-    <ClInclude Include="ThreadPool.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="Surface\DmiRuledSurface.h">
-      <Filter>Object\Surface</Filter>
-    </ClInclude>
-    <ClInclude Include="Surface\DmiElevationSurface.h">
-      <Filter>Object\Surface</Filter>
-    </ClInclude>
-    <ClInclude Include="Surface\DmiRevolutionSurface.h">
-      <Filter>Object\Surface</Filter>
-    </ClInclude>
-    <ClInclude Include="Surface\DmiExtrusionSurface.h">
-      <Filter>Object\Surface</Filter>
-    </ClInclude>
-    <ClInclude Include="Convert\ConvFaceShell.h">
-      <Filter>ConvertObject</Filter>
-    </ClInclude>
-    <ClInclude Include="TopoItem\DmiOrientedEdge.h">
-      <Filter>Object\TopoItem</Filter>
-    </ClInclude>
-    <ClInclude Include="Surface\DmiPlane.h">
-      <Filter>Object\Surface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\Common_Define.h">
-      <Filter>_Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\Fio.h">
-      <Filter>_Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\WStr.h">
-      <Filter>_Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\Json.h">
-      <Filter>_Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\Path.h">
-      <Filter>_Common</Filter>
-    </ClInclude>
-    <ClInclude Include="3DXSignal.h">
-      <Filter>Signal</Filter>
-    </ClInclude>
-    <ClInclude Include="3DXSignal.Interface.h">
-      <Filter>Signal</Filter>
-    </ClInclude>
-    <ClInclude Include="3DX.Base.h">
-      <Filter>3DX</Filter>
-    </ClInclude>
-    <ClInclude Include="3DX.C3dImport.h">
-      <Filter>Import</Filter>
-    </ClInclude>
-    <ClInclude Include="3DX.3DfImport.h">
-      <Filter>Import</Filter>
-    </ClInclude>
-    <ClInclude Include="3DX.ImportBase.h">
-      <Filter>Import</Filter>
-    </ClInclude>
-    <ClInclude Include="DLL.h">
-      <Filter>DLL</Filter>
-    </ClInclude>
-    <ClInclude Include="3DX.ExchangeWrapper.h">
-      <Filter>Import</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Signal\Signal.h">
-      <Filter>_Signal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\LogManager.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\Dir.h">
-      <Filter>_Common</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\File.h">
-      <Filter>_Common</Filter>
-    </ClInclude>
-    <ClInclude Include="3DX.FileOptions.h">
-      <Filter>Import</Filter>
-    </ClInclude>
-    <ClInclude Include="3DX.h">
-      <Filter>3DX</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Signal\WorkerThread.h">
-      <Filter>_Signal</Filter>
-    </ClInclude>
-    <ClInclude Include="3DX.Log.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="3DX.Simplifier.h">
-      <Filter>Function</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Dmi3dx.cpp">
-      <Filter>Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="Surface\DmiCylinderSurface.cpp">
-      <Filter>Object\Surface</Filter>
-    </ClCompile>
-    <ClCompile Include="Surface\DmiConeSurface.cpp">
-      <Filter>Object\Surface</Filter>
-    </ClCompile>
-    <ClCompile Include="C3dTracer.cpp">
-      <Filter>Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="Surface\DmiSurface.cpp">
-      <Filter>Object\Surface</Filter>
-    </ClCompile>
-    <ClCompile Include="A3dTracer.cpp">
-      <Filter>Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="Surface\DmiSphereSurface.cpp">
-      <Filter>Object\Surface</Filter>
-    </ClCompile>
-    <ClCompile Include="Surface\DmiTorusSurface.cpp">
-      <Filter>Object\Surface</Filter>
-    </ClCompile>
-    <ClCompile Include="Convert\ConvFace.cpp">
-      <Filter>ConvertObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Convert\ConvObject.cpp">
-      <Filter>ConvertObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Convert\ConvLoop.cpp">
-      <Filter>ConvertObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Convert\ConvCoEdge.cpp">
-      <Filter>ConvertObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Convert\ConvEdge.cpp">
-      <Filter>ConvertObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Convert\ConvVertex.cpp">
-      <Filter>ConvertObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Convert\ConvSurface.cpp">
-      <Filter>ConvertObject</Filter>
-    </ClCompile>
-    <ClCompile Include="Convert\ConvCurve.cpp">
-      <Filter>ConvertObject</Filter>
-    </ClCompile>
-    <ClCompile Include="ThreadPool.cpp">
-      <Filter>Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="Surface\DmiRuledSurface.cpp">
-      <Filter>Object\Surface</Filter>
-    </ClCompile>
-    <ClCompile Include="Surface\DmiElevationSurface.cpp">
-      <Filter>Object\Surface</Filter>
-    </ClCompile>
-    <ClCompile Include="Surface\DmiRevolutionSurface.cpp">
-      <Filter>Object\Surface</Filter>
-    </ClCompile>
-    <ClCompile Include="Surface\DmiExtrusionSurface.cpp">
-      <Filter>Object\Surface</Filter>
-    </ClCompile>
-    <ClCompile Include="Convert\ConvFaceShell.cpp">
-      <Filter>ConvertObject</Filter>
-    </ClCompile>
-    <ClCompile Include="TopoItem\DmiOrientedEdge.cpp">
-      <Filter>Object\TopoItem</Filter>
-    </ClCompile>
-    <ClCompile Include="Surface\DmiPlane.cpp">
-      <Filter>Object\Surface</Filter>
-    </ClCompile>
     <ClCompile Include="..\Common\Common_Define.cpp">
       <Filter>_Common</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\Fio.cpp">
+    <ClCompile Include="..\Common\Dir.cpp">
       <Filter>_Common</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\WStr.cpp">
+    <ClCompile Include="..\Common\File.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Fio.cpp">
       <Filter>_Common</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Json.cpp">
@@ -290,47 +19,390 @@
     <ClCompile Include="..\Common\Path.cpp">
       <Filter>_Common</Filter>
     </ClCompile>
-    <ClCompile Include="3DXSignal.Interface.cpp">
-      <Filter>Signal</Filter>
+    <ClCompile Include="..\Common\WStr.cpp">
+      <Filter>_Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Signal\Signal.cpp">
+      <Filter>_Signal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Signal\WorkerThread.cpp">
+      <Filter>_Signal</Filter>
     </ClCompile>
     <ClCompile Include="3DX.Base.cpp">
       <Filter>3DX</Filter>
     </ClCompile>
+    <ClCompile Include="Convert\ConvCoEdge.cpp">
+      <Filter>ConvertObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Convert\ConvCurve.cpp">
+      <Filter>ConvertObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Convert\ConvEdge.cpp">
+      <Filter>ConvertObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Convert\ConvFace.cpp">
+      <Filter>ConvertObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Convert\ConvFaceShell.cpp">
+      <Filter>ConvertObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Convert\ConvLoop.cpp">
+      <Filter>ConvertObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Convert\ConvObject.cpp">
+      <Filter>ConvertObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Convert\ConvSurface.cpp">
+      <Filter>ConvertObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Convert\ConvVertex.cpp">
+      <Filter>ConvertObject</Filter>
+    </ClCompile>
+    <ClCompile Include="DLL.cpp">
+      <Filter>DLL</Filter>
+    </ClCompile>
+    <ClCompile Include="3DX.Simplifier.cpp">
+      <Filter>Function</Filter>
+    </ClCompile>
+    <ClCompile Include="3DX.3DfImport.cpp">
+      <Filter>Import</Filter>
+    </ClCompile>
     <ClCompile Include="3DX.C3dImport.cpp">
       <Filter>Import</Filter>
     </ClCompile>
-    <ClCompile Include="3DX.3DfImport.cpp">
+    <ClCompile Include="3DX.FileOptions.cpp">
       <Filter>Import</Filter>
     </ClCompile>
     <ClCompile Include="3DX.ImportBase.cpp">
       <Filter>Import</Filter>
     </ClCompile>
-    <ClCompile Include="DLL.cpp">
-      <Filter>DLL</Filter>
+    <ClCompile Include="Surface\DmiConeSurface.cpp">
+      <Filter>Object\Surface</Filter>
     </ClCompile>
-    <ClCompile Include="..\Signal\Signal.cpp">
-      <Filter>_Signal</Filter>
+    <ClCompile Include="Surface\DmiCylinderSurface.cpp">
+      <Filter>Object\Surface</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\LogManager.cpp">
-      <Filter>Utility</Filter>
+    <ClCompile Include="Surface\DmiElevationSurface.cpp">
+      <Filter>Object\Surface</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\Dir.cpp">
-      <Filter>_Common</Filter>
+    <ClCompile Include="Surface\DmiExtrusionSurface.cpp">
+      <Filter>Object\Surface</Filter>
     </ClCompile>
-    <ClCompile Include="..\Common\File.cpp">
-      <Filter>_Common</Filter>
+    <ClCompile Include="Surface\DmiPlane.cpp">
+      <Filter>Object\Surface</Filter>
     </ClCompile>
-    <ClCompile Include="3DX.FileOptions.cpp">
-      <Filter>Import</Filter>
+    <ClCompile Include="Surface\DmiRevolutionSurface.cpp">
+      <Filter>Object\Surface</Filter>
     </ClCompile>
-    <ClCompile Include="..\Signal\WorkerThread.cpp">
-      <Filter>_Signal</Filter>
+    <ClCompile Include="Surface\DmiRuledSurface.cpp">
+      <Filter>Object\Surface</Filter>
+    </ClCompile>
+    <ClCompile Include="Surface\DmiSphereSurface.cpp">
+      <Filter>Object\Surface</Filter>
+    </ClCompile>
+    <ClCompile Include="Surface\DmiSurface.cpp">
+      <Filter>Object\Surface</Filter>
+    </ClCompile>
+    <ClCompile Include="Surface\DmiTorusSurface.cpp">
+      <Filter>Object\Surface</Filter>
+    </ClCompile>
+    <ClCompile Include="TopoItem\DmiOrientedEdge.cpp">
+      <Filter>Object\TopoItem</Filter>
+    </ClCompile>
+    <ClCompile Include="3DXSignal.Interface.cpp">
+      <Filter>Signal</Filter>
     </ClCompile>
     <ClCompile Include="3DX.Log.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="3DX.Simplifier.cpp">
-      <Filter>Function</Filter>
+    <ClCompile Include="A3dTracer.cpp">
+      <Filter>Utility</Filter>
     </ClCompile>
+    <ClCompile Include="C3dTracer.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Dmi3dx.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\LogManager.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadPool.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Am.Object.cpp">
+      <Filter>AM</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Am.Equipment.cpp">
+      <Filter>AM</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Am.DatalConverter.cpp">
+      <Filter>AM</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Impl\Am.DatalConverter.Impl.cpp">
+      <Filter>AM\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Impl\Am.Impl.cpp">
+      <Filter>AM\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="Impl\3DX.Simplifier.Impl.cpp">
+      <Filter>Function\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Impl\Am.Equipment.Impl.cpp">
+      <Filter>AM\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Am.Template.cpp">
+      <Filter>AM</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Impl\Am.Template.Impl.cpp">
+      <Filter>AM\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Am.Kit.cpp">
+      <Filter>AM</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Common\Common_Define.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Dir.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\File.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Fio.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Json.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Path.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\WStr.h">
+      <Filter>_Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Signal\Signal.h">
+      <Filter>_Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Signal\WorkerThread.h">
+      <Filter>_Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="3DX.h">
+      <Filter>3DX</Filter>
+    </ClInclude>
+    <ClInclude Include="3DX.Base.h">
+      <Filter>3DX</Filter>
+    </ClInclude>
+    <ClInclude Include="Convert\ConvCoEdge.h">
+      <Filter>ConvertObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Convert\ConvCurve.h">
+      <Filter>ConvertObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Convert\ConvEdge.h">
+      <Filter>ConvertObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Convert\ConvFace.h">
+      <Filter>ConvertObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Convert\ConvFaceShell.h">
+      <Filter>ConvertObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Convert\ConvLoop.h">
+      <Filter>ConvertObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Convert\ConvObject.h">
+      <Filter>ConvertObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Convert\ConvSurface.h">
+      <Filter>ConvertObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Convert\ConvVertex.h">
+      <Filter>ConvertObject</Filter>
+    </ClInclude>
+    <ClInclude Include="DLL.h">
+      <Filter>DLL</Filter>
+    </ClInclude>
+    <ClInclude Include="3DX.Simplifier.h">
+      <Filter>Function</Filter>
+    </ClInclude>
+    <ClInclude Include="3DX.3DfImport.h">
+      <Filter>Import</Filter>
+    </ClInclude>
+    <ClInclude Include="3DX.C3dImport.h">
+      <Filter>Import</Filter>
+    </ClInclude>
+    <ClInclude Include="3DX.ExchangeWrapper.h">
+      <Filter>Import</Filter>
+    </ClInclude>
+    <ClInclude Include="3DX.FileOptions.h">
+      <Filter>Import</Filter>
+    </ClInclude>
+    <ClInclude Include="3DX.ImportBase.h">
+      <Filter>Import</Filter>
+    </ClInclude>
+    <ClInclude Include="3DX.DataGuard.h">
+      <Filter>3DX</Filter>
+    </ClInclude>
+    <ClInclude Include="Surface\DmiConeSurface.h">
+      <Filter>Object\Surface</Filter>
+    </ClInclude>
+    <ClInclude Include="Surface\DmiCylinderSurface.h">
+      <Filter>Object\Surface</Filter>
+    </ClInclude>
+    <ClInclude Include="Surface\DmiElevationSurface.h">
+      <Filter>Object\Surface</Filter>
+    </ClInclude>
+    <ClInclude Include="Surface\DmiExtrusionSurface.h">
+      <Filter>Object\Surface</Filter>
+    </ClInclude>
+    <ClInclude Include="Surface\DmiPlane.h">
+      <Filter>Object\Surface</Filter>
+    </ClInclude>
+    <ClInclude Include="Surface\DmiRevolutionSurface.h">
+      <Filter>Object\Surface</Filter>
+    </ClInclude>
+    <ClInclude Include="Surface\DmiRuledSurface.h">
+      <Filter>Object\Surface</Filter>
+    </ClInclude>
+    <ClInclude Include="Surface\DmiSphereSurface.h">
+      <Filter>Object\Surface</Filter>
+    </ClInclude>
+    <ClInclude Include="Surface\DmiSurface.h">
+      <Filter>Object\Surface</Filter>
+    </ClInclude>
+    <ClInclude Include="Surface\DmiTorusSurface.h">
+      <Filter>Object\Surface</Filter>
+    </ClInclude>
+    <ClInclude Include="TopoItem\DmiOrientedEdge.h">
+      <Filter>Object\TopoItem</Filter>
+    </ClInclude>
+    <ClInclude Include="3DXSignal.h">
+      <Filter>Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="3DXSignal.Interface.h">
+      <Filter>Signal</Filter>
+    </ClInclude>
+    <ClInclude Include="3DX.Log.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="A3dTracer.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="C3dTracer.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Dmi3dx.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\LogManager.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadPool.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Am.Object.h">
+      <Filter>AM</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Am.h">
+      <Filter>AM</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Am.Equipment.h">
+      <Filter>AM</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Am.DatalConverter.h">
+      <Filter>AM</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Impl\Am.Impl.h">
+      <Filter>AM\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Impl\Am.DatalConverter.Impl.h">
+      <Filter>AM\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="Impl\3DX.Simplifier.Impl.h">
+      <Filter>Function\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Impl\Am.Equipment.Impl.h">
+      <Filter>AM\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Am.Template.h">
+      <Filter>AM</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Impl\Am.Template.Impl.h">
+      <Filter>AM\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Am.Kit.h">
+      <Filter>AM</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="_Common">
+      <UniqueIdentifier>{a56e6d18-5948-4398-a247-da64174c0401}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="_Signal">
+      <UniqueIdentifier>{b05680fe-c262-4050-8ee6-7661d3d39ad6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="3DX">
+      <UniqueIdentifier>{61261331-7fc2-4efd-a26a-f14c6d7d393c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ConvertObject">
+      <UniqueIdentifier>{43c6fee8-8e72-4a90-bd82-f22fe81094bd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DLL">
+      <UniqueIdentifier>{1e33a50d-38d4-4f39-957c-eb15cb22aee8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Function">
+      <UniqueIdentifier>{9078f102-b738-4448-b1d6-84556765f972}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Import">
+      <UniqueIdentifier>{62a0e7f4-ef7d-441e-8a8d-ec3473715dbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object">
+      <UniqueIdentifier>{b0cbcdb0-fd84-44e6-8fd3-9a96a8bcc27e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Surface">
+      <UniqueIdentifier>{50965737-27a7-4da1-b681-ab9b1e2daa15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\TopoItem">
+      <UniqueIdentifier>{76d646e7-e1bc-40d8-9134-8ed5cbf02f34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Curve">
+      <UniqueIdentifier>{de60a85d-01bb-48db-bc1f-81b610e0e2ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Signal">
+      <UniqueIdentifier>{42f8fd90-1c77-4fd3-97a1-3d794b87a3ee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{c0b169eb-f37f-4700-8916-079e54e1e07d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{098490a1-7ae9-4007-a7d8-702daa301dc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{8c5f6e02-29d5-4d4c-bfe3-808be5a7a343}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{4698eec5-23fa-4bea-aeaa-f573ef815060}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AM">
+      <UniqueIdentifier>{bbd383f2-f289-431a-bf52-3811f545ff36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="AM\Impl">
+      <UniqueIdentifier>{27f3dab1-5c1e-45fa-be9b-78492d86df43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Function\Impl">
+      <UniqueIdentifier>{ca697c96-e35e-499e-8994-19f86648cf65}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

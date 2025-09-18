@@ -93,7 +93,7 @@ bool ConvLoop::Convert(ConvSurface * pcConvSurface, bool bOrientationWithShell, 
 	if(st_ConeSurface == eSpaceType) {
 		CheckOrientedEdgeOpenAndHealing(lpcOrientedEdgeList, pcSurface, 1.0e-6);
 	}
-	// #Check_point
+	// #Chech_point
 /*
 	else {
 		// ConeSurface가 아닌 경우에서 총 2개의 Edge Curve가 모드 line인 경우 Loop를 만들지 않는다.

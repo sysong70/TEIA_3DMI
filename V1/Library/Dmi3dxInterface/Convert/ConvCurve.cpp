@@ -939,7 +939,7 @@ void ConvCurveBase::CalculateSurfaceCoeffPoint(const MbSurface * pcSurface, MbCa
 
 	// V값이 범위안에 있는지 여부 확인 (Major radius가 Minor radius보다 작은 경우 확인 필요, 완전한 Torus가 아닌 형태)
 
-	// #Check_point : Torus Radius 관련 처리 부분 일단 Remark한다.
+	// #Chech_point : Torus Radius 관련 처리 부분 일단 Remark한다.
 /*
 	if(st_TorusSurface == pcSurface->IsA()) {
 		MbTorusSurface * pcTorus = (MbTorusSurface *) pcSurface;

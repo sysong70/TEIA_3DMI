@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #ifndef INITIALIZE_A3D_API
-	#include <A3DSDKIncludes.h>
+#include <A3DSDKIncludes.h>
 #endif
 
 #include <templ_p_array.h>
@@ -53,7 +53,10 @@ namespace Dmi3dx
 
 	//== H3DF 관련 함수 ==============================================================================
 	H3DF::Point GetPoint(A3DVector3dData & cData);
+	H3DF::Point GetPoint(const A3DVector3dData & cData);
+
 	H3DF::Vector GetVector(A3DVector3dData & cData);
+	H3DF::Vector GetVector(const A3DVector3dData & cData);
 	H3DF::MatrixKit GetMatrix(A3DSurfPlaneData & cData);
 	H3DF::Plane GetPlane(A3DSurfPlaneData & cData);
 

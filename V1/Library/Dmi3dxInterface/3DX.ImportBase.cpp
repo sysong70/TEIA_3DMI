@@ -6,6 +6,7 @@ USING_3DX_NAMESPACE
 
 // A3DSDKLoader.h 한번만 선언되어야 정상 작동함.
 #include <A3DSDKLoader.h>
+#include <hoops_license.h>
 
 std::vector<CString> g_vestrMessage;
 std::vector<CString> g_vestrWarning;

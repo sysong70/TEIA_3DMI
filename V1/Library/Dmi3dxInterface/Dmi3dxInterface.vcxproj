@@ -132,6 +132,7 @@
     <ClInclude Include="..\Signal\Signal.h" />
     <ClInclude Include="..\Signal\WorkerThread.h" />
     <ClInclude Include="3DX.3DfImport.h" />
+    <ClInclude Include="3DX.DataGuard.h" />
     <ClInclude Include="3DX.ExchangeWrapper.h" />
     <ClInclude Include="3DX.FileOptions.h" />
     <ClInclude Include="3DX.Base.h" />
@@ -142,6 +143,16 @@
     <ClInclude Include="3DXSignal.h" />
     <ClInclude Include="3DXSignal.Interface.h" />
     <ClInclude Include="A3dTracer.h" />
+    <ClInclude Include="AM\Am.DatalConverter.h" />
+    <ClInclude Include="AM\Am.Equipment.h" />
+    <ClInclude Include="AM\Am.h" />
+    <ClInclude Include="AM\Am.Kit.h" />
+    <ClInclude Include="AM\Am.Object.h" />
+    <ClInclude Include="AM\Am.Template.h" />
+    <ClInclude Include="AM\Impl\Am.DatalConverter.Impl.h" />
+    <ClInclude Include="AM\Impl\Am.Equipment.Impl.h" />
+    <ClInclude Include="AM\Impl\Am.Impl.h" />
+    <ClInclude Include="AM\Impl\Am.Template.Impl.h" />
     <ClInclude Include="C3dTracer.h" />
     <ClInclude Include="Convert\ConvCoEdge.h" />
     <ClInclude Include="Convert\ConvCurve.h" />
@@ -153,6 +164,7 @@
     <ClInclude Include="Convert\ConvSurface.h" />
     <ClInclude Include="Convert\ConvVertex.h" />
     <ClInclude Include="DLL.h" />
+    <ClInclude Include="Impl\3DX.Simplifier.Impl.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="3DX.C3dImport.h" />
     <ClInclude Include="Dmi3dx.h" />
@@ -188,6 +200,15 @@
     <ClCompile Include="3DX.Simplifier.cpp" />
     <ClCompile Include="3DXSignal.Interface.cpp" />
     <ClCompile Include="A3dTracer.cpp" />
+    <ClCompile Include="AM\Am.DatalConverter.cpp" />
+    <ClCompile Include="AM\Am.Equipment.cpp" />
+    <ClCompile Include="AM\Am.Kit.cpp" />
+    <ClCompile Include="AM\Am.Object.cpp" />
+    <ClCompile Include="AM\Am.Template.cpp" />
+    <ClCompile Include="AM\Impl\Am.DatalConverter.Impl.cpp" />
+    <ClCompile Include="AM\Impl\Am.Equipment.Impl.cpp" />
+    <ClCompile Include="AM\Impl\Am.Impl.cpp" />
+    <ClCompile Include="AM\Impl\Am.Template.Impl.cpp" />
     <ClCompile Include="C3dTracer.cpp" />
     <ClCompile Include="Convert\ConvCoEdge.cpp" />
     <ClCompile Include="Convert\ConvCurve.cpp" />
@@ -200,6 +221,7 @@
     <ClCompile Include="Convert\ConvVertex.cpp" />
     <ClCompile Include="DLL.cpp" />
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="Impl\3DX.Simplifier.Impl.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>

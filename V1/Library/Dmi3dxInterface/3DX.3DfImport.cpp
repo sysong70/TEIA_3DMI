@@ -47,7 +47,10 @@
 #include <Signal.h>
 #include <Path.h>
 
+#include "3DX.Simplifier.h"
 #include "3DX.Log.h"
+
+#include "./AM/Am.DatalConverter.h"
 
 #ifdef _DEBUG
 #	define USED_LOG_MANAGER
@@ -420,9 +423,62 @@ bool TdfImport::ParseModelFile(const A3DAsmModelFile * pcAsmModelFile, H3DF::Seg
 	A3DMiscCascadedAttributes * pcAttrs = nullptr;
 	CHECK_A3D_RESULT(A3DMiscCascadedAttributesCreate(&pcAttrs));
 
+	// #Simplify: m_bSimplifyBrepData Flag 설정
+	m_bSimplifyBrepData = false;
+
+	// #AmDatalConvert: m_bAmDatalConvertTest Flag 설정
+	m_bAmDatalConvertTest = true;
+
 	A3DUns32 nSize = cModelFileData.m_uiPOccurrencesSize;
-	for (A3DUns32 nIndex = 0; nIndex < nSize; ++nIndex) {
-		ParseProductOccurrence(cModelFileData.m_ppPOccurrences[nIndex], pcAttrs, dModelScale, cModelSegment, *m_pcModelsComponent);
+
+	if (false == m_bSimplifyBrepData) {
+		for (A3DUns32 nIndex = 0; nIndex < nSize; ++nIndex) {
+			ParseProductOccurrence(cModelFileData.m_ppPOccurrences[nIndex], pcAttrs, dModelScale, cModelSegment, *m_pcModelsComponent);
+		}
+	}
+	else {
+		// #Simplify: m_bSimplifyBrepData 처리
+		SegmentKey cOriginModelSegment = cModelSegment.Subsegment("Origin_Data");
+		H3DF::Component * pcOriginModelComponent = AddComponent(cModelSegment, "Origin Data", H3DF::Component::Type::ExchangeProductOccurrence, *m_pcModelsComponent);
+
+		m_bSimplifyBrepData = false;
+		for (A3DUns32 nIndex = 0; nIndex < nSize; ++nIndex) {
+			ParseProductOccurrence(cModelFileData.m_ppPOccurrences[nIndex], pcAttrs, dModelScale, cOriginModelSegment, *pcOriginModelComponent);
+		}
+
+		BoundingKit cOriginModelBounding;
+		cOriginModelSegment.ShowBounding(cOriginModelBounding);
+
+		SimpleSphere cSphere;
+		SimpleCuboid cCuboid;
+		cOriginModelBounding.ShowVolume(cSphere, cCuboid);
+
+		m_bSimplifyBrepData = true;
+
+		SegmentKey cSimplifyModelSegment = cModelSegment.Subsegment("Simplify_Data");
+		H3DF::Component * pcSimplifyModelComponent = AddComponent(cModelSegment, "Simplify Data", H3DF::Component::Type::ExchangeProductOccurrence, *m_pcModelsComponent);
+
+		MatrixKit cMatrix;
+
+		float fDX = (cCuboid.cMax.x - cCuboid.cMin.x);
+		float fDY = (cCuboid.cMax.y - cCuboid.cMin.y);
+		float fDZ = (cCuboid.cMax.z - cCuboid.cMin.z);
+
+		if (fDX < fDY && fDX < fDZ) {
+			cMatrix.SetOrigin(fDX * 1.5, 0, 0);
+		}
+		else if (fDY < fDZ && fDY < fDX) {
+			cMatrix.SetOrigin(0, fDY * 1.5, 0);
+		}
+		else {
+			cMatrix.SetOrigin(0, 0, fDZ * 1.5);
+		}
+		
+		cSimplifyModelSegment.SetModellingMatrix(cMatrix);
+
+		for (A3DUns32 nIndex = 0; nIndex < nSize; ++nIndex) {
+			ParseProductOccurrence(cModelFileData.m_ppPOccurrences[nIndex], pcAttrs, dModelScale, cSimplifyModelSegment, *pcSimplifyModelComponent);
+		}
 	}
 
 	A3DAsmModelFileGet(nullptr, &cModelFileData);
@@ -1539,8 +1595,27 @@ A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcInRepIte
 	A3D_INITIALIZE_DATA(A3DRiBrepModelData, cBrepModelData);
 	A3DStatus nResult = A3DRiBrepModelGet(pcInRepItem, &cBrepModelData);
 
+	// #Simplifier: B-Rep Data Simplify 하는 부분
+	H3DX::Simplifier cSimplifier;
+
 	if (A3D_SUCCESS == nResult) {
 		Log::A3DTopoBrepDataLog(cBrepModelData.m_pBrepData);
+
+		if (true == m_bSimplifyBrepData) {
+			cSimplifier.Initialize(cBrepModelData.m_pBrepData);
+		}
+
+		// #AmDatalConvertTest: ExportBrep (AmDatal Converter)
+		if (true == m_bAmDatalConvertTest) {
+			AM::DatalConverter cConverter;
+			bool bStatus = cConverter.ExportBrep(cBrepModelData.m_pBrepData);
+		}
+
+		if (true == cSimplifier.Simplify()) {
+#ifdef BREP_DATA_LOG
+			Log::A3DTopoBrepDataLog(cSimplifier.GetSimplifiedData());
+#endif
+		}
 	}
 
 	// cBrepModelData 초기화

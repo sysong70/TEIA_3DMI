@@ -22,12 +22,12 @@ void A3dTracer::A3DTopoShellLog(const A3DTopoShell * pcTopoShell)
 	A3DTopoShellData cTopoShellData;
 	A3D_INITIALIZE_DATA(A3DTopoShellData, cTopoShellData);
 	A3DStatus nResult = A3DTopoShellGet(pcTopoShell, &cTopoShellData);
-	if(A3D_SUCCESS == nResult) {
+	if (A3D_SUCCESS == nResult) {
 		Log(L"A3DTopoShell: %s", HexStr((DWORD_PTR) pcTopoShell));
 
 		Log(L"FaceSize: %d, Closed: %s", cTopoShellData.m_uiFaceSize, BoolStr((bool) cTopoShellData.m_bClosed));
 
-		for(A3DUns32 nIndex = 0; nIndex < cTopoShellData.m_uiFaceSize; nIndex++) {
+		for (A3DUns32 nIndex = 0; nIndex < cTopoShellData.m_uiFaceSize; nIndex++) {
 			A3DTopoFaceLog(cTopoShellData.m_ppFaces[nIndex], nIndex, cTopoShellData.m_pucOrientationWithShell[nIndex]);
 		}
 
@@ -46,17 +46,17 @@ void A3dTracer::A3DTopoFaceLog(const A3DTopoFace * pcTopoFace, A3DUns32 nFaceInd
 		A3DTopoFaceData cTopoFaceData;
 		A3D_INITIALIZE_DATA(A3DTopoFaceData, cTopoFaceData);
 		A3DStatus eResult = A3DTopoFaceGet(pcTopoFace, &cTopoFaceData);
-		if(A3D_SUCCESS == eResult) {
+		if (A3D_SUCCESS == eResult) {
 			A3DSurfBaseLog(cTopoFaceData.m_pSurface);
 			Log(L"LoopSize: %d, HasTrimDomain: %s", cTopoFaceData.m_uiLoopSize, BoolStr((bool) cTopoFaceData.m_bHasTrimDomain));
-			if(TRUE == cTopoFaceData.m_bHasTrimDomain) {
+			if (TRUE == cTopoFaceData.m_bHasTrimDomain) {
 				A3DDomainDataLog(cTopoFaceData.m_sSurfaceDomain);
 			}
 
 			Log(L"OuterLoopIndex: %d", cTopoFaceData.m_uiOuterLoopIndex);
 
 			// Loop Data
-			for(A3DUns32 nIndex = 0; nIndex < cTopoFaceData.m_uiLoopSize; nIndex++) {
+			for (A3DUns32 nIndex = 0; nIndex < cTopoFaceData.m_uiLoopSize; nIndex++) {
 				A3DTopoLoopLog(cTopoFaceData.m_ppLoops[nIndex], nIndex, nFaceIndex);
 			}
 
@@ -75,10 +75,10 @@ void A3dTracer::A3DTopoLoopLog(const A3DTopoLoop * pcTopoLoop, A3DUns32 nLoopInd
 	A3DTopoLoopData cTopoLoopData;
 	A3D_INITIALIZE_DATA(A3DTopoLoopData, cTopoLoopData);
 	A3DStatus eResult = A3DTopoLoopGet(pcTopoLoop, &cTopoLoopData);
-	if(A3D_SUCCESS == eResult) {
+	if (A3D_SUCCESS == eResult) {
 		Log(L"EdgeSize: %d, OrientationWithSurface: %s", cTopoLoopData.m_uiCoEdgeSize, BoolStr((bool) cTopoLoopData.m_ucOrientationWithSurface));
 
-		for(A3DUns32 nIndex = 0; nIndex < cTopoLoopData.m_uiCoEdgeSize; nIndex++) {
+		for (A3DUns32 nIndex = 0; nIndex < cTopoLoopData.m_uiCoEdgeSize; nIndex++) {
 			A3DTopoCoEdgeLog(cTopoLoopData.m_ppCoEdges[nIndex], nIndex, nFaceIndex);
 		}
 
@@ -97,7 +97,7 @@ void A3dTracer::A3DTopoCoEdgeLog(const A3DTopoCoEdge * pcTopoCoEdge, A3DUns32 nE
 		A3DTopoCoEdgeData cTopoCoEdgeData;
 		A3D_INITIALIZE_DATA(A3DTopoCoEdgeData, cTopoCoEdgeData);
 		A3DStatus eResult = A3DTopoCoEdgeGet(pcTopoCoEdge, &cTopoCoEdgeData);
-		if(A3D_SUCCESS == eResult) {
+		if (A3D_SUCCESS == eResult) {
 			Log(L"OrientationWithLoop: %s, OrientationUVWithLoop: %s", BoolStr((bool) cTopoCoEdgeData.m_ucOrientationWithLoop),
 				BoolStr((bool) cTopoCoEdgeData.m_ucOrientationUVWithLoop));
 
@@ -127,7 +127,7 @@ void A3dTracer::A3DTopoEdgeLog(const A3DTopoEdge * pcTopoEdge, A3DUns32 nFaceInd
 	A3DTopoEdgeData cTopoEdgeData;
 	A3D_INITIALIZE_DATA(A3DTopoEdgeData, cTopoEdgeData);
 	A3DStatus eResult = A3DTopoEdgeGet(pcTopoEdge, &cTopoEdgeData);
-	if(A3D_SUCCESS == eResult) {
+	if (A3D_SUCCESS == eResult) {
 		Log(L"3D space curve: %s", HexStr((DWORD_PTR) cTopoEdgeData.m_p3dCurve));
 		// 		Log(L"HasTrimDomain: %s, Tolerance: %s", BoolStr((bool) cTopoEdgeData.m_bHasTrimDomain), DblStr(cTopoEdgeData.m_dTolerance));
 		// 		Log(L"Interval: %s,%s", DblStr(cTopoEdgeData.m_sInterval.m_dMin), DblStr(cTopoEdgeData.m_sInterval.m_dMax));
@@ -145,12 +145,11 @@ void A3dTracer::A3DTopoEdgeLog(const A3DTopoEdge * pcTopoEdge, A3DUns32 nFaceInd
 void A3dTracer::A3DSurfBaseLog(const A3DSurfBase * pcSurfBase)
 {
 	A3DEEntityType eType = kA3DTypeUnknown;
-	if(A3D_SUCCESS != A3DEntityGetType(pcSurfBase, &eType)) {
+	if (A3D_SUCCESS != A3DEntityGetType(pcSurfBase, &eType)) {
 		return;
 	}
 
-	switch(eType)
-	{
+	switch (eType) {
 		case kA3DTypeSurfPlane:
 			A3DSurfPlaneLog(pcSurfBase);
 			break;
@@ -463,12 +462,11 @@ void A3dTracer::A3DSurfNurbsLog(const A3DSurfBase * pcSurfBase)
 void A3dTracer::A3DCrvBaseLog(const A3DCrvBase * pcCrvBase)
 {
 	A3DEEntityType eType = kA3DTypeUnknown;
-	if(A3D_SUCCESS != A3DEntityGetType(pcCrvBase, &eType)) {
+	if (A3D_SUCCESS != A3DEntityGetType(pcCrvBase, &eType)) {
 		return;
 	}
 
-	switch(eType)
-	{
+	switch (eType) {
 		// 		case kA3DTypeCrvLine:
 		// 			CHECK_BOOL_RETURN(ConvertCrvLine(pcCrvBase, pcCurve, pcSurface));
 		// 			break;
@@ -515,8 +513,7 @@ void A3dTracer::A3DCrvNurbsLog(const A3DCrvBase * pcCrvBase)
 		CString strKnotType = GetKnotTypeString(cCrvNurbsData.m_eKnotType);
 
 		CString strCurveForm;
-		switch(cCrvNurbsData.m_eCurveForm)
-		{
+		switch (cCrvNurbsData.m_eCurveForm) {
 			case kA3DBSplineCurveFormUnspecified:
 				strCurveForm = L"Unspecified";
 				break;
@@ -548,17 +545,17 @@ void A3dTracer::A3DCrvNurbsLog(const A3DCrvBase * pcCrvBase)
 		IncreaseLogTab();
 		{
 #ifdef _LOG_NURBS_CURVE_DETAIL_LOG_
-			for(A3DUns32 nIndex = 0; nIndex < cCrvNurbsData.m_uiCtrlSize; nIndex++) {
+			for (A3DUns32 nIndex = 0; nIndex < cCrvNurbsData.m_uiCtrlSize; nIndex++) {
 				CString strText;
 				strText.Format(L"Po [%d]: ", nIndex);
 				A3DVector3dDataUVLog(cCrvNurbsData.m_pCtrlPts[nIndex], strText, m_dTopoContextScale);
 			}
 
-			for(A3DUns32 nIndex = 0; nIndex < cCrvNurbsData.m_uiKnotSize; nIndex++) {
+			for (A3DUns32 nIndex = 0; nIndex < cCrvNurbsData.m_uiKnotSize; nIndex++) {
 				Log(L"Knot [%d]: %s", nIndex, DblStr(cCrvNurbsData.m_pdKnots[nIndex]));
 			}
 
-			for(A3DUns32 nIndex = 0; nIndex < cCrvNurbsData.m_uiWeightSize; nIndex++) {
+			for (A3DUns32 nIndex = 0; nIndex < cCrvNurbsData.m_uiWeightSize; nIndex++) {
 				Log(L"Weight [%d]: %s", nIndex, DblStr(cCrvNurbsData.m_pdWeights[nIndex]));
 			}
 #else
@@ -600,13 +597,12 @@ void A3dTracer::A3DTopoVertexLog(const A3DTopoVertex * pcTopoVertex)
 
 	CString strVertexType = L"Vertex Error";
 
-	switch(eType)
-	{
+	switch (eType) {
 		case kA3DTypeTopoUniqueVertex:
 		{
 			A3DTopoUniqueVertexData cTopoUniqueVertexData;
 			A3D_INITIALIZE_DATA(A3DTopoUniqueVertexData, cTopoUniqueVertexData);
-			if(A3D_SUCCESS == A3DTopoUniqueVertexGet(pcTopoVertex, &cTopoUniqueVertexData)) {
+			if (A3D_SUCCESS == A3DTopoUniqueVertexGet(pcTopoVertex, &cTopoUniqueVertexData)) {
 				x = cTopoUniqueVertexData.m_sPoint.m_dX * m_dTopoContextScale;
 				y = cTopoUniqueVertexData.m_sPoint.m_dY * m_dTopoContextScale;
 				z = cTopoUniqueVertexData.m_sPoint.m_dZ * m_dTopoContextScale;
@@ -622,8 +618,8 @@ void A3dTracer::A3DTopoVertexLog(const A3DTopoVertex * pcTopoVertex)
 		{
 			A3DTopoMultipleVertexData cMultipleVertexData;
 			A3D_INITIALIZE_DATA(A3DTopoMultipleVertexData, cMultipleVertexData);
-			if(A3D_SUCCESS == A3DTopoMultipleVertexGet(pcTopoVertex, &cMultipleVertexData)) {
-				if(0 != cMultipleVertexData.m_uiSize) {
+			if (A3D_SUCCESS == A3DTopoMultipleVertexGet(pcTopoVertex, &cMultipleVertexData)) {
+				if (0 != cMultipleVertexData.m_uiSize) {
 					x = cMultipleVertexData.m_pPts[0].m_dX * m_dTopoContextScale;
 					y = cMultipleVertexData.m_pPts[0].m_dY * m_dTopoContextScale;
 					z = cMultipleVertexData.m_pPts[0].m_dZ * m_dTopoContextScale;
@@ -646,7 +642,7 @@ void A3dTracer::A3DVector3dDataLog(const A3DVector3dData & cVector, CString strP
 	strNumberText.Format(L"%s, %s, %s", DblStr(cVector.m_dX * dScale), DblStr(cVector.m_dY * dScale),
 		DblStr(cVector.m_dZ * dScale));
 
-	if(true == strPrevText.IsEmpty()) {
+	if (true == strPrevText.IsEmpty()) {
 		Log(strNumberText);
 	}
 	else {
@@ -660,7 +656,7 @@ void A3dTracer::A3DVector3dDataUVLog(const A3DVector3dData & cVector, CString st
 	strNumberText.Format(L"%s, %s (%s, %s)", DblStr(cVector.m_dX * dScale * m_dUSurfCoeff), DblStr(cVector.m_dY * dScale * m_dVSurfCoeff),
 		DblStr(cVector.m_dX), DblStr(cVector.m_dY));
 
-	if(true == strPrevText.IsEmpty()) {
+	if (true == strPrevText.IsEmpty()) {
 		Log(strNumberText);
 	}
 	else {
@@ -673,7 +669,7 @@ void A3dTracer::A3DVector2dDataLog(const A3DVector2dData & cVector, CString strP
 	CString strNumberText;
 	strNumberText.Format(L"%s, %s", DblStr(cVector.m_dX * dScale), DblStr(cVector.m_dY * dScale));
 
-	if(true == strPrevText.IsEmpty()) {
+	if (true == strPrevText.IsEmpty()) {
 		Log(strNumberText);
 	}
 	else {
@@ -694,8 +690,7 @@ void A3dTracer::A3DUVParameterizationDataLog(const A3DUVParameterizationData & c
 CString A3dTracer::GetKnotTypeString(A3DEKnotType eKnotType)
 {
 	CString strKnotTypeText;
-	switch(eKnotType)
-	{
+	switch (eKnotType) {
 		case kA3DKnotTypeUniformKnots:
 			strKnotTypeText = L"Uniform";
 			break;
@@ -720,8 +715,7 @@ CString A3dTracer::GetBSplineSurfaceFormString(A3DEBSplineSurfaceForm eSurfaceFo
 {
 	CString strSurfaceForm;
 
-	switch(eSurfaceForm)
-	{
+	switch (eSurfaceForm) {
 		case kA3DBSplineSurfaceFormPlane:
 			strSurfaceForm = L"Planar surface";
 			break;
@@ -787,7 +781,7 @@ void A3dTracer::CreateLog(CString strFilePathName)
 
 void A3dTracer::Log(LPCWSTR chMessage, ...)
 {
-	if(false == LogManager::IsWriteLog(LogManager::GetCurrentId())) {
+	if (false == LogManager::IsWriteLog(LogManager::GetCurrentId())) {
 		return;
 	}
 
@@ -823,7 +817,7 @@ CString A3dTracer::HexStr(DWORD_PTR nValue)
 {
 	CString strText;
 
-	if(0 == nValue) {
+	if (0 == nValue) {
 		strText = L"NULL";
 	}
 	else {
@@ -834,7 +828,7 @@ CString A3dTracer::HexStr(DWORD_PTR nValue)
 
 CString A3dTracer::BoolStr(bool bValue)
 {
-	if(true == bValue) {
+	if (true == bValue) {
 		return L"true";
 	}
 

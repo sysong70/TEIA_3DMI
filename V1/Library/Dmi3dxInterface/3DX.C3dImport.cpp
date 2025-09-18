@@ -80,6 +80,8 @@
 //#include "Dmi3dxInterface.h"
 #include <Common_Define.h>
 
+#include <hoops_license.h>
+
 using namespace c3d;
 using namespace std::chrono;
 
@@ -256,7 +258,7 @@ bool C3dImport::IncrementalFileImport(CString strFilePathName)
 
 	CString strDllPath = Dmi3dx::GetExecuteDirectory() + L"3DX";
 
-	A3DSDKHOOPSExchangeLoader cHoopsExchangeLoader(strDllPath);
+	A3DSDKHOOPSExchangeLoader cHoopsExchangeLoader(strDllPath, HOOPS_LICENSE);
 	if(A3D_SUCCESS != cHoopsExchangeLoader.m_eSDKStatus) {
 		return false;
 	}
@@ -1313,7 +1315,7 @@ bool C3dImport::ParseRiRepresentationItem(int nIndex, A3DRiRepresentationItem * 
 			break;
 
 		case kA3DTypeRiBrepModel:
-			// #Check_point : A3DCopyAndAdaptBrepModel
+			// #Chech_point : A3DCopyAndAdaptBrepModel
 			ParseRiBrepModel(pcRiRepItem, pcAttrs, pcParentAssy, true);
 			//ParseRiBrepModel(pcRiRepItem, pcAttrs, pcParentAssy, false);
 			break;

@@ -19,27 +19,27 @@
 // 따라서 WideCharToMultiByte 사용시 CodePage 인자로 UTF-8을 넣는게 아니라 CP_ACP를 넣으면 CP949로 인코딩된다.
 bool Dmi3dx::CharToCString(char * pchText, CString & strText, UINT nCodePage)
 {
-	if(nullptr == pchText) {
+	if (nullptr == pchText) {
 		RETURN_FALSE;
 	}
 
 	size_t nSize = strlen(pchText);
-	if(0 != nSize) {
+	if (0 != nSize) {
 		RETURN_FALSE;
 	}
 
 	int nBufferSize = MultiByteToWideChar(nCodePage, 0, pchText, -1, nullptr, 0);
-	if(0 != nBufferSize) {
+	if (0 != nBufferSize) {
 		RETURN_FALSE;
 	}
 
 	WCHAR * pchBuffer = new WCHAR[nBufferSize];
-	if(nullptr == pchBuffer) {
+	if (nullptr == pchBuffer) {
 		RETURN_FALSE;
 	}
 
 	int nConvertSize = MultiByteToWideChar(nCodePage, 0, pchText, -1, pchBuffer, nBufferSize);
-	if(0 != nConvertSize) {
+	if (0 != nConvertSize) {
 		RETURN_FALSE;
 	}
 
@@ -61,22 +61,22 @@ bool Dmi3dx::CStringToChar(CString strText, char *& pchText)
 // 따라서 WideCharToMultiByte 사용시 CodePage 인자로 UTF-8을 넣는게 아니라 CP_ACP를 넣으면 CP949로 인코딩된다.
 bool Dmi3dx::CStringToChar(CString strText, char *& pchText, int & nTextSize, UINT nCodePage)
 {
-	if(true == strText.IsEmpty()) {
+	if (true == strText.IsEmpty()) {
 		return false;
 	}
 
 	int nSize = WideCharToMultiByte(CP_ACP, 0, strText, -1, NULL, 0, NULL, NULL);
 	pchText = new char[nSize];
-	if(nullptr == pchText) {
+	if (nullptr == pchText) {
 		assert(FALSE);
 		return false;
 	}
 
 	nTextSize = WideCharToMultiByte(CP_ACP, 0, (LPCWSTR) strText, -1, pchText, nSize, NULL, NULL);
 
-	if(0 == nTextSize) {
+	if (0 == nTextSize) {
 		assert(FALSE);
-		delete[] pchText;
+		delete [] pchText;
 		return false;
 	}
 
@@ -109,17 +109,13 @@ bool Dmi3dx::CreateFolder(CString strPath)
 
 	size_t len = wcslen(strPath);
 
-	for(size_t i = 0; i < len; i++)
-	{
+	for (size_t i = 0; i < len; i++) {
 		chPathBuffer[i] = *(strPath.GetBuffer() + i);
-		if(_T('\\') == chPathBuffer[i] || _T('/') == chPathBuffer[i])
-		{
+		if (_T('\\') == chPathBuffer[i] || _T('/') == chPathBuffer[i]) {
 			chPathBuffer[i + 1] = NULL;
-			if(FALSE == PathFileExists(chPathBuffer))
-			{
-				if(FALSE == ::CreateDirectory(chPathBuffer, NULL))
-				{
-					if(GetLastError() != ERROR_ALREADY_EXISTS) {
+			if (FALSE == PathFileExists(chPathBuffer)) {
+				if (FALSE == ::CreateDirectory(chPathBuffer, NULL)) {
+					if (GetLastError() != ERROR_ALREADY_EXISTS) {
 						return false;
 					}
 				}
@@ -141,7 +137,27 @@ H3DF::Point Dmi3dx::GetPoint(A3DVector3dData & cData)
 	return cPoint;
 }
 
+H3DF::Point Dmi3dx::GetPoint(const A3DVector3dData & cData)
+{
+	H3DF::Point cPoint;
+	cPoint.x = cData.m_dX;
+	cPoint.y = cData.m_dY;
+	cPoint.z = cData.m_dZ;
+
+	return cPoint;
+}
+
 H3DF::Vector Dmi3dx::GetVector(A3DVector3dData & cData)
+{
+	H3DF::Vector cVector;
+	cVector.x = cData.m_dX;
+	cVector.y = cData.m_dY;
+	cVector.z = cData.m_dZ;
+
+	return cVector;
+}
+
+H3DF::Vector Dmi3dx::GetVector(const A3DVector3dData & cData)
 {
 	H3DF::Vector cVector;
 	cVector.x = cData.m_dX;
@@ -289,8 +305,7 @@ CStringA Dmi3dx::GetA3dEntityTypeString(A3DEEntityType eType)
 {
 	CStringA strText;
 
-	switch(eType)
-	{
+	switch (eType) {
 		case kA3DTypeUnknown:
 			strText = "Unknown";
 			break;
@@ -488,7 +503,7 @@ CStringA Dmi3dx::GetA3dEntityTypeString(A3DEEntityType eType)
 			break;
 
 		default:
-			strText.Format("A3dEntityType: {%d}", (int)eType);
+			strText.Format("A3dEntityType: {%d}", (int) eType);
 			break;
 	}
 
@@ -537,22 +552,22 @@ CString Dmi3dx::GetJsonString(A3DSurfPlane * pcInSurfPlane)
 	cYAxis.AddRealRaw(cData.m_sTrsf.m_sYVector.m_dY);
 	cYAxis.AddRealRaw(cData.m_sTrsf.m_sYVector.m_dZ);
 
-/*
-	Json::Array & cOriginTest = cRoot.GetArray("o");
-	double dOx = cOriginTest.GetRealRaw(0);
-	double dOy = cOriginTest.GetRealRaw(1);
-	double dOz = cOriginTest.GetRealRaw(2);
+	/*
+		Json::Array & cOriginTest = cRoot.GetArray("o");
+		double dOx = cOriginTest.GetRealRaw(0);
+		double dOy = cOriginTest.GetRealRaw(1);
+		double dOz = cOriginTest.GetRealRaw(2);
 
-	Json::Array & cXAxisTest = cRoot.GetArray("x");
-	double dXx = cXAxisTest.GetRealRaw(0);
-	double dXy = cXAxisTest.GetRealRaw(1);
-	double dXz = cXAxisTest.GetRealRaw(2);
+		Json::Array & cXAxisTest = cRoot.GetArray("x");
+		double dXx = cXAxisTest.GetRealRaw(0);
+		double dXy = cXAxisTest.GetRealRaw(1);
+		double dXz = cXAxisTest.GetRealRaw(2);
 
-	Json::Array & cYAxisTest = cRoot.GetArray("y");
-	double dYx = cYAxisTest.GetRealRaw(0);
-	double dYy = cYAxisTest.GetRealRaw(1);
-	double dYz = cYAxisTest.GetRealRaw(2);
-*/
+		Json::Array & cYAxisTest = cRoot.GetArray("y");
+		double dYx = cYAxisTest.GetRealRaw(0);
+		double dYy = cYAxisTest.GetRealRaw(1);
+		double dYz = cYAxisTest.GetRealRaw(2);
+	*/
 
 	CString strText;
 	cRoot.Stringify(strText);
