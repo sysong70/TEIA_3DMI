@@ -574,3 +574,27 @@ CString Dmi3dx::GetJsonString(A3DSurfPlane * pcInSurfPlane)
 
 	return strText;
 }
+
+//== 3DX 관련 함수 ===============================================================================
+
+bool Dmi3dx::GetName(const A3DRootBaseWithGraphics * pcRootBase, std::string_view & name)
+{
+	A3DRootBaseData sRootBaseData;
+	A3D_INITIALIZE_DATA(A3DRootBaseData, sRootBaseData);
+
+	A3DStatus eStstus = A3DRootBaseGet(pcRootBase, &sRootBaseData);
+	if (A3D_SUCCESS != eStstus) {
+// 		m_e3dxLastErrorCode = eStstus;
+// 		SetLastErrorMessage(L"Get Name - Root Base Get Error", eStstus);
+		return false;
+	}
+
+	bool bStatus = false;
+	if (nullptr != sRootBaseData.m_pcName) {
+		name = sRootBaseData.m_pcName;
+	}
+
+	A3DRootBaseGet(nullptr, &sRootBaseData);
+
+	return bStatus;
+}

@@ -5,12 +5,12 @@
 #include "./Impl/Am.Impl.h"
 #include "./Impl/Am.Equipment.Impl.h"
 
+#include "Am.Template.h"
+
 using namespace AM;
 
 AM::Equipment::Equipment()
 {
-	SET_IMPL(Equipment);
-	AM::Impl::setImpl(*this, std::unique_ptr<AM::EquipmentImpl>());
 }
 
 AM::Equipment::~Equipment()
@@ -18,14 +18,38 @@ AM::Equipment::~Equipment()
 
 }
 
-void AM::Equipment::setTitile(std::string_view title)
+Equipment & AM::Equipment::setTitile(std::string_view title)
 {
-	IMPL(Equipment);
-	impl->m_title = title;
+	auto * impl = ENSURE_IMPL(Equipment);
+	if (nullptr != impl) {
+		impl->m_title = title;
+	}
+
+	return *this;
 }
 
-void AM::Equipment::setBuiltIn(bool builtIn)
+Equipment & AM::Equipment::setBuiltIn(bool builtIn)
 {
-	IMPL(Equipment);
-	impl->m_builtIn = builtIn;
+	auto * impl = ENSURE_IMPL(Equipment);
+	if (nullptr != impl) {
+		impl->m_builtIn = builtIn;
+	}
+
+	return *this;
+}
+
+AM::Template AM::Equipment::insertTemplate(TemplateKit const & kit)
+{
+	AM::Template templ;
+
+	auto * impl = ENSURE_IMPL(Equipment);
+	if (nullptr == impl) {
+		return templ;
+	}
+
+	templ.set(kit);
+	
+	impl->m_templates.push_back(templ);
+
+	return templ;
 }

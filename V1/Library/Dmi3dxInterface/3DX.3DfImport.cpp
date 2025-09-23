@@ -1608,7 +1608,7 @@ A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcInRepIte
 		// #AmDatalConvertTest: ExportBrep (AmDatal Converter)
 		if (true == m_bAmDatalConvertTest) {
 			AM::DatalConverter cConverter;
-			bool bStatus = cConverter.ExportBrep(cBrepModelData.m_pBrepData);
+			bool bStatus = cConverter.ExportBrep(cBrepModelData.m_pBrepData, "m_strCadFileName");
 		}
 
 		if (true == cSimplifier.Simplify()) {

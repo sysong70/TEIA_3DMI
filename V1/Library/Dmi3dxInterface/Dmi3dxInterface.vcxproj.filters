@@ -166,6 +166,39 @@
     <ClCompile Include="AM\Am.Kit.cpp">
       <Filter>AM</Filter>
     </ClCompile>
+    <ClCompile Include="AM\Am.Geometry.cpp">
+      <Filter>AM</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Am.Box.cpp">
+      <Filter>AM</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Am.Cylinder.cpp">
+      <Filter>AM</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Impl\Am.Box.Impl.cpp">
+      <Filter>AM\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Impl\Am.Cylinder.Impl.cpp">
+      <Filter>AM\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Impl\Am.Extrusion.Impl.cpp">
+      <Filter>AM\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Am.Extrusion.cpp">
+      <Filter>AM</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Am.Vertex.cpp">
+      <Filter>AM</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Impl\Am.Vertex.Impl.cpp">
+      <Filter>AM\Impl</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Am.Loop.cpp">
+      <Filter>AM</Filter>
+    </ClCompile>
+    <ClCompile Include="AM\Impl\Am.Loop.Impl.cpp">
+      <Filter>AM\Impl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\Common_Define.h">
@@ -344,6 +377,39 @@
     </ClInclude>
     <ClInclude Include="AM\Am.Kit.h">
       <Filter>AM</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Am.Geometry.h">
+      <Filter>AM</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Am.Box.h">
+      <Filter>AM</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Am.Cylinder.h">
+      <Filter>AM</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Impl\Am.Box.Impl.h">
+      <Filter>AM\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Impl\Am.Cylinder.Impl.h">
+      <Filter>AM\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Impl\Am.Extrusion.Impl.h">
+      <Filter>AM\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Am.Extrusion.h">
+      <Filter>AM</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Am.Vertex.h">
+      <Filter>AM</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Impl\Am.Vertex.Impl.h">
+      <Filter>AM\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Am.Loop.h">
+      <Filter>AM</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Impl\Am.Loop.Impl.h">
+      <Filter>AM\Impl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

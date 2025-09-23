@@ -2,34 +2,85 @@
 
 #include "Am.Template.h"
 
-#include "./Impl/Am.Impl.h"
 #include "./Impl/Am.Template.Impl.h"
 
 using namespace AM;
 
-TemplateKit::TemplateKit()
+//== TemplateKit class =============================================================================
+AM::TemplateKit::TemplateKit() = default;
+
+TemplateKit & AM::TemplateKit::setDescription(std::string_view description)
 {
-	SET_IMPL(TemplateKit);
+	auto * impl = ENSURE_IMPL(TemplateKit);
+	if(nullptr != impl) {
+		impl->m_description = description;
+	}
+
+	return *this;
 }
 
-AM::Template::Template()
+TemplateKit & AM::TemplateKit::setProperty(std::string_view property)
 {
-	SET_IMPL(Template);
+	auto * impl = ENSURE_IMPL(TemplateKit);
+	if (nullptr != impl) {
+		impl->m_property = property;
+	}
+
+	return *this;
 }
 
-AM::Template::~Template()
-{
+//== Template class ================================================================================
 
+AM::Template::Template() = default;
+
+AM::Template::~Template() = default;
+
+Template & AM::Template::set(TemplateKit const & kit)
+{
+	auto * impl = ENSURE_IMPL(Template);
+	if (nullptr != impl) {
+		auto * kitImpl = GET_IMPL(kit, TemplateKit);
+		if (nullptr != kitImpl) {
+			impl->m_kit = std::move(*kitImpl);
+		}
+	}
+
+	return *this;
 }
 
-void AM::Template::setDescription(std::string_view description) noexcept
+Template & AM::Template::setDescription(std::string_view description)
 {
-	IMPL(Template);
-	impl->m_description = description;
+	auto * impl = ENSURE_IMPL(Template);
+	if (nullptr != impl) {
+		impl->m_kit.m_description = description;
+	}
+
+	return *this;
 }
 
-void AM::Template::setProperty(std::string_view property) noexcept
+Template & AM::Template::setProperty(std::string_view property)
 {
-	IMPL(Template);
-	impl->m_property = property;
+	auto * impl = ENSURE_IMPL(Template);
+	if (nullptr != impl) {
+		impl->m_kit.m_property = property;
+	}
+
+	return *this;
+}
+
+Cylinder AM::Template::insertCylinder(CylinderKit const & kit)
+{
+	auto * impl = ENSURE_IMPL(Template);
+	if (nullptr == impl) {
+		return {};
+	}
+
+	auto cylinder = std::make_unique<Cylinder>();
+	cylinder->set(kit);
+
+	Cylinder * returnCylinder = cylinder.get();
+
+	impl->m_kit.m_geometries.emplace_back(std::move(cylinder));
+
+	return *returnCylinder;
 }

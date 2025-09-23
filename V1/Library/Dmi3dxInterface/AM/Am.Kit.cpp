@@ -4,8 +4,6 @@
 
 using namespace AM;
 
-AM::Kit::Kit() = default;
-
 AM::Kit::Kit(Kit && cInThat) noexcept :
 	Object(std::move(cInThat))
 {

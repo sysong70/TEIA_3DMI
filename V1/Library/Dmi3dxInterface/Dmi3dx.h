@@ -78,5 +78,8 @@ namespace Dmi3dx
 
 	//== Json 관련 함수 ==============================================================================
 	CString GetJsonString(A3DSurfPlane * pcInSurfPlane);
+
+	//== 3DX 관련 함수 ===============================================================================
+	bool GetName(const A3DRootBaseWithGraphics * pcRootBase, std::string_view & name);
 };
 

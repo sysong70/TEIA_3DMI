@@ -4,6 +4,8 @@
 
 #include "Am.Impl.h"
 
+#include "../Am.Template.h"
+
 namespace AM  
 {
 	class EquipmentImpl : public Impl
@@ -15,6 +17,8 @@ namespace AM
 
 		std::string_view m_title;
 		bool m_builtIn = false;  // BUIL
+
+		std::vector<Template> m_templates;
 
 		// DSCO unset
 		// PTSP unset

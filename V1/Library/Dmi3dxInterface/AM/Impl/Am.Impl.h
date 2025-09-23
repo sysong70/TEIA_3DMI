@@ -10,12 +10,28 @@
 #include <memory>
 #include <filesystem>
 
-#define SET_IMPL(ClassName) \
-	AM::Impl::setImpl(*this, std::unique_ptr<ClassName##Impl>());
+// 내부 유니크 이름 도우미
+#define AM_CONCAT_INNER(a, b) a##b
+#define AM_CONCAT(a, b)       AM_CONCAT_INNER(a, b)
+#define AM_UNIQUE(base)       AM_CONCAT(base, __LINE__)
 
-#define IMPL(ClassName) \
-	auto * impl = static_cast<ClassName##Impl *>(Impl::getImpl(*this).get()); \
-	if (nullptr == impl) { DEBUG_STOP; return; } 
+#define ENSURE_IMPL(ClassName)                                           \
+    ([&]() -> ClassName##Impl* {                                              \
+        auto* p = static_cast<ClassName##Impl*>(AM::Impl::getImpl(*this).get()); \
+        if (!p) {                                                             \
+            AM::Impl::setImpl(*this, std::make_unique<ClassName##Impl>());    \
+            p = static_cast<ClassName##Impl*>(AM::Impl::getImpl(*this).get()); \
+            if (!p) { DEBUG_STOP; return nullptr; }                           \
+        }                                                                     \
+        return p;                                                             \
+    }())
+
+#define GET_IMPL(Obj, ClassName)                                     \
+    ([&]() -> ClassName##Impl* {                                          \
+        auto* p = static_cast<ClassName##Impl*>(Impl::getImpl(Obj).get());\
+        if (!p) { DEBUG_STOP; return nullptr; }                           \
+        return p;                                                         \
+    }())
 
 #define IMPL_AS(ClassName, varName) \
     varName = static_cast<ClassName##Impl *>(m_pcImpl.get()); \
@@ -24,6 +40,11 @@
 #define INIT_IMPL(ClassName) \
 	m_pcImpl = std::make_unique<ClassName##Impl>(); \
 	DEBUG_VALID(m_pcImpl)
+
+#define CLONE_IMPL(ClassName) \
+	auto impl = std::make_unique<ClassName>(); \
+	DEBUG_VALID(impl.get()); \
+	return impl;
 
 namespace AM
 {
@@ -66,11 +87,24 @@ namespace AM
 		std::ostream * m_os = nullptr;
 	};
 
-#define AM_IMPL_COMMON(Derived, EnumType)                                \
-    Derived() { this->SetType(EnumType); }                               \
-    Derived(Derived const&) = default;                                   \
-    std::unique_ptr<AM::Impl> Clone() const override {                   \
-        return std::make_unique<Derived>(*this);                         \
-    }
+	#define AM_IMPL_COMMON(Derived, EnumType)                                \
+		Derived() { this->SetType(EnumType); }                               \
+		Derived(Derived const&) = default;                                   \
+		std::unique_ptr<AM::Impl> Clone() const override {                   \
+			return std::make_unique<Derived>(*this);                         \
+		}
+
+	template <class ImplT, class ObjT>
+	ImplT & ensureImpl(ObjT & obj) {
+		if (auto * p = static_cast<ImplT *>(Impl::getImpl(obj).get()))
+			return *p;
+		Impl::setImpl(obj, std::make_unique<ImplT>());
+		return *static_cast<ImplT *>(Impl::getImpl(obj).get());
+	}
+
+	template <class ImplT, class ObjT>
+	const ImplT * peekImpl(const ObjT & obj) noexcept {
+		return static_cast<const ImplT *>(Impl::getImpl(obj).get());
+	}
 }
 

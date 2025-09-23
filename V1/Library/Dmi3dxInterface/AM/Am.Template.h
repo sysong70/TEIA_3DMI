@@ -5,6 +5,8 @@
 #include "Am.Object.h"
 #include "Am.Kit.h"
 
+#include "Am.Cylinder.h"
+
 namespace AM
 {
 	class TemplateKit : public Kit
@@ -12,9 +14,17 @@ namespace AM
 	public:
 		TemplateKit();
 
-		void setDescription(std::string_view description) noexcept;
+		// 복사 허용
+		TemplateKit(const TemplateKit &) = default;
+		TemplateKit & operator=(const TemplateKit &) = default;
 
-		void setProperty(std::string_view property) noexcept;
+		// 이동 허용
+		TemplateKit(TemplateKit &&) noexcept = default;
+		TemplateKit & operator=(TemplateKit &&) noexcept = default;
+
+		TemplateKit & setDescription(std::string_view description);
+
+		TemplateKit & setProperty(std::string_view property);
 	};
 
 	class Template : public Object
@@ -26,8 +36,20 @@ namespace AM
 		static const AM::Type staticType = AM::Type::Template;
 		AM::Type ObjectType() const { return staticType; }
 
-		void setDescription(std::string_view description) noexcept;
+		// 복사 허용
+		Template(const Template &) = default;
+		Template & operator=(const Template &) = default;
 
-		void setProperty(std::string_view property) noexcept;
+		// 이동 허용
+		Template(Template &&) noexcept = default;
+		Template & operator=(Template &&) noexcept = default;
+
+		Template & set(TemplateKit const & kit);
+
+		Template & setDescription(std::string_view description);
+
+		Template & setProperty(std::string_view property);
+
+		Cylinder insertCylinder(CylinderKit const & kit);
 	};
 }

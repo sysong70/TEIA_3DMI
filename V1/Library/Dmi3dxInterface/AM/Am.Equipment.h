@@ -15,13 +15,12 @@ namespace AM
 		static const AM::Type staticType = AM::Type::Equipment;
 		AM::Type ObjectType() const { return staticType; }
 
-		void setTitile(std::string_view title);
+		Equipment & setTitile(std::string_view title);
 
-		void setBuiltIn(bool builtIn);
+		Equipment & setBuiltIn(bool builtIn);
 
 
 		//== Template ==============================================================================
-		Template InsertTemplate(TemplateKit const & kit);
-
+		Template insertTemplate(TemplateKit const & kit);
 	};
 }

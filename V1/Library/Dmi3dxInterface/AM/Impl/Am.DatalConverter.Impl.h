@@ -4,6 +4,8 @@
 
 #include "../../3DX.h"
 
+#include "../AM.h"
+
 #include <memory>
 #include <string>
 #include <string_view>
@@ -197,8 +199,8 @@ namespace AM
 		DatalConverterImpl();
 
 	protected:
-		bool ExportTopoConnex(const A3DTopoConnex * connex) noexcept;
-		bool ExportTopoShell(const A3DTopoShell * shell) noexcept;
+		bool ExportTopoConnex(const A3DTopoConnex * connex, AM::Equipment & equipment) noexcept;
+		bool ExportTopoShell(const A3DTopoShell * shell, AM::Template & templ) noexcept;
 		bool ExportTopoFace(const A3DTopoFace * face) noexcept;
 
 		//== Solid 분석 =============================================================================
@@ -262,7 +264,7 @@ namespace AM
 			}
 		};
 
-		struct FaceSummary {
+		struct FaceAnalysisResult {
 			const A3DTopoFace * face;
 			SurfKind kind{ SurfKind::Other };
 
@@ -278,7 +280,7 @@ namespace AM
 			bool     hasInnerLoops;
 		};
 
-		bool AnalyzeFaceSurface(const A3DTopoFace * face, FaceSummary & out,
+		bool AnalyzeFaceSurface(const A3DTopoFace * face, FaceAnalysisResult & out,
 			double lenTol, double angTol) noexcept;
 
 		// ---- Solid Cylinder 결과 & 유틸 ----
@@ -337,6 +339,10 @@ namespace AM
 
 		// 주어진 Face 로부터 바깥 경계(외곽) 원을 추출.
 		bool ExtractOuterCircle(const A3DTopoFace * f, CircleParam & outCircle) noexcept;
+
+		bool IsHollowCandidate(const DatalConverterImpl::CylinderParam & refCyl,
+			const std::vector<DatalConverterImpl::FaceAnalysisResult> & allCylinders,
+			double lenTol, double angTol) noexcept;
 
 		std::optional<SolidCylinderResult> DetectSolidCylinder(const A3DTopoShell * shell, double lenTol = 1e-4, double angTol = 1e-5) noexcept;
 
