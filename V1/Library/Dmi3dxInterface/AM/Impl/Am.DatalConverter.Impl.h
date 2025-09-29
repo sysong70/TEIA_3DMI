@@ -16,6 +16,8 @@
 #include <cstdint>
 #include <cmath>
 #include <iosfwd>
+#include <set>
+#include <unordered_map>
 
 namespace AM
 {
@@ -46,152 +48,9 @@ namespace AM
 {
 	using Scalar = double;
 
-	class AmWriter {
-	public:
-		enum class Status : uint8_t {
-			Ok = 0,
-			FileOpenFailed,
-			AlreadyOpen,
-			NotOpen,
-			WriteFailed,
-			InvalidArgument
-		};
+	using FaceList = std::vector<const A3DTopoFace *>;
+	using CombinationList = std::vector<FaceList>;
 
-		struct Error {
-			Status code{ Status::Ok };
-			std::string message{};
-			explicit operator bool() const noexcept { return code != Status::Ok; }
-		};
-
-		enum class Axis : uint8_t  { 
-			X, 
-			Y, 
-			Z 
-		};
-
-		struct AxisMap { 
-			Axis to{}; 
-			int sign{ +1 }; 
-		};
-
-		struct Orientation { 
-			AxisMap mapY{ Axis::Y, +1 }; 
-			AxisMap mapZ{ Axis::Z, +1 }; 
-		};
-
-		class BlockGuard {
-		public:
-			BlockGuard() = default;
-			BlockGuard(AmWriter * w, std::string_view name);
-			BlockGuard(BlockGuard &&) noexcept;
-			BlockGuard & operator=(BlockGuard &&) noexcept;
-			~BlockGuard();
-
-			void End();
-			bool active() const noexcept { return m_writer != nullptr; }
-		private:
-			AmWriter * m_writer{ nullptr };
-			std::string m_name{};
-			bool m_closed{ true };
-		};
-
-	public:
-		// lifecycle
-		AmWriter() = default;
-		~AmWriter();
-		AmWriter(const AmWriter &) = delete;
-		AmWriter & operator=(const AmWriter &) = delete;
-		AmWriter(AmWriter &&) noexcept;
-		AmWriter & operator=(AmWriter &&) noexcept;
-
-		// file
-		Status Open(const std::filesystem::path & path_utf8, bool writeBOM = true) noexcept;
-		void Close() noexcept;
-		bool IsOpen() const noexcept;
-
-		void Flush() noexcept;
-
-		// input / equipment helpers
-		Status BeginInput();
-		Status EndInput();            // prints: "INPUT END  EQUIPMENT <name>" if equipment set, else "INPUT END"
-		Status FinishInput();         // prints: "INPUT FINISH"
-		Status WriteEquipmentHeader(std::string_view equipmentPath,
-			bool buil,
-			std::string_view dsco = "unset",
-			std::string_view ptsp = "unset",
-			std::string_view insc = "unset");
-
-		Status StartWithTemplate(
-			std::string_view equipmentPath,
-			std::string_view desc,
-			std::string_view purp = "EQUI",
-			std::optional<double> userWeightKg = std::nullopt,
-			bool buil = false,
-			std::string_view dsco = "unset",
-			std::string_view ptsp = "unset",
-			std::string_view insc = "unset");
-
-		// template / primitives
-		BlockGuard BeginTemplate(std::string_view desc,
-			std::string_view purp = "EQUI",
-			std::optional<double> userWeightKg = std::nullopt);
-		Status End();
-
-		BlockGuard BeginBox(double px, double py, double pz,
-			const Orientation & ori,
-			double xlen, double ylen, double zlen);
-
-		auto BeginCylinder(double cx, double cy, double cz, double radius, double height, Axis axis = Axis::Z) -> BlockGuard;
-
-		// Overload that applies a yaw (roll) angle around the cylinder axis and optional quantization step (deg)
-		auto BeginCylinder(double cx, double cy, double cz, double radius, double height, Axis axis, double yawDeg, double quantStepDeg) -> BlockGuard;
-
-		// Overload: cylinder with explicit ORI and DIAM/HEIG keys
-		auto BeginCylinder(double cx, double cy, double cz, double diam, double heig, const Orientation & ori) -> BlockGuard;
-
-		// Oriented solid cylinder (no RAII)
-		Status WriteSolidCylinder(double cx, double cy, double cz, const Orientation & ori, double diam, double heig);
-		Status WriteSolidCylinder(double cx, double cy, double cz, double nx, double ny, double nz, double radius, double height);
-
-		Status WritePlainCylinder(double cx, double cy, double cz, double diam, double heig);
-
-		// Hole(내경) 실린더 출력용 선언 추가:
-		Status WriteHoleCylinder(double cx, double cy, double cz, double nx, double ny, double nz, double radius, double height, double stepDeg = 11.25);
-
-		// emit
-		Status EmitLine(std::string_view line);
-		Status EmitKV(std::string_view key, std::string_view value);
-		Status EmitRawKV(std::string_view key, std::string_view value);
-		Status EmitKV(std::string_view key, double value, std::string_view unit = "");
-
-		const Error & LastError() const noexcept;
-
-	private:
-		friend class BlockGuard;
-		Status beginBlock(std::string_view name);
-		Status endBlock(std::string_view name);
-		void setError(Status c, std::string msg);
-		static std::string axisToStr(Axis a);
-		static std::string axisMapStr(const AxisMap & m);
-		static std::string formatOriFromAxisAndYaw(Axis axis, int zSign, double yawDeg, double stepDeg);
-		static std::string formatOriFromVector(double nx, double ny, double nz, double stepDeg);
-		static std::string formatOriYZFromVectors(double yx, double yy, double yz, double zx, double zy, double zz, double stepDeg);
-		static double autoYawFromAxisDeg(double nx, double ny, double nz, Axis a) noexcept;
-		static double normalizeDeg(double deg) noexcept;
-		static double quantizeDeg(double deg, double step) noexcept;
-		static std::string formatOrientation(const Orientation & ori);
-		static std::string formatNumber(double v, int maxDecimals = 3);
-		static Axis pickDominantAxis(double nx, double ny, double nz) noexcept;
-		static int pickAxisSign(Axis a, double nx, double ny, double nz) noexcept;
-		static Orientation orientationFromAxis(double nx, double ny, double nz) noexcept;
-
-	private:
-		std::ofstream m_out{};
-		Error m_lastError{};
-		std::vector<std::string> m_stack{};
-		std::string m_currentEquipment{};
-		int m_fd;
-	};
 
 	class DatalConverterImpl
 	{
@@ -199,37 +58,41 @@ namespace AM
 		DatalConverterImpl();
 
 	protected:
-		bool ExportTopoConnex(const A3DTopoConnex * connex, AM::Equipment & equipment) noexcept;
-		bool ExportTopoShell(const A3DTopoShell * shell, AM::Template & templ) noexcept;
-		bool ExportTopoFace(const A3DTopoFace * face) noexcept;
+		bool ProcessTopoConnex(const A3DTopoConnex * connex, AM::Equipment & equipment) noexcept;
+		bool ProcessTopoShell(const A3DTopoShell * shell, AM::Template & templ) noexcept;
+
+		std::set<const A3DTopoFace *> processOuterFaceBoundary(const std::vector<const A3DTopoFace *> & allShellFaces) noexcept;
+		const A3DTopoFace * FindNeighborFace(const A3DTopoCoEdge * ce, const std::vector<const A3DTopoFace *> & allShellFaces) noexcept;
+		const A3DTopoFace * FindNeighborFace(const A3DTopoCoEdge * coEdge, const std::set<const A3DTopoFace *> & faces) noexcept;
+
+		bool AssemblePrimitive(const A3DTopoFace * face, AM::Template & amTemplate, std::set<const A3DTopoFace *> & consumedFaces) noexcept;
+		bool AssemblePrimitive(const A3DTopoFace * face, AM::Template & amTemplate, std::set<const A3DTopoFace *> & consumedFaces, const std::set<const A3DTopoFace *> & outerFaces) noexcept;
+
+		bool assemblePlane(const A3DTopoFace * lateralFace, AM::Template & amTemplate, std::unordered_map<const A3DTopoFace *, bool> & faceMap, double lenTol, double angTol) noexcept;
+		bool assembleCylinder(const A3DTopoFace * face, AM::Template & amTemplate, std::set<const A3DTopoFace *> & consumedFaces, double lenTol, double angTol) noexcept;
+		bool assembleSphere(const A3DTopoFace * face, AM::Template & amTemplate, std::set<const A3DTopoFace *> & consumedFaces, const std::set<const A3DTopoFace *> & outerFaces, double lenTol, double angTol) noexcept;
 
 		//== Solid 분석 =============================================================================
 
 		//----- 공통 유틸: 어디서나 호출 가능하도록 static -----
-		static H3DF_INLINE H3DF::DVector SafeNormalized(H3DF::DVector v, Scalar eps = Scalar(1e-12f))
-		{
-			if (v.Length() <= eps) {
-				return H3DF::DVector::Zero();
-			}
-
-			v.Normalize();
-			return v;
-		}
 
 		// 축(Z)으로부터 안정적인 X/Y 프레임 생성 (Exchange에서 XDir 미제공 시 사용)
 		static H3DF_INLINE void BuildXYFromAxis(H3DF::DVector zAxis, H3DF::DVector & xOut, H3DF::DVector & yOut)
 		{
-			auto z = SafeNormalized(zAxis);
-			H3DF::DVector t = (std::fabs(z.z) < 0.9f) ? H3DF::DVector(0, 0, 1) : H3DF::DVector(1, 0, 0);
-			xOut = SafeNormalized(t.Cross(z));
-			yOut = SafeNormalized(z.Cross(xOut)); // 오른손 좌표계
+			zAxis.Normalize();
+			H3DF::DVector t = (std::fabs(zAxis.z) < 0.9f) ? H3DF::DVector(0, 0, 1) : H3DF::DVector(1, 0, 0);
+			xOut = t.Cross(zAxis);
+			yOut = zAxis.Cross(xOut); // 오른손 좌표계
+
+			xOut.Normalize();
+			yOut.Normalize();
 		}
 
 		//----- Solid 분석 기초 타입들 -----
-		struct CircleParam {
-			H3DF::DPoint  origin;   // (cx,cy,cz) → DPoint
-			H3DF::DVector normal;   // (nx,ny,nz) → DVector (normalized)
-			double r = 0;        // 반경(그대로 double 유지)
+		struct CircleParameter {
+			H3DF::DPoint  m_origin;   // (cx,cy,cz) → DPoint
+			H3DF::DVector m_normal;   // (nx,ny,nz) → DVector (normalized)
+			double m_radius = 0;        // 반경(그대로 double 유지)
 		};
 
 		enum class SurfKind : uint8_t {
@@ -237,47 +100,59 @@ namespace AM
 			Cylinder,
 			NurbsPlane,
 			NurbsCylinder,
+			Sphere,
 			Other
 		};
 
 		// X/Y 프레임 기반 원통 파라미터 (축 Z = X × Y)
-		struct CylinderParam {
-			H3DF::DVector origin, xAxis, yAxis;
-			Scalar radius{};
-			bool uClosed{ true };
+		struct CylinderParameters {
+			H3DF::DVector m_origin, m_xAxis, m_yAxis;
+			Scalar m_radius{};
+			bool m_closed{ true };
 
 			H3DF_INLINE H3DF::DVector Axis() const {
-				return DatalConverterImpl::SafeNormalized(xAxis.Cross(yAxis));
+				H3DF::DVector zAxis = m_xAxis.Cross(m_yAxis);
+				zAxis.Normalize();
+				return zAxis;
 			}
 
 			H3DF_INLINE void Orthonormalize() {
-				xAxis = DatalConverterImpl::SafeNormalized(xAxis);
-				const Scalar d = static_cast<Scalar>(yAxis.Dot(xAxis));
-				yAxis = H3DF::DVector(
-					static_cast<Scalar>(yAxis.x - d * xAxis.x),
-					static_cast<Scalar>(yAxis.y - d * xAxis.y),
-					static_cast<Scalar>(yAxis.z - d * xAxis.z)
+				m_xAxis.Normalize();
+				const Scalar d = static_cast<Scalar>(m_yAxis.Dot(m_xAxis));
+				m_yAxis = H3DF::DVector(
+					static_cast<Scalar>(m_yAxis.x - d * m_xAxis.x),
+					static_cast<Scalar>(m_yAxis.y - d * m_xAxis.y),
+					static_cast<Scalar>(m_yAxis.z - d * m_xAxis.z)
 				);
-				yAxis = DatalConverterImpl::SafeNormalized(yAxis);
+
+				m_yAxis.Normalize();
+
 				H3DF::DVector z = Axis();
-				yAxis = DatalConverterImpl::SafeNormalized(z.Cross(xAxis));
+				m_yAxis = z.Cross(m_xAxis);
 			}
 		};
 
+		struct DishParameters {
+			Scalar m_diameter{};          // XY 평면에서의 Dish 직경 (Diameter)
+			Scalar m_height{};            // Z축에 평행한 Dish의 높이 (Height)
+			Scalar m_radius{};            // 너클 반경 (Knuckle radius, Radius)
+		};
+
 		struct FaceAnalysisResult {
-			const A3DTopoFace * face;
+			const A3DTopoFace * face{};
 			SurfKind kind{ SurfKind::Other };
 
 			H3DF::DPoint  planeOrigin;
 			H3DF::DVector planeNormal;
 
-			CylinderParam cyl;
+			CylinderParameters cylinder;
 
-			bool        outerHasCircle{ false };
-			CircleParam outerCircle;
+			DishParameters dish;
 
-			uint32_t loopCount;
-			bool     hasInnerLoops;
+			std::vector<CircleParameter> allCircles;
+
+			uint32_t loopCount = 0;
+			bool hasInnerLoops = false;
 		};
 
 		bool AnalyzeFaceSurface(const A3DTopoFace * face, FaceAnalysisResult & out,
@@ -286,10 +161,41 @@ namespace AM
 		// ---- Solid Cylinder 결과 & 유틸 ----
 		struct SolidCylinderResult {
 			bool isSolidCylinder{ false };
-			CylinderParam cyl;
+			CylinderParameters cyl;
 			double height;
 			std::vector<const A3DTopoFace *> lateral;
 			const A3DTopoFace * caps[2];
+		};
+
+
+		// X/Y/Z 축 방향 및 크기를 포함하는 Box 파라미터 구조체
+		struct BoxParameters {
+			H3DF::DPoint m_origin;        // POS X Y Z (Box의 중심 좌표)
+			H3DF::DVector m_size;         // (XLEN, YLEN, ZLEN)
+			H3DF::DVector m_xAxis;        // X 축 방향 벡터 (Normalize 됨)
+			H3DF::DVector m_yAxis;        // Y 축 방향 벡터 (Normalize 됨)
+			H3DF::DVector m_zAxis;        // Z 축 방향 벡터 (Normalize 됨)
+		};
+
+		struct BoxFaceInfo {
+			const A3DTopoFace * face;
+			H3DF::DVector normal;
+			double distToOrigin;
+			size_t originalIndex;
+		};
+
+		struct BoxBuilderState {
+			std::set<const A3DTopoFace *> faces;        // 현재까지 선택된 면 (최종적으로 6개)
+			std::vector<H3DF::DVector> axes;           // 현재까지 확정된 직교 축 (최대 3개)
+			std::vector<const A3DTopoFace *> boxFaces;  // 순서대로 정렬된 6개의 면
+		};
+
+		struct SolidBoxResult {
+			bool isSolidBox { false };
+			BoxParameters box;
+
+			// 6개의 면 (Face) 포인터: 순서대로 X+, X-, Y+, Y-, Z+, Z- 면을 담을 수 있음.
+			const A3DTopoFace * faces[6];
 		};
 
 		// 두 스칼라가 공차(tol) 이내로 같은지 검사.
@@ -319,7 +225,7 @@ namespace AM
 		// 벡터 a 의 성분 중, 방향 bDir 에 수직인 성분의 길이(수선 거리)를 반환.
 		static H3DF_INLINE Scalar PerpDistance(H3DF::DVector a, H3DF::DVector bDir) 
 		{
-			bDir = SafeNormalized(bDir);
+			bDir.Normalize();
 			const Scalar proj = static_cast<Scalar>(a.Dot(bDir));
 			H3DF::DVector s(
 				static_cast<Scalar>(a.x - proj * bDir.x),
@@ -330,30 +236,28 @@ namespace AM
 		}
 
 		// 두 원기둥이 같은 축(coaxial)이며 반지름 또한 동일한지, 공차 내에서 판단.
-		bool IsCoaxialSameRadius(const CylinderParam & a, const CylinderParam & b,
+		bool IsCoaxialSameRadius(const CylinderParameters & a, const CylinderParameters & b,
 			Scalar lenTol, Scalar angTolRad) noexcept;
 
 		// 원(cap)이 주어진 원기둥의 엔드캡(끝면)인지 판정.
-		bool IsCapForCylinder(const CircleParam & cap, const CylinderParam & cy,
+		bool IsCapForCylinder(const CircleParameter & cap, const CylinderParameters & cy,
 			Scalar lenTol, Scalar angTolRad) noexcept;
 
-		// 주어진 Face 로부터 바깥 경계(외곽) 원을 추출.
-		bool ExtractOuterCircle(const A3DTopoFace * f, CircleParam & outCircle) noexcept;
+		bool extractAllCircles(const A3DTopoFace * face, std::vector<CircleParameter> & outCircles) noexcept;
 
-		bool IsHollowCandidate(const DatalConverterImpl::CylinderParam & refCyl,
+		//== Utility 함수 ===================================================================================
+		Result ExtractCircleParameter(const A3DCrvBase * curve, CircleParameter & outCircle) noexcept;
+
+		// 주어진 Face 로부터 바깥 경계(외곽) 원을 추출.
+		bool ExtractOuterCircle(const A3DTopoFace * f, CircleParameter & outCircle) noexcept;
+
+		bool IsHollowCandidate(const DatalConverterImpl::CylinderParameters & refCyl,
 			const std::vector<DatalConverterImpl::FaceAnalysisResult> & allCylinders,
 			double lenTol, double angTol) noexcept;
 
-		std::optional<SolidCylinderResult> DetectSolidCylinder(const A3DTopoShell * shell, double lenTol = 1e-4, double angTol = 1e-5) noexcept;
+		std::vector<SolidCylinderResult> DetectSolidCylinder(const A3DTopoShell * shell, double lenTol = 1e-4, double angTol = 1e-5) noexcept;
 
-	protected:
-		//== AM Datal writer =======================================================================
-		bool ExportToDatal(const std::filesystem::path & outPathUTF8);
-		AmWriter & Writer() noexcept { return m_writer; }
-		const AmWriter & Writer() const noexcept { return m_writer; }
-
-	private:
-		AmWriter m_writer; // owns the writer instance
+		//std::vector<SolidBoxResult> DetectSolidBox(const A3DTopoShell * shell, double lenTol = 1e-4, double angTol = 1e-5) noexcept;
 	};
 }
 

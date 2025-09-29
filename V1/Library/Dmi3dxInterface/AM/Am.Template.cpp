@@ -2,12 +2,17 @@
 
 #include "Am.Template.h"
 
+#include "./Impl/Am.Impl.h"
 #include "./Impl/Am.Template.Impl.h"
 
 using namespace AM;
 
 //== TemplateKit class =============================================================================
-AM::TemplateKit::TemplateKit() = default;
+AM::TemplateKit::TemplateKit()
+{
+	// Kit 관련 Class는 초기화를 실시한다. 값이 비어 있어도 Kit는 역활을 해야 함.
+	INIT_IMPL(TemplateKit);
+}
 
 TemplateKit & AM::TemplateKit::setDescription(std::string_view description)
 {
@@ -34,6 +39,16 @@ TemplateKit & AM::TemplateKit::setProperty(std::string_view property)
 AM::Template::Template() = default;
 
 AM::Template::~Template() = default;
+
+Result AM::Template::writeDatal(std::ostream * os) noexcept
+{
+	auto * impl = ENSURE_IMPL(Template);
+	if (nullptr == impl) {
+		return Result::Fail(Error::NotInitialized, "Template implementation is not valid.");
+	}
+
+	return impl->writeDatal(os);
+}
 
 Template & AM::Template::set(TemplateKit const & kit)
 {
@@ -66,6 +81,23 @@ Template & AM::Template::setProperty(std::string_view property)
 	}
 
 	return *this;
+}
+
+Box AM::Template::insertBox(BoxKit const & kit)
+{
+	auto * impl = ENSURE_IMPL(Template);
+	if (nullptr == impl) {
+		return {};
+	}
+
+	auto box = std::make_unique<Box>();
+	box->set(kit);
+
+	Box * returnBox = box.get();
+
+	impl->m_kit.m_geometries.emplace_back(std::move(box));
+
+	return *returnBox;
 }
 
 Cylinder AM::Template::insertCylinder(CylinderKit const & kit)

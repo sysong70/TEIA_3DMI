@@ -14,6 +14,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <cmath>
+#include <queue>
 
 using namespace H3DX;
 using namespace H3DF;
@@ -101,7 +102,8 @@ AM::DatalConverterImpl::DatalConverterImpl()
 
 }
 
-bool AM::DatalConverterImpl::ExportTopoConnex(const A3DTopoConnex * connex, AM::Equipment & equipment) noexcept
+// Connex에서 Shell 단위로 순회하면서 Template을 생성하고, Shell 내에서 Primitive를 감지하여 추가함.
+bool AM::DatalConverterImpl::ProcessTopoConnex(const A3DTopoConnex * connex, AM::Equipment & equipment) noexcept
 {
 	if(nullptr == connex) {
 		return false;
@@ -112,44 +114,36 @@ bool AM::DatalConverterImpl::ExportTopoConnex(const A3DTopoConnex * connex, AM::
 		return false;
 	}
 
-
-// 	// Write 부분은 차후에 처리하도록 한다. 일단 구조 생성작업 부터 함.
-// 	m_writer.Open("Z:\\AmDataData.mac", false);
-// 
-// 	m_writer.StartWithTemplate("/SSD-TEST", "SEPARATED OIL TANK HEATER-2661", "EQUI", 310.0, false, "unset", "unset", "unset");
-
 	const auto & connexData = dataGuard.Data();
 
-	for (A3DUns32 i = 0; i < connexData.m_uiShellSize; ++i) {
+	// Template에 사용할 이름을 추출
+	std::string_view connexName;
+	Dmi3dx::GetName(connex, connexName);
 
-		// Template에 사용할 이름을 추출
-		std::string_view shellName;
-		Dmi3dx::GetName(connexData.m_ppShells[i], shellName);
+	AM::TemplateKit templateKit;
 
-		AM::TemplateKit templateKit;
-
-		// 이름이 있는 경우 Description으로 활용
-		if (false == shellName.empty()) {
-			templateKit.setDescription(shellName);
-		}
-
-		// TemplateKit을 사용해서 template를 생성, Equipment에서 Kit을 이용해서, Template를 생성     
-		AM::Template templ = equipment.insertTemplate(templateKit);
-
-		ExportTopoShell(connexData.m_ppShells[i], templ);
+	// 이름이 있는 경우 Description으로 활용
+	if (false == connexName.empty()) {
+		templateKit.setDescription(connexName);
+	}
+	else {
+		templateKit.setDescription("TopoConnex");
 	}
 
-// 	// Close TMPLATE explicitly at the very end
-// 	m_writer.End();
-// 
-// 	// Footer lines as requested
-// 	m_writer.EndInput(); // -> "INPUT END EQUIPMENT /SSD-TEST"
-// 	m_writer.FinishInput(); // -> "INPUT FINISH"
+	// TemplateKit을 사용해서 template를 생성, Equipment에서 Kit을 이용해서, Template를 생성     
+	AM::Template & templ = equipment.insertTemplate(templateKit);
+
+	// Connex 내의 Shell 순회
+	for (A3DUns32 i = 0; i < connexData.m_uiShellSize; ++i) {
+		ProcessTopoShell(connexData.m_ppShells[i], templ);
+	}
 
 	return true;
 }
 
-bool AM::DatalConverterImpl::ExportTopoShell(const A3DTopoShell * shell, AM::Template & amTemplate) noexcept
+// Shell에서 Primitive를 감지하여 Template에 추가해야 함.
+// Primitive가 여러개 존재할 수 있음.
+bool AM::DatalConverterImpl::ProcessTopoShell(const A3DTopoShell * shell, AM::Template & amTemplate) noexcept
 {
 	if (nullptr == shell) {
 		return false;
@@ -159,184 +153,201 @@ bool AM::DatalConverterImpl::ExportTopoShell(const A3DTopoShell * shell, AM::Tem
 	if (!dataGuard.IsValid()) {
 		return false;
 	}
-	
+
 	const auto & shellData = dataGuard.Data();
 
-	// 1. 솔리드 원기둥 판별 (허용공차는 모델 스케일에 맞게 조정)
-	constexpr double kLenTol = 1e-4;   // 길이/거리 허용오차
-	constexpr double kAngTol = 1e-5;   // 라디안(≈0.00057°)
+	// 1. Edge 연결성을 기반으로 Outer Face Boundary를 찾습니다.
+	//std::set<const A3DTopoFace *> outerFaces = processOuterFaceBoundary(allFaces);
 
-	// 2. Face 요약 수집 (Cylinder 및 Hole 처리를 위해 필요)
-	std::vector<FaceAnalysisResult> planes;
-	std::vector<FaceAnalysisResult> cylinders;
+	// 3. 사용 여부 추적을 위한 Set 초기화 (faceMap 역할 대체)
+   //    outerFaces에 속한 면 중에서 사용된 면을 추적합니다.
+	std::set<const A3DTopoFace *> consumedFaces;
 
-	planes.reserve(shellData.m_uiFaceSize);
-	cylinders.reserve(shellData.m_uiFaceSize);
-
-	// Shell Data에서 각 Face를 순회하며 요약 정보 수집
-	for (A3DUns32 nIndex = 0; nIndex < shellData.m_uiFaceSize; ++nIndex) {
-		const A3DTopoFace * face = shellData.m_ppFaces[nIndex];
-
-		FaceAnalysisResult fs {};
-		if (!AnalyzeFaceSurface(face, fs, kLenTol, kAngTol)) {
-			continue;
-		}
-
-		switch (fs.kind) {
-			case SurfKind::Plane:
-			case SurfKind::NurbsPlane:
-				// AnalyzeFaceSurface에서 outerCircle이 채워지지 않았으면 여기서 재시도
-				if (!fs.outerHasCircle) {
-					CircleParam tmp {};
-					if (ExtractOuterCircle(face, tmp)) {
-						fs.outerHasCircle = true;
-						fs.outerCircle = tmp;
-					}
-				}
-				// 복사본을 이동하여 저장 (fs가 지역 변수이므로)
-				planes.push_back(std::move(fs));
-				break;
-
-			case SurfKind::Cylinder:
-				cylinders.push_back(std::move(fs));
-				break;
-
-			default:
-				break;
-		}
-	}
-
-	// 실린더가 없거나, 평면이 2개 미만이면 cylinder/hole 판단 불가
-	if (cylinders.empty() || planes.size() < 2) {
-		// Cylinder/Hole이 아니므로 나머지 페이스만 처리하고 종료
-		for (A3DUns32 i = 0; i < shellData.m_uiFaceSize; ++i) {
-			ExportTopoFace(shellData.m_ppFaces[i]);
-		}
-
-		return true;
-	}
-
-	// 3. Cylinder / Hole 감지 및 객체 삽입 루프 시작
 	bool primitiveInserted = false;
 
-	// Solid Cylinder 감지 (가장 큰 Solid를 먼저 찾음)
-	if (auto solid = DetectSolidCylinder(shell, kLenTol, kAngTol)) {
-		if (true == solid->isSolidCylinder) {
-			const auto & cylinder = solid->cyl;
-			double radius = cylinder.radius;
-			double height = solid->height;
-			H3DF::Vector axis = cylinder.Axis();
-
-			// Solid Cylinder 객체 생성 및 삽입
-			AM::CylinderKit cylinderKit;
-			cylinderKit.setPosition(cylinder.origin);
-			cylinderKit.setOrientation(axis);
-			cylinderKit.setDiameter(radius * 2.0);
-			cylinderKit.setHeight(height);
-			amTemplate.insertCylinder(cylinderKit);
-
-			primitiveInserted = true;
-			// Solid가 발견되었으므로, 이 쉘에 대한 추가 Hole 검사는 일반적으로 필요하지 않지만, 
-			// 경우에 따라서는 Hole 검사를 포함하여 복합 형상을 처리할 수도 있습니다.
-			// 여기서는 Solid로 처리된 후에는 Hole 로직을 건너뜁니다.
-
-			// 만약 하나의 쉘에 여러 독립된 프리미티브가 있다면, DetectSolidCylinder를 루프 안에 두어야 합니다.
-			// 하지만 현재는 Solid Cylinder를 찾으면 전체 쉘을 대표한다고 가정하고 여기서 끝냅니다.
-
-			return true;
-		}
-	}
-
-	// 4. Hole(내경) 케이스 처리 (DetectSolidCylinder에서 Solid가 발견되지 않은 경우)
-	for (const auto & cf : cylinders) {
-		const CylinderParam & cy = cf.cyl;
-
-		std::vector<const FaceAnalysisResult *> caps;
-		// ... (caps 벡터를 채우는 로직은 기존 코드와 동일. planeFaces 벡터를 순회하며 캡을 찾음)
-
-		// 주의: 이 부분은 FindCapsForCylinder(cy, planes, ...)와 같은 함수로 분리하면 더 좋습니다.
-
-		for (auto & pf : planes) {
-			if (!pf.outerHasCircle) continue;
-			if (IsCapForCylinder(pf.outerCircle, cy, static_cast<Scalar>(kLenTol), static_cast<Scalar>(kAngTol))) {
-				caps.push_back(&pf);
-			}
-		}
-
-		if (caps.size() < 2) {
-			continue;
-		}
-
-		// 높이 계산 (기존 로직과 동일)
-		const H3DF::DVector axis = cy.Axis();
-		const auto dotAxis = [&](const FaceAnalysisResult * a, const FaceAnalysisResult * b)->double {
-			// ... (기존 dotAxis 람다 정의와 동일)
-			H3DF::DVector ca(a->outerCircle.origin.x, a->outerCircle.origin.y, a->outerCircle.origin.z);
-			H3DF::DVector cb(b->outerCircle.origin.x, b->outerCircle.origin.y, b->outerCircle.origin.z);
-			H3DF::DVector d(cb.x - ca.x, cb.y - ca.y, cb.z - ca.z);
-			return std::abs(static_cast<double>(d.Dot(axis)));
-		};
-
-		const FaceAnalysisResult * cap0 = nullptr;
-		const FaceAnalysisResult * cap1 = nullptr;
-		double bestH = 0.0;
-
-		// ... (bestH, cap0, cap1을 찾는 루프 로직은 기존과 동일)
-		for (size_t i = 0; i < caps.size(); ++i) {
-			for (size_t j = i + 1; j < caps.size(); ++j) {
-				const double h = dotAxis(caps[i], caps[j]);
-				if (h > bestH && h > kLenTol) {
-					bestH = h;
-					cap0 = caps[i];
-					cap1 = caps[j];
-				}
-			}
-		}
-		if (!cap0 || !cap1) {
-			continue;
-		}
-
-		// *******************************************************************
-		// Writer 호출 제거 및 객체 모델링으로 전환
-		// *******************************************************************
-
-		// 1. 바깥 실린더 (NEW CYLINDER) 객체 생성 및 삽입
-		//    (ORI 없음. POS, DIAM, HEIG만 출력되는 Plain Cylinder)
-		AM::CylinderKit outerKit;
-		outerKit.setPosition(cy.origin);
-		// ORI가 없는 경우를 표현하기 위해 setOrientation을 호출하지 않거나 기본값 사용
-		// 현재 AmWriter::WritePlainCylinder가 ORI를 출력하지 않으므로, 이 키트는 순수 데이터만 가집니다.
-		outerKit.setDiameter(cy.radius * 2.0);
-		outerKit.setHeight(bestH);
-		amTemplate.insertCylinder(outerKit);
-
-		// 2. 구멍 실린더 (NEW NCYLINDER) 객체 생성 및 삽입
-		AM::CylinderKit holeKit;
-		H3DF::Vector axisVec = cy.Axis();
-		holeKit.setPosition(cy.origin);
-		holeKit.setOrientation(axisVec);
-		holeKit.setDiameter(cy.radius * 2.0);
-		holeKit.setHeight(bestH);
-		holeKit.setProductHint("Hole"); // NCYLINDER를 구분하는 핵심 속성
-		amTemplate.insertCylinder(holeKit);
-
-		// *******************************************************************
-
-		primitiveInserted = true;
-		// 동일 쉘 내 여러 개 hole을 위해 continue
-		continue;
-	}
-
-	// 5. 나머지 페이스들 처리 (원하면 생략 가능)
+	// 1. Face를 순회하며 처리.
 	for (A3DUns32 i = 0; i < shellData.m_uiFaceSize; ++i) {
-		ExportTopoFace(shellData.m_ppFaces[i]);
+		auto face = shellData.m_ppFaces[i];
+
+		// 이미 소비된 면은 건너뜁니다.
+		if (consumedFaces.count(face)) {
+			continue;
+		}
+
+		// AssemblePrimitive는 이 Face를 시드로 Primitive를 조립합니다.
+		// NOTE: AssemblePrimitive 함수 시그니처에서 faceMap을 제거해야 합니다.
+		if (AssemblePrimitive(face, amTemplate, consumedFaces)) { // <-- consumedFaces, outerFaces 전달
+			primitiveInserted = true;
+		}
 	}
 
-	// primitiveInserted는 적어도 Hole이 발견되었거나, Face가 처리되었음을 의미
+	// 5. 최종 결과 반환
 	return primitiveInserted || true;
 }
 
-bool AM::DatalConverterImpl::ExportTopoFace(const A3DTopoFace * face) noexcept
+std::set<const A3DTopoFace *> AM::DatalConverterImpl::processOuterFaceBoundary(
+	const std::vector<const A3DTopoFace *> & allShellFaces) noexcept
+{
+	std::set<const A3DTopoFace *> outerFaces;
+	if (allShellFaces.empty()) {
+		return outerFaces;
+	}
+
+	// 1. 순회 시작점(Seed Face) 선택 및 Queue 초기화
+	const A3DTopoFace * seedFace = allShellFaces[0];
+	std::set<const A3DTopoFace *> visited;
+	std::queue<const A3DTopoFace *> faceQueue;
+
+	faceQueue.push(seedFace);
+	visited.insert(seedFace);
+
+	// 2. BFS (Breadth-First Search) 순회 시작
+	while (!faceQueue.empty()) {
+		const A3DTopoFace * currentFace = faceQueue.front();
+		faceQueue.pop();
+
+		outerFaces.insert(currentFace);
+
+		H3DX::TopoFaceDataGuard faceDataGuard(currentFace);
+		if (!faceDataGuard.IsValid()) {
+			continue;
+		}
+		const auto & faceData = faceDataGuard.Data();
+
+		// 3. Outter loop를 순회하면서 이웃 Face 탐색
+		// 3.1. 인덱스 유효성 검사
+		if (faceData.m_uiOuterLoopIndex == A3D_LOOP_UNKNOWN_OUTER_INDEX ||
+			faceData.m_uiOuterLoopIndex >= faceData.m_uiLoopSize) {
+			// 외부 루프 정보가 없거나 유효하지 않으므로, 이 면은 여기서 처리를 종료합니다.
+			continue;
+		}
+
+		// 3.2. Outer Loop만 이웃 Face 탐색
+		H3DX::TopoLoopDataGuard loopDataGuard(faceData.m_ppLoops[faceData.m_uiOuterLoopIndex]);
+		if (!loopDataGuard.IsValid()) {
+			continue;
+		}
+
+		const auto & loopData = loopDataGuard.Data();
+
+		// 4. CoEdge 순회: 이웃 Face (Twin Face) 찾기
+		for (A3DUns32 j = 0; j < loopData.m_uiCoEdgeSize; ++j) {
+			const A3DTopoCoEdge * ce = loopData.m_ppCoEdges[j];
+			if (!ce) continue;
+
+			// *************************************************************************
+			// 핵심 로직: Edge 연결성을 따라 다음 Face를 찾습니다.
+			// *************************************************************************
+
+			// 4.1. 트윈 CoEdge가 속한 Face를 역추적
+			const A3DTopoFace * nextFace = FindNeighborFace(ce, allShellFaces); // <-- 헬퍼 함수 호출
+
+			// *************************************************************************
+
+			if (!nextFace) continue;
+
+			// 5. 다음 면이 아직 방문되지 않았고, Shell의 멤버라면 Queue에 추가
+			if (visited.find(nextFace) == visited.end()) {
+				// NOTE: nextFace가 allShellFaces에 속하는지 확인하는 추가 검사가 필요할 수 있으나, 
+				//       B-Rep 가정상 쉘 내부의 면이라고 가정합니다.
+				visited.insert(nextFace);
+				faceQueue.push(nextFace);
+			}
+		}
+	}
+
+	return outerFaces;
+}
+
+// allShellFaces는 ProcessOuterFaceBoundary에서 사용된 쉘의 전체 Face 목록.
+const A3DTopoFace * AM::DatalConverterImpl::FindNeighborFace(const A3DTopoCoEdge * coEdge, const std::vector<const A3DTopoFace *> & allShellFaces) noexcept
+{
+	if (nullptr == coEdge) {
+		return nullptr;
+	}
+
+	H3DX::TopoCoEdgeDataGuard coEdgeDataGuard(coEdge);
+	if (!coEdgeDataGuard.IsValid()) {
+		return nullptr;
+	}
+	const auto & coEdgeData = coEdgeDataGuard.Data(); // A3DTopoCoEdgeData 획득
+
+	// 1. Twin CoEdge (m_pNeighbor) 객체 획득
+	const A3DTopoCoEdge * neighborCoEdge = coEdgeData.m_pNeighbor;
+	if (nullptr == neighborCoEdge) {
+		return nullptr; // 트윈 CoEdge 없음
+	}
+
+	// 2. Twin CoEdge를 포함하는 Face를 Shell 전체 목록에서 검색
+	for (const A3DTopoFace * face : allShellFaces) {
+		H3DX::TopoFaceDataGuard faceDataGuard(face);
+		if (!faceDataGuard.IsValid()) continue;
+		const auto & faceData = faceDataGuard.Data(); // A3DTopoFaceData
+
+		// Face의 모든 Loop를 순회
+		for (A3DUns32 i = 0; i < faceData.m_uiLoopSize; ++i) {
+			H3DX::TopoLoopDataGuard loopDataGuard(faceData.m_ppLoops[i]);
+			if (!loopDataGuard.IsValid()) continue;
+			const auto & loopData = loopDataGuard.Data(); // A3DTopoLoopData
+
+			// Loop의 모든 CoEdge를 순회
+			for (A3DUns32 j = 0; j < loopData.m_uiCoEdgeSize; ++j) {
+				// 현재 순회 중인 CoEdge가 우리가 찾는 Twin CoEdge와 일치하는지 확인
+				if (loopData.m_ppCoEdges[j] == neighborCoEdge) {
+					return face; // Twin CoEdge를 포함하는 Face를 찾음.
+				}
+			}
+		}
+	}
+
+	return nullptr; // Twin CoEdge를 포함하는 Face를 찾지 못함
+}
+
+const A3DTopoFace * AM::DatalConverterImpl::FindNeighborFace(const A3DTopoCoEdge * coEdge, const std::set<const A3DTopoFace *> & faces) noexcept
+{
+	if (nullptr == coEdge) {
+		return nullptr;
+	}
+
+	H3DX::TopoCoEdgeDataGuard coEdgeDataGuard(coEdge);
+	if (!coEdgeDataGuard.IsValid()) {
+		return nullptr;
+	}
+	const auto & coEdgeData = coEdgeDataGuard.Data(); // A3DTopoCoEdgeData 획득
+
+	// 1. Neighbor CoEdge (m_pNeighbor) 객체 획득
+	const A3DTopoCoEdge * neighborCoEdge = coEdgeData.m_pNeighbor;
+	if (nullptr == neighborCoEdge) {
+		return nullptr; // 이웃 CoEdge 없음
+	}
+
+	// 2. Neighbor CoEdge를 포함하는 Face를 주어진 Face 목록에서 검색
+	//    Set을 순회하는 것은 Vector를 순회하는 것과 구조는 동일하나, Set에 없는 Face는 제외됨.
+	for (const A3DTopoFace * face : faces) { // <-- Set 순회
+		H3DX::TopoFaceDataGuard faceDataGuard(face);
+		if (!faceDataGuard.IsValid()) continue;
+		const auto & faceData = faceDataGuard.Data(); // A3DTopoFaceData
+
+		// Face의 모든 Loop를 순회
+		for (A3DUns32 i = 0; i < faceData.m_uiLoopSize; ++i) {
+			H3DX::TopoLoopDataGuard loopDataGuard(faceData.m_ppLoops[i]);
+			if (!loopDataGuard.IsValid()) continue;
+			const auto & loopData = loopDataGuard.Data(); // A3DTopoLoopData
+
+			// Loop의 모든 CoEdge를 순회
+			for (A3DUns32 j = 0; j < loopData.m_uiCoEdgeSize; ++j) {
+				// 현재 순회 중인 CoEdge가 우리가 찾는 Neighbor CoEdge와 일치하는지 확인
+				if (loopData.m_ppCoEdges[j] == neighborCoEdge) {
+					return face; // 이웃 CoEdge를 포함하는 Face를 찾음.
+				}
+			}
+		}
+	}
+
+	return nullptr; // 이웃 Face를 찾지 못함
+}
+
+bool AM::DatalConverterImpl::AssemblePrimitive(const A3DTopoFace * face, AM::Template & amTemplate, std::set<const A3DTopoFace *> & consumedFaces) noexcept
 {
 	if (nullptr == face) {
 		return false;
@@ -348,12 +359,20 @@ bool AM::DatalConverterImpl::ExportTopoFace(const A3DTopoFace * face) noexcept
 	}
 
 	const auto & faceData = dataGuard.Data();
-	// faceData.m_pSurface; // A3DSurfBase* - Surface 정보
-	// faceData.m_uiLoopSize; // 루프 수
 
 	if (nullptr == faceData.m_pSurface) {
 		DEBUG_STOP;
 		return false;
+	}
+
+	// NOTE: kLenTol, kAngTol 등의 공차는 필요 시 정의되거나 전달됩니다.
+	constexpr double kLenTol = 1e-4;
+	constexpr double kAngTol = 1e-5;
+
+	// 1. Face 분석 (FaceAnalysisResult 생성)
+	FaceAnalysisResult fs{};
+	if (!AnalyzeFaceSurface(face, fs, kLenTol, kAngTol)) {
+		return false; // 분석 실패
 	}
 
 	// Surface Type check
@@ -362,31 +381,339 @@ bool AM::DatalConverterImpl::ExportTopoFace(const A3DTopoFace * face) noexcept
 		return false;
 	}
 
+	// 2. Primitive 타입에 따른 분기 및 조립 시도
 	switch (eType)
 	{
 		case kA3DTypeSurfPlane:
+			// Plane 처리: Box 조립 또는 Extrusion 처리 시작
+			// 이 Face가 BOX를 구성하는 면이라면, Box 조립 함수를 호출합니다.
+
+			// NOTE: Box 조립은 6면 전체를 대상으로 하므로, Box 조립 함수가 
+			//       Shell의 모든 Outer Face를 대상으로 시도하는 것이 더 적절합니다.
+
+			// (여기서는 추후 Box 조립 로직이 이 분기에 추가된다고 가정합니다.)
 
 			break;
 
 		case kA3DTypeSurfCylinder:
-
+			// Cylinder Lateral Face 판정: 이 면을 시드로 Cylinder 완성 시도
+			// assembleCylinder 함수가 양쪽 캡을 찾고 객체를 생성합니다.
+			if (true == assembleCylinder(face, amTemplate, consumedFaces, kLenTol, kAngTol)) {
+				// Cylinder 생성 및 객체 삽입 성공
+				return true;
+			}
 			break;
+
+		case kA3DTypeSurfSphere:
+			//if (true == assembleSphere(face, amTemplate, consumedFaces, outerFaces, kLenTol, kAngTol)) 
+			{
+				// Cylinder 생성 및 객체 삽입 성공
+				return true;
+			}
+			break;
+
+			// TODO: Torus, Sphere 등 Surface Type 분기 추가
 	}
 
-// 	for (A3DUns32 i = 0; i < faceData.m_uiLoopSize; ++i) {
-// 		ExportTopoLoop(faceData.m_ppLoops[i]);
-// 	}
+	return false; // 프리미티브를 찾지 못함
+}
+
+bool AM::DatalConverterImpl::AssemblePrimitive(const A3DTopoFace * face, AM::Template & amTemplate, std::set<const A3DTopoFace *> & consumedFaces,	const std::set<const A3DTopoFace *> & outerFaces) noexcept
+{
+	if (nullptr == face) {
+		return false;
+	}
+
+	H3DX::TopoFaceDataGuard dataGuard(face);
+	if (!dataGuard.IsValid()) {
+		return false;
+	}
+
+	const auto & faceData = dataGuard.Data();
+
+	if (nullptr == faceData.m_pSurface) {
+		DEBUG_STOP;
+		return false;
+	}
+
+	// NOTE: kLenTol, kAngTol 등의 공차는 필요 시 정의되거나 전달됩니다.
+	constexpr double kLenTol = 1e-4;
+	constexpr double kAngTol = 1e-5;
+
+	// 1. Face 분석 (FaceAnalysisResult 생성)
+	FaceAnalysisResult fs{};
+	if (!AnalyzeFaceSurface(face, fs, kLenTol, kAngTol)) {
+		return false; // 분석 실패
+	}
+
+	// Surface Type check
+	A3DEEntityType eType = kA3DTypeUnknown;
+	if (A3D_SUCCESS != A3DEntityGetType(faceData.m_pSurface, &eType)) {
+		return false;
+	}
+
+	// 2. Primitive 타입에 따른 분기 및 조립 시도
+	switch (eType)
+	{
+		case kA3DTypeSurfPlane:
+			// Plane 처리: Box 조립 또는 Extrusion 처리 시작
+			// 이 Face가 BOX를 구성하는 면이라면, Box 조립 함수를 호출합니다.
+
+			// NOTE: Box 조립은 6면 전체를 대상으로 하므로, Box 조립 함수가 
+			//       Shell의 모든 Outer Face를 대상으로 시도하는 것이 더 적절합니다.
+
+			// (여기서는 추후 Box 조립 로직이 이 분기에 추가된다고 가정합니다.)
+
+			break;
+
+		case kA3DTypeSurfCylinder:
+			// Cylinder Lateral Face 판정: 이 면을 시드로 Cylinder 완성 시도
+			// assembleCylinder 함수가 양쪽 캡을 찾고 객체를 생성합니다.
+			if (true == assembleCylinder(face, amTemplate, consumedFaces, kLenTol, kAngTol)) {
+				// Cylinder 생성 및 객체 삽입 성공
+				return true;
+			}
+			break;
+
+		case kA3DTypeSurfSphere:
+			if (true == assembleSphere(face, amTemplate, consumedFaces, outerFaces, kLenTol, kAngTol)) {
+				// Cylinder 생성 및 객체 삽입 성공
+				return true;
+			}
+			break;
+
+			// TODO: Torus, Sphere 등 Surface Type 분기 추가
+	}
+
+	return false; // 프리미티브를 찾지 못함
+}
+
+// Assembly Cylinder
+bool AM::DatalConverterImpl::assemblePlane(const A3DTopoFace * face, AM::Template & amTemplate, std::unordered_map<const A3DTopoFace *, bool> & faceMap, double lenTol, double angTol) noexcept
+{
+	if (nullptr == face) {
+		return false;
+	}
+
+	// 1. Face의 정보 분석 및 유효성 검사
+	FaceAnalysisResult surfaceAnalyzeResult;
+	if (!AnalyzeFaceSurface(face, surfaceAnalyzeResult, lenTol, angTol)) {
+		return false;
+	}
+
+	// 2. Face가 원통형(Cylinder) Surface인지 최종 확인
+	if (surfaceAnalyzeResult.kind != SurfKind::Cylinder) {
+		return false;
+	}
 
 	return true;
 }
 
-bool AM::DatalConverterImpl::AnalyzeFaceSurface(
-	const A3DTopoFace * face,
-	FaceAnalysisResult & out,
-	double /*lenTol*/,
-	double /*angTol*/) noexcept
+// Assembly Cylinder
+bool AM::DatalConverterImpl::assembleCylinder(const A3DTopoFace * face, AM::Template & amTemplate, std::set<const A3DTopoFace *> & consumedFaces, double lenTol, double angTol) noexcept
 {
-	out = FaceAnalysisResult{};
+	if (nullptr == face) {
+		return false; // 면 포인터가 null이면 실패 반환
+	}
+
+	// 1. Lateral Face의 정보 분석 및 유효성 검사
+	FaceAnalysisResult fsLateral; // Face에 대한 정보 수집
+	if (false == AnalyzeFaceSurface(face, fsLateral, lenTol, angTol)) {
+		return false; // 분석 실패 시 반환
+	}
+
+	// Lateral Face가 원통형(Cylinder) Surface인지 확인
+	if (fsLateral.kind != SurfKind::Cylinder) {
+		return false; // Cylinder Surface가 아니면 실패
+	}
+
+	const H3DF::DVector cylinderAxis = fsLateral.cylinder.Axis(); // Cylinder 축 벡터 획득
+	const Scalar cylinderRadius = fsLateral.cylinder.m_radius; // Cylinder 반지름 획득
+
+	// 2. 캡(Cap) 후보 찾기 및 Edge 순회 준비
+	std::vector<const A3DTopoFace *> capFaceCandidates; // 캡 Face 후보 리스트
+	std::vector<CircleParameter> capCircles; // 캡 Circle 파라미터 리스트
+
+	H3DX::TopoFaceDataGuard lateralFaceDataGuard(face);
+	if (!lateralFaceDataGuard.IsValid()) return false; // Face 데이터 유효성 확인
+	const auto & lateralFaceData = lateralFaceDataGuard.Data();
+
+
+	std::vector<A3DCrvBase *> circleCurves; // Lateral Face의 Edge에서 찾은 Circle 커브 리스트
+
+	// 2. Lateral Face의 Edge를 Circle이 있는지 확인
+
+	// 2.1 Circle 2개로 구성된 Cylinder를 찾는다.
+	for (A3DUns32 loopIndex = 0; loopIndex < lateralFaceData.m_uiLoopSize; ++loopIndex) {
+		H3DX::TopoLoopDataGuard loopDataGuard(lateralFaceData.m_ppLoops[loopIndex]);
+
+		if (false == loopDataGuard.IsValid()) {
+			continue; // 루프 데이터 유효성 확인
+		}
+
+		const auto & loopData = loopDataGuard.Data();
+
+		// 루프의 모든 CoEdge를 순회하면서 Circle을 찾는다.
+		for (A3DUns32 coEdgeIndex = 0; coEdgeIndex < loopData.m_uiCoEdgeSize; ++coEdgeIndex) {
+			const A3DTopoCoEdge * coEdge = loopData.m_ppCoEdges[coEdgeIndex];
+			if (!coEdge) {
+				continue;
+			}
+
+			H3DX::TopoCoEdgeDataGuard coEdgeDataGuard(coEdge);
+			if (!coEdgeDataGuard.IsValid()) { // CoEdge 데이터 유효성 확인
+				continue;
+			}
+			const auto & coEdgeData = coEdgeDataGuard.Data();
+
+			const A3DTopoEdge * edge = coEdgeData.m_pEdge;
+			if (nullptr == edge) {
+				continue; // Edge 포인터 확인
+			}
+
+			H3DX::TopoEdgeDataGuard edgeDataGuard(edge);
+			if (!edgeDataGuard.IsValid()) {
+				continue; // Edge 데이터 유효성 확인
+			}
+
+			const auto & edgeData = edgeDataGuard.Data(); // A3DTopoEdgeData 획득
+			if (nullptr == edgeData.m_p3dCurve) {
+				continue; // 3D 커브가 없는 경우 건너뜀
+			}
+
+			// Edge Curve 타입 검사: 원형 커브인지 확인
+			A3DEEntityType curveType = kA3DTypeUnknown;
+			if (A3D_SUCCESS != A3DEntityGetType(edgeData.m_p3dCurve, &curveType)) continue;
+
+			if (curveType == kA3DTypeCrvCircle) {
+
+/*
+				// A. Circle 커브 데이터 추출
+				CircleParameter currentCircle;
+				if (ExtractCircleParameter(edgeData.m_p3dCurve, currentCircle) != Result::Ok()) continue;
+
+				// B. 이웃 Face 찾기
+				const A3DTopoFace * nextFace = FindNeighborFace(coEdge, outerFaces); // outerFaces에서 이웃 Face 찾음
+				if (!nextFace) continue;
+
+				// C. Cap 유효성 검사 (평면, 반지름, 축 일치 여부)
+				FaceAnalysisResult fsCap;
+				if (!AnalyzeFaceSurface(nextFace, fsCap, lenTol, angTol)) continue;
+				if (fsCap.kind != SurfKind::Plane && fsCap.kind != SurfKind::NurbsPlane) continue;
+
+				// D. 기하학적 매칭 검사
+				if (IsCapForCylinder(currentCircle, fsLateral.cylinder, static_cast<Scalar>(lenTol), static_cast<Scalar>(angTol))) {
+					capFaceCandidates.push_back(nextFace);
+					capCircles.push_back(currentCircle);
+				}
+*/
+
+				CircleParameter currentCircle;
+				if (ExtractCircleParameter(edgeData.m_p3dCurve, currentCircle) != Result::Ok()) continue;
+
+				capCircles.push_back(currentCircle);				// Circle 커브를 리스트에 추가
+				circleCurves.push_back(edgeData.m_p3dCurve);
+			}
+		}
+	}
+
+	/*
+	// 2.1. Lateral Face의 모든 루프(Edge)를 순회합니다.
+	for (A3DUns32 i = 0; i < lateralFaceData.m_uiLoopSize; ++i) {
+		H3DX::TopoLoopDataGuard loopDataGuard(lateralFaceData.m_ppLoops[i]);
+		if (!loopDataGuard.IsValid()) continue; // 루프 데이터 유효성 확인
+		const auto & loopData = loopDataGuard.Data();
+
+		for (A3DUns32 j = 0; j < loopData.m_uiCoEdgeSize; ++j) {
+			const A3DTopoCoEdge * ce = loopData.m_ppCoEdges[j];
+			if (!ce) continue; // CoEdge 포인터 유효성 확인
+
+			H3DX::TopoCoEdgeDataGuard coEdgeDataGuard(ce);
+			if (!coEdgeDataGuard.IsValid()) continue; // CoEdge 데이터 유효성 확인
+			const auto & coEdgeData = coEdgeDataGuard.Data();
+
+			// 2.2. Neighbor CoEdge (다음 면 후보) 찾기
+			const A3DTopoCoEdge * neighborCoEdge = coEdgeData.m_pNeighbor; // m_pNeighbor 사용
+			if (!neighborCoEdge) continue; // 이웃 CoEdge 없음
+
+			// A3D SDK 토폴로지 구조를 기반으로 Neighbor CoEdge가 속한 다음 면을 추출합니다.
+			const A3DTopoFace * nextFace = FindNeighborFace(neighborCoEdge, outerFaces);// A3DTopoCoEdge::m_pFace 가정
+			if (!nextFace) continue; // 다음 Face 포인터 유효성 확인
+
+			// 이미 사용된 면은 건너뛰어 중복 처리 방지
+			if (consumedFaces.count(nextFace)) continue; // 이미 소비되었으면 건너뜀
+
+			// 다음 면이 Outer Face 집합에 포함되는지 확인 (Inner Face 무시)
+			if (outerFaces.count(nextFace) == 0) continue; // Outer Face가 아니면 건너뜀
+
+
+			// 2.3. 캡(Cap) 유효성 검사
+			FaceAnalysisResult fsCap;
+			if (!AnalyzeFaceSurface(nextFace, fsCap, lenTol, angTol)) continue; // 캡 후보 분석
+
+			// 캡은 평면이어야 함
+			if (fsCap.kind != SurfKind::Plane && fsCap.kind != SurfKind::NurbsPlane) continue; // 평면이 아니면 건너뜀
+
+			// Cap Face에서 Cylinder Axis와 동일한 반지름의 원(Circle)을 찾음
+			for (const auto & circle : fsCap.allCircles) {
+				// IsCapForCylinder는 Cap과 Lateral Cylinder의 기하학적 매칭을 검사합니다.
+				if (IsCapForCylinder(circle, fsLateral.cylinder, static_cast<Scalar>(lenTol), static_cast<Scalar>(angTol))) {
+
+					capFaceCandidates.push_back(nextFace); // 유효한 캡 Face 추가
+					capCircles.push_back(circle); // 유효한 Circle Parameter 추가
+					goto next_cap_search; // 이 Cap Face에 대한 Edge 검사 중단
+				}
+			}
+		}
+	next_cap_search:;
+	}*/
+
+	// 3. Cylinder 완성 조건 검사: 캡이 정확히 2개인지 확인
+	if (capCircles.size() != 2) return false; // 캡 개수 불일치 시 조립 실패 반환
+
+
+	// 4. 높이 계산 및 최종 Solid Cylinder 조립
+
+	const CircleParameter & cap0_circle = capCircles[0]; // 첫 번째 캡 원점
+	const CircleParameter & cap1_circle = capCircles[1]; // 두 번째 캡 원점
+
+	// Cap 사이의 벡터 획득 및 높이 계산
+	const H3DF::DVector vecBetweenCaps = cap1_circle.m_origin - cap0_circle.m_origin;
+	double height = std::abs(static_cast<double>(vecBetweenCaps.Dot(cylinderAxis))); // 높이 계산
+
+	// 높이가 공차 이상인지 확인
+	if (height <= lenTol) return false; // 높이 불충분 시 조립 실패 반환
+
+
+	// 5. Cylinder 객체 생성 및 FaceMap 업데이트
+
+	// Midpoint 계산 (POS)
+	H3DF::DPoint midpoint;
+	midpoint.x = (cap0_circle.m_origin.x + cap1_circle.m_origin.x) / 2.0;
+	midpoint.y = (cap0_circle.m_origin.y + cap1_circle.m_origin.y) / 2.0;
+	midpoint.z = (cap0_circle.m_origin.z + cap1_circle.m_origin.z) / 2.0;
+
+	AM::CylinderKit cylinderKit; // Cylinder Kit 생성
+	cylinderKit.setPosition(midpoint); // POS 설정
+	cylinderKit.setOrientation(cylinderAxis); // ORI 설정
+	cylinderKit.setDiameter(cylinderRadius * 2.0); // Diameter 설정
+	cylinderKit.setHeight(height); // Height 설정
+
+	amTemplate.insertCylinder(cylinderKit); // Template에 Cylinder 객체 삽입
+
+	// 6. FaceMap 업데이트: 이 Cylinder를 구성하는 면을 사용됨으로 표시
+	consumedFaces.insert(face); // Lateral Face 소비
+	consumedFaces.insert(capFaceCandidates[0]); // 첫 번째 캡 Face 소비
+	consumedFaces.insert(capFaceCandidates[1]); // 두 번째 캡 Face 소비
+
+
+	return true; // Cylinder 조립 성공 반환
+}
+
+// Face에 포함된 Surface의 정보를 분석하여 FaceAnalysisResult에 채워넣음.
+bool AM::DatalConverterImpl::AnalyzeFaceSurface(const A3DTopoFace * face, FaceAnalysisResult & out,	double lenTol, double angTol) noexcept
+{
+	out = FaceAnalysisResult {}; // <-- FaceAnalysisResult 초기화
 	out.face = face;
 
 	if (nullptr == face) {
@@ -411,15 +738,13 @@ bool AM::DatalConverterImpl::AnalyzeFaceSurface(
 
 	A3DEEntityType type = kA3DTypeUnknown;
 	if (A3D_SUCCESS != A3DEntityGetType(faceData.m_pSurface, &type)) {
-		DEBUG_STOP;
 		return false;
 	}
 
-	switch (type)
-	{
-		case kA3DTypeSurfPlane:
-		{
-			SurfPlaneDataGuard planeDataGuard(faceData.m_pSurface);
+	// 1. 표면 타입 분석 및 파라미터 추출
+	switch (type) {
+		case kA3DTypeSurfPlane: {
+			H3DX::SurfPlaneDataGuard planeDataGuard(faceData.m_pSurface);
 			if (false == planeDataGuard.IsValid()) {
 				DEBUG_STOP;
 				return false;
@@ -428,27 +753,23 @@ bool AM::DatalConverterImpl::AnalyzeFaceSurface(
 
 			out.kind = SurfKind::Plane;
 
+			// Plane 파라미터 추출
 			out.planeOrigin = Dmi3dx::GetPoint(planeData.m_sTrsf.m_sOrigin) * EXCHAGE_SCALE;
 
 			DVector xAxis = Dmi3dx::GetVector(planeData.m_sTrsf.m_sXVector);
 			DVector yAxis = Dmi3dx::GetVector(planeData.m_sTrsf.m_sYVector);
 
-			DVector normal = SafeNormalized(xAxis.Cross(yAxis));
-			(void) normal; // TODO: FaceSummary에 plane normal 필드가 생기면 대입
+			out.planeNormal = xAxis.Cross(yAxis); // 법선 저장
+			out.planeNormal.Normalize();
 
-			// 캡 후보를 위해 외곽 원 탐색
-			CircleParam circleParam{};
-			if (true == ExtractOuterCircle(face, circleParam)) {
-				out.outerHasCircle = true;
-				out.outerCircle = circleParam;
-			}
-			// TODO: 외곽 원이 없을 때 NURBS 원 판정 보완
-		}
-		break;
+			// TODO: FaceAnalysisResult에 plane normal 필드가 생기면 out.planeNormal에 대입
 
-		case kA3DTypeSurfCylinder:
-		{
-			SurfCylinderDataGuard cylinderDataGuard(faceData.m_pSurface);
+			// NOTE: 이제 모든 원 추출 로직은 ExtractOuterCircle이 아닌 
+			//       새로운 ExtractAllCircles(face, out.allCircles)가 담당해야 합니다.
+		}  break;
+
+		case kA3DTypeSurfCylinder: {
+			H3DX::SurfCylinderDataGuard cylinderDataGuard(faceData.m_pSurface);
 			if (false == cylinderDataGuard.IsValid()) {
 				DEBUG_STOP;
 				return false;
@@ -457,43 +778,42 @@ bool AM::DatalConverterImpl::AnalyzeFaceSurface(
 
 			out.kind = SurfKind::Cylinder;
 
-			out.cyl.radius = cylinderData.m_dRadius * EXCHAGE_SCALE;
-			out.cyl.origin = Dmi3dx::GetPoint(cylinderData.m_sTrsf.m_sOrigin) * EXCHAGE_SCALE;
+			// Cylinder 파라미터 추출
+			out.cylinder.m_radius = cylinderData.m_dRadius * EXCHAGE_SCALE;
+			out.cylinder.m_origin = Dmi3dx::GetPoint(cylinderData.m_sTrsf.m_sOrigin) * EXCHAGE_SCALE;
 
 			DVector xAxis = Dmi3dx::GetVector(cylinderData.m_sTrsf.m_sXVector);
 			DVector yAxis = Dmi3dx::GetVector(cylinderData.m_sTrsf.m_sYVector);
 
-			DVector axis = SafeNormalized(xAxis.Cross(yAxis)); // 원통 축 방향
-			BuildXYFromAxis(axis, out.cyl.xAxis, out.cyl.yAxis);
-			out.cyl.Orthonormalize();
-		}
-		break;
+			DVector axis = xAxis.Cross(yAxis); // 원통 축 방향
+			axis.Normalize();
 
-		case kA3DTypeSurfNurbs:
-		{
-			SurfNurbsDataGuard nurbsDataGuard(faceData.m_pSurface);
+			BuildXYFromAxis(axis, out.cylinder.m_xAxis, out.cylinder.m_yAxis);
+			out.cylinder.Orthonormalize();
+		} break;
+
+		case kA3DTypeSurfNurbs: {
+			H3DX::SurfNurbsDataGuard nurbsDataGuard(faceData.m_pSurface);
 			if (false == nurbsDataGuard.IsValid()) {
 				DEBUG_STOP;
 				return false;
 			}
 			const auto & nurbsData = nurbsDataGuard.Data();
 
-			switch (nurbsData.m_eSurfaceForm)
-			{
+			switch (nurbsData.m_eSurfaceForm) {
 				case kA3DBSplineSurfaceFormPlane:
 					out.kind = SurfKind::NurbsPlane;
 					break;
 
 				case kA3DBSplineSurfaceFormCylindrical:
-					out.kind = SurfKind::NurbsCylinder; // TODO: 축/반지름 추정 로직 추가
+					out.kind = SurfKind::NurbsCylinder;
 					break;
 
 				default:
 					out.kind = SurfKind::Other;
 					break;
 			}
-		}
-		break;
+		} break;
 
 		default:
 			out.kind = SurfKind::Other;
@@ -503,11 +823,61 @@ bool AM::DatalConverterImpl::AnalyzeFaceSurface(
 	return true;
 }
 
+bool AM::DatalConverterImpl::assembleSphere(const A3DTopoFace * face, AM::Template & amTemplate, std::set<const A3DTopoFace *> & consumedFaces,  const std::set<const A3DTopoFace *> & outerFaces,  double lenTol, double angTol) noexcept
+{
+	if (nullptr == face) {
+		return false; // 면 포인터가 null이면 실패 반환
+	}
+/*
+
+	// 1. Face 정보 분석 및 유효성 검사
+	FaceAnalysisResult fsSphere;
+	if (!AnalyzeFaceSurface(face, fsSphere, lenTol, angTol)) return false; // 분석 실패 시 반환
+
+	// Surface가 Sphere인지 최종 확인
+	if (fsSphere.kind != SurfKind::Sphere) return false; // Sphere Surface가 아니면 실패
+
+	// NOTE: FaceAnalysisResult 구조체에 Sphere 파라미터가 저장되어 있다고 가정하고,
+	//       여기서는 CylinderParameters 구조를 활용합니다. 
+
+	// 2. Sphere 파라미터 추출
+	//    Sphere는 중심(Origin)과 반지름(Radius)만 있으면 됩니다.
+	const H3DF::DPoint sphereOrigin = fsSphere.sphere.m_origin; // Sphere 중심 가정
+	const Scalar sphereRadius = fsSphere.sphere.m_radius; // Sphere 반지름 가정
+
+	// 3. 닫힌 Solid Sphere 검사 (선택적)
+	//    Sphere는 단일 면이므로, 이 면이 쉘 전체를 대표하는지 확인합니다.
+	//    만약 이 Face에 Edge가 없다면 (Hole이 없는 단일 구) 닫힌 Sphere입니다.
+
+	H3DX::TopoFaceDataGuard faceDataGuard(face);
+	if (!faceDataGuard.IsValid()) return false;
+	const auto & faceData = faceDataGuard.Data();
+
+	// 4. 프리미티브 조립 및 객체 삽입
+
+	// CylinderKit을 Box처럼 재사용하거나, 별도의 SphereKit을 사용해야 합니다.
+	// 여기서는 SphereKit이 있다고 가정하고 객체를 삽입합니다.
+
+	AM::SphereKit sphereKit; // Sphere Kit 생성 가정
+	sphereKit.setPosition(sphereOrigin); // POS 설정
+	sphereKit.setDiameter(sphereRadius * 2.0); // Diameter 설정
+
+	amTemplate.insertSphere(sphereKit); // Template에 Sphere 객체 삽입 가정
+
+	// 5. FaceMap 업데이트: 이 Sphere를 구성하는 면을 사용됨으로 표시
+	consumedFaces.insert(face); // Sphere Face 소비
+
+	// NOTE: 만약 Sphere가 단일 면으로 된 닫힌 솔리드가 아니라면, 
+	//       Loop를 순회하여 Edge를 따라 다른 면(DISH 등)을 찾아야 합니다.
+*/
+
+	return true; // Sphere 조립 성공 반환
+}
 
 //== 보조 유틸 정의 ==================================================================================
 
 // 두 원(혹은 두 원통)이 같은 축(coaxial) 을 공유하고, 같은 반지름 을 가지는지 판별.
-bool AM::DatalConverterImpl::IsCoaxialSameRadius(const CylinderParam & a, const CylinderParam & b, Scalar lenTol, Scalar angTolRad) noexcept
+bool AM::DatalConverterImpl::IsCoaxialSameRadius(const CylinderParameters & a, const CylinderParameters & b, Scalar lenTol, Scalar angTolRad) noexcept
 {
 	// 기본 가드
 	if (lenTol < static_cast<Scalar>(0) || angTolRad < static_cast<Scalar>(0)) {
@@ -516,21 +886,22 @@ bool AM::DatalConverterImpl::IsCoaxialSameRadius(const CylinderParam & a, const 
 	}
 
 	// 축 정규화 후 평행성(역방향 포함) 검사
-	const DVector za = SafeNormalized(a.Axis());
-	const DVector zb = SafeNormalized(b.Axis());
+	const DVector za = a.Axis();
+	const DVector zb = b.Axis();
+
 	if (false == ParallelWithinTol(za, zb, angTolRad)) {
 		return false;
 	}
 
 	// 두 축(같은 직선) 사이의 최소 거리 검사
-	const DVector d(static_cast<Scalar>(a.origin.x - b.origin.x), static_cast<Scalar>(a.origin.y - b.origin.y), static_cast<Scalar>(a.origin.z - b.origin.z));
+	const DVector d(static_cast<Scalar>(a.m_origin.x - b.m_origin.x), static_cast<Scalar>(a.m_origin.y - b.m_origin.y), static_cast<Scalar>(a.m_origin.z - b.m_origin.z));
 
 	if (PerpDistance(d, za) > lenTol) {
 		return false;
 	}
 
 	// 반지름 동일성 검사
-	if (false == NearlyEqual(a.radius, b.radius, lenTol)) {
+	if (false == NearlyEqual(a.m_radius, b.m_radius, lenTol)) {
 		return false;
 	}
 
@@ -539,7 +910,7 @@ bool AM::DatalConverterImpl::IsCoaxialSameRadius(const CylinderParam & a, const 
 
 
 // 주어진 평면(face)이 특정 원통(face)의 캡(cap) 역할을 하는지 판별.
-bool AM::DatalConverterImpl::IsCapForCylinder(const CircleParam & cap, const CylinderParam & cy, Scalar lenTol, Scalar angTolRad) noexcept
+bool AM::DatalConverterImpl::IsCapForCylinder(const CircleParameter & cap, const CylinderParameters & cy, Scalar lenTol, Scalar angTolRad) noexcept
 {
 	// 인자 가드
 	if (lenTol < static_cast<Scalar>(0) || angTolRad < static_cast<Scalar>(0)) {
@@ -548,32 +919,165 @@ bool AM::DatalConverterImpl::IsCapForCylinder(const CircleParam & cap, const Cyl
 	}
 
 	// 1. 법선 // 축 (정/역방향 허용)
-	const DVector n = SafeNormalized(cap.normal);
-	const DVector az = SafeNormalized(cy.Axis());
+	const DVector n = cap.m_normal;
+	const DVector az = cy.Axis();
+
 	if (false == ParallelWithinTol(n, az, angTolRad)) {
 		return false;
 	}
 
 	// 2. 원 중심이 축 위에 있는지: 축에 대한 수직거리 검사
 	const DVector d(
-		static_cast<Scalar>(cap.origin.x - cy.origin.x),
-		static_cast<Scalar>(cap.origin.y - cy.origin.y),
-		static_cast<Scalar>(cap.origin.z - cy.origin.z));
+		static_cast<Scalar>(cap.m_origin.x - cy.m_origin.x),
+		static_cast<Scalar>(cap.m_origin.y - cy.m_origin.y),
+		static_cast<Scalar>(cap.m_origin.z - cy.m_origin.z));
 	if (PerpDistance(d, az) > lenTol) {
 		return false;
 	}
 
 	// 3. 반지름 동일성
-	if (false == NearlyEqual(static_cast<Scalar>(cap.r), cy.radius, lenTol)) {
+	if (false == NearlyEqual(static_cast<Scalar>(cap.m_radius), cy.m_radius, lenTol)) {
 		return false;
 	}
 
 	return true;
 }
 
+bool AM::DatalConverterImpl::extractAllCircles(const A3DTopoFace * face, std::vector<CircleParameter> & outCircles) noexcept
+{
+	if (nullptr == face) {
+		DEBUG_STOP;
+		return false;
+	}
+
+	H3DX::TopoFaceDataGuard faceDataGuard(face);
+	if (!faceDataGuard.IsValid()) {
+		DEBUG_STOP;
+		return false;
+	}
+
+	const auto & faceData = faceDataGuard.Data();
+	bool circleFound = false;
+
+	// 1. 모든 루프(Loop) 순회 (Outer Loop + Inner Loops)
+	for (A3DUns32 i = 0; i < faceData.m_uiLoopSize; ++i) {
+		H3DX::TopoLoopDataGuard loopDataGuard(faceData.m_ppLoops[i]);
+		if (false == loopDataGuard.IsValid()) {
+			continue;
+		}
+
+		const auto & loopData = loopDataGuard.Data();
+
+		// 2. 루프 내의 CoEdge(모서리) 순회
+		for (A3DUns32 j = 0; j < loopData.m_uiCoEdgeSize; ++j) {
+			const A3DTopoCoEdge * ce = loopData.m_ppCoEdges[j];
+			if (!ce) continue;
+
+			H3DX::TopoCoEdgeDataGuard coEdgeDataGuard(ce);
+			if (false == coEdgeDataGuard.IsValid()) {
+				continue;
+			}
+
+			const auto & coEdgeData = coEdgeDataGuard.Data();
+
+			const A3DTopoEdge * topoEdge = coEdgeData.m_pEdge;
+			if (!topoEdge) continue;
+
+			H3DX::TopoEdgeDataGuard edgeDataGuard(topoEdge);
+			if (false == edgeDataGuard.IsValid()) {
+				continue;
+			}
+
+			const auto & edgeData = edgeDataGuard.Data();
+			if (nullptr == edgeData.m_p3dCurve) {
+				continue;
+			}
+
+			A3DEEntityType ct = kA3DTypeUnknown;
+			if (A3D_SUCCESS != A3DEntityGetType(edgeData.m_p3dCurve, &ct)) continue;
+
+			// 3. 커브 타입 확인: 원(Circle)인 경우
+			if (ct == kA3DTypeCrvCircle) {
+
+				H3DX::CrvCircleDataGuard circleDataGuard(edgeData.m_p3dCurve);
+				if (false == circleDataGuard.IsValid()) {
+					continue;
+				}
+
+				const auto & circleData = circleDataGuard.Data();
+
+				CircleParameter outCircle {};
+
+				// 파라미터 추출
+				outCircle.m_radius = circleData.m_dRadius * EXCHAGE_SCALE;
+				outCircle.m_origin = Dmi3dx::GetPoint(circleData.m_sTrsf.m_sOrigin) * EXCHAGE_SCALE;
+
+				H3DF::DVector xAxis = Dmi3dx::GetVector(circleData.m_sTrsf.m_sXVector);
+				H3DF::DVector yAxis = Dmi3dx::GetVector(circleData.m_sTrsf.m_sYVector);
+
+				H3DF::DVector normal = xAxis.Cross(yAxis);
+				normal.Normalize();
+				outCircle.m_normal = normal;
+
+				// 4. 추출된 원을 결과 벡터에 추가
+				outCircles.push_back(std::move(outCircle));
+				circleFound = true;
+
+				// NOTE: 원은 루프의 경계를 대표하는 단일 커브이므로, 
+				//       루프 내에서 원을 찾았다면 해당 루프의 나머지 CoEdge는 건너뛰어도 됩니다.
+				break;
+			}
+			// TODO: NURBS 원 판정 로직 추가 가능
+		}
+	}
+	return circleFound;
+}
+
+//== Utility 함수 ===================================================================================
+
+// 1. Circle 커브에서 파라미터 추출
+Result AM::DatalConverterImpl::ExtractCircleParameter(const A3DCrvBase * curve, CircleParameter & circleParameter) noexcept
+{
+	if (nullptr == curve) {
+		return Result::Fail(Error::InvalidArgument, "Curve is null."); // 커브 포인터가 null이면 실패 반환
+	}
+
+	A3DEEntityType curveType = kA3DTypeUnknown;
+	if (A3D_SUCCESS != A3DEntityGetType(curve, &curveType)) {
+		return Result::Fail(Error::AnalysisFailed, "Failed to get curve type."); // 커브 타입 획득 실패 반환
+	}
+
+	if (curveType != kA3DTypeCrvCircle) {
+		return Result::Fail(Error::InvalidArgument, "Curve is not a Circle."); // Circle 타입이 아니면 실패 반환
+	}
+
+	H3DX::CrvCircleDataGuard circleDataGuard(curve);
+	if (false == circleDataGuard.IsValid()) {
+		return Result::Fail(Error::AnalysisFailed, "Failed to get circle data."); // Circle 데이터 획득 실패 반환
+	}
+
+	const auto & circleData = circleDataGuard.Data(); // A3DCrvCircleData 획득
+
+	// 1. 파라미터 추출 및 스케일 적용 (EXCHAGE_SCALE은 1000이라고 가정)
+	circleParameter.m_radius = circleData.m_dRadius * EXCHAGE_SCALE;
+	circleParameter.m_origin = Dmi3dx::GetPoint(circleData.m_sTrsf.m_sOrigin) * EXCHAGE_SCALE;
+
+	// 2. 법선 벡터 계산 및 정규화
+	H3DF::DVector xAxis = Dmi3dx::GetVector(circleData.m_sTrsf.m_sXVector);
+	H3DF::DVector yAxis = Dmi3dx::GetVector(circleData.m_sTrsf.m_sYVector);
+
+	H3DF::DVector normal = xAxis.Cross(yAxis);
+
+	// Normalize()를 사용하여 정규화
+	normal.Normalize();
+	circleParameter.m_normal = normal;
+
+	return Result::Ok(); // 추출 성공 반환
+}
+
 // 루프에서 원 하나 찾기 (circle curve 우선)
 // 필요시 NURBS-원 판정 추가 가능.
-bool AM::DatalConverterImpl::ExtractOuterCircle(const A3DTopoFace * face, CircleParam & outCircle) noexcept
+bool AM::DatalConverterImpl::ExtractOuterCircle(const A3DTopoFace * face, CircleParameter & outCircle) noexcept
 {
 	if (nullptr == face) {
 		DEBUG_STOP;
@@ -632,14 +1136,15 @@ bool AM::DatalConverterImpl::ExtractOuterCircle(const A3DTopoFace * face, Circle
 
 				const auto & circleData = circleDataGuard.Data();
 
-				outCircle.r = circleData.m_dRadius * EXCHAGE_SCALE;
-				outCircle.origin = Dmi3dx::GetPoint(circleData.m_sTrsf.m_sOrigin) * EXCHAGE_SCALE;
+				outCircle.m_radius = circleData.m_dRadius * EXCHAGE_SCALE;
+				outCircle.m_origin = Dmi3dx::GetPoint(circleData.m_sTrsf.m_sOrigin) * EXCHAGE_SCALE;
 
 				DVector xAxis = Dmi3dx::GetVector(circleData.m_sTrsf.m_sXVector);
 				DVector yAxis = Dmi3dx::GetVector(circleData.m_sTrsf.m_sYVector);
 
 				DVector normal = xAxis.Cross(yAxis);
-				outCircle.normal = SafeNormalized(normal);
+				normal.Normalize();
+				outCircle.m_normal = normal;
 
 				return true;
 			}
@@ -652,34 +1157,34 @@ bool AM::DatalConverterImpl::ExtractOuterCircle(const A3DTopoFace * face, Circle
 //== 쉘에서 Solid Cylinder 찾기 ======================================================================
 
 // 보조 함수: 동일 축선 상에 다른 반지름의 실린더가 있는지 확인 (Hollow 필터링 로직)
-bool AM::DatalConverterImpl::IsHollowCandidate(const DatalConverterImpl::CylinderParam & refCyl,
+bool AM::DatalConverterImpl::IsHollowCandidate(const DatalConverterImpl::CylinderParameters & refCyl,
 	const std::vector<DatalConverterImpl::FaceAnalysisResult> & allCylinders,
 	double lenTol, double angTol) noexcept
 {
 	// 같은 축(coaxial) 여부만 판단(반지름 무시)하는 헬퍼를 재사용
 	// (여기서는 sameAxisWithinTol 함수가 DatalConverterImpl의 protected 멤버라고 가정)
-	auto sameAxisWithinTol = [&](const DatalConverterImpl::CylinderParam & A, const DatalConverterImpl::CylinderParam & B) -> bool {
-		const H3DF::DVector za = DatalConverterImpl::SafeNormalized(A.Axis());
-		const H3DF::DVector zb = DatalConverterImpl::SafeNormalized(B.Axis());
+	auto sameAxisWithinTol = [&](const DatalConverterImpl::CylinderParameters & A, const DatalConverterImpl::CylinderParameters & B) -> bool {
+		const H3DF::DVector za = A.Axis();
+		const H3DF::DVector zb = B.Axis();
 		if (!DatalConverterImpl::ParallelWithinTol(za, zb, static_cast<Scalar>(angTol))) {
 			return false;
 		}
 		const H3DF::DVector d(
-			static_cast<Scalar>(A.origin.x - B.origin.x),
-			static_cast<Scalar>(A.origin.y - B.origin.y),
-			static_cast<Scalar>(A.origin.z - B.origin.z)
+			static_cast<Scalar>(A.m_origin.x - B.m_origin.x),
+			static_cast<Scalar>(A.m_origin.y - B.m_origin.y),
+			static_cast<Scalar>(A.m_origin.z - B.m_origin.z)
 		);
 		return DatalConverterImpl::PerpDistance(d, za) <= static_cast<Scalar>(lenTol);
 	};
 
 	for (const auto & fs : allCylinders) {
-		if (!sameAxisWithinTol(refCyl, fs.cyl)) {
+		if (!sameAxisWithinTol(refCyl, fs.cylinder)) {
 			continue;
 		}
 
 		// 반지름이 다르면 Hollow 후보로 간주
-		const double rdiff = std::abs(static_cast<double>(refCyl.radius) -
-			static_cast<double>(fs.cyl.radius));
+		const double rdiff = std::abs(static_cast<double>(refCyl.m_radius) -
+			static_cast<double>(fs.cylinder.m_radius));
 		if (rdiff > lenTol) {
 			return true;
 		}
@@ -687,20 +1192,22 @@ bool AM::DatalConverterImpl::IsHollowCandidate(const DatalConverterImpl::Cylinde
 	return false;
 }
 
-std::optional<DatalConverterImpl::SolidCylinderResult> AM::DatalConverterImpl::DetectSolidCylinder(const A3DTopoShell * shell, double lenTol, double angTol) noexcept
+std::vector<DatalConverterImpl::SolidCylinderResult> AM::DatalConverterImpl::DetectSolidCylinder(const A3DTopoShell * shell, double lenTol, double angTol) noexcept
 {
+	std::vector<SolidCylinderResult> results;
+
 	if (nullptr == shell) {
-		return std::nullopt;
+		return results;
 	}
 
-	TopoShellDataGuard shellDataGuard(shell);
+	H3DX::TopoShellDataGuard shellDataGuard(shell);
 	if (false == shellDataGuard.IsValid()) {
-		return std::nullopt;
+		return results;
 	}
 
 	const auto & shellData = shellDataGuard.Data();
 
-	// 1. Face 요약 수집
+	// 1. Face 요약 수집 (FaceAnalysisResult 사용)
 	std::vector<FaceAnalysisResult> planes;
 	std::vector<FaceAnalysisResult> cylinders;
 	planes.reserve(shellData.m_uiFaceSize);
@@ -708,97 +1215,87 @@ std::optional<DatalConverterImpl::SolidCylinderResult> AM::DatalConverterImpl::D
 
 	for (A3DUns32 nIndex = 0; nIndex < shellData.m_uiFaceSize; ++nIndex) {
 		const A3DTopoFace * face = shellData.m_ppFaces[nIndex];
-		
-		FaceAnalysisResult faceSummary{};
-		if (false == AnalyzeFaceSurface(face, faceSummary, lenTol, angTol)) {
+
+		FaceAnalysisResult faceAnalysisResult {};
+		if (false == AnalyzeFaceSurface(face, faceAnalysisResult, lenTol, angTol)) {
 			continue;
 		}
 
-		if (faceSummary.kind == SurfKind::Plane || faceSummary.kind == SurfKind::NurbsPlane) {
-			planes.push_back(std::move(faceSummary));
+		if (faceAnalysisResult.kind == SurfKind::Plane || faceAnalysisResult.kind == SurfKind::NurbsPlane) {
+			planes.push_back(std::move(faceAnalysisResult));
 		}
-		else if (faceSummary.kind == SurfKind::Cylinder /*|| fs.kind == SurfKind::NurbsCylinder*/) { // NURBS Cyl은 후속 확장
-			cylinders.push_back(std::move(faceSummary));
+		else if (faceAnalysisResult.kind == SurfKind::Cylinder /*|| fs.kind == SurfKind::NurbsCylinder*/) {
+			cylinders.push_back(std::move(faceAnalysisResult));
 		}
 	}
 
 	if (cylinders.empty() || planes.size() < 2) {
-		return std::nullopt;
+		return results;
 	}
 
 	// 2. 옆면 군(동축·동반지름)으로 묶기
-	struct Group { 
-		CylinderParam ref; 
-		std::vector<const A3DTopoFace *> members; 
+	struct Group {
+		CylinderParameters ref;
+		std::vector<const A3DTopoFace *> members;
 	};
 
 	std::vector<Group> groups;
 
 	for (auto & cylinder : cylinders) {
-		
-		// 현재 cylinder가 어떤 그룹에 들어갔는지 표시
+
 		bool placed = false;
 
-		// 1. 기존 그룹들 중에서 동일 축 + 동일 반지름(공차 내)인 그룹이 있는지 탐색.
 		for (auto & group : groups) {
-			// group.ref : 그룹의 대표(첫 원소) 실린더 파라미터
-			// cylinder.cyl : 지금 배치하려는 실린더 파라미터
-			if (IsCoaxialSameRadius(group.ref, cylinder.cyl, static_cast<Scalar>(lenTol), static_cast<Scalar>(angTol))) {
-				// 같은 그룹 판정, 해당 그룹의 멤버로 face를 추가
+			// IsCoaxialSameRadius는 CylinderParam을 사용하여 동축/동반지름 여부를 검사합니다.
+			if (IsCoaxialSameRadius(group.ref, cylinder.cylinder, static_cast<Scalar>(lenTol), static_cast<Scalar>(angTol))) {
 				group.members.push_back(cylinder.face);
-				placed = true; 
+				placed = true;
 				break;
 			}
 		}
 
-		// 2. 어떤 그룹에도 들어가지 못했다면, 새 그룹을 생성.
 		if (false == placed) {
-			Group newGroup{ cylinder.cyl, { cylinder.face } };
+			Group newGroup { cylinder.cylinder, { cylinder.face } };
 			groups.push_back(std::move(newGroup));
 		}
 	}
 
 	if (groups.empty()) {
-		return std::nullopt;
+		return results;
 	}
 
-	// 같은 축(coaxial) 여부만 판단(반지름 무시)하는 헬퍼
-	auto sameAxisWithinTol = [&](const CylinderParam & A, const CylinderParam & B) -> bool {
-		const H3DF::DVector za = SafeNormalized(A.Axis());
-		const H3DF::DVector zb = SafeNormalized(B.Axis());
+	// 같은 축(coaxial) 여부만 판단(반지름 무시)하는 헬퍼 (Hollow 검사에도 사용됨)
+	auto sameAxisWithinTol = [&](const CylinderParameters & A, const CylinderParameters & B) -> bool {
+		const H3DF::DVector za = A.Axis();
+		const H3DF::DVector zb = B.Axis();
 		if (!ParallelWithinTol(za, zb, static_cast<Scalar>(angTol))) {
 			return false;
 		}
 		const H3DF::DVector d(
-			static_cast<Scalar>(A.origin.x - B.origin.x),
-			static_cast<Scalar>(A.origin.y - B.origin.y),
-			static_cast<Scalar>(A.origin.z - B.origin.z)
+			static_cast<Scalar>(A.m_origin.x - B.m_origin.x),
+			static_cast<Scalar>(A.m_origin.y - B.m_origin.y),
+			static_cast<Scalar>(A.m_origin.z - B.m_origin.z)
 		);
 		return PerpDistance(d, za) <= static_cast<Scalar>(lenTol);
 	};
 
-	// 3. 각 그룹에 대해 평면 캡 2개 찾기 (주요 루프 시작)
+
+	// 3. 각 그룹에 대해 평면 캡 2개 찾기 (솔리드 판별 루프)
 	for (auto & group : groups) {
-		// 캡 후보 리스트 구성(원 루프 가지고, 축/반지름 매칭되는 평면)
-		std::vector<const FaceAnalysisResult *> caps;
-		caps.reserve(4);
+
+		std::vector<const CircleParameter *> caps; // <-- 캡 후보 원 포인터 리스트
+		caps.reserve(8); // 넉넉하게 예약
 
 		for (auto & planeFace : planes) {
-			// 필요시 플레인에서 원 추출 시도(AnalyzeFaceSurface에서 이미 시도함)
-			if (true == planeFace.outerHasCircle) {
-				CircleParam c{};
-				if (ExtractOuterCircle(planeFace.face, c)) {
-					const_cast<FaceAnalysisResult &>(planeFace).outerHasCircle = true;
-					const_cast<FaceAnalysisResult &>(planeFace).outerCircle = c;
+
+			// planeFace 내의 모든 원(allCircles)을 순회하며 캡인지 검사합니다.
+			for (const auto & circle : planeFace.allCircles) { // <-- 모든 원 순회
+
+				// IsCapForCylinder는 원(circle)이 그룹의 실린더와 동축/동반지름인지 검사
+				if (IsCapForCylinder(circle, group.ref, static_cast<Scalar>(lenTol), static_cast<Scalar>(angTol))) {
+					// CircleParameter의 주소(const CircleParameter *)를 캡 후보 리스트에 추가
+					caps.push_back(&circle);
 				}
-			}
-
-			if (!planeFace.outerHasCircle) {
-				continue;
-			}
-
-			if (IsCapForCylinder(planeFace.outerCircle, group.ref, static_cast<Scalar>(lenTol), static_cast<Scalar>(angTol))) {
-				caps.push_back(&planeFace);
 			}
 		}
 
@@ -809,856 +1306,58 @@ std::optional<DatalConverterImpl::SolidCylinderResult> AM::DatalConverterImpl::D
 		// 서로 다른 높이의 두 캡 선택(축 방향 거리 최대 페어)
 		const H3DF::DVector axis = group.ref.Axis();
 
-		// 람다 캡처를 명시적으로 변경: [axis, kLenTol]
-		const auto dotAxis = [&](const FaceAnalysisResult * a, const FaceAnalysisResult * b)->double {
-			H3DF::DVector ca(a->outerCircle.origin.x, a->outerCircle.origin.y, a->outerCircle.origin.z);
-			H3DF::DVector cb(b->outerCircle.origin.x, b->outerCircle.origin.y, b->outerCircle.origin.z);
+		// dotAxis 람다 수정: cap은 이제 CircleParameter * 타입입니다.
+		const auto dotAxis = [&](const CircleParameter * a, const CircleParameter * b)->double {
+			H3DF::DVector ca(a->m_origin.x, a->m_origin.y, a->m_origin.z);
+			H3DF::DVector cb(b->m_origin.x, b->m_origin.y, b->m_origin.z);
 			H3DF::DVector d(cb.x - ca.x, cb.y - ca.y, cb.z - ca.z);
 			return std::abs(static_cast<double>(d.Dot(axis)));
 		};
 
-		const FaceAnalysisResult * cap0 = nullptr;
-		const FaceAnalysisResult * cap1 = nullptr;
+		const CircleParameter * cap0_circle = nullptr; // 캡 원 객체 포인터
+		const CircleParameter * cap1_circle = nullptr;
 		double bestH = 0.0;
 
 		for (size_t i = 0; i < caps.size(); ++i) {
 			for (size_t j = i + 1; j < caps.size(); ++j) {
-				double h = dotAxis(caps[i], caps[j]);
+				double h = dotAxis(caps[i], caps[j]); // CircleParameter*을 사용
 				if (h > bestH && h > lenTol) {
-					bestH = h; cap0 = caps[i]; cap1 = caps[j];
+					bestH = h;
+					cap0_circle = caps[i];
+					cap1_circle = caps[j];
 				}
 			}
 		}
 
-		if (!cap0 || !cap1) {
+		if (!cap0_circle || !cap1_circle) {
 			continue;
 		}
 
-		// 동축 상에 '다른 반지름'이 존재하면 솔리드가 아닌 hollow로 간주 → 솔리드 반환 금지
-		if (IsHollowCandidate(group.ref, cylinders, lenTol, angTol)) {
-			continue; // 솔리드 확정하지 않고 다음 그룹 탐색 → 상위에서 hole 경로로 처리
-		}
+		// 4. Cylinder 중간점 계산 (POS)
+		// 두 캡의 중심을 평균하여 실린더의 중간점(Midpoint)을 계산합니다.
+		H3DF::DPoint cap0_origin = cap0_circle->m_origin;
+		H3DF::DPoint cap1_origin = cap1_circle->m_origin;
 
-		// 솔리드 확정
-		// (선택) 옆면 둘레 2π 검증은 생략(분할 옆면이 많을 수 있음)
-		SolidCylinderResult res{};
+		H3DF::DPoint midpoint;
+		midpoint.x = (cap0_origin.x + cap1_origin.x) / 2.0;
+		midpoint.y = (cap0_origin.y + cap1_origin.y) / 2.0;
+		midpoint.z = (cap0_origin.z + cap1_origin.z) / 2.0;
+
+		// Hollow 케이스 필터링 로직을 분리된 함수로 대체
+		// IsHollowCandidate는 동일 축선 상에 다른 반지름의 실린더가 있는지 검사합니다.
+// 		if (IsHollowCandidate(group.ref, cylinders, lenTol, angTol)) {
+// 			continue; // 솔리드가 아님
+// 		}
+
+		// 솔리드 확정: 결과 벡터에 추가
+		SolidCylinderResult res {};
 		res.isSolidCylinder = true;
 		res.cyl = group.ref;
+		// res.cyl.m_origin = midpoint;
 		res.height = bestH;
-		res.caps[0] = cap0->face;
-		res.caps[1] = cap1->face;
-		res.lateral = group.members;
 
-		return res;
+		results.push_back(std::move(res));
 	}
 
-	return std::nullopt;
-}
-
-//== AM Datal writer ===============================================================================
-
-bool DatalConverterImpl::ExportToDatal(const std::filesystem::path & outPathUTF8)
-{
-	using W = AmWriter;
-	if (auto st = m_writer.Open(outPathUTF8, /*BOM*/true); st != W::Status::Ok) return false;
-	{
-		auto tmpl = m_writer.BeginTemplate("SEPARATED OIL TANK HEATER-2661", "EQUI", 310.0);
-		W::Orientation o; 
-		o.mapY = { W::Axis::Z, -1 }; 
-		o.mapZ = { W::Axis::Y, +1 };
-		auto box = m_writer.BeginBox(0.0, 274.3, -205.0, o, 50, 10, 100);
-		(void) box; // RAII
-	}
-	m_writer.Close();
-	return true;
-}
-
-// BlockGuard
-AmWriter::BlockGuard::BlockGuard(AmWriter * w, std::string_view name)
-	: m_writer(w), m_name(name), m_closed(false) {
-}
-
-AmWriter::BlockGuard::BlockGuard(BlockGuard && o) noexcept { 
-	*this = std::move(o); 
-}
-
-auto AmWriter::BlockGuard::operator=(BlockGuard && o) noexcept -> BlockGuard & 
-{
-	if (this != &o) {
-		if (!m_closed && m_writer) {
-			End();
-		}
-
-		m_writer = o.m_writer; 
-		o.m_writer = nullptr;
-		m_name = std::move(o.m_name);
-		m_closed = o.m_closed; 
-		o.m_closed = true;
-	}
-	return *this;
-}
-
-AmWriter::BlockGuard::~BlockGuard() 
-{
-	if (!m_closed && m_writer) {
-		End();
-	}
-}
-
-void AmWriter::BlockGuard::End() 
-{
-	if (m_writer) {
-		(void) m_writer->endBlock(m_name);
-	}
-
-	m_closed = true; 
-	m_writer = nullptr;
-}
-
-// lifecycle
-AmWriter::~AmWriter() 
-{ 
-	Close(); 
-}
-
-AmWriter::AmWriter(AmWriter && o) noexcept 
-{ 
-	*this = std::move(o); 
-}
-
-auto AmWriter::operator=(AmWriter && o) noexcept -> AmWriter & {
-	if (this != &o) {
-		m_out = std::move(o.m_out);
-		o.m_lastError = std::move(o.m_lastError);
-		m_stack = std::move(o.m_stack);
-	}
-	return *this;
-}
-
-static void H3DX_writeBOM(std::ofstream & out) {
-	const unsigned char bom[3] = { 0xEF, 0xBB, 0xBF };
-	out.write(reinterpret_cast<const char *>(bom), 3);
-}
-
-// file
-auto AmWriter::Open(const std::filesystem::path & path_utf8, bool writeBOM) noexcept -> Status 
-{
-	if (IsOpen()) { 
-		setError(Status::AlreadyOpen, "file already open"); 
-		return Status::AlreadyOpen; 
-	}
-
-	std::error_code ec;
-	if (!path_utf8.empty()) {
-		std::filesystem::create_directories(path_utf8.parent_path(), ec);
-	}
-
-	m_out.open(path_utf8, std::ios::binary | std::ios::out | std::ios::trunc);
-
-	if (!m_out) { 
-		setError(Status::FileOpenFailed, "failed to open file"); 
-		return Status::FileOpenFailed; 
-	}
-
-	if (writeBOM) {
-		H3DX_writeBOM(m_out);
-	}
-
-	m_stack.clear(); 
-	m_lastError = {};
-
-	return Status::Ok;
-}
-
-void AmWriter::Close() noexcept 
-{
-	if (false == IsOpen()) {
-		return;
-	}
-	
-	while (!m_stack.empty())  { 
-		(void) endBlock(m_stack.back()); 
-	}
-
-	m_out.flush();
-	m_out.close();
-}
-
-bool AmWriter::IsOpen() const noexcept 
-{ 
-	return m_out.is_open(); 
-}
-
-void AmWriter::Flush() noexcept 
-{
-	if (false == IsOpen()) {
-		return;
-	}
-
-	m_out.flush();
-}
-
-// input / equipment
-auto AmWriter::BeginInput() -> Status { return EmitLine("INPUT BEGIN"); }
-
-auto AmWriter::EndInput() -> Status {
-	if (!IsOpen()) {
-		setError(Status::NotOpen, "file not open");
-		return Status::NotOpen;
-	}
-	// Two spaces before "EQUIPMENT" per requested format
-	if (m_currentEquipment.empty()) {
-		return EmitLine("INPUT END");
-	}
-	return EmitLine(std::string("INPUT END  EQUIPMENT ") + m_currentEquipment);
-}
-
-auto AmWriter::FinishInput() -> Status { return EmitLine("INPUT FINISH"); }
-
-auto AmWriter::WriteEquipmentHeader(std::string_view equipmentPath, bool buil, std::string_view dsco, std::string_view ptsp, std::string_view insc) -> Status 
-{
-	if (!IsOpen()) {
-		setError(Status::NotOpen, "file not open");
-		return Status::NotOpen;
-	}
-
-	m_currentEquipment = std::string(equipmentPath);
-	
-	Status s;
-	s = EmitLine("NEW EQUIPMENT " + std::string(equipmentPath));	if (s != Status::Ok) return s;
-	s = EmitRawKV("BUIL", buil ? "true" : "false");					if (s != Status::Ok) return s;
-	s = EmitRawKV("DSCO", dsco);									if (s != Status::Ok) return s;
-	s = EmitRawKV("PTSP", ptsp);									if (s != Status::Ok) return s;
-	s = EmitRawKV("INSC", insc);									if (s != Status::Ok) return s;
-
-	return Status::Ok;
-}
-
-auto AmWriter::StartWithTemplate(std::string_view equipmentPath,
-	std::string_view desc,
-	std::string_view purp,
-	std::optional<double> userWeightKg,
-	bool buil,
-	std::string_view dsco,
-	std::string_view ptsp,
-	std::string_view insc) -> Status 
-{
-	// Begin input and equipment header
-	Status s = BeginInput();
-	if (s != Status::Ok) {
-		return s;
-	}
-
-	s = WriteEquipmentHeader(equipmentPath, buil, dsco, ptsp, insc);
-	if (s != Status::Ok) {
-		return s;
-	}
-
-	EmitLine(""); // NEW TMPLATE 앞에 공백 라인
-
-	// Begin template WITHOUT RAII guard (avoid immediate END if caller ignores return)
-	(void) beginBlock("NEW TMPLATE");
-	EmitKV("DESC", std::string(desc));
-	EmitRawKV("PURP", std::string(purp));
-	if (userWeightKg.has_value()) {
-		EmitLine("USRWEI ( " + formatNumber(*userWeightKg, 3) + "kg )");
-	}
-	return Status::Ok;
-}
-
-// template / primitives
-auto AmWriter::BeginTemplate(std::string_view desc,
-	std::string_view purp,
-	std::optional<double> userWeightKg) -> BlockGuard {
-
-	EmitLine(""); // NEW TMPLATE 앞에 공백 라인
-
-	(void) beginBlock("NEW TMPLATE");
-	EmitKV("DESC", std::string(desc));
-	EmitKV("PURP", std::string(purp));
-	if (userWeightKg.has_value()) EmitLine("USRWEI ( " + formatNumber(*userWeightKg, 3) + "kg )");
-	return BlockGuard(this, "NEW TMPLATE");
-}
-
-auto AmWriter::End() -> Status 
-{
-	EmitLine(""); // NEW TMPLATE End 앞에 공백 라인
-
-	return endBlock(m_stack.empty() ? std::string_view{} : m_stack.back());
-}
-
-auto AmWriter::BeginBox(double px, double py, double pz,
-	const Orientation & ori,
-	double xlen, double ylen, double zlen) -> BlockGuard {
-	(void) beginBlock("NEW BOX");
-	EmitLine("POS X " + std::string(formatNumber(px, 3)) +
-		"mm Y " + std::string(formatNumber(py, 3)) +
-		"mm Z " + std::string(formatNumber(pz, 3)) + "mm");
-	
-	EmitLine("ORI Y is " + axisMapStr(ori.mapY) + " and Z is " + axisMapStr(ori.mapZ));
-
-	EmitKV("XLEN", xlen, "mm");
-	EmitKV("YLEN", ylen, "mm");
-	EmitKV("ZLEN", zlen, "mm");
-
-	return BlockGuard(this, "NEW BOX");
-}
-
-auto AmWriter::BeginCylinder(double cx, double cy, double cz, double radius, double height, Axis axis) -> BlockGuard 
-{
-	EmitLine(""); // NEW CYLINDER 앞에 공백 라인
-	
-	(void) beginBlock("NEW CYLINDER");
-	EmitLine("POS X " + std::string(formatNumber(cx, 3)) +
-		"mm Y " + std::string(formatNumber(cy, 3)) +
-		"mm Z " + std::string(formatNumber(cz, 3)) + "mm");
-
-	// ORI derived from axis with zero yaw (no angle numbers)
-	EmitLine(formatOriFromAxisAndYaw(axis, 1, 0.0, 0.0));
-
-	EmitKV("RADIUS", radius, "mm");
-	EmitKV("HEIGHT", height, "mm");
-
-	return BlockGuard(this, "NEW CYLINDER");
-}
-
-// Overload: axis + yaw angle (deg) with optional quantization step
-auto AmWriter::BeginCylinder(double cx, double cy, double cz, double radius, double height, Axis axis, double yawDeg, double quantStepDeg) -> BlockGuard 
-{
-	EmitLine(""); // NEW CYLINDER 앞에 공백 라인
-
-	(void) beginBlock("NEW CYLINDER");
-
-	EmitLine("POS X " + std::string(formatNumber(cx, 3)) +
-		"mm Y " + std::string(formatNumber(cy, 3)) +
-		"mm Z " + std::string(formatNumber(cz, 3)) + "mm");
-
-	EmitLine(formatOriFromAxisAndYaw(axis, 1, yawDeg, quantStepDeg));
-
-	EmitKV("RADIUS", radius, "mm");
-	EmitKV("HEIGHT", height, "mm");
-	return BlockGuard(this, "NEW CYLINDER");
-};
-
-// New overload: explicit ORI + DIAM/HEIG
-auto AmWriter::BeginCylinder(double cx, double cy, double cz, double diam, double heig, const Orientation & ori) -> BlockGuard 
-{
-	EmitLine("");
-
-	(void) beginBlock("NEW CYLINDER");
-
-	EmitLine("POS X " + std::string(formatNumber(cx, 3)) +
-		"mm Y " + std::string(formatNumber(cy, 3)) +
-		"mm Z " + std::string(formatNumber(cz, 3)) + "mm");
-
-	EmitLine("ORI Y is " + axisMapStr(ori.mapY) + " and Z is " + axisMapStr(ori.mapZ));
-
-	EmitKV("DIAM", diam, "mm");
-	EmitKV("HEIG", heig, "mm");
-
-	return BlockGuard(this, "NEW CYLINDER");
-}
-
-auto AmWriter::WriteSolidCylinder(double cx, double cy, double cz, const Orientation & ori, double diam, double heig) -> Status 
-{
-	if (!IsOpen()) { 
-		setError(Status::NotOpen, "file not open"); 
-		return Status::NotOpen; 
-	}
-	// Delegate to RAII cylinder opener (prints POS/ORI/DIAM/HEIG) and let guard close the block.
-	auto guard = BeginCylinder(cx, cy, cz, diam, heig, ori);
-
-	(void) guard; // RAII: END on scope exit
-
-	return Status::Ok;
-}
-
-// solid cylinder (detected geometry)
-auto AmWriter::WriteSolidCylinder(double cx, double cy, double cz,double nx, double ny, double nz, double radius, double height) -> Status 
-{
-	if (!IsOpen()) { 
-		setError(Status::NotOpen, "file not open"); 
-		return Status::NotOpen; 
-	}
-
-	// Z 축 정규화
-	const double nlen = std::sqrt(nx * nx + ny * ny + nz * nz);
-	if (!(nlen > 0.0)) {
-		setError(Status::InvalidArgument, "axis vector is zero");
-		return Status::InvalidArgument;
-	}
-
-	const double zx = nx / nlen;
-	const double zy = ny / nlen;
-	const double zz = nz / nlen;
-
-	// 월드 힌트(+Y, 거의 평행이면 +X)를 Z에 수직으로 투영 → Y 벡터
-	const double dotUp = zy; // dot((0,1,0), Z)
-	double hx = 0.0, hy = 1.0, hz = 0.0;
-	if (std::abs(dotUp) > 0.985) {
-		hx = 1.0; hy = 0.0; hz = 0.0;
-	}
-
-	const double hdotz = hx * zx + hy * zy + hz * zz;
-	double yx = hx - hdotz * zx;
-	double yy = hy - hdotz * zy;
-	double yz = hz - hdotz * zz;
-	const double ylen = std::sqrt(yx * yx + yy * yy + yz * yz);
-
-	if (ylen > 0.0) {
-		yx /= ylen; yy /= ylen; yz /= ylen;
-	}
-	else {
-		// 병행/퇴화 시 대체 직교 벡터 선택
-		if (std::abs(zx) <= std::abs(zy) && std::abs(zx) <= std::abs(zz)) { yx = 0.0; yy = -zz; yz = +zy; }
-		else if (std::abs(zy) <= std::abs(zx) && std::abs(zy) <= std::abs(zz)) { yx = +zz; yy = 0.0; yz = -zx; }
-		else { yx = -zy; yy = +zx; yz = 0.0; }
-		const double ylen2 = std::sqrt(yx * yx + yy * yy + yz * yz);
-		if (ylen2 > 0.0) { yx /= ylen2; yy /= ylen2; yz /= ylen2; }
-	}
-
-	const double diam = radius * 2.0;
-
-	EmitLine("");
-	(void) beginBlock("NEW CYLINDER");
-
-	EmitLine("POS X " + std::string(formatNumber(cx, 3)) +
-		"mm Y " + std::string(formatNumber(cy, 3)) +
-		"mm Z " + std::string(formatNumber(cz, 3)) + "mm");
-
-	// 정확 각도(스냅 없음)로 Y와 Z 모두를 혼합 각도로 표기
-	EmitLine(formatOriYZFromVectors(yx, yy, yz, zx, zy, zz, 0.0));
-
-	EmitKV("DIAM", diam, "mm");
-	EmitKV("HEIG", height, "mm");
-	return endBlock("NEW CYLINDER");
-}
-
-auto AmWriter::WritePlainCylinder(double cx, double cy, double cz, double diam, double heig) -> Status
-{
-	if (!IsOpen()) {
-		setError(Status::NotOpen, "file not open");
-		return Status::NotOpen;
-	}
-
-	EmitLine("");
-	(void) beginBlock("NEW CYLINDER");
-
-	EmitLine("POS X " + std::string(formatNumber(cx, 3)) +
-		"mm Y " + std::string(formatNumber(cy, 3)) +
-		"mm Z " + std::string(formatNumber(cz, 3)) + "mm");
-
-	// ORI 출력 없음 (요청 포맷 준수)
-	EmitKV("DIAM", diam, "mm");
-	EmitKV("HEIG", heig, "mm");
-
-	//return endBlock("NEW CYLINDER");
-	return Status::Ok;
-}
-
-auto AmWriter::WriteHoleCylinder(double cx, double cy, double cz, double nx, double ny, double nz, double radius, double height, double stepDeg) -> Status
-{
-	if (!IsOpen()) {
-		setError(Status::NotOpen, "file not open");
-		return Status::NotOpen;
-	}
-
-	// Z 축 정규화
-	const double nlen = std::sqrt(nx * nx + ny * ny + nz * nz);
-	if (!(nlen > 0.0)) {
-		setError(Status::InvalidArgument, "axis vector is zero");
-		return Status::InvalidArgument;
-	}
-	const double zx = nx / nlen;
-	const double zy = ny / nlen;
-	const double zz = nz / nlen;
-
-	// 월드 +Y(거의 평행이면 +X) 투영으로 Y 벡터 구축
-	const double dotUp = zy; // dot((0,1,0), Z)
-	double hx = 0.0, hy = 1.0, hz = 0.0;
-	if (std::abs(dotUp) > 0.985) {
-		hx = 1.0; hy = 0.0; hz = 0.0;
-	}
-
-	const double hdotz = hx * zx + hy * zy + hz * zz;
-	double yx = hx - hdotz * zx;
-	double yy = hy - hdotz * zy;
-	double yz = hz - hdotz * zz;
-	const double ylen = std::sqrt(yx * yx + yy * yy + yz * yz);
-	if (ylen > 0.0) {
-		yx /= ylen; yy /= ylen; yz /= ylen;
-	}
-	else {
-		// 병행/퇴화 대비 대체 직교 벡터
-		if (std::abs(zx) <= std::abs(zy) && std::abs(zx) <= std::abs(zz)) { yx = 0.0; yy = -zz; yz = +zy; }
-		else if (std::abs(zy) <= std::abs(zx) && std::abs(zy) <= std::abs(zz)) { yx = +zz; yy = 0.0; yz = -zx; }
-		else { yx = -zy; yy = +zx; yz = 0.0; }
-		const double ylen2 = std::sqrt(yx * yx + yy * yy + yz * yz);
-		if (ylen2 > 0.0) { yx /= ylen2; yy /= ylen2; yz /= ylen2; }
-	}
-
-	const double diam = radius * 2.0;
-
-	EmitLine("");
-	(void) beginBlock("NEW NCYLINDER");
-
-	EmitLine("POS X " + std::string(formatNumber(cx, 3)) +
-		"mm Y " + std::string(formatNumber(cy, 3)) +
-		"mm Z " + std::string(formatNumber(cz, 3)) + "mm");
-
-	// Y, Z 모두 각도 혼합으로 ORI 출력 (기본 11.25° 스냅 → 샘플과 동일)
-	EmitLine(formatOriYZFromVectors(yx, yy, yz, zx, zy, zz, stepDeg));
-
-	EmitKV("DIAM", diam, "mm");
-	EmitKV("HEIG", height, "mm");
-	EmitLine("PRODHT 'Hole'");
-
-	return endBlock("NEW NCYLINDER");
-}
-
-// emit
-auto AmWriter::EmitLine(std::string_view line) -> Status 
-{
-	if (!IsOpen()) {
-		setError(Status::NotOpen, "file not open");
-		return Status::NotOpen;
-	}
-
-	try {
-		m_out.write(line.data(), static_cast<std::streamsize>(line.size()));
-		m_out.put('\n');
-
-		if (!m_out.good()) { 
-			setError(Status::WriteFailed, "stream write failed"); 
-			return Status::WriteFailed; 
-		}
-	}
-	catch (const std::exception & ex) {
-		setError(Status::WriteFailed, ex.what());
-		return Status::WriteFailed;
-	}
-	return Status::Ok;
-}
-
-auto AmWriter::EmitKV(std::string_view key, std::string_view value) -> Status {
-	return EmitLine(std::string(key) + " '" + std::string(value) + "'");
-}
-
-auto AmWriter::EmitRawKV(std::string_view key, std::string_view value) -> Status {
-	return EmitLine(std::string(key) + " " + std::string(value));
-}
-
-auto AmWriter::EmitKV(std::string_view key, double value, std::string_view unit) -> Status {
-	std::string v = formatNumber(value, 3);
-	if (!unit.empty()) v += std::string(unit);
-	return EmitLine(std::string(key) + " " + v);
-}
-
-const AmWriter::Error & AmWriter::LastError() const noexcept { return m_lastError; }
-
-// internals
-auto AmWriter::beginBlock(std::string_view name) -> Status 
-{
-	if (!IsOpen()) { 
-		setError(Status::NotOpen, "file not open"); 
-		return Status::NotOpen; 
-	}
-
-	EmitLine(std::string(name));
-	m_stack.emplace_back(name);
-
-	return Status::Ok;
-}
-
-auto AmWriter::endBlock(std::string_view name) -> Status 
-{
-	if (!IsOpen()) { 
-		setError(Status::NotOpen, "file not open"); 
-		return Status::NotOpen; 
-	}
-
-	if (m_stack.empty()) { 
-		setError(Status::InvalidArgument, "no open block to end"); 
-		return Status::InvalidArgument; 
-	}
-
-	if (!name.empty() && m_stack.back() != name) {
-		setError(Status::InvalidArgument, "block mismatch: end '" + std::string(name) + "' while '" + m_stack.back() + "' open");
-		return Status::InvalidArgument;
-	}
-
-	EmitLine("END"); m_stack.pop_back(); return Status::Ok;
-}
-
-void AmWriter::setError(Status c, std::string msg) { m_lastError.code = c; m_lastError.message = std::move(msg); }
-
-std::string AmWriter::axisToStr(Axis a) 
-{
-	switch (a) {
-		case Axis::X:
-			return "X";
-		case Axis::Y:
-			return "Y";
-		default:
-			return "Z";
-	}
-}
-
-std::string AmWriter::axisMapStr(const AxisMap & m) 
-{ 
-	std::string s; 
-	if (m.sign < 0) s += "-"; 
-	s += axisToStr(m.to); 
-	return s; 
-}
-
-double AmWriter::normalizeDeg(double deg) noexcept {
-	double d = std::fmod(deg, 360.0);
-	if (d < 0.0) d += 360.0;
-	return d;
-}
-
-double AmWriter::quantizeDeg(double deg, double step) noexcept {
-	if (step <= 0.0) return deg;
-	return std::round(deg / step) * step;
-}
-
-std::string AmWriter::formatOriFromAxisAndYaw(Axis axis, int zSign, double yawDeg, double stepDeg) 
-{
-	// Normalize and quantize yaw (roll around axis)
-	double yaw = normalizeDeg(yawDeg);
-	yaw = normalizeDeg(quantizeDeg(yaw, stepDeg));
-
-	// Determine sector [0..3] and local angle within [0,90)
-	int sector = static_cast<int>(std::floor(yaw / 90.0)) & 3;
-	double a = yaw - static_cast<double>(sector) * 90.0;
-
-	AxisMap start{}, toward{};
-	const AxisMap zlab{ axis, (zSign >= 0 ? +1 : -1) };
-
-	auto mk = [](Axis ax, int s) { return AxisMap{ ax, s }; };
-
-	switch (axis) {
-		case Axis::Z:
-			switch (sector) {
-				case 0: start = mk(Axis::Y, +1); toward = mk(Axis::X, -1); break; // Y -> -X
-				case 1: start = mk(Axis::X, -1); toward = mk(Axis::Y, -1); break; // -X -> -Y
-				case 2: start = mk(Axis::Y, -1); toward = mk(Axis::X, +1); break; // -Y -> X
-				default: start = mk(Axis::X, +1); toward = mk(Axis::Y, +1); break; // X -> Y
-			}
-			break;
-		case Axis::X:
-			switch (sector) {
-				case 0: start = mk(Axis::Y, +1); toward = mk(Axis::Z, +1); break; // Y -> Z
-				case 1: start = mk(Axis::Z, +1); toward = mk(Axis::Y, -1); break; // Z -> -Y
-				case 2: start = mk(Axis::Y, -1); toward = mk(Axis::Z, -1); break; // -Y -> -Z
-				default: start = mk(Axis::Z, -1); toward = mk(Axis::Y, +1); break; // -Z -> Y
-			}
-			break;
-		case Axis::Y:
-			switch (sector) {
-				case 0: start = mk(Axis::X, +1); toward = mk(Axis::Z, +1); break; // X -> Z
-				case 1: start = mk(Axis::Z, +1); toward = mk(Axis::X, -1); break; // Z -> -X
-				case 2: start = mk(Axis::X, -1); toward = mk(Axis::Z, -1); break; // -X -> -Z
-				default: start = mk(Axis::Z, -1); toward = mk(Axis::X, +1); break; // -Z -> X
-			}
-			break;
-	}
-
-	std::string line = "ORI Y is " + axisMapStr(start);
-	
-	if (a > 0.0) {
-		line += " " + formatNumber(a, 3) + " " + axisMapStr(toward);
-	}
-
-	line += " and Z is " + axisMapStr(zlab);
-	return line;
-}
-
-std::string AmWriter::formatOriFromVector(double nx, double ny, double nz, double stepDeg)
-{
-	// 두 개의 가장 큰 성분으로 평면 결정 (tie-breaker: Z > Y > X)
-	const double ax = std::abs(nx), ay = std::abs(ny), az = std::abs(nz);
-
-	struct AxisComp { 
-		Axis ax; 
-		double val; 
-		double abs; 
-	} comps[3] = {
-		{ Axis::X, nx, ax }, 
-		{ Axis::Y, ny, ay }, 
-		{ Axis::Z, nz, az }
-	};
-
-	auto prio = [](Axis a) { 
-		return (a == Axis::Z ? 3 : (a == Axis::Y ? 2 : 1)); 
-	};
-
-	std::sort(std::begin(comps), std::end(comps), [&](const AxisComp & A, const AxisComp & B) {
-		if (A.abs != B.abs) return A.abs > B.abs;      // 큰 값 우선
-		return prio(A.ax) > prio(B.ax);               // 동률: Z > Y > X
-		});
-
-	const AxisComp & sA = comps[0]; // Z 라인 시작축(큰 성분)
-	const AxisComp & tA = comps[1]; // Z 라인 향하는 축(작은 성분)
-	const AxisComp & oA = comps[2]; // Y 라인(직교축 = 최소 성분)
-
-	double ang = std::atan2(std::abs(tA.val), std::abs(sA.val)) * 180.0 / M_PI; // [0,90]
-	if (stepDeg > 0.0) ang = normalizeDeg(quantizeDeg(ang, stepDeg));
-
-	// "ORI Y is <orth> and Z is <start> [ang] <toward>"
-	std::string line = "ORI Y is " + axisMapStr(AxisMap{ oA.ax, +1 });
-	line += " and Z is " + axisMapStr(AxisMap{ sA.ax, (sA.val >= 0.0 ? +1 : -1) });
-	if (ang > 0.0) {
-		line += " " + formatNumber(ang, 3) + " "
-			+ axisMapStr(AxisMap{ tA.ax, (tA.val >= 0.0 ? +1 : -1) });
-	}
-
-	return line;
-}
-
-std::string AmWriter::formatOriYZFromVectors(double yx, double yy, double yz, double zx, double zy, double zz, double stepDeg)
-{
-	auto mixLine = [&](char which,double vx,double vy, double vz) -> std::string
-	{
-		struct AxisComp { Axis ax; double val; double abs; };
-		AxisComp comps[3] = {
-			{ Axis::X, vx, std::abs(vx) },
-			{ Axis::Y, vy, std::abs(vy) },
-			{ Axis::Z, vz, std::abs(vz) }
-		};
-
-		auto prio = [](Axis a) { return (a == Axis::Z ? 3 : (a == Axis::Y ? 2 : 1)); };
-
-		std::sort(std::begin(comps), std::end(comps),
-			[&](const AxisComp & A, const AxisComp & B) {
-				if (A.abs != B.abs) return A.abs > B.abs;   // 큰 값 우선
-				return prio(A.ax) > prio(B.ax);             // 동률: Z > Y > X
-			});
-
-		const AxisComp & sA = comps[0]; // 시작축
-		const AxisComp & tA = comps[1]; // 향하는 축
-
-		double ang = std::atan2(std::abs(tA.val), std::abs(sA.val)) * 180.0 / M_PI; // [0,90]
-		if (stepDeg > 0.0) {
-			ang = normalizeDeg(quantizeDeg(ang, stepDeg));
-		}
-
-		std::string line;
-		line.reserve(64);
-		line += (which == 'Y' ? "ORI Y is " : "Z is ");
-		line += axisMapStr(AxisMap{ sA.ax, (sA.val >= 0.0 ? +1 : -1) });
-		if (ang > 0.0) {
-			line += " ";
-			line += formatNumber(ang, 3);
-			line += " ";
-			line += axisMapStr(AxisMap{ tA.ax, (tA.val >= 0.0 ? +1 : -1) });
-		}
-		return line;
-	};
-
-	// "ORI Y is ... and Z is ..." 형태로 결합
-	std::string left = mixLine('Y', yx, yy, yz);
-	std::string right = mixLine('Z', zx, zy, zz);
-
-	return left + " and " + right;
-}
-
-double AmWriter::autoYawFromAxisDeg(double nx, double ny, double nz, Axis a) noexcept 
-{
-	// normalize axis
-	const double len = std::sqrt(nx * nx + ny * ny + nz * nz);
-	if (!(len > 0.0)) {
-		return 0.0;
-	}
-
-	const double vx = nx / len, vy = ny / len, vz = nz / len;
-
-	// choose hint: world +Y, fallback +X if nearly parallel
-	const double dotUp = vy; // dot((0,1,0), v)
-	double hx = 0.0, hy = 1.0, hz = 0.0;
-	if (std::abs(dotUp) > 0.985) 
-	{ 
-		hx = 1.0; 
-		hy = 0.0;
-		hz = 0.0; 
-	}
-
-	// project hint onto plane perpendicular to v: h_proj = h - (h·v) v
-	const double hdotv = hx * vx + hy * vy + hz * vz;
-	double yx = hx - hdotv * vx;
-	double yy = hy - hdotv * vy;
-	double yz = hz - hdotv * vz;
-	const double ylen = std::sqrt(yx * yx + yy * yy + yz * yz);
-	if (!(ylen > 0.0)) {
-		// pathological: pick another fallback
-		yx = (a == Axis::Z ? 1.0 : 0.0);
-		yy = (a == Axis::Z ? 0.0 : 1.0);
-		yz = 0.0;
-	}
-	else {
-		yx /= ylen; yy /= ylen; yz /= ylen;
-	}
-
-	double deg = 0.0;
-
-	switch (a) {
-		case Axis::Z:  // XY-plane: 0° at +Y, +90° at -X
-			deg = std::atan2(-yx, yy) * 180.0 / M_PI; 
-			break;
-
-		case Axis::X: // YZ-plane: 0° at +Y, +90° at +Z
-			deg = std::atan2(yz, yy) * 180.0 / M_PI;
-			break; 
-
-		case Axis::Y: // XZ-plane: 0° at +X, +90° at +Z
-			deg = std::atan2(yz, yx) * 180.0 / M_PI;
-			break; 
-	}
-
-	// normalize to [0,360)
-	while (deg < 0.0) {
-		deg += 360.0;
-	}
-
-	while (deg >= 360.0) {
-		deg -= 360.0;
-	}
-
-	return deg;
-}
-
-std::string AmWriter::formatOrientation(const Orientation & ori) 
-{ 
-	return axisMapStr(ori.mapY) + " and Z is " + axisMapStr(ori.mapZ); 
-}
-
-std::string AmWriter::formatNumber(double v, int maxDecimals) 
-{
-	double rounded = std::round(v);
-	if (std::fabs(v - rounded) < 1e-9) {
-		std::ostringstream oss; oss.setf(std::ios::fixed); oss << std::setprecision(0) << rounded; return oss.str();
-	}
-	std::ostringstream oss; oss.setf(std::ios::fixed); oss << std::setprecision(maxDecimals) << v; std::string s = oss.str();
-	if (auto pos = s.find('.'); pos != std::string::npos) { while (!s.empty() && s.back() == '0') s.pop_back(); if (!s.empty() && s.back() == '.') s.pop_back(); }
-	return s;
-}
-
-AmWriter::Axis AmWriter::pickDominantAxis(double nx, double ny, double nz) noexcept {
-	const double ax = std::abs(nx), ay = std::abs(ny), az = std::abs(nz);
-	if (ax >= ay && ax >= az) return Axis::X; if (ay >= ax && ay >= az) return Axis::Y; return Axis::Z;
-}
-
-int AmWriter::pickAxisSign(Axis a, double nx, double ny, double nz) noexcept {
-        switch (a) { case Axis::X: return nx >= 0.0 ? +1 : -1; case Axis::Y: return ny >= 0.0 ? +1 : -1; default: return nz >= 0.0 ? +1 : -1; }
-}
-
-AmWriter::Orientation AmWriter::orientationFromAxis(double nx, double ny, double nz) noexcept {
-	Orientation ori;
-	Axis a = pickDominantAxis(nx, ny, nz);
-	int  s = pickAxisSign(a, nx, ny, nz);
-	ori.mapZ = { a, s };
-	// Z와 다른 안정적인 Y축 선택
-	ori.mapY = { (a != Axis::Y ? Axis::Y : Axis::X), +1 };
-	return ori;
+	return results; // 발견된 모든 솔리드 리스트 반환
 }

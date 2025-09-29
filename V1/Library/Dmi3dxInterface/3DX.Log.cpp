@@ -15,7 +15,11 @@
 
 #ifdef USED_LOG_MANAGER
 
+// #define _LOG_NURBS_CURVE_DETAIL_LOG_
+
 #define LOG_3DX_ID		2
+
+#define TOPO_CONTEXT_SCALE 1000
 
 void Log::CreateLog(const WCHAR * pchFilePathName)
 {
@@ -1677,7 +1681,7 @@ void Log::A3DTopoFaceLog(const A3DTopoFace * pcTopoFace, A3DUns32 nInIndex, A3DU
 
 		IncreaseTabIndex(); {
 
-			// A3DSurfBaseLog(cTopoFaceData.m_pSurface);
+			A3DSurfBaseLog(cTopoFaceData.m_pSurface);
 
 			if (TRUE == cTopoFaceData.m_bHasTrimDomain) {
 				// A3DDomainDataLog(cTopoFaceData.m_sSurfaceDomain);
@@ -1749,51 +1753,273 @@ void Log::A3DTopoCoEdgeLog(const A3DTopoCoEdge * pcTopoCoEdge, A3DUns32 nEdgeInd
 
 void Log::A3DTopoEdgeLog(const A3DTopoEdge * pcTopoEdge)
 {
-	A3DTopoEdgeData cTopoEdgeData;
-	A3D_INITIALIZE_DATA(A3DTopoEdgeData, cTopoEdgeData);
-	A3DStatus eResult = A3DTopoEdgeGet(pcTopoEdge, &cTopoEdgeData);
+	A3DTopoEdgeData topoEdgeData;
+	A3D_INITIALIZE_DATA(A3DTopoEdgeData, topoEdgeData);
+	A3DStatus eResult = A3DTopoEdgeGet(pcTopoEdge, &topoEdgeData);
 
 	if (A3D_SUCCESS == eResult) {
-		Write(L"Edge: %s, 3D space curve: %s", HexStr((DWORD_PTR) pcTopoEdge), HexStr((DWORD_PTR) cTopoEdgeData.m_p3dCurve));
+		Write(L"Edge: %s, 3D space curve: %s", HexStr((DWORD_PTR) pcTopoEdge), HexStr((DWORD_PTR) topoEdgeData.m_p3dCurve));
 
 		IncreaseTabIndex(); {
+			A3DCrvBaseLog(topoEdgeData.m_p3dCurve);
+
 	// 		Log(L"HasTrimDomain: %s, Tolerance: %s", BoolStr((bool) cTopoEdgeData.m_bHasTrimDomain), DblStr(cTopoEdgeData.m_dTolerance));
 	// 		Log(L"Interval: %s,%s", DblStr(cTopoEdgeData.m_sInterval.m_dMin), DblStr(cTopoEdgeData.m_sInterval.m_dMax));
 
-			A3DTopoVertexLog(cTopoEdgeData.m_pStartVertex);
-			A3DTopoVertexLog(cTopoEdgeData.m_pEndVertex);
+			A3DTopoVertexLog(topoEdgeData.m_pStartVertex);
+			A3DTopoVertexLog(topoEdgeData.m_pEndVertex);
 		} DecreaseTabIndex();
 
-		A3DTopoEdgeGet(nullptr, &cTopoEdgeData);
+		A3DTopoEdgeGet(nullptr, &topoEdgeData);
 	}
 	else {
 		Write(L"A3DTopoEdgeGet failed: %d", eResult);
 	}
 }
 
-void Log::A3DTopoVertexLog(const A3DTopoVertex * pcTopoVertex)
+// == Surface 관련 함수 ==============================================================================
+void Log::A3DSurfBaseLog(const A3DSurfBase * pcSurfBase)
+{
+	if(nullptr == pcSurfBase) {
+		Write(L"SurfBase: NULL");
+		return;
+	}
+
+	A3DEEntityType eType = kA3DTypeUnknown;
+	if (A3D_SUCCESS != A3DEntityGetType(pcSurfBase, &eType)) {
+		return;
+	}
+
+	switch (eType) {
+		case kA3DTypeSurfPlane:
+			A3DSurfPlaneLog(pcSurfBase);
+			break;
+
+		case kA3DTypeSurfCylinder:
+			A3DSurfCylinderLog(pcSurfBase);
+			break;
+
+		case kA3DTypeSurfTorus:
+			A3DSurfTorusLog(pcSurfBase);
+			break;
+
+		case kA3DTypeSurfCone:
+			A3DSurfConeLog(pcSurfBase);
+			break;
+
+		default:
+			Write("SurfBase: %s, %s", Dmi3dx::GetA3dEntityTypeString(eType), HexStrA((DWORD_PTR) pcSurfBase));
+			break;
+	}
+}
+
+void Log::A3DSurfPlaneLog(const A3DSurfBase * pcSurfBase)
+{
+	Write(L"SurfPlane: %s", HexStr((DWORD_PTR) pcSurfBase));
+
+	A3DSurfPlaneData planeData;
+	A3D_INITIALIZE_DATA(A3DSurfPlaneData, planeData);
+	A3DSurfPlaneGet(pcSurfBase, &planeData);
+
+	IncreaseTabIndex(); {
+		A3DMiscCartesianTransformationDataLog(planeData.m_sTrsf);
+
+		// m_dUSurfCoeff = cSurfPlaneData.m_sParam.m_dUCoeffA;
+		// m_dVSurfCoeff = cSurfPlaneData.m_sParam.m_dVCoeffA;
+
+		A3DUVParameterizationDataLog(planeData.m_sParam);
+	} DecreaseTabIndex();
+}
+
+void Log::A3DSurfCylinderLog(const A3DSurfBase * pcSurfBase)
+{
+	Write(L"SurfCylinder: %s", HexStr((DWORD_PTR) pcSurfBase));
+
+	A3DSurfCylinderData cylinderData;
+	A3D_INITIALIZE_DATA(A3DSurfCylinderData, cylinderData);
+	A3DSurfCylinderGet(pcSurfBase, &cylinderData);
+
+	IncreaseTabIndex(); {
+		Write(L"Radius: %s", DblStr(cylinderData.m_dRadius));
+		A3DMiscCartesianTransformationDataLog(cylinderData.m_sTrsf);
+		A3DUVParameterizationDataLog(cylinderData.m_sParam);
+	} DecreaseTabIndex();
+}
+
+void Log::A3DSurfTorusLog(const A3DSurfBase * pcSurfBase)
+{
+	Write(L"SurfTorus: %s", HexStr((DWORD_PTR) pcSurfBase));
+
+	A3DSurfTorusData torusData;
+	A3D_INITIALIZE_DATA(A3DSurfTorusData, torusData);
+	A3DSurfTorusGet(pcSurfBase, &torusData);
+
+	IncreaseTabIndex(); {
+		Write(L"Major Radius: %s, Minor Radius: %s", DblStr(torusData.m_dMajorRadius), DblStr(torusData.m_dMinorRadius));
+		A3DMiscCartesianTransformationDataLog(torusData.m_sTrsf);
+		// m_dUSurfCoeff = cSurfTorusData.m_sParam.m_dUCoeffA / m_dTopoContextScale;
+		// m_dVSurfCoeff = cSurfTorusData.m_sParam.m_dVCoeffA;
+		A3DUVParameterizationDataLog(torusData.m_sParam);
+	} DecreaseTabIndex();
+}
+
+void Log::A3DSurfConeLog(const A3DSurfBase * pcSurfBase)
+{
+	Write(L"SurfCone: %s", HexStr((DWORD_PTR) pcSurfBase));
+
+	A3DSurfConeData coneData;
+	A3D_INITIALIZE_DATA(A3DSurfConeData, coneData);
+	A3DSurfConeGet(pcSurfBase, &coneData);
+
+	IncreaseTabIndex(); {
+		Write(L"Radius: %s, SemiAngle: %s", DblStr(coneData.m_dRadius), DblStr(coneData.m_dSemiAngle));
+		A3DMiscCartesianTransformationDataLog(coneData.m_sTrsf);
+		A3DUVParameterizationDataLog(coneData.m_sParam);
+	} DecreaseTabIndex();
+}
+
+// == Curve 관련 함수 ===============================================================================
+void Log::A3DCrvBaseLog(const A3DCrvBase * pcCrvBase)
 {
 	A3DEEntityType eType = kA3DTypeUnknown;
-	A3DEntityGetType(pcTopoVertex, &eType);
+	if (A3D_SUCCESS != A3DEntityGetType(pcCrvBase, &eType)) {
+		return;
+	}
+
+	switch (eType) {
+// 		case kA3DTypeCrvLine:
+// 			CHECK_BOOL_RETURN(ConvertCrvLine(pcCrvBase, pcCurve, pcSurface));
+// 			break;
+// 
+		case kA3DTypeCrvCircle:
+			A3DCrvCircleLog(pcCrvBase);
+			break;
+
+		case kA3DTypeCrvNurbs:
+			A3DCrvNurbsLog(pcCrvBase);
+			break;
+	}
+}
+
+void Log::A3DCrvCircleLog(const A3DCrvBase * pcCrvBase)
+{
+	A3DCrvCircleData circleData;
+	A3D_INITIALIZE_DATA(A3DCrvCircleData, circleData);
+	A3DStatus eResult = A3DCrvCircleGet(pcCrvBase, &circleData);
+
+	Write(L"CrvCircle: Radius %s, %s", DblStr(circleData.m_dRadius), (A3D_TRUE == circleData.m_bIs2D) ? L"2D Curve" : L"3D Curve");
+
+	IncreaseTabIndex(); {
+		A3DMiscCartesianTransformationDataLog(circleData.m_sTrsf);
+		A3DParameterizationDataLog(circleData.m_sParam);
+	} DecreaseTabIndex();
+}
+
+void Log::A3DCrvNurbsLog(const A3DCrvBase * pcCrvBase)
+{
+	Write(L"CrvNurbs");
+
+	A3DCrvNurbsData cCrvNurbsData;
+	A3D_INITIALIZE_DATA(A3DCrvNurbsData, cCrvNurbsData);
+	A3DStatus eResult = A3DCrvNurbsGet(pcCrvBase, &cCrvNurbsData);
+
+	IncreaseTabIndex();
+	{
+		ptrdiff_t nDegree = cCrvNurbsData.m_uiDegree;
+		A3DUns32 nCtrlSize = cCrvNurbsData.m_uiCtrlSize;
+
+		CString strKnotType = GetKnotTypeString(cCrvNurbsData.m_eKnotType);
+
+		CString strCurveForm;
+		switch (cCrvNurbsData.m_eCurveForm) {
+			case kA3DBSplineCurveFormUnspecified:
+				strCurveForm = L"Unspecified";
+				break;
+
+			case kA3DBSplineCurveFormPolyline:
+				strCurveForm = L"Polyline";
+				break;
+
+			case kA3DBSplineCurveFormCircularArc:
+				strCurveForm = L"CircularArc";
+				break;
+
+			case kA3DBSplineCurveFormEllipticArc:
+				strCurveForm = L"EllipticArc";
+				break;
+
+			case kA3DBSplineCurveFormParabolicArc:
+				strCurveForm = L"ParabolicArc";
+				break;
+
+			case kA3DBSplineCurveFormHyperbolicArc:
+				strCurveForm = L"HyperbolicArc";
+				break;
+		}
+
+		Write(L"KnotType: %s, CurveForm: %s", strKnotType, strCurveForm);
+		Write(L"Degree: %d, Control Point Count: %d", nDegree, nCtrlSize);
+
+		IncreaseTabIndex();
+		{
+#ifdef _LOG_NURBS_CURVE_DETAIL_LOG_
+			for (A3DUns32 nIndex = 0; nIndex < cCrvNurbsData.m_uiCtrlSize; nIndex++) {
+				CString strText;
+				strText.Format(L"Po [%d]: ", nIndex);
+				A3DVector3dDataUVLog(cCrvNurbsData.m_pCtrlPts[nIndex], strText, m_dTopoContextScale);
+			}
+
+			for (A3DUns32 nIndex = 0; nIndex < cCrvNurbsData.m_uiKnotSize; nIndex++) {
+				Log(L"Knot [%d]: %s", nIndex, DblStr(cCrvNurbsData.m_pdKnots[nIndex]));
+			}
+
+			for (A3DUns32 nIndex = 0; nIndex < cCrvNurbsData.m_uiWeightSize; nIndex++) {
+				Log(L"Weight [%d]: %s", nIndex, DblStr(cCrvNurbsData.m_pdWeights[nIndex]));
+			}
+#else
+			CString strText;
+			A3DUns32 nIndex = 0;
+			strText.Format(L"Po [%d]: ", nIndex);
+			A3DVector3dDataUVLog(cCrvNurbsData.m_pCtrlPts[nIndex], strText, TOPO_CONTEXT_SCALE, 1, 1);
+
+			nIndex = cCrvNurbsData.m_uiCtrlSize - 1;
+			strText.Format(L"Po [%d]: ", nIndex);
+			A3DVector3dDataUVLog(cCrvNurbsData.m_pCtrlPts[nIndex], strText, TOPO_CONTEXT_SCALE, 1, 1);
+#endif
+		}
+		DecreaseTabIndex();
+	}
+	DecreaseTabIndex();
+}
+
+void Log::A3DTopoVertexLog(const A3DTopoVertex * topoVertex)
+{
+	if(nullptr == topoVertex) {
+		Write(L"Vertex: NULL");
+		return;
+	}
+
+	A3DEEntityType type = kA3DTypeUnknown;
+	A3DEntityGetType(topoVertex, &type);
 
 	double x = 0.0, y = 0.0, z = 0.0;
 
 	CString strVertexType = L"Vertex Error";
 
-	double m_dTopoContextScale = 1.0;
+	double scale = 1.0;
 
-	switch (eType)
+	switch (type)
 	{
 		case kA3DTypeTopoUniqueVertex:
 		{
-			A3DTopoUniqueVertexData cTopoUniqueVertexData;
-			A3D_INITIALIZE_DATA(A3DTopoUniqueVertexData, cTopoUniqueVertexData);
-			if (A3D_SUCCESS == A3DTopoUniqueVertexGet(pcTopoVertex, &cTopoUniqueVertexData)) {
-				x = cTopoUniqueVertexData.m_sPoint.m_dX * m_dTopoContextScale;
-				y = cTopoUniqueVertexData.m_sPoint.m_dY * m_dTopoContextScale;
-				z = cTopoUniqueVertexData.m_sPoint.m_dZ * m_dTopoContextScale;
+			A3DTopoUniqueVertexData topoUniqueVertexData;
+			A3D_INITIALIZE_DATA(A3DTopoUniqueVertexData, topoUniqueVertexData);
+			if (A3D_SUCCESS == A3DTopoUniqueVertexGet(topoVertex, &topoUniqueVertexData)) {
+				x = topoUniqueVertexData.m_sPoint.m_dX * scale;
+				y = topoUniqueVertexData.m_sPoint.m_dY * scale;
+				z = topoUniqueVertexData.m_sPoint.m_dZ * scale;
 
-				A3DTopoUniqueVertexGet(nullptr, &cTopoUniqueVertexData);
+				A3DTopoUniqueVertexGet(nullptr, &topoUniqueVertexData);
 
 				strVertexType = L"UniqueVertex";
 			}
@@ -1802,24 +2028,116 @@ void Log::A3DTopoVertexLog(const A3DTopoVertex * pcTopoVertex)
 
 		case kA3DTypeTopoMultipleVertex:
 		{
-			A3DTopoMultipleVertexData cMultipleVertexData;
-			A3D_INITIALIZE_DATA(A3DTopoMultipleVertexData, cMultipleVertexData);
-			if (A3D_SUCCESS == A3DTopoMultipleVertexGet(pcTopoVertex, &cMultipleVertexData)) {
-				if (0 != cMultipleVertexData.m_uiSize) {
-					x = cMultipleVertexData.m_pPts[0].m_dX * m_dTopoContextScale;
-					y = cMultipleVertexData.m_pPts[0].m_dY * m_dTopoContextScale;
-					z = cMultipleVertexData.m_pPts[0].m_dZ * m_dTopoContextScale;
+			A3DTopoMultipleVertexData multipleVertexData;
+			A3D_INITIALIZE_DATA(A3DTopoMultipleVertexData, multipleVertexData);
+			if (A3D_SUCCESS == A3DTopoMultipleVertexGet(topoVertex, &multipleVertexData)) {
+				if (0 != multipleVertexData.m_uiSize) {
+					x = multipleVertexData.m_pPts[0].m_dX * scale;
+					y = multipleVertexData.m_pPts[0].m_dY * scale;
+					z = multipleVertexData.m_pPts[0].m_dZ * scale;
 				}
 
-				A3DTopoMultipleVertexGet(nullptr, &cMultipleVertexData);
+				A3DTopoMultipleVertexGet(nullptr, &multipleVertexData);
 
-				strVertexType.Format(L"MultipleVertex [%d]", cMultipleVertexData.m_uiSize);
+				strVertexType.Format(L"MultipleVertex [%d]", multipleVertexData.m_uiSize);
 			}
 		}
 		break;
 	}
 
-	Write(L"%s: %s, %s,%s,%s", strVertexType, HexStr((DWORD_PTR) pcTopoVertex), DblStr(x), DblStr(y), DblStr(z));
+	Write(L"%s: %s, %s,%s,%s", strVertexType, HexStr((DWORD_PTR) topoVertex), DblStr(x), DblStr(y), DblStr(z));
+}
+
+// == 기타 요소 관련 함수 =============================================================================
+CString Log::GetKnotTypeString(A3DEKnotType knotType)
+{
+	CString typeText;
+
+	switch (knotType) {
+		case kA3DKnotTypeUniformKnots:
+			typeText = L"Uniform";
+			break;
+
+		case kA3DKnotTypeUnspecified:
+			typeText = L"Unspecified";
+			break;
+
+		case kA3DKnotTypeQuasiUniformKnots:
+			typeText = L"Quasi-uniform";
+			break;
+
+		case kA3DKnotTypePieceWiseBezierKnots:
+			typeText = L"PieceWiseBezier"; // Extrema with multiplicities of degree + 1, internal is degree.
+			break;
+	}
+
+	return typeText;
+}
+
+void Log::A3DMiscCartesianTransformationDataLog(A3DMiscCartesianTransformationData & trans)
+{
+	Write(L"Origin: %s, X Vector: %s, Y Vector: %s, Scale: %s", GetVector3dDataString(trans.m_sOrigin), GetVector3dDataString(trans.m_sXVector), GetVector3dDataString(trans.m_sYVector), GetVector3dDataString(trans.m_sScale));
+}
+
+void Log::A3DVector3dDataLog(const A3DVector3dData & vector, CString prevText, double scale)
+{
+	CString strNumberText;
+	strNumberText.Format(L"%s, %s, %s", DblStr(vector.m_dX * scale), DblStr(vector.m_dY * scale),
+		DblStr(vector.m_dZ * scale));
+
+	if (true == prevText.IsEmpty()) {
+		Write(strNumberText);
+	}
+	else {
+		Write(L"%s%s", prevText, strNumberText);
+	}
+}
+
+void Log::A3DVector3dDataUVLog(const A3DVector3dData & vector, CString prevText, double scale, double uSurfCoeff, double vSurfCoeff)
+{
+	CString strNumberText;
+	strNumberText.Format(L"%s, %s (%s, %s)", DblStr(vector.m_dX * scale * uSurfCoeff), DblStr(vector.m_dY * scale * vSurfCoeff),
+		DblStr(vector.m_dX), DblStr(vector.m_dY));
+
+	if (true == prevText.IsEmpty()) {
+		Write(strNumberText);
+	}
+	else {
+		Write(L"%s%s", prevText, strNumberText);
+	}
+}
+
+void Log::A3DVector2dDataLog(const A3DVector2dData & vector, CString prevText, double scale)
+{
+	CString numberText;
+	numberText.Format(L"%s, %s", DblStr(vector.m_dX * scale), DblStr(vector.m_dY * scale));
+
+	if (true == prevText.IsEmpty()) {
+		Write(numberText);
+	}
+	else {
+		Write(L"%s%s", prevText, numberText);
+	}
+}
+
+void Log::A3DParameterizationDataLog(const A3DParameterizationData & param)
+{
+	Write(L"Interval Max/Min: %s, %s, Coeff A: %s, Coeff B: %s", DblStr(param.m_sInterval.m_dMax), DblStr(param.m_sInterval.m_dMin), DblStr(param.m_dCoeffA), DblStr(param.m_dCoeffB));
+}
+
+void Log::A3DUVParameterizationDataLog(const A3DUVParameterizationData & param)
+{
+	Write(L"SwapUV: %s, UA,UB Coeff: %s, %s, VA,VB Coeff: %s, %s", BoolStr(param.m_bSwapUV), DblStr(param.m_dUCoeffA), DblStr(param.m_dUCoeffB), DblStr(param.m_dVCoeffA), DblStr(param.m_dVCoeffB));
+
+	A3DDomainDataLog(param.m_sUVDomain);
+}
+
+void Log::A3DDomainDataLog(const A3DDomainData & domainData)
+{
+	CString numberText;
+	numberText.Format(L"Domain Max: %s, %s, Min: %s, %s", DblStr(domainData.m_sMax.m_dX), DblStr(domainData.m_sMax.m_dY), DblStr(domainData.m_sMin.m_dX), DblStr(domainData.m_sMin.m_dY));
+
+	Write(numberText);
 }
 
 #else
@@ -1888,4 +2206,15 @@ void Log::A3DTopoLoopLog(const A3DTopoLoop * pcTopoLoop, A3DUns32 nLoopIndex, A3
 void Log::A3DTopoCoEdgeLog(const A3DTopoCoEdge * pcTopoCoEdge, A3DUns32 nEdgeIndex) {}
 void Log::A3DTopoEdgeLog(const A3DTopoEdge * pcTopoEdge) {}
 void Log::A3DTopoVertexLog(const A3DTopoVertex * pcTopoVertex) {}
+
+void Log::A3DSurfBaseLog(const A3DSurfBase * pcSurfBase) {}
+void Log::A3DSurfPlaneLog(const A3DSurfBase * pcSurfBase) {}
+void Log::A3DSurfCylinderLog(const A3DSurfBase * pcSurfBase) {}
+void Log::A3DSurfTorusLog(const A3DSurfBase * pcSurfBase) {}
+
+// == Curve 관련 함수 ============================================================================
+void Log::A3DCrvBaseLog(const A3DCrvBase * pcCrvBase) {}
+void Log::A3DCrvCircleLog(const A3DCrvBase * pcCrvBase) {}
+void Log::A3DCrvNurbsLog(const A3DCrvBase * pcCrvBase) {}
+
 #endif

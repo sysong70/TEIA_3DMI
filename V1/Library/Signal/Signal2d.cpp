@@ -881,12 +881,15 @@ void SgnDelivery2d::SetSender(void (*func)(const wchar_t*))
 
 void SgnDelivery2d::SendData(Json::Object& data)
 {
+	// #2D_ODA
+/*
 	if (SendSignal != nullptr) {
 		SendSignal(data.ToString().GetBuffer());
 	}
 	else {
 		DEBUG_STOP;
 	}
+*/
 }
 
 //**************************************************************************************************

@@ -5,6 +5,7 @@
 #include "Am.Object.h"
 #include "Am.Kit.h"
 
+#include "Am.Box.h"
 #include "Am.Cylinder.h"
 
 namespace AM
@@ -44,11 +45,15 @@ namespace AM
 		Template(Template &&) noexcept = default;
 		Template & operator=(Template &&) noexcept = default;
 
+		Result writeDatal(std::ostream * os) noexcept override;
+
 		Template & set(TemplateKit const & kit);
 
 		Template & setDescription(std::string_view description);
 
 		Template & setProperty(std::string_view property);
+
+		Box insertBox(BoxKit const & kit);
 
 		Cylinder insertCylinder(CylinderKit const & kit);
 	};

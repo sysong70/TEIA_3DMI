@@ -338,20 +338,45 @@ CStringA Dmi3dx::GetA3dEntityTypeString(A3DEEntityType eType)
 			strText = "SurfBlend03";
 			break;
 
-		case kA3DTypeSurfOffset:
+
+		case kA3DTypeSurfNurbs: // 80
+			strText = "SurfNurbs";
+			break;
+
+		case kA3DTypeSurfCone: // 81
+			strText = "SurfCone";
+			break;
+
+		case kA3DTypeSurfCylinder: // 82
+			strText = "SurfCylinder";
+			break;
+
+		case kA3DTypeSurfCylindrical: // 83
+			strText = "SurfCylindrical";
+			break;
+
+		case kA3DTypeSurfOffset: // 84
 			strText = "SurfOffset";
 			break;
 
-		case kA3DTypeSurfRuled:
+		case kA3DTypeSurfRuled: // 87
 			strText = "SurfRuled";
 			break;
 
-		case kA3DTypeSurfRevolution:
+		case kA3DTypeSurfRevolution: // 89
 			strText = "SurfRevolution";
 			break;
 
-		case kA3DTypeSurfExtrusion:
+		case kA3DTypeSurfExtrusion: // 90
 			strText = "SurfExtrusion";
+			break;
+
+		case kA3DTypeSurfFromCurves: // 91
+			strText = "SurfFromCurves";
+			break;
+
+		case kA3DTypeSurfTorus: // 92
+			strText = "SurfTorus";
 			break;
 
 		case kA3DTypeAsmProductOccurrence:

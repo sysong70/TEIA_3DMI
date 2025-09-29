@@ -63,6 +63,17 @@ CylinderKit & AM::CylinderKit::setProductHint(std::string_view productHint)
 //== Cylinder class ================================================================================
 AM::Cylinder::Cylinder() = default;
 
+Result AM::Cylinder::writeDatal(std::ostream * os) noexcept
+{
+	auto * impl = ENSURE_IMPL(Cylinder);
+	if (nullptr == impl) {
+		return Result::Fail(Error::NotInitialized, "Cylinder implementation is not valid.");
+	}
+
+	return impl->writeDatal(os);
+}
+
+
 Cylinder & AM::Cylinder::set(CylinderKit const & kit)
 {
 	auto * impl = ENSURE_IMPL(Cylinder);

@@ -3,6 +3,7 @@
 #include "Am.Object.h"
 
 #include "Impl/AM.Impl.h"
+#include "Impl/AM.Object.Impl.h"
 
 using namespace AM;
 
@@ -42,11 +43,17 @@ AM::Type AM::Object::Type() const
 	return m_impl->Type();
 }
 
-Result AM::Object::Bind(std::ostream * os) noexcept
+
+Result AM::Object::writeDatal(std::ostream * os) noexcept
 {
-	if (nullptr == m_impl) {
-		return Result::Fail(Error::NotInitialized, "No implementation.");
+	if (nullptr == os) {
+		return Result::Fail(Error::InvalidArgument, "ostream is null.");
 	}
 
-	return m_impl->Bind(os);
+	auto * impl = ENSURE_IMPL(Object);
+	if (nullptr == impl) {
+		return Result::Fail(Error::NotInitialized, "Object implementation is not valid.");
+	}
+
+	return impl->writeDatal(os);
 }

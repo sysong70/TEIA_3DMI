@@ -3,6 +3,7 @@
 #include "../AM.h"
 
 #include "Am.Impl.h"
+#include "Am.Object.Impl.h"
 
 namespace AM  
 {
@@ -11,11 +12,9 @@ namespace AM
 	public:
 		TemplateKitImpl();
 
-		// 복사 금지
 		TemplateKitImpl(const TemplateKitImpl &) = default;
 		TemplateKitImpl & operator=(const TemplateKitImpl &) = default;
 
-		// 이동 허용
 		TemplateKitImpl(TemplateKitImpl &&) noexcept = default;
 		TemplateKitImpl & operator=(TemplateKitImpl &&) noexcept = default;
 
@@ -28,12 +27,14 @@ namespace AM
 		std::vector<std::unique_ptr<AM::Geometry>> m_geometries;
 	};
 
-	class TemplateImpl : public Impl
+	class TemplateImpl : public ObjectImpl
 	{
 	public:
 		TemplateImpl();
 
 		std::unique_ptr<Impl> Clone() const override;
+
+		Result writeDatal(std::ostream * os) noexcept override;
 
 		TemplateKitImpl m_kit;
 	};

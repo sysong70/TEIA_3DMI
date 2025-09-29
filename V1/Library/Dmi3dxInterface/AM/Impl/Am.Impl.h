@@ -38,8 +38,7 @@
     DEBUG_VALID(varName)
 
 #define INIT_IMPL(ClassName) \
-	m_pcImpl = std::make_unique<ClassName##Impl>(); \
-	DEBUG_VALID(m_pcImpl)
+	AM::Impl::setImpl(*this, std::make_unique<ClassName##Impl>());
 
 #define CLONE_IMPL(ClassName) \
 	auto impl = std::make_unique<ClassName>(); \
@@ -80,31 +79,8 @@ namespace AM
 		AM::Type Type() const noexcept { return m_type; }
 		void SetType(AM::Type type) { m_type = type; }
 
-		Result Bind(std::ostream * os) noexcept;
-
 	private:
 		AM::Type m_type = AM::Type::None;
-		std::ostream * m_os = nullptr;
 	};
-
-	#define AM_IMPL_COMMON(Derived, EnumType)                                \
-		Derived() { this->SetType(EnumType); }                               \
-		Derived(Derived const&) = default;                                   \
-		std::unique_ptr<AM::Impl> Clone() const override {                   \
-			return std::make_unique<Derived>(*this);                         \
-		}
-
-	template <class ImplT, class ObjT>
-	ImplT & ensureImpl(ObjT & obj) {
-		if (auto * p = static_cast<ImplT *>(Impl::getImpl(obj).get()))
-			return *p;
-		Impl::setImpl(obj, std::make_unique<ImplT>());
-		return *static_cast<ImplT *>(Impl::getImpl(obj).get());
-	}
-
-	template <class ImplT, class ObjT>
-	const ImplT * peekImpl(const ObjT & obj) noexcept {
-		return static_cast<const ImplT *>(Impl::getImpl(obj).get());
-	}
 }
 

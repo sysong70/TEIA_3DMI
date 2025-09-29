@@ -199,6 +199,9 @@
     <ClCompile Include="AM\Impl\Am.Loop.Impl.cpp">
       <Filter>AM\Impl</Filter>
     </ClCompile>
+    <ClCompile Include="AM\Impl\Am.Object.Impl.cpp">
+      <Filter>AM\Impl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\Common_Define.h">
@@ -409,6 +412,9 @@
       <Filter>AM</Filter>
     </ClInclude>
     <ClInclude Include="AM\Impl\Am.Loop.Impl.h">
+      <Filter>AM\Impl</Filter>
+    </ClInclude>
+    <ClInclude Include="AM\Impl\Am.Object.Impl.h">
       <Filter>AM\Impl</Filter>
     </ClInclude>
   </ItemGroup>

@@ -22,14 +22,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <UseOfMfc>Dynamic</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -162,6 +162,7 @@
     <ClInclude Include="AM\Impl\Am.Extrusion.Impl.h" />
     <ClInclude Include="AM\Impl\Am.Impl.h" />
     <ClInclude Include="AM\Impl\Am.Loop.Impl.h" />
+    <ClInclude Include="AM\Impl\Am.Object.Impl.h" />
     <ClInclude Include="AM\Impl\Am.Template.Impl.h" />
     <ClInclude Include="AM\Impl\Am.Vertex.Impl.h" />
     <ClInclude Include="C3dTracer.h" />
@@ -229,6 +230,7 @@
     <ClCompile Include="AM\Impl\Am.Extrusion.Impl.cpp" />
     <ClCompile Include="AM\Impl\Am.Impl.cpp" />
     <ClCompile Include="AM\Impl\Am.Loop.Impl.cpp" />
+    <ClCompile Include="AM\Impl\Am.Object.Impl.cpp" />
     <ClCompile Include="AM\Impl\Am.Template.Impl.cpp" />
     <ClCompile Include="AM\Impl\Am.Vertex.Impl.cpp" />
     <ClCompile Include="C3dTracer.cpp" />

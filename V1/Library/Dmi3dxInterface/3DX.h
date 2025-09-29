@@ -13,14 +13,20 @@ enum class Error {
 	StateError,
 	NotInitialized,
 	Internal,
+	WriteFailed,
+	AnalysisFailed
 };
 
 struct Result {
 	Error code { Error::None };
 	std::string message {};
 
-	constexpr explicit operator bool() const noexcept {
-		return code == Error::None;
+	friend bool operator ==(const Result & lhs, const Result & rhs) noexcept {
+		return lhs.code == rhs.code;
+	}
+
+	friend bool operator !=(const Result & lhs, const Result & rhs) noexcept {
+		return lhs.code != rhs.code;
 	}
 
 	static Result Ok() noexcept {

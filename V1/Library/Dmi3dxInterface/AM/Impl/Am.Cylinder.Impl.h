@@ -3,6 +3,7 @@
 #include "../AM.h"
 
 #include "Am.Impl.h"
+#include "Am.Object.Impl.h"
 
 namespace AM  
 {
@@ -21,12 +22,14 @@ namespace AM
 		std::string_view m_productHint;
 	};
 
-	class CylinderImpl : public Impl
+	class CylinderImpl : public ObjectImpl
 	{
 	public:
 		CylinderImpl();
 
 		std::unique_ptr<Impl> Clone() const override;
+
+		Result writeDatal(std::ostream * os) noexcept override;
 
 		CylinderKitImpl m_kit;
 	};

@@ -360,7 +360,8 @@ BOOL WndApplication::InitInstance()
 	else {
 		RETURN_FALSE;
 	}
-
+	// #2D_ODA
+/* 
 	if (Cnt2d::Initialize()) {
 		//:Ken -20250128
 		Cnt2d::SetLanguage((int)language);
@@ -376,6 +377,7 @@ BOOL WndApplication::InitInstance()
 	else {
 		RETURN_FALSE;
 	}
+*/
 
 #pragma endregion // REGION
 

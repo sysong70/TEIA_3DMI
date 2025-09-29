@@ -68,7 +68,7 @@ namespace Log
 	CStringA GetAnchorPointTypeString(EA3DMDAnchorPointType cInType);
 	CStringA GetLeaderSymbolTypeString(A3DMDLeaderSymbolType cInType);
 
-	//== Topology Log Functions ===================================================================
+	//== Topology Log Functions ====================================================================
 	void A3DTopoBrepDataLog(const A3DTopoBrepData * pcInBrepData);
 	void A3DTopoConnexLog(A3DTopoConnex * pcInTopoConnex, A3DUns32 nInIndex);
 	void A3DTopoShellLog(const A3DTopoShell * pcInTopoShell, A3DUns32 nInIndex);
@@ -77,4 +77,27 @@ namespace Log
 	void A3DTopoCoEdgeLog(const A3DTopoCoEdge * pcTopoCoEdge, A3DUns32 nEdgeIndex);
 	void A3DTopoEdgeLog(const A3DTopoEdge * pcTopoEdge);
 	void A3DTopoVertexLog(const A3DTopoVertex * pcTopoVertex);
+
+	// == Surface 관련 함수 ==========================================================================
+	void A3DSurfBaseLog(const A3DSurfBase * pcSurfBase);
+	void A3DSurfPlaneLog(const A3DSurfBase * pcSurfBase);
+	void A3DSurfCylinderLog(const A3DSurfBase * pcSurfBase);
+	void A3DSurfTorusLog(const A3DSurfBase * pcSurfBase);
+	void A3DSurfConeLog(const A3DSurfBase * pcSurfBase);
+
+	// == Curve 관련 함수 ============================================================================
+	void A3DCrvBaseLog(const A3DCrvBase * pcCrvBase);
+	void A3DCrvCircleLog(const A3DCrvBase * pcCrvBase);
+	void A3DCrvNurbsLog(const A3DCrvBase * pcCrvBase);
+
+	// == 기타 요소 관련 함수 =========================================================================
+	CString GetKnotTypeString(A3DEKnotType knotType);
+	void A3DMiscCartesianTransformationDataLog(A3DMiscCartesianTransformationData & trans);
+
+	void A3DVector3dDataLog(const A3DVector3dData & vector, CString prevText, double scale);
+	void A3DVector3dDataUVLog(const A3DVector3dData & vector, CString prevText, double scale, double uSurfCoeff, double vSurfCoeff);
+	void A3DVector2dDataLog(const A3DVector2dData & vector, CString prevText, double scale);
+	void A3DParameterizationDataLog(const A3DParameterizationData & param);
+	void A3DUVParameterizationDataLog(const A3DUVParameterizationData & param);
+	void A3DDomainDataLog(const A3DDomainData & domainData);
 }

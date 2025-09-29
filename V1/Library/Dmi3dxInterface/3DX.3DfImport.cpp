@@ -38,6 +38,8 @@
 #include <chrono>
 #include <utility>
 #include <memory>
+#include <string_view>
+#include <atlstr.h> 
 
 #include <A3DSDKIncludes.h>
 #include <A3DSDKMarkupDimension.h>
@@ -46,6 +48,7 @@
 
 #include <Signal.h>
 #include <Path.h>
+
 
 #include "3DX.Simplifier.h"
 #include "3DX.Log.h"
@@ -1571,6 +1574,63 @@ A3DStatus TdfImport::ParseRiSet(const A3DRiSet * pcInSet, const A3DMiscEntityRef
 	return A3D_SUCCESS;
 }
 
+std::wstring_view CStringWToWStringView(const CStringW & cstrW) noexcept
+{
+	// cstrW.GetString()은 const wchar_t*를 반환합니다.
+	return std::wstring_view(cstrW.GetString(), static_cast<size_t>(cstrW.GetLength()));
+}
+
+std::string WStringToUTF8(std::wstring_view wstrView) noexcept
+{
+	if (wstrView.empty()) {
+		return {};
+	}
+
+	const wchar_t * source = wstrView.data();
+	int sourceLen = static_cast<int>(wstrView.length());
+
+	// 1단계: 변환에 필요한 버퍼 크기 계산 (NULL 종료 문자 포함)
+	int requiredLen = ::WideCharToMultiByte(
+		CP_UTF8,                  // 대상 코드 페이지: UTF-8
+		0,                        // 플래그 (0)
+		source,                   // 원본 Wide String
+		sourceLen,                // 원본 길이 (NULL 제외)
+		nullptr,                  // 출력 버퍼 (길이 계산을 위해 nullptr)
+		0,                        // 출력 버퍼 크기 (0)
+		nullptr, nullptr          // 기본 문자/사용 플래그 (nullptr)
+	);
+
+	if (requiredLen == 0) {
+		// 변환 실패 (예: 잘못된 입력)
+		return {};
+	}
+
+	// 2단계: std::string 버퍼 할당 및 변환 수행
+	std::string utf8Str(requiredLen, 0); // 필요한 길이만큼 버퍼 할당
+
+	int convertedLen = ::WideCharToMultiByte(
+		CP_UTF8,
+		0,
+		source,
+		sourceLen,
+		utf8Str.data(),             // 출력 버퍼 포인터
+		requiredLen,
+		nullptr, nullptr
+	);
+
+	if (convertedLen == 0) {
+		// 변환 실패 (오류 코드를 얻어 로깅할 수 있음)
+		return {};
+	}
+
+	// 3단계: NULL 종료 문자를 제거하거나, string의 크기를 조정
+	// WideCharToMultiByte가 NULL 종료 문자를 포함하여 길이를 반환했으므로, 
+	// 실제 데이터 길이(sourceLen과 동일)로 string의 크기를 조정합니다.
+	utf8Str.resize(convertedLen);
+
+	return utf8Str;
+}
+
 // 2-1. Draw Ri Brep Model (B-Rep Model 및 Tessellation Model도 함께 처리된다.)
 A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcInRepItem, const A3DRiRepresentationItemData & cInRepItemData, const A3DMiscEntityReference * pcInEntityRef,
 	const A3DMiscCascadedAttributes * pcInAttr, const A3DMiscCascadedAttributesData & cInAttrData, H3DF::SegmentKey & cInSegment)
@@ -1607,8 +1667,14 @@ A3DStatus TdfImport::ParseRiBrepModel(const A3DRiRepresentationItem * pcInRepIte
 
 		// #AmDatalConvertTest: ExportBrep (AmDatal Converter)
 		if (true == m_bAmDatalConvertTest) {
+
+			char * pchBuffer = nullptr;
+			Dmi3dx::CStringToChar(m_strCadFileName, pchBuffer);
+
+			std::string_view utf8FileName = pchBuffer;
+
 			AM::DatalConverter cConverter;
-			bool bStatus = cConverter.ExportBrep(cBrepModelData.m_pBrepData, "m_strCadFileName");
+			bool bStatus = cConverter.ExportBrep(cBrepModelData.m_pBrepData, utf8FileName);
 		}
 
 		if (true == cSimplifier.Simplify()) {

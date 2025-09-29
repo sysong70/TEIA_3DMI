@@ -124,18 +124,25 @@ void A3dTracer::A3DTopoEdgeLog(const A3DTopoEdge * pcTopoEdge, A3DUns32 nFaceInd
 
 	IncreaseLogTab();
 
-	A3DTopoEdgeData cTopoEdgeData;
-	A3D_INITIALIZE_DATA(A3DTopoEdgeData, cTopoEdgeData);
-	A3DStatus eResult = A3DTopoEdgeGet(pcTopoEdge, &cTopoEdgeData);
+	A3DTopoEdgeData topoEdgeData;
+	A3D_INITIALIZE_DATA(A3DTopoEdgeData, topoEdgeData);
+	A3DStatus eResult = A3DTopoEdgeGet(pcTopoEdge, &topoEdgeData);
 	if (A3D_SUCCESS == eResult) {
-		Log(L"3D space curve: %s", HexStr((DWORD_PTR) cTopoEdgeData.m_p3dCurve));
+		Log(L"3D space curve: %s", HexStr((DWORD_PTR) topoEdgeData.m_p3dCurve));
+
+		IncreaseLogTab();
+		{
+			A3DCrvBaseLog(topoEdgeData.m_p3dCurve);
+		}
+		DecreaseLogTab();
+
 		// 		Log(L"HasTrimDomain: %s, Tolerance: %s", BoolStr((bool) cTopoEdgeData.m_bHasTrimDomain), DblStr(cTopoEdgeData.m_dTolerance));
 		// 		Log(L"Interval: %s,%s", DblStr(cTopoEdgeData.m_sInterval.m_dMin), DblStr(cTopoEdgeData.m_sInterval.m_dMax));
 
-		A3DTopoVertexLog(cTopoEdgeData.m_pStartVertex);
-		A3DTopoVertexLog(cTopoEdgeData.m_pEndVertex);
+		A3DTopoVertexLog(topoEdgeData.m_pStartVertex);
+		A3DTopoVertexLog(topoEdgeData.m_pEndVertex);
 
-		A3DTopoEdgeGet(nullptr, &cTopoEdgeData);
+		A3DTopoEdgeGet(nullptr, &topoEdgeData);
 	}
 
 	DecreaseLogTab();

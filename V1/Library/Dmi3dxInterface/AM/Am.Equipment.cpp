@@ -38,18 +38,31 @@ Equipment & AM::Equipment::setBuiltIn(bool builtIn)
 	return *this;
 }
 
-AM::Template AM::Equipment::insertTemplate(TemplateKit const & kit)
+Result AM::Equipment::writeDatal(std::ostream * os) noexcept
 {
-	AM::Template templ;
-
+	// ENSURE_IMPL을 사용하여 Impl 객체가 유효함을 보장하고 포인터를 얻습니다.
 	auto * impl = ENSURE_IMPL(Equipment);
 	if (nullptr == impl) {
-		return templ;
+		// Impl 확보 실패 시 에러 반환 (DEBUG_STOP이 걸리지 않았다면)
+		return Result::Fail(Error::NotInitialized, "Equipment implementation is not valid.");
 	}
 
-	templ.set(kit);
-	
-	impl->m_templates.push_back(templ);
+	return impl->writeDatal(os);
+}
 
-	return templ;
+AM::Template & AM::Equipment::insertTemplate(TemplateKit const & kit)
+{
+	auto * impl = ENSURE_IMPL(Equipment);
+	if (nullptr == impl) {
+		DEBUG_STOP;
+	}
+
+	auto templ = std::make_unique<Template>();
+	templ->set(kit);
+
+	Template * returnTemplate = templ.get();
+
+	impl->m_templates.emplace_back(std::move(templ));
+
+	return *returnTemplate;
 }

@@ -3,6 +3,7 @@
 #include "../AM.h"
 
 #include "Am.Impl.h"
+#include "Am.Object.Impl.h"
 
 namespace AM  
 {
@@ -18,12 +19,14 @@ namespace AM
 		H3DF::DVector m_size;
 	};
 
-	class BoxImpl : public Impl
+	class BoxImpl : public ObjectImpl
 	{
 	public:
 		BoxImpl();
 
 		std::unique_ptr<Impl> Clone() const override;
+
+		Result writeDatal(std::ostream * os) noexcept override;
 
 		BoxKitImpl m_kit;
 	};

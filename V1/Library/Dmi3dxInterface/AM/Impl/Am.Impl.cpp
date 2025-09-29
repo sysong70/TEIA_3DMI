@@ -15,24 +15,3 @@ bool AM::Impl::Equal(const Impl * pcInThat) const
 
 	return true;
 }
-
-Result AM::Impl::Bind(std::ostream * os) noexcept
-{
-	if (nullptr == os) {
-		return Result::Fail(Error::InvalidArgument, "DatalWriter::Bind: os is null");
-	}
-
-	m_os = os;
-
-	return Result::Ok();
-}
-
-//== Impl Factory ==================================================================================
-
-template <typename ImplT>
-std::unique_ptr<ImplT> InitImpl()
-{
-	auto impl = std::make_unique<ImplT>();
-	DEBUG_VALID(impl.get());
-	return impl;
-}

@@ -19,8 +19,9 @@ namespace AM
 
 		Equipment & setBuiltIn(bool builtIn);
 
+		Result writeDatal(std::ostream * os) noexcept override;
 
 		//== Template ==============================================================================
-		Template insertTemplate(TemplateKit const & kit);
+		Template & insertTemplate(TemplateKit const & kit);
 	};
 }

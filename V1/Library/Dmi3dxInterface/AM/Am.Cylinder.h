@@ -37,6 +37,8 @@ namespace AM
 		Cylinder(Cylinder &&) noexcept = default;
 		Cylinder & operator=(Cylinder &&) noexcept = default;
 
+		Result writeDatal(std::ostream * os) noexcept override;
+
 		Cylinder & set(CylinderKit const & kit);
 
 		Cylinder & setPosition(const H3DF::DPoint & position);
